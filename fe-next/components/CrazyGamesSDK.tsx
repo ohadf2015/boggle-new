@@ -142,7 +142,7 @@ export function CrazyGamesProvider({ children }: { children: ReactNode }) {
   }, [isAvailable]);
 
   const happyTime = useCallback(() => {
-    if (isAvailable && window.CrazyGames?.SDK) window.CrazyGames.SDK.game.happyTime();
+    if (isAvailable && window.CrazyGames?.SDK?.game?.happyTime) window.CrazyGames.SDK.game.happyTime();
   }, [isAvailable]);
 
   // Ad handlers

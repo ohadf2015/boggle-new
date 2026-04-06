@@ -11,13 +11,19 @@
 
 'use client';
 
-import { memo, useMemo, useState } from 'react';
+import { memo, useMemo, useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import { Swords, Trophy, Clock, Star, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
+import { useAdPlacement } from '@/hooks/useAdPlacement';
+import { useCrazyGamesAds } from '@/hooks/useCrazyGamesAds';
+import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { getBossConfig } from '@/lib/adventure/bossConfig';
 import type { BossRushState } from './hooks/useBossRush';
+
+const CrazyGamesBanner = dynamic(() => import('@/components/CrazyGamesBanner'), { ssr: false });
 
 // ==============================================
 // TYPES
@@ -50,6 +56,19 @@ const BossRushResults = memo<BossRushResultsProps>(({ state, onRetry, onExit }) 
   // Capture end time once on mount to avoid impure Date.now() in render
   const [endTime] = useState(() => Date.now());
   const elapsed = endTime - state.startTime;
+
+  const { showInterstitial } = useAdPlacement();
+  const { requestMidgameAd } = useCrazyGamesAds();
+  const { submitLeaderboardScore } = useCrazyGames();
+
+  // Ads + leaderboard on mount
+  useEffect(() => {
+    showInterstitial('boss-rush-complete');
+    requestMidgameAd();
+    if (state.totalScore > 0) {
+      submitLeaderboardScore(state.totalScore);
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const bossIcons = useMemo(() => {
     return state.defeatedBosses.map((worldId, i) => {
@@ -146,6 +165,14 @@ const BossRushResults = memo<BossRushResultsProps>(({ state, onRetry, onExit }) 
               {formatTime(elapsed)}
             </span>
           </div>
+        </div>
+
+        {/* Banner Ad */}
+        <div className="hidden md:block mb-4">
+          <CrazyGamesBanner size="728x90" />
+        </div>
+        <div className="md:hidden mb-4">
+          <CrazyGamesBanner size="320x50" />
         </div>
 
         {/* Action buttons */}

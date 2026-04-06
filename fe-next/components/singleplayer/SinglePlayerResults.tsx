@@ -24,6 +24,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAdPlacement } from '@/hooks/useAdPlacement';
 import { useCrazyGamesAds } from '@/hooks/useCrazyGamesAds';
+import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useWinStreak } from '@/hooks/useWinStreak';
 import { useIsDesktop } from '@/hooks/useDesktopLayout';
 import { fireConfetti } from '@/utils/confettiUtils';
@@ -104,10 +105,14 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   const isDesktop = useIsDesktop();
   const { showInterstitial } = useAdPlacement();
   const { requestMidgameAd } = useCrazyGamesAds();
+  const { submitLeaderboardScore } = useCrazyGames();
 
   useEffect(() => {
     showInterstitial('singleplayer-complete');
     requestMidgameAd();
+    if (results.playerScore > 0) {
+      submitLeaderboardScore(results.playerScore);
+    }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const nextStepMode: NextStepMode = mode === 'practice' ? 'practice' : 'solo-bots';

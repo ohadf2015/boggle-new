@@ -40,9 +40,9 @@ interface LightningBolt {
 
 // ─── Constants ─────────────────────────────────────────────────────────
 
-const SNOW_COUNT = 80;
-const METEOR_INTERVAL_MS = 400;
-const LIGHTNING_INTERVAL_MS = 600;
+const SNOW_COUNT = 120;
+const METEOR_INTERVAL_MS = 350;
+const LIGHTNING_INTERVAL_MS = 500;
 
 // ─── Component ─────────────────────────────────────────────────────────
 
@@ -65,20 +65,22 @@ export const RoundEventCanvas = memo<RoundEventCanvasProps>(function RoundEventC
     const particles = particlesRef.current;
     if (particles.length >= SNOW_COUNT) return;
 
-    const count = Math.min(4, SNOW_COUNT - particles.length);
+    const count = Math.min(6, SNOW_COUNT - particles.length);
     for (let i = 0; i < count; i++) {
+      // Mix of small fast flakes and large slow floaters
+      const isLarge = Math.random() > 0.7;
       particles.push({
         x: Math.random() * w,
-        y: -10 - Math.random() * 40,
-        vx: (Math.random() - 0.5) * 1.2,
-        vy: 1 + Math.random() * 2,
-        size: 2 + Math.random() * 4,
-        opacity: 0.4 + Math.random() * 0.6,
+        y: -10 - Math.random() * 60,
+        vx: (Math.random() - 0.5) * (isLarge ? 0.8 : 1.5),
+        vy: isLarge ? (0.6 + Math.random() * 1.2) : (1.5 + Math.random() * 2.5),
+        size: isLarge ? (5 + Math.random() * 4) : (1.5 + Math.random() * 3),
+        opacity: isLarge ? (0.3 + Math.random() * 0.4) : (0.5 + Math.random() * 0.5),
         life: 0,
         maxLife: 999,
-        color: '#ffffff',
+        color: isLarge ? '#e0f0ff' : '#ffffff',
         rotation: Math.random() * Math.PI * 2,
-        rotationSpeed: (Math.random() - 0.5) * 0.04,
+        rotationSpeed: (Math.random() - 0.5) * (isLarge ? 0.02 : 0.05),
       });
     }
   }, []);
@@ -144,23 +146,46 @@ export const RoundEventCanvas = memo<RoundEventCanvasProps>(function RoundEventC
     ctx.save();
     ctx.translate(p.x, p.y);
     ctx.rotate(p.rotation);
-    ctx.globalAlpha = p.opacity * fadeOpacityRef.current;
+    const alpha = p.opacity * fadeOpacityRef.current;
+    ctx.globalAlpha = alpha;
 
-    // Draw a 6-pointed snowflake
+    // Glow for larger flakes
+    if (p.size > 5) {
+      ctx.shadowColor = 'rgba(150, 200, 255, 0.6)';
+      ctx.shadowBlur = 8;
+    }
+
+    // Draw a 6-pointed snowflake with branch tips
     ctx.strokeStyle = p.color;
-    ctx.lineWidth = 1;
+    ctx.lineWidth = p.size > 5 ? 1.2 : 0.8;
+    ctx.lineCap = 'round';
     ctx.beginPath();
     for (let i = 0; i < 6; i++) {
       const angle = (i * Math.PI) / 3;
+      const ax = Math.cos(angle) * p.size;
+      const ay = Math.sin(angle) * p.size;
       ctx.moveTo(0, 0);
-      ctx.lineTo(Math.cos(angle) * p.size, Math.sin(angle) * p.size);
+      ctx.lineTo(ax, ay);
+      // Small branch tips for larger flakes
+      if (p.size > 4) {
+        const mid = 0.55;
+        const mx = ax * mid;
+        const my = ay * mid;
+        const branchLen = p.size * 0.35;
+        const perpAngle = angle + Math.PI / 4;
+        ctx.moveTo(mx, my);
+        ctx.lineTo(mx + Math.cos(perpAngle) * branchLen, my + Math.sin(perpAngle) * branchLen);
+        ctx.moveTo(mx, my);
+        ctx.lineTo(mx + Math.cos(perpAngle + Math.PI / 2) * branchLen, my + Math.sin(perpAngle + Math.PI / 2) * branchLen);
+      }
     }
     ctx.stroke();
 
     // Center dot
+    ctx.shadowBlur = 0;
     ctx.fillStyle = p.color;
     ctx.beginPath();
-    ctx.arc(0, 0, 1, 0, Math.PI * 2);
+    ctx.arc(0, 0, p.size > 5 ? 1.5 : 0.8, 0, Math.PI * 2);
     ctx.fill();
 
     ctx.restore();
@@ -307,7 +332,7 @@ export const RoundEventCanvas = memo<RoundEventCanvasProps>(function RoundEventC
       const flashR = (5 - bolt.life) * 8;
       const flashGrad = ctx.createRadialGradient(endPt.x, endPt.y, 0, endPt.x, endPt.y, flashR);
       flashGrad.addColorStop(0, 'rgba(255, 255, 255, 0.8)');
-      flashGrad.addColorStop(0.4, `${bolt.glowColor}66`);
+      flashGrad.addColorStop(0.4, bolt.glowColor.replace('hsl(', 'hsla(').replace(')', ', 0.4)'));
       flashGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
       ctx.globalAlpha = bolt.opacity * fade;
       ctx.fillStyle = flashGrad;
@@ -375,21 +400,27 @@ export const RoundEventCanvas = memo<RoundEventCanvasProps>(function RoundEventC
       if (eventType === 'blizzard') {
         // Ambient frost tint
         ctx.save();
-        ctx.globalAlpha = 0.08 * fadeOpacityRef.current;
-        ctx.fillStyle = '#87CEEB';
+        ctx.globalAlpha = 0.06 * fadeOpacityRef.current;
+        ctx.fillStyle = '#a8d8ea';
         ctx.fillRect(0, 0, w, h);
         ctx.restore();
 
         spawnSnowflakes(w);
 
+        // Global wind sway — all flakes drift together
+        const windOffset = Math.sin(now * 0.0008) * 0.6;
+
         // Update & draw snowflakes
         const particles = particlesRef.current;
         for (let i = particles.length - 1; i >= 0; i--) {
           const p = particles[i];
-          p.x += p.vx + Math.sin(p.life * 0.02) * 0.5;
+          p.x += p.vx + windOffset + Math.sin(p.life * 0.025 + p.rotation) * 0.4;
           p.y += p.vy;
           p.rotation += p.rotationSpeed;
           p.life += 1;
+          // Wrap horizontally so flakes don't vanish at edges
+          if (p.x < -20) p.x = w + 20;
+          if (p.x > w + 20) p.x = -20;
           if (p.y > h + 20) {
             particles.splice(i, 1);
             continue;
@@ -397,12 +428,13 @@ export const RoundEventCanvas = memo<RoundEventCanvasProps>(function RoundEventC
           drawSnowflake(ctx, p);
         }
 
-        // Frost vignette around edges
+        // Frost vignette around edges — heavier at corners
         ctx.save();
-        ctx.globalAlpha = 0.25 * fadeOpacityRef.current;
-        const frostGrad = ctx.createRadialGradient(w / 2, h / 2, w * 0.3, w / 2, h / 2, w * 0.7);
+        ctx.globalAlpha = 0.3 * fadeOpacityRef.current;
+        const frostGrad = ctx.createRadialGradient(w / 2, h / 2, w * 0.25, w / 2, h / 2, w * 0.65);
         frostGrad.addColorStop(0, 'rgba(135, 206, 235, 0)');
-        frostGrad.addColorStop(1, 'rgba(135, 206, 235, 0.4)');
+        frostGrad.addColorStop(0.7, 'rgba(135, 206, 235, 0.15)');
+        frostGrad.addColorStop(1, 'rgba(135, 206, 235, 0.5)');
         ctx.fillStyle = frostGrad;
         ctx.fillRect(0, 0, w, h);
         ctx.restore();
@@ -452,23 +484,32 @@ export const RoundEventCanvas = memo<RoundEventCanvasProps>(function RoundEventC
       }
 
       if (eventType === 'lightning') {
-        // Spawn lightning bolts
-        if (spawnTimerRef.current > LIGHTNING_INTERVAL_MS) {
+        // Spawn lightning bolts with randomized intervals for unpredictability
+        const interval = LIGHTNING_INTERVAL_MS + (Math.sin(now * 0.003) * 150);
+        if (spawnTimerRef.current > interval) {
           spawnTimerRef.current = 0;
           spawnLightning(w, h);
+          // Occasionally spawn a second bolt for dramatic double-strikes
+          if (Math.random() > 0.6) {
+            spawnLightning(w, h);
+          }
+        }
 
-          // Screen flash on new bolt
+        // Screen flash that decays — bright on spawn, darkens over time between bolts
+        const flashAge = spawnTimerRef.current;
+        if (flashAge < 80) {
           ctx.save();
-          ctx.globalAlpha = 0.15 * fadeOpacityRef.current;
+          ctx.globalAlpha = (1 - flashAge / 80) * 0.25 * fadeOpacityRef.current;
           ctx.fillStyle = '#ffffff';
           ctx.fillRect(0, 0, w, h);
           ctx.restore();
         }
 
-        // Ambient electric atmosphere
+        // Ambient dark storm atmosphere with periodic flicker
         ctx.save();
-        ctx.globalAlpha = 0.03 * fadeOpacityRef.current;
-        ctx.fillStyle = '#4fc3f7';
+        const flicker = Math.random() > 0.95 ? 0.06 : 0.03;
+        ctx.globalAlpha = flicker * fadeOpacityRef.current;
+        ctx.fillStyle = '#2a1a4e';
         ctx.fillRect(0, 0, w, h);
         ctx.restore();
 

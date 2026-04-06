@@ -58,6 +58,8 @@ export function useUnclaimedGifts(): UseUnclaimedGiftsReturn {
 
   // Track locally claimed gift IDs to preserve claimed status during refresh
   const locallyClaimedIdsRef = useRef<Set<string>>(new Set());
+  // Track whether we have loaded the full gift list (once loaded, derive count from gifts)
+  const giftsLoadedRef = useRef(false);
 
   // Save to localStorage cache
   const setCachedCount = useCallback((count: number) => {
@@ -93,8 +95,9 @@ export function useUnclaimedGifts(): UseUnclaimedGiftsReturn {
     },
   });
 
-  // Sync count query into local state + localStorage
+  // Sync count query into local state + localStorage (skip if gifts already loaded locally)
   useEffect(() => {
+    if (giftsLoadedRef.current) return; // gifts effect manages count after first load
     const count = countQuery.data?.count ?? 0;
     setUnclaimedCount(count);
     if (countQuery.data) setCachedCount(count);
@@ -116,6 +119,8 @@ export function useUnclaimedGifts(): UseUnclaimedGiftsReturn {
   // Merge fetched gifts with locally claimed state
   useEffect(() => {
     const fetchedGifts = giftsQuery.data?.gifts ?? [];
+    if (fetchedGifts.length === 0 && !giftsQuery.data) return;
+    giftsLoadedRef.current = true;
     const unclaimedOnly = fetchedGifts.filter(g => !g.claimed);
     const mergedGifts = unclaimedOnly.map(g => {
       if (locallyClaimedIdsRef.current.has(g.id)) {
@@ -170,6 +175,8 @@ export function useUnclaimedGifts(): UseUnclaimedGiftsReturn {
     if (!isAuthenticated) {
       setUnclaimedCount(0);
       setGifts([]);
+      giftsLoadedRef.current = false;
+      locallyClaimedIdsRef.current = new Set();
     }
   }, [isAuthenticated]);
 

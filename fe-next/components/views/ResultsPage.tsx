@@ -642,8 +642,8 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
       return {
         username: p.username,
         score: p.score || 0,
-        survived: !(wordHuntSummary?.eliminatedPlayers || wordHuntEliminatedPlayers).includes(p.username),
-        lifeRemaining: (wordHuntSummary?.playerLives || wordHuntPlayerLives)[p.username] ?? 0,
+        survived: !(wordHuntSummary?.eliminatedPlayers ?? wordHuntEliminatedPlayers ?? []).includes(p.username),
+        lifeRemaining: (wordHuntSummary?.playerLives ?? wordHuntPlayerLives ?? {})[p.username] ?? 0,
         validWordCount: validWords.length,
         invalidWordCount: invalidWords.length,
         avgWordLength: avgLen,

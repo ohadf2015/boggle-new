@@ -2,14 +2,20 @@
 
 import React, { useEffect, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
+import dynamic from 'next/dynamic';
 import { RotateCw, Home, Share2, TrendingUp, TrendingDown, Copy, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { fireConfetti } from '@/utils/confettiUtils';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAdPlacement } from '@/hooks/useAdPlacement';
+import { useCrazyGamesAds } from '@/hooks/useCrazyGamesAds';
+import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { cn } from '@/lib/utils';
 import { getChallengeUrl, generateChallengeShareMessage, type ScoreChallenge } from '@/utils/challenges';
 import ResultsWinnerBanner from '@/components/results/ResultsWinnerBanner';
 import type { SinglePlayerResultsData } from '@/components/singleplayer/SinglePlayerView';
+
+const CrazyGamesBanner = dynamic(() => import('@/components/CrazyGamesBanner'), { ssr: false });
 
 interface ChallengeResultsProps {
   results: SinglePlayerResultsData;
@@ -32,6 +38,18 @@ const ChallengeResults: React.FC<ChallengeResultsProps> = ({
 }) => {
   const { language, t } = useLanguage();
   const [copied, setCopied] = useState(false);
+  const { showInterstitial } = useAdPlacement();
+  const { requestMidgameAd } = useCrazyGamesAds();
+  const { submitLeaderboardScore } = useCrazyGames();
+
+  // Ads + leaderboard on mount
+  useEffect(() => {
+    showInterstitial('challenge-complete');
+    requestMidgameAd();
+    if (results.playerScore > 0) {
+      submitLeaderboardScore(results.playerScore);
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const beatCreator = attemptResult?.beatCreator ?? results.playerScore > challenge.creatorScore;
   const scoreDiff = attemptResult?.scoreDifference ?? (results.playerScore - challenge.creatorScore);
@@ -221,6 +239,14 @@ const ChallengeResults: React.FC<ChallengeResultsProps> = ({
             <Home className="w-4 h-4" />
             {t('common.backToHome')}
           </Button>
+
+          {/* Banner Ads */}
+          <div className="hidden md:block">
+            <CrazyGamesBanner size="728x90" />
+          </div>
+          <div className="md:hidden">
+            <CrazyGamesBanner size="320x50" />
+          </div>
         </motion.div>
       </motion.div>
     </div>

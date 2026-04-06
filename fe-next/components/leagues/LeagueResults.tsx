@@ -1,9 +1,15 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAdPlacement } from '@/hooks/useAdPlacement';
+import { useCrazyGamesAds } from '@/hooks/useCrazyGamesAds';
+import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import type { LeagueTier, LeagueZone } from '@/hooks/useLeague';
+
+const CrazyGamesBanner = dynamic(() => import('@/components/CrazyGamesBanner'), { ssr: false });
 
 const ZONE_MESSAGES: Record<LeagueZone, string> = {
   promotion: 'league.promoted',
@@ -27,6 +33,18 @@ interface LeagueResultsProps {
 
 export function LeagueResults({ tier, position, zone, coinsEarned, onClose }: LeagueResultsProps) {
   const { t } = useLanguage();
+  const { showInterstitial } = useAdPlacement();
+  const { requestMidgameAd } = useCrazyGamesAds();
+  const { submitLeaderboardScore } = useCrazyGames();
+
+  // Ads + leaderboard on mount
+  useEffect(() => {
+    showInterstitial('league-complete');
+    requestMidgameAd();
+    if (coinsEarned > 0) {
+      submitLeaderboardScore(coinsEarned);
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
@@ -51,6 +69,11 @@ export function LeagueResults({ tier, position, zone, coinsEarned, onClose }: Le
         <div className="border-3 border-black rounded-neo bg-neo-navy/50 p-4 text-center mb-4">
           <p className="text-sm text-neo-white/60">{t('league.coinsEarned')}</p>
           <p className="font-neo-display text-2xl font-bold text-neo-yellow">{coinsEarned}</p>
+        </div>
+
+        {/* Banner Ad */}
+        <div className="mb-4">
+          <CrazyGamesBanner size="300x250" />
         </div>
 
         <button

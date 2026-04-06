@@ -368,7 +368,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
           {remainingTime !== null && (
             <div
               ref={gameStatsRef}
-              className="flex flex-col gap-0 w-full px-1 md:px-2 sticky top-0 z-40 bg-neo-navy flex-shrink-0"
+              className="flex flex-col gap-0 w-full px-1 md:px-2 sticky top-0 z-40 flex-shrink-0 bg-gradient-to-b from-neo-navy/95 via-neo-navy/85 to-transparent backdrop-blur-md"
               role="status"
               aria-label="Game status"
             >
@@ -477,9 +477,9 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
             </div>
           )}
 
-          {/* Word Forming Area - tight spacing to board (hidden in word-hunt mode, feedback goes to clue boxes) */}
+          {/* Word Forming Area - inside header area for tighter integration */}
           {isPlaying && gameMode !== 'word-hunt' && (
-            <div className="relative flex items-center justify-center flex-shrink-0 mt-1 lg:mt-2 mb-1">
+            <div className="relative flex items-center justify-center flex-shrink-0 -mt-1 mb-0.5">
               <LeadChangeBanner event={leadChangeEvent ?? null} />
               <WordFormingArea
                 word={isTypingMode ? typedWord : formedWord}
@@ -552,7 +552,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
               comboGlow
             )}
           >
-            <div className="relative w-full max-w-[min(600px,85vw)] lg:max-w-[clamp(280px,45dvh,480px)] mx-auto">
+            <div className="relative w-full max-w-[min(600px,92vw)] lg:max-w-[clamp(300px,48dvh,520px)] mx-auto">
               <GridComponent
                 key={isPlaying ? 'playing-grid' : 'spectating-grid'}
                 grid={letterGrid}

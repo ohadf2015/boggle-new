@@ -18,7 +18,7 @@ import logger from '../utils/logger.js';
 export type RoundEventType = 'blizzard' | 'lightning' | 'meteor';
 
 export interface RoundEventData {
-  blizzard?: { comboDecayMultiplier: number; durationMs: number };
+  blizzard?: { frozenTiles: Array<{ row: number; col: number }>; comboDecayMultiplier: number; durationMs: number };
   lightning?: { chargedTiles: Array<{ row: number; col: number }>; bonusMultiplier: number; durationMs: number };
   meteor?: { affectedTiles: Array<{ row: number; col: number; newLetter: string }>; scoreMultiplier: number; durationMs: number };
 }
@@ -173,6 +173,15 @@ function executeRoundEvent(
         data: eventData as Record<string, unknown>,
       });
 
+      // Persist blizzard frozen tiles so word validation can reject them
+      if (eventType === 'blizzard' && eventData.blizzard) {
+        const cg = getGame(gameCode);
+        if (cg) {
+          (cg as GameState & { frozenTiles?: Array<{ row: number; col: number }> }).frozenTiles =
+            eventData.blizzard.frozenTiles;
+        }
+      }
+
       // Persist lightning charged tiles so word validation can check them
       if (eventType === 'lightning' && eventData.lightning) {
         updateGame(gameCode, {
@@ -217,6 +226,14 @@ function executeRoundEvent(
 
       updateGame(gameCode, { activeRoundEvent: null });
 
+      // Clean up blizzard frozen tiles
+      if (eventType === 'blizzard') {
+        const bg = getGame(gameCode);
+        if (bg) {
+          delete (bg as GameState & { frozenTiles?: unknown }).frozenTiles;
+        }
+      }
+
       // Clean up lightning tiles
       if (eventType === 'lightning') {
         const cg = getGame(gameCode);
@@ -241,10 +258,12 @@ function buildEventData(eventType: RoundEventType, game: GameState): RoundEventD
   const grid = (game.letterGrid as Array<Array<unknown>>) || [];
 
   switch (eventType) {
-    case 'blizzard':
+    case 'blizzard': {
+      const frozenTiles = pickRandomTiles(grid, 5);
       return {
-        blizzard: { comboDecayMultiplier: 0.5, durationMs: EVENT_CONFIG.blizzard.durationMs },
+        blizzard: { frozenTiles, comboDecayMultiplier: 0.5, durationMs: EVENT_CONFIG.blizzard.durationMs },
       };
+    }
 
     case 'lightning': {
       const chargedTiles = pickRandomTiles(grid, 3);

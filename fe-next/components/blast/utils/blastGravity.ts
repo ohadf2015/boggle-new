@@ -126,7 +126,7 @@ export function computeGravityResult(
 
   for (let col = 0; col < gridSize; col++) {
     // Collect surviving tiles from bottom to top
-    const survivors: Array<{ uid: string; letter: string; type: BlastTileType; originalRow: number; hitsRemaining: number; innerType?: BlastTileType }> = [];
+    const survivors: Array<{ uid: string; letter: string; type: BlastTileType; originalRow: number; hitsRemaining: number; innerType?: BlastTileType; isThawed?: boolean; countdown?: number }> = [];
     for (let row = gridSize - 1; row >= 0; row--) {
       if (!tileStates[row][col].isCleared) {
         survivors.push({
@@ -136,6 +136,8 @@ export function computeGravityResult(
           originalRow: row,
           hitsRemaining: tileStates[row][col].hitsRemaining,
           ...(tileStates[row][col].innerType ? { innerType: tileStates[row][col].innerType } : {}),
+          ...(tileStates[row][col].isThawed ? { isThawed: true } : {}),
+          ...(tileStates[row][col].countdown != null ? { countdown: tileStates[row][col].countdown } : {}),
         });
       }
     }
@@ -153,6 +155,8 @@ export function computeGravityResult(
         activationEffect: null,
         hitsRemaining: survivor.hitsRemaining,
         ...(survivor.innerType ? { innerType: survivor.innerType } : {}),
+        ...(survivor.isThawed ? { isThawed: true } : {}),
+        ...(survivor.countdown != null ? { countdown: survivor.countdown } : {}),
       };
 
       const fallDist = bottomRow - survivor.originalRow;

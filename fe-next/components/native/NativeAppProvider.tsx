@@ -33,8 +33,8 @@ export function NativeAppProvider({ children }: NativeAppProviderProps): React.R
     if (!isNative()) return;
 
     import('@capacitor/status-bar').then(({ StatusBar, Style }) => {
-      // Prevent WebView from rendering behind the status bar
-      StatusBar.setOverlaysWebView({ overlay: false }).catch(() => {});
+      // Let WebView render behind the status bar — CSS safe area vars handle the inset
+      StatusBar.setOverlaysWebView({ overlay: true }).catch(() => {});
       StatusBar.setBackgroundColor({ color: '#1a1a2e' }).catch(() => {});
       StatusBar.setStyle({ style: Style.Dark }).catch(() => {});
       logger.log('[NativeAppProvider] Status bar configured');

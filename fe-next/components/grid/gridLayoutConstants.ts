@@ -22,4 +22,4 @@ export const GRID_PADDING = '0.4rem';
  * because the grid is the primary content and tracks viewport width in
  * portrait orientation and viewport height in landscape.
  */
-export const GRID_GAP_CLASS = 'gap-0.5 min-[360px]:gap-1 sm:gap-1.5 md:gap-2 lg:gap-2';
+export const GRID_GAP_CLASS = 'gap-0.5 min-[360px]:gap-0.5 sm:gap-1 md:gap-1.5 lg:gap-1.5';

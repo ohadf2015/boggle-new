@@ -24,6 +24,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { GameEmojiShareCard } from '@/components/shared/GameEmojiShareCard';
 import { useAdPlacement } from '@/hooks/useAdPlacement';
 import { useCrazyGamesAds } from '@/hooks/useCrazyGamesAds';
+import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useDailyResultSubmission } from './results/useDailyResultSubmission';
 import {
   shareImageWithNativeShare,
@@ -70,11 +71,15 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
   const { profile, isAuthenticated } = useAuth();
   const { showInterstitial } = useAdPlacement();
   const { requestMidgameAd } = useCrazyGamesAds();
+  const { submitLeaderboardScore } = useCrazyGames();
 
   const hasMarkedQuestRef = useRef(false);
   useEffect(() => {
     showInterstitial('daily-complete');
     requestMidgameAd();
+    if (result.score > 0) {
+      submitLeaderboardScore(result.score);
+    }
     if (!hasMarkedQuestRef.current) {
       markModePlayedLogic('daily');
       hasMarkedQuestRef.current = true;
