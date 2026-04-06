@@ -278,8 +278,8 @@ describe('BlastTile', () => {
         <BlastTile {...baseProps} type="standard" phase="landing" />
       );
       const button = container.querySelector('button');
-      expect(button?.style.transform).toContain('scaleY(1.15)');
-      expect(button?.style.transform).toContain('scaleX(0.88)');
+      expect(button?.style.transform).toContain('scaleY(1.08)');
+      expect(button?.style.transform).toContain('scaleX(0.94)');
     });
   });
 
