@@ -149,9 +149,10 @@ function EffectsWorker({
 
   // Clean up magnet timers and cross flash on unmount
   useEffect(() => {
+    const timers = magnetTimersRef.current;
     return () => {
-      for (const tid of magnetTimersRef.current) clearTimeout(tid);
-      magnetTimersRef.current.clear();
+      for (const tid of timers) clearTimeout(tid);
+      timers.clear();
       cancelAnimationFrame(crossFlashRafRef.current);
       if (crossFlashRef.current) { crossFlashRef.current.destroy(); crossFlashRef.current = null; }
     };

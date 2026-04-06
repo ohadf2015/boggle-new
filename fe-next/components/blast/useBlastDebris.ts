@@ -46,16 +46,18 @@ export function useBlastDebris(
     const container = new Container();
     camera.addChild(container);
     debrisContainerRef.current = container;
+    const intervals = lightningIntervalsRef.current;
+    const rafs = lightningRafsRef.current;
     return () => {
       for (const d of debrisRef.current) {
         physics.removeBody(d.bodyId);
         d.graphic.destroy();
       }
       debrisRef.current = [];
-      for (const iid of lightningIntervalsRef.current) clearInterval(iid);
-      lightningIntervalsRef.current.clear();
-      for (const rid of lightningRafsRef.current) cancelAnimationFrame(rid);
-      lightningRafsRef.current.clear();
+      for (const iid of intervals) clearInterval(iid);
+      intervals.clear();
+      for (const rid of rafs) cancelAnimationFrame(rid);
+      rafs.clear();
       camera.removeChild(container);
       container.destroy();
     };
