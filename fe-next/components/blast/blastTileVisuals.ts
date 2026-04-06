@@ -8,10 +8,11 @@ import type { BlastTileType } from './types';
  */
 export const TILE_VISUALS: Record<BlastTileType, { bg: string; indicator?: string; text?: string; style?: React.CSSProperties }> = {
   standard: {
-    bg: '', text: 'text-neo-navy',
+    bg: '', text: 'text-neo-cream',
     style: {
-      background: 'linear-gradient(180deg, #FFFEF0 0%, #F5F0E0 40%, #E8DFC8 100%)',
-      boxShadow: 'inset 0 2px 4px rgba(255,255,255,0.7), inset 0 -2px 3px rgba(0,0,0,0.08), 0 4px 0 #B8A88A, 0 6px 8px rgba(0,0,0,0.25)',
+      background: 'linear-gradient(180deg, rgba(30,28,50,0.75) 0%, rgba(20,18,40,0.7) 40%, rgba(15,13,30,0.65) 100%)',
+      boxShadow: 'inset 0 2px 4px rgba(255,255,255,0.08), inset 0 -2px 3px rgba(0,0,0,0.3), 0 4px 0 rgba(0,0,0,0.4), 0 6px 8px rgba(0,0,0,0.25)',
+      border: '2px solid rgba(255,254,240,0.12)',
     },
   },
   gold: {
@@ -78,10 +79,10 @@ export const TILE_VISUALS: Record<BlastTileType, { bg: string; indicator?: strin
     },
   },
   mirror: {
-    bg: '', indicator: '🪞', text: 'text-neo-navy',
+    bg: '', indicator: '🪞', text: 'text-neo-cream',
     style: {
-      background: 'linear-gradient(180deg, #FFFEF0 0%, #E8E0D0 40%, #D0C8B8 100%)',
-      boxShadow: 'inset 0 2px 5px rgba(255,255,255,0.8), inset 0 -2px 3px rgba(0,0,0,0.08), 0 4px 0 #A89880, 0 6px 8px rgba(200,190,170,0.3)',
+      background: 'linear-gradient(180deg, rgba(200,200,220,0.6) 0%, rgba(160,155,175,0.55) 40%, rgba(130,125,145,0.5) 100%)',
+      boxShadow: 'inset 0 2px 5px rgba(255,255,255,0.4), inset 0 -2px 3px rgba(0,0,0,0.15), 0 4px 0 rgba(80,75,90,0.6), 0 6px 8px rgba(200,190,220,0.2), 0 0 12px rgba(200,200,255,0.15)',
     },
   },
   silver: {

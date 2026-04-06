@@ -54,6 +54,8 @@ export interface GridCellProps {
   onTouchStart: (e: React.TouchEvent) => void;
   onMouseDown: (e: React.MouseEvent) => void;
   onDoubleClick: (e: React.MouseEvent) => void;
+  /** Ghost mode: invisible cell for touch interaction only (blast mode overlay handles visuals) */
+  ghost?: boolean;
 }
 
 const GridCell = memo<GridCellProps>(({
@@ -66,7 +68,7 @@ const GridCell = memo<GridCellProps>(({
   comboLevel, escalationCombo, comboColors, reduceMotion, animateOnMount, interactive,
   isSelecting, isDragging, isTypingMode, hintAnimationPhase,
   currentTier, selectedCellsLength,
-  onTouchStart, onMouseDown, onDoubleClick,
+  onTouchStart, onMouseDown, onDoubleClick, ghost = false,
 }) => {
   // Empty cell — render invisible placeholder to maintain grid layout
   if (!cell) {
@@ -78,6 +80,25 @@ const GridCell = memo<GridCellProps>(({
         aria-hidden="true"
         className="aspect-square rounded-neo"
         style={{ visibility: 'hidden' }}
+      />
+    );
+  }
+
+  // Ghost mode: invisible touch target — BlastTile overlay handles all visuals
+  if (ghost) {
+    return (
+      <div
+        data-row={row}
+        data-col={col}
+        data-letter={cell}
+        role="gridcell"
+        aria-hidden="true"
+        tabIndex={interactive ? 0 : -1}
+        onTouchStart={onTouchStart}
+        onMouseDown={onMouseDown}
+        onDoubleClick={onDoubleClick}
+        className="aspect-square"
+        style={{ background: 'transparent' }}
       />
     );
   }

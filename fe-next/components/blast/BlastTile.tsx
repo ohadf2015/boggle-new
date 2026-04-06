@@ -159,8 +159,8 @@ function getPhaseClasses(phase: TilePhase, isSelected: boolean, selectionIndex?:
     const intensity = (selectionIndex != null && selectionTotal && selectionTotal > 1)
       ? Math.min(0.4 + (selectionIndex / (selectionTotal - 1)) * 0.6, 1.0)
       : 0.6;
-    const glowSize = Math.round(8 + intensity * 12);
-    return `ring-2 ring-neo-lime ring-offset-1 ring-offset-neo-navy shadow-[0_0_${glowSize}px_rgba(191,255,0,${intensity})] blast-tile-select-pop`;
+    const glowSize = Math.round(10 + intensity * 14);
+    return `ring-3 ring-neo-lime ring-offset-2 ring-offset-neo-navy shadow-[0_0_${glowSize}px_rgba(191,255,0,${intensity}),0_0_${glowSize + 6}px_rgba(191,255,0,${(intensity * 0.4).toFixed(2)})] blast-tile-select-pop`;
   }
   return '';
 }

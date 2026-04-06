@@ -15,7 +15,7 @@ import { BlastStage } from './BlastStage';
 import { detectSpecialCombos, type BlastComboType, type SpecialCombo } from './utils/blastCombos';
 import { getWaveObjectives, type WaveConfig } from './utils/blastWaveConfig';
 import { getComboMultiplier } from '@/shared/utils/scoring';
-import { MAX_CASCADE_CHAIN, CASCADE_MIN_WORD_LENGTH, MAX_CASCADE_WORDS_PER_LEVEL, CASCADE_CHAIN_BONUS_MULTIPLIER, type BlastGameConfig, type BlastResultsData, type BlastTileState, type BlastTileType } from './types';
+import { MAX_CASCADE_CHAIN, CASCADE_MIN_WORD_LENGTH, MAX_CASCADE_WORDS_PER_LEVEL, CASCADE_CHAIN_BONUS_MULTIPLIER, CASCADE_MOMENTUM_THRESHOLDS, CASCADE_MOMENTUM_PER_WORD, CASCADE_MOMENTUM_LONG_WORD_BONUS, CASCADE_MOMENTUM_DECAY, CASCADE_TIER_MAX_CHAIN, type BlastGameConfig, type BlastResultsData, type BlastTileState, type BlastTileType } from './types';
 import { detectVerticalWords, detectHorizontalWords } from './utils/blastVerticalScanner';
 import { detectMatch3Clusters } from './utils/blastMatch3Detector';
 import { useDictionaryCache } from '@/hooks/useDictionaryCache';
@@ -135,6 +135,9 @@ export function BlastGame({
   // Track last submitted path
   const lastPathRef = useRef<Array<{ row: number; col: number }>>([]);
   const [gameStartTime] = useState(() => Date.now());
+
+  // Cascade momentum: accumulates as player finds words, decays on idle turns
+  const cascadeMomentumRef = useRef(0);
   const onWordWithComboTypeRef = useRef(onWordWithComboType);
   useEffect(() => { onWordWithComboTypeRef.current = onWordWithComboType; }, [onWordWithComboType]);
 
@@ -210,6 +213,20 @@ export function BlastGame({
     }
 
     // 7. Run cascade + animate with multi-chain support
+    // Build cascade momentum: consecutive words increase allowed chain depth
+    const wordLen = path.length;
+    cascadeMomentumRef.current += CASCADE_MOMENTUM_PER_WORD + (wordLen >= 5 ? CASCADE_MOMENTUM_LONG_WORD_BONUS : 0);
+
+    // Determine momentum tier → max chain depth for this cascade
+    let momentumTier = 0;
+    for (let i = CASCADE_MOMENTUM_THRESHOLDS.length - 1; i >= 0; i--) {
+      if (cascadeMomentumRef.current >= CASCADE_MOMENTUM_THRESHOLDS[i]) {
+        momentumTier = i;
+        break;
+      }
+    }
+    const maxChainForMomentum = CASCADE_TIER_MAX_CHAIN[momentumTier] ?? 1;
+
     // Pause combo timer so cascades don't penalise the player's streak
     comboStreak.pauseTimer();
     let chainLevel = 0;
@@ -220,7 +237,8 @@ export function BlastGame({
     // Chain cascades: match-3 clusters + auto-formed words after gravity
     const cascadeBonusMult = waveConfig?.cascadeChainBonus ?? CASCADE_CHAIN_BONUS_MULTIPLIER;
     const foundWordsSet = new Set(engine.gameState.wordsFound);
-    while (chainLevel < MAX_CASCADE_CHAIN) {
+    const effectiveMaxChain = Math.min(MAX_CASCADE_CHAIN, maxChainForMomentum);
+    while (chainLevel < effectiveMaxChain) {
       // Use the CURRENT cascadeResult (from either initial or previous iteration's gravity)
       const affectedCols = new Set(cascadeResult.gravity.newTiles.map(t => t.col));
       const affectedRows = new Set(cascadeResult.gravity.newTiles.map(t => t.row));
@@ -304,6 +322,11 @@ export function BlastGame({
       cascadeResult = engine.startCascade();
       await sequencer.animateCascade(cascadeResult.gravity, chainLevel);
       cascadeResult.commit?.();
+    }
+
+    // Decay momentum if no cascade triggered (cool-down mechanic)
+    if (chainLevel === 0) {
+      cascadeMomentumRef.current = Math.max(0, cascadeMomentumRef.current - CASCADE_MOMENTUM_DECAY);
     }
 
     // Resume combo timer after cascades complete

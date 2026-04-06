@@ -55,6 +55,8 @@ interface GridComponentProps {
   frozenTiles?: Set<string>;
   chargedTiles?: Set<string>;
   meteorTiles?: Set<string>;
+  /** Ghost mode: transparent bg + invisible cells (blast mode — overlay handles visuals) */
+  ghostCells?: boolean;
 }
 
 const GridComponent = memo<GridComponentProps>(({
@@ -84,6 +86,7 @@ const GridComponent = memo<GridComponentProps>(({
   frozenTiles,
   chargedTiles,
   meteorTiles,
+  ghostCells = false,
 }) => {
   const [reduceMotion, setReduceMotion] = useState(false);
   const [performanceMode, setPerformanceMode] = useState<PerformanceMode>('full');
@@ -405,7 +408,7 @@ const GridComponent = memo<GridComponentProps>(({
           className={cn(
             "grid touch-none select-none absolute rounded-neo",
             gridDimensions.gap,
-            "bg-neo-cream",
+            !ghostCells && "bg-neo-cream",
             earthquakeShaking && "earthquake-shake",
             interactive && isSelecting && "cursor-crosshair",
             interactive && isDragging && "cursor-grabbing",
@@ -416,7 +419,7 @@ const GridComponent = memo<GridComponentProps>(({
             padding: GRID_PADDING,
             gridTemplateColumns: `repeat(${gridDimensions.cols}, minmax(0, 1fr))`,
             gridTemplateRows: `repeat(${gridDimensions.rows}, minmax(0, 1fr))`,
-            backgroundColor: 'var(--neo-cream)',
+            backgroundColor: ghostCells ? 'transparent' : 'var(--neo-cream)',
             ...(currentTier >= 3 && !reduceMotion ? {
               filter: 'drop-shadow(2px 0 0 rgba(0,255,255,0.25)) drop-shadow(-2px 0 0 rgba(255,51,102,0.25))',
             } : {}),
@@ -466,6 +469,7 @@ const GridComponent = memo<GridComponentProps>(({
                   cell={cell}
                   row={i}
                   col={j}
+                  ghost={ghostCells}
                   isSelected={isSelected}
                   isFirstSelected={isFirstSelected}
                   isLastSelected={isLastSelected}

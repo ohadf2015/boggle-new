@@ -233,16 +233,30 @@ export const TREASURE_GEM_BONUS_MOVES = 2;
 // ==================== Cascade Chain Constants ====================
 
 /** Maximum number of auto-cascade chain levels before stopping */
-export const MAX_CASCADE_CHAIN = 2;
+export const MAX_CASCADE_CHAIN = 5;
 /** Maximum words/clusters cleared per cascade level */
 export const MAX_CASCADE_WORDS_PER_LEVEL = 1;
 /** Minimum word length for cascade auto-detection (shorter words ignored) */
-export const CASCADE_MIN_WORD_LENGTH = 3;
+export const CASCADE_MIN_WORD_LENGTH = 4;
 /** Delay (ms) before scanning for cascade words after grid settles.
  * Reduced from 700ms → 400ms to eliminate the "frozen board" dead gap. */
 export const CASCADE_DETECTION_DELAY = 200;
 /** Bonus multiplier per chain level: base * chainLevel * this */
-export const CASCADE_CHAIN_BONUS_MULTIPLIER = 0.5;
+export const CASCADE_CHAIN_BONUS_MULTIPLIER = 0.75;
+
+// ==================== Cascade Momentum System ====================
+
+/** Momentum points required for each cascade tier (cumulative thresholds).
+ * Players build momentum by finding words; higher tiers unlock deeper cascades. */
+export const CASCADE_MOMENTUM_THRESHOLDS = [0, 2, 4, 7, 11] as const;
+/** Momentum points earned per word found (before cascade detection) */
+export const CASCADE_MOMENTUM_PER_WORD = 1;
+/** Bonus momentum for words of 5+ letters */
+export const CASCADE_MOMENTUM_LONG_WORD_BONUS = 1;
+/** Momentum decay per turn when no cascade triggers (cool-down) */
+export const CASCADE_MOMENTUM_DECAY = 1;
+/** Maximum cascade chain allowed at each momentum tier (index = tier) */
+export const CASCADE_TIER_MAX_CHAIN = [1, 2, 3, 4, 5] as const;
 
 // ==================== Cascade Highlight Constants ====================
 

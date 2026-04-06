@@ -155,6 +155,7 @@ export const BlastBoard = memo(function BlastBoard({
         hideComboIndicator
         largeText
         language={language}
+        ghostCells
       />
 
       {/* Layer 2: Blast tile type overlay — indicators, special backgrounds, selection glow */}
