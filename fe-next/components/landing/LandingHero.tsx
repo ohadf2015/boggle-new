@@ -9,7 +9,10 @@ import type { TopPlayer } from '@/hooks/useTopPlayers';
 
 const LandingLeaderboardPreview = dynamic(
   () => import('./LandingLeaderboardPreview').then(m => m.LandingLeaderboardPreview),
-  { ssr: false }
+  {
+    ssr: false,
+    loading: () => <div className="w-full h-64 rounded-neo bg-neo-navy-light/50 animate-pulse" />,
+  }
 );
 
 interface LandingHeroProps {
@@ -21,7 +24,7 @@ interface LandingHeroProps {
 const HeroMascot = memo(function HeroMascot({ isMobilePortrait }: { isMobilePortrait: boolean }) {
   return (
     <IdleMascotWithEntrance
-      baseVariant="waving"
+      baseVariant="happy"
       size="xl"
       sizeClassName={isMobilePortrait ? 'w-[100px] h-[100px]' : 'w-32 h-32 sm:w-36 sm:h-36 md:w-40 md:h-40 lg:w-48 lg:h-48'}
       enableHover={!isMobilePortrait}
@@ -29,7 +32,7 @@ const HeroMascot = memo(function HeroMascot({ isMobilePortrait }: { isMobilePort
       hoverVariant="excited"
       clickVariant="celebrating"
       clickAnimation="bounce"
-      clipBorder="none"
+      priority
       delay={0.1}
     />
   );

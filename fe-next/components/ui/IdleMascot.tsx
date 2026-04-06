@@ -129,8 +129,8 @@ export const IdleMascotWithEntrance = memo(function IdleMascotWithEntrance({
 
   return (
     <motion.div
-      initial={shouldAnimate ? { scale: 0, opacity: 0, y: 20 } : undefined}
-      animate={{ scale: 1, opacity: 1, y: 0 }}
+      initial={shouldAnimate ? { opacity: 0, y: 12 } : undefined}
+      animate={{ opacity: 1, y: 0 }}
       transition={{
         type: 'spring',
         stiffness: 260,

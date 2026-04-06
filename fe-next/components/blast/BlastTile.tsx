@@ -117,11 +117,15 @@ function getPhaseStyles(phase: TilePhase, type: BlastTileType, fallOffset?: numb
         }),
       };
     }
-    case 'falling':
+    case 'falling': {
+      // Tile is at its destination row; animate FROM above (negative offset) TO 0
+      const dist = fallOffset ?? 0;
       return {
-        transform: `translateY(${fallOffset ?? 0}px)`,
-        transition: 'transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1)',
-      };
+        transform: 'translateY(0)',
+        animation: `blastTileFall 200ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards`,
+        '--fall-from': `-${dist}px`,
+      } as React.CSSProperties;
+    }
     case 'appearing':
       return {
         transform: `translateY(${-(spawnOffset ?? 40)}px) scale(0)`,
