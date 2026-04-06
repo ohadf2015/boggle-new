@@ -43,6 +43,8 @@ export interface BlastTileProps {
   isDiamondRevealed?: boolean;
   /** The hidden inner type of a frozen tile */
   innerType?: BlastTileType;
+  /** Cascade highlight — tile is about to be cleared by a cascade chain reaction */
+  isCascadeHighlight?: boolean;
   onClick?: () => void;
 }
 
@@ -197,7 +199,7 @@ export const BlastTile = memo(function BlastTile({
   letter, type, phase, isSelected, isCleared, hitsRemaining,
   fallOffset, clearRotate, spawnOffset, isNearMiss, activationEffect, isComboPreview,
   selectionIndex, selectionTotal, isLocked, countdown, zonePreview,
-  isDiamondRevealed, innerType, onClick,
+  isDiamondRevealed, innerType, isCascadeHighlight, onClick,
 }: BlastTileProps) {
   const reducedMotion = usePrefersReducedMotion();
   const { enableGlowEffects } = useDevicePerformance();
@@ -241,6 +243,7 @@ export const BlastTile = memo(function BlastTile({
         RARE_LETTERS.has(letter.toUpperCase()) ? 'blast-rare-letter' : '',
         isComboPreview ? 'blast-combo-preview' : '',
         isLocked ? 'blast-tile-locked' : '',
+        isCascadeHighlight ? 'blast-tile-cascade-highlight' : '',
         isNearMiss ? 'ring-2 ring-neo-lime/80 animate-pulse' : '',
         getPhaseClasses(effectivePhase, isSelected, selectionIndex, selectionTotal),
       ].filter(Boolean).join(' ')}
@@ -364,6 +367,7 @@ export const BlastTile = memo(function BlastTile({
   prev.zonePreview === next.zonePreview &&
   prev.isDiamondRevealed === next.isDiamondRevealed &&
   prev.innerType === next.innerType &&
+  prev.isCascadeHighlight === next.isCascadeHighlight &&
   prev.onClick === next.onClick
 );
 

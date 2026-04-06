@@ -109,10 +109,15 @@ export function broadcastActiveRooms(io: Server, rooms: unknown[]): void {
 export function _resetBroadcastThrottle(): void {
   if (_broadcastActiveRoomsTimer) {
     clearTimeout(_broadcastActiveRoomsTimer);
-    _broadcastActiveRoomsTimer = null;
   }
+  _broadcastActiveRoomsTimer = null;
   _pendingBroadcastArgs = null;
 }
+
+// Expose reset on globalThis so tests can reach it regardless of which
+// module instance Vitest resolved (dual-specifier .ts vs .js issue)
+ 
+(globalThis as any).__resetBroadcastThrottle = _resetBroadcastThrottle;
 
 // ==========================================
 // Room Query Functions

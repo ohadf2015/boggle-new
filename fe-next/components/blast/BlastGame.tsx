@@ -15,7 +15,7 @@ import { BlastStage } from './BlastStage';
 import { detectSpecialCombos, type BlastComboType, type SpecialCombo } from './utils/blastCombos';
 import { getWaveObjectives, type WaveConfig } from './utils/blastWaveConfig';
 import { getComboMultiplier } from '@/shared/utils/scoring';
-import { MAX_CASCADE_CHAIN, CASCADE_MIN_WORD_LENGTH, MAX_CASCADE_WORDS_PER_LEVEL, CASCADE_CHAIN_BONUS_MULTIPLIER, CASCADE_MOMENTUM_THRESHOLDS, CASCADE_MOMENTUM_PER_WORD, CASCADE_MOMENTUM_LONG_WORD_BONUS, CASCADE_MOMENTUM_DECAY, CASCADE_TIER_MAX_CHAIN, type BlastGameConfig, type BlastResultsData, type BlastTileState, type BlastTileType } from './types';
+import { MAX_CASCADE_CHAIN, CASCADE_MIN_WORD_LENGTH, MAX_CASCADE_WORDS_PER_LEVEL, CASCADE_CHAIN_BONUS_MULTIPLIER, CASCADE_MOMENTUM_THRESHOLDS, CASCADE_MOMENTUM_PER_WORD, CASCADE_MOMENTUM_LONG_WORD_BONUS, CASCADE_MOMENTUM_DECAY, CASCADE_TIER_MAX_CHAIN, CASCADE_HIGHLIGHT_DURATION, CASCADE_HIGHLIGHT_LINGER, type BlastGameConfig, type BlastResultsData, type BlastTileState, type BlastTileType } from './types';
 import { detectVerticalWords, detectHorizontalWords } from './utils/blastVerticalScanner';
 import { detectMatch3Clusters } from './utils/blastMatch3Detector';
 import { useDictionaryCache } from '@/hooks/useDictionaryCache';
@@ -131,6 +131,9 @@ export function BlastGame({
   const [formedWord, setFormedWord] = useState('');
   // Near-miss shimmer state
   const [nearMissCells, setNearMissCells] = useState<Array<{ row: number; col: number }>>([]);
+  // Cascade highlight: cells to glow before cascade clears them
+  const [cascadeHighlightCells, setCascadeHighlightCells] = useState<Array<{ row: number; col: number }>>([]);
+  const [cascadeHighlightWord, setCascadeHighlightWord] = useState<string | null>(null);
 
   // Track last submitted path
   const lastPathRef = useRef<Array<{ row: number; col: number }>>([]);
@@ -252,53 +255,68 @@ export function BlastGame({
       const { grid, tileStates: latestTiles } = engine.getLatestState();
       if (!grid) break;
 
-      let totalClearsThisLevel = 0;
+      // Collect all cascade finds for this level BEFORE submitting
+      type CascadeFind = { cells: Array<{ row: number; col: number }>; label: string; bonusFn: (cl: number) => number };
+      const cascadeFinds: CascadeFind[] = [];
 
       // 1. Match-3 clusters
       const allClusters = detectMatch3Clusters(grid, latestTiles, affectedCols);
       const clusters = allClusters.slice(0, MAX_CASCADE_WORDS_PER_LEVEL);
-      if (clusters.length > 0) {
-        chainLevel++;
-        for (const cluster of clusters) {
-          const bonus = Math.round(cluster.cells.length * 3 * cascadeBonusMult * chainLevel);
-          const result = engine.submitWord(cluster.cells, `[${cluster.letter}×${cluster.cells.length}]`, bonus);
-          totalClearsThisLevel += result.clearedTiles.length;
-          foundWordsSet.add(`[${cluster.letter}×${cluster.cells.length}]`);
-        }
+      for (const cluster of clusters) {
+        cascadeFinds.push({
+          cells: cluster.cells,
+          label: `[${cluster.letter}×${cluster.cells.length}]`,
+          bonusFn: (cl) => Math.round(cluster.cells.length * 3 * cascadeBonusMult * cl),
+        });
       }
 
       // 2. Vertical auto-words
       const vertWords = detectVerticalWords(
         grid, latestTiles, checkWord, foundWordsSet, CASCADE_MIN_WORD_LENGTH, affectedCols,
       );
-      if (vertWords.length > 0) {
-        if (totalClearsThisLevel === 0) chainLevel++;
-        const toClear = vertWords.slice(0, MAX_CASCADE_WORDS_PER_LEVEL);
-        for (const vw of toClear) {
-          const bonus = Math.round(vw.word.length * vw.word.length * cascadeBonusMult * chainLevel);
-          const result = engine.submitWord(vw.path, vw.word, bonus);
-          totalClearsThisLevel += result.clearedTiles.length;
-          foundWordsSet.add(vw.word);
-        }
+      for (const vw of vertWords.slice(0, MAX_CASCADE_WORDS_PER_LEVEL)) {
+        cascadeFinds.push({
+          cells: vw.path,
+          label: vw.word,
+          bonusFn: (cl) => Math.round(vw.word.length * vw.word.length * cascadeBonusMult * cl),
+        });
       }
 
       // 3. Horizontal auto-words
       const horizWords = detectHorizontalWords(
         grid, latestTiles, checkWord, foundWordsSet, CASCADE_MIN_WORD_LENGTH, affectedRows,
       );
-      if (horizWords.length > 0) {
-        if (totalClearsThisLevel === 0) chainLevel++;
-        const toClear = horizWords.slice(0, MAX_CASCADE_WORDS_PER_LEVEL);
-        for (const hw of toClear) {
-          const bonus = Math.round(hw.word.length * hw.word.length * cascadeBonusMult * chainLevel);
-          const result = engine.submitWord(hw.path, hw.word, bonus);
-          totalClearsThisLevel += result.clearedTiles.length;
-          foundWordsSet.add(hw.word);
-        }
+      for (const hw of horizWords.slice(0, MAX_CASCADE_WORDS_PER_LEVEL)) {
+        cascadeFinds.push({
+          cells: hw.path,
+          label: hw.word,
+          bonusFn: (cl) => Math.round(hw.word.length * hw.word.length * cascadeBonusMult * cl),
+        });
       }
 
-      // Break if nothing was actually cleared this iteration
-      if (totalClearsThisLevel === 0) break;
+      // Break if nothing found this iteration
+      if (cascadeFinds.length === 0) break;
+
+      chainLevel++;
+
+      // ── Highlight phase: show cascade words on grid before clearing ──
+      const allHighlightCells = cascadeFinds.flatMap(f => f.cells);
+      const firstWordLabel = cascadeFinds[0].label;
+      setCascadeHighlightCells(allHighlightCells);
+      setCascadeHighlightWord(firstWordLabel.startsWith('[') ? firstWordLabel : firstWordLabel.toUpperCase());
+      await new Promise<void>(r => setTimeout(r, CASCADE_HIGHLIGHT_DURATION));
+      setCascadeHighlightWord(null);
+      await new Promise<void>(r => setTimeout(r, CASCADE_HIGHLIGHT_LINGER));
+      setCascadeHighlightCells([]);
+
+      // Now submit all finds
+      let totalClearsThisLevel = 0;
+      for (const find of cascadeFinds) {
+        const bonus = find.bonusFn(chainLevel);
+        const result = engine.submitWord(find.cells, find.label, bonus);
+        totalClearsThisLevel += result.clearedTiles.length;
+        foundWordsSet.add(find.label);
+      }
 
       // Cascade chain sound
       sounds.playCascadeChain(chainLevel);
@@ -551,6 +569,8 @@ export function BlastGame({
         onComboFlashComplete={handleComboFlashComplete}
         comboTypeName={comboTypeName}
         nearMissCells={nearMissCells}
+        cascadeHighlightCells={cascadeHighlightCells}
+        cascadeHighlightWord={cascadeHighlightWord}
         clearedTilesForEffects={clearedTilesForEffects}
         waveCleared={objectives.allObjectivesComplete}
         leaderboard={leaderboard}

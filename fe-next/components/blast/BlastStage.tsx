@@ -68,6 +68,9 @@ interface BlastStageProps {
   comboTypeName?: string;
   // Near-miss shimmer
   nearMissCells?: Array<{ row: number; col: number }>;
+  // Cascade highlight — cells to glow before cascade clears
+  cascadeHighlightCells?: Array<{ row: number; col: number }>;
+  cascadeHighlightWord?: string | null;
   // PixiJS effects layer events
   clearedTilesForEffects?: ClearedTileEvent[];
   waveCleared?: boolean;
@@ -111,6 +114,8 @@ export function BlastStage({
   onComboFlashComplete,
   comboTypeName,
   nearMissCells = [],
+  cascadeHighlightCells = [],
+  cascadeHighlightWord,
   clearedTilesForEffects = [],
   waveCleared = false,
   leaderboard,
@@ -319,6 +324,7 @@ export function BlastStage({
                 onWordChange={onWordChange}
                 sequencerState={sequencerState}
                 nearMissCells={nearMissCells}
+                cascadeHighlightCells={cascadeHighlightCells}
                 diamondRevealTurns={gameState.diamondRevealTurns}
               />
             </div>
@@ -329,6 +335,24 @@ export function BlastStage({
           <div className="absolute bottom-1 left-1 w-3 h-3 rounded-bl-lg border-b-2 border-l-2 border-amber-400/40 pointer-events-none" />
           <div className="absolute bottom-1 right-1 w-3 h-3 rounded-br-lg border-b-2 border-r-2 border-amber-400/40 pointer-events-none" />
         </div>
+        {/* Cascade word discovery banner */}
+        <AdaptiveAnimatePresence>
+          {cascadeHighlightWord && (
+            <AdaptiveMotion.div
+              initial={{ scale: 0.5, opacity: 0, y: 10 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 pointer-events-none"
+            >
+              <div className="px-5 py-2 rounded-xl bg-neo-navy/90 border-2 border-neo-lime shadow-[0_0_20px_rgba(191,255,0,0.4),0_0_40px_rgba(191,255,0,0.15)]">
+                <span className="text-neo-lime font-neo-display text-xl font-black tracking-wide drop-shadow-[0_0_8px_rgba(191,255,0,0.6)]">
+                  {cascadeHighlightWord}
+                </span>
+              </div>
+            </AdaptiveMotion.div>
+          )}
+        </AdaptiveAnimatePresence>
         {/* Chain escalation text — scoped within board area */}
         <BlastChainText chainLevel={sequencerState?.chainLevel ?? 0} t={t} />
         <BlastWaveClearText waveCleared={waveCleared} movesRemaining={movesRemaining} />

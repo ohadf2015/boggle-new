@@ -40,11 +40,27 @@ vi.mock('../../modules/roundEventsManager', () => ({
   cancelRoundEvents: vi.fn(),
 }));
 
-// Reset throttle via dynamic import
-async function resetBroadcastThrottle() {
-  const { _resetBroadcastThrottle } = await import('../../utils/socketHelpers');
-  _resetBroadcastThrottle();
-}
+// Mock wordValidatorPool to prevent setImmediate-based hangs under fake timers
+vi.mock('../../modules/wordValidatorPool', () => ({
+  findAllWordsAsync: vi.fn().mockResolvedValue([]),
+  getPoolStats: vi.fn().mockReturnValue({ workers: 0 }),
+  shutdownPool: vi.fn().mockResolvedValue(undefined),
+}));
+
+// Mock dictionary to prevent file I/O under fake timers
+// (Vitest dual-specifier issue: beforeAll loads dictionary in one instance,
+// but handlers import from another — the handler's instance tries to load from
+// disk under fake timers and hangs indefinitely)
+vi.mock('../../dictionary', () => ({
+  ensureLanguageLoaded: vi.fn().mockResolvedValue(undefined),
+  getCachedTrie: vi.fn().mockReturnValue(null),
+  isDictionaryWord: vi.fn().mockReturnValue(false),
+  isValidWordCached: vi.fn().mockReturnValue(false),
+  getRandomLongWordsWithTheme: vi.fn().mockReturnValue({ words: [], theme: null }),
+}));
+
+// Use globalThis to reset throttle across all module instances
+// (Vitest dual-specifier .ts vs .js creates separate instances)
 
 // Increase timeout for dictionary loading during parallel test execution
 // Integration tests may take longer under heavy parallel load
@@ -59,16 +75,17 @@ describe('Game Flow Integration', () => {
     await ensureLanguageLoaded('en');
   });
 
-  beforeEach(async () => {
-    await resetBroadcastThrottle();
+  beforeEach(() => {
     env = createTestEnvironment();
-    // Clear rate limiter state between tests
+    globalThis.__resetBroadcastThrottle?.();
     vi.useFakeTimers({ advanceTimers: true });
   });
 
   afterEach(() => {
+    globalThis.__clearAllGameTimers?.();
     env.cleanup();
     vi.useRealTimers();
+    globalThis.__resetBroadcastThrottle?.();
   });
 
   describe('Game Creation', () => {
@@ -160,30 +177,6 @@ describe('Game Flow Integration', () => {
   });
 
   describe('Game Start', () => {
-    test('host can start the game', async () => {
-      const hostSocket = env.createSocket();
-      const playerSocket = env.createSocket();
-      const gameData = env.createGameData();
-
-      await hostSocket.receiveEvent('createGame', gameData);
-      await playerSocket.receiveEvent('join', env.createJoinData(gameData.gameCode));
-
-      hostSocket.clearTracking();
-      playerSocket.clearTracking();
-
-      // Start the game
-      await hostSocket.receiveEvent('startGame', {
-        letterGrid: [['A', 'B'], ['C', 'D']],
-        timerSeconds: 60,
-        language: 'en',
-        minWordLength: 2,
-      });
-
-      // Both should receive startGame event
-      expect(hostSocket.getEmittedEvents()).toContainEvent('startGame');
-      expect(playerSocket.getEmittedEvents()).toContainEvent('startGame');
-    });
-
     test('non-host cannot start the game', async () => {
       const hostSocket = env.createSocket();
       const playerSocket = env.createSocket();
@@ -250,26 +243,6 @@ describe('Game Flow Integration', () => {
     });
   });
 
-  describe('Game Reset', () => {
-    test('host can reset game after it ends', async () => {
-      const hostSocket = env.createSocket();
-      const gameData = env.createGameData();
-
-      await hostSocket.receiveEvent('createGame', gameData);
-      await hostSocket.receiveEvent('startGame', {
-        letterGrid: [['A', 'B'], ['C', 'D']],
-        timerSeconds: 60,
-      });
-
-      hostSocket.clearTracking();
-
-      await hostSocket.receiveEvent('resetGame', {});
-
-      // Handler broadcasts 'resetGame' event, not 'gameReset'
-      expect(hostSocket.getEmittedEvents()).toContainEvent('resetGame');
-    });
-  });
-
   describe('Active Rooms', () => {
     test('can request active rooms list', async () => {
       const socket = env.createSocket();
@@ -285,6 +258,74 @@ describe('Game Flow Integration', () => {
   });
 });
 
+// Game Start and Reset tests use real timers to avoid Vitest dual-specifier issues
+// where gameStartCoordinator mocks don't apply to handler imports, causing
+// the real coordinator to create timer chains that hang under fake timers.
+describe('Game Start & Reset (real timers)', () => {
+  let env;
+
+  beforeAll(async () => {
+    const { ensureLanguageLoaded } = await import('../../dictionary');
+    await ensureLanguageLoaded('en');
+  });
+
+  beforeEach(() => {
+    env = createTestEnvironment();
+    globalThis.__resetBroadcastThrottle?.();
+  });
+
+  afterEach(() => {
+    globalThis.__clearAllGameTimers?.();
+    env.cleanup();
+    globalThis.__resetBroadcastThrottle?.();
+  });
+
+  test('host can start the game', async () => {
+    const hostSocket = env.createSocket();
+    const playerSocket = env.createSocket();
+    const gameData = env.createGameData();
+
+    await hostSocket.receiveEvent('createGame', gameData);
+    await playerSocket.receiveEvent('join', env.createJoinData(gameData.gameCode));
+
+    hostSocket.clearTracking();
+    playerSocket.clearTracking();
+
+    // Start the game
+    await hostSocket.receiveEvent('startGame', {
+      letterGrid: [['A', 'B'], ['C', 'D']],
+      timerSeconds: 60,
+      language: 'en',
+      minWordLength: 2,
+    });
+
+    // Both should receive startGame event
+    expect(hostSocket.getEmittedEvents()).toContainEvent('startGame');
+    expect(playerSocket.getEmittedEvents()).toContainEvent('startGame');
+  });
+
+  test('host can reset game after it ends', async () => {
+    const hostSocket = env.createSocket();
+    const playerSocket = env.createSocket();
+    const gameData = env.createGameData();
+
+    await hostSocket.receiveEvent('createGame', gameData);
+    await playerSocket.receiveEvent('join', env.createJoinData(gameData.gameCode));
+    await hostSocket.receiveEvent('startGame', {
+      letterGrid: [['A', 'B'], ['C', 'D']],
+      timerSeconds: 60,
+      language: 'en',
+    });
+
+    hostSocket.clearTracking();
+
+    await hostSocket.receiveEvent('resetGame', {});
+
+    // Handler broadcasts 'resetGame' event, not 'gameReset'
+    expect(hostSocket.getEmittedEvents()).toContainEvent('resetGame');
+  });
+});
+
 describe('Room Auto-Close', () => {
   let env;
 
@@ -297,7 +338,7 @@ describe('Room Auto-Close', () => {
   });
 
   test('room auto-closes when last player (host) leaves in waiting state', async () => {
-    const { gameExists } = await import('../../modules/gameStateManager');
+    const { gameExists } = globalThis.__gameStateManager;
     const hostSocket = env.createSocket();
     const gameData = env.createGameData();
 
@@ -319,7 +360,7 @@ describe('Room Auto-Close', () => {
   });
 
   test('room auto-closes when last player leaves after others left', async () => {
-    const { gameExists } = await import('../../modules/gameStateManager');
+    const { gameExists } = globalThis.__gameStateManager;
     const hostSocket = env.createSocket();
     const playerSocket = env.createSocket();
     const gameData = env.createGameData();
@@ -356,7 +397,7 @@ describe('Room Auto-Close', () => {
   });
 
   test('room auto-closes when host (only player) disconnects', async () => {
-    const { gameExists } = await import('../../modules/gameStateManager');
+    const { gameExists } = globalThis.__gameStateManager;
     const hostSocket = env.createSocket();
     const gameData = env.createGameData();
 
@@ -374,7 +415,7 @@ describe('Room Auto-Close', () => {
   });
 
   test('room auto-closes when last non-host player disconnects', async () => {
-    const { gameExists, getGame } = await import('../../modules/gameStateManager');
+    const { gameExists, getGame } = globalThis.__gameStateManager;
     const hostSocket = env.createSocket();
     const playerSocket = env.createSocket();
     const gameData = env.createGameData();

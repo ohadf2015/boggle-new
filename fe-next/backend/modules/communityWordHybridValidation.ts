@@ -6,7 +6,15 @@
 import { normalizeWord } from '../dictionary';
 import type { Language } from '@/shared/types';
 import logger from '../utils/logger';
-import { isWordCommunityValid } from './communityWordManager';
+// Lazy import to break circular dependency with communityWordManager
+let _isWordCommunityValid: ((word: string, lang: string) => boolean) | null = null;
+function getIsWordCommunityValid(): (word: string, lang: string) => boolean {
+  if (!_isWordCommunityValid) {
+     
+    _isWordCommunityValid = require('./communityWordManager').isWordCommunityValid;
+  }
+  return _isWordCommunityValid!;
+}
 
 export interface ShouldValidateResult {
   shouldValidate: boolean;
@@ -122,7 +130,7 @@ export function shouldUseAIValidation(
   const lang = (language || 'en') as LanguageCode;
   const normalized = normalizeWord(word, lang as Language);
 
-  if (isWordCommunityValid(normalized, lang)) {
+  if (getIsWordCommunityValid()(normalized, lang)) {
     return {
       shouldValidate: false,
       reason: 'already_community_valid',

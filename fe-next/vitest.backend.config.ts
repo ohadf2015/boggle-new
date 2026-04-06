@@ -12,13 +12,26 @@ function resolveTypescriptRequires() {
     enforce: 'pre' as const,
     resolveId(source: string, importer: string | undefined) {
       if (!importer || source.startsWith('\0') || /node_modules/.test(importer)) return null;
-      // Only handle relative paths without extensions
-      if (!source.startsWith('.') || path.extname(source)) return null;
+      if (!source.startsWith('.')) return null;
 
       const dir = path.dirname(importer);
+      const ext = path.extname(source);
+
+      // Handle .js imports → resolve to .ts if it exists (prevents dual module instances)
+      if (ext === '.js') {
+        const tsCandidate = path.resolve(dir, source.replace(/\.js$/, '.ts'));
+        if (fs.existsSync(tsCandidate)) {
+          return tsCandidate;
+        }
+        return null;
+      }
+
+      // Handle extensionless imports
+      if (ext) return null;
+
       // Try .ts, .tsx, then /index.ts
-      for (const ext of ['.ts', '.tsx', '.js', '/index.ts', '/index.js']) {
-        const candidate = path.resolve(dir, source + ext);
+      for (const suffix of ['.ts', '.tsx', '.js', '/index.ts', '/index.js']) {
+        const candidate = path.resolve(dir, source + suffix);
         if (fs.existsSync(candidate)) {
           return candidate;
         }

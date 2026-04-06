@@ -33,6 +33,8 @@ export interface BlastBoardProps {
   onWordChange: (word: string, count: number) => void;
   sequencerState?: SequencerState;
   nearMissCells?: Array<{ row: number; col: number }>;
+  /** Cells highlighted during cascade discovery — glow before clearing */
+  cascadeHighlightCells?: Array<{ row: number; col: number }>;
   /** Remaining turns of diamond reveal (shows frozen tile inner types) */
   diamondRevealTurns?: number;
 }
@@ -55,6 +57,7 @@ export const BlastBoard = memo(function BlastBoard({
   onWordChange,
   sequencerState,
   nearMissCells = [],
+  cascadeHighlightCells = [],
   diamondRevealTurns = 0,
 }: BlastBoardProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -108,6 +111,11 @@ export const BlastBoard = memo(function BlastBoard({
   const nearMissSet = useMemo(
     () => new Set(nearMissCells.map(c => `${c.row}-${c.col}`)),
     [nearMissCells],
+  );
+
+  const cascadeHighlightSet = useMemo(
+    () => new Set(cascadeHighlightCells.map(c => `${c.row}-${c.col}`)),
+    [cascadeHighlightCells],
   );
 
   // Combo preview: detect if 2+ combo-eligible tiles are in the current selection
@@ -212,6 +220,7 @@ export const BlastBoard = memo(function BlastBoard({
                 selectionIndex={selectionIndexMap.get(key)}
                 selectionTotal={selectedCells.length}
                 isLocked={!cellFilter(tile.row, tile.col) && !tile.isCleared}
+                isCascadeHighlight={cascadeHighlightSet.has(key)}
                 zonePreview={isSelected ? getZonePreview(tile.type) : null}
                 isDiamondRevealed={tile.type === 'frozen' && diamondRevealTurns > 0 && tile.innerType != null}
                 innerType={tile.innerType}

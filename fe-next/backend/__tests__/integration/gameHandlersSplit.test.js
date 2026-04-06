@@ -36,11 +36,21 @@ vi.mock('../../modules/roundEventsManager', () => ({
   cancelRoundEvents: vi.fn(),
 }));
 
-// Reset throttle via dynamic import
-async function resetBroadcastThrottle() {
-  const { _resetBroadcastThrottle } = await import('../../utils/socketHelpers');
-  _resetBroadcastThrottle();
-}
+// Mock wordValidatorPool to prevent setImmediate-based hangs under fake timers
+vi.mock('../../modules/wordValidatorPool', () => ({
+  findAllWordsAsync: vi.fn().mockResolvedValue([]),
+  getPoolStats: vi.fn().mockReturnValue({ workers: 0 }),
+  shutdownPool: vi.fn().mockResolvedValue(undefined),
+}));
+
+// Mock dictionary to prevent file I/O under fake timers
+vi.mock('../../dictionary', () => ({
+  ensureLanguageLoaded: vi.fn().mockResolvedValue(undefined),
+  getCachedTrie: vi.fn().mockReturnValue(null),
+  isDictionaryWord: vi.fn().mockReturnValue(false),
+  isValidWordCached: vi.fn().mockReturnValue(false),
+  getRandomLongWordsWithTheme: vi.fn().mockReturnValue({ words: [], theme: null }),
+}));
 
 // Increase timeout for dictionary loading during parallel test execution
 // Integration tests may take longer under heavy parallel load
@@ -55,15 +65,17 @@ describe('Game Lifecycle Handler', () => {
     await ensureLanguageLoaded('en');
   });
 
-  beforeEach(async () => {
-    await resetBroadcastThrottle();
+  beforeEach(() => {
     env = createTestEnvironment();
+    globalThis.__resetBroadcastThrottle?.();
     vi.useFakeTimers({ advanceTimers: true });
   });
 
   afterEach(() => {
+    globalThis.__clearAllGameTimers?.();
     env.cleanup();
     vi.useRealTimers();
+    globalThis.__resetBroadcastThrottle?.();
   });
 
   describe('createGame', () => {
@@ -127,48 +139,6 @@ describe('Game Lifecycle Handler', () => {
   });
 
   describe('startGame', () => {
-    test('host can start game with valid grid', async () => {
-      const hostSocket = env.createSocket();
-      const gameData = env.createGameData();
-
-      await hostSocket.receiveEvent('createGame', gameData);
-      hostSocket.clearTracking();
-
-      await hostSocket.receiveEvent('startGame', {
-        letterGrid: [['A', 'B', 'C'], ['D', 'E', 'F'], ['G', 'H', 'I']],
-        timerSeconds: 120,
-        language: 'en',
-        minWordLength: 3,
-      });
-
-      expect(hostSocket.getEmittedEvents()).toContainEvent('startGame');
-
-      const startEvent = hostSocket.getEmittedEventsByName('startGame')[0];
-      expect(startEvent.data).toMatchObject({
-        timerSeconds: 120,
-        language: 'en',
-        minWordLength: 3,
-      });
-    });
-
-    test('enforces timer bounds (30-600 seconds)', async () => {
-      const socket = env.createSocket();
-      const gameData = env.createGameData();
-
-      await socket.receiveEvent('createGame', gameData);
-      socket.clearTracking();
-
-      // Try to set timer below minimum
-      await socket.receiveEvent('startGame', {
-        letterGrid: [['A', 'B'], ['C', 'D']],
-        timerSeconds: 10, // Below min of 30
-        language: 'en',
-      });
-
-      const startEvent = socket.getEmittedEventsByName('startGame')[0];
-      expect(startEvent.data.timerSeconds).toBe(30); // Should be clamped to minimum
-    });
-
     test('non-host cannot start game', async () => {
       const hostSocket = env.createSocket();
       const playerSocket = env.createSocket();
@@ -187,61 +157,7 @@ describe('Game Lifecycle Handler', () => {
     });
   });
 
-  describe('endGame', () => {
-    test('host can end game in progress', async () => {
-      const socket = env.createSocket();
-      const gameData = env.createGameData();
-
-      await socket.receiveEvent('createGame', gameData);
-      await socket.receiveEvent('startGame', {
-        letterGrid: [['A', 'B'], ['C', 'D']],
-        timerSeconds: 60,
-      });
-      socket.clearTracking();
-
-      await socket.receiveEvent('endGame', {});
-
-      // Handler broadcasts 'endGame' event (not 'gameEnded')
-      expect(socket.getEmittedEvents()).toContainEvent('endGame');
-    });
-
-    test('non-host cannot end game', async () => {
-      const hostSocket = env.createSocket();
-      const playerSocket = env.createSocket();
-      const gameData = env.createGameData();
-
-      await hostSocket.receiveEvent('createGame', gameData);
-      await playerSocket.receiveEvent('join', env.createJoinData(gameData.gameCode));
-      await hostSocket.receiveEvent('startGame', {
-        letterGrid: [['A', 'B'], ['C', 'D']],
-        timerSeconds: 60,
-      });
-      playerSocket.clearTracking();
-
-      await playerSocket.receiveEvent('endGame', {});
-
-      expect(playerSocket.getEmittedEvents()).toContainEvent('error');
-    });
-  });
-
   describe('resetGame', () => {
-    test('host can reset game after ending', async () => {
-      const socket = env.createSocket();
-      const gameData = env.createGameData();
-
-      await socket.receiveEvent('createGame', gameData);
-      await socket.receiveEvent('startGame', {
-        letterGrid: [['A', 'B'], ['C', 'D']],
-        timerSeconds: 60,
-      });
-      socket.clearTracking();
-
-      await socket.receiveEvent('resetGame', {});
-
-      // Handler broadcasts 'resetGame' event
-      expect(socket.getEmittedEvents()).toContainEvent('resetGame');
-    });
-
     test('non-host cannot reset game', async () => {
       const hostSocket = env.createSocket();
       const playerSocket = env.createSocket();
@@ -278,15 +194,17 @@ describe('Game Lifecycle Handler', () => {
 describe('Player Join Handler', () => {
   let env;
 
-  beforeEach(async () => {
-    await resetBroadcastThrottle();
+  beforeEach(() => {
     env = createTestEnvironment();
+    globalThis.__resetBroadcastThrottle?.();
     vi.useFakeTimers({ advanceTimers: true });
   });
 
   afterEach(() => {
+    globalThis.__clearAllGameTimers?.();
     env.cleanup();
     vi.useRealTimers();
+    globalThis.__resetBroadcastThrottle?.();
   });
 
   describe('join', () => {
@@ -308,30 +226,6 @@ describe('Player Join Handler', () => {
         isHost: false,
         username: 'JoiningPlayer',
       });
-    });
-
-    test('late join sends current game state', async () => {
-      const hostSocket = env.createSocket();
-      const playerSocket = env.createSocket();
-      const gameData = env.createGameData();
-
-      await hostSocket.receiveEvent('createGame', gameData);
-      await hostSocket.receiveEvent('startGame', {
-        letterGrid: [['A', 'B'], ['C', 'D']],
-        timerSeconds: 120,
-        language: 'en',
-      });
-
-      playerSocket.clearTracking();
-      await playerSocket.receiveEvent('join', env.createJoinData(gameData.gameCode, {
-        username: 'LateJoiner',
-      }));
-
-      // Late joiner should receive startGame with current state
-      expect(playerSocket.getEmittedEvents()).toContainEvent('startGame');
-
-      const startEvent = playerSocket.getEmittedEventsByName('startGame')[0];
-      expect(startEvent.data.lateJoin).toBe(true);
     });
 
     test('reconnection restores player state', async () => {
@@ -429,15 +323,17 @@ describe('Player Join Handler', () => {
 describe('Room Management Handler', () => {
   let env;
 
-  beforeEach(async () => {
-    await resetBroadcastThrottle();
+  beforeEach(() => {
     env = createTestEnvironment();
+    globalThis.__resetBroadcastThrottle?.();
     vi.useFakeTimers({ advanceTimers: true });
   });
 
   afterEach(() => {
+    globalThis.__clearAllGameTimers?.();
     env.cleanup();
     vi.useRealTimers();
+    globalThis.__resetBroadcastThrottle?.();
   });
 
   describe('closeRoom', () => {
@@ -568,24 +464,173 @@ describe('Room Management Handler', () => {
   });
 });
 
-describe('Handler Integration', () => {
+// Tests that call startGame use real timers to avoid Vitest dual-specifier issues
+// where gameStartCoordinator mocks don't apply to handler imports, causing
+// the real coordinator to create timer chains that hang under fake timers.
+describe('Game Start & Lifecycle (real timers)', () => {
   let env;
 
-  // Preload dictionary BEFORE enabling fake timers to avoid I/O conflicts
   beforeAll(async () => {
     const { ensureLanguageLoaded } = await import('../../dictionary');
     await ensureLanguageLoaded('en');
   });
 
-  beforeEach(async () => {
-    await resetBroadcastThrottle();
+  beforeEach(() => {
     env = createTestEnvironment();
-    vi.useFakeTimers({ advanceTimers: true });
+    globalThis.__resetBroadcastThrottle?.();
   });
 
   afterEach(() => {
+    globalThis.__clearAllGameTimers?.();
     env.cleanup();
-    vi.useRealTimers();
+    globalThis.__resetBroadcastThrottle?.();
+  });
+
+  test('host can start game with valid grid', async () => {
+    const hostSocket = env.createSocket();
+    const playerSocket = env.createSocket();
+    const gameData = env.createGameData();
+
+    await hostSocket.receiveEvent('createGame', gameData);
+    await playerSocket.receiveEvent('join', env.createJoinData(gameData.gameCode, { username: 'Player1' }));
+    hostSocket.clearTracking();
+
+    await hostSocket.receiveEvent('startGame', {
+      letterGrid: [['A', 'B', 'C'], ['D', 'E', 'F'], ['G', 'H', 'I']],
+      timerSeconds: 120,
+      language: 'en',
+      minWordLength: 3,
+    });
+
+    expect(hostSocket.getEmittedEvents()).toContainEvent('startGame');
+
+    const startEvent = hostSocket.getEmittedEventsByName('startGame')[0];
+    expect(startEvent.data).toMatchObject({
+      timerSeconds: 120,
+      language: 'en',
+      minWordLength: 3,
+    });
+  });
+
+  test('enforces timer bounds (30-600 seconds)', async () => {
+    const hostSocket = env.createSocket();
+    const playerSocket = env.createSocket();
+    const gameData = env.createGameData();
+
+    await hostSocket.receiveEvent('createGame', gameData);
+    await playerSocket.receiveEvent('join', env.createJoinData(gameData.gameCode, { username: 'Player1' }));
+    hostSocket.clearTracking();
+
+    await hostSocket.receiveEvent('startGame', {
+      letterGrid: [['A', 'B'], ['C', 'D']],
+      timerSeconds: 10, // Below min of 30
+      language: 'en',
+    });
+
+    const startEvent = hostSocket.getEmittedEventsByName('startGame')[0];
+    expect(startEvent.data.timerSeconds).toBe(30); // Should be clamped to minimum
+  });
+
+  test('host can end game in progress', async () => {
+    const hostSocket = env.createSocket();
+    const playerSocket = env.createSocket();
+    const gameData = env.createGameData();
+
+    await hostSocket.receiveEvent('createGame', gameData);
+    await playerSocket.receiveEvent('join', env.createJoinData(gameData.gameCode, { username: 'Player1' }));
+    await hostSocket.receiveEvent('startGame', {
+      letterGrid: [['A', 'B'], ['C', 'D']],
+      timerSeconds: 60,
+      language: 'en',
+    });
+    hostSocket.clearTracking();
+
+    await hostSocket.receiveEvent('endGame', {});
+
+    expect(hostSocket.getEmittedEvents()).toContainEvent('endGame');
+  });
+
+  test('non-host cannot end game', async () => {
+    const hostSocket = env.createSocket();
+    const playerSocket = env.createSocket();
+    const gameData = env.createGameData();
+
+    await hostSocket.receiveEvent('createGame', gameData);
+    await playerSocket.receiveEvent('join', env.createJoinData(gameData.gameCode));
+    await hostSocket.receiveEvent('startGame', {
+      letterGrid: [['A', 'B'], ['C', 'D']],
+      timerSeconds: 60,
+      language: 'en',
+    });
+    playerSocket.clearTracking();
+
+    await playerSocket.receiveEvent('endGame', {});
+
+    expect(playerSocket.getEmittedEvents()).toContainEvent('error');
+  });
+
+  test('host can reset game after ending', async () => {
+    const hostSocket = env.createSocket();
+    const playerSocket = env.createSocket();
+    const gameData = env.createGameData();
+
+    await hostSocket.receiveEvent('createGame', gameData);
+    await playerSocket.receiveEvent('join', env.createJoinData(gameData.gameCode, { username: 'Player1' }));
+    await hostSocket.receiveEvent('startGame', {
+      letterGrid: [['A', 'B'], ['C', 'D']],
+      timerSeconds: 60,
+      language: 'en',
+    });
+    hostSocket.clearTracking();
+
+    await hostSocket.receiveEvent('resetGame', {});
+
+    expect(hostSocket.getEmittedEvents()).toContainEvent('resetGame');
+  });
+
+  test('late join sends current game state', async () => {
+    const hostSocket = env.createSocket();
+    const player1Socket = env.createSocket();
+    const gameData = env.createGameData();
+
+    await hostSocket.receiveEvent('createGame', gameData);
+    await player1Socket.receiveEvent('join', env.createJoinData(gameData.gameCode, { username: 'Player1' }));
+    await hostSocket.receiveEvent('startGame', {
+      letterGrid: [['A', 'B'], ['C', 'D']],
+      timerSeconds: 120,
+      language: 'en',
+    });
+
+    const lateSocket = env.createSocket();
+    lateSocket.clearTracking();
+    await lateSocket.receiveEvent('join', env.createJoinData(gameData.gameCode, {
+      username: 'LateJoiner',
+    }));
+
+    expect(lateSocket.getEmittedEvents()).toContainEvent('startGame');
+
+    const startEvent = lateSocket.getEmittedEventsByName('startGame')[0];
+    expect(startEvent.data.lateJoin).toBe(true);
+  });
+});
+
+describe('Handler Integration (real timers)', () => {
+  let env;
+
+  beforeAll(async () => {
+    const { ensureLanguageLoaded } = await import('../../dictionary');
+    await ensureLanguageLoaded('en');
+  });
+
+  beforeEach(() => {
+    env = createTestEnvironment();
+    globalThis.__resetBroadcastThrottle?.();
+  });
+
+  afterEach(() => {
+    globalThis.__clearAllGameTimers?.();
+    env.cleanup();
+    globalThis.__resetBroadcastThrottle?.();
   });
 
   test('full game lifecycle with multiple players', async () => {

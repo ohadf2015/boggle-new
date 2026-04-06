@@ -166,6 +166,10 @@ export const clearGameTimer = (gameCode: string): boolean => {
   return timerManager.clearTimer(`game:${gameCode}`);
 };
 
+// Expose clearAll on globalThis for test cleanup across module instances
+ 
+(globalThis as any).__clearAllGameTimers = () => timerManager.clearAll();
+
 export default timerManager;
 export { TimerManager };
 export type { TimerType, TimerEntry };
