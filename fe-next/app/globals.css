@@ -1459,9 +1459,9 @@ body {
   }
 
   @keyframes blastTileAppear {
-    0% { opacity: 0; transform: scale(0); }
-    70% { opacity: 1; transform: scale(1.08); }
-    100% { opacity: 1; transform: scale(1); }
+    0% { opacity: 0; transform: translateY(var(--spawn-from, -40px)) scale(0); }
+    70% { opacity: 1; transform: translateY(0) scale(1.08); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
   }
 
   @keyframes blastLightningFlash {

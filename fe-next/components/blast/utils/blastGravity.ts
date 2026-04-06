@@ -206,7 +206,7 @@ export function computeGravityResult(
           col,
           letter,
           type,
-          spawnOffset: i + 1, // topmost new tile (furthest travel) gets highest offset
+          spawnOffset: emptyCount - i, // topmost new tile (furthest travel) gets highest offset
         });
       }
     } else {

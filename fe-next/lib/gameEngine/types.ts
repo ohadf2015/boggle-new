@@ -159,6 +159,8 @@ export interface GameCanvasConfig {
   antialias?: boolean;
   /** Device pixel ratio */
   resolution?: number;
+  /** Background alpha (0 = transparent, 1 = opaque). Default: 1 */
+  backgroundAlpha?: number;
 }
 
 // ─── Events ───────────────────────────────────────────────────────────

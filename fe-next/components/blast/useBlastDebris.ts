@@ -32,13 +32,12 @@ const CROSS_DIRECTIONS = [
 
 export function useBlastDebris(
   cellSize: number,
-  gridSize: number,
+  _gridSize: number,
   camera: Container,
   physics: PhysicsWorld,
 ) {
   const debrisRef = useRef<DebrisFragment[]>([]);
   const debrisContainerRef = useRef<Container | null>(null);
-  const magnetTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
   const lightningIntervalsRef = useRef<ReturnType<typeof setInterval>[]>([]);
   const lightningRafsRef = useRef<number[]>([]);
 
@@ -53,8 +52,6 @@ export function useBlastDebris(
         d.graphic.destroy();
       }
       debrisRef.current = [];
-      for (const tid of magnetTimersRef.current) clearTimeout(tid);
-      magnetTimersRef.current = [];
       for (const iid of lightningIntervalsRef.current) clearInterval(iid);
       lightningIntervalsRef.current = [];
       for (const rid of lightningRafsRef.current) cancelAnimationFrame(rid);
@@ -295,10 +292,5 @@ export function useBlastDebris(
     }
   }, [cellSize, physics]);
 
-  const cleanupTimers = useCallback(() => {
-    for (const tid of magnetTimersRef.current) clearTimeout(tid);
-    magnetTimersRef.current = [];
-  }, []);
-
-  return { spawnDebris, spawnLightningDebris, spawnLightningBolt, spawnPrismDebris, cleanupTimers };
+  return { spawnDebris, spawnLightningDebris, spawnLightningBolt, spawnPrismDebris };
 }

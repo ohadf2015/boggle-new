@@ -86,6 +86,7 @@ export function GameCanvas({
         width: config.width,
         height: config.height,
         background: config.background,
+        backgroundAlpha: config.backgroundAlpha ?? 1,
         antialias: config.antialias ?? true,
         resolution: config.resolution ?? (typeof window !== 'undefined' ? window.devicePixelRatio : 1),
         autoDensity: true,

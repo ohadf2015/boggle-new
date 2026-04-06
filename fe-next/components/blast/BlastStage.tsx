@@ -129,6 +129,9 @@ export function BlastStage({
   useEffect(() => {
     const el = boardContainerRef.current;
     if (!el) return;
+    // Immediate measurement so effects canvas mounts on first render
+    const rect = el.getBoundingClientRect();
+    if (rect.width > 0) setBoardSize({ width: rect.width, height: rect.height });
     const observer = new ResizeObserver(entries => {
       for (const entry of entries) {
         setBoardSize({ width: entry.contentRect.width, height: entry.contentRect.height });

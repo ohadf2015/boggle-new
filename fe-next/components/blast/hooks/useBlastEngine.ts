@@ -71,6 +71,7 @@ export interface UseBlastEngineReturn {
   getResults: (maxCombo: number, wavesCompleted?: number, waveResults?: WaveResult[]) => BlastResultsData;
   isCascading: boolean;
   startCascade: () => CascadeResult;
+  stopCascade: () => void;
   setTileStates: (updater: (prev: BlastTileState[][]) => BlastTileState[][]) => void;
   trackWordFail: () => void;
   /** Consume a move without clearing tiles (e.g. invalid word submission) */
@@ -162,9 +163,9 @@ export function useBlastEngine(
   const gameStateRef = useRef(gameState);
   gameStateRef.current = gameState;
 
-  // Cascade tracking — use ref, not state, because startCascade() sets true+false
-  // synchronously and React would batch both into just false.
-  const isCascadingRef = useRef(false);
+  // Cascade tracking — React state so the `isCascading` return value gates
+  // interactivity across renders (ref was always false because set+unset in same call).
+  const [isCascading, setIsCascading] = useState(false);
 
   // DDA invisible assist
   const ddaStateRef = useRef(createDDAState());
@@ -203,7 +204,7 @@ export function useBlastEngine(
   useEffect(() => {
     if (!isDictLoaded || !effectiveGrid) return;
     if (gameState.isComplete || gameState.isDeadEnd) return;
-    if (isCascadingRef.current) return;
+    if (isCascading) return;
     if (wordsFoundCount === 0) return;
 
     // Build display grid (hide cleared tiles)
@@ -232,7 +233,7 @@ export function useBlastEngine(
       }
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps -- minWordLength is stable config; including it would re-run dead-end detection on every render
-  }, [isDictLoaded, effectiveGrid, gameState.isComplete, gameState.isDeadEnd, wordsFoundCount, gameState.wordsFound, language, checkWordInDict, tileStates]);
+  }, [isDictLoaded, effectiveGrid, gameState.isComplete, gameState.isDeadEnd, wordsFoundCount, gameState.wordsFound, language, checkWordInDict, tileStates, isCascading]);
 
   // ── Auto-end game when no valid words remain (after grace period for shuffle) ──
   useEffect(() => {
@@ -333,13 +334,13 @@ export function useBlastEngine(
 
   // ── startCascade ──
   const startCascade = useCallback((): CascadeResult => {
-    isCascadingRef.current = true;
+    setIsCascading(true);
 
     const grid = effectiveGridRef.current;
     const tiles = tileStatesRef.current;
 
     if (!grid) {
-      isCascadingRef.current = false;
+      setIsCascading(false);
       return {
         gravity: { newGrid: [], newTileStates: [], clearedTiles: [], fallingTiles: [], newTiles: [] },
         hasNewWords: false,
@@ -364,8 +365,6 @@ export function useBlastEngine(
      
     tileStatesRef.current = gravityResult.newTileStates;
 
-    isCascadingRef.current = false;
-
     return {
       gravity: gravityResult,
       hasNewWords: false,
@@ -378,6 +377,11 @@ export function useBlastEngine(
       },
     };
   }, [gridSize, language, specialTileChance, customDistribution, effectiveBlastSeed, options?.isMultiplayer, config.boardClearMode]);
+
+  // ── stopCascade — call after the entire cascade loop completes ──
+  const stopCascade = useCallback(() => {
+    setIsCascading(false);
+  }, []);
 
   // ── shuffleGrid ──
   const shuffleGrid = useCallback(() => {
@@ -456,8 +460,9 @@ export function useBlastEngine(
     endGame,
     unlockMoves,
     getResults,
-    isCascading: isCascadingRef.current,
+    isCascading,
     startCascade,
+    stopCascade,
     setTileStates,
     trackWordFail,
     consumeMove,

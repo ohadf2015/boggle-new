@@ -118,25 +118,23 @@ function getPhaseStyles(phase: TilePhase, type: BlastTileType, fallOffset?: numb
       };
     }
     case 'falling': {
-      // Tile is at its destination row; animate FROM above (negative offset) TO 0
+      // Tile is at its destination row; CSS keyframe animates FROM --fall-from TO 0
       const dist = fallOffset ?? 0;
       return {
-        transform: 'translateY(0)',
         animation: `blastTileFall 200ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards`,
         '--fall-from': `-${dist}px`,
       } as React.CSSProperties;
     }
     case 'appearing':
       return {
-        transform: `translateY(${-(spawnOffset ?? 40)}px) scale(0)`,
+        '--spawn-from': `${-(spawnOffset ?? 40)}px`,
         opacity: 0,
         animation: 'blastTileAppear 200ms ease-out forwards',
-      };
+      } as React.CSSProperties;
     case 'landing':
       return {
         transform: 'scaleY(1.15) scaleX(0.88)',
         transition: 'transform 120ms cubic-bezier(0.34, 1.56, 0.64, 1)',
-        animationFillMode: 'forwards',
       };
     default:
       return {};

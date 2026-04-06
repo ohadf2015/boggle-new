@@ -324,6 +324,9 @@ export function BlastGame({
       cascadeResult.commit?.();
     }
 
+    // Mark cascade sequence as complete — releases the interactivity gate
+    engine.stopCascade();
+
     // Decay momentum if no cascade triggered (cool-down mechanic)
     if (chainLevel === 0) {
       cascadeMomentumRef.current = Math.max(0, cascadeMomentumRef.current - CASCADE_MOMENTUM_DECAY);

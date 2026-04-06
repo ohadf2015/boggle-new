@@ -95,6 +95,7 @@ export function BlastEffectsCanvas({
         width: Math.round(width),
         height: Math.round(height),
         background: 0x1a1a2e, // match bg-neo-navy
+        backgroundAlpha: 0, // transparent so particles show through
         antialias: true,
       }}
     >
@@ -135,6 +136,7 @@ function EffectsWorker({
   const { particles, shake, physics, camera } = useGameEngine();
 
   const prevClearedKeyRef = useRef('');
+  const clearedSeqRef = useRef(0);
   const prevChainRef = useRef(0);
   const prevComboRef = useRef(0);
   const prevWaveRef = useRef(false);
@@ -172,6 +174,13 @@ function EffectsWorker({
 
   // ─── Cross flash (white lines fading to transparent over 300ms) ──
   const flashCross = useCallback((cx: number, cy: number) => {
+    // Destroy previous cross flash if still animating
+    if (crossFlashRef.current) {
+      cancelAnimationFrame(crossFlashRafRef.current);
+      camera.removeChild(crossFlashRef.current);
+      crossFlashRef.current.destroy();
+      crossFlashRef.current = null;
+    }
     const g = new Graphics();
     const lineLen = gridSize * cellSize;
     g.rect(0, cy - 2, lineLen, 4).fill({ color: 0xffffff });
@@ -216,6 +225,7 @@ function EffectsWorker({
       const filters = Array.isArray(camera.filters) ? camera.filters : [];
       camera.filters = filters.filter(f => f !== bloom);
       /* eslint-enable react-hooks/immutability */
+      bloom.destroy();
       bloomRef.current = null;
     };
   }, [camera]);
@@ -232,6 +242,7 @@ function EffectsWorker({
       camera.filters = filters.filter(f => f !== sw);
       /* eslint-enable react-hooks/immutability */
       cancelAnimationFrame(shockwaveRafRef.current);
+      sw.destroy();
       shockwaveRef.current = null;
     };
   }, [camera, width, height]);
@@ -273,7 +284,8 @@ function EffectsWorker({
   // Tile clear → per-type particle bursts + screen shake
   useEffect(() => {
     if (clearedTiles.length === 0) return;
-    const key = clearedTiles.map(t => `${t.row},${t.col},${t.type}`).join(';');
+    clearedSeqRef.current++;
+    const key = `${clearedSeqRef.current}:${clearedTiles.map(t => `${t.row},${t.col},${t.type}`).join(';')}`;
     if (key === prevClearedKeyRef.current) return;
     prevClearedKeyRef.current = key;
 

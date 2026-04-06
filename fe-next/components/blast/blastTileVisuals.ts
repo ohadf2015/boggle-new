@@ -10,9 +10,9 @@ export const TILE_VISUALS: Record<BlastTileType, { bg: string; indicator?: strin
   standard: {
     bg: '', text: 'text-neo-cream',
     style: {
-      background: 'linear-gradient(180deg, rgba(30,28,50,0.75) 0%, rgba(20,18,40,0.7) 40%, rgba(15,13,30,0.65) 100%)',
-      boxShadow: 'inset 0 2px 4px rgba(255,255,255,0.08), inset 0 -2px 3px rgba(0,0,0,0.3), 0 4px 0 rgba(0,0,0,0.4), 0 6px 8px rgba(0,0,0,0.25)',
-      border: '2px solid rgba(255,254,240,0.12)',
+      background: 'linear-gradient(180deg, rgba(70,65,110,0.85) 0%, rgba(55,50,90,0.8) 40%, rgba(40,36,70,0.75) 100%)',
+      boxShadow: 'inset 0 2px 4px rgba(255,255,255,0.12), inset 0 -2px 3px rgba(0,0,0,0.3), 0 4px 0 rgba(0,0,0,0.4), 0 6px 8px rgba(0,0,0,0.25)',
+      border: '2px solid rgba(255,254,240,0.18)',
     },
   },
   gold: {

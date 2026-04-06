@@ -25,6 +25,8 @@ const HeroMascot = memo(function HeroMascot({ isMobilePortrait }: { isMobilePort
   return (
     <IdleMascotWithEntrance
       baseVariant="happy"
+      enableIdleActivities={false}
+      cycleBaseVariants={false}
       size="xl"
       sizeClassName={isMobilePortrait ? 'w-[100px] h-[100px]' : 'w-32 h-32 sm:w-36 sm:h-36 md:w-40 md:h-40 lg:w-48 lg:h-48'}
       enableHover={!isMobilePortrait}

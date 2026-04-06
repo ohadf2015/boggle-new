@@ -23,6 +23,8 @@ interface TileSprite {
   /** Animation state */
   animState: 'idle' | 'appearing' | 'clearing' | 'falling' | 'landing' | 'swapping';
   animProgress: number;
+  /** Origin position for fall animation */
+  fallFromY?: number;
   /** Origin position for swap animation */
   swapFromX?: number;
   swapFromY?: number;
@@ -117,6 +119,7 @@ export class TileRenderer {
           Math.abs(existing.container.y - pos.y) > 1 &&
           existing.animState === 'idle'
         ) {
+          existing.fallFromY = existing.container.y;
           existing.animState = 'falling';
           existing.animProgress = 0;
         }
@@ -220,8 +223,8 @@ export class TileRenderer {
             ? 1 - Math.pow(1 - t / 0.9, 3)
             : 1 + Math.sin((t - 0.9) / 0.1 * Math.PI) * 0.03;
 
-          sprite.container.y =
-            sprite.container.y + (sprite.targetY - sprite.container.y) * ease;
+          const fromY = sprite.fallFromY ?? sprite.container.y;
+          sprite.container.y = fromY + (sprite.targetY - fromY) * ease;
 
           if (t >= 1) {
             sprite.container.y = sprite.targetY;
