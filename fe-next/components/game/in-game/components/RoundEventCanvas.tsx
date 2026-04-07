@@ -332,8 +332,10 @@ export const RoundEventCanvas = memo<RoundEventCanvasProps>(function RoundEventC
       const flashR = (5 - bolt.life) * 8;
       const flashGrad = ctx.createRadialGradient(endPt.x, endPt.y, 0, endPt.x, endPt.y, flashR);
       try {
+        const hslMatch = bolt.glowColor.match(/^hsl\(([^)]+)\)$/);
+        const midColor = hslMatch ? `hsla(${hslMatch[1]}, 0.4)` : 'rgba(100, 150, 255, 0.4)';
         flashGrad.addColorStop(0, 'rgba(255, 255, 255, 0.8)');
-        flashGrad.addColorStop(0.4, bolt.glowColor.replace(/^hsl\(([^)]+)\)$/, 'hsla($1, 0.4)'));
+        flashGrad.addColorStop(0.4, midColor);
         flashGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
       } catch { /* skip frame if color parse fails */ }
       ctx.globalAlpha = bolt.opacity * fade;

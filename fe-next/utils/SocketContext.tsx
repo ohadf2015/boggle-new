@@ -293,7 +293,7 @@ export function SocketProvider({ children }: SocketProviderProps) {
       if (error && typeof error === 'object' && Object.keys(error).length > 0) {
         const code = (error as Record<string, unknown>).code;
         const expectedErrors = [
-          'GAME_NOT_FOUND', 'NOT_IN_GAME', 'ROOM_NOT_FOUND',
+          'GAME_NOT_FOUND', 'NOT_IN_GAME', 'PLAYER_NOT_IN_GAME', 'ROOM_NOT_FOUND',
           'GAME_NOT_IN_PROGRESS', 'GAME_ALREADY_IN_PROGRESS', 'INTERNAL_ERROR',
         ];
         if (typeof code === 'string' && expectedErrors.includes(code)) {

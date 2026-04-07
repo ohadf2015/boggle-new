@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { loadTranslation, type TranslationData } from '@/translations/loadTranslation';
 import { DAILY_CHALLENGE_EPOCH } from '@/utils/dailyChallenge/constants';
+import { toBcp47Locale } from '@/utils/bcp47Locale';
 
 type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es';
 
@@ -111,10 +112,7 @@ export default async function DailyArchivePage({ params }: PageParams) {
     groupedByMonth[monthKey].push(entry);
   }
 
-  const localeMap: Record<string, string> = {
-    he: 'he-IL', ja: 'ja-JP', sv: 'sv-SE', es: 'es-ES', en: 'en-US',
-  };
-  const dateLocale = localeMap[validLocale] || 'en-US';
+  const dateLocale = toBcp47Locale(validLocale);
 
   const formatMonth = (monthKey: string) => {
     const [year, month] = monthKey.split('-');

@@ -11,6 +11,7 @@ import { CreateChallengeModal } from './CreateChallengeModal';
 import { UnauthenticatedCreateChallengeSection } from './UnauthenticatedCreateChallengeSection';
 import AuthModal from '../auth/AuthModal';
 import { hasPlayedWordHuntToday } from '@/utils/dailyChallenge';
+import { toBcp47Locale } from '@/utils/bcp47Locale';
 import { useMusic } from '@/contexts/MusicContext';
 import { MascotWithEntrance } from '@/components/ui/Mascot';
 import type { Language } from '@/types';
@@ -132,7 +133,7 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
 
   const formattedDate = useMemo(() => {
     try {
-      return new Date(puzzleDate + 'T00:00:00Z').toLocaleDateString(language, {
+      return new Date(puzzleDate + 'T00:00:00Z').toLocaleDateString(toBcp47Locale(language), {
         weekday: 'long',
         month: 'long',
         day: 'numeric',

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import { useTheme } from '@/utils/ThemeContext';
+import { toBcp47Locale } from '@/utils/bcp47Locale';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { ArrowLeft, Calendar, Clock, User } from 'lucide-react';
@@ -106,7 +107,7 @@ export default function StrategiesPageClient(): React.ReactElement {
           )}>
             <span className="flex items-center gap-1">
               <Calendar className="w-4 h-4" />
-              {new Date('2025-07-22').toLocaleDateString(language, { month: 'long', day: 'numeric', year: 'numeric' })}
+              {new Date('2025-07-22').toLocaleDateString(toBcp47Locale(language), { month: 'long', day: 'numeric', year: 'numeric' })}
             </span>
             <span className="flex items-center gap-1">
               <Clock className="w-4 h-4" />

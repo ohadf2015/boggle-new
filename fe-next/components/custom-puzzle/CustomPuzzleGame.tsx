@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, useMemo } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { getGuestFingerprint } from '@/utils/dailyChallenge';
@@ -54,8 +54,11 @@ const CustomPuzzleGame: React.FC<CustomPuzzleGameProps> = ({ puzzleCode }) => {
   // Local state for fingerprint (not game state)
   const [fingerprint, setFingerprint] = React.useState<string | null>(null);
 
-  // Get display name
-  const displayName = profile?.display_name || user?.email?.split('@')[0] || 'Player';
+  // Get display name — memoized to prevent handleGameComplete recreation on auth context re-renders
+  const displayName = useMemo(
+    () => profile?.display_name || user?.email?.split('@')[0] || 'Player',
+    [profile?.display_name, user?.email]
+  );
 
   // Reset store when puzzle code changes or on mount
   useEffect(() => {
