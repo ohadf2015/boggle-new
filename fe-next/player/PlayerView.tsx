@@ -40,6 +40,7 @@ import {
   useLeaderboard,
   useGameActions,
   useGameMode,
+  useGameStore,
 } from '@/hooks/gameState';
 import { useNavigationGuard } from '@/hooks/useNavigationGuard';
 
@@ -337,6 +338,47 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
     }
 
     setFoundWords([]);
+
+    // Sync Zustand store with game start data.
+    // When a non-ready player is on the results screen, usePlayerGameEvents isn't mounted
+    // so its handleStartGame listener misses the startGame socket event.
+    // This ensures all store fields are set regardless of mount timing.
+    const data = pendingGameStart as any;
+    const storeUpdates: Record<string, any> = {
+      foundWords: [],
+      achievements: [],
+      showStartAnimation: !data.lateJoin,
+    };
+    if (data.letterGrid) storeUpdates.letterGrid = data.letterGrid;
+    if (data.timerSeconds) {
+      storeUpdates.remainingTime = data.timerSeconds;
+      storeUpdates.gameDuration = data.timerSeconds;
+    }
+    if (data.language) storeUpdates.gameLanguage = data.language;
+    storeUpdates.minWordLength = data.minWordLength ?? 2;
+    if (data.boardTheme) storeUpdates.boardTheme = data.boardTheme;
+    if (data.gameMode) storeUpdates.gameMode = data.gameMode;
+    if (data.blastTileOverlay) {
+      storeUpdates.blastTileOverlay = data.blastTileOverlay;
+      storeUpdates.blastMovesUsed = 0;
+      if (data.blastSeed != null) storeUpdates.blastSeed = data.blastSeed;
+    }
+    if (data.wordHuntTargetLength != null && data.wordHuntTargetLength > 0) {
+      storeUpdates.wordHuntTargetLength = data.wordHuntTargetLength;
+      storeUpdates.wordHuntTargetCategory = data.wordHuntTargetCategory ?? null;
+      storeUpdates.wordHuntMyLife = 100;
+      storeUpdates.wordHuntPlayerLives = data.wordHuntPlayerLives || {};
+      storeUpdates.wordHuntTargetAttempts = [];
+      storeUpdates.wordHuntTargetFound = false;
+      storeUpdates.wordHuntTargetFoundBy = null;
+      storeUpdates.wordHuntEliminatedPlayers = data.wordHuntEliminatedPlayers || [];
+      storeUpdates.wordHuntDiscoveryClues = [];
+      storeUpdates.wordHuntKnownLetters = [];
+    }
+    if (data.lateJoin) {
+      storeUpdates.gameActive = true;
+    }
+    useGameStore.setState(storeUpdates);
 
     // For late joins, show waiting screen briefly before starting animation
     // This gives visual confirmation that the player successfully joined the room

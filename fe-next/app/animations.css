@@ -2294,17 +2294,13 @@ html.reduce-motion *::after {
 /* ==================== Desktop Layout Grid Container ==================== */
 /* Override game-board-frame sizing when inside desktop 3-column layout */
 .desktop-grid-container {
-  /* Container queries for responsive sizing within flex/grid layout */
-  container-type: size;
+  position: relative;
+  aspect-ratio: 1 / 1;
 }
 
 .desktop-grid-container .game-board-frame {
-  /* Override viewport-based sizing with container-relative sizing */
   width: 100% !important;
   height: 100% !important;
-  max-width: min(100%, 600px) !important;
-  max-height: min(100%, 600px) !important;
-  aspect-ratio: 1 / 1 !important;
   margin: 0 auto;
 }
 

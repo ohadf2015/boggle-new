@@ -47,12 +47,15 @@ const HeaderMenuDropdown = memo<HeaderMenuDropdownProps>(({
     // Aggregate badge: gifts + notifications + completed quests
     const badgeCount = unclaimedCount + (isAuthenticated ? notificationCount : 0) + completedCount;
 
-    // Reset "seen" when badge count increases (new notifications arrived)
+    // Reset "seen" when badge count increases (new notifications arrived),
+    // but only if the menu isn't currently open (avoid fighting with the user's click)
     const prevBadgeCount = useRef(badgeCount);
-    if (badgeCount > prevBadgeCount.current) {
-        setBadgeSeen(false);
-    }
-    prevBadgeCount.current = badgeCount;
+    useEffect(() => {
+        if (badgeCount > prevBadgeCount.current && !isOpen) {
+            setBadgeSeen(false);
+        }
+        prevBadgeCount.current = badgeCount;
+    }, [badgeCount, isOpen]);
 
     const closeMenu = useCallback(() => setIsOpen(false), []);
 

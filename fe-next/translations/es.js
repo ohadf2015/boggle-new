@@ -1008,7 +1008,8 @@ const es = {
     "avatarLabel": "Elige tu personaje",
     "namePlaceholder": "Escribe tu nombre",
     "saveButton": "Guardar",
-    "skipButton": "Saltar"
+    "skipButton": "Saltar",
+    "saveError": "No se pudo guardar. Inténtalo de nuevo."
   },
   "avatar": {
     "builder": {
@@ -1163,7 +1164,12 @@ const es = {
       "roomsListLabel": "Lista de salas disponibles",
       "linkCopied": "Enlace de invitación copiado — ¡envíalo a tus amigos!",
       "fetchTimeout": "No se pudieron cargar las salas. Comprueba tu conexión.",
-      "retry": "Reintentar"
+      "retry": "Reintentar",
+      "gameModes": {
+        "classic": "Clásico",
+        "wordHunt": "Caza de Palabras",
+        "blast": "Blast"
+      }
     },
     "joinModal": {
       "title": "Únete al combate",
@@ -7793,6 +7799,18 @@ const es = {
       "wordsFoundCount": "Palabras",
       "playerStats": "Estadísticas de Jugadores"
     },
+    "results": {
+      "boardDomination": "Dominación del Tablero",
+      "demolitionKing": "Rey de la Demolición",
+      "comboMaster": "Maestro del Combo",
+      "gemCollector": "Recolector de Gemas",
+      "wordsmith": "Maestro de Palabras",
+      "tilesCleared": "Fichas eliminadas",
+      "maxCombo": "Combo máximo",
+      "gemsCollected": "Gemas",
+      "bestWord": "Mejor Palabra",
+      "tiles": "fichas",
+    },
     "ready": {
       "title": "Modo Blast",
       "subtitle": "¡Limpia fichas formando palabras. Encadena combos para grandes puntuaciones!",
@@ -7828,7 +7846,7 @@ const es = {
     "helpDiamondLabel": "Diamante",
     "helpDiamond": "Multiplicador de 5x. La ficha de mayor valor.",
     "hintCooldown": "Usada",
-    "waveClear": "¡Oleada Limpia!",
+    "waveClearBanner": "¡Oleada Limpia!",
     "tapToContinue": "Toca para continuar",
     "levelComplete": "¡Nivel Completo!",
     "moveBonus": "Bonus de Movimiento",
@@ -7894,7 +7912,39 @@ const es = {
     "codexProgress": "{discovered}/{total} descubiertos",
     "codexLocked": "???",
     "comboDiscovered": "¡COMBO DESCUBIERTO!",
-    "chainCounter": "CADENA x{{count}}"
+    "chainCounter": "CADENA x{{count}}",
+    "wave": "Oleada",
+    "words": "palabras",
+    "help": "Ayuda",
+    "generating": "Generando tablero...",
+    "score": "Puntos",
+    "wordsFound": "palabras",
+    "gameOver": "FIN DEL JUEGO",
+    "waves": "oleadas",
+    "bestWord": "Mejor",
+    "playAgain": "JUGAR DE NUEVO",
+    "waveComplete": "¡Oleada {{wave}} completada!",
+    "tileGuide": {
+      "title": "Guía de fichas",
+      "standard": { "name": "Estándar", "desc": "Ficha básica — sin efecto especial" },
+      "gold": { "name": "Oro", "desc": "×3 puntos + 1 movimiento extra" },
+      "silver": { "name": "Plata", "desc": "×1.5 puntos + extiende cuentas regresivas en 1" },
+      "diamond": { "name": "Diamante", "desc": "×5 puntos + revela contenido congelado por 3 turnos" },
+      "bomb": { "name": "Bomba", "desc": "Limpia área 3×3 — encadena a bombas cercanas" },
+      "lightning": { "name": "Rayo", "desc": "Limpia columna entera — encadena a otros rayos" },
+      "prism": { "name": "Prisma", "desc": "2 golpes — limpia fila + columna, crea 2 especiales" },
+      "rainbow": { "name": "Arcoíris", "desc": "Copia el mejor especial en tu palabra, o ×2 puntos" },
+      "ice": { "name": "Hielo", "desc": "2 golpes para romper — congela virus adyacentes" },
+      "frozen": { "name": "Congelado", "desc": "2 golpes — libera un especial oculto dentro" },
+      "gem": { "name": "Gema", "desc": "3 golpes — genera 2 especiales + 2 movimientos extra" },
+      "mirror": { "name": "Espejo", "desc": "Copia el primer especial ofensivo en tu palabra" },
+      "magnet": { "name": "Imán", "desc": "Atrae fichas cercanas hacia adentro, luego explota 3×3" },
+      "wildcard": { "name": "Comodín", "desc": "Coincide con cualquier letra — puntúa por rareza" },
+      "countdown": { "name": "Cuenta regresiva", "desc": "¡Desactiva antes de 0! +2 movimientos — o penalización de 50pts" },
+      "virus": { "name": "Virus", "desc": "Se propaga cada turno — elimina 3+ en una palabra para curar todos" },
+      "portal": { "name": "Portal", "desc": "Enlazados en pares — limpia ambos, ×2 puntos de palabra" },
+      "catalyst": { "name": "Catalizador", "desc": "Mejora todas las fichas adyacentes a especiales aleatorias" }
+    }
   },
   "student": {
     "hub": {
@@ -9980,74 +10030,6 @@ const es = {
       "escalator": "El objetivo aumenta 5% por palabra",
       "nullifier": "Tus 2 primeras ranuras de runas están desactivadas",
       "inverter": "Runas de chip desactivadas, solo funcionan los multiplicadores"
-    }
-  },
-  "blast": {
-    "wave": "Oleada",
-    "moves": "movimientos",
-    "words": "palabras",
-    "help": "Ayuda",
-    "stuck": "¡No quedan palabras!",
-    "shuffle": "Mezclar",
-    "generating": "Generando tablero...",
-    "ready": {
-      "title": "MODO BLAST",
-      "subtitle": "Limpia el tablero, encadena combos, sobrevive las oleadas",
-      "play": "JUGAR",
-      "rule1": "Arrastra sobre las fichas para deletrear palabras (3+ letras)",
-      "rule2": "Palabras más largas dan más puntos y limpian más fichas",
-      "rule3": "Fichas especiales (💣⚡🔷) provocan reacciones en cadena",
-      "rule4": "Limpia 50%+ de fichas para avanzar a la siguiente oleada"
-    },
-    "waveComplete": "¡Oleada {{wave}} completada!",
-    "score": "Puntos",
-    "wordsFound": "palabras",
-    "cleared": "limpiado",
-    "nextWave": "Oleada {{wave}}",
-    "gameOver": "FIN DEL JUEGO",
-    "waves": "oleadas",
-    "bestWord": "Mejor",
-    "playAgain": "JUGAR DE NUEVO",
-    "chain": {
-      "cascade": "¡Cascada!",
-      "double": "¡Doble!",
-      "triple": "¡TRIPLE!",
-      "mega": "¡MEGA!",
-      "ultra": "¡¡ULTRA!!"
-    },
-    "praise": {
-      "nice": "¡Bien!",
-      "great": "¡Genial!",
-      "brilliant": "¡Brillante!",
-      "amazing": "¡INCREÍBLE!",
-      "legendary": "¡LEGENDARIO!"
-    },
-    "tileGuide": {
-      "title": "Guía de fichas",
-      "standard": { "name": "Estándar", "desc": "Ficha básica — sin efecto especial" },
-      "gold": { "name": "Oro", "desc": "×3 puntos + 1 movimiento extra" },
-      "silver": { "name": "Plata", "desc": "×1.5 puntos + extiende cuentas regresivas en 1" },
-      "diamond": { "name": "Diamante", "desc": "×5 puntos + revela contenido congelado por 3 turnos" },
-      "bomb": { "name": "Bomba", "desc": "Limpia área 3×3 — encadena a bombas cercanas" },
-      "lightning": { "name": "Rayo", "desc": "Limpia columna entera — encadena a otros rayos" },
-      "prism": { "name": "Prisma", "desc": "2 golpes — limpia fila + columna, crea 2 especiales" },
-      "rainbow": { "name": "Arcoíris", "desc": "Copia el mejor especial en tu palabra, o ×2 puntos" },
-      "ice": { "name": "Hielo", "desc": "2 golpes para romper — congela virus adyacentes" },
-      "frozen": { "name": "Congelado", "desc": "2 golpes — libera un especial oculto dentro" },
-      "gem": { "name": "Gema", "desc": "3 golpes — genera 2 especiales + 2 movimientos extra" },
-      "mirror": { "name": "Espejo", "desc": "Copia el primer especial ofensivo en tu palabra" },
-      "magnet": { "name": "Imán", "desc": "Atrae fichas cercanas hacia adentro, luego explota 3×3" },
-      "wildcard": { "name": "Comodín", "desc": "Coincide con cualquier letra — puntúa por rareza" },
-      "countdown": { "name": "Cuenta regresiva", "desc": "¡Desactiva antes de 0! +2 movimientos — o penalización de 50pts" },
-      "virus": { "name": "Virus", "desc": "Se propaga cada turno — elimina 3+ en una palabra para curar todos" },
-      "portal": { "name": "Portal", "desc": "Enlazados en pares — limpia ambos, ×2 puntos de palabra" },
-      "catalyst": { "name": "Catalizador", "desc": "Mejora todas las fichas adyacentes a especiales aleatorias" }
-    },
-    "objective": {
-      "scoreTarget": "Consigue {target} pts",
-      "collectType": "Recoge {target} {tileType}",
-      "clearAllType": "Limpia todos los {tileType}",
-      "wordLength": "Encuentra {target} palabras con {minWordLength}+ letras"
     }
   }
 };

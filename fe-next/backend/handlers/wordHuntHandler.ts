@@ -96,6 +96,12 @@ export function handleSubmitTargetWord(
     return;
   }
 
+  // Target already found — reject further guesses
+  if (huntState.targetFoundBy) {
+    socket.emit('error', { message: 'Target word already found' });
+    return;
+  }
+
   const guess = (data.guess || '').toLowerCase().trim();
   if (!guess) {
     socket.emit('error', { message: 'Guess is required' });

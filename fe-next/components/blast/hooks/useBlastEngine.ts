@@ -205,7 +205,19 @@ export function useBlastEngine(
     if (!isDictLoaded || !effectiveGrid) return;
     if (gameState.isComplete || gameState.isDeadEnd) return;
     if (isCascading) return;
-    if (wordsFoundCount === 0) return;
+    // Run initial dead-end check after a longer delay to let the board settle
+    if (wordsFoundCount === 0) {
+      const initialTimer = setTimeout(() => {
+        if (!effectiveGrid || !isDictLoaded) return;
+        const displayGrid = effectiveGrid.map((row, ri) =>
+          row.map((cell, ci) => tileStates[ri]?.[ci]?.isCleared ? '' : cell),
+        );
+        const foundSet = new Set<string>();
+        const valid = hasValidWords(displayGrid, language, checkWordInDict, foundSet, options?.minWordLength ?? 2);
+        setNoWordsRemaining(!valid);
+      }, 1500);
+      return () => clearTimeout(initialTimer);
+    }
 
     // Build display grid (hide cleared tiles)
     const displayGrid = effectiveGrid.map((row, ri) =>

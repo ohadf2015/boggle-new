@@ -1,10 +1,9 @@
 /**
- * RedditGameplayDemo — Landscape (1920x1080, 30fps, ~10s)
+ * RedditGameplayDemo — Landscape (1920x1080, 30fps, ~15s)
  * For r/WebGames, r/playmygame
  *
- * Simulated Word Hunt gameplay matching the real LexiClash UI:
+ * Simulated Word Hunt gameplay — relaxed pacing, 4 words found,
  * dark charcoal tiles, neon glows, circuit texture, mascot.
- * Designed for muted autoplay on Reddit.
  */
 
 import React from 'react';
@@ -49,20 +48,17 @@ const GRID_LETTERS = [
   ['B', 'E', 'X', 'I'],
 ];
 
+/** Only 4 words, spaced out generously */
 const FOUND_WORDS: {
   word: string;
   pts: number;
   delay: number;
   cells: [number, number][];
 }[] = [
-  { word: 'HUNT', pts: 120, delay: 30, cells: [[0,0],[0,1],[0,2],[0,3]] },
-  { word: 'CLASH', pts: 250, delay: 55, cells: [[1,0],[1,1],[1,2],[1,3],[0,3]] },
-  { word: 'WORDS', pts: 180, delay: 80, cells: [[2,0],[2,1],[2,2],[2,3],[0,3]] },
-  { word: 'ORAL', pts: 90, delay: 100, cells: [[2,1],[2,2],[1,2],[1,1]] },
-  { word: 'CLAN', pts: 110, delay: 120, cells: [[1,0],[1,1],[1,2],[0,2]] },
-  { word: 'LORE', pts: 140, delay: 140, cells: [[1,1],[2,1],[2,2],[3,1]] },
-  { word: 'CLAWS', pts: 280, delay: 160, cells: [[1,0],[1,1],[1,2],[2,0],[0,3]] },
-  { word: 'SAIL', pts: 100, delay: 180, cells: [[1,3],[1,2],[3,3],[1,1]] },
+  { word: 'HUNT', pts: 120, delay: 50, cells: [[0,0],[0,1],[0,2],[0,3]] },
+  { word: 'CLASH', pts: 250, delay: 100, cells: [[1,0],[1,1],[1,2],[1,3],[0,3]] },
+  { word: 'WORDS', pts: 180, delay: 155, cells: [[2,0],[2,1],[2,2],[2,3],[0,3]] },
+  { word: 'LORE', pts: 140, delay: 210, cells: [[1,1],[2,1],[2,2],[3,1]] },
 ];
 
 function getActiveCellInfo(frame: number): { active: Set<string>; combo: number } {
@@ -70,8 +66,8 @@ function getActiveCellInfo(frame: number): { active: Set<string>; combo: number 
   for (const w of FOUND_WORDS) {
     if (frame < w.delay) continue;
     const elapsed = frame - w.delay;
-    if (elapsed > 15) { combo++; continue; }
-    const cellsLit = Math.min(w.cells.length, Math.floor(elapsed / 2) + 1);
+    if (elapsed > 25) { combo++; continue; }
+    const cellsLit = Math.min(w.cells.length, Math.floor(elapsed / 4) + 1);
     const active = new Set<string>();
     for (let i = 0; i < cellsLit; i++) {
       active.add(`${w.cells[i][0]},${w.cells[i][1]}`);
@@ -81,24 +77,20 @@ function getActiveCellInfo(frame: number): { active: Set<string>; combo: number 
   return { active: new Set(), combo };
 }
 
-/** Circuit board background lines */
 const CircuitBackground: React.FC = () => (
   <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', opacity: 0.06 }}>
-    {/* Horizontal circuit lines */}
     {[180, 400, 620, 840].map((y) => (
       <div key={`h${y}`} style={{
         position: 'absolute', top: y, left: 0, right: 0,
         height: 1, background: C.cyan,
       }} />
     ))}
-    {/* Vertical circuit lines */}
     {[300, 700, 1100, 1500].map((x) => (
       <div key={`v${x}`} style={{
         position: 'absolute', left: x, top: 0, bottom: 0,
         width: 1, background: C.cyan,
       }} />
     ))}
-    {/* Circuit nodes */}
     {[[300,180],[700,400],[1100,620],[1500,840],[300,620],[1100,180]].map(([x,y], i) => (
       <div key={`n${i}`} style={{
         position: 'absolute', left: x - 3, top: y - 3,
@@ -109,28 +101,24 @@ const CircuitBackground: React.FC = () => (
   </div>
 );
 
-/** Dark charcoal tile matching real game */
 const GridCell: React.FC<{
   letter: string; row: number; col: number;
   frame: number; fps: number;
   isSelected: boolean; combo: number;
 }> = ({ letter, row, col, frame, fps, isSelected, combo }) => {
-  const delay = row * 3 + col * 2;
-  const s = spring({ frame: frame - delay, fps, config: { damping: 12, stiffness: 120 } });
+  const delay = row * 4 + col * 3;
+  const s = spring({ frame: frame - delay, fps, config: { damping: 14, stiffness: 90 } });
 
   let selectedBg: string = C.lime;
   let selectedGlow = '0 0 16px rgba(191,255,0,0.6), 0 0 4px rgba(191,255,0,0.3)';
-  if (combo >= 5) {
-    selectedBg = 'linear-gradient(135deg, #FF6B35, #FF3366)';
-    selectedGlow = '0 0 16px rgba(255,51,102,0.6)';
-  } else if (combo >= 3) {
+  if (combo >= 3) {
     selectedBg = 'linear-gradient(135deg, #F97316, #EF4444)';
     selectedGlow = '0 0 16px rgba(249,115,22,0.6)';
   }
 
   return (
     <div style={{
-      width: 105, height: 105,
+      width: 110, height: 110,
       display: 'flex', alignItems: 'center', justifyContent: 'center',
       background: isSelected ? selectedBg : `linear-gradient(165deg, ${C.tile} 0%, #232338 100%)`,
       border: `2px solid ${isSelected ? 'rgba(191,255,0,0.6)' : C.tileBorder}`,
@@ -138,11 +126,11 @@ const GridCell: React.FC<{
       boxShadow: isSelected
         ? selectedGlow
         : 'inset 0 1px 0 rgba(255,255,255,0.05), 0 2px 4px rgba(0,0,0,0.3)',
-      transform: `scale(${s * (isSelected ? 1.08 : 1)})`,
+      transform: `scale(${s * (isSelected ? 1.06 : 1)})`,
       fontFamily: fredoka, fontSize: 48, fontWeight: 700,
       color: isSelected ? C.black : C.white,
-      letterSpacing: '0.02em',
       textShadow: isSelected ? 'none' : '0 1px 2px rgba(0,0,0,0.5)',
+      transition: 'background 0.3s, border-color 0.3s',
     }}>
       {letter}
     </div>
@@ -183,7 +171,7 @@ const ScoreDisplay: React.FC<{ score: number; rank: number }> = ({ score, rank }
   <div style={{
     position: 'relative',
     border: '2px solid rgba(191,255,0,0.3)', borderRadius: 12,
-    background: 'rgba(191,255,0,0.08)', backdropFilter: 'blur(4px)',
+    background: 'rgba(191,255,0,0.08)',
     padding: '8px 28px', minWidth: 100, textAlign: 'center',
   }}>
     <div style={{
@@ -220,9 +208,9 @@ const WordListPanel: React.FC<{
     }}>WORDS FOUND</div>
     <div style={{ padding: 10, display: 'flex', flexDirection: 'column', gap: 6 }}>
       {words.map((w) => {
-        const wIn = spring({ frame: frame - w.delay - 8, fps, config: { damping: 10, stiffness: 140 } });
-        if (frame <= w.delay + 5) return null;
-        const isLatest = words.filter((ww) => frame > ww.delay + 5).pop()?.word === w.word;
+        const wIn = spring({ frame: frame - w.delay - 15, fps, config: { damping: 12, stiffness: 100 } });
+        if (frame <= w.delay + 10) return null;
+        const isLatest = words.filter((ww) => frame > ww.delay + 10).pop()?.word === w.word;
         return (
           <div key={w.word} style={{
             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
@@ -256,12 +244,12 @@ const WordFormingBar: React.FC<{ frame: number; words: typeof FOUND_WORDS }> = (
   for (const w of words) {
     if (frame < w.delay) continue;
     const elapsed = frame - w.delay;
-    if (elapsed <= 12) {
-      const lettersShown = Math.min(w.word.length, Math.floor(elapsed / 2) + 1);
+    if (elapsed <= 18) {
+      const lettersShown = Math.min(w.word.length, Math.floor(elapsed / 3) + 1);
       currentWord = w.word.slice(0, lettersShown);
       state = 'forming';
       break;
-    } else if (elapsed <= 18) {
+    } else if (elapsed <= 28) {
       currentWord = w.word;
       currentPts = w.pts;
       state = 'accepted';
@@ -295,24 +283,23 @@ export const RedditGameplayDemo: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
-  const titleIn = spring({ frame, fps, config: { damping: 14, stiffness: 100 } });
-  const titleO = interpolate(frame, [0, 10], [0, 1], { extrapolateRight: 'clamp' });
+  const titleIn = spring({ frame, fps, config: { damping: 16, stiffness: 80 } });
+  const titleO = interpolate(frame, [0, 15], [0, 1], { extrapolateRight: 'clamp' });
   const { active, combo } = getActiveCellInfo(frame);
 
   const score = FOUND_WORDS.reduce((acc, w) =>
-    frame > w.delay + 12 ? acc + w.pts : acc, 0);
-  const timeLeft = Math.max(0, 60 - Math.floor(frame / 5));
+    frame > w.delay + 20 ? acc + w.pts : acc, 0);
+  const timeLeft = Math.max(0, 60 - Math.floor(frame / 7));
 
-  const ctaO = interpolate(frame, [220, 245], [0, 1], {
+  const ctaO = interpolate(frame, [340, 370], [0, 1], {
     extrapolateLeft: 'clamp', extrapolateRight: 'clamp',
   });
-  const ctaScale = spring({ frame: frame - 220, fps, config: { damping: 8, stiffness: 60 } });
+  const ctaScale = spring({ frame: frame - 340, fps, config: { damping: 10, stiffness: 60 } });
 
   return (
     <AbsoluteFill style={{ backgroundColor: C.navy }}>
       <CircuitBackground />
 
-      {/* Atmospheric glow behind grid */}
       <div style={{
         position: 'absolute', left: 200, top: '40%',
         width: 500, height: 500, borderRadius: '50%',
@@ -337,11 +324,9 @@ export const RedditGameplayDemo: React.FC = () => {
           display: 'flex', flexDirection: 'column', gap: 6, padding: 12,
           borderRadius: 14, background: 'rgba(0,0,0,0.2)',
           border: '1px solid rgba(255,255,255,0.05)',
-          boxShadow: combo >= 5
-            ? '0 0 30px rgba(255,51,102,0.4), 0 0 60px rgba(255,51,102,0.15)'
-            : combo >= 3
-              ? '0 0 20px rgba(0,255,255,0.3)'
-              : '0 4px 20px rgba(0,0,0,0.3)',
+          boxShadow: combo >= 3
+            ? '0 0 20px rgba(0,255,255,0.3)'
+            : '0 4px 20px rgba(0,0,0,0.3)',
         }}>
           {GRID_LETTERS.map((row, ri) => (
             <div key={ri} style={{ display: 'flex', gap: 6 }}>
@@ -378,20 +363,19 @@ export const RedditGameplayDemo: React.FC = () => {
         <WordListPanel words={FOUND_WORDS} frame={frame} fps={fps} />
 
         <div style={{ alignSelf: 'center', marginTop: 4 }}>
-          <AnimatedImage src={staticFile('mascot/play.gif')}
-            width={110} height={110} fit="contain" loopBehavior="loop" />
+          <AnimatedImage src={staticFile('mascot/onfire-nobg.gif')}
+            width={180} height={180} fit="contain" loopBehavior="loop" />
         </div>
       </div>
 
       {/* CTA overlay */}
-      {frame > 210 && (
+      {frame > 330 && (
         <div style={{
           position: 'absolute', inset: 0,
           display: 'flex', flexDirection: 'column',
           alignItems: 'center', justifyContent: 'center',
           background: 'rgba(26,26,46,0.94)', opacity: ctaO,
         }}>
-          {/* Glow orb behind logo */}
           <div style={{
             position: 'absolute', width: 400, height: 400, borderRadius: '50%',
             background: 'radial-gradient(circle, rgba(191,255,0,0.12) 0%, transparent 60%)',
@@ -412,8 +396,8 @@ export const RedditGameplayDemo: React.FC = () => {
             textShadow: '0 0 12px rgba(191,255,0,0.4)',
           }}>lexiclash.live</div>
           <div style={{ marginTop: 16 }}>
-            <AnimatedImage src={staticFile('mascot/waving.gif')}
-              width={120} height={120} fit="contain" loopBehavior="loop" />
+            <AnimatedImage src={staticFile('mascot/explorer-nobg.gif')}
+              width={200} height={200} fit="contain" loopBehavior="loop" />
           </div>
         </div>
       )}

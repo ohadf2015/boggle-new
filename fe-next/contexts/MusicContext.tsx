@@ -58,7 +58,7 @@ const TRACKS: Record<TrackKey, string> = {
   almostOutOfTime: '/music/almost_out_of_time.mp3',
   bossaArcade: '/music/bossa-arcade.mp3',
   bossa: '/music/bossa.mp3',
-  blast: '/music/blast.mp3',
+  blast: '/music/blast_mode.mp3',
 };
 
 const STORAGE_KEY = 'boggle_music_settings';

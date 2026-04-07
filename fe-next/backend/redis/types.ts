@@ -27,6 +27,7 @@ export interface GameStateData {
   blastModeState: Record<string, unknown> | null;
   wordHuntState: Record<string, unknown> | null;
   isRanked?: boolean;
+  isPrivate?: boolean;
   allowLateJoin?: boolean;
   chatHistory?: unknown[];
   aiApprovedWords?: unknown[];
@@ -122,6 +123,7 @@ export interface GameDataInput {
   blastModeState?: Record<string, unknown> | null;
   wordHuntState?: Record<string, unknown> | null;
   isRanked?: boolean;
+  isPrivate?: boolean;
   allowLateJoin?: boolean;
   chatHistory?: unknown[];
   aiApprovedWords?: unknown[];

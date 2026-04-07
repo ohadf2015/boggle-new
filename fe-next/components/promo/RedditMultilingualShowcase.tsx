@@ -63,25 +63,25 @@ const LANGUAGES: LangScene[] = [
     flag: '🇺🇸',
     label: 'ENGLISH',
     grid: [['H','U','N','T'],['C','L','A','S'],['W','O','R','D'],['B','E','X','I']],
-    words: ['HUNT', 'CLASH', 'WORDS', 'LORE'],
+    words: ['HUNT', 'CLASH', 'WORDS'],
     color: C.lime,
     dir: 'ltr',
-    mascot: 'mascot/flexing.gif',
+    mascot: 'mascot/powerup-nobg.gif',
   },
   {
     flag: '🇮🇱',
     label: 'עברית',
     grid: [['מ','ל','ח','מ'],['ה','ש','ב','ע'],['ד','ר','כ','י'],['ת','פ','ל','ה']],
-    words: ['מלחמה', 'דרך', 'שבע', 'תפלה'],
+    words: ['מלחמה', 'דרך', 'שבע'],
     color: C.cyan,
     dir: 'rtl',
-    mascot: 'mascot/play.gif',
+    mascot: 'mascot/explorer-nobg.gif',
   },
   {
     flag: '🇯🇵',
     label: '日本語',
     grid: [['あ','い','う','え'],['か','き','く','け'],['さ','し','す','せ'],['た','ち','つ','て']],
-    words: ['あいう', 'かき', 'しすせ', 'たちつ'],
+    words: ['あいう', 'かき', 'しすせ'],
     color: C.pink,
     dir: 'ltr',
     mascot: 'mascot/onfire-nobg.gif',
@@ -90,24 +90,24 @@ const LANGUAGES: LangScene[] = [
     flag: '🇸🇪',
     label: 'SVENSKA',
     grid: [['S','T','Ö','R'],['K','L','A','N'],['V','Ä','G','E'],['D','R','Ö','M']],
-    words: ['STÖRA', 'KLAN', 'VÄGE', 'DRÖM'],
+    words: ['STÖRA', 'KLAN', 'DRÖM'],
     color: C.purple,
     dir: 'ltr',
-    mascot: 'mascot/trophy.gif',
+    mascot: 'mascot/trophy-nobg.gif',
   },
   {
     flag: '🇪🇸',
     label: 'ESPAÑOL',
     grid: [['P','A','L','A'],['B','R','A','S'],['C','O','M','O'],['J','U','E','G']],
-    words: ['PALABRA', 'COMO', 'JUEGO', 'BRAS'],
+    words: ['PALABRA', 'COMO', 'JUEGO'],
     color: C.lime,
     dir: 'ltr',
-    mascot: 'mascot/celebration.gif',
+    mascot: 'mascot/mindblown-nobg.gif',
   },
 ];
 
-const SCENE_FRAMES = 48;
-const TRANSITION_FRAMES = 8;
+const SCENE_FRAMES = 75;
+const TRANSITION_FRAMES = 16;
 
 /** Circuit board background */
 const CircuitBg: React.FC = () => (
@@ -186,9 +186,9 @@ const WordChip: React.FC<{
   isLatest: boolean;
 }> = ({ word, index, frame, fps, color, dir, isLatest }) => {
   const wS = spring({
-    frame: frame - (12 + index * 8),
+    frame: frame - (15 + index * 14),
     fps,
-    config: { damping: 10, stiffness: 140 },
+    config: { damping: 12, stiffness: 100 },
   });
   return (
     <div
@@ -221,7 +221,7 @@ const LanguageScene: React.FC<{ lang: LangScene }> = ({ lang }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
-  const visibleWords = lang.words.filter((_, i) => frame > 12 + i * 8);
+  const visibleWords = lang.words.filter((_, i) => frame > 15 + i * 14);
 
   return (
     <AbsoluteFill style={{ backgroundColor: C.navy }}>
@@ -349,8 +349,8 @@ const LanguageScene: React.FC<{ lang: LangScene }> = ({ lang }) => {
       }}>
         <AnimatedImage
           src={staticFile(lang.mascot)}
-          width={110}
-          height={110}
+          width={180}
+          height={180}
           fit="contain"
           loopBehavior="loop"
         />
@@ -473,9 +473,9 @@ const CTAScene: React.FC = () => {
         opacity: interpolate(frame, [8, 16], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }),
       }}>
         <AnimatedImage
-          src={staticFile('mascot/waving.gif')}
-          width={140}
-          height={140}
+          src={staticFile('mascot/crying-nobg.gif')}
+          width={200}
+          height={200}
           fit="contain"
           loopBehavior="loop"
         />
@@ -511,7 +511,7 @@ export const RedditMultilingualShowcase: React.FC = () => {
           timing={linearTiming({ durationInFrames: 10 })}
         />
 
-        <TransitionSeries.Sequence durationInFrames={90}>
+        <TransitionSeries.Sequence durationInFrames={120}>
           <CTAScene />
         </TransitionSeries.Sequence>
       </TransitionSeries>

@@ -49,12 +49,17 @@ export default function ProfileCustomizationWrapper() {
   const handleSave = useCallback(async (name: string, avatarConfig: CustomAvatarConfig) => {
     logger.info('ProfileCustomizationWrapper: Saving profile', { name });
 
-    await updateProfile({
+    const { error } = await updateProfile({
       display_name: name,
       username: name,
       avatar_config: avatarConfig,
       has_customized_profile: true,
     });
+
+    if (error) {
+      logger.error('ProfileCustomizationWrapper: Failed to save profile', { error: error.message });
+      throw new Error(error.message);
+    }
 
     logger.info('ProfileCustomizationWrapper: Profile saved successfully');
     setShowModal(false);

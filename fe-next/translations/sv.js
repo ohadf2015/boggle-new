@@ -959,7 +959,8 @@ const sv = {
     "avatarLabel": "Välj din karaktär",
     "namePlaceholder": "Ange ditt namn",
     "saveButton": "Spara",
-    "skipButton": "Hoppa över"
+    "skipButton": "Hoppa över",
+    "saveError": "Det gick inte att spara. Försök igen."
   },
   "avatar": {
     "builder": {
@@ -1145,7 +1146,12 @@ const sv = {
       "roomsListLabel": "Lista över tillgängliga spelrum",
       "linkCopied": "Inbjudningslänk kopierad — skicka till vänner!",
       "fetchTimeout": "Det gick inte att ladda rum. Kontrollera din anslutning.",
-      "retry": "Försök igen"
+      "retry": "Försök igen",
+      "gameModes": {
+        "classic": "Klassiskt",
+        "wordHunt": "Ordjakt",
+        "blast": "Blast"
+      }
     },
     "joinModal": {
       "title": "Gå med i striden",
@@ -7708,6 +7714,18 @@ const sv = {
       "wordsFoundCount": "Ord",
       "playerStats": "Spelarstatistik",
     },
+    "results": {
+      "boardDomination": "Brädkontroll",
+      "demolitionKing": "Rivningskung",
+      "comboMaster": "Kombomästare",
+      "gemCollector": "Ädelstenssamlare",
+      "wordsmith": "Ordsmed",
+      "tilesCleared": "Brickor rensade",
+      "maxCombo": "Max kombo",
+      "gemsCollected": "Ädelstenar",
+      "bestWord": "Bästa ord",
+      "tiles": "brickor",
+    },
     "ready": {
       "title": "Blast-läge",
       "subtitle": "Rensa brickor genom att bilda ord. Kedjekombos ger stora poäng!",
@@ -7733,7 +7751,7 @@ const sv = {
     "hint": "Tips",
     "stuck": "Fastnat?",
     "hintCooldown": "Använt",
-    "waveClear": "Vågen klar!",
+    "waveClearBanner": "Vågen klar!",
     "tapToContinue": "Tryck för att fortsätta",
     "levelComplete": "Nivå klar!",
     "moveBonus": "Dragbonus",
@@ -7799,7 +7817,37 @@ const sv = {
     "codexProgress": "{discovered}/{total} hittade",
     "codexLocked": "???",
     "comboDiscovered": "KOMBINATION HITTAD!",
-    "chainCounter": "KEDJA x{{count}}"
+    "chainCounter": "KEDJA x{{count}}",
+    "wave": "Våg",
+    "words": "ord",
+    "help": "Hjälp",
+    "generating": "Skapar rutnät...",
+    "score": "Poäng",
+    "wordsFound": "ord",
+    "gameOver": "SPELET SLUT",
+    "waves": "vågor",
+    "playAgain": "SPELA IGEN",
+    "tileGuide": {
+      "title": "Brickguide",
+      "standard": { "name": "Standard", "desc": "Vanlig bricka — ingen specialeffekt" },
+      "gold": { "name": "Guld", "desc": "×3 poäng + 1 bonusdrag" },
+      "silver": { "name": "Silver", "desc": "×1,5 poäng + förlänger nedräkningar med 1" },
+      "diamond": { "name": "Diamant", "desc": "×5 poäng + avslöjar frusna i 3 turer" },
+      "bomb": { "name": "Bomb", "desc": "Rensar 3×3 — kedjar till närliggande bomber" },
+      "lightning": { "name": "Blixt", "desc": "Rensar hela kolumnen — kedjar till andra blixtar" },
+      "prism": { "name": "Prisma", "desc": "2 träffar — rensar rad + kolumn, skapar 2 special" },
+      "rainbow": { "name": "Regnbåge", "desc": "Kopierar bästa special i ditt ord, eller ×2 poäng" },
+      "ice": { "name": "Is", "desc": "2 träffar att krossa — fryser intilliggande virus" },
+      "frozen": { "name": "Frusen", "desc": "2 träffar — frigör dold special inuti" },
+      "gem": { "name": "Ädelsten", "desc": "3 träffar — skapar 2 special + 2 bonusdrag" },
+      "mirror": { "name": "Spegel", "desc": "Kopierar första offensiva special i ditt ord" },
+      "magnet": { "name": "Magnet", "desc": "Drar brickor inåt, sedan spränger 3×3" },
+      "wildcard": { "name": "Joker", "desc": "Matchar alla bokstäver — poäng efter bokstavens sällsynthet" },
+      "countdown": { "name": "Nedräkning", "desc": "Desarmera innan 0! +2 drag — eller 50p straff" },
+      "virus": { "name": "Virus", "desc": "Sprider sig varje tur — rensa 3+ i ett ord för att bota alla" },
+      "portal": { "name": "Portal", "desc": "Länkade i par — rensar båda, ×2 ordpoäng" },
+      "catalyst": { "name": "Katalysator", "desc": "Uppgraderar alla intilliggande brickor till special" }
+    }
   },
   "student": {
     "hub": {
@@ -9872,74 +9920,6 @@ const sv = {
       "escalator": "Målet ökar med 5% per ord",
       "nullifier": "Dina 2 första runplatser är avaktiverade",
       "inverter": "Chiprunor avaktiverade, bara multiplikatorer fungerar"
-    }
-  },
-  "blast": {
-    "wave": "Våg",
-    "moves": "drag",
-    "words": "ord",
-    "help": "Hjälp",
-    "stuck": "Inga ord kvar!",
-    "shuffle": "Blanda",
-    "generating": "Skapar rutnät...",
-    "ready": {
-      "title": "BLAST-LÄGE",
-      "subtitle": "Rensa brädet, kedja kombos, överlev vågorna",
-      "play": "SPELA",
-      "rule1": "Dra över brickor för att stava ord (3+ bokstäver)",
-      "rule2": "Längre ord ger mer poäng och rensar fler brickor",
-      "rule3": "Specialbrickor (💣⚡🔷) utlöser explosiva kedjereaktioner",
-      "rule4": "Rensa 50%+ av brickorna för att gå vidare till nästa våg"
-    },
-    "waveComplete": "Våg {{wave}} klar!",
-    "score": "Poäng",
-    "wordsFound": "ord",
-    "cleared": "rensat",
-    "nextWave": "Våg {{wave}}",
-    "gameOver": "SPELET SLUT",
-    "waves": "vågor",
-    "bestWord": "Bästa",
-    "playAgain": "SPELA IGEN",
-    "chain": {
-      "cascade": "Kaskad!",
-      "double": "Dubbel!",
-      "triple": "TRIPPEL!",
-      "mega": "MEGA!",
-      "ultra": "ULTRA!!"
-    },
-    "praise": {
-      "nice": "Snyggt!",
-      "great": "Bra!",
-      "brilliant": "Briljant!",
-      "amazing": "FANTASTISKT!",
-      "legendary": "LEGENDARISKT!"
-    },
-    "tileGuide": {
-      "title": "Brickguide",
-      "standard": { "name": "Standard", "desc": "Vanlig bricka — ingen specialeffekt" },
-      "gold": { "name": "Guld", "desc": "×3 poäng + 1 bonusdrag" },
-      "silver": { "name": "Silver", "desc": "×1,5 poäng + förlänger nedräkningar med 1" },
-      "diamond": { "name": "Diamant", "desc": "×5 poäng + avslöjar frusna i 3 turer" },
-      "bomb": { "name": "Bomb", "desc": "Rensar 3×3 — kedjar till närliggande bomber" },
-      "lightning": { "name": "Blixt", "desc": "Rensar hela kolumnen — kedjar till andra blixtar" },
-      "prism": { "name": "Prisma", "desc": "2 träffar — rensar rad + kolumn, skapar 2 special" },
-      "rainbow": { "name": "Regnbåge", "desc": "Kopierar bästa special i ditt ord, eller ×2 poäng" },
-      "ice": { "name": "Is", "desc": "2 träffar att krossa — fryser intilliggande virus" },
-      "frozen": { "name": "Frusen", "desc": "2 träffar — frigör dold special inuti" },
-      "gem": { "name": "Ädelsten", "desc": "3 träffar — skapar 2 special + 2 bonusdrag" },
-      "mirror": { "name": "Spegel", "desc": "Kopierar första offensiva special i ditt ord" },
-      "magnet": { "name": "Magnet", "desc": "Drar brickor inåt, sedan spränger 3×3" },
-      "wildcard": { "name": "Joker", "desc": "Matchar alla bokstäver — poäng efter bokstavens sällsynthet" },
-      "countdown": { "name": "Nedräkning", "desc": "Desarmera innan 0! +2 drag — eller 50p straff" },
-      "virus": { "name": "Virus", "desc": "Sprider sig varje tur — rensa 3+ i ett ord för att bota alla" },
-      "portal": { "name": "Portal", "desc": "Länkade i par — rensar båda, ×2 ordpoäng" },
-      "catalyst": { "name": "Katalysator", "desc": "Uppgraderar alla intilliggande brickor till special" }
-    },
-    "objective": {
-      "scoreTarget": "Få {target} poäng",
-      "collectType": "Samla {target} {tileType}",
-      "clearAllType": "Rensa alla {tileType}",
-      "wordLength": "Hitta {target} ord med {minWordLength}+ bokstäver"
     }
   }
 };

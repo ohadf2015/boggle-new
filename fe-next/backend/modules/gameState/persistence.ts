@@ -111,6 +111,7 @@ export async function restoreGameFromRedis(
       tournamentId: redisState.tournamentId,
       reconnectionTimeout: null,
       isRanked: (redisState as any).isRanked ?? false,
+      isPrivate: (redisState as any).isPrivate ?? false,
       allowLateJoin: (redisState as any).allowLateJoin ?? true,
       aiApprovedWords: (redisState as any).aiApprovedWords || [],
       peerValidationWord: null,

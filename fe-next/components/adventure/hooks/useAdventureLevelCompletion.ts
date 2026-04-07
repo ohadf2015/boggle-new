@@ -389,10 +389,12 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
             goldEarned: earnedGoldRef.current,
             longWords: gameState.wordsFound.filter(w => w.length >= 6).length,
           };
-          navigator.sendBeacon(
-            '/api/adventure/complete',
-            new Blob([JSON.stringify(payload)], { type: 'application/json' })
-          );
+          if (navigator.sendBeacon) {
+            navigator.sendBeacon(
+              '/api/adventure/complete',
+              new Blob([JSON.stringify(payload)], { type: 'application/json' })
+            );
+          }
         } catch { /* best effort */ }
       }
     };

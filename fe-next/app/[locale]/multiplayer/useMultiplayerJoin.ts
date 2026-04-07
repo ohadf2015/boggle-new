@@ -95,6 +95,7 @@ type HandleJoinFn = (
   overrideGameCode?: string,
   overrideRoomName?: string,
   overrideUsername?: string,
+  options?: { isPrivate?: boolean },
 ) => Promise<void>;
 
 export function useMultiplayerJoin({
@@ -123,6 +124,7 @@ export function useMultiplayerJoin({
       overrideGameCode?: string,
       overrideRoomName?: string,
       overrideUsername?: string,
+      options?: { isPrivate?: boolean },
     ) => {
       if (process.env.NODE_ENV === 'development') {
         console.log(`[JOIN] handleJoin called - mode: ${isHostMode ? 'HOST' : 'PLAYER'}, socket connected: ${socket?.connected}`);
@@ -235,6 +237,7 @@ export function useMultiplayerJoin({
           guestTokenHash,
           guestSessionId,
           avatar: hostAvatar,
+          ...(options?.isPrivate && { isPrivate: true }),
         });
       } else {
         logger.log('[JOIN] Emitting join event:', {

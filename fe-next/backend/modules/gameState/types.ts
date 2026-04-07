@@ -90,6 +90,7 @@ export interface GameState {
   hostReconnectionTimeout?: ReturnType<typeof setTimeout> | null;
   validationTimeout?: ReturnType<typeof setTimeout> | null;
   isRanked: boolean;
+  isPrivate: boolean;
   allowLateJoin: boolean;
   aiApprovedWords: AiApprovedWord[];
   peerValidationWord: AiApprovedWord | null;
@@ -142,6 +143,7 @@ export interface GameCreationData {
   roomName?: string;
   language?: Language;
   isRanked?: boolean;
+  isPrivate?: boolean;
   allowLateJoin?: boolean;
 }
 

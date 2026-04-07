@@ -141,14 +141,12 @@ export const ChallengeInviteDialog: React.FC<ChallengeInviteDialogProps> = ({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             className={cn(
-              'fixed inset-x-4 top-1/2 z-50 mx-auto max-w-md',
-              '-translate-y-1/2',
-              'max-h-[100dvh]',
+              'fixed inset-x-0 inset-y-0 z-50 flex items-center justify-center p-4',
               className
             )}
           >
             <div className={cn(
-              'rounded-neo border-2 border-neo-black shadow-hard-lg p-6',
+              'w-full max-w-md rounded-neo border-2 border-neo-black shadow-hard-lg p-6',
               'max-h-[calc(100dvh-2rem)] overflow-y-auto',
               isDark ? 'bg-slate-800' : 'bg-white'
             )}>
@@ -177,7 +175,7 @@ export const ChallengeInviteDialog: React.FC<ChallengeInviteDialogProps> = ({
 
               {/* Recipient */}
               <p className={cn('text-sm mb-4', isDark ? 'text-gray-400' : 'text-gray-600')}>
-                {t('friends.challenges.inviteMessage', { username: friendUsername })}
+                {t('friends.challenges.inviteMessage', { name: friendUsername })}
               </p>
 
               {/* Settings */}

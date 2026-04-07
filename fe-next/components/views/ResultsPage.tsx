@@ -42,8 +42,10 @@ import { useInterstitialAd } from '@/hooks/useInterstitialAd';
 import { useGameKeyboardShortcuts } from '@/hooks/useGameKeyboardShortcuts';
 import type { GameModeOption } from '@/components/GameModeSelector';
 import { useGameMode, useWordHuntPlayerLives, useWordHuntEliminatedPlayers, useBlastMovesUsed, useBlastTotalTileBonus, useBlastTotalTilesCleared, useBlastPlayerStats } from '@/hooks/gameState/store';
+import type { BlastPlayerStats } from '@/shared/types/game';
 const WordHuntResultsSummary = dynamic(() => import('@/components/results/WordHuntResultsSummary'), { ssr: false });
 const BlastResultsSummary = dynamic(() => import('@/components/results/BlastResultsSummary'), { ssr: false });
+const BlastBoardDomination = dynamic(() => import('@/components/results/BlastBoardDomination'), { ssr: false });
 const CrazyGamesBanner = dynamic(() => import('@/components/CrazyGamesBanner'), { ssr: false });
 const PostGameWordReview = dynamic(() => import('@/components/education/PostGameWordReview'), { ssr: false });
 
@@ -65,6 +67,8 @@ interface DesktopResultsLayoutProps {
   blastMovesUsed: number;
   blastTotalTilesCleared: number;
   blastTotalTileBonus: number;
+  blastPlayerStats: Record<string, BlastPlayerStats>;
+  currentUsername?: string;
   gameCode?: string;
   sortedScores: any[];
   otherPlayers: any[];
@@ -82,6 +86,8 @@ function DesktopResultsLayout({
   blastMovesUsed,
   blastTotalTilesCleared,
   blastTotalTileBonus,
+  blastPlayerStats,
+  currentUsername,
   gameCode,
   sortedScores,
   otherPlayers,
@@ -139,11 +145,18 @@ function DesktopResultsLayout({
               <WordHuntResultsSummary {...wordHuntResultsData} />
             )}
             {resolvedGameMode === 'blast' && (
-              <BlastResultsSummary
-                movesUsed={blastMovesUsed}
-                tilesCleared={blastTotalTilesCleared}
-                tileBonus={blastTotalTileBonus}
-              />
+              Object.keys(blastPlayerStats).length >= 2 ? (
+                <BlastBoardDomination
+                  playerStats={blastPlayerStats}
+                  currentUsername={currentUsername}
+                />
+              ) : (
+                <BlastResultsSummary
+                  movesUsed={blastMovesUsed}
+                  tilesCleared={blastTotalTilesCleared}
+                  tileBonus={blastTotalTileBonus}
+                />
+              )
             )}
             {gameCode && sortedScores.length > 1 && (
               <PostGameSocialActions
@@ -665,11 +678,18 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
       )}
       {resolvedGameMode === 'blast' && (
         <div className="mb-3">
-          <BlastResultsSummary
-            movesUsed={blastMovesUsed}
-            tilesCleared={blastTotalTilesCleared}
-            tileBonus={blastTotalTileBonus}
-          />
+          {Object.keys(blastPlayerStats).length >= 2 ? (
+            <BlastBoardDomination
+              playerStats={blastPlayerStats}
+              currentUsername={username}
+            />
+          ) : (
+            <BlastResultsSummary
+              movesUsed={blastMovesUsed}
+              tilesCleared={blastTotalTilesCleared}
+              tileBonus={blastTotalTileBonus}
+            />
+          )}
         </div>
       )}
       {/* Social actions: Add Friend for non-friend opponents (E-10, E-14) */}
@@ -843,6 +863,8 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
         blastMovesUsed={blastMovesUsed}
         blastTotalTilesCleared={blastTotalTilesCleared}
         blastTotalTileBonus={blastTotalTileBonus}
+        blastPlayerStats={blastPlayerStats}
+        currentUsername={username}
         gameCode={gameCode}
         sortedScores={sortedScores}
         otherPlayers={otherPlayers}

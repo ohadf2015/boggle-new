@@ -69,6 +69,7 @@ interface CreateGamePayload {
   guestTokenHash?: string;
   guestSessionId?: string;
   isRanked?: boolean;
+  isPrivate?: boolean;
 }
 
 interface StartGameAckPayload {
@@ -120,7 +121,7 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
         return;
       }
 
-      const { gameCode, roomName, language, hostUsername, playerId, avatar, authUserId, guestTokenHash, guestSessionId, isRanked } = validation.data as CreateGamePayload;
+      const { gameCode, roomName, language, hostUsername, playerId, avatar, authUserId, guestTokenHash, guestSessionId, isRanked, isPrivate } = validation.data as CreateGamePayload;
 
       logger.info('SOCKET', `Create game request: ${gameCode} by ${hostUsername}${isRanked ? ' (RANKED)' : ''}`, {
         socketId: socket.id,
@@ -147,6 +148,7 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
         roomName: roomName || gameCode,
         language: language || 'en',
         isRanked: isRanked || false,
+        isPrivate: isPrivate || false,
         allowLateJoin: isRanked ? false : true
       });
 

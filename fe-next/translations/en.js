@@ -944,7 +944,8 @@ const en = {
     "avatarLabel": "Your character",
     "namePlaceholder": "Your name",
     "saveButton": "Save",
-    "skipButton": "Skip"
+    "skipButton": "Skip",
+    "saveError": "Failed to save. Please try again."
   },
   "avatar": {
     "builder": {
@@ -1130,7 +1131,12 @@ const en = {
       "roomsListLabel": "List of available game rooms",
       "linkCopied": "Invite link copied — send it to friends!",
       "fetchTimeout": "Couldn't load rooms. Check your connection.",
-      "retry": "Retry"
+      "retry": "Retry",
+      "gameModes": {
+        "classic": "Classic",
+        "wordHunt": "Word Hunt",
+        "blast": "Blast"
+      }
     },
     "joinModal": {
       "title": "Join the Fight",
@@ -7902,6 +7908,18 @@ const en = {
       "wordsFoundCount": "Words",
       "playerStats": "Player Stats",
     },
+    "results": {
+      "boardDomination": "Board Domination",
+      "demolitionKing": "Demolition King",
+      "comboMaster": "Combo Master",
+      "gemCollector": "Gem Collector",
+      "wordsmith": "Wordsmith",
+      "tilesCleared": "Tiles Cleared",
+      "maxCombo": "Max Combo",
+      "gemsCollected": "Gems",
+      "bestWord": "Best Word",
+      "tiles": "tiles",
+    },
     "ready": {
       "title": "Blast Mode",
       "subtitle": "Clear tiles by forming words. Chain combos for big scores!",
@@ -7927,7 +7945,7 @@ const en = {
     "hint": "Hint",
     "stuck": "Stuck?",
     "hintCooldown": "Used",
-    "waveClear": "Wave Clear!",
+    "waveClearBanner": "Wave Clear!",
     "tapToContinue": "Tap to continue",
     "levelComplete": "Level Complete!",
     "moveBonus": "Move Bonus",
@@ -7993,7 +8011,37 @@ const en = {
     "codexProgress": "{discovered}/{total} discovered",
     "codexLocked": "???",
     "comboDiscovered": "COMBO DISCOVERED!",
-    "chainCounter": "CHAIN x{{count}}"
+    "chainCounter": "CHAIN x{{count}}",
+    "wave": "Wave",
+    "words": "words",
+    "help": "Help",
+    "generating": "Generating grid...",
+    "score": "Score",
+    "wordsFound": "words",
+    "gameOver": "GAME OVER",
+    "waves": "waves",
+    "playAgain": "PLAY AGAIN",
+    "tileGuide": {
+      "title": "Tile Guide",
+      "standard": { "name": "Standard", "desc": "Basic tile — no special effect" },
+      "gold": { "name": "Gold", "desc": "×3 score + 1 bonus move" },
+      "silver": { "name": "Silver", "desc": "×1.5 score + extends countdowns by 1" },
+      "diamond": { "name": "Diamond", "desc": "×5 score + reveals frozen contents for 3 turns" },
+      "bomb": { "name": "Bomb", "desc": "Clears 3×3 area — chains to nearby bombs" },
+      "lightning": { "name": "Lightning", "desc": "Clears entire column — chains to other bolts" },
+      "prism": { "name": "Prism", "desc": "2 hits — clears row + column, spawns 2 specials" },
+      "rainbow": { "name": "Rainbow", "desc": "Copies best special in your word, or ×2 score" },
+      "ice": { "name": "Ice", "desc": "2 hits to break — freezes adjacent viruses" },
+      "frozen": { "name": "Frozen", "desc": "2 hits — releases a hidden special inside" },
+      "gem": { "name": "Gem", "desc": "3 hits — spawns 2 specials + 2 bonus moves" },
+      "mirror": { "name": "Mirror", "desc": "Copies first offensive special in your word" },
+      "magnet": { "name": "Magnet", "desc": "Pulls nearby tiles inward, then explodes 3×3" },
+      "wildcard": { "name": "Wildcard", "desc": "Matches any letter — scores by letter rarity" },
+      "countdown": { "name": "Countdown", "desc": "Defuse before 0! +2 moves — or 50pt penalty" },
+      "virus": { "name": "Virus", "desc": "Spreads each turn — clear 3+ in one word to cure all" },
+      "portal": { "name": "Portal", "desc": "Linked in pairs — clears both, ×2 word score" },
+      "catalyst": { "name": "Catalyst", "desc": "Upgrades all adjacent tiles to random specials" }
+    }
   },
   "student": {
         "hub": {
@@ -9957,74 +10005,6 @@ const en = {
       "escalator": "Target increases 5% per word",
       "nullifier": "Your first 2 rune slots are disabled",
       "inverter": "Chip runes disabled, only mult works"
-    }
-  },
-  "blast": {
-    "wave": "Wave",
-    "moves": "moves",
-    "words": "words",
-    "help": "Help",
-    "stuck": "No words left!",
-    "shuffle": "Shuffle",
-    "generating": "Generating grid...",
-    "ready": {
-      "title": "BLAST MODE",
-      "subtitle": "Clear the board, chain combos, survive the waves",
-      "play": "PLAY",
-      "rule1": "Drag across tiles to spell words (3+ letters)",
-      "rule2": "Longer words score more and clear more tiles",
-      "rule3": "Special tiles (💣⚡🔷) trigger explosive chain reactions",
-      "rule4": "Clear 50%+ of tiles to advance to the next wave"
-    },
-    "waveComplete": "Wave {{wave}} Complete!",
-    "score": "Score",
-    "wordsFound": "words",
-    "cleared": "cleared",
-    "nextWave": "Wave {{wave}}",
-    "gameOver": "GAME OVER",
-    "waves": "waves",
-    "bestWord": "Best",
-    "playAgain": "PLAY AGAIN",
-    "chain": {
-      "cascade": "Cascade!",
-      "double": "Double!",
-      "triple": "TRIPLE!",
-      "mega": "MEGA!",
-      "ultra": "ULTRA!!"
-    },
-    "praise": {
-      "nice": "Nice!",
-      "great": "Great!",
-      "brilliant": "Brilliant!",
-      "amazing": "AMAZING!",
-      "legendary": "LEGENDARY!"
-    },
-    "tileGuide": {
-      "title": "Tile Guide",
-      "standard": { "name": "Standard", "desc": "Basic tile — no special effect" },
-      "gold": { "name": "Gold", "desc": "×3 score + 1 bonus move" },
-      "silver": { "name": "Silver", "desc": "×1.5 score + extends countdowns by 1" },
-      "diamond": { "name": "Diamond", "desc": "×5 score + reveals frozen contents for 3 turns" },
-      "bomb": { "name": "Bomb", "desc": "Clears 3×3 area — chains to nearby bombs" },
-      "lightning": { "name": "Lightning", "desc": "Clears entire column — chains to other bolts" },
-      "prism": { "name": "Prism", "desc": "2 hits — clears row + column, spawns 2 specials" },
-      "rainbow": { "name": "Rainbow", "desc": "Copies best special in your word, or ×2 score" },
-      "ice": { "name": "Ice", "desc": "2 hits to break — freezes adjacent viruses" },
-      "frozen": { "name": "Frozen", "desc": "2 hits — releases a hidden special inside" },
-      "gem": { "name": "Gem", "desc": "3 hits — spawns 2 specials + 2 bonus moves" },
-      "mirror": { "name": "Mirror", "desc": "Copies first offensive special in your word" },
-      "magnet": { "name": "Magnet", "desc": "Pulls nearby tiles inward, then explodes 3×3" },
-      "wildcard": { "name": "Wildcard", "desc": "Matches any letter — scores by letter rarity" },
-      "countdown": { "name": "Countdown", "desc": "Defuse before 0! +2 moves — or 50pt penalty" },
-      "virus": { "name": "Virus", "desc": "Spreads each turn — clear 3+ in one word to cure all" },
-      "portal": { "name": "Portal", "desc": "Linked in pairs — clears both, ×2 word score" },
-      "catalyst": { "name": "Catalyst", "desc": "Upgrades all adjacent tiles to random specials" }
-    },
-    "objective": {
-      "scoreTarget": "Score {target} pts",
-      "collectType": "Collect {target} {tileType}",
-      "clearAllType": "Clear all {tileType}",
-      "wordLength": "Find {target} words with {minWordLength}+ letters"
     }
   }
 };

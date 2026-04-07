@@ -28,6 +28,7 @@ interface MultiplayerFlowProps {
     gameCode?: string,
     roomName?: string,
     overrideUsername?: string,
+    options?: { isPrivate?: boolean },
   ) => void;
   refreshRooms: () => void;
 
@@ -258,7 +259,7 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
       setUsername(config.hostUsername);
 
       // Pass username as override to avoid stale closure in handleJoin
-      handleJoin(true, config.language, gameCode, config.roomName, config.hostUsername);
+      handleJoin(true, config.language, gameCode, config.roomName, config.hostUsername, { isPrivate: true });
 
       // Show CrazyGames invite button so host can invite friends
       cgShowInvite(gameCode);

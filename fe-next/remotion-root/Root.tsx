@@ -70,7 +70,7 @@ export const RemotionRoot: React.FC = () => {
       <Composition
         id="RedditGameplayDemo"
         component={RedditGameplayDemo}
-        durationInFrames={270}
+        durationInFrames={450}
         fps={30}
         width={1920}
         height={1080}
@@ -78,7 +78,7 @@ export const RemotionRoot: React.FC = () => {
       <Composition
         id="RedditMultilingualShowcase"
         component={RedditMultilingualShowcase}
-        durationInFrames={380}
+        durationInFrames={500}
         fps={30}
         width={1920}
         height={1080}
@@ -86,7 +86,7 @@ export const RemotionRoot: React.FC = () => {
       <Composition
         id="RedditVSBattle"
         component={RedditVSBattle}
-        durationInFrames={235}
+        durationInFrames={350}
         fps={30}
         width={1920}
         height={1080}

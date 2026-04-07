@@ -196,7 +196,10 @@ const FriendsList: React.FC<FriendsListProps> = ({
     challengeType: 'new_game' | 'join_room',
     settings?: { language?: string; timerSeconds?: number; mode?: string; message?: string }
   ) => {
-    if (!giftSocket || !isGiftSocketConnected) return;
+    if (!giftSocket || !isGiftSocketConnected) {
+      toast.error(t('friends.errors.sendFailed'));
+      return;
+    }
     // Emit async challenge with settings (no live room join)
     giftSocket.emit('friends:sendChallenge', {
       friendUserId: friendId,
@@ -214,7 +217,11 @@ const FriendsList: React.FC<FriendsListProps> = ({
 
   // Gift sending via Socket.IO
   const handleSendGift = useCallback((gift: GiftPayload) => {
-    if (!giftFriend || !giftSocket || !isGiftSocketConnected) return;
+    if (!giftFriend) return;
+    if (!giftSocket || !isGiftSocketConnected) {
+      toast.error(t('socialGift.error'));
+      return;
+    }
     giftSocket.emit('gift:send', {
       recipientId: giftFriend.odUserId,
       giftType: gift.type,

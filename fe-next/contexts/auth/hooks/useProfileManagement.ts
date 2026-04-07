@@ -210,7 +210,16 @@ export function useProfileManagement({
       }
 
       if (profileData) {
-        setProfile(profileData);
+        // Guard: never overwrite a locally-saved profile that already has
+        // has_customized_profile=true with stale DB data that still has false.
+        // This prevents the race where a delayed fetchUserData (from duplicate
+        // SIGNED_IN/INITIAL_SESSION events) reverts the user's customization.
+        setProfile((current) => {
+          if (current?.has_customized_profile && !profileData.has_customized_profile) {
+            return current;
+          }
+          return profileData;
+        });
 
         // Auto-assign random custom avatar for existing users who don't have one
         if (!profileData.avatar_config) {

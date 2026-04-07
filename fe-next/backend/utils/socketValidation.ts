@@ -210,6 +210,7 @@ export const createGameSchema = compiledSchemas?.createGameSchema || z.object({
   authUserId: z.string().uuid().optional().nullable(),
   guestTokenHash: guestTokenHashSchema,
   isRanked: z.boolean().optional().default(false),
+  isPrivate: z.boolean().optional().default(false),
 });
 
 export const joinGameSchema = compiledSchemas?.joinGameSchema || z.object({

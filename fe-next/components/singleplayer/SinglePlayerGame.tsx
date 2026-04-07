@@ -235,7 +235,7 @@ function SinglePlayerGame({
   // Landscape layout
   if (core.isLandscape) {
     return (
-      <div className="relative">
+      <div className="relative h-full">
         {encouragementBanner}
         {scorePopupElement}
         <LandscapeGameLayout
@@ -252,7 +252,7 @@ function SinglePlayerGame({
   // Desktop/TV layout
   if (core.isDesktop || core.isTv) {
     return (
-      <div className="relative">
+      <div className="relative h-full">
         {encouragementBanner}
         {scorePopupElement}
         <DesktopGameLayout

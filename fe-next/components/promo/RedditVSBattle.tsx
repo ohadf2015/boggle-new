@@ -111,8 +111,8 @@ const VSIntroScene: React.FC = () => {
         display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16,
         opacity: interpolate(p1In, [0, 0.5], [0, 1], { extrapolateRight: 'clamp' }),
       }}>
-        <AnimatedImage src={staticFile('mascot/flexing.gif')}
-          width={160} height={160} fit="contain" loopBehavior="loop" />
+        <AnimatedImage src={staticFile('mascot/powerup-nobg.gif')}
+          width={220} height={220} fit="contain" loopBehavior="loop" />
         <div style={{
           fontFamily: fredoka, fontSize: 34, fontWeight: 700,
           color: C.lime, letterSpacing: '0.06em',
@@ -149,7 +149,7 @@ const VSIntroScene: React.FC = () => {
         opacity: interpolate(p2In, [0, 0.5], [0, 1], { extrapolateRight: 'clamp' }),
       }}>
         <AnimatedImage src={staticFile('mascot/onfire-nobg.gif')}
-          width={160} height={160} fit="contain" loopBehavior="loop" />
+          width={220} height={220} fit="contain" loopBehavior="loop" />
         <div style={{
           fontFamily: fredoka, fontSize: 34, fontWeight: 700,
           color: C.cyan, letterSpacing: '0.06em',
@@ -175,19 +175,14 @@ const VSIntroScene: React.FC = () => {
 
 /* ---------- Scene 2: Split-screen gameplay ---------- */
 const PLAYER_WORDS = [
-  { word: 'CLASH', pts: 250, at: 10 },
-  { word: 'HUNT', pts: 120, at: 25 },
-  { word: 'CLAWS', pts: 280, at: 42 },
-  { word: 'ORAL', pts: 90, at: 55 },
-  { word: 'LORE', pts: 140, at: 68 },
-  { word: 'SAIL', pts: 100, at: 80 },
+  { word: 'CLASH', pts: 250, at: 20 },
+  { word: 'HUNT', pts: 120, at: 60 },
+  { word: 'CLAWS', pts: 280, at: 100 },
 ];
 const OPPONENT_WORDS = [
-  { word: 'WORDS', pts: 180, at: 15 },
-  { word: 'CLAN', pts: 110, at: 30 },
-  { word: 'DIAL', pts: 80, at: 48 },
-  { word: 'SAIL', pts: 100, at: 60 },
-  { word: 'BORE', pts: 90, at: 75 },
+  { word: 'WORDS', pts: 180, at: 35 },
+  { word: 'CLAN', pts: 110, at: 75 },
+  { word: 'DIAL', pts: 80, at: 115 },
 ];
 
 function scoreAt(words: typeof PLAYER_WORDS, frame: number): number {
@@ -365,8 +360,8 @@ const BattleScene: React.FC = () => {
         width: 'calc(50% - 60px)',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-          <AnimatedImage src={staticFile('mascot/flexing.gif')}
-            width={48} height={48} fit="contain" loopBehavior="loop" />
+          <AnimatedImage src={staticFile('mascot/powerup-nobg.gif')}
+            width={64} height={64} fit="contain" loopBehavior="loop" />
           <span style={{
             fontFamily: fredoka, fontSize: 22, fontWeight: 700, color: C.lime,
             textShadow: `0 0 12px ${C.lime}44`,
@@ -388,7 +383,7 @@ const BattleScene: React.FC = () => {
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
           <AnimatedImage src={staticFile('mascot/onfire-nobg.gif')}
-            width={48} height={48} fit="contain" loopBehavior="loop" />
+            width={64} height={64} fit="contain" loopBehavior="loop" />
           <span style={{
             fontFamily: fredoka, fontSize: 22, fontWeight: 700, color: C.cyan,
             textShadow: `0 0 12px ${C.cyan}44`,
@@ -433,8 +428,8 @@ const VictoryScene: React.FC = () => {
         transform: `scale(${Math.max(0, winnerScale)})`,
         display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12,
       }}>
-        <AnimatedImage src={staticFile('mascot/trophy.gif')}
-          width={140} height={140} fit="contain" loopBehavior="loop" />
+        <AnimatedImage src={staticFile('mascot/trophy-nobg.gif')}
+          width={220} height={220} fit="contain" loopBehavior="loop" />
         <div style={{
           fontFamily: fredoka, fontSize: 72, fontWeight: 700,
           color: C.lime, letterSpacing: '0.08em',
@@ -476,25 +471,25 @@ const VictoryScene: React.FC = () => {
 export const RedditVSBattle: React.FC = () => (
   <AbsoluteFill style={{ backgroundColor: C.navy }}>
     <TransitionSeries>
-      <TransitionSeries.Sequence durationInFrames={55}>
+      <TransitionSeries.Sequence durationInFrames={80}>
         <VSIntroScene />
       </TransitionSeries.Sequence>
 
       <TransitionSeries.Transition
         presentation={slide({ direction: 'from-bottom' })}
-        timing={linearTiming({ durationInFrames: 10 })}
+        timing={linearTiming({ durationInFrames: 18 })}
       />
 
-      <TransitionSeries.Sequence durationInFrames={100}>
+      <TransitionSeries.Sequence durationInFrames={160}>
         <BattleScene />
       </TransitionSeries.Sequence>
 
       <TransitionSeries.Transition
         presentation={fade()}
-        timing={linearTiming({ durationInFrames: 12 })}
+        timing={linearTiming({ durationInFrames: 20 })}
       />
 
-      <TransitionSeries.Sequence durationInFrames={80}>
+      <TransitionSeries.Sequence durationInFrames={110}>
         <VictoryScene />
       </TransitionSeries.Sequence>
     </TransitionSeries>

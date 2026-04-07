@@ -234,14 +234,14 @@ export function useSurvivalHints({
     nextHintItem,
   };
 
-  const actions: HintActions = {
+  const actions: HintActions = useMemo(() => ({
     buyNextHint,
     getNextAffordableClue,
     handlePurchase,
     autoRevealLetter,
     revealCategory,
     revealExample,
-  };
+  }), [buyNextHint, getNextAffordableClue, handlePurchase, autoRevealLetter, revealCategory, revealExample]);
 
   return [state, actions];
 }

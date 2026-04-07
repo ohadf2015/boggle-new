@@ -121,7 +121,8 @@ function HostPreGameView({
   onAvatarChange,
 }: HostPreGameViewProps): React.ReactElement {
   const { socket } = useSocket();
-  const { isAdmin, isAuthenticated, updateProfile } = useAuth();
+  const { isAdmin, isAuthenticated, updateProfile, profile } = useAuth();
+  const hasBlastAccess = !!profile?.blast_access;
   const { isOnCrazyGamesPlatform } = useCrazyGames();
 
   // Avatar & name editing state
@@ -150,7 +151,7 @@ function HostPreGameView({
   const [showTvTutorial, setShowTvTutorial] = useState(false);
   const storeGameMode = useGameMode();
   // If stored mode is blast but user isn't admin, fall back to random
-  const initialMode = (storeGameMode === 'blast' && !isAdmin) ? 'random' : (storeGameMode || 'random');
+  const initialMode = (storeGameMode === 'blast' && !isAdmin && !hasBlastAccess) ? 'random' : (storeGameMode || 'random');
   const [selectedGameMode, setSelectedGameMode] = useState<GameModeOption>(initialMode);
   const { setGameMode: setStoreGameMode } = useGameActions();
 
@@ -423,7 +424,7 @@ function HostPreGameView({
                 <AnimatePresence>{renderBotCountdown()}</AnimatePresence>
                 <StartButton onStartGame={onStartGame} disabled={isStartDisabled} tournamentCreating={tournamentCreating} playerCount={filteredPlayersForDisplay.length} t={t} />
                 <PlayerRoster players={filteredPlayersForDisplay} username={username} gameCode={gameCode} maxPlayers={maxPlayers} hostLabel={hostLabel} t={t} />
-                <BattleModeCard hostPlaying={hostPlaying} setHostPlaying={setHostPlaying} selectedGameMode={selectedGameMode} setSelectedGameMode={setSelectedGameMode} gameCode={gameCode} playersReady={playersReady} t={t} isAdmin={isAdmin}>
+                <BattleModeCard hostPlaying={hostPlaying} setHostPlaying={setHostPlaying} selectedGameMode={selectedGameMode} setSelectedGameMode={setSelectedGameMode} gameCode={gameCode} playersReady={playersReady} t={t} isAdmin={isAdmin} hasBlastAccess={hasBlastAccess}>
                   <div>
                     <label className="text-xs font-black uppercase text-neo-cream/70 mb-1.5 block">{t('hostView.gameLanguage')}</label>
                     <LanguageSelector selectedLanguage={roomLanguage} onLanguageChange={handleRoomLanguageChange} hideLabel />
@@ -452,7 +453,7 @@ function HostPreGameView({
           <div className="flex-1 overflow-y-auto overscroll-contain min-h-0 px-3 py-2 space-y-2">
             <AnimatePresence>{renderBotCountdown()}</AnimatePresence>
             <PlayerRoster players={filteredPlayersForDisplay} username={username} gameCode={gameCode} maxPlayers={maxPlayers} hostLabel={hostLabel} t={t} />
-            <BattleModeCard hostPlaying={hostPlaying} setHostPlaying={setHostPlaying} selectedGameMode={selectedGameMode} setSelectedGameMode={setSelectedGameMode} gameCode={gameCode} playersReady={playersReady} t={t} isAdmin={isAdmin}>
+            <BattleModeCard hostPlaying={hostPlaying} setHostPlaying={setHostPlaying} selectedGameMode={selectedGameMode} setSelectedGameMode={setSelectedGameMode} gameCode={gameCode} playersReady={playersReady} t={t} isAdmin={isAdmin} hasBlastAccess={hasBlastAccess}>
               <div>
                 <label className="text-xs font-black uppercase text-neo-cream/70 mb-1.5 block">{t('hostView.gameLanguage')}</label>
                 <LanguageSelector selectedLanguage={roomLanguage} onLanguageChange={handleRoomLanguageChange} hideLabel />

@@ -110,8 +110,11 @@ export async function initializeNativeOAuth(): Promise<boolean> {
     // Handle expected errors gracefully without reporting to Sentry
     const errorMessage = error instanceof Error ? error.message : String(error);
 
+    // Also check error.code for object-style errors (e.g. {code: "UNIMPLEMENTED"})
+    const errorCode = typeof error === 'object' && error !== null && 'code' in error ? String((error as Record<string, unknown>).code) : '';
+
     // Android Apple redirect URL error is expected - Apple Sign-In isn't configured for Android
-    if (errorMessage.includes('redirectUrl is null or empty') || errorMessage.includes('apple.android') || errorMessage.includes('UNIMPLEMENTED') || errorMessage.includes('not implemented')) {
+    if (errorMessage.includes('redirectUrl is null or empty') || errorMessage.includes('apple.android') || errorMessage.includes('UNIMPLEMENTED') || errorMessage.includes('not implemented') || errorCode === 'UNIMPLEMENTED') {
       logger.log('[NativeOAuth] Apple Sign-In not configured for Android (expected) - Google Sign-In still available');
       // Still mark as initialized - Google Sign-In should work
       socialLoginInitialized = true;

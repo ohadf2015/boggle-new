@@ -37,12 +37,16 @@ const ProfileCustomizationModal: React.FC<ProfileCustomizationModalProps> = ({
   );
   const [displayName, setDisplayName] = useState(defaultName);
   const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState(false);
   const [nameTouched, setNameTouched] = useState(false);
   const [showShake, setShowShake] = useState(false);
 
-  // Reset state when modal opens
+  // Reset state only when modal first opens (not on prop changes while open)
+  const prevOpenRef = useRef(false);
   useEffect(() => {
-    if (isOpen) {
+    const justOpened = isOpen && !prevOpenRef.current;
+    prevOpenRef.current = isOpen;
+    if (justOpened) {
       setDisplayName(defaultName);
       setSelectedAvatar(initialAvatar ?? getRandomAvatarConfig());
       setNameTouched(false);
@@ -79,10 +83,12 @@ const ProfileCustomizationModal: React.FC<ProfileCustomizationModalProps> = ({
     }
 
     setIsSaving(true);
+    setSaveError(false);
     try {
       await onSave(trimmedName, selectedAvatar);
       onClose();
     } catch (error) {
+      setSaveError(true);
       console.error('Failed to save profile:', error);
     } finally {
       setIsSaving(false);
@@ -217,6 +223,11 @@ const ProfileCustomizationModal: React.FC<ProfileCustomizationModalProps> = ({
         </DialogBody>
 
         <DialogFooter className="px-4 sm:px-5 pb-4">
+          {saveError && (
+            <p className="text-neo-red text-xs font-bold text-center mb-2">
+              {t('profileCustomization.saveError', 'Failed to save. Please try again.')}
+            </p>
+          )}
           <button
             onClick={handleSave}
             disabled={isSaving}

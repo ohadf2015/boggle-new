@@ -330,7 +330,8 @@ describe('MultiplayerFlow', () => {
         'en',
         expect.any(String),
         'Test Room',
-        'HostPlayer'
+        'HostPlayer',
+        expect.objectContaining({ isPrivate: true })
       );
     });
 

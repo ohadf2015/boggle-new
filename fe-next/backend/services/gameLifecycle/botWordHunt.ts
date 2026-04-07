@@ -212,6 +212,9 @@ function scheduleWordHuntGuess(
     return;
   }
 
+  // Target already found — stop guessing
+  if (huntState.targetFoundBy) return;
+
   // Pick a guess — avoids target until enough wrong guesses made
   const guess = pickBotGuess(strategy.candidates, bot.difficulty, strategy);
   if (!guess) {

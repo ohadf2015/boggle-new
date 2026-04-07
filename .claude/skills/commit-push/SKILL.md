@@ -112,23 +112,9 @@ Do NOT ask for user permission - fix everything automatically.
 ```bash
 cd /Users/ohadfisher/git/boggle-new/fe-next
 
-# Frontend (vitest): use --related to run only tests affected by changed files
-FRONTEND_CHANGED="[space-separated list of changed frontend source files]"
-if [ -n "$FRONTEND_CHANGED" ]; then
-  npx vitest run --config vitest.config.ts --related $FRONTEND_CHANGED
-fi
-
-# If test files themselves changed, also run those directly
-TEST_CHANGED="[space-separated list of changed test files matching vitest]"
-if [ -n "$TEST_CHANGED" ]; then
-  npx vitest run --config vitest.config.ts $TEST_CHANGED
-fi
-
-# Backend (vitest): use --related
-BACKEND_CHANGED="[space-separated list of changed backend files]"
-if [ -n "$BACKEND_CHANGED" ]; then
-  npx vitest run --config backend/vitest.config.ts --related $BACKEND_CHANGED
-fi
+# --changed uses git status internally to find affected tests — no file lists needed
+npx vitest run --config vitest.config.ts --changed
+npx vitest run --config backend/vitest.config.ts --changed
 ```
 
 If failures: fix root cause in code (not tests). Re-run to verify.

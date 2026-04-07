@@ -89,7 +89,7 @@ const MODE_CONFIG: Record<string, {
     iconBg: 'bg-neo-cyan',
     iconColor: 'text-neo-black',
     textColor: 'text-neo-cyan',
-    labelKey: 'classroom.gameModes.classic',
+    labelKey: 'multiplayerFlow.roomList.gameModes.classic',
     descKey: 'gameModes.classic.description',
   },
   blast: {
@@ -98,7 +98,7 @@ const MODE_CONFIG: Record<string, {
     iconBg: 'bg-neo-pink',
     iconColor: 'text-neo-black',
     textColor: 'text-neo-pink',
-    labelKey: 'classroom.gameModes.blast',
+    labelKey: 'multiplayerFlow.roomList.gameModes.blast',
     descKey: 'gameModes.blast.description',
   },
   'word-hunt': {
@@ -107,7 +107,7 @@ const MODE_CONFIG: Record<string, {
     iconBg: 'bg-neo-purple',
     iconColor: 'text-neo-black',
     textColor: 'text-neo-purple',
-    labelKey: 'classroom.gameModes.wordHunt',
+    labelKey: 'multiplayerFlow.roomList.gameModes.wordHunt',
     descKey: 'gameModes.wordHunt.description',
   },
 };
@@ -118,7 +118,7 @@ const DEFAULT_MODE_CONFIG = {
   iconBg: 'bg-neo-cyan',
   iconColor: 'text-neo-black',
   textColor: 'text-neo-cyan',
-  labelKey: 'classroom.gameModes.classic',
+  labelKey: 'multiplayerFlow.roomList.gameModes.classic',
   descKey: 'gameModes.classic.description',
 };
 
@@ -251,21 +251,21 @@ const RoomListView: React.FC<RoomListViewProps> = ({
               variants={quickPlayVariants}
               initial="hidden"
               animate="visible"
-              className="flex gap-3"
+              className="flex flex-col sm:flex-row gap-2.5"
             >
               <motion.button
                 onClick={onQuickPlay}
                 disabled={isQuickPlayLoading}
-                className="flex-[2] py-4 flex items-center justify-center gap-2.5 bg-neo-lime border-3 border-neo-black rounded-xl shadow-hard active:translate-y-0.5 active:shadow-hard-pressed transition-all disabled:opacity-70 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
+                className="flex-[2] min-h-[52px] py-3 px-4 flex items-center justify-center gap-2.5 bg-neo-lime border-3 border-neo-black rounded-xl shadow-hard active:translate-y-0.5 active:shadow-hard-pressed transition-all disabled:opacity-70 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
                 whileHover={{ scale: 1.02, transition: { type: 'spring' as const, stiffness: 400, damping: 20 } }}
                 whileTap={{ scale: 0.97 }}
               >
                 {isQuickPlayLoading ? (
                   <Loader size="sm" />
                 ) : (
-                  <Zap className="w-5 h-5 text-neo-black" />
+                  <Zap className="w-5 h-5 text-neo-black shrink-0" />
                 )}
-                <span className="text-neo-black font-black text-lg uppercase tracking-tight">
+                <span className="text-neo-black font-black text-base sm:text-lg uppercase tracking-tight">
                   {t('multiplayerFlow.roomList.quickStart')}
                 </span>
               </motion.button>
@@ -274,10 +274,10 @@ const RoomListView: React.FC<RoomListViewProps> = ({
                 onClick={onCreateRoom}
                 whileHover={{ scale: 1.02, transition: { type: 'spring' as const, stiffness: 400, damping: 20 } }}
                 whileTap={{ scale: 0.97 }}
-                className="flex-1 py-4 flex items-center justify-center gap-2 bg-neo-navy-light border-3 border-neo-pink/60 rounded-xl shadow-hard-sm hover:border-neo-pink active:translate-y-0.5 active:shadow-hard-pressed transition-all focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime"
+                className="flex-1 min-h-[48px] py-3 px-4 flex items-center justify-center gap-2 bg-neo-navy-light border-3 border-neo-pink/60 rounded-xl shadow-hard-sm hover:border-neo-pink active:translate-y-0.5 active:shadow-hard-pressed transition-all focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime"
               >
-                <Users className="w-4 h-4 text-neo-pink" />
-                <span className="text-neo-pink font-black text-xs uppercase tracking-wide">
+                <Users className="w-4 h-4 text-neo-pink shrink-0" />
+                <span className="text-neo-pink font-black text-sm uppercase tracking-wide whitespace-nowrap">
                   {t('multiplayerFlow.roomList.createPrivateBattle')}
                 </span>
               </motion.button>

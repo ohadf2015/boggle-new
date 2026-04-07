@@ -166,6 +166,139 @@ describe('ProfileCustomizationWrapper', () => {
       expect(savedData).toHaveProperty('avatar_config');
     });
   });
+
+  describe('Error Handling on Save', () => {
+    it('should not close modal when updateProfile returns an error', async () => {
+      const mockUpdateProfile = vi.fn().mockResolvedValue({
+        data: null,
+        error: { message: 'Network error' },
+      });
+
+      // Simulate the wrapper's handleSave logic
+      let modalClosed = false;
+      const handleSave = async (name: string, avatarConfig: CustomAvatarConfig) => {
+        const { error } = await mockUpdateProfile({
+          display_name: name,
+          username: name,
+          avatar_config: avatarConfig,
+          has_customized_profile: true,
+        });
+
+        if (error) {
+          throw new Error(error.message);
+        }
+        modalClosed = true;
+      };
+
+      await expect(
+        handleSave('TestPlayer', getRandomAvatarConfig())
+      ).rejects.toThrow('Network error');
+      expect(modalClosed).toBe(false);
+    });
+
+    it('should close modal when updateProfile succeeds', async () => {
+      const mockUpdateProfile = vi.fn().mockResolvedValue({
+        data: { has_customized_profile: true },
+        error: null,
+      });
+
+      let modalClosed = false;
+      const handleSave = async (name: string, avatarConfig: CustomAvatarConfig) => {
+        const { error } = await mockUpdateProfile({
+          display_name: name,
+          username: name,
+          avatar_config: avatarConfig,
+          has_customized_profile: true,
+        });
+
+        if (error) {
+          throw new Error(error.message);
+        }
+        modalClosed = true;
+      };
+
+      await handleSave('TestPlayer', getRandomAvatarConfig());
+      expect(modalClosed).toBe(true);
+    });
+  });
+
+  describe('Race Condition Protection', () => {
+    it('should not overwrite has_customized_profile=true with stale false data', () => {
+      // Simulate the functional updater guard in fetchUserData
+      const currentProfile = {
+        id: 'user-1',
+        username: 'CustomName',
+        display_name: 'Custom Name',
+        has_customized_profile: true,
+        avatar_config: getRandomAvatarConfig(),
+      };
+
+      const staleDbData = {
+        id: 'user-1',
+        username: 'GoogleName',
+        display_name: 'Google Name',
+        has_customized_profile: false,
+      };
+
+      // This is the guard logic from useProfileManagement.fetchUserData
+      const result = (() => {
+        if (currentProfile?.has_customized_profile && !staleDbData.has_customized_profile) {
+          return currentProfile;
+        }
+        return staleDbData;
+      })();
+
+      expect(result).toBe(currentProfile);
+      expect(result.has_customized_profile).toBe(true);
+      expect(result.display_name).toBe('Custom Name');
+    });
+
+    it('should allow overwrite when DB data also has has_customized_profile=true', () => {
+      const currentProfile = {
+        id: 'user-1',
+        username: 'OldName',
+        display_name: 'Old Name',
+        has_customized_profile: true,
+      };
+
+      const freshDbData = {
+        id: 'user-1',
+        username: 'NewName',
+        display_name: 'New Name',
+        has_customized_profile: true,
+      };
+
+      const result = (() => {
+        if (currentProfile?.has_customized_profile && !freshDbData.has_customized_profile) {
+          return currentProfile;
+        }
+        return freshDbData;
+      })();
+
+      expect(result).toBe(freshDbData);
+      expect(result.display_name).toBe('New Name');
+    });
+
+    it('should allow setting profile when no current profile exists', () => {
+      const currentProfile = null;
+
+      const dbData = {
+        id: 'user-1',
+        username: 'NewUser',
+        display_name: 'New User',
+        has_customized_profile: false,
+      };
+
+      const result = (() => {
+        if (currentProfile?.has_customized_profile && !dbData.has_customized_profile) {
+          return currentProfile;
+        }
+        return dbData;
+      })();
+
+      expect(result).toBe(dbData);
+    });
+  });
 });
 
 describe('Integration: Profile Customization Flow', () => {

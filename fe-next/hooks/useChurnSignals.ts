@@ -177,7 +177,9 @@ export function useChurnSignals(): UseChurnSignalsReturn {
         notificationDismissals: signals.notificationDismissals,
       });
 
-      navigator.sendBeacon('/api/growth/churn-signals', new Blob([payload], { type: 'application/json' }));
+      if (navigator.sendBeacon) {
+        navigator.sendBeacon('/api/growth/churn-signals', new Blob([payload], { type: 'application/json' }));
+      }
     };
 
     window.addEventListener('beforeunload', handleUnload);

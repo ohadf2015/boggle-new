@@ -140,6 +140,7 @@ function createGame(gameCode: string, data: GameCreationData): GameState {
     tournamentId: null,
     reconnectionTimeout: null,
     isRanked: data.isRanked || false,
+    isPrivate: data.isPrivate || false,
     allowLateJoin: data.allowLateJoin !== false,
     aiApprovedWords: [],
     peerValidationWord: null,

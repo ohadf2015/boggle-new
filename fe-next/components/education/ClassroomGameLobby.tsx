@@ -8,7 +8,7 @@
 
 'use client';
 
-import { useState, useCallback, useEffect, useMemo } from 'react';
+import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import logger from '@/utils/logger';
 import { BookOpen, School } from 'lucide-react';
@@ -32,6 +32,7 @@ export function ClassroomGameLobby({ initialLessonId, onBack }: ClassroomGameLob
   const { t, language } = useLanguage();
   const { user, profile } = useAuth();
   const router = useRouter();
+  const tRef = useRef(t);
 
   // Wizard state
   const [currentStep, setCurrentStep] = useState(1);

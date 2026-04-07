@@ -959,7 +959,8 @@ const ja = {
     "avatarLabel": "キャラクターを選ぶ",
     "namePlaceholder": "名前を入力",
     "saveButton": "保存",
-    "skipButton": "スキップ"
+    "skipButton": "スキップ",
+    "saveError": "保存に失敗しました。もう一度お試しください。"
   },
   "avatar": {
     "builder": {
@@ -1145,7 +1146,12 @@ const ja = {
       "roomsListLabel": "利用可能なゲームルームの一覧",
       "linkCopied": "招待リンクをコピーしました — 友達に送ろう！",
       "fetchTimeout": "ルームを読み込めませんでした。接続を確認してください。",
-      "retry": "再試行"
+      "retry": "再試行",
+      "gameModes": {
+        "classic": "クラシック",
+        "wordHunt": "ワードハント",
+        "blast": "ブラスト"
+      }
     },
     "joinModal": {
       "title": "バトルに参戦",
@@ -7760,6 +7766,18 @@ const ja = {
       "wordsFoundCount": "単語数",
       "playerStats": "プレイヤー統計",
     },
+    "results": {
+      "boardDomination": "ボード制覇",
+      "demolitionKing": "破壊王",
+      "comboMaster": "コンボマスター",
+      "gemCollector": "宝石コレクター",
+      "wordsmith": "言葉の達人",
+      "tilesCleared": "クリアしたタイル",
+      "maxCombo": "最大コンボ",
+      "gemsCollected": "宝石",
+      "bestWord": "ベストワード",
+      "tiles": "タイル",
+    },
     "ready": {
       "title": "ブラストモード",
       "subtitle": "単語を作ってタイルをクリア。コンボをつなげて高得点！",
@@ -7785,7 +7803,7 @@ const ja = {
     "hint": "ヒント",
     "stuck": "詰まった？",
     "hintCooldown": "使用済",
-    "waveClear": "ウェーブクリア！",
+    "waveClearBanner": "ウェーブクリア！",
     "tapToContinue": "タップして続ける",
     "levelComplete": "レベルクリア！",
     "moveBonus": "手数ボーナス",
@@ -7851,7 +7869,37 @@ const ja = {
     "codexProgress": "{discovered}/{total} 発見済み",
     "codexLocked": "???",
     "comboDiscovered": "コンボ発見！",
-    "chainCounter": "チェーン x{{count}}"
+    "chainCounter": "チェーン x{{count}}",
+    "wave": "ウェーブ",
+    "words": "単語",
+    "help": "ヘルプ",
+    "generating": "グリッド生成中...",
+    "score": "スコア",
+    "wordsFound": "単語",
+    "gameOver": "ゲームオーバー",
+    "waves": "ウェーブ",
+    "playAgain": "もう一度",
+    "tileGuide": {
+      "title": "タイルガイド",
+      "standard": { "name": "通常", "desc": "基本タイル — 特殊効果なし" },
+      "gold": { "name": "ゴールド", "desc": "×3スコア + ボーナス1手" },
+      "silver": { "name": "シルバー", "desc": "×1.5スコア + カウントダウンを1延長" },
+      "diamond": { "name": "ダイヤモンド", "desc": "×5スコア + 凍結タイルの中身を3ターン表示" },
+      "bomb": { "name": "ボム", "desc": "3×3エリアをクリア — 近くのボムに連鎖" },
+      "lightning": { "name": "ライトニング", "desc": "列全体をクリア — 他のライトニングに連鎖" },
+      "prism": { "name": "プリズム", "desc": "2回 — 行+列クリア、スペシャル2つ生成" },
+      "rainbow": { "name": "レインボー", "desc": "単語内の最強スペシャルをコピー、または×2スコア" },
+      "ice": { "name": "アイス", "desc": "2回で破壊 — 隣接ウイルスを凍結" },
+      "frozen": { "name": "フローズン", "desc": "2回 — 中に隠されたスペシャルを解放" },
+      "gem": { "name": "ジェム", "desc": "3回 — スペシャル2つ + ボーナス2手" },
+      "mirror": { "name": "ミラー", "desc": "単語内の最初の攻撃スペシャルをコピー" },
+      "magnet": { "name": "マグネット", "desc": "近くのタイルを引き寄せ、3×3を爆発" },
+      "wildcard": { "name": "ワイルドカード", "desc": "どの文字にもなる — レア度でスコア" },
+      "countdown": { "name": "カウントダウン", "desc": "0になる前に解除！+2手 — さもなくば50点ペナルティ" },
+      "virus": { "name": "ウイルス", "desc": "毎ターン拡散 — 1単語で3+消して全治療" },
+      "portal": { "name": "ポータル", "desc": "ペアで連結 — 両方消去、単語スコア×2" },
+      "catalyst": { "name": "カタリスト", "desc": "隣接タイルを全てランダムなスペシャルに昇格" }
+    }
   },
   "student": {
     "hub": {
@@ -9872,74 +9920,6 @@ const ja = {
       "escalator": "単語ごとに目標が5%増加",
       "nullifier": "最初の2つのルーンスロットが無効",
       "inverter": "チップルーン無効、倍率のみ有効"
-    }
-  },
-  "blast": {
-    "wave": "ウェーブ",
-    "moves": "手数",
-    "words": "単語",
-    "help": "ヘルプ",
-    "stuck": "単語がありません！",
-    "shuffle": "シャッフル",
-    "generating": "グリッド生成中...",
-    "ready": {
-      "title": "ブラストモード",
-      "subtitle": "ボードをクリアし、コンボをつなげ、ウェーブを生き延びよう",
-      "play": "プレイ",
-      "rule1": "タイルをドラッグして単語を綴ろう（3文字以上）",
-      "rule2": "長い単語ほど高得点＆多くのタイルをクリア",
-      "rule3": "特殊タイル（💣⚡🔷）が爆発的な連鎖反応を起こす",
-      "rule4": "タイルの50%以上をクリアして次のウェーブへ"
-    },
-    "waveComplete": "ウェーブ{{wave}}クリア！",
-    "score": "スコア",
-    "wordsFound": "単語",
-    "cleared": "クリア",
-    "nextWave": "ウェーブ{{wave}}",
-    "gameOver": "ゲームオーバー",
-    "waves": "ウェーブ",
-    "bestWord": "ベスト",
-    "playAgain": "もう一度",
-    "chain": {
-      "cascade": "カスケード！",
-      "double": "ダブル！",
-      "triple": "トリプル！",
-      "mega": "メガ！",
-      "ultra": "ウルトラ！！"
-    },
-    "praise": {
-      "nice": "ナイス！",
-      "great": "すごい！",
-      "brilliant": "ブリリアント！",
-      "amazing": "アメイジング！",
-      "legendary": "レジェンド！！"
-    },
-    "tileGuide": {
-      "title": "タイルガイド",
-      "standard": { "name": "通常", "desc": "基本タイル — 特殊効果なし" },
-      "gold": { "name": "ゴールド", "desc": "×3スコア + ボーナス1手" },
-      "silver": { "name": "シルバー", "desc": "×1.5スコア + カウントダウンを1延長" },
-      "diamond": { "name": "ダイヤモンド", "desc": "×5スコア + 凍結タイルの中身を3ターン表示" },
-      "bomb": { "name": "ボム", "desc": "3×3エリアをクリア — 近くのボムに連鎖" },
-      "lightning": { "name": "ライトニング", "desc": "列全体をクリア — 他のライトニングに連鎖" },
-      "prism": { "name": "プリズム", "desc": "2回 — 行+列クリア、スペシャル2つ生成" },
-      "rainbow": { "name": "レインボー", "desc": "単語内の最強スペシャルをコピー、または×2スコア" },
-      "ice": { "name": "アイス", "desc": "2回で破壊 — 隣接ウイルスを凍結" },
-      "frozen": { "name": "フローズン", "desc": "2回 — 中に隠されたスペシャルを解放" },
-      "gem": { "name": "ジェム", "desc": "3回 — スペシャル2つ + ボーナス2手" },
-      "mirror": { "name": "ミラー", "desc": "単語内の最初の攻撃スペシャルをコピー" },
-      "magnet": { "name": "マグネット", "desc": "近くのタイルを引き寄せ、3×3を爆発" },
-      "wildcard": { "name": "ワイルドカード", "desc": "どの文字にもなる — レア度でスコア" },
-      "countdown": { "name": "カウントダウン", "desc": "0になる前に解除！+2手 — さもなくば50点ペナルティ" },
-      "virus": { "name": "ウイルス", "desc": "毎ターン拡散 — 1単語で3+消して全治療" },
-      "portal": { "name": "ポータル", "desc": "ペアで連結 — 両方消去、単語スコア×2" },
-      "catalyst": { "name": "カタリスト", "desc": "隣接タイルを全てランダムなスペシャルに昇格" }
-    },
-    "objective": {
-      "scoreTarget": "{target}ポイント獲得",
-      "collectType": "{tileType}を{target}個集める",
-      "clearAllType": "{tileType}を全てクリア",
-      "wordLength": "{minWordLength}文字以上の単語を{target}個見つける"
     }
   }
 };

@@ -482,4 +482,50 @@ describe('gameStateManager', () => {
       expect(gsm.getTournamentIdFromGame('G1')).toBe('tourney-123');
     });
   });
+
+  // ─── Private Rooms ───
+  describe('private rooms', () => {
+    it('creates a game with isPrivate defaulting to false', () => {
+      const game = gsm.createGame('PUB1', defaultCreationData());
+      expect(game.isPrivate).toBe(false);
+    });
+
+    it('creates a private game when isPrivate is true', () => {
+      const game = gsm.createGame('PRIV1', defaultCreationData({ isPrivate: true }));
+      expect(game.isPrivate).toBe(true);
+    });
+
+    it('excludes private rooms from getActiveRooms', () => {
+      // Create a public room with a human player
+      gsm.createGame('PUB1', defaultCreationData());
+      gsm.addUserToGame('PUB1', 'Player1', 'sock-1');
+
+      // Create a private room with a human player
+      gsm.createGame('PRIV1', defaultCreationData({ isPrivate: true }));
+      gsm.addUserToGame('PRIV1', 'Player2', 'sock-2');
+
+      const activeRooms = gsm.getActiveRooms();
+      const codes = activeRooms.map((r: { gameCode: string }) => r.gameCode);
+
+      expect(codes).toContain('PUB1');
+      expect(codes).not.toContain('PRIV1');
+    });
+
+    it('includes private rooms in getDetailedGames (admin view)', () => {
+      gsm.createGame('PUB1', defaultCreationData());
+      gsm.addUserToGame('PUB1', 'Player1', 'sock-1');
+
+      gsm.createGame('PRIV1', defaultCreationData({ isPrivate: true }));
+      gsm.addUserToGame('PRIV1', 'Player2', 'sock-2');
+
+      const detailed = gsm.getDetailedGames();
+      const codes = detailed.map((r: { gameCode: string }) => r.gameCode);
+
+      expect(codes).toContain('PUB1');
+      expect(codes).toContain('PRIV1');
+
+      const privRoom = detailed.find((r: { gameCode: string }) => r.gameCode === 'PRIV1');
+      expect(privRoom?.isPrivate).toBe(true);
+    });
+  });
 });

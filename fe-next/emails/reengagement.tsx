@@ -162,11 +162,7 @@ interface ReengagementEmailProps {
 
 /* ─── Image base: dev server vs production CDN ─── */
 
-const imgBase = process.env.NODE_ENV === 'production'
-  ? 'https://lexiclash.live'
-  : '';
-
-const mascotSrc = `${imgBase}/static/mascot-waving.gif`;
+const mascotSrc = 'https://lexiclash.live/email/mascot-waving.gif';
 
 /* ─── Colors (solid hex only — Gmail dark-mode safe) ─── */
 
@@ -205,7 +201,7 @@ export default function ReengagementEmail({
   const rtl = language === 'he';
   const dir = rtl ? 'rtl' : 'ltr';
   const sh = rtl ? '-' : '';
-  const arrow = rtl ? '◀' : '▶';
+  /* arrow removed — cleaner CTA without play icon */
   const locale = ['he', 'sv', 'ja', 'es'].includes(language) ? language : 'en';
   const privacyUrl = `https://lexiclash.live/${locale}/privacy`;
   const year = new Date().getFullYear();
@@ -429,7 +425,7 @@ export default function ReengagementEmail({
                                     <tr>
                                       <td align="center" style={{ paddingBottom: '24px' }}>
                                         <table role="presentation" cellPadding={0} cellSpacing={0}
-                                          style={{ width: '100%', maxWidth: '320px' }}>
+                                          style={{ width: '100%', maxWidth: '320px', margin: '0 auto' }}>
                                           <tr>
                                             <td align="center" style={{
                                               backgroundColor: C.lime,
@@ -454,7 +450,7 @@ export default function ReengagementEmail({
                                                   textAlign: 'center',
                                                   width: '100%',
                                                 }}>
-                                                {arrow}&nbsp;&nbsp;{t.cta}
+                                                {t.cta}
                                               </Button>
                                             </td>
                                           </tr>

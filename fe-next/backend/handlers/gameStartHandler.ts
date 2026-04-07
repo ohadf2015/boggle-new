@@ -48,6 +48,7 @@ import { BLAST_MP_DEFAULT_TIMER } from '@/shared/constants/gameConstants';
 import { getClassroomGame } from '../modules/classroomGameManager.js';
 import { initBlastModeState, hashStringToSeed } from '../modules/blastModeManager.js';
 import { initWordHuntState, selectTargetWordWithFallback } from '../modules/wordHuntManager.js';
+import { getSupabase } from '../modules/supabase/client.js';
 import { autoAddBotsForSoloPlayer } from '../services/gameLifecycle/autoAddBots.js';
 import { scheduleRoundEvent } from '../modules/roundEventsManager.js';
 
@@ -251,6 +252,32 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
     // Default blast MP to 90s when host didn't set an explicit timer
     if (resolvedMode === 'blast' && !timerSeconds) {
       validTimer = BLAST_MP_DEFAULT_TIMER;
+    }
+
+    // Server-side blast access enforcement — only admin or blast_access users can start blast games
+    if (resolvedMode === 'blast') {
+      const hostUser = Object.values(game.users).find((u) => u.isHost);
+      const hostAuthId = hostUser?.authUserId || (socket.data?.verifiedUserId as string | undefined);
+      const supabase = getSupabase();
+      // If Supabase is not configured (dev/test), allow blast access by default.
+      // In production with Supabase available, require admin or blast_access on the profile.
+      let blastAllowed = !supabase;
+
+      if (hostAuthId && supabase) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('is_admin, blast_access')
+          .eq('id', hostAuthId)
+          .single();
+        blastAllowed = !!(profile?.is_admin || profile?.blast_access);
+      }
+
+      if (!blastAllowed) {
+        gamesStarting.delete(gameCode);
+        logger.warn('SOCKET', `Rejected blast mode for ${gameCode}: host lacks blast_access`);
+        emitError(socket, 'Blast mode requires special access');
+        return;
+      }
     }
 
     // CRITICAL: Transition state FIRST to guard against concurrent startGame calls.

@@ -18,6 +18,7 @@ export interface QueryGameBase {
   language: Language;
   gameState: GameStateValue;
   isRanked: boolean;
+  isPrivate: boolean;
   createdAt: number;
   timerSeconds: number;
   lastActivity: number;
@@ -67,6 +68,7 @@ export interface DetailedGame {
   language: Language;
   gameState: GameStateValue;
   isRanked: boolean;
+  isPrivate: boolean;
   createdAt: number;
   timerSeconds: number;
   players: DetailedGamePlayer[];
@@ -134,6 +136,7 @@ export function getDetailedGames(games: Record<string, QueryGameBase>): Detailed
       language: game.language,
       gameState: game.gameState,
       isRanked: game.isRanked,
+      isPrivate: game.isPrivate,
       createdAt: game.createdAt,
       timerSeconds: game.timerSeconds,
       players,
@@ -166,6 +169,7 @@ export function getActiveRooms(games: Record<string, QueryGameBase>): GameSummar
     }
 
     if (humanCount === 0) continue;
+    if (game.isPrivate) continue;
 
     result.push({
       gameCode: game.gameCode,

@@ -95,7 +95,8 @@ const CustomPuzzleGame: React.FC<CustomPuzzleGameProps> = ({ puzzleCode }) => {
     }
 
     fetchPuzzle();
-  }, [puzzleCode, setError, setPhase, setPuzzle, t]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- t changes on language load, causing unnecessary refetch
+  }, [puzzleCode, setError, setPhase, setPuzzle]);
 
   // Handle game completion
   const handleGameComplete = useCallback(async (result: SurvivalGameResult) => {
