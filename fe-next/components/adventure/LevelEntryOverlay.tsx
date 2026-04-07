@@ -94,7 +94,7 @@ const DEFAULT_THEME = WORLD_THEMES[1];
 const BURST_DURATION = OPTIMIZED_TIMING.title.burstMs;
 const HOLD_DURATION = OPTIMIZED_TIMING.title.holdMs;
 const FADE_DURATION = OPTIMIZED_TIMING.title.fadeMs;
-const TOTAL_DURATION = BURST_DURATION + HOLD_DURATION + FADE_DURATION;
+// Total duration computed per-render (world intros get extra hold time)
 
 // ==============================================
 // COMPONENT
@@ -107,6 +107,11 @@ const LevelEntryOverlay = memo<LevelEntryOverlayProps>(
     const [phase, setPhase] = useState<'burst' | 'hold' | 'fade' | 'done'>('burst');
 
     const theme = WORLD_THEMES[worldNumber] || DEFAULT_THEME;
+
+    // Extend hold time on world intros (level 1, W2+) so players can read the mechanic hint
+    const isWorldIntro = levelNumber === 1 && worldNumber >= 2;
+    const holdMs = isWorldIntro ? HOLD_DURATION + 800 : HOLD_DURATION;
+    const totalMs = BURST_DURATION + holdMs + FADE_DURATION;
 
     // Handle animation phases
     useEffect(() => {
@@ -124,18 +129,18 @@ const LevelEntryOverlay = memo<LevelEntryOverlayProps>(
 
       // Progress through animation phases
       const burstTimer = setTimeout(() => setPhase('hold'), BURST_DURATION);
-      const holdTimer = setTimeout(() => setPhase('fade'), BURST_DURATION + HOLD_DURATION);
+      const holdTimer = setTimeout(() => setPhase('fade'), BURST_DURATION + holdMs);
       const doneTimer = setTimeout(() => {
         setPhase('done');
         onComplete?.();
-      }, TOTAL_DURATION);
+      }, totalMs);
 
       return () => {
         clearTimeout(burstTimer);
         clearTimeout(holdTimer);
         clearTimeout(doneTimer);
       };
-    }, [isVisible, prefersReducedMotion, onComplete]);
+    }, [isVisible, prefersReducedMotion, onComplete, holdMs, totalMs]);
 
     // Don't render if not visible or animation complete
     if (!isVisible || phase === 'done') {
@@ -259,16 +264,18 @@ const LevelEntryOverlay = memo<LevelEntryOverlayProps>(
                 {levelNumber}
               </AdaptiveMotion.span>
 
-              {/* World mechanic hint on first level of W2+ */}
+              {/* World mechanic intro on first level of W2+ */}
               {levelNumber === 1 && worldNumber >= 2 && (
-                <AdaptiveMotion.span
-                  className="text-xs font-neo-body text-neo-white/60 text-center mt-2 max-w-[200px]"
-                  initial={{ y: 10, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.3, duration: 0.4 }}
+                <AdaptiveMotion.div
+                  className="mt-4 px-4 py-2 rounded-neo border-neo bg-neo-navy/80 backdrop-blur-sm"
+                  initial={{ y: 16, opacity: 0, scale: 0.9 }}
+                  animate={{ y: 0, opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.3, duration: 0.5, type: 'spring', stiffness: 300, damping: 25 }}
                 >
-                  {t(`adventure.worlds.mechanicHint${worldNumber}`)}
-                </AdaptiveMotion.span>
+                  <p className={cn('text-sm font-bold text-center max-w-[260px] leading-snug', theme.textColor)}>
+                    {t(`adventure.worlds.mechanicHint${worldNumber}`)}
+                  </p>
+                </AdaptiveMotion.div>
               )}
             </div>
 

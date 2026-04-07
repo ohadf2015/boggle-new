@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useRef } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 
 // ── Web Audio path-tone oscillator ──
@@ -35,12 +35,61 @@ export function useBlastSounds() {
 
   const audioCtxRef = useRef<AudioContext | null>(null);
 
+  const getAudioCtx = useCallback(() => {
+    if (typeof window === 'undefined') return null;
+    try {
+      if (!audioCtxRef.current) {
+        audioCtxRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+      }
+      const ctx = audioCtxRef.current;
+      if (ctx.state === 'suspended') ctx.resume();
+      return ctx;
+    } catch { return null; }
+  }, []);
+
+  /** Synthesize a short tone with configurable waveform, frequency, and duration */
+  const synthTone = useCallback((freq: number, wave: OscillatorType, dur: number, vol = 0.1, detune = 0) => {
+    const ctx = getAudioCtx();
+    if (!ctx) return;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = wave;
+    osc.frequency.value = freq;
+    osc.detune.value = detune;
+    gain.gain.setValueAtTime(vol, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + dur);
+  }, [getAudioCtx]);
+
+  /** Synthesized sound configs per tile type — unique waveform/freq combos */
+  const TILE_SYNTH: Record<string, () => void> = useMemo(() => ({
+    gold:      () => { synthTone(880, 'sine', 0.2, 0.08); synthTone(1320, 'sine', 0.15, 0.05); },
+    silver:    () => { synthTone(784, 'triangle', 0.18, 0.07); synthTone(1175, 'triangle', 0.12, 0.04); },
+    diamond:   () => { synthTone(1047, 'sine', 0.25, 0.06); synthTone(1568, 'sine', 0.2, 0.04); synthTone(2093, 'sine', 0.15, 0.03); },
+    gem:       () => { synthTone(660, 'triangle', 0.2, 0.07); synthTone(990, 'triangle', 0.15, 0.05); },
+    rainbow:   () => { synthTone(523, 'sine', 0.3, 0.06); synthTone(659, 'sine', 0.25, 0.05); synthTone(784, 'sine', 0.2, 0.04); },
+    mirror:    () => { synthTone(698, 'square', 0.12, 0.04); synthTone(698, 'square', 0.12, 0.04); },
+    magnet:    () => { synthTone(220, 'sawtooth', 0.25, 0.06); synthTone(330, 'sawtooth', 0.2, 0.04); },
+    ice:       () => { synthTone(1200, 'sine', 0.15, 0.05, 30); synthTone(1600, 'sine', 0.1, 0.03, -30); },
+    frozen:    () => { synthTone(1400, 'sine', 0.12, 0.04); synthTone(1800, 'sine', 0.1, 0.03); },
+    wildcard:  () => { synthTone(440, 'triangle', 0.2, 0.06); synthTone(880, 'triangle', 0.15, 0.04); },
+    countdown: () => { synthTone(200, 'square', 0.3, 0.08); synthTone(150, 'square', 0.2, 0.06); },
+    virus:     () => { synthTone(180, 'sawtooth', 0.25, 0.05); synthTone(120, 'sawtooth', 0.3, 0.04); },
+    portal:    () => { synthTone(400, 'sine', 0.3, 0.06, 100); synthTone(600, 'sine', 0.25, 0.05, -100); },
+    catalyst:  () => { synthTone(550, 'triangle', 0.2, 0.07); synthTone(825, 'sine', 0.18, 0.05); synthTone(1100, 'sine', 0.12, 0.03); },
+  }), [synthTone]);
+
   /** Play special tile activation sound based on tile type */
   const playSpecialTileSound = useCallback((tileType: string) => {
-    if (tileType === 'bomb') playBlastBombSound();
-    else if (tileType === 'lightning') playBlastLightningSound();
-    else if (tileType === 'prism') playBlastPrismSound();
-  }, [playBlastBombSound, playBlastLightningSound, playBlastPrismSound]);
+    // Use dedicated asset-based sounds for bomb/lightning/prism (existing)
+    if (tileType === 'bomb') { playBlastBombSound(); return; }
+    if (tileType === 'lightning') { playBlastLightningSound(); return; }
+    if (tileType === 'prism') { playBlastPrismSound(); return; }
+    // Synthesized sounds for all other special tiles
+    TILE_SYNTH[tileType]?.();
+  }, [playBlastBombSound, playBlastLightningSound, playBlastPrismSound, TILE_SYNTH]);
 
   /** Play tile select sound when player adds a tile to path */
   const playTileSelect = useCallback(() => {
@@ -64,16 +113,29 @@ export function useBlastSounds() {
     }
   }, [playSound, playComboSound]);
 
-  /** Play cascade chain sound — pitch escalates faster for Blast chains */
+  /** Pentatonic scale frequencies — C4, D4, E4, G4, A4, C5, D5, E5, G5, A5
+   *  Pentatonic avoids semitone dissonance so every step sounds pleasant. */
+  const PENTATONIC_SCALE = useMemo(() => [
+    262, 294, 330, 392, 440, 523, 587, 659, 784, 880,
+  ], []);
+
+  /** Play cascade chain sound — pentatonic pitch ladder for satisfying escalation */
   const playCascadeChain = useCallback((level: number) => {
-    // Mega cascade at 5+ chain
+    // Mega cascade at 5+ chain — layer pentatonic arpeggio on top
     if (level >= 5) {
       playMegaCascadeSound();
+      // Add shimmering arpeggio
+      const base = PENTATONIC_SCALE[Math.min(level - 1, PENTATONIC_SCALE.length - 1)];
+      synthTone(base, 'sine', 0.3, 0.06);
+      synthTone(base * 1.5, 'sine', 0.25, 0.04); // fifth above
     } else {
-      // Boost level by 2 so Blast cascades feel more dramatic than standard combos
-      playComboSound(level + 2);
+      // Pentatonic tone per chain level — each step is a pleasant interval
+      const freq = PENTATONIC_SCALE[Math.min(level, PENTATONIC_SCALE.length - 1)];
+      synthTone(freq, 'triangle', 0.25, 0.1);
+      // Layer a softer octave-up shimmer for depth
+      synthTone(freq * 2, 'sine', 0.18, 0.04);
     }
-  }, [playComboSound, playMegaCascadeSound]);
+  }, [playMegaCascadeSound, synthTone, PENTATONIC_SCALE]);
 
   /** Play combo activation sound — milestone for tier 2+, combo for tier 1 */
   const playComboActivation = useCallback((tier: 1 | 2 | 3) => {

@@ -6,8 +6,6 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 
 /** Base combo window (2-letter min). Tighter for competitive play — rewards fast word-finding. */
 export const COMBO_WINDOW_BASE_MS = 3000;
-/** @deprecated Use COMBO_WINDOW_BASE_MS */
-export const COMBO_WINDOW_MS = COMBO_WINDOW_BASE_MS;
 
 /** Compute combo window duration scaled by minimum word length.
  *  2-letter → 3s, 3-letter → 3.4s, 4-letter → 3.8s */

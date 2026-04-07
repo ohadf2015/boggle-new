@@ -89,11 +89,7 @@ export function TileWarningOverlay({
     <AdaptiveMotion.div
       className={`absolute inset-0 pointer-events-none z-10 ${className}`}
       initial={{ opacity: 0, scale: 1 }}
-      animate={{
-        opacity: 1,
-        scale,
-        boxShadow: `inset 0 0 ${glowIntensity}px rgba(239, 68, 68, ${opacity})`,
-      }}
+      animate={{ opacity: 1, scale }}
       exit={{ opacity: 0, scale: 1 }}
       transition={{
         repeat: Infinity,
@@ -103,6 +99,7 @@ export function TileWarningOverlay({
       data-testid="tile-warning-overlay"
       style={{
         borderRadius: 'inherit',
+        boxShadow: `inset 0 0 ${glowIntensity}px rgba(239, 68, 68, ${opacity})`,
       }}
     >
       {/* Pulsing inner effect */}

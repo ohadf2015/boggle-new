@@ -111,7 +111,7 @@ export async function initializeNativeOAuth(): Promise<boolean> {
     const errorMessage = error instanceof Error ? error.message : String(error);
 
     // Android Apple redirect URL error is expected - Apple Sign-In isn't configured for Android
-    if (errorMessage.includes('redirectUrl is null or empty') || errorMessage.includes('apple.android')) {
+    if (errorMessage.includes('redirectUrl is null or empty') || errorMessage.includes('apple.android') || errorMessage.includes('UNIMPLEMENTED') || errorMessage.includes('not implemented')) {
       logger.log('[NativeOAuth] Apple Sign-In not configured for Android (expected) - Google Sign-In still available');
       // Still mark as initialized - Google Sign-In should work
       socialLoginInitialized = true;

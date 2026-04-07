@@ -7,8 +7,7 @@ import { RotateCw, Home, Share2, TrendingUp, TrendingDown, Copy, Check } from 'l
 import { Button } from '@/components/ui/button';
 import { fireConfetti } from '@/utils/confettiUtils';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useAdPlacement } from '@/hooks/useAdPlacement';
-import { useCrazyGamesAds } from '@/hooks/useCrazyGamesAds';
+import { useInterstitialAd } from '@/hooks/useInterstitialAd';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { cn } from '@/lib/utils';
 import { getChallengeUrl, generateChallengeShareMessage, type ScoreChallenge } from '@/utils/challenges';
@@ -16,6 +15,7 @@ import ResultsWinnerBanner from '@/components/results/ResultsWinnerBanner';
 import type { SinglePlayerResultsData } from '@/components/singleplayer/SinglePlayerView';
 
 const CrazyGamesBanner = dynamic(() => import('@/components/CrazyGamesBanner'), { ssr: false });
+const NativeBannerAd = dynamic(() => import('@/components/ads/NativeBannerAd'), { ssr: false });
 
 interface ChallengeResultsProps {
   results: SinglePlayerResultsData;
@@ -38,14 +38,12 @@ const ChallengeResults: React.FC<ChallengeResultsProps> = ({
 }) => {
   const { language, t } = useLanguage();
   const [copied, setCopied] = useState(false);
-  const { showInterstitial } = useAdPlacement();
-  const { requestMidgameAd } = useCrazyGamesAds();
+  const { showInterstitial } = useInterstitialAd();
   const { submitLeaderboardScore } = useCrazyGames();
 
   // Ads + leaderboard on mount
   useEffect(() => {
     showInterstitial('challenge-complete');
-    requestMidgameAd();
     if (results.playerScore > 0) {
       submitLeaderboardScore(results.playerScore);
     }
@@ -240,13 +238,14 @@ const ChallengeResults: React.FC<ChallengeResultsProps> = ({
             {t('common.backToHome')}
           </Button>
 
-          {/* Banner Ads */}
+          {/* Banner Ads — CrazyGames (web iframe) / AdMob (native) */}
           <div className="hidden md:block">
             <CrazyGamesBanner size="728x90" />
           </div>
           <div className="md:hidden">
             <CrazyGamesBanner size="320x50" />
           </div>
+          <NativeBannerAd />
         </motion.div>
       </motion.div>
     </div>

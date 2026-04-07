@@ -9,10 +9,11 @@
 
 import React, { memo, useRef } from 'react';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
-import { RotateCcw, Clock, Lightbulb, LogOut, TrendingUp } from 'lucide-react';
+import { RotateCcw, Clock, Lightbulb, LogOut, Target } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
+import type { NearMissMessage } from '@/lib/adventure/nearMiss';
 
 // ==============================================
 // TYPES
@@ -37,6 +38,8 @@ interface RetryAssistModalProps {
   onRetryWithHint: () => void;
   /** Exit to menu callback */
   onExit: () => void;
+  /** Near-miss feedback messages (optional) */
+  nearMissMessages?: NearMissMessage[];
 }
 
 // ==============================================
@@ -88,6 +91,7 @@ const RetryAssistModal = memo<RetryAssistModalProps>(
     onRetryWithBonus,
     onRetryWithHint,
     onExit,
+    nearMissMessages,
   }) => {
     const { t } = useLanguage();
     const dialogRef = useRef<HTMLDivElement>(null);
@@ -194,6 +198,26 @@ const RetryAssistModal = memo<RetryAssistModalProps>(
                   </div>
                 </div>
               </div>
+
+              {/* Near-Miss Encouragement */}
+              {nearMissMessages && nearMissMessages.length > 0 && (
+                <div
+                  data-testid="near-miss-section"
+                  className="px-4 py-3 border-b-2 border-neo-black/20 bg-neo-purple/10"
+                >
+                  <p className="text-xs font-bold text-neo-purple uppercase tracking-wide mb-2 flex items-center gap-1.5">
+                    <Target className="w-3.5 h-3.5" />
+                    {t('adventure.retry.nearMissTitle')}
+                  </p>
+                  <ul className="space-y-1">
+                    {nearMissMessages.map((msg) => (
+                      <li key={msg.type} className="text-sm text-neo-white/80 font-medium">
+                        {t(msg.translationKey, msg.params as Record<string, string | number>)}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
 
               {/* Action Buttons */}
               <div className="p-4 space-y-3">

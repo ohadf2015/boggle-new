@@ -17,7 +17,7 @@ function readSource(relativePath: string): string {
 }
 
 describe('CrazyGames Integration Wiring', () => {
-  describe('Midgame ads wired in all results screens', () => {
+  describe('Interstitial ads wired in all results screens', () => {
     const resultsScreens = [
       'components/views/ResultsPage.tsx',
       'components/singleplayer/SinglePlayerResults.tsx',
@@ -26,14 +26,14 @@ describe('CrazyGames Integration Wiring', () => {
     ];
 
     resultsScreens.forEach((screenPath) => {
-      it(`${screenPath} imports useCrazyGamesAds`, () => {
+      it(`${screenPath} imports useInterstitialAd`, () => {
         const source = readSource(screenPath);
-        expect(source).toContain("useCrazyGamesAds");
+        expect(source).toContain("useInterstitialAd");
       });
 
-      it(`${screenPath} calls requestMidgameAd`, () => {
+      it(`${screenPath} calls showInterstitial`, () => {
         const source = readSource(screenPath);
-        expect(source).toContain('requestMidgameAd');
+        expect(source).toContain('showInterstitial');
       });
     });
   });

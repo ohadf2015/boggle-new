@@ -7,6 +7,8 @@ import { getRandomWaveClear } from './blastEffectVariations';
 interface BlastWaveClearTextProps {
   waveCleared: boolean;
   movesRemaining: number;
+  /** Translation function */
+  t: (key: string) => string | undefined;
 }
 
 interface WaveClearTier {
@@ -18,18 +20,24 @@ interface WaveClearTier {
 
 const LEFTOVER_MOVE_BONUS = 5;
 
+/** Tier config without text — text comes from translations */
+const WAVE_CLEAR_TIERS = {
+  perfect: { key: 'blast.waveClear.perfect', fallback: 'PERFECT!', color: 'text-neo-lime', glow: 'rgba(191,255,0,0.5)', scale: 1.4 },
+  great:   { key: 'blast.waveClear.great',   fallback: 'GREAT!',   color: 'text-neo-cyan', glow: 'rgba(0,255,255,0.4)', scale: 1.1 },
+  clear:   { key: 'blast.waveClear.clear',   fallback: 'CLEAR!',   color: 'text-yellow-300', glow: 'rgba(255,215,0,0.3)', scale: 0.9 },
+} as const;
+
+type WaveClearTierKey = keyof typeof WAVE_CLEAR_TIERS;
+
 /** Determine celebration tier based on leftover moves */
-export function getWaveClearTier(movesRemaining: number): WaveClearTier {
-  if (movesRemaining >= 5) {
-    return { text: 'PERFECT!', color: 'text-neo-lime', glow: 'rgba(191,255,0,0.5)', scale: 1.4 };
-  }
-  if (movesRemaining >= 3) {
-    return { text: 'GREAT!', color: 'text-neo-cyan', glow: 'rgba(0,255,255,0.4)', scale: 1.1 };
-  }
-  return { text: 'CLEAR!', color: 'text-yellow-300', glow: 'rgba(255,215,0,0.3)', scale: 0.9 };
+export function getWaveClearTier(movesRemaining: number, t?: (key: string) => string | undefined): WaveClearTier {
+  const tierKey: WaveClearTierKey = movesRemaining >= 5 ? 'perfect' : movesRemaining >= 3 ? 'great' : 'clear';
+  const tier = WAVE_CLEAR_TIERS[tierKey];
+  const text = t?.(tier.key) || tier.fallback;
+  return { text, color: tier.color, glow: tier.glow, scale: tier.scale };
 }
 
-export function BlastWaveClearText({ waveCleared, movesRemaining }: BlastWaveClearTextProps) {
+export function BlastWaveClearText({ waveCleared, movesRemaining, t }: BlastWaveClearTextProps) {
   const [visible, setVisible] = useState(false);
   const [key, setKey] = useState(0);
 
@@ -47,7 +55,7 @@ export function BlastWaveClearText({ waveCleared, movesRemaining }: BlastWaveCle
 
   if (!visible) return null;
 
-  const tier = getWaveClearTier(movesRemaining);
+  const tier = getWaveClearTier(movesRemaining, t);
   const bonusPoints = movesRemaining * LEFTOVER_MOVE_BONUS;
 
   return (

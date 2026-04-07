@@ -86,14 +86,14 @@ export default function ClassroomManager() {
   };
 
   const copyJoinCode = (code: string) => {
-    navigator.clipboard.writeText(code);
+    navigator.clipboard.writeText(code).catch(() => {});
     toast.success(t('teacher.classroom.codeCopied'));
   };
 
   const copyInviteLink = (code: string) => {
     const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
     const link = `${baseUrl}/${language}/join/${code}`;
-    navigator.clipboard.writeText(link);
+    navigator.clipboard.writeText(link).catch(() => {});
     toast.success(t('teacher.classroom.linkCopied'));
   };
 

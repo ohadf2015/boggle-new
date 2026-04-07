@@ -44,7 +44,7 @@ describe('JoinWithCodePage - Bug Reproduction', () => {
       t: (key: string) => key,
       language: 'en',
       setLanguage: vi.fn(),
-      languages: ['en', 'he', 'sv', 'ja'],
+      languages: ['en', 'he', 'sv', 'ja', 'es'],
     } as any);
 
     // Clear sessionStorage

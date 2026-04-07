@@ -3997,7 +3997,7 @@ const en = {
     "best": "Best",
     "target": "Target",
     "totalPoints": "total pts",
-    "topPercent": "Top ${percent}%",
+    "topPercent": "Top {percent}%",
     "noRankYet": "Play games to get ranked!",
     "viewLeaderboard": "View Leaderboard",
     "friends": "Friends",
@@ -4352,7 +4352,7 @@ const en = {
     "multiPlayer": "Multiplayer",
     "multiplayer": "Multiplayer",
     "multiplayerDesc": "Live word battles!",
-    "arena": "Word Arena",
+    "arena": "Multiplayer",
     "arenaDesc": "Play solo or challenge friends!",
     "practice": "Practice",
     "practiceDesc": "No pressure, just words",
@@ -5364,7 +5364,8 @@ const en = {
         "classic": "Classic",
         "blitz": "Blitz",
         "survival": "Survival"
-      }
+      },
+      "sent": "Challenge sent!"
     },
     "copyInviteLink": "Copy invite link",
     "linkCopied": "Link copied!",
@@ -6334,9 +6335,63 @@ const en = {
     "perfect": "Perfect!",
     "restart": "Restart",
     "gold": "Gold",
+    "archetype": {
+      "standard": "Standard",
+      "excavation": "Excavation",
+      "goldRush": "Gold Rush",
+      "puzzle": "Puzzle",
+      "survival": "Survival",
+      "cascade": "Cascade",
+      "boss": "Boss Battle"
+    },
+    "mastery": {
+      "title": "Archetype Mastery",
+      "tier": {
+        "none": "Unranked",
+        "bronze": "Bronze",
+        "silver": "Silver",
+        "gold": "Gold",
+        "diamond": "Diamond"
+      },
+      "progress": "{current}/{target} stars",
+      "bonusUnlocked": "Bonus unlocked: {description}",
+      "nextTier": "Next tier: {tier} ({remaining} stars needed)"
+    },
+    "runes": {
+      "title": "Rune Collection",
+      "forge": "Forge Rune",
+      "equip": "Equip",
+      "unequip": "Unequip",
+      "equipped": "Equipped ({count}/{max})",
+      "fragments": "{count} Fragments",
+      "forgeCost": "Cost: {cost} fragments",
+      "alreadyOwned": "Already owned",
+      "notEnoughFragments": "Not enough fragments",
+      "fragment": "Rune Fragment",
+      "slotsFull": "All rune slots full",
+      "rarity": {
+        "common": "Common",
+        "rare": "Rare",
+        "epic": "Epic",
+        "legendary": "Legendary"
+      },
+      "ember": { "name": "Ember Rune", "desc": "+10% score bonus" },
+      "inferno": { "name": "Inferno Rune", "desc": "+25% score bonus" },
+      "midas": { "name": "Midas Rune", "desc": "+15% gold bonus" },
+      "fortune": { "name": "Fortune Rune", "desc": "+40% gold bonus" },
+      "hourglass": { "name": "Hourglass Rune", "desc": "+5s bonus time" },
+      "eternity": { "name": "Eternity Rune", "desc": "+12s bonus time" },
+      "flow": { "name": "Flow Rune", "desc": "15% slower combo decay" },
+      "torrent": { "name": "Torrent Rune", "desc": "35% slower combo decay" },
+      "insight": { "name": "Insight Rune", "desc": "+1 hint charge" },
+      "oracle": { "name": "Oracle Rune", "desc": "+2 hint charges" },
+      "valor": { "name": "Valor Rune", "desc": "+20% boss damage" },
+      "dragonslayer": { "name": "Dragonslayer Rune", "desc": "+50% boss damage" }
+    },
     "loading": "Loading adventure...",
     "currency": {
-      "goldAmount": "{amount} gold"
+      "goldAmount": "{amount} gold",
+      "coinIcon": "coin"
     },
     "levelLocked": "Level {level} — Locked",
     "bossLevel": "Boss Level {level}",
@@ -6477,14 +6532,14 @@ const en = {
     },
     "mechanic": {
       "synonymPairs": "Synonym Pairs",
-      "etymologyRoots": "Bonus for Latin/Greek roots",
-      "idioms": "Hidden idiom challenges",
-      "compounds": "+30% for compound words",
-      "anagrams": "Solve anagrams for bonuses",
-      "palindromes": "+50% for palindromes",
-      "rareWords": "+40% for rare/new words",
-      "multilingual": "Multi-language word bonuses",
-      "allMechanics": "All mechanics combined"
+      "etymologyRoots": "Root Words",
+      "idioms": "Idiom Hunt",
+      "compounds": "Compound Words",
+      "anagrams": "Anagram Match",
+      "palindromes": "Palindromes",
+      "rareWords": "Rare Words",
+      "multilingual": "Polyglot",
+      "allMechanics": "All Mechanics"
     },
     "objectives": {
       "wordCount": "Find words",
@@ -6557,6 +6612,18 @@ const en = {
     "retryLevel": "Retry",
     "backToLevels": "World Map",
     "freeRetry": "Free Retry",
+    "share": {
+      "perfectClear": "Perfect Clear",
+      "bestWord": "Best Word",
+      "wordsFound": "words found"
+    },
+    "streak": {
+      "days": "day streak",
+      "milestone3": "3-Day Streak!",
+      "milestone7": "Week Warrior!",
+      "milestone14": "Two-Week Champion!",
+      "milestone30": "Monthly Legend!"
+    },
     "album": {
       "title": "Word Album",
       "uniqueWords": "Unique Words",
@@ -6783,7 +6850,8 @@ const en = {
       "yourProgress": "Your Progress",
       "bestWords": "Best Words",
       "bestScore": "Best Score",
-      "attempts": "Attempts"
+      "attempts": "Attempts",
+      "nearMissTitle": "So Close!"
     },
     "preview": {
       "title": "Level Preview",
@@ -7715,7 +7783,35 @@ const en = {
   },
   "blast": {
     "chain": {
-      "badge": "Chain x{level}"
+      "badge": "Chain x{level}",
+      "cascade": "CASCADE!",
+      "double": "DOUBLE!",
+      "triple": "TRIPLE!",
+      "mega": "MEGA!",
+      "ultra": "ULTRA!"
+    },
+    "praise": {
+      "nice": "Nice!",
+      "great": "Great!",
+      "brilliant": "Brilliant!",
+      "amazing": "AMAZING!",
+      "legendary": "LEGENDARY!"
+    },
+    "waveClear": {
+      "perfect": "PERFECT!",
+      "great": "GREAT!",
+      "clear": "CLEAR!"
+    },
+    "milestone": {
+      "100": "100!",
+      "250": "250!",
+      "500": "500!",
+      "750": "750!",
+      "1000": "1000!",
+      "1500": "1500!",
+      "2000": "2000!",
+      "3000": "3000!",
+      "5000": "5000+"
     },
     "tile": {
       "gold":      { "name": "Gold",      "desc": "3× score + grants 1 bonus move." },
@@ -9318,7 +9414,8 @@ const en = {
     "send": "Send Gift",
     "sent": "Gift Sent!",
     "limitReached": "Daily limit reached",
-    "error": "Gift failed. Try again?"
+    "error": "Gift failed. Try again?",
+    "received": "{sender} sent you a {type}!"
   },
   "faq": {
     "title": "FAQ",
@@ -9895,21 +9992,33 @@ const en = {
       "mega": "MEGA!",
       "ultra": "ULTRA!!"
     },
+    "praise": {
+      "nice": "Nice!",
+      "great": "Great!",
+      "brilliant": "Brilliant!",
+      "amazing": "AMAZING!",
+      "legendary": "LEGENDARY!"
+    },
     "tileGuide": {
       "title": "Tile Guide",
-      "standard": { "name": "Standard", "desc": "Basic tile" },
-      "gold": { "name": "Gold", "desc": "3x score multiplier" },
-      "silver": { "name": "Silver", "desc": "1.5x score multiplier" },
-      "diamond": { "name": "Diamond", "desc": "5x score multiplier" },
-      "bomb": { "name": "Bomb", "desc": "Clears 3x3 area" },
-      "lightning": { "name": "Lightning", "desc": "Clears entire column" },
-      "prism": { "name": "Prism", "desc": "Clears cross pattern" },
-      "rainbow": { "name": "Rainbow", "desc": "Copies best nearby special" },
-      "ice": { "name": "Ice", "desc": "Obstacle — hit to break" },
-      "frozen": { "name": "Frozen", "desc": "2 hits to free inner special" },
-      "gem": { "name": "Gem", "desc": "3 hits — spawns 2 specials" },
-      "mirror": { "name": "Mirror", "desc": "Doubles partner effect" },
-      "magnet": { "name": "Magnet", "desc": "Pulls and explodes nearby tiles" }
+      "standard": { "name": "Standard", "desc": "Basic tile — no special effect" },
+      "gold": { "name": "Gold", "desc": "×3 score + 1 bonus move" },
+      "silver": { "name": "Silver", "desc": "×1.5 score + extends countdowns by 1" },
+      "diamond": { "name": "Diamond", "desc": "×5 score + reveals frozen contents for 3 turns" },
+      "bomb": { "name": "Bomb", "desc": "Clears 3×3 area — chains to nearby bombs" },
+      "lightning": { "name": "Lightning", "desc": "Clears entire column — chains to other bolts" },
+      "prism": { "name": "Prism", "desc": "2 hits — clears row + column, spawns 2 specials" },
+      "rainbow": { "name": "Rainbow", "desc": "Copies best special in your word, or ×2 score" },
+      "ice": { "name": "Ice", "desc": "2 hits to break — freezes adjacent viruses" },
+      "frozen": { "name": "Frozen", "desc": "2 hits — releases a hidden special inside" },
+      "gem": { "name": "Gem", "desc": "3 hits — spawns 2 specials + 2 bonus moves" },
+      "mirror": { "name": "Mirror", "desc": "Copies first offensive special in your word" },
+      "magnet": { "name": "Magnet", "desc": "Pulls nearby tiles inward, then explodes 3×3" },
+      "wildcard": { "name": "Wildcard", "desc": "Matches any letter — scores by letter rarity" },
+      "countdown": { "name": "Countdown", "desc": "Defuse before 0! +2 moves — or 50pt penalty" },
+      "virus": { "name": "Virus", "desc": "Spreads each turn — clear 3+ in one word to cure all" },
+      "portal": { "name": "Portal", "desc": "Linked in pairs — clears both, ×2 word score" },
+      "catalyst": { "name": "Catalyst", "desc": "Upgrades all adjacent tiles to random specials" }
     },
     "objective": {
       "scoreTarget": "Score {target} pts",

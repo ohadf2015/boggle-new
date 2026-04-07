@@ -199,6 +199,10 @@ export async function setupPushListeners(
   try {
     const { PushNotifications } = { PushNotifications: (globalThis as any).Capacitor?.Plugins?.PushNotifications } as any;
 
+    if (!PushNotifications) {
+      return () => {}; // Plugin not available (e.g., Android WebView without Capacitor)
+    }
+
     // Handle notification received while app is in foreground
     const receivedListener = await PushNotifications.addListener(
       'pushNotificationReceived',

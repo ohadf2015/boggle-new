@@ -3524,7 +3524,7 @@ const ja = {
     "best": "ベスト",
     "target": "ターゲット",
     "totalPoints": "合計",
-    "topPercent": "トップ${percent}%",
+    "topPercent": "トップ{percent}%",
     "noRankYet": "ゲームをプレイしてランク入り!",
     "viewLeaderboard": "リーダーボードを見る",
     "friends": "フレンド",
@@ -4246,7 +4246,7 @@ const ja = {
     "multiPlayer": "マルチプレイヤー",
     "multiplayer": "マルチプレイヤー",
     "multiplayerDesc": "リアルタイムで友達と対戦！",
-    "arena": "ワードアリーナ",
+    "arena": "マルチプレイヤー",
     "arenaDesc": "ソロでもフレンドとでも！",
     "practice": "練習",
     "practiceDesc": "プレッシャーなし、言葉だけ",
@@ -5252,7 +5252,8 @@ const ja = {
         "classic": "クラシック",
         "blitz": "ブリッツ",
         "survival": "サバイバル"
-      }
+      },
+      "sent": "チャレンジを送信しました！"
     },
     "copyInviteLink": "招待リンクをコピー",
     "linkCopied": "リンクをコピーしました！",
@@ -6275,6 +6276,59 @@ const ja = {
       }
     },
     "title": "アドベンチャーモード",
+    "archetype": {
+      "standard": "スタンダード",
+      "excavation": "発掘",
+      "goldRush": "ゴールドラッシュ",
+      "puzzle": "パズル",
+      "survival": "サバイバル",
+      "cascade": "カスケード",
+      "boss": "ボスバトル"
+    },
+    "mastery": {
+      "title": "アーキタイプ熟練度",
+      "tier": {
+        "none": "ランクなし",
+        "bronze": "ブロンズ",
+        "silver": "シルバー",
+        "gold": "ゴールド",
+        "diamond": "ダイヤモンド"
+      },
+      "progress": "{current}/{target} スター",
+      "bonusUnlocked": "ボーナス解放: {description}",
+      "nextTier": "次のティア: {tier} (あと{remaining}スター)"
+    },
+    "runes": {
+      "title": "ルーンコレクション",
+      "forge": "ルーンを鍛造",
+      "equip": "装備",
+      "unequip": "外す",
+      "equipped": "装備中 ({count}/{max})",
+      "fragments": "{count} フラグメント",
+      "forgeCost": "費用: {cost} フラグメント",
+      "alreadyOwned": "所持済み",
+      "notEnoughFragments": "フラグメントが足りません",
+      "fragment": "ルーンの欠片",
+      "slotsFull": "スロットが全て埋まっています",
+      "rarity": {
+        "common": "コモン",
+        "rare": "レア",
+        "epic": "エピック",
+        "legendary": "レジェンダリー"
+      },
+      "ember": { "name": "エンバールーン", "desc": "+10% スコアボーナス" },
+      "inferno": { "name": "インフェルノルーン", "desc": "+25% スコアボーナス" },
+      "midas": { "name": "ミダスルーン", "desc": "+15% ゴールドボーナス" },
+      "fortune": { "name": "フォーチュンルーン", "desc": "+40% ゴールドボーナス" },
+      "hourglass": { "name": "砂時計ルーン", "desc": "+5秒ボーナスタイム" },
+      "eternity": { "name": "エタニティルーン", "desc": "+12秒ボーナスタイム" },
+      "flow": { "name": "フロールーン", "desc": "コンボ減衰15%緩和" },
+      "torrent": { "name": "トレントルーン", "desc": "コンボ減衰35%緩和" },
+      "insight": { "name": "インサイトルーン", "desc": "+1 ヒント" },
+      "oracle": { "name": "オラクルルーン", "desc": "+2 ヒント" },
+      "valor": { "name": "ヴァラールーン", "desc": "+20% ボスダメージ" },
+      "dragonslayer": { "name": "ドラゴンスレイヤールーン", "desc": "+50% ボスダメージ" }
+    },
     "worldMap": "ワールドマップ",
     "subtitle": "10のテーマワールドを旅し、100レベルを制覇して、究極のワードマスターになろう！",
     "adminOnly": "管理者のみ",
@@ -6327,6 +6381,18 @@ const ja = {
       "bossRushLocked": "全ボスを倒してボスラッシュを解放",
       "allQuestsComplete": "デイリークエスト全達成！ボーナス獲得！",
       "dailyQuestBonusComplete": "全クエスト達成！+50ボーナスゴールド"
+    },
+    "share": {
+      "perfectClear": "パーフェクトクリア",
+      "bestWord": "ベストワード",
+      "wordsFound": "発見した単語"
+    },
+    "streak": {
+      "days": "日連続",
+      "milestone3": "3日連続！",
+      "milestone7": "ウィークウォリアー！",
+      "milestone14": "2週間チャンピオン！",
+      "milestone30": "月間レジェンド！"
     },
     "album": {
       "title": "ワードアルバム",
@@ -6474,7 +6540,8 @@ const ja = {
     "gold": "ゴールド",
     "loading": "アドベンチャーを読み込み中...",
     "currency": {
-      "goldAmount": "{amount} ゴールド"
+      "goldAmount": "{amount} ゴールド",
+      "coinIcon": "コイン"
     },
     "levelLocked": "レベル{level} — ロック中",
     "bossLevel": "ボスレベル{level}",
@@ -6615,14 +6682,14 @@ const ja = {
     },
     "mechanic": {
       "synonymPairs": "同義語ペア",
-      "etymologyRoots": "ラテン語/ギリシャ語の語源でボーナス",
-      "idioms": "隠し慣用句チャレンジ",
-      "compounds": "複合語で+30%",
-      "anagrams": "アナグラムを解いてボーナス",
-      "palindromes": "回文で+50%",
-      "rareWords": "珍しい/新しい単語で+40%",
-      "multilingual": "多言語ワードボーナス",
-      "allMechanics": "すべてのメカニクスを組み合わせ"
+      "etymologyRoots": "語源ルーツ",
+      "idioms": "慣用句ハント",
+      "compounds": "複合語",
+      "anagrams": "アナグラム",
+      "palindromes": "回文",
+      "rareWords": "レア単語",
+      "multilingual": "ポリグロット",
+      "allMechanics": "全メカニクス"
     },
     "objectives": {
       "wordCount": "単語を見つける",
@@ -6742,7 +6809,8 @@ const ja = {
       "yourProgress": "あなたの進捗",
       "bestWords": "最高の単語数",
       "bestScore": "最高スコア",
-      "attempts": "挑戦回数"
+      "attempts": "挑戦回数",
+      "nearMissTitle": "あと少し！"
     },
     "preview": {
       "title": "レベル プレビュー",
@@ -7573,7 +7641,35 @@ const ja = {
   },
   "blast": {
     "chain": {
-      "badge": "チェイン x{level}"
+      "badge": "チェイン x{level}",
+      "cascade": "カスケード！",
+      "double": "ダブル！",
+      "triple": "トリプル！",
+      "mega": "メガ！",
+      "ultra": "ウルトラ！！"
+    },
+    "praise": {
+      "nice": "ナイス！",
+      "great": "すごい！",
+      "brilliant": "ブリリアント！",
+      "amazing": "アメイジング！",
+      "legendary": "レジェンド！！"
+    },
+    "waveClear": {
+      "perfect": "パーフェクト！",
+      "great": "グレート！",
+      "clear": "クリア！"
+    },
+    "milestone": {
+      "100": "100！",
+      "250": "250！",
+      "500": "500！",
+      "750": "750！",
+      "1000": "1000！",
+      "1500": "1500！",
+      "2000": "2000！",
+      "3000": "3000！",
+      "5000": "5000＋"
     },
     "tile": {
       "gold":      { "name": "ゴールド",    "desc": "スコア3倍 + ボーナス1手。" },
@@ -9111,7 +9207,8 @@ const ja = {
     "send": "ギフトを送る",
     "sent": "ギフト送信完了！",
     "limitReached": "日間上限に達しました",
-    "error": "ギフト送信失敗。もう一度？"
+    "error": "ギフト送信失敗。もう一度？",
+    "received": "{sender}から{type}が届きました！"
   },
   "faq": {
     "title": "よくある質問",
@@ -9810,21 +9907,33 @@ const ja = {
       "mega": "メガ！",
       "ultra": "ウルトラ！！"
     },
+    "praise": {
+      "nice": "ナイス！",
+      "great": "すごい！",
+      "brilliant": "ブリリアント！",
+      "amazing": "アメイジング！",
+      "legendary": "レジェンド！！"
+    },
     "tileGuide": {
       "title": "タイルガイド",
-      "standard": { "name": "通常", "desc": "基本タイル" },
-      "gold": { "name": "ゴールド", "desc": "スコア3倍" },
-      "silver": { "name": "シルバー", "desc": "スコア1.5倍" },
-      "diamond": { "name": "ダイヤモンド", "desc": "スコア5倍" },
-      "bomb": { "name": "ボム", "desc": "3x3エリアをクリア" },
-      "lightning": { "name": "ライトニング", "desc": "列全体をクリア" },
-      "prism": { "name": "プリズム", "desc": "十字パターンをクリア" },
-      "rainbow": { "name": "レインボー", "desc": "近くの最強スペシャルをコピー" },
-      "ice": { "name": "アイス", "desc": "障害物 — 叩いて壊す" },
-      "frozen": { "name": "フローズン", "desc": "2回叩いて内部スペシャルを解放" },
-      "gem": { "name": "ジェム", "desc": "3回叩く — スペシャル2つ出現" },
-      "mirror": { "name": "ミラー", "desc": "パートナーの効果を倍増" },
-      "magnet": { "name": "マグネット", "desc": "近くのタイルを引き寄せ爆発" }
+      "standard": { "name": "通常", "desc": "基本タイル — 特殊効果なし" },
+      "gold": { "name": "ゴールド", "desc": "×3スコア + ボーナス1手" },
+      "silver": { "name": "シルバー", "desc": "×1.5スコア + カウントダウンを1延長" },
+      "diamond": { "name": "ダイヤモンド", "desc": "×5スコア + 凍結タイルの中身を3ターン表示" },
+      "bomb": { "name": "ボム", "desc": "3×3エリアをクリア — 近くのボムに連鎖" },
+      "lightning": { "name": "ライトニング", "desc": "列全体をクリア — 他のライトニングに連鎖" },
+      "prism": { "name": "プリズム", "desc": "2回 — 行+列クリア、スペシャル2つ生成" },
+      "rainbow": { "name": "レインボー", "desc": "単語内の最強スペシャルをコピー、または×2スコア" },
+      "ice": { "name": "アイス", "desc": "2回で破壊 — 隣接ウイルスを凍結" },
+      "frozen": { "name": "フローズン", "desc": "2回 — 中に隠されたスペシャルを解放" },
+      "gem": { "name": "ジェム", "desc": "3回 — スペシャル2つ + ボーナス2手" },
+      "mirror": { "name": "ミラー", "desc": "単語内の最初の攻撃スペシャルをコピー" },
+      "magnet": { "name": "マグネット", "desc": "近くのタイルを引き寄せ、3×3を爆発" },
+      "wildcard": { "name": "ワイルドカード", "desc": "どの文字にもなる — レア度でスコア" },
+      "countdown": { "name": "カウントダウン", "desc": "0になる前に解除！+2手 — さもなくば50点ペナルティ" },
+      "virus": { "name": "ウイルス", "desc": "毎ターン拡散 — 1単語で3+消して全治療" },
+      "portal": { "name": "ポータル", "desc": "ペアで連結 — 両方消去、単語スコア×2" },
+      "catalyst": { "name": "カタリスト", "desc": "隣接タイルを全てランダムなスペシャルに昇格" }
     },
     "objective": {
       "scoreTarget": "{target}ポイント獲得",

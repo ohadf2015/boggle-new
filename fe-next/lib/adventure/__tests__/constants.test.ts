@@ -141,31 +141,27 @@ describe('World Unlock Functions', () => {
       expect(getWorldUnlockRequirement(1)).toBe(0);
     });
 
-    it('should require stars per world (W2 lowered to 7, others use 11 per world)', () => {
-      // World 2 requires 7 stars (lowered so 1-star-avg players can progress)
+    it('should require stars per world with consistent 11-star gaps from W2', () => {
       expect(getWorldUnlockRequirement(2)).toBe(7);
-      // World 3 requires 22 stars
-      expect(getWorldUnlockRequirement(3)).toBe(22);
-      // World 4 requires 33 stars
-      expect(getWorldUnlockRequirement(4)).toBe(33);
+      expect(getWorldUnlockRequirement(3)).toBe(18);
+      expect(getWorldUnlockRequirement(4)).toBe(29);
     });
 
-    it('should require 99 stars for world 10 (same formula as other worlds: 11 * 9)', () => {
-      // World 10 uses the standard formula to prevent early skip-ahead
-      expect(getWorldUnlockRequirement(10)).toBe(99);
+    it('should require 95 stars for world 10', () => {
+      expect(getWorldUnlockRequirement(10)).toBe(95);
     });
 
-    it('should use formula (N-1)*11 for worlds 3-10, W2 special-cased to 7', () => {
+    it('should use formula 7+11*(N-2) for worlds 3-10, W2 special-cased to 7', () => {
       expect(getWorldUnlockRequirement(2)).toBe(7);
       for (let world = 3; world <= WORLDS_COUNT; world++) {
-        expect(getWorldUnlockRequirement(world)).toBe((world - 1) * STARS_TO_UNLOCK_NEXT_WORLD);
+        expect(getWorldUnlockRequirement(world)).toBe(7 + STARS_TO_UNLOCK_NEXT_WORLD * (world - 2));
       }
     });
 
     it('should handle invalid world numbers', () => {
       expect(getWorldUnlockRequirement(0)).toBe(0);
       expect(getWorldUnlockRequirement(-1)).toBe(0);
-      expect(getWorldUnlockRequirement(11)).toBe(99);
+      expect(getWorldUnlockRequirement(11)).toBe(95);
     });
   });
 
@@ -180,9 +176,9 @@ describe('World Unlock Functions', () => {
       expect(isWorldUnlocked(2, 21)).toBe(true);
     });
 
-    it('should unlock world 10 with 99+ stars', () => {
-      expect(isWorldUnlocked(10, 98)).toBe(false);
-      expect(isWorldUnlocked(10, 99)).toBe(true);
+    it('should unlock world 10 with 95+ stars', () => {
+      expect(isWorldUnlocked(10, 94)).toBe(false);
+      expect(isWorldUnlocked(10, 95)).toBe(true);
     });
   });
 

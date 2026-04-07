@@ -53,7 +53,7 @@ export interface UseAdventureWordSubmitProps {
   isBossActive: boolean;
   bossConfig: BossConfig | null;
   checkBossWord: (word: string) => BossMechanicResult;
-  dealBossDamage: (baseDamage: number, combo: number, mechanicMultiplier: number, comboBonus: number) => number;
+  dealBossDamage: (baseDamage: number, mechanicMultiplier: number) => number;
   triggerBossTaunt: (event: BossTauntEvent) => void;
   handleEarnAchievement: (id: AdventureAchievementId) => boolean;
   recordAIWord: (success: boolean, combo: number) => void;
@@ -80,6 +80,12 @@ export interface UseAdventureWordSubmitProps {
   detonateActive?: boolean;
 }
 
+export interface MechanicBonusData {
+  id: number;
+  feedbackKey: string;
+  multiplier: number;
+}
+
 export interface UseAdventureWordSubmitReturn {
   handleWordSubmit: (submittedWord: string, submittedIndices: number[]) => Promise<void>;
   validationFeedback: ValidationFeedback;
@@ -88,6 +94,9 @@ export interface UseAdventureWordSubmitReturn {
   lastSubmittedWordRef: React.MutableRefObject<{ word: string; path: Array<{ row: number; col: number }> } | null>;
   prevComboCountRef: React.MutableRefObject<number>;
   resetWordSubmitState: () => void;
+  mechanicBonus: MechanicBonusData | null;
+  dismissMechanicBonus: () => void;
+  mechanicHitCount: number;
 }
 
 export function useAdventureWordSubmit(props: UseAdventureWordSubmitProps): UseAdventureWordSubmitReturn {
@@ -117,6 +126,9 @@ export function useAdventureWordSubmit(props: UseAdventureWordSubmitProps): UseA
   });
   const [lastAccepted, setLastAccepted] = useState<{ word: string; score: number } | null>(null);
   const [wordFeedback, setWordFeedback] = useState<WordFeedback | null>(null);
+  const [mechanicBonus, setMechanicBonus] = useState<MechanicBonusData | null>(null);
+  const [mechanicHitCount, setMechanicHitCount] = useState(0);
+  const dismissMechanicBonus = useCallback(() => setMechanicBonus(null), []);
 
   const validationErrorTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const wordSubmittedTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -194,7 +206,18 @@ export function useAdventureWordSubmit(props: UseAdventureWordSubmitProps): UseA
           const activeMechanic = (isBossActive && bossCurrentPhase) ? bossCurrentPhase : (worldMechanic ?? null);
           const mechanicEval = evaluateWorldMechanic(word, activeMechanic, wordsFound);
           if (mechanicEval.bonus) {
-            scoreValue = Math.floor(scoreValue * mechanicEval.multiplier);
+            // Streak bonus: consecutive mechanic triggers boost the multiplier
+            // 0 hits = 1x, 1 hit = 1x, 2 hits = 1.1x, 3+ = 1.2x (capped)
+            const streakBonus = mechanicHitCount >= 3 ? 1.2 : mechanicHitCount >= 2 ? 1.1 : 1;
+            const effectiveMultiplier = mechanicEval.multiplier * streakBonus;
+            scoreValue = Math.floor(scoreValue * effectiveMultiplier);
+            if (mechanicEval.feedbackKey) {
+              setMechanicBonus({ id: ++popupIdCounter, feedbackKey: mechanicEval.feedbackKey, multiplier: effectiveMultiplier });
+              setMechanicHitCount(prev => prev + 1);
+            }
+          } else if (mechanicHitCount > 0) {
+            // Reset streak on non-mechanic word
+            setMechanicHitCount(0);
           }
 
           let bossBonus: string | undefined;
@@ -207,7 +230,7 @@ export function useAdventureWordSubmit(props: UseAdventureWordSubmitProps): UseA
             baseDamage = Math.ceil(baseDamage * skillEffects.getLongWordDamageMultiplier(word.length));
 
             const mechanicMultiplier = mechResult.meetsRequirement ? 2.0 : 1.0;
-            dealBossDamage(baseDamage, comboCount, mechanicMultiplier, skillEffects.comboMultiplierBonus);
+            dealBossDamage(baseDamage, mechanicMultiplier);
 
             if (mechResult.triggerTaunt) {
               triggerBossTaunt(mechResult.triggerTaunt);
@@ -303,6 +326,7 @@ export function useAdventureWordSubmit(props: UseAdventureWordSubmitProps): UseA
         }, 2000);
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [isPlaying, isPaused, isCascading, currentWord, selectedIndices, tiles, gridSize, validateWord, submitWordWithPath, clearSelection, t, getPopupStartPosition, comboCount, wordsFound, clearCurrentHint, recordActivity, resetOnGameAction, isBossActive, bossConfig, checkBossWord, triggerBossTaunt, dealBossDamage, minWordLength, upgradeBonuses.scoreBonus, skillEffects, handleEarnAchievement, recordAIWord, handleAITransition, addScorePopup, getScoreMultiplier, worldMechanic, bossCurrentPhase, tap, hapticSuccess, bossHealPerWord, healPlayerHealth, detonateActive]
   );
 
@@ -310,6 +334,8 @@ export function useAdventureWordSubmit(props: UseAdventureWordSubmitProps): UseA
     setValidationFeedback({ error: null, wasSubmitted: false, isValid: false });
     setLastAccepted(null);
     setWordFeedback(null);
+    setMechanicBonus(null);
+    setMechanicHitCount(0);
     lastSubmittedWordRef.current = null;
     prevComboCountRef.current = 0;
     isSubmittingRef.current = false;
@@ -331,5 +357,8 @@ export function useAdventureWordSubmit(props: UseAdventureWordSubmitProps): UseA
     lastSubmittedWordRef,
     prevComboCountRef,
     resetWordSubmitState,
+    mechanicBonus,
+    dismissMechanicBonus,
+    mechanicHitCount,
   };
 }

@@ -118,7 +118,7 @@ describe('Header - Mobile Menu Avatar Bug', () => {
       language: 'en',
       currentFlag: '🇺🇸',
       setLanguage: vi.fn(),
-      availableLanguages: ['en', 'he', 'sv', 'ja'],
+      availableLanguages: ['en', 'he', 'sv', 'ja', 'es'],
     } as any);
   });
 

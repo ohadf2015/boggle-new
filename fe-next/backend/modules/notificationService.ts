@@ -115,7 +115,8 @@ function getLanguageDisplay(lang?: string): string {
     en: 'English',
     he: 'Hebrew',
     sv: 'Swedish',
-    ja: 'Japanese'
+    ja: 'Japanese',
+    es: 'Spanish'
   };
   return languages[lang || 'en'] || lang || 'en';
 }

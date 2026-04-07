@@ -78,14 +78,30 @@ export async function performMobileOAuth(
 
     logger.log('[MobileOAuth] Opening in-app browser for OAuth');
 
-    const BrowserPlugin = getCapacitor()?.Plugins?.Browser;
-    if (BrowserPlugin) {
-      await BrowserPlugin.open({
-        url: data.url,
-        presentationStyle: 'popover',
-        windowName: '_self',
-      });
+    // Capacitor 8: plugins use registerPlugin(), not Capacitor.Plugins.*
+    // Must dynamically import to get the real plugin instance
+    let BrowserPlugin = getCapacitor()?.Plugins?.Browser;
+    if (!BrowserPlugin) {
+      try {
+        const mod = await import('@capacitor/browser');
+        BrowserPlugin = mod.Browser;
+      } catch (e) {
+        logger.error('[MobileOAuth] Failed to import @capacitor/browser:', e);
+      }
     }
+
+    if (!BrowserPlugin) {
+      // Last resort: open in system browser
+      logger.log('[MobileOAuth] No Browser plugin, falling back to window.open');
+      window.open(data.url, '_blank');
+      return { success: true };
+    }
+
+    await BrowserPlugin.open({
+      url: data.url,
+      presentationStyle: 'popover',
+      windowName: '_self',
+    });
 
     return { success: true };
   } catch (err) {
@@ -99,7 +115,10 @@ export async function closeMobileOAuthBrowser(): Promise<void> {
   if (!isNative()) return;
 
   try {
-    const BrowserPlugin = getCapacitor()?.Plugins?.Browser;
+    let BrowserPlugin = getCapacitor()?.Plugins?.Browser;
+    if (!BrowserPlugin) {
+      try { BrowserPlugin = (await import('@capacitor/browser')).Browser; } catch { /* noop */ }
+    }
     if (BrowserPlugin) await BrowserPlugin.close();
   } catch (err) {
     logger.log('[MobileOAuth] Browser close (may already be closed):', err);
@@ -113,7 +132,10 @@ export async function listenForOAuthCallback(
     return () => {};
   }
 
-  const AppPlugin = getCapacitor()?.Plugins?.App;
+  let AppPlugin = getCapacitor()?.Plugins?.App;
+  if (!AppPlugin) {
+    try { AppPlugin = (await import('@capacitor/app')).App; } catch { /* noop */ }
+  }
   if (!AppPlugin) return () => {};
 
   const listener = await Promise.resolve(AppPlugin.addListener('appUrlOpen', (event: { url: string }) => {

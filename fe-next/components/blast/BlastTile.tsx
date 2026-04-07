@@ -3,7 +3,6 @@
 import { memo } from 'react';
 import type { BlastTileType } from './types';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
-import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getTileTooltip } from './utils/blastTileTooltips';
 import { TILE_VISUALS, CLEARING_COLORS, CLEARING_ANIMS } from './blastTileVisuals';
@@ -45,6 +44,10 @@ export interface BlastTileProps {
   innerType?: BlastTileType;
   /** Cascade highlight — tile is about to be cleared by a cascade chain reaction */
   isCascadeHighlight?: boolean;
+  /** Portal pair color index (0-based) — portals with the same index are linked */
+  portalPairIndex?: number;
+  /** Rainbow/mirror scan target — this tile will be copied by rainbow or mirror */
+  isScanTarget?: 'rainbow' | 'mirror';
   onClick?: () => void;
 }
 
@@ -54,6 +57,9 @@ const MULTIPLIER_BADGES: Partial<Record<BlastTileType, string>> = {
   gold: '×3',
   diamond: '×5',
 };
+
+/** Portal pair colors — each pair gets a distinct dot color */
+const PORTAL_PAIR_COLORS = ['#FF6B9D', '#00E5FF', '#FFD700', '#B388FF', '#69F0AE'];
 
 /** Multi-hit tiles: initial hit counts for crack state calculation */
 const MULTI_HIT_MAX: Partial<Record<BlastTileType, number>> = {
@@ -155,14 +161,9 @@ function getSelectionScale(selectionIndex?: number, selectionTotal?: number): nu
   return Math.round((1.05 + t * 0.07) * 1000) / 1000;
 }
 
-function getPhaseClasses(phase: TilePhase, isSelected: boolean, selectionIndex?: number, selectionTotal?: number): string {
+function getPhaseClasses(phase: TilePhase, isSelected: boolean): string {
   if (phase === 'selected' || (phase === 'idle' && isSelected)) {
-    // Intensify glow based on position in word — later tiles glow brighter
-    const intensity = (selectionIndex != null && selectionTotal && selectionTotal > 1)
-      ? Math.min(0.4 + (selectionIndex / (selectionTotal - 1)) * 0.6, 1.0)
-      : 0.6;
-    const glowSize = Math.round(10 + intensity * 14);
-    return `ring-3 ring-neo-lime ring-offset-2 ring-offset-neo-navy shadow-[0_0_${glowSize}px_rgba(191,255,0,${intensity}),0_0_${glowSize + 6}px_rgba(191,255,0,${(intensity * 0.4).toFixed(2)})] blast-tile-select-pop`;
+    return `ring-3 ring-neo-lime ring-offset-2 ring-offset-neo-navy shadow-hard-lime blast-tile-select-pop`;
   }
   return '';
 }
@@ -174,35 +175,14 @@ function getSelectionStyles(isSelected: boolean, selectionIndex?: number, select
   return { transform: `scale(${scale})` };
 }
 
-/**
- * Strip glow/spread shadows (0 0 Xpx ...) from boxShadow for low-end devices.
- * Keeps structural shadows: inset highlights, bottom-edge depth (Y offset > 0).
- */
-function stripGlowShadows(boxShadow: string): string {
-  return boxShadow
-    .split(',')
-    .map(s => s.trim())
-    .filter(s => {
-      // Keep inset shadows (structural highlights)
-      if (s.startsWith('inset')) return true;
-      // Parse: "Xpx Ypx ..." — keep if Y offset > 0 (bottom edge shadow)
-      const nums = s.match(/-?\d+/g);
-      if (nums && nums.length >= 2 && parseInt(nums[1]) > 0) return true;
-      // Drop glow shadows (0 0 Xpx rgba(...))
-      return false;
-    })
-    .join(', ');
-}
-
 
 export const BlastTile = memo(function BlastTile({
   letter, type, phase, isSelected, isCleared, hitsRemaining,
   fallOffset, clearRotate, spawnOffset, isNearMiss, activationEffect, isComboPreview,
   selectionIndex, selectionTotal, isLocked, countdown, zonePreview,
-  isDiamondRevealed, innerType, isCascadeHighlight, onClick,
+  isDiamondRevealed, innerType, isCascadeHighlight, portalPairIndex, isScanTarget, onClick,
 }: BlastTileProps) {
   const reducedMotion = usePrefersReducedMotion();
-  const { enableGlowEffects } = useDevicePerformance();
   const { t } = useLanguage();
 
   if (isCleared) {
@@ -224,7 +204,7 @@ export const BlastTile = memo(function BlastTile({
       onClick={onClick}
       className={[
         'relative aspect-square flex items-center justify-center',
-        'border-2 border-white/10 rounded-xl',
+        'rounded-neo',
         'font-neo-display text-[clamp(1.1rem,4.5cqw,1.85rem)] font-black uppercase',
         'select-none',
         // Only apply CSS transition + active press when idle/selected — animated phases use keyframes
@@ -245,13 +225,10 @@ export const BlastTile = memo(function BlastTile({
         isLocked ? 'blast-tile-locked' : '',
         isCascadeHighlight ? 'blast-tile-cascade-highlight' : '',
         isNearMiss ? 'ring-2 ring-neo-lime/80 animate-pulse' : '',
-        getPhaseClasses(effectivePhase, isSelected, selectionIndex, selectionTotal),
+        getPhaseClasses(effectivePhase, isSelected),
       ].filter(Boolean).join(' ')}
       style={{
         ...(visual.style ?? {}),
-        ...(!enableGlowEffects && visual.style?.boxShadow && {
-          boxShadow: stripGlowShadows(visual.style.boxShadow as string),
-        }),
         ...phaseStyle,
         ...selectionStyle,
         ...(needsWillChange && { willChange: 'transform, opacity' }),
@@ -310,10 +287,27 @@ export const BlastTile = memo(function BlastTile({
           {countdown}
         </span>
       )}
+      {type === 'portal' && portalPairIndex != null && (
+        <span
+          data-testid="portal-pair-badge"
+          className="absolute bottom-0.5 start-0.5 w-2.5 h-2.5 rounded-full border border-white/50 pointer-events-none"
+          style={{ background: PORTAL_PAIR_COLORS[portalPairIndex % PORTAL_PAIR_COLORS.length] }}
+          aria-hidden="true"
+        />
+      )}
+      {isScanTarget && (
+        <span
+          data-testid="scan-target"
+          className={`absolute inset-0 rounded-neo pointer-events-none z-15 border-2 border-dashed ${
+            isScanTarget === 'rainbow' ? 'border-yellow-300/80 bg-yellow-400/10' : 'border-pink-300/80 bg-pink-400/10'
+          }`}
+          aria-hidden="true"
+        />
+      )}
       {isLocked && (
         <span
           data-testid="locked-overlay"
-          className={`absolute inset-0 rounded-xl pointer-events-none z-20 flex flex-col items-center justify-center gap-0 ${
+          className={`absolute inset-0 rounded-neo pointer-events-none z-20 flex flex-col items-center justify-center gap-0 ${
             isDiamondRevealed ? 'bg-white/15 border-2 border-dashed border-cyan-300/50' : 'bg-blue-900/40 backdrop-blur-[1px]'
           }`}
           aria-hidden="true"
@@ -325,9 +319,15 @@ export const BlastTile = memo(function BlastTile({
           ) : (
             <span className="blast-lock-hint flex flex-col items-center">
               <span className="text-[clamp(0.55rem,2.2cqw,0.85rem)]">🔒</span>
-              <span className="text-[clamp(0.3rem,1.2cqw,0.45rem)] text-cyan-200/80 font-neo-body leading-none mt-[-1px]">
-                ✦ nearby ✦
-              </span>
+              {type === 'frozen' && innerType ? (
+                <span className="text-[clamp(0.35rem,1.4cqw,0.5rem)] opacity-30 blur-[1px] leading-none mt-[-1px]">
+                  {TILE_VISUALS[innerType]?.indicator ?? '?'}
+                </span>
+              ) : (
+                <span className="text-[clamp(0.3rem,1.2cqw,0.45rem)] text-cyan-200/80 font-neo-body leading-none mt-[-1px]">
+                  ✦ nearby ✦
+                </span>
+              )}
             </span>
           )}
         </span>
@@ -336,7 +336,7 @@ export const BlastTile = memo(function BlastTile({
         <span
           data-testid="zone-preview"
           className={[
-            'absolute inset-0 rounded-xl pointer-events-none z-20 border-2 border-dashed',
+            'absolute inset-0 rounded-neo pointer-events-none z-20 border-2 border-dashed',
             zonePreview === 'bomb' ? 'border-red-400/70 bg-red-500/10' : '',
             zonePreview === 'lightning' ? 'border-yellow-400/70 bg-yellow-500/10' : '',
             zonePreview === 'prism' ? 'border-purple-400/70 bg-purple-500/10' : '',
@@ -368,6 +368,8 @@ export const BlastTile = memo(function BlastTile({
   prev.isDiamondRevealed === next.isDiamondRevealed &&
   prev.innerType === next.innerType &&
   prev.isCascadeHighlight === next.isCascadeHighlight &&
+  prev.portalPairIndex === next.portalPairIndex &&
+  prev.isScanTarget === next.isScanTarget &&
   prev.onClick === next.onClick
 );
 

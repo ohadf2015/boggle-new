@@ -84,7 +84,7 @@ export const CustomChallengeStats: React.FC<CustomChallengeStatsProps> = ({ puzz
 
   const handleShare = () => {
     const url = `${window.location.origin}/${stats?.language || 'en'}/custom/${puzzleCode}`;
-    navigator.clipboard.writeText(url);
+    navigator.clipboard.writeText(url).catch(() => {});
     // Could add toast notification here
   };
 

@@ -360,10 +360,10 @@ describe('useBossMechanics - finalWord mechanic (Lexicon Dragon)', () => {
       });
       expect(result.current.bossState.phase).toBe('hiveMind');
 
-      // WHEN - Long word (5+ letters)
+      // WHEN - Word with double letters (hiveMind checks for consecutive repeated letters)
       let mechResult: ReturnType<typeof result.current.checkWord>;
       act(() => {
-        mechResult = result.current.checkWord('GARDEN');
+        mechResult = result.current.checkWord('BUZZING');
       });
 
       // THEN
@@ -383,10 +383,10 @@ describe('useBossMechanics - finalWord mechanic (Lexicon Dragon)', () => {
       }
       expect(result.current.bossState.phase).toBe('idiomBattle');
 
-      // WHEN - Long word (6+ letters for idiomBattle)
+      // WHEN - Word where first letter == last letter (idiomBattle checks for "full circle" words)
       let mechResult: ReturnType<typeof result.current.checkWord>;
       act(() => {
-        mechResult = result.current.checkWord('WEATHER');
+        mechResult = result.current.checkWord('TRUST');
       });
 
       // THEN
@@ -429,10 +429,10 @@ describe('useBossMechanics - finalWord mechanic (Lexicon Dragon)', () => {
       }
       expect(result.current.bossState.phase).toBe('babelSummit');
 
-      // WHEN - Long word (6+ letters)
+      // WHEN - Word with high letter diversity (>=80% unique letters, min 4 chars)
       let mechResult: ReturnType<typeof result.current.checkWord>;
       act(() => {
-        mechResult = result.current.checkWord('LANGUAGE');
+        mechResult = result.current.checkWord('WORLD');
       });
 
       // THEN
@@ -577,21 +577,21 @@ describe('useBossMechanics - finalWord mechanic (Lexicon Dragon)', () => {
       });
       expect(result.current.bossState.phase).toBe('hiveMind');
 
-      // WHEN - Short word (should not meet 5+ requirement)
-      let shortResult: ReturnType<typeof result.current.checkWord>;
+      // WHEN - Word without double letters
+      let noDoubleResult: ReturnType<typeof result.current.checkWord>;
       act(() => {
-        shortResult = result.current.checkWord('CAT');
+        noDoubleResult = result.current.checkWord('DRAGON');
       });
 
-      // WHEN - Long word
-      let longResult: ReturnType<typeof result.current.checkWord>;
+      // WHEN - Word with double letters
+      let doubleResult: ReturnType<typeof result.current.checkWord>;
       act(() => {
-        longResult = result.current.checkWord('ELEPHANT');
+        doubleResult = result.current.checkWord('BALLOON');
       });
 
       // THEN
-      expect(shortResult!.meetsRequirement).toBe(false);
-      expect(longResult!.meetsRequirement).toBe(true);
+      expect(noDoubleResult!.meetsRequirement).toBe(false);
+      expect(doubleResult!.meetsRequirement).toBe(true);
     });
 
     it('should evaluate correctly in etymologyDig phase', () => {
@@ -624,10 +624,10 @@ describe('useBossMechanics - finalWord mechanic (Lexicon Dragon)', () => {
       }
       expect(result.current.bossState.phase).toBe('idiomBattle');
 
-      // WHEN - 6+ letter word
+      // WHEN - Word where first letter == last letter
       let mechResult: ReturnType<typeof result.current.checkWord>;
       act(() => {
-        mechResult = result.current.checkWord('CRYSTAL');
+        mechResult = result.current.checkWord('COMIC');
       });
 
       // THEN
@@ -644,10 +644,10 @@ describe('useBossMechanics - finalWord mechanic (Lexicon Dragon)', () => {
       }
       expect(result.current.bossState.phase).toBe('assemblyLine');
 
-      // WHEN - 5+ letter word
+      // WHEN - Word with common prefix/suffix (assemblyLine checks for affixes)
       let mechResult: ReturnType<typeof result.current.checkWord>;
       act(() => {
-        mechResult = result.current.checkWord('STEAM');
+        mechResult = result.current.checkWord('RUNNING');
       });
 
       // THEN
@@ -724,10 +724,10 @@ describe('useBossMechanics - finalWord mechanic (Lexicon Dragon)', () => {
       }
       expect(result.current.bossState.phase).toBe('babelSummit');
 
-      // WHEN - 6+ letter word
+      // WHEN - Word with high letter diversity
       let mechResult: ReturnType<typeof result.current.checkWord>;
       act(() => {
-        mechResult = result.current.checkWord('SUMMIT');
+        mechResult = result.current.checkWord('BRAIN');
       });
 
       // THEN

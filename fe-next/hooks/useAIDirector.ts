@@ -11,7 +11,7 @@
  * - Respects boss battle exclusion (DDA-05)
  */
 
-import { useEffect, useCallback, useRef } from 'react';
+import { useEffect, useCallback, useRef, useMemo } from 'react';
 import {
   useAIDirectorStore,
   useIntensityAdjustments,
@@ -219,7 +219,7 @@ export function useAIDirector(options: UseAIDirectorOptions): UseAIDirectorRetur
     return storeIsWarmedUp();
   }, [storeIsWarmedUp]);
 
-  return {
+  return useMemo(() => ({
     tier,
     flowState,
     intensityAdjustments,
@@ -231,5 +231,6 @@ export function useAIDirector(options: UseAIDirectorOptions): UseAIDirectorRetur
     isActive,
     isBossBattle: storeIsBossBattle,
     checkIsWarmedUp,
-  };
+  }), [tier, flowState, intensityAdjustments, metrics, startSession, endSession,
+    recordWord, handleTransition, isActive, storeIsBossBattle, checkIsWarmedUp]);
 }

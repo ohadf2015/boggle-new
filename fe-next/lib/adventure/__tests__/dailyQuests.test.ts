@@ -49,6 +49,39 @@ describe('dailyQuests', () => {
     expect(new Set(ids).size).toBe(3);
   });
 
+  describe('world filtering', () => {
+    it('should exclude bossDefeat and mechanicUse quests for world 1 players', () => {
+      // Try many dates to ensure we'd normally hit these types
+      const allQuests: DailyQuest[] = [];
+      for (let d = 1; d <= 30; d++) {
+        allQuests.push(...getDailyQuests(`2026-03-${String(d).padStart(2, '0')}`, 1));
+      }
+      const types = allQuests.map(q => q.type);
+      expect(types).not.toContain('bossDefeat');
+      expect(types).not.toContain('mechanicUse');
+    });
+
+    it('should include bossDefeat and mechanicUse quests for world 2+ players', () => {
+      const allQuests: DailyQuest[] = [];
+      for (let d = 1; d <= 30; d++) {
+        allQuests.push(...getDailyQuests(`2026-03-${String(d).padStart(2, '0')}`, 5));
+      }
+      const types = new Set(allQuests.map(q => q.type));
+      expect(types.has('bossDefeat')).toBe(true);
+      expect(types.has('mechanicUse')).toBe(true);
+    });
+
+    it('should default to no filtering (world 10) when currentWorld omitted', () => {
+      // Default = world 10, all quest types eligible
+      const allQuests: DailyQuest[] = [];
+      for (let d = 1; d <= 30; d++) {
+        allQuests.push(...getDailyQuests(`2026-03-${String(d).padStart(2, '0')}`));
+      }
+      const types = new Set(allQuests.map(q => q.type));
+      expect(types.has('bossDefeat')).toBe(true);
+    });
+  });
+
   describe('checkAllDailyQuestsComplete', () => {
     it('should return true when all 3 quests meet their targets', () => {
       const quests = getDailyQuests('2026-03-14');

@@ -22,8 +22,7 @@ import { DailyRewardClaim } from './DailyRewardClaim';
 import { getRewardCoins } from '@/lib/dailyRewards';
 import { useAuth } from '@/contexts/AuthContext';
 import { GameEmojiShareCard } from '@/components/shared/GameEmojiShareCard';
-import { useAdPlacement } from '@/hooks/useAdPlacement';
-import { useCrazyGamesAds } from '@/hooks/useCrazyGamesAds';
+import { useInterstitialAd } from '@/hooks/useInterstitialAd';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useDailyResultSubmission } from './results/useDailyResultSubmission';
 import {
@@ -69,14 +68,12 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
   const [showImagePreview, setShowImagePreview] = useState(false);
   const [showWords, setShowWords] = useState(false);
   const { profile, isAuthenticated } = useAuth();
-  const { showInterstitial } = useAdPlacement();
-  const { requestMidgameAd } = useCrazyGamesAds();
+  const { showInterstitial } = useInterstitialAd();
   const { submitLeaderboardScore } = useCrazyGames();
 
   const hasMarkedQuestRef = useRef(false);
   useEffect(() => {
     showInterstitial('daily-complete');
-    requestMidgameAd();
     if (result.score > 0) {
       submitLeaderboardScore(result.score);
     }

@@ -3,13 +3,13 @@
 import React, { useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useAdPlacement } from '@/hooks/useAdPlacement';
-import { useCrazyGamesAds } from '@/hooks/useCrazyGamesAds';
+import { useInterstitialAd } from '@/hooks/useInterstitialAd';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import type { LeagueTier, LeagueZone } from '@/hooks/useLeague';
 
 const CrazyGamesBanner = dynamic(() => import('@/components/CrazyGamesBanner'), { ssr: false });
+const NativeBannerAd = dynamic(() => import('@/components/ads/NativeBannerAd'), { ssr: false });
 
 const ZONE_MESSAGES: Record<LeagueZone, string> = {
   promotion: 'league.promoted',
@@ -33,14 +33,12 @@ interface LeagueResultsProps {
 
 export function LeagueResults({ tier, position, zone, coinsEarned, onClose }: LeagueResultsProps) {
   const { t } = useLanguage();
-  const { showInterstitial } = useAdPlacement();
-  const { requestMidgameAd } = useCrazyGamesAds();
+  const { showInterstitial } = useInterstitialAd();
   const { submitLeaderboardScore } = useCrazyGames();
 
   // Ads + leaderboard on mount
   useEffect(() => {
     showInterstitial('league-complete');
-    requestMidgameAd();
     if (coinsEarned > 0) {
       submitLeaderboardScore(coinsEarned);
     }
@@ -71,10 +69,11 @@ export function LeagueResults({ tier, position, zone, coinsEarned, onClose }: Le
           <p className="font-neo-display text-2xl font-bold text-neo-yellow">{coinsEarned}</p>
         </div>
 
-        {/* Banner Ad */}
+        {/* Banner Ads — CrazyGames (web iframe) / AdMob (native) */}
         <div className="mb-4">
           <CrazyGamesBanner size="300x250" />
         </div>
+        <NativeBannerAd />
 
         <button
           onClick={onClose}

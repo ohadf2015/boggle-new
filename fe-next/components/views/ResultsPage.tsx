@@ -37,9 +37,8 @@ const PostGameSocialActions = dynamic(() => import('@/components/results/PostGam
 import { generateRandomTable } from '@/utils/utils';
 import { DIFFICULTIES } from '@/utils/consts';
 import { useCrazyGamesLifecycle } from '@/hooks/useCrazyGamesLifecycle';
-import { useCrazyGamesAds } from '@/hooks/useCrazyGamesAds';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
-import { useAdPlacement } from '@/hooks/useAdPlacement';
+import { useInterstitialAd } from '@/hooks/useInterstitialAd';
 import { useGameKeyboardShortcuts } from '@/hooks/useGameKeyboardShortcuts';
 import type { GameModeOption } from '@/components/GameModeSelector';
 import { useGameMode, useWordHuntPlayerLives, useWordHuntEliminatedPlayers, useBlastMovesUsed, useBlastTotalTileBonus, useBlastTotalTilesCleared, useBlastPlayerStats } from '@/hooks/gameState/store';
@@ -231,12 +230,9 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     }
   }, []);
 
-  const { showInterstitial } = useAdPlacement();
-  const { requestMidgameAd } = useCrazyGamesAds();
+  const { showInterstitial } = useInterstitialAd();
   useEffect(() => {
     showInterstitial('multiplayer-round-complete');
-    // Show CrazyGames midgame ad at this natural break between rounds
-    requestMidgameAd();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
   const [showExitConfirm, setShowExitConfirm] = useState<boolean>(false);
   // Score reveal animation state (Netflix Boggle Party-inspired "trading places" reveal)

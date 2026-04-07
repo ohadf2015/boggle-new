@@ -80,7 +80,7 @@ describe('Ice Tile Melt Activation Effect', () => {
     expect(result.current.tiles[0][1].activationTimestamp).toBeDefined();
   });
 
-  it('should set melt effect on ice tiles cleared by bomb row', () => {
+  it('should not set melt effect on ice tiles outside bomb word path', () => {
     // GIVEN - Bomb and ice in same row
     const levelConfig = createMockLevelConfig({
       gridSize: 4,
@@ -102,8 +102,8 @@ describe('Ice Tile Melt Activation Effect', () => {
       ]);
     });
 
-    // THEN - Ice tile in bomb row should have melt effect
-    expect(result.current.tiles[1][3].activationEffect).toBe('melt');
+    // THEN - Bomb is now a score doubler, not row-clear. Ice tile outside path is untouched.
+    expect(result.current.tiles[1][3].activationEffect).toBeNull();
   });
 });
 

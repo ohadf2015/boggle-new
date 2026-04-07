@@ -28,15 +28,15 @@ describe('useAdventureXp', () => {
     });
 
     it('should initialize with provided initialXp', () => {
-      // Level 6 requires ~600 XP based on exponential curve
+      // With CURVE_DIVISOR=12, 600 XP maps to level 7
       const initialXp = 600;
       const { result } = renderHook(() =>
         useAdventureXp({ userId: 'user-2', initialXp })
       );
 
       expect(result.current.totalXp).toBe(600);
-      expect(result.current.currentLevel).toBe(6);
-      expect(result.current.xpProgress.currentLevel).toBe(6);
+      expect(result.current.currentLevel).toBe(7);
+      expect(result.current.xpProgress.currentLevel).toBe(7);
     });
 
     it('should calculate xpProgress correctly from initialXp', () => {

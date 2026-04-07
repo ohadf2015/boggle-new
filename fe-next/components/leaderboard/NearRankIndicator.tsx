@@ -87,14 +87,14 @@ const NearRankIndicator: React.FC<NearRankIndicatorProps> = memo(({
 
     // Calculate percentile
     const total = totalPlayers || leaderboard.length;
-    const percentile = total > 0 ? Math.round((1 - (currentRank - 1) / total) * 100) : 0;
+    const percentile = total > 0 ? Math.max(1, Math.round((currentRank / total) * 100)) : 0;
 
-    // Determine percentile tier for styling
+    // Determine percentile tier for styling (lower = better)
     let percentileTier: 'top1' | 'top5' | 'top10' | 'top25' | 'normal' = 'normal';
-    if (percentile >= 99) percentileTier = 'top1';
-    else if (percentile >= 95) percentileTier = 'top5';
-    else if (percentile >= 90) percentileTier = 'top10';
-    else if (percentile >= 75) percentileTier = 'top25';
+    if (percentile <= 1) percentileTier = 'top1';
+    else if (percentile <= 5) percentileTier = 'top5';
+    else if (percentile <= 10) percentileTier = 'top10';
+    else if (percentile <= 25) percentileTier = 'top25';
 
     return {
       currentRank,

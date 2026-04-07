@@ -66,7 +66,9 @@ export const recordGameCompleted = (): void => {
  */
 export const isNewPlayer = (): boolean => {
   const progress = getMultiplayerProgress();
-  return progress.gamesCompleted < NEW_PLAYER_THRESHOLD;
+  // Only show new-player UX if they've started at least one game but haven't completed the threshold.
+  // Brand-new visitors (gamesJoined === 0) see the default order.
+  return progress.gamesJoined > 0 && progress.gamesCompleted < NEW_PLAYER_THRESHOLD;
 };
 
 /**

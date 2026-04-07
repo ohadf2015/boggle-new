@@ -86,6 +86,9 @@ export const PowerUpButton = memo<PowerUpButtonProps>(
           'bg-neo-purple border-3 border-neo-black shadow-hard',
           'transition-all duration-200',
 
+          // Focus ring for keyboard navigation
+          'focus-visible:ring-2 focus-visible:ring-neo-lime focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy focus-visible:outline-none',
+
           // Ready state - interactive
           isReady && [
             'cursor-pointer',

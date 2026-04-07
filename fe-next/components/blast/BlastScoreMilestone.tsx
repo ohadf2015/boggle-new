@@ -13,23 +13,31 @@ interface MilestoneConfig {
   className: string;
 }
 
-function getMilestoneConfig(score: number): MilestoneConfig {
-  if (score >= 5000) return { label: '🔥 5000+', className: 'bg-gradient-to-r from-yellow-300 via-white to-yellow-300 text-neo-black animate-pulse' };
-  if (score >= 3000) return { label: '⚡ 3000!', className: 'bg-gradient-to-r from-neo-pink via-neo-cyan to-neo-lime text-neo-black' };
-  if (score >= 2000) return { label: '💎 2000!', className: 'bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500 text-white' };
-  if (score >= 1500) return { label: '✨ 1500!', className: 'bg-gradient-to-r from-amber-400 to-yellow-300 text-neo-black' };
-  if (score >= 1000) return { label: '🏆 1000!', className: 'bg-gradient-to-r from-neo-lime to-neo-cyan text-neo-black' };
-  if (score >= 750) return { label: '💪 750!', className: 'bg-neo-lime text-neo-black' };
-  if (score >= 500) return { label: '🎯 500!', className: 'bg-neo-cyan text-neo-black' };
-  if (score >= 250) return { label: '👍 250!', className: 'bg-neo-cyan/80 text-neo-black' };
-  return { label: '✓ 100!', className: 'bg-neo-white/90 text-neo-black' };
+const MILESTONE_TIERS = [
+  { threshold: 5000, key: '5000', emoji: '🔥', className: 'bg-gradient-to-r from-yellow-300 via-white to-yellow-300 text-neo-black animate-pulse' },
+  { threshold: 3000, key: '3000', emoji: '⚡', className: 'bg-gradient-to-r from-neo-pink via-neo-cyan to-neo-lime text-neo-black' },
+  { threshold: 2000, key: '2000', emoji: '💎', className: 'bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500 text-white' },
+  { threshold: 1500, key: '1500', emoji: '✨', className: 'bg-gradient-to-r from-amber-400 to-yellow-300 text-neo-black' },
+  { threshold: 1000, key: '1000', emoji: '🏆', className: 'bg-gradient-to-r from-neo-lime to-neo-cyan text-neo-black' },
+  { threshold: 750,  key: '750',  emoji: '💪', className: 'bg-neo-lime text-neo-black' },
+  { threshold: 500,  key: '500',  emoji: '🎯', className: 'bg-neo-cyan text-neo-black' },
+  { threshold: 250,  key: '250',  emoji: '👍', className: 'bg-neo-cyan/80 text-neo-black' },
+  { threshold: 100,  key: '100',  emoji: '✓',  className: 'bg-neo-white/90 text-neo-black' },
+] as const;
+
+function getMilestoneConfig(score: number, t?: (key: string) => string | undefined): MilestoneConfig {
+  const tier = MILESTONE_TIERS.find(m => score >= m.threshold) ?? MILESTONE_TIERS[MILESTONE_TIERS.length - 1];
+  const text = t?.(`blast.milestone.${tier.key}`) || `${tier.key}!`;
+  return { label: `${tier.emoji} ${text}`, className: tier.className };
 }
 
 interface BlastScoreMilestoneProps {
   score: number;
+  /** Translation function */
+  t?: (key: string) => string | undefined;
 }
 
-export function BlastScoreMilestone({ score }: BlastScoreMilestoneProps) {
+export function BlastScoreMilestone({ score, t }: BlastScoreMilestoneProps) {
   const [activeMilestone, setActiveMilestone] = useState<MilestoneConfig | null>(null);
   const lastMilestoneRef = useRef(0);
   const entranceRef = useRef(getRandomMilestoneEntrance());
@@ -40,13 +48,14 @@ export function BlastScoreMilestone({ score }: BlastScoreMilestoneProps) {
     if (crossed) {
       lastMilestoneRef.current = crossed;
       entranceRef.current = getRandomMilestoneEntrance();
-      const config = getMilestoneConfig(crossed);
+      const config = getMilestoneConfig(crossed, t);
       setActiveMilestone(config);
       playAchievementSound();
       const timer = setTimeout(() => setActiveMilestone(null), 1500);
       return () => clearTimeout(timer);
     }
     return undefined;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [score, playAchievementSound]);
 
   useEffect(() => {

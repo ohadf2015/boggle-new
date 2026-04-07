@@ -9,6 +9,7 @@ import { UpgradeShop } from './meta/UpgradeShop';
 import type { UpgradeState } from '@/lib/adventure/upgradeConfig';
 import WordAlbumPanel from './WordAlbumPanel';
 import WeeklyChallengePanel from './WeeklyChallengePanel';
+import CollectionPanel from './CollectionPanel';
 
 interface AdventureViewModalsProps {
   showShop: boolean;
@@ -25,6 +26,8 @@ interface AdventureViewModalsProps {
   onCloseWeeklyChallenge: () => void;
   onPlayWeeklyChallenge: () => void;
   onShopPurchase: (upgradeId: string, newState: UpgradeState, newGold: number) => void;
+  showCollection: boolean;
+  onCloseCollection: () => void;
   t: (key: string) => string;
 }
 
@@ -43,6 +46,8 @@ export default function AdventureViewModals({
   onCloseWeeklyChallenge,
   onPlayWeeklyChallenge,
   onShopPurchase,
+  showCollection,
+  onCloseCollection,
   t,
 }: AdventureViewModalsProps): React.JSX.Element {
   const shopRef = useRef<HTMLDivElement>(null);
@@ -113,6 +118,15 @@ export default function AdventureViewModals({
           isOpen={showWeeklyChallenge}
           onClose={onCloseWeeklyChallenge}
           onPlay={onPlayWeeklyChallenge}
+        />
+      )}
+      {/* Collection Gallery */}
+      {showCollection && (
+        <CollectionPanel
+          key="collection"
+          isOpen={showCollection}
+          onClose={onCloseCollection}
+          inventory={[]}
         />
       )}
     </AdaptiveAnimatePresence>

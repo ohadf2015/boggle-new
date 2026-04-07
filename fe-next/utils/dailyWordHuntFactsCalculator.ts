@@ -123,22 +123,24 @@ export function getTopPerformerFact(
 ): WordHuntFact | null {
   if (stats.totalPlayers < MIN_PLAYERS_FOR_STATS) return null;
   if (!stats.yourStats?.percentile) return null;
-  if (stats.yourStats.percentile > TOP_PERCENTILE_THRESHOLD) return null;
+  // percentile is "Top X%" (low = better), e.g. 5 means top 5%
+  const topPercent = stats.yourStats.percentile;
+  if (topPercent > TOP_PERCENTILE_THRESHOLD) return null;
 
   const othersBeaten = Math.round(
-    stats.totalPlayers * (1 - stats.yourStats.percentile / 100)
+    stats.totalPlayers * ((100 - topPercent) / 100)
   );
 
   return {
     type: 'topPerformer',
     translationKey: 'wordHunt.facts.topPerformer',
     translationParams: {
-      percentile: stats.yourStats.percentile,
+      percentile: topPercent,
       others: othersBeaten,
     },
     icon: 'Crown',
     color: 'neo-yellow',
-    value: `${stats.yourStats.percentile}%`,
+    value: `${topPercent}%`,
   };
 }
 

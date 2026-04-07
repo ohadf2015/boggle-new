@@ -57,6 +57,8 @@ export interface TileProcessingInput {
   gridSize: number;
   currentWave: number;
   preDetectedCombos?: SpecialCombo[];
+  /** Seeded RNG for multiplayer determinism. Defaults to Math.random. */
+  rng?: () => number;
 }
 
 export interface TileProcessingResult {
@@ -84,7 +86,10 @@ export interface TileProcessingResult {
  * Returns the new tile state grid and all computed side-effect data.
  */
 export function processTilesForWord(input: TileProcessingInput): TileProcessingResult {
-  const { prev, path, word, baseScore, gridSize, currentWave, preDetectedCombos } = input;
+  const { prev, path, word, baseScore, gridSize, currentWave, preDetectedCombos, rng = Math.random } = input;
+
+  // Pre-build path lookup set for O(1) membership checks
+  const pathSet = new Set(path.map(p => `${p.row},${p.col}`));
 
   const next = prev.map(row => row.map(tile => ({ ...tile })));
   let bonusScore = 0;
@@ -261,21 +266,21 @@ export function processTilesForWord(input: TileProcessingInput): TileProcessingR
           for (let r = 0; r < gridSize; r++) {
             for (let c = 0; c < gridSize; c++) {
               const t = next[r][c];
-              if (!t.isCleared && t.type === 'standard' && !path.some(p => p.row === r && p.col === c)) {
+              if (!t.isCleared && t.type === 'standard' && !pathSet.has(`${r},${c}`)) {
                 standardTiles.push(t);
               }
             }
           }
           // Pick 2 random standard tiles and convert them
           for (let i = standardTiles.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
+            const j = Math.floor(rng() * (i + 1));
             [standardTiles[i], standardTiles[j]] = [standardTiles[j], standardTiles[i]];
           }
           const prismConvertCount = Math.min(2, standardTiles.length);
           for (let i = 0; i < prismConvertCount; i++) {
             const t = standardTiles[i];
             const specials: BlastTileType[] = ['bomb', 'lightning', 'gold', 'rainbow'];
-            t.type = specials[Math.floor(Math.random() * specials.length)];
+            t.type = specials[Math.floor(rng() * specials.length)];
             t.activationEffect = 'prism-convert';
           }
         }
@@ -450,7 +455,7 @@ export function processTilesForWord(input: TileProcessingInput): TileProcessingR
       const tile = next[targetRow]?.[c];
       if (!tile || tile.isCleared) continue;
       // Skip tiles already in the word path (already processed above)
-      if (path.some(p => p.row === targetRow && p.col === c)) continue;
+      if (pathSet.has(`${targetRow},${c}`)) continue;
 
       if (isMultiHitAlive(tile)) {
         hitMultiHitTile(tile);

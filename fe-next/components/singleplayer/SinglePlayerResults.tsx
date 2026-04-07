@@ -19,11 +19,11 @@ import TomorrowPreview from '@/components/results/TomorrowPreview';
 
 const UGCFeaturedStrip = dynamic(() => import('@/components/ugc/UGCFeaturedStrip'), { ssr: false });
 const CrazyGamesBanner = dynamic(() => import('@/components/CrazyGamesBanner'), { ssr: false });
+const NativeBannerAd = dynamic(() => import('@/components/ads/NativeBannerAd'), { ssr: false });
 
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { useAdPlacement } from '@/hooks/useAdPlacement';
-import { useCrazyGamesAds } from '@/hooks/useCrazyGamesAds';
+import { useInterstitialAd } from '@/hooks/useInterstitialAd';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useWinStreak } from '@/hooks/useWinStreak';
 import { useIsDesktop } from '@/hooks/useDesktopLayout';
@@ -103,13 +103,11 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   const { t, language } = useLanguage();
   const { user, isAuthenticated, profile, updateProfile, loading: authLoading } = useAuth();
   const isDesktop = useIsDesktop();
-  const { showInterstitial } = useAdPlacement();
-  const { requestMidgameAd } = useCrazyGamesAds();
+  const { showInterstitial } = useInterstitialAd();
   const { submitLeaderboardScore } = useCrazyGames();
 
   useEffect(() => {
     showInterstitial('singleplayer-complete');
-    requestMidgameAd();
     if (results.playerScore > 0) {
       submitLeaderboardScore(results.playerScore);
     }
@@ -376,8 +374,9 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
               </div>
             </div>
             <div className="mt-8">{analysisBlock}</div>
-            {/* CrazyGames banner ad — shown after analysis on desktop */}
+            {/* Banner ads — CrazyGames (web iframe) / AdMob (native) */}
             <CrazyGamesBanner size="728x90" className="mt-6" />
+            <NativeBannerAd />
           </>
         ) : (
           <div className="space-y-4">
@@ -388,8 +387,9 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
             {!showShareImmediate && <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}>{shareBlock}</motion.div>}
             <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>{achievementsBlock}</motion.div>
             {globalRank && <GlobalRankBadge rank={globalRank} label={t('leaderboard.globalRank')} />}
-            {/* CrazyGames banner ad — mobile size */}
+            {/* Banner ads — CrazyGames (web iframe) / AdMob (native) */}
             <CrazyGamesBanner size="320x50" />
+            <NativeBannerAd />
             {ctaBlock}{analysisBlock}
           </div>
         )}

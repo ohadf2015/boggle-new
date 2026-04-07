@@ -695,9 +695,10 @@ describe('Bot Configuration', () => {
     expect(BOT_CONFIG.NAMES).toHaveProperty('he');
     expect(BOT_CONFIG.NAMES).toHaveProperty('sv');
     expect(BOT_CONFIG.NAMES).toHaveProperty('ja');
+    expect(BOT_CONFIG.NAMES).toHaveProperty('es');
 
     // Each language should have names for all difficulties
-    ['en', 'he', 'sv', 'ja'].forEach(lang => {
+    ['en', 'he', 'sv', 'ja', 'es'].forEach(lang => {
       expect(BOT_CONFIG.NAMES[lang]).toHaveProperty('easy');
       expect(BOT_CONFIG.NAMES[lang]).toHaveProperty('medium');
       expect(BOT_CONFIG.NAMES[lang]).toHaveProperty('hard');

@@ -436,8 +436,6 @@ export function spawnGemSpecials(
   }
 }
 
-// Catalyst, countdown, virus, and applyBetweenTurnEffects moved to blastBetweenTurnEffects.ts
-// Re-export for backwards compatibility
 export {
   fireCatalystUpgrade,
   fireCountdownExplosion,

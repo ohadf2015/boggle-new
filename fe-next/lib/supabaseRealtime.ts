@@ -208,7 +208,7 @@ function getOrCreateLeaderboardChannel(): RealtimeChannel | null {
             getOrCreateLeaderboardChannel();
           }, delay);
         } else {
-          logger.error('[Realtime] Leaderboard connection failed after max retries');
+          logger.warn('[Realtime] Leaderboard connection failed after max retries');
         }
       } else if (status === REALTIME_SUBSCRIBE_STATES.SUBSCRIBED) {
         connectionRetryCount = 0; // Reset on successful connection

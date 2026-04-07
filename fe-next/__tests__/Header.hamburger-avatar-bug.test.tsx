@@ -105,7 +105,7 @@ describe('Header - Hamburger Menu Avatar Bugs', () => {
       language: 'en',
       currentFlag: '🇺🇸',
       setLanguage: vi.fn(),
-      availableLanguages: ['en', 'he', 'sv', 'ja'],
+      availableLanguages: ['en', 'he', 'sv', 'ja', 'es'],
     } as any);
   });
 

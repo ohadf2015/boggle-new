@@ -16,6 +16,7 @@
     "start": "cross-env NODE_ENV=production tsx server.ts",
     "lint": "eslint",
     "test": "npm run test:backend && npm run test:frontend",
+    "test:changed": "vitest run --config vitest.config.ts --changed && vitest run --config backend/vitest.config.ts --changed",
     "test:backend": "vitest run --config backend/vitest.config.ts",
     "test:frontend": "vitest run --config vitest.config.ts",
     "test:frontend:fast": "bash scripts/test-parallel.sh 4",

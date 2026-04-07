@@ -12,7 +12,7 @@ async function getHowler(): Promise<typeof import('howler')['Howler']> {
 }
 import { useMusicFocusManager } from '@/lib/audio/useMusicFocusManager';
 
-type TrackKey = 'lobby' | 'beforeGame' | 'inGame' | 'almostOutOfTime' | 'bossaArcade' | 'bossa';
+type TrackKey = 'lobby' | 'beforeGame' | 'inGame' | 'almostOutOfTime' | 'bossaArcade' | 'bossa' | 'blast';
 
 interface MusicContextType {
   currentTrack: TrackKey | null;
@@ -34,6 +34,7 @@ interface MusicContextType {
     ALMOST_OUT_OF_TIME: 'almostOutOfTime';
     BOSSA_ARCADE: 'bossaArcade';
     BOSSA: 'bossa';
+    BLAST: 'blast';
   };
 }
 
@@ -57,6 +58,7 @@ const TRACKS: Record<TrackKey, string> = {
   almostOutOfTime: '/music/almost_out_of_time.mp3',
   bossaArcade: '/music/bossa-arcade.mp3',
   bossa: '/music/bossa.mp3',
+  blast: '/music/blast.mp3',
 };
 
 const STORAGE_KEY = 'boggle_music_settings';
@@ -410,6 +412,7 @@ export function MusicProvider({ children }: MusicProviderProps): React.ReactElem
     ALMOST_OUT_OF_TIME: 'almostOutOfTime' as const,
     BOSSA_ARCADE: 'bossaArcade' as const,
     BOSSA: 'bossa' as const,
+    BLAST: 'blast' as const,
   }), []);
 
   const value = useMemo<MusicContextType>(() => ({
@@ -442,6 +445,7 @@ const STUB_TRACKS = {
   ALMOST_OUT_OF_TIME: 'almostOutOfTime' as const,
   BOSSA_ARCADE: 'bossaArcade' as const,
   BOSSA: 'bossa' as const,
+  BLAST: 'blast' as const,
 };
 const stubValue: MusicContextType = {
   currentTrack: null,

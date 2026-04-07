@@ -163,7 +163,7 @@ describe('useAdventureBossOrchestration', () => {
     it('should multiply base damage by mechanic multiplier and call dealDamage', () => {
       const { result } = renderHook(() => useAdventureBossOrchestration(defaultProps));
 
-      result.current.dealBossDamage(10, 3, 2.0, 0.5);
+      result.current.dealBossDamage(10, 2.0);
 
       // 10 * 2.0 = 20
       expect(mockDealDamage).toHaveBeenCalledWith(20);

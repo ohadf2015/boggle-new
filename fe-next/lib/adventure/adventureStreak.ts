@@ -82,6 +82,26 @@ export function updateStreak(
   };
 }
 
+// ── Streak Milestones ──────────────────────────────────
+
+export interface StreakMilestone {
+  days: number;
+  rewardGold: number;
+  titleKey: string;
+}
+
+export const STREAK_MILESTONES: StreakMilestone[] = [
+  { days: 3,  rewardGold: 50,  titleKey: 'adventure.streak.milestone3' },
+  { days: 7,  rewardGold: 150, titleKey: 'adventure.streak.milestone7' },
+  { days: 14, rewardGold: 300, titleKey: 'adventure.streak.milestone14' },
+  { days: 30, rewardGold: 500, titleKey: 'adventure.streak.milestone30' },
+];
+
+/** Returns milestone info if streak exactly hits a milestone, otherwise null */
+export function getStreakMilestone(streak: number): StreakMilestone | null {
+  return STREAK_MILESTONES.find(m => m.days === streak) ?? null;
+}
+
 /** Get XP/gold multiplier from streak length (1.0x to 2.0x over 7 days) */
 export function getStreakMultiplier(streakDays: number): number {
   if (streakDays <= 0) return 1.0;

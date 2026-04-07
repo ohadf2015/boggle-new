@@ -71,38 +71,65 @@ vi.mock('framer-motion', () => {
   };
 });
 
-// Mock next/dynamic — resolve each import to its mocked module
+// Mock next/dynamic — return a simple passthrough that eagerly resolves imports
 vi.mock('next/dynamic', () => {
   const React = require('react');
-  const loadedModules = new Map<string, React.ComponentType>();
-
-  return {
-    default: (importFn: () => Promise<any>, _opts?: unknown) => {
-      // Resolve the import to detect which component is being loaded
-      const importStr = importFn.toString();
-
-      const Dynamic = (props: Record<string, unknown>) => {
-        const [Comp, setComp] = React.useState<React.ComponentType | null>(
-          () => loadedModules.get(importStr) || null
-        );
-
-        React.useEffect(() => {
-          if (!Comp) {
-            importFn().then((mod: any) => {
-              const resolved = mod.default || mod;
-              loadedModules.set(importStr, resolved);
-              setComp(() => resolved);
-            });
-          }
-        }, [Comp]);
-
-        if (!Comp) return null;
-        return React.createElement(Comp, props);
-      };
-      Dynamic.displayName = 'NextDynamic';
-      return Dynamic;
-    },
+  const dynamic = (importFn: () => Promise<any>, _opts?: unknown) => {
+    const Dynamic = (props: Record<string, unknown>) => {
+      const [Comp, setComp] = React.useState<React.ComponentType | null>(null);
+      React.useEffect(() => {
+        importFn().then((mod: any) => {
+          setComp(() => mod.default || mod);
+        });
+      }, []);
+      if (!Comp) return null;
+      return React.createElement(Comp, props);
+    };
+    Dynamic.displayName = 'NextDynamic';
+    return Dynamic;
   };
+  dynamic.__esModule = true;
+  return { default: dynamic, __esModule: true };
+});
+
+// Mock AdaptiveMotion — avoid AccessibilityContext / performanceUtils deps
+vi.mock('@/components/motion/AdaptiveMotion', () => {
+  const React = require('react');
+  const passthrough = (tag: string) => {
+    const C = React.forwardRef(({ children, ...props }: any, ref: any) => {
+      const clean: Record<string, unknown> = {};
+      for (const [k, v] of Object.entries(props)) {
+        if (!['initial', 'animate', 'exit', 'transition', 'whileHover', 'whileTap', 'whileFocus', 'whileDrag', 'whileInView', 'layout', 'layoutId', 'skipAnimation', 'variants', 'custom', 'onAnimationComplete'].includes(k)) {
+          clean[k] = v;
+        }
+      }
+      return React.createElement(tag, { ...clean, ref }, children);
+    });
+    C.displayName = `AdaptiveMotion.${tag}`;
+    return C;
+  };
+  return {
+    AdaptiveMotion: {
+      div: passthrough('div'),
+      span: passthrough('span'),
+      button: passthrough('button'),
+      li: passthrough('li'),
+      ul: passthrough('ul'),
+      p: passthrough('p'),
+      h1: passthrough('h1'),
+      h2: passthrough('h2'),
+    },
+    AdaptiveAnimatePresence: ({ children }: { children: React.ReactNode }) => children,
+    useSkipAnimations: () => false,
+    SkipAnimationsProvider: ({ children }: { children: React.ReactNode }) => children,
+  };
+});
+
+// Mock BossRushResults to avoid its internal next/dynamic call
+vi.mock('../BossRushResults', () => {
+  const MockBossRushResults = () => null;
+  MockBossRushResults.displayName = 'MockBossRushResults';
+  return { default: MockBossRushResults };
 });
 
 vi.mock('@/components/auth/AuthModal', () => {
@@ -548,10 +575,20 @@ const createMockProgression = (overrides = {}): PlayerProgression => ({
 // HELPER FUNCTIONS
 // ==============================================
 
-/** Render AdventureView.
- * Note: Initial view is now 'worldMap' (hub was removed). */
+/** Render AdventureView. Returning players (with completions) start at hub. */
 const renderAdventureView = () => {
   return render(<AdventureView />);
+};
+
+/** Render and navigate past hub to world map (for tests that need worldMap). */
+const renderAtWorldMap = () => {
+  const result = render(<AdventureView />);
+  // Returning players see hub first — click through to world map
+  const hubWorldMap = screen.queryByTestId('hub-world-map');
+  if (hubWorldMap) {
+    fireEvent.click(hubWorldMap);
+  }
+  return result;
 };
 
 // ==============================================
@@ -613,28 +650,50 @@ describe('AdventureView Integration', () => {
     });
   });
 
-  describe('World Map (Initial State)', () => {
-    it('should render world map as initial view', () => {
-      render(<AdventureView />);
+  describe('Hub (Initial State for Returning Players)', () => {
+    it('should render hub for returning players with completions', () => {
+      renderAdventureView();
+      expect(screen.getByTestId('adventure-hub')).toBeInTheDocument();
+      expect(screen.queryByTestId('world-map')).not.toBeInTheDocument();
+    });
+
+    it('should render world map for new players without completions', () => {
+      mockProgressionState.progression = createMockProgression({ completions: [], totalStars: 0 });
+      renderAdventureView();
       expect(screen.getByTestId('world-map')).toBeInTheDocument();
+      expect(screen.queryByTestId('adventure-hub')).not.toBeInTheDocument();
+    });
+
+    it('should navigate from hub to world map via World Map button', () => {
+      renderAdventureView();
+      expect(screen.getByTestId('adventure-hub')).toBeInTheDocument();
+      fireEvent.click(screen.getByTestId('hub-world-map'));
+      expect(screen.getByTestId('world-map')).toBeInTheDocument();
+      expect(screen.queryByTestId('adventure-hub')).not.toBeInTheDocument();
+    });
+
+    it('should navigate from hub directly to playing via Continue button', async () => {
+      renderAdventureView();
+      fireEvent.click(screen.getByTestId('hub-continue'));
+      await waitFor(() => expect(screen.getByTestId('adventure-game')).toBeInTheDocument());
     });
   });
 
   describe('World Map View', () => {
     it('should display player stats in header', () => {
-      renderAdventureView(); // auto-navigates past hub
+      renderAtWorldMap(); // auto-navigates past hub
       // totalStars derived from completions: 3+2+3+2+2 = 12
       expect(screen.getByText('12')).toBeInTheDocument();
       expect(screen.getByText('Lv. 3')).toBeInTheDocument();
     });
 
     it('should display adventure title', () => {
-      renderAdventureView();
+      renderAtWorldMap();
       expect(screen.getByText('Adventure')).toBeInTheDocument();
     });
 
     it('should display back button to hub on world map for returning players', () => {
-      renderAdventureView();
+      renderAtWorldMap();
       // Returning players (with completions) see a back button that navigates to hub
       const backButton = screen.getByRole('button', { name: /back/i });
       expect(backButton).toBeInTheDocument();
@@ -644,7 +703,7 @@ describe('AdventureView Integration', () => {
   describe('World Selection → Level Grid Transition', () => {
     it('should transition to level grid when a world is selected', () => {
       // GIVEN
-      renderAdventureView();
+      renderAtWorldMap();
       expect(screen.getByTestId('world-map')).toBeInTheDocument();
 
       // WHEN - click on World 1
@@ -658,7 +717,7 @@ describe('AdventureView Integration', () => {
 
     it('should display world name in level grid', () => {
       // GIVEN
-      renderAdventureView();
+      renderAtWorldMap();
 
       // WHEN
       fireEvent.click(screen.getByTestId('world-1'));
@@ -669,7 +728,7 @@ describe('AdventureView Integration', () => {
 
     it('should show back button after selecting a world', () => {
       // GIVEN
-      renderAdventureView();
+      renderAtWorldMap();
 
       // WHEN
       fireEvent.click(screen.getByTestId('world-1'));
@@ -694,7 +753,7 @@ describe('AdventureView Integration', () => {
 
     it('should return to world map when back button is clicked', () => {
       // GIVEN
-      renderAdventureView();
+      renderAtWorldMap();
       fireEvent.click(screen.getByTestId('world-1'));
       expect(screen.getByTestId('level-grid')).toBeInTheDocument();
 
@@ -761,7 +820,7 @@ describe('AdventureView Integration', () => {
 
     it('should navigate from level grid to world map when browser back is pressed', async () => {
       // GIVEN
-      renderAdventureView();
+      renderAtWorldMap();
       fireEvent.click(screen.getByTestId('world-1'));
       expect(screen.getByTestId('level-grid')).toBeInTheDocument();
 
@@ -778,7 +837,7 @@ describe('AdventureView Integration', () => {
 
     it('should navigate from playing to level grid when browser back is pressed', async () => {
       // GIVEN
-      renderAdventureView();
+      renderAtWorldMap();
       fireEvent.click(screen.getByTestId('world-1'));
       await waitFor(() => expect(screen.getByTestId('level-grid')).toBeInTheDocument());
       fireEvent.click(screen.getByTestId('level-button-1'));
@@ -797,7 +856,7 @@ describe('AdventureView Integration', () => {
 
     it('should push history state when navigating to level grid', () => {
       // GIVEN
-      renderAdventureView();
+      renderAtWorldMap();
       const pushStateSpy = vi.spyOn(window.history, 'pushState');
 
       // WHEN
@@ -812,7 +871,7 @@ describe('AdventureView Integration', () => {
 
     it('should push history state when navigating to playing', () => {
       // GIVEN
-      renderAdventureView();
+      renderAtWorldMap();
       fireEvent.click(screen.getByTestId('world-1'));
       const pushStateSpy = vi.spyOn(window.history, 'pushState');
       pushStateSpy.mockClear(); // Clear calls from world selection
@@ -829,7 +888,7 @@ describe('AdventureView Integration', () => {
 
     it('should use history.back() when clicking in-app back button on level grid', () => {
       // GIVEN
-      renderAdventureView();
+      renderAtWorldMap();
       fireEvent.click(screen.getByTestId('world-1'));
       expect(screen.getByTestId('level-grid')).toBeInTheDocument();
       const backSpy = vi.spyOn(window.history, 'back');
@@ -843,9 +902,9 @@ describe('AdventureView Integration', () => {
   });
 
   describe('Level Selection → Playing Transition', () => {
-    it('should transition to playing state when a level is selected', () => {
+    it('should transition to playing state when a level is selected', async () => {
       // GIVEN
-      renderAdventureView();
+      renderAtWorldMap();
       fireEvent.click(screen.getByTestId('world-1'));
       expect(screen.getByTestId('level-grid')).toBeInTheDocument();
 
@@ -853,19 +912,19 @@ describe('AdventureView Integration', () => {
       const levelButton = screen.getByTestId('level-button-1');
       fireEvent.click(levelButton);
 
-      // THEN
-      expect(screen.getByTestId('adventure-game')).toBeInTheDocument();
+      // THEN (AdventureGame is dynamically imported — wait for it)
+      await waitFor(() => expect(screen.getByTestId('adventure-game')).toBeInTheDocument());
       expect(screen.queryByTestId('level-grid')).not.toBeInTheDocument();
     });
 
-    it('should show exit button when playing', () => {
+    it('should show exit button when playing', async () => {
       // GIVEN
-      renderAdventureView();
+      renderAtWorldMap();
       fireEvent.click(screen.getByTestId('world-1'));
       fireEvent.click(screen.getByTestId('level-button-1'));
 
       // THEN - outer header hidden during gameplay, GameHeader's exit button visible
-      expect(screen.getByRole('button', { name: /^exit$/i })).toBeInTheDocument();
+      await waitFor(() => expect(screen.getByRole('button', { name: /^exit$/i })).toBeInTheDocument());
     });
   });
 
@@ -882,12 +941,12 @@ describe('AdventureView Integration', () => {
       vi.restoreAllMocks();
     });
 
-    it('should return to level grid when exit button is clicked in header', () => {
+    it('should return to level grid when exit button is clicked in header', async () => {
       // GIVEN
-      renderAdventureView();
+      renderAtWorldMap();
       fireEvent.click(screen.getByTestId('world-1'));
       fireEvent.click(screen.getByTestId('level-button-1'));
-      expect(screen.getByTestId('adventure-game')).toBeInTheDocument();
+      await waitFor(() => expect(screen.getByTestId('adventure-game')).toBeInTheDocument());
 
       // WHEN - click the GameHeader exit button (outer header hidden during gameplay)
       fireEvent.click(screen.getByRole('button', { name: /^exit$/i }));
@@ -932,11 +991,11 @@ describe('AdventureView Integration', () => {
       vi.restoreAllMocks();
     });
 
-    it('should support complete navigation: world → level → play → back → world', () => {
+    it('should support complete navigation: hub → world → level → play → back → world', async () => {
       // GIVEN
-      renderAdventureView();
+      renderAtWorldMap();
 
-      // Start at world map
+      // Start at world map (navigated past hub)
       expect(screen.getByTestId('world-map')).toBeInTheDocument();
 
       // WHEN - select world 1
@@ -945,7 +1004,7 @@ describe('AdventureView Integration', () => {
 
       // WHEN - select level 1
       fireEvent.click(screen.getByTestId('level-button-1'));
-      expect(screen.getByTestId('adventure-game')).toBeInTheDocument();
+      await waitFor(() => expect(screen.getByTestId('adventure-game')).toBeInTheDocument());
 
       // WHEN - exit game (GameHeader's exit button, outer header hidden during gameplay)
       fireEvent.click(screen.getByRole('button', { name: /^exit$/i }));
@@ -962,13 +1021,13 @@ describe('AdventureView Integration', () => {
   describe('Level Completion Integration', () => {
     it('should call completeLevel when game reports completion', async () => {
       // GIVEN
-      renderAdventureView();
+      renderAtWorldMap();
       fireEvent.click(screen.getByTestId('world-1'));
       fireEvent.click(screen.getByTestId('level-button-1'));
 
       // WHEN - simulate game completion (this would normally happen via AdventureGame callback)
       // For now, we verify the game component is rendered with correct props
-      expect(screen.getByTestId('adventure-game')).toBeInTheDocument();
+      await waitFor(() => expect(screen.getByTestId('adventure-game')).toBeInTheDocument());
 
       // Note: Full game completion testing is handled in AdventureGame.test.tsx
       // Here we verify the integration point exists
@@ -982,7 +1041,7 @@ describe('AdventureView Integration', () => {
         completions: [{ world: 1, level: 1, stars: 2 }],
         totalStars: 2,
       });
-      renderAdventureView();
+      renderAtWorldMap();
       fireEvent.click(screen.getByTestId('world-1'));
 
       // WHEN - try to click level 7 (should be locked - only level 1 completed)
@@ -1020,7 +1079,7 @@ describe('AdventureView Integration', () => {
       });
 
       // WHEN
-      renderAdventureView();
+      renderAtWorldMap();
 
       // THEN - 14 completions × 3 stars = 42
       expect(screen.getByText('42')).toBeInTheDocument();
@@ -1029,14 +1088,14 @@ describe('AdventureView Integration', () => {
   });
 
   describe('Grid Generation', () => {
-    it('should generate deterministic grid for same world/level', () => {
+    it('should generate deterministic grid for same world/level', async () => {
       // GIVEN
-      renderAdventureView();
+      renderAtWorldMap();
       fireEvent.click(screen.getByTestId('world-1'));
       fireEvent.click(screen.getByTestId('level-button-1'));
 
-      // THEN - game should render with a grid
-      expect(screen.getByRole('grid')).toBeInTheDocument();
+      // THEN - game should render with a grid (dynamically imported)
+      await waitFor(() => expect(screen.getByRole('grid')).toBeInTheDocument());
     });
   });
 });

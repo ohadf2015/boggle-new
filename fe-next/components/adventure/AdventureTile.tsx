@@ -385,6 +385,19 @@ export const AdventureTile = memo(({
         </>
       )}
 
+      {/* ========== ACTIVATION LABEL (floating "+2x", "+5s" etc.) ========== */}
+      {tile.activationEffect && enableComplexAnimations && (
+        <div className="tile-activation-label">
+          {tile.activationEffect === 'explode' && '2x'}
+          {tile.activationEffect === 'timeBonus' && '+5s'}
+          {tile.activationEffect === 'wildcard' && '+25%'}
+          {tile.activationEffect === 'multiply' && '2x'}
+          {tile.activationEffect === 'collect' && '3x'}
+          {tile.activationEffect === 'link' && '🔗'}
+          {tile.activationEffect === 'melt' && '💧'}
+        </div>
+      )}
+
       {/* ========== SELECTION RIPPLE EFFECT ========== */}
       {/* Contained ripple that stays within cell bounds - no blur, no overflow */}
       {/* Selection glow ring — prominent inset highlight + radial fill */}

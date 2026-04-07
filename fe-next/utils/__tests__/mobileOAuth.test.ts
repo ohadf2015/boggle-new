@@ -29,7 +29,7 @@ vi.mock('@/utils/logger', () => ({
 
 vi.mock('@/lib/i18n', () => ({
   defaultLocale: 'en',
-  locales: ['en', 'he', 'sv', 'ja'],
+  locales: ['en', 'he', 'sv', 'ja', 'es'],
 }));
 
 import { supabase } from '@/lib/supabase';

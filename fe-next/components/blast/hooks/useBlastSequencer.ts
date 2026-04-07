@@ -37,8 +37,13 @@ export interface UseBlastSequencerReturn {
 
 // ==================== Timing Constants ====================
 
+/** Tile types that warrant a longer anticipation beat for dramatic effect */
+const SPECIAL_TILE_TYPES = new Set(['bomb', 'lightning', 'prism', 'rainbow', 'diamond', 'gem', 'catalyst']);
+
 export const ANIM_TIMING = {
   anticipation: 120,
+  /** Extended anticipation for paths containing special tiles — builds tension */
+  anticipationSpecial: 220,
   clearing: 180,
   clearStagger: 8,
   pauseAfterClear: 120,
@@ -124,9 +129,11 @@ export function useBlastSequencer(): UseBlastSequencerReturn {
         row: t.row, col: t.col, phase: 'anticipation' as AnimPhase,
       }));
 
-      // Phase 1: Anticipation
+      // Phase 1: Anticipation — longer pause when special tiles are involved
+      const hasSpecial = clearedTiles.some(t => SPECIAL_TILE_TYPES.has(t.type));
+      const anticipationMs = hasSpecial ? ANIM_TIMING.anticipationSpecial : ANIM_TIMING.anticipation;
       commit({ phase: 'anticipation', activeTiles: tiles, isAnimating: true, chainLevel: 0 }, token);
-      await wait(ANIM_TIMING.anticipation, timersRef.current);
+      await wait(anticipationMs, timersRef.current);
       if (cancelled()) return;
 
       // Phase 2: Clearing (with random rotation per tile)

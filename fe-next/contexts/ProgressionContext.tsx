@@ -166,6 +166,8 @@ interface ProgressionContextType {
   updateChapterQuestProgress: (questType: string, amount: number, questIds: string[]) => void;
   /** Add words to the word album — deduplicates and persists */
   updateWordAlbum: (newWords: string[]) => void;
+  /** Update rune inventory (forge/equip/unequip) — optimistic local update */
+  updateRunes: (runes: import('@/types/adventure').PlayerRune[], fragments: number) => void;
 }
 
 // ==============================================
@@ -196,6 +198,7 @@ interface ProgressionActionsContextType {
   updateCurrency: ProgressionContextType['updateCurrency'];
   updateChapterQuestProgress: (questType: string, amount: number, questIds: string[]) => void;
   updateWordAlbum: (newWords: string[]) => void;
+  updateRunes: ProgressionContextType['updateRunes'];
 }
 
 const ProgressionDataContext = createContext<ProgressionDataContextType | null>(null);
@@ -746,6 +749,17 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
     [setProgression]
   );
 
+  // Update rune inventory — optimistic local update (persisted via cloud save)
+  const updateRunes = useCallback(
+    (runes: import('@/types/adventure').PlayerRune[], fragments: number) => {
+      setProgression((prev) => {
+        if (!prev) return prev;
+        return { ...prev, runes, runeFragments: fragments };
+      });
+    },
+    [setProgression]
+  );
+
   // Purchase upgrade by ID — server validates cost and deducts gold
   const updateCurrency = useCallback(
     async (upgradeId: string, optimisticGold: number, optimisticUpgrades: Record<string, number>) => {
@@ -854,12 +868,13 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
       updateCurrency,
       updateChapterQuestProgress,
       updateWordAlbum,
+      updateRunes,
     }),
     [
       refreshProgression, completeLevel, recordAttempt,
       isWorldUnlocked, isLevelUnlocked,
       getWorldStars, getLevelCompletion, getLevelAttempt,
-      updateCurrency, updateChapterQuestProgress, updateWordAlbum,
+      updateCurrency, updateChapterQuestProgress, updateWordAlbum, updateRunes,
     ]
   );
 

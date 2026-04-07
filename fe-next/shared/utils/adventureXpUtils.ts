@@ -4,7 +4,7 @@
  * Calculates XP progression for Adventure Mode using an exponential curve
  * inspired by RuneScape's leveling formula.
  *
- * Formula: XP per level = floor(i + 300 * 2^(i/7)) / 4
+ * Formula: XP per level = floor(i + 300 * 2^(i/12)) / 4
  * Max level: 50 (soft cap with linear progression after)
  */
 
@@ -25,7 +25,11 @@ export const ADVENTURE_XP_CONFIG = {
   PERFECT_CLEAR_BONUS: 0.25, // +25% for perfect clear
 
   // World scaling: XP multiplier per world (1.0x for W1, increasing)
-  WORLD_XP_MULTIPLIER: 0.25, // +25% per world above 1
+  WORLD_XP_MULTIPLIER: 0.35, // +35% per world above 1
+
+  // Exponential curve divisor — controls how steeply XP-to-level grows
+  // Lower = steeper (RuneScape uses 7). 12 fits a 70-level adventure mode.
+  CURVE_DIVISOR: 12,
 } as const;
 
 // ==================== Types ====================
@@ -86,7 +90,7 @@ export function getXpForLevel(level: number): number {
   for (let i = 1; i < cappedLevel; i++) {
     // Per-level XP = floor(i + 300 * 2^(i / 7)) / 4
     // This creates smooth exponential growth
-    const xpForThisLevel = Math.floor((i + 300 * Math.pow(2, i / 7)) / 4);
+    const xpForThisLevel = Math.floor((i + 300 * Math.pow(2, i / ADVENTURE_XP_CONFIG.CURVE_DIVISOR)) / 4);
     totalXp += xpForThisLevel;
   }
 

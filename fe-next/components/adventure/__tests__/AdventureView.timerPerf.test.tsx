@@ -211,7 +211,8 @@ describe('AdventureView timer performance', () => {
 
   it('does NOT pass onTimerStateChange to AdventureGame (timer state lifted out)', () => {
     render(<AdventureView />);
-    // Initial view is worldMap (hub was removed)
+    // Returning players start at hub, navigate to worldMap first
+    fireEvent.click(screen.getByTestId('hub-map'));
     fireEvent.click(screen.getByTestId('w1'));
     fireEvent.click(screen.getByTestId('lvl1'));
 
@@ -223,7 +224,8 @@ describe('AdventureView timer performance', () => {
 
   it('useAdventureMusic is disabled during gameplay so timer ticks stay isolated to AdventureGame', () => {
     render(<AdventureView />);
-    // Initial view is worldMap (hub was removed)
+    // Returning players start at hub, navigate to worldMap first
+    fireEvent.click(screen.getByTestId('hub-map'));
     fireEvent.click(screen.getByTestId('w1'));
     mockUseAdventureMusic.mockClear();
     fireEvent.click(screen.getByTestId('lvl1'));
@@ -236,7 +238,8 @@ describe('AdventureView timer performance', () => {
 
   it('useAdventureMusic is enabled in ambient mode (non-gameplay)', () => {
     render(<AdventureView />);
-    // Initial view is worldMap (hub was removed)
+    // Returning players start at hub, navigate to worldMap first
+    fireEvent.click(screen.getByTestId('hub-map'));
     fireEvent.click(screen.getByTestId('w1'));
 
     const calls = mockUseAdventureMusic.mock.calls;

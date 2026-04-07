@@ -159,7 +159,7 @@ export const GameHeader = memo(function GameHeader({
             'border-2 border-neo-black/30',
             'px-2 py-0.5'
           )}>
-            <span className={cn('text-[10px] font-mono font-bold tabular-nums', hudTheme.levelBadgeText)}>
+            <span dir="ltr" className={cn('text-[10px] font-mono font-bold tabular-nums', hudTheme.levelBadgeText)}>
               W{worldNumber}·L{levelNumber}
             </span>
             <span className="text-neo-white/20 text-[10px]">|</span>

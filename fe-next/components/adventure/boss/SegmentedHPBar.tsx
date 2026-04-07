@@ -403,13 +403,10 @@ const SegmentedHPBar = memo<SegmentedHPBarProps>(({
         {isLowHP && !prefersReducedMotion && (
           <AdaptiveMotion.div
             className="absolute inset-0 rounded-neo pointer-events-none"
-            animate={{
-              boxShadow: [
-                `inset 0 0 ${8 + (1 - hpPercentage / 25) * 10}px rgba(255,0,0,0.6), 0 0 ${12 + (1 - hpPercentage / 25) * 16}px rgba(255,0,0,0.5)`,
-                `inset 0 0 ${18 + (1 - hpPercentage / 25) * 14}px rgba(255,0,0,0.95), 0 0 ${24 + (1 - hpPercentage / 25) * 20}px rgba(255,0,0,0.8)`,
-                `inset 0 0 ${8 + (1 - hpPercentage / 25) * 10}px rgba(255,0,0,0.6), 0 0 ${12 + (1 - hpPercentage / 25) * 16}px rgba(255,0,0,0.5)`,
-              ],
+            style={{
+              boxShadow: `inset 0 0 ${18 + (1 - hpPercentage / 25) * 14}px rgba(255,0,0,0.95), 0 0 ${24 + (1 - hpPercentage / 25) * 20}px rgba(255,0,0,0.8)`,
             }}
+            animate={{ opacity: [0.6, 1, 0.6] }}
             transition={{ duration: 0.5, repeat: Infinity, ease: 'easeInOut' }}
           />
         )}

@@ -18,6 +18,7 @@ import { BlastHUD } from './BlastHUD';
 import { BlastBoard } from './BlastBoard';
 import BlastChainText from './BlastChainText';
 import BlastWaveClearText from './BlastWaveClearText';
+import BlastWordPraise from './BlastWordPraise';
 import { BlastWordRewardPreview } from './BlastWordRewardPreview';
 import { BlastEffectsLayer } from './BlastEffectsLayer';
 import { BlastScoreMilestone } from './BlastScoreMilestone';
@@ -80,6 +81,11 @@ interface BlastStageProps {
   // Combo streak
   comboStreak?: ComboStreakState;
   comboStreakArcRef?: React.RefObject<SVGCircleElement | null>;
+  // Explosion screen shake (bomb/countdown)
+  explosionShake?: boolean;
+  // Word praise feedback
+  lastWordLength?: number;
+  wordSubmitCount?: number;
   // Translation
   t: (key: string) => string | undefined;
 }
@@ -122,6 +128,9 @@ export function BlastStage({
   username,
   comboStreak,
   comboStreakArcRef,
+  explosionShake,
+  lastWordLength = 0,
+  wordSubmitCount = 0,
   t,
 }: BlastStageProps) {
   const { score, wordsFound, movesRemaining, totalMoves, tilesCleared, totalTiles, isComplete, isDeadEnd } = gameState;
@@ -187,7 +196,7 @@ export function BlastStage({
       />
 
       {/* Score milestone announcements */}
-      <BlastScoreMilestone score={score} />
+      <BlastScoreMilestone score={score} t={t} />
       {/* Combo milestone announcements */}
       <ComboMilestoneAnnouncement comboLevel={comboLevel} />
 
@@ -198,7 +207,6 @@ export function BlastStage({
         movesRemaining={movesRemaining}
         totalMoves={totalMoves}
         waveNumber={waveNumber}
-        comboLevel={comboLevel}
         tilesCleared={tilesCleared}
         totalTiles={totalTiles}
         onQuit={onQuit}
@@ -266,6 +274,7 @@ export function BlastStage({
       <div
         className={cn(
           'flex-1 flex flex-col items-center justify-center px-4 sm:px-6 py-2 relative z-30 min-h-0',
+          explosionShake ? 'animate-neo-shake' :
           sequencerState?.chainLevel && sequencerState.chainLevel >= 3 ? 'animate-neo-shake' :
           sequencerState?.chainLevel && sequencerState.chainLevel >= 2 ? 'animate-neo-wobble' :
           sequencerState?.phase === 'clearing' ? 'animate-neo-wobble' : '',
@@ -277,29 +286,18 @@ export function BlastStage({
           transition: 'transform 200ms ease-out',
         }}
       >
-        {/* Ornate board frame — golden trim with recessed interior */}
+        {/* Board frame — neo-brutalist with hard shadow */}
         <div
-          className="relative w-full max-w-[min(92vw,78dvh)] sm:max-w-[min(440px,75dvh)] md:max-w-[min(480px,72dvh)] lg:max-w-[min(520px,60dvh)]"
-          style={{
-            padding: '6px',
-            borderRadius: '20px',
-            background: 'linear-gradient(180deg, #B8860B 0%, #8B6914 40%, #6B4F10 100%)',
-            boxShadow: 'inset 0 1px 2px rgba(255,230,150,0.5), 0 8px 24px rgba(0,0,0,0.5), 0 2px 0 #4a3508',
-          }}
+          className="relative w-full max-w-[min(92vw,78dvh)] sm:max-w-[min(440px,75dvh)] md:max-w-[min(480px,72dvh)] lg:max-w-[min(520px,60dvh)] p-1.5 rounded-neo border-3 border-neo-black bg-neo-navy-light shadow-hard-lg"
         >
-          {/* Inner recessed board surface */}
+          {/* Inner board surface */}
           <div
             ref={boardContainerRef}
-            className="relative w-full overflow-hidden"
-            style={{
-              borderRadius: '14px',
-              background: 'linear-gradient(180deg, #0d0b20 0%, #0a0818 100%)',
-              boxShadow: 'inset 0 3px 12px rgba(0,0,0,0.8), inset 0 0 20px rgba(0,0,0,0.4)',
-            }}
+            className="relative w-full overflow-hidden rounded-[6px] bg-neo-navy"
           >
             {/* PixiJS effects layer */}
             {boardSize.width > 0 && (
-              <div className="absolute inset-0 z-0 overflow-hidden" style={{ borderRadius: '14px' }}>
+              <div className="absolute inset-0 z-0 overflow-hidden rounded-[6px]">
                 <BlastEffectsCanvas
                   width={boardSize.width}
                   height={boardSize.height || boardSize.width}
@@ -329,11 +327,6 @@ export function BlastStage({
               />
             </div>
           </div>
-          {/* Golden corner accents */}
-          <div className="absolute top-1 left-1 w-3 h-3 rounded-tl-lg border-t-2 border-l-2 border-amber-400/40 pointer-events-none" />
-          <div className="absolute top-1 right-1 w-3 h-3 rounded-tr-lg border-t-2 border-r-2 border-amber-400/40 pointer-events-none" />
-          <div className="absolute bottom-1 left-1 w-3 h-3 rounded-bl-lg border-b-2 border-l-2 border-amber-400/40 pointer-events-none" />
-          <div className="absolute bottom-1 right-1 w-3 h-3 rounded-br-lg border-b-2 border-r-2 border-amber-400/40 pointer-events-none" />
         </div>
         {/* Cascade word discovery banner */}
         <AdaptiveAnimatePresence>
@@ -345,8 +338,8 @@ export function BlastStage({
               transition={{ type: 'spring', stiffness: 400, damping: 20 }}
               className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 pointer-events-none"
             >
-              <div className="px-5 py-2 rounded-xl bg-neo-navy/90 border-2 border-neo-lime shadow-[0_0_20px_rgba(191,255,0,0.4),0_0_40px_rgba(191,255,0,0.15)]">
-                <span className="text-neo-lime font-neo-display text-xl font-black tracking-wide drop-shadow-[0_0_8px_rgba(191,255,0,0.6)]">
+              <div className="px-5 py-2 rounded-neo bg-neo-navy border-3 border-neo-black shadow-hard">
+                <span className="text-neo-lime font-neo-display text-xl font-black tracking-wide">
                   {cascadeHighlightWord}
                 </span>
               </div>
@@ -354,8 +347,9 @@ export function BlastStage({
           )}
         </AdaptiveAnimatePresence>
         {/* Chain escalation text — scoped within board area */}
-        <BlastChainText chainLevel={sequencerState?.chainLevel ?? 0} t={t} />
-        <BlastWaveClearText waveCleared={waveCleared} movesRemaining={movesRemaining} />
+        <BlastChainText chainLevel={sequencerState?.chainLevel ?? 0} wordLength={lastWordLength} t={t} />
+        <BlastWordPraise wordLength={lastWordLength} submitCount={wordSubmitCount} t={t} />
+        <BlastWaveClearText waveCleared={waveCleared} movesRemaining={movesRemaining} t={t} />
       </div>
 
       {/* 4. Word forming area — golden ribbon style */}
@@ -370,17 +364,15 @@ export function BlastStage({
             formedWord ? 'opacity-100' : 'opacity-40',
           )}
           style={{
-            background: formedWord
-              ? 'linear-gradient(90deg, rgba(184,134,11,0.15) 0%, rgba(255,215,0,0.12) 50%, rgba(184,134,11,0.15) 100%)'
-              : 'transparent',
-            borderRadius: '12px',
-            border: formedWord ? '1px solid rgba(255,215,0,0.2)' : '1px solid rgba(255,255,255,0.05)',
+            borderRadius: '8px',
+            border: formedWord ? '2px solid rgba(0,0,0,0.4)' : '2px solid transparent',
+            background: formedWord ? 'rgba(255,255,255,0.05)' : 'transparent',
           }}
         >
           <WordFormingArea word={formedWord} letterCount={formedWord.length} feedback={currentFeedback} compact />
           <BlastWordRewardPreview wordLength={formedWord.length} />
           {formedWord && (
-            <span className="text-[10px] font-bold text-amber-400/60 tabular-nums">
+            <span className="text-[10px] font-bold text-white/50 tabular-nums">
               {formedWord.length}
             </span>
           )}

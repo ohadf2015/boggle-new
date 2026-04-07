@@ -126,17 +126,54 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
     })();
   }, [audioUnlocked]);
 
-  // Track tab visibility to block sounds when tab is hidden
+  // Track tab visibility AND window focus to block sounds when not in focus
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
+    const setVisible = (visible: boolean, reason: string) => {
+      const wasVisible = isTabVisibleRef.current;
+      isTabVisibleRef.current = visible;
+      logger.log(`[SFX] ${reason}:`, visible ? 'visible' : 'hidden');
+
+      // Pause fire crackle loop when losing focus, resume when regaining
+      if (!visible && wasVisible) {
+        const howl = soundsRef.current['fireCrackleLoop'];
+        if (howl && fireCrackleLoopIdRef.current !== null && howl.playing()) {
+          howl.pause();
+          logger.log('[SFX] Paused fire crackle loop (lost focus)');
+        }
+      } else if (visible && !wasVisible) {
+        const howl = soundsRef.current['fireCrackleLoop'];
+        if (howl && fireCrackleLoopIdRef.current !== null && !howl.playing() && !sfxMutedRef.current && isGameActiveRef.current) {
+          howl.play();
+          logger.log('[SFX] Resumed fire crackle loop (regained focus)');
+        }
+      }
+    };
+
     const handleVisibilityChange = () => {
-      isTabVisibleRef.current = document.visibilityState === 'visible';
-      logger.log('[SFX] Tab visibility changed:', isTabVisibleRef.current ? 'visible' : 'hidden');
+      setVisible(document.visibilityState === 'visible', 'Tab visibility changed');
+    };
+
+    const handleBlur = () => {
+      if (document.visibilityState === 'visible') {
+        setVisible(false, 'Window blur');
+      }
+    };
+
+    const handleFocus = () => {
+      setVisible(true, 'Window focus');
     };
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
-    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('blur', handleBlur);
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('blur', handleBlur);
+      window.removeEventListener('focus', handleFocus);
+    };
   }, []);
 
   // Initialize sound effects — wait for howler module to load first

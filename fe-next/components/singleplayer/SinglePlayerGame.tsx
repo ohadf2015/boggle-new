@@ -212,11 +212,13 @@ function SinglePlayerGame({
   }
 
   const encouragementBanner = encouragement.currentTrigger ? (
-    <div className="flex justify-center py-1">
-      <FirstTimeEncouragement
-        trigger={encouragement.currentTrigger}
-        onDismiss={encouragement.dismiss}
-      />
+    <div className="absolute top-2 left-0 right-0 z-50 flex justify-center pointer-events-none">
+      <div className="pointer-events-auto">
+        <FirstTimeEncouragement
+          trigger={encouragement.currentTrigger}
+          onDismiss={encouragement.dismiss}
+        />
+      </div>
     </div>
   ) : null;
 
@@ -233,7 +235,7 @@ function SinglePlayerGame({
   // Landscape layout
   if (core.isLandscape) {
     return (
-      <>
+      <div className="relative">
         {encouragementBanner}
         {scorePopupElement}
         <LandscapeGameLayout
@@ -243,14 +245,14 @@ function SinglePlayerGame({
           showLandscapeTutorial={core.showLandscapeTutorial}
           onDismissLandscapeTutorial={core.dismissLandscapeTutorial}
         />
-      </>
+      </div>
     );
   }
 
   // Desktop/TV layout
   if (core.isDesktop || core.isTv) {
     return (
-      <>
+      <div className="relative">
         {encouragementBanner}
         {scorePopupElement}
         <DesktopGameLayout
@@ -261,13 +263,13 @@ function SinglePlayerGame({
           onToggleProgressBar={core.handleToggleProgressBar}
           isTv={core.isTv}
         />
-      </>
+      </div>
     );
   }
 
   // Portrait layout (default)
   return (
-    <>
+    <div className="relative">
       {encouragementBanner}
         {scorePopupElement}
       <PortraitGameLayout
@@ -280,7 +282,7 @@ function SinglePlayerGame({
         setShowCompletionPopup={core.setShowCompletionPopup}
         gameStatsRef={core.gameStatsRef}
       />
-    </>
+    </div>
   );
 }
 

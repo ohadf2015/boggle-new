@@ -520,8 +520,8 @@ describe('Ice Tile - Clearing Mechanics', () => {
 // BOMB TILE TESTS
 // ==============================================
 
-describe('Bomb Tile - Row Clearing', () => {
-  it('should clear entire row when bomb tile is used', () => {
+describe('Bomb Tile - Score Bomb', () => {
+  it('should double the word score when bomb tile is used', () => {
     // GIVEN
     const levelConfig = createMockLevelConfig({
       gridSize: 4,
@@ -531,6 +531,8 @@ describe('Bomb Tile - Row Clearing', () => {
     const { result } = renderHook(() =>
       useAdventureGame({ levelConfig, initialGrid: grid })
     );
+
+    const scoreBefore = result.current.gameState.score;
 
     // WHEN
     act(() => {
@@ -542,19 +544,19 @@ describe('Bomb Tile - Row Clearing', () => {
       ]);
     });
 
-    // THEN - All tiles in row 1 should be cleared
-    expect(result.current.tiles[1][0].isCleared).toBe(true);
-    expect(result.current.tiles[1][1].isCleared).toBe(true);
-    expect(result.current.tiles[1][2].isCleared).toBe(true);
-    expect(result.current.tiles[1][3].isCleared).toBe(true);
+    // THEN - Score should be doubled (100 * 2 = 200)
+    expect(result.current.gameState.score).toBe(scoreBefore + 200);
 
-    // Other rows should NOT be cleared
+    // Bomb tile itself should be cleared
+    expect(result.current.tiles[1][1].isCleared).toBe(true);
+
+    // Other tiles in row NOT in path should NOT be cleared
     expect(result.current.tiles[0][0].isCleared).toBe(false);
     expect(result.current.tiles[2][0].isCleared).toBe(false);
   });
 
-  it('should clear ice tiles in the same row as bomb', () => {
-    // GIVEN - Bomb and ice in same row
+  it('should not clear ice tiles outside the word path', () => {
+    // GIVEN - Bomb and ice in same row but ice not in path
     const levelConfig = createMockLevelConfig({
       gridSize: 4,
       specialTiles: [
@@ -579,13 +581,13 @@ describe('Bomb Tile - Row Clearing', () => {
       ]);
     });
 
-    // THEN - Ice tile in same row should be cleared
-    expect(result.current.tiles[1][3].isCleared).toBe(true);
+    // THEN - Ice tile NOT in path should NOT be cleared (bomb no longer clears row)
+    expect(result.current.tiles[1][3].isCleared).toBe(false);
 
     const clearIceObjective = result.current.objectives.find(
       (o) => o.type === 'clearIce'
     );
-    expect(clearIceObjective?.current).toBe(1);
+    expect(clearIceObjective?.current).toBe(0);
   });
 });
 

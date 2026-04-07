@@ -48,6 +48,19 @@ const LOOT_DROP_IMAGES: Record<string, string> = {
   cosmicShard: '/images/adventure/loot/loot-cosmic-shard.webp',
 };
 
+const LOOT_TRANSLATION_KEYS: Record<string, string> = {
+  gold: 'common.gold',
+  runeFragment: 'adventure.runes.fragment',
+  loreScroll: 'adventure.loot.loreScroll',
+  bossTrophy: 'adventure.loot.bossTrophy',
+  goldenQuill: 'adventure.loot.goldenQuill',
+  worldEssence: 'adventure.loot.worldEssence',
+  ancientRelic: 'adventure.loot.ancientRelic',
+  cosmicShard: 'adventure.loot.cosmicShard',
+  bonusGold: 'adventure.loot.bonusGold',
+  xp: 'common.xp',
+};
+
 function getRarityClasses(rarity: string): string {
   if (rarity === 'legendary') {
     return 'bg-neo-yellow/20 border-neo-yellow text-neo-yellow';
@@ -67,7 +80,7 @@ export const LootRevealAnimation = memo<LootRevealAnimationProps>(({
   baseDelay = 0.8,
   className,
 }) => {
-  const { t: _t } = useLanguage();
+  const { t } = useLanguage();
 
   if (drops.length === 0) return null;
 
@@ -112,7 +125,7 @@ export const LootRevealAnimation = memo<LootRevealAnimationProps>(({
                   className="flex-shrink-0"
                 />
               )}
-              {drop.label || drop.type}
+              {drop.label || (LOOT_TRANSLATION_KEYS[drop.type] ? t(LOOT_TRANSLATION_KEYS[drop.type]) : drop.type)}
             </AdaptiveMotion.div>
           );
         })}

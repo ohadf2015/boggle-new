@@ -17,7 +17,7 @@ import { customAvatarSchema } from '../../shared/types/customAvatar';
 
 const updateAvatarSchema = z.object({
   gameCode: z.string().min(1).max(20).optional(),
-  avatarImage: z.string().min(1).max(100),
+  avatarImage: z.string().min(1).max(100).optional(),
   customAvatar: customAvatarSchema.optional(),
 });
 
@@ -57,7 +57,9 @@ function registerAvatarHandlers(io: Server, socket: Socket): void {
     // Update avatar in game state
     const player = game.users?.[username];
     if (player && player.avatar) {
-      player.avatar.avatarImage = avatarImage;
+      if (avatarImage) {
+        player.avatar.avatarImage = avatarImage;
+      }
       if (customAvatar) {
         player.avatar.customAvatar = customAvatar;
       }

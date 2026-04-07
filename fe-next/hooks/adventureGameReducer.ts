@@ -265,33 +265,20 @@ function processSpecialTileEffects(
     }
   }
 
-  // Bomb tile - clear entire row (Blast Shield T2: give time instead)
+  // Bomb tile - "Score Bomb": doubles word score (Blast Shield T2: also gives +5s)
   const bombPos = path.find(
     (pos) => newTiles[pos.row]?.[pos.col]?.type === 'bomb'
   );
   if (bombPos) {
+    finalScore *= 2;
+    const tile = newTiles[bombPos.row][bombPos.col];
+    if (tile) {
+      tile.activationEffect = 'explode';
+      tile.activationTimestamp = activationTimestamp;
+      tile.isCleared = true;
+    }
     if (upgradeConfig?.bombTimerInvert) {
-      // Blast Shield T2: bomb gives +5s instead of clearing row
       timeBonusSeconds += TIME_TILE_BONUS_SECONDS;
-      const tile = newTiles[bombPos.row][bombPos.col];
-      if (tile) {
-        tile.activationEffect = 'timeBonus';
-        tile.activationTimestamp = activationTimestamp;
-        tile.isCleared = true;
-      }
-    } else {
-      for (let col = 0; col < newTiles[bombPos.row].length; col++) {
-        const tile = newTiles[bombPos.row][col];
-        if (tile.type === 'ice' && !tile.isCleared) {
-          iceClearedCount++;
-          tile.isFrozen = false;
-          tile.activationEffect = 'melt';
-        } else {
-          tile.activationEffect = 'explode';
-        }
-        tile.activationTimestamp = activationTimestamp;
-        tile.isCleared = true;
-      }
     }
   }
 

@@ -138,7 +138,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
   };
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(shareUrl);
+    navigator.clipboard.writeText(shareUrl).catch(() => {});
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
     neoSuccessToast(t('daily.linkCopied'));

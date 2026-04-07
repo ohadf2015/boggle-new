@@ -1,6 +1,6 @@
 /**
  * Endless Mode — procedurally generated levels with escalating difficulty.
- * Unlocked after completing all 10 worlds.
+ * Unlocked at World 3 (prologue access) via AdventureHub gate.
  * Each floor increases difficulty and cycles world mechanics.
  */
 

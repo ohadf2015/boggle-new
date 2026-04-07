@@ -291,7 +291,7 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
     // Auto-copy invite link to clipboard for easy sharing
     try {
       const joinUrl = getJoinUrl(gameCode, 'quick-play');
-      navigator.clipboard.writeText(joinUrl);
+      navigator.clipboard.writeText(joinUrl).catch(() => {});
       toast.success(t('multiplayerFlow.roomList.linkCopied'), { duration: 3000, icon: '\uD83D\uDD17' });
     } catch {
       // Clipboard API not available — no-op

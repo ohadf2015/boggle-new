@@ -1,1154 +1,472 @@
 /**
- * useBossMechanics Stub Mechanic Tests
+ * useBossMechanics — Differentiated Mechanic Tests
  *
- * Tests for length-based stub mechanics that serve as MVP placeholders:
- * - idiomBattle (World 4 Captain Metaphor): 6+ letters
- * - assemblyLine (World 5 Baron Buildaword): 5+ letters
- * - babelSummit (World 9 Linguist Sage): 6+ letters
- *
- * NOTE: These are intentionally simple length checks for MVP.
- * Data-driven implementations (idiom lists, compound detection,
- * multilingual dictionary lookup) are deferred to Phase 24.
+ * Each boss mechanic tests a genuinely different word property:
+ * - hiveMind (W2 Spelling Bee): double letters (BOOK, TEETH, LETTER)
+ * - idiomBattle (W4 Captain Metaphor): same start & end letter (KAYAK, ROAR)
+ * - assemblyLine (W5 Baron Buildaword): common prefix/suffix (UN-, RE-, -ING, -TION)
+ * - babelSummit (W9 Linguist Sage): high unique-letter ratio (>=80%)
  */
 
 import { renderHook } from '@testing-library/react';
 import { useBossMechanics } from '../useBossMechanics';
 
-// ==============================================
-// CONSTANTS
-// ==============================================
-
-/** World 4: Captain Metaphor - idiomBattle mechanic */
+const WORLD_2 = 2;
 const WORLD_4 = 4;
-
-/** World 5: Baron Buildaword - assemblyLine mechanic */
 const WORLD_5 = 5;
-
-/** World 9: Linguist Sage - babelSummit mechanic */
 const WORLD_9 = 9;
 
 // ==============================================
-// IDIOM BATTLE TESTS (World 4 - Captain Metaphor)
+// HIVE MIND (World 2 — Double Letters)
+// ==============================================
+
+describe('useBossMechanics - hiveMind (World 2 Spelling Bee)', () => {
+  it('should load spellingBee boss with hiveMind twist', () => {
+    const { result } = renderHook(() => useBossMechanics({ worldId: WORLD_2 }));
+    expect(result.current.boss?.id).toBe('spellingBee');
+    expect(result.current.boss?.twistMechanic.type).toBe('hiveMind');
+    expect(result.current.isActive).toBe(true);
+  });
+
+  describe('double-letter detection', () => {
+    it('should trigger for BOOK (OO)', () => {
+      const { result } = renderHook(() => useBossMechanics({ worldId: WORLD_2 }));
+      const r = result.current.checkWord('BOOK');
+      expect(r.meetsRequirement).toBe(true);
+      expect(r.scoreMultiplier).toBe(2.0);
+    });
+
+    it('should trigger for TEETH (EE)', () => {
+      const { result } = renderHook(() => useBossMechanics({ worldId: WORLD_2 }));
+      expect(result.current.checkWord('TEETH').meetsRequirement).toBe(true);
+    });
+
+    it('should trigger for LETTER (TT)', () => {
+      const { result } = renderHook(() => useBossMechanics({ worldId: WORLD_2 }));
+      expect(result.current.checkWord('LETTER').meetsRequirement).toBe(true);
+    });
+
+    it('should trigger for BUZZING (ZZ)', () => {
+      const { result } = renderHook(() => useBossMechanics({ worldId: WORLD_2 }));
+      expect(result.current.checkWord('BUZZING').meetsRequirement).toBe(true);
+    });
+
+    it('should NOT trigger for WORD (no doubles)', () => {
+      const { result } = renderHook(() => useBossMechanics({ worldId: WORLD_2 }));
+      const r = result.current.checkWord('WORD');
+      expect(r.meetsRequirement).toBe(false);
+      expect(r.scoreMultiplier).toBe(1.0);
+    });
+
+    it('should NOT trigger for ABCDE (all unique)', () => {
+      const { result } = renderHook(() => useBossMechanics({ worldId: WORLD_2 }));
+      expect(result.current.checkWord('ABCDE').meetsRequirement).toBe(false);
+    });
+
+    it('should NOT trigger for CAT', () => {
+      const { result } = renderHook(() => useBossMechanics({ worldId: WORLD_2 }));
+      expect(result.current.checkWord('CAT').meetsRequirement).toBe(false);
+    });
+
+    it('should handle empty string', () => {
+      const { result } = renderHook(() => useBossMechanics({ worldId: WORLD_2 }));
+      expect(result.current.checkWord('').meetsRequirement).toBe(false);
+    });
+  });
+
+  describe('case insensitivity', () => {
+    it('should detect book (lowercase)', () => {
+      const { result } = renderHook(() => useBossMechanics({ worldId: WORLD_2 }));
+      expect(result.current.checkWord('book').meetsRequirement).toBe(true);
+    });
+
+    it('should detect Book (mixed case)', () => {
+      const { result } = renderHook(() => useBossMechanics({ worldId: WORLD_2 }));
+      expect(result.current.checkWord('Book').meetsRequirement).toBe(true);
+    });
+  });
+
+  describe('feedback and effects', () => {
+    it('should trigger taunt and effect for matches', () => {
+      const { result } = renderHook(() => useBossMechanics({ worldId: WORLD_2 }));
+      const r = result.current.checkWord('BOOK');
+      expect(r.triggerTaunt).toBe('onMechanic');
+      expect(r.triggerEffect).toBe(true);
+      expect(r.feedbackKey).toBe('adventure.bosses.common.doubleLetterFound');
+    });
+
+    it('should NOT trigger taunt for non-matches', () => {
+      const { result } = renderHook(() => useBossMechanics({ worldId: WORLD_2 }));
+      const r = result.current.checkWord('WORD');
+      expect(r.triggerTaunt).toBeUndefined();
+      expect(r.triggerEffect).toBe(false);
+    });
+  });
+});
+
+// ==============================================
+// IDIOM BATTLE (World 4 — Same Start & End Letter)
 // ==============================================
 
 describe('useBossMechanics - idiomBattle (World 4 Captain Metaphor)', () => {
-  describe('boss configuration', () => {
-    it('should load Captain Metaphor for World 4', () => {
-      // GIVEN World 4 boss
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_4 })
-      );
-
-      // THEN should return Captain Metaphor boss config
-      expect(result.current.boss).toBeDefined();
-      expect(result.current.boss?.id).toBe('captainMetaphor');
-    });
-
-    it('should have idiomBattle twist type', () => {
-      // GIVEN World 4 boss
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_4 })
-      );
-
-      // THEN twist type should be idiomBattle
-      expect(result.current.boss?.twistMechanic.type).toBe('idiomBattle');
-    });
-
-    it('should return isActive true for World 4 boss level', () => {
-      // GIVEN World 4 boss
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_4 })
-      );
-
-      // THEN should be active
-      expect(result.current.isActive).toBe(true);
-    });
-
-    it('should have idiomBonusMultiplier of 2.5 in params', () => {
-      // GIVEN World 4 boss
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_4 })
-      );
-
-      // THEN idiomBonusMultiplier should be 2.5
-      const params = result.current.boss?.twistMechanic.params;
-      expect(params?.idiomBonusMultiplier).toBe(2.5);
-    });
+  it('should load captainMetaphor boss with idiomBattle twist', () => {
+    const { result } = renderHook(() => useBossMechanics({ worldId: WORLD_4 }));
+    expect(result.current.boss?.id).toBe('captainMetaphor');
+    expect(result.current.boss?.twistMechanic.type).toBe('idiomBattle');
+    expect(result.current.isActive).toBe(true);
   });
 
-  describe('6+ letter word bonus (MVP stub)', () => {
-    it('should trigger bonus for PHRASE (6 letters)', () => {
-      // GIVEN World 4 boss (idiomBattle mechanic)
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_4 })
-      );
-
-      // WHEN checking a 6-letter word
-      const mechanicResult = result.current.checkWord('PHRASE');
-
-      // THEN should meet requirement
-      expect(mechanicResult.meetsRequirement).toBe(true);
+  describe('same start & end letter detection', () => {
+    it('should trigger for KAYAK (K...K)', () => {
+      const { result } = renderHook(() => useBossMechanics({ worldId: WORLD_4 }));
+      const r = result.current.checkWord('KAYAK');
+      expect(r.meetsRequirement).toBe(true);
+      expect(r.scoreMultiplier).toBe(2.5);
     });
 
-    it('should trigger bonus for SAYING (6 letters)', () => {
-      // GIVEN World 4 boss
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_4 })
-      );
-
-      // WHEN checking SAYING
-      const mechanicResult = result.current.checkWord('SAYING');
-
-      // THEN should meet requirement
-      expect(mechanicResult.meetsRequirement).toBe(true);
+    it('should trigger for ROAR (R...R)', () => {
+      const { result } = renderHook(() => useBossMechanics({ worldId: WORLD_4 }));
+      expect(result.current.checkWord('ROAR').meetsRequirement).toBe(true);
     });
 
-    it('should trigger bonus for PROVERB (7 letters)', () => {
-      // GIVEN World 4 boss
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_4 })
-      );
-
-      // WHEN checking a 7-letter word
-      const mechanicResult = result.current.checkWord('PROVERB');
-
-      // THEN should meet requirement (7 >= 6)
-      expect(mechanicResult.meetsRequirement).toBe(true);
+    it('should trigger for STATS (S...S)', () => {
+      const { result } = renderHook(() => useBossMechanics({ worldId: WORLD_4 }));
+      expect(result.current.checkWord('STATS').meetsRequirement).toBe(true);
     });
 
-    it('should trigger bonus for METAPHOR (8 letters)', () => {
-      // GIVEN World 4 boss
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_4 })
-      );
-
-      // WHEN checking an 8-letter word
-      const mechanicResult = result.current.checkWord('METAPHOR');
-
-      // THEN should meet requirement
-      expect(mechanicResult.meetsRequirement).toBe(true);
+    it('should trigger for COMIC (C...C)', () => {
+      const { result } = renderHook(() => useBossMechanics({ worldId: WORLD_4 }));
+      expect(result.current.checkWord('COMIC').meetsRequirement).toBe(true);
     });
 
-    it('should trigger bonus for EXPRESSION (10 letters)', () => {
-      // GIVEN World 4 boss
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_4 })
-      );
-
-      // WHEN checking a 10-letter word
-      const mechanicResult = result.current.checkWord('EXPRESSION');
-
-      // THEN should meet requirement
-      expect(mechanicResult.meetsRequirement).toBe(true);
-    });
-  });
-
-  describe('5 letter and shorter word rejection', () => {
-    it('should NOT trigger bonus for WORDS (5 letters)', () => {
-      // GIVEN World 4 boss
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_4 })
-      );
-
-      // WHEN checking a 5-letter word
-      const mechanicResult = result.current.checkWord('WORDS');
-
-      // THEN should NOT meet requirement (5 < 6)
-      expect(mechanicResult.meetsRequirement).toBe(false);
+    it('should trigger for TREAT (T...T)', () => {
+      const { result } = renderHook(() => useBossMechanics({ worldId: WORLD_4 }));
+      expect(result.current.checkWord('TREAT').meetsRequirement).toBe(true);
     });
 
-    it('should NOT trigger bonus for TALK (4 letters)', () => {
-      // GIVEN World 4 boss
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_4 })
-      );
-
-      // WHEN checking a 4-letter word
-      const mechanicResult = result.current.checkWord('TALK');
-
-      // THEN should NOT meet requirement
-      expect(mechanicResult.meetsRequirement).toBe(false);
+    it('should NOT trigger for WORD (W...D)', () => {
+      const { result } = renderHook(() => useBossMechanics({ worldId: WORLD_4 }));
+      const r = result.current.checkWord('WORD');
+      expect(r.meetsRequirement).toBe(false);
+      expect(r.scoreMultiplier).toBe(1.0);
     });
 
-    it('should NOT trigger bonus for CAT (3 letters)', () => {
-      // GIVEN World 4 boss
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_4 })
-      );
-
-      // WHEN checking a 3-letter word
-      const mechanicResult = result.current.checkWord('CAT');
-
-      // THEN should NOT meet requirement
-      expect(mechanicResult.meetsRequirement).toBe(false);
+    it('should NOT trigger for HOUSE (H...E)', () => {
+      const { result } = renderHook(() => useBossMechanics({ worldId: WORLD_4 }));
+      expect(result.current.checkWord('HOUSE').meetsRequirement).toBe(false);
     });
 
-    it('should NOT trigger bonus for IT (2 letters)', () => {
-      // GIVEN World 4 boss
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_4 })
-      );
-
-      // WHEN checking a 2-letter word
-      const mechanicResult = result.current.checkWord('IT');
-
-      // THEN should NOT meet requirement
-      expect(mechanicResult.meetsRequirement).toBe(false);
-    });
-  });
-
-  describe('edge cases at 6-letter boundary', () => {
-    it('should pass for exactly 6 letters (BRIDGE)', () => {
-      // GIVEN World 4 boss
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_4 })
-      );
-
-      // WHEN checking exactly 6-letter word
-      const mechanicResult = result.current.checkWord('BRIDGE');
-
-      // THEN should meet requirement (6 >= 6)
-      expect(mechanicResult.meetsRequirement).toBe(true);
-      expect(mechanicResult.scoreMultiplier).toBe(2.5);
+    it('should NOT trigger for single letter', () => {
+      const { result } = renderHook(() => useBossMechanics({ worldId: WORLD_4 }));
+      // Single char trivially matches start==end, but min length should prevent it
+      expect(result.current.checkWord('A').meetsRequirement).toBe(false);
     });
 
-    it('should fail for exactly 5 letters (WATER)', () => {
-      // GIVEN World 4 boss
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_4 })
-      );
-
-      // WHEN checking exactly 5-letter word
-      const mechanicResult = result.current.checkWord('WATER');
-
-      // THEN should NOT meet requirement (5 < 6)
-      expect(mechanicResult.meetsRequirement).toBe(false);
-      expect(mechanicResult.scoreMultiplier).toBe(1.0);
+    it('should NOT trigger for 2-letter words (too short)', () => {
+      const { result } = renderHook(() => useBossMechanics({ worldId: WORLD_4 }));
+      expect(result.current.checkWord('AA').meetsRequirement).toBe(false);
     });
 
-    it('should handle empty string gracefully', () => {
-      // GIVEN World 4 boss
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_4 })
-      );
-
-      // WHEN checking empty string
-      const mechanicResult = result.current.checkWord('');
-
-      // THEN should NOT meet requirement
-      expect(mechanicResult.meetsRequirement).toBe(false);
-    });
-  });
-
-  describe('score multipliers', () => {
-    it('should apply 2.5x multiplier for 6+ letter words', () => {
-      // GIVEN World 4 boss (idiomBonusMultiplier = 2.5)
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_4 })
-      );
-
-      // WHEN checking a long word
-      const mechanicResult = result.current.checkWord('PHRASE');
-
-      // THEN score multiplier should be 2.5
-      expect(mechanicResult.scoreMultiplier).toBe(2.5);
-    });
-
-    it('should apply 1.0x multiplier for short words', () => {
-      // GIVEN World 4 boss
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_4 })
-      );
-
-      // WHEN checking a short word
-      const mechanicResult = result.current.checkWord('WORD');
-
-      // THEN score multiplier should be 1.0 (neutral)
-      expect(mechanicResult.scoreMultiplier).toBe(1.0);
-    });
-
-    it('should not penalize short words (neutral 1.0x)', () => {
-      // GIVEN World 4 boss
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_4 })
-      );
-
-      // WHEN checking multiple short words
-      const shortWords = ['CAT', 'DOG', 'TALK', 'SPEAK'];
-      for (const word of shortWords) {
-        const mechanicResult = result.current.checkWord(word);
-        // THEN should have neutral multiplier (1.0)
-        expect(mechanicResult.scoreMultiplier).toBe(1.0);
-      }
-    });
-  });
-
-  describe('feedback and taunts', () => {
-    it('should NOT have feedbackKey for stub implementation (long words)', () => {
-      // GIVEN World 4 boss
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_4 })
-      );
-
-      // WHEN checking a long word
-      const mechanicResult = result.current.checkWord('PHRASE');
-
-      // THEN feedbackKey should be undefined (stub has no feedback)
-      expect(mechanicResult.feedbackKey).toBeUndefined();
-    });
-
-    it('should NOT have feedbackKey for short words', () => {
-      // GIVEN World 4 boss
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_4 })
-      );
-
-      // WHEN checking a short word
-      const mechanicResult = result.current.checkWord('WORD');
-
-      // THEN feedbackKey should be undefined
-      expect(mechanicResult.feedbackKey).toBeUndefined();
-    });
-
-    it('should trigger onMechanic taunt for long words', () => {
-      // GIVEN World 4 boss
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_4 })
-      );
-
-      // WHEN checking a 6+ letter word
-      const mechanicResult = result.current.checkWord('SAYING');
-
-      // THEN should trigger mechanic taunt
-      expect(mechanicResult.triggerTaunt).toBe('onMechanic');
-    });
-
-    it('should NOT trigger taunt for short words', () => {
-      // GIVEN World 4 boss
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_4 })
-      );
-
-      // WHEN checking a short word
-      const mechanicResult = result.current.checkWord('TALK');
-
-      // THEN should not trigger taunt
-      expect(mechanicResult.triggerTaunt).toBeUndefined();
-    });
-  });
-
-  describe('trigger effects', () => {
-    it('should trigger effect for long words', () => {
-      // GIVEN World 4 boss
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_4 })
-      );
-
-      // WHEN checking a 6+ letter word
-      const mechanicResult = result.current.checkWord('PROVERB');
-
-      // THEN should trigger visual effect
-      expect(mechanicResult.triggerEffect).toBe(true);
-    });
-
-    it('should NOT trigger effect for short words', () => {
-      // GIVEN World 4 boss
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_4 })
-      );
-
-      // WHEN checking a short word
-      const mechanicResult = result.current.checkWord('CAT');
-
-      // THEN should not trigger effect
-      expect(mechanicResult.triggerEffect).toBe(false);
+    it('should handle empty string', () => {
+      const { result } = renderHook(() => useBossMechanics({ worldId: WORLD_4 }));
+      expect(result.current.checkWord('').meetsRequirement).toBe(false);
     });
   });
 
   describe('case insensitivity', () => {
-    it('should detect phrase (lowercase) as meeting requirement', () => {
-      // GIVEN World 4 boss
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_4 })
-      );
-
-      // WHEN checking lowercase word
-      const mechanicResult = result.current.checkWord('phrase');
-
-      // THEN should detect (length check is case insensitive)
-      expect(mechanicResult.meetsRequirement).toBe(true);
+    it('should detect kayak (lowercase)', () => {
+      const { result } = renderHook(() => useBossMechanics({ worldId: WORLD_4 }));
+      expect(result.current.checkWord('kayak').meetsRequirement).toBe(true);
     });
 
-    it('should detect Phrase (mixed case) as meeting requirement', () => {
-      // GIVEN World 4 boss
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_4 })
-      );
+    it('should detect Kayak (mixed case)', () => {
+      const { result } = renderHook(() => useBossMechanics({ worldId: WORLD_4 }));
+      expect(result.current.checkWord('Kayak').meetsRequirement).toBe(true);
+    });
+  });
 
-      // WHEN checking mixed case word
-      const mechanicResult = result.current.checkWord('Phrase');
+  describe('feedback and effects', () => {
+    it('should trigger taunt and effect for matches', () => {
+      const { result } = renderHook(() => useBossMechanics({ worldId: WORLD_4 }));
+      const r = result.current.checkWord('ROAR');
+      expect(r.triggerTaunt).toBe('onMechanic');
+      expect(r.triggerEffect).toBe(true);
+      expect(r.feedbackKey).toBe('adventure.bosses.common.fullCircleWord');
+    });
 
-      // THEN should detect
-      expect(mechanicResult.meetsRequirement).toBe(true);
+    it('should NOT trigger taunt for non-matches', () => {
+      const { result } = renderHook(() => useBossMechanics({ worldId: WORLD_4 }));
+      const r = result.current.checkWord('HOUSE');
+      expect(r.triggerTaunt).toBeUndefined();
+      expect(r.triggerEffect).toBe(false);
     });
   });
 });
 
 // ==============================================
-// ASSEMBLY LINE TESTS (World 5 - Baron Buildaword)
+// ASSEMBLY LINE (World 5 — Common Prefix/Suffix)
 // ==============================================
 
 describe('useBossMechanics - assemblyLine (World 5 Baron Buildaword)', () => {
-  describe('boss configuration', () => {
-    it('should load Baron Buildaword for World 5', () => {
-      // GIVEN World 5 boss
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_5 })
-      );
+  it('should load baronBuildaword boss with assemblyLine twist', () => {
+    const { result } = renderHook(() => useBossMechanics({ worldId: WORLD_5 }));
+    expect(result.current.boss?.id).toBe('baronBuildaword');
+    expect(result.current.boss?.twistMechanic.type).toBe('assemblyLine');
+    expect(result.current.isActive).toBe(true);
+  });
 
-      // THEN should return Baron Buildaword boss config
-      expect(result.current.boss).toBeDefined();
-      expect(result.current.boss?.id).toBe('baronBuildaword');
+  describe('prefix detection', () => {
+    it('should trigger for UNDO (UN- prefix)', () => {
+      const { result } = renderHook(() => useBossMechanics({ worldId: WORLD_5 }));
+      const r = result.current.checkWord('UNDO');
+      expect(r.meetsRequirement).toBe(true);
+      expect(r.scoreMultiplier).toBe(3.0);
     });
 
-    it('should have assemblyLine twist type', () => {
-      // GIVEN World 5 boss
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_5 })
-      );
-
-      // THEN twist type should be assemblyLine
-      expect(result.current.boss?.twistMechanic.type).toBe('assemblyLine');
+    it('should trigger for REDO (RE- prefix)', () => {
+      const { result } = renderHook(() => useBossMechanics({ worldId: WORLD_5 }));
+      expect(result.current.checkWord('REDO').meetsRequirement).toBe(true);
     });
 
-    it('should return isActive true for World 5 boss level', () => {
-      // GIVEN World 5 boss
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_5 })
-      );
-
-      // THEN should be active
-      expect(result.current.isActive).toBe(true);
+    it('should trigger for PREVIEW (PRE- prefix)', () => {
+      const { result } = renderHook(() => useBossMechanics({ worldId: WORLD_5 }));
+      expect(result.current.checkWord('PREVIEW').meetsRequirement).toBe(true);
     });
 
-    it('should have compoundBonusMultiplier of 3.0 in params', () => {
-      // GIVEN World 5 boss
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_5 })
-      );
+    it('should trigger for OUTDOOR (OUT- prefix)', () => {
+      const { result } = renderHook(() => useBossMechanics({ worldId: WORLD_5 }));
+      expect(result.current.checkWord('OUTDOOR').meetsRequirement).toBe(true);
+    });
 
-      // THEN compoundBonusMultiplier should be 3.0
-      const params = result.current.boss?.twistMechanic.params;
-      expect(params?.compoundBonusMultiplier).toBe(3.0);
+    it('should trigger for OVERFLOW (OVER- prefix)', () => {
+      const { result } = renderHook(() => useBossMechanics({ worldId: WORLD_5 }));
+      expect(result.current.checkWord('OVERFLOW').meetsRequirement).toBe(true);
+    });
+
+    it('should trigger for DISABLE (DIS- prefix)', () => {
+      const { result } = renderHook(() => useBossMechanics({ worldId: WORLD_5 }));
+      expect(result.current.checkWord('DISABLE').meetsRequirement).toBe(true);
     });
   });
 
-  describe('5+ letter word bonus (MVP stub)', () => {
-    it('should trigger bonus for BUILD (5 letters)', () => {
-      // GIVEN World 5 boss (assemblyLine mechanic)
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_5 })
-      );
-
-      // WHEN checking a 5-letter word
-      const mechanicResult = result.current.checkWord('BUILD');
-
-      // THEN should meet requirement
-      expect(mechanicResult.meetsRequirement).toBe(true);
+  describe('suffix detection', () => {
+    it('should trigger for RUNNING (-ING suffix)', () => {
+      const { result } = renderHook(() => useBossMechanics({ worldId: WORLD_5 }));
+      expect(result.current.checkWord('RUNNING').meetsRequirement).toBe(true);
     });
 
-    it('should trigger bonus for HOUSE (5 letters)', () => {
-      // GIVEN World 5 boss
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_5 })
-      );
-
-      // WHEN checking HOUSE
-      const mechanicResult = result.current.checkWord('HOUSE');
-
-      // THEN should meet requirement
-      expect(mechanicResult.meetsRequirement).toBe(true);
+    it('should trigger for NATION (-TION suffix)', () => {
+      const { result } = renderHook(() => useBossMechanics({ worldId: WORLD_5 }));
+      expect(result.current.checkWord('NATION').meetsRequirement).toBe(true);
     });
 
-    it('should trigger bonus for TOWER (5 letters)', () => {
-      // GIVEN World 5 boss
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_5 })
-      );
-
-      // WHEN checking TOWER
-      const mechanicResult = result.current.checkWord('TOWER');
-
-      // THEN should meet requirement (5 >= 5)
-      expect(mechanicResult.meetsRequirement).toBe(true);
+    it('should trigger for KINDNESS (-NESS suffix)', () => {
+      const { result } = renderHook(() => useBossMechanics({ worldId: WORLD_5 }));
+      expect(result.current.checkWord('KINDNESS').meetsRequirement).toBe(true);
     });
 
-    it('should trigger bonus for CONSTRUCT (9 letters)', () => {
-      // GIVEN World 5 boss
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_5 })
-      );
-
-      // WHEN checking a 9-letter word
-      const mechanicResult = result.current.checkWord('CONSTRUCT');
-
-      // THEN should meet requirement
-      expect(mechanicResult.meetsRequirement).toBe(true);
+    it('should trigger for PAYMENT (-MENT suffix)', () => {
+      const { result } = renderHook(() => useBossMechanics({ worldId: WORLD_5 }));
+      expect(result.current.checkWord('PAYMENT').meetsRequirement).toBe(true);
     });
 
-    it('should trigger bonus for BUILDING (8 letters)', () => {
-      // GIVEN World 5 boss
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_5 })
-      );
+    it('should trigger for CAPABLE (-ABLE suffix)', () => {
+      const { result } = renderHook(() => useBossMechanics({ worldId: WORLD_5 }));
+      expect(result.current.checkWord('CAPABLE').meetsRequirement).toBe(true);
+    });
 
-      // WHEN checking an 8-letter word
-      const mechanicResult = result.current.checkWord('BUILDING');
+    it('should trigger for QUICKLY (-LY suffix)', () => {
+      const { result } = renderHook(() => useBossMechanics({ worldId: WORLD_5 }));
+      expect(result.current.checkWord('QUICKLY').meetsRequirement).toBe(true);
+    });
 
-      // THEN should meet requirement
-      expect(mechanicResult.meetsRequirement).toBe(true);
+    it('should trigger for CARELESS (-LESS suffix)', () => {
+      const { result } = renderHook(() => useBossMechanics({ worldId: WORLD_5 }));
+      expect(result.current.checkWord('CARELESS').meetsRequirement).toBe(true);
+    });
+
+    it('should trigger for HOPEFUL (-FUL suffix)', () => {
+      const { result } = renderHook(() => useBossMechanics({ worldId: WORLD_5 }));
+      expect(result.current.checkWord('HOPEFUL').meetsRequirement).toBe(true);
     });
   });
 
-  describe('4 letter and shorter word rejection', () => {
-    it('should NOT trigger bonus for WALL (4 letters)', () => {
-      // GIVEN World 5 boss
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_5 })
-      );
-
-      // WHEN checking a 4-letter word
-      const mechanicResult = result.current.checkWord('WALL');
-
-      // THEN should NOT meet requirement (4 < 5)
-      expect(mechanicResult.meetsRequirement).toBe(false);
+  describe('no prefix or suffix', () => {
+    it('should NOT trigger for WORD', () => {
+      const { result } = renderHook(() => useBossMechanics({ worldId: WORLD_5 }));
+      const r = result.current.checkWord('WORD');
+      expect(r.meetsRequirement).toBe(false);
+      expect(r.scoreMultiplier).toBe(1.0);
     });
 
-    it('should NOT trigger bonus for CAT (3 letters)', () => {
-      // GIVEN World 5 boss
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_5 })
-      );
-
-      // WHEN checking a 3-letter word
-      const mechanicResult = result.current.checkWord('CAT');
-
-      // THEN should NOT meet requirement
-      expect(mechanicResult.meetsRequirement).toBe(false);
+    it('should NOT trigger for LAMP', () => {
+      const { result } = renderHook(() => useBossMechanics({ worldId: WORLD_5 }));
+      expect(result.current.checkWord('LAMP').meetsRequirement).toBe(false);
     });
 
-    it('should NOT trigger bonus for IT (2 letters)', () => {
-      // GIVEN World 5 boss
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_5 })
-      );
-
-      // WHEN checking a 2-letter word
-      const mechanicResult = result.current.checkWord('IT');
-
-      // THEN should NOT meet requirement
-      expect(mechanicResult.meetsRequirement).toBe(false);
+    it('should NOT trigger for BRICK', () => {
+      const { result } = renderHook(() => useBossMechanics({ worldId: WORLD_5 }));
+      expect(result.current.checkWord('BRICK').meetsRequirement).toBe(false);
     });
 
-    it('should NOT trigger bonus for MAKE (4 letters)', () => {
-      // GIVEN World 5 boss
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_5 })
-      );
-
-      // WHEN checking a 4-letter word
-      const mechanicResult = result.current.checkWord('MAKE');
-
-      // THEN should NOT meet requirement
-      expect(mechanicResult.meetsRequirement).toBe(false);
-    });
-  });
-
-  describe('edge cases at 5-letter boundary', () => {
-    it('should pass for exactly 5 letters (BRICK)', () => {
-      // GIVEN World 5 boss
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_5 })
-      );
-
-      // WHEN checking exactly 5-letter word
-      const mechanicResult = result.current.checkWord('BRICK');
-
-      // THEN should meet requirement (5 >= 5)
-      expect(mechanicResult.meetsRequirement).toBe(true);
-      expect(mechanicResult.scoreMultiplier).toBe(3.0);
-    });
-
-    it('should fail for exactly 4 letters (WOOD)', () => {
-      // GIVEN World 5 boss
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_5 })
-      );
-
-      // WHEN checking exactly 4-letter word
-      const mechanicResult = result.current.checkWord('WOOD');
-
-      // THEN should NOT meet requirement (4 < 5)
-      expect(mechanicResult.meetsRequirement).toBe(false);
-      expect(mechanicResult.scoreMultiplier).toBe(1.0);
-    });
-
-    it('should handle empty string gracefully', () => {
-      // GIVEN World 5 boss
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_5 })
-      );
-
-      // WHEN checking empty string
-      const mechanicResult = result.current.checkWord('');
-
-      // THEN should NOT meet requirement
-      expect(mechanicResult.meetsRequirement).toBe(false);
-    });
-  });
-
-  describe('score multipliers', () => {
-    it('should apply 3.0x multiplier for 5+ letter words', () => {
-      // GIVEN World 5 boss (compoundBonusMultiplier = 3.0)
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_5 })
-      );
-
-      // WHEN checking a 5+ letter word
-      const mechanicResult = result.current.checkWord('BUILD');
-
-      // THEN score multiplier should be 3.0
-      expect(mechanicResult.scoreMultiplier).toBe(3.0);
-    });
-
-    it('should apply 1.0x multiplier for short words', () => {
-      // GIVEN World 5 boss
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_5 })
-      );
-
-      // WHEN checking a short word
-      const mechanicResult = result.current.checkWord('WALL');
-
-      // THEN score multiplier should be 1.0 (neutral)
-      expect(mechanicResult.scoreMultiplier).toBe(1.0);
-    });
-
-    it('should not penalize short words (neutral 1.0x)', () => {
-      // GIVEN World 5 boss
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_5 })
-      );
-
-      // WHEN checking multiple short words
-      const shortWords = ['CAT', 'DOG', 'WALL', 'MAKE'];
-      for (const word of shortWords) {
-        const mechanicResult = result.current.checkWord(word);
-        // THEN should have neutral multiplier (1.0)
-        expect(mechanicResult.scoreMultiplier).toBe(1.0);
-      }
-    });
-  });
-
-  describe('feedback and taunts', () => {
-    it('should have compoundDetected feedbackKey for long words', () => {
-      // GIVEN World 5 boss
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_5 })
-      );
-
-      // WHEN checking a long word
-      const mechanicResult = result.current.checkWord('BUILD');
-
-      // THEN feedbackKey should be compoundDetected
-      expect(mechanicResult.feedbackKey).toBe('adventure.bosses.common.compoundDetected');
-    });
-
-    it('should NOT have feedbackKey for short words', () => {
-      // GIVEN World 5 boss
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_5 })
-      );
-
-      // WHEN checking a short word
-      const mechanicResult = result.current.checkWord('WALL');
-
-      // THEN feedbackKey should be undefined
-      expect(mechanicResult.feedbackKey).toBeUndefined();
-    });
-
-    it('should trigger onMechanic taunt for long words', () => {
-      // GIVEN World 5 boss
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_5 })
-      );
-
-      // WHEN checking a 5+ letter word
-      const mechanicResult = result.current.checkWord('HOUSE');
-
-      // THEN should trigger mechanic taunt
-      expect(mechanicResult.triggerTaunt).toBe('onMechanic');
-    });
-
-    it('should NOT trigger taunt for short words', () => {
-      // GIVEN World 5 boss
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_5 })
-      );
-
-      // WHEN checking a short word
-      const mechanicResult = result.current.checkWord('MAKE');
-
-      // THEN should not trigger taunt
-      expect(mechanicResult.triggerTaunt).toBeUndefined();
-    });
-  });
-
-  describe('trigger effects', () => {
-    it('should trigger effect for long words', () => {
-      // GIVEN World 5 boss
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_5 })
-      );
-
-      // WHEN checking a 5+ letter word
-      const mechanicResult = result.current.checkWord('TOWER');
-
-      // THEN should trigger visual effect
-      expect(mechanicResult.triggerEffect).toBe(true);
-    });
-
-    it('should NOT trigger effect for short words', () => {
-      // GIVEN World 5 boss
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_5 })
-      );
-
-      // WHEN checking a short word
-      const mechanicResult = result.current.checkWord('CAT');
-
-      // THEN should not trigger effect
-      expect(mechanicResult.triggerEffect).toBe(false);
+    it('should handle empty string', () => {
+      const { result } = renderHook(() => useBossMechanics({ worldId: WORLD_5 }));
+      expect(result.current.checkWord('').meetsRequirement).toBe(false);
     });
   });
 
   describe('case insensitivity', () => {
-    it('should detect build (lowercase) as meeting requirement', () => {
-      // GIVEN World 5 boss
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_5 })
-      );
-
-      // WHEN checking lowercase word
-      const mechanicResult = result.current.checkWord('build');
-
-      // THEN should detect (length check is case insensitive)
-      expect(mechanicResult.meetsRequirement).toBe(true);
+    it('should detect undo (lowercase)', () => {
+      const { result } = renderHook(() => useBossMechanics({ worldId: WORLD_5 }));
+      expect(result.current.checkWord('undo').meetsRequirement).toBe(true);
     });
 
-    it('should detect Build (mixed case) as meeting requirement', () => {
-      // GIVEN World 5 boss
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_5 })
-      );
+    it('should detect Running (mixed case)', () => {
+      const { result } = renderHook(() => useBossMechanics({ worldId: WORLD_5 }));
+      expect(result.current.checkWord('Running').meetsRequirement).toBe(true);
+    });
+  });
 
-      // WHEN checking mixed case word
-      const mechanicResult = result.current.checkWord('Build');
+  describe('feedback and effects', () => {
+    it('should show compoundDetected feedback for matches', () => {
+      const { result } = renderHook(() => useBossMechanics({ worldId: WORLD_5 }));
+      const r = result.current.checkWord('UNDO');
+      expect(r.triggerTaunt).toBe('onMechanic');
+      expect(r.triggerEffect).toBe(true);
+      expect(r.feedbackKey).toBe('adventure.bosses.common.compoundDetected');
+    });
 
-      // THEN should detect
-      expect(mechanicResult.meetsRequirement).toBe(true);
+    it('should NOT trigger taunt for non-matches', () => {
+      const { result } = renderHook(() => useBossMechanics({ worldId: WORLD_5 }));
+      const r = result.current.checkWord('LAMP');
+      expect(r.triggerTaunt).toBeUndefined();
+      expect(r.triggerEffect).toBe(false);
     });
   });
 });
 
 // ==============================================
-// BABEL SUMMIT TESTS (World 9 - Linguist Sage)
+// BABEL SUMMIT (World 9 — Unique Letter Ratio)
 // ==============================================
 
 describe('useBossMechanics - babelSummit (World 9 Linguist Sage)', () => {
-  describe('boss configuration', () => {
-    it('should load Linguist Sage for World 9', () => {
-      // GIVEN World 9 boss
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_9 })
-      );
+  it('should load linguistSage boss with babelSummit twist', () => {
+    const { result } = renderHook(() => useBossMechanics({ worldId: WORLD_9 }));
+    expect(result.current.boss?.id).toBe('linguistSage');
+    expect(result.current.boss?.twistMechanic.type).toBe('babelSummit');
+    expect(result.current.isActive).toBe(true);
+  });
 
-      // THEN should return Linguist Sage boss config
-      expect(result.current.boss).toBeDefined();
-      expect(result.current.boss?.id).toBe('linguistSage');
+  describe('high unique-letter ratio (>=80%, min 4 letters)', () => {
+    it('should trigger for WORLD (5 unique / 5 total = 100%)', () => {
+      const { result } = renderHook(() => useBossMechanics({ worldId: WORLD_9 }));
+      const r = result.current.checkWord('WORLD');
+      expect(r.meetsRequirement).toBe(true);
+      expect(r.scoreMultiplier).toBe(3.0);
     });
 
-    it('should have babelSummit twist type', () => {
-      // GIVEN World 9 boss
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_9 })
-      );
-
-      // THEN twist type should be babelSummit
-      expect(result.current.boss?.twistMechanic.type).toBe('babelSummit');
+    it('should trigger for FRENCH (6 unique / 6 total = 100%)', () => {
+      const { result } = renderHook(() => useBossMechanics({ worldId: WORLD_9 }));
+      expect(result.current.checkWord('FRENCH').meetsRequirement).toBe(true);
     });
 
-    it('should return isActive true for World 9 boss level', () => {
-      // GIVEN World 9 boss
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_9 })
-      );
-
-      // THEN should be active
-      expect(result.current.isActive).toBe(true);
+    it('should trigger for HYPE (4 unique / 4 total = 100%)', () => {
+      const { result } = renderHook(() => useBossMechanics({ worldId: WORLD_9 }));
+      expect(result.current.checkWord('HYPE').meetsRequirement).toBe(true);
     });
 
-    it('should have universalWordBonusMultiplier of 3.0 in params', () => {
-      // GIVEN World 9 boss
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_9 })
-      );
-
-      // THEN universalWordBonusMultiplier should be 3.0
-      const params = result.current.boss?.twistMechanic.params;
-      expect(params?.universalWordBonusMultiplier).toBe(3.0);
+    it('should trigger for STUDY (5 unique / 5 total = 100%)', () => {
+      const { result } = renderHook(() => useBossMechanics({ worldId: WORLD_9 }));
+      expect(result.current.checkWord('STUDY').meetsRequirement).toBe(true);
     });
 
-    it('should have loanwordBonusMultiplier of 1.5 in params', () => {
-      // GIVEN World 9 boss
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_9 })
-      );
-
-      // THEN loanwordBonusMultiplier should be 1.5
-      const params = result.current.boss?.twistMechanic.params;
-      expect(params?.loanwordBonusMultiplier).toBe(1.5);
+    it('should trigger for LANKY (5 unique / 5 total = 100%)', () => {
+      const { result } = renderHook(() => useBossMechanics({ worldId: WORLD_9 }));
+      expect(result.current.checkWord('LANKY').meetsRequirement).toBe(true);
     });
   });
 
-  describe('6+ letter word bonus (MVP stub - universal word)', () => {
-    it('should trigger bonus for GLOBAL (6 letters)', () => {
-      // GIVEN World 9 boss (babelSummit mechanic)
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_9 })
-      );
-
-      // WHEN checking a 6-letter word
-      const mechanicResult = result.current.checkWord('GLOBAL');
-
-      // THEN should meet requirement
-      expect(mechanicResult.meetsRequirement).toBe(true);
+  describe('low unique-letter ratio rejection', () => {
+    it('should NOT trigger for TEETH (4 unique / 5 total = 80% but has TT+EE)', () => {
+      // TEETH = T,E,E,T,H → 3 unique / 5 = 60%
+      const { result } = renderHook(() => useBossMechanics({ worldId: WORLD_9 }));
+      expect(result.current.checkWord('TEETH').meetsRequirement).toBe(false);
     });
 
-    it('should trigger bonus for LINGUA (6 letters)', () => {
-      // GIVEN World 9 boss
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_9 })
-      );
-
-      // WHEN checking LINGUA
-      const mechanicResult = result.current.checkWord('LINGUA');
-
-      // THEN should meet requirement
-      expect(mechanicResult.meetsRequirement).toBe(true);
+    it('should NOT trigger for BANANA (3 unique / 6 total = 50%)', () => {
+      const { result } = renderHook(() => useBossMechanics({ worldId: WORLD_9 }));
+      const r = result.current.checkWord('BANANA');
+      expect(r.meetsRequirement).toBe(false);
     });
 
-    it('should trigger bonus for MULTILINGUAL (12 letters)', () => {
-      // GIVEN World 9 boss
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_9 })
-      );
-
-      // WHEN checking a 12-letter word
-      const mechanicResult = result.current.checkWord('MULTILINGUAL');
-
-      // THEN should meet requirement (12 >= 6)
-      expect(mechanicResult.meetsRequirement).toBe(true);
+    it('should NOT trigger for ASSESS (3 unique / 6 total = 50%)', () => {
+      const { result } = renderHook(() => useBossMechanics({ worldId: WORLD_9 }));
+      expect(result.current.checkWord('ASSESS').meetsRequirement).toBe(false);
     });
 
-    it('should trigger bonus for LANGUAGE (8 letters)', () => {
-      // GIVEN World 9 boss
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_9 })
-      );
-
-      // WHEN checking an 8-letter word
-      const mechanicResult = result.current.checkWord('LANGUAGE');
-
-      // THEN should meet requirement
-      expect(mechanicResult.meetsRequirement).toBe(true);
-    });
-
-    it('should trigger bonus for DIALECT (7 letters)', () => {
-      // GIVEN World 9 boss
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_9 })
-      );
-
-      // WHEN checking a 7-letter word
-      const mechanicResult = result.current.checkWord('DIALECT');
-
-      // THEN should meet requirement
-      expect(mechanicResult.meetsRequirement).toBe(true);
+    it('should NOT trigger for LETTER (4 unique / 6 total = 67%)', () => {
+      const { result } = renderHook(() => useBossMechanics({ worldId: WORLD_9 }));
+      expect(result.current.checkWord('LETTER').meetsRequirement).toBe(false);
     });
   });
 
-  describe('5 letter and shorter word - loanword fallback', () => {
-    it('should NOT meet requirement for SPEAK (5 letters)', () => {
-      // GIVEN World 9 boss
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_9 })
-      );
-
-      // WHEN checking a 5-letter word
-      const mechanicResult = result.current.checkWord('SPEAK');
-
-      // THEN should NOT meet requirement (5 < 6)
-      expect(mechanicResult.meetsRequirement).toBe(false);
+  describe('minimum length requirement', () => {
+    it('should NOT trigger for CAT (too short, 3 letters)', () => {
+      const { result } = renderHook(() => useBossMechanics({ worldId: WORLD_9 }));
+      expect(result.current.checkWord('CAT').meetsRequirement).toBe(false);
     });
 
-    it('should NOT meet requirement for SAY (3 letters)', () => {
-      // GIVEN World 9 boss
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_9 })
-      );
-
-      // WHEN checking a 3-letter word
-      const mechanicResult = result.current.checkWord('SAY');
-
-      // THEN should NOT meet requirement
-      expect(mechanicResult.meetsRequirement).toBe(false);
+    it('should NOT trigger for IT (too short)', () => {
+      const { result } = renderHook(() => useBossMechanics({ worldId: WORLD_9 }));
+      expect(result.current.checkWord('IT').meetsRequirement).toBe(false);
     });
 
-    it('should NOT meet requirement for WORD (4 letters)', () => {
-      // GIVEN World 9 boss
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_9 })
-      );
-
-      // WHEN checking a 4-letter word
-      const mechanicResult = result.current.checkWord('WORD');
-
-      // THEN should NOT meet requirement
-      expect(mechanicResult.meetsRequirement).toBe(false);
-    });
-
-    it('should NOT meet requirement for TALK (4 letters)', () => {
-      // GIVEN World 9 boss
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_9 })
-      );
-
-      // WHEN checking a 4-letter word
-      const mechanicResult = result.current.checkWord('TALK');
-
-      // THEN should NOT meet requirement
-      expect(mechanicResult.meetsRequirement).toBe(false);
+    it('should handle empty string', () => {
+      const { result } = renderHook(() => useBossMechanics({ worldId: WORLD_9 }));
+      expect(result.current.checkWord('').meetsRequirement).toBe(false);
     });
   });
 
-  describe('edge cases at 6-letter boundary', () => {
-    it('should pass for exactly 6 letters (FRENCH)', () => {
-      // GIVEN World 9 boss
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_9 })
-      );
-
-      // WHEN checking exactly 6-letter word
-      const mechanicResult = result.current.checkWord('FRENCH');
-
-      // THEN should meet requirement (6 >= 6)
-      expect(mechanicResult.meetsRequirement).toBe(true);
-      expect(mechanicResult.scoreMultiplier).toBe(3.0);
+  describe('loanword fallback multiplier for non-matches', () => {
+    it('should give 1.5x for words that dont meet requirement', () => {
+      const { result } = renderHook(() => useBossMechanics({ worldId: WORLD_9 }));
+      const r = result.current.checkWord('BANANA');
+      expect(r.meetsRequirement).toBe(false);
+      expect(r.scoreMultiplier).toBe(1.5);
     });
 
-    it('should fail for exactly 5 letters (DUTCH)', () => {
-      // GIVEN World 9 boss
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_9 })
-      );
-
-      // WHEN checking exactly 5-letter word
-      const mechanicResult = result.current.checkWord('DUTCH');
-
-      // THEN should NOT meet requirement (5 < 6)
-      expect(mechanicResult.meetsRequirement).toBe(false);
-      // NOTE: babelSummit returns loanwordBonusMultiplier for short words (not 1.0)
-      expect(mechanicResult.scoreMultiplier).toBe(1.5);
-    });
-
-    it('should handle empty string gracefully', () => {
-      // GIVEN World 9 boss
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_9 })
-      );
-
-      // WHEN checking empty string
-      const mechanicResult = result.current.checkWord('');
-
-      // THEN should NOT meet requirement
-      expect(mechanicResult.meetsRequirement).toBe(false);
-    });
-  });
-
-  describe('score multipliers (unique babelSummit pattern)', () => {
-    it('should apply 3.0x multiplier for 6+ letter words (universalWordBonus)', () => {
-      // GIVEN World 9 boss (universalWordBonusMultiplier = 3.0)
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_9 })
-      );
-
-      // WHEN checking a 6+ letter word
-      const mechanicResult = result.current.checkWord('GLOBAL');
-
-      // THEN score multiplier should be 3.0
-      expect(mechanicResult.scoreMultiplier).toBe(3.0);
-    });
-
-    it('should apply 1.5x multiplier for short words (loanwordBonus)', () => {
-      // GIVEN World 9 boss (loanwordBonusMultiplier = 1.5)
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_9 })
-      );
-
-      // WHEN checking a short word
-      const mechanicResult = result.current.checkWord('SPEAK');
-
-      // THEN score multiplier should be 1.5 (NOT 1.0 like other stubs)
-      expect(mechanicResult.scoreMultiplier).toBe(1.5);
-    });
-
-    it('should NOT return 1.0x for short words (unlike other stubs)', () => {
-      // GIVEN World 9 boss
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_9 })
-      );
-
-      // WHEN checking multiple short words
-      const shortWords = ['SAY', 'WORD', 'TALK', 'DUTCH'];
-      for (const word of shortWords) {
-        const mechanicResult = result.current.checkWord(word);
-        // THEN should have loanword multiplier (1.5), NOT neutral (1.0)
-        expect(mechanicResult.scoreMultiplier).toBe(1.5);
-      }
-    });
-
-    it('should provide small bonus (1.5x) even for very short words', () => {
-      // GIVEN World 9 boss
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_9 })
-      );
-
-      // WHEN checking a 2-letter word
-      const mechanicResult = result.current.checkWord('IT');
-
-      // THEN should still get loanword bonus (1.5)
-      expect(mechanicResult.scoreMultiplier).toBe(1.5);
-    });
-  });
-
-  describe('feedback and taunts', () => {
-    it('should NOT have feedbackKey for stub implementation (long words)', () => {
-      // GIVEN World 9 boss
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_9 })
-      );
-
-      // WHEN checking a long word
-      const mechanicResult = result.current.checkWord('GLOBAL');
-
-      // THEN feedbackKey should be undefined (stub has no feedback)
-      expect(mechanicResult.feedbackKey).toBeUndefined();
-    });
-
-    it('should NOT have feedbackKey for short words', () => {
-      // GIVEN World 9 boss
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_9 })
-      );
-
-      // WHEN checking a short word
-      const mechanicResult = result.current.checkWord('SPEAK');
-
-      // THEN feedbackKey should be undefined
-      expect(mechanicResult.feedbackKey).toBeUndefined();
-    });
-
-    it('should trigger onMechanic taunt for 6+ letter words', () => {
-      // GIVEN World 9 boss
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_9 })
-      );
-
-      // WHEN checking a 6+ letter word
-      const mechanicResult = result.current.checkWord('LINGUA');
-
-      // THEN should trigger mechanic taunt
-      expect(mechanicResult.triggerTaunt).toBe('onMechanic');
-    });
-
-    it('should NOT trigger taunt for short words', () => {
-      // GIVEN World 9 boss
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_9 })
-      );
-
-      // WHEN checking a short word
-      const mechanicResult = result.current.checkWord('SAY');
-
-      // THEN should not trigger taunt
-      expect(mechanicResult.triggerTaunt).toBeUndefined();
-    });
-  });
-
-  describe('trigger effects', () => {
-    it('should trigger effect for 6+ letter words', () => {
-      // GIVEN World 9 boss
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_9 })
-      );
-
-      // WHEN checking a 6+ letter word
-      const mechanicResult = result.current.checkWord('LANGUAGE');
-
-      // THEN should trigger visual effect
-      expect(mechanicResult.triggerEffect).toBe(true);
-    });
-
-    it('should NOT trigger effect for short words', () => {
-      // GIVEN World 9 boss
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_9 })
-      );
-
-      // WHEN checking a short word
-      const mechanicResult = result.current.checkWord('WORD');
-
-      // THEN should not trigger effect
-      expect(mechanicResult.triggerEffect).toBe(false);
+    it('should give 1.5x even for very short words', () => {
+      const { result } = renderHook(() => useBossMechanics({ worldId: WORLD_9 }));
+      expect(result.current.checkWord('IT').scoreMultiplier).toBe(1.5);
     });
   });
 
   describe('case insensitivity', () => {
-    it('should detect global (lowercase) as meeting requirement', () => {
-      // GIVEN World 9 boss
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_9 })
-      );
-
-      // WHEN checking lowercase word
-      const mechanicResult = result.current.checkWord('global');
-
-      // THEN should detect (length check is case insensitive)
-      expect(mechanicResult.meetsRequirement).toBe(true);
+    it('should detect world (lowercase)', () => {
+      const { result } = renderHook(() => useBossMechanics({ worldId: WORLD_9 }));
+      expect(result.current.checkWord('world').meetsRequirement).toBe(true);
     });
 
-    it('should detect Global (mixed case) as meeting requirement', () => {
-      // GIVEN World 9 boss
-      const { result } = renderHook(() =>
-        useBossMechanics({ worldId: WORLD_9 })
-      );
+    it('should detect World (mixed case)', () => {
+      const { result } = renderHook(() => useBossMechanics({ worldId: WORLD_9 }));
+      expect(result.current.checkWord('World').meetsRequirement).toBe(true);
+    });
+  });
 
-      // WHEN checking mixed case word
-      const mechanicResult = result.current.checkWord('Global');
+  describe('feedback and effects', () => {
+    it('should show diverseWord feedback for matches', () => {
+      const { result } = renderHook(() => useBossMechanics({ worldId: WORLD_9 }));
+      const r = result.current.checkWord('WORLD');
+      expect(r.triggerTaunt).toBe('onMechanic');
+      expect(r.triggerEffect).toBe(true);
+      expect(r.feedbackKey).toBe('adventure.bosses.common.diverseWord');
+    });
 
-      // THEN should detect
-      expect(mechanicResult.meetsRequirement).toBe(true);
+    it('should NOT trigger taunt for non-matches', () => {
+      const { result } = renderHook(() => useBossMechanics({ worldId: WORLD_9 }));
+      const r = result.current.checkWord('BANANA');
+      expect(r.triggerTaunt).toBeUndefined();
+      expect(r.triggerEffect).toBe(false);
     });
   });
 });

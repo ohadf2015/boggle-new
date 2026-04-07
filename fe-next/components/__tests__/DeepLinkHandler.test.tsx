@@ -38,7 +38,7 @@ vi.mock('@/utils/logger', () => ({
 // Mock i18n
 vi.mock('@/lib/i18n', () => ({
   defaultLocale: 'en',
-  locales: ['en', 'he', 'sv', 'ja'],
+  locales: ['en', 'he', 'sv', 'ja', 'es'],
 }));
 
 // Mock pushNotifications/tokenRegistration

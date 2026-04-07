@@ -151,7 +151,7 @@ export function useSinglePlayerCore({
     isGameActive: !!grid && !isPaused && !isGameOver,
   });
 
-  const trainingGridSize = useMemo(() => ({ rows: 5, cols: 5 }), []);
+  const trainingGridSize = useMemo(() => ({ rows: 4, cols: 4 }), []);
   const handleTrainingAnalysisComplete = useCallback(() => { }, []);
   const {
     trackPath: trainingAnalysisTrackPath, trackValidWord: trainingAnalysisTrackValidWord,
@@ -367,7 +367,9 @@ export function useSinglePlayerCore({
 
   useEffect(() => {
     const difficultyConfig = DIFFICULTIES[settings.difficulty];
-    const rows = difficultyConfig.rows; const cols = difficultyConfig.cols;
+    // Practice mode uses a smaller 4x4 grid for a gentler experience
+    const rows = settings.mode === 'practice' ? 4 : difficultyConfig.rows;
+    const cols = settings.mode === 'practice' ? 4 : difficultyConfig.cols;
     const totalCells = rows * cols;
     const baseWordCount = Math.min(35, Math.max(5, Math.floor(totalCells / 3)));
     const wordCount = settings.mode === 'practice' ? Math.min(50, baseWordCount * 2) : baseWordCount;

@@ -126,7 +126,7 @@ export const StatsSection: React.FC<StatsSectionProps> = ({
           >
             <div className="px-3 py-1 bg-gradient-to-r from-neo-pink/20 to-neo-yellow/20 border border-neo-pink/40 rounded-full">
               <span className="text-xs font-black text-neo-pink">
-                {t('wordHunt.stats.top')} {stats.yourStats.percentile}%
+                {t('wordHunt.stats.top')} {Math.max(1, 100 - stats.yourStats.percentile)}%
               </span>
             </div>
             {/* Shimmer sweep */}

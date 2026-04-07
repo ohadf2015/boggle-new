@@ -73,7 +73,7 @@ describe('validateBlastResult', () => {
   });
 
   it('should accept all valid languages', () => {
-    for (const lang of ['en', 'he', 'sv', 'ja']) {
+    for (const lang of ['en', 'he', 'sv', 'ja', 'es']) {
       const result = validateBlastResult({ ...validPayload, language: lang });
       expect(result.valid).toBe(true);
     }

@@ -117,7 +117,7 @@
 
 ## Critical Constraints
 - **Translation-First**: ALL UI text must use `t()` - NO hardcoded strings
-- **4-Language Support**: Add translations for Hebrew, English, Swedish, Japanese
+- **5-Language Support**: Add translations for Hebrew, English, Swedish, Japanese, Spanish
 - **RTL Testing**: Always test Hebrew rendering
 - **Input Validation**: Validate on BOTH frontend AND backend
 - **Error Handling**: Graceful degradation on failures

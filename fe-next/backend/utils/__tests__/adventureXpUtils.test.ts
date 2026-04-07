@@ -28,19 +28,19 @@ describe('adventureXpUtils', () => {
 
     it('should return appropriate XP for level 10 (mid game)', () => {
       const xp = getXpForLevel(10);
-      expect(xp).toBeGreaterThan(1000);
-      expect(xp).toBeLessThan(3000);
+      expect(xp).toBeGreaterThan(500);
+      expect(xp).toBeLessThan(2000);
     });
 
     it('should return appropriate XP for level 30 (late game)', () => {
       const xp = getXpForLevel(30);
-      expect(xp).toBeGreaterThan(10000);
-      expect(xp).toBeLessThan(30000);
+      expect(xp).toBeGreaterThan(3000);
+      expect(xp).toBeLessThan(15000);
     });
 
     it('should return appropriate XP for level 50 (max level)', () => {
       const xp = getXpForLevel(50);
-      expect(xp).toBeGreaterThan(50000);
+      expect(xp).toBeGreaterThan(15000);
     });
 
     it('should handle level 0 as level 1', () => {
@@ -269,8 +269,8 @@ describe('adventureXpUtils', () => {
       }
 
       expect(currentLevel).toBe(10);
-      expect(totalXp).toBeGreaterThan(1000);
-      expect(totalXp).toBeLessThan(5000);
+      expect(totalXp).toBeGreaterThan(500);
+      expect(totalXp).toBeLessThan(3000);
     });
 
     it('should maintain consistent XP curve across all levels', () => {

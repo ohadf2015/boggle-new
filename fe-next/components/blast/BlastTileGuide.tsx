@@ -25,10 +25,15 @@ const TILE_GUIDE_ENTRIES: Array<{ type: BlastTileType; indicator: string; key: s
   { type: 'gem', indicator: '💎', key: 'gem' },
   { type: 'mirror', indicator: '🪞', key: 'mirror' },
   { type: 'magnet', indicator: '🌀', key: 'magnet' },
+  { type: 'wildcard', indicator: '🃏', key: 'wildcard' },
+  { type: 'countdown', indicator: '⏳', key: 'countdown' },
+  { type: 'virus', indicator: '🦠', key: 'virus' },
+  { type: 'portal', indicator: '🌌', key: 'portal' },
+  { type: 'catalyst', indicator: '⚗️', key: 'catalyst' },
 ];
 
 /**
- * BlastTileGuide — modal showing all 13 tile types with descriptions.
+ * BlastTileGuide — modal showing all 18 tile types with descriptions.
  * Neo-brutalist styling, animated enter/exit.
  */
 export function BlastTileGuide({ isOpen, onClose, t }: BlastTileGuideProps) {

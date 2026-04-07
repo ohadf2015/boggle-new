@@ -14,6 +14,7 @@
  */
 
 import { create } from 'zustand';
+import { useShallow } from 'zustand/shallow';
 import { subscribeWithSelector } from 'zustand/middleware';
 import type { LetterGrid, Language } from '@/shared/types/game';
 import type { SurvivalGameResult } from '@/components/daily/survival';
@@ -138,14 +139,16 @@ export const useCustomPuzzleLeaderboard = () => useCustomPuzzleStore((state) => 
 export const useCustomPuzzlePlayerRank = () => useCustomPuzzleStore((state) => state.playerRank);
 export const useCustomPuzzleBeatCreator = () => useCustomPuzzleStore((state) => state.beatCreator);
 
-// Actions selector (never causes re-renders since actions are stable)
-export const useCustomPuzzleActions = () => useCustomPuzzleStore((state) => ({
-  setPhase: state.setPhase,
-  setPuzzle: state.setPuzzle,
-  setError: state.setError,
-  setGameResult: state.setGameResult,
-  setLeaderboard: state.setLeaderboard,
-  setPlayerRank: state.setPlayerRank,
-  setBeatCreator: state.setBeatCreator,
-  resetAll: state.resetAll,
-}));
+// Actions selector — useShallow prevents infinite re-renders from new object refs
+export const useCustomPuzzleActions = () => useCustomPuzzleStore(
+  useShallow((state) => ({
+    setPhase: state.setPhase,
+    setPuzzle: state.setPuzzle,
+    setError: state.setError,
+    setGameResult: state.setGameResult,
+    setLeaderboard: state.setLeaderboard,
+    setPlayerRank: state.setPlayerRank,
+    setBeatCreator: state.setBeatCreator,
+    resetAll: state.resetAll,
+  })),
+);

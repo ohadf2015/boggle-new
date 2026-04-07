@@ -66,15 +66,13 @@ export function useAdventureQuestTracking(params: UseAdventureQuestTrackingParam
   const prevGridEffectRef = useRef(gridEffectTrigger);
   useEffect(() => {
     if (gridEffectTrigger !== prevGridEffectRef.current && gridEffectTrigger) {
-      // Boss objective: mechanicTrigger
-      if (isBossLevel) {
-        updateObjective('mechanicTrigger', 1, 'increment');
-      }
+      // Mechanic trigger objective (boss AND regular levels with mechanics)
+      updateObjective('mechanicTrigger', 1, 'increment');
       // Chapter quest: world mechanic use
       chapterQuestsRef.current.recordWorldMechanicUse();
     }
     prevGridEffectRef.current = gridEffectTrigger;
-  }, [isBossLevel, gridEffectTrigger, updateObjective]);
+  }, [gridEffectTrigger, updateObjective]);
 
   // Daily quest progress: track words found, long words, and combos
   const prevQuestWordsRef = useRef(wordsFound.length);

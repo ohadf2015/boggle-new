@@ -1,6 +1,12 @@
-import { generateLootChest, type LootChest, type LootDrop } from '../lootConfig';
+import { vi } from 'vitest';
+import { generateLootChest } from '../lootConfig';
 
 describe('generateLootChest', () => {
+  // Mock Math.random to 0.5 for deterministic tests (variance = 0.85 + 0.15 = 1.0, lucky = no)
+  let randomSpy: ReturnType<typeof vi.spyOn>;
+  beforeEach(() => { randomSpy = vi.spyOn(Math, 'random').mockReturnValue(0.5); });
+  afterEach(() => { randomSpy.mockRestore(); });
+
   it('always includes a gold drop with world-scaled formula', () => {
     const chest = generateLootChest(1, 1, 2, 300, 1);
     const gold = chest.drops.find(d => d.type === 'gold');
@@ -34,8 +40,8 @@ describe('generateLootChest', () => {
     const chest = generateLootChest(1, 1, 1, 100, 1);
     const xp = chest.drops.find(d => d.type === 'xp');
     expect(xp).toBeDefined();
-    // 25 + 1*15 = 40
-    expect(xp!.amount).toBe(40);
+    // 25 + 1*15 + 1*10 = 50 (world scaling)
+    expect(xp!.amount).toBe(50);
   });
 
   it('guarantees bonus gold on 3-star', () => {
@@ -110,5 +116,60 @@ describe('generateLootChest', () => {
     for (const drop of chest.drops) {
       expect(drop.nameKey).toBeTruthy();
     }
+  });
+
+  describe('variable loot drops', () => {
+    beforeEach(() => { randomSpy.mockRestore(); });
+
+    it('gold amount varies between runs for same inputs', () => {
+      const results = new Set<number>();
+      for (let i = 0; i < 20; i++) {
+        const chest = generateLootChest(3, 3, 2, 300, 1);
+        const gold = chest.drops.find(d => d.type === 'gold')!.amount;
+        results.add(gold);
+      }
+      // With ±15% variance, we should see at least 2 different values in 20 runs
+      expect(results.size).toBeGreaterThanOrEqual(2);
+    });
+
+    it('gold variance stays within ±20% of base', () => {
+      // World 3, level 3, 2 stars, multiplier 1
+      // baseGold = (10 + 9) * 2 = 38, perfectBonus = 0 → base = 38
+      const base = 38;
+      for (let i = 0; i < 50; i++) {
+        const chest = generateLootChest(3, 3, 2, 300, 1);
+        const gold = chest.drops.find(d => d.type === 'gold')!.amount;
+        expect(gold).toBeGreaterThanOrEqual(Math.floor(base * 0.8));
+        expect(gold).toBeLessThanOrEqual(Math.ceil(base * 1.2));
+      }
+    });
+
+    it('can produce a lucky bonus drop', () => {
+      // Run many times, at least once we should see a lucky drop
+      let sawLucky = false;
+      for (let i = 0; i < 200; i++) {
+        const chest = generateLootChest(2, 3, 2, 300, 1);
+        if (chest.drops.some(d => d.nameKey === 'adventure.loot.luckyBonus')) {
+          sawLucky = true;
+          break;
+        }
+      }
+      expect(sawLucky).toBe(true);
+    });
+
+    it('lucky bonus has rare rarity', () => {
+      // Keep generating until we get a lucky drop
+      for (let i = 0; i < 500; i++) {
+        const chest = generateLootChest(2, 3, 2, 300, 1);
+        const lucky = chest.drops.find(d => d.nameKey === 'adventure.loot.luckyBonus');
+        if (lucky) {
+          expect(lucky.rarity).toBe('rare');
+          expect(lucky.type).toBe('bonusGold');
+          return;
+        }
+      }
+      // If we never got one in 500 tries, that's a problem (10% chance per run)
+      throw new Error('Never generated a lucky bonus in 500 attempts');
+    });
   });
 });

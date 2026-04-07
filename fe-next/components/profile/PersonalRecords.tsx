@@ -58,7 +58,7 @@ export function PersonalRecords() {
 
   const handleShare = useCallback((record: PersonalRecord) => {
     const text = `${t(record.label)}: ${record.value} - LexiClash`;
-    navigator.clipboard.writeText(text);
+    navigator.clipboard.writeText(text).catch(() => {});
   }, [t]);
 
   if (isLoading) return null;

@@ -43,14 +43,10 @@ describe('getWaveConfig', () => {
     expect(w5.vowelModifier).toBeLessThan(w3.vowelModifier);
   });
 
-  it('increases minWordLength at wave 3', () => {
-    expect(getWaveConfig(2).minWordLength).toBe(2);
-    expect(getWaveConfig(3).minWordLength).toBe(3);
-  });
-
-  it('increases minWordLength at wave 6', () => {
-    expect(getWaveConfig(5).minWordLength).toBe(3);
-    expect(getWaveConfig(6).minWordLength).toBe(4);
+  it('keeps minWordLength at 2 for all waves', () => {
+    for (let wave = 1; wave <= 12; wave++) {
+      expect(getWaveConfig(wave).minWordLength).toBe(2);
+    }
   });
 
   it('enables lightning at wave 4', () => {
@@ -78,18 +74,18 @@ describe('getWaveConfig', () => {
     expect(getWaveConfig(6).frozenEnabled).toBe(true);
   });
 
-  it('has scoreThreshold starting at wave 4 (wave 3 is threshold-free for learning)', () => {
+  it('has scoreThreshold starting at wave 3', () => {
     expect(getWaveConfig(1).scoreThreshold).toBeUndefined();
     expect(getWaveConfig(2).scoreThreshold).toBeUndefined();
-    expect(getWaveConfig(3).scoreThreshold).toBeUndefined();
-    expect(getWaveConfig(4).scoreThreshold).toBe(150);
+    expect(getWaveConfig(3).scoreThreshold).toBe(80);
+    expect(getWaveConfig(4).scoreThreshold).toBe(180);
   });
 
   it('increases scoreThreshold for later waves', () => {
-    expect(getWaveConfig(4).scoreThreshold).toBe(150);
-    expect(getWaveConfig(5).scoreThreshold).toBe(200);
-    expect(getWaveConfig(6).scoreThreshold).toBe(300);
-    expect(getWaveConfig(7).scoreThreshold).toBe(400);
+    expect(getWaveConfig(4).scoreThreshold).toBe(180);
+    expect(getWaveConfig(5).scoreThreshold).toBe(250);
+    expect(getWaveConfig(6).scoreThreshold).toBe(350);
+    expect(getWaveConfig(7).scoreThreshold).toBe(450);
   });
 
   it('caps scaling at wave 12+ (no further changes beyond last WAVE_TABLE entry)', () => {

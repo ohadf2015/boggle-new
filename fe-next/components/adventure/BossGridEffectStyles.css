@@ -11,10 +11,10 @@
    ============================================ */
 
 @keyframes boss-tile-darken {
-  0%   { filter: brightness(1) blur(0px); }
-  30%  { filter: brightness(0.15) blur(3px); }
-  70%  { filter: brightness(0.2) blur(2px); }
-  100% { filter: brightness(1) blur(0px); }
+  0%   { filter: brightness(1); opacity: 1; }
+  30%  { filter: brightness(0.15); opacity: 0.4; }
+  70%  { filter: brightness(0.2); opacity: 0.5; }
+  100% { filter: brightness(1); opacity: 1; }
 }
 
 .boss-effect-obscure-cavein [role="gridcell"]:nth-child(3n),
@@ -131,10 +131,10 @@
 }
 
 @keyframes boss-tile-maze {
-  0%   { filter: blur(0px); }
-  25%  { filter: blur(4px) brightness(0.7); }
-  75%  { filter: blur(1px) brightness(0.9); }
-  100% { filter: blur(0px); }
+  0%   { opacity: 1; }
+  25%  { opacity: 0.3; filter: brightness(0.7); }
+  75%  { opacity: 0.7; filter: brightness(0.9); }
+  100% { opacity: 1; }
 }
 
 .boss-effect-scramble-full [role="gridcell"] span {

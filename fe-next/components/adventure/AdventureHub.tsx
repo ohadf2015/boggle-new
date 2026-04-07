@@ -11,7 +11,7 @@
 import { memo, useMemo } from 'react';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import Image from 'next/image';
-import { Flame, ChevronRight, Map, Swords, Target, Check, Coins, Star, BookOpen, ShoppingBag, Home, Crown, Zap, Infinity as InfinityIcon } from 'lucide-react';
+import { Flame, ChevronRight, Map, Swords, Target, Check, Coins, Star, BookOpen, ShoppingBag, Home, Crown, Zap, Infinity as InfinityIcon, Gem, Trophy } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { GhostRivalWidget } from '@/components/engagement/GhostRivalWidget';
@@ -50,7 +50,11 @@ interface AdventureHubProps {
 
   onBossRush?: () => void;
   canBossRush?: boolean;
+  onOpenRunes?: () => void;
+  runeCount?: number;
   onOpenWordAlbum?: () => void;
+  onOpenCollection?: () => void;
+  collectionCount?: number;
   ascensionLevel?: number;
   weeklyModifiers?: WeeklyModifier[];
 }
@@ -94,8 +98,12 @@ const AdventureHub = memo<AdventureHubProps>(({
   onBossRush,
   canBossRush = false,
 
+  onOpenRunes,
+  runeCount = 0,
   wordAlbumCount = 0,
   onOpenWordAlbum,
+  onOpenCollection,
+  collectionCount = 0,
   ascensionLevel = 0,
   weeklyModifiers = [],
 }) => {
@@ -451,6 +459,30 @@ const AdventureHub = memo<AdventureHubProps>(({
             {t('adventure.shop.title')}
           </AdaptiveMotion.button>
 
+          {onOpenRunes && (
+            <AdaptiveMotion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={onOpenRunes}
+              className={cn(
+                'flex-1 py-2.5 px-3',
+                'flex items-center justify-center gap-1.5',
+                'bg-neo-purple/10 text-neo-purple',
+                'font-bold text-xs',
+                'border border-neo-purple/30 rounded-neo',
+                'hover:bg-neo-purple/20 transition-colors'
+              )}
+            >
+              <Gem className="w-4 h-4" />
+              {t('adventure.runes.title')}
+              {runeCount > 0 && (
+                <span className="text-[10px] font-mono text-neo-purple tabular-nums">
+                  {runeCount}
+                </span>
+              )}
+            </AdaptiveMotion.button>
+          )}
+
           {onOpenWordAlbum && (
             <AdaptiveMotion.button
               whileHover={{ scale: 1.05 }}
@@ -470,6 +502,31 @@ const AdventureHub = memo<AdventureHubProps>(({
               {wordAlbumCount > 0 && (
                 <span className="text-[10px] font-mono text-neo-cyan tabular-nums">
                   {wordAlbumCount}
+                </span>
+              )}
+            </AdaptiveMotion.button>
+          )}
+
+          {onOpenCollection && (
+            <AdaptiveMotion.button
+              data-testid="hub-open-collection"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={onOpenCollection}
+              className={cn(
+                'flex-1 py-2.5 px-3',
+                'flex items-center justify-center gap-1.5',
+                'bg-neo-pink/10 text-neo-pink',
+                'font-bold text-xs',
+                'border border-neo-pink/30 rounded-neo',
+                'hover:bg-neo-pink/20 transition-colors'
+              )}
+            >
+              <Trophy className="w-4 h-4" />
+              {t('adventure.collection.title')}
+              {collectionCount > 0 && (
+                <span className="text-[10px] font-mono text-neo-pink tabular-nums">
+                  {collectionCount}
                 </span>
               )}
             </AdaptiveMotion.button>

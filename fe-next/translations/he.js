@@ -3910,7 +3910,7 @@ const he = {
     "best": "הכי טוב",
     "target": "יעד",
     "totalPoints": "סה״כ נק׳",
-    "topPercent": "${percent}% העליונים",
+    "topPercent": "{percent}% העליונים",
     "noRankYet": "שחק משחקים כדי להיכנס לדירוג!",
     "viewLeaderboard": "צפייה בטבלת מובילים",
     "friends": "חברים",
@@ -4265,7 +4265,7 @@ const he = {
     "multiPlayer": "רב משתתפים",
     "multiplayer": "רב משתתפים",
     "multiplayerDesc": "התחרה עם חברים בזמן אמת!",
-    "arena": "זירת המילים",
+    "arena": "מולטיפלייר",
     "arenaDesc": "שחקו לבד או אתגרו חברים!",
     "practice": "תרגול",
     "practiceDesc": "בלי לחץ, רק מילים",
@@ -5194,7 +5194,8 @@ const he = {
         "classic": "קלאסי",
         "blitz": "בליץ",
         "survival": "הישרדות"
-      }
+      },
+      "sent": "האתגר נשלח!"
     },
     "copyInviteLink": "העתק קישור הזמנה",
     "linkCopied": "הקישור הועתק!",
@@ -6275,9 +6276,63 @@ const he = {
     "perfect": "מושלם!",
     "restart": "מחדש",
     "gold": "זהב",
+    "archetype": {
+      "standard": "רגיל",
+      "excavation": "חפירה",
+      "goldRush": "בהלת זהב",
+      "puzzle": "חידה",
+      "survival": "הישרדות",
+      "cascade": "מפולת",
+      "boss": "קרב בוס"
+    },
+    "mastery": {
+      "title": "מומחיות ארכיטיפ",
+      "tier": {
+        "none": "ללא דרגה",
+        "bronze": "ארד",
+        "silver": "כסף",
+        "gold": "זהב",
+        "diamond": "יהלום"
+      },
+      "progress": "{current}/{target} כוכבים",
+      "bonusUnlocked": "בונוס נפתח: {description}",
+      "nextTier": "דרגה הבאה: {tier} (עוד {remaining} כוכבים)"
+    },
+    "runes": {
+      "title": "אוסף רונות",
+      "forge": "יצירת רונה",
+      "equip": "לצייד",
+      "unequip": "להסיר",
+      "equipped": "מצוידות ({count}/{max})",
+      "fragments": "{count} שברים",
+      "forgeCost": "עלות: {cost} שברים",
+      "alreadyOwned": "כבר בבעלותך",
+      "notEnoughFragments": "אין מספיק שברים",
+      "fragment": "שבר רונה",
+      "slotsFull": "כל המשבצות תפוסות",
+      "rarity": {
+        "common": "נפוצה",
+        "rare": "נדירה",
+        "epic": "אפית",
+        "legendary": "אגדית"
+      },
+      "ember": { "name": "רונת גחלת", "desc": "+10% בונוס ניקוד" },
+      "inferno": { "name": "רונת להבה", "desc": "+25% בונוס ניקוד" },
+      "midas": { "name": "רונת מידאס", "desc": "+15% בונוס זהב" },
+      "fortune": { "name": "רונת מזל", "desc": "+40% בונוס זהב" },
+      "hourglass": { "name": "רונת שעון חול", "desc": "+5 שניות בונוס" },
+      "eternity": { "name": "רונת נצח", "desc": "+12 שניות בונוס" },
+      "flow": { "name": "רונת זרימה", "desc": "15% דעיכת קומבו איטית" },
+      "torrent": { "name": "רונת סערה", "desc": "35% דעיכת קומבו איטית" },
+      "insight": { "name": "רונת תובנה", "desc": "+1 רמז" },
+      "oracle": { "name": "רונת נביא", "desc": "+2 רמזים" },
+      "valor": { "name": "רונת אומץ", "desc": "+20% נזק לבוס" },
+      "dragonslayer": { "name": "רונת קוטל דרקונים", "desc": "+50% נזק לבוס" }
+    },
     "loading": "טוען הרפתקה...",
     "currency": {
-      "goldAmount": "{amount} זהב"
+      "goldAmount": "{amount} זהב",
+      "coinIcon": "מטבע"
     },
     "levelLocked": "שלב {level} — נעול",
     "bossLevel": "שלב בוס {level}",
@@ -6341,6 +6396,18 @@ const he = {
       "bossRushLocked": "נצחו את כל הבוסים כדי לפתוח קרב בוסים",
       "allQuestsComplete": "כל המשימות היומיות הושלמו! בונוס!",
       "dailyQuestBonusComplete": "כל המשימות הושלמו! +50 זהב בונוס"
+    },
+    "share": {
+      "perfectClear": "ניצחון מושלם",
+      "bestWord": "המילה הטובה",
+      "wordsFound": "מילים נמצאו"
+    },
+    "streak": {
+      "days": "ימי רצף",
+      "milestone3": "רצף של 3 ימים!",
+      "milestone7": "לוחם שבועי!",
+      "milestone14": "אלוף שבועיים!",
+      "milestone30": "אגדה חודשית!"
     },
     "album": {
       "title": "אלבום מילים",
@@ -6589,14 +6656,14 @@ const he = {
     },
     "mechanic": {
       "synonymPairs": "זוגות נרדפים",
-      "etymologyRoots": "בונוס לשורשים לטיניים/יווניים",
-      "idioms": "אתגרי ביטויים נסתרים",
-      "compounds": "+30% למילים מורכבות",
-      "anagrams": "פתרו אנגרמות לבונוסים",
-      "palindromes": "+50% לפלינדרומים",
-      "rareWords": "+40% למילים נדירות/חדשות",
-      "multilingual": "בונוסים למילים רב-לשוניות",
-      "allMechanics": "כל המכניקות משולבות"
+      "etymologyRoots": "שורשי מילים",
+      "idioms": "ציד ביטויים",
+      "compounds": "מילים מורכבות",
+      "anagrams": "אנגרמות",
+      "palindromes": "פלינדרומים",
+      "rareWords": "מילים נדירות",
+      "multilingual": "פוליגלוט",
+      "allMechanics": "כל המכניקות"
     },
     "objectives": {
       "wordCount": "מצאו מילים",
@@ -6716,7 +6783,8 @@ const he = {
       "yourProgress": "ההתקדמות שלכם",
       "bestWords": "מילים הכי טובות",
       "bestScore": "ניקוד הכי טוב",
-      "attempts": "ניסיונות"
+      "attempts": "ניסיונות",
+      "nearMissTitle": "כמעט!"
     },
     "preview": {
       "title": "תצוגה מקדימה של שלב",
@@ -7556,7 +7624,35 @@ const he = {
   },
   "blast": {
     "chain": {
-      "badge": "שרשרת x{level}"
+      "badge": "שרשרת x{level}",
+      "cascade": "!שרשרת",
+      "double": "!כפול",
+      "triple": "!משולש",
+      "mega": "!מגה",
+      "ultra": "!!אולטרה"
+    },
+    "praise": {
+      "nice": "!יפה",
+      "great": "!מעולה",
+      "brilliant": "!גאוני",
+      "amazing": "!מדהים",
+      "legendary": "!!אגדי"
+    },
+    "waveClear": {
+      "perfect": "!מושלם",
+      "great": "!מצוין",
+      "clear": "!נוקה"
+    },
+    "milestone": {
+      "100": "!100",
+      "250": "!250",
+      "500": "!500",
+      "750": "!750",
+      "1000": "!1000",
+      "1500": "!1500",
+      "2000": "!2000",
+      "3000": "!3000",
+      "5000": "+5000"
     },
     "tile": {
       "gold":      { "name": "זהב",      "desc": "ניקוד ×3 + מהלך בונוס 1." },
@@ -9146,7 +9242,8 @@ const he = {
     "send": "שלח מתנה",
     "sent": "המתנה נשלחה!",
     "limitReached": "הגעת למגבלה היומית",
-    "error": "שליחה נכשלה. נסה שוב?"
+    "error": "שליחה נכשלה. נסה שוב?",
+    "received": "{sender} שלח/ה לך {type}!"
   },
   "faq": {
     "title": "שאלות נפוצות",
@@ -9845,21 +9942,33 @@ const he = {
       "mega": "!מגה",
       "ultra": "!!אולטרה"
     },
+    "praise": {
+      "nice": "!יפה",
+      "great": "!מעולה",
+      "brilliant": "!גאוני",
+      "amazing": "!מדהים",
+      "legendary": "!!אגדי"
+    },
     "tileGuide": {
       "title": "מדריך אריחים",
-      "standard": { "name": "רגיל", "desc": "אריח בסיסי" },
-      "gold": { "name": "זהב", "desc": "מכפיל ניקוד x3" },
-      "silver": { "name": "כסף", "desc": "מכפיל ניקוד x1.5" },
-      "diamond": { "name": "יהלום", "desc": "מכפיל ניקוד x5" },
-      "bomb": { "name": "פצצה", "desc": "מנקה אזור 3x3" },
-      "lightning": { "name": "ברק", "desc": "מנקה עמודה שלמה" },
-      "prism": { "name": "פריזמה", "desc": "מנקה בצורת צלב" },
-      "rainbow": { "name": "קשת", "desc": "מעתיק את המיוחד הטוב ביותר בסביבה" },
-      "ice": { "name": "קרח", "desc": "מכשול — פגעו כדי לשבור" },
-      "frozen": { "name": "קפוא", "desc": "2 פגיעות לשחרור המיוחד הפנימי" },
-      "gem": { "name": "אבן חן", "desc": "3 פגיעות — יוצר 2 מיוחדים" },
-      "mirror": { "name": "מראה", "desc": "מכפיל אפקט השותף" },
-      "magnet": { "name": "מגנט", "desc": "מושך ומפוצץ אריחים קרובים" }
+      "standard": { "name": "רגיל", "desc": "אריח בסיסי — ללא אפקט מיוחד" },
+      "gold": { "name": "זהב", "desc": "×3 ניקוד + 1 מהלך בונוס" },
+      "silver": { "name": "כסף", "desc": "×1.5 ניקוד + מאריך ספירות לאחור ב-1" },
+      "diamond": { "name": "יהלום", "desc": "×5 ניקוד + חושף תוכן קפוא ל-3 תורות" },
+      "bomb": { "name": "פצצה", "desc": "מנקה אזור 3×3 — משרשר לפצצות סמוכות" },
+      "lightning": { "name": "ברק", "desc": "מנקה עמודה שלמה — משרשר לברקים אחרים" },
+      "prism": { "name": "פריזמה", "desc": "2 פגיעות — מנקה שורה + עמודה, יוצר 2 מיוחדים" },
+      "rainbow": { "name": "קשת", "desc": "מעתיק את המיוחד הטוב במילה, או ×2 ניקוד" },
+      "ice": { "name": "קרח", "desc": "2 פגיעות לשבירה — מקפיא וירוסים סמוכים" },
+      "frozen": { "name": "קפוא", "desc": "2 פגיעות — משחרר מיוחד חבוי בפנים" },
+      "gem": { "name": "אבן חן", "desc": "3 פגיעות — יוצר 2 מיוחדים + 2 מהלכי בונוס" },
+      "mirror": { "name": "מראה", "desc": "מעתיק את המיוחד ההתקפי הראשון במילה" },
+      "magnet": { "name": "מגנט", "desc": "מושך אריחים קרובים פנימה, ואז מפוצץ 3×3" },
+      "wildcard": { "name": "ג׳וקר", "desc": "מתאים לכל אות — ניקוד לפי נדירות האות" },
+      "countdown": { "name": "ספירה לאחור", "desc": "נטרלו לפני 0! +2 מהלכים — או קנס 50 נק׳" },
+      "virus": { "name": "וירוס", "desc": "מתפשט כל תור — נקו 3+ במילה אחת לריפוי כולם" },
+      "portal": { "name": "פורטל", "desc": "מחוברים בזוגות — מנקה שניהם, ×2 ניקוד מילה" },
+      "catalyst": { "name": "זרז", "desc": "משדרג את כל האריחים הסמוכים למיוחדים" }
     },
     "objective": {
       "scoreTarget": "השיגו {target} נקודות",

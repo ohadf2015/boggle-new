@@ -33,7 +33,7 @@ export const WordListStats: React.FC<WordListStatsProps> = ({
 
   const handleExportCode = () => {
     const code = generateTypeScriptCode(wordLists);
-    navigator.clipboard.writeText(code);
+    navigator.clipboard.writeText(code).catch(() => {});
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };

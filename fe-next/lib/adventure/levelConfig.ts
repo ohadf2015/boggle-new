@@ -11,6 +11,7 @@ import type {
   SpecialTile,
   ObjectiveType,
   TileType,
+  LevelArchetype,
 } from '@/types/adventure';
 import {
   WORLDS_COUNT,
@@ -24,6 +25,7 @@ import {
 import { VOWELS } from './gridGenerator';
 import { getBossConfig } from './bossConfig';
 import { hasPathOfLength, hasWordPath } from './gridValidator';
+import { getArchetypeForLevel, getArchetypeConfig } from './levelArchetypes';
 
 // ==============================================
 // WORLD CONFIGURATION
@@ -241,13 +243,21 @@ export function getLevelConfig(
 
   const worldConfig = getWorldConfig(world);
   const gridSize = getGridSize(world);
-  const timerSeconds = getTimerDuration(world);
   const difficulty = getDifficultyForWorld(world);
 
-  // Generate level-specific content
+  // Determine level archetype for gameplay flavor
+  const archetype = getArchetypeForLevel(world, level);
+  const archetypeConfig = getArchetypeConfig(archetype);
+
+  // Apply archetype timer multiplier to base world timer
+  // Floor at 80s to prevent unplayable timers (e.g., survival ×0.6 on W2 = 66s)
+  const baseTimer = getTimerDuration(world);
+  const timerSeconds = Math.max(80, Math.round(baseTimer * archetypeConfig.timerMultiplier));
+
+  // Generate level-specific content driven by archetype
   // Pass grid for vowel protection on ice tiles (prevents unfair levels)
-  const objectives = generateObjectives(world, level, grid);
-  const specialTiles = generateSpecialTiles(world, level, gridSize, grid);
+  const objectives = generateObjectives(world, level, grid, archetype);
+  const specialTiles = generateSpecialTiles(world, level, gridSize, grid, archetype);
 
   // Calculate chapter structure (2-2-3 pattern)
   // Chapter 1: levels 1-2, Chapter 2: levels 3-4, Chapter 3 (Boss): levels 5-7
@@ -277,6 +287,7 @@ export function getLevelConfig(
     chapterNumber,
     levelInChapter,
     isBossLevel,
+    archetype,
   };
 
   // Add world mechanic for non-tutorial worlds
@@ -357,25 +368,24 @@ export function getAllLevelConfigs(): LevelConfig[] {
 export function generateObjectives(
   world: number,
   level: number,
-  grid?: string[][]
+  grid?: string[][],
+  archetype?: LevelArchetype
 ): LevelObjective[] {
   const objectives: LevelObjective[] = [];
   const isBossLevel = level === LEVELS_PER_WORLD; // Level 7 is boss
+  const effectiveArchetype = archetype ?? getArchetypeForLevel(world, level);
+  const archetypeConfig = getArchetypeConfig(effectiveArchetype);
 
   // =============================================
   // BOSS LEVELS: Battle-focused objectives
   // =============================================
   if (isBossLevel) {
-    // Primary: Defeat the boss (reduce HP to 0)
-    // Target represents boss max HP percentage to deplete (always 100)
     objectives.push({
       type: OBJECTIVE_TYPES.DEFEAT_BOSS as ObjectiveType,
       target: 100,
       isPrimary: true,
     });
 
-    // Secondary: Trigger boss twist mechanic N times
-    // Scales with world: 3 triggers in World 1, up to 8 in World 10
     const mechanicTarget = Math.min(3 + Math.floor(world / 3), 8);
     objectives.push({
       type: OBJECTIVE_TYPES.MECHANIC_TRIGGER as ObjectiveType,
@@ -383,8 +393,6 @@ export function generateObjectives(
       isPrimary: false,
     });
 
-    // Secondary: Survive with health remaining (for bonus stars)
-    // 50% health remaining target
     objectives.push({
       type: OBJECTIVE_TYPES.SURVIVE_BATTLE as ObjectiveType,
       target: 50,
@@ -395,172 +403,195 @@ export function generateObjectives(
   }
 
   // =============================================
-  // REGULAR LEVELS: Standard objectives
+  // ARCHETYPE-DRIVEN OBJECTIVES
   // =============================================
   const globalLevel = (world - 1) * LEVELS_PER_WORLD + level;
-
-  // Breather levels: positions 3 and 5 have reduced objectives
-  // Creates pacing valleys between difficulty peaks (boss at 7, chapter ends)
-  const isBreatherLevel = level === 3 || level === 5;
-  const breatherMultiplier = isBreatherLevel ? 0.75 : 1;
-
-  // Primary objective: Alternate between wordCount and scoreTarget
-  const timerSeconds = getTimerDuration(world);
-
-  if (level % 2 === 1) {
-    // Odd levels: word count
-    // Base: 5 words for W1, 6 for W2, 7 for W3, then ramps up
-    // Previous base of 8 was too punishing on small 4x4 grids for new players
-    const baseWords = world <= 1 ? 5 : world <= 2 ? 6 : world <= 3 ? 7 : 8;
-    let target = Math.min(baseWords + Math.floor(globalLevel / 5) * 2, 25);
-
-    // Breather reduction for levels 3/5
-    target = Math.max(4, Math.round(target * breatherMultiplier));
-
-    // Backpressure: cap wordCount based on available timer
-    // 1 word per 4 seconds is very fast; cap at 80% of that
-    const maxReasonableWords = Math.floor((timerSeconds / 4) * 0.8);
-    target = Math.min(target, maxReasonableWords);
-
-    objectives.push({
-      type: OBJECTIVE_TYPES.WORD_COUNT as ObjectiveType,
-      target,
-      isPrimary: true,
-    });
-  } else {
-    // Even levels: score target calibrated to realistic word output
-    // Average word ~3.5 letters => base ~45 pts, but gold tiles (3×) and
-    // rainbow tiles (+25%) are common in adventure — effective avg ~65 pts
-    const AVERAGE_WORD_SCORE = 65;
-    const estimatedWordsInTime = timerSeconds / 5; // ~1 word per 5 seconds
-    // difficultyFactor scales from 0.3 (world 1) to 1.1 (world 10)
-    const difficultyFactor = 0.3 + (world - 1) * (0.8 / 9);
-    // Level progression bonus: +1.5% per global level beyond first
-    const levelBonus = 1 + (globalLevel - 1) * 0.015;
-    // Cap scales linearly per world so late worlds still have progression
-    // W1: 1500 → W10: 3000 (~167 per world)
-    const worldCap = Math.round(1500 + (world - 1) * (1500 / 9));
-    const target = Math.min(
-      Math.round(estimatedWordsInTime * AVERAGE_WORD_SCORE * difficultyFactor * levelBonus * breatherMultiplier),
-      worldCap
-    );
-    objectives.push({
-      type: OBJECTIVE_TYPES.SCORE_TARGET as ObjectiveType,
-      target,
-      isPrimary: true,
-    });
-  }
-
-  // =============================================
-  // SECONDARY OBJECTIVES
-  // Every level gets at least 2 secondaries (1 for breathers)
-  // so players can earn 1, 2, or 3 stars — not just 3-or-nothing.
-  // =============================================
-
-  // --- Secondary 1: Complementary objective (opposite of primary) ---
-  // If primary is wordCount, secondary is a score stretch goal (and vice versa)
-  // Relax secondary objectives for early worlds so 3-star feels achievable
-  const worldSecondaryEase = world <= 2 ? 0.5 : world <= 4 ? 0.6 : 0.7;
-  const complementaryMultiplier = isBreatherLevel ? 0.4 : worldSecondaryEase;
-  if (level % 2 === 1) {
-    // Primary is wordCount → secondary is scoreTarget
-    const AVERAGE_WORD_SCORE = 65;
-    const estimatedWordsInTime = timerSeconds / 5;
-    const difficultyFactor = 0.5 + (world - 1) * (0.6 / 9);
-    const target = Math.round(
-      estimatedWordsInTime * AVERAGE_WORD_SCORE * difficultyFactor * complementaryMultiplier
-    );
-    objectives.push({
-      type: OBJECTIVE_TYPES.SCORE_TARGET as ObjectiveType,
-      target: Math.max(target, 200),
-      isPrimary: false,
-    });
-  } else {
-    // Primary is scoreTarget → secondary is wordCount
-    const estimatedWordsInTime = timerSeconds / 5;
-    const target = Math.round(estimatedWordsInTime * complementaryMultiplier);
-    objectives.push({
-      type: OBJECTIVE_TYPES.WORD_COUNT as ObjectiveType,
-      target: Math.max(target, 3),
-      isPrimary: false,
-    });
-  }
-
-  // Breather levels get only 1 secondary (relaxed but not binary)
-  if (isBreatherLevel) return objectives;
-
-  // --- Secondary 2+: Skill-based objectives that scale with progression ---
-
-  // Long words objective (level 2+)
-  // Only add if grid supports paths of LONG_WORD_LENGTH (5)
+  const timerSeconds = Math.max(80, Math.round(getTimerDuration(world) * archetypeConfig.timerMultiplier));
   const LONG_WORD_LENGTH = 5;
-  if (level >= 2) {
-    const gridSupportsLongWords = !grid || hasPathOfLength(grid, LONG_WORD_LENGTH);
-    if (gridSupportsLongWords) {
-      // 1 long word at level 2, +1 every 3 levels, max 5
-      const target = Math.min(1 + Math.floor((level - 2) / 3), 5);
+
+  // --- PRIMARY OBJECTIVE (driven by archetype) ---
+  switch (archetypeConfig.primaryObjective) {
+    case 'clearIce': {
+      // Excavation: clear a target number of ice tiles
+      const baseIce = world <= 2 ? 3 : world <= 5 ? 5 : 7;
+      const target = Math.min(baseIce + Math.floor(level / 2), 15);
       objectives.push({
-        type: OBJECTIVE_TYPES.LONG_WORDS as ObjectiveType,
+        type: OBJECTIVE_TYPES.CLEAR_ICE as ObjectiveType,
         target,
-        isPrimary: false,
+        isPrimary: true,
       });
-    } else {
-      // Fallback: add a wordCount secondary objective instead
-      const target = Math.min(3 + Math.floor(level / 2), 8);
+      break;
+    }
+
+    case 'scoreTarget': {
+      // Gold Rush: high score target (compensated by gold-heavy board)
+      const AVERAGE_WORD_SCORE = 65;
+      const estimatedWordsInTime = timerSeconds / 5;
+      const difficultyFactor = 0.4 + (world - 1) * (0.7 / 9);
+      const levelBonus = 1 + (globalLevel - 1) * 0.015;
+      // Gold Rush gets a score boost since the board is loaded with multipliers
+      const archetypeBoost = effectiveArchetype === 'goldRush' ? 1.4 : 1;
+      const worldCap = Math.round(1500 + (world - 1) * (1500 / 9));
+      const target = Math.min(
+        Math.round(estimatedWordsInTime * AVERAGE_WORD_SCORE * difficultyFactor * levelBonus * archetypeBoost),
+        worldCap
+      );
+      objectives.push({
+        type: OBJECTIVE_TYPES.SCORE_TARGET as ObjectiveType,
+        target,
+        isPrimary: true,
+      });
+      break;
+    }
+
+    case 'longWords': {
+      // Puzzle: find N long words (5+ letters)
+      const gridSupportsLongWords = !grid || hasPathOfLength(grid, LONG_WORD_LENGTH);
+      if (gridSupportsLongWords) {
+        const base = world <= 3 ? 2 : world <= 6 ? 3 : 4;
+        const target = Math.min(base + Math.floor(level / 3), 7);
+        objectives.push({
+          type: OBJECTIVE_TYPES.LONG_WORDS as ObjectiveType,
+          target,
+          isPrimary: true,
+        });
+      } else {
+        // Fallback if grid can't support long paths
+        const target = Math.min(5 + Math.floor(globalLevel / 5), 15);
+        objectives.push({
+          type: OBJECTIVE_TYPES.WORD_COUNT as ObjectiveType,
+          target,
+          isPrimary: true,
+        });
+      }
+      break;
+    }
+
+    case 'timeBonus': {
+      // Survival: finish with N seconds remaining despite short timer
+      // Target is a % of the (already reduced) timer
+      const target = Math.max(Math.round(timerSeconds * 0.25), 10);
+      objectives.push({
+        type: OBJECTIVE_TYPES.TIME_BONUS as ObjectiveType,
+        target,
+        isPrimary: true,
+      });
+      break;
+    }
+
+    case 'wordCount':
+    default: {
+      // Standard / Cascade: find N words
+      const baseWords = world <= 1 ? 5 : world <= 2 ? 6 : world <= 3 ? 7 : 8;
+      // Cascade gets a higher word count (chains help find more words)
+      const archetypeBoost = effectiveArchetype === 'cascade' ? 1.2 : 1;
+      let target = Math.min(
+        Math.round((baseWords + Math.floor(globalLevel / 5) * 2) * archetypeBoost),
+        25
+      );
+      const maxReasonableWords = Math.floor((timerSeconds / 4) * 0.8);
+      target = Math.min(target, maxReasonableWords);
+      target = Math.max(4, target);
       objectives.push({
         type: OBJECTIVE_TYPES.WORD_COUNT as ObjectiveType,
         target,
-        isPrimary: false,
+        isPrimary: true,
       });
+      break;
     }
   }
 
-  // For level 1, add a time bonus as the second secondary
-  // (since longWords doesn't kick in until level 2)
-  if (level === 1) {
-    // Easy time bonus: finish with 10%+ time remaining (very achievable for first-timers)
-    const target = Math.max(Math.round(timerSeconds * 0.1), 10);
-    objectives.push({
-      type: OBJECTIVE_TYPES.TIME_BONUS as ObjectiveType,
-      target,
-      isPrimary: false,
-    });
+  // --- SECONDARY OBJECTIVES (archetype-aware) ---
+
+  // Secondary 1: from archetype's preferred secondaries
+  const secondaries = archetypeConfig.secondaryObjectives;
+  const primaryType = objectives[0].type;
+
+  for (const secType of secondaries) {
+    // Skip if same as primary
+    if (secType === primaryType) continue;
+    // Skip boss-only objectives on regular levels
+    if (secType === 'mechanicTrigger' || secType === 'surviveBattle') continue;
+    // Skip longWords if grid can't support long paths
+    if (secType === 'longWords' && grid && !hasPathOfLength(grid, LONG_WORD_LENGTH)) continue;
+
+    const target = generateSecondaryTarget(secType, world, level, timerSeconds, globalLevel);
+    if (target > 0) {
+      objectives.push({
+        type: secType as ObjectiveType,
+        target,
+        isPrimary: false,
+      });
+      break; // Only add first valid secondary from archetype
+    }
   }
 
-  // Clear ice objective (world 2+, level 4+)
-  if (world >= 2 && level >= 4) {
-    // 2 ice tiles + 1 per 2 levels, max 10
-    const target = Math.min(2 + Math.floor((level - 4) / 2), 10);
+  // Secondary 2: World mechanic trigger (world 2+), or fallback secondary for W1
+  const worldConfig = WORLD_CONFIGS[world - 1];
+  if (worldConfig?.mechanic) {
+    const mechanicTarget = Math.min(1 + Math.floor((world - 1) / 2), 4);
     objectives.push({
-      type: OBJECTIVE_TYPES.CLEAR_ICE as ObjectiveType,
-      target,
+      type: OBJECTIVE_TYPES.MECHANIC_TRIGGER as ObjectiveType,
+      target: mechanicTarget,
       isPrimary: false,
     });
-  }
-
-  // Time bonus objective (level 6+, worlds 3+)
-  if (world >= 3 && level >= 6 && !isBossLevel) {
-    // Complete with 30+ seconds remaining
-    const target = Math.max(30 - (world - 3) * 5, 10);
-    objectives.push({
-      type: OBJECTIVE_TYPES.TIME_BONUS as ObjectiveType,
-      target,
-      isPrimary: false,
-    });
-  }
-
-  // Collect gems objective (world 2+, even levels) — use gold tiles strategically
-  if (world >= 2 && level % 2 === 0 && level >= 4) {
-    // Gold tile count scales: 1-4 per level, ask player to collect 2-3
-    const target = Math.min(2 + Math.floor((world - 2) / 3), 3);
-    objectives.push({
-      type: OBJECTIVE_TYPES.COLLECT_GEMS as ObjectiveType,
-      target,
-      isPrimary: false,
-    });
+  } else {
+    // Worlds without a mechanic (W1) get a second archetype secondary
+    // to ensure 3-star is achievable (need 2 secondaries for 3 stars)
+    const usedTypes = new Set(objectives.map(o => o.type));
+    const fallbackOrder: ObjectiveType[] = ['scoreTarget', 'longWords', 'wordCount', 'timeBonus'];
+    for (const fbType of fallbackOrder) {
+      if (usedTypes.has(fbType)) continue;
+      if (fbType === 'longWords' && grid && !hasPathOfLength(grid, LONG_WORD_LENGTH)) continue;
+      const target = generateSecondaryTarget(fbType, world, level, timerSeconds, globalLevel);
+      if (target > 0) {
+        objectives.push({ type: fbType as ObjectiveType, target, isPrimary: false });
+        break;
+      }
+    }
   }
 
   return objectives;
+}
+
+/**
+ * Generate a target value for a secondary objective type.
+ * Shared helper to keep secondary objective scaling consistent.
+ */
+function generateSecondaryTarget(
+  type: ObjectiveType,
+  world: number,
+  level: number,
+  timerSeconds: number,
+  _globalLevel: number
+): number {
+  const worldEase = world <= 2 ? 0.5 : world <= 4 ? 0.6 : 0.7;
+
+  switch (type) {
+    case 'scoreTarget': {
+      const estimatedWords = timerSeconds / 5;
+      const factor = 0.5 + (world - 1) * (0.6 / 9);
+      return Math.max(Math.round(estimatedWords * 65 * factor * worldEase), 200);
+    }
+    case 'wordCount': {
+      const estimatedWords = timerSeconds / 5;
+      return Math.max(Math.round(estimatedWords * worldEase), 3);
+    }
+    case 'longWords': {
+      return Math.min(1 + Math.floor((level - 1) / 2), 5);
+    }
+    case 'clearIce': {
+      return world >= 2 ? Math.min(2 + Math.floor(level / 3), 8) : 0;
+    }
+    case 'timeBonus': {
+      return Math.max(Math.round(timerSeconds * 0.1), 10);
+    }
+    case 'collectGems': {
+      return world >= 2 ? Math.min(2 + Math.floor((world - 2) / 3), 3) : 0;
+    }
+    default:
+      return 0;
+  }
 }
 
 // ==============================================
@@ -591,8 +622,11 @@ export function generateSpecialTiles(
   world: number,
   level: number,
   gridSize: number,
-  grid?: string[][]
+  grid?: string[][],
+  archetype?: LevelArchetype
 ): SpecialTile[] {
+  const effectiveArchetype = archetype ?? getArchetypeForLevel(world, level);
+  const { tileModifiers } = getArchetypeConfig(effectiveArchetype);
   const tiles: SpecialTile[] = [];
   const usedPositions = new Set<string>();
 
@@ -639,19 +673,17 @@ export function generateSpecialTiles(
 
   // Gold tiles: World 1 level 5+ (boss chapter), World 2+ all levels
   if ((world === 1 && level >= 5) || world >= 2) {
-    const goldCount = Math.min(
-      1 + Math.floor((world - 1) / 2) + Math.floor(level / 5),
-      4
-    );
+    const baseGold = Math.min(1 + Math.floor((world - 1) / 2) + Math.floor(level / 5), 4);
+    const goldCount = Math.round(baseGold * tileModifiers.goldMultiplier);
     for (let i = 0; i < goldCount; i++) {
       addTile(TILE_TYPES.GOLD as TileType);
     }
   }
 
-  // Ice tiles: World 2+
-  if (world >= 2) {
-    // Base: 2 ice tiles, +1 per 3 levels, +1 per world, max 8
-    const iceCount = Math.min(2 + Math.floor(level / 3) + (world - 2), 8);
+  // Ice tiles: World 2+ (or any world if archetype demands it)
+  if (world >= 2 || tileModifiers.iceMultiplier > 1) {
+    const baseIce = Math.min(2 + Math.floor(level / 3) + (Math.max(world, 2) - 2), 8);
+    const iceCount = Math.round(baseIce * tileModifiers.iceMultiplier);
     for (let i = 0; i < iceCount; i++) {
       addTile(TILE_TYPES.ICE as TileType);
     }
@@ -659,32 +691,36 @@ export function generateSpecialTiles(
 
   // Bomb tiles: World 3+, level 3+
   if (world >= 3 && level >= 3) {
-    // 1 bomb tile, +1 for level 7+
-    const bombCount = level >= 7 ? 2 : 1;
+    const baseBombs = level >= 7 ? 2 : 1;
+    const bombCount = Math.round(baseBombs * tileModifiers.bombMultiplier);
     for (let i = 0; i < bombCount; i++) {
       addTile(TILE_TYPES.BOMB as TileType);
     }
   }
 
-  // Rainbow tiles: World 5+, level 5+
-  if (world >= 5 && level >= 5) {
-    // 1 rainbow tile, rare
-    addTile(TILE_TYPES.RAINBOW as TileType);
+  // Rainbow tiles: World 5+, level 5+ (or earlier if archetype boosts)
+  if ((world >= 5 && level >= 5) || tileModifiers.rainbowMultiplier > 1) {
+    const rainbowCount = Math.round(1 * tileModifiers.rainbowMultiplier);
+    for (let i = 0; i < rainbowCount; i++) {
+      addTile(TILE_TYPES.RAINBOW as TileType);
+    }
   }
 
   // Time tiles: World 3+, level 2+ — strategic lifeline (+5s each)
   if (world >= 3 && level >= 2) {
-    // 1 time tile, +1 for level 5+
-    const timeCount = level >= 5 ? 2 : 1;
+    const baseTime = level >= 5 ? 2 : 1;
+    const timeCount = Math.round(baseTime * tileModifiers.timeMultiplier);
     for (let i = 0; i < timeCount; i++) {
       addTile(TILE_TYPES.TIME as TileType);
     }
   }
 
-  // Chain tiles: World 4+, level 3+ — rewards combo play
-  if (world >= 4 && level >= 3) {
-    // 1 chain tile
-    addTile(TILE_TYPES.CHAIN as TileType);
+  // Chain tiles: World 4+, level 3+ (or earlier if archetype boosts)
+  if ((world >= 4 && level >= 3) || tileModifiers.chainMultiplier > 1) {
+    const chainCount = Math.round(1 * tileModifiers.chainMultiplier);
+    for (let i = 0; i < chainCount; i++) {
+      addTile(TILE_TYPES.CHAIN as TileType);
+    }
   }
 
   return tiles;

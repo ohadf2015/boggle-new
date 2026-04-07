@@ -31,8 +31,6 @@ const TAUNT_DISPLAY_MS = 3000;
 /** Minimum cooldown between taunts (ms) */
 const TAUNT_COOLDOWN_MS = 5000;
 
-/** Minimum word length for assemblyLine (Baron Buildaword) bonus */
-const ASSEMBLY_LINE_MIN_LENGTH = 5;
 
 // ==============================================
 // TYPES
@@ -200,7 +198,11 @@ function evaluateHiveMind(
 ): BossMechanicResult {
   const synonymBonusMultiplier =
     (params.synonymBonusMultiplier as number) ?? 2.0;
-  return buildThresholdResult(word.length >= 5, synonymBonusMultiplier);
+  return buildThresholdResult(
+    hasDoubleLetters(word),
+    synonymBonusMultiplier,
+    'adventure.bosses.common.doubleLetterFound'
+  );
 }
 
 function evaluateEtymologyDig(
@@ -217,13 +219,42 @@ function evaluateEtymologyDig(
   );
 }
 
+/**
+ * Check if a word starts and ends with the same letter (min 3 letters).
+ * "Coming full circle" — thematic for Captain Metaphor's idiom battle.
+ */
+function hasSameStartEndLetter(word: string): boolean {
+  if (word.length < 3) return false;
+  const upper = word.toUpperCase();
+  return upper[0] === upper[upper.length - 1];
+}
+
 function evaluateIdiomBattle(
   word: string,
   params: Record<string, unknown>
 ): BossMechanicResult {
   const idiomBonusMultiplier =
     (params.idiomBonusMultiplier as number) ?? 2.5;
-  return buildThresholdResult(word.length >= 6, idiomBonusMultiplier);
+  return buildThresholdResult(
+    hasSameStartEndLetter(word),
+    idiomBonusMultiplier,
+    'adventure.bosses.common.fullCircleWord'
+  );
+}
+
+/** Common English prefixes and suffixes for assemblyLine mechanic */
+const ASSEMBLY_PREFIXES = ['UN', 'RE', 'PRE', 'OUT', 'OVER', 'DIS', 'MIS'];
+const ASSEMBLY_SUFFIXES = ['ING', 'TION', 'NESS', 'MENT', 'ABLE', 'IBLE', 'LESS', 'FUL', 'LY'];
+
+/**
+ * Check if a word has a common prefix or suffix.
+ * "Assembled from parts" — thematic for Baron Buildaword's factory.
+ */
+function hasCommonAffix(word: string): boolean {
+  const upper = word.toUpperCase();
+  if (upper.length < 3) return false;
+  return ASSEMBLY_PREFIXES.some(p => upper.startsWith(p) && upper.length > p.length)
+    || ASSEMBLY_SUFFIXES.some(s => upper.endsWith(s) && upper.length > s.length);
 }
 
 function evaluateAssemblyLine(
@@ -233,7 +264,7 @@ function evaluateAssemblyLine(
   const compoundBonusMultiplier =
     (params.compoundBonusMultiplier as number) ?? 3.0;
   return buildThresholdResult(
-    word.length >= ASSEMBLY_LINE_MIN_LENGTH,
+    hasCommonAffix(word),
     compoundBonusMultiplier,
     'adventure.bosses.common.compoundDetected'
   );
@@ -318,22 +349,33 @@ function evaluateStellarForge(
   );
 }
 
+/**
+ * Check if a word has high letter diversity (>=80% unique letters, min 4 letters).
+ * "Diverse language mastery" — thematic for Linguist Sage's babel summit.
+ */
+function hasHighLetterDiversity(word: string): boolean {
+  if (word.length < 4) return false;
+  const upper = word.toUpperCase();
+  const uniqueCount = new Set(upper.split('')).size;
+  return uniqueCount / upper.length >= 0.8;
+}
+
 function evaluateBabelSummit(
   word: string,
   params: Record<string, unknown>
 ): BossMechanicResult {
-  // BabelSummit rewards universal/long words
   const universalWordBonusMultiplier =
     (params.universalWordBonusMultiplier as number) ?? 3.0;
   const loanwordBonusMultiplier =
     (params.loanwordBonusMultiplier as number) ?? 1.5;
-  const isLong = word.length >= 6;
+  const meets = hasHighLetterDiversity(word);
 
   return {
-    meetsRequirement: isLong,
-    scoreMultiplier: isLong ? universalWordBonusMultiplier : loanwordBonusMultiplier,
-    triggerTaunt: isLong ? 'onMechanic' : undefined,
-    triggerEffect: isLong,
+    meetsRequirement: meets,
+    scoreMultiplier: meets ? universalWordBonusMultiplier : loanwordBonusMultiplier,
+    triggerTaunt: meets ? 'onMechanic' : undefined,
+    feedbackKey: meets ? 'adventure.bosses.common.diverseWord' : undefined,
+    triggerEffect: meets,
   };
 }
 

@@ -194,10 +194,10 @@ export async function getClassReportData(
 
     // Get all students in classroom
     const { data: students, error: studentsError } = await supabase
-      .from('classroom_students')
+      .from('classroom_memberships')
       .select(`
         student_id,
-        profiles!classroom_students_student_id_fkey(id, display_name, avatar_config)
+        profiles!classroom_memberships_student_id_fkey(id, display_name, avatar_config)
       `)
       .eq('classroom_id', classroomId)
       .eq('status', 'active');

@@ -37,6 +37,10 @@ import { useAdventureHistory } from './useAdventureHistory';
 import { AdventureGameErrorBoundary } from './AdventureGameErrorBoundary';
 import { useBossRush } from './hooks/useBossRush';
 import BossRushResults from './BossRushResults';
+import AdventureHub from './AdventureHub';
+import RunePanel from './RunePanel';
+import { useDailyQuests } from '@/hooks/useDailyQuests';
+import { forgeRune as forgeRuneLogic, equipRune as equipRuneLogic, unequipRune as unequipRuneLogic } from '@/lib/adventure/runeCatalog';
 
 const AdventureGame = dynamic(() => import('./AdventureGame'), { ssr: false, loading: () => <div className="h-screen bg-neo-navy flex items-center justify-center"><Loader2 className="w-12 h-12 text-neo-yellow animate-spin" /></div> });
 const AuthModal = dynamic(() => import('@/components/auth/AuthModal'), { ssr: false });
@@ -45,7 +49,7 @@ const AuthModal = dynamic(() => import('@/components/auth/AuthModal'), { ssr: fa
 function AdventureView(): React.JSX.Element {
   const { t, dir, language } = useLanguageSafe();
   const isRTL = dir === 'rtl';
-  const { progression, isLoading, error, isAuthError, completeLevel, updateCurrency, refreshProgression } = useProgression();
+  const { progression, isLoading, error, isAuthError, completeLevel, updateCurrency, updateRunes, refreshProgression } = useProgression();
   const { user, profile } = useAuth();
   const isGuest = !user?.id;
 
@@ -56,24 +60,41 @@ function AdventureView(): React.JSX.Element {
   const [showSignupPrompt, setShowSignupPrompt] = useState(false);
   const [showWordAlbum, setShowWordAlbum] = useState(false);
   const [showWeeklyChallenge, setShowWeeklyChallenge] = useState(false);
+  const [showRunes, setShowRunes] = useState(false);
+  const [showCollection, setShowCollection] = useState(false);
 
   // Stable callbacks for modal toggles — prevents child re-renders via memo
   const openShop = useCallback(() => setShowShop(true), []);
   const closeShop = useCallback(() => setShowShop(false), []);
   const closeWeeklyChallenge = useCallback(() => setShowWeeklyChallenge(false), []);
   const closeWordAlbum = useCallback(() => setShowWordAlbum(false), []);
+  const openRunes = useCallback(() => setShowRunes(true), []);
+  const closeRunes = useCallback(() => setShowRunes(false), []);
+  const openCollection = useCallback(() => setShowCollection(true), []);
+  const closeCollection = useCallback(() => setShowCollection(false), []);
   const { stopMusic: stopGlobalMusic } = useMusic();
   const setIsInGame = useHideNavigation();
 
   const hasCompletions = (progression?.completions?.length ?? 0) > 0;
+  const initialView = hasCompletions ? 'hub' : 'worldMap';
   const {
     viewState, setViewState,
     selectedWorld, selectedLevel, setSelectedLevel,
     navigateToWorldMap, selectWorld, selectLevel,
-    historyBack,
-  } = useAdventureHistory('worldMap', null);
+    historyBack, openWorldMapFromHub,
+  } = useAdventureHistory(initialView, null);
 
   useEffect(() => { stopGlobalMusic(500); }, [stopGlobalMusic]);
+
+  // Daily quests and streak for hub
+  const { quests: dailyQuests } = useDailyQuests({ currentWorld: progression?.currentWorld });
+  const streakDays = progression?.streak?.currentStreak ?? 0;
+  const bestStreak = progression?.streak?.bestStreak ?? 0;
+
+  // Hub "Continue" / "Play Level" navigates directly into gameplay
+  const handleHubPlayLevel = useCallback((worldId: number, levelId: number) => {
+    selectLevel(worldId, levelId);
+  }, [selectLevel]);
 
   // Hide main header during active gameplay
   useEffect(() => {
@@ -240,6 +261,28 @@ function AdventureView(): React.JSX.Element {
     else { setViewState('levelGrid'); setSelectedLevel(null); }
   }, [setViewState, setSelectedLevel]);
 
+  // ── Rune handlers ──
+  const handleForgeRune = useCallback((runeId: string) => {
+    const runes = progression?.runes ?? [];
+    const fragments = progression?.runeFragments ?? 0;
+    const result = forgeRuneLogic(runeId, fragments, runes);
+    if (result) {
+      updateRunes([...runes, result.newRune], result.remainingFragments);
+    }
+  }, [progression?.runes, progression?.runeFragments, updateRunes]);
+
+  const handleEquipRune = useCallback((runeId: string) => {
+    const runes = progression?.runes ?? [];
+    const result = equipRuneLogic(runeId, runes);
+    if (result) updateRunes(result, progression?.runeFragments ?? 0);
+  }, [progression?.runes, progression?.runeFragments, updateRunes]);
+
+  const handleUnequipRune = useCallback((runeId: string) => {
+    const runes = progression?.runes ?? [];
+    const result = unequipRuneLogic(runeId, runes);
+    if (result) updateRunes(result, progression?.runeFragments ?? 0);
+  }, [progression?.runes, progression?.runeFragments, updateRunes]);
+
   // Only show full-screen spinner when there's no cached progression at all.
   // When cached data exists, render the UI immediately with stale data —
   // the API fetch will merge fresh data in the background.
@@ -352,6 +395,8 @@ function AdventureView(): React.JSX.Element {
         onCloseWeeklyChallenge={closeWeeklyChallenge}
         onPlayWeeklyChallenge={handlePlayWeeklyChallenge}
         onShopPurchase={handleShopPurchase}
+        showCollection={showCollection}
+        onCloseCollection={closeCollection}
         t={t}
       />
 
@@ -359,6 +404,33 @@ function AdventureView(): React.JSX.Element {
 
       <div className="relative z-10 flex-1 min-h-0">
         <AdaptiveAnimatePresence mode="wait">
+          {viewState === 'hub' && (
+            <AdaptiveMotion.div key="hub" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }} className="h-full">
+              <AdventureHub
+                streakDays={streakDays}
+                bestStreak={bestStreak}
+                dailyQuests={dailyQuests}
+                totalStars={totalStars}
+                playerLevel={playerLevel}
+                gold={gold}
+                completions={completions}
+                currentWorld={selectedWorld ?? Math.max(1, ...completions.map(c => c.world))}
+                onOpenWorldMap={openWorldMapFromHub}
+                onPlayLevel={handleHubPlayLevel}
+                onOpenShop={openShop}
+                wordAlbumCount={progression?.wordAlbum?.length}
+                onBossRush={() => { bossRush.startRush(); setViewState('bossRush'); }}
+                canBossRush={bossRush.canStartBossRush}
+                onOpenRunes={openRunes}
+                runeCount={progression?.runes?.length}
+                onOpenWordAlbum={() => setShowWordAlbum(true)}
+                onOpenCollection={openCollection}
+                collectionCount={0}
+                weeklyModifiers={weeklyModifiers}
+              />
+            </AdaptiveMotion.div>
+          )}
+
           {viewState === 'worldMap' && (
             <AdaptiveMotion.div key="world-map" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, x: isRTL ? 100 : -100 }} transition={{ duration: 0.3 }} className="h-full relative">
               <WorldMap totalStars={totalStars} completions={completions} onWorldSelect={selectWorld} masteryTiers={masteryTiers} onContinue={selectLevel} welcomeBanner={!hasCompletions ? <AdventureWelcomeBanner t={t} onSelectWorld={() => selectWorld(1)} /> : undefined} />
@@ -428,6 +500,16 @@ function AdventureView(): React.JSX.Element {
         onClose={() => setShowSignupPrompt(false)}
         initialMode="signup"
         showGuestStats
+      />
+
+      <RunePanel
+        isOpen={showRunes}
+        onClose={closeRunes}
+        runes={progression?.runes ?? []}
+        fragments={progression?.runeFragments ?? 0}
+        onForge={handleForgeRune}
+        onEquip={handleEquipRune}
+        onUnequip={handleUnequipRune}
       />
     </div>
     </AdventureThemeProvider>

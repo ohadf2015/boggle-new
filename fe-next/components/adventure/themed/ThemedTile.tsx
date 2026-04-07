@@ -148,13 +148,8 @@ const TileOverlay = memo<TileOverlayProps>(({ type, config }) => {
       return (
         <AdaptiveMotion.div
           className="absolute inset-0 pointer-events-none rounded-neo"
-          animate={{
-            boxShadow: [
-              '0 0 5px rgba(255, 100, 50, 0.4)',
-              '0 0 15px rgba(255, 100, 50, 0.7)',
-              '0 0 5px rgba(255, 100, 50, 0.4)',
-            ],
-          }}
+          style={{ boxShadow: '0 0 15px rgba(255, 100, 50, 0.7)' }}
+          animate={{ opacity: [0.5, 1, 0.5] }}
           transition={{ duration: 1, repeat: Infinity, ease: 'easeInOut' }}
         />
       );
@@ -171,13 +166,8 @@ const TileOverlay = memo<TileOverlayProps>(({ type, config }) => {
       return (
         <AdaptiveMotion.div
           className="absolute inset-0 pointer-events-none rounded-neo"
-          animate={{
-            boxShadow: [
-              '0 0 5px rgba(50, 200, 150, 0.3)',
-              '0 0 12px rgba(50, 200, 150, 0.6)',
-              '0 0 5px rgba(50, 200, 150, 0.3)',
-            ],
-          }}
+          style={{ boxShadow: '0 0 12px rgba(50, 200, 150, 0.6)' }}
+          animate={{ opacity: [0.5, 1, 0.5] }}
           transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
         />
       );

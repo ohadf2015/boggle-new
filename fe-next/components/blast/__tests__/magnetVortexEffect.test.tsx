@@ -112,9 +112,9 @@ describe('Magnet/Vortex Effect', () => {
         <BlastTile {...baseProps} phase="clearing" />
       );
       const button = container.querySelector('button');
-      // jsdom strips radial-gradient() from style — verify purple via border color
+      // Verify purple via style attribute — jsdom may keep hex or convert to rgb
       const styleAttr = button?.getAttribute('style') ?? '';
-      expect(styleAttr).toContain('139, 0, 255'); // #8B00FF in rgb (jsdom preserves spaces in rgba)
+      expect(styleAttr).toContain('#8B00FF');
     });
   });
 });

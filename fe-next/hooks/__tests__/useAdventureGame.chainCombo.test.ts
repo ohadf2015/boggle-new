@@ -632,18 +632,13 @@ describe('Chain Tile Special Tile Interactions', () => {
       ]);
     });
 
-    // THEN - Chain bonus should apply to base score before bomb clears row
-    // Base: 100
-    // Chain bonus: 100 * 1.15 = 115
-    // Bomb clears row (no additional score from bomb itself)
-    const expectedScoreGain = 115;
+    // THEN - Chain bonus 1.15x then bomb doubles: 100 * 1.15 * 2 = 230
+    const expectedScoreGain = 230;
     expect(result.current.gameState.score).toBe(scoreBeforeWord + expectedScoreGain);
 
-    // Verify bomb cleared the row
-    expect(result.current.tiles[1][0].isCleared).toBe(true);
-    expect(result.current.tiles[1][1].isCleared).toBe(true);
-    expect(result.current.tiles[1][2].isCleared).toBe(true);
-    expect(result.current.tiles[1][3].isCleared).toBe(true);
+    // Bomb tile cleared (score bomb), but non-path tiles in row are NOT cleared
+    expect(result.current.tiles[1][2].isCleared).toBe(true); // bomb tile in path
+    expect(result.current.tiles[0][0].isCleared).toBe(false); // other row untouched
   });
 
   it('should handle multiple chain tiles in the same word', () => {

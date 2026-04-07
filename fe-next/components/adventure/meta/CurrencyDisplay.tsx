@@ -50,7 +50,7 @@ export function CurrencyDisplay({
   const { t, language } = useLanguageSafe();
 
   // Format number with locale-aware separators
-  const localeMap: Record<string, string> = { en: 'en-US', he: 'he-IL', sv: 'sv-SE', ja: 'ja-JP' };
+  const localeMap: Record<string, string> = { en: 'en-US', he: 'he-IL', sv: 'sv-SE', ja: 'ja-JP', es: 'es-ES' };
   const formattedAmount = amount.toLocaleString(localeMap[language] ?? 'en-US');
 
   // Size classes
@@ -86,7 +86,7 @@ export function CurrencyDisplay({
         data-testid="coin-icon"
         className={`${iconSizeClasses[size]}`}
         role="img"
-        aria-label="coin"
+        aria-label={t('adventure.currency.coinIcon')}
       >
         🪙
       </span>

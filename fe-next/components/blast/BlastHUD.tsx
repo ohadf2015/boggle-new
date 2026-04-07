@@ -48,7 +48,6 @@ interface BlastHUDProps {
   movesRemaining: number;
   totalMoves: number;
   waveNumber: number;
-  comboLevel: number;
   tilesCleared: number;
   totalTiles: number;
   onQuit: () => void;
@@ -70,7 +69,6 @@ export function BlastHUD({
   movesRemaining,
   totalMoves,
   waveNumber,
-  comboLevel,
   tilesCleared,
   totalTiles,
   onQuit,
@@ -96,18 +94,14 @@ export function BlastHUD({
 
   return (
     <div
-      className="flex items-center justify-between gap-2 px-3 py-2 pt-safe"
-      style={{
-        background: 'linear-gradient(180deg, rgba(15,12,41,0.85) 0%, rgba(15,12,41,0.6) 100%)',
-        backdropFilter: 'blur(8px)',
-      }}
+      className="flex items-center justify-between gap-2 px-3 py-2 pt-safe bg-neo-navy border-b-2 border-neo-black"
       data-testid="blast-hud"
     >
       {/* Left: wave shield + score */}
       <div className="flex items-center gap-2.5 min-w-0">
         <span
           className="shrink-0 text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-lg border-2 border-neo-cyan/40 text-neo-cyan"
-          style={{ textShadow: '0 0 6px rgba(0,255,255,0.4)' }}
+          style={{ textShadow: 'none' }}
           aria-label={`${t('blast.wave')} ${waveNumber}`}
         >
           W{waveNumber}
@@ -116,27 +110,13 @@ export function BlastHUD({
           <span className="text-amber-400 text-sm">★</span>
           <span
             className={cn(
-              'text-xl font-black tabular-nums truncate transition-transform duration-150',
+              'text-xl font-black tabular-nums truncate transition-transform duration-150 text-neo-cream',
               scorePulse && 'scale-[1.15]',
             )}
-            style={{
-              background: 'linear-gradient(180deg, #FFE566 0%, #FFD700 50%, #B8860B 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              textShadow: 'none',
-              filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.4))',
-            }}
           >
             {animatedScore.toLocaleString()}
           </span>
         </div>
-        {comboLevel >= 2 && (
-          <span
-            className="text-[10px] font-black px-1.5 py-0.5 rounded-md bg-neo-lime text-neo-black border-2 border-neo-black animate-neo-pop"
-          >
-            x{comboLevel}
-          </span>
-        )}
       </div>
 
       {/* Combo streak badge */}
@@ -178,9 +158,7 @@ export function BlastHUD({
                 background: clearPct >= 50
                   ? 'linear-gradient(90deg, #BFFF00, #D9FF66)'
                   : 'linear-gradient(90deg, #00FFFF, #66FFFF)',
-                boxShadow: clearPct >= 50
-                  ? '0 0 6px rgba(191,255,0,0.5)'
-                  : '0 0 6px rgba(0,255,255,0.5)',
+                boxShadow: 'none',
               }}
             />
           </div>

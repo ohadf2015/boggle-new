@@ -7,13 +7,11 @@ import { defaultLocale, locales } from '@/lib/i18n';
 import { isNative } from '@/utils/platform';
 import { setupPushListeners } from '@/utils/pushNotifications/tokenRegistration';
 
- 
-
 /**
  * DeepLinkHandler Component
  *
  * Handles deep link navigation for OAuth callbacks and other app links on Capacitor (mobile).
- * Uses globalThis.Capacitor.Plugins to avoid any @capacitor/* imports that break Turbopack.
+ * Dynamically imports Capacitor plugins to support both legacy and Capacitor 8 plugin patterns.
  */
 export default function DeepLinkHandler() {
   const router = useRouter();
@@ -21,13 +19,29 @@ export default function DeepLinkHandler() {
   useEffect(() => {
     if (typeof window === 'undefined' || !isNative()) return;
 
-    const plugins = (globalThis as any).Capacitor?.Plugins;
-    const AppPlugin = plugins?.App;
-    const BrowserPlugin = plugins?.Browser;
-    if (!AppPlugin) return;
-
     let cleanup: (() => void) | null = null;
     let pushCleanup: (() => void) | null = null;
+    let mounted = true;
+
+    function getSyncAppPlugin() {
+      return (globalThis as any).Capacitor?.Plugins?.App ?? null;
+    }
+
+    function getSyncBrowserPlugin() {
+      return (globalThis as any).Capacitor?.Plugins?.Browser ?? null;
+    }
+
+    async function getAppPlugin() {
+      const legacy = getSyncAppPlugin();
+      if (legacy) return legacy;
+      try { return (await import('@capacitor/app')).App; } catch { return null; }
+    }
+
+    async function getBrowserPlugin() {
+      const legacy = getSyncBrowserPlugin();
+      if (legacy) return legacy;
+      try { return (await import('@capacitor/browser')).Browser; } catch { return null; }
+    }
 
     const handleAppUrlOpen = async (event: { url: string }) => {
       try {
@@ -44,12 +58,15 @@ export default function DeepLinkHandler() {
         }
 
         const isAuthCallback = path.includes('auth/callback');
-        if (isAuthCallback && BrowserPlugin) {
-          try {
-            logger.log('Closing OAuth browser after callback');
-            await BrowserPlugin.close();
-          } catch {
-            logger.log('Browser close (may already be closed)');
+        if (isAuthCallback) {
+          const BrowserPlugin = getSyncBrowserPlugin() ?? await getBrowserPlugin();
+          if (BrowserPlugin) {
+            try {
+              logger.log('Closing OAuth browser after callback');
+              await BrowserPlugin.close();
+            } catch {
+              logger.log('Browser close (may already be closed)');
+            }
           }
         }
 
@@ -69,32 +86,64 @@ export default function DeepLinkHandler() {
       }
     };
 
-    Promise.resolve(AppPlugin.addListener('appUrlOpen', handleAppUrlOpen))
-      .then((listener: { remove: () => void }) => {
-        cleanup = () => listener.remove();
-      })
-      .catch((error: unknown) => {
-        logger.error('Failed to register deep link listener:', error);
-      });
-
-    setupPushListeners(
-      undefined,
-      (data) => {
-        const deepLink = data.deepLink;
-        if (deepLink) {
-          const validLocale = (typeof window !== 'undefined' && locales.find((l) => window.location.pathname.startsWith(`/${l}`))) || defaultLocale;
-          const route = deepLink.startsWith('/') ? `/${validLocale}${deepLink}` : `/${validLocale}/${deepLink}`;
-          logger.log('Push notification tap routing to:', route);
-          router.replace(route);
+    // Register synchronously if plugin is available (covers test env & native Capacitor bridge)
+    const syncApp = getSyncAppPlugin();
+    if (syncApp) {
+      try {
+        const listenerResult = syncApp.addListener('appUrlOpen', handleAppUrlOpen);
+        if (listenerResult && typeof listenerResult.then === 'function') {
+          listenerResult.then((listener: { remove: () => void }) => {
+            if (mounted) cleanup = () => listener.remove();
+          }).catch((error: unknown) => {
+            logger.error('Failed to register deep link listener:', error);
+          });
+        } else if (listenerResult?.remove) {
+          cleanup = () => listenerResult.remove();
         }
+      } catch (error) {
+        logger.error('Failed to register deep link listener:', error);
       }
-    ).then((fn) => {
-      pushCleanup = fn;
-    }).catch((error) => {
-      logger.error('Failed to set up push listeners:', error);
-    });
+    } else {
+      // Async fallback for dynamic import path
+      getAppPlugin().then((AppPlugin) => {
+        if (!AppPlugin || !mounted) return;
+        try {
+          Promise.resolve(AppPlugin.addListener('appUrlOpen', handleAppUrlOpen))
+            .then((listener: { remove: () => void }) => {
+              if (mounted) cleanup = () => listener.remove();
+            })
+            .catch((error: unknown) => {
+              logger.error('Failed to register deep link listener:', error);
+            });
+        } catch (error) {
+          logger.error('Failed to register deep link listener:', error);
+        }
+      });
+    }
+
+    async function initPush() {
+      try {
+        pushCleanup = await setupPushListeners(
+          undefined,
+          (data) => {
+            const deepLink = data.deepLink;
+            if (deepLink) {
+              const validLocale = (typeof window !== 'undefined' && locales.find((l) => window.location.pathname.startsWith(`/${l}`))) || defaultLocale;
+              const route = deepLink.startsWith('/') ? `/${validLocale}${deepLink}` : `/${validLocale}/${deepLink}`;
+              logger.log('Push notification tap routing to:', route);
+              router.replace(route);
+            }
+          }
+        );
+      } catch (error) {
+        logger.error('Failed to set up push listeners:', error);
+      }
+    }
+
+    initPush();
 
     return () => {
+      mounted = false;
       cleanup?.();
       pushCleanup?.();
     };

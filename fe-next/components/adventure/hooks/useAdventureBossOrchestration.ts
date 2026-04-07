@@ -154,12 +154,15 @@ export function useAdventureBossOrchestration(props: UseAdventureBossOrchestrati
 
   // Phase change drama: freeze timer, screen shake, taunt
   const prevBossPhase = usePreviousValue(bossPhaseValue);
+  const lastPhaseAdvanceRef = useRef(0);
   useEffect(() => {
     if (prevBossPhase !== undefined && prevBossPhase !== bossPhaseValue && bossIsActive) {
       shake(4);
       bossTriggerTaunt('onMechanic');
       addTime(1.5);
       // Advance twist mechanic phase for multi-phase bosses (World 10 finalWord)
+      // Guard: debounce so timed rotation and HP-triggered advance don't double-fire
+      lastPhaseAdvanceRef.current = Date.now();
       bossMechanics.advancePhase();
     }
   }, [bossPhaseValue, prevBossPhase, bossIsActive, shake, bossTriggerTaunt, addTime, bossMechanics]);
@@ -171,6 +174,8 @@ export function useAdventureBossOrchestration(props: UseAdventureBossOrchestrati
 
     const phaseDuration = (boss.twistMechanic.params.phaseDuration as number) || 15;
     const interval = setInterval(() => {
+      // Skip if HP-triggered advance happened within last 2 seconds
+      if (Date.now() - lastPhaseAdvanceRef.current < 2000) return;
       bossMechanics.advancePhase();
     }, phaseDuration * 1000);
 
@@ -203,18 +208,8 @@ export function useAdventureBossOrchestration(props: UseAdventureBossOrchestrati
     }
   }, [bossIsActive, isPlaying, playerHealth.healthState.currentHP, bossTriggerTaunt]);
 
-  // Boss intro start handler
-  const handleBossIntroStart = useCallback(() => {
-    setShowBossIntro(false);
-    bossStartBattle();
-    if (!isPlaying) {
-      startGame();
-      startAIDirector();
-    }
-  }, [isPlaying, startGame, startAIDirector, bossStartBattle]);
-
-  // Boss intro skip handler
-  const handleBossIntroSkip = useCallback(() => {
+  // Boss intro handler (start or skip — same behavior)
+  const handleBossIntro = useCallback(() => {
     setShowBossIntro(false);
     bossStartBattle();
     if (!isPlaying) {
@@ -232,9 +227,8 @@ export function useAdventureBossOrchestration(props: UseAdventureBossOrchestrati
     return result;
   }, [bossMechanics]);
 
-  // Simplified dealBossDamage — wraps the new hook's dealDamage
-  // Accepts old signature for compatibility but internally just uses score
-  const dealBossDamage = useCallback((baseDamage: number, _combo: number, mechanicMultiplier: number, _comboBonus: number): number => {
+  // Deal damage to boss: baseDamage × mechanicMultiplier
+  const dealBossDamage = useCallback((baseDamage: number, mechanicMultiplier: number): number => {
     const damage = Math.floor(baseDamage * mechanicMultiplier);
     const result = bossDealDamage(damage);
     bossHit();
@@ -303,7 +297,6 @@ export function useAdventureBossOrchestration(props: UseAdventureBossOrchestrati
     bossHealthState,
     bossHPPercentage,
     isEnraged: bossPhaseValue === 'desperate',
-    bossState: {},
     showBossIntro,
     showBossFireworks: battleState.showFireworks,
     defeatedBossTier: battleState.defeatedTier,
@@ -325,9 +318,9 @@ export function useAdventureBossOrchestration(props: UseAdventureBossOrchestrati
     endBossBattle,
     resetBossHealth,
 
-    // Boss intro handlers
-    handleBossIntroStart,
-    handleBossIntroSkip,
+    // Boss intro handler (start and skip are identical)
+    handleBossIntroStart: handleBossIntro,
+    handleBossIntroSkip: handleBossIntro,
 
     // Player health
     playerHealthState: playerHealth.healthState,

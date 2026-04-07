@@ -178,7 +178,84 @@ export interface LevelConfig {
   bossTwist?: BossTwistType;
   /** Whether to show the boss intro cutscene */
   showBossIntro?: boolean;
+  /** Level archetype that defines gameplay flavor */
+  archetype?: LevelArchetype;
 }
+
+// ==============================================
+// LEVEL ARCHETYPES
+// ==============================================
+
+/**
+ * Level archetypes define distinct gameplay flavors.
+ * Each archetype modifies objectives, tiles, and timer to create a unique feel,
+ * even though the core mechanic (form words on a grid) stays the same.
+ *
+ * - standard: Balanced wordCount/score — the baseline Boggle experience
+ * - excavation: Board starts heavily iced. Chip away to reveal letters. Strategic tile clearing.
+ * - goldRush: Loaded with gold/multiplier tiles, short timer. Maximize value per word.
+ * - puzzle: Small effective area, find specific long/hidden words. Brain teaser.
+ * - survival: Timer drains fast, time tiles are lifelines. Every second counts.
+ * - cascade: Aggressive board reshuffling. Combo chains and positioning matter.
+ * - boss: Boss battle with HP, phases, and twist mechanics. (Existing system.)
+ */
+export type LevelArchetype =
+  | 'standard'
+  | 'excavation'
+  | 'goldRush'
+  | 'puzzle'
+  | 'survival'
+  | 'cascade'
+  | 'boss';
+
+// ==============================================
+// ARCHETYPE MASTERY
+// ==============================================
+
+/**
+ * Archetype mastery tier — earned by accumulating stars on levels of a given archetype.
+ * Distinct from the numeric MasteryTier used for world mastery.
+ */
+export type ArchetypeMasteryTier = 'none' | 'bronze' | 'silver' | 'gold' | 'diamond';
+
+/**
+ * Star thresholds to reach each archetype mastery tier.
+ * e.g. bronze at 5 stars, silver at 15, gold at 30, diamond at 50.
+ */
+export interface ArchetypeMasteryThresholds {
+  bronze: number;
+  silver: number;
+  gold: number;
+  diamond: number;
+}
+
+/**
+ * Passive bonus granted at an archetype mastery tier.
+ * Each archetype rewards mastery with a thematic bonus.
+ */
+export interface ArchetypeMasteryBonus {
+  /** Human-readable description (dev reference) */
+  description: string;
+  /** The bonus type — what game parameter is modified */
+  bonusType: 'timer' | 'score' | 'tiles' | 'objectives';
+  /** Numeric value of the bonus (interpretation depends on bonusType) */
+  value: number;
+}
+
+/**
+ * Per-archetype mastery state for a player.
+ */
+export interface ArchetypeMasteryState {
+  /** Total stars earned on levels of this archetype */
+  totalStars: number;
+  /** Current mastery tier */
+  tier: ArchetypeMasteryTier;
+}
+
+/**
+ * Mastery archetypes — boss excluded (bosses don't have mastery tracks).
+ */
+export type MasterableArchetype = Exclude<LevelArchetype, 'boss'>;
 
 // ==============================================
 // PLAYER PROGRESSION
@@ -275,6 +352,8 @@ export interface PlayerProgression {
   dailyQuestProgress?: Record<string, number>;
   /** Last date daily quests were active (YYYY-MM-DD) — for reset detection */
   dailyQuestDate?: string;
+  /** Per-archetype mastery progression */
+  archetypeMastery?: Partial<Record<MasterableArchetype, ArchetypeMasteryState>>;
   /** Array of completed levels */
   completions: LevelCompletion[];
   /** ISO timestamp of creation */

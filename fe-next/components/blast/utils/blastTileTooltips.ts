@@ -28,7 +28,7 @@ const TILE_I18N_KEYS: Partial<Record<BlastTileType, { name: string; desc: string
   wildcard:  { name: 'blast.tile.wildcard.name',  desc: 'blast.tile.wildcard.desc',  icon: '🃏' },
   countdown: { name: 'blast.tile.countdown.name', desc: 'blast.tile.countdown.desc', icon: '⏳' },
   virus:     { name: 'blast.tile.virus.name',     desc: 'blast.tile.virus.desc',     icon: '🦠' },
-  portal:    { name: 'blast.tile.portal.name',    desc: 'blast.tile.portal.desc',    icon: '🌀' },
+  portal:    { name: 'blast.tile.portal.name',    desc: 'blast.tile.portal.desc',    icon: '🌌' },
   catalyst:  { name: 'blast.tile.catalyst.name',  desc: 'blast.tile.catalyst.desc',  icon: '⚗️' },
 };
 
@@ -49,7 +49,7 @@ const ENGLISH_FALLBACK: Partial<Record<BlastTileType, TileTooltip>> = {
   wildcard:  { name: 'Wildcard',  desc: 'Matches any letter. Scores based on letter rarity.',        icon: '🃏' },
   countdown: { name: 'Countdown', desc: 'Explodes if not defused! Defusing grants 2 bonus moves.',   icon: '⏳' },
   virus:     { name: 'Virus',     desc: 'Spreads each turn. Clear 3+ in one word to cure ALL.',      icon: '🦠' },
-  portal:    { name: 'Portal',    desc: 'Teleport through paired portals. Words score 2\u00d7.',     icon: '🌀' },
+  portal:    { name: 'Portal',    desc: 'Teleport through paired portals. Words score 2\u00d7.',     icon: '🌌' },
   catalyst:  { name: 'Catalyst',  desc: 'Clears and upgrades adjacent tiles to random specials.',    icon: '⚗️' },
 };
 

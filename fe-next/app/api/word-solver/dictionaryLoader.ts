@@ -24,14 +24,14 @@ export async function loadDictionaryWords(language: string): Promise<string[]> {
 
   switch (language) {
     case 'en': {
-      const englishWords = (await import('an-array-of-english-words', { with: { type: 'json' } })).default as string[];
+      const englishWords = require('an-array-of-english-words') as string[];
       result = englishWords.map(w => w.toLowerCase());
       cache[language] = result;
       return result;
     }
 
     case 'es': {
-      const spanishWords = (await import('an-array-of-spanish-words', { with: { type: 'json' } })).default as string[];
+      const spanishWords = require('an-array-of-spanish-words') as string[];
       result = spanishWords.map(w => w.toLowerCase());
       cache[language] = result;
       return result;

@@ -195,4 +195,62 @@ describe('useFlashChallenge', () => {
       expect(result.current.isChallengeComplete).toBe(true);
     });
   });
+
+  describe('multiple triggers per level', () => {
+    it('triggers a second challenge at 60% after first is dismissed', () => {
+      const { result, rerender } = renderHook(
+        ({ timeRemaining, wordsFound }) =>
+          useFlashChallenge({ ...baseProps, timeRemaining, wordsFound }),
+        { initialProps: { timeRemaining: 69, wordsFound: [] as string[] } }
+      );
+      // First challenge at 31%
+      expect(result.current.activeChallenge).not.toBeNull();
+      const firstType = result.current.activeChallenge!.type;
+
+      // Dismiss first challenge
+      act(() => { result.current.dismiss(); });
+      expect(result.current.activeChallenge).toBeNull();
+
+      // Advance to 61% elapsed
+      rerender({ timeRemaining: 39, wordsFound: [] });
+      expect(result.current.activeChallenge).not.toBeNull();
+    });
+
+    it('triggers a third challenge at 85% after second is dismissed', () => {
+      const { result, rerender } = renderHook(
+        ({ timeRemaining, wordsFound }) =>
+          useFlashChallenge({ ...baseProps, timeRemaining, wordsFound }),
+        { initialProps: { timeRemaining: 69, wordsFound: [] as string[] } }
+      );
+      // Dismiss first (30%)
+      act(() => { result.current.dismiss(); });
+
+      // Trigger + dismiss second (60%)
+      rerender({ timeRemaining: 39, wordsFound: [] });
+      expect(result.current.activeChallenge).not.toBeNull();
+      act(() => { result.current.dismiss(); });
+
+      // Trigger third (85%)
+      rerender({ timeRemaining: 14, wordsFound: [] });
+      expect(result.current.activeChallenge).not.toBeNull();
+    });
+
+    it('does not trigger a fourth challenge after all 3 thresholds used', () => {
+      const { result, rerender } = renderHook(
+        ({ timeRemaining, wordsFound }) =>
+          useFlashChallenge({ ...baseProps, timeRemaining, wordsFound }),
+        { initialProps: { timeRemaining: 69, wordsFound: [] as string[] } }
+      );
+      // Dismiss all 3
+      act(() => { result.current.dismiss(); });
+      rerender({ timeRemaining: 39, wordsFound: [] });
+      act(() => { result.current.dismiss(); });
+      rerender({ timeRemaining: 14, wordsFound: [] });
+      act(() => { result.current.dismiss(); });
+
+      // No more challenges at 95%
+      rerender({ timeRemaining: 5, wordsFound: [] });
+      expect(result.current.activeChallenge).toBeNull();
+    });
+  });
 });

@@ -231,8 +231,7 @@ function WaveEffect({ config }: { config: AttackEffectConfig }) {
       <div
         className="h-full w-1/3"
         style={{
-          background: `linear-gradient(90deg, transparent, ${config.glowColor}, ${config.coreColor}, ${config.glowColor}, transparent)`,
-          filter: 'blur(4px)',
+          background: `linear-gradient(90deg, transparent 0%, ${config.glowColor} 20%, ${config.coreColor} 50%, ${config.glowColor} 80%, transparent 100%)`,
         }}
       />
     </AdaptiveMotion.div>
@@ -275,7 +274,6 @@ function BeamEffect({ config }: { config: AttackEffectConfig }) {
       transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
       style={{
         background: `linear-gradient(180deg, ${config.coreColor}, ${config.glowColor}, transparent)`,
-        filter: 'blur(3px)',
         boxShadow: `0 0 30px ${config.glowColor}`,
       }}
     />

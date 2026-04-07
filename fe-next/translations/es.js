@@ -600,6 +600,16 @@ const es = {
     },
     "gestureTutorial": "Desliza sobre las letras para formar palabras"
   },
+  "roundEvent": {
+    "blizzardWarning": "¡Ventisca entrante!",
+    "lightningWarning": "¡Rayo!",
+    "meteorWarning": "¡Lluvia de meteoritos!",
+    "active": "Activo"
+  },
+  "specialWord": {
+    "bonus": "+{{bonus}} ⭐",
+    "foundBy": "Encontrada por {{username}}"
+  },
   "countdown": {
     "hint": "¡Desliza letras para formar palabras!",
     "go": "¡YA!",
@@ -1836,6 +1846,7 @@ const es = {
     "viewDetails": "A fondo",
     "viewAllWords": "Todas las Palabras",
     "viewXpBreakdown": "Desglose XP",
+    "showDetails": "Ver Detalles",
     "rewardsEarned": "Botín Ganado",
     "achievementUnlocked": "Logro Desbloqueado",
     "achievementsUnlocked": "Logros Desbloqueados",
@@ -3706,6 +3717,7 @@ const es = {
       "averageScore": "El promedio de hoy es {{average}}",
       "tryAgain": "¿Intentar de nuevo?",
       "continue": "Continuar",
+      "aboveAverage": "¡Por encima del promedio!",
       "dailyChallenge": "Desafío Diario",
       "dailyChallengeDesc": "Compite en el tablero de hoy — ¡el mismo puzzle para todos!",
       "practiceMode": "Juego Rápido",
@@ -3926,7 +3938,7 @@ const es = {
     "best": "Mejor",
     "target": "Objetivo",
     "totalPoints": "total pts",
-    "topPercent": "Top ${percent}%",
+    "topPercent": "Top {percent}%",
     "noRankYet": "¡Juega partidas para clasificarte!",
     "viewLeaderboard": "Ver Clasificación",
     "friends": "Amigos",
@@ -3952,7 +3964,20 @@ const es = {
     "hint": "Sigue subiendo posiciones",
     "multiplayerTip": "¡En multijugador, la velocidad importa!",
     "wordsPerMin": "Palabras/min",
-    "topCreators": "Mejores Creadores"
+    "topCreators": "Mejores Creadores",
+    "tierUp": {
+      "title": "¡Subiste de Rango!",
+      "message": "¡Has alcanzado {tier}!"
+    },
+    "tiers": {
+      "stone": "Piedra",
+      "bronze": "Bronce",
+      "silver": "Plata",
+      "gold": "Oro",
+      "platinum": "Platino",
+      "diamond": "Diamante",
+      "grandmaster": "Gran Maestro"
+    }
   },
   "ugc": {
     "createBoard": "Crear tablero",
@@ -4268,7 +4293,7 @@ const es = {
     "multiPlayer": "Multijugador",
     "multiplayer": "Multijugador",
     "multiplayerDesc": "¡Compite con amigos en tiempo real!",
-    "arena": "Arena de Palabras",
+    "arena": "Multijugador",
     "arenaDesc": "¡Juega solo o desafía amigos!",
     "practice": "Práctica",
     "practiceDesc": "Sin presión, solo palabras",
@@ -5207,7 +5232,8 @@ const es = {
         "classic": "Clásico",
         "blitz": "Blitz",
         "survival": "Supervivencia"
-      }
+      },
+      "sent": "¡Desafío enviado!"
     },
     "copyInviteLink": "Copiar enlace de invitación",
     "linkCopied": "¡Enlace copiado!",
@@ -6284,6 +6310,18 @@ const es = {
       "allQuestsComplete": "¡Todas las misiones diarias completas! ¡Bonus!",
       "dailyQuestBonusComplete": "¡Todas las misiones completas! +50 oro de bonificación"
     },
+    "share": {
+      "perfectClear": "¡Perfecto!",
+      "bestWord": "Mejor palabra",
+      "wordsFound": "palabras encontradas"
+    },
+    "streak": {
+      "days": "días de racha",
+      "milestone3": "¡Racha de 3 días!",
+      "milestone7": "¡Guerrero semanal!",
+      "milestone14": "¡Campeón de dos semanas!",
+      "milestone30": "¡Leyenda mensual!"
+    },
     "album": {
       "title": "Álbum de palabras",
       "uniqueWords": "Palabras únicas",
@@ -6347,13 +6385,49 @@ const es = {
     },
     "mastery": {
       "label": "Maestría",
+      "title": "Maestría de Arquetipo",
       "tier": {
+        "none": "Sin rango",
         "bronze": "Bronce",
         "silver": "Plata",
         "gold": "Oro",
         "platinum": "Platino",
         "diamond": "Diamante"
-      }
+      },
+      "progress": "{current}/{target} estrellas",
+      "bonusUnlocked": "Bonus desbloqueado: {description}",
+      "nextTier": "Siguiente nivel: {tier} ({remaining} estrellas más)"
+    },
+    "runes": {
+      "title": "Colección de Runas",
+      "forge": "Forjar Runa",
+      "equip": "Equipar",
+      "unequip": "Desequipar",
+      "equipped": "Equipadas ({count}/{max})",
+      "fragments": "{count} Fragmentos",
+      "forgeCost": "Costo: {cost} fragmentos",
+      "alreadyOwned": "Ya poseída",
+      "notEnoughFragments": "Fragmentos insuficientes",
+      "fragment": "Fragmento de Runa",
+      "slotsFull": "Todas las ranuras llenas",
+      "rarity": {
+        "common": "Común",
+        "rare": "Rara",
+        "epic": "Épica",
+        "legendary": "Legendaria"
+      },
+      "ember": { "name": "Runa de Brasa", "desc": "+10% bonus de puntaje" },
+      "inferno": { "name": "Runa Infernal", "desc": "+25% bonus de puntaje" },
+      "midas": { "name": "Runa de Midas", "desc": "+15% bonus de oro" },
+      "fortune": { "name": "Runa de Fortuna", "desc": "+40% bonus de oro" },
+      "hourglass": { "name": "Runa de Reloj", "desc": "+5s tiempo bonus" },
+      "eternity": { "name": "Runa de Eternidad", "desc": "+12s tiempo bonus" },
+      "flow": { "name": "Runa de Flujo", "desc": "15% menos decaimiento de combo" },
+      "torrent": { "name": "Runa de Torrente", "desc": "35% menos decaimiento de combo" },
+      "insight": { "name": "Runa de Perspicacia", "desc": "+1 pista" },
+      "oracle": { "name": "Runa del Oráculo", "desc": "+2 pistas" },
+      "valor": { "name": "Runa de Valor", "desc": "+20% daño al jefe" },
+      "dragonslayer": { "name": "Runa Matadragones", "desc": "+50% daño al jefe" }
     },
     "share": {
       "bossDefeated": "¡Derroté a {{boss}} en {{world}}!",
@@ -6411,9 +6485,19 @@ const es = {
     "perfect": "¡Perfecto!",
     "restart": "Reiniciar",
     "gold": "Oro",
+    "archetype": {
+      "standard": "Estándar",
+      "excavation": "Excavación",
+      "goldRush": "Fiebre del Oro",
+      "puzzle": "Rompecabezas",
+      "survival": "Supervivencia",
+      "cascade": "Cascada",
+      "boss": "Batalla de Jefe"
+    },
     "loading": "Cargando aventura...",
     "currency": {
-      "goldAmount": "{amount} oro"
+      "goldAmount": "{amount} oro",
+      "coinIcon": "moneda"
     },
     "levelLocked": "Nivel {level} — Bloqueado",
     "bossLevel": "Nivel jefe {level}",
@@ -7028,7 +7112,8 @@ const es = {
       "yourProgress": "Tu progreso",
       "bestWords": "Mejores palabras",
       "bestScore": "Mejor puntuación",
-      "attempts": "Intentos"
+      "attempts": "Intentos",
+      "nearMissTitle": "¡Tan cerca!"
     },
     "preview": {
       "title": "Vista previa del nivel",
@@ -7573,10 +7658,61 @@ const es = {
     "reconnectAttempt": "Intento {current} de {max}",
     "leaveGame": "Salir del juego",
     "scoreSafeReconnect": "Tu puntuación está segura",
+    "defeatExplainer": {
+      "title": "Qué Salió Mal",
+      "tip": {
+        "wordCount": "Intenta encontrar palabras cortas más rápido para aumentar tu cuenta.",
+        "scoreTarget": "Concéntrate en palabras largas — dan exponencialmente más puntos.",
+        "longWords": "Busca palabras de 5+ letras revisando bordes y diagonales.",
+        "clearIce": "Prioriza palabras que pasen por las casillas de hielo.",
+        "timeBonus": "Envía palabras rápido — la velocidad es clave para este objetivo.",
+        "collectGems": "Dirige tus palabras por las casillas de gemas siempre que puedas.",
+        "defeatBoss": "Mantén un combo constante para maximizar el daño.",
+        "surviveBattle": "Encuentra palabras rápido para curarte y esquivar ataques del jefe.",
+        "mechanicTrigger": "Enfócate en activar la mecánica del nivel antes que otros objetivos.",
+        "noDamage": "Prioriza palabras cortas y rápidas para mantener tu escudo de combo."
+      }
+    },
+    "starsNeeded": "Se necesitan {{count}} estrellas más",
+    "hpBar": {
+      "enragedZone": "Zona de furia",
+      "phase2Zone": "Zona fase 2",
+      "phase1Zone": "Zona fase 1",
+      "healthLabel": "Salud de {{bossName}}: {{percentage}}%"
+    },
+    "comboExplainer": "Encuentra palabras rápido en fila para crear combos. ¡Cada combo aumenta tu multiplicador de puntuación!"
   },
   "blast": {
     "chain": {
-      "badge": "Cadena x{level}"
+      "badge": "Cadena x{level}",
+      "cascade": "¡Cascada!",
+      "double": "¡Doble!",
+      "triple": "¡TRIPLE!",
+      "mega": "¡MEGA!",
+      "ultra": "¡¡ULTRA!!"
+    },
+    "praise": {
+      "nice": "¡Bien!",
+      "great": "¡Genial!",
+      "brilliant": "¡Brillante!",
+      "amazing": "¡INCREÍBLE!",
+      "legendary": "¡¡LEGENDARIO!!"
+    },
+    "waveClear": {
+      "perfect": "¡PERFECTO!",
+      "great": "¡GENIAL!",
+      "clear": "¡LIMPIO!"
+    },
+    "milestone": {
+      "100": "¡100!",
+      "250": "¡250!",
+      "500": "¡500!",
+      "750": "¡750!",
+      "1000": "¡1000!",
+      "1500": "¡1500!",
+      "2000": "¡2000!",
+      "3000": "¡3000!",
+      "5000": "5000+"
     },
     "tile": {
       "gold":      { "name": "Oro",        "desc": "Puntos ×3 + 1 movimiento extra." },
@@ -9109,7 +9245,8 @@ const es = {
     "send": "Enviar Regalo",
     "sent": "¡Regalo Enviado!",
     "limitReached": "Límite diario alcanzado",
-    "error": "Regalo fallido. ¿Intentar de nuevo?"
+    "error": "Regalo fallido. ¿Intentar de nuevo?",
+    "received": "¡{sender} te envió un {type}!"
   },
   "faq": {
     "title": "Preguntas frecuentes",
@@ -9878,21 +10015,33 @@ const es = {
       "mega": "¡MEGA!",
       "ultra": "¡¡ULTRA!!"
     },
+    "praise": {
+      "nice": "¡Bien!",
+      "great": "¡Genial!",
+      "brilliant": "¡Brillante!",
+      "amazing": "¡INCREÍBLE!",
+      "legendary": "¡LEGENDARIO!"
+    },
     "tileGuide": {
       "title": "Guía de fichas",
-      "standard": { "name": "Estándar", "desc": "Ficha básica" },
-      "gold": { "name": "Oro", "desc": "Multiplicador de puntos x3" },
-      "silver": { "name": "Plata", "desc": "Multiplicador de puntos x1.5" },
-      "diamond": { "name": "Diamante", "desc": "Multiplicador de puntos x5" },
-      "bomb": { "name": "Bomba", "desc": "Limpia área 3x3" },
-      "lightning": { "name": "Rayo", "desc": "Limpia columna entera" },
-      "prism": { "name": "Prisma", "desc": "Limpia patrón en cruz" },
-      "rainbow": { "name": "Arcoíris", "desc": "Copia el mejor especial cercano" },
-      "ice": { "name": "Hielo", "desc": "Obstáculo — golpea para romper" },
-      "frozen": { "name": "Congelado", "desc": "2 golpes para liberar especial interior" },
-      "gem": { "name": "Gema", "desc": "3 golpes — genera 2 especiales" },
-      "mirror": { "name": "Espejo", "desc": "Duplica el efecto del compañero" },
-      "magnet": { "name": "Imán", "desc": "Atrae y explota fichas cercanas" }
+      "standard": { "name": "Estándar", "desc": "Ficha básica — sin efecto especial" },
+      "gold": { "name": "Oro", "desc": "×3 puntos + 1 movimiento extra" },
+      "silver": { "name": "Plata", "desc": "×1.5 puntos + extiende cuentas regresivas en 1" },
+      "diamond": { "name": "Diamante", "desc": "×5 puntos + revela contenido congelado por 3 turnos" },
+      "bomb": { "name": "Bomba", "desc": "Limpia área 3×3 — encadena a bombas cercanas" },
+      "lightning": { "name": "Rayo", "desc": "Limpia columna entera — encadena a otros rayos" },
+      "prism": { "name": "Prisma", "desc": "2 golpes — limpia fila + columna, crea 2 especiales" },
+      "rainbow": { "name": "Arcoíris", "desc": "Copia el mejor especial en tu palabra, o ×2 puntos" },
+      "ice": { "name": "Hielo", "desc": "2 golpes para romper — congela virus adyacentes" },
+      "frozen": { "name": "Congelado", "desc": "2 golpes — libera un especial oculto dentro" },
+      "gem": { "name": "Gema", "desc": "3 golpes — genera 2 especiales + 2 movimientos extra" },
+      "mirror": { "name": "Espejo", "desc": "Copia el primer especial ofensivo en tu palabra" },
+      "magnet": { "name": "Imán", "desc": "Atrae fichas cercanas hacia adentro, luego explota 3×3" },
+      "wildcard": { "name": "Comodín", "desc": "Coincide con cualquier letra — puntúa por rareza" },
+      "countdown": { "name": "Cuenta regresiva", "desc": "¡Desactiva antes de 0! +2 movimientos — o penalización de 50pts" },
+      "virus": { "name": "Virus", "desc": "Se propaga cada turno — elimina 3+ en una palabra para curar todos" },
+      "portal": { "name": "Portal", "desc": "Enlazados en pares — limpia ambos, ×2 puntos de palabra" },
+      "catalyst": { "name": "Catalizador", "desc": "Mejora todas las fichas adyacentes a especiales aleatorias" }
     },
     "objective": {
       "scoreTarget": "Consigue {target} pts",

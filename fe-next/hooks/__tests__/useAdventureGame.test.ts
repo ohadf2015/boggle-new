@@ -464,6 +464,7 @@ describe('useAdventureGame', () => {
       );
 
       // WHEN - Submit word using bomb tile
+      const scoreBefore = result.current.gameState.score;
       act(() => {
         result.current.submitWordWithPath('TEST', 100, [
           { row: 1, col: 0 },
@@ -473,11 +474,9 @@ describe('useAdventureGame', () => {
         ]);
       });
 
-      // THEN - All tiles in row 1 should be cleared
-      expect(result.current.tiles[1][0].isCleared).toBe(true);
+      // THEN - Bomb doubles score (100 * 2 = 200), bomb tile cleared
+      expect(result.current.gameState.score).toBe(scoreBefore + 200);
       expect(result.current.tiles[1][1].isCleared).toBe(true);
-      expect(result.current.tiles[1][2].isCleared).toBe(true);
-      expect(result.current.tiles[1][3].isCleared).toBe(true);
       // Other rows unaffected
       expect(result.current.tiles[0][0].isCleared).toBe(false);
     });

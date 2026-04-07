@@ -25,16 +25,20 @@ import { getChapterNumber } from '@/lib/adventure/questConfig';
 import { getMasteryAura } from '@/lib/adventure/powerGrowth';
 import { applyGemDetectorBoost, LEVELS_PER_WORLD } from '@/lib/adventure';
 import { getStoryBeat } from '@/lib/adventure/storyConfig';
+import { getStreakMilestone } from '@/lib/adventure/adventureStreak';
 import GameplayBackground from './themed/GameplayBackground';
 import { GameHeader, GameSidebar, GameGridArea, GameLayout } from './ui';
 import AdventureGameOverlays from './AdventureGameOverlays';
+import MechanicBonusToast from './MechanicBonusToast';
+import MechanicIndicator from './MechanicIndicator';
 import RetryAssistModal from './RetryAssistModal';
+import { getNearMissMessages } from '@/lib/adventure/nearMiss';
 import { AdventureTutorial, hasSeenTutorial } from './AdventureTutorial';
 import { useAdventureGameCallbacks } from './hooks/useAdventureGameCallbacks';
 import { useAdventureQuestTracking } from './hooks/useAdventureQuestTracking';
 import { useAdventureGridInteraction } from './hooks/useAdventureGridInteraction';
 import { useCrazyGamesLifecycle } from '@/hooks/useCrazyGamesLifecycle';
-import { useCrazyGamesAds } from '@/hooks/useCrazyGamesAds';
+import { useInterstitialAd } from '@/hooks/useInterstitialAd';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useAdventureKeyboardShortcuts } from './hooks/useAdventureKeyboardShortcuts';
 import { useAdventureSFX, useAdventureAnalytics } from './hooks/useAdventureSFXAndAnalytics';
@@ -120,7 +124,7 @@ const AdventureGame = memo<AdventureGameProps>(
     });
 
     const tiles = useMemoizedFlatTiles(tiles2D, tilesVersion);
-    const { recordAttempt, getLevelAttempt, getLevelCompletion, progression, updateWordAlbum, completeLevel: persistCompletion } = useProgression();
+    const { recordAttempt, getLevelAttempt, getLevelCompletion, progression, updateWordAlbum, updateRunes, completeLevel: persistCompletion } = useProgression();
     // Wrap to ensure correct return type for saveCompletion prop
     const saveCompletionToDb = useCallback(
       async (world: number, level: number, stars: 0 | 1 | 2 | 3, score: number, words: number, goldEarned?: number, longWords?: number): Promise<boolean> => {
@@ -132,6 +136,10 @@ const AdventureGame = memo<AdventureGameProps>(
     const bestAttempt = useMemo(
       () => getLevelAttempt(levelConfig.world, levelConfig.level),
       [getLevelAttempt, levelConfig.world, levelConfig.level]
+    );
+    const streakMilestone = useMemo(
+      () => getStreakMilestone(progression?.streak?.currentStreak ?? 0),
+      [progression?.streak?.currentStreak]
     );
     const previousBestStars = useMemo(
       () => getLevelCompletion?.(levelConfig.world, levelConfig.level)?.stars ?? 0,
@@ -210,6 +218,7 @@ const AdventureGame = memo<AdventureGameProps>(
     const { recordProgress: recordQuestProgress } = useDailyQuests({
       initialProgress: progression?.dailyQuestProgress,
       lastQuestDate: progression?.dailyQuestDate,
+      currentWorld: progression?.currentWorld,
     });
     const chapterNumber = getChapterNumber(levelConfig.level);
     const chapterQuests = useChapterQuests({ worldId: levelConfig.world, chapterNumber });
@@ -260,15 +269,15 @@ const AdventureGame = memo<AdventureGameProps>(
       maxCombo: gameState.comboCount,
       wordsFound: gameState.wordsFound.length,
     });
-    // Show midgame ad between adventure levels (natural break point)
-    const { requestMidgameAd: cgRequestMidgameAd } = useCrazyGamesAds();
+    // Show interstitial ad between adventure levels (natural break point)
+    const { showInterstitial } = useInterstitialAd();
     const prevIsCompleteRef = useRef(false);
     useEffect(() => {
       if (gameState.isComplete && !prevIsCompleteRef.current) {
-        cgRequestMidgameAd();
+        showInterstitial('adventure-level-complete');
       }
       prevIsCompleteRef.current = gameState.isComplete;
-    }, [gameState.isComplete, cgRequestMidgameAd]);
+    }, [gameState.isComplete, showInterstitial]);
 
     const getScoreMultiplier = useCallback(() => 1, []);
     const augmentedSkillEffects = useMemo(() => ({
@@ -320,10 +329,12 @@ const AdventureGame = memo<AdventureGameProps>(
       isPlaying: isPlaying && entryPhase === 'playing', isPaused, isModalOpen, isBossLevel,
     });
 
+    // Coarsen timeRemaining to avoid re-render every second — only changes at the 10s threshold
+    const coarseTimeRemaining = timeRemaining <= 10 ? timeRemaining : 11;
     const lexiGameState = useMemo(() => ({
-      wordsFound: gameState.wordsFound, comboCount: gameState.comboCount, timeRemaining,
+      wordsFound: gameState.wordsFound, comboCount: gameState.comboCount, timeRemaining: coarseTimeRemaining,
       isComplete: gameState.isComplete, stars: gameState.stars, worldId: levelConfig.world,
-    }), [gameState.wordsFound, gameState.comboCount, gameState.isComplete, gameState.stars, levelConfig.world, timeRemaining]);
+    }), [gameState.wordsFound, gameState.comboCount, coarseTimeRemaining, gameState.isComplete, gameState.stars, levelConfig.world]);
 
     const effects = useAdventureEffects({
       gameStateForReactions: { gameState: lexiGameState, isPlaying: isPlaying && entryPhase === 'playing' && !isPaused },
@@ -364,7 +375,8 @@ const AdventureGame = memo<AdventureGameProps>(
       bonusGoldMultiplier: init.runeEffects.goldMultiplier * init.streakMultiplier,
       isFirstCompletion: !bestAttempt,
       awardXp: init.awardXp, addGold: init.addGold,
-      recordAttempt, recordCompletion: init.recordCompletion, saveCompletion: saveCompletionToDb, updateWordAlbum,
+      recordAttempt, recordCompletion: init.recordCompletion, saveCompletion: saveCompletionToDb, updateWordAlbum, updateRunes,
+      currentRunes: progression?.runes, currentFragments: progression?.runeFragments,
       endAIDirector: init.endAIDirector, handleEarnAchievement: init.handleEarnAchievement,
       pauseGame, completeLevel, showVictory: cinematics.showVictory, showDefeat: cinematics.showDefeat,
       showLevelComplete, showVictoryCinematic: cinematics.showVictoryCinematic,
@@ -661,7 +673,7 @@ const AdventureGame = memo<AdventureGameProps>(
           }
           overlays={
             <AdventureGameOverlays
-              bossConfig={bossOrch.bossConfig} bossMaxHP={bossOrch.bossMaxHP}
+              bossConfig={bossOrch.bossConfig}
               bossTaunt={bossOrch.bossTaunt} showBossIntro={bossOrch.showBossIntro}
               handleBossIntroStart={bossOrch.handleBossIntroStart}
               handleBossIntroSkip={bossOrch.handleBossIntroSkip}
@@ -713,9 +725,19 @@ const AdventureGame = memo<AdventureGameProps>(
               pendingExplosions={effects.pendingExplosions} removeExplosion={effects.removeExplosion}
               levelUpData={levelCompletion.levelUpData} handleLevelUpClose={levelCompletion.handleLevelUpClose}
               currentMilestone={init.currentMilestone}
+              streakMilestone={streakMilestone}
             />
           }
         />
+        <MechanicBonusToast bonus={wordSubmit.mechanicBonus} onDismiss={wordSubmit.dismissMechanicBonus} />
+        {entryPhase === 'playing' && levelConfig.worldMechanic && (
+          <MechanicIndicator
+            mechanic={levelConfig.worldMechanic}
+            hitCount={wordSubmit.mechanicHitCount}
+            worldNumber={levelConfig.world}
+            className="fixed top-12 left-1/2 -translate-x-1/2 z-20"
+          />
+        )}
         {showRetryAssist && (
           <RetryAssistModal
             isOpen={showRetryAssist}
@@ -723,6 +745,7 @@ const AdventureGame = memo<AdventureGameProps>(
             bestWords={gameState.wordsFound.length}
             bestScore={gameState.score}
             attemptCount={(bestAttempt?.attemptCount ?? 0) + 1}
+            nearMissMessages={getNearMissMessages(objectives)}
             onRetry={handleRetryFromAssist}
             onRetryWithBonus={handleRetryWithBonus}
             onRetryWithHint={handleRetryWithHint}

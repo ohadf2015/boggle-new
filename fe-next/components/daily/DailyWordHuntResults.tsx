@@ -15,11 +15,11 @@ import { ArrowLeft, Trophy, BarChart3 } from 'lucide-react';
 import { CoinSpendAnimation } from '@/components/animations/CoinSpendAnimation';
 import { MobileTabBar } from '@/components/layout/MobileTabBar';
 import { Button } from '@/components/ui/button';
-import { useAdPlacement } from '@/hooks/useAdPlacement';
-import { useCrazyGamesAds } from '@/hooks/useCrazyGamesAds';
+import { useInterstitialAd } from '@/hooks/useInterstitialAd';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 
 const CrazyGamesBanner = dynamic(() => import('@/components/CrazyGamesBanner'), { ssr: false });
+const NativeBannerAd = dynamic(() => import('@/components/ads/NativeBannerAd'), { ssr: false });
 import {
   getGuestFingerprint,
   getGuestDailyPlayer,
@@ -71,14 +71,12 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
   const { t } = useLanguage();
   const { user, profile, isAuthenticated } = useAuth();
 
-  const { showInterstitial } = useAdPlacement();
-  const { requestMidgameAd } = useCrazyGamesAds();
+  const { showInterstitial } = useInterstitialAd();
   const { submitLeaderboardScore } = useCrazyGames();
 
   // Ads + leaderboard on mount
   useEffect(() => {
     showInterstitial('word-hunt-complete');
-    requestMidgameAd();
     if (result.efficiencyScore != null && result.efficiencyScore > 0) {
       submitLeaderboardScore(result.efficiencyScore);
     }
@@ -409,13 +407,14 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
         </div>
       </div>
 
-      {/* Banner Ads */}
+      {/* Banner Ads — CrazyGames (web iframe) / AdMob (native) */}
       <div className="hidden md:flex justify-center py-2">
         <CrazyGamesBanner size="728x90" />
       </div>
       <div className="flex justify-center py-2 md:hidden">
         <CrazyGamesBanner size="320x50" />
       </div>
+      <NativeBannerAd />
 
       {/* Mobile Tab Bar */}
       <div className="flex-shrink-0 fixed bottom-0 inset-x-0 z-50 bg-neo-navy border-t-4 border-neo-black md:hidden">

@@ -15,7 +15,7 @@ import logger from '../utils/logger';
  * Works with Railway, Heroku, or any Node.js hosting
  */
 
-const LANGUAGES: readonly Language[] = ['en', 'he', 'sv', 'ja'] as const;
+const LANGUAGES: readonly Language[] = ['en', 'he', 'sv', 'ja', 'es'] as const;
 /**
  * Start Wikipedia word population cron
  * Runs at 23:55 UTC daily

@@ -14,7 +14,7 @@ import { getBossConfig, getBossTaunt } from '@/lib/adventure/bossConfig';
 vi.mock('@/lib/adventure/bossConfig', () => ({
   getBossConfig: vi.fn(),
   getBossTaunt: vi.fn(),
-  BOSS_HP: { 1: 30, 2: 50, 3: 75, 4: 100, 5: 130, 6: 165, 7: 200, 8: 240, 9: 280, 10: 350 },
+  BOSS_HP: { 1: 150, 2: 250, 3: 375, 4: 500, 5: 650, 6: 825, 7: 1000, 8: 1200, 9: 1400, 10: 1750 },
 }));
 
 const mockGetBossConfig = getBossConfig as any;
@@ -101,11 +101,11 @@ describe('useAdventureBossNew', () => {
         result.current.startBattle();
       });
 
-      expect(result.current.maxHP).toBe(75);
-      expect(result.current.hp).toBe(75);
+      expect(result.current.maxHP).toBe(375);
+      expect(result.current.hp).toBe(375);
     });
 
-    it('should compute HP for world 1 as 30', () => {
+    it('should compute HP for world 1 as 150', () => {
       const { result } = renderHook(() =>
         useAdventureBossNew({ worldId: 1 })
       );
@@ -114,10 +114,10 @@ describe('useAdventureBossNew', () => {
         result.current.startBattle();
       });
 
-      expect(result.current.maxHP).toBe(30);
+      expect(result.current.maxHP).toBe(150);
     });
 
-    it('should compute HP for world 10 as 350', () => {
+    it('should compute HP for world 10 as 1750', () => {
       mockGetBossConfig.mockReturnValue({ ...MOCK_BOSS_CONFIG, worldId: 10 } as any);
       const { result } = renderHook(() =>
         useAdventureBossNew({ worldId: 10 })
@@ -127,7 +127,7 @@ describe('useAdventureBossNew', () => {
         result.current.startBattle();
       });
 
-      expect(result.current.maxHP).toBe(350);
+      expect(result.current.maxHP).toBe(1750);
     });
   });
 
@@ -149,7 +149,7 @@ describe('useAdventureBossNew', () => {
         result.current.dealDamage(25);
       });
 
-      expect(result.current.hp).toBe(5);
+      expect(result.current.hp).toBe(125);
     });
 
     it('should not reduce HP below 0', () => {
@@ -162,7 +162,7 @@ describe('useAdventureBossNew', () => {
       });
 
       act(() => {
-        result.current.dealDamage(150);
+        result.current.dealDamage(200);
       });
 
       expect(result.current.hp).toBe(0);
@@ -192,7 +192,7 @@ describe('useAdventureBossNew', () => {
       });
 
       act(() => {
-        result.current.dealDamage(30);
+        result.current.dealDamage(150);
       });
 
       expect(result.current.hp).toBe(0);
@@ -227,7 +227,7 @@ describe('useAdventureBossNew', () => {
       });
 
       act(() => {
-        result.current.dealDamage(25);
+        result.current.dealDamage(140);
       });
 
       let damage: number = 0;
@@ -235,8 +235,8 @@ describe('useAdventureBossNew', () => {
         damage = result.current.dealDamage(50);
       });
 
-      // Only 5 HP left, so damage should be capped at 5
-      expect(damage).toBe(5);
+      // Only 10 HP left, so damage should be capped at 10
+      expect(damage).toBe(10);
     });
   });
 
@@ -266,9 +266,9 @@ describe('useAdventureBossNew', () => {
         result.current.startBattle();
       });
 
-      // Deal 16 damage (HP drops to 14 out of 30 = 46.7% < 50%)
+      // Deal 80 damage (HP drops to 70 out of 150 = 46.7% < 50%)
       act(() => {
-        result.current.dealDamage(16);
+        result.current.dealDamage(80);
       });
 
       expect(result.current.phase).toBe('angry');
@@ -284,7 +284,7 @@ describe('useAdventureBossNew', () => {
       });
 
       act(() => {
-        result.current.dealDamage(14); // 16 HP remaining out of 30 = 53.3%
+        result.current.dealDamage(70); // 80 HP remaining out of 150 = 53.3%
       });
 
       expect(result.current.phase).toBe('normal');
@@ -300,7 +300,7 @@ describe('useAdventureBossNew', () => {
       });
 
       act(() => {
-        result.current.dealDamage(23); // 7 HP remaining out of 30 = 23.3% < 25%
+        result.current.dealDamage(115); // 35 HP remaining out of 150 = 23.3% < 25%
       });
 
       expect(result.current.phase).toBe('desperate');
@@ -316,7 +316,7 @@ describe('useAdventureBossNew', () => {
       });
 
       act(() => {
-        result.current.dealDamage(22); // 8 HP remaining out of 30 = 26.7% > 25%
+        result.current.dealDamage(110); // 40 HP remaining out of 150 = 26.7% > 25%
       });
 
       expect(result.current.phase).toBe('angry');
@@ -332,7 +332,7 @@ describe('useAdventureBossNew', () => {
       });
 
       act(() => {
-        result.current.dealDamage(16); // 14 HP out of 30 = 46.7% < 50% → angry
+        result.current.dealDamage(80); // 70 HP out of 150 = 46.7% < 50% → angry
       });
 
       // Should have a taunt from phase change
@@ -349,7 +349,7 @@ describe('useAdventureBossNew', () => {
       });
 
       act(() => {
-        result.current.dealDamage(23); // 7 HP out of 30 = 23.3% < 25% → desperate
+        result.current.dealDamage(115); // 35 HP out of 150 = 23.3% < 25% → desperate
       });
 
       expect(result.current.currentTaunt).not.toBeNull();
@@ -371,8 +371,8 @@ describe('useAdventureBossNew', () => {
       });
 
       expect(result.current.isActive).toBe(true);
-      expect(result.current.hp).toBe(30);
-      expect(result.current.maxHP).toBe(30);
+      expect(result.current.hp).toBe(150);
+      expect(result.current.maxHP).toBe(150);
     });
 
     it('should trigger onStart taunt', () => {
@@ -491,7 +491,7 @@ describe('useAdventureBossNew', () => {
 
       // Move to angry phase
       act(() => {
-        result.current.dealDamage(16);
+        result.current.dealDamage(80);
       });
 
       onAttack.mockClear();
@@ -515,7 +515,7 @@ describe('useAdventureBossNew', () => {
 
       // Move to desperate phase
       act(() => {
-        result.current.dealDamage(23);
+        result.current.dealDamage(115);
       });
 
       onAttack.mockClear();
@@ -707,11 +707,11 @@ describe('useAdventureBossNew', () => {
         result.current.startBattle();
       });
 
-      // World 2 = 50 HP
+      // World 2 = 250 HP
       expect(result.current.hpPercentage).toBe(100);
 
       act(() => {
-        result.current.dealDamage(25);
+        result.current.dealDamage(125);
       });
 
       expect(result.current.hpPercentage).toBe(50);
@@ -772,7 +772,7 @@ describe('useAdventureBossNew', () => {
       });
 
       act(() => {
-        result.current.dealDamage(16);
+        result.current.dealDamage(80);
       });
 
       expect(result.current.phase).toBe('angry');
@@ -804,11 +804,11 @@ describe('useAdventureBossNew', () => {
         result.current.startBattle();
       });
 
-      // World 1 = 30 HP. Two calls each dealing 30 would both see hp > 0
+      // World 1 = 150 HP. Two calls each dealing 150 would both see hp > 0
       // if isActiveRef is not set false immediately in dealDamage.
       act(() => {
-        result.current.dealDamage(30); // kills boss
-        result.current.dealDamage(30); // should be a no-op (guard)
+        result.current.dealDamage(150); // kills boss
+        result.current.dealDamage(150); // should be a no-op (guard)
       });
 
       expect(onVictory).toHaveBeenCalledTimes(1);
@@ -823,17 +823,115 @@ describe('useAdventureBossNew', () => {
       act(() => { result.current.startBattle(); });
 
       // First kill: drops HP to 0. isActiveRef must be set false in dealDamage itself.
-      act(() => { result.current.dealDamage(30); });
+      act(() => { result.current.dealDamage(150); });
       // React effects have run — isActive state is now false.
       // A second call simulates a concurrent submission arriving slightly later.
       let damage2: number = -1;
-      act(() => { damage2 = result.current.dealDamage(30); });
+      act(() => { damage2 = result.current.dealDamage(150); });
 
       // The second call must return 0 (guarded) and must NOT fire onVictory again.
       expect(damage2).toBe(0);
       expect(onVictory).toHaveBeenCalledTimes(1);
     });
 
+  });
+
+  // ==============================================
+  // MULTI-PHASE ROTATION (W10 boss has 9 phases)
+  // ==============================================
+
+  describe('multi-phase rotation', () => {
+    const NINE_PHASE_BOSS = {
+      ...MOCK_BOSS_CONFIG,
+      worldId: 10,
+      id: 'lexiconDragon',
+      twistMechanic: { type: 'finalWord' as const, description: '', params: {
+        phaseOrder: ['popQuiz', 'hiveMind', 'etymologyDig', 'idiomBattle', 'assemblyLine', 'scrambledReality', 'mirrorMatch', 'stellarForge', 'babelSummit'],
+      }},
+      phases: Array.from({ length: 9 }, (_, i) => ({
+        nameKey: `phase.${i}`,
+        hpThreshold: Math.round(100 - (i * (100 / 9))),
+        mechanicModifiers: {
+          speedMultiplier: 1 + (i * 0.15),
+          mechanicOverride: { activeMechanic: ['popQuiz', 'hiveMind', 'etymologyDig', 'idiomBattle', 'assemblyLine', 'scrambledReality', 'mirrorMatch', 'stellarForge', 'babelSummit'][i] },
+          gridEffect: `effect-${i}`,
+        },
+      })),
+    };
+
+    beforeEach(() => {
+      mockGetBossConfig.mockReturnValue(NINE_PHASE_BOSS as any);
+    });
+
+    it('should start at phaseIndex 0', () => {
+      const { result } = renderHook(() =>
+        useAdventureBossNew({ worldId: 10 })
+      );
+
+      act(() => { result.current.startBattle(); });
+
+      expect(result.current.phaseIndex).toBe(0);
+    });
+
+    it('should advance phaseIndex as HP drops through thresholds', () => {
+      const { result } = renderHook(() =>
+        useAdventureBossNew({ worldId: 10 })
+      );
+
+      act(() => { result.current.startBattle(); });
+
+      // W10 HP = 1750, phase thresholds are 100, 89, 78, 67, 56, 44, 33, 22, 11
+      // Damage to drop below 89% = need HP < 89% of 1750 = 1557.5 → deal 193+ damage
+      act(() => { result.current.dealDamage(200); });
+      // HP = 1550, pct = 88.6% < 89% → phaseIndex should be 1
+      expect(result.current.phaseIndex).toBe(1);
+    });
+
+    it('should reach phaseIndex 8 near 0 HP', () => {
+      const { result } = renderHook(() =>
+        useAdventureBossNew({ worldId: 10 })
+      );
+
+      act(() => { result.current.startBattle(); });
+
+      // Deal enough to get below 11% threshold (phase 8): HP < 192.5
+      act(() => { result.current.dealDamage(1560); });
+      // HP = 190, pct = 10.9% < 11%
+      expect(result.current.phaseIndex).toBe(8);
+    });
+
+    it('should use phaseIndex for gridEffect lookup instead of hardcoded 0/1/2', () => {
+      const onAttack = vi.fn();
+      const { result } = renderHook(() =>
+        useAdventureBossNew({ worldId: 10, onAttack })
+      );
+
+      act(() => { result.current.startBattle(); });
+
+      // Drop to phase 2 (below 78% = 1365 HP, deal 400 → HP=1350, pct=77.1%)
+      act(() => { result.current.dealDamage(400); });
+      expect(result.current.phaseIndex).toBe(2);
+    });
+
+    it('should fallback to 3-phase indexing for bosses without multiple phases', () => {
+      // Reset to standard 3-phase boss
+      mockGetBossConfig.mockReturnValue(MOCK_BOSS_CONFIG as any);
+
+      const { result } = renderHook(() =>
+        useAdventureBossNew({ worldId: 1 })
+      );
+
+      act(() => { result.current.startBattle(); });
+
+      expect(result.current.phaseIndex).toBe(0);
+
+      // Drop below 50% → angry → phaseIndex 1
+      act(() => { result.current.dealDamage(80); });
+      expect(result.current.phaseIndex).toBe(1);
+    });
+  });
+
+  describe('double-dealDamage guard (continued)', () => {
     it('dealDamage sets isActiveRef false synchronously when HP reaches 0 (prevents same-tick double-fire)', () => {
       // This test verifies the fix: dealDamage must set isActiveRef.current=false
       // immediately when newHP<=0, before effects run.
@@ -850,11 +948,11 @@ describe('useAdventureBossNew', () => {
       // before React effects can run (inside act, but both calls before flush)
       let damage1 = 0, damage2 = 0;
       act(() => {
-        damage1 = result.current.dealDamage(30); // kills boss, must set isActiveRef=false
-        damage2 = result.current.dealDamage(30); // must return 0 if isActiveRef was set false above
+        damage1 = result.current.dealDamage(150); // kills boss, must set isActiveRef=false
+        damage2 = result.current.dealDamage(150); // must return 0 if isActiveRef was set false above
       });
 
-      expect(damage1).toBe(30); // full damage dealt
+      expect(damage1).toBe(150); // full damage dealt
       expect(damage2).toBe(0);  // guarded — isActiveRef was already false
       expect(onVictory).toHaveBeenCalledTimes(1);
     });

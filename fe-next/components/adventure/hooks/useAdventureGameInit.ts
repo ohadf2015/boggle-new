@@ -23,15 +23,8 @@ import { showAchievementToast } from '@/components/achievements/AchievementToast
 import { ADVENTURE_ACHIEVEMENTS } from '@/utils/adventureAchievementUtils';
 import { getStreakMultiplier } from '@/lib/adventure/adventureStreak';
 import { getWeeklyModifiers, applyModifiers } from '@/lib/adventure/weeklyModifiers';
-/** Default rune effects — rune system not yet wired to DB */
-const DEFAULT_RUNE_EFFECTS = {
-  scoreMultiplier: 1.0,
-  goldMultiplier: 1.0,
-  timeBonus: 0,
-  comboDecay: 1.0,
-  hintBonus: 0,
-  bossDamage: 1.0,
-} as const;
+import { applyMasteryBonuses, calculateArchetypeMastery } from '@/lib/adventure/archetypeMastery';
+import { computeRuneEffects } from '@/lib/adventure/runeCatalog';
 
 export interface UseAdventureGameInitProps {
   world: number;
@@ -141,8 +134,12 @@ export function useAdventureGameInit({ world, level, timerSeconds }: UseAdventur
   // Word Forge upgrade effects
   const upgradeEffects = useUpgradeEffects(upgrades);
 
-  // Rune effects — system not yet wired, use defaults
-  const runeEffects = DEFAULT_RUNE_EFFECTS;
+  // Rune effects — computed from player's equipped runes
+  const playerRunes = progression?.runes;
+  const runeEffects = useMemo(
+    () => computeRuneEffects(playerRunes ?? []),
+    [playerRunes]
+  );
 
   // Streak multiplier — scales gold/XP based on consecutive play days
   const streakMultiplier = useMemo(
@@ -170,18 +167,27 @@ export function useAdventureGameInit({ world, level, timerSeconds }: UseAdventur
     xpBonus: streakMultiplier, // streak boosts XP
   }), [upgradeEffects.comboScoreMultiplier, runeEffects.scoreMultiplier, weeklyApplied.scoreMultiplier, streakMultiplier]);
 
-  // Adjusted level config with Fuel Tank + rune time bonuses + weekly timer modifier
+  // Archetype mastery — derived from completion history
+  const completions = progression?.completions;
+  const archetypeMastery = useMemo(
+    () => completions ? calculateArchetypeMastery(completions) : undefined,
+    [completions]
+  );
+
+  // Adjusted level config with Fuel Tank + rune time bonuses + weekly timer modifier + mastery bonuses
   const adjustedLevelConfig = useMemo(() => {
     const baseTimer = adjustedConfig.timerSeconds + upgradeEffects.bonusTimeSeconds + runeEffects.timeBonus;
     const weeklyTimerMod = weeklyModifiers.reduce((m, mod) => m * (mod.effects.timerMultiplier ?? 1), 1);
     // Floor at 45s — even with aggressive modifiers, levels must remain playable
     const effectiveTimer = Math.max(Math.round(baseTimer * weeklyTimerMod), 45);
-    return {
+    const baseConfig = {
       ...adjustedConfig,
       timerSeconds: effectiveTimer,
       minWordLength: Math.max(adjustedConfig.minWordLength ?? 2, weeklyApplied.minWordLength) as 2 | 3,
     };
-  }, [adjustedConfig, upgradeEffects.bonusTimeSeconds, runeEffects.timeBonus, weeklyModifiers, weeklyApplied.minWordLength]);
+    // Apply archetype mastery bonuses (timer bonuses applied here, score/tiles at runtime)
+    return applyMasteryBonuses(baseConfig, archetypeMastery);
+  }, [adjustedConfig, upgradeEffects.bonusTimeSeconds, runeEffects.timeBonus, weeklyModifiers, weeklyApplied.minWordLength, archetypeMastery]);
 
   // Adjusted inactivity threshold from AI director + Word Radar upgrade + rune hint bonus
   const adjustedInactivityThresholdMs = useMemo(() => {

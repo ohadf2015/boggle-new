@@ -56,6 +56,8 @@ export interface UseAdventureBossNewReturn {
   hpPercentage: number;
   /** Current phase */
   phase: BossPhaseNew;
+  /** Index into boss.phases[] — supports multi-phase bosses (e.g. W10 with 9 phases) */
+  phaseIndex: number;
   /** Boss config (null if no boss) */
   boss: BossConfig | null;
   /** Current taunt translation key (null if none) */
@@ -115,6 +117,30 @@ function derivePhase(hp: number, maxHP: number, phaseThresholds?: { angry: numbe
   return 'normal';
 }
 
+/**
+ * Derive phase index from HP percentage using boss phase thresholds.
+ * Phases are ordered by descending hpThreshold (100, 89, 78, ...).
+ * Returns the highest index whose threshold the current HP% has fallen below.
+ * Falls back to 3-phase mapping when no phases are defined.
+ */
+function derivePhaseIndex(hp: number, maxHP: number, phases: Array<{ hpThreshold: number }> | undefined): number {
+  if (maxHP <= 0) return 0;
+  if (!phases || phases.length === 0) {
+    // Fallback: map 3-phase system to indices 0/1/2
+    const phase = derivePhase(hp, maxHP);
+    return phase === 'normal' ? 0 : phase === 'angry' ? 1 : 2;
+  }
+
+  const pct = (hp / maxHP) * 100;
+  let idx = 0;
+  for (let i = 1; i < phases.length; i++) {
+    if (pct < phases[i].hpThreshold) {
+      idx = i;
+    }
+  }
+  return idx;
+}
+
 function randomInt(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
@@ -145,6 +171,7 @@ export function useAdventureBossNew({
   const [hp, setHp] = useState(0);
   const [maxHP, setMaxHP] = useState(0);
   const [phase, setPhase] = useState<BossPhaseNew>('normal');
+  const [phaseIndex, setPhaseIndex] = useState(0);
   const [currentTaunt, setCurrentTaunt] = useState<string | null>(null);
   const [lockedTiles, setLockedTiles] = useState<number[]>([]);
 
@@ -153,6 +180,7 @@ export function useAdventureBossNew({
   const tauntTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lockTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const phaseRef = useRef<BossPhaseNew>('normal');
+  const phaseIndexRef = useRef(0);
   const isActiveRef = useRef(false);
   const hpRef = useRef(0);
 
@@ -160,6 +188,10 @@ export function useAdventureBossNew({
   useEffect(() => {
     phaseRef.current = phase;
   }, [phase]);
+
+  useEffect(() => {
+    phaseIndexRef.current = phaseIndex;
+  }, [phaseIndex]);
 
   useEffect(() => {
     isActiveRef.current = isActive;
@@ -237,9 +269,8 @@ export function useAdventureBossNew({
       const worldScale = 1 + ((worldId ?? 1) - 1) * 0.1;
       attack.damage = Math.floor((PHASE_DAMAGE[phaseRef.current] + randomInt(0, 5)) * worldScale);
     } else if (attackType === 'gridEffect') {
-      // Trigger the boss's phase-specific grid effect
-      const phaseIndex = phaseRef.current === 'normal' ? 0 : phaseRef.current === 'angry' ? 1 : 2;
-      const phaseConfig = boss?.phases?.[phaseIndex];
+      // Trigger the boss's phase-specific grid effect (uses dynamic phaseIndex for multi-phase bosses)
+      const phaseConfig = boss?.phases?.[phaseIndexRef.current];
       const effectName = phaseConfig?.mechanicModifiers?.gridEffect as string | undefined;
       if (effectName) {
         attack.gridEffect = effectName;
@@ -272,9 +303,11 @@ export function useAdventureBossNew({
     setHp(bossMaxHP);
     setMaxHP(bossMaxHP);
     setPhase('normal');
+    setPhaseIndex(0);
     setIsActive(true);
     setLockedTiles([]);
     phaseRef.current = 'normal';
+    phaseIndexRef.current = 0;
     isActiveRef.current = true;
     hpRef.current = bossMaxHP;
 
@@ -325,6 +358,22 @@ export function useAdventureBossNew({
     if (!isActive || maxHP <= 0) return;
 
     const newPhase = derivePhase(hp, maxHP);
+    const newPhaseIdx = derivePhaseIndex(hp, maxHP, boss?.phases);
+
+    // Update phaseIndex regardless of named phase change
+    if (newPhaseIdx !== phaseIndex) {
+      setPhaseIndex(newPhaseIdx);
+
+      // Emit grid effect for this phase (boss visual signature)
+      if (boss?.phases) {
+        const phaseConfig = boss.phases[newPhaseIdx];
+        const gridEffectName = phaseConfig?.mechanicModifiers?.gridEffect as string | undefined;
+        if (gridEffectName) {
+          onAttackRef.current?.({ type: 'gridEffect', gridEffect: gridEffectName });
+        }
+      }
+    }
+
     if (newPhase !== phase) {
       setPhase(newPhase);
       phaseRef.current = newPhase;
@@ -334,16 +383,6 @@ export function useAdventureBossNew({
       // hasn't propagated to this effect yet)
       if (isActiveRef.current) {
         startAttackTimer(newPhase);
-      }
-
-      // Emit grid effect for this phase (boss visual signature)
-      if (boss?.phases) {
-        const phaseIndex = newPhase === 'normal' ? 0 : newPhase === 'angry' ? 1 : 2;
-        const phaseConfig = boss.phases[phaseIndex];
-        const gridEffectName = phaseConfig?.mechanicModifiers?.gridEffect as string | undefined;
-        if (gridEffectName) {
-          onAttackRef.current?.({ type: 'gridEffect', gridEffect: gridEffectName });
-        }
       }
 
       // Trigger phase change taunt
@@ -362,7 +401,7 @@ export function useAdventureBossNew({
     if (hp <= 0 && isActive) {
       endBattle('victory');
     }
-  }, [hp, maxHP, isActive, phase, worldId, boss?.phases, showTaunt, startAttackTimer, endBattle]);
+  }, [hp, maxHP, isActive, phase, phaseIndex, worldId, boss?.phases, showTaunt, startAttackTimer, endBattle]);
 
   // Reset function
   const reset = useCallback(() => {
@@ -373,6 +412,8 @@ export function useAdventureBossNew({
     setMaxHP(0);
     setPhase('normal');
     phaseRef.current = 'normal';
+    setPhaseIndex(0);
+    phaseIndexRef.current = 0;
     setCurrentTaunt(null);
     setLockedTiles([]);
     clearAttackTimer();
@@ -402,6 +443,7 @@ export function useAdventureBossNew({
     maxHP,
     hpPercentage,
     phase,
+    phaseIndex,
     boss,
     currentTaunt,
     lockedTiles,

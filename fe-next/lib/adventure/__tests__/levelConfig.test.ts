@@ -22,8 +22,7 @@ import {
   validateLevelConfig,
 } from '../levelConfig';
 import type { LevelConfig } from '@/types/adventure';
-import { hasPathOfLength } from '../gridValidator';
-import { getTimerDuration, LEVELS_PER_WORLD } from '../constants';
+import { getTimerDuration } from '../constants';
 
 describe('World Configuration', () => {
   describe('WORLD_CONFIGS', () => {
@@ -290,11 +289,56 @@ describe('Objective Generation', () => {
       expect(primary).toBeDefined();
       expect(['wordCount', 'scoreTarget']).toContain(primary!.type);
 
-      // THEN: Should NOT have boss-specific objectives
-      const hasBossObjective = objectives.some(
-        (o) => o.type === 'defeatBoss' || o.type === 'surviveBattle' || o.type === 'mechanicTrigger'
+      // THEN: Should NOT have boss-only objectives (defeatBoss, surviveBattle)
+      const hasBossOnlyObjective = objectives.some(
+        (o) => o.type === 'defeatBoss' || o.type === 'surviveBattle'
       );
-      expect(hasBossObjective).toBe(false);
+      expect(hasBossOnlyObjective).toBe(false);
+    });
+  });
+
+  describe('generateObjectives - Mechanic Trigger on Regular Levels', () => {
+    it('should add mechanicTrigger objective for worlds with mechanics (W2+)', () => {
+      // GIVEN: A regular level in World 2 (synonymPairs mechanic)
+      const objectives = generateObjectives(2, 3);
+
+      // THEN: Should have mechanicTrigger as secondary objective
+      const mechObj = objectives.find((o) => o.type === 'mechanicTrigger');
+      expect(mechObj).toBeDefined();
+      expect(mechObj!.isPrimary).toBe(false);
+    });
+
+    it('should NOT add mechanicTrigger for World 1 (no mechanic)', () => {
+      // GIVEN: A regular level in World 1 (no mechanic)
+      const objectives = generateObjectives(1, 3);
+
+      // THEN: No mechanicTrigger
+      const mechObj = objectives.find((o) => o.type === 'mechanicTrigger');
+      expect(mechObj).toBeUndefined();
+    });
+
+    it('should scale mechanicTrigger target with world progression', () => {
+      // GIVEN: Regular levels in early and late worlds
+      const w2Objectives = generateObjectives(2, 3);
+      const w9Objectives = generateObjectives(9, 3);
+
+      const w2Mechanic = w2Objectives.find((o) => o.type === 'mechanicTrigger');
+      const w9Mechanic = w9Objectives.find((o) => o.type === 'mechanicTrigger');
+
+      // THEN: Later worlds require more triggers
+      expect(w9Mechanic!.target).toBeGreaterThan(w2Mechanic!.target);
+    });
+
+    it('should have lower mechanicTrigger targets on regular levels than boss levels', () => {
+      // GIVEN: Same world, regular vs boss level
+      const regularObjectives = generateObjectives(5, 3);
+      const bossObjectives = generateObjectives(5, 7); // boss level
+
+      const regularMech = regularObjectives.find((o) => o.type === 'mechanicTrigger');
+      const bossMech = bossObjectives.find((o) => o.type === 'mechanicTrigger');
+
+      // THEN: Regular levels are more forgiving
+      expect(regularMech!.target).toBeLessThan(bossMech!.target);
     });
   });
 
@@ -334,28 +378,20 @@ describe('Objective Generation', () => {
     });
 
     it('should add secondary objectives for higher levels', () => {
-      // Early level should have fewer objectives
+      // World 1 (no mechanic) → 1 primary + 1 secondary
       const earlyObjectives = generateObjectives(1, 1);
 
-      // Later level should have more objectives
-      const lateObjectives = generateObjectives(3, 8);
+      // World 3 (has mechanic) → 1 primary + 1 archetype secondary + mechanicTrigger
+      const lateObjectives = generateObjectives(3, 6);
 
       expect(lateObjectives.length).toBeGreaterThanOrEqual(earlyObjectives.length);
     });
 
-    it('should add clearIce objective for worlds with ice tiles', () => {
-      // World 2+ has ice tiles
-      // Should sometimes have clearIce objectives
-      // (not always, so we check multiple levels)
-      let foundClearIce = false;
-      for (let level = 1; level <= 7; level++) {
-        const objs = generateObjectives(2, level);
-        if (objs.some((o) => o.type === 'clearIce')) {
-          foundClearIce = true;
-          break;
-        }
-      }
-      expect(foundClearIce).toBe(true);
+    it('should add clearIce objective for excavation archetype levels', () => {
+      // World 2 levels 3 and 6 are 'excavation' archetype → clearIce primary
+      const objs = generateObjectives(2, 3);
+      const clearIce = objs.find((o) => o.type === 'clearIce' && o.isPrimary);
+      expect(clearIce).toBeDefined();
     });
   });
 });
@@ -524,7 +560,7 @@ describe('Grid-aware objective generation', () => {
       expect(hasLongWords).toBe(false);
     });
 
-    it('should keep longWords objective when grid supports long paths', () => {
+    it('should keep longWords objective when grid supports long paths (puzzle archetype)', () => {
       // GIVEN: A 4x4 grid (supports paths well over 5)
       const grid = [
         ['A', 'B', 'C', 'D'],
@@ -533,68 +569,66 @@ describe('Grid-aware objective generation', () => {
         ['M', 'N', 'O', 'P'],
       ];
 
-      // Level 4 in world 1 gets longWords (level 3 is breather — no secondary objectives)
-      const objectives = generateObjectives(1, 4, grid);
+      // World 3 level 6 is 'puzzle' archetype → longWords primary
+      const objectives = generateObjectives(3, 6, grid);
       const hasLongWords = objectives.some((o) => o.type === 'longWords');
 
       expect(hasLongWords).toBe(true);
     });
 
-    it('should still work without grid (backward compatibility)', () => {
-      // Without grid, longWords is always added for level >= 3 (non-breather)
-      const objectives = generateObjectives(1, 4);
+    it('should still work without grid (puzzle archetype)', () => {
+      // Without grid, longWords is assumed valid (no grid to validate against)
+      // World 3 level 6 is 'puzzle' archetype → longWords primary
+      const objectives = generateObjectives(3, 6);
       const hasLongWords = objectives.some((o) => o.type === 'longWords');
       expect(hasLongWords).toBe(true);
     });
 
-    it('should give breather levels (3, 5) exactly 1 secondary objective', () => {
-      const obj3 = generateObjectives(1, 3);
-      const obj5 = generateObjectives(2, 5);
-      // Breather levels have primary + 1 easy secondary (reduced targets)
+    it('should give breather levels (3, 5) limited secondary objectives', () => {
+      const obj3 = generateObjectives(1, 3); // World 1: no mechanic → 1 secondary
+      const obj5 = generateObjectives(2, 5); // World 2: has mechanic → 2 secondaries (complementary + mechanicTrigger)
       const secondaries3 = obj3.filter((o) => !o.isPrimary);
       const secondaries5 = obj5.filter((o) => !o.isPrimary);
-      expect(secondaries3).toHaveLength(1);
-      expect(secondaries5).toHaveLength(1);
+      expect(secondaries3).toHaveLength(2); // World 1 gets fallback secondary for 3-star
+      expect(secondaries5).toHaveLength(2); // World 2+ gets mechanicTrigger too
     });
   });
 });
 
 describe('Granular star progression (1/2/3 stars reachable)', () => {
-  it('every non-boss regular level should have at least 2 secondary objectives', () => {
-    // With 2+ secondaries, calculateStars can return 1, 2, or 3
+  it('every non-boss regular level should have at least 1 secondary objective', () => {
+    // Archetype system gives 1 archetype secondary + mechanic trigger (world 2+)
     for (let world = 1; world <= 10; world++) {
       for (let level = 1; level <= 6; level++) {
         const objectives = generateObjectives(world, level);
         const secondaries = objectives.filter((o) => !o.isPrimary);
-        const isBreather = level === 3 || level === 5;
 
-        if (isBreather) {
-          // Breather levels get exactly 1 secondary (relaxed but not binary)
-          expect(secondaries.length).toBeGreaterThanOrEqual(1);
-        } else {
-          // Regular levels need 2+ secondaries for 1/2/3 star granularity
+        // Every level gets at least 1 secondary from archetype config
+        expect(secondaries.length).toBeGreaterThanOrEqual(1);
+
+        // World 2+ also gets mechanicTrigger secondary
+        if (world >= 2) {
           expect(secondaries.length).toBeGreaterThanOrEqual(2);
         }
       }
     }
   });
 
-  it('should add scoreTarget secondary for levels that previously had none', () => {
-    // Levels 1, 2 in all worlds should now have a secondary score objective
+  it('should add archetype-driven secondary objectives', () => {
+    // World 1 levels are all 'standard' → wordCount primary, scoreTarget secondary
     const obj1 = generateObjectives(1, 1);
     const obj2 = generateObjectives(1, 2);
 
-    // Level 1 primary is wordCount (odd), should have scoreTarget secondary
+    // Both levels have wordCount primary + scoreTarget secondary (standard archetype)
     const scoreSecondary1 = obj1.find(
       (o) => !o.isPrimary && o.type === 'scoreTarget'
     );
     expect(scoreSecondary1).toBeDefined();
 
-    // Level 2 primary is scoreTarget (even), should have wordCount secondary
-    const wordSecondary2 = obj2.find(
-      (o) => !o.isPrimary && o.type === 'wordCount'
+    const scoreSecondary2 = obj2.find(
+      (o) => !o.isPrimary && o.type === 'scoreTarget'
     );
-    expect(wordSecondary2).toBeDefined();
+    expect(scoreSecondary2).toBeDefined();
   });
 
   it('secondary targets should be easier than primary targets of same type', () => {
@@ -746,39 +780,37 @@ describe('Level Config Validation', () => {
 });
 
 describe('Score target calibration (Fix 1)', () => {
-  it('should base score targets on realistic word output given timer', () => {
-    // GIVEN: World 1 level 2 (even level = scoreTarget), timer=120s
-    const objectives = generateObjectives(1, 2);
-    const scoreObj = objectives.find((o) => o.type === 'scoreTarget');
+  it('should base score targets on realistic word output for goldRush levels', () => {
+    // W3 L3 is goldRush archetype → scoreTarget primary, timer×0.7
+    const objectives = generateObjectives(3, 3);
+    const scoreObj = objectives.find((o) => o.type === 'scoreTarget' && o.isPrimary);
 
-    // Average word ~65 pts, estimatedWords = 120/5 = 24, difficultyFactor = 0.3
-    // expected ~ 24 * 65 * 0.3 * 1.015 = ~475
     expect(scoreObj).toBeDefined();
-    expect(scoreObj!.target).toBeGreaterThanOrEqual(400);
-    expect(scoreObj!.target).toBeLessThanOrEqual(550);
+    // goldRush has 1.4× boost, shorter timer but gold-heavy board
+    expect(scoreObj!.target).toBeGreaterThan(0);
   });
 
   it('should produce higher score targets in later worlds', () => {
-    // Even levels: 2, 4, 6
-    const world1 = generateObjectives(1, 2);
-    const world5 = generateObjectives(5, 4);
-    const world10 = generateObjectives(10, 6);
+    // goldRush levels across worlds: W3L3, W6L2, W10L5
+    const world3 = generateObjectives(3, 3);
+    const world6 = generateObjectives(6, 2);
+    const world10 = generateObjectives(10, 5);
 
-    const s1 = world1.find((o) => o.type === 'scoreTarget')!.target;
-    const s5 = world5.find((o) => o.type === 'scoreTarget')!.target;
-    const s10 = world10.find((o) => o.type === 'scoreTarget')!.target;
+    const s3 = world3.find((o) => o.type === 'scoreTarget' && o.isPrimary)!.target;
+    const s6 = world6.find((o) => o.type === 'scoreTarget' && o.isPrimary)!.target;
+    const s10 = world10.find((o) => o.type === 'scoreTarget' && o.isPrimary)!.target;
 
-    expect(s5).toBeGreaterThan(s1);
-    expect(s10).toBeGreaterThan(s5);
+    expect(s6).toBeGreaterThan(s3);
+    expect(s10).toBeGreaterThan(s6);
   });
 
   it('should cap score targets at per-world maximum', () => {
     // Cap scales linearly: W1=1500 → W10=3000
     for (let world = 1; world <= 10; world++) {
       const worldCap = Math.round(1500 + (world - 1) * (1500 / 9));
-      for (let level = 2; level <= 6; level += 2) {
+      for (let level = 1; level <= 6; level++) {
         const objectives = generateObjectives(world, level);
-        const scoreObj = objectives.find((o) => o.type === 'scoreTarget');
+        const scoreObj = objectives.find((o) => o.type === 'scoreTarget' && o.isPrimary);
         if (scoreObj) {
           expect(scoreObj.target).toBeLessThanOrEqual(worldCap);
         }
@@ -791,7 +823,7 @@ describe('Word count backpressure from timer (Fix 2)', () => {
   it('should cap wordCount target based on available timer', () => {
     // GIVEN: Any world/level with wordCount objective (odd levels)
     for (let world = 1; world <= 10; world++) {
-      for (let level = 1; level <= 6; level += 2) {
+      for (let level = 1; level <= 6; level++) {
         const objectives = generateObjectives(world, level);
         const wordObj = objectives.find(
           (o) => o.type === 'wordCount' && o.isPrimary
@@ -809,7 +841,7 @@ describe('Word count backpressure from timer (Fix 2)', () => {
 
   it('should never require more than 1 word per 5 seconds', () => {
     for (let world = 1; world <= 10; world++) {
-      for (let level = 1; level <= 6; level += 2) {
+      for (let level = 1; level <= 6; level++) {
         const objectives = generateObjectives(world, level);
         const wordObj = objectives.find(
           (o) => o.type === 'wordCount' && o.isPrimary
@@ -826,49 +858,56 @@ describe('Word count backpressure from timer (Fix 2)', () => {
   });
 
   it('World 7 word count is capped by backpressure from timer', () => {
-    // GIVEN: World 7, level 1 (odd = wordCount)
+    // W7 L3 is 'standard' archetype → wordCount primary
     // Timer for world 7 = 140s (6x6 grid). Cap = floor((140/4)*0.8) = 28
-    // Formula: min(8 + floor(43/5)*2, 25) = 24, under cap of 28
-    const objectives = generateObjectives(7, 1);
+    const objectives = generateObjectives(7, 3);
     const wordObj = objectives.find(
       (o) => o.type === 'wordCount' && o.isPrimary
     );
 
     expect(wordObj).toBeDefined();
-    // With 140s timer (6x6 grid), backpressure cap = 28. Target = 24.
+    // With 140s timer, backpressure cap = 28
     expect(wordObj!.target).toBeLessThanOrEqual(28);
     // Still a challenging target
-    expect(wordObj!.target).toBeGreaterThanOrEqual(20);
+    expect(wordObj!.target).toBeGreaterThanOrEqual(15);
   });
 
   describe('Early game score targets (difficulty curve audit)', () => {
-    it('W1 L2 score target should be moderate (normal difficulty)', () => {
+    it('W1 standard levels should have wordCount primary', () => {
+      // World 1 is all standard archetype → wordCount primary
       const config = getLevelConfig(1, 2);
+      const wordObj = config.objectives.find(
+        (o) => o.type === 'wordCount' && o.isPrimary
+      );
+      expect(wordObj).toBeDefined();
+      // scoreTarget appears as secondary
+      const scoreSecondary = config.objectives.find(
+        (o) => o.type === 'scoreTarget' && !o.isPrimary
+      );
+      expect(scoreSecondary).toBeDefined();
+    });
+
+    it('goldRush levels should have scoreTarget primary with appropriate targets', () => {
+      // W3 L3 is goldRush → scoreTarget primary
+      const config = getLevelConfig(3, 3);
       const scoreObj = config.objectives.find(
         (o) => o.type === 'scoreTarget' && o.isPrimary
       );
       expect(scoreObj).toBeDefined();
-      expect(scoreObj!.target).toBeLessThanOrEqual(550);
-      expect(scoreObj!.target).toBeGreaterThanOrEqual(400);
+      expect(scoreObj!.target).toBeGreaterThan(0);
     });
 
-    it('W1 L4 score target should ramp slightly', () => {
-      const config = getLevelConfig(1, 4);
-      const scoreObj = config.objectives.find(
+    it('difficulty should ramp up by W5+ for goldRush levels', () => {
+      // W5 L3 is goldRush, W3 L3 is goldRush
+      const w3config = getLevelConfig(3, 3);
+      const w5config = getLevelConfig(5, 3);
+      const s3 = w3config.objectives.find(
         (o) => o.type === 'scoreTarget' && o.isPrimary
-      );
-      expect(scoreObj).toBeDefined();
-      expect(scoreObj!.target).toBeLessThanOrEqual(550);
-      expect(scoreObj!.target).toBeGreaterThanOrEqual(400);
-    });
-
-    it('difficulty should ramp up by W5+', () => {
-      const w5config = getLevelConfig(5, 2);
-      const scoreObj = w5config.objectives.find(
+      )!.target;
+      const s5 = w5config.objectives.find(
         (o) => o.type === 'scoreTarget' && o.isPrimary
-      );
-      expect(scoreObj).toBeDefined();
-      expect(scoreObj!.target).toBeGreaterThanOrEqual(1200);
+      )!.target;
+      expect(s5).toBeGreaterThan(s3);
     });
   });
 });

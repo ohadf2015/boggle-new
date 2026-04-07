@@ -10,6 +10,9 @@ import { WordleToLexiClashPromo } from '../components/promo/WordleToLexiClashPro
 import { SurvivalPromoVideo } from '../components/promo/SurvivalPromoVideo';
 import { WordleToLexiClashPromoHe } from '../components/promo/WordleToLexiClashPromoHe';
 import { SurvivalPromoVideoHe } from '../components/promo/SurvivalPromoVideoHe';
+import { RedditGameplayDemo } from '../components/promo/RedditGameplayDemo';
+import { RedditMultilingualShowcase } from '../components/promo/RedditMultilingualShowcase';
+import { RedditVSBattle } from '../components/promo/RedditVSBattle';
 
 export const RemotionRoot: React.FC = () => {
   return (
@@ -61,6 +64,32 @@ export const RemotionRoot: React.FC = () => {
         fps={30}
         width={1080}
         height={1920}
+      />
+
+      {/* Reddit Landscape Promos (1920x1080) */}
+      <Composition
+        id="RedditGameplayDemo"
+        component={RedditGameplayDemo}
+        durationInFrames={270}
+        fps={30}
+        width={1920}
+        height={1080}
+      />
+      <Composition
+        id="RedditMultilingualShowcase"
+        component={RedditMultilingualShowcase}
+        durationInFrames={380}
+        fps={30}
+        width={1920}
+        height={1080}
+      />
+      <Composition
+        id="RedditVSBattle"
+        component={RedditVSBattle}
+        durationInFrames={235}
+        fps={30}
+        width={1920}
+        height={1080}
       />
     </>
   );

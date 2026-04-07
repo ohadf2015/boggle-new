@@ -22,6 +22,10 @@ const mockTranslations: Record<string, string> = {
   'adventure.retry.bestWords': 'Best Words',
   'adventure.retry.bestScore': 'Best Score',
   'adventure.retry.attempts': 'Attempts',
+  'adventure.retry.nearMissTitle': 'So Close!',
+  'adventure.nearMiss.scoreAway': 'Only {remaining} points away!',
+  'adventure.nearMiss.wordsAway': 'Just {remaining} more words!',
+  'adventure.nearMiss.countAway': 'Only {remaining} more to go!',
   'common.exit': 'Exit',
 };
 
@@ -231,6 +235,37 @@ describe('RetryAssistModal', () => {
 
       const buttons = screen.getAllByRole('button');
       expect(buttons).toHaveLength(4); // Try Again, Bonus Time, Hint, Exit
+    });
+  });
+
+  describe('Near-Miss Messages', () => {
+    it('should render near-miss messages when provided', () => {
+      const nearMissMessages = [
+        { type: 'scoreTarget' as const, translationKey: 'adventure.nearMiss.scoreAway', params: { remaining: 25 } },
+      ];
+      render(<RetryAssistModal {...defaultProps} nearMissMessages={nearMissMessages} />);
+      expect(screen.getByTestId('near-miss-section')).toBeInTheDocument();
+      expect(screen.getByText('So Close!')).toBeInTheDocument();
+    });
+
+    it('should render multiple near-miss messages', () => {
+      const nearMissMessages = [
+        { type: 'scoreTarget' as const, translationKey: 'adventure.nearMiss.scoreAway', params: { remaining: 25 } },
+        { type: 'wordCount' as const, translationKey: 'adventure.nearMiss.wordsAway', params: { remaining: 1 } },
+      ];
+      render(<RetryAssistModal {...defaultProps} nearMissMessages={nearMissMessages} />);
+      const section = screen.getByTestId('near-miss-section');
+      expect(section).toBeInTheDocument();
+    });
+
+    it('should not render near-miss section when no messages', () => {
+      render(<RetryAssistModal {...defaultProps} nearMissMessages={[]} />);
+      expect(screen.queryByTestId('near-miss-section')).not.toBeInTheDocument();
+    });
+
+    it('should not render near-miss section when prop is undefined', () => {
+      render(<RetryAssistModal {...defaultProps} />);
+      expect(screen.queryByTestId('near-miss-section')).not.toBeInTheDocument();
     });
   });
 });

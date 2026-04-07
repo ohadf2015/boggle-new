@@ -95,7 +95,7 @@ export function LandingDesktopCards({
           <ModeCard
             title={t('landing.practice')}
             description={t('landing.practiceDesc')}
-            href={`/${language}/singleplayer?mode=practice`}
+            href={`/${language}/singleplayer?autoStart=practice`}
             icon={<BookOpen className="w-6 h-6" />}
             modeImage="/modes/practice.png"
             variant="cyan"

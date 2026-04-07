@@ -14,7 +14,7 @@ import {
 } from '../types';
 import { getInitialHitsRemaining } from './blastTileUtils';
 import { getWaveConfig, getWaveDistribution } from './blastWaveConfig';
-import type { TileEffectContext } from './blastTileEffects';
+import { processBombBFS, type TileEffectContext } from './blastTileEffects';
 
 // ── Catalyst effect ──────────────────────────────────────────────────
 
@@ -110,6 +110,7 @@ export function fireCountdownExplosion(
 export function spreadVirus(
   tiles: BlastTileState[][],
   gridSize: number,
+  rng: () => number = Math.random,
 ): Array<{ row: number; col: number }> {
   const newInfections: Array<{ row: number; col: number }> = [];
   const virusTiles: Array<{ row: number; col: number }> = [];
@@ -136,7 +137,7 @@ export function spreadVirus(
     }
     // Infect one random neighbor per virus tile
     if (neighbors.length > 0) {
-      const target = neighbors[Math.floor(Math.random() * neighbors.length)];
+      const target = neighbors[Math.floor(rng() * neighbors.length)];
       tiles[target.row][target.col].type = 'virus';
       tiles[target.row][target.col].activationEffect = 'virus-spread';
       newInfections.push(target);
@@ -181,33 +182,36 @@ export function applyBetweenTurnEffects(
   }
 
   // 2. Explode any countdown tiles that reached 0
+  // Use the dedicated fireCountdownExplosion which properly chain-reacts bombs
+  // and handles multi-hit tiles (avoids zombie tiles at hitsRemaining=0)
+  const processedBombs = new Set<string>();
+  const bombQueue: Array<{ row: number; col: number; depth: number }> = [];
+  const markCleared = (t: BlastTileState) => { t.isCleared = true; };
+  const isMultiHitAlive = (t: BlastTileState) =>
+    t.hitsRemaining > 1 && (t.type === 'ice' || t.type === 'prism' || t.type === 'frozen' || t.type === 'gem');
+  const hitMultiHitTile = (t: BlastTileState) => { t.hitsRemaining--; };
+  const processedLightning = new Set<string>();
+
+  const betweenCtx: TileEffectContext = {
+    next: tiles, gridSize, now: Date.now(), prev: tiles, path: [],
+    bombQueue, processedBombs, processedLightning,
+    markCleared, isMultiHitAlive, hitMultiHitTile,
+  };
+
   for (let r = 0; r < gridSize; r++) {
     for (let c = 0; c < gridSize; c++) {
       const tile = tiles[r][c];
       if (tile.type === 'countdown' && !tile.isCleared && tile.countdown != null && tile.countdown <= 0) {
-        // Mark countdown tile as cleared
-        tile.isCleared = true;
+        const result = fireCountdownExplosion(r, c, betweenCtx);
         countdownExplosions.push({ row: r, col: c });
-        penalty += COUNTDOWN_EXPLOSION_PENALTY;
-
-        // Clear adjacent tiles in explosion radius
-        for (let dr = -COUNTDOWN_EXPLOSION_RADIUS; dr <= COUNTDOWN_EXPLOSION_RADIUS; dr++) {
-          for (let dc = -COUNTDOWN_EXPLOSION_RADIUS; dc <= COUNTDOWN_EXPLOSION_RADIUS; dc++) {
-            if (dr === 0 && dc === 0) continue;
-            const nr = r + dr;
-            const nc = c + dc;
-            if (nr < 0 || nr >= gridSize || nc < 0 || nc >= gridSize) continue;
-            const target = tiles[nr][nc];
-            if (target.isCleared) continue;
-            if (target.hitsRemaining > 0) {
-              target.hitsRemaining -= 1;
-            } else {
-              target.isCleared = true;
-            }
-          }
-        }
+        penalty += result.penalty;
       }
     }
+  }
+
+  // Process any bombs chain-reacted by countdown explosions
+  if (bombQueue.length > 0) {
+    processBombBFS(betweenCtx);
   }
 
   // 3. Spread virus

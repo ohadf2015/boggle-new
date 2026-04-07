@@ -1,14 +1,10 @@
 /**
  * BossOverlay Compound Component
  *
- * Boss battle overlay that derives phase from actual HP values.
  * Renders all boss battle UI: HP bar, attack telegraphs, boss avatar,
  * attack effects, intro/victory/defeat screens.
- *
- * Phase derivation from HP:
- * - phase1: HP > 66%
- * - phase2: HP 33-66%
- * - enraged: HP < 33%
+ * Health state is provided by useAdventureBossOrchestration.
+ * Visual phase (avatar styling) derived from HP thresholds (66%/33%).
  */
 
 'use client';
@@ -30,7 +26,7 @@ import {
   ENTRANCE_DURATION_SECONDS,
   DEFEAT_DURATION_SECONDS,
 } from './cinematics';
-import { useBossStateMachine } from '../../../hooks/useBossStateMachine';
+import { useEffectCap, type EffectEntry } from '../../../hooks/useEffectCap';
 import { useBossAbilities } from '../../../hooks/useBossAbilities';
 import { useAttackTelegraph } from '../../../hooks/useAttackTelegraph';
 import { useBossEffectExecutor, type EffectCallbacks } from '../../../hooks/useBossEffectExecutor';
@@ -38,7 +34,7 @@ import { useLanguage } from '../../../contexts/LanguageContext';
 import type { BossConfig } from '@/types/boss';
 import { getBossAnimations } from '@/lib/adventure/bossAnimations';
 import type { AdventureGameState } from '@/types/adventure';
-import { BOSS_PHASE_THRESHOLDS, type BossStateMachineState, type BossStateMachineContext } from '@/types/bossStateMachine';
+import { BOSS_PHASE_THRESHOLDS } from '@/types/bossStateMachine';
 
 // ==============================================
 // TYPES
@@ -46,7 +42,6 @@ import { BOSS_PHASE_THRESHOLDS, type BossStateMachineState, type BossStateMachin
 
 interface BossOverlayProps {
   boss: BossConfig | null;
-  maxHP?: number;
   currentTaunt: string | null;
   showTaunt: boolean;
   showIntro?: boolean;
@@ -61,7 +56,7 @@ interface BossOverlayProps {
   onContinue: () => void;
   onRetry: () => void;
   worldNumber: number;
-  healthState?: {
+  healthState: {
     currentHP: number;
     maxHP: number;
     phase: string;
@@ -69,13 +64,6 @@ interface BossOverlayProps {
     isActive: boolean;
   };
   effectCallbacks?: EffectCallbacks;
-}
-
-export interface BossOverlayRef {
-  dealDamage: (amount: number) => void;
-  timerExpired: () => void;
-  startBattle: () => void;
-  reset: () => void;
 }
 
 // ==============================================
@@ -88,13 +76,6 @@ function derivePhaseFromHP(hpPercentage: number): 'phase1' | 'phase2' | 'enraged
   return 'phase1';
 }
 
-function deriveBossState(legacyPhase: string, hpPercentage: number): BossStateMachineState {
-  if (legacyPhase === 'intro') return 'intro';
-  if (legacyPhase === 'victory') return 'victory';
-  if (legacyPhase === 'defeat') return 'defeat';
-  return derivePhaseFromHP(hpPercentage);
-}
-
 /** Avatar border class per phase */
 function avatarBorderClass(phase: 'phase1' | 'phase2' | 'enraged'): string {
   if (phase === 'enraged') return 'border-neo-red';
@@ -105,14 +86,13 @@ function avatarBorderClass(phase: 'phase1' | 'phase2' | 'enraged'): string {
 const BossOverlay = memo<BossOverlayProps>(
   ({
     boss,
-    maxHP = 100,
     currentTaunt,
     showTaunt,
-    showIntro: legacyShowIntro,
-    onStartBattle: legacyOnStartBattle,
+    showIntro,
+    onStartBattle,
     onSkipIntro,
-    showVictory: legacyShowVictory,
-    showDefeat: legacyShowDefeat,
+    showVictory,
+    showDefeat,
     stars,
     score,
     wordsFound,
@@ -120,44 +100,32 @@ const BossOverlay = memo<BossOverlayProps>(
     onContinue,
     onRetry,
     worldNumber,
-    healthState: legacyHealthState,
+    healthState,
     effectCallbacks,
   }) => {
     const { t } = useLanguage();
 
     const effectiveBossId = boss?.id ?? 'placeholder';
 
-    const {
-      state: smState,
-      context: smContext,
-      startBattle,
-    } = useBossStateMachine({ maxHP, bossId: effectiveBossId });
-
-    // Derived state from legacy HP
-    const currentHP = legacyHealthState?.currentHP ?? smContext.hp;
-    const effectiveMaxHP = legacyHealthState?.maxHP ?? smContext.maxHP;
+    // Health state from orchestration hook (always provided)
+    const { currentHP, maxHP: effectiveMaxHP, isActive: effectiveIsActive, totalDamageDealt } = healthState;
     const hpPct = effectiveMaxHP > 0 ? Math.round((currentHP / effectiveMaxHP) * 100) : 0;
 
+    // Visual phase for avatar styling/animations (separate from game-logic phases)
     const derivedPhase = derivePhaseFromHP(hpPct);
-    const derivedState: BossStateMachineState = legacyHealthState
-      ? deriveBossState(legacyHealthState.phase, hpPct)
-      : smState;
 
-    const derivedContext: BossStateMachineContext = useMemo(() => ({
+    const derivedContext = useMemo(() => ({
       hp: currentHP,
       maxHP: effectiveMaxHP,
-      totalDamageDealt: legacyHealthState?.totalDamageDealt ?? smContext.totalDamageDealt,
+      totalDamageDealt,
       bossId: effectiveBossId,
-    }), [currentHP, effectiveMaxHP, legacyHealthState?.totalDamageDealt, smContext.totalDamageDealt, effectiveBossId]);
-
-    const effectiveIsActive = legacyHealthState?.isActive ?? (
-      smState === 'phase1' || smState === 'phase2' || smState === 'enraged'
-    );
+    }), [currentHP, effectiveMaxHP, totalDamageDealt, effectiveBossId]);
 
     // --- Boss visual state for image switching ---
     type BossReaction = 'idle' | 'attacking' | 'hit';
     const [bossReaction, setBossReaction] = useState<BossReaction>('idle');
     const reactionTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const dmgFloatTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const [playerDmgFloat, setPlayerDmgFloat] = useState<{ id: number; amount: number } | null>(null);
     const playerDmgIdRef = useRef(0);
     const prevHPRef = useRef(currentHP);
@@ -169,7 +137,8 @@ const BossOverlay = memo<BossOverlayProps>(
         reactionTimeoutRef.current = setTimeout(() => setBossReaction('idle'), 400);
         const id = ++playerDmgIdRef.current;
         setPlayerDmgFloat({ id, amount: delta });
-        setTimeout(() => setPlayerDmgFloat(prev => (prev?.id === id ? null : prev)), 900);
+        if (dmgFloatTimeoutRef.current) clearTimeout(dmgFloatTimeoutRef.current);
+        dmgFloatTimeoutRef.current = setTimeout(() => setPlayerDmgFloat(prev => (prev?.id === id ? null : prev)), 900);
       }
       prevHPRef.current = currentHP;
     }, [currentHP, effectiveIsActive]);
@@ -197,6 +166,7 @@ const BossOverlay = memo<BossOverlayProps>(
       return () => {
         if (attackEffectTimeoutRef.current) clearTimeout(attackEffectTimeoutRef.current);
         if (reactionTimeoutRef.current) clearTimeout(reactionTimeoutRef.current);
+        if (dmgFloatTimeoutRef.current) clearTimeout(dmgFloatTimeoutRef.current);
       };
     }, []);
 
@@ -232,14 +202,31 @@ const BossOverlay = memo<BossOverlayProps>(
       isActive: isTelegraphing,
     } = useAttackTelegraph({ duration: 2000, onComplete: handleTelegraphComplete });
 
+    // --- Effect cap: prevent "effect soup" by limiting simultaneous visual effects ---
+    const effectEntries: EffectEntry[] = useMemo(() => [
+      { id: 'attackTelegraph', active: isTelegraphing, priority: 10 },
+      { id: 'phaseBanner', active: !!phaseBanner, priority: 9 },
+      { id: 'attackPortrait', active: bossReaction === 'attacking', priority: 8 },
+      { id: 'attackEffect', active: !!attackEffect, priority: 7 },
+      { id: 'damageFloat', active: !!playerDmgFloat, priority: 5 },
+      { id: 'rageVignette', active: hpPct < 20 && !isTelegraphing, priority: 3 },
+      { id: 'enragedGlow', active: derivedPhase === 'enraged', priority: 1 },
+    ], [isTelegraphing, phaseBanner, bossReaction, attackEffect, playerDmgFloat, hpPct, derivedPhase]);
+    const fx = useEffectCap(effectEntries);
+
     const lastCheckRef = useRef<number>(0);
     const abilityCheckInterval = useSafeInterval();
-    const derivedStateRef = useRef(derivedState);
+    // State for ability system: map healthState.phase to BossStateMachineState
+    const abilityState = healthState.phase === 'victory' ? 'victory' as const
+      : healthState.phase === 'defeat' ? 'defeat' as const
+      : healthState.phase === 'intro' ? 'intro' as const
+      : derivedPhase;
+    const abilityStateRef = useRef(abilityState);
     const derivedContextRef = useRef(derivedContext);
     useEffect(() => {
-      derivedStateRef.current = derivedState;
+      abilityStateRef.current = abilityState;
       derivedContextRef.current = derivedContext;
-    }, [derivedState, derivedContext]);
+    }, [abilityState, derivedContext]);
 
     useEffect(() => {
       if (!boss || !effectiveIsActive) {
@@ -253,7 +240,7 @@ const BossOverlay = memo<BossOverlayProps>(
         lastCheckRef.current = now;
         tickCooldowns(delta);
         if (!telegraphingAbility) {
-          const abilityToActivate = checkActivation(derivedContextRef.current, derivedStateRef.current);
+          const abilityToActivate = checkActivation(derivedContextRef.current, abilityStateRef.current);
           if (abilityToActivate) {
             startAbility(abilityToActivate.id);
             startTelegraph(abilityToActivate.id, []);
@@ -270,9 +257,8 @@ const BossOverlay = memo<BossOverlayProps>(
     // ==============================================
 
     const handleEntranceComplete = useCallback(() => {
-      startBattle();
-      legacyOnStartBattle?.();
-    }, [startBattle, legacyOnStartBattle]);
+      onStartBattle?.();
+    }, [onStartBattle]);
 
     const handleVictoryComplete = useCallback(() => { onContinue(); }, [onContinue]);
     const handleDefeatComplete = useCallback(() => { onRetry(); }, [onRetry]);
@@ -283,10 +269,7 @@ const BossOverlay = memo<BossOverlayProps>(
 
     if (!boss) return null;
 
-    const showingIntro = legacyShowIntro;
-    const showingVictory = legacyShowVictory;
-    const showingDefeat = legacyShowDefeat;
-    const showingActivePhase = effectiveIsActive && !showingIntro;
+    const showingActivePhase = effectiveIsActive && !showIntro;
     const borderClass = avatarBorderClass(derivedPhase);
 
     // Per-boss unique animations
@@ -308,7 +291,7 @@ const BossOverlay = memo<BossOverlayProps>(
     return (
       <>
         {/* INTRO CINEMATIC */}
-        {showingIntro && (
+        {showIntro && (
           <div className="relative">
             <CinematicPlayer
               composition={BossEntranceCinematic as unknown as React.ComponentType<Record<string, unknown>>}
@@ -337,7 +320,7 @@ const BossOverlay = memo<BossOverlayProps>(
         )}
 
         {/* ACTIVE BATTLE UI */}
-        {showingActivePhase && !showingVictory && !showingDefeat && (
+        {showingActivePhase && !showVictory && !showDefeat && (
           <>
             {/* Compact Combat HUD Strip — sits just below the GameHeader */}
             <div className="fixed top-[3.25rem] sm:top-[3.75rem] left-0 right-0 z-30 pointer-events-none">
@@ -346,8 +329,8 @@ const BossOverlay = memo<BossOverlayProps>(
                 <div className="flex items-center gap-2 sm:gap-3">
                   {/* Boss Avatar — larger with rich state animations */}
                   <div className="relative flex-shrink-0">
-                    {/* Enraged outer glow ring — per-boss color */}
-                    {derivedPhase === 'enraged' && (
+                    {/* Enraged outer glow ring — per-boss color (capped) */}
+                    {fx.enragedGlow && (
                       <AdaptiveMotion.div
                         className="absolute -inset-1.5 rounded-neo blur-sm z-0"
                         style={{ backgroundColor: bossAnims.enragedGlowColor }}
@@ -404,8 +387,8 @@ const BossOverlay = memo<BossOverlayProps>(
                           />
                         )}
                       </AdaptiveAnimatePresence>
-                      {/* Enraged border pulse */}
-                      {derivedPhase === 'enraged' && (
+                      {/* Enraged border pulse (shares enragedGlow cap) */}
+                      {fx.enragedGlow && (
                         <AdaptiveMotion.div
                           className="absolute inset-0 border-2 border-neo-red rounded-neo"
                           style={{ boxShadow: 'inset 0 0 16px rgba(255,51,102,0.5)' }}
@@ -415,9 +398,9 @@ const BossOverlay = memo<BossOverlayProps>(
                       )}
                     </AdaptiveMotion.div>
 
-                    {/* Floating damage text — spring physics pop */}
+                    {/* Floating damage text — spring physics pop (capped) */}
                     <AdaptiveAnimatePresence>
-                      {playerDmgFloat && (
+                      {fx.damageFloat && playerDmgFloat && (
                         <AdaptiveMotion.div
                           key={playerDmgFloat.id}
                           className="absolute -top-4 left-1/2 -translate-x-1/2 pointer-events-none z-20"
@@ -500,9 +483,9 @@ const BossOverlay = memo<BossOverlayProps>(
               </div>
             </div>
 
-            {/* Phase Transition Banner — dramatic with boss portrait */}
+            {/* Phase Transition Banner — dramatic with boss portrait (capped) */}
             <AdaptiveAnimatePresence>
-              {phaseBanner && (
+              {fx.phaseBanner && phaseBanner && (
                 <AdaptiveMotion.div
                   className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none"
                   initial={{ opacity: 0 }}
@@ -552,8 +535,8 @@ const BossOverlay = memo<BossOverlayProps>(
               )}
             </AdaptiveAnimatePresence>
 
-            {/* Subtle rage vignette — only when NOT telegraphing (avoid double overlay) */}
-            {hpPct < 20 && !isTelegraphing && (
+            {/* Subtle rage vignette (capped) */}
+            {fx.rageVignette && (
               <AdaptiveMotion.div
                 className="fixed inset-0 pointer-events-none z-20"
                 animate={{ opacity: [0.15, 0.3, 0.15] }}
@@ -563,9 +546,9 @@ const BossOverlay = memo<BossOverlayProps>(
               />
             )}
 
-            {/* Simplified Attack Telegraph — edge glow only, no banner */}
+            {/* Simplified Attack Telegraph — edge glow only, no banner (capped) */}
             <AttackTelegraph
-              isActive={isTelegraphing}
+              isActive={!!fx.attackTelegraph}
               progress={telegraphState.progress}
               targetTiles={telegraphState.targetTiles}
               abilityId={telegraphState.abilityId}
@@ -573,11 +556,11 @@ const BossOverlay = memo<BossOverlayProps>(
               abilityName={telegraphingAbility?.name}
             />
 
-            {/* Boss Attack Effect */}
-            <BossAttackEffect attackEffect={attackEffect} bossId={boss.id} />
+            {/* Boss Attack Effect (capped) */}
+            {fx.attackEffect && <BossAttackEffect attackEffect={attackEffect} bossId={boss.id} />}
 
-            {/* Screen shake on boss attack — CSS animation on the game viewport */}
-            {attackEffect && (
+            {/* Screen shake on boss attack — CSS animation on the game viewport (shares attackEffect cap) */}
+            {fx.attackEffect && attackEffect && (
               <style jsx global>{`
                 @keyframes bossScreenShake {
                   0%, 100% { transform: translate(0, 0); }
@@ -600,9 +583,9 @@ const BossOverlay = memo<BossOverlayProps>(
               `}</style>
             )}
 
-            {/* Boss attack flash portrait — dramatic slam-in from right with spring physics */}
+            {/* Boss attack flash portrait (capped) */}
             <AdaptiveAnimatePresence>
-              {bossReaction === 'attacking' && (
+              {fx.attackPortrait && bossReaction === 'attacking' && (
                 <AdaptiveMotion.div
                   className="fixed inset-0 z-40 flex items-start justify-end pointer-events-none pe-3 sm:pe-5 pt-28 sm:pt-32"
                   initial={{ opacity: 0, scale: 0.3, x: 80, rotate: 8 }}
@@ -638,7 +621,7 @@ const BossOverlay = memo<BossOverlayProps>(
         )}
 
         {/* VICTORY CINEMATIC */}
-        {showingVictory && (
+        {showVictory && (
           <CinematicPlayer
             composition={BossDefeatCinematic as unknown as React.ComponentType<Record<string, unknown>>}
             compositionProps={{
@@ -658,7 +641,7 @@ const BossOverlay = memo<BossOverlayProps>(
         )}
 
         {/* DEFEAT SCREEN */}
-        {showingDefeat && (
+        {showDefeat && (
           <BossVictory
             boss={boss}
             isVictory={false}

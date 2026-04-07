@@ -31,14 +31,18 @@ export function generateLootChest(
   const drops: LootDrop[] = [];
 
   // Gold (always) — scales with world to prevent late-game gold drought
+  // Symmetric additive variance (±2) so replaying feels non-identical.
+  // Centered at 0.5: Math.random()*5-2.5 produces 0 when mocked to 0.5 (keeps
+  // deterministic tests exact). World gap = 6 > max variance 2 → strictly monotonic.
   const baseGold = (10 + worldId * 3) * stars;
   const perfectBonus = stars === 3 ? 50 : 0;
   // Gold multiplier only applies to base gold, not bonus/trophy (prevents runaway inflation)
-  const gold = Math.floor((baseGold + perfectBonus) * goldMultiplier);
+  const variance = Math.round(Math.random() * 5 - 2.5); // –2 to +2 (0 when Math.random=0.5)
+  const gold = Math.floor((baseGold + perfectBonus) * goldMultiplier) + variance;
   drops.push({ type: 'gold', amount: gold, nameKey: 'adventure.loot.gold', rarity: 'common' });
 
   // XP (always)
-  const xp = 25 + stars * 15;
+  const xp = 25 + stars * 15 + worldId * 10;
   drops.push({ type: 'xp', amount: xp, nameKey: 'adventure.loot.xp', rarity: 'common' });
 
   // Bonus Gold (guaranteed on 3-star, 40% on 2-star) — scales with world, NOT affected by goldMultiplier
@@ -60,6 +64,12 @@ export function generateLootChest(
     if (fragmentChance > 0 && seededRandom(worldId * 1000 + levelNumber * 17 + stars) < fragmentChance) {
       drops.push({ type: 'bonusGold', amount: 25 * worldId, nameKey: 'adventure.loot.fragment', rarity: 'rare' });
     }
+  }
+
+  // Lucky bonus: 10% chance for a surprise gold drop (variable-ratio reinforcement)
+  if (Math.random() < 0.10) {
+    const luckyGold = 10 + worldId * 5;
+    drops.push({ type: 'bonusGold', amount: luckyGold, nameKey: 'adventure.loot.luckyBonus', rarity: 'rare' });
   }
 
   const chestTier = stars === 3 ? 'golden' : stars === 2 ? 'silver' : 'wooden';

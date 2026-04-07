@@ -32,24 +32,33 @@ describe('getWaveClearTier', () => {
   });
 });
 
+const mockT = (key: string) => {
+  const map: Record<string, string> = {
+    'blast.waveClear.perfect': 'PERFECT!',
+    'blast.waveClear.great': 'GREAT!',
+    'blast.waveClear.clear': 'CLEAR!',
+  };
+  return map[key];
+};
+
 describe('BlastWaveClearText', () => {
   it('renders tier text when waveCleared is true', () => {
-    render(<BlastWaveClearText waveCleared movesRemaining={5} />);
+    render(<BlastWaveClearText waveCleared movesRemaining={5} t={mockT} />);
     expect(screen.getByText('PERFECT!')).toBeInTheDocument();
   });
 
   it('renders GREAT for 3 remaining moves', () => {
-    render(<BlastWaveClearText waveCleared movesRemaining={3} />);
+    render(<BlastWaveClearText waveCleared movesRemaining={3} t={mockT} />);
     expect(screen.getByText('GREAT!')).toBeInTheDocument();
   });
 
   it('renders nothing when waveCleared is false', () => {
-    const { container } = render(<BlastWaveClearText waveCleared={false} movesRemaining={5} />);
+    const { container } = render(<BlastWaveClearText waveCleared={false} movesRemaining={5} t={mockT} />);
     expect(container.textContent).toBe('');
   });
 
   it('renders bonus moves text for PERFECT tier', () => {
-    render(<BlastWaveClearText waveCleared movesRemaining={7} />);
+    render(<BlastWaveClearText waveCleared movesRemaining={7} t={mockT} />);
     expect(screen.getByText('+35')).toBeInTheDocument(); // 7 * 5 bonus points
   });
 });

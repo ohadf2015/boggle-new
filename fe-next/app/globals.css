@@ -1098,7 +1098,11 @@ body {
   .blast-tile-frozen,
   .blast-tile-mirror,
   .blast-tile-silver,
-  .blast-tile-diamond {
+  .blast-tile-diamond,
+  .blast-tile-countdown,
+  .blast-tile-virus,
+  .blast-tile-portal,
+  .blast-tile-catalyst {
     overflow: visible;
   }
   .blast-tile-ice::after,
@@ -1110,7 +1114,11 @@ body {
   .blast-tile-frozen::after,
   .blast-tile-mirror::after,
   .blast-tile-silver::after,
-  .blast-tile-diamond::after {
+  .blast-tile-diamond::after,
+  .blast-tile-countdown::after,
+  .blast-tile-virus::after,
+  .blast-tile-portal::after,
+  .blast-tile-catalyst::after {
     content: '';
     position: absolute;
     inset: 0;
@@ -1319,6 +1327,83 @@ body {
     20% { opacity: 0.4; }
     55% { opacity: 0.95; }
     60% { opacity: 0.4; }
+  }
+
+  /* ── Countdown ── urgent ticking pulse, red danger glow */
+  .blast-tile-countdown {
+    animation: blast-countdown-tick 1s ease-in-out infinite;
+  }
+  .blast-tile-countdown::after {
+    box-shadow: inset 0 0 20px rgba(255,50,50,0.4), 0 0 14px rgba(255,30,30,0.35), 0 0 28px rgba(200,0,0,0.2);
+    animation: blast-countdown-glow 1s ease-in-out infinite;
+  }
+  @keyframes blast-countdown-tick {
+    0%, 100% { filter: brightness(1); transform: scale(1); }
+    15% { filter: brightness(1.3); transform: scale(1.06); }
+    30% { filter: brightness(1); transform: scale(0.97); }
+    50% { filter: brightness(1.15); transform: scale(1.03); }
+    70% { filter: brightness(1); transform: scale(1); }
+  }
+  @keyframes blast-countdown-glow {
+    0%, 100% { opacity: 0.35; }
+    25% { opacity: 0.9; }
+    50% { opacity: 0.4; }
+    75% { opacity: 0.85; }
+  }
+
+  /* ── Virus ── sickly green throb with organic wobble */
+  .blast-tile-virus {
+    animation: blast-virus-throb 2.2s ease-in-out infinite;
+  }
+  .blast-tile-virus::after {
+    box-shadow: inset 0 0 22px rgba(80,200,30,0.45), 0 0 16px rgba(60,180,20,0.35), 0 0 30px rgba(40,160,0,0.2);
+    animation: blast-glow-pulse 2.2s ease-in-out infinite;
+  }
+  @keyframes blast-virus-throb {
+    0%, 100% { filter: brightness(1) saturate(1); transform: scale(1) rotate(0deg); }
+    25% { filter: brightness(1.15) saturate(1.3); transform: scale(1.04) rotate(1deg); }
+    50% { filter: brightness(0.95) saturate(1.1); transform: scale(0.98) rotate(-1deg); }
+    75% { filter: brightness(1.2) saturate(1.2); transform: scale(1.03) rotate(0.5deg); }
+  }
+
+  /* ── Portal ── swirling vortex with hue rotation */
+  .blast-tile-portal {
+    animation: blast-portal-swirl 3s linear infinite;
+  }
+  .blast-tile-portal::after {
+    box-shadow: inset 0 0 24px rgba(160,80,255,0.5), 0 0 18px rgba(130,60,220,0.4), 0 0 32px rgba(100,40,200,0.25);
+    animation: blast-portal-glow 3s ease-in-out infinite;
+  }
+  @keyframes blast-portal-swirl {
+    0% { filter: hue-rotate(0deg) brightness(1); transform: scale(1); }
+    33% { filter: hue-rotate(40deg) brightness(1.15); transform: scale(1.04); }
+    66% { filter: hue-rotate(-30deg) brightness(1.1); transform: scale(0.98); }
+    100% { filter: hue-rotate(0deg) brightness(1); transform: scale(1); }
+  }
+  @keyframes blast-portal-glow {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 0.85; }
+  }
+
+  /* ── Catalyst ── warm amber glow with energy radiation */
+  .blast-tile-catalyst {
+    animation: blast-catalyst-radiate 2.8s ease-in-out infinite;
+  }
+  .blast-tile-catalyst::after {
+    box-shadow: inset 0 0 20px rgba(255,165,0,0.45), 0 0 16px rgba(255,140,0,0.35), 0 0 28px rgba(255,100,0,0.2);
+    animation: blast-catalyst-glow 2.8s ease-in-out infinite;
+  }
+  @keyframes blast-catalyst-radiate {
+    0%, 100% { filter: brightness(1) saturate(1); transform: scale(1); }
+    25% { filter: brightness(1.25) saturate(1.2); transform: scale(1.05); }
+    50% { filter: brightness(1.1) saturate(1.3); transform: scale(1.02); }
+    75% { filter: brightness(1.3) saturate(1.1); transform: scale(1.04); }
+  }
+  @keyframes blast-catalyst-glow {
+    0%, 100% { opacity: 0.35; }
+    30% { opacity: 0.8; }
+    60% { opacity: 0.45; }
+    85% { opacity: 0.9; }
   }
 
   /* ── Gem glow stages — progressive amber→gold→white as hits deplete ── */
@@ -1541,6 +1626,10 @@ body {
     .blast-tile-mirror,
     .blast-tile-silver,
     .blast-tile-diamond,
+    .blast-tile-countdown,
+    .blast-tile-virus,
+    .blast-tile-portal,
+    .blast-tile-catalyst,
     .blast-tile-select-pop {
       animation: none;
     }

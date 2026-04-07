@@ -10,6 +10,7 @@
 import React, { memo, useMemo } from 'react';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { cn } from '@/lib/utils';
+import './WorldParticles.css';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import type { ParticleConfig } from '@/lib/adventure/themes/types';
 
@@ -283,42 +284,6 @@ const WorldParticles = memo<WorldParticlesProps>(({ particles, className }) => {
   }
 
   return (
-    <>
-      {/* Animation keyframes with viewport-optimized ranges (visible area only) */}
-      <style jsx global>{`
-        @keyframes flutter {
-          from { transform: translateY(0) rotateZ(0deg); opacity: 0.8; }
-          to { transform: translateY(-120%) rotateZ(360deg); opacity: 0; }
-        }
-
-        @keyframes fall-splash {
-          0% { transform: translateY(-20%) scale(1); opacity: 0; }
-          10% { opacity: 0.7; }
-          90% { opacity: 0.7; }
-          100% { transform: translateY(120%) scale(0.5); opacity: 0; }
-        }
-
-        @keyframes sparkle-drift {
-          0% { transform: translate(0, 0) scale(1); opacity: 0; }
-          10% { opacity: 0.8; }
-          50% { transform: translate(var(--drift-x), var(--drift-y)) scale(1.2); opacity: 1; }
-          90% { opacity: 0.8; }
-          100% { transform: translate(calc(var(--drift-x) * 2), calc(var(--drift-y) * 2)) scale(0.8); opacity: 0; }
-        }
-
-        .animate-particle-flutter {
-          animation: flutter var(--duration) linear infinite;
-        }
-
-        .animate-particle-fall-splash {
-          animation: fall-splash var(--duration) ease-in infinite;
-        }
-
-        .animate-particle-sparkle-drift {
-          animation: sparkle-drift var(--duration) ease-in-out infinite;
-        }
-      `}</style>
-
       <div className={cn('absolute inset-0 overflow-hidden pointer-events-none', className)}>
         {particleElements.map((particle) => (
           <AdaptiveMotion.div
@@ -341,7 +306,6 @@ const WorldParticles = memo<WorldParticlesProps>(({ particles, className }) => {
           </AdaptiveMotion.div>
         ))}
       </div>
-    </>
   );
 });
 

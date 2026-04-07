@@ -3,6 +3,7 @@
 import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
+import { useMusic } from '@/contexts/MusicContext';
 import { useBlastSounds } from './hooks/useBlastSounds';
 import { useComboSystem } from '@/hooks/useComboSystem';
 import { useWordSubmission } from '@/components/singleplayer/game/hooks/useWordSubmission';
@@ -21,6 +22,7 @@ import { detectMatch3Clusters } from './utils/blastMatch3Detector';
 import { useDictionaryCache } from '@/hooks/useDictionaryCache';
 import { vibrateBlastBomb, vibrateBlastLightning, vibrateBlastPrism, vibrateBlastCascade } from '@/components/grid/hapticFeedback';
 import { detectNearMiss } from './utils/blastNearMiss';
+import { planSugarCrush } from './utils/blastSugarCrush';
 import type { ScoreFlyEvent } from './BlastScoreFly';
 import type { ClearedTileEvent } from './BlastEffectsCanvas';
 
@@ -74,6 +76,7 @@ export function BlastGame({
   const isMultiplayer = mode === 'multiplayer';
   const { t } = useLanguage();
   const { playComboSound, playBoardShuffleSound, setGameActive } = useSoundEffects();
+  const { fadeToTrack, stopMusic, TRACKS } = useMusic();
   const sounds = useBlastSounds();
 
   const minWordLength = waveConfig?.minWordLength ?? 2;
@@ -117,7 +120,13 @@ export function BlastGame({
   // Enable sound gate on mount, disable on unmount
   useEffect(() => {
     setGameActive(true);
-    return () => setGameActive(false);
+    fadeToTrack(TRACKS.BLAST, 800, 800);
+    return () => {
+      setGameActive(false);
+      stopMusic();
+      if (explosionShakeTimerRef.current) clearTimeout(explosionShakeTimerRef.current);
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setGameActive]);
 
   // Effects state
@@ -135,6 +144,17 @@ export function BlastGame({
   const [cascadeHighlightCells, setCascadeHighlightCells] = useState<Array<{ row: number; col: number }>>([]);
   const [cascadeHighlightWord, setCascadeHighlightWord] = useState<string | null>(null);
 
+  // Word praise feedback state
+  const [lastWordLength, setLastWordLength] = useState(0);
+  const [wordSubmitCount, setWordSubmitCount] = useState(0);
+
+  // Explosion screen shake — triggered by bomb/countdown explosions
+  const [explosionShake, setExplosionShake] = useState(false);
+  const explosionShakeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Sugar Crush end-of-level sequence
+  const sugarCrushRunningRef = useRef(false);
+
   // Track last submitted path
   const lastPathRef = useRef<Array<{ row: number; col: number }>>([]);
   const [gameStartTime] = useState(() => Date.now());
@@ -150,6 +170,10 @@ export function BlastGame({
 
     const path = lastPathRef.current;
     lastPathRef.current = [];
+
+    // Track word length for praise feedback
+    setLastWordLength(path.length);
+    setWordSubmitCount(c => c + 1);
 
     // Detect combos on the path
     const detectedCombos = detectSpecialCombos(path, engine.tileStates);
@@ -198,15 +222,27 @@ export function BlastGame({
       const mult = detectedCombos[0].scoreMultiplier;
       const flashTier: 1 | 2 | 3 = mult >= 6 ? 3 : mult >= 4 ? 2 : 1;
       setComboFlash({ id: `flash-${flyIdRef.current}`, tier: flashTier });
-      setComboTypeName(`${detectedCombos[0].type.toUpperCase()}!`);
+      setComboTypeName(t(`blast.combo.${detectedCombos[0].type}`) || `${detectedCombos[0].type.toUpperCase()}!`);
       sounds.playComboActivation(flashTier);
     }
 
     // 5. Haptic + sound feedback based on tile types in path
     const clearedTypes = new Set(clearedInfo.map(c => c.type));
-    if (clearedTypes.has('bomb')) { vibrateBlastBomb(); sounds.playSpecialTileSound('bomb'); }
-    else if (clearedTypes.has('lightning')) { vibrateBlastLightning(); sounds.playSpecialTileSound('lightning'); }
-    else if (clearedTypes.has('prism')) { vibrateBlastPrism(); sounds.playSpecialTileSound('prism'); }
+    if (clearedTypes.has('bomb')) vibrateBlastBomb();
+    else if (clearedTypes.has('lightning')) vibrateBlastLightning();
+    else if (clearedTypes.has('prism')) vibrateBlastPrism();
+    // Play sounds for ALL special tile types in the path
+    for (const type of clearedTypes) {
+      if (type !== 'standard') sounds.playSpecialTileSound(type);
+    }
+
+    // 5b. Screen shake on bomb/countdown explosions
+    const hasBombExplosion = clearedTypes.has('bomb') || clearedTypes.has('countdown');
+    if (hasBombExplosion || (result.countdownExplosions && result.countdownExplosions.length > 0)) {
+      if (explosionShakeTimerRef.current) clearTimeout(explosionShakeTimerRef.current);
+      setExplosionShake(true);
+      explosionShakeTimerRef.current = setTimeout(() => setExplosionShake(false), 400);
+    }
 
     // 6. Near-miss detection — shimmer tiles the player almost included
     const nearMiss = detectNearMiss(path, engine.grid!, engine.tileStates, config.gridSize, hadCombo);
@@ -358,6 +394,7 @@ export function BlastGame({
 
     sounds.playTileClear(clearedInfo.length);
     sounds.playLongWordBonus(path.length);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [engine, comboStreak, onComboDetected, sounds, sequencer, checkWord, config.gridSize, waveConfig?.cascadeChainBonus]);
 
   // Score fly + combo flash handlers
@@ -497,23 +534,71 @@ export function BlastGame({
       return () => clearTimeout(timer);
     }
 
-    // Dead end (includes moves exhausted) — check if objectives were met for wave advance
+    // Dead end (includes moves exhausted) — run Sugar Crush finale, then end game
     if (engine.gameState.isDeadEnd) {
-      const { score, wordsFound, tilesCleared, totalTiles } = engine.gameState;
-      const clearPct = totalTiles > 0 ? Math.min(100, Math.round((tilesCleared / totalTiles) * 100)) : 0;
-      const scoreThreshold = waveConfig?.scoreThreshold;
+      if (sugarCrushRunningRef.current) return undefined; // Sugar Crush in progress — wait
+      sugarCrushRunningRef.current = true;
 
-      if (onWaveComplete && objectives.allObjectivesComplete && (!scoreThreshold || score >= scoreThreshold)) {
-        const timer = setTimeout(() => onWaveComplete(score, wordsFound, clearPct), 2000);
-        return () => clearTimeout(timer);
-      }
+      let cancelled = false;
 
-      const results = engine.getResults(combo.maxCombo);
-      const timer = setTimeout(() => onGameEnd(results), 5000);
-      return () => clearTimeout(timer);
+      // Run Sugar Crush asynchronously, then end game
+      (async () => {
+        // Plan Sugar Crush from current tile state
+        const tiles = engine.getLatestState().tileStates;
+        const steps = planSugarCrush(tiles, config.gridSize);
+
+        if (steps.length > 0) {
+          // Execute each step with staggered timing
+          for (let i = 0; i < steps.length; i++) {
+            if (cancelled) return;
+            const step = steps[i];
+            const delay = i === 0 ? step.delayMs : step.delayMs - steps[i - 1].delayMs;
+            await new Promise<void>(r => setTimeout(r, delay));
+            if (cancelled) return;
+
+            // Convert tile to special type
+            engine.setTileStates(prev => prev.map((row, ri) =>
+              row.map((tile, ci) => {
+                if (ri === step.row && ci === step.col) {
+                  return { ...tile, type: step.convertTo, hitsRemaining: 1, activationEffect: 'sugar-crush' as any };
+                }
+                return tile;
+              }),
+            ));
+
+            // Play conversion sound + screen shake for high-intensity
+            sounds.playSpecialTileSound(step.convertTo);
+            if (step.intensity === 'high' || step.convertTo === 'bomb') {
+              if (explosionShakeTimerRef.current) clearTimeout(explosionShakeTimerRef.current);
+              setExplosionShake(true);
+              explosionShakeTimerRef.current = setTimeout(() => setExplosionShake(false), 400);
+            }
+          }
+
+          // Brief pause before the chain reaction finale
+          if (!cancelled) await new Promise<void>(r => setTimeout(r, 500));
+        }
+
+        if (cancelled) return;
+
+        // End game
+        const { score, wordsFound, tilesCleared, totalTiles } = engine.gameState;
+        const clearPct = totalTiles > 0 ? Math.min(100, Math.round((tilesCleared / totalTiles) * 100)) : 0;
+        const scoreThreshold = waveConfig?.scoreThreshold;
+
+        if (onWaveComplete && objectives.allObjectivesComplete && (!scoreThreshold || score >= scoreThreshold)) {
+          onWaveComplete(score, wordsFound, clearPct);
+        } else {
+          const results = engine.getResults(combo.maxCombo);
+          onGameEnd(results);
+        }
+      })();
+
+      return () => { cancelled = true; sugarCrushRunningRef.current = false; };
     }
 
     return undefined;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     engine.gameState.isComplete,
     engine.gameState.isDeadEnd,
@@ -577,6 +662,9 @@ export function BlastGame({
         username={username}
         comboStreak={comboStreak.streak}
         comboStreakArcRef={comboStreak.arcRef}
+        explosionShake={explosionShake}
+        lastWordLength={lastWordLength}
+        wordSubmitCount={wordSubmitCount}
         t={(key: string) => t(key) || undefined}
       />
     </div>

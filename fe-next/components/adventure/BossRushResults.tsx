@@ -16,14 +16,14 @@ import dynamic from 'next/dynamic';
 import { Swords, Trophy, Clock, Star, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
-import { useAdPlacement } from '@/hooks/useAdPlacement';
-import { useCrazyGamesAds } from '@/hooks/useCrazyGamesAds';
+import { useInterstitialAd } from '@/hooks/useInterstitialAd';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { getBossConfig } from '@/lib/adventure/bossConfig';
 import type { BossRushState } from './hooks/useBossRush';
 
 const CrazyGamesBanner = dynamic(() => import('@/components/CrazyGamesBanner'), { ssr: false });
+const NativeBannerAd = dynamic(() => import('@/components/ads/NativeBannerAd'), { ssr: false });
 
 // ==============================================
 // TYPES
@@ -57,14 +57,12 @@ const BossRushResults = memo<BossRushResultsProps>(({ state, onRetry, onExit }) 
   const [endTime] = useState(() => Date.now());
   const elapsed = endTime - state.startTime;
 
-  const { showInterstitial } = useAdPlacement();
-  const { requestMidgameAd } = useCrazyGamesAds();
+  const { showInterstitial } = useInterstitialAd();
   const { submitLeaderboardScore } = useCrazyGames();
 
   // Ads + leaderboard on mount
   useEffect(() => {
     showInterstitial('boss-rush-complete');
-    requestMidgameAd();
     if (state.totalScore > 0) {
       submitLeaderboardScore(state.totalScore);
     }
@@ -167,13 +165,14 @@ const BossRushResults = memo<BossRushResultsProps>(({ state, onRetry, onExit }) 
           </div>
         </div>
 
-        {/* Banner Ad */}
+        {/* Banner Ads — CrazyGames (web iframe) / AdMob (native) */}
         <div className="hidden md:block mb-4">
           <CrazyGamesBanner size="728x90" />
         </div>
         <div className="md:hidden mb-4">
           <CrazyGamesBanner size="320x50" />
         </div>
+        <NativeBannerAd />
 
         {/* Action buttons */}
         <div className="flex gap-3">

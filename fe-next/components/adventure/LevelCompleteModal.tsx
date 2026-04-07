@@ -64,6 +64,12 @@ interface LevelCompleteModalProps {
   onRetrySave?: () => void;
   /** Words on the board the player didn't find */
   missedWords?: string[];
+  /** Best word found (longest) — for share card */
+  bestWord?: string;
+  /** Total words found — for share card */
+  wordsFoundCount?: number;
+  /** Streak milestone reached this session, if any */
+  streakMilestone?: { days: number; rewardGold: number; titleKey: string } | null;
 }
 
 // ==============================================
@@ -115,6 +121,9 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
     saveFailed,
     onRetrySave,
     missedWords,
+    bestWord,
+    wordsFoundCount,
+    streakMilestone,
   }) => {
     const { t } = useLanguage();
     const dialogRef = useRef<HTMLDivElement>(null);
@@ -339,6 +348,9 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
               score={score}
               worldNumber={worldNumber}
               levelNumber={levelNumber}
+              bestWord={bestWord}
+              wordsFound={wordsFoundCount}
+              streakMilestone={streakMilestone}
               t={t}
             />
           </AdaptiveMotion.div>

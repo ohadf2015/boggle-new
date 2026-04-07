@@ -89,6 +89,33 @@ export {
   TITLE_TOTAL_MS,
 } from './entryTiming';
 
+// Archetype mastery system
+export {
+  ARCHETYPE_MASTERY_THRESHOLDS,
+  ARCHETYPE_MASTERY_BONUSES,
+  getMasteryTier,
+  calculateArchetypeMastery,
+  getMasteryBonusesForArchetype,
+  applyMasteryBonuses,
+} from './archetypeMastery';
+
+// Rune collection system
+export {
+  RUNE_CATALOG,
+  RUNE_FORGE_COSTS,
+  MAX_EQUIPPED_RUNES,
+  getRuneById,
+  canForgeRune,
+  forgeRune,
+  equipRune,
+  unequipRune,
+  computeRuneEffects,
+  type RuneDefinition,
+  type RuneRarity,
+  type RuneEffectChannel,
+  type RuneEffects,
+} from './runeCatalog';
+
 // World mastery system
 export {
   calculateMasteryCriteria,

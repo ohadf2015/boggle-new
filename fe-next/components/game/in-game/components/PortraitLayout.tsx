@@ -344,7 +344,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
         t={t}
       />
 
-      <div className="flex flex-col lg:flex-row lg:items-stretch lg:justify-center gap-0 md:gap-2 lg:gap-3 flex-1 w-full max-w-[1920px] mx-auto overflow-x-clip overflow-y-auto lg:overflow-hidden transition-all duration-500 ease-in-out pb-16 lg:pb-2 px-2 lg:px-3 xl:px-4 lg:h-[100dvh] lg:max-h-[100dvh]">
+      <div className="flex flex-col lg:flex-row lg:items-stretch lg:justify-center gap-0 md:gap-2 lg:gap-3 flex-1 w-full max-w-[1920px] mx-auto overflow-x-clip overflow-y-auto transition-all duration-500 ease-in-out pb-16 lg:pb-2 px-2 lg:px-3 xl:px-4 lg:h-[100dvh] lg:max-h-[100dvh]">
         {/* Mobile Header */}
         <GameHeader
           onExitRoom={onExitRoom}
@@ -368,7 +368,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
           {remainingTime !== null && (
             <div
               ref={gameStatsRef}
-              className="flex flex-col gap-0 w-full px-1 md:px-2 sticky top-0 z-40 flex-shrink-0 bg-gradient-to-b from-neo-navy/95 via-neo-navy/85 to-transparent backdrop-blur-md"
+              className="flex flex-col gap-0 w-full px-1 md:px-2 sticky top-0 z-40 flex-shrink-0"
               role="status"
               aria-label="Game status"
             >
@@ -389,7 +389,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
 
               {/* Stats row - Timer centered on mobile, Timer + controls on desktop */}
               <div
-                className="flex w-full items-center justify-between relative min-h-[56px] md:min-h-[70px] lg:min-h-[clamp(48px,8dvh,64px)] gap-2"
+                className="flex w-full items-center justify-start relative min-h-[56px] md:min-h-[70px] lg:min-h-[clamp(48px,8dvh,64px)] gap-2"
                 data-testid="stats-row"
               >
                 {/* Desktop header */}

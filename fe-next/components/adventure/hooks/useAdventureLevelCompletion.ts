@@ -69,6 +69,12 @@ export interface UseAdventureLevelCompletionProps {
   flashChallengeGold?: number;
   /** Update word album with words found this level */
   updateWordAlbum?: (words: string[]) => void;
+  /** Update runes + fragment balance (optimistic, client-only) */
+  updateRunes?: (runes: import('@/types/adventure').PlayerRune[], fragments: number) => void;
+  /** Current rune state for fragment accumulation */
+  currentRunes?: import('@/types/adventure').PlayerRune[];
+  /** Current fragment balance */
+  currentFragments?: number;
   endAIDirector: () => void;
   handleEarnAchievement: (id: AdventureAchievementId) => boolean;
   pauseGame: () => void;
@@ -137,6 +143,7 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
   const endAIDirectorRef = useRef(endAIDirector);
   const handleEarnAchievementRef = useRef(handleEarnAchievement);
   const updateWordAlbumRef = useRef(props.updateWordAlbum);
+  const updateRunesRef = useRef(props.updateRunes);
 
   // Keep callback refs in sync (separated from reset to avoid clearing
   // completion guards when only a callback reference changes — H8 fix)
@@ -147,6 +154,7 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
     endAIDirectorRef.current = endAIDirector;
     handleEarnAchievementRef.current = handleEarnAchievement;
     updateWordAlbumRef.current = props.updateWordAlbum;
+    updateRunesRef.current = props.updateRunes;
   }); // runs every render — ref sync is cheap, no deps needed
 
   // Reset completion flags ONLY on actual level change
@@ -209,12 +217,24 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
       });
       setLootDrops(drops);
 
+      // Accumulate rune fragments from loot drops
+      const fragmentCount = drops
+        .filter(d => d.type === 'runeFragment')
+        .reduce((sum, d) => sum + (d.quantity ?? 1), 0);
+      if (fragmentCount > 0 && updateRunesRef.current) {
+        updateRunesRef.current(
+          props.currentRunes ?? [],
+          (props.currentFragments ?? 0) + fragmentCount,
+        );
+      }
+
       setHasAwardedLevelRewards(true);
     }
     // Failure gold (Salvage Claw) — server handles via complete endpoint
     if ((gameState.isComplete || timeRemaining === 0) && !hasAwardedLevelRewards && gameState.stars === 0) {
       setHasAwardedLevelRewards(true);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gameState.isComplete, gameState.stars, gameState.comboCount, gameState.score, gameState.wordsFound, timeRemaining, hasAwardedLevelRewards, levelConfig.level, levelConfig.world, timerSeconds, awardXp, currentLevel, upgradeBonuses.xpBonus, isBossLevel, props.isFirstCompletion, props.upgradeEffects?.doubleFirstCompletionGold]);
 
   // Victory/Defeat Detection & Cinematic Trigger

@@ -1926,3 +1926,40 @@
     display: none;
   }
 }
+
+/* ========== ACTIVATION LABEL (floating bonus text) ========== */
+.tile-activation-label {
+  position: absolute;
+  top: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 11px;
+  font-weight: 900;
+  color: #fff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+  pointer-events: none;
+  z-index: 20;
+  animation: activation-label-float 800ms ease-out forwards;
+}
+
+@keyframes activation-label-float {
+  0% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+  60% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-18px) scale(1.15);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-28px) scale(0.9);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tile-activation-label {
+    animation: none;
+    display: none;
+  }
+}

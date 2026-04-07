@@ -8,8 +8,11 @@ import type { LetterGrid, Language } from '@/shared/types/game';
 import type { BlastTileState, BlastTileType } from './types';
 import type { SequencerState, TileAnimState } from './hooks/useBlastSequencer';
 import { GRID_PADDING, GRID_GAP_CLASS } from '@/components/grid/gridLayoutConstants';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { COMBO_ELIGIBLE_TILES } from './utils/blastCombos';
 import { computeCellFilter } from './hooks/blastCellFilterLogic';
+import { scanOffensiveSpecial, OFFENSIVE_RANK } from './utils/blastTileEffects';
+import { getTileTooltip } from './utils/blastTileTooltips';
 
 const ZONE_PREVIEW_TILES: Partial<Record<BlastTileType, 'bomb' | 'lightning' | 'prism' | 'magnet'>> = {
   bomb: 'bomb',
@@ -20,6 +23,43 @@ const ZONE_PREVIEW_TILES: Partial<Record<BlastTileType, 'bomb' | 'lightning' | '
 
 function getZonePreview(type: BlastTileType): 'bomb' | 'lightning' | 'prism' | 'magnet' | null {
   return ZONE_PREVIEW_TILES[type] ?? null;
+}
+
+/** Find which tile rainbow/mirror will copy in the current selection */
+function computeScanTarget(
+  cells: SelectedCell[],
+  tiles: BlastTileState[][],
+): { key: string; source: 'rainbow' | 'mirror' } | null {
+  if (cells.length < 2) return null;
+  const hasRainbow = cells.some(c => tiles[c.row]?.[c.col]?.type === 'rainbow');
+  const hasMirror = cells.some(c => tiles[c.row]?.[c.col]?.type === 'mirror');
+  if (!hasRainbow && !hasMirror) return null;
+
+  const path = cells.map(c => ({ row: c.row, col: c.col }));
+
+  if (hasRainbow && scanOffensiveSpecial(path, tiles, 'best')) {
+    let bestRank = -1;
+    let bestKey: string | null = null;
+    for (const c of cells) {
+      const t = tiles[c.row]?.[c.col];
+      if (t && !t.isCleared && t.type !== 'rainbow' && t.type !== 'mirror') {
+        const rank = OFFENSIVE_RANK[t.type] ?? -1;
+        if (rank > bestRank) { bestRank = rank; bestKey = `${c.row}-${c.col}`; }
+      }
+    }
+    if (bestKey) return { key: bestKey, source: 'rainbow' };
+  }
+
+  if (hasMirror && scanOffensiveSpecial(path, tiles, 'first')) {
+    for (const c of cells) {
+      const t = tiles[c.row]?.[c.col];
+      if (t && !t.isCleared && t.type !== 'rainbow' && t.type !== 'mirror' && (OFFENSIVE_RANK[t.type] ?? -1) >= 0) {
+        return { key: `${c.row}-${c.col}`, source: 'mirror' };
+      }
+    }
+  }
+
+  return null;
 }
 
 export interface BlastBoardProps {
@@ -60,6 +100,7 @@ export const BlastBoard = memo(function BlastBoard({
   cascadeHighlightCells = [],
   diamondRevealTurns = 0,
 }: BlastBoardProps) {
+  const { t } = useLanguage();
   const containerRef = useRef<HTMLDivElement>(null);
   // Initialize to 1 (not 0) so the overlay grid renders immediately.
   // Fall animation pixel math degrades gracefully until ResizeObserver fires.
@@ -131,6 +172,26 @@ export const BlastBoard = memo(function BlastBoard({
     return eligibleKeys.length >= 2 ? new Set(eligibleKeys) : null;
   }, [selectedCells, tileStates]);
 
+  // Portal pair index map — assign each unique portalPairId a color index
+  const portalPairMap = useMemo(() => {
+    const map = new Map<string, number>();
+    let idx = 0;
+    for (const row of tileStates) {
+      for (const tile of row) {
+        if (tile.type === 'portal' && tile.portalPairId && !tile.isCleared && !map.has(tile.portalPairId)) {
+          map.set(tile.portalPairId, idx++);
+        }
+      }
+    }
+    return map;
+  }, [tileStates]);
+
+  // Rainbow/Mirror scan target — find which tile in the selection will be copied
+  const scanTargetKey = useMemo(
+    () => computeScanTarget(selectedCells, tileStates),
+    [selectedCells, tileStates],
+  );
+
   // Build a lookup map from sequencer active tiles
   const animLookup = useMemo(() => {
     if (!sequencerState?.activeTiles.length) return null;
@@ -140,6 +201,17 @@ export const BlastBoard = memo(function BlastBoard({
     }
     return map;
   }, [sequencerState]);
+
+  // Single-tile tooltip: when exactly 1 special tile is selected, show its info
+  const singleTileTooltip = useMemo(() => {
+    if (selectedCells.length !== 1) return null;
+    const c = selectedCells[0];
+    const tile = tileStates[c.row]?.[c.col];
+    if (!tile || tile.type === 'standard') return null;
+    const tooltip = getTileTooltip(tile.type, t);
+    if (!tooltip) return null;
+    return { ...tooltip, row: c.row, col: c.col };
+  }, [selectedCells, tileStates, t]);
 
   // Only render overlay once we have tile states
   const hasTileStates = tileStates.length > 0 && tileStates[0]?.length > 0;
@@ -224,12 +296,32 @@ export const BlastBoard = memo(function BlastBoard({
                 zonePreview={isSelected ? getZonePreview(tile.type) : null}
                 isDiamondRevealed={tile.type === 'frozen' && diamondRevealTurns > 0 && tile.innerType != null}
                 innerType={tile.innerType}
+                portalPairIndex={tile.type === 'portal' && tile.portalPairId ? portalPairMap.get(tile.portalPairId) : undefined}
+                isScanTarget={scanTargetKey?.key === key ? scanTargetKey.source : undefined}
                 clearRotate={animState?.clearRotate}
                 fallOffset={animState?.fallDistance ? animState.fallDistance * cellHeight : undefined}
                 spawnOffset={animState?.spawnOffset ? animState.spawnOffset * cellHeight : undefined}
               />
             );
           })}
+        </div>
+      )}
+      {/* Layer 3: Single-tile info tooltip (mobile-friendly) */}
+      {singleTileTooltip && (
+        <div
+          className="absolute left-1/2 -translate-x-1/2 z-30 px-3 py-1.5 rounded-neo bg-neo-navy/95 border border-neo-lime/40 shadow-hard-sm pointer-events-none animate-neo-pop"
+          style={{
+            top: `${(singleTileTooltip.row / gridSize) * 100}%`,
+            transform: `translateX(-50%) translateY(${singleTileTooltip.row < 2 ? '110%' : '-110%'})`,
+            maxWidth: '85%',
+          }}
+        >
+          <span className="text-[0.7rem] font-neo-display text-neo-lime whitespace-nowrap">
+            {singleTileTooltip.icon} {singleTileTooltip.name}
+          </span>
+          <span className="block text-[0.6rem] font-neo-body text-neo-cream/80 leading-tight">
+            {singleTileTooltip.desc}
+          </span>
         </div>
       )}
     </div>

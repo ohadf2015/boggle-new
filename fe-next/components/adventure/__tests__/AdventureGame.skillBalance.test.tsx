@@ -370,7 +370,7 @@ describe('Overall skill-based balance (POWER-07)', () => {
     // Power-ups should provide 20%+ advantage (helpful but not mandatory)
     if (primary.type === 'wordCount') {
       const advantagePercent = (freezeTimeAdvantage / primary.target) * 100;
-      expect(advantagePercent).toBeGreaterThan(20); // At least 20% help
+      expect(advantagePercent).toBeGreaterThanOrEqual(20); // At least 20% help
       // Removed upper bound - some power-ups can provide large advantage (that's okay)
     }
 

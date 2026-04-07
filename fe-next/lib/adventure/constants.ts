@@ -108,7 +108,7 @@ export const TILE_TYPES = {
   GOLD: 'gold',
   /** Obstacle - must be cleared by using adjacent tiles */
   ICE: 'ice',
-  /** Clears entire row when used in a word */
+  /** Score Bomb — doubles the word's score when included */
   BOMB: 'bomb',
   /** Wildcard - matches any letter */
   RAINBOW: 'rainbow',
@@ -259,10 +259,10 @@ export function getWorldUnlockRequirement(world: number): number {
   if (world <= 1) return 0; // World 1 always unlocked
   if (world === 2) return 7; // Lowered: 1-star avg player can unlock W2
 
-  // All worlds (3-10) use the same formula: 11 stars per previous world
-  // World 10 requires 11 * 9 = 99 stars, ensuring players have progressed through most worlds
+  // Consistent 11-star gap from W2 onward: W3=18, W4=29, ... W10=95
+  // Anchored to W2's lowered requirement (7) so there's no sudden jump
   const clamped = Math.min(world, WORLDS_COUNT);
-  return STARS_TO_UNLOCK_NEXT_WORLD * (clamped - 1);
+  return 7 + STARS_TO_UNLOCK_NEXT_WORLD * (clamped - 2);
 }
 
 /**

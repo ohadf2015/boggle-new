@@ -396,8 +396,10 @@ describe('ProgressionContext', () => {
       expect(result.current.isWorldUnlocked(1)).toBe(true);
       // World 2 requires 15 stars (we have 20)
       expect(result.current.isWorldUnlocked(2)).toBe(true);
-      // World 3 requires 30 stars (we have 20)
-      expect(result.current.isWorldUnlocked(3)).toBe(false);
+      // World 3 requires 18 stars (we have 20)
+      expect(result.current.isWorldUnlocked(3)).toBe(true);
+      // World 4 requires 29 stars (we have 20)
+      expect(result.current.isWorldUnlocked(4)).toBe(false);
     });
 
     it('should provide isLevelUnlocked helper', async () => {

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { Copy, Check, Share2, Sword } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -194,6 +194,11 @@ function buildBossShareText(props: BossDefeatShareCardProps, theme: BossShareThe
 export function BossDefeatShareCard(props: BossDefeatShareCardProps) {
   const { bossId, bossName, worldName, killingWord, stars, score, t } = props;
   const [copied, setCopied] = useState(false);
+  const copiedTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => { if (copiedTimeoutRef.current) clearTimeout(copiedTimeoutRef.current); };
+  }, []);
 
   const theme = BOSS_THEMES[bossId] || DEFAULT_THEME;
   const [tauntIndex] = useState(() => Math.floor(Math.random() * theme.taunts.length));
@@ -208,7 +213,8 @@ export function BossDefeatShareCard(props: BossDefeatShareCardProps) {
     try {
       await navigator.clipboard.writeText(shareText);
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      if (copiedTimeoutRef.current) clearTimeout(copiedTimeoutRef.current);
+      copiedTimeoutRef.current = setTimeout(() => setCopied(false), 2000);
     } catch { /* fallback silently */ }
   }, [shareText]);
 

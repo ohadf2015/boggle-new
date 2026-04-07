@@ -99,13 +99,8 @@ export const PauseOverlay = memo(function PauseOverlay({
                 'bg-neo-yellow/20 border-4 border-neo-yellow',
                 'flex items-center justify-center'
               )}
-              animate={{
-                boxShadow: [
-                  '0 0 0 rgba(255,225,53,0)',
-                  '0 0 30px rgba(255,225,53,0.3)',
-                  '0 0 0 rgba(255,225,53,0)',
-                ],
-              }}
+              style={{ boxShadow: '0 0 30px rgba(255,225,53,0.3)' }}
+              animate={{ opacity: [0, 1, 0] }}
               transition={{ duration: 2, repeat: Infinity }}
             >
               <Pause className="w-8 h-8 sm:w-10 sm:h-10 text-neo-yellow" />

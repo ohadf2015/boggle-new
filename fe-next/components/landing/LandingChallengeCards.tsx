@@ -6,6 +6,7 @@ import ModeCard from './ModeCard';
 import DailyChallengeBanner from '@/components/daily/DailyChallengeBanner';
 import { shouldShowGuidance } from '@/utils/contextualGuidanceStorage';
 import { hasCompletedOnboarding } from '@/utils/onboardingStorage';
+import { isNewPlayer } from '@/utils/multiplayerProgressStorage';
 import type { LandingGameMode } from '@/lib/landing/fetchGameModeStats';
 
 interface DailyChallengePreloadedStats {
@@ -49,11 +50,17 @@ export function LandingChallengeCards({
   cardOrder: cardOrderProp,
 }: LandingChallengeCardsProps) {
   const [isFirstTimer, setIsFirstTimer] = useState(false);
+  const [isNewbie, setIsNewbie] = useState(false);
   useEffect(() => {
     setIsFirstTimer(shouldShowGuidance('firstPlayTutorialCompleted') && !hasCompletedOnboarding());
+    setIsNewbie(isNewPlayer());
   }, []);
 
-  const cardOrder = cardOrderProp ?? DEFAULT_ORDER;
+  // New players (< 3 games) see practice first to ease them in
+  const serverOrder = cardOrderProp ?? DEFAULT_ORDER;
+  const cardOrder = isNewbie
+    ? ['practice', ...serverOrder.filter(m => m !== 'practice')] as LandingGameMode[]
+    : serverOrder;
 
   /** Renders a card by mode key with staggered CSS animation */
   const renderCard = (mode: LandingGameMode, index: number) => {
@@ -72,8 +79,8 @@ export function LandingChallengeCards({
               variant="pink"
               liveBadge={{ openRooms, totalPlayers, roomsLabel: t('landing.openRooms'), playersLabel: t('landing.playersLive') }}
               playerCount={{ count: activePlayers, label: t('landing.playingNow') }}
-              highlighted={isFirstTimer}
-              highlightLabel={isFirstTimer ? t('onboarding.welcome.startHere') : undefined}
+              highlighted={isFirstTimer && !isNewbie}
+              highlightLabel={isFirstTimer && !isNewbie ? t('onboarding.welcome.startHere') : undefined}
               duration={t('landing.duration').replace('{time}', '1-3')}
               difficulty={2}
               difficultyLabel={t('landing.difficultyMedium')}
@@ -87,11 +94,13 @@ export function LandingChallengeCards({
             <ModeCard
               title={t('landing.practice')}
               description={t('landing.practiceDesc')}
-              href={`/${language}/singleplayer?mode=practice`}
+              href={`/${language}/singleplayer?autoStart=practice`}
               icon={<BookOpen className="w-6 h-6" />}
               modeImage="/modes/practice.png"
               variant="cyan"
               personalBest={playerAllTimeBest ? { score: playerAllTimeBest.score, label: t('landing.personalBest') } : undefined}
+              highlighted={isNewbie}
+              highlightLabel={isNewbie ? t('onboarding.welcome.startHere') : undefined}
               duration={t('landing.duration').replace('{time}', '1-3')}
               difficulty={1}
               difficultyLabel={t('landing.difficultyEasy')}

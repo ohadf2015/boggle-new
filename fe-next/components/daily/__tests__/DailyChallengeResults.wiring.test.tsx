@@ -22,12 +22,8 @@ vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({ profile: null, isAuthenticated: false }),
 }));
 
-vi.mock('@/hooks/useAdPlacement', () => ({
-  useAdPlacement: () => ({ showInterstitial: vi.fn() }),
-}));
-
-vi.mock('@/hooks/useCrazyGamesAds', () => ({
-  useCrazyGamesAds: () => ({ requestMidgameAd: vi.fn() }),
+vi.mock('@/hooks/useInterstitialAd', () => ({
+  useInterstitialAd: () => ({ showInterstitial: vi.fn() }),
 }));
 
 vi.mock('@/hooks/useDailyModeQuest', () => ({

@@ -14,7 +14,7 @@ Next.js 16 | TypeScript | Tailwind | Express | Socket.IO | Supabase | Redis | Vi
 
 ## Critical Guidelines
 - All UI text: `t('key')` - NO hardcoded strings
-- 4 languages: Hebrew (RTL), English, Swedish, Japanese
+- 5 languages: Hebrew (RTL), English, Swedish, Japanese, Spanish
 - TDD mandatory: Test first, then implement
 - Max 500 lines per file
 - Run `npm run lint && npm run test && npm run build` after changes

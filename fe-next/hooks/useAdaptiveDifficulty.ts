@@ -181,11 +181,11 @@ export function useAdaptiveDifficulty(
     [world, level, recordAttempt]
   );
 
-  return {
+  return useMemo(() => ({
     tier,
     adjustedConfig,
     hintData,
     powerUpCooldownMultiplier,
     recordCompletion,
-  };
+  }), [tier, adjustedConfig, hintData, powerUpCooldownMultiplier, recordCompletion]);
 }

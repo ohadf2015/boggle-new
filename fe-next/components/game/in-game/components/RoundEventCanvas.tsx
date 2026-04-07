@@ -331,9 +331,11 @@ export const RoundEventCanvas = memo<RoundEventCanvasProps>(function RoundEventC
     if (bolt.life < 5) {
       const flashR = (5 - bolt.life) * 8;
       const flashGrad = ctx.createRadialGradient(endPt.x, endPt.y, 0, endPt.x, endPt.y, flashR);
-      flashGrad.addColorStop(0, 'rgba(255, 255, 255, 0.8)');
-      flashGrad.addColorStop(0.4, bolt.glowColor.replace('hsl(', 'hsla(').replace(')', ', 0.4)'));
-      flashGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+      try {
+        flashGrad.addColorStop(0, 'rgba(255, 255, 255, 0.8)');
+        flashGrad.addColorStop(0.4, bolt.glowColor.replace(/^hsl\(([^)]+)\)$/, 'hsla($1, 0.4)'));
+        flashGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+      } catch { /* skip frame if color parse fails */ }
       ctx.globalAlpha = bolt.opacity * fade;
       ctx.fillStyle = flashGrad;
       ctx.beginPath();

@@ -14,6 +14,9 @@ import { RewardedAdButton } from '@/components/ads/RewardedAdButton';
 import { getNearMissMessages } from '@/lib/adventure/nearMiss';
 import { MissedWordsPanel } from './MissedWordsPanel';
 import { LootRevealAnimation } from './LootRevealAnimation';
+import { LevelShareCard } from './LevelShareCard';
+import { StreakMilestoneCelebration } from './StreakMilestoneCelebration';
+import type { StreakMilestone } from '@/lib/adventure/adventureStreak';
 import type { LevelObjective, LevelAttempt } from '@/types/adventure';
 
 
@@ -299,13 +302,18 @@ export interface LevelCompleteActionsProps {
   score?: number;
   worldNumber?: number;
   levelNumber?: number;
+  worldName?: string;
+  bestWord?: string;
+  wordsFound?: number;
+  streakMilestone?: StreakMilestone | null;
   t: (key: string, params?: Record<string, string | number>) => string;
 }
 
 export const LevelCompleteActions = memo<LevelCompleteActionsProps>(({
-  isFailed, isLastLevelOfWorld, onNextWorld, onContinue, onRetry, onExit, canRetryFree, stars, goldEarned: _goldEarned, saveFailed, onRetrySave, score = 0, worldNumber = 1, levelNumber = 1, t,
+  isFailed, isLastLevelOfWorld, onNextWorld, onContinue, onRetry, onExit, canRetryFree, stars, goldEarned: _goldEarned, saveFailed, onRetrySave, score = 0, worldNumber = 1, levelNumber = 1, worldName = '', bestWord = '', wordsFound = 0, streakMilestone, t,
 }) => {
   const [goldDoubled, setGoldDoubled] = useState(false);
+  const [showShareCard, setShowShareCard] = useState(false);
 
   return (
     <div className="flex flex-col gap-2 p-4 md:p-6 pt-3 border-t border-neo-white/10 bg-neo-navy/95 backdrop-blur-sm flex-shrink-0">
@@ -324,6 +332,11 @@ export const LevelCompleteActions = memo<LevelCompleteActionsProps>(({
             </button>
           )}
         </div>
+      )}
+
+      {/* Streak milestone celebration */}
+      {!isFailed && streakMilestone && (
+        <StreakMilestoneCelebration milestone={streakMilestone} t={t} />
       )}
 
       {/* Double Coins Rewarded Ad */}
@@ -350,19 +363,31 @@ export const LevelCompleteActions = memo<LevelCompleteActionsProps>(({
         </button>
       )}
 
+      {/* Share card — 3-star only */}
+      {showShareCard && stars === 3 && !isFailed && (
+        <LevelShareCard
+          worldNumber={worldNumber}
+          levelNumber={levelNumber}
+          worldName={worldName}
+          stars={stars}
+          score={score}
+          bestWord={bestWord}
+          wordsFound={wordsFound}
+          t={t}
+        />
+      )}
+
       <div className="flex gap-2">
-        {/* Share — 3-star only, compact icon button */}
+        {/* Share toggle — 3-star only, compact icon button */}
         {stars === 3 && !isFailed && (
           <button
-            onClick={() => {
-              const text = `⭐⭐⭐ W${worldNumber}-L${levelNumber} — ${score.toLocaleString()} pts! 🏆`;
-              if (navigator.share) {
-                navigator.share({ text }).catch(() => {});
-              } else {
-                navigator.clipboard?.writeText(text);
-              }
-            }}
-            className="py-2.5 px-3 bg-neo-yellow/20 text-neo-yellow border-2 border-neo-yellow/40 rounded-neo hover:bg-neo-yellow/30 transition-colors"
+            onClick={() => setShowShareCard(prev => !prev)}
+            className={cn(
+              'py-2.5 px-3 border-2 rounded-neo transition-colors',
+              showShareCard
+                ? 'bg-neo-lime/20 text-neo-lime border-neo-lime/40'
+                : 'bg-neo-lime/10 text-neo-lime/70 border-neo-lime/20 hover:bg-neo-lime/20',
+            )}
             aria-label={t('common.share')}
           >
             <Share2 className="w-4 h-4" />

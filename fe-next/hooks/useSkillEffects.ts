@@ -90,7 +90,7 @@ export function useSkillEffects(): UseSkillEffectsReturn {
     [unlockedSkills]
   );
 
-  return {
+  return useMemo(() => ({
     maxPowerUpSlots: maxPowerUpSlotsValue,
     powerUpCooldownMultiplier: powerUpCooldownMultiplierValue,
     comboMultiplierBonus: comboMultiplierBonusValue,
@@ -99,5 +99,7 @@ export function useSkillEffects(): UseSkillEffectsReturn {
     hasAdvancedMultiplier: hasAdvancedMultiplierValue,
     getLongWordDamageMultiplier: getLongWordDamageMultiplierFn,
     getChainDurationBonus: getChainDurationBonusFn,
-  };
+  }), [maxPowerUpSlotsValue, powerUpCooldownMultiplierValue, comboMultiplierBonusValue,
+    bossDamageMultiplierValue, hintDurationValue, hasAdvancedMultiplierValue,
+    getLongWordDamageMultiplierFn, getChainDurationBonusFn]);
 }

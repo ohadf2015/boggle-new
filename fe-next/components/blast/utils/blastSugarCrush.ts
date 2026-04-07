@@ -48,9 +48,9 @@ const CONVERT_TYPE_BY_INTENSITY: Record<SugarCrushIntensity, BlastTileType[]> = 
  * Fisher-Yates shuffle (in place).
  * Returns the shuffled array for chaining.
  */
-function fisherYatesShuffle<T>(arr: T[]): T[] {
+function fisherYatesShuffle<T>(arr: T[], rng: () => number = Math.random): T[] {
   for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
+    const j = Math.floor(rng() * (i + 1));
     [arr[i], arr[j]] = [arr[j], arr[i]];
   }
   return arr;
@@ -72,6 +72,7 @@ function fisherYatesShuffle<T>(arr: T[]): T[] {
 export function planSugarCrush(
   tileStates: BlastTileState[][],
   gridSize: number,
+  rng: () => number = Math.random,
 ): SugarCrushStep[] {
   // Collect uncleared standard tiles
   const candidates: { row: number; col: number }[] = [];
@@ -88,7 +89,7 @@ export function planSugarCrush(
   if (candidates.length === 0) return [];
 
   // Randomly select up to MAX_SUGAR_CRUSH_TILES
-  fisherYatesShuffle(candidates);
+  fisherYatesShuffle(candidates, rng);
   const selected = candidates.slice(0, MAX_SUGAR_CRUSH_TILES);
   const total = selected.length;
 

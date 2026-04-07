@@ -3524,7 +3524,7 @@ const sv = {
     "best": "Bäst",
     "target": "Mål",
     "totalPoints": "totalt",
-    "topPercent": "Topp ${percent}%",
+    "topPercent": "Topp {percent}%",
     "noRankYet": "Spela för att bli rankad!",
     "viewLeaderboard": "Visa topplista",
     "friends": "Vänner",
@@ -4246,7 +4246,7 @@ const sv = {
     "multiPlayer": "Flerspelarläge",
     "multiplayer": "Flerspelarläge",
     "multiplayerDesc": "Tävla med vänner i realtid!",
-    "arena": "Ordarenan",
+    "arena": "Multiplayer",
     "arenaDesc": "Spela ensam eller utmana vänner!",
     "practice": "Träning",
     "practiceDesc": "Ingen press, bara ord",
@@ -5183,7 +5183,8 @@ const sv = {
         "classic": "Klassisk",
         "blitz": "Blixt",
         "survival": "Överlevnad"
-      }
+      },
+      "sent": "Utmaning skickad!"
     },
     "copyInviteLink": "Kopiera inbjudningslänk",
     "linkCopied": "Länk kopierad!",
@@ -6223,6 +6224,59 @@ const sv = {
       }
     },
     "title": "Äventyrsläge",
+    "archetype": {
+      "standard": "Standard",
+      "excavation": "Utgrävning",
+      "goldRush": "Guldrush",
+      "puzzle": "Pussel",
+      "survival": "Överlevnad",
+      "cascade": "Kaskad",
+      "boss": "Bosskamp"
+    },
+    "mastery": {
+      "title": "Arketypbehärskning",
+      "tier": {
+        "none": "Orankad",
+        "bronze": "Brons",
+        "silver": "Silver",
+        "gold": "Guld",
+        "diamond": "Diamant"
+      },
+      "progress": "{current}/{target} stjärnor",
+      "bonusUnlocked": "Bonus upplåst: {description}",
+      "nextTier": "Nästa nivå: {tier} ({remaining} stjärnor kvar)"
+    },
+    "runes": {
+      "title": "Runsamling",
+      "forge": "Smid runa",
+      "equip": "Utrusta",
+      "unequip": "Avutrusta",
+      "equipped": "Utrustade ({count}/{max})",
+      "fragments": "{count} fragment",
+      "forgeCost": "Kostnad: {cost} fragment",
+      "alreadyOwned": "Redan ägd",
+      "notEnoughFragments": "Inte tillräckligt med fragment",
+      "fragment": "Runfragment",
+      "slotsFull": "Alla platser fulla",
+      "rarity": {
+        "common": "Vanlig",
+        "rare": "Sällsynt",
+        "epic": "Episk",
+        "legendary": "Legendarisk"
+      },
+      "ember": { "name": "Glödruna", "desc": "+10% poängbonus" },
+      "inferno": { "name": "Infernaruna", "desc": "+25% poängbonus" },
+      "midas": { "name": "Midasruna", "desc": "+15% guldbonus" },
+      "fortune": { "name": "Lyckosruna", "desc": "+40% guldbonus" },
+      "hourglass": { "name": "Timglasruna", "desc": "+5s bonustid" },
+      "eternity": { "name": "Evighetsruna", "desc": "+12s bonustid" },
+      "flow": { "name": "Flödesruna", "desc": "15% långsammare komboförlust" },
+      "torrent": { "name": "Forsenruna", "desc": "35% långsammare komboförlust" },
+      "insight": { "name": "Insiktsruna", "desc": "+1 ledtråd" },
+      "oracle": { "name": "Orakelruna", "desc": "+2 ledtrådar" },
+      "valor": { "name": "Modsruna", "desc": "+20% bossskada" },
+      "dragonslayer": { "name": "Drakdödarruna", "desc": "+50% bossskada" }
+    },
     "worldMap": "Världskarta",
     "subtitle": "Res genom 10 temavärldar, erövra 100 nivåer och bli den ultimata ordmästaren!",
     "adminOnly": "Endast admin",
@@ -6275,6 +6329,18 @@ const sv = {
       "bossRushLocked": "Besegra alla bossar för att låsa upp Bossrush",
       "allQuestsComplete": "Alla dagliga uppdrag klara! Bonus!",
       "dailyQuestBonusComplete": "Alla uppdrag klara! +50 bonusguld"
+    },
+    "share": {
+      "perfectClear": "Perfekt klart",
+      "bestWord": "Bästa ord",
+      "wordsFound": "ord hittade"
+    },
+    "streak": {
+      "days": "dagars svit",
+      "milestone3": "3-dagars svit!",
+      "milestone7": "Veckokrigare!",
+      "milestone14": "Tvåveckorsmästare!",
+      "milestone30": "Månadslegend!"
     },
     "album": {
       "title": "Ordalbum",
@@ -6404,7 +6470,8 @@ const sv = {
     "gold": "Guld",
     "loading": "Laddar äventyr...",
     "currency": {
-      "goldAmount": "{amount} guld"
+      "goldAmount": "{amount} guld",
+      "coinIcon": "mynt"
     },
     "levelLocked": "Nivå {level} — Låst",
     "bossLevel": "Bossnivå {level}",
@@ -6564,14 +6631,14 @@ const sv = {
     },
     "mechanic": {
       "synonymPairs": "Synonympar",
-      "etymologyRoots": "Bonus för latinska/grekiska rötter",
-      "idioms": "Dolda idiomutmaningar",
-      "compounds": "+30% för sammansatta ord",
-      "anagrams": "Lös anagram för bonusar",
-      "palindromes": "+50% för palindromer",
-      "rareWords": "+40% för sällsynta/nya ord",
-      "multilingual": "Flerspråkiga ordbonusar",
-      "allMechanics": "Alla mekaniker kombinerade"
+      "etymologyRoots": "Rotord",
+      "idioms": "Idiomjakt",
+      "compounds": "Sammansatta ord",
+      "anagrams": "Anagram",
+      "palindromes": "Palindromer",
+      "rareWords": "Ovanliga ord",
+      "multilingual": "Polyglott",
+      "allMechanics": "Alla mekaniker"
     },
     "objectives": {
       "wordCount": "Hitta ord",
@@ -6691,7 +6758,8 @@ const sv = {
       "yourProgress": "Din framsteg",
       "bestWords": "Bästa ord",
       "bestScore": "Bästa poäng",
-      "attempts": "Försök"
+      "attempts": "Försök",
+      "nearMissTitle": "Så nära!"
     },
     "preview": {
       "title": "Förhandsvisning",
@@ -7521,7 +7589,35 @@ const sv = {
   },
   "blast": {
     "chain": {
-      "badge": "Kedja x{level}"
+      "badge": "Kedja x{level}",
+      "cascade": "Kaskad!",
+      "double": "Dubbel!",
+      "triple": "TRIPPEL!",
+      "mega": "MEGA!",
+      "ultra": "ULTRA!!"
+    },
+    "praise": {
+      "nice": "Snyggt!",
+      "great": "Bra!",
+      "brilliant": "Briljant!",
+      "amazing": "FANTASTISKT!",
+      "legendary": "LEGENDARISKT!"
+    },
+    "waveClear": {
+      "perfect": "PERFEKT!",
+      "great": "BRA!",
+      "clear": "KLART!"
+    },
+    "milestone": {
+      "100": "100!",
+      "250": "250!",
+      "500": "500!",
+      "750": "750!",
+      "1000": "1000!",
+      "1500": "1500!",
+      "2000": "2000!",
+      "3000": "3000!",
+      "5000": "5000+"
     },
     "tile": {
       "gold":      { "name": "Guld",      "desc": "3× poäng + 1 bonusdrag." },
@@ -9111,7 +9207,8 @@ const sv = {
     "send": "Skicka gåva",
     "sent": "Gåva skickad!",
     "limitReached": "Daglig gräns nådd",
-    "error": "Gåvan misslyckades. Försök igen?"
+    "error": "Gåvan misslyckades. Försök igen?",
+    "received": "{sender} skickade dig en {type}!"
   },
   "faq": {
     "title": "Vanliga frågor",
@@ -9810,21 +9907,33 @@ const sv = {
       "mega": "MEGA!",
       "ultra": "ULTRA!!"
     },
+    "praise": {
+      "nice": "Snyggt!",
+      "great": "Bra!",
+      "brilliant": "Briljant!",
+      "amazing": "FANTASTISKT!",
+      "legendary": "LEGENDARISKT!"
+    },
     "tileGuide": {
       "title": "Brickguide",
-      "standard": { "name": "Standard", "desc": "Vanlig bricka" },
-      "gold": { "name": "Guld", "desc": "3x poängmultiplikator" },
-      "silver": { "name": "Silver", "desc": "1,5x poängmultiplikator" },
-      "diamond": { "name": "Diamant", "desc": "5x poängmultiplikator" },
-      "bomb": { "name": "Bomb", "desc": "Rensar 3x3 område" },
-      "lightning": { "name": "Blixt", "desc": "Rensar hela kolumnen" },
-      "prism": { "name": "Prisma", "desc": "Rensar korsmönster" },
-      "rainbow": { "name": "Regnbåge", "desc": "Kopierar bästa närliggande special" },
-      "ice": { "name": "Is", "desc": "Hinder — träffa för att krossa" },
-      "frozen": { "name": "Frusen", "desc": "2 träffar för att frigöra inre special" },
-      "gem": { "name": "Ädelsten", "desc": "3 träffar — skapar 2 specialbrickor" },
-      "mirror": { "name": "Spegel", "desc": "Fördubblar partnerns effekt" },
-      "magnet": { "name": "Magnet", "desc": "Drar och spränger närliggande brickor" }
+      "standard": { "name": "Standard", "desc": "Vanlig bricka — ingen specialeffekt" },
+      "gold": { "name": "Guld", "desc": "×3 poäng + 1 bonusdrag" },
+      "silver": { "name": "Silver", "desc": "×1,5 poäng + förlänger nedräkningar med 1" },
+      "diamond": { "name": "Diamant", "desc": "×5 poäng + avslöjar frusna i 3 turer" },
+      "bomb": { "name": "Bomb", "desc": "Rensar 3×3 — kedjar till närliggande bomber" },
+      "lightning": { "name": "Blixt", "desc": "Rensar hela kolumnen — kedjar till andra blixtar" },
+      "prism": { "name": "Prisma", "desc": "2 träffar — rensar rad + kolumn, skapar 2 special" },
+      "rainbow": { "name": "Regnbåge", "desc": "Kopierar bästa special i ditt ord, eller ×2 poäng" },
+      "ice": { "name": "Is", "desc": "2 träffar att krossa — fryser intilliggande virus" },
+      "frozen": { "name": "Frusen", "desc": "2 träffar — frigör dold special inuti" },
+      "gem": { "name": "Ädelsten", "desc": "3 träffar — skapar 2 special + 2 bonusdrag" },
+      "mirror": { "name": "Spegel", "desc": "Kopierar första offensiva special i ditt ord" },
+      "magnet": { "name": "Magnet", "desc": "Drar brickor inåt, sedan spränger 3×3" },
+      "wildcard": { "name": "Joker", "desc": "Matchar alla bokstäver — poäng efter bokstavens sällsynthet" },
+      "countdown": { "name": "Nedräkning", "desc": "Desarmera innan 0! +2 drag — eller 50p straff" },
+      "virus": { "name": "Virus", "desc": "Sprider sig varje tur — rensa 3+ i ett ord för att bota alla" },
+      "portal": { "name": "Portal", "desc": "Länkade i par — rensar båda, ×2 ordpoäng" },
+      "catalyst": { "name": "Katalysator", "desc": "Uppgraderar alla intilliggande brickor till special" }
     },
     "objective": {
       "scoreTarget": "Få {target} poäng",

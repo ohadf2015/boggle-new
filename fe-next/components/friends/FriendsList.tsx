@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 import {
@@ -92,6 +92,16 @@ const FriendsList: React.FC<FriendsListProps> = ({
   const giftSocket = socketContext?.socket ?? null;
   const isGiftSocketConnected = socketContext?.isConnected ?? false;
 
+  // Listen for incoming gift notifications
+  useEffect(() => {
+    if (!giftSocket || !isGiftSocketConnected) return;
+    const handleGiftReceive = (data: { senderName: string; giftType: string; amount?: number }) => {
+      toast.success(t('socialGift.received', { sender: data.senderName, type: t(`socialGift.type.${data.giftType}`) }));
+    };
+    giftSocket.on('gift:receive', handleGiftReceive);
+    return () => { giftSocket.off('gift:receive', handleGiftReceive); };
+  }, [giftSocket, isGiftSocketConnected, t]);
+
   const {
     threads,
     messages,
@@ -99,7 +109,6 @@ const FriendsList: React.FC<FriendsListProps> = ({
     sendMessage,
     loadMessages,
     markAsRead,
-    sendChallenge,
     refreshThreads,
     setTyping,
     typingUsername,
@@ -184,11 +193,24 @@ const FriendsList: React.FC<FriendsListProps> = ({
 
   const handleSendChallenge = useCallback(async (
     friendId: string,
-    challengeType: 'new_game' | 'join_room'
+    challengeType: 'new_game' | 'join_room',
+    settings?: { language?: string; timerSeconds?: number; mode?: string; message?: string }
   ) => {
-    await sendChallenge(friendId, challengeType);
+    if (!giftSocket || !isGiftSocketConnected) return;
+    // Emit async challenge with settings (no live room join)
+    giftSocket.emit('friends:sendChallenge', {
+      friendUserId: friendId,
+      challengeType,
+      gameSettings: settings ? {
+        language: settings.language,
+        timerSeconds: settings.timerSeconds,
+        mode: settings.mode,
+      } : undefined,
+      message: settings?.message,
+    });
+    toast.success(t('friends.challenges.sent'));
     setChallengeFriend(null);
-  }, [sendChallenge]);
+  }, [giftSocket, isGiftSocketConnected, t]);
 
   // Gift sending via Socket.IO
   const handleSendGift = useCallback((gift: GiftPayload) => {
