@@ -36,6 +36,10 @@ export interface NotificationDropdownProps {
   onMarkAllAsRead: () => void;
   onNotificationClick: (notification: NotificationData) => void;
   onDismiss: (id: string) => void;
+  onClearAll: () => Promise<void>;
+  onFetchPrevious: () => Promise<unknown>;
+  previousNotifications: NotificationData[];
+  isLoadingPrevious: boolean;
 }
 
 export interface NotificationItemProps {

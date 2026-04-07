@@ -8960,6 +8960,10 @@ const es = {
     "dismiss": "Descartar",
     "showAll": "Todas",
     "unreadOnly": "No leídas",
+    "showPrevious": "Notificaciones anteriores",
+    "hidePrevious": "Ocultar anteriores",
+    "previousTitle": "Previamente eliminadas",
+    "noPrevious": "Sin notificaciones anteriores",
     "types": {
       "gift": "Regalo",
       "system": "Sistema",

@@ -60,7 +60,6 @@ describe('Blast Mobile Responsive', () => {
       movesRemaining: 10,
       totalMoves: 20,
       waveNumber: 1,
-      comboLevel: 0,
       tilesCleared: 5,
       totalTiles: 36,
       onQuit: jest.fn(),
@@ -70,7 +69,8 @@ describe('Blast Mobile Responsive', () => {
     it('renders HUD with pt-safe class for notch phones', () => {
       render(<BlastHUD {...hudProps} />);
       const hud = screen.getByTestId('blast-hud');
-      expect(hud.className).toContain('pt-safe');
+      // pt-safe is now on the inner top row, not the outer container
+      expect(hud.querySelector('.pt-safe') || hud.innerHTML.includes('pt-safe')).toBeTruthy();
     });
   });
 });

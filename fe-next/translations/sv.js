@@ -8867,6 +8867,10 @@ const sv = {
     "dismiss": "Avfärda",
     "showAll": "Alla",
     "unreadOnly": "Olästa",
+    "showPrevious": "Tidigare aviseringar",
+    "hidePrevious": "Dölj tidigare",
+    "previousTitle": "Tidigare rensade",
+    "noPrevious": "Inga tidigare aviseringar",
     "types": {
       "gift": "Gåva",
       "system": "System",

@@ -109,7 +109,7 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
           rng,
         });
 
-        // 2. Apply gravity + refill cleared tiles
+        // 2. Apply gravity — no refill so cleared tiles stay empty (like SP shrink mode)
         const gravityResult = computeGravityResult(
           blastState.grid,
           processResult.next,
@@ -118,6 +118,8 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
           BLAST_SPECIAL_TILE_CHANCE,
           undefined,
           0,
+          rng,
+          false, // refill=false: tiles stay missing until board has no moves
         );
 
         // 3. Update authoritative state

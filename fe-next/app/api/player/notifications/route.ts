@@ -29,6 +29,8 @@ export async function GET(request: NextRequest) {
 
     const searchParams = request.nextUrl.searchParams;
     const unreadOnly = searchParams.get('unreadOnly') === 'true';
+    const includeDismissed = searchParams.get('includeDismissed') === 'true';
+    const dismissedOnly = searchParams.get('dismissedOnly') === 'true';
     const limit = Math.min(50, Math.max(1, parseInt(searchParams.get('limit') || '20', 10)));
     const offset = Math.max(0, parseInt(searchParams.get('offset') || '0', 10));
 
@@ -46,6 +48,7 @@ export async function GET(request: NextRequest) {
         related_entity_id,
         read,
         read_at,
+        dismissed,
         created_at,
         sender:profiles!user_notifications_sender_profile_fkey(
           username,
@@ -55,6 +58,12 @@ export async function GET(request: NextRequest) {
       `, { count: 'exact' })
       .eq('user_id', user.id)
       .order('created_at', { ascending: false });
+
+    if (dismissedOnly) {
+      query = query.eq('dismissed', true);
+    } else if (!includeDismissed) {
+      query = query.eq('dismissed', false);
+    }
 
     if (unreadOnly) {
       query = query.eq('read', false);
@@ -68,7 +77,8 @@ export async function GET(request: NextRequest) {
         .from('user_notifications')
         .select('*', { count: 'exact', head: true })
         .eq('user_id', user.id)
-        .eq('read', false),
+        .eq('read', false)
+        .eq('dismissed', false),
     ]);
 
     if (notifResult.error) {

@@ -16,6 +16,8 @@ import {
   fetchNotifications,
   markNotificationRead,
   markAllNotificationsRead,
+  dismissNotificationApi,
+  dismissAllNotificationsApi,
   type RealtimeNotification,
 } from '@/lib/supabaseRealtimeNotifications';
 
@@ -39,12 +41,18 @@ interface UseRealtimeNotificationsReturn {
   markAllAsRead: () => Promise<void>;
   /** Dismiss a notification (mark read + remove from local list) */
   dismissNotification: (notificationId: string) => Promise<void>;
-  /** Clear all notifications (mark all read + remove from list) */
+  /** Clear all notifications (dismiss persistently + remove from list) */
   clearAllNotifications: () => Promise<void>;
   /** Clear the latest notification (after toast is dismissed) */
   clearLatestNotification: () => void;
   /** Refresh notifications from server */
   refresh: () => Promise<void>;
+  /** Fetch previously dismissed notifications */
+  fetchPreviousNotifications: () => Promise<RealtimeNotification[]>;
+  /** Previously dismissed notifications */
+  previousNotifications: RealtimeNotification[];
+  /** Whether previous notifications are loading */
+  isLoadingPrevious: boolean;
 }
 
 export function useRealtimeNotifications(): UseRealtimeNotificationsReturn {
@@ -55,6 +63,8 @@ export function useRealtimeNotifications(): UseRealtimeNotificationsReturn {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [latestNotification, setLatestNotification] = useState<RealtimeNotification | null>(null);
+  const [previousNotifications, setPreviousNotifications] = useState<RealtimeNotification[]>([]);
+  const [isLoadingPrevious, setIsLoadingPrevious] = useState(false);
 
   // Track if we've done initial fetch
   const hasFetchedRef = useRef(false);
@@ -206,9 +216,9 @@ export function useRealtimeNotifications(): UseRealtimeNotificationsReturn {
     }
   }, []);
 
-  // Dismiss a notification — mark as read and remove from list
+  // Dismiss a notification — persistently hide from list
   const dismissNotification = useCallback(async (notificationId: string) => {
-    const success = await markNotificationRead(notificationId);
+    const success = await dismissNotificationApi(notificationId);
     if (success) {
       setNotifications((prev) => {
         const removed = prev.find((n) => n.id === notificationId);
@@ -220,12 +230,24 @@ export function useRealtimeNotifications(): UseRealtimeNotificationsReturn {
     }
   }, []);
 
-  // Clear all notifications — mark all as read and remove from list
+  // Clear all notifications — persistently dismiss all
   const clearAllNotifications = useCallback(async () => {
-    const success = await markAllNotificationsRead();
-    if (success) {
+    const result = await dismissAllNotificationsApi();
+    if (result.success) {
       setNotifications([]);
       setUnreadCount(0);
+    }
+  }, []);
+
+  // Fetch previously dismissed notifications
+  const fetchPreviousNotifications = useCallback(async () => {
+    setIsLoadingPrevious(true);
+    try {
+      const data = await fetchNotifications({ dismissedOnly: true, limit: 50 });
+      setPreviousNotifications(data.notifications);
+      return data.notifications;
+    } finally {
+      setIsLoadingPrevious(false);
     }
   }, []);
 
@@ -246,6 +268,9 @@ export function useRealtimeNotifications(): UseRealtimeNotificationsReturn {
     clearAllNotifications,
     clearLatestNotification,
     refresh,
+    fetchPreviousNotifications,
+    previousNotifications,
+    isLoadingPrevious,
   };
 }
 

@@ -26,6 +26,7 @@ import { planSugarCrush } from './utils/blastSugarCrush';
 import type { ScoreFlyEvent } from './BlastScoreFly';
 import type { ClearedTileEvent } from './BlastEffectsCanvas';
 import { useGameStore } from '@/hooks/gameState';
+import type { LetterGrid } from '@/shared/types';
 
 interface BlastGameProps {
   config: BlastGameConfig;
@@ -116,17 +117,30 @@ export function BlastGame({
   const spamDetection = useSpamDetection();
 
   // MP board sync: apply server-authoritative board state when blastBoardUpdate arrives
+  // Queue updates during cascade to prevent ref corruption mid-animation
+  const pendingBoardUpdateRef = useRef<{ grid: LetterGrid; tileStates: BlastTileState[][] } | null>(null);
   const blastBoardUpdate = useGameStore((s) => s.blastBoardUpdate);
   useEffect(() => {
     if (!isMultiplayer || !blastBoardUpdate) return;
-    // Skip if this update was from our own word (we already ran local cascade)
-    if (blastBoardUpdate.clearedBy === username) {
-      useGameStore.getState().setBlastBoardUpdate(null);
+    const boardData = { grid: blastBoardUpdate.grid, tileStates: blastBoardUpdate.tileStates };
+    useGameStore.getState().setBlastBoardUpdate(null);
+    // If mid-cascade (own word or opponent's), queue — apply after stopCascade
+    if (engine.isCascading) {
+      pendingBoardUpdateRef.current = boardData;
       return;
     }
-    engine.applyServerBoard(blastBoardUpdate.grid, blastBoardUpdate.tileStates);
-    useGameStore.getState().setBlastBoardUpdate(null);
+    // For own words not mid-cascade, still apply server state to correct any drift
+    engine.applyServerBoard(boardData.grid, boardData.tileStates);
   }, [blastBoardUpdate, isMultiplayer, username, engine]);
+
+  // Flush queued board update after cascade completes
+  useEffect(() => {
+    if (!engine.isCascading && pendingBoardUpdateRef.current) {
+      const pending = pendingBoardUpdateRef.current;
+      pendingBoardUpdateRef.current = null;
+      engine.applyServerBoard(pending.grid, pending.tileStates);
+    }
+  }, [engine.isCascading, engine]);
 
   // Dictionary cache for cascade word detection + validation gate
   const { checkWord, isLoaded: isDictionaryReady } = useDictionaryCache(config.language);
@@ -658,7 +672,7 @@ export function BlastGame({
         formedWord={formedWord}
         currentFeedback={wordSubmission.currentFeedback}
         sequencerState={sequencer.state}
-        interactive={!engine.isCascading && !sequencer.state.isAnimating && pendingDiscovery == null}
+        interactive={!engine.isCascading && !sequencer.state.isAnimating && pendingDiscovery == null && !engine.gameState.isDeadEnd && !engine.gameState.isComplete}
         onWordSubmit={handleWordSubmit}
         onPathSubmit={handlePathSubmit}
         onWordChange={handleWordChange}

@@ -8902,6 +8902,10 @@ const he = {
     "dismiss": "סגור",
     "showAll": "הכל",
     "unreadOnly": "לא נקראו",
+    "showPrevious": "התראות קודמות",
+    "hidePrevious": "הסתר קודמות",
+    "previousTitle": "נמחקו בעבר",
+    "noPrevious": "אין התראות קודמות",
     "types": {
       "gift": "מתנה",
       "system": "מערכת",

@@ -26,7 +26,11 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
     markAsRead,
     markAllAsRead,
     dismissNotification,
+    clearAllNotifications,
     clearLatestNotification,
+    fetchPreviousNotifications,
+    previousNotifications,
+    isLoadingPrevious,
   } = useRealtimeNotifications();
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -131,6 +135,10 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
         onMarkAllAsRead={markAllAsRead}
         onNotificationClick={handleNotificationClick}
         onDismiss={dismissNotification}
+        onClearAll={clearAllNotifications}
+        onFetchPrevious={fetchPreviousNotifications}
+        previousNotifications={previousNotifications as NotificationData[]}
+        isLoadingPrevious={isLoadingPrevious}
       />
 
       {/* Toast for new notifications */}

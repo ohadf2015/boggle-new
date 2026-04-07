@@ -29,7 +29,7 @@ interface BlastMPState {
   isConnected: boolean;
 }
 
-const FROST_INNER_CANDIDATES: BlastTileType[] = ['bomb', 'lightning', 'prism', 'rainbow'];
+const FROST_INNER_CANDIDATES: BlastTileType[] = ['bomb', 'lightning', 'prism', 'gem', 'rainbow'];
 
 export function useBlastEngineMultiplayer(config: BlastMPConfig): BlastMPState {
   const overlay = useBlastTileOverlay();

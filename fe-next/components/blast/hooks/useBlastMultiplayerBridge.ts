@@ -85,6 +85,7 @@ export function useBlastMultiplayerBridge({
     specialTileChance: 0.15,
     language: gameLanguage ?? 'en',
     difficulty: 'medium',
+    boardClearMode: 'shrink' as const, // tiles stay missing like SP — no auto-refill
   }), [gridSize, gameLanguage]);
 
   const initialTileStates = useMemo(() => {

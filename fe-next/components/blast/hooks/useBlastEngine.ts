@@ -252,13 +252,13 @@ export function useBlastEngine(
   // ── Auto-end game when no valid words remain (after grace period for shuffle) ──
   useEffect(() => {
     if (!noWordsRemaining || gameState.isComplete || gameState.isDeadEnd) return;
-    // Give player 5 seconds to use the shuffle button before ending
+    // Give player 2 seconds to use the shuffle button before ending
     const timer = setTimeout(() => {
       setGameState(prev => {
         if (prev.isComplete || prev.isDeadEnd) return prev;
         return { ...prev, isDeadEnd: true };
       });
-    }, 5000);
+    }, 2000);
     return () => clearTimeout(timer);
   }, [noWordsRemaining, gameState.isComplete, gameState.isDeadEnd]);
 

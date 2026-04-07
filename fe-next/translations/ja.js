@@ -8919,6 +8919,10 @@ const ja = {
     "dismiss": "閉じる",
     "showAll": "すべて",
     "unreadOnly": "未読",
+    "showPrevious": "以前の通知",
+    "hidePrevious": "以前を非表示",
+    "previousTitle": "以前にクリアした通知",
+    "noPrevious": "以前の通知はありません",
     "types": {
       "gift": "ギフト",
       "system": "システム",

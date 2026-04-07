@@ -9073,6 +9073,10 @@ const en = {
     "dismiss": "Dismiss",
     "showAll": "All",
     "unreadOnly": "Unread",
+    "showPrevious": "Previous notifications",
+    "hidePrevious": "Hide previous",
+    "previousTitle": "Previously cleared",
+    "noPrevious": "No previous notifications",
     "types": {
       "gift": "Gift",
       "system": "System",

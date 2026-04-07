@@ -94,11 +94,11 @@ export function BlastHUD({
 
   return (
     <div
-      className="flex items-center justify-between gap-2 px-3 py-2 pt-safe bg-neo-navy border-b-2 border-neo-black"
+      className="flex flex-col gap-0 bg-neo-navy border-b-2 border-neo-black"
       data-testid="blast-hud"
     >
-      {/* Left: wave shield + score */}
-      <div className="flex items-center gap-2.5 min-w-0">
+      {/* Top row: wave + controls */}
+      <div className="flex items-center justify-between px-3 py-1.5 pt-safe">
         <span
           className="shrink-0 text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-lg border-2 border-neo-cyan/40 text-neo-cyan"
           style={{ textShadow: 'none' }}
@@ -106,56 +106,84 @@ export function BlastHUD({
         >
           W{waveNumber}
         </span>
+
+        {/* Combo streak badge */}
+        {comboStreak && comboStreakArcRef && (
+          <BlastComboStreakBadge streak={comboStreak} arcRef={comboStreakArcRef} />
+        )}
+
         <div className="flex items-center gap-1.5">
-          <span className="text-amber-400 text-sm">★</span>
+          {onShowHelp && (
+            <button
+              onClick={onShowHelp}
+              className="text-white/30 hover:text-white/60 transition-colors"
+              aria-label={t('blast.help')}
+            >
+              <HelpCircle className="h-4 w-4" />
+            </button>
+          )}
+          <button
+            onClick={onQuit}
+            className="flex items-center justify-center w-7 h-7 rounded-lg bg-white/8 hover:bg-neo-red/25 text-white/50 hover:text-neo-red transition-colors"
+            aria-label={t('common.quit')}
+            data-testid="blast-quit-btn"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+      </div>
+
+      {/* Bottom row: score | moves | progress — the three key stats */}
+      <div className="flex items-center justify-between px-3 py-1.5 gap-2">
+        {/* Score */}
+        <div className="flex items-center gap-1.5 min-w-0" aria-label={`${t('blast.score') || 'Score'}: ${animatedScore}`}>
+          <span className="text-amber-400 text-base">★</span>
           <span
             className={cn(
-              'text-xl font-black tabular-nums truncate transition-transform duration-150 text-neo-cream',
+              'text-2xl font-black tabular-nums truncate transition-transform duration-150 text-neo-cream',
               scorePulse && 'scale-[1.15]',
             )}
           >
             {animatedScore.toLocaleString()}
           </span>
         </div>
-      </div>
 
-      {/* Combo streak badge */}
-      {comboStreak && comboStreakArcRef && (
-        <BlastComboStreakBadge streak={comboStreak} arcRef={comboStreakArcRef} />
-      )}
-
-      {/* Center: move counter in circle */}
-      <div className="flex flex-col items-center gap-0.5" aria-live="polite">
-        {isFiniteMoves ? (
-          <>
-            <div
-              className={cn(
-                'w-10 h-10 rounded-full flex flex-col items-center justify-center border-2',
-                movesRemaining <= 3 ? 'border-neo-red/80 bg-neo-red/15' : 'border-white/20 bg-white/5',
-              )}
-            >
-              <span className={cn('text-lg font-black tabular-nums leading-none', moveColorClass)}>
-                {movesRemaining}
+        {/* Move counter / word count */}
+        <div className="flex flex-col items-center gap-0.5 shrink-0" aria-live="polite">
+          {isFiniteMoves ? (
+            <>
+              <div
+                className={cn(
+                  'w-11 h-11 rounded-full flex flex-col items-center justify-center border-2',
+                  movesRemaining <= 3 ? 'border-neo-red/80 bg-neo-red/15' : 'border-white/25 bg-white/8',
+                )}
+              >
+                <span className={cn('text-xl font-black tabular-nums leading-none', moveColorClass)}>
+                  {movesRemaining}
+                </span>
+              </div>
+              <span className={cn('text-[9px] font-bold uppercase tracking-wider leading-none', movesRemaining <= 3 ? 'text-neo-red' : 'text-white/50')}>
+                {t('blast.movesLeft')}
+              </span>
+            </>
+          ) : (
+            <div className="flex flex-col items-center gap-0.5">
+              <span className="text-lg font-black text-neo-cream tabular-nums">
+                {wordsFoundCount}
+              </span>
+              <span className="text-[9px] font-bold uppercase tracking-wider text-white/50">
+                {t('blast.words')}
               </span>
             </div>
-            <span className={cn('text-[9px] font-bold uppercase tracking-wider leading-none', movesRemaining <= 3 ? 'text-neo-red' : 'text-white/50')}>
-              {t('blast.movesLeft')}
-            </span>
-          </>
-        ) : (
-          <span className="text-xs font-bold text-white/50 tabular-nums">
-            {wordsFoundCount} {t('blast.words')}
-          </span>
-        )}
-      </div>
+          )}
+        </div>
 
-      {/* Right: progress + controls */}
-      <div className="flex items-center gap-2">
-        <div className="flex flex-col items-end">
-          <span className="text-[10px] font-bold text-white/60 tabular-nums">
+        {/* Tile clear progress */}
+        <div className="flex flex-col items-end gap-0.5">
+          <span className="text-xs font-bold text-white/70 tabular-nums">
             {clearPct}%
           </span>
-          <div className="w-14 h-1.5 bg-white/10 rounded-full overflow-hidden">
+          <div className="w-16 h-2 bg-white/10 rounded-full overflow-hidden">
             <div
               className="h-full rounded-full transition-all duration-300"
               style={{
@@ -163,28 +191,13 @@ export function BlastHUD({
                 background: clearPct >= 50
                   ? 'linear-gradient(90deg, #BFFF00, #D9FF66)'
                   : 'linear-gradient(90deg, #00FFFF, #66FFFF)',
-                boxShadow: 'none',
               }}
             />
           </div>
+          <span className="text-[8px] font-bold uppercase tracking-wider text-white/40">
+            {t('blast.cleared') || 'cleared'}
+          </span>
         </div>
-        {onShowHelp && (
-          <button
-            onClick={onShowHelp}
-            className="text-white/30 hover:text-white/60 transition-colors"
-            aria-label={t('blast.help')}
-          >
-            <HelpCircle className="h-4 w-4" />
-          </button>
-        )}
-        <button
-          onClick={onQuit}
-          className="flex items-center justify-center w-8 h-8 rounded-lg bg-white/8 hover:bg-neo-red/25 text-white/50 hover:text-neo-red transition-colors"
-          aria-label={t('common.quit')}
-          data-testid="blast-quit-btn"
-        >
-          <X className="h-5 w-5" />
-        </button>
       </div>
     </div>
   );

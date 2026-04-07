@@ -16,7 +16,11 @@ import {
   recordFirstFinder,
 } from '../../modules/gameStateManager';
 import { broadcastToRoom, volatileBroadcastToRoom, getGameRoom } from '../../utils/socketHelpers';
-import { calculateBlastTileBonus, getTilesOnPath, recordBlastMove } from '../../modules/blastModeManager';
+import { calculateBlastTileBonus, getTilesOnPath, recordBlastMove, getWordPath } from '../../modules/blastModeManager';
+import { processTilesForWord } from '@/components/blast/utils/clearTilesProcessor';
+import { computeGravityResult } from '@/components/blast/utils/blastGravity';
+import { createSeededRandom } from '@/components/blast/utils/blastLetterGenerator';
+import { BLAST_SPECIAL_TILE_CHANCE } from '@/shared/constants/blastMultiplayerConstants';
 import { BOARD_WORD_SCORE_PER_LETTER } from '@/shared/constants/wordHuntMultiplayerConstants';
 import * as botManager from '../../modules/botManager';
 import logger from '../../utils/logger';
@@ -145,6 +149,44 @@ export function startBotsForGame(
             blastTileBonus = calculateBlastTileBonus(tilesOnPath);
             const gemCount = tilesOnPath.filter((t: string) => t === 'gem').length;
             recordBlastMove(blastState, username, comboLevel || 0, word, tilesOnPath.length, gemCount, blastTileBonus);
+
+            // Mutate board state + broadcast (same as human words in wordValidationHandler)
+            if (blastState.grid && blastState.tileStates) {
+              const wordPath = getWordPath(word, currentGame.letterPositions || new Map());
+              const gridSize = blastState.grid.length;
+              const totalMoves = (blastState.totalMoves ?? 0) + 1;
+              blastState.totalMoves = totalMoves;
+              const rng = createSeededRandom((blastState.seed ?? 0) + totalMoves);
+
+              const processResult = processTilesForWord({
+                prev: blastState.tileStates,
+                path: wordPath,
+                word,
+                baseScore: word.length - 1,
+                gridSize,
+                currentWave: 1,
+                rng,
+              });
+
+              const gravityResult = computeGravityResult(
+                blastState.grid, processResult.next, gridSize,
+                language, BLAST_SPECIAL_TILE_CHANCE,
+                undefined, 0, rng,
+                false, // no refill — tiles stay missing
+              );
+
+              blastState.grid = gravityResult.newGrid;
+              blastState.tileStates = gravityResult.newTileStates;
+
+              broadcastToRoom(io, getGameRoom(gameCode), 'blastBoardUpdate', {
+                grid: gravityResult.newGrid,
+                tileStates: gravityResult.newTileStates,
+                clearedBy: username,
+                word,
+                clearedCount: processResult.newlyClearedCount,
+                totalMoves,
+              });
+            }
           } catch (err) {
             logger.error('BOT', `Blast bonus error for "${username}": ${(err as Error).message}`);
           }

@@ -136,10 +136,45 @@ export async function markAllNotificationsRead(): Promise<{ success: boolean; co
 }
 
 /**
+ * Dismiss a single notification (persistent removal from list)
+ */
+export async function dismissNotificationApi(notificationId: string): Promise<boolean> {
+  try {
+    const response = await fetch(`/api/player/notifications/${notificationId}/dismiss`, {
+      method: 'POST',
+    });
+    return response.ok;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Dismiss all notifications (persistent removal from list)
+ */
+export async function dismissAllNotificationsApi(): Promise<{ success: boolean; count: number }> {
+  try {
+    const response = await fetch('/api/player/notifications/dismiss-all', {
+      method: 'POST',
+    });
+
+    if (!response.ok) {
+      return { success: false, count: 0 };
+    }
+
+    const data = await response.json();
+    return { success: true, count: data.count || 0 };
+  } catch {
+    return { success: false, count: 0 };
+  }
+}
+
+/**
  * Fetch notifications from API
  */
 export async function fetchNotifications(options: {
   unreadOnly?: boolean;
+  dismissedOnly?: boolean;
   limit?: number;
   offset?: number;
 } = {}): Promise<{
@@ -149,6 +184,7 @@ export async function fetchNotifications(options: {
 }> {
   const params = new URLSearchParams();
   if (options.unreadOnly) params.set('unreadOnly', 'true');
+  if (options.dismissedOnly) params.set('dismissedOnly', 'true');
   if (options.limit) params.set('limit', options.limit.toString());
   if (options.offset) params.set('offset', options.offset.toString());
 

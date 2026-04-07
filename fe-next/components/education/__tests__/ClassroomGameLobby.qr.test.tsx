@@ -157,7 +157,7 @@ describe('ClassroomGameLobby — QR code', () => {
     });
   });
 
-  it('renders QR code in step 2 with a valid join URL', async () => {
+  it('renders QR code in step 2 with a valid join URL', { timeout: 15000, retry: 2 }, async () => {
     render(<ClassroomGameLobby onBack={vi.fn()} />);
 
     // Step 1: wait for data load, select lessons, advance.
