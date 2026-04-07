@@ -3,7 +3,7 @@
  * Used by both frontend and backend
  */
 
-import type { BlastTileType } from './blast';
+import type { BlastTileType, BlastTileState } from './blast';
 import type { CustomAvatarConfig } from './customAvatar';
 
 // ==================== Core Types ====================
@@ -351,9 +351,12 @@ export interface BlastModeState {
   /**
    * Seeded PRNG seed for deterministic multiplayer refills.
    * Generated server-side in initBlastModeState and broadcast with startGame.
-   * Clients use createSeededRandom(seed) to produce identical tile refills.
-   * NOTE: Boards remain client-authoritative; seeded refill reduces divergence
-   *       but does not guarantee lockstep (different words clear different cells).
    */
   seed?: number;
+  /** Server-authoritative letter grid for MP board sync */
+  grid?: string[][];
+  /** Server-authoritative tile states for MP board sync */
+  tileStates?: BlastTileState[][];
+  /** Tracks total moves across all players for seeded RNG sequencing */
+  totalMoves?: number;
 }

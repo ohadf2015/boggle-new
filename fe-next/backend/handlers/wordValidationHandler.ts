@@ -24,7 +24,11 @@ import { addWordToBlacklist } from '../modules/botManager.js';
 import { inc, incPerGame } from '../utils/metrics.js';
 import logger from '../utils/logger.js';
 import { processLongWordEngagement } from './engagementHandler';
-import { calculateBlastTileBonus, getTilesOnPath, recordBlastMove } from '../modules/blastModeManager.js';
+import { calculateBlastTileBonus, getTilesOnPath, recordBlastMove, getWordPath } from '../modules/blastModeManager.js';
+import { processTilesForWord } from '@/components/blast/utils/clearTilesProcessor';
+import { computeGravityResult } from '@/components/blast/utils/blastGravity';
+import { createSeededRandom } from '@/components/blast/utils/blastLetterGenerator';
+import { BLAST_SPECIAL_TILE_CHANCE } from '@/shared/constants/blastMultiplayerConstants';
 import { restoreLife, getLifeBonus, computeDiscoveryClues } from '../modules/wordHuntManager.js';
 import { BOARD_WORD_SCORE_PER_LETTER } from '@/shared/constants/wordHuntMultiplayerConstants';
 
@@ -83,6 +87,53 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
       blastTilesCleared = tilesOnPath;
       const gemCount = tilesOnPath.filter(t => t === 'gem').length;
       blastMoveResult = recordBlastMove(blastState, username, safeComboLevel, normalizedWord, tilesOnPath.length, gemCount, blastTileBonus);
+
+      // Server-side board mutation: process tile clears + gravity on authoritative state
+      if (blastState.grid && blastState.tileStates) {
+        const wordPath = getWordPath(normalizedWord, game.letterPositions || new Map());
+        const gridSize = blastState.grid.length;
+        const totalMoves = (blastState.totalMoves ?? 0) + 1;
+        blastState.totalMoves = totalMoves;
+
+        // Seeded RNG for deterministic processing
+        const rng = createSeededRandom((blastState.seed ?? 0) + totalMoves);
+
+        // 1. Process tile clears (bomb explosions, lightning, prism, etc.)
+        const processResult = processTilesForWord({
+          prev: blastState.tileStates,
+          path: wordPath,
+          word: normalizedWord,
+          baseScore: normalizedWord.length - 1,
+          gridSize,
+          currentWave: 1,
+          rng,
+        });
+
+        // 2. Apply gravity + refill cleared tiles
+        const gravityResult = computeGravityResult(
+          blastState.grid,
+          processResult.next,
+          gridSize,
+          (game.language || 'en') as import('@/shared/types').Language,
+          BLAST_SPECIAL_TILE_CHANCE,
+          undefined,
+          0,
+        );
+
+        // 3. Update authoritative state
+        blastState.grid = gravityResult.newGrid;
+        blastState.tileStates = gravityResult.newTileStates;
+
+        // 4. Broadcast board update to ALL players
+        broadcastToRoom(io, getGameRoom(gameCode), 'blastBoardUpdate', {
+          grid: gravityResult.newGrid,
+          tileStates: gravityResult.newTileStates,
+          clearedBy: username,
+          word: normalizedWord,
+          clearedCount: processResult.newlyClearedCount,
+          totalMoves,
+        });
+      }
     } catch (err: unknown) {
       const error = err as Error;
       logger.error('BLAST', `Blast bonus calculation error: ${error.message}`);

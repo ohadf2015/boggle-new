@@ -125,18 +125,23 @@ export function BlastHUD({
       )}
 
       {/* Center: move counter in circle */}
-      <div className="flex flex-col items-center" aria-live="polite">
+      <div className="flex flex-col items-center gap-0.5" aria-live="polite">
         {isFiniteMoves ? (
-          <div
-            className={cn(
-              'w-10 h-10 rounded-full flex flex-col items-center justify-center border-2',
-              movesRemaining <= 3 ? 'border-neo-red/80 bg-neo-red/15' : 'border-white/20 bg-white/5',
-            )}
-          >
-            <span className={cn('text-lg font-black tabular-nums leading-none', moveColorClass)}>
-              {movesRemaining}
+          <>
+            <div
+              className={cn(
+                'w-10 h-10 rounded-full flex flex-col items-center justify-center border-2',
+                movesRemaining <= 3 ? 'border-neo-red/80 bg-neo-red/15' : 'border-white/20 bg-white/5',
+              )}
+            >
+              <span className={cn('text-lg font-black tabular-nums leading-none', moveColorClass)}>
+                {movesRemaining}
+              </span>
+            </div>
+            <span className={cn('text-[9px] font-bold uppercase tracking-wider leading-none', movesRemaining <= 3 ? 'text-neo-red' : 'text-white/50')}>
+              {t('blast.movesLeft')}
             </span>
-          </div>
+          </>
         ) : (
           <span className="text-xs font-bold text-white/50 tabular-nums">
             {wordsFoundCount} {t('blast.words')}

@@ -60,6 +60,7 @@ const initialState: GameState = {
   blastComboSync: null,
   blastOpponentActivity: [],
   blastPlayerStats: {},
+  blastBoardUpdate: null,
   wordHuntTargetLength: 0,
   wordHuntTargetCategory: null as string | null,
   wordHuntMyLife: 100,
@@ -336,6 +337,8 @@ export const useGameStore = create<GameStore>()(
       blastPlayerStats: applySetState(value, state.blastPlayerStats)
     })),
 
+    setBlastBoardUpdate: (value) => set({ blastBoardUpdate: value }),
+
     // ==========================================
     // Word Hunt Multiplayer Actions
     // ==========================================
@@ -453,6 +456,7 @@ export const useGameStore = create<GameStore>()(
         blastComboSync: null,
         blastOpponentActivity: [],
         blastPlayerStats: {},
+        blastBoardUpdate: null,
         wordHuntTargetLength: 0,
         wordHuntTargetCategory: null,
         wordHuntMyLife: 100,

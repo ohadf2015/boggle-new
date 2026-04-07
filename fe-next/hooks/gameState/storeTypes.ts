@@ -4,6 +4,7 @@
  */
 
 import type { LetterGrid, LeaderboardEntry, Language, WordDetail, GameModeSelection, BlastTileOverlay, LetterFeedback, BlastPlayerStats } from '@/shared/types/game';
+import type { BlastTileState } from '@/shared/types/blast';
 import type { XpGainedPayload, LevelUpPayload, AchievementPayload, BoardTheme } from '@/shared/types/socket';
 import type { Player, TournamentData, TournamentStanding, ComboState } from './types';
 
@@ -63,6 +64,8 @@ export interface GameState {
   blastOpponentActivity: Array<{ id: string; username: string; type: 'word' | 'combo' | 'milestone'; word?: string; score?: number; comboLevel?: number; message?: string }>;
   /** Rich per-player blast stats from results */
   blastPlayerStats: Record<string, BlastPlayerStats>;
+  /** Server-authoritative board update for MP blast sync */
+  blastBoardUpdate: { grid: string[][]; tileStates: BlastTileState[][]; clearedBy: string; word: string; clearedCount: number; totalMoves: number } | null;
 
   // Word Hunt multiplayer state
   wordHuntTargetLength: number;
@@ -140,6 +143,7 @@ export interface GameActions {
   setBlastComboSync: (value: { comboType: string; username: string; id: string } | null) => void;
   pushBlastOpponentActivity: (event: { id: string; username: string; type: 'word' | 'combo' | 'milestone'; word?: string; score?: number; comboLevel?: number; message?: string }) => void;
   setBlastPlayerStats: (value: Record<string, BlastPlayerStats> | ((prev: Record<string, BlastPlayerStats>) => Record<string, BlastPlayerStats>)) => void;
+  setBlastBoardUpdate: (value: { grid: string[][]; tileStates: BlastTileState[][]; clearedBy: string; word: string; clearedCount: number; totalMoves: number } | null) => void;
 
   // Word Hunt multiplayer actions
   setWordHuntTargetLength: (value: number | ((prev: number) => number)) => void;

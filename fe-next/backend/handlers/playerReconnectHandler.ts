@@ -232,6 +232,13 @@ function handleReconnection(io: Server, socket: Socket, game: GameState, gameCod
       reconnectPayload.blastSeed = game.blastModeState.seed ?? null;
       // Send player's moves-used count so client can restore correct state
       reconnectPayload.blastPlayerMoves = game.blastModeState.playerMoves || {};
+      // Send current server-authoritative board state for MP sync
+      if (game.blastModeState.grid) {
+        reconnectPayload.blastGrid = game.blastModeState.grid;
+      }
+      if (game.blastModeState.tileStates) {
+        reconnectPayload.blastTileStates = game.blastModeState.tileStates;
+      }
     }
 
     // Include word hunt state for reconnecting players
@@ -286,6 +293,12 @@ function handleLateJoin(socket: Socket, game: GameState, gameCode: string, usern
     lateJoinPayload.blastTileOverlay = game.blastModeState.overlay || [];
     lateJoinPayload.blastSeed = game.blastModeState.seed ?? null;
     lateJoinPayload.blastPlayerMoves = game.blastModeState.playerMoves || {};
+    if (game.blastModeState.grid) {
+      lateJoinPayload.blastGrid = game.blastModeState.grid;
+    }
+    if (game.blastModeState.tileStates) {
+      lateJoinPayload.blastTileStates = game.blastModeState.tileStates;
+    }
   }
 
   // Include word hunt state for late joiners — also initialize their lives

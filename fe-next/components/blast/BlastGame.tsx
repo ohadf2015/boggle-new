@@ -25,6 +25,7 @@ import { detectNearMiss } from './utils/blastNearMiss';
 import { planSugarCrush } from './utils/blastSugarCrush';
 import type { ScoreFlyEvent } from './BlastScoreFly';
 import type { ClearedTileEvent } from './BlastEffectsCanvas';
+import { useGameStore } from '@/hooks/gameState';
 
 interface BlastGameProps {
   config: BlastGameConfig;
@@ -113,6 +114,19 @@ export function BlastGame({
 
   // Spam detection
   const spamDetection = useSpamDetection();
+
+  // MP board sync: apply server-authoritative board state when blastBoardUpdate arrives
+  const blastBoardUpdate = useGameStore((s) => s.blastBoardUpdate);
+  useEffect(() => {
+    if (!isMultiplayer || !blastBoardUpdate) return;
+    // Skip if this update was from our own word (we already ran local cascade)
+    if (blastBoardUpdate.clearedBy === username) {
+      useGameStore.getState().setBlastBoardUpdate(null);
+      return;
+    }
+    engine.applyServerBoard(blastBoardUpdate.grid, blastBoardUpdate.tileStates);
+    useGameStore.getState().setBlastBoardUpdate(null);
+  }, [blastBoardUpdate, isMultiplayer, username, engine]);
 
   // Dictionary cache for cascade word detection + validation gate
   const { checkWord, isLoaded: isDictionaryReady } = useDictionaryCache(config.language);
@@ -251,7 +265,7 @@ export function BlastGame({
       setTimeout(() => setNearMissCells([]), 1200);
     }
 
-    // 7. Run cascade + animate with multi-chain support
+    // 7. Run cascade + animate with multi-chain support (try/finally ensures isCascading resets)
     // Build cascade momentum: consecutive words increase allowed chain depth
     const wordLen = path.length;
     cascadeMomentumRef.current += CASCADE_MOMENTUM_PER_WORD + (wordLen >= 5 ? CASCADE_MOMENTUM_LONG_WORD_BONUS : 0);
@@ -269,6 +283,7 @@ export function BlastGame({
     // Pause combo timer so cascades don't penalise the player's streak
     comboStreak.pauseTimer();
     let chainLevel = 0;
+    try {
     let cascadeResult = engine.startCascade();
     // Pass commit as callback so sequencer sets falling phase BEFORE grid updates —
     // prevents 1-frame flash where tiles appear at destination without animation
@@ -377,9 +392,11 @@ export function BlastGame({
       cascadeResult = engine.startCascade();
       await sequencer.animateCascade(cascadeResult.gravity, chainLevel, () => cascadeResult.commit?.());
     }
-
+    } finally {
     // Mark cascade sequence as complete — releases the interactivity gate
+    // MUST run even if cascade throws, otherwise isCascading stays true and dead-end detection is blocked
     engine.stopCascade();
+    }
 
     // Decay momentum if no cascade triggered (cool-down mechanic)
     if (chainLevel === 0) {

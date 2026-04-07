@@ -6,7 +6,8 @@
 
 import type { BlastTileOverlay, BlastModeState, BlastPlayerStats } from '@/shared/types/game';
 
-import type { BlastTileType } from '@/shared/types/blast';
+import type { BlastTileType, BlastTileState } from '@/shared/types/blast';
+import { getInitialHitsRemaining } from '@/components/blast/utils/blastTileUtils';
 
 import {
   BLAST_BONUS_MOVE_COMBO_THRESHOLD,
@@ -90,6 +91,52 @@ export function calculateBlastTileBonus(tilesOnPath: BlastTileType[]): number {
   return total;
 }
 
+/** Candidates for frozen tile innerType (must match client-side FROST_INNER_CANDIDATES) */
+const FROST_INNER_CANDIDATES: BlastTileType[] = ['bomb', 'lightning', 'prism', 'gem', 'rainbow'];
+
+/**
+ * Build BlastTileState[][] from overlay + grid size (server-side equivalent of
+ * useBlastMultiplayerBridge.overlayToTileStates).
+ */
+function buildTileStatesFromOverlay(
+  overlay: BlastTileOverlay[],
+  gridSize: number,
+  seed: number,
+): BlastTileState[][] {
+  const lookup = new Map<string, BlastTileOverlay>();
+  for (const tile of overlay) {
+    lookup.set(`${tile.row}-${tile.col}`, tile);
+  }
+
+  const random = createSeededRandom(seed);
+  const states: BlastTileState[][] = [];
+
+  for (let row = 0; row < gridSize; row++) {
+    states[row] = [];
+    for (let col = 0; col < gridSize; col++) {
+      const entry = lookup.get(`${row}-${col}`);
+      const type = entry?.type ?? 'standard';
+
+      const innerType: BlastTileType | undefined =
+        type === 'frozen'
+          ? FROST_INNER_CANDIDATES[Math.floor(random() * FROST_INNER_CANDIDATES.length)]
+          : undefined;
+
+      states[row][col] = {
+        uid: `mp-${row}-${col}`,
+        row,
+        col,
+        type,
+        isCleared: false,
+        activationEffect: null,
+        hitsRemaining: getInitialHitsRemaining(type),
+        ...(innerType !== undefined ? { innerType } : {}),
+      };
+    }
+  }
+  return states;
+}
+
 /**
  * Initialize blast mode state for a new game.
  * Generates overlay, initializes move tracking for all players.
@@ -129,7 +176,10 @@ export function initBlastModeState(
     overlayMap.set(`${tile.row},${tile.col}`, tile.type);
   }
 
-  return { overlay, overlayMap, playerMoves, playerBonusMoves, playerStats, seed };
+  // Build server-authoritative tileStates from overlay
+  const tileStates = buildTileStatesFromOverlay(overlay, grid.length, seed);
+
+  return { overlay, overlayMap, playerMoves, playerBonusMoves, playerStats, seed, grid, tileStates, totalMoves: 0 };
 }
 
 /**
@@ -232,4 +282,37 @@ export function getTilesOnPath(
   }
 
   return tiles;
+}
+
+/**
+ * Get word path positions for server-side tile processing.
+ * Returns {row, col} for each letter in the word, matching the same
+ * position-selection logic as getTilesOnPath.
+ */
+export function getWordPath(
+  word: string,
+  letterPositions: Map<string, Array<{ row: number; col: number }>>,
+): Array<{ row: number; col: number }> {
+  const path: Array<{ row: number; col: number }> = [];
+  const usedPositions = new Set<string>();
+
+  for (const letter of word.toLowerCase()) {
+    const positions = letterPositions.get(letter);
+    if (!positions || positions.length === 0) continue;
+
+    let found = false;
+    for (const pos of positions) {
+      const key = `${pos.row},${pos.col}`;
+      if (!usedPositions.has(key)) {
+        usedPositions.add(key);
+        path.push({ row: pos.row, col: pos.col });
+        found = true;
+        break;
+      }
+    }
+    if (!found && positions.length > 0) {
+      path.push({ row: positions[0].row, col: positions[0].col });
+    }
+  }
+  return path;
 }

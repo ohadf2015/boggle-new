@@ -16,6 +16,7 @@ import {
 } from '@/shared/utils/gameEventUtils';
 import { useLetterGrid, useGameLanguage, useShowStartAnimation, useGameActions, useGameStore } from '@/hooks/gameState';
 import type { BlastWordAcceptedPayload, BlastComboSyncPayload, StartGameBroadcast } from '@/shared/types/socket';
+import type { BlastTileState } from '@/shared/types/blast';
 import { createEarthquakeSocketHandlers } from '@/shared/utils/earthquakeSocketHandlers';
 import logger from '@/utils/logger';
 import type { GameTimerReturn } from '@/hooks/useGameTimer';
@@ -125,6 +126,7 @@ export function usePlayerGameEvents({
     setTotalBoardWords,
     setBlastMovesUsed,
     setBlastComboSync,
+    setBlastBoardUpdate,
     setWordHuntMyLife,
     setWordHuntPlayerLives,
     setWordHuntTargetAttempts,
@@ -229,6 +231,17 @@ export function usePlayerGameEvents({
         storeUpdates.blastTileOverlay = (data as any).blastTileOverlay;
         storeUpdates.blastMovesUsed = 0;
         if ((data as any).blastSeed != null) storeUpdates.blastSeed = (data as any).blastSeed;
+        // Reconnect/late-join: apply current server board state if available
+        if ((data as any).blastGrid && (data as any).blastTileStates) {
+          storeUpdates.blastBoardUpdate = {
+            grid: (data as any).blastGrid,
+            tileStates: (data as any).blastTileStates,
+            clearedBy: '__server_reconnect__',
+            word: '',
+            clearedCount: 0,
+            totalMoves: 0,
+          };
+        }
       }
       if ((data as any).wordHuntTargetLength != null && (data as any).wordHuntTargetLength > 0) {
         storeUpdates.wordHuntTargetLength = (data as any).wordHuntTargetLength;
@@ -562,6 +575,12 @@ export function usePlayerGameEvents({
       }
     };
 
+    // Handle server-authoritative blast board update (MP board sync)
+    const handleBlastBoardUpdate = (data: { grid: string[][]; tileStates: BlastTileState[][]; clearedBy: string; word: string; clearedCount: number; totalMoves: number }) => {
+      logger.log('[PLAYER] Blast board update from', data.clearedBy, '- word:', data.word, 'cleared:', data.clearedCount);
+      setBlastBoardUpdate(data);
+    };
+
     // Handle total board words count (for "words remaining" display)
     const handleTotalBoardWords = (data: { count: number }) => {
       logger.log('[PLAYER] Received totalBoardWords:', data.count);
@@ -627,6 +646,7 @@ export function usePlayerGameEvents({
     socket.on('blastWordAccepted', handleBlastWordAccepted);
     socket.on('blastComboSync', handleBlastComboSync);
     socket.on('playerFoundWord', handlePlayerFoundWord);
+    socket.on('blastBoardUpdate', handleBlastBoardUpdate);
     socket.on('wordHuntLifeUpdate', handleWordHuntLifeUpdate);
     socket.on('wordHuntTargetResult', handleWordHuntTargetResult);
     socket.on('wordHuntTargetFound', handleWordHuntTargetFound);
@@ -670,6 +690,7 @@ export function usePlayerGameEvents({
       socket.off('blastWordAccepted', handleBlastWordAccepted);
       socket.off('blastComboSync', handleBlastComboSync);
       socket.off('playerFoundWord', handlePlayerFoundWord);
+      socket.off('blastBoardUpdate', handleBlastBoardUpdate);
       socket.off('wordHuntLifeUpdate', handleWordHuntLifeUpdate);
       socket.off('wordHuntTargetResult', handleWordHuntTargetResult);
       socket.off('wordHuntTargetFound', handleWordHuntTargetFound);

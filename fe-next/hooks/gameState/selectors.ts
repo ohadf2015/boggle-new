@@ -118,6 +118,7 @@ const getActions = (state: GameStore) => ({
   setBlastComboSync: state.setBlastComboSync,
   pushBlastOpponentActivity: state.pushBlastOpponentActivity,
   setBlastPlayerStats: state.setBlastPlayerStats,
+  setBlastBoardUpdate: state.setBlastBoardUpdate,
   setWordHuntTargetLength: state.setWordHuntTargetLength,
   setWordHuntMyLife: state.setWordHuntMyLife,
   setWordHuntPlayerLives: state.setWordHuntPlayerLives,

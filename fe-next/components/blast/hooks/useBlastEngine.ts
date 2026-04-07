@@ -79,6 +79,8 @@ export interface UseBlastEngineReturn {
   noWordsRemaining: boolean;
   /** Read current grid/tileStates from refs — use in async loops where React state is stale */
   getLatestState: () => { grid: LetterGrid | null; tileStates: BlastTileState[][] };
+  /** Apply server-authoritative board state (MP sync) */
+  applyServerBoard: (newGrid: LetterGrid, newTileStates: BlastTileState[][]) => void;
 }
 
 // ── Constants ──────────────────────────────────────────────────────────────
@@ -463,6 +465,14 @@ export function useBlastEngine(
     tileStates: tileStatesRef.current,
   }), []);
 
+  /** Apply server-authoritative board state (MP sync) */
+  const applyServerBoard = useCallback((newGrid: LetterGrid, newTileStates: BlastTileState[][]) => {
+    effectiveGridRef.current = newGrid;
+    setCurrentGrid(newGrid);
+    tileStatesRef.current = newTileStates;
+    setTileStates(() => newTileStates);
+  }, []);
+
   return {
     grid: effectiveGrid,
     tileStates,
@@ -480,5 +490,6 @@ export function useBlastEngine(
     consumeMove,
     noWordsRemaining,
     getLatestState,
+    applyServerBoard,
   };
 }
