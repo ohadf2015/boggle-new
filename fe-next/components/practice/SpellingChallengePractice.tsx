@@ -86,13 +86,16 @@ export function SpellingChallengePractice({
     }
   }, [wordIndex, isComplete, feedback]);
 
-  // Show results when complete
+  // Show results and report completion when game ends
   useEffect(() => {
     if (isComplete && !showResults) {
       setTimeSpent(Math.floor((Date.now() - sessionStartRef.current) / 1000));
-      setTimeout(() => setShowResults(true), 500);
+      setTimeout(() => {
+        setShowResults(true);
+        onComplete({ correct: correctCount, total: attempts, accuracy });
+      }, 500);
     }
-  }, [isComplete, showResults]);
+  }, [isComplete, showResults, onComplete, correctCount, attempts, accuracy]);
 
   const handleSubmit = useCallback(
     (e: React.FormEvent) => {
@@ -122,9 +125,6 @@ export function SpellingChallengePractice({
     sessionStartRef.current = Date.now();
   }, [resetGame]);
 
-  const handleComplete = useCallback(() => {
-    onComplete({ correct: correctCount, total: attempts, accuracy });
-  }, [correctCount, attempts, accuracy, onComplete]);
 
   // Track hints used across all words — intentionally fires on word transition only
   useEffect(() => {
@@ -141,7 +141,7 @@ export function SpellingChallengePractice({
           xpEarned={xpSessionData?.sessionXpEarned}
           masteryMessage={xpSessionData?.sessionMasteryMessage ?? undefined}
           onRestart={handleRestart}
-          onBack={handleComplete}
+          onBack={onBack}
           timeSpent={timeSpent}
           maxStreak={maxStreak}
           hintsUsed={totalHintsUsed}

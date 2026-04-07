@@ -198,14 +198,19 @@ export const WordMatchingPractice = memo<WordMatchingPracticeProps>(
       [definitionColumn, checkMatch]
     );
 
-    // Show results when complete
+    // Show results and report completion when game ends
     useMemo(() => {
       if (isComplete && !showResults && words.length > 0) {
         setTimeout(() => {
           setShowResults(true);
+          onComplete({
+            correct: correctCount,
+            total: attempts,
+            accuracy,
+          });
         }, 500);
       }
-    }, [isComplete, showResults, words.length]);
+    }, [isComplete, showResults, words.length, onComplete, correctCount, attempts, accuracy]);
 
     // Handle restart
     const handleRestart = useCallback(() => {
@@ -214,14 +219,6 @@ export const WordMatchingPractice = memo<WordMatchingPracticeProps>(
       setFeedback({});
     }, [resetGame]);
 
-    // Handle completion
-    const handleComplete = useCallback(() => {
-      onComplete({
-        correct: correctCount,
-        total: attempts,
-        accuracy,
-      });
-    }, [correctCount, attempts, accuracy, onComplete]);
 
     if (showResults) {
       return (
@@ -232,7 +229,7 @@ export const WordMatchingPractice = memo<WordMatchingPracticeProps>(
             xpEarned={xpSessionData?.sessionXpEarned}
             masteryMessage={xpSessionData?.sessionMasteryMessage ?? undefined}
             onRestart={handleRestart}
-            onBack={handleComplete}
+            onBack={onBack}
           />
         </div>
       );
