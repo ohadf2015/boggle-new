@@ -41,6 +41,7 @@ export interface GameLoopState {
   lastScoreFly: ScoreFlyData | null;
   isWaveCleared: boolean;
   isProcessing: boolean;
+  invalidWordShake: boolean;
   lastSwapPair: null;
   /** Called when drag enters a tile */
   selectTile: (row: number, col: number) => void;
@@ -239,6 +240,7 @@ export function useBlastGameLoop({ config, wave, language, movesAllowed }: GameL
   const [lastScoreFly, setLastScoreFly] = useState<ScoreFlyData | null>(null);
   const [isWaveCleared, setIsWaveCleared] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [invalidWordShake, setInvalidWordShake] = useState(false);
 
   // Drag path (mutable ref for real-time updates during drag)
   const pathRef = useRef<Array<{ row: number; col: number }>>([]);
@@ -399,7 +401,8 @@ export function useBlastGameLoop({ config, wave, language, movesAllowed }: GameL
 
     const valid = await isValidWord(word, language);
     if (!valid) {
-      // TODO: shake animation for invalid word
+      setInvalidWordShake(true);
+      setTimeout(() => setInvalidWordShake(false), 400);
       return;
     }
 
@@ -438,7 +441,7 @@ export function useBlastGameLoop({ config, wave, language, movesAllowed }: GameL
     selectedTile: selectedPath.length > 0 ? selectedPath[selectedPath.length - 1] : null,
     selectedPath, currentWord, score, movesRemaining, movesUsed,
     comboLevel, cascadeLevel, wordsFound, tilesCleared, totalTiles,
-    lastClearedTiles, lastScoreFly, isWaveCleared, isProcessing,
+    lastClearedTiles, lastScoreFly, isWaveCleared, isProcessing, invalidWordShake,
     lastSwapPair: null,
     selectTile, submitWord, reset,
   };

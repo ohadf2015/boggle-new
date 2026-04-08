@@ -95,7 +95,7 @@ export default function CookieConsent() {
       aria-label={t('cookieConsent.title')}
       aria-modal="true"
       className={cn(
-        'fixed bottom-0 inset-x-0 z-[100] p-3 sm:p-4',
+        'fixed bottom-0 inset-x-0 z-[110] p-3 sm:p-4',
         'bg-neo-navy border-t-4 border-neo-black',
         'animate-fade-in-up'
       )}

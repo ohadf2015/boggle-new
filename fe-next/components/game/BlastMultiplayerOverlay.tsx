@@ -11,7 +11,7 @@ interface BlastMultiplayerOverlayProps {
   gridSize: { rows: number; cols: number };
 }
 
-/** Emoji/icon mapping for all 12 special tile types */
+/** Emoji/icon mapping for all 19 special tile types */
 const TILE_ICONS: Partial<Record<BlastTileType, string>> = {
   gold: '\u2B50',           // star
   rainbow: '\uD83C\uDF08', // rainbow
@@ -25,6 +25,12 @@ const TILE_ICONS: Partial<Record<BlastTileType, string>> = {
   mirror: '\uD83E\uDE9E',  // mirror
   silver: '\uD83E\uDD48',  // silver medal
   diamond: '\uD83D\uDC8E', // gem (diamond variant)
+  wildcard: '\uD83C\uDFB2', // game die
+  countdown: '\u23F3',      // hourglass
+  portal: '\uD83C\uDF00',  // cyclone
+  catalyst: '\u2697\uFE0F', // alembic
+  shuffle: '\uD83D\uDD00', // shuffle arrows
+  magma: '\uD83C\uDF0B',   // volcano
 };
 
 export function BlastMultiplayerOverlay({ overlay, gridSize }: BlastMultiplayerOverlayProps) {

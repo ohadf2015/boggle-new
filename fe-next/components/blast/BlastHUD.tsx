@@ -138,7 +138,7 @@ export function BlastHUD({
       {/* Bottom row: score | moves | progress — the three key stats */}
       <div className="flex items-center justify-between px-3 py-1.5 gap-2">
         {/* Score */}
-        <div className="flex items-center gap-1.5 min-w-0" aria-label={`${t('blast.score') || 'Score'}: ${animatedScore}`}>
+        <div className="flex items-center gap-1.5 min-w-0" aria-label={`${t('blast.score')}: ${animatedScore}`}>
           <span className="text-amber-400 text-base">★</span>
           <span
             className={cn(
@@ -197,7 +197,7 @@ export function BlastHUD({
             />
           </div>
           <span className="text-[8px] font-bold uppercase tracking-wider text-white/40">
-            {t('blast.cleared') || 'cleared'}
+            {t('blast.cleared')}
           </span>
         </div>
       </div>

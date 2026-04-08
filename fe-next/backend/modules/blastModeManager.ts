@@ -14,6 +14,7 @@ import {
   BLAST_SPECIAL_TILE_CHANCE,
   BLAST_TILE_BONUSES,
   BLAST_RAINBOW_FLAT_BONUS,
+  FROST_INNER_CANDIDATES,
 } from '@/shared/constants/blastMultiplayerConstants';
 
 import { getWaveConfig, getWaveDistribution } from '@/components/blast/utils/blastWaveConfig';
@@ -91,8 +92,6 @@ export function calculateBlastTileBonus(tilesOnPath: BlastTileType[]): number {
   return total;
 }
 
-/** Candidates for frozen tile innerType (must match client-side FROST_INNER_CANDIDATES) */
-const FROST_INNER_CANDIDATES: BlastTileType[] = ['bomb', 'lightning', 'prism', 'gem', 'rainbow'];
 
 /**
  * Build BlastTileState[][] from overlay + grid size (server-side equivalent of

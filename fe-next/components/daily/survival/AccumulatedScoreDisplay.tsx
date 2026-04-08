@@ -97,6 +97,7 @@ export const AccumulatedScoreDisplay: React.FC<AccumulatedScoreDisplayProps> = (
           'bg-neo-black/60 backdrop-blur-sm',
           'border-2 border-neo-cream/15',
           'rounded-full',
+          'min-w-[72px]',
           isAnimating && 'score-glow-pulse',
         )}
         animate={isAnimating ? { scale: [1, 1.1, 1] } : { scale: 1 }}
@@ -109,7 +110,7 @@ export const AccumulatedScoreDisplay: React.FC<AccumulatedScoreDisplayProps> = (
       >
         {/* Icon with tier color glow */}
         <div className={cn(
-          'w-5 h-5 rounded-full flex items-center justify-center',
+          'w-5 h-5 shrink-0 rounded-full flex items-center justify-center',
           'bg-linear-to-br',
           scoreColors.gradient,
         )}>
@@ -117,9 +118,9 @@ export const AccumulatedScoreDisplay: React.FC<AccumulatedScoreDisplayProps> = (
         </div>
 
         {/* Score Value */}
-        <div className="relative">
+        <div className="relative overflow-visible">
           <animated.span
-            className="text-xl @[100px]:text-2xl font-black font-neo-display text-neo-cream tabular-nums block"
+            className="text-xl @[100px]:text-2xl font-black font-neo-display text-neo-cream tabular-nums block whitespace-nowrap"
           >
             {springProps.val.to((v) => Math.round(v).toLocaleString())}
           </animated.span>

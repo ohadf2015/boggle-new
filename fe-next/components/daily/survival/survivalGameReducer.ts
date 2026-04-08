@@ -53,7 +53,7 @@ export interface SurvivalReducerState {
 
 export type SurvivalAction =
   // Life actions
-  | { type: 'DRAIN_LIFE'; payload: { drainRate: number } }
+  | { type: 'DRAIN_LIFE'; payload: { drainRate: number; lifeFloor?: number } }
   | { type: 'ADJUST_LIFE'; payload: { delta: number } }
   | { type: 'SET_LIFE_GAIN_ANIMATION'; payload: { amount: number | null; isGaining: boolean } }
   | { type: 'STOP_LIFE_ANIMATION' }
@@ -143,7 +143,8 @@ export function survivalGameReducer(
   switch (action.type) {
     // Life actions
     case 'DRAIN_LIFE': {
-      const newLife = Math.max(0, state.lifePoints - action.payload.drainRate);
+      const floor = action.payload.lifeFloor ?? 0;
+      const newLife = Math.max(floor, state.lifePoints - action.payload.drainRate);
       return { ...state, lifePoints: newLife };
     }
 

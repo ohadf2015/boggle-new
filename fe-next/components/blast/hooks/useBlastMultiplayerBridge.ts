@@ -11,9 +11,7 @@ import type { BlastTileState, BlastTileType } from '@/shared/types/blast';
 import type { BlastGameConfig } from '../types';
 import { getInitialHitsRemaining } from '../utils/blastTileUtils';
 import { createSeededRandom } from '../utils/blastLetterGenerator';
-
-/** Valid inner types for frozen tiles in multiplayer — matches SP candidates */
-const FROST_INNER_CANDIDATES: BlastTileType[] = ['bomb', 'lightning', 'prism', 'gem', 'rainbow'];
+import { FROST_INNER_CANDIDATES } from '@/shared/constants/blastMultiplayerConstants';
 
 interface UseBlastMultiplayerBridgeOptions {
   letterGrid: LetterGrid | null;

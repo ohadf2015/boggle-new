@@ -40,7 +40,7 @@ interface UsePlayerWordEventsProps {
   setShowWordFeedback: React.Dispatch<React.SetStateAction<boolean>>;
   setWordToVote: React.Dispatch<React.SetStateAction<any>>;
 
-  // Combo refs and setters (TODO: refactor to use context actions)
+  // Combo refs and setters
   comboLevelRef: MutableRefObject<number>;
   lastWordTimeRef: MutableRefObject<number | null>;
   setComboLevel: React.Dispatch<React.SetStateAction<number>>;

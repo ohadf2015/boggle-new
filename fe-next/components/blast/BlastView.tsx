@@ -113,10 +113,10 @@ export function BlastView() {
       {phase === 'ready' && (
         <div className="flex-1 flex flex-col items-center justify-center gap-6 px-4">
           <h1 className="text-4xl font-black uppercase text-white font-neo-display">
-            {t('blast.ready.title') || 'BLAST MODE'}
+            {t('blast.ready.title')}
           </h1>
           <p className="text-sm text-white/60 text-center max-w-xs">
-            {t('blast.ready.subtitle') || 'Clear the board, chain combos, survive the waves'}
+            {t('blast.ready.subtitle')}
           </p>
           <Button
             data-testid="play-button"
@@ -124,7 +124,7 @@ export function BlastView() {
             onClick={handleStart}
             className="min-h-[56px] w-full max-w-xs font-black text-xl uppercase border-3 border-neo-black shadow-hard-lg bg-neo-lime text-neo-black hover:bg-neo-lime/90"
           >
-            {t('blast.ready.play') || 'PLAY'}
+            {t('blast.ready.play')}
           </Button>
         </div>
       )}
@@ -178,8 +178,8 @@ export function BlastView() {
               transition={{ delay: 0.6 }}
               className="text-white/80 text-center space-y-1"
             >
-              <p className="text-lg font-bold tabular-nums">{lastWaveStats.score} {t('common.points') || 'pts'}</p>
-              <p className="text-sm">{lastWaveStats.words} {t('blast.wordsFound') || 'words'} · {Math.round(lastWaveStats.clearPct)}% {t('blast.cleared') || 'cleared'}</p>
+              <p className="text-lg font-bold tabular-nums">{lastWaveStats.score} {t('common.points')}</p>
+              <p className="text-sm">{lastWaveStats.words} {t('blast.wordsFound')} · {Math.round(lastWaveStats.clearPct)}% {t('blast.cleared')}</p>
             </AdaptiveMotion.div>
 
             <AdaptiveMotion.div
@@ -194,7 +194,7 @@ export function BlastView() {
                 onClick={handleWaveAdvance}
                 className="min-h-[56px] w-full font-black text-xl uppercase border-3 border-neo-black shadow-hard-lg bg-neo-cyan text-neo-black hover:bg-neo-cyan/90"
               >
-                {t('blast.nextWave', { wave: currentWave + 1 }) || 'NEXT WAVE'}
+                {t('blast.nextWave', { wave: currentWave + 1 })}
               </Button>
             </AdaptiveMotion.div>
           </div>
@@ -204,15 +204,15 @@ export function BlastView() {
       {phase === 'results' && results && (
         <div className="flex-1 flex flex-col items-center justify-center gap-6 px-4">
           <h2 className="text-3xl font-black uppercase text-neo-pink font-neo-display">
-            {t('blast.gameOver') || 'GAME OVER'}
+            {t('blast.gameOver')}
           </h2>
           <div className="text-white text-center space-y-2">
             <p className="text-4xl font-black">{results.finalScore}</p>
             <p className="text-sm text-white/60">
-              {results.wordsFound.length} {t('blast.wordsFound') || 'words'} &middot; {results.wavesCompleted} {t('blast.waves') || 'waves'}
+              {results.wordsFound.length} {t('blast.wordsFound')} &middot; {results.wavesCompleted} {t('blast.waves')}
             </p>
             {results.bestWord && (
-              <p className="text-sm text-neo-lime font-bold uppercase">{t('blast.bestWord') || 'Best'}: {results.bestWord}</p>
+              <p className="text-sm text-neo-lime font-bold uppercase">{t('blast.bestWord')}: {results.bestWord}</p>
             )}
           </div>
           <div className="flex flex-col gap-3 w-full max-w-xs">
@@ -222,7 +222,7 @@ export function BlastView() {
               onClick={handlePlayAgain}
               className="min-h-[56px] font-black text-xl uppercase border-3 border-neo-black shadow-hard-lg bg-neo-lime text-neo-black hover:bg-neo-lime/90"
             >
-              {t('blast.playAgain') || 'PLAY AGAIN'}
+              {t('blast.playAgain')}
             </Button>
             <Button
               variant="outline"
@@ -230,7 +230,7 @@ export function BlastView() {
               onClick={handleQuit}
               className="min-h-[48px] font-bold uppercase border-3 border-neo-lime/50 text-neo-lime bg-neo-navy/80 hover:bg-neo-navy"
             >
-              {t('common.home') || 'HOME'}
+              {t('common.home')}
             </Button>
           </div>
         </div>

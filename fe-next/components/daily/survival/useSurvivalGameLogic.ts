@@ -12,6 +12,7 @@ import {
   LIFE_DRAIN_RATE,
   NEW_PLAYER_LIFE_DRAIN_RATE,
   NEW_PLAYER_THRESHOLD,
+  NEW_PLAYER_LIFE_FLOOR,
   getLanguageDrainMultiplier,
 } from './constants';
 import { useAuth } from '@/contexts/AuthContext';
@@ -253,8 +254,9 @@ export function useSurvivalGameLogic({
       return;
     }
 
+    const lifeFloor = isNewPlayer.current ? NEW_PLAYER_LIFE_FLOOR : 0;
     lifeDrainInterval.start(() => {
-      dispatch({ type: 'DRAIN_LIFE', payload: { drainRate } });
+      dispatch({ type: 'DRAIN_LIFE', payload: { drainRate, lifeFloor } });
     }, 1000);
 
     return () => {

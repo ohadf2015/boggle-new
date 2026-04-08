@@ -374,7 +374,7 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
         false &&"flex-col h-full me-4 mb-0"
       )} role="status" aria-label="Game status">
         {/* Combo (left - placeholder for layout balance) */}
-        <div className="min-w-[70px] md:min-w-[90px] flex justify-end">
+        <div className="min-w-[80px] md:min-w-[100px] flex justify-end">
           <ComboDisplay
             comboLevel={combo.comboLevel}
             compact
@@ -403,7 +403,7 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
         <motion.div
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          className="relative border-3 border-neo-black rounded-neo shadow-hard-lg px-3 md:px-4 py-1.5 min-w-[70px] md:min-w-[90px]"
+          className="relative border-3 border-neo-black rounded-neo shadow-hard-lg px-3 md:px-4 py-1.5 min-w-[80px] md:min-w-[100px]"
           style={{
             background: 'linear-gradient(135deg, #FFE135 0%, #BFFF00 100%)',
           }}
@@ -413,10 +413,10 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
               key={score}
               initial={{ scale: 1.3 }}
               animate={{ scale: 1 }}
-              className="text-xl md:text-2xl font-black text-neo-black leading-tight"
+              className="text-xl md:text-2xl font-black text-neo-black leading-tight whitespace-nowrap tabular-nums"
               style={{ textShadow: '1px 1px 0px rgba(255,255,255,0.5)' }}
             >
-              {score}
+              {score.toLocaleString()}
             </motion.div>
             <div className="text-[10px] md:text-xs font-bold uppercase tracking-wider text-neo-black/80">
               {t('common.score')}

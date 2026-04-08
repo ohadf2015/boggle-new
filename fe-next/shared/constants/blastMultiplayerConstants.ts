@@ -44,3 +44,7 @@ export const BLAST_TILE_BONUSES: Record<BlastTileType, number> = {
 };
 
 export const BLAST_RAINBOW_FLAT_BONUS = 3;
+
+/** Valid inner types for Frost (frozen) tiles — only explosion/effect specials, not obstacles or multipliers.
+ *  Single source of truth used by both server and client. */
+export const FROST_INNER_CANDIDATES: BlastTileType[] = ['bomb', 'lightning', 'prism', 'gem', 'rainbow'];

@@ -30,6 +30,14 @@ export const NEW_PLAYER_LIFE_DRAIN_RATE = 0.8;
 export const NEW_PLAYER_THRESHOLD = 3;
 
 /**
+ * Minimum life floor for new players (percentage).
+ * New players' life will never drain below this value,
+ * keeping them in the "yellow" zone instead of dying.
+ * This lets first-timers learn without the stress of game-over.
+ */
+export const NEW_PLAYER_LIFE_FLOOR = 34;
+
+/**
  * Life bonus awarded for discovering long words
  * Key is word length, value is life points restored
  */

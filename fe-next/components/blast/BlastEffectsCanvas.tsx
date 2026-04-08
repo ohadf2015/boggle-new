@@ -132,6 +132,7 @@ function EffectsWorker({
   const crossFlashRef = useRef<Graphics | null>(null);
   const crossFlashRafRef = useRef<number>(0);
   const magnetTimersRef = useRef<Set<ReturnType<typeof setTimeout>>>(new Set());
+  const bloomTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const bloomRef = useRef<InstanceType<typeof BloomFilter> | null>(null);
   const shockwaveRef = useRef<InstanceType<typeof ShockwaveFilter> | null>(null);
   const shockwaveRafRef = useRef<number>(0);
@@ -142,6 +143,7 @@ function EffectsWorker({
     return () => {
       for (const tid of timers) clearTimeout(tid);
       timers.clear();
+      if (bloomTimerRef.current) clearTimeout(bloomTimerRef.current);
       cancelAnimationFrame(crossFlashRafRef.current);
       if (crossFlashRef.current) { crossFlashRef.current.destroy(); crossFlashRef.current = null; }
     };
@@ -462,7 +464,8 @@ function EffectsWorker({
         if (bloom) {
           bloom.enabled = true;
           bloom.strength = 12;
-          setTimeout(() => { if (bloomRef.current) bloomRef.current.strength = 2 + chainLevel * 1.5; }, 400);
+          if (bloomTimerRef.current) clearTimeout(bloomTimerRef.current);
+          bloomTimerRef.current = setTimeout(() => { if (bloomRef.current) bloomRef.current.strength = 2 + chainLevel * 1.5; }, 400);
         }
       } else if (chainLevel >= 3) {
         shake.medium();
@@ -488,7 +491,8 @@ function EffectsWorker({
         const prev = bloom.strength;
         bloom.enabled = true;
         bloom.strength = 6 + comboTier * 3;
-        setTimeout(() => { if (bloomRef.current) bloomRef.current.strength = prev; }, 300);
+        if (bloomTimerRef.current) clearTimeout(bloomTimerRef.current);
+        bloomTimerRef.current = setTimeout(() => { if (bloomRef.current) bloomRef.current.strength = prev; }, 300);
       }
     }
     prevComboRef.current = comboTier;

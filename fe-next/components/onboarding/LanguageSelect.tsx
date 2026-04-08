@@ -21,6 +21,10 @@ const LanguageSelect: React.FC<LanguageSelectProps> = ({ onSelect }) => {
   const [selected, setSelected] = useState<Language>(language);
 
   const handleSelect = (lang: Language) => {
+    if (lang === selected) {
+      onSelect();
+      return;
+    }
     setSelected(lang);
     setLanguage(lang);
   };

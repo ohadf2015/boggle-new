@@ -6,6 +6,7 @@ import {
 } from '../types';
 import { getInitialHitsRemaining } from './blastTileUtils';
 import { getWaveConfig, getWaveDistribution } from './blastWaveConfig';
+import { FROST_INNER_CANDIDATES } from '@/shared/constants/blastMultiplayerConstants';
 
 let _tileUidCounter = 0;
 /** Generate a unique tile ID that persists through gravity shifts */
@@ -39,12 +40,6 @@ export function rollSpecialFromDistribution(
   }
   return 'standard';
 }
-
-/**
- * Valid inner types for Frost tiles -- only explosion/effect specials, not obstacles or multipliers.
- * Wave-gating is applied at call site using rollSpecialFromDistribution with wave distribution.
- */
-const FROST_INNER_CANDIDATES: BlastTileType[] = ['bomb', 'lightning', 'prism', 'gem', 'rainbow'];
 
 /** Generate initial tile states with special tile placement */
 export function generateTileStates(

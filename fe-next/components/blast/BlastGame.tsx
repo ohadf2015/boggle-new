@@ -17,14 +17,13 @@ import { GameParticles } from '@/components/effects/GameParticles';
 import { detectSpecialCombos, type BlastComboType, type SpecialCombo } from './utils/blastCombos';
 import { getWaveObjectives, type WaveConfig } from './utils/blastWaveConfig';
 import { getComboMultiplier } from '@/shared/utils/scoring';
-import { MAX_CASCADE_CHAIN, CASCADE_MIN_WORD_LENGTH, MAX_CASCADE_WORDS_PER_LEVEL, CASCADE_CHAIN_BONUS_MULTIPLIER, CASCADE_MOMENTUM_THRESHOLDS, CASCADE_MOMENTUM_PER_WORD, CASCADE_MOMENTUM_LONG_WORD_BONUS, CASCADE_MOMENTUM_DECAY, CASCADE_TIER_MAX_CHAIN, CASCADE_HIGHLIGHT_DURATION, CASCADE_HIGHLIGHT_LINGER, type BlastGameConfig, type BlastResultsData, type BlastTileState, type BlastTileType } from './types';
-import { detectVerticalWords, detectHorizontalWords } from './utils/blastVerticalScanner';
-import { detectMatch3Clusters } from './utils/blastMatch3Detector';
+import { type BlastGameConfig, type BlastResultsData, type BlastTileState, type BlastTileType } from './types';
 import { useDictionaryCache } from '@/hooks/useDictionaryCache';
-import { vibrateBlastBomb, vibrateBlastLightning, vibrateBlastPrism, vibrateBlastCascade } from '@/components/grid/hapticFeedback';
-import { formatObjectiveLabel } from './utils/blastObjectiveUtils';
+import { vibrateBlastBomb, vibrateBlastLightning, vibrateBlastPrism } from '@/components/grid/hapticFeedback';
 import { detectNearMiss } from './utils/blastNearMiss';
-import { planSugarCrush } from './utils/blastSugarCrush';
+import { useBlastCascade } from './hooks/useBlastCascade';
+import { useBlastGameEnd } from './hooks/useBlastGameEnd';
+import { useBlastObjectiveEffects } from './hooks/useBlastObjectiveEffects';
 import type { ScoreFlyEvent } from './BlastScoreFly';
 import type { ClearedTileEvent } from './BlastEffectsCanvas';
 import { useGameStore } from '@/hooks/gameState';
@@ -102,20 +101,9 @@ export function BlastGame({
     minWordLength,
   });
 
-  // Combo system
-  const combo = useComboSystem({
-    trackMaxCombo: true,
-    onComboSound: playComboSound,
-    timerIntervalMs: 250,
-  });
-
-  // Animation sequencer
+  const combo = useComboSystem({ trackMaxCombo: true, onComboSound: playComboSound, timerIntervalMs: 250 });
   const sequencer = useBlastSequencer();
-
-  // Combo streak
   const comboStreak = useBlastComboStreak(getComboWindowMs(minWordLength));
-
-  // Spam detection
   const spamDetection = useSpamDetection();
 
   // MP board sync: apply server-authoritative board state when blastBoardUpdate arrives
@@ -158,63 +146,42 @@ export function BlastGame({
       setGameActive(false);
       stopMusic();
       if (explosionShakeTimerRef.current) clearTimeout(explosionShakeTimerRef.current);
+      if (nearMissTimerRef.current) clearTimeout(nearMissTimerRef.current);
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setGameActive]);
 
-  // Effects state
+  // Effects + UI state
   const [scoreFlyEvents, setScoreFlyEvents] = useState<ScoreFlyEvent[]>([]);
   const [comboFlash, setComboFlash] = useState<{ id: string; tier: 1 | 2 | 3 } | null>(null);
   const [comboTypeName, setComboTypeName] = useState<string | undefined>();
   const [clearedTilesForEffects, setClearedTilesForEffects] = useState<ClearedTileEvent[]>([]);
   const flyIdRef = useRef(0);
-
-  // Particle effect triggers (incrementing counters — each change fires the effect)
   const [wordFoundParticle, setWordFoundParticle] = useState(0);
   const [comboParticle, setComboParticle] = useState(0);
   const [waveClearParticle, setWaveClearParticle] = useState(0);
-
-  // Word forming state
   const [formedWord, setFormedWord] = useState('');
-  // Near-miss shimmer state
   const [nearMissCells, setNearMissCells] = useState<Array<{ row: number; col: number }>>([]);
-  // Cascade highlight: cells to glow before cascade clears them
   const [cascadeHighlightCells, setCascadeHighlightCells] = useState<Array<{ row: number; col: number }>>([]);
   const [cascadeHighlightWord, setCascadeHighlightWord] = useState<string | null>(null);
-
-  // Word praise feedback state
   const [lastWordLength, setLastWordLength] = useState(0);
   const [wordSubmitCount, setWordSubmitCount] = useState(0);
-
-  // Explosion screen shake — triggered by bomb/countdown explosions
   const [explosionShake, setExplosionShake] = useState(0);
   const explosionShakeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  // Sugar Crush end-of-level sequence
-  const sugarCrushRunningRef = useRef(false);
-
-  // Track last submitted path
+  const nearMissTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastPathRef = useRef<Array<{ row: number; col: number }>>([]);
   const [gameStartTime] = useState(() => Date.now());
 
-  // Cascade momentum: accumulates as player finds words, decays on idle turns
-  const cascadeMomentumRef = useRef(0);
   const onWordWithComboTypeRef = useRef(onWordWithComboType);
   useEffect(() => { onWordWithComboTypeRef.current = onWordWithComboType; }, [onWordWithComboType]);
 
-  // Refs for game-end effect — avoid stale closures on callback props and dynamic values
-  const onGameEndRef = useRef(onGameEnd);
-  useEffect(() => { onGameEndRef.current = onGameEnd; }, [onGameEnd]);
-  const onWaveCompleteRef = useRef(onWaveComplete);
-  useEffect(() => { onWaveCompleteRef.current = onWaveComplete; }, [onWaveComplete]);
-  const engineRef = useRef(engine);
-  useEffect(() => { engineRef.current = engine; }, [engine]);
-  const maxComboRef = useRef(combo.maxCombo);
-  useEffect(() => { maxComboRef.current = combo.maxCombo; }, [combo.maxCombo]);
-  const waveConfigRef = useRef(waveConfig);
-  useEffect(() => { waveConfigRef.current = waveConfig; }, [waveConfig]);
-  const soundsRef = useRef(sounds);
-  useEffect(() => { soundsRef.current = sounds; }, [sounds]);
+  // Cascade system (extracted hook)
+  const { runCascade } = useBlastCascade({
+    engine, sequencer, sounds, comboStreak, checkWord,
+    waveConfig,
+    setCascadeHighlightCells, setCascadeHighlightWord,
+    setScoreFlyEvents, setComboFlash, flyIdRef,
+  });
 
   // Handle accepted word: clear tiles, cascade, track combos
   const handleWordAccepted = useCallback(async (data: { word: string; score: number }) => {
@@ -316,157 +283,17 @@ export function BlastGame({
     const nearMiss = detectNearMiss(path, engine.grid!, engine.tileStates, config.gridSize, hadCombo);
     if (nearMiss) {
       setNearMissCells(nearMiss.cells);
-      setTimeout(() => setNearMissCells([]), 1200);
+      if (nearMissTimerRef.current) clearTimeout(nearMissTimerRef.current);
+      nearMissTimerRef.current = setTimeout(() => setNearMissCells([]), 1200);
     }
 
-    // 7. Run cascade + animate with multi-chain support (try/finally ensures isCascading resets)
-    // Build cascade momentum: consecutive words increase allowed chain depth
-    const wordLen = path.length;
-    cascadeMomentumRef.current += CASCADE_MOMENTUM_PER_WORD + (wordLen >= 5 ? CASCADE_MOMENTUM_LONG_WORD_BONUS : 0);
-
-    // Determine momentum tier → max chain depth for this cascade
-    let momentumTier = 0;
-    for (let i = CASCADE_MOMENTUM_THRESHOLDS.length - 1; i >= 0; i--) {
-      if (cascadeMomentumRef.current >= CASCADE_MOMENTUM_THRESHOLDS[i]) {
-        momentumTier = i;
-        break;
-      }
-    }
-    const maxChainForMomentum = CASCADE_TIER_MAX_CHAIN[momentumTier] ?? 1;
-
-    // Pause combo timer so cascades don't penalise the player's streak
-    comboStreak.pauseTimer();
-    let chainLevel = 0;
-    try {
-    let cascadeResult = engine.startCascade();
-    // Pass commit as callback so sequencer sets falling phase BEFORE grid updates —
-    // prevents 1-frame flash where tiles appear at destination without animation
-    await sequencer.animateCascade(cascadeResult.gravity, chainLevel, () => cascadeResult.commit?.());
-
-    // Chain cascades: match-3 clusters + auto-formed words after gravity
-    const cascadeBonusMult = waveConfig?.cascadeChainBonus ?? CASCADE_CHAIN_BONUS_MULTIPLIER;
-    const foundWordsSet = new Set(engine.gameState.wordsFound);
-    const effectiveMaxChain = Math.min(MAX_CASCADE_CHAIN, maxChainForMomentum);
-    while (chainLevel < effectiveMaxChain) {
-      // Use the CURRENT cascadeResult (from either initial or previous iteration's gravity)
-      const affectedCols = new Set(cascadeResult.gravity.newTiles.map(t => t.col));
-      const affectedRows = new Set(cascadeResult.gravity.newTiles.map(t => t.row));
-      for (const ft of cascadeResult.gravity.fallingTiles) {
-        affectedRows.add(ft.row);
-        affectedCols.add(ft.col);
-      }
-
-      // Read latest state from refs AFTER the previous gravity committed
-      const { grid, tileStates: latestTiles } = engine.getLatestState();
-      if (!grid) break;
-
-      // Collect all cascade finds for this level BEFORE submitting
-      type CascadeFind = { cells: Array<{ row: number; col: number }>; label: string; bonusFn: (cl: number) => number };
-      const cascadeFinds: CascadeFind[] = [];
-
-      // 1. Match-3 clusters
-      const allClusters = detectMatch3Clusters(grid, latestTiles, affectedCols);
-      const clusters = allClusters.slice(0, MAX_CASCADE_WORDS_PER_LEVEL);
-      for (const cluster of clusters) {
-        cascadeFinds.push({
-          cells: cluster.cells,
-          label: `[${cluster.letter}×${cluster.cells.length}]`,
-          bonusFn: (cl) => Math.round(cluster.cells.length * 3 * cascadeBonusMult * cl),
-        });
-      }
-
-      // 2. Vertical auto-words
-      const vertWords = detectVerticalWords(
-        grid, latestTiles, checkWord, foundWordsSet, CASCADE_MIN_WORD_LENGTH, affectedCols,
-      );
-      for (const vw of vertWords.slice(0, MAX_CASCADE_WORDS_PER_LEVEL)) {
-        cascadeFinds.push({
-          cells: vw.path,
-          label: vw.word,
-          bonusFn: (cl) => Math.round(vw.word.length * vw.word.length * cascadeBonusMult * cl),
-        });
-      }
-
-      // 3. Horizontal auto-words
-      const horizWords = detectHorizontalWords(
-        grid, latestTiles, checkWord, foundWordsSet, CASCADE_MIN_WORD_LENGTH, affectedRows,
-      );
-      for (const hw of horizWords.slice(0, MAX_CASCADE_WORDS_PER_LEVEL)) {
-        cascadeFinds.push({
-          cells: hw.path,
-          label: hw.word,
-          bonusFn: (cl) => Math.round(hw.word.length * hw.word.length * cascadeBonusMult * cl),
-        });
-      }
-
-      // Break if nothing found this iteration
-      if (cascadeFinds.length === 0) break;
-
-      chainLevel++;
-
-      // ── Highlight phase: show cascade words on grid before clearing ──
-      const allHighlightCells = cascadeFinds.flatMap(f => f.cells);
-      const firstWordLabel = cascadeFinds[0].label;
-      setCascadeHighlightCells(allHighlightCells);
-      setCascadeHighlightWord(firstWordLabel.startsWith('[') ? firstWordLabel : firstWordLabel.toUpperCase());
-      await new Promise<void>(r => setTimeout(r, CASCADE_HIGHLIGHT_DURATION));
-      setCascadeHighlightWord(null);
-      await new Promise<void>(r => setTimeout(r, CASCADE_HIGHLIGHT_LINGER));
-      setCascadeHighlightCells([]);
-
-      // Now submit all finds
-      let totalClearsThisLevel = 0;
-      for (const find of cascadeFinds) {
-        const bonus = find.bonusFn(chainLevel);
-        const result = engine.submitWord(find.cells, find.label, bonus);
-        totalClearsThisLevel += result.clearedTiles.length;
-        foundWordsSet.add(find.label);
-      }
-
-      // Cascade chain sound
-      sounds.playCascadeChain(chainLevel);
-
-      // Chain score fly
-      const chainFlyId = `chain-${++flyIdRef.current}`;
-      const chainTier: 1 | 2 | 3 = chainLevel >= 3 ? 3 : chainLevel >= 2 ? 2 : 1;
-      const chainBonus = chainLevel * 5;
-      setScoreFlyEvents(prev => [...prev.slice(-3), {
-        id: chainFlyId, score: chainBonus,
-        startX: 50, startY: 50,
-        tier: chainTier,
-      }]);
-
-      // Chain combo flash + haptic
-      if (chainLevel >= 2) {
-        setComboFlash({ id: `chain-flash-${flyIdRef.current}`, tier: chainTier });
-        vibrateBlastCascade();
-      }
-
-      // Run gravity for this chain level — sequencer sets falling phase before commit
-      cascadeResult = engine.startCascade();
-      await sequencer.animateCascade(cascadeResult.gravity, chainLevel, () => cascadeResult.commit?.());
-    }
-    } finally {
-    // Mark cascade sequence as complete — releases the interactivity gate
-    // MUST run even if cascade throws, otherwise isCascading stays true and dead-end detection is blocked
-    engine.stopCascade();
-    }
-
-    // Decay momentum if no cascade triggered (cool-down mechanic)
-    if (chainLevel === 0) {
-      cascadeMomentumRef.current = Math.max(0, cascadeMomentumRef.current - CASCADE_MOMENTUM_DECAY);
-    }
-
-    // Resume combo timer after cascades complete
-    comboStreak.resumeTimer();
-
-    // Track combo streak
-    comboStreak.onWordSubmitted();
+    // 7. Run cascade chain (extracted to useBlastCascade)
+    await runCascade(path.length);
 
     sounds.playTileClear(clearedInfo.length);
     sounds.playLongWordBonus(path.length);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [engine, comboStreak, onComboDetected, sounds, sequencer, checkWord, config.gridSize, waveConfig?.cascadeChainBonus]);
+  }, [engine, runCascade, onComboDetected, sounds, sequencer, checkWord, config.gridSize]);
 
   // Score fly + combo flash handlers
   const handleScoreFlyComplete = useCallback((id: string) => {
@@ -588,151 +415,21 @@ export function BlastGame({
     prevMovesRef.current = movesRemaining;
   }, [engine.gameState.movesRemaining, sounds]);
 
-  // Track individual objective completions — hidden objectives give surprise bonus score
-  const HIDDEN_OBJECTIVE_BONUS = 25;
-  const completedObjRef = useRef<Set<number>>(new Set());
-  useEffect(() => {
-    objectives.objectiveProgress.forEach((obj, i) => {
-      if (obj.isComplete && !completedObjRef.current.has(i)) {
-        completedObjRef.current.add(i);
-        const isHidden = obj.objective.type !== 'clear_percent';
-        if (isHidden) {
-          // Surprise bonus: score boost + celebratory fly + medium shake
-          engine.addBonusScore(HIDDEN_OBJECTIVE_BONUS);
-          const flyId = `obj-bonus-${flyIdRef.current++}`;
-          setScoreFlyEvents(prev => [...prev.slice(-2), {
-            id: flyId,
-            score: HIDDEN_OBJECTIVE_BONUS,
-            startX: 50,
-            startY: 30,
-            tier: 2,
-            tileType: obj.objective.tileType || undefined,
-          }]);
-          setComboFlash({ id: flyId, tier: 2 });
-          setComboTypeName(formatObjectiveLabel(obj.objective, t));
-          if (explosionShakeTimerRef.current) clearTimeout(explosionShakeTimerRef.current);
-          setExplosionShake(2);
-          explosionShakeTimerRef.current = setTimeout(() => setExplosionShake(0), 500);
-        } else {
-          // Primary objective (clear_percent) — light shake only
-          if (explosionShakeTimerRef.current) clearTimeout(explosionShakeTimerRef.current);
-          setExplosionShake(1);
-          explosionShakeTimerRef.current = setTimeout(() => setExplosionShake(0), 400);
-        }
-      }
-    });
-  }, [objectives.objectiveProgress, engine, t]);
+  // Objective completion effects (extracted to useBlastObjectiveEffects)
+  useBlastObjectiveEffects({
+    objectives, engine, sounds, t,
+    setScoreFlyEvents, setComboFlash, setComboTypeName,
+    setExplosionShake, setWaveClearParticle,
+    explosionShakeTimerRef, flyIdRef,
+  });
 
-  // Play wave-clear sound once when ALL objectives are met (but don't end the game)
-  const waveClearPlayedRef = useRef(false);
-  useEffect(() => {
-    if (objectives.allObjectivesComplete && !waveClearPlayedRef.current) {
-      sounds.playWaveClear();
-      setWaveClearParticle(c => c + 1);
-      // Heavy celebratory shake for wave completion
-      if (explosionShakeTimerRef.current) clearTimeout(explosionShakeTimerRef.current);
-      setExplosionShake(3);
-      explosionShakeTimerRef.current = setTimeout(() => setExplosionShake(0), 600);
-      waveClearPlayedRef.current = true;
-    }
-  }, [objectives.allObjectivesComplete, sounds]);
-
-  // Game end detection
-  // SP: moves run out, board clears, or dead end. MP: server timer controls end, but dead-end still triggers locally.
-  // Uses refs for callbacks/dynamic values to avoid stale closures without re-triggering the effect.
-  // IMPORTANT: Do NOT include `engine` in deps — Sugar Crush mutates tileStates which would
-  // recreate the engine object, cancel the async loop via cleanup, and restart it infinitely.
-  useEffect(() => {
-    // Board cleared — all tiles gone (SP only — MP wave logic is server-driven)
-    if (!isMultiplayer && engine.gameState.isComplete) {
-      const { score, wordsFound, tilesCleared, totalTiles } = engine.gameState;
-      const clearPct = totalTiles > 0 ? Math.min(100, Math.round((tilesCleared / totalTiles) * 100)) : 0;
-      const scoreThreshold = waveConfigRef.current?.scoreThreshold;
-
-      if (onWaveCompleteRef.current && objectives.allObjectivesComplete && (!scoreThreshold || score >= scoreThreshold)) {
-        const timer = setTimeout(() => onWaveCompleteRef.current?.(score, wordsFound, clearPct), 2000);
-        return () => clearTimeout(timer);
-      }
-
-      const results = engine.getResults(maxComboRef.current);
-      const timer = setTimeout(() => onGameEndRef.current(results), 2000);
-      return () => clearTimeout(timer);
-    }
-
-    // Dead end (includes moves exhausted) — run Sugar Crush finale, then end game
-    if (engine.gameState.isDeadEnd) {
-      if (sugarCrushRunningRef.current) return undefined; // Sugar Crush in progress — wait
-      sugarCrushRunningRef.current = true;
-
-      let cancelled = false;
-
-      // Run Sugar Crush asynchronously, then end game
-      // Read engine from ref inside async so we always get latest state without depending on engine object
-      (async () => {
-        const eng = engineRef.current;
-        const tiles = eng.getLatestState().tileStates;
-        const steps = planSugarCrush(tiles, config.gridSize);
-
-        if (steps.length > 0) {
-          // Execute each step with staggered timing
-          for (let i = 0; i < steps.length; i++) {
-            if (cancelled) return;
-            const step = steps[i];
-            const delay = i === 0 ? step.delayMs : step.delayMs - steps[i - 1].delayMs;
-            await new Promise<void>(r => setTimeout(r, delay));
-            if (cancelled) return;
-
-            // Convert tile to special type
-            engineRef.current.setTileStates(prev => prev.map((row, ri) =>
-              row.map((tile, ci) => {
-                if (ri === step.row && ci === step.col) {
-                  return { ...tile, type: step.convertTo, hitsRemaining: 1, activationEffect: 'sugar-crush' as any };
-                }
-                return tile;
-              }),
-            ));
-
-            // Play conversion sound + screen shake for high-intensity
-            soundsRef.current.playSpecialTileSound(step.convertTo);
-            if (step.intensity === 'high' || step.convertTo === 'bomb') {
-              if (explosionShakeTimerRef.current) clearTimeout(explosionShakeTimerRef.current);
-              setExplosionShake(step.convertTo === 'bomb' ? 3 : 2);
-              explosionShakeTimerRef.current = setTimeout(() => setExplosionShake(0), 500);
-            }
-          }
-
-          // Brief pause before the chain reaction finale
-          if (!cancelled) await new Promise<void>(r => setTimeout(r, 500));
-        }
-
-        if (cancelled) return;
-
-        // End game — read latest state from ref
-        const latestEngine = engineRef.current;
-        const { score, wordsFound, tilesCleared, totalTiles } = latestEngine.gameState;
-        const clearPct = totalTiles > 0 ? Math.min(100, Math.round((tilesCleared / totalTiles) * 100)) : 0;
-        const scoreThreshold = waveConfigRef.current?.scoreThreshold;
-
-        if (onWaveCompleteRef.current && objectives.allObjectivesComplete && (!scoreThreshold || score >= scoreThreshold)) {
-          onWaveCompleteRef.current(score, wordsFound, clearPct);
-        } else {
-          const results = latestEngine.getResults(maxComboRef.current);
-          onGameEndRef.current(results);
-        }
-      })();
-
-      return () => { cancelled = true; };
-    }
-
-    return undefined;
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- engine excluded: Sugar Crush mutates tileStates which recreates engine; using engineRef instead
-  }, [
-    engine.gameState.isComplete,
-    engine.gameState.isDeadEnd,
-    objectives.allObjectivesComplete,
-    isMultiplayer,
-    config.gridSize,
-  ]);
+  // Game end detection + Sugar Crush (extracted to useBlastGameEnd)
+  useBlastGameEnd({
+    engine, isMultiplayer, gridSize: config.gridSize,
+    waveConfig, objectives, onGameEnd, onWaveComplete,
+    maxCombo: combo.maxCombo, sounds,
+    setExplosionShake, explosionShakeTimerRef,
+  });
 
   // Loading state — wait for both grid generation AND dictionary cache
   if (!engine.grid || !isDictionaryReady) {
@@ -741,7 +438,7 @@ export function BlastGame({
         <div className="flex flex-col items-center gap-3">
           <div className="w-10 h-10 border-4 border-neo-lime border-t-transparent rounded-full animate-spin" />
           <span className="text-neo-white/60 text-sm font-bold">
-            {t('blast.generating') || 'Generating grid...'}
+            {t('blast.generating')}
           </span>
         </div>
       </div>
