@@ -32,8 +32,6 @@ class MockResponse {
 // Set as global Response for tests
 global.Response = MockResponse as any;
 
-// Mock fetch globally
-global.fetch = vi.fn();
 
 // Mock the supabase module with factory function
 vi.mock('@/lib/supabase', () => ({
@@ -66,8 +64,8 @@ import { supabase } from '@/lib/supabase';
 
 describe('fetchWithAuth', () => {
   beforeEach(() => {
+    vi.stubGlobal('fetch', vi.fn());
     vi.clearAllMocks();
-    (global.fetch as jest.Mock).mockClear();
   });
 
   describe('successful requests', () => {

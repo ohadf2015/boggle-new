@@ -43,7 +43,8 @@ describe('WordHuntLifeBar enhanced features', () => {
   it('should use gradient class for fill bar', () => {
     render(<WordHuntLifeBar life={80} maxLife={100} />);
     const fill = screen.getByTestId('word-hunt-life-bar-fill');
-    expect(fill.className).toContain('gradient');
+    // Component uses Tailwind v4 bg-linear-to-r (equivalent to gradient)
+    expect(fill.className).toContain('bg-linear-to-r');
   });
 
   it('should show green gradient when life > 60%', () => {

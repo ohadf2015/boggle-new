@@ -218,6 +218,26 @@ async function handleGiftSendInner(
  * Register gift socket event handlers
  */
 export function registerGiftHandlers(io: Server, socket: Socket): void {
+  // Return how many gifts the user has sent today
+  socket.on('gift:getDailyCount', async () => {
+    const senderId = getAuthUserId(socket);
+    if (!senderId) return;
+    try {
+      const supabase = getSupabase();
+      if (!supabase) { socket.emit('gift:dailyCount', { count: 0 }); return; }
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const { count } = await supabase
+        .from('gift_history')
+        .select('id', { count: 'exact', head: true })
+        .eq('sender_id', senderId)
+        .gte('created_at', today.toISOString());
+      socket.emit('gift:dailyCount', { count: count ?? 0 });
+    } catch {
+      socket.emit('gift:dailyCount', { count: 0 });
+    }
+  });
+
   socket.on('gift:send', async (data: GiftSendParams) => {
     try {
       if (!checkRateLimit(socket.id)) {

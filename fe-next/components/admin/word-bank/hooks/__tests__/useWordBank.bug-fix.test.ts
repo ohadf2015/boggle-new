@@ -22,11 +22,9 @@ vi.mock('@supabase/ssr', () => ({
   })),
 }));
 
-// Mock fetch
-global.fetch = vi.fn();
-
 describe('useWordBank - Bug Fix: Infinite Loop and Rate Limit', () => {
   beforeEach(() => {
+    vi.stubGlobal('fetch', vi.fn());
     vi.clearAllMocks();
     (global.fetch as any).mockResolvedValue({
       ok: true,

@@ -19,7 +19,6 @@ import type { PlayerProgression } from '@/types/adventure';
 
 // Mock fetch globally
 const mockFetch = vi.fn();
-global.fetch = mockFetch;
 
 // Mock AuthContext
 vi.mock('@/contexts/AuthContext', () => ({
@@ -58,6 +57,7 @@ const wrapper = ({ children }: { children: React.ReactNode }) => (
 
 describe('ProgressionContext - Level Unlock Bug', () => {
   beforeEach(() => {
+    global.fetch = mockFetch;
     mockFetch.mockClear();
     localStorage.clear();
   });

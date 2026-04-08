@@ -13,12 +13,10 @@
 import React from 'react';
 import { renderHook, waitFor, act } from '@testing-library/react';
 import { useResultSubmission } from '../results/useResultSubmission';
-import type { WordHuntResult, GuestDailyPlayer } from '@/utils/dailyChallenge';
+import type { WordHuntResult } from '@/utils/dailyChallenge';
 import * as dailyChallengeUtils from '@/utils/dailyChallenge';
-
-// Mock fetch globally
-const mockFetch = vi.fn();
-global.fetch = mockFetch;
+import { http, HttpResponse } from 'msw';
+import { server } from '@/test/msw/server';
 
 // Mock dailyChallenge utilities
 vi.mock('@/utils/dailyChallenge', () => ({
@@ -70,24 +68,13 @@ describe('Bug Fixes - Phase 10', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    mockFetch.mockReset();
-
-    // Default: successful API responses
-    mockFetch.mockImplementation((url: string) => {
-      if (url === '/api/geolocation') {
-        return Promise.resolve({
-          ok: true,
-          json: () => Promise.resolve({ countryCode: 'US' }),
-        });
-      }
-      if (url === '/api/daily-challenge/word-hunt/submit') {
-        return Promise.resolve({
-          ok: true,
-          json: () => Promise.resolve({ success: true, data: { id: 'test-id' } }),
-        });
-      }
-      return Promise.resolve({ ok: true, json: () => Promise.resolve({}) });
-    });
+    // Register default handlers for this test suite
+    server.use(
+      http.get('*/api/geolocation*', () => HttpResponse.json({ countryCode: 'US' })),
+      http.post('*/api/daily-challenge/word-hunt/submit*', () =>
+        HttpResponse.json({ success: true, data: { id: 'test-id' } })
+      )
+    );
   });
 
   describe('BUG-002: Invalid Attempt Count Blocks Result Submission', () => {
@@ -111,6 +98,13 @@ describe('Bug Fixes - Phase 10', () => {
     it('should not mark as submitted when attempt count is zero (BUG-002)', async () => {
       // GIVEN: Result with invalid attempt count (0)
       const invalidResult = createMockResult(0);
+      let submitCalled = false;
+      server.use(
+        http.post('*/api/daily-challenge/word-hunt/submit*', () => {
+          submitCalled = true;
+          return HttpResponse.json({ success: true, data: { id: 'test-id' } });
+        })
+      );
 
       const props = {
         result: invalidResult,
@@ -135,14 +129,10 @@ describe('Bug Fixes - Phase 10', () => {
       });
 
       // THEN: Should NOT mark as submitted
-      // This test will FAIL initially (RED phase) because current code marks it as submitted
       expect(dailyChallengeUtils.markWordHuntResultSubmitted).not.toHaveBeenCalled();
 
       // AND: Should NOT submit to server
-      const submitCalls = mockFetch.mock.calls.filter(
-        (call) => call[0] === '/api/daily-challenge/word-hunt/submit'
-      );
-      expect(submitCalls).toHaveLength(0);
+      expect(submitCalled).toBe(false);
 
       // AND: Should NOT call onSubmitSuccess
       expect(mockOnSubmitSuccess).not.toHaveBeenCalled();
@@ -151,6 +141,13 @@ describe('Bug Fixes - Phase 10', () => {
     it('should not mark as submitted when attempt count is negative (BUG-002)', async () => {
       // GIVEN: Result with invalid attempt count (-1)
       const invalidResult = createMockResult(-1);
+      let submitCalled = false;
+      server.use(
+        http.post('*/api/daily-challenge/word-hunt/submit*', () => {
+          submitCalled = true;
+          return HttpResponse.json({ success: true, data: { id: 'test-id' } });
+        })
+      );
 
       const props = {
         result: invalidResult,
@@ -177,15 +174,19 @@ describe('Bug Fixes - Phase 10', () => {
       expect(dailyChallengeUtils.markWordHuntResultSubmitted).not.toHaveBeenCalled();
 
       // AND: Should NOT submit to server
-      const submitCalls = mockFetch.mock.calls.filter(
-        (call) => call[0] === '/api/daily-challenge/word-hunt/submit'
-      );
-      expect(submitCalls).toHaveLength(0);
+      expect(submitCalled).toBe(false);
     });
 
     it('should not mark as submitted when attempt count exceeds maximum (BUG-002)', async () => {
       // GIVEN: Result with invalid attempt count (11)
       const invalidResult = createMockResult(11);
+      let submitCalled = false;
+      server.use(
+        http.post('*/api/daily-challenge/word-hunt/submit*', () => {
+          submitCalled = true;
+          return HttpResponse.json({ success: true, data: { id: 'test-id' } });
+        })
+      );
 
       const props = {
         result: invalidResult,
@@ -212,15 +213,19 @@ describe('Bug Fixes - Phase 10', () => {
       expect(dailyChallengeUtils.markWordHuntResultSubmitted).not.toHaveBeenCalled();
 
       // AND: Should NOT submit to server
-      const submitCalls = mockFetch.mock.calls.filter(
-        (call) => call[0] === '/api/daily-challenge/word-hunt/submit'
-      );
-      expect(submitCalls).toHaveLength(0);
+      expect(submitCalled).toBe(false);
     });
 
     it('should mark as submitted when attempt count is valid (BUG-002 - control test)', async () => {
       // GIVEN: Result with VALID attempt count (3)
       const validResult = createMockResult(3);
+      let capturedBody: Record<string, unknown> | null = null;
+      server.use(
+        http.post('*/api/daily-challenge/word-hunt/submit*', async ({ request }) => {
+          capturedBody = await request.json() as Record<string, unknown>;
+          return HttpResponse.json({ success: true, data: { id: 'test-id' } });
+        })
+      );
 
       const props = {
         result: validResult,
@@ -246,10 +251,7 @@ describe('Bug Fixes - Phase 10', () => {
 
       // AND: Should submit to server
       await waitFor(() => {
-        expect(mockFetch).toHaveBeenCalledWith(
-          '/api/daily-challenge/word-hunt/submit',
-          expect.anything()
-        );
+        expect(capturedBody).not.toBeNull();
       }, { timeout: 3000 });
 
       // AND: Should call onSubmitSuccess
@@ -288,6 +290,13 @@ describe('Bug Fixes - Phase 10', () => {
     it('should submit for authenticated user even when guestFingerprint is NULL (BUG-005 regression)', async () => {
       // GIVEN: Authenticated user WITH profile, WITHOUT guestFingerprint
       const validResult = createMockResult(3);
+      let capturedBody: Record<string, unknown> | null = null;
+      server.use(
+        http.post('*/api/daily-challenge/word-hunt/submit*', async ({ request }) => {
+          capturedBody = await request.json() as Record<string, unknown>;
+          return HttpResponse.json({ success: true, data: { id: 'test-id' } });
+        })
+      );
 
       const props = {
         result: validResult,
@@ -308,28 +317,24 @@ describe('Bug Fixes - Phase 10', () => {
 
       // THEN: Should submit to server (authenticated users don't need guestFingerprint)
       await waitFor(() => {
-        expect(mockFetch).toHaveBeenCalledWith(
-          '/api/daily-challenge/word-hunt/submit',
-          expect.objectContaining({
-            method: 'POST',
-          })
-        );
+        expect(capturedBody).not.toBeNull();
       }, { timeout: 3000 });
 
       // AND: Submission body should use playerId, not guestFingerprint
-      const submitCall = mockFetch.mock.calls.find(
-        (call) => call[0] === '/api/daily-challenge/word-hunt/submit'
-      );
-      expect(submitCall).toBeDefined();
-      const bodyText = submitCall![1].body;
-      const body = JSON.parse(bodyText);
-      expect(body.playerId).toBe(mockProfile.id);
-      expect(body.guestFingerprint).toBeNull();
+      expect(capturedBody!.playerId).toBe(mockProfile.id);
+      expect(capturedBody!.guestFingerprint).toBeNull();
     });
 
     it('should NOT submit for guest user when guestFingerprint is null (BUG-005 control)', async () => {
       // GIVEN: Guest user WITHOUT profile AND WITHOUT guestFingerprint
       const validResult = createMockResult(3);
+      let submitCalled = false;
+      server.use(
+        http.post('*/api/daily-challenge/word-hunt/submit*', () => {
+          submitCalled = true;
+          return HttpResponse.json({ success: true, data: { id: 'test-id' } });
+        })
+      );
 
       const props = {
         result: validResult,
@@ -354,10 +359,7 @@ describe('Bug Fixes - Phase 10', () => {
       });
 
       // THEN: Should NOT submit to server (guests need guestFingerprint)
-      const submitCalls = mockFetch.mock.calls.filter(
-        (call) => call[0] === '/api/daily-challenge/word-hunt/submit'
-      );
-      expect(submitCalls).toHaveLength(0);
+      expect(submitCalled).toBe(false);
     });
   });
 

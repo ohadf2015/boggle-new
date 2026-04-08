@@ -37,13 +37,10 @@ vi.mock('@/utils/supabase/client', () => ({
 // Import after mock is set up
 import { useWikipediaCandidates } from '../hooks/useWikipediaCandidates';
 
-// Mock fetch for API calls
-global.fetch = vi.fn();
-
 describe('Admin Dashboard - Wikipedia Population Integration', () => {
   beforeEach(() => {
+    vi.stubGlobal('fetch', vi.fn());
     vi.clearAllMocks();
-    (global.fetch as vi.Mock).mockReset();
 
     // Reset Supabase mock to ensure clean state
     mockAuthGetSession.mockResolvedValue({

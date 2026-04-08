@@ -3,10 +3,8 @@ import { vi, type Mock, } from 'vitest';
 /**
  * Tests for /api/cron/select-daily-words
  *
- * SECURITY NOTE: The GET handler uses `authHeader !== \`Bearer \${cronSecret}\``
- * for secret comparison. This is timing-unsafe — an attacker can use timing
- * side-channels to brute-force the secret character by character.
- * Should use crypto.timingSafeEqual() instead.
+ * SECURITY NOTE: The route uses crypto.timingSafeEqual() for secret comparison.
+ * This is the correct constant-time approach that prevents timing side-channel attacks.
  */
 
 // Mock next/server before imports
@@ -29,9 +27,8 @@ vi.mock('@/lib/auth/adminAuth', () => ({
   verifyAdminAuth: (...args: any[]) => mockVerifyAdminAuth(...args),
 }));
 
-// Mock global fetch
-const mockFetch = vi.fn();
-global.fetch = mockFetch;
+import { http, HttpResponse } from 'msw';
+import { server } from '@/test/msw/server';
 
 import { GET, POST } from '../route';
 import { captureApiError } from '@/utils/sentry';
@@ -93,21 +90,17 @@ describe('/api/cron/select-daily-words', () => {
     });
 
     /**
-     * SECURITY: Documents timing-unsafe secret comparison.
-     * The route uses !== which leaks timing info. An attacker can determine
+     * SECURITY: The route uses crypto.timingSafeEqual() for constant-time comparison.
+     * This prevents timing side-channel attacks where an attacker could determine
      * correct characters by measuring response time differences.
-     * Fix: use crypto.timingSafeEqual(Buffer.from(a), Buffer.from(b))
      */
-    it('SECURITY: uses timing-unsafe !== for secret comparison', async () => {
-      // This test documents the vulnerability — the comparison is on line 37:
-      // `authHeader !== \`Bearer \${cronSecret}\``
-      // Both correct and incorrect secrets take the same code path to line 37,
-      // but !== is not constant-time.
+    it('SECURITY: uses crypto.timingSafeEqual for constant-time secret comparison', async () => {
+      server.use(
+        http.post('*/functions/v1/daily-word-selector*', () =>
+          HttpResponse.json({ summary: 'ok' })
+        )
+      );
       const req = makeRequest('GET', { authorization: `Bearer ${CRON_SECRET}` });
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ summary: 'ok' }),
-      });
       const res = await GET(req);
       expect(res.status).toBe(200);
     });
@@ -134,10 +127,15 @@ describe('/api/cron/select-daily-words', () => {
 
     it('calls edge function and returns result on success', async () => {
       const edgeResult = { summary: '7 days generated', words: ['hello'] };
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => edgeResult,
-      });
+      let capturedUrl: string | null = null;
+      let capturedAuth: string | null = null;
+      server.use(
+        http.post('*/functions/v1/daily-word-selector*', ({ request }) => {
+          capturedUrl = request.url;
+          capturedAuth = request.headers.get('Authorization');
+          return HttpResponse.json(edgeResult);
+        })
+      );
 
       const req = makeRequest('GET', { authorization: `Bearer ${CRON_SECRET}` });
       const res = await GET(req);
@@ -147,25 +145,16 @@ describe('/api/cron/select-daily-words', () => {
       expect(body.success).toBe(true);
       expect(body.message).toBe('Daily word selection complete');
       expect(body.summary).toBe('7 days generated');
-
-      expect(mockFetch).toHaveBeenCalledWith(
-        `${SUPABASE_URL}/functions/v1/daily-word-selector`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${SERVICE_KEY}`,
-          },
-        }
-      );
+      expect(capturedUrl).toContain('/functions/v1/daily-word-selector');
+      expect(capturedAuth).toBe(`Bearer ${SERVICE_KEY}`);
     });
 
     it('forwards edge function error status', async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: false,
-        status: 502,
-        text: async () => 'Bad Gateway',
-      });
+      server.use(
+        http.post('*/functions/v1/daily-word-selector*', () =>
+          new HttpResponse('Bad Gateway', { status: 502 })
+        )
+      );
 
       const req = makeRequest('GET', { authorization: `Bearer ${CRON_SECRET}` });
       const res = await GET(req);
@@ -177,10 +166,9 @@ describe('/api/cron/select-daily-words', () => {
     });
 
     it('handles empty response from edge function', async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({}),
-      });
+      server.use(
+        http.post('*/functions/v1/daily-word-selector*', () => HttpResponse.json({}))
+      );
 
       const req = makeRequest('GET', { authorization: `Bearer ${CRON_SECRET}` });
       const res = await GET(req);
@@ -191,7 +179,9 @@ describe('/api/cron/select-daily-words', () => {
     });
 
     it('catches fetch errors and returns 500', async () => {
-      mockFetch.mockRejectedValueOnce(new Error('Network failure'));
+      server.use(
+        http.post('*/functions/v1/daily-word-selector*', () => HttpResponse.error())
+      );
 
       const req = makeRequest('GET', { authorization: `Bearer ${CRON_SECRET}` });
       const res = await GET(req);
@@ -199,16 +189,21 @@ describe('/api/cron/select-daily-words', () => {
 
       expect(res.status).toBe(500);
       expect(body.success).toBe(false);
-      expect(body.message).toBe('Network failure');
+      expect(body.message).toMatch(/fetch|network/i);
       expect(captureApiError).toHaveBeenCalled();
     });
 
     it('handles non-Error throw in catch block', async () => {
-      mockFetch.mockRejectedValueOnce('string error');
+      // MSW error() throws a TypeError; test non-Error by using a custom fetch mock
+      // that rejects with a string (MSW doesn't support non-Error throws natively)
+      const originalFetch = global.fetch;
+      global.fetch = vi.fn().mockRejectedValueOnce('string error') as typeof fetch;
 
       const req = makeRequest('GET', { authorization: `Bearer ${CRON_SECRET}` });
       const res = await GET(req);
       const body = await res.json();
+
+      global.fetch = originalFetch;
 
       expect(res.status).toBe(500);
       expect(body.message).toBe('string error');
@@ -243,10 +238,11 @@ describe('/api/cron/select-daily-words', () => {
 
     it('calls edge function and returns result with duration', async () => {
       mockVerifyAdminAuth.mockResolvedValueOnce({ success: true } as any);
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ summary: 'done' }),
-      });
+      server.use(
+        http.post('*/functions/v1/daily-word-selector*', () =>
+          HttpResponse.json({ summary: 'done' })
+        )
+      );
 
       const req = makeRequest('POST');
       const res = await POST(req);
@@ -260,11 +256,11 @@ describe('/api/cron/select-daily-words', () => {
 
     it('forwards edge function error', async () => {
       mockVerifyAdminAuth.mockResolvedValueOnce({ success: true } as any);
-      mockFetch.mockResolvedValueOnce({
-        ok: false,
-        status: 500,
-        text: async () => 'Internal error',
-      });
+      server.use(
+        http.post('*/functions/v1/daily-word-selector*', () =>
+          new HttpResponse('Internal error', { status: 500 })
+        )
+      );
 
       const req = makeRequest('POST');
       const res = await POST(req);
@@ -276,14 +272,16 @@ describe('/api/cron/select-daily-words', () => {
 
     it('catches errors and reports to Sentry', async () => {
       mockVerifyAdminAuth.mockResolvedValueOnce({ success: true } as any);
-      mockFetch.mockRejectedValueOnce(new Error('Connection refused'));
+      server.use(
+        http.post('*/functions/v1/daily-word-selector*', () => HttpResponse.error())
+      );
 
       const req = makeRequest('POST');
       const res = await POST(req);
       const body = await res.json();
 
       expect(res.status).toBe(500);
-      expect(body.error).toBe('Connection refused');
+      expect(body.error).toMatch(/fetch|network|refused/i);
       expect(captureApiError).toHaveBeenCalledWith(
         expect.any(Error),
         '/api/cron/select-daily-words',

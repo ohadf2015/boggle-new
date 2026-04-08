@@ -13,6 +13,19 @@ import { render, screen } from '@testing-library/react';
 // Mocks
 // ---------------------------------------------------------------------------
 
+// Mock next/dynamic to render mocked components synchronously in tests
+vi.mock('next/dynamic', () => ({
+  __esModule: true,
+  default: (importFn: () => Promise<any>, _opts?: any) => {
+    let Comp: any = null;
+    const promise = importFn();
+    promise.then((mod: any) => { Comp = mod.default ?? mod; });
+    const Wrapper = (props: any) => (Comp ? Comp(props) : null);
+    Wrapper.displayName = 'DynamicWrapper';
+    return Wrapper;
+  },
+}));
+
 vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({ profile: { total_games: 5 } }),
 }));

@@ -24,8 +24,6 @@ function createWrapper() {
   };
 }
 
-// Mock fetch
-global.fetch = vi.fn();
 
 // Mock useAuth
 vi.mock('@/contexts/AuthContext', () => ({
@@ -36,6 +34,7 @@ vi.mock('@/contexts/AuthContext', () => ({
 
 describe('useUnclaimedGifts - Refresh Overwrite Bug', () => {
   beforeEach(() => {
+    vi.stubGlobal('fetch', vi.fn());
     vi.clearAllMocks();
     localStorage.clear();
   });

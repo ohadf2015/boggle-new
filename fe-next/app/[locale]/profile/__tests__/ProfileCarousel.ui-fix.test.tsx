@@ -125,13 +125,14 @@ vi.mock('@/utils/supabase/client', () => ({
 
 import ProfilePageClient from '../PageClient';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { NuqsTestingAdapter } from 'nuqs/adapters/testing';
 
 
 const createWrapper = () => {
   const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   // eslint-disable-next-line react/display-name
   return ({ children }: { children: React.ReactNode }) => (
-    <QueryClientProvider client={qc}>{children}</QueryClientProvider>
+    <NuqsTestingAdapter><QueryClientProvider client={qc}>{children}</QueryClientProvider></NuqsTestingAdapter>
   );
 };
 

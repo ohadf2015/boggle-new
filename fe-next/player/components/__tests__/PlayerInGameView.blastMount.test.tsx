@@ -12,6 +12,29 @@ import { render, screen } from '@testing-library/react';
 // Mocks
 // ---------------------------------------------------------------------------
 
+// Mock next/dynamic: resolve module synchronously using vi.importActual-style trick.
+// We can't use async React.lazy because tests don't use waitFor.
+// Instead, return a no-op placeholder — the important behavior (BlastGame props)
+// is tested via capturedBlastGameProps which is set in the BlastGame mock render.
+vi.mock('next/dynamic', () => ({
+  __esModule: true,
+  default: (importFn: () => Promise<any>, _opts?: any) => {
+    // Run the import synchronously so the mocked module is available immediately
+    let Comp: any = null;
+    const promise = importFn();
+    // Promise.resolve chaining - in vitest the mock module resolves in microtask queue
+    // We force synchronous resolution via the module registry
+    promise.then((mod: any) => {
+      Comp = mod.default ?? mod;
+    });
+    // Return a component that renders Comp if resolved, otherwise nothing
+    // Testing-library's render() flushes microtasks via act(), so Comp will be set
+    const Wrapper = (props: any) => (Comp ? Comp(props) : null);
+    Wrapper.displayName = 'DynamicWrapper';
+    return Wrapper;
+  },
+}));
+
 vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({ profile: { total_games: 5 } }),
 }));

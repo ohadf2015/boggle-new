@@ -130,13 +130,11 @@ const createMockAllTimeParticipant = (overrides: Partial<AllTimeParticipant> = {
   ...overrides,
 });
 
-// Mock fetch for API calls
-global.fetch = vi.fn();
-
 describe('TabbedDailyLeaderboard', () => {
   const mockT = (key: string) => key;
 
   beforeEach(() => {
+    vi.stubGlobal('fetch', vi.fn());
     vi.clearAllMocks();
     (global.fetch as jest.Mock).mockImplementation((url: string) => {
       if (url.includes('/word-hunt/leaderboard')) {

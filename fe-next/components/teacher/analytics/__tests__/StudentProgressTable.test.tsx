@@ -146,8 +146,8 @@ describe('StudentProgressTable', () => {
     const rows1 = screen.getAllByRole('row');
     expect(rows1[1]).toHaveTextContent('Charlie'); // 300 XP
 
-    // Click XP header to toggle to ASC
-    const xpHeader = screen.getByText('XP');
+    // Click XP header to toggle to ASC (may have sort indicator appended)
+    const xpHeader = screen.getByText(/^XP/);
     fireEvent.click(xpHeader);
 
     // THEN

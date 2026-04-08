@@ -15,8 +15,8 @@ import {
 import { DEFAULT_INTENSITY } from '../constants';
 
 // Mock fetch with proper typing
-const mockFetch = vi.fn<() => Promise<Partial<Response>>>();
-global.fetch = mockFetch as typeof fetch;
+import { http, HttpResponse } from 'msw';
+import { server } from '@/test/msw/server';
 
 describe('createDDAEvent', () => {
   it('should create event with all required fields', () => {
@@ -137,12 +137,14 @@ describe('createDDAAnalyticsPayload', () => {
 });
 
 describe('logDDAEvent', () => {
-  beforeEach(() => {
-    mockFetch.mockClear();
-  });
-
   it('should POST event to analytics endpoint', async () => {
-    mockFetch.mockResolvedValueOnce({ ok: true });
+    let capturedMethod: string | null = null;
+    server.use(
+      http.post('*/api/analytics/log-session*', ({ request }) => {
+        capturedMethod = request.method;
+        return HttpResponse.json({ ok: true });
+      })
+    );
 
     const event: DDAAnalyticsEvent = {
       sessionId: 'session-123',
@@ -162,17 +164,13 @@ describe('logDDAEvent', () => {
     const result = await logDDAEvent(event);
 
     expect(result).toBe(true);
-    expect(mockFetch).toHaveBeenCalledWith(
-      '/api/analytics/log-session',
-      expect.objectContaining({
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-      })
-    );
+    expect(capturedMethod).toBe('POST');
   });
 
   it('should return false on fetch error', async () => {
-    mockFetch.mockRejectedValueOnce(new Error('Network error'));
+    server.use(
+      http.post('*/api/analytics/log-session*', () => HttpResponse.error())
+    );
 
     const event: DDAAnalyticsEvent = {
       sessionId: 'session-123',
@@ -195,7 +193,9 @@ describe('logDDAEvent', () => {
   });
 
   it('should return false on non-OK response', async () => {
-    mockFetch.mockResolvedValueOnce({ ok: false, status: 500 });
+    server.use(
+      http.post('*/api/analytics/log-session*', () => new HttpResponse(null, { status: 500 }))
+    );
 
     const event: DDAAnalyticsEvent = {
       sessionId: 'session-123',
@@ -218,7 +218,13 @@ describe('logDDAEvent', () => {
   });
 
   it('should include all DDA fields in request body', async () => {
-    mockFetch.mockResolvedValueOnce({ ok: true });
+    let capturedBody: Record<string, unknown> | null = null;
+    server.use(
+      http.post('*/api/analytics/log-session*', async ({ request }) => {
+        capturedBody = await request.json() as Record<string, unknown>;
+        return HttpResponse.json({ ok: true });
+      })
+    );
 
     const event: DDAAnalyticsEvent = {
       sessionId: 'session-789',
@@ -243,16 +249,14 @@ describe('logDDAEvent', () => {
 
     await logDDAEvent(event);
 
-    const [, options] = mockFetch.mock.calls[0] as unknown as [string, RequestInit];
-    const body = JSON.parse(options.body as string);
-
-    expect(body.ddaFlowState).toBe('flow');
-    expect(body.ddaWordsPerMinute).toBe(5.5);
-    expect(body.ddaSuccessRate).toBe(0.82);
-    expect(body.ddaComboMaintenance).toBe(3.5);
-    expect(body.ddaTimeInFlow).toBe(120);
-    expect(body.ddaIsBossBattle).toBe(true);
-    expect(body.ddaAdjustmentTrigger).toBe('session_end');
+    expect(capturedBody).not.toBeNull();
+    expect(capturedBody!.ddaFlowState).toBe('flow');
+    expect(capturedBody!.ddaWordsPerMinute).toBe(5.5);
+    expect(capturedBody!.ddaSuccessRate).toBe(0.82);
+    expect(capturedBody!.ddaComboMaintenance).toBe(3.5);
+    expect(capturedBody!.ddaTimeInFlow).toBe(120);
+    expect(capturedBody!.ddaIsBossBattle).toBe(true);
+    expect(capturedBody!.ddaAdjustmentTrigger).toBe('session_end');
   });
 });
 

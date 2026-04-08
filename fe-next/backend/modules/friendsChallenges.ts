@@ -63,6 +63,7 @@ export async function sendChallenge(
         message: challengeData.message,
         game_mode: challengeData.gameSettings?.mode,
         game_language: challengeData.gameSettings?.language,
+        timer_seconds: challengeData.gameSettings?.timerSeconds,
       })
       .select()
       .single();

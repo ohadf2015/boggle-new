@@ -10,13 +10,11 @@ import React from 'react';
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useAdventureHints } from '../useAdventureHints';
+import { http, HttpResponse } from 'msw';
+import { server } from '@/test/msw/server';
 
 let queryClient: QueryClient;
 let wrapper: ({ children }: { children: React.ReactNode }) => React.ReactElement;
-
-// Mock fetch globally
-const mockFetch = vi.fn();
-global.fetch = mockFetch;
 
 // Test grid (4x4)
 const testGrid = [
@@ -43,10 +41,11 @@ describe('useAdventureHints', () => {
       React.createElement(QueryClientProvider, { client: queryClient }, children);
     vi.clearAllMocks();
     vi.useFakeTimers();
-    mockFetch.mockResolvedValue({
-      ok: true,
-      json: async () => mockSolveResponse,
-    });
+
+    // Default handler: returns mockSolveResponse
+    server.use(
+      http.post('*/api/solve-grid*', () => HttpResponse.json(mockSolveResponse))
+    );
   });
 
   afterEach(() => {
@@ -55,8 +54,17 @@ describe('useAdventureHints', () => {
 
   describe('Initialization', () => {
     it('should fetch valid words on mount', async () => {
-      // GIVEN
-      const { result } = renderHook(() =>
+      // GIVEN — capture request body via closure
+      let capturedBody: Record<string, unknown> | null = null;
+      server.use(
+        http.post('*/api/solve-grid*', async ({ request }) => {
+          capturedBody = await request.json() as Record<string, unknown>;
+          return HttpResponse.json(mockSolveResponse);
+        })
+      );
+
+      // WHEN
+      renderHook(() =>
         useAdventureHints({
           grid: testGrid,
           language: 'en',
@@ -67,17 +75,17 @@ describe('useAdventureHints', () => {
 
       // THEN
       await waitFor(() => {
-        expect(mockFetch).toHaveBeenCalledWith('/api/solve-grid', expect.objectContaining({
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ grid: testGrid, language: 'en' }),
-        }));
+        expect(capturedBody).not.toBeNull();
       });
+      expect(capturedBody!.grid).toEqual(testGrid);
+      expect(capturedBody!.language).toBe('en');
     });
 
     it('should set isLoading to true initially', () => {
-      // GIVEN
-      mockFetch.mockImplementation(() => new Promise(() => {})); // Never resolves
+      // GIVEN — handler that never resolves
+      server.use(
+        http.post('*/api/solve-grid*', () => new Promise(() => {}))
+      );
 
       // WHEN
       const { result } = renderHook(() =>
@@ -460,8 +468,10 @@ describe('useAdventureHints', () => {
 
   describe('Error Handling', () => {
     it('should handle API errors gracefully', async () => {
-      // GIVEN
-      mockFetch.mockRejectedValueOnce(new Error('Network error'));
+      // GIVEN - network error
+      server.use(
+        http.post('*/api/solve-grid*', () => HttpResponse.error())
+      );
 
       const { result } = renderHook(() =>
         useAdventureHints({
@@ -481,11 +491,12 @@ describe('useAdventureHints', () => {
     });
 
     it('should handle invalid API response gracefully', async () => {
-      // GIVEN
-      mockFetch.mockResolvedValueOnce({
-        ok: false,
-        json: async () => ({ success: false, error: 'Server error' }),
-      });
+      // GIVEN - non-ok HTTP response
+      server.use(
+        http.post('*/api/solve-grid*', () =>
+          new HttpResponse(JSON.stringify({ success: false, error: 'Server error' }), { status: 500 })
+        )
+      );
 
       const { result } = renderHook(() =>
         useAdventureHints({

@@ -52,5 +52,11 @@ Sentry.init({
     /\[AI_SERVICE\].*AI validation failed/i,
     /\[AI_SERVICE\].*attempt.*failed.*retrying/i,
     /\[AI_SERVICE\].*failed after.*attempts/i,
+    // Bot requests hitting [locale] route with invalid params (e.g. /.rss/blog/...)
+    /Incorrect locale information provided/i,
+    // Race condition on duplicate word submit — non-critical
+    /Error inserting player word/i,
+    // Transient API failure for non-critical stat
+    /Word Hunt leaderboard count error/i,
   ],
 });

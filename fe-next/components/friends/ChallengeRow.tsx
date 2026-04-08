@@ -1,8 +1,7 @@
 'use client';
 
-import React from 'react';
-import Link from 'next/link';
-import { Target } from 'lucide-react';
+import React, { useState } from 'react';
+import { Target, Check, X, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Avatar from '@/components/Avatar';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -11,30 +10,45 @@ import type { FriendChallenge } from '@/utils/friends';
 interface ChallengeRowProps {
   challenge: FriendChallenge;
   isDark: boolean;
+  onAccept: (challengeId: string) => Promise<void>;
+  onDecline: (challengeId: string) => Promise<void>;
 }
 
 /**
- * ChallengeRow - Challenge invitation item
- *
- * Features:
- * - Challenger avatar and username
- * - Challenge message or default text
- * - Click to join challenge
- * - Target icon indicator
+ * ChallengeRow - Challenge invitation with Accept/Decline actions
  */
 export const ChallengeRow: React.FC<ChallengeRowProps> = ({
   challenge,
   isDark,
+  onAccept,
+  onDecline,
 }) => {
-  const { t, language } = useLanguage();
+  const { t } = useLanguage();
+  const [loading, setLoading] = useState<'accept' | 'decline' | null>(null);
+
+  const handleAccept = async () => {
+    setLoading('accept');
+    try {
+      await onAccept(challenge.challengeId);
+    } finally {
+      setLoading(null);
+    }
+  };
+
+  const handleDecline = async () => {
+    setLoading('decline');
+    try {
+      await onDecline(challenge.challengeId);
+    } finally {
+      setLoading(null);
+    }
+  };
 
   return (
-    <Link
-      href={`/${language}/challenge/${challenge.challengeCode}`}
+    <div
       className={cn(
-        'flex items-center gap-3 p-2 rounded-neo border-2 border-neo-black shadow-hard-sm transition-all',
-        'hover:shadow-hard hover:-translate-y-0.5',
-        isDark ? 'bg-black/20 hover:bg-black/40' : 'bg-white/50 hover:bg-white/80'
+        'flex items-center gap-3 p-2 rounded-neo border-2 border-neo-black shadow-hard-sm',
+        isDark ? 'bg-black/20' : 'bg-white/50'
       )}
     >
       <Avatar
@@ -50,8 +64,38 @@ export const ChallengeRow: React.FC<ChallengeRowProps> = ({
           {challenge.message || t('friends.challenges.defaultMessage')}
         </p>
       </div>
+      <div className="flex items-center gap-1.5">
+        {/* Accept */}
+        <button
+          data-testid={`accept-challenge-${challenge.challengeId}`}
+          onClick={handleAccept}
+          disabled={loading !== null}
+          className={cn(
+            'w-8 h-8 flex items-center justify-center border-2 border-neo-black rounded-neo shadow-hard-sm transition-all',
+            'bg-neo-lime text-neo-black hover:shadow-hard active:shadow-hard-pressed active:translate-y-0.5',
+            loading !== null && 'opacity-50 cursor-not-allowed'
+          )}
+          aria-label={t('friends.challenges.accept', 'Accept')}
+        >
+          {loading === 'accept' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+        </button>
+        {/* Decline */}
+        <button
+          data-testid={`decline-challenge-${challenge.challengeId}`}
+          onClick={handleDecline}
+          disabled={loading !== null}
+          className={cn(
+            'w-8 h-8 flex items-center justify-center border-2 border-neo-black rounded-neo shadow-hard-sm transition-all',
+            'bg-neo-red text-white hover:shadow-hard active:shadow-hard-pressed active:translate-y-0.5',
+            loading !== null && 'opacity-50 cursor-not-allowed'
+          )}
+          aria-label={t('friends.challenges.decline', 'Decline')}
+        >
+          {loading === 'decline' ? <Loader2 className="w-4 h-4 animate-spin" /> : <X className="w-4 h-4" />}
+        </button>
+      </div>
       <Target className="w-5 h-5 text-neo-lime" />
-    </Link>
+    </div>
   );
 };
 

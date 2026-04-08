@@ -9,17 +9,18 @@ import { vi, type Mock, } from 'vitest';
  */
 
 
-const createWrapper = () => {
-  const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
-  const Wrapper = ({ children }: { children: React.ReactNode }) => (
-    <QueryClientProvider client={qc}>{children}</QueryClientProvider>
-  );
-  return Wrapper;
-};
-
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import { NuqsTestingAdapter } from 'nuqs/adapters/testing';
+
+const createWrapper = () => {
+  const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  const Wrapper = ({ children }: { children: React.ReactNode }) => (
+    <NuqsTestingAdapter><QueryClientProvider client={qc}>{children}</QueryClientProvider></NuqsTestingAdapter>
+  );
+  return Wrapper;
+};
 
 // Mock dependencies
 let mockLanguageData = {

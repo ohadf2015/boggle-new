@@ -401,7 +401,10 @@ export function useSurvivalGameLogic({
     hintActions.buyNextHint(state.clueTokens, setClueTokens);
   }, [hintActions, state.clueTokens, hintState.nextHintItem, adjustTokens]);
 
-  // Auto-Unlock Effect: Check periodically or on token change
+  // Track the token count that last triggered an auto-unlock to prevent cascading
+  const lastAutoUnlockTokensRef = useRef<number | null>(null);
+
+  // Auto-Unlock Effect: fires when tokens increase from word discovery
   useEffect(() => {
     const nextItem = hintState.nextHintItem;
 
@@ -410,14 +413,22 @@ export function useSurvivalGameLogic({
       return undefined;
     }
 
+    // Prevent cascading: if tokens decreased (from a previous auto-unlock), skip.
+    // Only auto-unlock when tokens increase from an external source (word discovery).
+    if (lastAutoUnlockTokensRef.current !== null && state.clueTokens <= lastAutoUnlockTokensRef.current) {
+      return undefined;
+    }
+
     // Mark this hint as pending unlock to prevent race conditions
     pendingUnlockRef.current = nextItem.id;
 
     // Auto-unlock with a small delay for smooth UX
     const timer = setTimeout(() => {
+      lastAutoUnlockTokensRef.current = state.clueTokens;
       buyNextHint();
       showAutoClueNotification(nextItem.id);
-      // Clear pending after unlock completes
+      // Keep pendingUnlockRef set to prevent immediate re-trigger;
+      // it will be bypassed when tokens next increase above current level
       pendingUnlockRef.current = null;
     }, 500);
 

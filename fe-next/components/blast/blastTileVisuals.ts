@@ -8,11 +8,6 @@ import type { BlastTileType } from './types';
 export const TILE_VISUALS: Record<BlastTileType, { bg: string; indicator?: string; text?: string; style?: React.CSSProperties }> = {
   standard: {
     bg: '', text: 'text-neo-navy',
-    style: {
-      background: 'linear-gradient(165deg, #ffffff 0%, #fafaf9 40%, #f5f5f3 100%)',
-      boxShadow: '2px 2px 0px rgba(0,0,0,0.85)',
-      border: '2px solid rgba(0,0,0,0.4)',
-    },
   },
   gold: {
     bg: '', indicator: '✦', text: 'text-neo-navy',

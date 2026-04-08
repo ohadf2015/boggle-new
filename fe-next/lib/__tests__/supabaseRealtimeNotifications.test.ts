@@ -12,9 +12,8 @@ vi.mock('@/utils/supabase/client', () => ({
   createClient: vi.fn(),
 }));
 
-// Mock fetch for API calls
-const mockFetch = vi.fn();
-global.fetch = mockFetch;
+import { http, HttpResponse } from 'msw';
+import { server } from '@/test/msw/server';
 
 describe('supabaseRealtimeNotifications', () => {
   let mockChannel: {
@@ -183,14 +182,17 @@ describe('supabaseRealtimeNotifications', () => {
   describe('fetchNotifications', () => {
     it('should fetch notifications from API', async () => {
       // GIVEN: API returns notifications
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve({
-          notifications: [{ id: '1', title: 'Test' }],
-          unreadCount: 1,
-          pagination: { total: 1 },
-        }),
-      });
+      let capturedUrl: string | null = null;
+      server.use(
+        http.get('*/api/player/notifications*', ({ request }) => {
+          capturedUrl = request.url;
+          return HttpResponse.json({
+            notifications: [{ id: '1', title: 'Test' }],
+            unreadCount: 1,
+            pagination: { total: 1 },
+          });
+        })
+      );
 
       // WHEN: Fetching notifications
       const result = await fetchNotifications({ limit: 10 });
@@ -198,13 +200,15 @@ describe('supabaseRealtimeNotifications', () => {
       // THEN: Should return notifications
       expect(result.notifications).toHaveLength(1);
       expect(result.unreadCount).toBe(1);
-      expect(mockFetch).toHaveBeenCalledWith('/api/player/notifications?limit=10');
+      expect(capturedUrl).toMatch(/\/api\/player\/notifications\?.*limit=10/);
     });
 
     it('should return empty result on fetch error', async () => {
       // GIVEN: API fails
       const errorSpy = vi.spyOn(console, 'error').mockImplementation();
-      mockFetch.mockRejectedValueOnce(new Error('Network error'));
+      server.use(
+        http.get('*/api/player/notifications*', () => HttpResponse.error())
+      );
 
       // WHEN: Fetching notifications
       const result = await fetchNotifications();
@@ -212,7 +216,7 @@ describe('supabaseRealtimeNotifications', () => {
       // THEN: Should return empty result and log error
       expect(result.notifications).toEqual([]);
       expect(result.unreadCount).toBe(0);
-      expect(errorSpy).toHaveBeenCalledWith('Error fetching notifications:', 'Network error');
+      expect(errorSpy).toHaveBeenCalledWith('Error fetching notifications:', expect.any(String));
 
       errorSpy.mockRestore();
     });
@@ -220,10 +224,9 @@ describe('supabaseRealtimeNotifications', () => {
     it('should handle non-ok response', async () => {
       // GIVEN: API returns error status
       const errorSpy = vi.spyOn(console, 'error').mockImplementation();
-      mockFetch.mockResolvedValueOnce({
-        ok: false,
-        status: 500,
-      });
+      server.use(
+        http.get('*/api/player/notifications*', () => new HttpResponse(null, { status: 500 }))
+      );
 
       // WHEN: Fetching notifications
       const result = await fetchNotifications();

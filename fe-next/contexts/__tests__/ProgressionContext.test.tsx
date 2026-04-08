@@ -16,7 +16,6 @@ import type { PlayerProgression, LevelCompletion } from '@/types/adventure';
 
 // Mock fetch globally
 const mockFetch = vi.fn();
-global.fetch = mockFetch;
 
 // Mock attempts response
 const mockAttemptsResponse = {
@@ -89,6 +88,7 @@ function createFetchMock(progressionResponse: object | null) {
 
 describe('ProgressionContext', () => {
   beforeEach(() => {
+    global.fetch = mockFetch;
     mockFetch.mockClear();
     mockAuthUser = { id: 'test-user-123' };
     localStorage.clear();

@@ -33,7 +33,6 @@ vi.mock('@/contexts/AuthContext', () => ({
 
 // Mock fetch
 const mockFetch = vi.fn();
-global.fetch = mockFetch;
 
 // Mock localStorage
 const mockLocalStorage = {
@@ -83,6 +82,7 @@ describe('useUnclaimedGifts', () => {
   };
 
   beforeEach(() => {
+    vi.stubGlobal('fetch', mockFetch);
     vi.clearAllMocks();
     mockIsAuthenticated.mockReturnValue(true);
     mockLocalStorage.getItem.mockReturnValue(null);

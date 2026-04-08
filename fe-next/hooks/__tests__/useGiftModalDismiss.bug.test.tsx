@@ -28,6 +28,7 @@ describe('Gift Modal Dismissal Persistence Bug', () => {
   beforeEach(() => {
     // Don't call vi.clearAllMocks() - it clears mock implementations too
     // Just clear the specific mocks we need
+    vi.stubGlobal('fetch', vi.fn());
     (global.fetch as any).mockReset();
     localStorage.clear();
     sessionStorage.clear();

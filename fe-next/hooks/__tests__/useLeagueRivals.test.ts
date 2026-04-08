@@ -8,10 +8,10 @@ import { useLeagueRivals } from '../useLeagueRivals';
 
 // Mock fetch
 const mockFetch = vi.fn();
-global.fetch = mockFetch;
 
 describe('useLeagueRivals', () => {
   beforeEach(() => {
+    vi.stubGlobal('fetch', mockFetch);
     vi.clearAllMocks();
   });
 

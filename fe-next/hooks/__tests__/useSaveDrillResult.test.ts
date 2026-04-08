@@ -8,11 +8,9 @@ import { vi } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { useSaveDrillResult } from '../useSaveDrillResult';
 
-// Mock fetch
-global.fetch = vi.fn();
-
 describe('useSaveDrillResult', () => {
   beforeEach(() => {
+    vi.stubGlobal('fetch', vi.fn());
     vi.clearAllMocks();
     (global.fetch as any).mockReset();
   });

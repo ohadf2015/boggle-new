@@ -203,6 +203,21 @@ export function useBlastEngine(
   // ── Dead-end detection ──
   const wordsFoundCount = gameState.wordsFound.length;
 
+  // Locked tile types that can't be used for word formation until thawed
+  const LOCKED_TYPES = new Set(['ice', 'frozen']);
+
+  /** Build grid masking cleared AND locked (ice/frozen unthawed) tiles as empty */
+  const buildDeadEndGrid = (grid: LetterGrid, tiles: BlastTileState[][]) =>
+    grid.map((row, ri) =>
+      row.map((cell, ci) => {
+        const t = tiles[ri]?.[ci];
+        if (!t || t.isCleared) return '';
+        // Ice/frozen tiles that haven't been thawed can't be selected
+        if (LOCKED_TYPES.has(t.type) && !t.isThawed) return '';
+        return cell;
+      }),
+    );
+
   useEffect(() => {
     if (!isDictLoaded || !effectiveGrid) return;
     if (gameState.isComplete || gameState.isDeadEnd) return;
@@ -211,9 +226,7 @@ export function useBlastEngine(
     if (wordsFoundCount === 0) {
       const initialTimer = setTimeout(() => {
         if (!effectiveGrid || !isDictLoaded) return;
-        const displayGrid = effectiveGrid.map((row, ri) =>
-          row.map((cell, ci) => tileStates[ri]?.[ci]?.isCleared ? '' : cell),
-        );
+        const displayGrid = buildDeadEndGrid(effectiveGrid, tileStates);
         const foundSet = new Set<string>();
         const valid = hasValidWords(displayGrid, language, checkWordInDict, foundSet, options?.minWordLength ?? 2);
         setNoWordsRemaining(!valid);
@@ -221,10 +234,8 @@ export function useBlastEngine(
       return () => clearTimeout(initialTimer);
     }
 
-    // Build display grid (hide cleared tiles)
-    const displayGrid = effectiveGrid.map((row, ri) =>
-      row.map((cell, ci) => tileStates[ri]?.[ci]?.isCleared ? '' : cell),
-    );
+    // Build display grid (hide cleared + locked tiles)
+    const displayGrid = buildDeadEndGrid(effectiveGrid, tileStates);
 
     const timer = setTimeout(() => {
       const run = () => {

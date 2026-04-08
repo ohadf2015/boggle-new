@@ -8,10 +8,8 @@ import React from 'react';
 import { renderHook, act } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useWordPackBuilder } from '../useWordPackBuilder';
-
-// Mock fetch globally
-const mockFetch = vi.fn();
-global.fetch = mockFetch;
+import { http, HttpResponse } from 'msw';
+import { server } from '@/test/msw/server';
 
 function createWrapper() {
   const queryClient = new QueryClient({
@@ -22,8 +20,23 @@ function createWrapper() {
   };
 }
 
+// Known-valid words for tests
+const VALID_WORDS = new Set(['APPLE', 'CAT', 'DOG', 'WORD0', 'WORD1', 'WORD2', 'WORD3', 'WORD4', 'WORD5', 'WORD6', 'WORD7', 'WORD8', 'WORD9']);
+
 beforeEach(() => {
-  mockFetch.mockReset();
+  vi.clearAllMocks();
+
+  // Default handlers
+  server.use(
+    http.post('*/api/ugc/packs/validate*', async ({ request }) => {
+      const body = await request.json() as { word: string };
+      const valid = VALID_WORDS.has(body.word.toUpperCase());
+      return HttpResponse.json({ valid });
+    }),
+    http.post('*/api/ugc/packs', () =>
+      HttpResponse.json({ id: 'pack-123' })
+    )
+  );
 });
 
 describe('useWordPackBuilder — initial state', () => {
@@ -102,11 +115,6 @@ describe('useWordPackBuilder — setters', () => {
 
 describe('useWordPackBuilder — addWord', () => {
   it('adds a valid word to the words array', async () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ valid: true }),
-    });
-
     const { result } = renderHook(() => useWordPackBuilder(), { wrapper: createWrapper() });
 
     let validation: { word: string; valid: boolean; duplicate: boolean } | undefined;
@@ -120,11 +128,7 @@ describe('useWordPackBuilder — addWord', () => {
   });
 
   it('does not add an invalid word', async () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ valid: false }),
-    });
-
+    // ZZZZQ is not in VALID_WORDS so MSW returns valid: false
     const { result } = renderHook(() => useWordPackBuilder(), { wrapper: createWrapper() });
 
     let validation: { word: string; valid: boolean; duplicate: boolean } | undefined;
@@ -137,11 +141,6 @@ describe('useWordPackBuilder — addWord', () => {
   });
 
   it('rejects duplicate words', async () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ valid: true }),
-    });
-
     const { result } = renderHook(() => useWordPackBuilder(), { wrapper: createWrapper() });
 
     // Add the word once
@@ -160,11 +159,6 @@ describe('useWordPackBuilder — addWord', () => {
   });
 
   it('uppercases the word before adding', async () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ valid: true }),
-    });
-
     const { result } = renderHook(() => useWordPackBuilder(), { wrapper: createWrapper() });
 
     await act(async () => {
@@ -177,11 +171,6 @@ describe('useWordPackBuilder — addWord', () => {
 
 describe('useWordPackBuilder — removeWord', () => {
   it('removes a word from the words array', async () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ valid: true }),
-    });
-
     const { result } = renderHook(() => useWordPackBuilder(), { wrapper: createWrapper() });
 
     await act(async () => {
@@ -203,11 +192,7 @@ describe('useWordPackBuilder — removeWord', () => {
 
 describe('useWordPackBuilder — bulkAddWords', () => {
   it('splits text by newlines and adds valid words', async () => {
-    mockFetch
-      .mockResolvedValueOnce({ ok: true, json: async () => ({ valid: true }) })
-      .mockResolvedValueOnce({ ok: true, json: async () => ({ valid: true }) })
-      .mockResolvedValueOnce({ ok: true, json: async () => ({ valid: false }) });
-
+    // CAT and DOG are valid, ZZZ is not
     const { result } = renderHook(() => useWordPackBuilder(), { wrapper: createWrapper() });
 
     let validations: { word: string; valid: boolean; duplicate: boolean }[] = [];
@@ -222,10 +207,6 @@ describe('useWordPackBuilder — bulkAddWords', () => {
   });
 
   it('skips empty lines', async () => {
-    mockFetch
-      .mockResolvedValueOnce({ ok: true, json: async () => ({ valid: true }) })
-      .mockResolvedValueOnce({ ok: true, json: async () => ({ valid: true }) });
-
     const { result } = renderHook(() => useWordPackBuilder(), { wrapper: createWrapper() });
 
     await act(async () => {
@@ -233,17 +214,12 @@ describe('useWordPackBuilder — bulkAddWords', () => {
     });
 
     // Only 2 non-empty words → 2 fetch calls max
-    // DOG also gets validated
     expect(result.current.words.length).toBeGreaterThanOrEqual(1);
   });
 });
 
 describe('useWordPackBuilder — canPublish', () => {
   it('is false when name is empty even with 10+ words', async () => {
-    for (let i = 0; i < 10; i++) {
-      mockFetch.mockResolvedValueOnce({ ok: true, json: async () => ({ valid: true }) });
-    }
-
     const { result } = renderHook(() => useWordPackBuilder(), { wrapper: createWrapper() });
 
     for (let i = 0; i < 10; i++) {
@@ -256,8 +232,6 @@ describe('useWordPackBuilder — canPublish', () => {
   });
 
   it('is false when name is set but fewer than 10 words', async () => {
-    mockFetch.mockResolvedValueOnce({ ok: true, json: async () => ({ valid: true }) });
-
     const { result } = renderHook(() => useWordPackBuilder(), { wrapper: createWrapper() });
 
     act(() => { result.current.setName('My Pack'); });
@@ -270,10 +244,6 @@ describe('useWordPackBuilder — canPublish', () => {
   });
 
   it('is true when name is set and 10+ words added', async () => {
-    for (let i = 0; i < 10; i++) {
-      mockFetch.mockResolvedValueOnce({ ok: true, json: async () => ({ valid: true }) });
-    }
-
     const { result } = renderHook(() => useWordPackBuilder(), { wrapper: createWrapper() });
 
     act(() => { result.current.setName('My Pack'); });
@@ -290,13 +260,13 @@ describe('useWordPackBuilder — canPublish', () => {
 
 describe('useWordPackBuilder — publishPack', () => {
   it('calls POST /api/ugc/packs and sets publishedPackId on success', async () => {
-    for (let i = 0; i < 10; i++) {
-      mockFetch.mockResolvedValueOnce({ ok: true, json: async () => ({ valid: true }) });
-    }
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ id: 'pack-123' }),
-    });
+    let capturedPublishBody: Record<string, unknown> | null = null;
+    server.use(
+      http.post('*/api/ugc/packs', async ({ request }) => {
+        capturedPublishBody = await request.json() as Record<string, unknown>;
+        return HttpResponse.json({ id: 'pack-123' });
+      })
+    );
 
     const { result } = renderHook(() => useWordPackBuilder(), { wrapper: createWrapper() });
 
@@ -318,13 +288,11 @@ describe('useWordPackBuilder — publishPack', () => {
   });
 
   it('sets publishError on API failure', async () => {
-    for (let i = 0; i < 10; i++) {
-      mockFetch.mockResolvedValueOnce({ ok: true, json: async () => ({ valid: true }) });
-    }
-    mockFetch.mockResolvedValueOnce({
-      ok: false,
-      json: async () => ({ message: 'Server error' }),
-    });
+    server.use(
+      http.post('*/api/ugc/packs', () =>
+        new HttpResponse(JSON.stringify({ message: 'Server error' }), { status: 500 })
+      )
+    );
 
     const { result } = renderHook(() => useWordPackBuilder(), { wrapper: createWrapper() });
 

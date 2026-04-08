@@ -52,7 +52,6 @@ const invalidPath = [
 
 // Mock fetch for API validation
 const mockFetch = vi.fn();
-global.fetch = mockFetch;
 
 // Mock invalidWordTracker to prevent actual API calls
 vi.mock('@/utils/invalidWordTracker', () => ({
@@ -95,6 +94,7 @@ function createDefaultFetchImpl() {
 
 describe('useAdventureWordValidation', () => {
   beforeEach(() => {
+    global.fetch = mockFetch;
     queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
     wrapper = ({ children }: { children: React.ReactNode }) =>
       React.createElement(QueryClientProvider, { client: queryClient }, children);

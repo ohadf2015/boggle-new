@@ -66,14 +66,14 @@ export function useSurvivalHints({
     return generateFallbackHints(targetWord, language);
   }, [targetWord, language]);
 
-  // Set initial hints on mount
+  // Set initial hints on mount (only when initialHints changes, not currentHint)
   useEffect(() => {
-    if (initialHints && initialHints.hints.length > 0 && !currentHint) {
-      setCurrentHint(initialHints.hints[0]);
+    if (initialHints && initialHints.hints.length > 0) {
+      setCurrentHint(prev => prev ?? initialHints.hints[0]);
       setCategory(initialHints.category);
       setExampleSentence(initialHints.exampleSentence);
     }
-  }, [initialHints, currentHint]);
+  }, [initialHints]);
 
   // Determine hint availability based on state
   const unrevealedCount = useMemo(() => {

@@ -12,6 +12,7 @@ import { vi, type Mock, } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { useSearchParams } from 'next/navigation';
 import React from 'react';
+import { NuqsTestingAdapter } from 'nuqs/adapters/testing';
 
 // Mock Next.js navigation
 const mockPush = vi.fn();
@@ -157,7 +158,7 @@ describe('Profile Tab Deep Linking', () => {
     });
 
     // WHEN profile page renders
-    render(<ProfilePageClient />);
+    render(<NuqsTestingAdapter><ProfilePageClient /></NuqsTestingAdapter>);
 
     // THEN overview section should be visible (tab buttons should show overview as selected)
     await waitFor(() => {
@@ -173,7 +174,7 @@ describe('Profile Tab Deep Linking', () => {
     });
 
     // WHEN profile page renders
-    render(<ProfilePageClient />);
+    render(<NuqsTestingAdapter searchParams={{ tab: 'collection' }}><ProfilePageClient /></NuqsTestingAdapter>);
 
     // THEN collection section should be visible with ReferralCard
     await waitFor(() => {
@@ -192,7 +193,7 @@ describe('Profile Tab Deep Linking', () => {
     });
 
     // WHEN profile page renders
-    render(<ProfilePageClient />);
+    render(<NuqsTestingAdapter searchParams={{ tab: 'stats' }}><ProfilePageClient /></NuqsTestingAdapter>);
 
     // THEN stats section should be visible
     await waitFor(() => {
@@ -208,7 +209,7 @@ describe('Profile Tab Deep Linking', () => {
     });
 
     // WHEN profile page renders
-    render(<ProfilePageClient />);
+    render(<NuqsTestingAdapter searchParams={{ tab: 'achievements' }}><ProfilePageClient /></NuqsTestingAdapter>);
 
     // THEN achievements section should be visible
     await waitFor(() => {
@@ -224,7 +225,7 @@ describe('Profile Tab Deep Linking', () => {
     });
 
     // WHEN profile page renders
-    render(<ProfilePageClient />);
+    render(<NuqsTestingAdapter><ProfilePageClient /></NuqsTestingAdapter>);
 
     // THEN overview should be shown (fallback behavior)
     await waitFor(() => {

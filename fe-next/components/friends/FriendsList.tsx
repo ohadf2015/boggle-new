@@ -99,8 +99,26 @@ const FriendsList: React.FC<FriendsListProps> = ({
       toast.success(t('socialGift.received', { sender: data.senderName, type: t(`socialGift.type.${data.giftType}`) }));
     };
     giftSocket.on('gift:receive', handleGiftReceive);
-    return () => { giftSocket.off('gift:receive', handleGiftReceive); };
-  }, [giftSocket, isGiftSocketConnected, t]);
+
+    // When a challenge we SENT gets accepted, navigate sender to the room
+    const handleChallengeAccepted = (data: { roomCode: string; toUsername?: string }) => {
+      toast.success(t('friends.challenges.friendAccepted', { name: data.toUsername || '' }));
+      router.push(`/${language}/multiplayer?room=${data.roomCode}`);
+    };
+    giftSocket.on('friends:challengeAccepted', handleChallengeAccepted);
+
+    // Toast when a new challenge arrives
+    const handleChallengeReceived = (data: { fromUsername?: string }) => {
+      toast(t('friends.challenges.received', { name: data.fromUsername || '' }), { icon: '⚔️' });
+    };
+    giftSocket.on('friends:challengeReceived', handleChallengeReceived);
+
+    return () => {
+      giftSocket.off('gift:receive', handleGiftReceive);
+      giftSocket.off('friends:challengeAccepted', handleChallengeAccepted);
+      giftSocket.off('friends:challengeReceived', handleChallengeReceived);
+    };
+  }, [giftSocket, isGiftSocketConnected, t, router, language]);
 
   const {
     threads,
@@ -113,7 +131,22 @@ const FriendsList: React.FC<FriendsListProps> = ({
     setTyping,
     typingUsername,
     deleteMessage,
+    acceptChallenge,
+    declineChallenge,
   } = useFriendMessages(selectedThread?.friendUserId);
+
+  // Track actual daily gifts remaining
+  const [giftsUsedToday, setGiftsUsedToday] = useState(0);
+  useEffect(() => {
+    if (!giftSocket || !isGiftSocketConnected) return;
+    // Ask backend for today's gift count on mount
+    giftSocket.emit('gift:getDailyCount');
+    const handleDailyCount = (data: { count: number }) => {
+      setGiftsUsedToday(data.count);
+    };
+    giftSocket.on('gift:dailyCount', handleDailyCount);
+    return () => { giftSocket.off('gift:dailyCount', handleDailyCount); };
+  }, [giftSocket, isGiftSocketConnected]);
 
 
   const handleAccept = useCallback(async (requestId: string) => {
@@ -230,12 +263,29 @@ const FriendsList: React.FC<FriendsListProps> = ({
     giftSocket.once('gift:sendResult', (result: { success: boolean; error?: string }) => {
       if (result.success) {
         toast.success(t('socialGift.sent'));
+        setGiftsUsedToday(prev => prev + 1);
       } else {
         toast.error(result.error || t('socialGift.error'));
       }
     });
     setGiftFriend(null);
   }, [giftFriend, giftSocket, isGiftSocketConnected, t]);
+
+  // Challenge accept: navigate both players to multiplayer room
+  const handleAcceptChallenge = useCallback(async (challengeId: string) => {
+    const roomCode = await acceptChallenge(challengeId);
+    if (roomCode) {
+      toast.success(t('friends.challenges.accepted'));
+      router.push(`/${language}/multiplayer?room=${roomCode}`);
+    } else {
+      toast.error(t('friends.challenges.acceptFailed', 'Failed to accept challenge'));
+    }
+  }, [acceptChallenge, router, language, t]);
+
+  const handleDeclineChallenge = useCallback(async (challengeId: string) => {
+    await declineChallenge(challengeId);
+    toast.success(t('friends.challenges.declined', 'Challenge declined'));
+  }, [declineChallenge, t]);
 
   const notificationCount = pendingRequests.length + pendingChallenges.length;
 
@@ -416,7 +466,13 @@ const FriendsList: React.FC<FriendsListProps> = ({
                 </div>
                 <div className="space-y-2">
                   {pendingChallenges.map(challenge => (
-                    <ChallengeRow key={challenge.id} challenge={challenge} isDark={isDark} />
+                    <ChallengeRow
+                      key={challenge.id}
+                      challenge={challenge}
+                      isDark={isDark}
+                      onAccept={handleAcceptChallenge}
+                      onDecline={handleDeclineChallenge}
+                    />
                   ))}
                 </div>
               </div>
@@ -641,7 +697,7 @@ const FriendsList: React.FC<FriendsListProps> = ({
           onSend={handleSendGift}
           recipientName={giftFriend.displayName || giftFriend.username}
           senderBalance={profile?.total_coins ?? 0}
-          giftsRemaining={DAILY_GIFT_LIMIT}
+          giftsRemaining={Math.max(0, DAILY_GIFT_LIMIT - giftsUsedToday)}
         />
       )}
 

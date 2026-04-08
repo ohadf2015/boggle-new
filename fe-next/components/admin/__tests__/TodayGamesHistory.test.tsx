@@ -7,6 +7,8 @@
 import React from 'react';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import { http, HttpResponse } from 'msw';
+import { server } from '@/test/msw/server';
 
 // Mock framer-motion to avoid animation issues in tests
 vi.mock('framer-motion', () => {
@@ -74,10 +76,6 @@ vi.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-// Mock fetch
-const mockFetch = vi.fn();
-global.fetch = mockFetch;
-
 // Import after mocks
 import { TodayGamesHistory } from '../TodayGamesHistory';
 
@@ -86,7 +84,6 @@ describe('TodayGamesHistory', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.useFakeTimers();
   });
 
   afterEach(() => {
@@ -153,8 +150,11 @@ describe('TodayGamesHistory', () => {
     },
   };
 
-  it('renders loading state initially', () => {
-    mockFetch.mockImplementation(() => new Promise(() => {})); // Never resolves
+  it('renders loading state initially', async () => {
+    // Use a handler that never resolves to keep loading state
+    server.use(
+      http.get('*/api/admin/game-logs*', () => new Promise(() => {}))
+    );
 
     render(<TodayGamesHistory authToken={mockAuthToken} />);
 
@@ -164,10 +164,9 @@ describe('TodayGamesHistory', () => {
   });
 
   it('renders games data after successful fetch', async () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: () => Promise.resolve(mockGamesResponse),
-    });
+    server.use(
+      http.get('*/api/admin/game-logs*', () => HttpResponse.json(mockGamesResponse))
+    );
 
     render(<TodayGamesHistory authToken={mockAuthToken} />);
 
@@ -196,10 +195,9 @@ describe('TodayGamesHistory', () => {
       },
     };
 
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: () => Promise.resolve(emptyResponse),
-    });
+    server.use(
+      http.get('*/api/admin/game-logs*', () => HttpResponse.json(emptyResponse))
+    );
 
     render(<TodayGamesHistory authToken={mockAuthToken} />);
 
@@ -211,10 +209,9 @@ describe('TodayGamesHistory', () => {
   });
 
   it('renders error state when fetch fails', async () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: false,
-      status: 500,
-    });
+    server.use(
+      http.get('*/api/admin/game-logs*', () => new HttpResponse(null, { status: 500 }))
+    );
 
     render(<TodayGamesHistory authToken={mockAuthToken} />);
 
@@ -226,44 +223,51 @@ describe('TodayGamesHistory', () => {
   });
 
   it('sends correct authorization header', async () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: () => Promise.resolve(mockGamesResponse),
-    });
+    let capturedAuth: string | null = null;
+    server.use(
+      http.get('*/api/admin/game-logs*', ({ request }) => {
+        capturedAuth = request.headers.get('Authorization');
+        return HttpResponse.json(mockGamesResponse);
+      })
+    );
 
     render(<TodayGamesHistory authToken={mockAuthToken} />);
 
     await waitFor(() => {
-      expect(mockFetch).toHaveBeenCalled();
+      expect(screen.getByText("Today's Games")).toBeInTheDocument();
     });
 
-    const fetchCall = mockFetch.mock.calls[0];
-    expect(fetchCall[1].headers.Authorization).toBe('Bearer test-auth-token');
+    expect(capturedAuth).toBe('Bearer test-auth-token');
   });
 
   it('includes today date in query params', async () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: () => Promise.resolve(mockGamesResponse),
-    });
+    let capturedUrl: string | null = null;
+    server.use(
+      http.get('*/api/admin/game-logs*', ({ request }) => {
+        capturedUrl = request.url;
+        return HttpResponse.json(mockGamesResponse);
+      })
+    );
 
     render(<TodayGamesHistory authToken={mockAuthToken} />);
 
     await waitFor(() => {
-      expect(mockFetch).toHaveBeenCalled();
+      expect(screen.getByText("Today's Games")).toBeInTheDocument();
     });
 
-    const fetchUrl = mockFetch.mock.calls[0][0];
     const today = new Date().toISOString().split('T')[0];
-    expect(fetchUrl).toContain(`startDate=${today}`);
-    expect(fetchUrl).toContain(`endDate=${today}`);
+    expect(capturedUrl).toContain(`startDate=${today}`);
+    expect(capturedUrl).toContain(`endDate=${today}`);
   });
 
   it('filters by language when selected', async () => {
-    mockFetch.mockResolvedValue({
-      ok: true,
-      json: () => Promise.resolve(mockGamesResponse),
-    });
+    const capturedUrls: string[] = [];
+    server.use(
+      http.get('*/api/admin/game-logs*', ({ request }) => {
+        capturedUrls.push(request.url);
+        return HttpResponse.json(mockGamesResponse);
+      })
+    );
 
     render(<TodayGamesHistory authToken={mockAuthToken} />);
 
@@ -276,17 +280,15 @@ describe('TodayGamesHistory', () => {
     fireEvent.change(languageSelect, { target: { value: 'he' } });
 
     await waitFor(() => {
-      const calls = mockFetch.mock.calls;
-      const lastCall = calls[calls.length - 1][0];
-      expect(lastCall).toContain('language=he');
+      const lastUrl = capturedUrls[capturedUrls.length - 1];
+      expect(lastUrl).toContain('language=he');
     });
   });
 
   it('displays guest badge for guest players', async () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: () => Promise.resolve(mockGamesResponse),
-    });
+    server.use(
+      http.get('*/api/admin/game-logs*', () => HttpResponse.json(mockGamesResponse))
+    );
 
     render(<TodayGamesHistory authToken={mockAuthToken} />);
 
@@ -336,10 +338,9 @@ describe('TodayGamesHistory', () => {
       },
     };
 
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: () => Promise.resolve(multiTypeResponse),
-    });
+    server.use(
+      http.get('*/api/admin/game-logs*', () => HttpResponse.json(multiTypeResponse))
+    );
 
     render(<TodayGamesHistory authToken={mockAuthToken} />);
 
@@ -355,10 +356,13 @@ describe('TodayGamesHistory', () => {
   });
 
   it('handles refresh button click', async () => {
-    mockFetch.mockResolvedValue({
-      ok: true,
-      json: () => Promise.resolve(mockGamesResponse),
-    });
+    let callCount = 0;
+    server.use(
+      http.get('*/api/admin/game-logs*', () => {
+        callCount++;
+        return HttpResponse.json(mockGamesResponse);
+      })
+    );
 
     render(<TodayGamesHistory authToken={mockAuthToken} />);
 
@@ -366,22 +370,26 @@ describe('TodayGamesHistory', () => {
       expect(screen.getByText("Today's Games")).toBeInTheDocument();
     });
 
-    const initialCallCount = mockFetch.mock.calls.length;
+    const countBeforeRefresh = callCount;
 
     // Click refresh button
     const refreshButton = screen.getByRole('button', { name: /Refresh/i });
     fireEvent.click(refreshButton);
 
     await waitFor(() => {
-      expect(mockFetch.mock.calls.length).toBeGreaterThan(initialCallCount);
+      expect(callCount).toBeGreaterThan(countBeforeRefresh);
     });
   });
 
   it('auto-refreshes every 30 seconds', async () => {
-    mockFetch.mockResolvedValue({
-      ok: true,
-      json: () => Promise.resolve(mockGamesResponse),
-    });
+    vi.useFakeTimers();
+    let callCount = 0;
+    server.use(
+      http.get('*/api/admin/game-logs*', () => {
+        callCount++;
+        return HttpResponse.json(mockGamesResponse);
+      })
+    );
 
     render(<TodayGamesHistory authToken={mockAuthToken} />);
 
@@ -389,13 +397,13 @@ describe('TodayGamesHistory', () => {
       expect(screen.getByText("Today's Games")).toBeInTheDocument();
     });
 
-    const initialCallCount = mockFetch.mock.calls.length;
+    const countAfterMount = callCount;
 
     // Advance timers by 30 seconds
-    vi.advanceTimersByTime(30000);
+    await vi.advanceTimersByTimeAsync(30000);
 
     await waitFor(() => {
-      expect(mockFetch.mock.calls.length).toBeGreaterThan(initialCallCount);
+      expect(callCount).toBeGreaterThan(countAfterMount);
     });
   });
 });

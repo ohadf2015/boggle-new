@@ -81,7 +81,8 @@ describe('Worlds 6-10: Full Theme Implementations', () => {
 
     describe('Background', () => {
       it('has baseColor with gradient', () => {
-        expect(world.background.baseColor).toContain('bg-gradient');
+        // Tailwind v4 uses 'bg-linear-to-*' syntax instead of 'bg-gradient-to-*'
+        expect(world.background.baseColor).toMatch(/bg-linear|bg-gradient/);
       });
 
       it('has 3 parallax layers', () => {

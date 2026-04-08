@@ -24,9 +24,8 @@ type PracticeSessionXp = {
   streakDays?: number;
 };
 
-// Mock fetch — the hook now fires a fetch to /api/education/record-xp
-// Use a never-resolving promise so pendingUpdate stays set during tests
-global.fetch = vi.fn().mockImplementation(() => new Promise(() => {}));
+// Mock fetch — stub is applied in beforeEach; this is just a placeholder fn
+const mockEducationFetch = vi.fn().mockImplementation(() => new Promise(() => {}));
 
 // Mock the educationXpManager module
 vi.mock('@/backend/modules/educationXpManager', () => ({
@@ -111,6 +110,7 @@ describe('useEducationXp', () => {
   };
 
   beforeEach(() => {
+    vi.stubGlobal('fetch', vi.fn().mockImplementation(() => new Promise(() => {})));
     queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
     wrapper = ({ children }: { children: React.ReactNode }) =>
       React.createElement(QueryClientProvider, { client: queryClient }, children);

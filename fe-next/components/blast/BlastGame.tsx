@@ -206,6 +206,8 @@ export function BlastGame({
   useEffect(() => { onGameEndRef.current = onGameEnd; }, [onGameEnd]);
   const onWaveCompleteRef = useRef(onWaveComplete);
   useEffect(() => { onWaveCompleteRef.current = onWaveComplete; }, [onWaveComplete]);
+  const engineRef = useRef(engine);
+  useEffect(() => { engineRef.current = engine; }, [engine]);
   const maxComboRef = useRef(combo.maxCombo);
   useEffect(() => { maxComboRef.current = combo.maxCombo; }, [combo.maxCombo]);
   const waveConfigRef = useRef(waveConfig);
@@ -584,6 +586,8 @@ export function BlastGame({
   // Game end detection
   // SP: moves run out, board clears, or dead end. MP: server timer controls end, but dead-end still triggers locally.
   // Uses refs for callbacks/dynamic values to avoid stale closures without re-triggering the effect.
+  // IMPORTANT: Do NOT include `engine` in deps — Sugar Crush mutates tileStates which would
+  // recreate the engine object, cancel the async loop via cleanup, and restart it infinitely.
   useEffect(() => {
     // Board cleared — all tiles gone (SP only — MP wave logic is server-driven)
     if (!isMultiplayer && engine.gameState.isComplete) {
@@ -609,9 +613,10 @@ export function BlastGame({
       let cancelled = false;
 
       // Run Sugar Crush asynchronously, then end game
+      // Read engine from ref inside async so we always get latest state without depending on engine object
       (async () => {
-        // Plan Sugar Crush from current tile state
-        const tiles = engine.getLatestState().tileStates;
+        const eng = engineRef.current;
+        const tiles = eng.getLatestState().tileStates;
         const steps = planSugarCrush(tiles, config.gridSize);
 
         if (steps.length > 0) {
@@ -624,7 +629,7 @@ export function BlastGame({
             if (cancelled) return;
 
             // Convert tile to special type
-            engine.setTileStates(prev => prev.map((row, ri) =>
+            engineRef.current.setTileStates(prev => prev.map((row, ri) =>
               row.map((tile, ci) => {
                 if (ri === step.row && ci === step.col) {
                   return { ...tile, type: step.convertTo, hitsRemaining: 1, activationEffect: 'sugar-crush' as any };
@@ -648,15 +653,16 @@ export function BlastGame({
 
         if (cancelled) return;
 
-        // End game
-        const { score, wordsFound, tilesCleared, totalTiles } = engine.gameState;
+        // End game — read latest state from ref
+        const latestEngine = engineRef.current;
+        const { score, wordsFound, tilesCleared, totalTiles } = latestEngine.gameState;
         const clearPct = totalTiles > 0 ? Math.min(100, Math.round((tilesCleared / totalTiles) * 100)) : 0;
         const scoreThreshold = waveConfigRef.current?.scoreThreshold;
 
         if (onWaveCompleteRef.current && objectives.allObjectivesComplete && (!scoreThreshold || score >= scoreThreshold)) {
           onWaveCompleteRef.current(score, wordsFound, clearPct);
         } else {
-          const results = engine.getResults(maxComboRef.current);
+          const results = latestEngine.getResults(maxComboRef.current);
           onGameEndRef.current(results);
         }
       })();
@@ -665,12 +671,13 @@ export function BlastGame({
     }
 
     return undefined;
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- engine excluded: Sugar Crush mutates tileStates which recreates engine; using engineRef instead
   }, [
     engine.gameState.isComplete,
     engine.gameState.isDeadEnd,
     objectives.allObjectivesComplete,
     isMultiplayer,
-    engine, config.gridSize, sounds,
+    config.gridSize, sounds,
   ]);
 
   // Loading state — wait for both grid generation AND dictionary cache

@@ -138,9 +138,8 @@ vi.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-// Mock fetch
-const mockFetch = vi.fn();
-global.fetch = mockFetch;
+import { http, HttpResponse } from 'msw';
+import { server } from '@/test/msw/server';
 
 // Import after mocks
 import { InvalidWordsManager } from '../InvalidWordsManager';
@@ -157,7 +156,15 @@ describe('InvalidWordsManager', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    mockFetch.mockReset();
+    // Register default handlers — return standard mock data for both endpoints
+    server.use(
+      http.get('*/api/admin/invalid-words/auto-promote-stats*', () =>
+        HttpResponse.json(mockAutoPromoteStatsResponse)
+      ),
+      http.get('*/api/admin/invalid-words*', () =>
+        HttpResponse.json(mockInvalidWordsResponse)
+      )
+    );
   });
 
   afterEach(() => {
@@ -202,21 +209,11 @@ describe('InvalidWordsManager', () => {
   };
 
   it('renders component without crashing', () => {
-    mockFetch.mockResolvedValue({
-      ok: true,
-      json: () => Promise.resolve(mockInvalidWordsResponse),
-    });
-
     // Simply verify the component renders without throwing
     expect(() => render(<InvalidWordsManager authToken={mockAuthToken} />)).not.toThrow();
   });
 
   it('renders invalid words when data is loaded', async () => {
-    mockFetch.mockResolvedValue({
-      ok: true,
-      json: () => Promise.resolve(mockInvalidWordsResponse),
-    });
-
     render(<InvalidWordsManager authToken={mockAuthToken} />);
 
     await waitFor(() => {
@@ -229,11 +226,6 @@ describe('InvalidWordsManager', () => {
   });
 
   it('renders stats cards correctly', async () => {
-    mockFetch.mockResolvedValue({
-      ok: true,
-      json: () => Promise.resolve(mockInvalidWordsResponse),
-    });
-
     render(<InvalidWordsManager authToken={mockAuthToken} />);
 
     await waitFor(() => {
@@ -247,15 +239,11 @@ describe('InvalidWordsManager', () => {
   });
 
   it('renders empty state when no words meet threshold', async () => {
-    mockFetch.mockResolvedValue({
-      ok: true,
-      json: () => Promise.resolve({
-        words: [],
-        total: 0,
-        stats: { total: 0, pending: 0, approved: 0 },
-        pagination: { limit: 50, offset: 0, hasMore: false },
-      }),
-    });
+    server.use(
+      http.get('*/api/admin/invalid-words*', () =>
+        HttpResponse.json({ words: [], total: 0, stats: { total: 0, pending: 0, approved: 0 }, pagination: { limit: 50, offset: 0, hasMore: false } })
+      )
+    );
 
     render(<InvalidWordsManager authToken={mockAuthToken} />);
 
@@ -265,10 +253,9 @@ describe('InvalidWordsManager', () => {
   });
 
   it('handles fetch error gracefully', async () => {
-    mockFetch.mockResolvedValue({
-      ok: false,
-      status: 500,
-    });
+    server.use(
+      http.get('*/api/admin/invalid-words*', () => new HttpResponse(null, { status: 500 }))
+    );
 
     render(<InvalidWordsManager authToken={mockAuthToken} />);
 
@@ -278,16 +265,13 @@ describe('InvalidWordsManager', () => {
   });
 
   it('calls approve API when approve button is clicked', async () => {
-    mockFetch
-      .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(mockAutoPromoteStatsResponse) })
-      .mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockInvalidWordsResponse),
+    let capturedApproveBody: unknown = null;
+    server.use(
+      http.post('*/api/admin/invalid-words/approve*', async ({ request }) => {
+        capturedApproveBody = await request.json();
+        return HttpResponse.json({ success: true, votesAdded: 10 });
       })
-      .mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve({ success: true, votesAdded: 10 }),
-      });
+    );
 
     render(<InvalidWordsManager authToken={mockAuthToken} />);
 
@@ -296,34 +280,24 @@ describe('InvalidWordsManager', () => {
     });
 
     // Find the Approve button in the card (exact text "Approve", not "Bulk Approve")
-    // The card approve buttons have exact text "Approve" while bulk has "Bulk Approve (X)"
     const approveButtons = screen.getAllByRole('button', { name: /^approve$/i });
     fireEvent.click(approveButtons[0]);
 
     await waitFor(() => {
-      expect(mockFetch).toHaveBeenCalledWith(
-        '/api/admin/invalid-words/approve',
-        expect.objectContaining({
-          method: 'POST',
-          body: JSON.stringify({ word: 'testword', language: 'en', addToDictionary: false }),
-        })
-      );
+      expect(capturedApproveBody).toMatchObject({ word: 'testword', language: 'en', addToDictionary: false });
     });
 
     expect(toast.success).toHaveBeenCalledWith('Approved "testword"');
   });
 
   it('calls dismiss API when dismiss button is clicked', async () => {
-    mockFetch
-      .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(mockAutoPromoteStatsResponse) })
-      .mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockInvalidWordsResponse),
+    let dismissCalled = false;
+    server.use(
+      http.post('*/api/admin/invalid-words/dismiss*', () => {
+        dismissCalled = true;
+        return HttpResponse.json({ success: true });
       })
-      .mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve({ success: true }),
-      });
+    );
 
     render(<InvalidWordsManager authToken={mockAuthToken} />);
 
@@ -342,21 +316,11 @@ describe('InvalidWordsManager', () => {
     }
 
     await waitFor(() => {
-      expect(mockFetch).toHaveBeenCalledWith(
-        '/api/admin/invalid-words/dismiss',
-        expect.objectContaining({
-          method: 'POST',
-        })
-      );
+      expect(dismissCalled).toBe(true);
     });
   });
 
   it('renders language filter select', async () => {
-    mockFetch.mockResolvedValue({
-      ok: true,
-      json: () => Promise.resolve(mockInvalidWordsResponse),
-    });
-
     render(<InvalidWordsManager authToken={mockAuthToken} />);
 
     await waitFor(() => {
@@ -370,31 +334,22 @@ describe('InvalidWordsManager', () => {
   });
 
   it('passes auth token in request headers', async () => {
-    mockFetch.mockResolvedValue({
-      ok: true,
-      json: () => Promise.resolve(mockInvalidWordsResponse),
-    });
+    let capturedAuth: string | null = null;
+    server.use(
+      http.get('*/api/admin/invalid-words*', ({ request }) => {
+        capturedAuth = request.headers.get('Authorization');
+        return HttpResponse.json(mockInvalidWordsResponse);
+      })
+    );
 
     render(<InvalidWordsManager authToken={mockAuthToken} />);
 
     await waitFor(() => {
-      expect(mockFetch).toHaveBeenCalledWith(
-        expect.stringContaining('/api/admin/invalid-words'),
-        expect.objectContaining({
-          headers: expect.objectContaining({
-            Authorization: `Bearer ${mockAuthToken}`,
-          }),
-        })
-      );
+      expect(capturedAuth).toBe(`Bearer ${mockAuthToken}`);
     });
   });
 
   it('displays reason badges for each word', async () => {
-    mockFetch.mockResolvedValue({
-      ok: true,
-      json: () => Promise.resolve(mockInvalidWordsResponse),
-    });
-
     render(<InvalidWordsManager authToken={mockAuthToken} />);
 
     await waitFor(() => {
@@ -407,11 +362,6 @@ describe('InvalidWordsManager', () => {
   });
 
   it('displays language badges for each word', async () => {
-    mockFetch.mockResolvedValue({
-      ok: true,
-      json: () => Promise.resolve(mockInvalidWordsResponse),
-    });
-
     render(<InvalidWordsManager authToken={mockAuthToken} />);
 
     await waitFor(() => {
@@ -424,16 +374,11 @@ describe('InvalidWordsManager', () => {
   });
 
   it('removes word from list after successful approval', async () => {
-    mockFetch
-      .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(mockAutoPromoteStatsResponse) })
-      .mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockInvalidWordsResponse),
-      })
-      .mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve({ success: true, votesAdded: 10 }),
-      });
+    server.use(
+      http.post('*/api/admin/invalid-words/approve*', () =>
+        HttpResponse.json({ success: true, votesAdded: 10 })
+      )
+    );
 
     render(<InvalidWordsManager authToken={mockAuthToken} />);
 
@@ -457,11 +402,6 @@ describe('InvalidWordsManager', () => {
   // Selection functionality tests
   describe('Selection functionality', () => {
     it('renders checkbox for each word', async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: () => Promise.resolve(mockInvalidWordsResponse),
-      });
-
       render(<InvalidWordsManager authToken={mockAuthToken} />);
 
       await waitFor(() => {
@@ -473,11 +413,6 @@ describe('InvalidWordsManager', () => {
     });
 
     it('toggles selection when checkbox is clicked', async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: () => Promise.resolve(mockInvalidWordsResponse),
-      });
-
       render(<InvalidWordsManager authToken={mockAuthToken} />);
 
       await waitFor(() => {
@@ -492,11 +427,6 @@ describe('InvalidWordsManager', () => {
     });
 
     it('selects all words when Select All is clicked', async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: () => Promise.resolve(mockInvalidWordsResponse),
-      });
-
       render(<InvalidWordsManager authToken={mockAuthToken} />);
 
       await waitFor(() => {
@@ -512,11 +442,6 @@ describe('InvalidWordsManager', () => {
     });
 
     it('clears all selections when Clear Selection is clicked', async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: () => Promise.resolve(mockInvalidWordsResponse),
-      });
-
       render(<InvalidWordsManager authToken={mockAuthToken} />);
 
       await waitFor(() => {
@@ -528,7 +453,7 @@ describe('InvalidWordsManager', () => {
       expect(screen.getByText('2 selected')).toBeInTheDocument();
 
       // Clear selection
-      fireEvent.click(screen.getByRole('button', { name: /clear selection/i }));
+      fireEvent.click(screen.getByRole('button', { name: /^clear$/i }));
 
       const checkboxes = screen.getAllByRole('checkbox');
       expect(checkboxes[0]).not.toBeChecked();
@@ -537,16 +462,11 @@ describe('InvalidWordsManager', () => {
     });
 
     it('removes word from selection after approval', async () => {
-      mockFetch
-        .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(mockAutoPromoteStatsResponse) })
-        .mockResolvedValueOnce({
-          ok: true,
-          json: () => Promise.resolve(mockInvalidWordsResponse),
-        })
-        .mockResolvedValueOnce({
-          ok: true,
-          json: () => Promise.resolve({ success: true, votesAdded: 10 }),
-        });
+      server.use(
+        http.post('*/api/admin/invalid-words/approve*', () =>
+          HttpResponse.json({ success: true, votesAdded: 10 })
+        )
+      );
 
       render(<InvalidWordsManager authToken={mockAuthToken} />);
 
@@ -576,11 +496,6 @@ describe('InvalidWordsManager', () => {
   // BulkApproveButton integration tests
   describe('BulkApproveButton integration', () => {
     it('renders BulkApproveButton in toolbar when words are loaded', async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: () => Promise.resolve(mockInvalidWordsResponse),
-      });
-
       render(<InvalidWordsManager authToken={mockAuthToken} />);
 
       await waitFor(() => {
@@ -592,11 +507,6 @@ describe('InvalidWordsManager', () => {
     });
 
     it('BulkApproveButton shows selected count in label', async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: () => Promise.resolve(mockInvalidWordsResponse),
-      });
-
       render(<InvalidWordsManager authToken={mockAuthToken} />);
 
       await waitFor(() => {
@@ -611,11 +521,6 @@ describe('InvalidWordsManager', () => {
     });
 
     it('BulkApproveButton is disabled when no words are selected', async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: () => Promise.resolve(mockInvalidWordsResponse),
-      });
-
       render(<InvalidWordsManager authToken={mockAuthToken} />);
 
       await waitFor(() => {
@@ -628,11 +533,6 @@ describe('InvalidWordsManager', () => {
     });
 
     it('BulkApproveButton is enabled when words are selected', async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: () => Promise.resolve(mockInvalidWordsResponse),
-      });
-
       render(<InvalidWordsManager authToken={mockAuthToken} />);
 
       await waitFor(() => {

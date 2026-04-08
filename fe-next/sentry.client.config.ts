@@ -196,6 +196,9 @@ Sentry.init({
     // DOM parentNode null — transient React unmount race condition
     /Cannot read property 'parentNode' of null/i,
     /Cannot read properties of null.*parentNode/i,
+    // PixiJS WebGL errors on low-end Android devices — not actionable
+    /Cannot read properties of null.*alphaMode/i,
+    /Unable to convert color/i,
   ],
 
   denyUrls: [

@@ -12,9 +12,8 @@
 import React from 'react';
 import { render, waitFor } from '@testing-library/react';
 
-// Mock fetch globally
-const mockFetch = vi.fn();
-global.fetch = mockFetch;
+import { http, HttpResponse } from 'msw';
+import { server } from '@/test/msw/server';
 
 // Mock useDevicePerformance
 vi.mock('@/hooks/useDevicePerformance', () => ({
@@ -171,24 +170,13 @@ describe('DailyChallengeResults score submission', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    mockFetch.mockReset();
-
-    // Default: successful API responses
-    mockFetch.mockImplementation((url: string) => {
-      if (url === '/api/geolocation') {
-        return Promise.resolve({
-          ok: true,
-          json: () => Promise.resolve({ countryCode: 'US' }),
-        });
-      }
-      if (url === '/api/daily-challenge/submit') {
-        return Promise.resolve({
-          ok: true,
-          json: () => Promise.resolve({ success: true, rank: 5 }),
-        });
-      }
-      return Promise.resolve({ ok: true, json: () => Promise.resolve({}) });
-    });
+    // Default MSW handlers
+    server.use(
+      http.get('*/api/geolocation*', () => HttpResponse.json({ countryCode: 'US' })),
+      http.post('*/api/daily-challenge/submit*', () =>
+        HttpResponse.json({ success: true, rank: 5 })
+      )
+    );
   });
 
   describe('Authenticated user submission', () => {
@@ -210,12 +198,16 @@ describe('DailyChallengeResults score submission', () => {
 
     it('should submit score for authenticated user even when guestFingerprint NEVER loads (BUG FIX)', async () => {
       // GIVEN: getGuestFingerprint NEVER resolves (simulates blocked fingerprint scenario)
-      // This is the exact bug Ohad experienced - authenticated users should NOT need fingerprint
-      mockGetGuestFingerprint.mockReturnValue(new Promise(() => {
-        // Never resolves - simulates ad blocker blocking fingerprint or timeout
-      }));
+      mockGetGuestFingerprint.mockReturnValue(new Promise(() => {}));
 
-      // WHEN: Rendering results with isNewCompletion=true for authenticated user
+      let capturedBody: Record<string, unknown> | null = null;
+      server.use(
+        http.post('*/api/daily-challenge/submit*', async ({ request }) => {
+          capturedBody = await request.json() as Record<string, unknown>;
+          return HttpResponse.json({ success: true, rank: 5 });
+        })
+      );
+
       render(
         <DailyChallengeResults
           result={mockResult}
@@ -230,38 +222,28 @@ describe('DailyChallengeResults score submission', () => {
         />
       );
 
-      // THEN: Score should STILL be submitted with playerId (not guestFingerprint)
-      // BUG: Before fix, this would NEVER happen because canSubmit required guestFingerprint
       await waitFor(() => {
-        expect(mockFetch).toHaveBeenCalledWith(
-          '/api/daily-challenge/submit',
-          expect.objectContaining({
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-          })
-        );
+        expect(capturedBody).not.toBeNull();
       }, { timeout: 2000 });
 
-      // Verify the submission includes playerId
-      const submitCall = mockFetch.mock.calls.find(
-        (call) => call[0] === '/api/daily-challenge/submit'
-      );
-      expect(submitCall).toBeDefined();
-
-      const body = JSON.parse(submitCall[1].body);
-      expect(body.playerId).toBe('user-123-uuid');
-      expect(body.displayName).toBe('Ohad Fisher');
-      expect(body.avatarEmoji).toBe('🏆');
-      expect(body.score).toBe(500);
-      // For authenticated users, guestFingerprint should be null
-      expect(body.guestFingerprint).toBeNull();
+      expect(capturedBody!.playerId).toBe('user-123-uuid');
+      expect(capturedBody!.displayName).toBe('Ohad Fisher');
+      expect(capturedBody!.avatarEmoji).toBe('🏆');
+      expect(capturedBody!.score).toBe(500);
+      expect(capturedBody!.guestFingerprint).toBeNull();
     });
 
     it('should include null guestFingerprint for authenticated users', async () => {
-      // GIVEN: Authenticated user with profile
       mockGetGuestFingerprint.mockResolvedValue('some-fingerprint');
 
-      // WHEN: Rendering results
+      let capturedBody: Record<string, unknown> | null = null;
+      server.use(
+        http.post('*/api/daily-challenge/submit*', async ({ request }) => {
+          capturedBody = await request.json() as Record<string, unknown>;
+          return HttpResponse.json({ success: true, rank: 5 });
+        })
+      );
+
       render(
         <DailyChallengeResults
           result={mockResult}
@@ -276,21 +258,12 @@ describe('DailyChallengeResults score submission', () => {
         />
       );
 
-      // THEN: Submission should have playerId and null guestFingerprint
       await waitFor(() => {
-        expect(mockFetch).toHaveBeenCalledWith(
-          '/api/daily-challenge/submit',
-          expect.anything()
-        );
+        expect(capturedBody).not.toBeNull();
       }, { timeout: 3000 });
 
-      const submitCall = mockFetch.mock.calls.find(
-        (call) => call[0] === '/api/daily-challenge/submit'
-      );
-      const body = JSON.parse(submitCall[1].body);
-
-      expect(body.playerId).toBe('user-123-uuid');
-      expect(body.guestFingerprint).toBeNull();
+      expect(capturedBody!.playerId).toBe('user-123-uuid');
+      expect(capturedBody!.guestFingerprint).toBeNull();
     });
   });
 
@@ -303,7 +276,6 @@ describe('DailyChallengeResults score submission', () => {
     });
 
     it('should submit score for guest user with guestFingerprint', async () => {
-      // GIVEN: Guest user with fingerprint
       mockGetGuestFingerprint.mockResolvedValue('guest-fp-12345');
       mockGetGuestDailyPlayer.mockResolvedValue({
         displayName: 'Test Guest',
@@ -311,7 +283,14 @@ describe('DailyChallengeResults score submission', () => {
         avatarColor: '#6366f1',
       });
 
-      // WHEN: Rendering results for guest
+      let capturedBody: Record<string, unknown> | null = null;
+      server.use(
+        http.post('*/api/daily-challenge/submit*', async ({ request }) => {
+          capturedBody = await request.json() as Record<string, unknown>;
+          return HttpResponse.json({ success: true, rank: 5 });
+        })
+      );
+
       render(
         <DailyChallengeResults
           result={mockResult}
@@ -326,21 +305,12 @@ describe('DailyChallengeResults score submission', () => {
         />
       );
 
-      // THEN: Score should be submitted with guestFingerprint
       await waitFor(() => {
-        expect(mockFetch).toHaveBeenCalledWith(
-          '/api/daily-challenge/submit',
-          expect.anything()
-        );
+        expect(capturedBody).not.toBeNull();
       }, { timeout: 3000 });
 
-      const submitCall = mockFetch.mock.calls.find(
-        (call) => call[0] === '/api/daily-challenge/submit'
-      );
-      const body = JSON.parse(submitCall[1].body);
-
-      expect(body.playerId).toBeNull();
-      expect(body.guestFingerprint).toBe('guest-fp-12345');
+      expect(capturedBody!.playerId).toBeNull();
+      expect(capturedBody!.guestFingerprint).toBe('guest-fp-12345');
     });
   });
 
@@ -369,12 +339,16 @@ describe('DailyChallengeResults score submission', () => {
       );
 
       // THEN: No submission should be made
-      await new Promise((resolve) => setTimeout(resolve, 500));
-
-      const submitCalls = mockFetch.mock.calls.filter(
-        (call) => call[0] === '/api/daily-challenge/submit'
+      let submitCalled = false;
+      server.use(
+        http.post('*/api/daily-challenge/submit*', () => {
+          submitCalled = true;
+          return HttpResponse.json({ success: true });
+        })
       );
-      expect(submitCalls).toHaveLength(0);
+
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      expect(submitCalled).toBe(false);
     });
   });
 });

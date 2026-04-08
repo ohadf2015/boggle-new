@@ -45,9 +45,9 @@ const mockT = (key: string) => {
 
 // Mock fetch for leaderboard
 const mockFetch = vi.fn();
-global.fetch = mockFetch;
 
 beforeEach(() => {
+  global.fetch = mockFetch;
   mockFetch.mockReset();
   mockFetch.mockResolvedValue({
     ok: true,

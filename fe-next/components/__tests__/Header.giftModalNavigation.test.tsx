@@ -12,9 +12,8 @@
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import React from 'react';
 
-// Mock fetch for API calls
-const mockFetch = vi.fn();
-global.fetch = mockFetch;
+import { http, HttpResponse } from 'msw';
+import { server } from '@/test/msw/server';
 
 // Mock dependencies
 vi.mock('next/navigation', () => ({
@@ -188,8 +187,13 @@ import Header from '../Header';
 describe('Header - Gift Modal Database Persistence', () => {
   beforeEach(() => {
     vi.useFakeTimers();
-    mockFetch.mockClear();
     mockRefreshProfile.mockClear();
+    // Register default MSW handler for dismiss-modal
+    server.use(
+      http.post('*/api/player/gifts/dismiss-modal*', () =>
+        HttpResponse.json({ success: true, dismissedAt: new Date().toISOString() })
+      )
+    );
     // Reset mock values to defaults
     mockProfile = {
       id: 'test-user',
@@ -211,11 +215,6 @@ describe('Header - Gift Modal Database Persistence', () => {
         created_at: new Date().toISOString(),
       },
     ];
-    // Mock successful API response
-    mockFetch.mockResolvedValue({
-      ok: true,
-      json: async () => ({ success: true, dismissedAt: new Date().toISOString() }),
-    });
   });
 
   afterEach(() => {
@@ -225,6 +224,14 @@ describe('Header - Gift Modal Database Persistence', () => {
 
   describe('database persistence on dismissal', () => {
     it('should call dismiss-modal API IMMEDIATELY when dismissing a gift', async () => {
+      let dismissCalled = false;
+      server.use(
+        http.post('*/api/player/gifts/dismiss-modal*', () => {
+          dismissCalled = true;
+          return HttpResponse.json({ success: true, dismissedAt: new Date().toISOString() });
+        })
+      );
+
       render(<Header />);
 
       // Wait for auto-show timer (3 seconds)
@@ -242,9 +249,7 @@ describe('Header - Gift Modal Database Persistence', () => {
 
       // API should be called IMMEDIATELY (not waiting for all gifts to be dismissed)
       await waitFor(() => {
-        expect(mockFetch).toHaveBeenCalledWith('/api/player/gifts/dismiss-modal', {
-          method: 'POST',
-        });
+        expect(dismissCalled).toBe(true);
       });
     });
 

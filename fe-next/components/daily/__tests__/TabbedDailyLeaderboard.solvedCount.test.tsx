@@ -75,8 +75,6 @@ const createMockSolvedParticipant = (id: number): DailyParticipant => ({
   efficiency_score: 90 - id * 5,
 });
 
-global.fetch = vi.fn();
-
 describe('TabbedDailyLeaderboard - Solved Count Display', () => {
   const mockT = (key: string) => {
     // Return translation keys that match the component's expected text
@@ -101,6 +99,7 @@ describe('TabbedDailyLeaderboard - Solved Count Display', () => {
   };
 
   beforeEach(() => {
+    vi.stubGlobal('fetch', vi.fn());
     vi.clearAllMocks();
   });
 

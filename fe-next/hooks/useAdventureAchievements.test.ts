@@ -29,7 +29,6 @@ Object.defineProperty(window, 'localStorage', { value: localStorageMock });
 
 // Mock fetch
 const mockFetch = vi.fn();
-global.fetch = mockFetch;
 
 function mockFetchGet(counts: Record<string, number>) {
   mockFetch.mockResolvedValueOnce({
@@ -48,6 +47,7 @@ function mockFetchPost(ok = true) {
 
 describe('useAdventureAchievements', () => {
   beforeEach(() => {
+    vi.stubGlobal('fetch', mockFetch);
     localStorageMock.clear();
     vi.clearAllMocks();
   });

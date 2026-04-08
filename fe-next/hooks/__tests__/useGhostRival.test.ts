@@ -12,10 +12,10 @@ import { useAuth } from '@/contexts/AuthContext';
 vi.mock('@/contexts/AuthContext');
 
 const mockFetch = vi.fn();
-global.fetch = mockFetch;
 
 describe('useGhostRival', () => {
   beforeEach(() => {
+    vi.stubGlobal('fetch', mockFetch);
     vi.clearAllMocks();
   });
 

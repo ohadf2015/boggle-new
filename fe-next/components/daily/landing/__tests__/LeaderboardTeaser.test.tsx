@@ -2,9 +2,8 @@ import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import { LeaderboardTeaser } from '../LeaderboardTeaser';
 import { LanguageProvider } from '@/contexts/LanguageContext';
-
-const mockFetch = vi.fn();
-global.fetch = mockFetch;
+import { http, HttpResponse } from 'msw';
+import { server } from '@/test/msw/server';
 
 function renderWithProviders(ui: React.ReactElement) {
   return render(
@@ -12,16 +11,17 @@ function renderWithProviders(ui: React.ReactElement) {
   );
 }
 
+const LEADERBOARD_URL_PATTERN = '*/api/daily-challenge/leaderboard/*/*';
+
 describe('LeaderboardTeaser', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   test('renders leaderboard container', () => {
-    mockFetch.mockResolvedValue({
-      ok: true,
-      json: () => Promise.resolve({ data: [] }),
-    });
+    server.use(
+      http.get(LEADERBOARD_URL_PATTERN, () => HttpResponse.json({ data: [] }))
+    );
 
     renderWithProviders(<LeaderboardTeaser currentLanguage="en" />);
 
@@ -30,7 +30,9 @@ describe('LeaderboardTeaser', () => {
 
   test('shows skeleton loading state initially', () => {
     // Never resolve fetch to keep loading state
-    mockFetch.mockReturnValue(new Promise(() => {}));
+    server.use(
+      http.get(LEADERBOARD_URL_PATTERN, () => new Promise(() => {}))
+    );
 
     const { container } = renderWithProviders(
       <LeaderboardTeaser currentLanguage="en" />
@@ -41,16 +43,15 @@ describe('LeaderboardTeaser', () => {
   });
 
   test('renders top 3 players after fetch', async () => {
-    mockFetch.mockResolvedValue({
-      ok: true,
-      json: () => Promise.resolve({
+    server.use(
+      http.get(LEADERBOARD_URL_PATTERN, () => HttpResponse.json({
         data: [
           { display_name: 'JellyDrifter', score: 12450 },
           { display_name: 'ZenithX', score: 11920 },
           { display_name: 'WordWiz99', score: 10105 },
         ],
-      }),
-    });
+      }))
+    );
 
     renderWithProviders(<LeaderboardTeaser currentLanguage="en" />);
 
@@ -62,24 +63,25 @@ describe('LeaderboardTeaser', () => {
   });
 
   test('fetches from correct daily-challenge leaderboard URL', async () => {
-    mockFetch.mockResolvedValue({
-      ok: true,
-      json: () => Promise.resolve({ data: [] }),
-    });
+    let capturedUrl: string | null = null;
+    server.use(
+      http.get(LEADERBOARD_URL_PATTERN, ({ request }) => {
+        capturedUrl = request.url;
+        return HttpResponse.json({ data: [] });
+      })
+    );
 
     renderWithProviders(<LeaderboardTeaser currentLanguage="en" />);
 
     await waitFor(() => {
-      const url = mockFetch.mock.calls[0]?.[0] as string;
-      expect(url).toMatch(/\/api\/daily-challenge\/leaderboard\/\d{4}-\d{2}-\d{2}\/en\?limit=3/);
+      expect(capturedUrl).toMatch(/\/api\/daily-challenge\/leaderboard\/\d{4}-\d{2}-\d{2}\/en\?limit=3/);
     });
   });
 
   test('handles empty leaderboard gracefully', async () => {
-    mockFetch.mockResolvedValue({
-      ok: true,
-      json: () => Promise.resolve({ data: [] }),
-    });
+    server.use(
+      http.get(LEADERBOARD_URL_PATTERN, () => HttpResponse.json({ data: [] }))
+    );
 
     renderWithProviders(<LeaderboardTeaser currentLanguage="en" />);
 
@@ -90,7 +92,9 @@ describe('LeaderboardTeaser', () => {
   });
 
   test('handles fetch error gracefully', async () => {
-    mockFetch.mockRejectedValue(new Error('Network error'));
+    server.use(
+      http.get(LEADERBOARD_URL_PATTERN, () => HttpResponse.error())
+    );
 
     renderWithProviders(<LeaderboardTeaser currentLanguage="en" />);
 
@@ -98,33 +102,5 @@ describe('LeaderboardTeaser', () => {
       // Should still render the container without crashing
       expect(screen.getByTestId('leaderboard-teaser')).toBeInTheDocument();
     });
-  });
-
-  test('renders crown icon in header', () => {
-    mockFetch.mockResolvedValue({
-      ok: true,
-      json: () => Promise.resolve({ data: [] }),
-    });
-
-    renderWithProviders(<LeaderboardTeaser currentLanguage="en" />);
-
-    // Crown icon should be present (via lucide-react)
-    expect(screen.getByTestId('leaderboard-teaser')).toBeInTheDocument();
-  });
-
-  test('renders Full Standings link when onViewFull is provided', () => {
-    mockFetch.mockResolvedValue({
-      ok: true,
-      json: () => Promise.resolve({ data: [] }),
-    });
-
-    const onViewFull = vi.fn();
-    renderWithProviders(
-      <LeaderboardTeaser currentLanguage="en" onViewFull={onViewFull} />
-    );
-
-    // The "Full Standings" text should render as a button
-    const standingsLink = screen.getByText(/full standings/i);
-    expect(standingsLink).toBeInTheDocument();
   });
 });

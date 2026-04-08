@@ -10,6 +10,7 @@ const createWrapper = () => {
   const Wrapper = ({ children }: { children: React.ReactNode }) => (
     <QueryClientProvider client={qc}>{children}</QueryClientProvider>
   );
+  return Wrapper;
 };
 
 // Mock dependencies before importing component
@@ -50,7 +51,6 @@ vi.mock('@/components/Avatar', () => {
 
 // Mock fetch
 const mockFetch = vi.fn();
-global.fetch = mockFetch;
 
 const MOCK_CREATORS = [
   {
@@ -88,6 +88,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 describe('CreatorLeaderboard', () => {
   beforeEach(() => {
+    global.fetch = mockFetch;
     vi.clearAllMocks();
   });
 

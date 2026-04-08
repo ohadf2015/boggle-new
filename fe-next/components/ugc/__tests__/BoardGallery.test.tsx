@@ -7,6 +7,12 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import BoardGallery from '../BoardGallery';
 
+vi.mock('next/link', () => ({
+  default: ({ children, href, className }: { children: React.ReactNode; href: string; className?: string }) => (
+    <a href={href} className={className}>{children}</a>
+  ),
+}));
+
 vi.mock('@/components/motion/AdaptiveMotion', () => ({
   AdaptiveMotion: {
     div: ({ children, ...props }: { children: React.ReactNode; [key: string]: unknown }) => <div {...props}>{children}</div>,
@@ -72,7 +78,6 @@ const mockBoards = [
 
 // Mock fetch
 const mockFetch = vi.fn();
-global.fetch = mockFetch;
 
 function buildFetchResponse(boards: typeof mockBoards, total = boards.length) {
   return Promise.resolve({
@@ -85,6 +90,11 @@ describe('BoardGallery', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockFetch.mockReturnValue(buildFetchResponse(mockBoards));
+    vi.stubGlobal('fetch', mockFetch);
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
   });
 
   it('renders sort and filter toolbar', async () => {

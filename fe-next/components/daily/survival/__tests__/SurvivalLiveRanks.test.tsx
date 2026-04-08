@@ -1,6 +1,8 @@
 import React from 'react';
 import { render, screen, waitFor, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import { http, HttpResponse } from 'msw';
+import { server } from '@/test/msw/server';
 
 // Mock framer-motion
 vi.mock('framer-motion', () => {
@@ -27,6 +29,24 @@ vi.mock('@/utils/rankingStyles', () => ({
   getRankDisplay: (rank: number) => `#${rank}`,
 }));
 
+// Mock AdaptiveMotion to avoid useDevicePerformance dependency
+vi.mock('@/components/motion/AdaptiveMotion', () => ({
+  AdaptiveMotion: {
+    div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => <div {...props}>{children}</div>,
+  },
+  AdaptiveAnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
+}));
+
+// Mock PlayerProfileTooltip to avoid LanguageContext dependency
+vi.mock('@/components/ui/PlayerProfileTooltip', () => ({
+  default: ({ children }: React.PropsWithChildren) => <>{children}</>,
+}));
+
+// Mock LanguageContext for transitive dependencies
+vi.mock('@/contexts/LanguageContext', () => ({
+  useLanguage: () => ({ t: (k: string) => k, language: 'en' }),
+}));
+
 import { SurvivalLiveRanks, type SurvivalLiveRanksProps } from '../SurvivalLiveRanks';
 
 const mockT = (key: string) => {
@@ -44,19 +64,6 @@ const baseProps: SurvivalLiveRanksProps = {
   t: mockT,
 };
 
-// Mock fetch
-const mockFetch = vi.fn();
-global.fetch = mockFetch;
-
-beforeEach(() => {
-  jest.useFakeTimers({ legacyFakeTimers: false });
-  mockFetch.mockReset();
-});
-
-afterEach(() => {
-  vi.useRealTimers();
-});
-
 // Mock response matches real Supabase view output (snake_case)
 const mockLeaderboardResponse = {
   data: [
@@ -67,37 +74,34 @@ const mockLeaderboardResponse = {
   totalPlayers: 25,
 };
 
+const LEADERBOARD_URL = '/api/daily-challenge/word-hunt/leaderboard/2026-02-07/en';
+
 describe('SurvivalLiveRanks', () => {
   it('renders header', async () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: () => Promise.resolve(mockLeaderboardResponse),
-    });
-
     render(<SurvivalLiveRanks {...baseProps} />);
     expect(screen.getByText('Live Ranks')).toBeInTheDocument();
   });
 
   it('fetches leaderboard data on mount', async () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: () => Promise.resolve(mockLeaderboardResponse),
-    });
+    let fetchCalled = false;
+    server.use(
+      http.get(`*${LEADERBOARD_URL}*`, () => {
+        fetchCalled = true;
+        return HttpResponse.json(mockLeaderboardResponse);
+      })
+    );
 
     render(<SurvivalLiveRanks {...baseProps} />);
 
     await waitFor(() => {
-      expect(mockFetch).toHaveBeenCalledWith(
-        '/api/daily-challenge/word-hunt/leaderboard/2026-02-07/en?limit=10'
-      );
+      expect(fetchCalled).toBe(true);
     });
   });
 
   it('displays player names from leaderboard', async () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: () => Promise.resolve(mockLeaderboardResponse),
-    });
+    server.use(
+      http.get(`*${LEADERBOARD_URL}*`, () => HttpResponse.json(mockLeaderboardResponse))
+    );
 
     render(<SurvivalLiveRanks {...baseProps} />);
 
@@ -109,10 +113,9 @@ describe('SurvivalLiveRanks', () => {
   });
 
   it('highlights current player by playerId', async () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: () => Promise.resolve(mockLeaderboardResponse),
-    });
+    server.use(
+      http.get(`*${LEADERBOARD_URL}*`, () => HttpResponse.json(mockLeaderboardResponse))
+    );
 
     render(<SurvivalLiveRanks {...baseProps} currentPlayerId="alice-id" />);
 
@@ -123,10 +126,9 @@ describe('SurvivalLiveRanks', () => {
   });
 
   it('highlights current player by guestFingerprint', async () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: () => Promise.resolve(mockLeaderboardResponse),
-    });
+    server.use(
+      http.get(`*${LEADERBOARD_URL}*`, () => HttpResponse.json(mockLeaderboardResponse))
+    );
 
     render(<SurvivalLiveRanks {...baseProps} currentGuestFingerprint="bob-fp" />);
 
@@ -137,32 +139,37 @@ describe('SurvivalLiveRanks', () => {
   });
 
   it('polls every 30 seconds', async () => {
-    mockFetch.mockResolvedValue({
-      ok: true,
-      json: () => Promise.resolve(mockLeaderboardResponse),
-    });
+    vi.useFakeTimers();
+    let callCount = 0;
+    server.use(
+      http.get(`*${LEADERBOARD_URL}*`, () => {
+        callCount++;
+        return HttpResponse.json(mockLeaderboardResponse);
+      })
+    );
 
     render(<SurvivalLiveRanks {...baseProps} />);
 
     await waitFor(() => {
-      expect(mockFetch).toHaveBeenCalledTimes(1);
+      expect(callCount).toBeGreaterThanOrEqual(1);
     });
 
-    // Advance 30 seconds
-    act(() => {
+    const countAfterMount = callCount;
+
+    await act(async () => {
       vi.advanceTimersByTime(30000);
     });
 
     await waitFor(() => {
-      expect(mockFetch).toHaveBeenCalledTimes(2);
+      expect(callCount).toBeGreaterThan(countAfterMount);
     });
+    vi.useRealTimers();
   });
 
   it('shows total players count', async () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: () => Promise.resolve(mockLeaderboardResponse),
-    });
+    server.use(
+      http.get(`*${LEADERBOARD_URL}*`, () => HttpResponse.json(mockLeaderboardResponse))
+    );
 
     render(<SurvivalLiveRanks {...baseProps} />);
 

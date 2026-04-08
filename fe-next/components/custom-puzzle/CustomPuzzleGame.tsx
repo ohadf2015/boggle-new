@@ -182,12 +182,12 @@ const CustomPuzzleGame: React.FC<CustomPuzzleGameProps> = ({ puzzleCode }) => {
           text: shareText,
           url: shareUrl,
         });
-      } catch (err) {
-        // User cancelled or share failed
-        await navigator.clipboard.writeText(shareUrl);
+      } catch {
+        // User cancelled or share failed — clipboard fallback
+        try { await navigator.clipboard.writeText(shareUrl); } catch { /* not focused */ }
       }
     } else {
-      await navigator.clipboard.writeText(shareUrl);
+      try { await navigator.clipboard.writeText(shareUrl); } catch { /* not focused */ }
     }
   }, [puzzleCode, language, t]);
 

@@ -160,7 +160,7 @@ export default function BulkWordImporter({
               <div className="space-y-3">
                 <div className="flex items-center justify-between text-sm font-neo-body">
                   <span className="text-neo-cyan tabular-nums">
-                    {t('teacher.lesson.bulkImportDetected').replace('{{count}}', String(parsedWords.length))}
+                    {t('teacher.lesson.bulkImportDetected', { count: parsedWords.length })}
                   </span>
                   <span className="text-neo-white/50 tabular-nums">
                     {integrableCount} {t('teacher.lesson.canIntegrate')}

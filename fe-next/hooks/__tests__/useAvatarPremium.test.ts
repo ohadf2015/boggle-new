@@ -26,8 +26,6 @@ vi.mock('@/contexts/AuthContext', () => ({
   }),
 }));
 
-// Mock fetch for API calls
-global.fetch = vi.fn();
 
 import { useAvatarPremium } from '../useAvatarPremium';
 
@@ -47,6 +45,7 @@ describe('useAvatarPremium', () => {
   });
 
   beforeEach(() => {
+    vi.stubGlobal('fetch', vi.fn());
     queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
     wrapper = ({ children }: { children: React.ReactNode }) =>
       React.createElement(QueryClientProvider, { client: queryClient }, children);

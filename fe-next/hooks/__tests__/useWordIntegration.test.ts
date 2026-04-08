@@ -1,37 +1,28 @@
 import { vi } from 'vitest';
 import { checkWordIntegration, checkWordIntegrationAsync, useWordIntegration } from '../useWordIntegration';
 import { renderHook } from '@testing-library/react';
+import { http, HttpResponse } from 'msw';
+import { server } from '@/test/msw/server';
 
-// Mock fetch for async dictionary checks
-global.fetch = vi.fn();
-
-const mockFetch = global.fetch as any;
+const commonWords = ['cat', 'dog', 'hello', 'appreciation', 'world'];
+const hebrewWords = ['שלום'];
+const swedishWords = ['hej'];
+const japaneseWords = ['日本'];
+const spanishWords = ['hola'];
+const allKnownWords = [...commonWords, ...hebrewWords, ...swedishWords, ...japaneseWords, ...spanishWords];
 
 describe('checkWordIntegration', () => {
   beforeEach(() => {
-    // Reset mocks before each test
     vi.clearAllMocks();
 
-    // Default: simulate API response for dictionary validation
-    mockFetch.mockImplementation(async (_url, options) => {
-      const body = JSON.parse((options as RequestInit).body as string);
-      const word = body.word;
-
-      // Simulate common words in dictionary
-      const commonWords = ['cat', 'dog', 'hello', 'appreciation', 'world'];
-      const hebrewWords = ['שלום'];
-      const swedishWords = ['hej'];
-      const japaneseWords = ['日本'];
-      const spanishWords = ['hola'];
-
-      const allWords = [...commonWords, ...hebrewWords, ...swedishWords, ...japaneseWords, ...spanishWords];
-      const isValid = allWords.includes(word.toLowerCase());
-
-      return {
-        ok: true,
-        json: async () => ({ isValid }),
-      } as Response;
-    });
+    // Register MSW handler that simulates dictionary validation
+    server.use(
+      http.post('*/api/validate-word*', async ({ request }) => {
+        const body = await request.json() as { word: string };
+        const isValid = allKnownWords.includes(body.word.toLowerCase());
+        return HttpResponse.json({ isValid });
+      })
+    );
   });
   // Valid dictionary words
   describe('Valid dictionary words', () => {

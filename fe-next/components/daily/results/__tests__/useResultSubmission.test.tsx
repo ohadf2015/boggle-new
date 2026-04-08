@@ -16,7 +16,6 @@ import type { WordHuntResult, GuestDailyPlayer } from '@/utils/dailyChallenge';
 
 // Mock fetch globally
 const mockFetch = vi.fn();
-global.fetch = mockFetch;
 
 // Mock dailyChallenge utilities
 vi.mock('@/utils/dailyChallenge', () => ({
@@ -95,6 +94,7 @@ describe('useResultSubmission', () => {
   const mockOnSubmitSuccess = vi.fn();
 
   beforeEach(() => {
+    vi.stubGlobal('fetch', mockFetch);
     vi.clearAllMocks();
     mockFetch.mockReset();
 

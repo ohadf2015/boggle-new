@@ -30,11 +30,9 @@ vi.mock('@/utils/supabase/client', () => ({
   })),
 }));
 
-// Mock fetch
-global.fetch = vi.fn();
-
 describe('useWordBank - Bug Fix: Missing Authorization Header', () => {
   beforeEach(() => {
+    vi.stubGlobal('fetch', vi.fn());
     vi.clearAllMocks();
     (global.fetch as any).mockResolvedValue({
       ok: true,

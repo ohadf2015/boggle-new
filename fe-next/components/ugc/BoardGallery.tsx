@@ -63,7 +63,7 @@ const BoardGallery = memo<BoardGalleryProps>(({ onPlay }) => {
         if (!res.ok) return;
         const data: GalleryResponse = await res.json();
 
-        setBoards(prev => append ? [...prev, ...data.boards] : data.boards);
+        setBoards(prev => append ? [...prev, ...(data.boards ?? [])] : (data.boards ?? []));
         setTotal(data.total);
         setHasMore(data.hasMore);
       } finally {
