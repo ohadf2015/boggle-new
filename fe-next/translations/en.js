@@ -7941,7 +7941,11 @@ const en = {
       "mediumDesc": "Balanced chaos",
       "hardDesc": "Specials everywhere, brutal waves",
       "resumeWave": "Start from Wave {wave}",
-      "savedScore": "Score: {score}"
+      "savedScore": "Score: {score}",
+      "rule1": "Swipe adjacent letters to form words",
+      "rule2": "Diagonal connections allowed",
+      "rule3": "Special tiles explode, freeze & multiply",
+      "rule4": "Clear the board to advance"
     },
     "hint": "Hint",
     "stuck": "Stuck?",
@@ -7950,7 +7954,9 @@ const en = {
     "tapToContinue": "Tap to continue",
     "levelComplete": "Level Complete!",
     "moveBonus": "Move Bonus",
+    "waveComplete": "Wave {wave} Complete!",
     "nextWave": "Next Wave",
+    "bestWord": "Best",
     "celebrateAgain": "Celebrate again",
     "best": "Best",
     "movesLeft": "Moves",
@@ -9650,7 +9656,9 @@ const en = {
     "weeklyWordMasteryDesc": "Master {target} words this week",
     "questOptions": "Quest options",
     "completion": {
+      "title": "Quest Complete!",
       "grandSlam": "GRAND SLAM!",
+      "grandSlamDesc": "All daily missions crushed!",
       "xpReward": "+{{xp}} XP",
       "goldReward": "+{{gold}} Gold"
     }

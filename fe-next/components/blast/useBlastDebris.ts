@@ -81,7 +81,7 @@ export function useBlastDebris(
         }
 
         const state = physics.getBodyState(d.bodyId);
-        if (state) {
+        if (state && !d.graphic.destroyed) {
           d.graphic.x = state.position.x;
           d.graphic.y = state.position.y;
           d.graphic.rotation = state.angle;

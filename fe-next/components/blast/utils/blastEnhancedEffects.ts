@@ -355,8 +355,14 @@ export function createEnhancedEffects(
     if (destroyed) return;
     const sprite = createTileProxy(app, camera, x, y, cellSize * 0.9, tileType);
     const config = tileType === 'frozen' ? FROZEN_DISSOLVE : ICE_DISSOLVE;
-    const effect = new DissolveEffect(sprite, config);
-    trackEffect(effect, sprite, effect.dissolve());
+    try {
+      const effect = new DissolveEffect(sprite, config);
+      trackEffect(effect, sprite, effect.dissolve());
+    } catch {
+      // RenderTexture has no canvas resource — fall back to simple fade-out
+      sprite.alpha = 0;
+      try { sprite.destroy(); } catch { /* already cleaned */ }
+    }
   }
 
   /** Helper: track a promise-based effect and clean up when done. */

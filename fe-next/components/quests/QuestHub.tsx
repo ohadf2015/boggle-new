@@ -18,6 +18,7 @@ import { cn } from '@/lib/utils';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { QuestProgressRing } from './QuestProgressRing';
 import { QuestCard } from './QuestCard';
+import { useCoinsFromContext } from '@/contexts/CoinContext';
 import PartPreview from '@/components/avatar/PartPreview';
 import { DEFAULT_AVATAR_CONFIG } from '@/shared/types/customAvatar';
 import type { AvatarPartReward } from '@/shared/weeklyQuestTemplates';
@@ -401,6 +402,7 @@ export function QuestHub() {
   const { missions, isGrandSlam, loading } =
     useDailyMissions();
   const { isComplete: weeklyComplete } = useWeeklyQuest();
+  const { addCoins } = useCoinsFromContext();
   const hasShownAllCompleteToast = useRef(false);
 
   // Show "All Quests Complete" celebration when both daily + weekly are done
@@ -408,6 +410,8 @@ export function QuestHub() {
   useEffect(() => {
     if (allComplete && !loading && !hasShownAllCompleteToast.current) {
       hasShownAllCompleteToast.current = true;
+      // Actually grant the gold reward
+      addCoins(200, 'all_quests_complete');
       import('./QuestCompletionToast').then(({ showQuestCompletionToast }) => {
         showQuestCompletionToast({
           questName: '',
@@ -418,7 +422,7 @@ export function QuestHub() {
         });
       });
     }
-  }, [allComplete, loading, t]);
+  }, [allComplete, loading, t, addCoins]);
 
   // Filter to only the 3 quests we show (no brain drill)
   const dailyCompleted = useMemo(() => DAILY_QUEST_CONFIGS.filter((config) => {

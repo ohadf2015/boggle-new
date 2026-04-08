@@ -542,6 +542,17 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
           };
         });
 
+        // Show quest completion toast if a weekly quest was completed
+        if (data.questUpdate?.completed) {
+          import('@/components/quests/QuestCompletionToast').then(({ showQuestCompletionToast }) => {
+            showQuestCompletionToast({
+              questName: data.questUpdate.description,
+              xpReward: data.questUpdate.xpReward,
+              t: (key: string) => key,
+            });
+          });
+        }
+
         // Sync to CrazyGames cloud save (fire-and-forget, non-blocking)
         syncCloudSave(world, level, stars);
 

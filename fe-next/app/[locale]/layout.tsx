@@ -390,7 +390,6 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 { '@type': 'SiteNavigationElement', name: 'Contact', url: `https://www.lexiclash.live${localePath}/contact` },
                 { '@type': 'SiteNavigationElement', name: 'Word Solver', url: `https://www.lexiclash.live${localePath}/tools/word-solver` },
                 { '@type': 'SiteNavigationElement', name: 'Word of the Day', url: `https://www.lexiclash.live${localePath}/word-of-the-day` },
-                { '@type': 'SiteNavigationElement', name: 'Brain Training', url: `https://www.lexiclash.live${localePath}/brain` },
                 { '@type': 'SiteNavigationElement', name: 'Adventure Mode', url: `https://www.lexiclash.live${localePath}/adventure` },
             ],
         },

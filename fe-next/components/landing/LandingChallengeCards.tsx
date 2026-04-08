@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Swords, BookOpen, Map, Bomb } from 'lucide-react';
 import ModeCard from './ModeCard';
 import DailyChallengeBanner from '@/components/daily/DailyChallengeBanner';
@@ -49,12 +49,15 @@ export function LandingChallengeCards({
   dailyChallengeStats,
   cardOrder: cardOrderProp,
 }: LandingChallengeCardsProps) {
-  const [isFirstTimer, setIsFirstTimer] = useState(false);
-  const [isNewbie, setIsNewbie] = useState(false);
-  useEffect(() => {
-    setIsFirstTimer(shouldShowGuidance('firstPlayTutorialCompleted') && !hasCompletedOnboarding());
-    setIsNewbie(isNewPlayer());
-  }, []);
+  // Synchronous init from localStorage — avoids post-mount card reorder CLS
+  const [isFirstTimer] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return shouldShowGuidance('firstPlayTutorialCompleted') && !hasCompletedOnboarding();
+  });
+  const [isNewbie] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return isNewPlayer();
+  });
 
   // New players (< 3 games) see practice first to ease them in
   const serverOrder = cardOrderProp ?? DEFAULT_ORDER;

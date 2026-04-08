@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef, useCallback } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -66,17 +66,8 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
   const { isAuthenticated, isAdmin, profile } = useAuth();
   const isMobilePortrait = useMobilePortrait();
 
-  // Defer below-fold content until after first paint to speed up FCP.
-  // Uses rAF (fires on next frame ~16ms) instead of requestIdleCallback
-  // which can be delayed several seconds on busy pages, blocking scroll.
-  const [hydrated, setHydrated] = useState(false);
-  const hydratedRef = useRef(false);
-  useEffect(() => {
-    if (hydratedRef.current) return;
-    hydratedRef.current = true;
-    const id = requestAnimationFrame(() => setHydrated(true));
-    return () => cancelAnimationFrame(id);
-  }, []);
+  // Below-fold content is already code-split via dynamic() imports,
+  // so no need for a separate hydration gate that causes CLS.
 
   const liveRoomStats = useLiveRoomStats();
   const { allTimeBest: playerAllTimeBest } = usePlayerStats();
@@ -131,19 +122,8 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
   const [enableHeavyBackground, setEnableHeavyBackground] = useState(false);
   useEffect(() => { setEnableHeavyBackground(getPerfVariant() === 'control'); }, []);
 
-  const [isDesktopWidth, setIsDesktopWidth] = useState(() => {
-    if (typeof window === 'undefined') return false;
-    return window.innerWidth >= 1024;
-  });
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const check = () => setIsDesktopWidth(window.innerWidth >= 1024);
-    window.addEventListener('resize', check);
-    return () => window.removeEventListener('resize', check);
-  }, []);
-
-  // Defer music until after first paint — keeps main thread free during FCP
-  useEffect(() => { if (hydrated) playTrack(TRACKS.BOSSA); }, [hydrated, playTrack, TRACKS]);
+  // Start music after mount
+  useEffect(() => { playTrack(TRACKS.BOSSA); }, [playTrack, TRACKS]);
 
   const dailyChallengeStats = {
     hasPlayed: dailyChallengeStatus.hasPlayed,
@@ -162,7 +142,7 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
         'flex flex-col bg-gray-100 dark:bg-neo-navy relative page-content-safe',
       )}
     >
-      {hydrated && enableHeavyBackground && !isMobilePortrait && <PlayfulBackground intensity="high" colorScheme="default" />}
+      {enableHeavyBackground && !isMobilePortrait && <PlayfulBackground intensity="high" colorScheme="default" />}
 
       <OnboardingModal isOpen={showOnboarding} onClose={() => setShowOnboarding(false)} />
       <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />
@@ -213,40 +193,38 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
         />
 
         {/* Leaderboard — mobile only (desktop shows in hero sidebar) */}
-        {hydrated && isMobilePortrait && (
-          <div className="w-full max-w-4xl mx-auto animate-[fadeIn_0.3s_ease-out]">
+        {isMobilePortrait && (
+          <div className="w-full max-w-4xl mx-auto">
             <LandingLeaderboardPreview players={topPlayers} loading={topPlayersLoading} compact />
           </div>
         )}
 
         {/* Engagement widgets — compact, below game modes. Max 3 to avoid overload */}
-        {hydrated && isAuthenticated && (
-          <div className="flex flex-col gap-4 max-w-4xl mx-auto w-full animate-[fadeIn_0.3s_ease-out]">
+        {isAuthenticated && (
+          <div className="flex flex-col gap-4 max-w-4xl mx-auto w-full">
             <UrgencyCard />
             <GhostRivalWidget />
             <VaultCardConnected />
           </div>
         )}
 
-        {/* Below-fold sections — deferred until after first paint, fade in smoothly */}
-        {hydrated && (
-          <div className="flex flex-col gap-6 sm:gap-8 animate-[fadeIn_0.3s_ease-out]">
-            <div className="flex flex-col gap-6 lg:flex-row lg:items-stretch lg:gap-6 w-full max-w-4xl mx-auto xl:max-w-5xl">
-              <div className="lg:flex-1">
-                <LandingYourRank />
-              </div>
-              <div className="lg:flex-1">
-                <LandingAvatarTeaser onBuilderOpenChange={setIsAvatarBuilderOpen} />
-              </div>
+        {/* Below-fold sections */}
+        <div className="flex flex-col gap-6 sm:gap-8">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-stretch lg:gap-6 w-full max-w-4xl mx-auto xl:max-w-5xl">
+            <div className="lg:flex-1">
+              <LandingYourRank />
             </div>
-
-            <LandingCommunityShowcase />
-
-            <div className="w-full max-w-4xl mx-auto">
-              <LandingShareBanner onShareClick={() => setShowShareModal(true)} />
+            <div className="lg:flex-1">
+              <LandingAvatarTeaser onBuilderOpenChange={setIsAvatarBuilderOpen} />
             </div>
           </div>
-        )}
+
+          <LandingCommunityShowcase />
+
+          <div className="w-full max-w-4xl mx-auto">
+            <LandingShareBanner onShareClick={() => setShowShareModal(true)} />
+          </div>
+        </div>
       </section>
 
       <ScrollIndicator />

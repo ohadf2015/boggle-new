@@ -7,6 +7,7 @@ import { motion } from 'framer-motion';
 import { Calendar, Clock, ArrowRight } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
+import { toBcp47Locale } from '@/utils/bcp47Locale';
 
 interface BlogPostData {
   slug: string;
@@ -138,7 +139,7 @@ export function LandingBlogSection() {
                 <div className="flex items-center gap-4 text-xs text-gray-500">
                   <span className="flex items-center gap-1">
                     <Calendar className="w-3 h-3" />
-                    {new Date(post.date).toLocaleDateString(lang, { month: 'short', day: 'numeric', year: 'numeric' })}
+                    {new Date(post.date).toLocaleDateString(toBcp47Locale(lang), { month: 'short', day: 'numeric', year: 'numeric' })}
                   </span>
                   <span className="flex items-center gap-1">
                     <Clock className="w-3 h-3" />

@@ -164,7 +164,7 @@ export async function checkAndClaimGrandSlam(
 ): Promise<GrandSlamResult> {
   const missions = await getDailyMissions(playerId, date);
 
-  if (missions.completedCount < 4) {
+  if (missions.completedCount < 3) {
     return { claimed: false, reward: 0 };
   }
 

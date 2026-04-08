@@ -413,7 +413,7 @@ function registerEngagementHandlers(io: Server, socket: Socket): void {
       safeEmit(socket, 'engagement:dailyMissions', { missions });
 
       // Auto-check grand slam
-      if (missions.completedCount === 4 && !missions.grandSlamClaimed) {
+      if (missions.completedCount >= 3 && !missions.grandSlamClaimed) {
         const grandSlam = await checkAndClaimGrandSlam(playerId);
         if (grandSlam.claimed) {
           safeEmit(socket, 'engagement:grandSlamClaimed', grandSlam);

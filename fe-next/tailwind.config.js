@@ -544,6 +544,21 @@ module.exports = {
           "50%": { transform: "scale(1)", opacity: "0.6" },
           "100%": { transform: "scale(1.5)", opacity: "0" },
         },
+        // Quest completion toast animations
+        "celebrationPop": {
+          "0%": { transform: "scale(0.5) translateY(20px)", opacity: "0" },
+          "60%": { transform: "scale(1.05) translateY(-5px)", opacity: "1" },
+          "100%": { transform: "scale(1) translateY(0)", opacity: "1" },
+        },
+        "iconBounce": {
+          "0%": { transform: "scale(0) rotate(-15deg)", opacity: "0" },
+          "50%": { transform: "scale(1.2) rotate(5deg)", opacity: "1" },
+          "100%": { transform: "scale(1) rotate(0deg)", opacity: "1" },
+        },
+        "rewardSlide": {
+          "0%": { transform: "translateY(10px) scale(0.8)", opacity: "0" },
+          "100%": { transform: "translateY(0) scale(1)", opacity: "1" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",

@@ -28,7 +28,6 @@ const SECTIONS = [
       { href: '/daily/word-wheel', labelKey: 'sitemap.wordWheel', fallback: 'Word Wheel' },
       { href: '/blast', labelKey: 'sitemap.blast', fallback: 'Blast Mode' },
       { href: '/adventure', labelKey: 'sitemap.adventure', fallback: 'Adventure Mode' },
-      { href: '/brain', labelKey: 'sitemap.brain', fallback: 'Brain Training' },
     ],
   },
   {

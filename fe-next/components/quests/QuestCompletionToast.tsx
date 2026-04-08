@@ -1,18 +1,19 @@
 'use client';
 
 /**
- * QuestCompletionToast — satisfying animated notification when a quest
+ * QuestCompletionToast — Satisfying animated celebration overlay when a quest
  * is completed. Uses react-hot-toast with a custom render.
  *
  * Features:
- * - Animated entrance with neo-pop
+ * - Full-width overlay with confetti burst
+ * - Animated entrance with bounce + scale
  * - XP/gold reward display with glow
- * - Confetti-like particle burst (CSS-only)
- * - Auto-dismiss after 4s
+ * - Tiered celebrations: normal < grandSlam < allComplete
+ * - Auto-dismiss
  */
 
 import toast from 'react-hot-toast';
-import { Trophy, Star, Sparkles, Crown } from 'lucide-react';
+import { Trophy, Star, Sparkles, Crown, Coins } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { fireVictoryConfetti, fireFireworks } from '@/utils/confettiUtils';
 
@@ -22,12 +23,12 @@ interface QuestCompletionOptions {
   goldReward?: number;
   isGrandSlam?: boolean;
   isAllComplete?: boolean;
-  t: (key: string, params?: Record<string, string | number>) => string;
+  t?: (key: string, params?: Record<string, string | number>) => string;
   onComplete?: () => void;
 }
 
 /**
- * Show a satisfying quest completion toast.
+ * Show a satisfying quest completion celebration.
  * Call this when a quest/mission is completed.
  */
 export function showQuestCompletionToast({
@@ -36,10 +37,11 @@ export function showQuestCompletionToast({
   goldReward,
   isGrandSlam = false,
   isAllComplete = false,
-  t,
+  t = (k) => k,
   onComplete,
 }: QuestCompletionOptions) {
   onComplete?.();
+
   // Fire confetti based on achievement tier
   if (isAllComplete) {
     fireFireworks(4, 2500);
@@ -49,104 +51,132 @@ export function showQuestCompletionToast({
     fireVictoryConfetti();
   }
 
-  const bgStyle = isAllComplete
-    ? 'bg-linear-to-br from-neo-lime/20 via-neo-navy to-neo-cyan/10 border-neo-lime'
+  const bgGradient = isAllComplete
+    ? 'from-neo-lime/30 via-neo-navy to-neo-cyan/20'
     : isGrandSlam
-      ? 'bg-linear-to-br from-neo-yellow/20 via-neo-navy to-neo-yellow/10 border-neo-yellow'
-      : 'bg-neo-navy';
+      ? 'from-neo-pink/30 via-neo-navy to-neo-lime/15'
+      : 'from-neo-lime/20 via-neo-navy to-neo-navy';
+
+  const borderColor = isAllComplete
+    ? 'border-neo-lime'
+    : isGrandSlam
+      ? 'border-neo-pink'
+      : 'border-neo-lime';
 
   const iconBg = isAllComplete
-    ? 'bg-neo-lime shadow-[0_0_20px_rgba(191,255,0,0.4)]'
+    ? 'bg-neo-lime shadow-[0_0_24px_rgba(191,255,0,0.5)]'
     : isGrandSlam
-      ? 'bg-neo-yellow shadow-[0_0_20px_rgba(255,225,53,0.4)]'
-      : 'bg-neo-lime shadow-[0_0_12px_rgba(191,255,0,0.3)]';
+      ? 'bg-neo-pink shadow-[0_0_24px_rgba(255,20,147,0.5)]'
+      : 'bg-neo-lime shadow-[0_0_16px_rgba(191,255,0,0.3)]';
 
   const title = isAllComplete
     ? t('quests.allComplete')
     : isGrandSlam
       ? t('quests.completion.grandSlam')
+      : t('quests.completion.title');
+
+  const subtitle = isAllComplete
+    ? t('quests.allCompleteDesc')
+    : isGrandSlam
+      ? t('quests.completion.grandSlamDesc')
       : questName;
 
-  const rewardColor = isAllComplete
-    ? 'text-neo-lime'
-    : isGrandSlam
-      ? 'text-neo-yellow'
-      : 'text-neo-lime';
+  const rewardColor = isAllComplete ? 'text-neo-lime' : isGrandSlam ? 'text-neo-pink' : 'text-neo-lime';
 
   toast.custom(
     (toastInstance) => (
       <div
         className={cn(
           'relative overflow-hidden',
-          'max-w-sm w-full mx-auto',
+          'w-full max-w-md mx-auto',
           'rounded-neo-lg border-3 border-neo-black',
           'shadow-hard-lg',
-          bgStyle,
-          toastInstance.visible ? 'animate-neo-pop' : 'opacity-0 scale-75',
+          'bg-linear-to-br',
+          bgGradient,
+          borderColor,
+          toastInstance.visible
+            ? 'animate-[celebrationPop_0.5s_cubic-bezier(0.34,1.56,0.64,1)_forwards]'
+            : 'opacity-0 scale-50',
           'transition-all duration-300',
         )}
         role="status"
-        aria-live="polite"
+        aria-live="assertive"
       >
         {/* Shimmer overlay */}
         <div
-          className="absolute inset-0 bg-linear-to-r from-transparent via-neo-white/5 to-transparent animate-shimmer pointer-events-none"
+          className="absolute inset-0 bg-linear-to-r from-transparent via-neo-white/8 to-transparent animate-shimmer pointer-events-none"
           aria-hidden="true"
         />
 
-        {/* Particle burst effect — CSS pseudo elements */}
-        <div className="absolute top-2 inset-s-4 w-2 h-2 rounded-full bg-neo-yellow animate-burst" aria-hidden="true" />
-        <div className="absolute top-4 inset-e-6 w-1.5 h-1.5 rounded-full bg-neo-pink animate-burst [animation-delay:0.1s]" aria-hidden="true" />
-        <div className="absolute bottom-3 inset-s-8 w-1 h-1 rounded-full bg-neo-cyan animate-burst [animation-delay:0.2s]" aria-hidden="true" />
-        <div className="absolute top-6 inset-e-10 w-1.5 h-1.5 rounded-full bg-neo-lime animate-burst [animation-delay:0.15s]" aria-hidden="true" />
+        {/* Particle burst decorations */}
+        <div className="absolute top-2 inset-s-4 w-2.5 h-2.5 rounded-full bg-neo-lime animate-burst" aria-hidden="true" />
+        <div className="absolute top-5 inset-e-6 w-2 h-2 rounded-full bg-neo-pink animate-burst [animation-delay:0.1s]" aria-hidden="true" />
+        <div className="absolute bottom-4 inset-s-8 w-1.5 h-1.5 rounded-full bg-neo-cyan animate-burst [animation-delay:0.2s]" aria-hidden="true" />
+        <div className="absolute top-8 inset-e-10 w-2 h-2 rounded-full bg-neo-lime animate-burst [animation-delay:0.15s]" aria-hidden="true" />
+        <div className="absolute bottom-2 inset-e-4 w-1.5 h-1.5 rounded-full bg-neo-pink animate-burst [animation-delay:0.25s]" aria-hidden="true" />
 
-        <div className="relative flex items-center gap-3 p-4">
-          {/* Icon */}
+        <div className="relative flex flex-col items-center text-center gap-3 p-6">
+          {/* Icon — larger and more prominent */}
           <div
             className={cn(
-              'shrink-0 w-12 h-12 flex items-center justify-center',
+              'w-16 h-16 flex items-center justify-center',
               'rounded-full border-3 border-neo-black',
               iconBg,
+              'animate-[iconBounce_0.6s_ease-out_0.2s_both]',
             )}
           >
             {isAllComplete ? (
-              <Crown className="w-6 h-6 text-neo-black" aria-hidden="true" />
+              <Crown className="w-8 h-8 text-neo-black" aria-hidden="true" />
             ) : isGrandSlam ? (
-              <Sparkles className="w-6 h-6 text-neo-black" aria-hidden="true" />
+              <Sparkles className="w-8 h-8 text-neo-black" aria-hidden="true" />
             ) : (
-              <Trophy className="w-6 h-6 text-neo-black" aria-hidden="true" />
+              <Trophy className="w-8 h-8 text-neo-black" aria-hidden="true" />
             )}
           </div>
 
-          {/* Content */}
-          <div className="flex-1 min-w-0">
-            <p className="font-neo-display text-sm font-black text-neo-white truncate">
+          {/* Title */}
+          <div>
+            <p className="font-neo-display text-xl font-black text-neo-white leading-tight">
               {title}
             </p>
-            {isAllComplete && (
-              <p className="font-neo-body text-xs text-neo-white/70 mt-0.5">
-                {t('quests.allCompleteDesc')}
+            {subtitle && (
+              <p className="font-neo-body text-sm text-neo-white/70 mt-1">
+                {subtitle}
               </p>
             )}
-            <div className="flex items-center gap-3 mt-1">
-              {/* XP reward */}
-              <span
+          </div>
+
+          {/* Rewards row */}
+          <div className="flex items-center justify-center gap-4 mt-1">
+            {/* XP reward */}
+            <div
+              className={cn(
+                'flex items-center gap-1.5',
+                'px-3 py-1.5 rounded-full',
+                'bg-neo-black/30 border-2 border-neo-black',
+                'font-neo-display text-sm font-black',
+                rewardColor,
+                'animate-[rewardSlide_0.4s_ease-out_0.4s_both]',
+              )}
+            >
+              <Star className="w-4 h-4" aria-hidden="true" />
+              +{xpReward} XP
+            </div>
+            {/* Gold reward */}
+            {goldReward && goldReward > 0 && (
+              <div
                 className={cn(
-                  'inline-flex items-center gap-1',
-                  'font-neo-display text-xs font-black',
-                  rewardColor,
+                  'flex items-center gap-1.5',
+                  'px-3 py-1.5 rounded-full',
+                  'bg-neo-black/30 border-2 border-neo-black',
+                  'font-neo-display text-sm font-black text-yellow-400',
+                  'animate-[rewardSlide_0.4s_ease-out_0.5s_both]',
                 )}
               >
-                <Star className="w-3.5 h-3.5" aria-hidden="true" />
-                {t('quests.completion.xpReward', { xp: xpReward })}
-              </span>
-              {/* Gold reward */}
-              {goldReward && goldReward > 0 && (
-                <span className="inline-flex items-center gap-1 font-neo-display text-xs font-black text-neo-yellow">
-                  {t('quests.completion.goldReward', { gold: goldReward })}
-                </span>
-              )}
-            </div>
+                <Coins className="w-4 h-4" aria-hidden="true" />
+                +{goldReward} gold
+              </div>
+            )}
           </div>
         </div>
       </div>

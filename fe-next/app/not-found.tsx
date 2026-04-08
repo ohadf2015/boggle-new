@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { headers } from 'next/headers';
 
 export const metadata: Metadata = {
+  title: '404 - Page Not Found | LexiClash',
   robots: { index: false, follow: false },
 };
 

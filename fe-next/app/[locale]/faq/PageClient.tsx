@@ -44,7 +44,7 @@ export default function FAQPageClient(): React.ReactElement {
               )}
             >
               <ArrowLeft className="w-4 h-4 me-1 rtl:rotate-180" />
-              Back
+              {c.back}
             </Button>
           </Link>
           <div>
@@ -165,17 +165,17 @@ export default function FAQPageClient(): React.ReactElement {
           <div className="flex flex-wrap gap-2">
             <Link href={`/${locale}/blog/science-behind-word-games`}>
               <Button variant="outline" size="sm" className="rounded-neo border-2 border-neo-black font-bold text-xs">
-                The Science Behind Word Games
+                {c.blogScienceTitle}
               </Button>
             </Link>
             <Link href={`/${locale}/blog/daily-challenge-strategies`}>
               <Button variant="outline" size="sm" className="rounded-neo border-2 border-neo-black font-bold text-xs">
-                Daily Challenge Strategies
+                {c.blogStrategiesTitle}
               </Button>
             </Link>
             <Link href={`/${locale}/blog`}>
               <Button size="sm" className="rounded-neo border-2 border-neo-black bg-neo-cyan text-neo-black font-bold text-xs shadow-hard-sm">
-                View all posts →
+                {c.blogViewAll}
               </Button>
             </Link>
           </div>

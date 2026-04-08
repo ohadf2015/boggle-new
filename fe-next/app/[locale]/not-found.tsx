@@ -1,11 +1,16 @@
 'use client';
 
+import { useEffect } from 'react';
 import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { InteractiveMascot } from '@/components/ui/InteractiveMascot';
 
 export default function NotFound() {
   const { t } = useLanguage();
+
+  useEffect(() => {
+    document.title = '404 - ' + (t('notFound.heading') || 'Page Not Found') + ' | LexiClash';
+  }, [t]);
 
   return (
     <div className="flex-1 flex items-center justify-center bg-linear-to-br from-neo-navy via-neo-navy-light to-neo-navy px-4 relative overflow-hidden">

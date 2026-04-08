@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, lazy, useState, useEffect } from 'react';
+import { Suspense, lazy, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
@@ -44,10 +44,11 @@ export function LandingMobileCards({
   onShareClick,
   dailyChallengeStats,
 }: LandingMobileCardsProps): React.JSX.Element {
-  const [isFirstTimer, setIsFirstTimer] = useState(false);
-  useEffect(() => {
-    setIsFirstTimer(shouldShowGuidance('firstPlayTutorialCompleted') && !hasCompletedOnboarding());
-  }, []);
+  // Synchronous init from localStorage — avoids post-mount highlight CLS
+  const [isFirstTimer] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return shouldShowGuidance('firstPlayTutorialCompleted') && !hasCompletedOnboarding();
+  });
 
   return (
     <div className='flex flex-col w-full'>

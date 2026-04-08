@@ -7747,7 +7747,11 @@ const sv = {
       "mediumDesc": "Balanserat kaos",
       "hardDesc": "Specialbrickor överallt, brutala vågor",
       "resumeWave": "Börja från Våg {wave}",
-      "savedScore": "Poäng: {score}"
+      "savedScore": "Poäng: {score}",
+      "rule1": "Svep över intilliggande bokstäver för att bilda ord",
+      "rule2": "Diagonala kopplingar tillåtna",
+      "rule3": "Specialbrickor spränger, fryser och multiplicerar",
+      "rule4": "Rensa brädet för att avancera"
     },
     "hint": "Tips",
     "stuck": "Fastnat?",
@@ -7756,6 +7760,7 @@ const sv = {
     "tapToContinue": "Tryck för att fortsätta",
     "levelComplete": "Nivå klar!",
     "moveBonus": "Dragbonus",
+    "waveComplete": "Våg {wave} klar!",
     "nextWave": "Nästa våg",
     "celebrateAgain": "Fira igen",
     "best": "Bäst",
@@ -7827,6 +7832,7 @@ const sv = {
     "wordsFound": "ord",
     "gameOver": "SPELET SLUT",
     "waves": "vågor",
+    "bestWord": "Bäst",
     "playAgain": "SPELA IGEN",
     "tileGuide": {
       "title": "Brickguide",
@@ -9443,7 +9449,9 @@ const sv = {
     "weeklyWordMasteryDesc": "Bemästra {target} ord den här veckan",
     "questOptions": "Uppdragsalternativ",
     "completion": {
+      "title": "Uppdrag klart!",
       "grandSlam": "Grand Slam!",
+      "grandSlamDesc": "Alla dagliga uppdrag avklarade!",
       "xpReward": "+{{xp}} XP",
       "goldReward": "+{{gold}} Guld"
     }

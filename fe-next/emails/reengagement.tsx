@@ -160,32 +160,36 @@ interface ReengagementEmailProps {
   playUrl: string;
 }
 
-/* ─── Image base: dev server vs production CDN ─── */
+/* ─── Assets ─── */
 
-const mascotSrc = 'https://lexiclash.live/mascot-new-crying.jpg';
+const mascotSrc = 'https://lexiclash.live/mascot/v1/crying-nobg.gif';
+const logoSrc = 'https://lexiclash.live/logos/lexiclash_logo_english-min.webp';
 
 /* ─── Colors (solid hex only — Gmail dark-mode safe) ─── */
 
 const C = {
-  bg: '#0f0f23',
-  card: '#1a1a2e',
-  cardTop: '#1a1a2e',
-  cardInner: '#141428',
+  bg: '#1a1a2e',
+  card: '#252545',
+  cardTop: '#252545',
+  cardInner: '#1e1e3a',
   tileEmpty: '#2a2a4a',
-  border: '#2e2e55',
+  border: '#000000',
   tileBorder: '#44447a',
-  muted: '#9999bb',
-  subtle: '#7a7aa0',
-  footer: '#606080',
+  muted: '#9CA3AF',
+  subtle: '#9CA3AF',
+  footer: '#666666',
   urgencyBg: '#331030',
   urgencyBorder: '#6a2858',
   lime: '#BFFF00',
+  limeMuted: '#A6D900',
   pink: '#FF1493',
   cyan: '#00FFFF',
   purple: '#8B5CF6',
   white: '#FFFFFF',
   black: '#000000',
   filledTile: '#00FFFF',
+  grayDark: '#374151',
+  grayLight: '#9CA3AF',
 } as const;
 
 /* ─── Component ─── */
@@ -226,7 +230,7 @@ export default function ReengagementEmail({
           <style>{`
             u + .body { background-color: ${C.bg} !important; }
             [data-ogsc] h1 { color: ${C.white} !important; }
-            [data-ogsc] .cta-btn { background-color: ${C.pink} !important; color: ${C.white} !important; }
+            [data-ogsc] .cta-btn { background-color: ${C.lime} !important; color: ${C.black} !important; }
             [data-ogsc] .streak { color: ${C.pink} !important; }
             [data-ogsc] .q { color: ${C.cyan} !important; }
             @media (max-width: 480px) {
@@ -242,30 +246,26 @@ export default function ReengagementEmail({
         <Body className="body" style={{
           margin: 0, padding: 0,
           backgroundColor: C.bg,
-          fontFamily: "'Fredoka', Arial, Helvetica, sans-serif",
+          fontFamily: "'Fredoka', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
         }}>
           {/* Outer centering table */}
           <table role="presentation" cellPadding={0} cellSpacing={0} width="100%" dir={dir}
             style={{ backgroundColor: C.bg }}>
             <tr>
-              <td align="center" style={{ padding: '32px 16px' }}>
+              <td align="center" style={{ padding: '40px 20px' }}>
                 <table role="presentation" cellPadding={0} cellSpacing={0} width="100%"
-                  style={{ maxWidth: '460px' }} dir={dir}>
+                  style={{ maxWidth: '540px' }} dir={dir}>
 
-                  {/* ── Text Logo ── */}
+                  {/* ── Logo ── */}
                   <tr>
                     <td align="center" style={{ paddingBottom: '24px' }}>
                       <Link href={playUrl} target="_blank" style={{ textDecoration: 'none' }}>
-                        <span style={{
-                          fontSize: '32px',
-                          fontWeight: 700,
-                          color: C.lime,
-                          letterSpacing: '4px',
-                          fontFamily: "'Fredoka', Arial, sans-serif",
-                          textShadow: `${sh}2px 2px 0px ${C.black}`,
-                        }}>
-                          LEXICLASH
-                        </span>
+                        <Img
+                          src={logoSrc}
+                          alt="LexiClash"
+                          width="140"
+                          style={{ display: 'block', maxWidth: '140px', height: 'auto' }}
+                        />
                       </Link>
                     </td>
                   </tr>
@@ -277,37 +277,35 @@ export default function ReengagementEmail({
                         dir={dir} style={{
                           backgroundColor: C.card,
                           borderRadius: '20px',
-                          boxShadow: `${sh}6px 6px 0px ${C.black}`,
+                          border: `4px solid ${C.black}`,
+                          boxShadow: `${sh}8px 8px 0px ${C.black}`,
                           overflow: 'hidden',
                         }}>
 
-                        {/* Rainbow gradient strip — thicker for visibility */}
+                        {/* Rainbow gradient strip */}
                         <tr>
                           <td style={{
-                            background: `linear-gradient(90deg, ${C.lime}, ${C.cyan}, ${C.purple}, ${C.pink})`,
+                            background: `linear-gradient(90deg, ${C.lime}, ${C.cyan}, ${C.pink})`,
                             height: '6px', fontSize: 0, lineHeight: 0,
                           }}>&nbsp;</td>
                         </tr>
 
                         <tr>
-                          <td>
+                          <td style={{ padding: '32px 28px 36px' }}>
+
                             {/* ── Mascot ── */}
                             <table role="presentation" cellPadding={0} cellSpacing={0} width="100%">
                               <tr>
-                                <td align="center" style={{
-                                  padding: '32px 28px 8px',
-                                  backgroundColor: C.cardTop,
-                                }}>
+                                <td align="center" style={{ paddingBottom: '20px' }}>
                                   <Img
                                     src={mascotSrc}
                                     alt="Lexi misses you"
-                                    width="160"
-                                    height="160"
+                                    width="140"
+                                    height="140"
                                     style={{
                                       display: 'block',
-                                      width: '160px',
-                                      height: '160px',
-                                      borderRadius: '16px',
+                                      width: '140px',
+                                      height: '140px',
                                     }}
                                   />
                                 </td>
@@ -315,45 +313,42 @@ export default function ReengagementEmail({
                             </table>
 
                             {/* ── Greeting + streak ── */}
-                            <table role="presentation" cellPadding={0} cellSpacing={0} width="100%">
-                              <tr>
-                                <td style={{ padding: '4px 32px 0' }}>
-                                  <Heading as="h1" style={{
-                                    color: C.white,
-                                    fontSize: '26px',
-                                    margin: '0 0 10px',
-                                    fontWeight: 700,
-                                    textAlign: 'center',
-                                    lineHeight: '1.35',
-                                    direction: dir,
-                                  }}>
-                                    {t.greeting(recipientName)}
-                                  </Heading>
-                                  <Text className="streak" style={{
-                                    color: C.pink,
-                                    fontSize: '15px',
-                                    margin: '0 0 32px',
-                                    fontWeight: 600,
-                                    textAlign: 'center',
-                                    direction: dir,
-                                  }}>
-                                    🔥 {t.streak}
-                                  </Text>
-                                </td>
-                              </tr>
-                            </table>
+                            <Heading as="h1" style={{
+                              color: C.white,
+                              fontSize: '28px',
+                              margin: '0 0 10px',
+                              fontWeight: 700,
+                              textAlign: 'center',
+                              lineHeight: '1.35',
+                              direction: dir,
+                            }}>
+                              {t.greeting(recipientName)}
+                            </Heading>
+                            <Text className="streak" style={{
+                              color: C.pink,
+                              fontSize: '15px',
+                              margin: '0 0 28px',
+                              fontWeight: 600,
+                              textAlign: 'center',
+                              direction: dir,
+                            }}>
+                              🔥 {t.streak}
+                            </Text>
 
                             {/* ── Word Tiles zone ── */}
-                            <table role="presentation" cellPadding={0} cellSpacing={0} width="100%">
+                            <table role="presentation" cellPadding={0} cellSpacing={0} width="100%"
+                              style={{
+                                backgroundColor: C.cardInner,
+                                borderRadius: '16px',
+                                border: `2px solid ${C.black}`,
+                                marginBottom: '28px',
+                              }}>
                               <tr>
-                                <td style={{
-                                  padding: '28px 28px 24px',
-                                  backgroundColor: C.cardInner,
-                                }}>
+                                <td style={{ padding: '24px 20px' }}>
                                   <Text style={{
-                                    color: C.muted, fontSize: '14px', margin: '0 0 18px',
-                                    textAlign: 'center', fontWeight: 500, direction: dir,
-                                    letterSpacing: '0.5px',
+                                    color: C.muted, fontSize: '12px', margin: '0 0 16px',
+                                    textAlign: 'center', fontWeight: 700, direction: dir,
+                                    letterSpacing: '1px',
                                     textTransform: 'uppercase' as const,
                                   }}>
                                     {t.teaser}
@@ -361,7 +356,7 @@ export default function ReengagementEmail({
 
                                   {/* Tile row */}
                                   <table role="presentation" cellPadding={0} cellSpacing={0} width="100%"
-                                    style={{ marginBottom: '18px' }}>
+                                    style={{ marginBottom: '16px' }}>
                                     <tr>
                                       <td align="center">
                                         <table role="presentation" cellPadding={0} cellSpacing={10}
@@ -407,82 +402,85 @@ export default function ReengagementEmail({
                               </tr>
                             </table>
 
-                            {/* ── CTA + urgency ── */}
+                            {/* ── CTA Button — lime, neo-brutalist ── */}
                             <table role="presentation" cellPadding={0} cellSpacing={0} width="100%">
                               <tr>
-                                <td style={{ padding: '28px 28px 28px' }}>
-                                  {/* CTA button — full width for impact */}
-                                  <table role="presentation" cellPadding={0} cellSpacing={0} width="100%">
+                                <td align="center" style={{ paddingBottom: '24px' }}>
+                                  <table role="presentation" cellPadding={0} cellSpacing={0}
+                                    style={{ width: '100%', maxWidth: '320px', margin: '0 auto' }}>
                                     <tr>
-                                      <td align="center" style={{ paddingBottom: '24px' }}>
-                                        <table role="presentation" cellPadding={0} cellSpacing={0}
-                                          style={{ width: '100%', maxWidth: '320px', margin: '0 auto' }}>
-                                          <tr>
-                                            <td align="center" style={{
-                                              backgroundColor: C.pink,
-                                              borderRadius: '14px',
-                                              border: `3px solid ${C.black}`,
-                                              boxShadow: `${sh}5px 5px 0px ${C.black}`,
-                                            }}>
-                                              <Button
-                                                href={playUrl}
-                                                className="cta-btn"
-                                                style={{
-                                                  display: 'block',
-                                                  backgroundColor: C.pink,
-                                                  color: C.white,
-                                                  fontSize: '20px',
-                                                  fontWeight: 700,
-                                                  textDecoration: 'none',
-                                                  padding: '16px 32px',
-                                                  borderRadius: '14px',
-                                                  fontFamily: "'Fredoka', Arial, sans-serif",
-                                                  letterSpacing: '0.5px',
-                                                  textAlign: 'center',
-                                                  width: '100%',
-                                                }}>
-                                                {t.cta}
-                                              </Button>
-                                            </td>
-                                          </tr>
-                                        </table>
+                                      <td align="center" style={{
+                                        backgroundColor: C.lime,
+                                        borderRadius: '12px',
+                                        border: `3px solid ${C.black}`,
+                                        boxShadow: `${sh}5px 5px 0px ${C.black}`,
+                                      }}>
+                                        <Button
+                                          href={playUrl}
+                                          className="cta-btn"
+                                          style={{
+                                            display: 'block',
+                                            backgroundColor: C.lime,
+                                            color: C.black,
+                                            fontSize: '18px',
+                                            fontWeight: 700,
+                                            textDecoration: 'none',
+                                            padding: '16px 48px',
+                                            borderRadius: '12px',
+                                            fontFamily: "'Fredoka', Arial, sans-serif",
+                                            letterSpacing: '2px',
+                                            textAlign: 'center',
+                                            textTransform: 'uppercase' as const,
+                                            width: '100%',
+                                          }}>
+                                          ▶ &nbsp;{t.cta}
+                                        </Button>
                                       </td>
                                     </tr>
                                   </table>
-
-                                  {/* Urgency pill */}
-                                  <table role="presentation" cellPadding={0} cellSpacing={0} width="100%">
-                                    <tr>
-                                      <td align="center" style={{ paddingBottom: '18px' }}>
-                                        <table role="presentation" cellPadding={0} cellSpacing={0}>
-                                          <tr>
-                                            <td style={{
-                                              backgroundColor: C.urgencyBg,
-                                              border: `1px solid ${C.urgencyBorder}`,
-                                              borderRadius: '20px',
-                                              padding: '8px 22px',
-                                              fontSize: '13px',
-                                              color: C.pink,
-                                              fontWeight: 600,
-                                              textAlign: 'center',
-                                            }}>
-                                              ⏰ {t.urgency}
-                                            </td>
-                                          </tr>
-                                        </table>
-                                      </td>
-                                    </tr>
-                                  </table>
-
-                                  <Text style={{
-                                    color: C.subtle, fontSize: '13px', margin: '0',
-                                    textAlign: 'center', fontStyle: 'italic', direction: dir,
-                                  }}>
-                                    {t.social}
-                                  </Text>
                                 </td>
                               </tr>
                             </table>
+
+                            {/* Urgency bar — styled like the daily email streak reminder */}
+                            <table role="presentation" cellPadding={0} cellSpacing={0} width="100%">
+                              <tr>
+                                <td style={{
+                                  backgroundColor: C.urgencyBg,
+                                  border: `2px solid ${C.urgencyBorder}`,
+                                  borderRadius: '8px',
+                                  padding: '14px 16px',
+                                  marginBottom: '16px',
+                                }}>
+                                  <table role="presentation" cellPadding={0} cellSpacing={0} width="100%">
+                                    <tr>
+                                      <td width="32" valign="middle">
+                                        <span style={{ fontSize: '22px' }}>⏰</span>
+                                      </td>
+                                      <td valign="middle">
+                                        <span style={{
+                                          color: C.pink,
+                                          fontSize: '14px',
+                                          fontWeight: 600,
+                                          lineHeight: '1.4',
+                                          direction: dir,
+                                        }}>
+                                          {t.urgency}
+                                        </span>
+                                      </td>
+                                    </tr>
+                                  </table>
+                                </td>
+                              </tr>
+                            </table>
+
+                            {/* Social proof */}
+                            <Text style={{
+                              color: C.subtle, fontSize: '13px', margin: '16px 0 0',
+                              textAlign: 'center', fontStyle: 'italic', direction: dir,
+                            }}>
+                              {t.social}
+                            </Text>
                           </td>
                         </tr>
                       </table>
@@ -491,37 +489,54 @@ export default function ReengagementEmail({
 
                   {/* ── Footer ── */}
                   <tr>
-                    <td align="center" dir={dir} style={{ padding: '28px 0 8px' }}>
-                      <Text style={{
-                        color: C.footer, fontSize: '11px', margin: '0 0 8px',
-                        lineHeight: '1.6', direction: dir,
-                      }}>
-                        {t.footerReason}
-                      </Text>
-                      <Text style={{ color: C.footer, fontSize: '11px', margin: '0', lineHeight: '1.6' }}>
-                        <Link href={unsubscribeUrl} target="_blank"
-                          style={{ color: C.muted, textDecoration: 'underline' }}>
-                          {t.unsubscribe}
-                        </Link>
-                        <span style={{ color: '#303050' }}>&nbsp;&middot;&nbsp;</span>
-                        <Link href={playUrl} target="_blank"
-                          style={{ color: C.muted, textDecoration: 'underline' }}>
-                          LexiClash
-                        </Link>
-                        <span style={{ color: '#303050' }}>&nbsp;&middot;&nbsp;</span>
-                        <Link href={privacyUrl} target="_blank"
-                          style={{ color: C.muted, textDecoration: 'underline' }}>
-                          {t.privacy}
-                        </Link>
-                      </Text>
-                    </td>
-                  </tr>
+                    <td style={{ paddingTop: '32px' }}>
+                      {/* Divider */}
+                      <table role="presentation" cellPadding={0} cellSpacing={0} width="100%"
+                        style={{ marginBottom: '20px' }}>
+                        <tr>
+                          <td style={{ borderTop: `1px solid ${C.grayDark}` }}>&nbsp;</td>
+                        </tr>
+                      </table>
 
-                  <tr>
-                    <td align="center" style={{ padding: '4px 0 0' }}>
-                      <span style={{ color: '#404060', fontSize: '10px' }}>
-                        &copy; {year} LexiClash
-                      </span>
+                      <table role="presentation" cellPadding={0} cellSpacing={0} width="100%">
+                        <tr>
+                          <td align="center" dir={dir}>
+                            <Text style={{
+                              color: C.footer, fontSize: '12px', margin: '0 0 12px',
+                              lineHeight: '1.6', direction: dir,
+                            }}>
+                              {t.footerReason}
+                            </Text>
+                            <Text style={{ color: C.footer, fontSize: '12px', margin: '0', lineHeight: '1.6' }}>
+                              <Link href={unsubscribeUrl} target="_blank"
+                                style={{ color: C.grayLight, textDecoration: 'underline' }}>
+                                {t.unsubscribe}
+                              </Link>
+                              <span style={{ color: C.grayDark }}>&nbsp;&nbsp;&middot;&nbsp;&nbsp;</span>
+                              <Link href={playUrl} target="_blank"
+                                style={{ color: C.grayLight, textDecoration: 'underline' }}>
+                                LexiClash
+                              </Link>
+                              <span style={{ color: C.grayDark }}>&nbsp;&nbsp;&middot;&nbsp;&nbsp;</span>
+                              <Link href={privacyUrl} target="_blank"
+                                style={{ color: C.grayLight, textDecoration: 'underline' }}>
+                                {t.privacy}
+                              </Link>
+                            </Text>
+                          </td>
+                        </tr>
+                      </table>
+
+                      <table role="presentation" cellPadding={0} cellSpacing={0} width="100%"
+                        style={{ marginTop: '24px' }}>
+                        <tr>
+                          <td align="center">
+                            <span style={{ color: C.grayDark, fontSize: '11px' }}>
+                              &copy; {year} LexiClash
+                            </span>
+                          </td>
+                        </tr>
+                      </table>
                     </td>
                   </tr>
                 </table>

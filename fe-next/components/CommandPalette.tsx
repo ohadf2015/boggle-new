@@ -5,7 +5,7 @@ import { Command } from 'cmdk';
 import { useRouter } from 'next/navigation';
 import {
   Home, Swords, ScrollText, Users, User, Settings, Trophy,
-  Gamepad2, Brain, BookOpen, ShieldCheck, Globe, Zap,
+  Gamepad2, BookOpen, ShieldCheck, Globe, Zap,
 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -24,7 +24,6 @@ const NAV_ITEMS: CommandItem[] = [
   { id: 'singleplayer', labelKey: 'nav.singleplayer', icon: Gamepad2, href: '/singleplayer', group: 'navigation' },
   { id: 'daily', labelKey: 'nav.daily', icon: Zap, href: '/daily', group: 'navigation' },
   { id: 'adventure', labelKey: 'nav.adventure', icon: Globe, href: '/adventure', group: 'navigation' },
-  { id: 'brain', labelKey: 'nav.brainTraining', icon: Brain, href: '/brain', group: 'navigation' },
   { id: 'quests', labelKey: 'nav.quests', icon: ScrollText, href: '/quests', group: 'navigation' },
   { id: 'friends', labelKey: 'nav.friends', icon: Users, href: '/friends', group: 'navigation' },
   { id: 'profile', labelKey: 'nav.profile', icon: User, href: '/profile', group: 'account' },

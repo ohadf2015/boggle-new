@@ -50,12 +50,6 @@ export default function HomePageClient({ initialData }: HomePageClientProps): Re
     setShowFTUE(false);
   }, []);
 
-  // Desktop check — also synchronous
-  const [isDesktop] = useState(() => {
-    if (typeof window === 'undefined') return false;
-    return window.innerWidth >= 1024;
-  });
-
   // On CrazyGames, skip the landing page and go straight to multiplayer
   useEffect(() => {
     if (!isCrazyGamesLoading && isOnCrazyGamesPlatform) {

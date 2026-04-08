@@ -586,20 +586,19 @@ export async function POST(request: NextRequest) {
       }
     });
 
-    // Update weekly quest progress (runs after response is sent)
+    // Update weekly quest progress (inline so we can return result to client)
     const questStats: GameStats = {
       gamesPlayed: 1,
       wordsFound: words,
       longWordsFound: clampedLongWords,
       maxScore: score,
     };
-    after(async () => {
-      try {
-        await updateWeeklyQuestProgress(supabase, userId, questStats);
-      } catch (err) {
-        console.error('[ADVENTURE COMPLETE API] Weekly quest update failed:', err);
-      }
-    });
+    let questUpdate: { questType: string; xpReward: number; description: string; completed: boolean } | null = null;
+    try {
+      questUpdate = await updateWeeklyQuestProgress(supabase, userId, questStats);
+    } catch (err) {
+      console.error('[ADVENTURE COMPLETE API] Weekly quest update failed:', err);
+    }
 
     return NextResponse.json({
       success: true,
@@ -627,6 +626,7 @@ export async function POST(request: NextRequest) {
       leveledUp,
       previousLevel: leveledUp ? previousLevel : undefined,
       lootDrops,
+      ...(questUpdate?.completed ? { questUpdate: { questType: questUpdate.questType, xpReward: questUpdate.xpReward, description: questUpdate.description, completed: true } } : {}),
     });
   } catch (error) {
     captureApiError(error instanceof Error ? error : new Error(String(error)), '/api/adventure/complete', { method: 'POST' });
@@ -645,7 +645,7 @@ async function updateWeeklyQuestProgress(
   supabase: any,
   userId: string,
   stats: GameStats,
-): Promise<void> {
+): Promise<{ questType: string; xpReward: number; description: string; completed: boolean } | null> {
   const weekStart = getWeekStart();
 
   // Fetch active quest
@@ -656,7 +656,7 @@ async function updateWeeklyQuestProgress(
     .eq('week_start', weekStart)
     .single();
 
-  if (fetchErr || !quest || quest.completed) return;
+  if (fetchErr || !quest || quest.completed) return null;
 
   const reqs = typeof quest.requirements === 'string'
     ? JSON.parse(quest.requirements)
@@ -668,7 +668,7 @@ async function updateWeeklyQuestProgress(
   const currentVal = prog?.current ?? 0;
   const target = reqs?.target ?? 0;
   const delta = getStatDelta(quest.quest_type, stats);
-  if (delta <= 0) return;
+  if (delta <= 0) return null;
 
   const newCurrent = Math.min(currentVal + delta, target);
   const completed = newCurrent >= target;
@@ -707,5 +707,9 @@ async function updateWeeklyQuestProgress(
         .update({ premium_avatar_parts: [...existing, partKey] })
         .eq('id', userId);
     }
+
+    return { questType: quest.quest_type, xpReward: 0, description: quest.quest_type, completed: true };
   }
+
+  return null;
 }

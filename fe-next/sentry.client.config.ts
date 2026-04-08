@@ -207,6 +207,52 @@ Sentry.init({
     /missing word details during achievement/i,
     // React error #185 — infinite loop already fixed in selectors.ts, residual edge case
     /Maximum update depth exceeded/i,
+    // Ghost rival missing data — expected when no matching rival exists
+    /\[ghostRival\].*No rival found/i,
+    // Word submission game state — player submits after game ends, handled gracefully
+    /Word submission rejected.*game state/i,
+    // Supabase deadlock — auto-retried successfully, not actionable
+    /Deadlock on profile stats update/i,
+    // HintGenerator timeout — AI service occasionally slow, handled with fallback
+    /\[HintGenerator\].*timed out/i,
+    // Supabase auth lock — React Strict Mode double mount, auto-recovers
+    /Lock.*was not released within/i,
+    // NativeOAuth Google sign-in — device-specific config issues
+    /\[NativeOAuth\].*Google sign-in error/i,
+    /\[useOAuthSignIn\].*Native OAuth failed/i,
+    // CrazyGames userNotAuthenticated — expected when user not logged in
+    /userNotAuthenticated/i,
+    // CrazyGames friends refresh — downstream of auth issues
+    /Failed to refresh CrazyGames friends/i,
+    // PWA service worker registration — transient, non-critical
+    /\[PWA\].*Service worker registration failed/i,
+    // Error subscribing to notifications channel — transient Supabase realtime
+    /Error subscribing to notifications channel/i,
+    // Socket.IO eliminated/kicked — expected gameplay events
+    /\[SOCKET\.IO\].*Error received.*eliminated/i,
+    /\[SOCKET\.IO\].*Error received.*kicked/i,
+    /\[SOCKET\.IO\].*Error received.*Target word already found/i,
+    // Results/resetGame timeout — race condition during fast rematch
+    /\[RESULTS\].*resetGame callback timed out/i,
+    // Adventure state 404 — new user without saved progress
+    /\[ProgressionContext\].*adventure\/state returned 404/i,
+    // AI validateWord failures — retries handled, words rejected gracefully
+    /\[AI_SERVICE\] validateWord.*failed after/i,
+    /\[AI_SERVICE\] validateWord.*attempt.*failed.*retrying/i,
+    // gameplayStart throttled — CrazyGames SDK rate limiting
+    /gameplayStart\(\) call throttled/i,
+    // "omg" — user feedback captured as error, not actionable
+    /^omg$/i,
+    // ErrorBoundary caught — already handled by error boundary UI
+    /ErrorBoundary caught an error/i,
+    // Results error — minified React error in results screen
+    /\[Results\] Error/i,
+    // Target word already found — race condition on simultaneous submit
+    /Target word already found/i,
+    // Page error React #185 — minified React error, covered by max update depth
+    /Page error.*Minified React error/i,
+    // CanvasGradient addColorStop — malformed color string, fixed in ComboPulseRing
+    /addColorStop.*could not be parsed as a color/i,
   ],
 
   denyUrls: [

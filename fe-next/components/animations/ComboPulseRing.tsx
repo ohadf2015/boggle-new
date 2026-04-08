@@ -193,10 +193,10 @@ export function ScreenEdgeGlow({
       transition={{ duration: 0.3 }}
       style={{
         background: `
-          radial-gradient(ellipse at top, transparent 50%, ${color}${Math.round(opacity * 255).toString(16).padStart(2, '0')} 100%),
-          radial-gradient(ellipse at bottom, transparent 50%, ${color}${Math.round(opacity * 255).toString(16).padStart(2, '0')} 100%),
-          radial-gradient(ellipse at left, transparent 60%, ${color}${Math.round(opacity * 0.5 * 255).toString(16).padStart(2, '0')} 100%),
-          radial-gradient(ellipse at right, transparent 60%, ${color}${Math.round(opacity * 0.5 * 255).toString(16).padStart(2, '0')} 100%)
+          radial-gradient(ellipse at top, transparent 50%, ${color.startsWith('#') ? `${color}${Math.round(opacity * 255).toString(16).padStart(2, '0')}` : color} 100%),
+          radial-gradient(ellipse at bottom, transparent 50%, ${color.startsWith('#') ? `${color}${Math.round(opacity * 255).toString(16).padStart(2, '0')}` : color} 100%),
+          radial-gradient(ellipse at left, transparent 60%, ${color.startsWith('#') ? `${color}${Math.round(opacity * 0.5 * 255).toString(16).padStart(2, '0')}` : color} 100%),
+          radial-gradient(ellipse at right, transparent 60%, ${color.startsWith('#') ? `${color}${Math.round(opacity * 0.5 * 255).toString(16).padStart(2, '0')}` : color} 100%)
         `,
       }}
     >

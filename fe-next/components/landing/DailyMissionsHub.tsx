@@ -7,7 +7,7 @@
  */
 
 import Link from 'next/link';
-import { Trophy, Brain, Sword, Users, Check, Gift } from 'lucide-react';
+import { Trophy, Sword, Users, Brain, Check, Gift } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useDailyMissions, type MissionType } from '@/hooks/useDailyMissions';
@@ -32,8 +32,8 @@ const MISSION_CONFIGS: MissionConfig[] = [
   {
     type: 'brainDrill',
     icon: Brain,
-    borderColor: 'border-s-neo-cyan',
-    dotColor: 'bg-neo-cyan',
+    borderColor: 'border-s-neo-purple',
+    dotColor: 'bg-neo-purple',
     translationKey: 'dailyMissions.brainDrill',
   },
   {

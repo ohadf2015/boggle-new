@@ -129,9 +129,9 @@ export function useDailyMissions(): UseDailyMissionsReturn {
   }, [fetchMissions]);
 
   const completedCount = missions.filter(m => m.completed).length;
-  const isGrandSlam = completedCount === 4;
+  const isGrandSlam = completedCount === missions.length && missions.length > 0;
 
-  // Show Grand Slam celebration toast when all 4 missions are completed
+  // Show Grand Slam celebration toast when all missions are completed
   useEffect(() => {
     if (isGrandSlam && !prevGrandSlamRef.current && !loading && !hasShownGrandSlamToast.current) {
       hasShownGrandSlamToast.current = true;

@@ -7832,7 +7832,11 @@ const es = {
       "mediumDesc": "Caos balanceado",
       "hardDesc": "Especiales por todos lados, oleadas brutales",
       "resumeWave": "Empezar desde Oleada {wave}",
-      "savedScore": "Puntos: {score}"
+      "savedScore": "Puntos: {score}",
+      "rule1": "Desliza sobre letras adyacentes para formar palabras",
+      "rule2": "Conexiones diagonales permitidas",
+      "rule3": "Fichas especiales explotan, congelan y multiplican",
+      "rule4": "Limpia el tablero para avanzar"
     },
     "helpIceLabel": "Hielo",
     "helpIce": "2 golpes para romper. Se agrieta en el primero.",
@@ -9553,7 +9557,9 @@ const es = {
     "weeklyWordMasteryDesc": "Domina {target} palabras esta semana",
     "questOptions": "Opciones de misión",
     "completion": {
+      "title": "¡Misión Cumplida!",
       "grandSlam": "¡Grand Slam!",
+      "grandSlamDesc": "¡Todas las misiones diarias completadas!",
       "xpReward": "+{{xp}} XP",
       "goldReward": "+{{gold}} Oro"
     }

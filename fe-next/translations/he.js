@@ -7782,7 +7782,11 @@ const he = {
       "mediumDesc": "כאוס מאוזן",
       "hardDesc": "מיוחדים בכל מקום, גלים אכזריים",
       "resumeWave": "התחל מגל {wave}",
-      "savedScore": "ניקוד: {score}"
+      "savedScore": "ניקוד: {score}",
+      "rule1": "החליקו על אותיות סמוכות ליצירת מילים",
+      "rule2": "חיבורים באלכסון מותרים",
+      "rule3": "אריחים מיוחדים מתפוצצים, מקפיאים ומכפילים",
+      "rule4": "נקו את הלוח כדי להתקדם"
     },
     "hint": "רמז",
     "stuck": "תקוע?",
@@ -7791,6 +7795,7 @@ const he = {
     "tapToContinue": "הקש להמשיך",
     "levelComplete": "שלב הושלם!",
     "moveBonus": "בונוס מהלכים",
+    "waveComplete": "גל {wave} הושלם!",
     "nextWave": "גל הבא",
     "celebrateAgain": "חגוג שוב",
     "best": "שיא",
@@ -7862,6 +7867,7 @@ const he = {
     "wordsFound": "מילים",
     "gameOver": "המשחק נגמר",
     "waves": "גלים",
+    "bestWord": "הטוב ביותר",
     "playAgain": "שחק שוב",
     "tileGuide": {
       "title": "מדריך אריחים",
@@ -9478,7 +9484,9 @@ const he = {
     "weeklyWordMasteryDesc": "שלוט ב-{target} מילים השבוע",
     "questOptions": "אפשרויות משימות",
     "completion": {
+      "title": "!משימה הושלמה",
       "grandSlam": "!גרנד סלאם",
+      "grandSlamDesc": "!כל המשימות היומיות הושלמו",
       "xpReward": "+{{xp}} XP",
       "goldReward": "+{{gold}} זהב"
     }

@@ -7799,7 +7799,11 @@ const ja = {
       "mediumDesc": "バランスのとれた混沌",
       "hardDesc": "特殊タイルだらけ、激しいウェーブ",
       "resumeWave": "ウェーブ{wave}から開始",
-      "savedScore": "スコア: {score}"
+      "savedScore": "スコア: {score}",
+      "rule1": "隣り合う文字をなぞって単語を作ろう",
+      "rule2": "斜め方向の接続もOK",
+      "rule3": "特殊タイルは爆発・凍結・倍増効果あり",
+      "rule4": "ボードをクリアして次へ進もう"
     },
     "hint": "ヒント",
     "stuck": "詰まった？",
@@ -7808,6 +7812,7 @@ const ja = {
     "tapToContinue": "タップして続ける",
     "levelComplete": "レベルクリア！",
     "moveBonus": "手数ボーナス",
+    "waveComplete": "ウェーブ{wave}クリア！",
     "nextWave": "次のウェーブ",
     "celebrateAgain": "また祝おう",
     "best": "ベスト",
@@ -7879,6 +7884,7 @@ const ja = {
     "wordsFound": "単語",
     "gameOver": "ゲームオーバー",
     "waves": "ウェーブ",
+    "bestWord": "ベスト",
     "playAgain": "もう一度",
     "tileGuide": {
       "title": "タイルガイド",
@@ -9443,7 +9449,9 @@ const ja = {
     "weeklyWordMasteryDesc": "今週{target}単語を習得する",
     "questOptions": "クエスト選択肢",
     "completion": {
+      "title": "クエスト完了！",
       "grandSlam": "グランドスラム！",
+      "grandSlamDesc": "デイリーミッション全制覇！",
       "xpReward": "+{{xp}} XP",
       "goldReward": "+{{gold}} ゴールド"
     }

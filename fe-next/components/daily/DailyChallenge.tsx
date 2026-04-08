@@ -316,6 +316,7 @@ const DailyChallenge: React.FC = () => {
         body: JSON.stringify({
           score: result.efficiencyScore ?? 0,
           wordCount: result.wordsDiscovered?.length ?? 0,
+          longWordsFound: result.wordsDiscovered?.filter(w => (w.word?.length ?? 0) >= 6).length ?? 0,
           mode: 'daily-challenge',
           isDailyChallenge: true,
         }),
