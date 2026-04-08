@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { AdminSidebar } from '@/components/admin/sidebar/AdminSidebar';
 import { AdminBottomNav } from '@/components/admin/sidebar/AdminBottomNav';
+import { AdminSubNav } from '@/components/admin/sidebar/AdminSubNav';
 
 export default function AdminWikipediaWordsPageClient() {
   const router = useRouter();
@@ -55,6 +56,7 @@ export default function AdminWikipediaWordsPageClient() {
       isRTL && 'rtl'
     )}>
       <Header />
+      <AdminSubNav />
 
       <div className="flex flex-1">
         <AdminSidebar />

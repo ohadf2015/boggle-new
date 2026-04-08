@@ -376,9 +376,9 @@ export function InvalidWordsManager({ authToken }: InvalidWordsManagerProps) {
           />
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2 w-full md:w-auto">
           <Select value={langFilter} onValueChange={(val) => { setLangFilter(val); setOffset(0); }}>
-            <SelectTrigger className="w-[140px] bg-slate-700 border-slate-600">
+            <SelectTrigger className="w-full sm:w-[140px] bg-slate-700 border-slate-600">
               <SelectValue placeholder="Language" />
             </SelectTrigger>
             <SelectContent>
@@ -392,7 +392,7 @@ export function InvalidWordsManager({ authToken }: InvalidWordsManagerProps) {
           </Select>
 
           <Select value={minCount.toString()} onValueChange={(val) => { setMinCount(parseInt(val)); setOffset(0); }}>
-            <SelectTrigger className="w-[140px] bg-slate-700 border-slate-600">
+            <SelectTrigger className="w-full sm:w-[140px] bg-slate-700 border-slate-600">
               <SelectValue placeholder="Min Count" />
             </SelectTrigger>
             <SelectContent>
@@ -407,8 +407,8 @@ export function InvalidWordsManager({ authToken }: InvalidWordsManagerProps) {
 
       {/* Bulk Selection Toolbar */}
       {words.length > 0 && (
-        <div className="flex items-center justify-between bg-slate-800 p-3 rounded-lg border border-slate-700">
-          <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center justify-between gap-2 bg-slate-800 p-3 rounded-lg border border-slate-700">
+          <div className="flex items-center gap-2 sm:gap-3">
             <Button
               variant="outline"
               size="sm"
@@ -425,11 +425,11 @@ export function InvalidWordsManager({ authToken }: InvalidWordsManagerProps) {
               className="text-slate-400 hover:text-white"
               disabled={selectedIds.size === 0}
             >
-              Clear Selection
+              Clear
             </Button>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             {selectedIds.size > 0 && (
               <span className="text-sm text-neo-yellow font-medium">
                 {selectedIds.size} selected

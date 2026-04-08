@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import Image from 'next/image';
 import {
   useReactTable,
@@ -10,7 +10,6 @@ import {
   createColumnHelper,
   type SortingState,
 } from '@tanstack/react-table';
-import { useState } from 'react';
 import { useStudentProgressMetrics } from '@/hooks/useStudentProgressMetrics';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { PageLoader } from '@/components/ui/PageLoader';

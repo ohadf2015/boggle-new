@@ -234,13 +234,13 @@ export const CompactLeaderboard = memo<CompactLeaderboardProps>(function Compact
     });
   }, []);
 
-  if (totalPlayers === 0 || !currentUser) return null;
-
   // Get top 3 OTHER players for race visualization (exclude current user)
   const raceParticipants = useMemo(
     () => sortedPlayers.filter(p => p.username !== currentUsername).slice(0, 3),
     [sortedPlayers, currentUsername],
   );
+
+  if (totalPlayers === 0 || !currentUser) return null;
 
   return (
     <div className={cn(

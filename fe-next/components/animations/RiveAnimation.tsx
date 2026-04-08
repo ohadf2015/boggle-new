@@ -65,11 +65,6 @@ export const RiveAnimation = memo(function RiveAnimation({
 }: RiveAnimationProps) {
   const { isLowEnd, prefersReducedMotion, enableComplexAnimations } = useDevicePerformance();
 
-  // Skip on low-end devices or when user prefers reduced motion
-  if (isLowEnd || prefersReducedMotion || !enableComplexAnimations) {
-    return <>{fallback}</>;
-  }
-
   const riveProps = useMemo(() => ({
     src,
     stateMachines: stateMachineName ? [stateMachineName] : undefined,
@@ -77,6 +72,11 @@ export const RiveAnimation = memo(function RiveAnimation({
     autoplay,
     artboard: artboardName,
   }), [src, stateMachineName, animationName, autoplay, artboardName]);
+
+  // Skip on low-end devices or when user prefers reduced motion
+  if (isLowEnd || prefersReducedMotion || !enableComplexAnimations) {
+    return <>{fallback}</>;
+  }
 
   return (
     <div className={cn(SIZE_MAP[size], className)}>

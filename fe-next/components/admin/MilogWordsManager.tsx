@@ -316,9 +316,9 @@ export function MilogWordsManager({ authToken }: MilogWordsManagerProps) {
           />
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex gap-2 w-full md:w-auto">
           <Select value={statusFilter} onValueChange={(val) => { setStatusFilter(val); setOffset(0); }}>
-            <SelectTrigger className="w-[160px] bg-slate-700 border-slate-600">
+            <SelectTrigger className="w-full sm:w-[160px] bg-slate-700 border-slate-600">
               <SelectValue placeholder="Status" />
             </SelectTrigger>
             <SelectContent>

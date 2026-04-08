@@ -8,7 +8,7 @@
 
 'use client';
 
-import { useMemo, useRef, useCallback } from 'react';
+import { useMemo, useRef, useCallback, useState } from 'react';
 import nextDynamic from 'next/dynamic';
 import Link from 'next/link';
 import { ArrowLeft, Swords, Skull, Trophy, Coins, Zap, Lock, RotateCcw } from 'lucide-react';
@@ -40,7 +40,8 @@ export function BossRushPageClient() {
   const { state, currentBossWorldId, isActive, startRush, reportResult, rewards, reset } = useBossRush();
 
   // Generate boss level config for AdventureGame
-  const seedRef = useRef(Date.now());
+  const [seed] = useState(() => Date.now());
+  const seedRef = useRef(seed);
   const levelConfig: LevelConfig | null = useMemo(() => {
     if (!currentBossWorldId) return null;
     return getLevelConfig(currentBossWorldId, LEVELS_PER_WORLD);

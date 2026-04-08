@@ -51,6 +51,16 @@ export function MultiLessonSelector({
     }
   }, [selectedLessonIds, onSelectChange]);
 
+  const allSelected = lessons.length > 0 && selectedLessonIds.length === lessons.length;
+
+  const handleSelectAll = useCallback(() => {
+    if (allSelected) {
+      onSelectChange([]);
+    } else {
+      onSelectChange(lessons.map((l) => l.id));
+    }
+  }, [allSelected, lessons, onSelectChange]);
+
   if (lessons.length === 0) {
     return (
       <div className={cn('text-center py-8', className)}>
@@ -61,16 +71,6 @@ export function MultiLessonSelector({
       </div>
     );
   }
-
-  const allSelected = lessons.length > 0 && selectedLessonIds.length === lessons.length;
-
-  const handleSelectAll = useCallback(() => {
-    if (allSelected) {
-      onSelectChange([]);
-    } else {
-      onSelectChange(lessons.map((l) => l.id));
-    }
-  }, [allSelected, lessons, onSelectChange]);
 
   return (
     <div className={cn('space-y-4', className)}>

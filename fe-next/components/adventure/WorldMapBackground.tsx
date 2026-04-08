@@ -39,6 +39,7 @@ export function WorldMapBackground({
     // Seeded PRNG for deterministic noise (Mulberry32)
     let rngState = 42;
     const seededRng = (): number => {
+      // eslint-disable-next-line react-hooks/immutability -- rngState mutation is local to this memo callback
       rngState = (rngState + 0x6d2b79f5) | 0;
       let t = rngState;
       t = Math.imul(t ^ (t >>> 15), t | 1);

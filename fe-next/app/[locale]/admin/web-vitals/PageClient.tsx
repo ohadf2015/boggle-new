@@ -18,6 +18,7 @@ import toast from 'react-hot-toast';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { AdminSidebar } from '@/components/admin/sidebar/AdminSidebar';
 import { AdminBottomNav } from '@/components/admin/sidebar/AdminBottomNav';
+import { AdminSubNav } from '@/components/admin/sidebar/AdminSubNav';
 
 interface WebVital {
   id: string;
@@ -247,6 +248,7 @@ export default function WebVitalsPageClient() {
   return (
     <div className={cn("flex-1 flex flex-col w-full overflow-x-hidden min-h-screen", isDark ? "bg-gray-900" : "bg-gray-50")}>
       <Header />
+      <AdminSubNav />
 
       <div className="flex flex-1">
         <AdminSidebar />
@@ -433,13 +435,13 @@ export default function WebVitalsPageClient() {
             <table className="w-full">
               <thead className={cn("text-sm", isDark ? "bg-gray-700" : "bg-gray-50")}>
                 <tr>
-                  <th className="px-4 py-3 text-left font-medium">Metric</th>
-                  <th className="px-4 py-3 text-left font-medium">Value</th>
-                  <th className="px-4 py-3 text-left font-medium">Rating</th>
-                  <th className="px-4 py-3 text-left font-medium">Page</th>
-                  <th className="px-4 py-3 text-left font-medium">Device</th>
-                  <th className="px-4 py-3 text-left font-medium">Connection</th>
-                  <th className="px-4 py-3 text-left font-medium">Time</th>
+                  <th className="px-3 sm:px-4 py-3 text-left font-medium">Metric</th>
+                  <th className="px-3 sm:px-4 py-3 text-left font-medium">Value</th>
+                  <th className="px-3 sm:px-4 py-3 text-left font-medium">Rating</th>
+                  <th className="hidden sm:table-cell px-4 py-3 text-left font-medium">Page</th>
+                  <th className="hidden md:table-cell px-4 py-3 text-left font-medium">Device</th>
+                  <th className="hidden lg:table-cell px-4 py-3 text-left font-medium">Connection</th>
+                  <th className="hidden sm:table-cell px-4 py-3 text-left font-medium">Time</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
@@ -457,22 +459,22 @@ export default function WebVitalsPageClient() {
                         isDark ? "hover:bg-gray-700" : "hover:bg-gray-50"
                       )}
                     >
-                      <td className={cn("px-4 py-3 font-medium", isDark ? "text-white" : "text-gray-900")}>
+                      <td className={cn("px-3 sm:px-4 py-3 font-medium", isDark ? "text-white" : "text-gray-900")}>
                         {vital.metric_name}
                       </td>
-                      <td className={cn("px-4 py-3", isDark ? "text-gray-300" : "text-gray-700")}>
+                      <td className={cn("px-3 sm:px-4 py-3", isDark ? "text-gray-300" : "text-gray-700")}>
                         {formatValue(vital.metric_name, vital.metric_value)}{info?.unit}
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="px-3 sm:px-4 py-3">
                         <span className={cn("inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full border", getRatingColor(vital.metric_rating))}>
                           <RatingIcon className="w-3 h-3" />
                           {vital.metric_rating}
                         </span>
                       </td>
-                      <td className={cn("px-4 py-3 max-w-xs truncate", isDark ? "text-gray-300" : "text-gray-700")}>
+                      <td className={cn("hidden sm:table-cell px-4 py-3 max-w-xs truncate", isDark ? "text-gray-300" : "text-gray-700")}>
                         {vital.page_path}
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="hidden md:table-cell px-4 py-3">
                         {isPoor && (
                           <div className="flex flex-col gap-1">
                             {getDeviceBadge(vital.device_type)}
@@ -481,10 +483,10 @@ export default function WebVitalsPageClient() {
                         )}
                         {!isPoor && getDeviceBadge(vital.device_type)}
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="hidden lg:table-cell px-4 py-3">
                         {vital.connection_type ? getConnectionBadge(vital.connection_type) : <span className="text-gray-400">-</span>}
                       </td>
-                      <td className={cn("px-4 py-3 text-xs", isDark ? "text-gray-400" : "text-gray-500")}>
+                      <td className={cn("hidden sm:table-cell px-4 py-3 text-xs", isDark ? "text-gray-400" : "text-gray-500")}>
                         {new Date(vital.created_at).toLocaleString()}
                       </td>
                     </tr>

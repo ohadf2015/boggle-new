@@ -143,9 +143,9 @@ export function PlayerManager({ authToken }: { authToken: string }) {
           />
         </div>
         
-        <div className="flex gap-2">
+        <div className="flex gap-2 w-full md:w-auto">
            <Select value={sortBy} onValueChange={(val) => { setSortBy(val); setOffset(0); }}>
-            <SelectTrigger className="w-[160px]">
+            <SelectTrigger className="w-full sm:w-[160px]">
               <SelectValue placeholder="Sort By" />
             </SelectTrigger>
             <SelectContent>
