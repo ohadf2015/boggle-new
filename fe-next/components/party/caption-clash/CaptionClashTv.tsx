@@ -138,6 +138,7 @@ function CaptionClashTvInner({ socket, roomCode }: CaptionClashTvProps) {
       socket.off('party:caption:voteResults', onVoteResults);
       socket.off('party:phaseChange', onPhaseChange);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- partySounds is stable, adding it would cause socket re-registration
   }, [socket]);
 
   // ==================== Render Phases ====================

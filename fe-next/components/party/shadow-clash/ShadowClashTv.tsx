@@ -136,6 +136,7 @@ function ShadowClashTvInner({ socket }: { socket: Socket | null }) {
       socket.off('party:shadow:voteReveal', onVoteReveal);
       socket.off('party:shadow:gameOver', onGameOver);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- partySounds is stable, adding it would cause socket re-registration
   }, [socket]);
 
   // ==================== Dealing ====================

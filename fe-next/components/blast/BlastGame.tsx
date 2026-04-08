@@ -132,6 +132,7 @@ export function BlastGame({
     }
     // Not cascading: apply immediately to correct any drift
     engine.applyServerBoard(boardData.grid, boardData.tileStates);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentionally using engine.* properties, not full engine object
   }, [blastBoardUpdate, isMultiplayer, username, engine.isCascading, engine.applyServerBoard]);
 
   // Flush queued board updates after cascade completes — only apply the last (each is a full snapshot)
@@ -142,6 +143,7 @@ export function BlastGame({
       pendingBoardUpdatesRef.current = [];
       engine.applyServerBoard(last.grid, last.tileStates);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentionally using engine.* properties
   }, [engine.isCascading, engine.applyServerBoard]);
 
   // Dictionary cache for cascade word detection + validation gate
@@ -508,6 +510,7 @@ export function BlastGame({
       engine.trackWordFail();
     }
     prevFeedbackIdRef.current = fb?.id ?? null;
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentionally using engine.* methods
   }, [wordSubmission.currentFeedback, sounds, engine.consumeMove, engine.trackWordFail]);
 
   const handleQuit = useCallback(() => {
@@ -517,6 +520,7 @@ export function BlastGame({
   const handleShuffle = useCallback(() => {
     engine.shuffleGrid();
     playBoardShuffleSound();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentionally using engine.* method
   }, [engine.shuffleGrid, playBoardShuffleSound]);
 
   const tAdapter = useCallback((key: string) => t(key) || undefined, [t]);

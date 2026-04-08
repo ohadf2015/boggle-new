@@ -162,6 +162,7 @@ function PixelClashTvInner({ socket }: { socket: Socket | null }) {
       socket.off('party:pixel:chainReveal', onChainReveal);
       socket.off('party:pixel:showdownResults', onShowdownResults);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- partySounds is stable, adding it would cause socket re-registration
   }, [socket]);
 
   // ==================== Relay: Artist Drawing Live ====================

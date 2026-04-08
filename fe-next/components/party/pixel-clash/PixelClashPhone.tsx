@@ -158,6 +158,7 @@ function PixelClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: Pi
       socket.off('party:pixel:relayBuildStart', onRelayBuildStart);
       socket.off('party:pixel:showdownCanvases', onShowdownCanvases);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- partySounds is stable, adding it would cause socket re-registration
   }, [socket]);
 
   // Track strokes on stroke end

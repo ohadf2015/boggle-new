@@ -144,6 +144,7 @@ function ShadowClashPhoneInner({ socket, onSendInput }: ShadowClashPhoneProps) {
       socket.off('party:shadow:youWereEliminated', onEliminated);
       socket.off('party:shadow:gameOver', onGameOver);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- partySounds is stable, adding it would cause socket re-registration
   }, [socket]);
 
   const handleNightAction = useCallback((targetUsername: string) => {

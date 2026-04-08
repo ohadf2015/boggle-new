@@ -132,6 +132,7 @@ export function StudentProgressTable({ classroomId, onStudentClick }: StudentPro
         </span>
       ),
     }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- formatLastActive is stable
   ], [t]);
 
   const table = useReactTable({

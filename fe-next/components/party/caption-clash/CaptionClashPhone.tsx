@@ -114,6 +114,7 @@ function CaptionClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: 
       socket.off('party:phaseChange', onPhaseChange);
       socket.off('party:caption:voteResults', onVoteResults);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- partySounds is stable, adding it would cause socket re-registration
   }, [socket]);
 
   const handleSubmitCaption = useCallback(() => {
