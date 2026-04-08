@@ -6,7 +6,7 @@
  *
  * Handles:
  * - Tile selection states and animations
- * - Special tile types (gold, ice, bomb, rainbow, chain, time)
+ * - Special tile types (gold, ice, bomb, time)
  * - Standard tiles styled to match GridComponent (letter-tile-gradient)
  * - Cascade animations
  * - Activation effects
@@ -59,8 +59,6 @@ export interface AdventureTileProps {
   onTileDragEnter: (index: number, tile: GridTileState) => void;
   /** Function to generate aria-label for tile */
   getTileAriaLabel: (tile: GridTileState) => string;
-  /** Optional chain cascade delay (overrides tile.cascadeDelay) */
-  chainCascadeDelay?: number;
   /** Whether tile is focused via keyboard navigation */
   isKeyboardFocused?: boolean;
   /** Whether tile is locked by boss ability (prevents selection, shows lock overlay) */
@@ -76,11 +74,7 @@ const TILE_TYPE_CLASSES: Record<TileType, string> = {
   gold: 'tile-gold',
   ice: 'tile-ice',
   bomb: 'tile-bomb',
-  rainbow: 'tile-rainbow',
-  chain: 'tile-chain',
   time: 'tile-time',
-  locked: 'tile-locked',
-  multiplier: 'tile-multiplier',
 };
 
 // ==============================================
@@ -108,7 +102,6 @@ export const AdventureTile = memo(({
   onTileDragStart,
   onTileDragEnter,
   getTileAriaLabel,
-  chainCascadeDelay,
   isKeyboardFocused = false,
   isLocked = false,
 }: AdventureTileProps) => {
@@ -118,8 +111,7 @@ export const AdventureTile = memo(({
   const handleMouseEnter = useCallback(() => onTileDragEnter(index, tile), [onTileDragEnter, index, tile]);
   const handleTouchStart = useCallback((e: React.TouchEvent) => onTileDragStart(e, index, tile), [onTileDragStart, index, tile]);
 
-  // Chain cascade delay takes priority over tile.cascadeDelay
-  const effectiveCascadeDelay = chainCascadeDelay ?? tile.cascadeDelay;
+  const effectiveCascadeDelay = tile.cascadeDelay;
 
   return (
     <AdaptiveMotion.div
@@ -192,8 +184,6 @@ export const AdventureTile = memo(({
         enableComplexAnimations && tile.type === 'gold' && 'tile-gold-enhanced',
         enableComplexAnimations && tile.type === 'ice' && !tile.isCleared && 'tile-ice-enhanced',
         enableComplexAnimations && tile.type === 'bomb' && 'tile-bomb-enhanced',
-        enableComplexAnimations && tile.type === 'rainbow' && 'tile-rainbow-enhanced',
-        enableComplexAnimations && tile.type === 'chain' && 'tile-chain-enhanced',
         enableComplexAnimations && tile.type === 'time' && 'tile-time-enhanced',
 
         // Activation effect classes (one-time animation when tile effect triggers)
@@ -245,19 +235,6 @@ export const AdventureTile = memo(({
           'border-red-700/60',
         ],
 
-        // Rainbow tile - animated via CSS
-        tile.type === 'rainbow' && [
-          'text-neo-black',
-          'border-purple-500/60',
-        ],
-
-        // Chain tile - purple link
-        tile.type === 'chain' && [
-          'bg-linear-to-br from-purple-400 via-violet-500 to-violet-600',
-          'text-neo-white',
-          'border-purple-700/60',
-        ],
-
         // Time tile - emerald clock
         tile.type === 'time' && [
           'bg-linear-to-br from-emerald-400 via-teal-500 to-teal-600',
@@ -294,24 +271,6 @@ export const AdventureTile = memo(({
             <div className="tile-bomb-ring tile-bomb-ring--3" />
           </div>
           <div className="tile-bomb-spark" />
-        </>
-      )}
-
-      {/* ========== RAINBOW TILE EFFECTS ========== */}
-      {tile.type === 'rainbow' && enableComplexAnimations && (
-        <>
-          <div className="tile-rainbow-particle tile-rainbow-particle--1" />
-          <div className="tile-rainbow-particle tile-rainbow-particle--2" />
-          <div className="tile-rainbow-particle tile-rainbow-particle--3" />
-          <div className="tile-rainbow-star" />
-        </>
-      )}
-
-      {/* ========== CHAIN TILE EFFECTS ========== */}
-      {tile.type === 'chain' && enableComplexAnimations && (
-        <>
-          <div className="tile-chain-line tile-chain-line--top" />
-          <div className="tile-chain-line tile-chain-line--bottom" />
         </>
       )}
 
@@ -357,25 +316,6 @@ export const AdventureTile = memo(({
         </>
       )}
 
-      {/* Wildcard effect - rainbow rings and star */}
-      {tile.activationEffect === 'wildcard' && enableComplexAnimations && (
-        <>
-          <div className="tile-wildcard-ring tile-wildcard-ring--1" />
-          <div className="tile-wildcard-ring tile-wildcard-ring--2" />
-          <div className="tile-wildcard-ring tile-wildcard-ring--3" />
-          <div className="tile-wildcard-star" />
-        </>
-      )}
-
-      {/* Link effect - pulse rings and icon */}
-      {tile.activationEffect === 'link' && enableComplexAnimations && (
-        <>
-          <div className="tile-link-pulse" />
-          <div className="tile-link-pulse tile-link-pulse--2" />
-          <div className="tile-link-icon">🔗</div>
-        </>
-      )}
-
       {/* Time bonus effect - floating +5s and clock */}
       {tile.activationEffect === 'timeBonus' && enableComplexAnimations && (
         <>
@@ -390,10 +330,7 @@ export const AdventureTile = memo(({
         <div className="tile-activation-label">
           {tile.activationEffect === 'explode' && '2x'}
           {tile.activationEffect === 'timeBonus' && '+5s'}
-          {tile.activationEffect === 'wildcard' && '+25%'}
-          {tile.activationEffect === 'multiply' && '2x'}
           {tile.activationEffect === 'collect' && '3x'}
-          {tile.activationEffect === 'link' && '🔗'}
           {tile.activationEffect === 'melt' && '💧'}
         </div>
       )}
@@ -423,16 +360,15 @@ export const AdventureTile = memo(({
           // Stronger text shadow for legibility against all tile backgrounds
           'drop-shadow-[0_1px_2px_rgb(0_0_0/0.6)]',
           // Extra contrast on dark tiles where text is light
-          (tile.type === 'bomb' || tile.type === 'chain' || tile.type === 'time') &&
+          (tile.type === 'bomb' || tile.type === 'time') &&
             'drop-shadow-[0_1px_3px_rgb(0_0_0/0.8)]',
-          // Keep existing gold/rainbow shadow
-          (tile.type === 'gold' || tile.type === 'rainbow') && 'drop-shadow-[0_1px_2px_rgb(0_0_0/0.5)]'
+          tile.type === 'gold' && 'drop-shadow-[0_1px_2px_rgb(0_0_0/0.5)]'
         )}
       >
         {tile.letter}
       </span>
 
-      {/* Tile badge (gold, rainbow, bomb, chain, time, frost overlay) */}
+      {/* Tile badge (gold, bomb, time, frost overlay) */}
       <TileBadge type={tile.type} isFrozen={tile.isFrozen} />
 
       {/* Boss lock overlay */}

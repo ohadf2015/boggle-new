@@ -91,7 +91,7 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
   setHostUsername,
 }) => {
   const { t } = useLanguage();
-  const { canPlayRanked, profile } = useAuth();
+  const { isAdmin, profile } = useAuth();
   const { isOnCrazyGamesPlatform } = useCrazyGames();
   const matchmaking = useMatchmaking();
 
@@ -350,7 +350,7 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
     <>
       <div className="px-4 pt-3">
         <SeasonBanner />
-        {canPlayRanked && (
+        {isAdmin && (
           <button
             onClick={() => matchmaking.joinQueue('classic', defaultLanguage)}
             disabled={matchmaking.status !== 'idle'}

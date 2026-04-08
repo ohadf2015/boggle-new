@@ -1,11 +1,11 @@
 /**
  * TileBadge Component
  *
- * Renders badges/indicators for special adventure tiles (gold, rainbow, bomb, chain, time, frost)
+ * Renders badges/indicators for special adventure tiles (gold, bomb, time, frost)
  * Extracted from AdventureGrid.tsx to improve maintainability.
  */
 
-import { Bomb, Link2, Clock } from 'lucide-react';
+import { Bomb, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { TileType } from '@/types/adventure';
 
@@ -21,12 +21,10 @@ export interface TileBadgeProps {
  *
  * Badge types:
  * - Gold: 3x multiplier badge
- * - Rainbow: Wildcard badge (✦)
  * - Bomb: Bomb icon + row indicator
- * - Chain: Link icon
  * - Time: Clock icon + 5s
  * - Ice (frozen): Frost overlay
- * - Standard/Locked/Multiplier: No badge
+ * - Standard: No badge
  */
 export function TileBadge({ type, isFrozen = false }: TileBadgeProps) {
   // Gold tile - 3x multiplier badge
@@ -45,25 +43,6 @@ export function TileBadge({ type, isFrozen = false }: TileBadgeProps) {
         )}
       >
         3x
-      </span>
-    );
-  }
-
-  // Rainbow tile - wildcard badge
-  if (type === 'rainbow') {
-    return (
-      <span
-        className={cn(
-          'absolute -top-1.5 -inset-e-1.5 z-20',
-          'min-w-6 h-6',
-          'flex items-center justify-center',
-          'bg-neo-black text-neo-white',
-          'text-[15px] font-black',
-          'rounded-full border-2 border-purple-400',
-          'shadow-[0_0_10px_rgba(168,85,247,0.6)]'
-        )}
-      >
-        ✦
       </span>
     );
   }
@@ -89,24 +68,6 @@ export function TileBadge({ type, isFrozen = false }: TileBadgeProps) {
           <span />
         </div>
       </>
-    );
-  }
-
-  // Chain tile - link icon badge
-  if (type === 'chain') {
-    return (
-      <div
-        className={cn(
-          'absolute -top-1 -inset-e-1 z-20',
-          'w-6 h-6',
-          'flex items-center justify-center',
-          'bg-neo-black rounded-full',
-          'border-2 border-purple-400',
-          'shadow-[0_0_8px_rgba(138,43,226,0.6)]'
-        )}
-      >
-        <Link2 className="w-3 h-3 text-purple-400" />
-      </div>
     );
   }
 
@@ -142,6 +103,6 @@ export function TileBadge({ type, isFrozen = false }: TileBadgeProps) {
     );
   }
 
-  // Standard, locked, multiplier tiles - no badge
+  // Standard tiles - no badge
   return null;
 }

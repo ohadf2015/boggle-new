@@ -127,7 +127,6 @@ describe('ProfileCustomizationWrapper', () => {
       const handleSave = async (name: string, avatarConfig: CustomAvatarConfig) => {
         await mockUpdateProfile({
           display_name: name,
-          username: name,
           avatar_config: avatarConfig,
           has_customized_profile: true,
         });
@@ -137,7 +136,6 @@ describe('ProfileCustomizationWrapper', () => {
 
       expect(mockUpdateProfile).toHaveBeenCalledWith({
         display_name: 'NewPlayer',
-        username: 'NewPlayer',
         avatar_config: testAvatar,
         has_customized_profile: true,
       });
@@ -151,7 +149,6 @@ describe('ProfileCustomizationWrapper', () => {
       const handleSave = async (name: string, avatarConfig: CustomAvatarConfig) => {
         await mockUpdateProfile({
           display_name: name,
-          username: name,
           avatar_config: avatarConfig,
           has_customized_profile: true,
         });
@@ -179,7 +176,6 @@ describe('ProfileCustomizationWrapper', () => {
       const handleSave = async (name: string, avatarConfig: CustomAvatarConfig) => {
         const { error } = await mockUpdateProfile({
           display_name: name,
-          username: name,
           avatar_config: avatarConfig,
           has_customized_profile: true,
         });
@@ -206,7 +202,6 @@ describe('ProfileCustomizationWrapper', () => {
       const handleSave = async (name: string, avatarConfig: CustomAvatarConfig) => {
         const { error } = await mockUpdateProfile({
           display_name: name,
-          username: name,
           avatar_config: avatarConfig,
           has_customized_profile: true,
         });

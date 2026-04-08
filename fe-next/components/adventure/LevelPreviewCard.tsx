@@ -19,11 +19,7 @@ import {
   Gem,
   Snowflake,
   Bomb,
-  Rainbow,
-  Link,
   Timer,
-  Lock,
-  Zap,
   Star,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -59,11 +55,7 @@ const TILE_TYPE_INFO: Record<Exclude<TileType, 'standard'>, { icon: React.Compon
   gold: { icon: Gem, key: 'adventure.tiles.gold', color: 'text-neo-yellow' },
   ice: { icon: Snowflake, key: 'adventure.tiles.ice', color: 'text-neo-cyan' },
   bomb: { icon: Bomb, key: 'adventure.tiles.bomb', color: 'text-neo-red' },
-  rainbow: { icon: Rainbow, key: 'adventure.tiles.rainbow', color: 'text-neo-pink' },
-  chain: { icon: Link, key: 'adventure.tiles.chain', color: 'text-neo-orange' },
   time: { icon: Timer, key: 'adventure.tiles.time', color: 'text-neo-lime' },
-  locked: { icon: Lock, key: 'adventure.tiles.locked', color: 'text-gray-400' },
-  multiplier: { icon: Zap, key: 'adventure.tiles.multiplier', color: 'text-purple-400' },
 };
 
 // ==============================================

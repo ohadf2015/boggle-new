@@ -27,7 +27,8 @@ const TILE_GUIDE_ENTRIES: Array<{ type: BlastTileType; indicator: string; key: s
   { type: 'magnet', indicator: '🌀', key: 'magnet' },
   { type: 'wildcard', indicator: '🃏', key: 'wildcard' },
   { type: 'countdown', indicator: '⏳', key: 'countdown' },
-  { type: 'virus', indicator: '🦠', key: 'virus' },
+  { type: 'shuffle', indicator: '🔀', key: 'shuffle' },
+  { type: 'magma', indicator: '🌋', key: 'magma' },
   { type: 'portal', indicator: '🌌', key: 'portal' },
   { type: 'catalyst', indicator: '⚗️', key: 'catalyst' },
 ];

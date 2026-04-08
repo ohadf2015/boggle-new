@@ -74,6 +74,16 @@ export default function CookieConsent() {
   const dialogRef = useRef<HTMLDivElement>(null);
   useFocusTrap(dialogRef, visible, handleDeclineAll);
 
+  // Add bottom padding to body when banner is visible so content isn't hidden behind it
+  useEffect(() => {
+    if (visible) {
+      document.body.style.paddingBottom = '80px';
+    } else {
+      document.body.style.paddingBottom = '';
+    }
+    return () => { document.body.style.paddingBottom = ''; };
+  }, [visible]);
+
   if (!visible) return null;
 
   const isRtl = language === 'he';

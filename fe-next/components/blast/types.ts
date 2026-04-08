@@ -196,14 +196,17 @@ export const COUNTDOWN_EXPLOSION_PENALTY = 50;
 /** Countdown explosion radius (same as bomb) */
 export const COUNTDOWN_EXPLOSION_RADIUS = 1;
 
-// ==================== Virus Constants ====================
+// ==================== Shuffle Constants ====================
 
-/** Score value when clearing a virus tile (worthless — clear them to stop spread) */
-export const VIRUS_CLEAR_SCORE = 0;
-/** Number of adjacent tiles a virus infects per turn */
-export const VIRUS_SPREAD_COUNT = 1;
-/** Clearing 3+ virus tiles in one word triggers a mass cure (clears ALL virus) */
-export const VIRUS_MASS_CURE_THRESHOLD = 3;
+/** Bonus score when shuffle tile is cleared (board rearrangement reward) */
+export const SHUFFLE_CLEAR_BONUS = 5;
+
+// ==================== Magma Constants ====================
+
+/** Bonus score per tile cleared by magma diagonal blast */
+export const MAGMA_DIAGONAL_CLEAR_BONUS = 2;
+/** Magma clears both diagonals through its position (X-pattern, full grid reach) */
+export const MAGMA_MULTIPLIER = 2;
 
 // ==================== Portal Constants ====================
 
@@ -300,14 +303,15 @@ export const SPECIAL_TILE_DISTRIBUTION: Record<Exclude<BlastTileType, 'standard'
   diamond: 0,
   wildcard: 0,
   countdown: 0,
-  virus: 0,
   portal: 0,
   catalyst: 0,
+  shuffle: 0,
+  magma: 0,
 };
 
 // ==================== Objectives ====================
 
-export type BlastObjectiveType = 'collect_type' | 'clear_all_type' | 'score_target' | 'word_length';
+export type BlastObjectiveType = 'collect_type' | 'clear_all_type' | 'score_target' | 'word_length' | 'clear_percent';
 
 export interface BlastObjective {
   type: BlastObjectiveType;

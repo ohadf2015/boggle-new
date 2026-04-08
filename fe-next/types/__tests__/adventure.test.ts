@@ -22,10 +22,10 @@ import {
 describe('Adventure Types', () => {
   describe('TileType', () => {
     it('should accept valid tile type values', () => {
-      const validTypes: TileType[] = ['standard', 'gold', 'ice', 'bomb', 'rainbow'];
+      const validTypes: TileType[] = ['standard', 'gold', 'ice', 'bomb', 'time'];
       expect(validTypes).toHaveLength(5);
       validTypes.forEach((type) => {
-        expect(['standard', 'gold', 'ice', 'bomb', 'rainbow']).toContain(type);
+        expect(['standard', 'gold', 'ice', 'bomb', 'time']).toContain(type);
       });
     });
   });

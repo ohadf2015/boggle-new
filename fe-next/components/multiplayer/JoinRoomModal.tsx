@@ -93,11 +93,15 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
     }
     setStoredCustomAvatar(customAvatar);
     if (isAuthenticated) {
-      updateAuthProfile({ avatar_config: customAvatar }).catch(() => {});
+      const profileUpdates: Record<string, unknown> = { avatar_config: customAvatar };
+      if (username.trim() !== displayName) {
+        profileUpdates.display_name = username.trim();
+      }
+      updateAuthProfile(profileUpdates).catch(() => {});
     }
 
     onJoin(username.trim());
-  }, [username, customAvatar, isAuthenticated, onJoin, updateAuthProfile]);
+  }, [username, customAvatar, isAuthenticated, onJoin, updateAuthProfile, displayName]);
 
   if (!room) return null;
 
@@ -150,33 +154,24 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
               <Label htmlFor="join-username" className="text-xs font-black uppercase tracking-wider text-neo-pink">
                 {t('multiplayerFlow.joinModal.yourName')}
               </Label>
-              {isAuthenticated ? (
-                <Input
-                  id="join-username"
-                  value={username}
-                  disabled
-                  className="font-bold bg-neo-navy-light border-neo-black text-neo-white cursor-not-allowed opacity-90"
-                />
-              ) : (
-                <Input
-                  ref={nameInputRef}
-                  id="join-username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  onBlur={() => setHasTouchedName(true)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleJoin()}
-                  maxLength={20}
-                  autoFocus
-                  aria-required="true"
-                  aria-invalid={!!nameError}
-                  aria-describedby={nameError ? 'join-username-error' : undefined}
-                  className={cn(
-                    'font-bold bg-neo-navy-light border-2 border-neo-black text-neo-white placeholder:text-neo-white/30 focus-visible:ring-neo-pink',
-                    nameError && 'border-red-500 animate-neo-shake'
-                  )}
-                  placeholder={t('multiplayerFlow.joinModal.namePlaceholder')}
-                />
-              )}
+              <Input
+                ref={nameInputRef}
+                id="join-username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                onBlur={() => setHasTouchedName(true)}
+                onKeyDown={(e) => e.key === 'Enter' && handleJoin()}
+                maxLength={20}
+                autoFocus
+                aria-required="true"
+                aria-invalid={!!nameError}
+                aria-describedby={nameError ? 'join-username-error' : undefined}
+                className={cn(
+                  'font-bold bg-neo-navy-light border-2 border-neo-black text-neo-white placeholder:text-neo-white/30 focus-visible:ring-neo-pink',
+                  nameError && 'border-red-500 animate-neo-shake'
+                )}
+                placeholder={t('multiplayerFlow.joinModal.namePlaceholder')}
+              />
               {nameError && (
                 <p id="join-username-error" className="text-xs font-bold text-red-400" role="alert">
                   {t(nameError)}

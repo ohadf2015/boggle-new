@@ -93,7 +93,7 @@ export const SurvivalLifeBar: React.FC<SurvivalLifeBarProps> = ({
         key={`heart-${isLifeGaining ? 'beating' : 'idle'}`}
         className={cn(
           "shrink-0 flex items-center justify-center w-9 h-9 sm:w-11 sm:h-11 rounded-full",
-          "border-3 border-neo-black shadow-hard-sm",
+          "border-2 border-neo-cream/15",
           tier.heart,
           isLifeGaining && "heart-beating"
         )}
@@ -118,17 +118,11 @@ export const SurvivalLifeBar: React.FC<SurvivalLifeBarProps> = ({
       <div className="flex-1 relative">
       <AdaptiveMotion.div
         className={cn(
-          "h-7 sm:h-8 rounded-neo overflow-hidden border-3 shadow-hard-sm relative transition-colors duration-200",
+          "h-7 sm:h-8 rounded-neo overflow-hidden border-2 relative transition-colors duration-300",
           "bg-neo-navy/80",
-          isDamaged ? "border-red-500 bg-red-900/30" : isLow ? "border-red-500" : "border-neo-black",
+          isDamaged ? "border-neo-cream/30 bg-red-900/20" : "border-neo-cream/10",
           isLifeGaining && "life-gain-flash life-meter-pulse"
         )}
-        animate={
-          isLow && !isGameOver && !isLifeGaining
-            ? { borderColor: ['#ef4444', '#991b1b', '#ef4444'] }
-            : {}
-        }
-        transition={{ duration: 1, repeat: isLow && !isLifeGaining ? Infinity : 0 }}
       >
         {/* Fill bar */}
         <AdaptiveMotion.div

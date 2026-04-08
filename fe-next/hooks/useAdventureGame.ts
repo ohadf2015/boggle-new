@@ -64,7 +64,6 @@ interface UseAdventureGameReturn {
   pauseGame: () => void;
   completeLevel: () => void;
   resetGame: (options?: { retainedScore?: number }) => void;
-  isWildcard: (row: number, col: number) => boolean;
   markCascadeComplete: () => void;
   clearActivationEffects: () => void;
   isCascading: boolean;
@@ -236,12 +235,6 @@ export function useAdventureGame({
     dispatch({ type: 'RESET_GAME', payload: { initialState: fresh } });
   }, [levelConfig, initialGrid, upgradeConfig]);
 
-  const isWildcard = useCallback(
-    (row: number, col: number): boolean => {
-      return state.tiles[row]?.[col]?.type === 'rainbow';
-    },
-    [state.tiles]
-  );
 
   const markCascadeComplete = useCallback(() => {
     dispatch({ type: 'CASCADE_COMPLETE' });
@@ -296,7 +289,6 @@ export function useAdventureGame({
     pauseGame,
     completeLevel,
     resetGame,
-    isWildcard,
     markCascadeComplete,
     clearActivationEffects,
     isCascading: cascade.state.isProcessing,

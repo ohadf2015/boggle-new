@@ -48,8 +48,6 @@ export interface WordSubmitResult {
   bonusMoves: number;
   /** Countdown tiles that exploded this turn (penalty applied) */
   countdownExplosions: Array<{ row: number; col: number }>;
-  /** Tiles newly infected by virus spread */
-  virusInfections: Array<{ row: number; col: number }>;
 }
 
 export interface CascadeResult {
@@ -283,7 +281,7 @@ export function useBlastEngine(
 
     const currentTiles = tileStatesRef.current;
     const result = processTilesForWord({ prev: currentTiles, path, word, baseScore, gridSize, currentWave });
-    const { next, totalScore, newlyClearedCount, clearedTypeCounts, explosions: newExplosions, vortexLetterSwaps, detectedCombos, bonusMoveCount, diamondRevealTurns: newDiamondReveal } = result;
+    const { next, totalScore, newlyClearedCount, clearedTypeCounts, explosions: newExplosions, vortexLetterSwaps, detectedCombos, bonusMoveCount, diamondRevealTurns: newDiamondReveal, shuffleTriggered } = result;
 
     if (word.length > bestWordRef.current.length) bestWordRef.current = word;
 
@@ -302,6 +300,32 @@ export function useBlastEngine(
       }
     }
 
+    // Shuffle tile effect: Fisher-Yates rearrange all uncleared letters
+    if (shuffleTriggered) {
+      const baseGrid = effectiveGridRef.current;
+      if (baseGrid) {
+        const shuffledGrid = baseGrid.map(row => [...row]);
+        const positions: Array<{ r: number; c: number }> = [];
+        for (let r = 0; r < gridSize; r++) {
+          for (let c = 0; c < gridSize; c++) {
+            if (!next[r][c].isCleared && !path.some(p => p.row === r && p.col === c)) {
+              positions.push({ r, c });
+            }
+          }
+        }
+        const letters = positions.map(p => shuffledGrid[p.r][p.c]);
+        for (let i = letters.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [letters[i], letters[j]] = [letters[j], letters[i]];
+        }
+        for (let i = 0; i < positions.length; i++) {
+          shuffledGrid[positions[i].r][positions[i].c] = letters[i];
+        }
+        setCurrentGrid(shuffledGrid);
+        effectiveGridRef.current = shuffledGrid;
+      }
+    }
+
     // Thaw ice/frozen tiles adjacent to the word path
     const thawedCells = computeThawedCells(next, path);
     const tilesAfterThaw = thawedCells.length > 0
@@ -313,7 +337,7 @@ export function useBlastEngine(
         }))
       : next;
 
-    // Between-turn effects: countdown tick + virus spread
+    // Between-turn effects: countdown tick
     const betweenTurn = applyBetweenTurnEffects(tilesAfterThaw, gridSize);
 
     setTileStates(tilesAfterThaw);
@@ -353,7 +377,6 @@ export function useBlastEngine(
       explosions: newExplosions.map(e => ({ row: e.row, col: e.col, type: e.type })),
       bonusMoves: bonusMoveCount,
       countdownExplosions: betweenTurn.countdownExplosions,
-      virusInfections: betweenTurn.virusInfections,
     };
   }, [gridSize, currentWave]);
 

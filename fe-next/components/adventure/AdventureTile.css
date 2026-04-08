@@ -419,214 +419,6 @@
    Neo-brutalist style: static gradient + hard shadow
    ============================================== */
 
-/* Star burst for wildcard */
-@keyframes rainbow-star {
-  0%, 100% {
-    transform: rotate(0deg) scale(1);
-    opacity: 0.8;
-  }
-  50% {
-    transform: rotate(180deg) scale(1.2);
-    opacity: 1;
-  }
-}
-
-/* Particle orbit */
-@keyframes rainbow-particle-orbit {
-  0% {
-    transform: rotate(0deg) translateX(20px) rotate(0deg);
-    opacity: 0.6;
-  }
-  50% {
-    opacity: 1;
-  }
-  100% {
-    transform: rotate(360deg) translateX(20px) rotate(-360deg);
-    opacity: 0.6;
-  }
-}
-
-.tile-rainbow-enhanced {
-  position: relative;
-  overflow: visible;
-  /* Static rainbow gradient - neo-brutalist style */
-  background: linear-gradient(
-    90deg,
-    #ff6b6b, #feca57, #48dbfb, #ff9ff3, #54a0ff, #5f27cd
-  );
-  /* Hard shadow instead of glow - neo-brutalist style */
-  box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.9);
-  /* No animation - static gradient per spec (compositor-only constraint) */
-}
-
-/* Shimmer overlay */
-.tile-rainbow-enhanced::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.4) 0%,
-    transparent 40%,
-    transparent 60%,
-    rgba(255, 255, 255, 0.3) 100%
-  );
-  border-radius: inherit;
-  pointer-events: none;
-  z-index: 3;
-}
-
-/* Orbiting particles */
-.tile-rainbow-particle {
-  position: absolute;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 6;
-  top: 50%;
-  left: 50%;
-  margin: -3px;
-}
-
-.tile-rainbow-particle--1 {
-  background: #ff6b6b;
-  animation: rainbow-particle-orbit 3s linear infinite;
-}
-
-.tile-rainbow-particle--2 {
-  background: #48dbfb;
-  animation: rainbow-particle-orbit 3s linear infinite;
-  animation-delay: -1s;
-}
-
-.tile-rainbow-particle--3 {
-  background: #feca57;
-  animation: rainbow-particle-orbit 3s linear infinite;
-  animation-delay: -2s;
-}
-
-/* Star burst overlay */
-.tile-rainbow-star {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 100%;
-  height: 100%;
-  transform: translate(-50%, -50%);
-  pointer-events: none;
-  z-index: 4;
-  animation: rainbow-star 4s ease-in-out infinite;
-}
-
-.tile-rainbow-star::before,
-.tile-rainbow-star::after {
-  content: '';
-  position: absolute;
-  background: rgba(255, 255, 255, 0.5);
-}
-
-.tile-rainbow-star::before {
-  width: 100%;
-  height: 2px;
-  top: 50%;
-  left: 0;
-  transform: translateY(-50%);
-}
-
-.tile-rainbow-star::after {
-  width: 2px;
-  height: 100%;
-  left: 50%;
-  top: 0;
-  transform: translateX(-50%);
-}
-
-/* ==============================================
-   CHAIN TILE EFFECTS
-   ============================================== */
-
-/* Chain link pulse */
-@keyframes chain-pulse {
-  0%, 100% {
-    box-shadow:
-      0 0 10px rgba(138, 43, 226, 0.4),
-      0 0 20px rgba(75, 0, 130, 0.2);
-  }
-  50% {
-    box-shadow:
-      0 0 20px rgba(138, 43, 226, 0.7),
-      0 0 40px rgba(75, 0, 130, 0.4),
-      0 0 60px rgba(148, 0, 211, 0.2);
-  }
-}
-
-/* Chain connection animation */
-@keyframes chain-connect {
-  0% {
-    stroke-dashoffset: 100;
-  }
-  100% {
-    stroke-dashoffset: 0;
-  }
-}
-
-/* Linking energy */
-@keyframes chain-energy {
-  0% {
-    opacity: 0.3;
-    transform: scaleX(0.5);
-  }
-  50% {
-    opacity: 0.8;
-    transform: scaleX(1);
-  }
-  100% {
-    opacity: 0.3;
-    transform: scaleX(0.5);
-  }
-}
-
-.tile-chain-enhanced {
-  position: relative;
-  overflow: visible;
-  animation: chain-pulse 2s ease-in-out infinite;
-}
-
-.tile-chain-enhanced::before {
-  content: '';
-  position: absolute;
-  inset: -2px;
-  border: 2px dashed rgba(148, 0, 211, 0.5);
-  border-radius: inherit;
-  animation: chain-energy 1.5s ease-in-out infinite;
-  pointer-events: none;
-  z-index: 2;
-}
-
-/* Energy lines */
-.tile-chain-line {
-  position: absolute;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, #9400d3, transparent);
-  pointer-events: none;
-  animation: chain-energy 1.5s ease-in-out infinite;
-  z-index: 3;
-}
-
-.tile-chain-line--top {
-  top: -4px;
-  left: 20%;
-  right: 20%;
-}
-
-.tile-chain-line--bottom {
-  bottom: -4px;
-  left: 20%;
-  right: 20%;
-  animation-delay: 0.75s;
-}
-
 /* ==============================================
    TIME TILE EFFECTS
    ============================================== */
@@ -747,163 +539,6 @@
 }
 
 /* ==============================================
-   LOCKED TILE EFFECTS
-   ============================================== */
-
-/* Locked tile pulse - restricted/blocked feel */
-@keyframes locked-pulse {
-  0%, 100% {
-    box-shadow:
-      0 0 8px rgba(128, 128, 128, 0.4),
-      0 0 16px rgba(100, 100, 100, 0.2);
-    filter: brightness(0.8) saturate(0.5);
-  }
-  50% {
-    box-shadow:
-      0 0 16px rgba(128, 128, 128, 0.6),
-      0 0 32px rgba(100, 100, 100, 0.3);
-    filter: brightness(0.9) saturate(0.6);
-  }
-}
-
-/* Chain pattern animation for locked bars */
-@keyframes locked-chains {
-  0% {
-    background-position: 0 0;
-  }
-  100% {
-    background-position: 20px 20px;
-  }
-}
-
-.tile-locked-enhanced {
-  position: relative;
-  overflow: hidden;
-  animation: locked-pulse 2s ease-in-out infinite;
-  filter: brightness(0.85) saturate(0.5);
-}
-
-/* Diagonal chain pattern overlay */
-.tile-locked-enhanced::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: repeating-linear-gradient(
-    45deg,
-    transparent 0px,
-    transparent 8px,
-    rgba(80, 80, 80, 0.3) 8px,
-    rgba(80, 80, 80, 0.3) 10px
-  );
-  animation: locked-chains 3s linear infinite;
-  pointer-events: none;
-  z-index: 3;
-}
-
-/* Steel bar overlay for locked appearance */
-.tile-locked-enhanced::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(90deg,
-      transparent 0%,
-      transparent 45%,
-      rgba(60, 60, 60, 0.5) 48%,
-      rgba(80, 80, 80, 0.6) 50%,
-      rgba(60, 60, 60, 0.5) 52%,
-      transparent 55%,
-      transparent 100%
-    );
-  pointer-events: none;
-  z-index: 4;
-}
-
-/* ==============================================
-   MULTIPLIER TILE EFFECTS
-   ============================================== */
-
-/* Multiplier pulse - bonus/reward feel */
-@keyframes multiplier-pulse {
-  0%, 100% {
-    box-shadow:
-      0 0 12px rgba(190, 255, 0, 0.5),
-      0 0 24px rgba(255, 215, 0, 0.3);
-    filter: brightness(1.1);
-  }
-  50% {
-    box-shadow:
-      0 0 24px rgba(190, 255, 0, 0.8),
-      0 0 48px rgba(255, 215, 0, 0.5),
-      0 0 72px rgba(255, 255, 0, 0.2);
-    filter: brightness(1.3);
-  }
-}
-
-/* Radiant energy from center */
-@keyframes multiplier-radiate {
-  0% {
-    transform: scale(0.8);
-    opacity: 0.4;
-  }
-  50% {
-    transform: scale(1.2);
-    opacity: 0.8;
-  }
-  100% {
-    transform: scale(1.5);
-    opacity: 0;
-  }
-}
-
-/* Sparkle twinkle effect */
-@keyframes multiplier-sparkle {
-  0%, 100% {
-    opacity: 0.3;
-    transform: scale(0.8) rotate(0deg);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1.2) rotate(180deg);
-  }
-}
-
-.tile-multiplier-enhanced {
-  position: relative;
-  overflow: visible;
-  animation: multiplier-pulse 1.5s ease-in-out infinite;
-  filter: brightness(1.15);
-}
-
-/* Radiant energy overlay */
-.tile-multiplier-enhanced::before {
-  content: '';
-  position: absolute;
-  inset: -8px;
-  border: 3px solid rgba(190, 255, 0, 0.6);
-  border-radius: 50%;
-  animation: multiplier-radiate 2s ease-out infinite;
-  pointer-events: none;
-  z-index: 2;
-}
-
-/* Inner glow highlight */
-.tile-multiplier-enhanced::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(
-    circle at center,
-    rgba(255, 255, 0, 0.3) 0%,
-    rgba(190, 255, 0, 0.15) 50%,
-    transparent 100%
-  );
-  border-radius: inherit;
-  pointer-events: none;
-  z-index: 3;
-}
-
-/* ==============================================
    SHARED UTILITIES
    ============================================== */
 
@@ -912,23 +547,13 @@
   .tile-gold-enhanced,
   .tile-ice-enhanced,
   .tile-bomb-enhanced,
-  .tile-rainbow-enhanced,
-  .tile-chain-enhanced,
   .tile-time-enhanced,
-  .tile-locked-enhanced,
-  .tile-multiplier-enhanced,
   .tile-gold-enhanced::before,
   .tile-ice-enhanced::before,
-  .tile-rainbow-enhanced::before,
-  .tile-locked-enhanced::before,
-  .tile-multiplier-enhanced::before,
   .tile-gold-sparkle,
   .tile-ice-snowflake,
   .tile-bomb-ring,
   .tile-bomb-spark,
-  .tile-rainbow-particle,
-  .tile-rainbow-star,
-  .tile-chain-line,
   .tile-time-hand,
   .tile-time-particle,
   .tile-gold-badge,
@@ -964,27 +589,6 @@
       0 0 20px rgba(139, 92, 246, 0.8),
       0 0 40px rgba(100, 60, 200, 0.4),
       inset 0 0 10px rgba(255, 255, 255, 0.3);
-  }
-
-  /* Static visual feedback for locked tiles */
-  .tile-locked-enhanced {
-    filter: brightness(0.8) saturate(0.5);
-    box-shadow:
-      0 0 8px rgba(128, 128, 128, 0.5),
-      inset 0 0 16px rgba(60, 60, 60, 0.3);
-  }
-
-  /* Static visual feedback for multiplier tiles */
-  .tile-multiplier-enhanced {
-    filter: brightness(1.2);
-    box-shadow:
-      0 0 20px rgba(190, 255, 0, 0.7),
-      0 0 40px rgba(255, 215, 0, 0.4);
-  }
-
-  /* Static visual feedback for rainbow tiles - hard shadow (already static by default) */
-  .tile-rainbow-enhanced {
-    box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.9);
   }
 }
 
@@ -1448,122 +1052,8 @@
   z-index: 35;
 }
 
-/* ========== RAINBOW WILDCARD EFFECT ========== */
-/* Simplified: transform + opacity only (compositor-friendly), no hue-rotate */
-@keyframes rainbow-wildcard {
-  0% {
-    transform: scale(1);
-    opacity: 1;
-  }
-  25% {
-    transform: scale(1.15);
-    opacity: 0.95;
-  }
-  50% {
-    transform: scale(1.2);
-    opacity: 1;
-  }
-  75% {
-    transform: scale(1.15);
-    opacity: 0.95;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-@keyframes rainbow-star-burst {
-  0% {
-    transform: scale(0) rotate(0deg);
-    opacity: 1;
-  }
-  50% {
-    transform: scale(1.5) rotate(180deg);
-    opacity: 1;
-  }
-  100% {
-    transform: scale(2) rotate(360deg);
-    opacity: 0;
-  }
-}
-
-@keyframes rainbow-ring-expand {
-  0% {
-    transform: scale(0.5);
-    opacity: 1;
-    border-width: 4px;
-  }
-  100% {
-    transform: scale(2.5);
-    opacity: 0;
-    border-width: 1px;
-  }
-}
-
-.tile-effect-wildcard {
-  animation: rainbow-wildcard 600ms ease-out forwards;
-  overflow: visible !important;
-  z-index: 40 !important;
-}
-
-/* Rainbow ring expansion */
-.tile-wildcard-ring {
-  position: absolute;
-  inset: -5px;
-  border: 4px solid;
-  border-radius: 50%;
-  animation: rainbow-ring-expand 400ms ease-out forwards;
-  pointer-events: none;
-  z-index: 35;
-}
-
-.tile-wildcard-ring--1 { border-color: #ff6b6b; }
-.tile-wildcard-ring--2 { border-color: #48dbfb; animation-delay: 80ms; }
-.tile-wildcard-ring--3 { border-color: #feca57; animation-delay: 160ms; }
-
-/* Star burst */
-.tile-wildcard-star {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 24px;
-  animation: rainbow-star-burst 500ms ease-out forwards;
-  pointer-events: none;
-  z-index: 40;
-}
-
-.tile-wildcard-star::before {
-  content: '✦';
-  background: linear-gradient(135deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-/* ========== CHAIN LINK EFFECT ========== */
-@keyframes chain-link {
-  0% {
-    transform: scale(1);
-    filter: brightness(1);
-  }
-  30% {
-    transform: scale(1.1);
-    filter: brightness(1.5);
-    box-shadow: 0 0 30px rgba(148, 0, 211, 0.8);
-  }
-  60% {
-    transform: scale(1.05);
-    filter: brightness(1.3);
-  }
-  100% {
-    transform: scale(1);
-    filter: brightness(1);
-  }
-}
-
-@keyframes chain-pulse-out {
+/* ========== TIME BONUS EFFECT ========== */
+@keyframes ring-expand-out {
   0% {
     transform: scale(0.8);
     opacity: 1;
@@ -1574,54 +1064,6 @@
   }
 }
 
-@keyframes chain-link-connect {
-  0% {
-    stroke-dashoffset: 20;
-    opacity: 1;
-  }
-  100% {
-    stroke-dashoffset: 0;
-    opacity: 0;
-  }
-}
-
-.tile-effect-link {
-  animation: chain-link 500ms ease-out forwards;
-  overflow: visible !important;
-  z-index: 40 !important;
-}
-
-/* Chain pulse rings */
-.tile-link-pulse {
-  position: absolute;
-  inset: -5px;
-  border: 3px solid rgba(148, 0, 211, 0.7);
-  border-radius: 50%;
-  animation: chain-pulse-out 400ms ease-out forwards;
-  pointer-events: none;
-  z-index: 35;
-}
-
-.tile-link-pulse--2 {
-  animation-delay: 100ms;
-  border-color: rgba(138, 43, 226, 0.5);
-}
-
-/* Chain icon burst */
-.tile-link-icon {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 18px;
-  color: #9400d3;
-  animation: chain-pulse-out 500ms ease-out forwards;
-  animation-delay: 100ms;
-  pointer-events: none;
-  z-index: 40;
-}
-
-/* ========== TIME BONUS EFFECT ========== */
 @keyframes time-bonus {
   0% {
     transform: scale(1) rotate(0deg);
@@ -1714,7 +1156,7 @@
   inset: -8px;
   border: 3px solid rgba(16, 185, 129, 0.6);
   border-radius: 50%;
-  animation: chain-pulse-out 400ms ease-out forwards;
+  animation: ring-expand-out 400ms ease-out forwards;
   pointer-events: none;
   z-index: 35;
 }
@@ -1727,8 +1169,6 @@
   .tile-effect-melt,
   .tile-effect-explode,
   .tile-effect-collect,
-  .tile-effect-wildcard,
-  .tile-effect-link,
   .tile-effect-timeBonus,
   .tile-effect-melt::before,
   .tile-effect-melt::after,
@@ -1737,10 +1177,6 @@
   .tile-explode-debris,
   .tile-collect-coin,
   .tile-collect-sparkle,
-  .tile-wildcard-ring,
-  .tile-wildcard-star,
-  .tile-link-pulse,
-  .tile-link-icon,
   .tile-time-plus,
   .tile-time-clock,
   .tile-time-ring {
@@ -1759,15 +1195,6 @@
   .tile-effect-collect {
     filter: brightness(1.3);
     box-shadow: 0 0 20px rgba(255, 225, 53, 0.6);
-  }
-
-  .tile-effect-wildcard {
-    filter: brightness(1.3);
-  }
-
-  .tile-effect-link {
-    filter: brightness(1.3);
-    box-shadow: 0 0 20px rgba(148, 0, 211, 0.6);
   }
 
   .tile-effect-timeBonus {

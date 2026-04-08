@@ -2181,7 +2181,6 @@ html.reduce-motion *::after {
 
 /* Disable heavy blast tile animations (box-shadow + filter keyframes) */
 .low-end-device .blast-tile-ice,
-.low-end-device .blast-tile-wildcard,
 .low-end-device .blast-tile-lightning,
 .low-end-device .blast-tile-magnet,
 .low-end-device .blast-tile-prism,
@@ -2194,9 +2193,7 @@ html.reduce-motion *::after {
 
 /* Disable adventure tile glow/shimmer animations */
 .low-end-device .adventure-tile-gold,
-.low-end-device .adventure-tile-rainbow,
 .low-end-device .adventure-tile-bomb,
-.low-end-device .adventure-tile-chain,
 .low-end-device .adventure-tile-time {
   animation: none !important;
   filter: none !important;
@@ -2633,6 +2630,75 @@ html.reduce-motion *::after {
 .low-end-device .life-bar-danger-glow,
 .low-end-device .life-bar-low-pulse {
   animation: none;
+}
+
+/* ====================================
+   WORD DISCOVERY SPARKLE BURST
+   Radial sparkle dots on valid word find
+   ==================================== */
+
+@keyframes sparkle-burst {
+  0% {
+    transform: scale(0) rotate(0deg);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.8) rotate(90deg);
+    opacity: 0;
+  }
+}
+
+.sparkle-burst {
+  position: absolute;
+  inset: -12px;
+  pointer-events: none;
+  z-index: 50;
+}
+
+.sparkle-burst::before,
+.sparkle-burst::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, transparent 40%,
+    transparent 40%),
+    conic-gradient(
+      from 0deg,
+      transparent 0deg, rgba(191, 255, 0, 0.6) 5deg, transparent 10deg,
+      transparent 80deg, rgba(0, 255, 255, 0.5) 85deg, transparent 90deg,
+      transparent 170deg, rgba(191, 255, 0, 0.4) 175deg, transparent 180deg,
+      transparent 260deg, rgba(0, 255, 255, 0.3) 265deg, transparent 270deg
+    );
+  mask: radial-gradient(circle, transparent 45%, black 46%, black 52%, transparent 53%);
+  -webkit-mask: radial-gradient(circle, transparent 45%, black 46%, black 52%, transparent 53%);
+  border-radius: 50%;
+  animation: sparkle-burst 0.5s ease-out forwards;
+}
+
+.sparkle-burst::after {
+  animation-delay: 0.06s;
+  transform: rotate(45deg);
+}
+
+.low-end-device .sparkle-burst,
+.low-end-device .sparkle-burst::before,
+.low-end-device .sparkle-burst::after {
+  animation: none;
+  display: none;
+}
+
+/* Score glow pulse on increment */
+@keyframes score-glow {
+  0% { box-shadow: 0 0 0 0 rgba(191, 255, 0, 0.3); }
+  50% { box-shadow: 0 0 12px 4px rgba(191, 255, 0, 0.15); }
+  100% { box-shadow: 0 0 0 0 rgba(191, 255, 0, 0); }
+}
+
+.score-glow-pulse {
+  animation: score-glow 0.4s ease-out;
 }
 
 /* ====================================

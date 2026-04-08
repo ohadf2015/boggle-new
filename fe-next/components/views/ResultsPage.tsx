@@ -507,7 +507,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     let callbackFired = false;
     const timeout = setTimeout(() => {
       if (!callbackFired) {
-        logger.warn('[RESULTS] resetGame callback timed out — attempting startGame anyway');
+        logger.debug('[RESULTS] resetGame callback timed out — attempting startGame anyway');
         socket.emit('startGame', {
           letterGrid: preGeneratedGrid,
           timerSeconds: 120,

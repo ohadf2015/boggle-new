@@ -23,7 +23,7 @@ describe('getInitialHitsRemaining', () => {
   });
 
   it('returns 0 for all other special tiles', () => {
-    const zeroHitTypes: BlastTileType[] = ['gold', 'bomb', 'rainbow', 'lightning', 'magnet', 'mirror', 'silver', 'diamond', 'wildcard', 'countdown', 'virus', 'portal', 'catalyst'];
+    const zeroHitTypes: BlastTileType[] = ['gold', 'bomb', 'rainbow', 'lightning', 'magnet', 'mirror', 'silver', 'diamond', 'wildcard', 'countdown', 'shuffle', 'magma', 'portal', 'catalyst'];
     for (const type of zeroHitTypes) {
       expect(getInitialHitsRemaining(type)).toBe(0);
     }

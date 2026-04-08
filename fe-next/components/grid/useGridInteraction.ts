@@ -40,6 +40,8 @@ interface UseGridInteractionProps {
   /** Optional filter — return false to prevent a cell from being selected (e.g. ice tiles).
    *  Third arg is the current drag path length (avoids stale React state during drag). */
   cellFilter?: (row: number, col: number, currentPathLength?: number) => boolean;
+  /** Optional adjacency override — return true if cell2 is reachable from cell1 (e.g. portal teleportation). */
+  isAdjacent?: (cell1: GridPosition, cell2: GridPosition) => boolean;
 }
 
 interface UseGridInteractionReturn {
@@ -80,6 +82,7 @@ export function useGridInteraction({
   language = 'en',
   disableLetterKeyInput = false,
   cellFilter,
+  isAdjacent: isAdjacentOverride,
 }: UseGridInteractionProps): UseGridInteractionReturn {
   const [internalSelectedCells, setInternalSelectedCells] = useState<SelectedCell[]>([]);
   const [fadingCells, setFadingCells] = useState<GridPosition[]>([]);
@@ -144,11 +147,28 @@ export function useGridInteraction({
   useEffect(() => {
     const lastCell = selectedCells[selectedCells.length - 1];
     if (lastCell && isTouchingRef.current) {
-      setAdjacentCells(getSelectableAdjacentCells(lastCell, grid, selectedCells));
+      const base = getSelectableAdjacentCells(lastCell, grid, selectedCells);
+      if (isAdjacentOverride) {
+        // Add portal-reachable cells beyond standard 8-direction
+        const selectedSet = new Set(selectedCells.map(c => `${c.row}-${c.col}`));
+        const baseSet = new Set(base.map(c => `${c.row}-${c.col}`));
+        const rows = grid.length;
+        const cols = grid[0]?.length ?? 4;
+        for (let r = 0; r < rows; r++) {
+          for (let c = 0; c < cols; c++) {
+            const key = `${r}-${c}`;
+            if (baseSet.has(key) || selectedSet.has(key)) continue;
+            if (isAdjacentOverride(lastCell, { row: r, col: c })) {
+              base.push({ row: r, col: c });
+            }
+          }
+        }
+      }
+      setAdjacentCells(base);
     } else {
       setAdjacentCells([]);
     }
-  }, [selectedCells, grid]);
+  }, [selectedCells, grid, isAdjacentOverride]);
   // Track fade timeouts so they can be cancelled when a new selection starts
   const fadeTimerIdsRef = useRef<NodeJS.Timeout[]>([]);
   const cancelFadeOut = useCallback(() => {
@@ -285,7 +305,8 @@ export function useGridInteraction({
       }
       return;
     }
-    if (isAdjacentCell(lastCell, currentCell)) {
+    const checkAdjacent = isAdjacentOverride ?? isAdjacentCell;
+    if (checkAdjacent(lastCell, currentCell)) {
       // Check cell filter — pass current drag length so gem filter uses real-time count
       if (cellFilter && !cellFilter(currentCell.row, currentCell.col, dragCells.length)) return;
       const newCount = dragCells.length + 1;
@@ -302,7 +323,7 @@ export function useGridInteraction({
         vibrateCellDrag(fireRoundActive, newTier);
       }
     }
-  }, [fireRoundActive, comboLevel, getCellAtPos, toggleDragClass, setSelectedCells, cellFilter]);
+  }, [fireRoundActive, comboLevel, getCellAtPos, toggleDragClass, setSelectedCells, cellFilter, isAdjacentOverride]);
 
   const handleTouchMove = useCallback((e: TouchEvent | MouseEvent) => {
     if (!interactive || !isTouchingRef.current) return;

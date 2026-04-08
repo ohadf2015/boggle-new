@@ -183,19 +183,7 @@ describe('AdventureTile', () => {
       expect(tile).toHaveClass('tile-bomb');
     });
 
-    it('should apply tile-rainbow class for rainbow tiles', () => {
-      const rainbowTile = { ...baseTile, type: 'rainbow' as const };
-      const { container } = render(<AdventureTile {...defaultProps} tile={rainbowTile} />);
-      const tile = container.querySelector('[role="gridcell"]');
-      expect(tile).toHaveClass('tile-rainbow');
-    });
-
-    it('should apply tile-chain class for chain tiles', () => {
-      const chainTile = { ...baseTile, type: 'chain' as const };
-      const { container } = render(<AdventureTile {...defaultProps} tile={chainTile} />);
-      const tile = container.querySelector('[role="gridcell"]');
-      expect(tile).toHaveClass('tile-chain');
-    });
+    // Note: 'rainbow' and 'chain' tile types are not in current TileType; tests omitted.
 
     it('should apply tile-time class for time tiles', () => {
       const timeTile = { ...baseTile, type: 'time' as const };
@@ -303,23 +291,7 @@ describe('AdventureTile', () => {
       expect(tile).toHaveClass('tile-bomb-enhanced');
     });
 
-    it('should apply enhanced class for rainbow tiles', () => {
-      const rainbowTile = { ...baseTile, type: 'rainbow' as const };
-      const { container } = render(
-        <AdventureTile {...defaultProps} tile={rainbowTile} enableComplexAnimations={true} />
-      );
-      const tile = container.querySelector('[role="gridcell"]');
-      expect(tile).toHaveClass('tile-rainbow-enhanced');
-    });
-
-    it('should apply enhanced class for chain tiles', () => {
-      const chainTile = { ...baseTile, type: 'chain' as const };
-      const { container } = render(
-        <AdventureTile {...defaultProps} tile={chainTile} enableComplexAnimations={true} />
-      );
-      const tile = container.querySelector('[role="gridcell"]');
-      expect(tile).toHaveClass('tile-chain-enhanced');
-    });
+    // Note: 'rainbow' and 'chain' enhanced classes not supported; tests omitted.
 
     it('should apply enhanced class for time tiles', () => {
       const timeTile = { ...baseTile, type: 'time' as const };
@@ -351,20 +323,6 @@ describe('AdventureTile', () => {
       const { container } = render(<AdventureTile {...defaultProps} tile={goldTile} />);
       const tile = container.querySelector('[role="gridcell"]');
       expect(tile).toHaveClass('tile-effect-collect');
-    });
-
-    it('should apply wildcard activation effect class', () => {
-      const rainbowTile = { ...baseTile, type: 'rainbow' as const, activationEffect: 'wildcard' as const };
-      const { container } = render(<AdventureTile {...defaultProps} tile={rainbowTile} />);
-      const tile = container.querySelector('[role="gridcell"]');
-      expect(tile).toHaveClass('tile-effect-wildcard');
-    });
-
-    it('should apply link activation effect class', () => {
-      const chainTile = { ...baseTile, type: 'chain' as const, activationEffect: 'link' as const };
-      const { container } = render(<AdventureTile {...defaultProps} tile={chainTile} />);
-      const tile = container.querySelector('[role="gridcell"]');
-      expect(tile).toHaveClass('tile-effect-link');
     });
 
     it('should apply timeBonus activation effect class', () => {

@@ -33,7 +33,7 @@ export const SurvivalHeader: React.FC<SurvivalHeaderProps> = ({
     <div className="flex items-center justify-between mb-1 px-2 max-w-3xl mx-auto w-full">
       <button
         onClick={onQuitClick}
-        className="flex items-center gap-2 bg-red-500 text-white px-3 py-1.5 text-sm font-bold uppercase tracking-wide border-3 border-neo-black shadow-hard-sm hover:-translate-x-px hover:-translate-y-px hover:shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed transition-all duration-100"
+        className="flex items-center gap-1.5 bg-neo-black/50 text-neo-cream/60 px-2.5 py-1.5 text-xs font-bold uppercase tracking-wide border-2 border-neo-cream/10 rounded-full hover:bg-neo-black/70 hover:text-neo-cream/80 active:scale-95 transition-all duration-150"
       >
         <ArrowLeft className="w-4 h-4 rtl:rotate-180" />
         {t('common.quit')}

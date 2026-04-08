@@ -55,9 +55,9 @@ describe('Level Archetypes', () => {
       expect(config.primaryObjective).toBe('timeBonus');
     });
 
-    it('cascade should have chain tile emphasis and wordCount primary', () => {
+    it('cascade should have bomb tile emphasis and wordCount primary', () => {
       const config = ARCHETYPE_CONFIGS.cascade;
-      expect(config.tileModifiers.chainMultiplier).toBeGreaterThan(1);
+      expect(config.tileModifiers.bombMultiplier).toBeGreaterThan(1);
       expect(config.primaryObjective).toBe('wordCount');
     });
 

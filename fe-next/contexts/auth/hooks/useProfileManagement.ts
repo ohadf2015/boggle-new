@@ -117,28 +117,25 @@ async function createNewProfile(
   // Extract name from OAuth provider (Google, Discord, Apple)
   const oauthName = extractOAuthDisplayName(userMetadata);
 
-  // Generate username and avatar: use OAuth name if available, otherwise get a fun random name
-  let username: string;
+  // Username is a non-user-facing unique slug derived from UUID (guaranteed unique).
+  // display_name is the human-visible name from OAuth or a fun random name.
+  const username = `user_${userId.replace(/-/g, '').slice(0, 12)}`;
   let displayName: string;
 
   // Always assign a random character avatar for new users as fallback
   const randomAvatar = getRandomAvatar();
-  const avatarImage = randomAvatar.id;
+  const finalAvatarImage = randomAvatar.id;
 
   if (oauthName) {
-    username = oauthName;
     displayName = oauthName;
   } else {
     // No OAuth display name - generate a fun random name
     const randomData = await fetchRandomPlayerName();
-    username = randomData.name;
     displayName = randomData.name;
   }
 
-  const finalAvatarImage = avatarImage;
-
   // Get legacy emoji/color from the character avatar (for backward compatibility with DB)
-  const { emoji: avatarEmoji, color: avatarColor } = getAvatarEmojiAndColor(avatarImage);
+  const { emoji: avatarEmoji, color: avatarColor } = getAvatarEmojiAndColor(finalAvatarImage);
 
   const randomCustomAvatar = getRandomAvatarConfig();
 
@@ -265,7 +262,7 @@ export function useProfileManagement({
 
       const profilePayload: Partial<ProfileData> = {
         id: user.id,
-        username,
+        username: `user_${user.id.replace(/-/g, '').slice(0, 12)}`,
         display_name: username,
         avatar_emoji: avatarEmoji || '',
         avatar_color: avatarColor || '#4ECDC4',

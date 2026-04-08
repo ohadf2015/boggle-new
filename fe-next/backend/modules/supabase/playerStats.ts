@@ -59,13 +59,14 @@ export async function ensureProfileExists(playerId: string): Promise<boolean> {
     };
     const oauthFirstName = oauthFullName ? getFirstName(oauthFullName) : null;
 
-    let username: string;
+    // Username is a non-user-facing unique slug derived from UUID (guaranteed unique).
+    // display_name is the human-visible name from OAuth provider or a fun random name.
+    const username = `user_${playerId.replace(/-/g, '').slice(0, 12)}`;
     let displayName: string;
     let avatarEmoji: string;
     let avatarColor: string;
 
     if (oauthFirstName) {
-      username = oauthFirstName;
       displayName = oauthFirstName;
       const genericAvatars = [
         { emoji: '😊', color: '#4F46E5' },
@@ -80,44 +81,27 @@ export async function ensureProfileExists(playerId: string): Promise<boolean> {
     } else {
       const generateRandomPlayerName = getRandomPlayerNameGenerator();
       const randomPlayerData = generateRandomPlayerName!([], 'en');
-      username = randomPlayerData.name;
       displayName = randomPlayerData.name;
       avatarEmoji = randomPlayerData.avatar.emoji;
       avatarColor = randomPlayerData.avatar.color;
     }
 
-    // Try to create the profile - handle username uniqueness constraint
-    let createAttempts = 0;
-    const maxAttempts = 3;
+    const { error: createError } = await client
+      .from('profiles')
+      .insert({
+        id: playerId,
+        username,
+        display_name: displayName,
+        avatar_emoji: avatarEmoji,
+        avatar_color: avatarColor
+      });
 
-    while (createAttempts < maxAttempts) {
-      const { error: createError } = await client
-        .from('profiles')
-        .insert({
-          id: playerId,
-          username: createAttempts === 0 ? username : `${username}${Math.floor(Math.random() * 10000)}`,
-          display_name: displayName,
-          avatar_emoji: avatarEmoji,
-          avatar_color: avatarColor
-        });
-
-      if (!createError) {
-        logger.info('SUPABASE', `Created minimal profile for ${playerId}`);
-        return true;
-      }
-
-      // Check if it's a unique constraint violation on username
-      if (createError.code === '23505' && createError.message?.includes('username')) {
-        createAttempts++;
-        logger.warn('SUPABASE', `Username collision, retrying with suffix (attempt ${createAttempts}/${maxAttempts})`);
-        continue;
-      }
-
-      logger.error('SUPABASE', `Failed to create profile for ${playerId}`, createError.message);
-      return false;
+    if (!createError) {
+      logger.info('SUPABASE', `Created minimal profile for ${playerId}`);
+      return true;
     }
 
-    logger.error('SUPABASE', `Failed to create profile after ${maxAttempts} attempts for ${playerId}`);
+    logger.error('SUPABASE', `Failed to create profile for ${playerId}`, createError.message);
     return false;
   }
 

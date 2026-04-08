@@ -4,6 +4,8 @@ import { captureApiError } from '@/utils/sentry';
 import { getPostHogServer } from '@/lib/posthog';
 
 // Server-side coin amount limits to prevent abuse
+// Daily rewards: base(25) + efficiency(50) + streak(100*10=1000) + streakBonus ≈ up to ~1500
+// Game rewards: capped at MAX_GAME_REWARD (500) in coinManager.ts
 const MAX_COIN_AWARD = 2000;
 const MAX_COIN_SPEND = 10000;
 

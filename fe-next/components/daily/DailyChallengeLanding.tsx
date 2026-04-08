@@ -148,7 +148,7 @@ export function DailyChallengeLanding({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ type: 'spring', stiffness: 280, damping: 26 }}
-      className="flex-1 flex flex-col items-center px-3 py-2 sm:px-4 sm:py-3 max-w-3xl mx-auto w-full relative"
+      className="flex-1 flex flex-col items-center px-3 py-2 sm:px-4 sm:py-2 max-w-3xl mx-auto w-full relative"
     >
       {/* Ambient effects */}
       <ConfettiBackground />

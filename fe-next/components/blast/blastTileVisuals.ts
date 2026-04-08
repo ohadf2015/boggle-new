@@ -6,7 +6,7 @@ const BORDER_SPECIAL = '2px solid rgba(0,0,0,0.4)';
 export const TILE_VISUALS: Record<BlastTileType, { bg: string; indicator?: string; text?: string; style?: React.CSSProperties }> = {
   standard: {
     bg: '', text: 'text-neo-navy',
-    style: { background: '#FFFFFF', boxShadow: SHADOW, border: '2px solid rgba(0,0,0,0.3)' },
+    style: { background: 'rgba(255,255,255,0.85)', boxShadow: SHADOW, border: '2px solid rgba(0,0,0,0.3)' },
   },
   gold: {
     bg: '', indicator: '✦', text: 'text-neo-navy',
@@ -64,9 +64,13 @@ export const TILE_VISUALS: Record<BlastTileType, { bg: string; indicator?: strin
     bg: '', indicator: '⏳', text: 'text-white',
     style: { background: 'linear-gradient(165deg, #FF9966 0%, #FF6633 40%, #EE5522 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL },
   },
-  virus: {
-    bg: '', indicator: '🦠', text: 'text-white',
-    style: { background: 'linear-gradient(165deg, #66FF66 0%, #33CC33 40%, #22BB22 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL },
+  shuffle: {
+    bg: '', indicator: '🔀', text: 'text-neo-navy',
+    style: { background: 'linear-gradient(165deg, #FFB347 0%, #FF8C00 40%, #E07700 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL },
+  },
+  magma: {
+    bg: '', indicator: '🌋', text: 'text-white',
+    style: { background: 'linear-gradient(165deg, #FF6B35 0%, #FF4500 40%, #CC3700 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL },
   },
   portal: {
     bg: '', indicator: '🌌', text: 'text-white',
@@ -94,7 +98,8 @@ export const CLEARING_COLORS: Partial<Record<BlastTileType, { background: string
   diamond:   { background: 'radial-gradient(circle, #B9F2FF 0%, #00CED1 100%)', border: '2px solid rgba(0,0,0,0.5)' },
   wildcard:  { background: 'radial-gradient(circle, #E8B4F8 0%, #9333EA 100%)', border: '2px solid rgba(0,0,0,0.5)' },
   countdown: { background: 'radial-gradient(circle, #FF9966 0%, #CC3300 100%)', border: '2px solid rgba(0,0,0,0.5)' },
-  virus:     { background: 'radial-gradient(circle, #66FF66 0%, #009900 100%)', border: '2px solid rgba(0,0,0,0.5)' },
+  shuffle:   { background: 'radial-gradient(circle, #FFB347 0%, #CC7000 100%)', border: '2px solid rgba(0,0,0,0.5)' },
+  magma:     { background: 'radial-gradient(circle, #FF6B35 0%, #CC2200 100%)', border: '2px solid rgba(0,0,0,0.5)' },
   portal:    { background: 'radial-gradient(circle, #7B68EE 0%, #2E0054 100%)', border: '2px solid rgba(0,0,0,0.5)' },
   catalyst:  { background: 'radial-gradient(circle, #FFD700 0%, #DAA520 100%)', border: '2px solid rgba(0,0,0,0.5)' },
 };
@@ -117,7 +122,8 @@ export const CLEARING_ANIMS: Partial<Record<BlastTileType, { transform: string; 
   diamond:   { transform: 'scale(1.9) rotate(45deg)', transition: 'all 200ms cubic-bezier(0.34, 1.56, 0.64, 1)', filter: 'brightness(3) saturate(2)' },
   wildcard:  { transform: 'scale(1.5) rotate(360deg)', transition: 'all 250ms ease-out', filter: 'brightness(2) hue-rotate(90deg)' },
   countdown: { transform: 'scale(2.5) rotate(30deg)', transition: 'all 180ms cubic-bezier(0.17, 0.67, 0.83, 0.67)', filter: 'brightness(3) saturate(2.5)' },
-  virus:     { transform: 'scale(0.2) rotate(-90deg)', transition: 'all 200ms cubic-bezier(0.55, 0.06, 0.68, 0.19)', filter: 'brightness(0.5) saturate(3)' },
+  shuffle:   { transform: 'scale(1.4) rotate(720deg)', transition: 'all 300ms cubic-bezier(0.34, 1.56, 0.64, 1)', filter: 'brightness(2) hue-rotate(45deg)' },
+  magma:     { transform: 'scale(2.5) rotate(45deg)', transition: 'all 250ms cubic-bezier(0.17, 0.67, 0.83, 0.67)', filter: 'brightness(3) saturate(2.5)' },
   portal:    { transform: 'scale(0.01) rotate(720deg)', transition: 'all 350ms cubic-bezier(0.36, 0, 0.66, -0.56)', filter: 'brightness(2) blur(2px)' },
   catalyst:  { transform: 'scale(2.0) rotate(-15deg)', transition: 'all 220ms ease-out', filter: 'brightness(2.5) saturate(2)' },
 };

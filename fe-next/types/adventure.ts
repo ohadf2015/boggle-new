@@ -15,15 +15,11 @@ import type { BossTwistType } from './boss';
  * Types of tiles in the adventure game grid
  * - standard: Normal letter tile
  * - gold: 3x point multiplier
- * - ice: Obstacle that must be cleared
- * - bomb: Clears entire row when used
- * - rainbow: Wildcard that matches any letter
- * - chain: Links adjacent tiles together for combo bonuses
+ * - ice: Obstacle that must be cleared by using adjacent tiles
+ * - bomb: Doubles word score when used
  * - time: Adds bonus time when used in a word
- * - locked: Cannot be used until unlocked by word with same letter
- * - multiplier: Multiplies word score by 2x when used
  */
-export type TileType = 'standard' | 'gold' | 'ice' | 'bomb' | 'rainbow' | 'chain' | 'time' | 'locked' | 'multiplier';
+export type TileType = 'standard' | 'gold' | 'ice' | 'bomb' | 'time' | 'locked' | 'rainbow' | 'chain' | 'multiplier';
 
 /**
  * Types of activation effects that can play when a special tile is used
@@ -32,11 +28,7 @@ export type TileActivationEffect =
   | 'melt'      // Ice tile melted by adjacent word
   | 'explode'   // Bomb tile detonated
   | 'collect'   // Gold tile 3x multiplier collected
-  | 'wildcard'  // Rainbow tile used as wildcard
-  | 'link'      // Chain tile linked neighbors
   | 'timeBonus' // Time tile added seconds
-  | 'unlock'    // Locked tile unlocked
-  | 'multiply'  // Multiplier tile activated
   | null;
 
 /**
@@ -53,10 +45,6 @@ export interface TileState {
   cascadeDelay?: number;
   /** Whether the tile is frozen (for ice tiles) */
   isFrozen?: boolean;
-  /** Whether the tile is part of a chain (for chain tiles) */
-  isChained?: boolean;
-  /** Indices of tiles chained to this one (for chain tiles) */
-  chainedWith?: number[];
   /** Bonus time value in seconds (for time tiles) */
   bonusTime?: number;
   /** Activation effect currently playing (clears after animation completes) */

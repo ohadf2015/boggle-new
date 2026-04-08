@@ -54,6 +54,8 @@ vi.mock('@/components/QuickLanguageSwitcher', () => ({
 }));
 vi.mock('@/utils/profileStorage', () => ({
     getStoredCustomAvatar: () => null,
+    getStoredUsername: () => '',
+    setStoredUsername: vi.fn(),
 }));
 
 // Mock Next.js Link

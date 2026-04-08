@@ -239,7 +239,7 @@ describe('blastEnhancedEffects', () => {
   describe('glitchTile', () => {
     it('creates a GlitchEffect and calls glitch', () => {
       const manager = createEnhancedEffects(app, camera, 50);
-      manager.glitchTile(100, 200, 'virus');
+      manager.glitchTile(100, 200, 'shuffle');
 
       expect(mockGlitch).toHaveBeenCalledTimes(1);
       expect(camera.addChild).toHaveBeenCalled();
@@ -248,7 +248,7 @@ describe('blastEnhancedEffects', () => {
     it('does nothing after destroy is called', () => {
       const manager = createEnhancedEffects(app, camera, 50);
       manager.destroy();
-      manager.glitchTile(100, 200, 'virus');
+      manager.glitchTile(100, 200, 'shuffle');
 
       expect(mockGlitch).not.toHaveBeenCalled();
     });

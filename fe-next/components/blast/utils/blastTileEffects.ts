@@ -439,7 +439,6 @@ export function spawnGemSpecials(
 export {
   fireCatalystUpgrade,
   fireCountdownExplosion,
-  spreadVirus,
   applyBetweenTurnEffects,
   type BetweenTurnResult,
 } from './blastBetweenTurnEffects';

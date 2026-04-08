@@ -266,121 +266,12 @@ describe('AdventureGame Special Tile Integration', () => {
     });
   });
 
-  describe('Locked Tiles', () => {
-    it('should unlock locked tile when word contains same letter', () => {
-      const config = createTestLevelConfig([
-        { row: 2, col: 2, type: 'locked' }, // Locked 'T' tile
-      ]);
-      const grid = createTestGrid();
-      grid[2][2] = 'T'; // Locked letter
-
-      renderGame(config, grid);
-
-      // If we submit a word with 'T', the locked tile should unlock
-      // Integration tested in useAdventureGame tests
-      expect(screen.getByTestId('adventure-game')).toBeInTheDocument();
-    });
-
-    it('should NOT unlock locked tile for different letters', () => {
-      const config = createTestLevelConfig([
-        { row: 2, col: 2, type: 'locked' }, // Locked 'T'
-      ]);
-      const grid = createTestGrid();
-      grid[2][2] = 'T';
-
-      renderGame(config, grid);
-
-      // Submitting word without 'T' should not unlock
-      expect(screen.getByTestId('adventure-game')).toBeInTheDocument();
-    });
-
-    it('should block new tile spawning in locked position', () => {
-      const config = createTestLevelConfig([
-        { row: 0, col: 0, type: 'locked' },
-      ]);
-      const grid = createTestGrid();
-
-      renderGame(config, grid);
-
-      // spawnNewTiles function skips positions with locked tiles
-      // Tested via useCascadeLoop integration
-      expect(screen.getByTestId('adventure-game')).toBeInTheDocument();
-    });
-
-    it('should make unlocked tile become standard tile', () => {
-      const config = createTestLevelConfig([
-        { row: 1, col: 1, type: 'locked' },
-      ]);
-      const grid = createTestGrid();
-
-      renderGame(config, grid);
-
-      // After unlocking, tile.type changes to 'standard'
-      // Integration tested in useAdventureGame
-      expect(screen.getByTestId('adventure-game')).toBeInTheDocument();
-    });
-  });
-
-  describe('Multiplier Tiles', () => {
-    it('should apply 2x multiplier to word score', () => {
-      const config = createTestLevelConfig([
-        { row: 0, col: 0, type: 'multiplier' },
-      ]);
-      const grid = createTestGrid();
-
-      renderGame(config, grid);
-
-      // Word with multiplier tile: base score * 2
-      // Integration tested in useAdventureGame
-      expect(screen.getByTestId('adventure-game')).toBeInTheDocument();
-    });
-
-    it('should stack multiple multipliers correctly (2x * 2x = 4x)', () => {
-      const config = createTestLevelConfig([
-        { row: 0, col: 0, type: 'multiplier' },
-        { row: 0, col: 1, type: 'multiplier' },
-      ]);
-      const grid = createTestGrid();
-
-      renderGame(config, grid);
-
-      // Two multipliers: base score * 2 * 2 = 4x
-      expect(screen.getByTestId('adventure-game')).toBeInTheDocument();
-    });
-
-    it('should stack multiplier with gold correctly (3x * 2x = 6x)', () => {
-      const config = createTestLevelConfig([
-        { row: 0, col: 0, type: 'gold' },
-        { row: 0, col: 1, type: 'multiplier' },
-      ]);
-      const grid = createTestGrid();
-
-      renderGame(config, grid);
-
-      // Gold 3x * Multiplier 2x = 6x total
-      expect(screen.getByTestId('adventure-game')).toBeInTheDocument();
-    });
-
-    it('should convert multiplier to standard after single use', () => {
-      const config = createTestLevelConfig([
-        { row: 0, col: 0, type: 'multiplier' },
-      ]);
-      const grid = createTestGrid();
-
-      renderGame(config, grid);
-
-      // After use, tile.type changes to 'standard'
-      // Single use only - tested in useAdventureGame
-      expect(screen.getByTestId('adventure-game')).toBeInTheDocument();
-    });
-  });
-
   describe('Full Phase 27 Integration', () => {
     it('should integrate cascade + explosion + special tiles', () => {
       const config = createTestLevelConfig([
-        { row: 0, col: 0, type: 'multiplier' },
+        { row: 0, col: 0, type: 'gold' },
         { row: 1, col: 1, type: 'ice' },
-        { row: 2, col: 2, type: 'locked' },
+        { row: 2, col: 2, type: 'bomb' },
       ]);
       const grid = createTestGrid();
 
@@ -397,23 +288,23 @@ describe('AdventureGame Special Tile Integration', () => {
 
     it('should show special tile effects during cascade animation', () => {
       const config = createTestLevelConfig([
-        { row: 0, col: 0, type: 'multiplier' },
+        { row: 0, col: 0, type: 'gold' },
       ]);
       const grid = createTestGrid();
 
       renderGame(config, grid);
 
-      // Activation effects (multiply, unlock, melt) visible during cascade
+      // Activation effects (collect, melt, explode) visible during cascade
       // Effects have activationTimestamp for animation timing
       expect(screen.getByTestId('adventure-game')).toBeInTheDocument();
     });
 
     it('should maintain 60fps performance with all Phase 27 features', () => {
       const config = createTestLevelConfig([
-        { row: 0, col: 0, type: 'multiplier' },
+        { row: 0, col: 0, type: 'gold' },
         { row: 0, col: 1, type: 'ice' },
-        { row: 0, col: 2, type: 'locked' },
-        { row: 0, col: 3, type: 'gold' },
+        { row: 0, col: 2, type: 'bomb' },
+        { row: 0, col: 3, type: 'time' },
       ]);
       const grid = createTestGrid();
 
@@ -431,7 +322,7 @@ describe('AdventureGame Special Tile Integration', () => {
   describe('Cascade Compatibility', () => {
     it('should process special tiles before cascade starts', () => {
       const config = createTestLevelConfig([
-        { row: 0, col: 0, type: 'multiplier' },
+        { row: 0, col: 0, type: 'gold' },
       ]);
       const grid = createTestGrid();
 
@@ -456,15 +347,15 @@ describe('AdventureGame Special Tile Integration', () => {
       expect(screen.getByTestId('adventure-game')).toBeInTheDocument();
     });
 
-    it('should respect locked tiles during spawning', () => {
+    it('should respect frozen tiles during spawning', () => {
       const config = createTestLevelConfig([
-        { row: 0, col: 0, type: 'locked' },
+        { row: 0, col: 0, type: 'ice' },
       ]);
       const grid = createTestGrid();
 
       renderGame(config, grid);
 
-      // spawnNewTiles skips positions with locked tiles
+      // spawnNewTiles skips positions with frozen tiles
       // Verified in useCascadeLoop tests
       expect(screen.getByTestId('adventure-game')).toBeInTheDocument();
     });
@@ -473,7 +364,7 @@ describe('AdventureGame Special Tile Integration', () => {
   describe('Animation Integration', () => {
     it('should set activation effects with timestamps', () => {
       const config = createTestLevelConfig([
-        { row: 0, col: 0, type: 'multiplier' },
+        { row: 0, col: 0, type: 'gold' },
       ]);
       const grid = createTestGrid();
 
@@ -486,7 +377,7 @@ describe('AdventureGame Special Tile Integration', () => {
 
     it('should coordinate explosion with special tile effects', () => {
       const config = createTestLevelConfig([
-        { row: 0, col: 0, type: 'multiplier' },
+        { row: 0, col: 0, type: 'gold' },
       ]);
       const grid = createTestGrid();
 
@@ -515,8 +406,8 @@ describe('AdventureGame Special Tile Integration', () => {
   describe('Edge Cases', () => {
     it('should handle multiple special tile types in same word', () => {
       const config = createTestLevelConfig([
-        { row: 0, col: 0, type: 'multiplier' },
-        { row: 0, col: 1, type: 'gold' },
+        { row: 0, col: 0, type: 'gold' },
+        { row: 0, col: 1, type: 'time' },
         { row: 0, col: 2, type: 'ice' },
       ]);
       const grid = createTestGrid();
@@ -531,7 +422,7 @@ describe('AdventureGame Special Tile Integration', () => {
     it('should handle special tiles at grid edges', () => {
       const config = createTestLevelConfig([
         { row: 0, col: 0, type: 'ice' }, // Corner
-        { row: 3, col: 3, type: 'locked' }, // Opposite corner
+        { row: 3, col: 3, type: 'bomb' }, // Opposite corner
       ]);
       const grid = createTestGrid();
 

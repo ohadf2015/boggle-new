@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useEffect, useRef } from 'react';
+import React, { useMemo, useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useDesktopLayout } from '@/hooks/useDesktopLayout';
@@ -10,6 +10,9 @@ import { useKeyboardWordInput } from '@/hooks/useKeyboardWordInput';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
 import WordFormingArea from '@/components/game/WordFormingArea';
+import { useGameRewards } from '@/hooks/useGameRewards';
+import { InlineConfetti } from '@/components/effects/InlineConfetti';
+import { ScreenFlashOverlay } from '@/components/game/ScreenFlashOverlay';
 
 import type { LetterGrid, Language } from '@/types';
 import type { SurvivalGameResult } from './survival/types';
@@ -24,7 +27,6 @@ import {
   AutoClueNotification,
 } from './survival';
 import { SurvivalDesktopLayout } from './survival/SurvivalDesktopLayout';
-import { SurvivalMobileInfoBar } from './survival/SurvivalMobileInfoBar';
 
 // Re-export types for backwards compatibility
 export type { WordDiscovery, TargetAttempt, SurvivalGameResult } from './survival/types';
@@ -112,6 +114,34 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     disablePathHighlighting: true,
   });
 
+  // Micro-celebration effects (react-rewards confetti bursts)
+  const { rewardId, triggerReward } = useGameRewards();
+  const [showTargetConfetti, setShowTargetConfetti] = useState(false);
+  const [flashTrigger, setFlashTrigger] = useState(0);
+  const [flashColor, setFlashColor] = useState('bg-green-400/15');
+
+  // Trigger effects on feedback type changes
+  const prevFeedbackForEffects = useRef(state.feedbackType);
+  useEffect(() => {
+    if (state.feedbackType && state.feedbackType !== prevFeedbackForEffects.current) {
+      if (state.feedbackType === 'valid-word') {
+        triggerReward('wordFound');
+        if (!skipAnimations) {
+          setFlashColor('bg-green-400/15');
+          setFlashTrigger((n) => n + 1);
+        }
+      } else if (state.feedbackType === 'target-found') {
+        triggerReward('levelUp');
+        setShowTargetConfetti(true);
+        if (!skipAnimations) {
+          setFlashColor('bg-neo-lime/20');
+          setFlashTrigger((n) => n + 1);
+        }
+      }
+    }
+    prevFeedbackForEffects.current = state.feedbackType;
+  }, [state.feedbackType, triggerReward, skipAnimations]);
+
   // Hide bottom navigation during active gameplay
   useEffect(() => {
     setIsInGame(isGameActive);
@@ -128,6 +158,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
   if ((isDesktop || isTv) && puzzleDate) {
     return (
       <>
+        <ScreenFlashOverlay trigger={flashTrigger} colorClass={flashColor} />
         <SurvivalDesktopLayout
           isTv={isTv}
           grid={grid}
@@ -213,6 +244,9 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom, 0px))',
       } as React.CSSProperties}
     >
+      {/* Subtle screen flash on word discovery */}
+      <ScreenFlashOverlay trigger={flashTrigger} colorClass={flashColor} />
+
       {/* Top bar */}
       <SurvivalHeader
         liveScore={state.liveScore}
@@ -241,29 +275,39 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         />
 
         {/* Minimal word feedback pill — shows life delta near clue boxes */}
-        <div className="h-6 flex items-center justify-center">
+        <div className="h-6 flex items-center justify-center relative">
+          {/* react-rewards anchor — confetti bursts from this point */}
+          <span id={rewardId} className="absolute inset-0 pointer-events-none" />
           <AnimatePresence mode="wait">
             {state.feedbackType && (
               <motion.div
                 key={`${state.feedbackType}-${feedbackKeyRef.current}`}
-                initial={{ opacity: 0, y: -6, scale: 0.8 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: 4, scale: 0.8 }}
-                transition={{ duration: 0.2 }}
-                className={`text-xs font-bold px-2.5 py-0.5 rounded-full ${
+                initial={{ opacity: 0, y: -8, scale: 0.6 }}
+                animate={{ opacity: 1, y: 0, scale: [0.6, 1.08, 1] }}
+                exit={{ opacity: 0, y: 6, scale: 0.7 }}
+                transition={{ duration: 0.25, ease: 'easeOut' }}
+                className={`relative text-xs font-bold px-2.5 py-0.5 rounded-full ${
                   state.feedbackType === 'valid-word'
-                    ? 'bg-green-500/20 text-green-400 border border-green-500/40'
+                    ? 'bg-green-500/15 text-green-400 drop-shadow-[0_0_8px_rgba(34,197,94,0.4)]'
                     : state.feedbackType === 'duplicate'
-                      ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/40'
+                      ? 'bg-yellow-500/15 text-yellow-400 drop-shadow-[0_0_8px_rgba(234,179,8,0.3)]'
                       : state.feedbackType === 'target-found'
-                        ? 'bg-neo-lime/20 text-neo-lime border border-neo-lime/40'
-                        : 'bg-red-500/20 text-red-400 border border-red-500/40'
+                        ? 'bg-neo-lime/20 text-neo-lime drop-shadow-[0_0_12px_rgba(191,255,0,0.5)]'
+                        : 'bg-red-500/15 text-red-400 drop-shadow-[0_0_8px_rgba(239,68,68,0.3)]'
                 }`}
               >
                 {state.feedbackMessage}
+                {/* Sparkle burst on positive feedback */}
+                {(state.feedbackType === 'valid-word' || state.feedbackType === 'target-found') && (
+                  <span key={feedbackKeyRef.current} className="sparkle-burst" />
+                )}
               </motion.div>
             )}
           </AnimatePresence>
+          {/* Full confetti explosion when target word is found */}
+          {showTargetConfetti && (
+            <InlineConfetti size="lg" duration={2500} onComplete={() => setShowTargetConfetti(false)} />
+          )}
         </div>
       </div>
 
@@ -308,18 +352,11 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         />
       </div>
 
-      {/* Mobile Info Bar — rank + loot with expandable bottom sheet */}
-      {puzzleDate && (
-        <SurvivalMobileInfoBar
-          discoveredWords={state.discoveredWords}
-          hintStage={state.hintStage}
-          attempts={state.attempts}
-          puzzleDate={puzzleDate}
-          language={language}
-          currentPlayerId={currentPlayerId ?? null}
-          currentGuestFingerprint={currentGuestFingerprint ?? null}
-          t={t}
-        />
+      {/* Mobile: minimal word count badge (no expandable sheet — less intrusive) */}
+      {puzzleDate && state.discoveredWords.length > 0 && (
+        <div className="flex items-center justify-center gap-2 py-1 text-[11px] text-neo-cream/60 font-bold">
+          <span className="tabular-nums">{state.discoveredWords.length} {t('wordHunt.mobile.words')}</span>
+        </div>
       )}
 
       {/* Auto-Clue Notifications */}

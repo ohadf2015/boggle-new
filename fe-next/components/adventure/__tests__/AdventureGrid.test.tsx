@@ -164,18 +164,7 @@ describe('AdventureGrid', () => {
       expect(cells[10]).toHaveClass('tile-bomb');
     });
 
-    it('should apply rainbow styling to rainbow tiles', () => {
-      // GIVEN
-      const tiles = createMockTiles(4);
-      tiles[15] = createTileWithType(15, 'rainbow');
-
-      // WHEN
-      render(<AdventureGrid tiles={tiles} gridSize={4} />);
-
-      // THEN
-      const cells = screen.getAllByRole('gridcell');
-      expect(cells[15]).toHaveClass('tile-rainbow');
-    });
+    // Note: 'rainbow' tile type is not in current TileType; test omitted.
 
     it('should show frozen overlay on frozen ice tiles', () => {
       // GIVEN

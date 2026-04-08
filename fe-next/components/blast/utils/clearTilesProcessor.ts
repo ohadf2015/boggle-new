@@ -23,8 +23,9 @@ import {
   SCRABBLE_VALUES,
   COUNTDOWN_DEFUSE_BONUS,
   COUNTDOWN_DEFUSE_MOVES,
-  VIRUS_CLEAR_SCORE,
-  VIRUS_MASS_CURE_THRESHOLD,
+  SHUFFLE_CLEAR_BONUS,
+  MAGMA_DIAGONAL_CLEAR_BONUS,
+  MAGMA_MULTIPLIER,
   PORTAL_USE_BONUS,
   PORTAL_WORD_MULTIPLIER,
   type BlastTileState,
@@ -75,8 +76,8 @@ export interface TileProcessingResult {
   diamondRevealTurns: number;
   /** Silver extended countdown timers (already applied to tiles) */
   silverCountdownExtended: boolean;
-  /** Virus mass cure triggered (3+ virus cleared in one word) */
-  virusMassCure: boolean;
+  /** Shuffle triggered — board rearrangement pending */
+  shuffleTriggered: boolean;
   /** Portal word multiplier (applied if word passes through portal) */
   portalMultiplier: number;
 }
@@ -104,7 +105,7 @@ export function processTilesForWord(input: TileProcessingInput): TileProcessingR
   let tileBonusMoves = 0;
   let diamondRevealTurns = 0;
   let silverCountdownExtended = false;
-  let virusClearedCount = 0;
+  let shuffleTriggered = false;
   let hasPortal = false;
 
   // Pre-scan for Rainbow (best offensive) and Mirror (first offensive)
@@ -240,20 +241,6 @@ export function processTilesForWord(input: TileProcessingInput): TileProcessingR
 
       case 'ice':
         bonusScore += ICE_CLEAR_BONUS;
-        // Ice shatter: freeze adjacent virus tiles (prevent spread for 2 turns)
-        for (const [dr, dc] of [[-1, 0], [1, 0], [0, -1], [0, 1]]) {
-          const r = cell.row + dr;
-          const c = cell.col + dc;
-          if (r >= 0 && r < gridSize && c >= 0 && c < gridSize) {
-            const adj = next[r][c];
-            if (!adj.isCleared && adj.type === 'virus') {
-              adj.activationEffect = 'virus-frozen';
-              // Convert virus to ice (2 hits to break, stops spread)
-              adj.type = 'ice';
-              adj.hitsRemaining = 2;
-            }
-          }
-        }
         break;
 
       case 'prism': {
@@ -342,11 +329,41 @@ export function processTilesForWord(input: TileProcessingInput): TileProcessingR
         newExplosions.push({ id: `countdown-defuse-${now}-${cell.row}-${cell.col}`, row: cell.row, col: cell.col, type: 'word', intensity: 2, timestamp: now });
         break;
 
-      case 'virus':
-        // Virus cleared — track count for mass cure
-        bonusScore += VIRUS_CLEAR_SCORE;
-        virusClearedCount++;
+      case 'shuffle':
+        // Shuffle cleared — flag board rearrangement for post-processing
+        bonusScore += SHUFFLE_CLEAR_BONUS;
+        shuffleTriggered = true;
+        newExplosions.push({ id: `shuffle-${now}-${cell.row}-${cell.col}`, row: cell.row, col: cell.col, type: 'clear', intensity: 3, timestamp: now });
         break;
+
+      case 'magma': {
+        // Magma eruption — clear both diagonals (X-pattern) through this tile
+        bonusScore += MAGMA_DIAGONAL_CLEAR_BONUS;
+        goldMultiplier *= MAGMA_MULTIPLIER;
+        newExplosions.push({ id: `magma-${now}-${cell.row}-${cell.col}`, row: cell.row, col: cell.col, type: 'bomb', intensity: 4, timestamp: now });
+        for (let d = 1; d < gridSize; d++) {
+          // All 4 diagonal directions
+          for (const [dr, dc] of [[-1, -1], [-1, 1], [1, -1], [1, 1]]) {
+            const r = cell.row + dr * d;
+            const c = cell.col + dc * d;
+            if (r < 0 || r >= gridSize || c < 0 || c >= gridSize) continue;
+            const target = next[r][c];
+            if (target.isCleared) continue;
+            if (isMultiHitAlive(target)) {
+              hitMultiHitTile(target);
+            } else {
+              markCleared(target);
+              // Chain bombs hit by magma
+              if (target.type === 'bomb' && !processedBombs.has(`${r},${c}`)) {
+                processedBombs.add(`${r},${c}`);
+                bombQueue.push({ row: r, col: c, depth: 0 });
+              }
+            }
+            newExplosions.push({ id: `magma-diag-${now}-${r}-${c}`, row: r, col: c, type: 'clear', intensity: 2, timestamp: now });
+          }
+        }
+        break;
+      }
 
       case 'portal': {
         bonusScore += PORTAL_USE_BONUS;
@@ -376,16 +393,13 @@ export function processTilesForWord(input: TileProcessingInput): TileProcessingR
     }
   }
 
-  // Virus mass cure: clearing 3+ virus tiles in one word cures ALL virus on board
-  const virusMassCure = virusClearedCount >= VIRUS_MASS_CURE_THRESHOLD;
-  if (virusMassCure) {
+  // Shuffle effect: mark uncleared tiles for animation (letter rearrangement done in engine)
+  if (shuffleTriggered) {
     for (let r = 0; r < gridSize; r++) {
       for (let c = 0; c < gridSize; c++) {
         const t = next[r][c];
-        if (t.type === 'virus' && !t.isCleared) {
-          markCleared(t);
-          t.activationEffect = 'virus-cured';
-          newExplosions.push({ id: `virus-cure-${now}-${r}-${c}`, row: r, col: c, type: 'clear', intensity: 2, timestamp: now });
+        if (!t.isCleared && !pathSet.has(`${r},${c}`)) {
+          t.activationEffect = 'shuffle-rearrange';
         }
       }
     }
@@ -511,7 +525,7 @@ export function processTilesForWord(input: TileProcessingInput): TileProcessingR
     bonusMoveCount,
     diamondRevealTurns,
     silverCountdownExtended,
-    virusMassCure,
+    shuffleTriggered,
     portalMultiplier,
   };
 }

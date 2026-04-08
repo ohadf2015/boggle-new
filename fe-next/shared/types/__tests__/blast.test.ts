@@ -6,7 +6,7 @@ import { BLAST_TILE_TYPE_LIST, type BlastTileType } from '../blast';
 
 describe('BlastTileType canonical definition', () => {
   it('should contain exactly 18 tile types', () => {
-    expect(BLAST_TILE_TYPE_LIST).toHaveLength(18);
+    expect(BLAST_TILE_TYPE_LIST).toHaveLength(19);
   });
 
   it('should include standard (not normal)', () => {
@@ -20,10 +20,11 @@ describe('BlastTileType canonical definition', () => {
     expect(BLAST_TILE_TYPE_LIST).toContain('diamond');
   });
 
-  it('should contain wildcard, countdown, virus, portal, catalyst', () => {
+  it('should contain wildcard, countdown, shuffle, magma, portal, catalyst', () => {
     expect(BLAST_TILE_TYPE_LIST).toContain('wildcard');
     expect(BLAST_TILE_TYPE_LIST).toContain('countdown');
-    expect(BLAST_TILE_TYPE_LIST).toContain('virus');
+    expect(BLAST_TILE_TYPE_LIST).toContain('shuffle');
+    expect(BLAST_TILE_TYPE_LIST).toContain('magma');
     expect(BLAST_TILE_TYPE_LIST).toContain('portal');
     expect(BLAST_TILE_TYPE_LIST).toContain('catalyst');
   });
@@ -45,7 +46,8 @@ describe('BlastTileType canonical definition', () => {
       'diamond',
       'wildcard',
       'countdown',
-      'virus',
+      'shuffle',
+      'magma',
       'portal',
       'catalyst',
     ];

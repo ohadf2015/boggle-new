@@ -244,16 +244,42 @@ export const BlastStage = memo(function BlastStage({
         </div>
       )}
 
-      {/* 2. Objective progress bar */}
+      {/* 2. Objective progress — primary (clear_percent) + secondary bars */}
       {objectiveProgress && objectiveProgress.length > 0 && (
         <div className="px-4 py-1 max-w-md mx-auto w-full shrink-0 relative z-40">
+          {/* Primary objective: clear_percent — shown large and prominent */}
+          {objectiveProgress.filter(o => o.objective.type === 'clear_percent').map((obj, i) => {
+            const pct = Math.min(100, obj.objective.target > 0 ? (obj.current / obj.objective.target) * 100 : 0);
+            return (
+              <div key={`primary-${i}`} className="mb-1.5">
+                <div className="flex justify-between text-xs font-bold mb-0.5">
+                  <span className={obj.isComplete ? 'text-neo-lime' : 'text-neo-white'}>
+                    {formatObjectiveLabel(obj.objective, t)}
+                  </span>
+                  <span className={cn('tabular-nums', obj.isComplete ? 'text-neo-lime' : 'text-neo-white')}>
+                    {obj.current}%
+                  </span>
+                </div>
+                <div className="h-2.5 bg-white/10 rounded-full overflow-hidden border border-white/20">
+                  <div
+                    className={cn(
+                      'h-full rounded-full transition-all duration-500',
+                      obj.isComplete ? 'bg-neo-lime shadow-[0_0_8px_rgba(191,255,0,0.5)]' : 'bg-neo-cyan',
+                    )}
+                    style={{ width: `${pct}%` }}
+                  />
+                </div>
+              </div>
+            );
+          })}
+          {/* Secondary objectives — smaller */}
           <div className="flex gap-2">
-            {objectiveProgress.map((obj, i) => {
+            {objectiveProgress.filter(o => o.objective.type !== 'clear_percent').map((obj, i) => {
               const target = obj.objective.target;
               return (
                 <div key={i} className="flex-1">
                   <div className="flex justify-between text-[9px] font-bold text-white/50 mb-0.5">
-                    <span>{formatObjectiveLabel(obj.objective, t)}</span>
+                    <span className={obj.isComplete ? 'text-neo-lime' : ''}>{formatObjectiveLabel(obj.objective, t)}</span>
                     <span className="tabular-nums">{obj.current}/{target}</span>
                   </div>
                   <div className="h-1 bg-white/10 rounded-full overflow-hidden">

@@ -22,6 +22,7 @@ import { useCrazyGamesLifecycle } from '@/hooks/useCrazyGamesLifecycle';
 import { resolveBlastConfig, type BlastPhase, type BlastResultsData, type WaveResult } from '@/components/blast/types';
 import { getWaveConfig, getWaveDistribution, getWaveObjectives } from '@/components/blast/utils/blastWaveConfig';
 import { calculateEarnedStars } from '@/components/blast/utils/blastStarCalculator';
+import { saveBlastResult } from '@/components/blast/utils/saveBlastResult';
 import type { Language } from '@/shared/types/game';
 
 // Dynamically import the PixiJS game canvas (SSR-unsafe)
@@ -183,7 +184,7 @@ export function BlastEngineView() {
       } else {
         // Game over — didn't clear enough
         const allWords = [...allWordsFound, ...waveWords];
-        setResults({
+        const resultsData: BlastResultsData = {
           finalScore: totalScore + waveScore,
           tilesCleared,
           totalTiles: totalTilesCount,
@@ -194,11 +195,15 @@ export function BlastEngineView() {
           stars,
           wavesCompleted: currentWave,
           waveResults: [...waveHistory, waveResult],
-        });
+        };
+        setResults(resultsData);
         setPhase('results');
+
+        // Persist to DB (fire-and-forget)
+        saveBlastResult(resultsData, config.difficulty ?? 'medium', language);
       }
     },
-    [currentWave, totalScore, allWordsFound, waveHistory, game.comboLevel],
+    [currentWave, totalScore, allWordsFound, waveHistory, game.comboLevel, config.difficulty, language],
   );
 
   // ─── React to wave completion / game over from game loop ──────

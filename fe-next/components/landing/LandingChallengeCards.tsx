@@ -59,11 +59,13 @@ export function LandingChallengeCards({
     return isNewPlayer();
   });
 
-  // New players (< 3 games) see practice first to ease them in
+  // New players (< 3 games) see practice first, daily always second.
+  // All users: daily is guaranteed top-2 so it's never buried on mobile.
   const serverOrder = cardOrderProp ?? DEFAULT_ORDER;
   const cardOrder = isNewbie
-    ? ['practice', ...serverOrder.filter(m => m !== 'practice')] as LandingGameMode[]
-    : serverOrder;
+    ? ['practice', 'daily', ...serverOrder.filter(m => m !== 'practice' && m !== 'daily')] as LandingGameMode[]
+    : serverOrder[0] === 'daily' ? serverOrder
+    : ['daily', ...serverOrder.filter(m => m !== 'daily')] as LandingGameMode[];
 
   /** Renders a card by mode key with staggered CSS animation */
   const renderCard = (mode: LandingGameMode, index: number) => {

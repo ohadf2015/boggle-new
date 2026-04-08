@@ -11,6 +11,7 @@ import { calculateEarnedStars } from './utils/blastStarCalculator';
 import { resolveBlastConfig, type BlastPhase, type BlastResultsData, type WaveResult } from './types';
 import type { Language } from '@/shared/types/game';
 import { Button } from '@/components/ui/button';
+import { saveBlastResult } from './utils/saveBlastResult';
 
 /**
  * BlastView — Phase router for Blast Mode.
@@ -77,7 +78,10 @@ export function BlastView() {
     };
     setResults(mergedResults);
     setPhase('results');
-  }, [totalScore, allWordsFound, waveHistory, currentWave]);
+
+    // Persist to DB (fire-and-forget)
+    saveBlastResult(mergedResults, config.difficulty ?? 'medium', language);
+  }, [totalScore, allWordsFound, waveHistory, currentWave, config.difficulty, language]);
 
   /** Advance to next wave */
   const handleWaveAdvance = useCallback(() => {
@@ -224,7 +228,7 @@ export function BlastView() {
               variant="outline"
               size="lg"
               onClick={handleQuit}
-              className="min-h-[48px] font-bold uppercase border-3 border-white/30 text-white hover:bg-white/10"
+              className="min-h-[48px] font-bold uppercase border-3 border-neo-lime/50 text-neo-lime bg-neo-navy/80 hover:bg-neo-navy"
             >
               {t('common.home') || 'HOME'}
             </Button>

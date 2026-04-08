@@ -153,9 +153,9 @@ describe('CreateRoomModal', () => {
     expect(nameInput.tagName).toBe('INPUT');
   });
 
-  it('should show authenticated user name as text (not editable input)', () => {
+  it('should show authenticated user name in input (pre-filled with displayName)', () => {
     render(<CreateRoomModal {...defaultProps} isAuthenticated={true} displayName="AuthUser" />);
-    expect(screen.getByText('AuthUser')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('AuthUser')).toBeInTheDocument();
   });
 
   it('should show validation error on submit with empty name', async () => {

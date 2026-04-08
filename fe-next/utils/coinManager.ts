@@ -43,6 +43,7 @@ export const COIN_EARNING_OTHER = {
   TOP_3_BONUS: 10,          // Bonus for 2nd-3rd place
   MULTIPLAYER_BASE: 15,     // Base coins for multiplayer participation
   SINGLEPLAYER_BASE: 10,    // Base coins for single player completion
+  MAX_GAME_REWARD: 500,     // Cap per game — prevents high Word Hunt scores from exceeding API limit
 } as const;
 
 // Free reveals per game
@@ -297,8 +298,10 @@ export function calculateGameReward(
   const subtotal = base + scoreBonus + placement;
   const streakBonus = currentStreak ? Math.floor(subtotal * getStreakCoinBonusPercent(currentStreak) / 100) : 0;
 
+  const total = Math.min(subtotal + streakBonus, COIN_EARNING_OTHER.MAX_GAME_REWARD);
+
   return {
-    total: subtotal + streakBonus,
+    total,
     breakdown: { base, scoreBonus, placement, streakBonus }
   };
 }

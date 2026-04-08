@@ -45,19 +45,19 @@ import type { BlastTileType } from './types';
 
 // ─── Lingering sparkle dust — slow-rising ambient particles after clears ─
 const LINGER_SPARKLE: ParticleConfig = {
-  maxParticles: 12,
-  frequency: 0.05,
-  emitterLifetime: 0.6,
-  particlesPerWave: 2,
-  lifetime: { min: 0.6, max: 1.2 },
-  speed: { min: 15, max: 40 },
-  gravity: { x: 0, y: -30 },
-  scale: { start: 0.5, end: 0 },
-  alpha: { start: 0.7, end: 0 },
-  rotationSpeed: { min: -30, max: 30 },
-  colors: ['ffffff', 'ffffcc', 'ccffff'],
+  maxParticles: 18,
+  frequency: 0.04,
+  emitterLifetime: 0.8,
+  particlesPerWave: 3,
+  lifetime: { min: 0.8, max: 1.6 },
+  speed: { min: 20, max: 55 },
+  gravity: { x: 0, y: -40 },
+  scale: { start: 0.7, end: 0 },
+  alpha: { start: 0.85, end: 0 },
+  rotationSpeed: { min: -60, max: 60 },
+  colors: ['ffffff', 'ffffcc', 'ccffff', 'ffccff', 'ccffcc'],
   spawnShape: 'rect',
-  spawnConfig: { width: 20, height: 20 },
+  spawnConfig: { width: 28, height: 28 },
   blendMode: 'add',
 };
 
@@ -191,13 +191,18 @@ function EffectsWorker({
     const start = performance.now();
     const duration = 300;
     const fade = () => {
+      // Guard: camera or graphics may be destroyed on unmount
+      if (camera.destroyed || g.destroyed) {
+        crossFlashRef.current = null;
+        return;
+      }
       const elapsed = performance.now() - start;
       const t = Math.min(elapsed / duration, 1);
       g.alpha = 0.9 * (1 - t);
       if (t < 1) {
         crossFlashRafRef.current = requestAnimationFrame(fade);
       } else {
-        camera.removeChild(g);
+        try { camera.removeChild(g); } catch { /* */ }
         g.destroy();
         crossFlashRef.current = null;
       }
@@ -364,10 +369,15 @@ function EffectsWorker({
           fireShockwave(x, y, 15);
           enhancedRef.current?.erodeTile(x, y, 'countdown');
         }
-      // Virus: toxic green implosion + glitch corruption
-      } else if (tile.type === 'virus') {
+      // Shuffle: swirling rearrangement burst
+      } else if (tile.type === 'shuffle') {
         particles.burst(VORTEX_PULL, x, y);
-        enhancedRef.current?.glitchTile(x, y, 'virus');
+        enhancedRef.current?.shatterTile(x, y, 'shuffle');
+      // Magma: volcanic eruption — explosive radial burst
+      } else if (tile.type === 'magma') {
+        particles.burst(FIRE_EMBERS, x, y);
+        fireShockwave(x, y, 18);
+        enhancedRef.current?.shatterTile(x, y, 'magma');
       // Portal: vortex pull + electric rings + slit-scan warp
       } else if (tile.type === 'portal') {
         particles.burst(VORTEX_PULL, x, y);

@@ -11,7 +11,7 @@ import { CreateChallengeModal } from './CreateChallengeModal';
 import { UnauthenticatedCreateChallengeSection } from './UnauthenticatedCreateChallengeSection';
 import AuthModal from '../auth/AuthModal';
 import { hasPlayedWordHuntToday } from '@/utils/dailyChallenge';
-import { toBcp47Locale } from '@/utils/bcp47Locale';
+import { safeToLocaleDateString } from '@/utils/bcp47Locale';
 import { useMusic } from '@/contexts/MusicContext';
 import { MascotWithEntrance } from '@/components/ui/Mascot';
 import type { Language } from '@/types';
@@ -133,7 +133,7 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
 
   const formattedDate = useMemo(() => {
     try {
-      return new Date(puzzleDate + 'T00:00:00Z').toLocaleDateString(toBcp47Locale(language), {
+      return safeToLocaleDateString(new Date(puzzleDate + 'T00:00:00Z'), language, {
         weekday: 'long',
         month: 'long',
         day: 'numeric',
@@ -149,7 +149,7 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
-      className="flex-1 flex flex-col items-center justify-start pt-4 sm:pt-6 page-content-safe px-4 pb-28 lg:pb-10 min-h-0 overflow-y-auto"
+      className="flex-1 flex flex-col items-center justify-start pt-2 sm:pt-4 page-content-safe px-4 pb-10 min-h-0 overflow-y-auto"
     >
       {/* Top bar with back and language */}
       <div className="w-full max-w-md lg:max-w-5xl xl:max-w-6xl flex items-center justify-between mb-2">
@@ -226,7 +226,7 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
       <div className="text-center space-y-3">
         {/* Explorer mascot — sets adventure tone before the word hunt */}
         <div className="flex justify-center">
-          <MascotWithEntrance variant="explorer" size="md" delay={0.1} />
+          <MascotWithEntrance variant="explorer" size="sm" delay={0.1} />
         </div>
 
         {/* Guest Mode Notice - Show only for anonymous users */}
@@ -309,6 +309,22 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
             <span className="text-gray-300 dark:text-gray-600">•</span>
             <span className="text-sm">{formattedDate}</span>
           </div>
+        </motion.div>
+
+        {/* PRIMARY PLAY BUTTON — inline, always visible early on ALL viewports */}
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.15, type: 'spring', stiffness: 300, damping: 26 }}
+          className="w-full max-w-sm mx-auto"
+        >
+          <button
+            onClick={onStart}
+            className="group w-full py-4 text-lg font-black uppercase rounded-neo border-3 border-neo-black bg-linear-to-r from-emerald-400 to-neo-cyan text-neo-black shadow-hard transition-all duration-200 hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0.5 active:shadow-hard-pressed flex items-center justify-center gap-2 animate-breathing"
+          >
+            <Target className="w-6 h-6" />
+            {t('daily.playButton')}
+          </button>
         </motion.div>
 
         {/* Animated Tutorial Carousel */}
@@ -411,21 +427,7 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
           {t('daily.samePuzzle')}
         </motion.p>
 
-        {/* Desktop inline play button — replaces sticky footer on lg+ */}
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.3, type: 'spring', stiffness: 300, damping: 26 }}
-          className="hidden lg:block pt-2"
-        >
-          <button
-            onClick={onStart}
-            className="group w-full py-3.5 text-lg font-black uppercase rounded-neo border-3 border-neo-black bg-linear-to-r from-emerald-400 to-neo-cyan text-neo-black shadow-hard transition-all duration-200 hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0.5 active:shadow-hard-pressed flex items-center justify-center gap-2"
-          >
-            <Target className="w-5 h-5" />
-            {t('daily.playButton')}
-          </button>
-        </motion.div>
+        {/* (desktop play button moved up to appear right after hero section) */}
       </div>
 
       {/* Right column: desktop-only persistent leaderboard sidebar */}
@@ -459,25 +461,7 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
 
       </div>
 
-      {/* STICKY PLAY BUTTON — mobile only */}
-      <motion.div
-        initial={{ y: 40, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.3, type: 'spring', stiffness: 300, damping: 26 }}
-        className="fixed bottom-0 inset-x-0 z-50 pointer-events-none lg:hidden"
-      >
-        <div className="bg-neo-navy px-4 pt-3 pointer-events-auto" style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
-          <div className="max-w-sm mx-auto">
-            <button
-              onClick={onStart}
-              className="group w-full py-3 text-base font-black uppercase rounded-neo border-3 border-neo-black bg-linear-to-r from-emerald-400 to-neo-cyan text-neo-black shadow-hard transition-all duration-200 hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0.5 active:shadow-hard-pressed flex items-center justify-center gap-2"
-            >
-              <Target className="w-5 h-5" />
-              {t('daily.playButton')}
-            </button>
-          </div>
-        </div>
-      </motion.div>
+      {/* Sticky play button removed — inline CTA now appears above the fold on all viewports */}
 
       <CreateChallengeModal
         isOpen={showCreateChallenge}

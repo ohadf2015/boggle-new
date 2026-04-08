@@ -51,7 +51,6 @@ export default function ProfileCustomizationWrapper() {
 
     const { error } = await updateProfile({
       display_name: name,
-      username: name,
       avatar_config: avatarConfig,
       has_customized_profile: true,
     });

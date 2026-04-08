@@ -140,7 +140,7 @@ export function QuestCard({
           'shadow-hard overflow-hidden cursor-pointer',
           isSecondary
             ? 'flex flex-row items-center gap-3 p-3'
-            : 'flex flex-col gap-3 p-4',
+            : 'flex flex-col gap-3 p-4 md:flex-row md:items-center md:gap-4',
           'focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-lime',
           'transition-shadow duration-200 group',
           requestState === 'loading' && 'opacity-50 cursor-not-allowed',
@@ -204,7 +204,7 @@ export function QuestCard({
         ) : (
           /* Primary: full top row with pill badge + circular icon */
           <>
-            <div className="flex items-start justify-between relative z-10">
+            <div className="flex items-start justify-between relative z-10 md:flex-col md:items-center md:gap-2 md:shrink-0">
               <div className={cn(
                 'flex items-center gap-1.5 px-3 py-1 rounded-full border-2 text-[10px] font-black uppercase tracking-wide',
                 colorConfig.pill
@@ -260,7 +260,7 @@ export function QuestCard({
         )}
 
         {/* Content */}
-        <div className={cn('relative z-10', isSecondary ? 'flex-1 min-w-0' : 'space-y-1')}>
+        <div className={cn('relative z-10', isSecondary ? 'flex-1 min-w-0' : 'space-y-1 md:flex-1 md:min-w-0')}>
           <h2 className={cn(
             'font-neo-display font-black leading-none',
             colorConfig.text,
@@ -286,7 +286,7 @@ export function QuestCard({
             'active:translate-y-0.5 active:shadow-none transition-all',
             isSecondary
               ? 'py-2.5 text-[10px] px-4 shrink-0'
-              : 'w-full py-3 text-xs'
+              : 'w-full py-3 text-xs md:w-auto md:px-8 md:shrink-0'
           )}>
             {buttonText}
           </div>

@@ -20,36 +20,36 @@ import {
 // ==================== Wave Config movesAllowed ====================
 
 describe('WaveConfig movesAllowed', () => {
-  it('wave 1 allows 18 moves (learn the ropes)', () => {
-    expect(getWaveConfig(1).movesAllowed).toBe(18);
+  it('wave 1 allows 12 moves (learn the ropes)', () => {
+    expect(getWaveConfig(1).movesAllowed).toBe(12);
   });
 
-  it('wave 2 allows 15 moves', () => {
-    expect(getWaveConfig(2).movesAllowed).toBe(15);
+  it('wave 2 allows 10 moves', () => {
+    expect(getWaveConfig(2).movesAllowed).toBe(10);
   });
 
-  it('wave 3 allows 13 moves (prism unlock)', () => {
-    expect(getWaveConfig(3).movesAllowed).toBe(13);
+  it('wave 3 allows 9 moves (prism unlock)', () => {
+    expect(getWaveConfig(3).movesAllowed).toBe(9);
   });
 
-  it('wave 4 allows 12 moves', () => {
-    expect(getWaveConfig(4).movesAllowed).toBe(12);
+  it('wave 4 allows 8 moves', () => {
+    expect(getWaveConfig(4).movesAllowed).toBe(8);
   });
 
-  it('wave 5 allows 11 moves', () => {
-    expect(getWaveConfig(5).movesAllowed).toBe(11);
+  it('wave 5 allows 7 moves', () => {
+    expect(getWaveConfig(5).movesAllowed).toBe(7);
   });
 
-  it('wave 6 allows 10 moves', () => {
-    expect(getWaveConfig(6).movesAllowed).toBe(10);
+  it('wave 6 allows 7 moves', () => {
+    expect(getWaveConfig(6).movesAllowed).toBe(7);
   });
 
-  it('wave 7 allows 9 moves', () => {
-    expect(getWaveConfig(7).movesAllowed).toBe(9);
+  it('wave 7 allows 6 moves', () => {
+    expect(getWaveConfig(7).movesAllowed).toBe(6);
   });
 
   it('late waves (10+) reduce moves for difficulty', () => {
-    expect(getWaveConfig(10).movesAllowed).toBe(7);
+    expect(getWaveConfig(10).movesAllowed).toBe(5);
   });
 });
 

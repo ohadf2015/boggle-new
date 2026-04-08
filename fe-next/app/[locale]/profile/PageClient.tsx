@@ -45,7 +45,7 @@ interface GameSession {
 export default function ProfilePageClient(): React.JSX.Element {
   const { theme } = useTheme();
   const { t, language } = useLanguage();
-  const { user, profile, isAuthenticated, loading, canPlayRanked, gamesUntilRanked, updateProfile, refreshProfile } = useAuth();
+  const { user, profile, isAuthenticated, loading, isAdmin, canPlayRanked, gamesUntilRanked, updateProfile, refreshProfile } = useAuth();
   const router = useRouter();
   const isDarkMode = theme === 'dark';
 
@@ -307,7 +307,7 @@ export default function ProfilePageClient(): React.JSX.Element {
                 transition={{ duration: 0.2 }}
               >
                 <ProfileStatsGrid profile={profile} isDarkMode={isDarkMode} />
-                <ProfileRankedProgress profile={profile} isDarkMode={isDarkMode} canPlayRanked={canPlayRanked} gamesUntilRanked={gamesUntilRanked} />
+                {isAdmin && <ProfileRankedProgress profile={profile} isDarkMode={isDarkMode} canPlayRanked={canPlayRanked} gamesUntilRanked={gamesUntilRanked} />}
               </motion.div>
             )}
 
@@ -379,7 +379,7 @@ export default function ProfilePageClient(): React.JSX.Element {
           </div>
 
           {/* 4. Ranked Progress */}
-          <ProfileRankedProgress profile={profile} isDarkMode={isDarkMode} canPlayRanked={canPlayRanked} gamesUntilRanked={gamesUntilRanked} delay={0.2} />
+          {isAdmin && <ProfileRankedProgress profile={profile} isDarkMode={isDarkMode} canPlayRanked={canPlayRanked} gamesUntilRanked={gamesUntilRanked} delay={0.2} />}
 
           {/* 4b. Creator Stats */}
           <CreatorProfileStats stats={getCreatorStats()} />

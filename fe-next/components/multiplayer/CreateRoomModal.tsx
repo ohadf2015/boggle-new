@@ -112,7 +112,11 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
     if (!isAuthenticated) setStoredUsername(username.trim());
     setStoredCustomAvatar(customAvatar!);
     if (isAuthenticated) {
-      updateAuthProfile({ avatar_config: customAvatar! }).catch(() => {});
+      const profileUpdates: Record<string, unknown> = { avatar_config: customAvatar! };
+      if (username.trim() !== displayName) {
+        profileUpdates.display_name = username.trim();
+      }
+      updateAuthProfile(profileUpdates).catch(() => {});
     }
 
     const finalRoomName = roomName.trim()
@@ -120,7 +124,7 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
       : sanitizeRoomName(generateRoomName(username.trim()));
 
     onCreate({ hostUsername: username.trim(), roomName: finalRoomName, language });
-  }, [username, customAvatar, roomName, language, isAuthenticated, onCreate, generateRoomName, updateAuthProfile]);
+  }, [username, customAvatar, roomName, language, isAuthenticated, onCreate, generateRoomName, updateAuthProfile, displayName]);
 
   const usernameValidation = validateUsername(username);
   const showError = (hasAttemptedSubmit || hasTouchedName) && !usernameValidation.isValid;
@@ -186,82 +190,73 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
             </label>
 
             {/* Name input — centered, underline style */}
-            {isAuthenticated ? (
-              <div className="flex items-center gap-2">
-                <span className="font-neo-display font-bold text-2xl text-neo-white">{username}</span>
-                <span className="text-[9px] font-bold text-neo-cyan/60 uppercase bg-neo-cyan/10 px-1.5 py-0.5 rounded-sm">
-                  {t('common.verified') || '✓'}
+            <div className="w-full max-w-[280px]">
+              <input
+                ref={nameInputRef}
+                id="create-username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                onFocus={() => setNameFocused(true)}
+                onBlur={() => { setNameFocused(false); setHasTouchedName(true); }}
+                onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
+                maxLength={MAX_NAME_LENGTH}
+                autoFocus
+                aria-required="true"
+                aria-invalid={!!nameError}
+                aria-describedby={nameError ? 'create-username-error' : undefined}
+                className={cn(
+                  'w-full bg-transparent text-center font-neo-display font-bold text-2xl text-neo-white',
+                  'border-b-3 pb-1.5 outline-hidden transition-colors',
+                  'placeholder:text-neo-white/15',
+                  nameError
+                    ? 'border-red-500 animate-neo-shake'
+                    : nameFocused
+                      ? 'border-neo-lime'
+                      : isNameValid
+                        ? 'border-neo-lime/40'
+                        : 'border-neo-white/20',
+                )}
+                placeholder={t('multiplayerFlow.createModal.namePlaceholder')}
+              />
+              {/* Feedback row */}
+              <div className="flex items-center justify-between mt-1.5 px-1">
+                <AdaptiveAnimatePresence mode="wait">
+                  {nameError ? (
+                    <AdaptiveMotion.span
+                      key="error"
+                      id="create-username-error"
+                      initial={{ opacity: 0, x: -4 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0 }}
+                      className="text-[10px] font-bold text-red-400"
+                      role="alert"
+                    >
+                      {t(nameError)}
+                    </AdaptiveMotion.span>
+                  ) : isNameValid ? (
+                    <AdaptiveMotion.span
+                      key="ok"
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="text-[10px] font-bold text-neo-lime"
+                    >
+                      {isAuthenticated ? `✓ ${t('common.verified') || 'Verified'}` : `✓ ${t('common.looksGood') || 'Ready'}`}
+                    </AdaptiveMotion.span>
+                  ) : (
+                    <span className="text-[10px] text-neo-white/25">
+                      {t('multiplayerFlow.profileSetup.usernameHint') || '2-20 characters'}
+                    </span>
+                  )}
+                </AdaptiveAnimatePresence>
+                <span className={cn(
+                  'text-[10px] font-mono tabular-nums',
+                  username.length >= MAX_NAME_LENGTH ? 'text-neo-orange font-bold' : 'text-neo-white/20',
+                )}>
+                  {username.length}/{MAX_NAME_LENGTH}
                 </span>
               </div>
-            ) : (
-              <div className="w-full max-w-[280px]">
-                <input
-                  ref={nameInputRef}
-                  id="create-username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  onFocus={() => setNameFocused(true)}
-                  onBlur={() => { setNameFocused(false); setHasTouchedName(true); }}
-                  onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
-                  maxLength={MAX_NAME_LENGTH}
-                  autoFocus
-                  aria-required="true"
-                  aria-invalid={!!nameError}
-                  aria-describedby={nameError ? 'create-username-error' : undefined}
-                  className={cn(
-                    'w-full bg-transparent text-center font-neo-display font-bold text-2xl text-neo-white',
-                    'border-b-3 pb-1.5 outline-hidden transition-colors',
-                    'placeholder:text-neo-white/15',
-                    nameError
-                      ? 'border-red-500 animate-neo-shake'
-                      : nameFocused
-                        ? 'border-neo-lime'
-                        : isNameValid
-                          ? 'border-neo-lime/40'
-                          : 'border-neo-white/20',
-                  )}
-                  placeholder={t('multiplayerFlow.createModal.namePlaceholder')}
-                />
-                {/* Feedback row */}
-                <div className="flex items-center justify-between mt-1.5 px-1">
-                  <AdaptiveAnimatePresence mode="wait">
-                    {nameError ? (
-                      <AdaptiveMotion.span
-                        key="error"
-                        id="create-username-error"
-                        initial={{ opacity: 0, x: -4 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0 }}
-                        className="text-[10px] font-bold text-red-400"
-                        role="alert"
-                      >
-                        {t(nameError)}
-                      </AdaptiveMotion.span>
-                    ) : isNameValid ? (
-                      <AdaptiveMotion.span
-                        key="ok"
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="text-[10px] font-bold text-neo-lime"
-                      >
-                        ✓ {t('common.looksGood') || 'Ready'}
-                      </AdaptiveMotion.span>
-                    ) : (
-                      <span className="text-[10px] text-neo-white/25">
-                        {t('multiplayerFlow.profileSetup.usernameHint') || '2-20 characters'}
-                      </span>
-                    )}
-                  </AdaptiveAnimatePresence>
-                  <span className={cn(
-                    'text-[10px] font-mono tabular-nums',
-                    username.length >= MAX_NAME_LENGTH ? 'text-neo-orange font-bold' : 'text-neo-white/20',
-                  )}>
-                    {username.length}/{MAX_NAME_LENGTH}
-                  </span>
-                </div>
-              </div>
-            )}
+            </div>
           </AdaptiveMotion.div>
 
           {/* ── Divider ── */}

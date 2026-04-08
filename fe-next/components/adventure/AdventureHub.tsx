@@ -337,6 +337,9 @@ const AdventureHub = memo<AdventureHubProps>(({
         {/* Spacer to push CTA + actions to bottom */}
         <div className="flex-1 min-h-2" />
 
+        {/* Bottom actions — padded and spaced */}
+        <div className="flex flex-col gap-2 px-4 pb-4">
+
         {/* Continue Button — hero CTA with subtle pulse */}
         {nextLevel && nextWorldConfig && (
           <AdaptiveMotion.button
@@ -378,7 +381,7 @@ const AdventureHub = memo<AdventureHubProps>(({
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ ...spring, delay: 0.4 }}
-          className="flex gap-2 w-full pb-2"
+          className="flex gap-2 w-full"
         >
           <AdaptiveMotion.button
             whileHover={{ scale: 1.05 }}
@@ -440,7 +443,7 @@ const AdventureHub = memo<AdventureHubProps>(({
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ ...spring, delay: 0.5 }}
-          className="flex gap-2 w-full pb-2"
+          className="flex gap-2 w-full"
         >
           <AdaptiveMotion.button
             whileHover={{ scale: 1.05 }}
@@ -532,6 +535,8 @@ const AdventureHub = memo<AdventureHubProps>(({
             </AdaptiveMotion.button>
           )}
         </AdaptiveMotion.div>
+
+        </div>
       </div>
     </div>
   );

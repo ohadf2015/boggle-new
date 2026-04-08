@@ -25,9 +25,7 @@ export interface TileModifiers {
   goldMultiplier: number;
   iceMultiplier: number;
   bombMultiplier: number;
-  rainbowMultiplier: number;
   timeMultiplier: number;
-  chainMultiplier: number;
 }
 
 /**
@@ -52,9 +50,7 @@ const NEUTRAL_TILES: TileModifiers = {
   goldMultiplier: 1,
   iceMultiplier: 1,
   bombMultiplier: 1,
-  rainbowMultiplier: 1,
   timeMultiplier: 1,
-  chainMultiplier: 1,
 };
 
 /**
@@ -91,7 +87,6 @@ export const ARCHETYPE_CONFIGS: Record<LevelArchetype, ArchetypeConfig> = {
       ...NEUTRAL_TILES,
       goldMultiplier: 3,
       iceMultiplier: 0,
-      rainbowMultiplier: 2,
     },
     nameKey: 'adventure.archetype.goldRush',
     description: 'Gold-loaded board, short timer. Maximize value per word.',
@@ -105,8 +100,6 @@ export const ARCHETYPE_CONFIGS: Record<LevelArchetype, ArchetypeConfig> = {
       ...NEUTRAL_TILES,
       iceMultiplier: 0,
       bombMultiplier: 0,
-      rainbowMultiplier: 2,
-      chainMultiplier: 0,
     },
     nameKey: 'adventure.archetype.puzzle',
     description: 'Find specific long or hidden words. Brain teaser.',
@@ -132,12 +125,11 @@ export const ARCHETYPE_CONFIGS: Record<LevelArchetype, ArchetypeConfig> = {
     timerMultiplier: 0.9,
     tileModifiers: {
       ...NEUTRAL_TILES,
-      chainMultiplier: 3,
       bombMultiplier: 2,
       goldMultiplier: 1.5,
     },
     nameKey: 'adventure.archetype.cascade',
-    description: 'Aggressive board reshuffling. Combos and chains matter.',
+    description: 'Aggressive board reshuffling. Bombs and combos matter.',
     secondaryObjectives: ['scoreTarget', 'collectGems'],
   },
 

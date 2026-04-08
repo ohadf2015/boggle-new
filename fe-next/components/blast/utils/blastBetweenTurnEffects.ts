@@ -1,5 +1,5 @@
 /**
- * Between-turn blast effects: catalyst upgrade, countdown explosion, virus spread,
+ * Between-turn blast effects: catalyst upgrade, countdown explosion,
  * and the applyBetweenTurnEffects orchestrator.
  * Extracted from blastTileEffects.ts to keep files under 500 lines.
  */
@@ -36,7 +36,7 @@ export function fireCatalystUpgrade(
   const upgradeDist = { ...waveDist };
   delete upgradeDist['standard'];
   delete upgradeDist['catalyst']; // Don't spawn more catalysts
-  delete upgradeDist['virus'];    // Don't spawn threats from catalyst
+  // Don't spawn threats from catalyst
   delete upgradeDist['countdown'];
   const total = Object.values(upgradeDist).reduce((a, b) => a + b, 0);
   if (total <= 0) return CATALYST_CLEAR_BONUS;
@@ -104,49 +104,6 @@ export function fireCountdownExplosion(
   return { penalty: COUNTDOWN_EXPLOSION_PENALTY, explosions };
 }
 
-// ── Virus spread ──────────────────────────────────────────────────────
-
-/** Spread virus tiles to adjacent standard tiles. Called between turns. */
-export function spreadVirus(
-  tiles: BlastTileState[][],
-  gridSize: number,
-  rng: () => number = Math.random,
-): Array<{ row: number; col: number }> {
-  const newInfections: Array<{ row: number; col: number }> = [];
-  const virusTiles: Array<{ row: number; col: number }> = [];
-
-  for (let r = 0; r < gridSize; r++) {
-    for (let c = 0; c < gridSize; c++) {
-      if (tiles[r][c].type === 'virus' && !tiles[r][c].isCleared) {
-        virusTiles.push({ row: r, col: c });
-      }
-    }
-  }
-
-  for (const v of virusTiles) {
-    const neighbors: Array<{ row: number; col: number }> = [];
-    for (const [dr, dc] of [[-1, 0], [1, 0], [0, -1], [0, 1]]) {
-      const r = v.row + dr;
-      const c = v.col + dc;
-      if (r >= 0 && r < gridSize && c >= 0 && c < gridSize) {
-        const t = tiles[r][c];
-        if (!t.isCleared && t.type === 'standard') {
-          neighbors.push({ row: r, col: c });
-        }
-      }
-    }
-    // Infect one random neighbor per virus tile
-    if (neighbors.length > 0) {
-      const target = neighbors[Math.floor(rng() * neighbors.length)];
-      tiles[target.row][target.col].type = 'virus';
-      tiles[target.row][target.col].activationEffect = 'virus-spread';
-      newInfections.push(target);
-    }
-  }
-
-  return newInfections;
-}
-
 // ── Between-turn effects (called after each word submission) ─────────
 
 export interface BetweenTurnResult {
@@ -156,12 +113,10 @@ export interface BetweenTurnResult {
   penalty: number;
   /** Countdown tiles that exploded */
   countdownExplosions: Array<{ row: number; col: number }>;
-  /** Tiles newly infected by virus */
-  virusInfections: Array<{ row: number; col: number }>;
 }
 
 /**
- * Apply between-turn effects: countdown tick + virus spread.
+ * Apply between-turn effects: countdown tick.
  * Mutates tiles in place for performance. Call after word submission, before gravity.
  */
 export function applyBetweenTurnEffects(
@@ -214,8 +169,5 @@ export function applyBetweenTurnEffects(
     processBombBFS(betweenCtx);
   }
 
-  // 3. Spread virus
-  const virusInfections = spreadVirus(tiles, gridSize);
-
-  return { tiles, penalty, countdownExplosions, virusInfections };
+  return { tiles, penalty, countdownExplosions };
 }

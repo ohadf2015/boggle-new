@@ -6,7 +6,7 @@ import { useParams } from 'next/navigation';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
-import { toBcp47Locale } from '@/utils/bcp47Locale';
+import { safeLocaleCompare } from '@/utils/bcp47Locale';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import AutoHideHeader from '@/components/AutoHideHeader';
@@ -22,13 +22,13 @@ export default function GlossaryPageClient(): React.ReactElement {
   const content = contentByLocale[locale] || contentByLocale.en;
 
   const sortedTerms = useMemo(() =>
-    [...content.terms].sort((a, b) => a.term.localeCompare(b.term, toBcp47Locale(locale))),
+    [...content.terms].sort((a, b) => safeLocaleCompare(a.term, b.term, locale)),
     [content.terms, locale]
   );
 
   const letters = useMemo(() => {
     const set = new Set(sortedTerms.map(t => t.term.charAt(0).toUpperCase()));
-    return Array.from(set).sort((a, b) => a.localeCompare(b, toBcp47Locale(locale)));
+    return Array.from(set).sort((a, b) => safeLocaleCompare(a, b, locale));
   }, [sortedTerms, locale]);
 
   return (

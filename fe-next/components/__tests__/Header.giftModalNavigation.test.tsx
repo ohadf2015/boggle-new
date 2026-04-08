@@ -179,6 +179,8 @@ vi.mock('@/components/notifications/NotificationBell', () => ({
 
 vi.mock('@/utils/profileStorage', () => ({
   getStoredCustomAvatar: () => null,
+  getStoredUsername: () => null,
+  setStoredUsername: vi.fn(),
 }));
 
 // Import Header after mocks are set up

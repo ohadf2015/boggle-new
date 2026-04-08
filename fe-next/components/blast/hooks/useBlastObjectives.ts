@@ -43,6 +43,13 @@ function getProgress(
       current = wordsFound.filter(w => w.length >= minLen).length;
       break;
     }
+
+    case 'clear_percent': {
+      const { tilesCleared, totalTiles } = gameState;
+      current = totalTiles > 0 ? Math.round((tilesCleared / totalTiles) * 100) : 0;
+      // target is already the percent threshold (e.g. 90)
+      break;
+    }
   }
 
   return {

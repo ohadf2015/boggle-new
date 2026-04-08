@@ -2,13 +2,14 @@
  * useBlastObjectives - Tests for objective progress tracking hook.
  *
  * Current wave objectives (from blastWaveConfig.ts):
- * Wave 1: word_length(3, min=3)
- * Wave 2: word_length(2, min=4) + score_target(50)
- * Wave 3: collect_type(bomb, 2) + score_target(80)
- * Wave 4: collect_type(lightning, 2) + word_length(1, min=5)
- * Wave 5: collect_type(diamond, 1) + score_target(120)
- * Wave 6: clear_all_type(frozen) + score_target(150)
- * Wave 7: collect_type(prism, 2) + word_length(2, min=5)
+ * All waves include clear_percent(90) as primary objective.
+ * Wave 1: clear_percent(90) + word_length(4, min=3)
+ * Wave 2: clear_percent(90) + word_length(3, min=4) + score_target(60)
+ * Wave 3: clear_percent(90) + collect_type(bomb, 3) + score_target(100)
+ * Wave 4: clear_percent(90) + collect_type(lightning, 3) + word_length(2, min=5)
+ * Wave 5: clear_percent(90) + collect_type(diamond, 2) + score_target(150)
+ * Wave 6: clear_percent(90) + clear_all_type(frozen) + score_target(200)
+ * Wave 7: clear_percent(90) + collect_type(prism, 3) + word_length(3, min=5)
  */
 import { renderHook } from '@testing-library/react';
 import { useBlastObjectives } from '../useBlastObjectives';
@@ -52,9 +53,9 @@ describe('useBlastObjectives', () => {
       expect(scoreObj.current).toBe(10);
       expect(scoreObj.isComplete).toBe(false);
 
-      rerender({ gameState: makeGameState({ score: 55, wordsFound }) });
+      rerender({ gameState: makeGameState({ score: 65, wordsFound }) });
       const updated = result.current.objectiveProgress.find(p => p.objective.type === 'score_target')!;
-      expect(updated.current).toBe(55);
+      expect(updated.current).toBe(65);
       expect(updated.isComplete).toBe(true);
     });
   });
@@ -78,8 +79,8 @@ describe('useBlastObjectives', () => {
     });
 
     it('marks complete when target reached', () => {
-      // Wave 3: collect_type bomb target 2
-      const tileTypeClears = { bomb: 2 } as Record<BlastTileType, number>;
+      // Wave 3: collect_type bomb target 3
+      const tileTypeClears = { bomb: 3 } as Record<BlastTileType, number>;
       const { result } = renderHook(() =>
         useBlastObjectives({
           gameState: makeGameState(),
@@ -187,11 +188,11 @@ describe('useBlastObjectives', () => {
     });
 
     it('returns true when all objectives are met', () => {
-      // Wave 1: word_length(3, min=3) — need 3 words of 3+ letters
-      const wordsFound = ['cat', 'dog', 'bat'];
+      // Wave 1: clear_percent(90) + word_length(4, min=3) — need 4 words of 3+ letters and 90%+ cleared
+      const wordsFound = ['cat', 'dog', 'bat', 'hat'];
       const { result } = renderHook(() =>
         useBlastObjectives({
-          gameState: makeGameState({ wordsFound }),
+          gameState: makeGameState({ wordsFound, tilesCleared: 33, totalTiles: 36 }),
           tileTypeClears: {} as Record<BlastTileType, number>,
           waveNumber: 1,
           wordsFound,
@@ -229,8 +230,9 @@ describe('useBlastObjectives', () => {
         }),
       );
 
-      expect(result.current.objectives).toHaveLength(1);
-      expect(result.current.objectives[0].type).toBe('word_length');
+      expect(result.current.objectives).toHaveLength(2);
+      expect(result.current.objectives[0].type).toBe('clear_percent');
+      expect(result.current.objectives[1].type).toBe('word_length');
     });
   });
 });

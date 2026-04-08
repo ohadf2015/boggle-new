@@ -2,7 +2,7 @@ import { memo, useState, useRef, useEffect, useCallback } from 'react';
 import { LazyMotion, domAnimation, m, AnimatePresence } from 'framer-motion';
 import {
     Menu, X, Accessibility, Settings, Sparkles, BarChart3,
-    Gift, Users, Flame, Trophy, HelpCircle, Mail, Coffee, Info, Bell, Check
+    Gift, Users, Flame, Trophy, HelpCircle, Mail, Coffee, Info, Bell, Check, Pencil
 } from 'lucide-react';
 import Link from 'next/link';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -16,7 +16,9 @@ import { NotificationItem } from './notifications/NotificationItem';
 import type { NotificationData } from './notifications/types';
 import { QuickLanguageSwitcher } from './QuickLanguageSwitcher';
 import MusicControls from './MusicControls';
-import { getStoredCustomAvatar } from '../utils/profileStorage';
+import { getStoredCustomAvatar, getStoredUsername, setStoredUsername } from '../utils/profileStorage';
+import { setGuestName } from '../utils/guestManager';
+import { updateGuestDailyPlayer } from '../utils/dailyChallenge/guestPlayer';
 import { useEngagementStatus } from '@/hooks/useEngagementStatus';
 import { useDailyMissions } from '@/hooks/useDailyMissions';
 import { useRealtimeNotifications } from '@/hooks/useRealtimeNotifications';
@@ -39,6 +41,35 @@ const HeaderMenuDropdown = memo<HeaderMenuDropdownProps>(({
     const [isOpen, setIsOpen] = useState(false);
     const [badgeSeen, setBadgeSeen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
+
+    // Guest name editing
+    const [guestName, setGuestNameState] = useState<string>(() => getStoredUsername() || '');
+    const [isEditingGuestName, setIsEditingGuestName] = useState(false);
+    const [editGuestNameValue, setEditGuestNameValue] = useState('');
+    const guestNameInputRef = useRef<HTMLInputElement>(null);
+
+    useEffect(() => {
+        if (isOpen && !isAuthenticated) {
+            setGuestNameState(getStoredUsername() || '');
+        }
+    }, [isOpen, isAuthenticated]);
+
+    const handleStartEditGuestName = useCallback(() => {
+        setEditGuestNameValue(guestName);
+        setIsEditingGuestName(true);
+        setTimeout(() => guestNameInputRef.current?.focus(), 50);
+    }, [guestName]);
+
+    const handleSaveGuestName = useCallback(() => {
+        const trimmed = editGuestNameValue.trim().slice(0, 20);
+        if (trimmed) {
+            setStoredUsername(trimmed);
+            setGuestName(trimmed);
+            updateGuestDailyPlayer({ displayName: trimmed });
+            setGuestNameState(trimmed);
+        }
+        setIsEditingGuestName(false);
+    }, [editGuestNameValue]);
     const isRtl = language === 'he';
 
     const guestAvatar = !isAuthenticated ? getStoredCustomAvatar() : null;
@@ -184,7 +215,32 @@ const HeaderMenuDropdown = memo<HeaderMenuDropdownProps>(({
                                         />
                                     </div>
                                     <div className="flex flex-col gap-1">
-                                        <span className="text-sm font-black text-neo-white/60">{t('common.guest')}</span>
+                                        {isEditingGuestName ? (
+                                            <input
+                                                ref={guestNameInputRef}
+                                                type="text"
+                                                value={editGuestNameValue}
+                                                onChange={(e) => setEditGuestNameValue(e.target.value)}
+                                                maxLength={20}
+                                                className="bg-neo-navy/80 text-neo-white border-2 border-neo-cyan rounded-neo px-2 py-0.5 text-sm font-bold focus:outline-hidden focus:ring-2 focus:ring-neo-cyan w-full max-w-[140px]"
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter') handleSaveGuestName();
+                                                    if (e.key === 'Escape') setIsEditingGuestName(false);
+                                                }}
+                                                onBlur={handleSaveGuestName}
+                                            />
+                                        ) : (
+                                            <button
+                                                type="button"
+                                                onClick={handleStartEditGuestName}
+                                                className="flex items-center gap-1.5 group"
+                                            >
+                                                <span className="text-sm font-black text-neo-white/60 group-hover:text-neo-cyan transition-colors">
+                                                    {guestName || t('common.guest')}
+                                                </span>
+                                                <Pencil className="w-3 h-3 text-neo-white/30 group-hover:text-neo-cyan shrink-0 transition-colors" />
+                                            </button>
+                                        )}
                                         <AuthButton
                                             onClose={closeMenu}
                                         />

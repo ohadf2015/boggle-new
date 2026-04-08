@@ -130,8 +130,10 @@ export function GameCanvas({
         particles.update(deltaSec);
         shake.update(rawDelta); // Shake uses real time for consistent feel
         flash.update(rawDelta); // Flash uses real time
-        camera.x = shake.offset.x;
-        camera.y = shake.offset.y;
+        if (camera && !camera.destroyed) {
+          camera.x = shake.offset.x;
+          camera.y = shake.offset.y;
+        }
         onTickRef.current?.(deltaSec);
       });
 

@@ -110,10 +110,6 @@ export const TILE_TYPES = {
   ICE: 'ice',
   /** Score Bomb — doubles the word's score when included */
   BOMB: 'bomb',
-  /** Wildcard - matches any letter */
-  RAINBOW: 'rainbow',
-  /** Links adjacent tiles for combo bonuses */
-  CHAIN: 'chain',
   /** Adds bonus time when used in a word */
   TIME: 'time',
 } as const;

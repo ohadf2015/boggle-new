@@ -5,13 +5,15 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 interface ScreenFlashOverlayProps {
   trigger: number;
+  /** Flash color — defaults to white. Use Tailwind bg-* class. */
+  colorClass?: string;
 }
 
 /**
- * Full-screen white flash overlay that fires when trigger increments.
+ * Full-screen flash overlay that fires when trigger increments.
  * Self-managing: tracks previous trigger value internally.
  */
-export function ScreenFlashOverlay({ trigger }: ScreenFlashOverlayProps) {
+export function ScreenFlashOverlay({ trigger, colorClass = 'bg-white' }: ScreenFlashOverlayProps) {
   const [flash, setFlash] = useState(false);
   const prevTriggerRef = useRef(trigger);
 
@@ -35,7 +37,7 @@ export function ScreenFlashOverlay({ trigger }: ScreenFlashOverlayProps) {
           animate={{ opacity: 0 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2, ease: 'easeOut' }}
-          className="absolute inset-0 z-50 pointer-events-none bg-white"
+          className={`absolute inset-0 z-50 pointer-events-none ${colorClass}`}
         />
       )}
     </AnimatePresence>

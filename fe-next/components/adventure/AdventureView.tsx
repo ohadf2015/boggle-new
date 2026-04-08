@@ -297,6 +297,47 @@ function AdventureView(): React.JSX.Element {
     );
   }
 
+  // Guests hitting 401 is expected — show signup prompt, not an error
+  if (error && isAuthError && isGuest) {
+    return (
+      <div className="h-screen bg-neo-navy flex items-center justify-center">
+        <div className="flex flex-col items-center gap-5 text-center px-4 max-w-sm">
+          <div className="w-16 h-16 rounded-full flex items-center justify-center bg-neo-cyan/20">
+            <span className="text-3xl">🗺️</span>
+          </div>
+          <p className="text-neo-white font-bold text-lg">
+            {t('adventure.guestTitle')}
+          </p>
+          <p className="text-neo-white/60 text-sm">
+            {t('adventure.guestHint')}
+          </p>
+          <button
+            onClick={() => setShowSignupPrompt(true)}
+            className={cn(
+              'px-6 py-3 bg-neo-lime text-neo-black font-bold',
+              'border-3 border-neo-black rounded-neo shadow-hard',
+              'hover:shadow-hard-pressed active:translate-y-0.5 transition-all'
+            )}
+          >
+            {t('adventure.guestSignup')}
+          </button>
+          <Link
+            href="/"
+            className="text-neo-white/40 text-sm underline hover:text-neo-white/60 transition-colors"
+          >
+            {t('common.back')}
+          </Link>
+        </div>
+        <AuthModal
+          isOpen={showSignupPrompt}
+          onClose={() => setShowSignupPrompt(false)}
+          initialMode="signup"
+          showGuestStats
+        />
+      </div>
+    );
+  }
+
   if (error) {
     const handleReLogin = () => {
       // Clear stale auth cookies and redirect to login

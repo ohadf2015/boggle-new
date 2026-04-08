@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import { useTheme } from '@/utils/ThemeContext';
-import { toBcp47Locale } from '@/utils/bcp47Locale';
+import { safeToLocaleDateString } from '@/utils/bcp47Locale';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { ArrowLeft, BookOpen, Clock, Calendar } from 'lucide-react';
@@ -816,7 +816,7 @@ export default function BlogIndexPageClient(): React.ReactElement {
                   )}>
                     <span className="flex items-center gap-1">
                       <Calendar className="w-3 h-3" />
-                      {new Date(post.date).toLocaleDateString(toBcp47Locale(language), { month: 'short', day: 'numeric', year: 'numeric' })}
+                      {safeToLocaleDateString(new Date(post.date), language, { month: 'short', day: 'numeric', year: 'numeric' })}
                     </span>
                     <span className="flex items-center gap-1">
                       <Clock className="w-3 h-3" />

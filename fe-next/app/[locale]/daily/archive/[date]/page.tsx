@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { loadTranslation, type TranslationData } from '@/translations/loadTranslation';
 import { DAILY_CHALLENGE_EPOCH } from '@/utils/dailyChallenge/constants';
 import { getPuzzleNumber } from '@/utils/dailyChallenge';
+import { safeToLocaleDateString, safeToLocaleString } from '@/utils/bcp47Locale';
 
 type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es';
 const LOCALES: Locale[] = ['en', 'he', 'sv', 'ja', 'es'];
@@ -61,13 +62,9 @@ export async function generateStaticParams() {
 export const dynamicParams = true;
 export const revalidate = 21600;
 
-const LOCALE_MAP: Record<string, string> = {
-  he: 'he-IL', ja: 'ja-JP', sv: 'sv-SE', es: 'es-ES', en: 'en-US',
-};
-
 export async function generateMetadata({ params }: PageParams): Promise<Metadata> {
   const { locale, date } = await params;
-  const validLocale = (locale as Locale) || 'en';
+  const validLocale: Locale = LOCALES.includes(locale as Locale) ? (locale as Locale) : 'en';
   const t = await loadTranslation(validLocale) as Record<string, any>;
   const enT = await loadTranslation('en') as Record<string, any>;
 
@@ -76,8 +73,9 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
   }
 
   const puzzleNumber = getPuzzleNumber(date);
-  const formattedDate = new Date(date + 'T00:00:00Z').toLocaleDateString(
-    LOCALE_MAP[validLocale] || 'en-US',
+  const formattedDate = safeToLocaleDateString(
+    new Date(date + 'T00:00:00Z'),
+    validLocale,
     { month: 'long', day: 'numeric', year: 'numeric' }
   );
 
@@ -134,7 +132,7 @@ function StatCard({ label, value }: { label: string; value: string }) {
 
 export default async function DailyArchiveDatePage({ params }: PageParams) {
   const { locale, date } = await params;
-  const validLocale = (locale as Locale) || 'en';
+  const validLocale: Locale = LOCALES.includes(locale as Locale) ? (locale as Locale) : 'en';
   const t = await loadTranslation(validLocale) as Record<string, any>;
 
   if (!isValidArchiveDate(date)) {
@@ -154,10 +152,11 @@ export default async function DailyArchiveDatePage({ params }: PageParams) {
 
   const puzzleNumber = getPuzzleNumber(date);
   const stats = await fetchPuzzleStats(date, validLocale);
-  const dateLocale = LOCALE_MAP[validLocale] || 'en-US';
-  const formattedDate = new Date(date + 'T00:00:00Z').toLocaleDateString(dateLocale, {
-    weekday: 'long', month: 'long', day: 'numeric', year: 'numeric',
-  });
+  const formattedDate = safeToLocaleDateString(
+    new Date(date + 'T00:00:00Z'),
+    validLocale,
+    { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }
+  );
 
   // Prev/Next navigation
   const prevDate = new Date(date + 'T00:00:00Z');
@@ -219,9 +218,9 @@ export default async function DailyArchiveDatePage({ params }: PageParams) {
           {/* Stats */}
           {stats ? (
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
-              <StatCard label="Players" value={stats.totalPlayers.toLocaleString(dateLocale)} />
+              <StatCard label="Players" value={safeToLocaleString(stats.totalPlayers, validLocale)} />
               <StatCard label="Solve Rate" value={`${Math.round(stats.solveRate)}%`} />
-              <StatCard label="Solved" value={stats.solvedCount.toLocaleString(dateLocale)} />
+              <StatCard label="Solved" value={safeToLocaleString(stats.solvedCount, validLocale)} />
               <StatCard label="Avg Attempts" value={stats.avgAttemptsSolved?.toFixed(1) || '-'} />
             </div>
           ) : (

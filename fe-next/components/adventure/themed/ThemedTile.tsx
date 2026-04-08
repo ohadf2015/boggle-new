@@ -12,7 +12,7 @@
 
 import React, { memo, useMemo } from 'react';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
-import { Bomb, Link2, Clock } from 'lucide-react';
+import { Bomb, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAdventureTheme } from '@/contexts/AdventureThemeContext';
 import type { TileState, TileType } from '@/types/adventure';
@@ -45,8 +45,6 @@ const SPECIAL_TILE_TYPES: Set<TileType> = new Set([
   'gold',
   'ice',
   'bomb',
-  'rainbow',
-  'chain',
   'time',
 ]);
 
@@ -100,8 +98,6 @@ function getTileIcon(type: TileType): React.ReactNode {
   switch (type) {
     case 'bomb':
       return <Bomb className="w-4 h-4 text-neo-yellow drop-shadow-lg" />;
-    case 'chain':
-      return <Link2 className="w-4 h-4 text-purple-200 drop-shadow-lg" />;
     case 'time':
       return <Clock className="w-4 h-4 text-emerald-200 drop-shadow-lg" />;
     default:
@@ -335,10 +331,6 @@ const ThemedTile = memo<ThemedTileProps>(
           </span>
         )}
 
-        {/* Chain indicator for chained tiles */}
-        {tile.isChained && tile.chainedWith && tile.chainedWith.length > 0 && (
-          <div className="absolute inset-0 border-2 border-purple-400 rounded-neo animate-pulse" />
-        )}
       </AdaptiveMotion.div>
     );
   }

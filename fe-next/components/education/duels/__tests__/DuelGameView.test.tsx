@@ -85,12 +85,12 @@ const mockDuelRow = {
   challenger: {
     id: 'student-1',
     display_name: 'Alice',
-    avatar_url: null,
+    avatar_config: null,
   },
   opponent: {
     id: 'student-2',
     display_name: 'Bob',
-    avatar_url: null,
+    avatar_config: null,
   },
 };
 

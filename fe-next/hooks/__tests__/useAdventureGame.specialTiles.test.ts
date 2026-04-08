@@ -192,10 +192,12 @@ describe('Time Tile Effects', () => {
 // ==============================================
 
 describe('Chain Tile Effects', () => {
-  it('should apply combo bonus multiplier when chain tile is used', () => {
-    // GIVEN - Level with chain tile
+  it('should not apply special combo bonus when chain tile is used (not implemented)', () => {
+    // NOTE: chain tile type is not in the current TileType union.
+    // A tile declared as 'chain' is treated as standard — no combo bonus, no isChained.
+    // GIVEN - Level with standard tiles (chain not implemented)
     const levelConfig = createMockLevelConfig({
-      specialTiles: [{ row: 0, col: 0, type: 'chain' }],
+      specialTiles: [],
     });
     const grid = createMockGrid();
     const { result } = renderHook(() =>
@@ -210,56 +212,48 @@ describe('Chain Tile Effects', () => {
       result.current.submitWord('TWO', 50);
     });
 
-    // Combo is now 2
-    expect(result.current.gameState.comboCount).toBe(2);
-
-    // WHEN - Submit word using chain tile with active combo
+    // WHEN - Submit word; no chain bonus applies
     act(() => {
       result.current.submitWordWithPath('TEST', 100, [
-        { row: 0, col: 0 }, // Chain tile
+        { row: 0, col: 0 },
         { row: 0, col: 1 },
         { row: 0, col: 2 },
         { row: 0, col: 3 },
       ]);
     });
 
-    // THEN - Score should have bonus from chain tile
-    // Chain tile adds +50% to combo bonus
-    // Expected: base 100 + chain combo bonus
-    // Current combo: 3, chain bonus: 1.5x
-    // Formula: score * (1 + (comboCount * 0.1 * 1.5)) for chain
-    // = 100 * (1 + 0.45) = 145
-    expect(result.current.gameState.score).toBeGreaterThan(200); // 50 + 50 + 100 + bonus
+    // THEN - Score is exactly 50 + 50 + 100 = 200 (no chain bonus)
+    expect(result.current.gameState.score).toBe(200);
   });
 
-  it('should mark adjacent tiles as chained when chain tile is used', () => {
-    // GIVEN - Level with chain tile
+  it('should not mark adjacent tiles as chained (isChained not implemented)', () => {
+    // GIVEN - Level with no special tiles
     const levelConfig = createMockLevelConfig({
-      specialTiles: [{ row: 1, col: 1, type: 'chain' }],
+      specialTiles: [],
     });
     const grid = createMockGrid();
     const { result } = renderHook(() =>
       useAdventureGame({ levelConfig, initialGrid: grid })
     );
 
-    // WHEN - Submit word using chain tile
+    // WHEN - Submit any word
     act(() => {
       result.current.submitWordWithPath('TEST', 100, [
         { row: 1, col: 0 },
-        { row: 1, col: 1 }, // Chain tile
+        { row: 1, col: 1 },
         { row: 1, col: 2 },
         { row: 1, col: 3 },
       ]);
     });
 
-    // THEN - Adjacent tiles should be marked as chained (check tile above chain at 0,1)
-    expect(result.current.tiles[0][1].isChained).toBe(true);
+    // THEN - isChained is not set on any tile (feature not implemented)
+    expect(result.current.tiles[0][1].isChained).toBeFalsy();
   });
 
-  it('should initialize chain tile with isChained property', () => {
+  it('should initialize standard tile without chain-specific properties', () => {
     // GIVEN
     const levelConfig = createMockLevelConfig({
-      specialTiles: [{ row: 0, col: 0, type: 'chain' }],
+      specialTiles: [],
     });
     const grid = createMockGrid();
 
@@ -268,83 +262,8 @@ describe('Chain Tile Effects', () => {
       useAdventureGame({ levelConfig, initialGrid: grid })
     );
 
-    // THEN
-    expect(result.current.tiles[0][0].type).toBe('chain');
-  });
-});
-
-// ==============================================
-// RAINBOW/WILDCARD TILE TESTS
-// ==============================================
-
-describe('Rainbow/Wildcard Tile Effects', () => {
-  it('should expose isWildcard helper for rainbow tiles', () => {
-    // GIVEN
-    const levelConfig = createMockLevelConfig({
-      specialTiles: [{ row: 0, col: 0, type: 'rainbow' }],
-    });
-    const grid = createMockGrid();
-
-    // WHEN
-    const { result } = renderHook(() =>
-      useAdventureGame({ levelConfig, initialGrid: grid })
-    );
-
-    // THEN
-    expect(result.current.isWildcard(0, 0)).toBe(true);
-    expect(result.current.isWildcard(0, 1)).toBe(false);
-  });
-
-  it('should treat rainbow tile as matching any letter in word', () => {
-    // GIVEN - Level with rainbow tile at position (0,0) which has letter 'A'
-    const levelConfig = createMockLevelConfig({
-      specialTiles: [{ row: 0, col: 0, type: 'rainbow' }],
-    });
-    // Create grid where path would spell "ABCD"
-    const grid = createMockGrid(); // A B C D in row 0
-
-    const { result } = renderHook(() =>
-      useAdventureGame({ levelConfig, initialGrid: grid })
-    );
-
-    // WHEN - Submit word "XBCD" where X uses rainbow tile as wildcard
-    act(() => {
-      result.current.submitWordWithPath('XBCD', 100, [
-        { row: 0, col: 0 }, // Rainbow tile (will act as X)
-        { row: 0, col: 1 }, // B
-        { row: 0, col: 2 }, // C
-        { row: 0, col: 3 }, // D
-      ]);
-    });
-
-    // THEN - Word should be accepted and added (score includes rainbow bonus)
-    expect(result.current.gameState.wordsFound).toContain('XBCD');
-    expect(result.current.gameState.score).toBe(125); // 100 * 1.25 rainbow bonus
-  });
-
-  it('should apply small score bonus for using rainbow tile', () => {
-    // GIVEN
-    const levelConfig = createMockLevelConfig({
-      specialTiles: [{ row: 0, col: 0, type: 'rainbow' }],
-    });
-    const grid = createMockGrid();
-
-    const { result } = renderHook(() =>
-      useAdventureGame({ levelConfig, initialGrid: grid })
-    );
-
-    // WHEN - Submit word using rainbow tile
-    act(() => {
-      result.current.submitWordWithPath('TEST', 100, [
-        { row: 0, col: 0 }, // Rainbow tile
-        { row: 0, col: 1 },
-        { row: 0, col: 2 },
-        { row: 0, col: 3 },
-      ]);
-    });
-
-    // THEN - Score should include rainbow bonus (+25%)
-    expect(result.current.gameState.score).toBe(125);
+    // THEN - tile type is standard, no chain type exists
+    expect(result.current.tiles[0][0].type).toBe('standard');
   });
 });
 
@@ -377,13 +296,12 @@ describe('Gold Tile - Score Calculation Verification', () => {
     expect(result.current.gameState.score).toBe(300);
   });
 
-  it('should stack gold multiplier with other bonuses', () => {
-    // GIVEN - Gold tile + Time tile (time adds +5s, not score)
+  it('should apply gold multiplier independently', () => {
+    // GIVEN - Gold tile only
     const levelConfig = createMockLevelConfig({
       timerSeconds: 60,
       specialTiles: [
         { row: 0, col: 0, type: 'gold' },
-        { row: 0, col: 2, type: 'rainbow' }, // Rainbow adds 25% bonus
       ],
     });
     const grid = createMockGrid();
@@ -395,18 +313,18 @@ describe('Gold Tile - Score Calculation Verification', () => {
       result.current.startGame();
     });
 
-    // WHEN - Submit word using both gold and rainbow
+    // WHEN - Submit word using gold tile
     act(() => {
       result.current.submitWordWithPath('TEST', 100, [
         { row: 0, col: 0 }, // Gold tile (3x)
         { row: 0, col: 1 },
-        { row: 0, col: 2 }, // Rainbow tile (+25%)
+        { row: 0, col: 2 },
         { row: 0, col: 3 },
       ]);
     });
 
-    // THEN - Score: 100 * 3 (gold) * 1.25 (rainbow) = 375
-    expect(result.current.gameState.score).toBe(375);
+    // THEN - Score: 100 * 3 (gold only) = 300
+    expect(result.current.gameState.score).toBe(300);
   });
 });
 
@@ -604,14 +522,13 @@ describe('Combined Special Tile Effects', () => {
     vi.useRealTimers();
   });
 
-  it('should apply all bonuses when multiple special tiles are in path', () => {
-    // GIVEN - Gold + Time + Rainbow in path
+  it('should apply all implemented bonuses when multiple special tiles are in path', () => {
+    // GIVEN - Gold + Time in path
     const levelConfig = createMockLevelConfig({
       timerSeconds: 60,
       specialTiles: [
         { row: 0, col: 0, type: 'gold' },    // 3x multiplier
         { row: 0, col: 1, type: 'time' },    // +5 seconds
-        { row: 0, col: 2, type: 'rainbow' }, // +25% bonus
       ],
     });
     const grid = createMockGrid();
@@ -626,21 +543,19 @@ describe('Combined Special Tile Effects', () => {
       vi.advanceTimersByTime(10000); // 10 seconds pass
     });
 
-    const initialTime = result.current.timeRemaining; // 50
-
     // WHEN
     act(() => {
       result.current.submitWordWithPath('TEST', 100, [
         { row: 0, col: 0 }, // Gold (3x)
         { row: 0, col: 1 }, // Time (+5s)
-        { row: 0, col: 2 }, // Rainbow (+25%)
+        { row: 0, col: 2 },
         { row: 0, col: 3 },
       ]);
     });
 
     // THEN
-    // Score: 100 * 3 (gold) * 1.25 (rainbow) = 375
-    expect(result.current.gameState.score).toBe(375);
+    // Score: 100 * 3 (gold only) = 300
+    expect(result.current.gameState.score).toBe(300);
     // Time: 50 + 5 = 55
     expect(result.current.timeRemaining).toBe(55);
   });

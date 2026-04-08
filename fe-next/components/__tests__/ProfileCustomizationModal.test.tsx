@@ -54,7 +54,6 @@ describe('Profile Customization Save Handler Integration', () => {
 
       await mockUpdateProfile({
         display_name: name,
-        username: name,
         avatar_image: avatarId,
         avatar_emoji: emoji,
         avatar_color: color,
@@ -67,7 +66,6 @@ describe('Profile Customization Save Handler Integration', () => {
 
     expect(mockUpdateProfile).toHaveBeenCalledWith({
       display_name: 'TestPlayer',
-      username: 'TestPlayer',
       avatar_image: 'broccoli-bob',
       avatar_emoji: '🥦',
       avatar_color: '#52B788', // Using hex color for socket/database compatibility
@@ -83,7 +81,6 @@ describe('Profile Customization Save Handler Integration', () => {
 
       await mockUpdateProfile({
         display_name: name,
-        username: name,
         avatar_image: avatarId,
         avatar_emoji: emoji,
         avatar_color: color,
@@ -114,7 +111,6 @@ describe('LandingView handleProfileCustomizationSave bug verification', () => {
    * The BUGGY implementation was:
    *   await updateProfile({
    *     display_name: name,
-   *     username: name,
    *     avatar_image: avatarId,
    *     has_customized_profile: true,
    *   });

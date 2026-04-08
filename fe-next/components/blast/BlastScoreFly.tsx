@@ -42,7 +42,8 @@ const TILE_TYPE_COLORS: Record<string, string> = {
   mirror: '#D0D0E0',
   wildcard: '#E8B4F8',
   countdown: '#FF6633',
-  virus: '#33CC33',
+  shuffle: '#FF8C00',
+  magma: '#FF4500',
   portal: '#7B68EE',
   catalyst: '#FFD700',
 };

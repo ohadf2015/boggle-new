@@ -42,6 +42,9 @@ export function formatObjectiveLabel(
     case 'word_length':
       template = t('blast.objective.wordLength') || 'Find {target} words with {minWordLength}+ letters';
       break;
+    case 'clear_percent':
+      template = t('blast.objective.clearPercent') || 'Clear {target}% of the board';
+      break;
     default:
       template = '';
   }

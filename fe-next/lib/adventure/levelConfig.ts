@@ -671,55 +671,41 @@ export function generateSpecialTiles(
     return tiles;
   }
 
+  // Cap: max ~25% of grid can be special tiles
+  const maxSpecialTiles = Math.floor(gridSize * gridSize * 0.25);
+
   // Gold tiles: World 1 level 5+ (boss chapter), World 2+ all levels
   if ((world === 1 && level >= 5) || world >= 2) {
-    const baseGold = Math.min(1 + Math.floor((world - 1) / 2) + Math.floor(level / 5), 4);
-    const goldCount = Math.round(baseGold * tileModifiers.goldMultiplier);
-    for (let i = 0; i < goldCount; i++) {
+    const baseGold = Math.min(1 + Math.floor((world - 1) / 2), 3);
+    const goldCount = Math.min(Math.round(baseGold * tileModifiers.goldMultiplier), 3);
+    for (let i = 0; i < goldCount && tiles.length < maxSpecialTiles; i++) {
       addTile(TILE_TYPES.GOLD as TileType);
     }
   }
 
   // Ice tiles: World 2+ (or any world if archetype demands it)
   if (world >= 2 || tileModifiers.iceMultiplier > 1) {
-    const baseIce = Math.min(2 + Math.floor(level / 3) + (Math.max(world, 2) - 2), 8);
-    const iceCount = Math.round(baseIce * tileModifiers.iceMultiplier);
-    for (let i = 0; i < iceCount; i++) {
+    const baseIce = Math.min(1 + Math.floor(level / 3) + Math.floor((Math.max(world, 2) - 2) / 2), 4);
+    const iceCount = Math.min(Math.round(baseIce * tileModifiers.iceMultiplier), 5);
+    for (let i = 0; i < iceCount && tiles.length < maxSpecialTiles; i++) {
       addTile(TILE_TYPES.ICE as TileType);
     }
   }
 
   // Bomb tiles: World 3+, level 3+
   if (world >= 3 && level >= 3) {
-    const baseBombs = level >= 7 ? 2 : 1;
-    const bombCount = Math.round(baseBombs * tileModifiers.bombMultiplier);
-    for (let i = 0; i < bombCount; i++) {
+    const bombCount = Math.min(Math.round(1 * tileModifiers.bombMultiplier), 2);
+    for (let i = 0; i < bombCount && tiles.length < maxSpecialTiles; i++) {
       addTile(TILE_TYPES.BOMB as TileType);
-    }
-  }
-
-  // Rainbow tiles: World 5+, level 5+ (or earlier if archetype boosts)
-  if ((world >= 5 && level >= 5) || tileModifiers.rainbowMultiplier > 1) {
-    const rainbowCount = Math.round(1 * tileModifiers.rainbowMultiplier);
-    for (let i = 0; i < rainbowCount; i++) {
-      addTile(TILE_TYPES.RAINBOW as TileType);
     }
   }
 
   // Time tiles: World 3+, level 2+ — strategic lifeline (+5s each)
   if (world >= 3 && level >= 2) {
     const baseTime = level >= 5 ? 2 : 1;
-    const timeCount = Math.round(baseTime * tileModifiers.timeMultiplier);
-    for (let i = 0; i < timeCount; i++) {
+    const timeCount = Math.min(Math.round(baseTime * tileModifiers.timeMultiplier), 2);
+    for (let i = 0; i < timeCount && tiles.length < maxSpecialTiles; i++) {
       addTile(TILE_TYPES.TIME as TileType);
-    }
-  }
-
-  // Chain tiles: World 4+, level 3+ (or earlier if archetype boosts)
-  if ((world >= 4 && level >= 3) || tileModifiers.chainMultiplier > 1) {
-    const chainCount = Math.round(1 * tileModifiers.chainMultiplier);
-    for (let i = 0; i < chainCount; i++) {
-      addTile(TILE_TYPES.CHAIN as TileType);
     }
   }
 

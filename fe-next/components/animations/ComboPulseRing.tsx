@@ -131,7 +131,7 @@ export const ComboPulseRing = memo(function ComboPulseRing({
               marginLeft: -initialSize / 2,
               marginTop: -initialSize / 2,
               border: `${ring.thickness}px solid ${ring.color}`,
-              boxShadow: !isLowEnd ? `0 0 8px ${ring.color}60` : undefined,
+              boxShadow: !isLowEnd ? `0 0 8px ${ring.color.startsWith('#') ? `${ring.color}60` : ring.color}` : undefined,
             }}
             initial={{ scale: 1, opacity: 0.8 }}
             animate={{

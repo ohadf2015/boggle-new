@@ -44,7 +44,7 @@ interface DuelData {
   id: string;
   boardState: string[][];
   opponentName: string;
-  opponentAvatar: string | null;
+  opponentAvatar: Record<string, unknown> | null;
   opponentId: string;
   isChallenger: boolean;
   lessonId: string;
@@ -98,7 +98,7 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
         id: data.id,
         boardState: data.board_state || [],
         opponentName: opponent.display_name,
-        opponentAvatar: opponent.avatar_url,
+        opponentAvatar: opponent.avatar_config,
         opponentId: isChallenger ? data.opponent_id : data.challenger_id,
         isChallenger,
         lessonId: data.lesson_id,

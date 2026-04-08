@@ -269,12 +269,12 @@ describe('blastModeManager', () => {
       const canonicalTypes = [
         'standard', 'gold', 'bomb', 'rainbow', 'ice', 'lightning',
         'magnet', 'prism', 'gem', 'frozen', 'mirror', 'silver', 'diamond',
-        'wildcard', 'countdown', 'virus', 'portal', 'catalyst',
+        'wildcard', 'countdown', 'shuffle', 'magma', 'portal', 'catalyst',
       ];
       for (const t of canonicalTypes) {
         expect(BLAST_TILE_TYPES).toContain(t);
       }
-      expect(BLAST_TILE_TYPES).toHaveLength(18);
+      expect(BLAST_TILE_TYPES).toHaveLength(19);
     });
 
     it('BLAST_TILE_TYPES should include previously missing types (mirror, silver, diamond, prism)', () => {

@@ -80,10 +80,10 @@ describe('coinManager', () => {
       );
     });
 
-    it('handles very large score', () => {
+    it('handles very large score (total capped at MAX_GAME_REWARD)', () => {
       const result = calculateGameReward(1_000_000, 'singleplayer');
       expect(result.breakdown.scoreBonus).toBe(100_000);
-      expect(result.total).toBe(COIN_EARNING_OTHER.SINGLEPLAYER_BASE + 100_000);
+      expect(result.total).toBe(COIN_EARNING_OTHER.MAX_GAME_REWARD);
     });
 
     it('handles negative score (treated as no base)', () => {

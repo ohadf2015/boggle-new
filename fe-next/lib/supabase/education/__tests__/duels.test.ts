@@ -162,12 +162,12 @@ describe('Duel CRUD Operations', () => {
         challenger: {
           id: 'challenger-123',
           display_name: 'Alice',
-          avatar_url: 'avatar1.jpg',
+          avatar_config: null,
         },
         opponent: {
           id: 'opponent-456',
           display_name: 'Bob',
-          avatar_url: 'avatar2.jpg',
+          avatar_config: null,
         },
       };
 
@@ -291,8 +291,8 @@ describe('Duel CRUD Operations', () => {
           challenger_score: 100,
           opponent_score: 80,
           winner_id: studentId,
-          challenger: { display_name: 'Me', avatar_url: 'me.jpg' },
-          opponent: { display_name: 'Them', avatar_url: 'them.jpg' },
+          challenger: { display_name: 'Me', avatar_config: null },
+          opponent: { display_name: 'Them', avatar_config: null },
         },
         {
           id: 'duel-2',
@@ -302,8 +302,8 @@ describe('Duel CRUD Operations', () => {
           challenger_score: 90,
           opponent_score: 70,
           winner_id: 'other-2',
-          challenger: { display_name: 'Them2', avatar_url: 'them2.jpg' },
-          opponent: { display_name: 'Me', avatar_url: 'me.jpg' },
+          challenger: { display_name: 'Them2', avatar_config: null },
+          opponent: { display_name: 'Me', avatar_config: null },
         },
       ];
 

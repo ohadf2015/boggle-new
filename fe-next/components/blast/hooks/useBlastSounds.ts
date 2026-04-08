@@ -76,7 +76,8 @@ export function useBlastSounds() {
     frozen:    () => { synthTone(1400, 'sine', 0.12, 0.04); synthTone(1800, 'sine', 0.1, 0.03); },
     wildcard:  () => { synthTone(440, 'triangle', 0.2, 0.06); synthTone(880, 'triangle', 0.15, 0.04); },
     countdown: () => { synthTone(200, 'square', 0.3, 0.08); synthTone(150, 'square', 0.2, 0.06); },
-    virus:     () => { synthTone(180, 'sawtooth', 0.25, 0.05); synthTone(120, 'sawtooth', 0.3, 0.04); },
+    shuffle:   () => { synthTone(500, 'triangle', 0.2, 0.06); synthTone(600, 'triangle', 0.18, 0.05); synthTone(700, 'triangle', 0.15, 0.04); },
+    magma:     () => { synthTone(150, 'sawtooth', 0.3, 0.08); synthTone(100, 'sawtooth', 0.35, 0.06); synthTone(80, 'square', 0.25, 0.05); },
     portal:    () => { synthTone(400, 'sine', 0.3, 0.06, 100); synthTone(600, 'sine', 0.25, 0.05, -100); },
     catalyst:  () => { synthTone(550, 'triangle', 0.2, 0.07); synthTone(825, 'sine', 0.18, 0.05); synthTone(1100, 'sine', 0.12, 0.03); },
   }), [synthTone]);

@@ -587,7 +587,21 @@ export function BlastGame({
     prevMovesRef.current = movesRemaining;
   }, [engine.gameState.movesRemaining, sounds]);
 
-  // Play wave-clear sound once when objectives are met (but don't end the game)
+  // Track individual objective completions for celebration
+  const completedObjRef = useRef<Set<number>>(new Set());
+  useEffect(() => {
+    objectives.objectiveProgress.forEach((obj, i) => {
+      if (obj.isComplete && !completedObjRef.current.has(i)) {
+        completedObjRef.current.add(i);
+        // Light shake + sound for individual objective
+        if (explosionShakeTimerRef.current) clearTimeout(explosionShakeTimerRef.current);
+        setExplosionShake(1);
+        explosionShakeTimerRef.current = setTimeout(() => setExplosionShake(0), 400);
+      }
+    });
+  }, [objectives.objectiveProgress]);
+
+  // Play wave-clear sound once when ALL objectives are met (but don't end the game)
   const waveClearPlayedRef = useRef(false);
   useEffect(() => {
     if (objectives.allObjectivesComplete && !waveClearPlayedRef.current) {

@@ -75,8 +75,6 @@ export interface GameState {
 const GOLD_MULTIPLIER = 3;
 const LONG_WORD_LENGTH = 5;
 const TIME_TILE_BONUS_SECONDS = 5;
-const RAINBOW_SCORE_MULTIPLIER = 1.25;
-const CHAIN_COMBO_MULTIPLIER = 1.5;
 const MAX_TIMER_SECONDS = 180;
 
 function initializeTiles(
@@ -102,7 +100,6 @@ function initializeTiles(
         isCleared: false,
         isFrozen: tileType === 'ice',
         ...(tileType === 'time' ? { bonusTime: TIME_TILE_BONUS_SECONDS } : {}),
-        ...(tileType === 'chain' ? { isChained: false } : {}),
       });
     }
     tiles.push(rowTiles);
@@ -183,7 +180,6 @@ function processSpecialTileEffects(
   path: Array<{ row: number; col: number }>,
   newTiles: TileState[][],
   gridSize: number,
-  comboCount: number,
   baseScore: number,
   upgradeConfig?: ReducerUpgradeConfig,
 ): { finalScore: number; iceClearedCount: number; timeBonusSeconds: number } {
@@ -191,20 +187,6 @@ function processSpecialTileEffects(
   let iceClearedCount = 0;
   let timeBonusSeconds = 0;
   const activationTimestamp = Date.now();
-
-  // Multiplier tiles (2x each, stackable)
-  const multiplierPositions = path.filter(
-    (pos) => newTiles[pos.row]?.[pos.col]?.type === 'multiplier'
-  );
-  for (const pos of multiplierPositions) {
-    finalScore *= 2;
-    const tile = newTiles[pos.row]?.[pos.col];
-    if (tile) {
-      tile.activationEffect = 'multiply';
-      tile.activationTimestamp = activationTimestamp;
-      tile.type = 'standard';
-    }
-  }
 
   // Gold tile multiplier (3x)
   const goldPositions = path.filter(
@@ -218,37 +200,6 @@ function processSpecialTileEffects(
         tile.activationEffect = 'collect';
         tile.activationTimestamp = activationTimestamp;
       }
-    }
-  }
-
-  // Rainbow/wildcard tile bonus (+25%)
-  const rainbowPositions = path.filter(
-    (pos) => newTiles[pos.row]?.[pos.col]?.type === 'rainbow'
-  );
-  if (rainbowPositions.length > 0) {
-    finalScore = Math.floor(finalScore * RAINBOW_SCORE_MULTIPLIER);
-    for (const pos of rainbowPositions) {
-      const tile = newTiles[pos.row]?.[pos.col];
-      if (tile) {
-        tile.activationEffect = 'wildcard';
-        tile.activationTimestamp = activationTimestamp;
-      }
-    }
-  }
-
-  // Chain tile combo bonus
-  const chainPositions = path.filter(
-    (pos) => newTiles[pos.row]?.[pos.col]?.type === 'chain'
-  );
-  if (chainPositions.length > 0 && comboCount > 0) {
-    const comboBonus = comboCount * 0.1 * CHAIN_COMBO_MULTIPLIER;
-    finalScore = Math.round(finalScore * (1 + comboBonus));
-  }
-  for (const pos of chainPositions) {
-    const tile = newTiles[pos.row]?.[pos.col];
-    if (tile) {
-      tile.activationEffect = 'link';
-      tile.activationTimestamp = activationTimestamp;
     }
   }
 
@@ -299,44 +250,6 @@ function processSpecialTileEffects(
             neighborTile.type = 'standard';
             neighborTile.isFrozen = false;
             iceClearedCount++;
-          }
-        }
-      }
-    }
-  }
-
-  // Unlock locked tiles when word contains same letter
-  const wordLetters = new Set<string>();
-  for (const pos of path) {
-    const tile = newTiles[pos.row]?.[pos.col];
-    if (tile) {
-      wordLetters.add(tile.letter.toUpperCase());
-    }
-  }
-
-  for (let row = 0; row < gridSize; row++) {
-    for (let col = 0; col < gridSize; col++) {
-      const tile = newTiles[row][col];
-      if (tile.type === 'locked') {
-        if (wordLetters.has(tile.letter.toUpperCase())) {
-          tile.activationEffect = 'unlock';
-          tile.activationTimestamp = activationTimestamp;
-          tile.type = 'standard';
-        }
-      }
-    }
-  }
-
-  // Mark adjacent tiles as chained when chain tile is used
-  if (chainPositions.length > 0) {
-    for (const pos of chainPositions) {
-      for (let dr = -1; dr <= 1; dr++) {
-        for (let dc = -1; dc <= 1; dc++) {
-          if (dr === 0 && dc === 0) continue;
-          const nr = pos.row + dr;
-          const nc = pos.col + dc;
-          if (nr >= 0 && nr < gridSize && nc >= 0 && nc < gridSize) {
-            newTiles[nr][nc].isChained = true;
           }
         }
       }
@@ -456,13 +369,6 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
             rowsToClone.add(pos.row);
           }
         }
-        for (const pos of path) {
-          if (state.tiles[pos.row]?.[pos.col]?.type === 'chain') {
-            if (pos.row > 0) rowsToClone.add(pos.row - 1);
-            rowsToClone.add(pos.row);
-            if (pos.row < gridSize - 1) rowsToClone.add(pos.row + 1);
-          }
-        }
       }
 
       // Clone only affected rows (structural sharing)
@@ -490,7 +396,6 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
           path,
           newTiles,
           gridSize,
-          state.gameState.comboCount,
           score,
           state.upgradeConfig,
         );

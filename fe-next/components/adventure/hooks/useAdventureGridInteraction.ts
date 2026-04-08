@@ -60,12 +60,6 @@ export function useAdventureGridInteraction(params: UseAdventureGridInteractionP
     return { x: gridRect.left + col * tileSize + tileSize / 2, y: gridRect.top + row * tileSize + tileSize / 2 };
   }, [gridSize, gridRef]);
 
-  // Chain burst effect
-  useEffect(() => {
-    const chainTiles = tiles.filter(t => t.activationEffect === 'link' && t.activationTimestamp);
-    if (chainTiles.length === 0) return;
-    effects.setChainBurstConfig({ trigger: true, position: calculateTileCenter(chainTiles[0].row, chainTiles[0].col) });
-  }, [tiles, calculateTileCenter, effects]);
 
   // Word explosion effect
   useEffect(() => {

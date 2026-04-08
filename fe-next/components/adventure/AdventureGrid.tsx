@@ -14,17 +14,23 @@ import type { GridTileState } from '@/types/adventure';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { WordPathTrail, SelectionSparkle } from '@/components/animations';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
-import { useCascadeAnimation } from '@/hooks/useCascadeAnimation';
 import BoardFrame from '@/components/adventure/themed/BoardFrame';
 import { AdventureThemeContext } from '@/contexts/AdventureThemeContext';
 import { AdventureTile } from './AdventureTile';
 import { useGridKeyboardNav } from '@/hooks/useGridKeyboardNav';
 import './AdventureTile.css';
+import dynamic from 'next/dynamic';
 import { useGridGestures } from './useGridGestures';
 import { OPTIMIZED_TIMING } from '@/lib/adventure/entryTiming';
 import { GRID_PADDING, GRID_GAP_CLASS } from '@/components/grid/gridLayoutConstants';
 import { useBossGridEffect } from '@/hooks/useBossGridEffect';
 import './BossGridEffectStyles.css';
+import type { TileEffectEvent } from './AdventureEffectsCanvas';
+
+const AdventureEffectsCanvas = dynamic(
+  () => import('./AdventureEffectsCanvas').then(m => ({ default: m.AdventureEffectsCanvas })),
+  { ssr: false },
+);
 
 // ==============================================
 // TYPES
@@ -150,9 +156,6 @@ const AdventureGrid = memo(
         key: number;
       }>({ position: null, key: 0 });
 
-      // Chain cascade animation for chain tile reactions
-      const chainCascade = useCascadeAnimation();
-
       // Wrap drag start callback to add sparkle effect
       const handleDragStartWithSparkle = useCallback(
         (index: number, tile: GridTileState) => {
@@ -234,32 +237,6 @@ const AdventureGrid = memo(
       }
     }, [showCascade, prefersReducedMotion, cascadeComplete]);
 
-    // Detect chain tile activation and trigger cascade
-    useEffect(() => {
-      // Find chain tile with 'link' activation effect
-      const chainTile = tiles.find(
-        (tile) => tile.type === 'chain' && tile.activationEffect === 'link' && tile.activationTimestamp
-      );
-
-      if (!chainTile) return;
-
-      // Find all tiles marked as chained
-      const chainedIndices = tiles
-        .map((tile, idx) => (tile.isChained ? idx : -1))
-        .filter((idx) => idx !== -1);
-
-      if (chainedIndices.length === 0) return;
-
-      // Trigger cascade animation from chain tile position
-      chainCascade.startCascade({
-        origin: { row: chainTile.row, col: chainTile.col },
-        affectedIndices: chainedIndices,
-        gridSize,
-        staggerMs: 50, // Slower than regular cascade (30ms) for emphasis
-        animationType: 'wave',
-      });
-    }, [tiles, gridSize, chainCascade]);
-
     // Build selected set for quick lookup
     const selectedSet = useMemo(
       () => new Set(selectedIndices),
@@ -305,6 +282,36 @@ const AdventureGrid = memo(
       () => new Set(lockedTileIndices),
       [lockedTileIndices]
     );
+
+    // Measure grid container for PixiJS effects canvas
+    const [gridDims, setGridDims] = useState({ width: 0, height: 0 });
+    useEffect(() => {
+      const el = containerRef.current;
+      if (!el) return;
+      const ro = new ResizeObserver(([entry]) => {
+        const { width, height } = entry.contentRect;
+        setGridDims({ width: Math.round(width), height: Math.round(height) });
+      });
+      ro.observe(el);
+      return () => ro.disconnect();
+    }, [containerRef]);
+
+    // Derive effect events from tiles with active activation effects
+    const effectEvents = useMemo<TileEffectEvent[]>(() => {
+      const events: TileEffectEvent[] = [];
+      for (const tile of tiles) {
+        if (tile.activationEffect && tile.activationTimestamp) {
+          events.push({
+            row: tile.row,
+            col: tile.col,
+            type: tile.type,
+            effect: tile.activationEffect,
+            timestamp: tile.activationTimestamp,
+          });
+        }
+      }
+      return events;
+    }, [tiles]);
 
     // Detect if a bomb tile is selected and get its row for preview highlighting
     const bombRowPreview = useMemo(() => {
@@ -408,6 +415,18 @@ const AdventureGrid = memo(
             bossGridClass,
           )}
         >
+          {/* PixiJS particle effects layer — behind tiles */}
+          {enableComplexAnimations && gridDims.width > 0 && effectEvents.length > 0 && (
+            <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden rounded-neo-lg">
+              <AdventureEffectsCanvas
+                width={gridDims.width}
+                height={gridDims.height || gridDims.width}
+                gridSize={gridSize}
+                effectEvents={effectEvents}
+              />
+            </div>
+          )}
+
           <AdaptiveAnimatePresence mode={enableComplexAnimations ? 'popLayout' : 'sync'}>
           {tiles.map((tile, index) => {
             const isSelected = selectedSet.has(index);
@@ -415,9 +434,6 @@ const AdventureGrid = memo(
             const isAdjacentHint = adjacentSet.has(index);
             const isLocked = lockedSet.has(index);
             const canInteract = interactive && !disabled && !tile.isCleared && !isLocked;
-
-            // Chain cascade delay for chained tiles (takes priority over tile.cascadeDelay)
-            const chainCascadeDelay = tile.isChained ? chainCascade.delays.get(index) : undefined;
 
             return (
               <AdventureTile
@@ -440,7 +456,6 @@ const AdventureGrid = memo(
                 onTileDragStart={handleDragStart}
                 onTileDragEnter={handleDragEnter}
                 getTileAriaLabel={getTileAriaLabel}
-                chainCascadeDelay={chainCascadeDelay}
                 isLocked={isLocked}
               />
             );

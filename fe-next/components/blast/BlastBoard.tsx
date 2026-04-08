@@ -10,7 +10,7 @@ import type { SequencerState, TileAnimState } from './hooks/useBlastSequencer';
 import { GRID_PADDING, GRID_GAP_CLASS } from '@/components/grid/gridLayoutConstants';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { COMBO_ELIGIBLE_TILES } from './utils/blastCombos';
-import { computeCellFilter } from './hooks/blastCellFilterLogic';
+import { computeCellFilter, createPortalAdjacency } from './hooks/blastCellFilterLogic';
 import { scanOffensiveSpecial, OFFENSIVE_RANK } from './utils/blastTileEffects';
 import { getTileTooltip } from './utils/blastTileTooltips';
 
@@ -140,6 +140,12 @@ export const BlastBoard = memo(function BlastBoard({
     [tileStates, selectedCells],
   );
 
+  // Portal-aware adjacency: lets word paths teleport through paired portal tiles
+  const portalAdjacency = useMemo(
+    () => createPortalAdjacency(tileStates),
+    [tileStates],
+  );
+
   const selectedPositions = useMemo(
     () => new Set(selectedCells.map((c) => `${c.row}-${c.col}`)),
     [selectedCells],
@@ -236,6 +242,7 @@ export const BlastBoard = memo(function BlastBoard({
         onWordChange={onWordChange}
         onSelectionChange={handleSelectionChange}
         cellFilter={cellFilter}
+        isAdjacent={portalAdjacency}
         hideWordPreview
         hideComboIndicator
         largeText

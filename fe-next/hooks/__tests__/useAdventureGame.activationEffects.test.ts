@@ -171,68 +171,6 @@ describe('Gold Tile Collect Activation Effect', () => {
 });
 
 // ==============================================
-// RAINBOW TILE WILDCARD EFFECT TESTS
-// ==============================================
-
-describe('Rainbow Tile Wildcard Activation Effect', () => {
-  it('should set wildcard activation effect when rainbow tile is used', () => {
-    // GIVEN - Level with rainbow tile
-    const levelConfig = createMockLevelConfig({
-      specialTiles: [{ row: 0, col: 0, type: 'rainbow' }],
-    });
-    const grid = createMockGrid();
-    const { result } = renderHook(() =>
-      useAdventureGame({ levelConfig, initialGrid: grid })
-    );
-
-    // WHEN - Use rainbow tile in word
-    act(() => {
-      result.current.submitWordWithPath('TEST', 100, [
-        { row: 0, col: 0 }, // Rainbow tile
-        { row: 0, col: 1 },
-        { row: 0, col: 2 },
-        { row: 0, col: 3 },
-      ]);
-    });
-
-    // THEN - Rainbow tile should have wildcard activation effect
-    expect(result.current.tiles[0][0].activationEffect).toBe('wildcard');
-    expect(result.current.tiles[0][0].activationTimestamp).toBeDefined();
-  });
-});
-
-// ==============================================
-// CHAIN TILE LINK EFFECT TESTS
-// ==============================================
-
-describe('Chain Tile Link Activation Effect', () => {
-  it('should set link activation effect when chain tile is used', () => {
-    // GIVEN - Level with chain tile
-    const levelConfig = createMockLevelConfig({
-      specialTiles: [{ row: 0, col: 0, type: 'chain' }],
-    });
-    const grid = createMockGrid();
-    const { result } = renderHook(() =>
-      useAdventureGame({ levelConfig, initialGrid: grid })
-    );
-
-    // WHEN - Use chain tile in word
-    act(() => {
-      result.current.submitWordWithPath('TEST', 100, [
-        { row: 0, col: 0 }, // Chain tile
-        { row: 0, col: 1 },
-        { row: 0, col: 2 },
-        { row: 0, col: 3 },
-      ]);
-    });
-
-    // THEN - Chain tile should have link activation effect
-    expect(result.current.tiles[0][0].activationEffect).toBe('link');
-    expect(result.current.tiles[0][0].activationTimestamp).toBeDefined();
-  });
-});
-
-// ==============================================
 // TIME TILE TIME BONUS EFFECT TESTS
 // ==============================================
 
@@ -308,11 +246,11 @@ describe('Clear Activation Effects', () => {
   });
 
   it('should clear previous activation effects when new word is submitted', () => {
-    // GIVEN - Level with gold tile
+    // GIVEN - Level with gold tile (first row) and time tile (second row)
     const levelConfig = createMockLevelConfig({
       specialTiles: [
         { row: 0, col: 0, type: 'gold' },
-        { row: 1, col: 0, type: 'rainbow' },
+        { row: 1, col: 0, type: 'time' },
       ],
     });
     const grid = createMockGrid();
@@ -332,19 +270,19 @@ describe('Clear Activation Effects', () => {
 
     expect(result.current.tiles[0][0].activationEffect).toBe('collect');
 
-    // WHEN - Submit second word with rainbow tile
+    // WHEN - Submit second word with time tile
     act(() => {
       result.current.submitWordWithPath('WORD', 100, [
-        { row: 1, col: 0 }, // Rainbow
+        { row: 1, col: 0 }, // Time
         { row: 1, col: 1 },
         { row: 1, col: 2 },
         { row: 1, col: 3 },
       ]);
     });
 
-    // THEN - Gold tile effect should be cleared, rainbow effect should be set
+    // THEN - Gold tile effect should be cleared, time effect should be set
     expect(result.current.tiles[0][0].activationEffect).toBeNull();
-    expect(result.current.tiles[1][0].activationEffect).toBe('wildcard');
+    expect(result.current.tiles[1][0].activationEffect).toBe('timeBonus');
   });
 });
 
@@ -354,12 +292,11 @@ describe('Clear Activation Effects', () => {
 
 describe('Multiple Activation Effects', () => {
   it('should set activation effects on all special tiles used in the same word', () => {
-    // GIVEN - Level with gold, time, and rainbow in path
+    // GIVEN - Level with gold and time in path (implemented effects only)
     const levelConfig = createMockLevelConfig({
       specialTiles: [
         { row: 0, col: 0, type: 'gold' },
         { row: 0, col: 1, type: 'time' },
-        { row: 0, col: 2, type: 'rainbow' },
       ],
     });
     const grid = createMockGrid();
@@ -367,25 +304,23 @@ describe('Multiple Activation Effects', () => {
       useAdventureGame({ levelConfig, initialGrid: grid })
     );
 
-    // WHEN - Use all special tiles in word
+    // WHEN - Use both special tiles in word
     act(() => {
       result.current.submitWordWithPath('TEST', 100, [
         { row: 0, col: 0 }, // Gold
         { row: 0, col: 1 }, // Time
-        { row: 0, col: 2 }, // Rainbow
+        { row: 0, col: 2 },
         { row: 0, col: 3 },
       ]);
     });
 
-    // THEN - All special tiles should have their respective activation effects
+    // THEN - Both special tiles should have their respective activation effects
     expect(result.current.tiles[0][0].activationEffect).toBe('collect');
     expect(result.current.tiles[0][1].activationEffect).toBe('timeBonus');
-    expect(result.current.tiles[0][2].activationEffect).toBe('wildcard');
 
-    // All should have the same timestamp (set in same word submission)
+    // Both should have the same timestamp (set in same word submission)
     const timestamp = result.current.tiles[0][0].activationTimestamp;
     expect(result.current.tiles[0][1].activationTimestamp).toBe(timestamp);
-    expect(result.current.tiles[0][2].activationTimestamp).toBe(timestamp);
   });
 
   it('should not set activation effects on standard tiles', () => {

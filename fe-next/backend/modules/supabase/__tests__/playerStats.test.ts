@@ -395,21 +395,15 @@ describe('ensureProfileExists', () => {
     );
   });
 
-  test('should retry with suffix on username collision', async () => {
-    // GIVEN: Profile doesn't exist
-    const playerId = 'new-user-456';
+  test('should use UUID-derived username slug (not display name)', async () => {
+    // GIVEN: Profile doesn't exist, OAuth user has a name
+    const playerId = 'abc12345-def6-7890-abcd-ef1234567890';
     mockClient.single.mockResolvedValueOnce({
       data: null,
       error: { code: 'PGRST116', message: 'Not found' },
     });
 
-    // First insert fails with unique constraint violation on username
-    mockClient.insert.mockReturnValueOnce({
-      data: null,
-      error: { code: '23505', message: 'duplicate key value violates unique constraint "profiles_username_key"' },
-    });
-
-    // Second insert succeeds with suffixed username
+    // Insert succeeds
     mockClient.insert.mockReturnValueOnce({
       data: null,
       error: null,
@@ -418,13 +412,12 @@ describe('ensureProfileExists', () => {
     // WHEN: Ensure profile exists
     const result = await ensureProfileExists(playerId);
 
-    // THEN: Should retry and succeed
+    // THEN: Username should be a UUID-derived slug, not a display name
     expect(result).toBe(true);
-    expect(mockClient.insert).toHaveBeenCalledTimes(2);
-    expect(logger.warn).toHaveBeenCalledWith(
-      'SUPABASE',
-      expect.stringContaining('Username collision')
-    );
+    expect(mockClient.insert).toHaveBeenCalledTimes(1);
+    const insertedData = mockClient.insert.mock.calls[0][0];
+    expect(insertedData.username).toMatch(/^user_[a-f0-9]{12}$/);
+    expect(insertedData.username).not.toBe(insertedData.display_name);
   });
 
   test('should return false on database error', async () => {

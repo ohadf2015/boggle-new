@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { loadTranslation, type TranslationData } from '@/translations/loadTranslation';
 import { DAILY_CHALLENGE_EPOCH } from '@/utils/dailyChallenge/constants';
-import { toBcp47Locale } from '@/utils/bcp47Locale';
+import { safeToLocaleDateString } from '@/utils/bcp47Locale';
 
 type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es';
 
@@ -112,17 +112,15 @@ export default async function DailyArchivePage({ params }: PageParams) {
     groupedByMonth[monthKey].push(entry);
   }
 
-  const dateLocale = toBcp47Locale(validLocale);
-
   const formatMonth = (monthKey: string) => {
     const [year, month] = monthKey.split('-');
     const date = new Date(Number(year), Number(month) - 1);
-    return date.toLocaleDateString(dateLocale, { month: 'long', year: 'numeric' });
+    return safeToLocaleDateString(date, validLocale, { month: 'long', year: 'numeric' });
   };
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr + 'T00:00:00Z');
-    return date.toLocaleDateString(dateLocale, { weekday: 'short', month: 'short', day: 'numeric' });
+    return safeToLocaleDateString(date, validLocale, { weekday: 'short', month: 'short', day: 'numeric' });
   };
 
   // JSON-LD schemas — all content is server-generated from trusted constants, no user input

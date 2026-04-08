@@ -10,6 +10,7 @@ import type { BlastTileState, BlastTileType } from '../../types';
 import {
   computeCellFilter,
   computeThawedCells,
+  createPortalAdjacency,
 } from '../blastCellFilterLogic';
 
 function makeTile(
@@ -204,5 +205,96 @@ describe('computeThawedCells', () => {
 
     const matches = thawed.filter(c => c.row === 1 && c.col === 1);
     expect(matches).toHaveLength(1);
+  });
+});
+
+describe('createPortalAdjacency', () => {
+  it('returns standard adjacency when no portals exist', () => {
+    const grid = makeGrid(4);
+    const isAdj = createPortalAdjacency(grid);
+
+    // (0,0) and (0,1) are geometrically adjacent
+    expect(isAdj({ row: 0, col: 0 }, { row: 0, col: 1 })).toBe(true);
+    // (0,0) and (2,2) are NOT adjacent
+    expect(isAdj({ row: 0, col: 0 }, { row: 2, col: 2 })).toBe(false);
+  });
+
+  it('treats cells adjacent to a portal partner as reachable from the portal', () => {
+    // Portal A at (0,0), Portal B at (3,3) — paired together
+    const grid = makeGrid(4, {
+      '0-0': { type: 'portal', portalPairId: 'portal-0' },
+      '3-3': { type: 'portal', portalPairId: 'portal-0' },
+    });
+    const isAdj = createPortalAdjacency(grid);
+
+    // From portal A (0,0), cell (3,2) is adjacent to partner B (3,3) — should teleport
+    expect(isAdj({ row: 0, col: 0 }, { row: 3, col: 2 })).toBe(true);
+    // From portal A (0,0), cell (2,3) is adjacent to partner B (3,3) — should teleport
+    expect(isAdj({ row: 0, col: 0 }, { row: 2, col: 3 })).toBe(true);
+    // From portal B (3,3), cell (0,1) is adjacent to partner A (0,0) — should teleport
+    expect(isAdj({ row: 3, col: 3 }, { row: 0, col: 1 })).toBe(true);
+  });
+
+  it('does not teleport to cells NOT adjacent to portal partner', () => {
+    const grid = makeGrid(4, {
+      '0-0': { type: 'portal', portalPairId: 'portal-0' },
+      '3-3': { type: 'portal', portalPairId: 'portal-0' },
+    });
+    const isAdj = createPortalAdjacency(grid);
+
+    // (0,0) → (1,3) is NOT adjacent to either portal geometrically or via partner
+    expect(isAdj({ row: 0, col: 0 }, { row: 1, col: 3 })).toBe(false);
+  });
+
+  it('does not allow teleporting to the partner portal cell itself', () => {
+    const grid = makeGrid(4, {
+      '0-0': { type: 'portal', portalPairId: 'portal-0' },
+      '3-3': { type: 'portal', portalPairId: 'portal-0' },
+    });
+    const isAdj = createPortalAdjacency(grid);
+
+    // Moving from portal A directly to portal B — blocked (you teleport THROUGH, not TO)
+    expect(isAdj({ row: 0, col: 0 }, { row: 3, col: 3 })).toBe(false);
+  });
+
+  it('works with multiple portal pairs independently', () => {
+    const grid = makeGrid(5, {
+      '0-0': { type: 'portal', portalPairId: 'portal-0' },
+      '4-4': { type: 'portal', portalPairId: 'portal-0' },
+      '0-4': { type: 'portal', portalPairId: 'portal-1' },
+      '4-0': { type: 'portal', portalPairId: 'portal-1' },
+    });
+    const isAdj = createPortalAdjacency(grid);
+
+    // Pair 0: (0,0) → neighbors of (4,4)
+    expect(isAdj({ row: 0, col: 0 }, { row: 3, col: 4 })).toBe(true);
+    // Pair 1: (0,4) → neighbors of (4,0)
+    expect(isAdj({ row: 0, col: 4 }, { row: 3, col: 0 })).toBe(true);
+    // Cross-pair: (0,0) should NOT reach neighbors of (4,0)
+    expect(isAdj({ row: 0, col: 0 }, { row: 3, col: 0 })).toBe(false);
+  });
+
+  it('ignores cleared portal tiles', () => {
+    const grid = makeGrid(4, {
+      '0-0': { type: 'portal', portalPairId: 'portal-0' },
+      '3-3': { type: 'portal', portalPairId: 'portal-0', isCleared: true },
+    });
+    const isAdj = createPortalAdjacency(grid);
+
+    // Partner is cleared — no teleportation
+    expect(isAdj({ row: 0, col: 0 }, { row: 3, col: 2 })).toBe(false);
+  });
+
+  it('still allows standard adjacency for portal tiles', () => {
+    const grid = makeGrid(4, {
+      '0-0': { type: 'portal', portalPairId: 'portal-0' },
+      '3-3': { type: 'portal', portalPairId: 'portal-0' },
+    });
+    const isAdj = createPortalAdjacency(grid);
+
+    // (0,0) → (0,1) is standard adjacent — still works
+    expect(isAdj({ row: 0, col: 0 }, { row: 0, col: 1 })).toBe(true);
+    // (0,0) → (1,1) is standard diagonal — still works
+    expect(isAdj({ row: 0, col: 0 }, { row: 1, col: 1 })).toBe(true);
   });
 });

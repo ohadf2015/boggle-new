@@ -58,13 +58,11 @@ describe('Adventure Constants', () => {
   });
 
   describe('Tile Types', () => {
-    it('should have all 7 tile types', () => {
+    it('should have all 5 tile types', () => {
       expect(TILE_TYPES.STANDARD).toBe('standard');
       expect(TILE_TYPES.GOLD).toBe('gold');
       expect(TILE_TYPES.ICE).toBe('ice');
       expect(TILE_TYPES.BOMB).toBe('bomb');
-      expect(TILE_TYPES.RAINBOW).toBe('rainbow');
-      expect(TILE_TYPES.CHAIN).toBe('chain');
       expect(TILE_TYPES.TIME).toBe('time');
     });
   });

@@ -7,6 +7,8 @@
  * - all others: always selectable
  */
 import type { BlastTileState } from '../types';
+import type { GridPosition } from '@/types';
+import { isAdjacentCell } from '@/components/grid/gridGeometry';
 
 type CellCoord = { row: number; col: number };
 
@@ -82,4 +84,52 @@ export function computeThawedCells(
   }
 
   return thawed;
+}
+
+/**
+ * Creates a portal-aware adjacency function for blast mode.
+ * Two cells are "adjacent" if they are standard 8-directional neighbors,
+ * OR if cell1 is a portal and cell2 is adjacent to cell1's portal partner
+ * (but not the partner cell itself — you teleport THROUGH portals, not TO them).
+ */
+export function createPortalAdjacency(
+  tileStates: BlastTileState[][],
+): (cell1: GridPosition, cell2: GridPosition) => boolean {
+  // Pre-build portal partner lookup: position key → partner position
+  const portalPartner = new Map<string, GridPosition>();
+  const portalsByPairId = new Map<string, GridPosition[]>();
+
+  for (const row of tileStates) {
+    for (const tile of row) {
+      if (tile.type === 'portal' && tile.portalPairId && !tile.isCleared) {
+        const existing = portalsByPairId.get(tile.portalPairId) ?? [];
+        existing.push({ row: tile.row, col: tile.col });
+        portalsByPairId.set(tile.portalPairId, existing);
+      }
+    }
+  }
+
+  for (const positions of portalsByPairId.values()) {
+    if (positions.length === 2) {
+      portalPartner.set(`${positions[0].row}-${positions[0].col}`, positions[1]);
+      portalPartner.set(`${positions[1].row}-${positions[1].col}`, positions[0]);
+    }
+  }
+
+  return (cell1: GridPosition, cell2: GridPosition): boolean => {
+    // Standard adjacency always works
+    if (isAdjacentCell(cell1, cell2)) return true;
+
+    // Portal teleportation: if cell1 is a portal with a partner,
+    // check if cell2 is adjacent to the partner (but not the partner itself)
+    const partner = portalPartner.get(`${cell1.row}-${cell1.col}`);
+    if (partner) {
+      // Block direct movement to partner cell
+      if (cell2.row === partner.row && cell2.col === partner.col) return false;
+      // Allow if cell2 is adjacent to partner
+      if (isAdjacentCell(partner, cell2)) return true;
+    }
+
+    return false;
+  };
 }

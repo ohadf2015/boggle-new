@@ -22,7 +22,7 @@ import {
  * Returns null if the socket has not authenticated.
  */
 export function getAuthUserId(socket: Socket): string | null {
-  return (socket as any).authUserId || null;
+  return (socket.data?.verifiedUserId as string) || null;
 }
 
 // ==================== Broadcast ====================

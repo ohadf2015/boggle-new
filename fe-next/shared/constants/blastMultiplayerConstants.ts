@@ -37,7 +37,8 @@ export const BLAST_TILE_BONUSES: Record<BlastTileType, number> = {
   diamond: 2.5,
   wildcard: 1,     // no score bonus — flexibility is the reward
   countdown: 1.5,  // reward for defusing under pressure
-  virus: 0,        // 0 score — clearing virus is purely defensive
+  shuffle: 0.5,    // mild bonus for triggering board rearrange
+  magma: 2,        // high reward for diagonal clear power
   portal: 1.25,    // mild bonus for teleport path usage
   catalyst: 1.5,   // reward for triggering upgrade effect
 };

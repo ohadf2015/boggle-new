@@ -197,7 +197,7 @@ const RuneCard = memo<RuneCardProps>(({
         'text-xs font-bold text-center leading-tight',
         owned ? 'text-neo-white' : 'text-neo-white/40'
       )}>
-        {owned ? t(def.nameKey) : '???'}
+        {owned ? t(def.nameKey) : t('adventure.runes.unknown')}
       </span>
 
       {/* Rarity */}

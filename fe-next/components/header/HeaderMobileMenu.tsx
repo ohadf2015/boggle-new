@@ -1,7 +1,7 @@
 import { memo, useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { createPortal } from 'react-dom';
 import { LazyMotion, domAnimation, m, AnimatePresence, type PanInfo } from 'framer-motion';
-import { Menu, X, Settings, Trophy, ScrollText, Coffee, Accessibility, Info, HelpCircle, Mail, Cookie, Gift, Users, ChevronRight, Sparkles, User, Flame, Bell, Check } from 'lucide-react';
+import { Menu, X, Settings, Trophy, ScrollText, Coffee, Accessibility, Info, HelpCircle, Mail, Cookie, Gift, Users, ChevronRight, Sparkles, User, Flame, Bell, Check, Pencil } from 'lucide-react';
 import Link from 'next/link';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useAuth } from '../../contexts/AuthContext';
@@ -16,7 +16,9 @@ import type { NotificationData } from '../notifications/types';
 import { InstagramIcon } from '@/components/icons/SocialIcons';
 import { ManageCookiesButton } from '@/components/CookieConsent';
 import Avatar from '../Avatar';
-import { getStoredCustomAvatar } from '../../utils/profileStorage';
+import { getStoredCustomAvatar, getStoredUsername, setStoredUsername } from '../../utils/profileStorage';
+import { setGuestName } from '../../utils/guestManager';
+import { updateGuestDailyPlayer } from '../../utils/dailyChallenge/guestPlayer';
 import { useEngagementStatus } from '@/hooks/useEngagementStatus';
 import { useDailyMissions } from '@/hooks/useDailyMissions';
 import { useRealtimeNotifications } from '@/hooks/useRealtimeNotifications';
@@ -69,6 +71,36 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
     const { isCrazyGames } = useCrazyGamesAuth();
     const [showMobileMenu, setShowMobileMenu] = useState(false);
     const [badgeSeen, setBadgeSeen] = useState(false);
+
+    // Guest name editing
+    const [guestName, setGuestNameState] = useState<string>(() => getStoredUsername() || '');
+    const [isEditingGuestName, setIsEditingGuestName] = useState(false);
+    const [editGuestNameValue, setEditGuestNameValue] = useState('');
+    const guestNameInputRef = useRef<HTMLInputElement>(null);
+
+    // Refresh guest name when menu opens
+    useEffect(() => {
+        if (showMobileMenu && !isAuthenticated) {
+            setGuestNameState(getStoredUsername() || '');
+        }
+    }, [showMobileMenu, isAuthenticated]);
+
+    const handleStartEditGuestName = useCallback(() => {
+        setEditGuestNameValue(guestName);
+        setIsEditingGuestName(true);
+        setTimeout(() => guestNameInputRef.current?.focus(), 50);
+    }, [guestName]);
+
+    const handleSaveGuestName = useCallback(() => {
+        const trimmed = editGuestNameValue.trim().slice(0, 20);
+        if (trimmed) {
+            setStoredUsername(trimmed);
+            setGuestName(trimmed);
+            updateGuestDailyPlayer({ displayName: trimmed });
+            setGuestNameState(trimmed);
+        }
+        setIsEditingGuestName(false);
+    }, [editGuestNameValue]);
 
     // Aggregate badge: gifts + notifications + completed quests
     const badgeCount = unclaimedCount + (isAuthenticated ? notificationCount : 0) + completedCount;
@@ -327,9 +359,34 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                                         size="lg"
                                                     />
                                                 </div>
-                                                <span className="text-base font-black text-neo-white/60">
-                                                    {t('common.guest')}
-                                                </span>
+                                                {isEditingGuestName ? (
+                                                    <div className="flex items-center gap-2 flex-1 min-w-0">
+                                                        <input
+                                                            ref={guestNameInputRef}
+                                                            type="text"
+                                                            value={editGuestNameValue}
+                                                            onChange={(e) => setEditGuestNameValue(e.target.value)}
+                                                            maxLength={20}
+                                                            className="bg-neo-navy/80 text-neo-white border-2 border-neo-cyan rounded-neo px-2 py-1 text-base font-bold focus:outline-hidden focus:ring-2 focus:ring-neo-cyan w-full max-w-[160px]"
+                                                            onKeyDown={(e) => {
+                                                                if (e.key === 'Enter') handleSaveGuestName();
+                                                                if (e.key === 'Escape') setIsEditingGuestName(false);
+                                                            }}
+                                                            onBlur={handleSaveGuestName}
+                                                        />
+                                                    </div>
+                                                ) : (
+                                                    <button
+                                                        type="button"
+                                                        onClick={handleStartEditGuestName}
+                                                        className="flex items-center gap-2 group min-w-0"
+                                                    >
+                                                        <span className="text-base font-black text-neo-white/60 group-hover:text-neo-cyan transition-colors truncate">
+                                                            {guestName || t('common.guest')}
+                                                        </span>
+                                                        <Pencil className="w-3.5 h-3.5 text-neo-white/30 group-hover:text-neo-cyan shrink-0 transition-colors" />
+                                                    </button>
+                                                )}
                                             </div>
                                             <AuthButton
                                                 inline

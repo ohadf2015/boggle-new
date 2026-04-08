@@ -1,8 +1,8 @@
 /**
  * Tests for unique tile effects in clearTilesProcessor.processTilesForWord.
  * Covers: gold bonus moves, silver countdown extend, diamond reveal turns,
- * ice→virus freeze, wildcard Scrabble scoring, countdown defuse moves,
- * virus mass cure, portal word multiplier, gem completion bonus moves,
+ * wildcard Scrabble scoring, countdown defuse moves,
+ * shuffle board rearrange, magma diagonal clear, portal word multiplier, gem completion bonus moves,
  * prism tile conversion.
  */
 import { processTilesForWord, type TileProcessingInput } from '../utils/clearTilesProcessor';
@@ -115,30 +115,39 @@ describe('processTilesForWord — unique tile effects', () => {
     });
   });
 
-  describe('ice tile: virus freeze', () => {
-    it('converts adjacent virus tiles to ice with 2 hits', () => {
+  describe('shuffle tile: board rearrange', () => {
+    it('sets shuffleTriggered to true when shuffle tile is cleared', () => {
       const grid = makeGrid(4, [
-        { row: 1, col: 1, tile: { type: 'ice' } },
-        { row: 0, col: 1, tile: { type: 'virus' } }, // above
-        { row: 1, col: 2, tile: { type: 'virus' } }, // right
-        { row: 2, col: 2, tile: {} },                  // not adjacent — unchanged
+        { row: 0, col: 0, tile: { type: 'shuffle' } },
       ]);
-      const path = [{ row: 1, col: 0 }, { row: 1, col: 1 }];
+      const path = [{ row: 0, col: 0 }, { row: 0, col: 1 }];
       const result = processTilesForWord(makeInput(grid, path, 'AB'));
-      expect(result.next[0][1].type).toBe('ice');
-      expect(result.next[0][1].hitsRemaining).toBe(2);
-      expect(result.next[0][1].activationEffect).toBe('virus-frozen');
-      expect(result.next[1][2].type).toBe('ice');
+      expect(result.shuffleTriggered).toBe(true);
     });
 
-    it('does not convert non-virus adjacent tiles', () => {
+    it('marks uncleared non-path tiles with shuffle-rearrange activationEffect', () => {
       const grid = makeGrid(4, [
-        { row: 1, col: 1, tile: { type: 'ice' } },
-        { row: 0, col: 1, tile: { type: 'gold' } },
+        { row: 0, col: 0, tile: { type: 'shuffle' } },
       ]);
-      const path = [{ row: 1, col: 0 }, { row: 1, col: 1 }];
+      const path = [{ row: 0, col: 0 }, { row: 0, col: 1 }];
       const result = processTilesForWord(makeInput(grid, path, 'AB'));
-      expect(result.next[0][1].type).toBe('gold'); // unchanged
+      // All uncleared non-path tiles should have activationEffect 'shuffle-rearrange'
+      let rearrangedCount = 0;
+      for (let r = 0; r < 4; r++) {
+        for (let c = 0; c < 4; c++) {
+          if (path.some(p => p.row === r && p.col === c)) continue;
+          if (result.next[r][c].isCleared) continue;
+          if (result.next[r][c].activationEffect === 'shuffle-rearrange') rearrangedCount++;
+        }
+      }
+      expect(rearrangedCount).toBeGreaterThan(0);
+    });
+
+    it('does not set shuffleTriggered when no shuffle tile in word', () => {
+      const grid = makeGrid(4);
+      const path = [{ row: 0, col: 0 }, { row: 0, col: 1 }];
+      const result = processTilesForWord(makeInput(grid, path, 'AB'));
+      expect(result.shuffleTriggered).toBe(false);
     });
   });
 
@@ -186,33 +195,57 @@ describe('processTilesForWord — unique tile effects', () => {
     });
   });
 
-  describe('virus tile: mass cure', () => {
-    it('cures ALL virus on board when 3+ virus cleared in one word', () => {
+  describe('magma tile: diagonal clear', () => {
+    it('clears tiles along both diagonals (X-pattern)', () => {
       const grid = makeGrid(5, [
-        { row: 0, col: 0, tile: { type: 'virus' } },
-        { row: 0, col: 1, tile: { type: 'virus' } },
-        { row: 0, col: 2, tile: { type: 'virus' } },
-        { row: 3, col: 3, tile: { type: 'virus' } }, // not in path — should be cured
-        { row: 4, col: 4, tile: { type: 'virus' } }, // not in path — should be cured
+        { row: 2, col: 2, tile: { type: 'magma' } },
       ]);
-      const path = [{ row: 0, col: 0 }, { row: 0, col: 1 }, { row: 0, col: 2 }];
-      const result = processTilesForWord(makeInput(grid, path, 'ABC'));
-      expect(result.virusMassCure).toBe(true);
+      const path = [{ row: 2, col: 1 }, { row: 2, col: 2 }];
+      const result = processTilesForWord(makeInput(grid, path, 'AB'));
+      // Diagonal corners should be cleared
+      expect(result.next[0][0].isCleared).toBe(true); // top-left diagonal
+      expect(result.next[1][1].isCleared).toBe(true);
       expect(result.next[3][3].isCleared).toBe(true);
-      expect(result.next[4][4].isCleared).toBe(true);
-      expect(result.next[3][3].activationEffect).toBe('virus-cured');
+      expect(result.next[4][4].isCleared).toBe(true); // bottom-right diagonal
+      expect(result.next[0][4].isCleared).toBe(true); // top-right diagonal
+      expect(result.next[1][3].isCleared).toBe(true);
+      expect(result.next[3][1].isCleared).toBe(true);
+      expect(result.next[4][0].isCleared).toBe(true); // bottom-left diagonal
     });
 
-    it('does NOT trigger mass cure with fewer than 3 virus', () => {
+    it('applies MAGMA_MULTIPLIER to score', () => {
       const grid = makeGrid(4, [
-        { row: 0, col: 0, tile: { type: 'virus' } },
-        { row: 0, col: 1, tile: { type: 'virus' } },
-        { row: 3, col: 3, tile: { type: 'virus' } },
+        { row: 0, col: 0, tile: { type: 'magma' } },
       ]);
-      const path = [{ row: 0, col: 0 }, { row: 0, col: 1 }, { row: 0, col: 2 }];
-      const result = processTilesForWord(makeInput(grid, path, 'ABC'));
-      expect(result.virusMassCure).toBe(false);
-      expect(result.next[3][3].isCleared).toBe(false); // untouched
+      const path = [{ row: 0, col: 0 }, { row: 0, col: 1 }];
+      const result = processTilesForWord(makeInput(grid, path, 'AB'));
+      // Score should reflect the magma multiplier (2x)
+      expect(result.totalScore).toBeGreaterThan(10); // base 10 * MAGMA_MULTIPLIER
+    });
+
+    it('chains with bomb tiles on diagonals', () => {
+      const grid = makeGrid(5, [
+        { row: 2, col: 2, tile: { type: 'magma' } },
+        { row: 1, col: 1, tile: { type: 'bomb' } }, // on diagonal — should trigger bomb explosion
+      ]);
+      const path = [{ row: 2, col: 1 }, { row: 2, col: 2 }];
+      const result = processTilesForWord(makeInput(grid, path, 'AB'));
+      expect(result.next[1][1].isCleared).toBe(true); // bomb cleared
+      // Bomb's 3x3 area should also be cleared
+      expect(result.next[0][0].isCleared).toBe(true);
+      expect(result.next[0][1].isCleared).toBe(true);
+      expect(result.next[0][2].isCleared).toBe(true);
+    });
+
+    it('damages multi-hit tiles on diagonals instead of clearing', () => {
+      const grid = makeGrid(5, [
+        { row: 2, col: 2, tile: { type: 'magma' } },
+        { row: 1, col: 1, tile: { type: 'ice', hitsRemaining: 2 } },
+      ]);
+      const path = [{ row: 2, col: 1 }, { row: 2, col: 2 }];
+      const result = processTilesForWord(makeInput(grid, path, 'AB'));
+      expect(result.next[1][1].isCleared).toBe(false);
+      expect(result.next[1][1].hitsRemaining).toBe(1);
     });
   });
 

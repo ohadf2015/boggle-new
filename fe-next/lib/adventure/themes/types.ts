@@ -113,7 +113,7 @@ export interface TileVisualConfig {
 /**
  * Map of tile type to visual config for a world
  */
-export type TileStyleMap = Record<TileType, TileVisualConfig>;
+export type TileStyleMap = Partial<Record<TileType, TileVisualConfig>>;
 
 // ==============================================
 // MODIFIER TYPES

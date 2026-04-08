@@ -231,7 +231,7 @@ export async function setupPushListeners(
       actionListener.remove();
     };
   } catch (error) {
-    console.error('Error setting up push listeners:', error);
+    console.debug('Error setting up push listeners:', error);
     return () => {};
   }
 }

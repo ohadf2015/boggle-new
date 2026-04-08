@@ -481,21 +481,6 @@ describe('useAdventureGame', () => {
       expect(result.current.tiles[0][0].isCleared).toBe(false);
     });
 
-    it('should allow rainbow tile to match any letter', () => {
-      // GIVEN
-      const levelConfig = createMockLevelConfig({
-        specialTiles: [{ row: 0, col: 0, type: 'rainbow' }],
-      });
-      const grid = createMockGrid();
-      const { result } = renderHook(() =>
-        useAdventureGame({ levelConfig, initialGrid: grid })
-      );
-
-      // THEN - Rainbow tile should have isWildcard true
-      expect(result.current.tiles[0][0].type).toBe('rainbow');
-      // The hook should expose method to check if tile is wildcard
-      expect(result.current.isWildcard(0, 0)).toBe(true);
-    });
   });
 
   describe('Timer', () => {

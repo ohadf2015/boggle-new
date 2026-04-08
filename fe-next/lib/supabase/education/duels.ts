@@ -63,12 +63,12 @@ export interface DuelHistoryEntry extends DuelRow {
   challenger: {
     id: string;
     display_name: string;
-    avatar_url: string | null;
+    avatar_config: Record<string, unknown> | null;
   };
   opponent: {
     id: string;
     display_name: string;
-    avatar_url: string | null;
+    avatar_config: Record<string, unknown> | null;
   };
   isWin: boolean;
 }

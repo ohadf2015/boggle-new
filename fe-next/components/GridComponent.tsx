@@ -57,6 +57,8 @@ interface GridComponentProps {
   meteorTiles?: Set<string>;
   /** Ghost mode: transparent bg + invisible cells (blast mode — overlay handles visuals) */
   ghostCells?: boolean;
+  /** Optional adjacency override — return true if cell2 should be reachable from cell1 (e.g. portal teleportation) */
+  isAdjacent?: (cell1: { row: number; col: number }, cell2: { row: number; col: number }) => boolean;
 }
 
 const GridComponent = memo<GridComponentProps>(({
@@ -87,6 +89,7 @@ const GridComponent = memo<GridComponentProps>(({
   chargedTiles,
   meteorTiles,
   ghostCells = false,
+  isAdjacent,
 }) => {
   const [reduceMotion, setReduceMotion] = useState(false);
   const [performanceMode, setPerformanceMode] = useState<PerformanceMode>('full');
@@ -139,6 +142,7 @@ const GridComponent = memo<GridComponentProps>(({
     language,
     disableLetterKeyInput,
     cellFilter,
+    isAdjacent,
   });
 
   // Stable handlers that read row/col from data attributes to avoid inline arrows per cell

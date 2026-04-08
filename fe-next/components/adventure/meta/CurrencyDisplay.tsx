@@ -8,7 +8,7 @@
 'use client';
 
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
-import { toBcp47Locale } from '@/utils/bcp47Locale';
+import { safeToLocaleString } from '@/utils/bcp47Locale';
 import { usePrefersReducedMotion } from '../../../hooks/usePrefersReducedMotion';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 
@@ -51,7 +51,7 @@ export function CurrencyDisplay({
   const { t, language } = useLanguageSafe();
 
   // Format number with locale-aware separators
-  const formattedAmount = amount.toLocaleString(toBcp47Locale(language));
+  const formattedAmount = safeToLocaleString(amount, language);
 
   // Size classes
   const sizeClasses = {

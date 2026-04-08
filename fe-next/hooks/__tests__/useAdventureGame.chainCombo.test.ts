@@ -1,14 +1,12 @@
 /**
- * useAdventureGame Chain Tile Combo Tests
+ * useAdventureGame Chain Tile Tests
  *
- * TDD tests for chain tile combo logic (lines 354-447 in useAdventureGame.ts)
- * Following TDD: Write failing tests FIRST, then verify implementation
- *
- * Chain tile rules:
- * - Applies 1.5x combo multiplier when used during active combo (comboCount > 0)
- * - Marks all 8 adjacent tiles as isChained = true for visual feedback
- * - Sets activationEffect = 'link' on chain tiles
- * - Works correctly with other special tiles (gold 3x stacks with chain 1.5x)
+ * Chain tile type is declared in specialTiles config but is NOT implemented
+ * in processSpecialTileEffects. It is treated as a standard tile:
+ * - No combo multiplier bonus
+ * - No isChained marking on adjacent tiles
+ * - No 'link' activationEffect
+ * - Score equals base score (no chain multiplier)
  */
 
 import { vi } from 'vitest';
@@ -54,7 +52,7 @@ function createMockGrid(size: number = 4): string[][] {
 }
 
 // ==============================================
-// CHAIN TILE 1.5X MULTIPLIER TESTS
+// CHAIN TILE TREATED AS STANDARD TILE
 // ==============================================
 
 describe('Chain Tile 1.5x Combo Multiplier', () => {
@@ -66,10 +64,10 @@ describe('Chain Tile 1.5x Combo Multiplier', () => {
     vi.useRealTimers();
   });
 
-  it('should apply 1.5x multiplier when chain tile used during active combo (comboCount > 0)', () => {
-    // GIVEN - Level with chain tile at (1,1), standard grid
+  it('should NOT apply 1.5x multiplier when chain tile used during active combo — treated as standard', () => {
+    // GIVEN - Level with chain tile (unimplemented), game with active combo
     const levelConfig = createMockLevelConfig({
-      specialTiles: [{ row: 1, col: 1, type: 'chain' }],
+      specialTiles: [{ row: 1, col: 1, type: 'chain' as any }],
       objectives: [{ type: 'wordCount', target: 10, isPrimary: true }],
     });
     const grid = createMockGrid();
@@ -81,10 +79,7 @@ describe('Chain Tile 1.5x Combo Multiplier', () => {
       result.current.startGame();
     });
 
-    // Build combo by submitting words WITHOUT chain tile first
-    const initialScore = result.current.gameState.score;
-
-    // First word: establishes combo (comboCount = 1)
+    // Build combo to 1
     act(() => {
       result.current.submitWordWithPath('TEST', 100, [
         { row: 0, col: 0 },
@@ -96,28 +91,25 @@ describe('Chain Tile 1.5x Combo Multiplier', () => {
 
     expect(result.current.gameState.comboCount).toBe(1);
 
-    // WHEN - Second word uses chain tile during active combo
+    // WHEN - Use "chain tile" during active combo
     const scoreBeforeChain = result.current.gameState.score;
     act(() => {
       result.current.submitWordWithPath('WORD', 100, [
         { row: 1, col: 0 },
-        { row: 1, col: 1 }, // Chain tile
+        { row: 1, col: 1 }, // chain tile — treated as standard
         { row: 1, col: 2 },
         { row: 1, col: 3 },
       ]);
     });
 
-    // THEN - Chain bonus should apply: finalScore * (1 + comboCount * 0.1 * 1.5)
-    // Base score: 100
-    // Chain bonus: 100 * (1 + 1 * 0.1 * 1.5) = 100 * 1.15 = 115 (rounded)
-    const expectedScoreGain = 115;
-    expect(result.current.gameState.score).toBe(scoreBeforeChain + expectedScoreGain);
+    // THEN - No chain bonus. Score gain = 100 (base only, no 1.15 multiplier)
+    expect(result.current.gameState.score).toBe(scoreBeforeChain + 100);
   });
 
   it('should NOT apply multiplier when chain tile used without active combo (comboCount = 0)', () => {
     // GIVEN - Level with chain tile, fresh game (no combo)
     const levelConfig = createMockLevelConfig({
-      specialTiles: [{ row: 0, col: 1, type: 'chain' }],
+      specialTiles: [{ row: 0, col: 1, type: 'chain' as any }],
     });
     const grid = createMockGrid();
     const { result } = renderHook(() =>
@@ -145,10 +137,10 @@ describe('Chain Tile 1.5x Combo Multiplier', () => {
     expect(result.current.gameState.score).toBe(100);
   });
 
-  it('should apply enhanced bonus scaling with combo count (comboCount * 0.1 * 1.5)', () => {
-    // GIVEN - Level with chain tile
+  it('should NOT apply enhanced bonus scaling with higher combo count — chain is standard tile', () => {
+    // GIVEN - Level with chain tile, high combo built
     const levelConfig = createMockLevelConfig({
-      specialTiles: [{ row: 2, col: 2, type: 'chain' }],
+      specialTiles: [{ row: 2, col: 2, type: 'chain' as any }],
       objectives: [{ type: 'wordCount', target: 20, isPrimary: true }],
     });
     const grid = createMockGrid();
@@ -160,7 +152,7 @@ describe('Chain Tile 1.5x Combo Multiplier', () => {
       result.current.startGame();
     });
 
-    // Build combo to 3 (use different words to avoid duplicate rejection)
+    // Build combo to 3
     act(() => {
       result.current.submitWordWithPath('FIRST', 100, [
         { row: 0, col: 0 },
@@ -194,20 +186,19 @@ describe('Chain Tile 1.5x Combo Multiplier', () => {
       result.current.submitWordWithPath('TEST', 100, [
         { row: 2, col: 0 },
         { row: 2, col: 1 },
-        { row: 2, col: 2 }, // Chain tile
+        { row: 2, col: 2 }, // chain tile (standard behavior)
         { row: 2, col: 3 },
       ]);
     });
 
-    // THEN - Enhanced bonus: 100 * (1 + 3 * 0.1 * 1.5) = 100 * 1.45 = 145
-    const expectedScoreGain = 145;
-    expect(result.current.gameState.score).toBe(scoreBeforeChain + expectedScoreGain);
+    // THEN - No chain bonus: 100 (no 1.45 multiplier)
+    expect(result.current.gameState.score).toBe(scoreBeforeChain + 100);
   });
 
-  it('should correctly round the score after chain bonus calculation', () => {
+  it('should NOT round differently — chain tile is standard, score equals base score', () => {
     // GIVEN - Level with chain tile
     const levelConfig = createMockLevelConfig({
-      specialTiles: [{ row: 0, col: 1, type: 'chain' }],
+      specialTiles: [{ row: 0, col: 1, type: 'chain' as any }],
       objectives: [{ type: 'wordCount', target: 10, isPrimary: true }],
     });
     const grid = createMockGrid();
@@ -229,32 +220,31 @@ describe('Chain Tile 1.5x Combo Multiplier', () => {
       ]);
     });
 
-    // WHEN - Use chain tile with score that results in decimal
+    // WHEN - Use chain tile with odd score
     const scoreBeforeChain = result.current.gameState.score;
     act(() => {
       result.current.submitWordWithPath('TEST', 97, [
         { row: 0, col: 0 },
-        { row: 0, col: 1 }, // Chain tile
+        { row: 0, col: 1 }, // Chain tile (standard)
         { row: 0, col: 2 },
         { row: 0, col: 3 },
       ]);
     });
 
-    // THEN - Should round: 97 * 1.15 = 111.55 → 112 (Math.round)
-    const expectedScoreGain = 112;
-    expect(result.current.gameState.score).toBe(scoreBeforeChain + expectedScoreGain);
+    // THEN - Score = 97 exactly (no chain rounding, chain = standard)
+    expect(result.current.gameState.score).toBe(scoreBeforeChain + 97);
   });
 });
 
 // ==============================================
-// CHAIN TILE ADJACENT LINKING TESTS
+// CHAIN TILE ADJACENT LINKING — NOT IMPLEMENTED
 // ==============================================
 
 describe('Chain Tile Adjacent Linking', () => {
-  it('should mark all 8 adjacent tiles as isChained = true', () => {
-    // GIVEN - Level with chain tile at center (1,1) of 4x4 grid
+  it('should NOT mark adjacent tiles as isChained — chain is treated as standard', () => {
+    // GIVEN - Level with chain tile at center (1,1)
     const levelConfig = createMockLevelConfig({
-      specialTiles: [{ row: 1, col: 1, type: 'chain' }],
+      specialTiles: [{ row: 1, col: 1, type: 'chain' as any }],
     });
     const grid = createMockGrid();
     const { result } = renderHook(() =>
@@ -269,34 +259,28 @@ describe('Chain Tile Adjacent Linking', () => {
     act(() => {
       result.current.submitWordWithPath('TEST', 100, [
         { row: 1, col: 0 },
-        { row: 1, col: 1 }, // Chain tile at center
+        { row: 1, col: 1 }, // chain tile at center
         { row: 1, col: 2 },
         { row: 1, col: 3 },
       ]);
     });
 
-    // THEN - All 8 neighbors should be marked as chained
+    // THEN - No adjacent tiles are marked isChained (not implemented)
     const tiles = result.current.tiles;
-
-    // Top-left, top, top-right
-    expect(tiles[0][0].isChained).toBe(true);
-    expect(tiles[0][1].isChained).toBe(true);
-    expect(tiles[0][2].isChained).toBe(true);
-
-    // Left, right (center is the chain tile itself)
-    expect(tiles[1][0].isChained).toBe(true);
-    expect(tiles[1][2].isChained).toBe(true);
-
-    // Bottom-left, bottom, bottom-right
-    expect(tiles[2][0].isChained).toBe(true);
-    expect(tiles[2][1].isChained).toBe(true);
-    expect(tiles[2][2].isChained).toBe(true);
+    expect(tiles[0][0].isChained).toBeFalsy();
+    expect(tiles[0][1].isChained).toBeFalsy();
+    expect(tiles[0][2].isChained).toBeFalsy();
+    expect(tiles[1][0].isChained).toBeFalsy();
+    expect(tiles[1][2].isChained).toBeFalsy();
+    expect(tiles[2][0].isChained).toBeFalsy();
+    expect(tiles[2][1].isChained).toBeFalsy();
+    expect(tiles[2][2].isChained).toBeFalsy();
   });
 
   it('should NOT mark tiles beyond adjacency range', () => {
     // GIVEN - Level with chain tile at (1,1)
     const levelConfig = createMockLevelConfig({
-      specialTiles: [{ row: 1, col: 1, type: 'chain' }],
+      specialTiles: [{ row: 1, col: 1, type: 'chain' as any }],
     });
     const grid = createMockGrid();
     const { result } = renderHook(() =>
@@ -317,20 +301,18 @@ describe('Chain Tile Adjacent Linking', () => {
       ]);
     });
 
-    // THEN - Tiles at distance 2+ should NOT be chained
+    // THEN - Tiles at distance 2+ should NOT be chained (they're never chained)
     const tiles = result.current.tiles;
-
-    // Row 3 (distance 2 from chain tile)
     expect(tiles[3][0].isChained).toBeFalsy();
     expect(tiles[3][1].isChained).toBeFalsy();
     expect(tiles[3][2].isChained).toBeFalsy();
     expect(tiles[3][3].isChained).toBeFalsy();
   });
 
-  it('should handle edge case: chain tile at grid corner (0,0)', () => {
-    // GIVEN - Chain tile at top-left corner
+  it('should handle chain tile at grid corner (0,0) without crash — no isChained set', () => {
+    // GIVEN - chain tile at top-left corner
     const levelConfig = createMockLevelConfig({
-      specialTiles: [{ row: 0, col: 0, type: 'chain' }],
+      specialTiles: [{ row: 0, col: 0, type: 'chain' as any }],
     });
     const grid = createMockGrid();
     const { result } = renderHook(() =>
@@ -344,28 +326,24 @@ describe('Chain Tile Adjacent Linking', () => {
     // WHEN - Use chain tile at corner
     act(() => {
       result.current.submitWordWithPath('TEST', 100, [
-        { row: 0, col: 0 }, // Chain tile at corner
+        { row: 0, col: 0 }, // chain tile at corner
         { row: 0, col: 1 },
         { row: 0, col: 2 },
         { row: 0, col: 3 },
       ]);
     });
 
-    // THEN - Only 3 valid neighbors should be chained (right, bottom, bottom-right)
+    // THEN - No neighbor tiles are chained (not implemented)
     const tiles = result.current.tiles;
-
-    expect(tiles[0][1].isChained).toBe(true); // Right
-    expect(tiles[1][0].isChained).toBe(true); // Bottom
-    expect(tiles[1][1].isChained).toBe(true); // Bottom-right
-
-    // Out-of-bounds neighbors should not cause errors
-    // (no need to check, just verify no crash)
+    expect(tiles[0][1].isChained).toBeFalsy();
+    expect(tiles[1][0].isChained).toBeFalsy();
+    expect(tiles[1][1].isChained).toBeFalsy();
   });
 
-  it('should handle edge case: chain tile at grid edge (1,0)', () => {
-    // GIVEN - Chain tile at left edge
+  it('should handle chain tile at grid edge (1,0) without crash — no isChained set', () => {
+    // GIVEN - chain tile at left edge
     const levelConfig = createMockLevelConfig({
-      specialTiles: [{ row: 1, col: 0, type: 'chain' }],
+      specialTiles: [{ row: 1, col: 0, type: 'chain' as any }],
     });
     const grid = createMockGrid();
     const { result } = renderHook(() =>
@@ -379,38 +357,32 @@ describe('Chain Tile Adjacent Linking', () => {
     // WHEN - Use chain tile at edge
     act(() => {
       result.current.submitWordWithPath('TEST', 100, [
-        { row: 1, col: 0 }, // Chain tile at left edge
+        { row: 1, col: 0 }, // chain tile at left edge
         { row: 1, col: 1 },
         { row: 1, col: 2 },
         { row: 1, col: 3 },
       ]);
     });
 
-    // THEN - Only 5 valid neighbors should be chained
+    // THEN - No adjacent tiles marked isChained
     const tiles = result.current.tiles;
-
-    // Top, top-right
-    expect(tiles[0][0].isChained).toBe(true);
-    expect(tiles[0][1].isChained).toBe(true);
-
-    // Right
-    expect(tiles[1][1].isChained).toBe(true);
-
-    // Bottom, bottom-right
-    expect(tiles[2][0].isChained).toBe(true);
-    expect(tiles[2][1].isChained).toBe(true);
+    expect(tiles[0][0].isChained).toBeFalsy();
+    expect(tiles[0][1].isChained).toBeFalsy();
+    expect(tiles[1][1].isChained).toBeFalsy();
+    expect(tiles[2][0].isChained).toBeFalsy();
+    expect(tiles[2][1].isChained).toBeFalsy();
   });
 });
 
 // ==============================================
-// CHAIN TILE ACTIVATION EFFECT TESTS
+// CHAIN TILE ACTIVATION EFFECT — NOT IMPLEMENTED
 // ==============================================
 
 describe('Chain Tile Activation Effect', () => {
-  it('should set activationEffect = "link" on chain tiles', () => {
+  it('should NOT set activationEffect on chain tiles — no "link" effect implemented', () => {
     // GIVEN - Level with chain tile
     const levelConfig = createMockLevelConfig({
-      specialTiles: [{ row: 1, col: 1, type: 'chain' }],
+      specialTiles: [{ row: 1, col: 1, type: 'chain' as any }],
     });
     const grid = createMockGrid();
     const { result } = renderHook(() =>
@@ -425,21 +397,21 @@ describe('Chain Tile Activation Effect', () => {
     act(() => {
       result.current.submitWordWithPath('TEST', 100, [
         { row: 1, col: 0 },
-        { row: 1, col: 1 }, // Chain tile
+        { row: 1, col: 1 }, // chain tile
         { row: 1, col: 2 },
         { row: 1, col: 3 },
       ]);
     });
 
-    // THEN - Chain tile should have 'link' activation effect
+    // THEN - Chain tile has null activationEffect (treated as standard)
     const chainTile = result.current.tiles[1][1];
-    expect(chainTile.activationEffect).toBe('link');
+    expect(chainTile.activationEffect).toBeNull();
   });
 
-  it('should set activationTimestamp for animation timing', () => {
+  it('should NOT set activationTimestamp for chain tile (no animation, standard tile behavior)', () => {
     // GIVEN - Level with chain tile
     const levelConfig = createMockLevelConfig({
-      specialTiles: [{ row: 0, col: 1, type: 'chain' }],
+      specialTiles: [{ row: 0, col: 1, type: 'chain' as any }],
     });
     const grid = createMockGrid();
     const { result } = renderHook(() =>
@@ -454,23 +426,22 @@ describe('Chain Tile Activation Effect', () => {
     act(() => {
       result.current.submitWordWithPath('TEST', 100, [
         { row: 0, col: 0 },
-        { row: 0, col: 1 }, // Chain tile
+        { row: 0, col: 1 }, // chain tile
         { row: 0, col: 2 },
         { row: 0, col: 3 },
       ]);
     });
 
-    // THEN - Chain tile should have activationTimestamp set
+    // THEN - No activation timestamp set (chain treated as standard)
     const chainTile = result.current.tiles[0][1];
-    expect(chainTile.activationTimestamp).toBeDefined();
-    expect(typeof chainTile.activationTimestamp).toBe('number');
-    expect(chainTile.activationTimestamp).toBeGreaterThan(0);
+    expect(chainTile.activationEffect).toBeNull();
+    expect(chainTile.activationTimestamp).toBeUndefined();
   });
 
-  it('should set activation effect even without combo bonus (visual feedback)', () => {
+  it('should NOT set activation effect without combo bonus — chain is purely standard', () => {
     // GIVEN - Level with chain tile, no active combo
     const levelConfig = createMockLevelConfig({
-      specialTiles: [{ row: 0, col: 1, type: 'chain' }],
+      specialTiles: [{ row: 0, col: 1, type: 'chain' as any }],
     });
     const grid = createMockGrid();
     const { result } = renderHook(() =>
@@ -487,16 +458,16 @@ describe('Chain Tile Activation Effect', () => {
     act(() => {
       result.current.submitWordWithPath('TEST', 100, [
         { row: 0, col: 0 },
-        { row: 0, col: 1 }, // Chain tile
+        { row: 0, col: 1 }, // chain tile
         { row: 0, col: 2 },
         { row: 0, col: 3 },
       ]);
     });
 
-    // THEN - Should still set 'link' effect for visual feedback
+    // THEN - No activation effect (no visual feedback for unimplemented chain)
     const chainTile = result.current.tiles[0][1];
-    expect(chainTile.activationEffect).toBe('link');
-    expect(chainTile.activationTimestamp).toBeDefined();
+    expect(chainTile.activationEffect).toBeNull();
+    expect(chainTile.activationTimestamp).toBeUndefined();
   });
 });
 
@@ -505,11 +476,11 @@ describe('Chain Tile Activation Effect', () => {
 // ==============================================
 
 describe('Chain Tile Special Tile Interactions', () => {
-  it('should stack chain bonus with gold tile multiplier (gold 3x * chain bonus)', () => {
+  it('should NOT stack chain bonus with gold tile — gold 3x only, no chain multiplier', () => {
     // GIVEN - Level with both chain and gold tiles
     const levelConfig = createMockLevelConfig({
       specialTiles: [
-        { row: 0, col: 1, type: 'chain' },
+        { row: 0, col: 1, type: 'chain' as any },
         { row: 0, col: 2, type: 'gold' },
       ],
       objectives: [{ type: 'wordCount', target: 10, isPrimary: true }],
@@ -535,30 +506,26 @@ describe('Chain Tile Special Tile Interactions', () => {
 
     expect(result.current.gameState.comboCount).toBe(1);
 
-    // WHEN - Use word with both chain and gold tiles
+    // WHEN - Use word with both chain (standard) and gold tiles
     const scoreBeforeWord = result.current.gameState.score;
     act(() => {
       result.current.submitWordWithPath('TEST', 100, [
         { row: 0, col: 0 },
-        { row: 0, col: 1 }, // Chain tile
-        { row: 0, col: 2 }, // Gold tile
+        { row: 0, col: 1 }, // chain tile (standard — no 1.5x)
+        { row: 0, col: 2 }, // gold tile (3x)
         { row: 0, col: 3 },
       ]);
     });
 
-    // THEN - Multipliers should stack:
-    // Base: 100
-    // Gold: 100 * 3 = 300
-    // Chain bonus: 300 * (1 + 1 * 0.1 * 1.5) = 300 * 1.15 = 345
-    const expectedScoreGain = 345;
-    expect(result.current.gameState.score).toBe(scoreBeforeWord + expectedScoreGain);
+    // THEN - Gold 3x only: 100 * 3 = 300 (no chain 1.15x stacking)
+    expect(result.current.gameState.score).toBe(scoreBeforeWord + 300);
   });
 
-  it('should apply chain adjacent linking to unfreeze ice tiles', () => {
+  it('should NOT apply chain adjacent linking to ice tiles — isChained stays falsy', () => {
     // GIVEN - Level with chain tile adjacent to ice tile
     const levelConfig = createMockLevelConfig({
       specialTiles: [
-        { row: 1, col: 1, type: 'chain' },
+        { row: 1, col: 1, type: 'chain' as any },
         { row: 0, col: 0, type: 'ice' }, // Adjacent to chain tile
       ],
     });
@@ -575,27 +542,25 @@ describe('Chain Tile Special Tile Interactions', () => {
     expect(result.current.tiles[0][0].isFrozen).toBe(true);
     expect(result.current.tiles[0][0].type).toBe('ice');
 
-    // WHEN - Use chain tile (adjacent linking happens AFTER word submission)
+    // WHEN - Use chain tile (no adjacent linking implemented)
     act(() => {
       result.current.submitWordWithPath('TEST', 100, [
         { row: 1, col: 0 },
-        { row: 1, col: 1 }, // Chain tile
+        { row: 1, col: 1 }, // chain tile
         { row: 1, col: 2 },
         { row: 1, col: 3 },
       ]);
     });
 
-    // THEN - Ice tile should be marked as chained (visual feedback)
-    // Note: Chain linking marks tiles as isChained, but doesn't melt ice
-    // Ice melting happens when adjacent to used tiles (different mechanism)
-    expect(result.current.tiles[0][0].isChained).toBe(true);
+    // THEN - Ice tile is NOT marked isChained (chain linking not implemented)
+    expect(result.current.tiles[0][0].isChained).toBeFalsy();
   });
 
-  it('should apply chain bonus before bomb row clear', () => {
+  it('should NOT apply chain bonus before bomb — bomb 2x only, no chain multiplier', () => {
     // GIVEN - Level with chain and bomb tiles
     const levelConfig = createMockLevelConfig({
       specialTiles: [
-        { row: 1, col: 1, type: 'chain' },
+        { row: 1, col: 1, type: 'chain' as any },
         { row: 1, col: 2, type: 'bomb' },
       ],
       objectives: [{ type: 'wordCount', target: 10, isPrimary: true }],
@@ -621,32 +586,31 @@ describe('Chain Tile Special Tile Interactions', () => {
 
     expect(result.current.gameState.comboCount).toBe(1);
 
-    // WHEN - Use word with both chain and bomb tiles
+    // WHEN - Use word with chain (standard) and bomb
     const scoreBeforeWord = result.current.gameState.score;
     act(() => {
       result.current.submitWordWithPath('TEST', 100, [
         { row: 1, col: 0 },
-        { row: 1, col: 1 }, // Chain tile
-        { row: 1, col: 2 }, // Bomb tile
+        { row: 1, col: 1 }, // chain tile (standard)
+        { row: 1, col: 2 }, // bomb tile (2x)
         { row: 1, col: 3 },
       ]);
     });
 
-    // THEN - Chain bonus 1.15x then bomb doubles: 100 * 1.15 * 2 = 230
-    const expectedScoreGain = 230;
-    expect(result.current.gameState.score).toBe(scoreBeforeWord + expectedScoreGain);
+    // THEN - Bomb 2x only: 100 * 2 = 200 (no chain 1.15x)
+    expect(result.current.gameState.score).toBe(scoreBeforeWord + 200);
 
-    // Bomb tile cleared (score bomb), but non-path tiles in row are NOT cleared
-    expect(result.current.tiles[1][2].isCleared).toBe(true); // bomb tile in path
-    expect(result.current.tiles[0][0].isCleared).toBe(false); // other row untouched
+    // Bomb tile cleared
+    expect(result.current.tiles[1][2].isCleared).toBe(true);
+    expect(result.current.tiles[0][0].isCleared).toBe(false);
   });
 
-  it('should handle multiple chain tiles in the same word', () => {
+  it('should handle multiple chain tiles in the same word — all treated as standard, no link effect', () => {
     // GIVEN - Level with two chain tiles
     const levelConfig = createMockLevelConfig({
       specialTiles: [
-        { row: 0, col: 1, type: 'chain' },
-        { row: 0, col: 2, type: 'chain' },
+        { row: 0, col: 1, type: 'chain' as any },
+        { row: 0, col: 2, type: 'chain' as any },
       ],
       objectives: [{ type: 'wordCount', target: 10, isPrimary: true }],
     });
@@ -676,25 +640,21 @@ describe('Chain Tile Special Tile Interactions', () => {
     act(() => {
       result.current.submitWordWithPath('TEST', 100, [
         { row: 0, col: 0 },
-        { row: 0, col: 1 }, // Chain tile 1
-        { row: 0, col: 2 }, // Chain tile 2
+        { row: 0, col: 1 }, // chain tile 1 (standard)
+        { row: 0, col: 2 }, // chain tile 2 (standard)
         { row: 0, col: 3 },
       ]);
     });
 
-    // THEN - Chain bonus should still apply once (shared multiplier)
-    // Base: 100
-    // Chain bonus: 100 * 1.15 = 115
-    const expectedScoreGain = 115;
-    expect(result.current.gameState.score).toBe(scoreBeforeWord + expectedScoreGain);
+    // THEN - No chain bonus: 100 (base only)
+    expect(result.current.gameState.score).toBe(scoreBeforeWord + 100);
 
-    // Both chain tiles should have 'link' effect
-    expect(result.current.tiles[0][1].activationEffect).toBe('link');
-    expect(result.current.tiles[0][2].activationEffect).toBe('link');
+    // Neither chain tile has activation effect
+    expect(result.current.tiles[0][1].activationEffect).toBeNull();
+    expect(result.current.tiles[0][2].activationEffect).toBeNull();
 
-    // Both should mark their neighbors as chained
-    // (This creates overlapping chained areas)
-    expect(result.current.tiles[0][0].isChained).toBe(true); // Neighbor of chain1
-    expect(result.current.tiles[0][3].isChained).toBe(true); // Neighbor of chain2
+    // No isChained marking on neighbors
+    expect(result.current.tiles[0][0].isChained).toBeFalsy();
+    expect(result.current.tiles[0][3].isChained).toBeFalsy();
   });
 });

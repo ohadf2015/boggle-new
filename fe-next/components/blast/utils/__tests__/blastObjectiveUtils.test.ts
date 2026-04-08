@@ -59,6 +59,7 @@ describe('formatObjectiveLabel', () => {
       'blast.objective.collectType': 'Collect {target} {tileType} tiles',
       'blast.objective.clearAllType': 'Clear all {tileType} tiles',
       'blast.objective.wordLength': 'Find {target} words with {minWordLength}+ letters',
+      'blast.objective.clearPercent': 'Clear {target}% of the board',
     };
     return map[key] || key;
   };
@@ -81,5 +82,10 @@ describe('formatObjectiveLabel', () => {
   it('formats word_length objective', () => {
     const obj: BlastObjective = { type: 'word_length', target: 2, minWordLength: 5 };
     expect(formatObjectiveLabel(obj, mockT)).toBe('Find 2 words with 5+ letters');
+  });
+
+  it('formats clear_percent objective', () => {
+    const obj: BlastObjective = { type: 'clear_percent', target: 90 };
+    expect(formatObjectiveLabel(obj, mockT)).toBe('Clear 90% of the board');
   });
 });

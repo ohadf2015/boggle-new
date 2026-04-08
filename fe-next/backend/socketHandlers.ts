@@ -69,14 +69,14 @@ function initializeSocketHandlers(io: Server): void {
     // Initialize rate limiting for this socket with IP tracking
     initRateLimit(socket);
 
-    // Register friends:setAuth once — use JWT-verified identity, never trust client payload
-    socket.on('friends:setAuth', () => {
-      const userId = socket.data?.verifiedUserId;
-      if (!userId || typeof userId !== 'string') return;
-      (socket as any).authUserId = userId;
-      socket.join(`user:${userId}`);
-      logger.debug('SOCKET', `Socket ${socket.id} joined user room user:${userId}`);
-    });
+    // Auto-join user room for authenticated sockets so social features
+    // (gifts, friend challenges, messaging) can broadcast via `user:<id>` room.
+    // verifiedUserId is set by JWT middleware in socketSetup.ts.
+    const verifiedUserId = socket.data?.verifiedUserId;
+    if (verifiedUserId && typeof verifiedUserId === 'string') {
+      socket.join(`user:${verifiedUserId}`);
+      logger.debug('SOCKET', `Socket ${socket.id} joined user room user:${verifiedUserId}`);
+    }
 
     // Clean up rate limiting and all listeners on disconnect.
     // removeAllListeners() prevents listener accumulation from reconnects

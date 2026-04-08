@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useMemo } from 'react';
+import { useSpring, animated } from '@react-spring/web';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { TrendingUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -79,74 +80,70 @@ export const AccumulatedScoreDisplay: React.FC<AccumulatedScoreDisplayProps> = (
   // Memoize color classes to prevent recalculation on every render
   const scoreColors = useMemo(() => getScoreColorClasses(currentScore), [currentScore]);
 
+  // Smooth counting animation — interpolates score on every frame
+  const springProps = useSpring({
+    val: Math.max(0, currentScore),
+    from: { val: 0 },
+    config: { tension: 120, friction: 20 },
+  });
+
   return (
-    <div className="relative">
-      {/* Score Container */}
+    <div className="relative @container">
+      {/* Score Container — lightweight HUD style */}
       <AdaptiveMotion.div
         className={cn(
-          'relative flex flex-col items-center gap-0.5',
+          'relative flex items-center gap-2',
           'px-3 py-1.5',
-          'bg-linear-to-br',
-          scoreColors.gradient,
-          'border-neo-thick border-neo-black',
-          'rounded-neo',
-          'shadow-hard',
-          '@container'
+          'bg-neo-black/60 backdrop-blur-sm',
+          'border-2 border-neo-cream/15',
+          'rounded-full',
+          isAnimating && 'score-glow-pulse',
         )}
-        animate={isAnimating ? { scale: [1, 1.15, 1] } : { scale: 1 }}
+        animate={isAnimating ? { scale: [1, 1.1, 1] } : { scale: 1 }}
         transition={{
-          duration: 0.4,
+          duration: 0.3,
           type: 'spring',
-          damping: 15,
-          stiffness: 300,
+          damping: 18,
+          stiffness: 350,
         }}
       >
-        {/* Label */}
-        <div className="flex items-center gap-1">
-          <TrendingUp className={cn('w-3 h-3', scoreColors.iconColor)} />
-          <span className={cn(
-            'text-[8px] @[80px]:text-[9px] @[100px]:text-[10px] font-bold uppercase tracking-wide font-neo-body',
-            scoreColors.textColor
-          )}>
-            {t('wordHunt.survival.accumulatedScore')}
-          </span>
+        {/* Icon with tier color glow */}
+        <div className={cn(
+          'w-5 h-5 rounded-full flex items-center justify-center',
+          'bg-linear-to-br',
+          scoreColors.gradient,
+        )}>
+          <TrendingUp className="w-3 h-3 text-neo-black" />
         </div>
 
         {/* Score Value */}
         <div className="relative">
-          <AdaptiveMotion.div
-            key={currentScore}
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className={cn(
-              'text-2xl @[80px]:text-3xl @[120px]:text-4xl font-black font-neo-display',
-              scoreColors.textColor
-            )}
+          <animated.span
+            className="text-xl @[100px]:text-2xl font-black font-neo-display text-neo-cream tabular-nums block"
           >
-            {Math.max(0, Math.round(currentScore))}
-          </AdaptiveMotion.div>
+            {springProps.val.to((v) => Math.round(v).toLocaleString())}
+          </animated.span>
 
-          {/* Increment Badge */}
+          {/* Floating increment */}
           <AdaptiveAnimatePresence>
             {lastIncrement !== null && lastIncrement !== 0 && (
               <AdaptiveMotion.div
                 initial={{ opacity: 0, y: 0, scale: 0.5 }}
                 animate={{
                   opacity: [0, 1, 1, 0],
-                  y: [0, -20, -25, -30],
-                  scale: [0.5, 1.2, 1, 0.8],
+                  y: [0, -18, -24, -30],
+                  scale: [0.5, 1.1, 1, 0.8],
                 }}
                 exit={{ opacity: 0, scale: 0 }}
-                transition={{ duration: 0.6, ease: 'easeOut' }}
+                transition={{ duration: 0.55, ease: 'easeOut' }}
                 className={cn(
-                  'absolute -top-4 -right-6',
+                  'absolute -top-5 -right-4',
                   'px-1.5 py-0.5',
-                  'text-xs font-black font-neo-display',
-                  'rounded-neo border-2 border-neo-black',
-                  'shadow-hard-sm',
+                  'text-[11px] font-black font-neo-display',
+                  'rounded-full',
                   lastIncrement > 0
-                    ? 'bg-neo-cyan text-neo-black'
-                    : 'bg-neo-pink text-white'
+                    ? 'text-neo-lime drop-shadow-[0_0_6px_rgba(191,255,0,0.6)]'
+                    : 'text-neo-pink drop-shadow-[0_0_6px_rgba(255,20,147,0.6)]'
                 )}
               >
                 {lastIncrement > 0 ? '+' : ''}
@@ -154,11 +151,6 @@ export const AccumulatedScoreDisplay: React.FC<AccumulatedScoreDisplayProps> = (
               </AdaptiveMotion.div>
             )}
           </AdaptiveAnimatePresence>
-        </div>
-
-        {/* Tooltip Hint (on larger screens) */}
-        <div className="hidden @[120px]:block text-[8px] text-neo-black/60 font-bold">
-          {t('wordHunt.survival.scoreBreakdownTooltip')}
         </div>
       </AdaptiveMotion.div>
     </div>

@@ -71,7 +71,7 @@ export function getWorldTheme(worldId: number): WorldTheme {
  */
 export function getTileVisualConfig(worldId: number, tileType: TileType): TileVisualConfig {
   const theme = getWorldTheme(worldId);
-  return theme.tileStyles[tileType];
+  return theme.tileStyles[tileType] ?? theme.tileStyles['standard']!;
 }
 
 /**
