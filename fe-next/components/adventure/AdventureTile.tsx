@@ -75,6 +75,10 @@ const TILE_TYPE_CLASSES: Record<TileType, string> = {
   ice: 'tile-ice',
   bomb: 'tile-bomb',
   time: 'tile-time',
+  locked: 'tile-locked',
+  rainbow: 'tile-rainbow',
+  chain: 'tile-chain',
+  multiplier: 'tile-multiplier',
 };
 
 // ==============================================

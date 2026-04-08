@@ -51,7 +51,7 @@ interface LevelPreviewCardProps {
 // ==============================================
 
 /** Map tile types to icons and translation keys */
-const TILE_TYPE_INFO: Record<Exclude<TileType, 'standard'>, { icon: React.ComponentType<{ className?: string }>; key: string; color: string }> = {
+const TILE_TYPE_INFO: Partial<Record<Exclude<TileType, 'standard'>, { icon: React.ComponentType<{ className?: string }>; key: string; color: string }>> = {
   gold: { icon: Gem, key: 'adventure.tiles.gold', color: 'text-neo-yellow' },
   ice: { icon: Snowflake, key: 'adventure.tiles.ice', color: 'text-neo-cyan' },
   bomb: { icon: Bomb, key: 'adventure.tiles.bomb', color: 'text-neo-red' },
@@ -240,7 +240,9 @@ const LevelPreviewCard = memo<LevelPreviewCardProps>(
           {uniqueSpecialTiles.length > 0 ? (
             <div className="flex flex-wrap gap-2">
               {uniqueSpecialTiles.map((tileType) => {
-                const { icon: Icon, key, color } = TILE_TYPE_INFO[tileType];
+                const info = TILE_TYPE_INFO[tileType];
+                if (!info) return null;
+                const { icon: Icon, key, color } = info;
                 return (
                   <div
                     key={tileType}
