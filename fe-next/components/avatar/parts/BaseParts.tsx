@@ -13,12 +13,14 @@ interface BasePartProps {
 
 const Nose = () => (
   <g>
-    {/* Ball-shaped nose tip for visibility */}
-    <ellipse cx="50" cy="56" rx="2.5" ry="2" fill="#000" opacity="0.08" />
-    <path d="M47 53 Q50 58 53 53" fill="none" stroke="#000" strokeWidth={2} opacity="0.5" strokeLinecap="round" />
-    {/* Nostril hints */}
-    <circle cx="48.5" cy="56.5" r="0.8" fill="#000" opacity="0.2" />
-    <circle cx="51.5" cy="56.5" r="0.8" fill="#000" opacity="0.2" />
+    {/* Kawaii button nose — soft rounded shape with highlight */}
+    <ellipse cx="50" cy="55" rx="3.5" ry="2.8" fill="#000" opacity="0.1" />
+    <path d="M47.5 53 C48 56.5 50 58 50 58 C50 58 52 56.5 52.5 53" fill="none" stroke="#000" strokeWidth={1.8} opacity="0.45" strokeLinecap="round" />
+    {/* Nose highlight for 3D feel */}
+    <ellipse cx="49" cy="54" rx="1.5" ry="1" fill="#fff" opacity="0.15" />
+    {/* Soft nostril hints */}
+    <ellipse cx="48" cy="56" rx="1" ry="0.6" fill="#000" opacity="0.15" />
+    <ellipse cx="52" cy="56" rx="1" ry="0.6" fill="#000" opacity="0.15" />
   </g>
 );
 
@@ -26,8 +28,16 @@ function Round({ fill }: BasePartProps) {
   return (
     <g>
       <circle cx="50" cy="52" r="30" fill={fill} stroke="#000" strokeWidth={S} />
-      <circle cx="50" cy="52" r="27" fill="none" stroke="#000" strokeWidth={1} opacity="0.08" />
-      <path d="M38 70 Q50 76 62 70" fill="#fff" opacity="0.1" />
+      {/* Ear bumps peeking out */}
+      <ellipse cx="19" cy="52" rx="4" ry="6" fill={fill} stroke="#000" strokeWidth={2} />
+      <ellipse cx="81" cy="52" rx="4" ry="6" fill={fill} stroke="#000" strokeWidth={2} />
+      {/* Inner ear shadow */}
+      <ellipse cx="19.5" cy="53" rx="2" ry="3.5" fill="#000" opacity="0.08" />
+      <ellipse cx="80.5" cy="53" rx="2" ry="3.5" fill="#000" opacity="0.08" />
+      {/* Forehead shine arc */}
+      <path d="M36 34 Q50 28 64 34" fill="none" stroke="#fff" strokeWidth={1.5} opacity="0.18" strokeLinecap="round" />
+      {/* Chin softness */}
+      <path d="M40 72 Q50 78 60 72" fill="#fff" opacity="0.08" />
       <Nose />
     </g>
   );
@@ -36,9 +46,17 @@ function Round({ fill }: BasePartProps) {
 function Square({ fill }: BasePartProps) {
   return (
     <g>
-      <rect x="20" y="22" width="60" height="60" rx="8" fill={fill} stroke="#000" strokeWidth={S} />
-      <rect x="24" y="26" width="52" height="52" rx="5" fill="none" stroke="#fff" strokeWidth={1} opacity="0.12" />
-      <path d="M28 72 Q50 78 72 72" fill="#000" opacity="0.06" />
+      {/* Ear bumps */}
+      <ellipse cx="19" cy="50" rx="4" ry="6" fill={fill} stroke="#000" strokeWidth={2} />
+      <ellipse cx="81" cy="50" rx="4" ry="6" fill={fill} stroke="#000" strokeWidth={2} />
+      <ellipse cx="19.5" cy="51" rx="2" ry="3.5" fill="#000" opacity="0.08" />
+      <ellipse cx="80.5" cy="51" rx="2" ry="3.5" fill="#000" opacity="0.08" />
+      {/* Softer rounded square — more rx for kawaii feel */}
+      <rect x="20" y="22" width="60" height="60" rx="12" fill={fill} stroke="#000" strokeWidth={S} />
+      {/* Forehead shine */}
+      <path d="M32 30 Q50 24 68 30" fill="none" stroke="#fff" strokeWidth={1.5} opacity="0.14" strokeLinecap="round" />
+      {/* Jaw shadow */}
+      <path d="M28 72 Q50 78 72 72" fill="#000" opacity="0.05" />
       <Nose />
     </g>
   );
@@ -47,10 +65,19 @@ function Square({ fill }: BasePartProps) {
 function Oval({ fill }: BasePartProps) {
   return (
     <g>
+      {/* Ear bumps */}
+      <ellipse cx="21" cy="50" rx="4" ry="6.5" fill={fill} stroke="#000" strokeWidth={2} />
+      <ellipse cx="79" cy="50" rx="4" ry="6.5" fill={fill} stroke="#000" strokeWidth={2} />
+      <ellipse cx="21.5" cy="51" rx="2" ry="3.5" fill="#000" opacity="0.08" />
+      <ellipse cx="78.5" cy="51" rx="2" ry="3.5" fill="#000" opacity="0.08" />
       <ellipse cx="50" cy="52" rx="28" ry="33" fill={fill} stroke="#000" strokeWidth={S} />
-      <ellipse cx="34" cy="48" rx="6" ry="8" fill="#000" opacity="0.04" />
-      <ellipse cx="66" cy="48" rx="6" ry="8" fill="#000" opacity="0.04" />
-      <path d="M44 78 Q50 84 56 78" fill="none" stroke="#000" strokeWidth={1} opacity="0.15" />
+      {/* Forehead shine */}
+      <path d="M38 30 Q50 24 62 30" fill="none" stroke="#fff" strokeWidth={1.5} opacity="0.16" strokeLinecap="round" />
+      {/* Soft cheek contours */}
+      <ellipse cx="32" cy="50" rx="4" ry="6" fill="#000" opacity="0.03" />
+      <ellipse cx="68" cy="50" rx="4" ry="6" fill="#000" opacity="0.03" />
+      {/* Chin */}
+      <path d="M44 78 Q50 84 56 78" fill="#fff" opacity="0.06" />
       <Nose />
     </g>
   );
@@ -60,17 +87,21 @@ function Heart({ fill }: BasePartProps) {
   return (
     <g>
       <defs>
-        <radialGradient id="heartGlow" cx="50%" cy="40%" r="50%">
-          <stop offset="0%" stopColor="#fff" stopOpacity="0.15" />
-          <stop offset="100%" stopColor="#000" stopOpacity="0.05" />
+        <radialGradient id="heartGlow" cx="50%" cy="35%" r="55%">
+          <stop offset="0%" stopColor="#fff" stopOpacity="0.18" />
+          <stop offset="100%" stopColor="#000" stopOpacity="0.03" />
         </radialGradient>
       </defs>
-      <path d="M50 82 C24 64 15 48 23 36 C30 27 42 27 50 38 C58 27 70 27 77 36 C85 48 76 64 50 82Z"
+      {/* Plumper heart shape — wider lobes, softer chin */}
+      <path d="M50 80 C28 66 14 50 22 36 C28 26 40 26 50 36 C60 26 72 26 78 36 C86 50 72 66 50 80Z"
         fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
-      <path d="M50 82 C24 64 15 48 23 36 C30 27 42 27 50 38 C58 27 70 27 77 36 C85 48 76 64 50 82Z"
+      <path d="M50 80 C28 66 14 50 22 36 C28 26 40 26 50 36 C60 26 72 26 78 36 C86 50 72 66 50 80Z"
         fill="url(#heartGlow)" />
-      <path d="M32 38 Q36 32 42 36" fill="none" stroke="#000" strokeWidth={0.8} opacity="0.1" />
-      <path d="M58 36 Q64 32 68 38" fill="none" stroke="#000" strokeWidth={0.8} opacity="0.1" />
+      {/* Lobe highlights — makes them look round and plump */}
+      <ellipse cx="34" cy="36" rx="6" ry="5" fill="#fff" opacity="0.12" />
+      <ellipse cx="66" cy="36" rx="6" ry="5" fill="#fff" opacity="0.12" />
+      {/* Cleft hint at top */}
+      <path d="M47 36 Q50 32 53 36" fill="none" stroke="#000" strokeWidth={1} opacity="0.12" />
       <Nose />
     </g>
   );
@@ -107,12 +138,15 @@ function Hexagon({ fill }: BasePartProps) {
 function Blob({ fill }: BasePartProps) {
   return (
     <g>
+      {/* Ear bumps */}
+      <ellipse cx="17" cy="50" rx="4" ry="6" fill={fill} stroke="#000" strokeWidth={2} />
+      <ellipse cx="83" cy="48" rx="4" ry="6" fill={fill} stroke="#000" strokeWidth={2} />
       <path d="M50 20 C70 18 84 30 82 50 C84 70 72 84 52 82 C32 86 16 72 18 52 C14 32 30 18 50 20Z"
         fill={fill} stroke="#000" strokeWidth={S} />
-      <path d="M50 24 C66 22 78 32 76 50 C78 66 68 78 52 76 C36 80 22 68 24 52 C20 36 34 22 50 24Z"
-        fill="none" stroke="#000" strokeWidth={0.8} opacity="0.07" />
-      <ellipse cx="40" cy="42" rx="6" ry="4" fill="#000" opacity="0.04" />
-      <ellipse cx="62" cy="60" rx="5" ry="4" fill="#000" opacity="0.03" />
+      {/* Forehead shine — follows blob asymmetry */}
+      <path d="M38 30 Q52 24 66 32" fill="none" stroke="#fff" strokeWidth={1.5} opacity="0.16" strokeLinecap="round" />
+      {/* Chin */}
+      <path d="M42 74 Q52 80 60 74" fill="#fff" opacity="0.06" />
       <Nose />
     </g>
   );
@@ -295,11 +329,16 @@ function CatFace({ fill }: BasePartProps) {
       {/* Cheek fluff */}
       <ellipse cx="28" cy="52" rx="5" ry="6" fill="#fff" opacity="0.06" />
       <ellipse cx="72" cy="52" rx="5" ry="6" fill="#fff" opacity="0.06" />
-      {/* Whisker dots */}
-      <circle cx="36" cy="56" r="1" fill="#000" opacity="0.2" />
-      <circle cx="34" cy="58" r="1" fill="#000" opacity="0.2" />
-      <circle cx="64" cy="56" r="1" fill="#000" opacity="0.2" />
-      <circle cx="66" cy="58" r="1" fill="#000" opacity="0.2" />
+      {/* Whiskers — thin lines radiating from cheeks */}
+      <line x1="30" y1="54" x2="14" y2="50" stroke="#000" strokeWidth={1} opacity="0.2" strokeLinecap="round" />
+      <line x1="30" y1="57" x2="12" y2="58" stroke="#000" strokeWidth={1} opacity="0.2" strokeLinecap="round" />
+      <line x1="30" y1="60" x2="14" y2="64" stroke="#000" strokeWidth={1} opacity="0.15" strokeLinecap="round" />
+      <line x1="70" y1="54" x2="86" y2="50" stroke="#000" strokeWidth={1} opacity="0.2" strokeLinecap="round" />
+      <line x1="70" y1="57" x2="88" y2="58" stroke="#000" strokeWidth={1} opacity="0.2" strokeLinecap="round" />
+      <line x1="70" y1="60" x2="86" y2="64" stroke="#000" strokeWidth={1} opacity="0.15" strokeLinecap="round" />
+      {/* Whisker dots at base */}
+      <circle cx="34" cy="56" r="1.2" fill="#000" opacity="0.18" />
+      <circle cx="66" cy="56" r="1.2" fill="#000" opacity="0.18" />
       {/* Chin shadow */}
       <path d="M44 76 Q50 82 56 76" fill="#000" opacity="0.06" />
       <Nose />
@@ -311,14 +350,16 @@ function CatFace({ fill }: BasePartProps) {
 function Oblong({ fill }: BasePartProps) {
   return (
     <g>
+      {/* Ear bumps */}
+      <ellipse cx="25" cy="50" rx="4" ry="6" fill={fill} stroke="#000" strokeWidth={2} />
+      <ellipse cx="75" cy="50" rx="4" ry="6" fill={fill} stroke="#000" strokeWidth={2} />
+      <ellipse cx="25.5" cy="51" rx="2" ry="3.5" fill="#000" opacity="0.08" />
+      <ellipse cx="74.5" cy="51" rx="2" ry="3.5" fill="#000" opacity="0.08" />
       <ellipse cx="50" cy="50" rx="24" ry="36" fill={fill} stroke="#000" strokeWidth={S} />
-      {/* Forehead highlight */}
-      <ellipse cx="50" cy="28" rx="12" ry="6" fill="#fff" opacity="0.08" />
-      {/* Cheekbone shadows */}
-      <ellipse cx="32" cy="48" rx="4" ry="8" fill="#000" opacity="0.04" />
-      <ellipse cx="68" cy="48" rx="4" ry="8" fill="#000" opacity="0.04" />
-      {/* Chin contour */}
-      <path d="M42 78 Q50 86 58 78" fill="none" stroke="#000" strokeWidth={1} opacity="0.12" />
+      {/* Forehead shine */}
+      <path d="M40 26 Q50 20 60 26" fill="none" stroke="#fff" strokeWidth={1.5} opacity="0.14" strokeLinecap="round" />
+      {/* Chin */}
+      <path d="M44 78 Q50 84 56 78" fill="#fff" opacity="0.06" />
       <Nose />
     </g>
   );
@@ -328,15 +369,17 @@ function Oblong({ fill }: BasePartProps) {
 function Rectangular({ fill }: BasePartProps) {
   return (
     <g>
+      {/* Ear bumps */}
+      <ellipse cx="19" cy="48" rx="4" ry="6" fill={fill} stroke="#000" strokeWidth={2} />
+      <ellipse cx="81" cy="48" rx="4" ry="6" fill={fill} stroke="#000" strokeWidth={2} />
+      <ellipse cx="19.5" cy="49" rx="2" ry="3.5" fill="#000" opacity="0.08" />
+      <ellipse cx="80.5" cy="49" rx="2" ry="3.5" fill="#000" opacity="0.08" />
       <path d="M22 22 Q22 18 28 18 L72 18 Q78 18 78 22 L80 68 Q80 82 66 84 L50 86 L34 84 Q20 82 20 68Z"
         fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
-      {/* Inner contour */}
-      <path d="M26 22 L74 22 L76 66 Q76 78 64 80 L50 82 L36 80 Q24 78 24 66Z"
-        fill="none" stroke="#fff" strokeWidth={0.8} opacity="0.1" />
-      {/* Strong jawline shadow */}
-      <path d="M24 68 Q30 74 50 78 Q70 74 76 68" fill="#000" opacity="0.06" />
-      {/* Forehead highlight */}
-      <ellipse cx="50" cy="28" rx="18" ry="5" fill="#fff" opacity="0.07" />
+      {/* Forehead shine */}
+      <path d="M34 26 Q50 20 66 26" fill="none" stroke="#fff" strokeWidth={1.5} opacity="0.14" strokeLinecap="round" />
+      {/* Jaw shadow */}
+      <path d="M24 68 Q30 74 50 78 Q70 74 76 68" fill="#000" opacity="0.05" />
       <Nose />
     </g>
   );
@@ -346,15 +389,20 @@ function Rectangular({ fill }: BasePartProps) {
 function Pear({ fill }: BasePartProps) {
   return (
     <g>
+      {/* Ear bumps — placed wider to match pear's wide cheeks */}
+      <ellipse cx="19" cy="54" rx="4" ry="6" fill={fill} stroke="#000" strokeWidth={2} />
+      <ellipse cx="81" cy="54" rx="4" ry="6" fill={fill} stroke="#000" strokeWidth={2} />
+      <ellipse cx="19.5" cy="55" rx="2" ry="3.5" fill="#000" opacity="0.08" />
+      <ellipse cx="80.5" cy="55" rx="2" ry="3.5" fill="#000" opacity="0.08" />
       <path d="M34 20 Q42 14 50 14 Q58 14 66 20 Q78 30 80 48 Q82 64 74 74 Q66 82 50 84 Q34 82 26 74 Q18 64 20 48 Q22 30 34 20Z"
         fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
-      {/* Narrow temple shadow */}
-      <path d="M34 22 Q38 18 50 16 Q62 18 66 22" fill="none" stroke="#000" strokeWidth={0.7} opacity="0.1" />
-      {/* Wide cheek highlights */}
-      <ellipse cx="30" cy="56" rx="6" ry="8" fill="#fff" opacity="0.06" />
-      <ellipse cx="70" cy="56" rx="6" ry="8" fill="#fff" opacity="0.06" />
-      {/* Jaw contour */}
-      <path d="M30 72 Q40 80 50 82 Q60 80 70 72" fill="#000" opacity="0.05" />
+      {/* Forehead shine */}
+      <path d="M38 22 Q50 16 62 22" fill="none" stroke="#fff" strokeWidth={1.5} opacity="0.14" strokeLinecap="round" />
+      {/* Soft cheek contours */}
+      <ellipse cx="28" cy="58" rx="4" ry="6" fill="#000" opacity="0.03" />
+      <ellipse cx="72" cy="58" rx="4" ry="6" fill="#000" opacity="0.03" />
+      {/* Jaw */}
+      <path d="M30 72 Q40 80 50 82 Q60 80 70 72" fill="#000" opacity="0.04" />
       <Nose />
     </g>
   );

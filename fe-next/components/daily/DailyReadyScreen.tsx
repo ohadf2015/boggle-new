@@ -152,7 +152,7 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
       className="flex-1 flex flex-col items-center justify-start pt-4 sm:pt-6 page-content-safe px-4 pb-28 lg:pb-10 min-h-0 overflow-y-auto"
     >
       {/* Top bar with back and language */}
-      <div className="absolute top-20 sm:top-24 left-4 right-4 lg:left-8 lg:right-8 xl:left-16 xl:right-16 flex items-center justify-between">
+      <div className="w-full max-w-md lg:max-w-5xl xl:max-w-6xl flex items-center justify-between mb-2">
         {/* Back button */}
         <Button
           variant="ghost"
@@ -221,7 +221,7 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
       </div>
 
       {/* Main content - COMPACT on mobile, two-column on desktop */}
-      <div className="w-full max-w-md lg:max-w-5xl xl:max-w-6xl mt-14 sm:mt-16 lg:grid lg:grid-cols-[1fr_360px] lg:gap-8 xl:gap-12 lg:items-start">
+      <div className="w-full max-w-md lg:max-w-5xl xl:max-w-6xl lg:grid lg:grid-cols-[1fr_360px] lg:gap-8 xl:gap-12 lg:items-start">
       {/* Left column: primary content */}
       <div className="text-center space-y-3">
         {/* Explorer mascot — sets adventure tone before the word hunt */}
@@ -335,7 +335,7 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
             <Button
               onClick={() => setShowCreateChallenge(true)}
               variant="outline"
-              className="w-full max-w-btn py-3.5 text-lg font-black bg-linear-to-r from-neo-purple to-neo-pink text-neo-white border-neo-thick border-neo-white rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 active:translate-y-0 active:shadow-hard-pressed transition-all flex items-center justify-center gap-2 uppercase"
+              className="w-full max-w-btn py-3.5 text-sm sm:text-base font-black bg-linear-to-r from-neo-purple to-neo-pink text-neo-white border-neo-thick border-neo-white rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 active:translate-y-0 active:shadow-hard-pressed transition-all flex items-center justify-center gap-2 uppercase text-center leading-tight"
             >
               <Sparkles className="w-5 h-5" />
               {t('daily.createCustomChallenge')}
