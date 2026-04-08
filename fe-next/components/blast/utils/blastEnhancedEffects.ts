@@ -116,68 +116,68 @@ function createTileProxy(
 // ─── Effect Configs ───────────────────────────────────────────────────
 
 const BOMB_SHATTER: IShatterEffectOptions = {
-  gridCols: 6,
-  gridRows: 6,
-  explosionPower: 12,
-  friction: 0.97,
-  gravity: 400,
-  turbulence: 3,
-  lifetime: 0.8,
-  fadeOutDuration: 0.3,
+  gridCols: 8,
+  gridRows: 8,
+  explosionPower: 22,
+  friction: 0.96,
+  gravity: 500,
+  turbulence: 6,
+  lifetime: 1.1,
+  fadeOutDuration: 0.4,
   mode: 'radial',
   randomizeScale: true,
   enableRotation: true,
-  rotationStrength: 8,
+  rotationStrength: 14,
   endTint: 0xff2200,
 };
 
 const DIAMOND_SHATTER: IShatterEffectOptions = {
-  gridCols: 8,
-  gridRows: 8,
-  explosionPower: 8,
-  friction: 0.985,
-  gravity: 200,
-  turbulence: 2,
-  lifetime: 1.0,
-  fadeOutDuration: 0.4,
+  gridCols: 10,
+  gridRows: 10,
+  explosionPower: 14,
+  friction: 0.982,
+  gravity: 180,
+  turbulence: 4,
+  lifetime: 1.3,
+  fadeOutDuration: 0.5,
   mode: 'swirl',
-  swirlStrength: 4,
+  swirlStrength: 7,
   randomizeScale: true,
   enableRotation: true,
-  rotationStrength: 5,
+  rotationStrength: 8,
   endTint: 0xeeffff,
 };
 
 const GEM_SHATTER: IShatterEffectOptions = {
-  gridCols: 5,
-  gridRows: 5,
-  explosionPower: 10,
-  friction: 0.975,
-  gravity: 300,
-  turbulence: 2,
-  lifetime: 0.9,
-  fadeOutDuration: 0.35,
+  gridCols: 7,
+  gridRows: 7,
+  explosionPower: 16,
+  friction: 0.97,
+  gravity: 350,
+  turbulence: 4,
+  lifetime: 1.1,
+  fadeOutDuration: 0.4,
   mode: 'radial',
   randomizeScale: true,
   enableRotation: true,
-  rotationStrength: 6,
+  rotationStrength: 10,
   endTint: 0xffee44,
 };
 
 const MAGNET_SHATTER: IShatterEffectOptions = {
-  gridCols: 6,
-  gridRows: 6,
-  explosionPower: 14,
-  friction: 0.96,
-  gravity: 250,
-  turbulence: 5,
-  lifetime: 0.7,
-  fadeOutDuration: 0.25,
+  gridCols: 8,
+  gridRows: 8,
+  explosionPower: 20,
+  friction: 0.955,
+  gravity: 280,
+  turbulence: 8,
+  lifetime: 0.9,
+  fadeOutDuration: 0.3,
   mode: 'swirl',
-  swirlStrength: 8,
+  swirlStrength: 12,
   randomizeScale: true,
   enableRotation: true,
-  rotationStrength: 12,
+  rotationStrength: 18,
   endTint: 0xe879f9,
 };
 
@@ -359,25 +359,38 @@ export function createEnhancedEffects(
       const effect = new DissolveEffect(sprite, config);
       trackEffect(effect, sprite, effect.dissolve());
     } catch {
-      // RenderTexture has no canvas resource — fall back to simple fade-out
-      sprite.alpha = 0;
+      // RenderTexture has no canvas resource — fall back: remove + destroy
+      try { if (sprite.parent) sprite.parent.removeChild(sprite); } catch { /* */ }
+      if (sprite.texture && sprite.texture !== RenderTexture.EMPTY) {
+        try { sprite.texture.destroy(true); } catch { /* */ }
+      }
       try { sprite.destroy(); } catch { /* already cleaned */ }
     }
   }
 
   /** Helper: track a promise-based effect and clean up when done. */
   function trackEffect(effect: Container, sprite: Sprite, promise: Promise<void>): void {
+    // Hide the proxy sprite immediately — the effect container renders the visuals.
+    // Without this, the colored rect stays visible behind/after the effect.
+    sprite.visible = false;
+
     camera.addChild(effect);
     activeEffects.add(effect);
-    promise.then(() => {
+
+    const cleanup = () => {
       activeEffects.delete(effect);
-      if (!destroyed) {
-        try { effect.destroy(); } catch { /* already cleaned */ }
-      }
+      // Remove effect container from scene graph, then destroy
+      try { if (effect.parent) effect.parent.removeChild(effect); } catch { /* */ }
+      try { effect.destroy({ children: true }); } catch { /* already cleaned */ }
+      // Remove proxy sprite from scene graph, destroy texture, then sprite
+      try { if (sprite.parent) sprite.parent.removeChild(sprite); } catch { /* */ }
       if (sprite.texture && sprite.texture !== RenderTexture.EMPTY) {
         try { sprite.texture.destroy(true); } catch { /* */ }
       }
-    });
+      try { sprite.destroy(); } catch { /* */ }
+    };
+
+    promise.then(cleanup).catch(cleanup);
   }
 
   function crystallizeTile(x: number, y: number, tileType: string): void {
@@ -460,7 +473,8 @@ export function createEnhancedEffects(
   function destroy(): void {
     destroyed = true;
     for (const effect of activeEffects) {
-      try { effect.destroy(); } catch { /* */ }
+      try { if (effect.parent) effect.parent.removeChild(effect); } catch { /* */ }
+      try { effect.destroy({ children: true }); } catch { /* */ }
     }
     activeEffects.clear();
   }

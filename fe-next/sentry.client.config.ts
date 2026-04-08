@@ -253,6 +253,8 @@ Sentry.init({
     /Page error.*Minified React error/i,
     // CanvasGradient addColorStop — malformed color string, fixed in ComboPulseRing
     /addColorStop.*could not be parsed as a color/i,
+    // PixiJS sprite lifecycle race — animation rAF fires after sprite destroyed on unmount
+    /Cannot set properties of null \(setting '(x|y|width|height|alpha|scale|rotation)'\)/i,
   ],
 
   denyUrls: [
