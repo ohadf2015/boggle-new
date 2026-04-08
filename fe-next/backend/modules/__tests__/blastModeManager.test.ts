@@ -373,9 +373,9 @@ describe('blastModeManager', () => {
 
     it('should return tile types for letters on overlay positions', () => {
       // Word "AB" - A at (0,0) has gold, B at (0,1) has rainbow
-      const positions = new Map<string, Array<{ row: number; col: number }>>();
-      positions.set('a', [{ row: 0, col: 0 }]);
-      positions.set('b', [{ row: 0, col: 1 }]);
+      const positions = new Map<string, [number, number][]>();
+      positions.set('a', [[0, 0]]);
+      positions.set('b', [[0, 1]]);
 
       const result = getTilesOnPath('ab', positions, overlay);
       expect(result).toContain('gold');
@@ -383,15 +383,15 @@ describe('blastModeManager', () => {
     });
 
     it('should return standard for letters not on special tiles', () => {
-      const positions = new Map<string, Array<{ row: number; col: number }>>();
-      positions.set('x', [{ row: 1, col: 1 }]); // No overlay at (1,1)
+      const positions = new Map<string, [number, number][]>();
+      positions.set('x', [[1, 1]]); // No overlay at (1,1)
 
       const result = getTilesOnPath('x', positions, overlay);
       expect(result).toEqual(['standard']);
     });
 
     it('should return empty array for unknown letters', () => {
-      const positions = new Map<string, Array<{ row: number; col: number }>>();
+      const positions = new Map<string, [number, number][]>();
       // Letter 'z' not in positions map
 
       const result = getTilesOnPath('z', positions, overlay);
@@ -399,8 +399,8 @@ describe('blastModeManager', () => {
     });
 
     it('should handle word with duplicate letters', () => {
-      const positions = new Map<string, Array<{ row: number; col: number }>>();
-      positions.set('a', [{ row: 0, col: 0 }, { row: 1, col: 0 }]);
+      const positions = new Map<string, [number, number][]>();
+      positions.set('a', [[0, 0], [1, 0]]);
 
       const result = getTilesOnPath('aa', positions, overlay);
       // Both positions have overlays: (0,0)=gold, (1,0)=bomb

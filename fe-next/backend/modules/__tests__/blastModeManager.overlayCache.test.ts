@@ -58,8 +58,8 @@ describe('blastModeManager - overlayMap cache (Fix 3)', () => {
       ]);
 
       const positions = new Map([
-        ['a', [{ row: 0, col: 0 }]],
-        ['b', [{ row: 0, col: 1 }]],
+        ['a', [[0, 0] as [number, number]]],
+        ['b', [[0, 1] as [number, number]]],
       ]);
 
       // When overlayMap is provided, it should be used instead of rebuilding
@@ -73,7 +73,7 @@ describe('blastModeManager - overlayMap cache (Fix 3)', () => {
         { row: 0, col: 0, type: 'gold' as BlastTileType },
       ];
       const positions = new Map([
-        ['a', [{ row: 0, col: 0 }]],
+        ['a', [[0, 0] as [number, number]]],
       ]);
 
       // Without overlayMap — rebuilds from overlay array (old behavior)
@@ -90,7 +90,7 @@ describe('blastModeManager - overlayMap cache (Fix 3)', () => {
         ['0,0', 'bomb'], // different from overlay — cache wins
       ]);
       const positions = new Map([
-        ['a', [{ row: 0, col: 0 }]],
+        ['a', [[0, 0] as [number, number]]],
       ]);
 
       const result = getTilesOnPath('a', positions, overlay, cachedMap);
