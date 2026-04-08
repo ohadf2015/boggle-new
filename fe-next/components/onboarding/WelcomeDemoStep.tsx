@@ -44,7 +44,7 @@ const WelcomeDemoStep: React.FC<WelcomeDemoStepProps> = ({
         className="text-center space-y-1"
       >
         <div className="flex justify-center mb-1">
-          <Mascot variant="waving" size="sm" clipBorder="none" />
+          <Mascot variant="waving" size="sm" />
         </div>
         <h2 className="text-xl sm:text-2xl font-black text-neo-white uppercase">
           {t('onboarding.welcome.title')}

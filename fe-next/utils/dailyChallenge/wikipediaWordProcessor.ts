@@ -18,13 +18,13 @@ const MIN_WORD_LENGTH: Record<Language, number> = {
 
 // Maximum word lengths by language
 const MAX_WORD_LENGTH: Record<Language, number> = {
-  en: 8,
-  he: 8,
-  sv: 8,
+  en: 6,
+  he: 6,
+  sv: 6,
   ja: 4,
-  es: 8,
-  fr: 8,
-  de: 8
+  es: 6,
+  fr: 6,
+  de: 6
 };
 
 // Character set validators by language
@@ -224,8 +224,8 @@ export function calculateInterestingnessScore(
 
   // Length bonus: Slightly longer words are often more interesting
   if (language !== 'ja') {
+    if (normalizedWord.length >= 5) score += 5;
     if (normalizedWord.length >= 6) score += 5;
-    if (normalizedWord.length >= 7) score += 5;
   }
 
   // Overused penalty: Common words are less interesting

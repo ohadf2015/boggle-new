@@ -142,10 +142,9 @@ export const TARGET_WORD_LISTS: Record<Language, string[]> = {
     'BÄVER', 'HJÄLM', 'STRID', 'GULD', 'MÅNEN',
     'KLAR', 'RUNDA', 'VATTEN', 'VÄRLD', 'VALEN',
     // ── Swedish 6-letter ──
-    'MORGON', 'KVÄLL', 'VINTER', 'SOMMAR', 'FÖNSTER', 'MARKNAD',
-    'TRÄDGÅRD', 'ÄVENTYR', 'RIDDARE', 'SKOGEN', 'FJÄRIL',
-    'KANIN', 'REGNBÅGE', 'GNISTA', 'HONUNG',
-    'SILVER', 'BLOMMA', 'SOLNEDGÅNG', 'DJUNGEL', 'SJÖMAN',
+    'MORGON', 'KVÄLL', 'VINTER', 'SOMMAR', 'SKOGEN', 'FJÄRIL',
+    'KANIN', 'GNISTA', 'HONUNG',
+    'SILVER', 'BLOMMA', 'SJÖMAN',
   ],
   ja: [
     // ── Japanese 2-character (common compounds) ──
@@ -177,11 +176,11 @@ export const TARGET_WORD_LISTS: Record<Language, string[]> = {
     'LIMON', 'MANGO', 'ABEJA', 'BUHO', 'CORAL', 'CONCHA', 'ESPADA',
     'ISLA', 'VIENTO', 'CABRA', 'TIERRA',
     // ── Spanish 6-letter ──
-    'FIESTA', 'COCINA', 'JARDIN', 'TIEMPO', 'PLANTA', 'MERCADO', 'VENTANA',
-    'DRAGON', 'PIRATA', 'TESORO', 'CORONA', 'ESCUDO', 'CAMINO', 'ESTRELLA',
-    'CASCADA', 'VOLCAN', 'OCEANO', 'DELFIN', 'TORTUGA', 'CONEJO', 'CABALLO',
-    'HALCON', 'MADERA', 'CUERDA', 'MUSICA', 'BANDERA', 'FUENTE', 'MOLINO',
-    'REGALO', 'SONRISA',
+    'FIESTA', 'COCINA', 'JARDIN', 'TIEMPO', 'PLANTA',
+    'DRAGON', 'PIRATA', 'TESORO', 'CORONA', 'ESCUDO', 'CAMINO',
+    'VOLCAN', 'OCEANO', 'DELFIN', 'CONEJO',
+    'HALCON', 'MADERA', 'CUERDA', 'MUSICA', 'FUENTE', 'MOLINO',
+    'REGALO',
   ],
   fr: [
     // French 4-letter words
@@ -192,8 +191,8 @@ export const TARGET_WORD_LISTS: Record<Language, string[]> = {
     'BELLE', 'FORCE', 'PLACE', 'CHOSE', 'LIVRE', 'CHIEN', 'AMOUR',
     'JOLIE', 'RÊVE', 'ÉTOILE', 'NEIGE', 'NUAGE', 'HERBE',
     // French 6-letter words
-    'MAISON', 'JARDIN', 'SOLEIL', 'NATURE', 'RIVIÈRE', 'FORÊT',
-    'CHÂTEAU', 'MONTAGNE', 'DRAGON', 'TRÉSOR', 'PLAGE', 'OCÉAN',
+    'MAISON', 'JARDIN', 'SOLEIL', 'NATURE', 'FORÊT',
+    'DRAGON', 'TRÉSOR', 'PLAGE', 'OCÉAN',
   ],
   de: [
     // German 4-letter words
@@ -204,7 +203,7 @@ export const TARGET_WORD_LISTS: Record<Language, string[]> = {
     'KATZE', 'SONNE', 'STERN', 'STADT', 'KRAFT', 'PLATZ', 'LIEBE',
     'WASSER', 'FLUSS', 'ADLER', 'PFERD', 'FEUER', 'TRAUM', 'STURM',
     // German 6-letter words
-    'GARTEN', 'FENSTER', 'NATUR', 'HIMMEL', 'SOMMER', 'WINTER',
+    'GARTEN', 'NATUR', 'HIMMEL', 'SOMMER', 'WINTER',
     'HERBST', 'SCHULE', 'KIRCHE', 'BRÜCKE', 'DRACHE', 'RITTER',
   ],
 };

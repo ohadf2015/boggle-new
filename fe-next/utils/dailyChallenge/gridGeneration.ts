@@ -15,7 +15,7 @@ import {
 } from '../consts';
 import type { Language, LetterGrid } from '@/types';
 import type { DailyPuzzle, DailyTargetWord } from './types';
-import { SEED_SALT, normalizeHebrewFinalLetters, MIN_SAME_LENGTH_WORDS } from './constants';
+import { SEED_SALT, normalizeHebrewFinalLetters, MIN_SAME_LENGTH_WORDS, MAX_TARGET_WORD_LENGTH } from './constants';
 import { mulberry32, hashString } from './prng';
 import { getDailyChallengeDate, getPuzzleNumber } from './dateUtils';
 import {
@@ -25,6 +25,7 @@ import {
   calculateLetterOverlapScore,
 } from './wordLists';
 import { getMinAnswerLength } from '@/shared/constants/gameConstants';
+import { isWordHuntQuality } from '@/shared/utils/wordQuality';
 import {
   embedMultipleWordsInGrid,
   findWordPathInPartialGrid,
@@ -243,9 +244,24 @@ export function generateDailyPuzzle(
   if (preSelectedWord) {
     targetWord = preSelectedWord.toUpperCase();
   } else {
-    const wordList = TARGET_WORD_LISTS[language] || TARGET_WORD_LISTS['en'];
-    const filtered = wordList.filter(w => w.length >= minTargetLength);
-    const shuffled = [...filtered];
+    const curatedWords = (TARGET_WORD_LISTS[language] || TARGET_WORD_LISTS['en'])
+      .filter(w => w.length >= minTargetLength && w.length <= MAX_TARGET_WORD_LENGTH);
+
+    // Enrich with quality nouns from dictionary (capped at 6 letters, quality-filtered)
+    const nounCandidates = (supplementalNounWords || [])
+      .map(w => w.toUpperCase())
+      .filter(w =>
+        w.length >= minTargetLength &&
+        w.length <= MAX_TARGET_WORD_LENGTH &&
+        isWordHuntQuality(w, language)
+      );
+
+    // Curated words first (higher quality), then noun candidates (deduplicated)
+    const curatedSet = new Set(curatedWords.map(w => w.toUpperCase()));
+    const uniqueNouns = nounCandidates.filter(w => !curatedSet.has(w));
+    const combined = [...curatedWords, ...uniqueNouns];
+
+    const shuffled = [...combined];
     for (let i = shuffled.length - 1; i > 0; i--) {
       const j = Math.floor(random() * (i + 1));
       [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
@@ -442,7 +458,7 @@ export function selectDailyTargetWord(
 
   const minTargetLen = getMinAnswerLength(language);
   const wordList = (TARGET_WORD_LISTS[language] || TARGET_WORD_LISTS['en'])
-    .filter(w => w.length >= minTargetLen);
+    .filter(w => w.length >= minTargetLen && w.length <= MAX_TARGET_WORD_LENGTH);
 
   const shuffled = [...wordList];
   for (let i = shuffled.length - 1; i > 0; i--) {

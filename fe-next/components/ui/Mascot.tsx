@@ -597,12 +597,17 @@ function getAnimationVariants(variant: MascotVariant): Variants {
 function getAutoStyle(variant: MascotVariant, clipShape?: MascotClipShape, clipBorder?: MascotBorderColor, clipBg?: string) {
   const bgType = getMascotBgType(variant);
 
-  if (clipShape !== undefined && clipShape !== 'none') {
-    return { shape: clipShape, border: clipBorder ?? 'pink', bg: clipBg ?? 'bg-neo-navy' };
+  // White bg: always enforce circle clip + border — callers cannot override to 'none'
+  if (bgType === 'white') {
+    return {
+      shape: (clipShape && clipShape !== 'none' ? clipShape : 'circle') as MascotClipShape,
+      border: (clipBorder && clipBorder !== 'none' ? clipBorder : 'pink') as MascotBorderColor,
+      bg: clipBg ?? 'bg-white',
+    };
   }
 
-  if (bgType === 'white') {
-    return { shape: 'circle' as MascotClipShape, border: clipBorder ?? 'pink', bg: clipBg ?? 'bg-white' };
+  if (clipShape !== undefined && clipShape !== 'none') {
+    return { shape: clipShape, border: clipBorder ?? 'pink', bg: clipBg ?? 'bg-neo-navy' };
   }
 
   return { shape: (clipShape ?? 'none') as MascotClipShape, border: clipBorder ?? 'none', bg: clipBg ?? '' };

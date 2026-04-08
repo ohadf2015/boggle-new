@@ -540,11 +540,16 @@ export const InteractiveMascot = memo(function InteractiveMascot({
   // Auto-resolve clip/border/bg based on mascot background type
   const autoStyle = useMemo(() => {
     const bgType = getMascotBgType(baseVariant);
+    // White bg: always enforce circle clip + border — callers cannot override to 'none'
+    if (bgType === 'white') {
+      return {
+        shape: (clipShape && clipShape !== 'none' ? clipShape : 'circle') as MascotClipShape,
+        border: (clipBorder && clipBorder !== 'none' ? clipBorder : 'pink') as MascotBorderColor,
+        bg: clipBg ?? 'bg-white',
+      };
+    }
     if (clipShape !== undefined) {
       return { shape: clipShape, border: clipBorder ?? 'pink' as MascotBorderColor, bg: clipBg ?? 'bg-neo-navy' };
-    }
-    if (bgType === 'white') {
-      return { shape: 'circle' as MascotClipShape, border: clipBorder ?? 'pink' as MascotBorderColor, bg: clipBg ?? 'bg-white' };
     }
     return { shape: 'none' as MascotClipShape, border: clipBorder ?? 'none' as MascotBorderColor, bg: clipBg ?? '' };
   }, [baseVariant, clipShape, clipBorder, clipBg]);

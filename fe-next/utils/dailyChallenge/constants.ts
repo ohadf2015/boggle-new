@@ -23,6 +23,9 @@ export const DAILY_CHALLENGE_DURATION = 120;
 // Minimum number of same-length words to embed (excluding target word)
 export const MIN_SAME_LENGTH_WORDS = 5;
 
+// Maximum letter count for target words (keeps puzzles accessible across all languages)
+export const MAX_TARGET_WORD_LENGTH = 6;
+
 // ==========================================
 // Hebrew Letter Normalization
 // ==========================================

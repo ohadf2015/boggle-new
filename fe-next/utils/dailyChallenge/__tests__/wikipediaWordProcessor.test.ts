@@ -13,10 +13,10 @@ import {
 describe('WikipediaWordProcessor', () => {
   describe('validateGameWord', () => {
     describe('English words', () => {
-      it('should accept valid 4+ letter English words', () => {
-        const result = validateGameWord('MOUNTAIN', 'en');
+      it('should accept valid 4-6 letter English words', () => {
+        const result = validateGameWord('CASTLE', 'en');
         expect(result.valid).toBe(true);
-        expect(result.normalizedWord).toBe('MOUNTAIN');
+        expect(result.normalizedWord).toBe('CASTLE');
       });
 
       it('should reject 3-letter English words', () => {
@@ -25,37 +25,37 @@ describe('WikipediaWordProcessor', () => {
         expect(result.reason).toContain('at least 4');
       });
 
-      it('should reject words longer than 8 letters', () => {
-        const result = validateGameWord('EXTRAORDINARY', 'en');
+      it('should reject words longer than 6 letters', () => {
+        const result = validateGameWord('EXTREME', 'en');
         expect(result.valid).toBe(false);
-        expect(result.reason).toContain('at most 8');
+        expect(result.reason).toContain('at most 6');
       });
 
       it('should reject words with numbers', () => {
-        const result = validateGameWord('WORD123', 'en');
+        const result = validateGameWord('WO123', 'en');
         expect(result.valid).toBe(false);
         // May fail on character set or numbers check
         expect(result.reason).toMatch(/invalid characters|numbers/);
       });
 
       it('should reject words with spaces', () => {
-        const result = validateGameWord('NEW YORK', 'en');
+        const result = validateGameWord('NE YO', 'en');
         expect(result.valid).toBe(false);
         // May fail on character set or single word check
         expect(result.reason).toMatch(/invalid characters|single word/);
       });
 
       it('should reject words with hyphens', () => {
-        const result = validateGameWord('WELL-KNOWN', 'en');
+        const result = validateGameWord('WE-LL', 'en');
         expect(result.valid).toBe(false);
         // May fail on length, character set, or single word check
-        expect(result.reason).toMatch(/invalid characters|single word|at most 8/);
+        expect(result.reason).toMatch(/invalid characters|single word|at most 6/);
       });
     });
 
     describe('Hebrew words', () => {
-      it('should accept valid 4+ character Hebrew words', () => {
-        const result = validateGameWord('ירושלים', 'he');
+      it('should accept valid 4-6 character Hebrew words', () => {
+        const result = validateGameWord('שלומי', 'he');
         expect(result.valid).toBe(true);
       });
 
@@ -69,7 +69,7 @@ describe('WikipediaWordProcessor', () => {
         const result = validateGameWord('שלוםHello', 'he');
         expect(result.valid).toBe(false);
         // May fail on length or character set check
-        expect(result.reason).toMatch(/invalid characters|at most 8/);
+        expect(result.reason).toMatch(/invalid characters|at most 6/);
       });
     });
 
