@@ -2095,6 +2095,7 @@ const sv = {
     "series": {
       "title": "Sammanlagd ställning",
       "gameCount": "Spel {count}",
+      "gameXofY": "Spel {current} av {total}",
       "round": "R{num}",
       "winner": "Serievinnare!",
       "newSeries": "Ny serie",

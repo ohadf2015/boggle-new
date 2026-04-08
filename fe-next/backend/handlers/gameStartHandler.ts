@@ -274,7 +274,7 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
 
       if (!blastAllowed) {
         gamesStarting.delete(gameCode);
-        logger.warn('SOCKET', `Rejected blast mode for ${gameCode}: host lacks blast_access`);
+        logger.debug('SOCKET', `Rejected blast mode for ${gameCode}: host lacks blast_access`);
         emitError(socket, 'Blast mode requires special access');
         return;
       }
@@ -326,17 +326,11 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
     // can actually find them during gameplay.
     const vocabToEmbed = classroomGame?.vocabularyWords?.map(w => w.toUpperCase()) ?? [];
     const playerCount = Object.keys(game.users).length;
+    // Multiplayer always uses 6x6 grid regardless of mode
     if (playerCount >= 2) {
-      if (resolvedMode === 'blast') {
-        letterGrid = vocabToEmbed.length > 0
-          ? generateRandomTable(6, 6, gameLang, vocabToEmbed)
-          : generateRandomTable(6, 6, gameLang);
-      } else {
-        // Multiplayer always uses 6x6 grid for classic/word-hunt
-        letterGrid = vocabToEmbed.length > 0
-          ? generateRandomTable(6, 6, gameLang, vocabToEmbed)
-          : generateRandomTable(6, 6, gameLang);
-      }
+      letterGrid = vocabToEmbed.length > 0
+        ? generateRandomTable(6, 6, gameLang, vocabToEmbed)
+        : generateRandomTable(6, 6, gameLang);
     }
 
     updateGame(gameCode, {

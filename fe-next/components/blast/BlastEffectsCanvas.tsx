@@ -43,6 +43,24 @@ import { pickRandom } from './blastEffectVariations';
 import type { ParticleConfig } from '@/lib/gameEngine/types';
 import type { BlastTileType } from './types';
 
+// ─── Lingering sparkle dust — slow-rising ambient particles after clears ─
+const LINGER_SPARKLE: ParticleConfig = {
+  maxParticles: 12,
+  frequency: 0.05,
+  emitterLifetime: 0.6,
+  particlesPerWave: 2,
+  lifetime: { min: 0.6, max: 1.2 },
+  speed: { min: 15, max: 40 },
+  gravity: { x: 0, y: -30 },
+  scale: { start: 0.5, end: 0 },
+  alpha: { start: 0.7, end: 0 },
+  rotationSpeed: { min: -30, max: 30 },
+  colors: ['ffffff', 'ffffcc', 'ccffff'],
+  spawnShape: 'rect',
+  spawnConfig: { width: 20, height: 20 },
+  blendMode: 'add',
+};
+
 // ─── Types ──────────────────────────────────────────────────────────────
 
 export interface ClearedTileEvent {
@@ -74,51 +92,25 @@ const CLEAR_PRESET_MAP: Partial<Record<BlastTileType, ParticleConfig>> = {
 
 // ─── Main Component ─────────────────────────────────────────────────────
 
-export function BlastEffectsCanvas({
-  width,
-  height,
-  gridSize,
-  clearedTiles,
-  chainLevel,
-  comboTier,
-  waveCleared,
-}: BlastEffectsCanvasProps) {
-  if (width <= 0 || height <= 0) return null;
+export function BlastEffectsCanvas(props: BlastEffectsCanvasProps) {
+  if (props.width <= 0 || props.height <= 0) return null;
 
   return (
     <GameCanvas
       config={{
-        width: Math.round(width),
-        height: Math.round(height),
-        background: 0x1a1a2e, // match bg-neo-navy
-        backgroundAlpha: 0, // transparent so particles show through
+        width: Math.round(props.width),
+        height: Math.round(props.height),
+        background: 0x1a1a2e,
+        backgroundAlpha: 0,
         antialias: true,
       }}
     >
-      <EffectsWorker
-        width={width}
-        height={height}
-        gridSize={gridSize}
-        clearedTiles={clearedTiles}
-        chainLevel={chainLevel}
-        comboTier={comboTier}
-        waveCleared={waveCleared}
-      />
+      <EffectsWorker {...props} />
     </GameCanvas>
   );
 }
 
 // ─── Effects Worker (runs inside GameCanvas context) ─────────────────
-
-interface EffectsWorkerProps {
-  width: number;
-  height: number;
-  gridSize: number;
-  clearedTiles: ClearedTileEvent[];
-  chainLevel: number;
-  comboTier: number;
-  waveCleared: boolean;
-}
 
 function EffectsWorker({
   width,
@@ -128,7 +120,7 @@ function EffectsWorker({
   chainLevel,
   comboTier,
   waveCleared,
-}: EffectsWorkerProps) {
+}: BlastEffectsCanvasProps) {
   const { app, particles, shake, physics, camera } = useGameEngine();
   const enhancedRef = useRef<EnhancedEffectsManager | null>(null);
 
@@ -244,12 +236,12 @@ function EffectsWorker({
     /* eslint-disable react-hooks/immutability */
     camera.filters = [...(Array.isArray(camera.filters) ? camera.filters : []), sw];
     return () => {
+      cancelAnimationFrame(shockwaveRafRef.current);
+      shockwaveRef.current = null;
       const filters = Array.isArray(camera.filters) ? camera.filters : [];
       camera.filters = filters.filter(f => f !== sw);
       /* eslint-enable react-hooks/immutability */
-      cancelAnimationFrame(shockwaveRafRef.current);
       sw.destroy();
-      shockwaveRef.current = null;
     };
   }, [camera, width, height]);
 
@@ -264,6 +256,7 @@ function EffectsWorker({
     const start = performance.now();
     const duration = 600;
     const tick = () => {
+      if (!shockwaveRef.current) return;
       const t = Math.min((performance.now() - start) / duration, 1);
       sw.time = t;
       if (t < 1) {
@@ -403,6 +396,13 @@ function EffectsWorker({
         lightningCols.add(tile.col);
         enhancedRef.current?.pixelSortTile(x, y, 'lightning');
       }
+    }
+
+    // Lingering sparkle dust at each clear position — floats upward for ambient magic
+    for (const tile of clearedTiles) {
+      const x = tile.col * cellSize + cellSize / 2;
+      const y = tile.row * cellSize + cellSize / 2;
+      particles.burst(LINGER_SPARKLE, x, y, 3);
     }
 
     // Move ghost sprite to centroid of cleared tiles (for chain ghost trail)

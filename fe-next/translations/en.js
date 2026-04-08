@@ -2199,6 +2199,7 @@ const en = {
     "series": {
       "title": "Session Standings",
       "gameCount": "Game {count}",
+      "gameXofY": "Game {current} of {total}",
       "round": "R{num}",
       "winner": "Series Winner!",
       "newSeries": "New Series",

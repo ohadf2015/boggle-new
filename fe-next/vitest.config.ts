@@ -19,6 +19,7 @@ export default defineConfig({
       '@remotion/player': path.resolve(__dirname, './__mocks__/@remotion/player.ts'),
       '@remotion/transitions': path.resolve(__dirname, './__mocks__/@remotion/transitions.ts'),
       '@capgo/capacitor-social-login': path.resolve(__dirname, './__mocks__/@capgo/capacitor-social-login.ts'),
+      '@vfx-js/core': path.resolve(__dirname, './__mocks__/@vfx-js/core.ts'),
     },
   },
   test: {

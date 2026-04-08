@@ -1,11 +1,7 @@
-/**
- * Game flow orchestration for multiplayer
- * Manages results display and spectator state
- */
-
 import { useEffect, useState, useCallback } from 'react';
 import type { Socket } from 'socket.io-client';
 import { recordGameCompleted } from '@/utils/multiplayerProgressStorage';
+import { useGameStore } from '@/hooks/gameState/store';
 import type { Language } from '@/shared/types/game';
 
 export interface WordHuntSummary {
@@ -124,6 +120,8 @@ export function useMultiplayerGameFlow(
     if (socketRef.current && gameCode) {
       socketRef.current.emit('confirmReadyForNextGame');
     }
+    // Reset Zustand store to clear blast/word-hunt/leaderboard state from previous round
+    useGameStore.getState().resetForNewRound();
     setShowResults(false);
     setResultsData(null);
     setPendingGameStart(null);

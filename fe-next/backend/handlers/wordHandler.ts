@@ -54,7 +54,6 @@ interface SubmitWordVotePayload {
   voteType: 'valid' | 'invalid';
   gameCode?: string;
   submittedBy?: string;
-  isBot?: boolean;
 }
 
 interface SubmitPeerValidationVotePayload {
@@ -207,7 +206,7 @@ function registerWordHandlers(io: Server, socket: Socket): void {
 
       if (!game || (game.gameState !== 'in-progress' && !isWithinGracePeriod)) {
         // Log detailed state for debugging second-game-in-room issues
-        logger.warn('WORD', `Word submission rejected - game state issue`, {
+        logger.debug('WORD', `Word submission rejected - game state issue`, {
           gameCode,
           username,
           word,
@@ -463,7 +462,7 @@ function registerWordHandlers(io: Server, socket: Socket): void {
         gameCode,
         voteType: mappedVoteType,
         submitter: data.submittedBy || 'unknown',
-        isBotWord: data.isBot === true
+        isBotWord: game.users?.[data.submittedBy || '']?.isBot === true
       });
 
       if (result.success) {

@@ -83,7 +83,7 @@ function registerEarthquakeHandlers(io: Server, socket: Socket): void {
     // Get game by socket ID
     const gameCode = getGameBySocketId(socket.id);
     if (!gameCode) {
-      logger.warn('EARTHQUAKE', `Socket ${socket.id} not in a game`);
+      logger.debug('EARTHQUAKE', `Socket ${socket.id} not in a game`);
       return;
     }
 

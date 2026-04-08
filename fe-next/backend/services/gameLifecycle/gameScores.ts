@@ -57,6 +57,9 @@ export async function calculateAndBroadcastFinalScores(
     string,
     string[]
   ][]) {
+    // Skip bot players — their words shouldn't inflate wordCountMap or strip
+    // uniqueness bonuses from human players
+    if (game.users?.[username]?.isBot) continue;
     for (const word of words) {
       wordCountMap[word] = (wordCountMap[word] || 0) + 1;
 

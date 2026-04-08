@@ -160,19 +160,84 @@ export function BlastComboFlash({ flash, onComplete, comboTypeName }: BlastCombo
           );
         })}
 
+        {/* Tier 3: Screen-edge vignette for cinematic weight */}
+        {flash.tier === 3 && (
+          <AdaptiveMotion.div
+            className="absolute inset-0"
+            style={{
+              background: 'radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.6) 100%)',
+            }}
+            initial={{ opacity: 0.8 }}
+            animate={{ opacity: 0 }}
+            transition={{ duration: cfg.duration * 0.7, ease: 'easeOut' }}
+          />
+        )}
+
+        {/* Tier 3: Diagonal light streaks */}
+        {flash.tier === 3 && (
+          <>
+            <AdaptiveMotion.div
+              style={{
+                position: 'absolute',
+                top: '50%',
+                left: '-20%',
+                width: '140%',
+                height: 3,
+                background: 'linear-gradient(90deg, transparent 10%, rgba(255,255,255,0.7) 50%, transparent 90%)',
+                transform: 'translateY(-50%) rotate(35deg)',
+                transformOrigin: 'center',
+              }}
+              initial={{ scaleX: 0, opacity: 1 }}
+              animate={{ scaleX: 1.2, opacity: 0 }}
+              transition={{ duration: 0.35, ease: 'easeOut', delay: 0.03 }}
+            />
+            <AdaptiveMotion.div
+              style={{
+                position: 'absolute',
+                top: '50%',
+                left: '-20%',
+                width: '140%',
+                height: 3,
+                background: 'linear-gradient(90deg, transparent 10%, rgba(255,255,255,0.7) 50%, transparent 90%)',
+                transform: 'translateY(-50%) rotate(-35deg)',
+                transformOrigin: 'center',
+              }}
+              initial={{ scaleX: 0, opacity: 1 }}
+              animate={{ scaleX: 1.2, opacity: 0 }}
+              transition={{ duration: 0.35, ease: 'easeOut', delay: 0.06 }}
+            />
+          </>
+        )}
+
         {/* Combo type label */}
         {comboTypeName && (
           <AdaptiveMotion.div
             className="absolute inset-0 flex items-center justify-center pointer-events-none z-50"
-            initial={{ scale: 0.5, opacity: 1, rotate: variation.rotation ? -variation.rotation / 4 : 0 }}
-            animate={{ scale: 1.2, opacity: 0, rotate: 0 }}
-            transition={{ duration: cfg.duration * 0.8, ease: 'easeOut' }}
+            initial={{
+              scale: flash.tier === 3 ? 0.3 : 0.5,
+              opacity: 1,
+              rotate: variation.rotation ? -variation.rotation / 4 : 0,
+            }}
+            animate={{
+              scale: flash.tier === 3 ? [0.3, 1.4, 1.1, 1.3] : 1.2,
+              opacity: [1, 1, 1, 0],
+              rotate: 0,
+            }}
+            transition={{
+              duration: flash.tier === 3 ? cfg.duration * 1.1 : cfg.duration * 0.8,
+              ease: 'easeOut',
+              times: flash.tier === 3 ? [0, 0.3, 0.5, 1] : undefined,
+            }}
           >
             <span
-              className="font-neo-display uppercase text-2xl sm:text-3xl font-bold"
+              className={`font-neo-display uppercase font-bold ${flash.tier === 3 ? 'text-3xl sm:text-5xl' : 'text-2xl sm:text-3xl'}`}
               style={{
                 color: isGradient ? '#FFFFFF' : cfg.color,
-                textShadow: `0 0 12px ${isGradient ? '#FF1493' : cfg.color}, 0 2px 4px rgba(0,0,0,0.5)`,
+                textShadow: flash.tier === 3
+                  ? `0 0 20px #FF1493, 0 0 40px #00FFFF, 0 4px 8px rgba(0,0,0,0.7)`
+                  : `0 0 12px ${isGradient ? '#FF1493' : cfg.color}, 0 2px 4px rgba(0,0,0,0.5)`,
+                WebkitTextStroke: flash.tier === 3 ? '1.5px rgba(0,0,0,0.5)' : undefined,
+                paintOrder: 'stroke fill',
               }}
             >
               {comboTypeName}

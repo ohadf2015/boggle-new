@@ -266,7 +266,7 @@ export const submitWordVoteSchema = compiledSchemas?.submitWordVoteSchema || z.o
   isValid: z.boolean().optional(),
   language: languageSchema.optional(),
   submittedBy: usernameSchema.optional(),
-  isBot: z.boolean().optional(),
+  // isBot intentionally omitted — derived from server-side game.users state
 });
 
 export const submitPeerValidationVoteSchema = compiledSchemas?.submitPeerValidationVoteSchema || z.object({

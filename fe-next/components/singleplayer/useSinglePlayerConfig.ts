@@ -8,6 +8,7 @@ import {
   markGuidanceShown,
 } from '@/utils/contextualGuidanceStorage';
 import { hasCompletedOnboarding, markOnboardingComplete } from '@/utils/onboardingStorage';
+import { getStoredUsername } from '@/utils/profileStorage';
 import { useAuth } from '@/contexts/AuthContext';
 import type { DifficultyLevel, Language, LetterGrid } from '@/shared/types/game';
 import type {
@@ -261,7 +262,7 @@ export function useSinglePlayerConfig({ searchParams }: UseSinglePlayerConfigOpt
   // Handle pre-game tutorial completion
   const handleTutorialComplete = useCallback(() => {
     markGuidanceShown('firstPlayTutorialCompleted');
-    markOnboardingComplete({ avatarId: '', displayName: '', selectedMode: 'single' });
+    markOnboardingComplete({ avatarId: '', displayName: getStoredUsername() || '', selectedMode: 'single' });
     wasFirstTimerPracticeRef.current = true;
     const practicePreset = getDefaultPreset('practice');
     if (practicePreset) {
@@ -280,30 +281,13 @@ export function useSinglePlayerConfig({ searchParams }: UseSinglePlayerConfigOpt
     setPhase('playing');
   }, [uiLanguage]);
 
-  // Handle play again
+  // Handle play again — replays the current mode
   const handlePlayAgain = useCallback(() => {
-    if (wasFirstTimerPracticeRef.current) {
-      wasFirstTimerPracticeRef.current = false;
-      const botsPreset = getDefaultPreset('solo-bots');
-      if (botsPreset) {
-        unlockAudio();
-        const bots = generateBotsForPreset(botsPreset.settings.bots, botsPreset.settings.botDifficulty);
-        const minWordLength = getMinWordLength(uiLanguage, botsPreset.settings.difficulty);
-        setGameState({
-          mode: 'solo-bots',
-          difficulty: botsPreset.settings.difficulty,
-          timerSeconds: botsPreset.settings.timerSeconds,
-          bots,
-          language: (uiLanguage as Language) || 'en',
-          grid: null,
-          minWordLength,
-        });
-        setPhase('playing');
-        return;
-      }
-    }
-    router.push(`/${uiLanguage}/`);
-  }, [uiLanguage, router, unlockAudio]);
+    wasFirstTimerPracticeRef.current = false;
+    unlockAudio();
+    setGameState(prev => ({ ...prev, grid: null }));
+    setPhase('playing');
+  }, [unlockAudio]);
 
   // Quick rematch
   const handleQuickRematch = useCallback(() => {

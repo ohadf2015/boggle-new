@@ -198,6 +198,132 @@ describe('useSeriesTracker', () => {
     });
   });
 
+  describe('round wins tracking', () => {
+    it('should track round wins for each player', () => {
+      const { result } = renderHook(() => useSeriesTracker());
+
+      // Round 1: Alice wins
+      act(() => {
+        result.current.recordRound([
+          makePlayer('Alice', 100),
+          makePlayer('Bob', 80),
+        ]);
+      });
+
+      // Round 2: Bob wins
+      act(() => {
+        result.current.recordRound([
+          makePlayer('Alice', 50),
+          makePlayer('Bob', 120),
+        ]);
+      });
+
+      // Round 3: Alice wins
+      act(() => {
+        result.current.recordRound([
+          makePlayer('Alice', 90),
+          makePlayer('Bob', 70),
+        ]);
+      });
+
+      const alice = result.current.standings.find(s => s.username === 'Alice')!;
+      const bob = result.current.standings.find(s => s.username === 'Bob')!;
+      expect(alice.roundWins).toBe(2);
+      expect(bob.roundWins).toBe(1);
+    });
+
+    it('should determine series leader by round wins, not total score', () => {
+      const { result } = renderHook(() => useSeriesTracker());
+
+      // Round 1: Alice wins with modest score
+      act(() => {
+        result.current.recordRound([
+          makePlayer('Alice', 60),
+          makePlayer('Bob', 50),
+        ]);
+      });
+
+      // Round 2: Alice wins again
+      act(() => {
+        result.current.recordRound([
+          makePlayer('Alice', 55),
+          makePlayer('Bob', 50),
+        ]);
+      });
+
+      // Round 3: Bob wins with huge blowout
+      act(() => {
+        result.current.recordRound([
+          makePlayer('Alice', 30),
+          makePlayer('Bob', 200),
+        ]);
+      });
+
+      // Alice: 2 wins, 145 total. Bob: 1 win, 300 total.
+      // Series leader should be Alice (more wins)
+      expect(result.current.seriesLeader).toBe('Alice');
+    });
+
+    it('should break ties in round wins by total score', () => {
+      const { result } = renderHook(() => useSeriesTracker());
+
+      // Round 1: Alice wins
+      act(() => {
+        result.current.recordRound([
+          makePlayer('Alice', 100),
+          makePlayer('Bob', 80),
+        ]);
+      });
+
+      // Round 2: Bob wins
+      act(() => {
+        result.current.recordRound([
+          makePlayer('Alice', 50),
+          makePlayer('Bob', 120),
+        ]);
+      });
+
+      // Tied at 1 win each. Bob total = 200, Alice total = 150.
+      expect(result.current.seriesLeader).toBe('Bob');
+    });
+  });
+
+  describe('series length', () => {
+    it('should expose totalGames constant', () => {
+      const { result } = renderHook(() => useSeriesTracker());
+      expect(result.current.totalGames).toBeGreaterThan(0);
+    });
+
+    it('should report isSeriesComplete when all games played', () => {
+      const { result } = renderHook(() => useSeriesTracker());
+      const total = result.current.totalGames;
+
+      for (let i = 0; i < total; i++) {
+        act(() => {
+          result.current.recordRound([
+            makePlayer('Alice', 100 + i),
+            makePlayer('Bob', 80 + i),
+          ]);
+        });
+      }
+
+      expect(result.current.isSeriesComplete).toBe(true);
+    });
+
+    it('should not be complete before all games played', () => {
+      const { result } = renderHook(() => useSeriesTracker());
+
+      act(() => {
+        result.current.recordRound([
+          makePlayer('Alice', 100),
+          makePlayer('Bob', 80),
+        ]);
+      });
+
+      expect(result.current.isSeriesComplete).toBe(false);
+    });
+  });
+
   describe('duplicate round prevention', () => {
     it('should not record the same scores twice if called with identical data', () => {
       const { result } = renderHook(() => useSeriesTracker());

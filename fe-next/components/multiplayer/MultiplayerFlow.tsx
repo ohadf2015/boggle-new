@@ -23,6 +23,15 @@ import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 
 type FlowState = 'room-list' | 'join-modal' | 'create-modal';
 
+function generateGameCode(): string {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let code = '';
+  for (let i = 0; i < 6; i++) {
+    code += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return code;
+}
+
 interface MultiplayerFlowProps {
   // Callbacks
   handleJoin: (
@@ -247,16 +256,6 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
     },
     [selectedRoom, handleJoin, setGameCode, setUsername]
   );
-
-  // Generate a random game code - defined before useCallback that uses it
-  const generateGameCode = (): string => {
-    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-    let code = '';
-    for (let i = 0; i < 6; i++) {
-      code += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return code;
-  };
 
   // Handle create from modal
   const handleCreateFromModal = useCallback(

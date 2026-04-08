@@ -2,6 +2,7 @@
 
 import { memo, useEffect, useCallback, useMemo, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import dynamic from 'next/dynamic';
 import { motion, useMotionValue, useTransform, animate } from 'framer-motion';
 import { ArrowLeft, Trophy, RotateCcw, Crosshair, Lock } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -25,6 +26,8 @@ import {
   useAchievementsSave,
 } from '../results';
 import type { SinglePlayerResultsData } from '../SinglePlayerView';
+
+const FirstWinSignupModal = dynamic(() => import('@/components/auth/FirstWinSignupModal'), { ssr: false });
 
 // ─── Encouragement tiers — always positive ───
 
@@ -202,7 +205,7 @@ const PracticeResults = memo(function PracticeResults({
 
   useCognitiveScoring({ userId: user?.id, mode: 'practice', results });
 
-  useSignupPrompt({ isAuthenticated, hasUser: !!user, authLoading });
+  const { showSignupModal, setShowSignupModal } = useSignupPrompt({ isAuthenticated, hasUser: !!user, authLoading });
 
   useAchievementsSave({ isAuthenticated, profile, results, updateProfile });
 
@@ -433,27 +436,40 @@ const PracticeResults = memo(function PracticeResults({
         </div>
       </div>
 
-      {/* ── Mobile sticky bottom — play again + back ── */}
+      {/* ── Mobile sticky bottom — daily challenge primary + replay secondary ── */}
       <div className="md:hidden fixed bottom-0 inset-x-0 z-50 bg-neo-navy/95 backdrop-blur-xs border-t-3 border-neo-black safe-area-bottom px-3 py-2.5">
-        <div className="flex gap-2">
-          <button
-            onClick={onBackToLobby}
-            className="flex items-center justify-center gap-1 px-3 py-2.5 bg-white/10 text-white/80 font-bold text-xs uppercase border-2 border-white/20 rounded-neo transition-colors hover:bg-white/20"
-          >
-            <ArrowLeft className="w-3.5 h-3.5 rtl:rotate-180" />
-            {t('nextStep.backToLobby')}
-          </button>
-          <motion.button
-            onClick={onPlayAgain}
-            animate={reducedMotion ? {} : { scale: [1, 1.03, 1] }}
-            transition={{ duration: 2, repeat: inf, ease: 'easeInOut', repeatDelay: 1 }}
-            className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-neo-lime text-neo-black font-black text-sm uppercase border-3 border-neo-black rounded-neo shadow-hard"
-          >
-            <RotateCcw className="w-4 h-4" />
-            {t('practiceResults.playAgain')}
-          </motion.button>
+        <div className="flex flex-col gap-2">
+          {!dailyAlreadyPlayed && (
+            <motion.button
+              onClick={handleDailyChallenge}
+              animate={reducedMotion ? {} : { scale: [1, 1.03, 1] }}
+              transition={{ duration: 2, repeat: inf, ease: 'easeInOut', repeatDelay: 1 }}
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-amber-400 text-neo-black font-black text-sm uppercase border-3 border-neo-black rounded-neo shadow-hard"
+            >
+              <Trophy className="w-4 h-4" />
+              {t('practiceResults.wordHuntCta')}
+            </motion.button>
+          )}
+          <div className="flex gap-2">
+            <button
+              onClick={onBackToLobby}
+              className="flex items-center justify-center gap-1 px-3 py-2.5 bg-white/10 text-white/80 font-bold text-xs uppercase border-2 border-white/20 rounded-neo transition-colors hover:bg-white/20"
+            >
+              <ArrowLeft className="w-3.5 h-3.5 rtl:rotate-180" />
+              {t('nextStep.backToLobby')}
+            </button>
+            <button
+              onClick={onPlayAgain}
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-white/10 text-white/80 font-bold text-sm uppercase border-2 border-white/20 rounded-neo transition-colors hover:bg-white/20"
+            >
+              <RotateCcw className="w-4 h-4" />
+              {t('practiceResults.playAgain')}
+            </button>
+          </div>
         </div>
       </div>
+
+      <FirstWinSignupModal isOpen={showSignupModal} onClose={() => setShowSignupModal(false)} variant="multiGames" />
     </div>
   );
 });

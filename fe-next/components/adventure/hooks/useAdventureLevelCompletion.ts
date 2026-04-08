@@ -389,7 +389,7 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
             goldEarned: earnedGoldRef.current,
             longWords: gameState.wordsFound.filter(w => w.length >= 6).length,
           };
-          if (navigator.sendBeacon) {
+          if (typeof navigator !== 'undefined' && navigator.sendBeacon) {
             navigator.sendBeacon(
               '/api/adventure/complete',
               new Blob([JSON.stringify(payload)], { type: 'application/json' })

@@ -105,9 +105,13 @@ export interface ResultsPageProps {
   /** Game duration in seconds for cognitive scoring */
   gameDuration?: number;
   /** Series standings for accumulated scores across multiple games */
-  seriesStandings?: Array<{ username: string; avatar?: { emoji?: string; color?: string }; totalScore: number; roundScores: number[]; currentRank: number; rankChange: number }>;
+  seriesStandings?: Array<{ username: string; avatar?: { emoji?: string; color?: string }; totalScore: number; roundScores: number[]; currentRank: number; rankChange: number; roundWins: number }>;
   /** Current series round number */
   seriesRoundNumber?: number;
+  /** Total games in the series */
+  seriesTotalGames?: number;
+  /** Username of the current series leader */
+  seriesLeader?: string | null;
   /** Callback to reset the series tracker (start new series) */
   onResetSeries?: () => void;
   /** Word Hunt summary from server (target word, lives, eliminated) */

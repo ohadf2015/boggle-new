@@ -13,6 +13,7 @@ import { clearGameTimer, setGameTimer } from '../../utils/timerManager';
 import { drainLife, areAllPlayersEliminated } from '../../modules/wordHuntManager';
 import { startBotsForGame } from './botGame';
 import { endGame } from './gameEnd';
+import logger from '../../utils/logger';
 
 /**
  * Start the game timer
@@ -105,14 +106,18 @@ export function startGameTimer(
       // End game early if all players are eliminated
       if (areAllPlayersEliminated(huntState)) {
         clearGameTimer(gameCode);
-        endGame(io, gameCode);
+        endGame(io, gameCode).catch(err => {
+          logger.error('TIMER', `endGame failed (word-hunt elimination) for ${gameCode}: ${(err as Error).message}`);
+        });
         return;
       }
     }
 
     if (remainingTime <= 0) {
       clearGameTimer(gameCode);
-      endGame(io, gameCode);
+      endGame(io, gameCode).catch(err => {
+        logger.error('TIMER', `endGame failed (timer expired) for ${gameCode}: ${(err as Error).message}`);
+      });
     }
   }, intervalMs);
 

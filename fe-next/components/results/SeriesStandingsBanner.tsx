@@ -11,6 +11,8 @@ import type { SeriesStanding } from '@/hooks/useSeriesTracker';
 interface SeriesStandingsBannerProps {
   standings: SeriesStanding[];
   roundNumber: number;
+  totalGames?: number;
+  seriesLeader?: string | null;
   currentUsername?: string;
   t: (key: string, params?: Record<string, string | number>) => string;
   /** Compact mode for mobile */
@@ -23,6 +25,8 @@ const RANK_BG = ['bg-neo-yellow/20', 'bg-slate-300/10', 'bg-amber-600/10'];
 const SeriesStandingsBanner: React.FC<SeriesStandingsBannerProps> = ({
   standings,
   roundNumber,
+  totalGames,
+  seriesLeader,
   currentUsername,
   t,
   compact = false,
@@ -52,7 +56,9 @@ const SeriesStandingsBanner: React.FC<SeriesStandingsBannerProps> = ({
           </span>
         </div>
         <span className="text-xs font-bold text-neo-cream/50">
-          {t('results.series.gameCount', { count: roundNumber })}
+          {totalGames
+            ? t('results.series.gameXofY', { current: roundNumber, total: totalGames })
+            : t('results.series.gameCount', { count: roundNumber })}
         </span>
       </div>
 
@@ -141,15 +147,23 @@ const SeriesStandingsBanner: React.FC<SeriesStandingsBannerProps> = ({
                 )}
               </div>
 
-              {/* Total Score */}
-              <span
-                className={cn(
-                  'text-sm font-black',
-                  isCurrentUser ? 'text-neo-cyan' : 'text-neo-cream'
+              {/* Wins + Total Score */}
+              <div className="flex items-center gap-2">
+                {player.roundWins > 0 && (
+                  <span className="text-[10px] font-bold text-neo-lime bg-neo-lime/15 px-1 rounded">
+                    {player.roundWins}W
+                  </span>
                 )}
-              >
-                {player.totalScore}
-              </span>
+                <span
+                  className={cn(
+                    'text-sm font-black',
+                    isCurrentUser ? 'text-neo-cyan' : 'text-neo-cream',
+                    seriesLeader === player.username && 'text-neo-lime'
+                  )}
+                >
+                  {player.totalScore}
+                </span>
+              </div>
             </div>
           );
         })}

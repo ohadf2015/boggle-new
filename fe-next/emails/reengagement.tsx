@@ -162,16 +162,16 @@ interface ReengagementEmailProps {
 
 /* ─── Image base: dev server vs production CDN ─── */
 
-const mascotSrc = 'https://lexiclash.live/email/mascot-waving.gif';
+const mascotSrc = 'https://lexiclash.live/mascot-new-crying.jpg';
 
 /* ─── Colors (solid hex only — Gmail dark-mode safe) ─── */
 
 const C = {
   bg: '#0f0f23',
-  card: '#1a1a35',
-  cardTop: '#221a40',
-  cardInner: '#141430',
-  tileEmpty: '#2a2a55',
+  card: '#1a1a2e',
+  cardTop: '#1a1a2e',
+  cardInner: '#141428',
+  tileEmpty: '#2a2a4a',
   border: '#2e2e55',
   tileBorder: '#44447a',
   muted: '#9999bb',
@@ -180,12 +180,12 @@ const C = {
   urgencyBg: '#331030',
   urgencyBorder: '#6a2858',
   lime: '#BFFF00',
-  pink: '#FF6BB8',
+  pink: '#FF1493',
   cyan: '#00FFFF',
   purple: '#8B5CF6',
   white: '#FFFFFF',
   black: '#000000',
-  mascotBg: '#1e1e3e',
+  filledTile: '#00FFFF',
 } as const;
 
 /* ─── Component ─── */
@@ -226,7 +226,7 @@ export default function ReengagementEmail({
           <style>{`
             u + .body { background-color: ${C.bg} !important; }
             [data-ogsc] h1 { color: ${C.white} !important; }
-            [data-ogsc] .cta-btn { background-color: ${C.lime} !important; color: ${C.black} !important; }
+            [data-ogsc] .cta-btn { background-color: ${C.pink} !important; color: ${C.white} !important; }
             [data-ogsc] .streak { color: ${C.pink} !important; }
             [data-ogsc] .q { color: ${C.cyan} !important; }
             @media (max-width: 480px) {
@@ -291,34 +291,25 @@ export default function ReengagementEmail({
 
                         <tr>
                           <td>
-                            {/* ── Mascot in dark circle to mask white bg ── */}
+                            {/* ── Mascot ── */}
                             <table role="presentation" cellPadding={0} cellSpacing={0} width="100%">
                               <tr>
                                 <td align="center" style={{
-                                  padding: '40px 28px 16px',
+                                  padding: '32px 28px 8px',
                                   backgroundColor: C.cardTop,
                                 }}>
-                                  <table role="presentation" cellPadding={0} cellSpacing={0}>
-                                    <tr>
-                                      <td align="center" valign="middle" style={{
-                                        width: '130px',
-                                        height: '130px',
-                                        backgroundColor: C.mascotBg,
-                                        borderRadius: '50%',
-                                        border: `3px solid ${C.border}`,
-                                        boxShadow: `${sh}3px 3px 0px ${C.black}`,
-                                        overflow: 'hidden',
-                                      }}>
-                                        <Img
-                                          src={mascotSrc}
-                                          alt="Lexi waving hello"
-                                          width="120"
-                                          height="120"
-                                          style={{ display: 'block', width: '120px', height: '120px' }}
-                                        />
-                                      </td>
-                                    </tr>
-                                  </table>
+                                  <Img
+                                    src={mascotSrc}
+                                    alt="Lexi misses you"
+                                    width="160"
+                                    height="160"
+                                    style={{
+                                      display: 'block',
+                                      width: '160px',
+                                      height: '160px',
+                                      borderRadius: '16px',
+                                    }}
+                                  />
                                 </td>
                               </tr>
                             </table>
@@ -382,11 +373,11 @@ export default function ReengagementEmail({
                                                 <td key={i} width={52} height={52} align="center" valign="middle"
                                                   style={{
                                                     width: '52px', height: '52px',
-                                                    backgroundColor: isFilled ? C.lime : C.tileEmpty,
+                                                    backgroundColor: isFilled ? C.filledTile : C.tileEmpty,
                                                     border: isFilled
                                                       ? `3px solid ${C.black}`
                                                       : `2px solid ${C.tileBorder}`,
-                                                    borderRadius: '12px',
+                                                    borderRadius: '10px',
                                                     boxShadow: isFilled
                                                       ? `${sh}3px 3px 0px ${C.black}`
                                                       : 'none',
@@ -428,7 +419,7 @@ export default function ReengagementEmail({
                                           style={{ width: '100%', maxWidth: '320px', margin: '0 auto' }}>
                                           <tr>
                                             <td align="center" style={{
-                                              backgroundColor: C.lime,
+                                              backgroundColor: C.pink,
                                               borderRadius: '14px',
                                               border: `3px solid ${C.black}`,
                                               boxShadow: `${sh}5px 5px 0px ${C.black}`,
@@ -438,8 +429,8 @@ export default function ReengagementEmail({
                                                 className="cta-btn"
                                                 style={{
                                                   display: 'block',
-                                                  backgroundColor: C.lime,
-                                                  color: C.black,
+                                                  backgroundColor: C.pink,
+                                                  color: C.white,
                                                   fontSize: '20px',
                                                   fontWeight: 700,
                                                   textDecoration: 'none',

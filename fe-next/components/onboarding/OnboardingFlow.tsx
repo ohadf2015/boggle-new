@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { markOnboardingComplete, consumePendingRoomInvite, hasPendingRoomInvite } from '@/utils/onboardingStorage';
+import { markGuidanceShown } from '@/utils/contextualGuidanceStorage';
 import { setStoredCustomAvatar } from '@/utils/profileStorage';
 import { type CustomAvatarConfig } from '@/shared/types/customAvatar';
 import LanguageSelect from './LanguageSelect';
@@ -57,6 +58,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
     (score: number, wordsFound: string[]) => {
       setTutorialScore(score);
       setTutorialWords(wordsFound);
+      markGuidanceShown('firstPlayTutorialCompleted');
       setStep('profile');
     },
     []

@@ -368,7 +368,7 @@ export function awardFinalAchievements(game: Game, users: string[]): void {
 
   users.forEach(username => {
     if (!game.playerWordDetails[username]) {
-      logger.warn('ACHIEVEMENT', `Player ${username} missing word details during achievement calculation`);
+      logger.debug('ACHIEVEMENT', `Player ${username} missing word details during achievement calculation`);
       return;
     }
 

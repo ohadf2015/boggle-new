@@ -49,7 +49,7 @@ const BlastBoardDomination = dynamic(() => import('@/components/results/BlastBoa
 const CrazyGamesBanner = dynamic(() => import('@/components/CrazyGamesBanner'), { ssr: false });
 const PostGameWordReview = dynamic(() => import('@/components/education/PostGameWordReview'), { ssr: false });
 
-const SERIES_TOTAL_GAMES = 3;
+import { SERIES_TOTAL_GAMES } from '@/hooks/useSeriesTracker';
 
 // ==============================================
 // DESKTOP RESULTS LAYOUT
@@ -215,7 +215,7 @@ function DesktopResultsLayout({
   );
 }
 
-const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onReturnToRoom, username, socket, achievements, duplicateRuleDisabled, isHost = false, roomLanguage = 'en', gridSize = 4, gameDuration = 180, seriesStandings, seriesRoundNumber, onResetSeries, wordHuntSummary }) => {
+const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onReturnToRoom, username, socket, achievements, duplicateRuleDisabled, isHost = false, roomLanguage = 'en', gridSize = 4, gameDuration = 180, seriesStandings, seriesRoundNumber, seriesTotalGames, seriesLeader, onResetSeries, wordHuntSummary }) => {
   const { t } = useLanguage();
   const { isAuthenticated } = useAuth();
   const setIsInGame = useHideNavigation();
@@ -636,6 +636,8 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     onSelectGameMode: setSelectedGameMode,
     seriesStandings,
     seriesRoundNumber,
+    seriesTotalGames,
+    seriesLeader,
     gameMode: resolvedGameMode,
     missedWords,
     emojiReactions: memoizedEmojiReactions,

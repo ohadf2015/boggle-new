@@ -186,7 +186,7 @@ export function BlastGame({
   const [wordSubmitCount, setWordSubmitCount] = useState(0);
 
   // Explosion screen shake — triggered by bomb/countdown explosions
-  const [explosionShake, setExplosionShake] = useState(false);
+  const [explosionShake, setExplosionShake] = useState(0);
   const explosionShakeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Sugar Crush end-of-level sequence
@@ -212,6 +212,8 @@ export function BlastGame({
   useEffect(() => { maxComboRef.current = combo.maxCombo; }, [combo.maxCombo]);
   const waveConfigRef = useRef(waveConfig);
   useEffect(() => { waveConfigRef.current = waveConfig; }, [waveConfig]);
+  const soundsRef = useRef(sounds);
+  useEffect(() => { soundsRef.current = sounds; }, [sounds]);
 
   // Handle accepted word: clear tiles, cascade, track combos
   const handleWordAccepted = useCallback(async (data: { word: string; score: number }) => {
@@ -262,11 +264,19 @@ export function BlastGame({
     const avgCol = path.reduce((s, p) => s + p.col, 0) / path.length;
     const flyId = `fly-${++flyIdRef.current}`;
     const tier: 1 | 2 | 3 = result.score >= 25 ? 3 : result.score >= 10 ? 2 : 1;
+    // Dominant non-standard tile type for color-coding the score fly
+    const specialTypes = clearedInfo.map(c => c.type).filter(t => t !== 'standard');
+    const dominantTileType = specialTypes.length > 0
+      ? specialTypes.sort((a, b) =>
+          specialTypes.filter(t => t === b).length - specialTypes.filter(t => t === a).length
+        )[0]
+      : undefined;
     setScoreFlyEvents(prev => [...prev.slice(-2), {
       id: flyId, score: result.score,
       startX: ((avgCol + 0.5) / config.gridSize) * 100,
       startY: ((avgRow + 0.5) / config.gridSize) * 100,
       tier,
+      tileType: dominantTileType,
     }]);
 
     // 4. Combo flash effect
@@ -289,12 +299,16 @@ export function BlastGame({
       if (type !== 'standard') sounds.playSpecialTileSound(type);
     }
 
-    // 5b. Screen shake on bomb/countdown explosions
+    // 5b. Screen shake — intensity scales with cleared special count
     const hasBombExplosion = clearedTypes.has('bomb') || clearedTypes.has('countdown');
-    if (hasBombExplosion || (result.countdownExplosions && result.countdownExplosions.length > 0)) {
+    const countdownExplosionCount = result.countdownExplosions?.length ?? 0;
+    if (hasBombExplosion || countdownExplosionCount > 0) {
+      const bombCount = clearedInfo.filter(c => c.type === 'bomb' || c.type === 'countdown').length + countdownExplosionCount;
+      const intensity = Math.min(3, bombCount) as 1 | 2 | 3;
+      const duration = 300 + intensity * 100;
       if (explosionShakeTimerRef.current) clearTimeout(explosionShakeTimerRef.current);
-      setExplosionShake(true);
-      explosionShakeTimerRef.current = setTimeout(() => setExplosionShake(false), 400);
+      setExplosionShake(intensity);
+      explosionShakeTimerRef.current = setTimeout(() => setExplosionShake(0), duration);
     }
 
     // 6. Near-miss detection — shimmer tiles the player almost included
@@ -485,9 +499,6 @@ export function BlastGame({
   });
 
   // Handlers
-  const handleWordSubmit = useCallback((word: string) => {
-    wordSubmission.handleWordSubmit(word);
-  }, [wordSubmission]);
 
   const handlePathSubmit = useCallback((cells: Array<{ row: number; col: number }>) => {
     lastPathRef.current = cells;
@@ -497,6 +508,9 @@ export function BlastGame({
     setFormedWord(word);
     if (word.length > prevWordLenRef.current) {
       sounds.playTileSelect();
+    } else if (word.length === 0 && prevWordLenRef.current >= 2) {
+      // Path cancelled without submission — descending deflate tone
+      sounds.playPathCancel(prevWordLenRef.current);
     }
     prevWordLenRef.current = word.length;
     if (word.length > 0) sounds.playPathTone(word.length);
@@ -579,6 +593,10 @@ export function BlastGame({
     if (objectives.allObjectivesComplete && !waveClearPlayedRef.current) {
       sounds.playWaveClear();
       setWaveClearParticle(c => c + 1);
+      // Heavy celebratory shake for wave completion
+      if (explosionShakeTimerRef.current) clearTimeout(explosionShakeTimerRef.current);
+      setExplosionShake(3);
+      explosionShakeTimerRef.current = setTimeout(() => setExplosionShake(0), 600);
       waveClearPlayedRef.current = true;
     }
   }, [objectives.allObjectivesComplete, sounds]);
@@ -639,11 +657,11 @@ export function BlastGame({
             ));
 
             // Play conversion sound + screen shake for high-intensity
-            sounds.playSpecialTileSound(step.convertTo);
+            soundsRef.current.playSpecialTileSound(step.convertTo);
             if (step.intensity === 'high' || step.convertTo === 'bomb') {
               if (explosionShakeTimerRef.current) clearTimeout(explosionShakeTimerRef.current);
-              setExplosionShake(true);
-              explosionShakeTimerRef.current = setTimeout(() => setExplosionShake(false), 400);
+              setExplosionShake(step.convertTo === 'bomb' ? 3 : 2);
+              explosionShakeTimerRef.current = setTimeout(() => setExplosionShake(0), 500);
             }
           }
 
@@ -667,7 +685,7 @@ export function BlastGame({
         }
       })();
 
-      return () => { cancelled = true; sugarCrushRunningRef.current = false; };
+      return () => { cancelled = true; };
     }
 
     return undefined;
@@ -677,7 +695,7 @@ export function BlastGame({
     engine.gameState.isDeadEnd,
     objectives.allObjectivesComplete,
     isMultiplayer,
-    config.gridSize, sounds,
+    config.gridSize,
   ]);
 
   // Loading state — wait for both grid generation AND dictionary cache
@@ -714,7 +732,7 @@ export function BlastGame({
         currentFeedback={wordSubmission.currentFeedback}
         sequencerState={sequencer.state}
         interactive={!engine.isCascading && !sequencer.state.isAnimating && pendingDiscovery == null && !engine.gameState.isDeadEnd && !engine.gameState.isComplete}
-        onWordSubmit={handleWordSubmit}
+        onWordSubmit={wordSubmission.handleWordSubmit}
         onPathSubmit={handlePathSubmit}
         onWordChange={handleWordChange}
         onShuffle={handleShuffle}

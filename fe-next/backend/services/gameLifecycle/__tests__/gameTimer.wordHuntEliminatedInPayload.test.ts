@@ -29,7 +29,7 @@ vi.mock('../botGame', () => ({
 }));
 
 vi.mock('../gameEnd', () => ({
-  endGame: vi.fn(),
+  endGame: vi.fn().mockResolvedValue(undefined),
 }));
 
 vi.mock('../../../modules/wordHuntManager', () => ({

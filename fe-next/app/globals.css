@@ -2637,9 +2637,11 @@
   }
 
   @keyframes blastTileAppear {
-    0% { opacity: 0; transform: translateY(var(--spawn-from, -40px)) scale(0.3); }
-    50% { opacity: 1; transform: translateY(4px) scale(1.06); }
-    75% { opacity: 1; transform: translateY(-2px) scale(0.97); }
+    0% { opacity: 0; transform: translateY(var(--spawn-from, -60px)) scale(0.85); }
+    35% { opacity: 1; transform: translateY(0) scale(1); }
+    50% { transform: translateY(2px) scaleY(0.88) scaleX(1.1); }
+    65% { transform: translateY(-3px) scaleY(1.06) scaleX(0.96); }
+    80% { transform: translateY(1px) scaleY(0.97) scaleX(1.02); }
     100% { opacity: 1; transform: translateY(0) scale(1); }
   }
 

@@ -81,8 +81,8 @@ interface BlastStageProps {
   // Combo streak
   comboStreak?: ComboStreakState;
   comboStreakArcRef?: React.RefObject<SVGCircleElement | null>;
-  // Explosion screen shake (bomb/countdown)
-  explosionShake?: boolean;
+  // Explosion screen shake intensity (0=none, 1=light, 2=medium, 3=heavy)
+  explosionShake?: number;
   // Word praise feedback
   lastWordLength?: number;
   wordSubmitCount?: number;
@@ -276,15 +276,18 @@ export const BlastStage = memo(function BlastStage({
       <div
         className={cn(
           'flex-1 flex flex-col items-center justify-center px-4 sm:px-6 py-2 relative z-30 min-h-0',
-          explosionShake ? 'animate-neo-shake' :
+          explosionShake && explosionShake >= 2 ? 'animate-neo-shake' :
+          explosionShake === 1 ? 'animate-neo-wobble' :
           sequencerState?.chainLevel && sequencerState.chainLevel >= 3 ? 'animate-neo-shake' :
           sequencerState?.chainLevel && sequencerState.chainLevel >= 2 ? 'animate-neo-wobble' :
           sequencerState?.phase === 'clearing' ? 'animate-neo-wobble' : '',
         )}
         style={{
-          transform: sequencerState?.chainLevel
-            ? `scale(${1 + Math.min(sequencerState.chainLevel, 5) * 0.008})`
-            : undefined,
+          transform: explosionShake && explosionShake >= 3
+            ? `scale(${1.012 + Math.min(sequencerState?.chainLevel ?? 0, 5) * 0.008})`
+            : sequencerState?.chainLevel
+              ? `scale(${1 + Math.min(sequencerState.chainLevel, 5) * 0.008})`
+              : undefined,
           transition: 'transform 200ms ease-out',
         }}
       >

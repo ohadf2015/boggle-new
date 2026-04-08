@@ -2096,6 +2096,7 @@ const ja = {
     "series": {
       "title": "セッション順位",
       "gameCount": "ゲーム{count}",
+      "gameXofY": "ゲーム{current}/{total}",
       "round": "R{num}",
       "winner": "シリーズ優勝！",
       "newSeries": "新しいシリーズ",

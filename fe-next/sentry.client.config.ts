@@ -199,6 +199,14 @@ Sentry.init({
     // PixiJS WebGL errors on low-end Android devices — not actionable
     /Cannot read properties of null.*alphaMode/i,
     /Unable to convert color/i,
+    // Blast mode access rejection — expected for non-admin users trying blast
+    /Blast mode requires special access/i,
+    // DissolveEffect texture race — PixiJS texture not ready during effect init
+    /DissolveEffect.*Could not find valid resource/i,
+    // Bot achievement calculation with missing data — non-critical
+    /missing word details during achievement/i,
+    // React error #185 — infinite loop already fixed in selectors.ts, residual edge case
+    /Maximum update depth exceeded/i,
   ],
 
   denyUrls: [

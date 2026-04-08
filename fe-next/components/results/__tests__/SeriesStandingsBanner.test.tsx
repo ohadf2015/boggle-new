@@ -50,9 +50,11 @@ const makeStandings = (players: Array<{
   roundScores: number[];
   currentRank: number;
   rankChange: number;
+  roundWins?: number;
 }>): SeriesStanding[] =>
   players.map(p => ({
     ...p,
+    roundWins: p.roundWins ?? 0,
     avatar: { emoji: '🎮', color: '#FF0000' },
   }));
 

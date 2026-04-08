@@ -21,6 +21,7 @@ import { broadcastToRoom, getGameRoom } from '../../utils/socketHelpers';
 import { findAllWords, getCachedTrie } from '../../modules/boggleSolver';
 import { endGame } from './gameEnd';
 import { getBestHumanScore } from './botGame';
+import { setBotTimeout } from '../../modules/botLifecycle';
 import logger from '../../utils/logger';
 
 /** Delay before ending game after bot finds target (ms) */
@@ -189,16 +190,11 @@ export function startBotsForWordHunt(
 
     bot.isActive = true;
 
-    // Schedule first guess
+    // Schedule first guess — setBotTimeout auto-manages activeTimers and checks isActive
     const firstDelay = strategy.startDelay + Math.random() * 2000;
-    const timerId = setTimeout(() => {
-      if (!bot.activeTimers) bot.activeTimers = new Set();
-      bot.activeTimers.delete(timerId);
+    setBotTimeout(bot, () => {
       scheduleWordHuntGuess(io, gameCode, bot, strategy, huntState, gameEndTime);
     }, firstDelay);
-
-    if (!bot.activeTimers) bot.activeTimers = new Set();
-    bot.activeTimers.add(timerId);
   }
 }
 
@@ -259,8 +255,8 @@ function scheduleWordHuntGuess(
 
     logger.info('BOT', `Bot "${bot.username}" found target "${huntState.targetWord}" in ${gameCode}`);
 
-    // End game after delay
-    setTimeout(() => {
+    // End game after delay — use setBotTimeout so it's cleaned up if bot is stopped
+    setBotTimeout(bot, () => {
       const currentGame = getGame(gameCode);
       if (currentGame && currentGame.gameState === 'in-progress') {
         endGame(io, gameCode);
@@ -300,10 +296,7 @@ function scheduleWordHuntGuess(
   const delay = strategy.minDelay + Math.random() * (strategy.maxDelay - strategy.minDelay);
   if (delay > remainingMs - 1000) return;
 
-  const timerId = setTimeout(() => {
-    bot.activeTimers.delete(timerId);
+  setBotTimeout(bot, () => {
     scheduleWordHuntGuess(io, gameCode, bot, strategy, huntState, gameEndTime);
   }, delay);
-
-  bot.activeTimers.add(timerId);
 }

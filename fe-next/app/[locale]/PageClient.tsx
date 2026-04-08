@@ -72,8 +72,8 @@ export default function HomePageClient({ initialData }: HomePageClientProps): Re
     return <div className="fixed inset-0 bg-neo-navy" />;
   }
 
-  // Mobile new users go straight to onboarding — LandingView never mounts
-  if (showFTUE && !isDesktop) {
+  // New users go straight to onboarding — LandingView never mounts
+  if (showFTUE) {
     return <OnboardingFlow onComplete={handleFTUEComplete} />;
   }
 

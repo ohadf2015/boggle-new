@@ -194,6 +194,15 @@ export function useBlastSounds() {
     }
   }, []);
 
+  /** Descending "deflate" tone when player cancels a partial path (2+ tiles) */
+  const playPathCancel = useCallback((pathLength: number) => {
+    if (pathLength < 2) return;
+    // Quick descending glissando — higher start for longer paths
+    const startFreq = PATH_TONE_FREQUENCIES[Math.min(pathLength - 1, PATH_TONE_FREQUENCIES.length - 1)];
+    synthTone(startFreq * 0.7, 'triangle', 0.15, 0.06);
+    setTimeout(() => synthTone(startFreq * 0.4, 'triangle', 0.12, 0.04), 40);
+  }, [synthTone]);
+
   return {
     playTileClear,
     playCascadeChain,
@@ -203,6 +212,7 @@ export function useBlastSounds() {
     playWordReject,
     playComboTimeout,
     playPathTone,
+    playPathCancel,
     playSpecialTileSound,
     playTileSelect,
     playLongWordBonus,

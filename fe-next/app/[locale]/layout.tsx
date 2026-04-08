@@ -68,7 +68,7 @@ function getLanguageCode(locale: string): string {
 
 export async function generateMetadata({ params }: LocaleLayoutProps): Promise<Metadata> {
     const { locale } = await params;
-    const validLocale = (locale as Locale) || 'en';
+    const validLocale = (SUPPORTED_LOCALES.has(locale) ? locale : 'en') as Locale;
     const seo = translations[validLocale]?.seo || translations.en.seo;
     const localePath = getLocalePath(validLocale);
 
@@ -176,7 +176,7 @@ export async function generateMetadata({ params }: LocaleLayoutProps): Promise<M
 
 export default async function LocaleLayout({ children, params }: LocaleLayoutProps): Promise<ReactNode> {
     const { locale } = await params;
-    const validLocale = (locale as Locale) || 'en';
+    const validLocale = (SUPPORTED_LOCALES.has(locale) ? locale : 'en') as Locale;
     const dir = translations[validLocale]?.direction || 'ltr';
     const seo = translations[validLocale]?.seo || translations.en.seo;
     const localePath = getLocalePath(validLocale);

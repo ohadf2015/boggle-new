@@ -136,12 +136,6 @@ export function usePlayerGameEvents({
     addWordHuntDiscoveryClues,
   } = useGameActions();
 
-  // Track if was in active game (TODO: move to GameState context)
-  const setWasInActiveGame = useRef<(value: boolean) => void>(() => {});
-  const wasInActiveGameValue = useRef(false);
-  setWasInActiveGame.current = (value: boolean) => {
-    wasInActiveGameValue.current = value;
-  };
   // Use refs to avoid stale closure issues
   const onShowResultsRef = useRef(onShowResults);
   useEffect(() => {
@@ -204,7 +198,6 @@ export function usePlayerGameEvents({
         return;
       }
 
-      setWasInActiveGame.current(true);
       wasInActiveGameRef.current = true;
       comboShieldsUsedRef.current = 0;
 
@@ -453,7 +446,6 @@ export function usePlayerGameEvents({
       }
       setGameActive(false);
       gameActiveRef.current = false;
-      setWasInActiveGame.current(false);
       wasInActiveGameRef.current = false;
       setFoundWords([]);
       setAchievements([]);
@@ -491,6 +483,15 @@ export function usePlayerGameEvents({
       setXpGainedData(null);
       setLevelUpData(null);
       setTotalBoardWords(null);
+
+      // Reset earthquake/fire-round state for next game
+      setEarthquakeState('idle');
+      setFireRoundActive(false);
+      setFireRoundRemaining(0);
+      if (fireRoundIntervalRef.current) {
+        clearInterval(fireRoundIntervalRef.current);
+        fireRoundIntervalRef.current = null;
+      }
 
       // Reset word hunt state for next game
       setWordHuntEliminatedPlayers([]);

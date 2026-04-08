@@ -30,7 +30,7 @@ import { useMultiplayerEventNotifications } from '@/hooks/useMultiplayerEventNot
 import { useMultiplayerSounds } from '@/hooks/useMultiplayerSounds';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 import { useMultiplayerJoin } from './useMultiplayerJoin';
-import { useGameActions } from '@/hooks/gameState';
+import { useGameActions, useGameStore } from '@/hooks/gameState';
 import { useCrazyGamesAuth } from '@/hooks/useCrazyGamesAuth';
 import { neoInfoToast } from '@/components/NeoToast';
 import type { Language, ActiveRoom, Avatar, GameMode } from '@/shared/types/game';
@@ -57,6 +57,8 @@ const ResultsPage = nextDynamic(() => import('@/components/views/ResultsPage'), 
   ssr: false,
 });
 
+const VALID_MODES: GameMode[] = ['classic', 'blast', 'word-hunt'];
+
 function ViewLoadingSkeleton(): React.JSX.Element {
   return (
     <div className="flex-1 flex items-center justify-center bg-neo-navy relative">
@@ -73,7 +75,6 @@ export default function MultiplayerPageClient(): React.JSX.Element {
   const isClassroomMode = searchParams?.get('classroom') === 'true';
   const preselectedMode = searchParams?.get('mode') as GameMode | null;
   const autoCreate = searchParams?.get('autoCreate') === 'true';
-  const validModes: GameMode[] = ['classic', 'blast', 'word-hunt'];
   const { setGameMode: setStoreGameMode } = useGameActions();
 
   const [gameCode, setGameCode] = useState<string>('');
@@ -91,7 +92,7 @@ export default function MultiplayerPageClient(): React.JSX.Element {
 
   // Pre-select game mode from URL param (e.g., ?mode=word-hunt)
   useEffect(() => {
-    if (preselectedMode && validModes.includes(preselectedMode)) {
+    if (preselectedMode && VALID_MODES.includes(preselectedMode)) {
       setStoreGameMode(preselectedMode);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -244,7 +245,15 @@ export default function MultiplayerPageClient(): React.JSX.Element {
       setResultsData(null);
       mpSounds.onMatchStart();
     },
-    onGameReset: () => { /* Keep results visible until startGame arrives with new grid */ },
+    onGameReset: () => {
+      // Reset Zustand store so stale blast/word-hunt state doesn't leak into the next round.
+      // Also clear results — PlayerView is unmounted during results screen, so its own
+      // resetGame handler can't fire. PageClient must handle this since it's always mounted.
+      useGameStore.getState().resetForNewRound();
+      setShowResults(false);
+      setResultsData(null);
+      setPendingGameStart(null);
+    },
     onHostLeftRoomClosing: () => {
       clearSessionPreservingUsername(username);
       setIsActive(false); setIsHost(false); setGameCode('');
@@ -287,7 +296,7 @@ export default function MultiplayerPageClient(): React.JSX.Element {
   });
 
   // Sound: game over — victory if first place, defeat otherwise
-  React.useEffect(() => {
+  useEffect(() => {
     if (!showResults || !resultsData?.scores?.length) return;
     const myRank = resultsData.scores.findIndex(s => s.username === username);
     if (myRank === 0) mpSounds.onVictory(true);
@@ -296,18 +305,20 @@ export default function MultiplayerPageClient(): React.JSX.Element {
   }, [showResults]);
 
   // Series tracking
-  React.useEffect(() => {
+  useEffect(() => {
     if (showResults && resultsData?.scores) seriesTracker.recordRound(resultsData.scores);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showResults, resultsData?.scores]);
 
-  React.useEffect(() => {
-    if (!isActive) seriesTracker.reset();
+  // Only reset series when user truly leaves the room (gameCode cleared),
+  // not on transient isActive=false from reconnectable disconnects
+  useEffect(() => {
+    if (!isActive && !gameCode) seriesTracker.reset();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isActive]);
+  }, [isActive, gameCode]);
 
   // Music transitions
-  React.useEffect(() => {
+  useEffect(() => {
     if (showResults) return;
     if (!isActive) { playTrack(TRACKS.LOBBY); } else { playTrack(TRACKS.BEFORE_GAME); }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -335,6 +346,8 @@ export default function MultiplayerPageClient(): React.JSX.Element {
             gridSize={Array.isArray(resultsData?.letterGrid) && resultsData.letterGrid.length > 0 ? resultsData.letterGrid.length : 4}
             gameDuration={gameDuration} seriesStandings={seriesTracker.standings}
             seriesRoundNumber={seriesTracker.roundNumber}
+            seriesTotalGames={seriesTracker.totalGames}
+            seriesLeader={seriesTracker.seriesLeader}
             onResetSeries={seriesTracker.reset}
             wordHuntSummary={resultsData?.wordHuntSummary}
             blastSummary={resultsData?.blastSummary}

@@ -33,6 +33,20 @@ vi.mock('@/components/ui/button', () => ({
   Button: ({ children, ...props }: any) => <button {...props}>{children}</button>,
 }));
 
+vi.mock('next/link', () => ({
+  __esModule: true,
+  default: ({ children, ...props }: any) => <a {...props}>{children}</a>,
+}));
+
+vi.mock('@/lib/utils', () => ({
+  cn: (...args: any[]) => args.filter(Boolean).join(' '),
+}));
+
+vi.mock('@/components/legal/LegalPageLayout', () => ({
+  __esModule: true,
+  default: ({ children, title }: any) => <div><h1>{title}</h1>{children}</div>,
+}));
+
 describe('Legal Index - Cookies card', () => {
   let LegalIndexPageClient: any;
 

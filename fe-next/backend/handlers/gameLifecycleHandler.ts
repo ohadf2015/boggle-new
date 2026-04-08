@@ -92,6 +92,10 @@ interface AuthConnection {
   isHost: boolean;
 }
 
+// Guards against TOCTOU race in createGame: tracks game codes whose creation
+// is in-flight (between gameExists check and createGame call across async yields).
+const gamesBeingCreated = new Set<string>();
+
 /**
  * Register game lifecycle socket event handlers
  */
@@ -131,14 +135,25 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
 
       const sanitizedPlayerId = playerId || undefined;
 
-      if (gameExists(gameCode)) {
-        logger.warn('SOCKET', `Game code already exists: ${gameCode}`);
+      if (gameExists(gameCode) || gamesBeingCreated.has(gameCode)) {
+        logger.warn('SOCKET', `Game code already exists or in-flight: ${gameCode}`);
         emitError(socket, 'Game code already in use');
         return;
       }
 
+      // Lock the game code during async work to prevent TOCTOU races
+      gamesBeingCreated.add(gameCode);
+      try {
+
       if (authUserId) {
         await handleExistingAuthConnection(io, socket, authUserId, gameCode);
+      }
+
+      // Re-check after async yield — another socket may have created it
+      if (gameExists(gameCode)) {
+        logger.warn('SOCKET', `Game code created by another socket during async: ${gameCode}`);
+        emitError(socket, 'Game code already in use');
+        return;
       }
 
       const game = createGame(gameCode, {
@@ -214,7 +229,12 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
       }).catch((err: Error) => {
         logger.error('SOCKET', `Failed to notify room created for ${gameCode}: ${err.message}`);
       });
+
+      } finally {
+        gamesBeingCreated.delete(gameCode);
+      }
     } catch (error: unknown) {
+      gamesBeingCreated.delete((data as CreateGamePayload)?.gameCode);
       const err = error as Error;
       logger.error('SOCKET', `Unhandled error in createGame handler: ${err.message}`, {
         stack: err.stack,

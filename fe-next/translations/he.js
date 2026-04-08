@@ -2114,6 +2114,7 @@ const he = {
     "series": {
       "title": "דירוג מצטבר",
       "gameCount": "משחק {count}",
+      "gameXofY": "משחק {current} מתוך {total}",
       "round": "ס{num}",
       "winner": "מנצח הסדרה!",
       "newSeries": "סדרה חדשה",

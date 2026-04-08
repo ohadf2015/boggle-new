@@ -153,13 +153,12 @@ describe('StudentProfilePageClient - Duel Features', () => {
 
     render(<StudentProfilePageClient />);
 
-    // Wait for duel stats to load
+    // Wait for duel stats to load (async fetch)
     await waitFor(() => {
-      expect(screen.getByText('student.profile.duelRecord')).toBeInTheDocument();
+      expect(screen.getByText('duels.wins')).toBeInTheDocument();
     });
 
-    // Check wins label and value
-    expect(screen.getByText('duels.wins')).toBeInTheDocument();
+    expect(screen.getByText('student.profile.duelRecord')).toBeInTheDocument();
     expect(screen.getByText('duels.losses')).toBeInTheDocument();
     expect(screen.getByText('duels.draws')).toBeInTheDocument();
 

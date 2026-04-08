@@ -2112,6 +2112,7 @@ const es = {
     "series": {
       "title": "Tabla de la Sesión",
       "gameCount": "Juego {count}",
+      "gameXofY": "Juego {current} de {total}",
       "round": "R{num}",
       "winner": "¡Ganador de la serie!",
       "newSeries": "Nueva serie",

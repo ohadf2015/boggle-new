@@ -4,17 +4,20 @@
  * Maintains a history of round scores for each player, computes accumulated
  * standings, rank changes, and provides data compatible with SessionStatsCard.
  */
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import type { PlayerResult } from '@/types/components';
 import type { Avatar } from '@/shared/types/game';
 
 type AvatarLike = Avatar;
+
+export const SERIES_TOTAL_GAMES = 5;
 
 export interface SeriesStanding {
   username: string;
   avatar?: AvatarLike;
   totalScore: number;
   roundScores: number[];
+  roundWins: number;
   currentRank: number;
   rankChange: number; // positive = climbed, negative = dropped, 0 = no change
 }
@@ -23,8 +26,36 @@ interface RoundSnapshot {
   scores: Array<{ username: string; score: number; avatar?: AvatarLike }>;
 }
 
+const STORAGE_KEY = 'lexiclash:series-rounds';
+
+function loadRounds(): RoundSnapshot[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    const raw = sessionStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveRounds(rounds: RoundSnapshot[]): void {
+  if (typeof window === 'undefined') return;
+  try {
+    if (rounds.length === 0) {
+      sessionStorage.removeItem(STORAGE_KEY);
+    } else {
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(rounds));
+    }
+  } catch { /* quota exceeded — non-critical */ }
+}
+
 export function useSeriesTracker() {
-  const [rounds, setRounds] = useState<RoundSnapshot[]>([]);
+  const [rounds, setRounds] = useState<RoundSnapshot[]>(loadRounds);
+
+  // Sync to sessionStorage whenever rounds change
+  useEffect(() => {
+    saveRounds(rounds);
+  }, [rounds]);
 
   const recordRound = useCallback((players: PlayerResult[]) => {
     const snapshot: RoundSnapshot = {
@@ -36,16 +67,14 @@ export function useSeriesTracker() {
     };
 
     setRounds(prev => {
-      // Duplicate detection: check if last round has identical scores
+      // Duplicate detection: compare by sorted username+score pairs
+      // (order-independent, since score arrays may arrive in different order)
       if (prev.length > 0) {
         const last = prev[prev.length - 1];
-        const isSame =
-          last.scores.length === snapshot.scores.length &&
-          last.scores.every((s, i) =>
-            s.username === snapshot.scores[i]?.username &&
-            s.score === snapshot.scores[i]?.score
-          );
-        if (isSame) return prev;
+        const sortKey = (s: { username: string; score: number }) => `${s.username}:${s.score}`;
+        const lastSorted = last.scores.map(sortKey).sort().join('|');
+        const snapSorted = snapshot.scores.map(sortKey).sort().join('|');
+        if (lastSorted === snapSorted) return prev;
       }
       return [...prev, snapshot];
     });
@@ -64,6 +93,7 @@ export function useSeriesTracker() {
       avatar?: AvatarLike;
       roundScores: number[];
       totalScore: number;
+      roundWins: number;
     }>();
 
     for (let roundIdx = 0; roundIdx < rounds.length; roundIdx++) {
@@ -78,6 +108,7 @@ export function useSeriesTracker() {
             avatar: entry.avatar,
             roundScores: Array(roundIdx).fill(0),
             totalScore: 0,
+            roundWins: 0,
           };
           playerMap.set(entry.username, player);
         }
@@ -91,6 +122,23 @@ export function useSeriesTracker() {
         if (player.roundScores.length < roundIdx + 1) {
           player.roundScores.push(0);
         }
+      }
+    }
+
+    // Count round wins — the player with the highest score in each round gets a win
+    for (let roundIdx = 0; roundIdx < rounds.length; roundIdx++) {
+      const round = rounds[roundIdx];
+      let bestScore = -1;
+      let winner = '';
+      for (const entry of round.scores) {
+        if (entry.score > bestScore) {
+          bestScore = entry.score;
+          winner = entry.username;
+        }
+      }
+      if (winner) {
+        const p = playerMap.get(winner);
+        if (p) p.roundWins++;
       }
     }
 
@@ -119,6 +167,7 @@ export function useSeriesTracker() {
         avatar: player.avatar,
         totalScore: player.totalScore,
         roundScores: player.roundScores,
+        roundWins: player.roundWins,
         currentRank,
         rankChange,
       };
@@ -135,11 +184,23 @@ export function useSeriesTracker() {
     [standings]
   );
 
+  // Series leader: most round wins, tiebreak by total score
+  const seriesLeader = useMemo(() => {
+    if (standings.length === 0) return null;
+    const sorted = [...standings].sort((a, b) =>
+      b.roundWins - a.roundWins || b.totalScore - a.totalScore
+    );
+    return sorted[0].username;
+  }, [standings]);
+
   return {
     roundNumber: rounds.length,
+    totalGames: SERIES_TOTAL_GAMES,
+    isSeriesComplete: rounds.length >= SERIES_TOTAL_GAMES,
     hasMultipleRounds: rounds.length >= 2,
     standings,
     sessionStandings,
+    seriesLeader,
     recordRound,
     reset,
   };

@@ -210,21 +210,19 @@ export function recordBlastMove(
     state.playerBonusMoves[username] += 1;
   }
 
-  // Update rich per-player stats
-  if (state.playerStats) {
-    if (!state.playerStats[username]) {
-      state.playerStats[username] = { maxCombo: 0, gemsCollected: 0, wordsFound: [], bestWord: '', tilesCleared: 0, totalTileBonus: 0 };
-    }
-    const stats = state.playerStats[username];
-    if (comboLevel > stats.maxCombo) stats.maxCombo = comboLevel;
-    if (word) {
-      stats.wordsFound.push(word);
-      if (word.length > stats.bestWord.length) stats.bestWord = word;
-    }
-    if (tilesCleared) stats.tilesCleared += tilesCleared;
-    if (gemCount) stats.gemsCollected += gemCount;
-    if (tileBonus) stats.totalTileBonus = (stats.totalTileBonus || 0) + tileBonus;
+  // Update rich per-player stats (initialize lazily for late-joining players)
+  if (!state.playerStats[username]) {
+    state.playerStats[username] = { maxCombo: 0, gemsCollected: 0, wordsFound: [], bestWord: '', tilesCleared: 0, totalTileBonus: 0 };
   }
+  const stats = state.playerStats[username];
+  if (comboLevel > stats.maxCombo) stats.maxCombo = comboLevel;
+  if (word) {
+    stats.wordsFound.push(word);
+    if (word.length > stats.bestWord.length) stats.bestWord = word;
+  }
+  if (tilesCleared) stats.tilesCleared += tilesCleared;
+  if (gemCount) stats.gemsCollected += gemCount;
+  if (tileBonus) stats.totalTileBonus = (stats.totalTileBonus || 0) + tileBonus;
 
   return {
     movesUsed: state.playerMoves[username],
@@ -233,8 +231,38 @@ export function recordBlastMove(
 }
 
 /**
+ * Resolve an ordered list of grid positions for each letter in a word,
+ * preferring unused positions to handle duplicate letters correctly.
+ * Falls back to the first position when all positions for a letter are exhausted.
+ */
+function resolveWordPositions(
+  word: string,
+  letterPositions: Map<string, [number, number][]>,
+): Array<[number, number]> {
+  const usedPositions = new Set<string>();
+  const result: Array<[number, number]> = [];
+
+  for (const letter of word.toLowerCase()) {
+    const positions = letterPositions.get(letter);
+    if (!positions || positions.length === 0) continue;
+
+    let chosen = positions[0];
+    for (const pos of positions) {
+      const key = `${pos[0]},${pos[1]}`;
+      if (!usedPositions.has(key)) {
+        usedPositions.add(key);
+        chosen = pos;
+        break;
+      }
+    }
+    result.push(chosen);
+  }
+
+  return result;
+}
+
+/**
  * Get tile types for each letter in a word based on grid positions and overlay.
- * For each letter, finds its grid position and checks if it has a special tile.
  */
 export function getTilesOnPath(
   word: string,
@@ -242,9 +270,6 @@ export function getTilesOnPath(
   overlay: BlastTileOverlay[],
   cachedOverlayMap?: Map<string, BlastTileType>
 ): BlastTileType[] {
-  const tiles: BlastTileType[] = [];
-
-  // Use cached map if provided, otherwise build one from overlay array
   const overlayMap = cachedOverlayMap ?? new Map<string, BlastTileType>();
   if (!cachedOverlayMap) {
     for (const tile of overlay) {
@@ -252,67 +277,17 @@ export function getTilesOnPath(
     }
   }
 
-  // Track used positions to handle duplicate letters
-  const usedPositions = new Set<string>();
-
-  for (const letter of word.toLowerCase()) {
-    const positions = letterPositions.get(letter);
-    if (!positions || positions.length === 0) continue;
-
-    // Find first unused position for this letter
-    let foundPosition = false;
-    for (const pos of positions) {
-      const key = `${pos[0]},${pos[1]}`;
-      if (!usedPositions.has(key)) {
-        usedPositions.add(key);
-        const tileType = overlayMap.get(key) || 'standard';
-        tiles.push(tileType);
-        foundPosition = true;
-        break;
-      }
-    }
-
-    // If all positions used, use first position anyway
-    if (!foundPosition && positions.length > 0) {
-      const pos = positions[0];
-      const key = `${pos[0]},${pos[1]}`;
-      const tileType = overlayMap.get(key) || 'standard';
-      tiles.push(tileType);
-    }
-  }
-
-  return tiles;
+  return resolveWordPositions(word, letterPositions).map(([r, c]) =>
+    overlayMap.get(`${r},${c}`) ?? 'standard'
+  );
 }
 
 /**
  * Get word path positions for server-side tile processing.
- * Returns {row, col} for each letter in the word, matching the same
- * position-selection logic as getTilesOnPath.
  */
 export function getWordPath(
   word: string,
   letterPositions: Map<string, [number, number][]>,
 ): Array<{ row: number; col: number }> {
-  const path: Array<{ row: number; col: number }> = [];
-  const usedPositions = new Set<string>();
-
-  for (const letter of word.toLowerCase()) {
-    const positions = letterPositions.get(letter);
-    if (!positions || positions.length === 0) continue;
-
-    let found = false;
-    for (const pos of positions) {
-      const key = `${pos[0]},${pos[1]}`;
-      if (!usedPositions.has(key)) {
-        usedPositions.add(key);
-        path.push({ row: pos[0], col: pos[1] });
-        found = true;
-        break;
-      }
-    }
-    if (!found && positions.length > 0) {
-      path.push({ row: positions[0][0], col: positions[0][1] });
-    }
-  }
-  return path;
+  return resolveWordPositions(word, letterPositions).map(([r, c]) => ({ row: r, col: c }));
 }

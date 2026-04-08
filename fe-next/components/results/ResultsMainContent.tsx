@@ -17,6 +17,7 @@ import { ResultsRevengeSection } from '@/components/results/ResultsRevengeSectio
 
 import type { GameModeOption } from '@/components/GameModeSelector';
 import type { SeriesStanding } from '@/hooks/useSeriesTracker';
+import SeriesStandingsBanner from '@/components/results/SeriesStandingsBanner';
 
 import { ResultsWordsSection } from '@/components/results/ResultsWordsSection';
 import { WinStreakBadge } from '@/components/multiplayer/WinStreakBadge';
@@ -67,6 +68,8 @@ export interface ResultsMainContentProps {
   onSelectGameMode?: (mode: GameModeOption) => void;
   seriesStandings?: SeriesStanding[];
   seriesRoundNumber?: number;
+  seriesTotalGames?: number;
+  seriesLeader?: string | null;
   gameMode?: string;
   missedWords?: Array<{ word: string; score: number; foundBy: string[] }>;
   emojiReactions?: Array<{ id: string; emoji: string; username: string; timestamp: number }>;
@@ -112,8 +115,10 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
   wordHuntSummary,
   onPodiumReaction,
   emojiReactions: _emojiReactions,
-  seriesStandings: _seriesStandings,
-  seriesRoundNumber: _seriesRoundNumber,
+  seriesStandings,
+  seriesRoundNumber,
+  seriesTotalGames,
+  seriesLeader,
   missedWords: _missedWords,
 }) {
   const reducedMotion = useReducedMotion();
@@ -226,6 +231,18 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
           isWordHunt={isWordHunt}
           t={t}
           onReaction={onPodiumReaction}
+        />
+      )}
+
+      {/* 3.5 SERIES STANDINGS */}
+      {seriesStandings && seriesRoundNumber != null && (
+        <SeriesStandingsBanner
+          standings={seriesStandings}
+          roundNumber={seriesRoundNumber}
+          totalGames={seriesTotalGames}
+          seriesLeader={seriesLeader}
+          currentUsername={username}
+          t={t}
         />
       )}
 

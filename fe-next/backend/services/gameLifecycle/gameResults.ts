@@ -46,13 +46,23 @@ export async function recordGameResultsToSupabase(
   game: GameState
 ): Promise<void> {
   try {
-    // Build userAuthMap from game.users
+    // Filter out bot players — they have no auth identity and shouldn't be persisted
+    const humanScores = scoresArray.filter(
+      (p) => !(game.users?.[p.username] as unknown as { isBot?: boolean })?.isBot
+    );
+    if (humanScores.length === 0) {
+      logger.debug('GAME_RESULTS', `Game ${gameCode} had only bots, skipping Supabase save`);
+      return;
+    }
+
+    // Build userAuthMap from game.users (humans only)
     const userAuthMap: Record<string, UserAuthInfo> = {};
 
     for (const [username, userData] of Object.entries(game.users || {}) as [
       string,
       UserData
     ][]) {
+      if ((userData as unknown as { isBot?: boolean }).isBot) continue;
       userAuthMap[username] = {
         authUserId: userData.authUserId,
         guestTokenHash: userData.guestTokenHash,
@@ -73,13 +83,13 @@ export async function recordGameResultsToSupabase(
     };
 
     // Sort scores to calculate placements for stats recording
-    const sortedForStats = [...scoresArray].sort(
+    const sortedForStats = [...humanScores].sort(
       (a, b) => b.totalScore - a.totalScore
     );
-    const totalPlayersInGame = scoresArray.length;
+    const totalPlayersInGame = humanScores.length;
 
     // Map PlayerResult[] to PlayerScore[] format expected by processGameResults
-    const mappedScores = scoresArray.map((playerResult) => {
+    const mappedScores = humanScores.map((playerResult) => {
       const placement =
         sortedForStats.findIndex((p) => p.username === playerResult.username) + 1;
       const longestWord =
