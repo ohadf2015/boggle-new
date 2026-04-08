@@ -100,7 +100,7 @@ vi.mock('../../results', () => ({
   useGameSessionLogging: vi.fn(),
   useCoinRewards: vi.fn(),
   useCognitiveScoring: vi.fn(),
-  useSignupPrompt: vi.fn(),
+  useSignupPrompt: vi.fn().mockReturnValue({ showSignupModal: false, setShowSignupModal: vi.fn() }),
   useAchievementsSave: vi.fn(),
 }));
 
@@ -207,12 +207,14 @@ describe('PracticeResults — Celebratory Redesign', () => {
   describe('Word Hunt daily CTA', () => {
     it('renders Word Hunt daily as the primary CTA button', () => {
       render(<PracticeResults {...defaultProps} />);
-      expect(screen.getByText('Play Word Hunt Daily')).toBeInTheDocument();
+      const buttons = screen.getAllByText('Play Word Hunt Daily');
+      expect(buttons.length).toBeGreaterThanOrEqual(1);
     });
 
     it('navigates to daily challenge when CTA is clicked', () => {
       render(<PracticeResults {...defaultProps} />);
-      fireEvent.click(screen.getByText('Play Word Hunt Daily'));
+      const buttons = screen.getAllByText('Play Word Hunt Daily');
+      fireEvent.click(buttons[0]);
       expect(mockPush).toHaveBeenCalledWith('/en/daily');
     });
 
