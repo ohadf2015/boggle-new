@@ -43,13 +43,17 @@ function validateAttemptBody(body: Record<string, unknown>): {
     return { valid: false, error: 'Missing required fields: world, level, words, score, timeRemaining' };
   }
 
-  // Validate world range (1-10)
-  if (world < 1 || world > 10) {
-    return { valid: false, error: 'Invalid world: must be between 1 and 10' };
+  // Validate world range (0 = endless mode, 1-10 = story mode)
+  if (world < 0 || world > 10) {
+    return { valid: false, error: 'Invalid world: must be between 0 and 10' };
   }
 
-  // Validate level range (1-7) — aligned with complete/route.ts (LEVELS_PER_WORLD)
-  if (level < 1 || level > 7) {
+  // Validate level range (1-7 for story mode, unbounded for endless world=0)
+  if (world === 0) {
+    if (level < 1) {
+      return { valid: false, error: 'Invalid endless floor: must be >= 1' };
+    }
+  } else if (level < 1 || level > 7) {
     return { valid: false, error: 'Invalid level: must be between 1 and 7' };
   }
 

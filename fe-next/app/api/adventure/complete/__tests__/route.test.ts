@@ -277,9 +277,10 @@ describe('POST /api/adventure/complete', () => {
       expect(res.data.error).toContain('Missing required fields');
     });
 
-    it('rejects world out of range (0)', async () => {
+    it('does not reject world 0 as invalid (endless mode sentinel)', async () => {
       const res = await POST(makeRequest({ ...validBody, world: 0 }));
-      expect(res.status).toBe(400);
+      // World 0 should pass validation (not 400); downstream errors are mock artifacts
+      expect(res.status).not.toBe(400);
     });
 
     it('rejects world out of range (11)', async () => {

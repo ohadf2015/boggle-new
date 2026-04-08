@@ -5,7 +5,7 @@
 // These effects operate on temporary PixiJS Sprites created at tile positions.
 // The sprites are auto-cleaned up when the effect finishes.
 
-import { Container, Graphics, RenderTexture, Sprite, Ticker, type Application } from 'pixi.js';
+import { Container, Graphics, RenderTexture, Sprite, Texture, Ticker, type Application } from 'pixi.js';
 import {
   ShatterEffect,
   DissolveEffect,
@@ -106,7 +106,15 @@ function createTileProxy(
   // Guard: renderer may have been destroyed by the time an async effect fires
   if (!app.renderer || (app.renderer as { destroyed?: boolean }).destroyed) {
     g.destroy();
-    return new Sprite();
+    // Return a sprite with a 1x1 white texture to prevent null texture crashes
+    // in effects that read texture.alphaMode or compute colors from texture data
+    const fallback = new Sprite(Texture.WHITE);
+    fallback.anchor.set(0.5);
+    fallback.x = x;
+    fallback.y = y;
+    fallback.width = size;
+    fallback.height = size;
+    return fallback;
   }
   const texture = app.renderer.generateTexture({
     target: g,

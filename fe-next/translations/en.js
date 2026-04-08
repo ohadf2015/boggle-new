@@ -924,10 +924,10 @@ const en = {
     "loadFailed": "Couldn't load that — tap to retry!"
   },
   "notFound": {
-    "heading": "Lost in the Word Maze?",
-    "message": "This page wandered off the board! Let's get you back to the game.",
-    "button": "Back to Game",
-    "mascotTooltip": "Click me for directions!"
+    "heading": "404 — Word Not Found!",
+    "message": "\"404\" scored 0 points. Not in the dictionary. Even our mascot double-checked.",
+    "button": "Back to the Board",
+    "mascotTooltip": "That's not a word!"
   },
   "validation": {
     "enterGameCode": "Got a code? Drop it here!",

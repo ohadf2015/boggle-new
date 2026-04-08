@@ -22,6 +22,7 @@ import { detectVerticalWords, detectHorizontalWords } from './utils/blastVertica
 import { detectMatch3Clusters } from './utils/blastMatch3Detector';
 import { useDictionaryCache } from '@/hooks/useDictionaryCache';
 import { vibrateBlastBomb, vibrateBlastLightning, vibrateBlastPrism, vibrateBlastCascade } from '@/components/grid/hapticFeedback';
+import { formatObjectiveLabel } from './utils/blastObjectiveUtils';
 import { detectNearMiss } from './utils/blastNearMiss';
 import { planSugarCrush } from './utils/blastSugarCrush';
 import type { ScoreFlyEvent } from './BlastScoreFly';
@@ -587,19 +588,40 @@ export function BlastGame({
     prevMovesRef.current = movesRemaining;
   }, [engine.gameState.movesRemaining, sounds]);
 
-  // Track individual objective completions for celebration
+  // Track individual objective completions — hidden objectives give surprise bonus score
+  const HIDDEN_OBJECTIVE_BONUS = 25;
   const completedObjRef = useRef<Set<number>>(new Set());
   useEffect(() => {
     objectives.objectiveProgress.forEach((obj, i) => {
       if (obj.isComplete && !completedObjRef.current.has(i)) {
         completedObjRef.current.add(i);
-        // Light shake + sound for individual objective
-        if (explosionShakeTimerRef.current) clearTimeout(explosionShakeTimerRef.current);
-        setExplosionShake(1);
-        explosionShakeTimerRef.current = setTimeout(() => setExplosionShake(0), 400);
+        const isHidden = obj.objective.type !== 'clear_percent';
+        if (isHidden) {
+          // Surprise bonus: score boost + celebratory fly + medium shake
+          engine.addBonusScore(HIDDEN_OBJECTIVE_BONUS);
+          const flyId = `obj-bonus-${flyIdRef.current++}`;
+          setScoreFlyEvents(prev => [...prev.slice(-2), {
+            id: flyId,
+            score: HIDDEN_OBJECTIVE_BONUS,
+            startX: 50,
+            startY: 30,
+            tier: 2,
+            tileType: obj.objective.tileType || undefined,
+          }]);
+          setComboFlash({ id: flyId, tier: 2 });
+          setComboTypeName(formatObjectiveLabel(obj.objective, t));
+          if (explosionShakeTimerRef.current) clearTimeout(explosionShakeTimerRef.current);
+          setExplosionShake(2);
+          explosionShakeTimerRef.current = setTimeout(() => setExplosionShake(0), 500);
+        } else {
+          // Primary objective (clear_percent) — light shake only
+          if (explosionShakeTimerRef.current) clearTimeout(explosionShakeTimerRef.current);
+          setExplosionShake(1);
+          explosionShakeTimerRef.current = setTimeout(() => setExplosionShake(0), 400);
+        }
       }
     });
-  }, [objectives.objectiveProgress]);
+  }, [objectives.objectiveProgress, engine, t]);
 
   // Play wave-clear sound once when ALL objectives are met (but don't end the game)
   const waveClearPlayedRef = useRef(false);

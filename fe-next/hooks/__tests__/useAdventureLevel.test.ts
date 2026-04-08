@@ -51,14 +51,13 @@ describe('useAdventureLevel', () => {
       expect(result.current.levelConfig?.objectives.length).toBeGreaterThan(0);
     });
 
-    it('should return null for invalid world/level', () => {
-      // GIVEN - World 0 is invalid (must be 1-10)
+    it('should return valid config for world 0 (endless sentinel)', () => {
       const { result: resultWorld0 } = renderHook(() => useAdventureLevel(0, 1));
+      expect(resultWorld0.current.levelConfig).toBeDefined();
+      expect(resultWorld0.current.error).toBeFalsy();
+    });
 
-      // THEN
-      expect(resultWorld0.current.levelConfig).toBeNull();
-      expect(resultWorld0.current.error).toBeTruthy();
-
+    it('should return null for invalid world/level', () => {
       // GIVEN - World 11 is invalid (must be 1-10)
       const { result: resultWorld11 } = renderHook(() => useAdventureLevel(11, 1));
 

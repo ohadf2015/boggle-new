@@ -167,6 +167,10 @@ export const WORLD_CONFIGS: WorldConfig[] = [
  * @throws Error if world number is invalid
  */
 export function getWorldConfig(world: number): WorldConfig {
+  // world=0 is a sentinel for endless/weekly modes — return a default config
+  if (world === 0) {
+    return WORLD_CONFIGS[0];
+  }
   if (world < 1 || world > WORLDS_COUNT) {
     throw new Error(
       `Invalid world: ${world}. Must be between 1 and ${WORLDS_COUNT}.`
@@ -229,35 +233,41 @@ export function getLevelConfig(
   level: number,
   grid?: string[][]
 ): LevelConfig {
-  // Validate inputs
-  if (world < 1 || world > WORLDS_COUNT) {
+  // Validate inputs — world=0 is a sentinel for endless/weekly modes
+  if (world !== 0 && (world < 1 || world > WORLDS_COUNT)) {
     throw new Error(
       `Invalid world: ${world}. Must be between 1 and ${WORLDS_COUNT}.`
     );
   }
-  if (level < 1 || level > LEVELS_PER_WORLD) {
+  // Endless mode (world=0) allows unbounded floor numbers
+  if (world !== 0 && (level < 1 || level > LEVELS_PER_WORLD)) {
     throw new Error(
       `Invalid level: ${level}. Must be between 1 and ${LEVELS_PER_WORLD}.`
     );
   }
+  if (world === 0 && level < 1) {
+    throw new Error('Invalid endless floor: must be >= 1.');
+  }
+  // For endless mode (world=0), use world 1 config as base
+  const effectiveWorld = world === 0 ? 1 : world;
 
-  const worldConfig = getWorldConfig(world);
-  const gridSize = getGridSize(world);
-  const difficulty = getDifficultyForWorld(world);
+  const worldConfig = getWorldConfig(effectiveWorld);
+  const gridSize = getGridSize(effectiveWorld);
+  const difficulty = getDifficultyForWorld(effectiveWorld);
 
   // Determine level archetype for gameplay flavor
-  const archetype = getArchetypeForLevel(world, level);
+  const archetype = getArchetypeForLevel(effectiveWorld, level);
   const archetypeConfig = getArchetypeConfig(archetype);
 
   // Apply archetype timer multiplier to base world timer
   // Floor at 80s to prevent unplayable timers (e.g., survival ×0.6 on W2 = 66s)
-  const baseTimer = getTimerDuration(world);
+  const baseTimer = getTimerDuration(effectiveWorld);
   const timerSeconds = Math.max(80, Math.round(baseTimer * archetypeConfig.timerMultiplier));
 
   // Generate level-specific content driven by archetype
   // Pass grid for vowel protection on ice tiles (prevents unfair levels)
-  const objectives = generateObjectives(world, level, grid, archetype);
-  const specialTiles = generateSpecialTiles(world, level, gridSize, grid, archetype);
+  const objectives = generateObjectives(effectiveWorld, level, grid, archetype);
+  const specialTiles = generateSpecialTiles(effectiveWorld, level, gridSize, grid, archetype);
 
   // Calculate chapter structure (2-2-3 pattern)
   // Chapter 1: levels 1-2, Chapter 2: levels 3-4, Chapter 3 (Boss): levels 5-7
@@ -272,7 +282,7 @@ export function getLevelConfig(
 
   // World 1 is tutorial - allow 2-letter words for easier introduction
   // All other worlds require standard 3-letter minimum
-  const minWordLength: 2 | 3 = world === 1 ? 2 : 3;
+  const minWordLength: 2 | 3 = effectiveWorld === 1 ? 2 : 3;
 
   // Build config
   const config: LevelConfig = {
@@ -792,9 +802,11 @@ export function validateLevelConfig(config: LevelConfig): ValidationResult {
     errors.push('Invalid world: must be 1-10');
   }
 
-  // Validate level
-  if (config.level < 1 || config.level > LEVELS_PER_WORLD) {
+  // Validate level (world=0 is endless mode — unbounded floors)
+  if (config.world !== 0 && (config.level < 1 || config.level > LEVELS_PER_WORLD)) {
     errors.push('Invalid level: must be 1-7');
+  } else if (config.world === 0 && config.level < 1) {
+    errors.push('Invalid endless floor: must be >= 1');
   }
 
   // Validate grid size

@@ -272,29 +272,7 @@ export const BlastStage = memo(function BlastStage({
               </div>
             );
           })}
-          {/* Secondary objectives — smaller */}
-          <div className="flex gap-2">
-            {objectiveProgress.filter(o => o.objective.type !== 'clear_percent').map((obj, i) => {
-              const target = obj.objective.target;
-              return (
-                <div key={i} className="flex-1">
-                  <div className="flex justify-between text-[9px] font-bold text-white/50 mb-0.5">
-                    <span className={obj.isComplete ? 'text-neo-lime' : ''}>{formatObjectiveLabel(obj.objective, t)}</span>
-                    <span className="tabular-nums">{obj.current}/{target}</span>
-                  </div>
-                  <div className="h-1 bg-white/10 rounded-full overflow-hidden">
-                    <div
-                      className={cn(
-                        'h-full rounded-full transition-all duration-300',
-                        obj.isComplete ? 'bg-neo-lime' : 'bg-neo-cyan',
-                      )}
-                      style={{ width: `${Math.min(100, target > 0 ? (obj.current / target) * 100 : 0)}%` }}
-                    />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+          {/* Secondary objectives are hidden — revealed as surprise bonuses when completed */}
         </div>
       )}
 

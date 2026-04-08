@@ -206,12 +206,12 @@ const BossOverlay = memo<BossOverlayProps>(
     const effectEntries: EffectEntry[] = useMemo(() => [
       { id: 'attackTelegraph', active: isTelegraphing, priority: 10 },
       { id: 'phaseBanner', active: !!phaseBanner, priority: 9 },
-      { id: 'attackPortrait', active: bossReaction === 'attacking', priority: 8 },
+
       { id: 'attackEffect', active: !!attackEffect, priority: 7 },
       { id: 'damageFloat', active: !!playerDmgFloat, priority: 5 },
       { id: 'rageVignette', active: hpPct < 20 && !isTelegraphing, priority: 3 },
       { id: 'enragedGlow', active: derivedPhase === 'enraged', priority: 1 },
-    ], [isTelegraphing, phaseBanner, bossReaction, attackEffect, playerDmgFloat, hpPct, derivedPhase]);
+    ], [isTelegraphing, phaseBanner, attackEffect, playerDmgFloat, hpPct, derivedPhase]);
     const fx = useEffectCap(effectEntries);
 
     const lastCheckRef = useRef<number>(0);
@@ -323,8 +323,8 @@ const BossOverlay = memo<BossOverlayProps>(
         {showingActivePhase && !showVictory && !showDefeat && (
           <>
             {/* Compact Combat HUD Strip — sits just below the GameHeader */}
-            <div className="fixed top-13 sm:top-15 left-0 right-0 z-30 pointer-events-none">
-              <div className="w-full max-w-2xl mx-auto px-3 sm:px-4 pt-1.5">
+            <div className="fixed top-12 sm:top-15 left-0 right-0 z-30 pointer-events-none">
+              <div className="w-full max-w-2xl mx-auto px-2 sm:px-4 pt-1">
                 {/* Boss Avatar + HP Bar row */}
                 <div className="flex items-center gap-2 sm:gap-3">
                   {/* Boss Avatar — larger with rich state animations */}
@@ -340,7 +340,7 @@ const BossOverlay = memo<BossOverlayProps>(
                       />
                     )}
                     <AdaptiveMotion.div
-                      className={`relative w-14 h-14 sm:w-16 sm:h-16 rounded-neo border-3 ${borderClass} shadow-hard-sm overflow-hidden bg-neo-navy-light z-10`}
+                      className={`relative w-10 h-10 sm:w-14 sm:h-14 rounded-neo border-2 sm:border-3 ${borderClass} shadow-hard-sm overflow-hidden bg-neo-navy-light z-10`}
                       animate={
                         bossReaction === 'attacking'
                           ? bossAnims.attack.animate
@@ -438,10 +438,9 @@ const BossOverlay = memo<BossOverlayProps>(
                         transition={{ type: 'spring', stiffness: 500, damping: 25 }}
                         className="shrink-0 pointer-events-none"
                       >
-                        <div className="relative w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center">
+                        <div className="relative w-8 h-8 sm:w-11 sm:h-11 flex items-center justify-center">
                           <svg
-                            width="44" height="44" viewBox="0 0 44 44"
-                            className="-rotate-90"
+                            className="w-full h-full -rotate-90" viewBox="0 0 44 44"
                             aria-hidden="true"
                           >
                             <circle cx="22" cy="22" r="18" fill="rgba(239,68,68,0.15)" stroke="rgba(239,68,68,0.3)" strokeWidth="3" />
@@ -462,7 +461,7 @@ const BossOverlay = memo<BossOverlayProps>(
                   </AdaptiveAnimatePresence>
                 </div>
 
-                {/* Boss taunt — below the HUD strip, fades in/out */}
+                {/* Boss taunt — hidden on small screens to reduce clutter */}
                 <AdaptiveAnimatePresence>
                   {showTaunt && currentTaunt && (
                     <AdaptiveMotion.div
@@ -470,7 +469,7 @@ const BossOverlay = memo<BossOverlayProps>(
                       animate={{ opacity: 1, y: 0, height: 'auto' }}
                       exit={{ opacity: 0, y: -8, height: 0 }}
                       transition={{ duration: 0.3 }}
-                      className="mt-1.5 ms-12 sm:ms-14"
+                      className="hidden sm:block mt-1.5 ms-14"
                     >
                       <BossDialogueInline
                         dialogue={t(currentTaunt)}
@@ -583,40 +582,8 @@ const BossOverlay = memo<BossOverlayProps>(
               `}</style>
             )}
 
-            {/* Boss attack flash portrait (capped) */}
-            <AdaptiveAnimatePresence>
-              {fx.attackPortrait && bossReaction === 'attacking' && (
-                <AdaptiveMotion.div
-                  className="fixed inset-0 z-40 flex items-start justify-end pointer-events-none pe-3 sm:pe-5 pt-28 sm:pt-32"
-                  initial={{ opacity: 0, scale: 0.3, x: 80, rotate: 8 }}
-                  animate={{ opacity: 1, scale: 1, x: 0, rotate: 0 }}
-                  exit={{ opacity: 0, scale: 0.7, x: 30, rotate: -4 }}
-                  transition={{ type: 'spring', stiffness: 500, damping: 22, mass: 0.8 }}
-                  aria-hidden="true"
-                >
-                  <AdaptiveMotion.div
-                    className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-neo border-3 border-neo-red shadow-hard-lg overflow-hidden bg-neo-navy-dark"
-                    animate={{ scale: [1, 1.05, 1] }}
-                    transition={{ duration: 0.4, repeat: 1, ease: 'easeInOut' }}
-                  >
-                    <Image
-                      src={boss.images?.attack ?? boss.imagePath}
-                      alt=""
-                      fill
-                      className="object-cover"
-                      sizes="112px"
-                    />
-                    {/* Red danger overlay flash */}
-                    <AdaptiveMotion.div
-                      className="absolute inset-0 bg-neo-red/30"
-                      initial={{ opacity: 0.6 }}
-                      animate={{ opacity: 0 }}
-                      transition={{ duration: 0.5 }}
-                    />
-                  </AdaptiveMotion.div>
-                </AdaptiveMotion.div>
-              )}
-            </AdaptiveAnimatePresence>
+            {/* Attack portrait flyout removed — boss avatar already shows attack state,
+                and the large portrait was cluttering mobile layouts */}
           </>
         )}
 

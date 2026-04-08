@@ -21,39 +21,39 @@ const notFoundTranslations: Record<string, {
   cta: string;
 }> = {
   en: {
-    title: 'Oops! Off the Board!',
-    subtitle: "This word doesn't exist in our dictionary.",
-    description: "Looks like you wandered off the grid. Even our mascot can't find this page — and they've explored everywhere!",
-    hint: '(Psst... maybe try a real word next time)',
-    cta: 'Back to the Game',
+    title: '404 — Word Not Found!',
+    subtitle: '"404" scored 0 points. Not a valid word.',
+    description: "You tried to spell a page that doesn't exist. Classic triple-letter blunder. Even our mascot checked the dictionary twice.",
+    hint: '(Fun fact: 404 would be worth 8 points in Scrabble — if it were a word. It\'s not.)',
+    cta: 'Back to the Board',
   },
   he: {
-    title: '!אופס! מחוץ ללוח',
-    subtitle: 'המילה הזו לא קיימת במילון שלנו.',
-    description: 'נראה שיצאת מהלוח. גם הקמע שלנו לא מצליח למצוא את הדף הזה — והוא כבר חיפש בכל מקום!',
-    hint: '(פסט... אולי תנסו מילה אמיתית בפעם הבאה)',
-    cta: 'חזרה למשחק',
+    title: '!404 — מילה לא נמצאה',
+    subtitle: '.נקודות. לא מילה חוקית 0 קיבלה "404"',
+    description: 'ניסית לאיית דף שלא קיים. טעות קלאסית של משבצת כפולה. גם הקמע שלנו בדק במילון פעמיים.',
+    hint: '(עובדה מהנה: 404 הייתה שווה 8 נקודות בסקרבל — אם זו הייתה מילה. היא לא.)',
+    cta: 'חזרה ללוח',
   },
   sv: {
-    title: 'Hoppsan! Utanför brädet!',
-    subtitle: 'Det här ordet finns inte i vår ordbok.',
-    description: 'Det verkar som att du hamnat utanför rutnätet. Inte ens vår maskot hittar den här sidan — och den har letat överallt!',
-    hint: '(Psst... kanske prova ett riktigt ord nästa gång)',
-    cta: 'Tillbaka till spelet',
+    title: '404 — Ordet hittades inte!',
+    subtitle: '"404" gav 0 poäng. Inte ett giltigt ord.',
+    description: 'Du försökte stava en sida som inte finns. Klassisk trippelbokstavs-tabbe. Vår maskot kollade ordboken två gånger.',
+    hint: '(Kul fakta: 404 skulle vara värt 8 poäng i Scrabble — om det vore ett ord. Det är det inte.)',
+    cta: 'Tillbaka till brädet',
   },
   ja: {
-    title: 'おっと！盤外です！',
-    subtitle: 'この単語は辞書にありません。',
-    description: 'グリッドの外に出てしまったようです。マスコットでさえこのページを見つけられません — どこでも探したのに！',
-    hint: '（ヒント：次は本当の単語を試してみて）',
-    cta: 'ゲームに戻る',
+    title: '404 — 単語が見つかりません！',
+    subtitle: '「404」は0ポイント。有効な単語ではありません。',
+    description: '存在しないページを綴ろうとしました。典型的なトリプルレターの失敗。マスコットも辞書を二度確認しました。',
+    hint: '（豆知識：404はスクラブルで8点の価値がある — もし単語だったら。違うけど。）',
+    cta: 'ボードに戻る',
   },
   es: {
-    title: '¡Ups! ¡Fuera del tablero!',
-    subtitle: 'Esta palabra no existe en nuestro diccionario.',
-    description: '¡Parece que te saliste del tablero! Ni siquiera nuestra mascota puede encontrar esta página — ¡y ya exploró todo!',
-    hint: '(Psst... quizás intenta una palabra real la próxima vez)',
-    cta: 'Volver al juego',
+    title: '404 — ¡Palabra no encontrada!',
+    subtitle: '"404" obtuvo 0 puntos. No es una palabra válida.',
+    description: 'Intentaste deletrear una página que no existe. Error clásico de casilla triple. Hasta nuestra mascota revisó el diccionario dos veces.',
+    hint: '(Dato curioso: 404 valdría 8 puntos en Scrabble — si fuera una palabra. No lo es.)',
+    cta: 'Volver al tablero',
   },
 };
 
@@ -102,6 +102,19 @@ export default async function GlobalNotFound() {
               ))}
             </div>
 
+            {/* Score rejection */}
+            <div className="text-neo-red font-black text-lg sm:text-xl font-neo-display tracking-wider mb-4 animate-neo-shake" style={{ animationIterationCount: '1' }}>
+              <span className="line-through decoration-neo-red decoration-4">0 pts</span>
+              {' — '}
+              <span className="text-gray-400 text-sm font-neo-body">
+                {locale === 'he' ? 'לא במילון' :
+                 locale === 'ja' ? '辞書にない' :
+                 locale === 'sv' ? 'inte i ordboken' :
+                 locale === 'es' ? 'no en el diccionario' :
+                 'not in dictionary'}
+              </span>
+            </div>
+
             {/* Mascot */}
             <div className="relative mx-auto w-40 h-40 sm:w-52 sm:h-52 mb-6">
               <div className="animate-neo-wobble">
@@ -122,11 +135,11 @@ export default async function GlobalNotFound() {
                   animate-neo-pop max-w-[140px]`}
                 style={{ animationDelay: '0.5s', animationFillMode: 'both' }}
               >
-                {locale === 'he' ? '?!איפה אני' :
-                 locale === 'ja' ? 'ここどこ？！' :
-                 locale === 'sv' ? 'Var är jag?!' :
-                 locale === 'es' ? '¿¡Dónde estoy?!' :
-                 'Where am I?!'}
+                {locale === 'he' ? '!זו לא מילה' :
+                 locale === 'ja' ? 'それ単語じゃない！' :
+                 locale === 'sv' ? 'Det är inget ord!' :
+                 locale === 'es' ? '¡Eso no es palabra!' :
+                 "That's not a word!"}
                 <div className={`absolute bottom-[-6px] ${isRTL ? 'left-4' : 'right-4'}
                   w-3 h-3 bg-neo-cream border-b-2 border-r-2 border-black
                   transform rotate-45`}

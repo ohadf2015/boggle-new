@@ -38,9 +38,14 @@ export default function NotFound() {
           />
         </div>
 
-        {/* 404 Number with enhanced gradient and animation */}
-        <div className="text-9xl font-black text-transparent bg-clip-text bg-linear-to-r from-neo-cyan via-neo-pink to-neo-lime mb-6 font-neo-display animate-gradient-x" style={{ backgroundSize: '200% auto' }}>
-          404
+        {/* 404 as a rejected word tile with score */}
+        <div className="relative mb-6">
+          <div className="text-9xl font-black text-transparent bg-clip-text bg-linear-to-r from-neo-cyan via-neo-pink to-neo-lime font-neo-display animate-gradient-x" style={{ backgroundSize: '200% auto' }}>
+            404
+          </div>
+          <div className="text-neo-red font-black text-xl font-neo-display tracking-wider line-through decoration-neo-red decoration-4 inline-block">
+            0 pts
+          </div>
         </div>
 
         {/* Heading with neo-brutalist card style */}

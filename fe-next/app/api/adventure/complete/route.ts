@@ -61,13 +61,17 @@ function validateRequestBody(body: Record<string, unknown>): {
     return { valid: false, error: 'Missing required fields: world, level, stars, score, words' };
   }
 
-  // Validate world range (1-10)
-  if (world < 1 || world > 10) {
-    return { valid: false, error: 'Invalid world: must be between 1 and 10' };
+  // Validate world range (0 = endless mode, 1-10 = story mode)
+  if (world < 0 || world > 10) {
+    return { valid: false, error: 'Invalid world: must be between 0 and 10' };
   }
 
-  // Validate level range (1-7, matches LEVELS_PER_WORLD)
-  if (level < 1 || level > 7) {
+  // Validate level range (1-7 for story mode, unbounded for endless world=0)
+  if (world === 0) {
+    if (level < 1) {
+      return { valid: false, error: 'Invalid endless floor: must be >= 1' };
+    }
+  } else if (level < 1 || level > 7) {
     return { valid: false, error: 'Invalid level: must be between 1 and 7' };
   }
 
@@ -352,16 +356,20 @@ export async function POST(request: NextRequest) {
     const currentGold = (existingProgression?.gold as number) ?? 0;
     const newGold = currentGold + goldEarned;
 
-    // Calculate next unlocked level
-    let nextWorld = world;
-    let nextLevel = level + 1;
-    if (nextLevel > 7) {
-      nextWorld = world + 1;
-      nextLevel = 1;
-    }
-    if (nextWorld > 10) {
-      nextWorld = 10;
-      nextLevel = 7;
+    // Calculate next unlocked level (story mode only — endless doesn't advance story)
+    let nextWorld = existingProgression?.current_world ?? 1;
+    let nextLevel = existingProgression?.current_level ?? 1;
+    if (world !== 0) {
+      nextWorld = world;
+      nextLevel = level + 1;
+      if (nextLevel > 7) {
+        nextWorld = world + 1;
+        nextLevel = 1;
+      }
+      if (nextWorld > 10) {
+        nextWorld = 10;
+        nextLevel = 7;
+      }
     }
 
     // Persist word album — Task 1: validate each word against dictionary before storing

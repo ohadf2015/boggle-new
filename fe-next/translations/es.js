@@ -988,10 +988,10 @@ const es = {
     "loadFailed": "No se pudo cargar. ¡Intenta de nuevo!"
   },
   "notFound": {
-    "heading": "¿Perdido en el laberinto de palabras?",
-    "message": "¡Esta página se salió del tablero! Vamos a llevarte de vuelta al juego.",
-    "button": "Volver al juego",
-    "mascotTooltip": "¡Haz clic para volver al camino!"
+    "heading": "404 — ¡Palabra no encontrada!",
+    "message": "\"404\" obtuvo 0 puntos. No está en el diccionario. Hasta la mascota revisó dos veces.",
+    "button": "Volver al tablero",
+    "mascotTooltip": "¡Eso no es palabra!"
   },
   "validation": {
     "enterGameCode": "¿Tienes código? Ponlo aquí",

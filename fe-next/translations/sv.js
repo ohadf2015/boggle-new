@@ -939,10 +939,10 @@ const sv = {
     "resetFailed": "Serveråterställning misslyckades. Försök igen."
   },
   "notFound": {
-    "heading": "Vilse i ordlabyrinten?",
-    "message": "Den här sidan har vandrat bort från brädet! Låt oss ta dig tillbaka till spelet.",
-    "button": "Tillbaka till spelet",
-    "mascotTooltip": "Klicka på mig för vägbeskrivning!"
+    "heading": "404 — Ordet hittades inte!",
+    "message": "\"404\" gav 0 poäng. Finns inte i ordboken. Vår maskot dubbelkollade.",
+    "button": "Tillbaka till brädet",
+    "mascotTooltip": "Det är inget ord!"
   },
   "validation": {
     "enterGameCode": "Har du en kod? Ange den här",
@@ -7597,6 +7597,29 @@ const sv = {
     "reconnectAttempt": "Försök {current} av {max}",
     "leaveGame": "Lämna spel",
     "scoreSafeReconnect": "Din poäng är sparad",
+    "defeatExplainer": {
+      "title": "Vad gick fel",
+      "tip": {
+        "wordCount": "Försök hitta kortare ord snabbare för att öka antalet.",
+        "scoreTarget": "Fokusera på längre ord — de ger exponentiellt fler poäng.",
+        "longWords": "Leta efter ord med 5+ bokstäver genom att skanna kanter och diagonaler.",
+        "clearIce": "Prioritera ord som passerar genom isrutor först.",
+        "timeBonus": "Skicka in ord snabbt — hastighet är nyckeln för detta mål.",
+        "collectGems": "Dra dina ord genom ädelstensrutor när det är möjligt.",
+        "defeatBoss": "Håll en jämn kombo för att maximera skadeutdelningen.",
+        "surviveBattle": "Hitta ord snabbt för att läka och undvika bossattacker.",
+        "mechanicTrigger": "Fokusera på att aktivera banans mekanik före andra mål.",
+        "noDamage": "Prioritera korta, snabba ord för att hålla din kombosköld uppe."
+      }
+    },
+    "starsNeeded": "{{count}} fler stjärnor behövs",
+    "hpBar": {
+      "enragedZone": "Raserizon",
+      "phase2Zone": "Fas 2-zon",
+      "phase1Zone": "Fas 1-zon",
+      "healthLabel": "{{bossName}} hälsa: {{percentage}}%"
+    },
+    "comboExplainer": "Hitta ord snabbt i rad för att bygga kombos. Varje kombo ökar din poängmultiplikator!"
   },
   "blast": {
     "chain": {

@@ -939,10 +939,10 @@ const ja = {
     "loadFailed": "読み込み失敗。もう一度試して！"
   },
   "notFound": {
-    "heading": "言葉の迷路で迷子？",
-    "message": "このページはボードから離れてしまいました！ゲームに戻りましょう。",
-    "button": "ゲームに戻る",
-    "mascotTooltip": "クリックして道順を確認！"
+    "heading": "404 — 単語が見つかりません！",
+    "message": "「404」は0ポイント。辞書にありません。マスコットも二度確認しました。",
+    "button": "ボードに戻る",
+    "mascotTooltip": "それ単語じゃない！"
   },
   "validation": {
     "enterGameCode": "コードある？ここに入力",
@@ -7648,7 +7648,30 @@ const ja = {
     "reconnectAttempt": "試行 {current}/{max}",
     "leaveGame": "ゲームを離れる",
     "scoreSafeReconnect": "スコアは安全です",
-    "gestureTutorial": "スワイプで文字をつなげて単語を作ろう！"
+    "gestureTutorial": "スワイプで文字をつなげて単語を作ろう！",
+    "defeatExplainer": {
+      "title": "何がうまくいかなかったか",
+      "tip": {
+        "wordCount": "短い単語を素早く見つけて数を増やしましょう。",
+        "scoreTarget": "長い単語に集中しましょう — 指数的に多くのポイントが得られます。",
+        "longWords": "端や対角線をスキャンして5文字以上の単語を探しましょう。",
+        "clearIce": "まず氷タイルを通る単語を優先しましょう。",
+        "timeBonus": "素早く単語を送信しましょう — この目標ではスピードが鍵です。",
+        "collectGems": "できるだけ宝石タイルを通るように単語を作りましょう。",
+        "defeatBoss": "安定したコンボを維持してダメージ出力を最大化しましょう。",
+        "surviveBattle": "素早く単語を見つけて回復し、ボスの攻撃を避けましょう。",
+        "mechanicTrigger": "他の目標よりも先にレベルメカニクスの発動に集中しましょう。",
+        "noDamage": "短くて速い単語を優先してコンボシールドを維持しましょう。"
+      }
+    },
+    "starsNeeded": "あと{{count}}つ星が必要です",
+    "hpBar": {
+      "enragedZone": "激怒ゾーン",
+      "phase2Zone": "フェーズ2ゾーン",
+      "phase1Zone": "フェーズ1ゾーン",
+      "healthLabel": "{{bossName}}の体力: {{percentage}}%"
+    },
+    "comboExplainer": "連続で素早く単語を見つけてコンボを作ろう！コンボごとにスコア倍率がアップ！"
   },
   "blast": {
     "chain": {

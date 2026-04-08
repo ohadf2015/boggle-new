@@ -74,6 +74,8 @@ export interface UseBlastEngineReturn {
   trackWordFail: () => void;
   /** Consume a move without clearing tiles (e.g. invalid word submission) */
   consumeMove: () => void;
+  /** Add bonus score points (e.g. hidden objective completion) */
+  addBonusScore: (points: number) => void;
   noWordsRemaining: boolean;
   /** Read current grid/tileStates from refs — use in async loops where React state is stale */
   getLatestState: () => { grid: LetterGrid | null; tileStates: BlastTileState[][] };
@@ -492,6 +494,11 @@ export function useBlastEngine(
     });
   }, []);
 
+  // ── addBonusScore — add points from hidden objective completion ──
+  const addBonusScore = useCallback((points: number) => {
+    setGameState(prev => ({ ...prev, score: prev.score + points }));
+  }, []);
+
   /** Read current grid/tileStates from refs (not React state) — use in async loops
    *  where React state may be stale due to batching. */
   const getLatestState = useCallback(() => ({
@@ -519,6 +526,7 @@ export function useBlastEngine(
     setTileStates,
     trackWordFail,
     consumeMove,
+    addBonusScore,
     getLatestState,
     applyServerBoard,
   // eslint-disable-next-line react-hooks/exhaustive-deps

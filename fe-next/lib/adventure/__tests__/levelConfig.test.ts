@@ -81,8 +81,12 @@ describe('World Configuration', () => {
       expect(config.bossName).toBe('lexiconDragon');
     });
 
+    it('should return default config for world 0 (endless sentinel)', () => {
+      const config = getWorldConfig(0);
+      expect(config).toBeDefined();
+    });
+
     it('should throw error for invalid world numbers', () => {
-      expect(() => getWorldConfig(0)).toThrow();
       expect(() => getWorldConfig(11)).toThrow();
       expect(() => getWorldConfig(-1)).toThrow();
     });
@@ -163,8 +167,13 @@ describe('Level Configuration', () => {
       expect(world10.difficulty).toBe('HARD');
     });
 
+    it('should return config for world 0 (endless sentinel)', () => {
+      const config = getLevelConfig(0, 1);
+      expect(config).toBeDefined();
+      expect(config.world).toBe(0);
+    });
+
     it('should throw error for invalid world/level', () => {
-      expect(() => getLevelConfig(0, 1)).toThrow();
       expect(() => getLevelConfig(1, 0)).toThrow();
       expect(() => getLevelConfig(11, 1)).toThrow();
       expect(() => getLevelConfig(1, 8)).toThrow(); // Max level is 7

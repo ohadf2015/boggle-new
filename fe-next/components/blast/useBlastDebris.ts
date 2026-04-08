@@ -40,6 +40,7 @@ export function useBlastDebris(
   const debrisContainerRef = useRef<Container | null>(null);
   const lightningIntervalsRef = useRef<Set<ReturnType<typeof setInterval>>>(new Set());
   const lightningRafsRef = useRef<Set<number>>(new Set());
+  const mountedRef = useRef(true);
 
   // Create debris container on mount
   useEffect(() => {
@@ -49,9 +50,10 @@ export function useBlastDebris(
     const intervals = lightningIntervalsRef.current;
     const rafs = lightningRafsRef.current;
     return () => {
+      mountedRef.current = false;
       for (const d of debrisRef.current) {
         physics.removeBody(d.bodyId);
-        d.graphic.destroy();
+        if (!d.graphic.destroyed) d.graphic.destroy();
       }
       debrisRef.current = [];
       for (const iid of intervals) clearInterval(iid);
@@ -67,15 +69,20 @@ export function useBlastDebris(
   useEffect(() => {
     let rafId: number;
     const tick = () => {
+      if (!mountedRef.current) return;
       const now = performance.now() / 1000;
       const debris = debrisRef.current;
       for (let i = debris.length - 1; i >= 0; i--) {
         const d = debris[i];
+        if (d.graphic.destroyed) {
+          debris.splice(i, 1);
+          continue;
+        }
         const age = now - d.createdAt;
 
         if (age > DEBRIS_LIFETIME) {
           physics.removeBody(d.bodyId);
-          d.graphic.destroy();
+          if (!d.graphic.destroyed) d.graphic.destroy();
           debris.splice(i, 1);
           continue;
         }
