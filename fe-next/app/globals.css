@@ -779,6 +779,11 @@
 
 @utility blast-board {
   /* Blast board — hide base grid visuals so BlastTile overlay is the sole renderer */
+  & .game-board-frame {
+    background: transparent !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+  }
   & [role='grid'] {
     background: transparent !important;
     background-color: transparent !important;
