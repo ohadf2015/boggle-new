@@ -165,7 +165,7 @@ describe('FlashEffect', () => {
 });
 
 describe('ExplosionRing', () => {
-  it('should render ring element', () => {
+  it('should render ring-3 element', () => {
     render(<ExplosionRing frame={15} color="#FFE135" delay={0} size={100} />);
     const ring = screen.getByTestId('explosion-ring');
     expect(ring).toBeInTheDocument();

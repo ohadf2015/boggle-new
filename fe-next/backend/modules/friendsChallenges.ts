@@ -195,14 +195,16 @@ export async function getPendingChallenges(
       .select('*')
       .eq('challenged_id', userId)
       .eq('status', 'pending')
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: false })
+      .limit(50);
 
     const { data: sent } = await supabase
       .from('friend_challenges')
       .select('*')
       .eq('challenger_id', userId)
       .eq('status', 'pending')
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: false })
+      .limit(50);
 
     return {
       sent: (sent || []).map(c => mapChallengeRow(c)),

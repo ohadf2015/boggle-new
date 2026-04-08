@@ -2,12 +2,14 @@
  * BossRushPageClient — Client component for the Boss Rush page.
  *
  * Uses useBossRush hook to manage rush state.
+ * Embeds AdventureGame for actual boss fights (same pattern as Endless mode).
  * Gated behind having defeated at least 1 boss (level 7 completion).
  */
 
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useRef, useCallback } from 'react';
+import nextDynamic from 'next/dynamic';
 import Link from 'next/link';
 import { ArrowLeft, Swords, Skull, Trophy, Coins, Zap, Lock, RotateCcw } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -15,13 +17,51 @@ import { useLanguageSafe } from '@/contexts/LanguageContext';
 import { useProgressionData } from '@/contexts/ProgressionContext';
 import { useBossRush } from '@/hooks/useBossRush';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
-import { LEVELS_PER_WORLD } from '@/lib/adventure';
-import { getWorldConfig } from '@/lib/adventure/levelConfig';
+import { PageLoader } from '@/components/ui/PageLoader';
+import { LEVELS_PER_WORLD, generateAdventureGrid } from '@/lib/adventure';
+import { getLevelConfig, getWorldConfig } from '@/lib/adventure/levelConfig';
+import type { LevelConfig } from '@/types/adventure';
+
+const AdventureGame = nextDynamic(
+  () => import('@/components/adventure/AdventureGame'),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-screen bg-neo-navy flex items-center justify-center">
+        <PageLoader size="lg" />
+      </div>
+    ),
+  },
+);
 
 export function BossRushPageClient() {
-  const { t } = useLanguageSafe();
+  const { t, language } = useLanguageSafe();
   const { progression, isLoading } = useProgressionData();
   const { state, currentBossWorldId, isActive, startRush, reportResult, rewards, reset } = useBossRush();
+
+  // Generate boss level config for AdventureGame
+  const seedRef = useRef(Date.now());
+  const levelConfig: LevelConfig | null = useMemo(() => {
+    if (!currentBossWorldId) return null;
+    return getLevelConfig(currentBossWorldId, LEVELS_PER_WORLD);
+  }, [currentBossWorldId]);
+
+  const grid = useMemo(() => {
+    if (!levelConfig || !currentBossWorldId) return null;
+    const seed = seedRef.current + state.currentBossIndex;
+    return generateAdventureGrid(levelConfig.gridSize, seed, language);
+  }, [levelConfig, currentBossWorldId, state.currentBossIndex, language]);
+
+  const handleBossComplete = useCallback(
+    (stars: number) => {
+      reportResult(stars >= 1 ? 'victory' : 'defeat');
+    },
+    [reportResult],
+  );
+
+  const handleBossExit = useCallback(() => {
+    reportResult('defeat');
+  }, [reportResult]);
 
   const completions = useMemo(() => progression?.completions ?? [], [progression?.completions]);
   const hasBossDefeat = useMemo(
@@ -56,7 +96,7 @@ export function BossRushPageClient() {
           </p>
         </div>
         <Link
-          href="/adventure"
+          href={`/${language}/adventure`}
           className="text-neo-white/70 hover:text-neo-white font-bold text-sm flex items-center gap-2 transition-colors"
         >
           <ArrowLeft className="w-4 h-4 rtl:scale-x-[-1]" />
@@ -78,11 +118,11 @@ export function BossRushPageClient() {
           className={cn(
             'p-8 rounded-neo border-3 border-neo-black shadow-hard-lg',
             'text-center max-w-sm w-full',
-            isFullClear ? 'bg-neo-yellow/10' : 'bg-neo-pink/10',
+            isFullClear ? 'bg-neo-lime/10' : 'bg-neo-pink/10',
           )}
         >
           {isFullClear ? (
-            <Trophy className="w-16 h-16 text-neo-yellow mx-auto mb-4" />
+            <Trophy className="w-16 h-16 text-neo-lime mx-auto mb-4" />
           ) : (
             <Skull className="w-16 h-16 text-neo-pink mx-auto mb-4" />
           )}
@@ -99,7 +139,7 @@ export function BossRushPageClient() {
           </p>
 
           {isFullClear && (
-            <p className="text-neo-yellow text-xs font-black uppercase mb-4">
+            <p className="text-neo-lime text-xs font-black uppercase mb-4">
               {t('adventure.bossRush.fullClearBonus')}
             </p>
           )}
@@ -110,8 +150,8 @@ export function BossRushPageClient() {
             'flex items-center justify-center gap-6',
           )}>
             <div className="flex items-center gap-1.5">
-              <Coins className="w-5 h-5 text-neo-yellow" />
-              <span className="text-neo-yellow font-black">
+              <Coins className="w-5 h-5 text-neo-lime" />
+              <span className="text-neo-lime font-black">
                 {t('adventure.bossRush.goldEarned', { gold: String(rewards.gold) })}
               </span>
             </div>
@@ -140,7 +180,7 @@ export function BossRushPageClient() {
               {t('adventure.bossRush.tryAgain')}
             </button>
             <Link
-              href="/adventure"
+              href={`/${language}/adventure`}
               className={cn(
                 'flex-1 py-3 px-4',
                 'bg-neo-white/10 text-neo-white font-bold text-sm',
@@ -165,8 +205,8 @@ export function BossRushPageClient() {
     <div className="min-h-screen bg-neo-navy flex flex-col items-center justify-center gap-6 px-4">
       {/* Back link */}
       <Link
-        href="/adventure"
-        className="absolute top-4 start-4 text-neo-white/70 hover:text-neo-white font-bold text-sm flex items-center gap-2 transition-colors"
+        href={`/${language}/adventure`}
+        className="absolute top-4 inset-s-4 text-neo-white/70 hover:text-neo-white font-bold text-sm flex items-center gap-2 transition-colors"
       >
         <ArrowLeft className="w-4 h-4 rtl:scale-x-[-1]" />
         {t('adventure.bossRush.backToHub')}
@@ -223,49 +263,20 @@ export function BossRushPageClient() {
             ))}
           </div>
 
-          {/* Current boss card */}
-          {currentWorldConfig && (
-            <div className={cn(
-              'p-6 rounded-neo border-3 border-neo-black shadow-hard',
-              'bg-neo-pink/10 text-center',
-            )}>
-              <Skull className="w-10 h-10 text-neo-pink mx-auto mb-3" />
-              <p className="text-neo-white font-black text-lg">
-                {t('adventure.bossRush.fighting', {
-                  current: String(state.currentBossIndex + 1),
-                })}
-              </p>
-              <p className="text-neo-white/50 text-sm font-bold mt-1">
-                {t(`adventure.worlds.${currentWorldConfig.name}`)}
-              </p>
-
-              {/* Simulate fight buttons (placeholder for actual boss fight integration) */}
-              <div className="flex gap-3 mt-6">
-                <button
-                  onClick={() => reportResult('victory')}
-                  className={cn(
-                    'flex-1 py-3 px-4',
-                    'bg-neo-lime text-neo-black font-black text-sm uppercase',
-                    'border-3 border-neo-black rounded-neo shadow-hard',
-                    'hover:shadow-hard-sm active:shadow-hard-pressed active:translate-y-0.5',
-                    'transition-all duration-150',
-                  )}
-                >
-                  {t('adventure.victory')}
-                </button>
-                <button
-                  onClick={() => reportResult('defeat')}
-                  className={cn(
-                    'flex-1 py-3 px-4',
-                    'bg-neo-pink text-neo-black font-black text-sm uppercase',
-                    'border-3 border-neo-black rounded-neo shadow-hard',
-                    'hover:shadow-hard-sm active:shadow-hard-pressed active:translate-y-0.5',
-                    'transition-all duration-150',
-                  )}
-                >
-                  {t('adventure.cinematic.defeat')}
-                </button>
+          {/* Actual boss fight via AdventureGame */}
+          {levelConfig && grid && (
+            <div className="w-full -mx-4">
+              <div className="mb-3 text-center">
+                <p className="text-neo-white/50 text-sm font-bold">
+                  {currentWorldConfig && t(`adventure.worlds.${currentWorldConfig.name}`)}
+                </p>
               </div>
+              <AdventureGame
+                levelConfig={levelConfig}
+                initialGrid={grid}
+                onLevelComplete={handleBossComplete}
+                onExit={handleBossExit}
+              />
             </div>
           )}
         </AdaptiveMotion.div>

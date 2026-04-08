@@ -190,7 +190,7 @@ export function UnifiedAchievementModal(props: UnifiedAchievementModalProps) {
         className={cn(
           'fixed inset-0 z-60',
           'flex items-center justify-center',
-          'bg-neo-black/80 backdrop-blur-sm'
+          'bg-neo-black/80 backdrop-blur-xs'
         )}
         data-testid="unified-achievement-modal"
       >

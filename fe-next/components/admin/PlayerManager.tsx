@@ -129,7 +129,7 @@ export function PlayerManager({ authToken }: { authToken: string }) {
   return (
     <div className="space-y-6">
       {/* Filters */}
-      <div className="flex flex-col md:flex-row gap-4 bg-white dark:bg-slate-800 text-black dark:text-white p-4 rounded-lg shadow-sm">
+      <div className="flex flex-col md:flex-row gap-4 bg-white dark:bg-slate-800 text-black dark:text-white p-4 rounded-lg shadow-xs">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
           <Input 
@@ -258,7 +258,7 @@ export function PlayerManager({ authToken }: { authToken: string }) {
 
       {/* Pagination */}
       {total > limit && (
-        <div className="flex justify-between items-center bg-white dark:bg-slate-800 text-black dark:text-white p-4 rounded-lg shadow-sm">
+        <div className="flex justify-between items-center bg-white dark:bg-slate-800 text-black dark:text-white p-4 rounded-lg shadow-xs">
           <span className="text-sm text-slate-500">
             Showing {offset + 1}-{Math.min(offset + limit, total)} of {total}
           </span>

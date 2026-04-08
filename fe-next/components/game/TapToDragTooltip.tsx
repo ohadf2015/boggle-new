@@ -190,7 +190,7 @@ const TapToDragTooltip = memo<TapToDragTooltipProps>(
               {/* Compact Header */}
               <div className="flex items-center gap-1.5 mb-1.5">
                 <motion.div
-                  className="w-6 h-6 bg-gradient-to-br from-neo-cyan to-neo-lime rounded-neo border-2 border-neo-black flex items-center justify-center shadow-hard-sm"
+                  className="w-6 h-6 bg-linear-to-br from-neo-cyan to-neo-lime rounded-neo border-2 border-neo-black flex items-center justify-center shadow-hard-sm"
                   animate={{ scale: [1, 1.1, 1] }}
                   transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
                 >
@@ -266,7 +266,7 @@ const TapToDragTooltip = memo<TapToDragTooltipProps>(
                         </div>
                         {/* Glow effect */}
                         <motion.div
-                          className="absolute inset-0 w-5 h-5 bg-neo-pink rounded-full blur-sm -z-10"
+                          className="absolute inset-0 w-5 h-5 bg-neo-pink rounded-full blur-xs -z-10"
                           animate={{ opacity: [0.3, 0.6, 0.3] }}
                           transition={{ duration: 0.8, repeat: Infinity, ease: "easeInOut" }}
                         />

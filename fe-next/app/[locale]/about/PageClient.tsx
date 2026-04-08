@@ -30,7 +30,7 @@ function FeatureCard({
         <div
           className={cn(
             'w-10 h-10 rounded-lg flex items-center justify-center border-2 border-neo-black',
-            isDarkMode ? 'bg-neo-cyan' : 'bg-neo-yellow'
+            isDarkMode ? 'bg-neo-cyan' : 'bg-neo-lime'
           )}
         >
           <Icon className="w-5 h-5 text-neo-black" />
@@ -173,7 +173,7 @@ export default function AboutPageClient(): React.ReactElement {
               <div
                 className={cn(
                   'w-10 h-10 rounded-lg flex items-center justify-center border-2 border-neo-black mx-auto mb-3',
-                  isDarkMode ? 'bg-neo-pink' : 'bg-neo-orange'
+                  isDarkMode ? 'bg-neo-pink' : 'bg-neo-pink'
                 )}
               >
                 <ValIcon className="w-5 h-5 text-white" />
@@ -236,7 +236,7 @@ export default function AboutPageClient(): React.ReactElement {
           >
             <div className={cn(
               'w-12 h-12 rounded-lg flex items-center justify-center border-2 border-neo-black',
-              'bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400'
+              'bg-linear-to-br from-purple-500 via-pink-500 to-orange-400'
             )}>
               <InstagramIcon className="w-6 h-6 text-white" />
             </div>

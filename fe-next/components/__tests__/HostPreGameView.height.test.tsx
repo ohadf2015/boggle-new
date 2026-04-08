@@ -115,7 +115,7 @@ describe('HostPreGameView Height Constraint', () => {
     vi.clearAllMocks();
   });
 
-  it('should use flex-1 instead of h-[100dvh] to fit within parent container', () => {
+  it('should use flex-1 instead of h-dvh to fit within parent container', () => {
     const { container } = render(
       <SocketContext.Provider value={socketContextValue}>
         <HostPreGameView {...defaultProps} />
@@ -125,10 +125,10 @@ describe('HostPreGameView Height Constraint', () => {
     // Get the root div of HostPreGameView
     const rootDiv = container.firstChild as HTMLElement;
 
-    // The root div should have flex-1 class (fills available space in flex context), NOT h-[100dvh]
+    // The root div should have flex-1 class (fills available space in flex context), NOT h-dvh
     // This ensures the component fills its parent container without exceeding it
     expect(rootDiv.className).toContain('flex-1');
-    expect(rootDiv.className).not.toContain('h-[100dvh]');
+    expect(rootDiv.className).not.toContain('h-dvh');
   });
 
   it('should have proper flex layout structure for content containment', () => {

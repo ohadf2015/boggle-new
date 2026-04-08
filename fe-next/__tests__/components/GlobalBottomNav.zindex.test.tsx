@@ -4,7 +4,7 @@ import { vi, type Mock, } from 'vitest';
  *
  * Bug Context:
  * - GlobalBottomNav has z-50 (components/GlobalBottomNav.tsx:97)
- * - Tutorial button in LandingView has z-[55] (components/landing/LandingView.tsx:500)
+ * - Tutorial button in LandingView has z-55 (components/landing/LandingView.tsx:500)
  * - MobileDrawer has z-[60] (components/layout/MobileDrawer.tsx)
  * - Header has z-[60] and z-70 overlay
  * - This makes bottom nav tabs unclickable
@@ -75,6 +75,23 @@ vi.mock('@/hooks/useFriends', () => ({
   }),
 }));
 
+vi.mock('@/hooks/useDailyMissions', () => ({
+  useDailyMissions: () => ({
+    missions: [],
+    completedCount: 0,
+    isGrandSlam: false,
+    grandSlamClaimed: false,
+    loading: false,
+    refresh: vi.fn(),
+  }),
+}));
+
+vi.mock('@/components/CrazyGamesSDK', () => ({
+  useCrazyGames: () => ({
+    isOnCrazyGamesPlatform: false,
+  }),
+}));
+
 describe('GlobalBottomNav z-index', () => {
   test('should have z-index higher than all other fixed elements', () => {
     const { container } = render(<GlobalBottomNav />);
@@ -85,10 +102,10 @@ describe('GlobalBottomNav z-index', () => {
     const className = nav?.className || '';
 
     // Known z-index values in the app:
-    // - Tutorial button: z-[55]
+    // - Tutorial button: z-55
     // - MobileDrawer: z-[60]
     // - Header overlay: z-70
-    // - Various animations: z-[70] to z-[79]
+    // - Various animations: z-[70] to z-79
 
     // GlobalBottomNav must be HIGHER than all of these (z-80 or above)
     const zIndexMatch = className.match(/z-(\d+)|z-\[(\d+)\]/);

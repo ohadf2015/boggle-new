@@ -39,7 +39,7 @@ export const WordHuntGameOverlay = memo<WordHuntGameOverlayProps>(({
           data-testid="target-found-overlay"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-neo-black/70 backdrop-blur-sm"
+          className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-neo-black/70 backdrop-blur-xs"
         >
           {/* Icon */}
           <AdaptiveMotion.div

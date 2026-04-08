@@ -153,7 +153,7 @@ const Step1SwipeAndColors: React.FC<{ isRTL: boolean; t: (key: string) => string
       </div>
 
       {/* Mini Grid with Animated Swipe */}
-      <div className="relative inline-block flex-shrink-0">
+      <div className="relative inline-block shrink-0">
         <div className="grid grid-cols-3 gap-1">
           {letters.map((letter, idx) => (
             <motion.div
@@ -233,7 +233,7 @@ const Step2FindWordAndClues: React.FC<{ targetWordLength: number; t: (key: strin
       </div>
 
       {/* Target word boxes */}
-      <div className="flex flex-col items-center gap-3 flex-shrink-0">
+      <div className="flex flex-col items-center gap-3 shrink-0">
         <div className="flex justify-center gap-1.5 sm:gap-2">
           {Array.from({ length: displayLength }).map((_, idx) => (
             <motion.div

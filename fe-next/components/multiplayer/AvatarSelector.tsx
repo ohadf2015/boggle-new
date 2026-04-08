@@ -44,7 +44,7 @@ export const AvatarSelector: React.FC<AvatarSelectorProps> = ({
 
   if (compact) {
     return (
-      <div className={cn('flex-shrink-0', className)}>
+      <div className={cn('shrink-0', className)}>
         <button
           type="button"
           onClick={() => setIsBuilderOpen(true)}
@@ -54,7 +54,7 @@ export const AvatarSelector: React.FC<AvatarSelectorProps> = ({
           <div className="w-16 h-16 rounded-full border-3 border-neo-black shadow-hard-sm overflow-hidden group-hover:border-neo-cyan transition-colors">
             <AvatarRenderer config={currentConfig} size={64} />
           </div>
-          <div className="absolute -bottom-0.5 -end-0.5 w-6 h-6 bg-neo-cyan rounded-full border-2 border-neo-black flex items-center justify-center shadow-hard-sm">
+          <div className="absolute -bottom-0.5 -inset-e-0.5 w-6 h-6 bg-neo-cyan rounded-full border-2 border-neo-black flex items-center justify-center shadow-hard-sm">
             <Pencil className="w-3 h-3 text-neo-black" />
           </div>
         </button>
@@ -81,12 +81,12 @@ export const AvatarSelector: React.FC<AvatarSelectorProps> = ({
           'bg-neo-navy/40 hover:bg-neo-navy/60',
           'transition-all duration-200',
           'shadow-hard-sm hover:shadow-hard',
-          'hover:translate-x-[-1px] hover:translate-y-[-1px]',
-          'active:translate-x-[1px] active:translate-y-[1px] active:shadow-none'
+          'hover:-translate-x-px hover:-translate-y-px',
+          'active:translate-x-px active:translate-y-px active:shadow-none'
         )}
       >
         <div className="flex items-center gap-3">
-          <div className="relative w-14 h-14 rounded-full border-2 border-neo-cyan overflow-hidden flex-shrink-0 shadow-hard-sm">
+          <div className="relative w-14 h-14 rounded-full border-2 border-neo-cyan overflow-hidden shrink-0 shadow-hard-sm">
             <AvatarRenderer config={currentConfig} size={56} />
           </div>
           <div className="text-left">
@@ -98,7 +98,7 @@ export const AvatarSelector: React.FC<AvatarSelectorProps> = ({
             </p>
           </div>
         </div>
-        <div className="flex-shrink-0">
+        <div className="shrink-0">
           <Pencil className="w-5 h-5 text-neo-cyan" />
         </div>
       </button>

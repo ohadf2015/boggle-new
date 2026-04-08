@@ -86,7 +86,7 @@ const ShareButton: React.FC<ShareButtonProps> = ({
         'inline-flex items-center justify-center font-bold rounded-neo',
         'border-2 shadow-hard-sm transition-all duration-150',
         // Focus styles for accessibility
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2',
+        'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2',
         // Size
         sizeStyles[size],
         // Width
@@ -97,7 +97,7 @@ const ShareButton: React.FC<ShareButtonProps> = ({
         className
       )}
     >
-      {icon && <span className="flex-shrink-0" aria-hidden="true">{icon}</span>}
+      {icon && <span className="shrink-0" aria-hidden="true">{icon}</span>}
       <span>{children}</span>
     </button>
   );

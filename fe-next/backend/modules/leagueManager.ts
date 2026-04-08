@@ -208,9 +208,7 @@ export async function getOrCreateLeague(
     const league = openLeagues[0];
     await supabase
       .from('league_members')
-      .insert({ league_id: league.id, user_id: userId, weekly_xp: 0 })
-      .select()
-      .single();
+      .insert({ league_id: league.id, user_id: userId, weekly_xp: 0 });
 
     return { leagueId: league.id, tier: league.tier ?? tier };
   }
@@ -227,9 +225,7 @@ export async function getOrCreateLeague(
 
   await supabase
     .from('league_members')
-    .insert({ league_id: newLeague.id, user_id: userId, weekly_xp: 0 })
-    .select()
-    .single();
+    .insert({ league_id: newLeague.id, user_id: userId, weekly_xp: 0 });
 
   return { leagueId: newLeague.id, tier };
 }

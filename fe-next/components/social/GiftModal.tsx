@@ -48,7 +48,7 @@ const GiftModal: React.FC<GiftModalProps> = ({
   const giftTypes: GiftType[] = ['hints', 'streak_freeze', 'coins'];
 
   return (
-    <div data-testid="gift-modal" className="fixed inset-0 z-50 flex items-center justify-center bg-neo-black/60 backdrop-blur-sm">
+    <div data-testid="gift-modal" className="fixed inset-0 z-50 flex items-center justify-center bg-neo-black/60 backdrop-blur-xs">
       <motion.div
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}

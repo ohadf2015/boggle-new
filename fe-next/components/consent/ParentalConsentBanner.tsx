@@ -61,7 +61,7 @@ export const ParentalConsentBanner = memo<ParentalConsentBannerProps>(({
           transition={{ type: 'spring', stiffness: 300, damping: 30 }}
           className={cn(
             'fixed top-0 inset-x-0 z-[60]',
-            'bg-gradient-to-r from-neo-purple via-neo-indigo to-neo-purple',
+            'bg-linear-to-r from-neo-purple via-neo-indigo to-neo-purple',
             'text-white',
             'border-b-4 border-neo-black',
             'shadow-hard-xl',
@@ -78,7 +78,7 @@ export const ParentalConsentBanner = memo<ParentalConsentBannerProps>(({
             <div className="flex items-start gap-3">
               {/* Icon */}
               <div className={cn(
-                'flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12',
+                'shrink-0 w-10 h-10 sm:w-12 sm:h-12',
                 'bg-white/20',
                 'border-2 border-white/40 rounded-neo',
                 'flex items-center justify-center'
@@ -110,9 +110,9 @@ export const ParentalConsentBanner = memo<ParentalConsentBannerProps>(({
                       'min-h-[44px] min-w-[44px]',
                       'bg-neo-lime text-neo-black',
                       'shadow-hard',
-                      'hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard-lg',
-                      'active:translate-x-[1px] active:translate-y-[1px] active:shadow-none',
-                      'focus:outline-none focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2'
+                      'hover:-translate-x-px hover:-translate-y-px hover:shadow-hard-lg',
+                      'active:translate-x-px active:translate-y-px active:shadow-none',
+                      'focus:outline-hidden focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2'
                     )}
                   >
                     {t('consent.banner.action')}
@@ -127,7 +127,7 @@ export const ParentalConsentBanner = memo<ParentalConsentBannerProps>(({
                       'transition-all duration-100',
                       'min-h-[44px] min-w-[44px]',
                       'bg-white/20 hover:bg-white/30',
-                      'focus:outline-none focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2'
+                      'focus:outline-hidden focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2'
                     )}
                   >
                     {t('consent.banner.dismiss')}
@@ -139,13 +139,13 @@ export const ParentalConsentBanner = memo<ParentalConsentBannerProps>(({
               <button
                 onClick={onDismiss}
                 className={cn(
-                  'flex-shrink-0 w-11 h-11 sm:w-12 sm:h-12',
+                  'shrink-0 w-11 h-11 sm:w-12 sm:h-12',
                   'min-w-[44px] min-h-[44px]',
                   'flex items-center justify-center',
                   'bg-white/20 hover:bg-white/30',
                   'rounded-neo border-2 border-white/30',
                   'transition-colors',
-                  'focus:outline-none focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2'
+                  'focus:outline-hidden focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2'
                 )}
                 aria-label={t('common.close')}
               >

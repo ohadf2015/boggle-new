@@ -79,7 +79,7 @@ export function SeedWordTags({
         className={cn(
           'flex flex-wrap gap-2 items-center',
           'border-neo border-neo-white/20 bg-black/30 rounded-neo px-3 py-2.5 min-h-[52px]',
-          'focus-within:border-neo-cyan focus-within:shadow-[0_0_0_1px_theme(colors.neo-cyan/40)]',
+          'focus-within:border-neo-cyan focus-within:shadow-[0_0_0_1px_--theme(--color-neo-cyan/40)]',
           'transition-colors',
           disabled && 'opacity-50 pointer-events-none'
         )}
@@ -105,7 +105,7 @@ export function SeedWordTags({
                 <input
                   ref={editRef}
                   defaultValue={tag}
-                  className="bg-transparent text-neo-cyan outline-none w-16 font-neo-display font-bold text-sm"
+                  className="bg-transparent text-neo-cyan outline-hidden w-16 font-neo-display font-bold text-sm"
                   onBlur={e => commitEdit(i, e.target.value)}
                   onKeyDown={e => {
                     if (e.key === 'Enter') commitEdit(i, e.currentTarget.value);
@@ -149,7 +149,7 @@ export function SeedWordTags({
           disabled={disabled}
           className={cn(
             'flex-1 min-w-[80px] bg-transparent text-neo-white',
-            'font-neo-body text-sm outline-none',
+            'font-neo-body text-sm outline-hidden',
             'placeholder:text-neo-white/40'
           )}
         />

@@ -117,7 +117,7 @@ export function LandingDesktopCards({
         >
           <Suspense fallback={
             <div
-              className="w-full h-full p-3 sm:p-4 rounded-neo border-3 border-neo-black shadow-hard-lg bg-gradient-to-br from-yellow-300 via-amber-400 to-orange-500"
+              className="w-full h-full p-3 sm:p-4 rounded-neo border-3 border-neo-black shadow-hard-lg bg-linear-to-br from-yellow-300 via-amber-400 to-orange-500"
               style={{ minHeight: '72px' }}
             >
               <div className="flex items-center gap-3 sm:gap-4 animate-pulse">

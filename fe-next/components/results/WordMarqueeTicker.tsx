@@ -43,11 +43,11 @@ const WordMarqueeTicker: React.FC<WordMarqueeTickerProps> = memo(({
       )}
     >
       {/* Halftone texture */}
-      <div className="absolute inset-0 pointer-events-none opacity-[0.03] bg-[radial-gradient(circle,#fff_1px,transparent_1px)] bg-[length:6px_6px]" />
+      <div className="absolute inset-0 pointer-events-none opacity-[0.03] bg-[radial-gradient(circle,#fff_1px,transparent_1px)] bg-size-[6px_6px]" />
 
       {/* Edge fade masks */}
-      <div className="absolute inset-y-0 start-0 w-8 bg-gradient-to-e from-neo-black to-transparent z-20 pointer-events-none" />
-      <div className="absolute inset-y-0 end-0 w-8 bg-gradient-to-s from-neo-black to-transparent z-20 pointer-events-none" style={{ background: 'linear-gradient(to left, var(--neo-black), transparent)' }} />
+      <div className="absolute inset-y-0 inset-s-0 w-8 bg-linear-to-e from-neo-black to-transparent z-20 pointer-events-none" />
+      <div className="absolute inset-y-0 inset-e-0 w-8 bg-linear-to-s from-neo-black to-transparent z-20 pointer-events-none" style={{ background: 'linear-gradient(to left, var(--neo-black), transparent)' }} />
 
       <div
         ref={contentRef}

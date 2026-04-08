@@ -76,7 +76,7 @@ describe('Bug Fixes', () => {
   describe('Z-Index Hierarchy', () => {
     it('defines correct z-index hierarchy for dropdowns', () => {
       // Header dropdowns should use z-[100] to appear above other elements
-      // but below modals at z-[101]
+      // but below modals at z-101
       const headerDropdownZIndex = 100;
       const modalZIndex = 101;
 

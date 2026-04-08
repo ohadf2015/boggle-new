@@ -27,7 +27,7 @@ export default function FAQPageClient(): React.ReactElement {
       'min-h-screen flex flex-col',
       isDarkMode
         ? 'bg-neo-navy'
-        : 'bg-gradient-to-br from-neo-cream via-white to-neo-cream'
+        : 'bg-linear-to-br from-neo-cream via-white to-neo-cream'
     )}>
       <AutoHideHeader />
 
@@ -103,9 +103,9 @@ export default function FAQPageClient(): React.ReactElement {
                           {item.question}
                         </span>
                         {isOpen ? (
-                          <ChevronUp className="w-5 h-5 flex-shrink-0 text-neo-yellow" />
+                          <ChevronUp className="w-5 h-5 shrink-0 text-neo-yellow" />
                         ) : (
-                          <ChevronDown className="w-5 h-5 flex-shrink-0 text-gray-500" />
+                          <ChevronDown className="w-5 h-5 shrink-0 text-gray-500" />
                         )}
                       </button>
                       {/* Always render answer in DOM for SEO — use CSS to toggle visibility */}

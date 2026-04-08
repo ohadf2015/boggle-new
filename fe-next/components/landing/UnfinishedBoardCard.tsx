@@ -97,7 +97,7 @@ const UnfinishedBoardCard = memo<UnfinishedBoardCardProps>(({
       {/* Content */}
       <div className="p-3 flex gap-3">
         {/* Mini grid */}
-        <div className="w-20 h-20 flex-shrink-0">
+        <div className="w-20 h-20 shrink-0">
           <MiniGridPreview grid={grid} />
         </div>
 

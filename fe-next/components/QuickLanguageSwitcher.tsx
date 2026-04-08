@@ -69,7 +69,7 @@ export const QuickLanguageSwitcher = memo<QuickLanguageSwitcherProps>(({
           "active:translate-x-[2px] active:translate-y-[2px] active:shadow-none",
           "transition-all duration-100",
           // Focus ring
-          "focus:outline-none focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2",
+          "focus:outline-hidden focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2",
           // Override default SelectTrigger chevron
           "[&>svg:last-child]:hidden",
           className
@@ -115,7 +115,7 @@ export const QuickLanguageSwitcher = memo<QuickLanguageSwitcherProps>(({
               // Selected state
               "data-[state=checked]:bg-neo-cyan data-[state=checked]:text-neo-black",
               // Remove default focus bg
-              "focus:outline-none"
+              "focus:outline-hidden"
             )}
           >
             <div className="flex items-center gap-3">

@@ -196,7 +196,7 @@ export const ResultsDetailsContent: React.FC<ResultsDetailsContentProps> = ({
             transition={{ type: 'spring', stiffness: 250, damping: 14, delay: 0.4 }}
             className="flex items-center gap-3 px-4 py-3 bg-neo-navy border-3 border-neo-black shadow-hard-lg relative overflow-hidden"
           >
-            <div className="absolute inset-0 pointer-events-none opacity-[0.03] bg-[radial-gradient(circle,#fff_1px,transparent_1px)] bg-[length:6px_6px]" />
+            <div className="absolute inset-0 pointer-events-none opacity-[0.03] bg-[radial-gradient(circle,#fff_1px,transparent_1px)] bg-size-[6px_6px]" />
             <motion.span
               className="text-2xl relative z-10"
               initial={{ scale: 0, rotate: -180 }}
@@ -224,7 +224,7 @@ export const ResultsDetailsContent: React.FC<ResultsDetailsContentProps> = ({
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             onClick={onMarkReady}
-            className="pointer-events-auto flex items-center gap-2 px-5 py-2.5 bg-neo-lime text-neo-black font-black text-sm uppercase border-3 border-neo-black rounded-neo shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard-lg active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed transition-all"
+            className="pointer-events-auto flex items-center gap-2 px-5 py-2.5 bg-neo-lime text-neo-black font-black text-sm uppercase border-3 border-neo-black rounded-neo shadow-hard hover:-translate-x-px hover:-translate-y-px hover:shadow-hard-lg active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed transition-all"
           >
             <Check className="w-4 h-4" />
             {t('results.imReady')}

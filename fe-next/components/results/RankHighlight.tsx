@@ -27,7 +27,7 @@ const RANK_CONFIGS: Record<number, {
   messageKey: string;
 }> = {
   1: {
-    bg: 'bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-400',
+    bg: 'bg-linear-to-r from-amber-400 via-yellow-300 to-amber-400',
     border: 'border-neo-black',
     text: 'text-neo-black',
     icon: Crown,
@@ -35,7 +35,7 @@ const RANK_CONFIGS: Record<number, {
     messageKey: 'results.rankHighlight.champion',
   },
   2: {
-    bg: 'bg-gradient-to-r from-slate-300 via-slate-200 to-slate-300',
+    bg: 'bg-linear-to-r from-slate-300 via-slate-200 to-slate-300',
     border: 'border-neo-black',
     text: 'text-neo-black',
     icon: TrendingUp,
@@ -43,7 +43,7 @@ const RANK_CONFIGS: Record<number, {
     messageKey: 'results.rankHighlight.soClose',
   },
   3: {
-    bg: 'bg-gradient-to-r from-orange-400 via-amber-300 to-orange-400',
+    bg: 'bg-linear-to-r from-orange-400 via-amber-300 to-orange-400',
     border: 'border-neo-black',
     text: 'text-neo-black',
     icon: TrendingUp,
@@ -85,7 +85,7 @@ export function RankHighlight({ rank, totalPlayers, gapToWinner, winnerUsername 
         style={rank <= 3 ? { boxShadow: `0 0 20px ${config.glowColor}, 4px 4px 0px black` } : undefined}
       >
         {/* Halftone texture */}
-        <div className="absolute inset-0 pointer-events-none opacity-[0.06] bg-[radial-gradient(circle,#000_1px,transparent_1px)] bg-[length:6px_6px]" />
+        <div className="absolute inset-0 pointer-events-none opacity-[0.06] bg-[radial-gradient(circle,#000_1px,transparent_1px)] bg-size-[6px_6px]" />
         {/* Shimmer sweep for podium finishers */}
         {!reducedMotion && rank <= 3 && (
           <motion.div

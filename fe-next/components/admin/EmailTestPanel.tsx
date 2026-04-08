@@ -270,8 +270,8 @@ export function EmailTestPanel({ authToken, userEmail, userName }: EmailTestPane
             status === 'success' && 'bg-green-500/10 border-green-500 text-green-400',
             status === 'error' && 'bg-neo-red/10 border-neo-red text-neo-red'
           )}>
-            {status === 'success' && <CheckCircle className="w-5 h-5 flex-shrink-0" />}
-            {status === 'error' && <XCircle className="w-5 h-5 flex-shrink-0" />}
+            {status === 'success' && <CheckCircle className="w-5 h-5 shrink-0" />}
+            {status === 'error' && <XCircle className="w-5 h-5 shrink-0" />}
             <span className="text-sm font-medium">{message}</span>
           </div>
         )}
@@ -344,8 +344,8 @@ export function EmailTestPanel({ authToken, userEmail, userName }: EmailTestPane
                 playerSendStatus === 'success' && 'bg-green-500/10 border-green-500 text-green-400',
                 playerSendStatus === 'error' && 'bg-neo-red/10 border-neo-red text-neo-red'
               )}>
-                {playerSendStatus === 'success' && <CheckCircle className="w-4 h-4 flex-shrink-0" />}
-                {playerSendStatus === 'error' && <XCircle className="w-4 h-4 flex-shrink-0" />}
+                {playerSendStatus === 'success' && <CheckCircle className="w-4 h-4 shrink-0" />}
+                {playerSendStatus === 'error' && <XCircle className="w-4 h-4 shrink-0" />}
                 <span className="text-sm font-medium">{playerSendMessage}</span>
               </div>
             )}

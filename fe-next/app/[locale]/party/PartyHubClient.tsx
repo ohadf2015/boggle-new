@@ -17,19 +17,19 @@ const GAME_LIST = Object.values(PARTY_GAMES);
 /** Unique accent colors per game */
 const ACCENT_STYLES: Record<PartyGameId, { bg: string; border: string; shadow: string; glow: string }> = {
   'caption-clash': {
-    bg: 'bg-gradient-to-br from-neo-pink via-neo-pink-light to-neo-pink-dark',
+    bg: 'bg-linear-to-br from-neo-pink via-neo-pink-light to-neo-pink-dark',
     border: 'border-neo-pink',
     shadow: 'shadow-hard-pink',
     glow: 'hover:shadow-[0_0_20px_rgba(255,20,147,0.4)]',
   },
   'pixel-clash': {
-    bg: 'bg-gradient-to-br from-neo-cyan via-neo-cyan-light to-neo-cyan-dark',
+    bg: 'bg-linear-to-br from-neo-cyan via-neo-cyan-light to-neo-cyan-dark',
     border: 'border-neo-cyan',
     shadow: 'shadow-hard-cyan',
     glow: 'hover:shadow-[0_0_20px_rgba(0,255,255,0.4)]',
   },
   'shadow-clash': {
-    bg: 'bg-gradient-to-br from-neo-purple via-neo-purple-light to-neo-purple-dark',
+    bg: 'bg-linear-to-br from-neo-purple via-neo-purple-light to-neo-purple-dark',
     border: 'border-neo-purple',
     shadow: 'shadow-hard-purple',
     glow: 'hover:shadow-[0_0_20px_rgba(139,92,246,0.4)]',
@@ -109,7 +109,7 @@ export default function PartyHubClient() {
                   border-3 border-neo-black rounded-neo-lg
                   p-5 text-left
                   transition-all duration-100
-                  hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard-lg
+                  hover:-translate-x-px hover:-translate-y-px hover:shadow-hard-lg
                   active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed
                   ${accent.glow}
                 `}
@@ -148,7 +148,7 @@ export default function PartyHubClient() {
                 px-4 py-3 text-neo-cream font-neo-display text-xl text-center
                 uppercase tracking-[0.3em]
                 placeholder:text-neo-cream/30 placeholder:tracking-[0.2em]
-                focus:outline-none focus:border-neo-lime
+                focus:outline-hidden focus:border-neo-lime
                 transition-colors
               "
             />
@@ -159,7 +159,7 @@ export default function PartyHubClient() {
                 bg-neo-lime border-3 border-neo-black rounded-neo shadow-hard
                 px-6 py-3 font-neo-display text-neo-black uppercase font-bold
                 transition-all duration-100
-                hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard-lg
+                hover:-translate-x-px hover:-translate-y-px hover:shadow-hard-lg
                 active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed
                 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:translate-x-0 disabled:hover:translate-y-0
               "

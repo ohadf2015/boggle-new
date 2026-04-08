@@ -15,6 +15,7 @@ import type { GameStats } from '@/shared/weeklyQuestTemplates';
 import { getSocketById, safeEmit } from '../../utils/socketHelpers';
 import { incrementWordApproval } from '../../redis/wordApproval';
 import { processGameEndEngagement, processAchievementEngagement } from '../../handlers/engagementHandler';
+import { updateRankedMmr, type RankedParticipant } from '../../modules/supabase/rankedMmr';
 import logger from '../../utils/logger';
 import type { PlayerResult, UserData } from './types';
 
@@ -106,6 +107,28 @@ export async function recordGameResultsToSupabase(
       userAuthMap
     );
     logger.info('SUPABASE', `Game ${gameCode} results recorded`);
+
+    // Update ranked MMR if this was a ranked game
+    if (gameInfo.isRanked && scoresArray.length >= 2) {
+      try {
+        const sortedForRanked = [...scoresArray].sort((a, b) => b.totalScore - a.totalScore);
+        const rankedParticipants: RankedParticipant[] = sortedForRanked.map((p, i) => {
+          const userData = game.users?.[p.username] as UserData | undefined;
+          return {
+            playerId: userData?.authUserId || '',
+            placement: i + 1,
+            score: p.totalScore,
+          };
+        }).filter(p => p.playerId);
+
+        if (rankedParticipants.length >= 2) {
+          await updateRankedMmr(rankedParticipants);
+          logger.info('RANKED', `Updated MMR for ${rankedParticipants.length} players in game ${gameCode}`);
+        }
+      } catch (rankedErr) {
+        logger.error('RANKED', `Failed to update MMR for game ${gameCode}: ${(rankedErr as Error).message}`);
+      }
+    }
 
     // Emit XP events to each player
     emitXpEvents(io, results, game);

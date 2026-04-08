@@ -86,7 +86,7 @@ export default function DuelNotification({ classroomId }: DuelNotificationProps)
           className={cn(
             'fixed z-50',
             // Position: bottom-right on desktop, top-right on mobile
-            'bottom-6 end-6 md:bottom-8 md:end-8',
+            'bottom-6 inset-e-6 md:bottom-8 md:inset-e-8',
             'max-w-sm w-full'
           )}
         >
@@ -98,7 +98,7 @@ export default function DuelNotification({ classroomId }: DuelNotificationProps)
             )}
           >
             {/* Icon */}
-            <div className="flex-shrink-0">
+            <div className="shrink-0">
               <Swords className="w-8 h-8 text-neo-lime" />
             </div>
 
@@ -115,7 +115,7 @@ export default function DuelNotification({ classroomId }: DuelNotificationProps)
             {/* Dismiss button */}
             <button
               onClick={handleDismiss}
-              className="flex-shrink-0 text-neo-white/50 hover:text-neo-white transition-colors"
+              className="shrink-0 text-neo-white/50 hover:text-neo-white transition-colors"
               aria-label={t('common.dismiss', 'Dismiss')}
             >
               <X className="w-5 h-5" />

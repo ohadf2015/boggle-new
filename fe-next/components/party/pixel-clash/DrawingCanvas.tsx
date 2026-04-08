@@ -189,21 +189,21 @@ const DrawingCanvasInner = forwardRef<DrawingCanvasHandle, DrawingCanvasProps>((
             <button
               onClick={() => canvasRef.current?.undo()}
               className="bg-neo-navy-elevated border-2 border-neo-cream/30 rounded-neo px-3 py-1.5 text-neo-cream/60 text-xs font-neo-body
-                hover:border-neo-cream/50 active:translate-y-[1px] transition-all"
+                hover:border-neo-cream/50 active:translate-y-px transition-all"
             >
               {t('party.undo') || 'Undo'}
             </button>
             <button
               onClick={() => canvasRef.current?.redo()}
               className="bg-neo-navy-elevated border-2 border-neo-cream/30 rounded-neo px-3 py-1.5 text-neo-cream/60 text-xs font-neo-body
-                hover:border-neo-cream/50 active:translate-y-[1px] transition-all"
+                hover:border-neo-cream/50 active:translate-y-px transition-all"
             >
               {t('party.redo') || 'Redo'}
             </button>
             <button
               onClick={() => canvasRef.current?.clearCanvas()}
               className="bg-neo-navy-elevated border-2 border-neo-red/30 rounded-neo px-3 py-1.5 text-neo-red/60 text-xs font-neo-body
-                hover:border-neo-red/50 active:translate-y-[1px] transition-all"
+                hover:border-neo-red/50 active:translate-y-px transition-all"
             >
               {t('party.clear') || 'Clear'}
             </button>

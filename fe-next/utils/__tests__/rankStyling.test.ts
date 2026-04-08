@@ -12,7 +12,7 @@ describe('rankStyling', () => {
     it('should return current user highlight for rank 1 when isCurrentUser is true', () => {
       const result = getRankRowClasses(1, true);
 
-      expect(result).toContain('bg-gradient-to-r from-neo-cyan/40');
+      expect(result).toContain('bg-linear-to-r from-neo-cyan/40');
       expect(result).toContain('border-neo-cyan');
       expect(result).toContain('ring-2 ring-neo-cyan/60');
     });

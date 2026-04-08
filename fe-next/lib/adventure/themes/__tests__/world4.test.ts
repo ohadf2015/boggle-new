@@ -135,7 +135,7 @@ describe('World 4: Idiom Archipelago Theme', () => {
       expect(WORLD_4_THEME.animations.speedMultiplier).toBe(1.0);
     });
 
-    it('has neo-orange selection ring', () => {
+    it('has neo-orange selection ring-3', () => {
       expect(WORLD_4_THEME.animations.tileSelect).toContain('ring-neo-orange');
     });
   });

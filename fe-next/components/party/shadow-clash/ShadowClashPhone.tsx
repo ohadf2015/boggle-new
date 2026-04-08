@@ -7,9 +7,11 @@
  */
 
 import { memo, useEffect, useState, useCallback } from 'react';
+import { setInterval, clearInterval } from 'worker-timers';
 import type { Socket } from 'socket.io-client';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
+import { usePartySounds } from '@/hooks/usePartySounds';
 
 // ==================== Types ====================
 
@@ -40,7 +42,7 @@ interface VoteStartData {
 type PhonePhase = 'waiting' | 'role-reveal' | 'night-action' | 'night-waiting' | 'seer-result' | 'discussion' | 'voting' | 'voted' | 'eliminated' | 'watching';
 
 const ROLE_CONFIG: Record<ShadowRole, { emoji: string; color: string; nameKey: string; bgGlow: string }> = {
-  shadow: { emoji: '🐺', color: 'text-neo-red', nameKey: 'party.roleShadow', bgGlow: 'bg-neo-red/10 border-neo-red' },
+  'shadow': { emoji: '🐺', color: 'text-neo-red', nameKey: 'party.roleShadow', bgGlow: 'bg-neo-red/10 border-neo-red' },
   seer: { emoji: '👁️', color: 'text-neo-purple', nameKey: 'party.roleSeer', bgGlow: 'bg-neo-purple/10 border-neo-purple' },
   medic: { emoji: '🛡️', color: 'text-neo-lime', nameKey: 'party.roleMedic', bgGlow: 'bg-neo-lime/10 border-neo-lime' },
   citizen: { emoji: '👤', color: 'text-neo-cream', nameKey: 'party.roleCitizen', bgGlow: 'bg-neo-cream/5 border-neo-cream/30' },
@@ -57,6 +59,7 @@ interface ShadowClashPhoneProps {
 
 function ShadowClashPhoneInner({ socket, onSendInput }: ShadowClashPhoneProps) {
   const { t } = useLanguage();
+  const partySounds = usePartySounds();
   const [phase, setPhase] = useState<PhonePhase>('waiting');
   const [myRole, setMyRole] = useState<RoleAssignedData | null>(null);
   const [nightAction, setNightAction] = useState<NightActionData | null>(null);
@@ -69,9 +72,10 @@ function ShadowClashPhoneInner({ socket, onSendInput }: ShadowClashPhoneProps) {
   // Timer
   useEffect(() => {
     if (timeRemaining <= 0) return;
+    if (timeRemaining <= 5) partySounds.onCountdown(timeRemaining);
     const interval = setInterval(() => setTimeRemaining(prev => Math.max(0, prev - 1)), 1000);
     return () => clearInterval(interval);
-  }, [timeRemaining]);
+  }, [timeRemaining, partySounds]);
 
   // Socket listeners
   useEffect(() => {
@@ -80,6 +84,7 @@ function ShadowClashPhoneInner({ socket, onSendInput }: ShadowClashPhoneProps) {
     const onRoleAssigned = (data: RoleAssignedData) => {
       setMyRole(data);
       setPhase('role-reveal');
+      partySounds.onPhaseStart();
     };
 
     const onNightAction = (data: NightActionData) => {
@@ -102,6 +107,7 @@ function ShadowClashPhoneInner({ socket, onSendInput }: ShadowClashPhoneProps) {
       setPhase('discussion');
       setTimeRemaining(data.timeSeconds);
       setVotedTarget(null);
+      partySounds.onPhaseTransition();
     };
 
     const onVoteStart = (data: VoteStartData) => {
@@ -109,6 +115,7 @@ function ShadowClashPhoneInner({ socket, onSendInput }: ShadowClashPhoneProps) {
       setVoteTargets(data.targets);
       setTimeRemaining(data.timeSeconds);
       setVotedTarget(null);
+      partySounds.onPhaseTransition();
     };
 
     const onEliminated = () => {
@@ -117,6 +124,7 @@ function ShadowClashPhoneInner({ socket, onSendInput }: ShadowClashPhoneProps) {
 
     const onGameOver = () => {
       setPhase('watching');
+      partySounds.onGameOver();
     };
 
     socket.on('party:shadow:roleAssigned', onRoleAssigned);
@@ -141,13 +149,15 @@ function ShadowClashPhoneInner({ socket, onSendInput }: ShadowClashPhoneProps) {
   const handleNightAction = useCallback((targetUsername: string) => {
     onSendInput({ gameId: 'shadow-clash', action: 'night-action', targetUsername });
     setNightActionDone(true);
-  }, [onSendInput]);
+    partySounds.onSubmit();
+  }, [onSendInput, partySounds]);
 
   const handleVote = useCallback((targetUsername: string) => {
     onSendInput({ gameId: 'shadow-clash', action: 'vote', targetUsername });
     setVotedTarget(targetUsername);
     setPhase('voted');
-  }, [onSendInput]);
+    partySounds.onVote();
+  }, [onSendInput, partySounds]);
 
   const handleCallVote = useCallback(() => {
     onSendInput({ gameId: 'shadow-clash', action: 'call-vote' });
@@ -162,7 +172,7 @@ function ShadowClashPhoneInner({ socket, onSendInput }: ShadowClashPhoneProps) {
         <AdaptiveMotion.div
           initial={{ rotateY: 180, opacity: 0 }}
           animate={{ rotateY: 0, opacity: 1 }}
-          transition={{ duration: 0.6, type: 'spring' }}
+          transition={{ type: 'spring', stiffness: 200, damping: 20 }}
           className={`border-4 ${roleConfig.bgGlow} rounded-neo-xl p-8 shadow-hard-lg max-w-xs w-full text-center`}
         >
           <div className="text-7xl mb-4">{roleConfig.emoji}</div>
@@ -217,7 +227,7 @@ function ShadowClashPhoneInner({ socket, onSendInput }: ShadowClashPhoneProps) {
                 border-3 border-neo-cream/20 rounded-neo p-3 text-left
                 bg-neo-navy-elevated shadow-hard
                 transition-all duration-100
-                hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard-lg
+                hover:-translate-x-px hover:-translate-y-px hover:shadow-hard-lg
                 active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed
                 ${myRole?.role === 'shadow' ? 'hover:border-neo-red/50' :
                   myRole?.role === 'seer' ? 'hover:border-neo-purple/50' :
@@ -278,7 +288,7 @@ function ShadowClashPhoneInner({ socket, onSendInput }: ShadowClashPhoneProps) {
         <AdaptiveMotion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
-          transition={{ type: 'spring', damping: 10 }}
+          transition={{ type: 'spring', stiffness: 300, damping: 10 }}
           className="text-center"
         >
           <div className="text-5xl mb-3">{isEvil ? '🔴' : '🔵'}</div>
@@ -367,7 +377,7 @@ function ShadowClashPhoneInner({ socket, onSendInput }: ShadowClashPhoneProps) {
                       ? 'bg-neo-navy-elevated text-neo-cream/30'
                       : isSkip
                         ? 'bg-neo-navy-elevated text-neo-cream/50 border-neo-cream/20 shadow-hard hover:border-neo-cream/40'
-                        : 'bg-neo-navy-elevated text-neo-cream shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-pressed'
+                        : 'bg-neo-navy-elevated text-neo-cream shadow-hard hover:-translate-x-px hover:-translate-y-px active:translate-x-px active:translate-y-px active:shadow-hard-pressed'
                   }
                 `}
               >

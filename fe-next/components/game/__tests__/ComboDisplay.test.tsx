@@ -154,25 +154,25 @@ describe('ComboDisplay', () => {
     it('uses neon green for common rarity (levels 1-2)', () => {
       const { container } = render(<ComboDisplay comboLevel={2} />);
       // Check that the gradient class contains neon green colors
-      const comboText = container.querySelector('.bg-gradient-to-r');
+      const comboText = container.querySelector('.bg-linear-to-r');
       expect(comboText).toBeInTheDocument();
     });
 
     it('uses neon cyan for rare rarity (level 3)', () => {
       const { container } = render(<ComboDisplay comboLevel={3} />);
-      const comboText = container.querySelector('.bg-gradient-to-r');
+      const comboText = container.querySelector('.bg-linear-to-r');
       expect(comboText).toBeInTheDocument();
     });
 
     it('uses neon magenta for epic rarity (level 4)', () => {
       const { container } = render(<ComboDisplay comboLevel={4} />);
-      const comboText = container.querySelector('.bg-gradient-to-r');
+      const comboText = container.querySelector('.bg-linear-to-r');
       expect(comboText).toBeInTheDocument();
     });
 
     it('uses neon yellow/gold for legendary rarity (levels 5-6)', () => {
       const { container } = render(<ComboDisplay comboLevel={5} />);
-      const comboText = container.querySelector('.bg-gradient-to-r');
+      const comboText = container.querySelector('.bg-linear-to-r');
       expect(comboText).toBeInTheDocument();
     });
   });

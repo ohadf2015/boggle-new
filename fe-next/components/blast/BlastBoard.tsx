@@ -101,6 +101,11 @@ export const BlastBoard = memo(function BlastBoard({
   diamondRevealTurns = 0,
 }: BlastBoardProps) {
   const { t } = useLanguage();
+  const gridStyle = useMemo(() => ({
+    padding: GRID_PADDING,
+    gridTemplateColumns: `repeat(${gridSize}, minmax(0, 1fr))`,
+    gridTemplateRows: `repeat(${gridSize}, minmax(0, 1fr))`,
+  }), [gridSize]);
   const containerRef = useRef<HTMLDivElement>(null);
   // Initialize to 1 (not 0) so the overlay grid renders immediately.
   // Fall animation pixel math degrades gracefully until ResizeObserver fires.
@@ -243,11 +248,7 @@ export const BlastBoard = memo(function BlastBoard({
         <div
           dir="ltr"
           className={`absolute inset-0 pointer-events-none z-[10] grid ${GRID_GAP_CLASS}`}
-          style={{
-            padding: GRID_PADDING,
-            gridTemplateColumns: `repeat(${gridSize}, minmax(0, 1fr))`,
-            gridTemplateRows: `repeat(${gridSize}, minmax(0, 1fr))`,
-          }}
+          style={gridStyle}
           aria-hidden="true"
         >
           {tileStates.flat().map((tile) => {

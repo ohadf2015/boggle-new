@@ -51,7 +51,7 @@ const TvJoinBar = memo<TvJoinBarProps>(({
           </div>
 
           {/* Center: Game Code (HUGE) */}
-          <div className="flex-shrink-0 text-center px-6">
+          <div className="shrink-0 text-center px-6">
             <p className="text-neo-cream/80 text-sm font-bold uppercase tracking-wider mb-1" id="game-code-label">
               {t('tvBroadcast.gameCode')}
             </p>

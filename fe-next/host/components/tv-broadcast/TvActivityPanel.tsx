@@ -95,9 +95,9 @@ const TvBlastActivityPanel = memo<{
   t: TvActivityPanelProps['t'];
 }>(({ cascadeBlocks, activeCombos, highestCombo, reducedMotion, t }) => {
   const bgGlow = highestCombo >= 10
-    ? 'bg-gradient-to-b from-red-900/30 to-transparent'
+    ? 'bg-linear-to-b from-red-900/30 to-transparent'
     : highestCombo >= 5
-      ? 'bg-gradient-to-b from-orange-900/20 to-transparent'
+      ? 'bg-linear-to-b from-orange-900/20 to-transparent'
       : '';
 
   return (
@@ -323,7 +323,7 @@ const TvActivityPanel = memo<TvActivityPanelProps>(({
     >
       {/* Fire round glow overlay */}
       {fireRoundActive && (
-        <div className="absolute inset-0 bg-gradient-to-b from-orange-500/15 via-transparent to-red-500/10 pointer-events-none z-10" />
+        <div className="absolute inset-0 bg-linear-to-b from-orange-500/15 via-transparent to-red-500/10 pointer-events-none z-10" />
       )}
 
       {/* Hype mascot — pops in during intense action bursts (uses existing game mascot) */}

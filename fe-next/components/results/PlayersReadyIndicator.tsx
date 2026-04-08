@@ -78,8 +78,8 @@ const PlayersReadyIndicator: React.FC<PlayersReadyIndicatorProps> = ({
           <motion.div
             className={`absolute inset-y-0 left-0 ${
               allReady
-                ? 'bg-gradient-to-r from-emerald-500/30 to-teal-400/30'
-                : 'bg-gradient-to-r from-neo-lime/20 to-amber-500/20'
+                ? 'bg-linear-to-r from-emerald-500/30 to-teal-400/30'
+                : 'bg-linear-to-r from-neo-lime/20 to-amber-500/20'
             }`}
             initial={{ width: 0 }}
             animate={{ width: `${progressPercent}%` }}

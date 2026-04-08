@@ -81,7 +81,7 @@ export function NotificationDropdown({
     <div
       ref={dropdownRef}
       className="
-        absolute top-full end-0 mt-2
+        absolute top-full inset-e-0 mt-2
         w-80 max-w-[calc(100vw-1rem)] max-h-96
         bg-neo-navy border-3 border-black rounded-lg
         shadow-hard-lg overflow-hidden
@@ -100,7 +100,7 @@ export function NotificationDropdown({
               onClick={() => setShowUnreadOnly(!showUnreadOnly)}
               className={`
                 text-xs transition-colors font-medium
-                ${showUnreadOnly ? 'text-neo-yellow' : 'text-neo-white/50 hover:text-neo-cyan'}
+                ${showUnreadOnly ? 'text-neo-lime' : 'text-neo-white/50 hover:text-neo-cyan'}
               `}
             >
               {showUnreadOnly ? t('notifications.showAll', 'All') : t('notifications.unreadOnly', 'Unread')}
@@ -110,7 +110,7 @@ export function NotificationDropdown({
             <button
               onClick={onMarkAllAsRead}
               className="
-                text-xs text-neo-cyan hover:text-neo-yellow
+                text-xs text-neo-cyan hover:text-neo-lime
                 transition-colors font-medium
               "
             >
@@ -160,7 +160,7 @@ export function NotificationDropdown({
             onClick={() => setShowAll(true)}
             className="
               w-full text-center text-xs text-neo-cyan
-              hover:text-neo-yellow transition-colors font-medium
+              hover:text-neo-lime transition-colors font-medium
             "
           >
             {t('notifications.viewAll')} ({filteredNotifications.length - MAX_VISIBLE} {t('notifications.more', 'more')})

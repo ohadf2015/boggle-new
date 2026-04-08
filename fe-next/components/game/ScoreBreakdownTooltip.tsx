@@ -1,6 +1,6 @@
 'use client';
 
-import { memo, useState, useCallback } from 'react';
+import { memo, useState, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { HelpCircle, X } from 'lucide-react';
 
@@ -39,10 +39,13 @@ const ScoreBreakdownTooltip = memo<ScoreBreakdownTooltipProps>(({
   }, []);
 
   // Filter scoring rules based on minWordLength
-  const visibleRules = SCORING_RULES.filter(rule => {
-    const ruleLength = parseInt(rule.letters);
-    return isNaN(ruleLength) || ruleLength >= minWordLength;
-  });
+  const visibleRules = useMemo(
+    () => SCORING_RULES.filter(rule => {
+      const ruleLength = parseInt(rule.letters);
+      return isNaN(ruleLength) || ruleLength >= minWordLength;
+    }),
+    [minWordLength],
+  );
 
   return (
     <div className="relative inline-flex items-center">

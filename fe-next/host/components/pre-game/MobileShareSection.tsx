@@ -110,7 +110,7 @@ export const MobileShareSection = memo<MobileShareSectionProps>(function MobileS
               priority
             />
             {/* Gradient overlay for text readability */}
-            <div className="absolute inset-0 bg-gradient-to-t from-neo-navy/80 via-transparent to-transparent" />
+            <div className="absolute inset-0 bg-linear-to-t from-neo-navy/80 via-transparent to-transparent" />
             {/* Title overlay */}
             <div className="absolute bottom-0 inset-x-0 p-3">
               <DialogTitle className="text-xl font-black text-white drop-shadow-lg font-neo-display">

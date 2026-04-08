@@ -139,7 +139,7 @@ const ExplosiveBurstLayout = memo<ExplosiveBurstLayoutProps>(({
         transition={{ type: 'spring', stiffness: 500, damping: 15 }}
         className={cn(
           'relative px-8 py-6 rounded-neo border-4',
-          `bg-gradient-to-r ${bgGradient}`,
+          `bg-linear-to-r ${bgGradient}`,
           textColor,
           borderColor,
           'shadow-hard-xl',

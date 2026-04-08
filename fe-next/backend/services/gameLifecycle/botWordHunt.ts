@@ -30,10 +30,13 @@ const TARGET_FOUND_END_DELAY_MS = 3000;
 const BOT_SCORE_BUFFER = 20;
 
 /** Timing config per difficulty — startDelay is high so bots find regular words first */
-const HUNT_TIMING: Record<string, { minDelay: number; maxDelay: number; startDelay: number; minWrongGuesses: number }> = {
-  easy:   { minDelay: 8000,  maxDelay: 15000, startDelay: 15000, minWrongGuesses: 3 },
-  medium: { minDelay: 5000,  maxDelay: 10000, startDelay: 10000, minWrongGuesses: 2 },
-  hard:   { minDelay: 3000,  maxDelay: 7000,  startDelay: 6000,  minWrongGuesses: 1 },
+const HUNT_TIMING: Record<string, {
+  minDelay: number; maxDelay: number; startDelay: number;
+  minWrongGuesses: number; stumbleChance: number;
+}> = {
+  easy:   { minDelay: 10000, maxDelay: 20000, startDelay: 20000, minWrongGuesses: 5, stumbleChance: 0.50 },
+  medium: { minDelay: 7000,  maxDelay: 14000, startDelay: 14000, minWrongGuesses: 4, stumbleChance: 0.35 },
+  hard:   { minDelay: 4000,  maxDelay: 9000,  startDelay: 8000,  minWrongGuesses: 2, stumbleChance: 0.15 },
 };
 
 export interface BotWordHuntStrategy {
@@ -43,6 +46,7 @@ export interface BotWordHuntStrategy {
   maxDelay: number;
   startDelay: number;
   minWrongGuesses: number;
+  stumbleChance: number;
   targetWord: string;
 }
 
@@ -93,7 +97,7 @@ export function filterCandidatesByFeedback(
 /**
  * Pick a guess from remaining candidates.
  * Avoids the target word until the bot has made enough wrong guesses,
- * simulating a human who explores before honing in on the answer.
+ * and even then may "stumble" past it to simulate human imperfection.
  */
 export function pickBotGuess(
   candidates: string[],
@@ -102,10 +106,17 @@ export function pickBotGuess(
 ): string | null {
   if (candidates.length === 0) return null;
 
-  // If the bot hasn't made enough wrong guesses yet, avoid the target
-  if (strategy && strategy.guessesMade.length < strategy.minWrongGuesses) {
+  if (strategy) {
+    const pastMinGuesses = strategy.guessesMade.length >= strategy.minWrongGuesses;
     const nonTarget = candidates.filter(w => w !== strategy.targetWord);
-    if (nonTarget.length > 0) {
+
+    // Before enough wrong guesses: always avoid the target
+    if (!pastMinGuesses && nonTarget.length > 0) {
+      return nonTarget[Math.floor(Math.random() * nonTarget.length)];
+    }
+
+    // After enough wrong guesses: stumble chance — skip the target even if eligible
+    if (pastMinGuesses && nonTarget.length > 0 && Math.random() < strategy.stumbleChance) {
       return nonTarget[Math.floor(Math.random() * nonTarget.length)];
     }
   }
@@ -132,6 +143,7 @@ export function createBotWordHuntStrategy(
     maxDelay: timing.maxDelay,
     startDelay: timing.startDelay,
     minWrongGuesses: timing.minWrongGuesses,
+    stumbleChance: timing.stumbleChance,
     targetWord,
   };
 }

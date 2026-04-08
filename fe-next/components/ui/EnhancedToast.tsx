@@ -119,7 +119,7 @@ const ToastItem: React.FC<ToastItemProps> = ({ toast, onRemove }) => {
       <div className="p-4">
         <div className="flex items-start gap-3">
           {/* Icon */}
-          <div className={cn('flex-shrink-0 mt-0.5', text)}>
+          <div className={cn('shrink-0 mt-0.5', text)}>
             <Icon className="w-6 h-6" aria-hidden="true" />
           </div>
 
@@ -143,8 +143,8 @@ const ToastItem: React.FC<ToastItemProps> = ({ toast, onRemove }) => {
                 }}
                 className={cn(
                   'mt-3 px-3 py-1.5 text-sm font-bold rounded-neo border-2 border-neo-black shadow-hard-sm',
-                  'hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px]',
-                  'active:shadow-none active:translate-x-[1px] active:translate-y-[1px]',
+                  'hover:shadow-hard hover:-translate-x-px hover:-translate-y-px',
+                  'active:shadow-none active:translate-x-px active:translate-y-px',
                   'transition-all duration-100',
                   bg === 'bg-neo-black' ? 'bg-white text-neo-black' : 'bg-neo-black text-white'
                 )}
@@ -158,7 +158,7 @@ const ToastItem: React.FC<ToastItemProps> = ({ toast, onRemove }) => {
           <button
             onClick={() => onRemove(toast.id)}
             className={cn(
-              'flex-shrink-0 p-2.5 rounded-neo cursor-pointer',
+              'shrink-0 p-2.5 rounded-neo cursor-pointer',
               'hover:bg-neo-black/10 active:bg-neo-black/20',
               'transition-colors',
               text

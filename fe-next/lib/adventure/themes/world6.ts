@@ -40,12 +40,12 @@ const colors: WorldColorPalette = {
 // ==============================================
 
 const background: WorldBackground = {
-  baseColor: 'bg-gradient-to-b from-neo-navy via-slate-950 to-pink-950',
+  baseColor: 'bg-linear-to-b from-neo-navy via-slate-950 to-pink-950',
   illustrationPath: '/images/adventure/backgrounds/labyrinth.webp',
   layers: [
     {
       id: 'labyrinth-void',
-      source: 'bg-gradient-to-b from-neo-navy via-slate-950 to-pink-950',
+      source: 'bg-linear-to-b from-neo-navy via-slate-950 to-pink-950',
       depth: 0.1,
       opacity: 1,
       className: 'absolute inset-0',

@@ -114,7 +114,7 @@ export function CinematicFallback({
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-gradient-to-b from-neo-abyss to-neo-navy flex flex-col items-center justify-center"
+      className="fixed inset-0 z-50 bg-linear-to-b from-neo-abyss to-neo-navy flex flex-col items-center justify-center"
       data-testid="cinematic-fallback"
     >
       {/* Boss Image + Name */}

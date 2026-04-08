@@ -138,7 +138,7 @@ const BotControls: React.FC<BotControlsProps> = ({
 
   return (
     <div className="bg-neo-navy-light text-neo-cream p-4 rounded-xl border-3 border-neo-black shadow-hard relative overflow-hidden space-y-3">
-      <div className="absolute inset-0 bg-gradient-to-br from-neo-cyan/5 via-transparent to-neo-pink/5 pointer-events-none" />
+      <div className="absolute inset-0 bg-linear-to-br from-neo-cyan/5 via-transparent to-neo-pink/5 pointer-events-none" />
 
       {/* Screen reader announcements */}
       <div role="status" aria-live="polite" className="sr-only">

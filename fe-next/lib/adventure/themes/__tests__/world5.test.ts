@@ -160,7 +160,7 @@ describe('World 5: Compound Canyon Theme', () => {
       expect(WORLD_5_THEME.animations.speedMultiplier).toBe(1.0);
     });
 
-    it('has neo-red selection ring', () => {
+    it('has neo-red selection ring-3', () => {
       expect(WORLD_5_THEME.animations.tileSelect).toContain('ring-neo-red');
     });
   });

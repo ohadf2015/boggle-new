@@ -64,7 +64,7 @@ const WordHuntQuickRules = memo<WordHuntQuickRulesProps>(({ onDismiss, t }) => {
         transition={{ type: 'spring', stiffness: 300, damping: 25 }}
         className={cn(
           'fixed top-3 left-1/2 -translate-x-1/2 z-40 w-[min(92vw,360px)]',
-          'bg-neo-navy-light/95 backdrop-blur-sm',
+          'bg-neo-navy-light/95 backdrop-blur-xs',
           'border-2 border-neo-white/20 rounded-neo shadow-hard-sm',
           'px-4 py-3',
         )}

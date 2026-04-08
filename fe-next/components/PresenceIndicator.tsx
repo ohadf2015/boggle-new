@@ -207,7 +207,7 @@ const PresenceIndicator = memo<PresenceIndicatorProps>(({
               {['Z', 'z', 'z'].map((letter, i) => (
                 <motion.span
                   key={i}
-                  className={`${sizeConfig.zzz} font-black text-slate-900 drop-shadow-sm`}
+                  className={`${sizeConfig.zzz} font-black text-slate-900 drop-shadow-xs`}
                   style={{
                     fontSize: i === 0 ? '1em' : `${0.85 - i * 0.1}em`,
                   }}

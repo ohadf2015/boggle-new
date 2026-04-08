@@ -68,7 +68,7 @@ const PlayerProfileCard = memo<PlayerProfileCardProps>(({
             customAvatar={profile.customAvatar ?? undefined}
 
             size={compact ? 'md' : 'lg'}
-            className="flex-shrink-0 border-2 border-neo-black"
+            className="shrink-0 border-2 border-neo-black"
           />
 
           {/* Info column */}
@@ -82,7 +82,7 @@ const PlayerProfileCard = memo<PlayerProfileCardProps>(({
                 {profile.displayName}
               </span>
               {profile.countryCode && (
-                <span className="text-sm flex-shrink-0">{getCountryFlag(profile.countryCode)}</span>
+                <span className="text-sm shrink-0">{getCountryFlag(profile.countryCode)}</span>
               )}
             </div>
 
@@ -104,7 +104,7 @@ const PlayerProfileCard = memo<PlayerProfileCardProps>(({
 
           {/* Stats column */}
           {!compact && (
-            <div className="flex items-center gap-3 flex-shrink-0">
+            <div className="flex items-center gap-3 shrink-0">
               {/* Win rate */}
               <div className="text-center">
                 <div className="flex items-center gap-1">

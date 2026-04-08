@@ -165,7 +165,7 @@ Create a streamlined education experience with:
 
 ```tsx
 // ✅ GOOD: Consistent header across all practice modes
-<div className="sticky top-0 z-50 bg-neo-navy/95 backdrop-blur-sm border-b border-neo-black/30">
+<div className="sticky top-0 z-50 bg-neo-navy/95 backdrop-blur-xs border-b border-neo-black/30">
   <div className="max-w-2xl mx-auto px-4 py-3">
     <div className="flex items-center justify-between">
       {/* Back button + title */}
@@ -236,9 +236,9 @@ Create a streamlined education experience with:
 
 ```tsx
 // ✅ GOOD: Celebration-worthy results display
-<Card className="border-neo-thick border-neo-black shadow-hard-lg bg-gradient-to-br from-neo-navy to-neo-navy/80 overflow-hidden">
+<Card className="border-neo-thick border-neo-black shadow-hard-lg bg-linear-to-br from-neo-navy to-neo-navy/80 overflow-hidden">
   {/* Top celebration gradient */}
-  <div className="h-2 bg-gradient-to-r from-neo-pink via-neo-cyan to-neo-yellow" />
+  <div className="h-2 bg-linear-to-r from-neo-pink via-neo-cyan to-neo-yellow" />
 
   <CardContent className="p-8 text-center">
     {/* Animated trophy */}

@@ -329,7 +329,7 @@ export function SpellingChallengePractice({
               'bg-neo-white text-neo-black',
               'font-neo-body text-xl',
               'shadow-hard',
-              'focus:outline-none focus:ring-4 focus:ring-neo-purple',
+              'focus:outline-hidden focus:ring-4 focus:ring-neo-purple',
               'disabled:opacity-50 disabled:cursor-not-allowed',
               'transition-all'
             )}

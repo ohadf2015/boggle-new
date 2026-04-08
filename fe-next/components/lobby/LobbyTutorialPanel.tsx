@@ -98,7 +98,7 @@ export const LobbyTutorialPanel: React.FC<LobbyTutorialPanelProps> = ({ t }) => 
       </div>
 
       {/* UI Language Switcher (CrazyGames) */}
-      <div className="flex-shrink-0 border-t border-neo-white/10 pt-3 mt-3">
+      <div className="shrink-0 border-t border-neo-white/10 pt-3 mt-3">
         <div className="flex items-center gap-2 mb-2">
           <Globe className="w-3.5 h-3.5 text-neo-cream/60" />
           <span className="text-[10px] font-bold uppercase text-neo-cream/60">{t('tutorial.uiLanguage')}</span>

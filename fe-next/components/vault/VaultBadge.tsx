@@ -36,7 +36,7 @@ const VaultBadge: React.FC<VaultBadgeProps> = ({
         className
       )}
     >
-      <Shield size={16} className="text-neo-yellow flex-shrink-0" />
+      <Shield size={16} className="text-neo-yellow shrink-0" />
       <div className="min-w-0">
         <div className="flex items-center gap-1.5">
           <span className="text-xs font-bold text-neo-yellow truncate">

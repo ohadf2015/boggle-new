@@ -96,8 +96,8 @@ describe('ParticleEmitter', () => {
       expect(gfx.rect).toHaveBeenCalled();
     });
 
-    it('should draw ring shapes when shape is ring', () => {
-      const config = makeConfig({ shape: 'ring' });
+    it('should draw ring-3 shapes when shape is ring-3', () => {
+      const config = makeConfig({ shape: 'ring-3' });
       const emitter = new ParticleEmitter(parent, config);
       emitter.burst(100, 100, 3);
       emitter.update(0.016);

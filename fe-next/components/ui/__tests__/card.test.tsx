@@ -87,7 +87,7 @@ describe('Card Component', () => {
       expect(card).not.toHaveClass('border-4');
     });
 
-    it('renders with outline variant', () => {
+    it('renders with outline-solid variant', () => {
       const { container } = render(<CardVariant variant="outline">Test Card</CardVariant>);
       const card = container.firstChild as HTMLElement;
 
@@ -152,28 +152,28 @@ describe('Card Component', () => {
       const { container } = render(<CardVariant>Test Card</CardVariant>);
       const card = container.firstChild as HTMLElement;
 
-      expect(card).toHaveClass('[&>*]:cq-p-responsive');
+      expect(card).toHaveClass('*:cq-p-responsive');
     });
 
     it('renders with tight padding', () => {
       const { container } = render(<CardVariant padding="tight">Test Card</CardVariant>);
       const card = container.firstChild as HTMLElement;
 
-      expect(card).toHaveClass('[&>*]:cq-p-tight');
+      expect(card).toHaveClass('*:cq-p-tight');
     });
 
     it('renders with large padding', () => {
       const { container } = render(<CardVariant padding="large">Test Card</CardVariant>);
       const card = container.firstChild as HTMLElement;
 
-      expect(card).toHaveClass('[&>*]:cq-p-responsive-lg');
+      expect(card).toHaveClass('*:cq-p-responsive-lg');
     });
 
     it('renders with generous padding', () => {
       const { container } = render(<CardVariant padding="generous">Test Card</CardVariant>);
       const card = container.firstChild as HTMLElement;
 
-      expect(card).toHaveClass('[&>*]:cq-p-generous');
+      expect(card).toHaveClass('*:cq-p-generous');
     });
 
     it('renders with no padding', () => {
@@ -189,14 +189,14 @@ describe('Card Component', () => {
       const { container } = render(
         <CardVariant
           variant="gradient"
-          gradient="bg-gradient-to-br from-neo-cyan to-cyan-400"
+          gradient="bg-linear-to-br from-neo-cyan to-cyan-400"
         >
           Test Card
         </CardVariant>
       );
       const card = container.firstChild as HTMLElement;
 
-      expect(card).toHaveClass('bg-gradient-to-br');
+      expect(card).toHaveClass('bg-linear-to-br');
       expect(card).toHaveClass('from-neo-cyan');
       expect(card).toHaveClass('to-cyan-400');
     });
@@ -205,14 +205,14 @@ describe('Card Component', () => {
       const { container } = render(
         <CardVariant
           variant="default"
-          gradient="bg-gradient-to-r from-amber-700 to-amber-500"
+          gradient="bg-linear-to-r from-amber-700 to-amber-500"
         >
           Test Card
         </CardVariant>
       );
       const card = container.firstChild as HTMLElement;
 
-      expect(card).toHaveClass('bg-gradient-to-r');
+      expect(card).toHaveClass('bg-linear-to-r');
     });
   });
 
@@ -224,7 +224,7 @@ describe('Card Component', () => {
           tilt="left"
           hover="lift"
           padding="large"
-          gradient="bg-gradient-to-br from-neo-cyan to-cyan-400"
+          gradient="bg-linear-to-br from-neo-cyan to-cyan-400"
         >
           Test Card
         </CardVariant>
@@ -239,9 +239,9 @@ describe('Card Component', () => {
       // Hover
       expect(card).toHaveClass('hover:-translate-y-1');
       // Padding
-      expect(card).toHaveClass('[&>*]:cq-p-responsive-lg');
+      expect(card).toHaveClass('*:cq-p-responsive-lg');
       // Gradient
-      expect(card).toHaveClass('bg-gradient-to-br');
+      expect(card).toHaveClass('bg-linear-to-br');
     });
 
     it('applies custom className alongside variants', () => {
@@ -304,7 +304,7 @@ describe('Card Component', () => {
   describe('Complete Card Structure', () => {
     it('renders full card with all components using CardVariant', () => {
       const { container } = render(
-        <CardVariant variant="gradient" gradient="bg-gradient-to-br from-neo-cyan to-cyan-400">
+        <CardVariant variant="gradient" gradient="bg-linear-to-br from-neo-cyan to-cyan-400">
           <CardHeader>
             <CardTitle>Test Title</CardTitle>
             <CardDescription>Test Description</CardDescription>
@@ -318,7 +318,7 @@ describe('Card Component', () => {
         </CardVariant>
       );
 
-      expect(container.querySelector('.bg-gradient-to-br')).toBeInTheDocument();
+      expect(container.querySelector('.bg-linear-to-br')).toBeInTheDocument();
       expect(container.textContent).toContain('Test Title');
       expect(container.textContent).toContain('Test Description');
       expect(container.textContent).toContain('Test Content');

@@ -27,6 +27,7 @@ import { useMultiplayerGameFlow } from '@/hooks/useMultiplayerGameFlow';
 import { useSeriesTracker } from '@/hooks/useSeriesTracker';
 import { usePlayerJoinLeaveNotifications } from '@/hooks/usePlayerJoinLeaveNotifications';
 import { useMultiplayerEventNotifications } from '@/hooks/useMultiplayerEventNotifications';
+import { useMultiplayerSounds } from '@/hooks/useMultiplayerSounds';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 import { useMultiplayerJoin } from './useMultiplayerJoin';
 import { useGameActions } from '@/hooks/gameState';
@@ -150,6 +151,7 @@ export default function MultiplayerPageClient(): React.JSX.Element {
 
   usePlayerJoinLeaveNotifications({ players: playersInRoom, currentUsername: username, t, enabled: isActive });
   useMultiplayerEventNotifications({ currentUsername: username, t, enabled: isActive });
+  const mpSounds = useMultiplayerSounds();
 
   const {
     socket, isConnected, roomsLoading, attemptingReconnect,
@@ -240,6 +242,7 @@ export default function MultiplayerPageClient(): React.JSX.Element {
       setGameStartTime(Date.now());
       setShowResults(false);
       setResultsData(null);
+      mpSounds.onMatchStart();
     },
     onGameReset: () => { /* Keep results visible until startGame arrives with new grid */ },
     onHostLeftRoomClosing: () => {
@@ -282,6 +285,15 @@ export default function MultiplayerPageClient(): React.JSX.Element {
     guestAvatar, setGuestAvatar,
     setUsername, setError, setIsJoining,
   });
+
+  // Sound: game over — victory if first place, defeat otherwise
+  React.useEffect(() => {
+    if (!showResults || !resultsData?.scores?.length) return;
+    const myRank = resultsData.scores.findIndex(s => s.username === username);
+    if (myRank === 0) mpSounds.onVictory(true);
+    else mpSounds.onDefeat();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showResults]);
 
   // Series tracking
   React.useEffect(() => {

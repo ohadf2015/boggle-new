@@ -250,16 +250,16 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
     >
       {/* Blurred background layer - mimics content behind */}
       <div className="absolute inset-0 -z-10">
-        <div className="absolute inset-0 bg-gradient-to-br from-neo-navy/95 via-slate-900/95 to-neo-navy/95 backdrop-blur-xl" />
+        <div className="absolute inset-0 bg-linear-to-br from-neo-navy/95 via-slate-900/95 to-neo-navy/95 backdrop-blur-xl" />
         {/* Decorative blurred "fake" content shapes */}
-        <div className="absolute top-4 left-4 right-4 h-8 bg-slate-700/30 rounded-lg blur-sm" />
+        <div className="absolute top-4 left-4 right-4 h-8 bg-slate-700/30 rounded-lg blur-xs" />
         <div className="absolute top-16 left-4 w-24 h-24 bg-neo-lime/10 rounded-full blur-md" />
-        <div className="absolute top-20 right-8 w-16 h-4 bg-slate-600/30 rounded blur-sm" />
-        <div className="absolute bottom-8 left-8 right-8 h-12 bg-slate-700/20 rounded-lg blur-sm" />
+        <div className="absolute top-20 right-8 w-16 h-4 bg-slate-600/30 rounded blur-xs" />
+        <div className="absolute bottom-8 left-8 right-8 h-12 bg-slate-700/20 rounded-lg blur-xs" />
       </div>
 
       {/* Main card with glass effect */}
-      <div className="relative rounded-neo border-3 border-neo-lime/50 bg-neo-navy/90 shadow-hard-lg p-5 backdrop-blur-sm">
+      <div className="relative rounded-neo border-3 border-neo-lime/50 bg-neo-navy/90 shadow-hard-lg p-5 backdrop-blur-xs">
         {/* Sparkle decorations */}
         <div className="absolute -top-2 -right-2 rtl:-right-auto rtl:-left-2">
           <motion.div
@@ -288,7 +288,7 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
             initial={{ scale: 0, rotate: -20 }}
             animate={{ scale: 1, rotate: 0 }}
             transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
-            className="flex-shrink-0"
+            className="shrink-0"
           >
             <InteractiveMascot
               variant="excited"
@@ -347,7 +347,7 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
               transition={{ delay: 0.5 + idx * 0.05 }}
               className="flex items-center gap-2 text-xs"
             >
-              <benefit.icon className="w-4 h-4 text-neo-cyan flex-shrink-0" />
+              <benefit.icon className="w-4 h-4 text-neo-cyan shrink-0" />
               <span className="text-gray-300">
                 {t(`auth.dailyChallenge.benefits.${benefit.key}`) || benefit.key}
               </span>
@@ -464,7 +464,7 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
                         aria-invalid={emailError ? true : undefined}
                         aria-describedby={emailError ? 'dc-magic-email-error' : undefined}
                         className={cn(
-                          "w-full px-4 py-3 rounded-neo border-2 bg-slate-800 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-neo-cyan",
+                          "w-full px-4 py-3 rounded-neo border-2 bg-slate-800 text-white placeholder-gray-500 focus:outline-hidden focus:ring-2 focus:ring-neo-cyan",
                           emailError ? "border-red-500" : "border-slate-600 focus:border-neo-cyan"
                         )}
                         disabled={isAnyLoading || otpSent}
@@ -487,7 +487,7 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
                           value={otpCode}
                           onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
                           placeholder={t('auth.otp.enterCode')}
-                          className="w-full px-4 py-3 rounded-neo border-2 bg-slate-800 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-neo-cyan border-slate-600 focus:border-neo-cyan text-center text-2xl tracking-[0.5em] font-mono"
+                          className="w-full px-4 py-3 rounded-neo border-2 bg-slate-800 text-white placeholder-gray-500 focus:outline-hidden focus:ring-2 focus:ring-neo-cyan border-slate-600 focus:border-neo-cyan text-center text-2xl tracking-[0.5em] font-mono"
                           disabled={isAnyLoading}
                         />
                       </div>
@@ -537,7 +537,7 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
                         aria-invalid={emailError ? true : undefined}
                         aria-describedby={emailError ? 'dc-pwd-email-error' : undefined}
                         className={cn(
-                          "w-full px-4 py-3 rounded-neo border-2 bg-slate-800 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-neo-cyan",
+                          "w-full px-4 py-3 rounded-neo border-2 bg-slate-800 text-white placeholder-gray-500 focus:outline-hidden focus:ring-2 focus:ring-neo-cyan",
                           emailError ? "border-red-500" : "border-slate-600 focus:border-neo-cyan"
                         )}
                         disabled={isAnyLoading}
@@ -559,7 +559,7 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
                           aria-invalid={passwordError ? true : undefined}
                           aria-describedby={passwordError ? 'dc-pwd-password-error' : undefined}
                           className={cn(
-                            "w-full px-4 py-3 rounded-neo border-2 bg-slate-800 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-neo-cyan pe-12",
+                            "w-full px-4 py-3 rounded-neo border-2 bg-slate-800 text-white placeholder-gray-500 focus:outline-hidden focus:ring-2 focus:ring-neo-cyan pe-12",
                             passwordError ? "border-red-500" : "border-slate-600 focus:border-neo-cyan"
                           )}
                           disabled={isAnyLoading}
@@ -567,7 +567,7 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
                         <button
                           type="button"
                           onClick={() => setShowPassword(!showPassword)}
-                          className="absolute end-3 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-200"
+                          className="absolute inset-e-3 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-200"
                         >
                           {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                         </button>

@@ -311,7 +311,7 @@ export function TimeBonusPopup({
 
   return (
     <motion.div
-      className="fixed pointer-events-none z-[150]"
+      className="fixed pointer-events-none z-150"
       style={{ left: position.x, top: position.y }}
       initial={{ opacity: 0, y: 0, x: '-50%', scale: 0.8 }}
       animate={{ opacity: [0, 1, 1, 0], y: -40, scale: 1 }}

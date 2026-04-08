@@ -124,7 +124,7 @@ export const StatsSection: React.FC<StatsSectionProps> = ({
             transition={{ delay: 0.6, type: 'spring', stiffness: 400, damping: 12 }}
             className="relative"
           >
-            <div className="px-3 py-1 bg-gradient-to-r from-neo-pink/20 to-neo-yellow/20 border border-neo-pink/40 rounded-full">
+            <div className="px-3 py-1 bg-linear-to-r from-neo-pink/20 to-neo-yellow/20 border border-neo-pink/40 rounded-full">
               <span className="text-xs font-black text-neo-pink">
                 {t('wordHunt.stats.top')} {Math.max(1, 100 - stats.yourStats.percentile)}%
               </span>
@@ -137,7 +137,7 @@ export const StatsSection: React.FC<StatsSectionProps> = ({
               transition={{ delay: 1 }}
             >
               <motion.div
-                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                className="absolute inset-0 bg-linear-to-r from-transparent via-white/20 to-transparent"
                 animate={{ x: ['-100%', '200%'] }}
                 transition={{ delay: 1.2, duration: 0.8, ease: 'easeInOut', repeat: Infinity, repeatDelay: 4 }}
               />
@@ -243,7 +243,7 @@ export const StatsSection: React.FC<StatsSectionProps> = ({
                       ease: [0.34, 1.56, 0.64, 1],
                     }}
                     className={cn(
-                      "h-full rounded-sm bg-gradient-to-r flex items-center justify-end px-1.5",
+                      "h-full rounded-sm bg-linear-to-r flex items-center justify-end px-1.5",
                       isYourAttempt ? "from-neo-yellow to-amber-400" : getBarColor(attemptNum),
                       isYourAttempt && getBarGlow(attemptNum)
                     )}
@@ -253,7 +253,7 @@ export const StatsSection: React.FC<StatsSectionProps> = ({
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.9 + i * 0.08 }}
-                        className="text-[10px] font-black text-white/90 tabular-nums drop-shadow-sm"
+                        className="text-[10px] font-black text-white/90 tabular-nums drop-shadow-xs"
                       >
                         {count}
                       </motion.span>

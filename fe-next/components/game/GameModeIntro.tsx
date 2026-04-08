@@ -17,6 +17,8 @@ const MODE_TRANSLATION_KEYS: Record<GameMode, { name: string; description: strin
   'word-hunt': { name: 'gameModes.wordHunt.name', description: 'gameModes.wordHunt.description' },
 };
 
+const RADIAL_GRADIENT_STYLE = { background: 'radial-gradient(circle, var(--tw-gradient-stops))' } as const;
+
 /** Mode-specific accent colors for the radial burst */
 const MODE_COLORS: Record<GameMode, { from: string; via: string }> = {
   'classic': { from: 'from-neo-cyan/30', via: 'via-neo-cyan/5' },
@@ -70,7 +72,7 @@ export function GameModeIntro({
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 2.5, opacity: 1 }}
           transition={{ duration: 1.5, ease: 'easeOut' as const }}
-          style={{ background: `radial-gradient(circle, var(--tw-gradient-stops))` }}
+          style={RADIAL_GRADIENT_STYLE}
         />
 
         {/* Ring burst effect */}
@@ -130,7 +132,7 @@ export function GameModeIntro({
 
         {/* Decorative bottom line */}
         <motion.div
-          className="h-1 bg-gradient-to-r from-transparent via-neo-cream/30 to-transparent rounded-full"
+          className="h-1 bg-linear-to-r from-transparent via-neo-cream/30 to-transparent rounded-full"
           initial={{ width: 0, opacity: 0 }}
           animate={{ width: isTv ? 300 : 200, opacity: 1 }}
           transition={{ delay: 0.6, duration: 0.8, ease: 'easeOut' as const }}

@@ -26,7 +26,7 @@ describe('TileBadge', () => {
 
       const badge = screen.getByText('3x');
       expect(badge).toHaveClass('-top-1.5');
-      expect(badge).toHaveClass('-end-1.5');
+      expect(badge).toHaveClass('-inset-e-1.5');
     });
 
     it('should have glow shadow on gold badge', () => {
@@ -56,7 +56,7 @@ describe('TileBadge', () => {
 
       const badge = screen.getByText('✦');
       expect(badge).toHaveClass('-top-1.5');
-      expect(badge).toHaveClass('-end-1.5');
+      expect(badge).toHaveClass('-inset-e-1.5');
     });
   });
 
@@ -133,11 +133,11 @@ describe('TileBadge', () => {
       expect(frostOverlay).not.toBeInTheDocument();
     });
 
-    it('should have gradient and blur on frost overlay', () => {
+    it('should have gradient and blur-sm on frost overlay', () => {
       const { container } = render(<TileBadge type="ice" isFrozen={true} />);
 
       const frostOverlay = container.querySelector('.frost-overlay');
-      expect(frostOverlay).toHaveClass('bg-gradient-to-br');
+      expect(frostOverlay).toHaveClass('bg-linear-to-br');
       expect(frostOverlay).toHaveClass('backdrop-blur-[2px]');
     });
   });

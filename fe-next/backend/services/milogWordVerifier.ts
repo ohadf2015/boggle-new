@@ -4,7 +4,7 @@
  * Used to enrich the Hebrew dictionary with community-submitted words
  */
 
-import axios from 'axios';
+import ky, { HTTPError } from 'ky';
 import { getRedisClient } from '../redisClient';
 import logger from '../utils/logger';
 
@@ -196,21 +196,20 @@ async function fetchWithRetry(
   for (let attempt = 0; attempt <= retries; attempt++) {
     try {
       await enforceRateLimit();
-      const response = await axios.get<string>(url, {
+      return await ky.get(url, {
         headers: {
           'User-Agent': MILOG_USER_AGENT,
           'Accept': 'text/html,application/xhtml+xml',
           'Accept-Language': 'he,en;q=0.9',
         },
         timeout,
-        responseType: 'text',
-      });
-      return response.data;
+        retry: 0,
+      }).text();
     } catch (error) {
       lastError = error instanceof Error ? error : new Error(String(error));
 
       // Don't retry on 404 (word doesn't exist)
-      if (axios.isAxiosError(error) && error.response?.status === 404) {
+      if (error instanceof HTTPError && error.response.status === 404) {
         throw error;
       }
 
@@ -279,7 +278,7 @@ export async function verifyWordOnMilog(word: string): Promise<MilogVerification
     logger.error('Milog', `Error verifying word "${word}"`, { error: errorMessage });
 
     // On 404, word definitely doesn't exist
-    if (axios.isAxiosError(error) && error.response?.status === 404) {
+    if (error instanceof HTTPError && error.response.status === 404) {
       const result: MilogVerificationResult = {
         verified: false,
         status: 'not_found',

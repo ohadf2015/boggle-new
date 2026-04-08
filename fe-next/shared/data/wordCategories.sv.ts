@@ -22,7 +22,7 @@ export const CATEGORY_WORDS_SV: Record<string, string[]> = {
     'kopp', 'glas', 'kniv', 'gaffel', 'sked', 'fat', 'skål', 'nyckel', 'lås', 'klocka',
     'bok', 'penna', 'väska', 'rep', 'kedja', 'spegel', 'ljus', 'lampa', 'bild', 'matta',
     'hink', 'stege', 'hammare', 'spik', 'hjul', 'boll', 'låda', 'korg', 'tråd', 'band',
-    'kort', 'flagga', 'ring', 'duk', 'kam', 'tvål', 'handduk', 'kudde', 'filt', 'paraply',
+    'kort', 'flagga', 'ring-3', 'duk', 'kam', 'tvål', 'handduk', 'kudde', 'filt', 'paraply',
   ],
   actions: [
     'gå', 'springa', 'hoppa', 'simma', 'flyga', 'sitta', 'stå', 'ligga', 'äta', 'dricka',

@@ -49,7 +49,7 @@ export function DuelDisconnectOverlay({
   return (
     <motion.div
       data-testid="disconnect-overlay"
-      className="fixed inset-0 z-50 flex items-center justify-center bg-neo-navy/90 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-neo-navy/90 backdrop-blur-xs"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}

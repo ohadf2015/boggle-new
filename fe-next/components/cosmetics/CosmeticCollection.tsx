@@ -83,7 +83,7 @@ export function CosmeticCollection({ rankTier, streakDays, coins, spendCoins }: 
 
               {/* Status badges */}
               {item.isEquipped && (
-                <span className="absolute top-1 end-1 bg-neo-lime text-black text-xs px-1.5 py-0.5 rounded-neo font-bold">
+                <span className="absolute top-1 inset-e-1 bg-neo-lime text-black text-xs px-1.5 py-0.5 rounded-neo font-bold">
                   {t('cosmetics.equipped')}
                 </span>
               )}

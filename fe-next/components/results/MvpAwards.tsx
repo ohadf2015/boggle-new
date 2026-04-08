@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { memo, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -335,13 +335,13 @@ function AwardCard({
         border-3 border-neo-black
         shadow-hard-sm
         ${def.color}
-        backdrop-blur-sm
+        backdrop-blur-xs
         overflow-hidden
         min-w-0
       `}
     >
       {/* Mascot image */}
-      <div className="relative flex-shrink-0 w-12 h-12">
+      <div className="relative shrink-0 w-12 h-12">
         <Image
           src={def.image}
           alt={t(def.labelKey)}
@@ -387,7 +387,7 @@ export interface MvpAwardsProps {
   gameDuration?: number;
 }
 
-export default function MvpAwards({
+function MvpAwards({
   players,
   allPlayerWords,
   gameDuration = 180,
@@ -431,3 +431,5 @@ export default function MvpAwards({
     </div>
   );
 }
+
+export default memo(MvpAwards);

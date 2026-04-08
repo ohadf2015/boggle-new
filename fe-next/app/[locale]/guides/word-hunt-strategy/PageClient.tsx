@@ -22,7 +22,7 @@ export default function WordHuntStrategyPageClient(): React.ReactElement {
   return (
     <div className={cn(
       'min-h-screen flex flex-col',
-      isDarkMode ? 'bg-neo-navy' : 'bg-gradient-to-br from-neo-cream via-white to-neo-cream'
+      isDarkMode ? 'bg-neo-navy' : 'bg-linear-to-br from-neo-cream via-white to-neo-cream'
     )}>
       <AutoHideHeader />
 

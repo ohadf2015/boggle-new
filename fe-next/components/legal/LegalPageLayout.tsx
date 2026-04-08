@@ -33,7 +33,7 @@ export default function LegalPageLayout({
   return (
     <div className={cn(
       'flex-1 flex flex-col',
-      isDarkMode ? 'bg-neo-navy' : 'bg-gradient-to-br from-blue-50 via-white to-purple-50'
+      isDarkMode ? 'bg-neo-navy' : 'bg-linear-to-br from-blue-50 via-white to-purple-50'
     )}>
       <Header />
 

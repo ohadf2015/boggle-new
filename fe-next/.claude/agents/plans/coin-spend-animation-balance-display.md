@@ -150,7 +150,7 @@ export function CoinSpendAnimation({ trigger, position, amount, onComplete }) {
 
 ```tsx
 // ✅ GOOD: Use logical properties for RTL support
-className="absolute -top-2 end-0"  // Not "right-0"
+className="absolute -top-2 inset-e-0"  // Not "right-0"
 ```
 
 ---

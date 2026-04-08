@@ -25,8 +25,8 @@ const SelectTrigger = React.forwardRef<
       "px-3 py-2 text-sm font-medium",
       "shadow-hard-sm",
       "transition-all duration-100",
-      "hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard",
-      "focus:outline-none focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2",
+      "hover:-translate-x-px hover:-translate-y-px hover:shadow-hard",
+      "focus:outline-hidden focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2",
       "disabled:cursor-not-allowed disabled:opacity-70",
       "placeholder:text-neo-black/50",
       "[&>span]:line-clamp-1",
@@ -85,7 +85,7 @@ const SelectContent = React.forwardRef<
     <SelectPrimitive.Content
       ref={ref}
       className={cn(
-        "relative z-100 max-h-96 min-w-[8rem] overflow-hidden",
+        "relative z-100 max-h-96 min-w-32 overflow-hidden",
         // Neo-brutalist styling
         "bg-neo-cream text-neo-black dark:bg-slate-800 dark:text-white",
         "border-3 border-neo-black dark:border-slate-500 rounded-neo",
@@ -110,7 +110,7 @@ const SelectContent = React.forwardRef<
         className={cn(
           "p-1.5",
           position === "popper" &&
-            "h-[var(--radix-select-trigger-height)] w-full min-w-[var(--radix-select-trigger-width)]"
+            "h-(--radix-select-trigger-height) w-full min-w-(--radix-select-trigger-width)"
         )}
       >
         {children}
@@ -146,7 +146,7 @@ const SelectItem = React.forwardRef<
       "relative flex w-full cursor-pointer select-none items-center",
       // Neo-brutalist item styling
       "rounded-neo py-2.5 pl-9 rtl:pl-3 rtl:pr-9 pr-3 text-sm font-bold",
-      "outline-none",
+      "outline-hidden",
       // Hover: playful lime highlight
       "hover:bg-neo-lime/80 hover:text-neo-black",
       // Focus: same as hover for keyboard navigation
@@ -154,7 +154,7 @@ const SelectItem = React.forwardRef<
       // Selected state: cyan highlight
       "data-[state=checked]:bg-neo-cyan data-[state=checked]:text-neo-black",
       // Disabled state
-      "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+      "data-disabled:pointer-events-none data-disabled:opacity-50",
       // Transition
       "transition-colors duration-100",
       className
@@ -163,7 +163,7 @@ const SelectItem = React.forwardRef<
   >
     <span className="absolute left-2.5 rtl:left-auto rtl:right-2.5 flex h-4 w-4 items-center justify-center">
       <SelectPrimitive.ItemIndicator>
-        <Check className="h-4 w-4 stroke-[3]" />
+        <Check className="h-4 w-4 stroke-3" />
       </SelectPrimitive.ItemIndicator>
     </span>
 

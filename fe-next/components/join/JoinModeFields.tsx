@@ -10,7 +10,8 @@ import { cn } from '@/lib/utils';
 import { validateUsername, validateGameCode, sanitizeInput } from '@/utils/validation';
 import { useDebouncedValidation, getValidationClasses } from '@/hooks/useDebouncedValidation';
 import AvatarSelectorButton from './AvatarSelectorButton';
-import AvatarBuilderModal from '@/components/avatar/AvatarBuilderModal';
+import dynamic from 'next/dynamic';
+const AvatarBuilderModal = dynamic(() => import('@/components/avatar/AvatarBuilderModal'), { ssr: false });
 import { useAvatarPremium } from '@/hooks/useAvatarPremium';
 import { useAuth } from '@/contexts/AuthContext';
 import Avatar from '@/components/Avatar';
@@ -186,7 +187,7 @@ const JoinModeFields: React.FC<JoinModeFieldsProps> = ({
             <button
               type="button"
               onClick={() => setIsAuthAvatarPickerOpen(true)}
-              className="relative group flex-shrink-0"
+              className="relative group shrink-0"
               aria-label={t('joinView.changeAvatar')}
             >
               {selectedAvatar ? (

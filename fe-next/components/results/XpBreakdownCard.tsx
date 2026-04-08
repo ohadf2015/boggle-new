@@ -61,7 +61,7 @@ const XpBreakdownCard = memo<XpBreakdownCardProps>(({ xpGainedData, levelUpData,
       transition={{ delay: 0.5, type: 'spring', stiffness: 200, damping: 20 }}
       className={cn(
         "mt-4 p-4 rounded-neo border-3 border-neo-black shadow-hard relative overflow-hidden",
-        levelUpData ? "bg-gradient-to-br from-neo-lime via-neo-lime to-neo-pink" : "bg-neo-cream dark:bg-slate-700"
+        levelUpData ? "bg-linear-to-br from-neo-lime via-neo-lime to-neo-pink" : "bg-neo-cream dark:bg-slate-700"
       )}
     >
       {/* Comic-style halftone dots */}
@@ -136,7 +136,7 @@ const XpBreakdownCard = memo<XpBreakdownCardProps>(({ xpGainedData, levelUpData,
         {!xpProgress.isMaxLevel && (
           <div className="h-3 bg-neo-black/20 rounded-full overflow-hidden border border-neo-black/30">
             <motion.div
-              className="h-full rounded-full bg-gradient-to-r from-neo-purple via-neo-pink to-neo-purple"
+              className="h-full rounded-full bg-linear-to-r from-neo-purple via-neo-pink to-neo-purple"
               initial={{ width: `${previousProgress.progressPercent}%` }}
               animate={{ width: `${xpProgress.progressPercent}%` }}
               transition={{ delay: 1.0, duration: 1.2, ease: 'easeOut' }}
@@ -164,7 +164,7 @@ const XpBreakdownCard = memo<XpBreakdownCardProps>(({ xpGainedData, levelUpData,
           {/* Visual rate bar */}
           <div className="mt-1 h-1.5 bg-neo-black/10 rounded-full overflow-hidden">
             <div
-              className="h-full rounded-full bg-gradient-to-r from-neo-lime to-neo-cyan transition-all"
+              className="h-full rounded-full bg-linear-to-r from-neo-lime to-neo-cyan transition-all"
               style={{ width: `${getDiminishingReturnsFactor(newLevel) * 100}%` }}
             />
           </div>

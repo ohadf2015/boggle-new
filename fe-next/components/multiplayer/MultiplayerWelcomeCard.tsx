@@ -40,12 +40,12 @@ const MultiplayerWelcomeCard: React.FC<MultiplayerWelcomeCardProps> = ({ onDismi
       exit={{ opacity: 0, y: -12, transition: { duration: 0.15 } }}
       transition={{ duration: 0.25, ease: 'easeOut' }}
       dir={dir}
-      className="relative bg-slate-800/90 border-3 border-neo-cyan/40 rounded-neo-lg p-4 mb-4 backdrop-blur-sm"
+      className="relative bg-slate-800/90 border-3 border-neo-cyan/40 rounded-neo-lg p-4 mb-4 backdrop-blur-xs"
     >
       {/* Close button — top-end corner, always accessible */}
       <button
         onClick={onDismiss}
-        className="absolute top-2 end-2 w-7 h-7 rounded-full bg-slate-700 hover:bg-slate-600 flex items-center justify-center text-slate-400 hover:text-white transition-colors z-10"
+        className="absolute top-2 inset-e-2 w-7 h-7 rounded-full bg-slate-700 hover:bg-slate-600 flex items-center justify-center text-slate-400 hover:text-white transition-colors z-10"
         aria-label={t('common.close')}
       >
         <X className="w-4 h-4" strokeWidth={2.5} />
@@ -53,7 +53,7 @@ const MultiplayerWelcomeCard: React.FC<MultiplayerWelcomeCardProps> = ({ onDismi
 
       {/* Header */}
       <div className="flex items-center gap-2 mb-3 pe-8">
-        <div className="w-7 h-7 bg-neo-cyan border-2 border-neo-black rounded-lg flex items-center justify-center flex-shrink-0">
+        <div className="w-7 h-7 bg-neo-cyan border-2 border-neo-black rounded-lg flex items-center justify-center shrink-0">
           <Gamepad2 className="w-4 h-4 text-neo-black" />
         </div>
         <h3 className="font-neo-display font-black text-white text-base uppercase">
@@ -66,7 +66,7 @@ const MultiplayerWelcomeCard: React.FC<MultiplayerWelcomeCardProps> = ({ onDismi
         {steps.map((step, i) => (
           <div key={i} className="flex items-start gap-3">
             {/* Step number + icon */}
-            <div className="flex-shrink-0 flex items-center gap-2">
+            <div className="shrink-0 flex items-center gap-2">
               <span className="w-5 h-5 bg-neo-black text-white text-xs font-black flex items-center justify-center rounded">
                 {i + 1}
               </span>

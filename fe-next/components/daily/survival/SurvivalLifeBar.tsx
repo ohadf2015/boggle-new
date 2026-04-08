@@ -92,7 +92,7 @@ export const SurvivalLifeBar: React.FC<SurvivalLifeBarProps> = ({
       <AdaptiveMotion.div
         key={`heart-${isLifeGaining ? 'beating' : 'idle'}`}
         className={cn(
-          "flex-shrink-0 flex items-center justify-center w-9 h-9 sm:w-11 sm:h-11 rounded-full",
+          "shrink-0 flex items-center justify-center w-9 h-9 sm:w-11 sm:h-11 rounded-full",
           "border-3 border-neo-black shadow-hard-sm",
           tier.heart,
           isLifeGaining && "heart-beating"
@@ -134,7 +134,7 @@ export const SurvivalLifeBar: React.FC<SurvivalLifeBarProps> = ({
         <AdaptiveMotion.div
           className={cn(
             "h-full flex items-center relative overflow-hidden",
-            "bg-gradient-to-r",
+            "bg-linear-to-r",
             tier.gradient,
             isLow && !isLifeGaining && !skipAnimations && "life-bar-low-pulse"
           )}
@@ -143,10 +143,10 @@ export const SurvivalLifeBar: React.FC<SurvivalLifeBarProps> = ({
           transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
         >
           {/* Shimmer sweep */}
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent animate-shimmer pointer-events-none" />
+          <div className="absolute inset-0 bg-linear-to-r from-transparent via-white/25 to-transparent animate-shimmer pointer-events-none" />
 
           {/* Inner highlight — top edge glow */}
-          <div className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-white/40 via-white/20 to-white/40 pointer-events-none" />
+          <div className="absolute inset-x-0 top-0 h-[3px] bg-linear-to-r from-white/40 via-white/20 to-white/40 pointer-events-none" />
         </AdaptiveMotion.div>
 
         {/* Segment markers */}

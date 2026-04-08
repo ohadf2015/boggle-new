@@ -358,7 +358,7 @@ export const InvalidWordsSection = memo<InvalidWordsSectionProps>(({
                     'text-[10px] font-black uppercase px-2 py-1 rounded-neo border-2 border-neo-black transition-all min-h-[32px]',
                     appealedWords.has(wordObj.word)
                       ? 'bg-neo-lime text-neo-black cursor-default'
-                      : 'bg-neo-orange text-neo-black hover:bg-neo-yellow active:translate-y-[1px] active:shadow-none shadow-hard-sm cursor-pointer'
+                      : 'bg-neo-orange text-neo-black hover:bg-neo-yellow active:translate-y-px active:shadow-none shadow-hard-sm cursor-pointer'
                   )}
                   aria-label={`${t('results.appealWord')} ${wordObj.word}`}
                 >

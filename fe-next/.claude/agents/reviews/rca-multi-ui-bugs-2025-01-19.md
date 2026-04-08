@@ -40,7 +40,7 @@ The toggle button is within a flex layout (`flex items-start gap-4`) but there's
 
 ### Fix Strategy
 
-**Option 1 (Recommended):** Add `flex-shrink-0` to prevent the toggle from being affected by flex layout stretching and ensure consistent sizing.
+**Option 1 (Recommended):** Add `shrink-0` to prevent the toggle from being affected by flex layout stretching and ensure consistent sizing.
 
 **Files to Modify:**
 - `app/[locale]/accessibility/page.tsx` - Add constraint classes to toggle button
@@ -49,7 +49,7 @@ The toggle button is within a flex layout (`flex items-start gap-4`) but there's
 ```tsx
 <button
   onClick={() => handleToggle(setting.id as never, !setting.enabled)}
-  className={`relative w-16 h-8 flex-shrink-0 rounded-full border-3 border-neo-black transition-colors duration-200 ${
+  className={`relative w-16 h-8 shrink-0 rounded-full border-3 border-neo-black transition-colors duration-200 ${
     setting.enabled ? 'bg-neo-lime' : 'bg-neo-red'
   }`}
 >

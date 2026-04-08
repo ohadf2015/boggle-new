@@ -85,7 +85,7 @@ function SimpleRoleCard({
         'relative w-full text-start rounded-neo-lg border-neo-thick border-neo-black',
         'bg-neo-cream shadow-hard-lg overflow-hidden',
         'hover:shadow-hard-lg transition-shadow',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2',
+        'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2',
         'disabled:opacity-60 disabled:cursor-wait',
       )}
     >
@@ -93,7 +93,7 @@ function SimpleRoleCard({
       <div className={cn('h-3', stripeColor)} />
 
       {/* Badge */}
-      <div className="absolute top-5 end-4">
+      <div className="absolute top-5 inset-e-4">
         <span className={cn(
           'px-2 py-0.5 text-xs font-black uppercase rounded-full border-2 border-neo-black',
           badgeBg,
@@ -192,12 +192,12 @@ export default function EducationPageClient() {
             animate="visible"
             className={cn(
               'relative rounded-neo-lg border-neo-thick border-neo-black overflow-hidden mb-8',
-              'bg-gradient-to-br from-neo-navy via-neo-navy to-neo-navy-elevated',
+              'bg-linear-to-br from-neo-navy via-neo-navy to-neo-navy-elevated',
               'shadow-hard-lg p-6 sm:p-8',
             )}
           >
-            <Star className="absolute top-4 start-4 w-5 h-5 text-neo-lime/20" />
-            <Puzzle className="absolute bottom-4 end-4 w-6 h-6 text-neo-cyan/15 rotate-12" />
+            <Star className="absolute top-4 inset-s-4 w-5 h-5 text-neo-lime/20" />
+            <Puzzle className="absolute bottom-4 inset-e-4 w-6 h-6 text-neo-cyan/15 rotate-12" />
 
             <div className="flex items-center justify-between gap-4">
               <div className="flex-1 min-w-0">
@@ -210,7 +210,7 @@ export default function EducationPageClient() {
               </div>
 
               <AdaptiveMotion.div
-                className="flex-shrink-0 hidden sm:block"
+                className="shrink-0 hidden sm:block"
                 initial={{ scale: 0, rotate: 20 }}
                 animate={{ scale: 1, rotate: 0 }}
                 transition={{ type: 'spring', stiffness: 200, damping: 12, delay: 0.4 }}
@@ -238,7 +238,7 @@ export default function EducationPageClient() {
             )}
           >
             <p className="text-sm sm:text-base font-bold text-neo-white flex items-center justify-center gap-2 flex-wrap">
-              <Globe className="w-4 h-4 text-neo-lime flex-shrink-0" />
+              <Globe className="w-4 h-4 text-neo-lime shrink-0" />
               {t('education.landing.socialProof')}
             </p>
           </AdaptiveMotion.div>
@@ -257,7 +257,7 @@ export default function EducationPageClient() {
             >
               <div className="px-5 py-4 flex items-center justify-between gap-4">
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-10 h-10 rounded-neo border-2 border-neo-black bg-neo-black flex items-center justify-center flex-shrink-0">
+                  <div className="w-10 h-10 rounded-neo border-2 border-neo-black bg-neo-black flex items-center justify-center shrink-0">
                     {isTeacherRole ? (
                       <GraduationCap className="w-5 h-5 text-neo-lime" />
                     ) : (
@@ -273,7 +273,7 @@ export default function EducationPageClient() {
                     </p>
                   </div>
                 </div>
-                <div className="flex items-center gap-2 flex-shrink-0">
+                <div className="flex items-center gap-2 shrink-0">
                   {isTeacherRole && (
                     <Link
                       href={`/${language}/education/classroom-game`}

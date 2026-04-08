@@ -34,8 +34,15 @@ function parseWordFile(content: string): Set<string> {
   );
 }
 
-/** Resolve file path — tries __dirname first (Docker: dist/), then parent (dev: backend/modules/ → backend/) */
-function resolveWordFile(filename: string): string {
+/** Resolve file path async — tries __dirname first (Docker: dist/), then parent (dev: backend/modules/ → backend/) */
+async function resolveWordFileAsync(filename: string): Promise<string> {
+  const direct = path.join(__dirname, filename);
+  try { await fsAsync.access(direct); return direct; } catch { /* fallback */ }
+  return path.join(__dirname, '..', filename);
+}
+
+/** Resolve file path sync — only used by loadWordFileSync fallback */
+function resolveWordFileSync(filename: string): string {
   const direct = path.join(__dirname, filename);
   try { readFileSync(direct, 'utf-8'); return direct; } catch { /* fallback */ }
   return path.join(__dirname, '..', filename);
@@ -43,7 +50,7 @@ function resolveWordFile(filename: string): string {
 
 async function loadWordFileAsync(filename: string): Promise<Set<string>> {
   try {
-    const filePath = resolveWordFile(filename);
+    const filePath = await resolveWordFileAsync(filename);
     const content = await fsAsync.readFile(filePath, 'utf-8');
     return parseWordFile(content);
   } catch {
@@ -54,7 +61,7 @@ async function loadWordFileAsync(filename: string): Promise<Set<string>> {
 /** Sync fallback — only used on first call before async load completes */
 function loadWordFileSync(filename: string): Set<string> {
   try {
-    const filePath = resolveWordFile(filename);
+    const filePath = resolveWordFileSync(filename);
     const content = readFileSync(filePath, 'utf-8');
     return parseWordFile(content);
   } catch {

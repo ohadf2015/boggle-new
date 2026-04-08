@@ -66,7 +66,7 @@ function PhoneBallotInner({ options, onVote, voted, timeRemaining, accentColor =
                 ? `bg-${accentColor} text-neo-black shadow-hard`
                 : option.isOwn
                   ? 'bg-neo-navy-elevated text-neo-cream/30 border-neo-cream/15 cursor-not-allowed'
-                  : 'bg-neo-navy-elevated text-neo-cream shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard-lg active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed'
+                  : 'bg-neo-navy-elevated text-neo-cream shadow-hard hover:-translate-x-px hover:-translate-y-px hover:shadow-hard-lg active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed'
               }
             `}
           >
@@ -96,7 +96,7 @@ function TvResultsInner({ results, accentColor = 'neo-lime' }: TvResultsProps) {
           key={result.id}
           initial={{ opacity: 0, x: -30 }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: index * 0.15, duration: 0.3 }}
+          transition={{ delay: index * 0.15, type: 'spring', stiffness: 300, damping: 25 }}
           className="flex items-center gap-4"
         >
           {/* Label */}
@@ -114,7 +114,7 @@ function TvResultsInner({ results, accentColor = 'neo-lime' }: TvResultsProps) {
             <AdaptiveMotion.div
               initial={{ width: 0 }}
               animate={{ width: `${result.percentage}%` }}
-              transition={{ delay: index * 0.15 + 0.2, duration: 0.6, ease: [0.175, 0.885, 0.32, 1.275] }}
+              transition={{ delay: index * 0.15 + 0.2, type: 'spring', stiffness: 200, damping: 20 }}
               className={`h-full ${result.isWinner ? `bg-${accentColor}` : 'bg-neo-cream/30'} rounded-neo`}
             />
             <span className="absolute inset-0 flex items-center justify-center font-neo-display text-neo-black text-sm">

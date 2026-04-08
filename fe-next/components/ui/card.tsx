@@ -73,10 +73,10 @@ const cardVariants = cva(
       },
       padding: {
         none: "p-0",
-        tight: "[&>*]:cq-p-tight",
-        normal: "[&>*]:cq-p-responsive",
-        large: "[&>*]:cq-p-responsive-lg",
-        generous: "[&>*]:cq-p-generous",
+        tight: "*:cq-p-tight",
+        normal: "*:cq-p-responsive",
+        large: "*:cq-p-responsive-lg",
+        generous: "*:cq-p-generous",
       },
     },
     defaultVariants: {
@@ -92,7 +92,7 @@ const cardVariants = cva(
 export interface CardVariantProps
   extends React.HTMLAttributes<HTMLDivElement>,
     VariantProps<typeof cardVariants> {
-  gradient?: string; // For custom gradient backgrounds (e.g., "bg-gradient-to-br from-neo-cyan to-cyan-400")
+  gradient?: string; // For custom gradient backgrounds (e.g., "bg-linear-to-br from-neo-cyan to-cyan-400")
 }
 
 const CardVariant = React.forwardRef<HTMLDivElement, CardVariantProps>(

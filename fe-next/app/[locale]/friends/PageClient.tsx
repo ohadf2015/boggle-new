@@ -41,7 +41,7 @@ export default function FriendsPageClient(): React.JSX.Element {
       className={cn(
         'flex-1 flex flex-col relative',
         isDark
-          ? 'bg-gradient-to-b from-neo-navy via-neo-navy-light to-neo-navy'
+          ? 'bg-linear-to-b from-neo-navy via-neo-navy-light to-neo-navy'
           : 'bg-neo-navy'
       )}
       {...pullToRefreshHandlers}
@@ -55,7 +55,7 @@ export default function FriendsPageClient(): React.JSX.Element {
       {/* Header */}
       <header className={cn(
         'sticky top-0 z-40 px-4 py-3 border-b-3 border-neo-black',
-        isDark ? 'bg-slate-800/95 backdrop-blur' : 'bg-white/95 backdrop-blur'
+        isDark ? 'bg-slate-800/95 backdrop-blur-sm' : 'bg-white/95 backdrop-blur-sm'
       )}>
         <div className="max-w-2xl mx-auto flex items-center gap-4">
           <button

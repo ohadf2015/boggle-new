@@ -140,7 +140,10 @@ export function DesktopGameLayout({
   setShowQuitConfirm,
   t,
 }: DesktopGameLayoutProps): React.ReactElement {
-  const validWordCount = foundWords.filter(fw => fw.isValid === true).length;
+  const validWords = React.useMemo(() => foundWords.filter(fw => fw.isValid === true), [foundWords]);
+  const validWordCount = validWords.length;
+  const validWordLengths = React.useMemo(() => validWords.map(fw => fw.word.length), [validWords]);
+  const tSafe = React.useCallback((key: string) => t(key) || key, [t]);
   const isPracticeMode = mode === 'practice';
 
   // Desktop input state — highlight from visible text input
@@ -176,7 +179,7 @@ export function DesktopGameLayout({
         validWordCount={validWordCount}
         comboLevel={comboLevel}
         maxCombo={maxCombo}
-        wordLengths={foundWords.filter(fw => fw.isValid === true).map(fw => fw.word.length)}
+        wordLengths={validWordLengths}
         timeSinceStart={totalTime - remainingTime}
         gameDuration={totalTime}
         isGameOver={isGameOver}
@@ -187,7 +190,7 @@ export function DesktopGameLayout({
         trainingJustUnlocked={training?.justUnlocked}
         onClearTrainingUnlock={training?.clearJustUnlocked}
         showKeyboardHint={true}
-        t={(key) => t(key) || key}
+        t={tSafe}
       />
 
       {/* 3-Column Desktop Layout */}
@@ -215,7 +218,7 @@ export function DesktopGameLayout({
             isPracticeMode={isPracticeMode}
             comboCoinReward={comboCoinReward}
             onCoinAnimationComplete={onCoinAnimationComplete}
-            t={(key) => t(key) || key}
+            t={tSafe}
           />
         </div>
 
@@ -226,7 +229,7 @@ export function DesktopGameLayout({
             {/* Quit - btn-neo red */}
             <button
               onClick={onQuitRequest}
-              className="flex items-center gap-2 bg-red-500 text-white px-3 py-1.5 text-sm font-bold uppercase tracking-wide border-3 border-neo-black shadow-hard-sm hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed transition-all duration-100"
+              className="flex items-center gap-2 bg-red-500 text-white px-3 py-1.5 text-sm font-bold uppercase tracking-wide border-3 border-neo-black shadow-hard-sm hover:-translate-x-px hover:-translate-y-px hover:shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed transition-all duration-100"
             >
               <ArrowLeft className="w-4 h-4 rtl:rotate-180" />
               {t('common.quit')}
@@ -254,14 +257,14 @@ export function DesktopGameLayout({
             {isPracticeMode ? (
               <button
                 onClick={onFinishPractice}
-                className="flex items-center gap-2 bg-neo-lime text-neo-black px-4 py-2 text-sm font-bold uppercase tracking-wide border-3 border-neo-black shadow-hard-sm hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed transition-all duration-100"
+                className="flex items-center gap-2 bg-neo-lime text-neo-black px-4 py-2 text-sm font-bold uppercase tracking-wide border-3 border-neo-black shadow-hard-sm hover:-translate-x-px hover:-translate-y-px hover:shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed transition-all duration-100"
               >
                 {t('singlePlayer.finish')}
               </button>
             ) : (
               <button
                 onClick={onPauseToggle}
-                className="flex items-center justify-center bg-pink-500 text-white p-2 border-3 border-neo-black shadow-hard-sm hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed transition-all duration-100"
+                className="flex items-center justify-center bg-pink-500 text-white p-2 border-3 border-neo-black shadow-hard-sm hover:-translate-x-px hover:-translate-y-px hover:shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed transition-all duration-100"
               >
                 {isPaused ? <Play className="w-5 h-5" /> : <Pause className="w-5 h-5" />}
               </button>
@@ -299,9 +302,9 @@ export function DesktopGameLayout({
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  className="absolute top-2 start-4 end-4 z-40"
+                  className="absolute top-2 inset-s-4 inset-e-4 z-40"
                 >
-                  <div className="relative bg-gradient-to-r from-neo-pink to-pink-400 text-white text-center py-2 px-6 rounded-lg border-3 border-neo-black shadow-hard-sm">
+                  <div className="relative bg-linear-to-r from-neo-pink to-pink-400 text-white text-center py-2 px-6 rounded-lg border-3 border-neo-black shadow-hard-sm">
                     <span className="font-bold text-sm uppercase tracking-wide">
                       {t('singlePlayer.dragInstruction')}
                     </span>
@@ -347,7 +350,7 @@ export function DesktopGameLayout({
             foundWords={foundWords}
             showOnlyValid={true}
             maxVisible={isTv ? 20 : 15}
-            t={(key) => t(key) || key}
+            t={tSafe}
           />
         </div>
       </div>

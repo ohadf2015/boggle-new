@@ -2,7 +2,8 @@
 
 import React, { useState } from 'react';
 import Avatar from '@/components/Avatar';
-import AvatarBuilderModal from '@/components/avatar/AvatarBuilderModal';
+import dynamic from 'next/dynamic';
+const AvatarBuilderModal = dynamic(() => import('@/components/avatar/AvatarBuilderModal'), { ssr: false });
 import { type CustomAvatarConfig } from '@/shared/types/customAvatar';
 import { getOrCreateStoredCustomAvatar, setStoredCustomAvatar } from '@/utils/profileStorage';
 import { Pencil } from 'lucide-react';
@@ -59,9 +60,9 @@ const AvatarSelectorButton: React.FC<AvatarSelectorButtonProps> = ({
           border-3 border-neo-black
           shadow-hard-sm
           transition-all duration-100
-          hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard
+          hover:-translate-x-px hover:-translate-y-px hover:shadow-hard
           active:translate-x-[2px] active:translate-y-[2px] active:shadow-none
-          focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2
+          focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2
           overflow-hidden
           ${className}
         `}

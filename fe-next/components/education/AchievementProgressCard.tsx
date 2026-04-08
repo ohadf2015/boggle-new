@@ -114,7 +114,7 @@ export default function AchievementProgressCard({
       <div className="flex items-start gap-4">
         <div
           className={`
-            flex-shrink-0 w-16 h-16 rounded-full flex items-center justify-center
+            shrink-0 w-16 h-16 rounded-full flex items-center justify-center
             border-neo-thick border-neo-black
             ${tierColors?.bg || 'bg-neo-navy-light'}
             ${tierColors?.border || 'border-neo-black'}

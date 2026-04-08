@@ -208,7 +208,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="flex-1 flex flex-col p-2 sm:p-4 [overflow-x:clip] overflow-y-auto pb-safe pt-3 sm:pt-2"
+      className="flex-1 flex flex-col p-2 sm:p-4 overflow-x-clip overflow-y-auto pb-safe pt-3 sm:pt-2"
       style={{
         paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom, 0px))',
       } as React.CSSProperties}
@@ -223,7 +223,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
       />
 
       {/* Target word clue boxes + inline feedback */}
-      <div className="flex-shrink-0">
+      <div className="shrink-0">
         <SurvivalClueBoxes
           ref={actions.clueContainerRef}
           currentHint={state.currentHint}
@@ -284,7 +284,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
       )}
 
       {/* Life bar — overflow-x clips sideways particles, overflow-y visible for gain animation */}
-      <div className="flex-shrink-0 overflow-x-clip">
+      <div className="shrink-0 overflow-x-clip">
         <SurvivalLifeBar
           lifePoints={state.lifePoints}
           isGameOver={state.isGameOver}

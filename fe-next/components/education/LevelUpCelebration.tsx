@@ -79,7 +79,7 @@ const LevelUpCelebration = memo<LevelUpCelebrationProps>(
           className={cn(
             'fixed inset-0 z-60',
             'flex items-center justify-center',
-            'bg-neo-black/80 backdrop-blur-sm'
+            'bg-neo-black/80 backdrop-blur-xs'
           )}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -204,7 +204,7 @@ const LevelUpCelebration = memo<LevelUpCelebrationProps>(
                 'border-3 border-neo-black rounded-neo',
                 'shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5',
                 'active:translate-y-0.5 active:shadow-hard-pressed',
-                'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan',
+                'focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan',
                 'transition-all duration-200'
               )}
               initial={{ opacity: 0, y: 10 }}

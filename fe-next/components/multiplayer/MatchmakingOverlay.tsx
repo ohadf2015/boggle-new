@@ -41,7 +41,7 @@ export function MatchmakingOverlay({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-xs"
       role="dialog"
       aria-label={t('matchmaking.findingOpponent')}
     >

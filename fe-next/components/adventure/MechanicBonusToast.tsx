@@ -40,12 +40,12 @@ export const MechanicBonusToast = memo(function MechanicBonusToast({
           animate={{ y: 0, opacity: 1, scale: 1 }}
           exit={{ y: -10, opacity: 0, scale: 0.9 }}
           transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-          className="fixed top-20 left-1/2 -translate-x-1/2 z-30 rounded-neo border-neo px-3 py-1.5 bg-neo-purple/90 border-neo-purple-light shadow-hard-sm backdrop-blur-sm"
+          className="fixed top-20 left-1/2 -translate-x-1/2 z-30 rounded-neo border-neo px-3 py-1.5 bg-neo-purple/90 border-neo-purple-light shadow-hard-sm backdrop-blur-xs"
           role="status"
           aria-live="polite"
         >
           <div className="flex items-center gap-1.5">
-            <Sparkles className="w-4 h-4 text-neo-purple-light flex-shrink-0" />
+            <Sparkles className="w-4 h-4 text-neo-purple-light shrink-0" />
             <span className="text-xs font-bold text-neo-white whitespace-nowrap">
               {t(bonus.feedbackKey)}
             </span>

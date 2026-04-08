@@ -52,7 +52,7 @@ export function BenefitsList({
             className="flex items-center gap-2 text-sm"
           >
             <benefit.icon className={cn(
-              'flex-shrink-0 w-4 h-4',
+              'shrink-0 w-4 h-4',
               isDarkMode ? 'text-cyan-400' : 'text-cyan-600'
             )} />
             <span className={isDarkMode ? 'text-gray-300' : 'text-gray-600'}>

@@ -67,7 +67,7 @@ export function LevelShareCard(props: LevelShareCardProps) {
       transition={{ type: 'spring', stiffness: 200, damping: 20 }}
       className={cn(
         'relative overflow-hidden border-3 rounded-neo shadow-hard p-5 select-all',
-        'bg-gradient-to-br from-neo-black via-slate-900 to-neo-black',
+        'bg-linear-to-br from-neo-black via-slate-900 to-neo-black',
         'border-neo-lime',
       )}
     >
@@ -119,7 +119,7 @@ export function LevelShareCard(props: LevelShareCardProps) {
         transition={{ delay: 0.25, type: 'spring' }}
         className="flex items-center gap-3 mb-3 p-3 border-2 rounded-neo bg-neo-lime/10 border-neo-lime/30"
       >
-        <Star className="w-5 h-5 flex-shrink-0 text-neo-lime" />
+        <Star className="w-5 h-5 shrink-0 text-neo-lime" />
         <div className="min-w-0">
           <div className="text-neo-white/40 text-[10px] font-bold uppercase tracking-wider">
             {t('adventure.share.bestWord')}

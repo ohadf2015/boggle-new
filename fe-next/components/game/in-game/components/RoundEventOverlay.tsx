@@ -34,19 +34,19 @@ const EVENT_CONFIG: Record<RoundEventType, {
   blizzard: {
     warningText: 'roundEvent.blizzardWarning',
     icon: '❄️',
-    warningBg: 'bg-gradient-to-r from-blue-900/95 via-cyan-900/95 to-blue-900/95 border-cyan-300',
+    warningBg: 'bg-linear-to-r from-blue-900/95 via-cyan-900/95 to-blue-900/95 border-cyan-300',
     warningGlow: 'shadow-[0_0_60px_rgba(96,165,250,0.8),0_0_120px_rgba(96,165,250,0.3)]',
   },
   lightning: {
     warningText: 'roundEvent.lightningWarning',
     icon: '⚡',
-    warningBg: 'bg-gradient-to-r from-indigo-900/95 via-purple-900/95 to-indigo-900/95 border-yellow-300',
+    warningBg: 'bg-linear-to-r from-indigo-900/95 via-purple-900/95 to-indigo-900/95 border-yellow-300',
     warningGlow: 'shadow-[0_0_60px_rgba(250,204,21,0.8),0_0_120px_rgba(250,204,21,0.3)]',
   },
   meteor: {
     warningText: 'roundEvent.meteorWarning',
     icon: '☄️',
-    warningBg: 'bg-gradient-to-r from-red-900/95 via-orange-900/95 to-red-900/95 border-orange-300',
+    warningBg: 'bg-linear-to-r from-red-900/95 via-orange-900/95 to-red-900/95 border-orange-300',
     warningGlow: 'shadow-[0_0_60px_rgba(251,146,60,0.8),0_0_120px_rgba(251,146,60,0.3)]',
   },
 };

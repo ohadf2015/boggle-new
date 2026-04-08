@@ -11,7 +11,7 @@
  * - Secret badge hint count
  */
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, Loader2, Trophy, Star } from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -105,32 +105,31 @@ export default function EducationBadgeGrid({
     [achievements, pinnedKeys]
   );
 
-  // Calculate overall completion
-  const earnedCount = achievementsWithPins.filter(a => a.currentTier !== null).length;
-  const totalCount = achievementsWithPins.length;
-  const completionPercent = totalCount > 0 ? Math.round((earnedCount / totalCount) * 100) : 0;
+  // Derived stats from achievementsWithPins
+  const { earnedCount, totalCount, completionPercent, pinnedBadges, lockedSecretsCount, grouped } = useMemo(() => {
+    const earned = achievementsWithPins.filter(a => a.currentTier !== null).length;
+    const total = achievementsWithPins.length;
+    return {
+      earnedCount: earned,
+      totalCount: total,
+      completionPercent: total > 0 ? Math.round((earned / total) * 100) : 0,
+      pinnedBadges: achievementsWithPins.filter(a => a.isPinned),
+      lockedSecretsCount: achievementsWithPins.filter(a => a.isSecret && a.currentTier === null).length,
+      grouped: groupByCategory(achievementsWithPins),
+    };
+  }, [achievementsWithPins]);
 
-  // Get pinned badges
-  const pinnedBadges = achievementsWithPins.filter(a => a.isPinned);
   const pinnedCount = pinCount;
 
-  // Group by category
-  const grouped = groupByCategory(achievementsWithPins);
-
-  // Count locked secrets
-  const lockedSecretsCount = achievementsWithPins.filter(
-    a => a.isSecret && a.currentTier === null
-  ).length;
-
   // Pin toggle handler
-  const handleTogglePin = async (achievementKey: string, currentPinned: boolean) => {
+  const handleTogglePin = useCallback(async (achievementKey: string, currentPinned: boolean) => {
     await togglePin(achievementKey, currentPinned);
-  };
+  }, [togglePin]);
 
   // Toggle category collapse
-  const toggleCategory = (category: string) => {
+  const toggleCategory = useCallback((category: string) => {
     setCollapsed(prev => ({ ...prev, [category]: !prev[category] }));
-  };
+  }, []);
 
   return (
     <div className={cn('space-y-8', className)}>

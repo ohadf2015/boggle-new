@@ -43,8 +43,8 @@ const BrainPointsDisplay: React.FC<BrainPointsDisplayProps> = memo(({
     
     // Use neo-lime (success/progress) for positive scores
     const bgColor = isPositive
-        ? 'bg-gradient-to-r from-neo-lime to-lime-400'
-        : 'bg-gradient-to-r from-neo-red to-red-400';
+        ? 'bg-linear-to-r from-neo-lime to-lime-400'
+        : 'bg-linear-to-r from-neo-red to-red-400';
     
     const textColor = isPositive ? 'text-neo-black' : 'text-white';
     const subTextColor = isPositive ? 'text-neo-black/90' : 'text-white/90';

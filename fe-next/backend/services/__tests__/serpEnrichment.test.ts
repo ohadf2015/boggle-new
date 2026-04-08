@@ -5,11 +5,12 @@
 
 import { vi, type Mock, type MockInstance } from 'vitest';
 import { enrichTrendWithNews, enrichTrendsWithNews, type TrendingTopic } from '../serpApiClient';
-import axios from 'axios';
 
-// Mock axios
-vi.mock('axios');
-const mockedAxios = axios as Mocked<typeof axios>;
+// Mock ky — vi.hoisted() ensures mockGet is available when the hoisted vi.mock() runs
+const { mockGet } = vi.hoisted(() => ({ mockGet: vi.fn() }));
+vi.mock('ky', () => ({
+  default: { get: mockGet },
+}));
 
 describe('SERP API Trend Enrichment', () => {
   const mockTrend: TrendingTopic = {
@@ -32,8 +33,8 @@ describe('SERP API Trend Enrichment', () => {
   describe('enrichTrendWithNews', () => {
     it('should enrich trend with news articles, related searches, and PAA', async () => {
       // Mock Google News response
-      mockedAxios.get.mockResolvedValueOnce({
-        data: {
+      mockGet.mockReturnValueOnce({
+        json: () => Promise.resolve({
           news_results: [
             {
               title: 'AI Breakthrough in Healthcare',
@@ -49,12 +50,12 @@ describe('SERP API Trend Enrichment', () => {
               snippet: 'Latest language model announced...',
             },
           ],
-        },
+        }),
       });
 
       // Mock Google Search response (related searches & PAA)
-      mockedAxios.get.mockResolvedValueOnce({
-        data: {
+      mockGet.mockReturnValueOnce({
+        json: () => Promise.resolve({
           related_searches: [
             { query: 'what is artificial intelligence' },
             { query: 'AI tools 2026' },
@@ -64,7 +65,7 @@ describe('SERP API Trend Enrichment', () => {
             { question: 'How does AI work?' },
             { question: 'Is AI dangerous?' },
           ],
-        },
+        }),
       });
 
       const enriched = await enrichTrendWithNews(mockTrend, 'en', 3);
@@ -86,7 +87,7 @@ describe('SERP API Trend Enrichment', () => {
     });
 
     it('should handle API errors gracefully and return original trend', async () => {
-      mockedAxios.get.mockRejectedValue(new Error('API Error'));
+      mockGet.mockReturnValue({ json: () => Promise.reject(new Error('API Error')) });
 
       const enriched = await enrichTrendWithNews(mockTrend, 'en', 3);
 
@@ -98,8 +99,8 @@ describe('SERP API Trend Enrichment', () => {
     });
 
     it('should handle empty news results', async () => {
-      mockedAxios.get.mockResolvedValueOnce({ data: { news_results: [] } });
-      mockedAxios.get.mockResolvedValueOnce({ data: {} });
+      mockGet.mockReturnValueOnce({ json: () => Promise.resolve({ news_results: [] }) });
+      mockGet.mockReturnValueOnce({ json: () => Promise.resolve({}) });
 
       const enriched = await enrichTrendWithNews(mockTrend, 'en', 3);
 
@@ -117,7 +118,7 @@ describe('SERP API Trend Enrichment', () => {
       const enriched = await enrichTrendsWithNews(trends, 'en', 5);
 
       expect(enriched).toEqual(trends);
-      expect(mockedAxios.get).not.toHaveBeenCalled();
+      expect(mockGet).not.toHaveBeenCalled();
     });
 
     it('should only enrich top N trends to save API quota', async () => {
@@ -126,13 +127,13 @@ describe('SERP API Trend Enrichment', () => {
         query: `Trend ${i + 1}`,
       }));
 
-      mockedAxios.get.mockResolvedValue({ data: {} });
+      mockGet.mockReturnValue({ json: () => Promise.resolve({}) });
 
       const enriched = await enrichTrendsWithNews(trends, 'en', 3);
 
       expect(enriched).toHaveLength(10);
       // Should call API 6 times (3 trends × 2 endpoints each)
-      expect(mockedAxios.get).toHaveBeenCalledTimes(6);
+      expect(mockGet).toHaveBeenCalledTimes(6);
     });
 
     it('should add delays between API calls to avoid rate limiting', async () => {
@@ -143,7 +144,7 @@ describe('SERP API Trend Enrichment', () => {
         { ...mockTrend, query: 'Trend 2' },
       ];
 
-      mockedAxios.get.mockResolvedValue({ data: {} });
+      mockGet.mockReturnValue({ json: () => Promise.resolve({}) });
 
       const enrichPromise = enrichTrendsWithNews(trends, 'en', 2);
 

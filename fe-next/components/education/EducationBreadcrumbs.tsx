@@ -186,7 +186,7 @@ export const EducationBreadcrumbs = memo<EducationBreadcrumbsProps>(({
                     'text-neo-white/70 hover:text-neo-white',
                     'transition-colors duration-100',
                     'truncate max-w-[100px] sm:max-w-none',
-                    'focus:outline-none focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2 focus:ring-offset-neo-navy rounded-sm'
+                    'focus:outline-hidden focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2 focus:ring-offset-neo-navy rounded-sm'
                   )}
                 >
                   {isFirst && (

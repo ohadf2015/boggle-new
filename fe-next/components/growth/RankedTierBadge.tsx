@@ -33,7 +33,7 @@ export const RankedTierBadge: React.FC = memo(function RankedTierBadge() {
       <div
         data-testid="tier-icon"
         className={cn(
-          'flex-shrink-0 w-8 h-8 rounded-full',
+          'shrink-0 w-8 h-8 rounded-full',
           'border-2 flex items-center justify-center',
         )}
         style={{ borderColor: tier.color, backgroundColor: `${tier.color}20` }}

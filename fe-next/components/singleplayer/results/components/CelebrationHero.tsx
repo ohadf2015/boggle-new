@@ -92,10 +92,10 @@ export const CelebrationHero = memo(function CelebrationHero({
           'relative overflow-hidden cursor-pointer transition-transform hover:scale-[1.01] active:scale-[0.99]',
           // Full-width transparent gradient zone - no border, no shadow
           isWinner
-            ? 'bg-gradient-to-b from-neo-lime/10 via-transparent to-transparent'
+            ? 'bg-linear-to-b from-neo-lime/10 via-transparent to-transparent'
             : styleKey === 'zero'
-              ? 'bg-gradient-to-b from-white/5 via-transparent to-transparent'
-              : 'bg-gradient-to-b from-neo-pink/10 via-transparent to-transparent',
+              ? 'bg-linear-to-b from-white/5 via-transparent to-transparent'
+              : 'bg-linear-to-b from-neo-pink/10 via-transparent to-transparent',
         )}
         onClick={handleClick}
       >
@@ -189,7 +189,7 @@ export const CelebrationHero = memo(function CelebrationHero({
             transition={{ delay: 0.3, type: 'spring', stiffness: 300, damping: 26 }}
             className={cn(
               'inline-flex items-center justify-center gap-3 sm:gap-4 mt-4',
-              'bg-black/40 backdrop-blur-sm border-4 border-neo-black p-3 sm:p-4 rounded-2xl shadow-hard-xl',
+              'bg-black/40 backdrop-blur-xs border-4 border-neo-black p-3 sm:p-4 rounded-2xl shadow-hard-xl',
             )}
           >
             {/* Words Found - lime icon square */}

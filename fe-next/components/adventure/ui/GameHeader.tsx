@@ -67,7 +67,7 @@ export const GameHeader = memo(function GameHeader({
   const hudTheme = useHUDTheme();
 
   return (
-    <div className="flex-shrink-0">
+    <div className="shrink-0">
     <header
       className={cn(
         'flex items-center justify-between relative',
@@ -78,7 +78,7 @@ export const GameHeader = memo(function GameHeader({
       )}
     >
       {/* Left: Exit only — single icon, minimal footprint */}
-      <div className="flex items-center flex-shrink-0">
+      <div className="flex items-center shrink-0">
         <AdaptiveMotion.button
           onClick={onExit}
           whileHover={{ scale: 1.08 }}
@@ -114,7 +114,7 @@ export const GameHeader = memo(function GameHeader({
             <AdaptiveMotion.span
               initial={{ scale: 0, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              className="absolute -start-1 -top-1 w-5 h-5 rounded-full bg-neo-purple text-neo-white text-[9px] font-black flex items-center justify-center leading-none"
+              className="absolute -inset-s-1 -top-1 w-5 h-5 rounded-full bg-neo-purple text-neo-white text-[9px] font-black flex items-center justify-center leading-none"
             >
               {comboCount}×
             </AdaptiveMotion.span>
@@ -139,7 +139,7 @@ export const GameHeader = memo(function GameHeader({
       </div>
 
       {/* Right: Level+Timer merged pill, then Pause */}
-      <div className="flex items-center gap-1 flex-shrink-0">
+      <div className="flex items-center gap-1 shrink-0">
         {/* Merged Level + Timer pill */}
         {isBossLevel ? (
           <div className="flex items-center gap-1.5 px-2 py-1 bg-neo-red/15 rounded-neo border border-neo-red/30">

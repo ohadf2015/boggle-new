@@ -49,14 +49,14 @@ export const SignupToast: React.FC<SignupToastProps> = ({
             'fixed top-4 inset-x-4 z-50 max-w-sm mx-auto',
             'rounded-neo border-3 border-black shadow-hard-sm',
             'flex items-center gap-2.5 px-4 py-3',
-            isDarkMode ? 'bg-amber-900/90 backdrop-blur-sm' : 'bg-amber-50 border-amber-300',
+            isDarkMode ? 'bg-amber-900/90 backdrop-blur-xs' : 'bg-amber-50 border-amber-300',
           )}
           role="status"
           aria-live="polite"
         >
           <AlertTriangle
             size={18}
-            className={isDarkMode ? 'text-amber-400 flex-shrink-0' : 'text-amber-600 flex-shrink-0'}
+            className={isDarkMode ? 'text-amber-400 shrink-0' : 'text-amber-600 shrink-0'}
           />
           <p className={cn(
             'text-sm font-medium',

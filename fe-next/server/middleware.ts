@@ -7,6 +7,7 @@ import crypto from 'crypto';
 import compression from 'compression';
 import cors, { type CorsOptions } from 'cors';
 import express, { Application, Request, Response, NextFunction, RequestHandler } from 'express';
+import helmet from 'helmet';
 import pinoHttp from 'pino-http';
 import { geolocationMiddleware } from '../backend/utils/geolocation';
 import { httpLogger } from './logger';
@@ -50,52 +51,66 @@ export function createCorsOptions(corsOrigin: string, isDev: boolean): CorsOptio
 }
 
 /**
- * Security headers middleware
- * @param isDev - Whether running in development mode
- * @returns Express middleware
+ * Security headers via helmet
+ * Replaces manual header-setting with helmet's battle-tested defaults,
+ * configured to preserve the project's custom CSP and game-portal embedding.
  */
-export function securityHeaders(isDev: boolean): RequestHandler {
-  // CSP is identical for dev and prod — kept as single string
-  const csp = "default-src 'self'; " +
-    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://cdn.lgrckt-in.com https://cdn.lr-in-prod.com https://cdn.lr-ingest.com https://sdk.crazygames.com https://*.crazygames.com https://pagead2.googlesyndication.com https://imasdk.googleapis.com https://*.googleadservices.com https://*.adtrafficquality.google https://*.doubleclick.net https://*.posthog.com https://eu.i.posthog.com; " +
-    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
-    "img-src 'self' data: https: blob:; " +
-    "font-src 'self' data: https://fonts.gstatic.com; " +
-    "connect-src 'self' https://*.supabase.co https://*.sentry.io https://*.logrocket.io https://*.lr-in-prod.com https://*.lgrckt-in.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://*.crazygames.com https://*.googlesyndication.com https://*.doubleclick.net https://*.googleadservices.com https://*.adtrafficquality.google https://*.posthog.com https://eu.i.posthog.com ws: wss:; " +
-    "worker-src 'self' blob:; " +
-    "frame-src 'self' https://*.googlesyndication.com https://*.doubleclick.net https://googleads.g.doubleclick.net; " +
-    "frame-ancestors 'self' https://*.crazygames.com https://crazygames.com https://poki.com https://www.poki.com;";
+export function createHelmetMiddleware(isDev: boolean): RequestHandler {
+  return helmet({
+    // Custom CSP for game portals, analytics, and ad networks
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'",
+          'https://www.googletagmanager.com', 'https://cdn.lgrckt-in.com',
+          'https://cdn.lr-in-prod.com', 'https://cdn.lr-ingest.com',
+          'https://sdk.crazygames.com', 'https://*.crazygames.com',
+          'https://pagead2.googlesyndication.com', 'https://imasdk.googleapis.com',
+          'https://*.googleadservices.com', 'https://*.adtrafficquality.google',
+          'https://*.doubleclick.net', 'https://*.posthog.com', 'https://eu.i.posthog.com'],
+        styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
+        imgSrc: ["'self'", 'data:', 'https:', 'blob:'],
+        fontSrc: ["'self'", 'data:', 'https://fonts.gstatic.com'],
+        connectSrc: ["'self'", 'https://*.supabase.co', 'https://*.sentry.io',
+          'https://*.logrocket.io', 'https://*.lr-in-prod.com', 'https://*.lgrckt-in.com',
+          'https://*.google-analytics.com', 'https://*.analytics.google.com',
+          'https://*.googletagmanager.com', 'https://*.crazygames.com',
+          'https://*.googlesyndication.com', 'https://*.doubleclick.net',
+          'https://*.googleadservices.com', 'https://*.adtrafficquality.google',
+          'https://*.posthog.com', 'https://eu.i.posthog.com', 'ws:', 'wss:'],
+        workerSrc: ["'self'", 'blob:'],
+        frameSrc: ["'self'", 'https://*.googlesyndication.com', 'https://*.doubleclick.net',
+          'https://googleads.g.doubleclick.net'],
+        frameAncestors: ["'self'", 'https://*.crazygames.com', 'https://crazygames.com',
+          'https://poki.com', 'https://www.poki.com'],
+      },
+    },
+    // HSTS only in production
+    strictTransportSecurity: isDev ? false : { maxAge: 31536000, includeSubDomains: true },
+    // Disable X-Frame-Options — using CSP frame-ancestors instead for game portal embedding
+    frameguard: false,
+    referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
+    // Helmet extras not in our old manual setup:
+    // - X-DNS-Prefetch-Control, Cross-Origin-Opener-Policy, Cross-Origin-Resource-Policy,
+    //   Origin-Agent-Cluster, X-Permitted-Cross-Domain-Policies
+    crossOriginOpenerPolicy: { policy: 'same-origin-allow-popups' },
+    // Allow cross-origin resources (fonts, images from CDNs)
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
+  }) as RequestHandler;
+}
 
-  // Permissions-Policy: Restrict browser features not needed by the game
-  // Allows: fullscreen (for immersive gameplay), autoplay (for game sounds)
-  // Denies: camera, microphone, geolocation, payment, usb, etc.
-  const permissionsPolicy = [
-    'camera=()',
-    'microphone=()',
-    'geolocation=()',
-    'payment=()',
-    'usb=()',
-    'magnetometer=()',
-    'gyroscope=()',
-    'accelerometer=()',
-    'autoplay=(self)',
-    'fullscreen=(self)',
-    'picture-in-picture=(self)',
+/**
+ * Permissions-Policy middleware (not covered by helmet)
+ */
+function permissionsPolicy(): RequestHandler {
+  const policy = [
+    'camera=()', 'microphone=()', 'geolocation=()', 'payment=()',
+    'usb=()', 'magnetometer=()', 'gyroscope=()', 'accelerometer=()',
+    'autoplay=(self)', 'fullscreen=(self)', 'picture-in-picture=(self)',
   ].join(', ');
 
-  return (req: Request, res: Response, next: NextFunction): void => {
-    res.setHeader('Content-Security-Policy', csp);
-    res.setHeader('X-Content-Type-Options', 'nosniff');
-    // X-Frame-Options removed — using CSP frame-ancestors instead
-    // Allows CrazyGames and other game portals to embed the game
-    res.setHeader('X-XSS-Protection', '1; mode=block');
-    res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
-    res.setHeader('Permissions-Policy', permissionsPolicy);
-
-    if (!isDev) {
-      res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
-    }
-
+  return (_req: Request, res: Response, next: NextFunction): void => {
+    res.setHeader('Permissions-Policy', policy);
     next();
   };
 }
@@ -301,8 +316,9 @@ export function configureMiddleware(app: Application, { corsOrigin, isDev }: Mid
 
   app.use(perfVariantCookie(isDev));
 
-  // Security headers
-  app.use(securityHeaders(isDev));
+  // Security headers (helmet + permissions policy)
+  app.use(createHelmetMiddleware(isDev));
+  app.use(permissionsPolicy());
 
   // CrazyGames SDK injection — now handled by CrazyGamesScriptServer React component
   // in app/[locale]/layout.tsx to avoid hydration mismatches. The Express middleware

@@ -76,9 +76,9 @@ export const MoreOptionsAccordion: React.FC<MoreOptionsAccordionProps> = ({
               {solved && isAuthenticated && (
                 <button
                   onClick={onCreatePuzzle}
-                  className="w-full flex items-center gap-3 p-3 bg-gradient-to-r from-neo-pink/10 to-neo-orange/10 rounded-neo border border-slate-700 hover:border-neo-pink/50 transition-colors group text-start"
+                  className="w-full flex items-center gap-3 p-3 bg-linear-to-r from-neo-pink/10 to-neo-orange/10 rounded-neo border border-slate-700 hover:border-neo-pink/50 transition-colors group text-start"
                 >
-                  <div className="w-9 h-9 flex-shrink-0 bg-gradient-to-br from-neo-pink to-neo-orange rounded-lg flex items-center justify-center">
+                  <div className="w-9 h-9 shrink-0 bg-linear-to-br from-neo-pink to-neo-orange rounded-lg flex items-center justify-center">
                     <Wand2 className="w-4 h-4 text-white" />
                   </div>
                   <div className="flex-1 min-w-0">

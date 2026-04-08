@@ -148,7 +148,7 @@ export default function LessonBuilderCreateDialog({
                 className={cn(
                   'w-full px-4 py-2 bg-neo-navy border-neo border-neo-black',
                   'text-neo-white font-neo-body shadow-hard-sm',
-                  'focus:outline-none focus:ring-2 focus:ring-neo-cyan'
+                  'focus:outline-hidden focus:ring-2 focus:ring-neo-cyan'
                 )}
               >
                 <option value="en">English</option>
@@ -169,7 +169,7 @@ export default function LessonBuilderCreateDialog({
                 className={cn(
                   'w-full px-4 py-2 bg-neo-navy border-neo border-neo-black',
                   'text-neo-white font-neo-body shadow-hard-sm',
-                  'focus:outline-none focus:ring-2 focus:ring-neo-cyan'
+                  'focus:outline-hidden focus:ring-2 focus:ring-neo-cyan'
                 )}
               >
                 <option value="">{t('teacher.lesson.noClassroomSelected')}</option>

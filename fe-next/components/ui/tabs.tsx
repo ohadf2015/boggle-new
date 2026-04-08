@@ -65,12 +65,12 @@ const TabsTrigger = React.forwardRef<
       className={cn(
         // Common styles
         "inline-flex items-center justify-center whitespace-nowrap transition-all",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2",
+        "focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2",
         "disabled:pointer-events-none disabled:opacity-70",
         // Variant-specific styles
         variant === 'pill' && [
           "rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background",
-          "data-[state=active]:bg-neo-navy data-[state=active]:text-neo-white data-[state=active]:shadow-sm",
+          "data-[state=active]:bg-neo-navy data-[state=active]:text-neo-white data-[state=active]:shadow-xs",
         ],
         variant === 'underline' && [
           "px-4 py-2 text-sm font-black uppercase",
@@ -93,7 +93,7 @@ const TabsContent = React.forwardRef<
   <TabsPrimitive.Content
     ref={ref}
     className={cn(
-      "mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2",
+      "mt-2 ring-offset-background focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2",
       className
     )}
     {...props}

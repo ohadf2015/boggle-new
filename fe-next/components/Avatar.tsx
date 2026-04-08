@@ -80,7 +80,7 @@ const Avatar = memo<AvatarProps>(({
   if (customAvatar) {
     return (
       <div
-        className={cn('relative rounded-full overflow-hidden flex-shrink-0', config.container, className)}
+        className={cn('relative rounded-full overflow-hidden shrink-0', config.container, className)}
         data-testid="header-avatar"
         data-avatar-type="custom"
       >
@@ -92,7 +92,7 @@ const Avatar = memo<AvatarProps>(({
   // 2. Fallback: deterministic random custom avatar
   return (
     <div
-      className={cn('relative rounded-full overflow-hidden flex-shrink-0', config.container, className)}
+      className={cn('relative rounded-full overflow-hidden shrink-0', config.container, className)}
       data-testid="header-avatar"
       data-avatar-type="generated"
     >

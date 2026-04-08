@@ -50,8 +50,8 @@ export function QuestCard({
         'shadow-hard-sm',
         'transition-all duration-200',
         'hover:-translate-y-1 hover:shadow-hard',
-        'active:translate-y-[1px] active:shadow-hard-pressed',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan',
+        'active:translate-y-px active:shadow-hard-pressed',
+        'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan',
         completed && 'opacity-80',
       )}
       aria-label={`${t(nameKey)}${completed ? ` - ${t('quests.done')}` : ''}`}
@@ -59,7 +59,7 @@ export function QuestCard({
       {/* Colored accent strip */}
       <div
         className={cn(
-          'absolute inset-y-0 start-0 w-1.5 rounded-s-neo-lg',
+          'absolute inset-y-0 inset-s-0 w-1.5 rounded-s-neo-lg',
           accentColor,
           completed && 'opacity-50',
         )}
@@ -67,7 +67,7 @@ export function QuestCard({
       />
 
       {/* Progress ring with icon in colored circle */}
-      <div className="flex-shrink-0 ms-1">
+      <div className="shrink-0 ms-1">
         <QuestProgressRing
           progress={completed ? 1 : 0}
           size={56}
@@ -129,7 +129,7 @@ export function QuestCard({
       </div>
 
       {/* Action badge */}
-      <div className="flex-shrink-0">
+      <div className="shrink-0">
         {completed ? (
           <span
             className={cn(

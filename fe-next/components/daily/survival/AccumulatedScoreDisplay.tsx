@@ -86,7 +86,7 @@ export const AccumulatedScoreDisplay: React.FC<AccumulatedScoreDisplayProps> = (
         className={cn(
           'relative flex flex-col items-center gap-0.5',
           'px-3 py-1.5',
-          'bg-gradient-to-br',
+          'bg-linear-to-br',
           scoreColors.gradient,
           'border-neo-thick border-neo-black',
           'rounded-neo',

@@ -71,7 +71,7 @@ const WordHuntPromoPopup: React.FC<WordHuntPromoPopupProps> = ({
         >
           {/* Backdrop */}
           <motion.div
-            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/70 backdrop-blur-xs"
             onClick={showCloseButton ? handleClose : undefined}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -95,7 +95,7 @@ const WordHuntPromoPopup: React.FC<WordHuntPromoPopupProps> = ({
               {showCloseButton && (
                 <motion.button
                   onClick={handleClose}
-                  className="absolute top-2 end-2 z-30 flex items-center justify-center w-8 h-8 rounded-full bg-neo-black/60 text-neo-white/80 hover:text-neo-white hover:bg-neo-black/80 transition-colors"
+                  className="absolute top-2 inset-e-2 z-30 flex items-center justify-center w-8 h-8 rounded-full bg-neo-black/60 text-neo-white/80 hover:text-neo-white hover:bg-neo-black/80 transition-colors"
                   initial={{ opacity: 0, scale: 0 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0 }}
@@ -117,20 +117,20 @@ const WordHuntPromoPopup: React.FC<WordHuntPromoPopupProps> = ({
                 priority
               />
               {/* Gradient fade to card */}
-              <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-neo-navy to-transparent" />
+              <div className="absolute inset-x-0 bottom-0 h-16 bg-linear-to-t from-neo-navy to-transparent" />
 
               {/* Floating sparkles on image */}
               {canAnimate && (
                 <>
                   <motion.div
-                    className="absolute top-3 start-4 z-10"
+                    className="absolute top-3 inset-s-4 z-10"
                     animate={{ rotate: [0, 15, -15, 0], scale: [1, 1.4, 1], opacity: [0.6, 1, 0.6] }}
                     transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
                   >
                     <Sparkles className="w-5 h-5 text-neo-lime drop-shadow-lg" />
                   </motion.div>
                   <motion.div
-                    className="absolute bottom-6 end-4 z-10"
+                    className="absolute bottom-6 inset-e-4 z-10"
                     animate={{ rotate: [0, -20, 20, 0], scale: [0.8, 1.2, 0.8], opacity: [0.5, 1, 0.5] }}
                     transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
                   >
@@ -164,7 +164,7 @@ const WordHuntPromoPopup: React.FC<WordHuntPromoPopupProps> = ({
                 onClick={handlePlay}
                 className={cn(
                   'w-full flex items-center justify-center gap-2 py-3 px-6 rounded-neo border-3 border-neo-black',
-                  'bg-gradient-to-r from-neo-purple via-purple-600 to-neo-pink',
+                  'bg-linear-to-r from-neo-purple via-purple-600 to-neo-pink',
                   'text-neo-white font-black text-base uppercase tracking-wide',
                   'shadow-hard active:shadow-hard-pressed',
                   'active:translate-y-[2px]',

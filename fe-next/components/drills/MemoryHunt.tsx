@@ -377,7 +377,7 @@ export default function MemoryHunt({
                   className={cn(
                     'flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-neo border-2 border-neo-black',
                     'font-bold text-sm uppercase',
-                    'transition-all hover:translate-y-[-1px]',
+                    'transition-all hover:-translate-y-px',
                     game.isHintActive
                       ? 'bg-neo-lime text-neo-black cursor-not-allowed'
                       : 'bg-neo-yellow text-neo-black hover:bg-neo-lime'
@@ -394,7 +394,7 @@ export default function MemoryHunt({
                 className={cn(
                   'flex-1 px-4 py-2 rounded-neo border-2 border-neo-black',
                   'font-bold text-sm uppercase',
-                  'transition-all hover:translate-y-[-1px]',
+                  'transition-all hover:-translate-y-px',
                   'bg-slate-700 text-neo-white'
                 )}
               >

@@ -408,7 +408,7 @@ export default function PatternSwitcher({
               className={cn(
                 'w-full mt-4 px-4 py-2 rounded-neo border-2 border-neo-black',
                 'font-bold text-sm uppercase',
-                'transition-all hover:translate-y-[-1px]',
+                'transition-all hover:-translate-y-px',
                 'bg-slate-700 text-neo-white'
               )}
             >

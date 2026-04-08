@@ -12,6 +12,7 @@ import {
   japaneseLetters,
   kanjiCompounds,
 } from '@/utils/consts';
+import { createNoise2D } from 'simplex-noise';
 
 // ==============================================
 // ENGLISH CONSTANTS (default)
@@ -227,95 +228,155 @@ export function generateAdventureGrid(
 }
 
 /**
- * Generate an English letter grid
+ * Generate an English letter grid with simplex-noise spatial zones.
+ * Noise value at each cell biases toward vowels (high noise) or consonants (low noise),
+ * creating organic letter-type clusters that improve word-forming adjacency.
  */
 function generateEnglishGrid(size: GridSize, random: () => number): string[][] {
+  const noise2D = createNoise2D(random);
+  const grid: string[][] = [];
+
+  let vowelCount = 0;
   const totalTiles = size * size;
+  const minVowels = Math.ceil(totalTiles * 0.28);
 
-  // Calculate target letter counts for good distribution
-  const minVowels = Math.ceil(totalTiles * 0.28); // ~28% vowels
-  const targetCommon = Math.ceil(totalTiles * 0.45); // ~45% common consonants
+  for (let row = 0; row < size; row++) {
+    const gridRow: string[] = [];
+    for (let col = 0; col < size; col++) {
+      // Noise at this cell — scale factor 0.8 gives smooth zones across 4-7 grids
+      const n = (noise2D(row * 0.8, col * 0.8) + 1) / 2; // normalize to [0, 1]
 
-  // Build letter pool
-  const letters: string[] = [];
-
-  // Add vowels (ensuring minimum)
-  for (let i = 0; i < minVowels; i++) {
-    letters.push(weightedRandomLetter(VOWELS, random));
+      let letter: string;
+      if (n > 0.55) {
+        // High noise zone → favor vowels
+        letter = weightedRandomLetter(VOWELS, random);
+        vowelCount++;
+      } else if (n < 0.35) {
+        // Low noise zone → favor rare consonants occasionally
+        letter = random() < 0.2
+          ? weightedRandomLetter(RARE_CONSONANTS, random)
+          : weightedRandomLetter(COMMON_CONSONANTS, random);
+      } else {
+        // Mid zone → weighted random from full alphabet
+        letter = weightedRandomFromWeights(ENGLISH_LETTER_WEIGHTS, random);
+        if (VOWELS.includes(letter)) vowelCount++;
+      }
+      gridRow.push(letter);
+    }
+    grid.push(gridRow);
   }
 
-  // Add common consonants
-  for (let i = 0; i < targetCommon; i++) {
-    letters.push(weightedRandomLetter(COMMON_CONSONANTS, random));
+  // Guarantee minimum vowel count by replacing random consonants
+  if (vowelCount < minVowels) {
+    const deficit = minVowels - vowelCount;
+    let replaced = 0;
+    for (let row = 0; row < size && replaced < deficit; row++) {
+      for (let col = 0; col < size && replaced < deficit; col++) {
+        if (!VOWELS.includes(grid[row][col])) {
+          grid[row][col] = weightedRandomLetter(VOWELS, random);
+          replaced++;
+        }
+      }
+    }
   }
 
-  // Fill remaining with weighted random from full alphabet
-  while (letters.length < totalTiles) {
-    letters.push(weightedRandomFromWeights(ENGLISH_LETTER_WEIGHTS, random));
-  }
-
-  // Shuffle and build grid
-  shuffle(letters, random);
-  return buildGrid(letters, size);
+  return grid;
 }
 
 /**
- * Generate a Hebrew letter grid
+ * Generate a Hebrew letter grid with simplex-noise spatial zones.
+ * High-noise cells favor common letters (matres lectionis), creating
+ * word-forming clusters similar to the English spatial approach.
  */
 function generateHebrewGrid(size: GridSize, random: () => number): string[][] {
+  const noise2D = createNoise2D(random);
+  const grid: string[][] = [];
+
+  let commonCount = 0;
   const totalTiles = size * size;
+  const minCommon = Math.ceil(totalTiles * 0.35);
 
-  // Hebrew needs ~35% common letters for word formation
-  const targetCommon = Math.ceil(totalTiles * 0.35);
+  for (let row = 0; row < size; row++) {
+    const gridRow: string[] = [];
+    for (let col = 0; col < size; col++) {
+      const n = (noise2D(row * 0.8, col * 0.8) + 1) / 2;
 
-  const letters: string[] = [];
-
-  // Add common Hebrew letters
-  for (let i = 0; i < targetCommon; i++) {
-    letters.push(weightedRandomLetter(HEBREW_COMMON_LETTERS, random));
+      let letter: string;
+      if (n > 0.5) {
+        letter = weightedRandomLetter(HEBREW_COMMON_LETTERS, random);
+        commonCount++;
+      } else {
+        letter = weightedRandomFromWeights(HEBREW_LETTER_WEIGHTS, random);
+        if (HEBREW_COMMON_LETTERS.includes(letter)) commonCount++;
+      }
+      gridRow.push(letter);
+    }
+    grid.push(gridRow);
   }
 
-  // Fill remaining with weighted random from Hebrew alphabet
-  while (letters.length < totalTiles) {
-    letters.push(weightedRandomFromWeights(HEBREW_LETTER_WEIGHTS, random));
+  // Guarantee minimum common letter count
+  if (commonCount < minCommon) {
+    const deficit = minCommon - commonCount;
+    let replaced = 0;
+    for (let row = 0; row < size && replaced < deficit; row++) {
+      for (let col = 0; col < size && replaced < deficit; col++) {
+        if (!HEBREW_COMMON_LETTERS.includes(grid[row][col])) {
+          grid[row][col] = weightedRandomLetter(HEBREW_COMMON_LETTERS, random);
+          replaced++;
+        }
+      }
+    }
   }
 
-  // Shuffle and build grid
-  shuffle(letters, random);
-  return buildGrid(letters, size);
+  return grid;
 }
 
 /**
- * Generate a Swedish letter grid
+ * Generate a Swedish letter grid with simplex-noise spatial zones.
  */
 function generateSwedishGrid(size: GridSize, random: () => number): string[][] {
-  const totalTiles = size * size;
-
-  // Swedish vowels + common consonants (~28% vowels, 45% common)
+  const noise2D = createNoise2D(random);
   const swedishVowels = ['A', 'E', 'I', 'O', 'U', 'Å', 'Ä', 'Ö'];
-  const minVowels = Math.ceil(totalTiles * 0.30); // ~30% vowels (including Å, Ä, Ö)
-  const targetCommon = Math.ceil(totalTiles * 0.40);
+  const grid: string[][] = [];
 
-  const letters: string[] = [];
+  let vowelCount = 0;
+  const totalTiles = size * size;
+  const minVowels = Math.ceil(totalTiles * 0.30);
 
-  // Add vowels
-  for (let i = 0; i < minVowels; i++) {
-    letters.push(weightedRandomLetter(swedishVowels, random));
+  for (let row = 0; row < size; row++) {
+    const gridRow: string[] = [];
+    for (let col = 0; col < size; col++) {
+      const n = (noise2D(row * 0.8, col * 0.8) + 1) / 2;
+
+      let letter: string;
+      if (n > 0.55) {
+        letter = weightedRandomLetter(swedishVowels, random);
+        vowelCount++;
+      } else if (n < 0.35) {
+        letter = weightedRandomLetter(SWEDISH_COMMON_LETTERS, random);
+      } else {
+        letter = weightedRandomFromWeights(SWEDISH_LETTER_WEIGHTS, random);
+        if (swedishVowels.includes(letter)) vowelCount++;
+      }
+      gridRow.push(letter);
+    }
+    grid.push(gridRow);
   }
 
-  // Add common consonants
-  for (let i = 0; i < targetCommon; i++) {
-    letters.push(weightedRandomLetter(SWEDISH_COMMON_LETTERS, random));
+  if (vowelCount < minVowels) {
+    const deficit = minVowels - vowelCount;
+    let replaced = 0;
+    for (let row = 0; row < size && replaced < deficit; row++) {
+      for (let col = 0; col < size && replaced < deficit; col++) {
+        if (!swedishVowels.includes(grid[row][col])) {
+          grid[row][col] = weightedRandomLetter(swedishVowels, random);
+          replaced++;
+        }
+      }
+    }
   }
 
-  // Fill remaining with weighted random
-  while (letters.length < totalTiles) {
-    letters.push(weightedRandomFromWeights(SWEDISH_LETTER_WEIGHTS, random));
-  }
-
-  // Shuffle and build grid
-  shuffle(letters, random);
-  return buildGrid(letters, size);
+  return grid;
 }
 
 /**
@@ -464,31 +525,6 @@ function weightedRandomFromWeights(
     weightedPoolCache.set(weights, pool);
   }
   return pool[Math.floor(random() * pool.length)];
-}
-
-/**
- * Fisher-Yates shuffle with seeded random
- */
-function shuffle(array: string[], random: () => number): void {
-  for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
-  }
-}
-
-/**
- * Build a 2D grid from a 1D array of letters
- */
-function buildGrid(letters: string[], size: number): string[][] {
-  const grid: string[][] = [];
-  for (let row = 0; row < size; row++) {
-    const gridRow: string[] = [];
-    for (let col = 0; col < size; col++) {
-      gridRow.push(letters[row * size + col]);
-    }
-    grid.push(gridRow);
-  }
-  return grid;
 }
 
 /**

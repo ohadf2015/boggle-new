@@ -322,7 +322,7 @@ export default function ClassroomManager() {
                   className={cn(
                     'w-full px-4 py-2 bg-neo-cream border-2 border-black',
                     'text-black font-neo-body font-bold shadow-hard-sm rounded-neo',
-                    'focus:outline-none focus:ring-2 focus:ring-neo-cyan'
+                    'focus:outline-hidden focus:ring-2 focus:ring-neo-cyan'
                   )}
                 >
                   <option value="en">{t('languages.english')}</option>
@@ -355,7 +355,7 @@ export default function ClassroomManager() {
 
             <Dialog.Close asChild>
               <button
-                className="absolute top-4 end-4 w-8 h-8 flex items-center justify-center rounded-neo border-2 border-black bg-neo-cream text-black hover:bg-black hover:text-white transition-all shadow-hard-sm"
+                className="absolute top-4 inset-e-4 w-8 h-8 flex items-center justify-center rounded-neo border-2 border-black bg-neo-cream text-black hover:bg-black hover:text-white transition-all shadow-hard-sm"
                 aria-label={t('common.close')}
               >
                 <X className="w-4 h-4" />

@@ -146,7 +146,7 @@ function PodiumEmojiPicker({
       animate={{ opacity: 1, scale: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.7, y: 4 }}
       transition={{ duration: 0.12 }}
-      className={cn("absolute top-full mt-1 z-50 flex gap-0.5 bg-neo-navy/95 border border-neo-white/15 rounded-lg p-1 backdrop-blur-sm shadow-lg", positionClass)}
+      className={cn("absolute top-full mt-1 z-50 flex gap-0.5 bg-neo-navy/95 border border-neo-white/15 rounded-lg p-1 backdrop-blur-xs shadow-lg", positionClass)}
     >
       {REACTIONS.map((r) => (
         <button
@@ -323,7 +323,7 @@ export default function ResultsPodium({
                     animate={{ scale: 1, rotate: 0 }}
                     transition={{ type: 'spring', delay: baseDelay + 0.25, stiffness: 400, damping: 15 }}
                     className={cn(
-                      'absolute -top-1.5 -right-1.5 text-black rounded-full flex items-center justify-center border-2 border-black shadow-sm font-black',
+                      'absolute -top-1.5 -right-1.5 text-black rounded-full flex items-center justify-center border-2 border-black shadow-xs font-black',
                       config.badgeSize,
                       config.bgClass
                     )}

@@ -10,7 +10,8 @@ import { cn } from '@/lib/utils';
 import { validateUsername, validateGameCode, sanitizeInput } from '@/utils/validation';
 import { useDebouncedValidation, getValidationClasses } from '@/hooks/useDebouncedValidation';
 import AvatarSelectorButton from './AvatarSelectorButton';
-import AvatarBuilderModal from '@/components/avatar/AvatarBuilderModal';
+import dynamic from 'next/dynamic';
+const AvatarBuilderModal = dynamic(() => import('@/components/avatar/AvatarBuilderModal'), { ssr: false });
 import { useAvatarPremium } from '@/hooks/useAvatarPremium';
 import { useAuth } from '@/contexts/AuthContext';
 import Avatar from '@/components/Avatar';
@@ -140,7 +141,7 @@ const HostModeFields: React.FC<HostModeFieldsProps> = ({
             <button
               type="button"
               onClick={() => setIsAuthAvatarPickerOpen(true)}
-              className="relative group flex-shrink-0"
+              className="relative group shrink-0"
               aria-label={t('joinView.changeAvatar')}
             >
               {selectedAvatar ? (
@@ -277,7 +278,7 @@ const HostModeFields: React.FC<HostModeFieldsProps> = ({
                   onClick={generateRoomCode}
                   size="icon"
                   aria-label={t('joinView.generateNewCode')}
-                  className="absolute right-1 top-1/2 -translate-y-1/2 h-10 w-10 min-w-[40px] min-h-[40px] bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-400 hover:to-pink-400"
+                  className="absolute right-1 top-1/2 -translate-y-1/2 h-10 w-10 min-w-[40px] min-h-[40px] bg-linear-to-r from-purple-500 to-pink-500 hover:from-purple-400 hover:to-pink-400"
                 >
                   <Dices className="text-sm" />
                 </Button>

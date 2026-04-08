@@ -109,7 +109,7 @@ const WordPackCard = memo(function WordPackCard({
       className
     )}>
       {/* Pink accent strip */}
-      <div className="h-1.5 w-full bg-gradient-to-r from-neo-pink to-purple-500" />
+      <div className="h-1.5 w-full bg-linear-to-r from-neo-pink to-purple-500" />
 
       {/* Creator row */}
       <div className="flex items-center gap-2 px-4 pt-3">
@@ -125,7 +125,7 @@ const WordPackCard = memo(function WordPackCard({
       {/* Pack identity */}
       <div className="flex items-start gap-3 px-4 pt-3">
         {pack.theme_emoji ? (
-          <span className="text-4xl leading-none flex-shrink-0" aria-hidden="true">
+          <span className="text-4xl leading-none shrink-0" aria-hidden="true">
             {pack.theme_emoji}
           </span>
         ) : (

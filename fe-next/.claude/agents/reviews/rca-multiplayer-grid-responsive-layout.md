@@ -101,7 +101,7 @@ The `max-w-[min(100%,800px)]` and `max-h-[min(100%,800px)]` constraints limit th
 
 In `TvResultsView.tsx` (line 186):
 ```tsx
-<div className="fixed inset-0 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 z-50 overflow-hidden">
+<div className="fixed inset-0 bg-linear-to-b from-slate-900 via-slate-800 to-slate-900 z-50 overflow-hidden">
 ```
 
 The results view uses `z-50`, and the header inside uses relative positioning. However, the TvBroadcastView may have elements with higher z-index, or there's a stacking context issue.

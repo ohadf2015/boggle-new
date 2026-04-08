@@ -365,7 +365,7 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
               />
             </motion.div>
             {/* Heat vignette */}
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_transparent_40%,_rgba(255,80,0,0.2)_100%)]" />
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_40%,rgba(255,80,0,0.2)_100%)]" />
           </motion.div>
         )}
       </AnimatePresence>

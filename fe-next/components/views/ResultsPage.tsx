@@ -202,7 +202,7 @@ function DesktopResultsLayout({
               transition={{ repeat: Infinity, duration: 1.5, ease: 'easeInOut' }}
               className="flex flex-col items-center gap-0.5"
             >
-              <div className="w-6 h-6 rounded-full bg-neo-white/10 backdrop-blur-sm flex items-center justify-center border border-neo-white/20">
+              <div className="w-6 h-6 rounded-full bg-neo-white/10 backdrop-blur-xs flex items-center justify-center border border-neo-white/20">
                 <svg className="w-3 h-3 text-neo-white/60" viewBox="0 0 12 12" fill="none">
                   <path d="M2 4l4 4 4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
@@ -556,6 +556,23 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     handleStartGame();
   }, [onResetSeries, handleStartGame]);
 
+  // Memoize player list for StickyReadyBar to avoid new array every render
+  const stickyBarPlayers = useMemo(() =>
+    sortedScores.map(p => ({ username: p.username, avatar: p.avatar, isBot: p.isBot, isHost: p.isHost })),
+    [sortedScores],
+  );
+
+  // Memoize emoji reactions to avoid new array reference every render
+  const memoizedEmojiReactions = useMemo(() =>
+    floatingReactions.map(r => ({
+      id: r.id,
+      emoji: r.emoji,
+      username: r.username,
+      timestamp: 0,
+    })),
+    [floatingReactions],
+  );
+
   // Overlay modals that should render regardless of orientation
   // These are rendered BEFORE the conditional returns to ensure they appear in both landscape and portrait modes
   // This fixes the bug where modals would only appear after switching from landscape to portrait
@@ -621,20 +638,15 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     seriesRoundNumber,
     gameMode: resolvedGameMode,
     missedWords,
-    emojiReactions: floatingReactions.map(r => ({
-      id: r.id,
-      emoji: r.emoji,
-      username: r.username,
-      timestamp: 0,
-    })),
+    emojiReactions: memoizedEmojiReactions,
     allPlayerWords,
     gameDuration,
     wordHuntSummary,
     onPodiumReaction: sendReaction,
   };
 
-  // Word Hunt results data (shared between tabs)
-  const wordHuntResultsData = resolvedGameMode === 'word-hunt' ? {
+  // Word Hunt results data (shared between tabs) — memoized to avoid O(n²) per render
+  const wordHuntResultsData = useMemo(() => resolvedGameMode !== 'word-hunt' ? undefined : {
     targetWord: wordHuntSummary?.targetWord || '',
     foundTarget: !!wordHuntSummary?.targetFoundBy,
     isFirstFinder: wordHuntSummary?.targetFoundBy === username,
@@ -661,7 +673,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
       };
     }),
     currentUsername: username,
-  } : undefined;
+  }, [resolvedGameMode, wordHuntSummary, sortedScores, wordHuntEliminatedPlayers, wordHuntPlayerLives, username]);
 
   // Render Results Tab Content using shared component
   const renderResultsTab = () => (
@@ -779,7 +791,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
         />
 
       {/* Subtle top gradient overlay */}
-      <div className="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-neo-cyan/5 to-transparent pointer-events-none" />
+      <div className="absolute top-0 left-0 w-full h-1/2 bg-linear-to-b from-neo-cyan/5 to-transparent pointer-events-none" />
 
       {/* Floating emoji reactions overlay */}
       <div className="absolute inset-0 pointer-events-none z-40">
@@ -793,7 +805,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
       {/* MOBILE VIEW — single scroll, no tabs */}
       <div className="md:hidden flex flex-col flex-1 min-h-0">
         {/* Header with pulsing indicator + exit */}
-        <div className="flex-shrink-0 w-full flex items-center justify-between px-2 py-2">
+        <div className="shrink-0 w-full flex items-center justify-between px-2 py-2">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 bg-neo-cyan rounded-full animate-pulse" />
             <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/50">
@@ -820,12 +832,12 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
 
         {/* Floating bottom bar — always-visible sticky CTA */}
         {gameCode && onReturnToRoom && (
-          <div className="flex-shrink-0 fixed bottom-0 inset-x-0 z-50 text-neo-cream">
+          <div className="shrink-0 fixed bottom-0 inset-x-0 z-50 text-neo-cream">
             <motion.div
               initial={{ y: 60, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ type: 'spring', stiffness: 200, damping: 24, delay: 0.3 }}
-              className="bg-neo-navy/95 backdrop-blur-xl border-t border-neo-white/[0.08] shadow-[0_-4px_24px_rgba(0,0,0,0.5)]"
+              className="bg-neo-navy/95 backdrop-blur-xl border-t border-neo-white/8 shadow-[0_-4px_24px_rgba(0,0,0,0.5)]"
             >
               <div className="px-3 pt-2.5 pb-[max(0.625rem,env(safe-area-inset-bottom))]">
                 <StickyReadyBar
@@ -884,7 +896,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
               readyCount={readyUsernames.length}
               totalPlayers={sortedScores.length}
               readyUsernames={readyUsernames}
-              players={sortedScores.map(p => ({ username: p.username, avatar: p.avatar, isBot: p.isBot, isHost: p.isHost }))}
+              players={stickyBarPlayers}
               onStartGame={handleStartGame}
               onMarkReady={handleMarkReady}
               selectedGameMode={selectedGameMode}

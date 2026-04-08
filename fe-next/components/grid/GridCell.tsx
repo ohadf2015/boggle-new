@@ -180,7 +180,7 @@ const GridCell = memo<GridCellProps>(({
     }
     className={cn(
       "aspect-square flex items-center justify-center font-black cursor-pointer relative overflow-hidden",
-      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan",
+      "focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan",
       isSelected
         ? comboColors.isRainbow
           ? `${comboColors.textColor || 'text-neo-black'} border-2 border-neo-black/60 z-10`
@@ -194,7 +194,7 @@ const GridCell = memo<GridCellProps>(({
             }`
           : isEliminated
             ? "bg-gray-400/60 text-gray-500/50 border border-gray-400/30 shadow-none cursor-not-allowed"
-            : "letter-tile-gradient text-neo-black border-2 border-neo-black/30 shadow-sm hover:shadow-md hover:border-neo-black/50 active:shadow-none",
+            : "letter-tile-gradient text-neo-black border-2 border-neo-black/30 shadow-xs hover:shadow-md hover:border-neo-black/50 active:shadow-none",
       isGolden && !isSelected && !isEliminated && "golden-tile-bg ring-2 ring-amber-400/80 shadow-[0_0_14px_rgba(255,215,0,0.7)] animate-golden-pulse",
       isFrozen && !isSelected && "ring-2 ring-cyan-300/90 shadow-[0_0_16px_rgba(96,165,250,0.6)] cursor-not-allowed opacity-70",
       isCharged && !isSelected && "ring-2 ring-yellow-300/90 shadow-[0_0_16px_rgba(250,204,21,0.7)] animate-pulse",

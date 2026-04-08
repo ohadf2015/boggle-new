@@ -96,7 +96,7 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
     <AdaptiveMotion.div
       className={cn(
         'border-2 border-neo-white/10 rounded-neo overflow-hidden',
-        'bg-neo-white/[0.03]',
+        'bg-neo-white/3',
         'transition-colors duration-200',
         open && 'border-neo-white/20 shadow-hard-sm'
       )}
@@ -197,7 +197,7 @@ export function LandingSEOSection({ className }: LandingSEOSectionProps) {
                 whileHover={{ y: -6, scale: 1.03, transition: { type: 'spring', stiffness: 400, damping: 15 } }}
                 className={cn(
                   'relative p-4 sm:p-5 rounded-neo border-2 border-neo-white/10',
-                  'bg-gradient-to-b', s.gradient, s.borderHover,
+                  'bg-linear-to-b', s.gradient, s.borderHover,
                   'flex flex-col items-center text-center gap-3',
                   'transition-all duration-300 cursor-default select-none',
                   'overflow-hidden group'
@@ -242,7 +242,7 @@ export function LandingSEOSection({ className }: LandingSEOSectionProps) {
           whileInView="visible"
           viewport={{ once: true, margin: '-30px' }}
         >
-          <div className="hidden sm:block absolute top-8 left-[12.5%] right-[12.5%] h-0.5 bg-gradient-to-r from-neo-pink/40 via-neo-cyan/40 via-50% to-neo-purple/40" aria-hidden="true" />
+          <div className="hidden sm:block absolute top-8 left-[12.5%] right-[12.5%] h-0.5 bg-linear-to-r from-neo-pink/40 via-neo-cyan/40 via-50% to-neo-purple/40" aria-hidden="true" />
           {c.steps.map((step, i) => {
             const StepIcon = STEP_ICONS[i];
             return (
@@ -296,7 +296,7 @@ export function LandingSEOSection({ className }: LandingSEOSectionProps) {
                 className={cn(
                   'inline-flex items-center gap-2 px-4 py-2.5',
                   'rounded-neo border-2 border-neo-white/10',
-                  'bg-neo-white/[0.03]',
+                  'bg-neo-white/3',
                   'text-neo-white/70 font-bold text-xs sm:text-sm'
                 )}
               >
@@ -338,7 +338,7 @@ export function LandingSEOSection({ className }: LandingSEOSectionProps) {
                 variants={staggerItem}
                 className={cn(
                   'relative rounded-neo border-2 border-neo-white/10 p-5',
-                  'bg-neo-white/[0.03] overflow-hidden',
+                  'bg-neo-white/3 overflow-hidden',
                   'group hover:border-neo-white/20 transition-colors duration-200'
                 )}
               >
@@ -388,11 +388,11 @@ export function LandingSEOSection({ className }: LandingSEOSectionProps) {
                 variants={staggerItem}
                 className={cn(
                   'relative rounded-neo border-2 border-neo-white/10 p-4 sm:p-5',
-                  'bg-neo-white/[0.02]',
+                  'bg-neo-white/2',
                   'overflow-hidden'
                 )}
               >
-                <div className={cn('absolute top-0 bottom-0 start-0 w-1 rounded-s-neo', barBg[i])} />
+                <div className={cn('absolute top-0 bottom-0 inset-s-0 w-1 rounded-s-neo', barBg[i])} />
                 <div className="flex gap-4 ps-3">
                   <div className={cn('shrink-0 w-9 h-9 rounded-full flex items-center justify-center mt-0.5', circleBg[i])}>
                     <ModeIcon className={cn('w-4 h-4', circleText[i])} aria-hidden="true" />
@@ -418,11 +418,11 @@ export function LandingSEOSection({ className }: LandingSEOSectionProps) {
       >
         <div className={cn(
           'relative rounded-neo border-2 border-neo-purple/20 overflow-hidden',
-          'bg-gradient-to-br from-neo-purple/10 via-neo-purple/5 to-transparent',
+          'bg-linear-to-br from-neo-purple/10 via-neo-purple/5 to-transparent',
           'p-6 sm:p-8'
         )}>
           {/* Subtle glow */}
-          <div className="absolute -top-16 -end-16 w-48 h-48 rounded-full bg-neo-purple/10 blur-3xl pointer-events-none" aria-hidden="true" />
+          <div className="absolute -top-16 -inset-e-16 w-48 h-48 rounded-full bg-neo-purple/10 blur-3xl pointer-events-none" aria-hidden="true" />
           <div className="relative">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 rounded-neo border bg-neo-purple/15 border-neo-purple/25 flex items-center justify-center">
@@ -482,7 +482,7 @@ export function LandingSEOSection({ className }: LandingSEOSectionProps) {
       >
         <div className={cn(
           'relative rounded-neo border-2 border-neo-cyan/20 overflow-hidden',
-          'bg-gradient-to-br from-neo-cyan/8 via-neo-pink/5 to-transparent',
+          'bg-linear-to-br from-neo-cyan/8 via-neo-pink/5 to-transparent',
           'p-6 sm:p-8 text-center'
         )}>
           {/* Decorative glow */}
@@ -542,12 +542,12 @@ export function LandingSEOSection({ className }: LandingSEOSectionProps) {
                 href={`/${locale}/blog/${blog.slug}`}
                 className={cn(
                   'group block rounded-neo border-2 border-neo-white/10 overflow-hidden',
-                  'bg-neo-white/[0.03]',
-                  'hover:border-neo-white/20 hover:bg-neo-white/[0.06] hover:-translate-y-0.5',
+                  'bg-neo-white/3',
+                  'hover:border-neo-white/20 hover:bg-neo-white/6 hover:-translate-y-0.5',
                   'transition-all duration-200'
                 )}
               >
-                <div className="relative aspect-[16/9] overflow-hidden">
+                <div className="relative aspect-video overflow-hidden">
                   <Image
                     src={BLOG_IMAGES[i]}
                     alt={blog.title}
@@ -555,7 +555,7 @@ export function LandingSEOSection({ className }: LandingSEOSectionProps) {
                     className="object-cover group-hover:scale-105 transition-transform duration-300"
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                   />
-                  <span className="absolute top-2 start-2 inline-block px-2 py-0.5 text-[10px] font-bold uppercase text-neo-white bg-neo-black/60 rounded-neo tracking-wider">
+                  <span className="absolute top-2 inset-s-2 inline-block px-2 py-0.5 text-[10px] font-bold uppercase text-neo-white bg-neo-black/60 rounded-neo tracking-wider">
                     {blog.category}
                   </span>
                 </div>

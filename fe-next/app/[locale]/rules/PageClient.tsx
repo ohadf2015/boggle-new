@@ -127,14 +127,14 @@ export default function RulesPageClient(): React.JSX.Element {
                     transition={{ delay: 0.2 }}
                 >
                     <Card className="border-2 sm:border-4 border-neo-black shadow-hard-lg bg-white dark:bg-slate-800 overflow-hidden">
-                        <CardHeader className="bg-gradient-to-r from-neo-cyan/30 to-neo-pink/30 border-b-2 sm:border-b-4 border-neo-black py-2 sm:py-4">
+                        <CardHeader className="bg-linear-to-r from-neo-cyan/30 to-neo-pink/30 border-b-2 sm:border-b-4 border-neo-black py-2 sm:py-4">
                             <CardTitle className="flex items-center justify-center gap-2 sm:gap-3 text-base sm:text-2xl font-black text-slate-900 dark:text-white">
                                 <Gamepad2 className="text-neo-pink w-5 h-5 sm:w-6 sm:h-6" />
                                 {t('footer.interactiveTutorial')}
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="p-2 sm:p-6">
-                            <div className="bg-gradient-to-br from-neo-navy/5 to-neo-pink/5 rounded-lg sm:rounded-xl p-2 sm:p-4 flex justify-center">
+                            <div className="bg-linear-to-br from-neo-navy/5 to-neo-pink/5 rounded-lg sm:rounded-xl p-2 sm:p-4 flex justify-center">
                                 <InteractiveGridDemo t={t} dir={dir} />
                             </div>
                         </CardContent>
@@ -159,20 +159,20 @@ export default function RulesPageClient(): React.JSX.Element {
                                 {/* Multiplayer Card */}
                                 <div className="p-2 sm:p-4 rounded-lg sm:rounded-xl bg-neo-cyan/10 border-2 sm:border-3 border-neo-black">
                                     <div className={`flex items-center gap-2 mb-2 sm:mb-3 ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}>
-                                        <Users className="text-neo-pink w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+                                        <Users className="text-neo-pink w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
                                         <h3 className="font-bold text-sm sm:text-lg text-slate-900 dark:text-white">{t('landing.multiPlayer')}</h3>
                                     </div>
                                     <ul className={`space-y-1 sm:space-y-2 text-xs sm:text-sm text-slate-600 dark:text-slate-300 ${dir === 'rtl' ? 'text-right' : ''}`}>
                                         <li className={`flex items-start gap-1.5 sm:gap-2 ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}>
-                                            <CheckCircle className="text-neo-lime mt-0.5 flex-shrink-0 w-3 h-3 sm:w-4 sm:h-4" />
+                                            <CheckCircle className="text-neo-lime mt-0.5 shrink-0 w-3 h-3 sm:w-4 sm:h-4" />
                                             <span>{t('rules.joinOrCreateDesc')}</span>
                                         </li>
                                         <li className={`flex items-start gap-1.5 sm:gap-2 ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}>
-                                            <CheckCircle className="text-neo-lime mt-0.5 flex-shrink-0 w-3 h-3 sm:w-4 sm:h-4" />
+                                            <CheckCircle className="text-neo-lime mt-0.5 shrink-0 w-3 h-3 sm:w-4 sm:h-4" />
                                             <span>{t('rules.raceAgainstTimeDesc')}</span>
                                         </li>
                                         <li className={`flex items-start gap-1.5 sm:gap-2 ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}>
-                                            <CheckCircle className="text-neo-lime mt-0.5 flex-shrink-0 w-3 h-3 sm:w-4 sm:h-4" />
+                                            <CheckCircle className="text-neo-lime mt-0.5 shrink-0 w-3 h-3 sm:w-4 sm:h-4" />
                                             <span>{t('rules.competeAndWinDesc')}</span>
                                         </li>
                                     </ul>
@@ -193,20 +193,20 @@ export default function RulesPageClient(): React.JSX.Element {
                                 {/* Single Player Card */}
                                 <div className="p-2 sm:p-4 rounded-lg sm:rounded-xl bg-neo-cyan/10 border-2 sm:border-3 border-neo-black">
                                     <div className={`flex items-center gap-2 mb-2 sm:mb-3 ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}>
-                                        <Bot className="text-neo-cyan w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+                                        <Bot className="text-neo-cyan w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
                                         <h3 className="font-bold text-sm sm:text-lg text-slate-900 dark:text-white">{t('landing.singlePlayer')}</h3>
                                     </div>
                                     <ul className={`space-y-1 sm:space-y-2 text-xs sm:text-sm text-slate-600 dark:text-slate-300 ${dir === 'rtl' ? 'text-right' : ''}`}>
                                         <li className={`flex items-start gap-1.5 sm:gap-2 ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}>
-                                            <CheckCircle className="text-neo-lime mt-0.5 flex-shrink-0 w-3 h-3 sm:w-4 sm:h-4" />
+                                            <CheckCircle className="text-neo-lime mt-0.5 shrink-0 w-3 h-3 sm:w-4 sm:h-4" />
                                             <span>{t('rules.soloVsBotsDesc')}</span>
                                         </li>
                                         <li className={`flex items-start gap-1.5 sm:gap-2 ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}>
-                                            <CheckCircle className="text-neo-lime mt-0.5 flex-shrink-0 w-3 h-3 sm:w-4 sm:h-4" />
+                                            <CheckCircle className="text-neo-lime mt-0.5 shrink-0 w-3 h-3 sm:w-4 sm:h-4" />
                                             <span>{t('rules.practiceModeDesc')}</span>
                                         </li>
                                         <li className={`flex items-start gap-1.5 sm:gap-2 ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}>
-                                            <CheckCircle className="text-neo-lime mt-0.5 flex-shrink-0 w-3 h-3 sm:w-4 sm:h-4" />
+                                            <CheckCircle className="text-neo-lime mt-0.5 shrink-0 w-3 h-3 sm:w-4 sm:h-4" />
                                             <span>{t('rules.challengeModeDesc')}</span>
                                         </li>
                                     </ul>
@@ -293,19 +293,19 @@ export default function RulesPageClient(): React.JSX.Element {
                         <CardContent className="p-2 sm:p-6">
                             <div className="space-y-1.5 sm:space-y-3">
                                 <div className={`flex items-start gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg bg-neo-cyan/10 ${dir === 'rtl' ? 'flex-row-reverse text-right' : ''}`}>
-                                    <span className="text-neo-cyan text-sm sm:text-lg font-bold flex-shrink-0">1</span>
+                                    <span className="text-neo-cyan text-sm sm:text-lg font-bold shrink-0">1</span>
                                     <p className="text-xs sm:text-base text-slate-700 dark:text-slate-300">
                                         <strong className="text-slate-900 dark:text-white">{t('rules.scanPrefixes')}:</strong> {t('rules.scanPrefixesDesc')}
                                     </p>
                                 </div>
                                 <div className={`flex items-start gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg bg-neo-pink/10 ${dir === 'rtl' ? 'flex-row-reverse text-right' : ''}`}>
-                                    <span className="text-neo-pink text-sm sm:text-lg font-bold flex-shrink-0">2</span>
+                                    <span className="text-neo-pink text-sm sm:text-lg font-bold shrink-0">2</span>
                                     <p className="text-xs sm:text-base text-slate-700 dark:text-slate-300">
                                         <strong className="text-slate-900 dark:text-white">{t('rules.thinkWordFamilies')}:</strong> {t('rules.thinkWordFamiliesDesc')}
                                     </p>
                                 </div>
                                 <div className={`flex items-start gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg bg-neo-lime/10 ${dir === 'rtl' ? 'flex-row-reverse text-right' : ''}`}>
-                                    <span className="text-neo-lime text-sm sm:text-lg font-bold flex-shrink-0">3</span>
+                                    <span className="text-neo-lime text-sm sm:text-lg font-bold shrink-0">3</span>
                                     <p className="text-xs sm:text-base text-slate-700 dark:text-slate-300">
                                         <strong className="text-slate-900 dark:text-white">{t('rules.dontOverthink')}:</strong> {t('rules.dontOverthinkDesc')}
                                     </p>

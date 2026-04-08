@@ -364,7 +364,7 @@ export class RateLimiter {
   constructor(options: SocketRateLimiterOptions = {}) {
     this.maxMessages = options.maxMessages ?? 100;
     this.windowMs = options.windowMs ?? 10000;
-    this.ipMaxMessages = options.ipMaxMessages ?? 4500;
+    this.ipMaxMessages = options.ipMaxMessages ?? 500;
     this.ipWindowMs = options.ipWindowMs ?? 10000;
     this.blockDurationMs = options.blockDurationMs ?? 60000;
 

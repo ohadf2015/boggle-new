@@ -40,12 +40,12 @@ const colors: WorldColorPalette = {
 // ==============================================
 
 const background: WorldBackground = {
-  baseColor: 'bg-gradient-to-b from-amber-950 via-yellow-950 to-orange-950',
+  baseColor: 'bg-linear-to-b from-amber-950 via-yellow-950 to-orange-950',
   illustrationPath: '/images/adventure/backgrounds/throne.webp',
   layers: [
     {
       id: 'throne-hall',
-      source: 'bg-gradient-to-b from-amber-950 via-yellow-950 to-orange-950',
+      source: 'bg-linear-to-b from-amber-950 via-yellow-950 to-orange-950',
       depth: 0.1,
       opacity: 1,
       className: 'absolute inset-0',

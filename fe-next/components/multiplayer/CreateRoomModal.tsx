@@ -21,6 +21,8 @@ import { cn } from '@/lib/utils';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { Swords, Loader2, MapPin } from 'lucide-react';
 import type { Language } from '@/shared/types/game';
+
+const HALFTONE_DOT_STYLE = { backgroundImage: 'radial-gradient(circle, black 1px, transparent 1px)', backgroundSize: '8px 8px' } as const;
 import { getRandomAvatarConfig, type CustomAvatarConfig } from '@/shared/types/customAvatar';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -126,7 +128,7 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
   const isNameValid = usernameValidation.isValid && username.length > 0;
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()} modal={!isAvatarBuilderOpen}>
-      <DialogContent noDescription dir={dir} className="!max-w-[420px] sm:!max-w-[420px] lg:!max-w-[420px] xl:!max-w-[420px] max-h-[90dvh] overflow-y-auto !p-0 !gap-0 !border-4">
+      <DialogContent noDescription dir={dir} className="max-w-[420px]! sm:max-w-[420px]! lg:max-w-[420px]! xl:max-w-[420px]! max-h-[90dvh] overflow-y-auto p-0! gap-0! border-4!">
         <DialogHeader className="sr-only">
           <DialogTitle>{t('multiplayerFlow.createModal.title')}</DialogTitle>
         </DialogHeader>
@@ -136,12 +138,12 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
           initial={{ opacity: 0, y: -16, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ ...SPRING, delay: 0.05 }}
-          className="relative bg-gradient-to-r from-neo-orange to-neo-pink px-5 py-4 border-b-4 border-black overflow-hidden"
+          className="relative bg-linear-to-r from-neo-orange to-neo-pink px-5 py-4 border-b-4 border-black overflow-hidden"
         >
           {/* Halftone dot pattern overlay */}
-          <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle, black 1px, transparent 1px)', backgroundSize: '8px 8px' }} />
+          <div className="absolute inset-0 opacity-10" style={HALFTONE_DOT_STYLE} />
           <div className="relative flex items-center gap-3">
-            <div className="w-10 h-10 bg-neo-black/20 rounded-neo border-2 border-black flex items-center justify-center flex-shrink-0">
+            <div className="w-10 h-10 bg-neo-black/20 rounded-neo border-2 border-black flex items-center justify-center shrink-0">
               <Swords className="w-5 h-5 text-neo-white" />
             </div>
             <div>
@@ -208,7 +210,7 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
                   aria-describedby={nameError ? 'create-username-error' : undefined}
                   className={cn(
                     'w-full bg-transparent text-center font-neo-display font-bold text-2xl text-neo-white',
-                    'border-b-3 pb-1.5 outline-none transition-colors',
+                    'border-b-3 pb-1.5 outline-hidden transition-colors',
                     'placeholder:text-neo-white/15',
                     nameError
                       ? 'border-red-500 animate-neo-shake'
@@ -285,7 +287,7 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
               onChange={(e) => setRoomName(e.target.value)}
               maxLength={MAX_ROOM_LENGTH}
               placeholder={generateRoomName(username || 'Your')}
-              className="w-full h-11 px-3 bg-neo-navy-light/50 border-3 border-neo-white/20 rounded-neo text-neo-white text-sm font-bold placeholder:text-neo-white/25 outline-none focus:border-neo-cyan/50 focus:bg-neo-navy-light/70 transition-colors"
+              className="w-full h-11 px-3 bg-neo-navy-light/50 border-3 border-neo-white/20 rounded-neo text-neo-white text-sm font-bold placeholder:text-neo-white/25 outline-hidden focus:border-neo-cyan/50 focus:bg-neo-navy-light/70 transition-colors"
             />
           </AdaptiveMotion.div>
 

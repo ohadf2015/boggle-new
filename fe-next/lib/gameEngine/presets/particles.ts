@@ -269,7 +269,7 @@ export const VORTEX_PULL: ParticleConfig = {
   spawnShape: 'circle',
   spawnConfig: { radius: 90 },
   blendMode: 'add',
-  shape: 'ring',
+  shape: 'ring-3',
 };
 
 // ─── Vortex Explosion ────────────────────────────────────────────────
@@ -384,7 +384,7 @@ export const COMBO_FLASH_RING: ParticleConfig = {
   speed: { min: 100, max: 250 },
   lifetime: { min: 0.4, max: 0.9 },
   colors: ['ff1493', 'bfff00', '00ffff', 'ffffff'],
-  shape: 'ring',
+  shape: 'ring-3',
 };
 
 export const COMBO_FLASH_VARIANTS: readonly ParticleConfig[] = [
@@ -473,7 +473,7 @@ export const ELECTRIC_RINGS: ParticleConfig = {
   spawnShape: 'burst',
   spawnConfig: { directions: 8 },
   blendMode: 'add',
-  shape: 'ring',
+  shape: 'ring-3',
 };
 
 // ─── Gold Stars ──────────────────────────────────────────────────────

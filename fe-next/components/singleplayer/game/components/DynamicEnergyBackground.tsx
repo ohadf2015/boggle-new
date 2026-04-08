@@ -3,6 +3,10 @@
 import React from 'react';
 import { Circle, Triangle, Square, Sparkles } from 'lucide-react';
 
+const DELAY_1S_STYLE = { animationDelay: '1s' } as const;
+const DELAY_2S_STYLE = { animationDelay: '2s' } as const;
+const DELAY_3S_STYLE = { animationDelay: '3s' } as const;
+
 /**
  * DynamicEnergyBackground - Animated background for Single Player mode
  * Features vortex rotation, aurora waves, floating particles, and scanlines
@@ -35,17 +39,17 @@ export function DynamicEnergyBackground(): React.ReactElement {
       />
       <Triangle
         className="absolute top-1/2 right-12 text-pink-400 w-4 h-4 animate-particle-float opacity-20"
-        style={{ animationDelay: '1s' }}
+        style={DELAY_1S_STYLE}
         aria-hidden="true"
       />
       <Square
         className="absolute bottom-1/4 left-20 text-lime-400 w-3 h-3 animate-particle-float opacity-20"
-        style={{ animationDelay: '2s' }}
+        style={DELAY_2S_STYLE}
         aria-hidden="true"
       />
       <Sparkles
         className="absolute top-20 right-1/4 text-white w-4 h-4 animate-particle-float opacity-20"
-        style={{ animationDelay: '3s' }}
+        style={DELAY_3S_STYLE}
         aria-hidden="true"
       />
     </>

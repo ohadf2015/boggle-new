@@ -93,7 +93,7 @@ export function LandingHero({ players, playersLoading, isMobilePortrait }: Landi
         {/* Right: Leaderboard Preview (desktop only — mobile moves below game cards) */}
         {!isMobilePortrait && (
           <div
-            className="hidden md:block w-64 lg:w-80 xl:w-[26rem] shrink-0 animate-[fadeInRight_0.5s_ease-out_0.3s_both]"
+            className="hidden md:block w-64 lg:w-80 xl:w-104 shrink-0 animate-[fadeInRight_0.5s_ease-out_0.3s_both]"
           >
             <LandingLeaderboardPreview players={players} loading={playersLoading} />
           </div>

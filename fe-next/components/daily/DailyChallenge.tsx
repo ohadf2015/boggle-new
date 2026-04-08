@@ -350,7 +350,7 @@ const DailyChallenge: React.FC = () => {
 
   return (
     <div
-      className="flex-1 flex flex-col min-h-0 h-dvh max-h-dvh bg-gray-100 dark:bg-neo-navy relative [overflow-x:clip] overflow-hidden"
+      className="flex-1 flex flex-col min-h-0 h-dvh max-h-dvh bg-gray-100 dark:bg-neo-navy relative overflow-x-clip overflow-hidden"
     >
       <AutoHideHeader />
 

@@ -218,7 +218,7 @@ const RPGLevelCard = memo(function RPGLevelCard({
       {isPerfect && isUnlocked && (
         <div
           data-testid="crown-badge"
-          className="absolute -top-1 -end-1 w-7 h-7 bg-neo-yellow rounded-full border-2 border-neo-black flex items-center justify-center shadow-hard-sm z-20"
+          className="absolute -top-1 -inset-e-1 w-7 h-7 bg-neo-yellow rounded-full border-2 border-neo-black flex items-center justify-center shadow-hard-sm z-20"
         >
           <Crown className="w-4 h-4 text-neo-black" />
         </div>
@@ -232,7 +232,7 @@ const RPGLevelCard = memo(function RPGLevelCard({
       {/* Current level pulse ring — world-colored */}
       {isCurrent && isUnlocked && (
         <div
-          className="absolute -inset-1 rounded-neo-lg border-[3px] border-neo-lime pointer-events-none z-20"
+          className="absolute -inset-1 rounded-neo-lg border-3 border-neo-lime pointer-events-none z-20"
           style={{ animation: 'pulse-border 2s ease-in-out infinite' }}
         />
       )}

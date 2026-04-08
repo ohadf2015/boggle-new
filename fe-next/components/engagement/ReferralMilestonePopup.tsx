@@ -87,7 +87,7 @@ export function ReferralMilestonePopup({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm"
+            className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs"
             onClick={handleClose}
           />
 
@@ -117,12 +117,12 @@ export function ReferralMilestonePopup({
             </button>
 
             {/* Header with gradient */}
-            <div className={`bg-gradient-to-br ${colors.bg} p-6 pb-8 text-center text-white`}>
+            <div className={`bg-linear-to-br ${colors.bg} p-6 pb-8 text-center text-white`}>
               <motion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
-                className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white/20 backdrop-blur-sm mb-3"
+                className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white/20 backdrop-blur-xs mb-3"
               >
                 <Users className="w-10 h-10" />
               </motion.div>
@@ -158,7 +158,7 @@ export function ReferralMilestonePopup({
                 initial={{ scale: 0, rotate: -180 }}
                 animate={{ scale: 1, rotate: 0 }}
                 transition={{ delay: 0.5, type: 'spring', stiffness: 200 }}
-                className={`inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br ${colors.bg} text-white text-2xl font-bold shadow-lg mb-4`}
+                className={`inline-flex items-center justify-center w-16 h-16 rounded-full bg-linear-to-br ${colors.bg} text-white text-2xl font-bold shadow-lg mb-4`}
               >
                 {gameCount}
               </motion.div>
@@ -194,7 +194,7 @@ export function ReferralMilestonePopup({
               >
                 <Button
                   onClick={handleClose}
-                  className={`w-full bg-gradient-to-r ${colors.bg} text-white font-bold py-3 rounded-xl hover:opacity-90 transition-opacity`}
+                  className={`w-full bg-linear-to-r ${colors.bg} text-white font-bold py-3 rounded-xl hover:opacity-90 transition-opacity`}
                 >
                   {t('common.awesome')}
                 </Button>

@@ -55,9 +55,22 @@ const SOCKET_CONFIG = (() => {
   };
 })();
 
-// Shared socket singleton to prevent duplicate connections across components
-let sharedSocketInstance: Socket | null = null;
-let sharedSocketRefCount = 0;
+// Shared socket singleton to prevent duplicate connections across components.
+// In dev, HMR re-evaluates this module — use globalThis to avoid orphaned sockets.
+const HMR_KEY = '__lexiclash_socket__';
+const HMR_RC_KEY = '__lexiclash_socket_rc__';
+
+let sharedSocketInstance: Socket | null =
+  (typeof globalThis !== 'undefined' && (globalThis as any)[HMR_KEY]) || null;
+let sharedSocketRefCount: number =
+  (typeof globalThis !== 'undefined' && (globalThis as any)[HMR_RC_KEY]) || 0;
+
+function syncHMR() {
+  if (process.env.NODE_ENV === 'development' && typeof globalThis !== 'undefined') {
+    (globalThis as any)[HMR_KEY] = sharedSocketInstance;
+    (globalThis as any)[HMR_RC_KEY] = sharedSocketRefCount;
+  }
+}
 
 /**
  * Get the shared socket URL
@@ -144,6 +157,7 @@ export function getSharedSocket(): Socket {
     });
   }
   sharedSocketRefCount++;
+  syncHMR();
   return sharedSocketInstance;
 }
 
@@ -160,6 +174,7 @@ export function releaseSharedSocket(): void {
     sharedSocketInstance = null;
     sharedSocketRefCount = 0;
   }
+  syncHMR();
 }
 
 /**
@@ -191,6 +206,7 @@ export function SocketProvider({ children }: SocketProviderProps) {
   const [connectionError, setConnectionError] = useState<string | null>(null);
   const reconnectAttemptRef = useRef<number>(0);
   const socketRef = useRef<Socket | null>(null);
+  const bgTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Manual reconnect function
   const manualReconnect = useCallback(() => {
@@ -292,11 +308,18 @@ export function SocketProvider({ children }: SocketProviderProps) {
       // Only log non-empty errors to reduce noise
       if (error && typeof error === 'object' && Object.keys(error).length > 0) {
         const code = (error as Record<string, unknown>).code;
-        const expectedErrors = [
+        const expectedCodes = [
           'GAME_NOT_FOUND', 'NOT_IN_GAME', 'PLAYER_NOT_IN_GAME', 'ROOM_NOT_FOUND',
           'GAME_NOT_IN_PROGRESS', 'GAME_ALREADY_IN_PROGRESS', 'INTERNAL_ERROR',
         ];
-        if (typeof code === 'string' && expectedErrors.includes(code)) {
+        const expectedMessages = [
+          'Not in a game', 'You are not in a game', 'Target word already found',
+        ];
+        const msg = (error as Record<string, unknown>).message;
+        if (
+          (typeof code === 'string' && expectedCodes.includes(code)) ||
+          (typeof msg === 'string' && expectedMessages.includes(msg))
+        ) {
           logger.log('[SOCKET.IO] Expected error:', error);
         } else {
           logger.warn('[SOCKET.IO] Socket error event:', JSON.stringify(error));
@@ -330,15 +353,19 @@ export function SocketProvider({ children }: SocketProviderProps) {
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'hidden') {
         // App backgrounded — disconnect after a grace period (user might just be switching tabs briefly)
-        (handleVisibilityChange as any)._bgTimer = setTimeout(() => {
-          if (socketInstance.connected) {
+        bgTimerRef.current = setTimeout(() => {
+          // Guard against stale closure: only disconnect if this is still the active socket
+          if (socketInstance === socketRef.current && socketInstance.connected) {
             logger.log('[SOCKET.IO] App backgrounded — disconnecting to save resources');
             socketInstance.disconnect();
           }
         }, 5000); // 5s grace period
       } else {
         // App foregrounded — cancel pending disconnect and reconnect if needed
-        clearTimeout((handleVisibilityChange as any)._bgTimer);
+        if (bgTimerRef.current) {
+          clearTimeout(bgTimerRef.current);
+          bgTimerRef.current = null;
+        }
         if (!socketInstance.connected) {
           logger.log('[SOCKET.IO] App foregrounded — reconnecting');
           // Refresh auth token before reconnecting (may have expired while backgrounded)
@@ -382,7 +409,10 @@ export function SocketProvider({ children }: SocketProviderProps) {
       socketInstance.off('error', handleError);
       if (mobile) {
         document.removeEventListener('visibilitychange', handleVisibilityChange);
-        clearTimeout((handleVisibilityChange as any)._bgTimer);
+        if (bgTimerRef.current) {
+          clearTimeout(bgTimerRef.current);
+          bgTimerRef.current = null;
+        }
       }
       window.removeEventListener('online', handleOnline);
       releaseSharedSocket();

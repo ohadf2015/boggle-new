@@ -1,381 +1,2354 @@
-@import '../styles/combo-flash.css';
+@import '../styles/combo-flash.css' layer(base);
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
 
-/* Live activity ticker — stable keyframe (not in JSX to avoid re-render flicker) */
-@keyframes activity-ticker-scroll {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
+@config '../tailwind.config.js';
+
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
 }
 
-/* ====================================
+/* Height-based breakpoints (migrated from tailwind.config.js raw screens for v4 compat) */
+@custom-variant tall (@media (min-height: 800px));
+@custom-variant short (@media (max-height: 600px));
+@custom-variant desktop-tall (@media (min-width: 1024px) and (min-height: 700px));
+
+@utility text-balance {
+  text-wrap: balance;
+}
+
+@utility content-visibility-auto {
+  /* ====================================
+     PERFORMANCE UTILITIES
+     ==================================== */
+
+  /* Content visibility for below-the-fold content - improves LCP */
+  /* Browser can skip rendering until content is near viewport */
+  content-visibility: auto;
+  contain-intrinsic-size: auto 500px;
+}
+
+@utility content-visibility-auto-sm {
+  /* Smaller intrinsic size for compact components */
+  content-visibility: auto;
+  contain-intrinsic-size: auto 200px;
+}
+
+@utility content-visibility-auto-lg {
+  /* Large intrinsic size for full-page sections */
+  content-visibility: auto;
+  contain-intrinsic-size: auto 800px;
+}
+
+@utility gpu-accelerated {
+  /* GPU-accelerated transforms for animated elements */
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  will-change: transform;
+}
+
+@utility will-change-off {
+  /* Remove will-change after animation completes to free GPU memory */
+  will-change: auto;
+}
+
+@utility paint-optimized {
+  /* Optimize paint for frequently changing elements */
+  isolation: isolate;
+  contain: layout style paint;
+}
+
+@utility sr-only {
+  /* Screen reader only utility class */
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+@utility text-bidi-isolate {
+  /* BiDi text isolation - prevents punctuation from appearing at wrong position
+     when LTR text is displayed in an RTL context (or vice versa) */
+  unicode-bidi: isolate;
+}
+
+@utility text-dir-auto {
+  /* Auto-detect text direction based on content */
+  direction: inherit;
+  unicode-bidi: plaintext;
+}
+
+@utility focus-visible-ring {
+  /* Focus visible styles for keyboard navigation - Neo-Brutalist style */
+  /* Using black outline with white inner ring for contrast on any background */
+  &:focus-visible {
+    outline: 3px solid rgb(var(--neo-black));
+    outline-offset: 2px;
+    box-shadow:
+      0 0 0 2px var(--background),
+      0 0 0 5px rgb(var(--neo-black));
+  }
+
+  /* Alternative focus style for dark backgrounds */
+  .dark &:focus-visible {
+    outline: 3px solid var(--neo-cyan);
+    outline-offset: 2px;
+    box-shadow:
+      0 0 0 2px var(--neo-navy),
+      0 0 0 5px var(--neo-cyan);
+  }
+
+  [data-theme='dark'] &:focus-visible {
+    outline: 3px solid var(--neo-cyan);
+    outline-offset: 2px;
+    box-shadow:
+      0 0 0 2px var(--neo-navy),
+      0 0 0 5px var(--neo-cyan);
+  }
+}
+
+@utility dark {
+  /* Alternative focus style for dark backgrounds */
+  & .focus-visible-ring:focus-visible {
+    outline: 3px solid var(--neo-cyan);
+    outline-offset: 2px;
+    box-shadow:
+      0 0 0 2px var(--neo-navy),
+      0 0 0 5px var(--neo-cyan);
+  }
+
+  /* Dark mode scrollbar */
+  & .custom-scrollbar {
+    scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+  }
+
+  & .custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.3);
+  }
+
+  & .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(255, 255, 255, 0.5);
+  }
+}
+
+@utility bg-neo-cyan {
+  /* Focus ring override for colored backgrounds (cyan, pink, etc.) */
+  /* Ensures visibility when focus ring would otherwise blend with background */
+  & :focus-visible {
+    outline: 3px solid rgb(var(--neo-black)) !important;
+    box-shadow:
+      0 0 0 2px #ffffff,
+      0 0 0 5px rgb(var(--neo-black)) !important;
+  }
+}
+
+@utility bg-neo-pink {
+  & :focus-visible {
+    outline: 3px solid rgb(var(--neo-black)) !important;
+    box-shadow:
+      0 0 0 2px #ffffff,
+      0 0 0 5px rgb(var(--neo-black)) !important;
+  }
+}
+
+@utility shadow-hard-sm {
+  /* ====================================
+     NEO-BRUTALIST UTILITY CLASSES
+     ==================================== */
+
+  /* Hard Shadow Utilities */
+  box-shadow: var(--shadow-sm);
+
+  /* RTL-aware hard shadows */
+  [dir='rtl'] & {
+    box-shadow: -1px 1px 0px rgb(var(--neo-black));
+  }
+}
+
+@utility shadow-hard {
+  box-shadow: var(--shadow-md);
+
+  [dir='rtl'] & {
+    box-shadow: -2px 2px 0px rgb(var(--neo-black));
+  }
+}
+
+@utility shadow-hard-md {
+  box-shadow: var(--shadow-md);
+
+  [dir='rtl'] & {
+    box-shadow: -2px 2px 0px rgb(var(--neo-black));
+  }
+}
+
+@utility shadow-hard-lg {
+  box-shadow: var(--shadow-lg);
+
+  [dir='rtl'] & {
+    box-shadow: -3px 3px 0px rgb(var(--neo-black));
+  }
+}
+
+@utility shadow-hard-xl {
+  box-shadow: var(--shadow-xl);
+
+  [dir='rtl'] & {
+    box-shadow: -5px 5px 0px rgb(var(--neo-black));
+  }
+}
+
+@utility shadow-hard-pressed {
+  box-shadow: var(--shadow-pressed);
+
+  [dir='rtl'] & {
+    box-shadow: -1px 1px 0px rgb(var(--neo-black));
+  }
+}
+
+@utility border-neo {
+  /* Neo-Brutalist Border */
+  border: var(--border-neo) solid rgb(var(--neo-black));
+}
+
+@utility border-neo-thick {
+  border: var(--border-neo-thick) solid rgb(var(--neo-black));
+}
+
+@utility max-w-btn {
+  /* ====================================
+     ACTION BUTTON MAX-WIDTH UTILITIES
+     Prevents full-width buttons from becoming
+     oversized on desktop viewports
+     ==================================== */
+
+  /* Standard action button max-width (320px) - ideal for primary CTAs */
+  max-width: 320px;
+  margin-inline: auto;
+}
+
+@utility max-w-btn-lg {
+  /* Large action button max-width (400px) - for prominent actions */
+  max-width: 400px;
+  margin-inline: auto;
+}
+
+@utility max-w-btn-xl {
+  /* Extra large action button max-width (480px) - for full-width sections */
+  max-width: 480px;
+  margin-inline: auto;
+}
+
+@utility fire-glow {
+  /* Fire Glow Utility - Applied to grid cells during fire round */
+  animation: fire-glow 0.8s ease-in-out infinite !important;
+  background: linear-gradient(135deg, #ff6b35, #ff3366) !important;
+  will-change: transform, opacity;
+  transform: translateZ(0);
+  /* Force GPU acceleration */
+}
+
+@utility earthquake-shake {
+  /* Earthquake Shake Utility - Applied to grid container */
+  animation: earthquake-shake 0.6s ease-in-out;
+}
+
+@utility letter-tile-gradient {
+  /* Letter Tile Gradient - Clean minimal design with subtle depth */
+  background: linear-gradient(165deg, #ffffff 0%, #fafaf9 40%, #f5f5f3 100%);
+}
+
+@utility golden-tile-bg {
+  /* Golden Tile - Full golden gradient for classic MP special tiles */
+  background: linear-gradient(
+    145deg,
+    #ffe066 0%,
+    #fbbf24 35%,
+    #f59e0b 65%,
+    #d97706 100%
+  ) !important;
+  border-color: rgba(180, 120, 0, 0.6) !important;
+}
+
+@utility golden-tile-sparkle {
+  /* Golden tile sparkle crosses (matching adventure tile-gold-sparkle pattern) */
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  pointer-events: none;
+  z-index: 10;
+  &::before {
+    content: '';
+    position: absolute;
+    background: rgba(255, 255, 255, 0.85);
+    border-radius: 2px;
+  }
+  &::after {
+    content: '';
+    position: absolute;
+    background: rgba(255, 255, 255, 0.85);
+    border-radius: 2px;
+  }
+  &::before {
+    width: 100%;
+    height: 2px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  &::after {
+    width: 2px;
+    height: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+
+@utility golden-tile-sparkle--1 {
+  top: 12%;
+  right: 14%;
+  animation: golden-sparkle-twinkle 1.8s ease-in-out infinite;
+}
+
+@utility golden-tile-sparkle--2 {
+  bottom: 16%;
+  left: 12%;
+  animation: golden-sparkle-twinkle 1.8s ease-in-out 0.6s infinite;
+}
+
+@utility golden-tile-sparkle--3 {
+  top: 50%;
+  left: 6%;
+  animation: golden-sparkle-twinkle 1.8s ease-in-out 1.2s infinite;
+}
+
+@utility letter-tile-gradient-cream {
+  /* Letter Tile Gradient (Cream variant) - For onboarding grids */
+  background:
+      /* Subtle inner glow for depth */
+    radial-gradient(
+      ellipse 70% 50% at 35% 30%,
+      rgba(255, 255, 253, 0.9) 0%,
+      rgba(255, 255, 253, 0.35) 35%,
+      transparent 60%
+    ),
+    /* Soft edge highlight */
+      linear-gradient(145deg, rgba(255, 255, 255, 0.5) 0%, transparent 25%),
+    /* Main gradient - warm cream with subtle depth */
+      linear-gradient(
+        165deg,
+        #fffef8 0%,
+        #fcfbf4 25%,
+        #f8f7f0 50%,
+        #f4f2ea 75%,
+        #f0ede4 100%
+      );
+}
+
+@utility texture-halftone {
+  /* Texture Overlays */
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: var(--halftone-pattern);
+    pointer-events: none;
+    z-index: 1;
+    border-radius: inherit;
+  }
+}
+
+@utility texture-halftone-lg {
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: var(--halftone-pattern-lg);
+    pointer-events: none;
+    z-index: 1;
+    border-radius: inherit;
+  }
+}
+
+@utility texture-halftone-comic {
+  /* Comic-style halftone - subtle dots like in comic books */
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(
+      circle,
+      rgb(var(--neo-black)) 1px,
+      transparent 1px
+    );
+    background-size: 12px 12px;
+    opacity: 0.03;
+    pointer-events: none;
+    z-index: 1;
+    border-radius: inherit;
+  }
+}
+
+@utility texture-halftone-comic-light {
+  /* Comic halftone variant for light backgrounds */
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(
+      circle,
+      rgb(var(--neo-black)) 1px,
+      transparent 1px
+    );
+    background-size: 12px 12px;
+    opacity: 0.025;
+    pointer-events: none;
+    z-index: 1;
+    border-radius: inherit;
+  }
+}
+
+@utility texture-halftone-comic-dense {
+  /* Dense comic halftone for featured/hero sections */
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(
+      circle,
+      rgb(var(--neo-black)) 1.5px,
+      transparent 1.5px
+    );
+    background-size: 10px 10px;
+    opacity: 0.04;
+    pointer-events: none;
+    z-index: 1;
+    border-radius: inherit;
+  }
+}
+
+@utility neo-tilt-left {
+  /* Neo-Brutalist Tilt Classes */
+  transform: rotate(-2deg);
+}
+
+@utility neo-tilt-right {
+  transform: rotate(2deg);
+}
+
+@utility neo-tilt-slight-left {
+  transform: rotate(-1deg);
+}
+
+@utility neo-tilt-slight-right {
+  transform: rotate(1deg);
+}
+
+@utility neo-title {
+  /* Neo-Brutalist Typography */
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  -webkit-text-stroke: 2px rgb(var(--neo-black));
+  text-shadow: 4px 4px 0px rgb(var(--neo-black));
+
+  /* Hebrew titles: use Heebo for clean feel, no stroke/shadow */
+  [dir='rtl'] & {
+    font-family: var(--font-heebo-hebrew), var(--font-rubik), Rubik, sans-serif;
+    -webkit-text-stroke: 0;
+    text-shadow: none;
+    letter-spacing: 0;
+  }
+}
+
+@utility neo-title-sm {
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  -webkit-text-stroke: 1px rgb(var(--neo-black));
+  text-shadow: 2px 2px 0px rgb(var(--neo-black));
+
+  [dir='rtl'] & {
+    font-family: var(--font-heebo-hebrew), var(--font-rubik), Rubik, sans-serif;
+    -webkit-text-stroke: 0;
+    text-shadow: none;
+    letter-spacing: 0;
+  }
+}
+
+@utility btn-neo {
+  /* Neo-Brutalist Button Base */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  border: var(--border-neo) solid rgb(var(--neo-black));
+  box-shadow: var(--shadow-md);
+  transition:
+    transform var(--duration-snap) var(--ease-snap),
+    box-shadow var(--duration-snap) var(--ease-snap);
+  cursor: pointer;
+
+  &:hover {
+    transform: translate(-1px, -1px);
+    box-shadow: 5px 5px 0px rgb(var(--neo-black));
+  }
+
+  &:active {
+    transform: translate(2px, 2px);
+    box-shadow: var(--shadow-pressed);
+  }
+
+  /* RTL Button Press */
+  [dir='rtl'] &:hover {
+    transform: translate(1px, -1px);
+    box-shadow: -5px 5px 0px rgb(var(--neo-black));
+  }
+
+  [dir='rtl'] &:active {
+    transform: translate(-2px, 2px);
+    box-shadow: -2px 2px 0px rgb(var(--neo-black));
+  }
+}
+
+@utility card-neo {
+  /* Neo-Brutalist Card */
+  background: var(--neo-cream);
+  color: rgb(var(--neo-black));
+  border: var(--border-neo-thick) solid rgb(var(--neo-black));
+  box-shadow: var(--shadow-lg);
+  border-radius: var(--radius-lg);
+}
+
+@utility speech-bubble {
+  /* Speech Bubble Styling */
+  position: relative;
+  background: var(--neo-cream);
+  color: rgb(var(--neo-black));
+  border: var(--border-neo) solid rgb(var(--neo-black));
+  box-shadow: var(--shadow-md);
+  border-radius: var(--radius-lg);
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -16px;
+    left: 24px;
+    width: 0;
+    height: 0;
+    border-left: 12px solid transparent;
+    border-right: 12px solid transparent;
+    border-top: 16px solid rgb(var(--neo-black));
+  }
+
+  &::before {
+    content: '';
+    position: absolute;
+    bottom: -12px;
+    left: 27px;
+    width: 0;
+    height: 0;
+    border-left: 9px solid transparent;
+    border-right: 9px solid transparent;
+    border-top: 12px solid var(--neo-cream);
+    z-index: 1;
+  }
+}
+
+@utility game-board-frame {
+  /* Game Board Frame (Neo-Brutalist design with hard shadows) */
+  position: relative;
+  background: var(--neo-cream);
+  /* Neo-Brutalist: thick black border */
+  border: 4px solid rgb(var(--neo-black));
+  /* Neo-Brutalist: hard shadow (NO blur) */
+  box-shadow: 6px 6px 0px rgb(var(--neo-black));
+  border-radius: var(--radius-lg);
+  /* No rotation - keep grid perfectly straight */
+  /* Padding for breathing room around the grid */
+  padding: 12px;
+  /* Simplified sizing using vmin to prevent layout shift on orientation change */
+  /* Max height leaves room for timer, stats, and word forming area above grid */
+  /* CRITICAL: Use single CSS variable for BOTH width AND height to guarantee square grid */
+  /* This ensures cells maintain 1:1 aspect ratio regardless of flex container constraints */
+  --game-chrome-height: 280px;
+  --board-size: min(
+    80vmin,
+    calc(100vw - 32px),
+    calc(100dvh - var(--game-chrome-height))
+  );
+  width: var(--board-size);
+  height: var(--board-size);
+  max-height: var(--board-size);
+  aspect-ratio: 1 / 1;
+  /* Center within parent */
+  margin: 0 auto;
+  /* Respect flex container — viewport calc is a starting estimate,
+       but the actual container may be smaller (e.g. WordHunt has extra chrome).
+       This ensures the grid never overflows its allocated flex space. */
+  max-height: min(var(--board-size), 100%);
+  max-width: min(var(--board-size), 100%);
+
+  /* On desktop screens, size grid to fill available space between sidebars */
+  /* Sidebars are ~224-288px each, gaps ~24px, so subtract ~500-600px for both + gaps */
+  /* Vertical: timer(64px) + word-forming(40px) + input(50px) + gaps ≈ 200px */
+  @media (min-width: 769px) {
+    --game-chrome-desktop: clamp(180px, 28dvh, 260px);
+    --board-size: min(
+      55vmin,
+      calc(100vw - 500px),
+      calc(100dvh - var(--game-chrome-desktop)),
+      560px
+    );
+    width: var(--board-size);
+    height: var(--board-size);
+    max-height: min(var(--board-size), 100%);
+    padding: 14px;
+  }
+
+  /* Large desktop screens - more room, larger grid */
+  @media (min-width: 1280px) {
+    --game-chrome-desktop: clamp(180px, 26dvh, 240px);
+    --board-size: min(
+      58vmin,
+      calc(100vw - 560px),
+      calc(100dvh - var(--game-chrome-desktop)),
+      580px
+    );
+    width: var(--board-size);
+    height: var(--board-size);
+    max-height: min(var(--board-size), 100%);
+  }
+
+  /* Extra large desktop screens - maximize grid utilization */
+  @media (min-width: 1536px) {
+    --game-chrome-desktop: clamp(180px, 24dvh, 230px);
+    --board-size: min(
+      62vmin,
+      calc(100vw - 620px),
+      calc(100dvh - var(--game-chrome-desktop)),
+      620px
+    );
+    width: var(--board-size);
+    height: var(--board-size);
+    max-height: min(var(--board-size), 100%);
+  }
+
+  /* On smaller screens, maximize board size with minimal margins */
+  @media (max-width: 768px) {
+    padding: 8px;
+    /* Single variable for BOTH width AND height — guarantees square grid on mobile */
+    /* Pick the smaller of: available width, or available height minus UI chrome */
+    --board-size: min(
+      calc(100dvw - 32px),
+      calc(
+        100dvh - var(--game-chrome-height, 280px) -
+          env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)
+      )
+    );
+    width: var(--board-size);
+    height: var(--board-size);
+    max-width: min(var(--board-size), 100%);
+    max-height: min(var(--board-size), 100%);
+    min-height: 180px;
+    min-width: 180px;
+  }
+
+  /* Note: Removed position: relative override that was breaking absolute-positioned grid children */
+  & > * {
+    z-index: 10;
+  }
+
+  /* Blast mode: grid must respect parent container, not viewport */
+  .blast-game & {
+    --board-size: 100%;
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    padding: 6px;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  /* RTL-aware hard shadow for game board frame */
+  [dir='rtl'] & {
+    box-shadow: -6px 6px 0px rgb(var(--neo-black));
+  }
+}
+
+@utility blast-game {
+  /* Blast mode: grid must respect parent container, not viewport */
+  & .game-board-frame {
+    --board-size: 100%;
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    padding: 6px;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  /* Pause idle tile animations during cascade to reduce GPU thrash.
+     Cascade overlay (anime.js) + idle CSS animations fighting = repaint storm.
+     This single toggle eliminates 10+ concurrent animations during cascades. */
+  &[data-cascade='active'] .blast-tile-gold {
+    animation-play-state: paused;
+  }
+  &[data-cascade='active'] .blast-tile-bomb {
+    animation-play-state: paused;
+  }
+  &[data-cascade='active'] .blast-tile-lightning {
+    animation-play-state: paused;
+  }
+  &[data-cascade='active'] .blast-tile-prism {
+    animation-play-state: paused;
+  }
+  &[data-cascade='active'] .blast-tile-gem {
+    animation-play-state: paused;
+  }
+  &[data-cascade='active'] .blast-tile-rainbow {
+    animation-play-state: paused;
+  }
+  &[data-cascade='active'] .blast-tile-ice {
+    animation-play-state: paused;
+  }
+  &[data-cascade='active'] .blast-tile-wildcard {
+    animation-play-state: paused;
+  }
+  &[data-cascade='active'] .blast-tile-magnet {
+    animation-play-state: paused;
+  }
+  &[data-cascade='active'] .blast-tile-frozen {
+    animation-play-state: paused;
+  }
+  &[data-cascade='active'] .blast-tile-mirror {
+    animation-play-state: paused;
+  }
+  &[data-cascade='active'] .blast-tile-silver {
+    animation-play-state: paused;
+  }
+  &[data-cascade='active'] .blast-tile-diamond {
+    animation-play-state: paused;
+  }
+  &[data-cascade='active'] .blast-tile-weakened {
+    animation-play-state: paused;
+  }
+  &[data-cascade='active'] .blast-tile-select-pop {
+    animation-play-state: paused;
+  }
+}
+
+@utility blast-heartbeat {
+  /* Blast HUD — heartbeat urgency for low moves */
+  animation: blast-heartbeat 0.8s ease-in-out infinite;
+}
+
+@utility blast-board {
+  /* Blast board — hide base grid visuals so BlastTile overlay is the sole renderer */
+  & [role='grid'] {
+    background: transparent !important;
+    background-color: transparent !important;
+    border-color: transparent !important;
+  }
+  & [role='gridcell'] {
+    color: transparent !important;
+    background: transparent !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+  }
+
+  /* Blast tile depth — specular highlight + inset shadow for 3D appearance */
+  & button {
+    position: relative;
+    overflow: hidden;
+  }
+  & button::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.25) 0%,
+      rgba(255, 255, 255, 0.08) 40%,
+      transparent 60%
+    );
+    pointer-events: none;
+    z-index: 1;
+    border-radius: inherit;
+  }
+  & button::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    box-shadow:
+      inset 0 -2px 4px rgba(0, 0, 0, 0.25),
+      inset 0 1px 2px rgba(255, 255, 255, 0.1);
+    pointer-events: none;
+    z-index: 1;
+    border-radius: inherit;
+  }
+
+  /* ── Tile press — reduce 3D shadow on active press for tactile push-in feel ── */
+  & button:active {
+    box-shadow:
+      inset 0 2px 4px rgba(255, 255, 255, 0.3),
+      inset 0 -1px 2px rgba(0, 0, 0, 0.1),
+      0 1px 0 rgba(0, 0, 0, 0.3) !important;
+    transition:
+      box-shadow 50ms ease-out,
+      transform 50ms ease-out;
+  }
+}
+
+@utility blast-tile-gold {
+  /* Blast special tile animations — neon arcade + chunky neo-brutalist */
+  animation: blast-shimmer 2.5s ease-in-out infinite;
+  background-size: 200% 200% !important;
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+
+  /* Pause idle tile animations during cascade to reduce GPU thrash.
+     Cascade overlay (anime.js) + idle CSS animations fighting = repaint storm.
+     This single toggle eliminates 10+ concurrent animations during cascades. */
+  .blast-game[data-cascade='active'] & {
+    animation-play-state: paused;
+  }
+}
+
+@utility blast-tile-bomb {
+  animation: blast-pulse 2s ease-in-out infinite;
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+
+  .blast-game[data-cascade='active'] & {
+    animation-play-state: paused;
+  }
+}
+
+@utility blast-tile-rainbow {
+  animation: blast-rainbow 5s linear infinite;
+  background-size: 300% 300% !important;
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+
+  .blast-game[data-cascade='active'] & {
+    animation-play-state: paused;
+  }
+}
+
+@utility blast-tile-ice {
+  /* ── Glow pseudo-element base ──
+   * Performance: static box-shadow on ::after, animate only opacity.
+   * This avoids box-shadow repaint every frame — GPU composites opacity instead.
+   */
+  overflow: visible;
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    z-index: 0;
+    will-change: opacity;
+  }
+
+  /* ── Ice ── crystalline frost breathing with subtle scale */
+  animation: blast-ice-shimmer-main 3s ease-in-out infinite;
+  &::after {
+    box-shadow:
+      inset 0 0 28px rgba(150, 220, 255, 0.55),
+      0 0 18px rgba(180, 230, 255, 0.45),
+      0 0 32px rgba(100, 200, 255, 0.25);
+    animation: blast-glow-pulse 3s ease-in-out infinite;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+
+  .blast-game[data-cascade='active'] & {
+    animation-play-state: paused;
+  }
+}
+
+@utility blast-tile-wildcard {
+  overflow: visible;
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    z-index: 0;
+    will-change: opacity;
+  }
+
+  /* ── Wildcard ── chameleon color cycling with gentle breathe */
+  animation: blast-wildcard-pulse-main 4s ease-in-out infinite;
+  &::after {
+    box-shadow:
+      inset 0 0 24px rgba(255, 255, 255, 0.4),
+      0 0 20px rgba(200, 200, 255, 0.35),
+      0 0 32px rgba(180, 100, 255, 0.15);
+    animation: blast-glow-pulse 4s ease-in-out infinite;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+
+  .blast-game[data-cascade='active'] & {
+    animation-play-state: paused;
+  }
+}
+
+@utility blast-tile-lightning {
+  overflow: visible;
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    z-index: 0;
+    will-change: opacity;
+  }
+
+  /* ── Lightning ── electric arc flicker with jitter */
+  animation: blast-lightning-flicker-main 2s ease-in-out infinite;
+  &::after {
+    box-shadow:
+      inset 0 0 24px rgba(255, 255, 0, 0.5),
+      0 0 18px rgba(0, 191, 255, 0.4),
+      0 0 36px rgba(255, 255, 100, 0.2);
+    animation: blast-glow-flicker 2s ease-in-out infinite;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+
+  .blast-game[data-cascade='active'] & {
+    animation-play-state: paused;
+  }
+}
+
+@utility blast-tile-magnet {
+  overflow: visible;
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    z-index: 0;
+    will-change: opacity;
+  }
+
+  /* ── Magnet ── swirling magnetic field with pull/push pulse */
+  animation: blast-magnet-rotate-main 3.5s ease-in-out infinite;
+  background-size: 200% 200% !important;
+  &::after {
+    box-shadow:
+      inset 0 0 24px rgba(139, 0, 255, 0.5),
+      0 0 20px rgba(255, 0, 64, 0.4),
+      0 0 32px rgba(180, 0, 180, 0.2);
+    animation: blast-magnet-field 3.5s ease-in-out infinite;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+
+  .blast-game[data-cascade='active'] & {
+    animation-play-state: paused;
+  }
+}
+
+@utility blast-tile-prism {
+  overflow: visible;
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    z-index: 0;
+    will-change: opacity;
+  }
+
+  /* ── Prism ── rainbow refraction with pulsing scale */
+  animation: blast-prism-spectrum-main 4s linear infinite;
+  &::after {
+    box-shadow:
+      inset 0 0 22px rgba(255, 255, 255, 0.4),
+      0 0 18px rgba(168, 85, 247, 0.35),
+      0 0 32px rgba(255, 100, 200, 0.2);
+    animation: blast-prism-glow 4s linear infinite;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+
+  .blast-game[data-cascade='active'] & {
+    animation-play-state: paused;
+  }
+}
+
+@utility blast-tile-gem {
+  overflow: visible;
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    z-index: 0;
+    will-change: opacity;
+  }
+
+  /* ── Gem ── emerald facet sparkle with rhythmic pulse */
+  animation: blast-gem-sparkle-main 3s ease-in-out infinite;
+  &::after {
+    box-shadow:
+      inset 0 0 26px rgba(80, 200, 120, 0.55),
+      0 0 20px rgba(0, 255, 120, 0.4),
+      0 0 32px rgba(0, 255, 100, 0.2);
+    animation: blast-glow-pulse 3s ease-in-out infinite;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+
+  .blast-game[data-cascade='active'] & {
+    animation-play-state: paused;
+  }
+}
+
+@utility blast-tile-frozen {
+  overflow: visible;
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    z-index: 0;
+    will-change: opacity;
+  }
+
+  /* ── Frozen ── deep-freeze slow throb with icy desaturation waves */
+  animation: blast-frozen-glow-main 5s ease-in-out infinite;
+  &::after {
+    box-shadow:
+      inset 0 0 30px rgba(180, 220, 255, 0.5),
+      0 0 20px rgba(200, 230, 255, 0.4),
+      0 0 36px rgba(150, 200, 255, 0.2);
+    animation: blast-frozen-glow-after 5s ease-in-out infinite;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+
+  .blast-game[data-cascade='active'] & {
+    animation-play-state: paused;
+  }
+}
+
+@utility blast-tile-mirror {
+  overflow: visible;
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    z-index: 0;
+    will-change: opacity;
+  }
+
+  /* ── Mirror ── reflective sweep with sharp glint flashes */
+  animation: blast-mirror-reflect-main 3.5s ease-in-out infinite;
+  background-size: 200% 200% !important;
+  &::after {
+    box-shadow:
+      inset 0 0 24px rgba(220, 220, 255, 0.5),
+      0 0 18px rgba(136, 136, 255, 0.4);
+    animation: blast-glow-pulse 3.5s ease-in-out infinite;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+
+  .blast-game[data-cascade='active'] & {
+    animation-play-state: paused;
+  }
+}
+
+@utility blast-tile-silver {
+  overflow: visible;
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    z-index: 0;
+    will-change: opacity;
+  }
+
+  /* ── Silver ── metallic sheen sweep with glint highlights */
+  animation: blast-silver-sheen-main 3.5s ease-in-out infinite;
+  background-size: 200% 200% !important;
+  &::after {
+    box-shadow:
+      inset 0 0 22px rgba(240, 240, 240, 0.5),
+      0 0 14px rgba(200, 200, 200, 0.35);
+    animation: blast-glow-pulse 3.5s ease-in-out infinite;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+
+  .blast-game[data-cascade='active'] & {
+    animation-play-state: paused;
+  }
+}
+
+@utility blast-tile-diamond {
+  overflow: visible;
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    z-index: 0;
+    will-change: opacity;
+  }
+
+  /* ── Diamond ── brilliant facet flashes with staggered double-spark */
+  animation: blast-diamond-flash-main 3s ease-in-out infinite;
+  &::after {
+    box-shadow:
+      inset 0 0 28px rgba(0, 206, 209, 0.55),
+      0 0 22px rgba(185, 242, 255, 0.5),
+      0 0 36px rgba(0, 255, 255, 0.25);
+    animation: blast-diamond-glow 3s ease-in-out infinite;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+
+  .blast-game[data-cascade='active'] & {
+    animation-play-state: paused;
+  }
+}
+
+@utility blast-tile-countdown {
+  overflow: visible;
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    z-index: 0;
+    will-change: opacity;
+  }
+
+  /* ── Countdown ── urgent ticking pulse, red danger glow */
+  animation: blast-countdown-tick 1s ease-in-out infinite;
+  &::after {
+    box-shadow:
+      inset 0 0 20px rgba(255, 50, 50, 0.4),
+      0 0 14px rgba(255, 30, 30, 0.35),
+      0 0 28px rgba(200, 0, 0, 0.2);
+    animation: blast-countdown-glow 1s ease-in-out infinite;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+@utility blast-tile-virus {
+  overflow: visible;
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    z-index: 0;
+    will-change: opacity;
+  }
+
+  /* ── Virus ── sickly green throb with organic wobble */
+  animation: blast-virus-throb 2.2s ease-in-out infinite;
+  &::after {
+    box-shadow:
+      inset 0 0 22px rgba(80, 200, 30, 0.45),
+      0 0 16px rgba(60, 180, 20, 0.35),
+      0 0 30px rgba(40, 160, 0, 0.2);
+    animation: blast-glow-pulse 2.2s ease-in-out infinite;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+@utility blast-tile-portal {
+  overflow: visible;
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    z-index: 0;
+    will-change: opacity;
+  }
+
+  /* ── Portal ── swirling vortex with hue rotation */
+  animation: blast-portal-swirl 3s linear infinite;
+  &::after {
+    box-shadow:
+      inset 0 0 24px rgba(160, 80, 255, 0.5),
+      0 0 18px rgba(130, 60, 220, 0.4),
+      0 0 32px rgba(100, 40, 200, 0.25);
+    animation: blast-portal-glow 3s ease-in-out infinite;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+@utility blast-tile-catalyst {
+  overflow: visible;
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    z-index: 0;
+    will-change: opacity;
+  }
+
+  /* ── Catalyst ── warm amber glow with energy radiation */
+  animation: blast-catalyst-radiate 2.8s ease-in-out infinite;
+  &::after {
+    box-shadow:
+      inset 0 0 20px rgba(255, 165, 0, 0.45),
+      0 0 16px rgba(255, 140, 0, 0.35),
+      0 0 28px rgba(255, 100, 0, 0.2);
+    animation: blast-catalyst-glow 2.8s ease-in-out infinite;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+@utility blast-tile-gem-glow-3 {
+  /* ── Gem glow stages — progressive amber→gold→white as hits deplete ── */
+  box-shadow:
+    0 0 8px rgba(255, 191, 0, 0.3),
+    inset 0 0 6px rgba(255, 191, 0, 0.15);
+}
+
+@utility blast-tile-gem-glow-2 {
+  box-shadow:
+    0 0 14px rgba(255, 215, 0, 0.5),
+    inset 0 0 10px rgba(255, 215, 0, 0.25);
+  animation: blast-gem-glow-pulse 1.2s ease-in-out infinite;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+@utility blast-tile-gem-glow-1 {
+  box-shadow:
+    0 0 20px rgba(255, 255, 200, 0.7),
+    inset 0 0 14px rgba(255, 255, 255, 0.35);
+  animation: blast-gem-glow-pulse 0.7s ease-in-out infinite;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+@utility blast-tile-gem-golden-flash {
+  /* ── Gem golden flash on final clear ── */
+  animation: blast-gem-golden-flash 350ms ease-out forwards;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+@utility blast-tile-frozen-cracked {
+  /* ── Frozen cracked — white crack lines via pseudo-element ── */
+  position: relative;
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    background:
+      linear-gradient(
+        135deg,
+        transparent 30%,
+        rgba(255, 255, 255, 0.6) 31%,
+        transparent 32%
+      ),
+      linear-gradient(
+        45deg,
+        transparent 55%,
+        rgba(255, 255, 255, 0.5) 56%,
+        transparent 57%
+      ),
+      linear-gradient(
+        170deg,
+        transparent 40%,
+        rgba(200, 230, 255, 0.4) 41%,
+        transparent 42%
+      );
+    pointer-events: none;
+    animation: blast-frozen-crack-appear 200ms ease-out forwards;
+  }
+}
+
+@utility blast-tile-frozen-emerge {
+  /* ── Frozen emerge — burst outward when frozen tile clears ── */
+  animation: blast-frozen-emerge 400ms ease-out forwards;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+@utility blast-tile-ice-shimmer {
+  /* ── Ice shimmer — traveling highlight sheen ── */
+  position: relative;
+  overflow: hidden;
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    background: linear-gradient(
+      110deg,
+      transparent 25%,
+      rgba(200, 240, 255, 0.25) 37%,
+      rgba(255, 255, 255, 0.35) 50%,
+      rgba(200, 240, 255, 0.25) 63%,
+      transparent 75%
+    );
+    background-size: 250% 100%;
+    animation: blast-ice-shimmer 3s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    &::before {
+      animation: none;
+    }
+  }
+}
+
+@utility blast-drag-selected {
+  /* ── Shared glow pulse: opacity-only for GPU compositing ── */
+
+  /* ── Drag selection — GPU-composited class toggled via DOM during drag ── */
+  outline: 2px solid #bfff00;
+  outline-offset: 1px;
+  box-shadow: 0 0 12px rgba(191, 255, 0, 0.6);
+  transform: scale(1.06);
+  z-index: 5;
+}
+
+@utility blast-tile-select-pop {
+  /* Selection pop — brief 100ms bounce when tile is first selected */
+  animation: blast-select-pop 100ms cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* Selection pop — brief 100ms bounce when tile is first selected */
+  animation: blast-select-pop 100ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+
+  .blast-game[data-cascade='active'] & {
+    animation-play-state: paused;
+  }
+}
+
+@utility blast-tile-prism-flash {
+  /* ── Lightning flash — white burst before vertical stretch ── */
+
+  /* ── Prism rainbow flash — rapid hue cycling before cross clear ── */
+  animation: blast-prism-flash 250ms linear forwards;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+
+  /* ── Prism rainbow flash — rapid hue cycling before cross clear ── */
+  animation: blast-prism-flash 250ms linear forwards;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+@utility blast-tile-selected {
+  /* Selection glow when dragging across special tiles — single pop, not infinite pulse */
+  box-shadow:
+    0 0 10px rgba(255, 255, 255, 0.5),
+    0 0 20px rgba(0, 255, 255, 0.25);
+  outline: 2px solid rgba(255, 255, 255, 0.85);
+  outline-offset: -1px;
+  transform: scale(1.05);
+  z-index: 2;
+  transition:
+    transform 0.1s ease-out,
+    box-shadow 0.1s ease-out;
+}
+
+@utility blast-tile-objective {
+  /* Objective tile highlight — subtle pulsing outline to guide strategy */
+  animation: blast-tile-objective-pulse 2s ease-in-out infinite;
+  outline: 2px solid rgba(255, 225, 53, 0.5);
+  outline-offset: -1px;
+}
+
+@utility blast-tile-weakened {
+  /* Score popup tier label — pops up and fades */
+
+  /* Score popup burst ring — expands and fades for exceptional words */
+
+  /* Accessibility: disable all blast tile idle animations for users who prefer reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+
+  /* Weakened (cracked) tile pulse — moved from Framer Motion JS to CSS for GPU compositing */
+  animation: blast-weakened-pulse 1s ease-in-out infinite;
+
+  .blast-game[data-cascade='active'] & {
+    animation-play-state: paused;
+  }
+}
+
+@utility blast-combo-preview {
+  /* ── Combo preview — pulsing glow when 2+ combo tiles are in the current word ── */
+  animation: blast-combo-glow 0.8s ease-in-out infinite !important;
+}
+
+@utility blast-tile-cascade-highlight {
+  /* ── Cascade highlight — glowing pulse on tiles about to be cleared by chain reaction ── */
+  animation: blast-cascade-glow 0.6s ease-in-out infinite !important;
+  z-index: 30;
+}
+
+@utility blast-rare-letter {
+  /* ── Rare letter glow — Q, Z, X, J shimmer to highlight high-value letters ── */
+  text-shadow:
+    0 0 8px rgba(255, 215, 0, 0.6),
+    0 0 16px rgba(255, 200, 0, 0.3);
+  & .relative.z-10 {
+    animation: blast-rare-shimmer 2s ease-in-out infinite;
+  }
+}
+
+@utility relative {
+  .blast-rare-letter &.z-10 {
+    animation: blast-rare-shimmer 2s ease-in-out infinite;
+  }
+}
+
+@utility z-10 {
+  .blast-rare-letter &.relative {
+    animation: blast-rare-shimmer 2s ease-in-out infinite;
+  }
+}
+
+@utility blast-tile-frost-shatter {
+  /* ── Frost shatter reveal — ice cracks apart to show inner special ── */
+  animation: blast-frost-shatter 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)
+    forwards;
+}
+
+@utility blast-tile-earned {
+  /* ── Earned tile birth — pop+shimmer when a word creates a new special ── */
+  animation: blast-tile-birth 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@utility blast-tile-virus-spread {
+  /* ── Virus spread — green toxic pulse when infection spreads ── */
+  animation: blast-virus-spread 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)
+    forwards;
+}
+
+@utility blast-tile-locked {
+  /* ── Locked tile state — ice/frozen tiles that haven't been thawed ── */
+  opacity: 0.6;
+  filter: saturate(0.35) brightness(0.75);
+  cursor: not-allowed;
+  animation: blast-locked-frost 3s ease-in-out infinite;
+  outline: 2px dashed rgba(150, 200, 255, 0.35);
+  outline-offset: -2px;
+}
+
+@utility blast-lock-hint {
+  /* Locked tile adjacency hint — radiating rings */
+  animation: blast-lock-hint-pulse 2s ease-in-out infinite;
+}
+
+@utility blast-tile-cracked {
+  /* ── Multi-hit crack progression — visual damage states ── */
+
+  /* Cracked: tile has taken damage, shows hairline fractures + faster animation */
+  animation-duration: 1.2s !important;
+  filter: contrast(1.1) brightness(0.92);
+  &::before {
+    background:
+      linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, transparent 40%),
+      linear-gradient(
+        45deg,
+        transparent 30%,
+        rgba(0, 0, 0, 0.15) 31%,
+        transparent 32%
+      ),
+      linear-gradient(
+        -30deg,
+        transparent 55%,
+        rgba(0, 0, 0, 0.12) 56%,
+        transparent 57%
+      ) !important;
+  }
+}
+
+@utility blast-tile-critical {
+  /* Critical: one hit from breaking — intense pulsing glow + visible fracture lines */
+  animation-duration: 0.8s !important;
+  filter: contrast(1.15) brightness(0.85) saturate(1.2);
+  &::before {
+    background:
+      linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, transparent 35%),
+      linear-gradient(
+        60deg,
+        transparent 20%,
+        rgba(0, 0, 0, 0.2) 21%,
+        transparent 22%
+      ),
+      linear-gradient(
+        -45deg,
+        transparent 35%,
+        rgba(0, 0, 0, 0.18) 36%,
+        transparent 37%
+      ),
+      linear-gradient(
+        120deg,
+        transparent 60%,
+        rgba(0, 0, 0, 0.15) 61%,
+        transparent 62%
+      ) !important;
+  }
+}
+
+@utility blast-grid-frame {
+  /* Blast grid frame styling */
+  border: 4px solid rgb(var(--neo-black));
+  box-shadow: 6px 6px 0px rgb(var(--neo-black));
+  border-radius: 8px;
+  padding: 3px;
+  background: rgba(26, 26, 46, 0.6);
+
+  [dir='rtl'] & {
+    box-shadow: -6px 6px 0px rgb(var(--neo-black));
+  }
+}
+
+@utility clipboard-clip {
+  /* Clipboard clip at top */
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 64px;
+  height: 24px;
+  background: linear-gradient(to bottom, #c0c0c0, #a0a0a0);
+  border: 3px solid rgb(var(--neo-black));
+  border-radius: 4px 4px 0 0;
+  box-shadow: 2px 2px 0px rgb(var(--neo-black));
+  z-index: 20;
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 44px;
+    height: 6px;
+    background: #909090;
+    border: 2px solid rgb(var(--neo-black));
+    border-top: none;
+    border-radius: 0 0 2px 2px;
+  }
+}
+
+@utility drop-shadow-neo {
+  /* ====================================
+     NEO-BRUTALIST DROP SHADOW UTILITIES
+     ==================================== */
+
+  /* Drop shadow filters for icons and elements */
+  filter: drop-shadow(2px 2px 0px rgb(var(--neo-black)));
+
+  /* RTL-aware drop shadows */
+  [dir='rtl'] & {
+    filter: drop-shadow(-2px 2px 0px rgb(var(--neo-black)));
+  }
+}
+
+@utility drop-shadow-neo-sm {
+  filter: drop-shadow(1px 1px 0px rgb(var(--neo-black)));
+
+  [dir='rtl'] & {
+    filter: drop-shadow(-1px 1px 0px rgb(var(--neo-black)));
+  }
+}
+
+@utility drop-shadow-neo-lg {
+  filter: drop-shadow(3px 3px 0px rgb(var(--neo-black)));
+
+  [dir='rtl'] & {
+    filter: drop-shadow(-3px 3px 0px rgb(var(--neo-black)));
+  }
+}
+
+@utility combo-glow-rainbow {
+  /* Combo glow effects */
+  filter: drop-shadow(0 0 30px rgba(255, 255, 255, 1));
+}
+
+@utility combo-glow-normal {
+  filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.8));
+}
+
+@utility combo-glow-subtle {
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.5));
+}
+
+@utility cq-container {
+  /* ====================================
+     CONTAINER QUERY UTILITIES
+     ==================================== */
+
+  /* Container type setup */
+  container-type: inline-size;
+}
+
+@utility cq-container-size {
+  container-type: size;
+}
+
+@utility cq-p-responsive {
+  /* Container-relative responsive padding - scales with container width */
+  padding: clamp(0.75rem, 4cqw, 2rem);
+}
+
+@utility cq-p-responsive-lg {
+  /* Larger container-relative padding for desktop emphasis */
+  padding: clamp(1rem, 5cqw, 2.5rem);
+}
+
+@utility cq-gap-responsive {
+  /* Container-relative responsive gap */
+  gap: clamp(0.5rem, 2.5cqw, 1.5rem);
+}
+
+@utility cq-text-responsive {
+  /* Container-relative responsive text */
+  font-size: clamp(0.875rem, 4cqw, 1.25rem);
+}
+
+@utility cq-text-lg-responsive {
+  /* Container-relative responsive text - larger variant */
+  font-size: clamp(1.125rem, 5cqw, 1.875rem);
+}
+
+@utility cq-icon-responsive {
+  /* Container-relative responsive icon sizing */
+  width: clamp(2rem, 10cqw, 4rem);
+  height: clamp(2rem, 10cqw, 4rem);
+}
+
+@utility cq-p-tight {
+  /* Additional container query padding utilities for component consolidation */
+  padding: clamp(0.5rem, 2cqw, 1rem);
+}
+
+@utility cq-p-generous {
+  padding: clamp(1.5rem, 6cqw, 3rem);
+}
+
+@utility cq-px-responsive {
+  /* Directional container padding for complex layouts */
+  padding-left: clamp(0.75rem, 4cqw, 2rem);
+  padding-right: clamp(0.75rem, 4cqw, 2rem);
+}
+
+@utility cq-py-responsive {
+  padding-top: clamp(0.75rem, 4cqw, 2rem);
+  padding-bottom: clamp(0.75rem, 4cqw, 2rem);
+}
+
+@utility scrollable-area {
+  /* ====================================
+     TOUCH SCROLL UTILITIES
+     ==================================== */
+
+  /* Touch-optimized vertical scrolling */
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  overscroll-behavior: contain;
+}
+
+@utility scroll-if-needed {
+  /* Conditional scrolling with touch optimization */
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+@utility neo-card {
+  /* ====================================
+     NEO-BRUTALIST COMPONENT CLASSES
+     ==================================== */
+
+  /* Neo-Brutalist Card - use instead of repeated border patterns */
+  @apply bg-neo-cream border-4 border-neo-black rounded-neo-lg shadow-hard-lg;
+}
+
+@utility neo-card-sm {
+  @apply bg-neo-cream border-3 border-neo-black rounded-neo shadow-hard;
+}
+
+@utility neo-card-dark {
+  @apply bg-neo-gray border-4 border-neo-black rounded-neo-lg shadow-hard-lg text-neo-white;
+}
+
+@utility neo-card-hover {
+  @apply neo-card hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard-xl transition-all duration-200;
+}
+
+@utility btn-neo-primary {
+  /* Neo-Brutalist Button Variants */
+  @apply bg-neo-yellow text-neo-black border-3 border-neo-black rounded-neo shadow-hard font-bold uppercase tracking-wide;
+  @apply hover:-translate-x-px hover:-translate-y-px hover:shadow-hard-lg;
+  @apply active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed;
+  @apply transition-all duration-100;
+}
+
+@utility btn-neo-secondary {
+  @apply bg-neo-pink text-neo-white border-3 border-neo-black rounded-neo shadow-hard font-bold uppercase tracking-wide;
+  @apply hover:-translate-x-px hover:-translate-y-px hover:shadow-hard-lg;
+  @apply active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed;
+  @apply transition-all duration-100;
+}
+
+@utility btn-neo-accent {
+  @apply bg-neo-pink text-neo-white border-3 border-neo-black rounded-neo shadow-hard font-bold uppercase tracking-wide;
+  @apply hover:-translate-x-px hover:-translate-y-px hover:shadow-hard-lg;
+  @apply active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed;
+  @apply transition-all duration-100;
+}
+
+@utility btn-neo-ghost {
+  @apply bg-transparent text-neo-white border-3 border-neo-black rounded-neo shadow-hard font-bold uppercase tracking-wide;
+  @apply hover:bg-neo-navy-light hover:-translate-x-px hover:-translate-y-px hover:shadow-hard-lg;
+  @apply active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed;
+  @apply transition-all duration-100;
+}
+
+@utility badge-neo {
+  /* Neo-Brutalist Badge */
+  @apply px-3 py-1 text-sm font-black uppercase tracking-wide border-3 border-neo-black rounded-md shadow-hard-sm;
+  @apply transition-all duration-100;
+}
+
+@utility badge-neo-yellow {
+  @apply badge-neo bg-neo-yellow text-neo-black;
+}
+
+@utility badge-neo-pink {
+  @apply badge-neo bg-neo-pink text-neo-white;
+}
+
+@utility badge-neo-cyan {
+  @apply badge-neo bg-neo-cyan text-neo-black;
+}
+
+@utility badge-neo-lime {
+  @apply badge-neo bg-neo-lime text-neo-black;
+}
+
+@utility zone-panel-pink {
+  /* Cyber-Hybrid Zone Panels — thick top border accent + hard shadow for desktop game layout */
+  background: rgba(0, 0, 0, 0.2);
+  border-top: 8px solid #ff1493;
+  box-shadow: 4px 4px 0px 0px #000000;
+}
+
+@utility zone-panel-cyan {
+  background: rgba(0, 0, 0, 0.2);
+  border-top: 8px solid #00ffff;
+  box-shadow:
+    4px 4px 0px 0px #000000,
+    0 0 20px rgba(0, 255, 255, 0.15);
+}
+
+@utility zone-panel-lime {
+  background: rgba(0, 0, 0, 0.2);
+  border-top: 8px solid #bfff00;
+  box-shadow: 4px 4px 0px 0px #000000;
+}
+
+@utility neo-panel {
+  /* Neo-Brutalist Panel with tilt */
+  @apply bg-neo-cream border-4 border-neo-black rounded-neo-lg shadow-hard-lg p-4;
+}
+
+@utility neo-panel-tilt-left {
+  @apply neo-panel rotate-[-2deg];
+}
+
+@utility neo-panel-tilt-right {
+  @apply neo-panel rotate-[2deg];
+}
+
+@utility neo-panel-tilt-slight-left {
+  @apply neo-panel rotate-[-1deg];
+}
+
+@utility neo-panel-tilt-slight-right {
+  @apply neo-panel rotate-[1deg];
+}
+
+@utility leaderboard-row {
+  /* Leaderboard styling */
+  @apply py-3 px-4 border-b-4 border-neo-black bg-neo-pink;
+}
+
+@utility leaderboard-title {
+  @apply flex items-center gap-2 text-neo-cream text-base uppercase tracking-widest font-black;
+}
+
+@utility input-neo {
+  /* Input field styling */
+  @apply w-full px-4 py-3 bg-neo-cream text-neo-black border-3 border-neo-black rounded-neo shadow-hard-sm;
+  @apply placeholder:text-neo-gray focus:outline-hidden focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2;
+  @apply transition-all duration-100;
+
+  &:focus {
+    @apply -translate-x-px -translate-y-px shadow-hard;
+  }
+}
+
+@utility custom-scrollbar {
+  /* Custom scrollbar styling - consistent across browsers */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.3) transparent;
+
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+
+  /* Dark mode scrollbar */
+  .dark & {
+    scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+  }
+
+  .dark &::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.3);
+  }
+
+  .dark &::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(255, 255, 255, 0.5);
+  }
+}
+
+@utility particle-yellow {
+  /* Particle effects for combo animations */
+  background: radial-gradient(circle, #ffff00, #ff6b00);
+}
+
+@utility particle-cyan {
+  background: radial-gradient(circle, #00ffff, #0088ff);
+}
+
+@utility particle-pink {
+  background: radial-gradient(circle, #ff00ff, #ff0088);
+}
+
+@utility particle-rainbow {
+  background: linear-gradient(
+    135deg,
+    #ff0000,
+    #ff7f00,
+    #ffff00,
+    #00ff00,
+    #0000ff,
+    #4b0082,
+    #9400d3
+  );
+  background-size: 200% 200%;
+  animation: rainbow-shift 2s ease infinite;
+}
+
+@layer utilities {
+  /* Live activity ticker — stable keyframe (not in JSX to avoid re-render flicker) */
+  @keyframes activity-ticker-scroll {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+
+  /* ====================================
    NEO-BRUTALIST "JACKBOX PARTY PACK" THEME
    ==================================== */
 
-:root {
-  /* Font Family Variables */
-  --font-fredoka: 'Fredoka', sans-serif;
-  --font-rubik: 'Rubik', sans-serif;
+  :root {
+    /* Font Family Variables */
+    --font-fredoka: 'Fredoka', sans-serif;
+    --font-rubik: 'Rubik', sans-serif;
 
-  /* Neo-Brutalist Color Palette - 4 Primary Colors with Tonal Variations */
-  /* Primary: lime, Secondary: pink, Tertiary: cyan, Quaternary: purple */
+    /* Neo-Brutalist Color Palette - 4 Primary Colors with Tonal Variations */
+    /* Primary: lime, Secondary: pink, Tertiary: cyan, Quaternary: purple */
 
-  /* LIME Family (Primary - Replaces Yellow) */
-  --neo-lime: #BFFF00;              /* HSL(76, 100%, 50%) - electric, energetic */
-  --neo-lime-light: #D9FF66;        /* HSL(76, 70%, 65%) - soft highlight */
-  --neo-lime-muted: #A6D900;        /* HSL(76, 60%, 50%) - subtle accent */
-  --neo-lime-dark: #8FB300;         /* HSL(76, 80%, 35%) - grounded tone */
+    /* LIME Family (Primary - Replaces Yellow) */
+    --neo-lime: #bfff00; /* HSL(76, 100%, 50%) - electric, energetic */
+    --neo-lime-light: #d9ff66; /* HSL(76, 70%, 65%) - soft highlight */
+    --neo-lime-muted: #a6d900; /* HSL(76, 60%, 50%) - subtle accent */
+    --neo-lime-dark: #8fb300; /* HSL(76, 80%, 35%) - grounded tone */
 
-  /* PINK Family (Multiplayer) */
-  --neo-pink: #FF1493;              /* HSL(328, 100%, 54%) - vibrant, playful */
-  --neo-pink-light: #FF6BB8;        /* HSL(328, 70%, 69%) - friendly accent */
-  --neo-pink-muted: #D9428F;        /* HSL(328, 60%, 54%) - muted energy */
-  --neo-pink-dark: #B30066;         /* HSL(328, 80%, 35%) - deep emphasis */
+    /* PINK Family (Multiplayer) */
+    --neo-pink: #ff1493; /* HSL(328, 100%, 54%) - vibrant, playful */
+    --neo-pink-light: #ff6bb8; /* HSL(328, 70%, 69%) - friendly accent */
+    --neo-pink-muted: #d9428f; /* HSL(328, 60%, 54%) - muted energy */
+    --neo-pink-dark: #b30066; /* HSL(328, 80%, 35%) - deep emphasis */
 
-  /* CYAN Family (Single Player) */
-  --neo-cyan: #00FFFF;              /* HSL(180, 100%, 50%) - cool, focused */
-  --neo-cyan-light: #66FFFF;        /* HSL(180, 70%, 65%) - calm highlight */
-  --neo-cyan-muted: #4DD9D9;        /* HSL(180, 60%, 50%) - subtle presence */
-  --neo-cyan-dark: #00B3B3;         /* HSL(180, 80%, 35%) - strong anchor */
+    /* CYAN Family (Single Player) */
+    --neo-cyan: #00ffff; /* HSL(180, 100%, 50%) - cool, focused */
+    --neo-cyan-light: #66ffff; /* HSL(180, 70%, 65%) - calm highlight */
+    --neo-cyan-muted: #4dd9d9; /* HSL(180, 60%, 50%) - subtle presence */
+    --neo-cyan-dark: #00b3b3; /* HSL(180, 80%, 35%) - strong anchor */
 
-  /* PURPLE Family (Brain Training) */
-  --neo-purple: #8B5CF6;            /* HSL(258, 90%, 66%) - intelligent, premium */
-  --neo-purple-light: #A78BFA;      /* HSL(258, 60%, 76%) - gentle guidance */
-  --neo-purple-muted: #7C4FCC;      /* HSL(258, 50%, 56%) - understated depth */
-  --neo-purple-dark: #5B21B6;       /* HSL(258, 70%, 42%) - authoritative */
+    /* PURPLE Family (Brain Training) */
+    --neo-purple: #8b5cf6; /* HSL(258, 90%, 66%) - intelligent, premium */
+    --neo-purple-light: #a78bfa; /* HSL(258, 60%, 76%) - gentle guidance */
+    --neo-purple-muted: #7c4fcc; /* HSL(258, 50%, 56%) - understated depth */
+    --neo-purple-dark: #5b21b6; /* HSL(258, 70%, 42%) - authoritative */
 
-  /* Error color */
-  --neo-red: #FF3366;
+    /* Error color */
+    --neo-red: #ff3366;
 
-  /* Deep space variants (darker than navy for immersive backgrounds) */
-  --neo-abyss: #0a0a1a;
-  --neo-abyss-deep: #050510;
-  --neo-abyss-mid: #0a0a2a;
-  --neo-abyss-light: #0d1033;
+    /* Deep space variants (darker than navy for immersive backgrounds) */
+    --neo-abyss: #0a0a1a;
+    --neo-abyss-deep: #050510;
+    --neo-abyss-mid: #0a0a2a;
+    --neo-abyss-light: #0d1033;
 
-  /* Navy elevated variant (slightly lighter for subtle card distinction) */
-  --neo-navy-elevated: #2a2a4e;
-  --neo-navy-radial: #1e1e3f;
+    /* Navy elevated variant (slightly lighter for subtle card distinction) */
+    --neo-navy-elevated: #2a2a4e;
+    --neo-navy-radial: #1e1e3f;
 
-  /* Structural colors */
-  --neo-navy: #1a1a2e;
-  --neo-navy-light: #16213e;
+    /* Structural colors */
+    --neo-navy: #1a1a2e;
+    --neo-navy-light: #16213e;
 
-  /* DEPRECATED - Keep for backward compatibility during migration */
-  --neo-yellow: #FFE135;            /* DEPRECATED - USE neo-lime */
-  --neo-yellow-hover: #FFD000;      /* DEPRECATED - USE neo-lime-light */
-  --neo-orange: #FF6B35;            /* DEPRECATED - USE neo-lime-dark */
-  --neo-orange-hover: #FF5722;      /* DEPRECATED - USE neo-lime-dark */
-  --neo-cream: #FFFEF0;
-  --neo-black: 0 0 0;
-  --neo-white: 255 255 255;
-  --neo-gray: #32324d;
+    /* DEPRECATED - Keep for backward compatibility during migration */
+    --neo-yellow: #ffe135; /* DEPRECATED - USE neo-lime */
+    --neo-yellow-hover: #ffd000; /* DEPRECATED - USE neo-lime-light */
+    --neo-orange: #ff6b35; /* DEPRECATED - USE neo-lime-dark */
+    --neo-orange-hover: #ff5722; /* DEPRECATED - USE neo-lime-dark */
+    --neo-cream: #fffef0;
+    --neo-black: 0 0 0;
+    --neo-white: 255 255 255;
+    --neo-gray: #32324d;
 
-  /* Hard Shadow Offsets (NO BLUR) — cleaned-up: smaller offsets for a lighter feel */
-  --shadow-sm: 1px 1px 0px rgb(var(--neo-black));
-  --shadow-md: 2px 2px 0px rgb(var(--neo-black));
-  --shadow-lg: 3px 3px 0px rgb(var(--neo-black));
-  --shadow-xl: 5px 5px 0px rgb(var(--neo-black));
-  --shadow-pressed: 1px 1px 0px rgb(var(--neo-black));
+    /* Hard Shadow Offsets (NO BLUR) — cleaned-up: smaller offsets for a lighter feel */
+    --shadow-sm: 1px 1px 0px rgb(var(--neo-black));
+    --shadow-md: 2px 2px 0px rgb(var(--neo-black));
+    --shadow-lg: 3px 3px 0px rgb(var(--neo-black));
+    --shadow-xl: 5px 5px 0px rgb(var(--neo-black));
+    --shadow-pressed: 1px 1px 0px rgb(var(--neo-black));
 
-  /* Border Widths — cleaned-up: thinner borders for lighter feel */
-  --border-neo: 2px;
-  --border-neo-thick: 3px;
+    /* Border Widths — cleaned-up: thinner borders for lighter feel */
+    --border-neo: 2px;
+    --border-neo-thick: 3px;
 
-  /* Mobile Layout Variables */
-  /* Tab bar height calculation:
+    /* Mobile Layout Variables */
+    /* Tab bar height calculation:
    * - .mobile-tab-bar min-height: 56px
    * - .mobile-tab-bar padding-top: 0.5rem (8px)
    * - .mobile-tab-bar padding-bottom: at least 0.5rem (8px)
    * - ResultsPage wrapper border-t-4: 4px
    * Total base height: 76px (4.75rem)
    * Using 5rem (80px) for extra safety margin */
-  --mobile-tab-bar-height: 5rem; /* 80px - accounts for min-height + padding + border */
-  --mobile-bottom-safe: calc(var(--mobile-tab-bar-height) + var(--combined-safe-area-bottom, env(safe-area-inset-bottom, 0px)));
-  
-  /* Header/Footer Height Variables for Content Spacing */
-  --header-height-mobile: 60px;
-  --header-height-tablet: 70px;
-  --header-height-desktop: 80px;
-  --footer-height: 60px;
-  --bottom-nav-height: 64px;
+    --mobile-tab-bar-height: 5rem; /* 80px - accounts for min-height + padding + border */
+    --mobile-bottom-safe: calc(
+      var(--mobile-tab-bar-height) +
+        var(--combined-safe-area-bottom, env(safe-area-inset-bottom, 0px))
+    );
 
-  /* Snappy Timing Functions */
-  --ease-snap: cubic-bezier(0.68, -0.55, 0.265, 1.55);
-  --ease-bounce: cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  --ease-slam: cubic-bezier(0.55, 1.75, 0.6, 1);
-  --duration-snap: 100ms;
-  --duration-quick: 150ms;
+    /* Header/Footer Height Variables for Content Spacing */
+    --header-height-mobile: 60px;
+    --header-height-tablet: 70px;
+    --header-height-desktop: 80px;
+    --footer-height: 60px;
+    --bottom-nav-height: 64px;
 
-  /* Halftone Pattern (SVG-based) - white dots for dark backgrounds - nearly invisible for cleaner look */
-  --halftone-pattern: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='10' cy='10' r='1' fill='%23FFFFFF' fill-opacity='0.005'/%3E%3C/svg%3E");
-  --halftone-pattern-lg: url("data:image/svg+xml,%3Csvg width='30' height='30' viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='15' cy='15' r='1.5' fill='%23FFFFFF' fill-opacity='0.005'/%3E%3C/svg%3E");
+    /* Snappy Timing Functions */
+    --ease-snap: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    --ease-bounce: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    --ease-slam: cubic-bezier(0.55, 1.75, 0.6, 1);
+    --duration-snap: 100ms;
+    --duration-quick: 150ms;
 
-  /* Retro Grid Pattern for backgrounds - nearly invisible for cleaner look */
-  --retro-grid-pattern:
-    linear-gradient(to right, rgba(255,255,255,0.012) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255,255,255,0.012) 1px, transparent 1px);
+    /* Halftone Pattern (SVG-based) - white dots for dark backgrounds - nearly invisible for cleaner look */
+    --halftone-pattern: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='10' cy='10' r='1' fill='%23FFFFFF' fill-opacity='0.005'/%3E%3C/svg%3E");
+    --halftone-pattern-lg: url("data:image/svg+xml,%3Csvg width='30' height='30' viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='15' cy='15' r='1.5' fill='%23FFFFFF' fill-opacity='0.005'/%3E%3C/svg%3E");
 
-  /* Semantic Color Mappings (Dark-only Neo-Brutalist) */
-  --background: var(--neo-navy);
-  --foreground: rgb(var(--neo-white));
-  --card: var(--neo-gray);
-  --card-foreground: rgb(var(--neo-white));
-  --popover: var(--neo-gray);
-  --popover-foreground: rgb(var(--neo-white));
-  --primary: var(--neo-yellow);
-  --primary-foreground: rgb(var(--neo-black));
-  --secondary: var(--neo-pink);
-  --secondary-foreground: rgb(var(--neo-white));
-  --muted: var(--neo-navy-light);
-  --muted-foreground: #d4d4e8;
-  --accent: var(--neo-pink);
-  --accent-foreground: rgb(var(--neo-white));
-  --destructive: var(--neo-red);
-  --destructive-foreground: rgb(var(--neo-white));
-  --border: rgb(var(--neo-black));
-  --input: var(--neo-navy-light);
-  --ring: var(--neo-cyan);
+    /* Retro Grid Pattern for backgrounds - nearly invisible for cleaner look */
+    --retro-grid-pattern:
+      linear-gradient(
+        to right,
+        rgba(255, 255, 255, 0.012) 1px,
+        transparent 1px
+      ),
+      linear-gradient(
+        to bottom,
+        rgba(255, 255, 255, 0.012) 1px,
+        transparent 1px
+      );
 
-  /* Border Radius — cleaned-up: softer corners for modern feel */
-  --radius: 8px;
-  --radius-sm: 4px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
+    /* Semantic Color Mappings (Dark-only Neo-Brutalist) */
+    --background: var(--neo-navy);
+    --foreground: rgb(var(--neo-white));
+    --card: var(--neo-gray);
+    --card-foreground: rgb(var(--neo-white));
+    --popover: var(--neo-gray);
+    --popover-foreground: rgb(var(--neo-white));
+    --primary: var(--neo-yellow);
+    --primary-foreground: rgb(var(--neo-black));
+    --secondary: var(--neo-pink);
+    --secondary-foreground: rgb(var(--neo-white));
+    --muted: var(--neo-navy-light);
+    --muted-foreground: #d4d4e8;
+    --accent: var(--neo-pink);
+    --accent-foreground: rgb(var(--neo-white));
+    --destructive: var(--neo-red);
+    --destructive-foreground: rgb(var(--neo-white));
+    --border: rgb(var(--neo-black));
+    --input: var(--neo-navy-light);
+    --ring: var(--neo-cyan);
 
-  /* Avatar Color Palette */
-  --avatar-1: #FF6B6B;
-  --avatar-2: #4ECDC4;
-  --avatar-3: #45B7D1;
-  --avatar-4: #FFA07A;
-  --avatar-5: #98D8C8;
-  --avatar-6: #F7DC6F;
-  --avatar-7: #BB8FCE;
-  --avatar-8: #85C1E2;
-  --avatar-9: #F8B739;
-  --avatar-10: #52B788;
-  --avatar-11: #FF8FAB;
-  --avatar-12: #6BCF7F;
-  --avatar-13: #FFB347;
-  --avatar-14: #9D84B7;
-  --avatar-15: #FF6F61;
+    /* Border Radius — cleaned-up: softer corners for modern feel */
+    --radius: 8px;
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
 
-  /* ========================================
+    /* Avatar Color Palette */
+    --avatar-1: #ff6b6b;
+    --avatar-2: #4ecdc4;
+    --avatar-3: #45b7d1;
+    --avatar-4: #ffa07a;
+    --avatar-5: #98d8c8;
+    --avatar-6: #f7dc6f;
+    --avatar-7: #bb8fce;
+    --avatar-8: #85c1e2;
+    --avatar-9: #f8b739;
+    --avatar-10: #52b788;
+    --avatar-11: #ff8fab;
+    --avatar-12: #6bcf7f;
+    --avatar-13: #ffb347;
+    --avatar-14: #9d84b7;
+    --avatar-15: #ff6f61;
+
+    /* ========================================
      BRAND COLORS - Social OAuth & Sharing
      ======================================== */
 
-  /* OAuth Providers */
-  --brand-google: #4285F4;
-  --brand-google-hover: #3367D6;
-  --brand-google-dark: #1e4a8f;
+    /* OAuth Providers */
+    --brand-google: #4285f4;
+    --brand-google-hover: #3367d6;
+    --brand-google-dark: #1e4a8f;
 
-  --brand-discord: #5865F2;
-  --brand-discord-hover: #4752C4;
-  --brand-discord-dark: #3c45a5;
+    --brand-discord: #5865f2;
+    --brand-discord-hover: #4752c4;
+    --brand-discord-dark: #3c45a5;
 
-  --brand-apple: #000000;
-  --brand-apple-hover: #333333;
-  --brand-apple-light: #f5f5f7;
+    --brand-apple: #000000;
+    --brand-apple-hover: #333333;
+    --brand-apple-light: #f5f5f7;
 
-  /* Social Sharing Platforms */
-  --brand-whatsapp: #25D366;
-  --brand-whatsapp-hover: #1ebe5d;
-  --brand-whatsapp-dark: #128C7E;
+    /* Social Sharing Platforms */
+    --brand-whatsapp: #25d366;
+    --brand-whatsapp-hover: #1ebe5d;
+    --brand-whatsapp-dark: #128c7e;
 
-  --brand-facebook: #1877F2;
-  --brand-facebook-hover: #166FE5;
-  --brand-facebook-dark: #144a9e;
+    --brand-facebook: #1877f2;
+    --brand-facebook-hover: #166fe5;
+    --brand-facebook-dark: #144a9e;
 
-  --brand-twitter: #1DA1F2;
-  --brand-twitter-hover: #1A91DA;
-  --brand-twitter-dark: #0d7ac2;
+    --brand-twitter: #1da1f2;
+    --brand-twitter-hover: #1a91da;
+    --brand-twitter-dark: #0d7ac2;
 
-  --brand-linkedin: #0A66C2;
-  --brand-linkedin-hover: #094F9B;
-  --brand-linkedin-dark: #073d74;
+    --brand-linkedin: #0a66c2;
+    --brand-linkedin-hover: #094f9b;
+    --brand-linkedin-dark: #073d74;
 
-  --brand-telegram: #0088cc;
-  --brand-telegram-hover: #0077b5;
-  --brand-telegram-dark: #006699;
+    --brand-telegram: #0088cc;
+    --brand-telegram-hover: #0077b5;
+    --brand-telegram-dark: #006699;
 
-  /* ========================================
+    /* ========================================
      AVATAR COLORS - Character-Specific
      ======================================== */
 
-  /* Semantic character names referencing numeric avatars */
-  --avatar-broccoli-bob: var(--avatar-10);
-  --avatar-drippy-drop: var(--avatar-2);
-  --avatar-sunny-steve: var(--avatar-9);
-  --avatar-cloudy-carl: var(--avatar-8);
-  --avatar-octo-otto: var(--avatar-7);
-  --avatar-pizza-pete: var(--avatar-1);
-  --avatar-prickly-pat: var(--avatar-12);
-  --avatar-melon-molly: var(--avatar-11);
-  --avatar-avo-alex: var(--avatar-10);
-  --avatar-frosty-frank: var(--avatar-3);
-  --avatar-flaky-fred: var(--avatar-8);
-  --avatar-eggy-ed: var(--avatar-6);
-  --avatar-slimy-sam: var(--avatar-12);
-  --avatar-starry-stella: var(--avatar-9);
-  --avatar-shroom-shelly: var(--avatar-15);
+    /* Semantic character names referencing numeric avatars */
+    --avatar-broccoli-bob: var(--avatar-10);
+    --avatar-drippy-drop: var(--avatar-2);
+    --avatar-sunny-steve: var(--avatar-9);
+    --avatar-cloudy-carl: var(--avatar-8);
+    --avatar-octo-otto: var(--avatar-7);
+    --avatar-pizza-pete: var(--avatar-1);
+    --avatar-prickly-pat: var(--avatar-12);
+    --avatar-melon-molly: var(--avatar-11);
+    --avatar-avo-alex: var(--avatar-10);
+    --avatar-frosty-frank: var(--avatar-3);
+    --avatar-flaky-fred: var(--avatar-8);
+    --avatar-eggy-ed: var(--avatar-6);
+    --avatar-slimy-sam: var(--avatar-12);
+    --avatar-starry-stella: var(--avatar-9);
+    --avatar-shroom-shelly: var(--avatar-15);
 
-  /* ========================================
+    /* ========================================
      GRADIENT PRESETS - Rank & Stats
      ======================================== */
 
-  /* First Place Gradients */
-  --gradient-rank-first-from: var(--neo-yellow);
-  --gradient-rank-first-via: #FFD000;
-  --gradient-rank-first-to: var(--neo-yellow);
+    /* First Place Gradients */
+    --gradient-rank-first-from: var(--neo-yellow);
+    --gradient-rank-first-via: #ffd000;
+    --gradient-rank-first-to: var(--neo-yellow);
 
-  /* Second Place Gradients */
-  --gradient-rank-second-from: #cbd5e1;
-  --gradient-rank-second-via: #e2e8f0;
-  --gradient-rank-second-to: #cbd5e1;
+    /* Second Place Gradients */
+    --gradient-rank-second-from: #cbd5e1;
+    --gradient-rank-second-via: #e2e8f0;
+    --gradient-rank-second-to: #cbd5e1;
 
-  /* Third Place Gradients */
-  --gradient-rank-third-from: #f59e0b;
-  --gradient-rank-third-via: #fbbf24;
-  --gradient-rank-third-to: #f59e0b;
+    /* Third Place Gradients */
+    --gradient-rank-third-from: #f59e0b;
+    --gradient-rank-third-via: #fbbf24;
+    --gradient-rank-third-to: #f59e0b;
 
-  /* Performance Stats Gradients */
-  --gradient-stat-positive-from: var(--neo-lime);
-  --gradient-stat-positive-to: #84cc16;
+    /* Performance Stats Gradients */
+    --gradient-stat-positive-from: var(--neo-lime);
+    --gradient-stat-positive-to: #84cc16;
 
-  --gradient-stat-negative-from: var(--neo-red);
-  --gradient-stat-negative-to: #dc2626;
+    --gradient-stat-negative-from: var(--neo-red);
+    --gradient-stat-negative-to: #dc2626;
 
-  --gradient-stat-neutral-from: #94a3b8;
-  --gradient-stat-neutral-to: #64748b;
+    --gradient-stat-neutral-from: #94a3b8;
+    --gradient-stat-neutral-to: #64748b;
 
-  /* Background Decoration Gradients */
-  --gradient-bg-navy-from: var(--neo-navy);
-  --gradient-bg-navy-to: var(--neo-navy-light);
+    /* Background Decoration Gradients */
+    --gradient-bg-navy-from: var(--neo-navy);
+    --gradient-bg-navy-to: var(--neo-navy-light);
 
-  --gradient-bg-accent-from: var(--neo-pink);
-  --gradient-bg-accent-to: var(--neo-cyan);
+    --gradient-bg-accent-from: var(--neo-pink);
+    --gradient-bg-accent-to: var(--neo-cyan);
 
-  /* ========================================
+    /* ========================================
      SEMANTIC COMPONENT TOKENS
      ======================================== */
 
-  /* Button Semantic Mappings */
-  --button-primary: var(--neo-yellow);
-  --button-primary-hover: var(--neo-yellow-hover);
-  --button-primary-text: rgb(var(--neo-black));
+    /* Button Semantic Mappings */
+    --button-primary: var(--neo-yellow);
+    --button-primary-hover: var(--neo-yellow-hover);
+    --button-primary-text: rgb(var(--neo-black));
 
-  --button-secondary: var(--neo-pink);
-  --button-secondary-hover: var(--neo-pink-light);
-  --button-secondary-text: rgb(var(--neo-black));
+    --button-secondary: var(--neo-pink);
+    --button-secondary-hover: var(--neo-pink-light);
+    --button-secondary-text: rgb(var(--neo-black));
 
-  --button-destructive: var(--neo-red);
-  --button-destructive-hover: #dc2626;
-  --button-destructive-text: rgb(var(--neo-black));
+    --button-destructive: var(--neo-red);
+    --button-destructive-hover: #dc2626;
+    --button-destructive-text: rgb(var(--neo-black));
 
-  --button-success: var(--neo-lime);
-  --button-success-hover: #84cc16;
-  --button-success-text: rgb(var(--neo-black));
+    --button-success: var(--neo-lime);
+    --button-success-hover: #84cc16;
+    --button-success-text: rgb(var(--neo-black));
 
-  /* Badge/Tag Semantic Mappings */
-  --badge-info: var(--neo-cyan);
-  --badge-info-text: rgb(var(--neo-black));
+    /* Badge/Tag Semantic Mappings */
+    --badge-info: var(--neo-cyan);
+    --badge-info-text: rgb(var(--neo-black));
 
-  --badge-warning: var(--neo-yellow);
-  --badge-warning-text: rgb(var(--neo-black));
+    --badge-warning: var(--neo-yellow);
+    --badge-warning-text: rgb(var(--neo-black));
 
-  --badge-error: var(--neo-red);
-  --badge-error-text: rgb(var(--neo-black));
+    --badge-error: var(--neo-red);
+    --badge-error-text: rgb(var(--neo-black));
 
-  --badge-success: var(--neo-lime);
-  --badge-success-text: rgb(var(--neo-black));
+    --badge-success: var(--neo-lime);
+    --badge-success-text: rgb(var(--neo-black));
 
-  /* Status Indicator Mappings */
-  --status-active: var(--neo-lime);
-  --status-inactive: var(--neo-gray);
-  --status-error: var(--neo-red);
-  --status-pending: var(--neo-yellow);
-}
+    /* Status Indicator Mappings */
+    --status-active: var(--neo-lime);
+    --status-inactive: var(--neo-gray);
+    --status-error: var(--neo-red);
+    --status-pending: var(--neo-yellow);
+  }
 
-/* RTL Hard Shadow Offsets */
-[dir="rtl"] {
-  --shadow-sm: -1px 1px 0px rgb(var(--neo-black));
-  --shadow-md: -2px 2px 0px rgb(var(--neo-black));
-  --shadow-lg: -3px 3px 0px rgb(var(--neo-black));
-  --shadow-xl: -5px 5px 0px rgb(var(--neo-black));
-  --shadow-pressed: -1px 1px 0px rgb(var(--neo-black));
-}
+  /* RTL Hard Shadow Offsets */
+  [dir='rtl'] {
+    --shadow-sm: -1px 1px 0px rgb(var(--neo-black));
+    --shadow-md: -2px 2px 0px rgb(var(--neo-black));
+    --shadow-lg: -3px 3px 0px rgb(var(--neo-black));
+    --shadow-xl: -5px 5px 0px rgb(var(--neo-black));
+    --shadow-pressed: -1px 1px 0px rgb(var(--neo-black));
+  }
 
-/* Light Mode Variables */
-.light {
-  /* Inverted semantic color mappings for light mode */
-  --background: #f8fafc;
-  --foreground: rgb(var(--neo-black));
-  --card: #ffffff;
-  --card-foreground: rgb(var(--neo-black));
-  --popover: #ffffff;
-  --popover-foreground: rgb(var(--neo-black));
-  --primary: var(--neo-yellow);
-  --primary-foreground: rgb(var(--neo-black));
-  --secondary: var(--neo-pink);
-  --secondary-foreground: rgb(var(--neo-black));
-  --muted: #e2e8f0;
-  --muted-foreground: #475569;
-  --accent: var(--neo-pink);
-  --accent-foreground: rgb(var(--neo-black));
-  --destructive: var(--neo-red);
-  --destructive-foreground: rgb(var(--neo-black));
-  --border: rgb(var(--neo-black));
-  --input: #e2e8f0;
-  --ring: var(--neo-cyan);
+  /* Light Mode Variables */
+  .light {
+    /* Inverted semantic color mappings for light mode */
+    --background: #f8fafc;
+    --foreground: rgb(var(--neo-black));
+    --card: #ffffff;
+    --card-foreground: rgb(var(--neo-black));
+    --popover: #ffffff;
+    --popover-foreground: rgb(var(--neo-black));
+    --primary: var(--neo-yellow);
+    --primary-foreground: rgb(var(--neo-black));
+    --secondary: var(--neo-pink);
+    --secondary-foreground: rgb(var(--neo-black));
+    --muted: #e2e8f0;
+    --muted-foreground: #475569;
+    --accent: var(--neo-pink);
+    --accent-foreground: rgb(var(--neo-black));
+    --destructive: var(--neo-red);
+    --destructive-foreground: rgb(var(--neo-black));
+    --border: rgb(var(--neo-black));
+    --input: #e2e8f0;
+    --ring: var(--neo-cyan);
 
-  /* Light mode specific overrides */
-  --neo-navy: #f1f5f9;
-  --neo-navy-light: #e2e8f0;
-  --neo-gray: #f8fafc;
+    /* Light mode specific overrides */
+    --neo-navy: #f1f5f9;
+    --neo-navy-light: #e2e8f0;
+    --neo-gray: #f8fafc;
 
-  /* Black dots for light mode backgrounds - very subtle */
-  --halftone-pattern: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='10' cy='10' r='1' fill='%23000000' fill-opacity='0.02'/%3E%3C/svg%3E");
-  --retro-grid-pattern:
-    linear-gradient(to right, rgba(0,0,0,0.02) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(0,0,0,0.02) 1px, transparent 1px);
-}
+    /* Black dots for light mode backgrounds - very subtle */
+    --halftone-pattern: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='10' cy='10' r='1' fill='%23000000' fill-opacity='0.02'/%3E%3C/svg%3E");
+    --retro-grid-pattern:
+      linear-gradient(to right, rgba(0, 0, 0, 0.02) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(0, 0, 0, 0.02) 1px, transparent 1px);
+  }
 
-/* Light mode body background */
-.light body,
-html.light body {
-  background-color: #f8fafc;
-  color: rgb(var(--neo-black));
-}
+  /* Light mode body background */
+  .light body,
+  html.light body {
+    background-color: #f8fafc;
+    color: rgb(var(--neo-black));
+  }
 
-html {
-  overflow: visible !important; /* Prevent html from becoming a scroll container */
-}
+  html {
+    overflow: visible !important; /* Prevent html from becoming a scroll container */
+  }
 
-body {
-  color: var(--foreground);
-  font-family: var(--font-rubik), 'Rubik', Arial, Helvetica, sans-serif;
-  font-size: 16px;
-  line-height: 1.5;
-  margin: 0;
-  padding: 0;
-  /* Note: overflow-x and viewport height handled by .screen-fit class */
-  /* Neo-brutalist background with halftone dots and retro grid - consistent across entire app */
-  background-color: var(--neo-navy);
-  background-image:
-    var(--halftone-pattern),
-    var(--retro-grid-pattern);
-  background-size: 20px 20px, 60px 60px;
-}
+  body {
+    color: var(--foreground);
+    font-family: var(--font-rubik), 'Rubik', Arial, Helvetica, sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    margin: 0;
+    padding: 0;
+    /* Note: overflow-x and viewport height handled by .screen-fit class */
+    /* Neo-brutalist background with halftone dots and retro grid - consistent across entire app */
+    background-color: var(--neo-navy);
+    background-image: var(--halftone-pattern), var(--retro-grid-pattern);
+    background-size:
+      20px 20px,
+      60px 60px;
+  }
 
-/* Hebrew body: use Heebo for clean, modern Hebrew with proper weight support */
-[dir="rtl"] body {
-  font-family: var(--font-heebo-hebrew), var(--font-rubik), 'Rubik', Arial, Helvetica, sans-serif;
-}
+  /* Hebrew body: use Heebo for clean, modern Hebrew with proper weight support */
+  [dir='rtl'] body {
+    font-family:
+      var(--font-heebo-hebrew), var(--font-rubik), 'Rubik', Arial, Helvetica,
+      sans-serif;
+  }
 
-* {
-  box-sizing: border-box;
+  * {
+    box-sizing: border-box;
+  }
 }
 
 @layer base {
@@ -392,660 +2365,17 @@ body {
 }
 
 @layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
-
-  /* ====================================
-     PERFORMANCE UTILITIES
-     ==================================== */
-
-  /* Content visibility for below-the-fold content - improves LCP */
-  /* Browser can skip rendering until content is near viewport */
-  .content-visibility-auto {
-    content-visibility: auto;
-    contain-intrinsic-size: auto 500px;
-  }
-
-  /* Smaller intrinsic size for compact components */
-  .content-visibility-auto-sm {
-    content-visibility: auto;
-    contain-intrinsic-size: auto 200px;
-  }
-
-  /* Large intrinsic size for full-page sections */
-  .content-visibility-auto-lg {
-    content-visibility: auto;
-    contain-intrinsic-size: auto 800px;
-  }
-
-  /* GPU-accelerated transforms for animated elements */
-  .gpu-accelerated {
-    transform: translateZ(0);
-    backface-visibility: hidden;
-    will-change: transform;
-  }
-
-  /* Remove will-change after animation completes to free GPU memory */
-  .will-change-off {
-    will-change: auto;
-  }
-
-  /* Optimize paint for frequently changing elements */
-  .paint-optimized {
-    isolation: isolate;
-    contain: layout style paint;
-  }
-
-  /* Screen reader only utility class */
-  .sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border-width: 0;
-  }
-
-  /* BiDi text isolation - prevents punctuation from appearing at wrong position
-     when LTR text is displayed in an RTL context (or vice versa) */
-  .text-bidi-isolate {
-    unicode-bidi: isolate;
-  }
-
-  /* Auto-detect text direction based on content */
-  .text-dir-auto {
-    direction: inherit;
-    unicode-bidi: plaintext;
-  }
-
-  /* Focus visible styles for keyboard navigation - Neo-Brutalist style */
-  /* Using black outline with white inner ring for contrast on any background */
-  .focus-visible-ring:focus-visible {
-    outline: 3px solid rgb(var(--neo-black));
-    outline-offset: 2px;
-    box-shadow: 0 0 0 2px var(--background), 0 0 0 5px rgb(var(--neo-black));
-  }
-
-  /* Alternative focus style for dark backgrounds */
-  .dark .focus-visible-ring:focus-visible,
-  [data-theme="dark"] .focus-visible-ring:focus-visible {
-    outline: 3px solid var(--neo-cyan);
-    outline-offset: 2px;
-    box-shadow: 0 0 0 2px var(--neo-navy), 0 0 0 5px var(--neo-cyan);
-  }
-
-  /* Focus ring override for colored backgrounds (cyan, pink, etc.) */
-  /* Ensures visibility when focus ring would otherwise blend with background */
-  .bg-neo-cyan :focus-visible,
-  [class*="from-neo-cyan"] :focus-visible,
-  .bg-neo-pink :focus-visible,
-  [class*="from-neo-pink"] :focus-visible {
-    outline: 3px solid rgb(var(--neo-black)) !important;
-    box-shadow: 0 0 0 2px #ffffff, 0 0 0 5px rgb(var(--neo-black)) !important;
-  }
-
-  /* ====================================
-     NEO-BRUTALIST UTILITY CLASSES
-     ==================================== */
-
-  /* Hard Shadow Utilities */
-  .shadow-hard-sm {
-    box-shadow: var(--shadow-sm);
-  }
-
-  .shadow-hard {
-    box-shadow: var(--shadow-md);
-  }
-
-  .shadow-hard-md {
-    box-shadow: var(--shadow-md);
-  }
-
-  .shadow-hard-lg {
-    box-shadow: var(--shadow-lg);
-  }
-
-  .shadow-hard-xl {
-    box-shadow: var(--shadow-xl);
-  }
-
-  .shadow-hard-pressed {
-    box-shadow: var(--shadow-pressed);
-  }
-
-  /* RTL-aware hard shadows */
-  [dir="rtl"] .shadow-hard-sm {
-    box-shadow: -1px 1px 0px rgb(var(--neo-black));
-  }
-
-  [dir="rtl"] .shadow-hard,
-  [dir="rtl"] .shadow-hard-md {
-    box-shadow: -2px 2px 0px rgb(var(--neo-black));
-  }
-
-  [dir="rtl"] .shadow-hard-lg {
-    box-shadow: -3px 3px 0px rgb(var(--neo-black));
-  }
-
-  [dir="rtl"] .shadow-hard-xl {
-    box-shadow: -5px 5px 0px rgb(var(--neo-black));
-  }
-
-  [dir="rtl"] .shadow-hard-pressed {
-    box-shadow: -1px 1px 0px rgb(var(--neo-black));
-  }
-
-  /* Neo-Brutalist Border */
-  .border-neo {
-    border: var(--border-neo) solid rgb(var(--neo-black));
-  }
-
-  .border-neo-thick {
-    border: var(--border-neo-thick) solid rgb(var(--neo-black));
-  }
-
-  /* ====================================
-     ACTION BUTTON MAX-WIDTH UTILITIES
-     Prevents full-width buttons from becoming
-     oversized on desktop viewports
-     ==================================== */
-
-  /* Standard action button max-width (320px) - ideal for primary CTAs */
-  .max-w-btn {
-    max-width: 320px;
-    margin-inline: auto;
-  }
-
-  /* Large action button max-width (400px) - for prominent actions */
-  .max-w-btn-lg {
-    max-width: 400px;
-    margin-inline: auto;
-  }
-
-  /* Extra large action button max-width (480px) - for full-width sections */
-  .max-w-btn-xl {
-    max-width: 480px;
-    margin-inline: auto;
-  }
-
-  /* Fire Glow Utility - Applied to grid cells during fire round */
-  .fire-glow {
-    animation: fire-glow 0.8s ease-in-out infinite !important;
-    background: linear-gradient(135deg, #FF6B35, #FF3366) !important;
-    will-change: transform, opacity;
-    transform: translateZ(0);
-    /* Force GPU acceleration */
-  }
-
-  /* Earthquake Shake Utility - Applied to grid container */
-  .earthquake-shake {
-    animation: earthquake-shake 0.6s ease-in-out;
-  }
-
-  /* Letter Tile Gradient - Clean minimal design with subtle depth */
-  .letter-tile-gradient {
-    background: linear-gradient(165deg,
-      #ffffff 0%,
-      #fafaf9 40%,
-      #f5f5f3 100%);
-  }
-
-  /* Golden Tile - Full golden gradient for classic MP special tiles */
-  .golden-tile-bg {
-    background: linear-gradient(145deg,
-      #ffe066 0%,
-      #fbbf24 35%,
-      #f59e0b 65%,
-      #d97706 100%) !important;
-    border-color: rgba(180, 120, 0, 0.6) !important;
-  }
-
-  /* Golden tile sparkle crosses (matching adventure tile-gold-sparkle pattern) */
-  .golden-tile-sparkle {
-    position: absolute;
-    width: 6px;
-    height: 6px;
-    pointer-events: none;
-    z-index: 10;
-  }
-  .golden-tile-sparkle::before,
-  .golden-tile-sparkle::after {
-    content: '';
-    position: absolute;
-    background: rgba(255, 255, 255, 0.85);
-    border-radius: 2px;
-  }
-  .golden-tile-sparkle::before {
-    width: 100%;
-    height: 2px;
-    top: 50%;
-    transform: translateY(-50%);
-  }
-  .golden-tile-sparkle::after {
-    width: 2px;
-    height: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-  }
-  .golden-tile-sparkle--1 {
-    top: 12%;
-    right: 14%;
-    animation: golden-sparkle-twinkle 1.8s ease-in-out infinite;
-  }
-  .golden-tile-sparkle--2 {
-    bottom: 16%;
-    left: 12%;
-    animation: golden-sparkle-twinkle 1.8s ease-in-out 0.6s infinite;
-  }
-  .golden-tile-sparkle--3 {
-    top: 50%;
-    left: 6%;
-    animation: golden-sparkle-twinkle 1.8s ease-in-out 1.2s infinite;
-  }
 
   @keyframes golden-sparkle-twinkle {
     0%, 100% { opacity: 0.2; transform: scale(0.6); }
     50% { opacity: 1; transform: scale(1.2); }
   }
-
-  /* Letter Tile Gradient (Cream variant) - For onboarding grids */
-  .letter-tile-gradient-cream {
-    background:
-      /* Subtle inner glow for depth */
-      radial-gradient(ellipse 70% 50% at 35% 30%,
-        rgba(255, 255, 253, 0.9) 0%,
-        rgba(255, 255, 253, 0.35) 35%,
-        transparent 60%),
-      /* Soft edge highlight */
-      linear-gradient(145deg,
-        rgba(255, 255, 255, 0.5) 0%,
-        transparent 25%),
-      /* Main gradient - warm cream with subtle depth */
-      linear-gradient(165deg,
-        #fffef8 0%,
-        #fcfbf4 25%,
-        #f8f7f0 50%,
-        #f4f2ea 75%,
-        #f0ede4 100%);
-  }
-
-  /* Texture Overlays */
-  .texture-halftone {
-    position: relative;
-  }
-
-  .texture-halftone::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-image: var(--halftone-pattern);
-    pointer-events: none;
-    z-index: 1;
-    border-radius: inherit;
-  }
-
-  .texture-halftone-lg {
-    position: relative;
-  }
-
-  .texture-halftone-lg::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-image: var(--halftone-pattern-lg);
-    pointer-events: none;
-    z-index: 1;
-    border-radius: inherit;
-  }
-
-  /* Comic-style halftone - subtle dots like in comic books */
-  .texture-halftone-comic {
-    position: relative;
-  }
-
-  .texture-halftone-comic::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-image: radial-gradient(circle, rgb(var(--neo-black)) 1px, transparent 1px);
-    background-size: 12px 12px;
-    opacity: 0.03;
-    pointer-events: none;
-    z-index: 1;
-    border-radius: inherit;
-  }
-
-  /* Comic halftone variant for light backgrounds */
-  .texture-halftone-comic-light {
-    position: relative;
-  }
-
-  .texture-halftone-comic-light::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-image: radial-gradient(circle, rgb(var(--neo-black)) 1px, transparent 1px);
-    background-size: 12px 12px;
-    opacity: 0.025;
-    pointer-events: none;
-    z-index: 1;
-    border-radius: inherit;
-  }
-
-  /* Dense comic halftone for featured/hero sections */
-  .texture-halftone-comic-dense {
-    position: relative;
-  }
-
-  .texture-halftone-comic-dense::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-image: radial-gradient(circle, rgb(var(--neo-black)) 1.5px, transparent 1.5px);
-    background-size: 10px 10px;
-    opacity: 0.04;
-    pointer-events: none;
-    z-index: 1;
-    border-radius: inherit;
-  }
-
-  /* Neo-Brutalist Tilt Classes */
-  .neo-tilt-left {
-    transform: rotate(-2deg);
-  }
-
-  .neo-tilt-right {
-    transform: rotate(2deg);
-  }
-
-  .neo-tilt-slight-left {
-    transform: rotate(-1deg);
-  }
-
-  .neo-tilt-slight-right {
-    transform: rotate(1deg);
-  }
-
-  /* Neo-Brutalist Typography */
-  .neo-title {
-    font-weight: 900;
-    text-transform: uppercase;
-    letter-spacing: 0.02em;
-    -webkit-text-stroke: 2px rgb(var(--neo-black));
-    text-shadow: 4px 4px 0px rgb(var(--neo-black));
-  }
-
-  .neo-title-sm {
-    font-weight: 900;
-    text-transform: uppercase;
-    letter-spacing: 0.02em;
-    -webkit-text-stroke: 1px rgb(var(--neo-black));
-    text-shadow: 2px 2px 0px rgb(var(--neo-black));
-  }
-
-  /* Hebrew titles: use Heebo for clean feel, no stroke/shadow */
-  [dir="rtl"] .neo-title {
-    font-family: var(--font-heebo-hebrew), var(--font-rubik), Rubik, sans-serif;
-    -webkit-text-stroke: 0;
-    text-shadow: none;
-    letter-spacing: 0;
-  }
-
-  [dir="rtl"] .neo-title-sm {
-    font-family: var(--font-heebo-hebrew), var(--font-rubik), Rubik, sans-serif;
-    -webkit-text-stroke: 0;
-    text-shadow: none;
-    letter-spacing: 0;
-  }
-
-  /* Neo-Brutalist Button Base */
-  .btn-neo {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.025em;
-    border: var(--border-neo) solid rgb(var(--neo-black));
-    box-shadow: var(--shadow-md);
-    transition: transform var(--duration-snap) var(--ease-snap),
-      box-shadow var(--duration-snap) var(--ease-snap);
-    cursor: pointer;
-  }
-
-  .btn-neo:hover {
-    transform: translate(-1px, -1px);
-    box-shadow: 5px 5px 0px rgb(var(--neo-black));
-  }
-
-  .btn-neo:active {
-    transform: translate(2px, 2px);
-    box-shadow: var(--shadow-pressed);
-  }
-
-  /* RTL Button Press */
-  [dir="rtl"] .btn-neo:hover {
-    transform: translate(1px, -1px);
-    box-shadow: -5px 5px 0px rgb(var(--neo-black));
-  }
-
-  [dir="rtl"] .btn-neo:active {
-    transform: translate(-2px, 2px);
-    box-shadow: -2px 2px 0px rgb(var(--neo-black));
-  }
-
-  /* Neo-Brutalist Card */
-  .card-neo {
-    background: var(--neo-cream);
-    color: rgb(var(--neo-black));
-    border: var(--border-neo-thick) solid rgb(var(--neo-black));
-    box-shadow: var(--shadow-lg);
-    border-radius: var(--radius-lg);
-  }
-
-  /* Speech Bubble Styling */
-  .speech-bubble {
-    position: relative;
-    background: var(--neo-cream);
-    color: rgb(var(--neo-black));
-    border: var(--border-neo) solid rgb(var(--neo-black));
-    box-shadow: var(--shadow-md);
-    border-radius: var(--radius-lg);
-  }
-
-  .speech-bubble::after {
-    content: '';
-    position: absolute;
-    bottom: -16px;
-    left: 24px;
-    width: 0;
-    height: 0;
-    border-left: 12px solid transparent;
-    border-right: 12px solid transparent;
-    border-top: 16px solid rgb(var(--neo-black));
-  }
-
-  .speech-bubble::before {
-    content: '';
-    position: absolute;
-    bottom: -12px;
-    left: 27px;
-    width: 0;
-    height: 0;
-    border-left: 9px solid transparent;
-    border-right: 9px solid transparent;
-    border-top: 12px solid var(--neo-cream);
-    z-index: 1;
-  }
-
-  /* Game Board Frame (Neo-Brutalist design with hard shadows) */
-  .game-board-frame {
-    position: relative;
-    background: var(--neo-cream);
-    /* Neo-Brutalist: thick black border */
-    border: 4px solid rgb(var(--neo-black));
-    /* Neo-Brutalist: hard shadow (NO blur) */
-    box-shadow: 6px 6px 0px rgb(var(--neo-black));
-    border-radius: var(--radius-lg);
-    /* No rotation - keep grid perfectly straight */
-    /* Padding for breathing room around the grid */
-    padding: 12px;
-    /* Simplified sizing using vmin to prevent layout shift on orientation change */
-    /* Max height leaves room for timer, stats, and word forming area above grid */
-    /* CRITICAL: Use single CSS variable for BOTH width AND height to guarantee square grid */
-    /* This ensures cells maintain 1:1 aspect ratio regardless of flex container constraints */
-    --game-chrome-height: 280px;
-    --board-size: min(80vmin, calc(100vw - 32px), calc(100dvh - var(--game-chrome-height)));
-    width: var(--board-size);
-    height: var(--board-size);
-    max-height: var(--board-size);
-    aspect-ratio: 1 / 1;
-    /* Center within parent */
-    margin: 0 auto;
-    /* Respect flex container — viewport calc is a starting estimate,
-       but the actual container may be smaller (e.g. WordHunt has extra chrome).
-       This ensures the grid never overflows its allocated flex space. */
-    max-height: min(var(--board-size), 100%);
-    max-width: min(var(--board-size), 100%);
-  }
-
-  /* On desktop screens, size grid to fill available space between sidebars */
-  /* Sidebars are ~224-288px each, gaps ~24px, so subtract ~500-600px for both + gaps */
-  /* Vertical: timer(64px) + word-forming(40px) + input(50px) + gaps ≈ 200px */
-  @media (min-width: 769px) {
-    .game-board-frame {
-      --game-chrome-desktop: clamp(180px, 28dvh, 260px);
-      --board-size: min(55vmin, calc(100vw - 500px), calc(100dvh - var(--game-chrome-desktop)), 560px);
-      width: var(--board-size);
-      height: var(--board-size);
-      max-height: min(var(--board-size), 100%);
-      padding: 14px;
-    }
-  }
-
-  /* Large desktop screens - more room, larger grid */
-  @media (min-width: 1280px) {
-    .game-board-frame {
-      --game-chrome-desktop: clamp(180px, 26dvh, 240px);
-      --board-size: min(58vmin, calc(100vw - 560px), calc(100dvh - var(--game-chrome-desktop)), 580px);
-      width: var(--board-size);
-      height: var(--board-size);
-      max-height: min(var(--board-size), 100%);
-    }
-  }
-
-  /* Extra large desktop screens - maximize grid utilization */
-  @media (min-width: 1536px) {
-    .game-board-frame {
-      --game-chrome-desktop: clamp(180px, 24dvh, 230px);
-      --board-size: min(62vmin, calc(100vw - 620px), calc(100dvh - var(--game-chrome-desktop)), 620px);
-      width: var(--board-size);
-      height: var(--board-size);
-      max-height: min(var(--board-size), 100%);
-    }
-  }
-
-  /* On smaller screens, maximize board size with minimal margins */
-  @media (max-width: 768px) {
-    .game-board-frame {
-      padding: 8px;
-      /* Single variable for BOTH width AND height — guarantees square grid on mobile */
-      /* Pick the smaller of: available width, or available height minus UI chrome */
-      --board-size: min(calc(100dvw - 32px), calc(100dvh - var(--game-chrome-height, 280px) - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)));
-      width: var(--board-size);
-      height: var(--board-size);
-      max-width: min(var(--board-size), 100%);
-      max-height: min(var(--board-size), 100%);
-      min-height: 180px;
-      min-width: 180px;
-    }
-  }
-
-  /* Note: Removed position: relative override that was breaking absolute-positioned grid children */
-  .game-board-frame>* {
-    z-index: 10;
-  }
-
-  /* Blast mode: grid must respect parent container, not viewport */
-  .blast-game .game-board-frame {
-    --board-size: 100%;
-    width: 100%;
-    height: 100%;
-    max-width: 100%;
-    max-height: 100%;
-    padding: 6px;
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-  }
-
-  /* Blast HUD — heartbeat urgency for low moves */
   @keyframes blast-heartbeat {
     0%, 100% { transform: scale(1); }
     15% { transform: scale(1.18); }
     30% { transform: scale(1); }
     45% { transform: scale(1.12); }
     60% { transform: scale(1); }
-  }
-  .blast-heartbeat {
-    animation: blast-heartbeat 0.8s ease-in-out infinite;
-  }
-
-  /* Blast board — hide base grid visuals so BlastTile overlay is the sole renderer */
-  .blast-board [role="grid"] {
-    background: transparent !important;
-    background-color: transparent !important;
-    border-color: transparent !important;
-  }
-  .blast-board [role="gridcell"] {
-    color: transparent !important;
-    background: transparent !important;
-    border-color: transparent !important;
-    box-shadow: none !important;
-  }
-
-  /* Blast tile depth — specular highlight + inset shadow for 3D appearance */
-  .blast-board button {
-    position: relative;
-    overflow: hidden;
-  }
-  .blast-board button::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.08) 40%, transparent 60%);
-    pointer-events: none;
-    z-index: 1;
-    border-radius: inherit;
-  }
-  .blast-board button::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    box-shadow: inset 0 -2px 4px rgba(0,0,0,0.25), inset 0 1px 2px rgba(255,255,255,0.1);
-    pointer-events: none;
-    z-index: 1;
-    border-radius: inherit;
-  }
-
-  /* Blast special tile animations — neon arcade + chunky neo-brutalist */
-  .blast-tile-gold {
-    animation: blast-shimmer 2.5s ease-in-out infinite;
-    background-size: 200% 200% !important;
-  }
-
-  .blast-tile-bomb {
-    animation: blast-pulse 2s ease-in-out infinite;
-  }
-
-  .blast-tile-rainbow {
-    animation: blast-rainbow 5s linear infinite;
-    background-size: 300% 300% !important;
   }
 
   @keyframes borderShimmer {
@@ -1084,87 +2414,17 @@ body {
     75% { filter: hue-rotate(270deg) brightness(1.1); }
     100% { background-position: 0% 50%; filter: hue-rotate(360deg) brightness(1); }
   }
-
-  /* ── Glow pseudo-element base ──
-   * Performance: static box-shadow on ::after, animate only opacity.
-   * This avoids box-shadow repaint every frame — GPU composites opacity instead.
-   */
-  .blast-tile-ice,
-  .blast-tile-wildcard,
-  .blast-tile-lightning,
-  .blast-tile-magnet,
-  .blast-tile-prism,
-  .blast-tile-gem,
-  .blast-tile-frozen,
-  .blast-tile-mirror,
-  .blast-tile-silver,
-  .blast-tile-diamond,
-  .blast-tile-countdown,
-  .blast-tile-virus,
-  .blast-tile-portal,
-  .blast-tile-catalyst {
-    overflow: visible;
-  }
-  .blast-tile-ice::after,
-  .blast-tile-wildcard::after,
-  .blast-tile-lightning::after,
-  .blast-tile-magnet::after,
-  .blast-tile-prism::after,
-  .blast-tile-gem::after,
-  .blast-tile-frozen::after,
-  .blast-tile-mirror::after,
-  .blast-tile-silver::after,
-  .blast-tile-diamond::after,
-  .blast-tile-countdown::after,
-  .blast-tile-virus::after,
-  .blast-tile-portal::after,
-  .blast-tile-catalyst::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    pointer-events: none;
-    z-index: 0;
-    will-change: opacity;
-  }
-
-  /* ── Ice ── crystalline frost breathing with subtle scale */
-  .blast-tile-ice {
-    animation: blast-ice-shimmer-main 3s ease-in-out infinite;
-  }
-  .blast-tile-ice::after {
-    box-shadow: inset 0 0 28px rgba(150,220,255,0.55), 0 0 18px rgba(180,230,255,0.45), 0 0 32px rgba(100,200,255,0.25);
-    animation: blast-glow-pulse 3s ease-in-out infinite;
-  }
   @keyframes blast-ice-shimmer-main {
     0%, 100% { filter: brightness(1) saturate(1); transform: scale(1); }
     30% { filter: brightness(1.25) saturate(1.1); }
     50% { filter: brightness(1.15) saturate(1.2); transform: scale(1.03); }
     70% { filter: brightness(1.3) saturate(1); }
   }
-
-  /* ── Wildcard ── chameleon color cycling with gentle breathe */
-  .blast-tile-wildcard {
-    animation: blast-wildcard-pulse-main 4s ease-in-out infinite;
-  }
-  .blast-tile-wildcard::after {
-    box-shadow: inset 0 0 24px rgba(255,255,255,0.4), 0 0 20px rgba(200,200,255,0.35), 0 0 32px rgba(180,100,255,0.15);
-    animation: blast-glow-pulse 4s ease-in-out infinite;
-  }
   @keyframes blast-wildcard-pulse-main {
     0%, 100% { filter: hue-rotate(0deg) brightness(1); transform: scale(1); }
     25% { filter: hue-rotate(60deg) brightness(1.15); transform: scale(1.02); }
     50% { filter: hue-rotate(120deg) brightness(1.05); transform: scale(1); }
     75% { filter: hue-rotate(180deg) brightness(1.2); transform: scale(1.02); }
-  }
-
-  /* ── Lightning ── electric arc flicker with jitter */
-  .blast-tile-lightning {
-    animation: blast-lightning-flicker-main 2s ease-in-out infinite;
-  }
-  .blast-tile-lightning::after {
-    box-shadow: inset 0 0 24px rgba(255,255,0,0.5), 0 0 18px rgba(0,191,255,0.4), 0 0 36px rgba(255,255,100,0.2);
-    animation: blast-glow-flicker 2s ease-in-out infinite;
   }
   @keyframes blast-lightning-flicker-main {
     0% { filter: brightness(1); transform: scale(1); }
@@ -1188,16 +2448,6 @@ body {
     70% { opacity: 0.7; }
     100% { opacity: 0.5; }
   }
-
-  /* ── Magnet ── swirling magnetic field with pull/push pulse */
-  .blast-tile-magnet {
-    animation: blast-magnet-rotate-main 3.5s ease-in-out infinite;
-    background-size: 200% 200% !important;
-  }
-  .blast-tile-magnet::after {
-    box-shadow: inset 0 0 24px rgba(139,0,255,0.5), 0 0 20px rgba(255,0,64,0.4), 0 0 32px rgba(180,0,180,0.2);
-    animation: blast-magnet-field 3.5s ease-in-out infinite;
-  }
   @keyframes blast-magnet-rotate-main {
     0% { background-position: 0% 0%; transform: scale(1); }
     25% { background-position: 100% 0%; transform: scale(1.04) rotate(1deg); }
@@ -1208,15 +2458,6 @@ body {
   @keyframes blast-magnet-field {
     0%, 100% { opacity: 0.4; box-shadow: inset 0 0 24px rgba(139,0,255,0.5), 0 0 20px rgba(255,0,64,0.4); }
     50% { opacity: 0.9; box-shadow: inset 0 0 28px rgba(255,0,64,0.5), 0 0 24px rgba(139,0,255,0.4); }
-  }
-
-  /* ── Prism ── rainbow refraction with pulsing scale */
-  .blast-tile-prism {
-    animation: blast-prism-spectrum-main 4s linear infinite;
-  }
-  .blast-tile-prism::after {
-    box-shadow: inset 0 0 22px rgba(255,255,255,0.4), 0 0 18px rgba(168,85,247,0.35), 0 0 32px rgba(255,100,200,0.2);
-    animation: blast-prism-glow 4s linear infinite;
   }
   @keyframes blast-prism-spectrum-main {
     0% { filter: hue-rotate(0deg) brightness(1); transform: scale(1); }
@@ -1231,30 +2472,12 @@ body {
     50% { opacity: 0.5; box-shadow: inset 0 0 22px rgba(100,100,255,0.4), 0 0 18px rgba(50,50,255,0.35); }
     75% { opacity: 0.9; box-shadow: inset 0 0 22px rgba(255,100,255,0.4), 0 0 18px rgba(255,50,255,0.35); }
   }
-
-  /* ── Gem ── emerald facet sparkle with rhythmic pulse */
-  .blast-tile-gem {
-    animation: blast-gem-sparkle-main 3s ease-in-out infinite;
-  }
-  .blast-tile-gem::after {
-    box-shadow: inset 0 0 26px rgba(80,200,120,0.55), 0 0 20px rgba(0,255,120,0.4), 0 0 32px rgba(0,255,100,0.2);
-    animation: blast-glow-pulse 3s ease-in-out infinite;
-  }
   @keyframes blast-gem-sparkle-main {
     0%, 100% { filter: brightness(1) saturate(1); transform: scale(1); }
     20% { filter: brightness(1.3) saturate(1.2); transform: scale(1.04); }
     35% { filter: brightness(1) saturate(1); transform: scale(1); }
     55% { filter: brightness(1.2) saturate(1.15); transform: scale(1.02); }
     70% { filter: brightness(1) saturate(1); transform: scale(1); }
-  }
-
-  /* ── Frozen ── deep-freeze slow throb with icy desaturation waves */
-  .blast-tile-frozen {
-    animation: blast-frozen-glow-main 5s ease-in-out infinite;
-  }
-  .blast-tile-frozen::after {
-    box-shadow: inset 0 0 30px rgba(180,220,255,0.5), 0 0 20px rgba(200,230,255,0.4), 0 0 36px rgba(150,200,255,0.2);
-    animation: blast-frozen-glow-after 5s ease-in-out infinite;
   }
   @keyframes blast-frozen-glow-main {
     0%, 100% { filter: brightness(1) saturate(0.8); transform: scale(1); }
@@ -1268,16 +2491,6 @@ body {
     50% { opacity: 0.5; }
     75% { opacity: 0.9; }
   }
-
-  /* ── Mirror ── reflective sweep with sharp glint flashes */
-  .blast-tile-mirror {
-    animation: blast-mirror-reflect-main 3.5s ease-in-out infinite;
-    background-size: 200% 200% !important;
-  }
-  .blast-tile-mirror::after {
-    box-shadow: inset 0 0 24px rgba(220,220,255,0.5), 0 0 18px rgba(136,136,255,0.4);
-    animation: blast-glow-pulse 3.5s ease-in-out infinite;
-  }
   @keyframes blast-mirror-reflect-main {
     0%, 100% { background-position: 0% 50%; filter: brightness(1); transform: scale(1); }
     15% { filter: brightness(1.6); transform: scale(1.03); }
@@ -1286,16 +2499,6 @@ body {
     65% { filter: brightness(1.5); transform: scale(1.02); }
     70% { filter: brightness(1); transform: scale(1); }
   }
-
-  /* ── Silver ── metallic sheen sweep with glint highlights */
-  .blast-tile-silver {
-    animation: blast-silver-sheen-main 3.5s ease-in-out infinite;
-    background-size: 200% 200% !important;
-  }
-  .blast-tile-silver::after {
-    box-shadow: inset 0 0 22px rgba(240,240,240,0.5), 0 0 14px rgba(200,200,200,0.35);
-    animation: blast-glow-pulse 3.5s ease-in-out infinite;
-  }
   @keyframes blast-silver-sheen-main {
     0%, 100% { background-position: 0% 50%; filter: brightness(1); transform: scale(1); }
     25% { filter: brightness(1.35); transform: scale(1.02); }
@@ -1303,15 +2506,6 @@ body {
     50% { background-position: 100% 50%; }
     75% { filter: brightness(1.25); transform: scale(1.02); }
     80% { filter: brightness(1); transform: scale(1); }
-  }
-
-  /* ── Diamond ── brilliant facet flashes with staggered double-spark */
-  .blast-tile-diamond {
-    animation: blast-diamond-flash-main 3s ease-in-out infinite;
-  }
-  .blast-tile-diamond::after {
-    box-shadow: inset 0 0 28px rgba(0,206,209,0.55), 0 0 22px rgba(185,242,255,0.5), 0 0 36px rgba(0,255,255,0.25);
-    animation: blast-diamond-glow 3s ease-in-out infinite;
   }
   @keyframes blast-diamond-flash-main {
     0%, 100% { filter: brightness(1); transform: scale(1); }
@@ -1328,15 +2522,6 @@ body {
     55% { opacity: 0.95; }
     60% { opacity: 0.4; }
   }
-
-  /* ── Countdown ── urgent ticking pulse, red danger glow */
-  .blast-tile-countdown {
-    animation: blast-countdown-tick 1s ease-in-out infinite;
-  }
-  .blast-tile-countdown::after {
-    box-shadow: inset 0 0 20px rgba(255,50,50,0.4), 0 0 14px rgba(255,30,30,0.35), 0 0 28px rgba(200,0,0,0.2);
-    animation: blast-countdown-glow 1s ease-in-out infinite;
-  }
   @keyframes blast-countdown-tick {
     0%, 100% { filter: brightness(1); transform: scale(1); }
     15% { filter: brightness(1.3); transform: scale(1.06); }
@@ -1350,29 +2535,11 @@ body {
     50% { opacity: 0.4; }
     75% { opacity: 0.85; }
   }
-
-  /* ── Virus ── sickly green throb with organic wobble */
-  .blast-tile-virus {
-    animation: blast-virus-throb 2.2s ease-in-out infinite;
-  }
-  .blast-tile-virus::after {
-    box-shadow: inset 0 0 22px rgba(80,200,30,0.45), 0 0 16px rgba(60,180,20,0.35), 0 0 30px rgba(40,160,0,0.2);
-    animation: blast-glow-pulse 2.2s ease-in-out infinite;
-  }
   @keyframes blast-virus-throb {
     0%, 100% { filter: brightness(1) saturate(1); transform: scale(1) rotate(0deg); }
     25% { filter: brightness(1.15) saturate(1.3); transform: scale(1.04) rotate(1deg); }
     50% { filter: brightness(0.95) saturate(1.1); transform: scale(0.98) rotate(-1deg); }
     75% { filter: brightness(1.2) saturate(1.2); transform: scale(1.03) rotate(0.5deg); }
-  }
-
-  /* ── Portal ── swirling vortex with hue rotation */
-  .blast-tile-portal {
-    animation: blast-portal-swirl 3s linear infinite;
-  }
-  .blast-tile-portal::after {
-    box-shadow: inset 0 0 24px rgba(160,80,255,0.5), 0 0 18px rgba(130,60,220,0.4), 0 0 32px rgba(100,40,200,0.25);
-    animation: blast-portal-glow 3s ease-in-out infinite;
   }
   @keyframes blast-portal-swirl {
     0% { filter: hue-rotate(0deg) brightness(1); transform: scale(1); }
@@ -1383,15 +2550,6 @@ body {
   @keyframes blast-portal-glow {
     0%, 100% { opacity: 0.4; }
     50% { opacity: 0.85; }
-  }
-
-  /* ── Catalyst ── warm amber glow with energy radiation */
-  .blast-tile-catalyst {
-    animation: blast-catalyst-radiate 2.8s ease-in-out infinite;
-  }
-  .blast-tile-catalyst::after {
-    box-shadow: inset 0 0 20px rgba(255,165,0,0.45), 0 0 16px rgba(255,140,0,0.35), 0 0 28px rgba(255,100,0,0.2);
-    animation: blast-catalyst-glow 2.8s ease-in-out infinite;
   }
   @keyframes blast-catalyst-radiate {
     0%, 100% { filter: brightness(1) saturate(1); transform: scale(1); }
@@ -1405,117 +2563,30 @@ body {
     60% { opacity: 0.45; }
     85% { opacity: 0.9; }
   }
-
-  /* ── Gem glow stages — progressive amber→gold→white as hits deplete ── */
-  .blast-tile-gem-glow-3 {
-    box-shadow: 0 0 8px rgba(255,191,0,0.3), inset 0 0 6px rgba(255,191,0,0.15);
-  }
-  .blast-tile-gem-glow-2 {
-    box-shadow: 0 0 14px rgba(255,215,0,0.5), inset 0 0 10px rgba(255,215,0,0.25);
-    animation: blast-gem-glow-pulse 1.2s ease-in-out infinite;
-  }
-  .blast-tile-gem-glow-1 {
-    box-shadow: 0 0 20px rgba(255,255,200,0.7), inset 0 0 14px rgba(255,255,255,0.35);
-    animation: blast-gem-glow-pulse 0.7s ease-in-out infinite;
-  }
   @keyframes blast-gem-glow-pulse {
     0%, 100% { filter: brightness(1); }
     50% { filter: brightness(1.3); }
-  }
-
-  /* ── Gem golden flash on final clear ── */
-  .blast-tile-gem-golden-flash {
-    animation: blast-gem-golden-flash 350ms ease-out forwards;
   }
   @keyframes blast-gem-golden-flash {
     0% { filter: brightness(2) saturate(1.5); box-shadow: 0 0 30px rgba(255,215,0,0.9); }
     100% { filter: brightness(1) saturate(1); box-shadow: 0 0 0 transparent; }
   }
-
-  /* ── Frozen cracked — white crack lines via pseudo-element ── */
-  .blast-tile-frozen-cracked {
-    position: relative;
-  }
-  .blast-tile-frozen-cracked::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: 3;
-    background:
-      linear-gradient(135deg, transparent 30%, rgba(255,255,255,0.6) 31%, transparent 32%),
-      linear-gradient(45deg, transparent 55%, rgba(255,255,255,0.5) 56%, transparent 57%),
-      linear-gradient(170deg, transparent 40%, rgba(200,230,255,0.4) 41%, transparent 42%);
-    pointer-events: none;
-    animation: blast-frozen-crack-appear 200ms ease-out forwards;
-  }
   @keyframes blast-frozen-crack-appear {
     0% { opacity: 0; transform: scale(0.9); }
     100% { opacity: 1; transform: scale(1); }
-  }
-
-  /* ── Frozen emerge — burst outward when frozen tile clears ── */
-  .blast-tile-frozen-emerge {
-    animation: blast-frozen-emerge 400ms ease-out forwards;
   }
   @keyframes blast-frozen-emerge {
     0% { transform: scale(1); filter: brightness(1.8) hue-rotate(-20deg); opacity: 1; }
     50% { transform: scale(1.3); filter: brightness(2) hue-rotate(0deg); }
     100% { transform: scale(0.6); filter: brightness(1); opacity: 0; }
   }
-
-  /* ── Ice shimmer — traveling highlight sheen ── */
-  .blast-tile-ice-shimmer {
-    position: relative;
-    overflow: hidden;
-  }
-  .blast-tile-ice-shimmer::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: 2;
-    background: linear-gradient(
-      110deg,
-      transparent 25%,
-      rgba(200,240,255,0.25) 37%,
-      rgba(255,255,255,0.35) 50%,
-      rgba(200,240,255,0.25) 63%,
-      transparent 75%
-    );
-    background-size: 250% 100%;
-    animation: blast-ice-shimmer 3s ease-in-out infinite;
-    pointer-events: none;
-  }
   @keyframes blast-ice-shimmer {
     0% { background-position: 200% 0; }
     100% { background-position: -50% 0; }
   }
-
-  @media (prefers-reduced-motion: reduce) {
-    .blast-tile-gem-glow-1,
-    .blast-tile-gem-glow-2 { animation: none; }
-    .blast-tile-gem-golden-flash { animation: none; }
-    .blast-tile-frozen-emerge { animation: none; }
-    .blast-tile-ice-shimmer::before { animation: none; }
-  }
-
-  /* ── Shared glow pulse: opacity-only for GPU compositing ── */
   @keyframes blast-glow-pulse {
     0%, 100% { opacity: 0.45; }
     50% { opacity: 1; }
-  }
-
-  /* ── Drag selection — GPU-composited class toggled via DOM during drag ── */
-  .blast-drag-selected {
-    outline: 2px solid #BFFF00;
-    outline-offset: 1px;
-    box-shadow: 0 0 12px rgba(191,255,0,0.6);
-    transform: scale(1.06);
-    z-index: 5;
-  }
-
-  /* Selection pop — brief 100ms bounce when tile is first selected */
-  .blast-tile-select-pop {
-    animation: blast-select-pop 100ms cubic-bezier(0.34, 1.56, 0.64, 1);
   }
 
   @keyframes blast-select-pop {
@@ -1523,17 +2594,10 @@ body {
     60% { transform: scale(1.1); }
     100% { transform: scale(1); }
   }
-
-  /* ── Lightning flash — white burst before vertical stretch ── */
   @keyframes blastLightningFlash {
     0% { opacity: 1; transform: scale(1.15); background: white; }
     30% { opacity: 1; transform: scaleY(1.8) scaleX(0.5); }
     100% { opacity: 0; transform: scaleY(2.5) scaleX(0.3); }
-  }
-
-  /* ── Prism rainbow flash — rapid hue cycling before cross clear ── */
-  .blast-tile-prism-flash {
-    animation: blast-prism-flash 250ms linear forwards;
   }
 
   @keyframes blast-prism-flash {
@@ -1544,53 +2608,21 @@ body {
     100% { filter: hue-rotate(360deg) brightness(2.0); }
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .blast-tile-prism-flash {
-      animation: none;
-    }
-  }
-
-  /* Selection pop — brief 100ms bounce when tile is first selected */
-  .blast-tile-select-pop {
-    animation: blast-select-pop 100ms cubic-bezier(0.34, 1.56, 0.64, 1);
-  }
-
   @keyframes blast-select-pop {
     0% { transform: scale(0.92); }
     60% { transform: scale(1.1); }
     100% { transform: scale(1); }
   }
 
-  /* Selection glow when dragging across special tiles — single pop, not infinite pulse */
-  .blast-tile-selected {
-    box-shadow: 0 0 10px rgba(255,255,255,0.5), 0 0 20px rgba(0,255,255,0.25);
-    outline: 2px solid rgba(255,255,255,0.85);
-    outline-offset: -1px;
-    transform: scale(1.05);
-    z-index: 2;
-    transition: transform 0.1s ease-out, box-shadow 0.1s ease-out;
-  }
-
-  /* Objective tile highlight — subtle pulsing outline to guide strategy */
-  .blast-tile-objective {
-    animation: blast-tile-objective-pulse 2s ease-in-out infinite;
-    outline: 2px solid rgba(255,225,53,0.5);
-    outline-offset: -1px;
-  }
-
   @keyframes blast-tile-objective-pulse {
     0%, 100% { outline-color: rgba(255,225,53,0.3); }
     50% { outline-color: rgba(255,225,53,0.7); }
   }
-
-  /* Score popup tier label — pops up and fades */
   @keyframes blast-tier-label-pop {
     0% { opacity: 0; transform: translate(-50%, -80%) scale(0.5); }
     40% { opacity: 1; transform: translate(-50%, -110%) scale(1.1); }
     100% { opacity: 0; transform: translate(-50%, -130%) scale(0.9); }
   }
-
-  /* Score popup burst ring — expands and fades for exceptional words */
   @keyframes blast-burst-ring {
     0% { opacity: 0.6; transform: translate(-50%, -50%) scale(0.5); }
     100% { opacity: 0; transform: translate(-50%, -50%) scale(2.5); }
@@ -1611,46 +2643,9 @@ body {
     100% { opacity: 1; transform: translateY(0) scale(1); }
   }
 
-  /* Accessibility: disable all blast tile idle animations for users who prefer reduced motion */
-  @media (prefers-reduced-motion: reduce) {
-    .blast-tile-gold,
-    .blast-tile-bomb,
-    .blast-tile-lightning,
-    .blast-tile-prism,
-    .blast-tile-gem,
-    .blast-tile-rainbow,
-    .blast-tile-ice,
-    .blast-tile-wildcard,
-    .blast-tile-magnet,
-    .blast-tile-frozen,
-    .blast-tile-mirror,
-    .blast-tile-silver,
-    .blast-tile-diamond,
-    .blast-tile-countdown,
-    .blast-tile-virus,
-    .blast-tile-portal,
-    .blast-tile-catalyst,
-    .blast-tile-select-pop {
-      animation: none;
-    }
-    .blast-tile-weakened {
-      animation: none;
-    }
-  }
-
-  /* Weakened (cracked) tile pulse — moved from Framer Motion JS to CSS for GPU compositing */
-  .blast-tile-weakened {
-    animation: blast-weakened-pulse 1s ease-in-out infinite;
-  }
-
   @keyframes blast-weakened-pulse {
     0%, 100% { opacity: 1; }
     50% { opacity: 0.85; }
-  }
-
-  /* ── Combo preview — pulsing glow when 2+ combo tiles are in the current word ── */
-  .blast-combo-preview {
-    animation: blast-combo-glow 0.8s ease-in-out infinite !important;
   }
 
   @keyframes blast-combo-glow {
@@ -1664,12 +2659,6 @@ body {
       outline-offset: 2px;
       filter: brightness(1.25);
     }
-  }
-
-  /* ── Cascade highlight — glowing pulse on tiles about to be cleared by chain reaction ── */
-  .blast-tile-cascade-highlight {
-    animation: blast-cascade-glow 0.6s ease-in-out infinite !important;
-    z-index: 30;
   }
 
   @keyframes blast-cascade-glow {
@@ -1687,28 +2676,9 @@ body {
     }
   }
 
-  /* ── Tile press — reduce 3D shadow on active press for tactile push-in feel ── */
-  .blast-board button:active {
-    box-shadow: inset 0 2px 4px rgba(255,255,255,0.3), inset 0 -1px 2px rgba(0,0,0,0.1), 0 1px 0 rgba(0,0,0,0.3) !important;
-    transition: box-shadow 50ms ease-out, transform 50ms ease-out;
-  }
-
-  /* ── Rare letter glow — Q, Z, X, J shimmer to highlight high-value letters ── */
-  .blast-rare-letter {
-    text-shadow: 0 0 8px rgba(255,215,0,0.6), 0 0 16px rgba(255,200,0,0.3);
-  }
-  .blast-rare-letter .relative.z-10 {
-    animation: blast-rare-shimmer 2s ease-in-out infinite;
-  }
-
   @keyframes blast-rare-shimmer {
     0%, 100% { text-shadow: 0 0 6px rgba(255,215,0,0.5), 0 0 12px rgba(255,200,0,0.2); }
     50% { text-shadow: 0 0 12px rgba(255,215,0,0.8), 0 0 24px rgba(255,200,0,0.4), 0 0 36px rgba(255,180,0,0.2); }
-  }
-
-  /* ── Frost shatter reveal — ice cracks apart to show inner special ── */
-  .blast-tile-frost-shatter {
-    animation: blast-frost-shatter 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
   }
 
   @keyframes blast-frost-shatter {
@@ -1734,11 +2704,6 @@ body {
     }
   }
 
-  /* ── Prism rainbow flash — rapid hue cycling before cross clear ── */
-  .blast-tile-prism-flash {
-    animation: blast-prism-flash 250ms linear forwards;
-  }
-
   @keyframes blast-prism-flash {
     0%   { filter: hue-rotate(0deg) brightness(1.4); }
     25%  { filter: hue-rotate(90deg) brightness(1.6); }
@@ -1747,26 +2712,10 @@ body {
     100% { filter: hue-rotate(360deg) brightness(2.0); }
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .blast-tile-prism-flash {
-      animation: none;
-    }
-  }
-
-  /* ── Earned tile birth — pop+shimmer when a word creates a new special ── */
-  .blast-tile-earned {
-    animation: blast-tile-birth 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-  }
-
   @keyframes blast-tile-birth {
     0% { transform: scale(0.5); filter: brightness(2); box-shadow: 0 0 30px rgba(191,255,0,0.8); }
     50% { transform: scale(1.15); filter: brightness(1.5); box-shadow: 0 0 20px rgba(191,255,0,0.5); }
     100% { transform: scale(1); filter: brightness(1); box-shadow: none; }
-  }
-
-  /* ── Virus spread — green toxic pulse when infection spreads ── */
-  .blast-tile-virus-spread {
-    animation: blast-virus-spread 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
   }
 
   @keyframes blast-virus-spread {
@@ -1775,384 +2724,17 @@ body {
     100% { transform: scale(1); filter: brightness(1); box-shadow: none; }
   }
 
-  /* ── Locked tile state — ice/frozen tiles that haven't been thawed ── */
-  .blast-tile-locked {
-    opacity: 0.6;
-    filter: saturate(0.35) brightness(0.75);
-    cursor: not-allowed;
-    animation: blast-locked-frost 3s ease-in-out infinite;
-    outline: 2px dashed rgba(150, 200, 255, 0.35);
-    outline-offset: -2px;
-  }
-
   @keyframes blast-locked-frost {
     0%, 100% { opacity: 0.6; outline-color: rgba(150, 200, 255, 0.35); }
     50% { opacity: 0.45; outline-color: rgba(150, 200, 255, 0.15); }
-  }
-
-  /* Locked tile adjacency hint — radiating rings */
-  .blast-lock-hint {
-    animation: blast-lock-hint-pulse 2s ease-in-out infinite;
   }
   @keyframes blast-lock-hint-pulse {
     0%, 100% { opacity: 0.7; transform: scale(1); }
     50% { opacity: 1; transform: scale(1.05); }
   }
-
-  /* ── Multi-hit crack progression — visual damage states ── */
-
-  /* Cracked: tile has taken damage, shows hairline fractures + faster animation */
-  .blast-tile-cracked {
-    animation-duration: 1.2s !important;
-    filter: contrast(1.1) brightness(0.92);
-  }
-  .blast-tile-cracked::before {
-    background:
-      linear-gradient(135deg, rgba(255,255,255,0.25) 0%, transparent 40%),
-      linear-gradient(45deg, transparent 30%, rgba(0,0,0,0.15) 31%, transparent 32%),
-      linear-gradient(-30deg, transparent 55%, rgba(0,0,0,0.12) 56%, transparent 57%) !important;
-  }
-
-  /* Critical: one hit from breaking — intense pulsing glow + visible fracture lines */
-  .blast-tile-critical {
-    animation-duration: 0.8s !important;
-    filter: contrast(1.15) brightness(0.85) saturate(1.2);
-  }
-  .blast-tile-critical::before {
-    background:
-      linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 35%),
-      linear-gradient(60deg, transparent 20%, rgba(0,0,0,0.2) 21%, transparent 22%),
-      linear-gradient(-45deg, transparent 35%, rgba(0,0,0,0.18) 36%, transparent 37%),
-      linear-gradient(120deg, transparent 60%, rgba(0,0,0,0.15) 61%, transparent 62%) !important;
-  }
-
-  /* Pause idle tile animations during cascade to reduce GPU thrash.
-     Cascade overlay (anime.js) + idle CSS animations fighting = repaint storm.
-     This single toggle eliminates 10+ concurrent animations during cascades. */
-  .blast-game[data-cascade="active"] .blast-tile-gold,
-  .blast-game[data-cascade="active"] .blast-tile-bomb,
-  .blast-game[data-cascade="active"] .blast-tile-lightning,
-  .blast-game[data-cascade="active"] .blast-tile-prism,
-  .blast-game[data-cascade="active"] .blast-tile-gem,
-  .blast-game[data-cascade="active"] .blast-tile-rainbow,
-  .blast-game[data-cascade="active"] .blast-tile-ice,
-  .blast-game[data-cascade="active"] .blast-tile-wildcard,
-  .blast-game[data-cascade="active"] .blast-tile-magnet,
-  .blast-game[data-cascade="active"] .blast-tile-frozen,
-  .blast-game[data-cascade="active"] .blast-tile-mirror,
-  .blast-game[data-cascade="active"] .blast-tile-silver,
-  .blast-game[data-cascade="active"] .blast-tile-diamond,
-  .blast-game[data-cascade="active"] .blast-tile-weakened,
-  .blast-game[data-cascade="active"] .blast-tile-select-pop {
-    animation-play-state: paused;
-  }
-
-  /* Blast grid frame styling */
-  .blast-grid-frame {
-    border: 4px solid rgb(var(--neo-black));
-    box-shadow: 6px 6px 0px rgb(var(--neo-black));
-    border-radius: 8px;
-    padding: 3px;
-    background: rgba(26, 26, 46, 0.6);
-  }
-
-  [dir="rtl"] .blast-grid-frame {
-    box-shadow: -6px 6px 0px rgb(var(--neo-black));
-  }
-
-  /* RTL-aware hard shadow for game board frame */
-  [dir="rtl"] .game-board-frame {
-    box-shadow: -6px 6px 0px rgb(var(--neo-black));
-  }
-
-  /* Clipboard clip at top */
-  .clipboard-clip {
-    position: absolute;
-    top: -14px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 64px;
-    height: 24px;
-    background: linear-gradient(to bottom, #c0c0c0, #a0a0a0);
-    border: 3px solid rgb(var(--neo-black));
-    border-radius: 4px 4px 0 0;
-    box-shadow: 2px 2px 0px rgb(var(--neo-black));
-    z-index: 20;
-  }
-
-  .clipboard-clip::after {
-    content: '';
-    position: absolute;
-    bottom: -6px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 44px;
-    height: 6px;
-    background: #909090;
-    border: 2px solid rgb(var(--neo-black));
-    border-top: none;
-    border-radius: 0 0 2px 2px;
-  }
-
-  /* ====================================
-     NEO-BRUTALIST DROP SHADOW UTILITIES
-     ==================================== */
-
-  /* Drop shadow filters for icons and elements */
-  .drop-shadow-neo {
-    filter: drop-shadow(2px 2px 0px rgb(var(--neo-black)));
-  }
-
-  .drop-shadow-neo-sm {
-    filter: drop-shadow(1px 1px 0px rgb(var(--neo-black)));
-  }
-
-  .drop-shadow-neo-lg {
-    filter: drop-shadow(3px 3px 0px rgb(var(--neo-black)));
-  }
-
-  /* Combo glow effects */
-  .combo-glow-rainbow {
-    filter: drop-shadow(0 0 30px rgba(255, 255, 255, 1));
-  }
-
-  .combo-glow-normal {
-    filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.8));
-  }
-
-  .combo-glow-subtle {
-    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.5));
-  }
-
-  /* RTL-aware drop shadows */
-  [dir="rtl"] .drop-shadow-neo {
-    filter: drop-shadow(-2px 2px 0px rgb(var(--neo-black)));
-  }
-
-  [dir="rtl"] .drop-shadow-neo-sm {
-    filter: drop-shadow(-1px 1px 0px rgb(var(--neo-black)));
-  }
-
-  [dir="rtl"] .drop-shadow-neo-lg {
-    filter: drop-shadow(-3px 3px 0px rgb(var(--neo-black)));
-  }
-
-  /* ====================================
-     CONTAINER QUERY UTILITIES
-     ==================================== */
-
-  /* Container type setup */
-  .cq-container {
-    container-type: inline-size;
-  }
-
-  .cq-container-size {
-    container-type: size;
-  }
-
-  /* Container-relative responsive padding - scales with container width */
-  .cq-p-responsive {
-    padding: clamp(0.75rem, 4cqw, 2rem);
-  }
-
-  /* Larger container-relative padding for desktop emphasis */
-  .cq-p-responsive-lg {
-    padding: clamp(1rem, 5cqw, 2.5rem);
-  }
-
-  /* Container-relative responsive gap */
-  .cq-gap-responsive {
-    gap: clamp(0.5rem, 2.5cqw, 1.5rem);
-  }
-
-  /* Container-relative responsive text */
-  .cq-text-responsive {
-    font-size: clamp(0.875rem, 4cqw, 1.25rem);
-  }
-
-  /* Container-relative responsive text - larger variant */
-  .cq-text-lg-responsive {
-    font-size: clamp(1.125rem, 5cqw, 1.875rem);
-  }
-
-  /* Container-relative responsive icon sizing */
-  .cq-icon-responsive {
-    width: clamp(2rem, 10cqw, 4rem);
-    height: clamp(2rem, 10cqw, 4rem);
-  }
-
-  /* Additional container query padding utilities for component consolidation */
-  .cq-p-tight {
-    padding: clamp(0.5rem, 2cqw, 1rem);
-  }
-
-  .cq-p-generous {
-    padding: clamp(1.5rem, 6cqw, 3rem);
-  }
-
-  /* Directional container padding for complex layouts */
-  .cq-px-responsive {
-    padding-left: clamp(0.75rem, 4cqw, 2rem);
-    padding-right: clamp(0.75rem, 4cqw, 2rem);
-  }
-
-  .cq-py-responsive {
-    padding-top: clamp(0.75rem, 4cqw, 2rem);
-    padding-bottom: clamp(0.75rem, 4cqw, 2rem);
-  }
-
-  /* ====================================
-     TOUCH SCROLL UTILITIES
-     ==================================== */
-
-  /* Touch-optimized vertical scrolling */
-  .scrollable-area {
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    touch-action: pan-y;
-    overscroll-behavior: contain;
-  }
-
-  /* Conditional scrolling with touch optimization */
-  .scroll-if-needed {
-    overflow: auto;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior: contain;
-  }
 }
 
 @layer components {
-  /* ====================================
-     NEO-BRUTALIST COMPONENT CLASSES
-     ==================================== */
-
-  /* Neo-Brutalist Card - use instead of repeated border patterns */
-  .neo-card {
-    @apply bg-neo-cream border-4 border-neo-black rounded-neo-lg shadow-hard-lg;
-  }
-
-  .neo-card-sm {
-    @apply bg-neo-cream border-3 border-neo-black rounded-neo shadow-hard;
-  }
-
-  .neo-card-dark {
-    @apply bg-neo-gray border-4 border-neo-black rounded-neo-lg shadow-hard-lg text-neo-white;
-  }
-
-  .neo-card-hover {
-    @apply neo-card hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard-xl transition-all duration-200;
-  }
-
-  /* Neo-Brutalist Button Variants */
-  .btn-neo-primary {
-    @apply bg-neo-yellow text-neo-black border-3 border-neo-black rounded-neo shadow-hard font-bold uppercase tracking-wide;
-    @apply hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard-lg;
-    @apply active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed;
-    @apply transition-all duration-100;
-  }
-
-  .btn-neo-secondary {
-    @apply bg-neo-pink text-neo-white border-3 border-neo-black rounded-neo shadow-hard font-bold uppercase tracking-wide;
-    @apply hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard-lg;
-    @apply active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed;
-    @apply transition-all duration-100;
-  }
-
-  .btn-neo-accent {
-    @apply bg-neo-pink text-neo-white border-3 border-neo-black rounded-neo shadow-hard font-bold uppercase tracking-wide;
-    @apply hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard-lg;
-    @apply active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed;
-    @apply transition-all duration-100;
-  }
-
-  .btn-neo-ghost {
-    @apply bg-transparent text-neo-white border-3 border-neo-black rounded-neo shadow-hard font-bold uppercase tracking-wide;
-    @apply hover:bg-neo-navy-light hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard-lg;
-    @apply active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed;
-    @apply transition-all duration-100;
-  }
-
-  /* Neo-Brutalist Badge */
-  .badge-neo {
-    @apply px-3 py-1 text-sm font-black uppercase tracking-wide border-3 border-neo-black rounded-md shadow-hard-sm;
-    @apply transition-all duration-100;
-  }
-
-  .badge-neo-yellow {
-    @apply badge-neo bg-neo-yellow text-neo-black;
-  }
-
-  .badge-neo-pink {
-    @apply badge-neo bg-neo-pink text-neo-white;
-  }
-
-  .badge-neo-cyan {
-    @apply badge-neo bg-neo-cyan text-neo-black;
-  }
-
-  .badge-neo-lime {
-    @apply badge-neo bg-neo-lime text-neo-black;
-  }
-
-  /* Cyber-Hybrid Zone Panels — thick top border accent + hard shadow for desktop game layout */
-  .zone-panel-pink {
-    background: rgba(0, 0, 0, 0.2);
-    border-top: 8px solid #FF1493;
-    box-shadow: 4px 4px 0px 0px #000000;
-  }
-
-  .zone-panel-cyan {
-    background: rgba(0, 0, 0, 0.2);
-    border-top: 8px solid #00FFFF;
-    box-shadow: 4px 4px 0px 0px #000000, 0 0 20px rgba(0, 255, 255, 0.15);
-  }
-
-  .zone-panel-lime {
-    background: rgba(0, 0, 0, 0.2);
-    border-top: 8px solid #BFFF00;
-    box-shadow: 4px 4px 0px 0px #000000;
-  }
-
-  /* Neo-Brutalist Panel with tilt */
-  .neo-panel {
-    @apply bg-neo-cream border-4 border-neo-black rounded-neo-lg shadow-hard-lg p-4;
-  }
-
-  .neo-panel-tilt-left {
-    @apply neo-panel rotate-[-2deg];
-  }
-
-  .neo-panel-tilt-right {
-    @apply neo-panel rotate-[2deg];
-  }
-
-  .neo-panel-tilt-slight-left {
-    @apply neo-panel rotate-[-1deg];
-  }
-
-  .neo-panel-tilt-slight-right {
-    @apply neo-panel rotate-[1deg];
-  }
-
-  /* Leaderboard styling */
-  .leaderboard-row {
-    @apply py-3 px-4 border-b-4 border-neo-black bg-neo-pink;
-  }
-
-  .leaderboard-title {
-    @apply flex items-center gap-2 text-neo-cream text-base uppercase tracking-widest font-black;
-  }
-
-  /* Input field styling */
-  .input-neo {
-    @apply w-full px-4 py-3 bg-neo-cream text-neo-black border-3 border-neo-black rounded-neo shadow-hard-sm;
-    @apply placeholder:text-neo-gray focus:outline-none focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2;
-    @apply transition-all duration-100;
-  }
-
-  .input-neo:focus {
-    @apply translate-x-[-1px] translate-y-[-1px] shadow-hard;
-  }
 
   /* Global placeholder styling for WCAG AA compliance */
   /* Using opacity 1 with explicit color for consistent contrast */
@@ -2160,63 +2742,6 @@ body {
   textarea::placeholder {
     opacity: 1;
     color: var(--muted-foreground);
-  }
-
-  /* Custom scrollbar styling - consistent across browsers */
-  .custom-scrollbar {
-    scrollbar-width: thin;
-    scrollbar-color: rgba(0, 0, 0, 0.3) transparent;
-  }
-
-  .custom-scrollbar::-webkit-scrollbar {
-    width: 8px;
-  }
-
-  .custom-scrollbar::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  .custom-scrollbar::-webkit-scrollbar-thumb {
-    background-color: rgba(0, 0, 0, 0.3);
-    border-radius: 4px;
-    border: 2px solid transparent;
-    background-clip: content-box;
-  }
-
-  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background-color: rgba(0, 0, 0, 0.5);
-  }
-
-  /* Dark mode scrollbar */
-  .dark .custom-scrollbar {
-    scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
-  }
-
-  .dark .custom-scrollbar::-webkit-scrollbar-thumb {
-    background-color: rgba(255, 255, 255, 0.3);
-  }
-
-  .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background-color: rgba(255, 255, 255, 0.5);
-  }
-
-  /* Particle effects for combo animations */
-  .particle-yellow {
-    background: radial-gradient(circle, #ffff00, #ff6b00);
-  }
-
-  .particle-cyan {
-    background: radial-gradient(circle, #00ffff, #0088ff);
-  }
-
-  .particle-pink {
-    background: radial-gradient(circle, #ff00ff, #ff0088);
-  }
-
-  .particle-rainbow {
-    background: linear-gradient(135deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3);
-    background-size: 200% 200%;
-    animation: rainbow-shift 2s ease infinite;
   }
 }
 

@@ -102,7 +102,7 @@ export const WordsRemaining = memo<WordsRemainingProps>(({
         {/* Progress bar */}
         <div className="h-3 bg-neo-black/30 text-white rounded-full overflow-hidden border-2 border-neo-black">
           <motion.div
-            className="h-full bg-gradient-to-r from-neo-lime to-neo-cyan rounded-full"
+            className="h-full bg-linear-to-r from-neo-lime to-neo-cyan rounded-full"
             initial={{ width: 0 }}
             animate={{ width: `${progress}%` }}
             transition={{ type: 'spring', stiffness: 100, damping: 15 }}

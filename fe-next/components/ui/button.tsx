@@ -15,10 +15,10 @@ const buttonVariants = cva(
     "shadow-hard",
     "transition-all duration-100",
     // Press effect: translate to close shadow gap
-    "hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard-lg",
+    "hover:-translate-x-px hover:-translate-y-px hover:shadow-hard-lg",
     "active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed",
     // Focus styling
-    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-white dark:focus-visible:ring-offset-neo-navy",
+    "focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-white dark:focus-visible:ring-offset-neo-navy",
     // Disabled state
     "disabled:pointer-events-none disabled:opacity-70 disabled:translate-x-0 disabled:translate-y-0",
     // SVG icons - responsive sizes

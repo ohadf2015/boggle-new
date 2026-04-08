@@ -141,7 +141,7 @@ export function QuestCard({
           isSecondary
             ? 'flex flex-row items-center gap-3 p-3'
             : 'flex flex-col gap-3 p-4',
-          'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime',
+          'focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-lime',
           'transition-shadow duration-200 group',
           requestState === 'loading' && 'opacity-50 cursor-not-allowed',
           isCompleted && 'opacity-85',
@@ -151,13 +151,13 @@ export function QuestCard({
       >
         {/* Accent strip */}
         {!isSecondary && (
-          <div className={cn('absolute end-0 top-0 bottom-0 w-2', colorConfig.accent)} />
+          <div className={cn('absolute inset-e-0 top-0 bottom-0 w-2', colorConfig.accent)} />
         )}
 
         {/* Gradient overlay */}
         {!isSecondary && (
           <div className={cn(
-            'absolute inset-x-0 top-0 h-16 bg-gradient-to-b to-transparent pointer-events-none',
+            'absolute inset-x-0 top-0 h-16 bg-linear-to-b to-transparent pointer-events-none',
             colorConfig.gradient
           )} />
         )}
@@ -166,7 +166,7 @@ export function QuestCard({
         {showEffects && isHovered && !isSecondary && (
           <div className="absolute inset-0 z-20 pointer-events-none overflow-hidden" aria-hidden="true">
             <div
-              className="absolute top-0 w-[60%] h-full bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 animate-hologram-shimmer"
+              className="absolute top-0 w-[60%] h-full bg-linear-to-r from-transparent via-white/10 to-transparent -skew-x-12 animate-hologram-shimmer"
               style={{ left: '-150%' }}
             />
           </div>
@@ -189,7 +189,7 @@ export function QuestCard({
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 className={cn(
-                  'absolute -top-1 -start-1 p-0.5 rounded-full border-2 border-neo-black shadow-hard-xs',
+                  'absolute -top-1 -inset-s-1 p-0.5 rounded-full border-2 border-neo-black shadow-hard-xs',
                   status === 'won' ? 'bg-neo-lime' : 'bg-neo-pink'
                 )}
                 data-testid={status === 'won' ? 'won-badge' : 'lost-badge'}
@@ -231,7 +231,7 @@ export function QuestCard({
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     className={cn(
-                      'absolute -top-1 -start-1 p-0.5 rounded-full border-2 border-neo-black shadow-hard-xs',
+                      'absolute -top-1 -inset-s-1 p-0.5 rounded-full border-2 border-neo-black shadow-hard-xs',
                       status === 'won' ? 'bg-neo-lime' : 'bg-neo-pink'
                     )}
                     data-testid={status === 'won' ? 'won-badge' : 'lost-badge'}
@@ -244,13 +244,13 @@ export function QuestCard({
                 )}
 
                 {isLoadingStatus && (
-                  <div className="absolute -top-1 -start-1 p-0.5 rounded-full bg-slate-700 border border-slate-600">
+                  <div className="absolute -top-1 -inset-s-1 p-0.5 rounded-full bg-slate-700 border border-slate-600">
                     <Loader2 className="w-3 h-3 animate-spin text-slate-400" />
                   </div>
                 )}
 
                 {badge && !isCompleted && !isLoadingStatus && (
-                  <div className="absolute -bottom-1 -end-1 bg-neo-pink px-1.5 py-0.5 border border-neo-black text-[8px] font-black text-white rounded-md shadow-hard-xs uppercase">
+                  <div className="absolute -bottom-1 -inset-e-1 bg-neo-pink px-1.5 py-0.5 border border-neo-black text-[8px] font-black text-white rounded-md shadow-hard-xs uppercase">
                     {badge}
                   </div>
                 )}

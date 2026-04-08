@@ -138,7 +138,10 @@ export function LandscapeGameLayout({
   onDismissLandscapeTutorial: _onDismissLandscapeTutorial,
   t,
 }: LandscapeGameLayoutProps): React.ReactElement {
-  const validWordCount = foundWords.filter(fw => fw.isValid === true).length;
+  const validWords = React.useMemo(() => foundWords.filter(fw => fw.isValid === true), [foundWords]);
+  const validWordCount = validWords.length;
+  const validWordLengths = React.useMemo(() => validWords.map(fw => fw.word.length), [validWords]);
+  const tSafe = React.useCallback((key: string) => t(key) || key, [t]);
   const isPracticeMode = mode === 'practice';
 
   // Desktop input state
@@ -166,7 +169,7 @@ export function LandscapeGameLayout({
         validWordCount={validWordCount}
         comboLevel={comboLevel}
         maxCombo={maxCombo}
-        wordLengths={foundWords.filter(fw => fw.isValid === true).map(fw => fw.word.length)}
+        wordLengths={validWordLengths}
         timeSinceStart={totalTime - remainingTime}
         gameDuration={totalTime}
         isGameOver={isGameOver}
@@ -177,7 +180,7 @@ export function LandscapeGameLayout({
         trainingJustUnlocked={training?.justUnlocked}
         onClearTrainingUnlock={training?.clearJustUnlocked}
         showKeyboardHint={true}
-        t={(key) => t(key) || key}
+        t={tSafe}
       />
 
       {/* Training Progress Bar - compact chip in landscape practice mode */}
@@ -350,7 +353,7 @@ export function LandscapeGameLayout({
           <AdaptiveMotion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-neo-cream/95 backdrop-blur-sm border-2 border-neo-black rounded-full shadow-hard-sm"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-neo-cream/95 backdrop-blur-xs border-2 border-neo-black rounded-full shadow-hard-sm"
           >
             <List className="w-4 h-4 text-neo-black/70" />
             {foundWords.slice(-3).reverse().map((fw, i) => (

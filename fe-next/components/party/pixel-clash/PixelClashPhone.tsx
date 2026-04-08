@@ -7,9 +7,11 @@
  */
 
 import { memo, useEffect, useState, useCallback, useRef } from 'react';
+import { setInterval, clearInterval } from 'worker-timers';
 import type { Socket } from 'socket.io-client';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { DrawingCanvas, type DrawingData, type DrawingCanvasHandle } from './DrawingCanvas';
+import { usePartySounds } from '@/hooks/usePartySounds';
 
 // ==================== Types ====================
 
@@ -58,6 +60,7 @@ interface PixelClashPhoneProps {
 
 function PixelClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: PixelClashPhoneProps) {
   const { t } = useLanguage();
+  const partySounds = usePartySounds();
   const [phase, setPhase] = useState<PhonePhase>('waiting');
   const [promptText, setPromptText] = useState('');
   const [guessText, setGuessText] = useState('');
@@ -73,9 +76,10 @@ function PixelClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: Pi
   // Timer
   useEffect(() => {
     if (timeRemaining <= 0) return;
+    if (timeRemaining <= 5) partySounds.onCountdown(timeRemaining);
     const interval = setInterval(() => setTimeRemaining(prev => Math.max(0, prev - 1)), 1000);
     return () => clearInterval(interval);
-  }, [timeRemaining]);
+  }, [timeRemaining, partySounds]);
 
   // Socket listeners
   useEffect(() => {
@@ -83,6 +87,7 @@ function PixelClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: Pi
 
     const onPhaseUpdate = (data: PhaseUpdateData) => {
       setTimeRemaining(data.timeSeconds);
+      partySounds.onPhaseTransition();
 
       if (data.phase === 'write-prompt') {
         // Legacy — prompts now auto-assigned, but keep for safety
@@ -172,7 +177,8 @@ function PixelClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: Pi
     if (!promptText.trim()) return;
     onSendInput({ gameId: 'pixel-clash', action: 'submit-prompt', text: promptText.trim() });
     setPhase('submitted');
-  }, [promptText, onSendInput]);
+    partySounds.onSubmit();
+  }, [promptText, onSendInput, partySounds]);
 
   const handleSubmitDrawing = useCallback(() => {
     const strokes = strokesRef.current;
@@ -189,19 +195,22 @@ function PixelClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: Pi
       onSendInput({ gameId: 'pixel-clash', action: 'draw', strokes });
     }
     setPhase('submitted');
-  }, [assignment, phase, onSendInput]);
+    partySounds.onSubmit();
+  }, [assignment, phase, onSendInput, partySounds]);
 
   const handleSubmitGuess = useCallback(() => {
     if (!guessText.trim() || !assignment?.chainId) return;
     onSendInput({ gameId: 'pixel-clash', action: 'guess', text: guessText.trim(), chainId: assignment.chainId });
     setPhase('submitted');
-  }, [guessText, assignment, onSendInput]);
+    partySounds.onSubmit();
+  }, [guessText, assignment, onSendInput, partySounds]);
 
   const handleSubmitVote = useCallback(() => {
     if (!showdownVote.best) return;
     onSendInput({ gameId: 'pixel-clash', action: 'vote', best: showdownVote.best, funniest: showdownVote.funniest });
     setPhase('submitted');
-  }, [showdownVote, onSendInput]);
+    partySounds.onVote();
+  }, [showdownVote, onSendInput, partySounds]);
 
   const canvasSize = Math.min(320, typeof window !== 'undefined' ? window.innerWidth - 32 : 320);
 
@@ -234,7 +243,7 @@ function PixelClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: Pi
             bg-neo-navy-elevated border-3 border-neo-cyan/50 rounded-neo
             px-4 py-3 text-neo-cream font-neo-body text-lg
             placeholder:text-neo-cream/20
-            focus:outline-none focus:border-neo-cyan mb-4
+            focus:outline-hidden focus:border-neo-cyan mb-4
           "
         />
 
@@ -245,7 +254,7 @@ function PixelClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: Pi
             bg-neo-cyan border-3 border-neo-black rounded-neo shadow-hard
             px-6 py-3 font-neo-display text-neo-black uppercase font-bold
             transition-all duration-100
-            hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard-lg
+            hover:-translate-x-px hover:-translate-y-px hover:shadow-hard-lg
             active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed
             disabled:opacity-30 disabled:cursor-not-allowed
           "
@@ -342,7 +351,7 @@ function PixelClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: Pi
             w-full bg-neo-navy-elevated border-3 border-neo-cyan/50 rounded-neo
             px-4 py-3 text-neo-cream font-neo-body text-lg
             placeholder:text-neo-cream/20
-            focus:outline-none focus:border-neo-cyan mb-3
+            focus:outline-hidden focus:border-neo-cyan mb-3
           "
         />
 

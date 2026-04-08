@@ -69,9 +69,9 @@ function initializeSocketHandlers(io: Server): void {
     // Initialize rate limiting for this socket with IP tracking
     initRateLimit(socket);
 
-    // Register friends:setAuth once (not inside promise branches to avoid duplication)
-    socket.on('friends:setAuth', (data: { userId: string }) => {
-      const userId = data?.userId;
+    // Register friends:setAuth once — use JWT-verified identity, never trust client payload
+    socket.on('friends:setAuth', () => {
+      const userId = socket.data?.verifiedUserId;
       if (!userId || typeof userId !== 'string') return;
       (socket as any).authUserId = userId;
       socket.join(`user:${userId}`);

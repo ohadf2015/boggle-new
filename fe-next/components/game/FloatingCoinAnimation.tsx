@@ -136,7 +136,7 @@ const FloatingCoinAnimation = memo<FloatingCoinAnimationProps>(({
         exit={{ opacity: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <div className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-gradient-to-r from-yellow-400 to-orange-400 text-white font-bold shadow-lg">
+        <div className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-linear-to-r from-yellow-400 to-orange-400 text-white font-bold shadow-lg">
           <span>💰</span>
           <span>+{displayAmount}</span>
         </div>
@@ -169,7 +169,7 @@ const FloatingCoinAnimation = memo<FloatingCoinAnimationProps>(({
           }}
         >
           <motion.div
-            className="px-4 py-2 rounded-full bg-gradient-to-r from-yellow-400 via-amber-400 to-orange-400 text-white font-black text-xl shadow-xl border-2 border-yellow-200"
+            className="px-4 py-2 rounded-full bg-linear-to-r from-yellow-400 via-amber-400 to-orange-400 text-white font-black text-xl shadow-xl border-2 border-yellow-200"
             style={{
               filter: 'drop-shadow(0 0 12px rgba(251, 191, 36, 0.6))',
             }}

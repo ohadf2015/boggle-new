@@ -71,7 +71,7 @@ const PuzzleWordEditor: React.FC<PuzzleWordEditorProps> = ({
       className="bg-neo-cream border-4 border-neo-black rounded-neo shadow-hard-lg max-w-md w-full overflow-hidden"
     >
       {/* Header with gradient */}
-      <div className="bg-gradient-to-r from-neo-pink to-neo-orange border-b-4 border-neo-black px-5 py-4">
+      <div className="bg-linear-to-r from-neo-pink to-neo-orange border-b-4 border-neo-black px-5 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <AdaptiveMotion.div
@@ -113,7 +113,7 @@ const PuzzleWordEditor: React.FC<PuzzleWordEditorProps> = ({
               className={cn(
                 "w-full px-4 py-4 text-2xl font-black text-center uppercase tracking-widest",
                 "bg-neo-white border-4 border-neo-black rounded-neo shadow-hard-sm",
-                "focus:outline-none focus:shadow-hard focus:-translate-y-0.5 transition-all",
+                "focus:outline-hidden focus:shadow-hard focus:-translate-y-0.5 transition-all",
                 "placeholder:text-neo-black/30 placeholder:lowercase placeholder:font-normal placeholder:tracking-normal placeholder:text-base",
                 validationStatus === 'valid' && "border-neo-lime bg-neo-lime/10",
                 (validationStatus === 'invalid' || validationStatus === 'too-short' || validationStatus === 'too-long') && "border-neo-pink bg-neo-pink/10 animate-shake"
@@ -202,7 +202,7 @@ const PuzzleWordEditor: React.FC<PuzzleWordEditorProps> = ({
             className={cn(
               "w-full py-4 text-xl font-black uppercase border-4 rounded-neo transition-all",
               validationStatus === 'valid' && !isCreating
-                ? "bg-gradient-to-r from-neo-lime to-neo-cyan text-neo-black border-neo-black shadow-hard hover:shadow-hard-lg hover:-translate-y-1 active:translate-y-0 active:shadow-hard-pressed"
+                ? "bg-linear-to-r from-neo-lime to-neo-cyan text-neo-black border-neo-black shadow-hard hover:shadow-hard-lg hover:-translate-y-1 active:translate-y-0 active:shadow-hard-pressed"
                 : "bg-neo-black/20 text-neo-black/40 border-neo-black/30 cursor-not-allowed shadow-none"
             )}
           >

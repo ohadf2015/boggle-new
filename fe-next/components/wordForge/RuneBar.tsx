@@ -102,7 +102,7 @@ export function RuneBar({ runes, maxSlots, triggeredRuneIds = [] }: RuneBarProps
                       RARITY_GLOW[rune.def.rarity],
                       isTriggered && `ring-4 ${RARITY_RING[rune.def.rarity]}`,
                       'hover:translate-y-[-2px] hover:shadow-hard',
-                      'active:translate-y-[1px] active:shadow-hard-pressed',
+                      'active:translate-y-px active:shadow-hard-pressed',
                     )
                   : 'bg-transparent border-dashed border-neo-cream/20',
               )}

@@ -223,7 +223,7 @@ export function DuelHistory({ studentId, className }: DuelHistoryProps) {
                 {/* Badge */}
                 <div
                   className={cn(
-                    'flex-shrink-0 w-10 h-10 rounded-neo border-neo shadow-hard flex items-center justify-center',
+                    'shrink-0 w-10 h-10 rounded-neo border-neo shadow-hard flex items-center justify-center',
                     isWin && 'bg-green-500',
                     isLoss && 'bg-red-500',
                     isDraw && 'bg-yellow-500'

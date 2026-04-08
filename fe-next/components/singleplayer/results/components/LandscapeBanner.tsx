@@ -54,7 +54,7 @@ export function LandscapeBanner({
   const backgroundClass = hasNoWords
     ? 'bg-neo-cream dark:bg-slate-700'
     : (isWinner || isNewHighScore)
-      ? 'bg-gradient-to-r from-tier-gold to-yellow-300'
+      ? 'bg-linear-to-r from-tier-gold to-yellow-300'
       : 'bg-neo-cream dark:bg-slate-700';
 
   return (

@@ -99,7 +99,7 @@ const BossVictory = memo<BossVictoryProps>(
           className={cn(
             'fixed inset-0 z-50',
             'flex items-center justify-center',
-            'bg-neo-black/85 backdrop-blur-sm'
+            'bg-neo-black/85 backdrop-blur-xs'
           )}
         >
           {/* Themed background glow */}
@@ -174,7 +174,7 @@ const BossVictory = memo<BossVictoryProps>(
                     'object-contain',
                     'border-3 border-neo-black rounded-neo',
                     isVictory
-                      ? 'opacity-90 grayscale-[20%]'
+                      ? 'opacity-90 grayscale-20'
                       : 'drop-shadow-[0_0_16px_rgba(239,68,68,0.6)]'
                   )}
                   animate={isVictory
@@ -325,7 +325,7 @@ const BossVictory = memo<BossVictoryProps>(
                     'border-3 border-neo-black rounded-neo',
                     'shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5',
                     'active:translate-y-0.5 active:shadow-hard-pressed',
-                    'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan',
+                    'focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan',
                     'transition-all duration-200'
                   )}
                 >
@@ -346,7 +346,7 @@ const BossVictory = memo<BossVictoryProps>(
                   'border-3 border-neo-black rounded-neo',
                   'shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5',
                   'active:translate-y-0.5 active:shadow-hard-pressed',
-                  'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan',
+                  'focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan',
                   'transition-all duration-200'
                 )}
               >

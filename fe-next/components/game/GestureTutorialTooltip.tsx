@@ -58,7 +58,7 @@ export function GestureTutorialTooltip() {
             <AdaptiveMotion.div
               animate={{ x: [0, 8, 0] }}
               transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
-              className="flex-shrink-0"
+              className="shrink-0"
             >
               <Hand className="w-6 h-6 text-neo-navy" strokeWidth={2.5} />
             </AdaptiveMotion.div>

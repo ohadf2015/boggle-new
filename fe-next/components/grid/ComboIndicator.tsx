@@ -215,7 +215,7 @@ const ComboIndicator: React.FC<ComboIndicatorProps> = ({
     <AnimatePresence mode="wait">
       <motion.div
         key={`combo-${animationKey}`}
-        className="fixed top-28 start-4 sm:start-1/2 sm:-translate-x-1/2 rtl:sm:translate-x-1/2 z-[80] pointer-events-none combo-indicator-container flex items-center justify-center"
+        className="fixed top-28 inset-s-4 sm:inset-s-1/2 sm:-translate-x-1/2 sm:rtl:translate-x-1/2 z-[80] pointer-events-none combo-indicator-container flex items-center justify-center"
         data-tutorial="combo"
         data-extreme={isExtremeCombo}
         initial={{ opacity: 1 }}
@@ -286,8 +286,8 @@ const ComboIndicator: React.FC<ComboIndicatorProps> = ({
           {/* Badge content */}
           <motion.div
             className={cn(
-              'px-5 py-2.5 rounded-full font-extrabold text-2xl md:text-3xl text-white backdrop-blur-sm relative overflow-hidden',
-              !isRainbow && 'bg-gradient-to-r from-orange-500 via-red-500 to-pink-500',
+              'px-5 py-2.5 rounded-full font-extrabold text-2xl md:text-3xl text-white backdrop-blur-xs relative overflow-hidden',
+              !isRainbow && 'bg-linear-to-r from-orange-500 via-red-500 to-pink-500',
               comboColors.shadow,
               'border-3 border-white/50'
             )}

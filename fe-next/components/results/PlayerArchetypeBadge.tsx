@@ -211,7 +211,7 @@ const PlayerArchetypeBadge = memo<PlayerArchetypeBadgeProps>(({
       transition={{ type: 'spring', stiffness: 300, damping: 15 }}
     >
       {/* Icon - Image or Emoji fallback */}
-      <div className={cn('flex-shrink-0 flex items-center justify-center', sizes.icon)}>
+      <div className={cn('shrink-0 flex items-center justify-center', sizes.icon)}>
         {archetype.icon && !imageError ? (
           <Image
             src={archetype.icon}
@@ -293,7 +293,7 @@ const PlayerArchetypeBadge = memo<PlayerArchetypeBadgeProps>(({
           {/* Header: Icon + Name */}
           <div className="flex items-center gap-2 mb-1.5 relative z-10">
             <div className={cn(
-              'w-7 h-7 rounded-neo border-2 border-neo-black flex items-center justify-center flex-shrink-0',
+              'w-7 h-7 rounded-neo border-2 border-neo-black flex items-center justify-center shrink-0',
               bgColor
             )}>
               {archetype.icon && !imageError ? (

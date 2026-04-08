@@ -35,7 +35,7 @@ export function TileBadge({ type, isFrozen = false }: TileBadgeProps) {
       <span
         className={cn(
           'tile-gold-badge',
-          'absolute -top-1.5 -end-1.5 z-20',
+          'absolute -top-1.5 -inset-e-1.5 z-20',
           'min-w-6 h-6',
           'flex items-center justify-center',
           'bg-neo-black text-neo-yellow',
@@ -54,7 +54,7 @@ export function TileBadge({ type, isFrozen = false }: TileBadgeProps) {
     return (
       <span
         className={cn(
-          'absolute -top-1.5 -end-1.5 z-20',
+          'absolute -top-1.5 -inset-e-1.5 z-20',
           'min-w-6 h-6',
           'flex items-center justify-center',
           'bg-neo-black text-neo-white',
@@ -74,7 +74,7 @@ export function TileBadge({ type, isFrozen = false }: TileBadgeProps) {
       <>
         <div
           className={cn(
-            'absolute -top-1 -end-1 z-20',
+            'absolute -top-1 -inset-e-1 z-20',
             'w-6 h-6',
             'flex items-center justify-center',
             'bg-neo-black rounded-full',
@@ -97,7 +97,7 @@ export function TileBadge({ type, isFrozen = false }: TileBadgeProps) {
     return (
       <div
         className={cn(
-          'absolute -top-1 -end-1 z-20',
+          'absolute -top-1 -inset-e-1 z-20',
           'w-6 h-6',
           'flex items-center justify-center',
           'bg-neo-black rounded-full',
@@ -115,7 +115,7 @@ export function TileBadge({ type, isFrozen = false }: TileBadgeProps) {
     return (
       <div
         className={cn(
-          'absolute -top-1 -end-1 z-20',
+          'absolute -top-1 -inset-e-1 z-20',
           'w-6 h-6',
           'flex items-center justify-center',
           'bg-neo-black rounded-full',
@@ -134,7 +134,7 @@ export function TileBadge({ type, isFrozen = false }: TileBadgeProps) {
       <div
         className={cn(
           'frost-overlay absolute inset-0 rounded-neo',
-          'bg-gradient-to-br from-white/50 via-cyan-100/40 to-blue-200/50',
+          'bg-linear-to-br from-white/50 via-cyan-100/40 to-blue-200/50',
           'backdrop-blur-[2px]',
           'pointer-events-none z-5'
         )}

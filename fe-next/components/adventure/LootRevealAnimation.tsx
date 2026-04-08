@@ -122,7 +122,7 @@ export const LootRevealAnimation = memo<LootRevealAnimationProps>(({
                   alt={drop.label || drop.type}
                   width={20}
                   height={20}
-                  className="flex-shrink-0"
+                  className="shrink-0"
                 />
               )}
               {drop.label || (LOOT_TRANSLATION_KEYS[drop.type] ? t(LOOT_TRANSLATION_KEYS[drop.type]) : drop.type)}

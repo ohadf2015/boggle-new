@@ -32,7 +32,7 @@ interface ResultsInfoCardsProps {
 function InfoCard({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
     <div className={cn(
-      'bg-white/[0.06] text-white border-2 border-white/10 rounded-neo-lg p-4 backdrop-blur-sm',
+      'bg-white/6 text-white border-2 border-white/10 rounded-neo-lg p-4 backdrop-blur-xs',
       className,
     )}>
       {children}

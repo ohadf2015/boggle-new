@@ -14,6 +14,8 @@ function getRedisClient(): RedisClient {
 
 // Debounce timers for persistence
 const persistTimers: Record<string, ReturnType<typeof setTimeout>> = {};
+// Cleanup timers for restored games (cancellable on shutdown)
+const restoreCleanupTimers: ReturnType<typeof setTimeout>[] = [];
 const PERSIST_DEBOUNCE_MS = parseInt(process.env.PERSIST_DEBOUNCE_MS || '200', 10);
 
 export function persistGameState(
@@ -207,13 +209,14 @@ export async function restoreAllGamesFromRedis(
         if (game) {
           restored++;
           // Set a cleanup timer — if no players reconnect, clean up the game
-          setTimeout(() => {
+          const timer = setTimeout(() => {
             const g = games[gameCode];
             if (g && Object.keys(g.users).length === 0) {
               logger.info('PERSIST', `No players reconnected to ${gameCode} within ${RESTORE_CLEANUP_MS / 1000}s, cleaning up`);
               delete games[gameCode];
             }
           }, RESTORE_CLEANUP_MS);
+          restoreCleanupTimers.push(timer);
         }
       } catch (error) {
         logger.error('PERSIST', `Failed to restore game ${gameCode}`, error);
@@ -233,4 +236,10 @@ export function clearPersistTimer(gameCode: string): void {
     clearTimeout(persistTimers[gameCode]);
     delete persistTimers[gameCode];
   }
+}
+
+/** Cancel all restore cleanup timers (call on graceful shutdown). */
+export function clearAllRestoreTimers(): void {
+  for (const t of restoreCleanupTimers) clearTimeout(t);
+  restoreCleanupTimers.length = 0;
 }

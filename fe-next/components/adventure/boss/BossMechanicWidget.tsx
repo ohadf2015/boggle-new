@@ -74,7 +74,7 @@ const BossMechanicWidget = memo<BossMechanicWidgetProps>(({
         {showMultiplier && (
           <span
             data-testid="bonus-multiplier"
-            className="font-neo-display text-xs font-bold text-neo-yellow ms-2 flex-shrink-0"
+            className="font-neo-display text-xs font-bold text-neo-yellow ms-2 shrink-0"
           >
             {Math.floor(bonusMultiplier)}x
           </span>

@@ -81,7 +81,7 @@ const CrazyGamesFriendsStrip = memo(function CrazyGamesFriendsStrip({ roomId }: 
               onClick={handleFriendClick}
               title={t('multiplayerFlow.inviteFriend', 'Invite {{name}}').replace('{{name}}', friend.username)}
               className={cn(
-                'flex flex-col items-center gap-1.5 w-16 flex-shrink-0',
+                'flex flex-col items-center gap-1.5 w-16 shrink-0',
                 roomId ? 'cursor-pointer hover:scale-105 transition-transform' : 'cursor-default'
               )}
             >

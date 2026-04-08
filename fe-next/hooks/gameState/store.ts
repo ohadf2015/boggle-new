@@ -394,9 +394,15 @@ export const useGameStore = create<GameStore>()(
     // ==========================================
 
     batchStartGame: (data) => {
+      // Clear combo timeout to prevent stale timer from previous game
+      if (_comboTimeoutId) {
+        clearTimeout(_comboTimeoutId);
+        _comboTimeoutId = null;
+      }
+      // Full reset first, then apply explicit overrides — prevents stale state bleed
       set(() => ({
-        foundWords: [],
-        achievements: [],
+        ...initialState,
+        combo: DEFAULT_COMBO_STATE,
         ...(data.letterGrid !== undefined && { letterGrid: data.letterGrid }),
         ...(data.remainingTime !== undefined && { remainingTime: data.remainingTime, gameDuration: data.remainingTime }),
         ...(data.gameLanguage !== undefined && { gameLanguage: data.gameLanguage }),
@@ -410,14 +416,6 @@ export const useGameStore = create<GameStore>()(
         ...(data.wordHuntMyLife !== undefined && { wordHuntMyLife: data.wordHuntMyLife }),
         ...(data.showStartAnimation !== undefined && { showStartAnimation: data.showStartAnimation }),
         ...(data.gameActive !== undefined && { gameActive: data.gameActive }),
-        // Always reset word hunt state to avoid stale data from previous WH games
-        wordHuntTargetCategory: null,
-        wordHuntPlayerLives: {},
-        wordHuntTargetAttempts: [],
-        wordHuntTargetFound: false,
-        wordHuntTargetFoundBy: null,
-        wordHuntDiscoveryClues: [],
-        wordHuntKnownLetters: [],
       }));
     },
 
@@ -463,6 +461,7 @@ export const useGameStore = create<GameStore>()(
         wordHuntPlayerLives: {},
         wordHuntTargetAttempts: [],
         wordHuntTargetFound: false,
+        wordHuntTargetFoundBy: null,
         wordHuntEliminatedPlayers: [],
         wordHuntDiscoveryClues: [],
         wordHuntKnownLetters: [],

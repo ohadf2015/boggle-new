@@ -162,7 +162,7 @@ const TvGameHeader = memo<TvGameHeaderProps>(({
                 initial={{ scale: 0, rotate: -10 }}
                 animate={{ scale: 1, rotate: 3 }}
                 exit={{ scale: 0, rotate: 10 }}
-                className="flex items-center gap-2 bg-gradient-to-r from-neo-orange to-neo-red text-neo-cream px-4 py-2 rounded-neo border-3 border-neo-black shadow-hard-sm"
+                className="flex items-center gap-2 bg-linear-to-r from-neo-orange to-neo-red text-neo-cream px-4 py-2 rounded-neo border-3 border-neo-black shadow-hard-sm"
                 style={{
                   animation: 'fire-glow 1s ease-in-out infinite',
                 }}

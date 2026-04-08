@@ -63,11 +63,11 @@ export function PushNotificationPrompt() {
           aria-label={t('notifications.prompt.title')}
           data-testid="push-notification-prompt"
         >
-          <div className="relative bg-neo-navy border-neo border-neo-yellow rounded-neo p-5 shadow-hard-lg">
+          <div className="relative bg-neo-navy border-neo border-neo-lime rounded-neo p-5 shadow-hard-lg">
             {/* Close button */}
             <button
               onClick={handleDismiss}
-              className="absolute top-2 end-2 p-1 text-gray-400 hover:text-white transition-colors"
+              className="absolute top-2 inset-e-2 p-1 text-gray-400 hover:text-white transition-colors"
               aria-label={t('notifications.prompt.notNow')}
             >
               <X className="w-4 h-4" />
@@ -75,8 +75,8 @@ export function PushNotificationPrompt() {
 
             {/* Icon + Content */}
             <div className="flex items-start gap-4">
-              <div className="flex-shrink-0 w-12 h-12 rounded-neo bg-neo-yellow/20 flex items-center justify-center">
-                <Bell className="w-6 h-6 text-neo-yellow" />
+              <div className="shrink-0 w-12 h-12 rounded-neo bg-neo-lime/20 flex items-center justify-center">
+                <Bell className="w-6 h-6 text-neo-lime" />
               </div>
               <div className="flex-1 min-w-0">
                 <h3 className="font-neo-display text-lg font-bold text-neo-white mb-1">
@@ -90,7 +90,7 @@ export function PushNotificationPrompt() {
                 <div className="flex gap-3">
                   <button
                     onClick={handleEnable}
-                    className="flex-1 px-4 py-2 bg-neo-yellow text-neo-black font-bold text-sm rounded-neo border-neo border-neo-black shadow-hard-sm hover:shadow-hard-pressed active:translate-y-0.5 transition-all"
+                    className="flex-1 px-4 py-2 bg-neo-lime text-neo-black font-bold text-sm rounded-neo border-neo border-neo-black shadow-hard-sm hover:shadow-hard-pressed active:translate-y-0.5 transition-all"
                   >
                     {t('notifications.prompt.enable')}
                   </button>

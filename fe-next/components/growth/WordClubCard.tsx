@@ -38,7 +38,7 @@ function MemberRow({
       {/* Rank */}
       <span
         className={cn(
-          'flex-shrink-0 w-5 text-center text-xs font-bold',
+          'shrink-0 w-5 text-center text-xs font-bold',
           rank === 1 && 'text-neo-yellow',
           rank === 2 && 'text-neo-white/80',
           rank === 3 && 'text-neo-orange',
@@ -59,7 +59,7 @@ function MemberRow({
       </span>
 
       {/* Weekly XP */}
-      <span className="flex-shrink-0 text-xs font-bold text-neo-yellow">
+      <span className="shrink-0 text-xs font-bold text-neo-yellow">
         {member.weeklyXp.toLocaleString()} XP
       </span>
     </div>

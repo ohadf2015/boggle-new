@@ -98,7 +98,7 @@ export const ShareSection: React.FC<ShareSectionProps> = ({
             className={cn(
               "w-full py-3.5 text-lg font-black uppercase border-3 rounded-neo transition-all",
               canAffordRetry && !isRetrying
-                ? "bg-gradient-to-r from-amber-400 to-orange-500 text-neo-black border-neo-black shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5"
+                ? "bg-linear-to-r from-amber-400 to-orange-500 text-neo-black border-neo-black shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5"
                 : "bg-gray-400 text-gray-600 border-neo-black cursor-not-allowed shadow-hard"
             )}
           >
@@ -128,7 +128,7 @@ export const ShareSection: React.FC<ShareSectionProps> = ({
         /* Winners: Challenge Friends CTA (falls back to native share) */
         <Button
           onClick={onChallengeShare ?? onShare}
-          className="w-full max-w-btn mx-auto py-3.5 text-lg font-black uppercase bg-gradient-to-r from-neo-lime via-neo-lime to-neo-pink text-neo-black border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 transition-all"
+          className="w-full max-w-btn mx-auto py-3.5 text-lg font-black uppercase bg-linear-to-r from-neo-lime via-neo-lime to-neo-pink text-neo-black border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 transition-all"
         >
           <Share2 className="me-2 w-5 h-5" />
           {t('wordHunt.results.challengeFriends')}

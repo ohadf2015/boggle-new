@@ -45,7 +45,7 @@ export function ChartSkeleton({
               {[40, 60, 45, 70, 55, 80, 65].map((h, i) => (
                 <div
                   key={i}
-                  className="w-2 bg-gradient-to-t from-neo-cyan/30 to-neo-pink/30 rounded-t animate-pulse"
+                  className="w-2 bg-linear-to-t from-neo-cyan/30 to-neo-pink/30 rounded-t animate-pulse"
                   style={{ height: `${h}%`, animationDelay: `${i * 100}ms` }}
                 />
               ))}

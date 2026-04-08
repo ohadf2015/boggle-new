@@ -62,14 +62,14 @@ export const CoinUnlockCard: React.FC<CoinUnlockCardProps> = ({
       className={cn(
         "rounded-neo-lg border-3 border-neo-black shadow-hard transition-all",
         canAffordAction
-          ? `bg-gradient-to-br ${gradientFrom} ${gradientTo} cursor-pointer hover:shadow-hard-lg`
+          ? `bg-linear-to-br ${gradientFrom} ${gradientTo} cursor-pointer hover:shadow-hard-lg`
           : "bg-gray-700"
       )}
       onClick={handleClick}
     >
       <div className="px-4 py-3 flex items-center gap-3">
         <div className={cn(
-          "flex-shrink-0 w-10 h-10 rounded-neo flex items-center justify-center border-2 border-neo-black",
+          "shrink-0 w-10 h-10 rounded-neo flex items-center justify-center border-2 border-neo-black",
           canAffordAction ? "bg-white/20" : "bg-white/10"
         )}>
           {icon}
@@ -83,7 +83,7 @@ export const CoinUnlockCard: React.FC<CoinUnlockCardProps> = ({
           </div>
         </div>
         {/* Cost badge — inline instead of absolute */}
-        <div className="flex-shrink-0 flex items-center gap-1 px-2.5 py-1 bg-neo-lime rounded-full border-2 border-neo-black shadow-hard-sm text-neo-black">
+        <div className="shrink-0 flex items-center gap-1 px-2.5 py-1 bg-neo-lime rounded-full border-2 border-neo-black shadow-hard-sm text-neo-black">
           <Coins className="w-4 h-4 text-neo-black" />
           <span className="font-black text-sm text-neo-black">{cost}</span>
         </div>

@@ -122,7 +122,7 @@ const MusicControls: React.FC = memo(() => {
         variant="outline"
         size="icon"
         onClick={handleClick}
-        className={`relative flex items-center justify-center w-10 h-10 min-w-[44px] min-h-[44px] border-3 border-neo-black dark:border-slate-500 rounded-neo shadow-hard-sm hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all duration-100 flex-shrink-0 ${hasMounted && (isMuted || volume === 0) && (sfxMuted || sfxVolume === 0) ? 'bg-slate-200 text-slate-400 dark:bg-slate-600 dark:text-slate-400' : 'bg-neo-cream dark:bg-slate-700 text-neo-black dark:text-white'}`}
+        className={`relative flex items-center justify-center w-10 h-10 min-w-[44px] min-h-[44px] border-3 border-neo-black dark:border-slate-500 rounded-neo shadow-hard-sm hover:-translate-x-px hover:-translate-y-px hover:shadow-hard active:translate-x-px active:translate-y-px active:shadow-none transition-all duration-100 shrink-0 ${hasMounted && (isMuted || volume === 0) && (sfxMuted || sfxVolume === 0) ? 'bg-slate-200 text-slate-400 dark:bg-slate-600 dark:text-slate-400' : 'bg-neo-cream dark:bg-slate-700 text-neo-black dark:text-white'}`}
         aria-label={hasMounted ? (isMuted ? (t('music.unmute')) : (t('music.mute'))) : (t('music.mute'))}
         aria-pressed={hasMounted ? !isMuted : true}
         title={hasMounted ? (isMuted ? (t('music.soundOff')) : (t('music.soundOn'))) : (t('music.sound'))}

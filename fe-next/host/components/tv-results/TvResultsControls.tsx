@@ -48,7 +48,7 @@ const TvResultsControls = memo<TvResultsControlsProps>(({
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 50, opacity: 0 }}
           transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-          className="fixed bottom-0 left-0 right-0 z-[70] bg-gradient-to-t from-slate-900 via-slate-900/95 to-transparent pt-8 pb-6 px-6"
+          className="fixed bottom-0 left-0 right-0 z-[70] bg-linear-to-t from-slate-900 via-slate-900/95 to-transparent pt-8 pb-6 px-6"
         >
           <div className="max-w-5xl mx-auto flex items-center justify-between gap-4">
             {/* Skip Button (only during animation) */}
@@ -115,7 +115,7 @@ const TvResultsControls = memo<TvResultsControlsProps>(({
                       'bg-neo-lime text-neo-black border-4 border-neo-black',
                       'shadow-hard-lg hover:shadow-hard-xl',
                       'hover:translate-x-[-3px] hover:translate-y-[-3px]',
-                      'active:shadow-hard active:translate-x-[1px] active:translate-y-[1px]',
+                      'active:shadow-hard active:translate-x-px active:translate-y-px',
                       'transition-all'
                     )}
                   >
@@ -130,7 +130,7 @@ const TvResultsControls = memo<TvResultsControlsProps>(({
                       'bg-neo-lime text-neo-black border-4 border-neo-black',
                       'shadow-hard-lg hover:shadow-hard-xl',
                       'hover:translate-x-[-3px] hover:translate-y-[-3px]',
-                      'active:shadow-hard active:translate-x-[1px] active:translate-y-[1px]',
+                      'active:shadow-hard active:translate-x-px active:translate-y-px',
                       'transition-all'
                     )}
                   >

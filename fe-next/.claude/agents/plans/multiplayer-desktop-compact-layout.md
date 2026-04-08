@@ -117,7 +117,7 @@ Multiple spacing improvements:
 1. **Main container gaps** (line 190): Reduce `lg:gap-3` to `lg:gap-2`
 2. **Stats row padding** (line 214): Reduce `px-1 md:px-2` - keep minimal
 3. **Grid container** (line 357): Ensure `flex-1` takes maximum space
-4. **Sidebar flex properties**: Ensure `flex-shrink-0` is minimal
+4. **Sidebar flex properties**: Ensure `shrink-0` is minimal
 
 ### Phase 3: Optimize Sidebar Heights
 

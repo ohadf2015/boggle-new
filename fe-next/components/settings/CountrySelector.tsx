@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo, useRef, useEffect } from 'react';
+import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import { ChevronDown, Search, X, Globe } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getCountryFlag } from '@/shared/utils/countryUtils';
@@ -137,11 +137,11 @@ export function CountrySelector({
     }
   }, [isOpen]);
 
-  const handleSelect = (code: string | null) => {
+  const handleSelect = useCallback((code: string | null) => {
     onChange(code);
     setIsOpen(false);
     setSearch('');
-  };
+  }, [onChange]);
 
   return (
     <div ref={dropdownRef} className={cn('relative', className)}>
@@ -213,7 +213,7 @@ export function CountrySelector({
                 placeholder={t('profile.searchCountry')}
                 className={cn(
                   'w-full ps-8 pe-8 py-2 text-sm rounded-md border',
-                  'focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2',
+                  'focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2',
                   isDarkMode
                     ? 'bg-slate-700 border-slate-600 text-white placeholder:text-gray-500 focus:border-cyan-500'
                     : 'bg-gray-50 border-gray-300 text-gray-900 placeholder:text-gray-400 focus:border-cyan-500'
@@ -226,7 +226,7 @@ export function CountrySelector({
                   aria-label={t('common.clearSearch')}
                   className={cn(
                     'absolute right-2 rtl:right-auto rtl:left-2 top-1/2 -translate-y-1/2',
-                    'focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 rounded',
+                    'focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 rounded',
                     isDarkMode ? 'text-gray-500 hover:text-gray-400' : 'text-gray-400 hover:text-gray-500'
                   )}
                 >

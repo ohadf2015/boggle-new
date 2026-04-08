@@ -213,7 +213,8 @@ export function generateDailyPuzzle(
   language: Language,
   preSelectedWord?: string,
   customRows?: number,
-  customCols?: number
+  customCols?: number,
+  supplementalNounWords?: string[],
 ): DailyPuzzle {
   const seedString = `${SEED_SALT}-${dateString}-${language}-v2`;
   const seed = hashString(seedString);
@@ -252,12 +253,17 @@ export function generateDailyPuzzle(
     targetWord = shuffled[0];
   }
 
-  // Get bonus words
-  const sameLengthWords = getSameLengthWords(targetWord, language, random);
+  // Get bonus words — supplemental noun words enrich both same-length and bonus pools
+  const nounWords = supplementalNounWords || [];
+  const sameLengthWords = getSameLengthWords(targetWord, language, random, nounWords);
   const bonusWordList = BONUS_WORD_LISTS[language] || BONUS_WORD_LISTS['en'];
-  const otherBonusWords = bonusWordList
-    .filter((w) => w.length !== targetWord.length)
+  const nounBonusWords = nounWords
+    .filter((w) => w.length !== targetWord.length && w.length >= 3)
     .map((w) => w.toUpperCase());
+  const otherBonusWords = [...new Set([
+    ...bonusWordList.filter((w) => w.length !== targetWord.length).map((w) => w.toUpperCase()),
+    ...nounBonusWords,
+  ])];
 
   const scoredOtherBonus = otherBonusWords.map((word) => ({
     word,

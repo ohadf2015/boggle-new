@@ -60,7 +60,7 @@ export function ProfileRankedProgress({
           </div>
           <div className="h-3 rounded-full overflow-hidden bg-black border-3 border-neo-black">
             <div
-              className="h-full bg-gradient-to-r from-neo-pink to-neo-cyan transition-all duration-500"
+              className="h-full bg-linear-to-r from-neo-pink to-neo-cyan transition-all duration-500"
               style={{ width: `${Math.min(100, ((profile?.casual_games || 0) / 10) * 100)}%` }}
             />
           </div>

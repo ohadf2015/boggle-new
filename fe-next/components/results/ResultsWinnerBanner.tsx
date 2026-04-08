@@ -68,7 +68,7 @@ const RANK_STYLES: Record<number, {
   glowColor: string;
 }> = {
   1: {
-    bgClass: 'bg-gradient-to-br from-tier-gold via-yellow-300 to-tier-gold',
+    bgClass: 'bg-linear-to-br from-tier-gold via-yellow-300 to-tier-gold',
     textClass: 'text-neo-black',
     iconBgClass: 'bg-neo-cream',
     iconTextClass: 'text-tier-gold',
@@ -92,7 +92,7 @@ const RANK_STYLES: Record<number, {
     glowColor: 'rgba(0,255,255,0.2)',
   },
   3: {
-    bgClass: 'bg-gradient-to-br from-amber-700 via-orange-600 to-amber-700',
+    bgClass: 'bg-linear-to-br from-amber-700 via-orange-600 to-amber-700',
     textClass: 'text-neo-cream',
     iconBgClass: 'bg-amber-100',
     iconTextClass: 'text-amber-700',
@@ -104,7 +104,7 @@ const RANK_STYLES: Record<number, {
     glowColor: 'rgba(205,127,50,0.2)',
   },
   4: {
-    bgClass: 'bg-gradient-to-br from-neo-pink via-purple-500 to-neo-pink',
+    bgClass: 'bg-linear-to-br from-neo-pink via-purple-500 to-neo-pink',
     textClass: 'text-white',
     iconBgClass: 'bg-purple-100',
     iconTextClass: 'text-neo-pink',
@@ -262,7 +262,7 @@ const ResultsWinnerBanner = memo<ResultsWinnerBannerProps>(({
         {/* Ghost rank number — dramatic backdrop */}
         {variant === 'ranking' && (
           <motion.div
-            className="absolute -top-3 -start-2 sm:-top-5 sm:-start-3 pointer-events-none select-none"
+            className="absolute -top-3 -inset-s-2 sm:-top-5 sm:-inset-s-3 pointer-events-none select-none"
             initial={reducedMotion ? { opacity: 0.08 } : { opacity: 0, scale: 2.5, rotate: -20 }}
             animate={{ opacity: 0.08, scale: 1, rotate: -12 }}
             transition={{ type: 'spring', stiffness: 300, damping: 15, delay: 0.2 }}
@@ -284,7 +284,7 @@ const ResultsWinnerBanner = memo<ResultsWinnerBannerProps>(({
         {/* Animated accent border glow for top 3 */}
         {rank <= 3 && variant === 'ranking' && !reducedMotion && (
           <motion.div
-            className="absolute inset-0 rounded-neo-lg pointer-events-none z-[2]"
+            className="absolute inset-0 rounded-neo-lg pointer-events-none z-2"
             animate={{
               boxShadow: [
                 `inset 0 0 0px transparent, 0 0 0px transparent`,
@@ -297,7 +297,7 @@ const ResultsWinnerBanner = memo<ResultsWinnerBannerProps>(({
         )}
 
         {/* Comic-style halftone texture */}
-        <div className="absolute inset-0 pointer-events-none opacity-[0.06] bg-[radial-gradient(circle,rgb(var(--neo-black))_1px,transparent_1px)] bg-[length:12px_12px]" />
+        <div className="absolute inset-0 pointer-events-none opacity-[0.06] bg-[radial-gradient(circle,rgb(var(--neo-black))_1px,transparent_1px)] bg-size-[12px_12px]" />
 
         {/* Diagonal accent stripes */}
         <div
@@ -331,7 +331,7 @@ const ResultsWinnerBanner = memo<ResultsWinnerBannerProps>(({
                 animate={{ scale: 1, rotate: -3, y: 0 }}
                 transition={{ delay: 0.2, type: 'spring', stiffness: 400, damping: 12 }}
                 whileHover={{ scale: 1.15, rotate: 3, transition: { duration: 0.15 } }}
-                className="flex-shrink-0"
+                className="shrink-0"
               >
                 <div className={`
                   relative ${styles.iconBgClass} border-3 border-neo-black rounded-neo shadow-hard
@@ -342,7 +342,7 @@ const ResultsWinnerBanner = memo<ResultsWinnerBannerProps>(({
                     className={`${styles.iconTextClass} ${compact ? 'w-5 h-5' : 'w-6 h-6 sm:w-7 sm:h-7'}`}
                   />
                   <span className={`
-                    absolute -bottom-2 -end-2 bg-neo-black text-neo-cream border-2 border-neo-cream
+                    absolute -bottom-2 -inset-e-2 bg-neo-black text-neo-cream border-2 border-neo-cream
                     rounded-neo font-black flex items-center justify-center shadow-hard-sm leading-none
                     ${compact ? 'px-1.5 py-0.5 min-w-[28px] text-[11px]' : 'px-2 py-1 min-w-[32px] text-xs sm:min-w-[36px] sm:text-sm'}
                   `}>
@@ -358,7 +358,7 @@ const ResultsWinnerBanner = memo<ResultsWinnerBannerProps>(({
                 initial={reducedMotion ? undefined : { scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ delay: 0.3, duration: 0.4, ease: [0.34, 1.56, 0.64, 1] }}
-                className="flex-shrink-0"
+                className="shrink-0"
               >
                 <div className={`
                   border-3 border-neo-black rounded-full shadow-hard-sm bg-neo-cream p-0.5

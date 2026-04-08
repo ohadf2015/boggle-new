@@ -6,10 +6,18 @@ import { Button } from '../../components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../../components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '../../components/ui/alert-dialog';
 import TournamentStandings from '../../components/TournamentStandings';
+import dynamic from 'next/dynamic';
 import InGameScreen from '../../components/game/InGameScreen';
-import { BlastGame } from '@/components/blast/BlastGame';
 import { useBlastMultiplayerBridge } from '@/components/blast/hooks/useBlastMultiplayerBridge';
-import { WordHuntGame } from '@/components/wordhunt/WordHuntGame';
+
+const BlastGame = dynamic(
+  () => import('@/components/blast/BlastGame').then(m => ({ default: m.BlastGame })),
+  { ssr: false },
+);
+const WordHuntGame = dynamic(
+  () => import('@/components/wordhunt/WordHuntGame').then(m => ({ default: m.WordHuntGame })),
+  { ssr: false },
+);
 import type { LetterGrid, Language, Avatar as AvatarType, TournamentStanding } from '@/shared/types/game';
 import type { BoardTheme } from '@/shared/types/socket';
 import { cn } from '@/lib/utils';

@@ -33,13 +33,13 @@ const HeaderLogo = memo(() => {
 
     return (
         <button
-            className="flex items-center gap-0.5 xs:gap-1 cursor-pointer bg-transparent border-none p-0 flex-shrink-0 relative active:scale-95 transition-transform"
+            className="flex items-center gap-0.5 xs:gap-1 cursor-pointer bg-transparent border-none p-0 shrink-0 relative active:scale-95 transition-transform"
             onClick={handleLogoClick}
             aria-label={t('common.goToHome')}
         >
             {/* Lime-light lightning bolt - left */}
             <svg
-                className="w-4 h-5 xs:w-5 xs:h-6 sm:w-5 sm:h-6 flex-shrink-0 text-neo-black dark:text-neo-lime-light"
+                className="w-4 h-5 xs:w-5 xs:h-6 sm:w-5 sm:h-6 shrink-0 text-neo-black dark:text-neo-lime-light"
                 viewBox="0 0 24 32"
                 fill="none"
                 style={{ transform: 'rotate(-15deg)', filter: 'drop-shadow(0 0 4px currentColor)' }}
@@ -82,7 +82,7 @@ const HeaderLogo = memo(() => {
 
             {/* Cyan lightning bolt - right */}
             <svg
-                className="w-4 h-5 xs:w-5 xs:h-6 sm:w-5 sm:h-6 flex-shrink-0 text-neo-black dark:text-neo-cyan-light"
+                className="w-4 h-5 xs:w-5 xs:h-6 sm:w-5 sm:h-6 shrink-0 text-neo-black dark:text-neo-cyan-light"
                 viewBox="0 0 24 32"
                 fill="none"
                 style={{ transform: 'rotate(15deg)', filter: 'drop-shadow(0 0 4px currentColor)' }}

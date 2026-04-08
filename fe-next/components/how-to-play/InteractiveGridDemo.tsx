@@ -159,7 +159,7 @@ export const InteractiveGridDemo: React.FC<InteractiveGridDemoProps> = ({ t, dir
 
       {/* Demo Grid - Force LTR for consistent SVG line positioning */}
       <div dir="ltr" className="relative overflow-hidden p-1 sm:p-2">
-        <div className="grid grid-cols-3 gap-1 sm:gap-2 p-2 sm:p-4 bg-gradient-to-br from-neo-navy/10 to-neo-pink/10 rounded-lg sm:rounded-xl border-2 sm:border-4 border-neo-black shadow-hard-lg">
+        <div className="grid grid-cols-3 gap-1 sm:gap-2 p-2 sm:p-4 bg-linear-to-br from-neo-navy/10 to-neo-pink/10 rounded-lg sm:rounded-xl border-2 sm:border-4 border-neo-black shadow-hard-lg">
           {demoGrid.map((row, rowIndex) => (
             row.map((letter, colIndex) => {
               const isSelected = isCellSelected(rowIndex, colIndex);

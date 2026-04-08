@@ -58,7 +58,7 @@ const WordHuntAnnouncementBanner: React.FC<WordHuntAnnouncementBannerProps> = ({
       onMouseLeave={() => setIsHovered(false)}
       className={cn(
         'w-full relative overflow-hidden rounded-neo border-3 border-neo-black cursor-pointer text-start',
-        'bg-gradient-to-br from-neo-purple via-purple-600 to-neo-pink',
+        'bg-linear-to-br from-neo-purple via-purple-600 to-neo-pink',
         isRTL
           ? 'active:translate-x-[-2px] active:translate-y-[2px]'
           : 'active:translate-x-[2px] active:translate-y-[2px]',
@@ -76,14 +76,14 @@ const WordHuntAnnouncementBanner: React.FC<WordHuntAnnouncementBannerProps> = ({
       {canAnimate && (
         <>
           <motion.div
-            className="absolute top-1.5 end-14 z-20"
+            className="absolute top-1.5 inset-e-14 z-20"
             animate={{ rotate: [0, 15, -15, 0], scale: [1, 1.3, 1], opacity: [0.5, 1, 0.5] }}
             transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
           >
             <Sparkles className="w-3.5 h-3.5 text-neo-lime" />
           </motion.div>
           <motion.div
-            className="absolute bottom-2 end-6 z-20"
+            className="absolute bottom-2 inset-e-6 z-20"
             animate={{ rotate: [0, -20, 20, 0], scale: [0.8, 1.1, 0.8], opacity: [0.4, 0.9, 0.4] }}
             transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut', delay: 0.7 }}
           >
@@ -156,7 +156,7 @@ const WordHuntAnnouncementBanner: React.FC<WordHuntAnnouncementBannerProps> = ({
           transition={{ duration: 0.25 }}
         >
           <motion.div
-            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
+            className="absolute inset-0 bg-linear-to-r from-transparent via-white/30 to-transparent"
             initial={{ x: '-100%' }}
             animate={isHovered ? { x: '200%' } : { x: '-100%' }}
             transition={{ duration: 0.6, ease: 'easeOut' }}

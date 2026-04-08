@@ -102,8 +102,8 @@ const PreGameTutorial: React.FC<PreGameTutorialProps> = ({ onComplete }) => {
                 animate={{ scale: 1, opacity: 1, y: 0 }}
                 transition={{ delay: 0.2, ...SPRING_POP }}
               >
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[12px] border-l-transparent border-r-[12px] border-r-transparent border-b-[12px] border-b-neo-black" />
-                <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-b-[10px] border-b-neo-cream" />
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-0 h-0 border-l-12 border-l-transparent border-r-12 border-r-transparent border-b-12 border-b-neo-black" />
+                <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-0 h-0 border-l-10 border-l-transparent border-r-10 border-r-transparent border-b-10 border-b-neo-cream" />
 
                 <h2 className="text-xl font-black text-neo-black">
                   {t('preGameTutorial.welcome.title')}
@@ -201,8 +201,8 @@ const PreGameTutorial: React.FC<PreGameTutorialProps> = ({ onComplete }) => {
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ delay: 0.1, ...SPRING_POP }}
               >
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[12px] border-l-transparent border-r-[12px] border-r-transparent border-b-[12px] border-b-neo-black" />
-                <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-b-[10px] border-b-neo-cream" />
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-0 h-0 border-l-12 border-l-transparent border-r-12 border-r-transparent border-b-12 border-b-neo-black" />
+                <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-0 h-0 border-l-10 border-l-transparent border-r-10 border-r-transparent border-b-10 border-b-neo-cream" />
 
                 <h2 className="text-lg font-black text-neo-black">
                   {t('preGameTutorial.tips.title')}

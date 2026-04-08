@@ -199,7 +199,7 @@ describe('CoinSpendAnimation', () => {
   });
 
   describe('Visual Elements', () => {
-    it('should render shrinking ring effect', () => {
+    it('should render shrinking ring-3 effect', () => {
       const { container } = render(
         <CoinSpendAnimation
           trigger={true}
@@ -221,7 +221,7 @@ describe('CoinSpendAnimation', () => {
       );
       const badge = container.querySelector('.rounded-neo');
       expect(badge).toBeInTheDocument();
-      expect(badge).toHaveClass('bg-gradient-to-br');
+      expect(badge).toHaveClass('bg-linear-to-br');
     });
 
     it('should render coin particles', () => {

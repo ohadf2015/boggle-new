@@ -30,13 +30,13 @@ export function LandingShareBanner({ onShareClick }: LandingShareBannerProps) {
           'bg-neo-navy border-3 border-neo-black rounded-neo-lg shadow-hard-lg',
           'hover:shadow-hard-xl hover:-translate-y-0.5 active:shadow-hard-pressed active:translate-y-[2px]',
           'transition-all duration-150',
-          'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2',
+          'focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2',
           'group text-start'
         )}
         aria-label={t('landing.shareTitle')}
       >
         {/* Subtle accent line */}
-        <div className="absolute inset-y-0 start-0 w-1.5 bg-neo-cyan" aria-hidden="true" />
+        <div className="absolute inset-y-0 inset-s-0 w-1.5 bg-neo-cyan" aria-hidden="true" />
 
         <div className="relative p-3 bg-neo-cyan/15 rounded-neo border-2 border-neo-cyan/30 shrink-0">
           <Users className="w-5 h-5 sm:w-6 sm:h-6 text-neo-cyan" aria-hidden="true" />

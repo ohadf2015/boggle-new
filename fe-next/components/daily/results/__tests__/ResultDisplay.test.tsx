@@ -125,7 +125,7 @@ describe('ResultDisplay Component', () => {
   };
 
   describe('Win state', () => {
-    it('renders the gauge ring for solved puzzle', () => {
+    it('renders the gauge ring-3 for solved puzzle', () => {
       render(<ResultDisplay {...solvedProps} />);
       expect(screen.getByTestId('score-gauge-ring')).toBeInTheDocument();
     });

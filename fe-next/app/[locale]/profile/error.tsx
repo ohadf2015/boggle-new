@@ -57,7 +57,7 @@ export default function ProfileError({
           </p>
           <button
             onClick={reset}
-            className="px-5 py-2 rounded-lg font-bold bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white transition-all inline-flex items-center gap-2"
+            className="px-5 py-2 rounded-lg font-bold bg-linear-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white transition-all inline-flex items-center gap-2"
           >
             🔄 {t(locale, 'errors.tryAgainButton')}
           </button>

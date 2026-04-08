@@ -13,6 +13,7 @@ import { useBlastObjectives } from './hooks/useBlastObjectives';
 import { useBlastComboStreak, getComboWindowMs } from './hooks/useBlastComboStreak';
 import { useBlastSequencer } from './hooks/useBlastSequencer';
 import { BlastStage } from './BlastStage';
+import { GameParticles } from '@/components/effects/GameParticles';
 import { detectSpecialCombos, type BlastComboType, type SpecialCombo } from './utils/blastCombos';
 import { getWaveObjectives, type WaveConfig } from './utils/blastWaveConfig';
 import { getComboMultiplier } from '@/shared/utils/scoring';
@@ -118,29 +119,30 @@ export function BlastGame({
 
   // MP board sync: apply server-authoritative board state when blastBoardUpdate arrives
   // Queue updates during cascade to prevent ref corruption mid-animation
-  const pendingBoardUpdateRef = useRef<{ grid: LetterGrid; tileStates: BlastTileState[][] } | null>(null);
+  const pendingBoardUpdatesRef = useRef<Array<{ grid: LetterGrid; tileStates: BlastTileState[][] }>>([]);
   const blastBoardUpdate = useGameStore((s) => s.blastBoardUpdate);
   useEffect(() => {
     if (!isMultiplayer || !blastBoardUpdate) return;
     const boardData = { grid: blastBoardUpdate.grid, tileStates: blastBoardUpdate.tileStates };
     useGameStore.getState().setBlastBoardUpdate(null);
-    // If mid-cascade (own word or opponent's), queue — apply after stopCascade
+    // If mid-cascade, queue — apply after cascade completes
     if (engine.isCascading) {
-      pendingBoardUpdateRef.current = boardData;
+      pendingBoardUpdatesRef.current.push(boardData);
       return;
     }
-    // For own words not mid-cascade, still apply server state to correct any drift
+    // Not cascading: apply immediately to correct any drift
     engine.applyServerBoard(boardData.grid, boardData.tileStates);
-  }, [blastBoardUpdate, isMultiplayer, username, engine]);
+  }, [blastBoardUpdate, isMultiplayer, username, engine.isCascading, engine.applyServerBoard]);
 
-  // Flush queued board update after cascade completes
+  // Flush queued board updates after cascade completes — only apply the last (each is a full snapshot)
   useEffect(() => {
-    if (!engine.isCascading && pendingBoardUpdateRef.current) {
-      const pending = pendingBoardUpdateRef.current;
-      pendingBoardUpdateRef.current = null;
-      engine.applyServerBoard(pending.grid, pending.tileStates);
+    if (!engine.isCascading && pendingBoardUpdatesRef.current.length > 0) {
+      const queue = pendingBoardUpdatesRef.current;
+      const last = queue[queue.length - 1];
+      pendingBoardUpdatesRef.current = [];
+      engine.applyServerBoard(last.grid, last.tileStates);
     }
-  }, [engine.isCascading, engine]);
+  }, [engine.isCascading, engine.applyServerBoard]);
 
   // Dictionary cache for cascade word detection + validation gate
   const { checkWord, isLoaded: isDictionaryReady } = useDictionaryCache(config.language);
@@ -163,6 +165,11 @@ export function BlastGame({
   const [comboTypeName, setComboTypeName] = useState<string | undefined>();
   const [clearedTilesForEffects, setClearedTilesForEffects] = useState<ClearedTileEvent[]>([]);
   const flyIdRef = useRef(0);
+
+  // Particle effect triggers (incrementing counters — each change fires the effect)
+  const [wordFoundParticle, setWordFoundParticle] = useState(0);
+  const [comboParticle, setComboParticle] = useState(0);
+  const [waveClearParticle, setWaveClearParticle] = useState(0);
 
   // Word forming state
   const [formedWord, setFormedWord] = useState('');
@@ -192,6 +199,16 @@ export function BlastGame({
   const onWordWithComboTypeRef = useRef(onWordWithComboType);
   useEffect(() => { onWordWithComboTypeRef.current = onWordWithComboType; }, [onWordWithComboType]);
 
+  // Refs for game-end effect — avoid stale closures on callback props and dynamic values
+  const onGameEndRef = useRef(onGameEnd);
+  useEffect(() => { onGameEndRef.current = onGameEnd; }, [onGameEnd]);
+  const onWaveCompleteRef = useRef(onWaveComplete);
+  useEffect(() => { onWaveCompleteRef.current = onWaveComplete; }, [onWaveComplete]);
+  const maxComboRef = useRef(combo.maxCombo);
+  useEffect(() => { maxComboRef.current = combo.maxCombo; }, [combo.maxCombo]);
+  const waveConfigRef = useRef(waveConfig);
+  useEffect(() => { waveConfigRef.current = waveConfig; }, [waveConfig]);
+
   // Handle accepted word: clear tiles, cascade, track combos
   const handleWordAccepted = useCallback(async (data: { word: string; score: number }) => {
     if (lastPathRef.current.length === 0) return;
@@ -216,6 +233,9 @@ export function BlastGame({
     if (hadCombo && onComboDetected) {
       onComboDetected(detectedCombos);
     }
+
+    // Trigger word-found particle effect
+    setWordFoundParticle(c => c + 1);
 
     // 1. Animate word clear (anticipation → clearing)
     const clearedInfo = path.map(p => ({
@@ -252,6 +272,7 @@ export function BlastGame({
       setComboFlash({ id: `flash-${flyIdRef.current}`, tier: flashTier });
       setComboTypeName(t(`blast.combo.${detectedCombos[0].type}`) || `${detectedCombos[0].type.toUpperCase()}!`);
       sounds.playComboActivation(flashTier);
+      setComboParticle(c => c + 1);
     }
 
     // 5. Haptic + sound feedback based on tile types in path
@@ -438,20 +459,24 @@ export function BlastGame({
   }, []);
 
   // Word submission pipeline
+  const getScoreMultiplier = useCallback(() => getComboMultiplier(combo.comboLevel), [combo.comboLevel]);
+  const tSafe = useCallback((key: string) => t(key) || key, [t]);
+  const noop = useCallback(() => {}, []);
+
   const wordSubmission = useWordSubmission({
     language: config.language,
     minWordLength,
     grid: engine.grid,
     gameStartTime,
-    getScoreMultiplier: () => getComboMultiplier(combo.comboLevel),
+    getScoreMultiplier,
     fireRoundActive: false,
     combo,
     spamDetection,
-    t: (key: string) => t(key) || key,
-    playWordAcceptedSound: () => {}, // Blast uses useBlastSounds.playTileClear instead
+    t: tSafe,
+    playWordAcceptedSound: noop, // Blast uses useBlastSounds.playTileClear instead
     playComboSound,
-    announceWordResult: () => {},
-    announceCombo: () => {},
+    announceWordResult: noop,
+    announceCombo: noop,
     onWordAccepted: handleWordAccepted,
   });
 
@@ -483,11 +508,18 @@ export function BlastGame({
       engine.trackWordFail();
     }
     prevFeedbackIdRef.current = fb?.id ?? null;
-  }, [wordSubmission.currentFeedback, sounds, engine]);
+  }, [wordSubmission.currentFeedback, sounds, engine.consumeMove, engine.trackWordFail]);
 
   const handleQuit = useCallback(() => {
     onQuit();
   }, [onQuit]);
+
+  const handleShuffle = useCallback(() => {
+    engine.shuffleGrid();
+    playBoardShuffleSound();
+  }, [engine.shuffleGrid, playBoardShuffleSound]);
+
+  const tAdapter = useCallback((key: string) => t(key) || undefined, [t]);
 
   // Compute initial tile type counts once per wave (for clear_all_type objectives)
   const initialTileTypeCounts = useMemo(() => {
@@ -540,28 +572,28 @@ export function BlastGame({
   useEffect(() => {
     if (objectives.allObjectivesComplete && !waveClearPlayedRef.current) {
       sounds.playWaveClear();
+      setWaveClearParticle(c => c + 1);
       waveClearPlayedRef.current = true;
     }
   }, [objectives.allObjectivesComplete, sounds]);
 
-  // Game end detection (SP only — MP uses server timer)
-  // Player keeps playing until moves run out, board clears, or dead end — objectives don't stop the game
+  // Game end detection
+  // SP: moves run out, board clears, or dead end. MP: server timer controls end, but dead-end still triggers locally.
+  // Uses refs for callbacks/dynamic values to avoid stale closures without re-triggering the effect.
   useEffect(() => {
-    if (isMultiplayer) return undefined;
-
-    // Board cleared — all tiles gone
-    if (engine.gameState.isComplete) {
+    // Board cleared — all tiles gone (SP only — MP wave logic is server-driven)
+    if (!isMultiplayer && engine.gameState.isComplete) {
       const { score, wordsFound, tilesCleared, totalTiles } = engine.gameState;
       const clearPct = totalTiles > 0 ? Math.min(100, Math.round((tilesCleared / totalTiles) * 100)) : 0;
-      const scoreThreshold = waveConfig?.scoreThreshold;
+      const scoreThreshold = waveConfigRef.current?.scoreThreshold;
 
-      if (onWaveComplete && objectives.allObjectivesComplete && (!scoreThreshold || score >= scoreThreshold)) {
-        const timer = setTimeout(() => onWaveComplete(score, wordsFound, clearPct), 2000);
+      if (onWaveCompleteRef.current && objectives.allObjectivesComplete && (!scoreThreshold || score >= scoreThreshold)) {
+        const timer = setTimeout(() => onWaveCompleteRef.current?.(score, wordsFound, clearPct), 2000);
         return () => clearTimeout(timer);
       }
 
-      const results = engine.getResults(combo.maxCombo);
-      const timer = setTimeout(() => onGameEnd(results), 2000);
+      const results = engine.getResults(maxComboRef.current);
+      const timer = setTimeout(() => onGameEndRef.current(results), 2000);
       return () => clearTimeout(timer);
     }
 
@@ -615,13 +647,13 @@ export function BlastGame({
         // End game
         const { score, wordsFound, tilesCleared, totalTiles } = engine.gameState;
         const clearPct = totalTiles > 0 ? Math.min(100, Math.round((tilesCleared / totalTiles) * 100)) : 0;
-        const scoreThreshold = waveConfig?.scoreThreshold;
+        const scoreThreshold = waveConfigRef.current?.scoreThreshold;
 
-        if (onWaveComplete && objectives.allObjectivesComplete && (!scoreThreshold || score >= scoreThreshold)) {
-          onWaveComplete(score, wordsFound, clearPct);
+        if (onWaveCompleteRef.current && objectives.allObjectivesComplete && (!scoreThreshold || score >= scoreThreshold)) {
+          onWaveCompleteRef.current(score, wordsFound, clearPct);
         } else {
-          const results = engine.getResults(combo.maxCombo);
-          onGameEnd(results);
+          const results = engine.getResults(maxComboRef.current);
+          onGameEndRef.current(results);
         }
       })();
 
@@ -629,19 +661,12 @@ export function BlastGame({
     }
 
     return undefined;
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     engine.gameState.isComplete,
     engine.gameState.isDeadEnd,
-    engine.gameState.movesRemaining,
     objectives.allObjectivesComplete,
-    engine,
-    combo.maxCombo,
-    onGameEnd,
-    onWaveComplete,
-    waveConfig,
     isMultiplayer,
-    sounds,
+    engine, config.gridSize, sounds,
   ]);
 
   // Loading state — wait for both grid generation AND dictionary cache
@@ -660,6 +685,11 @@ export function BlastGame({
 
   return (
     <div className="blast-game relative flex-1 flex flex-col h-full" data-testid="blast-game-root">
+      {/* Particle effects — self-gate on device performance */}
+      <GameParticles preset="wordFound" trigger={wordFoundParticle} />
+      <GameParticles preset="comboBreak" trigger={comboParticle} />
+      <GameParticles preset="victory" trigger={waveClearParticle} />
+
       <BlastStage
         grid={engine.grid}
         tileStates={engine.tileStates}
@@ -676,7 +706,7 @@ export function BlastGame({
         onWordSubmit={handleWordSubmit}
         onPathSubmit={handlePathSubmit}
         onWordChange={handleWordChange}
-        onShuffle={() => { engine.shuffleGrid(); playBoardShuffleSound(); }}
+        onShuffle={handleShuffle}
         onQuit={handleQuit}
         noWordsRemaining={engine.noWordsRemaining}
         scoreFlyEvents={scoreFlyEvents}
@@ -696,7 +726,7 @@ export function BlastGame({
         explosionShake={explosionShake}
         lastWordLength={lastWordLength}
         wordSubmitCount={wordSubmitCount}
-        t={(key: string) => t(key) || undefined}
+        t={tAdapter}
       />
     </div>
   );

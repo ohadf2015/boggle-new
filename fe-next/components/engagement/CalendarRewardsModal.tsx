@@ -271,27 +271,27 @@ export function CalendarRewardsModal({ isOpen, onClose }: CalendarRewardsModalPr
                 </h4>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 sm:gap-2 text-[10px] sm:text-xs">
                   <div className="flex items-center gap-1 sm:gap-1.5 text-neo-black/80">
-                    <Zap className="w-3 h-3 text-neo-lime flex-shrink-0" />
+                    <Zap className="w-3 h-3 text-neo-lime shrink-0" />
                     <span>XP Bonus</span>
                   </div>
                   <div className="flex items-center gap-1 sm:gap-1.5 text-neo-black/80">
-                    <Sparkles className="w-3 h-3 text-neo-cyan flex-shrink-0" />
+                    <Sparkles className="w-3 h-3 text-neo-cyan shrink-0" />
                     <span>Free Hints</span>
                   </div>
                   <div className="flex items-center gap-1 sm:gap-1.5 text-neo-black/80">
-                    <Shield className="w-3 h-3 text-neo-lime flex-shrink-0" />
+                    <Shield className="w-3 h-3 text-neo-lime shrink-0" />
                     <span>Streak Freeze</span>
                   </div>
                   <div className="flex items-center gap-1 sm:gap-1.5 text-neo-black/80">
-                    <Gift className="w-3 h-3 text-neo-pink flex-shrink-0" />
+                    <Gift className="w-3 h-3 text-neo-pink shrink-0" />
                     <span>Mystery Box</span>
                   </div>
                   <div className="flex items-center gap-1 sm:gap-1.5 text-neo-black/80">
-                    <Crown className="w-3 h-3 text-neo-pink flex-shrink-0" />
+                    <Crown className="w-3 h-3 text-neo-pink shrink-0" />
                     <span>Exclusive Title</span>
                   </div>
                   <div className="flex items-center gap-1 sm:gap-1.5 text-neo-black/80">
-                    <Flame className="w-3 h-3 text-neo-lime flex-shrink-0" />
+                    <Flame className="w-3 h-3 text-neo-lime shrink-0" />
                     <span>Milestone</span>
                   </div>
                 </div>

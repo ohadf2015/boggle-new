@@ -127,7 +127,7 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
       >
         {/* Halftone texture */}
         <div
-          className="absolute inset-0 pointer-events-none opacity-[0.04] bg-[radial-gradient(circle,white_1px,transparent_1px)] bg-[length:8px_8px]"
+          className="absolute inset-0 pointer-events-none opacity-[0.04] bg-[radial-gradient(circle,white_1px,transparent_1px)] bg-size-[8px_8px]"
         />
 
         <div className="relative z-10 p-4 sm:p-5">
@@ -148,7 +148,7 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
                 animate={{ scale: 1, rotate: 3 }}
                 transition={{ type: 'spring', stiffness: 380, damping: 22, delay: 0.1 }}
                 className={cn(
-                  'flex-shrink-0 w-14 h-14 sm:w-16 sm:h-16 rounded-neo flex items-center justify-center border-3 sm:border-4 border-neo-black shadow-hard-lg',
+                  'shrink-0 w-14 h-14 sm:w-16 sm:h-16 rounded-neo flex items-center justify-center border-3 sm:border-4 border-neo-black shadow-hard-lg',
                   rankStyle.bg, rankStyle.text
                 )}
               >
@@ -164,7 +164,7 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
                 userId={player.username}
                 customAvatar={player.avatar.customAvatar}
                 size="xl"
-                className="flex-shrink-0 border-2 border-neo-black w-12 h-12 sm:w-14 sm:h-14"
+                className="shrink-0 border-2 border-neo-black w-12 h-12 sm:w-14 sm:h-14"
               />
             )}
 
@@ -189,7 +189,7 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ type: 'spring', stiffness: 380, damping: 22, delay: 0.2 }}
-                className="flex-shrink-0 text-right"
+                className="shrink-0 text-right"
               >
                 <div className="text-2xl sm:text-3xl font-black text-white">{player.score}</div>
                 <div className="text-[9px] sm:text-[10px] font-bold uppercase text-slate-300">
@@ -223,7 +223,7 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={{ delay: 0.6, type: 'spring', stiffness: 400, damping: 15 }}
-                  className="absolute -top-1.5 -end-1.5 w-5 h-5 bg-tier-gold rounded-full border border-neo-black flex items-center justify-center shadow-hard-sm z-10"
+                  className="absolute -top-1.5 -inset-e-1.5 w-5 h-5 bg-tier-gold rounded-full border border-neo-black flex items-center justify-center shadow-hard-sm z-10"
                   title={t('results.personalBest')}
                 >
                   <Star className="w-3 h-3 text-neo-black" />
@@ -294,7 +294,7 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
               className="mb-2 sm:mb-3 p-2 bg-neo-cyan/10 rounded-neo border border-neo-cyan/30"
             >
               <div className="text-[10px] sm:text-xs text-neo-cyan font-bold flex items-center gap-1.5 mb-1">
-                <Lightbulb className="w-3.5 h-3.5 flex-shrink-0" />
+                <Lightbulb className="w-3.5 h-3.5 shrink-0" />
                 {t('results.scoringTip')}
               </div>
               <p className="text-[9px] sm:text-[10px] text-neo-cream/70 leading-relaxed">

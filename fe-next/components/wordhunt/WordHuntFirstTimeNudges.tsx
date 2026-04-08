@@ -139,7 +139,7 @@ const WordHuntFirstTimeNudges = memo<WordHuntFirstTimeNudgesProps>(({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.95 }}
             transition={{ type: 'spring', stiffness: 300, damping: 22 }}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-neo border-2 shadow-hard-sm backdrop-blur-sm ${activeNudge.accent}`}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-neo border-2 shadow-hard-sm backdrop-blur-xs ${activeNudge.accent}`}
             data-testid={`nudge-${activeNudge.type}`}
           >
             <span className="text-lg" aria-hidden="true">{activeNudge.icon}</span>

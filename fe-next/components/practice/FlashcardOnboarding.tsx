@@ -70,7 +70,7 @@ export const FlashcardOnboarding = memo<FlashcardOnboardingProps>(({
           aria-labelledby="onboarding-title"
           className={cn(
             'fixed inset-0 z-[100]',
-            'bg-neo-black/85 backdrop-blur-sm',
+            'bg-neo-black/85 backdrop-blur-xs',
             'flex items-center justify-center',
             'p-4',
             className
@@ -90,7 +90,7 @@ export const FlashcardOnboarding = memo<FlashcardOnboardingProps>(({
             )}
           >
             {/* Gradient accent */}
-            <div className="h-1.5 bg-gradient-to-r from-neo-pink via-neo-cyan to-neo-yellow" />
+            <div className="h-1.5 bg-linear-to-r from-neo-pink via-neo-cyan to-neo-yellow" />
 
             <div className="p-6 text-center">
               {/* Mascot */}

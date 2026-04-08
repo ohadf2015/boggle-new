@@ -552,7 +552,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
           transition={{ type: 'spring', stiffness: 300, damping: 25 }}
           className="flex flex-col items-center gap-4 text-center px-6"
         >
-          <div className="border-3 border-neo-black rounded-neo shadow-hard px-6 py-4 bg-gradient-to-br from-neo-yellow to-neo-orange">
+          <div className="border-3 border-neo-black rounded-neo shadow-hard px-6 py-4 bg-linear-to-br from-neo-yellow to-neo-orange">
             <div className="font-black text-neo-black text-3xl tabular-nums">
               {playerScore.toLocaleString()}
             </div>

@@ -29,9 +29,9 @@ const buttonVariants = cva(
     'min-h-[48px] min-w-[48px]',
     // Press effect: subtle translate to close shadow gap
     'hover:translate-x-[-0.5px] hover:translate-y-[-0.5px] hover:shadow-hard-lg',
-    'active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-pressed',
+    'active:translate-x-px active:translate-y-px active:shadow-hard-pressed',
     // Enhanced focus styling with visible ring
-    'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-white dark:focus-visible:ring-offset-neo-navy',
+    'focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-white dark:focus-visible:ring-offset-neo-navy',
     // Disabled state
     'disabled:pointer-events-none disabled:opacity-70 disabled:shadow-none disabled:translate-x-0 disabled:translate-y-0',
     // SVG icons - responsive sizes
@@ -74,7 +74,7 @@ const buttonVariants = cva(
         cyan: 'bg-neo-cyan text-neo-black hover:brightness-110',
         // Gradient variant for special CTAs
         gradient: [
-          'bg-gradient-to-r from-neo-pink via-neo-orange to-neo-yellow',
+          'bg-linear-to-r from-neo-pink via-neo-orange to-neo-yellow',
           'text-neo-black hover:brightness-110',
         ].join(' '),
       },

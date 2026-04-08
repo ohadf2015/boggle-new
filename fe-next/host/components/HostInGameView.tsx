@@ -1,11 +1,19 @@
 'use client';
 
 import React, { useCallback, useMemo } from 'react';
+import dynamic from 'next/dynamic';
 import type { Socket } from 'socket.io-client';
 import InGameScreen from '../../components/game/InGameScreen';
-import { BlastGame } from '@/components/blast/BlastGame';
 import { useBlastMultiplayerBridge } from '@/components/blast/hooks/useBlastMultiplayerBridge';
-import { WordHuntGame } from '@/components/wordhunt/WordHuntGame';
+
+const BlastGame = dynamic(
+  () => import('@/components/blast/BlastGame').then(m => ({ default: m.BlastGame })),
+  { ssr: false },
+);
+const WordHuntGame = dynamic(
+  () => import('@/components/wordhunt/WordHuntGame').then(m => ({ default: m.WordHuntGame })),
+  { ssr: false },
+);
 import type { Language, LetterGrid, Avatar as AvatarType, PresenceStatus } from '@/shared/types/game';
 import type { EarthquakeState } from '@/shared/types/earthquake';
 import type { BoardTheme } from '@/shared/types/socket';

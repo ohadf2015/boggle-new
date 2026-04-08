@@ -47,7 +47,7 @@ export interface PhysicsBodyState {
 // ─── Particles ────────────────────────────────────────────────────────
 
 /** Shape drawn for each particle. Default: 'circle'. */
-export type ParticleShape = 'circle' | 'star' | 'diamond' | 'rect' | 'ring';
+export type ParticleShape = 'circle' | 'star' | 'diamond' | 'rect' | 'ring-3';
 
 export interface ParticleConfig {
   /** Max concurrent particles */

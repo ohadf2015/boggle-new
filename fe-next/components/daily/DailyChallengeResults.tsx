@@ -200,7 +200,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
       className="flex-1 min-h-0 flex flex-col items-center justify-start p-4 page-content-safe overflow-y-auto overscroll-contain scrollable-area"
     >
       {/* Back button */}
-      <motion.div className="absolute top-24 sm:top-28 start-4">
+      <motion.div className="absolute top-24 sm:top-28 inset-s-4">
         <Button
           variant="ghost"
           size="sm"

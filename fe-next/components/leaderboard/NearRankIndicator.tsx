@@ -139,7 +139,7 @@ const NearRankIndicator: React.FC<NearRankIndicatorProps> = memo(({
       )}
     >
       {/* Header */}
-      <div className="px-4 py-3 bg-gradient-to-r from-neo-cyan/20 to-neo-purple/20 border-b-2 border-neo-black/20">
+      <div className="px-4 py-3 bg-linear-to-r from-neo-cyan/20 to-neo-purple/20 border-b-2 border-neo-black/20">
         <div className="flex items-center gap-2">
           <TrendingUp className="w-5 h-5 text-neo-cyan" />
           <h3 className="font-black text-white uppercase tracking-wider text-sm">
@@ -159,7 +159,7 @@ const NearRankIndicator: React.FC<NearRankIndicatorProps> = memo(({
           </div>
           <div
             className={cn(
-              'px-3 py-1 rounded-full font-black text-sm bg-gradient-to-r',
+              'px-3 py-1 rounded-full font-black text-sm bg-linear-to-r',
               percentileColors[percentileTier]
             )}
           >
@@ -194,7 +194,7 @@ const NearRankIndicator: React.FC<NearRankIndicatorProps> = memo(({
             {playerAbove && (
               <div className="mt-2 flex items-center gap-2 text-xs text-white/70">
                 <span>{t('leaderboard.beat')}:</span>
-                <div className="w-7 h-7 rounded-full overflow-hidden border border-white/30 flex-shrink-0">
+                <div className="w-7 h-7 rounded-full overflow-hidden border border-white/30 shrink-0">
                   <Avatar
 
                     avatarImage={playerAbove.avatar_image ?? undefined}
@@ -262,7 +262,7 @@ const NearRankIndicator: React.FC<NearRankIndicatorProps> = memo(({
                     <span className="text-xs font-bold text-white/60 w-8">
                       #{playerRank}
                     </span>
-                    <div className="w-8 h-8 flex-shrink-0 rounded-full overflow-hidden border-2 border-white/20">
+                    <div className="w-8 h-8 shrink-0 rounded-full overflow-hidden border-2 border-white/20">
                       <Avatar
 
                         avatarImage={player.avatar_image ?? undefined}

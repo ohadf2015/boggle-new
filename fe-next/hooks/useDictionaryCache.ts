@@ -17,8 +17,10 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import * as Comlink from 'comlink';
 import type { Language } from '@/shared/types/game';
 import { normalizeHebrewWord, applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
+import type { DictionaryWorkerApi } from '@/workers/dictionaryWorker';
 
 // IndexedDB configuration
 const DB_NAME = 'lexiclash-dictionary';
@@ -115,6 +117,47 @@ async function cacheDictionary(language: Language, words: string[]): Promise<voi
   }
 }
 
+// ─── Worker-accelerated loading ─────────────────────────────────────
+// Offloads fetch + parse + Set construction to a Web Worker.
+// Falls back to main-thread loading if Workers are unavailable.
+
+let workerProxy: Comlink.Remote<DictionaryWorkerApi> | null = null;
+let workerFailed = false;
+
+function getWorkerProxy(): Comlink.Remote<DictionaryWorkerApi> | null {
+  if (workerFailed) return null;
+  if (workerProxy) return workerProxy;
+  try {
+    const worker = new Worker(
+      new URL('../workers/dictionaryWorker.ts', import.meta.url),
+      { type: 'module' },
+    );
+    workerProxy = Comlink.wrap<DictionaryWorkerApi>(worker);
+    return workerProxy;
+  } catch {
+    workerFailed = true;
+    return null;
+  }
+}
+
+/**
+ * Load dictionary via Web Worker (off-thread fetch + parse).
+ * Returns null if worker unavailable — caller falls back to main-thread.
+ */
+async function fetchViaWorker(language: Language): Promise<Set<string> | null> {
+  const proxy = getWorkerProxy();
+  if (!proxy) return null;
+
+  try {
+    await proxy.load(language);
+    const words = await proxy.getWords(language);
+    if (words.length === 0) return null;
+    return new Set(words);
+  } catch {
+    return null;
+  }
+}
+
 /**
  * Fetch dictionary from API
  */
@@ -139,7 +182,14 @@ async function fetchDictionary(language: Language): Promise<Set<string>> {
       return wordSet;
     }
 
-    // Fetch from API
+    // Try Web Worker (offloads fetch + parse to background thread)
+    const workerResult = await fetchViaWorker(language);
+    if (workerResult) {
+      memoryCache.set(language, workerResult);
+      return workerResult;
+    }
+
+    // Fallback: fetch on main thread
     const response = await fetch(`/api/dictionary-words?lang=${language}`);
     if (!response.ok) {
       throw new Error(`Failed to fetch dictionary: ${response.status}`);

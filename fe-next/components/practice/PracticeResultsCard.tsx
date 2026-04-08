@@ -92,14 +92,14 @@ export const PracticeResultsCard = memo<PracticeResultsCardProps>(({
       data-testid="practice-results-card"
       className={cn(
         'border-neo-thick border-neo-black shadow-hard-lg',
-        'bg-gradient-to-br from-neo-navy to-neo-navy/80',
+        'bg-linear-to-br from-neo-navy to-neo-navy/80',
         'overflow-hidden max-w-md mx-auto',
         className
       )}
       dir={isRTL ? 'rtl' : 'ltr'}
     >
       {/* Top celebration gradient */}
-      <div className="h-2 bg-gradient-to-r from-neo-pink via-neo-cyan to-neo-yellow" />
+      <div className="h-2 bg-linear-to-r from-neo-pink via-neo-cyan to-neo-yellow" />
 
       <CardContent className="p-8 text-center">
         {/* Mascot */}

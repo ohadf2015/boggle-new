@@ -179,7 +179,7 @@ const DirectionGuidanceTooltip = memo<DirectionGuidanceTooltipProps>(
 
               {/* Header */}
               <div className="flex items-center gap-2 mb-3">
-                <div className="w-8 h-8 bg-gradient-to-br from-neo-pink to-neo-pink rounded-neo border-2 border-neo-black flex items-center justify-center shadow-hard-sm">
+                <div className="w-8 h-8 bg-linear-to-br from-neo-pink to-neo-pink rounded-neo border-2 border-neo-black flex items-center justify-center shadow-hard-sm">
                   <Route className="w-4 h-4 text-white" />
                 </div>
                 <h4 className="font-black text-neo-black text-sm uppercase tracking-wide">

@@ -190,7 +190,7 @@ const AdventureObjectives = memo<AdventureObjectivesProps>(
               <AdaptiveMotion.div
                 whileHover={{ scale: 1.1, rotate: 5 }}
                 className={cn(
-                  'flex-shrink-0 w-9 h-9 flex items-center justify-center',
+                  'shrink-0 w-9 h-9 flex items-center justify-center',
                   'rounded-neo border-2',
                   objective.isComplete
                     ? 'bg-neo-lime border-neo-black text-neo-black'
@@ -250,14 +250,14 @@ const AdventureObjectives = memo<AdventureObjectivesProps>(
                       objective.isComplete
                         ? 'bg-neo-lime'
                         : objective.isPrimary
-                          ? 'bg-gradient-to-r from-neo-yellow to-neo-orange'
+                          ? 'bg-linear-to-r from-neo-yellow to-neo-orange'
                           : 'bg-neo-white/50'
                     )}
                   >
                     {/* Shimmer effect on progress */}
                     {!objective.isComplete && progress > 0 && (
                       <AdaptiveMotion.div
-                        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
+                        className="absolute inset-0 bg-linear-to-r from-transparent via-white/30 to-transparent"
                         animate={{ x: ['-100%', '100%'] }}
                         transition={{ duration: 1.5, repeat: Infinity, ease: 'linear' }}
                       />
@@ -275,7 +275,7 @@ const AdventureObjectives = memo<AdventureObjectivesProps>(
                     exit={{ scale: 0, rotate: 180 }}
                     transition={{ type: 'spring', stiffness: 500, damping: 15 }}
                     className={cn(
-                      'flex-shrink-0 w-7 h-7 flex items-center justify-center',
+                      'shrink-0 w-7 h-7 flex items-center justify-center',
                       'rounded-full bg-neo-lime border-2 border-neo-black shadow-hard-sm'
                     )}
                   >

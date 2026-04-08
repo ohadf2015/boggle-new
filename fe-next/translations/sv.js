@@ -9713,6 +9713,17 @@ const sv = {
     "unranked": "Spela rankade spel för att få en nivå!",
     "playRanked": "Spela rankat"
   },
+  "matchmaking": {
+    "rankedMatch": "Rankad match",
+    "findingOpponent": "Söker motståndare…",
+    "eloRange": "{{elo}} ELO (±{{range}})",
+    "playersInQueue": "{{count}} i kö",
+    "estimatedWait": "~{{time}}",
+    "cancel": "Avbryt",
+    "matchFound": "Match hittad!",
+    "timeout": "Ingen motståndare hittades",
+    "createRoom": "Skapa ett rum istället"
+  },
   "seasonalEvent": {
     "ariaLabel": "Säsongsevent",
     "score": "Poäng",

@@ -44,7 +44,7 @@ export function SpectatorBanner({
       transition={{ type: 'spring', stiffness: 300, damping: 30 }}
       className={cn(
         'sticky top-0 inset-x-0 z-[60]',
-        'bg-gradient-to-r from-orange-500 via-orange-600 to-orange-500',
+        'bg-linear-to-r from-orange-500 via-orange-600 to-orange-500',
         'text-white',
         'border-b-4 border-neo-black',
         'shadow-hard-xl'
@@ -61,7 +61,7 @@ export function SpectatorBanner({
           {/* Left: Status info */}
           <div className="flex items-center gap-3 flex-1 min-w-0">
             {/* Icon */}
-            <div className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 bg-white/20 border-2 border-white/40 rounded-neo flex items-center justify-center">
+            <div className="shrink-0 w-10 h-10 sm:w-12 sm:h-12 bg-white/20 border-2 border-white/40 rounded-neo flex items-center justify-center">
               <Eye className="w-5 h-5 sm:w-6 sm:h-6" aria-hidden="true" />
             </div>
 
@@ -83,21 +83,21 @@ export function SpectatorBanner({
           </div>
 
           {/* Mascot: spectating */}
-          <Mascot variant="spectating" size="sm" className="flex-shrink-0" clipBorder="none" />
+          <Mascot variant="spectating" size="sm" className="shrink-0" clipBorder="none" />
 
           {/* Right: Action button */}
           {onRequestUpgrade && (
             <button
               onClick={onRequestUpgrade}
               className={cn(
-                'flex-shrink-0',
+                'shrink-0',
                 'px-4 py-2 sm:px-5 sm:py-2.5',
                 'bg-white text-orange-600',
                 'border-3 border-neo-black',
                 'rounded-neo shadow-hard',
                 'font-black text-sm sm:text-base uppercase',
                 'hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard-lg',
-                'active:translate-x-[1px] active:translate-y-[1px] active:shadow-none',
+                'active:translate-x-px active:translate-y-px active:shadow-none',
                 'transition-all duration-100',
                 'min-h-[44px] min-w-[44px]'
               )}

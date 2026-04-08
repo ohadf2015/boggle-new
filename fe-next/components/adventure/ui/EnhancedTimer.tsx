@@ -197,7 +197,7 @@ export const EnhancedTimer = memo(function EnhancedTimer({
 
       {/* Icon - switches to AlertTriangle in critical state, no animation */}
       {showIcon && (
-        <div className="relative flex-shrink-0">
+        <div className="relative shrink-0">
           {urgencyState === 'critical' ? (
             <AlertTriangle
               className={cn(

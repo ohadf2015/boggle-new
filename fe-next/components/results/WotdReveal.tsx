@@ -93,7 +93,7 @@ export function WotdReveal({ playerWords, className }: WotdRevealProps) {
       className={cn(
         'rounded-neo border-neo p-4 text-center',
         found
-          ? 'border-neo-yellow bg-gradient-to-br from-neo-navy to-neo-navy/80 shadow-hard'
+          ? 'border-neo-yellow bg-linear-to-br from-neo-navy to-neo-navy/80 shadow-hard'
           : 'border-white/20 bg-neo-navy/60',
         className
       )}

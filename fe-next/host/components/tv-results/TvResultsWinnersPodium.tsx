@@ -215,7 +215,7 @@ const PodiumCard = memo<PodiumCardProps>(({ rank, player, t, isWinner }) => {
         transition={{ duration: 0.6, delay: baseDelay, ease: [0.33, 1, 0.68, 1] }}
         className={cn(
           'w-full rounded-neo border-4 border-neo-black',
-          `bg-gradient-to-b ${config.bgGradient}`,
+          `bg-linear-to-b ${config.bgGradient}`,
           config.shadowColor,
           config.height,
         )}

@@ -108,6 +108,21 @@ interface CoinContextValue {
 
 const CoinContext = createContext<CoinContextValue | null>(null);
 
+/** Actions-only context — consumers that never read `coins` or `isLoading` won't re-render on balance changes. */
+interface CoinActionsValue {
+  addCoins: CoinContextValue['addCoins'];
+  spendCoins: CoinContextValue['spendCoins'];
+  refreshCoins: CoinContextValue['refreshCoins'];
+  canAfford: CoinContextValue['canAfford'];
+  awardDailyCompletion: CoinContextValue['awardDailyCompletion'];
+  awardGameCompletion: CoinContextValue['awardGameCompletion'];
+  awardComboMilestone: CoinContextValue['awardComboMilestone'];
+  awardWatchedAd: CoinContextValue['awardWatchedAd'];
+  costs: typeof COIN_COSTS;
+  rewards: typeof COIN_REWARDS;
+}
+const CoinActionsContext = createContext<CoinActionsValue | null>(null);
+
 // Helper to check if award already given
 function isAlreadyAwarded(key: string): boolean {
   if (typeof window === 'undefined') return false;
@@ -150,6 +165,10 @@ export function CoinProvider({ children }: { children: ReactNode }) {
     ? (profile?.total_coins ?? 0)
     : localCoins;
 
+  // Ref keeps latest coins so canAfford identity stays stable
+  const coinsRef = useRef(coins);
+  coinsRef.current = coins;
+
   /**
    * Refresh coin balance from source of truth
    */
@@ -166,11 +185,11 @@ export function CoinProvider({ children }: { children: ReactNode }) {
   }, [isAuthenticated, user, refreshProfile]);
 
   /**
-   * Check if user can afford an amount
+   * Check if user can afford an amount (ref-based for stable identity)
    */
   const canAfford = useCallback((amount: number) => {
-    return coins >= amount;
-  }, [coins]);
+    return coinsRef.current >= amount;
+  }, []);
 
   /**
    * Core: Add coins to balance
@@ -472,9 +491,25 @@ export function CoinProvider({ children }: { children: ReactNode }) {
     awardWatchedAd,
   ]);
 
+  // Actions-only value — stable across balance changes (no coins/isLoading deps)
+  const actionsValue = useMemo<CoinActionsValue>(() => ({
+    addCoins,
+    spendCoins,
+    refreshCoins,
+    canAfford,
+    awardDailyCompletion,
+    awardGameCompletion,
+    awardComboMilestone,
+    awardWatchedAd,
+    costs: COIN_COSTS,
+    rewards: COIN_REWARDS,
+  }), [addCoins, spendCoins, refreshCoins, canAfford, awardDailyCompletion, awardGameCompletion, awardComboMilestone, awardWatchedAd]);
+
   return (
     <CoinContext.Provider value={value}>
-      {children}
+      <CoinActionsContext.Provider value={actionsValue}>
+        {children}
+      </CoinActionsContext.Provider>
     </CoinContext.Provider>
   );
 }
@@ -494,6 +529,31 @@ export function useCoinContext(): CoinContextValue {
       addCoins: async () => 0,
       spendCoins: async () => false,
       refreshCoins: async () => 0,
+      awardDailyCompletion: async () => null,
+      awardGameCompletion: async () => null,
+      awardComboMilestone: async () => 0,
+      awardWatchedAd: async () => null,
+      costs: COIN_COSTS,
+      rewards: COIN_REWARDS,
+    };
+  }
+  return context;
+}
+
+/**
+ * Hook to access coin actions without re-rendering on balance changes.
+ * Use this in components that only call actions (spend, award, etc.)
+ * but don't display the coin balance.
+ */
+export function useCoinActions(): CoinActionsValue {
+  const context = useContext(CoinActionsContext);
+  if (!context) {
+    Sentry.captureMessage('useCoinActions used outside CoinProvider — returning defaults', 'warning');
+    return {
+      addCoins: async () => 0,
+      spendCoins: async () => false,
+      refreshCoins: async () => 0,
+      canAfford: () => false,
       awardDailyCompletion: async () => null,
       awardGameCompletion: async () => null,
       awardComboMilestone: async () => 0,

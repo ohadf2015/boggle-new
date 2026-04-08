@@ -100,7 +100,7 @@ export function LandingCommunityShowcase({ className }: LandingCommunityShowcase
           )}
         >
           {t('landing.viewAllBoards')}
-          <ArrowIcon className="w-3 h-3 group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5 transition-transform" />
+          <ArrowIcon className="w-3 h-3 group-hover:translate-x-0.5 group-hover:rtl:-translate-x-0.5 transition-transform" />
         </Link>
       </motion.div>
 
@@ -133,7 +133,7 @@ export function LandingCommunityShowcase({ className }: LandingCommunityShowcase
               )}
             >
               {/* Difficulty accent strip */}
-              <div className={cn('absolute top-0 inset-x-0 h-1 bg-gradient-to-r', {
+              <div className={cn('absolute top-0 inset-x-0 h-1 bg-linear-to-r', {
                 'from-green-500 to-green-600': board.difficulty === 'EASY',
                 'from-neo-orange to-amber-600': board.difficulty === 'MEDIUM',
                 'from-red-500 to-red-600': board.difficulty === 'HARD',
@@ -141,7 +141,7 @@ export function LandingCommunityShowcase({ className }: LandingCommunityShowcase
 
               {/* Staff pick badge */}
               {board.featured && (
-                <div className="absolute top-2 -end-5 z-10">
+                <div className="absolute top-2 -inset-e-5 z-10">
                   <span className="inline-block bg-neo-orange text-white text-[9px] font-bold px-5 py-0.5 -rotate-3 shadow-hard-sm border border-black uppercase">
                     {t('ugc.gallery.staffPick')}
                   </span>

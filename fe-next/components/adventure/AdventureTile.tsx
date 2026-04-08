@@ -212,7 +212,7 @@ export const AdventureTile = memo(({
         bombRowPreview !== null && tile.row === bombRowPreview && 'bomb-row-preview',
 
         // Adjacent hint: subtle ring showing which tiles can be selected next (classic grid behavior)
-        isAdjacentHint && !isSelected && !isHintHighlighted && 'ring-2 ring-neo-lime/40 z-[5]',
+        isAdjacentHint && !isSelected && !isHintHighlighted && 'ring-2 ring-neo-lime/40 z-5',
 
         // Hint highlight: match GridComponent's lime bg + yellow glow style
         isHintHighlighted && !isSelected && [
@@ -226,21 +226,21 @@ export const AdventureTile = memo(({
 
         // Gold tile - golden glow
         tile.type === 'gold' && [
-          'bg-gradient-to-br from-neo-yellow via-yellow-400 to-amber-500',
+          'bg-linear-to-br from-neo-yellow via-yellow-400 to-amber-500',
           'text-neo-black',
           'border-amber-600/60',
         ],
 
         // Ice tile - blue frost
         tile.type === 'ice' && [
-          'bg-gradient-to-br from-cyan-200 via-blue-300 to-cyan-400',
+          'bg-linear-to-br from-cyan-200 via-blue-300 to-cyan-400',
           'text-blue-900',
           'border-cyan-500/60',
         ],
 
         // Bomb tile - danger red
         tile.type === 'bomb' && [
-          'bg-gradient-to-br from-red-500 via-red-600 to-orange-600',
+          'bg-linear-to-br from-red-500 via-red-600 to-orange-600',
           'text-neo-white',
           'border-red-700/60',
         ],
@@ -253,14 +253,14 @@ export const AdventureTile = memo(({
 
         // Chain tile - purple link
         tile.type === 'chain' && [
-          'bg-gradient-to-br from-purple-400 via-violet-500 to-violet-600',
+          'bg-linear-to-br from-purple-400 via-violet-500 to-violet-600',
           'text-neo-white',
           'border-purple-700/60',
         ],
 
         // Time tile - emerald clock
         tile.type === 'time' && [
-          'bg-gradient-to-br from-emerald-400 via-teal-500 to-teal-600',
+          'bg-linear-to-br from-emerald-400 via-teal-500 to-teal-600',
           'text-neo-white',
           'border-emerald-600/60',
         ]

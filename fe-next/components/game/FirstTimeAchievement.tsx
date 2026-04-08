@@ -7,6 +7,7 @@ import {
   markAchievementEarned,
   type FirstTimeAchievementType,
 } from '@/utils/multiplayerProgressStorage';
+import { InlineConfetti } from '@/components/effects/InlineConfetti';
 
 // Achievement configurations
 const ACHIEVEMENT_CONFIG: Record<FirstTimeAchievementType, {
@@ -114,11 +115,14 @@ const FirstTimeAchievement = memo<FirstTimeAchievementProps>(({
           <div
             className={cn(
               'flex items-center gap-2 px-4 py-2 rounded-xl',
-              'bg-gradient-to-r shadow-hard border-2 border-neo-black',
+              'bg-linear-to-r shadow-hard border-2 border-neo-black',
               'cursor-pointer select-none',
               config.color
             )}
           >
+            {/* Confetti burst on achievement */}
+            <InlineConfetti size="sm" duration={1800} />
+
             {/* Emoji */}
             <motion.span
               className="text-2xl"

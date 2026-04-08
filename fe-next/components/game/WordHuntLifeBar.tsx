@@ -88,7 +88,7 @@ export function WordHuntLifeBar({ life, maxLife }: WordHuntLifeBarProps) {
       {/* Heart icon */}
       <motion.div
         className={cn(
-          "flex-shrink-0 flex items-center justify-center w-9 h-9 rounded-full",
+          "shrink-0 flex items-center justify-center w-9 h-9 rounded-full",
           "border-3 border-neo-black shadow-hard-sm",
           colors.heart
         )}
@@ -111,7 +111,7 @@ export function WordHuntLifeBar({ life, maxLife }: WordHuntLifeBarProps) {
           <motion.div
             data-testid="word-hunt-life-bar-fill"
             className={cn(
-              "h-full relative overflow-hidden bg-gradient-to-r transition-colors duration-700 ease-in-out",
+              "h-full relative overflow-hidden bg-linear-to-r transition-colors duration-700 ease-in-out",
               gradient.from, gradient.via, gradient.to,
               isLow && "life-bar-low-pulse"
             )}
@@ -121,9 +121,9 @@ export function WordHuntLifeBar({ life, maxLife }: WordHuntLifeBarProps) {
           >
             <div
               data-testid="word-hunt-life-bar-shimmer"
-              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent animate-shimmer pointer-events-none"
+              className="absolute inset-0 bg-linear-to-r from-transparent via-white/25 to-transparent animate-shimmer pointer-events-none"
             />
-            <div className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-white/40 via-white/20 to-white/40 pointer-events-none" />
+            <div className="absolute inset-x-0 top-0 h-[3px] bg-linear-to-r from-white/40 via-white/20 to-white/40 pointer-events-none" />
           </motion.div>
 
           {/* Segments */}

@@ -76,7 +76,7 @@ export const StartButton = memo<StartButtonProps>(function StartButton({
           'border-3 border-neo-black transition-all',
           'active:translate-y-0.5 active:shadow-hard-pressed',
           'disabled:opacity-50 disabled:cursor-not-allowed',
-          'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan',
+          'focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan',
           'bg-neo-lime text-neo-black shadow-hard'
         )}
       >

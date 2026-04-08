@@ -72,7 +72,7 @@ describe('RPGLevelCard', () => {
       expect(filled).toHaveLength(2);
     });
 
-    it('renders empty stars as outline', () => {
+    it('renders empty stars as outline-solid', () => {
       render(<RPGLevelCard {...baseProps} stars={2} />);
       const empty = screen.getAllByTestId('star-empty');
       expect(empty).toHaveLength(1);

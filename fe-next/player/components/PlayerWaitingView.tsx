@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback } from 'react';
+import React, { memo, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Users, Crown, Bot, LogOut, Plus, Check, Pencil, X, Camera, Zap, Crosshair, Grid3X3, Lightbulb } from 'lucide-react';
 import Avatar from '../../components/Avatar';
@@ -105,14 +105,14 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
       transition={SPRING_PRESETS.balanced}
       className="rounded-neo-lg border-3 border-neo-black bg-slate-800/80 shadow-hard-lg overflow-hidden"
     >
-      <div className="h-1.5 bg-gradient-to-r from-neo-cyan via-neo-pink to-neo-lime" />
+      <div className="h-1.5 bg-linear-to-r from-neo-cyan via-neo-pink to-neo-lime" />
 
       <div className="p-4 sm:p-5 flex items-center gap-4 sm:gap-5">
         {/* Large clickable avatar */}
         <button
           data-testid="edit-avatar-button"
           onClick={() => setIsAvatarBuilderOpen(true)}
-          className="relative flex-shrink-0 group"
+          className="relative shrink-0 group"
         >
           <div className="w-20 h-20 rounded-full border-3 border-neo-black overflow-hidden shadow-hard ring-2 ring-neo-lime ring-offset-2 ring-offset-slate-800 transition-transform group-hover:scale-105 group-active:scale-95">
             <Avatar
@@ -124,7 +124,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
           <div className="absolute inset-0 rounded-full bg-neo-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
             <Camera className="w-6 h-6 text-neo-cream" />
           </div>
-          <div className="absolute -bottom-1 -end-1 w-7 h-7 rounded-full bg-neo-cyan border-2 border-neo-black shadow-hard-sm flex items-center justify-center">
+          <div className="absolute -bottom-1 -inset-e-1 w-7 h-7 rounded-full bg-neo-cyan border-2 border-neo-black shadow-hard-sm flex items-center justify-center">
             <Pencil className="w-3.5 h-3.5 text-neo-black" />
           </div>
         </button>
@@ -139,7 +139,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
                 value={editNameValue}
                 onChange={(e) => setEditNameValue(e.target.value)}
                 maxLength={20}
-                className="bg-white/10 text-neo-cream border-2 border-neo-black rounded-neo px-3 py-1.5 text-lg font-black focus:outline-none focus:ring-2 focus:ring-neo-cyan w-full max-w-[200px]"
+                className="bg-white/10 text-neo-cream border-2 border-neo-black rounded-neo px-3 py-1.5 text-lg font-black focus:outline-hidden focus:ring-2 focus:ring-neo-cyan w-full max-w-[200px]"
                 autoFocus
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') handleSaveName();
@@ -149,13 +149,13 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
               <button
                 data-testid="name-save-button"
                 onClick={handleSaveName}
-                className="w-8 h-8 flex items-center justify-center bg-neo-lime border-2 border-neo-black rounded-neo shadow-hard-sm flex-shrink-0"
+                className="w-8 h-8 flex items-center justify-center bg-neo-lime border-2 border-neo-black rounded-neo shadow-hard-sm shrink-0"
               >
                 <Check className="w-4 h-4 text-neo-black" />
               </button>
               <button
                 onClick={() => { setIsEditingName(false); setEditNameValue(username); }}
-                className="w-8 h-8 flex items-center justify-center bg-white/10 border-2 border-neo-black rounded-neo flex-shrink-0"
+                className="w-8 h-8 flex items-center justify-center bg-white/10 border-2 border-neo-black rounded-neo shrink-0"
               >
                 <X className="w-4 h-4 text-neo-cream" />
               </button>
@@ -169,7 +169,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
                 <button
                   data-testid="edit-name-button"
                   onClick={() => { setEditNameValue(username); setIsEditingName(true); }}
-                  className="flex-shrink-0 w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
+                  className="shrink-0 w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
                   aria-label={t('playerView.editName')}
                 >
                   <Pencil className="w-3.5 h-3.5 text-slate-400" />
@@ -222,7 +222,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
                 transition={{
                   type: 'spring', stiffness: 400, damping: 22, delay: index * 0.06,
                 }}
-                className="flex-shrink-0 flex flex-col items-center gap-1.5"
+                className="shrink-0 flex flex-col items-center gap-1.5"
               >
                 <div
                   className="relative animate-avatar-float"
@@ -270,7 +270,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
 
         {/* Empty Slots */}
         {Array.from({ length: emptySlots }).map((_, i) => (
-          <div key={`empty-${i}`} className="flex-shrink-0 flex flex-col items-center gap-1.5">
+          <div key={`empty-${i}`} className="shrink-0 flex flex-col items-center gap-1.5">
             <div className="w-16 h-16 rounded-full border-2 border-dashed border-neo-cyan/30 bg-white/5 flex items-center justify-center">
               <Plus className="w-5 h-5 text-neo-cyan/50" />
             </div>
@@ -351,7 +351,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
                 transition={{ delay: 0.4 + i * 0.1 }}
                 className="flex items-start gap-2 text-sm text-slate-300"
               >
-                <span className={cn('mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0', dotClass)} />
+                <span className={cn('mt-1.5 w-1.5 h-1.5 rounded-full shrink-0', dotClass)} />
                 <span>{tip}</span>
               </motion.li>
             ))}
@@ -390,12 +390,12 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
   return (
     <div className="flex-1 flex flex-col min-h-0 bg-neo-navy lg:max-w-7xl lg:mx-auto">
       {/* Header */}
-      <header className="flex-shrink-0 px-3 py-2 bg-neo-navy/95 border-b-3 border-neo-black sticky z-20" style={{ top: 'var(--combined-safe-area-top, env(safe-area-inset-top, 0px))' }}>
+      <header className="shrink-0 px-3 py-2 bg-neo-navy/95 border-b-3 border-neo-black sticky z-20" style={{ top: 'var(--combined-safe-area-top, env(safe-area-inset-top, 0px))' }}>
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2 min-w-0">
             <MobileShareSection gameCode={gameCode} t={t} compact />
           </div>
-          <div className="flex items-center gap-2 flex-shrink-0">
+          <div className="flex items-center gap-2 shrink-0">
             {gameLanguage && (
               <div className="bg-black/40 border-2 border-neo-black px-2 py-1 rounded-md flex items-center gap-1.5">
                 <span className="text-sm">{LANGUAGE_FLAGS[gameLanguage] || '🌐'}</span>
@@ -496,4 +496,4 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
   );
 };
 
-export default PlayerWaitingView;
+export default memo(PlayerWaitingView);

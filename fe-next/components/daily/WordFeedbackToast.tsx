@@ -87,7 +87,7 @@ const FEEDBACK_STYLES: Record<FeedbackType, {
     animation: 'animate-neo-pop',
   },
   'target-found': {
-    bg: 'bg-gradient-to-r from-purple-500 via-pink-500 to-yellow-500',
+    bg: 'bg-linear-to-r from-purple-500 via-pink-500 to-yellow-500',
     text: 'text-white',
     border: 'border-purple-700',
     icon: <div className="text-base">🎉</div>,
@@ -133,7 +133,7 @@ export const WordFeedbackToast: React.FC<WordFeedbackToastProps> = ({
             style.animation
           )}
         >
-          <div className="flex-shrink-0">
+          <div className="shrink-0">
             {style.icon}
           </div>
           <div className="font-bold text-sm">

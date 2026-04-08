@@ -76,7 +76,7 @@ export const EarthquakeWarning: React.FC<EarthquakeWarningProps> = ({ isVisible 
           >
             {/* Semi-transparent backdrop */}
             <motion.div
-              className="absolute inset-0 bg-neo-black/40 text-white backdrop-blur-sm pointer-events-none"
+              className="absolute inset-0 bg-neo-black/40 text-white backdrop-blur-xs pointer-events-none"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}

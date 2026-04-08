@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useState } from 'react';
+import React, { memo, useCallback, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Crown, Bot, Plus, Minus, UserPlus, Sparkles, Brain, Zap, X } from 'lucide-react';
 import Avatar from '../../../components/Avatar';
@@ -72,7 +72,7 @@ const playerEntranceVariants = {
   },
 };
 
-export function PlayerRoster({ players, username, gameCode, maxPlayers, hostLabel, t, compact = false }: PlayerRosterProps): React.ReactElement {
+export const PlayerRoster = memo(function PlayerRoster({ players, username, gameCode, maxPlayers, hostLabel, t, compact = false }: PlayerRosterProps): React.ReactElement {
   const { socket } = useSocket();
   const { tryNativeShare } = useNativeShare();
   const { language } = useLanguage();
@@ -149,7 +149,7 @@ export function PlayerRoster({ players, username, gameCode, maxPlayers, hostLabe
                 initial="initial"
                 animate="animate"
                 exit="exit"
-                className="flex-shrink-0 flex flex-col items-center gap-2 group/player"
+                className="shrink-0 flex flex-col items-center gap-2 group/player"
               >
                 <div className="relative">
                   {/* Host crown with wobble */}
@@ -204,16 +204,16 @@ export function PlayerRoster({ players, username, gameCode, maxPlayers, hostLabe
                       whileHover={{ scale: 1.2 }}
                       whileTap={{ scale: 0.9 }}
                       onClick={() => handleKick(name)}
-                      className="absolute -top-1 -end-1 z-20 w-5 h-5 rounded-full bg-red-500 border-2 border-neo-black flex items-center justify-center opacity-0 group-hover/player:opacity-100 transition-opacity shadow-hard-sm"
+                      className="absolute -top-1 -inset-e-1 z-20 w-5 h-5 rounded-full bg-red-500 border-2 border-neo-black flex items-center justify-center opacity-0 group-hover/player:opacity-100 transition-opacity shadow-hard-sm"
                       aria-label={t('hostView.kickPlayer')}
                     >
-                      <X className="w-3 h-3 text-white stroke-[3]" />
+                      <X className="w-3 h-3 text-white stroke-3" />
                     </motion.button>
                   )}
 
                   {/* Bot indicator — small emoji only */}
                   {isBot && diffConfig && (
-                    <span className="absolute -bottom-1 -end-1 text-sm" aria-label={t('hostView.bot')}>
+                    <span className="absolute -bottom-1 -inset-e-1 text-sm" aria-label={t('hostView.bot')}>
                       {diffConfig.emoji}
                     </span>
                   )}
@@ -230,7 +230,7 @@ export function PlayerRoster({ players, username, gameCode, maxPlayers, hostLabe
 
         {/* Add players section */}
         {!isFull && (
-          <div className="flex-shrink-0 flex flex-col items-center gap-2">
+          <div className="shrink-0 flex flex-col items-center gap-2">
             {/* Invite + Bot buttons row */}
             <div className="flex items-center gap-1.5">
               {/* Invite player */}
@@ -258,7 +258,7 @@ export function PlayerRoster({ players, username, gameCode, maxPlayers, hostLabe
                 >
                   <div className="relative">
                     <Bot className="w-4 h-4 text-neo-cyan/50" />
-                    <Plus className="w-2.5 h-2.5 text-neo-cyan/70 absolute -bottom-0.5 -end-1 stroke-[3]" />
+                    <Plus className="w-2.5 h-2.5 text-neo-cyan/70 absolute -bottom-0.5 -inset-e-1 stroke-3" />
                   </div>
                 </motion.button>
 
@@ -270,7 +270,7 @@ export function PlayerRoster({ players, username, gameCode, maxPlayers, hostLabe
                       animate={{ opacity: 1, scale: 1, y: 0 }}
                       exit={{ opacity: 0, scale: 0.85, y: -5 }}
                       transition={{ type: 'spring', stiffness: 500, damping: 28 }}
-                      className="absolute top-full start-1/2 -translate-x-1/2 mt-2 z-50 bg-neo-navy-light border-3 border-neo-black rounded-neo shadow-hard p-2 flex flex-col gap-1 min-w-[140px]"
+                      className="absolute top-full inset-s-1/2 -translate-x-1/2 mt-2 z-50 bg-neo-navy-light border-3 border-neo-black rounded-neo shadow-hard p-2 flex flex-col gap-1 min-w-[140px]"
                     >
                       {([
                         { key: 'easy' as const, icon: Sparkles, color: 'text-neo-lime', bg: 'bg-neo-lime', emoji: '🌱' },
@@ -314,7 +314,7 @@ export function PlayerRoster({ players, username, gameCode, maxPlayers, hostLabe
                 >
                   <div className="relative">
                     <Bot className="w-4 h-4 text-neo-orange/50" />
-                    <Minus className="w-2.5 h-2.5 text-neo-orange/70 absolute -bottom-0.5 -end-1 stroke-[3]" />
+                    <Minus className="w-2.5 h-2.5 text-neo-orange/70 absolute -bottom-0.5 -inset-e-1 stroke-3" />
                   </div>
                 </motion.button>
               )}
@@ -328,4 +328,4 @@ export function PlayerRoster({ players, username, gameCode, maxPlayers, hostLabe
 
     </section>
   );
-}
+});

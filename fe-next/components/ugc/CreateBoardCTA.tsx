@@ -31,7 +31,7 @@ const CreateBoardCTA = memo<CreateBoardCTAProps>(({ gamesPlayed, className }) =>
         className
       )}
     >
-      <div className="flex items-center justify-center w-10 h-10 bg-neo-pink/20 rounded-neo flex-shrink-0">
+      <div className="flex items-center justify-center w-10 h-10 bg-neo-pink/20 rounded-neo shrink-0">
         <PencilRuler className="w-5 h-5 text-neo-pink" />
       </div>
       <div>

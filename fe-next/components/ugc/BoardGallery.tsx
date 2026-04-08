@@ -150,7 +150,7 @@ const BoardGallery = memo<BoardGalleryProps>(({ onPlay }) => {
         <div className="flex flex-col items-center gap-4 py-20 text-center">
           <div className="relative">
             <Layout size={52} className="text-neo-white/10" />
-            <Search size={20} className="text-neo-white/20 absolute -bottom-1 -end-1" />
+            <Search size={20} className="text-neo-white/20 absolute -bottom-1 -inset-e-1" />
           </div>
           <div>
             <p className="font-neo-display font-bold text-neo-white/60 text-lg mb-1">
@@ -196,7 +196,7 @@ const BoardGallery = memo<BoardGalleryProps>(({ onPlay }) => {
               {Array.from({ length: 3 }).map((_, i) => (
                 <div
                   key={i}
-                  className="h-52 rounded-neo border-3 border-black bg-neo-white/[0.03] animate-pulse"
+                  className="h-52 rounded-neo border-3 border-black bg-neo-white/3 animate-pulse"
                 />
               ))}
             </div>

@@ -109,7 +109,7 @@ const BossActiveBattleUI = memo<BossActiveBattleUIProps>(({
           <div className="flex items-center gap-3 mb-2">
             {/* Boss Avatar */}
             <AdaptiveMotion.div
-              className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-neo border-3 border-neo-black shadow-hard-sm overflow-hidden bg-neo-navy-light flex-shrink-0"
+              className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-neo border-3 border-neo-black shadow-hard-sm overflow-hidden bg-neo-navy-light shrink-0"
               animate={
                 bossReaction === 'hit'
                   ? { x: [0, -3, 3, -2, 2, 0], scale: [1, 0.95, 1] }

@@ -720,7 +720,7 @@ export default function BlogIndexPageClient(): React.ReactElement {
       'min-h-screen flex flex-col',
       isDarkMode
         ? 'bg-neo-navy'
-        : 'bg-gradient-to-br from-neo-cream via-white to-neo-cream'
+        : 'bg-linear-to-br from-neo-cream via-white to-neo-cream'
     )}>
       <AutoHideHeader />
 
@@ -775,7 +775,7 @@ export default function BlogIndexPageClient(): React.ReactElement {
                 )}
               >
                 {/* Preview Image */}
-                <div className="relative w-full aspect-[16/9] overflow-hidden">
+                <div className="relative w-full aspect-video overflow-hidden">
                   <Image
                     src={post.image}
                     alt={postContent.title}
@@ -784,7 +784,7 @@ export default function BlogIndexPageClient(): React.ReactElement {
                     className="object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                   {/* Category Badge overlaid on image */}
-                  <div className="absolute top-3 start-3">
+                  <div className="absolute top-3 inset-s-3">
                     <span className={cn(
                       'inline-block px-3 py-1 text-xs font-bold uppercase rounded-neo border-2 border-neo-black',
                       'bg-neo-yellow text-neo-black'

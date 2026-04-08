@@ -67,7 +67,7 @@ export function MobileGameDrawer({
         type="button"
         aria-expanded={isOpen}
         aria-label={t('game.drawer.toggle')}
-        className="w-full bg-neo-navy/95 backdrop-blur-sm border-t-2 border-neo-black/60 cursor-grab active:cursor-grabbing touch-none select-none"
+        className="w-full bg-neo-navy/95 backdrop-blur-xs border-t-2 border-neo-black/60 cursor-grab active:cursor-grabbing touch-none select-none"
         drag="y"
         dragConstraints={{ top: 0, bottom: 0 }}
         dragElastic={0.2}
@@ -122,7 +122,7 @@ export function MobileGameDrawer({
         role="region"
         aria-label={t('game.drawer.content')}
         className={cn(
-          'bg-neo-navy/95 backdrop-blur-sm overflow-y-auto overscroll-contain',
+          'bg-neo-navy/95 backdrop-blur-xs overflow-y-auto overscroll-contain',
           'px-2 pb-2'
         )}
         animate={{

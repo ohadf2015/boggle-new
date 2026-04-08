@@ -93,7 +93,7 @@ const PuzzleBrowse: React.FC = () => {
           </div>
           <Button
             onClick={() => setShowCreator(true)}
-            className="bg-gradient-to-r from-neo-pink to-neo-orange text-neo-cream border-3 border-neo-black rounded-neo shadow-hard font-bold hover:shadow-hard-lg hover:-translate-y-1 active:translate-y-0 active:shadow-hard-pressed transition-all"
+            className="bg-linear-to-r from-neo-pink to-neo-orange text-neo-cream border-3 border-neo-black rounded-neo shadow-hard font-bold hover:shadow-hard-lg hover:-translate-y-1 active:translate-y-0 active:shadow-hard-pressed transition-all"
           >
             <Plus className="w-5 h-5 me-2" />
             {t('puzzleBrowse.createYourOwn')}

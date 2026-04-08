@@ -58,7 +58,7 @@ const AvatarStack = memo<AvatarStackProps>(({
         <div
           key={av.username || `avatar-${i}`}
           className={cn(
-            'relative rounded-full flex-shrink-0',
+            'relative rounded-full shrink-0',
             config.ring,
             'ring-neo-navy-light',
             i > 0 && config.overlap,
@@ -76,7 +76,7 @@ const AvatarStack = memo<AvatarStackProps>(({
       {overflow > 0 && (
         <div
           className={cn(
-            'relative rounded-full flex-shrink-0 flex items-center justify-center',
+            'relative rounded-full shrink-0 flex items-center justify-center',
             'bg-neo-navy border-2 border-white/20 font-black text-white/70',
             config.overflow,
             config.overlap,

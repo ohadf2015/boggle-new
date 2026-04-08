@@ -86,7 +86,7 @@ const XpProgressBar = memo<XpProgressBarProps>(({
                   'inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-bold',
                   'border border-current/30',
                   'hover:scale-105 transition-transform cursor-pointer',
-                  `bg-gradient-to-r ${prestigeDisplay.gradient} text-white`
+                  `bg-linear-to-r ${prestigeDisplay.gradient} text-white`
                 )}
                 title={`${prestigeDisplay.name} - Click for details`}
                 aria-label={`${prestigeDisplay.name} - View prestige details`}
@@ -142,8 +142,8 @@ const XpProgressBar = memo<XpProgressBarProps>(({
           transition={{ duration: 0.8, ease: 'easeOut' }}
           className={cn(
             'absolute inset-y-0 left-0',
-            'bg-gradient-to-r from-neo-cyan via-neo-pink to-neo-pink',
-            'shadow-sm'
+            'bg-linear-to-r from-neo-cyan via-neo-pink to-neo-pink',
+            'shadow-xs'
           )}
         />
 
@@ -157,7 +157,7 @@ const XpProgressBar = memo<XpProgressBarProps>(({
             repeatDelay: 3,
             ease: 'easeInOut',
           }}
-          className="absolute inset-y-0 w-1/4 bg-gradient-to-r from-transparent via-white/30 to-transparent"
+          className="absolute inset-y-0 w-1/4 bg-linear-to-r from-transparent via-white/30 to-transparent"
         />
       </div>
 

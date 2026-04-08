@@ -231,7 +231,7 @@ export function LevelUpCelebration({
           onClick={onDismiss}
         >
           {/* Backdrop */}
-          <div className="absolute inset-0 bg-neo-black/85 backdrop-blur-sm" />
+          <div className="absolute inset-0 bg-neo-black/85 backdrop-blur-xs" />
 
           {/* Flash overlay */}
           <div
@@ -269,7 +269,7 @@ export function LevelUpCelebration({
 
               {/* Main badge */}
               <div
-                className="w-28 h-28 rounded-full bg-gradient-to-br from-amber-300 via-yellow-400 to-amber-500 border-4 border-neo-black shadow-hard flex items-center justify-center"
+                className="w-28 h-28 rounded-full bg-linear-to-br from-amber-300 via-yellow-400 to-amber-500 border-4 border-neo-black shadow-hard flex items-center justify-center"
                 style={{
                   boxShadow: enableGlowEffects
                     ? '6px 6px 0 black, 0 0 40px rgba(255,225,53,0.5)'
@@ -337,7 +337,7 @@ export function LevelUpCelebration({
               <div className="level-rewards space-y-2">
                 {rewards.coins && (
                   <motion.div
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-neo bg-gradient-to-r from-amber-400 to-yellow-400 border-3 border-neo-black shadow-hard"
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-neo bg-linear-to-r from-amber-400 to-yellow-400 border-3 border-neo-black shadow-hard"
                     animate={
                       enableGlowEffects
                         ? {

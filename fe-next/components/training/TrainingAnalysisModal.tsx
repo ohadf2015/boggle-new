@@ -130,7 +130,7 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+        className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs"
         onClick={handleClose}
       >
         <motion.div
@@ -148,7 +148,7 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
         >
           {/* Decorative background */}
           {hasPassed && (
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-32 bg-gradient-to-b from-green-500/20 to-transparent rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-32 bg-linear-to-b from-green-500/20 to-transparent rounded-full blur-3xl pointer-events-none" />
           )}
 
           {/* Close button */}
@@ -209,11 +209,11 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
               'text-2xl font-bold mb-2',
               hasPassed
                 ? (isDarkMode
-                  ? 'text-transparent bg-clip-text bg-gradient-to-r from-green-300 to-emerald-400'
-                  : 'text-transparent bg-clip-text bg-gradient-to-r from-green-500 to-emerald-600')
+                  ? 'text-transparent bg-clip-text bg-linear-to-r from-green-300 to-emerald-400'
+                  : 'text-transparent bg-clip-text bg-linear-to-r from-green-500 to-emerald-600')
                 : (isDarkMode
-                  ? 'text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-pink-400'
-                  : 'text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-pink-600')
+                  ? 'text-transparent bg-clip-text bg-linear-to-r from-purple-300 to-pink-400'
+                  : 'text-transparent bg-clip-text bg-linear-to-r from-purple-500 to-pink-600')
             )}>
               {hasPassed
                 ? (t('training.analysis.titleComplete'))
@@ -255,8 +255,8 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
                 className={cn(
                   'h-full rounded-full',
                   hasPassed
-                    ? 'bg-gradient-to-r from-green-400 to-emerald-500'
-                    : 'bg-gradient-to-r from-purple-400 to-pink-500'
+                    ? 'bg-linear-to-r from-green-400 to-emerald-500'
+                    : 'bg-linear-to-r from-purple-400 to-pink-500'
                 )}
               />
             </div>
@@ -294,7 +294,7 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
                   <div className="flex items-center gap-2 mb-1">
                     <Icon
                       className={cn(
-                        'flex-shrink-0',
+                        'shrink-0',
                         isMastered
                           ? (isDarkMode ? 'text-green-400' : 'text-green-600')
                           : (isDarkMode ? 'text-gray-400' : 'text-gray-500')
@@ -437,7 +437,7 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
                     onClick={() => handleGoToMode('multiplayer')}
                     className={cn(
                       'h-12 font-semibold rounded-xl transition-all flex items-center justify-center gap-2',
-                      'bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600',
+                      'bg-linear-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600',
                       'text-white shadow-lg hover:shadow-xl'
                     )}
                   >
@@ -448,7 +448,7 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
                     onClick={() => handleGoToMode('daily')}
                     className={cn(
                       'h-12 font-semibold rounded-xl transition-all flex items-center justify-center gap-2',
-                      'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600',
+                      'bg-linear-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600',
                       'text-white shadow-lg hover:shadow-xl'
                     )}
                   >
@@ -479,7 +479,7 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
                   onClick={handleTryAgain}
                   className={cn(
                     'w-full h-12 text-base font-semibold rounded-xl transition-all flex items-center justify-center gap-2',
-                    'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600',
+                    'bg-linear-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600',
                     'text-white shadow-lg hover:shadow-xl'
                   )}
                 >

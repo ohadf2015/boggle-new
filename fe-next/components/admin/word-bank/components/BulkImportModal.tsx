@@ -112,7 +112,7 @@ export function BulkImportModal({
           {/* Instructions */}
           <div className="bg-gray-800 border border-gray-700 rounded-lg p-4">
             <div className="flex items-start gap-3">
-              <FileText className="w-5 h-5 text-neo-yellow flex-shrink-0 mt-0.5" />
+              <FileText className="w-5 h-5 text-neo-yellow shrink-0 mt-0.5" />
               <div className="text-sm text-gray-300">
                 <p className="font-medium text-white mb-2">{t('admin.wordBank.bulkImport.instructions')}</p>
                 <ul className="list-disc list-inside space-y-1 text-gray-400">
@@ -133,7 +133,7 @@ export function BulkImportModal({
               <select
                 value={source}
                 onChange={e => setSource(e.target.value as typeof source)}
-                className="w-full bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-neo-yellow"
+                className="w-full bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-2 focus:outline-hidden focus:ring-2 focus:ring-neo-yellow"
               >
                 <option value="admin">Admin</option>
                 <option value="dictionary">Dictionary</option>
@@ -147,7 +147,7 @@ export function BulkImportModal({
               <select
                 value={validationStatus}
                 onChange={e => setValidationStatus(e.target.value as ValidationStatus)}
-                className="w-full bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-neo-yellow"
+                className="w-full bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-2 focus:outline-hidden focus:ring-2 focus:ring-neo-yellow"
               >
                 <option value="approved">Approved (Add to Dictionary)</option>
                 <option value="pending">Pending (Needs Review)</option>
@@ -167,7 +167,7 @@ export function BulkImportModal({
 WORD2
 WORD3
 ...`}
-              className="w-full h-48 bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-neo-yellow font-mono text-sm"
+              className="w-full h-48 bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-2 focus:outline-hidden focus:ring-2 focus:ring-neo-yellow font-mono text-sm"
             />
           </div>
 

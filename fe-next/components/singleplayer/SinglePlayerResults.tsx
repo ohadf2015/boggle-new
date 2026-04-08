@@ -239,10 +239,13 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
     />
   );
 
-  const leaderboardBlock = mode === 'solo-bots' && allParticipants.length > 1 ? (
-    <MobileCompactLeaderboard participants={allParticipants.map(p => ({
+  const leaderboardParticipants = useMemo(() =>
+    allParticipants.map(p => ({
       name: p.name, score: p.score, isCurrentPlayer: p.isPlayer, isBot: !p.isPlayer,
-    }))} />
+    })), [allParticipants]);
+
+  const leaderboardBlock = mode === 'solo-bots' && allParticipants.length > 1 ? (
+    <MobileCompactLeaderboard participants={leaderboardParticipants} />
   ) : null;
 
   const statsBlock = (
@@ -396,7 +399,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
       </div>
 
       {!isDesktop && (
-        <div className="fixed bottom-0 inset-x-0 z-50 bg-neo-navy/95 backdrop-blur-sm border-t-3 border-neo-black safe-area-bottom px-3 py-2.5">
+        <div className="fixed bottom-0 inset-x-0 z-50 bg-neo-navy/95 backdrop-blur-xs border-t-3 border-neo-black safe-area-bottom px-3 py-2.5">
           <NextStepPrompt currentMode={nextStepMode} onBackToLobby={handleBackToLobby} variant="landscape" />
         </div>
       )}

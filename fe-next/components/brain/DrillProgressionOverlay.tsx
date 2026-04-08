@@ -300,7 +300,7 @@ export default function DrillProgressionOverlay({
                       className={cn('h-full', domainConfig.bgColor)}
                       initial={{ width: `${previousDomainScore}%` }}
                       animate={{ width: `${newDomainScore}%` }}
-                      transition={{ duration: 1, ease: 'easeOut' }}
+                      transition={{ type: 'spring', stiffness: 80, damping: 15 }}
                     />
                   </div>
                 </motion.div>

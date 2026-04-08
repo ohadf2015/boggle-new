@@ -117,7 +117,7 @@ export default function Error({
   const isChunkError = isChunkLoadError(error);
 
   return (
-    <div className="flex-1 flex items-center justify-center bg-gradient-to-br from-neo-navy via-neo-navy-light to-neo-navy px-4 py-8">
+    <div className="flex-1 flex items-center justify-center bg-linear-to-br from-neo-navy via-neo-navy-light to-neo-navy px-4 py-8">
       <div className="neo-card max-w-lg w-full p-8 text-center animate-neo-pop rotate-[-1deg] bg-neo-cream border-4 border-neo-black shadow-hard-xl">
         {/* Interactive Mascot - shows different moods based on error type */}
         <div className="mb-6">

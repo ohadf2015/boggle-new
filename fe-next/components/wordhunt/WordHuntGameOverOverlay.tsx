@@ -210,7 +210,7 @@ const SpectatorContent: React.FC<{ t: (key: string) => string }> = ({ t }) => (
     transition={{ duration: 0.5 }}
     className="relative flex flex-col items-center gap-2"
   >
-    <div className="flex items-center gap-2 px-4 py-2 rounded-neo border-2 border-neo-white/30 bg-neo-black/60 backdrop-blur-sm">
+    <div className="flex items-center gap-2 px-4 py-2 rounded-neo border-2 border-neo-white/30 bg-neo-black/60 backdrop-blur-xs">
       <Eye size={18} className="text-neo-white/70" />
       <span className="text-neo-white/70 font-neo-body text-sm font-medium">
         {t('wordHunt.mp.watchOthers')}

@@ -157,7 +157,7 @@ export function ParentalConsentModal({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute inset-0 bg-neo-black/60 backdrop-blur-sm"
+            className="absolute inset-0 bg-neo-black/60 backdrop-blur-xs"
           />
 
           {/* Modal */}
@@ -180,14 +180,14 @@ export function ParentalConsentModal({
             {/* Header */}
             <div className={cn(
               'sticky top-0 z-10',
-              'bg-gradient-to-r from-neo-purple via-neo-indigo to-neo-purple',
+              'bg-linear-to-r from-neo-purple via-neo-indigo to-neo-purple',
               'text-white',
               'px-4 py-4 sm:px-6',
               'border-b-4 border-neo-black'
             )}>
               <div className="flex items-start gap-3">
                 <div className={cn(
-                  'flex-shrink-0 w-10 h-10',
+                  'shrink-0 w-10 h-10',
                   'bg-white/20',
                   'border-2 border-white/40 rounded-neo',
                   'flex items-center justify-center'
@@ -208,13 +208,13 @@ export function ParentalConsentModal({
                 <button
                   onClick={onClose}
                   className={cn(
-                    'flex-shrink-0 w-10 h-10',
+                    'shrink-0 w-10 h-10',
                     'min-w-[44px] min-h-[44px]',
                     'flex items-center justify-center',
                     'bg-white/20 hover:bg-white/30',
                     'rounded-neo border-2 border-white/30',
                     'transition-colors',
-                    'focus:outline-none focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2'
+                    'focus:outline-hidden focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2'
                   )}
                   aria-label={t('common.close')}
                 >
@@ -249,7 +249,7 @@ export function ParentalConsentModal({
                     'w-full px-4 py-3',
                     'border-3 border-neo-black rounded-neo',
                     'font-medium',
-                    'focus:outline-none focus:ring-2 focus:ring-neo-purple focus:ring-offset-2',
+                    'focus:outline-hidden focus:ring-2 focus:ring-neo-purple focus:ring-offset-2',
                     errors.email && 'border-neo-red bg-neo-red/10'
                   )}
                   aria-invalid={!!errors.email}
@@ -283,7 +283,7 @@ export function ParentalConsentModal({
                     'border-3 border-neo-black rounded-neo',
                     'font-medium',
                     'bg-white',
-                    'focus:outline-none focus:ring-2 focus:ring-neo-purple focus:ring-offset-2',
+                    'focus:outline-hidden focus:ring-2 focus:ring-neo-purple focus:ring-offset-2',
                     errors.age && 'border-neo-red bg-neo-red/10'
                   )}
                   aria-invalid={!!errors.age}
@@ -314,7 +314,7 @@ export function ParentalConsentModal({
                     className={cn(
                       'mt-1 w-5 h-5',
                       'border-3 border-neo-black rounded',
-                      'focus:outline-none focus:ring-2 focus:ring-neo-purple focus:ring-offset-2',
+                      'focus:outline-hidden focus:ring-2 focus:ring-neo-purple focus:ring-offset-2',
                       'accent-neo-purple'
                     )}
                     aria-invalid={!!errors.terms}
@@ -348,7 +348,7 @@ export function ParentalConsentModal({
                     'inline-flex items-center gap-1',
                     'text-neo-purple hover:text-neo-indigo',
                     'font-medium underline underline-offset-2',
-                    'focus:outline-none focus:ring-2 focus:ring-neo-purple'
+                    'focus:outline-hidden focus:ring-2 focus:ring-neo-purple'
                   )}
                 >
                   {t('consent.privacyLink')}
@@ -362,7 +362,7 @@ export function ParentalConsentModal({
                     'inline-flex items-center gap-1',
                     'text-neo-purple hover:text-neo-indigo',
                     'font-medium underline underline-offset-2',
-                    'focus:outline-none focus:ring-2 focus:ring-neo-purple'
+                    'focus:outline-hidden focus:ring-2 focus:ring-neo-purple'
                   )}
                 >
                   {t('consent.termsLink')}
@@ -384,7 +384,7 @@ export function ParentalConsentModal({
                   'shadow-hard',
                   'hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard-lg',
                   'active:translate-x-[2px] active:translate-y-[2px] active:shadow-none',
-                  'focus:outline-none focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2',
+                  'focus:outline-hidden focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2',
                   'disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:shadow-hard'
                 )}
               >

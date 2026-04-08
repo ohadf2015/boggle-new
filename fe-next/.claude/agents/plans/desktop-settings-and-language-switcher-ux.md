@@ -106,8 +106,8 @@ So that **I can customize my experience (language, theme, sound) easily regardle
     "bg-neo-cream text-neo-black",
     "border-2 border-neo-black",
     "rounded-neo shadow-hard-sm",
-    "hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard hover:bg-neo-cyan/30",
-    "active:translate-x-[1px] active:translate-y-[1px] active:shadow-none",
+    "hover:-translate-x-px hover:-translate-y-px hover:shadow-hard hover:bg-neo-cyan/30",
+    "active:translate-x-px active:translate-y-px active:shadow-none",
     "transition-all duration-100"
   )}
   aria-label={t('settings.title') || 'Settings'}

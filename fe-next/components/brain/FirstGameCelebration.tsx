@@ -154,7 +154,7 @@ export default function FirstGameCelebration({
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
+            transition={{ delay: 0.2, type: 'spring', stiffness: 300, damping: 25 }}
             className={cn(
               'text-3xl font-black text-center mb-2 uppercase',
               isDarkMode ? 'text-neo-white' : 'text-neo-black'
@@ -231,7 +231,7 @@ export default function FirstGameCelebration({
                 key={key}
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.8 + index * 0.05 }}
+                transition={{ delay: 0.8 + index * 0.05, type: 'spring', stiffness: 300, damping: 25 }}
                 className={cn(
                   'flex items-center justify-between p-2 rounded-neo border-2 border-neo-black',
                   isDarkMode ? 'bg-slate-700/50' : 'bg-white'
@@ -268,7 +268,7 @@ export default function FirstGameCelebration({
             transition={{ delay: 1.2 }}
             className={cn(
               'p-4 rounded-neo border-2 border-neo-black text-center',
-              'bg-gradient-to-r from-neo-lime to-lime-400'
+              'bg-linear-to-r from-neo-lime to-lime-400'
             )}
           >
             <p className="text-sm font-bold text-neo-black mb-2">

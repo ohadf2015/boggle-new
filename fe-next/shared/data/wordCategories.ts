@@ -64,7 +64,7 @@ const CATEGORY_WORDS: Record<string, string[]> = {
     'gear', 'gem', 'glass', 'globe', 'glue', 'grip', 'grill', 'harp', 'hook', 'horn',
     'jar', 'key', 'knob', 'knot', 'lamp', 'lens', 'lid', 'lock', 'map', 'mask',
     'mat', 'nail', 'net', 'pad', 'pan', 'peg', 'pen', 'pin', 'pipe', 'plate',
-    'plug', 'pole', 'pot', 'pump', 'rack', 'rail', 'ring', 'rod', 'rope', 'rug',
+    'plug', 'pole', 'pot', 'pump', 'rack', 'rail', 'ring-3', 'rod', 'rope', 'rug',
     'sack', 'scale', 'seal', 'shelf', 'sign', 'slab', 'slot', 'spool', 'stamp',
     'stick', 'strap', 'string', 'tab', 'tag', 'tape', 'tile', 'tin', 'tool', 'tray',
     'tube', 'vase', 'vent', 'vest', 'wand', 'wheel', 'wire',

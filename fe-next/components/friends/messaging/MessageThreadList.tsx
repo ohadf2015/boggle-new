@@ -125,7 +125,7 @@ export const MessageThreadList: React.FC<MessageThreadListProps> = ({
           )}
         >
           {/* Avatar with online indicator */}
-          <div className="relative flex-shrink-0">
+          <div className="relative shrink-0">
             <Avatar
               avatarImage={thread.friendAvatar.image}
               customAvatar={thread.friendAvatar.customAvatar}
@@ -144,7 +144,7 @@ export const MessageThreadList: React.FC<MessageThreadListProps> = ({
                 {thread.friendDisplayName || thread.friendUsername}
               </p>
               <span className={cn(
-                'text-xs font-medium flex-shrink-0',
+                'text-xs font-medium shrink-0',
                 isDark ? 'text-gray-400' : 'text-gray-500',
                 'me-2'
               )}>
@@ -162,8 +162,8 @@ export const MessageThreadList: React.FC<MessageThreadListProps> = ({
           {/* Unread badge */}
           {thread.unreadCount > 0 && (
             <span className={cn(
-              'flex-shrink-0 bg-neo-pink text-white font-black text-xs px-2 py-1',
-              'rounded-full animate-pulse min-w-[1.5rem] text-center'
+              'shrink-0 bg-neo-pink text-white font-black text-xs px-2 py-1',
+              'rounded-full animate-pulse min-w-6 text-center'
             )}>
               {thread.unreadCount > 9 ? '9+' : thread.unreadCount}
             </span>

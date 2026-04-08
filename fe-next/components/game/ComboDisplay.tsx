@@ -31,7 +31,7 @@ type ComboRarity = 'common' | 'rare' | 'epic' | 'legendary' | 'mythic';
 const RARITY_COLORS = {
   // Level 1-2: Common - Neon Green/Lime (electric green)
   common: {
-    gradient: 'bg-gradient-to-r from-neo-lime via-neo-lime to-emerald-400',
+    gradient: 'bg-linear-to-r from-neo-lime via-neo-lime to-emerald-400',
     sparkles: ['#39FF14', '#BFFF00', '#00FF7F', '#7FFF00'], // neon green variants
     glow: 'linear-gradient(90deg, #39FF14, #BFFF00, #00FF7F)',
     shadow: 'rgba(57, 255, 20, 0.8)', // neon green glow
@@ -39,7 +39,7 @@ const RARITY_COLORS = {
   },
   // Level 3: Rare - Neon Cyan/Electric Blue
   rare: {
-    gradient: 'bg-gradient-to-r from-neo-cyan via-neo-cyan-light to-sky-400',
+    gradient: 'bg-linear-to-r from-neo-cyan via-neo-cyan-light to-sky-400',
     sparkles: ['#00FFFF', '#00F5FF', '#00BFFF', '#7DF9FF'], // neon cyan variants
     glow: 'linear-gradient(90deg, #00FFFF, #00F5FF, #00BFFF)',
     shadow: 'rgba(0, 255, 255, 0.8)', // neon cyan glow
@@ -47,7 +47,7 @@ const RARITY_COLORS = {
   },
   // Level 4: Epic - Neon Magenta/Hot Pink
   epic: {
-    gradient: 'bg-gradient-to-r from-fuchsia-500 via-neo-pink to-pink-500',
+    gradient: 'bg-linear-to-r from-fuchsia-500 via-neo-pink to-pink-500',
     sparkles: ['#FF00FF', '#FF1493', '#FF00BF', '#FF69B4'], // neon magenta variants
     glow: 'linear-gradient(90deg, #FF00FF, #FF1493, #FF00BF)',
     shadow: 'rgba(255, 0, 255, 0.8)', // neon magenta glow
@@ -55,7 +55,7 @@ const RARITY_COLORS = {
   },
   // Level 5-6: Legendary - Neon Yellow/Gold (electric gold)
   legendary: {
-    gradient: 'bg-gradient-to-r from-neo-yellow via-yellow-300 to-amber-400',
+    gradient: 'bg-linear-to-r from-neo-yellow via-yellow-300 to-amber-400',
     sparkles: ['#FFE135', '#FFFF00', '#FFD700', '#FFC300'], // neon yellow/gold variants
     glow: 'linear-gradient(90deg, #FFE135, #FFFF00, #FFD700)',
     shadow: 'rgba(255, 225, 53, 0.9)', // neon yellow glow
@@ -227,7 +227,7 @@ const ComboDisplay = memo<ComboDisplayProps>(({
             <div
               className={cn(
                 'absolute pointer-events-none top-1/2 -translate-y-1/2',
-                compact ? '-start-8' : '-start-10'
+                compact ? '-inset-s-8' : '-inset-s-10'
               )}
             >
               <svg
@@ -390,7 +390,7 @@ const ComboDisplay = memo<ComboDisplayProps>(({
             {/* Glow effect behind text - extends beyond container for full visibility */}
             {!skipSparkles && (
               <motion.div
-                className="absolute inset-0 pointer-events-none -z-10 blur-[12px] scale-[1.3] rounded-full"
+                className="absolute inset-0 pointer-events-none -z-10 blur-md scale-[1.3] rounded-full"
                 animate={{
                   opacity: [0.3, 0.5, 0.3],
                 }}
@@ -416,9 +416,9 @@ const ComboDisplay = memo<ComboDisplayProps>(({
                 'absolute -bottom-4 left-1/2 -translate-x-1/2 whitespace-nowrap',
                 'text-[9px] font-black uppercase tracking-wide px-1.5 py-0.5 rounded',
                 rarity === 'mythic'
-                  ? 'bg-gradient-to-r from-pink-500 via-cyan-500 to-yellow-500 text-white'
+                  ? 'bg-linear-to-r from-pink-500 via-cyan-500 to-yellow-500 text-white'
                   : rarity === 'legendary'
-                  ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white'
+                  ? 'bg-linear-to-r from-amber-500 to-orange-500 text-white'
                   : 'bg-neo-black text-white'
               )}
               style={{
@@ -486,7 +486,7 @@ const ComboDisplay = memo<ComboDisplayProps>(({
           {showMascot && (
             <motion.div
               data-testid="combo-mascot"
-              className="absolute -start-10 top-1/2 -translate-y-1/2 pointer-events-none"
+              className="absolute -inset-s-10 top-1/2 -translate-y-1/2 pointer-events-none"
               initial={{ scale: 0, opacity: 0, x: 20 }}
               animate={{ scale: 1, opacity: 1, x: 0 }}
               exit={{ scale: 0, opacity: 0, x: 20 }}

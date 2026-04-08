@@ -141,7 +141,7 @@ const AchievementPopup = ({ achievement, onComplete }: AchievementPopupProps): R
           stiffness: 300,
           damping: 25,
         }}
-        className="fixed top-20 end-4 z-60 w-80 max-w-[calc(100vw-2rem)]"
+        className="fixed top-20 inset-e-4 z-60 w-80 max-w-[calc(100vw-2rem)]"
         onClick={onComplete}
       >
         {/* Compact toast container - Neo-Brutalist */}
@@ -155,7 +155,7 @@ const AchievementPopup = ({ achievement, onComplete }: AchievementPopupProps): R
                 animate={{ scale: 1, rotate: 0 }}
                 transition={{ delay: 0.1, type: 'spring', stiffness: 400, damping: 15 }}
               >
-                <div className="relative flex-shrink-0">
+                <div className="relative shrink-0">
                   <div className="w-10 h-10 bg-neo-cyan text-neo-black border-2 border-neo-black shadow-hard rounded-md flex items-center justify-center">
                     <span className="text-xl">
                       {localizedAchievement.icon}
@@ -192,7 +192,7 @@ const AchievementPopup = ({ achievement, onComplete }: AchievementPopupProps): R
                 initial={{ scale: 0.95 }}
                 animate={{ scale: 1 }}
                 transition={{ delay: 0.3, type: 'spring', stiffness: 400, damping: 22 }}
-                className="flex-shrink-0 flex gap-1.5"
+                className="shrink-0 flex gap-1.5"
               >
                 {/* Share button */}
                 <button

@@ -58,7 +58,7 @@ export const StreakFreezeIndicator: React.FC<StreakFreezeIndicatorProps> = ({
         <div className="relative">
           <Shield className="w-4 h-4" />
           {!isActive && freezesAvailable > 0 && (
-            <span className="absolute -top-1.5 -end-1.5 text-[9px] font-black leading-none bg-blue-500 text-white rounded-full w-3.5 h-3.5 flex items-center justify-center">
+            <span className="absolute -top-1.5 -inset-e-1.5 text-[9px] font-black leading-none bg-blue-500 text-white rounded-full w-3.5 h-3.5 flex items-center justify-center">
               {freezesAvailable}
             </span>
           )}

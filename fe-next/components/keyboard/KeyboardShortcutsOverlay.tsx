@@ -89,7 +89,7 @@ export function KeyboardShortcutsOverlay({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
-          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-neo-black/80 backdrop-blur-sm"
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-neo-black/80 backdrop-blur-xs"
           onClick={handleBackdropClick}
           role="dialog"
           aria-modal="true"
@@ -130,7 +130,7 @@ export function KeyboardShortcutsOverlay({
                   'bg-white/20 hover:bg-white/30',
                   'rounded-neo border-2 border-white/30',
                   'transition-colors',
-                  'focus:outline-none focus:ring-2 focus:ring-neo-lime focus:ring-offset-2 focus:ring-offset-neo-pink'
+                  'focus:outline-hidden focus:ring-2 focus:ring-neo-lime focus:ring-offset-2 focus:ring-offset-neo-pink'
                 )}
                 aria-label="Close keyboard shortcuts"
               >
@@ -242,7 +242,7 @@ interface ShortcutRowProps {
 function ShortcutRow({ keys, description }: ShortcutRowProps) {
   return (
     <div className="flex items-center gap-3">
-      <div className="flex items-center gap-1 flex-shrink-0">
+      <div className="flex items-center gap-1 shrink-0">
         {keys.map((key, index) => (
           <kbd
             key={index}

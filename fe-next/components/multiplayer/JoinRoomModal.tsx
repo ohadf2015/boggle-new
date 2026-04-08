@@ -118,7 +118,7 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
             {/* Dashed separator line for "ticket" feel */}
             <div className="absolute inset-x-0 bottom-0 border-b-2 border-dashed border-neo-white/10" />
             <div className="flex items-center gap-3 p-3">
-              <span className="text-3xl flex-shrink-0">{LANGUAGE_FLAGS[room.language] || '🎮'}</span>
+              <span className="text-3xl shrink-0">{LANGUAGE_FLAGS[room.language] || '🎮'}</span>
               <div className="flex-1 min-w-0">
                 <p className="font-black text-neo-white truncate text-lg tracking-tight" title={room.roomName || room.gameCode}>
                   {room.roomName || room.gameCode}
@@ -197,7 +197,7 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
                 size="lg"
                 onClick={() => onSpectate?.(username.trim()) || handleJoin()}
                 disabled={isJoining}
-                className="w-full bg-neo-purple hover:bg-neo-purple/90 text-neo-white font-black uppercase tracking-wide border-3 border-neo-black shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard-lg active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all duration-100 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:translate-x-0 disabled:translate-y-0 gap-2"
+                className="w-full bg-neo-purple hover:bg-neo-purple/90 text-neo-white font-black uppercase tracking-wide border-3 border-neo-black shadow-hard hover:-translate-x-px hover:-translate-y-px hover:shadow-hard-lg active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all duration-100 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:translate-x-0 disabled:translate-y-0 gap-2"
               >
                 <Eye className="w-5 h-5" />
                 {t('multiplayerFlow.joinModal.spectateButton')}
@@ -209,7 +209,7 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
               size="lg"
               onClick={handleJoin}
               disabled={isJoining}
-              className="w-full bg-neo-pink hover:bg-neo-pink-light text-neo-black font-black uppercase tracking-wide border-3 border-neo-black shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard-lg active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all duration-100 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:translate-x-0 disabled:translate-y-0 gap-2"
+              className="w-full bg-neo-pink hover:bg-neo-pink-light text-neo-black font-black uppercase tracking-wide border-3 border-neo-black shadow-hard hover:-translate-x-px hover:-translate-y-px hover:shadow-hard-lg active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all duration-100 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:translate-x-0 disabled:translate-y-0 gap-2"
             >
               <Swords className="w-5 h-5" />
               {isJoining

@@ -56,7 +56,7 @@ export async function loadCommunityWords(): Promise<void> {
 
   const startTime = Date.now();
   try {
-    const { data, error } = await client.from('word_scores').select('word, language').eq('is_potentially_valid', true);
+    const { data, error } = await client.from('word_scores').select('word, language').eq('is_potentially_valid', true).limit(50000);
     if (error) { logger.error('CommunityWords', `Error loading: ${error.message}`); return; }
 
     const counts: Record<LanguageCode, number> = { en: 0, he: 0, sv: 0, ja: 0, es: 0 };
@@ -70,7 +70,7 @@ export async function loadCommunityWords(): Promise<void> {
 
     const { data: pendingData, error: pendingError } = await client
       .from('word_scores').select('word, language, likes_count, dislikes_count, net_score')
-      .eq('is_potentially_valid', false).gt('likes_count', 0);
+      .eq('is_potentially_valid', false).gt('likes_count', 0).limit(10000);
 
     if (!pendingError && pendingData) {
       for (const row of pendingData) {

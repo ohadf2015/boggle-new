@@ -422,7 +422,7 @@ För ordspelsspelare skapar falska vänner en unik sorts kognitiv störning. Du 
 Jag har förlorat fler LexiClash-rundor på grund av falska vänner än jag vill erkänna.`,
       },
       {
-        title: 'Tvärspråklig överföring: Dina språk hjälper varandra (mestadels)',
+        title: 'Tvärspråklig överföring-3: Dina språk hjälper varandra (mestadels)',
         content: `En PMC-studie från 2024 om arbetsminne och tvärspråkligt inflytande fann något som språkinlärare har misstänkt i århundraden: att kunna flera språk accelererar inlärningen av nya. Forskarna kallar detta "tvärspråklig överföring."
 
 Mekanismen är elegant. När du lär dig ett tredje språk börjar du inte från noll. Du har redan byggt den kognitiva infrastrukturen för att hantera flera språksystem. Du har hämningskretsarna. Du har växlingsmekanismerna. Du har övning i att hantera konkurrerande lexikon. Din hjärna har, i en mening, blivit förtränad för flerspråkighet.

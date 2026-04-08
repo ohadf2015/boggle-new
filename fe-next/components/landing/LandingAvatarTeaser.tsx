@@ -49,7 +49,7 @@ export function LandingAvatarTeaser({ onBuilderOpenChange }: LandingAvatarTeaser
       onClick={openBuilder}
       className={cn(
         'flex items-center gap-4 sm:gap-5 px-5 py-4 sm:px-6 sm:py-5',
-        'bg-gradient-to-r from-neo-purple/25 to-neo-pink/15',
+        'bg-linear-to-r from-neo-purple/25 to-neo-pink/15',
         'border-3 border-neo-black rounded-neo-lg shadow-hard',
         'max-w-lg mx-auto lg:max-w-none lg:h-full cursor-pointer',
         'hover:shadow-hard-lg hover:-translate-y-0.5 active:shadow-hard-pressed active:translate-y-[2px]',

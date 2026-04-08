@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence, PanInfo } from 'framer-motion';
 import { User, ArrowLeft, ChevronLeft, ChevronRight, LayoutDashboard, BarChart3, Trophy, Gem } from 'lucide-react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
+import { useQueryState, parseAsStringLiteral } from 'nuqs';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 import AutoHideHeader from '@/components/AutoHideHeader';
@@ -41,30 +42,23 @@ interface GameSession {
   gameCode?: string;
 }
 
-type ProfileSection = 'overview' | 'stats' | 'achievements' | 'collection';
-
 export default function ProfilePageClient(): React.JSX.Element {
   const { theme } = useTheme();
   const { t, language } = useLanguage();
   const { user, profile, isAuthenticated, loading, canPlayRanked, gamesUntilRanked, updateProfile, refreshProfile } = useAuth();
   const router = useRouter();
-  const searchParams = useSearchParams();
   const isDarkMode = theme === 'dark';
 
-  // Read initial tab from URL query parameter (e.g., ?tab=collection)
-  const getInitialSection = (): ProfileSection => {
-    const tabParam = searchParams.get('tab');
-    const validTabs: ProfileSection[] = ['overview', 'stats', 'achievements', 'collection'];
-    if (tabParam && validTabs.includes(tabParam as ProfileSection)) {
-      return tabParam as ProfileSection;
-    }
-    return 'overview';
-  };
+  // URL-synced tab state via nuqs — two-way binding between ?tab= and React state
+  const profileSections = ['overview', 'stats', 'achievements', 'collection'] as const;
+  const [activeSection, setActiveSection] = useQueryState(
+    'tab',
+    parseAsStringLiteral(profileSections).withDefault('overview'),
+  );
 
   // State
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [activeGameSession, setActiveGameSession] = useState<GameSession | null>(null);
-  const [activeSection, setActiveSection] = useState<ProfileSection>(getInitialSection);
 
   // Hooks
   const { spendCoins } = useCoinContext();
@@ -82,7 +76,7 @@ export default function ProfilePageClient(): React.JSX.Element {
   });
 
   // Section navigation
-  const sections: ProfileSection[] = ['overview', 'stats', 'achievements', 'collection'];
+  const sections = profileSections;
   const currentIndex = sections.indexOf(activeSection);
 
   const goToNextSection = () => {
@@ -134,7 +128,7 @@ export default function ProfilePageClient(): React.JSX.Element {
     return (
       <div className={cn(
         'flex flex-col h-full page-content-safe',
-        isDarkMode ? 'bg-neo-navy' : 'bg-gradient-to-br from-blue-50 via-white to-purple-50'
+        isDarkMode ? 'bg-neo-navy' : 'bg-linear-to-br from-blue-50 via-white to-purple-50'
       )}>
         <AutoHideHeader />
         {/* Reduced padding for unauthenticated view */}
@@ -177,7 +171,7 @@ export default function ProfilePageClient(): React.JSX.Element {
     return (
       <div className={cn(
         'flex flex-col h-full page-content-safe',
-        isDarkMode ? 'bg-neo-navy' : 'bg-gradient-to-br from-blue-50 via-white to-purple-50'
+        isDarkMode ? 'bg-neo-navy' : 'bg-linear-to-br from-blue-50 via-white to-purple-50'
       )}>
         <AutoHideHeader />
         <div className="max-w-4xl mx-auto px-4 py-6 w-full">
@@ -218,7 +212,7 @@ export default function ProfilePageClient(): React.JSX.Element {
       {/* Scroll is handled at body level via screen-fit class. This container just provides flex layout. */}
       <div className={cn(
         'md:hidden flex-1 flex flex-col min-h-0 relative',
-        isDarkMode ? 'bg-neo-navy' : 'bg-gradient-to-br from-blue-50 via-white to-purple-50'
+        isDarkMode ? 'bg-neo-navy' : 'bg-linear-to-br from-blue-50 via-white to-purple-50'
       )}>
         <AutoHideHeader />
 
@@ -260,7 +254,7 @@ export default function ProfilePageClient(): React.JSX.Element {
           {/* Swipe indicator - left side (use logical start for RTL support) */}
           {currentIndex > 0 && (
             <div
-              className="absolute start-0 top-0 bottom-0 w-6 z-10 pointer-events-none bg-gradient-to-r rtl:bg-gradient-to-l from-neo-navy/60 to-transparent flex items-center justify-start ps-1"
+              className="absolute inset-s-0 top-0 bottom-0 w-6 z-10 pointer-events-none bg-linear-to-r rtl:bg-linear-to-l from-neo-navy/60 to-transparent flex items-center justify-start ps-1"
               aria-hidden="true"
             >
               <ChevronLeft className="w-4 h-4 text-neo-yellow/60 rtl:rotate-180" />
@@ -270,7 +264,7 @@ export default function ProfilePageClient(): React.JSX.Element {
           {/* Swipe indicator - right side (use logical end for RTL support) */}
           {currentIndex < sections.length - 1 && (
             <div
-              className="absolute end-0 top-0 bottom-0 w-6 z-10 pointer-events-none bg-gradient-to-l rtl:bg-gradient-to-r from-neo-navy/60 to-transparent flex items-center justify-end pe-1"
+              className="absolute inset-e-0 top-0 bottom-0 w-6 z-10 pointer-events-none bg-linear-to-l rtl:bg-linear-to-r from-neo-navy/60 to-transparent flex items-center justify-end pe-1"
               aria-hidden="true"
             >
               <ChevronRight className="w-4 h-4 text-neo-yellow/60 rtl:rotate-180" />
@@ -363,7 +357,7 @@ export default function ProfilePageClient(): React.JSX.Element {
       <div
         className={cn(
           'hidden md:flex md:flex-col md:h-full relative',
-          isDarkMode ? 'bg-neo-navy' : 'bg-gradient-to-br from-blue-50 via-white to-purple-50'
+          isDarkMode ? 'bg-neo-navy' : 'bg-linear-to-br from-blue-50 via-white to-purple-50'
         )}
         {...pullToRefreshHandlers}
       >

@@ -168,7 +168,7 @@ export function XpBarAnimated({
           <motion.div
             className={cn(
               'flex items-center justify-center rounded-neo border-3 border-neo-black shadow-hard',
-              'bg-gradient-to-br from-neo-lime to-amber-500 font-black text-neo-black',
+              'bg-linear-to-br from-neo-lime to-amber-500 font-black text-neo-black',
               sizeConfig[size].levelBadge
             )}
             animate={
@@ -201,7 +201,7 @@ export function XpBarAnimated({
             {/* Fill bar */}
             <motion.div
               className={cn(
-                'absolute inset-y-0 left-0 rounded-r-sm bg-gradient-to-r',
+                'absolute inset-y-0 left-0 rounded-r-sm bg-linear-to-r',
                 colors.bar
               )}
               initial={{ width: `${(previousXp ?? currentXp) / maxXp * 100}%` }}

@@ -104,14 +104,14 @@ function MissionRow({
         'bg-neo-navy/60 hover:bg-neo-navy/80',
         'shadow-hard-sm hover:shadow-hard',
         'transition-all duration-150',
-        'hover:-translate-y-0.5 active:translate-y-[1px] active:shadow-hard-pressed',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan',
+        'hover:-translate-y-0.5 active:translate-y-px active:shadow-hard-pressed',
+        'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan',
       )}
       aria-label={`${t(config.translationKey)}${completed ? ` - ${t('dailyMissions.completed')}` : ''}`}
     >
       <div
         className={cn(
-          'flex-shrink-0 w-9 h-9 flex items-center justify-center rounded-neo',
+          'shrink-0 w-9 h-9 flex items-center justify-center rounded-neo',
           'border-2 border-neo-black',
           completed ? 'bg-neo-lime/20' : 'bg-neo-navy',
         )}
@@ -133,7 +133,7 @@ function MissionRow({
 
       <div
         className={cn(
-          'flex-shrink-0 w-6 h-6 flex items-center justify-center rounded-full',
+          'shrink-0 w-6 h-6 flex items-center justify-center rounded-full',
           'border-2 border-neo-black',
           completed ? 'bg-neo-lime' : 'bg-transparent',
         )}
@@ -155,7 +155,7 @@ function GrandSlamBadge({ t }: { t: (key: string) => string }) {
       role="status"
       aria-live="polite"
     >
-      <Gift className="w-5 h-5 text-neo-yellow flex-shrink-0" aria-hidden="true" />
+      <Gift className="w-5 h-5 text-neo-yellow shrink-0" aria-hidden="true" />
       <div className="flex-1">
         <p className="font-neo-display text-sm font-bold text-neo-yellow">
           {t('dailyMissions.grandSlam')}

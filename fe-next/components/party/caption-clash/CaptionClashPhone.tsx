@@ -6,9 +6,11 @@
  */
 
 import { memo, useEffect, useState, useCallback, useRef } from 'react';
+import { setInterval, clearInterval } from 'worker-timers';
 import type { Socket } from 'socket.io-client';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
+import { usePartySounds } from '@/hooks/usePartySounds';
 
 // ==================== Types ====================
 
@@ -45,6 +47,7 @@ interface CaptionClashPhoneProps {
 
 function CaptionClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: CaptionClashPhoneProps) {
   const { t } = useLanguage();
+  const partySounds = usePartySounds();
   const [phase, setPhase] = useState<PhonePhase>('waiting');
   const [imageData, setImageData] = useState<ImageReadyData | null>(null);
   const [captionText, setCaptionText] = useState('');
@@ -57,11 +60,12 @@ function CaptionClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: 
   // Timer countdown
   useEffect(() => {
     if (timeRemaining <= 0) return;
+    if (timeRemaining <= 5) partySounds.onCountdown(timeRemaining);
     const interval = setInterval(() => {
       setTimeRemaining(prev => Math.max(0, prev - 1));
     }, 1000);
     return () => clearInterval(interval);
-  }, [timeRemaining]);
+  }, [timeRemaining, partySounds]);
 
   // Socket listeners
   useEffect(() => {
@@ -75,11 +79,13 @@ function CaptionClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: 
       setSubmissions([]);
       setCurrentReveal(null);
       setTimeRemaining(data.writeTimeSeconds);
+      partySounds.onPhaseStart();
     };
 
     const onRevealCaption = (data: { submission: CaptionSubmission }) => {
       setPhase('lineup');
       setCurrentReveal(data.submission);
+      partySounds.onReveal();
     };
 
     const onPhaseChange = (data: { phase: string; gameState: Record<string, unknown> | null }) => {
@@ -88,11 +94,13 @@ function CaptionClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: 
         setPhase('voting');
         setSubmissions(gs.submissions as CaptionSubmission[]);
         setTimeRemaining(20);
+        partySounds.onPhaseTransition();
       }
     };
 
     const onVoteResults = () => {
       setPhase('crown');
+      partySounds.onCrowned();
     };
 
     socket.on('party:caption:imageReady', onImageReady);
@@ -112,7 +120,8 @@ function CaptionClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: 
     if (!captionText.trim() || phase !== 'writing') return;
     onSendInput({ gameId: 'caption-clash', action: 'submit-caption', text: captionText.trim() });
     setPhase('submitted');
-  }, [captionText, phase, onSendInput]);
+    partySounds.onSubmit();
+  }, [captionText, phase, onSendInput, partySounds]);
 
   const handleLaugh = useCallback(() => {
     if (!currentReveal) return;
@@ -127,7 +136,8 @@ function CaptionClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: 
     setVotedId(submissionId);
     onSendInput({ gameId: 'caption-clash', action: 'vote', submissionId });
     setPhase('voted');
-  }, [votedId, onSendInput]);
+    partySounds.onVote();
+  }, [votedId, onSendInput, partySounds]);
 
   // ==================== Render ====================
 
@@ -188,7 +198,7 @@ function CaptionClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: 
                 flex-1 bg-neo-navy-elevated border-3 border-neo-pink/50 rounded-neo-lg
                 p-4 text-neo-cream font-neo-body text-lg
                 placeholder:text-neo-cream/20
-                focus:outline-none focus:border-neo-pink
+                focus:outline-hidden focus:border-neo-pink
                 resize-none
               "
             />
@@ -203,7 +213,7 @@ function CaptionClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: 
                   bg-neo-pink border-3 border-neo-black rounded-neo shadow-hard
                   px-6 py-3 font-neo-display text-neo-black uppercase font-bold
                   transition-all duration-100
-                  hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard-lg
+                  hover:-translate-x-px hover:-translate-y-px hover:shadow-hard-lg
                   active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed
                   disabled:opacity-30 disabled:cursor-not-allowed
                 "
@@ -275,7 +285,7 @@ function CaptionClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: 
                     ? 'bg-neo-pink text-neo-black shadow-hard-pink'
                     : phase === 'voted'
                       ? 'bg-neo-navy-elevated text-neo-cream/40'
-                      : 'bg-neo-navy-elevated text-neo-cream shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-pressed'
+                      : 'bg-neo-navy-elevated text-neo-cream shadow-hard hover:-translate-x-px hover:-translate-y-px active:translate-x-px active:translate-y-px active:shadow-hard-pressed'
                   }
                 `}
               >

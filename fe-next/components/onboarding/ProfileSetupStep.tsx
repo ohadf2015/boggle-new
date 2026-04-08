@@ -118,7 +118,7 @@ const ProfileSetupStep: React.FC<ProfileSetupStepProps> = ({
                 className={cn(
                   'w-full px-3 py-2.5 sm:py-3 bg-white border-3 border-neo-black rounded-neo',
                   'font-bold text-base sm:text-lg text-neo-black placeholder:text-neo-black/40',
-                  'focus:outline-none focus:ring-3 focus:ring-neo-cyan',
+                  'focus:outline-hidden focus:ring-3 focus:ring-neo-cyan',
                   'shadow-hard-sm transition-all',
                   'min-h-[44px]',
                   showNameError && 'border-neo-red focus:ring-neo-red',

@@ -13,7 +13,8 @@ import {
   Trophy,
   QrCode,
 } from 'lucide-react';
-import { QRCodeSVG } from 'qrcode.react';
+import dynamic from 'next/dynamic';
+const QRCodeSVG = dynamic(() => import('qrcode.react').then(m => ({ default: m.QRCodeSVG })), { ssr: false });
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -106,7 +107,7 @@ function MilestoneProgress({
       {/* Progress bar */}
       <div className="relative h-5 rounded-neo border-3 border-neo-black bg-slate-700 overflow-hidden mb-4">
         <div
-          className="absolute inset-y-0 left-0 rtl:left-auto rtl:right-0 bg-gradient-to-r rtl:bg-gradient-to-l from-neo-lime to-neo-cyan transition-all duration-500"
+          className="absolute inset-y-0 left-0 rtl:left-auto rtl:right-0 bg-linear-to-r rtl:bg-linear-to-l from-neo-lime to-neo-cyan transition-all duration-500"
           style={{ width: `${pct}%` }}
         />
         {/* Milestone markers */}
@@ -325,7 +326,7 @@ export default function ReferralDashboardClient() {
   return (
     <div className="min-h-screen bg-neo-navy pb-24">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-neo-navy/95 backdrop-blur border-b-3 border-neo-black/30 px-4 py-3 flex items-center gap-3">
+      <div className="sticky top-0 z-10 bg-neo-navy/95 backdrop-blur-sm border-b-3 border-neo-black/30 px-4 py-3 flex items-center gap-3">
         <button
           onClick={() => router.back()}
           className="p-2 rounded-neo hover:bg-neo-white/10 transition-colors"

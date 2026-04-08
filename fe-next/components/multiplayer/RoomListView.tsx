@@ -14,6 +14,8 @@ import type { ActiveRoom } from '@/shared/types/game';
 import { cn } from '@/lib/utils';
 import dynamic from 'next/dynamic';
 
+const TITLE_TEXT_SHADOW_STYLE = { textShadow: '3px 3px 0px rgba(0,0,0,0.8)' } as const;
+
 const HowToPlay = dynamic(() => import('@/components/HowToPlay'), { ssr: false });
 const MultiplayerWelcomeCard = dynamic(() => import('@/components/multiplayer/MultiplayerWelcomeCard'), { ssr: false });
 import { Loader } from '@/components/ui/Loader';
@@ -167,8 +169,10 @@ const RoomListView: React.FC<RoomListViewProps> = ({
     threshold: 60,
   });
 
-  const totalPlayers = activeRooms.reduce((sum, room) => sum + (room.playerCount || 0), 0);
-  const liveMatchCount = activeRooms.filter((r) => r.gameState === 'in-progress').length;
+  const { totalPlayers, liveMatchCount } = React.useMemo(() => ({
+    totalPlayers: activeRooms.reduce((sum, room) => sum + (room.playerCount || 0), 0),
+    liveMatchCount: activeRooms.filter((r) => r.gameState === 'in-progress').length,
+  }), [activeRooms]);
   const hasRooms = activeRooms.length > 0;
 
   return (
@@ -190,12 +194,12 @@ const RoomListView: React.FC<RoomListViewProps> = ({
           variants={headerVariants}
           initial="hidden"
           animate="visible"
-          className="flex items-center justify-between py-3 px-4 lg:px-6 flex-shrink-0 border-b-2 border-white/10"
+          className="flex items-center justify-between py-3 px-4 lg:px-6 shrink-0 border-b-2 border-white/10"
         >
           <Link
             href="/"
             aria-label={t('common.back')}
-            className="flex items-center justify-center w-10 h-10 min-w-[44px] min-h-[44px] rounded-lg border-2 border-neo-black bg-neo-navy shadow-hard-sm hover:shadow-hard active:shadow-hard-pressed active:translate-y-0.5 transition-all focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime"
+            className="flex items-center justify-center w-10 h-10 min-w-[44px] min-h-[44px] rounded-lg border-2 border-neo-black bg-neo-navy shadow-hard-sm hover:shadow-hard active:shadow-hard-pressed active:translate-y-0.5 transition-all focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-lime"
           >
             <ArrowLeft className="w-5 h-5 text-neo-white rtl:rotate-180" />
           </Link>
@@ -203,7 +207,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
           <div className="text-center">
             <h1
               className="font-neo-display text-xl font-black uppercase text-neo-white tracking-tighter italic"
-              style={{ textShadow: '3px 3px 0px rgba(0,0,0,0.8)' }}
+              style={TITLE_TEXT_SHADOW_STYLE}
             >
               {t('multiplayerFlow.roomList.arenaHub')}
             </h1>
@@ -211,7 +215,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
 
           <button
             onClick={() => setShowHowToPlay(true)}
-            className="flex items-center justify-center w-10 h-10 min-w-[44px] min-h-[44px] rounded-lg border-2 border-neo-black bg-neo-navy shadow-hard-sm hover:bg-white/10 active:shadow-hard-pressed active:translate-y-0.5 transition-all focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime"
+            className="flex items-center justify-center w-10 h-10 min-w-[44px] min-h-[44px] rounded-lg border-2 border-neo-black bg-neo-navy shadow-hard-sm hover:bg-white/10 active:shadow-hard-pressed active:translate-y-0.5 transition-all focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-lime"
             aria-label={t('landing.tutorial')}
           >
             <HelpCircle className="w-5 h-5 text-neo-white" />
@@ -256,7 +260,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
               <motion.button
                 onClick={onQuickPlay}
                 disabled={isQuickPlayLoading}
-                className="flex-[2] min-h-[52px] py-3 px-4 flex items-center justify-center gap-2.5 bg-neo-lime border-3 border-neo-black rounded-xl shadow-hard active:translate-y-0.5 active:shadow-hard-pressed transition-all disabled:opacity-70 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
+                className="flex-2 min-h-[52px] py-3 px-4 flex items-center justify-center gap-2.5 bg-neo-lime border-3 border-neo-black rounded-xl shadow-hard active:translate-y-0.5 active:shadow-hard-pressed transition-all disabled:opacity-70 focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan"
                 whileHover={{ scale: 1.02, transition: { type: 'spring' as const, stiffness: 400, damping: 20 } }}
                 whileTap={{ scale: 0.97 }}
               >
@@ -274,7 +278,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
                 onClick={onCreateRoom}
                 whileHover={{ scale: 1.02, transition: { type: 'spring' as const, stiffness: 400, damping: 20 } }}
                 whileTap={{ scale: 0.97 }}
-                className="flex-1 min-h-[48px] py-3 px-4 flex items-center justify-center gap-2 bg-neo-navy-light border-3 border-neo-pink/60 rounded-xl shadow-hard-sm hover:border-neo-pink active:translate-y-0.5 active:shadow-hard-pressed transition-all focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime"
+                className="flex-1 min-h-[48px] py-3 px-4 flex items-center justify-center gap-2 bg-neo-navy-light border-3 border-neo-pink/60 rounded-xl shadow-hard-sm hover:border-neo-pink active:translate-y-0.5 active:shadow-hard-pressed transition-all focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-lime"
               >
                 <Users className="w-4 h-4 text-neo-pink shrink-0" />
                 <span className="text-neo-pink font-black text-sm uppercase tracking-wide whitespace-nowrap">
@@ -310,7 +314,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
                 whileHover={{ scale: 1.1, rotate: 90 }}
                 whileTap={{ scale: 0.9, rotate: 180 }}
                 transition={{ type: 'spring' as const, stiffness: 300, damping: 15 }}
-                className="w-9 h-9 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg border-2 border-neo-black/50 bg-neo-navy/50 hover:bg-neo-cyan/20 active:translate-y-0.5 transition-all disabled:opacity-50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime"
+                className="w-9 h-9 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg border-2 border-neo-black/50 bg-neo-navy/50 hover:bg-neo-cyan/20 active:translate-y-0.5 transition-all disabled:opacity-50 focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-lime"
                 aria-label={t('common.refresh')}
               >
                 {roomsLoading ? (
@@ -366,12 +370,12 @@ const RoomListView: React.FC<RoomListViewProps> = ({
                           transition: { type: 'spring' as const, stiffness: 400, damping: 20 },
                         }}
                         whileTap={{ scale: 0.98 }}
-                        className={`flex items-center gap-3 p-3 rounded-xl border-2 border-neo-black border-s-4 ${mode.borderColor} bg-neo-navy-light/40 hover:bg-neo-navy-light transition-colors text-start group relative overflow-hidden focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime cursor-pointer`}
+                        className={`flex items-center gap-3 p-3 rounded-xl border-2 border-neo-black border-s-4 ${mode.borderColor} bg-neo-navy-light/40 hover:bg-neo-navy-light transition-colors text-start group relative overflow-hidden focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-lime cursor-pointer`}
                       >
                         {/* Left: Mode icon + info */}
                         <div className="flex items-center gap-3 flex-1 min-w-0">
                           {/* Mode icon box */}
-                          <div className={`w-10 h-10 ${mode.iconBg} border-2 border-neo-black rounded-lg flex items-center justify-center flex-shrink-0 shadow-hard-sm`}>
+                          <div className={`w-10 h-10 ${mode.iconBg} border-2 border-neo-black rounded-lg flex items-center justify-center shrink-0 shadow-hard-sm`}>
                             <ModeIcon className={`w-5 h-5 ${mode.iconColor}`} />
                           </div>
 
@@ -382,7 +386,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
                                 {room.roomName || room.gameCode}
                               </h4>
                               {room.gameState === 'in-progress' && (
-                                <div className="w-2 h-2 rounded-full bg-neo-lime animate-pulse flex-shrink-0" />
+                                <div className="w-2 h-2 rounded-full bg-neo-lime animate-pulse shrink-0" />
                               )}
                             </div>
 
@@ -421,7 +425,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
                         </div>
 
                         {/* Right: Avatar stack + chevron */}
-                        <div className="flex items-center gap-2 flex-shrink-0">
+                        <div className="flex items-center gap-2 shrink-0">
                           {room.playerAvatars && room.playerAvatars.length > 0 && (
                             <AvatarStack
                               avatars={room.playerAvatars}
@@ -430,7 +434,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
                               size="sm"
                             />
                           )}
-                          <ChevronRight className="w-4 h-4 text-white/40 flex-shrink-0 rtl:rotate-180 group-hover:text-white/60 transition-colors" />
+                          <ChevronRight className="w-4 h-4 text-white/40 shrink-0 rtl:rotate-180 group-hover:text-white/60 transition-colors" />
                         </div>
                       </motion.button>
                     );

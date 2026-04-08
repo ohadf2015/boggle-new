@@ -152,10 +152,10 @@ export const EducationHeader = memo<EducationHeaderProps>(({
                 'bg-neo-cream text-neo-black dark:bg-neo-navy dark:text-white',
                 'border-3 border-neo-black dark:border-slate-500',
                 'rounded-neo shadow-hard-sm',
-                'hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard',
-                'active:translate-x-[1px] active:translate-y-[1px] active:shadow-none',
+                'hover:-translate-x-px hover:-translate-y-px hover:shadow-hard',
+                'active:translate-x-px active:translate-y-px active:shadow-none',
                 'transition-all duration-100',
-                'focus:outline-none focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2'
+                'focus:outline-hidden focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2'
               )}
               aria-label={t('common.back')}
             >
@@ -169,7 +169,7 @@ export const EducationHeader = memo<EducationHeaderProps>(({
             className={cn(
               'flex items-center gap-1 sm:gap-2',
               'hover:opacity-90 transition-opacity',
-              'focus:outline-none focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2 rounded-sm'
+              'focus:outline-hidden focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2 rounded-sm'
             )}
             aria-label={t('education.header.homeLink')}
           >
@@ -244,13 +244,13 @@ export const EducationHeader = memo<EducationHeaderProps>(({
             <button
               onClick={() => setShowMobileMenu(!showMobileMenu)}
               className={cn(
-                'flex items-center justify-center flex-shrink-0',
+                'flex items-center justify-center shrink-0',
                 'w-11 h-11 min-w-[44px] min-h-[44px]',
                 'bg-neo-cream text-neo-black',
                 'border-3 border-neo-black',
                 'rounded-neo shadow-hard-sm',
-                'hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard',
-                'active:translate-x-[1px] active:translate-y-[1px] active:shadow-none',
+                'hover:-translate-x-px hover:-translate-y-px hover:shadow-hard',
+                'active:translate-x-px active:translate-y-px active:shadow-none',
                 'transition-all duration-100'
               )}
               aria-label={showMobileMenu ? t('common.closeMenu') : t('common.openMenu')}
@@ -311,7 +311,7 @@ export const EducationHeader = memo<EducationHeaderProps>(({
                       'bg-neo-cream dark:bg-neo-navy text-neo-black dark:text-white',
                       'border-3 border-neo-black dark:border-slate-500',
                       'rounded-neo shadow-hard-sm',
-                      'active:translate-x-[1px] active:translate-y-[1px] active:shadow-none',
+                      'active:translate-x-px active:translate-y-px active:shadow-none',
                       'transition-all duration-100'
                     )}
                     aria-label={t('common.closeMenu')}
@@ -481,10 +481,10 @@ const EducationMenuDropdown = memo<EducationMenuDropdownProps>(({
           'bg-neo-cream text-neo-black dark:bg-neo-navy dark:text-white',
           'border-3 border-neo-black dark:border-slate-500',
           'rounded-neo shadow-hard-sm',
-          'hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard',
-          'active:translate-x-[1px] active:translate-y-[1px] active:shadow-none',
+          'hover:-translate-x-px hover:-translate-y-px hover:shadow-hard',
+          'active:translate-x-px active:translate-y-px active:shadow-none',
           'transition-all duration-100',
-          'focus:outline-none focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2'
+          'focus:outline-hidden focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2'
         )}
         aria-label={t('common.menu')}
         aria-expanded={isOpen}
@@ -557,7 +557,7 @@ const EducationMenuDropdown = memo<EducationMenuDropdownProps>(({
 
             {isAuthenticated && (
               <>
-                <div className="h-[1px] bg-neo-black/20 dark:bg-neo-navy-light mx-2" />
+                <div className="h-px bg-neo-black/20 dark:bg-neo-navy-light mx-2" />
 
                 <div className="p-2">
                   <button

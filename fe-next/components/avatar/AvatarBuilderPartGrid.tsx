@@ -148,9 +148,9 @@ export default function PartPreviewGrid<T extends string>({
                 selected === option
                   ? 'bg-neo-lime/15 border-neo-lime shadow-hard-sm ring-1 ring-neo-lime/30'
                   : isLocked && isLegendary
-                    ? 'bg-gradient-to-b from-amber-900/40 to-neo-navy-light/50 border-amber-400/50 hover:border-amber-300/70 ring-1 ring-amber-500/20'
+                    ? 'bg-linear-to-b from-amber-900/40 to-neo-navy-light/50 border-amber-400/50 hover:border-amber-300/70 ring-1 ring-amber-500/20'
                     : isLocked && isEpic
-                      ? 'bg-gradient-to-b from-purple-900/30 to-neo-navy-light/50 border-purple-500/40 hover:border-purple-400/60'
+                      ? 'bg-linear-to-b from-purple-900/30 to-neo-navy-light/50 border-purple-500/40 hover:border-purple-400/60'
                       : isLocked
                         ? 'bg-neo-navy-light/50 border-neo-white/10 hover:border-neo-yellow/40'
                         : 'bg-neo-navy-light border-neo-white/15 hover:border-neo-white/40 hover:bg-neo-navy-light/80'
@@ -158,9 +158,9 @@ export default function PartPreviewGrid<T extends string>({
             >
               {/* Tier badge — top corner */}
               {isLocked && (isLegendary || isEpic) && (
-                <div className="absolute top-0.5 end-0.5 z-10">
+                <div className="absolute top-0.5 inset-e-0.5 z-10">
                   {isLegendary ? (
-                    <span className="text-[7px] font-black text-amber-300 bg-gradient-to-r from-amber-900/80 to-amber-800/80 px-1 rounded shadow-sm tracking-wide">LEGENDARY</span>
+                    <span className="text-[7px] font-black text-amber-300 bg-linear-to-r from-amber-900/80 to-amber-800/80 px-1 rounded shadow-xs tracking-wide">LEGENDARY</span>
                   ) : (
                     <span className="text-[8px] font-black text-purple-400 bg-purple-900/60 px-1 rounded">EPIC</span>
                   )}
@@ -168,7 +168,7 @@ export default function PartPreviewGrid<T extends string>({
               )}
 
               {/* Part preview */}
-              <div className={`w-12 h-12 flex items-center justify-center ${isLocked ? 'opacity-40 grayscale-[30%]' : ''}`}>
+              <div className={`w-12 h-12 flex items-center justify-center ${isLocked ? 'opacity-40 grayscale-30' : ''}`}>
                 {option === 'none' ? (
                   <span className="text-neo-white/40 text-xs font-bold">{noneLabel ?? '—'}</span>
                 ) : (
@@ -221,9 +221,9 @@ export default function PartPreviewGrid<T extends string>({
               transition={{ type: 'spring', damping: 22, stiffness: 300 }}
               className={`relative mx-4 p-5 rounded-neo-lg border-3 border-black shadow-hard-lg max-w-xs w-full ${
                 confirmPurchase.isLegendary
-                  ? 'bg-gradient-to-b from-amber-950 to-neo-navy'
+                  ? 'bg-linear-to-b from-amber-950 to-neo-navy'
                   : confirmPurchase.isEpic
-                    ? 'bg-gradient-to-b from-purple-950 to-neo-navy'
+                    ? 'bg-linear-to-b from-purple-950 to-neo-navy'
                     : 'bg-neo-navy'
               }`}
               onClick={(e: React.MouseEvent) => e.stopPropagation()}
@@ -231,7 +231,7 @@ export default function PartPreviewGrid<T extends string>({
               {/* Close button */}
               <button
                 onClick={() => setConfirmPurchase(null)}
-                className="absolute top-2 end-2 text-neo-white/50 hover:text-neo-white p-1"
+                className="absolute top-2 inset-e-2 text-neo-white/50 hover:text-neo-white p-1"
                 aria-label="Close"
               >
                 <X size={18} />
@@ -306,9 +306,9 @@ export default function PartPreviewGrid<T extends string>({
                   disabled={premium?.isPurchasing}
                   className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 font-bold rounded-neo border-2 border-black shadow-hard-sm transition-colors disabled:opacity-50 ${
                     confirmPurchase.isLegendary
-                      ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-black'
+                      ? 'bg-linear-to-r from-amber-500 to-amber-600 text-black'
                       : confirmPurchase.isEpic
-                        ? 'bg-gradient-to-r from-purple-500 to-purple-600 text-white'
+                        ? 'bg-linear-to-r from-purple-500 to-purple-600 text-white'
                         : 'bg-neo-lime text-neo-black'
                   }`}
                 >

@@ -19,7 +19,7 @@ interface UseTvSoundsResult {
 const SOUND_PATHS: Record<NotificationTier | 'combo_break', string> = {
   subtle: '/sounds/combo.wav',
   medium: '/sounds/combo-milestone.mp3',
-  mega: '/sounds/achievment.mp3',
+  mega: '/sounds/achievement.mp3',
   combo_break: '/sounds/combo-break.mp3',
 };
 

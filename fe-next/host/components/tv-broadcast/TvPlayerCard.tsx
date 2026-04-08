@@ -36,21 +36,21 @@ interface TvPlayerCardProps {
 const RANK_CONFIGS = {
   1: {
     icon: Crown,
-    bgColor: 'bg-gradient-to-r from-yellow-400 to-amber-500',
+    bgColor: 'bg-linear-to-r from-yellow-400 to-amber-500',
     textColor: 'text-yellow-900',
     borderColor: 'border-yellow-600',
     shadowColor: 'shadow-[4px_4px_0_rgba(202,138,4,1)]',
   },
   2: {
     icon: Medal,
-    bgColor: 'bg-gradient-to-r from-gray-300 to-gray-400',
+    bgColor: 'bg-linear-to-r from-gray-300 to-gray-400',
     textColor: 'text-gray-700',
     borderColor: 'border-gray-500',
     shadowColor: 'shadow-[4px_4px_0_rgba(107,114,128,1)]',
   },
   3: {
     icon: Award,
-    bgColor: 'bg-gradient-to-r from-amber-600 to-amber-700',
+    bgColor: 'bg-linear-to-r from-amber-600 to-amber-700',
     textColor: 'text-amber-100',
     borderColor: 'border-amber-800',
     shadowColor: 'shadow-[4px_4px_0_rgba(146,64,14,1)]',
@@ -198,7 +198,7 @@ const TvPlayerCard = memo<TvPlayerCardProps>(({
       </div>
 
       {/* Avatar */}
-      <div className="relative flex-shrink-0">
+      <div className="relative shrink-0">
         <Avatar
 
           avatarImage={avatar?.avatarImage}
@@ -284,7 +284,7 @@ const TvPlayerCard = memo<TvPlayerCardProps>(({
             className={cn(
               'relative flex items-center gap-1 px-2 py-1 rounded-neo border-2 border-neo-black',
               comboLevel >= 10
-                ? 'bg-gradient-to-r from-neo-red to-neo-pink text-neo-cream'
+                ? 'bg-linear-to-r from-neo-red to-neo-pink text-neo-cream'
                 : comboLevel >= 5
                 ? 'bg-neo-orange text-neo-black'
                 : 'bg-neo-yellow text-neo-black'

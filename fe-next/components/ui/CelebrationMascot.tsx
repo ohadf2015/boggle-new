@@ -13,11 +13,11 @@ const CLIP_CLASSES: Record<MascotClipShape, string> = {
 };
 
 const BORDER_CLASSES: Record<MascotBorderColor, string> = {
-  pink: 'border-[3px] border-neo-pink shadow-hard',
-  lime: 'border-[3px] border-neo-lime shadow-hard',
-  cyan: 'border-[3px] border-neo-cyan shadow-hard',
-  purple: 'border-[3px] border-neo-purple shadow-hard',
-  white: 'border-[3px] border-neo-white shadow-hard',
+  pink: 'border-3 border-neo-pink shadow-hard',
+  lime: 'border-3 border-neo-lime shadow-hard',
+  cyan: 'border-3 border-neo-cyan shadow-hard',
+  purple: 'border-3 border-neo-purple shadow-hard',
+  white: 'border-3 border-neo-white shadow-hard',
   none: '',
 };
 

@@ -33,7 +33,7 @@ export function CosmeticPreview({ cosmetic, isUnlocked, onClose, onEquip, onPurc
         <button
           onClick={onClose}
           aria-label={t('cosmetics.close')}
-          className="absolute top-2 end-2 text-neo-cream hover:text-neo-lime"
+          className="absolute top-2 inset-e-2 text-neo-cream hover:text-neo-lime"
         >
           <X className="w-5 h-5" />
         </button>

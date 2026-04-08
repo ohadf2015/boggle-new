@@ -7,7 +7,7 @@
 
 'use client';
 
-import { memo, useRef, useEffect, useState } from 'react';
+import React, { memo, useRef, useEffect, useState } from 'react';
 import Avatar from '@/components/Avatar';
 import type { Avatar as AvatarType } from '@/shared/types/game';
 
@@ -48,10 +48,10 @@ const PlayerLifeRow = memo<{
   const barColor = isEliminated
     ? 'bg-gray-600'
     : percentage > 60
-      ? 'bg-gradient-to-r from-green-500 to-emerald-400'
+      ? 'bg-linear-to-r from-green-500 to-emerald-400'
       : percentage > 30
-        ? 'bg-gradient-to-r from-yellow-500 to-amber-400'
-        : 'bg-gradient-to-r from-red-500 to-rose-400';
+        ? 'bg-linear-to-r from-yellow-500 to-amber-400'
+        : 'bg-linear-to-r from-red-500 to-rose-400';
 
   // Low-health glow (soft pulse, not shake)
   const lowHealthGlow = !isEliminated && percentage <= 30 && percentage > 0;
@@ -59,7 +59,7 @@ const PlayerLifeRow = memo<{
   return (
     <div className={`flex items-center gap-2 ${isEliminated ? 'opacity-60' : ''}`}>
       {/* Player avatar */}
-      <div className={`flex-shrink-0 ${isEliminated ? 'grayscale' : ''}`}>
+      <div className={`shrink-0 ${isEliminated ? 'grayscale' : ''}`}>
         <Avatar
           customAvatar={avatar?.customAvatar ?? undefined}
           avatarImage={avatar?.avatarImage}
@@ -97,7 +97,7 @@ const PlayerLifeRow = memo<{
         {/* Subtle shimmer on healthy bars */}
         {!isEliminated && percentage > 0 && (
           <div
-            className="absolute inset-0 rounded-full bg-gradient-to-r from-transparent via-white/10 to-transparent animate-shimmer"
+            className="absolute inset-0 rounded-full bg-linear-to-r from-transparent via-white/10 to-transparent animate-shimmer"
             style={{ backgroundSize: '200% 100%', animationDuration: '3s' }}
           />
         )}
@@ -121,8 +121,9 @@ export const WordHuntPlayerLives = memo<WordHuntPlayerLivesProps>(function WordH
   currentPlayer,
   playerAvatars,
 }) {
-  const otherPlayers = Object.keys(playerLives).filter(
-    (p) => p !== currentPlayer,
+  const otherPlayers = React.useMemo(
+    () => Object.keys(playerLives).filter((p) => p !== currentPlayer),
+    [playerLives, currentPlayer],
   );
 
   if (otherPlayers.length === 0) return null;

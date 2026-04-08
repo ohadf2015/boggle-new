@@ -6,6 +6,8 @@ import { cn } from '@/lib/utils';
 import { BlastComboStreakBadge } from './BlastComboStreakBadge';
 import type { ComboStreakState } from './hooks/useBlastComboStreak';
 
+const NO_TEXT_SHADOW_STYLE = { textShadow: 'none' } as const;
+
 /** Smoothly lerps a number for display with a CSS transition on scale */
 function useAnimatedScore(target: number) {
   const [display, setDisplay] = useState(target);
@@ -101,7 +103,7 @@ export function BlastHUD({
       <div className="flex items-center justify-between px-3 py-1.5 pt-safe">
         <span
           className="shrink-0 text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-lg border-2 border-neo-cyan/40 text-neo-cyan"
-          style={{ textShadow: 'none' }}
+          style={NO_TEXT_SHADOW_STYLE}
           aria-label={`${t('blast.wave')} ${waveNumber}`}
         >
           W{waveNumber}

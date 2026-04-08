@@ -240,7 +240,7 @@ export function BossDefeatShareCard(props: BossDefeatShareCardProps) {
       transition={{ type: 'spring', stiffness: 200, damping: 20 }}
       className={cn(
         'relative overflow-hidden border-3 rounded-neo shadow-hard p-5 select-all',
-        'bg-gradient-to-br from-neo-black via-slate-900 to-neo-black',
+        'bg-linear-to-br from-neo-black via-slate-900 to-neo-black',
         theme.borderColor,
         isLegendary && 'ring-2 ring-neo-lime/40 ring-offset-2 ring-offset-neo-black',
       )}
@@ -276,7 +276,7 @@ export function BossDefeatShareCard(props: BossDefeatShareCardProps) {
         transition={{ delay: 0.25, type: 'spring' }}
         className={cn('flex items-center gap-3 mb-3 p-3 border-2 rounded-neo', theme.wordBg, theme.wordBorder)}
       >
-        <Sword className={cn('w-5 h-5 flex-shrink-0', theme.accentColor)} />
+        <Sword className={cn('w-5 h-5 shrink-0', theme.accentColor)} />
         <div className="min-w-0">
           <div className="text-neo-white/40 text-[10px] font-bold uppercase tracking-wider">
             {t('adventure.share.killingWord')}

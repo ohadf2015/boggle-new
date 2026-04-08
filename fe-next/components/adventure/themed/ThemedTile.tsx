@@ -81,7 +81,7 @@ function buildTileClasses(
     config.borderColor,
 
     // Gradient background
-    `bg-gradient-to-br from-${config.gradientFrom} to-${config.gradientTo}`,
+    `bg-linear-to-br from-${config.gradientFrom} to-${config.gradientTo}`,
 
     // Shadow style
     config.shadowStyle === 'hard' && 'shadow-hard-sm',
@@ -139,7 +139,7 @@ const TileOverlay = memo<TileOverlayProps>(({ type, config }) => {
       return (
         <div className={cn(
           'absolute inset-0 rounded-neo pointer-events-none',
-          'bg-gradient-to-br from-white/40 via-cyan-100/30 to-blue-200/40',
+          'bg-linear-to-br from-white/40 via-cyan-100/30 to-blue-200/40',
           'backdrop-blur-[1px]'
         )} />
       );

@@ -132,7 +132,7 @@ const TvLeaderboard = memo<TvLeaderboardProps>(({
   // Virtual rendering for large player counts
   return (
     <div className="h-full flex flex-col p-4">
-      <h3 className="text-xl font-black uppercase text-neo-black mb-4 text-center border-b-2 border-neo-black pb-2 flex-shrink-0">
+      <h3 className="text-xl font-black uppercase text-neo-black mb-4 text-center border-b-2 border-neo-black pb-2 shrink-0">
         {t('tvBroadcast.leaderboard')} ({sortedPlayers.length})
       </h3>
       <div

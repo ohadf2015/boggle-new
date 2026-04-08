@@ -100,7 +100,7 @@ const PhaseIndicator = memo<PhaseIndicatorProps>(({ phase }) => {
         ${config.animation}
       `.trim().replace(/\s+/g, ' ')}
     >
-      <Icon className="w-3 h-3 flex-shrink-0" aria-hidden="true" />
+      <Icon className="w-3 h-3 shrink-0" aria-hidden="true" />
       <span className="font-neo-display text-sm font-bold uppercase tracking-wide">
         {t(config.labelKey)}
       </span>

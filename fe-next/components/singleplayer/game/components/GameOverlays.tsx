@@ -85,7 +85,7 @@ export function GameOverlays({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute inset-0 z-50 flex items-center justify-center bg-neo-navy/90 backdrop-blur-sm"
+            className="absolute inset-0 z-50 flex items-center justify-center bg-neo-navy/90 backdrop-blur-xs"
           >
             <div className="flex flex-col items-center gap-4 p-6 bg-neo-cream border-4 border-neo-black rounded-neo shadow-hard-lg text-neo-black">
               <Loader

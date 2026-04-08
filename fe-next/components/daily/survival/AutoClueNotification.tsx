@@ -89,7 +89,7 @@ export const AutoClueNotification: React.FC<AutoClueNotificationProps> = ({
         className={cn(
           'relative flex items-center gap-3',
           'px-4 py-3 max-w-xs',
-          'bg-gradient-to-r',
+          'bg-linear-to-r',
           content.color,
           'border-neo-thick border-neo-black',
           'rounded-neo',
@@ -107,7 +107,7 @@ export const AutoClueNotification: React.FC<AutoClueNotificationProps> = ({
             repeat: 2,
             repeatDelay: 0.3,
           }}
-          className="flex-shrink-0"
+          className="shrink-0"
         >
           {content.icon}
         </AdaptiveMotion.div>
@@ -134,7 +134,7 @@ export const AutoClueNotification: React.FC<AutoClueNotificationProps> = ({
             </div>
 
             {/* Icon */}
-            <div className="flex-shrink-0 text-neo-black/70">{content.icon}</div>
+            <div className="shrink-0 text-neo-black/70">{content.icon}</div>
           </div>
         </div>
 
@@ -150,7 +150,7 @@ export const AutoClueNotification: React.FC<AutoClueNotificationProps> = ({
             'border-2 border-white',
             'shadow-hard-sm',
             'hover:bg-red-500 transition-colors',
-            'focus:outline-none focus:ring-2 focus:ring-neo-pink'
+            'focus:outline-hidden focus:ring-2 focus:ring-neo-pink'
           )}
           aria-label="Dismiss notification"
         >

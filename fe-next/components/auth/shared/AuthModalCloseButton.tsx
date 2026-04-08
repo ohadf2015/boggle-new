@@ -25,7 +25,7 @@ export function AuthModalCloseButton({ onClose, className }: AuthModalCloseButto
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ delay: 0.2 }}
-      className={cn('absolute top-4 end-4', className)}
+      className={cn('absolute top-4 inset-e-4', className)}
     >
       <Button
         variant="ghost"

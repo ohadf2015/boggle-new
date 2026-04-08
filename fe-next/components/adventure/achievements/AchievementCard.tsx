@@ -77,7 +77,7 @@ export function AchievementCard({
       <span
         className={cn(
           'text-3xl',
-          isHidden && 'blur-sm',
+          isHidden && 'blur-xs',
           !isEarned && 'grayscale opacity-50'
         )}
       >
@@ -99,7 +99,7 @@ export function AchievementCard({
       {tier && (
         <span
           className={cn(
-            'absolute -top-2 -end-2',
+            'absolute -top-2 -inset-e-2',
             'w-6 h-6 rounded-full',
             'flex items-center justify-center',
             'border-2 border-neo-black',
@@ -115,7 +115,7 @@ export function AchievementCard({
       {!achievement.oneTime && count > 1 && (
         <span
           className={cn(
-            'absolute -bottom-2 -end-2',
+            'absolute -bottom-2 -inset-e-2',
             'px-1.5 py-0.5 rounded-full',
             'text-[10px] font-bold',
             'bg-neo-black border border-neo-white/30',

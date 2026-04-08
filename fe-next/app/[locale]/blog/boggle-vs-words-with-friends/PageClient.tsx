@@ -47,7 +47,7 @@ export default function BoggleVsWwfPageClient(): React.ReactElement {
       'min-h-screen flex flex-col',
       isDarkMode
         ? 'bg-neo-navy'
-        : 'bg-gradient-to-br from-neo-cream via-white to-neo-cream'
+        : 'bg-linear-to-br from-neo-cream via-white to-neo-cream'
     )}>
       <AutoHideHeader />
 

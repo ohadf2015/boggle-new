@@ -175,7 +175,7 @@ export default function PlayerProfilePageClient() {
             customAvatar={profile.customAvatar ?? undefined}
             userId={id}
             size="2xl"
-            className="flex-shrink-0 border-3 border-neo-black shadow-hard"
+            className="shrink-0 border-3 border-neo-black shadow-hard"
           />
 
           {/* Name + meta */}

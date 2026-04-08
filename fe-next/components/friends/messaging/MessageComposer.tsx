@@ -165,7 +165,7 @@ export const MessageComposer: React.FC<MessageComposerProps> = ({
           disabled={disabled}
           rows={1}
           className={cn(
-            'flex-1 resize-none bg-transparent outline-none',
+            'flex-1 resize-none bg-transparent outline-hidden',
             'font-medium text-sm max-h-32 overflow-y-auto',
             isDark ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400',
             disabled && 'opacity-50 cursor-not-allowed'
@@ -181,7 +181,7 @@ export const MessageComposer: React.FC<MessageComposerProps> = ({
           onClick={handleSend}
           disabled={!isValid || disabled}
           className={cn(
-            'flex-shrink-0 p-2 rounded-neo border-2 border-neo-black',
+            'shrink-0 p-2 rounded-neo border-2 border-neo-black',
             'transition-all',
             isValid && !disabled
               ? 'bg-neo-cyan shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5'

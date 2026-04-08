@@ -167,7 +167,7 @@ const StreakMilestoneCelebration: React.FC<StreakMilestoneCelebrationProps> = ({
             animate={{ scale: 1, opacity: 1, rotate: 0 }}
             exit={{ scale: 0.5, opacity: 0, rotate: 10 }}
             transition={{ type: 'spring', damping: 15, stiffness: 200 }}
-            className="bg-gradient-to-br from-neo-cream to-white dark:from-neo-navy dark:to-neo-navy-light rounded-neo border-4 border-neo-black p-8 max-w-md w-full text-center shadow-hard-lg"
+            className="bg-linear-to-br from-neo-cream to-white dark:from-neo-navy dark:to-neo-navy-light rounded-neo border-4 border-neo-black p-8 max-w-md w-full text-center shadow-hard-lg"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Close button */}
@@ -211,7 +211,7 @@ const StreakMilestoneCelebration: React.FC<StreakMilestoneCelebrationProps> = ({
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ type: 'spring', delay: 0.4, stiffness: 400, damping: 22 }}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-orange-400 to-red-500 rounded-neo border-3 border-neo-black shadow-hard mb-4"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-linear-to-r from-orange-400 to-red-500 rounded-neo border-3 border-neo-black shadow-hard mb-4"
             >
               <span className="text-4xl font-black text-white">{streak}</span>
               <span className="text-lg font-bold text-white/90">DAYS</span>
@@ -235,7 +235,7 @@ const StreakMilestoneCelebration: React.FC<StreakMilestoneCelebrationProps> = ({
             >
               <Button
                 onClick={onClose}
-                className="w-full max-w-btn py-4 text-lg font-black uppercase bg-gradient-to-r from-neo-lime to-neo-cyan text-neo-black border-4 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-1 transition-all"
+                className="w-full max-w-btn py-4 text-lg font-black uppercase bg-linear-to-r from-neo-lime to-neo-cyan text-neo-black border-4 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-1 transition-all"
               >
                 Keep the streak going!
               </Button>

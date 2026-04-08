@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext, useContext, useState, useMemo } from 'react';
 
 interface HapticsContextValue {
   enabled: boolean;
@@ -12,12 +12,10 @@ const HapticsContext = createContext<HapticsContextValue | null>(null);
 export function HapticsProvider({ children }: { children: React.ReactNode }) {
   const [enabled, setEnabled] = useState(true);
 
-  const handleSetEnabled = useCallback((value: boolean) => {
-    setEnabled(value);
-  }, []);
+  const value = useMemo(() => ({ enabled, setEnabled }), [enabled]);
 
   return (
-    <HapticsContext.Provider value={{ enabled, setEnabled: handleSetEnabled }}>
+    <HapticsContext.Provider value={value}>
       {children}
     </HapticsContext.Provider>
   );

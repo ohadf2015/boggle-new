@@ -264,7 +264,7 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
   return (
     <div className={`${variant === 'standalone' ? 'speech-bubble rotate-[1deg] mb-4' : 'flex flex-col h-full'} flex flex-col ${className}`}>
       {/* Header */}
-      <div className={`py-3 px-4 flex-shrink-0 ${variant === 'standalone' ? 'border-b-3 border-neo-black' : 'border-b-2 border-neo-white/10'}`}>
+      <div className={`py-3 px-4 shrink-0 ${variant === 'standalone' ? 'border-b-3 border-neo-black' : 'border-b-2 border-neo-white/10'}`}>
         <h2 className={`text-base font-black uppercase flex items-center gap-2 ${variant === 'standalone' ? 'text-neo-black' : 'text-neo-cream'}`}>
           <MessageSquare className="text-neo-pink" />
           {t('chat.title')}
@@ -366,7 +366,7 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
                       </div>
                       {/* Message bubble */}
                       <div
-                        className={`px-3 py-2 max-w-[80%] break-words border-2 rounded-neo font-medium ${
+                        className={`px-3 py-2 max-w-[80%] wrap-break-word border-2 rounded-neo font-medium ${
                           variant === 'embedded'
                             ? isOwnMessage
                               ? 'bg-neo-cyan/20 text-neo-cyan border-neo-cyan/30'
@@ -387,7 +387,7 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
         </div>
 
         {/* NEO-BRUTALIST Input Area */}
-        <div className="flex gap-2 flex-shrink-0">
+        <div className="flex gap-2 shrink-0">
           <Input
             ref={inputRef}
             value={inputMessage}
@@ -405,7 +405,7 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
             disabled={!inputMessage.trim()}
             size="icon"
             variant="cyan"
-            className="flex-shrink-0"
+            className="shrink-0"
             aria-label={t('chat.send')}
           >
             <Send aria-hidden="true" />

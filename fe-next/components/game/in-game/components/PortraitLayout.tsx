@@ -238,6 +238,23 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
   }, [leaderboard]);
   const hapticsEnabled = useHapticsEnabled();
 
+  // Memoize derived counts to avoid recomputation on every render tick
+  const longValidWordCount = useMemo(
+    () => foundWords.filter((fw) => fw.isValid !== false && fw.word.length >= 5).length,
+    [foundWords],
+  );
+  const compactLeaderboardPlayers = useMemo(
+    () => leaderboard.map((p) => ({
+      username: p.username,
+      score: p.score,
+      rank: 0,
+      avatarEmoji: p.avatar?.emoji,
+      avatarColor: p.avatar?.color,
+      inputMethod: p.username === username && isTypingMode ? 'keyboard' as const : null,
+    })),
+    [leaderboard, username, isTypingMode],
+  );
+
   // Track floating score animation
   const [floatingScore, setFloatingScore] = useState<number | null>(null);
   const [isFireRoundScore, setIsFireRoundScore] = useState(false);
@@ -344,7 +361,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
         t={t}
       />
 
-      <div className="flex flex-col lg:flex-row lg:items-stretch lg:justify-center gap-0 md:gap-2 lg:gap-3 flex-1 w-full max-w-[1920px] mx-auto overflow-x-clip overflow-y-auto transition-all duration-500 ease-in-out pb-16 lg:pb-2 px-2 lg:px-3 xl:px-4 lg:h-[100dvh] lg:max-h-[100dvh]">
+      <div className="flex flex-col lg:flex-row lg:items-stretch lg:justify-center gap-0 md:gap-2 lg:gap-3 flex-1 w-full max-w-[1920px] mx-auto overflow-x-clip overflow-y-auto transition-all duration-500 ease-in-out pb-16 lg:pb-2 px-2 lg:px-3 xl:px-4 lg:h-dvh lg:max-h-dvh">
         {/* Mobile Header */}
         <GameHeader
           onExitRoom={onExitRoom}
@@ -357,7 +374,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
 
         {/* Left Column: Found Words (Desktop only) */}
         {isPlaying && !gameplayFocusMode && (
-          <div className="hidden lg:flex lg:flex-col lg:w-56 xl:w-64 2xl:w-72 gap-2 min-h-0 flex-shrink-0 overflow-y-auto">
+          <div className="hidden lg:flex lg:flex-col lg:w-56 xl:w-64 2xl:w-72 gap-2 min-h-0 shrink-0 overflow-y-auto">
             <GameWordList foundWords={foundWords} minWordLength={minWordLength} t={t} />
           </div>
         )}
@@ -368,7 +385,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
           {remainingTime !== null && (
             <div
               ref={gameStatsRef}
-              className="flex flex-col gap-0 w-full px-1 md:px-2 sticky top-0 z-40 flex-shrink-0"
+              className="flex flex-col gap-0 w-full px-1 md:px-2 sticky top-0 z-40 shrink-0"
               role="status"
               aria-label="Game status"
             >
@@ -424,7 +441,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
                 {/* Right Side: Score (mobile) - positioned absolutely to not affect timer centering */}
                 {isPlaying && (
                   <div
-                    className="absolute end-1 md:end-2 top-1/2 -translate-y-1/2 lg:hidden"
+                    className="absolute inset-e-1 md:inset-e-2 top-1/2 -translate-y-1/2 lg:hidden"
                     data-testid="score-mobile"
                   >
                     <ScoreDisplay
@@ -479,7 +496,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
 
           {/* Word Forming Area - inside header area for tighter integration */}
           {isPlaying && gameMode !== 'word-hunt' && (
-            <div className="relative flex items-center justify-center flex-shrink-0 -mt-1 mb-0.5">
+            <div className="relative flex items-center justify-center shrink-0 -mt-1 mb-0.5">
               <LeadChangeBanner event={leadChangeEvent ?? null} />
               <WordFormingArea
                 word={isTypingMode ? typedWord : formedWord}
@@ -608,10 +625,10 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
             totalBoardWords !== null &&
             totalBoardWords !== undefined &&
             totalBoardWords > 0 && (
-              <div className="flex justify-center flex-shrink-0">
+              <div className="flex justify-center shrink-0">
                 <WordsRemaining
                   totalWords={totalBoardWords}
-                  foundWordsCount={foundWords.filter((fw) => fw.isValid !== false && fw.word.length >= 5).length}
+                  foundWordsCount={longValidWordCount}
                   t={t}
                   minLength={5}
                 />
@@ -620,17 +637,9 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
 
           {/* Mobile: Split-view with compact leaderboard + words */}
           {isPlaying && !gameplayFocusMode && leaderboard && leaderboard.length > 0 && (
-            <div className="block lg:hidden mt-0.5 md:mt-1 space-y-0.5 max-w-md mx-auto md:space-y-1 flex-shrink-0 overflow-y-auto max-h-[120px] sm:max-h-[140px] short:max-h-[80px] scrollbar-thin">
+            <div className="block lg:hidden mt-0.5 md:mt-1 space-y-0.5 max-w-md mx-auto md:space-y-1 shrink-0 overflow-y-auto max-h-[120px] sm:max-h-[140px] short:max-h-[80px] scrollbar-thin">
               <CompactLeaderboard
-                players={leaderboard.map((p) => ({
-                  username: p.username,
-                  score: p.score,
-                  rank: 0,
-
-                  avatarEmoji: p.avatar?.emoji,
-                  avatarColor: p.avatar?.color,
-                  inputMethod: p.username === username && isTypingMode ? 'keyboard' as const : null,
-                }))}
+                players={compactLeaderboardPlayers}
                 currentUsername={username}
                 t={t}
                 comboEvent={blastComboSync}
@@ -645,7 +654,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
 
         {/* Right Column: Leaderboard + Chat (Desktop) */}
         {!gameplayFocusMode && (
-          <div className="hidden lg:flex lg:flex-col lg:w-56 xl:w-64 2xl:w-72 gap-2 flex-shrink-0 min-h-0 overflow-y-auto">
+          <div className="hidden lg:flex lg:flex-col lg:w-56 xl:w-64 2xl:w-72 gap-2 shrink-0 min-h-0 overflow-y-auto">
             <GameLeaderboard
               leaderboard={deferredLeaderboard}
               username={username}

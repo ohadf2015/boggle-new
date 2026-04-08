@@ -181,7 +181,7 @@ const PlacementHero = memo<PlacementHeroProps>(({
                 />
               </div>
               {/* Rank pip */}
-              <div className={`absolute -bottom-1.5 -end-1.5 ${theme.badgeBg} border-2 border-neo-black rounded-neo shadow-hard-sm w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center`}>
+              <div className={`absolute -bottom-1.5 -inset-e-1.5 ${theme.badgeBg} border-2 border-neo-black rounded-neo shadow-hard-sm w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center`}>
                 <Icon className={`${theme.badgeText} w-4 h-4 sm:w-5 sm:h-5`} />
               </div>
             </div>

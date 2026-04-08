@@ -185,7 +185,7 @@ const TvResultsStatsGrid = memo<TvResultsStatsGridProps>(({
           username: hero.player.username,
           avatar: hero.player.avatar,
         },
-        color: 'bg-gradient-to-r from-neo-orange to-neo-red',
+        color: 'bg-linear-to-r from-neo-orange to-neo-red',
       });
     }
 

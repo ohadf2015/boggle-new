@@ -85,7 +85,7 @@ const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
           'w-full flex items-center justify-between gap-2 p-2.5 sm:p-3',
           'font-bold text-sm uppercase tracking-wide',
           'border-b-2 transition-all duration-150',
-          'hover:brightness-95 focus:outline-none focus:ring-2 focus:ring-neo-cyan focus:ring-offset-1',
+          'hover:brightness-95 focus:outline-hidden focus:ring-2 focus:ring-neo-cyan focus:ring-offset-1',
           'min-h-[44px]', // WCAG touch target
           styles.header,
           isExpanded ? 'border-neo-black' : 'border-transparent',
@@ -93,7 +93,7 @@ const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
         )}
       >
         <div className="flex items-center gap-2">
-          {icon && <span className="flex-shrink-0">{icon}</span>}
+          {icon && <span className="shrink-0">{icon}</span>}
           <span>{title}</span>
           {badge !== undefined && (
             <span className={cn(
@@ -108,7 +108,7 @@ const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
           animate={{ rotate: isExpanded ? 180 : 0 }}
           transition={{ duration: 0.2 }}
         >
-          <ChevronDown className="w-5 h-5 flex-shrink-0" />
+          <ChevronDown className="w-5 h-5 shrink-0" />
         </AdaptiveMotion.div>
       </button>
 
@@ -118,8 +118,8 @@ const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
           onClick={handleToggle}
           className={cn(
             'w-full px-3 py-2 text-xs text-slate-300 border-t border-white/5 text-start',
-            'bg-gradient-to-r from-neo-cyan/[0.04] via-transparent to-neo-pink/[0.04]',
-            'hover:from-neo-cyan/[0.08] hover:to-neo-pink/[0.08] transition-colors cursor-pointer',
+            'bg-linear-to-r from-neo-cyan/4 via-transparent to-neo-pink/4',
+            'hover:from-neo-cyan/8 hover:to-neo-pink/8 transition-colors cursor-pointer',
             styles.content,
           )}
         >

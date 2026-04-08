@@ -158,7 +158,7 @@ export const MessageThread: React.FC<MessageThreadProps> = ({
                     className="border-2 border-neo-black"
                   />
                   {thread.isOnline && (
-                    <span className="absolute bottom-0 end-0 w-2.5 h-2.5 bg-green-500 border-2 border-neo-black rounded-full" />
+                    <span className="absolute bottom-0 inset-e-0 w-2.5 h-2.5 bg-green-500 border-2 border-neo-black rounded-full" />
                   )}
                 </div>
                 <div>
@@ -234,7 +234,7 @@ export const MessageThread: React.FC<MessageThreadProps> = ({
                           avatarImage={thread.friendAvatar.image}
                     customAvatar={thread.friendAvatar.customAvatar}
                           size="sm"
-                          className="border-2 border-neo-black flex-shrink-0"
+                          className="border-2 border-neo-black shrink-0"
                         />
                       )}
                       {!isMine && !showAvatar && <div className="w-8" />}
@@ -277,7 +277,7 @@ export const MessageThread: React.FC<MessageThreadProps> = ({
                             initial={{ opacity: 0, scale: 0.9 }}
                             animate={{ opacity: 1, scale: 1 }}
                             className={cn(
-                              'absolute -top-10 end-0 z-10 flex gap-1'
+                              'absolute -top-10 inset-e-0 z-10 flex gap-1'
                             )}
                           >
                             <button
@@ -305,7 +305,7 @@ export const MessageThread: React.FC<MessageThreadProps> = ({
                             </button>
                           </motion.div>
                         )}
-                        <p className="break-words whitespace-pre-wrap text-sm">
+                        <p className="wrap-break-word whitespace-pre-wrap text-sm">
                           {message.message}
                         </p>
                         <div className={cn(
@@ -347,7 +347,7 @@ export const MessageThread: React.FC<MessageThreadProps> = ({
                       avatarImage={thread.friendAvatar.image}
                     customAvatar={thread.friendAvatar.customAvatar}
                       size="sm"
-                      className="border-2 border-neo-black flex-shrink-0"
+                      className="border-2 border-neo-black shrink-0"
                     />
                     <div className={cn(
                       'px-4 py-2 rounded-neo border-2 border-neo-black',

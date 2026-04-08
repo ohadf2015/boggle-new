@@ -135,7 +135,7 @@ export const GameSidebar = memo(function GameSidebar({
       className={cn(
         'flex flex-col',
         'h-full',
-        'bg-neo-navy/60 backdrop-blur-sm',
+        'bg-neo-navy/60 backdrop-blur-xs',
         className
       )}
     >
@@ -145,7 +145,7 @@ export const GameSidebar = memo(function GameSidebar({
         <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide">
           {/* Star projection */}
           <div className={cn(
-            'flex-shrink-0 flex items-center gap-0.5 px-2 py-1.5',
+            'shrink-0 flex items-center gap-0.5 px-2 py-1.5',
             'rounded-full border min-h-9',
             currentStars === 3 ? 'bg-neo-yellow/15 border-neo-yellow/50' :
             currentStars > 0 ? 'bg-neo-yellow/8 border-neo-yellow/25' :
@@ -166,7 +166,7 @@ export const GameSidebar = memo(function GameSidebar({
                 key={obj.type}
                 data-testid={`objective-${obj.type}`}
                 className={cn(
-                  'flex-shrink-0 flex items-center gap-1 px-2 py-1',
+                  'shrink-0 flex items-center gap-1 px-2 py-1',
                   'rounded-full border min-h-9',
                   'transition-all duration-300',
                   obj.isComplete
@@ -177,7 +177,7 @@ export const GameSidebar = memo(function GameSidebar({
                 )}
               >
                 {/* Icon with circular progress ring */}
-                <div className="relative w-5 h-5 flex-shrink-0">
+                <div className="relative w-5 h-5 shrink-0">
                   <svg viewBox="0 0 20 20" className="absolute inset-0 -rotate-90">
                     <circle cx="10" cy="10" r="8" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="2" />
                     <circle
@@ -205,7 +205,7 @@ export const GameSidebar = memo(function GameSidebar({
                   {current}/{obj.target}
                 </span>
                 {obj.isComplete && (
-                  <Check className="w-3 h-3 text-neo-lime flex-shrink-0" strokeWidth={3} />
+                  <Check className="w-3 h-3 text-neo-lime shrink-0" strokeWidth={3} />
                 )}
               </div>
             );
@@ -339,7 +339,7 @@ export const GameSidebar = memo(function GameSidebar({
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
           className={cn(
-            'bg-neo-black/30 backdrop-blur-sm',
+            'bg-neo-black/30 backdrop-blur-xs',
             'border-2 rounded-neo-lg p-3',
             'transition-all duration-500',
             allComplete

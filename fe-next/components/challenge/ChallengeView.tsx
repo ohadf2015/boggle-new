@@ -261,7 +261,7 @@ const ChallengeView: React.FC<ChallengeViewProps> = ({ challengeCode }) => {
             {/* Score to Beat */}
             <div className={cn(
               'text-center p-6 rounded-neo border-3 mb-4',
-              'bg-gradient-to-br from-neo-lime/20 to-orange-500/20 border-neo-lime'
+              'bg-linear-to-br from-neo-lime/20 to-orange-500/20 border-neo-lime'
             )}>
               <p className={cn(
                 'text-sm font-bold uppercase tracking-wide mb-2',

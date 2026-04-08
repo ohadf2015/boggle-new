@@ -130,7 +130,7 @@ describe('TvPlayerCard animations', () => {
   });
 
   describe('Score change flash', () => {
-    it('shows flash ring when score changes', () => {
+    it('shows flash ring-3 when score changes', () => {
       const { container, rerender } = render(
         <TvPlayerCard {...defaultProps} score={100} />
       );
@@ -145,7 +145,7 @@ describe('TvPlayerCard animations', () => {
       expect(container.querySelector('.ring-neo-yellow')).toBeTruthy();
     });
 
-    it('removes flash ring after timeout', () => {
+    it('removes flash ring-3 after timeout', () => {
       const { container, rerender } = render(
         <TvPlayerCard {...defaultProps} score={100} />
       );

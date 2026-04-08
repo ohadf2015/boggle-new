@@ -87,7 +87,7 @@ export const AdventureHUD = memo<AdventureHUDProps>(
           data-testid="hud-top-bar"
           className={cn(
             'flex items-center justify-between gap-2 p-2',
-            hudTheme.headerBg, 'backdrop-blur-sm',
+            hudTheme.headerBg, 'backdrop-blur-xs',
             'border-b-2', hudTheme.headerBorder,
             'pointer-events-auto'
           )}
@@ -97,7 +97,7 @@ export const AdventureHUD = memo<AdventureHUDProps>(
             {/* Level badge */}
             <div
               className={cn(
-                'flex-shrink-0 px-2 py-1',
+                'shrink-0 px-2 py-1',
                 hudTheme.levelBadgeColor, hudTheme.levelBadgeText,
                 'rounded-neo border-2 border-neo-black',
                 'shadow-hard-sm',
@@ -140,7 +140,7 @@ export const AdventureHUD = memo<AdventureHUDProps>(
           className={cn(
             'fixed bottom-0 left-0 right-0',
             'flex items-end justify-between gap-2 p-2 pb-[max(0.5rem,env(safe-area-inset-bottom,0.5rem))]',
-            hudTheme.headerBg, 'backdrop-blur-sm',
+            hudTheme.headerBg, 'backdrop-blur-xs',
             'border-t-2', hudTheme.headerBorder,
             'pointer-events-auto'
           )}

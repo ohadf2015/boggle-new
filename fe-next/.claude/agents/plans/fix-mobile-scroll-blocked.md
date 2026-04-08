@@ -7,7 +7,7 @@ Height resolution conflict between layout's `screen-fit-content` scroll containe
 1. Remove `min-h-screen` from page root elements
 2. Replace nested `<main>` elements with `<div>` or `<section>`
 3. Let flex-based layout handle height naturally
-4. Ensure backgrounds still cover full viewport using flex-grow
+4. Ensure backgrounds still cover full viewport using grow
 
 ## Priority Files (Most Used Pages)
 1. `app/[locale]/settings/page.tsx` - Remove `min-h-screen`

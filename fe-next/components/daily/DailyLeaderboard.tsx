@@ -259,14 +259,14 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         className={`
-          bg-gradient-to-br from-white/95 to-slate-50/95 dark:from-neo-navy/95 dark:to-neo-navy/90
+          bg-linear-to-br from-white/95 to-slate-50/95 dark:from-neo-navy/95 dark:to-neo-navy/90
           rounded-2xl border-2 border-slate-200 dark:border-slate-700
           ${compact ? 'p-3' : 'p-4 sm:p-5'}
-          shadow-lg backdrop-blur-sm
+          shadow-lg backdrop-blur-xs
         `}
       >
         <div className="flex items-center gap-3 mb-4">
-          <div className="p-2 sm:p-2.5 bg-gradient-to-br from-indigo-500 to-purple-600 text-white rounded-xl border-2 border-indigo-600 shadow-md">
+          <div className="p-2 sm:p-2.5 bg-linear-to-br from-indigo-500 to-purple-600 text-white rounded-xl border-2 border-indigo-600 shadow-md">
             <Users className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
           </div>
           <div>
@@ -304,16 +304,16 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
       role="region"
       aria-label={t('daily.todaysPlayers')}
       className={`
-        bg-gradient-to-br from-white/95 to-slate-50/95 dark:from-neo-navy/95 dark:to-neo-navy/90
+        bg-linear-to-br from-white/95 to-slate-50/95 dark:from-neo-navy/95 dark:to-neo-navy/90
         rounded-2xl border-2 border-slate-200 dark:border-slate-700
         ${compact ? 'p-3' : 'p-4 sm:p-5'}
-        shadow-lg backdrop-blur-sm
+        shadow-lg backdrop-blur-xs
       `}
     >
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
-          <div className="p-2 sm:p-2.5 bg-gradient-to-br from-indigo-500 to-purple-600 text-white rounded-xl border-2 border-indigo-600 shadow-md">
+          <div className="p-2 sm:p-2.5 bg-linear-to-br from-indigo-500 to-purple-600 text-white rounded-xl border-2 border-indigo-600 shadow-md">
             <Trophy className="w-5 h-5 sm:w-6 sm:h-6 text-amber-300" />
           </div>
           <div>
@@ -341,7 +341,7 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
           <Button
             onClick={handleShareRank}
             size="sm"
-            className="px-3 py-1 h-8 bg-neo-pink hover:bg-neo-pink/90 text-white border-2 border-neo-black rounded-xl shadow-sm hover:-translate-y-0.5 transition-all"
+            className="px-3 py-1 h-8 bg-neo-pink hover:bg-neo-pink/90 text-white border-2 border-neo-black rounded-xl shadow-xs hover:-translate-y-0.5 transition-all"
             aria-label={t('common.share')}
           >
             {copied ? (
@@ -358,7 +358,7 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-3 p-3 rounded-xl bg-gradient-to-r from-neo-cyan/30 to-neo-cyan/10 border-2 border-neo-cyan shadow-[0_0_15px_rgba(0,255,255,0.2)]"
+          className="mb-3 p-3 rounded-xl bg-linear-to-r from-neo-cyan/30 to-neo-cyan/10 border-2 border-neo-cyan shadow-[0_0_15px_rgba(0,255,255,0.2)]"
         >
           <div className="flex items-center gap-3">
             {/* Your Rank Badge */}
@@ -375,7 +375,7 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
                 </span>
               </div>
               <div className="flex items-center gap-2 mt-1">
-                <div className="w-10 h-10 rounded-full border-2 border-neo-cyan overflow-hidden shadow-hard-sm flex-shrink-0">
+                <div className="w-10 h-10 rounded-full border-2 border-neo-cyan overflow-hidden shadow-hard-sm shrink-0">
                   <Avatar
 
                     avatarImage={currentUserData.avatar_image ?? undefined}

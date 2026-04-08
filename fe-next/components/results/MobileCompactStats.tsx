@@ -83,7 +83,7 @@ const MobileCompactStats: React.FC<MobileCompactStatsProps> = memo(({
       {/* Achievements row */}
       {visibleAchievements.length > 0 && (
         <div className="flex items-center justify-center gap-1.5 flex-wrap">
-          <Award className="w-3.5 h-3.5 text-neo-lime flex-shrink-0" />
+          <Award className="w-3.5 h-3.5 text-neo-lime shrink-0" />
           {visibleAchievements.map((ach, i) => (
             <AchievementBadge key={ach.key || ach.name || `ach-${i}`} achievement={ach} index={i} />
           ))}

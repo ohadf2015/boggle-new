@@ -272,7 +272,7 @@ export default function PracticeModeSelector({
                 <div className="p-5">
                   <div className="flex items-start gap-4">
                     <AdaptiveMotion.div
-                      className="w-14 h-14 rounded-neo border-2 border-black bg-black/20 flex items-center justify-center shadow-hard-sm flex-shrink-0"
+                      className="w-14 h-14 rounded-neo border-2 border-black bg-black/20 flex items-center justify-center shadow-hard-sm shrink-0"
                       animate={{ rotate: [0, -5, 5, -3, 0] }}
                       transition={{ duration: 3, repeat: Infinity, repeatDelay: 2 + index * 0.5, ease: 'easeInOut' }}
                     >

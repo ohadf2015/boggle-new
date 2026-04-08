@@ -197,7 +197,7 @@ export function ClassroomReviewStep({
                   className={cn(
                     'w-full px-4 py-2 bg-neo-navy border-neo border-neo-black',
                     'text-neo-white font-neo-body shadow-hard-sm rounded-neo',
-                    'focus:outline-none focus:ring-2 focus:ring-neo-cyan'
+                    'focus:outline-hidden focus:ring-2 focus:ring-neo-cyan'
                   )}
                   role="combobox"
                 >

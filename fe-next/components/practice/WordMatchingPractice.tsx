@@ -95,7 +95,7 @@ const DroppableDefinitionSlot = memo<DroppableDefinitionSlotProps>(({
       ref={setNodeRef}
       className={cn(
         'p-4 rounded-neo border-neo',
-        'font-neo-body text-base min-h-[4rem] flex items-center justify-center',
+        'font-neo-body text-base min-h-16 flex items-center justify-center',
         'transition-all relative',
         isMatched && 'border-neo-green bg-neo-green/10',
         !isMatched && 'border-neo-black bg-neo-white/5',

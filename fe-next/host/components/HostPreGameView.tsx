@@ -24,7 +24,8 @@ import {
 } from './pre-game/desktop';
 import TvTutorialOverlay, { isTvTutorialComplete } from './tv-broadcast/TvTutorialOverlay';
 import Avatar from '@/components/Avatar';
-import AvatarBuilderModal from '@/components/avatar/AvatarBuilderModal';
+import dynamic from 'next/dynamic';
+const AvatarBuilderModal = dynamic(() => import('@/components/avatar/AvatarBuilderModal'), { ssr: false });
 import { useAvatarPremium } from '@/hooks/useAvatarPremium';
 import { getOrCreateStoredCustomAvatar, setStoredCustomAvatar } from '@/utils/profileStorage';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
@@ -314,7 +315,7 @@ function HostPreGameView({
     <div className="flex-1 flex flex-col min-h-0 bg-neo-navy lg:max-w-7xl lg:mx-auto">
       {/* Lesson Mode Banner */}
       {lessonData && (
-        <div className="flex-shrink-0 px-3 py-2 bg-neo-purple/20 border-b-2 border-neo-purple/50">
+        <div className="shrink-0 px-3 py-2 bg-neo-purple/20 border-b-2 border-neo-purple/50">
           <div className="flex items-center gap-2">
             <BookOpen className="w-4 h-4 text-neo-purple" />
             <span className="text-sm font-bold text-neo-purple">
@@ -331,14 +332,14 @@ function HostPreGameView({
       )}
 
       {/* Header — compact with editable avatar & name */}
-      <header className="flex-shrink-0 px-3 py-1.5 bg-neo-navy/95 border-b-2 border-neo-black sticky top-0 z-20">
+      <header className="shrink-0 px-3 py-1.5 bg-neo-navy/95 border-b-2 border-neo-black sticky top-0 z-20">
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2 min-w-0">
             {/* Clickable avatar */}
             <button
               data-testid="host-edit-avatar-button"
               onClick={() => setIsAvatarBuilderOpen(true)}
-              className="relative flex-shrink-0 group"
+              className="relative shrink-0 group"
             >
               <div className="w-10 h-10 rounded-full border-2 border-neo-black overflow-hidden shadow-hard-sm ring-2 ring-neo-lime ring-offset-1 ring-offset-neo-navy transition-transform group-hover:scale-105 group-active:scale-95">
                 <Avatar
@@ -347,7 +348,7 @@ function HostPreGameView({
                   className="w-full h-full"
                 />
               </div>
-              <div className="absolute -bottom-0.5 -end-0.5 w-5 h-5 rounded-full bg-neo-cyan border-2 border-neo-black shadow-hard-sm flex items-center justify-center">
+              <div className="absolute -bottom-0.5 -inset-e-0.5 w-5 h-5 rounded-full bg-neo-cyan border-2 border-neo-black shadow-hard-sm flex items-center justify-center">
                 <Pencil className="w-2.5 h-2.5 text-neo-black" />
               </div>
             </button>
@@ -361,7 +362,7 @@ function HostPreGameView({
                   value={editNameValue}
                   onChange={(e) => setEditNameValue(e.target.value)}
                   maxLength={20}
-                  className="bg-white/10 text-neo-cream border-2 border-neo-black rounded-neo px-2 py-1 text-sm font-black focus:outline-none focus:ring-2 focus:ring-neo-cyan w-full max-w-[150px]"
+                  className="bg-white/10 text-neo-cream border-2 border-neo-black rounded-neo px-2 py-1 text-sm font-black focus:outline-hidden focus:ring-2 focus:ring-neo-cyan w-full max-w-[150px]"
                   autoFocus
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') handleSaveName();
@@ -371,13 +372,13 @@ function HostPreGameView({
                 <button
                   data-testid="host-name-save-button"
                   onClick={handleSaveName}
-                  className="w-7 h-7 flex items-center justify-center bg-neo-lime border-2 border-neo-black rounded-neo shadow-hard-sm flex-shrink-0"
+                  className="w-7 h-7 flex items-center justify-center bg-neo-lime border-2 border-neo-black rounded-neo shadow-hard-sm shrink-0"
                 >
                   <Check className="w-3.5 h-3.5 text-neo-black" />
                 </button>
                 <button
                   onClick={() => { setIsEditingName(false); setEditNameValue(username); }}
-                  className="w-7 h-7 flex items-center justify-center bg-white/10 border-2 border-neo-black rounded-neo flex-shrink-0"
+                  className="w-7 h-7 flex items-center justify-center bg-white/10 border-2 border-neo-black rounded-neo shrink-0"
                 >
                   <X className="w-3.5 h-3.5 text-neo-cream" />
                 </button>
@@ -395,12 +396,12 @@ function HostPreGameView({
                   {username}
                 </span>
                 {!isAuthenticated && (
-                  <Pencil className="w-3 h-3 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
+                  <Pencil className="w-3 h-3 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
                 )}
               </button>
             )}
           </div>
-          <div className="flex items-center gap-2 flex-shrink-0">
+          <div className="flex items-center gap-2 shrink-0">
             <MobileShareSection gameCode={gameCode} t={t} showHint={actualPlayerCount === 0} compact />
             <button
               onClick={onExitRoom}
@@ -471,7 +472,7 @@ function HostPreGameView({
           </div>
 
           {/* Sticky CTA at bottom */}
-          <div className="flex-shrink-0 px-3 py-2 bg-neo-navy border-t-2 border-neo-black" style={{ paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom, 0px))' }}>
+          <div className="shrink-0 px-3 py-2 bg-neo-navy border-t-2 border-neo-black" style={{ paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom, 0px))' }}>
             <StartButton onStartGame={onStartGame} disabled={isStartDisabled} tournamentCreating={tournamentCreating} playerCount={filteredPlayersForDisplay.length} maxPlayers={maxPlayers} t={t} compact />
           </div>
         </div>

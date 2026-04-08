@@ -51,14 +51,14 @@ export default function PartyScreenContent() {
         {/* Features */}
         <div className="grid gap-4 text-start">
           <div className="flex items-start gap-3 bg-neo-cream/10 p-4 rounded-neo border-2 border-neo-cream/20">
-            <QrCode className="w-6 h-6 text-neo-cyan flex-shrink-0 mt-0.5" />
+            <QrCode className="w-6 h-6 text-neo-cyan shrink-0 mt-0.5" />
             <div>
               <h3 className="font-bold text-neo-lime">{t('partyScreen.qrJoin')}</h3>
               <p className="text-sm text-neo-cream/70">{t('partyScreen.qrJoinDesc')}</p>
             </div>
           </div>
           <div className="flex items-start gap-3 bg-neo-cream/10 p-4 rounded-neo border-2 border-neo-cream/20">
-            <Users className="w-6 h-6 text-neo-pink flex-shrink-0 mt-0.5" />
+            <Users className="w-6 h-6 text-neo-pink shrink-0 mt-0.5" />
             <div>
               <h3 className="font-bold text-neo-lime">{t('partyScreen.liveLeaderboard')}</h3>
               <p className="text-sm text-neo-cream/70">{t('partyScreen.liveLeaderboardDesc')}</p>

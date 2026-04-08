@@ -15,6 +15,7 @@ import {
   loadSwedishDictionary,
   loadJapaneseDictionary,
   loadSpanishDictionary,
+  loadNounList,
 } from './dictionaryLoaders';
 
 function isValidHebrewWordForBoard(word: string): boolean {
@@ -69,6 +70,8 @@ class Dictionary {
   japaneseWords: Set<string>;
   spanishWords: Set<string>;
   kanjiCompounds: string[];
+  // Noun-only subsets for board seeding (players see recognizable words)
+  nounLists: Map<Language, Set<string>>;
   loaded: boolean;
   loadedLanguages: Set<Language>;
   loadingPromises: Map<Language, Promise<void>>;
@@ -81,6 +84,7 @@ class Dictionary {
     this.japaneseWords = new Set();
     this.spanishWords = new Set();
     this.kanjiCompounds = [];
+    this.nounLists = new Map();
     this.loaded = false;
     this.loadedLanguages = new Set();
     this.loadingPromises = new Map();
@@ -133,6 +137,7 @@ class Dictionary {
       case 'es': this.spanishWords = new Set(); break;
     }
 
+    this.nounLists.delete(language);
     this.loadedLanguages.delete(language);
     this.lastAccessTime.delete(language);
 
@@ -256,8 +261,18 @@ class Dictionary {
           break;
       }
 
+      // Load noun list for board seeding (non-blocking — empty set is fine as fallback)
+      const nounNormalizer = language === 'he'
+        ? (w: string) => normalizeHebrewWord(w.trim())
+        : (w: string) => w.trim().toLowerCase();
+      const nouns = await loadNounList(safeReadFile, language, nounNormalizer);
+      if (nouns.size > 0) {
+        this.nounLists.set(language, nouns);
+      }
+
       const loadTime = Date.now() - startTime;
-      logger.info('DICT', `${language} dictionary loaded in ${loadTime}ms`);
+      const nounInfo = nouns.size > 0 ? ` (${nouns.size} nouns)` : '';
+      logger.info('DICT', `${language} dictionary loaded in ${loadTime}ms${nounInfo}`);
     } catch (error) {
       logger.error('DICT', `Error loading ${language} dictionary: ${error}`);
     }
@@ -352,7 +367,11 @@ class Dictionary {
 
     if (!dictionary || dictionary.size === 0) return [];
 
-    const filtered = Array.from(dictionary).filter(
+    // Prefer nouns for board seeding — players see recognizable words
+    const nounList = this.nounLists.get(language);
+    const sourceWords = nounList && nounList.size > 0 ? nounList : dictionary;
+
+    const filtered = Array.from(sourceWords).filter(
       w => w.length >= minLength && w.length <= maxLength && validator(w)
     );
     if (filtered.length === 0) return [];

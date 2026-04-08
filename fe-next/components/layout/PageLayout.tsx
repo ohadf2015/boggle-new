@@ -91,7 +91,7 @@ export function PageLayout({
         fullHeight ? 'h-full overflow-hidden' : 'min-h-full',
         isDarkMode
           ? 'bg-neo-navy'
-          : 'bg-gradient-to-br from-blue-50 via-white to-purple-50',
+          : 'bg-linear-to-br from-blue-50 via-white to-purple-50',
         className
       )}
       {...(onRefresh ? pullToRefreshHandlers : {})}
@@ -113,7 +113,7 @@ export function PageLayout({
         className={cn(
           'flex-1 mx-auto w-full',
           fullHeight && 'min-h-0',
-          bottomNavAware && 'pb-[--mobile-bottom-safe] sm:pb-0',
+          bottomNavAware && 'pb-(--mobile-bottom-safe) sm:pb-0',
           maxWidthClasses[maxWidth],
           paddingClasses[padding]
         )}

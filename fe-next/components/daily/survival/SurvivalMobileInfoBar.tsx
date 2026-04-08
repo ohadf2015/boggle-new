@@ -105,7 +105,7 @@ export const SurvivalMobileInfoBar: React.FC<SurvivalMobileInfoBarProps> = ({
         onClick={() => setIsExpanded(!isExpanded)}
         className={cn(
           'w-full flex items-center justify-between px-3 py-2',
-          'bg-neo-black/40 backdrop-blur-sm border-2 border-neo-black/30 rounded-neo',
+          'bg-neo-black/40 backdrop-blur-xs border-2 border-neo-black/30 rounded-neo',
           'transition-colors active:bg-neo-black/60',
         )}
       >
@@ -157,7 +157,7 @@ export const SurvivalMobileInfoBar: React.FC<SurvivalMobileInfoBarProps> = ({
             transition={{ duration: 0.2 }}
             className="overflow-hidden"
           >
-            <div className="bg-neo-black/50 backdrop-blur-sm border-2 border-t-0 border-neo-black/30 rounded-b-neo">
+            <div className="bg-neo-black/50 backdrop-blur-xs border-2 border-t-0 border-neo-black/30 rounded-b-neo">
               {/* Tab switches */}
               <div className="flex border-b border-neo-black/30">
                 <button
@@ -258,10 +258,10 @@ const MobileLootItem: React.FC<{ word: WordDiscovery }> = ({ word }) => {
           {word.word}
         </span>
         {word.word.length >= 7 && (
-          <Star className="w-2.5 h-2.5 text-neo-pink flex-shrink-0" />
+          <Star className="w-2.5 h-2.5 text-neo-pink shrink-0" />
         )}
       </div>
-      <div className="flex items-center gap-1.5 flex-shrink-0 text-[10px]">
+      <div className="flex items-center gap-1.5 shrink-0 text-[10px]">
         {word.lifeGained > 0 && (
           <span className="text-green-400 font-bold flex items-center gap-0.5">
             +{word.lifeGained}
@@ -304,7 +304,7 @@ const RanksTabContent: React.FC<{
             )}
           >
             <span className={cn(
-              'w-5 text-center font-black text-[10px] flex-shrink-0',
+              'w-5 text-center font-black text-[10px] shrink-0',
               entry.rank === 1 ? 'text-neo-yellow' :
               entry.rank === 2 ? 'text-gray-300' :
               entry.rank === 3 ? 'text-amber-600' :
@@ -312,7 +312,7 @@ const RanksTabContent: React.FC<{
             )}>
               {getRankDisplay(entry.rank)}
             </span>
-            <div className="flex-shrink-0">
+            <div className="shrink-0">
               <Avatar
 
                 avatarImage={entry.avatar_image ?? undefined}
@@ -325,7 +325,7 @@ const RanksTabContent: React.FC<{
             )}>
               {entry.displayName}
             </span>
-            <span className="font-black text-neo-lime flex-shrink-0 tabular-nums">
+            <span className="font-black text-neo-lime shrink-0 tabular-nums">
               {entry.score}
             </span>
           </div>

@@ -205,7 +205,7 @@ const CustomPuzzleCreator: React.FC<CustomPuzzleCreatorProps> = ({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 bg-neo-black/70 backdrop-blur-sm flex items-center justify-center p-4"
+        className="fixed inset-0 z-50 bg-neo-black/70 backdrop-blur-xs flex items-center justify-center p-4"
         onClick={(e) => e.target === e.currentTarget && onClose()}
       >
         {/* Word Input Phase */}
@@ -244,7 +244,7 @@ const CustomPuzzleCreator: React.FC<CustomPuzzleCreatorProps> = ({
             className="bg-neo-cream border-4 border-neo-black rounded-neo shadow-hard-lg max-w-md w-full overflow-hidden"
           >
             {/* Success Header */}
-            <div className="bg-gradient-to-r from-neo-lime to-neo-cyan border-b-4 border-neo-black p-6 text-center relative overflow-hidden">
+            <div className="bg-linear-to-r from-neo-lime to-neo-cyan border-b-4 border-neo-black p-6 text-center relative overflow-hidden">
               <AdaptiveMotion.div
                 className="absolute top-2 left-4 text-2xl"
                 animate={{ rotate: [0, 15, -15, 0], y: [0, -5, 0] }}
@@ -326,7 +326,7 @@ const CustomPuzzleCreator: React.FC<CustomPuzzleCreatorProps> = ({
               >
                 <Button
                   onClick={handleShare}
-                  className="w-full py-4 text-lg font-black uppercase bg-gradient-to-r from-neo-pink to-neo-orange text-neo-cream border-4 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-1 active:translate-y-0 active:shadow-hard-pressed transition-all"
+                  className="w-full py-4 text-lg font-black uppercase bg-linear-to-r from-neo-pink to-neo-orange text-neo-cream border-4 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-1 active:translate-y-0 active:shadow-hard-pressed transition-all"
                 >
                   <Share2 className="w-5 h-5 me-2" />
                   {t('customPuzzle.share')}

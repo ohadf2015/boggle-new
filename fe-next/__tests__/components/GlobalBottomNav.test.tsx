@@ -45,6 +45,10 @@ vi.mock('../../utils/ThemeContext', () => ({
     useTheme: vi.fn(() => ({ theme: 'dark' })),
 }));
 
+vi.mock('../../components/CrazyGamesSDK', () => ({
+    useCrazyGames: () => ({ isOnCrazyGamesPlatform: false }),
+}));
+
 vi.mock('../../components/auth/AuthModal', () => ({
     __esModule: true,
     default: ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => (

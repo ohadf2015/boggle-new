@@ -30,11 +30,11 @@ const TIER_CONFIG = {
  * Low: Pink->Red, Medium: Orange->Yellow, High: Lime->Cyan
  */
 function getProgressBarGradient(score: number): string {
-  if (score < 20) return 'bg-gradient-to-r from-neo-pink to-neo-red';
-  if (score < 40) return 'bg-gradient-to-r from-neo-red to-neo-orange';
-  if (score < 60) return 'bg-gradient-to-r from-neo-orange to-neo-yellow';
-  if (score < 80) return 'bg-gradient-to-r from-neo-yellow to-neo-lime';
-  return 'bg-gradient-to-r from-neo-lime to-neo-cyan';
+  if (score < 20) return 'bg-linear-to-r from-neo-pink to-neo-red';
+  if (score < 40) return 'bg-linear-to-r from-neo-red to-neo-orange';
+  if (score < 60) return 'bg-linear-to-r from-neo-orange to-neo-yellow';
+  if (score < 80) return 'bg-linear-to-r from-neo-yellow to-neo-lime';
+  return 'bg-linear-to-r from-neo-lime to-neo-cyan';
 }
 
 /**

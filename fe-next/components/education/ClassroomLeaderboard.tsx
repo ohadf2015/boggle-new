@@ -262,7 +262,7 @@ const LeaderboardEntryRow = memo<LeaderboardEntryRowProps>(
         )}
 
         {/* Rank Number */}
-        <div className="flex-shrink-0 w-8 h-8 rounded-neo border-neo bg-neo-navy border-neo-black flex items-center justify-center">
+        <div className="shrink-0 w-8 h-8 rounded-neo border-neo bg-neo-navy border-neo-black flex items-center justify-center">
           <span className="font-neo-display font-black text-sm text-neo-white">
             {rank}
           </span>
@@ -323,7 +323,7 @@ const LeaderboardEntryRow = memo<LeaderboardEntryRowProps>(
         </div>
 
         {/* Rank Delta */}
-        <div className="flex-shrink-0">
+        <div className="shrink-0">
           <RankDeltaIndicator rankDelta={rankDelta} isNew={isNew} />
         </div>
       </AdaptiveMotion.div>

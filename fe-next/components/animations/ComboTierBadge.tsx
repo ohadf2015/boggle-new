@@ -53,13 +53,13 @@ export const COMBO_TIERS: ComboTier[] = [
   {
     threshold: 15,
     translationKey: 'adventure.combo.mythic',
-    color: 'bg-gradient-to-r from-purple-500 to-pink-500',
+    color: 'bg-linear-to-r from-purple-500 to-pink-500',
     animation: 'animate-neo-shake',
   },
   {
     threshold: 20,
     translationKey: 'adventure.combo.transcendent',
-    color: 'bg-gradient-to-r from-yellow-300 via-white to-yellow-300',
+    color: 'bg-linear-to-r from-yellow-300 via-white to-yellow-300',
     animation: 'animate-pulse',
   },
 ];

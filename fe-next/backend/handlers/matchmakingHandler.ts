@@ -9,10 +9,11 @@ import { MatchmakingQueue } from '../services/matchmakingQueue.js';
 import logger from '../utils/logger.js';
 import { checkRateLimit } from '../utils/rateLimiter.js';
 import { validatePayload } from '../utils/socketValidation.js';
+import { getSupabase } from '../modules/supabase/client.js';
+import { DEFAULT_RATING } from '@/shared/utils/eloRating';
 
 const MATCH_INTERVAL_MS = 2000;
 const TIMEOUT_MS = 60000;
-const DEFAULT_ELO = 1000;
 
 // SEC-007: Zod schema for joinMatchmaking payload (elo/playerId ignored — derived server-side)
 const joinMatchmakingSchema = z.object({
@@ -42,7 +43,7 @@ export function registerMatchmakingHandlers(
     queue.leaveQueue(socket.id);
   }
 
-  socket.on('joinMatchmaking', (rawData: unknown) => {
+  socket.on('joinMatchmaking', async (rawData: unknown) => {
     // SEC-008: Clear any existing timers/queue entry before creating new ones
     cleanup();
 
@@ -67,9 +68,21 @@ export function registerMatchmakingHandlers(
     // SEC-001: Use server-side player id, never trust client-supplied playerId
     const playerId = verifiedUserId ?? fallbackUserId!;
 
-    // SEC-001: Default ELO — ignore any client-supplied value.
-    // TODO: Look up player ELO from Supabase using playerId once the elo column is available.
-    const elo = DEFAULT_ELO;
+    // SEC-001: Fetch real ELO from Supabase — ignore any client-supplied value.
+    let elo = DEFAULT_RATING;
+    try {
+      const client = getSupabase();
+      if (client) {
+        const { data } = await client
+          .from('profiles')
+          .select('ranked_mmr')
+          .eq('id', playerId)
+          .single();
+        if (data?.ranked_mmr) elo = data.ranked_mmr;
+      }
+    } catch (err) {
+      logger.warn('MATCHMAKING', `Failed to fetch ELO for ${playerId}, using default: ${err}`);
+    }
 
     // SEC-007: Zod validation
     const validation = validatePayload(joinMatchmakingSchema, rawData);
@@ -82,7 +95,7 @@ export function registerMatchmakingHandlers(
 
     queue.joinQueue(socket.id, playerId, elo, gameMode as any, language);
 
-    logger.info('MATCHMAKING', `Player ${playerId} joined queue (elo=${elo} [default], mode=${gameMode})`);
+    logger.info('MATCHMAKING', `Player ${playerId} joined queue (elo=${elo}, mode=${gameMode})`);
 
     // Send initial stats
     const stats = queue.getQueueStats();

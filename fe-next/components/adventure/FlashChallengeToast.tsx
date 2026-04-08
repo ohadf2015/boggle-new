@@ -47,7 +47,7 @@ export const FlashChallengeToast = memo(function FlashChallengeToast({
         data-testid="challenge-dismiss"
         className={cn(
           // Bottom-right corner — avoids header and grid center
-          'fixed bottom-[5.5rem] sm:bottom-6 end-3 z-30',
+          'fixed bottom-[5.5rem] sm:bottom-6 inset-e-3 z-30',
           'w-auto max-w-[240px]',
           'min-w-[44px] min-h-[44px]',
           'rounded-neo border-2 shadow-hard-sm',
@@ -57,7 +57,7 @@ export const FlashChallengeToast = memo(function FlashChallengeToast({
             ? 'bg-neo-red/20 border-neo-red'
             : isComplete
               ? 'bg-neo-lime border-neo-black'
-              : 'bg-neo-navy/95 border-neo-yellow/70 backdrop-blur-sm'
+              : 'bg-neo-navy/95 border-neo-yellow/70 backdrop-blur-xs'
         )}
         onClick={onDismiss}
         role="status"
@@ -66,9 +66,9 @@ export const FlashChallengeToast = memo(function FlashChallengeToast({
         {/* Single-row ultra-compact layout */}
         <div className="flex items-center gap-1.5">
           {isFailed ? (
-            <XCircle className="w-3.5 h-3.5 flex-shrink-0 text-neo-red" />
+            <XCircle className="w-3.5 h-3.5 shrink-0 text-neo-red" />
           ) : (
-            <Zap className={cn('w-3.5 h-3.5 flex-shrink-0', isComplete ? 'text-neo-black' : 'text-neo-yellow')} />
+            <Zap className={cn('w-3.5 h-3.5 shrink-0', isComplete ? 'text-neo-black' : 'text-neo-yellow')} />
           )}
           <div className="flex-1 min-w-0">
             {isFailed ? (

@@ -334,7 +334,7 @@ export default function StickyReadyBar({
                   className={cn(
                     'flex-1 flex items-center justify-center gap-1.5 py-1.5 text-[9px] font-black uppercase rounded-lg border-2 transition-all',
                     isActive
-                      ? cn(MODE_ACTIVE_COLORS[mode], 'border-current/30 shadow-sm')
+                      ? cn(MODE_ACTIVE_COLORS[mode], 'border-current/30 shadow-xs')
                       : 'text-neo-cream/40 border-transparent hover:text-neo-cream/70 hover:bg-neo-white/5'
                   )}
                 >

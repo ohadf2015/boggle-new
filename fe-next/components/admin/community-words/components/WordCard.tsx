@@ -50,7 +50,7 @@ export function WordCard({
               type="checkbox"
               checked={isSelected}
               onChange={onToggleSelect}
-              className="w-4 h-4 mt-1 rounded border-slate-300 flex-shrink-0"
+              className="w-4 h-4 mt-1 rounded border-slate-300 shrink-0"
               aria-label={`Select ${word.word}`}
             />
             <div className="flex-1">
@@ -73,7 +73,7 @@ export function WordCard({
                 </Badge>
               </div>
             </div>
-            <div className="flex flex-col text-xs text-slate-400 text-right flex-shrink-0">
+            <div className="flex flex-col text-xs text-slate-400 text-right shrink-0">
               <span>
                 <ThumbsUp className="w-3 h-3 inline me-1 text-green-500" />
                 {word.likes_count}

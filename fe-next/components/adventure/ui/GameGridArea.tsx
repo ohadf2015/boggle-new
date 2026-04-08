@@ -131,7 +131,7 @@ export const GameGridArea = memo(function GameGridArea({
         sm+:    stacked column, each row gets a fixed height.
         Total cost: h-8 on mobile vs h-8+h-7=h-15 on sm+.
       */}
-      <div className="flex-shrink-0 px-2 sm:px-4 pt-0.5 sm:pt-2 pb-0">
+      <div className="shrink-0 px-2 sm:px-4 pt-0.5 sm:pt-2 pb-0">
         <div className="flex sm:flex-col items-center justify-between sm:justify-start gap-x-1.5 sm:gap-y-1 overflow-hidden">
           {/* Word Preview */}
           <div className="h-8 flex items-center justify-center shrink min-w-0 sm:w-full">

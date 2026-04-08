@@ -4,10 +4,10 @@ import { Star, Zap, Type, Sparkles } from 'lucide-react';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 
 const DECORATIONS = [
-  { Icon: Star, position: 'top-20 start-4', delay: '0s' },
-  { Icon: Zap, position: 'top-40 end-6', delay: '1.5s' },
-  { Icon: Type, position: 'bottom-40 start-8', delay: '3s' },
-  { Icon: Sparkles, position: 'bottom-20 end-4', delay: '4.5s' },
+  { Icon: Star, position: 'top-20 inset-s-4', delay: '0s' },
+  { Icon: Zap, position: 'top-40 inset-e-6', delay: '1.5s' },
+  { Icon: Type, position: 'bottom-40 inset-s-8', delay: '3s' },
+  { Icon: Sparkles, position: 'bottom-20 inset-e-4', delay: '4.5s' },
 ];
 
 /**

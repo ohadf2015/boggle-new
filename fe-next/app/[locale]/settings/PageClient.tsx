@@ -57,7 +57,7 @@ function SettingRow({ icon, label, description, children, isDarkMode }: SettingR
           )}
         </div>
       </div>
-      <div className="flex-shrink-0 ms-3">
+      <div className="shrink-0 ms-3">
         {children}
       </div>
     </div>
@@ -89,7 +89,7 @@ function ToggleButton({ isOn, onToggle, isDarkMode, label, onLabel = 'On', offLa
     >
       <div
         className={cn(
-          "absolute top-1 start-1 w-8 h-8 bg-white rounded-full border-2 border-neo-black shadow-sm transition-transform duration-200",
+          "absolute top-1 inset-s-1 w-8 h-8 bg-white rounded-full border-2 border-neo-black shadow-xs transition-transform duration-200",
           isOn ? "translate-x-[24px] rtl:-translate-x-[24px]" : "translate-x-0"
         )}
       />
@@ -168,7 +168,7 @@ export default function SettingsPageClient(): React.JSX.Element {
       'flex-1 flex flex-col min-h-screen',
       isDarkMode
         ? 'bg-neo-navy'
-        : 'bg-gradient-to-br from-neo-cream via-white to-neo-cream'
+        : 'bg-linear-to-br from-neo-cream via-white to-neo-cream'
     )}>
       <AutoHideHeader />
 

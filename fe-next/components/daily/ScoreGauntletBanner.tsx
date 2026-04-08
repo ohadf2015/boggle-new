@@ -24,7 +24,7 @@ export const ScoreGauntletBanner: React.FC<ScoreGauntletBannerProps> = ({
       data-testid="score-gauntlet-banner"
       initial={{ opacity: 0, y: -12 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-gradient-to-r from-neo-pink/20 to-neo-orange/20 border-3 border-neo-pink rounded-neo shadow-hard p-3 mb-4"
+      className="bg-linear-to-r from-neo-pink/20 to-neo-orange/20 border-3 border-neo-pink rounded-neo shadow-hard p-3 mb-4"
     >
       <div className="flex items-center gap-3">
         <span className="text-2xl">{challengerEmoji || '🎯'}</span>
@@ -45,7 +45,7 @@ export const ScoreGauntletBanner: React.FC<ScoreGauntletBannerProps> = ({
             {t('wordHunt.gauntlet.canYouBeat')}
           </div>
         </div>
-        <div className="flex-shrink-0">
+        <div className="shrink-0">
           <Swords className="w-5 h-5 text-neo-pink" aria-hidden="true" />
         </div>
       </div>

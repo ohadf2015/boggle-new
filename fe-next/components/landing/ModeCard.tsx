@@ -124,7 +124,7 @@ const ModeCard: React.FC<ModeCardProps> = ({
 
   const variantStyles = {
     cyan: {
-      bg: 'bg-gradient-to-br from-neo-cyan via-cyan-400 to-neo-cyan-dark',
+      bg: 'bg-linear-to-br from-neo-cyan via-cyan-400 to-neo-cyan-dark',
       hoverBg: 'hover:from-neo-cyan-light hover:via-neo-cyan hover:to-neo-cyan-dark',
       iconBg: 'bg-neo-navy',
       iconText: 'text-neo-cyan-light',
@@ -132,7 +132,7 @@ const ModeCard: React.FC<ModeCardProps> = ({
       glowColor: 'rgba(0, 255, 255, 0.4)',
     },
     pink: {
-      bg: 'bg-gradient-to-br from-neo-pink via-pink-400 to-neo-pink-dark',
+      bg: 'bg-linear-to-br from-neo-pink via-pink-400 to-neo-pink-dark',
       hoverBg: 'hover:from-neo-pink-light hover:via-neo-pink hover:to-neo-pink-dark',
       iconBg: 'bg-neo-navy',
       iconText: 'text-neo-pink-light',
@@ -140,7 +140,7 @@ const ModeCard: React.FC<ModeCardProps> = ({
       glowColor: 'rgba(255, 20, 147, 0.4)',
     },
     purple: {
-      bg: 'bg-gradient-to-br from-neo-purple via-purple-400 to-neo-purple-dark',
+      bg: 'bg-linear-to-br from-neo-purple via-purple-400 to-neo-purple-dark',
       hoverBg: 'hover:from-neo-purple-light hover:via-neo-purple hover:to-neo-purple-dark',
       iconBg: 'bg-neo-navy',
       iconText: 'text-neo-purple-light',
@@ -148,7 +148,7 @@ const ModeCard: React.FC<ModeCardProps> = ({
       glowColor: 'rgba(139, 92, 246, 0.4)',
     },
     orange: {
-      bg: 'bg-gradient-to-br from-neo-orange via-amber-500 to-amber-600',
+      bg: 'bg-linear-to-br from-neo-orange via-amber-500 to-amber-600',
       hoverBg: 'hover:from-amber-400 hover:via-neo-orange hover:to-amber-600',
       iconBg: 'bg-neo-navy',
       iconText: 'text-amber-400',
@@ -156,7 +156,7 @@ const ModeCard: React.FC<ModeCardProps> = ({
       glowColor: 'rgba(255, 107, 53, 0.4)',
     },
     lime: {
-      bg: 'bg-gradient-to-br from-neo-lime via-lime-400 to-neo-lime-dark',
+      bg: 'bg-linear-to-br from-neo-lime via-lime-400 to-neo-lime-dark',
       hoverBg: 'hover:from-neo-lime-light hover:via-neo-lime hover:to-neo-lime-dark',
       iconBg: 'bg-neo-navy',
       iconText: 'text-neo-lime-light',
@@ -167,7 +167,7 @@ const ModeCard: React.FC<ModeCardProps> = ({
 
   const styles = variantStyles[variant];
 
-  const wrapperClassName = cn('block w-full h-full group focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy rounded-neo-lg', className);
+  const wrapperClassName = cn('block w-full h-full group focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy rounded-neo-lg', className);
 
   const cardContent = (
     <div
@@ -191,8 +191,8 @@ const ModeCard: React.FC<ModeCardProps> = ({
         'transition-shadow duration-200 ease-out',
         // Active effect - press down (only when not locked)
         !locked && (isRTL
-          ? 'active:translate-x-[-1px] active:translate-y-[1px]'
-          : 'active:translate-x-[1px] active:translate-y-[1px]'),
+          ? 'active:-translate-x-px active:translate-y-px'
+          : 'active:translate-x-px active:translate-y-px'),
         !locked && 'active:shadow-hard-pressed',
         highlighted && 'ring-4 ring-neo-yellow ring-offset-2 ring-offset-neo-navy'
       )}
@@ -211,7 +211,7 @@ const ModeCard: React.FC<ModeCardProps> = ({
       {badge && !locked && (
         <div
           className={cn(
-            'absolute top-2 end-2 z-10',
+            'absolute top-2 inset-e-2 z-10',
             'px-2 py-0.5 sm:px-2.5 sm:py-1',
             'bg-neo-navy text-neo-white',
             'font-black uppercase tracking-wider',
@@ -488,7 +488,7 @@ const ModeCard: React.FC<ModeCardProps> = ({
             transition={{ duration: 0.3 }}
           >
             <motion.div
-              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent"
+              className="absolute inset-0 bg-linear-to-r from-transparent via-white/40 to-transparent"
               initial={{ x: '-100%' }}
               animate={isHovered ? { x: '200%' } : { x: '-100%' }}
               transition={{ duration: 0.5, ease: 'easeOut' }}
@@ -497,11 +497,11 @@ const ModeCard: React.FC<ModeCardProps> = ({
 
           {/* Decorative corner accent */}
           <motion.div
-            className="absolute top-0 end-0 w-16 h-16 pointer-events-none overflow-hidden rounded-neo-lg"
+            className="absolute top-0 inset-e-0 w-16 h-16 pointer-events-none overflow-hidden rounded-neo-lg"
             initial={false}
           >
             <motion.div
-              className="absolute -top-8 -end-8 w-16 h-16 bg-white/10 rotate-45"
+              className="absolute -top-8 -inset-e-8 w-16 h-16 bg-white/10 rotate-45"
               animate={isHovered ? { scale: 1.2, opacity: 0.15 } : { scale: 1, opacity: 0.08 }}
               transition={{ duration: 0.3 }}
             />

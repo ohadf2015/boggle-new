@@ -101,9 +101,11 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
   const guestStats: GuestStats | null = showGuestStats ? getGuestStatsSummary() : null;
 
   // OAuth sign-in with native SDK priority (Google/Apple native → in-app browser → redirect)
+  const handleOAuthError = useCallback((msg: string) => setError(msg), []);
+  const handleOAuthSuccess = useCallback(() => onClose(), [onClose]);
   const { signIn: oauthSignIn, loadingProvider: oauthLoadingProvider } = useOAuthSignIn({
-    onError: (msg) => setError(msg),
-    onSuccess: () => onClose(),
+    onError: handleOAuthError,
+    onSuccess: handleOAuthSuccess,
   });
 
   // Reset form when modal opens/closes
@@ -353,7 +355,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+        className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs"
         onClick={onClose}
       >
         <motion.div
@@ -512,7 +514,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                               aria-describedby={emailError ? 'otp-email-error' : undefined}
                               className={cn(
                                 'w-full px-4 py-3 rounded-neo border-2 bg-slate-800 text-white placeholder-gray-500',
-                                'focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy transition-colors',
+                                'focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy transition-colors',
                                 emailError ? 'border-red-500' : 'border-slate-600 focus:border-neo-cyan'
                               )}
                               disabled={isAnyLoading}
@@ -567,7 +569,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                               value={otpCode}
                               onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
                               placeholder="000000"
-                              className="w-full px-4 py-3 rounded-neo border-2 bg-slate-800 text-white placeholder-gray-500 text-center text-2xl tracking-[0.5em] font-mono focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy transition-colors border-slate-600 focus:border-neo-cyan"
+                              className="w-full px-4 py-3 rounded-neo border-2 bg-slate-800 text-white placeholder-gray-500 text-center text-2xl tracking-[0.5em] font-mono focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy transition-colors border-slate-600 focus:border-neo-cyan"
                               disabled={isAnyLoading}
                             />
                           </div>
@@ -618,7 +620,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                           aria-describedby={emailError ? 'magic-email-error' : undefined}
                           className={cn(
                             'w-full px-4 py-3 rounded-neo border-2 bg-slate-800 text-white placeholder-gray-500',
-                            'focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy transition-colors',
+                            'focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy transition-colors',
                             emailError ? 'border-red-500' : 'border-slate-600 focus:border-neo-cyan'
                           )}
                           disabled={isAnyLoading}
@@ -676,7 +678,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                           aria-describedby={emailError ? 'pwd-email-error' : undefined}
                           className={cn(
                             'w-full px-4 py-3 rounded-neo border-2 bg-slate-800 text-white placeholder-gray-500',
-                            'focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy transition-colors',
+                            'focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy transition-colors',
                             emailError ? 'border-red-500' : 'border-slate-600 focus:border-neo-cyan'
                           )}
                           disabled={isAnyLoading}
@@ -701,7 +703,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                             aria-describedby={passwordError ? 'pwd-password-error' : undefined}
                             className={cn(
                               'w-full px-4 py-3 pe-12 rounded-neo border-2 bg-slate-800 text-white placeholder-gray-500',
-                              'focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy transition-colors',
+                              'focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy transition-colors',
                               passwordError ? 'border-red-500' : 'border-slate-600 focus:border-neo-cyan'
                             )}
                             disabled={isAnyLoading}
@@ -710,7 +712,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                             type="button"
                             onClick={() => setShowPassword(!showPassword)}
                             aria-label={showPassword ? (t('auth.hidePassword')) : (t('auth.showPassword'))}
-                            className="absolute end-3 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-200 transition-colors rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan"
+                            className="absolute inset-e-3 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-200 transition-colors rounded focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan"
                           >
                             {showPassword ? <EyeOff className="w-5 h-5" aria-hidden="true" /> : <Eye className="w-5 h-5" aria-hidden="true" />}
                           </button>

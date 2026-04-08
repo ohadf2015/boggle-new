@@ -102,7 +102,7 @@ export interface SoundEffectOptions {
 
 // Sound effect definitions — maps keys to file paths
 export const SOUND_EFFECTS = {
-  achievement: '/sounds/achievment.mp3',
+  achievement: '/sounds/achievement.mp3',
   combo: '/sounds/combo.mp3',
   wordAccepted: '/sounds/word-accepted.mp3',
   countdownBeep: '/sounds/countdown-beep.mp3',

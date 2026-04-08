@@ -149,7 +149,7 @@ export default function BulkWordImporter({
                 className={cn(
                   'w-full h-40 px-4 py-3 bg-neo-black/50 border-neo border-neo-black',
                   'text-neo-white font-neo-body shadow-hard-sm resize-none',
-                  'focus:outline-none focus:ring-2 focus:ring-neo-cyan',
+                  'focus:outline-hidden focus:ring-2 focus:ring-neo-cyan',
                   'placeholder:text-neo-white/40'
                 )}
               />

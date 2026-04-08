@@ -242,7 +242,7 @@ export default function BlastBoardDomination({ playerStats, currentUsername }: B
               className="relative p-2.5 bg-neo-navy/60 border-3 border-neo-black rounded-neo shadow-hard-sm overflow-hidden"
             >
               {/* Ambient glow */}
-              <div className={`absolute inset-0 bg-gradient-to-br ${award.bgGlow} pointer-events-none`} />
+              <div className={`absolute inset-0 bg-linear-to-br ${award.bgGlow} pointer-events-none`} />
 
               {/* Content */}
               <div className="relative">
@@ -289,7 +289,7 @@ export default function BlastBoardDomination({ playerStats, currentUsername }: B
                 className={`flex items-center gap-3 px-3 py-2 bg-neo-navy/40 rounded-neo border-2 ${isMe ? (color?.border || 'border-neo-lime') + ' border-opacity-60' : 'border-neo-black/60'}`}
               >
                 {/* Color dot + name */}
-                <div className="flex items-center gap-1.5 min-w-0 flex-shrink-0">
+                <div className="flex items-center gap-1.5 min-w-0 shrink-0">
                   <div className={`w-2 h-2 rounded-full ${color?.fill || 'bg-neo-lime'}`} />
                   <span className={`text-xs font-bold truncate ${isMe ? 'text-neo-white' : 'text-neo-cream/80'}`}>
                     {username}

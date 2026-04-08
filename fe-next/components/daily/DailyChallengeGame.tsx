@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { X } from 'lucide-react';
 import GridComponent from '@/components/GridComponent';
@@ -276,6 +276,11 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [duration, onComplete, language, wordSubmission.foundWords]);
 
+  const validWordLengths = useMemo(
+    () => wordSubmission.foundWords.filter(w => w.isValid === true).map(w => w.word.length),
+    [wordSubmission.foundWords]
+  );
+
   // Keep handleGameEnd ref in sync for stable timer callback
   useEffect(() => {
     handleGameEndRef.current = handleGameEnd;
@@ -424,14 +429,14 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
       <div className="relative h-0">
         {/* Panic mascot: urgency indicator when clock runs low */}
         {timer.remainingTime <= PANIC_TIMER_THRESHOLD && (
-          <div className="absolute top-2 end-2 z-10 pointer-events-none">
+          <div className="absolute top-2 inset-e-2 z-10 pointer-events-none">
             <Mascot variant="panic" size="sm" animated clipBorder="none" />
           </div>
         )}
 
         {/* On-fire mascot: celebrates active combo streaks */}
         {combo.comboLevel >= ONFIRE_COMBO_THRESHOLD && timer.remainingTime > PANIC_TIMER_THRESHOLD && (
-          <div className="absolute top-2 start-2 z-10 pointer-events-none">
+          <div className="absolute top-2 inset-s-2 z-10 pointer-events-none">
             <Mascot variant="onfire" size="sm" animated clipBorder="none" />
           </div>
         )}
@@ -442,7 +447,7 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
         validWordCount={wordSubmission.validWordCount}
         comboLevel={combo.comboLevel}
         maxCombo={combo.maxCombo}
-        wordLengths={wordSubmission.foundWords.filter(w => w.isValid === true).map(w => w.word.length)}
+        wordLengths={validWordLengths}
         timeSinceStart={duration - timer.remainingTime}
         gameDuration={duration}
         earnedAchievements={[]}

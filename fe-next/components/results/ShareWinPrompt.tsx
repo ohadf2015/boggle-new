@@ -278,7 +278,7 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
             'flex items-center justify-center gap-3 p-3 rounded-xl border-2',
             isDarkMode
               ? 'bg-slate-800/60 border-cyan-400/30'
-              : 'bg-gradient-to-r from-cyan-50 to-blue-50 border-cyan-300'
+              : 'bg-linear-to-r from-cyan-50 to-blue-50 border-cyan-300'
           )}
         >
           <span className={cn('text-sm font-bold', isDarkMode ? 'text-cyan-300' : 'text-cyan-700')}>
@@ -293,7 +293,7 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
               'border-2 border-neo-black shadow-hard-sm',
               'hover:shadow-hard-md hover:-translate-y-0.5 transition-all',
               'bg-neo-lime text-neo-black',
-              'focus:outline-none focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2'
+              'focus:outline-hidden focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2'
             )}
             aria-label={t('results.share')}
           >
@@ -329,15 +329,15 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
           'relative p-4 sm:p-5 rounded-2xl border-3 overflow-hidden',
           isWinner
             ? isDarkMode
-              ? 'bg-gradient-to-br from-yellow-900/30 via-amber-900/20 to-orange-900/30 border-yellow-400/60 shadow-hard-lg'
-              : 'bg-gradient-to-br from-yellow-50 via-amber-50 to-orange-50 border-yellow-400 shadow-hard-lg'
+              ? 'bg-linear-to-br from-yellow-900/30 via-amber-900/20 to-orange-900/30 border-yellow-400/60 shadow-hard-lg'
+              : 'bg-linear-to-br from-yellow-50 via-amber-50 to-orange-50 border-yellow-400 shadow-hard-lg'
             : isDarkMode
-            ? 'bg-gradient-to-br from-cyan-900/30 via-blue-900/20 to-indigo-900/30 border-cyan-400/50 shadow-hard-md'
-            : 'bg-gradient-to-br from-cyan-50 via-blue-50 to-indigo-50 border-cyan-400 shadow-hard-md'
+            ? 'bg-linear-to-br from-cyan-900/30 via-blue-900/20 to-indigo-900/30 border-cyan-400/50 shadow-hard-md'
+            : 'bg-linear-to-br from-cyan-50 via-blue-50 to-indigo-50 border-cyan-400 shadow-hard-md'
         )}
       >
         {/* Background decoration */}
-        <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-bl from-white/15 to-transparent rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-0 right-0 w-40 h-40 bg-linear-to-bl from-white/15 to-transparent rounded-full blur-3xl pointer-events-none" />
 
         {/* Close button */}
         {onClose && (
@@ -424,7 +424,7 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
             'hover:shadow-hard-xl active:shadow-hard-sm',
             'transition-all duration-150',
             'bg-neo-lime text-neo-black',
-            'focus:outline-none focus:ring-4 focus:ring-neo-cyan focus:ring-offset-2'
+            'focus:outline-hidden focus:ring-4 focus:ring-neo-cyan focus:ring-offset-2'
           )}
         >
           <Share2 size={18} />

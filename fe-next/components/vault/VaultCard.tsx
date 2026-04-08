@@ -88,7 +88,7 @@ const VaultCard: React.FC<VaultCardProps> = ({
         data-testid="vault-teaser"
         className={cn(
           'relative border-3 border-neo-yellow/40 rounded-neo shadow-hard p-5',
-          'bg-gradient-to-br from-neo-navy via-neo-navy/95 to-neo-navy/80',
+          'bg-linear-to-br from-neo-navy via-neo-navy/95 to-neo-navy/80',
           className
         )}
       >
@@ -118,7 +118,7 @@ const VaultCard: React.FC<VaultCardProps> = ({
           data-testid="vault-card"
           className={cn(
             'relative border-3 border-neo-yellow rounded-neo shadow-hard-lg p-5',
-            'bg-gradient-to-br from-neo-navy via-neo-navy/95 to-neo-navy/80',
+            'bg-linear-to-br from-neo-navy via-neo-navy/95 to-neo-navy/80',
             className
           )}
         >

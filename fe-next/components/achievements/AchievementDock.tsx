@@ -249,7 +249,7 @@ const AchievementDock = ({ achievements = EMPTY_ACHIEVEMENTS, className }: Achie
                             'transition-all duration-100 cursor-pointer'
                           )}
                         >
-                          <div className="w-10 h-10 rounded-md bg-neo-cyan text-neo-black border-2 border-neo-black flex items-center justify-center shadow-hard-sm flex-shrink-0">
+                          <div className="w-10 h-10 rounded-md bg-neo-cyan text-neo-black border-2 border-neo-black flex items-center justify-center shadow-hard-sm shrink-0">
                             <span className="text-lg">{achievement.icon}</span>
                           </div>
                           <div className="flex-1 min-w-0">

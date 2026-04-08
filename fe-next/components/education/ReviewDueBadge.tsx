@@ -27,7 +27,7 @@ export function ReviewDueBadge({ count, onStartReview }: ReviewDueBadgeProps) {
       className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-neo-orange text-neo-black rounded-neo border-neo border-black shadow-hard-sm font-neo-body font-bold text-sm hover:brightness-110 active:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] transition-all"
       aria-label={t('education.reviewDue', { count })}
     >
-      <BookOpen className="w-4 h-4 flex-shrink-0" />
+      <BookOpen className="w-4 h-4 shrink-0" />
       <span>{t('education.reviewDue', { count })}</span>
     </button>
   );

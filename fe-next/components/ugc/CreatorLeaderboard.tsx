@@ -61,11 +61,11 @@ function ChampionSpotlight({ creator }: { creator: CreatorRow }) {
       className={cn(
         'relative overflow-hidden rounded-neo p-5 mb-6',
         'border-3 border-neo-yellow/40 shadow-hard',
-        'bg-gradient-to-br from-neo-yellow/[0.08] via-neo-navy to-neo-pink/[0.05]'
+        'bg-linear-to-br from-neo-yellow/8 via-neo-navy to-neo-pink/5'
       )}
     >
       {/* Decorative corner glow */}
-      <div className="absolute -top-8 -end-8 w-24 h-24 bg-neo-yellow/10 blur-2xl rounded-full pointer-events-none" />
+      <div className="absolute -top-8 -inset-e-8 w-24 h-24 bg-neo-yellow/10 blur-2xl rounded-full pointer-events-none" />
 
       <div className="flex items-center gap-4 relative">
         {/* Crown + Avatar */}
@@ -74,7 +74,7 @@ function ChampionSpotlight({ creator }: { creator: CreatorRow }) {
             customAvatar={creator.avatar_config}
             size="lg"
           />
-          <span className="absolute -top-2 -end-2 text-xl" aria-hidden>👑</span>
+          <span className="absolute -top-2 -inset-e-2 text-xl" aria-hidden>👑</span>
         </div>
 
         {/* Info */}
@@ -157,15 +157,15 @@ function CreatorRow_({ creator, rank }: { creator: CreatorRow; rank: number }) {
 
         {/* Stats */}
         <div className="flex items-center gap-4 shrink-0 text-xs text-neo-white/50">
-          <span className="hidden sm:flex items-center gap-1 min-w-[3rem] justify-end">
+          <span className="hidden sm:flex items-center gap-1 min-w-12 justify-end">
             <LayoutGrid className="w-3 h-3" />
             {creator.boards_created}
           </span>
-          <span className="flex items-center gap-1 min-w-[3.5rem] justify-end">
+          <span className="flex items-center gap-1 min-w-14 justify-end">
             <TrendingUp className="w-3 h-3" />
             {creator.total_plays.toLocaleString()}
           </span>
-          <span className="min-w-[3rem] flex justify-end">
+          <span className="min-w-12 flex justify-end">
             <RatingStars value={creator.avg_rating} />
           </span>
         </div>
@@ -192,7 +192,7 @@ export default function CreatorLeaderboard() {
       {loading && (
         <div className="space-y-3">
           {Array.from({ length: 5 }).map((_, i) => (
-            <div key={i} className="h-14 rounded-neo bg-neo-white/[0.03] animate-pulse" />
+            <div key={i} className="h-14 rounded-neo bg-neo-white/3 animate-pulse" />
           ))}
         </div>
       )}
@@ -217,9 +217,9 @@ export default function CreatorLeaderboard() {
           <div className="flex items-center gap-3 px-3 py-2 mb-1 text-[10px] font-bold uppercase tracking-wider text-neo-white/30">
             <div className="w-8 text-center">#</div>
             <div className="flex-1">{t('ugc.creator.leaderboard.creator')}</div>
-            <div className="hidden sm:block min-w-[3rem] text-end">{t('ugc.creator.leaderboard.boards')}</div>
-            <div className="min-w-[3.5rem] text-end">{t('ugc.creator.leaderboard.plays')}</div>
-            <div className="min-w-[3rem] text-end">{t('ugc.creator.leaderboard.rating')}</div>
+            <div className="hidden sm:block min-w-12 text-end">{t('ugc.creator.leaderboard.boards')}</div>
+            <div className="min-w-14 text-end">{t('ugc.creator.leaderboard.plays')}</div>
+            <div className="min-w-12 text-end">{t('ugc.creator.leaderboard.rating')}</div>
           </div>
 
           {/* Rows */}

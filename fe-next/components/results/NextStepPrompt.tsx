@@ -156,7 +156,7 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.2, type: 'spring', stiffness: 300, damping: 26 }}
         className={cn(
-          'bg-gradient-to-br from-neo-red to-neo-orange',
+          'bg-linear-to-br from-neo-red to-neo-orange',
           'border-4 border-neo-black rounded-neo-lg shadow-hard-xl',
           'p-6 relative overflow-hidden',
           className
@@ -220,7 +220,7 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
           onClick={() => handleNavigate(config.href)}
           className={cn(
             'relative flex items-center gap-3 p-3',
-            'bg-gradient-to-r', config.gradient,
+            'bg-linear-to-r', config.gradient,
             'border-3 border-neo-black rounded-neo shadow-hard',
             'hover:shadow-hard-lg hover:-translate-x-0.5 hover:-translate-y-0.5',
             'active:shadow-hard-pressed active:translate-x-0.5 active:translate-y-0.5',
@@ -258,7 +258,7 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
           onClick={() => handleNavigate(config.href)}
           className={cn(
             'relative block p-4',
-            'bg-gradient-to-br', config.gradient,
+            'bg-linear-to-br', config.gradient,
             'border-4 border-neo-black rounded-neo-lg shadow-hard-lg',
             'hover:shadow-hard-xl hover:-translate-x-1 hover:-translate-y-1',
             'active:shadow-hard-pressed active:translate-x-0.5 active:translate-y-0.5',
@@ -267,7 +267,7 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
         >
           {/* Shine effect - pointer-events-none to allow button clicks */}
           <motion.div
-            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 pointer-events-none"
+            className="absolute inset-0 bg-linear-to-r from-transparent via-white/20 to-transparent -skew-x-12 pointer-events-none"
             animate={{ x: ['-200%', '200%'] }}
             transition={{ duration: 3, repeat: inf, ease: 'easeInOut', repeatDelay: 2 }}
           />
@@ -314,7 +314,7 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
       animate={{ opacity: 1, scale: 1 }}
       transition={{ delay: 0.2, type: 'spring', stiffness: 300, damping: 26 }}
       className={cn(
-        'bg-gradient-to-br', config.gradient,
+        'bg-linear-to-br', config.gradient,
         'border-4 border-neo-black rounded-neo-lg shadow-hard-xl',
         'p-6 sm:p-8 relative overflow-hidden',
         className
@@ -384,7 +384,7 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
         >
           {/* Button shine effect - pointer-events-none to allow button clicks */}
           <motion.div
-            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 pointer-events-none"
+            className="absolute inset-0 bg-linear-to-r from-transparent via-white/10 to-transparent -skew-x-12 pointer-events-none"
             animate={{ x: ['-200%', '200%'] }}
             transition={{ duration: 2, repeat: inf, ease: 'easeInOut', repeatDelay: 1 }}
           />

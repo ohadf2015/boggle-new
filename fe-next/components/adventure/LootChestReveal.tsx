@@ -20,9 +20,9 @@ const STAGGER_MS = 500;
 
 const RARITY_GLOW: Record<LootRarity, string> = {
   common: 'shadow-hard-sm',
-  rare: 'shadow-[0_0_12px_theme(colors.neo-cyan)]',
-  epic: 'shadow-[0_0_16px_theme(colors.neo-pink)]',
-  legendary: 'shadow-[0_0_20px_theme(colors.neo-yellow)] ring-2 ring-neo-yellow/50',
+  rare: 'shadow-[0_0_12px_var(--color-neo-cyan)]',
+  epic: 'shadow-[0_0_16px_var(--color-neo-pink)]',
+  legendary: 'shadow-[0_0_20px_var(--color-neo-yellow)] ring-2 ring-neo-yellow/50',
 };
 
 const CHEST_IMAGES: Record<ChestTier, { closed: string; open: string }> = {

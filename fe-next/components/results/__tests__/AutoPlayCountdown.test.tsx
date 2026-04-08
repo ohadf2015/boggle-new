@@ -75,7 +75,7 @@ describe('AutoPlayCountdown', () => {
     expect(onComplete).toHaveBeenCalledTimes(1);
   });
 
-  it('should call onComplete immediately when countdown ring is clicked', () => {
+  it('should call onComplete immediately when countdown ring-3 is clicked', () => {
     const onComplete = vi.fn();
     render(<AutoPlayCountdown onComplete={onComplete} onCancel={vi.fn()} />);
 
@@ -112,7 +112,7 @@ describe('AutoPlayCountdown', () => {
     expect(region).toBeInTheDocument();
   });
 
-  it('should render SVG countdown ring', () => {
+  it('should render SVG countdown ring-3', () => {
     const { container } = render(<AutoPlayCountdown onComplete={vi.fn()} onCancel={vi.fn()} />);
     const svg = container.querySelector('svg');
     expect(svg).toBeInTheDocument();

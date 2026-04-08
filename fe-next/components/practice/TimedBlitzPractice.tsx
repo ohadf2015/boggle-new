@@ -291,7 +291,7 @@ export function TimedBlitzPractice({
                   'bg-neo-white text-neo-black',
                   'font-neo-body text-xl',
                   'shadow-hard',
-                  'focus:outline-none focus:ring-4 focus:ring-neo-cyan',
+                  'focus:outline-hidden focus:ring-4 focus:ring-neo-cyan',
                   'disabled:opacity-50 disabled:cursor-not-allowed',
                   'transition-all'
                 )}

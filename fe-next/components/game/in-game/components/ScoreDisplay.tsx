@@ -6,6 +6,9 @@ import ScoreBreakdownTooltip from '../../ScoreBreakdownTooltip';
 import type { TranslationFn } from '../types';
 import { displayScore } from '@/utils/scoreDisplay';
 
+const SCORE_GLOW_STYLE = { textShadow: '0 0 12px rgba(191,255,0,0.4)' } as const;
+const SCORE_GLOW_SM_STYLE = { textShadow: '0 0 10px rgba(191,255,0,0.4)' } as const;
+
 interface ScoreDisplayProps {
   score: number;
   rank: number | null;
@@ -48,7 +51,7 @@ export const ScoreDisplay = memo<ScoreDisplayProps>(function ScoreDisplay({
       <AdaptiveMotion.div
         initial={{ scale: 0, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        className="relative border-2 border-neo-lime/30 rounded-neo shadow-none px-4 py-1.5 min-w-[90px] overflow-hidden bg-neo-lime/10 backdrop-blur-sm"
+        className="relative border-2 border-neo-lime/30 rounded-neo shadow-none px-4 py-1.5 min-w-[90px] overflow-hidden bg-neo-lime/10 backdrop-blur-xs"
         whileHover={{ scale: 1.05 }}
         role="status"
         aria-live="polite"
@@ -74,7 +77,7 @@ export const ScoreDisplay = memo<ScoreDisplayProps>(function ScoreDisplay({
             animate={{ scale: 1, y: 0 }}
             transition={{ type: 'spring', stiffness: 400, damping: 18 }}
             className="text-3xl font-black text-neo-lime leading-tight"
-            style={{ textShadow: '0 0 12px rgba(191,255,0,0.4)' }}
+            style={SCORE_GLOW_STYLE}
           >
             {displayScore(score)}
           </AdaptiveMotion.div>
@@ -103,7 +106,7 @@ export const ScoreDisplay = memo<ScoreDisplayProps>(function ScoreDisplay({
     <AdaptiveMotion.div
       initial={{ scale: 0, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
-      className="relative border-2 border-neo-lime/30 rounded-neo shadow-none px-1.5 md:px-4 py-0.5 md:py-1.5 min-w-[50px] md:min-w-[90px] overflow-visible bg-neo-lime/10 backdrop-blur-sm"
+      className="relative border-2 border-neo-lime/30 rounded-neo shadow-none px-1.5 md:px-4 py-0.5 md:py-1.5 min-w-[50px] md:min-w-[90px] overflow-visible bg-neo-lime/10 backdrop-blur-xs"
       role="status"
       aria-live="polite"
       aria-label={scoreLabel}
@@ -128,7 +131,7 @@ export const ScoreDisplay = memo<ScoreDisplayProps>(function ScoreDisplay({
           animate={{ scale: 1, y: 0 }}
           transition={{ type: 'spring', stiffness: 400, damping: 18 }}
           className="font-black text-neo-lime leading-tight text-lg md:text-2xl"
-          style={{ textShadow: '0 0 10px rgba(191,255,0,0.4)' }}
+          style={SCORE_GLOW_SM_STYLE}
         >
           {displayScore(score)}
         </AdaptiveMotion.div>

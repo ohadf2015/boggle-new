@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -90,6 +90,9 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
   });
   const [dismissedEventIds, setDismissedEventIds] = useState<Set<string>>(new Set());
   const visibleEvent = activeEvents.find((e) => !dismissedEventIds.has(e.id));
+  const handleDismissEvent = useCallback(() => {
+    if (visibleEvent) setDismissedEventIds((prev) => new Set([...prev, visibleEvent.id]));
+  }, [visibleEvent]);
 
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -171,14 +174,14 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
           <EventBanner
             event={visibleEvent}
             onJoin={(id) => joinEventAction(id)}
-            onDismiss={() => setDismissedEventIds((prev) => new Set([...prev, visibleEvent.id]))}
+            onDismiss={handleDismissEvent}
             hasJoined={myEvents.some((e) => e.id === visibleEvent.id)}
           />
         </div>
       )}
 
       {/* Main content — padding uses CSS breakpoints to avoid JS-driven CLS */}
-      <section className="w-full max-w-7xl mx-auto [overflow-x:clip] relative z-20 flex flex-col gap-6 sm:gap-8 px-2 py-1.5 sm:px-3 sm:py-5 md:px-4 md:py-6 lg:px-6 lg:py-8 xl:px-8">
+      <section className="w-full max-w-7xl mx-auto overflow-x-clip relative z-20 flex flex-col gap-6 sm:gap-8 px-2 py-1.5 sm:px-3 sm:py-5 md:px-4 md:py-6 lg:px-6 lg:py-8 xl:px-8">
         {/* Hero: Mascot + Title + CTA + Leaderboard (desktop) */}
         <LandingHero
           players={topPlayers}

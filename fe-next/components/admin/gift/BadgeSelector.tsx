@@ -18,7 +18,7 @@ const rarityColors: Record<string, string> = {
   uncommon: 'border-green-500 bg-green-50 dark:bg-green-900/30',
   rare: 'border-blue-500 bg-blue-50 dark:bg-blue-900/30',
   epic: 'border-purple-500 bg-purple-50 dark:bg-purple-900/30',
-  legendary: 'border-yellow-500 bg-gradient-to-br from-yellow-50 to-orange-50 dark:from-yellow-900/30 dark:to-orange-900/30',
+  legendary: 'border-yellow-500 bg-linear-to-br from-yellow-50 to-orange-50 dark:from-yellow-900/30 dark:to-orange-900/30',
 };
 
 const rarityTextColors: Record<string, string> = {
@@ -140,7 +140,7 @@ export function BadgeSelector({ authToken, selectedBadgeId, onSelect }: BadgeSel
                     rarityColors[rarity],
                     selectedBadgeId === badge.id
                       ? 'ring-2 ring-neo-lime ring-offset-2 shadow-md'
-                      : 'hover:shadow-sm'
+                      : 'hover:shadow-xs'
                   )}
                 >
                   <div className="w-10 h-10 rounded-lg bg-white/50 dark:bg-black/20 flex items-center justify-center border border-black/10 overflow-hidden">
@@ -161,7 +161,7 @@ export function BadgeSelector({ authToken, selectedBadgeId, onSelect }: BadgeSel
                     <p className={cn('text-xs capitalize', rarityTextColors[rarity])}>{rarity}</p>
                   </div>
                   {selectedBadgeId === badge.id && (
-                    <Check className="w-5 h-5 text-neo-lime flex-shrink-0" />
+                    <Check className="w-5 h-5 text-neo-lime shrink-0" />
                   )}
                 </button>
               ))}

@@ -135,7 +135,7 @@ export default function WordSolverPageClient() {
               className={cn(
                 'flex-1 px-4 py-3 text-xl font-mono font-bold tracking-widest',
                 'bg-white text-neo-black border-3 border-neo-black rounded-neo',
-                'shadow-hard-sm focus:outline-none focus:ring-2 focus:ring-neo-cyan',
+                'shadow-hard-sm focus:outline-hidden focus:ring-2 focus:ring-neo-cyan',
                 'placeholder:text-gray-400 placeholder:tracking-normal placeholder:font-normal'
               )}
             />

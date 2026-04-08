@@ -107,7 +107,7 @@ export default function DeleteAccountSection({ isDarkMode }: DeleteAccountSectio
                 isDarkMode ? 'border-slate-700' : 'border-gray-200'
               )}>
                 <div className="flex items-start gap-2 mb-3">
-                  <AlertTriangle className="w-5 h-5 text-neo-red flex-shrink-0 mt-0.5" />
+                  <AlertTriangle className="w-5 h-5 text-neo-red shrink-0 mt-0.5" />
                   <p className={cn('text-sm font-medium', isDarkMode ? 'text-gray-300' : 'text-gray-700')}>
                     {t('settings.deleteAccountConfirm')}
                   </p>

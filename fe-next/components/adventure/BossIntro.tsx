@@ -204,7 +204,7 @@ const BossIntro = memo<BossIntroProps>(({ boss, worldNumber: _worldNumber, onSta
                   'border-3 border-neo-black rounded-neo',
                   'shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5',
                   'active:translate-y-0.5 active:shadow-hard-pressed',
-                  'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan',
+                  'focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan',
                   'transition-all duration-200'
                 )}
               >
@@ -225,7 +225,7 @@ const BossIntro = memo<BossIntroProps>(({ boss, worldNumber: _worldNumber, onSta
                   'bg-transparent text-neo-white/60',
                   'font-bold text-base',
                   'hover:text-neo-white hover:bg-neo-white/5',
-                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-lime',
+                  'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-lime',
                   'rounded-neo transition-all duration-200'
                 )}
               >

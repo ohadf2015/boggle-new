@@ -24,7 +24,7 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
             key={lang.code}
             onClick={() => onSelectLang(lang.code)}
             className={cn(
-              'px-2.5 sm:px-4 py-2 rounded-lg border-2 font-bold transition-all flex-shrink-0 text-xs sm:text-sm min-h-[40px]',
+              'px-2.5 sm:px-4 py-2 rounded-lg border-2 font-bold transition-all shrink-0 text-xs sm:text-sm min-h-[40px]',
               selectedLang === lang.code
                 ? 'bg-purple-600 text-white border-purple-700 shadow-md'
                 : 'bg-white dark:bg-slate-700 border-gray-300 dark:border-slate-600 hover:border-purple-400 text-gray-800 dark:text-gray-200'

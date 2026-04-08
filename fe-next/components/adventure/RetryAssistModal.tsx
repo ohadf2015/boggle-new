@@ -116,7 +116,7 @@ const RetryAssistModal = memo<RetryAssistModalProps>(
             className={cn(
               'fixed inset-0 z-50',
               'flex items-center justify-center',
-              'bg-neo-black/80 backdrop-blur-sm',
+              'bg-neo-black/80 backdrop-blur-xs',
               'p-4'
             )}
           >
@@ -137,7 +137,7 @@ const RetryAssistModal = memo<RetryAssistModalProps>(
               <div
                 className={cn(
                   'p-6 text-center',
-                  'bg-gradient-to-br from-neo-orange/20 to-neo-pink/20',
+                  'bg-linear-to-br from-neo-orange/20 to-neo-pink/20',
                   'border-b-3 border-neo-black/30'
                 )}
               >

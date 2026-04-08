@@ -2,6 +2,9 @@ import React, { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSoundEffects } from '../contexts/SoundEffectsContext';
 
+const RING_SIZE_STYLE = { width: 120, height: 120 } as const;
+const GO_TEXT_SHADOW_STYLE = { textShadow: '2px 2px 0px rgba(255,255,255,0.3)' } as const;
+
 interface GoRipplesAnimationProps {
   onComplete?: () => void;
   /** Translation function for hints */
@@ -85,7 +88,7 @@ const GoRipplesAnimation: React.FC<GoRipplesAnimationProps> = ({ onComplete, t }
             animate={{ scale: 2.5, opacity: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
             className="absolute rounded-full border-2 border-neo-cyan/50"
-            style={{ width: 120, height: 120 }}
+            style={RING_SIZE_STYLE}
           />
         )}
       </AnimatePresence>
@@ -132,7 +135,7 @@ const GoRipplesAnimation: React.FC<GoRipplesAnimationProps> = ({ onComplete, t }
             className={`relative z-10 font-black text-neo-black ${
               isGo ? 'text-6xl sm:text-8xl' : 'text-5xl sm:text-7xl'
             }`}
-            style={{ textShadow: '2px 2px 0px rgba(255,255,255,0.3)' }}
+            style={GO_TEXT_SHADOW_STYLE}
           >
             {count > 0 ? count : (t?.('countdown.go') || 'GO!')}
           </span>
@@ -147,7 +150,7 @@ const GoRipplesAnimation: React.FC<GoRipplesAnimationProps> = ({ onComplete, t }
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ delay: 0.3, duration: 0.3 }}
-            className="absolute bottom-[25%] text-center text-neo-white text-base sm:text-lg font-black px-6 py-2 bg-neo-black/40 rounded-neo backdrop-blur-sm"
+            className="absolute bottom-[25%] text-center text-neo-white text-base sm:text-lg font-black px-6 py-2 bg-neo-black/40 rounded-neo backdrop-blur-xs"
           >
             {t?.('countdown.hint') || 'Swipe letters to form words!'}
           </motion.p>

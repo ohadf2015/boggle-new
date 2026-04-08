@@ -310,7 +310,7 @@ const BossOverlay = memo<BossOverlayProps>(
             {onSkipIntro && (
               <button
                 onClick={onSkipIntro}
-                className="absolute bottom-6 end-6 z-50 px-4 py-2 bg-neo-black/60 text-neo-white/80 font-bold text-sm rounded-neo border border-neo-white/20 hover:bg-neo-black/80 transition-colors"
+                className="absolute bottom-6 inset-e-6 z-50 px-4 py-2 bg-neo-black/60 text-neo-white/80 font-bold text-sm rounded-neo border border-neo-white/20 hover:bg-neo-black/80 transition-colors"
                 aria-label={t('common.skip')}
               >
                 {t('common.skip')} →
@@ -323,16 +323,16 @@ const BossOverlay = memo<BossOverlayProps>(
         {showingActivePhase && !showVictory && !showDefeat && (
           <>
             {/* Compact Combat HUD Strip — sits just below the GameHeader */}
-            <div className="fixed top-[3.25rem] sm:top-[3.75rem] left-0 right-0 z-30 pointer-events-none">
+            <div className="fixed top-13 sm:top-15 left-0 right-0 z-30 pointer-events-none">
               <div className="w-full max-w-2xl mx-auto px-3 sm:px-4 pt-1.5">
                 {/* Boss Avatar + HP Bar row */}
                 <div className="flex items-center gap-2 sm:gap-3">
                   {/* Boss Avatar — larger with rich state animations */}
-                  <div className="relative flex-shrink-0">
+                  <div className="relative shrink-0">
                     {/* Enraged outer glow ring — per-boss color (capped) */}
                     {fx.enragedGlow && (
                       <AdaptiveMotion.div
-                        className="absolute -inset-1.5 rounded-neo blur-sm z-0"
+                        className="absolute -inset-1.5 rounded-neo blur-xs z-0"
                         style={{ backgroundColor: bossAnims.enragedGlowColor }}
                         animate={{ scale: [1, 1.15, 1], opacity: [0.3, 0.7, 0.3] }}
                         transition={{ repeat: Infinity, duration: 0.8, ease: 'easeInOut' }}
@@ -436,7 +436,7 @@ const BossOverlay = memo<BossOverlayProps>(
                         animate={{ scale: 1, opacity: 1 }}
                         exit={{ scale: 0, opacity: 0 }}
                         transition={{ type: 'spring', stiffness: 500, damping: 25 }}
-                        className="flex-shrink-0 pointer-events-none"
+                        className="shrink-0 pointer-events-none"
                       >
                         <div className="relative w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center">
                           <svg
@@ -511,7 +511,7 @@ const BossOverlay = memo<BossOverlayProps>(
                     transition={{ type: 'spring', stiffness: 400, damping: 22 }}
                   >
                     {/* Mini enraged boss portrait */}
-                    <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-neo border-3 border-neo-red overflow-hidden flex-shrink-0 shadow-hard-sm">
+                    <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-neo border-3 border-neo-red overflow-hidden shrink-0 shadow-hard-sm">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={boss.images?.enraged ?? boss.imagePath}

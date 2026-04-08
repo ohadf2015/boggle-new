@@ -556,7 +556,7 @@ export async function POST(request: NextRequest) {
           goldenQuill: 'relic', worldEssence: 'relic', ancientRelic: 'relic', cosmicShard: 'relic',
         };
 
-        for (const drop of collectibleDrops) {
+        const inventoryPayloads = collectibleDrops.map((drop) => {
           const itemId = drop.type === 'runeFragment' ? 'rune-fragment'
             : drop.type === 'loreScroll' ? `lore-scroll-w${world}-l${level}`
             : drop.type === 'bossTrophy' ? `boss-trophy-w${world}`
@@ -566,7 +566,7 @@ export async function POST(request: NextRequest) {
             : drop.type === 'goldenQuill' ? 'golden-quill'
             : drop.type;
 
-          await supabase.from('player_inventory').upsert({
+          return {
             user_id: userId,
             item_id: itemId,
             item_type: drop.type,
@@ -575,7 +575,11 @@ export async function POST(request: NextRequest) {
             quantity: drop.quantity,
             source_world: world,
             source_level: level,
-          }, { onConflict: 'user_id,item_id' });
+          };
+        });
+
+        if (inventoryPayloads.length > 0) {
+          await supabase.from('player_inventory').upsert(inventoryPayloads, { onConflict: 'user_id,item_id' });
         }
       } catch (err) {
         console.error('[ADVENTURE COMPLETE API] Inventory persistence failed:', err);

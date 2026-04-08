@@ -249,6 +249,8 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
   // Effective grid (player may have shufflingGrid fallback)
   const effectiveGrid = letterGrid || shufflingGrid || null;
 
+  const noop = useCallback(() => {}, []);
+
   // Blast multiplayer bridge
   const blastBridge = useBlastMultiplayerBridge({
     letterGrid: effectiveGrid,
@@ -310,7 +312,7 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
         totalTime={totalTime}
         leaderboard={leaderboard}
         username={username}
-        onGameEnd={() => {/* Server controls game end */}}
+        onGameEnd={noop} /* Server controls game end */
         onQuit={handleQuit}
         onWordWithComboType={handleBlastWordWithCombo}
         initialTileStates={blastBridge.initialTileStates}

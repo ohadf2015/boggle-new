@@ -9,6 +9,8 @@ import type { Language, LetterGrid } from '@/types';
 import type { DailyPuzzle } from './types';
 import { getPuzzleNumber } from './dateUtils';
 import { generateDailyPuzzle, isWordOnGrid } from './gridGeneration';
+import { loadNounList, createSafeReadFile } from '@/backend/dictionaryLoaders';
+import { normalizeHebrewWord } from '@/shared/utils/wordNormalization';
 
 // ==========================================
 // Database Operations
@@ -137,6 +139,29 @@ async function saveGridToDatabase(
 }
 
 // ==========================================
+// Noun List Loading (for board enrichment)
+// ==========================================
+
+const nounListCache = new Map<string, string[]>();
+
+async function loadNounWordsForLanguage(language: Language): Promise<string[]> {
+  if (nounListCache.has(language)) return nounListCache.get(language)!;
+
+  try {
+    const normalizer = language === 'he'
+      ? (w: string) => normalizeHebrewWord(w.trim())
+      : (w: string) => w.trim().toUpperCase();
+    const safeReadFile = createSafeReadFile();
+    const nounSet = await loadNounList(safeReadFile, language, normalizer);
+    const words = Array.from(nounSet);
+    nounListCache.set(language, words);
+    return words;
+  } catch {
+    return [];
+  }
+}
+
+// ==========================================
 // Server-Side Puzzle Generation
 // ==========================================
 
@@ -149,6 +174,9 @@ export async function generateDailyPuzzleAsync(
   language: Language,
   forceRegenerate: boolean = false
 ): Promise<DailyPuzzle> {
+  // Load noun words for board enrichment (cached after first load)
+  const nounWords = await loadNounWordsForLanguage(language);
+
   // Try to fetch puzzle data from database (includes stored grid)
   const puzzleData = await fetchDailyPuzzleData(dateString, language);
 
@@ -178,8 +206,8 @@ export async function generateDailyPuzzleAsync(
       console.log(`[Daily Puzzle] No stored grid for ${dateString}/${language} - generating new one`);
     }
 
-    // Generate new puzzle with the pre-selected word
-    const puzzle = generateDailyPuzzle(dateString, language, targetWord);
+    // Generate new puzzle with the pre-selected word + noun enrichment
+    const puzzle = generateDailyPuzzle(dateString, language, targetWord, undefined, undefined, nounWords);
 
     // Save the generated grid to database for future players
     const saved = await saveGridToDatabase(dateString, language, puzzle.grid, puzzle.targetWord);
@@ -194,7 +222,7 @@ export async function generateDailyPuzzleAsync(
   console.log(
     `[Daily Puzzle] No puzzle data in DB for ${dateString}/${language} - generating deterministically`
   );
-  const puzzle = generateDailyPuzzle(dateString, language);
+  const puzzle = generateDailyPuzzle(dateString, language, undefined, undefined, undefined, nounWords);
 
   // Try to save the generated grid
   const saved = await saveGridToDatabase(dateString, language, puzzle.grid, puzzle.targetWord);

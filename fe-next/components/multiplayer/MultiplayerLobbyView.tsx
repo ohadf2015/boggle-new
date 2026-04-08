@@ -134,6 +134,8 @@ const MultiplayerLobbyView: React.FC<MultiplayerLobbyViewProps> = ({
   const avatarPremium = useAvatarPremium();
   const currentAvatar = getOrCreateStoredCustomAvatar();
 
+  const noop = useCallback(() => {}, []);
+
   const handleAvatarSave = useCallback(async (config: CustomAvatarConfig) => {
     setStoredCustomAvatar(config);
     onAvatarChange?.(config);
@@ -156,7 +158,7 @@ const MultiplayerLobbyView: React.FC<MultiplayerLobbyViewProps> = ({
 
   // ==================== Shared Header ====================
   const renderHeader = () => (
-    <header className="flex-shrink-0 px-3 py-1.5 bg-neo-navy/95 border-b-2 border-neo-black sticky z-20" style={{ top: 'var(--combined-safe-area-top, env(safe-area-inset-top, 0px))' }}>
+    <header className="shrink-0 px-3 py-1.5 bg-neo-navy/95 border-b-2 border-neo-black sticky z-20" style={{ top: 'var(--combined-safe-area-top, env(safe-area-inset-top, 0px))' }}>
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2 min-w-0">
           {isHost && <DJMascotWithEntrance size="sm" delay={0.3} />}
@@ -166,7 +168,7 @@ const MultiplayerLobbyView: React.FC<MultiplayerLobbyViewProps> = ({
             {username}
           </span>
         </div>
-        <div className="flex items-center gap-2 flex-shrink-0">
+        <div className="flex items-center gap-2 shrink-0">
           <MobileShareSection gameCode={gameCode} t={t} compact />
           <button
             onClick={onExitRoom}
@@ -190,14 +192,14 @@ const MultiplayerLobbyView: React.FC<MultiplayerLobbyViewProps> = ({
       className="rounded-neo-lg border-3 border-neo-black bg-slate-800/80 shadow-hard-lg overflow-hidden"
     >
       {/* Accent bar */}
-      <div className="h-1.5 bg-gradient-to-r from-neo-cyan via-neo-pink to-neo-lime" />
+      <div className="h-1.5 bg-linear-to-r from-neo-cyan via-neo-pink to-neo-lime" />
 
       <div className="p-5 flex items-center gap-5">
         {/* Large clickable avatar */}
         <button
           data-testid="edit-avatar-button"
           onClick={() => setIsAvatarBuilderOpen(true)}
-          className="relative flex-shrink-0 group"
+          className="relative shrink-0 group"
         >
           <div className="w-20 h-20 rounded-full border-3 border-neo-black bg-neo-cyan/20 overflow-hidden shadow-hard ring-2 ring-neo-lime ring-offset-2 ring-offset-slate-800 transition-transform group-hover:scale-105 group-active:scale-95">
             <Avatar
@@ -211,7 +213,7 @@ const MultiplayerLobbyView: React.FC<MultiplayerLobbyViewProps> = ({
             <Camera className="w-6 h-6 text-neo-cream" />
           </div>
           {/* Edit badge */}
-          <div className="absolute -bottom-1 -end-1 w-7 h-7 rounded-full bg-neo-cyan border-2 border-neo-black shadow-hard-sm flex items-center justify-center">
+          <div className="absolute -bottom-1 -inset-e-1 w-7 h-7 rounded-full bg-neo-cyan border-2 border-neo-black shadow-hard-sm flex items-center justify-center">
             <Pencil className="w-3.5 h-3.5 text-neo-black" />
           </div>
         </button>
@@ -227,7 +229,7 @@ const MultiplayerLobbyView: React.FC<MultiplayerLobbyViewProps> = ({
                 value={editNameValue}
                 onChange={(e) => setEditNameValue(e.target.value)}
                 maxLength={20}
-                className="bg-white/10 text-neo-cream border-2 border-neo-black rounded-neo px-3 py-1.5 text-lg font-black focus:outline-none focus:ring-2 focus:ring-neo-cyan w-full max-w-[200px]"
+                className="bg-white/10 text-neo-cream border-2 border-neo-black rounded-neo px-3 py-1.5 text-lg font-black focus:outline-hidden focus:ring-2 focus:ring-neo-cyan w-full max-w-[200px]"
                 autoFocus
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') handleSaveName();
@@ -237,13 +239,13 @@ const MultiplayerLobbyView: React.FC<MultiplayerLobbyViewProps> = ({
               <button
                 data-testid="name-save-button"
                 onClick={handleSaveName}
-                className="w-8 h-8 min-w-[44px] min-h-[44px] flex items-center justify-center bg-neo-lime border-2 border-neo-black rounded-neo shadow-hard-sm flex-shrink-0"
+                className="w-8 h-8 min-w-[44px] min-h-[44px] flex items-center justify-center bg-neo-lime border-2 border-neo-black rounded-neo shadow-hard-sm shrink-0"
               >
                 <Check className="w-4 h-4 text-neo-black" />
               </button>
               <button
                 onClick={() => { setIsEditingName(false); setEditNameValue(username); }}
-                className="w-8 h-8 min-w-[44px] min-h-[44px] flex items-center justify-center bg-white/10 border-2 border-neo-black rounded-neo flex-shrink-0"
+                className="w-8 h-8 min-w-[44px] min-h-[44px] flex items-center justify-center bg-white/10 border-2 border-neo-black rounded-neo shrink-0"
               >
                 <X className="w-4 h-4 text-neo-cream" />
               </button>
@@ -257,7 +259,7 @@ const MultiplayerLobbyView: React.FC<MultiplayerLobbyViewProps> = ({
                 <button
                   data-testid="edit-name-button"
                   onClick={() => { setEditNameValue(username); setIsEditingName(true); }}
-                  className="flex-shrink-0 w-7 h-7 min-w-[44px] min-h-[44px] rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
+                  className="shrink-0 w-7 h-7 min-w-[44px] min-h-[44px] rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
                   aria-label={t('playerView.editName')}
                 >
                   <Pencil className="w-3.5 h-3.5 text-slate-400" />
@@ -345,7 +347,7 @@ const MultiplayerLobbyView: React.FC<MultiplayerLobbyViewProps> = ({
           <ul className="space-y-2">
             {tips.map((tip, i) => (
               <li key={i} className="flex items-start gap-2 text-sm text-slate-300">
-                <span className={cn('mt-1 w-1.5 h-1.5 rounded-full flex-shrink-0', dotClass)} />
+                <span className={cn('mt-1 w-1.5 h-1.5 rounded-full shrink-0', dotClass)} />
                 <span>{tip}</span>
               </li>
             ))}
@@ -400,7 +402,7 @@ const MultiplayerLobbyView: React.FC<MultiplayerLobbyViewProps> = ({
             isHost={isHost}
             gameCode={gameCode}
             className="h-full"
-            onNewMessage={() => {}}
+            onNewMessage={noop}
             variant="embedded"
           />
         </div>
@@ -420,7 +422,7 @@ const MultiplayerLobbyView: React.FC<MultiplayerLobbyViewProps> = ({
           {!isCrazyGames && (
             <motion.div className="pb-4" variants={sectionVariants} initial="hidden" animate="visible" custom={3}>
               <div className="bg-neo-navy-light/50 rounded-neo-lg border-2 border-neo-white/10 overflow-hidden h-64">
-                <RoomChat username={t('multiplayerFlow.host')} isHost={true} gameCode={gameCode} className="h-full" onNewMessage={() => {}} variant="embedded" />
+                <RoomChat username={t('multiplayerFlow.host')} isHost={true} gameCode={gameCode} className="h-full" onNewMessage={noop} variant="embedded" />
               </div>
             </motion.div>
           )}
@@ -448,7 +450,7 @@ const MultiplayerLobbyView: React.FC<MultiplayerLobbyViewProps> = ({
                 isHost={false}
                 gameCode={gameCode}
                 className="h-full"
-                onNewMessage={() => {}}
+                onNewMessage={noop}
                 variant="embedded"
               />
             </div>

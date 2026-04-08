@@ -39,13 +39,16 @@ export const DesktopWordList: React.FC<DesktopWordListProps> = ({
   const listRef = useRef<HTMLDivElement>(null);
   const [isExpanded, setIsExpanded] = useState(false);
 
-  // Filter words based on showOnlyValid setting
-  const displayWords = showOnlyValid
-    ? foundWords.filter(w => w.isValid === true)
-    : foundWords;
-
-  // Sort by timestamp (most recent first)
-  const sortedWords = [...displayWords].sort((a, b) => b.timestamp - a.timestamp);
+  // Memoize all derived data from foundWords in a single pass
+  const { displayWords, sortedWords, longestWord, totalBonusPoints } = React.useMemo(() => {
+    const filtered = showOnlyValid
+      ? foundWords.filter(w => w.isValid === true)
+      : foundWords;
+    const sorted = [...filtered].sort((a, b) => b.timestamp - a.timestamp);
+    const longest = filtered.reduce((max, w) => w.word.length > max.length ? w.word : max, '');
+    const bonus = filtered.reduce((sum, w) => sum + (w.comboBonus || 0) + (w.fireRoundBonus || 0), 0);
+    return { displayWords: filtered, sortedWords: sorted, longestWord: longest, totalBonusPoints: bonus };
+  }, [foundWords, showOnlyValid]);
 
   // Capture render time once to determine "new" words (avoids impure Date.now() in render)
   // Updates when sortedWords changes, so new words get the "new" animation
@@ -53,10 +56,6 @@ export const DesktopWordList: React.FC<DesktopWordListProps> = ({
   useEffect(() => {
     setRenderTime(Date.now());
   }, [sortedWords.length]);
-
-  // Calculate stats
-  const longestWord = displayWords.reduce((max, w) => w.word.length > max.length ? w.word : max, '');
-  const totalBonusPoints = displayWords.reduce((sum, w) => sum + (w.comboBonus || 0) + (w.fireRoundBonus || 0), 0);
 
   // Determine which words to show
   const visibleWords = isExpanded ? sortedWords : sortedWords.slice(0, maxVisible);
@@ -72,7 +71,7 @@ export const DesktopWordList: React.FC<DesktopWordListProps> = ({
   return (
     <div className="h-full flex flex-col bg-neo-navy/50 rounded-neo border-2 border-neo-black/30 overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-neo-cream/15 bg-neo-black/20 flex-shrink-0">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-neo-cream/15 bg-neo-black/20 shrink-0">
         <div className="flex items-center gap-2">
           <List className="w-4 h-4 text-neo-cyan" />
           <span className="font-bold text-neo-cream text-sm uppercase tracking-wide">
@@ -131,7 +130,7 @@ export const DesktopWordList: React.FC<DesktopWordListProps> = ({
 
       {/* Stats Footer */}
       {displayWords.length > 0 && (
-        <div className="flex-shrink-0 border-t border-neo-cream/10 bg-neo-black/20 p-3 space-y-2">
+        <div className="shrink-0 border-t border-neo-cream/10 bg-neo-black/20 p-3 space-y-2">
           {/* Best Word */}
           {longestWord && (
             <div className="flex items-center justify-between text-xs">
@@ -210,7 +209,7 @@ const WordItem: React.FC<WordItemProps> = ({ word, isNew, t }) => {
         </span>
 
         {/* Bonus Indicators */}
-        <div className="flex items-center gap-1 flex-shrink-0">
+        <div className="flex items-center gap-1 shrink-0">
           {hasComboBonus && (
             <div className="flex items-center text-neo-lime" title={t('singlePlayer.comboBonus')}>
               <Zap className="w-3 h-3" />
@@ -228,7 +227,7 @@ const WordItem: React.FC<WordItemProps> = ({ word, isNew, t }) => {
       </div>
 
       {/* Score */}
-      <div className="flex items-center gap-1 flex-shrink-0 tabular-nums">
+      <div className="flex items-center gap-1 shrink-0 tabular-nums">
         <span className="font-black text-neo-cream tracking-normal">
           {totalScore}
         </span>

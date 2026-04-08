@@ -13,6 +13,7 @@ import { vi, beforeAll, afterAll, afterEach, beforeEach } from 'vitest';
 import '@testing-library/jest-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
+import { server as mswServer } from './test/msw/server';
 
 // ==========================================
 // Global TanStack Query Provider for Tests
@@ -35,15 +36,21 @@ vi.mock('@testing-library/react', async (importOriginal) => {
   return {
     ...actual,
     render: (ui: React.ReactElement, options?: any) => {
-      const Wrapper = options?.wrapper || (({ children }: { children: React.ReactNode }) =>
-        React.createElement(QueryClientProvider, { client: globalQueryClient }, children)
-      );
+      const BaseWrapper = ({ children }: { children: React.ReactNode }) =>
+        React.createElement(QueryClientProvider, { client: globalQueryClient }, children);
+      const Wrapper = options?.wrapper
+        ? ({ children }: { children: React.ReactNode }) =>
+            React.createElement(BaseWrapper, null, React.createElement(options.wrapper!, null, children))
+        : BaseWrapper;
       return actual.render(ui, { ...options, wrapper: Wrapper });
     },
     renderHook: (hook: any, options?: any) => {
-      const Wrapper = options?.wrapper || (({ children }: { children: React.ReactNode }) =>
-        React.createElement(QueryClientProvider, { client: globalQueryClient }, children)
-      );
+      const BaseWrapper = ({ children }: { children: React.ReactNode }) =>
+        React.createElement(QueryClientProvider, { client: globalQueryClient }, children);
+      const Wrapper = options?.wrapper
+        ? ({ children }: { children: React.ReactNode }) =>
+            React.createElement(BaseWrapper, null, React.createElement(options.wrapper!, null, children))
+        : BaseWrapper;
       return actual.renderHook(hook, { ...options, wrapper: Wrapper });
     },
   };
@@ -167,21 +174,12 @@ if (!(global as any).performance) {
 }
 (global as any).performance.now = vi.fn(() => Date.now());
 
-// Mock fetch API with a default implementation
-const mockFetchImplementation = (url: string, _options?: any) => {
-  if (url.includes('/api/dictionary/check')) {
-    return Promise.resolve({
-      ok: true,
-      json: () => Promise.resolve({ isValid: true, source: 'dictionary' }),
-    });
-  }
-  return Promise.resolve({
-    ok: true,
-    json: () => Promise.resolve({}),
-  });
-};
-
-(global as any).fetch = vi.fn(mockFetchImplementation);
+// MSW intercepts fetch requests — no manual global.fetch mock needed.
+// Default handlers are in test/msw/handlers.ts.
+// Per-test overrides: server.use(http.get('/api/foo', () => HttpResponse.json({...})))
+beforeAll(() => mswServer.listen({ onUnhandledRequest: 'bypass' }));
+afterEach(() => mswServer.resetHandlers());
+afterAll(() => mswServer.close());
 
 // ==========================================
 // Mock Next.js Router

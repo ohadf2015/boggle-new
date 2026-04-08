@@ -121,7 +121,7 @@ export function VersionChecker() {
   // Show brief notification before auto-reload
   return (
     <div
-      className="fixed top-4 left-1/2 -translate-x-1/2 z-[999] pointer-events-none"
+      className="fixed top-4 left-1/2 -translate-x-1/2 z-999 pointer-events-none"
       role="status"
       aria-live="polite"
     >

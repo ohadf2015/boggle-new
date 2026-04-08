@@ -166,9 +166,9 @@ export const BossHPBar = memo(function BossHPBar({
   const barColor = isEnraged
     ? 'bg-neo-red'
     : pct > 50
-    ? 'bg-gradient-to-r from-lime-500 to-cyan-400'
+    ? 'bg-linear-to-r from-lime-500 to-cyan-400'
     : pct > 25
-    ? 'bg-gradient-to-r from-yellow-400 to-orange-400'
+    ? 'bg-linear-to-r from-yellow-400 to-orange-400'
     : 'bg-orange-500';
 
   return (

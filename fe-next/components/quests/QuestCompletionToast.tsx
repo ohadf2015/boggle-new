@@ -50,9 +50,9 @@ export function showQuestCompletionToast({
   }
 
   const bgStyle = isAllComplete
-    ? 'bg-gradient-to-br from-neo-lime/20 via-neo-navy to-neo-cyan/10 border-neo-lime'
+    ? 'bg-linear-to-br from-neo-lime/20 via-neo-navy to-neo-cyan/10 border-neo-lime'
     : isGrandSlam
-      ? 'bg-gradient-to-br from-neo-yellow/20 via-neo-navy to-neo-yellow/10 border-neo-yellow'
+      ? 'bg-linear-to-br from-neo-yellow/20 via-neo-navy to-neo-yellow/10 border-neo-yellow'
       : 'bg-neo-navy';
 
   const iconBg = isAllComplete
@@ -90,21 +90,21 @@ export function showQuestCompletionToast({
       >
         {/* Shimmer overlay */}
         <div
-          className="absolute inset-0 bg-gradient-to-r from-transparent via-neo-white/5 to-transparent animate-shimmer pointer-events-none"
+          className="absolute inset-0 bg-linear-to-r from-transparent via-neo-white/5 to-transparent animate-shimmer pointer-events-none"
           aria-hidden="true"
         />
 
         {/* Particle burst effect — CSS pseudo elements */}
-        <div className="absolute top-2 start-4 w-2 h-2 rounded-full bg-neo-yellow animate-burst" aria-hidden="true" />
-        <div className="absolute top-4 end-6 w-1.5 h-1.5 rounded-full bg-neo-pink animate-burst [animation-delay:0.1s]" aria-hidden="true" />
-        <div className="absolute bottom-3 start-8 w-1 h-1 rounded-full bg-neo-cyan animate-burst [animation-delay:0.2s]" aria-hidden="true" />
-        <div className="absolute top-6 end-10 w-1.5 h-1.5 rounded-full bg-neo-lime animate-burst [animation-delay:0.15s]" aria-hidden="true" />
+        <div className="absolute top-2 inset-s-4 w-2 h-2 rounded-full bg-neo-yellow animate-burst" aria-hidden="true" />
+        <div className="absolute top-4 inset-e-6 w-1.5 h-1.5 rounded-full bg-neo-pink animate-burst [animation-delay:0.1s]" aria-hidden="true" />
+        <div className="absolute bottom-3 inset-s-8 w-1 h-1 rounded-full bg-neo-cyan animate-burst [animation-delay:0.2s]" aria-hidden="true" />
+        <div className="absolute top-6 inset-e-10 w-1.5 h-1.5 rounded-full bg-neo-lime animate-burst [animation-delay:0.15s]" aria-hidden="true" />
 
         <div className="relative flex items-center gap-3 p-4">
           {/* Icon */}
           <div
             className={cn(
-              'flex-shrink-0 w-12 h-12 flex items-center justify-center',
+              'shrink-0 w-12 h-12 flex items-center justify-center',
               'rounded-full border-3 border-neo-black',
               iconBg,
             )}

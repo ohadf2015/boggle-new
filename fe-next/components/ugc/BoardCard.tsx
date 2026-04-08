@@ -196,11 +196,11 @@ const BoardCard = memo<BoardCardProps>(({ board, personalBest, onPlay, variant =
       className
     )}>
       {/* Difficulty accent strip */}
-      <div className={cn('h-1.5 w-full bg-gradient-to-r', diff.accent)} />
+      <div className={cn('h-1.5 w-full bg-linear-to-r', diff.accent)} />
 
       {/* Staff pick badge */}
       {board.featured && (
-        <div className="absolute top-4 -end-5 z-10 rotate-3">
+        <div className="absolute top-4 -inset-e-5 z-10 rotate-3">
           <span className="inline-block bg-neo-orange text-white text-[9px] font-neo-body font-bold px-5 py-0.5 shadow-hard-sm border border-black uppercase tracking-wide">
             {t('ugc.gallery.staffPick')}
           </span>

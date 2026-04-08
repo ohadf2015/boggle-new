@@ -99,7 +99,7 @@ export default function JoinRedirectClient() {
             px-4 py-3 text-neo-cream font-neo-display text-xl text-center
             uppercase tracking-[0.3em] mb-4 w-48
             placeholder:text-neo-cream/30
-            focus:outline-none focus:border-neo-cyan
+            focus:outline-hidden focus:border-neo-cyan
           "
         />
         <button

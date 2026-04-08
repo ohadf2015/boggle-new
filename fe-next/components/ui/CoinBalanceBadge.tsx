@@ -10,7 +10,7 @@
  * ```tsx
  * <div className="relative">
  *   <Button>Buy Item (100🪙)</Button>
- *   <CoinBalanceBadge balance={coins} size="sm" className="absolute -top-2 -end-2" />
+ *   <CoinBalanceBadge balance={coins} size="sm" className="absolute -top-2 -inset-e-2" />
  * </div>
  * ```
  */

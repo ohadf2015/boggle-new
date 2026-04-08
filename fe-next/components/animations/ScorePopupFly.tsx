@@ -127,7 +127,7 @@ export function ScorePopupFly({
   if (prefersReducedMotion && popup) {
     return (
       <div
-        className={cn('fixed pointer-events-none z-[150]', className)}
+        className={cn('fixed pointer-events-none z-150', className)}
         style={{ left: popup.x, top: popup.y, transform: 'translate(-50%, -50%)' }}
       >
         <div
@@ -147,7 +147,7 @@ export function ScorePopupFly({
       {popup && targetPos && (
         <motion.div
           key={popup.id}
-          className={cn('fixed pointer-events-none z-[150]', className)}
+          className={cn('fixed pointer-events-none z-150', className)}
           data-testid="score-popup-fly"
           style={{ left: popup.x, top: popup.y }}
           initial={{
@@ -201,7 +201,7 @@ export function ScorePopupFly({
             <motion.div
               className={cn(
                 'rounded-neo border-3 border-neo-black shadow-hard',
-                'bg-gradient-to-r from-neo-lime to-emerald-400',
+                'bg-linear-to-r from-neo-lime to-emerald-400',
                 sizeConfig[size].container
               )}
               animate={

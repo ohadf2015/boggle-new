@@ -101,7 +101,7 @@ export const MissedWordsPanel = memo<MissedWordsPanelProps>(({
           onClick={() => setExpanded((e) => !e)}
           className={cn(
             'mt-2 text-xs font-bold text-neo-cyan/70 hover:text-neo-cyan',
-            'focus-visible:outline-none focus-visible:underline',
+            'focus-visible:outline-hidden focus-visible:underline',
             'transition-colors duration-150'
           )}
         >

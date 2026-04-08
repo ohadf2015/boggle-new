@@ -159,6 +159,26 @@ export async function loadJapaneseDictionary(
   return { words: dict, compounds };
 }
 
+/**
+ * Load noun-only word list for a language (used for board seeding).
+ * Falls back to empty set if file doesn't exist — board generation
+ * will use the full dictionary as fallback.
+ */
+export async function loadNounList(
+  safeReadFile: SafeReadFile,
+  language: string,
+  normalizer: (w: string) => string = (w) => w.trim().toLowerCase()
+): Promise<Set<string>> {
+  const filePath = path.join(__dirname, `${language}_nouns.txt`);
+  const content = await safeReadFile(filePath);
+  if (!content) return new Set();
+
+  const words = content.split('\n').map(w => normalizer(w)).filter(w => w.length > 0);
+  const dict = new Set(words);
+  logger.debug('DICT', `Loaded ${dict.size} ${language} nouns for board seeding`);
+  return dict;
+}
+
 export async function loadSpanishDictionary(
   safeReadFile: SafeReadFile
 ): Promise<Set<string>> {

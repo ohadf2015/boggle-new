@@ -36,7 +36,7 @@ export function RankUpCinematic({ from, to, onDismiss }: RankUpCinematicProps) {
     <AnimatePresence>
       <motion.div
         data-testid="rank-up-cinematic"
-        className={`fixed inset-0 z-[100] flex flex-col items-center justify-center bg-gradient-to-b ${bgGradient} cursor-pointer`}
+        className={`fixed inset-0 z-[100] flex flex-col items-center justify-center bg-linear-to-b ${bgGradient} cursor-pointer`}
         onClick={onDismiss}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}

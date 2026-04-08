@@ -310,13 +310,13 @@ const PlayerInsights = memo<PlayerInsightsProps>(({ insights }) => {
           transition={{ delay: 0.1, type: 'spring', stiffness: 300, damping: 26 }}
           className={cn(
             'mb-3 p-3 rounded-neo border-3 border-neo-black',
-            'bg-gradient-to-br from-neo-pink to-neo-pink-light',
+            'bg-linear-to-br from-neo-pink to-neo-pink-light',
             'shadow-hard relative overflow-hidden'
           )}
         >
           {/* Comic-style halftone pattern - subtle for featured card */}
           <div
-            className="absolute inset-0 pointer-events-none opacity-[0.08] bg-[radial-gradient(circle,var(--neo-cream)_1px,transparent_1px)] bg-[length:12px_12px]"
+            className="absolute inset-0 pointer-events-none opacity-[0.08] bg-[radial-gradient(circle,var(--neo-cream)_1px,transparent_1px)] bg-size-[12px_12px]"
           />
           <div className="relative z-10">
             <div className="flex items-center gap-2 mb-2">

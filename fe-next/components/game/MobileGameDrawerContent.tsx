@@ -203,7 +203,7 @@ export function MobileGameDrawerContent({
               item.highlight && 'border-neo-lime/40 bg-neo-lime/10'
             )}
           >
-            <span className={cn('flex-shrink-0', item.color || 'text-neo-cream/70')}>
+            <span className={cn('shrink-0', item.color || 'text-neo-cream/70')}>
               {item.icon}
             </span>
             <div className="min-w-0 flex-1">

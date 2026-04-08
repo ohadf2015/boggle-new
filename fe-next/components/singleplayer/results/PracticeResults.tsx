@@ -434,7 +434,7 @@ const PracticeResults = memo(function PracticeResults({
       </div>
 
       {/* ── Mobile sticky bottom — play again + back ── */}
-      <div className="md:hidden fixed bottom-0 inset-x-0 z-50 bg-neo-navy/95 backdrop-blur-sm border-t-3 border-neo-black safe-area-bottom px-3 py-2.5">
+      <div className="md:hidden fixed bottom-0 inset-x-0 z-50 bg-neo-navy/95 backdrop-blur-xs border-t-3 border-neo-black safe-area-bottom px-3 py-2.5">
         <div className="flex gap-2">
           <button
             onClick={onBackToLobby}

@@ -30,7 +30,7 @@ export function LandingYourRank() {
     <motion.div
       className={cn(
         'w-full max-w-md mx-auto lg:max-w-none',
-        'bg-gradient-to-r from-neo-navy-light to-neo-navy',
+        'bg-linear-to-r from-neo-navy-light to-neo-navy',
         'border-3 border-neo-black shadow-hard-lg rounded-neo-lg',
         'p-4 sm:p-5 flex items-center gap-4',
         'relative overflow-hidden'
@@ -41,7 +41,7 @@ export function LandingYourRank() {
       transition={{ type: 'spring', stiffness: 300, damping: 22 }}
     >
       {/* Subtle rank badge glow */}
-      <div className="absolute -top-6 -start-6 w-24 h-24 rounded-full bg-neo-lime/10 blur-2xl pointer-events-none" aria-hidden="true" />
+      <div className="absolute -top-6 -inset-s-6 w-24 h-24 rounded-full bg-neo-lime/10 blur-2xl pointer-events-none" aria-hidden="true" />
 
       <div className={cn(
         'w-12 h-12 rounded-neo border-3 border-neo-black shadow-hard-sm',

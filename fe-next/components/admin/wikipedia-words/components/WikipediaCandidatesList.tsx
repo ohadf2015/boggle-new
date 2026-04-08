@@ -323,7 +323,7 @@ export function WikipediaCandidatesList({
                       className="flex items-center gap-1 text-sm text-neo-cyan hover:underline truncate"
                     >
                       {candidate.source_article_title}
-                      <ExternalLink className="w-3 h-3 flex-shrink-0" />
+                      <ExternalLink className="w-3 h-3 shrink-0" />
                     </a>
                   ) : (
                     <span className="text-gray-400 text-sm">-</span>

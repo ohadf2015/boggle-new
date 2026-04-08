@@ -113,7 +113,7 @@ export function LandingBlogSection() {
                 'transition-all hover:scale-[1.02]'
               )}
             >
-              <div className="relative w-full aspect-[16/9] overflow-hidden">
+              <div className="relative w-full aspect-video overflow-hidden">
                 <Image
                   src={post.image}
                   alt={c.title}
@@ -121,7 +121,7 @@ export function LandingBlogSection() {
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                   className="object-cover group-hover:scale-105 transition-transform duration-300"
                 />
-                <div className="absolute top-3 start-3">
+                <div className="absolute top-3 inset-s-3">
                   <span className="inline-block px-3 py-1 text-xs font-bold uppercase rounded-neo border-2 border-neo-black bg-neo-yellow text-neo-black">
                     {c.category}
                   </span>

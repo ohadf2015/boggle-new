@@ -202,7 +202,7 @@ export default function StudentLessonView() {
             )}
           >
             {/* Accent bar */}
-            <div className={cn('w-1.5 flex-shrink-0', accentBar)} />
+            <div className={cn('w-1.5 shrink-0', accentBar)} />
 
             <div className="flex-1 p-5">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -225,7 +225,7 @@ export default function StudentLessonView() {
                           ],
                         }}
                         transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-                        className="flex-shrink-0 flex items-center gap-1 px-2 py-0.5 bg-neo-cyan border-2 border-black text-black text-xs font-black rounded-neo shadow-hard-sm"
+                        className="shrink-0 flex items-center gap-1 px-2 py-0.5 bg-neo-cyan border-2 border-black text-black text-xs font-black rounded-neo shadow-hard-sm"
                       >
                         <Star className="w-3 h-3 fill-current" />
                         NEW
@@ -237,7 +237,7 @@ export default function StudentLessonView() {
                         variants={doneBadge}
                         initial="hidden"
                         animate="visible"
-                        className="flex-shrink-0 px-2 py-0.5 bg-neo-lime border-2 border-black text-black text-xs font-black rounded-neo shadow-hard-sm"
+                        className="shrink-0 px-2 py-0.5 bg-neo-lime border-2 border-black text-black text-xs font-black rounded-neo shadow-hard-sm"
                       >
                         ✓ DONE
                       </AdaptiveMotion.span>
@@ -282,7 +282,7 @@ export default function StudentLessonView() {
                 </div>
 
                 {/* Practice button */}
-                <div className="sm:flex-shrink-0 w-full sm:w-auto">
+                <div className="sm:shrink-0 w-full sm:w-auto">
                   <QuickPracticeButton
                     lessonId={studentLesson.lessonId}
                     onPractice={(mode: PracticeType) => {

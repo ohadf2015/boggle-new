@@ -76,7 +76,7 @@ export function SettingsPanel({
     >
       {/* Game Mode Section */}
       <div className="relative rounded-neo-lg border-4 border-neo-black bg-slate-800 shadow-hard overflow-hidden">
-        <div className="absolute top-0 left-0 right-0 h-1.5 xl:h-2 bg-gradient-to-r from-neo-pink via-neo-yellow to-neo-cyan" />
+        <div className="absolute top-0 left-0 right-0 h-1.5 xl:h-2 bg-linear-to-r from-neo-pink via-neo-yellow to-neo-cyan" />
 
         <div className="p-4 pt-5 xl:p-5 xl:pt-6">
           <p className="text-xs xl:text-sm font-bold uppercase text-neo-cream/60 mb-3 xl:mb-4">

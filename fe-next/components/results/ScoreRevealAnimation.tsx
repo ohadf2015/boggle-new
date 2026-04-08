@@ -231,10 +231,10 @@ const ScoreRevealAnimation = memo<ScoreRevealAnimationProps>(({
           'flex items-center gap-3 p-2.5 rounded-neo border-3 border-neo-black transition-colors duration-300 relative overflow-hidden',
           isTop3
             ? position === 0
-              ? 'bg-gradient-to-r from-neo-lime/20 via-neo-lime/10 to-neo-lime/20 border-neo-lime'
+              ? 'bg-linear-to-r from-neo-lime/20 via-neo-lime/10 to-neo-lime/20 border-neo-lime'
               : position === 1
-                ? 'bg-gradient-to-r from-slate-400/15 via-slate-300/10 to-slate-400/15 border-slate-400'
-                : 'bg-gradient-to-r from-neo-orange/15 via-neo-orange/10 to-neo-orange/15 border-neo-orange'
+                ? 'bg-linear-to-r from-slate-400/15 via-slate-300/10 to-slate-400/15 border-slate-400'
+                : 'bg-linear-to-r from-neo-orange/15 via-neo-orange/10 to-neo-orange/15 border-neo-orange'
             : 'bg-slate-800/60 border-slate-700',
           isCurrentPlayer && 'ring-2 ring-neo-cyan ring-offset-1 ring-offset-neo-navy',
           'shadow-hard-sm',
@@ -243,7 +243,7 @@ const ScoreRevealAnimation = memo<ScoreRevealAnimationProps>(({
         )}
       >
         {/* Halftone texture overlay */}
-        <div className="absolute inset-0 pointer-events-none opacity-[0.03] bg-[radial-gradient(circle,#fff_1px,transparent_1px)] bg-[length:8px_8px]" />
+        <div className="absolute inset-0 pointer-events-none opacity-[0.03] bg-[radial-gradient(circle,#fff_1px,transparent_1px)] bg-size-[8px_8px]" />
 
         {/* Rank badge */}
         <div className={cn(
@@ -303,7 +303,7 @@ const ScoreRevealAnimation = memo<ScoreRevealAnimationProps>(({
               initial={{ opacity: 0, scale: 0.5 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.5 }}
-              className="absolute end-0 -top-2"
+              className="absolute inset-e-0 -top-2"
             >
               <Zap className="w-4 h-4 text-neo-lime" />
             </motion.div>
@@ -323,7 +323,7 @@ const ScoreRevealAnimation = memo<ScoreRevealAnimationProps>(({
           className="h-2 bg-neo-black border-3 border-slate-700 overflow-hidden mb-3 shadow-hard-sm"
         >
           <motion.div
-            className="h-full bg-gradient-to-r from-neo-lime via-neo-cyan to-neo-lime"
+            className="h-full bg-linear-to-r from-neo-lime via-neo-cyan to-neo-lime"
             style={{
               boxShadow: '0 0 12px var(--neo-lime, #BFFF00)',
               backgroundSize: '200% 100%',

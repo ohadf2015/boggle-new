@@ -38,7 +38,7 @@ function PackCard({
     <div
       className={cn(
         'rounded-neo border-3 border-black shadow-hard bg-neo-navy/80',
-        'border-l-[8px]',
+        'border-l-8',
         colors.border,
         'flex flex-col'
       )}

@@ -139,7 +139,7 @@ export default function PersonalizedDrillRecommendation({
       animate={{ opacity: 1, y: 0 }}
       className={cn(
         'rounded-neo border-3 border-neo-black shadow-hard p-4',
-        isDarkMode ? 'bg-neo-navy' : 'bg-gradient-to-br from-neo-cream to-white'
+        isDarkMode ? 'bg-neo-navy' : 'bg-linear-to-br from-neo-cream to-white'
       )}
     >
       {/* Header */}

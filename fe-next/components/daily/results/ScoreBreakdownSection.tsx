@@ -112,7 +112,7 @@ export const ScoreBreakdownSection: React.FC<ScoreBreakdownSectionProps> = ({
   return (
     <div className="rounded-neo border-3 border-neo-black bg-slate-900 overflow-hidden shadow-hard">
       {/* Header with total score */}
-      <div className="p-4 bg-gradient-to-r from-purple-900/50 to-indigo-900/50 border-b-3 border-neo-black">
+      <div className="p-4 bg-linear-to-r from-purple-900/50 to-indigo-900/50 border-b-3 border-neo-black">
         <div className="text-center">
           <div className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">
             {t('wordHunt.score.title')}
@@ -140,7 +140,7 @@ export const ScoreBreakdownSection: React.FC<ScoreBreakdownSectionProps> = ({
               initial={{ width: 0 }}
               animate={{ width: `${(breakdown.total / 1000) * 100}%` }}
               transition={{ duration: 0.8, ease: 'easeOut' }}
-              className={`h-full rounded-full ${isPerfect ? 'bg-neo-lime' : 'bg-gradient-to-r from-neo-cyan via-neo-lime to-neo-pink'}`}
+              className={`h-full rounded-full ${isPerfect ? 'bg-neo-lime' : 'bg-linear-to-r from-neo-cyan via-neo-lime to-neo-pink'}`}
             />
           </div>
 
@@ -221,8 +221,8 @@ export const ScoreBreakdownSection: React.FC<ScoreBreakdownSectionProps> = ({
           transition={{ delay: 0.5, type: 'spring', stiffness: 280, damping: 26 }}
           className="px-4 pb-4"
         >
-          <div className="flex items-center gap-2 p-3 bg-gradient-to-r from-neo-cyan/10 to-neo-pink/10 rounded-lg border border-gray-700">
-            <TrendingUp className="w-4 h-4 text-neo-cyan flex-shrink-0" />
+          <div className="flex items-center gap-2 p-3 bg-linear-to-r from-neo-cyan/10 to-neo-pink/10 rounded-lg border border-gray-700">
+            <TrendingUp className="w-4 h-4 text-neo-cyan shrink-0" />
             <span className="text-sm text-gray-300">
               {improvementTip.tip}
               <span className="text-neo-lime font-bold ms-1">

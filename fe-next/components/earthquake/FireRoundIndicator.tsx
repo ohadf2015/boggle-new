@@ -31,7 +31,7 @@ export const FireRoundIndicator: React.FC<FireRoundIndicatorProps> = ({
     if (!isActive) return null;
     return (
       <div className="fixed z-50" style={{ top: 'calc(5rem + var(--cap-safe-area-top, env(safe-area-inset-top, 0px)))' }} role="status" aria-live="polite" aria-label={`${t('earthquake.fireRound')} - ${remainingSeconds}s`}>
-        <div className="relative bg-gradient-to-r from-neo-orange to-neo-red border-4 border-neo-black rounded-neo-lg px-4 py-2 shadow-hard-lg ltr:right-4 rtl:left-4">
+        <div className="relative bg-linear-to-r from-neo-orange to-neo-red border-4 border-neo-black rounded-neo-lg px-4 py-2 shadow-hard-lg ltr:right-4 rtl:left-4">
           <div className="relative z-10 flex items-center gap-2">
             <span className="text-2xl">🔥</span>
             <div className="flex flex-col">
@@ -68,7 +68,7 @@ export const FireRoundIndicator: React.FC<FireRoundIndicatorProps> = ({
         >
           {/* Fire Round Badge */}
           <div
-            className="relative bg-gradient-to-r from-neo-orange to-neo-red border-4 border-neo-black rounded-neo-lg px-4 py-2 shadow-hard-lg"
+            className="relative bg-linear-to-r from-neo-orange to-neo-red border-4 border-neo-black rounded-neo-lg px-4 py-2 shadow-hard-lg"
             style={{
               animation: 'fire-badge-pulse 1.5s ease-in-out infinite',
             }}

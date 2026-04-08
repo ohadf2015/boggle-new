@@ -139,7 +139,7 @@ const GameplayBackground = memo<GameplayBackgroundProps>(({ className, children 
       />
 
       {/* Margin-only ambient particles — never cross the grid */}
-      <MarginParticles worldId={worldId} className="z-[5]" />
+      <MarginParticles worldId={worldId} className="z-5" />
 
       {/* Content layer */}
       <div className="relative z-10 w-full h-full">

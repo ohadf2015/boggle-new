@@ -36,7 +36,7 @@ export default function AdventureViewHeader({
   );
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-30 px-4 py-2 sm:px-6 lg:px-8 bg-neo-navy/90 backdrop-blur-sm flex-shrink-0" style={{ paddingTop: 'max(0.5rem, env(safe-area-inset-top, 0.5rem))' }}>
+    <header className="fixed top-0 left-0 right-0 z-30 px-4 py-2 sm:px-6 lg:px-8 bg-neo-navy/90 backdrop-blur-xs shrink-0" style={{ paddingTop: 'max(0.5rem, env(safe-area-inset-top, 0.5rem))' }}>
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         {/* Back — ghost icon, no border */}
         {(viewState !== 'worldMap' || worldMapUsesHistoryBack) ? (

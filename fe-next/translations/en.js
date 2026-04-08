@@ -9814,6 +9814,17 @@ const en = {
     "title": "Ranked",
     "progress": "{{percent}}% to next tier"
   },
+  "matchmaking": {
+    "rankedMatch": "Ranked Match",
+    "findingOpponent": "Finding opponent…",
+    "eloRange": "{{elo}} ELO (±{{range}})",
+    "playersInQueue": "{{count}} in queue",
+    "estimatedWait": "~{{time}}",
+    "cancel": "Cancel",
+    "matchFound": "Match Found!",
+    "timeout": "No opponent found",
+    "createRoom": "Create a Room Instead"
+  },
   "seasonalEvent": {
     "ariaLabel": "Seasonal event",
     "rewards": "Rewards",

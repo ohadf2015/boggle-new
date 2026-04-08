@@ -167,7 +167,7 @@ export const BulkGenerator: React.FC<BulkGeneratorProps> = ({
                     key={item.date}
                     className="flex items-center gap-2 p-2 bg-gray-50 dark:bg-slate-700/50 rounded-lg border border-gray-200 dark:border-slate-600"
                   >
-                    <div className="flex-shrink-0 text-xs text-gray-500 dark:text-gray-400 w-20">
+                    <div className="shrink-0 text-xs text-gray-500 dark:text-gray-400 w-20">
                       {formatDateDisplay(item.date)}
                     </div>
                     <input
@@ -184,7 +184,7 @@ export const BulkGenerator: React.FC<BulkGeneratorProps> = ({
                     />
                     {item.reason && (
                       <span
-                        className="flex-shrink-0 text-xs text-gray-400 truncate max-w-[80px]"
+                        className="shrink-0 text-xs text-gray-400 truncate max-w-[80px]"
                         title={item.reason}
                       >
                         {item.reason.length > 15 ? item.reason.slice(0, 15) + '...' : item.reason}

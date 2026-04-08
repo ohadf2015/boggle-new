@@ -37,7 +37,7 @@ const FullWidthBannerLayout = memo<FullWidthBannerLayoutProps>(({
       transition={{ type: 'spring', stiffness: 400, damping: 25 }}
       className={cn(
         'w-[90vw] max-w-4xl px-8 py-5 rounded-neo border-4',
-        `bg-gradient-to-r ${bgGradient}`,
+        `bg-linear-to-r ${bgGradient}`,
         textColor,
         borderColor,
         'shadow-hard-xl',
@@ -48,7 +48,7 @@ const FullWidthBannerLayout = memo<FullWidthBannerLayoutProps>(({
         <motion.div
           animate={{ rotate: [0, -5, 5, 0], scale: [1, 1.1, 1] }}
           transition={{ duration: 0.6, repeat: Infinity }}
-          className="flex-shrink-0"
+          className="shrink-0"
         >
           <Icon className="w-12 h-12 md:w-16 md:h-16" />
         </motion.div>
@@ -79,7 +79,7 @@ const FullWidthBannerLayout = memo<FullWidthBannerLayoutProps>(({
           initial={{ scale: 0, rotate: 20 }}
           animate={{ scale: 1, rotate: 0 }}
           transition={{ type: 'spring', stiffness: 500, damping: 20, delay: 0.15 }}
-          className="flex-shrink-0"
+          className="shrink-0"
         >
           <Mascot
             variant={mascotVariant}

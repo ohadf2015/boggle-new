@@ -30,7 +30,7 @@ export function ImagePreviewModal({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-black/85 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+      className="fixed inset-0 bg-black/85 backdrop-blur-xs flex items-center justify-center z-50 p-4"
       onClick={onClose}
     >
       <motion.div
@@ -56,7 +56,7 @@ export function ImagePreviewModal({
 
         {/* Image preview */}
         <div className="relative rounded-lg overflow-hidden border border-slate-600 mb-4 bg-slate-800">
-          <div className="absolute inset-0 bg-gradient-to-br from-neo-cyan/5 via-transparent to-neo-pink/5 pointer-events-none" />
+          <div className="absolute inset-0 bg-linear-to-br from-neo-cyan/5 via-transparent to-neo-pink/5 pointer-events-none" />
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={shareImage.dataUrl}

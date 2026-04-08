@@ -202,7 +202,7 @@ describe('Profile Mobile Tab Navigation', () => {
       const { container } = render(<ProfilePageClient />, { wrapper: createWrapper() });
 
       // Find the right-side swipe indicator gradient
-      const rightIndicator = container.querySelector('[aria-hidden="true"].bg-gradient-to-l');
+      const rightIndicator = container.querySelector('[aria-hidden="true"].bg-linear-to-l');
       expect(rightIndicator).toBeInTheDocument();
     });
 
@@ -210,7 +210,7 @@ describe('Profile Mobile Tab Navigation', () => {
       const { container } = render(<ProfilePageClient />, { wrapper: createWrapper() });
 
       // Find the chevron icons in swipe indicators (end side for "next" direction)
-      const rightIndicator = container.querySelector('[aria-hidden="true"].end-0');
+      const rightIndicator = container.querySelector('[aria-hidden="true"].inset-e-0');
 
       if (rightIndicator) {
         const chevronIcon = rightIndicator.querySelector('svg');

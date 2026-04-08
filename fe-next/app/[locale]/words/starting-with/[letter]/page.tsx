@@ -204,7 +204,7 @@ export default async function StartingWithLetterPage({ params }: PageParams) {
 
           {/* Hero CTA — above the fold, with pulse */}
           <ScrollReveal delay={0.15} className="mb-8">
-            <div className="bg-gradient-to-r from-neo-lime/10 to-neo-cyan/10 border-3 border-neo-lime rounded-neo p-5 shadow-hard">
+            <div className="bg-linear-to-r from-neo-lime/10 to-neo-cyan/10 border-3 border-neo-lime rounded-neo p-5 shadow-hard">
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                 <div className="flex-1">
                   <p className="font-neo-display font-black text-xl text-neo-white mb-1">
@@ -415,7 +415,7 @@ export default async function StartingWithLetterPage({ params }: PageParams) {
 
           {/* Bottom CTA — final conversion push */}
           <ScrollReveal direction="scale" className="mt-10">
-            <div className="bg-gradient-to-r from-neo-lime/10 to-neo-pink/10 border-3 border-neo-lime rounded-neo p-6 shadow-hard text-center">
+            <div className="bg-linear-to-r from-neo-lime/10 to-neo-pink/10 border-3 border-neo-lime rounded-neo p-6 shadow-hard text-center">
               <p className="font-neo-display font-black text-2xl text-neo-white mb-2">
                 Ready to test your {upper}-word skills?
               </p>

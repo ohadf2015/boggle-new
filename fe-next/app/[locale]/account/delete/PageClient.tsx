@@ -109,7 +109,7 @@ export default function DeleteAccountPageClient() {
           {step === 'email' && (
             <div className="space-y-4">
               <div className="flex items-start gap-2">
-                <Mail className={cn('w-5 h-5 flex-shrink-0 mt-0.5', isDarkMode ? 'text-gray-400' : 'text-gray-500')} />
+                <Mail className={cn('w-5 h-5 shrink-0 mt-0.5', isDarkMode ? 'text-gray-400' : 'text-gray-500')} />
                 <p className={cn('text-sm', isDarkMode ? 'text-gray-300' : 'text-gray-700')}>
                   {t('deleteAccountWeb.enterEmail')}
                 </p>
@@ -155,7 +155,7 @@ export default function DeleteAccountPageClient() {
           {step === 'confirm' && (
             <div className="space-y-4">
               <div className="flex items-start gap-2">
-                <AlertTriangle className="w-5 h-5 text-neo-red flex-shrink-0 mt-0.5" />
+                <AlertTriangle className="w-5 h-5 text-neo-red shrink-0 mt-0.5" />
                 <p className={cn('text-sm font-medium', isDarkMode ? 'text-gray-300' : 'text-gray-700')}>
                   {t('settings.deleteAccountConfirm')}
                 </p>

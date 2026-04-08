@@ -27,7 +27,7 @@ export const LifeGainAnimation: React.FC<LifeGainAnimationProps> = ({
           <div className="flex items-center gap-2 px-3 py-1.5 bg-emerald-500 border-3 border-neo-black rounded-neo shadow-hard relative overflow-hidden">
             {/* Shimmer sweep across the badge */}
             <motion.div
-              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
+              className="absolute inset-0 bg-linear-to-r from-transparent via-white/30 to-transparent"
               initial={{ x: '-100%' }}
               animate={{ x: '200%' }}
               transition={{ duration: 0.6, ease: 'easeOut' }}

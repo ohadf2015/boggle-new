@@ -168,7 +168,7 @@ export default function ActivityFeed({ classroomId, userId }: ActivityFeedProps)
               {/* Avatar */}
               <motion.div
                 className={cn(
-                  'flex-shrink-0 w-10 h-10 rounded-full border-2 border-black flex items-center justify-center text-lg shadow-hard-sm',
+                  'shrink-0 w-10 h-10 rounded-full border-2 border-black flex items-center justify-center text-lg shadow-hard-sm',
                   isCurrentUser ? 'bg-neo-cyan' : 'bg-neo-lime'
                 )}
                 whileHover={{ scale: 1.15, rotate: -8 }}
@@ -194,7 +194,7 @@ export default function ActivityFeed({ classroomId, userId }: ActivityFeedProps)
               <motion.div
                 data-testid={`activity-icon-${activity.type}`}
                 className={cn(
-                  'flex-shrink-0 w-9 h-9 rounded-neo border-2 border-black flex items-center justify-center shadow-hard-sm',
+                  'shrink-0 w-9 h-9 rounded-neo border-2 border-black flex items-center justify-center shadow-hard-sm',
                   isDuel ? 'bg-neo-lime' : 'bg-neo-cyan'
                 )}
                 whileHover={{ scale: 1.2, rotate: 8 }}

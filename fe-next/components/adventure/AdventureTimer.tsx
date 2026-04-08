@@ -157,7 +157,7 @@ const AdventureTimerDisplay = memo<AdventureTimerDisplayProps>(
           sizeClasses[size],
           isEmbedded
             ? cn('relative', isDanger ? 'text-neo-red' : themeLevel.text)
-            : cn('rounded-neo border-2 backdrop-blur-sm', themeLevel.bg, themeLevel.text, themeLevel.shadow),
+            : cn('rounded-neo border-2 backdrop-blur-xs', themeLevel.bg, themeLevel.text, themeLevel.shadow),
           className
         )}
         animate={shouldPulse ? {

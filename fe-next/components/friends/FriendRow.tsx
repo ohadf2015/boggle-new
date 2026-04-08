@@ -57,7 +57,7 @@ const FriendStatusIndicator: React.FC<{
   return (
     <div
       className={cn(
-        'absolute -bottom-0.5 -end-0.5 rounded-full border-2 border-slate-800',
+        'absolute -bottom-0.5 -inset-e-0.5 rounded-full border-2 border-slate-800',
         dotSize,
         isOnline
           ? 'bg-green-500 shadow-[0_0_6px_rgba(34,197,94,0.6)]'
@@ -143,7 +143,7 @@ export const FriendRow: React.FC<FriendRowProps> = ({
         {!compact && (
           <div className="flex items-center gap-1">
             {!friend.isOnline && (
-              <Clock className={cn('w-3 h-3 flex-shrink-0', isDark ? 'text-gray-500' : 'text-gray-400')} />
+              <Clock className={cn('w-3 h-3 shrink-0', isDark ? 'text-gray-500' : 'text-gray-400')} />
             )}
             <p className={cn(
               'text-xs truncate',

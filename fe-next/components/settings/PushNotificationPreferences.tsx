@@ -121,7 +121,7 @@ export function PushNotificationPreferences({ isDarkMode }: PushNotificationPref
           'flex items-start gap-3 p-4 rounded-xl mb-4',
           isDarkMode ? 'bg-red-900/20 border border-red-800/30' : 'bg-red-50 border border-red-200'
         )}>
-          <AlertTriangle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+          <AlertTriangle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
           <div>
             <p className={cn(
               'font-medium',
@@ -186,7 +186,7 @@ export function PushNotificationPreferences({ isDarkMode }: PushNotificationPref
           onClick={handleToggle}
           disabled={isSaving || permissionStatus === 'denied'}
           className={cn(
-            'relative w-14 h-8 rounded-full transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2',
+            'relative w-14 h-8 rounded-full transition-colors duration-200 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2',
             preferences.enabled
               ? 'bg-neo-lime'
               : isDarkMode ? 'bg-slate-600' : 'bg-gray-300',
@@ -247,7 +247,7 @@ export function PushNotificationPreferences({ isDarkMode }: PushNotificationPref
               disabled={isSaving}
               aria-label="Select hour"
               className={cn(
-                'flex-1 px-4 py-2 rounded-lg border-2 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2',
+                'flex-1 px-4 py-2 rounded-lg border-2 transition-colors focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2',
                 isDarkMode
                   ? 'bg-slate-800 border-slate-600 text-white'
                   : 'bg-white border-gray-300 text-gray-900',
@@ -268,7 +268,7 @@ export function PushNotificationPreferences({ isDarkMode }: PushNotificationPref
               disabled={isSaving}
               aria-label="Select minute"
               className={cn(
-                'w-24 px-4 py-2 rounded-lg border-2 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2',
+                'w-24 px-4 py-2 rounded-lg border-2 transition-colors focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2',
                 isDarkMode
                   ? 'bg-slate-800 border-slate-600 text-white'
                   : 'bg-white border-gray-300 text-gray-900',

@@ -199,7 +199,7 @@ export function InviteCard({
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              className="flex-shrink-0 p-2 bg-white rounded-neo border-3 border-neo-black shadow-hard-sm"
+              className="shrink-0 p-2 bg-white rounded-neo border-3 border-neo-black shadow-hard-sm"
             >
               <QRCodeSVG
                 value={joinUrl}

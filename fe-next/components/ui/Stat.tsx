@@ -112,7 +112,7 @@ const VARIANT_STYLES: Record<StatVariant, { bg: string; border: string; text: st
     text: 'text-neo-pink',
   },
   highlight: {
-    bg: 'bg-gradient-to-br from-cyan-900/30 to-blue-900/30',
+    bg: 'bg-linear-to-br from-cyan-900/30 to-blue-900/30',
     border: 'border-neo-cyan/30',
     text: 'text-neo-cyan',
   },
@@ -204,7 +204,7 @@ export function Stat({
     : 'border border-dashed';  // Dashed border for non-interactive
 
   // Determine shadow based on interactive state
-  const shadowStyle = interactive ? 'shadow-sm' : 'shadow-none';
+  const shadowStyle = interactive ? 'shadow-xs' : 'shadow-none';
 
   // Base wrapper classes
   const wrapperClasses = cn(

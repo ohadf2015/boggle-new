@@ -37,7 +37,7 @@ export default function BattlePassTrack() {
   return (
     <div className="border-3 border-neo-black rounded-neo shadow-hard bg-neo-cream overflow-hidden">
       {/* Header */}
-      <div className="bg-gradient-to-r from-neo-purple to-neo-pink p-4 border-b-3 border-neo-black">
+      <div className="bg-linear-to-r from-neo-purple to-neo-pink p-4 border-b-3 border-neo-black">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Crown className="w-6 h-6 text-neo-yellow" />

@@ -121,12 +121,12 @@ export function VocabularyHeatmap({
             {/* Header Row - Student Names */}
             <div className="flex bg-neo-navy">
               {/* Corner cell */}
-              <div className="w-32 flex-shrink-0 p-2 border-neo border-neo-white/20" />
+              <div className="w-32 shrink-0 p-2 border-neo border-neo-white/20" />
               {/* Student name cells */}
               {heatmapData.students.map(student => (
                 <div
                   key={student.id}
-                  className="w-24 flex-shrink-0 p-2 border-neo border-neo-white/20 text-center"
+                  className="w-24 shrink-0 p-2 border-neo border-neo-white/20 text-center"
                 >
                   <span className="text-neo-white text-sm font-neo-display truncate block">
                     {student.name}
@@ -139,7 +139,7 @@ export function VocabularyHeatmap({
             {heatmapData.words.map(word => (
               <div key={word} className="flex">
                 {/* Word label (sticky) */}
-                <div className="w-32 flex-shrink-0 p-2 border-neo border-neo-white/20 bg-neo-navy flex items-center">
+                <div className="w-32 shrink-0 p-2 border-neo border-neo-white/20 bg-neo-navy flex items-center">
                   <span className="text-neo-white text-sm font-neo-body truncate">
                     {word}
                   </span>
@@ -158,7 +158,7 @@ export function VocabularyHeatmap({
                       data-cell="true"
                       data-mastery={cellData?.masteryLevel}
                       className={`
-                        w-24 flex-shrink-0 p-2 border-neo border-neo-white/20
+                        w-24 shrink-0 p-2 border-neo border-neo-white/20
                         ${getMasteryColor(cellData?.masteryLevel || 'not-started')}
                         ${isHovered ? 'shadow-hard-sm' : ''}
                         cursor-pointer transition-shadow

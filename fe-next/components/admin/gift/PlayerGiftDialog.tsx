@@ -254,7 +254,7 @@ export function PlayerGiftDialog({
       case 'preview':
         return (
           <div className="space-y-4">
-            <div className="p-4 bg-gradient-to-br from-amber-50 to-purple-50 dark:from-amber-900/20 dark:to-purple-900/20 rounded-lg border-2 border-amber-200 dark:border-amber-800">
+            <div className="p-4 bg-linear-to-br from-amber-50 to-purple-50 dark:from-amber-900/20 dark:to-purple-900/20 rounded-lg border-2 border-amber-200 dark:border-amber-800">
               {/* Preview Header */}
               <div className="text-center mb-4">
                 <Gift className="w-12 h-12 text-amber-500 mx-auto mb-2" />
@@ -264,7 +264,7 @@ export function PlayerGiftDialog({
               </div>
 
               {/* Preview Content */}
-              <div className="bg-white dark:bg-slate-800 rounded-lg p-4 shadow-sm">
+              <div className="bg-white dark:bg-slate-800 rounded-lg p-4 shadow-xs">
                 <h3 className="font-bold text-lg mb-2">{title}</h3>
                 <p className="text-sm text-slate-600 dark:text-slate-400 whitespace-pre-wrap">
                   {message}

@@ -37,13 +37,13 @@ function CategoryToggle({ label, checked, onChange, icon }: CategoryToggleProps)
         aria-label={label}
         onClick={() => onChange(!checked)}
         className={cn(
-          'relative w-11 h-6 rounded-full transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan',
+          'relative w-11 h-6 rounded-full transition-colors duration-200 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan',
           checked ? 'bg-neo-lime' : 'bg-slate-600'
         )}
       >
         <span
           className={cn(
-            'absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform duration-200',
+            'absolute top-0.5 w-5 h-5 rounded-full bg-white shadow-sm transition-transform duration-200',
             checked ? 'translate-x-5.5' : 'translate-x-0.5'
           )}
         />
@@ -72,7 +72,7 @@ export function NotificationCategoryPreferences() {
       className="rounded-neo border-neo border-slate-700 bg-slate-800/50 p-5"
     >
       <h3 className="flex items-center gap-2 font-neo-display text-base font-bold text-neo-white mb-3">
-        <Bell className="w-5 h-5 text-neo-orange" />
+        <Bell className="w-5 h-5 text-neo-pink" />
         {t('notifications.preferences.title')}
       </h3>
 

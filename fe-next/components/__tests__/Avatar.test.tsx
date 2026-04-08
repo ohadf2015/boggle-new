@@ -159,9 +159,9 @@ describe('Avatar', () => {
       expect(container.querySelector('.rounded-full')).toBeInTheDocument();
     });
 
-    it('has flex-shrink-0 to prevent shrinking in flex containers', () => {
+    it('has shrink-0 to prevent shrinking in flex containers', () => {
       const { container } = render(<Avatar userId="test" />);
-      expect(container.querySelector('.flex-shrink-0')).toBeInTheDocument();
+      expect(container.querySelector('.shrink-0')).toBeInTheDocument();
     });
   });
 

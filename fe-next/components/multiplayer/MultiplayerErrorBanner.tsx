@@ -55,7 +55,7 @@ export const MultiplayerErrorBanner: React.FC<MultiplayerErrorBannerProps> = ({
           <button
             onClick={onRetry}
             aria-label={t('common.retry')}
-            className="flex items-center gap-1 px-3 py-1 bg-neo-white rounded-neo border-2 border-neo-black text-xs font-black uppercase hover:bg-neo-cream active:translate-y-0.5 transition-all focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime"
+            className="flex items-center gap-1 px-3 py-1 bg-neo-white rounded-neo border-2 border-neo-black text-xs font-black uppercase hover:bg-neo-cream active:translate-y-0.5 transition-all focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-lime"
           >
             <RefreshCw className="w-3 h-3" />
             {t('common.retry')}
@@ -64,7 +64,7 @@ export const MultiplayerErrorBanner: React.FC<MultiplayerErrorBannerProps> = ({
         <button
           onClick={onDismiss}
           aria-label={t('common.dismiss')}
-          className="w-7 h-7 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full hover:bg-neo-black/10 transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime"
+          className="w-7 h-7 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full hover:bg-neo-black/10 transition-colors focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-lime"
         >
           <X className="w-4 h-4" />
         </button>

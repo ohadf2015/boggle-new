@@ -66,9 +66,9 @@ export const NOTIFICATION_TYPE_ICONS: Record<NotificationType, string> = {
 
 // Color mapping for notification types
 export const NOTIFICATION_TYPE_COLORS: Record<NotificationType, string> = {
-  gift: 'bg-neo-yellow',
+  gift: 'bg-neo-lime',
   system: 'bg-neo-cyan',
-  achievement: 'bg-neo-orange',
+  achievement: 'bg-neo-purple',
   social: 'bg-neo-pink',
   marketing: 'bg-neo-lime',
 };

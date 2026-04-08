@@ -6,7 +6,7 @@
  * Shows bot header with score and expandable word list.
  */
 
-import React from 'react';
+import React, { memo, useMemo } from 'react';
 import { Bot } from 'lucide-react';
 import { getPointColor, getTextColor } from '@/components/results/utils';
 import { applyHebrewFinalLetters } from '@/utils/utils';
@@ -22,7 +22,16 @@ interface BotWordCardProps {
 /**
  * Card displaying a bot's found words with styling
  */
-export function BotWordCard({ bot, language, t }: BotWordCardProps): React.ReactElement {
+export const BotWordCard = memo(function BotWordCard({ bot, language, t }: BotWordCardProps): React.ReactElement {
+  const processedWords = useMemo(() =>
+    (bot.words ?? []).slice(0, 20).map(word => ({
+      word,
+      points: calculateWordScore(word),
+      displayWord: language === 'he' ? applyHebrewFinalLetters(word) : word,
+    })),
+    [bot.words, language]
+  );
+
   return (
     <div className="bg-slate-800/50 border-2 border-slate-600 rounded-neo p-3">
       <div className="flex items-center justify-between mb-2">
@@ -39,11 +48,9 @@ export function BotWordCard({ bot, language, t }: BotWordCardProps): React.React
           <span className="text-sm font-black text-neo-lime">{bot.score} pts</span>
         </div>
       </div>
-      {bot.words && bot.words.length > 0 ? (
+      {processedWords.length > 0 ? (
         <div className="flex flex-wrap gap-1">
-          {bot.words.slice(0, 20).map((word, i) => {
-            const points = calculateWordScore(word);
-            const displayWord = language === 'he' ? applyHebrewFinalLetters(word) : word;
+          {processedWords.map(({ word, points, displayWord }, i) => {
             return (
               <span
                 key={`${word}-${i}`}
@@ -68,4 +75,4 @@ export function BotWordCard({ bot, language, t }: BotWordCardProps): React.React
       )}
     </div>
   );
-}
+});

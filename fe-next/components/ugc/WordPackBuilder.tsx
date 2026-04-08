@@ -110,7 +110,7 @@ export default function WordPackBuilder({ isOpen, onClose }: WordPackBuilderProp
               value={hook.name}
               onChange={(e) => hook.setName(e.target.value)}
               placeholder={t('ugc.pack.builder.namePlaceholder')}
-              className="w-full px-3 py-2 bg-neo-navy border-neo border-black rounded-neo text-neo-white placeholder-neo-white/40 focus:outline-none focus:ring-2 focus:ring-neo-yellow"
+              className="w-full px-3 py-2 bg-neo-navy border-neo border-black rounded-neo text-neo-white placeholder-neo-white/40 focus:outline-hidden focus:ring-2 focus:ring-neo-yellow"
             />
           </div>
 
@@ -125,7 +125,7 @@ export default function WordPackBuilder({ isOpen, onClose }: WordPackBuilderProp
               onChange={(e) => hook.setDescription(e.target.value)}
               placeholder={t('ugc.pack.builder.descriptionPlaceholder')}
               rows={2}
-              className="w-full px-3 py-2 bg-neo-navy border-neo border-black rounded-neo text-neo-white placeholder-neo-white/40 focus:outline-none focus:ring-2 focus:ring-neo-yellow resize-none"
+              className="w-full px-3 py-2 bg-neo-navy border-neo border-black rounded-neo text-neo-white placeholder-neo-white/40 focus:outline-hidden focus:ring-2 focus:ring-neo-yellow resize-none"
             />
           </div>
 
@@ -138,7 +138,7 @@ export default function WordPackBuilder({ isOpen, onClose }: WordPackBuilderProp
               <select
                 value={hook.language}
                 onChange={(e) => hook.setLanguage(e.target.value)}
-                className="w-full px-3 py-2 bg-neo-navy border-neo border-black rounded-neo text-neo-white focus:outline-none focus:ring-2 focus:ring-neo-yellow"
+                className="w-full px-3 py-2 bg-neo-navy border-neo border-black rounded-neo text-neo-white focus:outline-hidden focus:ring-2 focus:ring-neo-yellow"
               >
                 {LANGUAGES.map((lang) => (
                   <option key={lang.value} value={lang.value}>
@@ -157,7 +157,7 @@ export default function WordPackBuilder({ isOpen, onClose }: WordPackBuilderProp
                 value={hook.themeEmoji}
                 onChange={(e) => hook.setThemeEmoji(e.target.value)}
                 placeholder="🎯"
-                className="w-full px-3 py-2 bg-neo-navy border-neo border-black rounded-neo text-neo-white text-center text-xl placeholder-neo-white/40 focus:outline-none focus:ring-2 focus:ring-neo-yellow"
+                className="w-full px-3 py-2 bg-neo-navy border-neo border-black rounded-neo text-neo-white text-center text-xl placeholder-neo-white/40 focus:outline-hidden focus:ring-2 focus:ring-neo-yellow"
                 maxLength={2}
               />
             </div>
@@ -207,7 +207,7 @@ export default function WordPackBuilder({ isOpen, onClose }: WordPackBuilderProp
                 onChange={(e) => setWordInput(e.target.value)}
                 onKeyDown={handleWordKeyDown}
                 placeholder={t('ugc.pack.builder.wordPlaceholder')}
-                className="flex-1 px-3 py-2 bg-neo-navy border-neo border-black rounded-neo text-neo-white placeholder-neo-white/40 focus:outline-none focus:ring-2 focus:ring-neo-yellow uppercase"
+                className="flex-1 px-3 py-2 bg-neo-navy border-neo border-black rounded-neo text-neo-white placeholder-neo-white/40 focus:outline-hidden focus:ring-2 focus:ring-neo-yellow uppercase"
               />
               <button
                 type="button"
@@ -284,7 +284,7 @@ export default function WordPackBuilder({ isOpen, onClose }: WordPackBuilderProp
                   onChange={(e) => setBulkText(e.target.value)}
                   placeholder={t('ugc.pack.builder.bulkPlaceholder')}
                   rows={5}
-                  className="w-full px-3 py-2 bg-neo-navy border-neo border-black rounded-neo text-neo-white placeholder-neo-white/40 focus:outline-none focus:ring-2 focus:ring-neo-yellow resize-none uppercase text-sm font-mono"
+                  className="w-full px-3 py-2 bg-neo-navy border-neo border-black rounded-neo text-neo-white placeholder-neo-white/40 focus:outline-hidden focus:ring-2 focus:ring-neo-yellow resize-none uppercase text-sm font-mono"
                 />
                 <button
                   type="button"

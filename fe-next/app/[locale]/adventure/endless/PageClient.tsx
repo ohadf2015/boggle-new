@@ -129,7 +129,7 @@ export default function EndlessPageClient(): React.JSX.Element {
             >
               <Link
                 href={`/${language}/adventure`}
-                className="absolute top-4 start-4 flex items-center gap-2 text-neo-white/60 hover:text-neo-white transition-colors"
+                className="absolute top-4 inset-s-4 flex items-center gap-2 text-neo-white/60 hover:text-neo-white transition-colors"
               >
                 <ArrowLeft className="w-5 h-5 rtl:scale-x-[-1]" />
                 <span className="text-sm font-bold">{t('common.back')}</span>
@@ -152,8 +152,8 @@ export default function EndlessPageClient(): React.JSX.Element {
 
               {endless.highFloor > 0 && (
                 <div className="flex items-center gap-2 px-4 py-2 bg-neo-navy-light border-3 border-neo-black rounded-neo shadow-hard-sm">
-                  <Trophy className="w-5 h-5 text-neo-yellow" />
-                  <span className="text-neo-yellow font-black text-sm">
+                  <Trophy className="w-5 h-5 text-neo-lime" />
+                  <span className="text-neo-lime font-black text-sm">
                     {t('adventure.endlessMode.highFloor', { floor: endless.highFloor })}
                   </span>
                 </div>
@@ -186,7 +186,7 @@ export default function EndlessPageClient(): React.JSX.Element {
                     {t('adventure.endlessMode.floor', { floor: endless.currentFloor })}
                   </span>
                   {levelConfig.isBossLevel && (
-                    <span className="px-2 py-0.5 bg-neo-orange text-neo-white text-xs font-black uppercase rounded-neo border-2 border-neo-black">
+                    <span className="px-2 py-0.5 bg-neo-pink text-neo-white text-xs font-black uppercase rounded-neo border-2 border-neo-black">
                       {t('adventure.endlessMode.bossFloor')}
                     </span>
                   )}
@@ -236,10 +236,10 @@ export default function EndlessPageClient(): React.JSX.Element {
                 <AdaptiveMotion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="flex items-center gap-2 px-4 py-2 bg-neo-yellow/20 border-3 border-neo-yellow rounded-neo"
+                  className="flex items-center gap-2 px-4 py-2 bg-neo-lime/20 border-3 border-neo-lime rounded-neo"
                 >
-                  <Trophy className="w-5 h-5 text-neo-yellow" />
-                  <span className="text-neo-yellow font-black">
+                  <Trophy className="w-5 h-5 text-neo-lime" />
+                  <span className="text-neo-lime font-black">
                     {t('adventure.endlessMode.newRecord')}
                   </span>
                 </AdaptiveMotion.div>
@@ -291,7 +291,7 @@ export default function EndlessPageClient(): React.JSX.Element {
               exit={{ opacity: 0 }}
               className="relative z-10 flex-1 flex flex-col items-center justify-center p-6 gap-5"
             >
-              <h2 className="text-3xl font-black text-neo-orange font-neo-display uppercase">
+              <h2 className="text-3xl font-black text-neo-pink font-neo-display uppercase">
                 {t('adventure.endlessMode.runOver')}
               </h2>
 
@@ -300,9 +300,9 @@ export default function EndlessPageClient(): React.JSX.Element {
               </p>
 
               {isNewRecord && (
-                <div className="flex items-center gap-2 px-4 py-2 bg-neo-yellow/20 border-3 border-neo-yellow rounded-neo">
-                  <Trophy className="w-5 h-5 text-neo-yellow" />
-                  <span className="text-neo-yellow font-black">
+                <div className="flex items-center gap-2 px-4 py-2 bg-neo-lime/20 border-3 border-neo-lime rounded-neo">
+                  <Trophy className="w-5 h-5 text-neo-lime" />
+                  <span className="text-neo-lime font-black">
                     {t('adventure.endlessMode.newRecord')}
                   </span>
                 </div>

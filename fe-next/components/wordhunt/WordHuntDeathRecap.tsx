@@ -100,7 +100,7 @@ const WordHuntDeathRecap = memo<WordHuntDeathRecapProps>(({ stats, t }) => {
       data-testid="death-recap"
     >
       {/* Card */}
-      <div className="bg-neo-navy/95 backdrop-blur-sm border-3 border-neo-red/60 rounded-neo shadow-hard-lg overflow-hidden">
+      <div className="bg-neo-navy/95 backdrop-blur-xs border-3 border-neo-red/60 rounded-neo shadow-hard-lg overflow-hidden">
         {/* Header strip */}
         <div className="bg-neo-red/20 border-b-2 border-neo-red/30 px-4 py-2 flex items-center gap-2">
           <CauseIcon size={16} className="text-neo-red" />
@@ -134,7 +134,7 @@ const WordHuntDeathRecap = memo<WordHuntDeathRecapProps>(({ stats, t }) => {
         {/* Lesson card */}
         <div className="mx-3 mb-3 p-3 rounded-neo bg-neo-cyan/10 border-2 border-neo-cyan/30">
           <div className="flex items-start gap-2">
-            <Zap size={14} className="text-neo-cyan flex-shrink-0 mt-0.5" />
+            <Zap size={14} className="text-neo-cyan shrink-0 mt-0.5" />
             <p className="text-xs font-neo-body text-neo-cream leading-relaxed font-medium">
               {t(lesson.key, lesson.params)}
             </p>

@@ -63,7 +63,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                     "flex items-center justify-between",
                     "px-2 sm:px-3 lg:px-4 py-2 sm:py-2 lg:py-2.5",
                     "bg-neo-white/90 dark:bg-neo-navy",
-                    "backdrop-blur-sm",
+                    "backdrop-blur-xs",
                     "border-b-4 border-neo-black",
                     "transition-all duration-100",
                     "min-w-0"

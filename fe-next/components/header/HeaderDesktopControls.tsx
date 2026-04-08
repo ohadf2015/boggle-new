@@ -22,7 +22,7 @@ const HeaderDesktopControls = memo<HeaderDesktopControlsProps>(({ unclaimedCount
     const engagementStatus = useEngagementStatus();
 
     return (
-        <div className="hidden sm:flex items-center gap-3 flex-shrink-0">
+        <div className="hidden sm:flex items-center gap-3 shrink-0">
             {/* Streak indicator */}
             {isAuthenticated && engagementStatus.streak > 0 && (
                 <Link

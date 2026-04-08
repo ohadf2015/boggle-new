@@ -245,7 +245,7 @@ export default function WordHuntResultsSummary({
                     size="sm"
                   />
                   {isWinner && (
-                    <div className="absolute -top-1 -end-1 text-[8px] font-black bg-neo-lime text-neo-black rounded-full w-3.5 h-3.5 flex items-center justify-center shadow-hard-sm">
+                    <div className="absolute -top-1 -inset-e-1 text-[8px] font-black bg-neo-lime text-neo-black rounded-full w-3.5 h-3.5 flex items-center justify-center shadow-hard-sm">
                       👑
                     </div>
                   )}
@@ -297,7 +297,7 @@ export default function WordHuntResultsSummary({
                       size="sm"
                     />
                   </div>
-                  <div className="absolute -bottom-0.5 -end-0.5 flex items-center justify-center">
+                  <div className="absolute -bottom-0.5 -inset-e-0.5 flex items-center justify-center">
                     <Skull className="w-3 h-3 text-neo-red" />
                   </div>
                 </div>

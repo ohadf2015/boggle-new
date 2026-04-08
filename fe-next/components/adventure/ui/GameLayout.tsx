@@ -48,7 +48,7 @@ export const GameLayout = memo(function GameLayout({
       )}
     >
       {/* Header - Fixed height */}
-      <div className="flex-shrink-0 z-20">
+      <div className="shrink-0 z-20">
         {header}
       </div>
 
@@ -68,11 +68,11 @@ export const GameLayout = memo(function GameLayout({
         */}
         <div
           className={cn(
-            'flex-shrink-0 pointer-events-none',
+            'shrink-0 pointer-events-none',
             'h-px w-full',
-            'bg-gradient-to-r from-transparent via-neo-white/20 to-transparent',
-            'landscape:h-full landscape:w-px landscape:bg-gradient-to-b',
-            'lg:h-full lg:w-px lg:bg-gradient-to-b'
+            'bg-linear-to-r from-transparent via-neo-white/20 to-transparent',
+            'landscape:h-full landscape:w-px landscape:bg-linear-to-b',
+            'lg:h-full lg:w-px lg:bg-linear-to-b'
           )}
           aria-hidden="true"
         />
@@ -84,12 +84,12 @@ export const GameLayout = memo(function GameLayout({
         */}
         <div
           className={cn(
-            'flex-shrink-0 transition-all duration-300',
+            'shrink-0 transition-all duration-300',
             isBossActive
               ? 'h-0 landscape:w-0 lg:w-0 overflow-hidden opacity-0'
               : [
                   // Portrait: flexible bottom bar — fills remaining space below grid
-                  'min-h-20 max-h-48 flex-shrink-[2]',
+                  'min-h-20 max-h-48 shrink-2',
                   // Landscape / desktop: full-height column to the right
                   'landscape:h-full landscape:w-64 landscape:max-h-none landscape:min-h-0',
                   'lg:h-full lg:w-80 xl:w-96 lg:max-h-none lg:min-h-0',

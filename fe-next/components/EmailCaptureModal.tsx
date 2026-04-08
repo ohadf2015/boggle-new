@@ -210,7 +210,7 @@ export function EmailCaptureModal() {
                     placeholder={t('email.placeholder')}
                     aria-invalid={error ? true : undefined}
                     aria-describedby={error ? 'capture-email-error' : undefined}
-                    className="w-full px-4 py-3 bg-neo-cream text-neo-black border-3 border-neo-black rounded-neo shadow-hard-sm placeholder:text-neo-gray placeholder:opacity-75 focus:outline-none focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2 transition-all"
+                    className="w-full px-4 py-3 bg-neo-cream text-neo-black border-3 border-neo-black rounded-neo shadow-hard-sm placeholder:text-neo-gray placeholder:opacity-75 focus:outline-hidden focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2 transition-all"
                     required
                     disabled={subscribeMutation.isPending}
                   />

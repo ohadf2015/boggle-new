@@ -46,7 +46,7 @@ export const TodayParticipantRow = memo<{
         className={`
           w-9 h-9 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center font-black text-sm sm:text-base
           ${getRankBadgeColors(rank)}
-          border-2 shadow-sm
+          border-2 shadow-xs
         `}
       >
         {getRankDisplay(rank)}
@@ -65,7 +65,7 @@ export const TodayParticipantRow = memo<{
         </div>
         {/* Country Flag Badge */}
         {countryFlag && (
-          <div className="absolute -bottom-1 -end-1 text-sm sm:text-base drop-shadow-sm" title={participant.country_code || undefined}>
+          <div className="absolute -bottom-1 -inset-e-1 text-sm sm:text-base drop-shadow-xs" title={participant.country_code || undefined}>
             {countryFlag}
           </div>
         )}
@@ -91,7 +91,7 @@ export const TodayParticipantRow = memo<{
             </span>
           </PlayerProfileTooltip>
           {isCurrentUser && (
-            <span className="text-[10px] sm:text-xs bg-neo-cyan text-neo-black px-2 py-0.5 rounded-full font-black shrink-0 shadow-sm animate-pulse">
+            <span className="text-[10px] sm:text-xs bg-neo-cyan text-neo-black px-2 py-0.5 rounded-full font-black shrink-0 shadow-xs animate-pulse">
               YOU
             </span>
           )}
@@ -166,7 +166,7 @@ export const AllTimeParticipantRow = memo<{
         className={`
           w-9 h-9 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center font-black text-sm sm:text-base
           ${getRankBadgeColors(rank)}
-          border-2 shadow-sm
+          border-2 shadow-xs
         `}
       >
         {getRankDisplay(rank)}
@@ -185,7 +185,7 @@ export const AllTimeParticipantRow = memo<{
         </div>
         {/* Country Flag Badge */}
         {countryFlag && (
-          <div className="absolute -bottom-1 -end-1 text-sm sm:text-base drop-shadow-sm" title={participant.country_code || undefined}>
+          <div className="absolute -bottom-1 -inset-e-1 text-sm sm:text-base drop-shadow-xs" title={participant.country_code || undefined}>
             {countryFlag}
           </div>
         )}
@@ -215,7 +215,7 @@ export const AllTimeParticipantRow = memo<{
             </span>
           </PlayerProfileTooltip>
           {isCurrentUser && (
-            <span className="text-[10px] sm:text-xs bg-neo-cyan text-neo-black px-2 py-0.5 rounded-full font-black shrink-0 shadow-sm animate-pulse">
+            <span className="text-[10px] sm:text-xs bg-neo-cyan text-neo-black px-2 py-0.5 rounded-full font-black shrink-0 shadow-xs animate-pulse">
               YOU
             </span>
           )}

@@ -220,7 +220,7 @@ export function EmailPreferences({ isDarkMode }: EmailPreferencesProps) {
           onClick={handleToggleSubscription}
           disabled={isSaving}
           className={cn(
-            'relative w-14 h-8 rounded-full transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2',
+            'relative w-14 h-8 rounded-full transition-colors duration-200 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2',
             dailyEmailSubscribed
               ? 'bg-neo-lime'
               : isDarkMode ? 'bg-slate-600' : 'bg-gray-300',
@@ -277,7 +277,7 @@ export function EmailPreferences({ isDarkMode }: EmailPreferencesProps) {
             disabled={isSaving}
             aria-label={t('emailPreferences.selectTimezone')}
             className={cn(
-              'w-full px-4 py-2 rounded-lg border-2 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2',
+              'w-full px-4 py-2 rounded-lg border-2 transition-colors focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2',
               isDarkMode
                 ? 'bg-slate-800 border-slate-600 text-white'
                 : 'bg-white border-gray-300 text-gray-900',

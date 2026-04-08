@@ -98,7 +98,7 @@ describe('Stat', () => {
       const { container} = render(
         <Stat value={10} label="Test" variant="highlight" />
       );
-      expect(container.querySelector('.bg-gradient-to-br')).toBeInTheDocument();
+      expect(container.querySelector('.bg-linear-to-br')).toBeInTheDocument();
     });
   });
 
@@ -258,7 +258,7 @@ describe('Stat', () => {
 
       const stat = container.querySelector('[role="status"]');
       expect(stat).toHaveClass('border-2'); // Solid border
-      expect(stat).toHaveClass('shadow-sm'); // Has shadow
+      expect(stat).toHaveClass('shadow-xs'); // Has shadow
       expect(stat).not.toHaveClass('cursor-default');
     });
 

@@ -153,7 +153,7 @@ export default function BrainScoreHistoryChart({ history, className }: BrainScor
           'rounded-neo border-4 border-neo-black shadow-hard-lg overflow-hidden',
           isDarkMode
             ? 'bg-neo-navy'
-            : 'bg-gradient-to-br from-white via-gray-50 to-white',
+            : 'bg-linear-to-br from-white via-gray-50 to-white',
           className
         )}
       >
@@ -206,7 +206,7 @@ export default function BrainScoreHistoryChart({ history, className }: BrainScor
         'rounded-neo border-4 border-neo-black shadow-hard-lg overflow-hidden',
         isDarkMode
           ? 'bg-neo-navy'
-          : 'bg-gradient-to-br from-white via-gray-50 to-white',
+          : 'bg-linear-to-br from-white via-gray-50 to-white',
         className
       )}
     >
@@ -244,7 +244,7 @@ export default function BrainScoreHistoryChart({ history, className }: BrainScor
         </div>
 
         {/* Chart - only render ResponsiveContainer when dimensions are valid AND mounted */}
-        <div ref={containerRef} className="w-full h-48 min-h-[12rem] min-w-[100px]" style={{ minHeight: '12rem', minWidth: 100 }}>
+        <div ref={containerRef} className="w-full h-48 min-h-48 min-w-[100px]" style={{ minHeight: '12rem', minWidth: 100 }}>
           {isMounted && isReady && dimensions && dimensions.width > 0 && dimensions.height > 0 ? (
           <ResponsiveContainer width="100%" height="100%" minWidth={100} minHeight={100} debounce={50}>
             <AreaChart

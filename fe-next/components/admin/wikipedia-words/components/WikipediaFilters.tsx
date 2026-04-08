@@ -43,7 +43,7 @@ export function WikipediaFilters({
             key={lang.code}
             onClick={() => onLanguageChange(lang.code)}
             className={cn(
-              'px-3 py-2 rounded-lg border-2 font-bold transition-all flex-shrink-0 text-sm min-h-[40px]',
+              'px-3 py-2 rounded-lg border-2 font-bold transition-all shrink-0 text-sm min-h-[40px]',
               selectedLanguage === lang.code
                 ? 'bg-neo-pink text-white border-neo-pink shadow-hard-sm'
                 : 'bg-white dark:bg-slate-700 border-gray-300 dark:border-slate-600 hover:border-neo-pink text-gray-800 dark:text-gray-200'
@@ -60,7 +60,7 @@ export function WikipediaFilters({
       <div className="flex flex-col sm:flex-row gap-3">
         {/* Status Filter */}
         <div className="flex items-center gap-2">
-          <Filter className="w-4 h-4 text-gray-500 flex-shrink-0" />
+          <Filter className="w-4 h-4 text-gray-500 shrink-0" />
           <div className="flex gap-1">
             {STATUS_OPTIONS.map((option) => (
               <button

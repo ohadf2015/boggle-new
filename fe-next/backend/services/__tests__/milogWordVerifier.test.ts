@@ -4,7 +4,6 @@
  */
 
 import { vi, type Mock, type MockInstance } from 'vitest';
-import axios from 'axios';
 import {
   verifyWordOnMilog,
   parseVerificationResult,
@@ -12,9 +11,19 @@ import {
   invalidateMilogCache,
 } from '../milogWordVerifier';
 
-// Mock axios
-vi.mock('axios');
-const mockedAxios = axios as Mocked<typeof axios>;
+// Mock ky — vi.hoisted() ensures mockGet is available when the hoisted vi.mock() runs
+const { mockGet } = vi.hoisted(() => ({ mockGet: vi.fn() }));
+vi.mock('ky', () => ({
+  default: { get: mockGet },
+  HTTPError: class HTTPError extends Error {
+    response: { status: number };
+    constructor(status: number) {
+      super(`HTTPError: ${status}`);
+      this.name = 'HTTPError';
+      this.response = { status };
+    }
+  },
+}));
 
 // Mock Redis client - use a single instance for all tests
 const mockRedisGet = vi.fn();
@@ -313,14 +322,14 @@ describe('MilogWordVerifier', () => {
         </html>
       `;
 
-      mockedAxios.get.mockResolvedValueOnce({ data: html, status: 200 });
+      mockGet.mockReturnValueOnce({ text: () => Promise.resolve(html) });
 
       const result = await verifyWordOnMilog('שלום');
 
       expect(result.verified).toBe(true);
       expect(result.status).toBe('verified');
       // URL is encoded
-      expect(mockedAxios.get).toHaveBeenCalledWith(
+      expect(mockGet).toHaveBeenCalledWith(
         expect.stringContaining('milog.co.il/'),
         expect.objectContaining({
           headers: expect.objectContaining({
@@ -339,7 +348,7 @@ describe('MilogWordVerifier', () => {
         </html>
       `;
 
-      mockedAxios.get.mockResolvedValueOnce({ data: html, status: 200 });
+      mockGet.mockReturnValueOnce({ text: () => Promise.resolve(html) });
 
       const result = await verifyWordOnMilog('xyzלאמילה');
 
@@ -359,7 +368,7 @@ describe('MilogWordVerifier', () => {
         </html>
       `;
 
-      mockedAxios.get.mockResolvedValueOnce({ data: html, status: 200 });
+      mockGet.mockReturnValueOnce({ text: () => Promise.resolve(html) });
       mockRedisGet.mockResolvedValueOnce(null);
 
       const result = await verifyWordOnMilog('שדגשכשדכשד');
@@ -370,7 +379,7 @@ describe('MilogWordVerifier', () => {
     });
 
     it('should return error status on network failure', async () => {
-      mockedAxios.get.mockRejectedValueOnce(new Error('Network error'));
+      mockGet.mockReturnValueOnce({ text: () => Promise.reject(new Error('Network error')) });
 
       const result = await verifyWordOnMilog('מילה');
 
@@ -390,14 +399,14 @@ describe('MilogWordVerifier', () => {
 
       expect(result.verified).toBe(true);
       expect(result.status).toBe('verified');
-      expect(mockedAxios.get).not.toHaveBeenCalled();
+      expect(mockGet).not.toHaveBeenCalled();
     });
 
     it('should cache successful verification results', async () => {
       mockRedisGet.mockResolvedValueOnce(null); // No cache
 
       const html = `<a href="https://milog.co.il/בית/e_1001">בית</a>`;
-      mockedAxios.get.mockResolvedValueOnce({ data: html, status: 200 });
+      mockGet.mockReturnValueOnce({ text: () => Promise.resolve(html) });
 
       await verifyWordOnMilog('בית');
 
@@ -410,12 +419,12 @@ describe('MilogWordVerifier', () => {
 
     it('should make requests with proper headers', async () => {
       mockRedisGet.mockResolvedValue(null);
-      mockedAxios.get.mockResolvedValue({ data: '<html></html>', status: 200 });
+      mockGet.mockReturnValue({ text: () => Promise.resolve('<html></html>') });
 
       await verifyWordOnMilog('מילה');
 
       // Should have made request with proper User-Agent
-      expect(mockedAxios.get).toHaveBeenCalledWith(
+      expect(mockGet).toHaveBeenCalledWith(
         expect.stringContaining('milog.co.il'),
         expect.objectContaining({
           headers: expect.objectContaining({
@@ -444,16 +453,10 @@ describe('MilogWordVerifier', () => {
       // Mock update_milog_verification RPC calls
       mockRpc.mockResolvedValue({ error: null });
 
-      // Mock axios responses
-      mockedAxios.get
-        .mockResolvedValueOnce({
-          data: '<a href="https://milog.co.il/שלום/e_1">def</a>',
-          status: 200
-        })
-        .mockResolvedValueOnce({
-          data: '<a href="https://milog.co.il/בוקר/e_2">def</a>',
-          status: 200
-        });
+      // Mock ky responses
+      mockGet
+        .mockReturnValueOnce({ text: () => Promise.resolve('<a href="https://milog.co.il/שלום/e_1">def</a>') })
+        .mockReturnValueOnce({ text: () => Promise.resolve('<a href="https://milog.co.il/בוקר/e_2">def</a>') });
 
       mockRedisGet.mockResolvedValue(null);
 
@@ -483,10 +486,7 @@ describe('MilogWordVerifier', () => {
         })
         .mockResolvedValue({ error: null });
 
-      mockedAxios.get.mockResolvedValueOnce({
-        data: '<a href="https://milog.co.il/בדיקה/e_1">def</a>',
-        status: 200
-      });
+      mockGet.mockReturnValueOnce({ text: () => Promise.resolve('<a href="https://milog.co.il/בדיקה/e_1">def</a>') });
 
       mockRedisGet.mockResolvedValue(null);
 
@@ -518,7 +518,7 @@ describe('MilogWordVerifier', () => {
           <a href="https://milog.co.il/רמבם/e_8001">רַמְבָּ"ם - ראשי תיבות</a>
         </div>
       `;
-      mockedAxios.get.mockResolvedValueOnce({ data: html, status: 200 });
+      mockGet.mockReturnValueOnce({ text: () => Promise.resolve(html) });
       mockRedisGet.mockResolvedValue(null);
 
       const result = await processMilogVerificationQueue({ batchSize: 10 });

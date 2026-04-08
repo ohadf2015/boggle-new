@@ -96,7 +96,7 @@ export default function CookieConsent() {
         onClick={handleDeclineAll}
         aria-label={t('cookieConsent.decline')}
         className={cn(
-          'absolute top-2 end-2 p-1.5 min-h-[44px] min-w-[44px]',
+          'absolute top-2 inset-e-2 p-1.5 min-h-[44px] min-w-[44px]',
           'flex items-center justify-center',
           'text-neo-cream/60 hover:text-neo-white',
           'transition-colors duration-100'
@@ -248,7 +248,7 @@ function ConsentToggle({ label, description, checked, disabled, requiredLabel, o
         <div
           className={cn(
             'absolute top-0.5 w-5 h-5 rounded-full transition-transform',
-            'bg-white border-2 border-neo-black shadow-sm',
+            'bg-white border-2 border-neo-black shadow-xs',
             checked ? 'translate-x-[18px]' : 'translate-x-0.5'
           )}
         />

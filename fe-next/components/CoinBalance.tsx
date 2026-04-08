@@ -68,7 +68,7 @@ export function CoinBalance({
         // Neo-brutalist styling
         'border-3 border-neo-black shadow-hard',
         // Premium gold gradient
-        'bg-gradient-to-br from-amber-300 via-yellow-400 to-amber-500',
+        'bg-linear-to-br from-amber-300 via-yellow-400 to-amber-500',
         // Size-specific classes
         sizeClasses[size],
         className
@@ -85,7 +85,7 @@ export function CoinBalance({
       />
 
       {/* Inner glow effect */}
-      <div className="absolute inset-0 rounded-neo-lg opacity-30 pointer-events-none bg-gradient-to-t from-transparent via-white/20 to-white/40" />
+      <div className="absolute inset-0 rounded-neo-lg opacity-30 pointer-events-none bg-linear-to-t from-transparent via-white/20 to-white/40" />
 
       {/* Coin icon with subtle animation */}
       <motion.div
@@ -103,7 +103,7 @@ export function CoinBalance({
         <Coins
           className={cn(
             iconSizes[size],
-            'text-amber-700 drop-shadow-sm'
+            'text-amber-700 drop-shadow-xs'
           )}
           aria-hidden="true"
           strokeWidth={2.5}
@@ -142,7 +142,7 @@ export function CoinBalance({
       )}
 
       {/* Bottom edge highlight for depth */}
-      <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-amber-600/50 via-amber-500/30 to-amber-600/50" />
+      <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-linear-to-r from-amber-600/50 via-amber-500/30 to-amber-600/50" />
     </div>
   );
 

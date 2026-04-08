@@ -162,7 +162,7 @@ export default function SoloPracticeBoard({
           className="border-3 border-black rounded-neo shadow-hard-lg bg-neo-navy/90 max-w-md w-full overflow-hidden"
         >
           {/* Celebration header stripe */}
-          <div className="h-2 bg-gradient-to-r from-neo-cyan via-neo-yellow to-neo-pink" />
+          <div className="h-2 bg-linear-to-r from-neo-cyan via-neo-yellow to-neo-pink" />
 
           <div className="p-8 text-center">
             <motion.div

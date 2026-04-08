@@ -177,7 +177,7 @@ export function CurriculumWordListBrowser({
               aria-label={t('teacher.curriculum.filters.grade')}
               value={filters.gradeLevel || ''}
               onChange={handleGradeChange}
-              className="w-full bg-neo-navy border-neo border-black rounded-neo p-2 text-neo-white focus:ring-2 focus:ring-neo-lime focus:outline-none"
+              className="w-full bg-neo-navy border-neo border-black rounded-neo p-2 text-neo-white focus:ring-2 focus:ring-neo-lime focus:outline-hidden"
             >
               <option value="">{t('teacher.curriculum.allGrades')}</option>
               {GRADE_LEVELS.map((grade) => (
@@ -201,7 +201,7 @@ export function CurriculumWordListBrowser({
               aria-label={t('teacher.curriculum.filters.subject')}
               value={filters.subject || ''}
               onChange={handleSubjectChange}
-              className="w-full bg-neo-navy border-neo border-black rounded-neo p-2 text-neo-white focus:ring-2 focus:ring-neo-lime focus:outline-none"
+              className="w-full bg-neo-navy border-neo border-black rounded-neo p-2 text-neo-white focus:ring-2 focus:ring-neo-lime focus:outline-hidden"
             >
               <option value="">{t('teacher.curriculum.allSubjects')}</option>
               {SUBJECTS.map((subject) => (

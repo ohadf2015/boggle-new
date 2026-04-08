@@ -93,6 +93,10 @@ export function BlogPostingJsonLd({
                 url: `${SITE_URL}/icon-192.png`,
             },
         },
+        speakable: {
+            '@type': 'SpeakableSpecification',
+            cssSelector: ['h1', '[data-speakable="true"]'],
+        },
     };
 
     // Safe: all content is from static blog data constants, not user input
@@ -157,6 +161,22 @@ export function generateBlogMetadata({
                 sv: `https://www.lexiclash.live/sv/blog/${slug}`,
                 ja: `https://www.lexiclash.live/ja/blog/${slug}`,
                 es: `https://www.lexiclash.live/es/blog/${slug}`,
+                'en-IL': `https://www.lexiclash.live/en/blog/${slug}`,
+                'he-IL': `https://www.lexiclash.live/he/blog/${slug}`,
+                'en-US': `https://www.lexiclash.live/en/blog/${slug}`,
+                'es-US': `https://www.lexiclash.live/es/blog/${slug}`,
+                'en-GB': `https://www.lexiclash.live/en/blog/${slug}`,
+                'en-SE': `https://www.lexiclash.live/en/blog/${slug}`,
+                'sv-SE': `https://www.lexiclash.live/sv/blog/${slug}`,
+                'en-JP': `https://www.lexiclash.live/en/blog/${slug}`,
+                'ja-JP': `https://www.lexiclash.live/ja/blog/${slug}`,
+                'en-ES': `https://www.lexiclash.live/en/blog/${slug}`,
+                'es-ES': `https://www.lexiclash.live/es/blog/${slug}`,
+                'en-MX': `https://www.lexiclash.live/en/blog/${slug}`,
+                'es-MX': `https://www.lexiclash.live/es/blog/${slug}`,
+                'en-AU': `https://www.lexiclash.live/en/blog/${slug}`,
+                'es-AR': `https://www.lexiclash.live/es/blog/${slug}`,
+                'es-CO': `https://www.lexiclash.live/es/blog/${slug}`,
             },
         },
         robots: { index: true, follow: true },

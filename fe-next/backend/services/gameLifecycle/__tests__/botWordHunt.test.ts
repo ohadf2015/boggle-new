@@ -107,11 +107,12 @@ describe('Bot Word Hunt', () => {
       expect(strategy.guessesMade).toEqual([]);
     });
 
-    it('stores targetWord and minWrongGuesses', () => {
+    it('stores targetWord, minWrongGuesses, and stumbleChance', () => {
       const strategy = createBotWordHuntStrategy(['apple', 'beach'], 5, 'medium', 'apple');
 
       expect(strategy.targetWord).toBe('apple');
-      expect(strategy.minWrongGuesses).toBe(2);
+      expect(strategy.minWrongGuesses).toBe(4);
+      expect(strategy.stumbleChance).toBe(0.35);
     });
 
     it('easy bots require more wrong guesses than hard bots', () => {
@@ -131,6 +132,7 @@ describe('Bot Word Hunt', () => {
         maxDelay: 10000,
         startDelay: 10000,
         minWrongGuesses: 2,
+        stumbleChance: 0,
         targetWord: 'apple',
       };
 
@@ -141,7 +143,7 @@ describe('Bot Word Hunt', () => {
       }
     });
 
-    it('can pick the target word after enough wrong guesses', () => {
+    it('can pick the target word after enough wrong guesses (no stumble)', () => {
       const strategy: BotWordHuntStrategy = {
         candidates: ['apple'],
         guessesMade: ['beach', 'crane'],
@@ -149,9 +151,46 @@ describe('Bot Word Hunt', () => {
         maxDelay: 10000,
         startDelay: 10000,
         minWrongGuesses: 2,
+        stumbleChance: 0, // no stumble — should always pick target
         targetWord: 'apple',
       };
 
+      const guess = pickBotGuess(strategy.candidates, 'medium', strategy);
+      expect(guess).toBe('apple');
+    });
+
+    it('stumbles past the target word based on stumbleChance', () => {
+      // With 100% stumble chance and other candidates available, should never pick target
+      const strategy: BotWordHuntStrategy = {
+        candidates: ['apple', 'beach', 'crane'],
+        guessesMade: ['x', 'y'], // past minWrongGuesses
+        minDelay: 5000,
+        maxDelay: 10000,
+        startDelay: 10000,
+        minWrongGuesses: 2,
+        stumbleChance: 1.0,
+        targetWord: 'apple',
+      };
+
+      for (let i = 0; i < 50; i++) {
+        const guess = pickBotGuess(strategy.candidates, 'medium', strategy);
+        expect(guess).not.toBe('apple');
+      }
+    });
+
+    it('picks target when stumbleChance is 0 and only target left', () => {
+      const strategy: BotWordHuntStrategy = {
+        candidates: ['apple'],
+        guessesMade: ['x', 'y'],
+        minDelay: 5000,
+        maxDelay: 10000,
+        startDelay: 10000,
+        minWrongGuesses: 2,
+        stumbleChance: 1.0, // stumble chance high but no alternatives
+        targetWord: 'apple',
+      };
+
+      // Only candidate is the target — must return it regardless of stumble
       const guess = pickBotGuess(strategy.candidates, 'medium', strategy);
       expect(guess).toBe('apple');
     });
@@ -164,6 +203,7 @@ describe('Bot Word Hunt', () => {
         maxDelay: 10000,
         startDelay: 10000,
         minWrongGuesses: 2,
+        stumbleChance: 0,
         targetWord: 'apple',
       };
 

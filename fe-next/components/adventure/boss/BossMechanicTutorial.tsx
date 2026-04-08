@@ -77,7 +77,7 @@ export const BossMechanicTutorial = memo<BossMechanicTutorialProps>(({
         >
           {/* Header */}
           <div className="flex items-start gap-3 mb-3">
-            <span className="text-2xl flex-shrink-0" aria-hidden="true">{icon}</span>
+            <span className="text-2xl shrink-0" aria-hidden="true">{icon}</span>
             <div className="flex-1 min-w-0">
               <p className="text-neo-yellow text-xs font-bold uppercase tracking-wide mb-0.5">
                 {t('adventure.bosses.newMechanic')}
@@ -113,7 +113,7 @@ export const BossMechanicTutorial = memo<BossMechanicTutorialProps>(({
               'border-3 border-neo-black rounded-neo',
               'shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5',
               'active:translate-y-0.5 active:shadow-hard-pressed',
-              'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan',
+              'focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan',
               'transition-all duration-200'
             )}
           >

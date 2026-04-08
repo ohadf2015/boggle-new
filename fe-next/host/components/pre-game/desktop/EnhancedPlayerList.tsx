@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { memo, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Users, Crown, Bot } from 'lucide-react';
 import Avatar from '../../../../components/Avatar';
@@ -43,7 +43,7 @@ export interface EnhancedPlayerListProps {
  * - Animated entry/exit
  * - "You" indicator for current user
  */
-export function EnhancedPlayerList({
+export const EnhancedPlayerList = memo(function EnhancedPlayerList({
   players,
   currentUsername,
   t,
@@ -74,10 +74,10 @@ export function EnhancedPlayerList({
       )}
     >
       {/* Decorative top accent - slightly taller on desktop */}
-      <div className="absolute top-0 left-0 right-0 h-1.5 xl:h-2 bg-gradient-to-r from-neo-yellow via-neo-pink to-neo-purple" />
+      <div className="absolute top-0 left-0 right-0 h-1.5 xl:h-2 bg-linear-to-r from-neo-yellow via-neo-pink to-neo-purple" />
 
       {/* Header - larger on desktop */}
-      <div className="flex items-center gap-2 xl:gap-3 px-4 py-3 xl:px-5 xl:py-4 border-b border-neo-black/30 flex-shrink-0">
+      <div className="flex items-center gap-2 xl:gap-3 px-4 py-3 xl:px-5 xl:py-4 border-b border-neo-black/30 shrink-0">
         <Users className="w-5 h-5 xl:w-6 xl:h-6 text-neo-pink" />
         <span className="text-sm xl:text-base font-black uppercase text-neo-cream">
           {t('hostView.playersJoined')} ({filteredPlayers.length})
@@ -115,7 +115,7 @@ export function EnhancedPlayerList({
                 )}
               >
                 {/* Avatar - larger on desktop */}
-                <div className="relative flex-shrink-0">
+                <div className="relative shrink-0">
                   <Avatar
                     customAvatar={avatar?.customAvatar ?? undefined}
 
@@ -196,6 +196,6 @@ export function EnhancedPlayerList({
       </div>
     </div>
   );
-}
+});
 
 export default EnhancedPlayerList;

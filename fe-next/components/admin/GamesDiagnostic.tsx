@@ -73,7 +73,7 @@ export function GamesDiagnostic({ authToken }: GamesDiagnosticProps) {
       {error && (
         <div className="bg-red-900/30 border-neo border-red-500 rounded-neo p-4">
           <div className="flex items-start gap-3">
-            <AlertTriangle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
+            <AlertTriangle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
             <div>
               <div className="font-neo-display text-red-300 mb-1">Error</div>
               <div className="text-sm text-red-200">{error}</div>
@@ -97,9 +97,9 @@ export function GamesDiagnostic({ authToken }: GamesDiagnosticProps) {
           )}>
             <div className="flex items-start gap-3">
               {data.diagnostic.totals.todayGames > 0 ? (
-                <CheckCircle className="w-6 h-6 text-green-400 flex-shrink-0" />
+                <CheckCircle className="w-6 h-6 text-green-400 shrink-0" />
               ) : (
-                <AlertTriangle className="w-6 h-6 text-yellow-400 flex-shrink-0" />
+                <AlertTriangle className="w-6 h-6 text-yellow-400 shrink-0" />
               )}
               <div className="flex-1">
                 <div className="font-neo-display text-lg mb-2">

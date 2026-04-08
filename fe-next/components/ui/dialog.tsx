@@ -116,10 +116,10 @@ const DialogContent = React.forwardRef<
           className={cn(
             "absolute top-2 sm:top-3",
             "right-2 sm:right-3",
-            "rtl:right-auto rtl:left-2 rtl:sm:left-3",
+            "rtl:right-auto rtl:left-2 sm:rtl:left-3",
             "flex items-center justify-center",
             "transition-all duration-100",
-            "focus:outline-none focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2",
+            "focus:outline-hidden focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2",
             "z-10",
             // Variant-specific styles
             closeButtonVariant === 'minimal' ? [
@@ -139,14 +139,14 @@ const DialogContent = React.forwardRef<
               "border-2 sm:border-3 border-neo-black",
               "rounded-neo",
               "shadow-hard-sm",
-              "hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard",
+              "hover:-translate-x-px hover:-translate-y-px hover:shadow-hard",
               "active:translate-x-[2px] active:translate-y-[2px] active:shadow-none",
             ]
           )}
         >
           <X
             className={cn(
-              "stroke-[3]",
+              "stroke-3",
               closeButtonVariant === 'minimal'
                 ? "h-4 w-4"
                 : "h-5 w-5 sm:h-6 sm:w-6"

@@ -209,7 +209,7 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
       <span
         className={cn(
           // Increased padding for 48px minimum touch target to account for borders (WCAG 2.1 AA)
-          "inline-flex items-center gap-1.5 px-4 py-3 min-h-[48px] text-sm font-black uppercase border-2 border-neo-black rounded-neo shadow-hard-sm transition-all hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard",
+          "inline-flex items-center gap-1.5 px-4 py-3 min-h-[48px] text-sm font-black uppercase border-2 border-neo-black rounded-neo shadow-hard-sm transition-all hover:-translate-x-px hover:-translate-y-px hover:shadow-hard",
           isDuplicate && "line-through opacity-80",
           !isDuplicate && !isValid && "opacity-70",
           hasInvalidReason && "cursor-pointer active:scale-95"
@@ -246,7 +246,7 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
           <TooltipProvider delayDuration={0}>
             <Tooltip>
               <TooltipTrigger asChild>
-                <span className="text-xs px-1.5 py-0.5 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded border border-neo-black font-black cursor-help">
+                <span className="text-xs px-1.5 py-0.5 bg-linear-to-r from-orange-500 to-red-500 text-white rounded border border-neo-black font-black cursor-help">
                   🔥+{wordObj.fireRoundBonus}
                 </span>
               </TooltipTrigger>
@@ -291,7 +291,7 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
       {isOpen && isMounted && createPortal(validationTooltipContent, document.body)}
 
       {isDuplicate && playerCount > 1 && (
-        <span className="absolute -top-2 end-[-8px] bg-neo-black text-neo-cream text-[10px] px-1.5 py-0.5 min-w-[18px] h-[18px] flex items-center justify-center font-black border-2 border-neo-black rounded-neo">
+        <span className="absolute -top-2 inset-e-[-8px] bg-neo-black text-neo-cream text-[10px] px-1.5 py-0.5 min-w-[18px] h-[18px] flex items-center justify-center font-black border-2 border-neo-black rounded-neo">
           {playerCount}
         </span>
       )}

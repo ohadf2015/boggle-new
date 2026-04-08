@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, useEffect } from 'react';
+import { memo, useRef, useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { Shuffle } from 'lucide-react';
 import { formatObjectiveLabel } from './utils/blastObjectiveUtils';
@@ -94,7 +94,7 @@ interface BlastStageProps {
  * BlastStage — layout shell composing HUD + word forming + board + dead-end notification.
  * Purely presentational; all state lives in BlastGame.
  */
-export function BlastStage({
+export const BlastStage = memo(function BlastStage({
   grid,
   tileStates,
   gridSize,
@@ -200,7 +200,8 @@ export function BlastStage({
       {/* Combo milestone announcements */}
       <ComboMilestoneAnnouncement comboLevel={comboLevel} />
 
-      {/* 1. HUD */}
+      {/* 1. HUD — z-40 to sit above BlastBackground (absolute inset-0) */}
+      <div className="relative z-40">
       <BlastHUD
         score={score}
         wordsFoundCount={wordsFound.length}
@@ -215,10 +216,11 @@ export function BlastStage({
         comboStreakArcRef={comboStreakArcRef}
         t={t}
       />
+      </div>
 
       {/* 1b. Live leaderboard ticker (MP only) */}
       {leaderboard && leaderboard.length > 0 && (
-        <div className="absolute top-14 end-2 z-40 flex flex-col gap-0.5 pointer-events-none" data-testid="blast-leaderboard">
+        <div className="absolute top-14 inset-e-2 z-40 flex flex-col gap-0.5 pointer-events-none" data-testid="blast-leaderboard">
           {leaderboard
             .slice()
             .sort((a, b) => b.score - a.score)
@@ -244,7 +246,7 @@ export function BlastStage({
 
       {/* 2. Objective progress bar */}
       {objectiveProgress && objectiveProgress.length > 0 && (
-        <div className="px-4 py-1 max-w-md mx-auto w-full flex-shrink-0">
+        <div className="px-4 py-1 max-w-md mx-auto w-full shrink-0 relative z-40">
           <div className="flex gap-2">
             {objectiveProgress.map((obj, i) => {
               const target = obj.objective.target;
@@ -354,7 +356,7 @@ export function BlastStage({
 
       {/* 4. Word forming area — golden ribbon style */}
       <div className={cn(
-        'flex items-center justify-center flex-shrink-0 relative z-30 px-4 py-2',
+        'flex items-center justify-center shrink-0 relative z-40 px-4 py-2',
         'max-w-[360px] md:max-w-[480px] mx-auto w-full overflow-visible',
         'min-h-[44px]',
       )}>
@@ -387,7 +389,7 @@ export function BlastStage({
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-            className="overflow-hidden px-4 max-w-[360px] md:max-w-[480px] mx-auto w-full flex-shrink-0 pb-safe"
+            className="overflow-hidden px-4 max-w-[360px] md:max-w-[480px] mx-auto w-full shrink-0 pb-safe"
           >
             <div className={cn(
               'border-3 border-neo-black rounded-neo shadow-hard-sm p-3',
@@ -410,7 +412,7 @@ export function BlastStage({
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-            className="overflow-hidden px-4 max-w-[360px] md:max-w-[480px] mx-auto w-full flex-shrink-0 pb-safe"
+            className="overflow-hidden px-4 max-w-[360px] md:max-w-[480px] mx-auto w-full shrink-0 pb-safe"
           >
             <div className={cn(
               'border-3 border-neo-black rounded-neo shadow-hard-sm p-3',
@@ -437,4 +439,5 @@ export function BlastStage({
       <BlastTileGuide isOpen={showTileGuide} onClose={() => setShowTileGuide(false)} t={t} />
     </div>
   );
-}
+});
+BlastStage.displayName = 'BlastStage';

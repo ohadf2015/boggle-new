@@ -131,12 +131,12 @@ export default function WelcomeBackCard({
           className={cn(
             'rounded-neo border-3 border-neo-black shadow-hard overflow-hidden',
             isDarkMode
-              ? 'bg-gradient-to-br from-neo-purple/20 to-neo-cyan/20'
-              : 'bg-gradient-to-br from-purple-100 to-cyan-100'
+              ? 'bg-linear-to-br from-neo-purple/20 to-neo-cyan/20'
+              : 'bg-linear-to-br from-purple-100 to-cyan-100'
           )}
         >
           {/* Decorative top bar */}
-          <div className="h-1.5 bg-gradient-to-r from-neo-purple via-neo-cyan to-neo-lime" />
+          <div className="h-1.5 bg-linear-to-r from-neo-purple via-neo-cyan to-neo-lime" />
 
           <div className="p-4">
             {/* Header with dismiss button */}
@@ -252,7 +252,7 @@ export default function WelcomeBackCard({
             {/* Motivational message */}
             <div className={cn(
               'flex items-center gap-2 p-3 rounded-neo border-2 border-neo-black',
-              'bg-gradient-to-r from-neo-green/20 to-neo-cyan/20'
+              'bg-linear-to-r from-neo-green/20 to-neo-cyan/20'
             )}>
               <TrendingUp className="w-5 h-5 text-neo-green shrink-0" />
               <p className={cn(

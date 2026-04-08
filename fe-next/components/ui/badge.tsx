@@ -15,21 +15,21 @@ const badgeVariants = cva(
     variants: {
       variant: {
         // Primary: Yellow - interactive affordance
-        default: "bg-neo-lime text-neo-black shadow-hard-sm focus:outline-none focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2",
+        default: "bg-neo-lime text-neo-black shadow-hard-sm focus:outline-hidden focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2",
         // Secondary: Pink - interactive
-        secondary: "bg-neo-pink text-neo-black shadow-hard-sm focus:outline-none focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2",
+        secondary: "bg-neo-pink text-neo-black shadow-hard-sm focus:outline-hidden focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2",
         // Destructive: Red (4.8:1 contrast with cream)
-        destructive: "bg-neo-red text-neo-cream shadow-hard-sm focus:outline-none focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2",
+        destructive: "bg-neo-red text-neo-cream shadow-hard-sm focus:outline-hidden focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2",
         // Outline: Cream/transparent - interactive
-        outline: "bg-neo-cream text-neo-black shadow-hard-sm focus:outline-none focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2",
+        outline: "bg-neo-cream text-neo-black shadow-hard-sm focus:outline-hidden focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2",
         // Success: Lime green - interactive
-        success: "bg-neo-lime text-neo-black shadow-hard-sm focus:outline-none focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2",
+        success: "bg-neo-lime text-neo-black shadow-hard-sm focus:outline-hidden focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2",
         // Accent: Pink (5.8:1 contrast with black) - interactive
-        accent: "bg-neo-pink text-neo-black shadow-hard-sm focus:outline-none focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2",
+        accent: "bg-neo-pink text-neo-black shadow-hard-sm focus:outline-hidden focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2",
         // Cyan: For special highlights - interactive
-        cyan: "bg-neo-cyan text-neo-black shadow-hard-sm focus:outline-none focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2",
+        cyan: "bg-neo-cyan text-neo-black shadow-hard-sm focus:outline-hidden focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2",
         // Purple: For rare/special (7.2:1 contrast with cream) - interactive
-        purple: "bg-neo-purple text-neo-cream shadow-hard-sm focus:outline-none focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2",
+        purple: "bg-neo-purple text-neo-cream shadow-hard-sm focus:outline-hidden focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2",
         // DISPLAY-ONLY variants: No shadow, muted border, no focus ring
         // Use these for static info displays that aren't clickable
         "display-default": "bg-neo-lime/80 text-neo-black border-neo-black/50 shadow-none cursor-default",

@@ -52,12 +52,12 @@ export function ComboMilestoneAnnouncement({ comboLevel }: ComboMilestoneAnnounc
         >
           <div className={cn(
             'px-4 py-2 rounded-neo border-3 border-neo-black shadow-hard font-black text-lg uppercase tracking-wider',
-            comboLevel >= 25 ? 'bg-gradient-to-r from-yellow-300 via-white to-yellow-300 text-neo-black animate-pulse' :
-            comboLevel >= 20 ? 'bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500 text-white' :
-            comboLevel >= 15 ? 'bg-gradient-to-r from-neo-pink via-neo-cyan to-neo-lime text-neo-black' :
-            comboLevel >= 10 ? 'bg-gradient-to-r from-neo-pink via-neo-cyan to-neo-lime text-neo-black' :
-            comboLevel >= 7 ? 'bg-gradient-to-r from-pink-500 via-cyan-500 to-yellow-500 text-white' :
-            comboLevel >= 5 ? 'bg-gradient-to-r from-neo-yellow to-neo-orange text-neo-black' :
+            comboLevel >= 25 ? 'bg-linear-to-r from-yellow-300 via-white to-yellow-300 text-neo-black animate-pulse' :
+            comboLevel >= 20 ? 'bg-linear-to-r from-purple-500 via-pink-500 to-purple-500 text-white' :
+            comboLevel >= 15 ? 'bg-linear-to-r from-neo-pink via-neo-cyan to-neo-lime text-neo-black' :
+            comboLevel >= 10 ? 'bg-linear-to-r from-neo-pink via-neo-cyan to-neo-lime text-neo-black' :
+            comboLevel >= 7 ? 'bg-linear-to-r from-pink-500 via-cyan-500 to-yellow-500 text-white' :
+            comboLevel >= 5 ? 'bg-linear-to-r from-neo-yellow to-neo-orange text-neo-black' :
             'bg-neo-cyan text-neo-black'
           )}>
             {milestone}

@@ -191,7 +191,7 @@ const CollectionPanel = memo<CollectionPanelProps>(({ isOpen, onClose, inventory
                       'flex flex-col items-center p-3 rounded-neo border-2 transition-all',
                       owned
                         ? `${RARITY_BORDER[item.rarity]} ${RARITY_BG[item.rarity]}`
-                        : 'border-neo-white/10 bg-neo-white/[0.02] opacity-50'
+                        : 'border-neo-white/10 bg-neo-white/2 opacity-50'
                     )}
                   >
                     {/* Icon */}

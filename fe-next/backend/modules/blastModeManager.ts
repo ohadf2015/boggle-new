@@ -238,7 +238,7 @@ export function recordBlastMove(
  */
 export function getTilesOnPath(
   word: string,
-  letterPositions: Map<string, Array<{ row: number; col: number }>>,
+  letterPositions: Map<string, [number, number][]>,
   overlay: BlastTileOverlay[],
   cachedOverlayMap?: Map<string, BlastTileType>
 ): BlastTileType[] {
@@ -262,7 +262,7 @@ export function getTilesOnPath(
     // Find first unused position for this letter
     let foundPosition = false;
     for (const pos of positions) {
-      const key = `${pos.row},${pos.col}`;
+      const key = `${pos[0]},${pos[1]}`;
       if (!usedPositions.has(key)) {
         usedPositions.add(key);
         const tileType = overlayMap.get(key) || 'standard';
@@ -275,7 +275,7 @@ export function getTilesOnPath(
     // If all positions used, use first position anyway
     if (!foundPosition && positions.length > 0) {
       const pos = positions[0];
-      const key = `${pos.row},${pos.col}`;
+      const key = `${pos[0]},${pos[1]}`;
       const tileType = overlayMap.get(key) || 'standard';
       tiles.push(tileType);
     }
@@ -291,7 +291,7 @@ export function getTilesOnPath(
  */
 export function getWordPath(
   word: string,
-  letterPositions: Map<string, Array<{ row: number; col: number }>>,
+  letterPositions: Map<string, [number, number][]>,
 ): Array<{ row: number; col: number }> {
   const path: Array<{ row: number; col: number }> = [];
   const usedPositions = new Set<string>();
@@ -302,16 +302,16 @@ export function getWordPath(
 
     let found = false;
     for (const pos of positions) {
-      const key = `${pos.row},${pos.col}`;
+      const key = `${pos[0]},${pos[1]}`;
       if (!usedPositions.has(key)) {
         usedPositions.add(key);
-        path.push({ row: pos.row, col: pos.col });
+        path.push({ row: pos[0], col: pos[1] });
         found = true;
         break;
       }
     }
     if (!found && positions.length > 0) {
-      path.push({ row: positions[0].row, col: positions[0].col });
+      path.push({ row: positions[0][0], col: positions[0][1] });
     }
   }
   return path;

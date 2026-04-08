@@ -165,7 +165,7 @@ export const ObjectiveProgress = memo<ObjectiveProgressProps>(
                   data-testid={`icon-${objective.type}`}
                   whileHover={prefersReducedMotion ? {} : { scale: 1.1 }}
                   className={cn(
-                    'flex-shrink-0 w-6 h-6 flex items-center justify-center',
+                    'shrink-0 w-6 h-6 flex items-center justify-center',
                     'rounded-neo border-2 transition-colors duration-300',
                     objective.isComplete
                       ? 'bg-neo-lime border-neo-black text-neo-black'
@@ -238,7 +238,7 @@ export const ObjectiveProgress = memo<ObjectiveProgressProps>(
                           : { type: 'spring', stiffness: 400, damping: 15 }
                       }
                       className={cn(
-                        'flex-shrink-0 w-5 h-5 flex items-center justify-center',
+                        'shrink-0 w-5 h-5 flex items-center justify-center',
                         'rounded-full bg-neo-lime text-neo-black shadow-hard-sm'
                       )}
                     >

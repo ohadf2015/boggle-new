@@ -34,6 +34,9 @@ export { LevelUpCelebration } from './LevelUpCelebration';
 // Timer Animations
 export { TimerUrgency, TimeBonusPopup } from './TimerUrgency';
 
+// Rive Animations
+export { RiveAnimation } from './RiveAnimation';
+
 // Page Transitions
 export {
   PageTransition,

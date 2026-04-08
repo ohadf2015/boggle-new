@@ -37,7 +37,7 @@ function ChallengeRow({
       {/* Challenger avatar / initial */}
       <div
         className={cn(
-          'flex-shrink-0 w-8 h-8 rounded-full',
+          'shrink-0 w-8 h-8 rounded-full',
           'bg-neo-orange/20 border-2 border-neo-orange',
           'flex items-center justify-center',
           'font-neo-display font-bold text-sm text-neo-orange'
@@ -62,7 +62,7 @@ function ChallengeRow({
         data-testid={`play-challenge-${challenge.id}`}
         onClick={() => onPlay(challenge.id)}
         className={cn(
-          'flex-shrink-0 px-3 py-1.5 rounded-neo',
+          'shrink-0 px-3 py-1.5 rounded-neo',
           'bg-neo-orange text-neo-navy font-bold text-xs',
           'border-neo shadow-hard-sm',
           'hover:shadow-hard-pressed active:translate-y-0.5'

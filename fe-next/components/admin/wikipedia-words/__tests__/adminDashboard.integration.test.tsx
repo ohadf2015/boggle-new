@@ -85,7 +85,7 @@ describe('Admin Dashboard - Wikipedia Population Integration', () => {
     expect(SERVER_MAX_DURATION).toBeGreaterThan(60); // Old value
 
     // THEN: Server timeout should accommodate:
-    // - 30s axios timeout per Wikipedia API call
+    // - 30s ky timeout per Wikipedia API call
     // - 2 retries max = 30s + 500ms + 30s + 1000ms = ~62s worst case
     // - AI validation overhead
     // - Database operations

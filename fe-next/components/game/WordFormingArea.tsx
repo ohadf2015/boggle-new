@@ -145,27 +145,16 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
     className
   );
 
-  // Get background color based on state
-  const getBgColor = () => {
-    if (showFeedback) {
-      switch (visibleFeedback?.type) {
-        case 'accepted': return 'bg-neo-lime';
-        case 'rejected': return 'bg-neo-red';
-        case 'duplicate': return 'bg-neo-pink';
-        case 'foundByOther': return 'bg-neo-pink';
-        default: return 'bg-neo-cyan';
-      }
-    }
-    return 'bg-neo-cyan';
-  };
-
-  // Get text color based on state
-  const getTextColor = () => {
-    if (showFeedback && visibleFeedback?.type === 'rejected') {
-      return 'text-neo-cream';
-    }
-    return 'text-neo-black';
-  };
+  // Derive colors based on feedback state
+  const { bgColor, textColor } = useMemo(() => {
+    if (!showFeedback) return { bgColor: 'bg-neo-cyan', textColor: 'text-neo-black' };
+    const type = visibleFeedback?.type;
+    const bg = type === 'accepted' ? 'bg-neo-lime'
+      : type === 'rejected' ? 'bg-neo-red'
+      : type === 'duplicate' || type === 'foundByOther' ? 'bg-neo-pink'
+      : 'bg-neo-cyan';
+    return { bgColor: bg, textColor: type === 'rejected' ? 'text-neo-cream' : 'text-neo-black' };
+  }, [showFeedback, visibleFeedback?.type]);
 
   // Sparkle positions for accepted state
   const sparklePositions = useMemo(() =>
@@ -226,7 +215,7 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
             className={cn(
               'relative border-3 border-neo-black rounded-neo shadow-hard flex items-center gap-1.5 sm:gap-2 whitespace-nowrap overflow-visible',
               compact ? 'px-2 sm:px-3 py-1.5' : 'px-4 py-2',
-              getBgColor()
+              bgColor
             )}
           >
             {/* Status icon - only for feedback states */}
@@ -249,7 +238,7 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
                   className={cn(
                     'font-black',
                     compact ? 'text-base' : 'text-lg',
-                    getTextColor()
+                    textColor
                   )}
                 >
                   {visibleFeedback?.type === 'accepted' && '✓'}
@@ -272,7 +261,7 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
               className={cn(
                 'font-black uppercase tracking-wide',
                 compact ? 'text-base' : 'text-xl',
-                getTextColor()
+                textColor
               )}
             >
               {showFeedback && visibleFeedback?.type === 'rejected'
@@ -296,7 +285,7 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
                   className={cn(
                     'font-bold bg-neo-black/15 rounded-md',
                     compact ? 'text-xs px-1.5 py-0.5' : 'text-sm px-2 py-1',
-                    getTextColor()
+                    textColor
                   )}
                 >
                   {displayLetterCount}
@@ -363,7 +352,7 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
                     y: { delay: 0.4, duration: 0.6, repeat: Infinity, repeatDelay: 1 }
                   }}
                   className={cn(
-                    'bg-gradient-to-br from-neo-pink to-neo-purple text-white font-black rounded-neo border-2 border-neo-black',
+                    'bg-linear-to-br from-neo-pink to-neo-purple text-white font-black rounded-neo border-2 border-neo-black',
                     compact ? 'text-sm px-2 py-0.5' : 'text-base px-2.5 py-1'
                   )}
                   title="Lesson vocabulary word!"
@@ -383,7 +372,7 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
                   exit={{ scale: 0 }}
                   transition={{ delay: 0.2, ...SPRING_PRESETS.snappy }}
                   className={cn(
-                    'bg-gradient-to-r from-orange-500 to-red-500 text-white font-black rounded-md border-2 border-neo-black',
+                    'bg-linear-to-r from-orange-500 to-red-500 text-white font-black rounded-md border-2 border-neo-black',
                     compact ? 'text-xs px-1.5 py-0.5' : 'text-sm px-2 py-0.5'
                   )}
                 >
@@ -402,7 +391,7 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
                   exit={{ scale: 0 }}
                   transition={{ delay: 0.25, ...SPRING_PRESETS.snappy }}
                   className={cn(
-                    'bg-gradient-to-r from-yellow-400 to-amber-500 text-amber-900 font-black rounded-md border-2 border-amber-600/60 shadow-[0_0_10px_rgba(255,215,0,0.5)]',
+                    'bg-linear-to-r from-yellow-400 to-amber-500 text-amber-900 font-black rounded-md border-2 border-amber-600/60 shadow-[0_0_10px_rgba(255,215,0,0.5)]',
                     compact ? 'text-xs px-1.5 py-0.5' : 'text-sm px-2 py-0.5'
                   )}
                 >

@@ -173,7 +173,7 @@ lexiclash.com`;
             ref={cardRef}
             className={cn(
               'rounded-neo border-4 border-neo-black shadow-hard-lg overflow-hidden',
-              'bg-gradient-to-br',
+              'bg-linear-to-br',
               tierConfig.bgGradient
             )}
           >
@@ -203,7 +203,7 @@ lexiclash.com`;
               </motion.div>
 
               {/* Tier Badge */}
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 backdrop-blur-sm">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 backdrop-blur-xs">
                 <span className="text-2xl">{tierConfig.emoji}</span>
                 <span className="font-black uppercase tracking-wide">
                   {t(`brain.tiers.${tier}`)}
@@ -212,7 +212,7 @@ lexiclash.com`;
             </div>
 
             {/* Domain Scores Grid */}
-            <div className="bg-white/10 backdrop-blur-sm p-4">
+            <div className="bg-white/10 backdrop-blur-xs p-4">
               <div className="grid grid-cols-5 gap-2">
                 {Object.entries(domains).map(([key, data]) => {
                   const Icon = DOMAIN_ICONS[key as keyof typeof DOMAIN_ICONS];

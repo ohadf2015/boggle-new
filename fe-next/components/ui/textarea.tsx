@@ -21,7 +21,7 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
           // Placeholder styling
           "placeholder:text-slate-500 dark:placeholder:text-slate-400 placeholder:font-normal",
           // Focus state with cyan ring
-          "focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy",
+          "focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy",
           // Focus: slight "press" effect
           "focus:shadow-hard-pressed",
           // Disabled state

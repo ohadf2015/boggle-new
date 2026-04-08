@@ -240,7 +240,7 @@ export class ParticleEmitter {
             .rect(p.x - size, p.y - size * 0.5, size * 2, size)
             .fill({ color: p.color, alpha: p.alpha });
           break;
-        case 'ring':
+        case 'ring-3':
           this.graphics
             .circle(p.x, p.y, size)
             .stroke({ color: p.color, alpha: p.alpha, width: Math.max(1, size * 0.3) });

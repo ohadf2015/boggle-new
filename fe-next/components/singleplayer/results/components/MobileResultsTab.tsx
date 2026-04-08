@@ -65,6 +65,16 @@ export function MobileResultsTab({
   onBackToLobby,
   t,
 }: MobileResultsTabProps): React.ReactElement {
+  const leaderboardParticipants = React.useMemo(
+    () => allParticipants.map(p => ({
+      name: p.name,
+      score: p.score,
+      isCurrentPlayer: p.isPlayer,
+      isBot: !p.isPlayer,
+    })),
+    [allParticipants],
+  );
+
   return (
     <div className="space-y-3">
       {/* Top back button - visible immediately without scrolling */}
@@ -114,12 +124,7 @@ export function MobileResultsTab({
       {/* Compact leaderboard */}
       {mode === 'solo-bots' && results.botScores.length > 0 && (
         <MobileCompactLeaderboard
-          participants={allParticipants.map(p => ({
-            name: p.name,
-            score: p.score,
-            isCurrentPlayer: p.isPlayer,
-            isBot: !p.isPlayer,
-          }))}
+          participants={leaderboardParticipants}
         />
       )}
 

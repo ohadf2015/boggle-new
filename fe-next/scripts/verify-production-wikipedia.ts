@@ -3,7 +3,7 @@
  * Tests the specific issues that might prevent Wikipedia from working on the server
  */
 
-import axios from 'axios';
+import ky, { HTTPError } from 'ky';
 
 // ANSI colors
 const colors = {
@@ -76,17 +76,18 @@ async function testHttpsConnectivity(): Promise<void> {
 
   try {
     const startTime = Date.now();
-    const response = await axios.get('https://api.wikimedia.org/feed/v1/wikipedia/en/featured/2026/01/19', {
+    const response = await ky.get('https://api.wikimedia.org/feed/v1/wikipedia/en/featured/2026/01/19', {
       headers: {
         'User-Agent': 'LexiClash/1.0 (https://lexiclash.com; contact@lexiclash.com)',
         'Accept': 'application/json'
       },
-      timeout: 10000
+      timeout: 10000,
+      retry: 0,
     });
 
     const duration = Date.now() - startTime;
 
-    if (response.status === 200) {
+    if (response.ok) {
       results.push({
         test: 'HTTPS Connectivity',
         status: 'pass',
@@ -104,14 +105,8 @@ async function testHttpsConnectivity(): Promise<void> {
       log(`⚠ Unexpected status: ${response.status}`, 'yellow');
     }
   } catch (error) {
-    if (axios.isAxiosError(error)) {
-      const details = error.code === 'ECONNREFUSED'
-        ? 'Connection refused - firewall/network blocking?'
-        : error.code === 'ETIMEDOUT'
-        ? 'Connection timed out - slow network or blocked?'
-        : error.code === 'ENOTFOUND'
-        ? 'DNS lookup failed'
-        : error.message;
+    if (error instanceof HTTPError) {
+      const details = error.message;
 
       results.push({
         test: 'HTTPS Connectivity',
@@ -141,32 +136,32 @@ async function testTlsCertificate(): Promise<void> {
 
   try {
     const https = await import('https');
-    const { default: axios } = await import('axios');
 
-    // Try with strict SSL validation
-    const agent = new https.Agent({
-      rejectUnauthorized: true
-    });
-
-    const response = await axios.get('https://api.wikimedia.org/', {
-      httpsAgent: agent,
-      timeout: 5000
+    // Try with strict SSL validation using native https
+    const status = await new Promise<number>((resolve, reject) => {
+      const req = https.get('https://api.wikimedia.org/', {
+        rejectUnauthorized: true,
+        timeout: 5000,
+      }, (res) => resolve(res.statusCode ?? 0));
+      req.on('error', reject);
+      req.on('timeout', () => { req.destroy(); reject(new Error('TLS request timed out')); });
     });
 
     results.push({
       test: 'TLS/SSL Certificate',
       status: 'pass',
       message: 'SSL certificate is valid and trusted',
-      details: `Status: ${response.status}`
+      details: `Status: ${status}`
     });
     log('✓ SSL certificate verification passed', 'green');
   } catch (error) {
-    if (axios.isAxiosError(error) && error.message.includes('certificate')) {
+    const errMsg = error instanceof Error ? error.message : String(error);
+    if (errMsg.includes('certificate')) {
       results.push({
         test: 'TLS/SSL Certificate',
         status: 'fail',
         message: 'SSL certificate validation failed',
-        details: error.message
+        details: errMsg
       });
       log('✗ SSL certificate error', 'red');
     } else {
@@ -174,7 +169,7 @@ async function testTlsCertificate(): Promise<void> {
         test: 'TLS/SSL Certificate',
         status: 'warning',
         message: 'Could not verify SSL certificate',
-        details: error instanceof Error ? error.message : String(error)
+        details: errMsg
       });
       log('⚠ Could not verify SSL certificate', 'yellow');
     }

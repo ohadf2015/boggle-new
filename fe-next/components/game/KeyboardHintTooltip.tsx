@@ -104,7 +104,7 @@ export function KeyboardHintTooltip({
           <div className="flex items-start gap-2">
             {/* Icon with pulse animation */}
             <motion.div
-              className="flex-shrink-0 w-7 h-7 bg-neo-lime text-neo-black rounded-neo border-2 border-neo-black flex items-center justify-center"
+              className="shrink-0 w-7 h-7 bg-neo-lime text-neo-black rounded-neo border-2 border-neo-black flex items-center justify-center"
               animate={{ scale: [1, 1.1, 1] }}
               transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
             >
@@ -149,8 +149,8 @@ export function KeyboardHintTooltip({
               'bg-neo-lime text-neo-black',
               'border-2 border-neo-black rounded-neo',
               'font-bold text-[11px] uppercase',
-              'shadow-hard-sm hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard',
-              'active:translate-x-[1px] active:translate-y-[1px] active:shadow-none',
+              'shadow-hard-sm hover:-translate-x-px hover:-translate-y-px hover:shadow-hard',
+              'active:translate-x-px active:translate-y-px active:shadow-none',
               'transition-all'
             )}
           >

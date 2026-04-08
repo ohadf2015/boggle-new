@@ -4,11 +4,11 @@
  *
  * Validates:
  * 1. AchievementQueue inline toast uses shadow-hard-yellow class (no inline boxShadow)
- * 2. AchievementQueue inline toast has no backdrop-blur
+ * 2. AchievementQueue inline toast has no backdrop-blur-sm
  * 3. AchievementToast uses shadow-hard-yellow class (no inline boxShadow with tier border)
  * 4. AchievementToast achievement name uses neo-lime token class
  * 5. AchievementDock uses border-3 (not border-4)
- * 6. AchievementPopup uses end-4 logical property
+ * 6. AchievementPopup uses inset-e-4 logical property
  * 7. GuestBrainScorePreview has no backdrop-blur, uses neo tokens
  */
 
@@ -130,7 +130,7 @@ describe('AchievementQueue inline toast - neo-brutalist fixes', () => {
     });
   });
 
-  it('has no backdrop-blur class', async () => {
+  it('has no backdrop-blur-sm class', async () => {
     const { AchievementQueueProvider, useAchievementQueue } = await import('../AchievementQueue');
 
     function Trigger() {
@@ -149,7 +149,7 @@ describe('AchievementQueue inline toast - neo-brutalist fixes', () => {
 
     await screen.findByTestId('achievement-inline-toast');
     const toast = screen.getByTestId('achievement-inline-toast');
-    expect(toast.innerHTML).not.toContain('backdrop-blur');
+    expect(toast.innerHTML).not.toContain('backdrop-blur-sm');
   });
 });
 
@@ -169,15 +169,15 @@ describe('AchievementDock - neo-brutalist fixes', () => {
 });
 
 describe('AchievementPopup - logical property fix', () => {
-  it('uses end-4 instead of ltr:right-4 rtl:left-4', async () => {
+  it('uses inset-e-4 instead of ltr:right-4 rtl:left-4', async () => {
     const { default: AchievementPopup } = await import('../AchievementPopup');
 
     const { container } = render(
       <AchievementPopup achievement={{ key: 'test', icon: '🏆' }} />
     );
 
-    // The outer positioned div should use end-4
-    const fixedDiv = container.querySelector('.end-4');
+    // The outer positioned div should use inset-e-4
+    const fixedDiv = container.querySelector('.inset-e-4');
     expect(fixedDiv).toBeTruthy();
 
     // Should NOT have ltr:right-4 or rtl:left-4
@@ -190,15 +190,15 @@ describe('AchievementPopup - logical property fix', () => {
 });
 
 describe('GuestBrainScorePreview - neo-brutalist fixes', () => {
-  it('has no backdrop-blur and uses neo tokens', async () => {
+  it('has no backdrop-blur-sm and uses neo tokens', async () => {
     const { GuestBrainScorePreview } = await import('../../daily/results/GuestBrainScorePreview');
 
     const { container } = render(
       <GuestBrainScorePreview t={(k: string) => k} />
     );
 
-    // No backdrop-blur anywhere
-    expect(container.innerHTML).not.toContain('backdrop-blur');
+    // No backdrop-blur-sm anywhere
+    expect(container.innerHTML).not.toContain('backdrop-blur-sm');
 
     // No bg-white/30
     expect(container.innerHTML).not.toContain('bg-white/30');

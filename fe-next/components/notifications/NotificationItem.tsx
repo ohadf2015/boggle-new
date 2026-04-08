@@ -52,7 +52,7 @@ export function NotificationItem({ notification, onClick, onMarkAsRead, onDismis
       {/* Icon */}
       <div
         className={`
-          flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center
+          shrink-0 w-10 h-10 rounded-lg flex items-center justify-center
           border-2 border-black ${colorClass}
           text-lg text-black shadow-hard-sm
         `}
@@ -82,7 +82,7 @@ export function NotificationItem({ notification, onClick, onMarkAsRead, onDismis
       <button
         onClick={handleDismiss}
         className="
-          absolute top-2 end-2
+          absolute top-2 inset-e-2
           w-6 h-6 rounded-full
           flex items-center justify-center
           text-neo-white/40 hover:text-neo-white hover:bg-neo-white/10
@@ -97,7 +97,7 @@ export function NotificationItem({ notification, onClick, onMarkAsRead, onDismis
       {!notification.read && (
         <span
           className="
-            absolute bottom-3 end-3
+            absolute bottom-3 inset-e-3
             w-2.5 h-2.5 rounded-full bg-neo-cyan
             border border-black
           "

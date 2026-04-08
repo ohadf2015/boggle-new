@@ -255,8 +255,8 @@ function PreviewStep({ creator }: { creator: UseBoardCreatorReturn }) {
           className={cn(
             'border-neo border-neo-white/20 bg-black/30 text-neo-white',
             'font-neo-body text-sm rounded-neo px-3 py-2',
-            'placeholder:text-neo-white/40 focus:outline-none focus:border-neo-cyan',
-            'focus:shadow-[0_0_0_1px_theme(colors.neo-cyan/40)] transition-colors'
+            'placeholder:text-neo-white/40 focus:outline-hidden focus:border-neo-cyan',
+            'focus:shadow-[0_0_0_1px_--theme(--color-neo-cyan/40)] transition-colors'
           )}
         />
       </div>
@@ -276,8 +276,8 @@ function PreviewStep({ creator }: { creator: UseBoardCreatorReturn }) {
           className={cn(
             'border-neo border-neo-white/20 bg-black/30 text-neo-white',
             'font-neo-body text-sm rounded-neo px-3 py-2 resize-none',
-            'placeholder:text-neo-white/40 focus:outline-none focus:border-neo-cyan',
-            'focus:shadow-[0_0_0_1px_theme(colors.neo-cyan/40)] transition-colors'
+            'placeholder:text-neo-white/40 focus:outline-hidden focus:border-neo-cyan',
+            'focus:shadow-[0_0_0_1px_--theme(--color-neo-cyan/40)] transition-colors'
           )}
         />
       </div>
@@ -313,7 +313,7 @@ function PreviewStep({ creator }: { creator: UseBoardCreatorReturn }) {
             <button
               data-testid="remove-cover-image"
               onClick={() => setCoverImage(null)}
-              className="absolute top-2 end-2 bg-black/70 text-white rounded-full p-1 hover:bg-black transition-colors"
+              className="absolute top-2 inset-e-2 bg-black/70 text-white rounded-full p-1 hover:bg-black transition-colors"
               aria-label={t('ugc.board.removeCoverImage')}
             >
               <X size={16} />

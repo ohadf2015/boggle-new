@@ -104,7 +104,7 @@ export const ScheduleManager: React.FC<ScheduleManagerProps> = ({
                   <button
                     onClick={() => onSaveWord(item.puzzle_date)}
                     aria-label="Save word"
-                    className="p-1 text-green-600 hover:text-green-700 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500"
+                    className="p-1 text-green-600 hover:text-green-700 rounded focus:outline-hidden focus-visible:ring-2 focus-visible:ring-green-500"
                     disabled={isSaving}
                   >
                     <Check className="w-4 h-4" aria-hidden="true" />
@@ -112,7 +112,7 @@ export const ScheduleManager: React.FC<ScheduleManagerProps> = ({
                   <button
                     onClick={onCancelEdit}
                     aria-label="Cancel edit"
-                    className="p-1 text-red-500 hover:text-red-700 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
+                    className="p-1 text-red-500 hover:text-red-700 rounded focus:outline-hidden focus-visible:ring-2 focus-visible:ring-red-500"
                   >
                     <X className="w-4 h-4" aria-hidden="true" />
                   </button>
@@ -122,7 +122,7 @@ export const ScheduleManager: React.FC<ScheduleManagerProps> = ({
                   <span className="font-bold font-mono text-lg">{activeWord}</span>
                   <button
                     onClick={() => onStartEdit(item.puzzle_date, activeWord)}
-                    className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-gray-200 dark:hover:bg-slate-600 rounded text-gray-500 focus:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan"
+                    className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-gray-200 dark:hover:bg-slate-600 rounded text-gray-500 focus:opacity-100 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan"
                     aria-label="Edit word"
                   >
                     <Edit className="w-4 h-4" aria-hidden="true" />

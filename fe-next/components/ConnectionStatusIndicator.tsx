@@ -106,7 +106,7 @@ export const ConnectionDot: React.FC<{ className?: string }> = ({ className }) =
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -20 }}
         className={cn(
-          'fixed top-2 left-1/2 -translate-x-1/2 z-[9998]',
+          'fixed top-2 left-1/2 -translate-x-1/2 z-9998',
           'flex items-center gap-2',
           'px-3 py-1.5 rounded-full',
           'border-2 border-neo-black shadow-hard-sm',
@@ -188,7 +188,7 @@ export const ConnectionStatus: React.FC<ConnectionStatusProps> = ({
       className={cn(
         'relative inline-flex items-center gap-2 px-2 py-1 rounded-neo',
         'transition-colors duration-200',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan',
+        'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan',
         className
       )}
       onMouseEnter={() => setShowTooltip(true)}
@@ -413,8 +413,8 @@ export const ConnectionBanner: React.FC<ConnectionBannerProps> = ({ className, s
                 'bg-neo-lime text-neo-black',
                 'font-bold text-sm uppercase tracking-wide',
                 'border-2 border-neo-black shadow-hard-sm',
-                'hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px]',
-                'active:shadow-none active:translate-x-[1px] active:translate-y-[1px]',
+                'hover:shadow-hard hover:-translate-x-px hover:-translate-y-px',
+                'active:shadow-none active:translate-x-px active:translate-y-px',
                 'transition-all duration-100',
                 'flex items-center gap-2'
               )}

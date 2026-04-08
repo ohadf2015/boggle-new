@@ -6,6 +6,8 @@ import { applyHebrewFinalLetters } from '@/utils/utils';
 import type { FoundWord } from '@/shared/types/view';
 import type { TranslationFn } from '../types';
 
+const ROTATE_STYLE = { transform: 'rotate(1deg)' } as const;
+
 interface GameWordListProps {
   foundWords: FoundWord[];
   minWordLength: number;
@@ -23,6 +25,8 @@ export const GameWordList = memo<GameWordListProps>(function GameWordList({
   t,
   compact = false,
 }) {
+  const reversedWords = React.useMemo(() => [...foundWords].reverse(), [foundWords]);
+
   // Compact view for mobile (horizontal wrap)
   if (compact) {
     return (
@@ -40,10 +44,7 @@ export const GameWordList = memo<GameWordListProps>(function GameWordList({
             </p>
           ) : (
             <div className="flex flex-wrap gap-1">
-              {foundWords
-                .slice()
-                .reverse()
-                .map((wordObj, index) => (
+              {reversedWords.map((wordObj, index) => (
                   <AdaptiveMotion.span
                     key={`${wordObj.word}-${index}`}
                     initial={{ scale: 0.8, opacity: 0 }}
@@ -71,7 +72,7 @@ export const GameWordList = memo<GameWordListProps>(function GameWordList({
   return (
     <div
       className="bg-neo-cream text-neo-black border-4 border-neo-black rounded-neo-lg shadow-hard-lg flex flex-col min-h-0 max-h-[75vh] lg:max-h-[calc(100vh-120px)] overflow-hidden"
-      style={{ transform: 'rotate(1deg)' }}
+      style={ROTATE_STYLE}
     >
       {/* Header */}
       <div className="py-3 px-4 border-b-4 border-neo-black bg-neo-cyan text-neo-black">
@@ -100,7 +101,7 @@ export const GameWordList = memo<GameWordListProps>(function GameWordList({
                         ? 'bg-neo-red text-neo-cream shadow-hard-sm line-through opacity-70'
                         : isLatest
                           ? 'bg-neo-lime text-neo-black shadow-hard'
-                          : 'bg-neo-cream text-neo-black shadow-hard-sm hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard'
+                          : 'bg-neo-cream text-neo-black shadow-hard-sm hover:-translate-x-px hover:-translate-y-px hover:shadow-hard'
                     }`}
                 >
                   {applyHebrewFinalLetters(wordText).toUpperCase()}

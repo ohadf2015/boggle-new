@@ -74,7 +74,7 @@ export default function MilogWordsPageClient() {
   return (
     <div className={cn(
       'flex-1 flex flex-col w-full overflow-x-hidden min-h-screen',
-      isDarkMode ? 'bg-neo-navy' : 'bg-gradient-to-br from-blue-50 via-white to-purple-50',
+      isDarkMode ? 'bg-neo-navy' : 'bg-linear-to-br from-blue-50 via-white to-purple-50',
       isRTL && 'rtl'
     )}>
       <Header />

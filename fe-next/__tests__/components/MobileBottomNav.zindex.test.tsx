@@ -4,7 +4,7 @@ import { vi } from 'vitest';
  *
  * Bug Context:
  * - Header mobile menu overlay has z-70 (components/Header.tsx:445)
- * - MobileBottomNav was changed from z-50 to z-[65] (commit e95788ec)
+ * - MobileBottomNav was changed from z-50 to z-65 (commit e95788ec)
  * - This makes navigation tabs unclickable when menu is open
  *
  * Expected Behavior:
@@ -42,8 +42,9 @@ describe('MobileBottomNav z-index', () => {
     // Check className directly (getComputedStyle doesn't work reliably with custom z-index in JSDOM)
     const className = nav?.className || '';
 
-    // Must have z-[75] or higher (> z-70 Header overlay)
-    const zIndexMatch = className.match(/z-\[(\d+)\]/);
+    // Must have z-75 or higher (> z-70 Header overlay)
+    // Match both bracket notation z-[75] and standard Tailwind z-75
+    const zIndexMatch = className.match(/z-\[(\d+)\]/) || className.match(/z-(\d+)/);
     expect(zIndexMatch).toBeTruthy();
 
     if (zIndexMatch) {
@@ -118,14 +119,16 @@ describe('MobileBottomNav z-index', () => {
     const nav = container.querySelector('nav');
     const className = nav?.className || '';
 
-    // Should NOT use z-[65] (too low)
-    expect(className).not.toContain('z-[65]');
+    // Should NOT use z-65 (too low)
+    expect(className).not.toContain('z-65');
 
-    // Should use z-[75] or higher (must be > z-70 Header overlay)
-    const hasValidZIndex = className.includes('z-[75]') ||
-                          className.includes('z-[80]') ||
-                          className.includes('z-[90]');
-
-    expect(hasValidZIndex).toBe(true);
+    // Should use z-75 or higher (must be > z-70 Header overlay)
+    // Match both bracket z-[N] and standard z-N notation
+    const zMatch = className.match(/z-\[(\d+)\]/) || className.match(/z-(\d+)/);
+    expect(zMatch).toBeTruthy();
+    if (zMatch) {
+      const zVal = parseInt(zMatch[1], 10);
+      expect(zVal).toBeGreaterThanOrEqual(75);
+    }
   });
 });

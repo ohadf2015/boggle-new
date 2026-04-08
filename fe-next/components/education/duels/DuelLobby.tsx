@@ -208,7 +208,7 @@ export default function DuelLobby({ classroomId, studentId, lessons, onTabChange
                       'border-3 border-black shadow-hard-sm',
                       'hover:-translate-y-0.5 hover:shadow-hard active:translate-y-0.5 active:shadow-hard-pressed',
                       'transition-all duration-100',
-                      'focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-lime'
+                      'focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-lime'
                     )}
                   >
                     {t('accept')}
@@ -221,7 +221,7 @@ export default function DuelLobby({ classroomId, studentId, lessons, onTabChange
                       'border-3 border-black shadow-hard-sm',
                       'hover:-translate-y-0.5 hover:shadow-hard active:translate-y-0.5 active:shadow-hard-pressed',
                       'transition-all duration-100',
-                      'focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-lime'
+                      'focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-lime'
                     )}
                   >
                     {t('decline')}
@@ -245,7 +245,7 @@ export default function DuelLobby({ classroomId, studentId, lessons, onTabChange
             'hover:-translate-y-1 hover:shadow-hard-lg active:translate-y-0.5 active:shadow-hard-pressed',
             'animate-neo-press transition-all duration-100',
             'disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-hard',
-            'focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan'
+            'focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan'
           )}
         >
           <Swords className="w-6 h-6 inline me-2" aria-hidden="true" />
@@ -272,7 +272,7 @@ export default function DuelLobby({ classroomId, studentId, lessons, onTabChange
                   'border-3 border-black shadow-hard-sm',
                   'hover:-translate-y-0.5 hover:shadow-hard active:translate-y-0.5 active:shadow-hard-pressed',
                   'transition-all duration-100',
-                  'focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan'
+                  'focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan'
                 )}
               >
                 {t('education.duels.challengeSomeone')}
@@ -292,7 +292,7 @@ export default function DuelLobby({ classroomId, studentId, lessons, onTabChange
                   'active:translate-y-0.5 active:shadow-hard-pressed',
                   'transition-all duration-100 cursor-pointer',
                   'flex flex-col items-center gap-2',
-                  'focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan'
+                  'focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan'
                 )}
               >
                 {/* Avatar placeholder */}
@@ -301,7 +301,7 @@ export default function DuelLobby({ classroomId, studentId, lessons, onTabChange
                     {(opponent.displayName ?? '?').charAt(0).toUpperCase()}
                   </span>
                   {/* Online indicator — neo-cyan glow */}
-                  <div className="absolute -top-1.5 -end-1.5 w-4 h-4 rounded-full bg-neo-cyan border-3 border-black shadow-[0_0_8px_theme(colors.neo-cyan)]" aria-label={t('education.duels.online')} role="status" />
+                  <div className="absolute -top-1.5 -inset-e-1.5 w-4 h-4 rounded-full bg-neo-cyan border-3 border-black shadow-[0_0_8px_var(--color-neo-cyan)]" aria-label={t('education.duels.online')} role="status" />
                 </div>
 
                 {/* Name */}

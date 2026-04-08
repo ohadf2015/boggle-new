@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback, useRef, useEffect, createContext, useContext, ReactNode } from 'react';
+import React, { useState, useCallback, useMemo, useRef, useEffect, createContext, useContext, ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import dynamic from 'next/dynamic';
@@ -321,7 +321,7 @@ export const AchievementQueueProvider = ({ children }: AchievementQueueProviderP
   }, [processNext]);
 
   return (
-    <AchievementQueueContext.Provider value={{ queueAchievement }}>
+    <AchievementQueueContext.Provider value={useMemo(() => ({ queueAchievement }), [queueAchievement])}>
       {children}
       <AnimatePresence>
         {currentAchievement && (

@@ -127,7 +127,7 @@ export function WebVitalsReporter() {
         connection_type: getConnectionType(),
         navigation_type: metric.navigationType,
         session_id: getSessionId(),
-        user_agent: navigator.userAgent,
+        user_agent: typeof navigator !== 'undefined' ? navigator.userAgent : '',
         metadata: {
           id: metric.id,
           navigationType: metric.navigationType,
@@ -161,7 +161,7 @@ export function WebVitalsReporter() {
       });
 
       // Use sendBeacon if available, otherwise fetch
-      if (navigator.sendBeacon) {
+      if (typeof navigator !== 'undefined' && navigator.sendBeacon) {
         navigator.sendBeacon(process.env.NEXT_PUBLIC_WEB_VITALS_ENDPOINT, body);
       } else {
         fetch(process.env.NEXT_PUBLIC_WEB_VITALS_ENDPOINT, {

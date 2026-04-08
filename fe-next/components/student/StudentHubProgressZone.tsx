@@ -139,7 +139,7 @@ export function StudentHubProgressZone({ classroomId, userId }: StudentHubProgre
         {/* Lime header with XP */}
         <div className="bg-neo-lime px-6 pt-5 pb-4">
           <motion.div
-            className="absolute top-2 end-2 z-10"
+            className="absolute top-2 inset-e-2 z-10"
             initial={{ scale: 0, rotate: 30 }}
             animate={{ scale: 1, rotate: 0 }}
             transition={{ type: 'spring', stiffness: 200, damping: 12, delay: 0.5 }}
@@ -156,7 +156,7 @@ export function StudentHubProgressZone({ classroomId, userId }: StudentHubProgre
           </motion.div>
 
           <motion.div variants={childFadeUp} className="flex items-center gap-4 pe-14 sm:pe-20">
-            <motion.div variants={levelBadgePop} className="relative flex-shrink-0">
+            <motion.div variants={levelBadgePop} className="relative shrink-0">
               <motion.div
                 className="w-14 h-14 rounded-neo bg-black border-3 border-black flex items-center justify-center shadow-hard-sm"
                 whileHover={{ scale: 1.15, rotate: -5 }}

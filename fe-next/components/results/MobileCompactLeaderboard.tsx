@@ -46,11 +46,11 @@ function EmojiBubble({ emoji, onDone }: { emoji: string; onDone: () => void }) {
       animate={{ scale: 1, y: -8, opacity: 1 }}
       exit={{ scale: 0, opacity: 0 }}
       transition={{ type: 'spring', stiffness: 500, damping: 15 }}
-      className="absolute -top-2 end-10 z-20 bg-neo-cream border-3 border-neo-black rounded-neo shadow-hard-sm px-2 py-1 text-lg pointer-events-none"
+      className="absolute -top-2 inset-e-10 z-20 bg-neo-cream border-3 border-neo-black rounded-neo shadow-hard-sm px-2 py-1 text-lg pointer-events-none"
     >
       {emoji}
       {/* Triangle pointer */}
-      <div className="absolute -bottom-1.5 end-3 w-3 h-3 bg-neo-cream border-b-3 border-s-3 border-neo-black rotate-45" />
+      <div className="absolute -bottom-1.5 inset-e-3 w-3 h-3 bg-neo-cream border-b-3 border-s-3 border-neo-black rotate-45" />
     </motion.div>
   );
 }
@@ -106,7 +106,7 @@ const MobileCompactLeaderboard: React.FC<MobileCompactLeaderboardProps> = memo((
             {/* Winner pulsing border glow */}
             {isWinner && !reducedMotion && (
               <motion.div
-                className="absolute inset-y-0 start-0 w-1 bg-neo-lime"
+                className="absolute inset-y-0 inset-s-0 w-1 bg-neo-lime"
                 animate={{ opacity: [0.5, 1, 0.5] }}
                 transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
               />

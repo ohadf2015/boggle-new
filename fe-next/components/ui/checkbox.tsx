@@ -22,7 +22,7 @@ const Checkbox = React.forwardRef<
         "bg-white border-slate-400",
         // States
         "ring-offset-background",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2",
+        "focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2",
         "disabled:cursor-not-allowed disabled:opacity-70",
         // Checked state - bright green background, clear "on" state
         "data-[state=checked]:bg-emerald-500 data-[state=checked]:border-emerald-600",
@@ -36,7 +36,7 @@ const Checkbox = React.forwardRef<
       <CheckboxPrimitive.Indicator
         className={cn("flex items-center justify-center")}
       >
-        <Check className="h-4 w-4 stroke-[3] text-white" />
+        <Check className="h-4 w-4 stroke-3 text-white" />
       </CheckboxPrimitive.Indicator>
     </CheckboxPrimitive.Root>
   </span>

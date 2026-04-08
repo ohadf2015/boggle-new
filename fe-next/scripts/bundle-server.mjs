@@ -54,7 +54,7 @@ const externalPackages = [
   'bad-words',
   'resend',
   'ws',
-  'axios',
+
   'zod',
   'zod/*',
   'sharp',

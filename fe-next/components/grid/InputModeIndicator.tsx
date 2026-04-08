@@ -26,7 +26,7 @@ const InputModeIndicator = memo<InputModeIndicatorProps>(({ activeMode }) => {
 
   return (
     <div
-      className="hidden md:flex items-center gap-1 absolute bottom-1 end-1 z-20 pointer-events-none"
+      className="hidden md:flex items-center gap-1 absolute bottom-1 inset-e-1 z-20 pointer-events-none"
       aria-hidden="true"
     >
       {modes.map(({ key, labelKey }) => (

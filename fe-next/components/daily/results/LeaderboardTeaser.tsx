@@ -80,7 +80,7 @@ export const LeaderboardTeaser: React.FC<LeaderboardTeaserProps> = ({
 
       {/* Blurred preview */}
       <div className="relative mb-4">
-        <div className="blur-sm pointer-events-none select-none">
+        <div className="blur-xs pointer-events-none select-none">
           <div className="space-y-2">
             {[1, 2, 3].map((rank) => (
               <div

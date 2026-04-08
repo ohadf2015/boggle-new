@@ -91,7 +91,7 @@ export const SurvivalLiveRanks: React.FC<SurvivalLiveRanksProps> = ({
   return (
     <div className="h-full flex flex-col overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b-3 border-neo-black flex-shrink-0 bg-neo-black/30">
+      <div className="flex items-center justify-between px-4 py-3 border-b-3 border-neo-black shrink-0 bg-neo-black/30">
         <div className="flex items-center gap-2">
           <Trophy className="w-4 h-4 text-neo-yellow" />
           <span className="font-bold text-neo-cream text-sm uppercase tracking-wide">
@@ -124,7 +124,7 @@ export const SurvivalLiveRanks: React.FC<SurvivalLiveRanksProps> = ({
             >
               {/* Rank */}
               <span className={cn(
-                'w-6 text-center font-black text-sm tabular-nums flex-shrink-0',
+                'w-6 text-center font-black text-sm tabular-nums shrink-0',
                 entry.rank === 1 ? 'text-neo-yellow' :
                 entry.rank === 2 ? 'text-gray-300' :
                 entry.rank === 3 ? 'text-amber-600' :
@@ -134,7 +134,7 @@ export const SurvivalLiveRanks: React.FC<SurvivalLiveRanksProps> = ({
               </span>
 
               {/* Avatar */}
-              <div className="flex-shrink-0">
+              <div className="shrink-0">
                 <Avatar
 
                   avatarImage={entry.avatar_image ?? undefined}
@@ -163,7 +163,7 @@ export const SurvivalLiveRanks: React.FC<SurvivalLiveRanksProps> = ({
               </PlayerProfileTooltip>
 
               {/* Score */}
-              <span className="font-black text-sm tabular-nums text-neo-lime flex-shrink-0">
+              <span className="font-black text-sm tabular-nums text-neo-lime shrink-0">
                 {entry.score}
               </span>
             </AdaptiveMotion.div>

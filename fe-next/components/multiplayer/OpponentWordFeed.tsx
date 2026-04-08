@@ -37,7 +37,7 @@ export function OpponentWordFeed({ feedItems, t }: OpponentWordFeedProps) {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
               transition={{ duration: 0.25 }}
-              className={`rounded-neo border-neo border-black bg-neo-navy-light/80 px-3 py-1.5 backdrop-blur-sm ${
+              className={`rounded-neo border-neo border-black bg-neo-navy-light/80 px-3 py-1.5 backdrop-blur-xs ${
                 item.isLongWord ? 'animate-neo-shake text-neo-lime font-bold text-sm' : 'text-neo-cream/90 text-xs'
               }`}
             >

@@ -110,7 +110,7 @@ export const WordHuntMPLeaderboard = memo<WordHuntMPLeaderboardProps>(({
                 <span data-wrong-guess="true" className="sr-only" aria-hidden="true" />
               )}
               {/* Avatar */}
-              <div className={cn("flex-shrink-0", isEliminated && "grayscale")}>
+              <div className={cn("shrink-0", isEliminated && "grayscale")}>
                 <Avatar userId={player.username} size="sm" />
               </div>
 
@@ -145,13 +145,13 @@ export const WordHuntMPLeaderboard = memo<WordHuntMPLeaderboardProps>(({
                     )}
                     style={{ width: `${Math.max(life, 0)}%` }}
                   >
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer pointer-events-none" />
+                    <div className="absolute inset-0 bg-linear-to-r from-transparent via-white/20 to-transparent animate-shimmer pointer-events-none" />
                   </div>
                 </div>
               </div>
 
               {isEliminated && (
-                <Skull size={10} className="text-neo-red flex-shrink-0" />
+                <Skull size={10} className="text-neo-red shrink-0" />
               )}
             </div>
           );
@@ -200,14 +200,14 @@ export const WordHuntMPLeaderboard = memo<WordHuntMPLeaderboardProps>(({
                     side="right"
                   >
                     <span className={cn(
-                      "text-sm font-bold truncate flex-shrink min-w-0",
+                      "text-sm font-bold truncate shrink min-w-0",
                       isCurrent ? 'text-neo-yellow' : 'text-neo-white cursor-pointer hover:underline'
                     )}>
                       {player.username}
                     </span>
                   </PlayerProfileTooltip>
 
-                  <div className="flex items-center gap-1 flex-shrink-0">
+                  <div className="flex items-center gap-1 shrink-0">
                     <span className="text-sm font-mono font-bold text-neo-white tabular-nums">
                       {player.score}
                     </span>
@@ -236,7 +236,7 @@ export const WordHuntMPLeaderboard = memo<WordHuntMPLeaderboardProps>(({
                     )}
                     style={{ width: `${Math.max(life, 0)}%` }}
                   >
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer pointer-events-none" />
+                    <div className="absolute inset-0 bg-linear-to-r from-transparent via-white/20 to-transparent animate-shimmer pointer-events-none" />
                     <div className="absolute inset-x-0 top-0 h-[2px] bg-white/30 pointer-events-none" />
                   </div>
                   {/* Segment markers */}

@@ -128,7 +128,7 @@ const AdventureHub = memo<AdventureHubProps>(({
         initial={{ opacity: 0, scale: 1.05 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.6 }}
-        className="relative w-full aspect-[16/10] overflow-hidden"
+        className="relative w-full aspect-16/10 overflow-hidden"
       >
         <Image
           src={heroImage}
@@ -139,12 +139,12 @@ const AdventureHub = memo<AdventureHubProps>(({
           sizes="(max-width: 448px) 100vw, 448px"
         />
         {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-neo-navy via-neo-navy/60 to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-t from-neo-navy via-neo-navy/60 to-transparent" />
 
         {/* Home link — top-left */}
         <Link
           href="/"
-          className="absolute top-3 start-3 flex items-center gap-1 text-neo-white font-bold text-xs hover:text-neo-lime transition-colors z-10 bg-neo-black/60 backdrop-blur-sm px-2.5 py-1.5 rounded-neo border border-neo-white/20"
+          className="absolute top-3 inset-s-3 flex items-center gap-1 text-neo-white font-bold text-xs hover:text-neo-lime transition-colors z-10 bg-neo-black/60 backdrop-blur-xs px-2.5 py-1.5 rounded-neo border border-neo-white/20"
           aria-label={t('common.home')}
         >
           <Home className="w-3.5 h-3.5" />

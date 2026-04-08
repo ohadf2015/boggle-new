@@ -90,7 +90,7 @@ const TrainingGatewayModal: React.FC<TrainingGatewayModalProps> = ({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+        className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs"
         onClick={onClose}
       >
         <motion.div
@@ -107,7 +107,7 @@ const TrainingGatewayModal: React.FC<TrainingGatewayModalProps> = ({
           onClick={(e) => e.stopPropagation()}
         >
           {/* Decorative background glow */}
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-32 bg-gradient-to-b from-purple-500/20 to-transparent rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-32 bg-linear-to-b from-purple-500/20 to-transparent rounded-full blur-3xl pointer-events-none" />
 
           {/* Close button */}
           <button
@@ -174,8 +174,8 @@ const TrainingGatewayModal: React.FC<TrainingGatewayModalProps> = ({
             <h2 className={cn(
               'text-2xl font-bold mb-2',
               isDarkMode
-                ? 'text-transparent bg-clip-text bg-gradient-to-r from-purple-300 via-pink-300 to-purple-400'
-                : 'text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-pink-500 to-purple-600'
+                ? 'text-transparent bg-clip-text bg-linear-to-r from-purple-300 via-pink-300 to-purple-400'
+                : 'text-transparent bg-clip-text bg-linear-to-r from-purple-500 via-pink-500 to-purple-600'
             )}>
               {t('training.gateway.title')}
             </h2>
@@ -274,7 +274,7 @@ const TrainingGatewayModal: React.FC<TrainingGatewayModalProps> = ({
                 >
                   <benefit.icon
                     className={cn(
-                      'flex-shrink-0',
+                      'shrink-0',
                       isDarkMode ? 'text-purple-400' : 'text-purple-600'
                     )}
                     size={16}
@@ -313,7 +313,7 @@ const TrainingGatewayModal: React.FC<TrainingGatewayModalProps> = ({
               onClick={handleStartTraining}
               className={cn(
                 'w-full h-12 text-base font-semibold rounded-xl transition-all flex items-center justify-center gap-2',
-                'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600',
+                'bg-linear-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600',
                 'text-white shadow-lg hover:shadow-xl'
               )}
             >

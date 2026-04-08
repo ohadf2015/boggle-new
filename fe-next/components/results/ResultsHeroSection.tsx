@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useEffect, useRef, memo } from 'react';
-import { motion, useMotionValue, useSpring, useInView, animate } from 'framer-motion';
+import React, { memo } from 'react';
+import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import useReducedMotion from '@/hooks/useReducedMotion';
 import Avatar from '../Avatar';
 import { formatRankOrdinal } from '@/utils/formatRankOrdinal';
+import { AnimatedCounter } from '@/components/ui/AnimatedCounter';
 
 // ============================================================
 // TYPES
@@ -82,28 +83,14 @@ const AnimatedScore: React.FC<{
   className?: string;
   skipAnimation?: boolean;
 }> = ({ target, className, skipAnimation }) => {
-  const scoreRef = useRef<HTMLSpanElement>(null);
-  const scoreMotionValue = useMotionValue(0);
-  const scoreSpring = useSpring(scoreMotionValue, { stiffness: 100, damping: 30 });
-  const scoreInView = useInView(scoreRef, { once: true });
-
-  useEffect(() => {
-    if (!scoreInView || skipAnimation) {
-      if (scoreRef.current) scoreRef.current.textContent = target.toLocaleString();
-      return;
-    }
-    const controls = animate(scoreMotionValue, target, { duration: 1.5 });
-    return controls.stop;
-  }, [scoreInView, target, skipAnimation, scoreMotionValue]);
-
-  useEffect(() => {
-    const unsub = scoreSpring.on('change', (v) => {
-      if (scoreRef.current) scoreRef.current.textContent = Math.round(v).toLocaleString();
-    });
-    return unsub;
-  }, [scoreSpring]);
-
-  return <span ref={scoreRef} className={className}>0</span>;
+  return (
+    <AnimatedCounter
+      value={target}
+      size="xl"
+      duration={skipAnimation ? 0 : 1500}
+      className={className}
+    />
+  );
 };
 
 // ============================================================

@@ -195,7 +195,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
 
         <div className="max-h-[90vh] overflow-y-auto">
           {/* Header */}
-            <div className="relative flex items-center justify-between p-3 sm:p-4 border-b-neo-thick border-neo-black bg-gradient-to-br from-neo-lime to-neo-orange sticky top-0 z-10">
+            <div className="relative flex items-center justify-between p-3 sm:p-4 border-b-neo-thick border-neo-black bg-linear-to-br from-neo-lime to-neo-orange sticky top-0 z-10">
               <motion.div
                 className="flex items-center gap-3"
                 initial={{ x: -20, opacity: 0 }}
@@ -203,7 +203,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                 transition={{ type: 'spring', stiffness: 380, damping: 26, delay: 0.2 }}
               >
                 <div className="relative">
-                  <Crown className="w-7 h-7 sm:w-8 sm:h-8 text-neo-black drop-shadow-sm" strokeWidth={2.5} />
+                  <Crown className="w-7 h-7 sm:w-8 sm:h-8 text-neo-black drop-shadow-xs" strokeWidth={2.5} />
                   <motion.div
                     className="absolute -top-1 -right-1"
                     animate={{ scale: [1, 1.2, 1], rotate: [0, 10, 0] }}
@@ -212,7 +212,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                     <Sparkles className="w-4 h-4 text-neo-pink" fill="currentColor" />
                   </motion.div>
                 </div>
-                <h2 className="font-bold text-xl sm:text-2xl uppercase tracking-tight text-neo-black drop-shadow-sm">
+                <h2 className="font-bold text-xl sm:text-2xl uppercase tracking-tight text-neo-black drop-shadow-xs">
                   {t('daily.createChallengeTitle')}
                 </h2>
               </motion.div>
@@ -329,7 +329,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                         min: 4,
                         max: 8
                       })}
-                      className={`w-full px-4 py-3 text-lg font-bold text-neo-black border-neo-thick rounded-xl shadow-hard-sm focus:shadow-hard focus:outline-none transition-all ${
+                      className={`w-full px-4 py-3 text-lg font-bold text-neo-black border-neo-thick rounded-xl shadow-hard-sm focus:shadow-hard focus:outline-hidden transition-all ${
                         wordError
                           ? 'border-red-500 bg-red-50'
                           : 'border-neo-black bg-neo-white focus:border-neo-cyan'
@@ -356,14 +356,14 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                   >
                     <Button
                       onClick={handleCreate}
-                      className="relative w-full max-w-btn h-14 sm:h-16 text-lg sm:text-xl font-black bg-gradient-to-br from-neo-pink to-neo-pink/80 hover:from-neo-pink/90 hover:to-neo-pink/70 text-neo-white border-neo-thick border-neo-black shadow-hard-lg hover:shadow-hard-xl hover:-translate-y-1 active:translate-y-0 active:shadow-hard-sm rounded-xl transition-all uppercase tracking-wide overflow-hidden group"
+                      className="relative w-full max-w-btn h-14 sm:h-16 text-lg sm:text-xl font-black bg-linear-to-br from-neo-pink to-neo-pink/80 hover:from-neo-pink/90 hover:to-neo-pink/70 text-neo-white border-neo-thick border-neo-black shadow-hard-lg hover:shadow-hard-xl hover:-translate-y-1 active:translate-y-0 active:shadow-hard-sm rounded-xl transition-all uppercase tracking-wide overflow-hidden group"
                     >
                       <span className="relative z-10 flex items-center justify-center gap-3">
                         <Zap className="w-6 h-6" strokeWidth={2.5} fill="currentColor" />
                         {t('daily.generateChallenge')}
                       </span>
                       <motion.div
-                        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                        className="absolute inset-0 bg-linear-to-r from-transparent via-white/20 to-transparent"
                         animate={{ x: ['-100%', '200%'] }}
                         transition={{ repeat: Infinity, duration: 2, ease: 'linear' }}
                       />
@@ -442,7 +442,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                   <div className="relative flex items-center justify-center h-32 sm:h-40">
                     {/* Background circle */}
                     <motion.div
-                      className="absolute w-24 h-24 sm:w-32 sm:h-32 bg-gradient-to-br from-neo-lime to-neo-orange rounded-full border-neo-thick border-neo-black shadow-hard-lg"
+                      className="absolute w-24 h-24 sm:w-32 sm:h-32 bg-linear-to-br from-neo-lime to-neo-orange rounded-full border-neo-thick border-neo-black shadow-hard-lg"
                       initial={{ opacity: 0, scale: 0.95 }}
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ type: 'spring', bounce: 0.6, duration: 0.6 }}
@@ -537,7 +537,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                   >
                     <Button
                       onClick={handleNativeShare}
-                      className="w-full max-w-btn h-14 sm:h-16 text-lg sm:text-xl font-black bg-gradient-to-br from-neo-cyan to-blue-500 hover:from-neo-cyan/90 hover:to-blue-500/90 text-neo-white border-neo-thick border-neo-black shadow-hard-lg hover:shadow-hard-xl hover:-translate-y-1 active:translate-y-0 active:shadow-hard-sm rounded-xl transition-all uppercase tracking-wide"
+                      className="w-full max-w-btn h-14 sm:h-16 text-lg sm:text-xl font-black bg-linear-to-br from-neo-cyan to-blue-500 hover:from-neo-cyan/90 hover:to-blue-500/90 text-neo-white border-neo-thick border-neo-black shadow-hard-lg hover:shadow-hard-xl hover:-translate-y-1 active:translate-y-0 active:shadow-hard-sm rounded-xl transition-all uppercase tracking-wide"
                     >
                       <Share2 className="w-6 h-6 me-2" strokeWidth={2.5} />
                       {t('daily.shareChallenge')}
@@ -545,7 +545,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
 
                     <Button
                       onClick={() => setStep('stats')}
-                      className="w-full max-w-btn h-14 sm:h-16 text-lg sm:text-xl font-black bg-gradient-to-br from-neo-purple to-purple-600 hover:from-neo-purple/90 hover:to-purple-600/90 text-neo-white border-neo-thick border-neo-black shadow-hard-lg hover:shadow-hard-xl hover:-translate-y-1 active:translate-y-0 active:shadow-hard-sm rounded-xl transition-all uppercase tracking-wide"
+                      className="w-full max-w-btn h-14 sm:h-16 text-lg sm:text-xl font-black bg-linear-to-br from-neo-purple to-purple-600 hover:from-neo-purple/90 hover:to-purple-600/90 text-neo-white border-neo-thick border-neo-black shadow-hard-lg hover:shadow-hard-xl hover:-translate-y-1 active:translate-y-0 active:shadow-hard-sm rounded-xl transition-all uppercase tracking-wide"
                     >
                       <BarChart3 className="w-6 h-6 me-2" strokeWidth={2.5} />
                       {t('daily.viewStats')}

@@ -177,7 +177,7 @@ function ModeGlowOverlay({ isActive, gradientFrom, gradientTo }: {
   return (
     <div
       className={cn(
-        'absolute inset-0 rounded-neo bg-gradient-to-br transition-opacity duration-500 pointer-events-none',
+        'absolute inset-0 rounded-neo bg-linear-to-br transition-opacity duration-500 pointer-events-none',
         gradientFrom,
         gradientTo,
         isActive ? 'opacity-100 animate-mode-glow-breathe' : 'opacity-0'
@@ -192,7 +192,7 @@ function ShimmerSweep({ isActive }: { isActive: boolean }) {
   return (
     <div className="absolute inset-0 rounded-neo overflow-hidden pointer-events-none">
       <div
-        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-[mode-shimmer-sweep_1.5s_ease-in-out_1]"
+        className="absolute inset-0 bg-linear-to-r from-transparent via-white/10 to-transparent animate-[mode-shimmer-sweep_1.5s_ease-in-out_1]"
       />
     </div>
   );
@@ -204,7 +204,7 @@ function ScanLineEffect({ isActive, mode }: { isActive: boolean; mode: GameModeO
   return (
     <div className="absolute inset-0 rounded-neo overflow-hidden pointer-events-none">
       <div
-        className="absolute left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-neo-pink/60 to-transparent animate-[mode-scan-line_2.5s_linear_infinite]"
+        className="absolute left-0 right-0 h-[2px] bg-linear-to-r from-transparent via-neo-pink/60 to-transparent animate-[mode-scan-line_2.5s_linear_infinite]"
       />
     </div>
   );
@@ -241,7 +241,7 @@ export function BattleModeCard({
       {/* Game Mode Cards */}
       <div className={cn('bg-neo-navy-light text-neo-cream rounded-xl border-3 border-neo-black shadow-hard relative overflow-hidden', compact ? 'p-2.5' : 'p-4')}>
         {/* Ambient background gradient */}
-        <div className="absolute inset-0 bg-gradient-to-br from-neo-purple/10 via-transparent to-neo-cyan/5 pointer-events-none" />
+        <div className="absolute inset-0 bg-linear-to-br from-neo-purple/10 via-transparent to-neo-cyan/5 pointer-events-none" />
 
         {/* Section label with sparkle */}
         <div className={cn('relative flex items-center gap-1.5', compact ? 'mb-1.5' : 'mb-3')}>
@@ -360,7 +360,7 @@ export function BattleModeCard({
 
         {/* Broadcast Mode - desktop only */}
         <div className="relative mt-3 pt-3 border-t border-neo-white/10 hidden lg:flex items-center gap-2">
-          <Monitor className="w-4 h-4 text-neo-cream/50 flex-shrink-0" />
+          <Monitor className="w-4 h-4 text-neo-cream/50 shrink-0" />
           <Checkbox
             id={`broadcastMode-${compact ? 'mobile' : 'desktop'}`}
             checked={!hostPlaying}

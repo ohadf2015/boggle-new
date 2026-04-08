@@ -237,9 +237,10 @@ export const CompactLeaderboard = memo<CompactLeaderboardProps>(function Compact
   if (totalPlayers === 0 || !currentUser) return null;
 
   // Get top 3 OTHER players for race visualization (exclude current user)
-  const raceParticipants = sortedPlayers
-    .filter(p => p.username !== currentUsername)
-    .slice(0, 3);
+  const raceParticipants = useMemo(
+    () => sortedPlayers.filter(p => p.username !== currentUsername).slice(0, 3),
+    [sortedPlayers, currentUsername],
+  );
 
   return (
     <div className={cn(
@@ -279,7 +280,7 @@ export const CompactLeaderboard = memo<CompactLeaderboardProps>(function Compact
       )}
 
       {/* Race Track Visualization */}
-      <div className="px-2 py-1.5 bg-gradient-to-b from-neo-navy/5 to-transparent">
+      <div className="px-2 py-1.5 bg-linear-to-b from-neo-navy/5 to-transparent">
         {/* Track lanes */}
         <div className="relative space-y-1" role="list">
           {raceParticipants.map((player) => {
@@ -297,7 +298,7 @@ export const CompactLeaderboard = memo<CompactLeaderboardProps>(function Compact
                 onClick={isMe ? handleSelfClick : undefined}
                 className={cn(
                   'relative flex items-center gap-1.5 h-10 rounded-neo overflow-hidden transition-all duration-200',
-                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-1',
+                  'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-1',
                   'hover:bg-neo-black/10',
                   isMe
                     ? 'bg-neo-cyan/30 border-2 border-neo-cyan hover:bg-neo-cyan/40 cursor-pointer active:scale-[0.98]'
@@ -318,7 +319,7 @@ export const CompactLeaderboard = memo<CompactLeaderboardProps>(function Compact
                   <div className={cn(
                     'flex items-center gap-1 px-1.5 py-0.5 rounded-neo',
                     isLeader
-                      ? 'bg-gradient-to-r from-neo-lime to-neo-orange border-2 border-neo-black shadow-hard-sm'
+                      ? 'bg-linear-to-r from-neo-lime to-neo-orange border-2 border-neo-black shadow-hard-sm'
                       : isMe
                         ? 'bg-neo-cyan border-2 border-neo-black shadow-hard-sm'
                         : 'bg-neo-cream border border-neo-black/50'
@@ -449,7 +450,7 @@ export const CompactLeaderboard = memo<CompactLeaderboardProps>(function Compact
           className={cn(
             'relative flex items-center justify-between px-2 py-1.5 rounded-neo border-2',
             isLeading
-              ? 'bg-gradient-to-r from-neo-lime/50 to-neo-lime/50 border-neo-black'
+              ? 'bg-linear-to-r from-neo-lime/50 to-neo-lime/50 border-neo-black'
               : isCloseToOvertaking
                 ? 'bg-neo-pink/20 border-neo-pink'
                 : 'bg-neo-cyan/10 border-neo-cyan/50'
@@ -517,8 +518,8 @@ export const CompactLeaderboard = memo<CompactLeaderboardProps>(function Compact
                 className={cn(
                   'h-full rounded-full',
                   isCloseToOvertaking
-                    ? 'bg-gradient-to-r from-neo-pink to-neo-orange'
-                    : 'bg-gradient-to-r from-neo-cyan to-neo-pink'
+                    ? 'bg-linear-to-r from-neo-pink to-neo-orange'
+                    : 'bg-linear-to-r from-neo-cyan to-neo-pink'
                 )}
                 initial={{ width: '0%' }}
                 animate={{

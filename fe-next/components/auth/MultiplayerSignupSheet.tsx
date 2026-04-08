@@ -75,7 +75,7 @@ export const MultiplayerSignupSheet: React.FC<MultiplayerSignupSheetProps> = ({
           <button
             onClick={onClose}
             className={cn(
-              'absolute top-3 end-3 p-1.5 rounded-full transition-colors',
+              'absolute top-3 inset-e-3 p-1.5 rounded-full transition-colors',
               isDarkMode ? 'text-gray-400 hover:text-gray-200 hover:bg-gray-700' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100',
             )}
             aria-label={t('common.close')}
@@ -89,7 +89,7 @@ export const MultiplayerSignupSheet: React.FC<MultiplayerSignupSheetProps> = ({
               'flex items-center gap-3 p-3 rounded-xl mb-4 border-2 border-amber-400/30',
               isDarkMode ? 'bg-amber-900/20' : 'bg-amber-50',
             )}>
-              <Shield className="text-amber-400 flex-shrink-0" size={24} />
+              <Shield className="text-amber-400 shrink-0" size={24} />
               <div>
                 <p className={cn(
                   'text-sm font-bold',

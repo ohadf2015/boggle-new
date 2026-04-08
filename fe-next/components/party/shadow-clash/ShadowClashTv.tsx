@@ -7,9 +7,11 @@
  */
 
 import { memo, useEffect, useState } from 'react';
+import { setInterval, clearInterval } from 'worker-timers';
 import type { Socket } from 'socket.io-client';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
+import { usePartySounds } from '@/hooks/usePartySounds';
 
 // ==================== Types ====================
 
@@ -41,6 +43,7 @@ type TvPhase = 'waiting' | 'dealing' | 'night' | 'dawn' | 'discussion' | 'trial'
 
 function ShadowClashTvInner({ socket }: { socket: Socket | null }) {
   const { t } = useLanguage();
+  const partySounds = usePartySounds();
   const [phase, setPhase] = useState<TvPhase>('waiting');
   const [round, setRound] = useState(0);
   const [dawnData, setDawnData] = useState<DawnData | null>(null);
@@ -53,9 +56,10 @@ function ShadowClashTvInner({ socket }: { socket: Socket | null }) {
   // Timer
   useEffect(() => {
     if (timeRemaining <= 0) return;
+    if (timeRemaining <= 5) partySounds.onCountdown(timeRemaining);
     const interval = setInterval(() => setTimeRemaining(prev => Math.max(0, prev - 1)), 1000);
     return () => clearInterval(interval);
-  }, [timeRemaining]);
+  }, [timeRemaining, partySounds]);
 
   // Socket listeners
   useEffect(() => {
@@ -74,11 +78,13 @@ function ShadowClashTvInner({ socket }: { socket: Socket | null }) {
       setRound(data.round);
       setTimeRemaining(30);
       setDawnData(null);
+      partySounds.onPhaseStart();
     };
 
     const onDawn = (data: DawnData) => {
       setPhase('dawn');
       setDawnData(data);
+      partySounds.onReveal();
       if (data.eliminated && data.role) {
         setEliminatedHistory(prev => [...prev, { username: data.eliminated!, role: data.role! }]);
         setAliveUsernames(prev => prev.filter(u => u !== data.eliminated));
@@ -100,6 +106,7 @@ function ShadowClashTvInner({ socket }: { socket: Socket | null }) {
     const onVoteReveal = (data: VoteRevealData) => {
       setPhase('verdict');
       setVoteData(data);
+      partySounds.onReveal();
       if (data.eliminated && data.role) {
         setEliminatedHistory(prev => [...prev, { username: data.eliminated!, role: data.role! }]);
         setAliveUsernames(prev => prev.filter(u => u !== data.eliminated));
@@ -109,6 +116,7 @@ function ShadowClashTvInner({ socket }: { socket: Socket | null }) {
     const onGameOver = (data: GameOverData) => {
       setPhase('game-over');
       setGameOverData(data);
+      partySounds.onGameOver();
     };
 
     socket.on('party:phaseChange', onPhaseChange);
@@ -225,7 +233,7 @@ function ShadowClashTvInner({ socket }: { socket: Socket | null }) {
   // ==================== Dawn ====================
   if (phase === 'dawn' && dawnData) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#1a1020] to-[#2a1530] flex flex-col items-center justify-center p-8">
+      <div className="min-h-screen bg-linear-to-b from-[#1a1020] to-[#2a1530] flex flex-col items-center justify-center p-8">
         <div className="text-6xl mb-4">🌅</div>
 
         {dawnData.saved ? (
@@ -396,7 +404,7 @@ function ShadowClashTvInner({ socket }: { socket: Socket | null }) {
   if (phase === 'game-over' && gameOverData) {
     const isGoodWin = gameOverData.winner === 'good';
     return (
-      <div className={`min-h-screen flex flex-col items-center justify-center p-8 ${isGoodWin ? 'bg-gradient-to-b from-neo-abyss to-[#0a1a0a]' : 'bg-gradient-to-b from-neo-abyss to-[#1a0a0a]'}`}>
+      <div className={`min-h-screen flex flex-col items-center justify-center p-8 ${isGoodWin ? 'bg-linear-to-b from-neo-abyss to-[#0a1a0a]' : 'bg-linear-to-b from-neo-abyss to-[#1a0a0a]'}`}>
         <AdaptiveMotion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}

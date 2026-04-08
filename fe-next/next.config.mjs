@@ -1,6 +1,9 @@
 import path from 'path';
 import { fileURLToPath } from 'url';
+import createNextIntlPlugin from 'next-intl/plugin';
 import { withSentryConfig } from '@sentry/nextjs';
+
+const withNextIntl = createNextIntlPlugin();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -61,7 +64,7 @@ const nextConfig = {
       './node_modules/resend/**',
       './node_modules/@google-cloud/**',
       './node_modules/google-auth-library/**',
-      './node_modules/axios/**',
+
       './node_modules/zod/**',
     ],
   },
@@ -423,4 +426,4 @@ const sentryConfig = withSentryConfig(nextConfig, {
   },
 });
 
-export default withBundleAnalyzer(sentryConfig);
+export default withNextIntl(withBundleAnalyzer(sentryConfig));

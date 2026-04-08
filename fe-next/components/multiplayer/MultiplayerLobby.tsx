@@ -214,16 +214,16 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
   return (
     <>
       <div dir={dir} className="min-h-dvh bg-neo-navy flex flex-col overflow-y-auto scrollable-area">
-      <div className="w-[94%] max-w-7xl mx-auto py-3 sm:py-4 flex-1 flex flex-col min-h-0 pb-[--mobile-bottom-safe]">
+      <div className="w-[94%] max-w-7xl mx-auto py-3 sm:py-4 flex-1 flex flex-col min-h-0 pb-(--mobile-bottom-safe)">
         {/* Compact Header: back button + title inline with premium gradient accent */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex items-center gap-3 mb-4 flex-shrink-0"
+          className="flex items-center gap-3 mb-4 shrink-0"
         >
           <Link
             href="/"
-            className="flex items-center justify-center w-10 h-10 rounded-neo border-3 border-neo-black bg-neo-cream shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-pressed focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime transition-all text-neo-black"
+            className="flex items-center justify-center w-10 h-10 rounded-neo border-3 border-neo-black bg-neo-cream shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-px active:translate-y-px active:shadow-hard-pressed focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-lime transition-all text-neo-black"
             aria-label={t('common.back')}
           >
             <ArrowLeft className="w-5 h-5 rtl:rotate-180" />

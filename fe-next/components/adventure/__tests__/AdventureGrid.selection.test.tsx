@@ -366,7 +366,7 @@ describe('AdventureGrid Selection', () => {
       expect(cells[0]).toHaveClass('tile-selected-enhanced');
     });
 
-    it('should show ring around selected tiles', () => {
+    it('should show ring-3 around selected tiles', () => {
       // GIVEN
       const tiles = createMockTiles(4);
       const selectedIndices = [0, 1];

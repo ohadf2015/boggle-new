@@ -157,7 +157,7 @@ export function ClassroomGameBanner({
           : 'bg-neo-lime/20'
       )}>
         <Radio className={cn(
-          'w-4 h-4 flex-shrink-0',
+          'w-4 h-4 shrink-0',
           isConnected ? 'text-black animate-pulse' : 'text-black'
         )} />
         <span className="text-sm font-neo-body font-bold text-black">

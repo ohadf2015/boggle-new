@@ -225,7 +225,7 @@ function PracticeContent({
     return (
       <>
         {/* XP Header for practice modes */}
-        <div className="fixed top-0 left-0 right-0 z-50 bg-neo-navy/95 backdrop-blur-sm border-b border-neo-black/30 px-4 py-2">
+        <div className="fixed top-0 left-0 right-0 z-50 bg-neo-navy/95 backdrop-blur-xs border-b border-neo-black/30 px-4 py-2">
           <div className="max-w-2xl mx-auto flex items-center gap-4">
             <div className="flex-1">
               <XpProgressBar totalXp={totalXp} recentXpGain={sessionXpEarned} size="sm" />

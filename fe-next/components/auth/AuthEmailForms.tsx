@@ -55,7 +55,7 @@ interface PasswordFormProps extends Omit<SharedFormProps, 'onSwitchToPassword'> 
   onSubmit: (e: React.FormEvent) => void;
 }
 
-const EMAIL_INPUT_CLASS = 'w-full px-4 py-3 rounded-neo border-2 bg-slate-800 text-white placeholder-gray-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy transition-colors';
+const EMAIL_INPUT_CLASS = 'w-full px-4 py-3 rounded-neo border-2 bg-slate-800 text-white placeholder-gray-500 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy transition-colors';
 const SUBMIT_BTN_CLASS = 'w-full h-12 text-base font-bold rounded-neo border-3 border-neo-black bg-neo-cyan text-neo-black hover:bg-neo-cyan/90 shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 active:translate-y-0 active:shadow-hard-pressed transition-all';
 
 function EmailInput({ id, value, onChange, error, errorId, disabled, t }: {
@@ -120,7 +120,7 @@ export function OtpVerifyForm({ email, otpCode, otpCooldown, isAnyLoading, isLoa
           value={otpCode}
           onChange={(e) => onOtpChange(e.target.value.replace(/\D/g, '').slice(0, 6))}
           placeholder="000000"
-          className="w-full px-4 py-3 rounded-neo border-2 bg-slate-800 text-white placeholder-gray-500 text-center text-2xl tracking-[0.5em] font-mono focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy transition-colors border-slate-600 focus:border-neo-cyan"
+          className="w-full px-4 py-3 rounded-neo border-2 bg-slate-800 text-white placeholder-gray-500 text-center text-2xl tracking-[0.5em] font-mono focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy transition-colors border-slate-600 focus:border-neo-cyan"
           disabled={isAnyLoading}
         />
       </div>
@@ -176,7 +176,7 @@ export function PasswordForm({ email, emailError, password, passwordError, showP
             aria-describedby={passwordError ? 'pwd-password-error' : undefined}
             className={cn(
               'w-full px-4 py-3 pe-12 rounded-neo border-2 bg-slate-800 text-white placeholder-gray-500',
-              'focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy transition-colors',
+              'focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy transition-colors',
               passwordError ? 'border-red-500' : 'border-slate-600 focus:border-neo-cyan'
             )}
             disabled={isAnyLoading}
@@ -185,7 +185,7 @@ export function PasswordForm({ email, emailError, password, passwordError, showP
             type="button"
             onClick={onTogglePassword}
             aria-label={showPassword ? t('auth.hidePassword') : t('auth.showPassword')}
-            className="absolute end-3 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-200 transition-colors rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan"
+            className="absolute inset-e-3 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-200 transition-colors rounded focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan"
           >
             {showPassword ? <EyeOff className="w-5 h-5" aria-hidden="true" /> : <Eye className="w-5 h-5" aria-hidden="true" />}
           </button>

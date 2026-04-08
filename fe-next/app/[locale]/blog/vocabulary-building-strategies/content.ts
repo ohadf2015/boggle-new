@@ -404,7 +404,7 @@ Under mitt experiment började jag gruppera nya ord efter deras rötter. BENE- (
 Vid vecka två lärde jag mig ord i nästan dubbelt så snabb takt. Inte för att jag studerade hårdare, utan för att varje nytt ord kom förankopplat till ord jag redan kände.`,
       },
       {
-        title: 'Tvärlingvistisk överföring: Den flerspråkiga fördelen',
+        title: 'Tvärlingvistisk överföring-3: Den flerspråkiga fördelen',
         content: `Något jag inte förväntade mig: att spela ordspel på flera språk gjorde mig bättre på engelskt ordförråd.
 
 Det låter paradoxalt, men forskningen stödjer det. Kroll och Stewart (1994) föreslog att ord i olika språk delar konceptuella kopplingar. När man lär sig ett ord på ett språk stärker man det underliggande konceptet, vilket gör relaterade ord på andra språk lättare att lära sig.

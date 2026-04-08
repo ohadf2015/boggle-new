@@ -109,7 +109,7 @@ export default function GlobalError({
   return (
     <html lang={detectedLocale} dir={isRTL ? 'rtl' : 'ltr'}>
       <body className="antialiased">
-        <div className="min-h-screen flex items-center justify-center p-6 bg-gradient-to-br from-cyan-50 via-lime-50 to-cyan-100">
+        <div className="min-h-screen flex items-center justify-center p-6 bg-linear-to-br from-cyan-50 via-lime-50 to-cyan-100">
           <div className="max-w-xl w-full text-center p-8 neo-card bg-neo-cream text-neo-black rotate-[-1deg] animate-neo-pop">
             {/* Floating icon with gentle animation */}
             <div className="mb-6 animate-pulse flex justify-center"><Sparkles className="w-16 h-16 text-neo-cyan" /></div>

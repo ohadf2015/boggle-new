@@ -40,12 +40,12 @@ const colors: WorldColorPalette = {
 // ==============================================
 
 const background: WorldBackground = {
-  baseColor: 'bg-gradient-to-b from-neo-navy via-slate-950 to-purple-950',
+  baseColor: 'bg-linear-to-b from-neo-navy via-slate-950 to-purple-950',
   illustrationPath: '/images/adventure/backgrounds/caverns.webp',
   layers: [
     {
       id: 'caverns-deep',
-      source: 'bg-gradient-to-b from-neo-navy via-slate-950 to-purple-950',
+      source: 'bg-linear-to-b from-neo-navy via-slate-950 to-purple-950',
       depth: 0.1,
       opacity: 1,
       className: 'absolute inset-0',

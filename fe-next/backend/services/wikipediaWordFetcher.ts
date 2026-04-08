@@ -4,7 +4,7 @@
  * Used to source quality daily challenge words
  */
 
-import axios from 'axios';
+import ky, { HTTPError } from 'ky';
 import { getRedisClient } from '../redisClient';
 import type { Language } from '@/shared/types/game';
 import logger from '../utils/logger';
@@ -151,19 +151,19 @@ async function fetchWithRetry<T>(
   for (let attempt = 0; attempt <= retries; attempt++) {
     try {
       await enforceRateLimit();
-      const response = await axios.get<T>(url, {
+      return await ky.get(url, {
         headers: {
           'User-Agent': WIKIPEDIA_USER_AGENT,
           'Accept': 'application/json'
         },
-        timeout
-      });
-      return response.data;
+        timeout,
+        retry: 0,
+      }).json<T>();
     } catch (error) {
       lastError = error instanceof Error ? error : new Error(String(error));
 
       // Don't retry on 404 (content doesn't exist)
-      if (axios.isAxiosError(error) && error.response?.status === 404) {
+      if (error instanceof HTTPError && error.response.status === 404) {
         throw error;
       }
 
@@ -249,7 +249,7 @@ export async function fetchFeaturedContent(
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
 
     // 404 is common for non-English wikis on certain dates
-    if (axios.isAxiosError(error) && error.response?.status === 404) {
+    if (error instanceof HTTPError && error.response.status === 404) {
       logger.info('Wikipedia', `No featured content for ${language} on ${dateStr}`);
     } else {
       logger.error('Wikipedia', `Error fetching featured content for ${language}`, { error: errorMessage });
@@ -276,14 +276,14 @@ export async function fetchRandomArticles(
   // Fetch articles in parallel for better performance
   const fetchPromises = Array.from({ length: count }, async () => {
     try {
-      const response = await axios.get<WikipediaRandomArticle>(url, {
+      return await ky.get(url, {
         headers: {
           'User-Agent': WIKIPEDIA_USER_AGENT,
           'Accept': 'application/json'
         },
-        timeout: 5000
-      });
-      return response.data;
+        timeout: 5000,
+        retry: 0,
+      }).json<WikipediaRandomArticle>();
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       logger.error('Wikipedia', `Error fetching random article for ${language}`, { error: errorMessage });

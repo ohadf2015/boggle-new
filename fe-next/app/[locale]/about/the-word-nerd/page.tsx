@@ -127,7 +127,7 @@ export default async function TheWordNerdPage({ params }: PageProps) {
                     {/* Author Header */}
                     <div className="mb-10 flex flex-col items-center gap-6 sm:flex-row sm:items-start">
                         <div
-                            className="flex h-28 w-28 shrink-0 items-center justify-center rounded-neo border-3 border-black bg-gradient-to-br from-neo-yellow to-neo-orange shadow-hard-lg"
+                            className="flex h-28 w-28 shrink-0 items-center justify-center rounded-neo border-3 border-black bg-linear-to-br from-neo-yellow to-neo-orange shadow-hard-lg"
                             aria-hidden="true"
                         >
                             <span className="font-neo-display text-4xl font-bold text-black">WN</span>

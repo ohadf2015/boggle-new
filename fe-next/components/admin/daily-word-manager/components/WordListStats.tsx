@@ -103,7 +103,7 @@ export const WordListStats: React.FC<WordListStatsProps> = ({
       {stats.shortest < 3 && (
         <div className="mt-4 p-2 sm:p-3 bg-red-100 dark:bg-red-900/30 border border-red-500 rounded-lg">
           <div className="flex items-start gap-2">
-            <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5 text-red-600 flex-shrink-0 mt-0.5" />
+            <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5 text-red-600 shrink-0 mt-0.5" />
             <div className="text-xs sm:text-sm text-red-600 dark:text-red-400">
               <strong>Warning:</strong> Some words &lt;3 letters!
             </div>

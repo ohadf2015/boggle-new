@@ -2,6 +2,7 @@ import { memo } from 'react';
 import { motion } from 'framer-motion';
 import type { ComboColors, PerformanceMode } from './types';
 import { getSelectionEscalation } from './selectionEscalation';
+import VFXTileEffect from './VFXTileEffect';
 
 interface GridCellEffectsProps {
   isSelected: boolean;
@@ -231,6 +232,12 @@ const GridCellEffects = memo<GridCellEffectsProps>(function GridCellEffects({
           })}
         </>
       )}
+      {/* WebGL shader overlay for high combos */}
+      <VFXTileEffect
+        comboLevel={comboLevel}
+        isSelected={isSelected}
+        reduceMotion={reduceMotion}
+      />
     </>
   );
 });

@@ -213,7 +213,7 @@ export function QuickPracticeButton({
                     'w-full px-4 py-3 flex items-center gap-3',
                     'hover:bg-neo-white/10 transition-colors',
                     'text-left',
-                    'focus:outline-none focus:bg-neo-white/10'
+                    'focus:outline-hidden focus:bg-neo-white/10'
                   )}
                   role="option"
                   aria-selected={false}

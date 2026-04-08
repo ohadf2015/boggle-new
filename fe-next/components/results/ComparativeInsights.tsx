@@ -80,7 +80,7 @@ const ComparativeInsights: React.FC<ComparativeInsightsProps> = ({
       <div className="space-y-1.5">
         {uniqueWordCount > 0 && (
           <div className="flex items-center gap-2 text-sm text-neo-cream">
-            <Fingerprint className="w-4 h-4 text-neo-cyan flex-shrink-0" />
+            <Fingerprint className="w-4 h-4 text-neo-cyan shrink-0" />
             <span>
               {t('results.comparativeInsights.uniqueWords', { count: uniqueWordCount }) ||
                 `You found ${uniqueWordCount} word${uniqueWordCount !== 1 ? 's' : ''} nobody else found!`}
@@ -89,7 +89,7 @@ const ComparativeInsights: React.FC<ComparativeInsightsProps> = ({
         )}
         {longestDiff > 0 && (
           <div className="flex items-center gap-2 text-sm text-neo-cream">
-            <TrendingUp className="w-4 h-4 text-neo-lime flex-shrink-0" />
+            <TrendingUp className="w-4 h-4 text-neo-lime shrink-0" />
             <span>
               {t('results.comparativeInsights.longestWord', { count: longestDiff }) ||
                 `Your longest word was ${longestDiff} letter${longestDiff !== 1 ? 's' : ''} longer than average`}
@@ -98,7 +98,7 @@ const ComparativeInsights: React.FC<ComparativeInsightsProps> = ({
         )}
         {scorePctDiff !== 0 && (
           <div className="flex items-center gap-2 text-sm text-neo-cream">
-            <Sparkles className="w-4 h-4 text-neo-orange flex-shrink-0" />
+            <Sparkles className="w-4 h-4 text-neo-orange shrink-0" />
             <span>
               {scorePctDiff > 0
                 ? (t('results.comparativeInsights.scoreAbove', { pct: scorePctDiff }) ||

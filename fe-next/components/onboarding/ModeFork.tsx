@@ -79,7 +79,7 @@ const ModeOption: React.FC<ModeOptionProps> = ({
         transition={{ duration: 0.25 }}
       >
         <motion.div
-          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent"
+          className="absolute inset-0 bg-linear-to-r from-transparent via-white/25 to-transparent"
           initial={{ x: '-100%' }}
           animate={hovered ? { x: '200%' } : { x: '-100%' }}
           transition={{ duration: 0.5, ease: 'easeOut' }}
@@ -89,7 +89,7 @@ const ModeOption: React.FC<ModeOptionProps> = ({
       {/* Decorative corner sparkle for featured */}
       {featured && (
         <motion.div
-          className="absolute top-2 end-2"
+          className="absolute top-2 inset-e-2"
           animate={{ rotate: [0, 15, -15, 0], scale: [1, 1.2, 1] }}
           transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
         >

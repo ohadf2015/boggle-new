@@ -146,7 +146,7 @@ const Segment = memo<SegmentProps>(({ id, fill, color, labelKey, isLowHP }) => {
       <AdaptiveMotion.div
         data-fill-bar
         className={`
-          absolute inset-y-0 start-0 h-full
+          absolute inset-y-0 inset-s-0 h-full
           ${color}
           transition-all duration-300 ease-out
           motion-reduce:transition-none
@@ -211,7 +211,7 @@ interface FloatingDamageNumberProps {
 const FloatingDamageNumber = memo<FloatingDamageNumberProps>(({ id, amount }) => (
   <AdaptiveMotion.div
     key={id}
-    className="absolute -top-2 end-2 pointer-events-none z-20"
+    className="absolute -top-2 inset-e-2 pointer-events-none z-20"
     initial={{ y: 0, opacity: 1 }}
     animate={{ y: -28, opacity: 0 }}
     exit={{ opacity: 0 }}
@@ -337,11 +337,11 @@ const SegmentedHPBar = memo<SegmentedHPBarProps>(({
               transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.4, repeat: Infinity }}
               aria-hidden="true"
             >
-              <Swords className="w-3.5 h-3.5 text-neo-red flex-shrink-0" />
+              <Swords className="w-3.5 h-3.5 text-neo-red shrink-0" />
             </AdaptiveMotion.span>
           )}
         </div>
-        <div className="flex items-center gap-2 flex-shrink-0">
+        <div className="flex items-center gap-2 shrink-0">
           {/* HP numbers */}
           <span
             className={`font-mono text-[10px] sm:text-xs font-bold tabular-nums ${

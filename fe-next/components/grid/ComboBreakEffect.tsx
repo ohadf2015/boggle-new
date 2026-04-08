@@ -54,7 +54,7 @@ const ComboBreakEffect: React.FC<ComboBreakEffectProps> = ({
     <AnimatePresence mode="wait">
       <motion.div
         key={`combo-break-${displayLevel}`}
-        className="fixed top-28 left-1/2 -translate-x-1/2 z-[79] pointer-events-none flex flex-col items-center"
+        className="fixed top-28 left-1/2 -translate-x-1/2 z-79 pointer-events-none flex flex-col items-center"
         initial={{ opacity: 1 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -85,7 +85,7 @@ const ComboBreakEffect: React.FC<ComboBreakEffectProps> = ({
             duration: 0.8,
             ease: [0.4, 0, 0.2, 1],
           }}
-          className="px-5 py-2.5 rounded-full font-extrabold text-xl text-white/60 backdrop-blur-sm relative overflow-hidden bg-gradient-to-r from-gray-500 via-gray-600 to-gray-500 border-2 border-white/20"
+          className="px-5 py-2.5 rounded-full font-extrabold text-xl text-white/60 backdrop-blur-xs relative overflow-hidden bg-linear-to-r from-gray-500 via-gray-600 to-gray-500 border-2 border-white/20"
           style={{
             filter: 'drop-shadow(0 0 8px rgba(128, 128, 128, 0.4)) grayscale(0.5)',
           }}

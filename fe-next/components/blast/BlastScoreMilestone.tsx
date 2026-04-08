@@ -14,11 +14,11 @@ interface MilestoneConfig {
 }
 
 const MILESTONE_TIERS = [
-  { threshold: 5000, key: '5000', emoji: '🔥', className: 'bg-gradient-to-r from-yellow-300 via-white to-yellow-300 text-neo-black animate-pulse' },
-  { threshold: 3000, key: '3000', emoji: '⚡', className: 'bg-gradient-to-r from-neo-pink via-neo-cyan to-neo-lime text-neo-black' },
-  { threshold: 2000, key: '2000', emoji: '💎', className: 'bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500 text-white' },
-  { threshold: 1500, key: '1500', emoji: '✨', className: 'bg-gradient-to-r from-amber-400 to-yellow-300 text-neo-black' },
-  { threshold: 1000, key: '1000', emoji: '🏆', className: 'bg-gradient-to-r from-neo-lime to-neo-cyan text-neo-black' },
+  { threshold: 5000, key: '5000', emoji: '🔥', className: 'bg-linear-to-r from-yellow-300 via-white to-yellow-300 text-neo-black animate-pulse' },
+  { threshold: 3000, key: '3000', emoji: '⚡', className: 'bg-linear-to-r from-neo-pink via-neo-cyan to-neo-lime text-neo-black' },
+  { threshold: 2000, key: '2000', emoji: '💎', className: 'bg-linear-to-r from-purple-500 via-pink-500 to-purple-500 text-white' },
+  { threshold: 1500, key: '1500', emoji: '✨', className: 'bg-linear-to-r from-amber-400 to-yellow-300 text-neo-black' },
+  { threshold: 1000, key: '1000', emoji: '🏆', className: 'bg-linear-to-r from-neo-lime to-neo-cyan text-neo-black' },
   { threshold: 750,  key: '750',  emoji: '💪', className: 'bg-neo-lime text-neo-black' },
   { threshold: 500,  key: '500',  emoji: '🎯', className: 'bg-neo-cyan text-neo-black' },
   { threshold: 250,  key: '250',  emoji: '👍', className: 'bg-neo-cyan/80 text-neo-black' },

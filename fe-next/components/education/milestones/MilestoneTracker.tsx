@@ -32,16 +32,17 @@ export const MilestoneTracker = memo<MilestoneTrackerProps>(
   ({ totalXp, className }) => {
     const { t } = useLanguage();
 
-    // Calculate milestone progress
-    const progress = getMilestoneProgress(totalXp);
-    const allMilestones = getMilestones();
-
-    const { currentLevel, nextMilestone, progressPercent, xpToNextMilestone } = progress;
-
-    // Filter milestones to show (current level to a few milestones ahead)
-    const visibleMilestones = allMilestones.filter(
-      m => m.level >= currentLevel && m.level <= currentLevel + 20
-    );
+    // Calculate milestone progress and visible milestones
+    const { currentLevel, nextMilestone, progressPercent, xpToNextMilestone, visibleMilestones } = React.useMemo(() => {
+      const prog = getMilestoneProgress(totalXp);
+      const all = getMilestones();
+      return {
+        ...prog,
+        visibleMilestones: all.filter(
+          m => m.level >= prog.currentLevel && m.level <= prog.currentLevel + 20
+        ),
+      };
+    }, [totalXp]);
 
     return (
       <div className={cn('space-y-2', className)}>
@@ -85,7 +86,7 @@ export const MilestoneTracker = memo<MilestoneTrackerProps>(
             <div
               className={cn(
                 'h-full rounded-full',
-                'bg-gradient-to-r from-neo-lime to-neo-pink',
+                'bg-linear-to-r from-neo-lime to-neo-pink',
                 'transition-all duration-500 ease-out'
               )}
               style={{ width: `${progressPercent}%` }}

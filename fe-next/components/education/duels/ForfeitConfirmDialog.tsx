@@ -31,7 +31,7 @@ export function ForfeitConfirmDialog({
   return (
     <AlertDialog.Root open={open}>
       <AlertDialog.Portal>
-        <AlertDialog.Overlay className="fixed inset-0 bg-neo-black/60 backdrop-blur-sm z-50" />
+        <AlertDialog.Overlay className="fixed inset-0 bg-neo-black/60 backdrop-blur-xs z-50" />
         <AlertDialog.Content
           data-testid="forfeit-dialog"
           className={cn(

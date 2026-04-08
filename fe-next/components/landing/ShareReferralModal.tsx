@@ -49,7 +49,7 @@ export function ShareReferralModal({ isOpen, onClose }: ShareReferralModalProps)
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-neo-black/60 z-[60] backdrop-blur-sm"
+            className="fixed inset-0 bg-neo-black/60 z-[60] backdrop-blur-xs"
             onClick={onClose}
             aria-hidden="true"
           />
@@ -64,7 +64,7 @@ export function ShareReferralModal({ isOpen, onClose }: ShareReferralModalProps)
             aria-modal="true"
             aria-labelledby="share-modal-title"
             className={cn(
-              'fixed bottom-0 left-0 right-0 z-[61]',
+              'fixed bottom-0 left-0 right-0 z-61',
               'sm:bottom-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2',
               'sm:w-full sm:max-w-md',
               'bg-white dark:bg-neo-navy',
@@ -147,7 +147,7 @@ export function ShareReferralModal({ isOpen, onClose }: ShareReferralModalProps)
                   'bg-brand-whatsapp hover:bg-brand-whatsapp-hover text-white font-bold',
                   'rounded-neo border-3 border-neo-black shadow-hard',
                   'transition-shadow hover:shadow-hard-lg active:shadow-none',
-                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-lime'
+                  'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-lime'
                 )}
                 aria-label={t('common.shareViaWhatsApp')}
               >
@@ -163,7 +163,7 @@ export function ShareReferralModal({ isOpen, onClose }: ShareReferralModalProps)
                   'bg-brand-telegram hover:bg-brand-telegram-hover text-white font-bold',
                   'rounded-neo border-3 border-neo-black shadow-hard',
                   'transition-shadow hover:shadow-hard-lg active:shadow-none',
-                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-lime'
+                  'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-lime'
                 )}
                 aria-label={t('common.shareViaTelegram')}
               >
@@ -179,7 +179,7 @@ export function ShareReferralModal({ isOpen, onClose }: ShareReferralModalProps)
                   'bg-neo-pink hover:bg-neo-pink/90 text-white font-bold',
                   'rounded-neo border-3 border-neo-black shadow-hard',
                   'transition-shadow hover:shadow-hard-lg active:shadow-none',
-                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-lime'
+                  'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-lime'
                 )}
                 aria-label={t('common.share')}
               >
@@ -195,7 +195,7 @@ export function ShareReferralModal({ isOpen, onClose }: ShareReferralModalProps)
                 'w-full flex items-center justify-center gap-2 h-10 font-bold text-sm',
                 'rounded-neo border-3 border-neo-black',
                 'transition-all',
-                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-lime',
+                'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-lime',
                 copied
                   ? 'bg-neo-lime text-neo-black shadow-none'
                   : 'bg-neo-black/5 dark:bg-white/10 hover:bg-neo-black/10 shadow-hard hover:shadow-hard-lg active:shadow-none'

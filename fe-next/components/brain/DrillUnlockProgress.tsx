@@ -76,7 +76,7 @@ export default function DrillUnlockProgress({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             className={cn(
               'flex items-center gap-3 p-3 rounded-neo border-2 border-neo-black',
-              'bg-gradient-to-r from-neo-green/20 to-neo-cyan/20'
+              'bg-linear-to-r from-neo-green/20 to-neo-cyan/20'
             )}
           >
             <motion.div

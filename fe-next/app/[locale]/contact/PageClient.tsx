@@ -66,7 +66,7 @@ export default function ContactPageClient(): React.JSX.Element {
       'flex-1 flex flex-col',
       isDarkMode
         ? 'bg-neo-navy'
-        : 'bg-gradient-to-br from-neo-cream via-white to-neo-cream'
+        : 'bg-linear-to-br from-neo-cream via-white to-neo-cream'
     )}>
       <AutoHideHeader />
 
@@ -132,7 +132,7 @@ export default function ContactPageClient(): React.JSX.Element {
             >
               <div className={cn(
                 'w-12 h-12 rounded-lg flex items-center justify-center border-2 border-neo-black',
-                'bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400'
+                'bg-linear-to-br from-purple-500 via-pink-500 to-orange-400'
               )}>
                 <InstagramIcon className="w-6 h-6 text-white" />
               </div>
@@ -281,7 +281,7 @@ export default function ContactPageClient(): React.JSX.Element {
                     'bg-neo-cream dark:bg-slate-700 text-slate-900 dark:text-white',
                     'shadow-[inset_2px_2px_0px_rgba(0,0,0,0.1)]',
                     'placeholder:text-slate-500 dark:placeholder:text-slate-400 placeholder:font-normal',
-                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
+                    'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
                     'focus:shadow-[inset_3px_3px_0px_rgba(0,0,0,0.15)]',
                     'disabled:cursor-not-allowed disabled:opacity-50',
                     'transition-shadow duration-100'
@@ -296,7 +296,7 @@ export default function ContactPageClient(): React.JSX.Element {
                   animate={{ opacity: 1, y: 0 }}
                   className="flex items-center gap-2 p-3 rounded-neo border-2 border-neo-red bg-neo-red/10 text-neo-red"
                 >
-                  <AlertCircle className="w-5 h-5 flex-shrink-0" />
+                  <AlertCircle className="w-5 h-5 shrink-0" />
                   <p className="text-sm font-medium">{errorMessage || t('contact.errorMessage')}</p>
                 </motion.div>
               )}

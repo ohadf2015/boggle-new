@@ -370,24 +370,32 @@ export function registerFriendChallengeHandlers(io: Server, socket: Socket): voi
       // Enrich with profile data
       const sent = await Promise.all(
         result.sent.map(async (challenge) => {
-          const toProfile = await getUserProfile(challenge.toUserId);
-          return {
-            ...challenge,
-            toUsername: toProfile?.username || '',
-            fromAvatar: (await getUserProfile(challenge.fromUserId))?.avatar || { emoji: '👤', color: '#808080' },
-          };
+          try {
+            const toProfile = await getUserProfile(challenge.toUserId);
+            return {
+              ...challenge,
+              toUsername: toProfile?.username || '',
+              fromAvatar: (await getUserProfile(challenge.fromUserId))?.avatar || { emoji: '👤', color: '#808080' },
+            };
+          } catch {
+            return { ...challenge, toUsername: '', fromAvatar: { emoji: '👤', color: '#808080' } };
+          }
         })
       );
 
       const received = await Promise.all(
         result.received.map(async (challenge) => {
-          const fromProfile = await getUserProfile(challenge.fromUserId);
-          return {
-            ...challenge,
-            fromUsername: fromProfile?.username || '',
-            fromDisplayName: fromProfile?.displayName,
-            fromAvatar: fromProfile?.avatar || { emoji: '👤', color: '#808080' },
-          };
+          try {
+            const fromProfile = await getUserProfile(challenge.fromUserId);
+            return {
+              ...challenge,
+              fromUsername: fromProfile?.username || '',
+              fromDisplayName: fromProfile?.displayName,
+              fromAvatar: fromProfile?.avatar || { emoji: '👤', color: '#808080' },
+            };
+          } catch {
+            return { ...challenge, fromUsername: '', fromDisplayName: undefined, fromAvatar: { emoji: '👤', color: '#808080' } };
+          }
         })
       );
 

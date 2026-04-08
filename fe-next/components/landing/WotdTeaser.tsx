@@ -47,7 +47,7 @@ export function WotdTeaser({ className }: WotdTeaserProps) {
       )}
     >
       <div className="flex items-center gap-3">
-        <div className="flex-shrink-0 w-10 h-10 rounded-neo bg-neo-yellow/20 border-neo border-neo-yellow/30 flex items-center justify-center">
+        <div className="shrink-0 w-10 h-10 rounded-neo bg-neo-yellow/20 border-neo border-neo-yellow/30 flex items-center justify-center">
           <Sparkles className="w-5 h-5 text-neo-yellow group-hover:animate-neo-wobble" />
         </div>
 
@@ -91,7 +91,7 @@ export function WotdTeaser({ className }: WotdTeaserProps) {
           </div>
         </div>
 
-        <span className="text-xs font-neo-body text-neo-cyan group-hover:underline flex-shrink-0">
+        <span className="text-xs font-neo-body text-neo-cyan group-hover:underline shrink-0">
           {t('wotd.play')}
         </span>
       </div>

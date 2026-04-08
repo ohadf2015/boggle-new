@@ -66,7 +66,7 @@ export default function QuickStartButton({
         'bg-neo-lime/90 hover:bg-neo-lime',
         'shadow-hard hover:shadow-hard-lg transition-all',
         'text-left hover:translate-x-[-2px] hover:translate-y-[-2px]',
-        'focus:outline-none focus:ring-2 focus:ring-neo-lime',
+        'focus:outline-hidden focus:ring-2 focus:ring-neo-lime',
         isRTL && 'rtl text-right',
         className
       )}
@@ -108,7 +108,7 @@ export default function QuickStartButton({
 
         {/* Lessons */}
         <div className="flex items-center gap-2 text-sm">
-          <BookOpen className="w-4 h-4 text-neo-black/60 flex-shrink-0" />
+          <BookOpen className="w-4 h-4 text-neo-black/60 shrink-0" />
           <span className="text-neo-black truncate">{displayLessons}</span>
         </div>
 

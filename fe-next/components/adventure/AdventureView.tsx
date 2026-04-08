@@ -400,7 +400,7 @@ function AdventureView(): React.JSX.Element {
         t={t}
       />
 
-      {(viewState === 'worldMap' || viewState === 'levelGrid') && <div className="h-14 flex-shrink-0" />}
+      {(viewState === 'worldMap' || viewState === 'levelGrid') && <div className="h-14 shrink-0" />}
 
       <div className="relative z-10 flex-1 min-h-0">
         <AdaptiveAnimatePresence mode="wait">
@@ -444,7 +444,7 @@ function AdventureView(): React.JSX.Element {
           )}
 
           {viewState === 'playing' && levelConfig && gameGrid && (
-            <AdaptiveMotion.div key="playing" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} transition={{ duration: 0.3 }} className="h-full">
+            <AdaptiveMotion.div key="playing" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} transition={{ type: 'spring', stiffness: 300, damping: 25 }} className="h-full">
               <AdventureGameErrorBoundary onExit={handleGameExit}>
                 <AdventureGame levelConfig={levelConfig} initialGrid={gameGrid} onLevelComplete={handleLevelComplete} onExit={handleGameExit} totalStars={totalStars} onNextWorld={navigateToWorldMap} />
               </AdventureGameErrorBoundary>
@@ -452,7 +452,7 @@ function AdventureView(): React.JSX.Element {
           )}
 
           {viewState === 'weeklyChallenge' && (
-            <AdaptiveMotion.div key="weekly" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} transition={{ duration: 0.3 }} className="h-full">
+            <AdaptiveMotion.div key="weekly" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} transition={{ type: 'spring', stiffness: 300, damping: 25 }} className="h-full">
               <AdventureGameErrorBoundary onExit={() => setViewState('worldMap')}>
                 <AdventureGame levelConfig={weeklyLevelConfig} initialGrid={weeklyConfig.grid} onLevelComplete={handleWeeklyChallengeComplete} onExit={() => setViewState('worldMap')} totalStars={totalStars} />
               </AdventureGameErrorBoundary>
@@ -478,7 +478,7 @@ function AdventureView(): React.JSX.Element {
             // Active boss fight
             if (rushConfig && rushGrid) {
               return (
-                <AdaptiveMotion.div key={`boss-rush-${bossRush.state.currentBossIndex}`} initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} transition={{ duration: 0.3 }} className="h-full">
+                <AdaptiveMotion.div key={`boss-rush-${bossRush.state.currentBossIndex}`} initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} transition={{ type: 'spring', stiffness: 300, damping: 25 }} className="h-full">
                   <AdventureGameErrorBoundary onExit={handleBossRushExit}>
                     <AdventureGame levelConfig={rushConfig} initialGrid={rushGrid} onLevelComplete={handleBossRushBossDefeated} onExit={handleBossRushFailed} totalStars={totalStars} />
                   </AdventureGameErrorBoundary>
@@ -526,17 +526,17 @@ function AdventureWelcomeBanner({ t, onSelectWorld }: { t: (key: string) => stri
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
-      className="relative bg-gradient-to-r from-neo-purple to-neo-pink border-3 border-neo-black rounded-neo-lg shadow-hard-lg p-4"
+      className="relative bg-linear-to-r from-neo-purple to-neo-pink border-3 border-neo-black rounded-neo-lg shadow-hard-lg p-4"
     >
       <button
         onClick={() => setDismissed(true)}
-        className="absolute top-2 end-2 p-1 text-neo-white/60 hover:text-neo-white"
+        className="absolute top-2 inset-e-2 p-1 text-neo-white/60 hover:text-neo-white"
         aria-label={t('common.close')}
       >
         <X className="w-4 h-4" />
       </button>
       <div className="flex items-start gap-3">
-        <Sparkles className="w-6 h-6 text-neo-yellow flex-shrink-0 mt-0.5" />
+        <Sparkles className="w-6 h-6 text-neo-yellow shrink-0 mt-0.5" />
         <div>
           <h3 className="font-neo-display font-bold text-neo-white text-sm uppercase">
             {t('adventure.welcome.title')}

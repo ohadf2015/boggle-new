@@ -54,9 +54,12 @@ const ChallengeButton: React.FC<ChallengeButtonProps> = ({
   const [challengeUrl, setChallengeUrl] = useState<string | null>(null);
 
   // Find the longest word for challenge metadata
-  const longestWord = words.reduce(
-    (longest, word) => word.length > longest.length ? word : longest,
-    ''
+  const longestWord = React.useMemo(
+    () => words.reduce(
+      (longest, word) => word.length > longest.length ? word : longest,
+      '',
+    ),
+    [words],
   );
 
   const handleCreateChallenge = useCallback(async () => {
@@ -141,7 +144,7 @@ const ChallengeButton: React.FC<ChallengeButtonProps> = ({
             transition={{ type: 'spring', stiffness: 300, damping: 26 }}
             className={cn(
               'flex items-center justify-center gap-2 px-3 py-2',
-              'bg-gradient-to-r from-neo-yellow/20 to-neo-orange/20',
+              'bg-linear-to-r from-neo-yellow/20 to-neo-orange/20',
               'border-2 border-neo-yellow/40 rounded-neo'
             )}
           >

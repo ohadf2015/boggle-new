@@ -183,7 +183,7 @@ export function DailyChallengeLanding({
                 'relative w-full bg-slate-900/95 rounded-xl border-3 border-neo-black',
                 'shadow-hard overflow-hidden cursor-pointer p-4',
                 'flex items-center gap-4',
-                'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime',
+                'focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-lime',
                 'transition-shadow duration-200 group'
               )}
             >

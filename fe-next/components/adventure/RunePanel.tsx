@@ -177,7 +177,7 @@ const RuneCard = memo<RuneCardProps>(({
         'flex flex-col items-center p-3 rounded-neo border-2 transition-all',
         owned
           ? `${RARITY_BORDER[def.rarity]} ${RARITY_BG[def.rarity]}`
-          : 'border-neo-white/10 bg-neo-white/[0.02] opacity-60',
+          : 'border-neo-white/10 bg-neo-white/2 opacity-60',
         equipped && 'ring-2 ring-neo-lime/40'
       )}
     >

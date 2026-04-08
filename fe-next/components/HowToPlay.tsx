@@ -159,7 +159,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
         {/* Timeline */}
         <div className="relative">
           {/* Vertical connector line */}
-          <div className="absolute top-6 bottom-6 start-[23px] rtl:start-auto rtl:end-[23px] w-[3px] bg-gradient-to-b from-neo-cyan via-neo-lime to-neo-pink opacity-40" />
+          <div className="absolute top-6 bottom-6 inset-s-[23px] rtl:start-auto rtl:inset-e-[23px] w-[3px] bg-linear-to-b from-neo-cyan via-neo-lime to-neo-pink opacity-40" />
 
           <div className="space-y-4 relative">
             {items.map((item, index) => (
@@ -171,18 +171,18 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
                 className="flex gap-4 items-start"
               >
                 {/* Icon node on timeline */}
-                <div className="relative z-10 flex-shrink-0">
+                <div className="relative z-10 shrink-0">
                   <div className={`w-12 h-12 ${item.iconBg} border-3 border-neo-black rounded-xl shadow-hard-sm flex items-center justify-center`}>
                     <item.icon className="w-6 h-6 text-neo-black" strokeWidth={2.5} />
                   </div>
                   {/* Step number badge */}
-                  <div className="absolute -top-1.5 -end-1.5 w-6 h-6 bg-neo-black text-white text-xs font-black flex items-center justify-center rounded-md border-2 border-white/80">
+                  <div className="absolute -top-1.5 -inset-e-1.5 w-6 h-6 bg-neo-black text-white text-xs font-black flex items-center justify-center rounded-md border-2 border-white/80">
                     {index + 1}
                   </div>
                 </div>
 
                 {/* Card */}
-                <div className={`flex-1 bg-slate-800/80 border-2 ${item.accentBorder}/30 rounded-xl p-3.5 backdrop-blur-sm`}>
+                <div className={`flex-1 bg-slate-800/80 border-2 ${item.accentBorder}/30 rounded-xl p-3.5 backdrop-blur-xs`}>
                   <h4 className="font-neo-display font-black text-white text-base uppercase leading-tight">
                     {item.title}
                   </h4>
@@ -208,7 +208,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
           animate={{ scale: 1, opacity: 1 }}
           className="bg-neo-lime/10 border-2 border-neo-lime/40 rounded-xl p-3 flex items-center justify-center gap-3"
         >
-          <div className="w-8 h-8 bg-neo-lime border-2 border-neo-black rounded-lg flex items-center justify-center flex-shrink-0">
+          <div className="w-8 h-8 bg-neo-lime border-2 border-neo-black rounded-lg flex items-center justify-center shrink-0">
             <Pointer className="w-4 h-4 text-neo-black animate-bounce" />
           </div>
           <span className="font-bold text-white text-sm">
@@ -252,7 +252,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
       {/* Tip card */}
       <div className="bg-slate-800/60 border-2 border-slate-600/40 rounded-xl p-3.5">
         <div className="flex items-start gap-3">
-          <div className="w-9 h-9 bg-neo-lime/20 border-2 border-neo-lime/40 rounded-lg flex-shrink-0 flex items-center justify-center">
+          <div className="w-9 h-9 bg-neo-lime/20 border-2 border-neo-lime/40 rounded-lg shrink-0 flex items-center justify-center">
             <Lightbulb className="w-4 h-4 text-neo-lime" />
           </div>
           <p className="text-slate-300 text-sm leading-snug">
@@ -287,7 +287,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
             >
               {/* Fill bar behind */}
               <div
-                className="absolute inset-y-0 start-0 bg-neo-pink/15"
+                className="absolute inset-y-0 inset-s-0 bg-neo-pink/15"
                 style={{ width: item.width }}
               />
               <div className="relative flex justify-between items-center px-4 py-2.5">
@@ -305,7 +305,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
 
       {/* Combo bonus */}
       <div className="bg-slate-800/80 border-2 border-neo-cyan/30 rounded-xl p-4 flex gap-3.5 items-center">
-        <div className="w-11 h-11 bg-neo-cyan/20 border-2 border-neo-cyan/40 rounded-lg flex items-center justify-center flex-shrink-0">
+        <div className="w-11 h-11 bg-neo-cyan/20 border-2 border-neo-cyan/40 rounded-lg flex items-center justify-center shrink-0">
           <Flame className="w-6 h-6 text-neo-cyan animate-pulse" />
         </div>
         <div>
@@ -332,7 +332,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
         <ul className="space-y-2.5">
           {[1, 2, 4].map((num) => (
             <li key={num} className="flex gap-2.5 items-start">
-              <CheckCircle2 className="w-4 h-4 text-neo-lime mt-0.5 flex-shrink-0" />
+              <CheckCircle2 className="w-4 h-4 text-neo-lime mt-0.5 shrink-0" />
               <span className="text-slate-300 text-sm leading-tight">
                 {t(`howToPlay.tips.tip${num}`)}
               </span>
@@ -467,7 +467,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
       </div>
 
       {/* Divider line */}
-      <div className="h-px bg-gradient-to-r from-transparent via-slate-600/50 to-transparent" />
+      <div className="h-px bg-linear-to-r from-transparent via-slate-600/50 to-transparent" />
 
       {/* ─── Swipeable Content ─── */}
       <div data-testid="swipe-container" className="touch-pan-y">
@@ -494,7 +494,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
       </div>
 
       {/* ─── Navigation Footer ─── */}
-      <div className="h-px bg-gradient-to-r from-transparent via-slate-600/50 to-transparent" />
+      <div className="h-px bg-linear-to-r from-transparent via-slate-600/50 to-transparent" />
       <div
         data-testid="nav-footer"
         className="flex justify-between items-center px-5 py-4 bg-slate-900/50"

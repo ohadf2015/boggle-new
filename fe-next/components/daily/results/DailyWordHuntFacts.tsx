@@ -116,7 +116,7 @@ const DailyWordHuntFacts: React.FC<DailyWordHuntFactsProps> = ({ result, stats, 
             >
               <div
                 className={cn(
-                  'flex-shrink-0 w-9 h-9 rounded-neo flex items-center justify-center border-2 border-neo-black',
+                  'shrink-0 w-9 h-9 rounded-neo flex items-center justify-center border-2 border-neo-black',
                   styles.iconBg
                 )}
               >
@@ -130,7 +130,7 @@ const DailyWordHuntFacts: React.FC<DailyWordHuntFactsProps> = ({ result, stats, 
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={{ delay: index * 0.1 + 0.2, type: 'spring', stiffness: 400 }}
-                  className="flex-shrink-0 text-lg font-black text-neo-cream"
+                  className="shrink-0 text-lg font-black text-neo-cream"
                 >
                   {fact.value}
                 </motion.span>

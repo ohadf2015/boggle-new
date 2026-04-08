@@ -9748,6 +9748,17 @@ const he = {
     "unranked": "שחק משחקים מדורגים כדי לקבל דרגה!",
     "playRanked": "שחק מדורג"
   },
+  "matchmaking": {
+    "rankedMatch": "משחק מדורג",
+    "findingOpponent": "מחפש יריב…",
+    "eloRange": "{{elo}} ELO (±{{range}})",
+    "playersInQueue": "{{count}} בתור",
+    "estimatedWait": "~{{time}}",
+    "cancel": "ביטול",
+    "matchFound": "נמצא יריב!",
+    "timeout": "לא נמצא יריב",
+    "createRoom": "צור חדר במקום"
+  },
   "seasonalEvent": {
     "ariaLabel": "אירוע עונתי",
     "score": "ניקוד",

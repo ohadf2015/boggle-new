@@ -94,10 +94,10 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
           bg-neo-cream dark:bg-slate-700 text-neo-black dark:text-white
           border-3 border-neo-black dark:border-slate-500
           rounded-neo shadow-hard-sm
-          hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard hover:bg-neo-yellow/30
-          active:translate-x-[1px] active:translate-y-[1px] active:shadow-none
+          hover:-translate-x-px hover:-translate-y-px hover:shadow-hard hover:bg-neo-lime/30
+          active:translate-x-px active:translate-y-px active:shadow-none
           transition-all duration-100
-          focus:outline-none focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2
+          focus:outline-hidden focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2
           cursor-pointer
         "
         aria-label={unreadCount > 0
@@ -112,9 +112,9 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
         {unreadCount > 0 && (
           <span
             className="
-              absolute -top-0.5 -end-0.5
+              absolute -top-0.5 -inset-e-0.5
               min-w-5 h-5 px-1.5 rounded-full
-              bg-neo-yellow text-black
+              bg-neo-lime text-black
               text-xs font-bold flex items-center justify-center
               border-2 border-black
               animate-in zoom-in duration-200

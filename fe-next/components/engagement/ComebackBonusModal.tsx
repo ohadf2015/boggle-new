@@ -71,7 +71,7 @@ export function ComebackBonusModal({ isOpen, daysAway, tier, playerName, onClose
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs"
           onClick={(e: React.MouseEvent) => { if (e.target === e.currentTarget) onClose(); }}
         >
           <AdaptiveMotion.div
@@ -93,13 +93,13 @@ export function ComebackBonusModal({ isOpen, daysAway, tier, playerName, onClose
               <button
                 aria-label={t('comebackBonus.close')}
                 onClick={onClose}
-                className="absolute top-2.5 end-2.5 z-30 p-1.5 rounded-full text-neo-white/40 hover:text-neo-white hover:bg-neo-white/10 transition-colors"
+                className="absolute top-2.5 inset-e-2.5 z-30 p-1.5 rounded-full text-neo-white/40 hover:text-neo-white hover:bg-neo-white/10 transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
 
               {/* ── Hero section with mascot + multiplier ── */}
-              <div className="relative pt-4 sm:pt-6 pb-2 sm:pb-3 flex flex-col items-center bg-gradient-to-b from-neo-navy to-neo-navy-light">
+              <div className="relative pt-4 sm:pt-6 pb-2 sm:pb-3 flex flex-col items-center bg-linear-to-b from-neo-navy to-neo-navy-light">
                 {/* Glow effect behind mascot */}
                 <div
                   className="absolute top-3 w-36 h-36 rounded-full blur-3xl opacity-40"
@@ -113,7 +113,7 @@ export function ComebackBonusModal({ isOpen, daysAway, tier, playerName, onClose
                   transition={{ type: 'spring', stiffness: 250, damping: 18, delay: 0.1 }}
                   className="relative z-10"
                 >
-                  <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-full overflow-hidden border-[3px] border-neo-pink shadow-hard bg-neo-navy">
+                  <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-full overflow-hidden border-3 border-neo-pink shadow-hard bg-neo-navy">
                     <Image
                       src={GIF_SRC}
                       alt=""
@@ -148,7 +148,7 @@ export function ComebackBonusModal({ isOpen, daysAway, tier, playerName, onClose
                   transition={{ type: 'spring', stiffness: 400, damping: 12, delay: 0.25 }}
                   className="mt-2 sm:mt-3 -mb-4 sm:-mb-5 z-20 relative"
                 >
-                  <div className={`bg-gradient-to-r ${tierColor.gradient} px-6 py-2 rounded-neo border-neo-thick border-neo-white shadow-hard-lg`}>
+                  <div className={`bg-linear-to-r ${tierColor.gradient} px-6 py-2 rounded-neo border-neo-thick border-neo-white shadow-hard-lg`}>
                     <span className="text-3xl font-black font-neo-display text-neo-white drop-shadow-lg leading-none">
                       {multiplierDisplay}
                     </span>
@@ -199,7 +199,7 @@ export function ComebackBonusModal({ isOpen, daysAway, tier, playerName, onClose
                         ? 'bg-neo-lime text-neo-navy shadow-hard'
                         : claimState === 'error'
                           ? 'bg-neo-red text-neo-white shadow-hard hover:shadow-hard-lg'
-                          : `bg-gradient-to-r ${tierColor.gradient} text-neo-white shadow-hard hover:shadow-hard-lg active:shadow-hard-pressed active:translate-y-0.5`
+                          : `bg-linear-to-r ${tierColor.gradient} text-neo-white shadow-hard hover:shadow-hard-lg active:shadow-hard-pressed active:translate-y-0.5`
                     } disabled:cursor-not-allowed`}
                   >
                     {claimState === 'claiming' && (

@@ -129,7 +129,7 @@ export const RoomList: React.FC<RoomListProps> = ({
                     "w-full p-2.5 rounded-neo text-left transition-all duration-100 border-3",
                     selectedGameCode === room.gameCode
                       ? "bg-neo-cyan border-neo-cyan text-neo-black shadow-hard"
-                      : "bg-neo-navy border-neo-cream/50 text-neo-cream shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] hover:border-neo-cyan"
+                      : "bg-neo-navy border-neo-cream/50 text-neo-cream shadow-hard-sm hover:shadow-hard hover:-translate-x-px hover:-translate-y-px hover:border-neo-cyan"
                   )}
                 >
                   <div className="flex items-center justify-between gap-2">
@@ -237,7 +237,7 @@ export const RoomList: React.FC<RoomListProps> = ({
                     "w-full p-3 rounded-neo text-left transition-all duration-100 border-3",
                     selectedGameCode === room.gameCode
                       ? "bg-neo-cyan border-neo-cyan text-neo-black shadow-hard"
-                      : "bg-neo-navy border-neo-cream/50 text-neo-cream shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] hover:border-neo-cyan"
+                      : "bg-neo-navy border-neo-cream/50 text-neo-cream shadow-hard-sm hover:shadow-hard hover:-translate-x-px hover:-translate-y-px hover:border-neo-cyan"
                   )}
                 >
                   <div className="flex items-center justify-between gap-3">

@@ -36,7 +36,7 @@ const MechanicIndicator = memo(function MechanicIndicator({
         className
       )}
     >
-      <Sparkles className="w-3.5 h-3.5 text-neo-purple-light flex-shrink-0" />
+      <Sparkles className="w-3.5 h-3.5 text-neo-purple-light shrink-0" />
       <span className="font-bold text-neo-purple-light truncate">
         {t(`adventure.mechanic.${mechanic}`)}
       </span>

@@ -36,7 +36,7 @@ export function AuthorBioCard() {
       isDarkMode ? 'bg-slate-800' : 'bg-neo-cream'
     )}>
       {/* Avatar */}
-      <div className="w-16 h-16 rounded-full border-3 border-neo-black flex items-center justify-center shrink-0 bg-gradient-to-br from-neo-lime to-neo-cyan font-black text-neo-black text-xl">
+      <div className="w-16 h-16 rounded-full border-3 border-neo-black flex items-center justify-center shrink-0 bg-linear-to-br from-neo-lime to-neo-cyan font-black text-neo-black text-xl">
         WN
       </div>
 

@@ -64,7 +64,7 @@ export function AdminBottomNav({ moderationCount = 0 }: AdminBottomNavProps) {
               <div className="relative">
                 <Icon className="w-5 h-5" />
                 {tab.badge && tab.badge > 0 ? (
-                  <span className="absolute -top-1 -end-1.5 bg-neo-pink text-neo-white text-[10px] font-bold px-1 rounded-full min-w-[14px] text-center leading-tight">
+                  <span className="absolute -top-1 -inset-e-1.5 bg-neo-pink text-neo-white text-[10px] font-bold px-1 rounded-full min-w-[14px] text-center leading-tight">
                     {tab.badge > 99 ? '99+' : tab.badge}
                   </span>
                 ) : null}

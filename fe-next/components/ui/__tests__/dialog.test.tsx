@@ -135,7 +135,7 @@ describe('Dialog Component', () => {
       render(
         <Dialog open={true}>
           <DialogContent>
-            <DialogHeader variant="gradient" customBg="bg-gradient-to-r from-amber-700 to-amber-500">
+            <DialogHeader variant="gradient" customBg="bg-linear-to-r from-amber-700 to-amber-500">
               <DialogTitle>Test Dialog</DialogTitle>
             </DialogHeader>
           </DialogContent>
@@ -143,7 +143,7 @@ describe('Dialog Component', () => {
       );
 
       const header = screen.getByTestId('dialog-title').parentElement;
-      expect(header).toHaveClass('bg-gradient-to-r');
+      expect(header).toHaveClass('bg-linear-to-r');
       expect(header).toHaveClass('from-amber-700');
       expect(header).toHaveClass('to-amber-500');
     });

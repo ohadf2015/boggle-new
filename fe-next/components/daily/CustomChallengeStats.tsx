@@ -114,7 +114,7 @@ export const CustomChallengeStats: React.FC<CustomChallengeStatsProps> = ({ puzz
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-gradient-to-br from-neo-lime to-neo-orange p-6 rounded-xl border-neo-thick border-neo-black shadow-hard-lg">
+      <div className="bg-linear-to-br from-neo-lime to-neo-orange p-6 rounded-xl border-neo-thick border-neo-black shadow-hard-lg">
         <div className="flex items-start justify-between">
           <div>
             <h2 className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-neo-black mb-2">
@@ -215,7 +215,7 @@ export const CustomChallengeStats: React.FC<CustomChallengeStatsProps> = ({ puzz
                         initial={{ width: 0 }}
                         animate={{ width: `${percentage}%` }}
                         transition={{ duration: 0.5, delay: 0.1 * parseInt(attempts) }}
-                        className="h-full bg-gradient-to-r from-neo-cyan to-neo-pink flex items-center justify-end pr-2"
+                        className="h-full bg-linear-to-r from-neo-cyan to-neo-pink flex items-center justify-end pr-2"
                       >
                         <span className="text-xs font-black text-neo-white">{count}</span>
                       </motion.div>

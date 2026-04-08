@@ -78,7 +78,7 @@ export const SharePanel: React.FC<SharePanelProps> = ({
                 </p>
                 <div className="relative w-full rounded-neo border-3 border-neo-black overflow-hidden bg-gray-100 dark:bg-gray-800">
                   {!imageLoaded && (
-                    <div className="aspect-[1200/630] flex items-center justify-center">
+                    <div className="aspect-1200/630 flex items-center justify-center">
                       <Loader size="sm" />
                     </div>
                   )}

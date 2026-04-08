@@ -1,7 +1,7 @@
 'use client';
 
 // Note: Dynamic rendering is set in page.tsx (server component)
-import { useState } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 import dynamic from 'next/dynamic';
@@ -43,6 +43,19 @@ interface LeaderboardEntry {
   games_played?: number;
 }
 
+function getRankIcon(rank: number): React.ReactNode {
+  switch (rank) {
+    case 1:
+      return <span className="text-2xl">🥇</span>;
+    case 2:
+      return <span className="text-2xl">🥈</span>;
+    case 3:
+      return <span className="text-2xl">🥉</span>;
+    default:
+      return <span className="text-lg font-bold text-gray-600">#{rank}</span>;
+  }
+}
+
 export default function LeaderboardPageClient(): React.JSX.Element {
   const { theme } = useTheme();
   const { t, language } = useLanguage();
@@ -69,6 +82,12 @@ export default function LeaderboardPageClient(): React.JSX.Element {
 
   useTierPromotion({ userId: user?.id, currentTier: currentUserTier, t });
 
+  // Pre-compute tiers to avoid calling getGlobalLeaderboardTier per-row on every render
+  const leaderboardTiers = useMemo(
+    () => new Map(leaderboard.map(entry => [entry.player_id, getGlobalLeaderboardTier(entry.total_score ?? 0)])),
+    [leaderboard]
+  );
+
   const handleRefresh = async () => {
     refetch();
     await new Promise((resolve) => setTimeout(resolve, 500));
@@ -77,18 +96,6 @@ export default function LeaderboardPageClient(): React.JSX.Element {
     });
   };
 
-  const getRankIcon = (rank: number): React.ReactNode => {
-    switch (rank) {
-      case 1:
-        return <span className="text-2xl">🥇</span>;
-      case 2:
-        return <span className="text-2xl">🥈</span>;
-      case 3:
-        return <span className="text-2xl">🥉</span>;
-      default:
-        return <span className="text-lg font-bold text-gray-600">#{rank}</span>;
-    }
-  };
 
   // Supabase not enabled - show coming soon
   if (!isSupabaseEnabled) {
@@ -219,8 +226,8 @@ export default function LeaderboardPageClient(): React.JSX.Element {
               className={cn(
                 'p-4 rounded-xl border-2',
                 isDarkMode
-                  ? 'bg-gradient-to-r from-cyan-900/30 to-blue-900/30 border-cyan-500/30'
-                  : 'bg-gradient-to-r from-cyan-50 to-blue-50 border-cyan-200'
+                  ? 'bg-linear-to-r from-cyan-900/30 to-blue-900/30 border-cyan-500/30'
+                  : 'bg-linear-to-r from-cyan-50 to-blue-50 border-cyan-200'
               )}
             >
               <div className="flex items-center justify-between">
@@ -362,7 +369,7 @@ export default function LeaderboardPageClient(): React.JSX.Element {
                   >
                     <div className="hidden sm:block sm:col-span-1 text-center">{getRankIcon(rank)}</div>
                     <div className="flex items-center gap-2 w-full sm:w-auto sm:col-span-5">
-                      <div className="sm:hidden flex-shrink-0 w-6 text-center">{getRankIcon(rank)}</div>
+                      <div className="sm:hidden shrink-0 w-6 text-center">{getRankIcon(rank)}</div>
                       <Avatar
                         customAvatar={entry.avatar_config}
                         avatarImage={entry.avatar_image ?? undefined}
@@ -385,7 +392,7 @@ export default function LeaderboardPageClient(): React.JSX.Element {
                         {entry.display_name || entry.username}
                       </Link>
                       <TierBadge
-                        tier={getGlobalLeaderboardTier(entry.total_score ?? 0)}
+                        tier={leaderboardTiers.get(entry.player_id) ?? getGlobalLeaderboardTier(entry.total_score ?? 0)}
                         size="xs"
                         animated={isCurrentUser}
                       />

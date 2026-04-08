@@ -80,12 +80,12 @@ export const PlayerProfileCard: React.FC<PlayerProfileCardProps> = ({
           type="button"
           onClick={() => setIsBuilderOpen(true)}
           className={cn(
-            'relative flex-shrink-0 group',
+            'relative shrink-0 group',
             'w-16 h-16 rounded-full',
             'border-3 border-neo-cyan overflow-hidden',
             'shadow-hard-sm hover:shadow-hard',
-            'hover:translate-x-[-1px] hover:translate-y-[-1px]',
-            'active:translate-x-[1px] active:translate-y-[1px] active:shadow-none',
+            'hover:-translate-x-px hover:-translate-y-px',
+            'active:translate-x-px active:translate-y-px active:shadow-none',
             'transition-all duration-200'
           )}
           aria-label={t('profile.chooseAvatar')}
@@ -127,7 +127,7 @@ export const PlayerProfileCard: React.FC<PlayerProfileCardProps> = ({
               <span className="font-black text-lg text-neo-white truncate group-hover/name:text-neo-cyan transition-colors">
                 {username || t('multiplayerFlow.createModal.namePlaceholder')}
               </span>
-              <Pencil className="w-4 h-4 text-neo-cyan/60 group-hover/name:text-neo-cyan flex-shrink-0 transition-colors" />
+              <Pencil className="w-4 h-4 text-neo-cyan/60 group-hover/name:text-neo-cyan shrink-0 transition-colors" />
             </button>
           )}
           {nameError && (

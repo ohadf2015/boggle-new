@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { useGridInit } from '@/components/singleplayer/game/hooks/useGridInit';
 import { useDictionaryCache } from '@/hooks/useDictionaryCache';
 import { generateTileStates } from '../utils/blastTileGeneration';
@@ -473,23 +473,30 @@ export function useBlastEngine(
     setTileStates(() => newTileStates);
   }, []);
 
-  return {
-    grid: effectiveGrid,
-    tileStates,
-    gameState,
+  // Stable actions object — functions never change identity, so use empty deps
+  const actions = useMemo(() => ({
     submitWord,
     shuffleGrid,
     endGame,
     unlockMoves,
     getResults,
-    isCascading,
     startCascade,
     stopCascade,
     setTileStates,
     trackWordFail,
     consumeMove,
-    noWordsRemaining,
     getLatestState,
     applyServerBoard,
-  };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }), []);
+
+  // Combined return: reactive state + stable actions spread
+  return useMemo(() => ({
+    grid: effectiveGrid,
+    tileStates,
+    gameState,
+    isCascading,
+    noWordsRemaining,
+    ...actions,
+  }), [effectiveGrid, tileStates, gameState, isCascading, noWordsRemaining, actions]);
 }

@@ -69,7 +69,7 @@ function getUrgencyConfig(type: UrgencyType, language: string): UrgencyConfig {
   const configs: Record<string, UrgencyConfig> = {
     'streak-risk': {
       glowColor: 'rgba(255, 20, 147, 0.35)',
-      gradientClass: 'bg-gradient-to-r from-neo-pink/15 via-neo-pink/5 to-transparent',
+      gradientClass: 'bg-linear-to-r from-neo-pink/15 via-neo-pink/5 to-transparent',
       stripeClass: 'bg-neo-pink',
       iconRingClass: 'border-neo-pink bg-neo-pink/10',
       ctaBgClass: 'bg-neo-pink text-neo-white',
@@ -81,7 +81,7 @@ function getUrgencyConfig(type: UrgencyType, language: string): UrgencyConfig {
     },
     'daily-unsolved': {
       glowColor: 'rgba(255, 225, 53, 0.35)',
-      gradientClass: 'bg-gradient-to-r from-neo-yellow/15 via-neo-yellow/5 to-transparent',
+      gradientClass: 'bg-linear-to-r from-neo-yellow/15 via-neo-yellow/5 to-transparent',
       stripeClass: 'bg-neo-yellow',
       iconRingClass: 'border-neo-yellow bg-neo-yellow/10',
       ctaBgClass: 'bg-neo-yellow text-neo-black',
@@ -170,7 +170,7 @@ export function UrgencyCard() {
               aria-hidden="true"
             >
               <motion.div
-                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/15 to-transparent -skew-x-12"
+                className="absolute inset-0 bg-linear-to-r from-transparent via-white/15 to-transparent -skew-x-12"
                 animate={{ x: ['-100%', '200%'] }}
                 transition={{
                   duration: 1.8,
@@ -185,7 +185,7 @@ export function UrgencyCard() {
           {/* Icon with breathing pulse */}
           <motion.div
             className={`
-              flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12
+              shrink-0 w-10 h-10 sm:w-12 sm:h-12
               flex items-center justify-center
               rounded-full border-2 ${config.iconRingClass}
               relative z-10
@@ -214,13 +214,13 @@ export function UrgencyCard() {
           <motion.div
             data-testid="urgency-cta"
             className={`
-              flex-shrink-0 relative z-10
+              shrink-0 relative z-10
               px-3 sm:px-4 py-1.5 sm:py-2
               ${config.ctaBgClass}
               font-neo-display font-bold text-xs sm:text-sm
               border-2 border-neo-black rounded-neo
               shadow-hard-sm
-              group-active:shadow-none group-active:translate-x-[1px] group-active:translate-y-[1px]
+              group-active:shadow-none group-active:translate-x-px group-active:translate-y-px
               whitespace-nowrap
             `}
             animate={shouldReduceMotion ? undefined : { scale: [1, 1.04, 1] }}

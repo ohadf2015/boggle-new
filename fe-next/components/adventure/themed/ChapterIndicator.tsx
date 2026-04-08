@@ -62,7 +62,7 @@ const LevelDots = memo<LevelDotsProps>(({
             )}
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
-            transition={{ delay: i * 0.1 }}
+            transition={{ delay: i * 0.1, type: 'spring', stiffness: 500, damping: 25 }}
           >
             {isBossLevel && isCurrent && (
               <Crown className="w-full h-full p-0.5 text-neo-black" />
@@ -98,7 +98,7 @@ const ChapterIndicator = memo<ChapterIndicatorProps>(({
       className={cn(
         'flex items-center gap-3',
         'px-3 py-2 rounded-neo',
-        'bg-neo-black/40 backdrop-blur-sm',
+        'bg-neo-black/40 backdrop-blur-xs',
         'border border-neo-white/20',
         className
       )}

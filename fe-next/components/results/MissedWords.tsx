@@ -100,7 +100,7 @@ const MissedWords = memo<MissedWordsProps>(({
       >
         {/* Header - clearer messaging about missed words */}
         <div className="flex items-center justify-between gap-2 px-3 py-2.5 bg-neo-navy-light border-b-3 border-neo-black relative overflow-hidden">
-          <div className="absolute inset-0 pointer-events-none opacity-[0.03] bg-[radial-gradient(circle,#fff_1px,transparent_1px)] bg-[length:6px_6px]" />
+          <div className="absolute inset-0 pointer-events-none opacity-[0.03] bg-[radial-gradient(circle,#fff_1px,transparent_1px)] bg-size-[6px_6px]" />
           <div className={cn("flex items-center gap-2 relative z-10", dir === 'rtl' && 'flex-row-reverse')}>
             <EyeOff className="w-4 h-4 text-neo-lime" />
             <span className="font-black text-xs uppercase text-white tracking-wider">

@@ -205,7 +205,7 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
                     className="relative"
                   >
                     <div
-                      className={`inline-flex items-center gap-2 px-5 py-2 bg-gradient-to-r ${tier.gradient} rounded-neo border-3 border-neo-black shadow-hard`}
+                      className={`inline-flex items-center gap-2 px-5 py-2 bg-linear-to-r ${tier.gradient} rounded-neo border-3 border-neo-black shadow-hard`}
                       style={{ boxShadow: `0 0 20px ${tier.glow}, 4px 4px 0px black` }}
                     >
                       {attemptsUsed === 1 && <Sparkles className="w-5 h-5 text-neo-black" />}

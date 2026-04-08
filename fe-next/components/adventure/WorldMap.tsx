@@ -180,7 +180,7 @@ const WorldNode = memo(function WorldNode({
       style={{ '--entrance-delay': `${index * 0.08}s` } as React.CSSProperties}
     >
       {/* World orb with progress ring */}
-      <div className="flex-shrink-0">
+      <div className="shrink-0">
         <div className="relative">
           {/* Only show orbiting letters on the NEXT world to play — not all 10.
               This cuts concurrent orbit CSS animations from ~20 to ~2. */}
@@ -203,8 +203,8 @@ const WorldNode = memo(function WorldNode({
             whileHover={isUnlocked ? WORLD_HOVER_VARIANT : undefined}
             whileTap={isUnlocked ? WORLD_TAP_VARIANT : undefined}
             className={cn(
-              'relative flex-shrink-0',
-              'focus:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime rounded-full',
+              'relative shrink-0',
+              'focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-lime rounded-full',
               isUnlocked ? 'cursor-pointer' : 'cursor-not-allowed'
             )}
             style={orbButtonStyle}
@@ -241,9 +241,9 @@ const WorldNode = memo(function WorldNode({
             )}
 
             <div className={cn(
-              'relative z-10 w-[5.5rem] h-[5.5rem] sm:w-[6.5rem] sm:h-[6.5rem] md:w-[7.5rem] md:h-[7.5rem] lg:w-[8.5rem] lg:h-[8.5rem]',
+              'relative z-10 w-[5.5rem] h-[5.5rem] sm:w-[6.5rem] sm:h-[6.5rem] md:w-30 md:h-30 lg:w-34 lg:h-34',
               'rounded-full overflow-hidden',
-              'border-[4px] border-neo-black',
+              'border-4 border-neo-black',
               isUnlocked && isComplete && 'ring-[3px] ring-neo-lime/70',
               isUnlocked && !isComplete && 'ring-[3px] ring-neo-white/20'
             )}>
@@ -276,7 +276,7 @@ const WorldNode = memo(function WorldNode({
                 </div>
               )}
               {fogState === 'heavy' && (
-                <div className="absolute inset-0 rounded-full bg-neo-navy/70 opacity-30 blur-sm pointer-events-none" />
+                <div className="absolute inset-0 rounded-full bg-neo-navy/70 opacity-30 blur-xs pointer-events-none" />
               )}
               {fogState === 'shimmer' && (
                 <div className="absolute inset-0 rounded-full overflow-hidden pointer-events-none world-fog-shimmer" />
@@ -302,13 +302,13 @@ const WorldNode = memo(function WorldNode({
             )}
 
             {isComplete && (
-              <div className="absolute -top-1 -end-1 w-7 h-7 sm:w-8 sm:h-8 bg-neo-lime rounded-full border-3 border-neo-black flex items-center justify-center shadow-hard z-20">
+              <div className="absolute -top-1 -inset-e-1 w-7 h-7 sm:w-8 sm:h-8 bg-neo-lime rounded-full border-3 border-neo-black flex items-center justify-center shadow-hard z-20">
                 <span className="text-neo-black font-black text-sm">✓</span>
               </div>
             )}
 
             {isNextWorld && !isComplete && (
-              <div className="absolute -top-2 -start-2 z-20 px-2 py-0.5 bg-neo-lime text-neo-black text-[10px] font-black uppercase rounded-neo border-2 border-neo-black shadow-hard-sm animate-pulse motion-reduce:animate-none">
+              <div className="absolute -top-2 -inset-s-2 z-20 px-2 py-0.5 bg-neo-lime text-neo-black text-[10px] font-black uppercase rounded-neo border-2 border-neo-black shadow-hard-sm animate-pulse motion-reduce:animate-none">
                 {t('adventure.next')}
               </div>
             )}
@@ -319,7 +319,7 @@ const WorldNode = memo(function WorldNode({
             {isUnlocked && !isComplete && (
               <div
                 className={cn(
-                  'absolute -inset-1 rounded-full border-[3px] pointer-events-none',
+                  'absolute -inset-1 rounded-full border-3 pointer-events-none',
                   isNextWorld && !prefersReducedMotion && 'animate-pulse motion-reduce:animate-none'
                 )}
                 style={{ borderColor: glowColor, opacity: isNextWorld ? 0.6 : 0.25 }}
@@ -332,7 +332,7 @@ const WorldNode = memo(function WorldNode({
       {/* World Info Card — CSS entrance instead of framer-motion spring */}
       <div
         className={cn(
-          'flex-shrink min-w-0 relative',
+          'shrink min-w-0 relative',
           'w-[180px] sm:w-[210px] lg:w-[240px]',
           !isUnlocked && 'opacity-50',
           'world-card-entrance'
@@ -371,7 +371,7 @@ const WorldNode = memo(function WorldNode({
               <div dir="ltr" className="flex items-center justify-between mb-1">
                 <div className="flex items-center gap-1">
                   <Star className={cn(
-                    'w-3.5 h-3.5 flex-shrink-0',
+                    'w-3.5 h-3.5 shrink-0',
                     currentStars > 0 ? 'text-neo-yellow fill-neo-yellow' : 'text-neo-white/30 fill-neo-white/10'
                   )} />
                   <span className={cn(
@@ -406,9 +406,9 @@ const WorldNode = memo(function WorldNode({
             return (
               <div className="px-3 pb-3 space-y-1">
                 <div className="flex items-center gap-1.5 text-[11px] text-neo-white/40 font-mono">
-                  <Lock className="w-3 h-3 flex-shrink-0" />
+                  <Lock className="w-3 h-3 shrink-0" />
                   <span>{unlockRequirement}</span>
-                  <Star className="w-3 h-3 flex-shrink-0 text-neo-yellow/40" />
+                  <Star className="w-3 h-3 shrink-0 text-neo-yellow/40" />
                   <span>{t('adventure.stars')}</span>
                 </div>
                 {starsNeeded > 0 && starsNeeded <= unlockRequirement && (

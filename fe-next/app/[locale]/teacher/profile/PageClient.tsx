@@ -65,7 +65,7 @@ export default function TeacherProfilePageClient() {
         <div className="mb-8 p-6 bg-neo-cream border-3 border-neo-black rounded-neo shadow-hard">
           <div className="flex items-center gap-4">
             {/* Avatar */}
-            <div className="w-20 h-20 rounded-neo bg-neo-cyan border-3 border-neo-black shadow-hard-sm flex items-center justify-center flex-shrink-0">
+            <div className="w-20 h-20 rounded-neo bg-neo-cyan border-3 border-neo-black shadow-hard-sm flex items-center justify-center shrink-0">
               <span className="text-4xl" role="img" aria-label={t('teacher.profile.avatar')}>
                 {profile?.avatar_emoji || '👩‍🏫'}
               </span>
@@ -152,7 +152,7 @@ export default function TeacherProfilePageClient() {
           className="p-6 bg-neo-lime border-3 border-neo-black rounded-neo shadow-hard mb-8"
         >
           <div className="flex items-start gap-4">
-            <div className="w-12 h-12 rounded-neo bg-neo-black border-2 border-neo-black flex items-center justify-center flex-shrink-0 shadow-hard-sm">
+            <div className="w-12 h-12 rounded-neo bg-neo-black border-2 border-neo-black flex items-center justify-center shrink-0 shadow-hard-sm">
               <Mail className="w-6 h-6 text-neo-lime" />
             </div>
             <div>
@@ -170,7 +170,7 @@ export default function TeacherProfilePageClient() {
         {user.email && (
           <div className="p-5 bg-neo-navy-light border-3 border-neo-black rounded-neo shadow-hard">
             <div className="flex items-center gap-3">
-              <GraduationCap className="w-5 h-5 text-neo-cyan flex-shrink-0" />
+              <GraduationCap className="w-5 h-5 text-neo-cyan shrink-0" />
               <div>
                 <p className="text-neo-white/60 text-xs font-bold uppercase mb-0.5">
                   {t('common.email')}

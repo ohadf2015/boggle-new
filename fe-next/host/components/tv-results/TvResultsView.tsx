@@ -27,9 +27,9 @@ import type { Language } from '@/shared/types';
 const RESULTS_SOUNDS: Record<SoundType, string> = {
   whoosh: '/sounds/message.mp3',
   pop: '/sounds/word-accepted.wav',
-  fanfare: '/sounds/achievment.mp3',
+  fanfare: '/sounds/achievement.mp3',
   victory: '/sounds/fire-round-start.wav',
-  ding: '/sounds/achievment.mp3',
+  ding: '/sounds/achievement.mp3',
   ready: '/sounds/word-accepted.wav',
 };
 
@@ -202,7 +202,7 @@ const TvResultsView = memo<TvResultsViewProps>(({
   const showTournamentStandings = currentPhase === 'tournament-standings';
 
   return (
-    <div className="fixed inset-0 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 z-[60] overflow-hidden">
+    <div className="fixed inset-0 bg-linear-to-b from-slate-900 via-slate-800 to-slate-900 z-[60] overflow-hidden">
       {/* Fullscreen Toggle Button */}
       {isFullscreenSupported && (
         <motion.button
@@ -233,7 +233,7 @@ const TvResultsView = memo<TvResultsViewProps>(({
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: -50, opacity: 0 }}
               transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-              className="relative flex-shrink-0 py-6 px-8 text-center"
+              className="relative shrink-0 py-6 px-8 text-center"
             >
               {/* DJ Mascot */}
               <div className="absolute bottom-0 left-4">
@@ -247,7 +247,7 @@ const TvResultsView = memo<TvResultsViewProps>(({
                 className={cn(
                   'font-black text-4xl md:text-5xl lg:text-6xl uppercase tracking-wide',
                   'text-transparent bg-clip-text',
-                  'bg-gradient-to-r from-neo-yellow via-neo-orange to-neo-pink'
+                  'bg-linear-to-r from-neo-yellow via-neo-orange to-neo-pink'
                 )}
               >
                 {showTournamentStandings
@@ -295,7 +295,7 @@ const TvResultsView = memo<TvResultsViewProps>(({
               {/* Left Column: Podium & Awards */}
               <div className="lg:col-span-2 flex flex-col gap-6">
                 {/* Winners Podium */}
-                <div className="flex-shrink-0">
+                <div className="shrink-0">
                   <TvResultsWinnersPodium
                     players={podiumPlayers}
                     show3rd={getPhaseVisibility('podium-3rd')}
@@ -317,7 +317,7 @@ const TvResultsView = memo<TvResultsViewProps>(({
                 </div>
 
                 {/* Player Spotlight */}
-                <div className="flex-shrink-0">
+                <div className="shrink-0">
                   <TvResultsPlayerSpotlight
                     players={playerData}
                     visible={getPhaseVisibility('player-spotlight')}
@@ -330,7 +330,7 @@ const TvResultsView = memo<TvResultsViewProps>(({
               {/* Right Column: Stats & Leaderboard */}
               <div className="flex flex-col gap-6">
                 {/* Game Stats */}
-                <div className="flex-shrink-0">
+                <div className="shrink-0">
                   <TvResultsStatsGrid
                     players={playerData}
                     visible={getPhaseVisibility('stats')}

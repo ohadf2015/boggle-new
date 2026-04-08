@@ -292,9 +292,7 @@ export async function getGameSessions(filters: GameSessionFilters = {}): Promise
       query = query.eq('completed', filters.completed);
     }
 
-    if (filters.limit) {
-      query = query.limit(filters.limit);
-    }
+    query = query.limit(filters.limit || 500);
 
     if (filters.offset) {
       query = query.range(filters.offset, filters.offset + (filters.limit || 50) - 1);

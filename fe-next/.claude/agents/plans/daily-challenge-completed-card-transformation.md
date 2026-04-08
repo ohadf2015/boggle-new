@@ -419,7 +419,7 @@ interface CompactChallengeCardProps {
 className={cn(
   'relative w-full bg-slate-900/95 rounded-xl border-3 border-neo-black p-3 sm:p-4',
   // ... existing classes
-  status === 'done' && 'bg-gradient-to-br from-slate-900 via-slate-800/90 to-slate-900',
+  status === 'done' && 'bg-linear-to-br from-slate-900 via-slate-800/90 to-slate-900',
 )}
 ```
 
@@ -482,7 +482,7 @@ className={cn(
     className={cn(
       'relative w-full py-2 sm:py-2.5 text-xs sm:text-sm font-black uppercase rounded-lg overflow-hidden',
       status === 'done'
-        ? 'bg-gradient-to-r from-neo-lime to-neo-cyan text-neo-black border-2 border-neo-black shadow-hard-sm'
+        ? 'bg-linear-to-r from-neo-lime to-neo-cyan text-neo-black border-2 border-neo-black shadow-hard-sm'
         : cn(styles.bg, 'text-neo-black border-2 border-neo-black shadow-hard-sm'),
       'transition-all'
     )}

@@ -102,8 +102,8 @@ const FloatingScoreAnimation = memo<FloatingScoreAnimationProps>(({
         <div
           className={`flex items-center gap-1 px-3 py-1.5 rounded-full font-bold shadow-lg ${
             isFireRound
-              ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white'
-              : 'bg-gradient-to-r from-neo-lime to-neo-cyan text-neo-black'
+              ? 'bg-linear-to-r from-orange-500 to-red-500 text-white'
+              : 'bg-linear-to-r from-neo-lime to-neo-cyan text-neo-black'
           }`}
         >
           <span>+{displayScore}</span>
@@ -148,8 +148,8 @@ const FloatingScoreAnimation = memo<FloatingScoreAnimationProps>(({
           <AdaptiveMotion.div
             className={`px-4 py-2 rounded-full font-black text-xl shadow-xl border-3 border-neo-black ${
               isFireRound
-                ? 'bg-gradient-to-r from-orange-400 via-red-400 to-orange-400 text-white'
-                : 'bg-gradient-to-r from-neo-lime via-neo-cyan to-neo-lime text-neo-black'
+                ? 'bg-linear-to-r from-orange-400 via-red-400 to-orange-400 text-white'
+                : 'bg-linear-to-r from-neo-lime via-neo-cyan to-neo-lime text-neo-black'
             }`}
             style={{
               filter: isFireRound

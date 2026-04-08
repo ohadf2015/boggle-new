@@ -94,7 +94,7 @@ const UGCFeaturedStrip = memo<UGCFeaturedStripProps>(({
             className="flex items-center gap-1 text-xs font-bold text-neo-cyan hover:text-neo-lime transition-colors group"
           >
             {t('ugc.strip.viewAll')}
-            <ArrowIcon className="w-3 h-3 group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5 transition-transform" />
+            <ArrowIcon className="w-3 h-3 group-hover:translate-x-0.5 group-hover:rtl:-translate-x-0.5 transition-transform" />
           </Link>
         )}
       </div>

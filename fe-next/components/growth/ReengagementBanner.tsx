@@ -76,7 +76,7 @@ export const ReengagementBanner: React.FC<ReengagementBannerProps> = memo(
         aria-label={t('reengagement.ariaLabel')}
         className={cn(
           'relative w-full border-neo border-neo-pink rounded-neo p-4',
-          'bg-gradient-to-r from-neo-navy via-neo-pink/10 to-neo-navy',
+          'bg-linear-to-r from-neo-navy via-neo-pink/10 to-neo-navy',
           'shadow-hard-sm',
           'flex flex-col gap-3'
         )}
@@ -86,7 +86,7 @@ export const ReengagementBanner: React.FC<ReengagementBannerProps> = memo(
           data-testid="dismiss-reengagement"
           onClick={handleDismiss}
           className={cn(
-            'absolute top-2 end-2 p-1 rounded-neo',
+            'absolute top-2 inset-e-2 p-1 rounded-neo',
             'text-neo-white/40 hover:text-neo-white/80',
             'hover:bg-neo-white/10 transition-colors'
           )}

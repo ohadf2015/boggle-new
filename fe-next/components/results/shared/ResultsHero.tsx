@@ -45,7 +45,7 @@ const gradients: Record<HeroVariant, string> = {
 
 const badgeStyles: Record<string, string> = {
   completion: 'bg-neo-cyan/80 border-neo-cyan/40 text-neo-black',
-  milestone: 'bg-gradient-to-r from-amber-500/80 to-orange-500/80 border-amber-500/40 text-neo-black',
+  milestone: 'bg-linear-to-r from-amber-500/80 to-orange-500/80 border-amber-500/40 text-neo-black',
   streak: 'bg-neo-orange/80 border-neo-orange/40 text-neo-black',
 };
 
@@ -74,13 +74,13 @@ export function ResultsHero({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       className={cn(
-        'relative text-center bg-gradient-to-b py-6 md:py-10 overflow-hidden',
+        'relative text-center bg-linear-to-b py-6 md:py-10 overflow-hidden',
         gradients[variant],
         className,
       )}
     >
       {/* Halftone texture overlay */}
-      <div className="absolute inset-0 pointer-events-none opacity-[0.03] bg-[radial-gradient(circle,#fff_1px,transparent_1px)] bg-[length:8px_8px]" />
+      <div className="absolute inset-0 pointer-events-none opacity-[0.03] bg-[radial-gradient(circle,#fff_1px,transparent_1px)] bg-size-[8px_8px]" />
 
       {/* Outcome label — h1 for a11y, first heading on page */}
       <motion.div

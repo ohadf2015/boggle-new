@@ -105,7 +105,7 @@ const RoundEventTileEffects = memo<RoundEventTileEffectsProps>(function RoundEve
 
         {/* Frost edge glow */}
         <motion.div
-          className="absolute inset-[-2px] rounded-[8px] pointer-events-none"
+          className="absolute inset-[-2px] rounded-neo pointer-events-none"
           initial={{ opacity: 0 }}
           animate={{ opacity: [0.3, 0.7, 0.3] }}
           transition={{ duration: 2, delay: staggerDelay, repeat: Infinity, ease: 'easeInOut' }}
@@ -222,7 +222,7 @@ const RoundEventTileEffects = memo<RoundEventTileEffectsProps>(function RoundEve
 
         {/* Electric border glow — rapid pulsing */}
         <motion.div
-          className="absolute inset-[-2px] rounded-[8px] pointer-events-none"
+          className="absolute inset-[-2px] rounded-neo pointer-events-none"
           animate={{
             boxShadow: [
               '0 0 8px rgba(250,204,21,0.4), 0 0 16px rgba(250,204,21,0.2)',
@@ -335,7 +335,7 @@ const RoundEventTileEffects = memo<RoundEventTileEffectsProps>(function RoundEve
 
         {/* Crater glow — pulsing orange aura */}
         <motion.div
-          className="absolute inset-[-2px] rounded-[8px] pointer-events-none"
+          className="absolute inset-[-2px] rounded-neo pointer-events-none"
           animate={{
             boxShadow: [
               '0 0 8px rgba(251,146,60,0.3), 0 0 16px rgba(251,146,60,0.15)',

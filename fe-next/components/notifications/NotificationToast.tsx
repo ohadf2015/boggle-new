@@ -56,7 +56,7 @@ export function NotificationToast({ notification, onDismiss, onAction }: Notific
   return (
     <div
       className={`
-        fixed top-20 end-4 z-[100]
+        fixed top-20 inset-e-4 z-[100]
         w-80 max-w-[calc(100vw-2rem)]
         transition-all duration-200 ease-out
         ${isLeaving ? 'opacity-0 translate-x-4' : 'opacity-100 translate-x-0'}
@@ -82,7 +82,7 @@ export function NotificationToast({ notification, onDismiss, onAction }: Notific
         {/* Icon */}
         <div
           className={`
-            flex-shrink-0 w-12 h-12 rounded-lg flex items-center justify-center
+            shrink-0 w-12 h-12 rounded-lg flex items-center justify-center
             border-2 border-black ${colorClass}
             text-xl text-black shadow-hard-sm
           `}
@@ -107,7 +107,7 @@ export function NotificationToast({ notification, onDismiss, onAction }: Notific
             handleDismiss();
           }}
           className="
-            absolute top-2 end-2
+            absolute top-2 inset-e-2
             w-6 h-6 rounded-md flex items-center justify-center
             text-neo-white/50 hover:text-neo-white hover:bg-white/10
             transition-colors
@@ -119,7 +119,7 @@ export function NotificationToast({ notification, onDismiss, onAction }: Notific
         {/* Progress bar for auto-dismiss */}
         <div className="absolute bottom-0 left-0 right-0 h-1 bg-black/20 rounded-b-lg overflow-hidden">
           <div
-            className="h-full bg-neo-yellow animate-shrink-width"
+            className="h-full bg-neo-lime animate-shrink-width"
             style={{
               animationDuration: `${AUTO_DISMISS_MS}ms`,
             }}

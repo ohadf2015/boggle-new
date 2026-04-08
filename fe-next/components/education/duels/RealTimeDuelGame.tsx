@@ -438,7 +438,7 @@ export function RealTimeDuelGame({
               onKeyDown={handleKeyPress}
               placeholder={t('duels.typeWord')}
               data-testid="word-input"
-              className="flex-1 px-4 py-2 bg-neo-navy text-neo-white border-neo rounded-neo shadow-hard focus:outline-none focus:ring-2 focus:ring-neo-cyan"
+              className="flex-1 px-4 py-2 bg-neo-navy text-neo-white border-neo rounded-neo shadow-hard focus:outline-hidden focus:ring-2 focus:ring-neo-cyan"
             />
             <button
               onClick={handleSubmitWord}

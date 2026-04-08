@@ -106,7 +106,7 @@ const RewardsSummary: React.FC<RewardsSummaryProps> = memo(({
           transition={{ type: 'spring', stiffness: 200, damping: 20 }}
           className={cn(
             'relative overflow-hidden rounded-neo-lg border-4 border-neo-black shadow-hard-xl',
-            'bg-gradient-to-br from-neo-navy via-slate-800 to-neo-navy',
+            'bg-linear-to-br from-neo-navy via-slate-800 to-neo-navy',
             className
           )}
         >

@@ -119,7 +119,7 @@ const LevelPreviewCard = memo<LevelPreviewCardProps>(
         <div
           className={cn(
             'p-6 text-center',
-            'bg-gradient-to-br from-neo-cyan/20 to-neo-lime/20',
+            'bg-linear-to-br from-neo-cyan/20 to-neo-lime/20',
             'border-b-3 border-neo-black/30'
           )}
         >

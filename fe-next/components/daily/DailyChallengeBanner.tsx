@@ -191,7 +191,7 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
     // SSR placeholder — invisible to match motion wrapper's initial opacity:0
     return (
       <div className={cn(
-        "w-full h-full rounded-neo border-3 border-neo-black shadow-hard-lg bg-gradient-to-br from-yellow-300 via-amber-400 to-orange-500 opacity-0",
+        "w-full h-full rounded-neo border-3 border-neo-black shadow-hard-lg bg-linear-to-br from-yellow-300 via-amber-400 to-orange-500 opacity-0",
         compact ? "p-2 sm:p-3" : "p-3 sm:p-4",
         className
       )}>
@@ -211,8 +211,8 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
 
   // Premium gold gradient for "daily treasure" feel
   const gradientClass = hasPlayed
-    ? "bg-gradient-to-br from-amber-400 via-orange-400 to-amber-500"
-    : "bg-gradient-to-br from-yellow-300 via-amber-400 to-orange-500";
+    ? "bg-linear-to-br from-amber-400 via-orange-400 to-amber-500"
+    : "bg-linear-to-br from-yellow-300 via-amber-400 to-orange-500";
 
   const glowColor = 'rgba(255, 165, 0, 0.5)';
 
@@ -225,8 +225,8 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
           "relative w-full h-full rounded-neo border-3 border-neo-black shadow-hard-lg transition-shadow cursor-pointer overflow-hidden [container-type:inline-size]",
           // Active effects matching ModeCard
           isRTL
-            ? 'active:translate-x-[-1px] active:translate-y-[1px]'
-            : 'active:translate-x-[1px] active:translate-y-[1px]',
+            ? 'active:-translate-x-px active:translate-y-px'
+            : 'active:translate-x-px active:translate-y-px',
           'active:shadow-hard-pressed',
           // Premium gold gradient
           gradientClass,
@@ -336,14 +336,14 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
         <div className="flex items-center gap-3 sm:gap-4 relative z-10">
           {/* Mascot slot (for mobile portrait override) */}
           {mascot && (
-            <div className="flex-shrink-0">{mascot}</div>
+            <div className="shrink-0">{mascot}</div>
           )}
 
           {/* Content */}
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
               <h2 className={cn(
-                "font-black uppercase text-neo-black leading-tight drop-shadow-sm",
+                "font-black uppercase text-neo-black leading-tight drop-shadow-xs",
                 compact ? "text-base" : "text-lg sm:text-xl"
               )}>
                 {t('daily.badge')}
@@ -418,7 +418,7 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
               transition={{ duration: 0.3 }}
             >
               <motion.div
-                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/50 to-transparent"
+                className="absolute inset-0 bg-linear-to-r from-transparent via-white/50 to-transparent"
                 initial={{ x: '-100%' }}
                 animate={isHovered ? { x: '200%' } : { x: '-100%' }}
                 transition={{ duration: 0.6, ease: 'easeOut' }}

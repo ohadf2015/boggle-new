@@ -92,7 +92,7 @@ export default function ClassroomStudentList({ classroomId, joinCode }: Classroo
             className="flex items-center gap-3 p-3 border-2 border-black rounded-neo bg-neo-cream shadow-hard-sm hover:-translate-y-0.5 hover:shadow-hard transition-all"
           >
             {/* Avatar */}
-            <div className="flex-shrink-0">
+            <div className="shrink-0">
               <Avatar customAvatar={avatarConfig} userId={student.student_id || student.id} size="lg" />
             </div>
 
@@ -103,14 +103,14 @@ export default function ClassroomStudentList({ classroomId, joinCode }: Classroo
               </h4>
               {email && (
                 <div className={cn('flex items-center gap-1.5 text-black/60 text-xs mt-0.5 font-bold')}>
-                  <Mail className="w-3 h-3 flex-shrink-0" />
+                  <Mail className="w-3 h-3 shrink-0" />
                   <span className="truncate">{email}</span>
                 </div>
               )}
             </div>
 
             {/* Joined badge */}
-            <div className={cn('flex items-center gap-1.5 text-xs font-black px-2 py-1 rounded-neo border-2 border-black shadow-hard-sm flex-shrink-0', accentBg)}>
+            <div className={cn('flex items-center gap-1.5 text-xs font-black px-2 py-1 rounded-neo border-2 border-black shadow-hard-sm shrink-0', accentBg)}>
               <Calendar className="w-3 h-3 text-black" />
               <span className="text-black">{joinedAt}</span>
             </div>

@@ -16,6 +16,8 @@ interface LetterTileWordProps {
   maxTiles?: number;
 }
 
+const TILE_FONT_STYLE = { fontFamily: 'Arial, Helvetica, sans-serif' } as const;
+
 // Feedback icon mapping (foundByOther handled separately with avatar)
 const FEEDBACK_ICONS: Record<string, { icon: React.ElementType; color: string }> = {
   accepted: { icon: Check, color: 'text-neo-lime' },
@@ -93,7 +95,7 @@ export function LetterTileWord({
               'font-black text-xl uppercase',
               getTileStyle()
             )}
-            style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}
+            style={TILE_FONT_STYLE}
           >
             {letter}
           </AdaptiveMotion.div>

@@ -168,7 +168,7 @@ export function CoinTrajectory({
       case 'neo':
         return (
           <div
-            className="rounded-full bg-gradient-to-br from-amber-300 via-yellow-400 to-amber-500 border-2 border-amber-700 shadow-hard"
+            className="rounded-full bg-linear-to-br from-amber-300 via-yellow-400 to-amber-500 border-2 border-amber-700 shadow-hard"
             style={{ width: size, height: size }}
           >
             <div className="w-full h-full flex items-center justify-center text-amber-800 font-black text-xs">
@@ -179,7 +179,7 @@ export function CoinTrajectory({
       case 'icon':
         return (
           <div
-            className="rounded-full bg-gradient-to-br from-yellow-400 to-amber-500"
+            className="rounded-full bg-linear-to-br from-yellow-400 to-amber-500"
             style={{ width: size, height: size }}
           />
         );

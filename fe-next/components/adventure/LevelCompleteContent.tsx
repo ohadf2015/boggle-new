@@ -69,19 +69,19 @@ const LevelCompleteContent = memo<LevelCompleteContentProps>(({
         className="grid grid-cols-3 gap-3 mb-6"
       >
         {/* Score */}
-        <div className="bg-neo-black/60 backdrop-blur-sm border-3 border-neo-white/20 rounded-neo p-3">
+        <div className="bg-neo-black/60 backdrop-blur-xs border-3 border-neo-white/20 rounded-neo p-3">
           <div className="text-neo-white/60 text-xs font-bold mb-1 uppercase">{t('common.score')}</div>
           <RollingNumber value={score} variant="white" className="text-xl md:text-2xl" />
         </div>
         {/* XP */}
-        <div className="bg-neo-purple/20 backdrop-blur-sm border-3 border-neo-purple rounded-neo p-3">
+        <div className="bg-neo-purple/20 backdrop-blur-xs border-3 border-neo-purple rounded-neo p-3">
           <div className="text-neo-purple text-xs font-bold mb-1 flex items-center gap-1 justify-center uppercase">
             <Zap className="w-3 h-3" />+{t('common.xp')}
           </div>
           <RollingNumber value={xpEarned ?? Math.floor(score / 100)} variant="default" className="text-xl md:text-2xl text-neo-purple" />
         </div>
         {/* Gold */}
-        <div className="backdrop-blur-sm border-3 rounded-neo p-3 bg-neo-yellow/20 border-neo-yellow/60">
+        <div className="backdrop-blur-xs border-3 rounded-neo p-3 bg-neo-yellow/20 border-neo-yellow/60">
           <div className="text-neo-yellow text-xs font-bold mb-1 flex items-center gap-1 justify-center uppercase">
             <Coins className="w-3 h-3" />+{t('common.gold')}
           </div>
@@ -120,9 +120,9 @@ const LevelCompleteContent = memo<LevelCompleteContentProps>(({
               )}
             >
               {objective.isComplete ? (
-                <Check className="w-4 h-4 flex-shrink-0" />
+                <Check className="w-4 h-4 shrink-0" />
               ) : (
-                <X className="w-4 h-4 flex-shrink-0" />
+                <X className="w-4 h-4 shrink-0" />
               )}
               <span>{t(OBJECTIVE_TRANSLATION_KEYS[objective.type], { target: objective.target })}</span>
               <span className="ms-auto font-mono">{objective.current}/{objective.target}</span>
@@ -316,7 +316,7 @@ export const LevelCompleteActions = memo<LevelCompleteActionsProps>(({
   const [showShareCard, setShowShareCard] = useState(false);
 
   return (
-    <div className="flex flex-col gap-2 p-4 md:p-6 pt-3 border-t border-neo-white/10 bg-neo-navy/95 backdrop-blur-sm flex-shrink-0">
+    <div className="flex flex-col gap-2 p-4 md:p-6 pt-3 border-t border-neo-white/10 bg-neo-navy/95 backdrop-blur-xs shrink-0">
       {/* Save failed warning banner */}
       {saveFailed && (
         <div className="flex items-center gap-2 p-2.5 bg-neo-red/20 border-2 border-neo-red/50 rounded-neo" role="alert">
@@ -355,7 +355,7 @@ export const LevelCompleteActions = memo<LevelCompleteActionsProps>(({
             'border-3 border-neo-black rounded-neo',
             'shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5',
             'active:translate-y-0.5 active:shadow-hard-pressed',
-            'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan',
+            'focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan',
             'transition-all duration-200'
           )}
         >
@@ -402,7 +402,7 @@ export const LevelCompleteActions = memo<LevelCompleteActionsProps>(({
             'font-black text-base border-3 border-neo-black rounded-neo',
             'shadow-hard hover:shadow-hard-lg',
             'active:translate-y-0.5 active:shadow-hard-pressed',
-            'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan',
+            'focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan',
             'transition-all duration-200'
           )}
         >
@@ -418,7 +418,7 @@ export const LevelCompleteActions = memo<LevelCompleteActionsProps>(({
               ? 'flex-1 bg-neo-white/10 text-neo-white font-black text-base border-3 border-neo-black shadow-hard active:translate-y-0.5 active:shadow-hard-pressed'
               : 'bg-transparent text-neo-white/60 font-bold text-base border-2 border-neo-white/10',
             'hover:text-neo-white hover:bg-neo-white/10',
-            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-lime',
+            'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-lime',
             'rounded-neo transition-all duration-200'
           )}
         >

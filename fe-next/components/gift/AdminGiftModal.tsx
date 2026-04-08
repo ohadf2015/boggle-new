@@ -98,7 +98,7 @@ export function AdminGiftModal({
     uncommon: { border: 'border-green-400', bg: 'bg-green-500/20', text: 'text-green-300' },
     rare: { border: 'border-blue-400', bg: 'bg-blue-500/20', text: 'text-blue-300' },
     epic: { border: 'border-purple-400', bg: 'bg-purple-500/20', text: 'text-purple-300' },
-    legendary: { border: 'border-amber-400', bg: 'bg-gradient-to-br from-amber-500/30 to-orange-500/30', text: 'text-amber-300' },
+    legendary: { border: 'border-amber-400', bg: 'bg-linear-to-br from-amber-500/30 to-orange-500/30', text: 'text-amber-300' },
   };
 
   // GSAP Timeline Animation — extracted to avoid try/catch value block issue
@@ -282,7 +282,7 @@ export function AdminGiftModal({
         >
           {/* Backdrop */}
           <m.div
-            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/70 backdrop-blur-xs"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -294,7 +294,7 @@ export function AdminGiftModal({
             ref={containerRef}
             className={cn(
               'relative w-full max-w-md',
-              'bg-gradient-to-br from-neo-navy via-neo-navy to-purple-900/30',
+              'bg-linear-to-br from-neo-navy via-neo-navy to-purple-900/30',
               'rounded-xl overflow-hidden',
               'shadow-2xl',
               className
@@ -356,11 +356,11 @@ export function AdminGiftModal({
 
                 {/* Glow effect */}
                 {enableGlowEffects && (
-                  <div className="absolute inset-[-4px] bg-gradient-to-r from-amber-400/30 to-purple-500/30 rounded-full blur-xl animate-pulse" />
+                  <div className="absolute inset-[-4px] bg-linear-to-r from-amber-400/30 to-purple-500/30 rounded-full blur-xl animate-pulse" />
                 )}
 
                 {/* Icon background */}
-                <div className="absolute inset-0 bg-gradient-to-br from-amber-400 to-amber-500 rounded-full flex items-center justify-center shadow-hard-lg">
+                <div className="absolute inset-0 bg-linear-to-br from-amber-400 to-amber-500 rounded-full flex items-center justify-center shadow-hard-lg">
                   <Crown className="w-12 h-12 text-neo-navy" />
                 </div>
               </div>
@@ -504,7 +504,7 @@ export function AdminGiftModal({
                 disabled={claiming || phase === 'done'}
                 className={cn(
                   'gift-claim-btn w-full py-6 text-lg font-bold',
-                  'bg-gradient-to-r from-amber-400 to-amber-500',
+                  'bg-linear-to-r from-amber-400 to-amber-500',
                   'hover:from-amber-500 hover:to-amber-600',
                   'text-neo-navy border-2 border-neo-black',
                   'shadow-hard transition-all duration-200',

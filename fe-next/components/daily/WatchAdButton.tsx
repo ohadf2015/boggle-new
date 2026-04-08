@@ -114,7 +114,7 @@ const WatchAdButton: React.FC<WatchAdButtonProps> = ({
         className={cn(
           "relative overflow-hidden rounded-neo-lg border-3 border-neo-black shadow-hard transition-all cursor-pointer",
           showSuccess
-            ? "bg-gradient-to-br from-neo-lime to-emerald-500"
+            ? "bg-linear-to-br from-neo-lime to-emerald-500"
             : isDisabled
               ? "bg-gray-500 cursor-not-allowed"
               : "bg-neo-purple hover:shadow-hard-lg",
@@ -123,7 +123,7 @@ const WatchAdButton: React.FC<WatchAdButtonProps> = ({
         onClick={!isDisabled ? showAd : undefined}
       >
         {/* Reward badge */}
-        <div className="absolute top-2 end-2 flex items-center gap-1 px-2.5 py-1 bg-neo-lime rounded-full border-2 border-neo-black shadow-hard-sm text-neo-black">
+        <div className="absolute top-2 inset-e-2 flex items-center gap-1 px-2.5 py-1 bg-neo-lime rounded-full border-2 border-neo-black shadow-hard-sm text-neo-black">
           <Coins className="w-4 h-4" />
           <span className="font-black text-sm">+{rewardAmount}</span>
         </div>
@@ -132,7 +132,7 @@ const WatchAdButton: React.FC<WatchAdButtonProps> = ({
         <div className="p-4">
           <div className="flex items-center gap-3">
             <div className={cn(
-              "flex-shrink-0 w-12 h-12 rounded-neo flex items-center justify-center border-2 border-neo-black",
+              "shrink-0 w-12 h-12 rounded-neo flex items-center justify-center border-2 border-neo-black",
               showSuccess ? "bg-white/30" : "bg-white/20"
             )}>
               {content.icon}
@@ -173,7 +173,7 @@ const WatchAdButton: React.FC<WatchAdButtonProps> = ({
               ? "bg-neo-lime text-neo-black"
               : isDisabled
                 ? "bg-slate-500 text-slate-300 cursor-not-allowed opacity-70"
-                : "bg-gradient-to-r from-purple-500 to-indigo-600 text-white hover:shadow-hard-lg hover:-translate-y-0.5"
+                : "bg-linear-to-r from-purple-500 to-indigo-600 text-white hover:shadow-hard-lg hover:-translate-y-0.5"
           )}
         >
           <span className="flex items-center justify-center gap-2">

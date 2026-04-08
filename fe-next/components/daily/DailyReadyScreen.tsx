@@ -335,7 +335,7 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
             <Button
               onClick={() => setShowCreateChallenge(true)}
               variant="outline"
-              className="w-full max-w-btn py-3.5 text-lg font-black bg-gradient-to-r from-neo-purple to-neo-pink text-neo-white border-neo-thick border-neo-white rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 active:translate-y-0 active:shadow-hard-pressed transition-all flex items-center justify-center gap-2 uppercase"
+              className="w-full max-w-btn py-3.5 text-lg font-black bg-linear-to-r from-neo-purple to-neo-pink text-neo-white border-neo-thick border-neo-white rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 active:translate-y-0 active:shadow-hard-pressed transition-all flex items-center justify-center gap-2 uppercase"
             >
               <Sparkles className="w-5 h-5" />
               {t('daily.createCustomChallenge')}
@@ -420,7 +420,7 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
         >
           <button
             onClick={onStart}
-            className="group w-full py-3.5 text-lg font-black uppercase rounded-neo border-3 border-neo-black bg-gradient-to-r from-emerald-400 to-neo-cyan text-neo-black shadow-hard transition-all duration-200 hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0.5 active:shadow-hard-pressed flex items-center justify-center gap-2"
+            className="group w-full py-3.5 text-lg font-black uppercase rounded-neo border-3 border-neo-black bg-linear-to-r from-emerald-400 to-neo-cyan text-neo-black shadow-hard transition-all duration-200 hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0.5 active:shadow-hard-pressed flex items-center justify-center gap-2"
           >
             <Target className="w-5 h-5" />
             {t('daily.playButton')}
@@ -470,7 +470,7 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
           <div className="max-w-sm mx-auto">
             <button
               onClick={onStart}
-              className="group w-full py-3 text-base font-black uppercase rounded-neo border-3 border-neo-black bg-gradient-to-r from-emerald-400 to-neo-cyan text-neo-black shadow-hard transition-all duration-200 hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0.5 active:shadow-hard-pressed flex items-center justify-center gap-2"
+              className="group w-full py-3 text-base font-black uppercase rounded-neo border-3 border-neo-black bg-linear-to-r from-emerald-400 to-neo-cyan text-neo-black shadow-hard transition-all duration-200 hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0.5 active:shadow-hard-pressed flex items-center justify-center gap-2"
             >
               <Target className="w-5 h-5" />
               {t('daily.playButton')}

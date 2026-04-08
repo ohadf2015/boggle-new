@@ -166,12 +166,12 @@ export function getCardStyle(index: number): string {
  */
 export function getRankBgColor(rank: number, isPlayer: boolean): string {
   if (isPlayer) {
-    if (rank === 1) return 'bg-gradient-to-r from-amber-400 to-amber-300 border-amber-400';
+    if (rank === 1) return 'bg-linear-to-r from-amber-400 to-amber-300 border-amber-400';
     return 'bg-neo-cyan/20 dark:bg-neo-cyan/30 border-neo-cyan';
   }
-  if (rank === 1) return 'bg-gradient-to-r from-amber-400/30 to-amber-300/30 dark:from-amber-400/20 dark:to-amber-300/20 border-amber-400/50';
-  if (rank === 2) return 'bg-gradient-to-r from-gray-200 to-gray-100 dark:from-slate-600 dark:to-slate-700 border-gray-300 dark:border-slate-500';
-  if (rank === 3) return 'bg-gradient-to-r from-amber-200/50 to-amber-100/50 dark:from-amber-800/30 dark:to-amber-700/30 border-amber-300 dark:border-amber-600';
+  if (rank === 1) return 'bg-linear-to-r from-amber-400/30 to-amber-300/30 dark:from-amber-400/20 dark:to-amber-300/20 border-amber-400/50';
+  if (rank === 2) return 'bg-linear-to-r from-gray-200 to-gray-100 dark:from-slate-600 dark:to-slate-700 border-gray-300 dark:border-slate-500';
+  if (rank === 3) return 'bg-linear-to-r from-amber-200/50 to-amber-100/50 dark:from-amber-800/30 dark:to-amber-700/30 border-amber-300 dark:border-amber-600';
   return 'border-neo-black/20 dark:border-slate-500 bg-white dark:bg-slate-700';
 }
 
@@ -187,13 +187,13 @@ export function getRankBgColor(rank: number, isPlayer: boolean): string {
  */
 export function getWaitingResultsRankStyle(index: number): string {
   if (index === 0) {
-    return 'bg-gradient-to-r from-amber-400 via-amber-300 to-amber-400 text-neo-black font-black border-2 border-neo-black shadow-hard-sm';
+    return 'bg-linear-to-r from-amber-400 via-amber-300 to-amber-400 text-neo-black font-black border-2 border-neo-black shadow-hard-sm';
   }
   if (index === 1) {
-    return 'bg-gradient-to-r from-slate-300 via-slate-200 to-slate-300 text-neo-black font-bold border border-slate-400';
+    return 'bg-linear-to-r from-slate-300 via-slate-200 to-slate-300 text-neo-black font-bold border border-slate-400';
   }
   if (index === 2) {
-    return 'bg-gradient-to-r from-amber-500 via-orange-300 to-amber-500 text-neo-black font-bold border border-amber-500';
+    return 'bg-linear-to-r from-amber-500 via-orange-300 to-amber-500 text-neo-black font-bold border border-amber-500';
   }
   return 'bg-white/80 dark:bg-slate-700/80 text-neo-black dark:text-white border border-slate-200 dark:border-slate-600';
 }
@@ -253,22 +253,22 @@ export function rankToIndex(rank: number): number {
 export function getRankRowClasses(rank: number, isCurrentUser: boolean): string {
   // Current user gets cyan highlight regardless of rank
   if (isCurrentUser) {
-    return 'bg-gradient-to-r from-neo-cyan/40 to-neo-cyan/20 border-neo-cyan shadow-[0_0_12px_rgba(0,255,255,0.3)] ring-2 ring-neo-cyan/60';
+    return 'bg-linear-to-r from-neo-cyan/40 to-neo-cyan/20 border-neo-cyan shadow-[0_0_12px_rgba(0,255,255,0.3)] ring-2 ring-neo-cyan/60';
   }
 
   // Rank 1 - Gold tier
   if (rank === 1) {
-    return 'bg-gradient-to-r from-tier-gold/20 to-yellow-50 dark:from-tier-gold/40 dark:to-yellow-900/20 border-tier-gold dark:border-tier-gold';
+    return 'bg-linear-to-r from-tier-gold/20 to-yellow-50 dark:from-tier-gold/40 dark:to-yellow-900/20 border-tier-gold dark:border-tier-gold';
   }
 
   // Rank 2 - Silver tier
   if (rank === 2) {
-    return 'bg-gradient-to-r from-slate-100 to-gray-50 dark:from-slate-700/60 dark:to-slate-800/40 border-slate-400 dark:border-slate-400';
+    return 'bg-linear-to-r from-slate-100 to-gray-50 dark:from-slate-700/60 dark:to-slate-800/40 border-slate-400 dark:border-slate-400';
   }
 
   // Rank 3 - Bronze tier
   if (rank === 3) {
-    return 'bg-gradient-to-r from-orange-100 to-amber-50 dark:from-orange-900/40 dark:to-amber-900/20 border-orange-400 dark:border-orange-500';
+    return 'bg-linear-to-r from-orange-100 to-amber-50 dark:from-orange-900/40 dark:to-amber-900/20 border-orange-400 dark:border-orange-500';
   }
 
   // Rank 4+ - Default styling with hover state
@@ -294,17 +294,17 @@ export function getRankRowClasses(rank: number, isCurrentUser: boolean): string 
 export function getRankBadgeClasses(rank: number): string {
   // Rank 1 - Gold badge
   if (rank === 1) {
-    return 'bg-gradient-to-br from-tier-gold to-yellow-400 text-amber-900 border-tier-gold-border';
+    return 'bg-linear-to-br from-tier-gold to-yellow-400 text-amber-900 border-tier-gold-border';
   }
 
   // Rank 2 - Silver badge
   if (rank === 2) {
-    return 'bg-gradient-to-br from-slate-300 to-gray-400 text-slate-800 border-slate-500';
+    return 'bg-linear-to-br from-slate-300 to-gray-400 text-slate-800 border-slate-500';
   }
 
   // Rank 3 - Bronze badge
   if (rank === 3) {
-    return 'bg-gradient-to-br from-orange-400 to-amber-500 text-orange-900 border-orange-600';
+    return 'bg-linear-to-br from-orange-400 to-amber-500 text-orange-900 border-orange-600';
   }
 
   // Rank 4+ - Default badge

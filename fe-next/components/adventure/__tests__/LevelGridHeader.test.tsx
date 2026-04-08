@@ -61,7 +61,7 @@ describe('LevelGridHeader', () => {
     expect(screen.getByText('Azure Meadows')).toBeInTheDocument();
   });
 
-  it('renders mastery ring with correct percentage', () => {
+  it('renders mastery ring-3 with correct percentage', () => {
     render(<LevelGridHeader {...defaultProps} />);
     const ring = screen.getByTestId('mastery-ring');
     expect(ring).toBeInTheDocument();

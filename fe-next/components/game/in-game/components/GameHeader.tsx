@@ -33,7 +33,7 @@ export const GameHeader = memo<GameHeaderProps>(function GameHeader({
   // Mobile header
   if (isMobile) {
     return (
-      <div className="lg:hidden w-full flex items-center justify-between px-2 py-0.5 flex-shrink-0">
+      <div className="lg:hidden w-full flex items-center justify-between px-2 py-0.5 shrink-0">
         <div className="flex items-center gap-1.5">
           {onExitRoom && (
             <ExitRoomButton

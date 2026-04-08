@@ -113,7 +113,7 @@ const CoinRewardDisplay: React.FC<CoinRewardDisplayProps> = memo(({
   if (variant === 'compact') {
     return (
       <div className={cn(
-        'bg-gradient-to-r from-neo-lime to-amber-400 rounded-neo border-3 border-neo-black shadow-hard px-4 py-2',
+        'bg-linear-to-r from-neo-lime to-amber-400 rounded-neo border-3 border-neo-black shadow-hard px-4 py-2',
         className
       )}>
         <div className="flex items-center justify-center gap-2">
@@ -134,7 +134,7 @@ const CoinRewardDisplay: React.FC<CoinRewardDisplayProps> = memo(({
       animate={{ scale: 1, opacity: 1, y: 0 }}
       transition={{ delay: 0.3, type: 'spring', stiffness: 350, damping: 18 }}
       className={cn(
-        'px-4 py-3 bg-gradient-to-r from-neo-lime via-lime-300 to-amber-400 rounded-neo border-3 border-neo-black shadow-hard relative overflow-hidden',
+        'px-4 py-3 bg-linear-to-r from-neo-lime via-lime-300 to-amber-400 rounded-neo border-3 border-neo-black shadow-hard relative overflow-hidden',
         className
       )}
     >

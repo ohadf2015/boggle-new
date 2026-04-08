@@ -134,7 +134,7 @@ Create a redesigned desktop layout with:
 // ✅ GOOD: Neo-Brutalist card with gradient accent
 <div className="relative rounded-neo-lg border-4 border-neo-black bg-slate-800 shadow-hard-lg overflow-hidden">
   {/* Decorative top accent bar */}
-  <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-neo-pink via-neo-cyan to-neo-lime" />
+  <div className="absolute top-0 left-0 right-0 h-1.5 bg-linear-to-r from-neo-pink via-neo-cyan to-neo-lime" />
 
   {/* Card content with proper spacing */}
   <div className="p-4 pt-6">
@@ -168,7 +168,7 @@ Create a redesigned desktop layout with:
 
 ```tsx
 // ✅ GOOD: Prominent invite section
-<div className="bg-gradient-to-br from-neo-pink/20 to-neo-cyan/20 rounded-neo-lg border-4 border-neo-black p-6 shadow-hard-lg">
+<div className="bg-linear-to-br from-neo-pink/20 to-neo-cyan/20 rounded-neo-lg border-4 border-neo-black p-6 shadow-hard-lg">
   <div className="text-center mb-4">
     <h2 className="text-2xl font-black text-neo-white uppercase">
       {t('hostView.inviteFriends')}

@@ -9,7 +9,7 @@
  * Design: RPG Quest Board meets Neo-Brutalist.
  */
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { Trophy, Sword, Users, Gift, Sparkles, Target, Flame, Puzzle } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useDailyMissions, type MissionType } from '@/hooks/useDailyMissions';
@@ -152,7 +152,7 @@ function GrandSlamBanner({ t }: { t: (key: string) => string }) {
     >
       {/* Shimmer */}
       <div
-        className="absolute inset-0 bg-gradient-to-r from-transparent via-neo-yellow/10 to-transparent animate-shimmer"
+        className="absolute inset-0 bg-linear-to-r from-transparent via-neo-yellow/10 to-transparent animate-shimmer"
         aria-hidden="true"
       />
       <div className="relative flex items-center gap-2">
@@ -175,7 +175,7 @@ function GrandSlamBanner({ t }: { t: (key: string) => string }) {
           </span>
         </div>
       </div>
-      <Flame className="w-6 h-6 text-neo-yellow/60 animate-bob flex-shrink-0" aria-hidden="true" />
+      <Flame className="w-6 h-6 text-neo-yellow/60 animate-bob shrink-0" aria-hidden="true" />
     </div>
   );
 }
@@ -282,7 +282,7 @@ function WeeklyQuestSection() {
                 aria-valuemax={100}
               >
                 <div
-                  className="h-full bg-gradient-to-r from-neo-cyan to-neo-cyan-light rounded-full transition-all duration-700 ease-out"
+                  className="h-full bg-linear-to-r from-neo-cyan to-neo-cyan-light rounded-full transition-all duration-700 ease-out"
                   style={{
                     width: `${Math.min(100, (activeQuest.current / activeQuest.target) * 100)}%`,
                   }}
@@ -318,7 +318,7 @@ function WeeklyQuestSection() {
                         : [
                             'border-neo-black bg-neo-navy/60',
                             'hover:-translate-y-0.5 hover:shadow-hard',
-                            'active:translate-y-[1px] active:shadow-hard-pressed',
+                            'active:translate-y-px active:shadow-hard-pressed',
                           ],
                       selectingQuestId && !isSelecting && 'opacity-40',
                     )}
@@ -338,7 +338,7 @@ function WeeklyQuestSection() {
                         {t(quest.description, { target: quest.displayTarget ?? quest.target })}
                       </span>
                     </div>
-                    <div className="flex flex-col items-end gap-0.5 ms-3 flex-shrink-0">
+                    <div className="flex flex-col items-end gap-0.5 ms-3 shrink-0">
                       <span className="font-neo-display text-sm font-black text-neo-cyan">
                         {t('quests.reward.xp', { xp: quest.xpReward })}
                       </span>
@@ -367,14 +367,14 @@ function AllQuestsCompleteBanner({ t }: { t: (key: string) => string }) {
         className={cn(
           'relative overflow-hidden',
           'flex items-center gap-4 p-5 rounded-neo-lg',
-          'border-3 border-neo-lime bg-gradient-to-br from-neo-lime/15 via-neo-navy to-neo-cyan/10',
+          'border-3 border-neo-lime bg-linear-to-br from-neo-lime/15 via-neo-navy to-neo-cyan/10',
           'shadow-hard animate-neo-pop',
         )}
         role="status"
         aria-live="polite"
       >
         <div
-          className="absolute inset-0 bg-gradient-to-r from-transparent via-neo-lime/10 to-transparent animate-shimmer"
+          className="absolute inset-0 bg-linear-to-r from-transparent via-neo-lime/10 to-transparent animate-shimmer"
           aria-hidden="true"
         />
         <div className="relative flex items-center gap-2">
@@ -421,10 +421,10 @@ export function QuestHub() {
   }, [allComplete, loading, t]);
 
   // Filter to only the 3 quests we show (no brain drill)
-  const dailyCompleted = DAILY_QUEST_CONFIGS.filter((config) => {
+  const dailyCompleted = useMemo(() => DAILY_QUEST_CONFIGS.filter((config) => {
     const mission = missions.find((m) => m.type === config.type);
     return mission?.completed ?? false;
-  }).length;
+  }).length, [missions]);
 
   if (loading) {
     return (

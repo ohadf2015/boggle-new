@@ -120,7 +120,7 @@ export const EnhancedEmptyState: React.FC<EnhancedEmptyStateProps> = ({
           className={cn(
             'relative flex items-center justify-center rounded-neo-lg border-4 border-neo-black shadow-hard mb-6',
             compact ? 'w-16 h-16' : 'w-24 h-24',
-            'bg-gradient-to-br from-neo-lime to-neo-lime-hover'
+            'bg-linear-to-br from-neo-lime to-neo-lime-hover'
           )}
           variants={reduceMotion ? {} : itemVariants}
           whileHover={reduceMotion ? {} : { scale: 1.05, rotate: [-2, 2, 0] }}
@@ -204,7 +204,7 @@ export const EnhancedEmptyState: React.FC<EnhancedEmptyStateProps> = ({
         <motion.button
           className={cn(
             'mt-3 text-sm font-bold text-neo-cyan hover:text-neo-cyan-light underline underline-offset-4 decoration-2 transition-colors',
-            'focus:outline-none focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2 rounded-neo px-2 py-1'
+            'focus:outline-hidden focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2 rounded-neo px-2 py-1'
           )}
           onClick={secondaryAction.onClick}
           variants={reduceMotion ? {} : itemVariants}

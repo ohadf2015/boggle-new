@@ -61,7 +61,7 @@ export default function AdventureViewModals({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4"
           onClick={onCloseShop}
         >
           <AdaptiveMotion.div
@@ -82,7 +82,7 @@ export default function AdventureViewModals({
             <button
               onClick={onCloseShop}
               className={cn(
-                'absolute top-3 end-3 z-10 p-1.5',
+                'absolute top-3 inset-e-3 z-10 p-1.5',
                 'bg-neo-navy border-2 border-neo-white/20 rounded-neo',
                 'text-neo-white hover:bg-neo-red/30 transition-colors'
               )}

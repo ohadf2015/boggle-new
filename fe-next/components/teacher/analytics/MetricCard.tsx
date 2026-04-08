@@ -112,7 +112,7 @@ export function MetricCard({
       {/* Colored header */}
       <div className={cn('px-4 pt-4 pb-3 flex items-center gap-3', cardBg)}>
         <div className={cn(
-          'w-11 h-11 rounded-neo border-3 border-black flex items-center justify-center flex-shrink-0 shadow-hard-sm',
+          'w-11 h-11 rounded-neo border-3 border-black flex items-center justify-center shrink-0 shadow-hard-sm',
           iconBg
         )}>
           <span className={iconFg}>{icon}</span>
@@ -151,7 +151,7 @@ export function MetricCard({
               'font-black font-neo-body text-sm rounded-neo border-3 border-black shadow-hard-sm',
               'hover:-translate-y-0.5 hover:shadow-hard active:translate-y-0.5 active:shadow-hard-pressed',
               'transition-all duration-100',
-              'focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-lime'
+              'focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-lime'
             )}
           >
             {actionable.label}

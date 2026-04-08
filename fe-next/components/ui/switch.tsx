@@ -14,7 +14,7 @@ const Switch = React.forwardRef<
       className={cn(
         "peer inline-flex h-7 w-12 shrink-0 cursor-pointer items-center rounded-full border-2 border-neo-black transition-all duration-200",
         "shadow-hard-sm",
-        "focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+        "focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2 focus-visible:ring-offset-background",
         "disabled:cursor-not-allowed disabled:opacity-70",
         "data-[state=checked]:bg-neo-purple data-[state=checked]:shadow-hard-pressed",
         "data-[state=unchecked]:bg-neo-cream",
@@ -26,8 +26,8 @@ const Switch = React.forwardRef<
       <SwitchPrimitives.Thumb
         className={cn(
           "pointer-events-none block h-5 w-5 rounded-full bg-white border-2 border-neo-black shadow-hard-sm ring-0 transition-transform duration-200",
-          "data-[state=checked]:translate-x-5 data-[state=checked]:rtl:-translate-x-5",
-          "data-[state=unchecked]:translate-x-0 data-[state=unchecked]:rtl:-translate-x-0",
+          "data-[state=checked]:translate-x-5 rtl:data-[state=checked]:-translate-x-5",
+          "data-[state=unchecked]:translate-x-0 rtl:data-[state=unchecked]:translate-x-0",
           "data-[state=checked]:bg-neo-cream"
         )}
       />

@@ -163,7 +163,7 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
           className={cn(
             'fixed inset-0 z-50',
             'flex items-center justify-center',
-            'bg-neo-black/80 backdrop-blur-sm'
+            'bg-neo-black/80 backdrop-blur-xs'
           )}
         >
           <div
@@ -189,7 +189,7 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
               <AdaptiveMotion.div
                 initial={{ y: -30, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.1 }}
+                transition={{ delay: 0.1, type: 'spring', stiffness: 300, damping: 25 }}
                 className="mb-2"
               >
                 <h2
@@ -207,9 +207,9 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
 
               {/* Level Badge */}
               <AdaptiveMotion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.2 }}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.2, type: 'spring', stiffness: 300, damping: 25 }}
                 className="flex justify-center mb-3"
               >
                 <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-neo-black/50 border-2 border-neo-white/20 rounded-neo">
@@ -242,9 +242,9 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
               {/* Perfect Badge */}
               {isPerfect && (
                 <AdaptiveMotion.p
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.5 }}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5, type: 'spring', stiffness: 300, damping: 25 }}
                   className="text-center text-lg font-black text-neo-yellow mb-3"
                 >
                   {t('adventure.game.perfect')}
@@ -283,9 +283,9 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
               {/* Show previous best stars when current attempt earned fewer */}
               {previousBestStars > stars && (
                 <AdaptiveMotion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.6 }}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.6, type: 'spring', stiffness: 300, damping: 25 }}
                   className="flex justify-center items-center gap-1.5 -mt-2 mb-4"
                 >
                   <span className="text-neo-white/50 text-xs font-bold uppercase">

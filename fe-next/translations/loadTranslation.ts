@@ -10,6 +10,7 @@
  */
 
 import type { Language } from '@/types';
+import { normalizeMessages } from '@/i18n/normalizeMessages';
 
 // Translation data type — the shape of each language file
 export type TranslationData = Record<string, unknown>;
@@ -47,9 +48,10 @@ export async function loadTranslation(lang: Language): Promise<TranslationData> 
       mod = await import('./en.js');
   }
 
-  const data = mod[lang] || mod.default || Object.values(mod)[0];
-  cache.set(lang, data as TranslationData);
-  return data as TranslationData;
+  const raw = mod[lang] || mod.default || Object.values(mod)[0];
+  const data = normalizeMessages(raw as Record<string, unknown>) as TranslationData;
+  cache.set(lang, data);
+  return data;
 }
 
 /**
@@ -66,10 +68,11 @@ export function getCachedTranslation(lang: Language): TranslationData | undefine
   if (typeof window === 'undefined' || process.env.NODE_ENV === 'test') {
     try {
       const mod = require(`./${lang}.js`);
-      const data = mod[lang] || mod.default || Object.values(mod)[0];
-      if (data) {
-        cache.set(lang, data as TranslationData);
-        return data as TranslationData;
+      const raw = mod[lang] || mod.default || Object.values(mod)[0];
+      if (raw) {
+        const data = normalizeMessages(raw as Record<string, unknown>) as TranslationData;
+        cache.set(lang, data);
+        return data;
       }
     } catch { /* fall through */ }
   }

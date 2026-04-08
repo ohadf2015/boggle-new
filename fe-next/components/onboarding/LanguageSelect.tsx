@@ -82,7 +82,7 @@ const LanguageSelect: React.FC<LanguageSelectProps> = ({ onSelect }) => {
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={{ type: 'spring', stiffness: 500, damping: 20 }}
-                  className="absolute top-1.5 end-1.5 w-5 h-5 bg-neo-lime border-2 border-neo-black rounded-full flex items-center justify-center"
+                  className="absolute top-1.5 inset-e-1.5 w-5 h-5 bg-neo-lime border-2 border-neo-black rounded-full flex items-center justify-center"
                 >
                   <Check className="w-3 h-3 text-neo-black" strokeWidth={3} />
                 </motion.div>

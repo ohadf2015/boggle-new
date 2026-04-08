@@ -266,7 +266,7 @@ const CompactResultsStats: React.FC<CompactResultsStatsProps> = memo(({
             animate={{ scale: 1 }}
             transition={{ type: 'spring' as const, stiffness: 400, damping: 15, delay: 0.45 }}
           >
-            <Award className="w-4 h-4 text-neo-lime flex-shrink-0" />
+            <Award className="w-4 h-4 text-neo-lime shrink-0" />
           </motion.div>
           {achievements.slice(0, MAX_VISIBLE_ACHIEVEMENTS).map((ach, i) => (
             <motion.div

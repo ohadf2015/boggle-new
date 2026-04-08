@@ -220,7 +220,7 @@ export function CoinBurstSource({
             ease: 'backOut',
           }}
         >
-          <div className="px-4 py-2 rounded-neo-lg bg-gradient-to-br from-amber-300 via-yellow-400 to-amber-500 border-3 border-neo-black shadow-hard whitespace-nowrap">
+          <div className="px-4 py-2 rounded-neo-lg bg-linear-to-br from-amber-300 via-yellow-400 to-amber-500 border-3 border-neo-black shadow-hard whitespace-nowrap">
             <motion.span
               className="font-black text-neo-black text-xl flex items-center gap-1.5"
               animate={{

@@ -120,12 +120,12 @@ export function ProfileHeader({
       )}
     >
       {/* Sparkle decorations */}
-      <Sparkles className="absolute top-4 end-16 w-5 h-5 text-white/20 animate-pulse" aria-hidden="true" />
-      <Sparkles className="absolute bottom-6 start-4 w-4 h-4 text-white/15 animate-pulse" aria-hidden="true" />
+      <Sparkles className="absolute top-4 inset-e-16 w-5 h-5 text-white/20 animate-pulse" aria-hidden="true" />
+      <Sparkles className="absolute bottom-6 inset-s-4 w-4 h-4 text-white/15 animate-pulse" aria-hidden="true" />
 
       {/* Level badge — top-right */}
       {!compact && (
-        <div className="absolute top-4 end-4 bg-neo-yellow rounded-xl border-3 border-neo-black shadow-hard px-3 py-1.5 -rotate-6">
+        <div className="absolute top-4 inset-e-4 bg-neo-yellow rounded-xl border-3 border-neo-black shadow-hard px-3 py-1.5 -rotate-6">
           <span className="text-2xl font-black text-neo-black leading-none">{level}</span>
           <span className="block text-[9px] font-bold uppercase tracking-wider text-neo-black/70">{t('xp.level')}</span>
         </div>
@@ -133,7 +133,7 @@ export function ProfileHeader({
 
       <div className={cn('flex', compact ? 'flex-row gap-3 items-center' : 'flex-row gap-6 items-center')}>
         {/* Avatar with overlay control buttons */}
-        <div className="relative flex-shrink-0">
+        <div className="relative shrink-0">
           <div
             className={cn(
               'relative rounded-full border-3 border-neo-yellow shadow-hard-yellow overflow-hidden',
@@ -152,7 +152,7 @@ export function ProfileHeader({
           <button
             onClick={() => setIsAvatarBuilderOpen(true)}
             className={cn(
-              'absolute -bottom-1 -end-1 flex items-center justify-center',
+              'absolute -bottom-1 -inset-e-1 flex items-center justify-center',
               'rounded-full bg-neo-pink border-3 border-neo-black shadow-hard-sm',
               'text-white hover:bg-neo-pink/80 hover:scale-110 transition-all',
               compact ? 'w-6 h-6' : 'w-9 h-9'
@@ -200,7 +200,7 @@ export function ProfileHeader({
               <span className="truncate">{profile?.display_name || profile?.username || 'Player'}</span>
               <button
                 onClick={startEditingName}
-                className="p-1 rounded hover:bg-slate-700 transition-colors flex-shrink-0 text-gray-400"
+                className="p-1 rounded hover:bg-slate-700 transition-colors shrink-0 text-gray-400"
                 title={t('profile.editName')}
                 aria-label={t('profile.editName')}
               >

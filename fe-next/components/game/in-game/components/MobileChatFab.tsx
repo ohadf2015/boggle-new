@@ -96,7 +96,7 @@ export const MobileChatFab = memo<MobileChatFabProps>(({ username, isHost, gameC
               'w-10 h-10 min-w-[44px] min-h-[44px]',
               'flex items-center justify-center',
               'bg-neo-navy/90 border-2 border-neo-lime/60 rounded-full',
-              'backdrop-blur-sm',
+              'backdrop-blur-xs',
             )}
             aria-label={t('common.chat')}
           >
@@ -139,7 +139,7 @@ export const MobileChatFab = memo<MobileChatFabProps>(({ username, isHost, gameC
               )}
             >
               {/* Header */}
-              <div className="flex items-center justify-between px-4 py-2 border-b-2 border-neo-black/30 flex-shrink-0">
+              <div className="flex items-center justify-between px-4 py-2 border-b-2 border-neo-black/30 shrink-0">
                 <div className="flex items-center gap-2">
                   <MessageSquare className="w-4 h-4 text-neo-cyan" />
                   <span className="text-sm font-bold text-neo-cream uppercase tracking-wide">{t('common.chat')}</span>

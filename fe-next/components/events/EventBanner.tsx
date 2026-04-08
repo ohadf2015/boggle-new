@@ -75,7 +75,7 @@ const EventBanner: React.FC<EventBannerProps> = ({
           data-testid="event-banner"
           className={cn(
             'relative border-3 border-black rounded-neo shadow-hard p-4',
-            'bg-gradient-to-r from-neo-navy to-neo-navy/90',
+            'bg-linear-to-r from-neo-navy to-neo-navy/90',
             className
           )}
           style={{ borderColor: accentColor }}
@@ -92,7 +92,7 @@ const EventBanner: React.FC<EventBannerProps> = ({
           <div className="flex items-start gap-3">
             {/* Event icon */}
             <div
-              className="flex-shrink-0 w-10 h-10 rounded-neo border-2 border-black flex items-center justify-center"
+              className="shrink-0 w-10 h-10 rounded-neo border-2 border-black flex items-center justify-center"
               style={{ backgroundColor: accentColor }}
             >
               <Calendar size={20} className="text-black" />
@@ -131,7 +131,7 @@ const EventBanner: React.FC<EventBannerProps> = ({
             </div>
 
             {/* CTA */}
-            <div className="flex-shrink-0 self-center">
+            <div className="shrink-0 self-center">
               {hasJoined ? (
                 <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-neo border-2 border-black bg-green-500 text-black font-bold text-sm shadow-hard-sm">
                   <Zap size={14} />

@@ -136,7 +136,7 @@ const EmojiAvatarPicker: React.FC<AvatarPickerProps> = ({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/60 p-4"
+        className="fixed inset-0 z-1000 flex items-center justify-center bg-black/60 p-4"
         onClick={onClose}
         role="dialog"
         aria-modal="true"
@@ -241,7 +241,7 @@ const EmojiAvatarPicker: React.FC<AvatarPickerProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 py-3 font-bold rounded-neo transition-all flex items-center justify-center gap-2 bg-neo-white/10 text-neo-white border-2 border-neo-white/20 hover:bg-neo-white/20 active:translate-y-[1px]"
+              className="flex-1 py-3 font-bold rounded-neo transition-all flex items-center justify-center gap-2 bg-neo-white/10 text-neo-white border-2 border-neo-white/20 hover:bg-neo-white/20 active:translate-y-px"
             >
               <X size={16} />
               {t('common.cancel')}
@@ -249,7 +249,7 @@ const EmojiAvatarPicker: React.FC<AvatarPickerProps> = ({
             <button
               type="button"
               onClick={handleSave}
-              className="flex-1 py-3 font-black rounded-neo transition-all flex items-center justify-center gap-2 bg-neo-cyan text-neo-black border-3 border-neo-black shadow-hard-sm hover:translate-y-[-1px] hover:shadow-hard active:translate-y-[1px] active:shadow-none"
+              className="flex-1 py-3 font-black rounded-neo transition-all flex items-center justify-center gap-2 bg-neo-cyan text-neo-black border-3 border-neo-black shadow-hard-sm hover:-translate-y-px hover:shadow-hard active:translate-y-px active:shadow-none"
             >
               <Check size={16} />
               {t('common.save')}

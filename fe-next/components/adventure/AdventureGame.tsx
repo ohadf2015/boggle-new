@@ -742,8 +742,8 @@ const AdventureGame = memo<AdventureGameProps>(
           <RetryAssistModal
             isOpen={showRetryAssist}
             consecutiveFailures={consecutiveFailures}
-            bestWords={gameState.wordsFound.length}
-            bestScore={gameState.score}
+            bestWords={Math.max(gameState.wordsFound.length, bestAttempt?.bestWords ?? 0)}
+            bestScore={Math.max(gameState.score, bestAttempt?.bestScore ?? 0)}
             attemptCount={(bestAttempt?.attemptCount ?? 0) + 1}
             nearMissMessages={getNearMissMessages(objectives)}
             onRetry={handleRetryFromAssist}

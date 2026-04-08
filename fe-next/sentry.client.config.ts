@@ -141,15 +141,8 @@ Sentry.init({
     /\[ProgressionContext\].*Record attempt failed/i,
     // Moderation approve/reject timeouts — handled gracefully with AbortController
     /Moderation (approve|reject) failed/i,
-    // Blast result save transient failures — retried once on 5xx, guest fallback on 401
-    /\[useBlastResultSaver\].*Save failed/i,
     // Solve-grid blacklist Supabase 502 — returns unfiltered words as fallback
     /\[SOLVE-GRID\].*Blacklist query error/i,
-    // Supabase auth lock timeout — known React Strict Mode issue, auto-recovers
-    // See: https://github.com/supabase/gotrue-js/issues/806
-    /lock.*was not released within.*forcefully acquiring/i,
-    // Supabase auth lock stolen by concurrent request — known SSR race condition, auto-recovers
-    /Lock.*was released because another request stole it/i,
     // Friends fetch fails downstream of Supabase lock contention — non-actionable
     /Error fetching friends/i,
     // Capacitor addListener().then() — WebView compatibility issue on specific Android devices
@@ -171,6 +164,38 @@ Sentry.init({
     /Error checking CrazyGames user/i,
     /Failed to load CrazyGames friends/i,
     /Failed to get Xsolla token/i,
+    // Bots hitting routes with invalid locale params — not a bug
+    /Incorrect locale information provided/i,
+    // Clipboard writeText when document not focused — browser restriction, not a bug
+    /Document is not focused/i,
+    /Failed to execute 'writeText' on 'Clipboard'/i,
+    // navigator.sendBeacon unavailable in bot/SSR contexts — handled with fetch fallback
+    /navigator\.sendBeacon is not a function/i,
+    // Socket.IO expected race conditions — player left game or word already found
+    /\[SOCKET\.IO\] Socket error event.*Not in a game/i,
+    /\[SOCKET\.IO\] Socket error event.*not in a game/i,
+    /\[SOCKET\.IO\] Socket error event.*Target word already found/i,
+    // NativeOAuth UNIMPLEMENTED — CrazyGames SDK outside platform
+    /\[NativeOAuth\].*UNIMPLEMENTED/i,
+    // CrazyGames SDK ad/banner/gameplay warnings — expected outside platform
+    /adsDisabledBasicLaunch/i,
+    /bannersDisabledBasicLaunch/i,
+    /gameplayStop\(\) call throttled/i,
+    // Failed to retrieve friends list — CrazyGames SDK error
+    /Failed to retrieve friends list/i,
+    // Error setting up push listeners — CrazyGames SDK
+    /Error setting up push listeners/i,
+    // Leaderboard connection failures — transient, auto-retries
+    /Leaderboard connection failed after max retries/i,
+    // Supabase insert error for player words — race condition on duplicate submit
+    /Error inserting player word/i,
+    // Word Hunt leaderboard count errors — transient API failures
+    /Word Hunt leaderboard count error/i,
+    // ChunkError auto-refresh skip — expected after deployment
+    /\[ChunkError\] Skipping auto-refresh/i,
+    // DOM parentNode null — transient React unmount race condition
+    /Cannot read property 'parentNode' of null/i,
+    /Cannot read properties of null.*parentNode/i,
   ],
 
   denyUrls: [

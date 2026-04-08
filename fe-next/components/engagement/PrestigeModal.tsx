@@ -103,7 +103,7 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
         <div
           className={cn(
             'border-b-4 border-neo-black p-4 flex items-center justify-center gap-3',
-            `bg-gradient-to-r ${colors.gradient}`
+            `bg-linear-to-r ${colors.gradient}`
           )}
         >
           <Sparkles className={cn('w-6 h-6', colors.text)} />
@@ -174,7 +174,7 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
                 className="space-y-4"
               >
                 <div className="flex items-start gap-3 p-4 rounded-neo bg-yellow-500/20 border-2 border-yellow-500/50">
-                  <AlertTriangle className="w-6 h-6 text-yellow-400 flex-shrink-0 mt-0.5" />
+                  <AlertTriangle className="w-6 h-6 text-yellow-400 shrink-0 mt-0.5" />
                   <div>
                     <p className="font-bold text-yellow-300">
                       {pm('warning')}
@@ -211,7 +211,7 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
                     className={cn(
                       'flex-1 p-3 rounded-neo border-2 border-neo-black shadow-hard-sm',
                       'font-bold uppercase text-sm',
-                      `bg-gradient-to-r ${colors.gradient}`,
+                      `bg-linear-to-r ${colors.gradient}`,
                       colors.text,
                       'hover:shadow-hard-md hover:-translate-y-0.5',
                       'transition-all',
@@ -330,7 +330,7 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
                         className={cn(
                           'w-full p-4 rounded-neo border-4 border-neo-black shadow-hard-lg',
                           'font-black text-lg uppercase tracking-wide',
-                          `bg-gradient-to-r ${colors.gradient}`,
+                          `bg-linear-to-r ${colors.gradient}`,
                           colors.text,
                           'hover:shadow-hard-xl hover:-translate-y-1',
                           'transition-all'

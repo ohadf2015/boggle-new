@@ -27,7 +27,7 @@ export const QuestCard = memo(function QuestCard({ quest, progress }: QuestCardP
     >
       {/* Completion dot */}
       <div className={cn(
-        'flex-shrink-0 w-4 h-4 mt-0.5 rounded-full border-2 flex items-center justify-center',
+        'shrink-0 w-4 h-4 mt-0.5 rounded-full border-2 flex items-center justify-center',
         progress.isComplete ? 'bg-neo-lime border-neo-black' : 'border-neo-white/20'
       )}>
         {progress.isComplete && <Check className="w-2.5 h-2.5 text-neo-black" strokeWidth={3} />}
@@ -39,7 +39,7 @@ export const QuestCard = memo(function QuestCard({ quest, progress }: QuestCardP
           <span className={cn('text-xs font-bold truncate', progress.isComplete ? 'text-neo-lime' : 'text-neo-white/80')}>
             {t(quest.titleKey)}
           </span>
-          <span className="text-[10px] font-mono font-black text-neo-white/60 tabular-nums flex-shrink-0">
+          <span className="text-[10px] font-mono font-black text-neo-white/60 tabular-nums shrink-0">
             {progress.current}/{quest.target}
           </span>
         </div>

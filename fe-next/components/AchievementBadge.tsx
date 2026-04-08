@@ -114,7 +114,7 @@ export const AchievementBadge = memo<AchievementBadgeProps>(({ achievement, inde
                         border-3 rounded-md
                         shadow-hard-sm
                         hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard
-                        active:translate-x-[1px] active:translate-y-[1px] active:shadow-none
+                        active:translate-x-px active:translate-y-px active:shadow-none
                         transition-all duration-100 cursor-pointer touch-manipulation"
               style={{
                 backgroundColor: locked ? '#808080' : (tierColors?.bg || 'var(--neo-cyan)'),
@@ -131,7 +131,7 @@ export const AchievementBadge = memo<AchievementBadgeProps>(({ achievement, inde
             {/* Lock icon for locked achievements */}
             {locked && (
               <span
-                className="absolute -top-1 -right-1 text-xs w-5 h-5 flex items-center justify-center rounded-full border-2 border-gray-600 bg-gray-700 shadow-sm"
+                className="absolute -top-1 -right-1 text-xs w-5 h-5 flex items-center justify-center rounded-full border-2 border-gray-600 bg-gray-700 shadow-xs"
                 title={t('profile.locked')}
               >
                 🔒
@@ -140,7 +140,7 @@ export const AchievementBadge = memo<AchievementBadgeProps>(({ achievement, inde
             {/* Tier indicator badge (only for earned achievements) */}
             {showTier && tier && !locked && (
               <span
-                className="absolute -top-1 -right-1 text-xs w-5 h-5 flex items-center justify-center rounded-full border-2 border-neo-black shadow-sm"
+                className="absolute -top-1 -right-1 text-xs w-5 h-5 flex items-center justify-center rounded-full border-2 border-neo-black shadow-xs"
                 style={{ backgroundColor: tierColors?.bg }}
                 title={getTierName(tier)}
               >

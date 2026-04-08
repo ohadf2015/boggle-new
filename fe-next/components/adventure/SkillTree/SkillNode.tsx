@@ -116,7 +116,7 @@ export const SkillNode = memo<SkillNodeProps>(
           'rounded-xl border-3',
           'flex flex-col items-center justify-center',
           'transition-all duration-200',
-          'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan',
+          'focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan',
 
           // Status-specific styles
           isUnlocked && [
@@ -165,7 +165,7 @@ export const SkillNode = memo<SkillNodeProps>(
         {isClickable && (
           <AdaptiveMotion.span
             className={cn(
-              'absolute -bottom-2 -end-2',
+              'absolute -bottom-2 -inset-e-2',
               'px-2 py-0.5',
               'bg-neo-yellow text-neo-black',
               'text-xs font-black',
@@ -183,7 +183,7 @@ export const SkillNode = memo<SkillNodeProps>(
         {/* Locked Icon Overlay */}
         {isLocked && (
           <span
-            className="absolute top-1 end-1 text-neo-white/30"
+            className="absolute top-1 inset-e-1 text-neo-white/30"
             aria-label={t('adventure.skills.locked')}
           >
             🔒
@@ -194,7 +194,7 @@ export const SkillNode = memo<SkillNodeProps>(
         {isUnlocked && (
           <AdaptiveMotion.span
             className={cn(
-              'absolute -top-2 -end-2',
+              'absolute -top-2 -inset-e-2',
               'w-6 h-6 flex items-center justify-center',
               'bg-green-500 text-white',
               'border-2 border-neo-black rounded-full',

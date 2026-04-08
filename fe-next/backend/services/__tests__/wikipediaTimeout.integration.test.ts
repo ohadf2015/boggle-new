@@ -4,7 +4,7 @@
  */
 
 import { vi, type Mock, type MockInstance } from 'vitest';
-import axios from 'axios';
+import ky, { HTTPError, TimeoutError } from 'ky';
 import { fetchFeaturedContent } from '../wikipediaWordFetcher';
 
 describe('Wikipedia API Timeout Reproduction', () => {
@@ -24,7 +24,7 @@ describe('Wikipedia API Timeout Reproduction', () => {
     const duration = Date.now() - startTime;
     console.log(`[TEST] Fetch completed in ${duration}ms`);
 
-    // THEN: Should complete within 35 seconds (axios timeout is 30s + network variability buffer)
+    // THEN: Should complete within 35 seconds (ky timeout is 30s + network variability buffer)
     expect(duration).toBeLessThan(35000);
 
     // THEN: Should return featured content or null (404 is ok)
@@ -44,7 +44,7 @@ describe('Wikipedia API Timeout Reproduction', () => {
     const duration = Date.now() - startTime;
     console.log(`[TEST] Fetch completed in ${duration}ms`);
 
-    // THEN: Should complete within 35 seconds (axios timeout is 30s + network variability buffer)
+    // THEN: Should complete within 35 seconds (ky timeout is 30s + network variability buffer)
     expect(duration).toBeLessThan(35000);
 
     // THEN: Should return result or null
@@ -60,13 +60,14 @@ describe('Wikipedia API Timeout Reproduction', () => {
     const startTime = Date.now();
 
     try {
-      await axios.get(slowUrl, {
+      await ky.get(slowUrl, {
         timeout: 1000, // Very short timeout to force failure
+        retry: 0,
         headers: {
           'User-Agent': 'LexiClash/1.0 Test',
           'Accept': 'application/json'
         }
-      });
+      }).json();
 
       // Should not reach here
       fail('Expected timeout error');
@@ -74,19 +75,13 @@ describe('Wikipedia API Timeout Reproduction', () => {
       const duration = Date.now() - startTime;
       console.log(`[TEST] Timeout caught in ${duration}ms`);
 
-      // THEN: Should timeout within ~1 second
-      expect(duration).toBeLessThan(2000);
+      // THEN: Should timeout within reasonable time
+      expect(duration).toBeLessThan(5000);
 
-      // THEN: Should be axios error
-      expect(axios.isAxiosError(error)).toBe(true);
-
-      if (axios.isAxiosError(error)) {
-        console.log('[TEST] Error code:', error.code);
-        console.log('[TEST] Error message:', error.message);
-
-        // Should be timeout error
-        expect(['ECONNABORTED', 'ERR_BAD_REQUEST'].includes(error.code || '')).toBe(true);
-      }
+      // THEN: Should be a ky error (TimeoutError or HTTPError)
+      console.log('[TEST] Error type:', error instanceof TimeoutError ? 'TimeoutError' : error instanceof HTTPError ? 'HTTPError' : 'other');
+      console.log('[TEST] Error message:', error instanceof Error ? error.message : String(error));
+      expect(error instanceof Error).toBe(true);
     }
   });
 

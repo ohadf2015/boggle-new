@@ -51,33 +51,33 @@ function getNearMissIcon(nearMiss: NearMiss) {
 function getNearMissColors(nearMiss: NearMiss) {
   if (nearMiss.type === 'personal_best') {
     return {
-      bg: 'bg-gradient-to-r from-amber-500/20 to-yellow-500/20',
+      bg: 'bg-linear-to-r from-amber-500/20 to-yellow-500/20',
       border: 'border-amber-500/50',
       icon: 'text-amber-400',
-      progress: 'bg-gradient-to-r from-amber-500 to-yellow-400',
+      progress: 'bg-linear-to-r from-amber-500 to-yellow-400',
     };
   }
   if (nearMiss.type === 'close_loss') {
     return {
-      bg: 'bg-gradient-to-r from-red-500/20 to-orange-500/20',
+      bg: 'bg-linear-to-r from-red-500/20 to-orange-500/20',
       border: 'border-red-500/50',
       icon: 'text-red-400',
-      progress: 'bg-gradient-to-r from-red-500 to-orange-400',
+      progress: 'bg-linear-to-r from-red-500 to-orange-400',
     };
   }
   if (nearMiss.achievement?.includes('COMBO')) {
     return {
-      bg: 'bg-gradient-to-r from-orange-500/20 to-rose-500/20',
+      bg: 'bg-linear-to-r from-orange-500/20 to-rose-500/20',
       border: 'border-orange-500/50',
       icon: 'text-orange-400',
-      progress: 'bg-gradient-to-r from-orange-500 to-rose-400',
+      progress: 'bg-linear-to-r from-orange-500 to-rose-400',
     };
   }
   return {
-    bg: 'bg-gradient-to-r from-cyan-500/20 to-blue-500/20',
+    bg: 'bg-linear-to-r from-cyan-500/20 to-blue-500/20',
     border: 'border-cyan-500/50',
     icon: 'text-cyan-400',
-    progress: 'bg-gradient-to-r from-cyan-500 to-blue-400',
+    progress: 'bg-linear-to-r from-cyan-500 to-blue-400',
   };
 }
 
@@ -104,11 +104,11 @@ const NearMissCard: React.FC<NearMissCardProps> = ({
       transition={{ delay: 0.5, type: 'spring', stiffness: 300, damping: 26 }}
       className={cn(
         'rounded-neo border-2 border-neo-black shadow-hard overflow-hidden',
-        'bg-slate-800/90 backdrop-blur-sm'
+        'bg-slate-800/90 backdrop-blur-xs'
       )}
     >
       {/* Header */}
-      <div className="bg-gradient-to-r from-neo-purple to-neo-pink px-3 py-2 border-b-2 border-neo-black">
+      <div className="bg-linear-to-r from-neo-purple to-neo-pink px-3 py-2 border-b-2 border-neo-black">
         <div className="flex items-center gap-2">
           <TrendingUp className="w-4 h-4 text-white" />
           <h3 className="text-sm font-black text-white uppercase">
@@ -185,7 +185,7 @@ const NearMissCard: React.FC<NearMissCardProps> = ({
 
                 {/* Remaining badge */}
                 <div className={cn(
-                  'flex-shrink-0 px-2 py-1 rounded-lg text-center',
+                  'shrink-0 px-2 py-1 rounded-lg text-center',
                   'bg-white/10 border border-white/20'
                 )}>
                   <span className={cn(
@@ -214,7 +214,7 @@ const NearMissCard: React.FC<NearMissCardProps> = ({
             whileTap={{ scale: 0.98 }}
             className={cn(
               'w-full mt-2 py-2.5 rounded-lg border-2 border-neo-black shadow-hard-sm',
-              'bg-gradient-to-r from-neo-lime to-neo-lime',
+              'bg-linear-to-r from-neo-lime to-neo-lime',
               'text-neo-black font-black uppercase text-sm',
               'hover:shadow-hard-md hover:-translate-y-0.5 transition-all'
             )}

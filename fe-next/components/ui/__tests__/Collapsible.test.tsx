@@ -387,7 +387,7 @@ describe('Collapsible', () => {
       // ChevronDown icon is always present, check that label container has no icon
       const button = container.querySelector('button');
       const labelContainer = button?.querySelector('div');
-      const iconContainer = labelContainer?.querySelector('.flex-shrink-0');
+      const iconContainer = labelContainer?.querySelector('.shrink-0');
       expect(iconContainer).not.toBeInTheDocument();
     });
   });
@@ -539,7 +539,7 @@ describe('Collapsible', () => {
       expect(region).toHaveAttribute('aria-labelledby');
     });
 
-    it('should have focus ring on button', () => {
+    it('should have focus ring-3 on button', () => {
       const { container } = render(
         <Collapsible label="Test">
           <div>Content</div>

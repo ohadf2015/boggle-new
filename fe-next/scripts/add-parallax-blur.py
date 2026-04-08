@@ -27,7 +27,7 @@ BLUR_CONFIG = {
 }
 
 def add_blur(input_path: str, output_path: str, radius: float) -> None:
-    """Apply gaussian blur to an image while preserving transparency."""
+    """Apply gaussian blur-sm to an image while preserving transparency."""
     img = Image.open(input_path)
 
     # Convert to RGBA if needed
@@ -55,7 +55,7 @@ def main():
 
     os.makedirs(output_dir, exist_ok=True)
 
-    print("Adding blur depth effect to parallax layers...")
+    print("Adding blur-sm depth effect to parallax layers...")
     print()
 
     for layer_name, blur_radius in BLUR_CONFIG.items():

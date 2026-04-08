@@ -40,10 +40,7 @@ module.exports = {
       // TV/Large display breakpoints
       'tv': '1920px',          // Standard 1080p TV/monitor
       'tv-4k': '3840px',       // 4K displays
-      // Height-based breakpoints (for landscape detection)
-      'tall': { 'raw': '(min-height: 800px)' },
-      'short': { 'raw': '(max-height: 600px)' },
-      'desktop-tall': { 'raw': '(min-width: 1024px) and (min-height: 700px)' },
+      // Height-based breakpoints moved to globals.css @custom-variant for Tailwind v4 compat
     },
     extend: {
       colors: {

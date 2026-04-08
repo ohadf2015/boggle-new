@@ -44,14 +44,14 @@ const ParticipantRow = memo<{
         className={`
           w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center font-black text-sm sm:text-base
           ${getRankBadgeClasses(rank)}
-          border-2 shadow-sm flex-shrink-0
+          border-2 shadow-xs shrink-0
         `}
       >
         {getRankDisplay(rank)}
       </div>
 
       {/* Avatar with Country Flag */}
-      <div className="relative flex-shrink-0">
+      <div className="relative shrink-0">
         <div className={`
           w-11 h-11 sm:w-14 sm:h-14 border-3 shadow-hard-sm rounded-full overflow-hidden
           ${isCurrentUser ? 'border-neo-cyan' : isTopThree ? 'border-neo-orange' : 'border-neo-black/80'}
@@ -64,7 +64,7 @@ const ParticipantRow = memo<{
           />
         </div>
         {countryFlag && (
-          <div className="absolute -bottom-1 -end-1 text-sm sm:text-base drop-shadow-sm" title={participant.country_code || undefined}>
+          <div className="absolute -bottom-1 -inset-e-1 text-sm sm:text-base drop-shadow-xs" title={participant.country_code || undefined}>
             {countryFlag}
           </div>
         )}
@@ -89,7 +89,7 @@ const ParticipantRow = memo<{
             </span>
           </PlayerProfileTooltip>
           {isCurrentUser && (
-            <span className="text-[10px] sm:text-xs bg-neo-cyan text-neo-black px-2 py-0.5 rounded-full font-black shrink-0 shadow-sm animate-pulse">
+            <span className="text-[10px] sm:text-xs bg-neo-cyan text-neo-black px-2 py-0.5 rounded-full font-black shrink-0 shadow-xs animate-pulse">
               YOU
             </span>
           )}

@@ -22,6 +22,10 @@ import type { LetterGrid, Language } from '@/shared/types/game';
 import type { EarthquakeState } from '@/shared/types/earthquake';
 import type { FoundWord, KeyboardInputState, TrainingState } from '../types';
 
+// Static style objects extracted to module level to avoid re-creation on every render
+const TIMER_DROP_SHADOW_STYLE = { filter: 'drop-shadow(4px 4px 0px rgba(0,0,0,1))' } as const;
+const LIME_GRADIENT_STYLE = { background: 'linear-gradient(135deg, #FFE135 0%, #BFFF00 100%)' } as const;
+
 export interface PortraitGameLayoutProps {
   // Grid
   grid: LetterGrid;
@@ -149,7 +153,10 @@ export function PortraitGameLayout({
   gameStatsRef,
   t,
 }: PortraitGameLayoutProps): React.ReactElement {
-  const validWordCount = foundWords.filter(fw => fw.isValid === true).length;
+  const validWords = React.useMemo(() => foundWords.filter(fw => fw.isValid === true), [foundWords]);
+  const validWordCount = validWords.length;
+  const validWordLengths = React.useMemo(() => validWords.map(fw => fw.word.length), [validWords]);
+  const tSafe = React.useCallback((key: string) => t(key) || key, [t]);
   const isPracticeMode = mode === 'practice';
   const isChallengeMode = mode === 'challenge';
 
@@ -173,7 +180,7 @@ export function PortraitGameLayout({
         validWordCount={validWordCount}
         comboLevel={comboLevel}
         maxCombo={maxCombo}
-        wordLengths={foundWords.filter(fw => fw.isValid === true).map(fw => fw.word.length)}
+        wordLengths={validWordLengths}
         timeSinceStart={totalTime - remainingTime}
         gameDuration={totalTime}
         isGameOver={isGameOver}
@@ -184,7 +191,7 @@ export function PortraitGameLayout({
         trainingJustUnlocked={training?.justUnlocked}
         onClearTrainingUnlock={training?.clearJustUnlocked}
         showKeyboardHint={true}
-        t={(key) => t(key) || key}
+        t={tSafe}
       />
 
       {/* Header with controls */}
@@ -235,7 +242,7 @@ export function PortraitGameLayout({
 
       {/* Training Progress Bar - shown in practice mode (portrait) */}
       {isPracticeMode && training && (
-        <div className="px-2 md:px-4 py-1 flex-shrink-0 relative z-40">
+        <div className="px-2 md:px-4 py-1 shrink-0 relative z-40">
           <TrainingProgressBar
             completedSkills={training.completedSkills}
             score={score}
@@ -279,7 +286,7 @@ export function PortraitGameLayout({
               initial={{ scale: 0, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               className="relative z-20"
-              style={{ filter: 'drop-shadow(4px 4px 0px rgba(0,0,0,1))' }}
+              style={TIMER_DROP_SHADOW_STYLE}
             >
               <CircularTimer
                 remainingTime={remainingTime}
@@ -293,9 +300,7 @@ export function PortraitGameLayout({
               initial={{ scale: 0, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               className="relative border-3 border-neo-black rounded-lg shadow-hard px-4 py-1.5 min-w-[80px]"
-              style={{
-                background: 'linear-gradient(135deg, #FFE135 0%, #BFFF00 100%)',
-              }}
+              style={LIME_GRADIENT_STYLE}
             >
               <div className="text-center relative z-10">
                 <AdaptiveMotion.div
@@ -321,9 +326,7 @@ export function PortraitGameLayout({
               initial={{ scale: 0, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               className="relative border-3 border-neo-black rounded-lg shadow-hard px-2 py-1 min-w-[80px] transform rotate-1"
-              style={{
-                background: 'linear-gradient(135deg, #FFE135 0%, #BFFF00 100%)',
-              }}
+              style={LIME_GRADIENT_STYLE}
             >
               <div className="text-end relative z-10">
                 <div className="font-bold uppercase tracking-widest text-neo-black/60 text-[8px] mb-0.5">
@@ -355,7 +358,7 @@ export function PortraitGameLayout({
       </div>
 
       {/* Word Forming Area */}
-      <div className="h-10 flex items-center justify-center flex-shrink-0 relative z-30 px-4 mb-1 max-w-[360px] mx-auto w-full overflow-visible">
+      <div className="h-10 flex items-center justify-center shrink-0 relative z-30 px-4 mb-1 max-w-[360px] mx-auto w-full overflow-visible">
         <WordFormingArea word={keyboardInput.isTypingMode ? keyboardInput.typedWord : formedWord} letterCount={(keyboardInput.isTypingMode ? keyboardInput.typedWord : formedWord).length} feedback={currentFeedback} compact />
       </div>
 
@@ -396,9 +399,9 @@ export function PortraitGameLayout({
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="absolute top-2 start-4 end-4 z-40"
+              className="absolute top-2 inset-s-4 inset-e-4 z-40"
             >
-              <div className="relative bg-gradient-to-r from-neo-pink to-pink-400 text-white text-center py-2 px-4 rounded-lg border-3 border-neo-black shadow-hard-sm">
+              <div className="relative bg-linear-to-r from-neo-pink to-pink-400 text-white text-center py-2 px-4 rounded-lg border-3 border-neo-black shadow-hard-sm">
                 <span className="font-bold text-xs uppercase tracking-wide">
                   {t('singlePlayer.dragInstruction')}
                 </span>
@@ -504,15 +507,15 @@ function ChallengeProgressTracker({ score, targetHighScore, t }: ChallengeProgre
     <AdaptiveMotion.div
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="mx-1 md:mx-4 flex-shrink-0"
+      className="mx-1 md:mx-4 shrink-0"
     >
       {targetHighScore !== null ? (
         <div className={cn(
           'relative rounded-neo border-2 md:border-3 px-1.5 md:px-4 py-0.5 md:py-2 shadow-hard-sm',
           score > targetHighScore
-            ? 'bg-gradient-to-r from-neo-lime to-lime-300 border-neo-lime'
+            ? 'bg-linear-to-r from-neo-lime to-lime-300 border-neo-lime'
             : score === targetHighScore
-              ? 'bg-gradient-to-r from-neo-lime to-yellow-300 border-neo-lime'
+              ? 'bg-linear-to-r from-neo-lime to-yellow-300 border-neo-lime'
               : 'bg-neo-cream dark:bg-slate-700 border-neo-black dark:border-slate-500'
         )}>
           <div className="flex items-center justify-between">
@@ -561,7 +564,7 @@ function ChallengeProgressTracker({ score, targetHighScore, t }: ChallengeProgre
           {score <= targetHighScore && (
             <div className="mt-1 md:mt-2 h-1.5 md:h-2 bg-neo-black/10 text-white dark:bg-white/10 rounded-full overflow-hidden">
               <AdaptiveMotion.div
-                className="h-full bg-gradient-to-r from-neo-cyan to-neo-lime rounded-full"
+                className="h-full bg-linear-to-r from-neo-cyan to-neo-lime rounded-full"
                 initial={{ width: 0 }}
                 animate={{ width: `${Math.min((score / targetHighScore) * 100, 100)}%` }}
                 transition={{ type: 'spring', stiffness: 100 }}

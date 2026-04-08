@@ -140,7 +140,7 @@ const LevelBadge = memo<LevelBadgeProps>(({
       className={cn(
         'relative flex items-center justify-center rounded-full',
         'font-black text-white',
-        'bg-gradient-to-br',
+        'bg-linear-to-br',
         tier.gradient,
         sizeConfig.container,
         sizeConfig.border,
@@ -161,8 +161,8 @@ const LevelBadge = memo<LevelBadgeProps>(({
       {level >= 25 && (
         <div
           className={cn(
-            'absolute inset-0 rounded-full blur-sm opacity-50 -z-10',
-            'bg-gradient-to-br',
+            'absolute inset-0 rounded-full blur-xs opacity-50 -z-10',
+            'bg-linear-to-br',
             tier.gradient
           )}
         />

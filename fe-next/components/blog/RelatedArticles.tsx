@@ -84,7 +84,7 @@ export function RelatedArticles({ currentSlug, locale, heading, articles }: Rela
                 : 'bg-white hover:bg-neo-cream shadow-hard-sm hover:shadow-hard'
             )}
           >
-            <div className="relative w-full aspect-[16/10] overflow-hidden">
+            <div className="relative w-full aspect-16/10 overflow-hidden">
               <Image
                 src={article.image}
                 alt={article.title}

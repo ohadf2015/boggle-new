@@ -48,14 +48,14 @@ export function KeyboardQuickTip({
           <div className="flex items-center gap-2">
             {/* Icon with glow pulse */}
             <motion.div
-              className="flex-shrink-0 w-7 h-7 bg-neo-lime text-neo-black rounded-neo border-2 border-neo-black flex items-center justify-center relative"
+              className="shrink-0 w-7 h-7 bg-neo-lime text-neo-black rounded-neo border-2 border-neo-black flex items-center justify-center relative"
               animate={{ scale: [1, 1.08, 1] }}
               transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
             >
               <Keyboard className="w-4 h-4" />
               {/* Glow effect */}
               <motion.div
-                className="absolute inset-0 w-7 h-7 bg-neo-lime rounded-neo blur-sm -z-10"
+                className="absolute inset-0 w-7 h-7 bg-neo-lime rounded-neo blur-xs -z-10"
                 animate={{ opacity: [0.4, 0.8, 0.4] }}
                 transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
               />
@@ -71,7 +71,7 @@ export function KeyboardQuickTip({
             {/* Close button - inline */}
             <button
               onClick={onDismiss}
-              className="flex-shrink-0 w-6 h-6 flex items-center justify-center bg-white/20 hover:bg-white/30 rounded-full border-2 border-white/30 transition-colors"
+              className="shrink-0 w-6 h-6 flex items-center justify-center bg-white/20 hover:bg-white/30 rounded-full border-2 border-white/30 transition-colors"
               aria-label="Dismiss tip"
             >
               <X className="w-3 h-3" />

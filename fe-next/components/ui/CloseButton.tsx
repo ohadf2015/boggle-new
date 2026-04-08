@@ -46,7 +46,7 @@ const variantStyles: Record<CloseButtonVariant, string> = {
     'bg-neo-red text-neo-black',
     'border-2 sm:border-3 border-neo-black rounded-neo',
     'shadow-hard-sm',
-    'hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard',
+    'hover:-translate-x-px hover:-translate-y-px hover:shadow-hard',
     'active:translate-x-[2px] active:translate-y-[2px] active:shadow-none',
   ].join(' '),
   dark: [
@@ -83,14 +83,14 @@ const CloseButton: React.FC<CloseButtonProps> = ({
       data-testid={testId}
       className={cn(
         'flex items-center justify-center transition-all duration-100',
-        'focus:outline-none focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2',
+        'focus:outline-hidden focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2',
         s.button,
         variantStyles[variant],
         className,
       )}
       aria-label={label}
     >
-      <X className={cn(s.icon, 'stroke-[3]')} aria-hidden="true" />
+      <X className={cn(s.icon, 'stroke-3')} aria-hidden="true" />
     </button>
   );
 };

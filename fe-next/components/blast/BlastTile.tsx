@@ -7,6 +7,8 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { getTileTooltip } from './utils/blastTileTooltips';
 import { TILE_VISUALS, CLEARING_COLORS, CLEARING_ANIMS } from './blastTileVisuals';
 
+const TILE_TEXT_SHADOW_STYLE = { textShadow: '0 1px 2px rgba(0,0,0,0.3)' } as const;
+
 export type TilePhase = 'idle' | 'selected' | 'anticipation' | 'clearing' | 'falling' | 'appearing' | 'landing';
 
 export interface BlastTileProps {
@@ -237,15 +239,15 @@ export const BlastTile = memo(function BlastTile({
       aria-label={`${letter}${type !== 'standard' ? ` ${type} tile` : ''}`}
       title={tooltip ? `${tooltip.name}: ${tooltip.desc}` : undefined}
     >
-      <span className="relative z-10" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.3)' }}>{letter}</span>
+      <span className="relative z-10" style={TILE_TEXT_SHADOW_STYLE}>{letter}</span>
       {visual.indicator && (
-        <span className="absolute top-0.5 end-0.5 text-[clamp(0.45rem,1.8cqw,0.65rem)] leading-none pointer-events-none" aria-hidden="true">
+        <span className="absolute top-0.5 inset-e-0.5 text-[clamp(0.45rem,1.8cqw,0.65rem)] leading-none pointer-events-none" aria-hidden="true">
           {visual.indicator}
         </span>
       )}
       {hitsRemaining != null && hitsRemaining > 0 && (
         <span
-          className="absolute bottom-0.5 start-0.5 text-[clamp(0.4rem,1.5cqw,0.55rem)] font-neo-body font-semibold bg-white/60 rounded px-0.5 leading-tight"
+          className="absolute bottom-0.5 inset-s-0.5 text-[clamp(0.4rem,1.5cqw,0.55rem)] font-neo-body font-semibold bg-white/60 rounded px-0.5 leading-tight"
           aria-label={`${hitsRemaining} hits remaining`}
         >
           {hitsRemaining}
@@ -253,7 +255,7 @@ export const BlastTile = memo(function BlastTile({
       )}
       {MULTIPLIER_BADGES[type] && (
         <span
-          className="absolute bottom-0.5 end-0.5 text-[clamp(0.35rem,1.3cqw,0.5rem)] font-neo-body font-bold bg-black/40 text-white rounded px-0.5 leading-tight"
+          className="absolute bottom-0.5 inset-e-0.5 text-[clamp(0.35rem,1.3cqw,0.5rem)] font-neo-body font-bold bg-black/40 text-white rounded px-0.5 leading-tight"
           aria-hidden="true"
         >
           {MULTIPLIER_BADGES[type]}
@@ -262,7 +264,7 @@ export const BlastTile = memo(function BlastTile({
       {type === 'gem' && hitsRemaining != null && hitsRemaining > 0 && (
         <span
           data-testid="gem-shards"
-          className="absolute top-0.5 start-0.5 flex gap-px pointer-events-none"
+          className="absolute top-0.5 inset-s-0.5 flex gap-px pointer-events-none"
           aria-hidden="true"
         >
           {Array.from({ length: 3 }, (_, i) => {
@@ -279,7 +281,7 @@ export const BlastTile = memo(function BlastTile({
       {type === 'countdown' && countdown != null && (
         <span
           data-testid="countdown-badge"
-          className={`absolute bottom-0.5 start-0.5 text-[clamp(0.5rem,2cqw,0.7rem)] font-neo-body font-bold rounded px-0.5 leading-tight ${
+          className={`absolute bottom-0.5 inset-s-0.5 text-[clamp(0.5rem,2cqw,0.7rem)] font-neo-body font-bold rounded px-0.5 leading-tight ${
             countdown <= 1 ? 'bg-red-500/80 text-white animate-pulse' : 'bg-orange-400/70 text-white'
           }`}
           aria-label={`${countdown} moves until explosion`}
@@ -290,7 +292,7 @@ export const BlastTile = memo(function BlastTile({
       {type === 'portal' && portalPairIndex != null && (
         <span
           data-testid="portal-pair-badge"
-          className="absolute bottom-0.5 start-0.5 w-2.5 h-2.5 rounded-full border border-white/50 pointer-events-none"
+          className="absolute bottom-0.5 inset-s-0.5 w-2.5 h-2.5 rounded-full border border-white/50 pointer-events-none"
           style={{ background: PORTAL_PAIR_COLORS[portalPairIndex % PORTAL_PAIR_COLORS.length] }}
           aria-hidden="true"
         />
@@ -320,11 +322,11 @@ export const BlastTile = memo(function BlastTile({
             <span className="blast-lock-hint flex flex-col items-center">
               <span className="text-[clamp(0.55rem,2.2cqw,0.85rem)]">🔒</span>
               {type === 'frozen' && innerType ? (
-                <span className="text-[clamp(0.35rem,1.4cqw,0.5rem)] opacity-30 blur-[1px] leading-none mt-[-1px]">
+                <span className="text-[clamp(0.35rem,1.4cqw,0.5rem)] opacity-30 blur-[1px] leading-none -mt-px">
                   {TILE_VISUALS[innerType]?.indicator ?? '?'}
                 </span>
               ) : (
-                <span className="text-[clamp(0.3rem,1.2cqw,0.45rem)] text-cyan-200/80 font-neo-body leading-none mt-[-1px]">
+                <span className="text-[clamp(0.3rem,1.2cqw,0.45rem)] text-cyan-200/80 font-neo-body leading-none -mt-px">
                   ✦ nearby ✦
                 </span>
               )}

@@ -3,7 +3,7 @@
  * Fetches trending topics with aggressive caching to minimize API costs
  */
 
-import axios from 'axios';
+import ky from 'ky';
 import { getRedisClient } from '../redisClient';
 import logger from '../utils/logger';
 
@@ -95,19 +95,20 @@ export async function fetchGoogleTrends(
     logger.info('SERP', `Fetching fresh trends for ${region}...`);
     const startTime = Date.now();
 
-    const response = await axios.get<SerpApiResponse>('https://serpapi.com/search.json', {
-      params: {
+    const response = await ky.get('https://serpapi.com/search.json', {
+      searchParams: {
         engine: 'google_trends_trending_now',
         geo: region,
         hours: 24, // Get trends from last 24 hours for fresh daily content
         ...(language && { hl: language }),
-        api_key: process.env.SERPAPI_KEY
+        api_key: process.env.SERPAPI_KEY!
       },
-      timeout: 15000
-    });
+      timeout: 15000,
+      retry: 0,
+    }).json<SerpApiResponse>();
 
     const apiResponseTime = Date.now() - startTime;
-    let trends = response.data.trending_searches || [];
+    let trends = response.trending_searches || [];
 
     if (trends.length === 0) {
       logger.warn('SERP', `No trends returned for ${region}`);
@@ -278,19 +279,20 @@ export async function enrichTrendWithNews(
 
   try {
     // Fetch news articles about the trend
-    const newsResponse = await axios.get('https://serpapi.com/search.json', {
-      params: {
+    const newsData = await ky.get('https://serpapi.com/search.json', {
+      searchParams: {
         engine: 'google_news',
         q: query,
         hl: language,
         gl: getRegionFromLanguage(language),
         num: maxArticles,
-        api_key: process.env.SERPAPI_KEY
+        api_key: process.env.SERPAPI_KEY!
       },
-      timeout: 10000
-    });
+      timeout: 10000,
+      retry: 0,
+    }).json<any>();
 
-    const newsArticles: NewsArticle[] = (newsResponse.data.news_results || [])
+    const newsArticles: NewsArticle[] = (newsData.news_results || [])
       .slice(0, maxArticles)
       .map((article: any) => ({
         title: article.title,
@@ -302,22 +304,23 @@ export async function enrichTrendWithNews(
       }));
 
     // Fetch related searches and People Also Ask from Google Search
-    const searchResponse = await axios.get('https://serpapi.com/search.json', {
-      params: {
+    const searchData = await ky.get('https://serpapi.com/search.json', {
+      searchParams: {
         engine: 'google',
         q: query,
         hl: language,
         gl: getRegionFromLanguage(language),
-        api_key: process.env.SERPAPI_KEY
+        api_key: process.env.SERPAPI_KEY!
       },
-      timeout: 10000
-    });
+      timeout: 10000,
+      retry: 0,
+    }).json<any>();
 
-    const relatedSearches: string[] = (searchResponse.data.related_searches || [])
+    const relatedSearches: string[] = (searchData.related_searches || [])
       .slice(0, 5)
       .map((rs: any) => rs.query);
 
-    const peopleAlsoAsk: string[] = (searchResponse.data.related_questions || [])
+    const peopleAlsoAsk: string[] = (searchData.related_questions || [])
       .slice(0, 3)
       .map((paa: any) => paa.question);
 
@@ -464,17 +467,18 @@ export async function checkSerpApiHealth(): Promise<{
 }> {
   try {
     // Make a minimal test request
-    const response = await axios.get('https://serpapi.com/account.json', {
-      params: {
-        api_key: process.env.SERPAPI_KEY
+    const data = await ky.get('https://serpapi.com/account.json', {
+      searchParams: {
+        api_key: process.env.SERPAPI_KEY!
       },
-      timeout: 5000
-    });
+      timeout: 5000,
+      retry: 0,
+    }).json();
 
     return {
       healthy: true,
       message: 'SERP API is healthy',
-      quotaInfo: response.data
+      quotaInfo: data
     };
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';

@@ -86,6 +86,23 @@ export default async function GlossaryPage({ params }: PageProps) {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(definedTermSetSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
       <GlossaryPageClient />
+
+      {/* Server-rendered glossary terms for crawlers — visually hidden, not aria-hidden */}
+      <section className="sr-only">
+        <h1>{content.title}</h1>
+        <p>{content.subtitle}</p>
+        <dl>
+          {content.terms.map(term => (
+            <div key={term.term}>
+              <dt>{term.term}</dt>
+              <dd>{term.definition}</dd>
+              {term.related && term.related.length > 0 && (
+                <dd>Related: {term.related.join(', ')}</dd>
+              )}
+            </div>
+          ))}
+        </dl>
+      </section>
     </>
   );
 }

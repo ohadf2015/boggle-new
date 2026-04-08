@@ -220,15 +220,14 @@ export function useRealtimeNotifications(): UseRealtimeNotificationsReturn {
   const dismissNotification = useCallback(async (notificationId: string) => {
     const success = await dismissNotificationApi(notificationId);
     if (success) {
-      setNotifications((prev) => {
-        const removed = prev.find((n) => n.id === notificationId);
-        if (removed && !removed.read) {
-          setUnreadCount((c) => Math.max(0, c - 1));
-        }
-        return prev.filter((n) => n.id !== notificationId);
-      });
+      // Read notification state before updating — avoid nested setState in updater
+      const removed = notifications.find((n) => n.id === notificationId);
+      setNotifications((prev) => prev.filter((n) => n.id !== notificationId));
+      if (removed && !removed.read) {
+        setUnreadCount((c) => Math.max(0, c - 1));
+      }
     }
-  }, []);
+  }, [notifications]);
 
   // Clear all notifications — persistently dismiss all
   const clearAllNotifications = useCallback(async () => {

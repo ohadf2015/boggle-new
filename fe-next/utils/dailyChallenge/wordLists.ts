@@ -299,7 +299,12 @@ export function calculateLetterOverlapScore(word: string, targetWord: string): n
  * ENHANCED: Prioritizes words with higher letter overlap with target word
  * Words sharing more letters with target are sorted first, then shuffled within groups
  */
-export function getSameLengthWords(targetWord: string, language: Language, random: () => number): string[] {
+export function getSameLengthWords(
+  targetWord: string,
+  language: Language,
+  random: () => number,
+  extraWords: string[] = [],
+): string[] {
   const targetLength = targetWord.length;
   const targetUpper = targetWord.toUpperCase();
 
@@ -310,8 +315,11 @@ export function getSameLengthWords(targetWord: string, language: Language, rando
   const targetWords = (TARGET_WORD_LISTS[language] || [])
     .filter(w => w.length === targetLength);
 
-  // Combine both sources and remove duplicates and the target word itself
-  const allWords = [...new Set([...helperWords, ...targetWords])]
+  // Filter extra words (from noun lists) to same length
+  const extraSameLength = extraWords.filter(w => w.length === targetLength);
+
+  // Combine all sources and remove duplicates and the target word itself
+  const allWords = [...new Set([...helperWords, ...targetWords, ...extraSameLength])]
     .map(w => w.toUpperCase())
     .filter(w => w !== targetUpper);
 

@@ -123,7 +123,7 @@ export default function ScientificTipsCarousel() {
         <div className="flex items-center gap-2">
           <div className={cn(
             'p-1.5 rounded-lg border-2 border-neo-black',
-            isDarkMode ? 'bg-gradient-to-br from-neo-lime/30 to-neo-cyan/20' : 'bg-gradient-to-br from-neo-orange/30 to-neo-yellow/20'
+            isDarkMode ? 'bg-linear-to-br from-neo-lime/30 to-neo-cyan/20' : 'bg-linear-to-br from-neo-orange/30 to-neo-yellow/20'
           )}>
             <Lightbulb className={cn(
               'w-4 h-4',
@@ -165,7 +165,7 @@ export default function ScientificTipsCarousel() {
           exit={{ opacity: 0 }}
           transition={{ duration: 0.5 }}
           className={cn(
-            'absolute inset-0 bg-gradient-to-br pointer-events-none',
+            'absolute inset-0 bg-linear-to-br pointer-events-none',
             activeTip.gradient
           )}
         />
@@ -195,7 +195,7 @@ export default function ScientificTipsCarousel() {
                   animate={{ scale: 1, rotate: 0 }}
                   transition={{ delay: 0.1, type: 'spring', stiffness: 200 }}
                   className={cn(
-                    'flex-shrink-0 w-14 h-14 flex items-center justify-center rounded-xl border-3 border-neo-black shadow-hard-sm',
+                    'shrink-0 w-14 h-14 flex items-center justify-center rounded-xl border-3 border-neo-black shadow-hard-sm',
                     isDarkMode ? 'bg-slate-800' : 'bg-neo-cream'
                   )}
                 >
@@ -243,8 +243,8 @@ export default function ScientificTipsCarousel() {
                   rel="noopener noreferrer"
                   aria-label={t('brain.learnMore')}
                   className={cn(
-                    'flex-shrink-0 ms-3 p-2 rounded-lg border-2 border-neo-black transition-all',
-                    'hover:translate-y-[-2px] hover:shadow-hard-sm active:translate-y-[1px]',
+                    'shrink-0 ms-3 p-2 rounded-lg border-2 border-neo-black transition-all',
+                    'hover:translate-y-[-2px] hover:shadow-hard-sm active:translate-y-px',
                     isDarkMode
                       ? 'bg-neo-cyan text-neo-black hover:bg-neo-cyan/90'
                       : 'bg-neo-purple text-neo-white hover:bg-neo-purple/90'
@@ -267,7 +267,7 @@ export default function ScientificTipsCarousel() {
             aria-label={t('common.previous')}
             className={cn(
               'p-2 rounded-lg border-2 border-neo-black transition-all',
-              'hover:translate-y-[-2px] hover:shadow-hard-sm active:translate-y-[1px]',
+              'hover:translate-y-[-2px] hover:shadow-hard-sm active:translate-y-px',
               isDarkMode ? 'bg-slate-700 hover:bg-slate-600' : 'bg-white hover:bg-slate-50'
             )}
           >
@@ -305,7 +305,7 @@ export default function ScientificTipsCarousel() {
             aria-label={t('common.next')}
             className={cn(
               'p-2 rounded-lg border-2 border-neo-black transition-all',
-              'hover:translate-y-[-2px] hover:shadow-hard-sm active:translate-y-[1px]',
+              'hover:translate-y-[-2px] hover:shadow-hard-sm active:translate-y-px',
               isDarkMode ? 'bg-slate-700 hover:bg-slate-600' : 'bg-white hover:bg-slate-50'
             )}
           >

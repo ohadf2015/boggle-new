@@ -41,7 +41,7 @@ function GameModeSection({
                         className="flex gap-4 items-start bg-slate-800/50 border-3 border-neo-black rounded-neo p-4 shadow-hard-sm"
                     >
                         <span
-                            className="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-neo-cyan text-neo-black font-bold rounded-full border-2 border-neo-black text-sm"
+                            className="shrink-0 w-8 h-8 flex items-center justify-center bg-neo-cyan text-neo-black font-bold rounded-full border-2 border-neo-black text-sm"
                             aria-hidden="true"
                         >
                             {i + 1}

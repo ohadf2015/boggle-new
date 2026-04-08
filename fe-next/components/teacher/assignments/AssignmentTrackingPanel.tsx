@@ -89,7 +89,7 @@ function AssignmentCard({
           </div>
 
           {/* Right: Progress */}
-          <div className="text-right flex-shrink-0">
+          <div className="text-right shrink-0">
             <div className="text-sm font-neo-body text-neo-white/80 mb-1">
               {assignment.completion_count}/{assignment.student_count} {t('teacher.tracking.studentsCompleted')}
             </div>
@@ -103,7 +103,7 @@ function AssignmentCard({
           </div>
 
           {/* Expand icon */}
-          <div className="flex-shrink-0">
+          <div className="shrink-0">
             {isExpanded ? (
               <ChevronUp className="w-5 h-5 text-neo-cyan" />
             ) : (

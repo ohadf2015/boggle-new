@@ -41,7 +41,7 @@ export default function AdventureShopFAB({
         className={cn(
           'relative flex items-center gap-2.5',
           'pl-3.5 pr-2 py-2.5',
-          'bg-gradient-to-b from-neo-orange to-neo-orange-hover',
+          'bg-linear-to-b from-neo-orange to-neo-orange-hover',
           'text-neo-black font-neo-display font-black text-sm uppercase tracking-wider',
           'border-3 border-neo-black rounded-neo-lg',
           'shadow-hard-lg',
@@ -87,8 +87,8 @@ export default function AdventureShopFAB({
         </div>
 
         {/* Spark dots — tiny decorative "sparks" */}
-        <div className="absolute -top-1 -end-1 w-1.5 h-1.5 rounded-full bg-neo-yellow animate-[spark_2s_ease-in-out_infinite] motion-reduce:animate-none" />
-        <div className="absolute -top-0.5 end-3 w-1 h-1 rounded-full bg-neo-yellow/60 animate-[spark_2s_ease-in-out_infinite_0.7s] motion-reduce:animate-none" />
+        <div className="absolute -top-1 -inset-e-1 w-1.5 h-1.5 rounded-full bg-neo-yellow animate-[spark_2s_ease-in-out_infinite] motion-reduce:animate-none" />
+        <div className="absolute -top-0.5 inset-e-3 w-1 h-1 rounded-full bg-neo-yellow/60 animate-[spark_2s_ease-in-out_infinite_0.7s] motion-reduce:animate-none" />
       </AdaptiveMotion.button>
     </div>
   );

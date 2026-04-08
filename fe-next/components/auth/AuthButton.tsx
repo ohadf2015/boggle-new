@@ -9,7 +9,8 @@ import { Loader } from '@/components/ui/Loader';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { signOut } from '../../lib/supabase';
-import AuthModal from './AuthModal';
+import dynamic from 'next/dynamic';
+const AuthModal = dynamic(() => import('./AuthModal'), { ssr: false });
 import Avatar from '../Avatar';
 import LevelBadge from '../LevelBadge';
 import { getLevelFromXp } from '../XpProgressBar';
@@ -191,7 +192,7 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
 
     // Default dropdown variant
     return (
-      <div className="relative flex-shrink-0" ref={dropdownRef}>
+      <div className="relative shrink-0" ref={dropdownRef}>
         <Button
           ref={buttonRef}
           variant="outline"
@@ -266,7 +267,7 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
                   disabled={isCrazyGamesLoggingIn}
                   className={cn(
                     "flex items-center gap-3 px-3 py-2.5 text-sm font-bold rounded-neo border-2 border-neo-black transition-all w-full",
-                    "bg-neo-cyan shadow-hard-sm hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard",
+                    "bg-neo-cyan shadow-hard-sm hover:-translate-x-px hover:-translate-y-px hover:shadow-hard",
                     isCrazyGamesLoggingIn && "opacity-70 cursor-wait"
                   )}
                 >
@@ -279,14 +280,14 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
             <>
               <button
                 onClick={openSignIn}
-                className={cn("flex items-center gap-3 px-3 py-2.5 text-sm font-bold rounded-neo border-2 border-neo-black transition-all w-full", "bg-neo-cyan shadow-hard-sm hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard")}
+                className={cn("flex items-center gap-3 px-3 py-2.5 text-sm font-bold rounded-neo border-2 border-neo-black transition-all w-full", "bg-neo-cyan shadow-hard-sm hover:-translate-x-px hover:-translate-y-px hover:shadow-hard")}
               >
                 <User size={14} className="text-neo-black" aria-hidden="true" />
                 <span className="text-neo-black">{t('auth.signIn')}</span>
               </button>
               <button
                 onClick={openSignUp}
-                className={cn("flex items-center gap-3 px-3 py-2.5 text-sm font-bold rounded-neo border-2 border-neo-black transition-all w-full", "bg-neo-pink text-white shadow-hard-sm hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard")}
+                className={cn("flex items-center gap-3 px-3 py-2.5 text-sm font-bold rounded-neo border-2 border-neo-black transition-all w-full", "bg-neo-pink text-white shadow-hard-sm hover:-translate-x-px hover:-translate-y-px hover:shadow-hard")}
               >
                 <User size={14} aria-hidden="true" />
                 <span>{t('auth.signUp')}</span>

@@ -228,10 +228,10 @@ export function Collapsible({
 
     if (isIconComponent && !isReactElement) {
       const IconComponent = icon as React.ComponentType<{ className?: string }>;
-      return <IconComponent className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />;
+      return <IconComponent className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />;
     }
 
-    return <span className="flex-shrink-0">{icon as React.ReactNode}</span>;
+    return <span className="shrink-0">{icon as React.ReactNode}</span>;
   };
 
   // Render badge/count
@@ -263,7 +263,7 @@ export function Collapsible({
       className={cn(
         'w-full flex items-center justify-between',
         'font-bold uppercase tracking-wide transition-all duration-150',
-        'hover:brightness-95 focus:outline-none focus:ring-2 focus:ring-neo-cyan focus:ring-offset-1',
+        'hover:brightness-95 focus:outline-hidden focus:ring-2 focus:ring-neo-cyan focus:ring-offset-1',
         // Size variants based on bordered vs borderless
         bordered
           ? 'p-2.5 sm:p-3 text-sm min-h-[44px]'
@@ -293,7 +293,7 @@ export function Collapsible({
         transition={{ duration: 0.2 }}
       >
         <ChevronDown className={cn(
-          'flex-shrink-0',
+          'shrink-0',
           bordered ? 'w-5 h-5' : 'w-4 h-4 sm:w-5 sm:h-5'
         )} />
       </AdaptiveMotion.div>

@@ -6,9 +6,11 @@
  */
 
 import { memo, useEffect, useState, useCallback } from 'react';
+import { setInterval, clearInterval } from 'worker-timers';
 import type { Socket } from 'socket.io-client';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
+import { usePartySounds } from '@/hooks/usePartySounds';
 
 // ==================== Types ====================
 
@@ -51,6 +53,7 @@ interface CaptionClashTvProps {
 
 function CaptionClashTvInner({ socket, roomCode }: CaptionClashTvProps) {
   const { t } = useLanguage();
+  const partySounds = usePartySounds();
   const [phase, setPhase] = useState<CaptionPhase>('waiting');
   const [imageData, setImageData] = useState<ImageReadyData | null>(null);
   const [submissionCount, setSubmissionCount] = useState({ count: 0, total: 0 });
@@ -63,11 +66,12 @@ function CaptionClashTvInner({ socket, roomCode }: CaptionClashTvProps) {
   // Timer countdown
   useEffect(() => {
     if (timeRemaining <= 0) return;
+    if (timeRemaining <= 5) partySounds.onCountdown(timeRemaining);
     const interval = setInterval(() => {
       setTimeRemaining(prev => Math.max(0, prev - 1));
     }, 1000);
     return () => clearInterval(interval);
-  }, [timeRemaining]);
+  }, [timeRemaining, partySounds]);
 
   // Socket listeners
   useEffect(() => {
@@ -82,6 +86,7 @@ function CaptionClashTvInner({ socket, roomCode }: CaptionClashTvProps) {
       setVoteResults([]);
       setLaughCounts({});
       setTimeRemaining(data.writeTimeSeconds);
+      partySounds.onPhaseStart();
     };
 
     const onSubmissionCount = (data: { count: number; total: number }) => {
@@ -95,6 +100,7 @@ function CaptionClashTvInner({ socket, roomCode }: CaptionClashTvProps) {
     const onRevealCaption = (data: { submission: CaptionSubmission; index: number; total: number }) => {
       setPhase('lineup');
       setRevealedCaption(data);
+      partySounds.onReveal();
     };
 
     const onLaughUpdate = (data: { submissionId: string; count: number }) => {
@@ -104,12 +110,14 @@ function CaptionClashTvInner({ socket, roomCode }: CaptionClashTvProps) {
     const onVoteResults = (data: { results: VoteResult[] }) => {
       setPhase('crown');
       setVoteResults(data.results);
+      partySounds.onCrowned();
     };
 
     const onPhaseChange = (data: { phase: string; gameState: Record<string, unknown> | null }) => {
       if (data.gameState && (data.gameState as Record<string, unknown>).phase === 'voting') {
         setPhase('voting');
         setTimeRemaining(20);
+        partySounds.onPhaseTransition();
       }
     };
 
@@ -276,7 +284,7 @@ function CaptionClashTvInner({ socket, roomCode }: CaptionClashTvProps) {
               key={result.submission.id}
               initial={{ opacity: 0, x: -40 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: index * 0.2, duration: 0.4 }}
+              transition={{ delay: index * 0.2, type: 'spring', stiffness: 300, damping: 25 }}
               className="flex items-center gap-4"
             >
               <div className="w-1/3 text-right">
@@ -289,7 +297,7 @@ function CaptionClashTvInner({ socket, roomCode }: CaptionClashTvProps) {
                 <AdaptiveMotion.div
                   initial={{ width: 0 }}
                   animate={{ width: `${result.percentage}%` }}
-                  transition={{ delay: index * 0.2 + 0.3, duration: 0.6, ease: [0.175, 0.885, 0.32, 1.275] }}
+                  transition={{ delay: index * 0.2 + 0.3, type: 'spring', stiffness: 200, damping: 20 }}
                   className={`h-full rounded-neo ${result.isWinner ? 'bg-neo-pink' : 'bg-neo-cream/20'}`}
                 />
               </div>

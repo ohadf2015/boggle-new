@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { memo, useMemo, useState } from 'react';
 import { useReducedMotion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Sparkles, Type, Zap, ChevronDown, ChevronUp } from 'lucide-react';
@@ -97,7 +97,7 @@ export interface ResultsMainContentProps {
  *
  * YOU-FIRST order: Hero → Podium → ConsolationRows → Highlights → Revenge → Details
  */
-export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
+export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(function ResultsMainContent({
   sortedScores,
   currentPlayerData,
   currentPlayerValidWords,
@@ -115,7 +115,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
   seriesStandings: _seriesStandings,
   seriesRoundNumber: _seriesRoundNumber,
   missedWords: _missedWords,
-}) => {
+}) {
   const reducedMotion = useReducedMotion();
   const { dir: _dir, language } = useLanguage();
   const [showDetails, setShowDetails] = useState(false);
@@ -282,6 +282,8 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
       )}
     </div>
   );
-};
+});
+
+ResultsMainContent.displayName = 'ResultsMainContent';
 
 export default ResultsMainContent;

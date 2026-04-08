@@ -380,8 +380,8 @@ describe('Profile UI Styling', () => {
       const { container } = render(<ProfilePageClient />, { wrapper: createWrapper() });
 
       // Buttons use logical properties (start/end) which automatically flip for RTL
-      // Previous button uses start-2 (left in LTR, right in RTL)
-      // Next button uses end-2 (right in LTR, left in RTL)
+      // Previous button uses inset-s-2 (left in LTR, right in RTL)
+      // Next button uses inset-e-2 (right in LTR, left in RTL)
       const prevButton = screen.queryByLabelText(/previous section/i);
       const nextButton = screen.queryByLabelText(/next section/i);
 

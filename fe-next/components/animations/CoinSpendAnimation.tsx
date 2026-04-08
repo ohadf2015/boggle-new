@@ -156,7 +156,7 @@ export function CoinSpendAnimation({
           ease: 'easeOut',
         }}
       >
-        <div className="px-3 py-1.5 rounded-neo bg-gradient-to-br from-red-400 via-orange-500 to-red-500 border-2 border-neo-black shadow-hard-sm whitespace-nowrap">
+        <div className="px-3 py-1.5 rounded-neo bg-linear-to-br from-red-400 via-orange-500 to-red-500 border-2 border-neo-black shadow-hard-sm whitespace-nowrap">
           <span className="font-black text-white text-lg flex items-center gap-1">
             <span>-{amount}</span>
             <span>🪙</span>

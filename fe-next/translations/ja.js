@@ -9713,6 +9713,17 @@ const ja = {
     "unranked": "ランクマッチをプレイしてティアを獲得しよう！",
     "playRanked": "ランクをプレイ"
   },
+  "matchmaking": {
+    "rankedMatch": "ランクマッチ",
+    "findingOpponent": "対戦相手を探しています…",
+    "eloRange": "{{elo}} ELO (±{{range}})",
+    "playersInQueue": "{{count}}人が待機中",
+    "estimatedWait": "~{{time}}",
+    "cancel": "キャンセル",
+    "matchFound": "対戦相手が見つかりました！",
+    "timeout": "対戦相手が見つかりませんでした",
+    "createRoom": "代わりにルームを作成"
+  },
   "seasonalEvent": {
     "ariaLabel": "シーズンイベント",
     "score": "スコア",

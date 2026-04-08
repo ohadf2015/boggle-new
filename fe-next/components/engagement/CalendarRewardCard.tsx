@@ -97,14 +97,14 @@ export function CalendarRewardCard({
       className={cn(
         "relative flex flex-col items-center justify-center p-1 sm:p-2 rounded-neo border transition-all",
         "min-h-[42px] sm:min-h-[56px] md:min-h-[70px]",
-        "border-1 sm:border-2",
+        "border sm:border-2",
         // Base styles
         isClaimed && "bg-neo-lime/20 border-neo-lime",
         !isClaimed && !isPast && !isToday && "bg-neo-cream/50 border-neo-black/40",
         isPast && !isClaimed && "bg-neo-black/10 border-neo-black/30 opacity-50",
         // Today styles
         isToday && canClaim && [
-          "bg-gradient-to-br",
+          "bg-linear-to-br",
           rarityColors[rarity],
           rarityBorders[rarity],
           rarityGlows[rarity],

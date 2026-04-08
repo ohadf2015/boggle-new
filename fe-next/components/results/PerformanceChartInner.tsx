@@ -363,7 +363,7 @@ const PerformanceChart: React.FC<PerformanceChartProps> = ({
       >
         {/* Halftone texture overlay - matching the main chart */}
         <div
-          className="absolute inset-0 pointer-events-none opacity-[0.04] bg-[radial-gradient(circle,white_1px,transparent_1px)] bg-[length:8px_8px]"
+          className="absolute inset-0 pointer-events-none opacity-[0.04] bg-[radial-gradient(circle,white_1px,transparent_1px)] bg-size-[8px_8px]"
         />
 
         <div className="relative z-10 p-4">
@@ -387,12 +387,12 @@ const PerformanceChart: React.FC<PerformanceChartProps> = ({
           <div className="relative h-32 mb-4 overflow-hidden rounded-neo">
             {/* Fake chart lines - blurred preview */}
             <div className="absolute inset-0 flex items-end justify-around px-4 pb-4 opacity-30 blur-[2px]">
-              <div className="w-2 bg-gradient-to-t from-neo-pink to-neo-cyan rounded-t h-[40%]" />
-              <div className="w-2 bg-gradient-to-t from-neo-pink to-neo-cyan rounded-t h-[55%]" />
-              <div className="w-2 bg-gradient-to-t from-neo-pink to-neo-cyan rounded-t h-[45%]" />
-              <div className="w-2 bg-gradient-to-t from-neo-pink to-neo-cyan rounded-t h-[70%]" />
-              <div className="w-2 bg-gradient-to-t from-neo-pink to-neo-cyan rounded-t h-[60%]" />
-              <div className="w-2 bg-gradient-to-t from-neo-pink to-neo-lime rounded-t h-[85%]" />
+              <div className="w-2 bg-linear-to-t from-neo-pink to-neo-cyan rounded-t h-[40%]" />
+              <div className="w-2 bg-linear-to-t from-neo-pink to-neo-cyan rounded-t h-[55%]" />
+              <div className="w-2 bg-linear-to-t from-neo-pink to-neo-cyan rounded-t h-[45%]" />
+              <div className="w-2 bg-linear-to-t from-neo-pink to-neo-cyan rounded-t h-[70%]" />
+              <div className="w-2 bg-linear-to-t from-neo-pink to-neo-cyan rounded-t h-[60%]" />
+              <div className="w-2 bg-linear-to-t from-neo-pink to-neo-lime rounded-t h-[85%]" />
             </div>
 
             {/* Overlay with message */}
@@ -480,7 +480,7 @@ const PerformanceChart: React.FC<PerformanceChartProps> = ({
     >
       {/* Halftone texture overlay */}
       <div
-        className="absolute inset-0 pointer-events-none opacity-[0.04] bg-[radial-gradient(circle,white_1px,transparent_1px)] bg-[length:8px_8px]"
+        className="absolute inset-0 pointer-events-none opacity-[0.04] bg-[radial-gradient(circle,white_1px,transparent_1px)] bg-size-[8px_8px]"
       />
 
       <div className="relative z-10 p-4">
@@ -523,7 +523,7 @@ const PerformanceChart: React.FC<PerformanceChartProps> = ({
         )}
 
         {/* Chart - only render ResponsiveContainer when dimensions are valid */}
-        <div ref={containerRef} className={cn('w-full min-w-[100px]', compact ? 'h-32 min-h-[8rem]' : 'h-48 min-h-[12rem]')}>
+        <div ref={containerRef} className={cn('w-full min-w-[100px]', compact ? 'h-32 min-h-32' : 'h-48 min-h-48')}>
           {isReady && dimensions ? (
           <ResponsiveContainer width="100%" height="100%" minWidth={100} minHeight={100}>
             <LineChart

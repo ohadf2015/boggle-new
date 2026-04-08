@@ -111,7 +111,7 @@ const ProfileCustomizationModal: React.FC<ProfileCustomizationModalProps> = ({
         onEscapeKeyDown={(e) => e.preventDefault()}
       >
         {/* Header with gradient */}
-        <DialogHeader className="bg-gradient-to-r from-neo-cyan via-neo-cyan to-neo-lime text-neo-black p-4 sm:p-5 relative overflow-hidden">
+        <DialogHeader className="bg-linear-to-r from-neo-cyan via-neo-cyan to-neo-lime text-neo-black p-4 sm:p-5 relative overflow-hidden">
           <Sparkles className="absolute top-2 right-3 w-4 h-4 text-neo-black/20 animate-pulse" aria-hidden="true" />
           <Sparkles className="absolute bottom-2 left-4 w-3 h-3 text-neo-black/15 animate-pulse" aria-hidden="true" />
           <DialogTitle className="text-xl sm:text-2xl font-black uppercase text-center tracking-tight">
@@ -163,7 +163,7 @@ const ProfileCustomizationModal: React.FC<ProfileCustomizationModalProps> = ({
                   className={cn(
                     'w-full px-3 py-3 bg-white dark:bg-slate-600 border-3 border-neo-black dark:border-slate-500 rounded-neo',
                     'font-bold text-lg text-neo-black dark:text-white placeholder:text-neo-black/30 dark:placeholder:text-gray-400',
-                    'focus:outline-none focus:ring-3 focus:ring-neo-cyan',
+                    'focus:outline-hidden focus:ring-3 focus:ring-neo-cyan',
                     'shadow-hard-sm transition-all',
                     'min-h-[48px]',
                     showNameError && 'border-neo-red focus:ring-neo-red',
@@ -234,7 +234,7 @@ const ProfileCustomizationModal: React.FC<ProfileCustomizationModalProps> = ({
             className={cn(
               'w-full py-3.5 font-black text-lg uppercase rounded-neo border-3 border-neo-black transition-all',
               isNameValid && !isEmpty
-                ? 'bg-neo-lime text-neo-black shadow-hard hover:translate-y-[-2px] hover:shadow-hard-lg active:translate-y-[1px] active:shadow-hard-sm'
+                ? 'bg-neo-lime text-neo-black shadow-hard hover:translate-y-[-2px] hover:shadow-hard-lg active:translate-y-px active:shadow-hard-sm'
                 : 'bg-neo-black/20 text-neo-black/40 dark:bg-slate-600 dark:text-gray-500 cursor-not-allowed shadow-none',
               'flex items-center justify-center gap-2'
             )}

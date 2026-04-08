@@ -8,9 +8,9 @@ import Avatar from '@/components/Avatar';
 import type { HallOfFameEntry } from '@/hooks/useHallOfFame';
 
 const PODIUM_CONFIG = [
-  { rotate: -2, accent: 'border-yellow-400 bg-gradient-to-b from-yellow-400/20 to-yellow-600/10', medal: 'text-yellow-400', glow: 'shadow-[0_0_20px_rgba(250,204,21,0.3)]', rank: '1st', elevated: true },
-  { rotate: 2, accent: 'border-gray-300 bg-gradient-to-b from-gray-300/15 to-gray-400/5', medal: 'text-gray-300', glow: '', rank: '2nd', elevated: false },
-  { rotate: -1.5, accent: 'border-amber-600 bg-gradient-to-b from-amber-600/15 to-amber-700/5', medal: 'text-amber-600', glow: '', rank: '3rd', elevated: false },
+  { rotate: -2, accent: 'border-yellow-400 bg-linear-to-b from-yellow-400/20 to-yellow-600/10', medal: 'text-yellow-400', glow: 'shadow-[0_0_20px_rgba(250,204,21,0.3)]', rank: '1st', elevated: true },
+  { rotate: 2, accent: 'border-gray-300 bg-linear-to-b from-gray-300/15 to-gray-400/5', medal: 'text-gray-300', glow: '', rank: '2nd', elevated: false },
+  { rotate: -1.5, accent: 'border-amber-600 bg-linear-to-b from-amber-600/15 to-amber-700/5', medal: 'text-amber-600', glow: '', rank: '3rd', elevated: false },
   { rotate: 2.5, accent: 'border-neo-cyan/40 bg-neo-cyan/5', medal: 'text-neo-cyan/60', glow: '', rank: '4th', elevated: false },
   { rotate: -1, accent: 'border-neo-pink/40 bg-neo-pink/5', medal: 'text-neo-pink/60', glow: '', rank: '5th', elevated: false },
 ];

@@ -27,7 +27,7 @@ const rarityBgColors: Record<string, string> = {
   uncommon: 'bg-green-50 dark:bg-green-900/30',
   rare: 'bg-blue-50 dark:bg-blue-900/30',
   epic: 'bg-purple-50 dark:bg-purple-900/30',
-  legendary: 'bg-gradient-to-br from-yellow-50 to-orange-50 dark:from-yellow-900/30 dark:to-orange-900/30'
+  legendary: 'bg-linear-to-br from-yellow-50 to-orange-50 dark:from-yellow-900/30 dark:to-orange-900/30'
 };
 
 export function CollectionGrid({ collectibles, className }: CollectionGridProps) {
@@ -139,7 +139,7 @@ function CollectibleBadge({ item, index }: CollectibleBadgeProps) {
         whileHover={{ scale: 1.1, y: -2 }}
         className={cn(
           'w-12 h-12 flex items-center justify-center rounded-lg border-2 cursor-pointer transition-shadow overflow-hidden',
-          'shadow-sm hover:shadow-hard focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2',
+          'shadow-xs hover:shadow-hard focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2',
           rarityColors[rarity],
           rarityBgColors[rarity],
           item.is_equipped && 'ring-2 ring-neo-lime ring-offset-2'

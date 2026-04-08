@@ -244,7 +244,7 @@ const LevelEntryOverlay = memo<LevelEntryOverlayProps>(
               <AdaptiveMotion.span
                 className={cn(
                   'text-7xl md:text-8xl font-black',
-                  'bg-gradient-to-r bg-clip-text text-transparent',
+                  'bg-linear-to-r bg-clip-text text-transparent',
                   theme.gradient
                 )}
                 style={{
@@ -267,7 +267,7 @@ const LevelEntryOverlay = memo<LevelEntryOverlayProps>(
               {/* World mechanic intro on first level of W2+ */}
               {levelNumber === 1 && worldNumber >= 2 && (
                 <AdaptiveMotion.div
-                  className="mt-4 px-4 py-2 rounded-neo border-neo bg-neo-navy/80 backdrop-blur-sm"
+                  className="mt-4 px-4 py-2 rounded-neo border-neo bg-neo-navy/80 backdrop-blur-xs"
                   initial={{ y: 16, opacity: 0, scale: 0.9 }}
                   animate={{ y: 0, opacity: 1, scale: 1 }}
                   transition={{ delay: 0.3, duration: 0.5, type: 'spring', stiffness: 300, damping: 25 }}
@@ -287,7 +287,7 @@ const LevelEntryOverlay = memo<LevelEntryOverlayProps>(
                     key={`particle-${i}`}
                     className={cn(
                       'absolute w-3 h-3 rounded-full',
-                      'bg-gradient-to-r',
+                      'bg-linear-to-r',
                       theme.gradient
                     )}
                     style={{

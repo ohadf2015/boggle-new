@@ -281,10 +281,10 @@ export const TeacherOnboarding = memo<TeacherOnboardingProps>(({
           </div>
 
           {/* Decorative sparkles */}
-          <div className="absolute top-8 start-8 text-neo-lime/30">
+          <div className="absolute top-8 inset-s-8 text-neo-lime/30">
             <Sparkles className="w-6 h-6" />
           </div>
-          <div className="absolute bottom-12 end-12 text-neo-pink/30">
+          <div className="absolute bottom-12 inset-e-12 text-neo-pink/30">
             <Sparkles className="w-4 h-4" />
           </div>
         </AdaptiveMotion.div>

@@ -96,8 +96,8 @@ const HeaderMenuDropdown = memo<HeaderMenuDropdownProps>(({
                     "bg-neo-cream text-neo-black",
                     "border-3 border-neo-black",
                     "rounded-neo shadow-hard-sm",
-                    "hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard hover:bg-neo-lime/40",
-                    "active:translate-x-[1px] active:translate-y-[1px] active:shadow-none",
+                    "hover:-translate-x-px hover:-translate-y-px hover:shadow-hard hover:bg-neo-lime/40",
+                    "active:translate-x-px active:translate-y-px active:shadow-none",
                     "transition-all duration-100"
                 )}
                 aria-label={isOpen ? t('common.closeMenu') : t('common.openMenu')}
@@ -137,14 +137,14 @@ const HeaderMenuDropdown = memo<HeaderMenuDropdownProps>(({
                         )}
                     >
                         {/* Decorative top stripe */}
-                        <div className="h-1 bg-gradient-to-r from-neo-lime via-neo-cyan to-neo-purple" />
+                        <div className="h-1 bg-linear-to-r from-neo-lime via-neo-cyan to-neo-purple" />
 
                         {/* ── Profile Hero ── */}
-                        <div className="px-5 pt-5 pb-4 bg-gradient-to-b from-neo-purple/20 to-transparent border-b-2 border-neo-white/10">
+                        <div className="px-5 pt-5 pb-4 bg-linear-to-b from-neo-purple/20 to-transparent border-b-2 border-neo-white/10">
                             {isAuthenticated && profile ? (
                                 <Link href={`/${language}/profile`} onClick={closeMenu} className="block group">
                                     <div className="flex items-center gap-3.5">
-                                        <div className="relative flex-shrink-0">
+                                        <div className="relative shrink-0">
                                             <div className="rounded-full border-3 border-neo-lime shadow-hard-sm p-0.5 bg-neo-navy group-hover:border-neo-cyan transition-colors">
                                                 <Avatar
                                                     customAvatar={avatarConfig}
@@ -198,7 +198,7 @@ const HeaderMenuDropdown = memo<HeaderMenuDropdownProps>(({
                             <div className="px-5 py-3 bg-neo-navy-light/30 border-b-2 border-neo-white/10 space-y-2">
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-2">
-                                        <Trophy className="w-4 h-4 text-neo-lime flex-shrink-0" />
+                                        <Trophy className="w-4 h-4 text-neo-lime shrink-0" />
                                         <span className="text-[10px] font-black text-neo-white/50 uppercase tracking-widest">
                                             {t('dailyMissions.title')}
                                         </span>
@@ -224,7 +224,7 @@ const HeaderMenuDropdown = memo<HeaderMenuDropdownProps>(({
                                         )}
                                     >
                                         <div className={cn(
-                                            "w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0",
+                                            "w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0",
                                             m.completed ? "border-neo-lime bg-neo-lime/20" : "border-neo-white/20"
                                         )}>
                                             {m.completed && <Check size={10} className="text-neo-lime" />}
@@ -367,7 +367,7 @@ const HeaderMenuDropdown = memo<HeaderMenuDropdownProps>(({
                         </div>
 
                         {/* Divider */}
-                        <div className="mx-4 h-[2px] bg-gradient-to-r from-transparent via-neo-white/15 to-transparent" />
+                        <div className="mx-4 h-[2px] bg-linear-to-r from-transparent via-neo-white/15 to-transparent" />
 
                         {/* ── Settings ── */}
                         <div className="px-4 py-3 space-y-2">
@@ -400,7 +400,7 @@ const HeaderMenuDropdown = memo<HeaderMenuDropdownProps>(({
                         {/* ── Admin (if admin) ── */}
                         {isAdmin && (
                             <>
-                                <div className="mx-4 h-[2px] bg-gradient-to-r from-transparent via-neo-white/15 to-transparent" />
+                                <div className="mx-4 h-[2px] bg-linear-to-r from-transparent via-neo-white/15 to-transparent" />
                                 <div className="px-4 py-3">
                                     <SectionLabel icon={<BarChart3 size={12} />} label={t('common.admin')} />
                                     <Link
@@ -408,7 +408,7 @@ const HeaderMenuDropdown = memo<HeaderMenuDropdownProps>(({
                                         onClick={closeMenu}
                                         className={cn(
                                             "group flex items-center gap-3 px-3 py-2.5",
-                                            "bg-gradient-to-r from-neo-pink/20 to-neo-pink/10",
+                                            "bg-linear-to-r from-neo-pink/20 to-neo-pink/10",
                                             "border-2 border-neo-pink/30",
                                             "rounded-neo",
                                             "hover:from-neo-pink/30 hover:to-neo-pink/20 hover:border-neo-pink/50",
@@ -425,7 +425,7 @@ const HeaderMenuDropdown = memo<HeaderMenuDropdownProps>(({
                         )}
 
                         {/* ── Info ── */}
-                        <div className="mx-4 h-[2px] bg-gradient-to-r from-transparent via-neo-white/15 to-transparent" />
+                        <div className="mx-4 h-[2px] bg-linear-to-r from-transparent via-neo-white/15 to-transparent" />
                         <div className="px-4 py-3 grid grid-cols-2 gap-1.5">
                             <InfoLink href={`/${language}/about`} icon={<Info size={14} />} label={t('footer.about')} onClick={closeMenu} />
                             <InfoLink href={`/${language}/faq`} icon={<HelpCircle size={14} />} label={t('footer.faq')} onClick={closeMenu} />
@@ -436,7 +436,7 @@ const HeaderMenuDropdown = memo<HeaderMenuDropdownProps>(({
                         {/* ── Auth footer ── */}
                         {isAuthenticated && (
                             <>
-                                <div className="mx-4 h-[2px] bg-gradient-to-r from-transparent via-neo-white/15 to-transparent" />
+                                <div className="mx-4 h-[2px] bg-linear-to-r from-transparent via-neo-white/15 to-transparent" />
                                 <div className="px-4 py-3">
                                     <AuthButton inline onClose={closeMenu} />
                                 </div>
@@ -444,7 +444,7 @@ const HeaderMenuDropdown = memo<HeaderMenuDropdownProps>(({
                         )}
 
                         {/* Decorative bottom stripe */}
-                        <div className="h-1 bg-gradient-to-r from-neo-purple via-neo-cyan to-neo-lime" />
+                        <div className="h-1 bg-linear-to-r from-neo-purple via-neo-cyan to-neo-lime" />
                     </m.div>
                 )}
             </AnimatePresence>

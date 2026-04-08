@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useCallback } from 'react';
 import { BookOpen, Check } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -43,15 +43,13 @@ export function MultiLessonSelector({
   }, [lessons]);
 
   // Handle lesson selection toggle
-  const handleToggleLesson = (lessonId: string) => {
+  const handleToggleLesson = useCallback((lessonId: string) => {
     if (selectedLessonIds.includes(lessonId)) {
-      // Deselect
       onSelectChange(selectedLessonIds.filter((id) => id !== lessonId));
     } else {
-      // Select
       onSelectChange([...selectedLessonIds, lessonId]);
     }
-  };
+  }, [selectedLessonIds, onSelectChange]);
 
   if (lessons.length === 0) {
     return (
@@ -66,13 +64,13 @@ export function MultiLessonSelector({
 
   const allSelected = lessons.length > 0 && selectedLessonIds.length === lessons.length;
 
-  const handleSelectAll = () => {
+  const handleSelectAll = useCallback(() => {
     if (allSelected) {
       onSelectChange([]);
     } else {
       onSelectChange(lessons.map((l) => l.id));
     }
-  };
+  }, [allSelected, lessons, onSelectChange]);
 
   return (
     <div className={cn('space-y-4', className)}>
@@ -134,7 +132,7 @@ export function MultiLessonSelector({
 
               {/* Lesson name */}
               <div className="flex items-start gap-2 mb-2">
-                <BookOpen className={cn('w-5 h-5 flex-shrink-0 mt-0.5', isSelected ? 'text-neo-black' : 'text-neo-pink')} />
+                <BookOpen className={cn('w-5 h-5 shrink-0 mt-0.5', isSelected ? 'text-neo-black' : 'text-neo-pink')} />
                 <span className="font-bold font-neo-display">
                   {lesson.name}
                 </span>

@@ -71,7 +71,7 @@ import DailyChallengeBanner from '../DailyChallengeBanner';
 
 describe('DailyChallengeBanner Accessibility', () => {
   describe('WCAG 2.4.6 - Headings and Labels', () => {
-    it('should use h2 heading level for proper document outline', () => {
+    it('should use h2 heading level for proper document outline-solid', () => {
       // GIVEN: A DailyChallengeBanner rendered on the landing page
       // (where h1 is the page title and h2 is used for sections)
       render(<DailyChallengeBanner />);

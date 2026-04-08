@@ -1,299 +1,237 @@
 /**
- * SkillTreeView Component
+ * SkillTreeView — Interactive skill tree using @xyflow/react.
  *
- * Displays the full skill tree with all paths and nodes.
- * Allows users to unlock skills by clicking on available nodes.
+ * Renders 14 skills as graph nodes across 3 paths (power/strategy/utility)
+ * with edges representing prerequisites. Replaces the previous static
+ * CSS flexbox layout with a pannable, zoomable canvas.
  */
 
 'use client';
 
-import React, { useCallback } from 'react';
+import React, { useMemo, useCallback } from 'react';
+import {
+  ReactFlow,
+  ReactFlowProvider,
+  Background,
+  type Node,
+  type Edge,
+  type NodeTypes,
+  MarkerType,
+  Position,
+} from '@xyflow/react';
+import '@xyflow/react/dist/style.css';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSkillTreeStore } from '@/hooks/useSkillTreeStore';
-import { getSkillsByPath, canUnlockSkill } from '@/utils/skillTreeUtils';
-import type { SkillNode, SkillPath } from '@/types/adventure';
+import { SKILL_CATALOG } from '@/utils/skillTreeUtils';
+import { SkillFlowNode, type SkillFlowNodeData } from './SkillFlowNode';
+import type { SkillNode as SkillNodeType, SkillPath, SkillTreeState } from '@/types/adventure';
 
 // ==============================================
 // TYPES
 // ==============================================
 
 interface SkillTreeViewProps {
-  /** Callback when a skill is unlocked */
-  onSkillUnlock?: (skill: SkillNode) => void;
-  /** Additional CSS classes */
+  onSkillUnlock?: (skill: SkillNodeType) => void;
   className?: string;
 }
 
-interface SkillNodeComponentProps {
-  skill: SkillNode;
-  isUnlocked: boolean;
-  canUnlock: boolean;
-  onUnlock: () => void;
+// ==============================================
+// LAYOUT CONSTANTS
+// ==============================================
+
+/** Column X centers for each path */
+const PATH_X: Record<SkillPath, number> = {
+  power: 0,
+  strategy: 250,
+  utility: 500,
+};
+
+/** Row Y positions for each tier (tier 1 = bottom, tier 3 = top) */
+const TIER_Y: Record<1 | 2 | 3, number> = {
+  1: 350,
+  2: 200,
+  3: 50,
+};
+
+/** Horizontal offset when two skills share a tier in the same path */
+const TWIN_OFFSET = 70;
+
+// ==============================================
+// NODE/EDGE BUILDERS
+// ==============================================
+
+/** Build ReactFlow nodes from skill catalog */
+function buildNodes(
+  state: SkillTreeState,
+  onUnlock: (skill: SkillNodeType) => void,
+): Node<SkillFlowNodeData>[] {
+  // Count how many skills per path+tier so we can offset twins
+  const peerMap = new Map<string, SkillNodeType[]>();
+  for (const s of SKILL_CATALOG) {
+    const key = `${s.path}-${s.tier}`;
+    const arr = peerMap.get(key) || [];
+    arr.push(s);
+    peerMap.set(key, arr);
+  }
+
+  return SKILL_CATALOG.map((skill) => {
+    const peers = peerMap.get(`${skill.path}-${skill.tier}`) || [];
+    const peerIndex = peers.indexOf(skill);
+    const peerCount = peers.length;
+
+    // Center single skills, offset twins
+    let xOffset = 0;
+    if (peerCount === 2) {
+      xOffset = peerIndex === 0 ? -TWIN_OFFSET : TWIN_OFFSET;
+    }
+
+    return {
+      id: skill.id,
+      type: 'skillNode',
+      position: {
+        x: PATH_X[skill.path] + xOffset,
+        y: TIER_Y[skill.tier],
+      },
+      data: { skill, state, onUnlock },
+      draggable: false,
+      selectable: false,
+    };
+  });
+}
+
+/** Build ReactFlow edges from prerequisite relationships */
+function buildEdges(unlockedSkills: Set<string>): Edge[] {
+  const edges: Edge[] = [];
+
+  for (const skill of SKILL_CATALOG) {
+    for (const prereqId of skill.prerequisites) {
+      const bothUnlocked =
+        unlockedSkills.has(skill.id) && unlockedSkills.has(prereqId);
+
+      edges.push({
+        id: `${prereqId}->${skill.id}`,
+        source: prereqId,
+        target: skill.id,
+        type: 'smoothstep',
+        animated: !bothUnlocked,
+        style: {
+          stroke: bothUnlocked ? '#BFFF00' : 'rgba(255,255,255,0.2)',
+          strokeWidth: 2,
+        },
+        markerEnd: {
+          type: MarkerType.ArrowClosed,
+          color: bothUnlocked ? '#BFFF00' : 'rgba(255,255,255,0.2)',
+          width: 14,
+          height: 14,
+        },
+      });
+    }
+  }
+
+  return edges;
 }
 
 // ==============================================
-// PATH COLORS
+// NODE TYPES
 // ==============================================
 
-const PATH_COLORS: Record<SkillPath, { bg: string; border: string; text: string }> = {
-  power: {
-    bg: 'bg-neo-red/20',
-    border: 'border-neo-red',
-    text: 'text-neo-red',
-  },
-  strategy: {
-    bg: 'bg-neo-cyan/20',
-    border: 'border-neo-cyan',
-    text: 'text-neo-cyan',
-  },
-  utility: {
-    bg: 'bg-neo-yellow/20',
-    border: 'border-neo-yellow',
-    text: 'text-neo-yellow',
-  },
+const nodeTypes: NodeTypes = {
+  skillNode: SkillFlowNode,
 };
 
 // ==============================================
-// SKILL NODE COMPONENT
+// INNER COMPONENT (needs ReactFlowProvider above)
 // ==============================================
 
-function SkillNodeComponent({
-  skill,
-  isUnlocked,
-  canUnlock,
-  onUnlock,
-}: SkillNodeComponentProps) {
+function SkillTreeCanvas({ onSkillUnlock, className }: SkillTreeViewProps) {
   const { t } = useLanguage();
-  const colors = PATH_COLORS[skill.path];
+  const availablePoints = useSkillTreeStore((s) => s.availablePoints);
+  const unlockedSkills = useSkillTreeStore((s) => s.unlockedSkills);
+  const unlockSkill = useSkillTreeStore((s) => s.unlockSkill);
 
-  return (
-    <button
-      onClick={canUnlock ? onUnlock : undefined}
-      disabled={!canUnlock && !isUnlocked}
-      className={cn(
-        'relative p-3 rounded-neo',
-        'border-3 transition-all duration-200',
-        'flex flex-col items-center gap-2',
-        'min-w-[100px]',
-        isUnlocked && [colors.bg, colors.border, 'shadow-hard'],
-        canUnlock && !isUnlocked && [
-          'bg-neo-navy border-neo-white/50',
-          'hover:border-neo-white hover:shadow-hard',
-          'cursor-pointer',
-        ],
-        !canUnlock && !isUnlocked && [
-          'bg-neo-black/30 border-neo-white/20',
-          'opacity-50 cursor-not-allowed',
-        ]
-      )}
-      aria-label={t(skill.nameKey)}
-      data-testid={`skill-node-${skill.id}`}
-    >
-      {/* Icon */}
-      <span className="text-2xl">{skill.icon}</span>
-
-      {/* Name */}
-      <span
-        className={cn(
-          'text-xs font-bold text-center',
-          isUnlocked ? colors.text : 'text-neo-white/70'
-        )}
-      >
-        {t(skill.nameKey)}
-      </span>
-
-      {/* Cost Badge */}
-      {!isUnlocked && (
-        <span
-          className={cn(
-            'absolute -top-2 -end-2',
-            'px-1.5 py-0.5 rounded-full',
-            'text-[10px] font-bold',
-            'bg-neo-black border border-neo-white/30',
-            canUnlock ? 'text-neo-lime' : 'text-neo-white/50'
-          )}
-        >
-          {skill.cost} SP
-        </span>
-      )}
-
-      {/* Unlocked Checkmark */}
-      {isUnlocked && (
-        <span
-          className={cn(
-            'absolute -top-2 -end-2',
-            'w-5 h-5 rounded-full',
-            'flex items-center justify-center',
-            'bg-neo-lime border-2 border-neo-black',
-            'text-neo-black text-xs font-bold'
-          )}
-        >
-          ✓
-        </span>
-      )}
-    </button>
-  );
-}
-
-// ==============================================
-// SKILL PATH COMPONENT
-// ==============================================
-
-interface SkillPathComponentProps {
-  path: SkillPath;
-  skills: SkillNode[];
-  unlockedSkills: Set<string>;
-  availablePoints: number;
-  onUnlock: (skill: SkillNode) => void;
-}
-
-function SkillPathComponent({
-  path,
-  skills,
-  unlockedSkills,
-  availablePoints,
-  onUnlock,
-}: SkillPathComponentProps) {
-  const { t } = useLanguage();
-  const colors = PATH_COLORS[path];
-
-  // Group skills by tier
-  const tier1 = skills.filter((s) => s.tier === 1);
-  const tier2 = skills.filter((s) => s.tier === 2);
-  const tier3 = skills.filter((s) => s.tier === 3);
-
-  const pathNames: Record<SkillPath, string> = {
-    power: 'adventure.skills.paths.power',
-    strategy: 'adventure.skills.paths.strategy',
-    utility: 'adventure.skills.paths.utility',
-  };
-
-  return (
-    <div className="flex flex-col items-center gap-4">
-      {/* Path Header */}
-      <h3
-        className={cn(
-          'text-lg font-black uppercase tracking-wide',
-          colors.text
-        )}
-      >
-        {t(pathNames[path])}
-      </h3>
-
-      {/* Tier 3 */}
-      <div className="flex gap-3">
-        {tier3.map((skill) => (
-          <SkillNodeComponent
-            key={skill.id}
-            skill={skill}
-            isUnlocked={unlockedSkills.has(skill.id)}
-            canUnlock={canUnlockSkill(skill.id, { unlockedSkills, availablePoints, totalPointsEarned: availablePoints })}
-            onUnlock={() => onUnlock(skill)}
-          />
-        ))}
-      </div>
-
-      {/* Connector Line */}
-      <div className={cn('w-0.5 h-6', colors.bg, colors.border)} />
-
-      {/* Tier 2 */}
-      <div className="flex gap-3">
-        {tier2.map((skill) => (
-          <SkillNodeComponent
-            key={skill.id}
-            skill={skill}
-            isUnlocked={unlockedSkills.has(skill.id)}
-            canUnlock={canUnlockSkill(skill.id, { unlockedSkills, availablePoints, totalPointsEarned: availablePoints })}
-            onUnlock={() => onUnlock(skill)}
-          />
-        ))}
-      </div>
-
-      {/* Connector Line */}
-      <div className={cn('w-0.5 h-6', colors.bg, colors.border)} />
-
-      {/* Tier 1 */}
-      <div className="flex gap-3">
-        {tier1.map((skill) => (
-          <SkillNodeComponent
-            key={skill.id}
-            skill={skill}
-            isUnlocked={unlockedSkills.has(skill.id)}
-            canUnlock={canUnlockSkill(skill.id, { unlockedSkills, availablePoints, totalPointsEarned: availablePoints })}
-            onUnlock={() => onUnlock(skill)}
-          />
-        ))}
-      </div>
-    </div>
-  );
-}
-
-// ==============================================
-// MAIN COMPONENT
-// ==============================================
-
-export function SkillTreeView({ onSkillUnlock, className }: SkillTreeViewProps) {
-  const { t } = useLanguage();
-
-  // Store state and actions
-  const availablePoints = useSkillTreeStore((state) => state.availablePoints);
-  const unlockedSkills = useSkillTreeStore((state) => state.unlockedSkills);
-  const unlockSkill = useSkillTreeStore((state) => state.unlockSkill);
-
-  // Handle skill unlock
   const handleUnlock = useCallback(
-    (skill: SkillNode) => {
-      const success = unlockSkill(skill.id, skill.cost);
-      if (success && onSkillUnlock) {
-        onSkillUnlock(skill);
-      }
+    (skill: SkillNodeType) => {
+      const ok = unlockSkill(skill.id, skill.cost);
+      if (ok && onSkillUnlock) onSkillUnlock(skill);
     },
-    [unlockSkill, onSkillUnlock]
+    [unlockSkill, onSkillUnlock],
   );
 
-  // Get skills by path
-  const powerSkills = getSkillsByPath('power');
-  const strategySkills = getSkillsByPath('strategy');
-  const utilitySkills = getSkillsByPath('utility');
+  const treeState: SkillTreeState = useMemo(
+    () => ({
+      unlockedSkills,
+      availablePoints,
+      totalPointsEarned: availablePoints,
+    }),
+    [unlockedSkills, availablePoints],
+  );
+
+  const nodes = useMemo(
+    () => buildNodes(treeState, handleUnlock),
+    [treeState, handleUnlock],
+  );
+
+  const edges = useMemo(
+    () => buildEdges(unlockedSkills),
+    [unlockedSkills],
+  );
 
   return (
-    <div className={cn('flex flex-col items-center gap-8', className)}>
+    <div className={cn('flex flex-col items-center gap-4', className)}>
       {/* Header */}
-      <div className="text-center">
+      <div className="text-center z-10">
         <h2 className="text-2xl font-black text-neo-white mb-2">
           {t('adventure.skills.title')}
         </h2>
         <p className="text-neo-white/70">
-          {t('adventure.skills.points')}: <span className="text-neo-lime font-bold">{availablePoints}</span>
+          {t('adventure.skills.points')}:{' '}
+          <span className="text-neo-lime font-bold">{availablePoints}</span>
         </p>
       </div>
 
-      {/* Skill Paths */}
-      <div className="flex flex-wrap justify-center gap-8 lg:gap-12">
-        <SkillPathComponent
-          path="power"
-          skills={powerSkills}
-          unlockedSkills={unlockedSkills}
-          availablePoints={availablePoints}
-          onUnlock={handleUnlock}
-        />
-        <SkillPathComponent
-          path="strategy"
-          skills={strategySkills}
-          unlockedSkills={unlockedSkills}
-          availablePoints={availablePoints}
-          onUnlock={handleUnlock}
-        />
-        <SkillPathComponent
-          path="utility"
-          skills={utilitySkills}
-          unlockedSkills={unlockedSkills}
-          availablePoints={availablePoints}
-          onUnlock={handleUnlock}
-        />
+      {/* ReactFlow Canvas */}
+      <div className="w-full h-[500px] rounded-neo border-2 border-neo-white/10 bg-neo-navy-light overflow-hidden">
+        <ReactFlow
+          nodes={nodes}
+          edges={edges}
+          nodeTypes={nodeTypes}
+          fitView
+          fitViewOptions={{ padding: 0.3 }}
+          minZoom={0.5}
+          maxZoom={1.5}
+          panOnDrag
+          zoomOnScroll={false}
+          zoomOnPinch
+          preventScrolling={false}
+          nodesDraggable={false}
+          nodesConnectable={false}
+          elementsSelectable={false}
+          proOptions={{ hideAttribution: true }}
+        >
+          <Background color="rgba(255,255,255,0.03)" gap={20} />
+        </ReactFlow>
+      </div>
+
+      {/* Path Legend */}
+      <div className="flex gap-6 text-xs font-bold">
+        <span className="text-neo-red">⚔️ {t('adventure.skills.paths.power')}</span>
+        <span className="text-neo-cyan">🧠 {t('adventure.skills.paths.strategy')}</span>
+        <span className="text-neo-lime">🔧 {t('adventure.skills.paths.utility')}</span>
       </div>
     </div>
+  );
+}
+
+// ==============================================
+// EXPORTED WRAPPER (provides ReactFlow context)
+// ==============================================
+
+export function SkillTreeView(props: SkillTreeViewProps) {
+  return (
+    <ReactFlowProvider>
+      <SkillTreeCanvas {...props} />
+    </ReactFlowProvider>
   );
 }
 

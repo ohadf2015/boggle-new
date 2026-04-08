@@ -6,6 +6,7 @@ import { useTransform, type MotionValue } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { Cloud } from './WorldMapDecorations';
+import { createNoise2D } from 'simplex-noise';
 
 interface WorldMapBackgroundProps {
   parallaxX: MotionValue<number>;
@@ -31,23 +32,52 @@ export function WorldMapBackground({
   const cloudsParallaxX = useTransform(parallaxX, (v) => v * 0.5);
   const cloudsParallaxY = useTransform(parallaxY, (v) => v * 0.5);
 
-  // Reduce star count across ALL tiers — each star is a DOM node with a CSS animation.
-  // 15→8 on capable/low-end is enough for the visual effect without jank.
+  // Star generation with 2D simplex noise for spatially coherent clustering.
+  // Stars cluster in "dense" regions where noise > threshold, creating a natural sky.
   const starCount = isLowEnd ? 6 : 12;
   const stars = useMemo(() => {
-    const seededRandom = (seed: number) => {
-      const x = Math.sin(seed * 9999) * 10000;
-      return x - Math.floor(x);
+    // Seeded PRNG for deterministic noise (Mulberry32)
+    let rngState = 42;
+    const seededRng = (): number => {
+      rngState = (rngState + 0x6d2b79f5) | 0;
+      let t = rngState;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
     };
+    const noise2D = createNoise2D(seededRng);
 
-    return Array.from({ length: starCount }, (_, i) => ({
+    // Generate candidate stars, keep those in high-density noise regions
+    const candidates: Array<{ left: number; top: number; density: number }> = [];
+    const gridSteps = 30; // sample a 30×30 grid
+    for (let gx = 0; gx < gridSteps; gx++) {
+      for (let gy = 0; gy < gridSteps; gy++) {
+        const x = (gx / gridSteps) * 100;
+        const y = (gy / gridSteps) * 100;
+        // Low frequency noise for broad density clusters
+        const density = (noise2D(gx * 0.15, gy * 0.15) + 1) / 2; // normalize to [0, 1]
+        if (density > 0.45) {
+          // Jitter position within the cell for organic placement
+          const jitterX = x + (seededRng() - 0.5) * (100 / gridSteps);
+          const jitterY = y + (seededRng() - 0.5) * (100 / gridSteps);
+          candidates.push({ left: Math.max(0, Math.min(100, jitterX)), top: Math.max(0, Math.min(100, jitterY)), density });
+        }
+      }
+    }
+
+    // Sort by density (brightest first), take starCount
+    candidates.sort((a, b) => b.density - a.density);
+    const picked = candidates.slice(0, starCount);
+
+    return picked.map((s, i) => ({
       id: i,
-      left: seededRandom(i * 1.1) * 100,
-      top: seededRandom(i * 2.3) * 100,
-      opacity: 0.15 + seededRandom(i * 3.7) * 0.6,
-      duration: 2 + seededRandom(i * 4.2) * 4,
-      delay: seededRandom(i * 5.1) * 3,
-      size: i % 5 === 0 ? 4 : i % 3 === 0 ? 3 : i % 2 === 0 ? 2 : 1,
+      left: s.left,
+      top: s.top,
+      // Brightness correlates with noise density
+      opacity: 0.15 + s.density * 0.6,
+      duration: 2 + seededRng() * 4,
+      delay: seededRng() * 3,
+      size: s.density > 0.8 ? 4 : s.density > 0.65 ? 3 : s.density > 0.5 ? 2 : 1,
       color: i % 7 === 0 ? '#a5f3fc' : i % 11 === 0 ? '#fcd34d' : i % 13 === 0 ? '#f9a8d4' : '#ffffff',
     }));
   }, [starCount]);
@@ -68,7 +98,7 @@ export function WorldMapBackground({
   return (
     <>
       {/* Deep space background gradient — static, no parallax (saves a MotionValue layer) */}
-      <div className="fixed inset-0 bg-gradient-to-b from-neo-abyss-deep via-neo-abyss-mid to-neo-abyss-light pointer-events-none" />
+      <div className="fixed inset-0 bg-linear-to-b from-neo-abyss-deep via-neo-abyss-mid to-neo-abyss-light pointer-events-none" />
 
       {/* Milky Way band + cosmic dust merged into one static layer */}
       <div

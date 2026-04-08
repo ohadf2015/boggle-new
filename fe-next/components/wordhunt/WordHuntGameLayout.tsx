@@ -144,7 +144,7 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
         </div>
 
         {/* Life Bar — compact wrapper */}
-        <div className="px-2 py-0 flex-shrink-0">
+        <div className="px-2 py-0 shrink-0">
           <SurvivalLifeBar
             lifePoints={lifePoints}
             isGameOver={isGameOver}
@@ -176,7 +176,7 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
         </div>
 
         {/* MP Leaderboard — mobile: compact horizontal strip */}
-        <div className="flex-shrink-0 max-h-[10vh] overflow-y-auto lg:hidden">
+        <div className="shrink-0 max-h-[10vh] overflow-y-auto lg:hidden">
           <WordHuntMPLeaderboard
             playerLives={playerLives}
             eliminatedPlayers={eliminatedPlayers}

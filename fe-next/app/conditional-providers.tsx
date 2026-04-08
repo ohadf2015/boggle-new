@@ -17,9 +17,13 @@
  */
 
 import { usePathname } from 'next/navigation';
-import { ReactNode, useMemo } from 'react';
+import { ReactNode, useMemo, lazy, Suspense } from 'react';
+import { NextIntlClientProvider } from 'next-intl';
+import { NuqsAdapter } from 'nuqs/adapters/next/app';
 import { GameSpecificProviders } from './providers';
 import { EssentialProviders } from './essential-providers';
+
+const CommandPalette = lazy(() => import('@/components/CommandPalette'));
 import type { TranslationData } from '@/translations/loadTranslation';
 import type { Language } from '@/shared/types/game';
 
@@ -79,14 +83,21 @@ export function ConditionalProviders({ children, lang, initialTranslations }: Co
   // ALWAYS wrap with EssentialProviders first (never remounts on navigation)
   // Conditionally add game-specific providers inside
   return (
-    <EssentialProviders lang={lang} initialTranslations={initialTranslations}>
-      {needsGameStack ? (
-        <GameSpecificProviders>
-          {children}
-        </GameSpecificProviders>
-      ) : (
-        children
-      )}
-    </EssentialProviders>
+    <NextIntlClientProvider locale={lang} messages={initialTranslations as Record<string, unknown>}>
+      <NuqsAdapter>
+        <EssentialProviders lang={lang} initialTranslations={initialTranslations}>
+          {needsGameStack ? (
+            <GameSpecificProviders>
+              {children}
+            </GameSpecificProviders>
+          ) : (
+            children
+          )}
+        </EssentialProviders>
+        <Suspense fallback={null}>
+          <CommandPalette />
+        </Suspense>
+      </NuqsAdapter>
+    </NextIntlClientProvider>
   );
 }

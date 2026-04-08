@@ -368,7 +368,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
       className="flex-1 flex flex-col min-h-0 overflow-hidden"
     >
       {/* Compact Header */}
-      <div className="flex-shrink-0 px-3 py-2 border-b border-slate-700/50 bg-neo-navy">
+      <div className="shrink-0 px-3 py-2 border-b border-slate-700/50 bg-neo-navy">
         <div className="max-w-md mx-auto lg:max-w-5xl xl:max-w-6xl">
           <div className="flex items-center justify-between gap-2">
             <Button variant="ghost" size="sm" onClick={onBack} className="text-slate-400 hover:text-white -ms-2 py-1">
@@ -389,7 +389,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
 
       {/* Main Content - flex-1 min-h-0 fills remaining space after compact header */}
       {/* Bottom padding accounts for fixed MobileTabBar (--mobile-bottom-safe = 80px + safe-area) */}
-      <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain scrollable-area px-3 pb-[--mobile-bottom-safe] md:pb-6">
+      <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain scrollable-area px-3 pb-(--mobile-bottom-safe) md:pb-6">
         {/* Mobile: Tab-based content */}
         <div className="max-w-md mx-auto pt-4 md:hidden">
           {activeTab === 'results' && <WordHuntResultsContent {...resultsContentProps} />}
@@ -417,7 +417,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
       <NativeBannerAd />
 
       {/* Mobile Tab Bar */}
-      <div className="flex-shrink-0 fixed bottom-0 inset-x-0 z-50 bg-neo-navy border-t-4 border-neo-black md:hidden">
+      <div className="shrink-0 fixed bottom-0 inset-x-0 z-50 bg-neo-navy border-t-4 border-neo-black md:hidden">
         <MobileTabBar
           tabs={[
             { id: 'results', icon: <Trophy className="w-5 h-5" />, label: t('wordHunt.results.title') },

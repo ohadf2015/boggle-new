@@ -18,6 +18,7 @@ import { stopConnectionHealthCheck } from '../backend/handlers/presenceHandler';
 import { stopEmptyRoomCleanup } from '../backend/socketHandlers';
 import * as gameStateManager from '../backend/modules/gameStateManager';
 import { startAllCronJobs, stopAllCronJobs } from '../backend/services/cronScheduler';
+import { initCronQueue, registerAllCronJobs, shutdownCronQueue } from '../backend/queues/cronQueue';
 import type { ScheduledTask } from 'node-cron';
 
 /**
@@ -93,12 +94,23 @@ export async function initializeServer(io: Server): Promise<void> {
     lifecycleLogger.warn({ err: error }, 'Failed to warm up worker pool');
   }
 
-  // Start all cron schedulers (Wikipedia, Daily Words, Bot Difficulty)
-  try {
-    cronTasks = startAllCronJobs();
-    lifecycleLogger.info({ count: cronTasks.length }, 'Started cron schedulers');
-  } catch (error) {
-    lifecycleLogger.error({ err: error }, 'Failed to start cron schedulers');
+  // Start cron schedulers — BullMQ (durable, with retries) or node-cron (legacy)
+  if (process.env.USE_BULLMQ === 'true') {
+    try {
+      initCronQueue();
+      await registerAllCronJobs();
+      lifecycleLogger.info('Started BullMQ cron queue');
+    } catch (error) {
+      lifecycleLogger.error({ err: error }, 'Failed to start BullMQ cron queue, falling back to node-cron');
+      cronTasks = startAllCronJobs();
+    }
+  } else {
+    try {
+      cronTasks = startAllCronJobs();
+      lifecycleLogger.info({ count: cronTasks.length }, 'Started cron schedulers');
+    } catch (error) {
+      lifecycleLogger.error({ err: error }, 'Failed to start cron schedulers');
+    }
   }
 }
 
@@ -185,9 +197,12 @@ export function createShutdownHandler(httpServer: HttpServer, io: Server): Shutd
       lifecycleLogger.error({ err }, 'Error closing worker pool');
     }
 
-    // Stop all cron schedulers
+    // Stop all cron schedulers (BullMQ or node-cron)
     try {
-      if (cronTasks.length > 0) {
+      if (process.env.USE_BULLMQ === 'true') {
+        await shutdownCronQueue();
+        lifecycleLogger.info('Stopped BullMQ cron queue');
+      } else if (cronTasks.length > 0) {
         stopAllCronJobs(cronTasks);
         lifecycleLogger.info({ count: cronTasks.length }, 'Stopped cron schedulers');
       }

@@ -146,7 +146,7 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
                   </AnimatePresence>
                 </div>
                 <div className={cn(
-                  'absolute -bottom-1 -end-1 w-7 h-7',
+                  'absolute -bottom-1 -inset-e-1 w-7 h-7',
                   'bg-neo-lime border-2 border-neo-black rounded-full',
                   'flex items-center justify-center shadow-hard-sm',
                   'group-hover:scale-110 transition-transform'
@@ -195,7 +195,7 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
               className={cn(
                 'w-full px-3 py-3 bg-white border-3 border-neo-black rounded-neo',
                 'font-bold text-lg text-neo-black placeholder:text-neo-black/30',
-                'focus:outline-none focus:ring-3 focus:ring-neo-cyan',
+                'focus:outline-hidden focus:ring-3 focus:ring-neo-cyan',
                 'shadow-hard-sm mb-1 min-h-[48px]',
                 isNameValid && trimmedName.length > 0 && 'border-neo-lime',
                 !isNameValid && name.length > 0 && 'border-neo-red'

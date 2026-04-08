@@ -115,10 +115,10 @@ function PodiumEmojiBubble({ emoji, onDone }: { emoji: string; onDone: () => voi
       animate={{ scale: 1, y: -8, opacity: 1 }}
       exit={{ scale: 0, opacity: 0 }}
       transition={{ type: 'spring', stiffness: 500, damping: 15 }}
-      className="absolute -top-8 start-1/2 -translate-x-1/2 rtl:translate-x-1/2 z-30 bg-neo-cream border-3 border-neo-black rounded-neo shadow-hard-sm px-2 py-1 text-lg pointer-events-none"
+      className="absolute -top-8 inset-s-1/2 -translate-x-1/2 rtl:translate-x-1/2 z-30 bg-neo-cream border-3 border-neo-black rounded-neo shadow-hard-sm px-2 py-1 text-lg pointer-events-none"
     >
       {emoji}
-      <div className="absolute -bottom-1.5 start-1/2 -translate-x-1/2 rtl:translate-x-1/2 w-3 h-3 bg-neo-cream border-b-3 border-e-3 border-neo-black rotate-45" />
+      <div className="absolute -bottom-1.5 inset-s-1/2 -translate-x-1/2 rtl:translate-x-1/2 w-3 h-3 bg-neo-cream border-b-3 border-e-3 border-neo-black rotate-45" />
     </motion.div>
   );
 }
@@ -193,9 +193,9 @@ const Top3Leaderboard = memo<Top3LeaderboardProps>(({
 
   // Card background styling per rank
   const cardStyles = {
-    1: 'bg-gradient-to-b from-amber-300 via-amber-400 to-amber-500',
-    2: 'bg-gradient-to-b from-slate-300 to-slate-400',
-    3: 'bg-gradient-to-b from-orange-300 via-orange-400 to-orange-500',
+    1: 'bg-linear-to-b from-amber-300 via-amber-400 to-amber-500',
+    2: 'bg-linear-to-b from-slate-300 to-slate-400',
+    3: 'bg-linear-to-b from-orange-300 via-orange-400 to-orange-500',
   };
 
   // Reorder for podium display: [2nd, 1st, 3rd]
@@ -290,7 +290,7 @@ const Top3Leaderboard = memo<Top3LeaderboardProps>(({
                 )}
               >
                 {/* Subtle halftone texture */}
-                <div className="absolute inset-0 pointer-events-none opacity-[0.06] bg-[radial-gradient(circle,black_1px,transparent_1px)] bg-[length:8px_8px]" />
+                <div className="absolute inset-0 pointer-events-none opacity-[0.06] bg-[radial-gradient(circle,black_1px,transparent_1px)] bg-size-[8px_8px]" />
 
                 {/* Winner glow pulse */}
                 {rank === 1 && !reducedMotion && (
@@ -367,9 +367,9 @@ const Top3Leaderboard = memo<Top3LeaderboardProps>(({
                 'w-full border-x-3 border-t-3 border-neo-black flex items-start justify-center pt-2',
                 compact ? 'w-24 rounded-t-lg' : rank === 1 ? 'w-36 rounded-t-lg' : 'w-28 rounded-t-lg',
                 podium.podiumHeight,
-                rank === 1 ? 'bg-gradient-to-b from-amber-400 to-amber-500' :
-                rank === 2 ? 'bg-gradient-to-b from-slate-300 to-slate-400' :
-                'bg-gradient-to-b from-orange-400 to-orange-500',
+                rank === 1 ? 'bg-linear-to-b from-amber-400 to-amber-500' :
+                rank === 2 ? 'bg-linear-to-b from-slate-300 to-slate-400' :
+                'bg-linear-to-b from-orange-400 to-orange-500',
               )}>
                 <span className={cn(
                   'font-black',

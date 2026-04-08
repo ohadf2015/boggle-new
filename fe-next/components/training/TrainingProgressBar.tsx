@@ -114,7 +114,7 @@ const SkillCheckpoint = memo<{
     >
       {/* Icon */}
       <div className={cn(
-        'flex-shrink-0 p-1.5 rounded-md',
+        'shrink-0 p-1.5 rounded-md',
         isCompleted ? 'bg-neo-lime/20' : skill.bgColor
       )}>
         {isCompleted ? (
@@ -259,7 +259,7 @@ const TrainingProgressBar: React.FC<TrainingProgressBarProps> = ({
                 {t('training.progress.tapForDetails')}
               </span>
               <ChevronDown className={cn(
-                'w-4 h-4 flex-shrink-0',
+                'w-4 h-4 shrink-0',
                 isDarkMode ? 'text-gray-400' : 'text-gray-500'
               )} />
             </div>

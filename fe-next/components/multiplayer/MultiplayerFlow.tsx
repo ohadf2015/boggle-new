@@ -14,8 +14,11 @@ import { getJoinUrl } from '@/utils/share';
 import { useCrazyGamesInvite } from '@/hooks/useCrazyGamesInvite';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { SeasonBanner } from '@/components/multiplayer/SeasonBanner';
+import { MatchmakingOverlay } from '@/components/multiplayer/MatchmakingOverlay';
+import { useMatchmaking } from '@/hooks/useMatchmaking';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 
 type FlowState = 'room-list' | 'join-modal' | 'create-modal';
@@ -79,7 +82,19 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
   setHostUsername,
 }) => {
   const { t } = useLanguage();
+  const { canPlayRanked, profile } = useAuth();
   const { isOnCrazyGamesPlatform } = useCrazyGames();
+  const matchmaking = useMatchmaking();
+
+  // Auto-join ranked match room when found
+  useEffect(() => {
+    if (matchmaking.status !== 'found' || !matchmaking.roomId) return;
+    const timer = setTimeout(() => {
+      setGameCode(matchmaking.roomId!);
+      handleJoin(false, defaultLanguage, matchmaking.roomId!);
+    }, 1500); // Brief delay so player sees the opponent card
+    return () => clearTimeout(timer);
+  }, [matchmaking.status, matchmaking.roomId, handleJoin, defaultLanguage, setGameCode]);
 
   // Flow state - simplified to room-list with modal overlays
   const [flowState, setFlowState] = useState<FlowState>(autoCreate ? 'create-modal' : 'room-list');
@@ -336,8 +351,28 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
     <>
       <div className="px-4 pt-3">
         <SeasonBanner />
-        {/* TODO: Wire "Ranked Match" button + MatchmakingOverlay once player ELO is available in lobby context */}
+        {canPlayRanked && (
+          <button
+            onClick={() => matchmaking.joinQueue('classic', defaultLanguage)}
+            disabled={matchmaking.status !== 'idle'}
+            className="mt-2 w-full rounded-neo border-neo bg-neo-pink px-4 py-3 font-neo-display text-neo-white shadow-hard-sm transition-transform active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed disabled:opacity-50"
+          >
+            ⚔️ {t('matchmaking.rankedMatch')}
+          </button>
+        )}
       </div>
+
+      <MatchmakingOverlay
+        status={matchmaking.status}
+        elo={profile?.ranked_mmr ?? 1000}
+        eloRange={matchmaking.eloRange}
+        queueSize={matchmaking.queueSize}
+        waitTime={matchmaking.waitTime}
+        opponent={matchmaking.opponent}
+        onCancel={matchmaking.leaveQueue}
+        onCreateRoom={() => { matchmaking.leaveQueue(); setFlowState('create-modal'); }}
+        t={t as (key: string, params?: Record<string, unknown>) => string}
+      />
 
       {/* UX-014: Room fetch timeout retry banner */}
       {roomFetchTimedOut && !roomsLoading && activeRooms.length === 0 && (

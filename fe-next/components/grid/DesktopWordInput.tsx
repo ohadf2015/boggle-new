@@ -160,7 +160,7 @@ const DesktopWordInput = memo<DesktopWordInputProps>(({
             spellCheck={false}
             aria-label={t('desktopInput.ariaLabel') || 'Type a word to submit'}
             className={cn(
-              'flex-1 bg-transparent outline-none font-black text-lg uppercase tracking-wider',
+              'flex-1 bg-transparent outline-hidden font-black text-lg uppercase tracking-wider',
               'text-neo-black placeholder:text-neo-black/30 placeholder:font-bold placeholder:text-sm placeholder:normal-case placeholder:tracking-normal',
               'caret-neo-cyan',
             )}
@@ -191,7 +191,7 @@ const DesktopWordInput = memo<DesktopWordInputProps>(({
             className={cn(
               'p-1.5 rounded-neo border-2 transition-all duration-150',
               isSubmittable
-                ? 'bg-neo-lime border-neo-black text-neo-black shadow-hard-pressed hover:shadow-hard-sm hover:translate-x-[-1px] hover:translate-y-[-1px] cursor-pointer'
+                ? 'bg-neo-lime border-neo-black text-neo-black shadow-hard-pressed hover:shadow-hard-sm hover:-translate-x-px hover:-translate-y-px cursor-pointer'
                 : 'bg-neo-black/10 border-neo-black/20 text-neo-black/30 cursor-not-allowed',
             )}
             aria-label={t('desktopInput.submit') || 'Submit word'}

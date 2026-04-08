@@ -85,7 +85,7 @@ export default function TeacherDashboard() {
       <select
         value={selectedClassroomId}
         onChange={(e) => setSelectedClassroomId(e.target.value)}
-        className="px-3 py-1.5 bg-neo-cream border-2 border-black text-black font-neo-body font-bold text-sm shadow-hard-sm rounded-neo focus:outline-none focus:ring-2 focus:ring-neo-cyan"
+        className="px-3 py-1.5 bg-neo-cream border-2 border-black text-black font-neo-body font-bold text-sm shadow-hard-sm rounded-neo focus:outline-hidden focus:ring-2 focus:ring-neo-cyan"
       >
         {classrooms.map((c) => (
           <option key={c.id} value={c.id}>{c.name}</option>
@@ -132,7 +132,7 @@ export default function TeacherDashboard() {
                   onClick={() => setActiveTab(tab.id)}
                   className={cn(
                     'relative flex items-center gap-2 px-4 py-2 rounded-neo font-neo-body font-bold text-sm transition-all',
-                    'focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-lime focus-visible:ring-offset-1 focus-visible:ring-offset-neo-navy',
+                    'focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-lime focus-visible:ring-offset-1 focus-visible:ring-offset-neo-navy',
                     isActive
                       ? cn(tab.activeBg, tab.activeText, 'border-2 border-black shadow-hard-sm')
                       : 'text-neo-white/60 hover:text-neo-white hover:bg-neo-white/5 border-2 border-transparent'
@@ -158,10 +158,10 @@ export default function TeacherDashboard() {
                 className={cn(
                   'w-full flex items-center gap-5 p-6 rounded-neo border-3 border-black',
                   'bg-neo-cyan shadow-hard-lg text-left',
-                  'focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-lime'
+                  'focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-lime'
                 )}
               >
-                <div className="w-14 h-14 rounded-neo bg-black border-2 border-black flex items-center justify-center shadow-hard-sm flex-shrink-0">
+                <div className="w-14 h-14 rounded-neo bg-black border-2 border-black flex items-center justify-center shadow-hard-sm shrink-0">
                   <Gamepad2 className="w-7 h-7 text-neo-cyan" />
                 </div>
                 <div>
@@ -198,7 +198,7 @@ export default function TeacherDashboard() {
 
               {/* Tip */}
               <div className="flex items-start gap-3 p-4 rounded-neo border-2 border-neo-lime/30 bg-neo-lime/5">
-                <span className="text-lg flex-shrink-0">💡</span>
+                <span className="text-lg shrink-0">💡</span>
                 <div>
                   <p className="text-sm font-bold text-neo-lime">{t('teacher.dashboard.quickTip')}</p>
                   <p className="text-xs text-neo-white/60 font-neo-body mt-0.5">
@@ -290,7 +290,7 @@ export default function TeacherDashboard() {
                         'text-black font-neo-body font-bold'
                       )}
                     >
-                      <div className="w-10 h-10 rounded-neo bg-neo-lime border-2 border-black flex items-center justify-center shadow-hard-sm flex-shrink-0">
+                      <div className="w-10 h-10 rounded-neo bg-neo-lime border-2 border-black flex items-center justify-center shadow-hard-sm shrink-0">
                         <FileText className="w-5 h-5 text-black" />
                       </div>
                       <div>

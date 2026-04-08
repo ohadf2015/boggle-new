@@ -256,7 +256,7 @@ export default function CommunityPageClient() {
           className={cn(
             'mb-8 p-4 rounded-neo',
             'border-2 border-neo-yellow/20',
-            'bg-gradient-to-br from-neo-yellow/[0.04] via-transparent to-neo-pink/[0.04]'
+            'bg-linear-to-br from-neo-yellow/4 via-transparent to-neo-pink/4'
           )}
         >
           <div className="flex items-center gap-2 mb-3">
@@ -284,7 +284,7 @@ export default function CommunityPageClient() {
           transition={{ delay: 0.25, duration: 0.35 }}
           className={cn(
             'flex p-1 mb-8 overflow-x-auto scrollbar-hide',
-            'bg-neo-white/[0.03] border-2 border-neo-white/10 rounded-neo'
+            'bg-neo-white/3 border-2 border-neo-white/10 rounded-neo'
           )}
           role="tablist"
         >

@@ -103,7 +103,7 @@ export default function CognitiveRadarChart({ domains }: CognitiveRadarChartProp
         'relative overflow-hidden',
         isDarkMode
           ? 'bg-neo-navy'
-          : 'bg-gradient-to-br from-white via-gray-50 to-white'
+          : 'bg-linear-to-br from-white via-gray-50 to-white'
       )}
     >
       {/* Animated background gradient overlay */}
@@ -236,7 +236,7 @@ export default function CognitiveRadarChart({ domains }: CognitiveRadarChartProp
       <div className="relative z-10 flex items-center justify-center gap-2 mt-4">
         <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-neo border-2 border-neo-black bg-neo-cream/50">
           <motion.div
-            className="w-3 h-3 rounded-full border-2 border-neo-black bg-gradient-to-r from-neo-cyan via-purple-400 to-neo-pink"
+            className="w-3 h-3 rounded-full border-2 border-neo-black bg-linear-to-r from-neo-cyan via-purple-400 to-neo-pink"
             animate={{
               boxShadow: [
                 '0 0 8px rgba(0, 255, 255, 0.5)',

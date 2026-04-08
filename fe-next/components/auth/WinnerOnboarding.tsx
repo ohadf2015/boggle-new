@@ -128,7 +128,7 @@ const WinnerOnboarding: React.FC<WinnerOnboardingProps> = ({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
+        className="fixed inset-0 z-110 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs"
         onClick={(e) => e.stopPropagation()}
       >
         <motion.div
@@ -265,7 +265,7 @@ const WinnerOnboarding: React.FC<WinnerOnboardingProps> = ({
                     />
                     {selectedAvatar.id === avatar.id && (
                       <div className="absolute inset-0 bg-amber-400/20 flex items-center justify-center">
-                        <Check className="w-6 h-6 text-amber-600 drop-shadow" />
+                        <Check className="w-6 h-6 text-amber-600 drop-shadow-sm" />
                       </div>
                     )}
                   </motion.button>

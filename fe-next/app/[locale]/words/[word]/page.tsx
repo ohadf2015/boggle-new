@@ -110,7 +110,7 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
         ['es-CO', `${BASE_URL}/es/words/${word.toLowerCase()}`],
       ]),
     },
-    robots: { index: false, follow: true },
+    robots: { index: true, follow: true },
   };
 }
 

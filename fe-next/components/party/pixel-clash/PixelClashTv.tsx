@@ -7,10 +7,12 @@
  */
 
 import { memo, useEffect, useState } from 'react';
+import { setInterval, clearInterval } from 'worker-timers';
 import type { Socket } from 'socket.io-client';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { DrawingDisplay, type DrawingData } from './DrawingCanvas';
+import { usePartySounds } from '@/hooks/usePartySounds';
 
 // ==================== Types ====================
 
@@ -67,6 +69,7 @@ type TvPhase =
 
 function PixelClashTvInner({ socket }: { socket: Socket | null }) {
   const { t } = useLanguage();
+  const partySounds = usePartySounds();
   const [phase, setPhase] = useState<TvPhase>('waiting');
   const [phaseData, setPhaseData] = useState<PhaseUpdateData | null>(null);
   const [artistStrokes, setArtistStrokes] = useState<DrawingData>([]);
@@ -79,9 +82,10 @@ function PixelClashTvInner({ socket }: { socket: Socket | null }) {
   // Timer
   useEffect(() => {
     if (timeRemaining <= 0) return;
+    if (timeRemaining <= 5) partySounds.onCountdown(timeRemaining);
     const interval = setInterval(() => setTimeRemaining(prev => Math.max(0, prev - 1)), 1000);
     return () => clearInterval(interval);
-  }, [timeRemaining]);
+  }, [timeRemaining, partySounds]);
 
   // Socket listeners
   useEffect(() => {
@@ -91,6 +95,7 @@ function PixelClashTvInner({ socket }: { socket: Socket | null }) {
       setPhaseData(data);
       setPhase(data.phase as TvPhase);
       setTimeRemaining(data.timeSeconds);
+      partySounds.onPhaseTransition();
       setBuilderStrokes({});
       setMergeData(null);
       setChainData(null);
@@ -123,16 +128,19 @@ function PixelClashTvInner({ socket }: { socket: Socket | null }) {
     const onMergeReveal = (data: MergeRevealData) => {
       setPhase('relay-merge');
       setMergeData(data);
+      partySounds.onReveal();
     };
 
     const onChainReveal = (data: ChainRevealData) => {
       setPhase('gallery-reveal');
       setChainData(data);
+      partySounds.onReveal();
     };
 
     const onShowdownResults = (data: ShowdownResultsData) => {
       setPhase('crown');
       setShowdownResults(data);
+      partySounds.onCrowned();
     };
 
     socket.on('party:pixel:phaseUpdate', onPhaseUpdate);

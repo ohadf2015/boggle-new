@@ -89,7 +89,7 @@ const FirstWinSignupModal: React.FC<FirstWinSignupModalProps> = ({
 
         <DialogBody className="relative p-6 pt-0">
           {/* Decorative background glow */}
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-32 bg-gradient-to-b from-yellow-500/20 to-transparent rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-32 bg-linear-to-b from-yellow-500/20 to-transparent rounded-full blur-3xl pointer-events-none" />
 
 
           {/* Trophy animation */}
@@ -179,7 +179,7 @@ const FirstWinSignupModal: React.FC<FirstWinSignupModalProps> = ({
                   )}
                 >
                   <benefit.icon
-                    className={cn('flex-shrink-0', isDarkMode ? 'text-cyan-400' : 'text-cyan-600')}
+                    className={cn('shrink-0', isDarkMode ? 'text-cyan-400' : 'text-cyan-600')}
                     size={16}
                   />
                   <span>{t(benefit.translationKey)}</span>

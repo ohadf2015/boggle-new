@@ -26,7 +26,7 @@ import { checkRateLimit } from '../../utils/rateLimiter';
  */
 const submitScoreSchema = z.object({
   duelId: z.string().uuid('Invalid duel ID'),
-  wordsFound: z.array(z.string()).min(0, 'Words found must be an array'),
+  wordsFound: z.array(z.string().max(50)).max(500, 'Too many words').min(0, 'Words found must be an array'),
 });
 
 type SubmitScorePayload = z.infer<typeof submitScoreSchema>;

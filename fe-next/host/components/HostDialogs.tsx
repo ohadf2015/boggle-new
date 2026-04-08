@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { memo, useCallback, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { QrCode, Trophy } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
@@ -24,12 +24,12 @@ interface QRCodeDialogProps {
   t: (path: string, params?: Record<string, string | number>) => string;
 }
 
-export const QRCodeDialog: React.FC<QRCodeDialogProps> = ({
+export const QRCodeDialog: React.FC<QRCodeDialogProps> = memo(function QRCodeDialog({
   open,
   onOpenChange,
   gameCode,
   t
-}): React.ReactElement => {
+}: QRCodeDialogProps): React.ReactElement {
   const handleClose = useCallback(() => {
     onOpenChange(false);
   }, [onOpenChange]);
@@ -66,7 +66,7 @@ export const QRCodeDialog: React.FC<QRCodeDialogProps> = ({
       </DialogContent>
     </Dialog>
   );
-};
+});
 
 // ==================== Validation Modal ====================
 
@@ -89,7 +89,7 @@ interface ValidationModalProps {
   t: (path: string, params?: Record<string, string | number>) => string;
 }
 
-export const ValidationModal: React.FC<ValidationModalProps> = ({
+export const ValidationModal: React.FC<ValidationModalProps> = memo(function ValidationModal({
   open,
   onOpenChange,
   playerWords,
@@ -97,7 +97,7 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
   onToggleValidation,
   onSubmit,
   t,
-}): React.ReactElement => {
+}) {
   // Memoized handler for word validation toggle
   const handleToggleWord = useCallback((word: string, isDuplicate: boolean) => {
     if (!isDuplicate) {
@@ -106,7 +106,7 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
   }, [onToggleValidation]);
 
   // Collect unique words and count duplicates
-  const getUniqueWords = () => {
+  const uniqueWords = useMemo(() => {
     const uniqueWordsMap = new Map<string, {
       word: string;
       playerCount: number;
@@ -134,19 +134,17 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
       });
     });
 
-    const uniqueWords = Array.from(uniqueWordsMap.values());
-    uniqueWords.sort((a, b) => a.word.localeCompare(b.word));
-    return uniqueWords;
-  };
-
-  const uniqueWords = getUniqueWords();
+    const words = Array.from(uniqueWordsMap.values());
+    words.sort((a, b) => a.word.localeCompare(b.word));
+    return words;
+  }, [playerWords]);
   const nonAutoVerifiedWords = uniqueWords.filter(item => !item.autoValidated);
   const autoVerifiedWords = uniqueWords.filter(item => item.autoValidated);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent noDescription className="max-w-2xl max-h-[85vh] flex flex-col bg-neo-navy text-white border-cyan-500/40">
-        <DialogHeader className="flex-shrink-0 pb-2">
+        <DialogHeader className="shrink-0 pb-2">
           <DialogTitle className="text-center text-2xl font-black text-neo-cyan">
             {t('hostView.validation')}
           </DialogTitle>
@@ -199,7 +197,7 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
 
             {/* Auto-validated summary */}
             {autoVerifiedWords.length > 0 && (
-              <div className="flex-shrink-0 py-2 px-3 bg-teal-900/30 rounded-lg border border-teal-500/40 text-center">
+              <div className="shrink-0 py-2 px-3 bg-teal-900/30 rounded-lg border border-teal-500/40 text-center">
                 <span className="text-sm text-teal-300">
                   ✓ {autoVerifiedWords.length} {t('hostView.wordsAutoValidated')}
                 </span>
@@ -208,7 +206,7 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
           </div>
         </div>
 
-        <DialogFooter className="flex-shrink-0 pt-3 border-t border-cyan-500/30">
+        <DialogFooter className="shrink-0 pt-3 border-t border-cyan-500/30">
           <Button
             onClick={onSubmit}
             className="w-full h-12 text-lg font-black uppercase bg-neo-lime text-neo-black border-3 border-neo-black shadow-hard hover:shadow-hard-lg active:shadow-hard-pressed"
@@ -219,7 +217,7 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
       </DialogContent>
     </Dialog>
   );
-};
+});
 
 // ==================== Final Scores Modal ====================
 
@@ -249,7 +247,7 @@ interface FinalScoresModalProps {
   wordHuntSummary?: { targetWord: string; playerLives: Record<string, number>; eliminatedPlayers: string[]; targetFoundBy: string | null };
 }
 
-export const FinalScoresModal: React.FC<FinalScoresModalProps> = ({
+export const FinalScoresModal: React.FC<FinalScoresModalProps> = memo(function FinalScoresModal({
   open,
   onOpenChange,
   finalScores,
@@ -261,7 +259,7 @@ export const FinalScoresModal: React.FC<FinalScoresModalProps> = ({
   socket,
   playersReady,
   wordHuntSummary,
-}): React.ReactElement => {
+}) {
   const handleClose = useCallback(() => {
     onOpenChange(false);
   }, [onOpenChange]);
@@ -439,7 +437,7 @@ export const FinalScoresModal: React.FC<FinalScoresModalProps> = ({
       </DialogContent>
     </Dialog>
   );
-};
+});
 
 // ==================== Exit Confirmation Dialog ====================
 
@@ -450,12 +448,12 @@ interface ExitConfirmDialogProps {
   t: (path: string, params?: Record<string, string | number>) => string;
 }
 
-export const ExitConfirmDialog: React.FC<ExitConfirmDialogProps> = ({
+export const ExitConfirmDialog: React.FC<ExitConfirmDialogProps> = memo(function ExitConfirmDialog({
   open,
   onOpenChange,
   onConfirm,
   t
-}): React.ReactElement => (
+}) { return (
   <AlertDialog open={open} onOpenChange={onOpenChange}>
     <AlertDialogContent className="bg-white text-neo-black dark:bg-neo-navy dark:text-white border-red-500/30">
       <AlertDialogHeader>
@@ -479,7 +477,7 @@ export const ExitConfirmDialog: React.FC<ExitConfirmDialogProps> = ({
       </AlertDialogFooter>
     </AlertDialogContent>
   </AlertDialog>
-);
+); });
 
 // ==================== Solo Start Confirm Dialog ====================
 
@@ -490,12 +488,12 @@ interface SoloStartConfirmDialogProps {
   t: (path: string, params?: Record<string, string | number>) => string;
 }
 
-export const SoloStartConfirmDialog: React.FC<SoloStartConfirmDialogProps> = ({
+export const SoloStartConfirmDialog: React.FC<SoloStartConfirmDialogProps> = memo(function SoloStartConfirmDialog({
   open,
   onOpenChange,
   onConfirm,
   t
-}): React.ReactElement => (
+}) { return (
   <AlertDialog open={open} onOpenChange={onOpenChange}>
     <AlertDialogContent className="bg-white text-neo-black dark:bg-neo-navy dark:text-white border-neo-cyan/30">
       <AlertDialogHeader>
@@ -519,7 +517,7 @@ export const SoloStartConfirmDialog: React.FC<SoloStartConfirmDialogProps> = ({
       </AlertDialogFooter>
     </AlertDialogContent>
   </AlertDialog>
-);
+); });
 
 // ==================== Cancel Tournament Dialog ====================
 
@@ -530,12 +528,12 @@ interface CancelTournamentDialogProps {
   t: (path: string, params?: Record<string, string | number>) => string;
 }
 
-export const CancelTournamentDialog: React.FC<CancelTournamentDialogProps> = ({
+export const CancelTournamentDialog: React.FC<CancelTournamentDialogProps> = memo(function CancelTournamentDialog({
   open,
   onOpenChange,
   onConfirm,
   t
-}): React.ReactElement => (
+}) { return (
   <AlertDialog open={open} onOpenChange={onOpenChange}>
     <AlertDialogContent className="bg-white text-neo-black dark:bg-neo-navy dark:text-white border-red-500/30">
       <AlertDialogHeader>
@@ -559,4 +557,4 @@ export const CancelTournamentDialog: React.FC<CancelTournamentDialogProps> = ({
       </AlertDialogFooter>
     </AlertDialogContent>
   </AlertDialog>
-);
+); });

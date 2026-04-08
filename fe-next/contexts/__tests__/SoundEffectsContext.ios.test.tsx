@@ -150,7 +150,7 @@ describe('SoundEffectsContext iOS Safari Compatibility', () => {
 
       // Expected sound effects
       const expectedSounds = [
-        '/sounds/achievment.mp3',
+        '/sounds/achievement.mp3',
         '/sounds/combo.mp3',
         '/sounds/word-accepted.mp3',
         '/sounds/countdown-beep.mp3',

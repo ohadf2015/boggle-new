@@ -1,6 +1,7 @@
 import cron, { ScheduledTask } from 'node-cron';
 import { populateWikipediaWords } from './wikipediaWordPopulator';
 import { runDictionaryEnrichment } from '../modules/dictionaryEnrichment';
+import { withCronLock } from '../utils/cronLock';
 import type { Language } from '@/shared/types/game';
 import logger from '../utils/logger';
 
@@ -22,37 +23,37 @@ const LANGUAGES: readonly Language[] = ['en', 'he', 'sv', 'ja', 'es'] as const;
  */
 export function startWikipediaWordCron() {
   const task = cron.schedule('55 23 * * *', async () => {
-    logger.info('CRON', 'Starting Wikipedia word population...');
-    const startTime = Date.now();
+    await withCronLock('cron:wikipedia', 10 * 60 * 1000, async () => {
+      logger.info('CRON', 'Starting Wikipedia word population...');
+      const startTime = Date.now();
 
-    const results: Record<string, { success: boolean; wordsFound?: number; error?: string }> = {};
+      const results: Record<string, { success: boolean; wordsFound?: number; error?: string }> = {};
 
-    // Process languages in parallel for better performance
-    const populationPromises = LANGUAGES.map(async (language) => {
-      try {
-        logger.info('CRON', `Fetching Wikipedia words for ${language}...`);
-        const result = await populateWikipediaWords(new Date(), language);
-        logger.info('CRON', `${language}: ${result.wordsFound} words found`);
-        return { language, success: true, wordsFound: result.wordsFound };
-      } catch (error) {
-        const errorMsg = error instanceof Error ? error.message : 'Unknown error';
-        logger.error('CRON', `${language} failed`, { error: errorMsg });
-        return { language, success: false, error: errorMsg };
+      const populationPromises = LANGUAGES.map(async (language) => {
+        try {
+          logger.info('CRON', `Fetching Wikipedia words for ${language}...`);
+          const result = await populateWikipediaWords(new Date(), language);
+          logger.info('CRON', `${language}: ${result.wordsFound} words found`);
+          return { language, success: true, wordsFound: result.wordsFound };
+        } catch (error) {
+          const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+          logger.error('CRON', `${language} failed`, { error: errorMsg });
+          return { language, success: false, error: errorMsg };
+        }
+      });
+
+      const settledResults = await Promise.allSettled(populationPromises);
+
+      for (const result of settledResults) {
+        if (result.status === 'fulfilled') {
+          const { language, success, wordsFound, error } = result.value;
+          results[language] = { success, wordsFound, error };
+        }
       }
+
+      const duration = Date.now() - startTime;
+      logger.info('CRON', `Wikipedia word population complete in ${duration}ms`, { results });
     });
-
-    const settledResults = await Promise.allSettled(populationPromises);
-
-    // Collect results from all promises
-    for (const result of settledResults) {
-      if (result.status === 'fulfilled') {
-        const { language, success, wordsFound, error } = result.value;
-        results[language] = { success, wordsFound, error };
-      }
-    }
-
-    const duration = Date.now() - startTime;
-    logger.info('CRON', `Wikipedia word population complete in ${duration}ms`, { results });
   }, {
     timezone: 'UTC',
   });
@@ -160,18 +161,20 @@ async function callEdgeFunction(
  */
 export function startDailyWordSelectorCron() {
   const task = cron.schedule('0 1 * * *', async () => {
-    logger.info('CRON', 'Starting daily word selection...');
-    const startTime = Date.now();
+    await withCronLock('cron:daily-word', 5 * 60 * 1000, async () => {
+      logger.info('CRON', 'Starting daily word selection...');
+      const startTime = Date.now();
 
-    const result = await callEdgeFunction('daily-word-selector', '🎯 [CRON]');
+      const result = await callEdgeFunction('daily-word-selector', '🎯 [CRON]');
 
-    const duration = Date.now() - startTime;
-    if (result.success) {
-      const data = result.data as { summary?: { created: number; skipped: number } };
-      logger.info('CRON', `Daily word selection complete in ${duration}ms`, { summary: data.summary });
-    } else {
-      logger.error('CRON', 'Daily word selection failed', { error: result.error });
-    }
+      const duration = Date.now() - startTime;
+      if (result.success) {
+        const data = result.data as { summary?: { created: number; skipped: number } };
+        logger.info('CRON', `Daily word selection complete in ${duration}ms`, { summary: data.summary });
+      } else {
+        logger.error('CRON', 'Daily word selection failed', { error: result.error });
+      }
+    });
   }, {
     timezone: 'UTC',
   });
@@ -188,18 +191,20 @@ export function startBotDifficultyCalculatorCron() {
   // Run every Sunday at 03:00 UTC
   // Cron pattern: '0 3 * * 0' = At 03:00 on Sunday
   const task = cron.schedule('0 3 * * 0', async () => {
-    logger.info('CRON', 'Starting bot difficulty calculation...');
-    const startTime = Date.now();
+    await withCronLock('cron:bot-difficulty', 5 * 60 * 1000, async () => {
+      logger.info('CRON', 'Starting bot difficulty calculation...');
+      const startTime = Date.now();
 
-    const result = await callEdgeFunction('bot-difficulty-calculator', '[BOT-CRON]');
+      const result = await callEdgeFunction('bot-difficulty-calculator', '[BOT-CRON]');
 
-    const duration = Date.now() - startTime;
-    if (result.success) {
-      const data = result.data as { summary?: { updated: number; fallback: number } };
-      logger.info('CRON', `Bot difficulty calculation complete in ${duration}ms`, { summary: data.summary });
-    } else {
-      logger.error('CRON', 'Bot difficulty calculation failed', { error: result.error });
-    }
+      const duration = Date.now() - startTime;
+      if (result.success) {
+        const data = result.data as { summary?: { updated: number; fallback: number } };
+        logger.info('CRON', `Bot difficulty calculation complete in ${duration}ms`, { summary: data.summary });
+      } else {
+        logger.error('CRON', 'Bot difficulty calculation failed', { error: result.error });
+      }
+    });
   }, {
     timezone: 'UTC',
   });
@@ -258,21 +263,23 @@ export async function triggerBotDifficultyCalculation(): Promise<{
  */
 export function startDictionaryEnrichmentCron() {
   const task = cron.schedule('0 4 * * *', async () => {
-    logger.info('CRON', 'Starting Hebrew dictionary enrichment...');
-    const startTime = Date.now();
+    await withCronLock('cron:dictionary-enrichment', 10 * 60 * 1000, async () => {
+      logger.info('CRON', 'Starting Hebrew dictionary enrichment...');
+      const startTime = Date.now();
 
-    try {
-      const result = await runDictionaryEnrichment();
+      try {
+        const result = await runDictionaryEnrichment();
 
-      const duration = Date.now() - startTime;
-      logger.info('CRON', `Dictionary enrichment complete in ${duration}ms`, {
-        verification: { verified: result.verification.verified, processed: result.verification.processed },
-        promotion: { promoted: result.promotion.promoted, failed: result.promotion.failed, words: result.promotion.words },
-      });
-    } catch (error) {
-      const errorMsg = error instanceof Error ? error.message : 'Unknown error';
-      logger.error('CRON', 'Dictionary enrichment failed', { error: errorMsg });
-    }
+        const duration = Date.now() - startTime;
+        logger.info('CRON', `Dictionary enrichment complete in ${duration}ms`, {
+          verification: { verified: result.verification.verified, processed: result.verification.processed },
+          promotion: { promoted: result.promotion.promoted, failed: result.promotion.failed, words: result.promotion.words },
+        });
+      } catch (error) {
+        const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+        logger.error('CRON', 'Dictionary enrichment failed', { error: errorMsg });
+      }
+    });
   }, {
     timezone: 'UTC',
   });
@@ -328,25 +335,27 @@ export async function triggerDictionaryEnrichment(): Promise<{
  */
 export function startAutoPromotionCron() {
   const task = cron.schedule('0 */4 * * *', async () => {
-    logger.info('CRON', 'Starting auto-promotion pipeline...');
-    const startTime = Date.now();
+    await withCronLock('cron:auto-promotion', 5 * 60 * 1000, async () => {
+      logger.info('CRON', 'Starting auto-promotion pipeline...');
+      const startTime = Date.now();
 
-    try {
-      const { runAutoPromotion } = await import('../modules/autoPromotion');
-      const result = await runAutoPromotion();
-      const duration = Date.now() - startTime;
+      try {
+        const { runAutoPromotion } = await import('../modules/autoPromotion');
+        const result = await runAutoPromotion();
+        const duration = Date.now() - startTime;
 
-      if (result.skipped) {
-        logger.info('CRON', 'Auto-promotion skipped (already running)');
-      } else {
-        logger.info('CRON', `Auto-promotion complete in ${duration}ms`, {
-          promoted: result.promoted, failed: result.failed, words: result.words,
-        });
+        if (result.skipped) {
+          logger.info('CRON', 'Auto-promotion skipped (already running)');
+        } else {
+          logger.info('CRON', `Auto-promotion complete in ${duration}ms`, {
+            promoted: result.promoted, failed: result.failed, words: result.words,
+          });
+        }
+      } catch (error) {
+        const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+        logger.error('CRON', 'Auto-promotion failed', { error: errorMsg });
       }
-    } catch (error) {
-      const errorMsg = error instanceof Error ? error.message : 'Unknown error';
-      logger.error('CRON', 'Auto-promotion failed', { error: errorMsg });
-    }
+    });
   }, {
     timezone: 'UTC',
   });

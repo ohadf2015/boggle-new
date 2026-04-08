@@ -414,12 +414,12 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
         bg-white/95 dark:bg-slate-800/95
         rounded-2xl border-2 border-slate-200 dark:border-slate-700
         ${compact ? 'p-3' : 'p-4 sm:p-5'}
-        shadow-lg backdrop-blur-sm
+        shadow-lg backdrop-blur-xs
       `}
     >
       {/* Header - always visible */}
       <div className="flex items-center gap-3 mb-3">
-        <div className="p-2 sm:p-2.5 bg-gradient-to-br from-indigo-500 to-purple-600 text-white rounded-xl border-2 border-indigo-600 shadow-md">
+        <div className="p-2 sm:p-2.5 bg-linear-to-br from-indigo-500 to-purple-600 text-white rounded-xl border-2 border-indigo-600 shadow-md">
           <Trophy className="w-5 h-5 sm:w-6 sm:h-6 text-amber-300" />
         </div>
         <div className="flex-1 min-w-0">

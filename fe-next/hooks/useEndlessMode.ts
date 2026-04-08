@@ -7,7 +7,7 @@
 
 'use client';
 
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { generateEndlessFloor, getEndlessDifficulty, type EndlessDifficulty } from '@/lib/adventure/endlessMode';
 
 export interface UseEndlessModeReturn {
@@ -56,6 +56,11 @@ export function useEndlessMode({
   const [currentFloor, setCurrentFloor] = useState(1);
   const [isActive, setIsActive] = useState(false);
   const [highFloor, setHighFloor] = useState(initialHighFloor);
+  const highFloorRef = useRef(initialHighFloor);
+
+  useEffect(() => {
+    highFloorRef.current = highFloor;
+  }, [highFloor]);
 
   const levelConfig = useMemo(() => generateEndlessFloor(currentFloor), [currentFloor]);
   const difficulty = useMemo(() => getEndlessDifficulty(currentFloor), [currentFloor]);
@@ -68,14 +73,15 @@ export function useEndlessMode({
   const advanceFloor = useCallback(() => {
     setCurrentFloor(prev => {
       const next = prev + 1;
-      if (next > highFloor) {
+      if (next > highFloorRef.current) {
+        highFloorRef.current = next;
         setHighFloor(next);
         onNewHighFloor?.(next);
         saveHighFloor(next);
       }
       return next;
     });
-  }, [highFloor, onNewHighFloor]);
+  }, [onNewHighFloor]);
 
   const endRun = useCallback(() => {
     setIsActive(false);

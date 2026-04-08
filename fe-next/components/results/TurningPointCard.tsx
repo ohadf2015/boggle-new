@@ -105,7 +105,7 @@ const TurningPointCard = memo<TurningPointCardProps>(({ allPlayerWords, currentU
     >
       <div className="flex items-start gap-2">
         <Swords className={cn(
-          'w-4 h-4 mt-0.5 flex-shrink-0',
+          'w-4 h-4 mt-0.5 shrink-0',
           turningPoint.isCurrentPlayer ? 'text-neo-lime' : 'text-neo-pink'
         )} />
         <div className="min-w-0">

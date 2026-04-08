@@ -107,7 +107,7 @@ export default function NewYearCountdown({ enabled = true }: NewYearCountdownPro
       <AnimatePresence>
         {showPreNotification && (
           <motion.div
-            className="fixed top-4 right-4 z-[9998] max-w-xs"
+            className="fixed top-4 right-4 z-9998 max-w-xs"
             initial={{ opacity: 0, x: 100, rotate: 3 }}
             animate={{ opacity: 1, x: 0, rotate: 0 }}
             exit={{ opacity: 0, x: 100, rotate: -3 }}
@@ -115,7 +115,7 @@ export default function NewYearCountdown({ enabled = true }: NewYearCountdownPro
           >
             <div className="bg-neo-pink text-neo-white border-3 border-neo-black rounded-neo-lg shadow-hard-lg p-4">
               <div className="flex items-center gap-3">
-                <Sparkles className="w-6 h-6 flex-shrink-0" />
+                <Sparkles className="w-6 h-6 shrink-0" />
                 <div>
                   <p className="font-black text-sm uppercase">
                     {t('newYear.comingSoon')}

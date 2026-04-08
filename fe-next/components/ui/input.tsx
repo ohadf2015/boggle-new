@@ -22,7 +22,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           // Placeholder styling
           "placeholder:text-muted-foreground placeholder:font-normal",
           // Focus state with cyan ring
-          "focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy",
+          "focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy",
           // Focus: slight "press" effect
           "focus:shadow-hard-pressed",
           // Disabled state

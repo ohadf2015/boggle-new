@@ -36,6 +36,7 @@ const PushNotificationPrompt = nextDynamic(
 // Lazy-load cookie consent banner — only needed on first visit
 const CookieConsent = nextDynamic(() => import('@/components/CookieConsent'));
 
+
 export const dynamicParams = false;
 
 export function generateStaticParams() {
@@ -585,7 +586,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 {/* Skip to main content link for keyboard/screen reader users */}
                 <a
                     href="#main-content"
-                    className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-70 focus:px-4 focus:py-3 focus:min-h-[48px] focus:min-w-[48px] focus:bg-neo-lime focus:text-neo-black focus:font-bold focus:border-3 focus:border-neo-black focus:rounded-neo focus:shadow-hard focus:outline-none focus:flex focus:items-center focus:justify-center focus:ring-4 focus:ring-neo-cyan focus:ring-offset-2"
+                    className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-70 focus:px-4 focus:py-3 focus:min-h-[48px] focus:min-w-[48px] focus:bg-neo-lime focus:text-neo-black focus:font-bold focus:border-3 focus:border-neo-black focus:rounded-neo focus:shadow-hard focus:outline-hidden focus:flex focus:items-center focus:justify-center focus:ring-4 focus:ring-neo-cyan focus:ring-offset-2"
                     aria-label={translations[validLocale]?.accessibility?.skipToMain || 'Skip to main content'}
                 >
                     {translations[validLocale]?.accessibility?.skipToMain || 'Skip to main content'}
@@ -619,7 +620,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 <ConditionalProviders lang={validLocale} initialTranslations={initialTranslations}>
                     {/* VersionChecker needs to be inside providers to access LanguageContext */}
                     <VersionChecker />
-                    <div className="flex-1 flex flex-col min-h-0 relative [overflow-x:clip]">
+                    <div className="flex-1 flex flex-col min-h-0 relative overflow-x-clip">
                         <DesktopGameNav />
                         <main
                             id="main-content"
@@ -630,7 +631,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                                 {children}
                             </div>
                         </main>
-                        <AutoHideFooter className="relative z-0 flex-shrink-0" />
+                        <AutoHideFooter className="relative z-0 shrink-0" />
                         {/* Global bottom navigation - mobile only, hidden during gameplay */}
                         <GlobalBottomNav />
                     </div>

@@ -92,7 +92,7 @@ const PlayerRow: React.FC<PlayerRowProps> = ({
       className={cn(
         'flex items-center gap-2.5 rounded-neo border-2 p-2.5 sm:p-3',
         accent.borderColor,
-        isCurrentPlayer && !eliminated && 'bg-neo-white/[0.04] border-neo-cyan/40',
+        isCurrentPlayer && !eliminated && 'bg-neo-white/4 border-neo-cyan/40',
         eliminated && 'opacity-40',
       )}
     >

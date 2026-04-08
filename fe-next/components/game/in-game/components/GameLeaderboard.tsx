@@ -36,9 +36,9 @@ interface LeaderboardRowProps {
 
 /** Combo badge thresholds and styling */
 function getComboInfo(level: number): { label: string; className: string } | null {
-  if (level >= 15) return { label: `${level}x`, className: 'bg-gradient-to-r from-fuchsia-500 to-pink-500 text-white animate-pulse' };
-  if (level >= 10) return { label: `${level}x`, className: 'bg-gradient-to-r from-red-500 to-orange-500 text-white' };
-  if (level >= 5) return { label: `${level}x`, className: 'bg-gradient-to-r from-amber-400 to-yellow-300 text-neo-black' };
+  if (level >= 15) return { label: `${level}x`, className: 'bg-linear-to-r from-fuchsia-500 to-pink-500 text-white animate-pulse' };
+  if (level >= 10) return { label: `${level}x`, className: 'bg-linear-to-r from-red-500 to-orange-500 text-white' };
+  if (level >= 5) return { label: `${level}x`, className: 'bg-linear-to-r from-amber-400 to-yellow-300 text-neo-black' };
   if (level >= 3) return { label: `${level}x`, className: 'bg-neo-cyan text-neo-black' };
   return null;
 }
@@ -75,19 +75,19 @@ const LeaderboardRow = memo<LeaderboardRowProps>(function LeaderboardRow({
       role="listitem"
       tabIndex={0}
       className={`flex items-center gap-2.5 p-2 rounded-neo border-3 shadow-hard-sm transition-all duration-300
-        hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard
-        focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-1
+        hover:-translate-x-px hover:-translate-y-px hover:shadow-hard
+        focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-1
         ${player.rankStyle} ${dir === 'rtl' ? 'flex-row-reverse' : ''}
         ${player.isMe ? 'ring-2 ring-neo-cyan/50' : ''}`}
     >
       {/* Rank badge with change indicator */}
-      <div className="relative flex-shrink-0">
+      <div className="relative shrink-0">
         <div className="w-9 h-9 rounded-neo flex items-center justify-center font-black text-base bg-neo-black text-neo-cream border-2 border-neo-black">
           {player.rankDisplay}
         </div>
         {/* Rank change arrow */}
         {rankChange !== 0 && (
-          <div className={`absolute -top-1.5 -end-1.5 w-4 h-4 rounded-full flex items-center justify-center text-[8px] font-black
+          <div className={`absolute -top-1.5 -inset-e-1.5 w-4 h-4 rounded-full flex items-center justify-center text-[8px] font-black
             ${rankChange > 0 ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}`}
           >
             {rankChange > 0 ? <TrendingUp className="w-2.5 h-2.5" /> : <TrendingDown className="w-2.5 h-2.5" />}
@@ -109,7 +109,7 @@ const LeaderboardRow = memo<LeaderboardRowProps>(function LeaderboardRow({
         >
           {player.isHost && (
             <Crown
-              className="w-3.5 h-3.5 text-neo-lime flex-shrink-0 drop-shadow-[1px_1px_0px_rgb(var(--neo-black))]"
+              className="w-3.5 h-3.5 text-neo-lime shrink-0 drop-shadow-[1px_1px_0px_rgb(var(--neo-black))]"
             />
           )}
           <PlayerProfileTooltip
@@ -127,7 +127,7 @@ const LeaderboardRow = memo<LeaderboardRowProps>(function LeaderboardRow({
             </span>
           </PlayerProfileTooltip>
           {player.isMe && (
-            <span className="text-[10px] bg-neo-black text-neo-cream px-1 py-0.5 rounded-neo font-bold flex-shrink-0">
+            <span className="text-[10px] bg-neo-black text-neo-cream px-1 py-0.5 rounded-neo font-bold shrink-0">
               {t('playerView.me')}
             </span>
           )}
@@ -160,7 +160,7 @@ const LeaderboardRow = memo<LeaderboardRowProps>(function LeaderboardRow({
         <div className="text-right relative min-w-[50px]">
           {/* Score delta floating */}
           {showScoreDelta && scoreChange > 0 && (
-            <div className="absolute -top-3 end-0 text-[10px] font-black text-green-600 animate-bounce">
+            <div className="absolute -top-3 inset-e-0 text-[10px] font-black text-green-600 animate-bounce">
               +{scoreChange}
             </div>
           )}
@@ -227,7 +227,7 @@ export const GameLeaderboard = memo<GameLeaderboardProps>(function GameLeaderboa
 
   return (
     <AdaptiveMotion.div
-      className="bg-neo-cream text-neo-black border-4 border-neo-black rounded-neo-lg shadow-hard-lg flex flex-col overflow-hidden max-h-[45vh] lg:max-h-[50vh] lg:flex-shrink relative"
+      className="bg-neo-cream text-neo-black border-4 border-neo-black rounded-neo-lg shadow-hard-lg flex flex-col overflow-hidden max-h-[45vh] lg:max-h-[50vh] lg:shrink relative"
       initial={{ x: 50, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       transition={{ delay: 0.2 }}

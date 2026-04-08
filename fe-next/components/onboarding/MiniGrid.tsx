@@ -418,7 +418,7 @@ const MiniGrid: React.FC<MiniGridProps> = ({
         transition={{ delay: 0.3, ...SPRING_SOFT }}
         style={{ scale: progressScale }}
       >
-        <div className="inline-flex items-center gap-3 bg-neo-navy/90 backdrop-blur-sm text-neo-white border-3 border-neo-white/50 rounded-neo px-5 py-3 shadow-hard relative overflow-hidden">
+        <div className="inline-flex items-center gap-3 bg-neo-navy/90 backdrop-blur-xs text-neo-white border-3 border-neo-white/50 rounded-neo px-5 py-3 shadow-hard relative overflow-hidden">
           {/* Animated progress fill */}
           <motion.div
             className="absolute inset-0 bg-neo-lime/25 origin-left"

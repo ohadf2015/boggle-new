@@ -96,7 +96,7 @@ export default function BattlePassRewardCard({
 
       {/* Claimed check */}
       {state === 'claimed' && (
-        <div className="absolute -top-1.5 -end-1.5 w-5 h-5 bg-green-500 border-2 border-neo-black rounded-full flex items-center justify-center z-10">
+        <div className="absolute -top-1.5 -inset-e-1.5 w-5 h-5 bg-green-500 border-2 border-neo-black rounded-full flex items-center justify-center z-10">
           <Check className="w-3 h-3 text-white" />
         </div>
       )}

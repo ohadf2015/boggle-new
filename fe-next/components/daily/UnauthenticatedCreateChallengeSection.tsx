@@ -41,7 +41,7 @@ export const UnauthenticatedCreateChallengeSection: React.FC<UnauthenticatedCrea
       className="relative w-full"
     >
       {/* Main Card - Neo-Brutalist Style */}
-      <div className="relative overflow-hidden rounded-neo border-3 border-neo-black bg-gradient-to-br from-neo-lime via-neo-orange to-neo-lime shadow-hard-lg">
+      <div className="relative overflow-hidden rounded-neo border-3 border-neo-black bg-linear-to-br from-neo-lime via-neo-orange to-neo-lime shadow-hard-lg">
         {/* Sparkle Decoration */}
         <div className="absolute -top-2 -right-2 rtl:-right-auto rtl:-left-2 z-10">
           <motion.div
@@ -61,7 +61,7 @@ export const UnauthenticatedCreateChallengeSection: React.FC<UnauthenticatedCrea
               initial={{ scale: 0, rotate: -20 }}
               animate={{ scale: 1, rotate: 0 }}
               transition={{ delay: 0.4, type: 'spring', stiffness: 200 }}
-              className="flex-shrink-0"
+              className="shrink-0"
             >
               <InteractiveMascot
                 variant="excited"
@@ -102,9 +102,9 @@ export const UnauthenticatedCreateChallengeSection: React.FC<UnauthenticatedCrea
                 initial={{ x: -10, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
                 transition={{ delay: 0.55 + idx * 0.05 }}
-                className="flex items-start gap-2 bg-neo-black/10 rounded-lg p-2.5 backdrop-blur-sm"
+                className="flex items-start gap-2 bg-neo-black/10 rounded-lg p-2.5 backdrop-blur-xs"
               >
-                <benefit.icon className="w-5 h-5 text-neo-black flex-shrink-0 mt-0.5" strokeWidth={2.5} />
+                <benefit.icon className="w-5 h-5 text-neo-black shrink-0 mt-0.5" strokeWidth={2.5} />
                 <span className="text-sm font-bold text-neo-black leading-snug">
                   {t(`daily.createChallengeFeature.benefits.${benefit.key}`)}
                 </span>

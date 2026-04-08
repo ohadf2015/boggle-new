@@ -83,7 +83,7 @@ export function SkillUnlockModal({ skill, onClose }: SkillUnlockModalProps) {
           className={cn(
             'fixed inset-0 z-50',
             'flex items-center justify-center',
-            'bg-neo-black/80 backdrop-blur-sm'
+            'bg-neo-black/80 backdrop-blur-xs'
           )}
           data-testid="skill-unlock-modal"
         >
@@ -109,7 +109,7 @@ export function SkillUnlockModal({ skill, onClose }: SkillUnlockModalProps) {
                 'w-20 h-20 mx-auto mb-6',
                 'flex items-center justify-center',
                 'rounded-full border-4 border-neo-white',
-                'bg-gradient-to-br',
+                'bg-linear-to-br',
                 colors.gradient
               )}
             >
@@ -136,7 +136,7 @@ export function SkillUnlockModal({ skill, onClose }: SkillUnlockModalProps) {
               transition={{ delay: 0.4 }}
               className={cn(
                 'text-2xl font-black text-center mb-4',
-                'bg-gradient-to-r bg-clip-text text-transparent',
+                'bg-linear-to-r bg-clip-text text-transparent',
                 colors.gradient
               )}
             >

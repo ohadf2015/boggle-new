@@ -100,7 +100,7 @@ const LegacyBossDialogue = memo<BossDialogueProps>(
                 height={AVATAR_SIZE}
                 className={cn(
                   'rounded-full border-2 border-neo-yellow',
-                  'flex-shrink-0 object-cover'
+                  'shrink-0 object-cover'
                 )}
               />
 
@@ -196,14 +196,14 @@ export const BossDialogue = memo(function BossDialogue({
         onClick={skipTypewriter}
         className={cn(
           'flex items-start gap-3 p-3 cursor-pointer',
-          'bg-neo-navy backdrop-blur-sm',
+          'bg-neo-navy backdrop-blur-xs',
           'border-3 border-neo-black rounded-neo shadow-hard',
           'max-w-sm w-full',
           className
         )}
       >
         {/* Avatar — 48px with glow ring */}
-        <div className="flex-shrink-0 w-12 h-12 rounded-full border-2 border-neo-yellow shadow-[0_0_10px_rgba(255,225,53,0.4)] overflow-hidden">
+        <div className="shrink-0 w-12 h-12 rounded-full border-2 border-neo-yellow shadow-[0_0_10px_rgba(255,225,53,0.4)] overflow-hidden">
           <Image
             src={bossAvatarUrl}
             alt={bossName}

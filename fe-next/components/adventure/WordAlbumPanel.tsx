@@ -50,7 +50,7 @@ const WordAlbumPanel = memo<WordAlbumPanelProps>(({
   return (
     <AdaptiveAnimatePresence>
       <div
-        className="fixed inset-0 z-50 flex items-center justify-center bg-neo-black/80 backdrop-blur-sm"
+        className="fixed inset-0 z-50 flex items-center justify-center bg-neo-black/80 backdrop-blur-xs"
         onClick={onClose}
       >
         <AdaptiveMotion.div
@@ -101,7 +101,7 @@ const WordAlbumPanel = memo<WordAlbumPanelProps>(({
               >
                 {/* Icon */}
                 <div className={cn(
-                  'w-8 h-8 rounded-neo flex items-center justify-center border-2 border-neo-black flex-shrink-0',
+                  'w-8 h-8 rounded-neo flex items-center justify-center border-2 border-neo-black shrink-0',
                   m.isClaimed ? 'bg-neo-lime' :
                   m.isUnlocked ? 'bg-neo-yellow' :
                   'bg-neo-white/10'

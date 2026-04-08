@@ -9823,6 +9823,17 @@ const es = {
     "unranked": "¡Juega partidas clasificatorias para ganar un rango!",
     "playRanked": "Jugar clasificatoria"
   },
+  "matchmaking": {
+    "rankedMatch": "Partida clasificatoria",
+    "findingOpponent": "Buscando oponente…",
+    "eloRange": "{{elo}} ELO (±{{range}})",
+    "playersInQueue": "{{count}} en cola",
+    "estimatedWait": "~{{time}}",
+    "cancel": "Cancelar",
+    "matchFound": "¡Oponente encontrado!",
+    "timeout": "No se encontró oponente",
+    "createRoom": "Crear una sala"
+  },
   "seasonalEvent": {
     "ariaLabel": "Evento de temporada",
     "score": "Puntuación",

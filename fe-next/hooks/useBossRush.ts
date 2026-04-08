@@ -50,7 +50,7 @@ export function useBossRush(): UseBossRushReturn {
     });
   }, []);
 
-  const rewards = useMemo(() => getBossRushReward(state.defeatedCount), [state.defeatedCount]);
+  const rewards = useMemo(() => getBossRushReward(state.defeatedCount, state.difficulty), [state.defeatedCount, state.difficulty]);
 
   const currentBossWorldId = useMemo(() => {
     if (state.isComplete || state.currentBossIndex >= state.bossSequence.length) return null;

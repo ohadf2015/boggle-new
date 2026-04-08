@@ -28,7 +28,7 @@ export const ChapterQuestPanel = memo(function ChapterQuestPanel({
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       className={cn(
-        'rounded-neo border-3 border-neo-yellow/40 bg-neo-black/40 backdrop-blur-sm',
+        'rounded-neo border-3 border-neo-yellow/40 bg-neo-black/40 backdrop-blur-xs',
         'p-3 shadow-hard',
         className
       )}

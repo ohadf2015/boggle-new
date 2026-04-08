@@ -70,7 +70,7 @@ const LevelGridHeader = memo(function LevelGridHeader({
         {/* Content row: shield + title + mastery ring */}
         <div className="flex items-center gap-3 sm:gap-4 p-4 sm:p-5">
           {/* Shield Emblem — larger, more detailed */}
-          <div data-testid="shield-emblem" className="relative flex-shrink-0">
+          <div data-testid="shield-emblem" className="relative shrink-0">
             <svg viewBox="0 0 52 58" width="52" height="58" className="drop-shadow-[2px_2px_0px_black]">
               <path
                 d="M26 2 L48 14 L48 36 Q48 50 26 56 Q4 50 4 36 L4 14 Z"
@@ -126,7 +126,7 @@ const LevelGridHeader = memo(function LevelGridHeader({
           </div>
 
           {/* Mastery Ring — cleaner */}
-          <div data-testid="mastery-ring" className="relative flex-shrink-0 w-16 h-16">
+          <div data-testid="mastery-ring" className="relative shrink-0 w-16 h-16">
             <svg viewBox="0 0 64 64" width="64" height="64" className="transform -rotate-90">
               {/* Track */}
               <circle
@@ -185,7 +185,7 @@ const LevelGridHeader = memo(function LevelGridHeader({
       {/* Ornamental Divider */}
       <div data-testid="ornamental-divider" className="flex items-center w-full max-w-md gap-2 mt-4">
         <div className="flex-1 h-px" style={{ background: `linear-gradient(90deg, transparent, ${glowColor.replace(/[\d.]+\)$/, '0.2)')}, transparent)` }} />
-        <svg viewBox="0 0 16 16" width="10" height="10" className="flex-shrink-0">
+        <svg viewBox="0 0 16 16" width="10" height="10" className="shrink-0">
           <rect
             x="3" y="3" width="10" height="10"
             transform="rotate(45 8 8)"

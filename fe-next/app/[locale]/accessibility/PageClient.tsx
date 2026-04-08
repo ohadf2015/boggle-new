@@ -199,7 +199,7 @@ export default function AccessibilitySettingsPageClient() {
                 {/* Toggle Switch */}
                 <button
                   onClick={() => handleToggle(setting.id as never, !setting.enabled)}
-                  className={`relative w-16 h-8 flex-shrink-0 rounded-full border-3 border-neo-black transition-colors duration-200 ${
+                  className={`relative w-16 h-8 shrink-0 rounded-full border-3 border-neo-black transition-colors duration-200 ${
                     setting.enabled ? 'bg-neo-lime' : 'bg-neo-red'
                   }`}
                   aria-label={`${setting.enabled ? 'Disable' : 'Enable'} ${setting.title}`}
