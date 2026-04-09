@@ -9,6 +9,20 @@ const isPreviewEnvironment = process.env.NEXT_PUBLIC_IS_PREVIEW === 'true' ||
 
 export const metadata: Metadata = {
     metadataBase: new URL('https://www.lexiclash.live'),
+    // Canonical at the bare root — resolves the duplicate-content ambiguity
+    // between `/`, `/?room=…`, and `/?utm_*=…`. Locale pages set their own
+    // canonical in `[locale]/layout.tsx`.
+    alternates: {
+        canonical: 'https://www.lexiclash.live/',
+        languages: {
+            'x-default': 'https://www.lexiclash.live/en',
+            en: 'https://www.lexiclash.live/en',
+            he: 'https://www.lexiclash.live/he',
+            sv: 'https://www.lexiclash.live/sv',
+            ja: 'https://www.lexiclash.live/ja',
+            es: 'https://www.lexiclash.live/es',
+        },
+    },
     title: {
         default: 'Free Boggle Online — No Download | LexiClash Multiplayer Word Game',
         template: '%s | LexiClash',

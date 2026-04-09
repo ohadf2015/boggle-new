@@ -1,6 +1,11 @@
 // LexiClash Service Worker
 // Strategy: cache-first for static assets, network-first for pages/API
-const CACHE_NAME = 'lexiclash-v1';
+//
+// Bump CACHE_NAME on every deploy that changes caching behavior, precache
+// list, or static asset URLs. The `activate` handler below deletes any
+// cache whose name !== CACHE_NAME, so bumping the version reliably evicts
+// stale assets for returning users. Format: lexiclash-v{MAJOR}-{YYYYMMDD}.
+const CACHE_NAME = 'lexiclash-v2-20260409';
 
 // Static assets to precache on install
 const PRECACHE_ASSETS = [

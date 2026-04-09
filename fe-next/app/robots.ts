@@ -14,12 +14,25 @@ export default function robots(): MetadataRoute.Robots {
   }
 
   // Paths to block from crawling
+  // Share/tracking params are blocked to prevent duplicate-content dilution:
+  // multiple URLs resolve to the same canonical page, and crawlers waste budget
+  // on parametrized variants that add no unique value.
   const disallowPaths = [
     '/api/',
     '/_next/static/',
     '/_next/image/',
     '/admin/',
     '/*?room=*',
+    '/*?share=*',
+    '/*?ref=*',
+    '/*?referrer=*',
+    '/*?utm_source=*',
+    '/*?utm_medium=*',
+    '/*?utm_campaign=*',
+    '/*?utm_term=*',
+    '/*?utm_content=*',
+    '/*?fbclid=*',
+    '/*?gclid=*',
   ];
 
   return {
