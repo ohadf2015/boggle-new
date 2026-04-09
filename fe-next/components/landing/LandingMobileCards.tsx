@@ -96,8 +96,8 @@ export function LandingMobileCards({
             <span className="text-sm sm:text-lg font-black uppercase text-neo-black text-center">{t('landing.singlePlayer')}</span>
             {!isMobilePortrait && (
               <div className="flex gap-2 text-xs" aria-hidden="true">
-                <span className="bg-neo-black/20 px-2 py-1 rounded-neo font-bold"><Bot className="inline w-3 h-3 me-1" />Bots</span>
-                <span className="bg-neo-black/20 px-2 py-1 rounded-neo font-bold"><Trophy className="inline w-3 h-3 me-1" />Challenges</span>
+                <span className="bg-neo-black/20 px-2 py-1 rounded-neo font-bold"><Bot className="inline w-3 h-3 me-1" />{t('landing.badgeBots')}</span>
+                <span className="bg-neo-black/20 px-2 py-1 rounded-neo font-bold"><Trophy className="inline w-3 h-3 me-1" />{t('landing.badgeChallenges')}</span>
               </div>
             )}
           </Link>
@@ -140,8 +140,8 @@ export function LandingMobileCards({
             )}
             {!isMobilePortrait && activePlayers === 0 && (
               <div className="flex gap-2 text-xs" aria-hidden="true">
-                <span className="bg-neo-black/20 px-2 py-1 rounded-neo font-bold"><LayoutGrid className="inline w-3 h-3 me-1" />Rooms</span>
-                <span className="bg-neo-black/20 px-2 py-1 rounded-neo font-bold"><Crown className="inline w-3 h-3 me-1" />Host</span>
+                <span className="bg-neo-black/20 px-2 py-1 rounded-neo font-bold"><LayoutGrid className="inline w-3 h-3 me-1" />{t('landing.badgeRooms')}</span>
+                <span className="bg-neo-black/20 px-2 py-1 rounded-neo font-bold"><Crown className="inline w-3 h-3 me-1" />{t('landing.badgeHost')}</span>
               </div>
             )}
           </Link>

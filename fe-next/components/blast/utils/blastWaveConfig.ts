@@ -231,9 +231,9 @@ const WAVE_TABLE: WaveConfig[] = [
     gemEnabled: true, prismEnabled: true, frostEnabled: true, frozenEnabled: true,
     mirrorEnabled: true, silverEnabled: true, diamondEnabled: true,
     wildcardEnabled: true, countdownEnabled: true, shuffleEnabled: true, magmaEnabled: true, portalEnabled: true, catalystEnabled: false, crystalEnabled: false, fuseEnabled: true,
-    movesAllowed: 5,
+    movesAllowed: 6,
   },
-  // Wave 12+ — catalyst unlock, everything available (4 moves — master tier)
+  // Wave 12+ — catalyst unlock, everything available (master tier)
   {
     archetype: 'survival',
     minWordLength: 2, specialTileChance: 0.30, iceDistribution: 0.30, goldDistribution: 0.10,
@@ -242,7 +242,7 @@ const WAVE_TABLE: WaveConfig[] = [
     gemEnabled: true, prismEnabled: true, frostEnabled: true, frozenEnabled: true,
     mirrorEnabled: true, silverEnabled: true, diamondEnabled: true,
     wildcardEnabled: true, countdownEnabled: true, shuffleEnabled: true, magmaEnabled: true, portalEnabled: true, catalystEnabled: true, crystalEnabled: true, fuseEnabled: true,
-    movesAllowed: 4,
+    movesAllowed: 6,
   },
 ];
 
@@ -255,9 +255,11 @@ export function getWaveConfig(wave: number): WaveConfig {
   const clamped = Math.min(Math.max(wave, 1), 12);
   const config = { ...WAVE_TABLE[clamped] };
 
-  // Beyond wave 12: increase scoreThreshold linearly
+  // Beyond wave 12: increase scoreThreshold linearly AND grow movesAllowed
+  // to stay within the feasibility ceiling (~120 pts/move stacked).
   if (wave > 12) {
     config.scoreThreshold = 700 + (wave - 12) * 50;
+    config.movesAllowed = Math.max(6, Math.ceil(config.scoreThreshold / 120));
   }
 
   return config;

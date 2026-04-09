@@ -194,7 +194,7 @@ const ModeCard: React.FC<ModeCardProps> = ({
           ? 'active:-translate-x-px active:translate-y-px'
           : 'active:translate-x-px active:translate-y-px'),
         !locked && 'active:shadow-hard-pressed',
-        highlighted && 'ring-4 ring-neo-yellow ring-offset-2 ring-offset-neo-navy'
+        highlighted && 'ring-4 ring-neo-lime ring-offset-2 ring-offset-neo-navy'
       )}
       style={{
         // Container-relative padding using cqw - smaller for secondary
@@ -328,7 +328,7 @@ const ModeCard: React.FC<ModeCardProps> = ({
           {title}
         </h2>
 
-        {/* Arrow/Lock indicator — hidden on mobile, visible on hover (desktop) */}
+        {/* Arrow/Lock indicator — always visible on mobile (tap affordance), reveal-on-hover on desktop */}
         <div
           className={cn(
             'min-w-[44px] min-h-[44px]',
@@ -336,8 +336,8 @@ const ModeCard: React.FC<ModeCardProps> = ({
             secondary ? 'border' : 'border-2',
             'flex items-center justify-center shrink-0',
             'transition-all duration-200 ease-out',
-            !locked && 'opacity-0 group-hover:opacity-100',
-            !locked && (isRTL ? 'group-hover:-translate-x-1' : 'group-hover:translate-x-1'),
+            !locked && 'opacity-100 lg:opacity-0 lg:group-hover:opacity-100',
+            !locked && (isRTL ? 'lg:group-hover:-translate-x-1' : 'lg:group-hover:translate-x-1'),
             locked ? 'bg-neo-black/80 text-neo-white' : styles.arrow
           )}
           style={{
@@ -466,7 +466,7 @@ const ModeCard: React.FC<ModeCardProps> = ({
       {/* Personal Best Badge - shows user's all-time best score with trophy icon */}
       {personalBest && personalBest.score > 0 && !locked && (
         <div
-          className="inline-flex items-center bg-neo-orange text-neo-black font-bold rounded-neo border-2 border-neo-black shadow-hard-sm"
+          className="inline-flex items-center bg-neo-lime text-neo-black font-bold rounded-neo border-2 border-neo-black shadow-hard-sm"
           style={{
             gap: 'clamp(0.25rem, 1cqw, 0.5rem)',
             padding: 'clamp(0.25rem, 1cqw, 0.375rem) clamp(0.5rem, 2cqw, 0.75rem)',

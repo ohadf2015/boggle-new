@@ -1,7 +1,7 @@
 /**
  * blastWaveConfig - Pure function tests for wave scaling configuration.
  */
-import { getWaveConfig, getWaveDistribution, getWaveObjectives, type WaveConfig } from '../blastWaveConfig';
+import { getWaveConfig, getWaveDistribution, getWaveObjectives } from '../blastWaveConfig';
 
 describe('getWaveConfig', () => {
   it('returns WaveConfig for wave 1', () => {
