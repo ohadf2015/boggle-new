@@ -16,6 +16,7 @@ import { createEnhancedEffects, type EnhancedEffectsManager } from './utils/blas
 import { createBlastJuiceKit, type BlastJuiceKit } from './effects/blastJuiceKit';
 import { createGlowFilter } from './effects/pixiFilterPresets';
 import { computePulseRingFrame, pulseRingTierColor } from './effects/pulseRingCurve';
+import { isReducedMotionPreferred } from '@/utils/accessibility';
 import { useBlastAmbientEffects } from './useBlastAmbientEffects';
 import {
   TILE_EXPLOSION_VARIANTS,
@@ -215,6 +216,10 @@ function EffectsWorker({
   // `computePulseRingFrame`; GlowFilter supplies the neon halo. Multiple rings
   // can coexist when combos stack — each tracked in pulseRingsRef for cleanup.
   const spawnPulseRing = useCallback((cx: number, cy: number, tier: number) => {
+    // Accessibility: honor prefers-reduced-motion. Skipping the ring entirely
+    // (rather than shortening it) is safer than trying to "tone down" an
+    // additive glow burst — users who opt out want zero flashing motion.
+    if (isReducedMotionPreferred()) return;
     const g = new Graphics();
     // Base radius 1 — actual visual radius comes from scale tween × baseRadius.
     const baseRadius = Math.min(width, height) * 0.18;
