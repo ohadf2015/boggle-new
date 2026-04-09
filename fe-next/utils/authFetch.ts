@@ -36,7 +36,8 @@ export async function fetchWithAuth(
   options: FetchWithAuthOptions = {}
 ): Promise<Response> {
   if (!supabase) {
-    logger.warn('Supabase not configured - making unauthenticated request');
+    // Downgraded warn → debug: expected on public pages with no Supabase env.
+    logger.debug('Supabase not configured - making unauthenticated request');
     return fetch(url, options);
   }
 
@@ -44,7 +45,8 @@ export async function fetchWithAuth(
   const { data: { session }, error: sessionError } = await supabase.auth.getSession();
 
   if (sessionError || !session?.access_token) {
-    logger.warn('No valid session found - making unauthenticated request');
+    // Downgraded warn → debug: fires for every guest request, not actionable.
+    logger.debug('No valid session found - making unauthenticated request');
     return fetch(url, options);
   }
 

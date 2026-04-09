@@ -433,7 +433,8 @@ async function handleTabBecameVisible(
         }
       }
     } else if (userIdRef.current && isMountedRef.current) {
-      logger.warn('No session found on tab visibility but user state exists');
+      // Downgraded warn → debug: expected when user logs out in another tab.
+      logger.debug('No session found on tab visibility but user state exists');
       await clearAuthState('Session not found on tab visibility');
     }
   }

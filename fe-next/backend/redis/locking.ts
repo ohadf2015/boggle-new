@@ -42,7 +42,8 @@ export async function acquireGameLock(
     }
   }
 
-  logger.warn('LOCK', `Failed to acquire lock for game ${gameCode} after ${MAX_LOCK_RETRIES} attempts`);
+  // Downgraded warn → debug: transient contention, callers handle the `false` return.
+  logger.debug('LOCK', `Failed to acquire lock for game ${gameCode} after ${MAX_LOCK_RETRIES} attempts`);
   return false;
 }
 

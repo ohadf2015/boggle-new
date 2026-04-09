@@ -38,7 +38,9 @@ async function fetchToken(): Promise<string | null> {
   const { data: { session } } = await getSession();
 
   if (!session?.access_token) {
-    logger.warn('ADMIN_AUTH', 'No access token in session');
+    // Downgraded from warn → debug: fires on every guest visit to admin pages
+    // (not an actionable error). The thrown Error still surfaces to callers.
+    logger.debug('ADMIN_AUTH', 'No access token in session');
     throw new Error('Session not available - please log in again');
   }
 
