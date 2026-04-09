@@ -140,10 +140,11 @@ function EffectsWorker({
   // pulse rings, bloom/shockwave filters) lives inside useBlastPixiOverlays.
   useEffect(() => {
     const timers = magnetTimersRef.current;
+    const bloomTimerRefCurrent = bloomTimerRef;
     return () => {
       for (const tid of timers) clearTimeout(tid);
       timers.clear();
-      if (bloomTimerRef.current) clearTimeout(bloomTimerRef.current);
+      if (bloomTimerRefCurrent.current) clearTimeout(bloomTimerRefCurrent.current);
     };
   }, []);
 

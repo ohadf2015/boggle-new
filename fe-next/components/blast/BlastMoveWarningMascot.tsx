@@ -1,4 +1,5 @@
 'use client';
+import Image from 'next/image';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { MASCOT_IMAGES } from './utils/blastMascot';
 
@@ -29,12 +30,15 @@ export function BlastMoveWarningMascot({ movesRemaining, t }: BlastMoveWarningMa
             className="w-16 h-16 rounded-neo border-3 border-neo-black shadow-hard overflow-hidden bg-neo-navy-light"
             style={{ boxShadow: '3px 3px 0 #000, 0 0 18px rgba(255,51,102,0.55)' }}
           >
-            <img
+            <Image
               src={mascotSrc}
               alt={alt}
+              width={64}
+              height={64}
               data-testid="blast-move-warning-mascot"
               data-mascot-key="sweating"
               className="w-full h-full object-cover"
+              unoptimized
             />
           </div>
           <span
