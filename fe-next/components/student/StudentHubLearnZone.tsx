@@ -61,7 +61,7 @@ export function StudentHubLearnZone({ userId, classroomId }: StudentHubLearnZone
       {lessonId && wordsForToday.length > 0 && (
         <ReviewDueBadge
           count={wordsForToday.length}
-          onStartReview={() => router.push(`/${language}/student/practice?lessonId=${lessonId}&mode=review`)}
+          onStartReview={() => router.push(`/${language}/student/lessons/${lessonId}?mode=flashcard`)}
         />
       )}
 

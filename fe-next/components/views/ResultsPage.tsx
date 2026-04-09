@@ -216,7 +216,7 @@ function DesktopResultsLayout({
 }
 
 const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onReturnToRoom, username, socket, achievements, duplicateRuleDisabled, isHost = false, roomLanguage = 'en', gridSize = 4, gameDuration = 180, seriesStandings, seriesRoundNumber, seriesTotalGames, seriesLeader, onResetSeries, wordHuntSummary }) => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { isAuthenticated } = useAuth();
   const setIsInGame = useHideNavigation();
 
@@ -348,7 +348,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
       vocabularyWords={lessonGameData.vocabularyWords}
       wordsFound={currentPlayerValidWords.map((w: { word: string }) => w.word)}
       lessonId={lessonGameData.lessonId}
-      onPractice={() => router.push(`/student/practice?lessonId=${lessonGameData.lessonId}&mode=review`)}
+      onPractice={() => router.push(`/${language}/student/lessons/${lessonGameData.lessonId}?mode=flashcard`)}
     />
   ) : null;
 
