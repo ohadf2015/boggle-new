@@ -93,6 +93,8 @@ export interface WaveConfig {
   catalystEnabled: boolean;
   /** Whether crystal (growing-multiplier) tiles can appear (unlocks wave 12) */
   crystalEnabled: boolean;
+  /** Whether fuse (linked-pair threat) tiles can appear (unlocks wave 9 alongside countdown) */
+  fuseEnabled: boolean;
   /** Number of moves allowed per wave */
   movesAllowed: number;
 }
@@ -107,7 +109,7 @@ const WAVE_TABLE: WaveConfig[] = [
     lightningEnabled: false, vortexEnabled: false, magnetEnabled: false,
     gemEnabled: false, prismEnabled: false, frostEnabled: false, frozenEnabled: false,
     mirrorEnabled: false, silverEnabled: true, diamondEnabled: false,
-    wildcardEnabled: false, countdownEnabled: false, shuffleEnabled: false, magmaEnabled: false, portalEnabled: false, catalystEnabled: false, crystalEnabled: false,
+    wildcardEnabled: false, countdownEnabled: false, shuffleEnabled: false, magmaEnabled: false, portalEnabled: false, catalystEnabled: false, crystalEnabled: false, fuseEnabled: false,
     movesAllowed: 12,
   },
   // Wave 1 — basics only: bomb, ice, gold, silver, rainbow (12 moves — learn the ropes)
@@ -118,7 +120,7 @@ const WAVE_TABLE: WaveConfig[] = [
     lightningEnabled: false, vortexEnabled: false, magnetEnabled: false,
     gemEnabled: false, prismEnabled: false, frostEnabled: false, frozenEnabled: false,
     mirrorEnabled: false, silverEnabled: true, diamondEnabled: false,
-    wildcardEnabled: false, countdownEnabled: false, shuffleEnabled: false, magmaEnabled: false, portalEnabled: false, catalystEnabled: false, crystalEnabled: false,
+    wildcardEnabled: false, countdownEnabled: false, shuffleEnabled: false, magmaEnabled: false, portalEnabled: false, catalystEnabled: false, crystalEnabled: false, fuseEnabled: false,
     movesAllowed: 12,
   },
   // Wave 2 — treasure gem unlocks (10 moves)
@@ -129,7 +131,7 @@ const WAVE_TABLE: WaveConfig[] = [
     lightningEnabled: false, vortexEnabled: false, magnetEnabled: false,
     gemEnabled: true, prismEnabled: false, frostEnabled: false, frozenEnabled: false,
     mirrorEnabled: false, silverEnabled: true, diamondEnabled: false,
-    wildcardEnabled: false, countdownEnabled: false, shuffleEnabled: false, magmaEnabled: false, portalEnabled: false, catalystEnabled: false, crystalEnabled: false,
+    wildcardEnabled: false, countdownEnabled: false, shuffleEnabled: false, magmaEnabled: false, portalEnabled: false, catalystEnabled: false, crystalEnabled: false, fuseEnabled: false,
     movesAllowed: 10,
   },
   // Wave 3 — prism unlock (9 moves, score threshold kicks in)
@@ -140,7 +142,7 @@ const WAVE_TABLE: WaveConfig[] = [
     lightningEnabled: false, vortexEnabled: false, magnetEnabled: false,
     gemEnabled: true, prismEnabled: true, frostEnabled: false, frozenEnabled: false,
     mirrorEnabled: false, silverEnabled: true, diamondEnabled: false,
-    wildcardEnabled: false, countdownEnabled: false, shuffleEnabled: false, magmaEnabled: false, portalEnabled: false, catalystEnabled: false, crystalEnabled: false,
+    wildcardEnabled: false, countdownEnabled: false, shuffleEnabled: false, magmaEnabled: false, portalEnabled: false, catalystEnabled: false, crystalEnabled: false, fuseEnabled: false,
     movesAllowed: 9,
   },
   // Wave 4 — lightning unlock (8 moves)
@@ -151,7 +153,7 @@ const WAVE_TABLE: WaveConfig[] = [
     lightningEnabled: true, vortexEnabled: false, magnetEnabled: false,
     gemEnabled: true, prismEnabled: true, frostEnabled: false, frozenEnabled: false,
     mirrorEnabled: false, silverEnabled: true, diamondEnabled: false,
-    wildcardEnabled: false, countdownEnabled: false, shuffleEnabled: false, magmaEnabled: false, portalEnabled: false, catalystEnabled: false, crystalEnabled: false,
+    wildcardEnabled: false, countdownEnabled: false, shuffleEnabled: false, magmaEnabled: false, portalEnabled: false, catalystEnabled: false, crystalEnabled: false, fuseEnabled: false,
     movesAllowed: 8,
   },
   // Wave 5 — diamond + mirror unlock (7 moves)
@@ -162,7 +164,7 @@ const WAVE_TABLE: WaveConfig[] = [
     lightningEnabled: true, vortexEnabled: false, magnetEnabled: false,
     gemEnabled: true, prismEnabled: true, frostEnabled: false, frozenEnabled: false,
     mirrorEnabled: true, silverEnabled: true, diamondEnabled: true,
-    wildcardEnabled: false, countdownEnabled: false, shuffleEnabled: false, magmaEnabled: false, portalEnabled: false, catalystEnabled: false, crystalEnabled: false,
+    wildcardEnabled: false, countdownEnabled: false, shuffleEnabled: false, magmaEnabled: false, portalEnabled: false, catalystEnabled: false, crystalEnabled: false, fuseEnabled: false,
     movesAllowed: 7,
   },
   // Wave 6 — frost unlock (7 moves)
@@ -173,7 +175,7 @@ const WAVE_TABLE: WaveConfig[] = [
     lightningEnabled: true, vortexEnabled: false, magnetEnabled: false,
     gemEnabled: true, prismEnabled: true, frostEnabled: true, frozenEnabled: true,
     mirrorEnabled: true, silverEnabled: true, diamondEnabled: true,
-    wildcardEnabled: false, countdownEnabled: false, shuffleEnabled: false, magmaEnabled: false, portalEnabled: false, catalystEnabled: false, crystalEnabled: false,
+    wildcardEnabled: false, countdownEnabled: false, shuffleEnabled: false, magmaEnabled: false, portalEnabled: false, catalystEnabled: false, crystalEnabled: false, fuseEnabled: false,
     movesAllowed: 7,
   },
   // Wave 7 — vortex unlock (6 moves — tight, requires strategy)
@@ -184,7 +186,7 @@ const WAVE_TABLE: WaveConfig[] = [
     lightningEnabled: true, vortexEnabled: true, magnetEnabled: true,
     gemEnabled: true, prismEnabled: true, frostEnabled: true, frozenEnabled: true,
     mirrorEnabled: true, silverEnabled: true, diamondEnabled: true,
-    wildcardEnabled: false, countdownEnabled: false, shuffleEnabled: false, magmaEnabled: false, portalEnabled: false, catalystEnabled: false, crystalEnabled: false,
+    wildcardEnabled: false, countdownEnabled: false, shuffleEnabled: false, magmaEnabled: false, portalEnabled: false, catalystEnabled: false, crystalEnabled: false, fuseEnabled: false,
     movesAllowed: 6,
   },
   // Wave 8 — wildcard unlock (6 moves)
@@ -195,7 +197,7 @@ const WAVE_TABLE: WaveConfig[] = [
     lightningEnabled: true, vortexEnabled: true, magnetEnabled: true,
     gemEnabled: true, prismEnabled: true, frostEnabled: true, frozenEnabled: true,
     mirrorEnabled: true, silverEnabled: true, diamondEnabled: true,
-    wildcardEnabled: true, countdownEnabled: false, shuffleEnabled: false, magmaEnabled: false, portalEnabled: false, catalystEnabled: false, crystalEnabled: false,
+    wildcardEnabled: true, countdownEnabled: false, shuffleEnabled: false, magmaEnabled: false, portalEnabled: false, catalystEnabled: false, crystalEnabled: false, fuseEnabled: false,
     movesAllowed: 6,
   },
   // Wave 9 — countdown unlock (5 moves — tension mechanic, defuse or suffer)
@@ -206,7 +208,7 @@ const WAVE_TABLE: WaveConfig[] = [
     lightningEnabled: true, vortexEnabled: true, magnetEnabled: true,
     gemEnabled: true, prismEnabled: true, frostEnabled: true, frozenEnabled: true,
     mirrorEnabled: true, silverEnabled: true, diamondEnabled: true,
-    wildcardEnabled: true, countdownEnabled: true, shuffleEnabled: false, magmaEnabled: false, portalEnabled: false, catalystEnabled: false, crystalEnabled: false,
+    wildcardEnabled: true, countdownEnabled: true, shuffleEnabled: false, magmaEnabled: false, portalEnabled: false, catalystEnabled: false, crystalEnabled: false, fuseEnabled: true,
     movesAllowed: 5,
   },
   // Wave 10 — shuffle unlock (5 moves — rearranges board on clear)
@@ -217,7 +219,7 @@ const WAVE_TABLE: WaveConfig[] = [
     lightningEnabled: true, vortexEnabled: true, magnetEnabled: true,
     gemEnabled: true, prismEnabled: true, frostEnabled: true, frozenEnabled: true,
     mirrorEnabled: true, silverEnabled: true, diamondEnabled: true,
-    wildcardEnabled: true, countdownEnabled: true, shuffleEnabled: true, magmaEnabled: false, portalEnabled: false, catalystEnabled: false, crystalEnabled: false,
+    wildcardEnabled: true, countdownEnabled: true, shuffleEnabled: true, magmaEnabled: false, portalEnabled: false, catalystEnabled: false, crystalEnabled: false, fuseEnabled: true,
     movesAllowed: 5,
   },
   // Wave 11 — magma + portal unlock (5 moves — diagonal eruption + teleport paths)
@@ -228,7 +230,7 @@ const WAVE_TABLE: WaveConfig[] = [
     lightningEnabled: true, vortexEnabled: true, magnetEnabled: true,
     gemEnabled: true, prismEnabled: true, frostEnabled: true, frozenEnabled: true,
     mirrorEnabled: true, silverEnabled: true, diamondEnabled: true,
-    wildcardEnabled: true, countdownEnabled: true, shuffleEnabled: true, magmaEnabled: true, portalEnabled: true, catalystEnabled: false, crystalEnabled: false,
+    wildcardEnabled: true, countdownEnabled: true, shuffleEnabled: true, magmaEnabled: true, portalEnabled: true, catalystEnabled: false, crystalEnabled: false, fuseEnabled: true,
     movesAllowed: 5,
   },
   // Wave 12+ — catalyst unlock, everything available (4 moves — master tier)
@@ -239,7 +241,7 @@ const WAVE_TABLE: WaveConfig[] = [
     lightningEnabled: true, vortexEnabled: true, magnetEnabled: true,
     gemEnabled: true, prismEnabled: true, frostEnabled: true, frozenEnabled: true,
     mirrorEnabled: true, silverEnabled: true, diamondEnabled: true,
-    wildcardEnabled: true, countdownEnabled: true, shuffleEnabled: true, magmaEnabled: true, portalEnabled: true, catalystEnabled: true, crystalEnabled: true,
+    wildcardEnabled: true, countdownEnabled: true, shuffleEnabled: true, magmaEnabled: true, portalEnabled: true, catalystEnabled: true, crystalEnabled: true, fuseEnabled: true,
     movesAllowed: 4,
   },
 ];
@@ -344,6 +346,8 @@ const PORTAL_SHARE = 0.04;
 const CATALYST_SHARE = 0.04;
 /** Crystal share when enabled — smaller than others because growth multiplier scales exponentially */
 const CRYSTAL_SHARE = 0.03;
+/** Fuse share when enabled — spawns in linked pairs */
+const FUSE_SHARE = 0.04;
 
 /**
  * Build tile distribution for a wave, gating special tiles by unlock progression.
@@ -364,7 +368,7 @@ export function getWaveDistribution(config: WaveConfig): Record<string, number> 
     gemEnabled, prismEnabled, frostEnabled, frozenEnabled,
     mirrorEnabled, diamondEnabled,
     wildcardEnabled, countdownEnabled, shuffleEnabled, magmaEnabled, portalEnabled, catalystEnabled,
-    crystalEnabled,
+    crystalEnabled, fuseEnabled,
   } = config;
 
   // Effective flags (support deprecated field aliases)
@@ -393,6 +397,7 @@ export function getWaveDistribution(config: WaveConfig): Record<string, number> 
   let portal = 0;
   let catalyst = 0;
   let crystal = 0;
+  let fuse = 0;
   const silver = SILVER_BASE;
 
   // Helper: take a share proportionally from gold + rainbow
@@ -474,6 +479,11 @@ export function getWaveDistribution(config: WaveConfig): Record<string, number> 
     takeShare(CRYSTAL_SHARE);
   }
 
+  if (fuseEnabled) {
+    fuse = FUSE_SHARE;
+    takeShare(FUSE_SHARE);
+  }
+
   const raw: Record<string, number> = {
     gold: Math.max(0, gold),
     bomb: BOMB_BASE,
@@ -497,6 +507,7 @@ export function getWaveDistribution(config: WaveConfig): Record<string, number> 
     portal,
     catalyst,
     crystal,
+    fuse,
   };
 
   // Normalize to sum to 1.0 (avoids drift when many tiles are enabled)
