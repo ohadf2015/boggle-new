@@ -1,9 +1,11 @@
 'use client';
 'use no memo'; // Disable React Compiler memoization — PixiJS camera mutations incompatible with compiler immutability rules
 
-// BlastEffectsCanvas — Hybrid PixiJS effects layer behind DOM tiles.
-// GameCanvas renders particles, shake, ambient effects BEHIND DOM BlastBoard.
-// Dynamically imported (ssr: false) to keep PixiJS out of SSR bundle.
+// BlastEffectsCanvas — PixiJS effects layer rendered ABOVE the DOM BlastBoard.
+// The parent BlastStage wraps this canvas in an absolutely-positioned z-20 div
+// with pointer-events-none so particles/shockwaves/shatters overlay tile art
+// without blocking touch/drag word selection on the DOM grid beneath (z-10).
+// Dynamically imported (ssr: false) to keep PixiJS out of the SSR bundle.
 
 import { useEffect, useRef, useCallback } from 'react';
 import { Graphics } from 'pixi.js';
@@ -11,6 +13,9 @@ import { BloomFilter, ShockwaveFilter } from 'pixi-filters';
 import { useBlastDebris } from './useBlastDebris';
 import { GameCanvas, useGameEngine } from '@/lib/gameEngine/GameCanvas';
 import { createEnhancedEffects, type EnhancedEffectsManager } from './utils/blastEnhancedEffects';
+import { createBlastJuiceKit, type BlastJuiceKit } from './effects/blastJuiceKit';
+import { createGlowFilter } from './effects/pixiFilterPresets';
+import { computePulseRingFrame, pulseRingTierColor } from './effects/pulseRingCurve';
 import { useBlastAmbientEffects } from './useBlastAmbientEffects';
 import {
   TILE_EXPLOSION_VARIANTS,
@@ -121,8 +126,9 @@ function EffectsWorker({
   comboTier,
   waveCleared,
 }: BlastEffectsCanvasProps) {
-  const { app, particles, shake, physics, camera } = useGameEngine();
+  const { app, particles, shake, physics, camera, timeDilation } = useGameEngine();
   const enhancedRef = useRef<EnhancedEffectsManager | null>(null);
+  const juiceRef = useRef<BlastJuiceKit | null>(null);
 
   const prevClearedKeyRef = useRef('');
   const clearedSeqRef = useRef(0);
@@ -131,24 +137,49 @@ function EffectsWorker({
   const prevWaveRef = useRef(false);
   const crossFlashRef = useRef<Graphics | null>(null);
   const crossFlashRafRef = useRef<number>(0);
+  const pulseRingsRef = useRef<Set<Graphics>>(new Set());
+  const pulseRingRafsRef = useRef<Set<number>>(new Set());
   const magnetTimersRef = useRef<Set<ReturnType<typeof setTimeout>>>(new Set());
   const bloomTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const bloomRef = useRef<InstanceType<typeof BloomFilter> | null>(null);
   const shockwaveRef = useRef<InstanceType<typeof ShockwaveFilter> | null>(null);
   const shockwaveRafRef = useRef<number>(0);
 
-  // Clean up magnet timers and cross flash on unmount
+  // Clean up magnet timers and cross flash on unmount.
+  // IMPORTANT: removeChild BEFORE destroy — `camera` is owned by GameCanvas and
+  // typically outlives this component, so destroyed Graphics left in
+  // `camera.children` would be iterated next render and crash Pixi.
   useEffect(() => {
     const timers = magnetTimersRef.current;
+    const pulseRafs = pulseRingRafsRef.current;
+    const pulseRings = pulseRingsRef.current;
+    const cameraRef = camera;
     return () => {
       for (const tid of timers) clearTimeout(tid);
       timers.clear();
       if (bloomTimerRef.current) clearTimeout(bloomTimerRef.current);
       cancelAnimationFrame(crossFlashRafRef.current);
       cancelAnimationFrame(shockwaveRafRef.current);
-      if (crossFlashRef.current) { crossFlashRef.current.destroy(); crossFlashRef.current = null; }
+      const cameraAlive = !cameraRef.destroyed;
+      if (crossFlashRef.current) {
+        if (cameraAlive && !crossFlashRef.current.destroyed) {
+          try { cameraRef.removeChild(crossFlashRef.current); } catch { /* */ }
+        }
+        if (!crossFlashRef.current.destroyed) crossFlashRef.current.destroy();
+        crossFlashRef.current = null;
+      }
+      for (const raf of pulseRafs) cancelAnimationFrame(raf);
+      pulseRafs.clear();
+      for (const ring of pulseRings) {
+        if (ring.destroyed) continue;
+        if (cameraAlive) {
+          try { cameraRef.removeChild(ring); } catch { /* */ }
+        }
+        ring.destroy();
+      }
+      pulseRings.clear();
     };
-  }, []);
+  }, [camera]);
 
   // Initialize enhanced effects (ShatterEffect / DissolveEffect from custom-pixi-particles)
   useEffect(() => {
@@ -160,10 +191,65 @@ function EffectsWorker({
     };
   }, [app, camera, width, gridSize]);
 
+  // Initialize juice kit (chromatic aberration + zoom blur + bloom ramps + hit-stop)
+  useEffect(() => {
+    juiceRef.current = createBlastJuiceKit({ app, camera, shake, timeDilation });
+    return () => {
+      juiceRef.current?.destroy();
+      juiceRef.current = null;
+    };
+  }, [app, camera, shake, timeDilation]);
+
   const cellSize = width / gridSize;
 
-  const { spawnDebris, spawnLightningDebris, spawnLightningBolt, spawnPrismDebris } =
-    useBlastDebris(cellSize, gridSize, camera, physics);
+  const {
+    spawnDebris,
+    spawnLightningDebris,
+    spawnLightningBolt,
+    spawnPrismDebris,
+    spawnWaveClearBurst,
+  } = useBlastDebris(cellSize, gridSize, camera, physics);
+
+  // ─── Combo pulse ring — expanding GlowFilter ring, lime→pink→cyan by tier ──
+  // Drawn as a 1-unit-radius stroked circle with uniform scale driven by
+  // `computePulseRingFrame`; GlowFilter supplies the neon halo. Multiple rings
+  // can coexist when combos stack — each tracked in pulseRingsRef for cleanup.
+  const spawnPulseRing = useCallback((cx: number, cy: number, tier: number) => {
+    const g = new Graphics();
+    // Base radius 1 — actual visual radius comes from scale tween × baseRadius.
+    const baseRadius = Math.min(width, height) * 0.18;
+    g.circle(0, 0, baseRadius).stroke({ color: 0xffffff, width: 6, alpha: 1 });
+    g.x = cx;
+    g.y = cy;
+    g.filters = [createGlowFilter(pulseRingTierColor(tier), 3)];
+    camera.addChild(g);
+    pulseRingsRef.current.add(g);
+
+    const start = performance.now();
+    const duration = 450;
+    const step = () => {
+      if (camera.destroyed || g.destroyed) {
+        pulseRingsRef.current.delete(g);
+        return;
+      }
+      const frame = computePulseRingFrame((performance.now() - start) / duration);
+      g.scale.set(frame.scale);
+      g.alpha = frame.alpha;
+      if (frame.done) {
+        try { camera.removeChild(g); } catch { /* */ }
+        g.destroy();
+        pulseRingsRef.current.delete(g);
+        pulseRingRafsRef.current.delete(rafId);
+        return;
+      }
+      const next = requestAnimationFrame(step);
+      pulseRingRafsRef.current.delete(rafId);
+      pulseRingRafsRef.current.add(next);
+      rafId = next;
+    };
+    let rafId = requestAnimationFrame(step);
+    pulseRingRafsRef.current.add(rafId);
+  }, [camera, width, height]);
 
   // ─── Prism cross beam effect ──────────────────────────────────────
   const firePrismBeams = useCallback((cx: number, cy: number) => {
@@ -176,11 +262,15 @@ function EffectsWorker({
 
   // ─── Cross flash (white lines fading to transparent over 300ms) ──
   const flashCross = useCallback((cx: number, cy: number) => {
-    // Destroy previous cross flash if still animating
+    // Destroy previous cross flash if still animating.
+    // Guard removeChild — `g` may already be detached (camera teardown race).
     if (crossFlashRef.current) {
       cancelAnimationFrame(crossFlashRafRef.current);
-      camera.removeChild(crossFlashRef.current);
-      crossFlashRef.current.destroy();
+      const prev = crossFlashRef.current;
+      if (!camera.destroyed && !prev.destroyed) {
+        try { camera.removeChild(prev); } catch { /* */ }
+      }
+      if (!prev.destroyed) prev.destroy();
       crossFlashRef.current = null;
     }
     const g = new Graphics();
@@ -220,44 +310,49 @@ function EffectsWorker({
     return () => { emitter.destroy(); };
   }, [particles, width, height]);
 
-  // Bloom filter — intensifies with chain/combo level for that AAA glow
+  // Bloom + Shockwave filters — allocated once per camera mount.
+  // Single `camera.filters = [...]` assignment avoids the two-effect spread dance
+  // and keeps filter pipeline stable across re-renders (no rebuild on resize).
   useEffect(() => {
     const bloom = new BloomFilter({ strength: 2, quality: 4 });
     bloom.enabled = false;
     bloomRef.current = bloom;
+
+    const sw = new ShockwaveFilter({
+      center: { x: 0, y: 0 }, // lazily updated in fireShockwave
+      radius: -1,
+      speed: 300,
+      amplitude: 20,
+      wavelength: 120,
+    });
+    sw.enabled = false;
+    shockwaveRef.current = sw;
+
+    const prev = Array.isArray(camera.filters) ? camera.filters : [];
     /* eslint-disable react-hooks/immutability */
-    camera.filters = [...(Array.isArray(camera.filters) ? camera.filters : []), bloom];
+    camera.filters = [...prev, bloom, sw];
     return () => {
-      const filters = Array.isArray(camera.filters) ? camera.filters : [];
-      camera.filters = filters.filter(f => f !== bloom);
+      cancelAnimationFrame(shockwaveRafRef.current);
+      // Skip filter unmount if camera was already destroyed — accessing
+      // `.filters` on a destroyed Container throws in Pixi v8.
+      if (!camera.destroyed) {
+        const filters = Array.isArray(camera.filters) ? camera.filters : [];
+        camera.filters = filters.filter(f => f !== bloom && f !== sw);
+      }
       /* eslint-enable react-hooks/immutability */
       bloom.destroy();
+      sw.destroy();
       bloomRef.current = null;
+      shockwaveRef.current = null;
     };
   }, [camera]);
 
-  // Shockwave filter — triggered on bomb/wave clear
-  useEffect(() => {
-    const sw = new ShockwaveFilter({ center: { x: width / 2, y: height / 2 }, radius: -1, speed: 300, amplitude: 20, wavelength: 120 });
-    sw.enabled = false;
-    shockwaveRef.current = sw;
-    /* eslint-disable react-hooks/immutability */
-    camera.filters = [...(Array.isArray(camera.filters) ? camera.filters : []), sw];
-    return () => {
-      cancelAnimationFrame(shockwaveRafRef.current);
-      shockwaveRef.current = null;
-      const filters = Array.isArray(camera.filters) ? camera.filters : [];
-      camera.filters = filters.filter(f => f !== sw);
-      /* eslint-enable react-hooks/immutability */
-      sw.destroy();
-    };
-  }, [camera, width, height]);
-
-  // Fire a shockwave from a point
+  // Fire a shockwave from a point — mutate center fields in place (no object alloc).
   const fireShockwave = useCallback((cx: number, cy: number, amplitude = 20) => {
     const sw = shockwaveRef.current;
     if (!sw) return;
-    sw.center = { x: cx, y: cy };
+    sw.center.x = cx;
+    sw.center.y = cy;
     sw.time = 0;
     sw.amplitude = amplitude;
     sw.enabled = true;
@@ -455,19 +550,11 @@ function EffectsWorker({
       particles.burst(CASCADE_SPARKLE, width / 2, height * 0.7, chainLevel * 5);
 
       if (chainLevel >= 5) {
-        // MEGA CASCADE — triple particle burst + shockwave + heavy shake
+        // MEGA CASCADE — triple particle burst + shockwave + full juice punch
         particles.burst(BOARD_CLEAR, width / 2, height / 2);
         particles.burst(pickRandom(COMBO_FLASH_VARIANTS), width / 2, height / 2, 40);
         fireShockwave(width / 2, height / 2, 30);
-        shake.heavy();
-        // Bloom spike for epic feel
-        const bloom = bloomRef.current;
-        if (bloom) {
-          bloom.enabled = true;
-          bloom.strength = 12;
-          if (bloomTimerRef.current) clearTimeout(bloomTimerRef.current);
-          bloomTimerRef.current = setTimeout(() => { if (bloomRef.current) bloomRef.current.strength = 2 + chainLevel * 1.5; }, 400);
-        }
+        juiceRef.current?.megaPunch({ cx: width / 2, cy: height / 2 });
       } else if (chainLevel >= 3) {
         shake.medium();
       } else {
@@ -477,37 +564,26 @@ function EffectsWorker({
     prevChainRef.current = chainLevel;
   }, [chainLevel, particles, shake, width, height, fireShockwave]);
 
-  // Combo flash particles + bloom spike
+  // Combo flash particles + juice pulse (chromatic aberration + saturation bump)
   useEffect(() => {
     if (comboTier > prevComboRef.current && comboTier >= 1) {
       particles.burst(pickRandom(COMBO_FLASH_VARIANTS), width / 2, height / 2, comboTier * 15);
-      shake.shake({
-        intensity: comboTier * 4,
-        duration: 0.2 + comboTier * 0.1,
-        decay: 'exponential',
-      });
-      // Brief bloom spike on combo activation
-      const bloom = bloomRef.current;
-      if (bloom) {
-        const prev = bloom.strength;
-        bloom.enabled = true;
-        bloom.strength = 6 + comboTier * 3;
-        if (bloomTimerRef.current) clearTimeout(bloomTimerRef.current);
-        bloomTimerRef.current = setTimeout(() => { if (bloomRef.current) bloomRef.current.strength = prev; }, 300);
-      }
+      juiceRef.current?.comboPulse(comboTier);
+      spawnPulseRing(width / 2, height / 2, comboTier);
     }
     prevComboRef.current = comboTier;
-  }, [comboTier, particles, shake, width, height]);
+  }, [comboTier, particles, width, height, spawnPulseRing]);
 
-  // Wave clear celebration
+  // Wave clear celebration — particles + shockwave + juice burst (zoom blur + bloom + hit-stop)
   useEffect(() => {
     if (waveCleared && !prevWaveRef.current) {
       particles.burst(BOARD_CLEAR, width / 2, height / 2);
       fireShockwave(width / 2, height / 2, 35);
-      shake.heavy();
+      juiceRef.current?.waveClearBurst({ cx: width / 2, cy: height / 2 });
+      spawnWaveClearBurst(width / 2, height / 2, Math.min(width, height) * 0.45);
     }
     prevWaveRef.current = waveCleared;
-  }, [waveCleared, particles, shake, width, height, fireShockwave]);
+  }, [waveCleared, particles, width, height, fireShockwave, spawnWaveClearBurst]);
 
   return null;
 }
