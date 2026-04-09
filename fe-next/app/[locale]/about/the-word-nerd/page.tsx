@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import Link from 'next/link';
 
 interface PageProps {
@@ -126,12 +127,14 @@ export default async function TheWordNerdPage({ params }: PageProps) {
                 <div className="mx-auto max-w-3xl">
                     {/* Author Header */}
                     <div className="mb-10 flex flex-col items-center gap-6 sm:flex-row sm:items-start">
-                        <div
-                            className="flex h-28 w-28 shrink-0 items-center justify-center rounded-neo border-3 border-black bg-linear-to-br from-neo-yellow to-neo-orange shadow-hard-lg"
-                            aria-hidden="true"
-                        >
-                            <span className="font-neo-display text-4xl font-bold text-black">WN</span>
-                        </div>
+                        <Image
+                            src="/images/author-word-nerd.jpg"
+                            alt="The Word Nerd — Word Game Researcher and Game Designer"
+                            width={112}
+                            height={112}
+                            className="h-28 w-28 shrink-0 rounded-neo border-3 border-black object-cover shadow-hard-lg"
+                            priority
+                        />
                         <div className="text-center sm:text-start">
                             <h1 className="font-neo-display text-3xl font-bold text-neo-white sm:text-4xl">The Word Nerd</h1>
                             <p className="mt-1 font-neo-body text-lg text-neo-yellow">

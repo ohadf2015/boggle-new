@@ -1,7 +1,7 @@
 import { vi, type MockedFunction, type MockedClass, type Mock } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import BrainTrainingPage from '../page';
+import BrainTrainingPage from '../PageClient';
 import { useAuth } from '@/contexts/AuthContext';
 import { useBrainScore } from '@/hooks/useBrainScore';
 import { useLanguage } from '@/contexts/LanguageContext';

@@ -27,7 +27,6 @@ export function GamePageSeoContent({
 }: GamePageSeoContentProps) {
   return (
     <section
-      aria-hidden="true"
       className={cn('sr-only', className)}
     >
       <h2>{title}</h2>
