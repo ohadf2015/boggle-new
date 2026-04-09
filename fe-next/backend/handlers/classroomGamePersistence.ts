@@ -20,11 +20,23 @@ import logger from '../utils/logger.js';
 
 type PlayerScore = { userId: string; score: number; wordsFound?: string[] };
 
+/**
+ * Per-player reward summary returned from persistClassroomGameScores.
+ * The classroomGameEnded broadcast uses this to tell each client how much
+ * XP the server awarded, so the frontend can drive LevelUpCelebration /
+ * AchievementUnlockModal via a level-diff detector.
+ */
+export type ClassroomGameReward = {
+  userId: string;
+  xpEarned: number;
+  lessonIds: string[];
+};
+
 export async function persistClassroomGameScores(
   game: ClassroomGame | null | undefined,
   playerScores?: PlayerScore[]
-): Promise<void> {
-  if (!game) return;
+): Promise<ClassroomGameReward[]> {
+  if (!game) return [];
 
   // Idempotency guard: only persist once per game using Redis SET NX
   const redis = getRedisClient();
@@ -36,14 +48,14 @@ export async function persistClassroomGameScores(
         'CLASSROOM_GAME',
         `Scores for game ${game.gameCode} already persisted — skipping duplicate`
       );
-      return;
+      return [];
     }
   }
 
   const supabase = getSupabase();
   if (!supabase) {
     logger.warn('CLASSROOM_GAME', 'Supabase not configured, skipping score persistence');
-    return;
+    return [];
   }
 
   const lessonIds = game.lessonIds ?? [];
@@ -52,8 +64,10 @@ export async function persistClassroomGameScores(
       'CLASSROOM_GAME',
       `Game ${game.gameCode} has no lesson IDs, skipping persistence`
     );
-    return;
+    return [];
   }
+
+  const rewards: ClassroomGameReward[] = [];
 
   // Anchor the session row to the first lesson to avoid inflating
   // `board_sessions` counts in analytics views. Multi-lesson attribution
@@ -62,6 +76,7 @@ export async function persistClassroomGameScores(
   const gameMode = game.settings?.gameMode ?? 'classic';
 
   for (const player of game.players) {
+    let xpEarned = 0;
     try {
       const playerScore = playerScores?.find(ps => ps.userId === player.userId);
       const score = playerScore?.score ?? 0;
@@ -93,7 +108,11 @@ export async function persistClassroomGameScores(
       if (score > 0) {
         const totalXp = Math.max(10, Math.floor(score / 10));
         const perLessonXp = Math.floor(totalXp / lessonIds.length);
-        if (perLessonXp === 0) continue;
+        if (perLessonXp === 0) {
+          rewards.push({ userId: player.userId, xpEarned: 0, lessonIds });
+          continue;
+        }
+        xpEarned = totalXp;
 
         for (const lessonId of lessonIds) {
           const { error: xpError } = await supabase.rpc('award_education_xp', {
@@ -121,5 +140,8 @@ export async function persistClassroomGameScores(
         `Error persisting score for player ${player.userId}: ${error}`
       );
     }
+    rewards.push({ userId: player.userId, xpEarned, lessonIds });
   }
+
+  return rewards;
 }

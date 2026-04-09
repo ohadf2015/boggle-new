@@ -454,11 +454,12 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
 
       await updateClassroomGameStatus(payload.gameCode, 'finished');
 
-      // Persist scores to Supabase (S2.5)
-      await persistClassroomGameScores(game, payload.playerScores);
+      // Persist scores to Supabase (S2.5) — F-24: capture per-player rewards
+      const rewards = await persistClassroomGameScores(game, payload.playerScores);
 
       io.to(`classroom:${game.classroomId}`).emit('classroomGameEnded', {
         gameCode: payload.gameCode,
+        rewards,
       });
 
       logger.info('CLASSROOM_GAME', `Teacher ${authUserId} ended game ${payload.gameCode}`);
@@ -499,10 +500,11 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
       }
 
       await updateClassroomGameStatus(payload.gameCode, 'finished');
-      await persistClassroomGameScores(game, payload.playerScores);
+      const rewards = await persistClassroomGameScores(game, payload.playerScores);
 
       io.to(`classroom:${game.classroomId}`).emit('classroomGameEnded', {
         gameCode: payload.gameCode,
+        rewards,
       });
 
       logger.info('CLASSROOM_GAME', `Game ${payload.gameCode} ended, scores persisted`);

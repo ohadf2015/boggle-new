@@ -122,6 +122,34 @@ describe('persistClassroomGameScores', () => {
     });
   });
 
+  describe('F-24: reward summary return value', () => {
+    it('returns per-player reward summary with xpEarned and lessonIds', async () => {
+      const game = makeGame({
+        lessonIds: ['lesson-a', 'lesson-b'],
+        players: [
+          { userId: 'stu-1', username: 'Alice', socketId: 's1', joinedAt: 'now' },
+          { userId: 'stu-2', username: 'Bob', socketId: 's2', joinedAt: 'now' },
+        ],
+      });
+
+      const rewards = await persistClassroomGameScores(game, [
+        { userId: 'stu-1', score: 300 },
+        { userId: 'stu-2', score: 0 },
+      ]);
+
+      expect(rewards).toEqual([
+        { userId: 'stu-1', xpEarned: 30, lessonIds: ['lesson-a', 'lesson-b'] },
+        { userId: 'stu-2', xpEarned: 0, lessonIds: ['lesson-a', 'lesson-b'] },
+      ]);
+    });
+
+    it('returns empty array when persistence is skipped (already persisted)', async () => {
+      mockRedisSet.mockResolvedValueOnce(null);
+      const rewards = await persistClassroomGameScores(makeGame(), [{ userId: 'stu-1', score: 100 }]);
+      expect(rewards).toEqual([]);
+    });
+  });
+
   describe('idempotency + guards', () => {
     it('returns early when Redis idempotency key already exists', async () => {
       mockRedisSet.mockResolvedValueOnce(null); // SET NX returns null when key exists
