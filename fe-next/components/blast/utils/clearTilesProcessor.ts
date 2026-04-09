@@ -115,6 +115,7 @@ export function processTilesForWord(input: TileProcessingInput): TileProcessingR
   const mirrorFirstSpecial = hasMirror ? scanOffensiveSpecial(path, prev, 'first') : null;
   let rainbowSoloMultiplier = 1;
   let mirrorSoloMultiplier = 1;
+  let crystalWordMultiplier = 1;
 
   // Shared helpers (closures over mutable state)
   const markCleared = (t: BlastTileState) => {
@@ -390,6 +391,12 @@ export function processTilesForWord(input: TileProcessingInput): TileProcessingR
         bonusScore += fireCatalystUpgrade(cell.row, cell.col, ctx, currentWave, rollSpecialFromDistribution);
         break;
       }
+
+      case 'crystal': {
+        crystalWordMultiplier *= tile.crystalMultiplier ?? 1;
+        newExplosions.push({ id: `crystal-${now}-${cell.row}-${cell.col}`, row: cell.row, col: cell.col, type: 'word', intensity: 2, timestamp: now });
+        break;
+      }
     }
   }
 
@@ -439,7 +446,7 @@ export function processTilesForWord(input: TileProcessingInput): TileProcessingR
 
   // Score calculation: solo multipliers -> gold multiplier -> portal -> bonus
   const portalMultiplier = hasPortal ? PORTAL_WORD_MULTIPLIER : 1;
-  const effectiveBase = baseScore * rainbowSoloMultiplier * mirrorSoloMultiplier * portalMultiplier;
+  const effectiveBase = baseScore * rainbowSoloMultiplier * mirrorSoloMultiplier * portalMultiplier * crystalWordMultiplier;
   const goldBonusScore = effectiveBase * goldMultiplier - effectiveBase;
   if (goldMultiplier > 1) {
     const multiplierTiles = path.filter(cell => {

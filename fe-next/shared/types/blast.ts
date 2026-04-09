@@ -26,7 +26,8 @@ export type BlastTileType =
   | 'portal'
   | 'catalyst'
   | 'shuffle'
-  | 'magma';
+  | 'magma'
+  | 'crystal';
 
 /** Runtime-iterable list of all blast tile types (mirrors BlastTileType union) */
 export const BLAST_TILE_TYPE_LIST: readonly BlastTileType[] = [
@@ -49,6 +50,7 @@ export const BLAST_TILE_TYPE_LIST: readonly BlastTileType[] = [
   'catalyst',
   'shuffle',
   'magma',
+  'crystal',
 ] as const;
 
 // ==================== Tile State ====================
@@ -73,4 +75,6 @@ export interface BlastTileState {
   countdown?: number;
   /** Portal tiles: ID linking a portal pair (both share the same ID) */
   portalPairId?: string;
+  /** Crystal tiles: current growth multiplier (grows each unused turn, caps at CRYSTAL_MAX_MULTIPLIER) */
+  crystalMultiplier?: number;
 }

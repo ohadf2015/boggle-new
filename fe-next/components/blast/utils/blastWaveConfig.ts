@@ -20,7 +20,29 @@
  * Wave 12+: + catalyst (everything)
  */
 
+/**
+ * Wave archetype — pure metadata tag used by the UI layer to pick mascot art,
+ * wave-intro copy, and results flavor. The engine does NOT read this field;
+ * difficulty still flows from the numeric fields below. Archetypes exist only
+ * to give each wave an emotional identity ("it's a score rush!") without
+ * re-tuning balance.
+ *
+ * - normal:       baseline pacing, no special flavor
+ * - scoreRush:    combo/multiplier-friendly, big-swing wave
+ * - treasureHunt: new collectible tile unlock, encourages hunting
+ * - survival:     tight moves / hostile tiles, endurance test
+ * - silence:      reserved for future quiet/meditative waves
+ */
+export type BlastWaveArchetype =
+  | 'normal'
+  | 'scoreRush'
+  | 'treasureHunt'
+  | 'survival'
+  | 'silence';
+
 export interface WaveConfig {
+  /** Emotional identity tag — UI only, ignored by the engine */
+  archetype: BlastWaveArchetype;
   /** Minimum word length for player submissions */
   minWordLength: number;
   /** Chance of a cell being special (0-1) */
@@ -69,6 +91,8 @@ export interface WaveConfig {
   portalEnabled: boolean;
   /** Whether catalyst tiles can appear (unlocks wave 12) */
   catalystEnabled: boolean;
+  /** Whether crystal (growing-multiplier) tiles can appear (unlocks wave 12) */
+  crystalEnabled: boolean;
   /** Number of moves allowed per wave */
   movesAllowed: number;
 }
@@ -77,132 +101,145 @@ export interface WaveConfig {
 const WAVE_TABLE: WaveConfig[] = [
   // Placeholder index 0 (unused)
   {
+    archetype: 'normal',
     minWordLength: 2, specialTileChance: 0.10, iceDistribution: 0.17, goldDistribution: 0.22,
     vowelModifier: 1.0, maxCascadeChain: 2, cascadeChainBonus: 0.5, scoreThreshold: undefined,
     lightningEnabled: false, vortexEnabled: false, magnetEnabled: false,
     gemEnabled: false, prismEnabled: false, frostEnabled: false, frozenEnabled: false,
     mirrorEnabled: false, silverEnabled: true, diamondEnabled: false,
-    wildcardEnabled: false, countdownEnabled: false, shuffleEnabled: false, magmaEnabled: false, portalEnabled: false, catalystEnabled: false,
+    wildcardEnabled: false, countdownEnabled: false, shuffleEnabled: false, magmaEnabled: false, portalEnabled: false, catalystEnabled: false, crystalEnabled: false,
     movesAllowed: 12,
   },
   // Wave 1 — basics only: bomb, ice, gold, silver, rainbow (12 moves — learn the ropes)
   {
+    archetype: 'normal',
     minWordLength: 2, specialTileChance: 0.10, iceDistribution: 0.17, goldDistribution: 0.22,
     vowelModifier: 1.1, maxCascadeChain: 2, cascadeChainBonus: 0.5, scoreThreshold: undefined,
     lightningEnabled: false, vortexEnabled: false, magnetEnabled: false,
     gemEnabled: false, prismEnabled: false, frostEnabled: false, frozenEnabled: false,
     mirrorEnabled: false, silverEnabled: true, diamondEnabled: false,
-    wildcardEnabled: false, countdownEnabled: false, shuffleEnabled: false, magmaEnabled: false, portalEnabled: false, catalystEnabled: false,
+    wildcardEnabled: false, countdownEnabled: false, shuffleEnabled: false, magmaEnabled: false, portalEnabled: false, catalystEnabled: false, crystalEnabled: false,
     movesAllowed: 12,
   },
   // Wave 2 — treasure gem unlocks (10 moves)
   {
+    archetype: 'treasureHunt',
     minWordLength: 2, specialTileChance: 0.13, iceDistribution: 0.20, goldDistribution: 0.20,
     vowelModifier: 0.95, maxCascadeChain: 2, cascadeChainBonus: 0.6, scoreThreshold: undefined,
     lightningEnabled: false, vortexEnabled: false, magnetEnabled: false,
     gemEnabled: true, prismEnabled: false, frostEnabled: false, frozenEnabled: false,
     mirrorEnabled: false, silverEnabled: true, diamondEnabled: false,
-    wildcardEnabled: false, countdownEnabled: false, shuffleEnabled: false, magmaEnabled: false, portalEnabled: false, catalystEnabled: false,
+    wildcardEnabled: false, countdownEnabled: false, shuffleEnabled: false, magmaEnabled: false, portalEnabled: false, catalystEnabled: false, crystalEnabled: false,
     movesAllowed: 10,
   },
   // Wave 3 — prism unlock (9 moves, score threshold kicks in)
   {
+    archetype: 'normal',
     minWordLength: 2, specialTileChance: 0.19, iceDistribution: 0.23, goldDistribution: 0.18,
     vowelModifier: 0.90, maxCascadeChain: 2, cascadeChainBonus: 0.7, scoreThreshold: 80,
     lightningEnabled: false, vortexEnabled: false, magnetEnabled: false,
     gemEnabled: true, prismEnabled: true, frostEnabled: false, frozenEnabled: false,
     mirrorEnabled: false, silverEnabled: true, diamondEnabled: false,
-    wildcardEnabled: false, countdownEnabled: false, shuffleEnabled: false, magmaEnabled: false, portalEnabled: false, catalystEnabled: false,
+    wildcardEnabled: false, countdownEnabled: false, shuffleEnabled: false, magmaEnabled: false, portalEnabled: false, catalystEnabled: false, crystalEnabled: false,
     movesAllowed: 9,
   },
   // Wave 4 — lightning unlock (8 moves)
   {
+    archetype: 'scoreRush',
     minWordLength: 2, specialTileChance: 0.21, iceDistribution: 0.25, goldDistribution: 0.16,
     vowelModifier: 0.85, maxCascadeChain: 3, cascadeChainBonus: 0.8, scoreThreshold: 180,
     lightningEnabled: true, vortexEnabled: false, magnetEnabled: false,
     gemEnabled: true, prismEnabled: true, frostEnabled: false, frozenEnabled: false,
     mirrorEnabled: false, silverEnabled: true, diamondEnabled: false,
-    wildcardEnabled: false, countdownEnabled: false, shuffleEnabled: false, magmaEnabled: false, portalEnabled: false, catalystEnabled: false,
+    wildcardEnabled: false, countdownEnabled: false, shuffleEnabled: false, magmaEnabled: false, portalEnabled: false, catalystEnabled: false, crystalEnabled: false,
     movesAllowed: 8,
   },
   // Wave 5 — diamond + mirror unlock (7 moves)
   {
+    archetype: 'normal',
     minWordLength: 2, specialTileChance: 0.23, iceDistribution: 0.27, goldDistribution: 0.14,
     vowelModifier: 0.85, maxCascadeChain: 3, cascadeChainBonus: 0.9, scoreThreshold: 250,
     lightningEnabled: true, vortexEnabled: false, magnetEnabled: false,
     gemEnabled: true, prismEnabled: true, frostEnabled: false, frozenEnabled: false,
     mirrorEnabled: true, silverEnabled: true, diamondEnabled: true,
-    wildcardEnabled: false, countdownEnabled: false, shuffleEnabled: false, magmaEnabled: false, portalEnabled: false, catalystEnabled: false,
+    wildcardEnabled: false, countdownEnabled: false, shuffleEnabled: false, magmaEnabled: false, portalEnabled: false, catalystEnabled: false, crystalEnabled: false,
     movesAllowed: 7,
   },
   // Wave 6 — frost unlock (7 moves)
   {
+    archetype: 'survival',
     minWordLength: 2, specialTileChance: 0.24, iceDistribution: 0.28, goldDistribution: 0.13,
     vowelModifier: 0.82, maxCascadeChain: 3, cascadeChainBonus: 0.95, scoreThreshold: 350,
     lightningEnabled: true, vortexEnabled: false, magnetEnabled: false,
     gemEnabled: true, prismEnabled: true, frostEnabled: true, frozenEnabled: true,
     mirrorEnabled: true, silverEnabled: true, diamondEnabled: true,
-    wildcardEnabled: false, countdownEnabled: false, shuffleEnabled: false, magmaEnabled: false, portalEnabled: false, catalystEnabled: false,
+    wildcardEnabled: false, countdownEnabled: false, shuffleEnabled: false, magmaEnabled: false, portalEnabled: false, catalystEnabled: false, crystalEnabled: false,
     movesAllowed: 7,
   },
   // Wave 7 — vortex unlock (6 moves — tight, requires strategy)
   {
+    archetype: 'treasureHunt',
     minWordLength: 2, specialTileChance: 0.25, iceDistribution: 0.30, goldDistribution: 0.12,
     vowelModifier: 0.82, maxCascadeChain: 4, cascadeChainBonus: 1.0, scoreThreshold: 450,
     lightningEnabled: true, vortexEnabled: true, magnetEnabled: true,
     gemEnabled: true, prismEnabled: true, frostEnabled: true, frozenEnabled: true,
     mirrorEnabled: true, silverEnabled: true, diamondEnabled: true,
-    wildcardEnabled: false, countdownEnabled: false, shuffleEnabled: false, magmaEnabled: false, portalEnabled: false, catalystEnabled: false,
+    wildcardEnabled: false, countdownEnabled: false, shuffleEnabled: false, magmaEnabled: false, portalEnabled: false, catalystEnabled: false, crystalEnabled: false,
     movesAllowed: 6,
   },
   // Wave 8 — wildcard unlock (6 moves)
   {
+    archetype: 'scoreRush',
     minWordLength: 2, specialTileChance: 0.26, iceDistribution: 0.30, goldDistribution: 0.11,
     vowelModifier: 0.80, maxCascadeChain: 4, cascadeChainBonus: 1.0, scoreThreshold: 500,
     lightningEnabled: true, vortexEnabled: true, magnetEnabled: true,
     gemEnabled: true, prismEnabled: true, frostEnabled: true, frozenEnabled: true,
     mirrorEnabled: true, silverEnabled: true, diamondEnabled: true,
-    wildcardEnabled: true, countdownEnabled: false, shuffleEnabled: false, magmaEnabled: false, portalEnabled: false, catalystEnabled: false,
+    wildcardEnabled: true, countdownEnabled: false, shuffleEnabled: false, magmaEnabled: false, portalEnabled: false, catalystEnabled: false, crystalEnabled: false,
     movesAllowed: 6,
   },
   // Wave 9 — countdown unlock (5 moves — tension mechanic, defuse or suffer)
   {
+    archetype: 'survival',
     minWordLength: 2, specialTileChance: 0.27, iceDistribution: 0.30, goldDistribution: 0.10,
     vowelModifier: 0.78, maxCascadeChain: 4, cascadeChainBonus: 1.0, scoreThreshold: 550,
     lightningEnabled: true, vortexEnabled: true, magnetEnabled: true,
     gemEnabled: true, prismEnabled: true, frostEnabled: true, frozenEnabled: true,
     mirrorEnabled: true, silverEnabled: true, diamondEnabled: true,
-    wildcardEnabled: true, countdownEnabled: true, shuffleEnabled: false, magmaEnabled: false, portalEnabled: false, catalystEnabled: false,
+    wildcardEnabled: true, countdownEnabled: true, shuffleEnabled: false, magmaEnabled: false, portalEnabled: false, catalystEnabled: false, crystalEnabled: false,
     movesAllowed: 5,
   },
   // Wave 10 — shuffle unlock (5 moves — rearranges board on clear)
   {
+    archetype: 'normal',
     minWordLength: 2, specialTileChance: 0.28, iceDistribution: 0.30, goldDistribution: 0.10,
     vowelModifier: 0.76, maxCascadeChain: 5, cascadeChainBonus: 1.0, scoreThreshold: 600,
     lightningEnabled: true, vortexEnabled: true, magnetEnabled: true,
     gemEnabled: true, prismEnabled: true, frostEnabled: true, frozenEnabled: true,
     mirrorEnabled: true, silverEnabled: true, diamondEnabled: true,
-    wildcardEnabled: true, countdownEnabled: true, shuffleEnabled: true, magmaEnabled: false, portalEnabled: false, catalystEnabled: false,
+    wildcardEnabled: true, countdownEnabled: true, shuffleEnabled: true, magmaEnabled: false, portalEnabled: false, catalystEnabled: false, crystalEnabled: false,
     movesAllowed: 5,
   },
   // Wave 11 — magma + portal unlock (5 moves — diagonal eruption + teleport paths)
   {
+    archetype: 'scoreRush',
     minWordLength: 2, specialTileChance: 0.28, iceDistribution: 0.30, goldDistribution: 0.10,
     vowelModifier: 0.75, maxCascadeChain: 5, cascadeChainBonus: 1.0, scoreThreshold: 650,
     lightningEnabled: true, vortexEnabled: true, magnetEnabled: true,
     gemEnabled: true, prismEnabled: true, frostEnabled: true, frozenEnabled: true,
     mirrorEnabled: true, silverEnabled: true, diamondEnabled: true,
-    wildcardEnabled: true, countdownEnabled: true, shuffleEnabled: true, magmaEnabled: true, portalEnabled: true, catalystEnabled: false,
+    wildcardEnabled: true, countdownEnabled: true, shuffleEnabled: true, magmaEnabled: true, portalEnabled: true, catalystEnabled: false, crystalEnabled: false,
     movesAllowed: 5,
   },
   // Wave 12+ — catalyst unlock, everything available (4 moves — master tier)
   {
+    archetype: 'survival',
     minWordLength: 2, specialTileChance: 0.30, iceDistribution: 0.30, goldDistribution: 0.10,
     vowelModifier: 0.75, maxCascadeChain: 5, cascadeChainBonus: 1.0, scoreThreshold: 700,
     lightningEnabled: true, vortexEnabled: true, magnetEnabled: true,
     gemEnabled: true, prismEnabled: true, frostEnabled: true, frozenEnabled: true,
     mirrorEnabled: true, silverEnabled: true, diamondEnabled: true,
-    wildcardEnabled: true, countdownEnabled: true, shuffleEnabled: true, magmaEnabled: true, portalEnabled: true, catalystEnabled: true,
+    wildcardEnabled: true, countdownEnabled: true, shuffleEnabled: true, magmaEnabled: true, portalEnabled: true, catalystEnabled: true, crystalEnabled: true,
     movesAllowed: 4,
   },
 ];
@@ -305,6 +342,8 @@ const MAGMA_SHARE = 0.04;
 const PORTAL_SHARE = 0.04;
 /** Catalyst share when enabled */
 const CATALYST_SHARE = 0.04;
+/** Crystal share when enabled — smaller than others because growth multiplier scales exponentially */
+const CRYSTAL_SHARE = 0.03;
 
 /**
  * Build tile distribution for a wave, gating special tiles by unlock progression.
@@ -325,6 +364,7 @@ export function getWaveDistribution(config: WaveConfig): Record<string, number> 
     gemEnabled, prismEnabled, frostEnabled, frozenEnabled,
     mirrorEnabled, diamondEnabled,
     wildcardEnabled, countdownEnabled, shuffleEnabled, magmaEnabled, portalEnabled, catalystEnabled,
+    crystalEnabled,
   } = config;
 
   // Effective flags (support deprecated field aliases)
@@ -352,6 +392,7 @@ export function getWaveDistribution(config: WaveConfig): Record<string, number> 
   let magma = 0;
   let portal = 0;
   let catalyst = 0;
+  let crystal = 0;
   const silver = SILVER_BASE;
 
   // Helper: take a share proportionally from gold + rainbow
@@ -428,6 +469,11 @@ export function getWaveDistribution(config: WaveConfig): Record<string, number> 
     takeShare(CATALYST_SHARE);
   }
 
+  if (crystalEnabled) {
+    crystal = CRYSTAL_SHARE;
+    takeShare(CRYSTAL_SHARE);
+  }
+
   const raw: Record<string, number> = {
     gold: Math.max(0, gold),
     bomb: BOMB_BASE,
@@ -450,6 +496,7 @@ export function getWaveDistribution(config: WaveConfig): Record<string, number> 
     magma,
     portal,
     catalyst,
+    crystal,
   };
 
   // Normalize to sum to 1.0 (avoids drift when many tiles are enabled)

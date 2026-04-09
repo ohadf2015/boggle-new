@@ -80,6 +80,10 @@ export const TILE_VISUALS: Record<BlastTileType, { bg: string; indicator?: strin
     bg: '', indicator: '⚗️', text: 'text-neo-navy',
     style: { background: 'linear-gradient(165deg, #FFFACD 0%, #FFD700 40%, #F0C020 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL },
   },
+  crystal: {
+    bg: '', indicator: '🔮', text: 'text-white',
+    style: { background: 'linear-gradient(165deg, #F0C8FF 0%, #C084FC 40%, #8B5CF6 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL },
+  },
 };
 
 /** Clearing phase background color per tile type */
@@ -102,6 +106,7 @@ export const CLEARING_COLORS: Partial<Record<BlastTileType, { background: string
   magma:     { background: 'radial-gradient(circle, #FF6B35 0%, #CC2200 100%)', border: '2px solid rgba(0,0,0,0.5)' },
   portal:    { background: 'radial-gradient(circle, #7B68EE 0%, #2E0054 100%)', border: '2px solid rgba(0,0,0,0.5)' },
   catalyst:  { background: 'radial-gradient(circle, #FFD700 0%, #DAA520 100%)', border: '2px solid rgba(0,0,0,0.5)' },
+  crystal:   { background: 'radial-gradient(circle, #E0B0FF 0%, #7C3AED 100%)', border: '2px solid rgba(0,0,0,0.5)' },
 };
 
 /** Type-specific clearing transform overrides — visually distinct death animations.
@@ -126,4 +131,5 @@ export const CLEARING_ANIMS: Partial<Record<BlastTileType, { transform: string; 
   magma:     { transform: 'scale(2.5) rotate(45deg)', transition: 'all 250ms cubic-bezier(0.17, 0.67, 0.83, 0.67)', filter: 'brightness(3) saturate(2.5)' },
   portal:    { transform: 'scale(0.01) rotate(720deg)', transition: 'all 350ms cubic-bezier(0.36, 0, 0.66, -0.56)', filter: 'brightness(2) blur(2px)' },
   catalyst:  { transform: 'scale(2.0) rotate(-15deg)', transition: 'all 220ms ease-out', filter: 'brightness(2.5) saturate(2)' },
+  crystal:   { transform: 'scale(1.7) rotate(180deg)', transition: 'all 260ms cubic-bezier(0.34, 1.56, 0.64, 1)', filter: 'brightness(2.2) saturate(2.5) hue-rotate(20deg)' },
 };

@@ -31,6 +31,7 @@ const TILE_I18N_KEYS: Partial<Record<BlastTileType, { name: string; desc: string
   magma:     { name: 'blast.tile.magma.name',     desc: 'blast.tile.magma.desc',     icon: '🌋' },
   portal:    { name: 'blast.tile.portal.name',    desc: 'blast.tile.portal.desc',    icon: '🌌' },
   catalyst:  { name: 'blast.tile.catalyst.name',  desc: 'blast.tile.catalyst.desc',  icon: '⚗️' },
+  crystal:   { name: 'blast.tile.crystal.name',   desc: 'blast.tile.crystal.desc',   icon: '🔮' },
 };
 
 /** English fallbacks */
@@ -53,6 +54,7 @@ const ENGLISH_FALLBACK: Partial<Record<BlastTileType, TileTooltip>> = {
   magma:     { name: 'Magma',     desc: 'Erupts and clears both diagonals (X-pattern).',            icon: '🌋' },
   portal:    { name: 'Portal',    desc: 'Teleport through paired portals. Words score 2\u00d7.',     icon: '🌌' },
   catalyst:  { name: 'Catalyst',  desc: 'Clears and upgrades adjacent tiles to random specials.',    icon: '⚗️' },
+  crystal:   { name: 'Crystal',   desc: 'Grows +1\u00d7 each unused turn (max 5\u00d7). Multiplies your word score when used.', icon: '🔮' },
 };
 
 /** Get tooltip for a tile type. Uses t() for i18n when provided, English fallback otherwise. */

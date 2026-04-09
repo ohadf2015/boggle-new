@@ -31,6 +31,7 @@ const TILE_GUIDE_ENTRIES: Array<{ type: BlastTileType; indicator: string; key: s
   { type: 'magma', indicator: '🌋', key: 'magma' },
   { type: 'portal', indicator: '🌌', key: 'portal' },
   { type: 'catalyst', indicator: '⚗️', key: 'catalyst' },
+  { type: 'crystal', indicator: '🔮', key: 'crystal' },
 ];
 
 /**

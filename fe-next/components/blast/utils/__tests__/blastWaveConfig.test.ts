@@ -314,4 +314,89 @@ describe('getWaveDistribution — new tile unlock progression', () => {
       expect(getWaveConfig(wave).silverEnabled).toBe(true);
     }
   });
+
+  it('crystalEnabled=false for waves 1-11, true at wave 12+ (master-tier unlock)', () => {
+    for (let wave = 1; wave <= 11; wave++) {
+      expect(getWaveConfig(wave).crystalEnabled).toBe(false);
+    }
+    expect(getWaveConfig(12).crystalEnabled).toBe(true);
+    expect(getWaveConfig(15).crystalEnabled).toBe(true);
+  });
+
+  it('crystal absent from distribution for waves 1-11, present at wave 12+', () => {
+    for (let wave = 1; wave <= 11; wave++) {
+      const dist = getWaveDistribution(getWaveConfig(wave));
+      expect(dist.crystal ?? 0).toBe(0);
+    }
+    const dist12 = getWaveDistribution(getWaveConfig(12));
+    expect(dist12.crystal).toBeGreaterThan(0);
+  });
+
+  it('wave 12 distribution still sums to ~1.0 with crystal included', () => {
+    const dist = getWaveDistribution(getWaveConfig(12));
+    const sum = (Object.values(dist) as number[]).reduce((a, b) => a + b, 0);
+    expect(sum).toBeCloseTo(1.0, 2);
+  });
+});
+
+describe('getWaveConfig archetype', () => {
+  it('wave 1 is a calm normal wave (learn-the-ropes)', () => {
+    expect(getWaveConfig(1).archetype).toBe('normal');
+  });
+
+  it('wave 2 is a treasureHunt wave (gem unlock)', () => {
+    expect(getWaveConfig(2).archetype).toBe('treasureHunt');
+  });
+
+  it('wave 3 is a normal wave', () => {
+    expect(getWaveConfig(3).archetype).toBe('normal');
+  });
+
+  it('wave 4 is a scoreRush wave (lightning unlock → big combos)', () => {
+    expect(getWaveConfig(4).archetype).toBe('scoreRush');
+  });
+
+  it('wave 5 is a normal wave', () => {
+    expect(getWaveConfig(5).archetype).toBe('normal');
+  });
+
+  it('wave 6 is a survival wave (tight moves, frost unlock)', () => {
+    expect(getWaveConfig(6).archetype).toBe('survival');
+  });
+
+  it('wave 7 is a treasureHunt wave (vortex unlock → collection puzzle)', () => {
+    expect(getWaveConfig(7).archetype).toBe('treasureHunt');
+  });
+
+  it('wave 8 is a scoreRush wave (wildcard unlock)', () => {
+    expect(getWaveConfig(8).archetype).toBe('scoreRush');
+  });
+
+  it('wave 9 is a survival wave (countdown unlock)', () => {
+    expect(getWaveConfig(9).archetype).toBe('survival');
+  });
+
+  it('wave 10 is a normal wave', () => {
+    expect(getWaveConfig(10).archetype).toBe('normal');
+  });
+
+  it('wave 11 is a scoreRush wave (magma + portal chaos)', () => {
+    expect(getWaveConfig(11).archetype).toBe('scoreRush');
+  });
+
+  it('wave 12 is a survival wave (master tier, 4 moves)', () => {
+    expect(getWaveConfig(12).archetype).toBe('survival');
+  });
+
+  it('waves beyond 12 inherit the wave 12 archetype', () => {
+    expect(getWaveConfig(15).archetype).toBe(getWaveConfig(12).archetype);
+    expect(getWaveConfig(99).archetype).toBe(getWaveConfig(12).archetype);
+  });
+
+  it('every wave has an archetype from the known set', () => {
+    const known = new Set(['normal', 'scoreRush', 'treasureHunt', 'survival', 'silence']);
+    for (let wave = 1; wave <= 12; wave++) {
+      expect(known.has(getWaveConfig(wave).archetype)).toBe(true);
+    }
+  });
 });

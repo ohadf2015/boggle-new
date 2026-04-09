@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { applyBetweenTurnEffects } from '../blastBetweenTurnEffects';
-import { type BlastTileState, COUNTDOWN_EXPLOSION_PENALTY } from '../../types';
+import { type BlastTileState, COUNTDOWN_EXPLOSION_PENALTY, CRYSTAL_MAX_MULTIPLIER } from '../../types';
 
 /** Helper to create a minimal tile */
 function makeTile(row: number, col: number, type: BlastTileState['type'] = 'standard', overrides: Partial<BlastTileState> = {}): BlastTileState {
@@ -80,6 +80,45 @@ describe('applyBetweenTurnEffects', () => {
       applyBetweenTurnEffects(grid, 3);
 
       expect(grid[1][1].countdown).toBe(2); // unchanged
+    });
+  });
+
+  describe('crystal growth', () => {
+    it('increments crystalMultiplier by 1 on an unused crystal each turn', () => {
+      const grid = makeGrid(3);
+      grid[1][1] = makeTile(1, 1, 'crystal', { crystalMultiplier: 1 });
+
+      applyBetweenTurnEffects(grid, 3);
+
+      expect(grid[1][1].crystalMultiplier).toBe(2);
+    });
+
+    it(`caps crystalMultiplier at CRYSTAL_MAX_MULTIPLIER (${CRYSTAL_MAX_MULTIPLIER})`, () => {
+      const grid = makeGrid(3);
+      grid[1][1] = makeTile(1, 1, 'crystal', { crystalMultiplier: CRYSTAL_MAX_MULTIPLIER });
+
+      applyBetweenTurnEffects(grid, 3);
+
+      expect(grid[1][1].crystalMultiplier).toBe(CRYSTAL_MAX_MULTIPLIER);
+    });
+
+    it('does not grow cleared crystals', () => {
+      const grid = makeGrid(3);
+      grid[1][1] = makeTile(1, 1, 'crystal', { crystalMultiplier: 2, isCleared: true });
+
+      applyBetweenTurnEffects(grid, 3);
+
+      expect(grid[1][1].crystalMultiplier).toBe(2);
+    });
+
+    it('initializes missing crystalMultiplier to 2 on first tick', () => {
+      const grid = makeGrid(3);
+      // Simulate a crystal spawned without an explicit multiplier — treat as 1, grows to 2
+      grid[1][1] = makeTile(1, 1, 'crystal');
+
+      applyBetweenTurnEffects(grid, 3);
+
+      expect(grid[1][1].crystalMultiplier).toBe(2);
     });
   });
 

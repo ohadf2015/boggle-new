@@ -218,6 +218,13 @@ export const MAGMA_DIAGONAL_CLEAR_BONUS = 2;
 /** Magma clears both diagonals through its position (X-pattern, full grid reach) */
 export const MAGMA_MULTIPLIER = 2;
 
+// ==================== Crystal Constants ====================
+
+/** Crystal tiles start at this multiplier when spawned */
+export const CRYSTAL_START_MULTIPLIER = 1;
+/** Maximum growth multiplier a crystal can reach (caps between-turn growth) */
+export const CRYSTAL_MAX_MULTIPLIER = 5;
+
 // ==================== Portal Constants ====================
 
 /** Bonus score for using a portal in a word */
@@ -317,6 +324,7 @@ export const SPECIAL_TILE_DISTRIBUTION: Record<Exclude<BlastTileType, 'standard'
   catalyst: 0,
   shuffle: 0,
   magma: 0,
+  crystal: 0,
 };
 
 // ==================== Objectives ====================

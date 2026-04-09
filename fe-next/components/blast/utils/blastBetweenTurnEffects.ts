@@ -8,6 +8,8 @@ import {
   CATALYST_CLEAR_BONUS,
   COUNTDOWN_EXPLOSION_RADIUS,
   COUNTDOWN_EXPLOSION_PENALTY,
+  CRYSTAL_START_MULTIPLIER,
+  CRYSTAL_MAX_MULTIPLIER,
   type BlastTileState,
   type BlastTileType,
   type BlastExplosion,
@@ -132,6 +134,19 @@ export function applyBetweenTurnEffects(
       const tile = tiles[r][c];
       if (tile.type === 'countdown' && !tile.isCleared && tile.countdown != null && tile.countdown > 0) {
         tile.countdown -= 1;
+      }
+    }
+  }
+
+  // 1b. Grow unused crystal tiles (capped at CRYSTAL_MAX_MULTIPLIER).
+  // Crystals that sat on the board this turn gain +1 to their word multiplier,
+  // rewarding patient players who plan to use them later.
+  for (let r = 0; r < gridSize; r++) {
+    for (let c = 0; c < gridSize; c++) {
+      const tile = tiles[r][c];
+      if (tile.type === 'crystal' && !tile.isCleared) {
+        const current = tile.crystalMultiplier ?? CRYSTAL_START_MULTIPLIER;
+        tile.crystalMultiplier = Math.min(current + 1, CRYSTAL_MAX_MULTIPLIER);
       }
     }
   }

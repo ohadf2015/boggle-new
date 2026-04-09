@@ -41,6 +41,7 @@ export const BLAST_TILE_BONUSES: Record<BlastTileType, number> = {
   magma: 2,        // high reward for diagonal clear power
   portal: 1.25,    // mild bonus for teleport path usage
   catalyst: 1.5,   // reward for triggering upgrade effect
+  crystal: 1,      // no flat bonus — reward comes from crystalWordMultiplier
 };
 
 export const BLAST_RAINBOW_FLAT_BONUS = 3;
