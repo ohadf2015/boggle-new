@@ -144,11 +144,13 @@ export function BlastGame({
   useEffect(() => {
     setGameActive(true);
     fadeToTrack(TRACKS.BLAST, 800, 800);
+    const explosionShakeTimer = explosionShakeTimerRef;
+    const nearMissTimer = nearMissTimerRef;
     return () => {
       setGameActive(false);
       stopMusic();
-      if (explosionShakeTimerRef.current) clearTimeout(explosionShakeTimerRef.current);
-      if (nearMissTimerRef.current) clearTimeout(nearMissTimerRef.current);
+      if (explosionShakeTimer.current) clearTimeout(explosionShakeTimer.current);
+      if (nearMissTimer.current) clearTimeout(nearMissTimer.current);
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setGameActive]);
