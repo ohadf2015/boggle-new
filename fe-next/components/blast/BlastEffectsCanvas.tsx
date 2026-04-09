@@ -8,16 +8,13 @@
 // Dynamically imported (ssr: false) to keep PixiJS out of the SSR bundle.
 
 import { useEffect, useRef, useCallback } from 'react';
-import { Graphics } from 'pixi.js';
-import { BloomFilter, ShockwaveFilter } from 'pixi-filters';
 import { useBlastDebris } from './useBlastDebris';
 import { GameCanvas, useGameEngine } from '@/lib/gameEngine/GameCanvas';
 import { createEnhancedEffects, type EnhancedEffectsManager } from './utils/blastEnhancedEffects';
 import { createBlastJuiceKit, type BlastJuiceKit } from './effects/blastJuiceKit';
-import { createGlowFilter } from './effects/pixiFilterPresets';
-import { computePulseRingFrame, pulseRingTierColor } from './effects/pulseRingCurve';
-import { isReducedMotionPreferred } from '@/utils/accessibility';
 import { useBlastAmbientEffects } from './useBlastAmbientEffects';
+import { useBlastPixiOverlays } from './hooks/useBlastPixiOverlays';
+import { isReducedMotionPreferred } from '@/utils/accessibility';
 import {
   TILE_EXPLOSION_VARIANTS,
   BOMB_EXPLOSION_VARIANTS,
@@ -136,51 +133,19 @@ function EffectsWorker({
   const prevChainRef = useRef(0);
   const prevComboRef = useRef(0);
   const prevWaveRef = useRef(false);
-  const crossFlashRef = useRef<Graphics | null>(null);
-  const crossFlashRafRef = useRef<number>(0);
-  const pulseRingsRef = useRef<Set<Graphics>>(new Set());
-  const pulseRingRafsRef = useRef<Set<number>>(new Set());
   const magnetTimersRef = useRef<Set<ReturnType<typeof setTimeout>>>(new Set());
   const bloomTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const bloomRef = useRef<InstanceType<typeof BloomFilter> | null>(null);
-  const shockwaveRef = useRef<InstanceType<typeof ShockwaveFilter> | null>(null);
-  const shockwaveRafRef = useRef<number>(0);
 
-  // Clean up magnet timers and cross flash on unmount.
-  // IMPORTANT: removeChild BEFORE destroy — `camera` is owned by GameCanvas and
-  // typically outlives this component, so destroyed Graphics left in
-  // `camera.children` would be iterated next render and crash Pixi.
+  // Clean up magnet timers on unmount. Pixi overlay cleanup (cross flash,
+  // pulse rings, bloom/shockwave filters) lives inside useBlastPixiOverlays.
   useEffect(() => {
     const timers = magnetTimersRef.current;
-    const pulseRafs = pulseRingRafsRef.current;
-    const pulseRings = pulseRingsRef.current;
-    const cameraRef = camera;
     return () => {
       for (const tid of timers) clearTimeout(tid);
       timers.clear();
       if (bloomTimerRef.current) clearTimeout(bloomTimerRef.current);
-      cancelAnimationFrame(crossFlashRafRef.current);
-      cancelAnimationFrame(shockwaveRafRef.current);
-      const cameraAlive = !cameraRef.destroyed;
-      if (crossFlashRef.current) {
-        if (cameraAlive && !crossFlashRef.current.destroyed) {
-          try { cameraRef.removeChild(crossFlashRef.current); } catch { /* */ }
-        }
-        if (!crossFlashRef.current.destroyed) crossFlashRef.current.destroy();
-        crossFlashRef.current = null;
-      }
-      for (const raf of pulseRafs) cancelAnimationFrame(raf);
-      pulseRafs.clear();
-      for (const ring of pulseRings) {
-        if (ring.destroyed) continue;
-        if (cameraAlive) {
-          try { cameraRef.removeChild(ring); } catch { /* */ }
-        }
-        ring.destroy();
-      }
-      pulseRings.clear();
     };
-  }, [camera]);
+  }, []);
 
   // Initialize enhanced effects (ShatterEffect / DissolveEffect from custom-pixi-particles)
   useEffect(() => {
@@ -194,7 +159,15 @@ function EffectsWorker({
 
   // Initialize juice kit (chromatic aberration + zoom blur + bloom ramps + hit-stop)
   useEffect(() => {
-    juiceRef.current = createBlastJuiceKit({ app, camera, shake, timeDilation });
+    juiceRef.current = createBlastJuiceKit({
+      app,
+      camera,
+      shake,
+      timeDilation,
+      // Gate every burst through prefers-reduced-motion. Checked at call time
+      // so a user toggling their OS preference mid-run gets immediate relief.
+      motionOk: () => !isReducedMotionPreferred(),
+    });
     return () => {
       juiceRef.current?.destroy();
       juiceRef.current = null;
@@ -211,50 +184,12 @@ function EffectsWorker({
     spawnWaveClearBurst,
   } = useBlastDebris(cellSize, gridSize, camera, physics);
 
-  // ─── Combo pulse ring — expanding GlowFilter ring, lime→pink→cyan by tier ──
-  // Drawn as a 1-unit-radius stroked circle with uniform scale driven by
-  // `computePulseRingFrame`; GlowFilter supplies the neon halo. Multiple rings
-  // can coexist when combos stack — each tracked in pulseRingsRef for cleanup.
-  const spawnPulseRing = useCallback((cx: number, cy: number, tier: number) => {
-    // Accessibility: honor prefers-reduced-motion. Skipping the ring entirely
-    // (rather than shortening it) is safer than trying to "tone down" an
-    // additive glow burst — users who opt out want zero flashing motion.
-    if (isReducedMotionPreferred()) return;
-    const g = new Graphics();
-    // Base radius 1 — actual visual radius comes from scale tween × baseRadius.
-    const baseRadius = Math.min(width, height) * 0.18;
-    g.circle(0, 0, baseRadius).stroke({ color: 0xffffff, width: 6, alpha: 1 });
-    g.x = cx;
-    g.y = cy;
-    g.filters = [createGlowFilter(pulseRingTierColor(tier), 3)];
-    camera.addChild(g);
-    pulseRingsRef.current.add(g);
-
-    const start = performance.now();
-    const duration = 450;
-    const step = () => {
-      if (camera.destroyed || g.destroyed) {
-        pulseRingsRef.current.delete(g);
-        return;
-      }
-      const frame = computePulseRingFrame((performance.now() - start) / duration);
-      g.scale.set(frame.scale);
-      g.alpha = frame.alpha;
-      if (frame.done) {
-        try { camera.removeChild(g); } catch { /* */ }
-        g.destroy();
-        pulseRingsRef.current.delete(g);
-        pulseRingRafsRef.current.delete(rafId);
-        return;
-      }
-      const next = requestAnimationFrame(step);
-      pulseRingRafsRef.current.delete(rafId);
-      pulseRingRafsRef.current.add(next);
-      rafId = next;
-    };
-    let rafId = requestAnimationFrame(step);
-    pulseRingRafsRef.current.add(rafId);
-  }, [camera, width, height]);
+  // ─── Pixi overlay pipeline ────────────────────────────────────────
+  // Owns bloom+shockwave camera filters, cross flash, and combo pulse rings.
+  // All teardown + camera.destroyed guards live inside the hook.
+  const { fireShockwave, flashCross, spawnPulseRing } = useBlastPixiOverlays({
+    camera, width, height, gridSize, cellSize, chainLevel,
+  });
 
   // ─── Prism cross beam effect ──────────────────────────────────────
   const firePrismBeams = useCallback((cx: number, cy: number) => {
@@ -265,49 +200,6 @@ function EffectsWorker({
     particles.burst(PRISM_BEAM_RIGHT, cx + beamOffsets / 2, cy);
   }, [particles, gridSize, cellSize]);
 
-  // ─── Cross flash (white lines fading to transparent over 300ms) ──
-  const flashCross = useCallback((cx: number, cy: number) => {
-    // Destroy previous cross flash if still animating.
-    // Guard removeChild — `g` may already be detached (camera teardown race).
-    if (crossFlashRef.current) {
-      cancelAnimationFrame(crossFlashRafRef.current);
-      const prev = crossFlashRef.current;
-      if (!camera.destroyed && !prev.destroyed) {
-        try { camera.removeChild(prev); } catch { /* */ }
-      }
-      if (!prev.destroyed) prev.destroy();
-      crossFlashRef.current = null;
-    }
-    const g = new Graphics();
-    const lineLen = gridSize * cellSize;
-    g.rect(0, cy - 2, lineLen, 4).fill({ color: 0xffffff });
-    g.rect(cx - 2, 0, 4, lineLen).fill({ color: 0xffffff });
-    g.alpha = 0.9;
-    camera.addChild(g);
-    crossFlashRef.current = g;
-
-    const start = performance.now();
-    const duration = 300;
-    const fade = () => {
-      // Guard: camera or graphics may be destroyed on unmount
-      if (camera.destroyed || g.destroyed) {
-        crossFlashRef.current = null;
-        return;
-      }
-      const elapsed = performance.now() - start;
-      const t = Math.min(elapsed / duration, 1);
-      g.alpha = 0.9 * (1 - t);
-      if (t < 1) {
-        crossFlashRafRef.current = requestAnimationFrame(fade);
-      } else {
-        try { camera.removeChild(g); } catch { /* */ }
-        g.destroy();
-        crossFlashRef.current = null;
-      }
-    };
-    crossFlashRafRef.current = requestAnimationFrame(fade);
-  }, [camera, gridSize, cellSize]);
-
   // Start ambient bokeh on mount
   useEffect(() => {
     const emitter = particles.create(AMBIENT_BOKEH);
@@ -315,83 +207,10 @@ function EffectsWorker({
     return () => { emitter.destroy(); };
   }, [particles, width, height]);
 
-  // Bloom + Shockwave filters — allocated once per camera mount.
-  // Single `camera.filters = [...]` assignment avoids the two-effect spread dance
-  // and keeps filter pipeline stable across re-renders (no rebuild on resize).
-  useEffect(() => {
-    const bloom = new BloomFilter({ strength: 2, quality: 4 });
-    bloom.enabled = false;
-    bloomRef.current = bloom;
-
-    const sw = new ShockwaveFilter({
-      center: { x: 0, y: 0 }, // lazily updated in fireShockwave
-      radius: -1,
-      speed: 300,
-      amplitude: 20,
-      wavelength: 120,
-    });
-    sw.enabled = false;
-    shockwaveRef.current = sw;
-
-    const prev = Array.isArray(camera.filters) ? camera.filters : [];
-    /* eslint-disable react-hooks/immutability */
-    camera.filters = [...prev, bloom, sw];
-    return () => {
-      cancelAnimationFrame(shockwaveRafRef.current);
-      // Skip filter unmount if camera was already destroyed — accessing
-      // `.filters` on a destroyed Container throws in Pixi v8.
-      if (!camera.destroyed) {
-        const filters = Array.isArray(camera.filters) ? camera.filters : [];
-        camera.filters = filters.filter(f => f !== bloom && f !== sw);
-      }
-      /* eslint-enable react-hooks/immutability */
-      bloom.destroy();
-      sw.destroy();
-      bloomRef.current = null;
-      shockwaveRef.current = null;
-    };
-  }, [camera]);
-
-  // Fire a shockwave from a point — mutate center fields in place (no object alloc).
-  const fireShockwave = useCallback((cx: number, cy: number, amplitude = 20) => {
-    const sw = shockwaveRef.current;
-    if (!sw) return;
-    sw.center.x = cx;
-    sw.center.y = cy;
-    sw.time = 0;
-    sw.amplitude = amplitude;
-    sw.enabled = true;
-    const start = performance.now();
-    const duration = 600;
-    const tick = () => {
-      if (!shockwaveRef.current) return;
-      const t = Math.min((performance.now() - start) / duration, 1);
-      sw.time = t;
-      if (t < 1) {
-        shockwaveRafRef.current = requestAnimationFrame(tick);
-      } else {
-        sw.enabled = false;
-      }
-    };
-    shockwaveRafRef.current = requestAnimationFrame(tick);
-  }, []);
-
   // Ambient effects: ghost trails (chain >= 2) + metaball goo (chain >= 3)
   const { moveGhostTo } = useBlastAmbientEffects({
     app, camera, width, height, cellSize, chainLevel,
   });
-
-  // Update bloom intensity based on chain level
-  useEffect(() => {
-    const bloom = bloomRef.current;
-    if (!bloom) return;
-    if (chainLevel >= 1) {
-      bloom.enabled = true;
-      bloom.strength = 2 + chainLevel * 1.5;
-    } else {
-      bloom.enabled = false;
-    }
-  }, [chainLevel]);
 
   // Tile clear → per-type particle bursts + screen shake
   useEffect(() => {
