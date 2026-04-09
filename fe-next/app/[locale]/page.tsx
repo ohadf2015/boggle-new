@@ -63,7 +63,7 @@ export default async function HomePage({ params }: PageProps) {
           Visually hidden with CSS but NOT aria-hidden so crawlers index the text.
           This provides heading hierarchy (h2/h3) and word count for AdSense approval. */}
       <section className="sr-only">
-        <h1>{titleMap[locale] || titleMap.en}</h1>
+        <p>{titleMap[locale] || titleMap.en}</p>
         <h2>{seo?.whatIsTitle}</h2>
         <p>{seo?.whatIsContent}</p>
 
