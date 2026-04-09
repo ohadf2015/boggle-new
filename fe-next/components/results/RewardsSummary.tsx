@@ -188,13 +188,22 @@ const RewardsSummary: React.FC<RewardsSummaryProps> = memo(({
                 {isAuthenticated && coinReward.breakdown && (
                   <div className="text-xs text-white/60 space-y-0.5 text-right">
                     {coinReward.breakdown.base > 0 && (
-                      <div>Base: +{coinReward.breakdown.base}</div>
+                      <div>{t('reveal.base')}: +{coinReward.breakdown.base}</div>
                     )}
                     {(coinReward.breakdown.scoreBonus ?? 0) > 0 && (
-                      <div>Score: +{coinReward.breakdown.scoreBonus}</div>
+                      <div>{t('coins.score')}: +{coinReward.breakdown.scoreBonus}</div>
                     )}
                     {(coinReward.breakdown.placement ?? 0) > 0 && (
-                      <div>Rank: +{coinReward.breakdown.placement}</div>
+                      <div>{t('coins.placement')}: +{coinReward.breakdown.placement}</div>
+                    )}
+                    {(coinReward.breakdown.efficiency ?? 0) > 0 && (
+                      <div>{t('coins.efficiency')}: +{coinReward.breakdown.efficiency}</div>
+                    )}
+                    {(coinReward.breakdown.streak ?? 0) > 0 && (
+                      <div>{t('coins.streak')}: +{coinReward.breakdown.streak}</div>
+                    )}
+                    {(coinReward.breakdown.streakBonus ?? 0) > 0 && (
+                      <div className="text-amber-400 font-semibold">🔥 +{coinReward.breakdown.streakBonus}</div>
                     )}
                   </div>
                 )}
