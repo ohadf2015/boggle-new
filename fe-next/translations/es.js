@@ -7825,6 +7825,27 @@ const es = {
       "gemsCollected": "Gemas",
       "bestWord": "Mejor Palabra",
       "tiles": "fichas",
+      "newRecord": "¡NUEVO RÉCORD!",
+      "yourRank": "Tu Ranking",
+      "topPercent": "Top {pct}% esta semana",
+      "pbDelta": "+{delta} sobre tu mejor",
+      "fromBest": "desde tu mejor marca",
+      "biggestCombo": "Mayor Combo",
+      "bestWave": "Mejor Oleada",
+      "wave": "Oleada {n}",
+      "badgesEarned": "Insignias Ganadas",
+      "newBadge": "NUEVO",
+      "share": "Compartir"
+    },
+    "badges": {
+      "firstBlast": "Primer Blast",
+      "waveRider": "Jinete de Olas",
+      "marathoner": "Maratonista",
+      "comboChain": "Cadena de Combos",
+      "comboKing": "Rey del Combo",
+      "wordsmith": "Maestro de Palabras",
+      "clearMaster": "Maestro Limpiador",
+      "highScorer": "Gran Anotador"
     },
     "ready": {
       "title": "Modo Blast",

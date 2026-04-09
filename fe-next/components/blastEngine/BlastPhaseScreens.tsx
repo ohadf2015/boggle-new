@@ -1,9 +1,59 @@
 'use client';
 
+import { useEffect, useMemo, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { Star, Zap, RotateCcw, ArrowLeft, ChevronRight } from 'lucide-react';
+import NumberFlow from '@number-flow/react';
+import { useReward } from 'react-rewards';
+import {
+  Star,
+  Zap,
+  RotateCcw,
+  ArrowLeft,
+  ChevronRight,
+  Trophy,
+  TrendingUp,
+  BookOpen,
+  Target,
+  Sparkles,
+  Waves,
+  Flag,
+  Link as LinkIcon,
+  Crown,
+  type LucideIcon,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { BlastResultsData } from '@/components/blast/types';
+import { useBlastBadgeUnlocks } from '@/components/blast/hooks/useBlastBadgeUnlocks';
+
+// Lucide icon resolver for badge icon names stored as strings in blastBadges.ts.
+// Keeps the badge registry free of React imports (serializable, SSR-safe).
+const BADGE_ICON_MAP: Record<string, LucideIcon> = {
+  Sparkles,
+  Waves,
+  Flag,
+  Link: LinkIcon,
+  Crown,
+  BookOpen,
+  Target,
+  Trophy,
+};
+
+// Framer-motion stagger variants shared by the results screen sections.
+const containerVariants = {
+  hidden: {},
+  show: {
+    transition: { staggerChildren: 0.12, delayChildren: 0.1 },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: { type: 'spring' as const, stiffness: 200, damping: 20 },
+  },
+};
 
 // ─── BlastReadyScreen ──────────────────────────────────────────────────
 
@@ -182,29 +232,90 @@ interface BlastResultsScreenProps {
 }
 
 export function BlastResultsScreen({ results, onPlayAgain, onBack, t }: BlastResultsScreenProps) {
+  const finalScore = results?.finalScore ?? 0;
+  const wavesCompleted = results?.wavesCompleted ?? 0;
+  const wordsCount = results?.wordsFound.length ?? 0;
+  const stars = results?.stars ?? 0;
+  const bestWord = results?.bestWord ?? '';
+  const maxCombo = results?.maxCombo ?? 0;
+  const previousBest = results?.previousBest;
+  const percentile = results?.percentile;
+
+  // Compute earned badges, persist new unlocks, fire sonner toasts + haptics.
+  // Returns enriched list with localized labels + isNew flags for rendering.
+  const badges = useBlastBadgeUnlocks({ results, t });
+
+  // New record if we beat a previous best
+  const isNewRecord = previousBest != null && finalScore > previousBest;
+  const pbDelta = isNewRecord ? finalScore - (previousBest ?? 0) : 0;
+
+  // Derive best wave from waveResults (pure client-side)
+  const bestWave = useMemo(() => {
+    if (results?.bestWave) return results.bestWave;
+    if (!results?.waveResults?.length) return null;
+    return results.waveResults.reduce((best, w) =>
+      w.score > best.score ? w : best,
+    );
+  }, [results]);
+
+  // Confetti reward anchor for new records
+  const { reward } = useReward('blast-results-reward', 'confetti', {
+    elementCount: 120,
+    spread: 90,
+    lifetime: 200,
+  });
+  const firedRef = useRef(false);
+  useEffect(() => {
+    if (isNewRecord && !firedRef.current) {
+      firedRef.current = true;
+      // Small delay so the reward fires after the score card has appeared
+      const id = window.setTimeout(() => reward(), 300);
+      return () => window.clearTimeout(id);
+    }
+    return undefined;
+  }, [isNewRecord, reward]);
+
+  // Top-N% label: percentile is "higher = better", so top% = 100 - percentile
+  const topPercent = percentile != null ? Math.max(1, 100 - percentile) : null;
+
   return (
     <div
-      className="flex flex-col items-center justify-center min-h-screen p-4 gap-6"
+      className="flex flex-col items-center justify-start min-h-screen p-4 py-8 gap-5"
       style={{ background: 'radial-gradient(ellipse at 50% 30%, #2d1b4e 0%, #0f0c29 70%, #080618 100%)' }}
     >
       <motion.div
-        initial={{ scale: 0.9, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
+        variants={containerVariants}
+        initial="hidden"
+        animate="show"
+        className="w-full max-w-sm flex flex-col gap-4"
       >
-        <div
-          className="text-center p-8 rounded-2xl max-w-sm"
+        {/* ─── 1. Final Score + Stars + PB delta ─── */}
+        <motion.div
+          variants={itemVariants}
+          className="text-center p-6 rounded-2xl relative"
           style={{
             background: 'rgba(255,255,255,0.04)',
-            border: '1px solid rgba(255,255,255,0.08)',
+            border: '1px solid rgba(255,215,0,0.15)',
             backdropFilter: 'blur(12px)',
             boxShadow: '0 12px 40px rgba(0,0,0,0.4)',
           }}
         >
-          <h2 className="text-2xl font-neo-display font-black text-white/80 mb-2">
-            {t('blast.gameOver')}
+          <span
+            id="blast-results-reward"
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+          />
+          <h2 className="text-xl font-neo-display font-black text-white/80 mb-1 flex items-center justify-center gap-2">
+            {isNewRecord ? (
+              <>
+                <Sparkles className="w-5 h-5 text-amber-300" />
+                {t('blast.results.newRecord')}
+              </>
+            ) : (
+              t('blast.gameOver')
+            )}
           </h2>
           <div
-            className="text-5xl font-black mb-5"
+            className="text-6xl font-black mb-3 tabular-nums"
             style={{
               background: 'linear-gradient(180deg, #FFE566, #FFD700, #B8860B)',
               WebkitBackgroundClip: 'text',
@@ -212,45 +323,199 @@ export function BlastResultsScreen({ results, onPlayAgain, onBack, t }: BlastRes
               filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.4))',
             }}
           >
-            {results?.finalScore ?? 0}
+            <NumberFlow value={finalScore} />
           </div>
-          <div className="grid grid-cols-2 gap-4 text-sm text-white/50 mb-4">
-            <div>
-              <span className="block text-xl font-black text-white tabular-nums">
-                {results?.wavesCompleted ?? 0}
-              </span>
-              {t('blast.waves')}
-            </div>
-            <div>
-              <span className="block text-xl font-black text-white tabular-nums">
-                {results?.wordsFound.length ?? 0}
-              </span>
-              {t('blast.words')}
-            </div>
-          </div>
-        </div>
-      </motion.div>
 
-      <div className="flex gap-3">
-        <Button
-          onClick={onPlayAgain}
-          className="border-3 border-neo-black font-neo-display rounded-xl"
-          style={{
-            background: 'linear-gradient(180deg, #66FFFF 0%, #00FFFF 50%, #00B3B3 100%)',
-            boxShadow: 'inset 0 2px 4px rgba(255,255,255,0.4), 0 4px 0 #008888, 0 6px 12px rgba(0,255,255,0.25)',
-            color: '#1a1a2e',
-          }}
-        >
-          <RotateCcw className="w-4 h-4 mr-1" />
-          {t('blast.playAgain')}
-        </Button>
-        <Button
-          onClick={onBack}
-          variant="ghost"
-          className="text-white/30 hover:text-white/50 font-neo-display"
-        >
-          {t('common.back')}
-        </Button>
+          {/* Stars */}
+          <div className="flex gap-1.5 justify-center mb-3" dir="ltr">
+            {[1, 2, 3].map((s) => (
+              <Star
+                key={s}
+                className={`w-8 h-8 ${
+                  s <= stars ? 'text-amber-400 fill-amber-400' : 'text-white/10'
+                }`}
+                style={s <= stars ? { filter: 'drop-shadow(0 0 4px rgba(255,215,0,0.5))' } : undefined}
+              />
+            ))}
+          </div>
+
+          {/* PB delta */}
+          {previousBest != null && (
+            <div className="text-xs text-white/60 font-neo-body">
+              {isNewRecord
+                ? t('blast.results.pbDelta', { delta: pbDelta })
+                : t('blast.results.fromBest', { best: previousBest })}
+            </div>
+          )}
+        </motion.div>
+
+        {/* ─── 2. Rank card (gated on percentile) ─── */}
+        {topPercent != null && (
+          <motion.div
+            variants={itemVariants}
+            className="p-4 rounded-2xl"
+            style={{
+              background: 'rgba(255,255,255,0.04)',
+              border: '1px solid rgba(0,255,255,0.15)',
+              backdropFilter: 'blur(12px)',
+            }}
+          >
+            <div className="flex items-center gap-3 mb-2">
+              <Trophy className="w-5 h-5 text-neo-cyan" />
+              <span className="text-sm font-neo-display font-bold text-white/80">
+                {t('blast.results.yourRank')}
+              </span>
+            </div>
+            <div className="text-lg font-neo-display font-black text-neo-cyan mb-2 tabular-nums">
+              {t('blast.results.topPercent', { pct: topPercent })}
+            </div>
+            <div
+              className="relative h-2 rounded-full overflow-hidden"
+              style={{ background: 'rgba(255,255,255,0.08)' }}
+            >
+              <motion.div
+                className="absolute left-0 top-0 h-full rounded-full"
+                style={{
+                  background: 'linear-gradient(90deg, #00FFFF, #66FFFF)',
+                  boxShadow: '0 0 8px rgba(0,255,255,0.5)',
+                }}
+                initial={{ width: 0 }}
+                animate={{ width: `${percentile ?? 0}%` }}
+                transition={{ duration: 0.8, delay: 0.4, ease: 'easeOut' }}
+              />
+            </div>
+          </motion.div>
+        )}
+
+        {/* ─── 3. Best Moments grid ─── */}
+        <motion.div variants={itemVariants} className="grid grid-cols-3 gap-2">
+          <StatTile
+            icon={<BookOpen className="w-4 h-4 text-neo-lime" />}
+            label={t('blast.results.bestWord')}
+            value={bestWord || '—'}
+          />
+          <StatTile
+            icon={<Zap className="w-4 h-4 text-amber-300" />}
+            label={t('blast.results.biggestCombo')}
+            value={String(maxCombo)}
+          />
+          <StatTile
+            icon={<Target className="w-4 h-4 text-neo-pink" />}
+            label={t('blast.results.bestWave')}
+            value={bestWave ? `W${bestWave.waveNumber}` : '—'}
+          />
+        </motion.div>
+
+        {/* ─── 4. Totals grid ─── */}
+        <motion.div variants={itemVariants} className="grid grid-cols-2 gap-2">
+          <StatTile
+            icon={<TrendingUp className="w-4 h-4 text-neo-cyan" />}
+            label={t('blast.waves')}
+            value={<NumberFlow value={wavesCompleted} />}
+          />
+          <StatTile
+            icon={<BookOpen className="w-4 h-4 text-neo-lime" />}
+            label={t('blast.words')}
+            value={<NumberFlow value={wordsCount} />}
+          />
+        </motion.div>
+
+        {/* ─── 5. Badges row ─── */}
+        {badges.length > 0 && (
+          <motion.div
+            variants={itemVariants}
+            className="p-3 rounded-2xl"
+            style={{
+              background: 'rgba(255,255,255,0.04)',
+              border: '1px solid rgba(255,255,255,0.08)',
+            }}
+          >
+            <div className="flex items-center gap-2 mb-2">
+              <Sparkles className="w-4 h-4 text-amber-300" />
+              <span className="text-xs font-neo-display font-bold text-white/70">
+                {t('blast.results.badgesEarned')}
+              </span>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {badges.map((b) => {
+                const Icon = BADGE_ICON_MAP[b.icon] ?? Sparkles;
+                return (
+                <div
+                  key={b.id}
+                  className="relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-neo-body text-white/90"
+                  style={{
+                    background: 'rgba(255,215,0,0.08)',
+                    border: '1px solid rgba(255,215,0,0.25)',
+                  }}
+                >
+                  <Icon className="w-3 h-3 text-amber-300" />
+                  {b.label}
+                  {b.isNew && (
+                    <span
+                      className="absolute -top-1 -right-1 text-[9px] font-black px-1 rounded"
+                      style={{ background: '#FF1493', color: '#fff' }}
+                    >
+                      {t('blast.results.newBadge')}
+                    </span>
+                  )}
+                </div>
+                );
+              })}
+            </div>
+          </motion.div>
+        )}
+
+        {/* ─── 6. Actions ─── */}
+        <motion.div variants={itemVariants} className="flex gap-3 justify-center mt-2">
+          <Button
+            onClick={onPlayAgain}
+            className="border-3 border-neo-black font-neo-display rounded-xl px-6"
+            style={{
+              background: 'linear-gradient(180deg, #66FFFF 0%, #00FFFF 50%, #00B3B3 100%)',
+              boxShadow: 'inset 0 2px 4px rgba(255,255,255,0.4), 0 4px 0 #008888, 0 6px 12px rgba(0,255,255,0.25)',
+              color: '#1a1a2e',
+            }}
+          >
+            <RotateCcw className="w-4 h-4 mr-1" />
+            {t('blast.playAgain')}
+          </Button>
+          <Button
+            onClick={onBack}
+            variant="ghost"
+            className="text-white/30 hover:text-white/50 font-neo-display"
+          >
+            {t('common.back')}
+          </Button>
+        </motion.div>
+      </motion.div>
+    </div>
+  );
+}
+
+// Small stat tile used in Best Moments / Totals grids
+function StatTile({
+  icon,
+  label,
+  value,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: React.ReactNode;
+}) {
+  return (
+    <div
+      className="p-3 rounded-xl text-center"
+      style={{
+        background: 'rgba(255,255,255,0.04)',
+        border: '1px solid rgba(255,255,255,0.08)',
+      }}
+    >
+      <div className="flex items-center justify-center mb-1">{icon}</div>
+      <div className="text-lg font-neo-display font-black text-white tabular-nums truncate">
+        {value}
+      </div>
+      <div className="text-[10px] text-white/40 font-neo-body uppercase tracking-wide">
+        {label}
       </div>
     </div>
   );

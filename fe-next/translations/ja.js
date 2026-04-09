@@ -7815,6 +7815,27 @@ const ja = {
       "gemsCollected": "宝石",
       "bestWord": "ベストワード",
       "tiles": "タイル",
+      "newRecord": "新記録！",
+      "yourRank": "あなたのランク",
+      "topPercent": "今週トップ{pct}%",
+      "pbDelta": "自己ベスト+{delta}",
+      "fromBest": "前回のベストから",
+      "biggestCombo": "最大コンボ",
+      "bestWave": "ベストウェーブ",
+      "wave": "ウェーブ{n}",
+      "badgesEarned": "獲得バッジ",
+      "newBadge": "NEW",
+      "share": "共有"
+    },
+    "badges": {
+      "firstBlast": "ファーストブラスト",
+      "waveRider": "ウェーブライダー",
+      "marathoner": "マラソナー",
+      "comboChain": "コンボチェーン",
+      "comboKing": "コンボキング",
+      "wordsmith": "ワードスミス",
+      "clearMaster": "クリアマスター",
+      "highScorer": "ハイスコアラー"
     },
     "ready": {
       "title": "ブラストモード",

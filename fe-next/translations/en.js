@@ -7934,6 +7934,27 @@ const en = {
       "gemsCollected": "Gems",
       "bestWord": "Best Word",
       "tiles": "tiles",
+      "newRecord": "NEW RECORD!",
+      "yourRank": "Your Rank",
+      "topPercent": "Top {pct}% this week",
+      "pbDelta": "+{delta} over your best",
+      "fromBest": "from previous best",
+      "biggestCombo": "Biggest Combo",
+      "bestWave": "Best Wave",
+      "wave": "Wave {n}",
+      "badgesEarned": "Badges Earned",
+      "newBadge": "NEW",
+      "share": "Share"
+    },
+    "badges": {
+      "firstBlast": "First Blast",
+      "waveRider": "Wave Rider",
+      "marathoner": "Marathoner",
+      "comboChain": "Combo Chain",
+      "comboKing": "Combo King",
+      "wordsmith": "Wordsmith",
+      "clearMaster": "Clear Master",
+      "highScorer": "High Scorer"
     },
     "ready": {
       "title": "Blast Mode",

@@ -7798,6 +7798,27 @@ const he = {
       "gemsCollected": "אבנים",
       "bestWord": "המילה הטובה",
       "tiles": "אריחים",
+      "newRecord": "שיא חדש!",
+      "yourRank": "הדירוג שלך",
+      "topPercent": "ה-{pct}% העליונים השבוע",
+      "pbDelta": "+{delta} מעל השיא הקודם",
+      "fromBest": "מעל השיא הקודם",
+      "biggestCombo": "הקומבו הגדול",
+      "bestWave": "הגל הטוב",
+      "wave": "גל {n}",
+      "badgesEarned": "תגים שהושגו",
+      "newBadge": "חדש",
+      "share": "שתף"
+    },
+    "badges": {
+      "firstBlast": "פיצוץ ראשון",
+      "waveRider": "רוכב גלים",
+      "marathoner": "מרתוניסט",
+      "comboChain": "שרשרת קומבו",
+      "comboKing": "מלך הקומבו",
+      "wordsmith": "אמן מילים",
+      "clearMaster": "מאסטר ניקוי",
+      "highScorer": "שיאן"
     },
     "ready": {
       "title": "מצב פיצוץ",

@@ -7763,6 +7763,27 @@ const sv = {
       "gemsCollected": "Ädelstenar",
       "bestWord": "Bästa ord",
       "tiles": "brickor",
+      "newRecord": "NYTT REKORD!",
+      "yourRank": "Din rankning",
+      "topPercent": "Topp {pct}% denna vecka",
+      "pbDelta": "+{delta} över ditt bästa",
+      "fromBest": "från tidigare bästa",
+      "biggestCombo": "Största kombo",
+      "bestWave": "Bästa våg",
+      "wave": "Våg {n}",
+      "badgesEarned": "Märken intjänade",
+      "newBadge": "NY",
+      "share": "Dela"
+    },
+    "badges": {
+      "firstBlast": "Första Blasten",
+      "waveRider": "Vågryttare",
+      "marathoner": "Maratonlöpare",
+      "comboChain": "Kombokedja",
+      "comboKing": "Kombokung",
+      "wordsmith": "Ordkonstnär",
+      "clearMaster": "Rensmästare",
+      "highScorer": "Poängkung"
     },
     "ready": {
       "title": "Blast-läge",

@@ -114,6 +114,16 @@ export interface BlastResultsData {
   wavesCompleted: number;
   /** Per-wave breakdown for results screen */
   waveResults: WaveResult[];
+  /** Weekly leaderboard percentile (0-100, higher = better). Populated by backend. */
+  percentile?: number;
+  /** Cohort label for leaderboard (e.g. "weekly") */
+  cohort?: string;
+  /** Previous personal best score (for PB delta display) */
+  previousBest?: number;
+  /** Best single wave (derived from waveResults) */
+  bestWave?: { waveNumber: number; score: number };
+  /** Badges unlocked this run (for achievement ribbon) */
+  badges?: Array<{ id: string; icon: string; label: string; isNew?: boolean }>;
 }
 
 // ==================== Special Tile Effects ====================
