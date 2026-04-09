@@ -346,6 +346,8 @@ export const SPECIAL_TILE_DISTRIBUTION: Record<Exclude<BlastTileType, 'standard'
   magma: 0,
   crystal: 0,
   fuse: 0,
+  locked: 0,
+  key: 0,
 };
 
 // ==================== Objectives ====================

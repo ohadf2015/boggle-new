@@ -43,6 +43,8 @@ export const BLAST_TILE_BONUSES: Record<BlastTileType, number> = {
   catalyst: 1.5,   // reward for triggering upgrade effect
   crystal: 1,      // no flat bonus — reward comes from crystalWordMultiplier
   fuse: 1.5,       // reward for defusing linked-pair fuse before detonation
+  locked: 1,       // gated tile — no bonus, reward is through key unlock
+  key: 1.5,        // reward for clearing key (unlocks adjacent locked tiles)
 };
 
 export const BLAST_RAINBOW_FLAT_BONUS = 3;

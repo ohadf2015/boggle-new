@@ -7689,7 +7689,9 @@ const sv = {
       "portal":    { "name": "Portal",    "desc": "Teleportera din ordstig genom länkade par. Rensar båda. 2× poäng. +5 bonus." },
       "catalyst":  { "name": "Katalysator","desc": "+10 p. Uppgraderar intilliggande vanliga brickor till specialer." },
       "crystal":   { "name": "Kristall",   "desc": "Växer +1× varje oanvänd tur (max 5×). Multiplicerar din ordpoäng när den används." },
-      "fuse":      { "name": "Stubin",     "desc": "Länkat par. Rensa en för att tända dess partner — desarmera inom 3 drag för +15 p och 2 drag, annars detonerar en 3×3-smäll för -50 p." }
+      "fuse":      { "name": "Stubin",     "desc": "Länkat par. Rensa en för att tända dess partner — desarmera inom 3 drag för +15 p och 2 drag, annars detonerar en 3×3-smäll för -50 p." },
+      "locked":    { "name": "Låst",       "desc": "Spärrad bricka — kan inte användas i ord. Rensa dess parade Nyckel för att låsa upp." },
+      "key":       { "name": "Nyckel",     "desc": "Låser upp intilliggande Låsta brickor (8 riktningar) när den rensas i ett ord. +20 p per upplåsning." }
     },
     "title": "Blast-läge",
     "description": "Rensa brädet! Ord spränger brickor.",
@@ -7984,7 +7986,9 @@ const sv = {
       "portal": { "name": "Portal", "desc": "Teleportera genom par — rensar båda, ×2 ordpoäng" },
       "catalyst": { "name": "Katalysator", "desc": "Uppgraderar alla intilliggande brickor till special" },
       "crystal": { "name": "Kristall", "desc": "Växer +1× per oanvänd tur (max 5×) — multiplicerar ordpoäng" },
-      "fuse": { "name": "Stubin", "desc": "Länkat par — rensa en för att tända partnern, desarmera inom 3 drag annars smäller det" }
+      "fuse": { "name": "Stubin", "desc": "Länkat par — rensa en för att tända partnern, desarmera inom 3 drag annars smäller det" },
+      "locked": { "name": "Låst", "desc": "Spärrad — rensa parad Nyckel för att låsa upp" },
+      "key": { "name": "Nyckel", "desc": "Låser upp intilliggande Låsta brickor när den rensas (+20 p styck)" }
     }
   },
   "student": {

@@ -7860,7 +7860,9 @@ const en = {
       "portal":    { "name": "Portal",    "desc": "Teleport your word path through linked pairs. Clears both. 2× score. +5 bonus." },
       "catalyst":  { "name": "Catalyst",  "desc": "+10 pts. Upgrades adjacent standard tiles into specials." },
       "crystal":   { "name": "Crystal",   "desc": "Grows +1× each unused turn (max 5×). Multiplies your word score when used." },
-      "fuse":      { "name": "Fuse",      "desc": "Linked pair. Clear one to light its partner — defuse within 3 turns for +15 pts and 2 moves, or it detonates a 3×3 blast for -50 pts." }
+      "fuse":      { "name": "Fuse",      "desc": "Linked pair. Clear one to light its partner — defuse within 3 turns for +15 pts and 2 moves, or it detonates a 3×3 blast for -50 pts." },
+      "locked":    { "name": "Locked",    "desc": "Gated tile — can't be used in words. Clear its paired Key to unlock it." },
+      "key":       { "name": "Key",       "desc": "Unlocks adjacent Locked tiles (8-dir) when cleared in a word. +20 pts per unlock." }
     },
     "title": "Blast Mode",
     "description": "Clear the board! Words explode tiles.",
@@ -8155,7 +8157,9 @@ const en = {
       "portal": { "name": "Portal", "desc": "Teleport through linked pairs — clears both, ×2 word score" },
       "catalyst": { "name": "Catalyst", "desc": "Upgrades all adjacent tiles to random specials" },
       "crystal": { "name": "Crystal", "desc": "Grows +1× per unused turn (max 5×) — multiplies word score" },
-      "fuse": { "name": "Fuse", "desc": "Linked pair — clear one to light its partner, defuse in 3 turns or it blows!" }
+      "fuse": { "name": "Fuse", "desc": "Linked pair — clear one to light its partner, defuse in 3 turns or it blows!" },
+      "locked": { "name": "Locked", "desc": "Gated — clear its paired Key to unlock" },
+      "key": { "name": "Key", "desc": "Unlocks adjacent Locked tiles when cleared (+20 pts each)" }
     }
   },
   "student": {
