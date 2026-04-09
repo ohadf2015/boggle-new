@@ -1,100 +1,113 @@
+import {
+  type LucideIcon,
+  Bomb, Zap, Triangle, Rainbow, Snowflake, Gem, Magnet, FlipHorizontal2,
+  Coins, Diamond, Dices, Hourglass, Shuffle, Flame, Orbit, FlaskConical,
+  Sparkles, Lock, Key, Star, Type, Anchor,
+} from 'lucide-react';
 import type { BlastTileType } from './types';
 
 const SHADOW = '2px 2px 0px rgba(0,0,0,0.85)';
 const BORDER_SPECIAL = '2px solid rgba(0,0,0,0.4)';
 
-export const TILE_VISUALS: Record<BlastTileType, { bg: string; indicator?: string; text?: string; style?: React.CSSProperties }> = {
+/** Visual config per tile type.
+ *  `indicator` is a lucide-react component — inherits `currentColor` from the
+ *  tile's `text-*` class so gold/ice tiles get dark strokes, bombs get white. */
+export const TILE_VISUALS: Record<BlastTileType, { bg: string; indicator?: LucideIcon; text?: string; style?: React.CSSProperties }> = {
   standard: {
-    bg: '', text: 'text-neo-navy',
+    bg: '', indicator: Type, text: 'text-neo-navy',
     style: { background: 'rgba(255,255,255,0.85)', boxShadow: SHADOW, border: '2px solid rgba(0,0,0,0.3)' },
   },
   gold: {
-    bg: '', indicator: '✦', text: 'text-neo-navy',
+    bg: '', indicator: Star, text: 'text-neo-navy',
     style: { background: 'linear-gradient(165deg, #FFE566 0%, #FFD700 40%, #F0C800 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL },
   },
   bomb: {
-    bg: '', indicator: '💣', text: 'text-white',
+    bg: '', indicator: Bomb, text: 'text-white',
     style: { background: 'linear-gradient(165deg, #FF6B6B 0%, #FF3366 40%, #E0194D 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL },
   },
   lightning: {
-    bg: '', indicator: '⚡', text: 'text-neo-navy',
+    bg: '', indicator: Zap, text: 'text-neo-navy',
     style: { background: 'linear-gradient(165deg, #66FFFF 0%, #00FFFF 40%, #00E0E0 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL },
   },
   prism: {
-    bg: '', indicator: '🔷', text: 'text-white',
+    bg: '', indicator: Triangle, text: 'text-white',
     style: { background: 'conic-gradient(from 0deg, #FF1493, #8B5CF6, #00FFFF, #BFFF00, #FF1493)', boxShadow: SHADOW, border: BORDER_SPECIAL },
   },
   rainbow: {
-    bg: '', indicator: '🌈', text: 'text-white',
+    bg: '', indicator: Rainbow, text: 'text-white',
     style: { background: 'linear-gradient(135deg, #FF1493 0%, #8B5CF6 50%, #00FFFF 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL },
   },
   ice: {
-    bg: '', indicator: '❄', text: 'text-neo-navy',
+    bg: '', indicator: Snowflake, text: 'text-neo-navy',
     style: { background: 'linear-gradient(165deg, #E0FFFF 0%, #99EEFF 40%, #80DDEE 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL },
   },
   gem: {
-    bg: '', indicator: '💎', text: 'text-white',
+    bg: '', indicator: Gem, text: 'text-white',
     style: { background: 'linear-gradient(165deg, #7DFFB3 0%, #34D399 40%, #10B981 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL },
   },
   frozen: {
-    bg: '', indicator: '🧊', text: 'text-neo-navy',
+    bg: '', indicator: Snowflake, text: 'text-neo-navy',
     style: { background: 'linear-gradient(165deg, #E8F4FF 0%, #B8DDFF 40%, #A0CCEE 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL },
   },
   magnet: {
-    bg: '', indicator: '🌀', text: 'text-white',
+    bg: '', indicator: Magnet, text: 'text-white',
     style: { background: 'linear-gradient(165deg, #A78BFA 0%, #8B5CF6 40%, #7C3AED 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL },
   },
   mirror: {
-    bg: '', indicator: '🪞', text: 'text-neo-navy',
+    bg: '', indicator: FlipHorizontal2, text: 'text-neo-navy',
     style: { background: 'linear-gradient(165deg, #E8E8F0 0%, #D0D0E0 40%, #B8B8CC 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL },
   },
   silver: {
-    bg: '', indicator: '🪙', text: 'text-neo-navy',
+    bg: '', indicator: Coins, text: 'text-neo-navy',
     style: { background: 'linear-gradient(165deg, #E0E0E8 0%, #C0C0D0 40%, #A8A8B8 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL },
   },
   diamond: {
-    bg: '', indicator: '💠', text: 'text-neo-navy',
+    bg: '', indicator: Diamond, text: 'text-neo-navy',
     style: { background: 'linear-gradient(165deg, #88FFFF 0%, #00EEFF 40%, #00DDEE 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL },
   },
   wildcard: {
-    bg: '', indicator: '🃏', text: 'text-neo-navy',
+    bg: '', indicator: Dices, text: 'text-neo-navy',
     style: { background: 'linear-gradient(135deg, #FFE4FF 0%, #E8B4F8 40%, #D88CF8 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL },
   },
   countdown: {
-    bg: '', indicator: '⏳', text: 'text-white',
+    bg: '', indicator: Hourglass, text: 'text-white',
     style: { background: 'linear-gradient(165deg, #FF9966 0%, #FF6633 40%, #EE5522 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL },
   },
   shuffle: {
-    bg: '', indicator: '🔀', text: 'text-neo-navy',
+    bg: '', indicator: Shuffle, text: 'text-neo-navy',
     style: { background: 'linear-gradient(165deg, #FFB347 0%, #FF8C00 40%, #E07700 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL },
   },
   magma: {
-    bg: '', indicator: '🌋', text: 'text-white',
+    bg: '', indicator: Flame, text: 'text-white',
     style: { background: 'linear-gradient(165deg, #FF6B35 0%, #FF4500 40%, #CC3700 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL },
   },
   portal: {
-    bg: '', indicator: '🌌', text: 'text-white',
+    bg: '', indicator: Orbit, text: 'text-white',
     style: { background: 'radial-gradient(circle, #7B68EE 0%, #5B3BD6 60%, #4B0082 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL },
   },
   catalyst: {
-    bg: '', indicator: '⚗️', text: 'text-neo-navy',
+    bg: '', indicator: FlaskConical, text: 'text-neo-navy',
     style: { background: 'linear-gradient(165deg, #FFFACD 0%, #FFD700 40%, #F0C020 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL },
   },
   crystal: {
-    bg: '', indicator: '🔮', text: 'text-white',
+    bg: '', indicator: Sparkles, text: 'text-white',
     style: { background: 'linear-gradient(165deg, #F0C8FF 0%, #C084FC 40%, #8B5CF6 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL },
   },
   fuse: {
-    bg: '', indicator: '🧨', text: 'text-white',
+    bg: '', indicator: Flame, text: 'text-white',
     style: { background: 'linear-gradient(165deg, #FF7755 0%, #E33E1E 40%, #B02810 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL },
   },
   locked: {
-    bg: '', indicator: '🔒', text: 'text-neo-navy',
+    bg: '', indicator: Lock, text: 'text-neo-navy',
     style: { background: 'linear-gradient(165deg, #9CA3AF 0%, #6B7280 40%, #4B5563 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL },
   },
   key: {
-    bg: '', indicator: '🔑', text: 'text-neo-navy',
+    bg: '', indicator: Key, text: 'text-neo-navy',
     style: { background: 'linear-gradient(165deg, #FDE68A 0%, #F59E0B 40%, #D97706 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL },
+  },
+  anchor: {
+    bg: '', indicator: Anchor, text: 'text-white',
+    style: { background: 'linear-gradient(165deg, #60A5FA 0%, #2563EB 40%, #1E3A8A 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL },
   },
 };
 

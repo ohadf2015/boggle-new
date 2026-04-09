@@ -245,6 +245,12 @@ export const KEY_UNLOCK_BONUS = 20;
 /** Maximum Manhattan distance between a locked tile and its nearest key at generation */
 export const LOCKED_KEY_MAX_DISTANCE = 3;
 
+// ==================== Anchor Constants ====================
+
+/** Bonus score per letter in the word when an anchor tile is cleared in that word.
+ * Linear scaling rewards long-word discovery without making short words useless. */
+export const ANCHOR_LENGTH_BONUS = 3;
+
 // ==================== Portal Constants ====================
 
 /** Bonus score for using a portal in a word */
@@ -348,6 +354,7 @@ export const SPECIAL_TILE_DISTRIBUTION: Record<Exclude<BlastTileType, 'standard'
   fuse: 0,
   locked: 0,
   key: 0,
+  anchor: 0,
 };
 
 // ==================== Objectives ====================

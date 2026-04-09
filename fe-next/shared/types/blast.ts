@@ -30,7 +30,8 @@ export type BlastTileType =
   | 'crystal'
   | 'fuse'
   | 'locked'
-  | 'key';
+  | 'key'
+  | 'anchor';
 
 /** Runtime-iterable list of all blast tile types (mirrors BlastTileType union) */
 export const BLAST_TILE_TYPE_LIST: readonly BlastTileType[] = [
@@ -57,6 +58,7 @@ export const BLAST_TILE_TYPE_LIST: readonly BlastTileType[] = [
   'fuse',
   'locked',
   'key',
+  'anchor',
 ] as const;
 
 // ==================== Tile State ====================

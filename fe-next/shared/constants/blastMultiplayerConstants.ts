@@ -45,6 +45,7 @@ export const BLAST_TILE_BONUSES: Record<BlastTileType, number> = {
   fuse: 1.5,       // reward for defusing linked-pair fuse before detonation
   locked: 1,       // gated tile — no bonus, reward is through key unlock
   key: 1.5,        // reward for clearing key (unlocks adjacent locked tiles)
+  anchor: 1.5,     // base bonus — length-based bonus applied separately in clearTilesProcessor
 };
 
 export const BLAST_RAINBOW_FLAT_BONUS = 3;

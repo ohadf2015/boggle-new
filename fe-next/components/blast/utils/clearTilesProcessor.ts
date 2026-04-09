@@ -32,6 +32,7 @@ import {
   FUSE_DEFUSE_BONUS,
   FUSE_DEFUSE_MOVES,
   KEY_UNLOCK_BONUS,
+  ANCHOR_LENGTH_BONUS,
   type BlastTileState,
   type BlastTileType,
   type BlastExplosion,
@@ -427,6 +428,13 @@ export function processTilesForWord(input: TileProcessingInput): TileProcessingR
             }
           }
         }
+        break;
+      }
+
+      case 'anchor': {
+        // Length-bonus tile: awards ANCHOR_LENGTH_BONUS per letter in the word.
+        bonusScore += ANCHOR_LENGTH_BONUS * word.length;
+        newExplosions.push({ id: `anchor-${now}-${cell.row}-${cell.col}`, row: cell.row, col: cell.col, type: 'word', intensity: 2, timestamp: now });
         break;
       }
 
