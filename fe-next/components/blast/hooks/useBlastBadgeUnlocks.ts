@@ -23,6 +23,7 @@ import {
 } from '@/components/blast/utils/blastBadges';
 import { useBlastBadgeStore } from '@/stores/blastBadgeStore';
 import { triggerHaptic } from '@/utils/hapticFeedback';
+import { trackBlastBadgeUnlocked } from '@/components/blast/utils/blastTelemetry';
 import type { BlastResultsData } from '@/components/blast/types';
 
 export interface EnrichedBadge {
@@ -68,7 +69,11 @@ export function useBlastBadgeUnlocks({
     if (fresh.length === 0) return;
 
     // Persist all unlocks up-front (so a reload mid-toast-queue still sticks).
-    fresh.forEach((id) => store.unlockBadge(id));
+    const runFinalScore = results?.finalScore ?? 0;
+    fresh.forEach((id) => {
+      store.unlockBadge(id);
+      trackBlastBadgeUnlocked({ badgeId: id, runFinalScore });
+    });
 
     // Stagger toasts + haptics so the player can register each one.
     const timers: number[] = [];
@@ -88,7 +93,7 @@ export function useBlastBadgeUnlocks({
     return () => {
       timers.forEach((id) => window.clearTimeout(id));
     };
-  }, [earnedIds, t, toastStaggerMs]);
+  }, [earnedIds, t, toastStaggerMs, results?.finalScore]);
 
   // Build enriched list for the UI: preserve registry order, mark `isNew`
   // against the snapshot taken BEFORE this run's unlocks were persisted.

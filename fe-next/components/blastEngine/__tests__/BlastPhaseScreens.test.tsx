@@ -213,21 +213,14 @@ describe('BlastResultsScreen', () => {
     expect(screen.getByText('7')).toBeInTheDocument();
   });
 
-  it('should render badges when provided', () => {
-    render(
-      <BlastResultsScreen
-        {...defaultProps}
-        results={{
-          ...baseResults,
-          badges: [
-            { id: 'combo-master', icon: 'zap', label: 'Combo Master', isNew: true },
-            { id: 'wordsmith', icon: 'book', label: 'Wordsmith' },
-          ],
-        }}
-      />,
-    );
-    expect(screen.getByText('Combo Master')).toBeInTheDocument();
-    expect(screen.getByText('Wordsmith')).toBeInTheDocument();
+  it('should render badges computed from run stats', () => {
+    // baseResults (wavesCompleted=4, maxCombo=7) earns firstBlast, waveRider,
+    // and comboChain from the registry. The hook calls `t(labelKey, def.id)`,
+    // so mockT's fallback branch returns `def.id` — assert on the ids.
+    render(<BlastResultsScreen {...defaultProps} />);
+    expect(screen.getByText('firstBlast')).toBeInTheDocument();
+    expect(screen.getByText('waveRider')).toBeInTheDocument();
+    expect(screen.getByText('comboChain')).toBeInTheDocument();
   });
 
   it('should call onPlayAgain when play again button is clicked', () => {

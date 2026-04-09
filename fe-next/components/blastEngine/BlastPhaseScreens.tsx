@@ -24,6 +24,7 @@ import {
 import { Button } from '@/components/ui/button';
 import type { BlastResultsData } from '@/components/blast/types';
 import { useBlastBadgeUnlocks } from '@/components/blast/hooks/useBlastBadgeUnlocks';
+import { trackBlastResultsViewed } from '@/components/blast/utils/blastTelemetry';
 
 // Lucide icon resolver for badge icon names stored as strings in blastBadges.ts.
 // Keeps the badge registry free of React imports (serializable, SSR-safe).
@@ -274,6 +275,18 @@ export function BlastResultsScreen({ results, onPlayAgain, onBack, t }: BlastRes
     }
     return undefined;
   }, [isNewRecord, reward]);
+
+  // Fire blast_results_viewed exactly once per results-screen mount.
+  const viewedFiredRef = useRef(false);
+  useEffect(() => {
+    if (!results || viewedFiredRef.current) return;
+    viewedFiredRef.current = true;
+    trackBlastResultsViewed({
+      finalScore: results.finalScore,
+      wavesCompleted: results.wavesCompleted,
+      badgeCount: badges.length,
+    });
+  }, [results, badges.length]);
 
   // Top-N% label: percentile is "higher = better", so top% = 100 - percentile
   const topPercent = percentile != null ? Math.max(1, 100 - percentile) : null;

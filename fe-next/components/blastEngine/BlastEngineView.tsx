@@ -23,6 +23,11 @@ import { resolveBlastConfig, type BlastPhase, type BlastResultsData, type WaveRe
 import { getWaveConfig, getWaveDistribution, getWaveObjectives } from '@/components/blast/utils/blastWaveConfig';
 import { calculateEarnedStars } from '@/components/blast/utils/blastStarCalculator';
 import { saveBlastResult } from '@/components/blast/utils/saveBlastResult';
+import {
+  trackBlastRunStarted,
+  trackBlastWaveCompleted,
+  trackBlastRunEnded,
+} from '@/components/blast/utils/blastTelemetry';
 import type { Language } from '@/shared/types/game';
 
 // Dynamically import the PixiJS game canvas (SSR-unsafe)
@@ -162,7 +167,11 @@ export function BlastEngineView() {
     setWaveHistory([]);
     game.reset();
     setPhase('playing');
-  }, [game]);
+    trackBlastRunStarted({
+      difficulty: config.difficulty ?? 'medium',
+      language: (language as string) || 'en',
+    });
+  }, [game, config.difficulty, language]);
 
   const handleWaveComplete = useCallback(
     (waveScore: number, waveWords: string[], clearPct: number, tilesCleared: number, totalTilesCount: number) => {
@@ -180,6 +189,12 @@ export function BlastEngineView() {
       setLastWaveStats({ score: waveScore, words: waveWords.length, clearPct });
 
       if (clearPct >= 50) {
+        trackBlastWaveCompleted({
+          waveNumber: currentWave,
+          score: waveScore,
+          wordCount: waveWords.length,
+          clearPct: Math.round(clearPct),
+        });
         setPhase('waveTransition');
       } else {
         // Game over — didn't clear enough
@@ -201,6 +216,17 @@ export function BlastEngineView() {
 
         // Persist to DB (fire-and-forget)
         saveBlastResult(resultsData, config.difficulty ?? 'medium', language);
+
+        // Telemetry — run ended
+        trackBlastRunEnded({
+          finalScore: resultsData.finalScore,
+          wavesCompleted: resultsData.wavesCompleted,
+          maxCombo: resultsData.maxCombo,
+          clearPct: Math.round(resultsData.clearPercentage),
+          wordCount: allWords.length,
+          bestWordLength: resultsData.bestWord.length,
+          difficulty: config.difficulty ?? 'medium',
+        });
       }
     },
     [currentWave, totalScore, allWordsFound, waveHistory, game.comboLevel, config.difficulty, language],
