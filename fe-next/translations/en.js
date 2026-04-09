@@ -4364,6 +4364,15 @@ const en = {
     "alternativesTitle": "Best Boggle Alternatives 2026"
   },
   "landing": {
+    "teaser": {
+      "signInToUnlock": "Sign in to unlock",
+      "rivalTitle": "Your Weekly Rival",
+      "rivalSubtitle": "Beat rivals for weekly glory",
+      "streakTitle": "Daily Streak",
+      "streakSubtitle": "Keep the flame alive every day",
+      "vaultTitle": "Coin Vault",
+      "vaultSubtitle": "Stash coins, unlock rewards"
+    },
     "playingNow": "Playing Now",
     "welcomeTitle": "Ready to Play?",
     "welcomeSubtitle": "Pick your challenge!",

@@ -4277,6 +4277,15 @@ const he = {
     "alternativesTitle": "החלופות הטובות ביותר לבוגל 2026"
   },
   "landing": {
+    "teaser": {
+      "signInToUnlock": "התחברו כדי לפתוח",
+      "rivalTitle": "היריב השבועי שלך",
+      "rivalSubtitle": "נצחו יריבים לתהילה השבועית",
+      "streakTitle": "רצף יומי",
+      "streakSubtitle": "שמרו על הלהבה דולקת מדי יום",
+      "vaultTitle": "כספת המטבעות",
+      "vaultSubtitle": "אספו מטבעות, פתחו פרסים"
+    },
     "playingNow": "משחקים עכשיו",
     "welcomeTitle": "מוכנים לשחק?",
     "welcomeSubtitle": "בחרו את האתגר שלכם!",

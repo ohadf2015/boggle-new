@@ -4258,6 +4258,15 @@ const ja = {
     "alternativesTitle": "2026年おすすめボグル代替ゲーム"
   },
   "landing": {
+    "teaser": {
+      "signInToUnlock": "サインインして解除",
+      "rivalTitle": "今週のライバル",
+      "rivalSubtitle": "ライバルを倒して週間栄光を掴もう",
+      "streakTitle": "デイリーストリーク",
+      "streakSubtitle": "毎日炎を絶やさずに",
+      "vaultTitle": "コインの金庫",
+      "vaultSubtitle": "コインを貯めて報酬を解除"
+    },
     "playingNow": "プレイ中",
     "welcomeTitle": "準備OK？",
     "welcomeSubtitle": "チャレンジを選ぼう！",

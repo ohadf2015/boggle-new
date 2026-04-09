@@ -4305,6 +4305,15 @@ const es = {
     "alternativesTitle": "Mejores alternativas a Boggle 2026"
   },
   "landing": {
+    "teaser": {
+      "signInToUnlock": "Inicia sesión para desbloquear",
+      "rivalTitle": "Tu rival semanal",
+      "rivalSubtitle": "Vence rivales por la gloria semanal",
+      "streakTitle": "Racha diaria",
+      "streakSubtitle": "Mantén la llama viva cada día",
+      "vaultTitle": "Bóveda de monedas",
+      "vaultSubtitle": "Acumula monedas, desbloquea recompensas"
+    },
     "playingNow": "jugando",
     "welcomeTitle": "¿Listos para jugar?",
     "welcomeSubtitle": "¡Elige tu desafío!",

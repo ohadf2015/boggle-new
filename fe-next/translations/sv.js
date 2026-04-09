@@ -4258,6 +4258,15 @@ const sv = {
     "alternativesTitle": "Bästa Boggle-alternativen 2026"
   },
   "landing": {
+    "teaser": {
+      "signInToUnlock": "Logga in för att låsa upp",
+      "rivalTitle": "Din veckorival",
+      "rivalSubtitle": "Besegra rivaler för veckans ära",
+      "streakTitle": "Daglig svit",
+      "streakSubtitle": "Håll lågan levande varje dag",
+      "vaultTitle": "Myntvalv",
+      "vaultSubtitle": "Samla mynt, lås upp belöningar"
+    },
     "playingNow": "Spelar Nu",
     "welcomeTitle": "Redo att spela?",
     "welcomeSubtitle": "Välj din utmaning!",

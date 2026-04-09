@@ -33,6 +33,7 @@ const UrgencyCard = dynamic(() => import('./UrgencyCard').then(m => m.UrgencyCar
 // Engagement widgets — only high-value conditional ones on landing
 const VaultCardConnected = dynamic(() => import('@/components/vault/VaultCardConnected').then(m => m.VaultCardConnected), { ssr: false });
 const GhostRivalWidget = dynamic(() => import('@/components/engagement/GhostRivalWidget').then(m => m.GhostRivalWidget), { ssr: false });
+const AnonymousTeaserWidgets = dynamic(() => import('./AnonymousTeaserWidgets').then(m => m.AnonymousTeaserWidgets), { ssr: false });
 const LandingYourRank = dynamic(() => import('./LandingYourRank').then(m => m.LandingYourRank), { ssr: false });
 const LandingShareBanner = dynamic(() => import('./LandingShareBanner').then(m => m.LandingShareBanner), { ssr: false });
 const LandingCommunityShowcase = dynamic(() => import('./LandingCommunityShowcase').then(m => m.LandingCommunityShowcase), { ssr: false });
@@ -220,12 +221,14 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
         )}
 
         {/* Engagement widgets — compact, below game modes. Max 3 to avoid overload */}
-        {isAuthenticated && (
+        {isAuthenticated ? (
           <div className="flex flex-col gap-4 max-w-4xl mx-auto w-full">
             <UrgencyCard />
             <GhostRivalWidget />
             <VaultCardConnected />
           </div>
+        ) : (
+          <AnonymousTeaserWidgets onSignUpClick={() => setShowAuthModal(true)} />
         )}
 
         {/* Below-fold sections */}
