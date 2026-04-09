@@ -280,8 +280,8 @@ function EffectsWorker({
       } else if (tile.type === 'gold') {
         particles.burst(GOLD_STARS, x, y);
         enhancedRef.current?.meltTile(x, y, 'gold');
-      // Rainbow/Wildcard: confetti + magnetic assembly (vortex materialization)
-      } else if (tile.type === 'rainbow' || tile.type === 'wildcard') {
+      // Rainbow: confetti + magnetic assembly (vortex materialization)
+      } else if (tile.type === 'rainbow') {
         particles.burst(CONFETTI_BURST, x, y);
         enhancedRef.current?.assembleTile(x, y, 'rainbow');
       // Countdown: fire embers explosion + granular erosion on final
@@ -310,14 +310,6 @@ function EffectsWorker({
         particles.burst(GOLD_STARS, x, y);
         particles.burst(FIRE_EMBERS, x, y);
         enhancedRef.current?.mercuryTile(x, y, 'catalyst');
-      // Mirror: reflective crystallize fracture
-      } else if (tile.type === 'mirror') {
-        particles.burst(DIAMOND_SHARDS, x, y);
-        enhancedRef.current?.mirrorCrystallizeTile(x, y, 'mirror');
-      // Silver: metallic cold shatter
-      } else if (tile.type === 'silver') {
-        particles.burst(GEM_SHARD_BURST, x, y);
-        enhancedRef.current?.silverShatterTile(x, y, 'silver');
       } else {
         const preset = CLEAR_PRESET_MAP[tile.type] ?? pickRandom(TILE_EXPLOSION_VARIANTS);
         particles.burst(preset, x, y);

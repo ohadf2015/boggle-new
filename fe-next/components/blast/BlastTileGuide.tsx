@@ -2,7 +2,8 @@
 
 import { X } from 'lucide-react';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
-import type { BlastTileType } from './types';
+import { BLAST_TILE_TYPE_LIST } from '@/shared/types/blast';
+import { TILE_VISUALS } from './blastTileVisuals';
 
 interface BlastTileGuideProps {
   isOpen: boolean;
@@ -10,33 +11,10 @@ interface BlastTileGuideProps {
   t: (key: string) => string | undefined;
 }
 
-/** Tile type visual config for the guide: indicator emoji + translation key */
-const TILE_GUIDE_ENTRIES: Array<{ type: BlastTileType; indicator: string; key: string }> = [
-  { type: 'standard', indicator: '🔤', key: 'standard' },
-  { type: 'gold', indicator: '✦', key: 'gold' },
-  { type: 'silver', indicator: '🥈', key: 'silver' },
-  { type: 'diamond', indicator: '💠', key: 'diamond' },
-  { type: 'bomb', indicator: '💣', key: 'bomb' },
-  { type: 'lightning', indicator: '⚡', key: 'lightning' },
-  { type: 'prism', indicator: '🔷', key: 'prism' },
-  { type: 'rainbow', indicator: '🌈', key: 'rainbow' },
-  { type: 'ice', indicator: '❄', key: 'ice' },
-  { type: 'frozen', indicator: '🧊', key: 'frozen' },
-  { type: 'gem', indicator: '💎', key: 'gem' },
-  { type: 'mirror', indicator: '🪞', key: 'mirror' },
-  { type: 'magnet', indicator: '🌀', key: 'magnet' },
-  { type: 'wildcard', indicator: '🃏', key: 'wildcard' },
-  { type: 'countdown', indicator: '⏳', key: 'countdown' },
-  { type: 'shuffle', indicator: '🔀', key: 'shuffle' },
-  { type: 'magma', indicator: '🌋', key: 'magma' },
-  { type: 'portal', indicator: '🌌', key: 'portal' },
-  { type: 'catalyst', indicator: '⚗️', key: 'catalyst' },
-  { type: 'crystal', indicator: '🔮', key: 'crystal' },
-];
-
 /**
- * BlastTileGuide — modal showing all 18 tile types with descriptions.
- * Neo-brutalist styling, animated enter/exit.
+ * BlastTileGuide — modal listing every tile type with its in-game visual.
+ * Icons + gradients are pulled from TILE_VISUALS (single source of truth),
+ * so adding a new tile type automatically shows up here.
  */
 export function BlastTileGuide({ isOpen, onClose, t }: BlastTileGuideProps) {
   return (
@@ -78,24 +56,32 @@ export function BlastTileGuide({ isOpen, onClose, t }: BlastTileGuideProps) {
             {/* Scrollable grid */}
             <div className="overflow-y-auto overscroll-contain p-3 flex-1">
               <div className="grid grid-cols-1 gap-2">
-                {TILE_GUIDE_ENTRIES.map(({ type, indicator, key }) => (
-                  <div
-                    key={type}
-                    className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-neo px-3 py-2"
-                  >
-                    <span className="text-xl shrink-0 w-8 text-center" aria-hidden="true">
-                      {indicator}
-                    </span>
-                    <div className="min-w-0">
-                      <span className="block font-neo-display font-bold text-neo-white text-sm capitalize">
-                        {t(`blast.tileGuide.${key}.name`)}
+                {BLAST_TILE_TYPE_LIST.map((type) => {
+                  const visual = TILE_VISUALS[type];
+                  const Icon = visual.indicator;
+                  return (
+                    <div
+                      key={type}
+                      className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-neo px-3 py-2"
+                    >
+                      <span
+                        className={`shrink-0 w-10 h-10 flex items-center justify-center rounded-neo border-2 border-black/40 ${visual.text ?? ''}`}
+                        style={visual.style}
+                        aria-hidden="true"
+                      >
+                        {Icon ? <Icon className="w-5 h-5" strokeWidth={2.5} /> : null}
                       </span>
-                      <span className="block font-neo-body text-white/60 text-xs">
-                        {t(`blast.tileGuide.${key}.desc`)}
-                      </span>
+                      <div className="min-w-0">
+                        <span className="block font-neo-display font-bold text-neo-white text-sm capitalize">
+                          {t(`blast.tileGuide.${type}.name`)}
+                        </span>
+                        <span className="block font-neo-body text-white/60 text-xs">
+                          {t(`blast.tileGuide.${type}.desc`)}
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           </AdaptiveMotion.div>

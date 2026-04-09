@@ -1,5 +1,5 @@
 /**
- * Tactical combo effects: mirror, magnet, gem, frozen cross-type pairs.
+ * Tactical combo effects: magnet, gem, frozen cross-type pairs.
  * Split from blastComboEffects.ts to stay under 500-line limit.
  */
 import {
@@ -7,12 +7,12 @@ import {
   TREASURE_GEM_COMPLETION_BONUS,
   FROST_REVEAL_BONUS,
 } from '../types';
- 
+
 import { fireAreaBlast, fireCrossClear, fireVortex, pushExplosion, type ComboEffectContext, type ComboEffectResult } from './blastComboEffects';
 import { scaledRadius } from './blastComboScaling';
 
 /**
- * Handle tactical combo types (mirror/magnet/gem/frozen crosses).
+ * Handle tactical combo types (magnet/gem/frozen crosses).
  * Returns true if this function handled the combo, false if unrecognized.
  */
 export function executeTacticalCombo(
@@ -22,48 +22,6 @@ export function executeTacticalCombo(
   const { combo, next, gridSize, now } = ctx;
 
   switch (combo.type) {
-    case 'mirror_magnet': {
-      const mmMagnet = combo.tiles.find(t => t.tileType === 'magnet') ?? combo.tiles[1];
-      const mmMirror = combo.tiles.find(t => t.tileType === 'mirror') ?? combo.tiles[0];
-      if (!mmMagnet || !mmMirror) break;
-      const mmVortexRadius = scaledRadius(VORTEX_PULL_RADIUS, ctx.wordLengthScale);
-      fireVortex(mmMagnet.row, mmMagnet.col, mmVortexRadius, result, ctx);
-      pushExplosion(`combo-mma-${now}`, mmMagnet.row, mmMagnet.col, result, now);
-      fireVortex(mmMirror.row, mmMirror.col, mmVortexRadius, result, ctx);
-      pushExplosion(`combo-mmb-${now}`, mmMirror.row, mmMirror.col, result, now);
-      return true;
-    }
-
-    case 'mirror_gem': {
-      const mgMirrorT = combo.tiles.find(t => t.tileType === 'mirror') ?? combo.tiles[0];
-      const mgGemT = combo.tiles.find(t => t.tileType === 'gem') ?? combo.tiles[1];
-      if (!mgMirrorT) break;
-      if (mgGemT) {
-        const gemTile3 = next[mgGemT.row]?.[mgGemT.col];
-        if (gemTile3) { gemTile3.hitsRemaining = 0; ctx.markCleared(gemTile3); }
-      }
-      result.bonusScore += 2 * TREASURE_GEM_COMPLETION_BONUS;
-      result.spawnCount = 4;
-      pushExplosion(`combo-mg-${now}`, mgMirrorT.row, mgMirrorT.col, result, now);
-      return true;
-    }
-
-    case 'mirror_frozen': {
-      const mfMirrorT = combo.tiles.find(t => t.tileType === 'mirror') ?? combo.tiles[0];
-      const mfFrostT = combo.tiles.find(t => t.tileType === 'frozen') ?? combo.tiles[1];
-      if (!mfMirrorT) break;
-      if (mfFrostT) {
-        const frostTile = next[mfFrostT.row]?.[mfFrostT.col];
-        if (frostTile && !frostTile.isCleared) {
-          frostTile.hitsRemaining = Math.max(0, frostTile.hitsRemaining - 2);
-          if (frostTile.hitsRemaining === 0) ctx.markCleared(frostTile);
-        }
-      }
-      result.bonusScore += 2 * FROST_REVEAL_BONUS;
-      pushExplosion(`combo-mf-${now}`, mfMirrorT.row, mfMirrorT.col, result, now);
-      return true;
-    }
-
     case 'magnet_gem': {
       const mgMagnetT = combo.tiles.find(t => t.tileType === 'magnet') ?? combo.tiles[0];
       if (!mgMagnetT) break;

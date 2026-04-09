@@ -1,7 +1,7 @@
 import {
   type LucideIcon,
-  Bomb, Zap, Triangle, Rainbow, Snowflake, Gem, Magnet, FlipHorizontal2,
-  Coins, Diamond, Dices, Hourglass, Shuffle, Flame, Orbit, FlaskConical,
+  Bomb, Zap, Triangle, Rainbow, Snowflake, Gem, Magnet,
+  Diamond, Hourglass, Shuffle, Flame, Orbit, FlaskConical,
   Sparkles, Lock, Key, Star, Type, Anchor,
 } from 'lucide-react';
 import type { BlastTileType } from './types';
@@ -53,21 +53,9 @@ export const TILE_VISUALS: Record<BlastTileType, { bg: string; indicator?: Lucid
     bg: '', indicator: Magnet, text: 'text-white',
     style: { background: 'linear-gradient(165deg, #A78BFA 0%, #8B5CF6 40%, #7C3AED 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL },
   },
-  mirror: {
-    bg: '', indicator: FlipHorizontal2, text: 'text-neo-navy',
-    style: { background: 'linear-gradient(165deg, #E8E8F0 0%, #D0D0E0 40%, #B8B8CC 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL },
-  },
-  silver: {
-    bg: '', indicator: Coins, text: 'text-neo-navy',
-    style: { background: 'linear-gradient(165deg, #E0E0E8 0%, #C0C0D0 40%, #A8A8B8 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL },
-  },
   diamond: {
     bg: '', indicator: Diamond, text: 'text-neo-navy',
     style: { background: 'linear-gradient(165deg, #88FFFF 0%, #00EEFF 40%, #00DDEE 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL },
-  },
-  wildcard: {
-    bg: '', indicator: Dices, text: 'text-neo-navy',
-    style: { background: 'linear-gradient(135deg, #FFE4FF 0%, #E8B4F8 40%, #D88CF8 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL },
   },
   countdown: {
     bg: '', indicator: Hourglass, text: 'text-white',
@@ -122,11 +110,8 @@ export const CLEARING_COLORS: Partial<Record<BlastTileType, { background: string
   gem:       { background: 'radial-gradient(circle, #50C878 0%, #009450 100%)', border: '2px solid rgba(0,0,0,0.5)' },
   frozen:    { background: 'linear-gradient(135deg, #C8DCFF 0%, #A0C8F0 100%)', border: '2px solid rgba(0,0,0,0.5)' },
   magnet:    { background: 'radial-gradient(circle, #8B00FF 0%, #FF0040 100%)', border: '2px solid rgba(0,0,0,0.5)' },
-  mirror:    { background: 'radial-gradient(circle, #E0E0FF 0%, #8888FF 100%)', border: '2px solid rgba(0,0,0,0.5)' },
-  silver:    { background: 'radial-gradient(circle, #E8E8E8 0%, #B0B0B0 100%)', border: '2px solid rgba(0,0,0,0.5)' },
   diamond:   { background: 'radial-gradient(circle, #B9F2FF 0%, #00CED1 100%)', border: '2px solid rgba(0,0,0,0.5)' },
-  wildcard:  { background: 'radial-gradient(circle, #E8B4F8 0%, #9333EA 100%)', border: '2px solid rgba(0,0,0,0.5)' },
-  countdown: { background: 'radial-gradient(circle, #FF9966 0%, #CC3300 100%)', border: '2px solid rgba(0,0,0,0.5)' },
+  countdown:{ background: 'radial-gradient(circle, #FF9966 0%, #CC3300 100%)', border: '2px solid rgba(0,0,0,0.5)' },
   shuffle:   { background: 'radial-gradient(circle, #FFB347 0%, #CC7000 100%)', border: '2px solid rgba(0,0,0,0.5)' },
   magma:     { background: 'radial-gradient(circle, #FF6B35 0%, #CC2200 100%)', border: '2px solid rgba(0,0,0,0.5)' },
   portal:    { background: 'radial-gradient(circle, #7B68EE 0%, #2E0054 100%)', border: '2px solid rgba(0,0,0,0.5)' },
@@ -146,12 +131,9 @@ export const CLEARING_ANIMS: Partial<Record<BlastTileType, { transform: string; 
   frozen:    { transform: 'scale(0.1) rotate(-45deg)', transition: 'all 250ms cubic-bezier(0.55, 0.06, 0.68, 0.19)', filter: 'brightness(1.5) blur(3px)' },
   gem:       { transform: 'scale(1.8) rotate(90deg)', transition: 'all 220ms cubic-bezier(0.34, 1.56, 0.64, 1)', filter: 'brightness(2) saturate(3)' },
   gold:      { transform: 'scale(1.6) rotate(-20deg)', transition: 'all 200ms ease-out', filter: 'brightness(2.5) saturate(2)' },
-  silver:    { transform: 'scale(1.3) translateY(-15px)', transition: 'all 180ms ease-out', filter: 'brightness(2)' },
   rainbow:   { transform: 'scale(2.0) rotate(540deg)', transition: 'all 350ms cubic-bezier(0.34, 1.56, 0.64, 1)', filter: 'hue-rotate(360deg) brightness(2)' },
   magnet:    { transform: 'scale(0.05) rotate(1080deg)', transition: 'all 300ms cubic-bezier(0.36, 0, 0.66, -0.56)', filter: 'brightness(0.3) saturate(3)' },
-  mirror:    { transform: 'scaleX(0) scaleY(1.8)', transition: 'all 180ms ease-in', filter: 'brightness(3)' },
   diamond:   { transform: 'scale(1.9) rotate(45deg)', transition: 'all 200ms cubic-bezier(0.34, 1.56, 0.64, 1)', filter: 'brightness(3) saturate(2)' },
-  wildcard:  { transform: 'scale(1.5) rotate(360deg)', transition: 'all 250ms ease-out', filter: 'brightness(2) hue-rotate(90deg)' },
   countdown: { transform: 'scale(2.5) rotate(30deg)', transition: 'all 180ms cubic-bezier(0.17, 0.67, 0.83, 0.67)', filter: 'brightness(3) saturate(2.5)' },
   shuffle:   { transform: 'scale(1.4) rotate(720deg)', transition: 'all 300ms cubic-bezier(0.34, 1.56, 0.64, 1)', filter: 'brightness(2) hue-rotate(45deg)' },
   magma:     { transform: 'scale(2.5) rotate(45deg)', transition: 'all 250ms cubic-bezier(0.17, 0.67, 0.83, 0.67)', filter: 'brightness(3) saturate(2.5)' },

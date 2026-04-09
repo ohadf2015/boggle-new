@@ -24,7 +24,7 @@ describe('BlastTile', () => {
   describe('idle animation classes', () => {
     const tileTypes: BlastTileType[] = [
       'gold', 'bomb', 'rainbow', 'ice', 'lightning', 'magnet',
-      'prism', 'gem', 'frozen', 'mirror', 'silver', 'diamond',
+      'prism', 'gem', 'frozen', 'diamond',
     ];
 
     it.each(tileTypes)('renders blast-tile-%s class for %s type', (type) => {
@@ -80,11 +80,6 @@ describe('BlastTile', () => {
   });
 
   describe('multiplier badges', () => {
-    it('renders ×1.5 badge for silver tiles', () => {
-      render(<BlastTile {...baseProps} type="silver" />);
-      expect(screen.getByText('×1.5')).toBeInTheDocument();
-    });
-
     it('renders ×3 badge for gold tiles', () => {
       render(<BlastTile {...baseProps} type="gold" />);
       expect(screen.getByText('×3')).toBeInTheDocument();

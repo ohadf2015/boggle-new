@@ -11,9 +11,9 @@ export interface NearMissResult {
 
 // ==================== Constants ====================
 
-/** Special tile types eligible for near-miss detection (exclude standard, gold, silver, diamond, ice) */
+/** Special tile types eligible for near-miss detection (exclude standard, gold, diamond, ice) */
 const COMBO_ELIGIBLE_TYPES: ReadonlySet<BlastTileType> = new Set<BlastTileType>([
-  'bomb', 'lightning', 'prism', 'rainbow', 'mirror', 'magnet', 'gem', 'frozen',
+  'bomb', 'lightning', 'prism', 'rainbow', 'magnet', 'gem', 'frozen',
 ]);
 
 /** Maximum cells to return to avoid visual clutter */

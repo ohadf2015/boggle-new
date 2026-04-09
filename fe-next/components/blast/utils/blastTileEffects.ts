@@ -66,8 +66,8 @@ export function scanOffensiveSpecial(
   for (const cell of path) {
     const t = tiles[cell.row]?.[cell.col];
     if (!t || t.isCleared) continue;
-    // Skip rainbow/mirror themselves
-    if (t.type === 'rainbow' || t.type === 'mirror') continue;
+    // Skip rainbow itself
+    if (t.type === 'rainbow') continue;
     const rank = OFFENSIVE_RANK[t.type] ?? -1;
     if (rank < 0) continue;
     if (mode === 'first') return t.type;

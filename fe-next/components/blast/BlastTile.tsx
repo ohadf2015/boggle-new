@@ -1,6 +1,7 @@
 'use client';
 
 import { memo } from 'react';
+import { Lock } from 'lucide-react';
 import type { BlastTileType } from './types';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -50,14 +51,13 @@ export interface BlastTileProps {
   isCascadeHighlight?: boolean;
   /** Portal pair color index (0-based) — portals with the same index are linked */
   portalPairIndex?: number;
-  /** Rainbow/mirror scan target — this tile will be copied by rainbow or mirror */
-  isScanTarget?: 'rainbow' | 'mirror';
+  /** Rainbow scan target — this tile will be copied by rainbow */
+  isScanTarget?: 'rainbow';
   onClick?: () => void;
 }
 
 /** Multiplier badges for score-multiplier tiles */
 const MULTIPLIER_BADGES: Partial<Record<BlastTileType, string>> = {
-  silver: '×1.5',
   gold: '×3',
   diamond: '×5',
 };
@@ -251,8 +251,8 @@ export const BlastTile = memo(function BlastTile({
     >
       <span className="relative z-10" style={TILE_TEXT_SHADOW_STYLE}>{letter}</span>
       {visual.indicator && (
-        <span className="absolute top-0.5 inset-e-0.5 text-[clamp(0.45rem,1.8cqw,0.65rem)] leading-none pointer-events-none" aria-hidden="true">
-          {visual.indicator}
+        <span className={`absolute top-0.5 inset-e-0.5 leading-none pointer-events-none ${visual.text ?? ''}`} aria-hidden="true">
+          <visual.indicator className="w-[clamp(9px,2.4cqw,15px)] h-[clamp(9px,2.4cqw,15px)]" strokeWidth={2.5} />
         </span>
       )}
       {hitsRemaining != null && hitsRemaining > 0 && (
@@ -336,16 +336,26 @@ export const BlastTile = memo(function BlastTile({
           aria-hidden="true"
         >
           {isDiamondRevealed && innerType ? (
-            <span className="text-[clamp(0.7rem,3cqw,1.1rem)] animate-pulse drop-shadow-[0_0_4px_rgba(0,255,255,0.6)]">
-              {TILE_VISUALS[innerType]?.indicator ?? '?'}
-            </span>
+            (() => {
+              const InnerIcon = TILE_VISUALS[innerType]?.indicator;
+              return (
+                <span className={`animate-pulse drop-shadow-[0_0_4px_rgba(0,255,255,0.6)] ${TILE_VISUALS[innerType]?.text ?? ''}`}>
+                  {InnerIcon ? <InnerIcon className="w-[clamp(12px,3.2cqw,20px)] h-[clamp(12px,3.2cqw,20px)]" strokeWidth={2.5} /> : '?'}
+                </span>
+              );
+            })()
           ) : (
             <span className="blast-lock-hint flex flex-col items-center">
-              <span className="text-[clamp(0.55rem,2.2cqw,0.85rem)]">🔒</span>
+              <Lock className="w-[clamp(10px,2.6cqw,16px)] h-[clamp(10px,2.6cqw,16px)] text-white/90" strokeWidth={2.5} />
               {type === 'frozen' && innerType ? (
-                <span className="text-[clamp(0.35rem,1.4cqw,0.5rem)] opacity-30 blur-[1px] leading-none -mt-px">
-                  {TILE_VISUALS[innerType]?.indicator ?? '?'}
-                </span>
+                (() => {
+                  const InnerIcon = TILE_VISUALS[innerType]?.indicator;
+                  return (
+                    <span className={`opacity-30 blur-[1px] leading-none -mt-px ${TILE_VISUALS[innerType]?.text ?? ''}`}>
+                      {InnerIcon ? <InnerIcon className="w-[clamp(8px,1.8cqw,11px)] h-[clamp(8px,1.8cqw,11px)]" strokeWidth={2.5} /> : '?'}
+                    </span>
+                  );
+                })()
               ) : (
                 <span className="text-[clamp(0.3rem,1.2cqw,0.45rem)] text-cyan-200/80 font-neo-body leading-none -mt-px">
                   ✦ nearby ✦

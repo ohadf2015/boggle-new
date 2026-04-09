@@ -7,30 +7,23 @@ export type BlastComboType =
   | 'bomb_lightning'
   | 'bomb_prism'
   | 'bomb_rainbow'
-  | 'bomb_mirror'
   | 'bomb_magnet'
   | 'bomb_gem'
   | 'bomb_frozen'
   | 'lightning_lightning'
   | 'lightning_prism'
   | 'lightning_rainbow'
-  | 'lightning_mirror'
   | 'lightning_magnet'
   | 'lightning_gem'
   | 'lightning_frozen'
   | 'prism_prism'
   | 'prism_rainbow'
-  | 'prism_mirror'
   | 'prism_magnet'
   | 'prism_gem'
   | 'prism_frozen'
-  | 'rainbow_mirror'
   | 'rainbow_magnet'
   | 'rainbow_gem'
   | 'rainbow_frozen'
-  | 'mirror_magnet'
-  | 'mirror_gem'
-  | 'mirror_frozen'
   | 'magnet_gem'
   | 'magnet_frozen'
   | 'gem_frozen'
@@ -50,13 +43,13 @@ export interface SpecialCombo {
 // ==================== Constants ====================
 
 /** Tiles that have area/column/cross effects (eligible for gold_special and rainbow_special fallback) */
-const EFFECT_TILES: ReadonlySet<BlastTileType> = new Set([
-  'bomb', 'lightning', 'prism', 'magnet', 'rainbow', 'mirror', 'gem', 'frozen',
+const EFFECT_TILES: ReadonlySet<BlastTileType> = new Set<BlastTileType>([
+  'bomb', 'lightning', 'prism', 'magnet', 'rainbow', 'gem', 'frozen',
 ]);
 
 /** All tile types that can participate in a combo (used for combo hint glow) */
-export const COMBO_ELIGIBLE_TILES: ReadonlySet<BlastTileType> = new Set([
-  'bomb', 'lightning', 'prism', 'magnet', 'rainbow', 'mirror', 'gem', 'frozen', 'gold',
+export const COMBO_ELIGIBLE_TILES: ReadonlySet<BlastTileType> = new Set<BlastTileType>([
+  'bomb', 'lightning', 'prism', 'magnet', 'rainbow', 'gem', 'frozen', 'gold',
 ]);
 
 /** Combo definitions: [typeA, typeB] → combo config (ordered highest priority first) */
@@ -70,28 +63,21 @@ const PAIR_COMBOS: Array<{
   { a: 'prism',     b: 'prism',     comboType: 'prism_prism',         scoreMultiplier: 6  },
   { a: 'prism',     b: 'rainbow',   comboType: 'prism_rainbow',       scoreMultiplier: 5  },
   { a: 'lightning', b: 'prism',     comboType: 'lightning_prism',     scoreMultiplier: 5  },
-  { a: 'prism',     b: 'mirror',    comboType: 'prism_mirror',        scoreMultiplier: 5  },
   { a: 'prism',     b: 'magnet',    comboType: 'prism_magnet',        scoreMultiplier: 5  },
   { a: 'bomb',      b: 'prism',     comboType: 'bomb_prism',          scoreMultiplier: 4  },
   { a: 'prism',     b: 'gem',       comboType: 'prism_gem',           scoreMultiplier: 4  },
   { a: 'bomb',      b: 'magnet',    comboType: 'bomb_magnet',         scoreMultiplier: 4  },
   { a: 'lightning', b: 'rainbow',   comboType: 'lightning_rainbow',   scoreMultiplier: 4  },
   { a: 'lightning', b: 'magnet',    comboType: 'lightning_magnet',    scoreMultiplier: 4  },
-  { a: 'mirror',    b: 'magnet',    comboType: 'mirror_magnet',       scoreMultiplier: 4  },
-  { a: 'mirror',    b: 'gem',       comboType: 'mirror_gem',          scoreMultiplier: 4  },
   { a: 'magnet',    b: 'gem',       comboType: 'magnet_gem',          scoreMultiplier: 4  },
   { a: 'bomb',      b: 'lightning', comboType: 'bomb_lightning',      scoreMultiplier: 3  },
   { a: 'lightning', b: 'lightning', comboType: 'lightning_lightning', scoreMultiplier: 3  },
   { a: 'bomb',      b: 'rainbow',   comboType: 'bomb_rainbow',        scoreMultiplier: 3  },
-  { a: 'bomb',      b: 'mirror',    comboType: 'bomb_mirror',         scoreMultiplier: 3  },
   { a: 'bomb',      b: 'gem',       comboType: 'bomb_gem',            scoreMultiplier: 3  },
-  { a: 'lightning', b: 'mirror',    comboType: 'lightning_mirror',    scoreMultiplier: 3  },
   { a: 'lightning', b: 'gem',       comboType: 'lightning_gem',       scoreMultiplier: 3  },
-  { a: 'rainbow',   b: 'mirror',    comboType: 'rainbow_mirror',      scoreMultiplier: 4  },
   { a: 'rainbow',   b: 'magnet',    comboType: 'rainbow_magnet',      scoreMultiplier: 3  },
   { a: 'rainbow',   b: 'gem',       comboType: 'rainbow_gem',         scoreMultiplier: 3  },
   { a: 'prism',     b: 'frozen',    comboType: 'prism_frozen',        scoreMultiplier: 3  },
-  { a: 'mirror',    b: 'frozen',    comboType: 'mirror_frozen',       scoreMultiplier: 3  },
   { a: 'magnet',    b: 'frozen',    comboType: 'magnet_frozen',       scoreMultiplier: 3  },
   { a: 'gem',       b: 'frozen',    comboType: 'gem_frozen',          scoreMultiplier: 3  },
   { a: 'bomb',      b: 'bomb',      comboType: 'bomb_bomb',           scoreMultiplier: 2  },

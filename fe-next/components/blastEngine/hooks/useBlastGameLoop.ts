@@ -182,7 +182,7 @@ function expandSpecialTiles(
       // Chain: if newly cleared tiles are special, queue them for next depth
       for (const nt of newTiles) {
         const ntType = states[nt.row]?.[nt.col]?.type;
-        if (ntType && ntType !== 'standard' && ntType !== 'gold' && ntType !== 'silver' && ntType !== 'diamond') {
+        if (ntType && ntType !== 'standard' && ntType !== 'gold' && ntType !== 'diamond') {
           queue.push(nt);
         }
       }
@@ -282,7 +282,6 @@ export function useBlastGameLoop({ config, wave, language, movesAllowed }: GameL
       for (const cell of path) {
         const type = states[cell.row]?.[cell.col]?.type;
         if (type === 'gold') specialMultiplier *= 2;
-        else if (type === 'silver') specialMultiplier *= 1.5;
         else if (type === 'diamond') specialMultiplier *= 3;
       }
       // Bonus for each extra tile cleared by special effects

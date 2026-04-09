@@ -7,11 +7,11 @@ import type { BlastTileType } from '@/shared/types/blast';
 describe('getTileTooltip', () => {
   const allSpecialTypes: BlastTileType[] = [
     'gold', 'bomb', 'rainbow', 'ice', 'lightning', 'magnet',
-    'prism', 'gem', 'frozen', 'mirror', 'silver', 'diamond',
-    'wildcard', 'countdown', 'shuffle', 'magma', 'portal', 'catalyst',
+    'prism', 'gem', 'frozen', 'diamond',
+    'countdown', 'shuffle', 'magma', 'portal', 'catalyst',
   ];
 
-  it('defines tooltips for all 18 special tile types', () => {
+  it('defines tooltips for all 15 special tile types', () => {
     for (const type of allSpecialTypes) {
       const tip = getTileTooltip(type);
       expect(tip).toBeDefined();

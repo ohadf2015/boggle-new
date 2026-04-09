@@ -5,8 +5,8 @@
 import { BLAST_TILE_TYPE_LIST, type BlastTileType } from '../blast';
 
 describe('BlastTileType canonical definition', () => {
-  it('should contain exactly 23 tile types', () => {
-    expect(BLAST_TILE_TYPE_LIST).toHaveLength(23);
+  it('should contain exactly 21 tile types', () => {
+    expect(BLAST_TILE_TYPE_LIST).toHaveLength(21);
   });
 
   it('should contain fuse (linked pair detonation tile)', () => {
@@ -18,19 +18,23 @@ describe('BlastTileType canonical definition', () => {
     expect(BLAST_TILE_TYPE_LIST).toContain('key');
   });
 
+  it('should contain anchor (long-word length bonus)', () => {
+    expect(BLAST_TILE_TYPE_LIST).toContain('anchor');
+  });
+
   it('should include standard (not normal)', () => {
     expect(BLAST_TILE_TYPE_LIST).toContain('standard');
     expect(BLAST_TILE_TYPE_LIST).not.toContain('normal');
   });
 
-  it('should contain mirror, silver, diamond (added)', () => {
-    expect(BLAST_TILE_TYPE_LIST).toContain('mirror');
-    expect(BLAST_TILE_TYPE_LIST).toContain('silver');
-    expect(BLAST_TILE_TYPE_LIST).toContain('diamond');
+  it('should NOT contain retired tiles (mirror, silver, wildcard)', () => {
+    expect(BLAST_TILE_TYPE_LIST).not.toContain('mirror' as BlastTileType);
+    expect(BLAST_TILE_TYPE_LIST).not.toContain('silver' as BlastTileType);
+    expect(BLAST_TILE_TYPE_LIST).not.toContain('wildcard' as BlastTileType);
   });
 
-  it('should contain wildcard, countdown, shuffle, magma, portal, catalyst', () => {
-    expect(BLAST_TILE_TYPE_LIST).toContain('wildcard');
+  it('should contain diamond, countdown, shuffle, magma, portal, catalyst', () => {
+    expect(BLAST_TILE_TYPE_LIST).toContain('diamond');
     expect(BLAST_TILE_TYPE_LIST).toContain('countdown');
     expect(BLAST_TILE_TYPE_LIST).toContain('shuffle');
     expect(BLAST_TILE_TYPE_LIST).toContain('magma');
@@ -50,10 +54,7 @@ describe('BlastTileType canonical definition', () => {
       'prism',
       'gem',
       'frozen',
-      'mirror',
-      'silver',
       'diamond',
-      'wildcard',
       'countdown',
       'shuffle',
       'magma',
@@ -63,10 +64,12 @@ describe('BlastTileType canonical definition', () => {
       'fuse',
       'locked',
       'key',
+      'anchor',
     ];
     for (const type of expected) {
       expect(BLAST_TILE_TYPE_LIST).toContain(type);
     }
+    expect(expected).toHaveLength(21);
   });
 
   it('should have no duplicate entries', () => {

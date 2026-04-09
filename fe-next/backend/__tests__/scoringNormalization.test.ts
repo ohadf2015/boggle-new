@@ -49,10 +49,6 @@ describe('Scoring Normalization - Blast Tile Bonuses', () => {
     expect(BLAST_TILE_BONUSES.gold).toBe(1.5);
   });
 
-  test('silver tile bonus should be reduced from 4 to 2', () => {
-    expect(BLAST_TILE_BONUSES.silver).toBe(2);
-  });
-
   test('diamond tile bonus should be reduced from 5 to 2.5', () => {
     expect(BLAST_TILE_BONUSES.diamond).toBe(2.5);
   });
@@ -71,10 +67,6 @@ describe('Scoring Normalization - Blast Tile Bonuses', () => {
 
   test('prism tile bonus should be reduced from 2 to 1.25', () => {
     expect(BLAST_TILE_BONUSES.prism).toBe(1.25);
-  });
-
-  test('mirror tile bonus should be reduced from 2 to 1.25', () => {
-    expect(BLAST_TILE_BONUSES.mirror).toBe(1.25);
   });
 
   test('ice tile bonus should be reduced from 1.5 to 1', () => {
@@ -110,11 +102,10 @@ describe('Scoring Normalization - Blast Tile Bonuses', () => {
   });
 
   test('best-case word path tile bonus is reasonable', () => {
-    // A word crossing diamond + silver + gold (rare best case)
-    const bonus = calculateBlastTileBonus(['diamond', 'silver', 'gold']);
-    // Old: 5 + 4 + 3 = 12
-    // New: 2.5 + 2 + 1.5 = 6
-    expect(bonus).toBe(6);
+    // A word crossing diamond + gem + gold (rare best case on canonical tile set)
+    const bonus = calculateBlastTileBonus(['diamond', 'gem', 'gold']);
+    // 2.5 + 1.5 + 1.5 = 5.5
+    expect(bonus).toBe(5.5);
   });
 });
 

@@ -132,8 +132,8 @@ describe('computeCellFilter', () => {
 
   describe('other special tiles', () => {
     const alwaysSelectableTypes: BlastTileType[] = [
-      'standard', 'gold', 'silver', 'diamond', 'bomb',
-      'lightning', 'prism', 'rainbow', 'mirror', 'magnet',
+      'standard', 'gold', 'diamond', 'bomb',
+      'lightning', 'prism', 'rainbow', 'magnet',
       'key',
     ];
 

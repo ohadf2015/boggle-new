@@ -3,6 +3,7 @@ import { verifyAdminAuth } from '@/lib/auth/adminAuth';
 import { getSupabaseAdmin } from '@/lib/admin/server';
 import { regenerateDailyPuzzle } from '@/utils/dailyChallenge/gridGeneration.server';
 import { invalidateDailyPuzzleCache } from '@/backend/redis/dailyPuzzle';
+import { MAX_TARGET_WORD_LENGTH } from '@/utils/dailyChallenge/constants';
 import { captureApiError } from '@/utils/sentry';
 import type { Language } from '@/types';
 
@@ -59,7 +60,9 @@ export async function POST(request: NextRequest) {
     // Validate word format using language-specific minimum
     const formattedWord = newWord.toUpperCase().trim();
     const minLength = MIN_WORD_LENGTH[language as Language] || 4;
-    const maxLength = language === 'ja' ? 4 : 10;
+    // Cap admin overrides to the gameplay target length limit.
+    // Japanese kanji compounds are shorter (2-4); others follow MAX_TARGET_WORD_LENGTH.
+    const maxLength = language === 'ja' ? 4 : MAX_TARGET_WORD_LENGTH;
 
     if (formattedWord.length < minLength || formattedWord.length > maxLength) {
       return NextResponse.json(

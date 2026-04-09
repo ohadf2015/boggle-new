@@ -23,12 +23,12 @@ const baseTileProps = {
 
 describe('Blast Mobile Responsive', () => {
   describe('BlastTile indicator scaling with container queries', () => {
-    it('renders indicator emoji with cqw-based clamp sizing', () => {
+    it('renders indicator icon with cqw-based clamp sizing', () => {
       render(<BlastTile {...baseTileProps} type="bomb" />);
       const button = screen.getByRole('button');
-      const indicator = button.querySelector('[aria-hidden="true"]');
-      expect(indicator).toBeTruthy();
-      expect(indicator?.className).toContain('text-[clamp(0.45rem,1.8cqw,0.65rem)]');
+      const svg = button.querySelector('svg');
+      expect(svg).toBeTruthy();
+      expect(svg?.getAttribute('class') ?? '').toContain('w-[clamp(9px,2.4cqw,15px)]');
     });
 
     it('renders hits remaining with cqw-based clamp sizing', () => {

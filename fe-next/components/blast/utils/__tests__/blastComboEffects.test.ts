@@ -212,11 +212,10 @@ describe('executeComboEffect', () => {
 
   it('should not throw for any new combo type', () => {
     const newTypes: SpecialCombo['type'][] = [
-      'bomb_mirror', 'bomb_magnet', 'bomb_gem', 'bomb_frozen',
-      'lightning_rainbow', 'lightning_mirror', 'lightning_magnet', 'lightning_gem', 'lightning_frozen',
-      'prism_rainbow', 'prism_mirror', 'prism_magnet', 'prism_gem', 'prism_frozen',
-      'rainbow_mirror', 'rainbow_magnet', 'rainbow_gem', 'rainbow_frozen',
-      'mirror_magnet', 'mirror_gem', 'mirror_frozen',
+      'bomb_magnet', 'bomb_gem', 'bomb_frozen',
+      'lightning_rainbow', 'lightning_magnet', 'lightning_gem', 'lightning_frozen',
+      'prism_rainbow', 'prism_magnet', 'prism_gem', 'prism_frozen',
+      'rainbow_magnet', 'rainbow_gem', 'rainbow_frozen',
       'magnet_gem', 'magnet_frozen', 'gem_frozen',
       'gold_special', 'rainbow_special', 'triple_special',
     ];
@@ -297,39 +296,6 @@ describe('executeComboEffect', () => {
     executeComboEffect(makeCtx(grid, combo));
     expect(grid[2][0].isCleared).toBe(false);
     expect(grid[2][0].hitsRemaining).toBe(1);
-  });
-
-  // ── bomb_mirror (Twin Explosion) ──────────────────────────────────────────
-
-  it('bomb_mirror: should clear 3x3 at both bomb and mirror positions', () => {
-    const grid = makeGrid([
-      { row: 1, col: 1, type: 'bomb' },
-      { row: 4, col: 4, type: 'mirror' },
-    ]);
-    const combo = makeCombo('bomb_mirror', [
-      { row: 1, col: 1, tileType: 'bomb' },
-      { row: 4, col: 4, tileType: 'mirror' },
-    ], 4);
-    const result = executeComboEffect(makeCtx(grid, combo));
-    expect(grid[0][0].isCleared).toBe(true);
-    expect(grid[2][2].isCleared).toBe(true);
-    expect(grid[3][3].isCleared).toBe(true);
-    expect(grid[5][5].isCleared).toBe(true);
-    expect(result.explosions.length).toBe(2);
-    expect(result.processedBombKeys).toContain('1,1');
-  });
-
-  it('bomb_mirror: tiles outside 3x3 of either center NOT cleared', () => {
-    const grid = makeGrid([
-      { row: 0, col: 0, type: 'bomb' },
-      { row: 5, col: 5, type: 'mirror' },
-    ]);
-    const combo = makeCombo('bomb_mirror', [
-      { row: 0, col: 0, tileType: 'bomb' },
-      { row: 5, col: 5, tileType: 'mirror' },
-    ], 4);
-    executeComboEffect(makeCtx(grid, combo));
-    expect(grid[2][3].isCleared).toBe(false);
   });
 
   // ── bomb_magnet (Gravity Bomb) ────────────────────────────────────────────
@@ -433,24 +399,6 @@ describe('executeComboEffect', () => {
     expect(result.explosions.length).toBeGreaterThan(0);
   });
 
-  // ── lightning_mirror (Double Strike) ─────────────────────────────────────
-
-  it('lightning_mirror: should clear columns at both lightning and mirror positions', () => {
-    const grid = makeGrid([
-      { row: 0, col: 1, type: 'lightning' },
-      { row: 3, col: 4, type: 'mirror' },
-    ]);
-    const combo = makeCombo('lightning_mirror', [
-      { row: 0, col: 1, tileType: 'lightning' },
-      { row: 3, col: 4, tileType: 'mirror' },
-    ], 4);
-    const result = executeComboEffect(makeCtx(grid, combo));
-    for (let r = 0; r < 6; r++) expect(grid[r][1].isCleared).toBe(true);
-    for (let r = 0; r < 6; r++) expect(grid[r][4].isCleared).toBe(true);
-    expect(result.explosions.length).toBe(2);
-    expect(result.processedLightningKeys).toContain('0,1');
-  });
-
   // ── lightning_magnet (Magnetic Storm) ────────────────────────────────────
 
   it('lightning_magnet: should execute vortex pull then clear columns of magnet area', () => {
@@ -528,95 +476,7 @@ describe('executeComboEffect', () => {
     expect(result.explosions[0].intensity).toBe(4);
   });
 
-  // ── prism_mirror (Twin Cross) ─────────────────────────────────────────────
-
-  it('prism_mirror: should fire cross-clear from prism position twice (double-damage)', () => {
-    const grid = makeGrid([
-      { row: 2, col: 2, type: 'prism' },
-      { row: 2, col: 4, type: 'mirror' },
-      // ice tile in prism row — survives first pass, cleared on second
-      { row: 2, col: 0, type: 'ice', hitsRemaining: 2 },
-    ]);
-    const combo = makeCombo('prism_mirror', [
-      { row: 2, col: 2, tileType: 'prism' },
-      { row: 2, col: 4, tileType: 'mirror' },
-    ], 6);
-    const result = executeComboEffect(makeCtx(grid, combo));
-    // ice at (2,0): first pass hits (2→1), second pass clears (isMultiHitAlive=false)
-    expect(grid[2][0].isCleared).toBe(true);
-    // Standard tiles in cross cleared
-    expect(grid[0][2].isCleared).toBe(true);
-    expect(grid[5][2].isCleared).toBe(true);
-    expect(result.explosions.length).toBeGreaterThan(0);
-    expect(result.explosions[0].intensity).toBe(4);
-    expect(result.processedBombKeys).toEqual([]);
-  });
-
-  // ── Task 2: Mirror, Magnet, Gem, Frozen cross-type combos ─────────────────
-
-  // ── mirror_magnet (Dual Vortex) ───────────────────────────────────────────
-
-  it('mirror_magnet: fires vortex at BOTH mirror and magnet positions (2 explosions)', () => {
-    const grid = makeGrid([
-      { row: 1, col: 1, type: 'mirror' },
-      { row: 4, col: 4, type: 'magnet' },
-    ]);
-    const combo = makeCombo('mirror_magnet', [
-      { row: 1, col: 1, tileType: 'mirror' },
-      { row: 4, col: 4, tileType: 'magnet' },
-    ], 5);
-    const result = executeComboEffect(makeCtx(grid, combo));
-    // Two separate vortex centers → two explosion events
-    expect(result.explosions.length).toBe(2);
-  });
-
-  // ── mirror_gem (Twin Gems) ────────────────────────────────────────────────
-
-  it('mirror_gem: clears gem tile and awards 2x TREASURE_GEM_COMPLETION_BONUS', () => {
-    const grid = makeGrid([
-      { row: 2, col: 2, type: 'mirror' },
-      { row: 3, col: 3, type: 'gem', hitsRemaining: 3 },
-    ]);
-    const combo = makeCombo('mirror_gem', [
-      { row: 2, col: 2, tileType: 'mirror' },
-      { row: 3, col: 3, tileType: 'gem' },
-    ], 5);
-    const result = executeComboEffect(makeCtx(grid, combo));
-    expect(grid[3][3].isCleared).toBe(true);
-    expect(result.bonusScore).toBe(2 * TREASURE_GEM_COMPLETION_BONUS);
-    expect(result.spawnCount).toBe(4);
-  });
-
-  // ── mirror_frozen (Mirror Frost) ──────────────────────────────────────────
-
-  it('mirror_frozen: removes 2 hits from frost tile (hitsRemaining 2 → cleared)', () => {
-    const grid = makeGrid([
-      { row: 1, col: 1, type: 'mirror' },
-      { row: 2, col: 3, type: 'frozen', hitsRemaining: 2 },
-    ]);
-    const combo = makeCombo('mirror_frozen', [
-      { row: 1, col: 1, tileType: 'mirror' },
-      { row: 2, col: 3, tileType: 'frozen' },
-    ], 4);
-    const result = executeComboEffect(makeCtx(grid, combo));
-    expect(grid[2][3].isCleared).toBe(true);
-    expect(result.bonusScore).toBe(2 * FROST_REVEAL_BONUS);
-  });
-
-  it('mirror_frozen: removes 2 hits from frost tile (hitsRemaining 1 → max(0) → cleared)', () => {
-    const grid = makeGrid([
-      { row: 0, col: 0, type: 'mirror' },
-      { row: 0, col: 5, type: 'frozen', hitsRemaining: 1 },
-    ]);
-    const combo = makeCombo('mirror_frozen', [
-      { row: 0, col: 0, tileType: 'mirror' },
-      { row: 0, col: 5, tileType: 'frozen' },
-    ], 4);
-    const result = executeComboEffect(makeCtx(grid, combo));
-    expect(grid[0][5].hitsRemaining).toBe(0);
-    expect(grid[0][5].isCleared).toBe(true);
-    expect(result.bonusScore).toBe(2 * FROST_REVEAL_BONUS);
-  });
+  // ── Task 2: Magnet, Gem, Frozen cross-type combos ─────────────────────────
 
   // ── magnet_gem (Gem Suction) ──────────────────────────────────────────────
 

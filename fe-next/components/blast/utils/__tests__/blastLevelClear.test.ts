@@ -16,7 +16,6 @@
 import type { BlastTileState, BlastTileType } from '../../types';
 import {
   buildAutoTriggerSequence,
-  type AutoTriggerStep,
   calculateMoveConversionBonus,
   MOVE_CONVERSION_SCORE,
   AUTO_TRIGGER_STAGGER_MS,
@@ -171,13 +170,12 @@ describe('buildAutoTriggerSequence', () => {
     expect(result).toHaveLength(2);
   });
 
-  it('includes rainbow and mirror tiles', () => {
+  it('includes rainbow tiles', () => {
     const grid = makeGrid([
       makeTile(0, 0, 'rainbow', false),
-      makeTile(1, 1, 'mirror', false),
     ]);
     const result = buildAutoTriggerSequence(grid);
-    expect(result).toHaveLength(2);
+    expect(result).toHaveLength(1);
   });
 });
 

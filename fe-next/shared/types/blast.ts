@@ -18,10 +18,7 @@ export type BlastTileType =
   | 'prism'
   | 'gem'
   | 'frozen'
-  | 'mirror'
-  | 'silver'
   | 'diamond'
-  | 'wildcard'
   | 'countdown'
   | 'portal'
   | 'catalyst'
@@ -45,10 +42,7 @@ export const BLAST_TILE_TYPE_LIST: readonly BlastTileType[] = [
   'prism',
   'gem',
   'frozen',
-  'mirror',
-  'silver',
   'diamond',
-  'wildcard',
   'countdown',
   'portal',
   'catalyst',

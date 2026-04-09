@@ -115,7 +115,7 @@ describe('planSugarCrush', () => {
 
       // THEN: convertTo is only explosion/effect specials
       for (const step of steps) {
-        expect(['standard', 'ice', 'frozen', 'magnet', 'gold', 'silver', 'diamond', 'mirror', 'gem']).not.toContain(step.convertTo);
+        expect(['standard', 'ice', 'frozen', 'magnet', 'gold', 'diamond', 'gem']).not.toContain(step.convertTo);
       }
     });
   });

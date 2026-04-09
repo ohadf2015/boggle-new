@@ -9,6 +9,7 @@ import type { Language, LetterGrid } from '@/types';
 import type { DailyPuzzle } from './types';
 import { getPuzzleNumber } from './dateUtils';
 import { generateDailyPuzzle, isWordOnGrid } from './gridGeneration';
+import { MAX_TARGET_WORD_LENGTH } from './constants';
 import { loadNounList, createSafeReadFile } from '@/backend/dictionaryLoaders';
 import { normalizeHebrewWord } from '@/shared/utils/wordNormalization';
 
@@ -180,8 +181,20 @@ export async function generateDailyPuzzleAsync(
   // Try to fetch puzzle data from database (includes stored grid)
   const puzzleData = await fetchDailyPuzzleData(dateString, language);
 
+  // Guard: reject stored target words that exceed the gameplay cap.
+  // Legacy DB rows (or admin imports from before the cap tightened) may hold
+  // words longer than MAX_TARGET_WORD_LENGTH — fall through to deterministic
+  // regeneration instead of serving an oversized target to players.
+  const storedTargetTooLong =
+    !!puzzleData && puzzleData.targetWord.length > MAX_TARGET_WORD_LENGTH;
+  if (storedTargetTooLong) {
+    console.warn(
+      `[Daily Puzzle] Stored target "${puzzleData!.targetWord}" for ${dateString}/${language} exceeds ${MAX_TARGET_WORD_LENGTH} chars - regenerating deterministically`
+    );
+  }
+
   // If we have puzzle data with a valid grid, use it (unless force regenerate)
-  if (puzzleData && !forceRegenerate) {
+  if (puzzleData && !forceRegenerate && !storedTargetTooLong) {
     const targetWord = puzzleData.targetWord;
 
     // Check if we have a stored grid

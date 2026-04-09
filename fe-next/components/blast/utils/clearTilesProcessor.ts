@@ -15,12 +15,8 @@ import {
   PRISM_CROSS_BONUS,
   TREASURE_GEM_COMPLETION_BONUS,
   TREASURE_GEM_BONUS_MOVES,
-  MIRROR_MULTIPLIER,
-  SILVER_MULTIPLIER,
-  SILVER_COUNTDOWN_EXTEND,
   DIAMOND_MULTIPLIER,
   DIAMOND_REVEAL_TURNS,
-  SCRABBLE_VALUES,
   COUNTDOWN_DEFUSE_BONUS,
   COUNTDOWN_DEFUSE_MOVES,
   SHUFFLE_CLEAR_BONUS,
@@ -42,7 +38,6 @@ import { rollSpecialFromDistribution } from './blastTileGeneration';
 import {
   type TileEffectContext,
   scanOffensiveSpecial,
-  reFireOffensiveSpecial,
   fireLightningColumn,
   firePrismCross,
   fireVortexPull,
@@ -51,6 +46,7 @@ import {
   handleFrostFinalHit,
   spawnGemSpecials,
   fireCatalystUpgrade,
+  reFireOffensiveSpecial,
 } from './blastTileEffects';
 import { calculateBonusMoves } from './blastMoveUtils';
 import { earnTileUpgrade } from './blastEarnedTiles';
@@ -79,8 +75,6 @@ export interface TileProcessingResult {
   bonusMoveCount: number;
   /** Turns of diamond reveal to add to game state */
   diamondRevealTurns: number;
-  /** Silver extended countdown timers (already applied to tiles) */
-  silverCountdownExtended: boolean;
   /** Shuffle triggered — board rearrangement pending */
   shuffleTriggered: boolean;
   /** Portal word multiplier (applied if word passes through portal) */
@@ -109,17 +103,13 @@ export function processTilesForWord(input: TileProcessingInput): TileProcessingR
   let gemsCompletedThisWord = 0;
   let tileBonusMoves = 0;
   let diamondRevealTurns = 0;
-  let silverCountdownExtended = false;
   let shuffleTriggered = false;
   let hasPortal = false;
 
-  // Pre-scan for Rainbow (best offensive) and Mirror (first offensive)
+  // Pre-scan for Rainbow (best offensive)
   const hasRainbow = path.some(cell => prev[cell.row]?.[cell.col]?.type === 'rainbow');
   const bestOffensiveSpecial = hasRainbow ? scanOffensiveSpecial(path, prev, 'best') : null;
-  const hasMirror = path.some(cell => prev[cell.row]?.[cell.col]?.type === 'mirror');
-  const mirrorFirstSpecial = hasMirror ? scanOffensiveSpecial(path, prev, 'first') : null;
   let rainbowSoloMultiplier = 1;
-  let mirrorSoloMultiplier = 1;
   let crystalWordMultiplier = 1;
 
   // Shared helpers (closures over mutable state)
@@ -194,39 +184,11 @@ export function processTilesForWord(input: TileProcessingInput): TileProcessingR
         tileBonusMoves += GOLD_BONUS_MOVES;
         newExplosions.push({ id: `gold-${now}-${cell.row}-${cell.col}`, row: cell.row, col: cell.col, type: 'word', intensity: 2, timestamp: now });
         break;
-      case 'silver':
-        goldMultiplier *= SILVER_MULTIPLIER;
-        // Extend all active countdown timers on the board
-        if (!silverCountdownExtended) {
-          silverCountdownExtended = true;
-          for (let r = 0; r < gridSize; r++) {
-            for (let c = 0; c < gridSize; c++) {
-              const t = next[r][c];
-              if (t.type === 'countdown' && !t.isCleared && t.countdown != null) {
-                t.countdown += SILVER_COUNTDOWN_EXTEND;
-              }
-            }
-          }
-        }
-        newExplosions.push({ id: `silver-${now}-${cell.row}-${cell.col}`, row: cell.row, col: cell.col, type: 'word', intensity: 2, timestamp: now });
-        break;
       case 'diamond':
         goldMultiplier *= DIAMOND_MULTIPLIER;
         diamondRevealTurns = Math.max(diamondRevealTurns, DIAMOND_REVEAL_TURNS);
         newExplosions.push({ id: `diamond-${now}-${cell.row}-${cell.col}`, row: cell.row, col: cell.col, type: 'word', intensity: 3, timestamp: now });
         break;
-
-      case 'mirror': {
-        newExplosions.push({ id: `mirror-${now}-${cell.row}-${cell.col}`, row: cell.row, col: cell.col, type: 'word', intensity: 2, timestamp: now });
-        if (mirrorFirstSpecial !== null) {
-          const mirrorRefire = reFireOffensiveSpecial(mirrorFirstSpecial, ctx);
-          bonusScore += mirrorRefire.bonusScore;
-          vortexLetterSwaps.push(...mirrorRefire.letterSwaps);
-        } else {
-          mirrorSoloMultiplier = MIRROR_MULTIPLIER;
-        }
-        break;
-      }
 
       case 'bomb':
         processedBombs.add(`${cell.row},${cell.col}`);
@@ -313,18 +275,6 @@ export function processTilesForWord(input: TileProcessingInput): TileProcessingR
         bonusScore += pullResult.bonusScore;
         vortexLetterSwaps.push(...pullResult.letterSwaps);
         bonusScore += fireMagnetExplode(cell.row, cell.col, ctx);
-        break;
-      }
-
-      case 'wildcard': {
-        // Wildcard scores based on highest Scrabble-value letter it could represent
-        const letterIdx = path.indexOf(cell);
-        const wildcardLetter = letterIdx >= 0 ? word[letterIdx]?.toUpperCase() : null;
-        const wildcardValue = wildcardLetter ? (SCRABBLE_VALUES[wildcardLetter] ?? 1) : 1;
-        bonusScore += wildcardValue;
-        if (wildcardValue >= 4) {
-          newExplosions.push({ id: `wildcard-${now}-${cell.row}-${cell.col}`, row: cell.row, col: cell.col, type: 'word', intensity: 2, timestamp: now });
-        }
         break;
       }
 
@@ -507,12 +457,12 @@ export function processTilesForWord(input: TileProcessingInput): TileProcessingR
 
   // Score calculation: solo multipliers -> gold multiplier -> portal -> bonus
   const portalMultiplier = hasPortal ? PORTAL_WORD_MULTIPLIER : 1;
-  const effectiveBase = baseScore * rainbowSoloMultiplier * mirrorSoloMultiplier * portalMultiplier * crystalWordMultiplier;
+  const effectiveBase = baseScore * rainbowSoloMultiplier * portalMultiplier * crystalWordMultiplier;
   const goldBonusScore = effectiveBase * goldMultiplier - effectiveBase;
   if (goldMultiplier > 1) {
     const multiplierTiles = path.filter(cell => {
       const t = next[cell.row]?.[cell.col];
-      return t?.type === 'gold' || t?.type === 'silver' || t?.type === 'diamond';
+      return t?.type === 'gold' || t?.type === 'diamond';
     });
     const perTileBonus = multiplierTiles.length > 0 ? Math.round(goldBonusScore / multiplierTiles.length) : goldBonusScore;
     for (const cell of multiplierTiles) {
@@ -520,7 +470,7 @@ export function processTilesForWord(input: TileProcessingInput): TileProcessingR
       pendingPopups.push({ id: `gold-bonus-${now}-${cell.row}-${cell.col}`, score: perTileBonus, row: cell.row, col: cell.col, isSpecial: true, timestamp: now, tileType: (t?.type ?? 'gold') as 'gold' });
     }
   }
-  // Combo multiplier stacks with gold/rainbow/mirror multipliers
+  // Combo multiplier stacks with gold/rainbow multipliers
   const totalScore = effectiveBase * goldMultiplier * comboMultiplier + bonusScore;
 
   if (path.length > 0) {
@@ -592,7 +542,6 @@ export function processTilesForWord(input: TileProcessingInput): TileProcessingR
     detectedCombos,
     bonusMoveCount,
     diamondRevealTurns,
-    silverCountdownExtended,
     shuffleTriggered,
     portalMultiplier,
   };

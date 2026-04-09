@@ -23,14 +23,16 @@ export interface WordBankEntry {
 }
 
 // Word length constraints by language
+// NOTE: max must stay <= MAX_TARGET_WORD_LENGTH (6) in
+// utils/dailyChallenge/constants.ts. Japanese uses kanji compounds (2-4 chars).
 export const WORD_LENGTH_RANGE: Record<Language, { min: number; max: number }> = {
-  en: { min: 4, max: 8 },
-  he: { min: 4, max: 8 },
-  sv: { min: 4, max: 8 },
+  en: { min: 4, max: 6 },
+  he: { min: 4, max: 6 },
+  sv: { min: 4, max: 6 },
   ja: { min: 2, max: 4 },
-  es: { min: 4, max: 8 },
-  fr: { min: 4, max: 8 },
-  de: { min: 4, max: 8 },
+  es: { min: 4, max: 6 },
+  fr: { min: 4, max: 6 },
+  de: { min: 4, max: 6 },
 };
 
 // Expanded static fallback word lists by language

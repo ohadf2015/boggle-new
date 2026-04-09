@@ -25,38 +25,28 @@ function getZonePreview(type: BlastTileType): 'bomb' | 'lightning' | 'prism' | '
   return ZONE_PREVIEW_TILES[type] ?? null;
 }
 
-/** Find which tile rainbow/mirror will copy in the current selection */
+/** Find which tile rainbow will copy in the current selection */
 function computeScanTarget(
   cells: SelectedCell[],
   tiles: BlastTileState[][],
-): { key: string; source: 'rainbow' | 'mirror' } | null {
+): { key: string; source: 'rainbow' } | null {
   if (cells.length < 2) return null;
   const hasRainbow = cells.some(c => tiles[c.row]?.[c.col]?.type === 'rainbow');
-  const hasMirror = cells.some(c => tiles[c.row]?.[c.col]?.type === 'mirror');
-  if (!hasRainbow && !hasMirror) return null;
+  if (!hasRainbow) return null;
 
   const path = cells.map(c => ({ row: c.row, col: c.col }));
 
-  if (hasRainbow && scanOffensiveSpecial(path, tiles, 'best')) {
+  if (scanOffensiveSpecial(path, tiles, 'best')) {
     let bestRank = -1;
     let bestKey: string | null = null;
     for (const c of cells) {
       const t = tiles[c.row]?.[c.col];
-      if (t && !t.isCleared && t.type !== 'rainbow' && t.type !== 'mirror') {
+      if (t && !t.isCleared && t.type !== 'rainbow') {
         const rank = OFFENSIVE_RANK[t.type] ?? -1;
         if (rank > bestRank) { bestRank = rank; bestKey = `${c.row}-${c.col}`; }
       }
     }
     if (bestKey) return { key: bestKey, source: 'rainbow' };
-  }
-
-  if (hasMirror && scanOffensiveSpecial(path, tiles, 'first')) {
-    for (const c of cells) {
-      const t = tiles[c.row]?.[c.col];
-      if (t && !t.isCleared && t.type !== 'rainbow' && t.type !== 'mirror' && (OFFENSIVE_RANK[t.type] ?? -1) >= 0) {
-        return { key: `${c.row}-${c.col}`, source: 'mirror' };
-      }
-    }
   }
 
   return null;

@@ -13,10 +13,7 @@ export function getInitialHitsRemaining(type: BlastTileType): number {
     // Frost (frozen) redesign: 2 hits instead of 3 (reveals hidden inner special)
     case 'frozen': return FROST_HITS_REQUIRED;
     // New tile types: cleared on first hit like standard/gold/bomb/etc.
-    case 'mirror': return 0;
-    case 'silver': return 0;
     case 'diamond': return 0;
-    case 'wildcard': return 0;
     case 'countdown': return 0;
     case 'shuffle': return 0;
     case 'magma': return 0;

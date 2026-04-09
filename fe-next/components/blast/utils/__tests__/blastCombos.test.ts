@@ -1,4 +1,4 @@
-import { detectSpecialCombos, type SpecialCombo, type BlastComboType } from '../blastCombos';
+import { detectSpecialCombos } from '../blastCombos';
 import type { BlastTileState, BlastTileType } from '../../types';
 
 // ==================== Helpers ====================
@@ -365,16 +365,6 @@ describe('detectSpecialCombos', () => {
     expect(combos.find(c => c.type === 'bomb_rainbow')!.scoreMultiplier).toBe(3);
   });
 
-  it('should detect bomb_mirror combo', () => {
-    const grid = makeGrid([
-      { row: 0, col: 0, type: 'bomb' },
-      { row: 0, col: 1, type: 'mirror' },
-    ]);
-    const combos = detectSpecialCombos(makePath([0, 0], [0, 1], [0, 2]), grid);
-    expect(combos.find(c => c.type === 'bomb_mirror')).toBeDefined();
-    expect(combos.find(c => c.type === 'bomb_mirror')!.scoreMultiplier).toBe(3);
-  });
-
   it('should detect bomb_magnet combo', () => {
     const grid = makeGrid([
       { row: 0, col: 0, type: 'bomb' },
@@ -413,16 +403,6 @@ describe('detectSpecialCombos', () => {
     const combos = detectSpecialCombos(makePath([0, 0], [0, 1], [0, 2]), grid);
     expect(combos.find(c => c.type === 'lightning_rainbow')).toBeDefined();
     expect(combos.find(c => c.type === 'lightning_rainbow')!.scoreMultiplier).toBe(4);
-  });
-
-  it('should detect lightning_mirror combo', () => {
-    const grid = makeGrid([
-      { row: 0, col: 0, type: 'lightning' },
-      { row: 0, col: 1, type: 'mirror' },
-    ]);
-    const combos = detectSpecialCombos(makePath([0, 0], [0, 1], [0, 2]), grid);
-    expect(combos.find(c => c.type === 'lightning_mirror')).toBeDefined();
-    expect(combos.find(c => c.type === 'lightning_mirror')!.scoreMultiplier).toBe(3);
   });
 
   it('should detect lightning_magnet combo', () => {
@@ -465,16 +445,6 @@ describe('detectSpecialCombos', () => {
     expect(combos.find(c => c.type === 'prism_rainbow')!.scoreMultiplier).toBe(5);
   });
 
-  it('should detect prism_mirror combo', () => {
-    const grid = makeGrid([
-      { row: 0, col: 0, type: 'prism' },
-      { row: 0, col: 1, type: 'mirror' },
-    ]);
-    const combos = detectSpecialCombos(makePath([0, 0], [0, 1], [0, 2]), grid);
-    expect(combos.find(c => c.type === 'prism_mirror')).toBeDefined();
-    expect(combos.find(c => c.type === 'prism_mirror')!.scoreMultiplier).toBe(5);
-  });
-
   it('should detect prism_magnet combo', () => {
     const grid = makeGrid([
       { row: 0, col: 0, type: 'prism' },
@@ -505,16 +475,6 @@ describe('detectSpecialCombos', () => {
     expect(combos.find(c => c.type === 'prism_frozen')!.scoreMultiplier).toBe(3);
   });
 
-  it('should detect rainbow_mirror combo', () => {
-    const grid = makeGrid([
-      { row: 0, col: 0, type: 'rainbow' },
-      { row: 0, col: 1, type: 'mirror' },
-    ]);
-    const combos = detectSpecialCombos(makePath([0, 0], [0, 1], [0, 2]), grid);
-    expect(combos.find(c => c.type === 'rainbow_mirror')).toBeDefined();
-    expect(combos.find(c => c.type === 'rainbow_mirror')!.scoreMultiplier).toBe(4);
-  });
-
   it('should detect rainbow_magnet combo', () => {
     const grid = makeGrid([
       { row: 0, col: 0, type: 'rainbow' },
@@ -543,36 +503,6 @@ describe('detectSpecialCombos', () => {
     const combos = detectSpecialCombos(makePath([0, 0], [0, 1], [0, 2]), grid);
     expect(combos.find(c => c.type === 'rainbow_frozen')).toBeDefined();
     expect(combos.find(c => c.type === 'rainbow_frozen')!.scoreMultiplier).toBe(2);
-  });
-
-  it('should detect mirror_magnet combo', () => {
-    const grid = makeGrid([
-      { row: 0, col: 0, type: 'mirror' },
-      { row: 0, col: 1, type: 'magnet' },
-    ]);
-    const combos = detectSpecialCombos(makePath([0, 0], [0, 1], [0, 2]), grid);
-    expect(combos.find(c => c.type === 'mirror_magnet')).toBeDefined();
-    expect(combos.find(c => c.type === 'mirror_magnet')!.scoreMultiplier).toBe(4);
-  });
-
-  it('should detect mirror_gem combo', () => {
-    const grid = makeGrid([
-      { row: 0, col: 0, type: 'mirror' },
-      { row: 0, col: 1, type: 'gem' },
-    ]);
-    const combos = detectSpecialCombos(makePath([0, 0], [0, 1], [0, 2]), grid);
-    expect(combos.find(c => c.type === 'mirror_gem')).toBeDefined();
-    expect(combos.find(c => c.type === 'mirror_gem')!.scoreMultiplier).toBe(4);
-  });
-
-  it('should detect mirror_frozen combo', () => {
-    const grid = makeGrid([
-      { row: 0, col: 0, type: 'mirror' },
-      { row: 0, col: 1, type: 'frozen' },
-    ]);
-    const combos = detectSpecialCombos(makePath([0, 0], [0, 1], [0, 2]), grid);
-    expect(combos.find(c => c.type === 'mirror_frozen')).toBeDefined();
-    expect(combos.find(c => c.type === 'mirror_frozen')!.scoreMultiplier).toBe(3);
   });
 
   it('should detect magnet_gem combo', () => {
@@ -631,7 +561,7 @@ describe('detectSpecialCombos', () => {
     const grid3 = makeGrid([
       { row: 0, col: 0, type: 'bomb' },
       { row: 0, col: 1, type: 'rainbow' },
-      { row: 0, col: 2, type: 'mirror' },
+      { row: 0, col: 2, type: 'magnet' },
     ]);
     const combos3 = detectSpecialCombos(makePath([0, 0], [0, 1], [0, 2]), grid3);
     expect(combos3.find(c => c.type === 'triple_special')).toBeUndefined();

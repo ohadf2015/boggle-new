@@ -50,8 +50,8 @@ describe('scaledRadius', () => {
 });
 
 describe('CODEX_COMBOS', () => {
-  it('contains exactly 31 entries', () => {
-    expect(CODEX_COMBOS.length).toBe(31);
+  it('contains exactly 24 entries', () => {
+    expect(CODEX_COMBOS.length).toBe(24);
   });
 
   it('does NOT contain gold_special', () => {

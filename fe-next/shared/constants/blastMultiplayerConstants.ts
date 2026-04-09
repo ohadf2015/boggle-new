@@ -32,10 +32,7 @@ export const BLAST_TILE_BONUSES: Record<BlastTileType, number> = {
   magnet: 1,
   prism: 1.25,
   frozen: 1,
-  mirror: 1.25,
-  silver: 2,
   diamond: 2.5,
-  wildcard: 1,     // no score bonus — flexibility is the reward
   countdown: 1.5,  // reward for defusing under pressure
   shuffle: 0.5,    // mild bonus for triggering board rearrange
   magma: 2,        // high reward for diagonal clear power

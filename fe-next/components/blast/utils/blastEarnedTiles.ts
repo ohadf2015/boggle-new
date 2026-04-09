@@ -4,16 +4,16 @@
  * This is the "earned spectacle" pattern from Candy Crush:
  * longer words → better specials → players feel ownership over powerful tiles.
  *
- * 5-letter word → silver or gold (multiplier boost)
+ * 5-letter word → gold (multiplier boost)
  * 6-letter word → bomb or lightning (area/column clear)
- * 7+ letter word → prism or rainbow (cross-clear or wildcard)
+ * 7+ letter word → prism or rainbow (cross-clear)
  */
 import type { BlastTileState, BlastTileType } from '@/shared/types/blast';
 import { getInitialHitsRemaining } from './blastTileUtils';
 
 /** Tile pool per word length tier. Key = minimum word length. */
 export const WORD_LENGTH_REWARDS: Record<number, BlastTileType[]> = {
-  5: ['silver', 'gold'],
+  5: ['gold'],
   6: ['bomb', 'lightning'],
   7: ['prism', 'rainbow'],
 };

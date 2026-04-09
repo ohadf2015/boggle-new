@@ -14,6 +14,9 @@ import type {
 } from '@/components/results/types';
 
 // Dynamic imports for heavy components
+import ComparativeInsights from '@/components/results/ComparativeInsights';
+import WordComparisonGrid from '@/components/results/WordComparisonGrid';
+
 const ResultsPlayerCard = dynamic(() => import('@/components/results/ResultsPlayerCard'), { ssr: false });
 const BlastResultsSummary = dynamic(() => import('@/components/results/BlastResultsSummary'), { ssr: false });
 const WordHuntResultsSummary = dynamic(() => import('@/components/results/WordHuntResultsSummary'), { ssr: false });
@@ -185,6 +188,21 @@ export const ResultsDetailsContent: React.FC<ResultsDetailsContentProps> = ({
         </CollapsibleSection>
       )}
 
+      {/* Multiplayer comparison: high-level insights + per-player word drill-down */}
+      {otherPlayers.length > 0 && (
+        <>
+          <ComparativeInsights
+            allPlayerWords={allPlayerWords}
+            currentUsername={username || ''}
+            t={t}
+          />
+          <WordComparisonGrid
+            allPlayerWords={allPlayerWords}
+            currentUsername={username || ''}
+            t={t}
+          />
+        </>
+      )}
 
       {/* Rarest Achievement */}
       {achievements && achievements.length > 0 && (() => {

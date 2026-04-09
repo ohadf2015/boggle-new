@@ -2113,6 +2113,11 @@ const es = {
       "scoreAbove": "Le sacaste {pct}% al promedio",
       "scoreBelow": "Quedaste {pct}% abajo del promedio"
     },
+    "wordComparison": {
+      "title": "Comparación palabra por palabra",
+      "unique": "Solo tú",
+      "shared": "Todos"
+    },
     "sessionStats": {
       "title": "Momentos de la Sesión",
       "improved": "¡Mejoraste {percent}% desde la ronda 1!",

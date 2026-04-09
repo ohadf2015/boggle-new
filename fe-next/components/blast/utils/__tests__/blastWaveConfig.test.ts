@@ -191,77 +191,69 @@ describe('getWaveDistribution', () => {
 // ==================== New distribution tests (47-05) ====================
 
 describe('getWaveDistribution — new tile unlock progression', () => {
-  it('wave 1: has no wildcard, no advanced tiles (mirror/vortex/frost/prism/lightning/gem/diamond)', () => {
+  it('wave 1: basic tiles only, no advanced tiles', () => {
     const dist = getWaveDistribution(getWaveConfig(1));
-    // Wildcard must be gone
-    expect(dist.wildcard ?? 0).toBe(0);
     // Basic specials all present
     expect(dist.bomb).toBeGreaterThan(0);
     expect(dist.ice).toBeGreaterThan(0);
     expect(dist.gold).toBeGreaterThan(0);
-    expect(dist.silver).toBeGreaterThan(0);
     expect(dist.rainbow).toBeGreaterThan(0);
     // Advanced tiles absent in wave 1
-    expect(dist.mirror ?? 0).toBe(0);
-    expect(dist.vortex ?? dist.magnet ?? 0).toBe(0);
-    expect(dist.frost ?? dist.frozen ?? 0).toBe(0);
+    expect(dist.magnet ?? 0).toBe(0);
+    expect(dist.frozen ?? 0).toBe(0);
     expect(dist.prism ?? 0).toBe(0);
     expect(dist.lightning ?? 0).toBe(0);
     expect(dist.gem ?? 0).toBe(0);
     expect(dist.diamond ?? 0).toBe(0);
+    expect(dist.catalyst ?? 0).toBe(0);
+    expect(dist.crystal ?? 0).toBe(0);
   });
 
-  it('wave 2: unlocks treasure gem (gem > 0), still no mirror/lightning/prism/frost/vortex/diamond', () => {
+  it('wave 2: unlocks treasure gem, still no prism/lightning/diamond/frozen/magnet', () => {
     const dist = getWaveDistribution(getWaveConfig(2));
     expect(dist.gem).toBeGreaterThan(0);
-    expect(dist.mirror ?? 0).toBe(0);
     expect(dist.lightning ?? 0).toBe(0);
     expect(dist.prism ?? 0).toBe(0);
-    expect(dist.frost ?? dist.frozen ?? 0).toBe(0);
-    expect(dist.vortex ?? dist.magnet ?? 0).toBe(0);
+    expect(dist.frozen ?? 0).toBe(0);
+    expect(dist.magnet ?? 0).toBe(0);
     expect(dist.diamond ?? 0).toBe(0);
   });
 
-  it('wave 3: unlocks prism (> 0), still no mirror/lightning/frost/vortex/diamond', () => {
+  it('wave 3: unlocks prism, still no lightning/frozen/magnet/diamond', () => {
     const dist = getWaveDistribution(getWaveConfig(3));
     expect(dist.prism).toBeGreaterThan(0);
-    expect(dist.mirror ?? 0).toBe(0);
     expect(dist.lightning ?? 0).toBe(0);
-    expect(dist.frost ?? dist.frozen ?? 0).toBe(0);
-    expect(dist.vortex ?? dist.magnet ?? 0).toBe(0);
+    expect(dist.frozen ?? 0).toBe(0);
+    expect(dist.magnet ?? 0).toBe(0);
     expect(dist.diamond ?? 0).toBe(0);
   });
 
-  it('wave 4: unlocks lightning only, still no diamond/frost/mirror/vortex', () => {
+  it('wave 4: unlocks lightning, still no diamond/frozen/magnet', () => {
     const dist = getWaveDistribution(getWaveConfig(4));
     expect(dist.lightning).toBeGreaterThan(0);
     expect(dist.diamond ?? 0).toBe(0);
-    expect(dist.frost ?? dist.frozen ?? 0).toBe(0);
-    expect(dist.mirror ?? 0).toBe(0);
-    expect(dist.vortex ?? dist.magnet ?? 0).toBe(0);
+    expect(dist.frozen ?? 0).toBe(0);
+    expect(dist.magnet ?? 0).toBe(0);
   });
 
-  it('wave 5: unlocks diamond + mirror, still no frost/vortex', () => {
+  it('wave 5: unlocks diamond, still no frozen/magnet', () => {
     const dist = getWaveDistribution(getWaveConfig(5));
     expect(dist.diamond).toBeGreaterThan(0);
-    expect(dist.mirror).toBeGreaterThan(0);
     expect(dist.lightning).toBeGreaterThan(0);
-    expect(dist.frost ?? dist.frozen ?? 0).toBe(0);
-    expect(dist.vortex ?? dist.magnet ?? 0).toBe(0);
+    expect(dist.frozen ?? 0).toBe(0);
+    expect(dist.magnet ?? 0).toBe(0);
   });
 
-  it('wave 6: unlocks frost, still no vortex', () => {
+  it('wave 6: unlocks frozen, still no magnet', () => {
     const dist = getWaveDistribution(getWaveConfig(6));
-    expect(dist.frost ?? dist.frozen ?? 0).toBeGreaterThan(0);
-    expect(dist.mirror).toBeGreaterThan(0);
+    expect(dist.frozen ?? 0).toBeGreaterThan(0);
     expect(dist.diamond).toBeGreaterThan(0);
-    expect(dist.vortex ?? dist.magnet ?? 0).toBe(0);
+    expect(dist.magnet ?? 0).toBe(0);
   });
 
-  it('wave 7+: everything including vortex/magnet is > 0', () => {
+  it('wave 7+: magnet is > 0', () => {
     const dist = getWaveDistribution(getWaveConfig(7));
-    expect(dist.vortex ?? dist.magnet ?? 0).toBeGreaterThan(0);
-    expect(dist.mirror).toBeGreaterThan(0);
+    expect(dist.magnet ?? 0).toBeGreaterThan(0);
     expect(dist.diamond).toBeGreaterThan(0);
   });
 
@@ -273,46 +265,14 @@ describe('getWaveDistribution — new tile unlock progression', () => {
     }
   });
 
-  it('silver is present in all waves (basic tier)', () => {
-    for (let wave = 1; wave <= 6; wave++) {
-      const dist = getWaveDistribution(getWaveConfig(wave));
-      expect(dist.silver).toBeGreaterThan(0);
-    }
-  });
-
-  it('no wildcard in waves 1-7, present from wave 8+', () => {
-    for (let wave = 1; wave <= 7; wave++) {
-      const dist = getWaveDistribution(getWaveConfig(wave));
-      expect(dist.wildcard ?? 0).toBe(0);
-    }
-    const dist8 = getWaveDistribution(getWaveConfig(8));
-    expect(dist8.wildcard).toBeGreaterThan(0);
-  });
-
-  it('WaveConfig has mirrorEnabled, silverEnabled, diamondEnabled flags', () => {
+  it('WaveConfig has diamondEnabled flag', () => {
     const config = getWaveConfig(1);
-    expect(typeof config.mirrorEnabled).toBe('boolean');
-    expect(typeof config.silverEnabled).toBe('boolean');
     expect(typeof config.diamondEnabled).toBe('boolean');
-  });
-
-  it('mirrorEnabled=false for wave 1-2, true for wave 3+', () => {
-    expect(getWaveConfig(1).mirrorEnabled).toBe(false);
-    expect(getWaveConfig(2).mirrorEnabled).toBe(false);
-    expect(getWaveConfig(3).mirrorEnabled).toBe(false);
-    expect(getWaveConfig(4).mirrorEnabled).toBe(false);
-    expect(getWaveConfig(5).mirrorEnabled).toBe(true);
   });
 
   it('diamondEnabled=false for wave 1-4, true for wave 5+', () => {
     expect(getWaveConfig(4).diamondEnabled).toBe(false);
     expect(getWaveConfig(5).diamondEnabled).toBe(true);
-  });
-
-  it('silverEnabled=true for all waves', () => {
-    for (let wave = 1; wave <= 6; wave++) {
-      expect(getWaveConfig(wave).silverEnabled).toBe(true);
-    }
   });
 
   it('crystalEnabled=false for waves 1-11, true at wave 12+ (master-tier unlock)', () => {
@@ -368,7 +328,7 @@ describe('getWaveConfig archetype', () => {
     expect(getWaveConfig(7).archetype).toBe('treasureHunt');
   });
 
-  it('wave 8 is a scoreRush wave (wildcard unlock)', () => {
+  it('wave 8 is a scoreRush wave (catalyst unlock)', () => {
     expect(getWaveConfig(8).archetype).toBe('scoreRush');
   });
 

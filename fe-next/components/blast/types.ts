@@ -132,16 +132,10 @@ export interface BlastResultsData {
 export const GOLD_MULTIPLIER = 3;
 /** Gold tile awards +1 bonus move when cleared */
 export const GOLD_BONUS_MOVES = 1;
-/** Score multiplier for silver tiles (wave 2+) */
-export const SILVER_MULTIPLIER = 1.5;
-/** Silver tile extends all active countdown timers by +1 move */
-export const SILVER_COUNTDOWN_EXTEND = 1;
 /** Score multiplier for diamond tiles (wave 4+) */
 export const DIAMOND_MULTIPLIER = 5;
 /** Diamond reveals frozen tiles' inner types for N turns */
 export const DIAMOND_REVEAL_TURNS = 3;
-/** Mirror tile: doubles partner special's effect. Solo = 2x word score. */
-export const MIRROR_MULTIPLIER = 2;
 /** Number of adjacent cells a bomb clears */
 export const BOMB_RADIUS = 1; // 3x3 area (8 adjacent cells)
 
@@ -182,16 +176,6 @@ export const MAGNET_ATTRACT_BONUS = 3;
 export const PRISM_USE_BONUS = 2;
 /** Bonus when prism detonates (cross-clear) */
 export const PRISM_CROSS_BONUS = 5;
-
-// ==================== Wildcard Constants ====================
-
-/** Wildcard scores the highest Scrabble-value letter it could represent */
-export const WILDCARD_CLEAR_BONUS = 0;
-/** Scrabble letter values for wildcard scoring */
-export const SCRABBLE_VALUES: Record<string, number> = {
-  A: 1, B: 3, C: 3, D: 2, E: 1, F: 4, G: 2, H: 4, I: 1, J: 8, K: 5, L: 1, M: 3,
-  N: 1, O: 1, P: 3, Q: 10, R: 1, S: 1, T: 1, U: 1, V: 4, W: 4, X: 8, Y: 4, Z: 10,
-};
 
 // ==================== Countdown Constants ====================
 
@@ -341,10 +325,7 @@ export const SPECIAL_TILE_DISTRIBUTION: Record<Exclude<BlastTileType, 'standard'
   prism: 0,
   gem: 0,
   frozen: 0,
-  mirror: 0,
-  silver: 0,
   diamond: 0,
-  wildcard: 0,
   countdown: 0,
   portal: 0,
   catalyst: 0,

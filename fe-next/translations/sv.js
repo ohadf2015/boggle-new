@@ -2097,6 +2097,11 @@ const sv = {
       "scoreAbove": "{pct}% över snittet",
       "scoreBelow": "{pct}% under snittet"
     },
+    "wordComparison": {
+      "title": "Ord-för-ord jämförelse",
+      "unique": "Bara du",
+      "shared": "Alla"
+    },
     "sessionStats": {
       "title": "Sessionhöjdpunkter",
       "improved": "Förbättrade {percent}% från omgång 1!",

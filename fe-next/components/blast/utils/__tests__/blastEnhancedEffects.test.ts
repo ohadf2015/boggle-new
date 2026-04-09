@@ -362,42 +362,6 @@ describe('blastEnhancedEffects', () => {
     });
   });
 
-  describe('mirrorCrystallizeTile', () => {
-    it('creates a CrystallizeEffect and calls play for mirror', () => {
-      const manager = createEnhancedEffects(app, camera, 50);
-      manager.mirrorCrystallizeTile(100, 200, 'mirror');
-
-      expect(mockPlay).toHaveBeenCalledTimes(1);
-      expect(camera.addChild).toHaveBeenCalled();
-    });
-
-    it('does nothing after destroy is called', () => {
-      const manager = createEnhancedEffects(app, camera, 50);
-      manager.destroy();
-      manager.mirrorCrystallizeTile(100, 200, 'mirror');
-
-      expect(mockPlay).not.toHaveBeenCalled();
-    });
-  });
-
-  describe('silverShatterTile', () => {
-    it('creates a ShatterEffect and calls Explode for silver', () => {
-      const manager = createEnhancedEffects(app, camera, 50);
-      manager.silverShatterTile(100, 200, 'silver');
-
-      expect(mockExplode).toHaveBeenCalledTimes(1);
-      expect(camera.addChild).toHaveBeenCalled();
-    });
-
-    it('does nothing after destroy is called', () => {
-      const manager = createEnhancedEffects(app, camera, 50);
-      manager.destroy();
-      manager.silverShatterTile(100, 200, 'silver');
-
-      expect(mockExplode).not.toHaveBeenCalled();
-    });
-  });
-
   describe('destroy', () => {
     it('cleans up all active effects', async () => {
       // Make Explode/dissolve hang (never resolve) so effects stay active

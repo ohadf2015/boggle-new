@@ -317,31 +317,6 @@ const CATALYST_MERCURY: ILiquidMercuryEffectOptions = {
   duration: 0.9,
 };
 
-const MIRROR_CRYSTALLIZE: ICrystallizeEffectOptions = {
-  cellScale: 0.04,
-  jitter: 0.3,
-  highlightStrength: 1.0,
-  edgeSoftness: 0.1,
-  tintByCell: false,
-  duration: 0.9,
-};
-
-const SILVER_SHATTER: IShatterEffectOptions = {
-  gridCols: 9,
-  gridRows: 9,
-  explosionPower: 14,
-  friction: 0.975,
-  gravity: 300,
-  turbulence: 3,
-  lifetime: 1.0,
-  fadeOutDuration: 0.4,
-  mode: 'radial',
-  randomizeScale: true,
-  enableRotation: true,
-  rotationStrength: 8,
-  endTint: 0xe0e0e0,
-};
-
 const RAINBOW_ASSEMBLY: IMagneticAssemblyOptions = {
   gridCols: 8,
   gridRows: 8,
@@ -366,8 +341,6 @@ export interface EnhancedEffectsManager {
   slitScanTile(x: number, y: number, tileType: string): void;
   mercuryTile(x: number, y: number, tileType: string): void;
   assembleTile(x: number, y: number, tileType: string): void;
-  mirrorCrystallizeTile(x: number, y: number, tileType: string): void;
-  silverShatterTile(x: number, y: number, tileType: string): void;
   destroy(): void;
 }
 
@@ -508,20 +481,6 @@ export function createEnhancedEffects(
     trackEffect(effect, sprite, effect.assemble());
   }
 
-  function mirrorCrystallizeTile(x: number, y: number, tileType: string): void {
-    if (destroyed) return;
-    const sprite = createTileProxy(app, camera, x, y, cellSize * 0.9, tileType);
-    const effect = new CrystallizeEffect(sprite, MIRROR_CRYSTALLIZE);
-    trackEffect(effect, sprite, effect.play());
-  }
-
-  function silverShatterTile(x: number, y: number, tileType: string): void {
-    if (destroyed) return;
-    const sprite = createTileProxy(app, camera, x, y, cellSize * 0.9, tileType);
-    const effect = new ShatterEffect(sprite, { ...SILVER_SHATTER, explosionOrigin: { x: 0.5, y: 0.5 } });
-    trackEffect(effect, sprite, effect.Explode());
-  }
-
   function destroy(): void {
     destroyed = true;
     for (const effect of activeEffects) {
@@ -539,7 +498,6 @@ export function createEnhancedEffects(
   return {
     shatterTile, dissolveTile, crystallizeTile, meltTile,
     glitchTile, prismRefractTile, erodeTile, pixelSortTile,
-    slitScanTile, mercuryTile, assembleTile,
-    mirrorCrystallizeTile, silverShatterTile, destroy,
+    slitScanTile, mercuryTile, assembleTile, destroy,
   };
 }

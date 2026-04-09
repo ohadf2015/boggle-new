@@ -181,19 +181,15 @@ describe('LandingView', () => {
     expect(hasSinglePlayer || hasMultiplayer).toBe(true);
   });
 
-  it('plays lobby music on mount', async () => {
-    // LandingView gates music on hydrated state which uses requestAnimationFrame
-    const rafCallbacks: FrameRequestCallback[] = [];
-    vi.spyOn(window, 'requestAnimationFrame').mockImplementation((cb) => {
-      rafCallbacks.push(cb);
-      return 1;
-    });
-
+  it('plays lobby music on first user gesture (browser autoplay policy)', async () => {
     render(<LandingView />, { wrapper: createWrapper() });
 
-    // Flush the rAF to trigger hydration
+    // Music should NOT play until user interacts (Chrome autoplay policy)
+    expect(mockPlayTrack).not.toHaveBeenCalled();
+
+    // Simulate first user gesture
     act(() => {
-      rafCallbacks.forEach(cb => cb(0));
+      window.dispatchEvent(new Event('pointerdown'));
     });
 
     expect(mockPlayTrack).toHaveBeenCalledWith('bossa');

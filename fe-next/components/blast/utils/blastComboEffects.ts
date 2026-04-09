@@ -271,20 +271,6 @@ export function executeComboEffect(ctx: ComboEffectContext): ComboEffectResult {
       break;
     }
 
-    case 'bomb_mirror': {
-      // Twin Explosion: 3x3 at bomb position + 3x3 at mirror position
-      const bt = combo.tiles.find(t => t.tileType === 'bomb') ?? combo.tiles[0];
-      const mt = combo.tiles.find(t => t.tileType === 'mirror') ?? combo.tiles[1];
-      if (!bt || !mt) break;
-      const bmRadius = scaledRadius(BOMB_RADIUS, wordLengthScale);
-      for (const center of [bt, mt]) {
-        fireAreaBlast(center.row, center.col, bmRadius, ctx);
-        pushExplosion(`combo-bm-${now}-${center.row}-${center.col}`, center.row, center.col, result, now);
-      }
-      result.processedBombKeys.push(`${bt.row},${bt.col}`);
-      break;
-    }
-
     case 'bomb_magnet': {
       // Gravity Bomb: vortex pull toward magnet then scaled blast around magnet
       const mg = combo.tiles.find(t => t.tileType === 'magnet') ?? combo.tiles[1];
@@ -355,19 +341,6 @@ export function executeComboEffect(ctx: ComboEffectContext): ComboEffectResult {
       }
       pushExplosion(`combo-lr-${now}`, lt.row, lt.col, result, now);
       result.processedLightningKeys.push(`${lt.row},${lt.col}`);
-      break;
-    }
-
-    case 'lightning_mirror': {
-      // Double Strike: clear column at lightning AND column at mirror
-      const lt2 = combo.tiles.find(t => t.tileType === 'lightning') ?? combo.tiles[0];
-      const mt2 = combo.tiles.find(t => t.tileType === 'mirror') ?? combo.tiles[1];
-      if (!lt2 || !mt2) break;
-      for (const tile of [lt2, mt2]) {
-        for (let r = 0; r < gridSize; r++) applyToTile(next[r][tile.col], ctx);
-        pushExplosion(`combo-lm-${now}-${tile.col}`, tile.row, tile.col, result, now);
-      }
-      result.processedLightningKeys.push(`${lt2.row},${lt2.col}`);
       break;
     }
 
@@ -449,20 +422,8 @@ export function executeComboEffect(ctx: ComboEffectContext): ComboEffectResult {
       break;
     }
 
-    case 'prism_mirror': {
-      // Twin Cross: cross-clear from prism, then second pass applies another hit to survivors
-      const pt2 = combo.tiles.find(t => t.tileType === 'prism') ?? combo.tiles[0];
-      if (!pt2) break;
-      fireCrossClear(pt2.row, pt2.col, ctx);
-      // Second pass: apply another hit to tiles in the cross that survived the first pass
-      for (let c = 0; c < gridSize; c++) applyToTile(next[pt2.row][c], ctx);
-      for (let r = 0; r < gridSize; r++) applyToTile(next[r][pt2.col], ctx);
-      pushExplosion(`combo-pmr-${now}`, pt2.row, pt2.col, result, now);
-      break;
-    }
-
     default:
-      // Tactical combos (mirror/magnet/gem/frozen) — delegated to keep this file under 500 lines
+      // Tactical combos (magnet/gem/frozen) — delegated to keep this file under 500 lines
       executeTacticalCombo(ctx, result);
       break;
   }

@@ -95,21 +95,29 @@ describe('BlastMultiplayerOverlay', () => {
     }).not.toThrow();
   });
 
-  it('should render badges for ALL 12 special tile types', () => {
+  it('should render badges for ALL 20 special tile types', () => {
     const gridSize5 = { rows: 5, cols: 5 };
     const allSpecialTypes: BlastTileOverlay[] = [
       { row: 0, col: 0, type: 'gold' },
       { row: 0, col: 1, type: 'bomb' },
       { row: 0, col: 2, type: 'rainbow' },
       { row: 0, col: 3, type: 'ice' },
-      { row: 1, col: 0, type: 'lightning' },
-      { row: 1, col: 1, type: 'magnet' },
+      { row: 0, col: 4, type: 'lightning' },
+      { row: 1, col: 0, type: 'magnet' },
+      { row: 1, col: 1, type: 'prism' },
       { row: 1, col: 2, type: 'gem' },
-      { row: 1, col: 3, type: 'prism' },
-      { row: 2, col: 0, type: 'frozen' },
-      { row: 2, col: 1, type: 'mirror' },
-      { row: 2, col: 2, type: 'silver' },
-      { row: 2, col: 3, type: 'diamond' },
+      { row: 1, col: 3, type: 'frozen' },
+      { row: 1, col: 4, type: 'diamond' },
+      { row: 2, col: 0, type: 'countdown' },
+      { row: 2, col: 1, type: 'portal' },
+      { row: 2, col: 2, type: 'catalyst' },
+      { row: 2, col: 3, type: 'shuffle' },
+      { row: 2, col: 4, type: 'magma' },
+      { row: 3, col: 0, type: 'crystal' },
+      { row: 3, col: 1, type: 'fuse' },
+      { row: 3, col: 2, type: 'locked' },
+      { row: 3, col: 3, type: 'key' },
+      { row: 3, col: 4, type: 'anchor' },
     ];
 
     render(

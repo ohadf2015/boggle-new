@@ -4,7 +4,7 @@
 
 import { useEffect, useRef, type RefObject } from 'react';
 import {
-  TILE_EXPLOSION, COMBO_FLASH, CASCADE_SPARKLE,
+  TILE_EXPLOSION, CASCADE_SPARKLE,
   BOMB_EXPLOSION, LIGHTNING_SPARK, PRISM_CROSS, GEM_SHATTER,
   VORTEX_PULL, CONFETTI_BURST, FIRE_EMBERS, FROST_CRYSTALS, ELECTRIC_RINGS,
   GOLD_STARS, DIAMOND_SHARDS,
@@ -173,11 +173,6 @@ export function useBlastClearEffects({
         case 'rainbow': {
           particles.burst(CONFETTI_BURST, wx, wy, 30);
           flash.flash({ color: 0xff6699, duration: 0.15, intensity: 0.2 });
-          break;
-        }
-        case 'mirror': {
-          particles.burst({ ...COMBO_FLASH, colors: ['ffffff', 'eeeeff', 'ddddff'] }, wx, wy, 15);
-          flash.white();
           break;
         }
         default: {

@@ -2201,6 +2201,11 @@ const en = {
       "scoreAbove": "You scored {pct}% more than the average",
       "scoreBelow": "You scored {pct}% less than the average"
     },
+    "wordComparison": {
+      "title": "Word-by-Word Comparison",
+      "unique": "Only you",
+      "shared": "Everyone"
+    },
     "sessionStats": {
       "title": "Session Highlights",
       "improved": "Improved {percent}% from round 1!",

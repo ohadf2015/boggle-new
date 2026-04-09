@@ -2098,6 +2098,11 @@ const ja = {
       "scoreAbove": "平均を{pct}%上回った！",
       "scoreBelow": "平均を{pct}%下回った"
     },
+    "wordComparison": {
+      "title": "単語ごとの比較",
+      "unique": "あなただけ",
+      "shared": "全員"
+    },
     "sessionStats": {
       "title": "セッションハイライト",
       "improved": "ラウンド1から{percent}%向上！",

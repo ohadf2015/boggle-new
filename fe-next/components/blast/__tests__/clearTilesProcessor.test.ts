@@ -1,7 +1,6 @@
 /**
  * Tests for unique tile effects in clearTilesProcessor.processTilesForWord.
- * Covers: gold bonus moves, silver countdown extend, diamond reveal turns,
- * wildcard Scrabble scoring, countdown defuse moves,
+ * Covers: gold bonus moves, diamond reveal turns, countdown defuse moves,
  * shuffle board rearrange, magma diagonal clear, portal word multiplier, gem completion bonus moves,
  * prism tile conversion.
  */
@@ -81,32 +80,6 @@ describe('processTilesForWord — unique tile effects', () => {
     });
   });
 
-  describe('silver tile: countdown extension', () => {
-    it('extends countdown timers by 1 when silver is cleared', () => {
-      const grid = makeGrid(4, [
-        { row: 0, col: 0, tile: { type: 'silver' } },
-        { row: 2, col: 2, tile: { type: 'countdown', countdown: 2 } },
-        { row: 3, col: 3, tile: { type: 'countdown', countdown: 1 } },
-      ]);
-      const path = [{ row: 0, col: 0 }, { row: 0, col: 1 }];
-      const result = processTilesForWord(makeInput(grid, path, 'AB'));
-      expect(result.silverCountdownExtended).toBe(true);
-      // Countdown timers should have been extended in the returned grid
-      expect(result.next[2][2].countdown).toBe(3); // was 2
-      expect(result.next[3][3].countdown).toBe(2); // was 1
-    });
-
-    it('does not extend already-cleared countdown tiles', () => {
-      const grid = makeGrid(4, [
-        { row: 0, col: 0, tile: { type: 'silver' } },
-        { row: 2, col: 2, tile: { type: 'countdown', countdown: 2, isCleared: true } },
-      ]);
-      const path = [{ row: 0, col: 0 }, { row: 0, col: 1 }];
-      const result = processTilesForWord(makeInput(grid, path, 'AB'));
-      expect(result.next[2][2].countdown).toBe(2); // unchanged
-    });
-  });
-
   describe('diamond tile: reveal turns', () => {
     it('sets diamondRevealTurns to DIAMOND_REVEAL_TURNS', () => {
       const grid = makeGrid(4, [
@@ -151,39 +124,6 @@ describe('processTilesForWord — unique tile effects', () => {
       const path = [{ row: 0, col: 0 }, { row: 0, col: 1 }];
       const result = processTilesForWord(makeInput(grid, path, 'AB'));
       expect(result.shuffleTriggered).toBe(false);
-    });
-  });
-
-  describe('wildcard tile: Scrabble scoring', () => {
-    it('scores based on letter Scrabble value', () => {
-      const grid = makeGrid(4, [
-        { row: 0, col: 1, tile: { type: 'wildcard' } },
-      ]);
-      // Wildcard is at index 1 in path, representing letter 'Z' (10 points)
-      const path = [{ row: 0, col: 0 }, { row: 0, col: 1 }];
-      const result = processTilesForWord(makeInput(grid, path, 'AZ'));
-      // Total includes baseScore (10) + bonus from wildcard Scrabble value
-      expect(result.totalScore).toBeGreaterThan(10); // base 10 + Z bonus (10)
-    });
-
-    it('fires explosion for high-value letters (>=4)', () => {
-      const grid = makeGrid(4, [
-        { row: 0, col: 1, tile: { type: 'wildcard' } },
-      ]);
-      const path = [{ row: 0, col: 0 }, { row: 0, col: 1 }];
-      const result = processTilesForWord(makeInput(grid, path, 'AQ')); // Q = 10
-      const wildcardExplosion = result.explosions.find(e => e.id.startsWith('wildcard-'));
-      expect(wildcardExplosion).toBeDefined();
-    });
-
-    it('does NOT fire explosion for low-value letters (<4)', () => {
-      const grid = makeGrid(4, [
-        { row: 0, col: 1, tile: { type: 'wildcard' } },
-      ]);
-      const path = [{ row: 0, col: 0 }, { row: 0, col: 1 }];
-      const result = processTilesForWord(makeInput(grid, path, 'AE')); // E = 1
-      const wildcardExplosion = result.explosions.find(e => e.id.startsWith('wildcard-'));
-      expect(wildcardExplosion).toBeUndefined();
     });
   });
 

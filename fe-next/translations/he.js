@@ -2116,6 +2116,11 @@ const he = {
       "scoreAbove": "הבאת {pct}% יותר מהממוצע",
       "scoreBelow": "הבאת {pct}% פחות מהממוצע"
     },
+    "wordComparison": {
+      "title": "השוואת מילים",
+      "unique": "רק את/ה",
+      "shared": "כולם"
+    },
     "sessionStats": {
       "title": "נקודות עיקריות מהסשן",
       "improved": "השתפר/ה ב-{percent}% מהסיבוב הראשון!",

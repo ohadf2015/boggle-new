@@ -14,7 +14,6 @@ export interface TileTooltip {
 /** i18n keys per tile type */
 const TILE_I18N_KEYS: Partial<Record<BlastTileType, { name: string; desc: string; icon: string }>> = {
   gold:      { name: 'blast.tile.gold.name',      desc: 'blast.tile.gold.desc',      icon: '✦' },
-  silver:    { name: 'blast.tile.silver.name',    desc: 'blast.tile.silver.desc',    icon: '🪙' },
   diamond:   { name: 'blast.tile.diamond.name',   desc: 'blast.tile.diamond.desc',   icon: '💠' },
   bomb:      { name: 'blast.tile.bomb.name',      desc: 'blast.tile.bomb.desc',      icon: '💣' },
   lightning: { name: 'blast.tile.lightning.name', desc: 'blast.tile.lightning.desc', icon: '⚡' },
@@ -24,8 +23,6 @@ const TILE_I18N_KEYS: Partial<Record<BlastTileType, { name: string; desc: string
   gem:       { name: 'blast.tile.gem.name',       desc: 'blast.tile.gem.desc',       icon: '💎' },
   frozen:    { name: 'blast.tile.frozen.name',    desc: 'blast.tile.frozen.desc',    icon: '🧊' },
   magnet:    { name: 'blast.tile.magnet.name',    desc: 'blast.tile.magnet.desc',    icon: '🌀' },
-  mirror:    { name: 'blast.tile.mirror.name',    desc: 'blast.tile.mirror.desc',    icon: '🪞' },
-  wildcard:  { name: 'blast.tile.wildcard.name',  desc: 'blast.tile.wildcard.desc',  icon: '🃏' },
   countdown: { name: 'blast.tile.countdown.name', desc: 'blast.tile.countdown.desc', icon: '⏳' },
   shuffle:   { name: 'blast.tile.shuffle.name',   desc: 'blast.tile.shuffle.desc',   icon: '🔀' },
   magma:     { name: 'blast.tile.magma.name',     desc: 'blast.tile.magma.desc',     icon: '🌋' },
@@ -38,7 +35,6 @@ const TILE_I18N_KEYS: Partial<Record<BlastTileType, { name: string; desc: string
 /** English fallbacks */
 const ENGLISH_FALLBACK: Partial<Record<BlastTileType, TileTooltip>> = {
   gold:      { name: 'Gold',      desc: '3\u00d7 score + grants 1 bonus move.',                          icon: '✦' },
-  silver:    { name: 'Silver',    desc: '1.5\u00d7 score + extends all countdown timers by 1.',           icon: '🪙' },
   diamond:   { name: 'Diamond',   desc: '5\u00d7 score + reveals frozen inner types for 3 turns.',        icon: '💠' },
   bomb:      { name: 'Bomb',      desc: 'Clears 3\u00d73 area. Chains to nearby bombs.',                  icon: '💣' },
   lightning: { name: 'Lightning', desc: 'Clears entire column. Chains to other lightning bolts.',     icon: '⚡' },
@@ -48,8 +44,6 @@ const ENGLISH_FALLBACK: Partial<Record<BlastTileType, TileTooltip>> = {
   gem:       { name: 'Gem',       desc: '3 hits to complete. Spawns 2 specials + 2 bonus moves.',    icon: '💎' },
   frozen:    { name: 'Frost',     desc: '2 hits to reveal a hidden special inside.',                  icon: '🧊' },
   magnet:    { name: 'Vortex',    desc: 'Pulls nearby tiles inward, then explodes.',                  icon: '🌀' },
-  mirror:    { name: 'Mirror',    desc: 'Copies the first offensive special in your word.',           icon: '🪞' },
-  wildcard:  { name: 'Wildcard',  desc: 'Matches any letter. Scores based on letter rarity.',        icon: '🃏' },
   countdown: { name: 'Countdown', desc: 'Explodes if not defused! Defusing grants 2 bonus moves.',   icon: '⏳' },
   shuffle:   { name: 'Shuffle',   desc: 'Rearranges all remaining tiles on the board.',              icon: '🔀' },
   magma:     { name: 'Magma',     desc: 'Erupts and clears both diagonals (X-pattern).',            icon: '🌋' },

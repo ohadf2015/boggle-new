@@ -280,9 +280,9 @@ describe('blastModeManager', () => {
     it('BLAST_TILE_TYPES should include all 21 canonical types', () => {
       const canonicalTypes = [
         'standard', 'gold', 'bomb', 'rainbow', 'ice', 'lightning',
-        'magnet', 'prism', 'gem', 'frozen', 'mirror', 'silver', 'diamond',
-        'wildcard', 'countdown', 'shuffle', 'magma', 'portal', 'catalyst',
-        'crystal', 'fuse',
+        'magnet', 'prism', 'gem', 'frozen', 'diamond',
+        'countdown', 'portal', 'catalyst', 'shuffle', 'magma',
+        'crystal', 'fuse', 'locked', 'key', 'anchor',
       ];
       for (const t of canonicalTypes) {
         expect(BLAST_TILE_TYPES).toContain(t);
@@ -290,15 +290,13 @@ describe('blastModeManager', () => {
       expect(BLAST_TILE_TYPES).toHaveLength(21);
     });
 
-    it('BLAST_TILE_TYPES should include previously missing types (mirror, silver, diamond, prism)', () => {
-      expect(BLAST_TILE_TYPES).toContain('mirror');
-      expect(BLAST_TILE_TYPES).toContain('silver');
+    it('BLAST_TILE_TYPES should include core advanced types (diamond, prism, frozen)', () => {
       expect(BLAST_TILE_TYPES).toContain('diamond');
       expect(BLAST_TILE_TYPES).toContain('prism');
       expect(BLAST_TILE_TYPES).toContain('frozen');
     });
 
-    it('statistical: running 100 overlays on large grid eventually produces new tile types', () => {
+    it('statistical: running 100 overlays on large grid eventually produces basic tile types', () => {
       const newTypes = new Set<string>();
       for (let i = 0; i < 100; i++) {
         const overlay = generateBlastOverlay(largeGrid, 1.0, 1);
@@ -306,9 +304,9 @@ describe('blastModeManager', () => {
           newTypes.add(tile.type);
         }
       }
-      // After 100 overlays with wave=1, we expect at least silver to appear (enabled wave 1)
-      // wave 1 enables: bomb, ice, gold, silver, rainbow — silver is part of distribution
-      expect(newTypes.has('silver')).toBe(true);
+      // After 100 overlays with wave=1, we expect at least gold to appear (enabled wave 1)
+      // wave 1 enables: bomb, ice, gold, rainbow
+      expect(newTypes.has('gold')).toBe(true);
     });
   });
 
@@ -341,23 +339,23 @@ describe('blastModeManager', () => {
       expect(diamondSeen.has('diamond')).toBe(true);
     });
 
-    it.skip('wave 3 overlay CAN contain mirror tiles (mirror enabled at wave 3)', () => {
-      const mirrorSeen = new Set<string>();
+    it('wave 3 overlay CAN contain prism tiles (prism enabled at wave 3)', () => {
+      const prismSeen = new Set<string>();
       for (let i = 0; i < 500; i++) {
         const overlay = generateBlastOverlay(largeGrid, 1.0, 3);
         for (const tile of overlay) {
-          mirrorSeen.add(tile.type);
+          prismSeen.add(tile.type);
         }
-        if (mirrorSeen.has('mirror')) break;
+        if (prismSeen.has('prism')) break;
       }
-      expect(mirrorSeen.has('mirror')).toBe(true);
+      expect(prismSeen.has('prism')).toBe(true);
     });
 
-    it('wave 1 overlay should NOT contain mirror tiles (mirror unlocks at wave 3)', () => {
+    it('wave 1 overlay should NOT contain lightning tiles (lightning unlocks at wave 4)', () => {
       for (let i = 0; i < 200; i++) {
         const overlay = generateBlastOverlay(largeGrid, 1.0, 1);
         for (const tile of overlay) {
-          expect(tile.type).not.toBe('mirror');
+          expect(tile.type).not.toBe('lightning');
         }
       }
     });

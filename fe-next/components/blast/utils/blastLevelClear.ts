@@ -45,8 +45,6 @@ const TYPE_PRIORITY: BlastTileType[] = [
   'frozen',
   'ice',
   'rainbow',
-  'mirror',
-  'silver',
   'diamond',
 ];
 
