@@ -89,7 +89,10 @@ const ProfileCustomizationModal: React.FC<ProfileCustomizationModalProps> = ({
       onClose();
     } catch (error) {
       setSaveError(true);
-      console.error('Failed to save profile:', error);
+      // Serialize Error explicitly — passing a raw Error to console.error
+      // yields `{}` in Sentry because Error has no enumerable own-properties.
+      const message = error instanceof Error ? error.message : String(error);
+      console.error('Failed to save profile:', message);
     } finally {
       setIsSaving(false);
     }

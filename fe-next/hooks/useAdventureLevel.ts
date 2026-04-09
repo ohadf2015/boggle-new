@@ -58,8 +58,15 @@ export function useAdventureLevel(
       };
     }
 
-    // Validate level
-    if (level < 1 || level > LEVELS_PER_WORLD) {
+    // Validate level — endless mode (world=0) allows unbounded floor numbers
+    if (world === 0 && level < 1) {
+      return {
+        levelConfig: null,
+        worldConfig: null,
+        error: new Error('Invalid endless floor: must be >= 1.'),
+      };
+    }
+    if (world !== 0 && (level < 1 || level > LEVELS_PER_WORLD)) {
       return {
         levelConfig: null,
         worldConfig: null,
