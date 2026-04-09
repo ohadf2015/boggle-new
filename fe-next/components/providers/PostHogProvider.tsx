@@ -15,6 +15,11 @@ import { usePathname, useSearchParams } from 'next/navigation';
 import posthog from 'posthog-js';
 import { PostHogProvider as PHProvider } from 'posthog-js/react';
 import { onConsentChange } from '@/utils/cookieConsent';
+import {
+  setPostHogSuperProps,
+  setPostHogSuperPropsOnce,
+  installTabVisibilityTracker,
+} from '@/utils/posthogEngagement';
 
 let posthogInitialized = false;
 
@@ -64,6 +69,26 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     initPostHog();
 
+    // Register super properties attached to every event — lets you slice
+    // any funnel / cohort by locale + RTL in PostHog without joining data.
+    if (typeof document !== 'undefined') {
+      const htmlLang = document.documentElement.lang || 'en';
+      const isRtl = document.documentElement.dir === 'rtl';
+      setPostHogSuperProps({
+        locale: htmlLang,
+        is_rtl: isRtl,
+        viewport: `${window.innerWidth}x${window.innerHeight}`,
+        touch: 'ontouchstart' in window,
+      });
+      setPostHogSuperPropsOnce({
+        first_locale: htmlLang,
+        first_touch: 'ontouchstart' in window,
+      });
+    }
+
+    // Tab-visibility tracker — attention time is a core engagement metric.
+    const uninstallVisibility = installTabVisibilityTracker();
+
     // React to consent changes — opt out only if user explicitly declines
     const unsubscribe = onConsentChange((state) => {
       if (!state.analytics) {
@@ -73,7 +98,10 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
       }
     });
 
-    return unsubscribe;
+    return () => {
+      uninstallVisibility();
+      unsubscribe();
+    };
   }, []);
 
   return (

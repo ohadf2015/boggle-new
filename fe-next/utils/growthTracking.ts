@@ -12,6 +12,13 @@ import {
   saveJsonToLocalStorage,
 } from '@/utils/storageHelpers';
 import posthog from 'posthog-js';
+import {
+  setPostHogUserProps,
+  setPostHogUserPropsOnce,
+  incrementPostHogUserProp,
+  trackRageQuit,
+  trackSessionDepth,
+} from '@/utils/posthogEngagement';
 
 // Growth event types for tracking viral loops and engagement
 export type GrowthEvent =
@@ -511,6 +518,10 @@ export const trackPageView = (path?: string): void => {
   });
 };
 
+// In-memory session game counter — resets on tab reload, which is the
+// correct granularity for "binge session" analysis.
+let sessionGameCount = 0;
+
 /**
  * Track game start across any mode (SP, MP, daily, adventure, drill, blast)
  */
@@ -518,7 +529,9 @@ export const trackGameStart = (
   mode: string,
   extras: Record<string, unknown> = {}
 ): void => {
+  sessionGameCount += 1;
   trackGrowthEvent('game_started', { ...extras, gameMode: mode });
+  trackSessionDepth(sessionGameCount);
 };
 
 /**
@@ -539,6 +552,25 @@ export const trackGameEnd = (
     wordCount,
     durationSec,
   });
+
+  // Lifetime person properties — enable cohort slicing in PostHog
+  // (e.g. "players with ≥10 games" × "first_mode_played = adventure").
+  if (completed) {
+    incrementPostHogUserProp('total_games_played', 1);
+    if (wordCount > 0) incrementPostHogUserProp('total_words_found', wordCount);
+    setPostHogUserProps({
+      last_played_at: new Date().toISOString(),
+      last_mode: mode,
+      last_score: score,
+    });
+    setPostHogUserPropsOnce({
+      first_mode_played: mode,
+      first_played_at: new Date().toISOString(),
+    });
+  } else if (durationSec !== undefined && durationSec < 15) {
+    // Rage-quit: abandoned a game within 15s — strong onboarding-friction signal.
+    trackRageQuit({ mode, durationMs: durationSec * 1000, wordsFound: wordCount });
+  }
 };
 
 /**

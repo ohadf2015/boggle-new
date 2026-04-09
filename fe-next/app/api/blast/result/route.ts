@@ -12,6 +12,7 @@ import { createClient as createServiceClient } from '@supabase/supabase-js';
 import { validateBlastResult, calculatePersonalBests, type PersonalBests } from '../utils';
 import { captureApiError } from '@/utils/sentry';
 import { getPostHogServer } from '@/lib/posthog';
+import { addToWeeklyLeaderboard, getLeaderboardPercentile } from '@/lib/blastLeaderboard';
 
 // Lazy-init to avoid crash on missing env vars
 function getSupabaseConfig() {
@@ -198,6 +199,11 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Weekly leaderboard: record score + compute player's percentile.
+    // Both calls are internally fault-tolerant — Redis downtime returns null, never throws.
+    await addToWeeklyLeaderboard(userId, data.score, data.language, data.difficulty);
+    const percentile = await getLeaderboardPercentile(userId, data.language, data.difficulty);
+
     getPostHogServer()?.capture({
       distinctId: userId,
       event: 'blast_completed',
@@ -207,15 +213,18 @@ export async function POST(request: NextRequest) {
         stars: data.stars,
         is_new_best_score: isNewBestScore,
         xp_awarded: xpAwarded,
+        percentile,
       },
     });
 
     return NextResponse.json({
       success: true,
       personalBests: updated,
+      previousBest: existing?.bestScore ?? null,
       isNewBestScore,
       isNewBestCombo,
       xpAwarded,
+      percentile,
     });
   } catch (error) {
     captureApiError(error instanceof Error ? error : new Error(String(error)), '/api/blast/result', { method: 'POST' });

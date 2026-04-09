@@ -86,6 +86,14 @@ vi.mock('@/utils/dailyChallenge', () => ({
   getPuzzleNumber: () => 42,
 }));
 
+// Mock useFriends with a mutable list so individual tests can control it.
+// Must be hoisted above the component import; the `mock` prefix is required
+// by Vitest's auto-hoist rules for variables referenced inside factories.
+const mockFriendsState: { friends: Array<{ odUserId: string }> } = { friends: [] };
+vi.mock('@/hooks/useFriends', () => ({
+  useFriends: () => mockFriendsState,
+}));
+
 // Import the component types for mock data
 import type { DailyParticipant, AllTimeParticipant } from '../TabbedDailyLeaderboard';
 
@@ -221,6 +229,148 @@ describe('TabbedDailyLeaderboard', () => {
       // If avatar_image is properly used, there should be no emoji-based avatar div
       // with the background color (which is how emoji avatars are rendered)
       expect(emojiAvatarDivs.length).toBe(0);
+    });
+  });
+
+  describe('windowed pagination around current user', () => {
+    it('should center the visible window on the current user when present', async () => {
+      // Given: 30 participants, current user at rank 15
+      const manyParticipants = Array.from({ length: 30 }, (_, i) =>
+        createMockParticipant({
+          player_id: `user-${i + 1}`,
+          display_name: `Player${i + 1}`,
+          rank_position: i + 1,
+        })
+      );
+      (global.fetch as jest.Mock).mockImplementation((url: string) => {
+        if (url.includes('/word-hunt/leaderboard')) {
+          return Promise.resolve({
+            ok: true,
+            json: () => Promise.resolve({
+              data: manyParticipants,
+              totalParticipants: 30,
+              totalPlayers: 30,
+              totalSolved: 30,
+              guestPlayerCount: 0,
+            }),
+          });
+        }
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ data: [], totalParticipants: 0 }),
+        });
+      });
+
+      const { default: TabbedDailyLeaderboard } = await import('../TabbedDailyLeaderboard');
+      render(
+        <TabbedDailyLeaderboard
+          puzzleDate="2026-01-09"
+          language="en"
+          currentPlayerId="user-15"
+          maxVisible={10}
+          t={mockT}
+        />
+      );
+
+      // When: data loads
+      await screen.findByText('Player15');
+
+      // Then: window centered on rank 15 (Player11..Player20), Player1 hidden, Player30 hidden
+      expect(screen.queryByText('Player1')).not.toBeInTheDocument();
+      expect(screen.queryByText('Player30')).not.toBeInTheDocument();
+      expect(screen.getByText('Player15')).toBeInTheDocument();
+    });
+
+    it('should show "load more" buttons above and below when window is partial', async () => {
+      const manyParticipants = Array.from({ length: 30 }, (_, i) =>
+        createMockParticipant({
+          player_id: `user-${i + 1}`,
+          display_name: `Player${i + 1}`,
+          rank_position: i + 1,
+        })
+      );
+      (global.fetch as jest.Mock).mockImplementation((url: string) => {
+        if (url.includes('/word-hunt/leaderboard')) {
+          return Promise.resolve({
+            ok: true,
+            json: () => Promise.resolve({
+              data: manyParticipants,
+              totalParticipants: 30,
+              totalPlayers: 30,
+              totalSolved: 30,
+              guestPlayerCount: 0,
+            }),
+          });
+        }
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ data: [], totalParticipants: 0 }),
+        });
+      });
+
+      const { default: TabbedDailyLeaderboard } = await import('../TabbedDailyLeaderboard');
+      render(
+        <TabbedDailyLeaderboard
+          puzzleDate="2026-01-09"
+          language="en"
+          currentPlayerId="user-15"
+          maxVisible={10}
+          t={mockT}
+        />
+      );
+
+      await screen.findByText('Player15');
+
+      // Two "showMore" buttons should be visible — above and below
+      const showMoreButtons = screen.getAllByText(/daily\.showMore/);
+      expect(showMoreButtons.length).toBe(2);
+    });
+  });
+
+  describe('friends tab uses today row layout', () => {
+    it('should render TodayParticipantRow fields (attempts/efficiency) for friends tab', async () => {
+      const friendParticipant = createMockParticipant({
+        player_id: 'friend-1',
+        display_name: 'FriendPlayer',
+        attempts_used: 4,
+        efficiency_score: 77,
+      });
+      (global.fetch as jest.Mock).mockImplementation((url: string) => {
+        if (url.includes('/word-hunt/leaderboard')) {
+          return Promise.resolve({
+            ok: true,
+            json: () => Promise.resolve({
+              data: [friendParticipant],
+              totalParticipants: 1,
+              totalPlayers: 1,
+              totalSolved: 1,
+              guestPlayerCount: 0,
+            }),
+          });
+        }
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ data: [], totalParticipants: 0 }),
+        });
+      });
+
+      // Inject the friend so the friends tab includes our mock participant
+      mockFriendsState.friends = [{ odUserId: 'friend-1' }];
+
+      const { default: TabbedDailyLeaderboard } = await import('../TabbedDailyLeaderboard');
+      render(
+        <TabbedDailyLeaderboard
+          puzzleDate="2026-01-09"
+          language="en"
+          defaultTab="friends"
+          t={mockT}
+        />
+      );
+
+      // Today-row-only field: "✓ 4/10" attempts indicator
+      expect(await screen.findByText(/4\/10/)).toBeInTheDocument();
+      // Efficiency points indicator
+      expect(screen.getByText(/77/)).toBeInTheDocument();
     });
   });
 });

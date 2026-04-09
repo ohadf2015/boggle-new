@@ -214,8 +214,15 @@ export function BlastEngineView() {
         setResults(resultsData);
         setPhase('results');
 
-        // Persist to DB (fire-and-forget)
-        saveBlastResult(resultsData, config.difficulty ?? 'medium', language);
+        // Persist to DB. saveBlastResult never rejects — it resolves with an
+        // enrichment patch (percentile, previousBest) we merge into results
+        // so the rank card and PB delta render on the results screen.
+        saveBlastResult(resultsData, config.difficulty ?? 'medium', language).then(
+          (patch) => {
+            if (!patch) return;
+            setResults((prev) => (prev ? { ...prev, ...patch } : prev));
+          },
+        );
 
         // Telemetry — run ended
         trackBlastRunEnded({

@@ -79,8 +79,14 @@ export function BlastView() {
     setResults(mergedResults);
     setPhase('results');
 
-    // Persist to DB (fire-and-forget)
-    saveBlastResult(mergedResults, config.difficulty ?? 'medium', language);
+    // Persist to DB and merge the server's enrichment (percentile, previousBest)
+    // back into results state so the rank card and PB delta render.
+    saveBlastResult(mergedResults, config.difficulty ?? 'medium', language).then(
+      (patch) => {
+        if (!patch) return;
+        setResults((prev) => (prev ? { ...prev, ...patch } : prev));
+      },
+    );
   }, [totalScore, allWordsFound, waveHistory, currentWave, config.difficulty, language]);
 
   /** Advance to next wave */

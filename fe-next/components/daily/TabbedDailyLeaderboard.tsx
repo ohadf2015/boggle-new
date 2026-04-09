@@ -139,7 +139,8 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
   const [allTimeLoading, setAllTimeLoading] = useState(true);
   const [allTimeError, setAllTimeError] = useState<string | null>(null);
 
-  const [expanded, setExpanded] = useState(false);
+  // Windowed pagination state — initialized around the current user
+  const [windowRange, setWindowRange] = useState<{ start: number; end: number } | null>(null);
 
   // Fetch today's leaderboard
   const fetchTodayLeaderboard = useCallback(async () => {
@@ -153,7 +154,7 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
       setTodayError(null);
 
       // Use API endpoint for reliable server-side data fetching
-      const url = `/api/daily-challenge/word-hunt/leaderboard/${puzzleDate}/${language}?limit=50`;
+      const url = `/api/daily-challenge/word-hunt/leaderboard/${puzzleDate}/${language}?limit=100`;
       const response = await fetch(url);
 
       if (!response.ok) {
@@ -298,12 +299,68 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
   const loading = activeTab === 'friends' ? todayLoading : activeTab === 'today' ? todayLoading : allTimeLoading;
   const error = activeTab === 'friends' ? todayError : activeTab === 'today' ? todayError : allTimeError;
 
-  // Determine which participants to show
-  const visibleParticipants = expanded
-    ? participants
-    : participants.slice(0, maxVisible);
+  // Anchor index for current tab — where to center the visible window
+  const anchorIndex = useMemo(() => {
+    if (activeTab === 'today') return currentUserTodayIndex;
+    if (activeTab === 'friends') return friendsParticipants.findIndex(isCurrentUserToday);
+    return filteredAllTimeParticipants.findIndex(isCurrentUserAllTime);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab, currentUserTodayIndex, friendsParticipants, filteredAllTimeParticipants, currentPlayerId, currentGuestFingerprint]);
 
-  const hasMore = participants.length > maxVisible;
+  // Reset window when switching tabs so each tab re-centers on its own anchor
+  useEffect(() => {
+    setWindowRange(null);
+  }, [activeTab]);
+
+  // Initialize window once per tab when data arrives — center on current user if present
+  useEffect(() => {
+    if (windowRange !== null) return;
+    if (participants.length === 0) return;
+    const half = Math.floor(maxVisible / 2);
+    const anchor = anchorIndex >= 0 ? anchorIndex : 0;
+    let start = Math.max(0, anchor - half);
+    let end = Math.min(participants.length, start + maxVisible);
+    // If we hit the bottom, expand the window backwards to keep it full
+    if (end - start < maxVisible) start = Math.max(0, end - maxVisible);
+    setWindowRange({ start, end });
+  }, [windowRange, participants.length, anchorIndex, maxVisible]);
+
+  // Clamp the window if the participant count shrinks (e.g. polling brings smaller list)
+  useEffect(() => {
+    if (!windowRange) return;
+    if (windowRange.end > participants.length) {
+      setWindowRange({
+        start: Math.min(windowRange.start, Math.max(0, participants.length - maxVisible)),
+        end: participants.length,
+      });
+    }
+  }, [participants.length, windowRange, maxVisible]);
+
+  // Determine which participants to show
+  const visibleParticipants = windowRange
+    ? participants.slice(windowRange.start, windowRange.end)
+    : participants.slice(0, maxVisible);
+  const visibleStart = windowRange?.start ?? 0;
+
+  const hasAbove = (windowRange?.start ?? 0) > 0;
+  const hasBelow = (windowRange?.end ?? Math.min(maxVisible, participants.length)) < participants.length;
+  const aboveCount = windowRange?.start ?? 0;
+  const belowCount = participants.length - (windowRange?.end ?? Math.min(maxVisible, participants.length));
+
+  const loadAbove = useCallback(() => {
+    setWindowRange((prev) => {
+      if (!prev) return prev;
+      return { start: Math.max(0, prev.start - maxVisible), end: prev.end };
+    });
+  }, [maxVisible]);
+
+  const loadBelow = useCallback(() => {
+    setWindowRange((prev) => {
+      if (!prev) return prev;
+      return { start: prev.start, end: Math.min(participants.length, prev.end + maxVisible) };
+    });
+  }, [maxVisible, participants.length]);
+
   const isLoading = loading && participants.length === 0;
   const isEmpty = !loading && participants.length === 0;
 
@@ -351,14 +408,24 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
       );
     }
 
-    // Participants list
+    // Participants list with windowed pagination (load-above + load-below)
+    const loadMoreClass = 'w-full py-2 text-xs sm:text-sm font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 flex items-center justify-center gap-1.5 transition-colors rounded-xl bg-indigo-50/50 dark:bg-indigo-900/20 hover:bg-indigo-100/70 dark:hover:bg-indigo-900/30 border border-indigo-200/50 dark:border-indigo-700/30';
+
     return (
       <div className="space-y-2">
+        {/* Load more above */}
+        {hasAbove && (
+          <button onClick={loadAbove} className={loadMoreClass}>
+            <ChevronUp className="w-4 h-4" />
+            {t('daily.showMore')} ({aboveCount} {t('daily.more')})
+          </button>
+        )}
+
         <AnimatePresence mode="popLayout">
-          {activeTab === 'today' ? (
+          {activeTab !== 'alltime' ? (
             (visibleParticipants as DailyParticipant[]).map((participant, index) => (
               <TodayParticipantRow
-                key={participant.player_id || participant.guest_fingerprint || index}
+                key={participant.player_id || participant.guest_fingerprint || `idx-${visibleStart + index}`}
                 participant={participant}
                 index={index}
                 isCurrentUser={isCurrentUserToday(participant)}
@@ -369,7 +436,7 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
           ) : (
             (visibleParticipants as AllTimeParticipant[]).map((participant, index) => (
               <AllTimeParticipantRow
-                key={participant.player_identifier || index}
+                key={participant.player_identifier || `idx-${visibleStart + index}`}
                 participant={participant}
                 index={index}
                 isCurrentUser={isCurrentUserAllTime(participant)}
@@ -380,26 +447,12 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
           )}
         </AnimatePresence>
 
-        {/* Show more/less button */}
-        {hasMore && (
-          <motion.button
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            onClick={() => setExpanded(!expanded)}
-            className="w-full mt-2 py-2.5 text-sm font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 flex items-center justify-center gap-1.5 transition-colors rounded-xl bg-indigo-50/50 dark:bg-indigo-900/20 hover:bg-indigo-100/70 dark:hover:bg-indigo-900/30 border border-indigo-200/50 dark:border-indigo-700/30"
-          >
-            {expanded ? (
-              <>
-                <ChevronUp className="w-4 h-4" />
-                {t('daily.showLess')}
-              </>
-            ) : (
-              <>
-                <ChevronDown className="w-4 h-4" />
-                {t('daily.showMore')} ({participants.length - maxVisible} {t('daily.more')})
-              </>
-            )}
-          </motion.button>
+        {/* Load more below */}
+        {hasBelow && (
+          <button onClick={loadBelow} className={loadMoreClass}>
+            <ChevronDown className="w-4 h-4" />
+            {t('daily.showMore')} ({belowCount} {t('daily.more')})
+          </button>
         )}
       </div>
     );

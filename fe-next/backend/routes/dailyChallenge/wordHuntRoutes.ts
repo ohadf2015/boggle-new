@@ -371,7 +371,15 @@ router.get('/leaderboard/:date/:language', async (req: Request<LeaderboardParams
       logger.warn('API', `Word Hunt guest solved count error: ${guestSolvedError.message || guestSolvedError.code || 'Unknown'}`, { code: guestSolvedError.code, details: guestSolvedError.details });
     }
 
-    const dataLength = data?.length || 0;
+    // Re-number rank_position sequentially among authenticated players only.
+    // The view's rank_position includes guests, so post-filter rows would otherwise
+    // keep gaps (e.g. only auth player showing as rank #2 because rank #1 was a guest).
+    const rerankedData = (data || []).map((row, index) => ({
+      ...row,
+      rank_position: index + 1,
+    }));
+
+    const dataLength = rerankedData.length;
     const queryCount = count ?? 0;
     const totalParticipants = Math.max(queryCount, dataLength);
     const totalPlayers = totalPlayersCount ?? 0;
@@ -381,7 +389,7 @@ router.get('/leaderboard/:date/:language', async (req: Request<LeaderboardParams
     logger.info('API', `[WordHunt Leaderboard] ${date}/${language}: leaderboard=${totalParticipants}, totalPlayers=${totalPlayers}, totalSolved=${totalSolved}, guests=${guestPlayerCount}`);
 
     res.json({
-      data: data || [],
+      data: rerankedData,
       totalParticipants,
       totalPlayers,
       totalSolved,
