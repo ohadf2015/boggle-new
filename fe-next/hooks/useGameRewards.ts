@@ -63,6 +63,11 @@ export function useGameRewards(rewardId?: string) {
 
   const triggerReward = useCallback((type: GameRewardType) => {
     if (isLowEnd || prefersReducedMotion) return;
+    // react-rewards looks up the anchor via document.getElementById at
+    // dispatch time. If the anchor unmounted (phase change, route swap)
+    // the library logs "Element with id … not found" to Sentry. Guard
+    // the trigger so missing anchors silently no-op.
+    if (typeof document === 'undefined' || !document.getElementById(idRef.current)) return;
     rewardMap[type]();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLowEnd, prefersReducedMotion, wordFoundReward, achievementReward, streakReward, levelUpReward, coinCollectReward]);

@@ -238,7 +238,7 @@ const ModeCard: React.FC<ModeCardProps> = ({
             className={cn(
               'inline-flex items-center gap-1.5',
               'px-2.5 py-1 sm:px-3 sm:py-1.5',
-              'bg-neo-yellow text-neo-black',
+              'bg-neo-lime text-neo-black',
               'font-black uppercase tracking-wider',
               'text-[10px] sm:text-xs',
               'border-2 border-neo-black rounded-neo shadow-hard-sm',

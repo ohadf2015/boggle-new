@@ -40,9 +40,13 @@ export function getComboTierName(comboLevel: number): ComboTierName {
 /**
  * Get combo multiplier based on combo level (no cap).
  *
- * NOTE: This function is NOT used in actual score calculation.
- * Scoring uses getComboBonus() (flat additive) instead.
- * Kept for UI display (combo tier badges) and potential future use.
+ * NOTE: Base word scoring uses getComboBonus() (flat additive), NOT this.
+ * This multiplier powers downstream systems that layer on top of base score:
+ *   - Blast mode (components/blast/BlastGame.tsx) — combo × word score
+ *   - Skill effects (utils/skillEffects.ts, hooks/useSkillEffects.ts)
+ *   - Scoring engine tier rewards (backend/modules/scoringEngine.ts)
+ *   - How-to-play demo (components/how-to-play/InteractiveGridDemo.tsx)
+ * Keep tier breakpoints in sync with getComboTierName() above.
  *
  * @param comboLevel - Current combo level (0-∞)
  * @returns Multiplier value (1.0 - 3.0)
