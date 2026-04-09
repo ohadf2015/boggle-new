@@ -673,7 +673,16 @@ const he = {
   "combo": {
     "shieldUsed": "המגן הציל את הרצף!",
     "explanationTitle": "כוח הקומבו!",
-    "explanationText": "שרשרו מילים מהר לבניית קומבו. קומבו גבוה = מכפילים גדולים. אל תפילו!"
+    "explanationText": "שרשרו מילים מהר לבניית קומבו. קומבו גבוה = מכפילים גדולים. אל תפילו!",
+    "milestones": {
+      "nice": "יפה!",
+      "fire": "אש!",
+      "mythic": "מיתי!",
+      "godlike": "אלוהי!",
+      "legendary": "אגדי!",
+      "mythicStreak": "רצף מיתי!",
+      "transcendent": "נשגב!"
+    }
   },
   "wordRarity": {
     "common": "נפוצה",

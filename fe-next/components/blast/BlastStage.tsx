@@ -302,7 +302,7 @@ export const BlastStage = memo(function BlastStage({
           {/* Inner board surface */}
           <div
             ref={boardContainerRef}
-            className="relative w-full overflow-hidden rounded-[6px] bg-neo-navy"
+            className="relative w-full overflow-hidden rounded-[6px]"
           >
             {/* PixiJS effects layer */}
             {boardSize.width > 0 && (

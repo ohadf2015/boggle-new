@@ -40,7 +40,26 @@ export function useBlastDebris(
   const debrisContainerRef = useRef<Container | null>(null);
   const lightningIntervalsRef = useRef<Set<ReturnType<typeof setInterval>>>(new Set());
   const lightningRafsRef = useRef<Set<number>>(new Set());
+  const lightningGraphicsRef = useRef<Set<Graphics>>(new Set());
+  const cleanupTimersRef = useRef<Set<ReturnType<typeof setTimeout>>>(new Set());
   const mountedRef = useRef(true);
+
+  // Idempotent destroy for a single debris fragment (by bodyId + graphic ref)
+  const destroyFragment = useCallback((bodyId: number, g: Graphics) => {
+    const idx = debrisRef.current.findIndex(f => f.bodyId === bodyId);
+    if (idx >= 0) debrisRef.current.splice(idx, 1);
+    try { physics.removeBody(bodyId); } catch { /* body already gone */ }
+    if (!g.destroyed) g.destroy();
+  }, [physics]);
+
+  // Schedule backup cleanup — guarantees a fragment dies even if RAF tick stalls
+  const scheduleFragmentCleanup = useCallback((bodyId: number, g: Graphics, lifetimeSec: number) => {
+    const tid = setTimeout(() => {
+      cleanupTimersRef.current.delete(tid);
+      destroyFragment(bodyId, g);
+    }, lifetimeSec * 1000 + 250);
+    cleanupTimersRef.current.add(tid);
+  }, [destroyFragment]);
 
   // Create debris container on mount
   useEffect(() => {
@@ -49,10 +68,12 @@ export function useBlastDebris(
     debrisContainerRef.current = container;
     const intervals = lightningIntervalsRef.current;
     const rafs = lightningRafsRef.current;
+    const bolts = lightningGraphicsRef.current;
+    const timers = cleanupTimersRef.current;
     return () => {
       mountedRef.current = false;
       for (const d of debrisRef.current) {
-        physics.removeBody(d.bodyId);
+        try { physics.removeBody(d.bodyId); } catch { /* noop */ }
         if (!d.graphic.destroyed) d.graphic.destroy();
       }
       debrisRef.current = [];
@@ -60,6 +81,12 @@ export function useBlastDebris(
       intervals.clear();
       for (const rid of rafs) cancelAnimationFrame(rid);
       rafs.clear();
+      for (const tid of timers) clearTimeout(tid);
+      timers.clear();
+      for (const bolt of bolts) {
+        if (!bolt.destroyed) bolt.destroy();
+      }
+      bolts.clear();
       camera.removeChild(container);
       container.destroy();
     };
@@ -81,7 +108,7 @@ export function useBlastDebris(
         const age = now - d.createdAt;
 
         if (age > DEBRIS_LIFETIME) {
-          physics.removeBody(d.bodyId);
+          try { physics.removeBody(d.bodyId); } catch { /* noop */ }
           if (!d.graphic.destroyed) d.graphic.destroy();
           debris.splice(i, 1);
           continue;
@@ -96,6 +123,10 @@ export function useBlastDebris(
           d.graphic.alpha = age > fadeStart
             ? 1 - (age - fadeStart) / (DEBRIS_LIFETIME - fadeStart)
             : 1;
+        } else if (!state) {
+          // Physics body vanished — destroy orphan graphic
+          if (!d.graphic.destroyed) d.graphic.destroy();
+          debris.splice(i, 1);
         }
       }
       rafId = requestAnimationFrame(tick);
@@ -138,8 +169,9 @@ export function useBlastDebris(
       });
 
       debrisRef.current.push({ bodyId, graphic: g, color: colorNum, size, createdAt: now });
+      scheduleFragmentCleanup(bodyId, g, DEBRIS_LIFETIME);
     }
-  }, [physics]);
+  }, [physics, scheduleFragmentCleanup]);
 
   // Draw jagged lightning bolt down a column with rapid flash
   const spawnLightningBolt = useCallback((col: number, gridRows: number) => {
@@ -153,14 +185,20 @@ export function useBlastDebris(
     flash.rect(col * cellSize, 0, cellSize, colHeight).fill({ color: 0xffffff });
     flash.alpha = 0.8;
     container.addChild(flash);
+    lightningGraphicsRef.current.add(flash);
 
     const flashStart = performance.now();
     let flashRafId = 0;
     const rafs = lightningRafsRef.current;
     const fadeFlash = () => {
+      if (!mountedRef.current || flash.destroyed) {
+        rafs.delete(flashRafId);
+        return;
+      }
       const elapsed = performance.now() - flashStart;
       if (elapsed >= LIGHTNING_FLASH_DURATION) {
-        flash.destroy();
+        lightningGraphicsRef.current.delete(flash);
+        if (!flash.destroyed) flash.destroy();
         rafs.delete(flashRafId);
         return;
       }
@@ -191,17 +229,21 @@ export function useBlastDebris(
     let flashCount = 0;
     const boltA = drawBolt(0);
     const boltB = drawBolt(3);
+    lightningGraphicsRef.current.add(boltA);
+    lightningGraphicsRef.current.add(boltB);
     const boltFlashInterval = setInterval(() => {
       flashCount++;
       if (flashCount >= 6) {
         clearInterval(boltFlashInterval);
         lightningIntervalsRef.current.delete(boltFlashInterval);
-        boltA.destroy();
-        boltB.destroy();
+        lightningGraphicsRef.current.delete(boltA);
+        lightningGraphicsRef.current.delete(boltB);
+        if (!boltA.destroyed) boltA.destroy();
+        if (!boltB.destroyed) boltB.destroy();
         return;
       }
-      boltA.visible = flashCount % 2 === 0;
-      boltB.visible = flashCount % 2 === 1;
+      if (!boltA.destroyed) boltA.visible = flashCount % 2 === 0;
+      if (!boltB.destroyed) boltB.visible = flashCount % 2 === 1;
     }, 50);
     lightningIntervalsRef.current.add(boltFlashInterval);
   }, [cellSize]);
@@ -246,9 +288,10 @@ export function useBlastDebris(
         });
 
         debrisRef.current.push({ bodyId, graphic: g, color, size: w, createdAt: now });
+        scheduleFragmentCleanup(bodyId, g, DEBRIS_LIFETIME);
       }
     }
-  }, [cellSize, physics]);
+  }, [cellSize, physics, scheduleFragmentCleanup]);
 
   // Spawn debris fragments for cleared tiles
   const spawnDebris = useCallback((tiles: ClearedTileEvent[]) => {
@@ -298,13 +341,14 @@ export function useBlastDebris(
         });
 
         debrisRef.current.push({ bodyId, graphic: g, color: colorNum, size, createdAt: now });
+        scheduleFragmentCleanup(bodyId, g, DEBRIS_LIFETIME);
       }
     }
 
     if (hasBomb) {
       physics.applyExplosion(bombPos, 0.003, cellSize * 3);
     }
-  }, [cellSize, physics]);
+  }, [cellSize, physics, scheduleFragmentCleanup]);
 
   return { spawnDebris, spawnLightningDebris, spawnLightningBolt, spawnPrismDebris };
 }

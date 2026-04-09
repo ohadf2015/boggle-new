@@ -673,7 +673,16 @@ const ja = {
   "combo": {
     "shieldUsed": "シールドがストリークを守った！",
     "explanationTitle": "コンボパワー！",
-    "explanationText": "素早く単語をつなげてコンボを作ろう。高コンボ = 高倍率。途切れさせるな！"
+    "explanationText": "素早く単語をつなげてコンボを作ろう。高コンボ = 高倍率。途切れさせるな！",
+    "milestones": {
+      "nice": "ナイス！",
+      "fire": "ファイア！",
+      "mythic": "神話級！",
+      "godlike": "神の領域！",
+      "legendary": "伝説！",
+      "mythicStreak": "神話の連鎖！",
+      "transcendent": "超越！"
+    }
   },
   "wordRarity": {
     "common": "普通",

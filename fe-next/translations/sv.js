@@ -673,7 +673,16 @@ const sv = {
   "combo": {
     "shieldUsed": "Skölden räddade din svit!",
     "explanationTitle": "Kombokraft!",
-    "explanationText": "Kedja ord snabbt för att bygga kombos. Högre kombo = större multiplikatorer. Tappa den inte!"
+    "explanationText": "Kedja ord snabbt för att bygga kombos. Högre kombo = större multiplikatorer. Tappa den inte!",
+    "milestones": {
+      "nice": "SNYGGT!",
+      "fire": "ELD!",
+      "mythic": "MYTISK!",
+      "godlike": "GUDOMLIG!",
+      "legendary": "LEGENDARISK!",
+      "mythicStreak": "MYTISK SVIT!",
+      "transcendent": "TRANSCENDENT!"
+    }
   },
   "wordRarity": {
     "common": "Vanlig",

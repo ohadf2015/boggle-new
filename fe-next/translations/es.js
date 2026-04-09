@@ -654,7 +654,16 @@ const es = {
   "combo": {
     "shieldUsed": "¡El escudo salvó tu racha!",
     "explanationTitle": "¡Poder Combo!",
-    "explanationText": "Encadena palabras rápido para crear combos. Mayor combo = mayores multiplicadores. ¡No lo dejes caer!"
+    "explanationText": "Encadena palabras rápido para crear combos. Mayor combo = mayores multiplicadores. ¡No lo dejes caer!",
+    "milestones": {
+      "nice": "¡BIEN!",
+      "fire": "¡FUEGO!",
+      "mythic": "¡MÍTICO!",
+      "godlike": "¡DIVINO!",
+      "legendary": "¡LEGENDARIO!",
+      "mythicStreak": "¡RACHA MÍTICA!",
+      "transcendent": "¡TRASCENDENTE!"
+    }
   },
   "wordRarity": {
     "common": "Común",

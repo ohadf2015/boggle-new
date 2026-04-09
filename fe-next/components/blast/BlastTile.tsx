@@ -192,13 +192,21 @@ export const BlastTile = memo(function BlastTile({
   }
 
   const visual = TILE_VISUALS[type] ?? TILE_VISUALS.standard;
-  const tooltip = getTileTooltip(type, t);
+  // Skip tooltip lookup entirely for standard tiles (the vast majority) — keeps render fast
+  const tooltip = type !== 'standard' ? getTileTooltip(type, t) : null;
   const effectivePhase = reducedMotion && ANIMATED_PHASES.has(phase) ? 'idle' : phase;
   const phaseStyle = effectivePhase !== 'idle' && effectivePhase !== 'selected'
     ? getPhaseStyles(effectivePhase, type, fallOffset, clearRotate, spawnOffset)
     : {};
   const selectionStyle = getSelectionStyles(isSelected, selectionIndex, selectionTotal);
-  const needsWillChange = ANIMATED_PHASES.has(effectivePhase) || isSelected;
+  // Narrow willChange to the property the current phase actually animates — avoid forcing
+  // unnecessary compositor layers for idle tiles.
+  let willChangeValue: string | undefined;
+  if (effectivePhase === 'clearing' || effectivePhase === 'appearing') {
+    willChangeValue = 'transform, opacity';
+  } else if (effectivePhase === 'falling' || effectivePhase === 'landing' || isSelected) {
+    willChangeValue = 'transform';
+  }
 
   return (
     <button
@@ -233,7 +241,7 @@ export const BlastTile = memo(function BlastTile({
         ...(visual.style ?? {}),
         ...phaseStyle,
         ...selectionStyle,
-        ...(needsWillChange && { willChange: 'transform, opacity' }),
+        ...(willChangeValue && { willChange: willChangeValue }),
         containerType: 'inline-size',
       }}
       aria-label={`${letter}${type !== 'standard' ? ` ${type} tile` : ''}`}

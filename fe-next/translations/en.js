@@ -658,7 +658,16 @@ const en = {
   "combo": {
     "shieldUsed": "Shield blocked the reset!",
     "explanationTitle": "Combo Power!",
-    "explanationText": "Chain words fast for multipliers! Higher streak = bigger bonus. Keep it going!"
+    "explanationText": "Chain words fast for multipliers! Higher streak = bigger bonus. Keep it going!",
+    "milestones": {
+      "nice": "NICE!",
+      "fire": "FIRE!",
+      "mythic": "MYTHIC!",
+      "godlike": "GODLIKE!",
+      "legendary": "LEGENDARY!",
+      "mythicStreak": "MYTHIC STREAK!",
+      "transcendent": "TRANSCENDENT!"
+    }
   },
   "wordRarity": {
     "common": "Common",

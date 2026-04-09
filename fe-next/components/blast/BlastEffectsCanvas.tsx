@@ -145,6 +145,7 @@ function EffectsWorker({
       timers.clear();
       if (bloomTimerRef.current) clearTimeout(bloomTimerRef.current);
       cancelAnimationFrame(crossFlashRafRef.current);
+      cancelAnimationFrame(shockwaveRafRef.current);
       if (crossFlashRef.current) { crossFlashRef.current.destroy(); crossFlashRef.current = null; }
     };
   }, []);
