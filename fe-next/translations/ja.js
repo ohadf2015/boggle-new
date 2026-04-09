@@ -7930,6 +7930,17 @@ const ja = {
       "rainbow_special": "ダブルレインボー！",
       "triple_special": "トリプルスレット！"
     },
+    "micro": {
+      "firstCombo": "コンボ！",
+      "tripleChain": "トリプルチェイン！",
+      "megaChain": "メガチェイン！",
+      "bigWord": "ビッグワード！",
+      "hugeWord": "超ロングワード！",
+      "demolisher": "デモリッシャー！",
+      "gemHoarder": "ジェムコレクター！",
+      "specialist": "スペシャリスト！",
+      "waveClearer": "ウェーブクリア！"
+    },
     "comboCodex": "コンボ図鑑",
     "codexProgress": "{discovered}/{total} 発見済み",
     "codexLocked": "???",

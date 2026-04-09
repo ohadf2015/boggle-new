@@ -7878,6 +7878,17 @@ const sv = {
       "rainbow_special": "DUBBEL REGNBAGE!",
       "triple_special": "TRIPPELHOT!"
     },
+    "micro": {
+      "firstCombo": "Kombo!",
+      "tripleChain": "Trippelkedja!",
+      "megaChain": "Megakedja!",
+      "bigWord": "Stort ord!",
+      "hugeWord": "Enormt ord!",
+      "demolisher": "Rivare!",
+      "gemHoarder": "Ädelstenssamlare!",
+      "specialist": "Specialist!",
+      "waveClearer": "Våg klarad!"
+    },
     "comboCodex": "KOMBOKODEX",
     "codexProgress": "{discovered}/{total} hittade",
     "codexLocked": "???",

@@ -29,7 +29,9 @@
  * ```
  */
 
+import { useEffect, useMemo, useCallback } from 'react';
 import { useInactivityDetection } from './useInactivityDetection';
+import { createDeadTimeDetector } from '@/utils/posthogEngagement';
 
 /** Default timeout: 30 seconds for normal levels */
 const DEFAULT_TIMEOUT = 30000;
@@ -131,8 +133,29 @@ export function useLexiStuckDetection(
     enabled,
   });
 
+  // Parallel analytics probe — fires `dead_time_detected` independently of
+  // the UI hint so PostHog sees confusion/AFK even when Lexi hints are off.
+  const deadTimeDetector = useMemo(
+    () => createDeadTimeDetector({ thresholdMs: effectiveTimeout, mode: 'adventure' }),
+    [effectiveTimeout]
+  );
+
+  useEffect(() => {
+    if (enabled) {
+      deadTimeDetector.start();
+      return () => deadTimeDetector.stop();
+    }
+    deadTimeDetector.stop();
+    return undefined;
+  }, [enabled, deadTimeDetector]);
+
+  const resetOnGameAction = useCallback(() => {
+    reset();
+    deadTimeDetector.recordActivity();
+  }, [reset, deadTimeDetector]);
+
   return {
-    resetOnGameAction: reset,
+    resetOnGameAction,
   };
 }
 

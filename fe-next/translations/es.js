@@ -7949,6 +7949,17 @@ const es = {
       "rainbow_special": "¡DOBLE ARCOÍRIS!",
       "triple_special": "¡TRIPLE AMENAZA!"
     },
+    "micro": {
+      "firstCombo": "¡Combo!",
+      "tripleChain": "¡Cadena triple!",
+      "megaChain": "¡Mega cadena!",
+      "bigWord": "¡Palabra grande!",
+      "hugeWord": "¡Palabrón!",
+      "demolisher": "¡Demoledor!",
+      "gemHoarder": "¡Coleccionista de gemas!",
+      "specialist": "¡Especialista!",
+      "waveClearer": "¡Oleada superada!"
+    },
     "comboCodex": "CÓDEX DE COMBOS",
     "codexProgress": "{discovered}/{total} descubiertos",
     "codexLocked": "???",

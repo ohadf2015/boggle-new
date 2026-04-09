@@ -7913,6 +7913,17 @@ const he = {
       "rainbow_special": "קשת כפולה!",
       "triple_special": "איום משולש!"
     },
+    "micro": {
+      "firstCombo": "קומבו!",
+      "tripleChain": "שרשרת משולשת!",
+      "megaChain": "שרשרת ענק!",
+      "bigWord": "מילה גדולה!",
+      "hugeWord": "מילת ענק!",
+      "demolisher": "הורס!",
+      "gemHoarder": "אספן יהלומים!",
+      "specialist": "מומחה!",
+      "waveClearer": "גל הושלם!"
+    },
     "comboCodex": "קודקס קומבו",
     "codexProgress": "{discovered}/{total} התגלו",
     "codexLocked": "???",

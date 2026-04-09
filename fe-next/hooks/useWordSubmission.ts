@@ -19,7 +19,19 @@ import { validateWordLocally, isWordOnBoard, buildPositionsMap } from '@/utils/c
 import { getComboBonus, calculateWordScore } from '@/shared/utils/scoring';
 import { useDictionaryCache } from '@/hooks/useDictionaryCache';
 import { usePrevalidation } from '@/hooks/usePrevalidation';
+import { trackWordFound, trackInvalidWord } from '@/utils/posthogEngagement';
 import type { Language, LetterGrid } from '@/shared/types/game';
+
+type InvalidWordReason = 'not_in_dictionary' | 'too_short' | 'already_found' | 'invalid_path' | 'other';
+
+/** Maps the hook's i18n errorKey to the PostHog reason taxonomy. */
+function errorKeyToReason(errorKey: string | undefined): InvalidWordReason {
+  if (!errorKey) return 'other';
+  if (errorKey.includes('tooShort') || errorKey.includes('minLength')) return 'too_short';
+  if (errorKey.includes('alreadyFound')) return 'already_found';
+  if (errorKey.includes('notOnBoard') || errorKey.includes('invalidPath')) return 'invalid_path';
+  return 'other';
+}
 
 // ==================== Types ====================
 
@@ -53,6 +65,8 @@ export interface UseWordSubmissionOptions {
   minWordLength?: number;
   /** Enable spam detection (default: false) */
   enableSpamDetection?: boolean;
+  /** Game mode string for analytics (e.g. 'sp', 'daily', 'mp'). Omit to skip tracking. */
+  mode?: string;
   /** Fire round active (for 2x multiplier) */
   fireRoundActive?: boolean;
   /** Current combo level for scoring */
@@ -105,6 +119,7 @@ export function useWordSubmission(options: UseWordSubmissionOptions): WordSubmis
     language,
     minWordLength = 2,
     enableSpamDetection = false,
+    mode,
     fireRoundActive = false,
     comboLevel = 0,
     t = (key: string) => key,
@@ -121,6 +136,7 @@ export function useWordSubmission(options: UseWordSubmissionOptions): WordSubmis
   // Refs
   const foundWordsSetRef = useRef<Set<string>>(new Set());
   const gameStartTimeRef = useRef<number>(Date.now());
+  const lastWordTimeRef = useRef<number | null>(null);
   const submissionTimestampsRef = useRef<number[]>([]);
   const spamCooldownUntilRef = useRef<number>(0);
   const comboLevelRef = useRef(comboLevel);
@@ -230,7 +246,19 @@ export function useWordSubmission(options: UseWordSubmissionOptions): WordSubmis
     });
 
     onWordAccepted?.(normalizedWord, fullScore, comboBonus, fireRoundBonus);
-  }, [calculateScore, fireRoundActive, onWordAccepted]);
+
+    if (mode) {
+      const prev = lastWordTimeRef.current;
+      const timeSinceLastWordMs = prev != null ? now - prev : undefined;
+      lastWordTimeRef.current = now;
+      trackWordFound({
+        word: normalizedWord,
+        mode,
+        timeSinceLastWordMs,
+        score: fullScore,
+      });
+    }
+  }, [calculateScore, fireRoundActive, onWordAccepted, mode]);
 
   /**
    * Handle an invalid word (not in dictionary)
@@ -254,7 +282,15 @@ export function useWordSubmission(options: UseWordSubmissionOptions): WordSubmis
     });
     onWordRejected?.(normalizedWord, msg);
     onComboReset?.();
-  }, [t, onWordRejected, onComboReset]);
+
+    if (mode) {
+      trackInvalidWord({
+        mode,
+        reason: 'not_in_dictionary',
+        attemptLength: normalizedWord.length,
+      });
+    }
+  }, [t, onWordRejected, onComboReset, mode]);
 
   /**
    * Submit a word for validation
@@ -309,6 +345,13 @@ export function useWordSubmission(options: UseWordSubmissionOptions): WordSubmis
       });
       onWordRejected?.(normalizedWord, msg);
       onComboReset?.();
+      if (mode) {
+        trackInvalidWord({
+          mode,
+          reason: errorKeyToReason(localValidation.errorKey),
+          attemptLength: normalizedWord.length,
+        });
+      }
       return;
     }
 
@@ -324,6 +367,9 @@ export function useWordSubmission(options: UseWordSubmissionOptions): WordSubmis
       });
       onWordRejected?.(normalizedWord, msg);
       onComboReset?.();
+      if (mode) {
+        trackInvalidWord({ mode, reason: 'invalid_path', attemptLength: normalizedWord.length });
+      }
       return;
     }
 
@@ -339,6 +385,9 @@ export function useWordSubmission(options: UseWordSubmissionOptions): WordSubmis
       });
       onWordRejected?.(normalizedWord, msg);
       onComboReset?.();
+      if (mode) {
+        trackInvalidWord({ mode, reason: 'already_found', attemptLength: normalizedWord.length });
+      }
       return;
     }
 
@@ -419,6 +468,7 @@ export function useWordSubmission(options: UseWordSubmissionOptions): WordSubmis
     getPrevalidationCached,
     handleValidWord,
     handleInvalidWord,
+    mode,
   ]);
 
   /**
@@ -436,6 +486,7 @@ export function useWordSubmission(options: UseWordSubmissionOptions): WordSubmis
     setCurrentFeedback(null);
     foundWordsSetRef.current = new Set();
     gameStartTimeRef.current = Date.now();
+    lastWordTimeRef.current = null;
     submissionTimestampsRef.current = [];
     spamCooldownUntilRef.current = 0;
     clearPrevalidationCache();

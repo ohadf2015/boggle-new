@@ -3,6 +3,7 @@
 
 import React, { memo, useCallback, useState, useEffect, useMemo, useRef } from 'react';
 import { usePreviousValue } from '@/hooks/usePreviousValue';
+import { trackLevelRetried, trackModalDismissed } from '@/utils/posthogEngagement';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useProgression } from '@/contexts/ProgressionContext';
 import { useAdventureGame } from '@/hooks/useAdventureGame';
@@ -514,12 +515,17 @@ const AdventureGame = memo<AdventureGameProps>(
     });
 
     const handleRetry = useCallback(() => {
+      trackLevelRetried({
+        world: levelConfig.world,
+        level: levelConfig.level,
+        attempt: (bestAttempt?.attemptCount ?? 0) + 1,
+      });
       hintsUsedRef.current = 0;
       hasAwardedFlashGoldRef.current = false;
       resetTracking();
       setLastWordTileTypes([]);
       handleRetryBase();
-    }, [handleRetryBase, resetTracking]);
+    }, [handleRetryBase, resetTracking, levelConfig.world, levelConfig.level, bestAttempt]);
 
     // RetryAssistModal — progressive assists for consecutive failures
     const [showRetryAssist, setShowRetryAssist] = useState(false);
@@ -749,7 +755,7 @@ const AdventureGame = memo<AdventureGameProps>(
             onRetry={handleRetryFromAssist}
             onRetryWithBonus={handleRetryWithBonus}
             onRetryWithHint={handleRetryWithHint}
-            onExit={onExit}
+            onExit={() => { trackModalDismissed({ modalId: 'retry_assist', method: 'cta' }); onExit(); }}
           />
         )}
         {showTutorial && (

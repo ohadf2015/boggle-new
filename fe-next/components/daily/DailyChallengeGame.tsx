@@ -180,6 +180,7 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
     language,
     minWordLength: 2,
     enableSpamDetection: false, // Daily challenge doesn't need spam detection
+    mode: 'daily',
     fireRoundActive: false,
     comboLevel: combo.comboLevel,
     t,

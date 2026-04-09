@@ -8050,6 +8050,17 @@ const en = {
       "rainbow_special": "DOUBLE RAINBOW!",
       "triple_special": "TRIPLE THREAT!"
     },
+    "micro": {
+      "firstCombo": "Combo!",
+      "tripleChain": "Triple Chain!",
+      "megaChain": "Mega Chain!",
+      "bigWord": "Big Word!",
+      "hugeWord": "Huge Word!",
+      "demolisher": "Demolisher!",
+      "gemHoarder": "Gem Hoarder!",
+      "specialist": "Specialist!",
+      "waveClearer": "Wave Cleared!"
+    },
     "comboCodex": "COMBO CODEX",
     "codexProgress": "{discovered}/{total} discovered",
     "codexLocked": "???",

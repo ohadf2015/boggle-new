@@ -6,6 +6,7 @@ import { Star } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { BlastGame } from './BlastGame';
+import { BlastResultsSummary } from './BlastResultsSummary';
 import { getWaveConfig, getWaveDistribution } from './utils/blastWaveConfig';
 import { calculateEarnedStars } from './utils/blastStarCalculator';
 import { resolveBlastConfig, type BlastPhase, type BlastResultsData, type WaveResult } from './types';
@@ -208,38 +209,12 @@ export function BlastView() {
       })()}
 
       {phase === 'results' && results && (
-        <div className="flex-1 flex flex-col items-center justify-center gap-6 px-4">
-          <h2 className="text-3xl font-black uppercase text-neo-pink font-neo-display">
-            {t('blast.gameOver')}
-          </h2>
-          <div className="text-white text-center space-y-2">
-            <p className="text-4xl font-black">{results.finalScore}</p>
-            <p className="text-sm text-white/60">
-              {results.wordsFound.length} {t('blast.wordsFound')} &middot; {results.wavesCompleted} {t('blast.waves')}
-            </p>
-            {results.bestWord && (
-              <p className="text-sm text-neo-lime font-bold uppercase">{t('blast.bestWord')}: {results.bestWord}</p>
-            )}
-          </div>
-          <div className="flex flex-col gap-3 w-full max-w-xs">
-            <Button
-              data-testid="play-again-button"
-              size="lg"
-              onClick={handlePlayAgain}
-              className="min-h-[56px] font-black text-xl uppercase border-3 border-neo-black shadow-hard-lg bg-neo-lime text-neo-black hover:bg-neo-lime/90"
-            >
-              {t('blast.playAgain')}
-            </Button>
-            <Button
-              variant="outline"
-              size="lg"
-              onClick={handleQuit}
-              className="min-h-[48px] font-bold uppercase border-3 border-neo-lime/50 text-neo-lime bg-neo-navy/80 hover:bg-neo-navy"
-            >
-              {t('common.home')}
-            </Button>
-          </div>
-        </div>
+        <BlastResultsSummary
+          results={results}
+          t={t}
+          onPlayAgain={handlePlayAgain}
+          onQuit={handleQuit}
+        />
       )}
     </div>
   );

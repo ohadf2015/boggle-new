@@ -101,6 +101,7 @@ export default function SoloPracticeBoard({
     grid,
     language,
     minWordLength: 2,
+    mode: 'practice',
     t,
     onWordAccepted: (word) => {
       playWordAcceptedSound();

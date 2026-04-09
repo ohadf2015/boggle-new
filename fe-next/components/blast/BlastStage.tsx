@@ -2,7 +2,7 @@
 
 import { memo, useRef, useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
-import { Shuffle } from 'lucide-react';
+import { Shuffle, AlertTriangle, Lightbulb } from 'lucide-react';
 import { formatObjectiveLabel } from './utils/blastObjectiveUtils';
 
 const BlastTileGuide = dynamic(() => import('./BlastTileGuide'), { ssr: false });
@@ -23,6 +23,9 @@ import { BlastWordRewardPreview } from './BlastWordRewardPreview';
 import { BlastEffectsLayer } from './BlastEffectsLayer';
 import { BlastScoreMilestone } from './BlastScoreMilestone';
 import { ComboMilestoneAnnouncement } from '@/components/game/ComboMilestoneAnnouncement';
+import { BlastMicroToast } from './BlastMicroToast';
+import { useBlastMicroAchievements } from './hooks/useBlastMicroAchievements';
+import type { BlastMicroState } from './utils/blastMicroAchievements';
 import type { ScoreFlyEvent } from './BlastScoreFly';
 import { BlastBackground } from './BlastBackground';
 import { cn } from '@/lib/utils';
@@ -157,6 +160,28 @@ export const BlastStage = memo(function BlastStage({
 
   const comboFlashTier = comboFlash?.tier ?? 0;
 
+  // Mid-run achievement snapshot — running maxima tracked in a ref so the
+  // hook sees monotonic stats even though props only carry latest values.
+  // gemsCollected / specialTilesCleared / biggestSingleClear stay 0 until
+  // engine plumbing exists; their predicates simply never fire (graceful).
+  const microStateRef = useRef<BlastMicroState>({
+    maxCombo: 0,
+    wordsSubmitted: 0,
+    longestWordLen: 0,
+    biggestSingleClear: 0,
+    gemsCollected: 0,
+    specialTilesCleared: 0,
+    wavesCompleted: 0,
+  });
+  microStateRef.current = {
+    ...microStateRef.current,
+    maxCombo: Math.max(microStateRef.current.maxCombo, comboLevel),
+    wordsSubmitted: Math.max(microStateRef.current.wordsSubmitted, wordSubmitCount),
+    longestWordLen: Math.max(microStateRef.current.longestWordLen, lastWordLength),
+    wavesCompleted: Math.max(microStateRef.current.wavesCompleted, Math.max(0, waveNumber - 1)),
+  };
+  const { currentId: microId } = useBlastMicroAchievements(microStateRef.current);
+
   return (
     <div className="flex-1 flex flex-col h-full overflow-hidden relative pb-safe" data-testid="blast-stage">
       {/* Urgency vignette at low moves */}
@@ -199,6 +224,8 @@ export const BlastStage = memo(function BlastStage({
       <BlastScoreMilestone score={score} t={t} />
       {/* Combo milestone announcements */}
       <ComboMilestoneAnnouncement comboLevel={comboLevel} />
+      {/* Mid-run micro-achievement toast */}
+      <BlastMicroToast id={microId} t={t} />
 
       {/* 1. HUD — z-40 to sit above BlastBackground (absolute inset-0) */}
       <div className="relative z-40">
@@ -297,7 +324,7 @@ export const BlastStage = memo(function BlastStage({
       >
         {/* Board frame — neo-brutalist with hard shadow */}
         <div
-          className="relative w-full max-w-[min(92vw,78dvh)] sm:max-w-[min(440px,75dvh)] md:max-w-[min(480px,72dvh)] lg:max-w-[min(520px,60dvh)] p-1.5 rounded-neo border-3 border-neo-black bg-neo-navy-light shadow-hard-lg"
+          className="relative w-full max-w-[min(92vw,78dvh)] sm:max-w-[min(440px,75dvh)] md:max-w-[min(480px,72dvh)] lg:max-w-[min(520px,60dvh)] p-1.5 rounded-neo border-3 border-neo-black shadow-hard-lg"
         >
           {/* Inner board surface */}
           <div
@@ -388,53 +415,63 @@ export const BlastStage = memo(function BlastStage({
         </div>
       </div>
 
-      {/* 5a. Out of moves notification */}
+      {/* 5a. Out of moves notification — terminal urgency, red gradient */}
       <AdaptiveAnimatePresence>
         {movesRemaining <= 0 && isDeadEnd && !isComplete && !noWordsRemaining && (
           <AdaptiveMotion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-            className="overflow-hidden px-4 max-w-[360px] md:max-w-[480px] mx-auto w-full shrink-0 pb-safe"
+            initial={{ scale: 0.6, opacity: 0, y: 20 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            exit={{ scale: 0.8, opacity: 0, y: 10 }}
+            transition={{ type: 'spring', stiffness: 380, damping: 22 }}
+            className="px-4 max-w-[360px] md:max-w-[480px] mx-auto w-full shrink-0 pb-safe"
+            data-testid="blast-out-of-moves-notice"
           >
-            <div className={cn(
-              'border-3 border-neo-black rounded-neo shadow-hard-sm p-3',
-              'bg-neo-red/20 border border-neo-red/60',
-              'flex items-center justify-center gap-2',
-            )}>
-              <span className="font-bold text-neo-red text-sm sm:text-base">
-                {t('blast.outOfMoves')}
-              </span>
+            <div
+              className={cn(
+                'flex items-center justify-center gap-2 px-4 py-2.5',
+                'rounded-neo border-3 border-neo-black shadow-hard',
+                'bg-linear-to-r from-neo-red via-orange-400 to-neo-red',
+                'font-neo-display font-black uppercase tracking-wider text-base text-neo-black',
+              )}
+              style={{ boxShadow: '0 0 24px rgba(255,51,102,0.55), 3px 3px 0 #000' }}
+            >
+              <AlertTriangle className="w-5 h-5 shrink-0" strokeWidth={2.75} />
+              <span>{t('blast.outOfMoves')}</span>
             </div>
           </AdaptiveMotion.div>
         )}
       </AdaptiveAnimatePresence>
 
-      {/* 5b. Dead-end notification (no words remaining) */}
+      {/* 5b. Dead-end notification — recoverable, purple gradient + shuffle CTA */}
       <AdaptiveAnimatePresence>
         {noWordsRemaining && !isComplete && (
           <AdaptiveMotion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-            className="overflow-hidden px-4 max-w-[360px] md:max-w-[480px] mx-auto w-full shrink-0 pb-safe"
+            initial={{ scale: 0.6, opacity: 0, y: 20 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            exit={{ scale: 0.8, opacity: 0, y: 10 }}
+            transition={{ type: 'spring', stiffness: 380, damping: 22 }}
+            className="px-4 max-w-[360px] md:max-w-[480px] mx-auto w-full shrink-0 pb-safe"
+            data-testid="blast-stuck-notice"
           >
-            <div className={cn(
-              'border-3 border-neo-black rounded-neo shadow-hard-sm p-3',
-              'bg-indigo-900/80 border border-indigo-500',
-              'flex items-center justify-between gap-2',
-            )}>
-              <span className="font-bold text-white text-xs sm:text-sm shrink-0">
-                {t('blast.stuck')}
-              </span>
+            <div
+              className={cn(
+                'flex items-center justify-between gap-3 px-4 py-2.5',
+                'rounded-neo border-3 border-neo-black shadow-hard',
+                'bg-linear-to-r from-neo-purple via-neo-pink to-neo-purple',
+                'font-neo-display font-black uppercase tracking-wider text-sm text-neo-white',
+              )}
+              style={{ textShadow: '0 0 12px rgba(255,20,147,0.65)', boxShadow: '0 0 24px rgba(139,92,246,0.55), 3px 3px 0 #000' }}
+            >
+              <div className="flex items-center gap-2 min-w-0">
+                <Lightbulb className="w-5 h-5 shrink-0" strokeWidth={2.75} />
+                <span className="truncate">{t('blast.stuck')}</span>
+              </div>
               <Button
                 size="sm"
                 onClick={onShuffle}
-                className="border-2 border-neo-black shadow-hard-sm hover:shadow-hard active:shadow-none bg-neo-lime text-neo-black font-bold text-xs"
+                className="border-2 border-neo-black shadow-hard-sm hover:shadow-hard active:shadow-hard-pressed bg-neo-lime text-neo-black font-neo-display font-black uppercase text-xs shrink-0"
               >
-                <Shuffle className="h-3.5 w-3.5 me-1" />
+                <Shuffle className="h-3.5 w-3.5 me-1" strokeWidth={2.75} />
                 {t('blast.shuffle')}
               </Button>
             </div>

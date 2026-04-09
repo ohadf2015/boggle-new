@@ -18,6 +18,7 @@ import { useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useModalQueue } from '@/hooks/useModalQueue';
+import { trackModalDismissed } from '@/utils/posthogEngagement';
 import type { WordToVote } from '@/types/components';
 
 // Dynamic imports for modals (loaded after initial render)
@@ -175,7 +176,7 @@ export function ResultsModals({
       {!hideExternal && (
         <AuthModal
           isOpen={activeModalId === 'auth'}
-          onClose={() => { dismiss('auth'); authModal.setShowAuthModal(false); }}
+          onClose={() => { trackModalDismissed({ modalId: 'auth_prompt', method: 'close_button' }); dismiss('auth'); authModal.setShowAuthModal(false); }}
           showGuestStats={true}
         />
       )}
@@ -185,7 +186,7 @@ export function ResultsModals({
       {!hideExternal && (
         <FirstWinSignupModal
           isOpen={activeModalId === 'firstWin'}
-          onClose={() => { dismiss('firstWin'); firstWinModal.setShowFirstWinModal(false); }}
+          onClose={() => { trackModalDismissed({ modalId: 'first_win_signup', method: 'close_button' }); dismiss('firstWin'); firstWinModal.setShowFirstWinModal(false); }}
         />
       )}
     </>
