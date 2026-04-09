@@ -203,6 +203,38 @@ describe('OnboardingFlow', () => {
     expect(flow.className).toContain('fixed');
   });
 
+  describe('navigation loading state', () => {
+    it('shows a loading overlay after a mode is selected', () => {
+      render(<OnboardingFlow {...defaultProps} />);
+      selectLanguage();
+      fireEvent.click(screen.getByText('Complete Tutorial'));
+      fireEvent.click(screen.getByText('Set Profile'));
+      fireEvent.click(screen.getByText('Continue'));
+      fireEvent.click(screen.getByText('Daily'));
+      expect(screen.getByTestId('onboarding-loading')).toBeInTheDocument();
+    });
+
+    it('does not show a loading overlay before any mode is selected', () => {
+      render(<OnboardingFlow {...defaultProps} />);
+      selectLanguage();
+      fireEvent.click(screen.getByText('Complete Tutorial'));
+      fireEvent.click(screen.getByText('Set Profile'));
+      fireEvent.click(screen.getByText('Continue'));
+      expect(screen.queryByTestId('onboarding-loading')).not.toBeInTheDocument();
+    });
+
+    it('ignores duplicate mode selections while navigating', () => {
+      render(<OnboardingFlow {...defaultProps} />);
+      selectLanguage();
+      fireEvent.click(screen.getByText('Complete Tutorial'));
+      fireEvent.click(screen.getByText('Set Profile'));
+      fireEvent.click(screen.getByText('Continue'));
+      fireEvent.click(screen.getByText('Daily'));
+      fireEvent.click(screen.getByText('Daily'));
+      expect(mockPush).toHaveBeenCalledTimes(1);
+    });
+  });
+
   describe('pending room invite', () => {
     const advanceToProfile = () => {
       selectLanguage();

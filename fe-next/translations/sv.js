@@ -1659,6 +1659,7 @@ const sv = {
   },
   "onboarding": {
     "header": "Snabbguide",
+    "loading": "Laddar...",
     "skip": "Hoppa över",
     "letsPlay": "Nu kör vi!",
     "timingHint": "De första 10 sekunderna är avgörande!",
@@ -7691,7 +7692,8 @@ const sv = {
       "crystal":   { "name": "Kristall",   "desc": "Växer +1× varje oanvänd tur (max 5×). Multiplicerar din ordpoäng när den används." },
       "fuse":      { "name": "Stubin",     "desc": "Länkat par. Rensa en för att tända dess partner — desarmera inom 3 drag för +15 p och 2 drag, annars detonerar en 3×3-smäll för -50 p." },
       "locked":    { "name": "Låst",       "desc": "Spärrad bricka — kan inte användas i ord. Rensa dess parade Nyckel för att låsa upp." },
-      "key":       { "name": "Nyckel",     "desc": "Låser upp intilliggande Låsta brickor (8 riktningar) när den rensas i ett ord. +20 p per upplåsning." }
+      "key":       { "name": "Nyckel",     "desc": "Låser upp intilliggande Låsta brickor (8 riktningar) när den rensas i ett ord. +20 p per upplåsning." },
+      "anchor":    { "name": "Ankare",     "desc": "Belönar långa ord. Ger +3 poäng per bokstav i ordet när den rensas." }
     },
     "title": "Blast-läge",
     "description": "Rensa brädet! Ord spränger brickor.",
@@ -7988,7 +7990,8 @@ const sv = {
       "crystal": { "name": "Kristall", "desc": "Växer +1× per oanvänd tur (max 5×) — multiplicerar ordpoäng" },
       "fuse": { "name": "Stubin", "desc": "Länkat par — rensa en för att tända partnern, desarmera inom 3 drag annars smäller det" },
       "locked": { "name": "Låst", "desc": "Spärrad — rensa parad Nyckel för att låsa upp" },
-      "key": { "name": "Nyckel", "desc": "Låser upp intilliggande Låsta brickor när den rensas (+20 p styck)" }
+      "key": { "name": "Nyckel", "desc": "Låser upp intilliggande Låsta brickor när den rensas (+20 p styck)" },
+      "anchor": { "name": "Ankare", "desc": "Långordsbonus — +3 p per bokstav i ordet när den rensas" }
     }
   },
   "student": {

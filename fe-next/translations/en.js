@@ -1762,6 +1762,7 @@ const en = {
   },
   "onboarding": {
     "header": "Quick Start",
+    "loading": "Loading...",
     "skip": "Skip",
     "letsPlay": "Let's Clash!",
     "timingHint": "First 10 secs are key!",
@@ -7862,7 +7863,8 @@ const en = {
       "crystal":   { "name": "Crystal",   "desc": "Grows +1× each unused turn (max 5×). Multiplies your word score when used." },
       "fuse":      { "name": "Fuse",      "desc": "Linked pair. Clear one to light its partner — defuse within 3 turns for +15 pts and 2 moves, or it detonates a 3×3 blast for -50 pts." },
       "locked":    { "name": "Locked",    "desc": "Gated tile — can't be used in words. Clear its paired Key to unlock it." },
-      "key":       { "name": "Key",       "desc": "Unlocks adjacent Locked tiles (8-dir) when cleared in a word. +20 pts per unlock." }
+      "key":       { "name": "Key",       "desc": "Unlocks adjacent Locked tiles (8-dir) when cleared in a word. +20 pts per unlock." },
+      "anchor":    { "name": "Anchor",    "desc": "Rewards long words. Adds +3 points per letter in the word when cleared." }
     },
     "title": "Blast Mode",
     "description": "Clear the board! Words explode tiles.",
@@ -8159,7 +8161,8 @@ const en = {
       "crystal": { "name": "Crystal", "desc": "Grows +1× per unused turn (max 5×) — multiplies word score" },
       "fuse": { "name": "Fuse", "desc": "Linked pair — clear one to light its partner, defuse in 3 turns or it blows!" },
       "locked": { "name": "Locked", "desc": "Gated — clear its paired Key to unlock" },
-      "key": { "name": "Key", "desc": "Unlocks adjacent Locked tiles when cleared (+20 pts each)" }
+      "key": { "name": "Key", "desc": "Unlocks adjacent Locked tiles when cleared (+20 pts each)" },
+      "anchor": { "name": "Anchor", "desc": "Long-word bonus — +3 pts per letter in the word when cleared" }
     }
   },
   "student": {

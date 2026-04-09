@@ -41,7 +41,7 @@ const DEFAULT_AVERAGE_SCORE = 62;
  * Full-screen with floating geometric background and progress dots.
  */
 const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
-  const { language, dir } = useLanguage();
+  const { language, dir, t } = useLanguage();
   const router = useRouter();
 
   const [step, setStep] = useState<FlowStep>('language');
@@ -49,6 +49,10 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
   const [, setTutorialWords] = useState<string[]>([]);
   const [playerName, setPlayerName] = useState('');
   const [, setPlayerAvatar] = useState<CustomAvatarConfig | null>(null);
+  // Gate re-entry + show overlay once we've committed to a route navigation.
+  // Route transitions are outside React's lifecycle, so the modal would otherwise
+  // sit silently while Next.js fetches the destination page.
+  const [isNavigating, setIsNavigating] = useState(false);
 
   const stepIndex = useMemo(() => STEPS.indexOf(step), [step]);
   const accent = STEP_ACCENTS[step];
@@ -79,6 +83,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
           selectedMode: 'multi',
         });
         const roomCode = consumePendingRoomInvite();
+        setIsNavigating(true);
         router.push(`/${language}/multiplayer?room=${roomCode}`);
         onComplete();
         return;
@@ -103,6 +108,9 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
   // Step 4: Mode selected — complete the onboarding
   const handleModeSelect = useCallback(
     (mode: 'daily' | 'practice' | 'home' | 'joinRoom') => {
+      // Prevent double-taps from stacking router pushes during navigation
+      if (isNavigating) return;
+      setIsNavigating(true);
       markOnboardingComplete({
         avatarId: 'custom',
         displayName: playerName || 'Player',
@@ -129,7 +137,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
 
       onComplete();
     },
-    [language, router, onComplete, playerName]
+    [language, router, onComplete, playerName, isNavigating]
   );
 
   // Step 0: Language selected — proceed to tutorial
@@ -225,6 +233,33 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
         >
           {renderStep()}
         </motion.div>
+      </AnimatePresence>
+
+      {/* Navigation loading overlay — covers the modal while the destination
+          page hydrates. Blocks pointer events so duplicate taps cannot reach
+          the underlying mode buttons. */}
+      <AnimatePresence>
+        {isNavigating && (
+          <motion.div
+            key="onboarding-loading"
+            data-testid="onboarding-loading"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-neo-navy/90 backdrop-blur-sm"
+            role="status"
+            aria-live="polite"
+          >
+            <div
+              className="w-12 h-12 border-neo-thick border-neo-lime border-t-transparent rounded-full animate-spin"
+              aria-hidden
+            />
+            <p className="mt-4 font-neo-display text-neo-white text-lg uppercase tracking-wide">
+              {t('onboarding.loading')}
+            </p>
+          </motion.div>
+        )}
       </AnimatePresence>
     </div>
   );
