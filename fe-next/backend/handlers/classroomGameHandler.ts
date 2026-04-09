@@ -17,6 +17,10 @@ import {
   type CreateClassroomGameData,
 } from '../modules/classroomGameManager.js';
 import { getSupabase } from '../modules/supabase/client.js';
+import {
+  isClassroomTeacher,
+  getClassroomRole,
+} from '../modules/supabase/classroomMembership.js';
 import { getRedisClient } from '../redisClient.js';
 import { checkRateLimit } from '../utils/rateLimiter.js';
 import { validatePayload, gameCodeSchema, usernameSchema } from '../utils/socketValidation.js';
@@ -127,6 +131,14 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
       return;
     }
 
+    // F-08: Verify this user actually teaches this classroom (not just claims to).
+    // Without this, a teacher could create games on any classroomId they know.
+    const isTeacherOfClassroom = await isClassroomTeacher(payload.teacherId, payload.classroomId);
+    if (!isTeacherOfClassroom) {
+      socket.emit('classroomGameError', { error: 'You are not the teacher of this classroom' });
+      return;
+    }
+
     try {
       // Build game data with settings (including gameMode, default to 'classic')
       const gameData: CreateClassroomGameData = {
@@ -194,6 +206,19 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
     }
     const gamesPayload = gamesValidation.data as z.infer<typeof getActiveGamesSchema>;
 
+    // F-12: Require authentication + classroom membership before revealing
+    // active games or subscribing the socket to classroom broadcasts.
+    const gamesAuthUserId = getAuthUserId(socket);
+    if (!gamesAuthUserId) {
+      socket.emit('classroomGameError', { error: 'Authentication required' });
+      return;
+    }
+    const gamesRole = await getClassroomRole(gamesAuthUserId, gamesPayload.classroomId);
+    if (!gamesRole) {
+      socket.emit('classroomGameError', { error: 'You are not a member of this classroom' });
+      return;
+    }
+
     try {
       const games = await getActiveClassroomGames(gamesPayload.classroomId);
 
@@ -226,10 +251,31 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
     }
     const joinPayload = joinValidation.data as { gameCode: string; userId: string; username: string };
 
-    // Auth check: userId must match authenticated user if present
+    // Auth check: authentication required, userId must match authenticated user
     const joinAuthUserId = getAuthUserId(socket);
-    if (joinAuthUserId && joinAuthUserId !== joinPayload.userId) {
+    if (!joinAuthUserId) {
+      socket.emit('classroomGameError', { error: 'Authentication required' });
+      return;
+    }
+    if (joinAuthUserId !== joinPayload.userId) {
       socket.emit('classroomGameError', { error: 'User ID does not match authenticated user' });
+      return;
+    }
+
+    // F-03 + F-11: Load game first, then enforce classroom membership.
+    // Loading the game first means an invalid gameCode returns a generic
+    // "not found" without ever probing Supabase for classroom membership,
+    // which prevents attackers from using the membership check as an
+    // oracle to discover valid classroom IDs.
+    const existingGame = await getClassroomGame(joinPayload.gameCode);
+    if (!existingGame) {
+      socket.emit('classroomGameError', { error: 'Game not found' });
+      return;
+    }
+
+    const joinRole = await getClassroomRole(joinAuthUserId, existingGame.classroomId);
+    if (!joinRole) {
+      socket.emit('classroomGameError', { error: 'You are not a member of this classroom' });
       return;
     }
 

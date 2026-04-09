@@ -7,10 +7,16 @@ import type { Server, Socket } from 'socket.io';
 import { registerClassroomGameHandlers } from '../classroomGameHandler';
 import * as classroomGameManager from '../../modules/classroomGameManager';
 import * as gameStateManager from '../../modules/gameStateManager';
+import * as classroomMembership from '../../modules/supabase/classroomMembership';
 
 // Mock the modules
 vi.mock('../../modules/classroomGameManager');
 vi.mock('../../modules/gameStateManager');
+vi.mock('../../modules/supabase/classroomMembership', () => ({
+  isClassroomTeacher: vi.fn(),
+  isClassroomStudent: vi.fn(),
+  getClassroomRole: vi.fn(),
+}));
 // Mock rate limiter - always allow
 vi.mock('../../utils/rateLimiter', () => ({ checkRateLimit: vi.fn(() => true), default: {
   checkRateLimit: vi.fn(() => true),
@@ -56,6 +62,12 @@ describe('ClassroomGameHandler', () => {
       to: vi.fn().mockReturnThis(),
       emit: vi.fn(),
     };
+
+    // Default: allow access for existing happy-path tests.
+    // Individual tests override these for rejection scenarios.
+    (classroomMembership.isClassroomTeacher as Mock).mockResolvedValue(true);
+    (classroomMembership.isClassroomStudent as Mock).mockResolvedValue(true);
+    (classroomMembership.getClassroomRole as Mock).mockResolvedValue('student');
   });
 
   describe('registerClassroomGameHandlers', () => {
@@ -276,6 +288,162 @@ describe('ClassroomGameHandler', () => {
         settings: game.settings,
         playerCount: 1,
         vocabularyWords: ['cat', 'dog', 'bird'],
+      });
+    });
+  });
+
+  describe('classroom membership gate (F-03, F-08, F-11, F-12)', () => {
+    const validCreatePayload = {
+      gameCode: 'ABC123',
+      classroomId: '00000000-0000-4000-8000-000000000002',
+      teacherId: '00000000-0000-4000-8000-000000000001',
+      teacherName: 'Mr Smith',
+      lessonIds: ['00000000-0000-4000-8000-000000000003'],
+      lessonNames: ['Animals'],
+      vocabularyWords: ['cat'],
+      settings: {},
+    };
+
+    it('createClassroomGame rejects when auth user is not the classroom teacher', async () => {
+      // GIVEN auth matches teacherId claim, but Supabase says they do NOT own this classroom
+      (classroomMembership.isClassroomTeacher as Mock).mockResolvedValue(false);
+      (classroomGameManager.createClassroomGame as Mock).mockResolvedValue(undefined);
+
+      registerClassroomGameHandlers(mockIo, mockSocket);
+      const createHandler = mockSocket.on.mock.calls.find(
+        (c: any[]) => c[0] === 'createClassroomGame'
+      )[1];
+
+      // WHEN
+      await createHandler(validCreatePayload);
+
+      // THEN - Supabase-level check fires, Redis write never happens
+      expect(classroomMembership.isClassroomTeacher).toHaveBeenCalledWith(
+        validCreatePayload.teacherId,
+        validCreatePayload.classroomId
+      );
+      expect(classroomGameManager.createClassroomGame).not.toHaveBeenCalled();
+      expect(mockSocket.emit).toHaveBeenCalledWith('classroomGameError', {
+        error: expect.stringMatching(/not the teacher|not authorized|classroom/i),
+      });
+      expect(mockIo.emit).not.toHaveBeenCalledWith('classroomGameCreated', expect.anything());
+    });
+
+    it('joinClassroomGame rejects when user is neither teacher nor enrolled student', async () => {
+      // GIVEN
+      const studentId = '00000000-0000-4000-8000-000000000099';
+      mockSocket.handshake.auth.authUserId = studentId;
+
+      (classroomGameManager.getClassroomGame as Mock).mockResolvedValue({
+        gameCode: 'ABC123',
+        classroomId: '00000000-0000-4000-8000-000000000002',
+        players: [],
+      });
+      (classroomMembership.getClassroomRole as Mock).mockResolvedValue(null);
+
+      registerClassroomGameHandlers(mockIo, mockSocket);
+      const joinHandler = mockSocket.on.mock.calls.find(
+        (c: any[]) => c[0] === 'joinClassroomGame'
+      )[1];
+
+      // WHEN
+      await joinHandler({
+        gameCode: 'ABC123',
+        userId: studentId,
+        username: 'Outsider',
+      });
+
+      // THEN - role was checked, addPlayer never called, error emitted
+      expect(classroomMembership.getClassroomRole).toHaveBeenCalledWith(
+        studentId,
+        '00000000-0000-4000-8000-000000000002'
+      );
+      expect(classroomGameManager.addPlayerToClassroomGame).not.toHaveBeenCalled();
+      expect(mockSocket.emit).toHaveBeenCalledWith('classroomGameError', {
+        error: expect.stringMatching(/not a member|not authorized|classroom/i),
+      });
+    });
+
+    it('joinClassroomGame allows enrolled student', async () => {
+      // GIVEN
+      const studentId = '00000000-0000-4000-8000-000000000010';
+      mockSocket.handshake.auth.authUserId = studentId;
+
+      (classroomGameManager.getClassroomGame as Mock).mockResolvedValue({
+        gameCode: 'ABC123',
+        classroomId: '00000000-0000-4000-8000-000000000002',
+        players: [{ userId: studentId, username: 'Alice' }],
+      });
+      (classroomMembership.getClassroomRole as Mock).mockResolvedValue('student');
+      (classroomGameManager.addPlayerToClassroomGame as Mock).mockResolvedValue(undefined);
+
+      registerClassroomGameHandlers(mockIo, mockSocket);
+      const joinHandler = mockSocket.on.mock.calls.find(
+        (c: any[]) => c[0] === 'joinClassroomGame'
+      )[1];
+
+      // WHEN
+      await joinHandler({
+        gameCode: 'ABC123',
+        userId: studentId,
+        username: 'Alice',
+      });
+
+      // THEN
+      expect(classroomGameManager.addPlayerToClassroomGame).toHaveBeenCalled();
+      expect(mockSocket.emit).toHaveBeenCalledWith('joinedClassroomGame', {
+        success: true,
+        gameCode: 'ABC123',
+      });
+    });
+
+    it('joinClassroomGame rejects when game code does not exist (no classroom leak)', async () => {
+      // GIVEN: attacker probes a random game code
+      const attackerId = '00000000-0000-4000-8000-000000000066';
+      mockSocket.handshake.auth.authUserId = attackerId;
+      (classroomGameManager.getClassroomGame as Mock).mockResolvedValue(null);
+
+      registerClassroomGameHandlers(mockIo, mockSocket);
+      const joinHandler = mockSocket.on.mock.calls.find(
+        (c: any[]) => c[0] === 'joinClassroomGame'
+      )[1];
+
+      // WHEN
+      await joinHandler({
+        gameCode: 'ZZZZZZ',
+        userId: attackerId,
+        username: 'Mallory',
+      });
+
+      // THEN - generic error, no membership probe, no player add
+      expect(classroomMembership.getClassroomRole).not.toHaveBeenCalled();
+      expect(classroomGameManager.addPlayerToClassroomGame).not.toHaveBeenCalled();
+      expect(mockSocket.emit).toHaveBeenCalledWith('classroomGameError', {
+        error: expect.stringMatching(/not found|invalid/i),
+      });
+    });
+
+    it('getActiveClassroomGames rejects non-members and does not join socket room', async () => {
+      // GIVEN: random user tries to subscribe to a classroom they are not in
+      const outsiderId = '00000000-0000-4000-8000-000000000077';
+      mockSocket.handshake.auth.authUserId = outsiderId;
+      (classroomMembership.getClassroomRole as Mock).mockResolvedValue(null);
+
+      registerClassroomGameHandlers(mockIo, mockSocket);
+      const getHandler = mockSocket.on.mock.calls.find(
+        (c: any[]) => c[0] === 'getActiveClassroomGames'
+      )[1];
+
+      // WHEN
+      await getHandler({ classroomId: '00000000-0000-4000-8000-000000000002' });
+
+      // THEN
+      expect(mockSocket.join).not.toHaveBeenCalledWith(
+        'classroom:00000000-0000-4000-8000-000000000002'
+      );
+      expect(classroomGameManager.getActiveClassroomGames).not.toHaveBeenCalled();
+      expect(mockSocket.emit).toHaveBeenCalledWith('classroomGameError', {
+        error: expect.stringMatching(/not a member|not authorized|classroom/i),
       });
     });
   });
