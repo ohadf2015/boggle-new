@@ -13,6 +13,8 @@ import {
   TREASURE_GEM_BONUS_MOVES,
   DIAMOND_REVEAL_TURNS,
   PORTAL_WORD_MULTIPLIER,
+  FUSE_INITIAL_TIMER,
+  FUSE_DEFUSE_MOVES,
 } from '../types';
 
 // Mock tile generation to avoid randomness
@@ -310,6 +312,41 @@ describe('processTilesForWord — unique tile effects', () => {
         }
       }
       expect(convertedCount).toBeGreaterThanOrEqual(2);
+    });
+  });
+
+  describe('fuse tile: partner-lighting and defuse', () => {
+    it('lights unlit partner fuse when one in the pair is cleared', () => {
+      const grid = makeGrid(4, [
+        { row: 0, col: 0, tile: { type: 'fuse', fuseGroupId: 'pair-1' } },
+        { row: 2, col: 2, tile: { type: 'fuse', fuseGroupId: 'pair-1' } },
+      ]);
+      const path = [{ row: 0, col: 0 }, { row: 0, col: 1 }];
+      const result = processTilesForWord(makeInput(grid, path, 'AB'));
+      expect(result.next[0][0].isCleared).toBe(true);
+      expect(result.next[2][2].isCleared).toBe(false);
+      expect(result.next[2][2].type).toBe('fuse');
+      expect(result.next[2][2].fuseTimer).toBe(FUSE_INITIAL_TIMER);
+    });
+
+    it('does not light partners of a different fuseGroupId', () => {
+      const grid = makeGrid(4, [
+        { row: 0, col: 0, tile: { type: 'fuse', fuseGroupId: 'pair-1' } },
+        { row: 2, col: 2, tile: { type: 'fuse', fuseGroupId: 'pair-2' } },
+      ]);
+      const path = [{ row: 0, col: 0 }, { row: 0, col: 1 }];
+      const result = processTilesForWord(makeInput(grid, path, 'AB'));
+      expect(result.next[2][2].fuseTimer).toBeUndefined();
+    });
+
+    it('awards FUSE_DEFUSE_MOVES when clearing a lit fuse in a word', () => {
+      const grid = makeGrid(4, [
+        { row: 0, col: 0, tile: { type: 'fuse', fuseGroupId: 'pair-1', fuseTimer: 2 } },
+      ]);
+      const path = [{ row: 0, col: 0 }, { row: 0, col: 1 }];
+      const result = processTilesForWord(makeInput(grid, path, 'AB'));
+      expect(result.next[0][0].isCleared).toBe(true);
+      expect(result.bonusMoveCount).toBeGreaterThanOrEqual(FUSE_DEFUSE_MOVES);
     });
   });
 

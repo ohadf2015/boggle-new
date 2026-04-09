@@ -6,7 +6,7 @@
 
 // ==================== Tile Type ====================
 
-/** All possible blast mode tile types (standard + 18 special) */
+/** All possible blast mode tile types (standard + 20 special) */
 export type BlastTileType =
   | 'standard'
   | 'gold'
@@ -27,7 +27,8 @@ export type BlastTileType =
   | 'catalyst'
   | 'shuffle'
   | 'magma'
-  | 'crystal';
+  | 'crystal'
+  | 'fuse';
 
 /** Runtime-iterable list of all blast tile types (mirrors BlastTileType union) */
 export const BLAST_TILE_TYPE_LIST: readonly BlastTileType[] = [
@@ -51,6 +52,7 @@ export const BLAST_TILE_TYPE_LIST: readonly BlastTileType[] = [
   'shuffle',
   'magma',
   'crystal',
+  'fuse',
 ] as const;
 
 // ==================== Tile State ====================
@@ -77,4 +79,8 @@ export interface BlastTileState {
   portalPairId?: string;
   /** Crystal tiles: current growth multiplier (grows each unused turn, caps at CRYSTAL_MAX_MULTIPLIER) */
   crystalMultiplier?: number;
+  /** Fuse tiles: shared ID linking a fuse pair (both tiles share the same ID) */
+  fuseGroupId?: string;
+  /** Fuse tiles: turns remaining before detonation. Undefined = unlit; number = lit countdown. */
+  fuseTimer?: number;
 }

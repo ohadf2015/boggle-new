@@ -10,6 +10,8 @@ import {
   COUNTDOWN_EXPLOSION_PENALTY,
   CRYSTAL_START_MULTIPLIER,
   CRYSTAL_MAX_MULTIPLIER,
+  FUSE_EXPLOSION_RADIUS,
+  FUSE_EXPLOSION_PENALTY,
   type BlastTileState,
   type BlastTileType,
   type BlastExplosion,
@@ -111,10 +113,43 @@ export function fireCountdownExplosion(
 export interface BetweenTurnResult {
   /** Tiles modified (mutated in place) */
   tiles: BlastTileState[][];
-  /** Score penalty from countdown explosions */
+  /** Score penalty from countdown + fuse explosions */
   penalty: number;
   /** Countdown tiles that exploded */
   countdownExplosions: Array<{ row: number; col: number }>;
+  /** Fuse tiles that detonated (timer reached 0) */
+  fuseExplosions: Array<{ row: number; col: number }>;
+}
+
+/** Fuse detonation — 3x3 bomb-style blast, penalty, inline (no shared helper yet) */
+function fireFuseDetonation(
+  row: number,
+  col: number,
+  ctx: TileEffectContext,
+): { penalty: number } {
+  const { next, gridSize, markCleared, isMultiHitAlive, hitMultiHitTile, processedBombs, bombQueue } = ctx;
+  for (let dr = -FUSE_EXPLOSION_RADIUS; dr <= FUSE_EXPLOSION_RADIUS; dr++) {
+    for (let dc = -FUSE_EXPLOSION_RADIUS; dc <= FUSE_EXPLOSION_RADIUS; dc++) {
+      if (dr === 0 && dc === 0) continue;
+      const r = row + dr;
+      const c = col + dc;
+      if (r < 0 || r >= gridSize || c < 0 || c >= gridSize) continue;
+      const target = next[r][c];
+      if (target.isCleared) continue;
+      if (isMultiHitAlive(target)) {
+        hitMultiHitTile(target);
+      } else {
+        markCleared(target);
+        if (target.type === 'bomb' && !processedBombs.has(`${r},${c}`)) {
+          processedBombs.add(`${r},${c}`);
+          bombQueue.push({ row: r, col: c, depth: 0 });
+        }
+      }
+    }
+  }
+  const tile = next[row][col];
+  if (!tile.isCleared) markCleared(tile);
+  return { penalty: FUSE_EXPLOSION_PENALTY };
 }
 
 /**
@@ -127,6 +162,7 @@ export function applyBetweenTurnEffects(
 ): BetweenTurnResult {
   let penalty = 0;
   const countdownExplosions: Array<{ row: number; col: number }> = [];
+  const fuseExplosions: Array<{ row: number; col: number }> = [];
 
   // 1. Tick down all uncleared countdown tiles
   for (let r = 0; r < gridSize; r++) {
@@ -134,6 +170,16 @@ export function applyBetweenTurnEffects(
       const tile = tiles[r][c];
       if (tile.type === 'countdown' && !tile.isCleared && tile.countdown != null && tile.countdown > 0) {
         tile.countdown -= 1;
+      }
+    }
+  }
+
+  // 1a. Tick down lit fuses (unlit fuses have fuseTimer === undefined and are skipped)
+  for (let r = 0; r < gridSize; r++) {
+    for (let c = 0; c < gridSize; c++) {
+      const tile = tiles[r][c];
+      if (tile.type === 'fuse' && !tile.isCleared && typeof tile.fuseTimer === 'number' && tile.fuseTimer > 0) {
+        tile.fuseTimer -= 1;
       }
     }
   }
@@ -179,10 +225,27 @@ export function applyBetweenTurnEffects(
     }
   }
 
-  // Process any bombs chain-reacted by countdown explosions
+  // 3. Detonate any lit fuses whose timer reached 0 (player failed to defuse)
+  for (let r = 0; r < gridSize; r++) {
+    for (let c = 0; c < gridSize; c++) {
+      const tile = tiles[r][c];
+      if (
+        tile.type === 'fuse' &&
+        !tile.isCleared &&
+        typeof tile.fuseTimer === 'number' &&
+        tile.fuseTimer <= 0
+      ) {
+        const result = fireFuseDetonation(r, c, betweenCtx);
+        fuseExplosions.push({ row: r, col: c });
+        penalty += result.penalty;
+      }
+    }
+  }
+
+  // Process any bombs chain-reacted by countdown / fuse explosions
   if (bombQueue.length > 0) {
     processBombBFS(betweenCtx);
   }
 
-  return { tiles, penalty, countdownExplosions };
+  return { tiles, penalty, countdownExplosions, fuseExplosions };
 }

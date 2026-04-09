@@ -1,6 +1,12 @@
 import { describe, it, expect } from 'vitest';
 import { applyBetweenTurnEffects } from '../blastBetweenTurnEffects';
-import { type BlastTileState, COUNTDOWN_EXPLOSION_PENALTY, CRYSTAL_MAX_MULTIPLIER } from '../../types';
+import {
+  type BlastTileState,
+  COUNTDOWN_EXPLOSION_PENALTY,
+  CRYSTAL_MAX_MULTIPLIER,
+  FUSE_INITIAL_TIMER,
+  FUSE_EXPLOSION_PENALTY,
+} from '../../types';
 
 /** Helper to create a minimal tile */
 function makeTile(row: number, col: number, type: BlastTileState['type'] = 'standard', overrides: Partial<BlastTileState> = {}): BlastTileState {
@@ -122,4 +128,59 @@ describe('applyBetweenTurnEffects', () => {
     });
   });
 
+  describe('fuse tick and detonation', () => {
+    it('does not tick fuse tiles that are unlit (fuseTimer undefined)', () => {
+      const grid = makeGrid(3);
+      grid[1][1] = makeTile(1, 1, 'fuse', { fuseGroupId: 'g1' });
+
+      const result = applyBetweenTurnEffects(grid, 3);
+
+      expect(grid[1][1].fuseTimer).toBeUndefined();
+      expect(result.fuseExplosions).toHaveLength(0);
+    });
+
+    it('decrements fuseTimer on lit fuses', () => {
+      const grid = makeGrid(3);
+      grid[1][1] = makeTile(1, 1, 'fuse', { fuseGroupId: 'g1', fuseTimer: 3 });
+
+      applyBetweenTurnEffects(grid, 3);
+
+      expect(grid[1][1].fuseTimer).toBe(2);
+    });
+
+    it('detonates a lit fuse when fuseTimer reaches 0', () => {
+      const grid = makeGrid(3);
+      grid[1][1] = makeTile(1, 1, 'fuse', { fuseGroupId: 'g1', fuseTimer: 1 });
+
+      const result = applyBetweenTurnEffects(grid, 3);
+
+      expect(grid[1][1].isCleared).toBe(true);
+      expect(result.penalty).toBe(FUSE_EXPLOSION_PENALTY);
+      expect(result.fuseExplosions).toEqual([{ row: 1, col: 1 }]);
+    });
+
+    it('clears 8 adjacent tiles on fuse detonation (bomb-style blast)', () => {
+      const grid = makeGrid(3);
+      grid[1][1] = makeTile(1, 1, 'fuse', { fuseGroupId: 'g1', fuseTimer: 1 });
+
+      applyBetweenTurnEffects(grid, 3);
+
+      expect(grid[0][0].isCleared).toBe(true);
+      expect(grid[0][1].isCleared).toBe(true);
+      expect(grid[2][2].isCleared).toBe(true);
+    });
+
+    it('does not tick cleared fuses', () => {
+      const grid = makeGrid(3);
+      grid[1][1] = makeTile(1, 1, 'fuse', { fuseGroupId: 'g1', fuseTimer: 2, isCleared: true });
+
+      applyBetweenTurnEffects(grid, 3);
+
+      expect(grid[1][1].fuseTimer).toBe(2);
+    });
+
+    it('exposes FUSE_INITIAL_TIMER constant (used by partner-lighting path)', () => {
+      expect(FUSE_INITIAL_TIMER).toBeGreaterThan(0);
+    });
+  });
 });

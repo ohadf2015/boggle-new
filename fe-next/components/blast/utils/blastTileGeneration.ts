@@ -122,5 +122,41 @@ export function generateTileStates(
     orphan.hitsRemaining = 0;
   }
 
+  // Pair fuse tiles — each pair shares a fuseGroupId.
+  // Require min Manhattan distance ≥3 so defusing a partner is a real spatial choice.
+  const fuseTiles: BlastTileState[] = [];
+  for (const row of tiles) {
+    for (const tile of row) {
+      if (tile.type === 'fuse') fuseTiles.push(tile);
+    }
+  }
+  const MIN_FUSE_DISTANCE = 3;
+  const fusePaired = new Set<number>();
+  let fuseGroupIdx = 0;
+  for (let i = 0; i < fuseTiles.length; i++) {
+    if (fusePaired.has(i)) continue;
+    for (let j = i + 1; j < fuseTiles.length; j++) {
+      if (fusePaired.has(j)) continue;
+      const dist =
+        Math.abs(fuseTiles[i].row - fuseTiles[j].row) +
+        Math.abs(fuseTiles[i].col - fuseTiles[j].col);
+      if (dist >= MIN_FUSE_DISTANCE) {
+        const groupId = `fuse-${fuseGroupIdx++}`;
+        fuseTiles[i].fuseGroupId = groupId;
+        fuseTiles[j].fuseGroupId = groupId;
+        fusePaired.add(i);
+        fusePaired.add(j);
+        break;
+      }
+    }
+  }
+  // Unpaired fuses (no partner ≥3 away) → downgrade to standard
+  for (let i = 0; i < fuseTiles.length; i++) {
+    if (!fusePaired.has(i)) {
+      fuseTiles[i].type = 'standard';
+      fuseTiles[i].hitsRemaining = 0;
+    }
+  }
+
   return tiles;
 }

@@ -38,6 +38,8 @@ export interface BlastTileProps {
   isLocked?: boolean;
   /** Countdown moves remaining (countdown tile only) */
   countdown?: number;
+  /** Fuse timer — set once partner is cleared; undefined = unlit (fuse tile only) */
+  fuseTimer?: number;
   /** Zone preview type — shows effect radius indicator when tile is selected */
   zonePreview?: 'bomb' | 'lightning' | 'prism' | 'magnet' | null;
   /** Diamond reveal: shows inner type indicator on frozen tiles */
@@ -181,7 +183,7 @@ function getSelectionStyles(isSelected: boolean, selectionIndex?: number, select
 export const BlastTile = memo(function BlastTile({
   letter, type, phase, isSelected, isCleared, hitsRemaining,
   fallOffset, clearRotate, spawnOffset, isNearMiss, activationEffect, isComboPreview,
-  selectionIndex, selectionTotal, isLocked, countdown, zonePreview,
+  selectionIndex, selectionTotal, isLocked, countdown, fuseTimer, zonePreview,
   isDiamondRevealed, innerType, isCascadeHighlight, portalPairIndex, isScanTarget, onClick,
 }: BlastTileProps) {
   const reducedMotion = usePrefersReducedMotion();
@@ -297,6 +299,17 @@ export const BlastTile = memo(function BlastTile({
           {countdown}
         </span>
       )}
+      {type === 'fuse' && fuseTimer != null && (
+        <span
+          data-testid="fuse-badge"
+          className={`absolute bottom-0.5 inset-s-0.5 text-[clamp(0.5rem,2cqw,0.7rem)] font-neo-body font-bold rounded px-0.5 leading-tight ${
+            fuseTimer <= 1 ? 'bg-red-600/90 text-white animate-pulse' : 'bg-orange-500/80 text-white'
+          }`}
+          aria-label={`${fuseTimer} moves until fuse detonation`}
+        >
+          {fuseTimer}
+        </span>
+      )}
       {type === 'portal' && portalPairIndex != null && (
         <span
           data-testid="portal-pair-badge"
@@ -365,6 +378,7 @@ export const BlastTile = memo(function BlastTile({
   prev.isCleared === next.isCleared &&
   prev.hitsRemaining === next.hitsRemaining &&
   prev.countdown === next.countdown &&
+  prev.fuseTimer === next.fuseTimer &&
   prev.fallOffset === next.fallOffset &&
   prev.clearRotate === next.clearRotate &&
   prev.spawnOffset === next.spawnOffset &&

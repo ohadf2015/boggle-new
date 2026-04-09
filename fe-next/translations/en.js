@@ -598,6 +598,9 @@ const en = {
     "drawer": {
       "content": "Game content",
       "toggle": "Toggle game drawer"
+    },
+    "grid": {
+      "cellLabel": "Row {{row}}, Column {{col}}: Letter {{letter}}"
     }
   },
   "leadChange": {
@@ -7852,7 +7855,8 @@ const en = {
       "magma":     { "name": "Magma",     "desc": "Clears both diagonals (X-pattern) with 2× score multiplier." },
       "portal":    { "name": "Portal",    "desc": "Teleport your word path through linked pairs. Clears both. 2× score. +5 bonus." },
       "catalyst":  { "name": "Catalyst",  "desc": "+10 pts. Upgrades adjacent standard tiles into specials." },
-      "crystal":   { "name": "Crystal",   "desc": "Grows +1× each unused turn (max 5×). Multiplies your word score when used." }
+      "crystal":   { "name": "Crystal",   "desc": "Grows +1× each unused turn (max 5×). Multiplies your word score when used." },
+      "fuse":      { "name": "Fuse",      "desc": "Linked pair. Clear one to light its partner — defuse within 3 turns for +15 pts and 2 moves, or it detonates a 3×3 blast for -50 pts." }
     },
     "title": "Blast Mode",
     "description": "Clear the board! Words explode tiles.",
@@ -8146,7 +8150,8 @@ const en = {
       "magma": { "name": "Magma", "desc": "Clears both diagonals (X-pattern) with 2× score multiplier" },
       "portal": { "name": "Portal", "desc": "Teleport through linked pairs — clears both, ×2 word score" },
       "catalyst": { "name": "Catalyst", "desc": "Upgrades all adjacent tiles to random specials" },
-      "crystal": { "name": "Crystal", "desc": "Grows +1× per unused turn (max 5×) — multiplies word score" }
+      "crystal": { "name": "Crystal", "desc": "Grows +1× per unused turn (max 5×) — multiplies word score" },
+      "fuse": { "name": "Fuse", "desc": "Linked pair — clear one to light its partner, defuse in 3 turns or it blows!" }
     }
   },
   "student": {

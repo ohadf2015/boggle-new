@@ -28,6 +28,9 @@ import {
   MAGMA_MULTIPLIER,
   PORTAL_USE_BONUS,
   PORTAL_WORD_MULTIPLIER,
+  FUSE_INITIAL_TIMER,
+  FUSE_DEFUSE_BONUS,
+  FUSE_DEFUSE_MOVES,
   type BlastTileState,
   type BlastTileType,
   type BlastExplosion,
@@ -395,6 +398,34 @@ export function processTilesForWord(input: TileProcessingInput): TileProcessingR
       case 'crystal': {
         crystalWordMultiplier *= tile.crystalMultiplier ?? 1;
         newExplosions.push({ id: `crystal-${now}-${cell.row}-${cell.col}`, row: cell.row, col: cell.col, type: 'word', intensity: 2, timestamp: now });
+        break;
+      }
+
+      case 'fuse': {
+        // If this fuse was lit (partner already cleared), reward the defuse
+        if (typeof tile.fuseTimer === 'number') {
+          bonusScore += FUSE_DEFUSE_BONUS;
+          tileBonusMoves += FUSE_DEFUSE_MOVES;
+        }
+        newExplosions.push({ id: `fuse-${now}-${cell.row}-${cell.col}`, row: cell.row, col: cell.col, type: 'word', intensity: 2, timestamp: now });
+        // Light unlit partners sharing the same fuseGroupId
+        const groupId = prev[cell.row]?.[cell.col]?.fuseGroupId;
+        if (groupId) {
+          for (let r = 0; r < gridSize; r++) {
+            for (let c = 0; c < gridSize; c++) {
+              const t = next[r][c];
+              if (
+                !t.isCleared &&
+                t.type === 'fuse' &&
+                t.fuseGroupId === groupId &&
+                !(r === cell.row && c === cell.col) &&
+                t.fuseTimer === undefined
+              ) {
+                t.fuseTimer = FUSE_INITIAL_TIMER;
+              }
+            }
+          }
+        }
         break;
       }
     }

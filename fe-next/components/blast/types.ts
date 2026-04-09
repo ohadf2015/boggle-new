@@ -225,6 +225,19 @@ export const CRYSTAL_START_MULTIPLIER = 1;
 /** Maximum growth multiplier a crystal can reach (caps between-turn growth) */
 export const CRYSTAL_MAX_MULTIPLIER = 5;
 
+// ==================== Fuse Constants ====================
+
+/** Turns on a fuse timer after its partner is cleared (before auto-detonation) */
+export const FUSE_INITIAL_TIMER = 3;
+/** Fuse detonation radius (1 = 3x3 bomb-style blast) */
+export const FUSE_EXPLOSION_RADIUS = 1;
+/** Score penalty when a lit fuse detonates (player failed to defuse in time) */
+export const FUSE_EXPLOSION_PENALTY = 50;
+/** Score bonus when a lit fuse is cleared in a word (successful defuse) */
+export const FUSE_DEFUSE_BONUS = 15;
+/** Bonus moves awarded for defusing a lit fuse in a word */
+export const FUSE_DEFUSE_MOVES = 2;
+
 // ==================== Portal Constants ====================
 
 /** Bonus score for using a portal in a word */
@@ -325,6 +338,7 @@ export const SPECIAL_TILE_DISTRIBUTION: Record<Exclude<BlastTileType, 'standard'
   shuffle: 0,
   magma: 0,
   crystal: 0,
+  fuse: 0,
 };
 
 // ==================== Objectives ====================

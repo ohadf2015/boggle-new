@@ -294,6 +294,7 @@ export const BlastBoard = memo(function BlastBoard({
                 isCleared={tile.isCleared}
                 hitsRemaining={tile.hitsRemaining}
                 countdown={tile.countdown}
+                fuseTimer={tile.fuseTimer}
                 isNearMiss={nearMissSet.has(key)}
                 activationEffect={tile.activationEffect}
                 isComboPreview={comboPreviewSet?.has(key) ?? false}

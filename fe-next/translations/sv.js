@@ -598,6 +598,9 @@ const sv = {
     "drawer": {
       "content": "Spelinnehåll",
       "toggle": "Visa/dölj spellåda"
+    },
+    "grid": {
+      "cellLabel": "Rad {{row}}, kolumn {{col}}: bokstav {{letter}}"
     }
   },
   "leadChange": {
@@ -7681,7 +7684,8 @@ const sv = {
       "magma":     { "name": "Magma",     "desc": "Rensar båda diagonalerna (X-mönster) med 2× poängmultiplikator." },
       "portal":    { "name": "Portal",    "desc": "Teleportera din ordstig genom länkade par. Rensar båda. 2× poäng. +5 bonus." },
       "catalyst":  { "name": "Katalysator","desc": "+10 p. Uppgraderar intilliggande vanliga brickor till specialer." },
-      "crystal":   { "name": "Kristall",   "desc": "Växer +1× varje oanvänd tur (max 5×). Multiplicerar din ordpoäng när den används." }
+      "crystal":   { "name": "Kristall",   "desc": "Växer +1× varje oanvänd tur (max 5×). Multiplicerar din ordpoäng när den används." },
+      "fuse":      { "name": "Stubin",     "desc": "Länkat par. Rensa en för att tända dess partner — desarmera inom 3 drag för +15 p och 2 drag, annars detonerar en 3×3-smäll för -50 p." }
     },
     "title": "Blast-läge",
     "description": "Rensa brädet! Ord spränger brickor.",
@@ -7975,7 +7979,8 @@ const sv = {
       "magma": { "name": "Magma", "desc": "Rensar båda diagonalerna (X-mönster) med 2× poängmultiplikator" },
       "portal": { "name": "Portal", "desc": "Teleportera genom par — rensar båda, ×2 ordpoäng" },
       "catalyst": { "name": "Katalysator", "desc": "Uppgraderar alla intilliggande brickor till special" },
-      "crystal": { "name": "Kristall", "desc": "Växer +1× per oanvänd tur (max 5×) — multiplicerar ordpoäng" }
+      "crystal": { "name": "Kristall", "desc": "Växer +1× per oanvänd tur (max 5×) — multiplicerar ordpoäng" },
+      "fuse": { "name": "Stubin", "desc": "Länkat par — rensa en för att tända partnern, desarmera inom 3 drag annars smäller det" }
     }
   },
   "student": {

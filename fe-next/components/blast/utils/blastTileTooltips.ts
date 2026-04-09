@@ -32,6 +32,7 @@ const TILE_I18N_KEYS: Partial<Record<BlastTileType, { name: string; desc: string
   portal:    { name: 'blast.tile.portal.name',    desc: 'blast.tile.portal.desc',    icon: '🌌' },
   catalyst:  { name: 'blast.tile.catalyst.name',  desc: 'blast.tile.catalyst.desc',  icon: '⚗️' },
   crystal:   { name: 'blast.tile.crystal.name',   desc: 'blast.tile.crystal.desc',   icon: '🔮' },
+  fuse:      { name: 'blast.tile.fuse.name',      desc: 'blast.tile.fuse.desc',      icon: '🧨' },
 };
 
 /** English fallbacks */
@@ -55,6 +56,7 @@ const ENGLISH_FALLBACK: Partial<Record<BlastTileType, TileTooltip>> = {
   portal:    { name: 'Portal',    desc: 'Teleport through paired portals. Words score 2\u00d7.',     icon: '🌌' },
   catalyst:  { name: 'Catalyst',  desc: 'Clears and upgrades adjacent tiles to random specials.',    icon: '⚗️' },
   crystal:   { name: 'Crystal',   desc: 'Grows +1\u00d7 each unused turn (max 5\u00d7). Multiplies your word score when used.', icon: '🔮' },
+  fuse:      { name: 'Fuse',      desc: 'Linked pair. Clear one to light its partner — defuse in 3 turns or it detonates!', icon: '🧨' },
 };
 
 /** Get tooltip for a tile type. Uses t() for i18n when provided, English fallback otherwise. */

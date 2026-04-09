@@ -598,7 +598,10 @@ const es = {
       "content": "Contenido del juego",
       "toggle": "Mostrar/ocultar cajón del juego"
     },
-    "gestureTutorial": "Desliza sobre las letras para formar palabras"
+    "gestureTutorial": "Desliza sobre las letras para formar palabras",
+    "grid": {
+      "cellLabel": "Fila {{row}}, columna {{col}}: letra {{letter}}"
+    }
   },
   "roundEvent": {
     "blizzardWarning": "¡Ventisca entrante!",
@@ -7753,7 +7756,8 @@ const es = {
       "magma":     { "name": "Magma",      "desc": "Limpia ambas diagonales (patrón X) con multiplicador de puntos ×2." },
       "portal":    { "name": "Portal",     "desc": "Teletransporta tu camino de palabras a través de pares vinculados. Limpia ambos. ×2 puntos. +5 bonus." },
       "catalyst":  { "name": "Catalizador","desc": "+10 pts. Mejora fichas normales adyacentes a especiales." },
-      "crystal":   { "name": "Cristal",    "desc": "Crece +1× cada turno sin usar (máx 5×). Multiplica tu puntuación de palabra al usarlo." }
+      "crystal":   { "name": "Cristal",    "desc": "Crece +1× cada turno sin usar (máx 5×). Multiplica tu puntuación de palabra al usarlo." },
+      "fuse":      { "name": "Mecha",      "desc": "Par vinculado. Elimina una para encender su pareja — desactívala en 3 turnos para +15 pts y 2 movimientos, o detona un estallido 3×3 con -50 pts." }
     },
     "title": "Modo Blast",
     "description": "¡Limpia el tablero! Las palabras explotan fichas.",
@@ -8047,7 +8051,8 @@ const es = {
       "magma": { "name": "Magma", "desc": "Limpia ambas diagonales (patrón X) con multiplicador de puntos ×2" },
       "portal": { "name": "Portal", "desc": "Teletransporta entre pares — limpia ambos, ×2 puntos" },
       "catalyst": { "name": "Catalizador", "desc": "Mejora todas las fichas adyacentes a especiales aleatorias" },
-      "crystal": { "name": "Cristal", "desc": "Crece +1× por turno sin usar (máx 5×) — multiplica la puntuación" }
+      "crystal": { "name": "Cristal", "desc": "Crece +1× por turno sin usar (máx 5×) — multiplica la puntuación" },
+      "fuse": { "name": "Mecha", "desc": "Par vinculado — enciende al eliminar uno, desactívala en 3 turnos o explota" }
     }
   },
   "student": {
