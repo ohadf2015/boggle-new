@@ -3,7 +3,7 @@
 import { Suspense, lazy, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Swords, BookOpen, Trophy, Map, Bomb } from 'lucide-react';
+import { Swords, BookOpen, Trophy, Map, Bomb, Skull } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import ModeCard from './ModeCard';
 import { LandingShareBanner } from './LandingShareBanner';
@@ -149,6 +149,25 @@ export function LandingDesktopCards({
             variant="lime"
             className="w-full"
             onClick={() => trackModeSelected('adventure')}
+          />
+        </motion.div>
+
+        {/* Boss Rush — gauntlet of defeated bosses (self-gates via standalone page lock screen) */}
+        <motion.div
+          initial={{ opacity: 0, y: 20, scale: 0.96 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.3 }}
+          className="col-span-1 sm:col-span-2 lg:col-span-3 w-full max-w-md mx-auto"
+        >
+          <ModeCard
+            title={t('adventure.bossRush.title')}
+            description={t('adventure.bossRush.subtitle')}
+            href={`/${language}/adventure/boss-rush`}
+            icon={<Skull className="w-6 h-6" />}
+            variant="purple"
+            secondary
+            className="w-full"
+            onClick={() => trackModeSelected('boss-rush')}
           />
         </motion.div>
 

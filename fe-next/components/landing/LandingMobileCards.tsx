@@ -4,7 +4,7 @@ import { Suspense, lazy, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { Bot, Trophy, LayoutGrid, Crown, Sparkles } from 'lucide-react';
+import { Bot, Trophy, LayoutGrid, Crown, Sparkles, Skull } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { LandingShareBanner } from './LandingShareBanner';
 import { shouldShowGuidance } from '@/utils/contextualGuidanceStorage';
@@ -200,6 +200,40 @@ export function LandingMobileCards({
             </div>
             <div className="shrink-0 flex flex-col items-center gap-1.5">
               <Sparkles className="w-4 h-4 text-neo-black/40" aria-hidden="true" />
+            </div>
+          </Link>
+        </motion.div>
+
+        {/* Boss Rush Card — gauntlet of defeated bosses (self-gates via standalone page lock screen) */}
+        <motion.div
+          className="col-span-2 group"
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          transition={{ duration: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
+        >
+          <Link
+            href={`/${language}/adventure/boss-rush`}
+            onClick={() => trackModeSelected('boss-rush', 'home_mobile')}
+            className={cn(
+              'flex items-center gap-3 px-3 py-2 sm:px-4 sm:py-2.5 relative',
+              'bg-linear-to-br from-neo-purple via-purple-400 to-neo-purple-dark',
+              'border-3 sm:border-4 border-neo-black rounded-neo shadow-hard',
+              'transition-all duration-200',
+              'group-hover:shadow-hard-lg group-hover:filter-[drop-shadow(0_0_20px_rgb(139_92_246/0.5))]',
+              'focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy'
+            )}
+            aria-label={`${t('adventure.bossRush.title')} - ${t('adventure.bossRush.subtitle')}`}
+          >
+            <div className="shrink-0 flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-neo bg-neo-black/20 border-2 border-neo-black/30">
+              <Skull className="w-6 h-6 sm:w-7 sm:h-7 text-neo-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]" aria-hidden="true" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <span className="block text-sm sm:text-base font-black uppercase text-neo-white leading-tight">
+                {t('adventure.bossRush.title')}
+              </span>
+              <span className="block text-xs sm:text-sm text-neo-white/75 font-semibold mt-0.5 truncate">
+                {t('adventure.bossRush.subtitle')}
+              </span>
             </div>
           </Link>
         </motion.div>
