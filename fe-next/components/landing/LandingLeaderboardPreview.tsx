@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import Avatar from '@/components/Avatar';
 import PlayerProfileTooltip from '@/components/ui/PlayerProfileTooltip';
+import PrestigeBadge from '@/components/ui/PrestigeBadge';
 import type { TopPlayer } from '@/hooks/useTopPlayers';
 
 const RANK_BG = ['bg-yellow-400', 'bg-gray-300', 'bg-amber-600'];
@@ -122,9 +123,10 @@ export function LandingLeaderboardPreview({ players, loading, compact }: Landing
               >
                 <Link
                   href={`/${language}/player/${encodeURIComponent(player.id)}`}
-                  className="font-bold text-neo-white text-xs truncate max-w-[60px] sm:max-w-[80px] cursor-pointer hover:text-neo-cyan transition-colors"
+                  className="inline-flex items-center gap-1 font-bold text-neo-white text-xs truncate max-w-[80px] sm:max-w-[100px] cursor-pointer hover:text-neo-cyan transition-colors"
                 >
-                  {player.displayName || player.username}
+                  <PrestigeBadge level={player.prestigeLevel ?? 0} size="xs" hideLabel />
+                  <span className="truncate">{player.displayName || player.username}</span>
                 </Link>
               </PlayerProfileTooltip>
               <span className="font-black text-neo-lime text-xs">
@@ -191,9 +193,10 @@ export function LandingLeaderboardPreview({ players, loading, compact }: Landing
             >
               <Link
                 href={`/${language}/player/${encodeURIComponent(player.id)}`}
-                className="flex-1 font-bold text-neo-white text-sm truncate cursor-pointer hover:text-neo-cyan transition-colors"
+                className="flex-1 inline-flex items-center gap-1.5 font-bold text-neo-white text-sm truncate cursor-pointer hover:text-neo-cyan transition-colors"
               >
-                {player.displayName || player.username}
+                <PrestigeBadge level={player.prestigeLevel ?? 0} size="sm" />
+                <span className="truncate">{player.displayName || player.username}</span>
               </Link>
             </PlayerProfileTooltip>
             <span className="font-black text-neo-lime text-sm">

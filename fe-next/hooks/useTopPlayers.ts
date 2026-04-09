@@ -12,6 +12,7 @@ export interface TopPlayer {
   totalScore: number;
   avatarImage: string | null;
   avatarConfig: CustomAvatarConfig | null;
+  prestigeLevel: number;
 }
 
 // Module-level cache for top players
@@ -64,21 +65,26 @@ export function useTopPlayers(limit = 5, options: UseTopPlayersOptions = {}) {
     async function fetchData() {
       const { data, error } = await supabase!
         .from('leaderboard')
-        .select('player_id, username, display_name, total_score, avatar_image, avatar_config')
+        .select('player_id, username, display_name, total_score, avatar_image, avatar_config, profiles!leaderboard_player_id_fkey(prestige_level)')
         .order('total_score', { ascending: false })
         .limit(limit);
 
       if (cancelled) return;
 
       if (!error && data) {
-        const mapped = data.map((row: any) => ({
-          id: row.player_id,
-          username: row.username,
-          displayName: row.display_name,
-          totalScore: row.total_score,
-          avatarImage: row.avatar_image,
-          avatarConfig: row.avatar_config,
-        }));
+        const mapped = data.map((row: any) => {
+          // PostgREST embed returns either an object or array depending on cardinality
+          const profile = Array.isArray(row.profiles) ? row.profiles[0] : row.profiles;
+          return {
+            id: row.player_id,
+            username: row.username,
+            displayName: row.display_name,
+            totalScore: row.total_score,
+            avatarImage: row.avatar_image,
+            avatarConfig: row.avatar_config,
+            prestigeLevel: profile?.prestige_level ?? 0,
+          };
+        });
         setPlayers(mapped);
         topPlayersCache.data = mapped;
         topPlayersCache.timestamp = Date.now();
