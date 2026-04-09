@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 
 // ── Web Audio path-tone oscillator ──
@@ -34,6 +34,18 @@ export function useBlastSounds() {
   } = useSoundEffects();
 
   const audioCtxRef = useRef<AudioContext | null>(null);
+
+  // Release the AudioContext on unmount. Browsers cap concurrent AudioContexts
+  // (~6 on Chrome) — leaking one per blast session eventually starves audio.
+  useEffect(() => {
+    return () => {
+      const ctx = audioCtxRef.current;
+      if (ctx && ctx.state !== 'closed') {
+        ctx.close().catch(() => { /* ignore — already closing */ });
+      }
+      audioCtxRef.current = null;
+    };
+  }, []);
 
   const getAudioCtx = useCallback(() => {
     if (typeof window === 'undefined') return null;

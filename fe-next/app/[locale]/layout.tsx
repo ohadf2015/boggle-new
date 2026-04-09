@@ -566,7 +566,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                     type="application/ld+json"
                     dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
                 />
-                <link rel="manifest" href="/manifest.json" />
+                <link rel="manifest" href="/manifest.webmanifest" />
                 <meta name="mobile-web-app-capable" content="yes" />
                 <meta name="apple-mobile-web-app-capable" content="yes" />
                 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />

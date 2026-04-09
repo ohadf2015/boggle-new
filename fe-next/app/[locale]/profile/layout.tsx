@@ -71,9 +71,12 @@ export async function generateMetadata({ params }: LayoutParams): Promise<Metada
         'es-CO': 'https://www.lexiclash.live/es/profile',
       },
     },
+    // Private user page — exclude from search indexing.
+    // Content is personalized and auth-gated; no SEO value in crawling it.
     robots: {
-      index: true,
+      index: false,
       follow: true,
+      googleBot: { index: false, follow: true },
     },
   };
 }

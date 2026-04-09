@@ -42,6 +42,7 @@ export const BLAST_TILE_BONUSES: Record<BlastTileType, number> = {
   portal: 1.25,    // mild bonus for teleport path usage
   catalyst: 1.5,   // reward for triggering upgrade effect
   crystal: 1,      // no flat bonus — reward comes from crystalWordMultiplier
+  fuse: 1.5,       // reward for defusing linked-pair fuse before detonation
 };
 
 export const BLAST_RAINBOW_FLAT_BONUS = 3;

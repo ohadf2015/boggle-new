@@ -734,15 +734,16 @@ describe('educationXpManager', () => {
 
       const result = calculatePracticeXp(session);
 
-      // 15 words * 10 = 150 + (5 combo * 3) = 15 + 40 completion + 20 daily = 225 XP
-      expect(result.totalXp).toBe(225);
+      // Uncapped: 15*10 + 5*3 + 40 = 205 blitz portion. Capped to 180 + 20 daily = 200.
+      expect(result.totalXp).toBe(200);
       expect(result.breakdown.blitzWords).toBe(150);
       expect(result.breakdown.comboBonus).toBe(15);
       expect(result.breakdown.blitzCompletion).toBe(40);
       expect(result.breakdown.dailyPractice).toBe(20);
+      expect(result.breakdown.blitzCapApplied).toBe(25);
     });
 
-    it('should handle high word count and combo', () => {
+    it('should handle high word count and combo (cap enforced)', () => {
       const session: PracticeSessionXp = {
         type: 'blitz',
         sessionData: {
@@ -753,12 +754,29 @@ describe('educationXpManager', () => {
 
       const result = calculatePracticeXp(session);
 
-      // 25 words * 10 = 250 + (10 combo * 3) = 30 + 40 completion + 20 daily = 340 XP
-      expect(result.totalXp).toBe(340);
+      // Uncapped: 25*10 + 10*3 + 40 = 320 blitz portion. Capped to 180 + 20 daily = 200.
+      expect(result.totalXp).toBe(200);
       expect(result.breakdown.blitzWords).toBe(250);
       expect(result.breakdown.comboBonus).toBe(30);
       expect(result.breakdown.blitzCompletion).toBe(40);
       expect(result.breakdown.dailyPractice).toBe(20);
+      expect(result.breakdown.blitzCapApplied).toBe(140);
+    });
+
+    it('should NOT apply cap when under BLITZ_MAX_SESSION_XP', () => {
+      const session: PracticeSessionXp = {
+        type: 'blitz',
+        sessionData: {
+          blitzWordsFound: 12,
+          blitzMaxCombo: 3,
+        },
+      };
+
+      const result = calculatePracticeXp(session);
+
+      // 12*10 + 3*3 + 40 = 169 blitz (< 180), + 20 daily = 189. No cap flag.
+      expect(result.totalXp).toBe(189);
+      expect(result.breakdown.blitzCapApplied).toBeUndefined();
     });
   });
 

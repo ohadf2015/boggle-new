@@ -282,6 +282,7 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
             onWordWithComboType={handleBlastWordWithCombo}
             initialTileStates={blastBridge.initialTileStates}
             blastSeed={blastBridge.blastSeed}
+            waveNumber={blastBridge.waveNumber}
           />
       ) : gameMode === 'word-hunt' ? (
           <WordHuntGame

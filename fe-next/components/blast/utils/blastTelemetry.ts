@@ -60,3 +60,11 @@ export function trackBlastResultsViewed(params: {
 }): void {
   safeCapture('blast_results_viewed', { ...params });
 }
+
+export function trackBlastBrag(params: {
+  finalScore: number;
+  percentile: number | null;
+  method: 'share' | 'clipboard';
+}): void {
+  safeCapture('blast_brag_shared', { ...params });
+}

@@ -211,6 +211,48 @@ describe('handleReconnection', () => {
     expect(socket.emit).toHaveBeenCalledWith('updateLeaderboard', expect.objectContaining({ leaderboard: [] }));
   });
 
+  // 7b. Blast timer guard: remainingTime=0 must NOT fall back to full timerSeconds
+  // Regression guard — `||` falsy-fallback would reset an expired blast clock to 90s
+  // during the endGame race window, letting a reconnecting player play past t=0.
+  it('preserves remainingTime=0 instead of falling back to full timerSeconds', () => {
+    const game = makeGame({
+      gameState: 'playing',
+      gameMode: 'blast',
+      letterGrid: [['A']],
+      timerSeconds: 90,
+      remainingTime: 0,
+    });
+    mockIsInProgress.mockReturnValue(true);
+    const socket = createMockSocket('socket-new');
+
+    handleReconnection(mockIo, socket, game, 'GAME1', 'Player1');
+
+    expect(socket.emit).toHaveBeenCalledWith(
+      'startGame',
+      expect.objectContaining({ timerSeconds: 0 })
+    );
+  });
+
+  // 7c. remainingTime=undefined (never ticked) still falls back to original timerSeconds
+  it('falls back to timerSeconds only when remainingTime is nullish', () => {
+    const game = makeGame({
+      gameState: 'playing',
+      gameMode: 'blast',
+      letterGrid: [['A']],
+      timerSeconds: 90,
+      remainingTime: undefined,
+    });
+    mockIsInProgress.mockReturnValue(true);
+    const socket = createMockSocket('socket-new');
+
+    handleReconnection(mockIo, socket, game, 'GAME1', 'Player1');
+
+    expect(socket.emit).toHaveBeenCalledWith(
+      'startGame',
+      expect.objectContaining({ timerSeconds: 90 })
+    );
+  });
+
   // 8. Game state NOT sent when game not in progress
   it('does not emit startGame when game is not in progress', () => {
     const game = makeGame({ gameState: 'waiting' });

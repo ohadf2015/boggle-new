@@ -76,6 +76,10 @@ export const EDUCATION_XP_CONFIG = {
   BLITZ_WORD_FOUND: 10,
   BLITZ_COMBO_BONUS: 3, // Per combo level
   BLITZ_COMPLETION: 40,
+  // Anti-grind cap: Blitz is ~60s, so uncapped a skilled player could farm
+  // ~290 XP/min indefinitely. Cap the blitz portion (excluding DAILY_PRACTICE_BASE)
+  // so other modes (Adventure, Duel) remain competitive on XP/time.
+  BLITZ_MAX_SESSION_XP: 180,
 
   // Daily Challenge XP (Phase 39)
   DAILY_CHALLENGE_COMPLETE: 100,
@@ -397,6 +401,13 @@ function calculateBlitzXp(
   // Completion bonus
   breakdown.blitzCompletion = EDUCATION_XP_CONFIG.BLITZ_COMPLETION;
   xp += breakdown.blitzCompletion;
+
+  // Anti-grind cap on the blitz portion (DAILY_PRACTICE_BASE is added later).
+  const cap = EDUCATION_XP_CONFIG.BLITZ_MAX_SESSION_XP;
+  if (xp > cap) {
+    breakdown.blitzCapApplied = xp - cap; // how much was shaved off
+    return cap;
+  }
 
   return xp;
 }

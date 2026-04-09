@@ -10,7 +10,9 @@ import {
   recordBlastMove,
   getTilesOnPath,
   hashStringToSeed,
+  isBlastBoardCleared,
 } from '../blastModeManager';
+import type { BlastTileState } from '@/shared/types/blast';
 
 import {
   BLAST_BONUS_MOVE_COMBO_THRESHOLD,
@@ -172,6 +174,16 @@ describe('blastModeManager', () => {
       // At least some should differ (extremely unlikely all 10 match)
       expect(uniqueSeeds.size).toBeGreaterThan(1);
     });
+
+    it('should persist the wave number on the returned state', () => {
+      const state = initBlastModeState(grid, players, 3);
+      expect(state.wave).toBe(3);
+    });
+
+    it('should default wave to 1 when not specified', () => {
+      const state = initBlastModeState(grid, players);
+      expect(state.wave).toBe(1);
+    });
   });
 
   // ==========================================
@@ -265,16 +277,17 @@ describe('blastModeManager', () => {
       Array.from({ length: 10 }, () => 'A')
     );
 
-    it('BLAST_TILE_TYPES should include all 18 canonical types', () => {
+    it('BLAST_TILE_TYPES should include all 21 canonical types', () => {
       const canonicalTypes = [
         'standard', 'gold', 'bomb', 'rainbow', 'ice', 'lightning',
         'magnet', 'prism', 'gem', 'frozen', 'mirror', 'silver', 'diamond',
         'wildcard', 'countdown', 'shuffle', 'magma', 'portal', 'catalyst',
+        'crystal', 'fuse',
       ];
       for (const t of canonicalTypes) {
         expect(BLAST_TILE_TYPES).toContain(t);
       }
-      expect(BLAST_TILE_TYPES).toHaveLength(19);
+      expect(BLAST_TILE_TYPES).toHaveLength(21);
     });
 
     it('BLAST_TILE_TYPES should include previously missing types (mirror, silver, diamond, prism)', () => {
@@ -479,6 +492,55 @@ describe('blastModeManager', () => {
       const s = initBlastModeState(grid, players, 1, hashStringToSeed('ROOM99'));
       expect(typeof s.seed).toBe('number');
       expect(s.seed).toBeGreaterThan(0);
+    });
+  });
+
+  // ==========================================
+  // isBlastBoardCleared — MP win condition
+  // ==========================================
+  describe('isBlastBoardCleared', () => {
+    function makeTile(isCleared: boolean): BlastTileState {
+      return {
+        letter: 'A',
+        type: 'standard',
+        isCleared,
+      } as BlastTileState;
+    }
+
+    it('returns true when every tile is cleared', () => {
+      const tileStates: BlastTileState[][] = [
+        [makeTile(true), makeTile(true)],
+        [makeTile(true), makeTile(true)],
+      ];
+      expect(isBlastBoardCleared(tileStates)).toBe(true);
+    });
+
+    it('returns false when any tile is not cleared', () => {
+      const tileStates: BlastTileState[][] = [
+        [makeTile(true), makeTile(true)],
+        [makeTile(true), makeTile(false)],
+      ];
+      expect(isBlastBoardCleared(tileStates)).toBe(false);
+    });
+
+    it('returns false when most tiles are uncleared', () => {
+      const tileStates: BlastTileState[][] = [
+        [makeTile(false), makeTile(false)],
+        [makeTile(false), makeTile(false)],
+      ];
+      expect(isBlastBoardCleared(tileStates)).toBe(false);
+    });
+
+    it('returns true for empty grid (vacuously cleared)', () => {
+      expect(isBlastBoardCleared([])).toBe(true);
+    });
+
+    it('handles non-square grids (ragged rows)', () => {
+      const tileStates: BlastTileState[][] = [
+        [makeTile(true)],
+        [makeTile(true), makeTile(true), makeTile(true)],
+      ];
+      expect(isBlastBoardCleared(tileStates)).toBe(true);
     });
   });
 });

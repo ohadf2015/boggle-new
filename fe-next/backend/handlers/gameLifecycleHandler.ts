@@ -354,7 +354,7 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
       const recoveryGameMode = game.gameMode || 'classic';
       safeEmit(socket, 'startGame', {
         letterGrid: game.letterGrid,
-        timerSeconds: game.remainingTime || game.timerSeconds,
+        timerSeconds: game.remainingTime ?? game.timerSeconds,
         language: game.language,
         minWordLength: game.minWordLength || 2,
         messageId: 'recovery-' + Date.now(),

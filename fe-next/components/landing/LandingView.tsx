@@ -115,6 +115,7 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
 
   const handlePlayClick = () => {
     unlockAudio();
+    playTrack(TRACKS.BOSSA);
     trackModeSelected('arena', 'home_mobile_cta');
     router.push(`/${language}/multiplayer?autoCreate=true`);
   };
@@ -122,8 +123,27 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
   const [enableHeavyBackground, setEnableHeavyBackground] = useState(false);
   useEffect(() => { setEnableHeavyBackground(getPerfVariant() === 'control'); }, []);
 
-  // Start music after mount
-  useEffect(() => { playTrack(TRACKS.BOSSA); }, [playTrack, TRACKS]);
+  // Start ambient music on the FIRST user gesture (tap / click / key).
+  // Browsers block audio autoplay without interaction (WCAG 1.4.2 + Chrome
+  // autoplay policy), so we arm a one-shot listener and remove it after use.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    let started = false;
+    const start = () => {
+      if (started) return;
+      started = true;
+      unlockAudio();
+      playTrack(TRACKS.BOSSA);
+      window.removeEventListener('pointerdown', start);
+      window.removeEventListener('keydown', start);
+    };
+    window.addEventListener('pointerdown', start, { once: true });
+    window.addEventListener('keydown', start, { once: true });
+    return () => {
+      window.removeEventListener('pointerdown', start);
+      window.removeEventListener('keydown', start);
+    };
+  }, [playTrack, unlockAudio, TRACKS]);
 
   const dailyChallengeStats = {
     hasPlayed: dailyChallengeStatus.hasPlayed,

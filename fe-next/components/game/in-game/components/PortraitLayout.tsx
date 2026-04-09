@@ -39,7 +39,7 @@ import { WordHuntPlayerLives } from '../../WordHuntPlayerLives';
 import { DynamicEnergyBackground } from '@/components/singleplayer/game/components/DynamicEnergyBackground';
 import { ComboMilestoneAnnouncement } from '../../ComboMilestoneAnnouncement';
 import { ScreenFlashOverlay } from '../../ScreenFlashOverlay';
-import { useHapticsEnabled } from '@/contexts/AccessibilityContext';
+import { useHapticsEnabled, useShouldReduceMotion } from '@/contexts/AccessibilityContext';
 
 /** Stable empty array to avoid breaking GridComponent memo on every render */
 const EMPTY_HIGHLIGHTED_PATH: HighlightedCell[] = [];
@@ -237,6 +237,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
     return map;
   }, [leaderboard]);
   const hapticsEnabled = useHapticsEnabled();
+  const reduceMotion = useShouldReduceMotion();
 
   // Memoize derived counts to avoid recomputation on every render tick
   const longValidWordCount = useMemo(
@@ -315,26 +316,28 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
       {/* Dynamic Energy Background - animated vortex, aurora, particles */}
       <DynamicEnergyBackground />
 
-      {/* Countdown tension: screen border glow at ≤20s */}
+      {/* Countdown tension: screen border glow at ≤20s.
+          WCAG 2.3.3 — pulsing is suppressed under prefers-reduced-motion; color still conveys urgency. */}
       {timerUrgencyState !== 'normal' && (
         <div
           aria-hidden="true"
           className={cn(
             'fixed inset-0 pointer-events-none z-30 transition-all duration-500',
             timerUrgencyState === 'critical'
-              ? 'shadow-[inset_0_0_60px_rgba(255,50,50,0.6)] animate-pulse'
+              ? cn('shadow-[inset_0_0_60px_rgba(255,50,50,0.6)]', !reduceMotion && 'animate-pulse')
               : timerUrgencyState === 'veryLow'
-              ? 'shadow-[inset_0_0_40px_rgba(255,80,0,0.45)] animate-pulse'
+              ? cn('shadow-[inset_0_0_40px_rgba(255,80,0,0.45)]', !reduceMotion && 'animate-pulse')
               : 'shadow-[inset_0_0_30px_rgba(255,120,0,0.25)]',
           )}
         />
       )}
 
-      {/* Combo milestone announcement + screen flash */}
+      {/* Combo milestone announcement + screen flash.
+          ScreenFlashOverlay is a full-viewport luminance flash — suppress entirely under reduced motion. */}
       {isPlaying && (
         <>
           <ComboMilestoneAnnouncement comboLevel={comboLevel} />
-          <ScreenFlashOverlay trigger={foundWords.length} />
+          {!reduceMotion && <ScreenFlashOverlay trigger={foundWords.length} />}
         </>
       )}
 
@@ -635,15 +638,19 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
               </div>
             )}
 
-          {/* Mobile: Split-view with compact leaderboard + words */}
-          {isPlaying && !gameplayFocusMode && leaderboard && leaderboard.length > 0 && (
+          {/* Mobile: Split-view with compact leaderboard + words.
+              Leaderboard only when there are other players; word list always shows while playing
+              so single-player users can see their progress. */}
+          {isPlaying && !gameplayFocusMode && (
             <div className="block lg:hidden mt-0.5 md:mt-1 space-y-0.5 max-w-md mx-auto md:space-y-1 shrink-0 overflow-y-auto max-h-[120px] sm:max-h-[140px] short:max-h-[80px] scrollbar-thin">
-              <CompactLeaderboard
-                players={compactLeaderboardPlayers}
-                currentUsername={username}
-                t={t}
-                comboEvent={blastComboSync}
-              />
+              {leaderboard && leaderboard.length > 0 && (
+                <CompactLeaderboard
+                  players={compactLeaderboardPlayers}
+                  currentUsername={username}
+                  t={t}
+                  comboEvent={blastComboSync}
+                />
+              )}
               <GameWordList foundWords={foundWords} minWordLength={minWordLength} t={t} compact />
             </div>
           )}

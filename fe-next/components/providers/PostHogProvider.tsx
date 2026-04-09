@@ -14,7 +14,7 @@ import { Suspense, useEffect } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 import posthog from 'posthog-js';
 import { PostHogProvider as PHProvider } from 'posthog-js/react';
-import { onConsentChange } from '@/utils/cookieConsent';
+import { onConsentChange, hasConsent } from '@/utils/cookieConsent';
 import {
   setPostHogSuperProps,
   setPostHogSuperPropsOnce,
@@ -36,13 +36,19 @@ function initPostHog() {
 
   posthog.init(key, {
     api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST || 'https://eu.i.posthog.com',
-    opt_out_capturing_by_default: false,
+    // GDPR: start opted-out. We only opt in after the user grants analytics
+    // consent via the cookie banner (or if their stored consent already allows it).
+    opt_out_capturing_by_default: true,
     capture_pageview: false, // We track manually on route change
     capture_pageleave: true,
     capture_exceptions: true, // Capture unhandled JS errors and promise rejections
     persistence: 'localStorage+cookie',
-    loaded: () => {
-      // PostHog starts capturing by default; user can opt out via cookie banner
+    loaded: (ph) => {
+      // If the user has already granted analytics consent in a prior session,
+      // opt in immediately so this session is tracked.
+      if (hasConsent('analytics')) {
+        ph.opt_in_capturing();
+      }
     },
   });
 }

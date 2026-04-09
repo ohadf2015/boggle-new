@@ -5,7 +5,12 @@ import QuestsPageClient from './PageClient';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
-  return generatePageMetadata({ seoKey: 'quests', path: '/quests', locale });
+  const meta = await generatePageMetadata({ seoKey: 'quests', path: '/quests', locale });
+  // Auth-gated personalized page — no SEO value, exclude from index.
+  return {
+    ...meta,
+    robots: { index: false, follow: true, googleBot: { index: false, follow: true } },
+  };
 }
 
 export default function QuestsPage() {

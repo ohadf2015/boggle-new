@@ -24,10 +24,18 @@ import {
   Trophy, Star, Sparkles, Waves, Flag, Link as LinkIcon, Crown,
   BookOpen, Target, TrendingUp, Award, Zap,
 } from 'lucide-react';
-import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
+import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { Button } from '@/components/ui/button';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 import { useBlastBadgeUnlocks } from './hooks/useBlastBadgeUnlocks';
+import { BlastBragCard } from './BlastBragCard';
+import { getMascotForResults, MASCOT_IMAGES } from './utils/blastMascot';
 import type { BlastResultsData } from './types';
 
 type IconType = ComponentType<{ className?: string; strokeWidth?: number }>;
@@ -50,6 +58,10 @@ export function BlastResultsSummary({
   // Side-effect: persist + toast new badges. Returns enriched list w/ isNew flag.
   const badges = useBlastBadgeUnlocks({ results, t });
 
+  // Pure selector: results → mascot key → public asset path.
+  const mascotKey = getMascotForResults(results);
+  const mascotSrc = MASCOT_IMAGES[mascotKey];
+
   const pbDelta =
     results.previousBest != null && results.finalScore > results.previousBest
       ? results.finalScore - results.previousBest
@@ -65,6 +77,23 @@ export function BlastResultsSummary({
       className="flex-1 flex flex-col items-center justify-start gap-4 px-4 py-6 overflow-y-auto w-full max-w-md mx-auto"
       data-testid="blast-results-summary"
     >
+      {/* Mascot — expression reacts to run outcome via pure selector */}
+      <AdaptiveMotion.div
+        initial={{ scale: 0, rotate: -10, opacity: 0 }}
+        animate={{ scale: 1, rotate: 0, opacity: 1 }}
+        transition={{ type: 'spring', stiffness: 380, damping: 18 }}
+        className="relative w-24 h-24 rounded-neo border-3 border-neo-black shadow-hard-lg overflow-hidden bg-neo-navy-light"
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={mascotSrc}
+          alt={t(`blast.mascot.${mascotKey}`)}
+          data-testid="blast-results-mascot"
+          data-mascot-key={mascotKey}
+          className="w-full h-full object-cover"
+        />
+      </AdaptiveMotion.div>
+
       {/* Header */}
       <AdaptiveMotion.h2
         initial={{ scale: 0.6, opacity: 0, y: -10 }}
@@ -117,37 +146,8 @@ export function BlastResultsSummary({
         )}
       </AdaptiveMotion.div>
 
-      {/* Percentile rank band — only when backend has responded */}
-      <AdaptiveAnimatePresence>
-        {results.percentile != null && (
-          <AdaptiveMotion.div
-            key="percentile"
-            initial={{ scale: 0.7, opacity: 0, y: -10 }}
-            animate={{ scale: 1, opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
-            transition={{ type: 'spring', stiffness: 380, damping: 22 }}
-            className={cn(
-              'w-full flex items-center gap-3 px-4 py-3',
-              'rounded-neo border-3 border-neo-black shadow-hard',
-              'bg-linear-to-r from-neo-cyan via-sky-300 to-neo-cyan',
-            )}
-            style={{ boxShadow: '0 0 24px rgba(0,255,255,0.4), 3px 3px 0 #000' }}
-            data-testid="blast-results-percentile"
-          >
-            <Trophy className="w-7 h-7 shrink-0 text-neo-black" strokeWidth={2.75} />
-            <div className="flex-1 text-neo-black">
-              <p className="text-[10px] uppercase tracking-widest font-bold opacity-70">
-                {t('blast.results.yourRank')}
-              </p>
-              <p className="font-neo-display font-black uppercase tracking-wide text-base leading-tight">
-                {t('blast.results.topPercent', {
-                  pct: String(Math.max(1, 100 - results.percentile)),
-                })}
-              </p>
-            </div>
-          </AdaptiveMotion.div>
-        )}
-      </AdaptiveAnimatePresence>
+      {/* Brag card — richer comparison + share CTA. Self-hides until backend responds. */}
+      <BlastBragCard results={results} t={t} />
 
       {/* Best-moment card: best wave + biggest combo + best word */}
       <AdaptiveMotion.div
@@ -198,64 +198,82 @@ export function BlastResultsSummary({
           <p className="text-[10px] uppercase tracking-widest font-bold text-white/60 mb-2 px-1">
             {t('blast.results.badgesEarned')}
           </p>
-          <div className="flex flex-wrap gap-2">
-            {badges.map((badge, i) => {
-              const Icon = BADGE_ICONS[badge.icon] ?? Sparkles;
-              return (
-                <AdaptiveMotion.div
-                  key={badge.id}
-                  initial={{ scale: 0, rotate: -180 }}
-                  animate={{ scale: 1, rotate: 0 }}
-                  transition={{
-                    type: 'spring', stiffness: 380, damping: 16,
-                    delay: 0.3 + i * 0.08,
-                  }}
-                  className={cn(
-                    'relative flex items-center gap-1.5 px-3 py-2',
-                    'rounded-neo border-3 border-neo-black shadow-hard',
-                    badge.isNew
-                      ? 'bg-linear-to-r from-neo-lime via-yellow-300 to-neo-lime'
-                      : 'bg-neo-navy text-white',
-                  )}
-                  data-testid={`blast-badge-${badge.id}`}
-                >
-                  <Icon
-                    className={cn(
-                      'w-4 h-4 shrink-0',
-                      badge.isNew ? 'text-neo-black' : 'text-neo-lime',
-                    )}
-                    strokeWidth={2.75}
-                  />
-                  <span
-                    className={cn(
-                      'font-neo-display font-black uppercase tracking-wide text-[11px]',
-                      badge.isNew ? 'text-neo-black' : 'text-white',
-                    )}
-                  >
-                    {badge.label}
-                  </span>
-                  {badge.isNew && (
-                    <AdaptiveMotion.span
-                      initial={{ scale: 0, rotate: -8 }}
-                      animate={{ scale: 1, rotate: -8 }}
-                      transition={{
-                        type: 'spring', stiffness: 380, damping: 14,
-                        delay: 0.5 + i * 0.08,
-                      }}
-                      className={cn(
-                        'absolute -top-2 -right-2 px-1.5 py-0.5',
-                        'rounded border-2 border-neo-black bg-neo-pink text-white',
-                        'font-neo-display font-black text-[8px] uppercase tracking-wider',
-                        'shadow-hard-sm',
-                      )}
+          <TooltipProvider delayDuration={150}>
+            <div className="flex flex-wrap gap-2">
+              {badges.map((badge, i) => {
+                const Icon = BADGE_ICONS[badge.icon] ?? Sparkles;
+                return (
+                  <Tooltip key={badge.id}>
+                    <TooltipTrigger asChild>
+                      <AdaptiveMotion.button
+                        type="button"
+                        initial={{ scale: 0, rotate: -180 }}
+                        animate={{ scale: 1, rotate: 0 }}
+                        transition={{
+                          type: 'spring', stiffness: 380, damping: 16,
+                          delay: 0.3 + i * 0.08,
+                        }}
+                        className={cn(
+                          'relative flex items-center gap-1.5 px-3 py-2 cursor-help',
+                          'rounded-neo border-3 border-neo-black shadow-hard',
+                          'focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-pink',
+                          badge.isNew
+                            ? 'bg-linear-to-r from-neo-lime via-yellow-300 to-neo-lime'
+                            : 'bg-neo-navy text-white',
+                        )}
+                        data-testid={`blast-badge-${badge.id}`}
+                        aria-label={`${badge.label}: ${badge.desc}`}
+                      >
+                        <Icon
+                          className={cn(
+                            'w-4 h-4 shrink-0',
+                            badge.isNew ? 'text-neo-black' : 'text-neo-lime',
+                          )}
+                          strokeWidth={2.75}
+                        />
+                        <span
+                          className={cn(
+                            'font-neo-display font-black uppercase tracking-wide text-[11px]',
+                            badge.isNew ? 'text-neo-black' : 'text-white',
+                          )}
+                        >
+                          {badge.label}
+                        </span>
+                        {badge.isNew && (
+                          <AdaptiveMotion.span
+                            initial={{ scale: 0, rotate: -8 }}
+                            animate={{ scale: 1, rotate: -8 }}
+                            transition={{
+                              type: 'spring', stiffness: 380, damping: 14,
+                              delay: 0.5 + i * 0.08,
+                            }}
+                            className={cn(
+                              'absolute -top-2 -right-2 px-1.5 py-0.5',
+                              'rounded border-2 border-neo-black bg-neo-pink text-white',
+                              'font-neo-display font-black text-[8px] uppercase tracking-wider',
+                              'shadow-hard-sm',
+                            )}
+                          >
+                            {t('blast.results.newBadge')}
+                          </AdaptiveMotion.span>
+                        )}
+                      </AdaptiveMotion.button>
+                    </TooltipTrigger>
+                    <TooltipContent
+                      side="top"
+                      className="max-w-[220px] text-center"
+                      data-testid={`blast-badge-tooltip-${badge.id}`}
                     >
-                      {t('blast.results.newBadge')}
-                    </AdaptiveMotion.span>
-                  )}
-                </AdaptiveMotion.div>
-              );
-            })}
-          </div>
+                      <p className="font-neo-display font-black uppercase text-[11px] text-neo-pink">
+                        {badge.label}
+                      </p>
+                      <p className="text-xs mt-0.5">{badge.desc}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                );
+              })}
+            </div>
+          </TooltipProvider>
         </AdaptiveMotion.div>
       )}
 

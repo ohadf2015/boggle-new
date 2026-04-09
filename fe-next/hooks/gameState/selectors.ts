@@ -56,6 +56,7 @@ export const useBlastMovesUsed = (): number => useGameStore((state) => state.bla
 export const useBlastTotalTileBonus = (): number => useGameStore((state) => state.blastTotalTileBonus);
 export const useBlastTotalTilesCleared = (): number => useGameStore((state) => state.blastTotalTilesCleared);
 export const useBlastSeed = () => useGameStore((state) => state.blastSeed);
+export const useBlastWave = (): number => useGameStore((state) => state.blastWave);
 export const useBlastComboSync = () => useGameStore((state) => state.blastComboSync);
 export const useBlastOpponentActivity = () => useGameStore((state) => state.blastOpponentActivity);
 export const useBlastPlayerStats = () => useGameStore((state) => state.blastPlayerStats);

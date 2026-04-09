@@ -110,8 +110,20 @@ describe('POST /api/education/record-xp', () => {
     expect(result.status).toBe(500);
   });
 
-  it('accepts all valid activity types', async () => {
-    for (const type of ['flashcard', 'solo_board', 'lesson_completion', 'duel']) {
+  it('accepts all valid activity types (matches PracticeSessionXp union)', async () => {
+    const allTypes = [
+      'flashcard',
+      'solo_board',
+      'lesson_completion',
+      'matching',
+      'spelling',
+      'blitz',
+      'duel',
+      'duel_async',
+      'duel_realtime',
+      'daily_challenge',
+    ];
+    for (const type of allTypes) {
       mockRpc.mockResolvedValue({
         data: [{ new_total_xp: 100, new_level: 1, xp_granted: 50 }],
         error: null,
@@ -119,5 +131,10 @@ describe('POST /api/education/record-xp', () => {
       const result = await POST(makeRequest({ ...validBody, activityType: type }));
       expect(result.status).toBe(200);
     }
+  });
+
+  it('rejects unknown activity types', async () => {
+    const result = await POST(makeRequest({ ...validBody, activityType: 'not_a_real_type' }));
+    expect(result.status).toBe(400);
   });
 });

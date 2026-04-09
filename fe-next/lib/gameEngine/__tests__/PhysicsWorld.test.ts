@@ -108,6 +108,44 @@ describe('PhysicsWorld', () => {
     });
   });
 
+  describe('delta clamping', () => {
+    it('should clamp large delta to safe max (single long frame ≈ single 16.67ms frame)', () => {
+      // Two identical worlds; drive one with a 100ms stall frame, the other with
+      // a normal 16.67ms frame. A clamped implementation makes them equivalent.
+      const worldA = new PhysicsWorld({ gravity: { x: 0, y: 1 } });
+      const worldB = new PhysicsWorld({ gravity: { x: 0, y: 1 } });
+      const a = worldA.createRect(100, 50, 20, 20);
+      const b = worldB.createRect(100, 50, 20, 20);
+
+      worldA.update(100); // stall frame — must be clamped
+      worldB.update(16.67); // normal frame — reference
+
+      const sA = worldA.getBodyState(a)!;
+      const sB = worldB.getBodyState(b)!;
+      expect(sA.position.y).toBeCloseTo(sB.position.y, 3);
+
+      worldA.destroy();
+      worldB.destroy();
+    });
+
+    it('should still advance simulation under large delta', () => {
+      const id = world.createRect(100, 50, 20, 20);
+      const before = world.getBodyState(id)!;
+      world.update(100);
+      const after = world.getBodyState(id)!;
+      expect(after.position.y).toBeGreaterThan(before.position.y);
+    });
+
+    it('should not diverge (NaN/Infinity) on pathological delta', () => {
+      const id = world.createRect(100, 100, 20, 20);
+      world.setVelocity(id, { x: 2, y: 2 });
+      world.update(500);
+      const state = world.getBodyState(id)!;
+      expect(Number.isFinite(state.position.x)).toBe(true);
+      expect(Number.isFinite(state.position.y)).toBe(true);
+    });
+  });
+
   describe('collision callbacks', () => {
     it('should fire collision callback', () => {
       const callback = vi.fn();

@@ -15,7 +15,7 @@ import {
   createHostLeftRoomClosingHandler,
 } from '@/shared/utils/gameEventUtils';
 import { useLetterGrid, useGameLanguage, useShowStartAnimation, useGameActions, useGameStore } from '@/hooks/gameState';
-import type { BlastWordAcceptedPayload, BlastComboSyncPayload, StartGameBroadcast } from '@/shared/types/socket';
+import type { BlastComboSyncPayload, StartGameBroadcast } from '@/shared/types/socket';
 import type { BlastTileState } from '@/shared/types/blast';
 import { createEarthquakeSocketHandlers } from '@/shared/utils/earthquakeSocketHandlers';
 import logger from '@/utils/logger';
@@ -224,6 +224,7 @@ export function usePlayerGameEvents({
         storeUpdates.blastTileOverlay = (data as any).blastTileOverlay;
         storeUpdates.blastMovesUsed = 0;
         if ((data as any).blastSeed != null) storeUpdates.blastSeed = (data as any).blastSeed;
+        if ((data as any).blastWave != null) storeUpdates.blastWave = (data as any).blastWave;
         // Reconnect/late-join: apply current server board state if available
         if ((data as any).blastGrid && (data as any).blastTileStates) {
           storeUpdates.blastBoardUpdate = {
@@ -514,16 +515,6 @@ export function usePlayerGameEvents({
       neoSuccessToast(data.message || t('common.newGameReady'), { icon: TOAST_ICONS.refresh, duration: 3000 });
     };
 
-    // Handle blast word accepted (multiplayer blast mode)
-    const handleBlastWordAccepted = (data: BlastWordAcceptedPayload) => {
-      logger.log('[PLAYER] Blast word accepted:', data.word, 'bonus:', data.tileBonus, 'moves:', data.movesUsed);
-      setBlastMovesUsed(data.movesUsed);
-      // Accumulate tile bonus and tiles cleared for results display
-      const store = useGameStore.getState();
-      store.setBlastTotalTileBonus(prev => prev + (data.tileBonus || 0));
-      store.setBlastTotalTilesCleared(prev => prev + (data.tilesCleared?.length || 0));
-    };
-
     // Handle combo sync from another player — triggers BlastComboFlash overlay for spectators.
     // Only fires for other players' combos; local player sees their own flash immediately.
     const handleBlastComboSync = (data: BlastComboSyncPayload) => {
@@ -644,7 +635,6 @@ export function usePlayerGameEvents({
     socket.on('fireRoundStart', earthquakeHandlers.handleFireRoundStart);
     socket.on('fireRoundEnd', earthquakeHandlers.handleFireRoundEnd);
     socket.on('totalBoardWords', handleTotalBoardWords);
-    socket.on('blastWordAccepted', handleBlastWordAccepted);
     socket.on('blastComboSync', handleBlastComboSync);
     socket.on('playerFoundWord', handlePlayerFoundWord);
     socket.on('blastBoardUpdate', handleBlastBoardUpdate);
@@ -688,7 +678,6 @@ export function usePlayerGameEvents({
       socket.off('fireRoundEnd', earthquakeHandlers.handleFireRoundEnd);
       earthquakeHandlers.cleanup();
       socket.off('totalBoardWords', handleTotalBoardWords);
-      socket.off('blastWordAccepted', handleBlastWordAccepted);
       socket.off('blastComboSync', handleBlastComboSync);
       socket.off('playerFoundWord', handlePlayerFoundWord);
       socket.off('blastBoardUpdate', handleBlastBoardUpdate);

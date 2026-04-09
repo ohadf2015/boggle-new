@@ -84,7 +84,7 @@ describe('BlastResultsSummary', () => {
     expect(screen.getByTestId('blast-results-score-card').textContent).toContain('2');
   });
 
-  it('hides the percentile band until backend responds', () => {
+  it('hides the brag card until backend percentile resolves', () => {
     const { rerender } = render(
       <BlastResultsSummary
         results={makeResults({ percentile: undefined })}
@@ -93,7 +93,8 @@ describe('BlastResultsSummary', () => {
         onQuit={noop}
       />,
     );
-    expect(screen.queryByTestId('blast-results-percentile')).toBeNull();
+    // Card is now the BragCard — keyed off percentile availability.
+    expect(screen.queryByTestId('blast-brag-card')).toBeNull();
 
     rerender(
       <BlastResultsSummary
@@ -103,9 +104,9 @@ describe('BlastResultsSummary', () => {
         onQuit={noop}
       />,
     );
-    const band = screen.getByTestId('blast-results-percentile');
-    // 88th percentile → top 12% (100 - 88).
-    expect(band.textContent).toContain('12');
+    const card = screen.getByTestId('blast-brag-card');
+    // Interpolated "beats {pct}" line carries the raw percentile value.
+    expect(card.textContent).toContain('88');
   });
 
   it('shows PB delta + new-record ribbon only when previous best beaten', () => {
@@ -152,6 +153,32 @@ describe('BlastResultsSummary', () => {
     expect(fresh.textContent).toContain('blast.results.newBadge');
     const old = screen.getByTestId('blast-badge-comboChain');
     expect(old.textContent).not.toContain('blast.results.newBadge');
+  });
+
+  it('renders mascot image matching results priority ladder', () => {
+    // PB beaten → celebrating mascot
+    const { rerender } = render(
+      <BlastResultsSummary
+        results={makeResults({ finalScore: 9000, previousBest: 6000, maxCombo: 3, wavesCompleted: 2 })}
+        t={t}
+        onPlayAgain={noop}
+        onQuit={noop}
+      />,
+    );
+    const celebrating = screen.getByTestId('blast-results-mascot') as HTMLImageElement;
+    expect(celebrating.src).toContain('mascot-new-trophy');
+
+    // Flameout → sadSmile
+    rerender(
+      <BlastResultsSummary
+        results={makeResults({ finalScore: 200, previousBest: 6000, maxCombo: 1, wavesCompleted: 1 })}
+        t={t}
+        onPlayAgain={noop}
+        onQuit={noop}
+      />,
+    );
+    const sad = screen.getByTestId('blast-results-mascot') as HTMLImageElement;
+    expect(sad.src).toContain('mascot-new-oops');
   });
 
   it('invokes callbacks for play-again and quit', () => {

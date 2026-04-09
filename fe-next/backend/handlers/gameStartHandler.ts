@@ -97,6 +97,7 @@ function buildStartGamePayload(
   if (resolvedMode === 'blast') {
     payload.blastTileOverlay = game?.blastModeState?.overlay || [];
     payload.blastSeed = game?.blastModeState?.seed ?? null;
+    payload.blastWave = game?.blastModeState?.wave ?? 1;
   }
 
   if (resolvedMode === 'word-hunt') {

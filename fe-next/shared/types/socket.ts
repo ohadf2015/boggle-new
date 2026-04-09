@@ -225,7 +225,7 @@ export interface ServerToClientEvents {
   'scorecard:error': (data: { message: string; code?: string }) => void;
 
   // Blast multiplayer events
-  blastWordAccepted: (data: BlastWordAcceptedPayload) => void;
+  // Note: blastWordAccepted was merged into wordAccepted (see wordHandler.mergedEmits.test.ts)
   blastComboSync: (data: BlastComboSyncPayload) => void;
 
   // Spectator events
@@ -678,17 +678,6 @@ export interface EngagementStatus {
 }
 
 // ==================== Blast Multiplayer Types ====================
-
-export interface BlastWordAcceptedPayload {
-  word: string;
-  score: number;
-  tileBonus: number;
-  tilesCleared: BlastTileType[];
-  movesUsed: number;
-  bonusMove: boolean;
-  comboLevel: number;
-  comboType?: string | null;
-}
 
 export interface BlastComboSyncPayload {
   comboType: string;

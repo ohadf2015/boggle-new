@@ -359,4 +359,10 @@ export interface BlastModeState {
   tileStates?: BlastTileState[][];
   /** Tracks total moves across all players for seeded RNG sequencing */
   totalMoves?: number;
+  /**
+   * Wave number used to generate the overlay / distribution. Persisted so
+   * server word-validation and client engine both use the same value the
+   * overlay was rolled against (prevents overlay ↔ rules divergence).
+   */
+  wave?: number;
 }

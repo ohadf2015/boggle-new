@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useRef, useCallback } from 'react';
+// NOTE: Debris cleanup is driven solely by the RAF sweep below (age > DEBRIS_LIFETIME).
+// No per-fragment setTimeout backups — they duplicate work the RAF tick already does.
 import { Graphics, Container } from 'pixi.js';
 import { PhysicsWorld } from '@/lib/gameEngine/PhysicsWorld';
 import { SHATTER_COLORS, RAINBOW_DEBRIS_COLORS } from './blastColorTokens';
@@ -32,44 +34,53 @@ const CROSS_DIRECTIONS = [
 
 export function useBlastDebris(
   cellSize: number,
-  _gridSize: number,
+  gridSize: number,
   camera: Container,
   physics: PhysicsWorld,
 ) {
   const debrisRef = useRef<DebrisFragment[]>([]);
   const debrisContainerRef = useRef<Container | null>(null);
+  const wallBodyIdsRef = useRef<number[]>([]);
   const lightningIntervalsRef = useRef<Set<ReturnType<typeof setInterval>>>(new Set());
   const lightningRafsRef = useRef<Set<number>>(new Set());
   const lightningGraphicsRef = useRef<Set<Graphics>>(new Set());
-  const cleanupTimersRef = useRef<Set<ReturnType<typeof setTimeout>>>(new Set());
   const mountedRef = useRef(true);
 
-  // Idempotent destroy for a single debris fragment (by bodyId + graphic ref)
-  const destroyFragment = useCallback((bodyId: number, g: Graphics) => {
-    const idx = debrisRef.current.findIndex(f => f.bodyId === bodyId);
-    if (idx >= 0) debrisRef.current.splice(idx, 1);
-    try { physics.removeBody(bodyId); } catch { /* body already gone */ }
-    if (!g.destroyed) g.destroy();
-  }, [physics]);
-
-  // Schedule backup cleanup — guarantees a fragment dies even if RAF tick stalls
-  const scheduleFragmentCleanup = useCallback((bodyId: number, g: Graphics, lifetimeSec: number) => {
-    const tid = setTimeout(() => {
-      cleanupTimersRef.current.delete(tid);
-      destroyFragment(bodyId, g);
-    }, lifetimeSec * 1000 + 250);
-    cleanupTimersRef.current.add(tid);
-  }, [destroyFragment]);
-
-  // Create debris container on mount
+  // Create debris container + static walls on mount
   useEffect(() => {
     const container = new Container();
     camera.addChild(container);
     debrisContainerRef.current = container;
+
+    // Static collision walls — floor + left + right so debris bounces
+    // and never escapes the play area. Walls extend past the board so
+    // high-velocity fragments don't tunnel around corners.
+    const boardPx = gridSize * cellSize;
+    const thickness = 40;
+    const overshoot = 200;
+    const floorId = physics.createWall(
+      boardPx / 2,
+      boardPx + thickness / 2,
+      boardPx + overshoot,
+      thickness,
+    );
+    const leftId = physics.createWall(
+      -thickness / 2,
+      boardPx / 2,
+      thickness,
+      boardPx + overshoot,
+    );
+    const rightId = physics.createWall(
+      boardPx + thickness / 2,
+      boardPx / 2,
+      thickness,
+      boardPx + overshoot,
+    );
+    wallBodyIdsRef.current = [floorId, leftId, rightId];
+
     const intervals = lightningIntervalsRef.current;
     const rafs = lightningRafsRef.current;
     const bolts = lightningGraphicsRef.current;
-    const timers = cleanupTimersRef.current;
     return () => {
       mountedRef.current = false;
       for (const d of debrisRef.current) {
@@ -77,12 +88,14 @@ export function useBlastDebris(
         if (!d.graphic.destroyed) d.graphic.destroy();
       }
       debrisRef.current = [];
+      for (const wid of wallBodyIdsRef.current) {
+        try { physics.removeBody(wid); } catch { /* noop */ }
+      }
+      wallBodyIdsRef.current = [];
       for (const iid of intervals) clearInterval(iid);
       intervals.clear();
       for (const rid of rafs) cancelAnimationFrame(rid);
       rafs.clear();
-      for (const tid of timers) clearTimeout(tid);
-      timers.clear();
       for (const bolt of bolts) {
         if (!bolt.destroyed) bolt.destroy();
       }
@@ -90,7 +103,7 @@ export function useBlastDebris(
       camera.removeChild(container);
       container.destroy();
     };
-  }, [camera, physics]);
+  }, [camera, physics, cellSize, gridSize]);
 
   // Debris sync: update PixiJS Graphics positions from Matter.js bodies each frame
   useEffect(() => {
@@ -169,9 +182,8 @@ export function useBlastDebris(
       });
 
       debrisRef.current.push({ bodyId, graphic: g, color: colorNum, size, createdAt: now });
-      scheduleFragmentCleanup(bodyId, g, DEBRIS_LIFETIME);
     }
-  }, [physics, scheduleFragmentCleanup]);
+  }, [physics]);
 
   // Draw jagged lightning bolt down a column with rapid flash
   const spawnLightningBolt = useCallback((col: number, gridRows: number) => {
@@ -288,10 +300,9 @@ export function useBlastDebris(
         });
 
         debrisRef.current.push({ bodyId, graphic: g, color, size: w, createdAt: now });
-        scheduleFragmentCleanup(bodyId, g, DEBRIS_LIFETIME);
       }
     }
-  }, [cellSize, physics, scheduleFragmentCleanup]);
+  }, [cellSize, physics]);
 
   // Spawn debris fragments for cleared tiles
   const spawnDebris = useCallback((tiles: ClearedTileEvent[]) => {
@@ -341,14 +352,71 @@ export function useBlastDebris(
         });
 
         debrisRef.current.push({ bodyId, graphic: g, color: colorNum, size, createdAt: now });
-        scheduleFragmentCleanup(bodyId, g, DEBRIS_LIFETIME);
       }
     }
 
     if (hasBomb) {
       physics.applyExplosion(bombPos, 0.003, cellSize * 3);
     }
-  }, [cellSize, physics, scheduleFragmentCleanup]);
+  }, [cellSize, physics]);
 
-  return { spawnDebris, spawnLightningDebris, spawnLightningBolt, spawnPrismDebris };
+  // ─── Wave-clear radial burst ─────────────────────────────────────
+  // Spawns a ring of fresh debris fragments at the center then fires
+  // an explosion force — pushes the new fragments (and any existing
+  // debris within radius) radially outward. Called when a wave clears.
+  const spawnWaveClearBurst = useCallback(
+    (cx: number, cy: number, radius: number) => {
+      const container = debrisContainerRef.current;
+      if (!container) return;
+
+      const budget = MAX_DEBRIS - debrisRef.current.length;
+      const count = Math.min(24, budget);
+      if (count <= 0) return;
+
+      const now = performance.now() / 1000;
+      const rainbow = RAINBOW_DEBRIS_COLORS;
+
+      for (let i = 0; i < count; i++) {
+        const angle = (i / count) * Math.PI * 2;
+        const r = radius * 0.35 * (0.6 + Math.random() * 0.4);
+        const x = cx + Math.cos(angle) * r;
+        const y = cy + Math.sin(angle) * r;
+        const size = 4 + Math.random() * 4;
+        const colorHex = rainbow[i % rainbow.length];
+        const colorNum = parseInt(colorHex.replace('#', ''), 16);
+
+        const g = new Graphics();
+        g.rect(-size / 2, -size / 2, size, size).fill({ color: colorNum });
+        g.x = x;
+        g.y = y;
+        container.addChild(g);
+
+        const bodyId = physics.createRect(x, y, size, size, {
+          restitution: 0.5,
+          frictionAir: 0.012,
+          density: 0.0015,
+        });
+
+        debrisRef.current.push({
+          bodyId,
+          graphic: g,
+          color: colorNum,
+          size,
+          createdAt: now,
+        });
+      }
+
+      // Fire after spawning so new fragments get pushed too.
+      physics.applyExplosion({ x: cx, y: cy }, 0.004, radius);
+    },
+    [physics],
+  );
+
+  return {
+    spawnDebris,
+    spawnLightningDebris,
+    spawnLightningBolt,
+    spawnPrismDebris,
+    spawnWaveClearBurst,
+  };
 }

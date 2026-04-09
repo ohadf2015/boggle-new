@@ -4,10 +4,17 @@
  * MP: server timer controls end, but dead-end still triggers locally.
  */
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { planSugarCrush } from '../utils/blastSugarCrush';
-import type { BlastResultsData, BlastTileState } from '../types';
+import type { BlastResultsData, BlastTileState, BlastTileType } from '../types';
 import type { WaveConfig } from '../utils/blastWaveConfig';
+
+/** Shape we pass to the debris spawner for the dead-end finale burst. */
+export interface DeadEndFinaleTile {
+  row: number;
+  col: number;
+  type: BlastTileType;
+}
 
 interface GameEndDeps {
   engine: {
@@ -29,6 +36,8 @@ interface GameEndDeps {
   objectives: { allObjectivesComplete: boolean };
   onGameEnd: (results: BlastResultsData) => void;
   onWaveComplete?: (score: number, words: string[], clearPct: number) => void;
+  /** Fires after Sugar Crush with every non-cleared tile, so the view can trigger a finale debris burst. */
+  onDeadEndFinale?: (tiles: DeadEndFinaleTile[]) => void;
   maxCombo: number;
   sounds: {
     playSpecialTileSound: (type: string) => void;
@@ -52,6 +61,7 @@ export function useBlastGameEnd(deps: GameEndDeps) {
   useEffect(() => { depsRef.current = deps; }, [deps]);
 
   const sugarCrushRunningRef = useRef(false);
+  const [sugarCrushActive, setSugarCrushActive] = useState(false);
 
   // IMPORTANT: Do NOT include `engine` in deps — Sugar Crush mutates tileStates which would
   // recreate the engine object, cancel the async loop via cleanup, and restart it infinitely.
@@ -78,6 +88,7 @@ export function useBlastGameEnd(deps: GameEndDeps) {
     if (engine.gameState.isDeadEnd) {
       if (sugarCrushRunningRef.current) return undefined;
       sugarCrushRunningRef.current = true;
+      setSugarCrushActive(true);
 
       let cancelled = false;
 
@@ -115,8 +126,32 @@ export function useBlastGameEnd(deps: GameEndDeps) {
 
         if (cancelled) return;
 
-        // End game — read latest deps
+        // Finale burst: flag all remaining tiles for a debris/shockwave explosion
+        // before the game-end transition unmounts the canvas.
         const latestDeps = depsRef.current;
+        if (latestDeps.onDeadEndFinale) {
+          const finalTiles = engine.getLatestState().tileStates;
+          const remaining: DeadEndFinaleTile[] = [];
+          for (let r = 0; r < finalTiles.length; r++) {
+            const row = finalTiles[r];
+            for (let c = 0; c < row.length; c++) {
+              const tile = row[c];
+              if (tile && !tile.isCleared) {
+                remaining.push({ row: r, col: c, type: tile.type });
+              }
+            }
+          }
+          if (remaining.length > 0) {
+            latestDeps.onDeadEndFinale(remaining);
+            // Give debris time to render + physics to fling before phase transition.
+            await new Promise<void>(r => setTimeout(r, 1400));
+            if (cancelled) return;
+          }
+        }
+
+        setSugarCrushActive(false);
+
+        // End game — read latest deps
         const { score, wordsFound, tilesCleared, totalTiles } = engine.gameState;
         const clearPct = totalTiles > 0 ? Math.min(100, Math.round((tilesCleared / totalTiles) * 100)) : 0;
         const scoreThreshold = latestDeps.waveConfig?.scoreThreshold;
@@ -141,4 +176,6 @@ export function useBlastGameEnd(deps: GameEndDeps) {
     isMultiplayer,
     gridSize,
   ]);
+
+  return { sugarCrushActive };
 }

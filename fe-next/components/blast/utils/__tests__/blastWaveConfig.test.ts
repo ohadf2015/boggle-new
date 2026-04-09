@@ -1,7 +1,7 @@
 /**
  * blastWaveConfig - Pure function tests for wave scaling configuration.
  */
-import { getWaveConfig, getWaveDistribution, type WaveConfig } from '../blastWaveConfig';
+import { getWaveConfig, getWaveDistribution, getWaveObjectives, type WaveConfig } from '../blastWaveConfig';
 
 describe('getWaveConfig', () => {
   it('returns WaveConfig for wave 1', () => {
@@ -384,7 +384,7 @@ describe('getWaveConfig archetype', () => {
     expect(getWaveConfig(11).archetype).toBe('scoreRush');
   });
 
-  it('wave 12 is a survival wave (master tier, 4 moves)', () => {
+  it('wave 12 is a survival wave (master tier)', () => {
     expect(getWaveConfig(12).archetype).toBe('survival');
   });
 
@@ -398,5 +398,63 @@ describe('getWaveConfig archetype', () => {
     for (let wave = 1; wave <= 12; wave++) {
       expect(known.has(getWaveConfig(wave).archetype)).toBe(true);
     }
+  });
+});
+
+describe('wave completability invariants', () => {
+  /**
+   * Max sustainable score per move, derived from blast scoring:
+   *   base score (5-letter word) = 50, + cascade/gold/combo stacks ≈ 2.4x average
+   *   → ~120/move is the ceiling a skilled player can hit EVERY move.
+   * Used as a feasibility ceiling: threshold > moves * this => uncompletable in practice.
+   */
+  const MAX_FEASIBLE_PER_MOVE = 120;
+
+  /**
+   * Tiles clearable per move upper bound (word path + cascade refills + 1 bomb chain).
+   * Used to verify clear_percent objectives are reachable.
+   */
+  const MAX_TILES_PER_MOVE = 4;
+  const GRID_TILES = 16; // 4x4 default blast board
+
+  const WAVES_UNDER_TEST = Array.from({ length: 30 }, (_, i) => i + 1);
+
+  describe.each(WAVES_UNDER_TEST)('wave %i', (wave) => {
+    it('scoreThreshold is reachable within movesAllowed', () => {
+      const config = getWaveConfig(wave);
+      const threshold = config.scoreThreshold ?? 0;
+      expect(threshold).toBeLessThanOrEqual(config.movesAllowed * MAX_FEASIBLE_PER_MOVE);
+    });
+
+    it('clear_percent objective is reachable given movesAllowed', () => {
+      const config = getWaveConfig(wave);
+      const objectives = getWaveObjectives(wave);
+      const clearPct = objectives.find((o) => o.type === 'clear_percent');
+      if (!clearPct) return;
+      const tilesRequired = Math.ceil((GRID_TILES * clearPct.target) / 100);
+      expect(tilesRequired).toBeLessThanOrEqual(config.movesAllowed * MAX_TILES_PER_MOVE);
+    });
+
+    it('collect_type objectives do not demand more specials than movesAllowed', () => {
+      const config = getWaveConfig(wave);
+      const objectives = getWaveObjectives(wave);
+      const collects = objectives.filter((o) => o.type === 'collect_type');
+      for (const c of collects) {
+        expect(c.target).toBeLessThanOrEqual(config.movesAllowed);
+      }
+    });
+
+    it('word_length objectives do not demand more long words than movesAllowed', () => {
+      const config = getWaveConfig(wave);
+      const objectives = getWaveObjectives(wave);
+      const wordLen = objectives.filter((o) => o.type === 'word_length');
+      for (const w of wordLen) {
+        expect(w.target).toBeLessThanOrEqual(config.movesAllowed);
+      }
+    });
+
+    it('movesAllowed is at least 4 (minimum playable wave length)', () => {
+      expect(getWaveConfig(wave).movesAllowed).toBeGreaterThanOrEqual(4);
+    });
   });
 });

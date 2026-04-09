@@ -177,7 +177,7 @@ export function useHostGameEvents({
     if (!socket) return;
 
     const handleStartGame = (data: StartGameBroadcast) => {
-      const extData = data as StartGameBroadcast & { gameSessionId?: number; reconnect?: boolean; gameMode?: string; blastTileOverlay?: any; blastSeed?: number | null; wordHuntTargetLength?: number; wordHuntPlayerLives?: Record<string, number>; wordHuntEliminatedPlayers?: string[] };
+      const extData = data as StartGameBroadcast & { gameSessionId?: number; reconnect?: boolean; gameMode?: string; blastTileOverlay?: any; blastSeed?: number | null; blastWave?: number; wordHuntTargetLength?: number; wordHuntPlayerLives?: Record<string, number>; wordHuntEliminatedPlayers?: string[] };
 
       // Validate session ID - ignore stale startGame from previous sessions
       if (gameSessionIdRef.current !== null && extData.gameSessionId !== undefined &&
@@ -221,6 +221,9 @@ export function useHostGameEvents({
         store.setBlastMovesUsed(0);
         if (extData.blastSeed != null) {
           store.setBlastSeed(extData.blastSeed);
+        }
+        if (extData.blastWave != null) {
+          store.setBlastWave(extData.blastWave);
         }
       }
 

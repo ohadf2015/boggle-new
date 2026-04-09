@@ -175,12 +175,15 @@ export async function POST(request: NextRequest) {
       console.error('[BLAST API] Profile stats update error (non-fatal):', profileError);
     }
 
-    // Award XP based on difficulty and score performance
-    // Easy: 30, Medium: 50, Hard: 80 base + score bonus (capped at 150)
+    // Award XP based on difficulty and score performance.
+    // Per-difficulty cap preserves the progression gradient — previously a flat
+    // 150 cap meant a great Easy run earned as much as a great Hard run.
     const BLAST_XP_BASE: Record<string, number> = { easy: 30, medium: 50, hard: 80 };
+    const BLAST_XP_CAP: Record<string, number> = { easy: 100, medium: 175, hard: 250 };
     const baseXp = BLAST_XP_BASE[data.difficulty] ?? 30;
-    const scoreBonus = Math.min(70, Math.floor(data.score / 100));
-    const xpToAward = Math.min(Math.round(baseXp + scoreBonus), 150);
+    const cap = BLAST_XP_CAP[data.difficulty] ?? 100;
+    const scoreBonus = Math.min(cap - baseXp, Math.floor(data.score / 100));
+    const xpToAward = Math.min(Math.round(baseXp + scoreBonus), cap);
     let xpAwarded = 0;
 
     if (xpToAward > 0) {

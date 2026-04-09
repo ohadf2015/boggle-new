@@ -13,6 +13,9 @@ import { useBlastObjectives } from './hooks/useBlastObjectives';
 import { useBlastComboStreak, getComboWindowMs } from './hooks/useBlastComboStreak';
 import { useBlastSequencer } from './hooks/useBlastSequencer';
 import { BlastStage } from './BlastStage';
+import { BlastWaveIntro } from './BlastWaveIntro';
+import { BlastSugarCrushFinale } from './BlastSugarCrushFinale';
+import { BlastMoveWarningMascot } from './BlastMoveWarningMascot';
 import { GameParticles } from '@/components/effects/GameParticles';
 import { detectSpecialCombos, type BlastComboType, type SpecialCombo } from './utils/blastCombos';
 import { getWaveObjectives, type WaveConfig } from './utils/blastWaveConfig';
@@ -22,7 +25,7 @@ import { useDictionaryCache } from '@/hooks/useDictionaryCache';
 import { vibrateBlastBomb, vibrateBlastLightning, vibrateBlastPrism } from '@/components/grid/hapticFeedback';
 import { detectNearMiss } from './utils/blastNearMiss';
 import { useBlastCascade } from './hooks/useBlastCascade';
-import { useBlastGameEnd } from './hooks/useBlastGameEnd';
+import { useBlastGameEnd, type DeadEndFinaleTile } from './hooks/useBlastGameEnd';
 import { useBlastObjectiveEffects } from './hooks/useBlastObjectiveEffects';
 import type { ScoreFlyEvent } from './BlastScoreFly';
 import type { ClearedTileEvent } from './BlastEffectsCanvas';
@@ -232,13 +235,21 @@ export function BlastGame({
     const avgCol = path.reduce((s, p) => s + p.col, 0) / path.length;
     const flyId = `fly-${++flyIdRef.current}`;
     const tier: 1 | 2 | 3 = result.score >= 25 ? 3 : result.score >= 10 ? 2 : 1;
-    // Dominant non-standard tile type for color-coding the score fly
-    const specialTypes = clearedInfo.map(c => c.type).filter(t => t !== 'standard');
-    const dominantTileType = specialTypes.length > 0
-      ? specialTypes.sort((a, b) =>
-          specialTypes.filter(t => t === b).length - specialTypes.filter(t => t === a).length
-        )[0]
-      : undefined;
+    // Dominant non-standard tile type for color-coding the score fly.
+    // Single-pass frequency count — previously used a sort with a comparator
+    // that re-filtered the array on every comparison (O(N²)·log N).
+    let dominantTileType: string | undefined;
+    let dominantCount = 0;
+    const typeFreq = new Map<string, number>();
+    for (const c of clearedInfo) {
+      if (c.type === 'standard') continue;
+      const next = (typeFreq.get(c.type) ?? 0) + 1;
+      typeFreq.set(c.type, next);
+      if (next > dominantCount) {
+        dominantCount = next;
+        dominantTileType = c.type;
+      }
+    }
     setScoreFlyEvents(prev => [...prev.slice(-2), {
       id: flyId, score: result.score,
       startX: ((avgCol + 0.5) / config.gridSize) * 100,
@@ -423,12 +434,25 @@ export function BlastGame({
     explosionShakeTimerRef, flyIdRef,
   });
 
+  // Dead-end finale: flag every leftover tile as a 'bomb' event so spawnDebris routes
+  // them through physics.applyExplosion — no new physics code, maximum visual payoff.
+  const handleDeadEndFinale = useCallback((tiles: DeadEndFinaleTile[]) => {
+    setClearedTilesForEffects(tiles.map(t => ({
+      row: t.row, col: t.col, type: 'bomb' as BlastTileType,
+    })));
+    sounds.playSpecialTileSound('bomb');
+    if (explosionShakeTimerRef.current) clearTimeout(explosionShakeTimerRef.current);
+    setExplosionShake(3);
+    explosionShakeTimerRef.current = setTimeout(() => setExplosionShake(0), 800);
+  }, [sounds]);
+
   // Game end detection + Sugar Crush (extracted to useBlastGameEnd)
-  useBlastGameEnd({
+  const { sugarCrushActive } = useBlastGameEnd({
     engine, isMultiplayer, gridSize: config.gridSize,
     waveConfig, objectives, onGameEnd, onWaveComplete,
     maxCombo: combo.maxCombo, sounds,
     setExplosionShake, explosionShakeTimerRef,
+    onDeadEndFinale: handleDeadEndFinale,
   });
 
   // Loading state — wait for both grid generation AND dictionary cache
@@ -451,6 +475,14 @@ export function BlastGame({
       <GameParticles preset="wordFound" trigger={wordFoundParticle} />
       <GameParticles preset="comboBreak" trigger={comboParticle} />
       <GameParticles preset="victory" trigger={waveClearParticle} />
+
+      {waveConfig?.archetype && (
+        <BlastWaveIntro waveNumber={waveNumber} archetype={waveConfig.archetype} t={tAdapter} />
+      )}
+
+      <BlastSugarCrushFinale active={sugarCrushActive} t={tAdapter} />
+
+      <BlastMoveWarningMascot movesRemaining={engine.gameState.movesRemaining} t={tAdapter} />
 
       <BlastStage
         grid={engine.grid}

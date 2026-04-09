@@ -138,6 +138,30 @@ vi.mock('../../../backend/modules/blastModeManager', () => ({
   calculateBlastTileBonus: vi.fn().mockReturnValue(0),
   getTilesOnPath: vi.fn().mockReturnValue([]),
   recordBlastMove: vi.fn().mockReturnValue(null),
+  getWordPath: vi.fn().mockReturnValue([]),
+  isBlastBoardCleared: vi.fn().mockReturnValue(false),
+}));
+
+vi.mock('../../../backend/services/gameLifecycle/gameEnd', () => ({
+  endGame: vi.fn(),
+}));
+
+vi.mock('@/components/blast/utils/clearTilesProcessor', () => ({
+  processTilesForWord: vi.fn().mockReturnValue({
+    next: [[{ letter: 'A', type: 'standard', isCleared: true }]],
+    newlyClearedCount: 1,
+  }),
+}));
+
+vi.mock('@/components/blast/utils/blastGravity', () => ({
+  computeGravityResult: vi.fn().mockReturnValue({
+    newGrid: [['A']],
+    newTileStates: [[{ letter: 'A', type: 'standard', isCleared: true }]],
+  }),
+}));
+
+vi.mock('@/components/blast/utils/blastLetterGenerator', () => ({
+  createSeededRandom: vi.fn(() => () => 0.5),
 }));
 
 // Import mocks
@@ -146,7 +170,9 @@ import { isWordOnBoardAsync } from '../../../backend/modules/wordValidatorPool';
 import { isDictionaryWord, isValidWordCached } from '../../../backend/dictionary';
 import { isWordCommunityValid, isWordValidForScoring } from '../../../backend/modules/communityWordManager';
 import { broadcastToRoom } from '../../../backend/utils/socketHelpers';
-import { calculateBlastTileBonus, getTilesOnPath, recordBlastMove } from '../../../backend/modules/blastModeManager';
+import { calculateBlastTileBonus, getTilesOnPath, recordBlastMove, isBlastBoardCleared } from '../../../backend/modules/blastModeManager';
+import { endGame } from '../../../backend/services/gameLifecycle/gameEnd';
+import timerManager from '../../../backend/utils/timerManager';
 import { registerWordHandlers } from '../wordHandler';
 
 /** Helper to build a blast-mode game state */
@@ -261,6 +287,76 @@ describe('wordHandler - blastComboSync broadcast (52-02)', () => {
         comboType: 'lightning_prism',
         username: 'testUser',
       });
+    });
+  });
+
+  describe('win condition — board cleared (fix #6)', () => {
+    const blastStateWithBoard = {
+      overlay: [],
+      overlayMap: new Map(),
+      playerMoves: { testUser: 3 },
+      playerBonusMoves: { testUser: 0 },
+      playerStats: { testUser: { maxCombo: 0, gemsCollected: 0, wordsFound: [], bestWord: '', tilesCleared: 0, totalTileBonus: 0 } },
+      seed: 12345,
+      wave: 1,
+      totalMoves: 0,
+      grid: [['A']],
+      tileStates: [[{ letter: 'A', type: 'standard', isCleared: false }]],
+    };
+
+    it('should schedule a delayed endGame via timerManager when board is cleared', async () => {
+      (isBlastBoardCleared as Mock).mockReturnValue(true);
+      (getGame as Mock).mockReturnValue(makeBlastGame({ blastModeState: blastStateWithBoard }));
+
+      await handlers['submitWord']({ word: 'test' });
+
+      const setTimeoutMock = timerManager.setTimeout as unknown as Mock;
+      const scheduled = setTimeoutMock.mock.calls.find((call: any[]) => call[0] === 'blastEnd:BLAST1');
+      expect(scheduled).toBeDefined();
+      expect(typeof scheduled[1]).toBe('function');
+      expect(scheduled[2]).toBe(1500);
+    });
+
+    it('should NOT schedule endGame when board is not cleared', async () => {
+      (isBlastBoardCleared as Mock).mockReturnValue(false);
+      (getGame as Mock).mockReturnValue(makeBlastGame({ blastModeState: blastStateWithBoard }));
+
+      await handlers['submitWord']({ word: 'test' });
+
+      const setTimeoutMock = timerManager.setTimeout as unknown as Mock;
+      const scheduled = setTimeoutMock.mock.calls.find((call: any[]) => call[0] === 'blastEnd:BLAST1');
+      expect(scheduled).toBeUndefined();
+      expect(endGame as Mock).not.toHaveBeenCalled();
+    });
+
+    it('should call endGame inside the timer callback when game is still in-progress', async () => {
+      (isBlastBoardCleared as Mock).mockReturnValue(true);
+      (getGame as Mock).mockReturnValue(makeBlastGame({ blastModeState: blastStateWithBoard }));
+
+      await handlers['submitWord']({ word: 'test' });
+
+      const setTimeoutMock = timerManager.setTimeout as unknown as Mock;
+      const scheduled = setTimeoutMock.mock.calls.find((call: any[]) => call[0] === 'blastEnd:BLAST1');
+      expect(scheduled).toBeDefined();
+
+      // Invoke the scheduled callback — getGame still returns in-progress
+      scheduled[1]();
+      expect(endGame as Mock).toHaveBeenCalledWith(mockIo, 'BLAST1');
+    });
+
+    it('should NOT call endGame inside the timer callback when game already ended', async () => {
+      (isBlastBoardCleared as Mock).mockReturnValue(true);
+      (getGame as Mock).mockReturnValue(makeBlastGame({ blastModeState: blastStateWithBoard }));
+
+      await handlers['submitWord']({ word: 'test' });
+
+      const setTimeoutMock = timerManager.setTimeout as unknown as Mock;
+      const scheduled = setTimeoutMock.mock.calls.find((call: any[]) => call[0] === 'blastEnd:BLAST1');
+
+      // Simulate game having ended between schedule and fire
+      (getGame as Mock).mockReturnValue(makeBlastGame({ gameState: 'ended', blastModeState: blastStateWithBoard }));
+      scheduled[1]();
+      expect(endGame as Mock).not.toHaveBeenCalled();
     });
   });
 

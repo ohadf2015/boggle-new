@@ -211,6 +211,7 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
         onWordWithComboType={handleBlastWordWithCombo}
         initialTileStates={blastBridge.initialTileStates}
         blastSeed={blastBridge.blastSeed}
+        waveNumber={blastBridge.waveNumber}
       />
     );
   }

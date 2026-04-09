@@ -1,12 +1,13 @@
 'use client';
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { Star } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { BlastGame } from './BlastGame';
 import { BlastResultsSummary } from './BlastResultsSummary';
+import { useBlastCheckpoint } from './hooks/useBlastCheckpoint';
 import { getWaveConfig, getWaveDistribution } from './utils/blastWaveConfig';
 import { calculateEarnedStars } from './utils/blastStarCalculator';
 import { resolveBlastConfig, type BlastPhase, type BlastResultsData, type WaveResult } from './types';
@@ -27,23 +28,28 @@ export function BlastView() {
   const gameKeyRef = useRef(0);
 
   // Wave tracking
+  const checkpoint = useBlastCheckpoint();
   const [currentWave, setCurrentWave] = useState(1);
   const [totalScore, setTotalScore] = useState(0);
   const [allWordsFound, setAllWordsFound] = useState<string[]>([]);
   const [waveHistory, setWaveHistory] = useState<WaveResult[]>([]);
   const [lastWaveStats, setLastWaveStats] = useState({ score: 0, words: 0, clearPct: 0 });
 
-  const baseConfig = resolveBlastConfig((language as Language) || 'en', 'medium');
-
-  // Apply wave-specific overrides
+  // Apply wave-specific overrides.
+  // `config` is memoized so BlastGame doesn't see a new object reference on
+  // every BlastView render (e.g. phase flips, score ticks). A fresh config
+  // prop would invalidate every downstream memo + effect dep that touches it.
   const waveConfig = getWaveConfig(currentWave);
-  const config = {
-    ...baseConfig,
-    specialTileChance: waveConfig.specialTileChance,
-    customDistribution: getWaveDistribution(waveConfig),
-    // Always shrink — cleared cells stay empty so full board clear is achievable
-    boardClearMode: 'shrink' as const,
-  };
+  const config = useMemo(
+    () => ({
+      ...resolveBlastConfig((language as Language) || 'en', 'medium'),
+      specialTileChance: waveConfig.specialTileChance,
+      customDistribution: getWaveDistribution(waveConfig),
+      // Always shrink — cleared cells stay empty so full board clear is achievable
+      boardClearMode: 'shrink' as const,
+    }),
+    [language, waveConfig],
+  );
 
   /** Wave completed — transition to next wave */
   const handleWaveComplete = useCallback((waveScore: number, waveWords: string[], clearPct: number) => {
@@ -57,8 +63,9 @@ export function BlastView() {
     setAllWordsFound(prev => [...prev, ...waveWords]);
     setWaveHistory(prev => [...prev, waveResult]);
     setLastWaveStats({ score: waveScore, words: waveWords.length, clearPct });
+    checkpoint.recordWaveReached(currentWave);
     setPhase('waveTransition');
-  }, [currentWave]);
+  }, [currentWave, checkpoint]);
 
   /** Game ended */
   const handleGameEnd = useCallback((resultsData: BlastResultsData) => {
@@ -98,8 +105,14 @@ export function BlastView() {
   }, []);
 
   const handleStart = useCallback(() => {
+    setCurrentWave(1);
     setPhase('playing');
   }, []);
+
+  const handleResume = useCallback(() => {
+    setCurrentWave(checkpoint.resumeFromWave);
+    setPhase('playing');
+  }, [checkpoint.resumeFromWave]);
 
   const handlePlayAgain = useCallback(() => {
     setResults(null);
@@ -125,6 +138,16 @@ export function BlastView() {
           <p className="text-sm text-white/60 text-center max-w-xs">
             {t('blast.ready.subtitle')}
           </p>
+          {checkpoint.checkpoint && checkpoint.resumeFromWave > 1 && (
+            <Button
+              data-testid="resume-button"
+              size="lg"
+              onClick={handleResume}
+              className="min-h-[56px] w-full max-w-xs font-black text-xl uppercase border-3 border-neo-black shadow-hard-lg bg-neo-cyan text-neo-black hover:bg-neo-cyan/90"
+            >
+              {t('blast.ready.resume', { wave: checkpoint.resumeFromWave })}
+            </Button>
+          )}
           <Button
             data-testid="play-button"
             size="lg"

@@ -19,6 +19,7 @@ import DragReleaseHint from './grid/DragReleaseHint';
 import { useDisableEarthquakeEffects, useLargeLetters } from '@/contexts/AccessibilityContext';
 import { useDevicePerformance } from '../hooks/useDevicePerformance';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { useEarthquakeAnimation } from '../hooks/useEarthquakeAnimation';
 import GridCell, { type HighlightedCell } from './grid/GridCell';
 
@@ -91,6 +92,7 @@ const GridComponent = memo<GridComponentProps>(({
   ghostCells = false,
   isAdjacent,
 }) => {
+  const { t } = useLanguage();
   const [reduceMotion, setReduceMotion] = useState(false);
   const [performanceMode, setPerformanceMode] = useState<PerformanceMode>('full');
   const gridRef = useRef<HTMLDivElement>(null);
@@ -509,6 +511,7 @@ const GridComponent = memo<GridComponentProps>(({
                   onTouchStart={handleCellTouchStart}
                   onMouseDown={handleCellMouseDown}
                   onDoubleClick={handleCellDoubleClick}
+                  ariaLabel={t('game.grid.cellLabel', { row: i + 1, col: j + 1, letter: cell })}
                 />
               );
             })

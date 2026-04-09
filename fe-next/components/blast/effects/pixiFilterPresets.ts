@@ -11,7 +11,16 @@
  * ```
  */
 
-import { GlowFilter, OutlineFilter, BloomFilter, ShockwaveFilter } from 'pixi-filters';
+import {
+  GlowFilter,
+  OutlineFilter,
+  BloomFilter,
+  ShockwaveFilter,
+  RGBSplitFilter,
+  AdjustmentFilter,
+  ZoomBlurFilter,
+  AdvancedBloomFilter,
+} from 'pixi-filters';
 
 // ─── Neo-brutalist color constants ──────────────────────────────────────
 
@@ -130,6 +139,61 @@ export function createShockwaveFilter(
   };
 
   return { filter, animate, stop };
+}
+
+/**
+ * RGB channel split — classic chromatic aberration for impact moments.
+ * Animate the returned filter's `red`/`blue` offsets over time and reset to 0.
+ * @param amount - Pixel offset; 0 is a no-op, 4–10 reads as "punch"
+ */
+export function createRGBSplitFilter(amount = 0): InstanceType<typeof RGBSplitFilter> {
+  const filter = new RGBSplitFilter();
+  filter.red = [amount, 0];
+  filter.green = [0, 0];
+  // Avoid negative-zero when amount === 0 (breaks strict toEqual checks)
+  filter.blue = [amount === 0 ? 0 : -amount, 0];
+  return filter;
+}
+
+/**
+ * HSL-ish adjustment — pump saturation/brightness/contrast for comic-book pop.
+ */
+export function createAdjustmentFilter(
+  opts: { saturation?: number; brightness?: number; contrast?: number } = {},
+): InstanceType<typeof AdjustmentFilter> {
+  return new AdjustmentFilter({
+    saturation: opts.saturation ?? 1,
+    brightness: opts.brightness ?? 1,
+    contrast: opts.contrast ?? 1,
+  });
+}
+
+/**
+ * Radial zoom blur — directs eye to origin during mega cascades / wave clears.
+ * Default strength is 0 so the filter is a no-op until animated.
+ */
+export function createZoomBlurFilter(
+  opts: { strength?: number; center?: [number, number]; innerRadius?: number } = {},
+): InstanceType<typeof ZoomBlurFilter> {
+  return new ZoomBlurFilter({
+    strength: opts.strength ?? 0,
+    center: opts.center ?? [0, 0],
+    innerRadius: opts.innerRadius ?? 0,
+  });
+}
+
+/**
+ * Advanced bloom — richer HDR-style glow than BloomFilter, with threshold control.
+ * @param intensity - 1 = mild, 4+ = wave-clear level
+ */
+export function createAdvancedBloomFilter(intensity = 1.5): InstanceType<typeof AdvancedBloomFilter> {
+  return new AdvancedBloomFilter({
+    threshold: 0.35,
+    bloomScale: 0.6 + intensity * 0.4,
+    brightness: 1,
+    blur: 6,
+    quality: 4,
+  });
 }
 
 // ─── Preset Combos ──────────────────────────────────────────────────────

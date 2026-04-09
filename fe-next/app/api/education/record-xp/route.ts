@@ -54,7 +54,19 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing lessonId' }, { status: 400 });
     }
 
-    const validTypes = ['flashcard', 'solo_board', 'lesson_completion', 'duel'];
+    // Keep in sync with PracticeSessionXp['type'] in backend/modules/educationXpManager.ts
+    const validTypes = [
+      'flashcard',
+      'solo_board',
+      'lesson_completion',
+      'matching',
+      'spelling',
+      'blitz',
+      'duel',
+      'duel_async',
+      'duel_realtime',
+      'daily_challenge',
+    ];
     if (!validTypes.includes(activityType)) {
       return NextResponse.json({ error: 'Invalid activityType' }, { status: 400 });
     }

@@ -1,0 +1,141 @@
+import { describe, it, expect, vi } from 'vitest';
+import { renderHook } from '@testing-library/react';
+
+// ─── Mocks ──────────────────────────────────────────────────────────────
+
+vi.mock('pixi.js', () => {
+  class MockGraphics {
+    x = 0;
+    y = 0;
+    rotation = 0;
+    alpha = 1;
+    destroyed = false;
+    visible = true;
+    rect() { return this; }
+    fill() { return this; }
+    moveTo() { return this; }
+    lineTo() { return this; }
+    stroke() { return this; }
+    setStrokeStyle() { return this; }
+    destroy() { this.destroyed = true; }
+  }
+  class MockContainer {
+    children: unknown[] = [];
+    destroyed = false;
+    addChild(c: unknown) { this.children.push(c); return c; }
+    removeChild(c: unknown) {
+      const i = this.children.indexOf(c);
+      if (i >= 0) this.children.splice(i, 1);
+    }
+    destroy() { this.destroyed = true; }
+  }
+  return { Graphics: MockGraphics, Container: MockContainer };
+});
+
+// Stable RAF shim — avoid infinite loops in jsdom
+let rafCb: FrameRequestCallback | null = null;
+vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback) => {
+  rafCb = cb;
+  return 1;
+});
+vi.stubGlobal('cancelAnimationFrame', () => { rafCb = null; });
+
+import { Container } from 'pixi.js';
+import { PhysicsWorld } from '@/lib/gameEngine/PhysicsWorld';
+import { useBlastDebris } from '../useBlastDebris';
+
+describe('useBlastDebris — static walls', () => {
+  it('creates floor + left/right wall static bodies on mount', () => {
+    const physics = new PhysicsWorld({ gravity: { x: 0, y: 1 } });
+    const camera = new Container();
+
+    const { unmount } = renderHook(() =>
+      useBlastDebris(40, 8, camera, physics),
+    );
+
+    const walls = physics
+      .getAllBodyStates()
+      .filter(b => b.label === 'wall');
+
+    expect(walls.length).toBeGreaterThanOrEqual(3);
+
+    unmount();
+  });
+
+  it('spawnWaveClearBurst spawns debris and pushes it radially', () => {
+    const physics = new PhysicsWorld({ gravity: { x: 0, y: 0 } });
+    const camera = new Container();
+
+    const { result, unmount } = renderHook(() =>
+      useBlastDebris(40, 8, camera, physics),
+    );
+
+    expect(typeof result.current.spawnWaveClearBurst).toBe('function');
+
+    const wallCount = physics
+      .getAllBodyStates()
+      .filter(b => b.label === 'wall').length;
+    const before = physics.getAllBodyStates().length - wallCount;
+
+    result.current.spawnWaveClearBurst(160, 160, 120);
+
+    const after = physics.getAllBodyStates().length - wallCount;
+    expect(after).toBeGreaterThan(before);
+
+    // Step physics — fragments should have gained non-zero velocity from explosion
+    physics.update(16.67);
+    const dynamic = physics
+      .getAllBodyStates()
+      .filter(b => b.label !== 'wall');
+    const moving = dynamic.some(
+      b => Math.abs(b.velocity.x) + Math.abs(b.velocity.y) > 0.01,
+    );
+    expect(moving).toBe(true);
+
+    unmount();
+  });
+
+  it('does not schedule per-fragment setTimeout backups when spawning debris', () => {
+    // Given — RAF tick already sweeps fragments by age. Per-fragment setTimeout
+    // backups are redundant and were removed for perf. This test pins that
+    // invariant so regressions are caught.
+    const physics = new PhysicsWorld({ gravity: { x: 0, y: 0 } });
+    const camera = new Container();
+    const setTimeoutSpy = vi.spyOn(globalThis, 'setTimeout');
+
+    const { result, unmount } = renderHook(() =>
+      useBlastDebris(40, 8, camera, physics),
+    );
+
+    const baseline = setTimeoutSpy.mock.calls.length;
+
+    // When — spawning debris via every path
+    result.current.spawnWaveClearBurst(160, 160, 120);
+    result.current.spawnPrismDebris(160, 160);
+    result.current.spawnDebris([{ row: 2, col: 2, type: 'standard' }]);
+    result.current.spawnLightningDebris([{ row: 3, col: 3, type: 'lightning' }]);
+
+    // Then — no new setTimeout calls beyond baseline
+    expect(setTimeoutSpy.mock.calls.length).toBe(baseline);
+
+    setTimeoutSpy.mockRestore();
+    unmount();
+  });
+
+  it('removes wall bodies on unmount', () => {
+    const physics = new PhysicsWorld({ gravity: { x: 0, y: 1 } });
+    const camera = new Container();
+
+    const { unmount } = renderHook(() =>
+      useBlastDebris(40, 8, camera, physics),
+    );
+    unmount();
+
+    const walls = physics
+      .getAllBodyStates()
+      .filter(b => b.label === 'wall');
+    expect(walls).toHaveLength(0);
+
+    physics.destroy();
+  });
+});

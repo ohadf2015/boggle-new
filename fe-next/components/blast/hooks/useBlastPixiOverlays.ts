@@ -1,0 +1,224 @@
+'use client';
+'use no memo'; // Disable React Compiler memoization — PixiJS camera mutations incompatible with compiler immutability rules
+
+// useBlastPixiOverlays — owns the Pixi v8 overlay pipeline for BlastEffectsCanvas:
+//   • Bloom + Shockwave camera filters (allocated once per camera mount)
+//   • Cross-flash highlight on prism activation
+//   • Combo pulse rings with per-ring rAF tracking
+//
+// All teardown paths guard `camera.destroyed` because Pixi v8 throws when
+// touching `.filters` / `removeChild` on a destroyed Container, but Graphics
+// instances must still be `.destroy()`'d to release GPU buffers.
+
+import { useCallback, useEffect, useRef } from 'react';
+import { Graphics, type Container } from 'pixi.js';
+import { BloomFilter, ShockwaveFilter } from 'pixi-filters';
+import { createGlowFilter } from '../effects/pixiFilterPresets';
+import { computePulseRingFrame, pulseRingTierColor } from '../effects/pulseRingCurve';
+import { isReducedMotionPreferred } from '@/utils/accessibility';
+
+interface UseBlastPixiOverlaysParams {
+  camera: Container;
+  width: number;
+  height: number;
+  gridSize: number;
+  cellSize: number;
+  chainLevel: number;
+}
+
+export function useBlastPixiOverlays({
+  camera,
+  width,
+  height,
+  gridSize,
+  cellSize,
+  chainLevel,
+}: UseBlastPixiOverlaysParams) {
+  const bloomRef = useRef<InstanceType<typeof BloomFilter> | null>(null);
+  const shockwaveRef = useRef<InstanceType<typeof ShockwaveFilter> | null>(null);
+  const shockwaveRafRef = useRef<number>(0);
+  const crossFlashRef = useRef<Graphics | null>(null);
+  const crossFlashRafRef = useRef<number>(0);
+  // Map ring → its current rAF id. Replaces the prior Set<number> + delete-then-add
+  // dance: each ring owns one frame at a time, so unmount cleanup just iterates.
+  const pulseRingsRef = useRef<Map<Graphics, number>>(new Map());
+
+  // ─── Bloom + Shockwave allocation ──────────────────────────────────────
+  // Single `camera.filters = [...]` assignment avoids spread churn on re-render.
+  useEffect(() => {
+    const bloom = new BloomFilter({ strength: 2, quality: 4 });
+    bloom.enabled = false;
+    bloomRef.current = bloom;
+
+    const sw = new ShockwaveFilter({
+      center: { x: 0, y: 0 }, // lazily updated in fireShockwave
+      radius: -1,
+      speed: 300,
+      amplitude: 20,
+      wavelength: 120,
+    });
+    sw.enabled = false;
+    shockwaveRef.current = sw;
+
+    const prev = Array.isArray(camera.filters) ? camera.filters : [];
+    /* eslint-disable react-hooks/immutability */
+    camera.filters = [...prev, bloom, sw];
+    return () => {
+      cancelAnimationFrame(shockwaveRafRef.current);
+      // Skip filter strip if camera was already destroyed — accessing
+      // `.filters` on a destroyed Container throws in Pixi v8.
+      if (!camera.destroyed) {
+        const filters = Array.isArray(camera.filters) ? camera.filters : [];
+        camera.filters = filters.filter(f => f !== bloom && f !== sw);
+      }
+      /* eslint-enable react-hooks/immutability */
+      bloom.destroy();
+      sw.destroy();
+      bloomRef.current = null;
+      shockwaveRef.current = null;
+    };
+  }, [camera]);
+
+  // ─── Cross flash + pulse rings unmount cleanup ─────────────────────────
+  useEffect(() => {
+    const cameraRef = camera;
+    const pulseRings = pulseRingsRef.current;
+    return () => {
+      cancelAnimationFrame(crossFlashRafRef.current);
+      const cameraAlive = !cameraRef.destroyed;
+      if (crossFlashRef.current) {
+        const prev = crossFlashRef.current;
+        if (cameraAlive && !prev.destroyed) {
+          try { cameraRef.removeChild(prev); } catch { /* */ }
+        }
+        if (!prev.destroyed) prev.destroy();
+        crossFlashRef.current = null;
+      }
+      for (const [ring, rafId] of pulseRings) {
+        cancelAnimationFrame(rafId);
+        if (ring.destroyed) continue;
+        if (cameraAlive) {
+          try { cameraRef.removeChild(ring); } catch { /* */ }
+        }
+        ring.destroy();
+      }
+      pulseRings.clear();
+    };
+  }, [camera]);
+
+  // ─── Bloom intensity follows chain level ───────────────────────────────
+  useEffect(() => {
+    const bloom = bloomRef.current;
+    if (!bloom) return;
+    if (chainLevel >= 1) {
+      bloom.enabled = true;
+      bloom.strength = 2 + chainLevel * 1.5;
+    } else {
+      bloom.enabled = false;
+    }
+  }, [chainLevel]);
+
+  // ─── Fire a shockwave from a point ─────────────────────────────────────
+  // Mutate center fields in place (no object alloc per call).
+  const fireShockwave = useCallback((cx: number, cy: number, amplitude = 20) => {
+    const sw = shockwaveRef.current;
+    if (!sw) return;
+    sw.center.x = cx;
+    sw.center.y = cy;
+    sw.time = 0;
+    sw.amplitude = amplitude;
+    sw.enabled = true;
+    const start = performance.now();
+    const duration = 600;
+    const tick = () => {
+      if (!shockwaveRef.current) return;
+      const t = Math.min((performance.now() - start) / duration, 1);
+      sw.time = t;
+      if (t < 1) {
+        shockwaveRafRef.current = requestAnimationFrame(tick);
+      } else {
+        sw.enabled = false;
+      }
+    };
+    shockwaveRafRef.current = requestAnimationFrame(tick);
+  }, []);
+
+  // ─── Cross flash (white lines fading over 300ms) ───────────────────────
+  const flashCross = useCallback((cx: number, cy: number) => {
+    // Destroy previous cross flash if still animating.
+    if (crossFlashRef.current) {
+      cancelAnimationFrame(crossFlashRafRef.current);
+      const prev = crossFlashRef.current;
+      if (!camera.destroyed && !prev.destroyed) {
+        try { camera.removeChild(prev); } catch { /* */ }
+      }
+      if (!prev.destroyed) prev.destroy();
+      crossFlashRef.current = null;
+    }
+    const g = new Graphics();
+    const lineLen = gridSize * cellSize;
+    g.rect(0, cy - 2, lineLen, 4).fill({ color: 0xffffff });
+    g.rect(cx - 2, 0, 4, lineLen).fill({ color: 0xffffff });
+    g.alpha = 0.9;
+    camera.addChild(g);
+    crossFlashRef.current = g;
+
+    const start = performance.now();
+    const duration = 300;
+    const fade = () => {
+      if (camera.destroyed || g.destroyed) {
+        crossFlashRef.current = null;
+        return;
+      }
+      const elapsed = performance.now() - start;
+      const t = Math.min(elapsed / duration, 1);
+      g.alpha = 0.9 * (1 - t);
+      if (t < 1) {
+        crossFlashRafRef.current = requestAnimationFrame(fade);
+      } else {
+        try { camera.removeChild(g); } catch { /* */ }
+        g.destroy();
+        crossFlashRef.current = null;
+      }
+    };
+    crossFlashRafRef.current = requestAnimationFrame(fade);
+  }, [camera, gridSize, cellSize]);
+
+  // ─── Combo pulse ring — expanding GlowFilter ring, lime→pink→cyan by tier
+  // Drawn as a stroked circle scaled by `computePulseRingFrame`. Each ring
+  // owns one rAF at a time, tracked in pulseRingsRef Map for cleanup.
+  const spawnPulseRing = useCallback((cx: number, cy: number, tier: number) => {
+    // Accessibility: honor prefers-reduced-motion. Skip entirely (additive
+    // glow bursts can't be safely "toned down" for users who opt out).
+    if (isReducedMotionPreferred()) return;
+    const g = new Graphics();
+    const baseRadius = Math.min(width, height) * 0.18;
+    g.circle(0, 0, baseRadius).stroke({ color: 0xffffff, width: 6, alpha: 1 });
+    g.x = cx;
+    g.y = cy;
+    g.filters = [createGlowFilter(pulseRingTierColor(tier), 3)];
+    camera.addChild(g);
+
+    const start = performance.now();
+    const duration = 450;
+    const step = () => {
+      if (camera.destroyed || g.destroyed) {
+        pulseRingsRef.current.delete(g);
+        return;
+      }
+      const frame = computePulseRingFrame((performance.now() - start) / duration);
+      g.scale.set(frame.scale);
+      g.alpha = frame.alpha;
+      if (frame.done) {
+        try { camera.removeChild(g); } catch { /* */ }
+        g.destroy();
+        pulseRingsRef.current.delete(g);
+        return;
+      }
+      pulseRingsRef.current.set(g, requestAnimationFrame(step));
+    };
+    pulseRingsRef.current.set(g, requestAnimationFrame(step));
+  }, [camera, width, height]);
+
+  return { fireShockwave, flashCross, spawnPulseRing };
+}

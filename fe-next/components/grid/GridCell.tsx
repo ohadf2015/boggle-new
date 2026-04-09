@@ -56,6 +56,8 @@ export interface GridCellProps {
   onDoubleClick: (e: React.MouseEvent) => void;
   /** Ghost mode: invisible cell for touch interaction only (blast mode overlay handles visuals) */
   ghost?: boolean;
+  /** Pre-localized aria-label built by parent via `t()` — keeps this memo free of context subscriptions */
+  ariaLabel: string;
 }
 
 const GridCell = memo<GridCellProps>(({
@@ -68,7 +70,7 @@ const GridCell = memo<GridCellProps>(({
   comboLevel, escalationCombo, comboColors, reduceMotion, animateOnMount, interactive,
   isSelecting, isDragging, isTypingMode, hintAnimationPhase,
   currentTier, selectedCellsLength,
-  onTouchStart, onMouseDown, onDoubleClick, ghost = false,
+  onTouchStart, onMouseDown, onDoubleClick, ghost = false, ariaLabel,
 }) => {
   // Empty cell — render invisible placeholder to maintain grid layout
   if (!cell) {
@@ -111,7 +113,7 @@ const GridCell = memo<GridCellProps>(({
     data-letter={cell}
     role="gridcell"
     aria-selected={isSelected}
-    aria-label={`Row ${row + 1}, Column ${col + 1}: Letter ${cell}`}
+    aria-label={ariaLabel}
     tabIndex={interactive ? 0 : -1}
     onTouchStart={onTouchStart}
     onMouseDown={onMouseDown}

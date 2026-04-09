@@ -216,7 +216,7 @@ function handleReconnection(io: Server, socket: Socket, game: GameState, gameCod
   if (isInProgress(game.gameState)) {
     const reconnectPayload: Record<string, any> = {
       letterGrid: game.letterGrid,
-      timerSeconds: game.remainingTime || game.timerSeconds,
+      timerSeconds: game.remainingTime ?? game.timerSeconds,
       language: game.language,
       minWordLength: game.minWordLength || 2,
       messageId: 'reconnect-' + Date.now(),
@@ -230,6 +230,7 @@ function handleReconnection(io: Server, socket: Socket, game: GameState, gameCod
     if (game.gameMode === 'blast' && game.blastModeState) {
       reconnectPayload.blastTileOverlay = game.blastModeState.overlay || [];
       reconnectPayload.blastSeed = game.blastModeState.seed ?? null;
+      reconnectPayload.blastWave = game.blastModeState.wave ?? 1;
       // Send player's moves-used count so client can restore correct state
       reconnectPayload.blastPlayerMoves = game.blastModeState.playerMoves || {};
       // Send current server-authoritative board state for MP sync
@@ -278,7 +279,7 @@ function handleLateJoin(socket: Socket, game: GameState, gameCode: string, usern
 
   const lateJoinPayload: Record<string, any> = {
     letterGrid: game.letterGrid,
-    timerSeconds: game.remainingTime || game.timerSeconds,
+    timerSeconds: game.remainingTime ?? game.timerSeconds,
     language: game.language,
     minWordLength: game.minWordLength || 2,
     messageId: 'late-join-' + Date.now(),
@@ -292,6 +293,7 @@ function handleLateJoin(socket: Socket, game: GameState, gameCode: string, usern
   if (game.gameMode === 'blast' && game.blastModeState) {
     lateJoinPayload.blastTileOverlay = game.blastModeState.overlay || [];
     lateJoinPayload.blastSeed = game.blastModeState.seed ?? null;
+    lateJoinPayload.blastWave = game.blastModeState.wave ?? 1;
     lateJoinPayload.blastPlayerMoves = game.blastModeState.playerMoves || {};
     if (game.blastModeState.grid) {
       lateJoinPayload.blastGrid = game.blastModeState.grid;

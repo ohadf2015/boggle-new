@@ -1,5 +1,5 @@
-import { vi, type Mock, } from 'vitest';
 // @ts-nocheck
+import { vi } from 'vitest';
 /**
  * Blast Result API Route Tests
  *
@@ -407,6 +407,7 @@ describe('POST /api/blast/result', () => {
     it('includes xpAwarded in the response', async () => {
       setupDbMocks();
       const res = await POST(makeRequest(validBody));
+      // Mock's xp_granted is 40 (set in this block's beforeEach) — response echoes that
       expect(res.data.xpAwarded).toBe(40);
     });
 
@@ -418,11 +419,52 @@ describe('POST /api/blast/result', () => {
       expect(res.data.success).toBe(true);
     });
 
-    it('caps XP at a maximum to prevent farming', async () => {
+    it('caps XP at per-difficulty maximum to prevent farming (medium)', async () => {
       setupDbMocks();
-      await POST(makeRequest({ ...validBody, score: 50000 }));
+      await POST(makeRequest({ ...validBody, difficulty: 'medium', score: 50000 }));
       const xpAmount = mockRpc.mock.calls[0]?.[1]?.p_xp_amount;
-      expect(xpAmount).toBeLessThanOrEqual(150);
+      expect(xpAmount).toBeLessThanOrEqual(175);
+    });
+
+    it('caps Easy XP at 100 regardless of score', async () => {
+      setupDbMocks();
+      await POST(makeRequest({ ...validBody, difficulty: 'easy', score: 50000 }));
+      const xpAmount = mockRpc.mock.calls[0]?.[1]?.p_xp_amount;
+      expect(xpAmount).toBe(100);
+    });
+
+    it('caps Medium XP at 175 regardless of score', async () => {
+      setupDbMocks();
+      await POST(makeRequest({ ...validBody, difficulty: 'medium', score: 50000 }));
+      const xpAmount = mockRpc.mock.calls[0]?.[1]?.p_xp_amount;
+      expect(xpAmount).toBe(175);
+    });
+
+    it('caps Hard XP at 250 regardless of score', async () => {
+      setupDbMocks();
+      await POST(makeRequest({ ...validBody, difficulty: 'hard', score: 50000 }));
+      const xpAmount = mockRpc.mock.calls[0]?.[1]?.p_xp_amount;
+      expect(xpAmount).toBe(250);
+    });
+
+    it('Hard cap exceeds Medium cap exceeds Easy cap (preserves progression gradient)', async () => {
+      // Use MAX_SCORE (50_000) — anything higher fails server validation and POST returns 400.
+      setupDbMocks();
+      await POST(makeRequest({ ...validBody, difficulty: 'easy', score: 50000 }));
+      const easyXp = mockRpc.mock.calls[0]?.[1]?.p_xp_amount;
+
+      mockRpc.mockClear();
+      setupDbMocks();
+      await POST(makeRequest({ ...validBody, difficulty: 'medium', score: 50000 }));
+      const medXp = mockRpc.mock.calls[0]?.[1]?.p_xp_amount;
+
+      mockRpc.mockClear();
+      setupDbMocks();
+      await POST(makeRequest({ ...validBody, difficulty: 'hard', score: 50000 }));
+      const hardXp = mockRpc.mock.calls[0]?.[1]?.p_xp_amount;
+
+      expect(easyXp).toBeLessThan(medXp);
+      expect(medXp).toBeLessThan(hardXp);
     });
   });
 

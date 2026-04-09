@@ -12,6 +12,15 @@ export type CollisionCallback = (
   bodyB: PhysicsBodyState,
 ) => void;
 
+/**
+ * Matter.js `Engine.update` recommends delta ≤ 1000/60 ms. Above this, the
+ * solver normalizes by `delta / _baseDelta`, which squares into position
+ * error — fast bodies tunnel through walls and constraints oscillate.
+ * We clamp the delta fed to the solver so a stalled frame behaves like
+ * slow-motion instead of diverging.
+ */
+const MAX_SAFE_DELTA_MS = 1000 / 60;
+
 export class PhysicsWorld {
   private engine: Matter.Engine;
   private bodyMap = new Map<number, Matter.Body>();
@@ -226,7 +235,11 @@ export class PhysicsWorld {
 
   /** Call each frame from the PixiJS ticker. delta in ms. */
   update(deltaMs: number): void {
-    Engine.update(this.engine, deltaMs);
+    // Clamp to matter-js's recommended max (1000/60 ms). Large deltas (tab
+    // stalls, long GC pauses) would otherwise destabilize the solver.
+    const safeDelta =
+      deltaMs > MAX_SAFE_DELTA_MS ? MAX_SAFE_DELTA_MS : deltaMs;
+    Engine.update(this.engine, safeDelta);
 
     // Check settled state
     if (this.settledCallbacks.length > 0) {

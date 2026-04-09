@@ -30,6 +30,7 @@ export interface EnrichedBadge {
   id: BlastBadgeId;
   icon: string;
   label: string;
+  desc: string;
   isNew: boolean;
 }
 
@@ -103,6 +104,7 @@ export function useBlastBadgeUnlocks({
         id: def.id,
         icon: def.icon,
         label: t(def.labelKey, def.id),
+        desc: t(def.descKey, ''),
         isNew: !initialOwned.has(def.id),
       })),
     [earnedIds, t, initialOwned],

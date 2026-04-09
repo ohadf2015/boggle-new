@@ -11,6 +11,7 @@ import type { BlastTileOverlay } from '@/shared/types/game';
 // Mock Zustand selectors
 const mockBlastTileOverlay: BlastTileOverlay[] = [];
 const mockBlastSeed: number | null = 42;
+const mockBlastWave = 1;
 const mockGameLanguage = 'en';
 const mockLetterGrid = [
   ['A', 'B', 'C', 'D'],
@@ -22,6 +23,7 @@ const mockLetterGrid = [
 vi.mock('@/hooks/gameState/store', () => ({
   useBlastTileOverlay: () => mockBlastTileOverlay,
   useBlastSeed: () => mockBlastSeed,
+  useBlastWave: () => mockBlastWave,
   useGameLanguage: () => mockGameLanguage,
 }));
 

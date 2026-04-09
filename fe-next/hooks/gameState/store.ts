@@ -57,6 +57,7 @@ const initialState: GameState = {
   blastTotalTileBonus: 0,
   blastTotalTilesCleared: 0,
   blastSeed: null,
+  blastWave: 1,
   blastComboSync: null,
   blastOpponentActivity: [],
   blastPlayerStats: {},
@@ -327,6 +328,10 @@ export const useGameStore = create<GameStore>()(
       blastSeed: applySetState(value, state.blastSeed)
     })),
 
+    setBlastWave: (value) => set((state) => ({
+      blastWave: applySetState(value, state.blastWave)
+    })),
+
     setBlastComboSync: (value) => set({ blastComboSync: value }),
 
     pushBlastOpponentActivity: (event) => set((state) => ({
@@ -412,6 +417,7 @@ export const useGameStore = create<GameStore>()(
         ...(data.blastTileOverlay !== undefined && { blastTileOverlay: data.blastTileOverlay }),
         ...(data.blastMovesUsed !== undefined && { blastMovesUsed: data.blastMovesUsed }),
         ...(data.blastSeed !== undefined && { blastSeed: data.blastSeed }),
+        ...(data.blastWave !== undefined && { blastWave: data.blastWave }),
         ...(data.wordHuntTargetLength !== undefined && { wordHuntTargetLength: data.wordHuntTargetLength }),
         ...(data.wordHuntMyLife !== undefined && { wordHuntMyLife: data.wordHuntMyLife }),
         ...(data.showStartAnimation !== undefined && { showStartAnimation: data.showStartAnimation }),
@@ -451,6 +457,7 @@ export const useGameStore = create<GameStore>()(
         blastTotalTileBonus: 0,
         blastTotalTilesCleared: 0,
         blastSeed: null,
+        blastWave: 1,
         blastComboSync: null,
         blastOpponentActivity: [],
         blastPlayerStats: {},
@@ -509,6 +516,7 @@ export {
   useBlastTotalTileBonus,
   useBlastTotalTilesCleared,
   useBlastSeed,
+  useBlastWave,
   useBlastComboSync,
   useBlastOpponentActivity,
   useBlastPlayerStats,

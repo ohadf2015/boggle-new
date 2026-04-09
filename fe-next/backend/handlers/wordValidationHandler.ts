@@ -14,6 +14,7 @@ import {
   getLeaderboard,
   recordFirstFinder,
   removePeerRejectedWordScore,
+  getGame,
 } from '../modules/gameStateManager.js';
 
 import { broadcastToRoom, broadcastToRoomExceptSender, volatileBroadcastToRoom, getGameRoom, getSocketById, safeEmit } from '../utils/socketHelpers.js';
@@ -24,7 +25,9 @@ import { addWordToBlacklist } from '../modules/botManager.js';
 import { inc, incPerGame } from '../utils/metrics.js';
 import logger from '../utils/logger.js';
 import { processLongWordEngagement } from './engagementHandler';
-import { calculateBlastTileBonus, getTilesOnPath, recordBlastMove, getWordPath } from '../modules/blastModeManager.js';
+import { calculateBlastTileBonus, getTilesOnPath, recordBlastMove, getWordPath, isBlastBoardCleared } from '../modules/blastModeManager.js';
+import { endGame } from '../services/gameLifecycle/gameEnd.js';
+import timerManager from '../utils/timerManager.js';
 import { processTilesForWord } from '@/components/blast/utils/clearTilesProcessor';
 import { computeGravityResult } from '@/components/blast/utils/blastGravity';
 import { createSeededRandom } from '@/components/blast/utils/blastLetterGenerator';
@@ -105,7 +108,7 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
           word: normalizedWord,
           baseScore: normalizedWord.length - 1,
           gridSize,
-          currentWave: 1,
+          currentWave: blastState.wave ?? 1,
           rng,
         });
 
@@ -135,6 +138,20 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
           clearedCount: processResult.newlyClearedCount,
           totalMoves,
         });
+
+        // 5. MP win condition: board fully cleared — schedule delayed endGame
+        //    so clients render the clear animation before the results modal fires.
+        //    Guard against double-end by re-checking gameState inside the timer.
+        if (isBlastBoardCleared(gravityResult.newTileStates)) {
+          logger.info('BLAST', `Board cleared in ${gameCode} by ${username} via "${normalizedWord}" — scheduling endGame`);
+          timerManager.setTimeout(`blastEnd:${gameCode}`, () => {
+            const currentGame = getGame(gameCode);
+            if (currentGame && currentGame.gameState === 'in-progress') {
+              logger.info('BLAST', `Ending game ${gameCode} after board clear`);
+              endGame(io, gameCode);
+            }
+          }, 1500);
+        }
       }
     } catch (err: unknown) {
       const error = err as Error;

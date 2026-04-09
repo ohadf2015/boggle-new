@@ -7,18 +7,17 @@
 import type { BlastTileOverlay, BlastModeState, BlastPlayerStats } from '@/shared/types/game';
 
 import type { BlastTileType, BlastTileState } from '@/shared/types/blast';
-import { getInitialHitsRemaining } from '@/components/blast/utils/blastTileUtils';
 
 import {
   BLAST_BONUS_MOVE_COMBO_THRESHOLD,
   BLAST_SPECIAL_TILE_CHANCE,
   BLAST_TILE_BONUSES,
   BLAST_RAINBOW_FLAT_BONUS,
-  FROST_INNER_CANDIDATES,
 } from '@/shared/constants/blastMultiplayerConstants';
 
 import { getWaveConfig, getWaveDistribution } from '@/components/blast/utils/blastWaveConfig';
 import { rollSpecialType, createSeededRandom } from '@/components/blast/utils/blastLetterGenerator';
+import { overlayToTileStates } from '@/components/blast/utils/blastOverlayToTileStates';
 
 /**
  * Derive a deterministic unsigned 32-bit seed from an arbitrary string (e.g. gameCode).
@@ -94,46 +93,15 @@ export function calculateBlastTileBonus(tilesOnPath: BlastTileType[]): number {
 
 
 /**
- * Build BlastTileState[][] from overlay + grid size (server-side equivalent of
- * useBlastMultiplayerBridge.overlayToTileStates).
+ * Build BlastTileState[][] from overlay + grid size. Delegates to the shared
+ * helper used by useBlastMultiplayerBridge so client + server agree byte-for-byte.
  */
 function buildTileStatesFromOverlay(
   overlay: BlastTileOverlay[],
   gridSize: number,
   seed: number,
 ): BlastTileState[][] {
-  const lookup = new Map<string, BlastTileOverlay>();
-  for (const tile of overlay) {
-    lookup.set(`${tile.row}-${tile.col}`, tile);
-  }
-
-  const random = createSeededRandom(seed);
-  const states: BlastTileState[][] = [];
-
-  for (let row = 0; row < gridSize; row++) {
-    states[row] = [];
-    for (let col = 0; col < gridSize; col++) {
-      const entry = lookup.get(`${row}-${col}`);
-      const type = entry?.type ?? 'standard';
-
-      const innerType: BlastTileType | undefined =
-        type === 'frozen'
-          ? FROST_INNER_CANDIDATES[Math.floor(random() * FROST_INNER_CANDIDATES.length)]
-          : undefined;
-
-      states[row][col] = {
-        uid: `mp-${row}-${col}`,
-        row,
-        col,
-        type,
-        isCleared: false,
-        activationEffect: null,
-        hitsRemaining: getInitialHitsRemaining(type),
-        ...(innerType !== undefined ? { innerType } : {}),
-      };
-    }
-  }
-  return states;
+  return overlayToTileStates(overlay, gridSize, seed);
 }
 
 /**
@@ -178,7 +146,7 @@ export function initBlastModeState(
   // Build server-authoritative tileStates from overlay
   const tileStates = buildTileStatesFromOverlay(overlay, grid.length, seed);
 
-  return { overlay, overlayMap, playerMoves, playerBonusMoves, playerStats, seed, grid, tileStates, totalMoves: 0 };
+  return { overlay, overlayMap, playerMoves, playerBonusMoves, playerStats, seed, grid, tileStates, totalMoves: 0, wave };
 }
 
 /**
@@ -279,6 +247,20 @@ export function getTilesOnPath(
   return resolveWordPositions(word, letterPositions).map(([r, c]) =>
     overlayMap.get(`${r},${c}`) ?? 'standard'
   );
+}
+
+/**
+ * Check whether the blast board is fully cleared (MP win condition).
+ * Returns true when every tile in tileStates has isCleared === true.
+ * Empty grid is vacuously cleared.
+ */
+export function isBlastBoardCleared(tileStates: BlastTileState[][]): boolean {
+  for (const row of tileStates) {
+    for (const tile of row) {
+      if (!tile.isCleared) return false;
+    }
+  }
+  return true;
 }
 
 /**
