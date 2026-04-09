@@ -32,6 +32,7 @@ import { trackGameCompletion, trackStreakMilestone } from '@/utils/growthTrackin
 import type { WordObject } from '@/components/results/types';
 import { markModePlayedLogic } from '@/hooks/useDailyModeQuest';
 import { useMpWinStreak, type MpMode } from '@/hooks/useMpWinStreak';
+import { syncGhostRivalScore } from '@/utils/ghostRivalSync';
 
 // ==============================================
 // TYPES
@@ -185,6 +186,7 @@ export function useResultsSideEffects({
   const hasAddedToHistoryRef = useRef<boolean>(false);
   const hasAwardedCoinsRef = useRef<boolean>(false);
   const hasSavedCognitiveScoreRef = useRef<boolean>(false);
+  const hasSyncedGhostRivalRef = useRef<boolean>(false);
 
   // ==============================================
   // EFFECT 1: Update Guest Stats
@@ -407,6 +409,24 @@ export function useResultsSideEffects({
 
     hasAddedToHistoryRef.current = true;
   }, [currentPlayerData, currentPlayerRank, totalPlayers, isCurrentUserWinner]);
+
+  // ==============================================
+  // EFFECT 7: Sync Ghost Rival Score
+  // ==============================================
+  // Fire-and-forget increment of the player's weekly rivalry score.
+  // Guard prevents React 18 strict-mode double-fire, which would
+  // otherwise double-count the player's score against their rival.
+
+  useEffect(() => {
+    if (hasSyncedGhostRivalRef.current) return;
+    if (!user?.id || !currentPlayerData) return;
+
+    const points = currentPlayerData.score || 0;
+    if (points <= 0) return;
+
+    syncGhostRivalScore(user.id, points);
+    hasSyncedGhostRivalRef.current = true;
+  }, [user?.id, currentPlayerData]);
 
   // ==============================================
   // EFFECT 6: Signup Prompt (Scroll-Based)
