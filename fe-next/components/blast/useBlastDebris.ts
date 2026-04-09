@@ -128,7 +128,10 @@ export function useBlastDebris(
         }
 
         const state = physics.getBodyState(d.bodyId);
-        if (state && !d.graphic.destroyed) {
+        // Pixi v8's recursive parent destroy can null a child's internal
+        // `_position` *before* flipping `destroyed`, so `.x =` would throw
+        // "Cannot set properties of null". Guard on `position` too.
+        if (state && !d.graphic.destroyed && d.graphic.position) {
           d.graphic.x = state.position.x;
           d.graphic.y = state.position.y;
           d.graphic.rotation = state.angle;

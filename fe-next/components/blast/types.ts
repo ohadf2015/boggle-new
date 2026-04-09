@@ -238,6 +238,13 @@ export const FUSE_DEFUSE_BONUS = 15;
 /** Bonus moves awarded for defusing a lit fuse in a word */
 export const FUSE_DEFUSE_MOVES = 2;
 
+// ==================== Locked + Key Constants ====================
+
+/** Score bonus awarded per locked tile unlocked when a key is cleared */
+export const KEY_UNLOCK_BONUS = 20;
+/** Maximum Manhattan distance between a locked tile and its nearest key at generation */
+export const LOCKED_KEY_MAX_DISTANCE = 3;
+
 // ==================== Portal Constants ====================
 
 /** Bonus score for using a portal in a word */

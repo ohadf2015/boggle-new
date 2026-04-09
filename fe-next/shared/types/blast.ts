@@ -28,7 +28,9 @@ export type BlastTileType =
   | 'shuffle'
   | 'magma'
   | 'crystal'
-  | 'fuse';
+  | 'fuse'
+  | 'locked'
+  | 'key';
 
 /** Runtime-iterable list of all blast tile types (mirrors BlastTileType union) */
 export const BLAST_TILE_TYPE_LIST: readonly BlastTileType[] = [
@@ -53,6 +55,8 @@ export const BLAST_TILE_TYPE_LIST: readonly BlastTileType[] = [
   'magma',
   'crystal',
   'fuse',
+  'locked',
+  'key',
 ] as const;
 
 // ==================== Tile State ====================
@@ -83,4 +87,6 @@ export interface BlastTileState {
   fuseGroupId?: string;
   /** Fuse tiles: turns remaining before detonation. Undefined = unlit; number = lit countdown. */
   fuseTimer?: number;
+  /** Locked tiles: unlocked by a cleared key tile in 8-directional adjacency. Undefined/false = gated. */
+  isUnlocked?: boolean;
 }

@@ -88,6 +88,14 @@ export const TILE_VISUALS: Record<BlastTileType, { bg: string; indicator?: strin
     bg: '', indicator: '🧨', text: 'text-white',
     style: { background: 'linear-gradient(165deg, #FF7755 0%, #E33E1E 40%, #B02810 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL },
   },
+  locked: {
+    bg: '', indicator: '🔒', text: 'text-neo-navy',
+    style: { background: 'linear-gradient(165deg, #9CA3AF 0%, #6B7280 40%, #4B5563 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL },
+  },
+  key: {
+    bg: '', indicator: '🔑', text: 'text-neo-navy',
+    style: { background: 'linear-gradient(165deg, #FDE68A 0%, #F59E0B 40%, #D97706 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL },
+  },
 };
 
 /** Clearing phase background color per tile type */

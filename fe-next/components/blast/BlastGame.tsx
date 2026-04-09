@@ -17,14 +17,13 @@ import { BlastWaveIntro } from './BlastWaveIntro';
 import { BlastSugarCrushFinale } from './BlastSugarCrushFinale';
 import { BlastMoveWarningMascot } from './BlastMoveWarningMascot';
 import { GameParticles } from '@/components/effects/GameParticles';
-import { detectSpecialCombos, type BlastComboType, type SpecialCombo } from './utils/blastCombos';
+import { type BlastComboType, type SpecialCombo } from './utils/blastCombos';
 import { getWaveObjectives, type WaveConfig } from './utils/blastWaveConfig';
 import { getComboMultiplier } from '@/shared/utils/scoring';
 import { type BlastGameConfig, type BlastResultsData, type BlastTileState, type BlastTileType } from './types';
 import { useDictionaryCache } from '@/hooks/useDictionaryCache';
-import { vibrateBlastBomb, vibrateBlastLightning, vibrateBlastPrism } from '@/components/grid/hapticFeedback';
-import { detectNearMiss } from './utils/blastNearMiss';
 import { useBlastCascade } from './hooks/useBlastCascade';
+import { useBlastWordHandler } from './hooks/useBlastWordHandler';
 import { useBlastGameEnd, type DeadEndFinaleTile } from './hooks/useBlastGameEnd';
 import { useBlastObjectiveEffects } from './hooks/useBlastObjectiveEffects';
 import type { ScoreFlyEvent } from './BlastScoreFly';
@@ -186,125 +185,19 @@ export function BlastGame({
     setScoreFlyEvents, setComboFlash, flyIdRef,
   });
 
-  // Handle accepted word: clear tiles, cascade, track combos
-  const handleWordAccepted = useCallback(async (data: { word: string; score: number }) => {
-    if (lastPathRef.current.length === 0) return;
-
-    const path = lastPathRef.current;
-    lastPathRef.current = [];
-
-    // Track word length for praise feedback
-    setLastWordLength(path.length);
-    setWordSubmitCount(c => c + 1);
-
-    // Detect combos on the path
-    const detectedCombos = detectSpecialCombos(path, engine.tileStates);
-    const hadCombo = detectedCombos.length > 0;
-
-    // Report combo to parent (MP socket)
-    if (onWordWithComboTypeRef.current) {
-      onWordWithComboTypeRef.current(data.word, hadCombo ? detectedCombos[0].type : null);
-    }
-
-    // Notify parent of combo discovery
-    if (hadCombo && onComboDetected) {
-      onComboDetected(detectedCombos);
-    }
-
-    // Trigger word-found particle effect
-    setWordFoundParticle(c => c + 1);
-
-    // 1. Animate word clear (anticipation → clearing)
-    const clearedInfo = path.map(p => ({
-      row: p.row,
-      col: p.col,
-      type: engine.tileStates[p.row]?.[p.col]?.type ?? 'standard',
-    }));
-    await sequencer.animateWordClear(clearedInfo);
-
-    // 1b. Fire cleared tile events for PixiJS particle effects
-    setClearedTilesForEffects(clearedInfo.map(c => ({
-      row: c.row, col: c.col, type: c.type as BlastTileType,
-    })));
-
-    // 2. Submit to engine (instant state update)
-    const result = engine.submitWord(path, data.word, data.score);
-
-    // 3. Score fly effect
-    const avgRow = path.reduce((s, p) => s + p.row, 0) / path.length;
-    const avgCol = path.reduce((s, p) => s + p.col, 0) / path.length;
-    const flyId = `fly-${++flyIdRef.current}`;
-    const tier: 1 | 2 | 3 = result.score >= 25 ? 3 : result.score >= 10 ? 2 : 1;
-    // Dominant non-standard tile type for color-coding the score fly.
-    // Single-pass frequency count — previously used a sort with a comparator
-    // that re-filtered the array on every comparison (O(N²)·log N).
-    let dominantTileType: string | undefined;
-    let dominantCount = 0;
-    const typeFreq = new Map<string, number>();
-    for (const c of clearedInfo) {
-      if (c.type === 'standard') continue;
-      const next = (typeFreq.get(c.type) ?? 0) + 1;
-      typeFreq.set(c.type, next);
-      if (next > dominantCount) {
-        dominantCount = next;
-        dominantTileType = c.type;
-      }
-    }
-    setScoreFlyEvents(prev => [...prev.slice(-2), {
-      id: flyId, score: result.score,
-      startX: ((avgCol + 0.5) / config.gridSize) * 100,
-      startY: ((avgRow + 0.5) / config.gridSize) * 100,
-      tier,
-      tileType: dominantTileType,
-    }]);
-
-    // 4. Combo flash effect
-    if (hadCombo && detectedCombos[0]) {
-      const mult = detectedCombos[0].scoreMultiplier;
-      const flashTier: 1 | 2 | 3 = mult >= 6 ? 3 : mult >= 4 ? 2 : 1;
-      setComboFlash({ id: `flash-${flyIdRef.current}`, tier: flashTier });
-      setComboTypeName(t(`blast.combo.${detectedCombos[0].type}`) || `${detectedCombos[0].type.toUpperCase()}!`);
-      sounds.playComboActivation(flashTier);
-      setComboParticle(c => c + 1);
-    }
-
-    // 5. Haptic + sound feedback based on tile types in path
-    const clearedTypes = new Set(clearedInfo.map(c => c.type));
-    if (clearedTypes.has('bomb')) vibrateBlastBomb();
-    else if (clearedTypes.has('lightning')) vibrateBlastLightning();
-    else if (clearedTypes.has('prism')) vibrateBlastPrism();
-    // Play sounds for ALL special tile types in the path
-    for (const type of clearedTypes) {
-      if (type !== 'standard') sounds.playSpecialTileSound(type);
-    }
-
-    // 5b. Screen shake — intensity scales with cleared special count
-    const hasBombExplosion = clearedTypes.has('bomb') || clearedTypes.has('countdown');
-    const countdownExplosionCount = result.countdownExplosions?.length ?? 0;
-    if (hasBombExplosion || countdownExplosionCount > 0) {
-      const bombCount = clearedInfo.filter(c => c.type === 'bomb' || c.type === 'countdown').length + countdownExplosionCount;
-      const intensity = Math.min(3, bombCount) as 1 | 2 | 3;
-      const duration = 300 + intensity * 100;
-      if (explosionShakeTimerRef.current) clearTimeout(explosionShakeTimerRef.current);
-      setExplosionShake(intensity);
-      explosionShakeTimerRef.current = setTimeout(() => setExplosionShake(0), duration);
-    }
-
-    // 6. Near-miss detection — shimmer tiles the player almost included
-    const nearMiss = detectNearMiss(path, engine.grid!, engine.tileStates, config.gridSize, hadCombo);
-    if (nearMiss) {
-      setNearMissCells(nearMiss.cells);
-      if (nearMissTimerRef.current) clearTimeout(nearMissTimerRef.current);
-      nearMissTimerRef.current = setTimeout(() => setNearMissCells([]), 1200);
-    }
-
-    // 7. Run cascade chain (extracted to useBlastCascade)
-    await runCascade(path.length);
-
-    sounds.playTileClear(clearedInfo.length);
-    sounds.playLongWordBonus(path.length);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [engine, runCascade, onComboDetected, sounds, sequencer, checkWord, config.gridSize]);
+  // Word-accepted pipeline (extracted to useBlastWordHandler)
+  const { handleWordAccepted } = useBlastWordHandler({
+    engine, sequencer, sounds, runCascade,
+    lastPathRef, flyIdRef, explosionShakeTimerRef, nearMissTimerRef,
+    onWordWithComboTypeRef, onComboDetected,
+    config, t,
+    effects: {
+      setLastWordLength, setWordSubmitCount, setWordFoundParticle,
+      setClearedTilesForEffects, setScoreFlyEvents,
+      setComboFlash, setComboTypeName, setComboParticle,
+      setExplosionShake, setNearMissCells,
+    },
+  });
 
   // Score fly + combo flash handlers
   const handleScoreFlyComplete = useCallback((id: string) => {

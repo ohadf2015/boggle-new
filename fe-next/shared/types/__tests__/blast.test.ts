@@ -5,12 +5,17 @@
 import { BLAST_TILE_TYPE_LIST, type BlastTileType } from '../blast';
 
 describe('BlastTileType canonical definition', () => {
-  it('should contain exactly 21 tile types', () => {
-    expect(BLAST_TILE_TYPE_LIST).toHaveLength(21);
+  it('should contain exactly 23 tile types', () => {
+    expect(BLAST_TILE_TYPE_LIST).toHaveLength(23);
   });
 
   it('should contain fuse (linked pair detonation tile)', () => {
     expect(BLAST_TILE_TYPE_LIST).toContain('fuse');
+  });
+
+  it('should contain locked and key (cooperative unlock pair)', () => {
+    expect(BLAST_TILE_TYPE_LIST).toContain('locked');
+    expect(BLAST_TILE_TYPE_LIST).toContain('key');
   });
 
   it('should include standard (not normal)', () => {
@@ -56,6 +61,8 @@ describe('BlastTileType canonical definition', () => {
       'catalyst',
       'crystal',
       'fuse',
+      'locked',
+      'key',
     ];
     for (const type of expected) {
       expect(BLAST_TILE_TYPE_LIST).toContain(type);
