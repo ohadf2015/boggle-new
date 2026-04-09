@@ -7851,7 +7851,8 @@ const en = {
       "shuffle":   { "name": "Shuffle",   "desc": "Rearranges all remaining letters on the board when cleared." },
       "magma":     { "name": "Magma",     "desc": "Clears both diagonals (X-pattern) with 2× score multiplier." },
       "portal":    { "name": "Portal",    "desc": "Teleport your word path through linked pairs. Clears both. 2× score. +5 bonus." },
-      "catalyst":  { "name": "Catalyst",  "desc": "+10 pts. Upgrades adjacent standard tiles into specials." }
+      "catalyst":  { "name": "Catalyst",  "desc": "+10 pts. Upgrades adjacent standard tiles into specials." },
+      "crystal":   { "name": "Crystal",   "desc": "Grows +1× each unused turn (max 5×). Multiplies your word score when used." }
     },
     "title": "Blast Mode",
     "description": "Clear the board! Words explode tiles.",
@@ -7944,22 +7945,71 @@ const en = {
       "wave": "Wave {n}",
       "badgesEarned": "Badges Earned",
       "newBadge": "NEW",
-      "share": "Share"
+      "share": "Share",
+      "brag": {
+        "legend": "Legend",
+        "elite": "Elite",
+        "great": "Great Run",
+        "solid": "Solid",
+        "nice": "Nice Try",
+        "beats": "You beat {pct}% of players",
+        "weeklyCohort": "This week's global cohort",
+        "score": "Score",
+        "combo": "Combo",
+        "bestWord": "Best Word",
+        "share": "Brag",
+        "shareAria": "Share your result",
+        "shareTitle": "LexiClash Blast",
+        "shareScore": "Scored {score} in Blast Mode",
+        "shareRank": "Top {pct}% this week",
+        "copied": "Copied to clipboard!",
+        "copyFailed": "Couldn't copy — try again"
+      }
     },
     "badges": {
       "firstBlast": "First Blast",
+      "firstBlastDesc": "Cleared your very first wave.",
       "waveRider": "Wave Rider",
+      "waveRiderDesc": "Survived 3 waves in a single run.",
       "marathoner": "Marathoner",
+      "marathonerDesc": "Reached 5 waves — endurance unlocked.",
       "comboChain": "Combo Chain",
+      "comboChainDesc": "Chained 5 words without a miss.",
       "comboKing": "Combo King",
+      "comboKingDesc": "Landed a 10x combo. Unstoppable.",
       "wordsmith": "Wordsmith",
+      "wordsmithDesc": "Found 20+ words in one run.",
       "clearMaster": "Clear Master",
-      "highScorer": "High Scorer"
+      "clearMasterDesc": "Wiped 90% of the board clean.",
+      "highScorer": "High Scorer",
+      "highScorerDesc": "Broke 10,000 points. Elite territory."
+    },
+    "mascot": {
+      "hyped": "Hyped mascot cheering your combo",
+      "sneaky": "Sneaky mascot eyeing treasure",
+      "sweating": "Nervous mascot surviving the countdown",
+      "celebrating": "Celebrating mascot with trophy",
+      "sadSmile": "Mascot with a consoling smile",
+      "neutral": "Cheerful mascot ready for the next wave"
+    },
+    "archetypes": {
+      "normal": "Standard Wave",
+      "scoreRush": "Score Rush",
+      "treasureHunt": "Treasure Hunt",
+      "survival": "Survival",
+      "silence": "Silent Wave"
+    },
+    "sugarCrush": {
+      "title": "SUGAR CRUSH!"
+    },
+    "moveWarning": {
+      "label": "LOW MOVES!"
     },
     "ready": {
       "title": "Blast Mode",
       "subtitle": "Clear tiles by forming words. Chain combos for big scores!",
       "play": "Blast Off!",
+      "resume": "Resume Wave {wave}",
       "step1Title": "Swipe Words",
       "step1Desc": "Drag across adjacent letters to form words",
       "step2Title": "Power Tiles",
@@ -8095,7 +8145,8 @@ const en = {
       "shuffle": { "name": "Shuffle", "desc": "Rearranges all remaining letters on the board when cleared" },
       "magma": { "name": "Magma", "desc": "Clears both diagonals (X-pattern) with 2× score multiplier" },
       "portal": { "name": "Portal", "desc": "Teleport through linked pairs — clears both, ×2 word score" },
-      "catalyst": { "name": "Catalyst", "desc": "Upgrades all adjacent tiles to random specials" }
+      "catalyst": { "name": "Catalyst", "desc": "Upgrades all adjacent tiles to random specials" },
+      "crystal": { "name": "Crystal", "desc": "Grows +1× per unused turn (max 5×) — multiplies word score" }
     }
   },
   "student": {

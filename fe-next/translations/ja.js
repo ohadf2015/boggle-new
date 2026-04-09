@@ -7732,7 +7732,8 @@ const ja = {
       "shuffle":   { "name": "シャッフル",  "desc": "クリア時にボード上の残り文字を全て並べ替える。" },
       "magma":     { "name": "マグマ",      "desc": "両対角線（X字パターン）をクリアし、スコア2倍。" },
       "portal":    { "name": "ポータル",    "desc": "リンクペアを通じてワードパスをテレポート。両方クリア。スコア2倍。+5ボーナス。" },
-      "catalyst":  { "name": "触媒",        "desc": "+10点。隣接する通常タイルをスペシャルに昇格。" }
+      "catalyst":  { "name": "触媒",        "desc": "+10点。隣接する通常タイルをスペシャルに昇格。" },
+      "crystal":   { "name": "クリスタル",  "desc": "未使用のターンごとに×1成長（最大×5）。使用時に単語スコアを倍増。" }
     },
     "title": "ブラストモード",
     "description": "ボードをクリア！単語でタイルを爆破。",
@@ -7825,22 +7826,71 @@ const ja = {
       "wave": "ウェーブ{n}",
       "badgesEarned": "獲得バッジ",
       "newBadge": "NEW",
-      "share": "共有"
+      "share": "共有",
+      "brag": {
+        "legend": "レジェンド",
+        "elite": "エリート",
+        "great": "素晴らしいラン",
+        "solid": "堅実",
+        "nice": "ナイストライ",
+        "beats": "プレイヤーの{pct}%を超えた",
+        "weeklyCohort": "今週のグローバル集団",
+        "score": "スコア",
+        "combo": "コンボ",
+        "bestWord": "ベストワード",
+        "share": "自慢",
+        "shareAria": "結果を共有",
+        "shareTitle": "LexiClash Blast",
+        "shareScore": "ブラストモードで{score}点",
+        "shareRank": "今週上位{pct}%",
+        "copied": "クリップボードにコピーしました！",
+        "copyFailed": "コピーできませんでした — もう一度"
+      }
     },
     "badges": {
       "firstBlast": "ファーストブラスト",
+      "firstBlastDesc": "初めてのウェーブをクリア。",
       "waveRider": "ウェーブライダー",
+      "waveRiderDesc": "1ランで3ウェーブを生き延びた。",
       "marathoner": "マラソナー",
+      "marathonerDesc": "5ウェーブ到達 — 持久力解放。",
       "comboChain": "コンボチェーン",
+      "comboChainDesc": "5単語を連続でつないだ。",
       "comboKing": "コンボキング",
+      "comboKingDesc": "10倍コンボを達成。止められない。",
       "wordsmith": "ワードスミス",
+      "wordsmithDesc": "1ランで20単語以上を発見。",
       "clearMaster": "クリアマスター",
-      "highScorer": "ハイスコアラー"
+      "clearMasterDesc": "ボードの90%を消去。",
+      "highScorer": "ハイスコアラー",
+      "highScorerDesc": "10,000点突破。エリート領域。"
+    },
+    "mascot": {
+      "hyped": "コンボを喜ぶ興奮したマスコット",
+      "sneaky": "宝を狙うこっそりマスコット",
+      "sweating": "カウントダウンに耐える緊張したマスコット",
+      "celebrating": "トロフィーを掲げて祝うマスコット",
+      "sadSmile": "慰めるような笑顔のマスコット",
+      "neutral": "次のウェーブを待つ陽気なマスコット"
+    },
+    "archetypes": {
+      "normal": "通常ウェーブ",
+      "scoreRush": "スコアラッシュ",
+      "treasureHunt": "トレジャーハント",
+      "survival": "サバイバル",
+      "silence": "サイレントウェーブ"
+    },
+    "sugarCrush": {
+      "title": "シュガークラッシュ！"
+    },
+    "moveWarning": {
+      "label": "残り手数わずか！"
     },
     "ready": {
       "title": "ブラストモード",
       "subtitle": "単語を作ってタイルをクリア。コンボをつなげて高得点！",
       "play": "ブラスト開始！",
+      "resume": "ウェーブ{wave}から再開",
       "step1Title": "単語をスワイプ",
       "step1Desc": "隣り合う文字をなぞって単語を作ろう",
       "step2Title": "パワータイル",
@@ -7976,7 +8026,8 @@ const ja = {
       "shuffle": { "name": "シャッフル", "desc": "クリア時にボード上の残り文字を全て並べ替える" },
       "magma": { "name": "マグマ", "desc": "両対角線（X字パターン）をクリアし、スコア2倍" },
       "portal": { "name": "ポータル", "desc": "ペア間テレポート — 両方消去、単語スコア×2" },
-      "catalyst": { "name": "カタリスト", "desc": "隣接タイルを全てランダムなスペシャルに昇格" }
+      "catalyst": { "name": "カタリスト", "desc": "隣接タイルを全てランダムなスペシャルに昇格" },
+      "crystal": { "name": "クリスタル", "desc": "未使用ターン毎に+×1（最大×5） — 単語スコアを倍増" }
     }
   },
   "student": {

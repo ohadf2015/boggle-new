@@ -7752,7 +7752,8 @@ const es = {
       "shuffle":   { "name": "Mezcla",     "desc": "Reorganiza todas las letras restantes del tablero al limpiar." },
       "magma":     { "name": "Magma",      "desc": "Limpia ambas diagonales (patrón X) con multiplicador de puntos ×2." },
       "portal":    { "name": "Portal",     "desc": "Teletransporta tu camino de palabras a través de pares vinculados. Limpia ambos. ×2 puntos. +5 bonus." },
-      "catalyst":  { "name": "Catalizador","desc": "+10 pts. Mejora fichas normales adyacentes a especiales." }
+      "catalyst":  { "name": "Catalizador","desc": "+10 pts. Mejora fichas normales adyacentes a especiales." },
+      "crystal":   { "name": "Cristal",    "desc": "Crece +1× cada turno sin usar (máx 5×). Multiplica tu puntuación de palabra al usarlo." }
     },
     "title": "Modo Blast",
     "description": "¡Limpia el tablero! Las palabras explotan fichas.",
@@ -7835,22 +7836,71 @@ const es = {
       "wave": "Oleada {n}",
       "badgesEarned": "Insignias Ganadas",
       "newBadge": "NUEVO",
-      "share": "Compartir"
+      "share": "Compartir",
+      "brag": {
+        "legend": "Leyenda",
+        "elite": "Élite",
+        "great": "Gran Partida",
+        "solid": "Sólido",
+        "nice": "Buen Intento",
+        "beats": "Venciste al {pct}% de los jugadores",
+        "weeklyCohort": "Grupo global de esta semana",
+        "score": "Puntaje",
+        "combo": "Combo",
+        "bestWord": "Mejor Palabra",
+        "share": "Presumir",
+        "shareAria": "Comparte tu resultado",
+        "shareTitle": "LexiClash Blast",
+        "shareScore": "Marqué {score} en Modo Blast",
+        "shareRank": "Top {pct}% esta semana",
+        "copied": "¡Copiado al portapapeles!",
+        "copyFailed": "No se pudo copiar — intenta de nuevo"
+      }
     },
     "badges": {
       "firstBlast": "Primer Blast",
+      "firstBlastDesc": "Completaste tu primera oleada.",
       "waveRider": "Jinete de Olas",
+      "waveRiderDesc": "Sobreviviste 3 oleadas en una partida.",
       "marathoner": "Maratonista",
+      "marathonerDesc": "Llegaste a 5 oleadas — resistencia desbloqueada.",
       "comboChain": "Cadena de Combos",
+      "comboChainDesc": "Encadenaste 5 palabras sin fallar.",
       "comboKing": "Rey del Combo",
+      "comboKingDesc": "Lograste un combo x10. Imparable.",
       "wordsmith": "Maestro de Palabras",
+      "wordsmithDesc": "Encontraste 20+ palabras en una partida.",
       "clearMaster": "Maestro Limpiador",
-      "highScorer": "Gran Anotador"
+      "clearMasterDesc": "Limpiaste el 90% del tablero.",
+      "highScorer": "Gran Anotador",
+      "highScorerDesc": "Superaste los 10,000 puntos. Nivel élite."
+    },
+    "mascot": {
+      "hyped": "Mascota eufórica celebrando tu combo",
+      "sneaky": "Mascota astuta buscando el tesoro",
+      "sweating": "Mascota nerviosa sobreviviendo la cuenta atrás",
+      "celebrating": "Mascota celebrando con el trofeo",
+      "sadSmile": "Mascota con sonrisa consoladora",
+      "neutral": "Mascota lista para la siguiente ola"
+    },
+    "archetypes": {
+      "normal": "Ola estándar",
+      "scoreRush": "Carrera de puntos",
+      "treasureHunt": "Caza del tesoro",
+      "survival": "Supervivencia",
+      "silence": "Ola silenciosa"
+    },
+    "sugarCrush": {
+      "title": "¡EXPLOSIÓN DULCE!"
+    },
+    "moveWarning": {
+      "label": "¡POCOS MOVIMIENTOS!"
     },
     "ready": {
       "title": "Modo Blast",
       "subtitle": "¡Limpia fichas formando palabras. Encadena combos para grandes puntuaciones!",
       "play": "¡A jugar!",
+      "resume": "Continuar ola {wave}",
       "step1Title": "Desliza palabras",
       "step1Desc": "Arrastra sobre letras adyacentes para formar palabras",
       "step2Title": "Fichas de poder",
@@ -7996,7 +8046,8 @@ const es = {
       "shuffle": { "name": "Mezcla", "desc": "Reorganiza todas las letras restantes del tablero al limpiar" },
       "magma": { "name": "Magma", "desc": "Limpia ambas diagonales (patrón X) con multiplicador de puntos ×2" },
       "portal": { "name": "Portal", "desc": "Teletransporta entre pares — limpia ambos, ×2 puntos" },
-      "catalyst": { "name": "Catalizador", "desc": "Mejora todas las fichas adyacentes a especiales aleatorias" }
+      "catalyst": { "name": "Catalizador", "desc": "Mejora todas las fichas adyacentes a especiales aleatorias" },
+      "crystal": { "name": "Cristal", "desc": "Crece +1× por turno sin usar (máx 5×) — multiplica la puntuación" }
     }
   },
   "student": {

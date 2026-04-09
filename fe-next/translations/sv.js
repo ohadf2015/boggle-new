@@ -7680,7 +7680,8 @@ const sv = {
       "shuffle":   { "name": "Blanda",    "desc": "Blandar om alla återstående bokstäver på brädet vid rensning." },
       "magma":     { "name": "Magma",     "desc": "Rensar båda diagonalerna (X-mönster) med 2× poängmultiplikator." },
       "portal":    { "name": "Portal",    "desc": "Teleportera din ordstig genom länkade par. Rensar båda. 2× poäng. +5 bonus." },
-      "catalyst":  { "name": "Katalysator","desc": "+10 p. Uppgraderar intilliggande vanliga brickor till specialer." }
+      "catalyst":  { "name": "Katalysator","desc": "+10 p. Uppgraderar intilliggande vanliga brickor till specialer." },
+      "crystal":   { "name": "Kristall",   "desc": "Växer +1× varje oanvänd tur (max 5×). Multiplicerar din ordpoäng när den används." }
     },
     "title": "Blast-läge",
     "description": "Rensa brädet! Ord spränger brickor.",
@@ -7773,22 +7774,71 @@ const sv = {
       "wave": "Våg {n}",
       "badgesEarned": "Märken intjänade",
       "newBadge": "NY",
-      "share": "Dela"
+      "share": "Dela",
+      "brag": {
+        "legend": "Legend",
+        "elite": "Elit",
+        "great": "Grym Runda",
+        "solid": "Solid",
+        "nice": "Bra Försök",
+        "beats": "Du slog {pct}% av spelarna",
+        "weeklyCohort": "Veckans globala grupp",
+        "score": "Poäng",
+        "combo": "Kombo",
+        "bestWord": "Bästa Ord",
+        "share": "Skryt",
+        "shareAria": "Dela ditt resultat",
+        "shareTitle": "LexiClash Blast",
+        "shareScore": "Fick {score} i Blast-läge",
+        "shareRank": "Topp {pct}% denna vecka",
+        "copied": "Kopierat till urklipp!",
+        "copyFailed": "Kunde inte kopiera — försök igen"
+      }
     },
     "badges": {
       "firstBlast": "Första Blasten",
+      "firstBlastDesc": "Rensade din allra första våg.",
       "waveRider": "Vågryttare",
+      "waveRiderDesc": "Överlevde 3 vågor i en enda omgång.",
       "marathoner": "Maratonlöpare",
+      "marathonerDesc": "Nådde 5 vågor — uthållighet upplåst.",
       "comboChain": "Kombokedja",
+      "comboChainDesc": "Kedjade 5 ord utan miss.",
       "comboKing": "Kombokung",
+      "comboKingDesc": "Landade en 10x kombo. Ostoppbar.",
       "wordsmith": "Ordkonstnär",
+      "wordsmithDesc": "Hittade 20+ ord i en omgång.",
       "clearMaster": "Rensmästare",
-      "highScorer": "Poängkung"
+      "clearMasterDesc": "Rensade 90% av brädet.",
+      "highScorer": "Poängkung",
+      "highScorerDesc": "Slog 10 000 poäng. Elitnivå."
+    },
+    "mascot": {
+      "hyped": "Peppad maskot som hejar på ditt combo",
+      "sneaky": "Smygande maskot som letar skatt",
+      "sweating": "Nervös maskot som överlever nedräkningen",
+      "celebrating": "Firande maskot med pokal",
+      "sadSmile": "Maskot med tröstande leende",
+      "neutral": "Glad maskot redo för nästa våg"
+    },
+    "archetypes": {
+      "normal": "Standardvåg",
+      "scoreRush": "Poängrush",
+      "treasureHunt": "Skattjakt",
+      "survival": "Överlevnad",
+      "silence": "Tyst våg"
+    },
+    "sugarCrush": {
+      "title": "SOCKERKROSS!"
+    },
+    "moveWarning": {
+      "label": "FÅ DRAG!"
     },
     "ready": {
       "title": "Blast-läge",
       "subtitle": "Rensa brickor genom att bilda ord. Kedjekombos ger stora poäng!",
       "play": "Sätt igång!",
+      "resume": "Fortsätt våg {wave}",
       "step1Title": "Svep ord",
       "step1Desc": "Dra över intilliggande bokstäver för att bilda ord",
       "step2Title": "Kraftbrickor",
@@ -7924,7 +7974,8 @@ const sv = {
       "shuffle": { "name": "Blanda", "desc": "Blandar om alla återstående bokstäver på brädet vid rensning" },
       "magma": { "name": "Magma", "desc": "Rensar båda diagonalerna (X-mönster) med 2× poängmultiplikator" },
       "portal": { "name": "Portal", "desc": "Teleportera genom par — rensar båda, ×2 ordpoäng" },
-      "catalyst": { "name": "Katalysator", "desc": "Uppgraderar alla intilliggande brickor till special" }
+      "catalyst": { "name": "Katalysator", "desc": "Uppgraderar alla intilliggande brickor till special" },
+      "crystal": { "name": "Kristall", "desc": "Växer +1× per oanvänd tur (max 5×) — multiplicerar ordpoäng" }
     }
   },
   "student": {
