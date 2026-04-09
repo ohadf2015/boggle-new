@@ -331,21 +331,7 @@ export const BlastStage = memo(function BlastStage({
             ref={boardContainerRef}
             className="relative w-full overflow-hidden rounded-[6px]"
           >
-            {/* PixiJS effects layer */}
-            {boardSize.width > 0 && (
-              <div className="absolute inset-0 z-0 overflow-hidden rounded-[6px]">
-                <BlastEffectsCanvas
-                  width={boardSize.width}
-                  height={boardSize.height || boardSize.width}
-                  gridSize={gridSize}
-                  clearedTiles={clearedTilesForEffects}
-                  chainLevel={sequencerState?.chainLevel ?? 0}
-                  comboTier={comboFlashTier}
-                  waveCleared={waveCleared}
-                />
-              </div>
-            )}
-            {/* DOM board */}
+            {/* DOM board — renders underneath so effects overlay tile art */}
             <div className="relative z-10">
               <BlastBoard
                 grid={grid}
@@ -362,6 +348,20 @@ export const BlastStage = memo(function BlastStage({
                 diamondRevealTurns={gameState.diamondRevealTurns}
               />
             </div>
+            {/* PixiJS effects layer — overlays DOM board so particles/shockwaves/shatters are visible above tile art. pointer-events-none so taps still reach BlastBoard. */}
+            {boardSize.width > 0 && (
+              <div className="absolute inset-0 z-20 pointer-events-none rounded-[6px]">
+                <BlastEffectsCanvas
+                  width={boardSize.width}
+                  height={boardSize.height || boardSize.width}
+                  gridSize={gridSize}
+                  clearedTiles={clearedTilesForEffects}
+                  chainLevel={sequencerState?.chainLevel ?? 0}
+                  comboTier={comboFlashTier}
+                  waveCleared={waveCleared}
+                />
+              </div>
+            )}
           </div>
         </div>
         {/* Cascade word discovery banner */}
