@@ -16,12 +16,11 @@ import {
   updateClassroomGameStatus,
   type CreateClassroomGameData,
 } from '../modules/classroomGameManager.js';
-import { getSupabase } from '../modules/supabase/client.js';
 import {
   isClassroomTeacher,
   getClassroomRole,
 } from '../modules/supabase/classroomMembership.js';
-import { getRedisClient } from '../redisClient.js';
+import { persistClassroomGameScores } from './classroomGamePersistence.js';
 import { checkRateLimit } from '../utils/rateLimiter.js';
 import { validatePayload, gameCodeSchema, usernameSchema } from '../utils/socketValidation.js';
 import logger from '../utils/logger.js';
@@ -512,85 +511,6 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
       socket.emit('classroomGameError', { error: 'Failed to persist game results' });
     }
   });
-}
-
-/**
- * S2.5: Persist classroom game scores to Supabase
- * Creates a practice_session row per player and awards education XP
- */
-async function persistClassroomGameScores(
-  game: Awaited<ReturnType<typeof getClassroomGame>>,
-  playerScores?: Array<{ userId: string; score: number; wordsFound?: string[] }>
-): Promise<void> {
-  if (!game) return;
-
-  // Idempotency guard: only persist once per game using Redis SET NX
-  const redis = getRedisClient();
-  if (redis) {
-    const idempotencyKey = `classroom_game_persisted:${game.gameCode}`;
-    // Returns 1 if key was set (first time), 0 if already existed
-    const acquired = await redis.set(idempotencyKey, '1', 'EX', 86400, 'NX');
-    if (!acquired) {
-      logger.info('CLASSROOM_GAME', `Scores for game ${game.gameCode} already persisted — skipping duplicate`);
-      return;
-    }
-  }
-
-  const supabase = getSupabase();
-  if (!supabase) {
-    logger.warn('CLASSROOM_GAME', 'Supabase not configured, skipping score persistence');
-    return;
-  }
-
-  const lessonId = game.lessonIds[0];
-  if (!lessonId) {
-    logger.warn('CLASSROOM_GAME', `Game ${game.gameCode} has no lesson IDs, skipping persistence`);
-    return;
-  }
-
-  for (const player of game.players) {
-    try {
-      // Find this player's score from the provided scores, or default to 0
-      const playerScore = playerScores?.find(ps => ps.userId === player.userId);
-      const score = playerScore?.score ?? 0;
-      const wordsFound = playerScore?.wordsFound ?? [];
-
-      // Create practice_session row
-      const { error: sessionError } = await supabase
-        .from('practice_sessions')
-        .insert({
-          student_id: player.userId,
-          lesson_id: lessonId,
-          practice_type: 'solo_board',
-          total_score: score,
-          words_found: wordsFound,
-          completed_at: new Date().toISOString(),
-        });
-
-      if (sessionError) {
-        logger.error('CLASSROOM_GAME', `Failed to create practice session for ${player.userId}: ${sessionError.message}`);
-        continue;
-      }
-
-      // Award education XP via RPC
-      if (score > 0) {
-        const xpAmount = Math.max(10, Math.floor(score / 10));
-        const { error: xpError } = await supabase.rpc('award_education_xp', {
-          p_student_id: player.userId,
-          p_xp_amount: xpAmount,
-          p_lesson_id: lessonId,
-        });
-
-        if (xpError) {
-          logger.error('CLASSROOM_GAME', `Failed to award XP for ${player.userId}: ${xpError.message}`);
-        } else {
-          logger.info('CLASSROOM_GAME', `Awarded ${xpAmount} XP to ${player.userId} for game ${game.gameCode}`);
-        }
-      }
-    } catch (error) {
-      logger.error('CLASSROOM_GAME', `Error persisting score for player ${player.userId}: ${error}`);
-    }
-  }
 }
 
 export default registerClassroomGameHandlers;
