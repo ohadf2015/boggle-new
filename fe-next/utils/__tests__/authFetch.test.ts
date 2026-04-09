@@ -47,6 +47,7 @@ vi.mock('@/utils/logger', () => ({
   __esModule: true,
   default: {
     log: vi.fn(),
+    debug: vi.fn(),
     warn: vi.fn(),
     error: vi.fn(),
   },

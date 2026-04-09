@@ -65,12 +65,12 @@ describe('PostHogProvider', () => {
     delete process.env.NEXT_PUBLIC_POSTHOG_HOST;
   });
 
-  it('initializes PostHog with capturing enabled by default', () => {
+  it('initializes PostHog with consent-gated capturing (opt-out by default)', () => {
     render(<PostHogProvider><div>child</div></PostHogProvider>);
 
     expect(ph.init).toHaveBeenCalledWith('test-key', expect.objectContaining({
       api_host: 'https://us.i.posthog.com',
-      opt_out_capturing_by_default: false,
+      opt_out_capturing_by_default: true,
       capture_pageview: false,
       capture_pageleave: true,
     }));

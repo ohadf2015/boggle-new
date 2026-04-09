@@ -106,7 +106,7 @@ describe('useAdminAuth', () => {
       // THEN: Error should be set after max retries
       expect(result.current.authToken).toBeNull();
       expect(result.current.error).toBe('Session not available - please log in again');
-      expect(loggerModule.default.warn).toHaveBeenCalledWith(
+      expect(loggerModule.default.debug).toHaveBeenCalledWith(
         'ADMIN_AUTH',
         'No access token in session'
       );
