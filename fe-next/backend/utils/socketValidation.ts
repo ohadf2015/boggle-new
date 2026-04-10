@@ -231,7 +231,7 @@ export const leaveRoomSchema = compiledSchemas?.leaveRoomSchema || z.object({
 // boardTheme/gameMode validation and has restrictive min(30) on timerSeconds
 export const startGameSchema = z.object({
   gameCode: gameCodeSchema.optional(),
-  letterGrid: z.array(z.array(z.string().max(5)).max(15)).max(15),
+  letterGrid: z.array(z.array(z.string().max(5)).max(15)).max(15).optional().default([]),
   timerSeconds: z.number().int().optional().default(120),
   language: languageSchema.optional(),
   difficulty: difficultySchema.optional().default('MEDIUM'),

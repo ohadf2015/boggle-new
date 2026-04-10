@@ -39,6 +39,7 @@ export const AchievementBadge = memo<AchievementBadgeProps>(({ achievement, inde
   const [open, setOpen] = useState(false);
   const { t } = useLanguage();
   const isTouchDevice = useRef(false);
+  const justOpened = useRef(false);
 
   // Localize achievement using user's UI language preference
   // Achievement can have either { key, icon } (unlocalized) or { name, description, icon } (legacy localized)
@@ -65,7 +66,12 @@ export const AchievementBadge = memo<AchievementBadgeProps>(({ achievement, inde
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation();
-    setOpen(!open);
+    const next = !open;
+    setOpen(next);
+    if (next) {
+      justOpened.current = true;
+      setTimeout(() => { justOpened.current = false; }, 200);
+    }
   };
 
   const handleOpenChange = (newOpen: boolean) => {
@@ -153,7 +159,10 @@ export const AchievementBadge = memo<AchievementBadgeProps>(({ achievement, inde
           side="top"
           sideOffset={8}
           className="z-50 bg-neo-purple text-white border-3 border-neo-black shadow-hard rounded-md p-3 max-w-xs"
-          onPointerDownOutside={() => setOpen(false)}
+          onPointerDownOutside={(e) => {
+            if (justOpened.current) { e.preventDefault(); return; }
+            setOpen(false);
+          }}
         >
           <div>
             {/* Show lock indicator for locked achievements */}

@@ -327,8 +327,9 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
     // can actually find them during gameplay.
     const vocabToEmbed = classroomGame?.vocabularyWords?.map(w => w.toUpperCase()) ?? [];
     const playerCount = Object.keys(game.users).length;
-    // Multiplayer always uses 6x6 grid regardless of mode
-    if (playerCount >= 2) {
+    // Multiplayer always uses 6x6 grid regardless of mode.
+    // Also regenerate when the client sent no grid (e.g. quick play).
+    if (playerCount >= 2 || !letterGrid || letterGrid.length === 0) {
       letterGrid = vocabToEmbed.length > 0
         ? generateRandomTable(6, 6, gameLang, vocabToEmbed)
         : generateRandomTable(6, 6, gameLang);

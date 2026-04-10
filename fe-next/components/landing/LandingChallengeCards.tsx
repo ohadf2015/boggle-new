@@ -109,7 +109,7 @@ export function LandingChallengeCards({
               href={`/${language}/multiplayer?quickPlay=true`}
               icon={<Zap className="w-6 h-6" />}
               modeImage="/modes/arena.png"
-              variant="blue"
+              variant="cyan"
               highlighted={isVeteran}
               highlightLabel={isVeteran ? t('onboarding.welcome.startHere') : undefined}
               duration={t('landing.duration').replace('{time}', '1-3')}

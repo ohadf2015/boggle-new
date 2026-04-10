@@ -94,8 +94,8 @@ export const DailyIntroCarousel: React.FC<DailyIntroCarouselProps> = ({
       )}
     >
       {/* Header */}
-      <div className="text-center mb-3">
-        <h3 className="text-lg font-bold text-neo-black dark:text-neo-white uppercase tracking-wide">
+      <div className="mb-3 text-center">
+        <h3 className="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wide">
           {t('daily.carousel.header')}
         </h3>
       </div>
@@ -120,19 +120,19 @@ export const DailyIntroCarousel: React.FC<DailyIntroCarouselProps> = ({
         </AnimatePresence>
       </div>
 
-      {/* Progress Indicators - Neo-Brutalist Circles */}
-      <div className="flex items-center justify-center gap-3 mt-4">
-        {Array.from({ length: TOTAL_STEPS }).map((_, i) => (
+      {/* Progress Indicators */}
+      <div className="flex justify-center gap-2 mt-3">
+        {Array.from({ length: TOTAL_STEPS }).map((_, idx) => (
           <button
-            key={i}
-            onClick={() => goToStep(i)}
+            key={idx}
+            aria-label={t('daily.carousel.goToStep').replace('{step}', String(idx + 1))}
+            onClick={() => goToStep(idx)}
             className={cn(
-              'min-w-3 min-h-3 flex-none rounded-full border-2 border-neo-black transition-all duration-300 ease-out',
-              i === currentStep
+              'rounded-full border-2 border-neo-black transition-all duration-200',
+              idx === currentStep
                 ? 'w-4 h-4 bg-neo-pink'
-                : 'w-3 h-3 bg-neo-cream dark:bg-gray-600 hover:bg-neo-pink/30'
+                : 'w-3 h-3 bg-gray-300 hover:bg-neo-pink/30'
             )}
-            aria-label={t('daily.carousel.goToStep', { step: i + 1 }) || `Go to step ${i + 1}`}
           />
         ))}
       </div>

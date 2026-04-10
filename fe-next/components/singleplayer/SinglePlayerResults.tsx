@@ -362,7 +362,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
 
   return (
     <div className="min-h-dvh bg-neo-navy text-white">
-      <div className={isDesktop ? 'max-w-5xl mx-auto px-6 xl:px-8 pb-8 pt-4' : 'px-2 pb-20 pt-2'}>
+      <div className={isDesktop ? 'max-w-5xl mx-auto px-6 xl:px-8 pb-8 pt-4' : 'px-2 pb-28 pt-2'}>
         {isDesktop ? (
           <>
             <div className="grid grid-cols-[1fr_340px] xl:grid-cols-[1fr_380px] gap-6 items-start">
