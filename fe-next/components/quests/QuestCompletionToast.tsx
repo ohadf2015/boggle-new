@@ -31,6 +31,29 @@ interface QuestCompletionOptions {
 const recentToasts = new Set<string>();
 const DEDUP_WINDOW_MS = 2000;
 
+// Session-persistent dedup: prevent toasts from re-firing after page refresh.
+// Keys are stored in sessionStorage so they survive refresh but not new sessions.
+const SESSION_DEDUP_KEY = 'quest_toast_shown';
+
+function getSessionShownSet(): Set<string> {
+  try {
+    const raw = sessionStorage.getItem(SESSION_DEDUP_KEY);
+    return raw ? new Set(JSON.parse(raw)) : new Set();
+  } catch {
+    return new Set();
+  }
+}
+
+function markSessionShown(dedupKey: string) {
+  try {
+    const set = getSessionShownSet();
+    set.add(dedupKey);
+    sessionStorage.setItem(SESSION_DEDUP_KEY, JSON.stringify([...set]));
+  } catch {
+    // sessionStorage unavailable (SSR, private mode) — fall through
+  }
+}
+
 /**
  * Show a satisfying quest completion celebration.
  * Call this when a quest/mission is completed.
@@ -44,11 +67,18 @@ export function showQuestCompletionToast({
   t = (k) => k,
   onComplete,
 }: QuestCompletionOptions) {
-  // Deduplicate: skip if same toast was shown recently
+  // Deduplicate: skip if same toast was shown recently (in-memory, 2s window)
   const dedupKey = `${questName}:${isGrandSlam}:${isAllComplete}`;
   if (recentToasts.has(dedupKey)) return;
+
+  // Session-persistent dedup: skip if already shown this session (survives refresh)
+  const today = new Date().toISOString().split('T')[0];
+  const sessionKey = `${today}:${dedupKey}`;
+  if (getSessionShownSet().has(sessionKey)) return;
+
   recentToasts.add(dedupKey);
   setTimeout(() => recentToasts.delete(dedupKey), DEDUP_WINDOW_MS);
+  markSessionShown(sessionKey);
 
   onComplete?.();
 

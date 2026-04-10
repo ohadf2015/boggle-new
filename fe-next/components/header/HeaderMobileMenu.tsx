@@ -195,10 +195,12 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
 
                 {/* Animated Hamburger Button */}
                 <button
-                    onClick={() => {
+                    onClick={async () => {
                         if (!showMobileMenu) {
+                            if (notificationCount > 0) {
+                                await markAllAsRead();
+                            }
                             setBadgeSeen(true);
-                            if (notificationCount > 0) markAllAsRead();
                         }
                         setShowMobileMenu(!showMobileMenu);
                     }}
