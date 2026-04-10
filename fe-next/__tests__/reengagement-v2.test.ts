@@ -37,7 +37,7 @@ describe('ReengagementEmailV2 — component render', () => {
 
   it('includes the circular marshmallow mascot with alt text', async () => {
     const html = await renderHtml();
-    expect(html).toContain('https://www.lexiclash.live/mascot/v1/waving-nobg.gif');
+    expect(html).toContain('https://www.lexiclash.live/mascot/waving.gif');
     expect(html).toContain('Lexi waving hello');
     // Circular clipping — border-radius 9999px applied to the ring cell
     expect(html).toContain('border-radius:9999px');

@@ -113,6 +113,7 @@ export function getCardOrder(stats?: GameModeStats[]): LandingGameMode[] {
 
   const pinned = PINNED_FIRST.filter(m => mainModes.includes(m));
   const unpinned = mainModes.filter(m => !PINNED_FIRST.includes(m));
+
   return [...pinned, ...unpinned];
 }
 

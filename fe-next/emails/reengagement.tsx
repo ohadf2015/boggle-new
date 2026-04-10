@@ -162,8 +162,7 @@ interface ReengagementEmailProps {
 
 /* ─── Assets ─── */
 
-const mascotSrc = 'https://www.lexiclash.live/mascot/v1/crying-nobg.gif';
-const logoSrc = 'https://www.lexiclash.live/logos/lexiclash_logo_english-min.webp';
+const mascotSrc = 'https://www.lexiclash.live/mascot/crying-nobg.gif';
 
 /* ─── Colors (solid hex only — Gmail dark-mode safe) ─── */
 
@@ -231,8 +230,19 @@ export default function ReengagementEmail({
             u + .body { background-color: ${C.bg} !important; }
             [data-ogsc] h1 { color: ${C.white} !important; }
             [data-ogsc] .cta-btn { background-color: ${C.lime} !important; color: ${C.black} !important; }
+            [data-ogsc] .cta-td { background-color: ${C.lime} !important; }
             [data-ogsc] .streak { color: ${C.pink} !important; }
             [data-ogsc] .q { color: ${C.cyan} !important; }
+            [data-ogsb] .cta-btn { background-color: ${C.lime} !important; }
+            [data-ogsb] .cta-td { background-color: ${C.lime} !important; }
+            :root { color-scheme: dark !important; }
+            @media (prefers-color-scheme: dark) {
+              .body, body { background-color: ${C.bg} !important; }
+              .cta-btn { background-color: ${C.lime} !important; color: ${C.black} !important; }
+              .cta-td { background-color: ${C.lime} !important; }
+            }
+            u + .body .cta-btn { background-color: ${C.lime} !important; color: ${C.black} !important; }
+            u + .body .cta-td { background-color: ${C.lime} !important; }
             @media (max-width: 480px) {
               .tile-cell { width: 44px !important; height: 44px !important; font-size: 22px !important; }
             }
@@ -252,20 +262,23 @@ export default function ReengagementEmail({
           <table role="presentation" cellPadding={0} cellSpacing={0} width="100%" dir={dir}
             style={{ backgroundColor: C.bg }}>
             <tr>
-              <td align="center" style={{ padding: '40px 20px' }}>
+              <td align="center" style={{ padding: '32px 20px' }}>
                 <table role="presentation" cellPadding={0} cellSpacing={0} width="100%"
                   style={{ maxWidth: '540px' }} dir={dir}>
 
-                  {/* ── Logo ── */}
+                  {/* ── Text wordmark ── */}
                   <tr>
-                    <td align="center" style={{ paddingBottom: '24px' }}>
-                      <Link href={playUrl} target="_blank" style={{ textDecoration: 'none' }}>
-                        <Img
-                          src={logoSrc}
-                          alt="LexiClash"
-                          width="140"
-                          style={{ display: 'block', maxWidth: '140px', height: 'auto' }}
-                        />
+                    <td align="center" style={{ paddingBottom: '18px' }}>
+                      <Link href={playUrl} target="_blank"
+                        style={{
+                          color: C.lime,
+                          fontSize: '20px',
+                          fontWeight: 700,
+                          letterSpacing: '5px',
+                          textDecoration: 'none',
+                          fontFamily: "'Fredoka', Arial, sans-serif",
+                        }}>
+                        LEXICLASH
                       </Link>
                     </td>
                   </tr>
@@ -291,23 +304,48 @@ export default function ReengagementEmail({
                         </tr>
 
                         <tr>
-                          <td style={{ padding: '32px 28px 36px' }}>
+                          <td style={{ padding: '24px 24px 28px' }}>
 
-                            {/* ── Mascot ── */}
+                            {/* ── Mascot (clipped circle badge) ── */}
                             <table role="presentation" cellPadding={0} cellSpacing={0} width="100%">
                               <tr>
-                                <td align="center" style={{ paddingBottom: '20px' }}>
-                                  <Img
-                                    src={mascotSrc}
-                                    alt="Lexi misses you"
-                                    width="140"
-                                    height="140"
-                                    style={{
-                                      display: 'block',
-                                      width: '140px',
-                                      height: '140px',
-                                    }}
-                                  />
+                                <td align="center" style={{ paddingBottom: '16px' }}>
+                                  <table role="presentation" cellPadding={0} cellSpacing={0}>
+                                    <tr>
+                                      <td
+                                        align="center"
+                                        valign="middle"
+                                        width={140}
+                                        height={140}
+                                        style={{
+                                          width: '140px',
+                                          height: '140px',
+                                          backgroundColor: C.pink,
+                                          borderRadius: '9999px',
+                                          border: `4px solid ${C.black}`,
+                                          boxShadow: `${sh}6px 6px 0px ${C.black}`,
+                                          overflow: 'hidden',
+                                          lineHeight: 0,
+                                          fontSize: 0,
+                                        }}
+                                      >
+                                        <Img
+                                          src={mascotSrc}
+                                          alt="Lexi misses you"
+                                          width="132"
+                                          height="132"
+                                          style={{
+                                            display: 'block',
+                                            width: '132px',
+                                            height: '132px',
+                                            borderRadius: '9999px',
+                                            border: 0,
+                                            outline: 'none',
+                                          }}
+                                        />
+                                      </td>
+                                    </tr>
+                                  </table>
                                 </td>
                               </tr>
                             </table>
@@ -327,7 +365,7 @@ export default function ReengagementEmail({
                             <Text className="streak" style={{
                               color: C.pink,
                               fontSize: '15px',
-                              margin: '0 0 28px',
+                              margin: '0 0 20px',
                               fontWeight: 600,
                               textAlign: 'center',
                               direction: dir,
@@ -341,7 +379,7 @@ export default function ReengagementEmail({
                                 backgroundColor: C.cardInner,
                                 borderRadius: '16px',
                                 border: `2px solid ${C.black}`,
-                                marginBottom: '28px',
+                                marginBottom: '20px',
                               }}>
                               <tr>
                                 <td style={{ padding: '24px 20px' }}>
@@ -409,7 +447,7 @@ export default function ReengagementEmail({
                                   <table role="presentation" cellPadding={0} cellSpacing={0}
                                     style={{ width: '100%', maxWidth: '320px', margin: '0 auto' }}>
                                     <tr>
-                                      <td align="center" style={{
+                                      <td align="center" className="cta-td" style={{
                                         backgroundColor: C.lime,
                                         borderRadius: '12px',
                                         border: `3px solid ${C.black}`,
@@ -489,7 +527,7 @@ export default function ReengagementEmail({
 
                   {/* ── Footer ── */}
                   <tr>
-                    <td style={{ paddingTop: '32px' }}>
+                    <td style={{ paddingTop: '24px' }}>
                       {/* Divider */}
                       <table role="presentation" cellPadding={0} cellSpacing={0} width="100%"
                         style={{ marginBottom: '20px' }}>

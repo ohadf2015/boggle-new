@@ -58,7 +58,7 @@ describe('LandingChallengeCards reordering', () => {
     expect(cards[4]).toHaveTextContent('landing.adventureMode');
   });
 
-  it('pins daily+arena first, reorders rest by popularity', () => {
+  it('pins daily+arena first, keeps blast above adventure regardless of popularity', () => {
     const stats: GameModeStats[] = [
       { mode: 'adventure', playCount: 500 },
       { mode: 'daily', playCount: 300 },
@@ -70,12 +70,12 @@ describe('LandingChallengeCards reordering', () => {
     const cardOrder = getCardOrder(stats);
     render(<LandingChallengeCards {...baseProps} cardOrder={cardOrder} />);
     const cards = screen.getAllByTestId('mode-card');
-    // Daily (banner) + injected quickPlay lead, then arena pinned, then adventure > practice > blast.
+    // Daily (banner) + injected quickPlay lead, then arena pinned, then blast always before adventure.
     expect(cards[0]).toHaveTextContent('landing.quickPlay');
     expect(cards[1]).toHaveTextContent('landing.arena');
-    expect(cards[2]).toHaveTextContent('landing.adventureMode');
-    expect(cards[3]).toHaveTextContent('landing.practice');
-    expect(cards[4]).toHaveTextContent('landing.blastMode');
+    expect(cards[2]).toHaveTextContent('landing.blastMode');
+    expect(cards[3]).toHaveTextContent('landing.adventureMode');
+    expect(cards[4]).toHaveTextContent('landing.practice');
   });
 
   it('shows blast in regular order when most popular', () => {

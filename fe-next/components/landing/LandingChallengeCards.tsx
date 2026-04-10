@@ -77,7 +77,18 @@ export function LandingChallengeCards({
   //   3. Strip `'practice'` for veterans.
   //   4. Surface `'practice'` first for brand-new players (< 3 games).
   //   5. Guarantee `'daily'` lands in the top 2 — it must never be buried.
-  const serverOrder: LandingCardKey[] = cardOrderProp ?? DEFAULT_ORDER;
+  const rawOrder: LandingCardKey[] = cardOrderProp ?? DEFAULT_ORDER;
+  // Guarantee blast always appears before adventure (regardless of popularity ranking)
+  const serverOrder: LandingCardKey[] = (() => {
+    const order = [...rawOrder];
+    const blastIdx = order.indexOf('blast');
+    const adventureIdx = order.indexOf('adventure');
+    if (blastIdx > 0 && adventureIdx >= 0 && blastIdx > adventureIdx) {
+      order.splice(blastIdx, 1);
+      order.splice(adventureIdx, 0, 'blast');
+    }
+    return order;
+  })();
   const withQuickPlay: LandingCardKey[] = serverOrder.includes('quickPlay')
     ? serverOrder
     : (() => {

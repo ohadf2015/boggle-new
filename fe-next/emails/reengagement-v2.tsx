@@ -80,13 +80,13 @@ const COPY: Record<string, Copy> = {
   },
   sv: {
     greeting: (n) => `${n}, allt bra?`,
-    missed: 'Din streak ligger på akuten. Lexi slutar inte stirra på dörren.',
+    missed: 'Din streak ligger på intensiven. Lexi slutar inte stirra på dörren.',
     hint: 'Din ledtråd för idag',
     pitch: 'Trettio sekunder. Ett ord. Du har gjort svårare saker före frukost.',
     cta: 'Nu kör vi',
     urgency: 'Pusslet försvinner vid midnatt. Klockan tickar på riktigt.',
     social: 'PS — dina vänner har redan spelat. De pratar inte om något annat.',
-    footerReason: 'Du anmälde dig till dagliga ordpåminnelser. Dåtidens du var hoppfull.',
+    footerReason: 'Du anmälde dig till dagliga ordpåminnelser. Ditt gamla jag var optimistiskt.',
     unsubscribe: 'Avprenumerera',
     privacy: 'Integritet',
   },
@@ -143,7 +143,7 @@ export const SUBJECT_LINES: Record<string, ((letter: string, name: string) => st
     (_l, n) => `${n}, det var ett tag sen 👀`,
     () => `din streak ligger på akuten`,
     (l) => `30 sekunder. ett ord. börjar med "${l}".`,
-    (_l, n) => `${n}, lexi gör blängen igen`,
+    (_l, n) => `${n}, lexi gör hundögonen igen`,
     (l) => `liten ledtråd: "${l}" ___ ___ ___`,
   ],
   ja: [
@@ -190,7 +190,7 @@ interface ReengagementEmailV2Props {
 /* ───────────────────────── Assets ───────────────────────── */
 
 // Use www. domain — lexiclash.live 301s to www, and email clients don't follow redirects
-const MASCOT_SRC = 'https://www.lexiclash.live/mascot/v1/waving-nobg.gif';
+const MASCOT_SRC = 'https://www.lexiclash.live/mascot/waving.gif';
 
 /* ─── Palette (solid hex only — dark-mode safe) ─── */
 
@@ -247,19 +247,25 @@ export default function ReengagementEmailV2({
             /* Outlook dark mode (data-ogsc = color, data-ogsb = background) */
             [data-ogsc] h1 { color: ${C.text} !important; }
             [data-ogsc] .cta-btn-v2 { background-color: ${C.lime} !important; color: ${C.black} !important; }
+            [data-ogsc] .cta-td-v2 { background-color: ${C.lime} !important; }
             [data-ogsc] .missed-v2 { color: ${C.pink} !important; }
             [data-ogsc] .hint-label { color: ${C.hint} !important; }
             [data-ogsb] .body-v2 { background-color: ${C.bg} !important; }
             [data-ogsb] .cta-btn-v2 { background-color: ${C.lime} !important; }
+            [data-ogsb] .cta-td-v2 { background-color: ${C.lime} !important; }
             /* Gmail dark mode — prevent color inversion */
             :root { color-scheme: dark !important; }
             @media (prefers-color-scheme: dark) {
               .body-v2, body { background-color: ${C.bg} !important; }
               h1 { color: ${C.text} !important; }
               .cta-btn-v2 { background-color: ${C.lime} !important; color: ${C.black} !important; }
+              .cta-td-v2 { background-color: ${C.lime} !important; }
               .missed-v2 { color: ${C.pink} !important; }
               .hint-label { color: ${C.hint} !important; }
             }
+            /* Google dark mode specificity boost */
+            u + .body-v2 .cta-btn-v2 { background-color: ${C.lime} !important; color: ${C.black} !important; }
+            u + .body-v2 .cta-td-v2 { background-color: ${C.lime} !important; }
             @media (max-width: 480px) {
               .h1-v2 { font-size: 26px !important; line-height: 1.25 !important; }
               .mascot-ring { width: 132px !important; height: 132px !important; }
@@ -288,7 +294,7 @@ export default function ReengagementEmailV2({
 
                   {/* ── 1. Text wordmark ── */}
                   <tr>
-                    <td align="center" style={{ paddingBottom: '40px' }}>
+                    <td align="center" style={{ paddingBottom: '28px' }}>
                       <Link href={playUrl} target="_blank"
                         style={{
                           color: C.lime,
@@ -305,7 +311,7 @@ export default function ReengagementEmailV2({
 
                   {/* ── 2. HERO — circular marshmallow badge (clipped) ── */}
                   <tr>
-                    <td align="center" style={{ paddingBottom: '28px' }}>
+                    <td align="center" style={{ paddingBottom: '20px' }}>
                       <table role="presentation" cellPadding={0} cellSpacing={0}>
                         <tr>
                           <td
@@ -366,7 +372,7 @@ export default function ReengagementEmailV2({
                       <Text className="missed-v2" style={{
                         color: C.pink,
                         fontSize: '15px',
-                        margin: '0 0 36px',
+                        margin: '0 0 24px',
                         fontWeight: 500,
                         textAlign: 'center',
                         lineHeight: '1.55',
@@ -437,7 +443,7 @@ export default function ReengagementEmailV2({
 
                   {/* Trailing underscores to tease the remaining word */}
                   <tr>
-                    <td align="center" style={{ paddingBottom: '28px' }}>
+                    <td align="center" style={{ paddingBottom: '20px' }}>
                       <span style={{
                         color: C.muted,
                         fontSize: '28px',
@@ -452,7 +458,7 @@ export default function ReengagementEmailV2({
 
                   {/* ── 5. Pitch line ── */}
                   <tr>
-                    <td align="center" style={{ padding: '0 20px 28px' }}>
+                    <td align="center" style={{ padding: '0 20px 20px' }}>
                       <Text className="pitch-v2" style={{
                         color: C.text,
                         fontSize: '16px',
@@ -476,7 +482,7 @@ export default function ReengagementEmailV2({
                       <table role="presentation" cellPadding={0} cellSpacing={0}
                         style={{ margin: '0 auto' }}>
                         <tr>
-                          <td align="center" style={{
+                          <td align="center" className="cta-td-v2" style={{
                             backgroundColor: C.lime,
                             borderRadius: '16px',
                             border: `3px solid ${C.black}`,
@@ -525,7 +531,7 @@ export default function ReengagementEmailV2({
 
                   {/* ── 8. Social proof, casual P.S. ── */}
                   <tr>
-                    <td align="center" style={{ paddingBottom: '40px' }}>
+                    <td align="center" style={{ paddingBottom: '28px' }}>
                       <Text style={{
                         color: C.muted,
                         fontSize: '13px',

@@ -266,30 +266,8 @@ describe('DailyWordHuntResults - EmojiShareCard', () => {
     vi.clearAllMocks();
   });
 
-  it('renders EmojiShareCard when solved=true and words exist', () => {
+  it('does NOT render EmojiShareCard (removed from results)', () => {
     render(<DailyWordHuntResults {...baseProps} />);
-    // Component renders twice (mobile + desktop), at least one must appear
-    const cards = screen.getAllByTestId('emoji-share-card');
-    expect(cards.length).toBeGreaterThan(0);
-  });
-
-  it('does NOT render EmojiShareCard when solved=false', () => {
-    render(
-      <DailyWordHuntResults
-        {...baseProps}
-        result={{ ...baseResult, solved: false, wordsDiscovered }}
-      />
-    );
-    expect(screen.queryByTestId('emoji-share-card')).not.toBeInTheDocument();
-  });
-
-  it('does NOT render EmojiShareCard when solved=true but no words', () => {
-    render(
-      <DailyWordHuntResults
-        {...baseProps}
-        result={{ ...baseResult, solved: true, wordsDiscovered: [] }}
-      />
-    );
     expect(screen.queryByTestId('emoji-share-card')).not.toBeInTheDocument();
   });
 

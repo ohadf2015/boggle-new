@@ -25,7 +25,6 @@ import {
   PerformanceSection,
   RankBadge,
   DailyWordHuntFacts,
-  EmojiShareCard,
   ShareSection,
   CoinUnlockCard,
   MoreOptionsAccordion,
@@ -96,12 +95,12 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
   puzzleDate,
   language,
   countdown,
-  isNewCompletion,
+  isNewCompletion: _isNewCompletion,
   showFlexing,
   showEncouraging,
   survivalBonusTime,
   rarestWord,
-  emojiWords,
+  emojiWords: _emojiWords,
   stats,
   shareHandlers,
   coinActions,
@@ -200,73 +199,6 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
       </motion.div>
     )}
 
-    {/* Emoji share card — visible for winners with discovered words */}
-    {result.solved && emojiWords.length > 0 && (
-      <motion.div
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.6, type: 'spring', stiffness: 300, damping: 26 }}
-      >
-        <EmojiShareCard
-          puzzleNumber={puzzleNumber}
-          score={result.efficiencyScore || 0}
-          solved={result.solved}
-          words={emojiWords}
-          language={language}
-          t={t}
-        />
-      </motion.div>
-    )}
-
-    {/* Share/Retry Section */}
-    <motion.div
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.7, type: 'spring', stiffness: 300, damping: 26 }}
-    >
-      <ShareSection
-        solved={result.solved}
-        onShare={shareHandlers.handleNativeShare}
-        onChallengeShare={shareHandlers.handleChallengeShare}
-        onRetry={coinActions.handleRetryChallenge}
-        canAffordRetry={coinActions.canAffordRetry}
-        retryCost={coinActions.retryCost}
-        currentCoins={coinActions.currentCoins}
-        onWhatsApp={shareHandlers.handleWhatsApp}
-        onTwitter={shareHandlers.handleTwitter}
-        onTelegram={shareHandlers.handleTelegram}
-        onCopy={shareHandlers.handleCopy}
-        onDownloadImage={shareHandlers.handleDownloadShareImage}
-        copied={shareHandlers.copied}
-        isGeneratingImage={shareHandlers.isGeneratingImage}
-        onSpendStart={onSpendStart}
-        t={t}
-      />
-    </motion.div>
-
-    {/* Next Step — unlimited multiplayer games promo */}
-    {onBackToLobby && (
-      <motion.div
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.75, type: 'spring', stiffness: 300, damping: 26 }}
-      >
-        <NextStepPrompt
-          currentMode="word-hunt"
-          onBackToLobby={onBackToLobby}
-          variant="mobile"
-        />
-      </motion.div>
-    )}
-
-    {/* Inline signup for guests */}
-    {!isAuthenticated && !inlineSignupDismissed && (
-      <DailyChallengeInlineSignup
-        pendingResult={{ result, puzzleNumber, puzzleDate, language }}
-        onDismiss={onInlineSignupDismiss}
-      />
-    )}
-
     {/* FAIL state: Reveal target word + watch ad */}
     {!result.solved && (
       <div className="space-y-3">
@@ -309,7 +241,7 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
       </div>
     )}
 
-    {/* Leaderboard */}
+    {/* Leaderboard — in place of the removed emoji share section */}
     <TabbedDailyLeaderboard
       key={leaderboardKey}
       puzzleDate={puzzleDate}
@@ -322,7 +254,56 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
       defaultTab="today"
     />
 
-    {/* More Options - Secondary actions in accordion */}
+    {/* Share/Retry Section */}
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.7, type: 'spring', stiffness: 300, damping: 26 }}
+    >
+      <ShareSection
+        solved={result.solved}
+        onShare={shareHandlers.handleNativeShare}
+        onChallengeShare={shareHandlers.handleChallengeShare}
+        onRetry={coinActions.handleRetryChallenge}
+        canAffordRetry={coinActions.canAffordRetry}
+        retryCost={coinActions.retryCost}
+        currentCoins={coinActions.currentCoins}
+        onWhatsApp={shareHandlers.handleWhatsApp}
+        onTwitter={shareHandlers.handleTwitter}
+        onTelegram={shareHandlers.handleTelegram}
+        onCopy={shareHandlers.handleCopy}
+        onDownloadImage={shareHandlers.handleDownloadShareImage}
+        copied={shareHandlers.copied}
+        isGeneratingImage={shareHandlers.isGeneratingImage}
+        onSpendStart={onSpendStart}
+        t={t}
+      />
+    </motion.div>
+
+    {/* Inline signup for guests */}
+    {!isAuthenticated && !inlineSignupDismissed && (
+      <DailyChallengeInlineSignup
+        pendingResult={{ result, puzzleNumber, puzzleDate, language }}
+        onDismiss={onInlineSignupDismiss}
+      />
+    )}
+
+    {/* Next Step — play with friends */}
+    {onBackToLobby && (
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.75, type: 'spring', stiffness: 300, damping: 26 }}
+      >
+        <NextStepPrompt
+          currentMode="word-hunt"
+          onBackToLobby={onBackToLobby}
+          variant="mobile"
+        />
+      </motion.div>
+    )}
+
+    {/* Create Your Own Board + Language Options — visible, not collapsed */}
     <MoreOptionsAccordion
       isAuthenticated={isAuthenticated}
       solved={result.solved}

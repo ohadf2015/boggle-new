@@ -94,7 +94,7 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
   wordsDiscovered = 0,
   t,
 }) => {
-  const [wordHidden, setWordHidden] = useState(true);
+  const [wordHidden, setWordHidden] = useState(false);
 
   const scoreBreakdown = useMemo(() =>
     getScoreBreakdown(lifeRemaining, attemptsUsed, wordsDiscovered, solved),

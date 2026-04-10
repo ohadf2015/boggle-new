@@ -1,13 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { Mail, Send, CheckCircle, XCircle, Loader2, Eye, Calendar, UserX, UserPlus, Rocket } from 'lucide-react';
+import { Mail, Send, CheckCircle, XCircle, Loader2, Eye, Calendar, UserX, Rocket } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
+import { EmailBulkActions } from './EmailBulkActions';
 
 interface EmailTestPanelProps {
   authToken: string;
@@ -76,11 +77,6 @@ export function EmailTestPanel({ authToken, userEmail, userName }: EmailTestPane
   const [message, setMessage] = useState('');
   const [showPreview, setShowPreview] = useState(false);
 
-  // Manual send to player state
-  const [playerIdentifier, setPlayerIdentifier] = useState('');
-  const [playerSendStatus, setPlayerSendStatus] = useState<SendStatus>('idle');
-  const [playerSendMessage, setPlayerSendMessage] = useState('');
-
   const config = EMAIL_TYPE_CONFIG[emailType];
 
   const handleSendTestEmail = async () => {
@@ -127,40 +123,6 @@ export function EmailTestPanel({ authToken, userEmail, userName }: EmailTestPane
     setStatus('idle');
     setMessage('');
     setShowPreview(false);
-  };
-
-  const handleSendToPlayer = async () => {
-    if (!playerIdentifier) {
-      setPlayerSendStatus('error');
-      setPlayerSendMessage('Please enter a player email or username');
-      return;
-    }
-
-    setPlayerSendStatus('sending');
-    setPlayerSendMessage('');
-
-    try {
-      const response = await fetch('/api/admin/send-reengagement-to-player', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${authToken}`,
-        },
-        body: JSON.stringify({ playerIdentifier }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to send email');
-      }
-
-      setPlayerSendStatus('success');
-      setPlayerSendMessage(data.message || `Email sent to ${data.sentTo}`);
-    } catch (err) {
-      setPlayerSendStatus('error');
-      setPlayerSendMessage(err instanceof Error ? err.message : 'Failed to send email');
-    }
   };
 
   const baseUrl = typeof window !== 'undefined'
@@ -345,65 +307,14 @@ export function EmailTestPanel({ authToken, userEmail, userName }: EmailTestPane
           </div>
         )}
 
-        {/* Send to Player Section */}
-        {emailType === 'reengagement' && (
-          <div className="mt-6 pt-4 border-t-2 border-slate-700 space-y-3">
-            <div className="flex items-center gap-2 mb-2">
-              <UserPlus className="w-4 h-4 text-neo-orange" />
-              <span className="text-neo-white font-neo-display text-sm font-bold">
-                Send to Player (Real Email)
-              </span>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="player-identifier" className="text-neo-white font-medium text-sm">
-                Player Email or Username
-              </Label>
-              <div className="flex gap-2">
-                <Input
-                  id="player-identifier"
-                  type="text"
-                  value={playerIdentifier}
-                  onChange={(e) => setPlayerIdentifier(e.target.value)}
-                  placeholder="player@email.com or username"
-                  className="bg-neo-navy border-2 border-neo-black text-neo-white placeholder:text-slate-500 flex-1"
-                  onKeyDown={(e) => e.key === 'Enter' && handleSendToPlayer()}
-                />
-                <Button
-                  onClick={handleSendToPlayer}
-                  disabled={playerSendStatus === 'sending' || !playerIdentifier}
-                  className={cn(
-                    'bg-neo-orange text-neo-black font-bold border-3 border-neo-black shadow-hard-sm',
-                    'hover:bg-neo-orange/80 active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed',
-                    'disabled:opacity-50 disabled:cursor-not-allowed'
-                  )}
-                >
-                  {playerSendStatus === 'sending' ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : (
-                    <Send className="w-4 h-4" />
-                  )}
-                </Button>
-              </div>
-            </div>
-
-            {playerSendMessage && (
-              <div className={cn(
-                'flex items-center gap-2 p-3 rounded-neo border-2',
-                playerSendStatus === 'success' && 'bg-green-500/10 border-green-500 text-green-400',
-                playerSendStatus === 'error' && 'bg-neo-red/10 border-neo-red text-neo-red'
-              )}>
-                {playerSendStatus === 'success' && <CheckCircle className="w-4 h-4 shrink-0" />}
-                {playerSendStatus === 'error' && <XCircle className="w-4 h-4 shrink-0" />}
-                <span className="text-sm font-medium">{playerSendMessage}</span>
-              </div>
-            )}
-
-            <p className="text-xs text-slate-500">
-              Sends a real re-engagement email (not [TEST]). Auto-detects player language.
-            </p>
-          </div>
-        )}
+        {/* Send to Player + Bulk Send */}
+        <EmailBulkActions
+          authToken={authToken}
+          emailType={emailType}
+          emailLabel={config.label}
+          gameMode={gameMode}
+          showBulk={emailType !== 'daily-challenge'}
+        />
 
         {/* Info Box */}
         <div className="mt-4 p-3 bg-neo-navy rounded-neo border-2 border-slate-700">

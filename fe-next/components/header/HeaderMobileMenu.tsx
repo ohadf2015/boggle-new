@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { LazyMotion, domAnimation, m, AnimatePresence, type PanInfo } from 'framer-motion';
 import { Menu, X, Settings, Trophy, ScrollText, Coffee, Accessibility, Info, HelpCircle, Mail, Cookie, Gift, Users, ChevronRight, Sparkles, User, Flame, Bell, Check, Pencil } from 'lucide-react';
 import Link from 'next/link';
+import { useQueryClient } from '@tanstack/react-query';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { cn } from '../../lib/utils';
@@ -23,6 +24,7 @@ import { useEngagementStatus } from '@/hooks/useEngagementStatus';
 import { useDailyMissions } from '@/hooks/useDailyMissions';
 import { useRealtimeNotifications } from '@/hooks/useRealtimeNotifications';
 import { useCrazyGamesAuth } from '@/hooks/useCrazyGamesAuth';
+import { queryKeys } from '@/lib/queryKeys';
 
 interface HeaderMobileMenuProps {
     unclaimedCount: number;
@@ -68,9 +70,16 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
     const { missions, completedCount, isGrandSlam } = useDailyMissions();
     const { notifications, unreadCount: notificationCount, markAsRead, markAllAsRead, dismissNotification } = useRealtimeNotifications();
     const [showAllNotifications, setShowAllNotifications] = useState(false);
+
+    // Filter out gift notifications when the gift button is already visible (prevents duplication)
+    const filteredNotifications = (unclaimedCount > 0
+        ? ((notifications ?? []) as NotificationData[]).filter(n => n.notification_type !== 'gift')
+        : (notifications ?? []) as NotificationData[]);
     const { isCrazyGames } = useCrazyGamesAuth();
+    const queryClient = useQueryClient();
     const [showMobileMenu, setShowMobileMenu] = useState(false);
     const [badgeSeen, setBadgeSeen] = useState(false);
+    const [giftBannerDismissed, setGiftBannerDismissed] = useState(false);
 
     // Guest name editing
     const [guestName, setGuestNameState] = useState<string>(() => getStoredUsername() || '');
@@ -456,7 +465,7 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                 )}
 
                                 {/* ── Notifications Section (in-menu) ── */}
-                                {isAuthenticated && (notifications as NotificationData[]).length > 0 && (
+                                {isAuthenticated && filteredNotifications.length > 0 && (
                                     <div className="mx-4 mt-2">
                                         <div className="flex items-center justify-between mb-1.5">
                                             <div className="flex items-center gap-2">
@@ -485,8 +494,8 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                             "bg-neo-white/5"
                                         )}>
                                             {(showAllNotifications
-                                                ? (notifications as NotificationData[])
-                                                : (notifications as NotificationData[]).slice(0, 3)
+                                                ? filteredNotifications
+                                                : filteredNotifications.slice(0, 3)
                                             ).map((n) => (
                                                 <NotificationItem
                                                     key={n.id}
@@ -508,14 +517,14 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                                 />
                                             ))}
                                         </div>
-                                        {(notifications as NotificationData[]).length > 3 && (
+                                        {filteredNotifications.length > 3 && (
                                             <button
                                                 onClick={() => setShowAllNotifications(!showAllNotifications)}
                                                 className="w-full mt-1 text-center text-[10px] text-neo-white/40 hover:text-neo-cyan transition-colors font-bold py-1"
                                             >
                                                 {showAllNotifications
                                                     ? t('common.showLess')
-                                                    : t('notifications.viewAll') + ` (${(notifications as NotificationData[]).length})`
+                                                    : t('notifications.viewAll') + ` (${filteredNotifications.length})`
                                                 }
                                             </button>
                                         )}
@@ -531,26 +540,49 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                     exit="exit"
                                 >
                                     {/* Gift Notification - highlighted */}
-                                    {isAuthenticated && unclaimedCount > 0 && (
+                                    {isAuthenticated && unclaimedCount > 0 && !giftBannerDismissed && (
                                         <m.div variants={itemVariants}>
-                                            <button
-                                                onClick={handleOpenGift}
-                                                className={cn(
-                                                    "relative flex items-center gap-3 w-full px-4 py-3 text-sm font-bold rounded-neo",
-                                                    "bg-linear-to-r from-amber-500/90 to-amber-400/90 text-neo-black",
-                                                    "border-3 border-neo-black shadow-hard-sm",
-                                                    "hover:shadow-hard hover:-translate-y-px",
-                                                    "active:translate-y-px active:shadow-none",
-                                                    "transition-all duration-100"
-                                                )}
-                                            >
-                                                <MenuIcon className="bg-white/30 border-neo-black/30">
-                                                    <Gift className="w-4 h-4" aria-hidden="true" />
-                                                </MenuIcon>
-                                                <span>{t('gift.youHaveGifts') || `You have ${unclaimedCount} gift${unclaimedCount !== 1 ? 's' : ''}`}</span>
-                                                <GiftNotificationBadge count={unclaimedCount} className="relative top-0 right-0" />
-                                                <Sparkles className="absolute top-1 right-2 w-3 h-3 text-white/50 animate-pulse" aria-hidden="true" />
-                                            </button>
+                                            <div className="relative">
+                                                <button
+                                                    onClick={handleOpenGift}
+                                                    className={cn(
+                                                        "relative flex items-center gap-3 w-full px-4 py-3 text-sm font-bold rounded-neo",
+                                                        "bg-linear-to-r from-amber-500/90 to-amber-400/90 text-neo-black",
+                                                        "border-3 border-neo-black shadow-hard-sm",
+                                                        "hover:shadow-hard hover:-translate-y-px",
+                                                        "active:translate-y-px active:shadow-none",
+                                                        "transition-all duration-100"
+                                                    )}
+                                                >
+                                                    <MenuIcon className="bg-white/30 border-neo-black/30">
+                                                        <Gift className="w-4 h-4" aria-hidden="true" />
+                                                    </MenuIcon>
+                                                    <span>{t('gift.youHaveGifts') || `You have ${unclaimedCount} gift${unclaimedCount !== 1 ? 's' : ''}`}</span>
+                                                    <GiftNotificationBadge count={unclaimedCount} className="relative top-0 right-0" />
+                                                    <Sparkles className="absolute top-1 right-2 w-3 h-3 text-white/50 animate-pulse" aria-hidden="true" />
+                                                </button>
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setGiftBannerDismissed(true);
+                                                        // Persist dismissal to DB so it doesn't reappear on refresh
+                                                        fetch('/api/player/gifts/dismiss-modal', { method: 'POST' })
+                                                            .then(() => {
+                                                                // Invalidate gift queries so unclaimedCount updates
+                                                                queryClient.invalidateQueries({ queryKey: queryKeys.gifts._def });
+                                                            })
+                                                            .catch(() => {});
+                                                        // Also dismiss any gift-type notifications from the notification list
+                                                        (notifications as NotificationData[])
+                                                            .filter(n => n.notification_type === 'gift')
+                                                            .forEach(n => dismissNotification(n.id));
+                                                    }}
+                                                    className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-neo-black/80 border-2 border-neo-white/20 flex items-center justify-center text-neo-white/60 hover:text-neo-white hover:bg-neo-black transition-colors z-10"
+                                                    aria-label={t('notifications.dismiss')}
+                                                >
+                                                    <X size={12} />
+                                                </button>
+                                            </div>
                                         </m.div>
                                     )}
 

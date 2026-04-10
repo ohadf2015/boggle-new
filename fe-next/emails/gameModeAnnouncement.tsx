@@ -66,21 +66,21 @@ const MODE_PRESETS: Record<GameModeKey, ModePreset> = {
     badgeLabel: 'NEW MODE',
     heroImageUrl: 'https://www.lexiclash.live/modes/blast.png',
     heroImageAlt: 'Blast Mode — explosive word puzzles',
-    mascotUrl: 'https://www.lexiclash.live/mascot/v1/onfire-nobg.gif',
+    mascotUrl: 'https://www.lexiclash.live/mascot/onfire-nobg.gif',
   },
   wordhunt: {
     accent: 'pink',
     badgeLabel: 'NEW MODE',
     heroImageUrl: 'https://www.lexiclash.live/modes/wordhunt.png',
     heroImageAlt: 'Word Hunt multiplayer',
-    mascotUrl: 'https://www.lexiclash.live/mascot/v1/flexing-nobg.gif',
+    mascotUrl: 'https://www.lexiclash.live/mascot/flexing.gif',
   },
   adventure: {
     accent: 'purple',
     badgeLabel: 'NEW MODE',
     heroImageUrl: 'https://www.lexiclash.live/modes/adventure.png',
     heroImageAlt: 'Adventure Mode',
-    mascotUrl: 'https://www.lexiclash.live/mascot/v1/explorer-nobg.gif',
+    mascotUrl: 'https://www.lexiclash.live/mascot/explorer-nobg.gif',
   },
 };
 
@@ -95,7 +95,7 @@ const MODE_COPY: Record<GameModeKey, Record<string, ModeCopy>> = {
       features: ['Chain Blasts', 'Power Tiles', 'Boss Rush'],
       featureDescriptions: ['Trigger combo reactions', 'Bombs, prisms, lightning', 'New weekly bosses'],
       cta: 'Play Blast Mode',
-      urgency: 'First 3 boss runs — double gold until Sunday',
+      urgency: 'Jump in now — your first 3 boss runs earn bonus gold',
       footerReason: 'You subscribed to LexiClash updates.',
       unsubscribe: 'Unsubscribe',
       privacy: 'Privacy',
@@ -107,7 +107,7 @@ const MODE_COPY: Record<GameModeKey, Record<string, ModeCopy>> = {
       features: ['פיצוצי שרשרת', 'אריחי עוצמה', 'קרב בוסים'],
       featureDescriptions: ['הפעל תגובות קומבו', 'פצצות, פריזמות, ברקים', 'בוסים חדשים כל שבוע'],
       cta: 'שחק/י במצב בלאסט',
-      urgency: '3 קרבות הבוס הראשונים — זהב כפול עד יום ראשון',
+      urgency: 'קפוץ/קפצי עכשיו — 3 קרבות הבוס הראשונים עם זהב בונוס',
       footerReason: 'נרשמת לעדכוני LexiClash.',
       unsubscribe: 'ביטול הרשמה',
       privacy: 'פרטיות',
@@ -119,7 +119,7 @@ const MODE_COPY: Record<GameModeKey, Record<string, ModeCopy>> = {
       features: ['Kedje-blast', 'Kraft-brickor', 'Boss Rush'],
       featureDescriptions: ['Utlös comboreaktioner', 'Bomber, prismor, blixtar', 'Nya veckoboss'],
       cta: 'Spela Blast-läget',
-      urgency: 'Första 3 boss-rundorna — dubbelt guld till söndag',
+      urgency: 'Hoppa in nu — dina 3 första bossrundor ger bonusguld',
       footerReason: 'Du prenumererar på LexiClash-uppdateringar.',
       unsubscribe: 'Avprenumerera',
       privacy: 'Integritet',
@@ -131,7 +131,7 @@ const MODE_COPY: Record<GameModeKey, Record<string, ModeCopy>> = {
       features: ['連鎖ブラスト', 'パワータイル', 'ボスラッシュ'],
       featureDescriptions: ['コンボを起こそう', '爆弾・プリズム・稲妻', '毎週新ボス'],
       cta: 'ブラストモードで遊ぶ',
-      urgency: '最初の3回のボス戦はゴールド2倍 — 日曜まで',
+      urgency: '今すぐ参戦 — 最初の3回のボス戦でボーナスゴールド',
       footerReason: 'LexiClashのアップデートを購読しています。',
       unsubscribe: '配信停止',
       privacy: 'プライバシー',
@@ -143,7 +143,7 @@ const MODE_COPY: Record<GameModeKey, Record<string, ModeCopy>> = {
       features: ['Combos en Cadena', 'Fichas de Poder', 'Jefes'],
       featureDescriptions: ['Activa reacciones combo', 'Bombas, prismas, rayos', 'Nuevos jefes semanales'],
       cta: 'Jugar Modo Blast',
-      urgency: 'Primeros 3 combates — oro doble hasta el domingo',
+      urgency: 'Entra ya — tus primeras 3 peleas de jefe dan oro extra',
       footerReason: 'Te suscribiste a las novedades de LexiClash.',
       unsubscribe: 'Cancelar suscripción',
       privacy: 'Privacidad',
@@ -157,7 +157,7 @@ const MODE_COPY: Record<GameModeKey, Record<string, ModeCopy>> = {
       features: ['Live PvP', 'Power-Ups', 'Ranked Ladder'],
       featureDescriptions: ['Beat real players', 'Shield, freeze, boost', 'Climb the ranks'],
       cta: 'Find a Match',
-      urgency: 'Launch week — 2× XP on every match',
+      urgency: 'Your first match earns bonus XP — jump in now',
       footerReason: 'You subscribed to LexiClash updates.',
       unsubscribe: 'Unsubscribe',
       privacy: 'Privacy',
@@ -169,7 +169,7 @@ const MODE_COPY: Record<GameModeKey, Record<string, ModeCopy>> = {
       features: ['PvP חי', 'חיזוקים', 'דירוג'],
       featureDescriptions: ['נגד שחקנים אמיתיים', 'מגן, קפאה, בוסט', 'טפס/י בדירוג'],
       cta: 'מצא/י משחק',
-      urgency: 'שבוע השקה — XP כפול בכל משחק',
+      urgency: 'המשחק הראשון שלך נותן XP בונוס — קפוץ/קפצי עכשיו',
       footerReason: 'נרשמת לעדכוני LexiClash.',
       unsubscribe: 'ביטול הרשמה',
       privacy: 'פרטיות',
@@ -181,7 +181,7 @@ const MODE_COPY: Record<GameModeKey, Record<string, ModeCopy>> = {
       features: ['Live PvP', 'Power-Ups', 'Rankad'],
       featureDescriptions: ['Slå riktiga spelare', 'Sköld, frys, boost', 'Klättra i ranken'],
       cta: 'Hitta en match',
-      urgency: 'Lanseringsveckan — 2× XP varje match',
+      urgency: 'Din första match ger bonus-XP — hoppa in nu',
       footerReason: 'Du prenumererar på LexiClash-uppdateringar.',
       unsubscribe: 'Avprenumerera',
       privacy: 'Integritet',
@@ -193,7 +193,7 @@ const MODE_COPY: Record<GameModeKey, Record<string, ModeCopy>> = {
       features: ['ライブPvP', 'パワーアップ', 'ランク戦'],
       featureDescriptions: ['本物の相手と戦う', 'シールド・凍結・加速', 'ランクを登れ'],
       cta: 'マッチを探す',
-      urgency: 'ローンチ週間はXP2倍',
+      urgency: '初戦はボーナスXP — 今すぐ参戦',
       footerReason: 'LexiClashのアップデートを購読しています。',
       unsubscribe: '配信停止',
       privacy: 'プライバシー',
@@ -205,7 +205,7 @@ const MODE_COPY: Record<GameModeKey, Record<string, ModeCopy>> = {
       features: ['PvP en vivo', 'Potenciadores', 'Ranking'],
       featureDescriptions: ['Contra jugadores reales', 'Escudo, congelar, boost', 'Sube el ranking'],
       cta: 'Buscar partida',
-      urgency: 'Semana de lanzamiento — 2× XP en cada partida',
+      urgency: 'Tu primera partida da XP extra — entra ya',
       footerReason: 'Te suscribiste a las novedades de LexiClash.',
       unsubscribe: 'Cancelar suscripción',
       privacy: 'Privacidad',
@@ -238,7 +238,7 @@ const MODE_COPY: Record<GameModeKey, Record<string, ModeCopy>> = {
     },
     sv: {
       title: 'ÄVENTYRSLÄGET ÄR HÄR',
-      tagline: 'En ordäventyr genom märkliga världar',
+      tagline: 'Ett ordäventyr genom märkliga världar',
       intro: (n) => `${n}, din expedition börjar nu.`,
       features: ['Banor', 'Loot & Runor', 'Boss-strider'],
       featureDescriptions: ['20+ handgjorda banor', 'Samla uppgraderingar', 'Besegra bossar'],
@@ -407,13 +407,13 @@ export default function GameModeAnnouncementEmail({
           <table role="presentation" cellPadding={0} cellSpacing={0} width="100%" dir={dir}
             style={{ backgroundColor: C.bg }}>
             <tr>
-              <td align="center" style={{ padding: '40px 20px' }}>
+              <td align="center" style={{ padding: '32px 20px' }}>
                 <table role="presentation" cellPadding={0} cellSpacing={0} width="100%"
                   style={{ maxWidth: '560px' }} dir={dir}>
 
                   {/* ── Text logo ── */}
                   <tr>
-                    <td align="center" style={{ paddingBottom: '24px' }}>
+                    <td align="center" style={{ paddingBottom: '18px' }}>
                       <Link
                         href={playUrl}
                         target="_blank"
@@ -458,12 +458,12 @@ export default function GameModeAnnouncementEmail({
                         </tr>
 
                         <tr>
-                          <td style={{ padding: '32px 28px 36px' }}>
+                          <td style={{ padding: '24px 24px 28px' }}>
 
                             {/* ── "NEW MODE" badge ── */}
                             <table role="presentation" cellPadding={0} cellSpacing={0} width="100%">
                               <tr>
-                                <td align="center" style={{ paddingBottom: '20px' }}>
+                                <td align="center" style={{ paddingBottom: '14px' }}>
                                   <table role="presentation" cellPadding={0} cellSpacing={0}>
                                     <tr>
                                       <td
@@ -497,7 +497,7 @@ export default function GameModeAnnouncementEmail({
                             {/* ── Mascot clipped circle ── */}
                             <table role="presentation" cellPadding={0} cellSpacing={0} width="100%">
                               <tr>
-                                <td align="center" style={{ paddingBottom: '20px' }}>
+                                <td align="center" style={{ paddingBottom: '14px' }}>
                                   <table role="presentation" cellPadding={0} cellSpacing={0}>
                                     <tr>
                                       <td
@@ -564,7 +564,7 @@ export default function GameModeAnnouncementEmail({
                               style={{
                                 color: accent,
                                 fontSize: '15px',
-                                margin: '0 0 22px',
+                                margin: '0 0 16px',
                                 fontWeight: 600,
                                 textAlign: 'center',
                                 lineHeight: '1.5',
@@ -576,14 +576,14 @@ export default function GameModeAnnouncementEmail({
 
                             {/* ── Hero image ── */}
                             <table role="presentation" cellPadding={0} cellSpacing={0} width="100%"
-                              style={{ marginBottom: '24px' }}>
+                              style={{ marginBottom: '18px' }}>
                               <tr>
                                 <td align="center"
                                   style={{
                                     backgroundColor: C.cardInner,
                                     borderRadius: '14px',
                                     border: `3px solid ${C.black}`,
-                                    padding: '14px',
+                                    padding: '12px',
                                   }}>
                                   <Img
                                     src={preset.heroImageUrl}
@@ -609,7 +609,7 @@ export default function GameModeAnnouncementEmail({
                               style={{
                                 color: C.white,
                                 fontSize: '16px',
-                                margin: '0 0 22px',
+                                margin: '0 0 16px',
                                 textAlign: 'center',
                                 lineHeight: '1.55',
                                 direction: dir,
@@ -621,7 +621,7 @@ export default function GameModeAnnouncementEmail({
 
                             {/* ── Feature trio ── */}
                             <table role="presentation" cellPadding={0} cellSpacing={0} width="100%"
-                              style={{ marginBottom: '28px' }}>
+                              style={{ marginBottom: '20px' }}>
                               <tr>
                                 {([0, 1, 2] as const).map((i) => (
                                   <td key={i} width="33%" align="center" valign="top"
@@ -679,19 +679,18 @@ export default function GameModeAnnouncementEmail({
                                           href={playUrl}
                                           className="cta-btn"
                                           style={{
-                                            display: 'block',
+                                            display: 'inline-block',
                                             backgroundColor: accent,
                                             color: C.black,
-                                            fontSize: '18px',
+                                            fontSize: '17px',
                                             fontWeight: 700,
                                             textDecoration: 'none',
-                                            padding: '18px 36px',
+                                            padding: '16px 32px',
                                             borderRadius: '14px',
                                             fontFamily: "'Fredoka', Arial, sans-serif",
-                                            letterSpacing: '1.5px',
+                                            letterSpacing: '1px',
                                             textAlign: 'center',
                                             textTransform: 'uppercase' as const,
-                                            width: '100%',
                                           }}
                                         >
                                           {arrow}&nbsp;&nbsp;{t.cta}
@@ -745,7 +744,7 @@ export default function GameModeAnnouncementEmail({
 
                   {/* ── Footer ── */}
                   <tr>
-                    <td style={{ paddingTop: '32px' }}>
+                    <td style={{ paddingTop: '24px' }}>
                       <table role="presentation" cellPadding={0} cellSpacing={0} width="100%"
                         style={{ marginBottom: '20px' }}>
                         <tr>

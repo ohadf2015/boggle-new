@@ -130,22 +130,22 @@ describe('ResultDisplay Component', () => {
       expect(screen.getByTestId('score-gauge-ring')).toBeInTheDocument();
     });
 
-    it('hides target word by default for spoiler-free screenshots', () => {
+    it('shows target word by default', () => {
       render(<ResultDisplay {...solvedProps} targetWord="CAT" />);
-      // Word is hidden by default — letters should not be visible
-      expect(screen.queryByTestId('letter-C')).not.toBeInTheDocument();
-      // Should show ? placeholders
-      const questionMarks = screen.getAllByText('?');
-      expect(questionMarks.length).toBe(3);
-    });
-
-    it('reveals target word letters when eye toggle is clicked', () => {
-      render(<ResultDisplay {...solvedProps} targetWord="CAT" />);
-      const toggle = screen.getByTestId('word-visibility-toggle');
-      fireEvent.click(toggle);
+      // Word is visible by default
       expect(screen.getByTestId('letter-C')).toBeInTheDocument();
       expect(screen.getByTestId('letter-A')).toBeInTheDocument();
       expect(screen.getByTestId('letter-T')).toBeInTheDocument();
+    });
+
+    it('hides target word letters when eye toggle is clicked', () => {
+      render(<ResultDisplay {...solvedProps} targetWord="CAT" />);
+      const toggle = screen.getByTestId('word-visibility-toggle');
+      fireEvent.click(toggle);
+      // Word is now hidden
+      expect(screen.queryByTestId('letter-C')).not.toBeInTheDocument();
+      const questionMarks = screen.getAllByText('?');
+      expect(questionMarks.length).toBe(3);
     });
 
     it('renders puzzle number in header', () => {
@@ -183,28 +183,28 @@ describe('ResultDisplay Component', () => {
       expect(screen.getByTestId('word-visibility-toggle')).toBeInTheDocument();
     });
 
-    it('shows ? placeholders by default (spoiler-free)', () => {
+    it('shows letters by default', () => {
       render(<ResultDisplay {...solvedProps} />);
-      // Letters should be hidden by default
+      // Letters should be visible by default
+      expect(screen.getByTestId('letter-H')).toBeInTheDocument();
+    });
+
+    it('hides letters when toggle is clicked', () => {
+      render(<ResultDisplay {...solvedProps} />);
+      const toggle = screen.getByTestId('word-visibility-toggle');
+      fireEvent.click(toggle); // hide
       expect(screen.queryByTestId('letter-H')).not.toBeInTheDocument();
       // Should show ? placeholders (5 for HELLO)
       const questionMarks = screen.getAllByText('?');
       expect(questionMarks.length).toBe(5);
     });
 
-    it('reveals letters when toggle is clicked', () => {
+    it('shows letters again when toggle is clicked twice', () => {
       render(<ResultDisplay {...solvedProps} />);
       const toggle = screen.getByTestId('word-visibility-toggle');
-      fireEvent.click(toggle); // reveal
+      fireEvent.click(toggle); // hide
+      fireEvent.click(toggle); // show again
       expect(screen.getByTestId('letter-H')).toBeInTheDocument();
-    });
-
-    it('hides letters again when toggle is clicked twice', () => {
-      render(<ResultDisplay {...solvedProps} />);
-      const toggle = screen.getByTestId('word-visibility-toggle');
-      fireEvent.click(toggle); // reveal
-      fireEvent.click(toggle); // hide again
-      expect(screen.queryByTestId('letter-H')).not.toBeInTheDocument();
     });
   });
 
