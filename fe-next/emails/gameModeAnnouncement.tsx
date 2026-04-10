@@ -64,23 +64,23 @@ const MODE_PRESETS: Record<GameModeKey, ModePreset> = {
   blast: {
     accent: 'pink',
     badgeLabel: 'NEW MODE',
-    heroImageUrl: 'https://lexiclash.live/modes/blast.png',
+    heroImageUrl: 'https://www.lexiclash.live/modes/blast.png',
     heroImageAlt: 'Blast Mode — explosive word puzzles',
-    mascotUrl: 'https://lexiclash.live/mascot/v1/onfire-nobg.gif',
+    mascotUrl: 'https://www.lexiclash.live/mascot/v1/onfire-nobg.gif',
   },
   wordhunt: {
     accent: 'pink',
     badgeLabel: 'NEW MODE',
-    heroImageUrl: 'https://lexiclash.live/modes/wordhunt.png',
+    heroImageUrl: 'https://www.lexiclash.live/modes/wordhunt.png',
     heroImageAlt: 'Word Hunt multiplayer',
-    mascotUrl: 'https://lexiclash.live/mascot/v1/flexing-nobg.gif',
+    mascotUrl: 'https://www.lexiclash.live/mascot/v1/flexing-nobg.gif',
   },
   adventure: {
     accent: 'purple',
     badgeLabel: 'NEW MODE',
-    heroImageUrl: 'https://lexiclash.live/modes/adventure.png',
+    heroImageUrl: 'https://www.lexiclash.live/modes/adventure.png',
     heroImageAlt: 'Adventure Mode',
-    mascotUrl: 'https://lexiclash.live/mascot/v1/explorer-nobg.gif',
+    mascotUrl: 'https://www.lexiclash.live/mascot/v1/explorer-nobg.gif',
   },
 };
 

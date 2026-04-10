@@ -20,8 +20,10 @@ interface DailyChallengePreloadedStats {
 
 interface LandingChallengeCardsProps {
   language: string;
-  isAdmin: boolean;
-  hasBlastAccess: boolean;
+  /** @deprecated Blast is now public — kept for caller compat, ignored */
+  isAdmin?: boolean;
+  /** @deprecated Blast is now public — kept for caller compat, ignored */
+  hasBlastAccess?: boolean;
   activePlayers: number;
   openRooms: number;
   totalPlayers: number;
@@ -40,15 +42,13 @@ interface LandingChallengeCardsProps {
 type LandingCardKey = LandingGameMode | 'quickPlay';
 
 /** Default card order when no server data available */
-const DEFAULT_ORDER: LandingCardKey[] = ['daily', 'quickPlay', 'arena', 'practice', 'adventure'];
+const DEFAULT_ORDER: LandingCardKey[] = ['daily', 'quickPlay', 'arena', 'practice', 'blast', 'adventure'];
 
 /** CSS stagger delay for each card index */
 const cardDelay = (index: number) => `${index * 0.07}s`;
 
 export function LandingChallengeCards({
   language,
-  isAdmin,
-  hasBlastAccess,
   activePlayers,
   openRooms,
   totalPlayers,
@@ -167,6 +167,24 @@ export function LandingChallengeCards({
           </div>
         );
 
+      case 'blast':
+        return (
+          <div key="blast" className="w-full h-full animate-[fadeInUp_0.4s_ease-out_both]" style={style}>
+            <ModeCard
+              title={t('landing.blastMode')}
+              description={t('landing.blastModeDesc')}
+              href={`/${language}/blast`}
+              icon={<Bomb className="w-6 h-6" />}
+              modeImage="/modes/blast.png"
+              variant="orange"
+              badge="NEW"
+              duration={t('landing.duration').replace('{time}', '2-5')}
+              difficulty={3}
+              difficultyLabel={t('landing.difficultyHard')}
+            />
+          </div>
+        );
+
       case 'adventure':
         return (
           <div key="adventure" className="w-full h-full animate-[fadeInUp_0.4s_ease-out_both]" style={style}>
@@ -193,22 +211,6 @@ export function LandingChallengeCards({
     <div className="w-full max-w-5xl mx-auto xl:max-w-6xl">
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6 items-stretch">
         {cardOrder.map((mode, index) => renderCard(mode, index))}
-
-        {/* Blast Mode (admin only) — always last */}
-        {(isAdmin || hasBlastAccess) && (
-          <div className="w-full h-full animate-[fadeInUp_0.4s_ease-out_both]" style={{ animationDelay: cardDelay(cardOrder.length) }}>
-            <ModeCard
-              title={t('landing.blastMode')}
-              description={t('landing.blastModeDesc')}
-              href={`/${language}/blast`}
-              icon={<Bomb className="w-6 h-6" />}
-              modeImage="/modes/blast.png"
-              variant="orange"
-              secondary
-              badge="ADMIN"
-            />
-          </div>
-        )}
       </div>
     </div>
   );

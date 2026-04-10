@@ -13,6 +13,7 @@ import { SurvivalPromoVideoHe } from '../components/promo/SurvivalPromoVideoHe';
 import { RedditGameplayDemo } from '../components/promo/RedditGameplayDemo';
 import { RedditMultilingualShowcase } from '../components/promo/RedditMultilingualShowcase';
 import { RedditVSBattle } from '../components/promo/RedditVSBattle';
+import { BlastPromoVideo } from '../components/promo/BlastPromoVideo';
 
 export const RemotionRoot: React.FC = () => {
   return (
@@ -61,6 +62,16 @@ export const RemotionRoot: React.FC = () => {
         id="SurvivalPromoHe"
         component={SurvivalPromoVideoHe}
         durationInFrames={565}
+        fps={30}
+        width={1080}
+        height={1920}
+      />
+
+      {/* Blast Mode Instagram Promo */}
+      <Composition
+        id="BlastPromo"
+        component={BlastPromoVideo}
+        durationInFrames={407}
         fps={30}
         width={1080}
         height={1920}

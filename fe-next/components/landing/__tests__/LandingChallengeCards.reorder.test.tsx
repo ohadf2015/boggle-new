@@ -36,8 +36,6 @@ vi.mock('@/hooks/useIsPracticeVeteran', () => ({
 
 const baseProps = {
   language: 'en',
-  isAdmin: false,
-  hasBlastAccess: false,
   activePlayers: 10,
   openRooms: 2,
   totalPlayers: 100,
@@ -49,14 +47,15 @@ const baseProps = {
 describe('LandingChallengeCards reordering', () => {
   it('renders daily then arena first by default', () => {
     render(<LandingChallengeCards {...baseProps} />);
-    // Daily banner first (pinned), then arena (pinned), then practice, adventure
+    // Daily banner first (pinned), then arena (pinned), then practice, blast, adventure
     expect(screen.getByTestId('daily-banner')).toBeInTheDocument();
     const cards = screen.getAllByTestId('mode-card');
     // Quick Play is injected right after daily, so it leads the ModeCard list.
     expect(cards[0]).toHaveTextContent('landing.quickPlay');
     expect(cards[1]).toHaveTextContent('landing.arena');
     expect(cards[2]).toHaveTextContent('landing.practice');
-    expect(cards[3]).toHaveTextContent('landing.adventureMode');
+    expect(cards[3]).toHaveTextContent('landing.blastMode');
+    expect(cards[4]).toHaveTextContent('landing.adventureMode');
   });
 
   it('pins daily+arena first, reorders rest by popularity', () => {
@@ -71,14 +70,15 @@ describe('LandingChallengeCards reordering', () => {
     const cardOrder = getCardOrder(stats);
     render(<LandingChallengeCards {...baseProps} cardOrder={cardOrder} />);
     const cards = screen.getAllByTestId('mode-card');
-    // Daily (banner) + injected quickPlay lead, then arena pinned, then adventure > practice.
+    // Daily (banner) + injected quickPlay lead, then arena pinned, then adventure > practice > blast.
     expect(cards[0]).toHaveTextContent('landing.quickPlay');
     expect(cards[1]).toHaveTextContent('landing.arena');
     expect(cards[2]).toHaveTextContent('landing.adventureMode');
     expect(cards[3]).toHaveTextContent('landing.practice');
+    expect(cards[4]).toHaveTextContent('landing.blastMode');
   });
 
-  it('still shows blast separately even when most popular', () => {
+  it('shows blast in regular order when most popular', () => {
     const stats: GameModeStats[] = [
       { mode: 'blast', playCount: 9999 },
       { mode: 'practice', playCount: 10 },
@@ -87,10 +87,11 @@ describe('LandingChallengeCards reordering', () => {
       { mode: 'adventure', playCount: 1 },
     ];
     const cardOrder = getCardOrder(stats);
-    render(<LandingChallengeCards {...baseProps} isAdmin={true} cardOrder={cardOrder} />);
-    // Blast should be last (separate section)
+    render(<LandingChallengeCards {...baseProps} cardOrder={cardOrder} />);
     const cards = screen.getAllByTestId('mode-card');
-    const lastCard = cards[cards.length - 1];
-    expect(lastCard).toHaveTextContent('landing.blastMode');
+    // Blast is most popular, so after pinned daily+arena it comes first
+    expect(cards[0]).toHaveTextContent('landing.quickPlay');
+    expect(cards[1]).toHaveTextContent('landing.arena');
+    expect(cards[2]).toHaveTextContent('landing.blastMode');
   });
 });

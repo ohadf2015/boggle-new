@@ -385,4 +385,68 @@ router.post('/send-reengagement-to-player', async (req: AdminRequest, res: Respo
   }
 });
 
+/**
+ * POST /api/admin/send-test-game-mode-announcement
+ * Send a test game mode announcement email to a specified address
+ */
+router.post('/send-test-game-mode-announcement', async (req: AdminRequest, res: Response): Promise<void> => {
+  const startTime = Date.now();
+  logger.info('ADMIN_API', '====== Send test game mode announcement request START ======');
+
+  try {
+    const { sendTestGameModeAnnouncement } = await import('../../../lib/gameModeAnnouncementEmail');
+    const { isEmailServiceConfigured } = await import('../../../lib/email');
+
+    if (!isEmailServiceConfigured()) {
+      logger.warn('ADMIN_API', 'Email service not configured');
+      res.status(503).json({
+        error: 'Email service not configured. Set RESEND_API_KEY and RESEND_FROM_EMAIL.',
+        details: {
+          hasApiKey: !!process.env.RESEND_API_KEY,
+          hasFromEmail: !!process.env.RESEND_FROM_EMAIL,
+        }
+      });
+      return;
+    }
+
+    const { email, recipientName, language: reqLanguage, mode: reqMode } = req.body || {};
+
+    const targetEmail = email || req.adminUser?.email;
+    if (!targetEmail) {
+      res.status(400).json({ error: 'No email address provided' });
+      return;
+    }
+
+    const ALLOWED_MODES = ['blast', 'wordhunt', 'adventure'] as const;
+    const ALLOWED_LANGUAGES = ['en', 'he', 'sv', 'ja', 'es'];
+
+    const language = ALLOWED_LANGUAGES.includes(reqLanguage) ? reqLanguage : 'en';
+    const mode = (ALLOWED_MODES as readonly string[]).includes(reqMode) ? reqMode : 'blast';
+    const name = recipientName || req.adminUser?.username || 'Test User';
+
+    logger.info('ADMIN_API', `Sending test game mode (${mode}) announcement to ${targetEmail} (lang=${language})`);
+
+    const result = await sendTestGameModeAnnouncement(targetEmail, name, language, mode);
+
+    if (!result.success) {
+      logger.warn('ADMIN_API', `Send failed: ${result.error}`);
+      res.status(500).json({ error: result.error || 'Failed to send test email' });
+      return;
+    }
+
+    logger.info('ADMIN_API', `====== SUCCESS - Total time: ${Date.now() - startTime}ms ======`);
+    auditLog(req.adminUser, 'SEND_TEST_GAME_MODE_ANNOUNCEMENT', { targetEmail, language, mode });
+
+    res.json({
+      success: true,
+      message: `Test ${mode} announcement sent to ${targetEmail}`,
+      sentTo: targetEmail,
+    });
+  } catch (error) {
+    const err = error as Error;
+    logger.error('ADMIN_API', `Send test game mode announcement error: ${err.message}`);
+    res.status(500).json({ error: err.message || 'Internal server error' });
+  }
+});
+
 export default router;

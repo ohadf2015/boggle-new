@@ -162,8 +162,8 @@ interface ReengagementEmailProps {
 
 /* ─── Assets ─── */
 
-const mascotSrc = 'https://lexiclash.live/mascot/v1/crying-nobg.gif';
-const logoSrc = 'https://lexiclash.live/logos/lexiclash_logo_english-min.webp';
+const mascotSrc = 'https://www.lexiclash.live/mascot/v1/crying-nobg.gif';
+const logoSrc = 'https://www.lexiclash.live/logos/lexiclash_logo_english-min.webp';
 
 /* ─── Colors (solid hex only — Gmail dark-mode safe) ─── */
 

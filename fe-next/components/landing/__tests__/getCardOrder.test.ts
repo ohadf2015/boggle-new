@@ -2,9 +2,9 @@ import { getCardOrder, type GameModeStats } from '@/lib/landing/fetchGameModeSta
 
 describe('getCardOrder', () => {
   it('returns default order when no stats provided', () => {
-    expect(getCardOrder()).toEqual(['daily', 'arena', 'practice', 'adventure']);
-    expect(getCardOrder(undefined)).toEqual(['daily', 'arena', 'practice', 'adventure']);
-    expect(getCardOrder([])).toEqual(['daily', 'arena', 'practice', 'adventure']);
+    expect(getCardOrder()).toEqual(['daily', 'arena', 'practice', 'blast', 'adventure']);
+    expect(getCardOrder(undefined)).toEqual(['daily', 'arena', 'practice', 'blast', 'adventure']);
+    expect(getCardOrder([])).toEqual(['daily', 'arena', 'practice', 'blast', 'adventure']);
   });
 
   it('returns default order when all counts are zero', () => {
@@ -15,7 +15,7 @@ describe('getCardOrder', () => {
       { mode: 'adventure', playCount: 0 },
       { mode: 'blast', playCount: 0 },
     ];
-    expect(getCardOrder(stats)).toEqual(['daily', 'arena', 'practice', 'adventure']);
+    expect(getCardOrder(stats)).toEqual(['daily', 'arena', 'practice', 'blast', 'adventure']);
   });
 
   it('pins daily and arena first, reorders rest by popularity', () => {
@@ -26,11 +26,11 @@ describe('getCardOrder', () => {
       { mode: 'practice', playCount: 100 },
       { mode: 'blast', playCount: 50 },
     ];
-    // daily + arena pinned first, then adventure > practice by popularity
-    expect(getCardOrder(stats)).toEqual(['daily', 'arena', 'adventure', 'practice']);
+    // daily + arena pinned first, then adventure > practice > blast by popularity
+    expect(getCardOrder(stats)).toEqual(['daily', 'arena', 'adventure', 'practice', 'blast']);
   });
 
-  it('excludes blast from card order (shown separately)', () => {
+  it('includes blast in card order sorted by popularity', () => {
     const stats: GameModeStats[] = [
       { mode: 'blast', playCount: 9999 },
       { mode: 'daily', playCount: 100 },
@@ -39,8 +39,11 @@ describe('getCardOrder', () => {
       { mode: 'practice', playCount: 10 },
     ];
     const order = getCardOrder(stats);
-    expect(order).not.toContain('blast');
-    expect(order).toEqual(['daily', 'arena', 'adventure', 'practice']);
+    expect(order).toContain('blast');
+    // blast is most popular non-pinned, so it comes right after daily+arena
+    expect(order[0]).toBe('daily');
+    expect(order[1]).toBe('arena');
+    expect(order[2]).toBe('blast');
   });
 
   it('fills in missing modes from default order', () => {
@@ -49,11 +52,12 @@ describe('getCardOrder', () => {
       { mode: 'arena', playCount: 50 },
     ];
     const order = getCardOrder(stats);
-    expect(order).toHaveLength(4);
+    expect(order).toHaveLength(5);
     expect(order[0]).toBe('daily');
     expect(order[1]).toBe('arena');
     expect(order).toContain('practice');
     expect(order).toContain('adventure');
+    expect(order).toContain('blast');
   });
 
   it('pins daily+arena even when other modes have more plays', () => {
@@ -68,6 +72,6 @@ describe('getCardOrder', () => {
     expect(order[0]).toBe('daily');
     expect(order[1]).toBe('arena');
     expect(order[2]).toBe('adventure'); // most popular non-pinned
-    expect(order).toHaveLength(4);
+    expect(order).toHaveLength(5);
   });
 });

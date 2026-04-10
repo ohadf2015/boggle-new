@@ -40,8 +40,6 @@ vi.mock('@/hooks/useIsPracticeVeteran', () => ({
 
 const baseProps = {
   language: 'en',
-  isAdmin: false,
-  hasBlastAccess: false,
   activePlayers: 10,
   openRooms: 2,
   totalPlayers: 100,
@@ -62,17 +60,17 @@ describe('LandingChallengeCards', () => {
     expect(screen.getByText('landing.adventureMode')).toBeInTheDocument();
   });
 
-  it('shows blast mode only when isAdmin', () => {
-    const { rerender } = render(<LandingChallengeCards {...baseProps} />);
-    expect(screen.queryByText('landing.blastMode')).not.toBeInTheDocument();
-
-    rerender(<LandingChallengeCards {...baseProps} isAdmin={true} />);
+  it('shows blast mode for all players', () => {
+    render(<LandingChallengeCards {...baseProps} />);
     expect(screen.getByText('landing.blastMode')).toBeInTheDocument();
   });
 
-  it('shows blast mode when hasBlastAccess', () => {
-    render(<LandingChallengeCards {...baseProps} hasBlastAccess={true} />);
-    expect(screen.getByText('landing.blastMode')).toBeInTheDocument();
+  it('shows blast mode before adventure mode', () => {
+    render(<LandingChallengeCards {...baseProps} />);
+    const cards = screen.getAllByTestId('mode-card');
+    const blastIndex = cards.findIndex(c => c.textContent?.includes('landing.blastMode'));
+    const adventureIndex = cards.findIndex(c => c.textContent?.includes('landing.adventureMode'));
+    expect(blastIndex).toBeLessThan(adventureIndex);
   });
 
   it('renders daily challenge banner', () => {

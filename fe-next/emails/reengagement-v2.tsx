@@ -189,8 +189,8 @@ interface ReengagementEmailV2Props {
 
 /* ───────────────────────── Assets ───────────────────────── */
 
-// New marshmallow mascot — friendly waving pose
-const MASCOT_SRC = 'https://lexiclash.live/mascot/v1/waving-nobg.gif';
+// Use www. domain — lexiclash.live 301s to www, and email clients don't follow redirects
+const MASCOT_SRC = 'https://www.lexiclash.live/mascot/v1/waving-nobg.gif';
 
 /* ─── Palette (solid hex only — dark-mode safe) ─── */
 
@@ -242,11 +242,24 @@ export default function ReengagementEmailV2({
           <meta name="color-scheme" content="dark" />
           <meta name="supported-color-schemes" content="dark" />
           <style>{`
+            /* Force dark bg in all email clients */
             u + .body-v2 { background-color: ${C.bg} !important; }
+            /* Outlook dark mode (data-ogsc = color, data-ogsb = background) */
             [data-ogsc] h1 { color: ${C.text} !important; }
             [data-ogsc] .cta-btn-v2 { background-color: ${C.lime} !important; color: ${C.black} !important; }
             [data-ogsc] .missed-v2 { color: ${C.pink} !important; }
             [data-ogsc] .hint-label { color: ${C.hint} !important; }
+            [data-ogsb] .body-v2 { background-color: ${C.bg} !important; }
+            [data-ogsb] .cta-btn-v2 { background-color: ${C.lime} !important; }
+            /* Gmail dark mode — prevent color inversion */
+            :root { color-scheme: dark !important; }
+            @media (prefers-color-scheme: dark) {
+              .body-v2, body { background-color: ${C.bg} !important; }
+              h1 { color: ${C.text} !important; }
+              .cta-btn-v2 { background-color: ${C.lime} !important; color: ${C.black} !important; }
+              .missed-v2 { color: ${C.pink} !important; }
+              .hint-label { color: ${C.hint} !important; }
+            }
             @media (max-width: 480px) {
               .h1-v2 { font-size: 26px !important; line-height: 1.25 !important; }
               .mascot-ring { width: 132px !important; height: 132px !important; }

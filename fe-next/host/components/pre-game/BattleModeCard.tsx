@@ -103,8 +103,7 @@ export function BattleModeCard({
   compact = false,
   children,
 }: BattleModeCardProps): React.ReactElement {
-  // Filter modes: blast visible to admins or blast_access users
-  const visibleModes = (isAdmin || hasBlastAccess) ? MODES : MODES.filter(m => m.mode !== 'blast');
+  const visibleModes = MODES;
 
   const handleSelect = useCallback((mode: GameModeOption) => {
     setSelectedGameMode(mode);

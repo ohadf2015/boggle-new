@@ -92,20 +92,19 @@ export async function fetchGameModeStats(days: number = 30): Promise<GameModeSta
 }
 
 /** Default card order when no stats available */
-const DEFAULT_ORDER: LandingGameMode[] = ['daily', 'arena', 'practice', 'adventure'];
+const DEFAULT_ORDER: LandingGameMode[] = ['daily', 'arena', 'practice', 'blast', 'adventure'];
 
 /** Modes pinned to the front regardless of popularity */
 const PINNED_FIRST: LandingGameMode[] = ['daily', 'arena'];
 
-/** Compute card display order from popularity stats. Blast excluded (shown separately). */
+/** Compute card display order from popularity stats. */
 export function getCardOrder(stats?: GameModeStats[]): LandingGameMode[] {
   if (!stats || stats.length === 0) return DEFAULT_ORDER;
 
   const mainModes: LandingGameMode[] = stats
-    .filter(s => s.mode !== 'blast')
     .map(s => s.mode);
 
-  const hasData = stats.some(s => s.playCount > 0 && s.mode !== 'blast');
+  const hasData = stats.some(s => s.playCount > 0);
   if (!hasData) return DEFAULT_ORDER;
 
   for (const mode of DEFAULT_ORDER) {
