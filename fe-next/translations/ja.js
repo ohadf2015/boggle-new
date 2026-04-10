@@ -477,6 +477,8 @@ const ja = {
     "edit": "編集",
     "retry": "もう一度",
     "join": "参加",
+    "show": "表示",
+    "hide": "隠す",
     "showLess": "少なく",
     "showMore": "もっと",
     "collapse": "折りたたむ",
@@ -2145,6 +2147,8 @@ const ja = {
     "tryDailyChallengeDesc": "世界中で同じパズル - グローバルに競い合おう！",
     "goMultiplayer": "マルチプレイヤーへ",
     "goMultiplayerDesc": "リアルな人間、リアルな勝負、リアルな自慢",
+    "goMultiplayerFromDaily": "1回で終わり？",
+    "goMultiplayerFromDailyDesc": "無制限の対戦、リアルな相手 — 明日まで待つ必要なし",
     "brainTraining": "脳トレーニング",
     "brainTrainingDesc": "集中トレーニングで認知能力を向上"
   },

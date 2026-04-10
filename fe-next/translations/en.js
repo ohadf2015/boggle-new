@@ -480,6 +480,8 @@ const en = {
     "save": "Save",
     "edit": "Edit",
     "join": "Join",
+    "show": "Show",
+    "hide": "Hide",
     "showLess": "Less",
     "showMore": "More",
     "collapse": "Collapse",
@@ -2248,6 +2250,8 @@ const en = {
     "tryDailyChallengeDesc": "Everyone gets the same puzzle. Where do you rank?",
     "goMultiplayer": "Battle Friends",
     "goMultiplayerDesc": "Real humans, real competition, real bragging rights",
+    "goMultiplayerFromDaily": "Why Stop at One?",
+    "goMultiplayerFromDailyDesc": "Unlimited games, real opponents — no waiting until tomorrow",
     "brainTraining": "Brain Gym",
     "brainTrainingDesc": "Level up your mental game"
   },

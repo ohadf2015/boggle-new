@@ -25,6 +25,8 @@ vi.mock('@/contexts/LanguageContext', () => ({
       'nextStep.tryDailyChallengeDesc': 'Same puzzle for everyone worldwide - compete globally!',
       'nextStep.goMultiplayer': 'Go Multiplayer!',
       'nextStep.goMultiplayerDesc': 'Compete with real players',
+      'nextStep.goMultiplayerFromDaily': 'Why Stop at One?',
+      'nextStep.goMultiplayerFromDailyDesc': 'Unlimited games, real opponents — no waiting until tomorrow',
       'nextStep.backToLobby': 'Back to Lobby',
       'nextStep.letsGo': "Let's Go!",
     };
@@ -111,8 +113,8 @@ describe('NextStepPrompt', () => {
         />
       );
 
-      expect(screen.getByText('Go Multiplayer!')).toBeInTheDocument();
-      expect(screen.getByText('Compete with real players')).toBeInTheDocument();
+      expect(screen.getByText('Why Stop at One?')).toBeInTheDocument();
+      expect(screen.getByText('Unlimited games, real opponents — no waiting until tomorrow')).toBeInTheDocument();
     });
   });
 

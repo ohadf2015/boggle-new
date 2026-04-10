@@ -406,10 +406,10 @@ const AdventureGrid = memo(
             'adventure-grid',
             'relative grid flex-1',
             GRID_GAP_CLASS,
-            // Board visual treatment: dark inset background, neo-brutalist border, rounded container
-            'bg-black/30 rounded-neo-lg',
-            'border-2 border-black/50',
-            'shadow-[inset_0_2px_8px_rgba(0,0,0,0.4)]',
+            // Board visual treatment: subtle backdrop, lighter border for airy feel
+            'bg-black/15 rounded-neo-lg',
+            'border border-white/10',
+            'shadow-[inset_0_1px_4px_rgba(0,0,0,0.2)]',
             'select-none touch-none',
             disabled && 'adventure-grid-disabled pointer-events-none',
             bossGridClass,

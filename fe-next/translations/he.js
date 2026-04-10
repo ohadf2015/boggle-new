@@ -478,6 +478,8 @@ const he = {
     "edit": "ערוך",
     "retry": "נסה שוב",
     "join": "הצטרף",
+    "show": "הצג",
+    "hide": "הסתר",
     "showLess": "פחות",
     "showMore": "עוד",
     "collapse": "כווץ",
@@ -2163,6 +2165,8 @@ const he = {
     "tryDailyChallengeDesc": "אותו פאזל לכולם בעולם - תתחרו גלובלית!",
     "goMultiplayer": "עברו למולטיפלייר",
     "goMultiplayerDesc": "בני אדם אמיתיים, תחרות אמיתית, גאווה אמיתית",
+    "goMultiplayerFromDaily": "למה לעצור באחד?",
+    "goMultiplayerFromDailyDesc": "משחקים ללא הגבלה, יריבים אמיתיים — בלי לחכות למחר",
     "brainTraining": "אימון מוחי",
     "brainTrainingDesc": "שדרגו את המוח"
   },

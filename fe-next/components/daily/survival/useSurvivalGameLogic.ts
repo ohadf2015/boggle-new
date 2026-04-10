@@ -87,6 +87,7 @@ export interface SurvivalGameState {
   // Toast feedback
   feedbackType: FeedbackType | null;
   feedbackMessage: string;
+  feedbackWord: string | null;
 
   // WordFormingArea feedback
   wordFeedback: WordFeedback | null;
@@ -139,8 +140,8 @@ export function useSurvivalGameLogic({
   const lifeAnimationTimeout = useSafeTimeout();
 
   // Toast helpers - dispatch-based
-  const showToast = useCallback((type: FeedbackType, message: string) => {
-    dispatch({ type: 'SHOW_TOAST', payload: { type, message } });
+  const showToast = useCallback((type: FeedbackType, message: string, word?: string) => {
+    dispatch({ type: 'SHOW_TOAST', payload: { type, message, word } });
 
     // Also dispatch WordFeedback for WordFormingArea
     const wordFeedbackType = type === 'valid-word' || type === 'target-found'
@@ -500,6 +501,7 @@ export function useSurvivalGameLogic({
     isClueGaining: clueState.isClueGaining,
     feedbackType: state.feedbackType,
     feedbackMessage: state.feedbackMessage,
+    feedbackWord: state.feedbackWord,
     wordFeedback: state.wordFeedback,
   };
 

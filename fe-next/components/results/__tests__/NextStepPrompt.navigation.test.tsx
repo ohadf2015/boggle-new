@@ -29,6 +29,8 @@ vi.mock('@/contexts/LanguageContext', () => ({
         'nextStep.tryDailyChallengeDesc': 'Same puzzle for everyone worldwide - compete globally!',
         'nextStep.goMultiplayer': 'Go Multiplayer!',
         'nextStep.goMultiplayerDesc': 'Compete with real players',
+        'nextStep.goMultiplayerFromDaily': 'Why Stop at One?',
+        'nextStep.goMultiplayerFromDailyDesc': 'Unlimited games, real opponents — no waiting until tomorrow',
         'nextStep.backToLobby': 'Back to Lobby',
         'nextStep.letsGo': "Let's Go!",
       };
@@ -130,7 +132,7 @@ describe('NextStepPrompt Navigation', () => {
         />
       );
 
-      const buttonElement = screen.getByText('Go Multiplayer!');
+      const buttonElement = screen.getByText('Why Stop at One?');
       await user.click(buttonElement);
 
       expect(mockRouterPush).toHaveBeenCalledWith('/en/multiplayer');
@@ -179,7 +181,7 @@ describe('NextStepPrompt Navigation', () => {
     const testCases = [
       { mode: 'practice' as const, expectedHref: '/en/singleplayer?preset=bots', titleText: 'Challenge the Bots!' },
       { mode: 'solo-bots' as const, expectedHref: '/en/daily', titleText: 'Try Daily Challenge' },
-      { mode: 'daily' as const, expectedHref: '/en/multiplayer', titleText: 'Go Multiplayer!' },
+      { mode: 'daily' as const, expectedHref: '/en/multiplayer', titleText: 'Why Stop at One?' },
       { mode: 'multiplayer-bots' as const, expectedHref: '/en/daily', titleText: 'Try Daily Challenge' },
     ];
 

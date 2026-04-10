@@ -469,6 +469,8 @@ const es = {
     "edit": "Editar",
     "retry": "Reintentar",
     "join": "Unirse",
+    "show": "Mostrar",
+    "hide": "Ocultar",
     "showLess": "Menos",
     "showMore": "Más",
     "collapse": "Colapsar",
@@ -2160,6 +2162,8 @@ const es = {
     "tryDailyChallengeDesc": "¡Mismo puzzle para todos en el mundo - compite globalmente!",
     "goMultiplayer": "Contra Amigos",
     "goMultiplayerDesc": "Humanos reales, competencia real, presume de verdad",
+    "goMultiplayerFromDaily": "¿Solo una partida?",
+    "goMultiplayerFromDailyDesc": "Partidas ilimitadas, rivales reales — sin esperar hasta mañana",
     "brainTraining": "Gym Cerebral",
     "brainTrainingDesc": "Mejora tus habilidades cognitivas con ejercicios enfocados"
   },

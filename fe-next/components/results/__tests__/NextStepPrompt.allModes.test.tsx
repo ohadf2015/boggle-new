@@ -43,6 +43,8 @@ vi.mock('@/contexts/LanguageContext', () => ({
         'nextStep.tryDailyChallengeDesc': 'Same puzzle for everyone worldwide - compete globally!',
         'nextStep.goMultiplayer': 'Go Multiplayer!',
         'nextStep.goMultiplayerDesc': 'Compete with real players',
+        'nextStep.goMultiplayerFromDaily': 'Why Stop at One?',
+        'nextStep.goMultiplayerFromDailyDesc': 'Unlimited games, real opponents — no waiting until tomorrow',
         'nextStep.backToLobby': 'Back to Lobby',
         'nextStep.letsGo': "Let's Go!",
       };
@@ -182,7 +184,7 @@ describe('NextStepPrompt - All Navigation Modes', () => {
         // Find and click the navigation button
         const navButton = variant === 'desktop'
           ? screen.getByRole('button', { name: /let's go/i })
-          : screen.getByText('Go Multiplayer!');
+          : screen.getByText('Why Stop at One?');
 
         await user.click(navButton);
 

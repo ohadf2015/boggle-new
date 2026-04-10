@@ -38,6 +38,7 @@ export interface SurvivalReducerState {
   // Feedback/notifications
   feedbackType: FeedbackType | null;
   feedbackMessage: string;
+  feedbackWord: string | null;
   activeNotifications: AutoClueNotificationData[];
 
   // WordFormingArea feedback
@@ -78,7 +79,7 @@ export type SurvivalAction =
   | { type: 'SET_SHOW_QUIT_CONFIRM'; payload: boolean }
 
   // Toast feedback
-  | { type: 'SHOW_TOAST'; payload: { type: FeedbackType; message: string } }
+  | { type: 'SHOW_TOAST'; payload: { type: FeedbackType; message: string; word?: string } }
   | { type: 'CLOSE_TOAST' }
 
   // Notifications
@@ -122,6 +123,7 @@ export function createInitialState(): SurvivalReducerState {
     // Feedback/notifications
     feedbackType: null,
     feedbackMessage: '',
+    feedbackWord: null,
     activeNotifications: [],
 
     // WordFormingArea feedback
@@ -226,6 +228,7 @@ export function survivalGameReducer(
         ...state,
         feedbackType: action.payload.type,
         feedbackMessage: action.payload.message,
+        feedbackWord: action.payload.word ?? null,
       };
 
     case 'CLOSE_TOAST':
@@ -233,6 +236,7 @@ export function survivalGameReducer(
         ...state,
         feedbackType: null,
         feedbackMessage: '',
+        feedbackWord: null,
       };
 
     // Notifications

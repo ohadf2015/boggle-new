@@ -175,9 +175,9 @@ export const AdventureTile = memo(({
         // Base tile styles — match GridComponent baseline
         'relative aspect-square flex items-center justify-center',
         'font-black cursor-pointer overflow-hidden',
-        // Neo-brutalist corners + definition border + hard drop shadow for depth
-        'rounded-neo border-2 border-black/40',
-        'shadow-[2px_2px_0px_rgba(0,0,0,0.85)]',
+        // Neo-brutalist corners — lighter border + softer hard shadow for airy feel
+        'rounded-neo border border-black/20',
+        'shadow-[1px_1px_0px_rgba(0,0,0,0.4)]',
         // Hover: brightness lift to signal interactivity (no new shadow needed)
         canInteract && 'hover:brightness-110',
 
@@ -220,30 +220,30 @@ export const AdventureTile = memo(({
 
         // Gold tile - golden glow
         tile.type === 'gold' && [
-          'bg-linear-to-br from-neo-yellow via-yellow-400 to-amber-500',
+          'bg-linear-to-br from-neo-yellow via-yellow-300 to-amber-400',
           'text-neo-black',
-          'border-amber-600/60',
+          'border-amber-400/40',
         ],
 
         // Ice tile - blue frost
         tile.type === 'ice' && [
-          'bg-linear-to-br from-cyan-200 via-blue-300 to-cyan-400',
-          'text-blue-900',
-          'border-cyan-500/60',
+          'bg-linear-to-br from-cyan-100 via-blue-200 to-cyan-300',
+          'text-blue-800',
+          'border-cyan-300/40',
         ],
 
         // Bomb tile - danger red
         tile.type === 'bomb' && [
-          'bg-linear-to-br from-red-500 via-red-600 to-orange-600',
+          'bg-linear-to-br from-red-400 via-red-500 to-orange-500',
           'text-neo-white',
-          'border-red-700/60',
+          'border-red-500/40',
         ],
 
         // Time tile - emerald clock
         tile.type === 'time' && [
-          'bg-linear-to-br from-emerald-400 via-teal-500 to-teal-600',
+          'bg-linear-to-br from-emerald-300 via-teal-400 to-teal-500',
           'text-neo-white',
-          'border-emerald-600/60',
+          'border-emerald-400/40',
         ]
       )}
     >
@@ -347,9 +347,9 @@ export const AdventureTile = memo(({
           className="absolute inset-0 pointer-events-none z-10"
           style={{
             borderRadius: 'clamp(4px, 1cqi, 8px)',
-            // Strong golden inset ring for clear selection feedback
-            boxShadow: 'inset 0 0 0 2px rgba(255,225,53,0.9), inset 0 0 12px rgba(255,200,80,0.5)',
-            background: 'radial-gradient(circle at center, rgba(255,210,80,0.35) 0%, rgba(255,200,80,0.12) 55%, transparent 75%)',
+            // Refined golden inset ring — visible but not heavy
+            boxShadow: 'inset 0 0 0 1.5px rgba(255,225,53,0.7), inset 0 0 8px rgba(255,200,80,0.3)',
+            background: 'radial-gradient(circle at center, rgba(255,210,80,0.2) 0%, rgba(255,200,80,0.08) 55%, transparent 75%)',
           }}
           initial={{ opacity: 0 }}
           animate={{ opacity: [0, 1, 0.85] }}
@@ -361,12 +361,12 @@ export const AdventureTile = memo(({
       <span
         className={cn(
           'relative z-20 select-none',
-          // Stronger text shadow for legibility against all tile backgrounds
-          'drop-shadow-[0_1px_2px_rgb(0_0_0/0.6)]',
+          // Subtle text shadow for legibility without heaviness
+          'drop-shadow-[0_1px_1px_rgb(0_0_0/0.3)]',
           // Extra contrast on dark tiles where text is light
           (tile.type === 'bomb' || tile.type === 'time') &&
-            'drop-shadow-[0_1px_3px_rgb(0_0_0/0.8)]',
-          tile.type === 'gold' && 'drop-shadow-[0_1px_2px_rgb(0_0_0/0.5)]'
+            'drop-shadow-[0_1px_2px_rgb(0_0_0/0.5)]',
+          tile.type === 'gold' && 'drop-shadow-[0_1px_1px_rgb(0_0_0/0.25)]'
         )}
       >
         {tile.letter}

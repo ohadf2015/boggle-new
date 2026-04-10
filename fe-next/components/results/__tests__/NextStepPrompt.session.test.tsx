@@ -38,6 +38,8 @@ vi.mock('@/contexts/LanguageContext', () => ({
         'nextStep.tryDailyChallengeDesc': 'Same puzzle for everyone worldwide - compete globally!',
         'nextStep.goMultiplayer': 'Go Multiplayer!',
         'nextStep.goMultiplayerDesc': 'Compete with real players',
+        'nextStep.goMultiplayerFromDaily': 'Why Stop at One?',
+        'nextStep.goMultiplayerFromDailyDesc': 'Unlimited games, real opponents — no waiting until tomorrow',
         'nextStep.letsGo': "Let's Go!",
         'nextStep.backToLobby': 'Back to Lobby',
       };

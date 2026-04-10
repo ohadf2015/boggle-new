@@ -475,6 +475,8 @@ const sv = {
     "edit": "Redigera",
     "retry": "Försök igen",
     "join": "Gå med",
+    "show": "Visa",
+    "hide": "Dölj",
     "showLess": "Mindre",
     "showMore": "Mer",
     "collapse": "Minimera",
@@ -2144,6 +2146,8 @@ const sv = {
     "tryDailyChallengeDesc": "Samma pussel för alla i världen - tävla globalt!",
     "goMultiplayer": "Utmana vänner",
     "goMultiplayerDesc": "Riktiga motståndare, riktig tävling, riktigt skryt",
+    "goMultiplayerFromDaily": "Varför nöja sig med en?",
+    "goMultiplayerFromDailyDesc": "Obegränsat med matcher, riktiga motståndare — ingen väntan till imorgon",
     "brainTraining": "Hjärnträning",
     "brainTrainingDesc": "Vässa hjärnan"
   },

@@ -244,6 +244,21 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
       />
     </motion.div>
 
+    {/* Next Step — unlimited multiplayer games promo */}
+    {onBackToLobby && (
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.75, type: 'spring', stiffness: 300, damping: 26 }}
+      >
+        <NextStepPrompt
+          currentMode="word-hunt"
+          onBackToLobby={onBackToLobby}
+          variant="mobile"
+        />
+      </motion.div>
+    )}
+
     {/* Inline signup for guests */}
     {!isAuthenticated && !inlineSignupDismissed && (
       <DailyChallengeInlineSignup
@@ -317,19 +332,5 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
       t={t}
     />
 
-    {/* Next Step — guide player to multiplayer after word hunt */}
-    {onBackToLobby && (
-      <motion.div
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.9, type: 'spring', stiffness: 300, damping: 26 }}
-      >
-        <NextStepPrompt
-          currentMode="word-hunt"
-          onBackToLobby={onBackToLobby}
-          variant="mobile"
-        />
-      </motion.div>
-    )}
   </div>
 );

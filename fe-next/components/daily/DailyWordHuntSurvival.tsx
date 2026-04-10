@@ -15,7 +15,7 @@ import { InlineConfetti } from '@/components/effects/InlineConfetti';
 import { ScreenFlashOverlay } from '@/components/game/ScreenFlashOverlay';
 
 import type { LetterGrid, Language } from '@/types';
-import type { SurvivalGameResult } from './survival/types';
+import type { SurvivalGameResult, WordDiscovery } from './survival/types';
 import { MIN_DISCOVERY_WORD_LENGTH } from '@/shared/constants/gameConstants';
 
 import {
@@ -298,6 +298,9 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
                         : 'bg-red-500/15 text-red-400 drop-shadow-[0_0_8px_rgba(239,68,68,0.3)]'
                 }`}
               >
+                {state.feedbackWord && state.feedbackType === 'valid-word' && (
+                  <span className="font-black uppercase tracking-wider mr-1">{state.feedbackWord}</span>
+                )}
                 {state.feedbackMessage}
                 {/* Sparkle burst on positive feedback */}
                 {(state.feedbackType === 'valid-word' || state.feedbackType === 'target-found') && (
@@ -354,11 +357,12 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         />
       </div>
 
-      {/* Mobile: minimal word count badge (no expandable sheet — less intrusive) */}
-      {puzzleDate && state.discoveredWords.length > 0 && (
-        <div className="flex items-center justify-center gap-2 py-1 text-[11px] text-neo-cream/60 font-bold">
-          <span className="tabular-nums">{state.discoveredWords.length} {t('wordHunt.mobile.words')}</span>
-        </div>
+      {/* Mobile: discovered words list with obfuscate toggle */}
+      {state.discoveredWords.length > 0 && (
+        <DiscoveredWordsList
+          words={state.discoveredWords}
+          t={t}
+        />
       )}
 
       {/* Auto-Clue Notifications */}
@@ -389,6 +393,60 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         variant="danger"
       />
     </motion.div>
+  );
+};
+
+/**
+ * Inline discovered words list for mobile — words visible by default with obfuscate toggle
+ */
+const DiscoveredWordsList: React.FC<{
+  words: WordDiscovery[];
+  t: (key: string) => string;
+}> = ({ words, t }) => {
+  const [obfuscated, setObfuscated] = useState(false);
+
+  const sortedWords = useMemo(
+    () => [...words].sort((a, b) => b.timestamp - a.timestamp),
+    [words]
+  );
+
+  return (
+    <div className="shrink-0 px-1 pb-1">
+      {/* Header with count + toggle */}
+      <div className="flex items-center justify-between px-2 py-1">
+        <span className="text-[11px] text-neo-cream/60 font-bold tabular-nums">
+          {words.length} {t('wordHunt.mobile.words')}
+        </span>
+        <button
+          onClick={() => setObfuscated(!obfuscated)}
+          className="text-[10px] text-neo-cream/40 hover:text-neo-cream/70 font-medium transition-colors px-1.5 py-0.5 rounded"
+        >
+          {obfuscated ? t('common.show') : t('common.hide')}
+        </button>
+      </div>
+      {/* Word chips */}
+      <div className="flex flex-wrap gap-1 px-1 max-h-[72px] overflow-y-auto scrollbar-thin scrollbar-thumb-neo-cream/10">
+        <AnimatePresence mode="popLayout">
+          {sortedWords.map((w) => (
+            <motion.span
+              key={`${w.word}-${w.timestamp}`}
+              initial={{ opacity: 0, scale: 0.7 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.7 }}
+              className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider ${
+                w.word.length >= 7
+                  ? 'bg-neo-pink/15 text-neo-pink'
+                  : w.word.length >= 5
+                    ? 'bg-neo-cyan/15 text-neo-cyan'
+                    : 'bg-neo-cream/10 text-neo-cream/70'
+              }`}
+            >
+              {obfuscated ? '•'.repeat(w.word.length) : w.word}
+            </motion.span>
+          ))}
+        </AnimatePresence>
+      </div>
+    </div>
   );
 };
 

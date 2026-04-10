@@ -343,12 +343,11 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
           />
         </motion.div>
 
-        {/* Next Step - Suggest Multiplayer */}
+        {/* Next Step - Suggest Multiplayer (unlimited games!) */}
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.55 }}
-          className="pt-4"
         >
           <NextStepPrompt
             currentMode="daily"

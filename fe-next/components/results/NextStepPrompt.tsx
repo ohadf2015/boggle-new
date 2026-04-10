@@ -3,7 +3,7 @@
 import React, { memo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Bot, Users, ArrowLeft, ArrowRight, Sparkles, Trophy, Swords } from 'lucide-react';
+import { Bot, ArrowLeft, ArrowRight, Sparkles, Trophy, Swords, Infinity as InfinityIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -102,10 +102,10 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
         };
       case 'daily':
         return {
-          titleKey: 'nextStep.goMultiplayer',
-          descKey: 'nextStep.goMultiplayerDesc',
+          titleKey: 'nextStep.goMultiplayerFromDaily',
+          descKey: 'nextStep.goMultiplayerFromDailyDesc',
           href: `/${language}/multiplayer`,
-          icon: <Users className="w-6 h-6 sm:w-7 sm:h-7" />,
+          icon: <InfinityIcon className="w-6 h-6 sm:w-7 sm:h-7" strokeWidth={2.5} />,
           gradient: 'from-neo-pink to-neo-pink-dark',
           iconBg: 'bg-neo-navy text-neo-pink',
         };
@@ -130,10 +130,10 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
         };
       case 'word-hunt':
         return {
-          titleKey: 'nextStep.goMultiplayer',
-          descKey: 'nextStep.goMultiplayerDesc',
+          titleKey: 'nextStep.goMultiplayerFromDaily',
+          descKey: 'nextStep.goMultiplayerFromDailyDesc',
           href: `/${language}/multiplayer`,
-          icon: <Users className="w-6 h-6 sm:w-7 sm:h-7" />,
+          icon: <InfinityIcon className="w-6 h-6 sm:w-7 sm:h-7" strokeWidth={2.5} />,
           gradient: 'from-neo-pink to-neo-pink-dark',
           iconBg: 'bg-neo-navy text-neo-pink',
         };

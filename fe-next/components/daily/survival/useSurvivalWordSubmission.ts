@@ -35,7 +35,7 @@ export interface UseSurvivalWordSubmissionProps {
   // Dispatch
   dispatch: React.Dispatch<any>;
   // Callbacks
-  showToast: (type: FeedbackType, message: string) => void;
+  showToast: (type: FeedbackType, message: string, word?: string) => void;
   playWordAcceptedSound: (() => void) | undefined;
   playWordRejectedSound: (() => void) | undefined;
   clueActions: {
@@ -243,7 +243,7 @@ export function useSurvivalWordSubmission({
     const bonusMessage = longWordBonus > 0
       ? `${rewardMessage} 🔥 +${longWordBonus} long word bonus!`
       : rewardMessage;
-    showToast('valid-word', bonusMessage);
+    showToast('valid-word', bonusMessage, word);
   }, [discoveredWords, lifePoints, grid, language, playWordAcceptedSound, playWordRejectedSound, showToast, t, validateWordInDictionary, clueActions, lifeAnimationTimeout, dispatch]);
 
   // Handle word submission (main entry point)
