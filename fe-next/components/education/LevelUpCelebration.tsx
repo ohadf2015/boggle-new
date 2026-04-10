@@ -142,7 +142,7 @@ const LevelUpCelebration = memo<LevelUpCelebrationProps>(
                 className={cn(
                   'inline-flex items-center justify-center',
                   'w-20 h-20 md:w-24 md:h-24',
-                  'bg-neo-orange/20 border-4 border-neo-orange',
+                  'bg-neo-pink/20 border-4 border-neo-pink',
                   'rounded-full'
                 )}
                 initial={{ scale: 0 }}
@@ -152,7 +152,7 @@ const LevelUpCelebration = memo<LevelUpCelebrationProps>(
                 <span
                   className={cn(
                     'text-4xl md:text-5xl font-black tabular-nums',
-                    'text-neo-orange',
+                    'text-neo-pink',
                     'drop-shadow-[0_0_10px_rgb(255_107_53/0.5)]'
                   )}
                 >
@@ -166,13 +166,13 @@ const LevelUpCelebration = memo<LevelUpCelebrationProps>(
               <AdaptiveMotion.div
                 className={cn(
                   'mb-6 p-4 rounded-neo',
-                  'bg-neo-orange/20 border-neo border-neo-orange'
+                  'bg-neo-pink/20 border-neo border-neo-pink'
                 )}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.6 }}
               >
-                <p className="text-neo-orange font-bold text-sm uppercase tracking-wide mb-2">
+                <p className="text-neo-pink font-bold text-sm uppercase tracking-wide mb-2">
                   {t('education.xp.newTitleUnlocked')}
                 </p>
                 <div className="space-y-1">
@@ -199,7 +199,7 @@ const LevelUpCelebration = memo<LevelUpCelebrationProps>(
               onClick={onClose}
               className={cn(
                 'w-full py-3 px-6',
-                'bg-neo-lime hover:bg-neo-orange',
+                'bg-neo-lime hover:bg-neo-pink',
                 'text-neo-black font-black text-lg',
                 'border-3 border-neo-black rounded-neo',
                 'shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5',

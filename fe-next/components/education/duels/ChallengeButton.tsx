@@ -99,7 +99,7 @@ export function ChallengeButton({
           onClick={handleClick}
           className={cn(
             'p-2 rounded-neo transition-all',
-            'text-neo-orange hover:text-neo-lime',
+            'text-neo-pink hover:text-neo-lime',
             'hover:bg-neo-navy/30',
             className
           )}
@@ -129,7 +129,7 @@ export function ChallengeButton({
         disabled={showSuccess}
         className={cn(
           'px-4 py-2 font-neo-body font-bold rounded-neo',
-          'bg-neo-orange text-white',
+          'bg-neo-pink text-white',
           'border-3 border-neo border-neo-black shadow-hard-sm',
           'hover:shadow-hard transition-all',
           'disabled:opacity-70 disabled:cursor-not-allowed',

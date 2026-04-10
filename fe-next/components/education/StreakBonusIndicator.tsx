@@ -109,7 +109,7 @@ const StreakBonusIndicator = memo<StreakBonusIndicatorProps>(({
           // Base styles
           'inline-flex flex-col items-center',
           // Neo-brutalist styling
-          'bg-neo-orange border-neo border-neo-black rounded-neo shadow-hard',
+          'bg-neo-pink border-neo border-neo-black rounded-neo shadow-hard',
           sizeConfig.padding,
           className
         )}
@@ -182,7 +182,7 @@ const StreakBonusIndicator = memo<StreakBonusIndicatorProps>(({
       >
         <Flame className="w-4 h-4" />
       </motion.span>
-      <span className="font-neo-display font-black text-neo-orange">
+      <span className="font-neo-display font-black text-neo-pink">
         {currentStreak}
       </span>
       <span className="font-neo-body font-bold text-neo-black/70 dark:text-neo-white/70">

@@ -50,7 +50,7 @@ export function PlayWithClassButton({
         onClick={handleClick}
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
-        className="w-full p-6 text-left"
+        className="w-full p-4 sm:p-6 text-left"
       >
         <div className="flex items-center gap-4">
           <div className={cn(

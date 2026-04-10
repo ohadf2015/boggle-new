@@ -328,7 +328,7 @@ export function RealTimeDuelGame({
 
         {/* XP Earned */}
         <div className="flex items-center gap-2 mb-8 p-4 bg-neo-navy border-neo rounded-neo shadow-hard">
-          <Flame className="w-6 h-6 text-neo-orange" />
+          <Flame className="w-6 h-6 text-neo-pink" />
           <span className="text-neo-white font-neo-body">
             {t('duels.xpEarned')}: <span className="font-bold text-neo-lime">{xp}</span>
           </span>

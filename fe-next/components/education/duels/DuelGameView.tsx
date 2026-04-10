@@ -293,7 +293,7 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
 
         {/* XP Earned */}
         <div className="flex items-center gap-2 mb-8 p-4 bg-neo-navy border-neo rounded-neo shadow-hard">
-          <Flame className="w-6 h-6 text-neo-orange" />
+          <Flame className="w-6 h-6 text-neo-pink" />
           <span className="text-neo-white font-neo-body">
             {t('duels.xpEarned')}: <span className="font-bold text-neo-lime">{xp}</span>
           </span>
@@ -308,7 +308,7 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
                 onBackToLobby?.();
               }
             }}
-            className="px-6 py-3 bg-neo-orange text-neo-white font-neo-display font-bold rounded-neo border-neo-thick shadow-hard hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] transition-all"
+            className="px-6 py-3 bg-neo-pink text-neo-white font-neo-display font-bold rounded-neo border-neo-thick shadow-hard hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] transition-all"
           >
             {t('duels.rematch')}
           </button>
@@ -374,7 +374,7 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
       {/* Header */}
       <div className="flex items-center justify-between mb-6 p-4 bg-neo-navy border-neo rounded-neo shadow-hard">
         <div className="flex items-center gap-3">
-          <Swords className="w-6 h-6 text-neo-orange" />
+          <Swords className="w-6 h-6 text-neo-pink" />
           <h1 className="text-xl font-neo-display font-bold text-neo-white">
             {t('duels.playDuel')}
           </h1>
@@ -386,7 +386,7 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
           <div className={cn(
             'flex items-center gap-1 px-3 py-1 rounded-neo border-neo font-neo-display font-bold',
             timeRemaining <= 30 ? 'bg-red-500 text-neo-white animate-pulse' :
-            timeRemaining <= 60 ? 'bg-neo-orange text-neo-black' :
+            timeRemaining <= 60 ? 'bg-neo-pink text-neo-black' :
             'bg-neo-lime text-neo-black'
           )}>
             <Clock className="w-4 h-4" />
@@ -476,7 +476,7 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
           <button
             onClick={handleSubmitScore}
             disabled={wordsFound.length === 0 || phase === 'submitting'}
-            className="w-full px-6 py-3 bg-neo-orange text-neo-white font-neo-display font-bold text-lg rounded-neo border-neo-thick shadow-hard hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full px-6 py-3 bg-neo-pink text-neo-white font-neo-display font-bold text-lg rounded-neo border-neo-thick shadow-hard hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {phase === 'submitting' ? t('duels.loading') : t('duels.submitScore')}
           </button>

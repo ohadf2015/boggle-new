@@ -167,7 +167,7 @@ const RankDeltaIndicator = memo<RankDeltaProps>(({ rankDelta, isNew }) => {
   return (
     <AdaptiveMotion.span
       data-testid="rank-delta-down"
-      className="flex items-center gap-1 text-neo-orange text-sm font-neo-body font-bold"
+      className="flex items-center gap-1 text-neo-pink text-sm font-neo-body font-bold"
       initial={{ y: -8, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ type: 'spring', stiffness: 400, damping: 18 }}
@@ -198,7 +198,7 @@ const TierBadge = memo<TierBadgeProps>(({ rank, totalStudents }) => {
   const tierConfig = {
     top10: { bg: 'bg-neo-lime', label: t('education.leaderboard.top10') },
     top25: { bg: 'bg-neo-white/60', label: t('education.leaderboard.top25') },
-    top50: { bg: 'bg-neo-orange', label: t('education.leaderboard.top50') },
+    top50: { bg: 'bg-neo-pink', label: t('education.leaderboard.top50') },
   };
 
   const config = tierConfig[tier];
@@ -311,7 +311,7 @@ const LeaderboardEntryRow = memo<LeaderboardEntryRowProps>(
             {currentStreak >= 3 && (
               <span
                 data-testid="streak-badge"
-                className="px-2 py-0.5 text-xs font-neo-body bg-neo-orange text-white rounded flex items-center gap-1"
+                className="px-2 py-0.5 text-xs font-neo-body bg-neo-pink text-white rounded flex items-center gap-1"
               >
                 <Flame className="w-4 h-4 inline" /> {currentStreak}
               </span>

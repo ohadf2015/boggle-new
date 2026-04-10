@@ -268,7 +268,7 @@ const AchievementUnlockModal = memo<AchievementUnlockModalProps>(({ unlock, onCl
               onClick={onClose}
               className={cn(
                 'w-full py-3 px-6',
-                'bg-neo-lime hover:bg-neo-orange',
+                'bg-neo-lime hover:bg-neo-pink',
                 'text-neo-black font-black text-lg',
                 'border-3 border-neo-black rounded-neo',
                 'shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5',

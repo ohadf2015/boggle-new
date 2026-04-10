@@ -151,7 +151,7 @@ export function DuelHistory({ studentId, className }: DuelHistoryProps) {
         </div>
 
         {/* Win Streak */}
-        <div className="p-4 bg-neo-orange border-neo rounded-neo shadow-hard">
+        <div className="p-4 bg-neo-pink border-neo rounded-neo shadow-hard">
           <p className="text-xs text-white/70 uppercase tracking-wide mb-1">
             {t('duels.winStreak')}
           </p>

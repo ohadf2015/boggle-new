@@ -148,25 +148,44 @@ export function ClassroomGameBanner({
   };
 
   // Always show the "listening" indicator even when no game is active
+  // F-18/F-19: friendlier idle copy + pulsing radar animation so the empty
+  // state still feels alive instead of looking broken.
   if (!activeGame) {
     return (
-      <div className={cn(
-        'flex items-center gap-3 px-4 py-3 rounded-neo border-2 border-black shadow-hard-sm',
-        isConnected
-          ? 'bg-neo-cyan/20'
-          : 'bg-neo-lime/20'
-      )}>
-        <Radio className={cn(
-          'w-4 h-4 shrink-0',
-          isConnected ? 'text-black animate-pulse' : 'text-black'
-        )} />
-        <span className="text-sm font-neo-body font-bold text-black">
-          {isConnected
-            ? t('student.activeGame.listening')
-            : t('student.activeGame.connecting')
-          }
+      <motion.div
+        initial={{ opacity: 0, y: -8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ type: 'spring', stiffness: 260, damping: 22 }}
+        className={cn(
+          'relative flex items-center gap-3 px-4 py-3 rounded-neo border-2 border-black shadow-hard-sm overflow-hidden',
+          isConnected ? 'bg-neo-cyan/20' : 'bg-neo-lime/20'
+        )}
+      >
+        {/* Radar pulse ring */}
+        <span className="relative flex w-8 h-8 shrink-0 items-center justify-center">
+          {isConnected && (
+            <span className="absolute inset-0 rounded-full bg-neo-cyan/40 animate-ping" />
+          )}
+          <span
+            className={cn(
+              'relative flex w-8 h-8 items-center justify-center rounded-full border-2 border-black shadow-hard-sm',
+              isConnected ? 'bg-neo-cyan' : 'bg-neo-lime'
+            )}
+          >
+            <Radio className="w-4 h-4 text-black" aria-hidden="true" />
+          </span>
         </span>
-      </div>
+        <div className="flex flex-col">
+          <span className="text-sm font-neo-display font-black text-black uppercase tracking-wide">
+            {isConnected
+              ? t('student.activeGame.listening')
+              : t('student.activeGame.connecting')}
+          </span>
+          <span className="text-xs font-neo-body text-black/60">
+            {t('student.activeGame.idleHint')}
+          </span>
+        </div>
+      </motion.div>
     );
   }
 

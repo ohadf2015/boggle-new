@@ -6450,6 +6450,7 @@ const es = {
       "alreadyOwned": "Ya poseída",
       "notEnoughFragments": "Fragmentos insuficientes",
       "fragment": "Fragmento de Runa",
+      "fragmentEarned": "¡Fragmentos de Runa Obtenidos!",
       "slotsFull": "Todas las ranuras llenas",
       "unknown": "???",
       "rarity": {
@@ -7643,26 +7644,6 @@ const es = {
     "later": "Más tarde",
     "nextLevel": "Siguiente: Nivel",
     "play": "Jugar",
-    "runes": {
-      "goldvein": {
-        "name": "Veta de oro"
-      },
-      "insight": {
-        "name": "Perspicacia"
-      },
-      "momentum": {
-        "name": "Impulso"
-      },
-      "swiftword": {
-        "name": "Palabra veloz"
-      },
-      "timewarp": {
-        "name": "Distorsión temporal"
-      },
-      "wrath": {
-        "name": "Ira"
-      }
-    },
     "chapterComplete": "¡Capítulo {{chapter}} completado!",
     "lvl": "NIV",
     "cosmetic": {
@@ -8141,7 +8122,8 @@ const es = {
       "joinNow": "Unirse Ahora",
       "joining": "Uniéndose...",
       "listening": "Esperando juegos de clase...",
-      "connecting": "Conectando al aula..."
+      "connecting": "Conectando al aula...",
+      "idleHint": "Cuando tu profesor inicie un juego, aparecerá aquí"
     },
     "playWithClass": {
       "title": "Jugar con la clase",
@@ -9212,6 +9194,7 @@ const es = {
       "description": "¡Compite por encontrar la palabra objetivo!"
     },
     "random": "Aleatorio",
+    "randomDescription": "¡Sorpréndeme! Modo aleatorio en cada ronda.",
     "nextMode": "Siguiente modo",
     "randomizing": "Aleatorizando..."
   },
@@ -9636,9 +9619,8 @@ const es = {
     "grandSlamDesc": "Completa las 3 para un bonus",
     "grandSlamBonus": "+500 XP + Caja Misteriosa",
     "wordHunt": "Caza de Palabras Diaria",
-    "brainDrill": "Entrenamiento Mental Diario",
     "adventure": "Aventura Diaria",
-    "community": "Tablero Comunitario",
+    "community": "Partida Multijugador",
     "completed": "¡Completado!",
     "progress": "{{current}}/3 Misiones"
   },
@@ -9674,7 +9656,7 @@ const es = {
         "desc": "Completa al menos 1 nivel de aventura"
       },
       "community": {
-        "name": "Juego Comunitario",
+        "name": "Partida Multijugador",
         "desc": "Juega una partida multijugador"
       }
     },
@@ -9772,6 +9754,7 @@ const es = {
   },
   "weeklyQuest": {
     "title": "Misión semanal",
+    "intro": "Elige una misión cada semana. Complétala para ganar XP extra y una pieza de avatar exclusiva. Nuevas misiones cada lunes.",
     "choose": "Elige tu misión semanal",
     "easy": "Fácil",
     "medium": "Medio",

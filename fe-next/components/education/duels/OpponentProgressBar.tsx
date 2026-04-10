@@ -5,7 +5,7 @@
  *
  * Features:
  * - Left side (neo-cyan) = player score
- * - Right side (neo-orange) = opponent score
+ * - Right side (neo-pink) = opponent score
  * - Animated transitions with Framer Motion
  * - Handles edge case: both scores 0 → 50/50 split
  * - Neo-brutalist styling
@@ -59,7 +59,7 @@ export function OpponentProgressBar({
       {/* Opponent Side (Right) */}
       <motion.div
         data-side="opponent"
-        className="h-full bg-neo-orange flex items-center justify-between px-3"
+        className="h-full bg-neo-pink flex items-center justify-between px-3"
         initial={{ width: '50%' }}
         animate={{ width: `${opponentPercentage}%` }}
         transition={{ type: 'spring', stiffness: 300, damping: 30 }}

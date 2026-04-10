@@ -6406,6 +6406,7 @@ const en = {
       "alreadyOwned": "Already owned",
       "notEnoughFragments": "Not enough fragments",
       "fragment": "Rune Fragment",
+      "fragmentEarned": "Rune Fragments Earned!",
       "slotsFull": "All rune slots full",
       "unknown": "???",
       "rarity": {
@@ -7742,26 +7743,6 @@ const en = {
     "later": "Later",
     "nextLevel": "Next: Level",
     "play": "Play",
-    "runes": {
-      "goldvein": {
-        "name": "Gold Vein"
-      },
-      "insight": {
-        "name": "Insight"
-      },
-      "momentum": {
-        "name": "Momentum"
-      },
-      "swiftword": {
-        "name": "Swift Word"
-      },
-      "timewarp": {
-        "name": "Time Warp"
-      },
-      "wrath": {
-        "name": "Wrath"
-      }
-    },
     "chapterComplete": "Chapter {{chapter}} Complete!",
     "lvl": "LVL",
     "cosmetic": {
@@ -7952,6 +7933,11 @@ const en = {
     },
     "results": {
       "boardDomination": "Board Domination",
+      "matchRecap": "Blast Match Recap",
+      "totalTilesDemolished": "Tiles Demolished",
+      "intensity": "Intensity",
+      "peakCombo": "Peak Combo",
+      "totalGems": "Gems",
       "demolitionKing": "Demolition King",
       "comboMaster": "Combo Master",
       "gemCollector": "Gem Collector",
@@ -8196,7 +8182,8 @@ const en = {
       "joinNow": "Join Game Now",
       "joining": "Joining...",
       "listening": "Listening for classroom games...",
-      "connecting": "Connecting to classroom..."
+      "connecting": "Connecting to classroom...",
+      "idleHint": "When your teacher starts a game, you'll see it here"
     },
     "playWithClass": {
       "title": "Play with Class",
@@ -9507,6 +9494,7 @@ const en = {
       description: "Race to find the target word!"
     },
     random: "Random",
+    randomDescription: "Surprise me! Pick a random mode each round.",
     nextMode: "Next Mode",
     randomizing: "Randomizing..."
   },
@@ -9735,9 +9723,8 @@ const en = {
     "grandSlamDesc": "Complete all 3 for a bonus reward",
     "grandSlamBonus": "+500 XP + Mystery Box",
     "wordHunt": "Daily Word Hunt",
-    "brainDrill": "Daily Brain Drill",
     "adventure": "Daily Adventure",
-    "community": "Community Board",
+    "community": "Multiplayer Match",
     "completed": "Completed!",
     "progress": "{{current}}/3 Missions"
   },
@@ -9773,7 +9760,7 @@ const en = {
         "desc": "Complete at least 1 adventure level"
       },
       "community": {
-        "name": "Community Play",
+        "name": "Multiplayer Match",
         "desc": "Play a multiplayer game with others"
       }
     },
@@ -9871,6 +9858,7 @@ const en = {
   },
   "weeklyQuest": {
     "title": "Weekly Quest",
+    "intro": "Pick one quest each week. Earn bonus XP and an exclusive avatar part when you complete it. New quests every Monday.",
     "choose": "Choose Your Weekly Quest",
     "easy": "Easy",
     "medium": "Medium",

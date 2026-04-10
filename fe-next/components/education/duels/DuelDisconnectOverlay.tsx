@@ -56,7 +56,7 @@ export function DuelDisconnectOverlay({
     >
       <div className="bg-neo-navy border-neo-thick rounded-neo shadow-hard p-8 max-w-md text-center">
         {/* Icon */}
-        <WifiOff className="w-16 h-16 text-neo-orange mx-auto mb-4" />
+        <WifiOff className="w-16 h-16 text-neo-pink mx-auto mb-4" />
 
         {/* Heading */}
         <h2 className="text-2xl font-neo-display font-bold text-neo-white mb-4">

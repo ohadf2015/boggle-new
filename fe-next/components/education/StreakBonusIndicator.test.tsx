@@ -166,7 +166,7 @@ describe('StreakBonusIndicator', () => {
       render(<StreakBonusIndicator currentStreak={7} variant="badge" />);
 
       const indicator = screen.getByTestId('streak-indicator');
-      expect(indicator).toHaveClass('bg-neo-orange');
+      expect(indicator).toHaveClass('bg-neo-pink');
       expect(indicator).toHaveClass('border-neo-black');
       expect(indicator).toHaveClass('shadow-hard');
     });

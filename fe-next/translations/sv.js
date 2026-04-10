@@ -6295,6 +6295,7 @@ const sv = {
       "alreadyOwned": "Redan ägd",
       "notEnoughFragments": "Inte tillräckligt med fragment",
       "fragment": "Runfragment",
+      "fragmentEarned": "Runfragment intjänade!",
       "slotsFull": "Alla platser fulla",
       "unknown": "???",
       "rarity": {
@@ -7571,26 +7572,6 @@ const sv = {
     "later": "Senare",
     "nextLevel": "Nästa: Nivå",
     "play": "Spela",
-    "runes": {
-      "goldvein": {
-        "name": "Guldåder"
-      },
-      "insight": {
-        "name": "Insikt"
-      },
-      "momentum": {
-        "name": "Momentum"
-      },
-      "swiftword": {
-        "name": "Snabbt ord"
-      },
-      "timewarp": {
-        "name": "Tidsförvrängning"
-      },
-      "wrath": {
-        "name": "Vrede"
-      }
-    },
     "chapterComplete": "Kapitel {{chapter}} klart!",
     "lvl": "NIV",
     "cosmetic": {
@@ -8023,7 +8004,8 @@ const sv = {
       "joinNow": "Gå med nu",
       "joining": "Går med...",
       "listening": "Lyssnar efter klassrumsspel...",
-      "connecting": "Ansluter till klassrummet..."
+      "connecting": "Ansluter till klassrummet...",
+      "idleHint": "När din lärare startar ett spel visas det här"
     },
     "playWithClass": {
       "title": "Spela med klassen",
@@ -9323,6 +9305,7 @@ const sv = {
       description: "Tävla om att hitta målordet!"
     },
     random: "Slumpmässigt",
+    randomDescription: "Överraska mig! Slumpa läge varje runda.",
     nextMode: "Nästa läge",
     randomizing: "Slumpar..."
   },
@@ -9551,9 +9534,8 @@ const sv = {
     "grandSlamDesc": "Slutför alla 3 för en bonusbelöning",
     "grandSlamBonus": "+500 XP + Mysterilåda",
     "wordHunt": "Daglig Ordjakt",
-    "brainDrill": "Daglig Hjärnträning",
     "adventure": "Dagligt Äventyr",
-    "community": "Gemenskapstavla",
+    "community": "Multiplayer-match",
     "completed": "Klart!",
     "progress": "{{current}}/3 Uppdrag"
   },
@@ -9589,7 +9571,7 @@ const sv = {
         "desc": "Klara minst 1 äventyrsnivå"
       },
       "community": {
-        "name": "Gemenskapsspel",
+        "name": "Multiplayer-match",
         "desc": "Spela ett multiplayerspel"
       }
     },
@@ -9687,6 +9669,7 @@ const sv = {
   },
   "weeklyQuest": {
     "title": "Veckouppdrag",
+    "intro": "Välj ett uppdrag varje vecka. Slutför det för att tjäna bonus-XP och en exklusiv avatardel. Nya uppdrag varje måndag.",
     "choose": "Välj ditt veckouppdrag",
     "easy": "Lätt",
     "medium": "Medel",

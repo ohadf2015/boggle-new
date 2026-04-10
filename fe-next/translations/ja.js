@@ -6347,6 +6347,7 @@ const ja = {
       "alreadyOwned": "所持済み",
       "notEnoughFragments": "フラグメントが足りません",
       "fragment": "ルーンの欠片",
+      "fragmentEarned": "ルーンの欠片を獲得！",
       "slotsFull": "スロットが全て埋まっています",
       "unknown": "???",
       "rarity": {
@@ -7622,26 +7623,6 @@ const ja = {
     "later": "あとで",
     "nextLevel": "次: レベル",
     "play": "プレイ",
-    "runes": {
-      "goldvein": {
-        "name": "金脈"
-      },
-      "insight": {
-        "name": "洞察"
-      },
-      "momentum": {
-        "name": "モメンタム"
-      },
-      "swiftword": {
-        "name": "疾風の言葉"
-      },
-      "timewarp": {
-        "name": "時空の歪み"
-      },
-      "wrath": {
-        "name": "憤怒"
-      }
-    },
     "chapterComplete": "チャプター{{chapter}}クリア!",
     "lvl": "LV",
     "cosmetic": {
@@ -8075,7 +8056,8 @@ const ja = {
       "joinNow": "今すぐ参加",
       "joining": "参加中...",
       "listening": "クラスルームゲームを待機中...",
-      "connecting": "クラスルームに接続中..."
+      "connecting": "クラスルームに接続中...",
+      "idleHint": "先生がゲームを開始するとここに表示されます"
     },
     "playWithClass": {
       "title": "クラスと遊ぶ",
@@ -9323,6 +9305,7 @@ const ja = {
       description: "ターゲットの単語を最速で見つけよう！"
     },
     random: "ランダム",
+    randomDescription: "お楽しみに！毎ラウンド違うモードを選びます。",
     nextMode: "次のモード",
     randomizing: "ランダム選択中..."
   },
@@ -9551,9 +9534,8 @@ const ja = {
     "grandSlamDesc": "3つ全てクリアでボーナス",
     "grandSlamBonus": "+500 XP + ミステリーボックス",
     "wordHunt": "デイリーワードハント",
-    "brainDrill": "デイリー脳トレ",
     "adventure": "デイリーアドベンチャー",
-    "community": "コミュニティボード",
+    "community": "マルチプレイヤーマッチ",
     "completed": "完了！",
     "progress": "{{current}}/3 ミッション"
   },
@@ -9589,7 +9571,7 @@ const ja = {
         "desc": "アドベンチャーを1レベル以上クリアしよう"
       },
       "community": {
-        "name": "コミュニティプレイ",
+        "name": "マルチプレイヤーマッチ",
         "desc": "マルチプレイヤーゲームをプレイしよう"
       }
     },
@@ -9687,6 +9669,7 @@ const ja = {
   },
   "weeklyQuest": {
     "title": "ウィークリークエスト",
+    "intro": "毎週1つのクエストを選んでクリアしよう。ボーナスXPと限定アバターパーツがもらえるよ。毎週月曜日に新しいクエストが登場！",
     "choose": "今週のクエストを選ぼう",
     "easy": "イージー",
     "medium": "ノーマル",

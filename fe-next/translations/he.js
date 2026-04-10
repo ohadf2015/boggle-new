@@ -6347,6 +6347,7 @@ const he = {
       "alreadyOwned": "כבר בבעלותך",
       "notEnoughFragments": "אין מספיק שברים",
       "fragment": "שבר רונה",
+      "fragmentEarned": "הושגו שברי רונה!",
       "slotsFull": "כל המשבצות תפוסות",
       "unknown": "???",
       "rarity": {
@@ -7606,26 +7607,6 @@ const he = {
     "later": "אחר כך",
     "nextLevel": "הבא: שלב",
     "play": "שחק",
-    "runes": {
-      "goldvein": {
-        "name": "עורק זהב"
-      },
-      "insight": {
-        "name": "תובנה"
-      },
-      "momentum": {
-        "name": "מומנטום"
-      },
-      "swiftword": {
-        "name": "מילה מהירה"
-      },
-      "timewarp": {
-        "name": "עיוות זמן"
-      },
-      "wrath": {
-        "name": "זעם"
-      }
-    },
     "chapterComplete": "פרק {{chapter}} הושלם!",
     "lvl": "רמה",
     "cosmetic": {
@@ -8058,7 +8039,8 @@ const he = {
       "joinNow": "הצטרף עכשיו",
       "joining": "מצטרף...",
       "listening": "ממתין למשחקי כיתה...",
-      "connecting": "מתחבר לכיתה..."
+      "connecting": "מתחבר לכיתה...",
+      "idleHint": "כשהמורה יתחיל משחק, הוא יופיע כאן"
     },
     "playWithClass": {
       "title": "שחק עם הכיתה",
@@ -9358,6 +9340,7 @@ const he = {
       description: "מצאו את מילת היעד לפני כולם!"
     },
     random: "אקראי",
+    randomDescription: "הפתיעו אותי! מצב אקראי בכל סיבוב.",
     nextMode: "מצב הבא",
     randomizing: "מגריל..."
   },
@@ -9586,9 +9569,8 @@ const he = {
     "grandSlamDesc": "השלימו את כל 3 לבונוס",
     "grandSlamBonus": "קופסת מסתורין + XP 500+",
     "wordHunt": "ציד מילים יומי",
-    "brainDrill": "אימון מוח יומי",
     "adventure": "הרפתקה יומית",
-    "community": "לוח קהילתי",
+    "community": "משחק מרובה משתתפים",
     "completed": "!הושלם",
     "progress": "משימות {{current}}/3"
   },
@@ -9624,7 +9606,7 @@ const he = {
         "desc": "השלימו לפחות שלב אחד בהרפתקה"
       },
       "community": {
-        "name": "משחק קהילתי",
+        "name": "משחק מרובה משתתפים",
         "desc": "שחקו משחק מרובה משתתפים"
       }
     },
@@ -9722,6 +9704,7 @@ const he = {
   },
   "weeklyQuest": {
     "title": "משימת השבוע",
+    "intro": "בחרו משימה אחת בכל שבוע. השלימו אותה כדי לזכות בנקודות XP בונוס ובחלק אווטאר בלעדי. משימות חדשות כל יום שני.",
     "choose": "בחרו את משימת השבוע",
     "easy": "קל",
     "medium": "בינוני",

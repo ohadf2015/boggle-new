@@ -44,7 +44,7 @@ export function StudentHubPlayZone({ classroomId, userId, username }: StudentHub
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <PlayWithClassButton
           classroomId={classroomId}
           userId={userId}
@@ -58,7 +58,7 @@ export function StudentHubPlayZone({ classroomId, userId, username }: StudentHub
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           transition={cardSpring}
-          className="relative rounded-neo border-neo border-black shadow-hard-lg bg-neo-pink p-6 text-left"
+          className="relative rounded-neo border-neo border-black shadow-hard-lg bg-neo-pink p-4 sm:p-6 text-left"
         >
           <div className="flex flex-col items-center gap-3">
             <div className="w-14 h-14 rounded-neo border-3 border-black bg-black flex items-center justify-center shadow-hard-sm">

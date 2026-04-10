@@ -121,7 +121,7 @@ describe('ChallengeButton', () => {
       render(<ChallengeButton {...mockProps} />);
 
       const button = screen.getByTestId('challenge-button');
-      expect(button).toHaveClass('bg-neo-orange');
+      expect(button).toHaveClass('bg-neo-pink');
       expect(button).toHaveClass('border-3');
       expect(button).toHaveClass('shadow-hard-sm');
     });
@@ -160,7 +160,7 @@ describe('ChallengeButton', () => {
       render(<ChallengeButton {...mockProps} variant="icon" />);
 
       const button = screen.getByTestId('challenge-button-icon');
-      expect(button).toHaveClass('text-neo-orange');
+      expect(button).toHaveClass('text-neo-pink');
       expect(button).toHaveClass('hover:text-neo-lime');
     });
   });
