@@ -11,7 +11,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { supabase } from '@/lib/supabase';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 
-export type MissionType = 'wordHunt' | 'brainDrill' | 'adventure' | 'community';
+export type MissionType = 'wordHunt' | 'adventure' | 'community';
 
 export interface Mission {
   type: MissionType;
@@ -30,26 +30,25 @@ export interface UseDailyMissionsReturn {
 
 const MISSION_HREFS: Record<MissionType, string> = {
   wordHunt: '/daily',
-  brainDrill: '/drill',
   adventure: '/adventure',
-  community: '/community/create',
+  community: '/multiplayer',
 };
+
+// XP reward per individual daily quest (mirrors DAILY_QUEST_CONFIGS in QuestHub)
+const PER_QUEST_XP = 100;
 
 function buildMissions(data: {
   word_hunt_completed: boolean;
-  brain_drill_completed: boolean;
   adventure_completed: boolean;
   community_completed: boolean;
 } | null): Mission[] {
   const d = data || {
     word_hunt_completed: false,
-    brain_drill_completed: false,
     adventure_completed: false,
     community_completed: false,
   };
   return [
     { type: 'wordHunt', completed: d.word_hunt_completed, href: MISSION_HREFS.wordHunt },
-    { type: 'brainDrill', completed: d.brain_drill_completed, href: MISSION_HREFS.brainDrill },
     { type: 'adventure', completed: d.adventure_completed, href: MISSION_HREFS.adventure },
     { type: 'community', completed: d.community_completed, href: MISSION_HREFS.community },
   ];
@@ -67,6 +66,7 @@ export function useDailyMissions(): UseDailyMissionsReturn {
   const [missions, setMissions] = useState<Mission[]>(buildMissions(null));
   const [grandSlamClaimed, setGrandSlamClaimed] = useState(false);
   const [loading, setLoading] = useState(true);
+  const prevMissionsMapRef = useRef<Record<MissionType, boolean> | null>(null);
 
   const fetchMissions = useCallback(async () => {
     if (!playerId || !supabase) {
@@ -80,7 +80,7 @@ export function useDailyMissions(): UseDailyMissionsReturn {
     try {
       const { data, error } = await supabase
         .from('player_daily_missions')
-        .select('word_hunt_completed, brain_drill_completed, adventure_completed, community_completed, grand_slam_claimed')
+        .select('word_hunt_completed, adventure_completed, community_completed, grand_slam_claimed')
         .eq('player_id', playerId)
         .eq('mission_date', today)
         .single();
@@ -130,6 +130,40 @@ export function useDailyMissions(): UseDailyMissionsReturn {
 
   const completedCount = missions.filter(m => m.completed).length;
   const isGrandSlam = completedCount === missions.length && missions.length > 0;
+
+  // Fire per-quest celebration toast when an individual mission transitions false → true.
+  // Skips the initial mount (prevMissionsMapRef is null) so pre-existing completions don't re-celebrate.
+  useEffect(() => {
+    if (loading) return;
+    const currentMap: Record<MissionType, boolean> = {
+      wordHunt: missions.find(m => m.type === 'wordHunt')?.completed ?? false,
+      adventure: missions.find(m => m.type === 'adventure')?.completed ?? false,
+      community: missions.find(m => m.type === 'community')?.completed ?? false,
+    };
+
+    const prev = prevMissionsMapRef.current;
+    if (prev) {
+      const newlyCompleted = (Object.keys(currentMap) as MissionType[]).filter(
+        key => !prev[key] && currentMap[key],
+      );
+      if (newlyCompleted.length > 0) {
+        import('@/components/quests/QuestCompletionToast').then(({ showQuestCompletionToast }) => {
+          newlyCompleted.forEach((type, idx) => {
+            // Stagger multiple toasts slightly so they don't stack on top of each other.
+            setTimeout(() => {
+              showQuestCompletionToast({
+                questName: t(`dailyMissions.${type}`),
+                xpReward: PER_QUEST_XP,
+                t,
+                onComplete: idx === 0 ? playQuestCompleteSound : undefined,
+              });
+            }, idx * 400);
+          });
+        });
+      }
+    }
+    prevMissionsMapRef.current = currentMap;
+  }, [missions, loading, t, playQuestCompleteSound]);
 
   // Show Grand Slam celebration toast when all missions are completed
   useEffect(() => {

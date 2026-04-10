@@ -1,12 +1,13 @@
 'use client';
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Shuffle, Pencil } from 'lucide-react';
+import { Shuffle, Pencil, Check } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { type CustomAvatarConfig, getRandomAvatarConfig } from '@/shared/types/customAvatar';
 import Avatar from '@/components/Avatar';
 import AvatarBuilderModal from '@/components/avatar/AvatarBuilderModal';
+import { fireOnboardingBurst } from '@/utils/confettiUtils';
 import { cn } from '@/lib/utils';
 
 interface QuickProfileSetupProps {
@@ -30,14 +31,34 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
   const [isBuilderOpen, setIsBuilderOpen] = useState(false);
   const [avatarKey, setAvatarKey] = useState(0);
   const [showShake, setShowShake] = useState(false);
-  const inputRef = React.useRef<HTMLInputElement>(null);
+  const [justValidated, setJustValidated] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const previouslyValidRef = useRef(false);
 
   const trimmedName = name.trim();
   const isNameValid = trimmedName.length >= 2 && trimmedName.length <= 20 && /^[\p{L}\p{N}\s._-]+$/u.test(name);
 
+  // Pulse the input once, the first frame a name transitions invalid → valid.
+  // Using a ref guard keeps this a single celebration per validation flip.
+  useEffect(() => {
+    if (!isNameValid) {
+      previouslyValidRef.current = false;
+      return () => {};
+    }
+    if (previouslyValidRef.current) {
+      return () => {};
+    }
+    previouslyValidRef.current = true;
+    setJustValidated(true);
+    const timer = setTimeout(() => setJustValidated(false), 600);
+    return () => clearTimeout(timer);
+  }, [isNameValid]);
+
   const handleRandomize = useCallback(() => {
     setAvatar(getRandomAvatarConfig());
     setAvatarKey((k) => k + 1);
+    // Small burst centred near the avatar (roughly upper-middle of viewport)
+    fireOnboardingBurst({ y: 0.4 }, ['#FFE135', '#FF1493', '#BFFF00']);
   }, []);
 
   const handleBuilderSave = useCallback((config: CustomAvatarConfig) => {
@@ -52,6 +73,8 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
       inputRef.current?.focus();
       return;
     }
+    // Send-off burst in the brand pink — steps forward into the score reveal
+    fireOnboardingBurst({ y: 0.6 }, ['#FF1493', '#BFFF00', '#FFE135']);
     onComplete(trimmedName, avatar);
   }, [trimmedName, isNameValid, avatar, onComplete]);
 
@@ -70,7 +93,7 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
       initial={{ y: 60, opacity: 0, scale: 0.95 }}
       animate={{ y: 0, opacity: 1, scale: 1 }}
       transition={{ type: 'spring', stiffness: 300, damping: 26 }}
-      className="w-full max-w-sm mx-auto"
+      className="w-full max-w-sm lg:max-w-md mx-auto"
       dir={dir}
     >
       <div className="bg-neo-cream border-3 border-neo-black rounded-neo p-5 shadow-hard-md">
@@ -178,8 +201,15 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
             {t('validation.usernameRequired')}
           </label>
           <motion.div
-            animate={showShake ? { x: [0, -6, 6, -4, 4, 0] } : {}}
-            transition={{ duration: 0.4 }}
+            className="relative"
+            animate={
+              showShake
+                ? { x: [0, -6, 6, -4, 4, 0] }
+                : justValidated
+                ? { scale: [1, 1.04, 1] }
+                : {}
+            }
+            transition={{ duration: justValidated ? 0.5 : 0.4, ease: 'easeOut' }}
           >
             <input
               id="profile-name"
@@ -196,11 +226,27 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
                 'w-full px-3 py-3 bg-white border-3 border-neo-black rounded-neo',
                 'font-bold text-lg text-neo-black placeholder:text-neo-black/30',
                 'focus:outline-hidden focus:ring-3 focus:ring-neo-cyan',
-                'shadow-hard-sm mb-1 min-h-[48px]',
+                'shadow-hard-sm mb-1 min-h-[48px] pr-10',
                 isNameValid && trimmedName.length > 0 && 'border-neo-lime',
                 !isNameValid && name.length > 0 && 'border-neo-red'
               )}
             />
+            {/* Success check badge — pops in when the name first becomes valid */}
+            <AnimatePresence>
+              {isNameValid && (
+                <motion.div
+                  key="valid-check"
+                  initial={{ scale: 0, rotate: -45 }}
+                  animate={{ scale: 1, rotate: 0 }}
+                  exit={{ scale: 0, rotate: 45 }}
+                  transition={{ type: 'spring', stiffness: 500, damping: 18 }}
+                  className="absolute top-1/2 -translate-y-1/2 inset-e-2 w-6 h-6 bg-neo-lime border-2 border-neo-black rounded-full flex items-center justify-center shadow-hard-sm pointer-events-none"
+                  aria-hidden
+                >
+                  <Check className="w-3.5 h-3.5 text-neo-black" strokeWidth={3} />
+                </motion.div>
+              )}
+            </AnimatePresence>
           </motion.div>
           <div className="flex justify-between text-[10px] font-bold text-neo-black/40 mb-4 px-0.5">
             <span>{trimmedName.length < 2 && name.length > 0 ? t('validation.usernameTooShort') : '2-20 chars'}</span>

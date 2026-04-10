@@ -175,12 +175,6 @@ vi.mock('@/utils/playerProgressStorage', () => ({
   hasPlayedAnyGame: vi.fn(() => true),
 }));
 
-vi.mock('@/utils/trainingProgressStorage', () => ({
-  shouldShowTrainingGateway: vi.fn(() => false),
-  markGatewaySkipped: vi.fn(),
-  markGatewaySeen: vi.fn(),
-}));
-
 // Mock components
 vi.mock('../DailyWordHuntSurvival', () => ({
   __esModule: true,
@@ -211,10 +205,6 @@ vi.mock('../DailyReadyScreen', () => ({
 
 vi.mock('../DailyChallengeTutorial', () => ({
   DailyChallengeTutorial: () => <div data-testid="tutorial">Tutorial</div>,
-}));
-
-vi.mock('@/components/training', () => ({
-  TrainingGatewayModal: () => null,
 }));
 
 vi.mock('@/hooks/usePullToRefresh', () => ({

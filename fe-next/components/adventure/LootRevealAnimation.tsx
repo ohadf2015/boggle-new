@@ -22,6 +22,7 @@ export interface LootDrop {
   type: string;
   rarity: 'common' | 'rare' | 'legendary' | string;
   label?: string;
+  quantity?: number;
 }
 
 export interface LootRevealAnimationProps {
@@ -84,8 +85,42 @@ export const LootRevealAnimation = memo<LootRevealAnimationProps>(({
 
   if (drops.length === 0) return null;
 
+  const fragmentCount = drops
+    .filter(d => d.type === 'runeFragment')
+    .reduce((sum, d) => sum + (d.quantity ?? 1), 0);
+
   return (
     <AdaptiveAnimatePresence>
+      {fragmentCount > 0 && (
+        <AdaptiveMotion.div
+          key="rune-fragment-callout"
+          data-testid="loot-rune-fragment-callout"
+          initial={{ opacity: 0, y: -8, scale: 0.95 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ delay: baseDelay - 0.05, type: 'spring', stiffness: 320, damping: 22 }}
+          className={cn(
+            'mx-auto mb-3 flex items-center justify-center gap-3',
+            'px-4 py-2 rounded-neo border-3 border-neo-purple',
+            'bg-neo-purple/25 shadow-hard-sm max-w-sm w-full'
+          )}
+        >
+          <Image
+            src={LOOT_DROP_IMAGES.runeFragment}
+            alt="rune fragment"
+            width={32}
+            height={32}
+            className="shrink-0"
+          />
+          <div className="flex flex-col leading-tight text-start">
+            <span className="text-[10px] font-black uppercase tracking-wide text-neo-purple-light">
+              {t('adventure.runes.fragmentEarned')}
+            </span>
+            <span className="text-base font-black text-neo-white">
+              +{fragmentCount} {t('adventure.runes.fragment')}
+            </span>
+          </div>
+        </AdaptiveMotion.div>
+      )}
       <AdaptiveMotion.div
         data-testid="loot-reveal-container"
         initial={{ opacity: 0 }}

@@ -182,16 +182,17 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
       className="fixed inset-0 z-[100] bg-neo-navy flex flex-col items-center justify-center overflow-y-auto"
       dir={dir}
     >
-      {/* Floating geometric background shapes — shift color per step */}
+      {/* Floating geometric background shapes — shift color per step.
+          Sizes scale up at lg: so the navy doesn't feel empty on desktop. */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden>
         <motion.div
-          className="absolute w-[300px] h-[300px] rounded-full blur-[120px]"
+          className="absolute w-[300px] h-[300px] lg:w-[560px] lg:h-[560px] rounded-full blur-[120px] lg:blur-[160px]"
           animate={{ background: accent.color1, x: ['-10%', '5%', '-10%'], y: ['-5%', '10%', '-5%'] }}
           transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut' }}
           style={{ top: '-8%', left: '-5%' }}
         />
         <motion.div
-          className="absolute w-[250px] h-[250px] rounded-full blur-[100px]"
+          className="absolute w-[250px] h-[250px] lg:w-[480px] lg:h-[480px] rounded-full blur-[100px] lg:blur-[140px]"
           animate={{ background: accent.color2, x: ['5%', '-8%', '5%'], y: ['5%', '-5%', '5%'] }}
           transition={{ duration: 15, repeat: Infinity, ease: 'easeInOut' }}
           style={{ bottom: '5%', right: '-3%' }}
@@ -229,7 +230,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -16, scale: 0.98 }}
           transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-          className="w-full px-4 relative z-1"
+          className="w-full max-w-sm sm:max-w-md lg:max-w-3xl mx-auto px-4 relative z-1"
         >
           {renderStep()}
         </motion.div>

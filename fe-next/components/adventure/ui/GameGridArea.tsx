@@ -199,11 +199,11 @@ export const GameGridArea = memo(function GameGridArea({
         {/*
           Grid Container — uses container query height (cqh) so sizing adapts
           to the actual available space in the flex container, not the viewport.
-          - 90cqh keeps the grid within its parent (leaves room for word preview + hint).
-          - 520px caps on large screens to prevent an oversized board.
+          - 88cqh keeps the grid within its parent (leaves room for word preview + hint).
+          - 760px caps on very large screens to keep tiles readable but fills desktop space.
           - 100% width ensures full-width on narrow phones.
         */}
-        <div className="flex-1 flex items-center justify-center min-h-0 w-full" style={{ maxWidth: 'min(100%, 90cqh, 520px)' }}>
+        <div className="flex-1 flex items-center justify-center min-h-0 w-full" style={{ maxWidth: 'min(100%, 88cqh, 760px)' }}>
           <AdaptiveMotion.div
             className={cn(
               'w-full aspect-square max-h-full rounded-neo-lg',

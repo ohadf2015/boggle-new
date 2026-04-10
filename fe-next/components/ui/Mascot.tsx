@@ -25,7 +25,7 @@ export type MascotVariant =
   | 'onfire'      // onfire-nobg.gif (nobg) - On fire/hot streak
   | 'bored'       // bored-nobg.gif (nobg) - Bored/waiting/idle
   | 'mindblown'   // mindblown-nobg.gif (nobg) - Amazed/shocked
-  | 'encouraging' // encouraging.gif (dark) - Supportive/cheering on
+  | 'encouraging' // encouraging.gif (white) - Supportive/cheering on
   | 'explorer'    // explorer.gif (dark) - Adventuring/discovering
   | 'flexing'     // flexing.gif (dark) - Proud/strong/earned it
   | 'scared'      // scared.gif (white) - Frightened/nervous
@@ -109,7 +109,7 @@ export const MASCOT_BG_TYPE: Record<MascotVariant, MascotBgType> = {
   onfire: 'nobg',
   bored: 'nobg',
   mindblown: 'nobg',
-  encouraging: 'dark',
+  encouraging: 'white',
   explorer: 'dark',
   flexing: 'dark',
   scared: 'white',

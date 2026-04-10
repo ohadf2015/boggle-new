@@ -9,6 +9,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import AvatarRenderer from '@/components/avatar/AvatarRenderer';
 import AvatarBuilderModal from '@/components/avatar/AvatarBuilderModal';
 import { useAvatarPremium } from '@/hooks/useAvatarPremium';
+import { useAuth } from '@/contexts/AuthContext';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 
 const SAMPLE_AVATARS: CustomAvatarConfig[] = [
@@ -32,6 +33,7 @@ export function LandingAvatarTeaser({ onBuilderOpenChange }: LandingAvatarTeaser
   const ArrowIcon = dir === 'rtl' ? ArrowLeft : ArrowRight;
   const [isBuilderOpen, setIsBuilderOpen] = useState(false);
   const avatarPremium = useAvatarPremium();
+  const { profile } = useAuth();
 
   const openBuilder = () => {
     setIsBuilderOpen(true);
@@ -95,6 +97,7 @@ export function LandingAvatarTeaser({ onBuilderOpenChange }: LandingAvatarTeaser
       isOpen={isBuilderOpen}
       onClose={closeBuilder}
       onSave={closeBuilder}
+      initialConfig={profile?.avatar_config ?? undefined}
       premium={avatarPremium}
     />
     </>

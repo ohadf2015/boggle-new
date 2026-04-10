@@ -117,6 +117,7 @@ describe('HeaderMenuDropdown', () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
+        window.localStorage.clear();
         mockUseAuth.mockReturnValue(defaultAuthState);
         mockUseLanguage.mockReturnValue(defaultLanguageState);
     });
@@ -353,6 +354,75 @@ describe('HeaderMenuDropdown', () => {
             fireEvent.click(button);
             await waitFor(() => {
                 expect(button).toHaveAttribute('aria-expanded', 'false');
+            });
+        });
+    });
+
+    describe('Badge Persistence (localStorage)', () => {
+        const STORAGE_KEY = 'headerMenu.lastSeenBadgeCount';
+
+        it('shows badge when unclaimed gifts exist and nothing has been seen yet', () => {
+            render(<HeaderMenuDropdown unclaimedCount={3} />);
+
+            // The aggregate badge on the closed trigger shows the count.
+            const button = screen.getByRole('button', { name: /common.openMenu/i });
+            expect(button).toHaveTextContent('3');
+        });
+
+        it('persists the seen count in localStorage when the menu is opened', async () => {
+            render(<HeaderMenuDropdown unclaimedCount={3} />);
+
+            const button = screen.getByRole('button', { name: /common.openMenu/i });
+            fireEvent.click(button);
+
+            await waitFor(() => {
+                expect(button).toHaveAttribute('aria-expanded', 'true');
+            });
+
+            expect(window.localStorage.getItem(STORAGE_KEY)).toBe('3');
+        });
+
+        it('keeps the badge hidden after "refresh" (remount) once it has been seen', async () => {
+            const { unmount } = render(<HeaderMenuDropdown unclaimedCount={3} />);
+
+            // Open the menu → marks count=3 as seen.
+            fireEvent.click(screen.getByRole('button', { name: /common.openMenu/i }));
+            await waitFor(() => {
+                expect(window.localStorage.getItem(STORAGE_KEY)).toBe('3');
+            });
+
+            // Simulate a full page refresh by unmounting and re-rendering.
+            unmount();
+            render(<HeaderMenuDropdown unclaimedCount={3} />);
+
+            // Badge span renders `{badgeCount}` text; with badgeSeen=true on fresh mount,
+            // the badge should not appear. The trigger button should not contain the count.
+            const freshButton = screen.getByRole('button', { name: /common.openMenu/i });
+            expect(freshButton).not.toHaveTextContent('3');
+        });
+
+        it('resurfaces the badge when the count grows beyond the last seen value', async () => {
+            // Seed localStorage as if the user had previously seen 3 items.
+            window.localStorage.setItem(STORAGE_KEY, '3');
+
+            render(<HeaderMenuDropdown unclaimedCount={5} />);
+
+            // 5 > 3 → badge should appear with the new total.
+            const button = screen.getByRole('button', { name: /common.openMenu/i });
+            expect(button).toHaveTextContent('5');
+        });
+
+        it('clamps the stored marker when the live count drops below it', async () => {
+            // User previously saw 5 items.
+            window.localStorage.setItem(STORAGE_KEY, '5');
+
+            // Now only 2 remain (e.g. user dismissed some elsewhere).
+            render(<HeaderMenuDropdown unclaimedCount={2} />);
+
+            // Effect should clamp stored marker to the current count so a future
+            // increase back to 3 will correctly resurface the badge.
+            await waitFor(() => {
+                expect(window.localStorage.getItem(STORAGE_KEY)).toBe('2');
             });
         });
     });

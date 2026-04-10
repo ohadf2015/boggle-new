@@ -1,3 +1,4 @@
+import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { render, screen, act } from '@testing-library/react';
 import MechanicBonusToast, { type MechanicBonusData } from '../MechanicBonusToast';
 
@@ -8,7 +9,12 @@ vi.mock('@/contexts/LanguageContext', () => ({
 vi.mock('@/components/motion/AdaptiveMotion', () => ({
   AdaptiveMotion: {
     div: ({ children, ...props }: any) => (
-      <div role={props.role} aria-live={props['aria-live']} className={props.className}>
+      <div
+        role={props.role}
+        aria-live={props['aria-live']}
+        className={props.className}
+        data-testid="motion-root"
+      >
         {children}
       </div>
     ),
@@ -64,6 +70,23 @@ describe('MechanicBonusToast', () => {
     });
 
     expect(onDismiss).toHaveBeenCalledTimes(1);
+  });
+
+  it('uses default top-20 position when bossActive is false/undefined', () => {
+    const bonus: MechanicBonusData = { id: 10, feedbackKey: 'k', multiplier: 1.1 };
+    render(<MechanicBonusToast bonus={bonus} onDismiss={vi.fn()} />);
+    const root = screen.getByTestId('motion-root');
+    expect(root.className).toMatch(/top-20/);
+    expect(root.className).not.toMatch(/top-44/);
+  });
+
+  it('shifts below boss HUD when bossActive is true (avoids HP-bar overlap)', () => {
+    const bonus: MechanicBonusData = { id: 11, feedbackKey: 'k', multiplier: 1.1 };
+    render(<MechanicBonusToast bonus={bonus} onDismiss={vi.fn()} bossActive />);
+    const root = screen.getByTestId('motion-root');
+    // Must be clear of the boss HUD strip (top-12 .. ~top-28) and dialogue (top-28 .. ~top-44)
+    expect(root.className).toMatch(/top-44/);
+    expect(root.className).not.toMatch(/top-20\b/);
   });
 
   it('displays correct percentage for various multipliers', () => {

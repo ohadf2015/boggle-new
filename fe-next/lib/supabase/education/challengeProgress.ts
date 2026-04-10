@@ -5,7 +5,17 @@
 
 import { supabase } from '@/lib/supabase';
 import logger from '@/utils/logger';
-import type { DailyChallengeRow } from './types';
+import type { DailyChallengeRow, WeeklyQuestRow } from './types';
+
+/** Returns Monday of current week as YYYY-MM-DD (matches challenges.getCurrentWeekStart) */
+function getCurrentWeekStart(): string {
+  const now = new Date();
+  const day = now.getUTCDay(); // 0=Sun..6=Sat
+  const diff = day === 0 ? -6 : 1 - day; // shift to Monday
+  const monday = new Date(now);
+  monday.setUTCDate(now.getUTCDate() + diff);
+  return monday.toISOString().split('T')[0];
+}
 
 // ============================================
 // TYPES
@@ -66,21 +76,12 @@ export async function updateEducationChallengeProgress(
 
     if (fetchError) {
       logger.error('Error fetching challenges for progress update:', fetchError);
-      return { updated: 0 };
     }
 
-    if (!challenges || challenges.length === 0) {
-      return { updated: 0 };
-    }
-
-    // Filter to matching challenge type
-    const matching = (challenges as DailyChallengeRow[]).filter(
+    // Filter to matching challenge type (may be empty — weekly path still runs below)
+    const matching = ((challenges ?? []) as DailyChallengeRow[]).filter(
       c => c.challenge_type === challengeType
     );
-
-    if (matching.length === 0) {
-      return { updated: 0 };
-    }
 
     let updatedCount = 0;
 
@@ -104,6 +105,55 @@ export async function updateEducationChallengeProgress(
 
       if (updateError) {
         logger.error('Error updating challenge progress:', updateError);
+        continue;
+      }
+
+      updatedCount += 1;
+    }
+
+    // ----- Weekly quest progress -----
+    // Fetch this week's incomplete weekly quests, filter by quest_type,
+    // and increment current_progress[challengeType] (canonical key shape).
+    const weekStart = getCurrentWeekStart();
+    const { data: weeklyQuests, error: weeklyFetchError } = await supabase
+      .from('weekly_quests')
+      .select('*')
+      .eq('player_id', playerId)
+      .eq('week_start', weekStart)
+      .eq('completed', false);
+
+    if (weeklyFetchError) {
+      logger.error('Error fetching weekly quests for progress update:', weeklyFetchError);
+      return { updated: updatedCount };
+    }
+
+    const matchingWeekly = ((weeklyQuests ?? []) as WeeklyQuestRow[]).filter(
+      q => q.quest_type === challengeType
+    );
+
+    for (const quest of matchingWeekly) {
+      const requirements = (quest.requirements ?? {}) as Record<string, number>;
+      const currentProgress = (quest.current_progress ?? {}) as Record<string, number>;
+      const target = requirements[challengeType] ?? 0;
+      const prev = currentProgress[challengeType] ?? 0;
+      const newValue = prev + value;
+      const isCompleted = target > 0 && newValue >= target;
+
+      const updatePayload: Record<string, unknown> = {
+        current_progress: { ...currentProgress, [challengeType]: newValue },
+      };
+      if (isCompleted) {
+        updatePayload.completed = true;
+        updatePayload.completed_at = new Date().toISOString();
+      }
+
+      const { error: weeklyUpdateError } = await supabase
+        .from('weekly_quests')
+        .update(updatePayload)
+        .eq('id', quest.id);
+
+      if (weeklyUpdateError) {
+        logger.error('Error updating weekly quest progress:', weeklyUpdateError);
         continue;
       }
 

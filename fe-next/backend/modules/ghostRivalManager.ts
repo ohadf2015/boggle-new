@@ -201,7 +201,9 @@ export async function updateRivalScore(
   });
 
   // Fallback: manual update if RPC doesn't exist
-  if (error?.code === '42883') {
+  // 42883 = Postgres "function does not exist"
+  // PGRST202 = PostgREST "function not found in schema cache" (what Supabase actually returns)
+  if (error?.code === '42883' || error?.code === 'PGRST202') {
     const { data: existing } = await supabase
       .from('ghost_rivals')
       .select('player_score')
@@ -226,7 +228,11 @@ export async function updateRivalScore(
     return null;
   }
 
-  return { newScore: data ?? pointsEarned };
+  // RPC returns `TABLE(new_score integer)` → shape is `[{ new_score: number }]`.
+  // Empty array = no matching (player_id, week_start) row (rivalry not initialized).
+  const row = Array.isArray(data) ? data[0] : (data as { new_score?: number } | null);
+  if (!row || typeof row.new_score !== 'number') return null;
+  return { newScore: row.new_score };
 }
 
 /**

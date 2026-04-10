@@ -8,6 +8,7 @@ import { useIsDesktop } from '@/hooks/useMediaQuery';
 import { Mascot, MascotWithEntrance } from '@/components/ui/Mascot';
 import MiniGrid from '@/components/onboarding/MiniGrid';
 import AvatarBuilderModal from '@/components/avatar/AvatarBuilderModal';
+import { useAuth } from '@/contexts/AuthContext';
 import { demoConfigs } from '@/components/onboarding/demoConfigs';
 
 interface PreGameTutorialProps {
@@ -37,6 +38,7 @@ const PreGameTutorial: React.FC<PreGameTutorialProps> = ({ onComplete }) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [direction, setDirection] = useState(1);
   const [isAvatarBuilderOpen, setIsAvatarBuilderOpen] = useState(false);
+  const { profile } = useAuth();
 
   const demoConfig = useMemo(() => {
     return demoConfigs[language] || demoConfigs.en;
@@ -261,6 +263,7 @@ const PreGameTutorial: React.FC<PreGameTutorialProps> = ({ onComplete }) => {
                 isOpen={isAvatarBuilderOpen}
                 onClose={() => setIsAvatarBuilderOpen(false)}
                 onSave={() => setIsAvatarBuilderOpen(false)}
+                initialConfig={profile?.avatar_config ?? undefined}
                 premium={null}
               />
 

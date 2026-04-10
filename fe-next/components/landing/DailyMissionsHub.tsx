@@ -7,7 +7,7 @@
  */
 
 import Link from 'next/link';
-import { Trophy, Sword, Users, Brain, Check, Gift } from 'lucide-react';
+import { Trophy, Sword, Users, Check, Gift } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useDailyMissions, type MissionType } from '@/hooks/useDailyMissions';
@@ -28,13 +28,6 @@ const MISSION_CONFIGS: MissionConfig[] = [
     borderColor: 'border-s-neo-yellow',
     dotColor: 'bg-neo-yellow',
     translationKey: 'dailyMissions.wordHunt',
-  },
-  {
-    type: 'brainDrill',
-    icon: Brain,
-    borderColor: 'border-s-neo-purple',
-    dotColor: 'bg-neo-purple',
-    translationKey: 'dailyMissions.brainDrill',
   },
   {
     type: 'adventure',
@@ -187,7 +180,7 @@ export function DailyMissionsHub() {
       >
         <div className="h-6 w-40 bg-neo-white/10 rounded mb-4" />
         <div className="space-y-2">
-          {[1, 2, 3, 4].map((i) => (
+          {[1, 2, 3].map((i) => (
             <div key={i} className="h-14 bg-neo-white/5 rounded-neo" />
           ))}
         </div>

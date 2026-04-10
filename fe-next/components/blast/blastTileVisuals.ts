@@ -2,7 +2,7 @@ import {
   type LucideIcon,
   Bomb, Zap, Triangle, Rainbow, Snowflake, Gem, Magnet,
   Diamond, Hourglass, Shuffle, Flame, Orbit, FlaskConical,
-  Sparkles, Lock, Key, Star, Type, Anchor,
+  Sparkles, Lock, Key, Star, Anchor,
 } from 'lucide-react';
 import type { BlastTileType } from './types';
 
@@ -14,7 +14,7 @@ const BORDER_SPECIAL = '2px solid rgba(0,0,0,0.4)';
  *  tile's `text-*` class so gold/ice tiles get dark strokes, bombs get white. */
 export const TILE_VISUALS: Record<BlastTileType, { bg: string; indicator?: LucideIcon; text?: string; style?: React.CSSProperties }> = {
   standard: {
-    bg: '', indicator: Type, text: 'text-neo-navy',
+    bg: '', text: 'text-neo-navy',
     style: { background: 'rgba(255,255,255,0.85)', boxShadow: SHADOW, border: '2px solid rgba(0,0,0,0.3)' },
   },
   gold: {

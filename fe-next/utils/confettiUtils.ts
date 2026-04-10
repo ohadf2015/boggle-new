@@ -333,6 +333,28 @@ export function fireVictoryConfetti(): void {
 }
 
 /**
+ * Fire a light, short burst for onboarding FTUE beats.
+ * Tuned to be quick (no follow-up delay) so it doesn't slow step transitions.
+ *
+ * @param origin - Where the burst originates (default: center, slightly above middle)
+ * @param colors - Custom palette (defaults to the 5 neo-brutalist accents)
+ */
+export function fireOnboardingBurst(
+  origin: { x?: number; y?: number } = { x: 0.5, y: 0.55 },
+  colors: string[] = NEO_BRUTALIST_COLORS
+): void {
+  fireConfetti({
+    particleCount: 22,
+    spread: 75,
+    startVelocity: 42,
+    origin,
+    colors,
+    scalar: 1.15,
+    ticks: 120,
+  });
+}
+
+/**
  * Fire streak milestone confetti - moderate multi-burst
  */
 export function fireStreakConfetti(): void {

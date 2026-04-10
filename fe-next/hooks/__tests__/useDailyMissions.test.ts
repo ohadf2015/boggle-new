@@ -40,6 +40,10 @@ vi.mock('@/components/quests/QuestCompletionToast', () => ({
   showQuestCompletionToast: vi.fn(),
 }));
 
+vi.mock('@/contexts/SoundEffectsContext', () => ({
+  useSoundEffects: () => ({ playQuestCompleteSound: vi.fn() }),
+}));
+
 import { useDailyMissions } from '../useDailyMissions';
 import { showQuestCompletionToast } from '@/components/quests/QuestCompletionToast';
 
@@ -49,7 +53,6 @@ beforeEach(() => {
 
 const EMPTY_DATA = {
   word_hunt_completed: false,
-  brain_drill_completed: false,
   adventure_completed: false,
   community_completed: false,
   grand_slam_claimed: false,
@@ -57,7 +60,6 @@ const EMPTY_DATA = {
 
 const FULL_DATA = {
   word_hunt_completed: true,
-  brain_drill_completed: true,
   adventure_completed: true,
   community_completed: true,
   grand_slam_claimed: false,
@@ -75,7 +77,7 @@ describe('useDailyMissions', () => {
       expect(result.current.loading).toBe(false);
     });
 
-    expect(result.current.missions).toHaveLength(4);
+    expect(result.current.missions).toHaveLength(3);
     expect(result.current.completedCount).toBe(0);
     expect(result.current.isGrandSlam).toBe(false);
   });
@@ -89,7 +91,7 @@ describe('useDailyMissions', () => {
       expect(result.current.loading).toBe(false);
     });
 
-    expect(result.current.completedCount).toBe(4);
+    expect(result.current.completedCount).toBe(3);
     expect(result.current.isGrandSlam).toBe(true);
     expect(result.current.grandSlamClaimed).toBe(false);
   });
@@ -120,7 +122,7 @@ describe('useDailyMissions', () => {
     });
 
     const hrefs = result.current.missions.map(m => m.href);
-    expect(hrefs).toEqual(['/daily', '/drill', '/adventure', '/community/create']);
+    expect(hrefs).toEqual(['/daily', '/adventure', '/multiplayer']);
   });
 
   it('sets grandSlamClaimed from DB data', async () => {
@@ -138,7 +140,7 @@ describe('useDailyMissions', () => {
     expect(result.current.grandSlamClaimed).toBe(true);
   });
 
-  it('shows Grand Slam toast when all 4 missions complete', async () => {
+  it('shows Grand Slam toast when all 3 missions complete', async () => {
     mockSingle.mockResolvedValueOnce({ data: FULL_DATA, error: null });
 
     renderHook(() => useDailyMissions());
@@ -160,6 +162,53 @@ describe('useDailyMissions', () => {
 
     await waitFor(() => {
       expect(showQuestCompletionToast).not.toHaveBeenCalled();
+    });
+  });
+
+  it('does NOT fire per-quest toast on initial mount (pre-existing completions)', async () => {
+    // One mission already completed at mount — this is the initial state, not a transition.
+    mockSingle.mockResolvedValueOnce({
+      data: { ...EMPTY_DATA, word_hunt_completed: true },
+      error: null,
+    });
+
+    const { result } = renderHook(() => useDailyMissions());
+
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false);
+    });
+
+    // Should not celebrate a mission that was already complete when the hook mounted.
+    expect(showQuestCompletionToast).not.toHaveBeenCalled();
+  });
+
+  it('fires per-quest toast when a mission transitions false → true after refetch', async () => {
+    // First fetch: all incomplete. Second fetch (after visibility change): wordHunt done.
+    mockSingle
+      .mockResolvedValueOnce({ data: EMPTY_DATA, error: null })
+      .mockResolvedValueOnce({
+        data: { ...EMPTY_DATA, word_hunt_completed: true },
+        error: null,
+      });
+
+    const { result } = renderHook(() => useDailyMissions());
+
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false);
+    });
+    expect(showQuestCompletionToast).not.toHaveBeenCalled();
+
+    // Simulate user returning to tab after finishing Word Hunt.
+    Object.defineProperty(document, 'visibilityState', { value: 'visible', configurable: true });
+    document.dispatchEvent(new Event('visibilitychange'));
+
+    await waitFor(() => {
+      expect(showQuestCompletionToast).toHaveBeenCalledWith(
+        expect.objectContaining({
+          questName: 'dailyMissions.wordHunt',
+          xpReward: 100,
+        }),
+      );
     });
   });
 });

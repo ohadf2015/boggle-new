@@ -53,6 +53,20 @@ export function getModeLabel(mode: GameModeOption, t: GameModeSelectorProps['t']
 }
 
 /**
+ * Short description used as a hover tooltip (desktop) on mode buttons.
+ * Translations live under `gameModes.*.description` (plus `gameModes.randomDescription`).
+ */
+export function getModeDescription(mode: GameModeOption, t: GameModeSelectorProps['t']): string {
+  const descriptions: Record<GameModeOption, string> = {
+    random: t('gameModes.randomDescription'),
+    classic: t('gameModes.classic.description'),
+    blast: t('gameModes.blast.description'),
+    'word-hunt': t('gameModes.wordHunt.description'),
+  };
+  return descriptions[mode];
+}
+
+/**
  * Shared game mode selector used in lobby and results page.
  * Renders icon-based buttons with juicy selection animations.
  */
@@ -79,6 +93,8 @@ export function GameModeSelector({
             whileTap={{ scale: 0.92 }}
             transition={{ type: 'spring' as const, stiffness: 400, damping: 20 }}
             data-testid={`game-mode-${mode}`}
+            title={getModeDescription(mode, t)}
+            aria-label={`${getModeLabel(mode, t)} — ${getModeDescription(mode, t)}`}
             className={cn(
               'rounded-lg font-bold text-[9px] uppercase border-2 border-neo-black flex flex-col items-center gap-0.5',
               'transition-[background-color,color,border-color,box-shadow] duration-200',

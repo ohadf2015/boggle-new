@@ -40,9 +40,11 @@ vi.mock('lucide-react', () => ({
   Trophy: () => <div data-testid="trophy-icon" />,
 }));
 
-// Mock confettiUtils
+// Mock confettiUtils — both the opening victory burst and the staggered
+// firework follow-up need stubs so the mount effect doesn't crash in jsdom.
 vi.mock('@/utils/confettiUtils', () => ({
   fireVictoryConfetti: vi.fn(),
+  fireFireworks: vi.fn(() => () => {}),
 }));
 
 // Mock LanguageContext

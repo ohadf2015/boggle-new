@@ -30,6 +30,9 @@ vi.mock('@/components/daily/DailyChallengeBanner', () => {
   DailyChallengeBanner.displayName = 'DailyChallengeBanner';
   return { __esModule: true, default: DailyChallengeBanner };
 });
+vi.mock('@/hooks/useIsPracticeVeteran', () => ({
+  useIsPracticeVeteran: () => false,
+}));
 
 const baseProps = {
   language: 'en',
@@ -49,9 +52,11 @@ describe('LandingChallengeCards reordering', () => {
     // Daily banner first (pinned), then arena (pinned), then practice, adventure
     expect(screen.getByTestId('daily-banner')).toBeInTheDocument();
     const cards = screen.getAllByTestId('mode-card');
-    expect(cards[0]).toHaveTextContent('landing.arena');
-    expect(cards[1]).toHaveTextContent('landing.practice');
-    expect(cards[2]).toHaveTextContent('landing.adventureMode');
+    // Quick Play is injected right after daily, so it leads the ModeCard list.
+    expect(cards[0]).toHaveTextContent('landing.quickPlay');
+    expect(cards[1]).toHaveTextContent('landing.arena');
+    expect(cards[2]).toHaveTextContent('landing.practice');
+    expect(cards[3]).toHaveTextContent('landing.adventureMode');
   });
 
   it('pins daily+arena first, reorders rest by popularity', () => {
@@ -66,10 +71,11 @@ describe('LandingChallengeCards reordering', () => {
     const cardOrder = getCardOrder(stats);
     render(<LandingChallengeCards {...baseProps} cardOrder={cardOrder} />);
     const cards = screen.getAllByTestId('mode-card');
-    // Daily (banner, not ModeCard) + arena pinned, then adventure > practice by popularity
-    expect(cards[0]).toHaveTextContent('landing.arena');
-    expect(cards[1]).toHaveTextContent('landing.adventureMode');
-    expect(cards[2]).toHaveTextContent('landing.practice');
+    // Daily (banner) + injected quickPlay lead, then arena pinned, then adventure > practice.
+    expect(cards[0]).toHaveTextContent('landing.quickPlay');
+    expect(cards[1]).toHaveTextContent('landing.arena');
+    expect(cards[2]).toHaveTextContent('landing.adventureMode');
+    expect(cards[3]).toHaveTextContent('landing.practice');
   });
 
   it('still shows blast separately even when most popular', () => {

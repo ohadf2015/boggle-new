@@ -6,7 +6,12 @@
  */
 
 import { vi, type Mock, type MockInstance } from 'vitest';
-import { getBestHumanScore, shouldBotScore } from '../botGame';
+import {
+  getBestHumanScore,
+  shouldBotScore,
+  markBotScoringStart,
+  clearBotScoringStart,
+} from '../botGame';
 
 // Mock gameStateManager
 vi.mock('../../../modules/gameStateManager', () => ({
@@ -98,32 +103,76 @@ describe('Bot Score Cap', () => {
     });
   });
 
-  describe('shouldBotScore — no human scored yet (initial ceilings)', () => {
+  describe('shouldBotScore — no human scored yet (grace window + post-grace ceilings)', () => {
     beforeEach(() => {
       getLeaderboard.mockReturnValue([
         { username: 'Alice', score: 0, isBot: false },
         { username: 'TestBot', score: 0, isBot: true },
       ]);
+      clearBotScoringStart('GAME1');
     });
 
-    it('easy bot: allows up to ceiling of 40', () => {
-      expect(shouldBotScore('GAME1', 'TestBot', 30, 10, 'easy')).toBe(true);
-      expect(shouldBotScore('GAME1', 'TestBot', 35, 10, 'easy')).toBe(false);
+    afterEach(() => {
+      clearBotScoringStart('GAME1');
+      vi.useRealTimers();
     });
 
-    it('medium bot: allows up to ceiling of 80', () => {
-      expect(shouldBotScore('GAME1', 'TestBot', 70, 10, 'medium')).toBe(true);
-      expect(shouldBotScore('GAME1', 'TestBot', 75, 10, 'medium')).toBe(false);
+    it('inside the grace window: bot scores freely regardless of difficulty', () => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date('2026-01-01T00:00:00Z'));
+      markBotScoringStart('GAME1');
+
+      // Advance 5s (well within 15s grace)
+      vi.advanceTimersByTime(5_000);
+
+      expect(shouldBotScore('GAME1', 'TestBot', 200, 50, 'easy')).toBe(true);
+      expect(shouldBotScore('GAME1', 'TestBot', 500, 100, 'medium')).toBe(true);
+      expect(shouldBotScore('GAME1', 'TestBot', 1000, 200, 'hard')).toBe(true);
     });
 
-    it('hard bot: allows up to ceiling of 150', () => {
-      expect(shouldBotScore('GAME1', 'TestBot', 140, 10, 'hard')).toBe(true);
-      expect(shouldBotScore('GAME1', 'TestBot', 145, 10, 'hard')).toBe(false);
+    it('when scoring start was never marked: bot scores freely', () => {
+      // No markBotScoringStart call — falls into the "no startedAt" branch
+      expect(shouldBotScore('GAME1', 'TestBot', 999, 999, 'easy')).toBe(true);
     });
 
-    it('defaults to medium ceiling for unknown difficulty', () => {
-      expect(shouldBotScore('GAME1', 'TestBot', 70, 10, 'unknown')).toBe(true);
-      expect(shouldBotScore('GAME1', 'TestBot', 75, 10, 'unknown')).toBe(false);
+    it('after grace window expires: easy bot capped at post-grace ceiling 250', () => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date('2026-01-01T00:00:00Z'));
+      markBotScoringStart('GAME1');
+      vi.advanceTimersByTime(20_000); // > 15s grace
+
+      expect(shouldBotScore('GAME1', 'TestBot', 240, 10, 'easy')).toBe(true);
+      expect(shouldBotScore('GAME1', 'TestBot', 245, 10, 'easy')).toBe(false);
+    });
+
+    it('after grace window expires: medium bot capped at post-grace ceiling 400', () => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date('2026-01-01T00:00:00Z'));
+      markBotScoringStart('GAME1');
+      vi.advanceTimersByTime(20_000);
+
+      expect(shouldBotScore('GAME1', 'TestBot', 390, 10, 'medium')).toBe(true);
+      expect(shouldBotScore('GAME1', 'TestBot', 395, 10, 'medium')).toBe(false);
+    });
+
+    it('after grace window expires: hard bot capped at post-grace ceiling 600', () => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date('2026-01-01T00:00:00Z'));
+      markBotScoringStart('GAME1');
+      vi.advanceTimersByTime(20_000);
+
+      expect(shouldBotScore('GAME1', 'TestBot', 590, 10, 'hard')).toBe(true);
+      expect(shouldBotScore('GAME1', 'TestBot', 595, 10, 'hard')).toBe(false);
+    });
+
+    it('after grace window expires: unknown difficulty falls back to medium ceiling 400', () => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date('2026-01-01T00:00:00Z'));
+      markBotScoringStart('GAME1');
+      vi.advanceTimersByTime(20_000);
+
+      expect(shouldBotScore('GAME1', 'TestBot', 390, 10, 'unknown')).toBe(true);
+      expect(shouldBotScore('GAME1', 'TestBot', 395, 10, 'unknown')).toBe(false);
     });
   });
 

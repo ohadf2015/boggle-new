@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { Play, Crown, Check, X, Trophy } from 'lucide-react';
 import Avatar from '@/components/Avatar';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { MODE_ICONS, MODE_ACTIVE_COLORS, getModeLabel, type GameModeOption } from '@/components/GameModeSelector';
+import { MODE_ICONS, MODE_ACTIVE_COLORS, getModeLabel, getModeDescription, type GameModeOption } from '@/components/GameModeSelector';
 import { cn } from '@/lib/utils';
 import type { Avatar as AvatarType } from '@/types';
 
@@ -330,7 +330,8 @@ export default function StickyReadyBar({
                 <button
                   key={mode}
                   onClick={() => onSelectGameMode(mode)}
-                  aria-label={getModeLabel(mode, t)}
+                  title={getModeDescription(mode, t)}
+                  aria-label={`${getModeLabel(mode, t)} — ${getModeDescription(mode, t)}`}
                   className={cn(
                     'flex-1 flex items-center justify-center gap-1.5 py-1.5 text-[9px] font-black uppercase rounded-lg border-2 transition-all',
                     isActive

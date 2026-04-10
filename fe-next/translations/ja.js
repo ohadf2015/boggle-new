@@ -2489,21 +2489,6 @@ const ja = {
     }
   },
   "training": {
-    "gateway": {
-      "title": "LexiClash初めて？",
-      "subtitle": "簡単なトレーニングで操作をマスター！",
-      "demoHint": "どの方向にもスワイプ - 斜めもOK！",
-      "benefitsTitle": "トレーニングで学べること：",
-      "benefits": {
-        "learnControls": "スワイプ操作を学ぶ",
-        "masterDirections": "8方向すべてをマスター",
-        "noPressure": "時間制限なしで練習"
-      },
-      "returnNote": "トレーニング後、本番の挑戦へ！",
-      "startTraining": "トレーニング開始",
-      "skipAnyway": "スキップ、遊び方知ってる",
-      "dontShowAgain": "今後表示しない"
-    },
     "hints": {
       "tryDiagonal": "斜めにドラッグしてみて！",
       "changeDirection": "プロテク：途中で方向転換！",
@@ -4286,6 +4271,8 @@ const ja = {
     "multiplayerDesc": "リアルタイムで友達と対戦！",
     "arena": "マルチプレイヤー",
     "arenaDesc": "ソロでもフレンドとでも！",
+    "quickPlay": "クイックプレイ",
+    "quickPlayDesc": "すぐ開始 — ボットとランダムモード",
     "practice": "練習",
     "practiceDesc": "プレッシャーなし、言葉だけ",
     "brainTraining": "脳トレーニング",
@@ -7896,7 +7883,7 @@ const ja = {
     "ready": {
       "title": "ブラストモード",
       "subtitle": "単語を作ってタイルをクリア。コンボをつなげて高得点！",
-      "play": "ブラスト開始！",
+      "play": "最初から始める",
       "resume": "ウェーブ{wave}から再開",
       "step1Title": "単語をスワイプ",
       "step1Desc": "隣り合う文字をなぞって単語を作ろう",

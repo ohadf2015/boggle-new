@@ -42,6 +42,8 @@ export function useBlastPixiOverlays({
   // Map ring → its current rAF id. Replaces the prior Set<number> + delete-then-add
   // dance: each ring owns one frame at a time, so unmount cleanup just iterates.
   const pulseRingsRef = useRef<Map<Graphics, number>>(new Map());
+  // Star bursts — radial glowing beams, same tracking contract as pulseRings.
+  const starBurstsRef = useRef<Map<Graphics, number>>(new Map());
 
   // ─── Bloom + Shockwave allocation ──────────────────────────────────────
   // Single `camera.filters = [...]` assignment avoids spread churn on re-render.
@@ -83,6 +85,7 @@ export function useBlastPixiOverlays({
   useEffect(() => {
     const cameraRef = camera;
     const pulseRings = pulseRingsRef.current;
+    const starBursts = starBurstsRef.current;
     return () => {
       cancelAnimationFrame(crossFlashRafRef.current);
       const cameraAlive = !cameraRef.destroyed;
@@ -103,6 +106,15 @@ export function useBlastPixiOverlays({
         ring.destroy();
       }
       pulseRings.clear();
+      for (const [burst, rafId] of starBursts) {
+        cancelAnimationFrame(rafId);
+        if (burst.destroyed) continue;
+        if (cameraAlive) {
+          try { cameraRef.removeChild(burst); } catch { /* */ }
+        }
+        burst.destroy();
+      }
+      starBursts.clear();
     };
   }, [camera]);
 
@@ -123,6 +135,10 @@ export function useBlastPixiOverlays({
   const fireShockwave = useCallback((cx: number, cy: number, amplitude = 20) => {
     const sw = shockwaveRef.current;
     if (!sw) return;
+    // Cancel any in-flight shockwave rAF before reseeding — without this, two
+    // concurrent loops race on `sw.time`/`sw.enabled`, so a finished wave can
+    // re-enable briefly because the second loop overwrites the first's final tick.
+    cancelAnimationFrame(shockwaveRafRef.current);
     sw.center.x = cx;
     sw.center.y = cy;
     sw.time = 0;
@@ -220,5 +236,45 @@ export function useBlastPixiOverlays({
     pulseRingsRef.current.set(g, requestAnimationFrame(step));
   }, [camera, width, height]);
 
-  return { fireShockwave, flashCross, spawnPulseRing };
+  // ─── Star burst — radial glowing beams that scale + fade + rotate ──────
+  // Distinct from pulseRing (stroked circle) and shockwave (post-fx filter):
+  // this draws N line segments fanning out from the origin, glow-filtered for
+  // bloom kick. Great for "beam pop" moments on prism/rainbow/catalyst clears.
+  const spawnStarBurst = useCallback((cx: number, cy: number, color = 0xffffff, points = 8) => {
+    if (isReducedMotionPreferred()) return;
+    const g = new Graphics();
+    const radius = Math.min(width, height) * 0.22;
+    for (let i = 0; i < points; i++) {
+      const angle = (i / points) * Math.PI * 2;
+      g.moveTo(0, 0).lineTo(Math.cos(angle) * radius, Math.sin(angle) * radius)
+        .stroke({ color, width: 4, alpha: 1 });
+    }
+    g.x = cx;
+    g.y = cy;
+    g.filters = [createGlowFilter(color, 3)];
+    camera.addChild(g);
+
+    const start = performance.now();
+    const duration = 420;
+    const tick = () => {
+      if (camera.destroyed || g.destroyed) {
+        starBurstsRef.current.delete(g);
+        return;
+      }
+      const t = Math.min((performance.now() - start) / duration, 1);
+      g.scale.set(0.25 + t * 1.25);
+      g.alpha = 1 - t;
+      g.rotation = t * 0.6;
+      if (t >= 1) {
+        try { camera.removeChild(g); } catch { /* */ }
+        g.destroy();
+        starBurstsRef.current.delete(g);
+        return;
+      }
+      starBurstsRef.current.set(g, requestAnimationFrame(tick));
+    };
+    starBurstsRef.current.set(g, requestAnimationFrame(tick));
+  }, [camera, width, height]);
+
+  return { fireShockwave, flashCross, spawnPulseRing, spawnStarBurst };
 }

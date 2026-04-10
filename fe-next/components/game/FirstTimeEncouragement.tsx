@@ -31,12 +31,16 @@ export default function FirstTimeEncouragement({ trigger, onDismiss }: FirstTime
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -8 }}
         transition={{ duration: 0.25 }}
-        className="flex items-center gap-2 px-3 py-1.5 bg-neo-cream border-2 border-neo-black rounded-neo shadow-hard-sm max-h-12 overflow-hidden"
+        className="flex items-center gap-2 px-3 h-10 bg-neo-cream border-2 border-neo-black rounded-neo shadow-hard-sm"
         role="status"
         aria-live="polite"
         onClick={onDismiss}
       >
-        <Mascot variant={config.mascot} size="xs" className="shrink-0" clipBorder="none" />
+        <div className="w-7 h-7 flex items-center justify-center shrink-0" aria-hidden="true">
+          <div className="scale-[0.28] origin-center">
+            <Mascot variant={config.mascot} size="xs" clipBorder="none" />
+          </div>
+        </div>
         <span className="text-neo-black text-sm font-neo-body font-medium truncate">
           {t(config.key)}
         </span>

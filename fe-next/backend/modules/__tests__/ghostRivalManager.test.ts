@@ -119,7 +119,8 @@ describe('GhostRivalManager', () => {
     });
 
     it('should call RPC to increment score', async () => {
-      mockRpc.mockResolvedValue({ data: 150, error: null });
+      // RPC returns `TABLE(new_score integer)` shape: [{ new_score: 150 }]
+      mockRpc.mockResolvedValue({ data: [{ new_score: 150 }], error: null });
 
       const result = await updateRivalScore('player-1', 50);
 

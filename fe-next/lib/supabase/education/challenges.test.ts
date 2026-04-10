@@ -11,11 +11,20 @@ import {
   getDailyChallenges,
   getWeeklyQuests,
   assignDailyChallenges,
+  assignWeeklyQuests,
   claimChallengeReward,
   claimQuestReward,
   getCurrentWeekStart,
   updateEducationChallengeProgress,
 } from './challenges';
+
+// Helper: builds a mock select chain shaped like .select().eq().eq().eq() resolving to `rows`
+function buildSelectChain(rows: unknown[]) {
+  const eq3 = vi.fn().mockResolvedValue({ data: rows, error: null });
+  const eq2 = vi.fn().mockReturnValue({ eq: eq3 });
+  const eq1 = vi.fn().mockReturnValue({ eq: eq2 });
+  return vi.fn().mockReturnValue({ eq: eq1 });
+}
 
 // Mock supabase
 vi.mock('@/lib/supabase', () => ({
@@ -354,9 +363,13 @@ describe('challenges module', () => {
       const mockUpdateEq = vi.fn().mockReturnValue({ eq: mockUpdateEqId });
       const mockUpdate = vi.fn().mockReturnValue({ eq: mockUpdateEq });
 
+      // Weekly path: empty fetch — practice_session has no matching weekly quest_type
+      const weeklyEmpty = buildSelectChain([]);
+
       (supabase.from as Mock)
         .mockReturnValueOnce({ select: mockSelectChain })
-        .mockReturnValueOnce({ update: mockUpdate });
+        .mockReturnValueOnce({ update: mockUpdate })
+        .mockReturnValueOnce({ select: weeklyEmpty });
 
       // WHEN
       const result = await updateEducationChallengeProgress(mockPlayerId, 'practice_session', 1);
@@ -389,9 +402,13 @@ describe('challenges module', () => {
       const mockUpdateEq = vi.fn().mockReturnValue({ eq: mockUpdateEqId });
       const mockUpdate = vi.fn().mockReturnValue({ eq: mockUpdateEq });
 
+      // Weekly path: empty fetch
+      const weeklySelect = buildSelectChain([]);
+
       (supabase.from as Mock)
         .mockReturnValueOnce({ select: mockSelectChain })
-        .mockReturnValueOnce({ update: mockUpdate });
+        .mockReturnValueOnce({ update: mockUpdate })
+        .mockReturnValueOnce({ select: weeklySelect });
 
       // WHEN
       const result = await updateEducationChallengeProgress(mockPlayerId, 'word_mastered', 1);
@@ -427,6 +444,8 @@ describe('challenges module', () => {
       const mockEqPlayer = vi.fn().mockReturnValue({ eq: mockEqDate });
       const mockSelectChain = vi.fn().mockReturnValue({ eq: mockEqPlayer });
 
+      // Both daily and weekly fetches return the same (non-matching) row;
+      // the function filters by challenge_type/quest_type so neither updates.
       (supabase.from as Mock).mockReturnValue({ select: mockSelectChain });
 
       // WHEN: fire duel_played event
@@ -449,6 +468,121 @@ describe('challenges module', () => {
 
       // THEN
       expect(result.updated).toBe(0);
+    });
+
+    // ----- Weekly quest progress -----
+
+    it('increments weekly quest current_progress when event matches quest_type', async () => {
+      // GIVEN: no daily challenges + one incomplete weekly quest of matching type
+      const dailySelect = buildSelectChain([]);
+
+      const weeklyQuests = [
+        {
+          id: 'wq-1',
+          player_id: mockPlayerId,
+          week_start: '2026-04-06',
+          quest_type: 'words_mastered',
+          requirements: { words_mastered: 20 },
+          current_progress: { words_mastered: 5 },
+          completed: false,
+          claimed: false,
+        },
+      ];
+      const weeklySelect = buildSelectChain(weeklyQuests);
+
+      // Update chain for weekly increment
+      const weeklyUpdateEqId = vi.fn().mockResolvedValue({ data: null, error: null });
+      const weeklyUpdate = vi.fn().mockReturnValue({ eq: weeklyUpdateEqId });
+
+      (supabase.from as Mock)
+        .mockReturnValueOnce({ select: dailySelect }) // daily fetch
+        .mockReturnValueOnce({ select: weeklySelect }) // weekly fetch
+        .mockReturnValueOnce({ update: weeklyUpdate }); // weekly update
+
+      // WHEN
+      const result = await updateEducationChallengeProgress(mockPlayerId, 'word_mastered', 1);
+
+      // THEN: counted as updated, weekly_quests was the target table for the update
+      expect(result.updated).toBe(1);
+      expect(supabase.from).toHaveBeenCalledWith('weekly_quests');
+      expect(weeklyUpdate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          current_progress: { words_mastered: 6 },
+        })
+      );
+    });
+
+    it('marks weekly quest completed when target reached', async () => {
+      const dailySelect = buildSelectChain([]);
+
+      const weeklyQuests = [
+        {
+          id: 'wq-2',
+          player_id: mockPlayerId,
+          week_start: '2026-04-06',
+          quest_type: 'words_mastered',
+          requirements: { words_mastered: 20 },
+          current_progress: { words_mastered: 19 },
+          completed: false,
+          claimed: false,
+        },
+      ];
+      const weeklySelect = buildSelectChain(weeklyQuests);
+
+      const weeklyUpdateEqId = vi.fn().mockResolvedValue({ data: null, error: null });
+      const weeklyUpdate = vi.fn().mockReturnValue({ eq: weeklyUpdateEqId });
+
+      (supabase.from as Mock)
+        .mockReturnValueOnce({ select: dailySelect })
+        .mockReturnValueOnce({ select: weeklySelect })
+        .mockReturnValueOnce({ update: weeklyUpdate });
+
+      const result = await updateEducationChallengeProgress(mockPlayerId, 'word_mastered', 1);
+
+      expect(result.updated).toBe(1);
+      expect(weeklyUpdate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          current_progress: { words_mastered: 20 },
+          completed: true,
+          completed_at: expect.any(String),
+        })
+      );
+    });
+  });
+
+  // ==========================================
+  // assignWeeklyQuests
+  // ==========================================
+  describe('assignWeeklyQuests', () => {
+    it('writes requirements + current_progress keyed by quest_type (canonical shape)', async () => {
+      // GIVEN: no existing weekly quest
+      const checkEq2 = vi.fn().mockResolvedValue({ data: [], error: null });
+      const checkEq1 = vi.fn().mockReturnValue({ eq: checkEq2 });
+      const checkSelect = vi.fn().mockReturnValue({ eq: checkEq1 });
+
+      // Insert chain captures payload
+      const insertSelect = vi.fn().mockResolvedValue({
+        data: [{ id: 'new-wq', quest_type: 'words_mastered' }],
+        error: null,
+      });
+      const insertFn = vi.fn().mockReturnValue({ select: insertSelect });
+
+      (supabase.from as Mock)
+        .mockReturnValueOnce({ select: checkSelect })
+        .mockReturnValueOnce({ insert: insertFn });
+
+      // WHEN
+      const result = await assignWeeklyQuests(mockPlayerId);
+
+      // THEN: insert payload uses canonical { [quest_type]: target } shape — NOT { target } / { count }
+      expect(result.error).toBeNull();
+      expect(insertFn).toHaveBeenCalledWith([
+        expect.objectContaining({
+          quest_type: 'words_mastered',
+          requirements: { words_mastered: 20 },
+          current_progress: { words_mastered: 0 },
+        }),
+      ]);
     });
   });
 

@@ -1,12 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { Swords, BookOpen, Map, Bomb } from 'lucide-react';
+import { Swords, BookOpen, Map, Bomb, Zap } from 'lucide-react';
 import ModeCard from './ModeCard';
 import DailyChallengeBanner from '@/components/daily/DailyChallengeBanner';
 import { shouldShowGuidance } from '@/utils/contextualGuidanceStorage';
 import { hasCompletedOnboarding } from '@/utils/onboardingStorage';
 import { isNewPlayer } from '@/utils/multiplayerProgressStorage';
+import { useIsPracticeVeteran } from '@/hooks/useIsPracticeVeteran';
 import type { LandingGameMode } from '@/lib/landing/fetchGameModeStats';
 
 interface DailyChallengePreloadedStats {
@@ -31,8 +32,15 @@ interface LandingChallengeCardsProps {
   cardOrder?: LandingGameMode[];
 }
 
+/**
+ * Landing card identifiers — `'quickPlay'` is a landing-only synthetic mode
+ * that routes into `/multiplayer?quickPlay=true` (auto-creates a bot room and
+ * starts a random game). It is not part of `LandingGameMode` (server stats).
+ */
+type LandingCardKey = LandingGameMode | 'quickPlay';
+
 /** Default card order when no server data available */
-const DEFAULT_ORDER: LandingGameMode[] = ['daily', 'arena', 'practice', 'adventure'];
+const DEFAULT_ORDER: LandingCardKey[] = ['daily', 'quickPlay', 'arena', 'practice', 'adventure'];
 
 /** CSS stagger delay for each card index */
 const cardDelay = (index: number) => `${index * 0.07}s`;
@@ -58,20 +66,59 @@ export function LandingChallengeCards({
     if (typeof window === 'undefined') return false;
     return isNewPlayer();
   });
+  // Veterans skip the practice card entirely. Newcomers keep it as their
+  // soft-onramp into the game (single-player word grids without pressure).
+  const isVeteran = useIsPracticeVeteran();
 
-  // New players (< 3 games) see practice first, daily always second.
-  // All users: daily is guaranteed top-2 so it's never buried on mobile.
-  const serverOrder = cardOrderProp ?? DEFAULT_ORDER;
-  const cardOrder = isNewbie
-    ? ['practice', 'daily', ...serverOrder.filter(m => m !== 'practice' && m !== 'daily')] as LandingGameMode[]
-    : serverOrder[0] === 'daily' ? serverOrder
-    : ['daily', ...serverOrder.filter(m => m !== 'daily')] as LandingGameMode[];
+  // Layered ordering, applied to a `LandingCardKey[]` working set:
+  //   1. Start from the server-provided order (or `DEFAULT_ORDER`).
+  //   2. Inject the synthetic `'quickPlay'` card just after `'daily'` so the
+  //      primary CTA sits in the top row on mobile.
+  //   3. Strip `'practice'` for veterans.
+  //   4. Surface `'practice'` first for brand-new players (< 3 games).
+  //   5. Guarantee `'daily'` lands in the top 2 — it must never be buried.
+  const serverOrder: LandingCardKey[] = cardOrderProp ?? DEFAULT_ORDER;
+  const withQuickPlay: LandingCardKey[] = serverOrder.includes('quickPlay')
+    ? serverOrder
+    : (() => {
+        const next = [...serverOrder];
+        const dailyIdx = next.indexOf('daily');
+        next.splice(dailyIdx >= 0 ? dailyIdx + 1 : 0, 0, 'quickPlay');
+        return next;
+      })();
+  const veteranFiltered: LandingCardKey[] = isVeteran
+    ? withQuickPlay.filter((m) => m !== 'practice')
+    : withQuickPlay;
+  const cardOrder: LandingCardKey[] = isNewbie && !isVeteran
+    ? (['practice', 'daily', ...veteranFiltered.filter((m) => m !== 'practice' && m !== 'daily')] as LandingCardKey[])
+    : veteranFiltered[0] === 'daily'
+    ? veteranFiltered
+    : (['daily', ...veteranFiltered.filter((m) => m !== 'daily')] as LandingCardKey[]);
 
   /** Renders a card by mode key with staggered CSS animation */
-  const renderCard = (mode: LandingGameMode, index: number) => {
+  const renderCard = (mode: LandingCardKey, index: number) => {
     const style = { animationDelay: cardDelay(index) } as React.CSSProperties;
 
     switch (mode) {
+      case 'quickPlay':
+        return (
+          <div key="quickPlay" className="w-full h-full animate-[fadeInUp_0.4s_ease-out_both]" style={style}>
+            <ModeCard
+              title={t('landing.quickPlay')}
+              description={t('landing.quickPlayDesc')}
+              href={`/${language}/multiplayer?quickPlay=true`}
+              icon={<Zap className="w-6 h-6" />}
+              modeImage="/modes/arena.png"
+              variant="lime"
+              highlighted={isVeteran}
+              highlightLabel={isVeteran ? t('onboarding.welcome.startHere') : undefined}
+              duration={t('landing.duration').replace('{time}', '1-3')}
+              difficulty={2}
+              difficultyLabel={t('landing.difficultyMedium')}
+            />
+          </div>
+        );
+
       case 'arena':
         return (
           <div key="arena" className="w-full h-full animate-[fadeInUp_0.4s_ease-out_both]" style={style}>

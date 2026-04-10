@@ -40,9 +40,8 @@ vi.mock('@/lib/utils', () => ({
 
 const baseMissions = [
   { type: 'wordHunt' as const, completed: false, href: '/daily' },
-  { type: 'brainDrill' as const, completed: false, href: '/drill' },
   { type: 'adventure' as const, completed: false, href: '/adventure' },
-  { type: 'community' as const, completed: false, href: '/community' },
+  { type: 'community' as const, completed: false, href: '/multiplayer' },
 ];
 
 beforeEach(() => {
@@ -89,11 +88,10 @@ describe('DailyMissionsHub', () => {
     expect(screen.getByText('dailyMissions.title')).toBeTruthy();
   });
 
-  it('renders all 4 mission rows', () => {
+  it('renders all 3 mission rows', () => {
     render(<DailyMissionsHub />);
 
     expect(screen.getByText('dailyMissions.wordHunt')).toBeTruthy();
-    expect(screen.getByText('dailyMissions.brainDrill')).toBeTruthy();
     expect(screen.getByText('dailyMissions.adventure')).toBeTruthy();
     expect(screen.getByText('dailyMissions.community')).toBeTruthy();
   });
@@ -113,7 +111,7 @@ describe('DailyMissionsHub', () => {
   it('renders grand slam badge when all missions complete', () => {
     mockUseDailyMissions.mockReturnValue({
       missions: baseMissions.map(m => ({ ...m, completed: true })),
-      completedCount: 4,
+      completedCount: 3,
       isGrandSlam: true,
       grandSlamClaimed: false,
       loading: false,
@@ -129,7 +127,7 @@ describe('DailyMissionsHub', () => {
   it('shows claimed state when grand slam already claimed', () => {
     mockUseDailyMissions.mockReturnValue({
       missions: baseMissions.map(m => ({ ...m, completed: true })),
-      completedCount: 4,
+      completedCount: 3,
       isGrandSlam: true,
       grandSlamClaimed: true,
       loading: false,
@@ -149,8 +147,7 @@ describe('DailyMissionsHub', () => {
     const links = screen.getAllByRole('link');
     const hrefs = links.map(l => l.getAttribute('href'));
     expect(hrefs).toContain('/en/daily');
-    expect(hrefs).toContain('/en/drill');
     expect(hrefs).toContain('/en/adventure');
-    expect(hrefs).toContain('/en/community');
+    expect(hrefs).toContain('/en/multiplayer');
   });
 });

@@ -402,7 +402,9 @@ function HostPreGameView({
             )}
           </div>
           <div className="flex items-center gap-2 shrink-0">
-            <MobileShareSection gameCode={gameCode} t={t} showHint={actualPlayerCount === 0} compact />
+            <div className="lg:hidden">
+              <MobileShareSection gameCode={gameCode} t={t} showHint={actualPlayerCount === 0} compact />
+            </div>
             <button
               onClick={onExitRoom}
               className="w-8 h-8 flex items-center justify-center bg-neo-red border-2 border-neo-black shadow-hard-sm active:translate-y-0.5 active:shadow-none transition-all rounded"
@@ -426,10 +428,7 @@ function HostPreGameView({
                 <StartButton onStartGame={onStartGame} disabled={isStartDisabled} tournamentCreating={tournamentCreating} playerCount={filteredPlayersForDisplay.length} t={t} />
                 <PlayerRoster players={filteredPlayersForDisplay} username={username} gameCode={gameCode} maxPlayers={maxPlayers} hostLabel={hostLabel} t={t} />
                 <BattleModeCard hostPlaying={hostPlaying} setHostPlaying={setHostPlaying} selectedGameMode={selectedGameMode} setSelectedGameMode={setSelectedGameMode} gameCode={gameCode} playersReady={playersReady} t={t} isAdmin={isAdmin} hasBlastAccess={hasBlastAccess}>
-                  <div>
-                    <label className="text-xs font-black uppercase text-neo-cream/70 mb-1.5 block">{t('hostView.gameLanguage')}</label>
-                    <LanguageSelector selectedLanguage={roomLanguage} onLanguageChange={handleRoomLanguageChange} hideLabel />
-                  </div>
+                  <LanguageSelector selectedLanguage={roomLanguage} onLanguageChange={handleRoomLanguageChange} hideLabel />
                 </BattleModeCard>
               </>
             }
@@ -455,10 +454,7 @@ function HostPreGameView({
             <AnimatePresence>{renderBotCountdown()}</AnimatePresence>
             <PlayerRoster players={filteredPlayersForDisplay} username={username} gameCode={gameCode} maxPlayers={maxPlayers} hostLabel={hostLabel} t={t} />
             <BattleModeCard hostPlaying={hostPlaying} setHostPlaying={setHostPlaying} selectedGameMode={selectedGameMode} setSelectedGameMode={setSelectedGameMode} gameCode={gameCode} playersReady={playersReady} t={t} isAdmin={isAdmin} hasBlastAccess={hasBlastAccess}>
-              <div>
-                <label className="text-xs font-black uppercase text-neo-cream/70 mb-1.5 block">{t('hostView.gameLanguage')}</label>
-                <LanguageSelector selectedLanguage={roomLanguage} onLanguageChange={handleRoomLanguageChange} hideLabel />
-              </div>
+              <LanguageSelector selectedLanguage={roomLanguage} onLanguageChange={handleRoomLanguageChange} hideLabel />
             </BattleModeCard>
 
             {/* Chat or Tutorial (CrazyGames) */}

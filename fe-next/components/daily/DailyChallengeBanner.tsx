@@ -223,6 +223,9 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
         className={cn(
           // Base card styles matching ModeCard
           "relative w-full h-full rounded-neo border-3 border-neo-black shadow-hard-lg transition-shadow cursor-pointer overflow-hidden [container-type:inline-size]",
+          // Ensure the row is tall enough for the absolutely-positioned mascot,
+          // otherwise it clips on narrow phones where the text content alone is shorter than the mascot.
+          compact ? "min-h-[80px] sm:min-h-[92px]" : "min-h-[96px] sm:min-h-[112px]",
           // Active effects matching ModeCard
           isRTL
             ? 'active:-translate-x-px active:translate-y-px'
@@ -303,8 +306,11 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
               isRTL ? 'bottom-0 left-0' : 'bottom-0 right-0'
             )}
             style={{
-              width: 'clamp(3.75rem, 26cqw, 6rem)',
-              height: 'clamp(3.75rem, 26cqw, 6rem)',
+              // Floor reduced from 3.75rem → 3.25rem so the mascot fits inside
+              // the card's min-height (80px / 5rem) on the narrowest phones,
+              // leaving a small gutter and preventing the bottom-edge clipping.
+              width: 'clamp(3.25rem, 24cqw, 5.5rem)',
+              height: 'clamp(3.25rem, 24cqw, 5.5rem)',
             }}
             initial={{ scale: 0.6, opacity: 0, y: 20 }}
             whileInView={{ scale: 1, opacity: 1, y: 0 }}

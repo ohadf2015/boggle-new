@@ -5,7 +5,6 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { Crown, User, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -16,11 +15,9 @@ import type { Language, ActiveRoom } from '@/shared/types/game';
 import {
   RoomList,
   LanguageSelector,
-  ModeSelector,
   HostModeFields,
   JoinModeFields,
 } from '@/components/join';
-import { DJMascotWithEntrance } from '@/components/ui/DJMascot';
 
 export type JoinMode = 'join' | 'host';
 
@@ -214,12 +211,12 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
   return (
     <>
       <div dir={dir} className="min-h-dvh bg-neo-navy flex flex-col overflow-y-auto scrollable-area">
-      <div className="w-[94%] max-w-7xl mx-auto py-3 sm:py-4 flex-1 flex flex-col min-h-0 pb-(--mobile-bottom-safe)">
-        {/* Compact Header: back button + title inline with premium gradient accent */}
+      <div className="w-[94%] max-w-7xl mx-auto py-2 flex-1 flex flex-col min-h-0 pb-(--mobile-bottom-safe)">
+        {/* Compact Header: back button + title inline */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex items-center gap-3 mb-4 shrink-0"
+          className="flex items-center gap-3 mb-3 shrink-0"
         >
           <Link
             href="/"
@@ -228,16 +225,10 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
           >
             <ArrowLeft className="w-5 h-5 rtl:rotate-180" />
           </Link>
-          <div className="flex-1">
-            <h1 className="text-xl sm:text-2xl font-black uppercase text-neo-white flex items-center gap-2">
-              <span className="inline-block w-3 h-6 bg-neo-pink rounded-sm" />
-              {t('landing.multiplayer')}
-            </h1>
-            <p className="text-neo-white/60 text-xs sm:text-sm font-medium mt-0.5">
-              {t('multiplayer.subtitle')}
-            </p>
-          </div>
-          <DJMascotWithEntrance size="md" className="hidden sm:block" delay={0.3} />
+          <h1 className="text-xl sm:text-2xl font-black uppercase text-neo-white flex items-center gap-2 flex-1">
+            <span className="inline-block w-3 h-6 bg-neo-pink rounded-sm" />
+            {t('landing.multiplayer')}
+          </h1>
         </motion.div>
 
         {/* Desktop: Single row layout - Form | Rooms side by side without scroll */}
@@ -252,21 +243,16 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
             animate={{ x: 0, opacity: 1 }}
             className="w-full flex flex-col"
           >
-            <div className="rounded-neo-lg border-4 border-neo-black bg-slate-800 shadow-hard-lg p-4 flex flex-col h-full relative overflow-hidden">
-              {/* Decorative top accent bar */}
-              <div className="absolute top-0 left-0 right-0 h-1 bg-neo-pink" />
-              {/* Mode Selector - direct, no header wrapper */}
-              <ModeSelector mode={mode} onModeChange={handleModeChange} />
-
+            <div className="rounded-neo-lg border-4 border-neo-black bg-slate-800 shadow-hard-lg p-3 flex flex-col h-full relative overflow-hidden">
               {/* Error Alert */}
               {error && (
-                <Alert variant="destructive" className="mt-3">
+                <Alert variant="destructive" className="mb-2">
                   <AlertDescription>{error}</AlertDescription>
                 </Alert>
               )}
 
-              <form onSubmit={handleSubmit} className="flex-1 flex flex-col mt-3 space-y-3">
-                <div className="flex-1 space-y-3">
+              <form onSubmit={handleSubmit} className="flex-1 flex flex-col space-y-2">
+                <div className="flex-1 space-y-2">
                   {mode === 'host' ? (
                     <>
                       <HostModeFields
@@ -291,8 +277,6 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
                         isProfileLoading={isProfileLoading}
                         t={t}
                       />
-
-                      {/* Language Selector - no label, inline */}
                       <LanguageSelector
                         selectedLanguage={roomLanguage}
                         onLanguageChange={setRoomLanguage}
@@ -318,11 +302,11 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
                   )}
                 </div>
 
-                {/* Submit Button - fixed at bottom */}
+                {/* Primary submit — single focused action */}
                 <Button
                   type="submit"
                   variant={mode === 'host' ? 'success' : 'default'}
-                  className="w-full mt-auto"
+                  className="w-full"
                   size="lg"
                   disabled={isJoining || (mode === 'join' && (isAutoJoining || !gameCode))}
                 >
@@ -331,6 +315,17 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
                     ? (isJoining ? t('joinView.creating') : t('joinView.createRoom'))
                     : (isJoining || isAutoJoining ? t('joinView.joining') : t('joinView.joinGame'))}
                 </Button>
+
+                {/* Discreet mode toggle — replaces the tab bar */}
+                <button
+                  type="button"
+                  onClick={() => handleModeChange(mode === 'host' ? 'join' : 'host')}
+                  className="text-xs font-bold uppercase text-neo-white/60 hover:text-neo-pink transition-colors underline-offset-4 hover:underline self-center"
+                >
+                  {mode === 'host'
+                    ? t('joinView.joinGame')
+                    : t('joinView.createRoom')}
+                </button>
               </form>
             </div>
           </motion.div>

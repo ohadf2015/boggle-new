@@ -101,8 +101,7 @@ export const WordHuntMPLeaderboard = memo<WordHuntMPLeaderboardProps>(({
                 "flex-1 min-w-0 flex items-center gap-1.5 px-1.5 py-1 rounded-neo border-2 transition-all",
                 isEliminated
                   ? 'border-neo-white/10 bg-neo-white/5 opacity-40'
-                  : 'border-neo-white/15 bg-neo-white/5',
-                isDamaged && !isEliminated && 'animate-neo-damage-drip'
+                  : 'border-neo-white/15 bg-neo-white/5'
               )}
             >
               {/* Wrong-guess indicator (for tests and screen readers) */}
@@ -184,8 +183,7 @@ export const WordHuntMPLeaderboard = memo<WordHuntMPLeaderboardProps>(({
                     ? 'border-neo-yellow bg-neo-yellow/10'
                     : isEliminated
                       ? 'border-neo-red/30 bg-neo-red/5 opacity-50'
-                      : 'border-neo-white/10 bg-neo-white/5',
-                  isDamaged && !isEliminated && 'animate-neo-damage-drip'
+                      : 'border-neo-white/10 bg-neo-white/5'
                 )}
               >
                 {/* Wrong-guess indicator (for tests and screen readers) */}

@@ -39,7 +39,12 @@ const HeaderMenuDropdown = memo<HeaderMenuDropdownProps>(({
     const { notifications, unreadCount: notificationCount, markAsRead, markAllAsRead, dismissNotification, clearAllNotifications } = useRealtimeNotifications();
     const [showAllNotifications, setShowAllNotifications] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
-    const [badgeSeen, setBadgeSeen] = useState(false);
+    const [lastSeenBadgeCount, setLastSeenBadgeCount] = useState<number>(() => {
+        if (typeof window === 'undefined') return 0;
+        const raw = window.localStorage.getItem('headerMenu.lastSeenBadgeCount');
+        const parsed = raw ? Number.parseInt(raw, 10) : 0;
+        return Number.isFinite(parsed) ? parsed : 0;
+    });
     const dropdownRef = useRef<HTMLDivElement>(null);
 
     // Guest name editing
@@ -78,15 +83,24 @@ const HeaderMenuDropdown = memo<HeaderMenuDropdownProps>(({
     // Aggregate badge: gifts + notifications + completed quests
     const badgeCount = unclaimedCount + (isAuthenticated ? notificationCount : 0) + completedCount;
 
-    // Reset "seen" when badge count increases (new notifications arrived),
-    // but only if the menu isn't currently open (avoid fighting with the user's click)
-    const prevBadgeCount = useRef(badgeCount);
-    useEffect(() => {
-        if (badgeCount > prevBadgeCount.current && !isOpen) {
-            setBadgeSeen(false);
+    // Badge is hidden when the user has already seen at least this many items.
+    // New items pushing the count above the persisted high-water mark resurface it.
+    const badgeSeen = badgeCount <= lastSeenBadgeCount;
+
+    const markBadgeSeen = useCallback((count: number) => {
+        setLastSeenBadgeCount(count);
+        if (typeof window !== 'undefined') {
+            window.localStorage.setItem('headerMenu.lastSeenBadgeCount', String(count));
         }
-        prevBadgeCount.current = badgeCount;
-    }, [badgeCount, isOpen]);
+    }, []);
+
+    // If the count drops (e.g. user dismissed notifications elsewhere), clamp the
+    // stored marker so a future increase still triggers the badge correctly.
+    useEffect(() => {
+        if (badgeCount < lastSeenBadgeCount) {
+            markBadgeSeen(badgeCount);
+        }
+    }, [badgeCount, lastSeenBadgeCount, markBadgeSeen]);
 
     const closeMenu = useCallback(() => setIsOpen(false), []);
 
@@ -118,7 +132,7 @@ const HeaderMenuDropdown = memo<HeaderMenuDropdownProps>(({
             {/* Hamburger Trigger */}
             <button
                 onClick={() => {
-                    if (!isOpen) setBadgeSeen(true);
+                    if (!isOpen) markBadgeSeen(badgeCount);
                     setIsOpen(!isOpen);
                 }}
                 className={cn(

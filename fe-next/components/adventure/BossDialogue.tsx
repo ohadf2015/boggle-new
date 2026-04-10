@@ -73,8 +73,8 @@ const LegacyBossDialogue = memo<BossDialogueProps>(
               'fixed left-1/2 -translate-x-1/2 z-40',
               'pointer-events-none',
               'max-w-xs w-full px-2',
-              // Position below header and HP bar for better visibility
-              position === 'top' ? 'top-28 sm:top-32' : 'bottom-4'
+              // Position below header AND boss HUD strip (header 0-12, HUD 12-28)
+              position === 'top' ? 'top-32 sm:top-36' : 'bottom-4'
             )}
             initial={variants.initial}
             animate={variants.animate}

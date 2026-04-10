@@ -124,7 +124,7 @@ export function useMultiplayerJoin({
       overrideGameCode?: string,
       overrideRoomName?: string,
       overrideUsername?: string,
-      options?: { isPrivate?: boolean },
+      options?: { isPrivate?: boolean; quickPlay?: boolean },
     ) => {
       if (process.env.NODE_ENV === 'development') {
         console.log(`[JOIN] handleJoin called - mode: ${isHostMode ? 'HOST' : 'PLAYER'}, socket connected: ${socket?.connected}`);
@@ -239,6 +239,20 @@ export function useMultiplayerJoin({
           avatar: hostAvatar,
           ...(options?.isPrivate && { isPrivate: true }),
         });
+
+        // Quick Play: skip the lobby and auto-start the game in a random mode
+        // as soon as the host has joined. The backend's `autoAddBotsForSoloPlayer`
+        // will fill the room with bots, and `selectNextGameMode` resolves 'random'.
+        if (options?.quickPlay) {
+          socket.once('joined', (joinedData: { isHost?: boolean }) => {
+            if (!joinedData?.isHost) return;
+            logger.log('[QUICK_PLAY] Auto-starting game with random mode');
+            socket.emit('startGame', {
+              gameMode: 'random',
+              language: roomLang || language,
+            });
+          });
+        }
       } else {
         logger.log('[JOIN] Emitting join event:', {
           gameCode: codeToUse,

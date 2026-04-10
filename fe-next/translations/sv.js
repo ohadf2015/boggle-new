@@ -2488,21 +2488,6 @@ const sv = {
     }
   },
   "training": {
-    "gateway": {
-      "title": "Ny på LexiClash?",
-      "subtitle": "En snabb träning hjälper dig bemästra kontrollerna!",
-      "demoHint": "Svep i valfri riktning - även diagonalt!",
-      "benefitsTitle": "Träningen lär dig:",
-      "benefits": {
-        "learnControls": "Lära dig svepkontrollerna",
-        "masterDirections": "Bemästra alla 8 riktningar",
-        "noPressure": "Öva utan tidspress"
-      },
-      "returnNote": "Efter träningen är du redo för riktiga utmaningen!",
-      "startTraining": "Börja Träna",
-      "skipAnyway": "Hoppa över, jag kan spela",
-      "dontShowAgain": "Visa inte detta igen"
-    },
     "hints": {
       "tryDiagonal": "Prova att dra diagonalt!",
       "changeDirection": "Protips: Byt riktning mitt i ordet!",
@@ -4286,6 +4271,8 @@ const sv = {
     "multiplayerDesc": "Tävla med vänner i realtid!",
     "arena": "Multiplayer",
     "arenaDesc": "Spela ensam eller utmana vänner!",
+    "quickPlay": "Snabbspel",
+    "quickPlayDesc": "Hoppa in — slumpläge mot bottar",
     "practice": "Träning",
     "practiceDesc": "Ingen press, bara ord",
     "brainTraining": "Hjärnträning",
@@ -7844,7 +7831,7 @@ const sv = {
     "ready": {
       "title": "Blast-läge",
       "subtitle": "Rensa brickor genom att bilda ord. Kedjekombos ger stora poäng!",
-      "play": "Sätt igång!",
+      "play": "Börja från början",
       "resume": "Fortsätt våg {wave}",
       "step1Title": "Svep ord",
       "step1Desc": "Dra över intilliggande bokstäver för att bilda ord",

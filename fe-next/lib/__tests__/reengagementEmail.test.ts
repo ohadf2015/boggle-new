@@ -261,7 +261,7 @@ describe('generateReengagementEmailHtml', () => {
       baseUrl: 'https://example.com',
     });
 
-    expect(html).toContain('/static/mascot-waving.gif');
+    expect(html).toContain('waving-nobg.gif');
     expect(html).toContain('alt="Lexi waving hello"');
   });
 
@@ -289,15 +289,14 @@ describe('generateReengagementEmailHtml', () => {
       baseUrl: 'https://example.com',
     });
 
-    // Greeting text (witty version)
-    expect(html).toContain('where');
-    expect(html).toContain('you go');
+    // Greeting text (v2 humanized version)
+    expect(html).toContain('you good');
     // Mascot image (waving gif)
-    expect(html).toContain('mascot-waving.gif');
+    expect(html).toContain('waving-nobg.gif');
     // Accessible mascot alt text
     expect(html).toContain('alt="Lexi waving hello"');
     // CTA button
-    expect(html).toContain('cta-btn');
+    expect(html).toContain('cta-btn-v2');
   });
 
   test('should use Hebrew logo for Hebrew language', async () => {
@@ -327,11 +326,10 @@ describe('generateReengagementEmailHtml', () => {
     expect(html).toContain('dir="rtl"');
     expect(html).toContain('יוסי');
     expect(html).toContain('ש');
-    expect(html).toContain('לאן נעלמת');
+    // v2 Hebrew hint label
+    expect(html).toContain('הרמז שלך להיום');
     // RTL shadow direction (negative x offset)
     expect(html).toContain('-6px 6px 0px');
-    // RTL play arrow (left-pointing ◀)
-    expect(html).toContain('\u25C0');
     // Localized footer links
     expect(html).toContain('ביטול הרשמה');
     expect(html).toContain('פרטיות');
@@ -349,7 +347,7 @@ describe('generateReengagementEmailHtml', () => {
     });
 
     expect(html).toContain('Erik');
-    expect(html).toContain('vart tog du');
+    expect(html).toContain('Din ledtråd för idag');
   });
 
   test('should generate Japanese template', async () => {
@@ -363,7 +361,7 @@ describe('generateReengagementEmailHtml', () => {
     });
 
     expect(html).toContain('Taro');
-    expect(html).toContain('どこ行っちゃったの');
+    expect(html).toContain('今日のヒント');
   });
 
   test('should generate Spanish template', async () => {
@@ -377,7 +375,7 @@ describe('generateReengagementEmailHtml', () => {
     });
 
     expect(html).toContain('Maria');
-    expect(html).toContain('a dónde te fuiste');
+    expect(html).toContain('Tu pista de hoy');
   });
 
   test('should have localized footer links for all languages', async () => {
@@ -407,7 +405,7 @@ describe('generateReengagementEmailHtml', () => {
     expect(jaHtml).toContain('プライバシー');
   });
 
-  test('should use LTR play arrow for non-RTL and RTL arrow for Hebrew', async () => {
+  test('should flip hard shadow direction for RTL Hebrew', async () => {
     const { html: enHtml } = await generateReengagementEmailHtml({
       recipientName: 'Test',
       firstLetter: 'A',
@@ -416,8 +414,8 @@ describe('generateReengagementEmailHtml', () => {
       playUrl: '#',
       baseUrl: 'https://example.com',
     });
-    // LTR play arrow (right-pointing ▶)
-    expect(enHtml).toContain('\u25B6');
+    // LTR shadow — positive x offset
+    expect(enHtml).toContain('6px 6px 0px');
 
     const { html: heHtml } = await generateReengagementEmailHtml({
       recipientName: 'Test',
@@ -427,8 +425,8 @@ describe('generateReengagementEmailHtml', () => {
       playUrl: '#',
       baseUrl: 'https://example.com',
     });
-    // RTL play arrow (left-pointing ◀)
-    expect(heHtml).toContain('\u25C0');
+    // RTL shadow — negative x offset
+    expect(heHtml).toContain('-6px 6px 0px');
   });
 
   test('should default to English for unknown language', async () => {
@@ -441,8 +439,9 @@ describe('generateReengagementEmailHtml', () => {
       baseUrl: 'https://example.com',
     });
 
-    expect(html).toContain('where');
-    expect(html).toContain('you go');
+    // v2 defaults to English copy for unknown language
+    expect(html).toContain('you good');
+    expect(html).toContain('Your hint for today');
   });
 
   test('should display first letter as large tile in all languages', async () => {

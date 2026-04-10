@@ -30,7 +30,10 @@ export default function AdventureError({
   };
 
   useEffect(() => {
-    console.error('Adventure error:', error);
+    // Use error.message (string) not the Error object — Sentry's console
+    // integration serializes Error objects to `{}`, producing "Adventure error: {}"
+    // in the issue title. captureError below carries the full stack.
+    console.error('Adventure error:', error.message);
     captureError(error, {
       errorBoundary: { type: 'adventure-error', digest: error.digest },
     });

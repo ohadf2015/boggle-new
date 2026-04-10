@@ -2507,21 +2507,6 @@ const he = {
     }
   },
   "training": {
-    "gateway": {
-      "title": "פעם ראשונה?",
-      "subtitle": "אימון קצר ותהיו מוכנים!",
-      "demoHint": "החלק לכל כיוון - גם באלכסון!",
-      "benefitsTitle": "האימון יעזור לך:",
-      "benefits": {
-        "learnControls": "ללמוד את השליטה בהחלקה",
-        "masterDirections": "לשלוט בכל 8 הכיוונים",
-        "noPressure": "לתרגל בלי לחץ זמן"
-      },
-      "returnNote": "אחרי האימון, תהיה מוכן לאתגר האמיתי!",
-      "startTraining": "יאללה לאימון",
-      "skipAnyway": "דלג, אני יודע לשחק",
-      "dontShowAgain": "אל תציג שוב"
-    },
     "hints": {
       "tryDiagonal": "נסה להחליק באלכסון!",
       "changeDirection": "טיפ: אפשר לשנות כיוון באמצע מילה!",
@@ -4305,6 +4290,8 @@ const he = {
     "multiplayerDesc": "התחרה עם חברים בזמן אמת!",
     "arena": "מולטיפלייר",
     "arenaDesc": "שחקו לבד או אתגרו חברים!",
+    "quickPlay": "משחק מהיר",
+    "quickPlayDesc": "קפצו פנימה — מצב אקראי נגד בוטים",
     "practice": "תרגול",
     "practiceDesc": "בלי לחץ, רק מילים",
     "brainTraining": "אימון קוגניטיבי",
@@ -7879,7 +7866,7 @@ const he = {
     "ready": {
       "title": "מצב פיצוץ",
       "subtitle": "נקה אריחים ביצירת מילים. שרשר קומבו לניקוד גדול!",
-      "play": "יאללה!",
+      "play": "התחל מההתחלה",
       "resume": "המשך מגל {wave}",
       "step1Title": "החליקו מילים",
       "step1Desc": "גררו על אותיות סמוכות ליצירת מילים",

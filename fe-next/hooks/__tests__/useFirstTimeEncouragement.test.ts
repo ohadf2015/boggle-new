@@ -52,14 +52,14 @@ describe('useFirstTimeEncouragement', () => {
     expect(result.current.currentTrigger).toBeNull();
   });
 
-  it('auto-dismisses after 4 seconds', () => {
+  it('auto-dismisses after 2.5 seconds', () => {
     localStorageMock.getItem.mockReturnValue('0');
     const { result } = renderHook(() => useFirstTimeEncouragement());
 
     act(() => { result.current.triggerEncouragement('game-start'); });
     expect(result.current.currentTrigger).toBe('game-start');
 
-    act(() => { vi.advanceTimersByTime(4000); });
+    act(() => { vi.advanceTimersByTime(2500); });
     expect(result.current.currentTrigger).toBeNull();
   });
 

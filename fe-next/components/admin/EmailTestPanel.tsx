@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Mail, Send, CheckCircle, XCircle, Loader2, Eye, Calendar, UserX, UserPlus } from 'lucide-react';
+import { Mail, Send, CheckCircle, XCircle, Loader2, Eye, Calendar, UserX, UserPlus, Rocket } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -16,7 +16,8 @@ interface EmailTestPanelProps {
 }
 
 type SendStatus = 'idle' | 'sending' | 'success' | 'error';
-type EmailType = 'reengagement' | 'daily-challenge';
+type EmailType = 'reengagement' | 'daily-challenge' | 'game-mode-announcement';
+type GameMode = 'blast' | 'wordhunt' | 'adventure';
 
 const EMAIL_TYPE_CONFIG = {
   'reengagement': {
@@ -43,7 +44,25 @@ const EMAIL_TYPE_CONFIG = {
     borderClass: 'border-neo-cyan',
     textClass: 'text-neo-cyan',
   },
+  'game-mode-announcement': {
+    label: 'Game Mode',
+    icon: Rocket,
+    endpoint: '/api/admin/send-test-game-mode-announcement',
+    previewEndpoint: '/api/admin/game-mode-announcement-preview',
+    previewTitle: 'Game Mode Announcement Preview',
+    infoText: 'Sends a test game mode announcement with [TEST] prefix. Features the marshmallow mascot, hero image, and a single CTA.',
+    color: 'neo-pink',
+    bgClass: 'bg-neo-pink',
+    borderClass: 'border-neo-pink',
+    textClass: 'text-neo-pink',
+  },
 } as const;
+
+const GAME_MODE_OPTIONS: { value: GameMode; label: string }[] = [
+  { value: 'blast', label: 'Blast' },
+  { value: 'wordhunt', label: 'Word Hunt' },
+  { value: 'adventure', label: 'Adventure' },
+];
 
 export function EmailTestPanel({ authToken, userEmail, userName }: EmailTestPanelProps) {
   const { t, language } = useLanguage();
@@ -52,6 +71,7 @@ export function EmailTestPanel({ authToken, userEmail, userName }: EmailTestPane
   const [email, setEmail] = useState(userEmail || '');
   const [recipientName, setRecipientName] = useState(userName || '');
   const [emailType, setEmailType] = useState<EmailType>('reengagement');
+  const [gameMode, setGameMode] = useState<GameMode>('blast');
   const [status, setStatus] = useState<SendStatus>('idle');
   const [message, setMessage] = useState('');
   const [showPreview, setShowPreview] = useState(false);
@@ -84,6 +104,7 @@ export function EmailTestPanel({ authToken, userEmail, userName }: EmailTestPane
           email,
           recipientName: recipientName || 'Test User',
           language,
+          ...(emailType === 'game-mode-announcement' && { mode: gameMode }),
         }),
       });
 
@@ -148,7 +169,9 @@ export function EmailTestPanel({ authToken, userEmail, userName }: EmailTestPane
 
   const previewUrl = emailType === 'reengagement'
     ? `${baseUrl}${config.previewEndpoint}?language=${language}`
-    : `${baseUrl}${config.previewEndpoint}`;
+    : emailType === 'game-mode-announcement'
+      ? `${baseUrl}${config.previewEndpoint}?language=${language}&mode=${gameMode}`
+      : `${baseUrl}${config.previewEndpoint}`;
 
   return (
     <Card className={cn(
@@ -189,6 +212,32 @@ export function EmailTestPanel({ authToken, userEmail, userName }: EmailTestPane
             );
           })}
         </div>
+
+        {/* Game Mode Selector (only for game-mode-announcement) */}
+        {emailType === 'game-mode-announcement' && (
+          <div className="space-y-2">
+            <Label className="text-neo-white font-medium">Game Mode</Label>
+            <div className="flex gap-2">
+              {GAME_MODE_OPTIONS.map((opt) => {
+                const isActive = gameMode === opt.value;
+                return (
+                  <button
+                    key={opt.value}
+                    onClick={() => setGameMode(opt.value)}
+                    className={cn(
+                      'flex-1 px-3 py-2 rounded-neo border-2 font-bold text-sm transition-all',
+                      isActive
+                        ? 'bg-neo-pink text-neo-black border-neo-black shadow-hard-sm'
+                        : 'bg-neo-navy border-neo-pink text-neo-pink hover:opacity-80'
+                    )}
+                  >
+                    {opt.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* Email Input */}
         <div className="space-y-2">

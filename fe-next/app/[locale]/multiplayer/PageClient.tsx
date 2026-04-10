@@ -75,6 +75,7 @@ export default function MultiplayerPageClient(): React.JSX.Element {
   const isClassroomMode = searchParams?.get('classroom') === 'true';
   const preselectedMode = searchParams?.get('mode') as GameMode | null;
   const autoCreate = searchParams?.get('autoCreate') === 'true';
+  const quickPlay = searchParams?.get('quickPlay') === 'true';
   const { setGameMode: setStoreGameMode } = useGameActions();
 
   const [gameCode, setGameCode] = useState<string>('');
@@ -362,7 +363,7 @@ export default function MultiplayerPageClient(): React.JSX.Element {
           <MultiplayerFlow
             handleJoin={handleJoin} refreshRooms={refreshRooms}
             activeRooms={activeRooms} roomsLoading={roomsLoading}
-            isJoining={isJoining} isAuthenticated={isAuthenticated} autoCreate={autoCreate}
+            isJoining={isJoining} isAuthenticated={isAuthenticated} autoCreate={autoCreate} quickPlay={quickPlay}
             displayName={(isCrazyGames && cgUser?.username) || profile?.display_name || ''} profileAvatar={profile?.avatar_config}
             onCrazyGamesLogin={isCrazyGames && !cgUser ? loginCrazyGames : undefined}
             prefilledRoom={prefilledRoomCode} defaultLanguage={language as Language}

@@ -5,6 +5,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Keyboard, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
+/** Auto-close the tooltip this many ms after it appears */
+const AUTO_CLOSE_MS = 5000;
+
 interface KeyboardHintTooltipProps {
   /** Show the hint after this many seconds of gameplay */
   delaySeconds?: number;
@@ -49,12 +52,23 @@ export function KeyboardHintTooltip({
       }
     }
 
-    // Show hint after delay
-    const timer = setTimeout(() => {
+    // Show hint after delay, then auto-close after AUTO_CLOSE_MS
+    let closeTimer: ReturnType<typeof setTimeout> | undefined;
+    const showTimer = setTimeout(() => {
       setIsVisible(true);
+      closeTimer = setTimeout(() => {
+        setIsVisible(false);
+        setIsDismissed(true);
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('keyboardHintDismissed', 'true');
+        }
+      }, AUTO_CLOSE_MS);
     }, delaySeconds * 1000);
 
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(showTimer);
+      if (closeTimer) clearTimeout(closeTimer);
+    };
   }, [delaySeconds, desktopOnly]);
 
   const handleDismiss = () => {

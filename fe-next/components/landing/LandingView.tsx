@@ -25,7 +25,6 @@ const LandingSocialProofBar = dynamic(() => import('./LandingSocialProofBar').th
 const LandingAvatarTeaser = dynamic(() => import('./LandingAvatarTeaser').then(m => m.LandingAvatarTeaser), { ssr: false });
 import { LandingChallengeCards } from './LandingChallengeCards';
 import { LandingLeaderboardPreview } from './LandingLeaderboardPreview';
-import { LandingMobileCards } from './LandingMobileCards';
 
 // Below-the-fold sections — lazy load to speed up initial render
 // LiveActivityTicker moved out to reduce landing clutter

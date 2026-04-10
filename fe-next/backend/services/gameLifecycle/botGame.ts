@@ -36,12 +36,33 @@ const BOT_SCORE_TARGET: Record<string, number> = {
   hard: 0.95,    // Hard bots aim for ~95% — close but usually beatable
 };
 
-/** Minimum score bots can reach before any human scores (creates early pressure) */
-const BOT_INITIAL_CEILING: Record<string, number> = {
-  easy: 40,
-  medium: 80,
-  hard: 150,
+/**
+ * Grace period (ms) during which bots score freely at the start of a round.
+ * Before any human has scored, we want bots to appear active immediately —
+ * an absolute point-ceiling was too easy to hit on a single Blast word with
+ * tile bonuses, which silently froze bots for the whole round. Instead we
+ * gate only on time: bots play without restriction until either a human
+ * scores (switching to the relative target below) or the grace window ends.
+ */
+const BOT_FREE_SCORING_GRACE_MS = 15_000;
+
+/** Fallback ceiling applied only AFTER the grace window if no human has scored. */
+const BOT_POST_GRACE_CEILING: Record<string, number> = {
+  easy: 250,
+  medium: 400,
+  hard: 600,
 };
+
+/** Per-game timestamps for when scoring started (used for grace-window logic). */
+const gameScoringStart = new Map<string, number>();
+
+export function markBotScoringStart(gameCode: string): void {
+  gameScoringStart.set(gameCode, Date.now());
+}
+
+export function clearBotScoringStart(gameCode: string): void {
+  gameScoringStart.delete(gameCode);
+}
 
 /**
  * Get the best human (non-bot) player's score in a game.
@@ -74,8 +95,16 @@ export function shouldBotScore(
   const projectedScore = currentBotScore + pendingScore;
 
   if (bestHuman === 0) {
-    // No human scored yet — allow up to difficulty-based ceiling
-    const ceiling = BOT_INITIAL_CEILING[botDifficulty] ?? BOT_INITIAL_CEILING.medium;
+    // No human scored yet. Use a time-based grace window instead of a hard
+    // point ceiling, because Blast tile bonuses routinely exceed small ceilings
+    // on the first word and would otherwise freeze the bot permanently.
+    const startedAt = gameScoringStart.get(gameCode);
+    if (!startedAt || Date.now() - startedAt <= BOT_FREE_SCORING_GRACE_MS) {
+      return true;
+    }
+    // Grace window elapsed with no human activity — fall back to a much
+    // looser ceiling so bots still contribute rather than going silent.
+    const ceiling = BOT_POST_GRACE_CEILING[botDifficulty] ?? BOT_POST_GRACE_CEILING.medium;
     return projectedScore <= ceiling;
   }
 
@@ -114,8 +143,10 @@ export function startBotsForGame(
 
   logger.info('BOT', `Starting ${bots.length} bots for game ${gameCode}`);
 
-  // Store game start time so bots can calculate actual remaining time
+  // Store game start time so bots can calculate actual remaining time.
+  // Also mark scoring start for the bot grace-window in shouldBotScore.
   const gameStartTime = Date.now();
+  markBotScoringStart(gameCode);
 
   for (const bot of bots) {
     botManager.startBot(

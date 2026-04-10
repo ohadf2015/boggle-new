@@ -96,37 +96,41 @@ export const DesktopStatsPanel: React.FC<DesktopStatsPanelProps> = ({
         </motion.div>
       </div>
 
-      {/* Combo Section */}
-      <div className="flex flex-col items-center">
-        <ComboDisplay
-          comboLevel={comboLevel}
-          compact={false}
-          timeRemaining={comboTimeRemaining}
-          isDanger={comboDanger}
-          coinReward={comboCoinReward}
-          onCoinAnimationComplete={onCoinAnimationComplete}
-        />
-      </div>
-
-      {/* Divider */}
-      <div className="border-t border-neo-cream/15" />
-
-      {/* Words Found - Clean stat display */}
-      <div className={cn(
-        "flex items-center justify-between px-3 py-2.5 rounded-neo",
-        "bg-neo-black/20"
-      )}>
-        <div className="flex items-center gap-2 text-neo-cream/70">
-          <Target className="w-4 h-4 text-neo-cyan" />
-          <span className="text-xs font-medium">{t('singlePlayer.wordsFound')}</span>
+      {/* Combo Section - hidden in practice mode (no combos during learning) */}
+      {!isPracticeMode && (
+        <div className="flex flex-col items-center">
+          <ComboDisplay
+            comboLevel={comboLevel}
+            compact={false}
+            timeRemaining={comboTimeRemaining}
+            isDanger={comboDanger}
+            coinReward={comboCoinReward}
+            onCoinAnimationComplete={onCoinAnimationComplete}
+          />
         </div>
-        <div className="font-bold text-neo-cyan tabular-nums">
-          {wordsFound}
-          {totalBoardWords && (
-            <span className="text-neo-cream/50 text-xs ms-1">/ {totalBoardWords}</span>
-          )}
+      )}
+
+      {/* Divider - only when there is something above words-found to separate */}
+      {!isPracticeMode && <div className="border-t border-neo-cream/15" />}
+
+      {/* Words Found counter - hidden in practice mode (right sidebar already shows the list + count) */}
+      {!isPracticeMode && (
+        <div className={cn(
+          "flex items-center justify-between px-3 py-2.5 rounded-neo",
+          "bg-neo-black/20"
+        )}>
+          <div className="flex items-center gap-2 text-neo-cream/70">
+            <Target className="w-4 h-4 text-neo-cyan" />
+            <span className="text-xs font-medium">{t('singlePlayer.wordsFound')}</span>
+          </div>
+          <div className="font-bold text-neo-cyan tabular-nums">
+            {wordsFound}
+            {totalBoardWords && (
+              <span className="text-neo-cream/50 text-xs ms-1">/ {totalBoardWords}</span>
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Spacer pushes nothing to bottom - clean end */}
       <div className="flex-1" />

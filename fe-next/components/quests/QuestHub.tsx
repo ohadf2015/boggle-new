@@ -293,7 +293,10 @@ function WeeklyQuestSection() {
           </div>
         ) : (
           <div className="flex flex-col gap-3">
-            <p className="font-neo-body text-sm text-neo-white/70">
+            <p className="font-neo-body text-xs text-neo-white/60 leading-relaxed">
+              {t('weeklyQuest.intro')}
+            </p>
+            <p className="font-neo-body text-sm font-bold text-neo-white">
               {t('weeklyQuest.choose')}
             </p>
             <div className="grid gap-2">

@@ -64,18 +64,21 @@ vi.mock('../RoomListView', () => ({
     onRefreshRooms,
     onRoomClick,
     onCreateRoom,
+    onQuickPlay,
   }: {
     activeRooms: ActiveRoom[];
     roomsLoading: boolean;
     onRefreshRooms: () => void;
     onRoomClick: (room: ActiveRoom) => void;
     onCreateRoom: () => void;
+    onQuickPlay?: () => void;
   }) => (
     <div data-testid="room-list-view">
       <h2>Room List ({activeRooms.length} rooms)</h2>
       {roomsLoading && <span>Loading rooms...</span>}
       <button onClick={onRefreshRooms}>Refresh</button>
       <button onClick={onCreateRoom}>Create Room</button>
+      {onQuickPlay && <button onClick={onQuickPlay}>Quick Play</button>}
       {activeRooms.map((room) => (
         <button
           key={room.gameCode}
@@ -410,6 +413,39 @@ describe('MultiplayerFlow', () => {
     });
   });
 
+  describe('Quick Play', () => {
+    it('should call handleJoin with quickPlay flag when Quick Play clicked', async () => {
+      const handleJoin = vi.fn();
+      render(<MultiplayerFlow {...defaultProps} handleJoin={handleJoin} />);
+
+      const quickPlayButton = screen.getByRole('button', { name: 'Quick Play' });
+      await userEvent.click(quickPlayButton);
+
+      expect(handleJoin).toHaveBeenCalledWith(
+        true, // host mode
+        'en', // defaultLanguage
+        expect.stringMatching(/^[A-Z0-9]{6}$/),
+        expect.any(String), // generated room name
+        expect.any(String), // username (sourced from stored profile)
+        expect.objectContaining({ quickPlay: true }),
+      );
+    });
+
+    it('should auto-fire quick play once when quickPlay prop is true', async () => {
+      const handleJoin = vi.fn();
+      render(<MultiplayerFlow {...defaultProps} handleJoin={handleJoin} quickPlay />);
+
+      // Wait a microtask so the mount effect runs
+      await new Promise((r) => setTimeout(r, 0));
+
+      // handleJoin must be called exactly once with the quickPlay flag set
+      const quickPlayCalls = handleJoin.mock.calls.filter(
+        (call) => call[5]?.quickPlay === true,
+      );
+      expect(quickPlayCalls).toHaveLength(1);
+    });
+  });
+
   describe('Empty Room List', () => {
     it('should render correctly with no rooms', () => {
       render(<MultiplayerFlow {...defaultProps} activeRooms={[]} />);
@@ -519,6 +555,7 @@ describe('CrazyGames Smart Auto-Join', () => {
     // Quick play creates a room (host mode = true)
     expect(handleJoin).toHaveBeenCalledWith(
       true, expect.any(String), expect.any(String), expect.any(String), 'CGPlayer',
+      expect.objectContaining({ quickPlay: true }),
     );
   });
 
@@ -535,6 +572,7 @@ describe('CrazyGames Smart Auto-Join', () => {
     // Should quick-play since the only room is full
     expect(handleJoin).toHaveBeenCalledWith(
       true, expect.any(String), expect.any(String), expect.any(String), 'CGPlayer',
+      expect.objectContaining({ quickPlay: true }),
     );
   });
 
@@ -550,6 +588,7 @@ describe('CrazyGames Smart Auto-Join', () => {
 
     expect(handleJoin).toHaveBeenCalledWith(
       true, expect.any(String), expect.any(String), expect.any(String), 'CGPlayer',
+      expect.objectContaining({ quickPlay: true }),
     );
   });
 

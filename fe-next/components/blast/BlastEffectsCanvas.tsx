@@ -188,7 +188,7 @@ function EffectsWorker({
   // ─── Pixi overlay pipeline ────────────────────────────────────────
   // Owns bloom+shockwave camera filters, cross flash, and combo pulse rings.
   // All teardown + camera.destroyed guards live inside the hook.
-  const { fireShockwave, flashCross, spawnPulseRing } = useBlastPixiOverlays({
+  const { fireShockwave, flashCross, spawnPulseRing, spawnStarBurst } = useBlastPixiOverlays({
     camera, width, height, gridSize, cellSize, chainLevel,
   });
 
@@ -230,7 +230,7 @@ function EffectsWorker({
       const isFinalHit = !tile.hitsRemaining || tile.hitsRemaining <= 0;
 
       if (tile.type === 'bomb') {
-        fireShockwave(x, y, 25);
+        fireShockwave(x, y, 12);
         particles.burst(pickRandom(BOMB_EXPLOSION_VARIANTS), x, y);
         enhancedRef.current?.shatterTile(x, y, 'bomb');
       }
@@ -239,6 +239,8 @@ function EffectsWorker({
         if (isFinalHit) {
           particles.burst(GEM_GOLDEN_EXPLOSION, x, y);
           particles.burst(GEM_SHATTER, x, y);
+          fireShockwave(x, y, 8);
+          spawnStarBurst(x, y, 0x34d399, 6);
           enhancedRef.current?.shatterTile(x, y, 'gem');
         } else {
           particles.burst(GEM_SHARD_BURST, x, y);
@@ -261,12 +263,15 @@ function EffectsWorker({
         firePrismBeams(x, y);
         spawnPrismDebris(x, y);
         flashCross(x, y);
+        spawnPulseRing(x, y, 2);
+        spawnStarBurst(x, y, 0xff1493, 12);
         enhancedRef.current?.prismRefractTile(x, y, 'prism');
       } else if (tile.type === 'magnet') {
         particles.burst(VORTEX_PULL, x, y);
         const tid = setTimeout(() => {
           magnetTimersRef.current.delete(tid);
           particles.burst(VORTEX_EXPLOSION, x, y);
+          fireShockwave(x, y, 13);
           physics.applyExplosion({ x, y }, 0.005, cellSize * 3.5);
           enhancedRef.current?.shatterTile(x, y, 'magnet');
         }, 280);
@@ -274,22 +279,25 @@ function EffectsWorker({
       // Diamond: crystalline shards + shockwave + shatter + crystallize
       } else if (tile.type === 'diamond') {
         particles.burst(DIAMOND_SHARDS, x, y);
-        fireShockwave(x, y, 12);
+        fireShockwave(x, y, 7);
         enhancedRef.current?.shatterTile(x, y, 'diamond');
         enhancedRef.current?.crystallizeTile(x, y, 'diamond');
       // Gold: golden star burst + liquid melt
       } else if (tile.type === 'gold') {
         particles.burst(GOLD_STARS, x, y);
+        spawnStarBurst(x, y, 0xffd700, 10);
         enhancedRef.current?.meltTile(x, y, 'gold');
       // Rainbow: confetti + magnetic assembly (vortex materialization)
       } else if (tile.type === 'rainbow') {
         particles.burst(CONFETTI_BURST, x, y);
+        spawnPulseRing(x, y, 3);
+        spawnStarBurst(x, y, 0x00ffff, 14);
         enhancedRef.current?.assembleTile(x, y, 'rainbow');
       // Countdown: fire embers explosion + granular erosion on final
       } else if (tile.type === 'countdown') {
         particles.burst(FIRE_EMBERS, x, y);
         if (isFinalHit) {
-          fireShockwave(x, y, 15);
+          fireShockwave(x, y, 9);
           enhancedRef.current?.erodeTile(x, y, 'countdown');
         }
       // Shuffle: swirling rearrangement burst
@@ -299,17 +307,21 @@ function EffectsWorker({
       // Magma: volcanic eruption — explosive radial burst
       } else if (tile.type === 'magma') {
         particles.burst(FIRE_EMBERS, x, y);
-        fireShockwave(x, y, 18);
+        fireShockwave(x, y, 11);
         enhancedRef.current?.shatterTile(x, y, 'magma');
       // Portal: vortex pull + electric rings + slit-scan warp
       } else if (tile.type === 'portal') {
         particles.burst(VORTEX_PULL, x, y);
         particles.burst(ELECTRIC_RINGS, x, y);
+        fireShockwave(x, y, 6);
+        spawnPulseRing(x, y, 1);
         enhancedRef.current?.slitScanTile(x, y, 'portal');
       // Catalyst: liquid mercury transformation
       } else if (tile.type === 'catalyst') {
         particles.burst(GOLD_STARS, x, y);
         particles.burst(FIRE_EMBERS, x, y);
+        fireShockwave(x, y, 7);
+        spawnStarBurst(x, y, 0xffd700, 8);
         enhancedRef.current?.mercuryTile(x, y, 'catalyst');
       } else {
         const preset = CLEAR_PRESET_MAP[tile.type] ?? pickRandom(TILE_EXPLOSION_VARIANTS);
@@ -344,6 +356,9 @@ function EffectsWorker({
     if (lightningCols.size > 0) {
       for (const col of lightningCols) {
         spawnLightningBolt(col, gridSize);
+        const colX = col * cellSize + cellSize / 2;
+        fireShockwave(colX, height / 2, 7);
+        spawnStarBurst(colX, height / 2, 0x00ffff, 6);
       }
       spawnLightningDebris(lightningTiles);
       shake.shake({ intensity: 6, duration: 0.3, decay: 'exponential' });
@@ -359,7 +374,7 @@ function EffectsWorker({
       else if (count >= 3) shake.medium();
       else shake.light();
     }
-  }, [clearedTiles, particles, shake, cellSize, gridSize, spawnDebris, spawnLightningBolt, spawnLightningDebris, firePrismBeams, spawnPrismDebris, flashCross, physics, fireShockwave, moveGhostTo]);
+  }, [clearedTiles, particles, shake, cellSize, gridSize, height, spawnDebris, spawnLightningBolt, spawnLightningDebris, firePrismBeams, spawnPrismDebris, flashCross, physics, fireShockwave, spawnPulseRing, spawnStarBurst, moveGhostTo]);
 
   // Chain cascade sparkle + mega celebration at chain 5
   useEffect(() => {
@@ -371,6 +386,8 @@ function EffectsWorker({
         particles.burst(BOARD_CLEAR, width / 2, height / 2);
         particles.burst(pickRandom(COMBO_FLASH_VARIANTS), width / 2, height / 2, 40);
         fireShockwave(width / 2, height / 2, 30);
+        spawnStarBurst(width / 2, height / 2, 0xbfff00, 16);
+        spawnPulseRing(width / 2, height / 2, 3);
         juiceRef.current?.megaPunch({ cx: width / 2, cy: height / 2 });
       } else if (chainLevel >= 3) {
         shake.medium();
@@ -379,7 +396,7 @@ function EffectsWorker({
       }
     }
     prevChainRef.current = chainLevel;
-  }, [chainLevel, particles, shake, width, height, fireShockwave]);
+  }, [chainLevel, particles, shake, width, height, fireShockwave, spawnStarBurst, spawnPulseRing]);
 
   // Combo flash particles + juice pulse (chromatic aberration + saturation bump)
   useEffect(() => {
@@ -396,11 +413,13 @@ function EffectsWorker({
     if (waveCleared && !prevWaveRef.current) {
       particles.burst(BOARD_CLEAR, width / 2, height / 2);
       fireShockwave(width / 2, height / 2, 35);
+      spawnStarBurst(width / 2, height / 2, 0xffffff, 18);
+      spawnPulseRing(width / 2, height / 2, 3);
       juiceRef.current?.waveClearBurst({ cx: width / 2, cy: height / 2 });
       spawnWaveClearBurst(width / 2, height / 2, Math.min(width, height) * 0.45);
     }
     prevWaveRef.current = waveCleared;
-  }, [waveCleared, particles, width, height, fireShockwave, spawnWaveClearBurst]);
+  }, [waveCleared, particles, width, height, fireShockwave, spawnStarBurst, spawnPulseRing, spawnWaveClearBurst]);
 
   return null;
 }

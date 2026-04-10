@@ -7,10 +7,10 @@
  */
 
 import { render } from '@react-email/components';
-import ReengagementEmail, {
-  getReengagementSubject,
+import ReengagementEmailV2, {
+  getReengagementSubjectV2 as getReengagementSubject,
   SUBJECT_LINES,
-} from '@/emails/reengagement';
+} from '@/emails/reengagement-v2';
 
 export { getReengagementSubject, SUBJECT_LINES };
 
@@ -39,8 +39,8 @@ export async function generateReengagementEmailHtml(params: EmailTemplateParams)
   const props = { recipientName, firstLetter, language, unsubscribeUrl, playUrl };
 
   const [html, text] = await Promise.all([
-    render(ReengagementEmail(props)),
-    render(ReengagementEmail(props), { plainText: true }),
+    render(ReengagementEmailV2(props)),
+    render(ReengagementEmailV2(props), { plainText: true }),
   ]);
 
   return { subject, html, text };

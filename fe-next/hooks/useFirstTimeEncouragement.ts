@@ -13,7 +13,7 @@ export type EncouragementTrigger =
 const GAMES_PLAYED_KEY = 'lexiclash_games_played';
 const FIRST_TIME_THRESHOLD = 3;
 const RATE_LIMIT_MS = 15_000;
-const AUTO_DISMISS_MS = 4_000;
+const AUTO_DISMISS_MS = 2_500;
 
 export interface UseFirstTimeEncouragementReturn {
   currentTrigger: EncouragementTrigger | null;

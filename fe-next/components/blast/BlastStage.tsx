@@ -15,6 +15,7 @@ const BlastEffectsCanvas = dynamic(
 );
 import WordFormingArea, { type WordFeedback } from '@/components/game/WordFormingArea';
 import { BlastHUD } from './BlastHUD';
+import { BlastMPLeaderboard } from './BlastMPLeaderboard';
 import { BlastBoard } from './BlastBoard';
 import BlastChainText from './BlastChainText';
 import BlastWaveClearText from './BlastWaveClearText';
@@ -245,29 +246,11 @@ export const BlastStage = memo(function BlastStage({
       />
       </div>
 
-      {/* 1b. Live leaderboard ticker (MP only) */}
+      {/* 1b. Live leaderboard strip (MP only) — inline, non-overlapping,
+             surfaces opponent word-finds so the match feels shared. */}
       {leaderboard && leaderboard.length > 0 && (
-        <div className="absolute top-14 inset-e-2 z-40 flex flex-col gap-0.5 pointer-events-none" data-testid="blast-leaderboard">
-          {leaderboard
-            .slice()
-            .sort((a, b) => b.score - a.score)
-            .slice(0, 4)
-            .map((entry, i) => (
-              <div
-                key={entry.username}
-                className={cn(
-                  'flex items-center gap-1.5 px-2 py-0.5 rounded-neo text-[10px] font-bold tabular-nums',
-                  'border border-neo-black/40 shadow-hard-sm',
-                  entry.username === username
-                    ? 'bg-neo-lime/80 text-neo-navy'
-                    : 'bg-neo-navy/70 text-neo-white/80',
-                )}
-              >
-                <span className="text-white/50 w-3">{i + 1}.</span>
-                <span className="truncate max-w-[60px]">{entry.username}</span>
-                <span className="ms-auto">{entry.score}</span>
-              </div>
-            ))}
+        <div className="relative z-40">
+          <BlastMPLeaderboard leaderboard={leaderboard} username={username} />
         </div>
       )}
 

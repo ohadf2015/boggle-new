@@ -277,6 +277,156 @@ describe('updatePlayerStats', () => {
       });
     });
 
+    test('should mark practice_graduated_at when crossing 20 total words for the first time', async () => {
+      // GIVEN: Player has 10 total words, not yet graduated
+      const playerId = 'grad-user-1';
+      const currentProfile = {
+        id: playerId,
+        username: 'GradPlayer',
+        total_xp: 100,
+        current_level: 2,
+        total_games: 2,
+        total_score: 500,
+        total_words: 10,
+        ranked_games: 0,
+        casual_games: 2,
+        ranked_wins: 0,
+        casual_wins: 0,
+        achievement_counts: {},
+        practice_graduated_at: null,
+      };
+
+      mockClient.single.mockResolvedValueOnce({ data: currentProfile, error: null });
+
+      // WHEN: This game adds 15 words, pushing total to 25
+      const gameStats: GameStats = {
+        score: 500,
+        wordCount: 15,
+        placement: 2,
+        totalPlayers: 4,
+      };
+
+      await updatePlayerStats(playerId, gameStats);
+
+      // THEN: RPC must be called with updates containing practice_graduated_at
+      expect(mockClient.rpc).toHaveBeenCalledWith(
+        'update_player_stats_and_xp',
+        expect.objectContaining({
+          p_stats: expect.objectContaining({
+            practice_graduated_at: expect.any(String),
+          }),
+        })
+      );
+    });
+
+    test('should NOT re-mark practice_graduated_at if already graduated', async () => {
+      // GIVEN: Player is already graduated
+      const playerId = 'grad-user-2';
+      const currentProfile = {
+        id: playerId,
+        username: 'Veteran',
+        total_xp: 5000,
+        current_level: 15,
+        total_games: 50,
+        total_score: 50000,
+        total_words: 500,
+        ranked_games: 25,
+        casual_games: 25,
+        ranked_wins: 10,
+        casual_wins: 10,
+        achievement_counts: {},
+        practice_graduated_at: '2026-01-01T00:00:00.000Z',
+      };
+
+      mockClient.single.mockResolvedValueOnce({ data: currentProfile, error: null });
+
+      const gameStats: GameStats = {
+        score: 1000,
+        wordCount: 20,
+        placement: 1,
+        totalPlayers: 4,
+      };
+
+      await updatePlayerStats(playerId, gameStats);
+
+      // THEN: p_stats should NOT contain practice_graduated_at
+      const rpcCall = mockClient.rpc.mock.calls[0];
+      expect(rpcCall[0]).toBe('update_player_stats_and_xp');
+      expect(rpcCall[1].p_stats.practice_graduated_at).toBeUndefined();
+    });
+
+    test('should NOT graduate when staying under 20 total words', async () => {
+      // GIVEN: Player has 5 total words
+      const playerId = 'grad-user-3';
+      const currentProfile = {
+        id: playerId,
+        username: 'Newbie',
+        total_xp: 50,
+        current_level: 1,
+        total_games: 1,
+        total_score: 100,
+        total_words: 5,
+        ranked_games: 0,
+        casual_games: 1,
+        ranked_wins: 0,
+        casual_wins: 0,
+        achievement_counts: {},
+        practice_graduated_at: null,
+      };
+
+      mockClient.single.mockResolvedValueOnce({ data: currentProfile, error: null });
+
+      // WHEN: Adds 10 words → total 15 (still under 20)
+      const gameStats: GameStats = {
+        score: 200,
+        wordCount: 10,
+        placement: 3,
+        totalPlayers: 4,
+      };
+
+      await updatePlayerStats(playerId, gameStats);
+
+      // THEN: No graduation timestamp
+      const rpcCall = mockClient.rpc.mock.calls[0];
+      expect(rpcCall[1].p_stats.practice_graduated_at).toBeUndefined();
+    });
+
+    test('should graduate at exactly 20 total words', async () => {
+      // GIVEN: Player has 15 total words
+      const playerId = 'grad-user-4';
+      const currentProfile = {
+        id: playerId,
+        username: 'EdgeCase',
+        total_xp: 80,
+        current_level: 1,
+        total_games: 1,
+        total_score: 150,
+        total_words: 15,
+        ranked_games: 0,
+        casual_games: 1,
+        ranked_wins: 0,
+        casual_wins: 0,
+        achievement_counts: {},
+        practice_graduated_at: null,
+      };
+
+      mockClient.single.mockResolvedValueOnce({ data: currentProfile, error: null });
+
+      // WHEN: Adds exactly 5 words → total 20
+      const gameStats: GameStats = {
+        score: 250,
+        wordCount: 5,
+        placement: 2,
+        totalPlayers: 4,
+      };
+
+      await updatePlayerStats(playerId, gameStats);
+
+      // THEN: Graduates
+      const rpcCall = mockClient.rpc.mock.calls[0];
+      expect(rpcCall[1].p_stats.practice_graduated_at).toEqual(expect.any(String));
+    });
+
     test('should NOT count solo game as win', async () => {
       // GIVEN: Player exists
       const playerId = 'user-123';

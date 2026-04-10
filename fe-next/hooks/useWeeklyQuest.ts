@@ -5,8 +5,10 @@
  * Returns quest state, available quests, and selection function.
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { supabase } from '@/lib/supabase';
 import {
   getAvailableQuests, getWeekStart, getWeekNumber, pickAvatarReward,
@@ -56,10 +58,13 @@ function parseRow(row: Record<string, unknown>): ActiveQuest {
 
 export function useWeeklyQuest(): UseWeeklyQuestReturn {
   const { user } = useAuth();
+  const { t } = useLanguage();
+  const { playQuestCompleteSound } = useSoundEffects();
   const [activeQuest, setActiveQuest] = useState<ActiveQuest | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectingQuestId, setSelectingQuestId] = useState<string | null>(null);
   const available = getAvailableQuests();
+  const prevQuestStateRef = useRef<{ id: string; completed: boolean } | null>(null);
 
   const fetchQuest = useCallback(async () => {
     if (!user?.id || !supabase) {
@@ -90,7 +95,35 @@ export function useWeeklyQuest(): UseWeeklyQuestReturn {
 
   useEffect(() => {
     fetchQuest();
+
+    // Re-fetch when user returns to the tab (e.g., after finishing a game) so
+    // server-side progress updates are reflected immediately.
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        fetchQuest();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+    return () => document.removeEventListener('visibilitychange', handleVisibility);
   }, [fetchQuest]);
+
+  // Celebrate weekly quest completion on false → true transition.
+  useEffect(() => {
+    if (loading || !activeQuest) return;
+    const prev = prevQuestStateRef.current;
+    const isTransition = prev && prev.id === activeQuest.id && !prev.completed && activeQuest.completed;
+    if (isTransition) {
+      import('@/components/quests/QuestCompletionToast').then(({ showQuestCompletionToast }) => {
+        showQuestCompletionToast({
+          questName: activeQuest.title || t('weeklyQuest.title'),
+          xpReward: activeQuest.xpReward,
+          t,
+          onComplete: playQuestCompleteSound,
+        });
+      });
+    }
+    prevQuestStateRef.current = { id: activeQuest.id, completed: activeQuest.completed };
+  }, [activeQuest, loading, t, playQuestCompleteSound]);
 
   const handleSelectQuest = useCallback(async (questId: string) => {
     if (!user?.id || !supabase) return;

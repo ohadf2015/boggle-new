@@ -5,6 +5,7 @@ import React, { memo, useCallback, useState, useEffect, useMemo, useRef } from '
 import { usePreviousValue } from '@/hooks/usePreviousValue';
 import { trackLevelRetried, trackModalDismissed } from '@/utils/posthogEngagement';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { useProgression } from '@/contexts/ProgressionContext';
 import { useAdventureGame } from '@/hooks/useAdventureGame';
 import { useAdventureWordValidation } from '@/hooks/useAdventureWordValidation';
@@ -79,6 +80,8 @@ function useMemoizedFlatTiles(tiles2D: TileState[][], tilesVersion: number): Gri
 const AdventureGame = memo<AdventureGameProps>(
   ({ levelConfig, initialGrid, onLevelComplete, onExit, onTimerStateChange, totalStars, onNextWorld }) => {
     const isValidConfig = levelConfig.gridSize > 0 && levelConfig.objectives.length > 0;
+    const { user } = useAuth();
+    const isGuest = !user?.id;
     const init = useAdventureGameInit({ world: levelConfig.world, level: levelConfig.level, timerSeconds: levelConfig.timerSeconds ?? 120 });
 
     const boostedLevelConfig = useMemo(() => {
@@ -708,7 +711,7 @@ const AdventureGame = memo<AdventureGameProps>(
               objectives={objectives} totalStars={totalStars} bestAttempt={bestAttempt ?? null} previousBestStars={previousBestStars}
               earnedXp={levelCompletion.earnedXp} earnedGold={levelCompletion.earnedGold}
               isLastLevelOfWorld={levelConfig.level === LEVELS_PER_WORLD} onNextWorld={onNextWorld}
-              saveFailed={levelCompletion.completionSaveFailedRef?.current && showLevelComplete}
+              saveFailed={!isGuest && levelCompletion.completionSaveFailedRef?.current && showLevelComplete}
               onRetrySave={() => {
                 saveCompletionToDb(
                   levelConfig.world, levelConfig.level,
@@ -735,8 +738,12 @@ const AdventureGame = memo<AdventureGameProps>(
             />
           }
         />
-        <MechanicBonusToast bonus={wordSubmit.mechanicBonus} onDismiss={wordSubmit.dismissMechanicBonus} />
-        {entryPhase === 'playing' && levelConfig.worldMechanic && (
+        <MechanicBonusToast
+          bonus={wordSubmit.mechanicBonus}
+          onDismiss={wordSubmit.dismissMechanicBonus}
+          bossActive={isBossLevel && bossOrch.isBossActive}
+        />
+        {entryPhase === 'playing' && levelConfig.worldMechanic && !(isBossLevel && bossOrch.isBossActive) && (
           <MechanicIndicator
             mechanic={levelConfig.worldMechanic}
             hitCount={wordSubmit.mechanicHitCount}

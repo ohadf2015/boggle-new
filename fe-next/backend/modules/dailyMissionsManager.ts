@@ -1,7 +1,7 @@
 /**
  * Daily Missions Manager
- * Tracks 4 daily missions: Word Hunt, Brain Drill, Adventure, Community
- * Grand Slam bonus (500 XP) when all 4 complete
+ * Tracks 3 daily missions: Word Hunt, Adventure, Multiplayer
+ * Grand Slam bonus (500 XP) when all 3 complete
  */
 
 import { getSupabase } from './supabase/client';
@@ -16,11 +16,10 @@ function _resolveLogger(obj: any, depth = 0): any {
 }
 const logger = _resolveLogger(_loggerImport) as typeof _loggerImport;
 
-export type MissionType = 'word_hunt' | 'brain_drill' | 'adventure' | 'community';
+export type MissionType = 'word_hunt' | 'adventure' | 'community';
 
 export interface DailyMissions {
   wordHunt: boolean;
-  brainDrill: boolean;
   adventure: boolean;
   community: boolean;
   grandSlamClaimed: boolean;
@@ -40,13 +39,11 @@ function getTodayDate(date?: string): string {
 
 function countCompleted(row: {
   word_hunt_completed: boolean;
-  brain_drill_completed: boolean;
   adventure_completed: boolean;
   community_completed: boolean;
 }): number {
   return [
     row.word_hunt_completed,
-    row.brain_drill_completed,
     row.adventure_completed,
     row.community_completed,
   ].filter(Boolean).length;
@@ -54,14 +51,12 @@ function countCompleted(row: {
 
 function toMissions(row: {
   word_hunt_completed: boolean;
-  brain_drill_completed: boolean;
   adventure_completed: boolean;
   community_completed: boolean;
   grand_slam_claimed: boolean;
 }): DailyMissions {
   return {
     wordHunt: row.word_hunt_completed,
-    brainDrill: row.brain_drill_completed,
     adventure: row.adventure_completed,
     community: row.community_completed,
     grandSlamClaimed: row.grand_slam_claimed,
@@ -71,7 +66,6 @@ function toMissions(row: {
 
 const DEFAULT_ROW = {
   word_hunt_completed: false,
-  brain_drill_completed: false,
   adventure_completed: false,
   community_completed: false,
   grand_slam_claimed: false,
@@ -86,7 +80,7 @@ export async function getDailyMissions(playerId: string, date?: string): Promise
 
   const { data, error } = await supabase
     .from('player_daily_missions')
-    .select('word_hunt_completed, brain_drill_completed, adventure_completed, community_completed, grand_slam_claimed')
+    .select('word_hunt_completed, adventure_completed, community_completed, grand_slam_claimed')
     .eq('player_id', playerId)
     .eq('mission_date', today)
     .single();
@@ -96,7 +90,7 @@ export async function getDailyMissions(playerId: string, date?: string): Promise
     const { data: inserted, error: insertErr } = await supabase
       .from('player_daily_missions')
       .upsert({ player_id: playerId, mission_date: today, ...DEFAULT_ROW }, { onConflict: 'player_id,mission_date' })
-      .select('word_hunt_completed, brain_drill_completed, adventure_completed, community_completed, grand_slam_claimed')
+      .select('word_hunt_completed, adventure_completed, community_completed, grand_slam_claimed')
       .single();
 
     if (insertErr) {
@@ -116,7 +110,6 @@ export async function getDailyMissions(playerId: string, date?: string): Promise
 
 const COLUMN_MAP: Record<MissionType, string> = {
   word_hunt: 'word_hunt_completed',
-  brain_drill: 'brain_drill_completed',
   adventure: 'adventure_completed',
   community: 'community_completed',
 };

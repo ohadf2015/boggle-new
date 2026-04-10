@@ -2592,21 +2592,6 @@ const en = {
     }
   },
   "training": {
-    "gateway": {
-      "title": "First time?",
-      "subtitle": "Quick warm-up to master the moves!",
-      "demoHint": "Swipe anywhere - even diagonal!",
-      "benefitsTitle": "You'll learn:",
-      "benefits": {
-        "learnControls": "The swipe moves",
-        "masterDirections": "All 8 directions",
-        "noPressure": "No timer stress"
-      },
-      "returnNote": "Then you're battle-ready!",
-      "startTraining": "Warm Up!",
-      "skipAnyway": "Skip - I got this",
-      "dontShowAgain": "Don't show again"
-    },
     "hints": {
       "tryDiagonal": "Try dragging diagonally!",
       "changeDirection": "Pro tip: Change direction mid-word!",
@@ -4392,6 +4377,8 @@ const en = {
     "multiplayerDesc": "Live word battles!",
     "arena": "Multiplayer",
     "arenaDesc": "Play solo or challenge friends!",
+    "quickPlay": "Quick Play",
+    "quickPlayDesc": "Jump in — random mode vs bots",
     "practice": "Practice",
     "practiceDesc": "No pressure, just words",
     "brainTraining": "Brain Training",
@@ -8020,7 +8007,7 @@ const en = {
     "ready": {
       "title": "Blast Mode",
       "subtitle": "Clear tiles by forming words. Chain combos for big scores!",
-      "play": "Blast Off!",
+      "play": "Start From Beginning",
       "resume": "Resume Wave {wave}",
       "step1Title": "Swipe Words",
       "step1Desc": "Drag across adjacent letters to form words",

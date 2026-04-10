@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Trophy, Target, Users, Home, Sparkles } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { fireOnboardingBurst } from '@/utils/confettiUtils';
 import { cn } from '@/lib/utils';
 
 interface ModeForkProps {
@@ -149,14 +150,33 @@ const ModeOption: React.FC<ModeOptionProps> = ({
  * Step 5: The Fork. Vertical cards with gradient backgrounds,
  * glow halos, shine sweeps, and spring entrance animations.
  */
+/** Confetti palette per mode — picked to match each card's gradient accent */
+const MODE_CONFETTI_COLORS: Record<'daily' | 'practice' | 'home' | 'joinRoom', string[]> = {
+  daily: ['#BFFF00', '#FFE135', '#00FFFF'],
+  practice: ['#00FFFF', '#BFFF00', '#FF1493'],
+  home: ['#8B5CF6', '#FF1493', '#00FFFF'],
+  joinRoom: ['#FF1493', '#FFE135', '#00FFFF'],
+};
+
 const ModeFork: React.FC<ModeForkProps> = ({ onSelectMode, hasPendingInvite }) => {
   const { t, dir } = useLanguage();
   const baseDelay = hasPendingInvite ? 0.15 : 0.05;
 
+  // Wrap the select callback so each tap fires a color-matched burst before
+  // we navigate. Parent handles the isNavigating guard, so double-bursts are
+  // prevented upstream.
+  const handleSelect = useCallback(
+    (mode: 'daily' | 'practice' | 'home' | 'joinRoom') => {
+      fireOnboardingBurst({ y: 0.65 }, MODE_CONFETTI_COLORS[mode]);
+      onSelectMode(mode);
+    },
+    [onSelectMode]
+  );
+
   return (
     <div
       data-testid="mode-fork"
-      className="w-full max-w-sm mx-auto flex flex-col items-center gap-3"
+      className="w-full max-w-sm lg:max-w-3xl mx-auto flex flex-col items-center gap-3 lg:gap-5"
       dir={dir}
     >
       {/* Section header */}
@@ -164,12 +184,22 @@ const ModeFork: React.FC<ModeForkProps> = ({ onSelectMode, hasPendingInvite }) =
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
-        className="text-center mb-1"
+        className="text-center mb-1 lg:mb-2"
       >
-        <h2 className="text-xl font-neo-display font-black text-neo-cream">
+        <h2 className="text-xl lg:text-3xl font-neo-display font-black text-neo-cream">
           {t('onboarding.ftue.whereToStart', 'Where to start?')}
         </h2>
       </motion.div>
+
+      {/* Cards container — vertical on mobile, 3-col grid on desktop.
+          When a pending invite adds a 4th card we collapse to 2-col so the
+          featured Join card can stay prominent. */}
+      <div
+        className={cn(
+          'w-full grid grid-cols-1 gap-3',
+          hasPendingInvite ? 'lg:grid-cols-2 lg:gap-5' : 'lg:grid-cols-3 lg:gap-5'
+        )}
+      >
       {/* Join Friend's Game — shown only when user arrived via room invite link */}
       {hasPendingInvite && (
         <ModeOption
@@ -182,7 +212,7 @@ const ModeFork: React.FC<ModeForkProps> = ({ onSelectMode, hasPendingInvite }) =
           title={t('onboarding.ftue.joinFriendsGame')}
           description={t('onboarding.ftue.joinFriendsGameDesc')}
           delay={0.05}
-          onClick={() => onSelectMode('joinRoom')}
+          onClick={() => handleSelect('joinRoom')}
           featured
         />
       )}
@@ -197,7 +227,7 @@ const ModeFork: React.FC<ModeForkProps> = ({ onSelectMode, hasPendingInvite }) =
         title={t('onboarding.ftue.dailyChallenge')}
         description={t('onboarding.ftue.dailyChallengeDesc')}
         delay={baseDelay}
-        onClick={() => onSelectMode('daily')}
+        onClick={() => handleSelect('daily')}
         featured={!hasPendingInvite}
       />
 
@@ -211,7 +241,7 @@ const ModeFork: React.FC<ModeForkProps> = ({ onSelectMode, hasPendingInvite }) =
         title={t('onboarding.ftue.practiceMode')}
         description={t('onboarding.ftue.practiceModeDesc')}
         delay={baseDelay + 0.1}
-        onClick={() => onSelectMode('practice')}
+        onClick={() => handleSelect('practice')}
       />
 
       {/* Explore All Modes card */}
@@ -224,9 +254,10 @@ const ModeFork: React.FC<ModeForkProps> = ({ onSelectMode, hasPendingInvite }) =
         title={t('onboarding.ftue.homePage')}
         description={t('onboarding.ftue.homePageDesc')}
         delay={baseDelay + 0.2}
-        onClick={() => onSelectMode('home')}
+        onClick={() => handleSelect('home')}
         dark
       />
+      </div>
 
       {/* Subtitle */}
       <motion.p

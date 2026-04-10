@@ -182,12 +182,22 @@ router.get('/leaderboard/:date/:language', async (req: Request<LeaderboardParams
         logger.warn('API', `Daily leaderboard guest count error: ${guestCountError.message}`);
       }
 
-      const dataLength = data?.length || 0;
+      // Re-number rank_position sequentially among authenticated players only.
+      // The view's rank_position is partitioned by (puzzle_date, language) but
+      // includes guest rows, so post-filter rows would otherwise keep gaps
+      // (e.g. first auth player showing as rank #3 because ranks #1/#2 were guests).
+      // This guarantees each language's leaderboard starts at rank 1.
+      const rerankedData = (data || []).map((row, index) => ({
+        ...row,
+        rank_position: index + 1,
+      }));
+
+      const dataLength = rerankedData.length;
       const queryCount = count ?? 0;
       const totalParticipants = Math.max(queryCount, dataLength);
 
       const payload: LeaderboardResponse = {
-        data: data || [],
+        data: rerankedData,
         totalParticipants,
         totalAttempts: totalCount ?? 0,
         guestPlayerCount: guestCount ?? 0,

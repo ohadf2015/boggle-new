@@ -33,6 +33,11 @@ vi.mock('@/components/daily/DailyChallengeBanner', () => {
   return { __esModule: true, default: DailyChallengeBanner };
 });
 
+const mockIsVeteran = vi.fn(() => false);
+vi.mock('@/hooks/useIsPracticeVeteran', () => ({
+  useIsPracticeVeteran: () => mockIsVeteran(),
+}));
+
 const baseProps = {
   language: 'en',
   isAdmin: false,
@@ -75,4 +80,24 @@ describe('LandingChallengeCards', () => {
     expect(screen.getByTestId('daily-banner')).toBeInTheDocument();
   });
 
+  describe('veteran gating', () => {
+    afterEach(() => mockIsVeteran.mockReturnValue(false));
+
+    it('renders quick play card', () => {
+      render(<LandingChallengeCards {...baseProps} />);
+      expect(screen.getByText('landing.quickPlay')).toBeInTheDocument();
+    });
+
+    it('hides practice card for veterans', () => {
+      mockIsVeteran.mockReturnValue(true);
+      render(<LandingChallengeCards {...baseProps} />);
+      expect(screen.queryByText('landing.practice')).not.toBeInTheDocument();
+    });
+
+    it('keeps practice card for newcomers', () => {
+      mockIsVeteran.mockReturnValue(false);
+      render(<LandingChallengeCards {...baseProps} />);
+      expect(screen.getByText('landing.practice')).toBeInTheDocument();
+    });
+  });
 });

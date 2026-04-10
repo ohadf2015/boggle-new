@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, useReducedMotion } from 'framer-motion';
-import { Bomb, Crown, Flame, Gem, Sparkles, Sword, Trophy, Zap } from 'lucide-react';
+import { Bomb, Crown, Flame, Gem, Sparkles, Sword, Trophy, Zap, Waves } from 'lucide-react';
 import { useMemo } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { ScoreCountUp } from '@/components/results/shared';
@@ -95,6 +95,18 @@ export default function BlastBoardDomination({ playerStats, currentUsername }: B
 
   const totalTilesCleared = useMemo(() => entries.reduce((s, [, p]) => s + p.tilesCleared, 0), [entries]);
 
+  // ── Blast-unique aggregate stats — only meaningful for Blast mode ──
+  const matchRecap = useMemo(() => {
+    const totalTileBonus = entries.reduce((s, [, p]) => s + (p.totalTileBonus ?? 0), 0);
+    const peakCombo = entries.reduce((m, [, p]) => Math.max(m, p.maxCombo ?? 0), 0);
+    const totalGems = entries.reduce((s, [, p]) => s + (p.gemsCollected ?? 0), 0);
+    const totalWords = entries.reduce((s, [, p]) => s + (p.wordsFound?.length ?? 0), 0);
+    // Intensity = normalized blend of peak combo + shared gems per player. Caps at 100.
+    const perPlayerGems = entries.length > 0 ? totalGems / entries.length : 0;
+    const intensity = Math.min(100, Math.round(peakCombo * 8 + perPlayerGems * 12));
+    return { totalTileBonus, peakCombo, totalGems, totalWords, intensity };
+  }, [entries]);
+
   // Assign colors by rank
   const colorMap = useMemo(() => {
     const map: Record<string, typeof PLAYER_COLORS[0]> = {};
@@ -177,6 +189,96 @@ export default function BlastBoardDomination({ playerStats, currentUsername }: B
       animate="show"
       className="space-y-3"
     >
+      {/* ── Blast Match Recap hero card — Blast-only aggregate stats ── */}
+      <motion.div
+        variants={v}
+        className="relative overflow-hidden p-3 rounded-neo border-3 border-neo-black shadow-hard bg-linear-to-br from-neo-navy via-neo-navy-light to-neo-navy"
+        data-testid="blast-match-recap"
+      >
+        {/* Decorative pulse aura — only when the match was intense */}
+        {matchRecap.intensity >= 40 && !prefersReduced && (
+          <motion.div
+            aria-hidden
+            className="absolute inset-0 bg-linear-to-br from-neo-pink/10 via-neo-orange/10 to-neo-lime/10 pointer-events-none"
+            animate={{ opacity: [0.4, 0.8, 0.4] }}
+            transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
+          />
+        )}
+        <div className="relative">
+          <div className="flex items-center gap-1.5 mb-2">
+            <Bomb className="w-4 h-4 text-neo-lime" />
+            <h3 className="text-xs font-black uppercase tracking-wider text-neo-cream/80">
+              {t('blast.results.matchRecap') || 'Blast Match Recap'}
+            </h3>
+          </div>
+
+          {/* Big total tiles demolished number */}
+          <div className="flex items-end justify-between gap-3 mb-2">
+            <div className="min-w-0">
+              <div className="text-[10px] font-bold uppercase tracking-wider text-neo-cream/50">
+                {t('blast.results.totalTilesDemolished') || 'Tiles Demolished'}
+              </div>
+              <div className="text-4xl font-black text-neo-lime tabular-nums leading-none drop-shadow-[0_0_8px_rgba(191,255,0,0.3)]">
+                <ScoreCountUp to={totalTilesCleared} duration={1400} delay={prefersReduced ? 0 : 300} />
+              </div>
+            </div>
+            {/* Intensity meter */}
+            <div className="shrink-0 flex flex-col items-end gap-1">
+              <div className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-neo-cream/50">
+                <Waves className="w-3 h-3" />
+                {t('blast.results.intensity') || 'Intensity'}
+              </div>
+              <div className="w-20 h-2 rounded-full bg-neo-black/60 border border-neo-white/15 overflow-hidden">
+                <motion.div
+                  className={`h-full rounded-full ${matchRecap.intensity >= 70 ? 'bg-linear-to-r from-neo-pink via-neo-orange to-neo-red' : matchRecap.intensity >= 40 ? 'bg-linear-to-r from-neo-cyan to-neo-lime' : 'bg-neo-cyan/70'}`}
+                  initial={prefersReduced ? { width: `${matchRecap.intensity}%` } : { width: 0 }}
+                  animate={{ width: `${matchRecap.intensity}%` }}
+                  transition={{ duration: 1.1, delay: 0.4 }}
+                />
+              </div>
+              <span className="text-[10px] tabular-nums text-neo-cream/60">{matchRecap.intensity}%</span>
+            </div>
+          </div>
+
+          {/* Aggregate stat chips — combined tile bonus, peak combo, total gems */}
+          <div className="grid grid-cols-3 gap-1.5 pt-2 border-t-2 border-neo-black/40">
+            <div className="flex flex-col items-center">
+              <div className="flex items-center gap-1 text-neo-cyan">
+                <Sparkles className="w-3 h-3" />
+                <span className="text-sm font-black tabular-nums">
+                  +<ScoreCountUp to={matchRecap.totalTileBonus} duration={900} delay={prefersReduced ? 0 : 500} />
+                </span>
+              </div>
+              <span className="text-[9px] uppercase tracking-wider text-neo-cream/50">
+                {t('blast.multiplayer.tileBonus') || 'Tile Bonus'}
+              </span>
+            </div>
+            <div className="flex flex-col items-center">
+              <div className="flex items-center gap-1 text-neo-orange">
+                <Flame className="w-3 h-3" />
+                <span className="text-sm font-black tabular-nums">
+                  {matchRecap.peakCombo}x
+                </span>
+              </div>
+              <span className="text-[9px] uppercase tracking-wider text-neo-cream/50">
+                {t('blast.results.peakCombo') || 'Peak Combo'}
+              </span>
+            </div>
+            <div className="flex flex-col items-center">
+              <div className="flex items-center gap-1 text-neo-purple">
+                <Gem className="w-3 h-3" />
+                <span className="text-sm font-black tabular-nums">
+                  <ScoreCountUp to={matchRecap.totalGems} duration={900} delay={prefersReduced ? 0 : 600} />
+                </span>
+              </div>
+              <span className="text-[9px] uppercase tracking-wider text-neo-cream/50">
+                {t('blast.results.totalGems') || 'Gems'}
+              </span>
+            </div>
+          </div>
+        </div>
+      </motion.div>
+
       {/* ── Section header ── */}
       <motion.div variants={v} className="flex items-center gap-2 px-1">
         <Sparkles className="w-4 h-4 text-neo-orange" />

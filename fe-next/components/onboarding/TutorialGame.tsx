@@ -83,7 +83,7 @@ const TutorialGame: React.FC<TutorialGameProps> = ({ onComplete }) => {
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.2, type: 'spring', stiffness: 300, damping: 26 }}
-        className="flex items-center gap-3 mb-4"
+        className="flex items-center gap-3 lg:gap-4 mb-4 lg:mb-6"
       >
         <Mascot variant="encouraging" size="sm" clipBorder="none" />
         <div className="bg-neo-cream border-3 border-neo-black rounded-neo p-3 shadow-hard-sm relative max-w-xs">
@@ -113,7 +113,7 @@ const TutorialGame: React.FC<TutorialGameProps> = ({ onComplete }) => {
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ delay: 0.4, type: 'spring', stiffness: 280, damping: 26 }}
-        className="w-full max-w-sm"
+        className="w-full max-w-sm lg:max-w-md"
       >
         <MiniGrid
           size={4}

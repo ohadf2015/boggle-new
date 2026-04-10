@@ -8,7 +8,6 @@ import { Trophy } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import GridComponent, { type HighlightedCell } from '@/components/GridComponent';
-import DesktopWordInput from '@/components/grid/DesktopWordInput';
 import CircularTimer from '@/components/CircularTimer';
 import RoomChat from '@/components/RoomChat';
 import WordFormingArea, { type WordFeedback } from '../../WordFormingArea';
@@ -572,7 +571,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
               comboGlow
             )}
           >
-            <div className="relative w-full max-w-[min(600px,92vw)] lg:max-w-[clamp(300px,48dvh,520px)] mx-auto">
+            <div className="relative w-full max-w-[min(600px,92vw)] lg:max-w-[clamp(300px,48dvh,520px)] mx-auto aspect-square">
               <GridComponent
                 key={isPlaying ? 'playing-grid' : 'spectating-grid'}
                 grid={letterGrid}
@@ -604,14 +603,6 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
                 />
               )}
             </div>
-
-            {/* Desktop word input - visible typing field */}
-            <DesktopWordInput
-              grid={letterGrid}
-              language={gameLanguage}
-              enabled={isPlaying && !showStartAnimation}
-              onWordSubmit={onWordSubmit}
-            />
 
             {/* Desktop keyboard input hint - appears below grid */}
             {isPlaying && isDesktop && (
@@ -662,6 +653,15 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
         {/* Right Column: Leaderboard + Chat (Desktop) */}
         {!gameplayFocusMode && (
           <div className="hidden lg:flex lg:flex-col lg:w-56 xl:w-64 2xl:w-72 gap-2 shrink-0 min-h-0 overflow-y-auto">
+            {/* Live race-track leaderboard with avatars (multiplayer only) */}
+            {leaderboard && leaderboard.length > 1 && (
+              <CompactLeaderboard
+                players={compactLeaderboardPlayers}
+                currentUsername={username}
+                t={t}
+                comboEvent={blastComboSync}
+              />
+            )}
             <GameLeaderboard
               leaderboard={deferredLeaderboard}
               username={username}

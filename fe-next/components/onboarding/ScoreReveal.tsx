@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { RotateCcw, ArrowRight, Sparkles, Trophy } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
-import { fireVictoryConfetti } from '@/utils/confettiUtils';
+import { fireVictoryConfetti, fireFireworks } from '@/utils/confettiUtils';
 
 // Generated once at module load — avoids impure Math.random calls during render
 const SPARKLE_COLORS = ['text-neo-lime', 'text-neo-pink', 'text-neo-cyan'] as const;
@@ -50,8 +50,46 @@ const ScoreReveal: React.FC<ScoreRevealProps> = ({
     return Math.min(Math.round((score / max) * 100), 100);
   }, [score, averageScore]);
 
+  // Count-up animation: climb from 0 → score over ~900ms.
+  // Starts slightly after mount so the user sees the ring/trophy land first,
+  // then watches the number tick up — a classic arcade reveal beat.
+  const [displayScore, setDisplayScore] = useState(0);
+  useEffect(() => {
+    const target = Math.max(0, Math.floor(score));
+    const durationMs = 900;
+    const startDelayMs = 350;
+    let rafId: number | null = null;
+    let startTime: number | null = null;
+
+    const startTimer = setTimeout(() => {
+      const tick = (now: number) => {
+        if (startTime === null) startTime = now;
+        const elapsed = now - startTime;
+        const progress = Math.min(elapsed / durationMs, 1);
+        // easeOutCubic — fast start, gentle settle
+        const eased = 1 - Math.pow(1 - progress, 3);
+        setDisplayScore(Math.round(target * eased));
+        if (progress < 1) {
+          rafId = requestAnimationFrame(tick);
+        }
+      };
+      rafId = requestAnimationFrame(tick);
+    }, startDelayMs);
+
+    return () => {
+      clearTimeout(startTimer);
+      if (rafId !== null) cancelAnimationFrame(rafId);
+    };
+  }, [score]);
+
   useEffect(() => {
     fireVictoryConfetti();
+    // Follow the opening burst with staggered firework bursts (~1.4s long),
+    // so the celebration feels earned rather than a single pop.
+    const cancelFireworks = fireFireworks(3, 1400);
+    return () => {
+      cancelFireworks();
+    };
   }, []);
 
   return (
@@ -60,7 +98,7 @@ const ScoreReveal: React.FC<ScoreRevealProps> = ({
       initial={{ scale: 0.9, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
       transition={{ type: 'spring', stiffness: 300, damping: 26 }}
-      className="w-full max-w-sm mx-auto relative"
+      className="w-full max-w-sm lg:max-w-md mx-auto relative"
       dir={dir}
     >
       {/* Floating sparkle decorations — positions randomized per render */}
@@ -126,10 +164,11 @@ const ScoreReveal: React.FC<ScoreRevealProps> = ({
               )}
             />
             <div
-              className="text-7xl font-black text-neo-lime relative"
+              className="text-7xl font-black text-neo-lime relative tabular-nums"
               style={{ WebkitTextStroke: '2.5px black' }}
+              aria-label={String(score)}
             >
-              {score}
+              {displayScore}
             </div>
           </div>
           {isAboveAverage && (

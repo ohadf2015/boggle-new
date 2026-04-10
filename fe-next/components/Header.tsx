@@ -43,19 +43,36 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
     }, []);
 
     return (
-        <header
-            className={cn(
-                "w-full mb-1 sm:mb-2 lg:mb-3 pb-1 lg:pb-2",
-                "sticky lg:static",
-                "z-[60] bg-slate-50 dark:bg-slate-900",
-                "min-h-[60px] sm:min-h-[70px] lg:min-h-[80px]",
-                className
-            )}
-            style={{
-                top: 0,
-                paddingTop: safeArea.top > 0 ? `${safeArea.top}px` : undefined,
-            }}
-        >
+        <>
+            {/* Invisible spacer sibling — reserves flow space for the fixed header.
+                Classic "fixed header + spacer" pattern: avoids the `position: sticky`
+                failure modes when ancestors use overflow/flex-centering. Mirrors the
+                header's responsive height + safe-area top inset. */}
+            <div
+                aria-hidden="true"
+                className={cn(
+                    "h-header pb-1 lg:pb-2",
+                    "min-h-[60px] sm:min-h-[70px] lg:min-h-[80px]"
+                )}
+                style={{
+                    paddingTop: safeArea.top > 0 ? `${safeArea.top}px` : undefined,
+                }}
+            />
+            <header
+                className={cn(
+                    "pb-1 lg:pb-2",
+                    // Always fixed so it cannot silently lose its flow slot when an
+                    // ancestor has overflow/flex-centering (which breaks `sticky`).
+                    // Flow space is reserved by the sibling spacer div above.
+                    "fixed top-0 left-0 right-0",
+                    "z-[60] bg-slate-50 dark:bg-slate-900",
+                    "min-h-[60px] sm:min-h-[70px] lg:min-h-[80px]",
+                    className
+                )}
+                style={{
+                    paddingTop: safeArea.top > 0 ? `${safeArea.top}px` : undefined,
+                }}
+            >
             {/* NEO-BRUTALIST Header Bar */}
             <div
                 className={cn(
@@ -105,7 +122,8 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                 currentXp={profile?.total_xp || 0}
                 currentCoins={profile?.total_coins || 0}
             />
-        </header>
+            </header>
+        </>
     );
 });
 

@@ -22,12 +22,13 @@ interface HomePageClientProps {
 }
 
 /**
- * Gate: new mobile users → OnboardingFlow (no LandingView hooks run).
- * Returning/desktop users → LandingView immediately.
+ * Gate: new users (mobile AND desktop) → OnboardingFlow. Returning users → LandingView.
  *
- * The check is synchronous (localStorage) so there's no flash of landing page
- * before the onboarding renders. Auth-based returning-player detection is
- * handled inside LandingView for the edge case of cleared localStorage.
+ * Detection is purely localStorage-based (`hasCompletedOnboarding`) — there is
+ * no viewport branching, both form factors run the same FTUE. The check is
+ * synchronous so there's no flash of LandingView before the onboarding renders.
+ * Auth-based returning-player detection is handled inside LandingView for the
+ * edge case of cleared localStorage.
  */
 export default function HomePageClient({ initialData }: HomePageClientProps): React.JSX.Element {
   const { isOnCrazyGamesPlatform, isLoading: isCrazyGamesLoading } = useCrazyGames();

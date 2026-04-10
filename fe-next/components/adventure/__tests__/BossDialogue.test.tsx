@@ -6,6 +6,7 @@
  */
 
 import React from 'react';
+import { vi, describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import BossDialogue from '../BossDialogue';
 import type { BossConfig } from '@/types/boss';
@@ -81,6 +82,14 @@ const mockBoss: BossConfig = {
   personality: 'A prim owl schoolteacher',
   visualTheme: 'school-owl',
   imagePath: '/images/adventure/bosses/ms-grammar.webp',
+  images: {
+    idle: '/images/adventure/bosses/ms-grammar.webp',
+    attack: '/images/adventure/bosses/ms-grammar.webp',
+    hurt: '/images/adventure/bosses/ms-grammar.webp',
+    enraged: '/images/adventure/bosses/ms-grammar.webp',
+    defeated: '/images/adventure/bosses/ms-grammar.webp',
+  },
+  storylineIntro: 'adventure.bosses.msGrammar.storylineIntro',
   twistMechanic: {
     type: 'popQuiz',
     description: 'adventure.bosses.msGrammar.mechanic',
@@ -144,12 +153,15 @@ describe('BossDialogue', () => {
   });
 
   describe('positioning', () => {
-    it('should position at top by default (below header and HP bar)', () => {
+    it('should position at top by default, clear of header AND boss HUD strip', () => {
       render(<BossDialogue {...defaultProps} />);
 
       const container = screen.getByTestId('boss-dialogue');
-      // Positioned below header and HP bar for visibility
-      expect(container).toHaveClass('top-28');
+      // top-32 sits below the header (top-0..12) AND the boss HUD strip (top-12..28)
+      // so the dialogue does not clip the boss HP bar.
+      expect(container).toHaveClass('top-32');
+      expect(container).toHaveClass('sm:top-36');
+      expect(container).not.toHaveClass('top-28');
       expect(container).not.toHaveClass('bottom-4');
     });
 
@@ -158,7 +170,7 @@ describe('BossDialogue', () => {
 
       const container = screen.getByTestId('boss-dialogue');
       expect(container).toHaveClass('bottom-4');
-      expect(container).not.toHaveClass('top-28');
+      expect(container).not.toHaveClass('top-32');
     });
   });
 

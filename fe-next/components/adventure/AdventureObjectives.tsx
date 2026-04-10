@@ -204,10 +204,10 @@ const AdventureObjectives = memo<AdventureObjectivesProps>(
 
               {/* Label and Progress */}
               <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between gap-2">
+                <div className="flex items-start justify-between gap-2">
                   <span
                     className={cn(
-                      'text-sm font-bold truncate',
+                      'text-sm font-bold leading-snug break-words min-w-0',
                       objective.isComplete
                         ? 'text-neo-lime'
                         : objective.isPrimary
@@ -219,7 +219,7 @@ const AdventureObjectives = memo<AdventureObjectivesProps>(
                   </span>
                   <span
                     className={cn(
-                      'text-sm font-mono font-black tabular-nums',
+                      'shrink-0 text-sm font-mono font-black tabular-nums leading-snug',
                       objective.isComplete
                         ? 'text-neo-lime'
                         : 'text-neo-white/80'

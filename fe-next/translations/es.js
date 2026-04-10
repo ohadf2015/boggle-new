@@ -3876,21 +3876,6 @@ const es = {
     "multiDirection": "¡Desliza en cualquier dirección! Las palabras pueden zigzaguear por la grilla."
   },
   "training": {
-    "gateway": {
-      "title": "¿Nuevo en LexiClash?",
-      "subtitle": "¡Un entrenamiento rápido te ayudará a dominar los controles!",
-      "demoHint": "¡Desliza en cualquier dirección - incluso diagonal!",
-      "benefitsTitle": "El entrenamiento te ayuda a:",
-      "benefits": {
-        "learnControls": "Aprender los controles de deslizamiento",
-        "masterDirections": "Dominar las 8 direcciones",
-        "noPressure": "Practicar sin presión de tiempo"
-      },
-      "returnNote": "¡Después del entrenamiento estarás listo para el reto real!",
-      "startTraining": "¡A Calentar!",
-      "skipAnyway": "Saltar, ya sé jugar",
-      "dontShowAgain": "No mostrar de nuevo"
-    },
     "hints": {
       "tryDiagonal": "¡Prueba arrastrar en diagonal!",
       "changeDirection": "Pro tip: ¡Cambia dirección a mitad de palabra!",
@@ -4333,6 +4318,8 @@ const es = {
     "multiplayerDesc": "¡Compite con amigos en tiempo real!",
     "arena": "Multijugador",
     "arenaDesc": "¡Juega solo o desafía amigos!",
+    "quickPlay": "Juego Rápido",
+    "quickPlayDesc": "Entra ya — modo aleatorio vs bots",
     "practice": "Práctica",
     "practiceDesc": "Sin presión, solo palabras",
     "brainTraining": "Entrenamiento Cerebral",
@@ -7906,7 +7893,7 @@ const es = {
     "ready": {
       "title": "Modo Blast",
       "subtitle": "¡Limpia fichas formando palabras. Encadena combos para grandes puntuaciones!",
-      "play": "¡A jugar!",
+      "play": "Empezar desde el principio",
       "resume": "Continuar ola {wave}",
       "step1Title": "Desliza palabras",
       "step1Desc": "Arrastra sobre letras adyacentes para formar palabras",

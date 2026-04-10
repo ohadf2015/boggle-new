@@ -1,6 +1,6 @@
 'use client';
 
-import { memo } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { Lock } from 'lucide-react';
 import type { BlastTileType } from './types';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
@@ -189,6 +189,15 @@ export const BlastTile = memo(function BlastTile({
   const reducedMotion = usePrefersReducedMotion();
   const { t } = useLanguage();
 
+  // Track which activation effect is currently "live" (animation in flight).
+  // CSS keyframes use `animation-fill-mode: forwards`, so if we keep the class on the
+  // element after the animation finishes, the final frame freezes on screen permanently.
+  // We clear the live flag in `onAnimationEnd` (below) so the class drops off cleanly.
+  const [liveActivationEffect, setLiveActivationEffect] = useState<string | null>(activationEffect ?? null);
+  useEffect(() => {
+    if (activationEffect) setLiveActivationEffect(activationEffect);
+  }, [activationEffect]);
+
   if (isCleared) {
     return <div className="aspect-square opacity-0 pointer-events-none" aria-hidden="true" />;
   }
@@ -214,6 +223,14 @@ export const BlastTile = memo(function BlastTile({
     <button
       type="button"
       onClick={onClick}
+      onAnimationEnd={(e) => {
+        // Clear the live activation-effect flag when its own keyframe finishes.
+        // Name-guarding prevents other keyframes (falling, appearing, etc.) from clearing it.
+        const name = e.animationName;
+        if (name === 'blast-frost-shatter' || name === 'blast-tile-birth' || name === 'blast-shuffle-rearrange') {
+          setLiveActivationEffect(null);
+        }
+      }}
       className={[
         'relative aspect-square flex items-center justify-center',
         'rounded-neo',
@@ -228,9 +245,9 @@ export const BlastTile = memo(function BlastTile({
         type !== 'standard' ? `blast-tile-${type}` : '',
         getCrackClass(type, hitsRemaining),
         getSpecialEffectClasses(type, phase, hitsRemaining),
-        activationEffect === 'frost-free' ? 'blast-tile-frost-shatter' : '',
-        activationEffect === 'tile-earned' ? 'blast-tile-earned' : '',
-        activationEffect === 'shuffle-rearrange' ? 'blast-tile-shuffle-rearrange' : '',
+        liveActivationEffect === 'frost-free' ? 'blast-tile-frost-shatter' : '',
+        liveActivationEffect === 'tile-earned' ? 'blast-tile-earned' : '',
+        liveActivationEffect === 'shuffle-rearrange' ? 'blast-tile-shuffle-rearrange' : '',
         (type === 'prism' && effectivePhase === 'clearing') ? 'blast-tile-prism-flash' : '',
         RARE_LETTERS.has(letter.toUpperCase()) ? 'blast-rare-letter' : '',
         isComboPreview ? 'blast-combo-preview' : '',

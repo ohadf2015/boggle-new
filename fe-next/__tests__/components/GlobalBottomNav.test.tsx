@@ -105,9 +105,8 @@ describe('GlobalBottomNav', () => {
         mockUseDailyMissions.mockReturnValue({
             missions: [
                 { type: 'wordHunt', completed: false, href: '/daily' },
-                { type: 'brainDrill', completed: false, href: '/drill' },
                 { type: 'adventure', completed: false, href: '/adventure' },
-                { type: 'community', completed: false, href: '/community' },
+                { type: 'community', completed: false, href: '/multiplayer' },
             ],
             completedCount: 0,
             isGrandSlam: false,
@@ -414,9 +413,8 @@ describe('GlobalBottomNav', () => {
             mockUseDailyMissions.mockReturnValue({
                 missions: [
                     { type: 'wordHunt', completed: true, href: '/daily' },
-                    { type: 'brainDrill', completed: false, href: '/drill' },
                     { type: 'adventure', completed: false, href: '/adventure' },
-                    { type: 'community', completed: true, href: '/community' },
+                    { type: 'community', completed: true, href: '/multiplayer' },
                 ],
                 completedCount: 2,
                 isGrandSlam: false,
@@ -431,16 +429,15 @@ describe('GlobalBottomNav', () => {
             expect(badge).toHaveTextContent('2');
         });
 
-        it('should show full progress when all 3 quests completed (excludes brain drill)', () => {
+        it('should show full progress when all 3 quests completed', () => {
             mockUseDailyMissions.mockReturnValue({
                 missions: [
                     { type: 'wordHunt', completed: true, href: '/daily' },
-                    { type: 'brainDrill', completed: false, href: '/drill' },
                     { type: 'adventure', completed: true, href: '/adventure' },
-                    { type: 'community', completed: true, href: '/community' },
+                    { type: 'community', completed: true, href: '/multiplayer' },
                 ],
                 completedCount: 3,
-                isGrandSlam: false,
+                isGrandSlam: true,
                 grandSlamClaimed: false,
                 loading: false,
                 refresh: vi.fn(),
@@ -450,26 +447,6 @@ describe('GlobalBottomNav', () => {
             const badge = screen.getByTestId('quest-progress-badge');
             expect(badge).toBeInTheDocument();
             expect(badge).toHaveTextContent('3');
-        });
-
-        it('should not count brain drill toward quest progress', () => {
-            mockUseDailyMissions.mockReturnValue({
-                missions: [
-                    { type: 'wordHunt', completed: false, href: '/daily' },
-                    { type: 'brainDrill', completed: true, href: '/drill' },
-                    { type: 'adventure', completed: false, href: '/adventure' },
-                    { type: 'community', completed: false, href: '/community' },
-                ],
-                completedCount: 1,
-                isGrandSlam: false,
-                grandSlamClaimed: false,
-                loading: false,
-                refresh: vi.fn(),
-            });
-
-            render(<GlobalBottomNav />);
-            // Brain drill alone should not show badge
-            expect(screen.queryByTestId('quest-progress-badge')).not.toBeInTheDocument();
         });
     });
 

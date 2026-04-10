@@ -15,6 +15,7 @@ import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/Ada
 import { PageLoader } from '@/components/ui/PageLoader';
 import { PlayfulBackground } from '@/components/ui/PlayfulBackground';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
+import { AdventureThemeProvider } from '@/contexts/AdventureThemeContext';
 import { useProgressionData } from '@/contexts/ProgressionContext';
 import { useEndlessMode } from '@/hooks/useEndlessMode';
 import { generateAdventureGrid } from '@/lib/adventure';
@@ -200,12 +201,20 @@ export default function EndlessPageClient(): React.JSX.Element {
               </div>
 
               <div className="flex-1">
-                <AdventureGame
-                  levelConfig={levelConfig}
-                  initialGrid={grid}
-                  onLevelComplete={handleFloorComplete}
-                  onExit={handleExit}
-                />
+                {/* AdventureGame depends on AdventureThemeContext (boss HUD, dialogue,
+                    arena styling). Without this provider it throws "useAdventureTheme
+                    must be used within AdventureThemeProvider" on every endless floor. */}
+                <AdventureThemeProvider
+                  initialWorldId={levelConfig.world}
+                  initialLevel={levelConfig.level}
+                >
+                  <AdventureGame
+                    levelConfig={levelConfig}
+                    initialGrid={grid}
+                    onLevelComplete={handleFloorComplete}
+                    onExit={handleExit}
+                  />
+                </AdventureThemeProvider>
               </div>
             </AdaptiveMotion.div>
           )}

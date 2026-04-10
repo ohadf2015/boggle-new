@@ -59,6 +59,9 @@ export interface ProfileData {
   streak_days?: number;
   // Feature Access (admin-granted)
   blast_access?: boolean;
+  // Practice graduation: set once when player crosses 20 total words.
+  // Used by useIsPracticeVeteran to hide practice/single-player affordances.
+  practice_graduated_at?: string | null;
   // Role-based access control
   user_role?: 'student' | 'teacher' | 'admin';
 }

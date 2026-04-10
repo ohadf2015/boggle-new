@@ -927,7 +927,11 @@
 
 /* Page content with bottom nav awareness
    Uses --mobile-bottom-safe (nav height 64px + device safe area)
-   to prevent content from being hidden behind the fixed bottom nav */
+   to prevent content from being hidden behind the fixed bottom nav.
+   Top-spacing for the fixed <Header /> is handled by a sibling spacer the
+   Header component renders itself — this class intentionally only handles the
+   bottom. Pages without a Header (e.g. loading skeletons with their own inline
+   header) keep working unchanged. */
 .page-content-safe {
   padding-bottom: var(--mobile-bottom-safe);
 }

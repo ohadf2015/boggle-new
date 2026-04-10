@@ -35,7 +35,7 @@ export interface LevelCompleteContentProps {
   goldEarned?: number;
   isLastLevelOfWorld: boolean;
   onNextWorld?: () => void;
-  lootDrops: Array<{ type: string; rarity: string; label?: string }>;
+  lootDrops: Array<{ type: string; rarity: string; label?: string; quantity?: number }>;
   storyBeatText?: string;
   canRetryFree: boolean;
   nextLevelPreview?: { worldName: string; levelNumber: number; mechanic?: string } | null;

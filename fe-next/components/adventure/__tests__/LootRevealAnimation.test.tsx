@@ -5,6 +5,7 @@
  */
 
 import React from 'react';
+import { vi, describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { LootRevealAnimation } from '../LootRevealAnimation';
 
@@ -67,5 +68,25 @@ describe('LootRevealAnimation', () => {
     render(<LootRevealAnimation drops={commonDrop} />);
     const item = screen.getByTestId('loot-item');
     expect(item.className).toMatch(/neo-cyan/);
+  });
+
+  it('renders a prominent rune-fragment callout when runeFragment drops are present', () => {
+    const drops = [
+      { type: 'gold', rarity: 'common', label: 'Gold' },
+      { type: 'runeFragment', rarity: 'rare', quantity: 2 },
+    ];
+    render(<LootRevealAnimation drops={drops} />);
+
+    const callout = screen.getByTestId('loot-rune-fragment-callout');
+    expect(callout).toBeInTheDocument();
+    // Highlights total fragments earned this level
+    expect(callout.textContent).toContain('2');
+    // Uses the dedicated translation key (mocked to identity)
+    expect(callout.textContent).toContain('adventure.runes.fragmentEarned');
+  });
+
+  it('omits the rune-fragment callout when no fragments dropped', () => {
+    render(<LootRevealAnimation drops={sampleDrops} />);
+    expect(screen.queryByTestId('loot-rune-fragment-callout')).toBeNull();
   });
 });

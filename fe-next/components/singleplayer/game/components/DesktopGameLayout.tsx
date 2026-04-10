@@ -1,12 +1,11 @@
 'use client';
 
-import React, { useState, useCallback } from 'react';
+import React from 'react';
 import { ArrowLeft, Pause, Play, Coins } from 'lucide-react';
 import WordFormingArea, { type WordFeedback } from '@/components/game/WordFormingArea';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import GridComponent from '@/components/GridComponent';
 import DesktopInputHint from '@/components/grid/DesktopInputHint';
-import DesktopWordInput from '@/components/grid/DesktopWordInput';
 import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
 import { TrainingProgressBar } from '@/components/training';
 import { shouldShowKeyboardTrails } from '@/components/game/keyboardTrailsUtils';
@@ -146,25 +145,12 @@ export function DesktopGameLayout({
   const tSafe = React.useCallback((key: string) => t(key) || key, [t]);
   const isPracticeMode = mode === 'practice';
 
-  // Desktop input state — highlight from visible text input
-  const [desktopInputHighlight, setDesktopInputHighlight] = useState<Array<{ row: number; col: number }>>([]);
-  const [isDesktopInputTyping, setIsDesktopInputTyping] = useState(false);
-
-  const handleDesktopHighlight = useCallback((cells: Array<{ row: number; col: number }>) => {
-    setDesktopInputHighlight(cells);
-  }, []);
-  const handleDesktopTypingMode = useCallback((typing: boolean) => {
-    setIsDesktopInputTyping(typing);
-  }, []);
-
-  // Compute highlighted path for grid — desktop input takes priority over keyboard global listener
-  const gridHighlightedPath = isDesktopInputTyping && desktopInputHighlight.length > 0
-    ? desktopInputHighlight
-    : shouldShowKeyboardTrails(keyboardInput.isTypingMode, lastWordFoundTimeRef.current, undefined)
-      ? keyboardInput.highlightedCells
-      : tutorialPath
-        ? tutorialPath.map(p => ({ row: p.row, col: p.col }))
-        : highlightedPath;
+  // Compute highlighted path for grid — keyboard trails take priority over tutorial/reveal
+  const gridHighlightedPath = shouldShowKeyboardTrails(keyboardInput.isTypingMode, lastWordFoundTimeRef.current, undefined)
+    ? keyboardInput.highlightedCells
+    : tutorialPath
+      ? tutorialPath.map(p => ({ row: p.row, col: p.col }))
+      : highlightedPath;
 
   return (
     <div className="game-view-container relative flex h-full w-full bg-neo-navy overflow-hidden">
@@ -193,12 +179,16 @@ export function DesktopGameLayout({
         t={tSafe}
       />
 
-      {/* 3-Column Desktop Layout */}
+      {/* 3-Column Desktop Layout — practice mode uses narrower sidebars for a calmer layout */}
       <div
-        className="flex w-full h-full max-h-full gap-3 p-3 overflow-hidden"
+        className={isPracticeMode ? "flex w-full h-full max-h-full gap-6 p-6 overflow-hidden" : "flex w-full h-full max-h-full gap-3 p-3 overflow-hidden"}
         style={{
           display: 'grid',
-          gridTemplateColumns: isTv ? '300px 1fr 300px' : '230px 1fr 230px',
+          gridTemplateColumns: isTv
+            ? '300px 1fr 300px'
+            : isPracticeMode
+              ? '200px 1fr 240px'
+              : '230px 1fr 230px',
           gridTemplateRows: '1fr',
         }}
       >
@@ -235,23 +225,27 @@ export function DesktopGameLayout({
               {t('common.quit')}
             </button>
 
-            {/* Coins display - center, yellow tilted badge */}
-            <AdaptiveMotion.div
-              data-coin-target
-              initial={{ scale: 0, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              className="flex items-center gap-1.5 bg-yellow-400 border-3 border-neo-black rounded-lg px-2 py-1 shadow-hard-sm transform -rotate-1 hover:scale-105 transition-transform"
-            >
-              <div className="bg-black/10 rounded-full p-1">
-                <Coins className="w-4 h-4 text-neo-black" />
-              </div>
-              <div className="flex flex-col leading-none">
-                <span className="font-black text-base text-neo-black">
-                  {score > 0 ? COIN_EARNING_OTHER.SINGLEPLAYER_BASE + Math.floor(score / COIN_EARNING_OTHER.SCORE_DIVISOR) : 0}
-                </span>
-                <span className="text-[8px] font-bold text-neo-black/60 uppercase">{t('common.coins')}</span>
-              </div>
-            </AdaptiveMotion.div>
+            {/* Coins display - hidden in practice mode (learning surface, no economy) */}
+            {isPracticeMode ? (
+              <div className="flex-1" aria-hidden="true" />
+            ) : (
+              <AdaptiveMotion.div
+                data-coin-target
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                className="flex items-center gap-1.5 bg-yellow-400 border-3 border-neo-black rounded-lg px-2 py-1 shadow-hard-sm transform -rotate-1 hover:scale-105 transition-transform"
+              >
+                <div className="bg-black/10 rounded-full p-1">
+                  <Coins className="w-4 h-4 text-neo-black" />
+                </div>
+                <div className="flex flex-col leading-none">
+                  <span className="font-black text-base text-neo-black">
+                    {score > 0 ? COIN_EARNING_OTHER.SINGLEPLAYER_BASE + Math.floor(score / COIN_EARNING_OTHER.SCORE_DIVISOR) : 0}
+                  </span>
+                  <span className="text-[8px] font-bold text-neo-black/60 uppercase">{t('common.coins')}</span>
+                </div>
+              </AdaptiveMotion.div>
+            )}
 
             {/* Pause/Finish - btn-neo pink */}
             {isPracticeMode ? (
@@ -293,28 +287,31 @@ export function DesktopGameLayout({
             <WordFormingArea word={keyboardInput.isTypingMode ? keyboardInput.typedWord : formedWord} letterCount={(keyboardInput.isTypingMode ? keyboardInput.typedWord : formedWord).length} feedback={currentFeedback} compact />
           </div>
 
+          {/* Instruction Banner - inline above grid (not absolute) so it never clips the top row.
+              Hidden entirely in practice mode to keep the learning surface calm. */}
+          {!isPracticeMode && (
+            <div className="w-full flex justify-center shrink-0 min-h-[2.25rem]">
+              <AdaptiveAnimatePresence>
+                {showHintPrompt && !isPaused && !isGameOver && remainingTime > 0 && (
+                  <AdaptiveMotion.div
+                    initial={{ opacity: 0, y: -6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -6 }}
+                  >
+                    <div className="bg-linear-to-r from-neo-pink to-pink-400 text-white text-center py-1.5 px-5 rounded-lg border-3 border-neo-black shadow-hard-sm">
+                      <span className="font-bold text-sm uppercase tracking-wide">
+                        {t('singlePlayer.dragInstruction')}
+                      </span>
+                    </div>
+                  </AdaptiveMotion.div>
+                )}
+              </AdaptiveAnimatePresence>
+            </div>
+          )}
+
           {/* Game Grid - centered with aspect ratio maintained */}
           <div className="flex-1 flex items-center justify-center w-full min-h-0 overflow-hidden relative" style={{ containerType: 'size' }}>
-            {/* Instruction Banner - Absolute overlay, doesn't shift grid */}
-            <AdaptiveAnimatePresence>
-              {showHintPrompt && !isPaused && !isGameOver && remainingTime > 0 && (
-                <AdaptiveMotion.div
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  className="absolute top-2 inset-s-4 inset-e-4 z-40"
-                >
-                  <div className="relative bg-linear-to-r from-neo-pink to-pink-400 text-white text-center py-2 px-6 rounded-lg border-3 border-neo-black shadow-hard-sm">
-                    <span className="font-bold text-sm uppercase tracking-wide">
-                      {t('singlePlayer.dragInstruction')}
-                    </span>
-                    <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-neo-pink border-b-3 border-r-3 border-neo-black rotate-45" />
-                  </div>
-                </AdaptiveMotion.div>
-              )}
-            </AdaptiveAnimatePresence>
-
-            <div className="desktop-grid-container game-board-container" style={{ width: 'min(100cqw, 95cqh)', height: 'min(100cqw, 95cqh)', maxWidth: '520px', maxHeight: '520px' }}>
+            <div className="desktop-grid-container game-board-container" style={{ width: 'min(96cqw, 90cqh)', height: 'min(96cqw, 90cqh)', maxWidth: isPracticeMode ? '560px' : '520px', maxHeight: isPracticeMode ? '560px' : '520px' }}>
               <GridComponent
                 grid={grid}
                 interactive={!isPaused}
@@ -329,17 +326,9 @@ export function DesktopGameLayout({
                 earthquakeShaking={earthquakeState === 'shaking'}
                 highlightedPath={gridHighlightedPath}
                 language={language}
-                isTypingMode={keyboardInput.isTypingMode || isDesktopInputTyping}
+                isTypingMode={keyboardInput.isTypingMode}
               />
               <DesktopInputHint wordSubmitted={foundWords.length > 0} />
-              <DesktopWordInput
-                grid={grid}
-                language={language}
-                enabled={!isPaused && !isGameOver}
-                onWordSubmit={onWordSubmit}
-                onHighlightChange={handleDesktopHighlight}
-                onTypingModeChange={handleDesktopTypingMode}
-              />
             </div>
           </div>
         </div>

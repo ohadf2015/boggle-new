@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight, Check } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { SUPPORTED_GAME_LANGUAGES, LANGUAGE_CONFIG } from '@/lib/languageConfig';
 import { cn } from '@/lib/utils';
+import { fireOnboardingBurst } from '@/utils/confettiUtils';
 import type { Language } from '@/types';
 
 interface LanguageSelectProps {
@@ -20,26 +21,37 @@ const LanguageSelect: React.FC<LanguageSelectProps> = ({ onSelect }) => {
   const { language, setLanguage, t } = useLanguage();
   const [selected, setSelected] = useState<Language>(language);
 
-  const handleSelect = (lang: Language) => {
+  const handleSelect = useCallback((lang: Language) => {
     if (lang === selected) {
       onSelect();
       return;
     }
     setSelected(lang);
     setLanguage(lang);
-  };
+    // Celebratory burst from the tapped card area — gives tactile feedback
+    // that language actually changed under the hood.
+    fireOnboardingBurst({ y: 0.45 });
+  }, [selected, onSelect, setLanguage]);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[60vh] max-w-sm mx-auto gap-5">
+    <div className="flex flex-col items-center justify-center min-h-[60vh] max-w-sm lg:max-w-2xl mx-auto gap-5 lg:gap-7">
       {/* Brand hero — animated LexiClash wordmark */}
       <motion.div
         initial={{ opacity: 0, y: -16, scale: 0.92 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ type: 'spring', stiffness: 300, damping: 24 }}
-        className="text-center mb-1"
+        className="text-center mb-1 relative"
       >
+        {/* Soft breathing halo behind the wordmark */}
+        <motion.div
+          aria-hidden
+          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[160%] rounded-full pointer-events-none"
+          style={{ background: 'radial-gradient(circle, rgba(191,255,0,0.25) 0%, transparent 60%)' }}
+          animate={{ scale: [1, 1.08, 1], opacity: [0.55, 0.9, 0.55] }}
+          transition={{ duration: 3.2, repeat: Infinity, ease: 'easeInOut' }}
+        />
         <motion.h1
-          className="text-4xl font-neo-display font-black text-neo-lime tracking-tight"
+          className="relative text-4xl lg:text-6xl font-neo-display font-black text-neo-lime tracking-tight"
           style={{ WebkitTextStroke: '1.5px rgba(0,0,0,0.3)' }}
           animate={{ rotate: [0, -1.5, 1.5, 0] }}
           transition={{ delay: 0.6, duration: 0.5, ease: 'easeInOut' }}
@@ -50,14 +62,14 @@ const LanguageSelect: React.FC<LanguageSelectProps> = ({ onSelect }) => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.25 }}
-          className="text-neo-cream/60 text-sm font-neo-body mt-1"
+          className="text-neo-cream/60 text-sm lg:text-base font-neo-body mt-1 lg:mt-2"
         >
           {t('onboarding.ftue.chooseLanguage', 'Choose your language')}
         </motion.p>
       </motion.div>
 
-      {/* Language cards — two-column grid for 4 languages */}
-      <div className="grid grid-cols-2 gap-2.5 w-full px-1">
+      {/* Language cards — 2-col on mobile, 4-col on desktop so all flags sit on one row */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 lg:gap-4 w-full px-1">
         {SUPPORTED_GAME_LANGUAGES.map((lang, i) => {
           const config = LANGUAGE_CONFIG[lang];
           const isSelected = selected === lang;
@@ -114,9 +126,12 @@ const LanguageSelect: React.FC<LanguageSelectProps> = ({ onSelect }) => {
         transition={{ delay: 0.5, type: 'spring', stiffness: 300, damping: 22 }}
         whileHover={{ scale: 1.03, y: -2 }}
         whileTap={{ scale: 0.97, y: 2 }}
-        onClick={onSelect}
+        onClick={() => {
+          fireOnboardingBurst({ y: 0.7 }, ['#BFFF00', '#FFE135', '#00FFFF']);
+          onSelect();
+        }}
         className={cn(
-          'mt-1 w-full py-3.5 rounded-neo border-3 border-neo-black',
+          'mt-1 w-full lg:w-auto lg:px-12 py-3.5 lg:py-4 lg:self-center rounded-neo border-3 border-neo-black',
           'bg-neo-lime text-neo-navy font-neo-display font-black text-lg uppercase tracking-wide',
           'shadow-hard active:shadow-hard-pressed active:translate-y-[2px]',
           'transition-shadow flex items-center justify-center gap-2'

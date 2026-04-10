@@ -117,23 +117,10 @@ export function InviteCard({
               </div>
             </div>
 
-            {/* Right: Header + Share Options */}
-            <div className="flex flex-col justify-between h-full min-h-[180px] xl:min-h-[160px] py-1">
-              {/* Header */}
-              <div>
-                <div className="flex items-center gap-2 mb-2">
-                  <Share2 className="w-6 h-6 text-neo-cyan" />
-                  <h2 className="text-xl font-black uppercase text-neo-cream">
-                    {t('hostView.inviteFriends')}
-                  </h2>
-                </div>
-                <p className="text-sm text-neo-cream/70 leading-relaxed">
-                  {t('hostView.sendLinkToFriends')}
-                </p>
-              </div>
-
+            {/* Right: Share Options */}
+            <div className="flex flex-col justify-center h-full min-h-[180px] xl:min-h-[160px] py-1">
               {/* Share Buttons - stacked vertically for desktop */}
-              <div className="flex flex-col gap-3 mt-4">
+              <div className="flex flex-col gap-3">
                 <motion.button
                   data-testid="copy-link-button"
                   onClick={handleCopyLink}

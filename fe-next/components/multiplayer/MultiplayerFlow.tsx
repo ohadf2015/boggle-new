@@ -40,7 +40,7 @@ interface MultiplayerFlowProps {
     gameCode?: string,
     roomName?: string,
     overrideUsername?: string,
-    options?: { isPrivate?: boolean },
+    options?: { isPrivate?: boolean; quickPlay?: boolean },
   ) => void;
   refreshRooms: () => void;
 
@@ -55,6 +55,10 @@ interface MultiplayerFlowProps {
 
   // Auto-create room on mount (e.g., from Word Hunt banner)
   autoCreate?: boolean;
+
+  // Auto-fire Quick Play on mount (e.g., from landing Quick Play card).
+  // Mutually exclusive with autoCreate; if both are passed, autoCreate wins.
+  quickPlay?: boolean;
 
   // Profile avatar for authenticated users
   profileAvatar?: CustomAvatarConfig | null;
@@ -83,6 +87,7 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
   displayName,
   prefilledRoom,
   autoCreate,
+  quickPlay,
   defaultLanguage,
   profileAvatar,
   setGameCode,
@@ -296,9 +301,12 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
     setHostUsername(quickPlayUsername);
     setUsername(quickPlayUsername);
 
-    // Create room immediately with host playing (dual mode)
-    // Pass username as override to avoid stale closure in handleJoin
-    handleJoin(true, defaultLanguage, gameCode, roomName, quickPlayUsername);
+    // Create room immediately with host playing (dual mode).
+    // quickPlay: true tells useMultiplayerJoin to auto-emit `startGame` with
+    // a random mode as soon as the host's `joined` event arrives, so the user
+    // skips the lobby entirely. Bots get auto-filled by the backend's
+    // autoAddBotsForSoloPlayer service.
+    handleJoin(true, defaultLanguage, gameCode, roomName, quickPlayUsername, { quickPlay: true });
 
     // Show CrazyGames invite button so host can invite friends
     cgShowInvite(gameCode);
@@ -312,6 +320,20 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
       // Clipboard API not available — no-op
     }
   }, [isAuthenticated, displayName, defaultLanguage, handleJoin, setGameCode, setRoomName, setHostUsername, setUsername, t, cgShowInvite]);
+
+  // Landing Quick Play auto-fire: when the user arrives via
+  // `/multiplayer?quickPlay=true`, kick off `handleQuickPlay` exactly once on
+  // mount. We guard with a ref so React StrictMode double-invokes (and any
+  // re-renders) don't double-create rooms. `autoCreate` takes precedence so
+  // both flags can't fight.
+  const quickPlayHandledRef = useRef(false);
+  useEffect(() => {
+    if (!quickPlay) return;
+    if (autoCreate) return;
+    if (quickPlayHandledRef.current) return;
+    quickPlayHandledRef.current = true;
+    handleQuickPlay();
+  }, [quickPlay, autoCreate, handleQuickPlay]);
 
   // CrazyGames Smart Auto-Join: join an open room or quick-play on first load
   useEffect(() => {

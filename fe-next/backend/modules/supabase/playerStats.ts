@@ -123,7 +123,7 @@ export async function updatePlayerStats(
   // First, get current profile (only fields needed for stats update)
   let { data: profile, error: fetchError } = await client
     .from('profiles')
-    .select('id, username, avatar_emoji, avatar_color, total_games, total_score, total_words, casual_games, ranked_games, ranked_wins, casual_wins, ranked_mmr, peak_mmr, longest_word, longest_word_length, total_time_played, total_xp, current_level, player_title, last_game_at, achievement_counts, unique_days_played')
+    .select('id, username, avatar_emoji, avatar_color, total_games, total_score, total_words, casual_games, ranked_games, ranked_wins, casual_wins, ranked_mmr, peak_mmr, longest_word, longest_word_length, total_time_played, total_xp, current_level, player_title, last_game_at, achievement_counts, unique_days_played, practice_graduated_at')
     .eq('id', playerId)
     .single();
 
@@ -243,6 +243,13 @@ export async function updatePlayerStats(
   if (lastGameDate !== today) {
     updates.unique_days_played = (profile.unique_days_played || 0) + 1;
     logger.debug('SUPABASE', `Player ${playerId} played on a new day: ${today} (total: ${updates.unique_days_played})`);
+  }
+
+  // Practice graduation: mark the first moment the player crosses the 20-word threshold.
+  // This is the global "veteran" flag used to hide practice/single-player affordances.
+  const newTotalWords = (updates.total_words as number) ?? 0;
+  if (!profile.practice_graduated_at && newTotalWords >= 20) {
+    updates.practice_graduated_at = new Date().toISOString();
   }
 
   // Update longest word if this game had a longer one

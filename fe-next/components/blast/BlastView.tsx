@@ -138,24 +138,36 @@ export function BlastView() {
           <p className="text-sm text-white/60 text-center max-w-xs">
             {t('blast.ready.subtitle')}
           </p>
-          {checkpoint.checkpoint && checkpoint.resumeFromWave > 1 && (
+          {checkpoint.checkpoint && checkpoint.resumeFromWave > 1 ? (
+            <>
+              <Button
+                data-testid="resume-button"
+                size="lg"
+                onClick={handleResume}
+                className="min-h-[56px] w-full max-w-xs font-black text-xl uppercase border-3 border-neo-black shadow-hard-lg bg-neo-lime text-neo-black hover:bg-neo-lime/90"
+              >
+                {t('blast.ready.resume', { wave: checkpoint.resumeFromWave })}
+              </Button>
+              <Button
+                data-testid="play-button"
+                size="sm"
+                variant="ghost"
+                onClick={handleStart}
+                className="min-h-[40px] w-full max-w-xs font-bold text-sm uppercase text-white/70 hover:text-white underline underline-offset-4 decoration-white/40 hover:bg-transparent"
+              >
+                {t('blast.ready.play')}
+              </Button>
+            </>
+          ) : (
             <Button
-              data-testid="resume-button"
+              data-testid="play-button"
               size="lg"
-              onClick={handleResume}
-              className="min-h-[56px] w-full max-w-xs font-black text-xl uppercase border-3 border-neo-black shadow-hard-lg bg-neo-cyan text-neo-black hover:bg-neo-cyan/90"
+              onClick={handleStart}
+              className="min-h-[56px] w-full max-w-xs font-black text-xl uppercase border-3 border-neo-black shadow-hard-lg bg-neo-lime text-neo-black hover:bg-neo-lime/90"
             >
-              {t('blast.ready.resume', { wave: checkpoint.resumeFromWave })}
+              {t('blast.ready.play')}
             </Button>
           )}
-          <Button
-            data-testid="play-button"
-            size="lg"
-            onClick={handleStart}
-            className="min-h-[56px] w-full max-w-xs font-black text-xl uppercase border-3 border-neo-black shadow-hard-lg bg-neo-lime text-neo-black hover:bg-neo-lime/90"
-          >
-            {t('blast.ready.play')}
-          </Button>
         </div>
       )}
 

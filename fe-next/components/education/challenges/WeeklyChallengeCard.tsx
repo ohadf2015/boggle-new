@@ -13,12 +13,12 @@ interface WeeklyChallengeCardProps {
 export function WeeklyChallengeCard({ quest, onClaim }: WeeklyChallengeCardProps) {
   const { t } = useLanguage();
 
-  const requirementKey = quest.requirements && typeof quest.requirements === 'object'
-    ? Object.keys(quest.requirements as Record<string, unknown>)[0]
-    : null;
-  const progress = requirementKey
-    ? ((quest.current_progress as any)?.[requirementKey] / (quest.requirements as any)[requirementKey]) * 100
-    : 0;
+  // Canonical contract: requirements + current_progress are both keyed by quest.quest_type
+  const requirements = (quest.requirements ?? {}) as Record<string, number>;
+  const currentProgress = (quest.current_progress ?? {}) as Record<string, number>;
+  const target = requirements[quest.quest_type] ?? 0;
+  const current = currentProgress[quest.quest_type] ?? 0;
+  const progress = target > 0 ? (current / target) * 100 : 0;
 
   const canClaim = quest.completed && !quest.claimed;
 
@@ -36,7 +36,7 @@ export function WeeklyChallengeCard({ quest, onClaim }: WeeklyChallengeCardProps
 
       <h3 className="font-neo-display text-lg text-white mb-1">{t(quest.title)}</h3>
       <p className="text-sm text-neo-white/60 mb-3">
-        {t(quest.description, { target: requirementKey ? (quest.requirements as any)?.[requirementKey] || 0 : 0 })}
+        {t(quest.description, { target })}
       </p>
 
       <div className="relative h-6 bg-neo-navy rounded-full overflow-hidden mb-3">
@@ -47,7 +47,7 @@ export function WeeklyChallengeCard({ quest, onClaim }: WeeklyChallengeCardProps
           transition={{ type: 'spring', stiffness: 100 }}
         />
         <div className="absolute inset-0 flex items-center justify-center text-white text-sm font-bold">
-          {requirementKey ? (quest.current_progress as any)?.[requirementKey] || 0 : 0} / {requirementKey ? (quest.requirements as any)?.[requirementKey] || 0 : 0}
+          {current} / {target}
         </div>
       </div>
 

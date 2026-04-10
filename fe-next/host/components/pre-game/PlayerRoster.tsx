@@ -2,10 +2,8 @@
 
 import React, { memo, useCallback, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Crown, Bot, Plus, Minus, UserPlus, Sparkles, Brain, Zap, X } from 'lucide-react';
+import { Crown, Bot, Plus, Minus, Sparkles, Brain, Zap, X } from 'lucide-react';
 import Avatar from '../../../components/Avatar';
-import { useNativeShare } from '../../../hooks/useNativeShare';
-import { getJoinUrl, copyJoinUrl } from '../../../utils/share';
 import { useSocket } from '../../../utils/SocketContext';
 import { useLanguage } from '../../../contexts/LanguageContext';
 import { cn } from '../../../lib/utils';
@@ -74,7 +72,6 @@ const playerEntranceVariants = {
 
 export const PlayerRoster = memo(function PlayerRoster({ players, username, gameCode, maxPlayers, hostLabel, t, compact = false }: PlayerRosterProps): React.ReactElement {
   const { socket } = useSocket();
-  const { tryNativeShare } = useNativeShare();
   const { language } = useLanguage();
   const isRTL = language === 'he';
   const [showBotPicker, setShowBotPicker] = useState(false);
@@ -82,18 +79,6 @@ export const PlayerRoster = memo(function PlayerRoster({ players, username, game
   const isFull = players.length >= maxPlayers;
   const bots = players.filter(p => typeof p === 'object' && p.isBot);
   const botCount = bots.length;
-
-  const handleInvite = useCallback(async () => {
-    const joinUrl = getJoinUrl(gameCode, 'lobby-slot');
-    const shared = await tryNativeShare({
-      title: t('share.inviteTitle'),
-      text: `${t('share.inviteMessage')}\n${t('share.code')}: ${gameCode}`,
-      url: joinUrl,
-    });
-    if (!shared) {
-      copyJoinUrl(gameCode, t, 'lobby-slot');
-    }
-  }, [gameCode, t, tryNativeShare]);
 
   const handleAddBot = useCallback((difficulty: 'easy' | 'medium' | 'hard') => {
     socket?.emit('addBot', { difficulty, gameCode });
@@ -231,19 +216,8 @@ export const PlayerRoster = memo(function PlayerRoster({ players, username, game
         {/* Add players section */}
         {!isFull && (
           <div className="shrink-0 flex flex-col items-center gap-2">
-            {/* Invite + Bot buttons row */}
+            {/* Bot buttons row */}
             <div className="flex items-center gap-1.5">
-              {/* Invite player */}
-              <motion.button
-                onClick={handleInvite}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="w-9 h-9 rounded-full border-2 border-dashed border-neo-pink/30 bg-white/5 flex items-center justify-center hover:border-neo-pink/60 hover:bg-white/10 transition-colors"
-                aria-label={t('hostView.invitePlayer')}
-              >
-                <UserPlus className="w-4 h-4 text-neo-pink/50 hover:text-neo-pink transition-colors" />
-              </motion.button>
-
               {/* Add bot */}
               <div className="relative">
                 <motion.button
@@ -320,7 +294,7 @@ export const PlayerRoster = memo(function PlayerRoster({ players, username, game
               )}
             </div>
             <span className="text-[10px] font-bold text-slate-600 uppercase">
-              {t('share.invite')}
+              {t('hostView.addBot')}
             </span>
           </div>
         )}

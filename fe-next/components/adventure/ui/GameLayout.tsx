@@ -92,7 +92,7 @@ export const GameLayout = memo(function GameLayout({
                   'min-h-20 max-h-48 shrink-2',
                   // Landscape / desktop: full-height column to the right
                   'landscape:h-full landscape:w-64 landscape:max-h-none landscape:min-h-0',
-                  'lg:h-full lg:w-80 xl:w-96 lg:max-h-none lg:min-h-0',
+                  'lg:h-full lg:w-80 xl:w-[26rem] 2xl:w-[28rem] lg:max-h-none lg:min-h-0',
                   'overflow-x-auto overflow-y-hidden landscape:overflow-y-auto landscape:overflow-x-hidden',
                   'lg:overflow-y-auto lg:overflow-x-hidden',
                   'opacity-100',

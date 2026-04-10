@@ -255,6 +255,9 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
     socket?.emit('endGame', { gameCode });
     setRemainingTime(null);
     setGameStarted(false);
+    // Host pressed X — do not auto-advance to the next game on the results page.
+    // StickyReadyBar reads this flag on mount to keep its 35s countdown cancelled.
+    try { sessionStorage.setItem('mp-auto-advance-cancelled', '1'); } catch {}
     neoInfoToast(t('hostView.gameStopped'), { icon: TOAST_ICONS.stopCircle });
   }, [socket, gameCode, t, setRemainingTime, setGameStarted]);
 

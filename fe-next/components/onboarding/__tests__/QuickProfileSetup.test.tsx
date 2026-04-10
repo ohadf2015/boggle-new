@@ -30,6 +30,7 @@ vi.mock('framer-motion', () => {
 vi.mock('lucide-react', () => ({
   Shuffle: () => <div data-testid="shuffle-icon" />,
   Pencil: () => <div data-testid="pencil-icon" />,
+  Check: () => <div data-testid="check-icon" />,
   X: () => <div data-testid="x-icon" />,
 }));
 

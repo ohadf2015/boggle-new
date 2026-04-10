@@ -49,7 +49,6 @@ const TODAY = new Date().toISOString().split('T')[0];
 
 const EMPTY_ROW = {
   word_hunt_completed: false,
-  brain_drill_completed: false,
   adventure_completed: false,
   community_completed: false,
   grand_slam_claimed: false,
@@ -57,7 +56,6 @@ const EMPTY_ROW = {
 
 const FULL_ROW = {
   word_hunt_completed: true,
-  brain_drill_completed: true,
   adventure_completed: true,
   community_completed: true,
   grand_slam_claimed: false,
@@ -80,7 +78,6 @@ describe('getDailyMissions', () => {
     const result = await getDailyMissions(PLAYER_ID);
 
     expect(result.wordHunt).toBe(false);
-    expect(result.brainDrill).toBe(false);
     expect(result.adventure).toBe(false);
     expect(result.community).toBe(false);
     expect(result.grandSlamClaimed).toBe(false);
@@ -121,7 +118,6 @@ describe('getDailyMissions', () => {
     expect(result.completedCount).toBe(2);
     expect(result.wordHunt).toBe(true);
     expect(result.adventure).toBe(true);
-    expect(result.brainDrill).toBe(false);
   });
 });
 
@@ -155,7 +151,7 @@ describe('checkAndClaimGrandSlam', () => {
     expect(result.reward).toBe(0);
   });
 
-  it('claims grand slam when all 4 complete and grants XP', async () => {
+  it('claims grand slam when all 3 complete and grants XP', async () => {
     // getDailyMissions
     mockSingle.mockResolvedValueOnce({ data: FULL_ROW, error: null });
 
