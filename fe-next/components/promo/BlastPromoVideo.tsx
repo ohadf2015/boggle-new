@@ -894,8 +894,10 @@ const BlastCTAScene: React.FC = () => {
             marginBottom: 30,
           }}
         >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={staticFile('mascot-blast.jpg')}
+            alt=""
             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
           />
         </div>
