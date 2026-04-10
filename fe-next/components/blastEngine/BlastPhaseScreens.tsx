@@ -123,8 +123,8 @@ export function BlastReadyScreen({ onStart, onBack, t }: BlastReadyScreenProps) 
 
       <Button
         onClick={onBack}
-        variant="ghost"
-        className="text-white/30 hover:text-white/50"
+        variant="outline"
+        className="border-3 border-neo-lime text-neo-lime bg-neo-navy/80 hover:bg-neo-navy"
       >
         <ArrowLeft className="w-4 h-4 mr-1" />
         {t('common.back')}
@@ -494,8 +494,8 @@ export function BlastResultsScreen({ results, onPlayAgain, onBack, t }: BlastRes
           </Button>
           <Button
             onClick={onBack}
-            variant="ghost"
-            className="text-white/30 hover:text-white/50 font-neo-display"
+            variant="outline"
+            className="border-3 border-neo-lime text-neo-lime bg-neo-navy/80 hover:bg-neo-navy font-neo-display"
           >
             {t('common.back')}
           </Button>

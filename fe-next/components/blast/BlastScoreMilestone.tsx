@@ -10,7 +10,7 @@
  * rather than a muted system notification.
  */
 
-import { useState, useEffect, useRef, useCallback, type ComponentType } from 'react';
+import { useState, useEffect, useRef, type ComponentType } from 'react';
 import {
   Sparkles, Flame, Zap, Gem, Trophy, Target, TrendingUp, Rocket, Star,
 } from 'lucide-react';
@@ -119,23 +119,23 @@ export function BlastScoreMilestone({ score, t }: BlastScoreMilestoneProps) {
   const entranceRef = useRef(getRandomMilestoneEntrance());
   const { playAchievementSound } = useSoundEffects();
 
-  const checkMilestone = useCallback(() => {
+  const dismissTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+
+  useEffect(() => {
     const crossed = SCORE_MILESTONES.find((m) => score >= m && lastMilestoneRef.current < m);
     if (crossed) {
       lastMilestoneRef.current = crossed;
       entranceRef.current = getRandomMilestoneEntrance();
       setActiveMilestone(getMilestoneConfig(crossed, t));
       playAchievementSound();
-      const timer = setTimeout(() => setActiveMilestone(null), 1600);
-      return () => clearTimeout(timer);
+      clearTimeout(dismissTimerRef.current);
+      dismissTimerRef.current = setTimeout(() => setActiveMilestone(null), 1600);
     }
-    return undefined;
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [score, playAchievementSound]);
 
-  useEffect(() => {
-    return checkMilestone();
-  }, [checkMilestone]);
+  // Cleanup on unmount
+  useEffect(() => () => clearTimeout(dismissTimerRef.current), []);
 
   return (
     <AdaptiveAnimatePresence>

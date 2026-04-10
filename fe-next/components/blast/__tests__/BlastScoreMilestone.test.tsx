@@ -92,6 +92,17 @@ describe('BlastScoreMilestone', () => {
     expect(playAchievementSound).toHaveBeenCalledTimes(1);
   });
 
+  it('auto-hides pill even when score changes after milestone', () => {
+    const { rerender } = render(<BlastScoreMilestone score={120} />);
+    expect(screen.getByTestId('blast-milestone-pill')).toBeInTheDocument();
+    // Score changes mid-animation (no new milestone crossed)
+    rerender(<BlastScoreMilestone score={140} />);
+    rerender(<BlastScoreMilestone score={180} />);
+    // Pill should still dismiss after the timer
+    act(() => { vi.advanceTimersByTime(1700); });
+    expect(screen.queryByTestId('blast-milestone-pill')).toBeNull();
+  });
+
   it('fires a fresh pill when a higher threshold is crossed', () => {
     const { rerender } = render(<BlastScoreMilestone score={120} />);
     act(() => { vi.advanceTimersByTime(1700); });

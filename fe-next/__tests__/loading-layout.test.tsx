@@ -79,8 +79,8 @@ describe('Loading Layout', () => {
     expect(grid?.className).toContain('grid-cols-1');
     expect(grid?.className).toContain('sm:grid-cols-2');
 
-    // Should have multiple shimmer skeleton elements (neo-shimmer replaces animate-pulse)
-    const skeletonCards = container.querySelectorAll('.neo-shimmer');
+    // Should have multiple skeleton elements with pulse animation
+    const skeletonCards = container.querySelectorAll('.animate-pulse');
     expect(skeletonCards.length).toBeGreaterThan(0);
   });
 });

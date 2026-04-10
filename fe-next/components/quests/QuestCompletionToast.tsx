@@ -31,26 +31,36 @@ interface QuestCompletionOptions {
 const recentToasts = new Set<string>();
 const DEDUP_WINDOW_MS = 2000;
 
-// Session-persistent dedup: prevent toasts from re-firing after page refresh.
-// Keys are stored in sessionStorage so they survive refresh but not new sessions.
-const SESSION_DEDUP_KEY = 'quest_toast_shown';
+// Persistent dedup: prevent toasts from re-firing after page refresh or new tab.
+// Keys are stored in localStorage (keyed by date) so they survive across tabs/sessions
+// but auto-expire the next day for daily quests.
+const STORAGE_KEY = 'quest_toast_shown';
 
-function getSessionShownSet(): Set<string> {
+function getShownSet(): Set<string> {
   try {
-    const raw = sessionStorage.getItem(SESSION_DEDUP_KEY);
-    return raw ? new Set(JSON.parse(raw)) : new Set();
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return new Set();
+    const parsed = JSON.parse(raw);
+    // Auto-clean stale entries from previous days
+    const today = new Date().toISOString().split('T')[0];
+    if (parsed.date !== today) {
+      localStorage.removeItem(STORAGE_KEY);
+      return new Set();
+    }
+    return new Set(parsed.keys);
   } catch {
     return new Set();
   }
 }
 
-function markSessionShown(dedupKey: string) {
+function markShown(dedupKey: string) {
   try {
-    const set = getSessionShownSet();
+    const today = new Date().toISOString().split('T')[0];
+    const set = getShownSet();
     set.add(dedupKey);
-    sessionStorage.setItem(SESSION_DEDUP_KEY, JSON.stringify([...set]));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ date: today, keys: [...set] }));
   } catch {
-    // sessionStorage unavailable (SSR, private mode) — fall through
+    // localStorage unavailable (SSR, private mode) — fall through
   }
 }
 
@@ -71,14 +81,12 @@ export function showQuestCompletionToast({
   const dedupKey = `${questName}:${isGrandSlam}:${isAllComplete}`;
   if (recentToasts.has(dedupKey)) return;
 
-  // Session-persistent dedup: skip if already shown this session (survives refresh)
-  const today = new Date().toISOString().split('T')[0];
-  const sessionKey = `${today}:${dedupKey}`;
-  if (getSessionShownSet().has(sessionKey)) return;
+  // Persistent dedup: skip if already shown today (survives refresh + new tabs)
+  if (getShownSet().has(dedupKey)) return;
 
   recentToasts.add(dedupKey);
   setTimeout(() => recentToasts.delete(dedupKey), DEDUP_WINDOW_MS);
-  markSessionShown(sessionKey);
+  markShown(dedupKey);
 
   onComplete?.();
 

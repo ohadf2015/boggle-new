@@ -26,12 +26,7 @@ import {
 } from 'lucide-react';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { Button } from '@/components/ui/button';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
+import { MobileTooltip } from '@/components/ui/MobileTooltip';
 import { cn } from '@/lib/utils';
 import { useBlastBadgeUnlocks } from './hooks/useBlastBadgeUnlocks';
 import { BlastBragCard } from './BlastBragCard';
@@ -198,13 +193,24 @@ export function BlastResultsSummary({
           <p className="text-[10px] uppercase tracking-widest font-bold text-white/60 mb-2 px-1">
             {t('blast.results.badgesEarned')}
           </p>
-          <TooltipProvider delayDuration={150}>
-            <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2">
               {badges.map((badge, i) => {
                 const Icon = BADGE_ICONS[badge.icon] ?? Sparkles;
                 return (
-                  <Tooltip key={badge.id}>
-                    <TooltipTrigger asChild>
+                  <MobileTooltip
+                    key={badge.id}
+                    side="top"
+                    delayDuration={150}
+                    contentClassName="max-w-[220px] text-center"
+                    content={
+                      <>
+                        <p className="font-neo-display font-black uppercase text-[11px] text-neo-pink">
+                          {badge.label}
+                        </p>
+                        <p className="text-xs mt-0.5">{badge.desc}</p>
+                      </>
+                    }
+                  >
                       <AdaptiveMotion.button
                         type="button"
                         initial={{ scale: 0, rotate: -180 }}
@@ -258,22 +264,10 @@ export function BlastResultsSummary({
                           </AdaptiveMotion.span>
                         )}
                       </AdaptiveMotion.button>
-                    </TooltipTrigger>
-                    <TooltipContent
-                      side="top"
-                      className="max-w-[220px] text-center"
-                      data-testid={`blast-badge-tooltip-${badge.id}`}
-                    >
-                      <p className="font-neo-display font-black uppercase text-[11px] text-neo-pink">
-                        {badge.label}
-                      </p>
-                      <p className="text-xs mt-0.5">{badge.desc}</p>
-                    </TooltipContent>
-                  </Tooltip>
+                  </MobileTooltip>
                 );
               })}
             </div>
-          </TooltipProvider>
         </AdaptiveMotion.div>
       )}
 
@@ -296,7 +290,7 @@ export function BlastResultsSummary({
           variant="outline"
           size="lg"
           onClick={onQuit}
-          className="min-h-[48px] font-bold uppercase border-3 border-neo-lime/50 text-neo-lime bg-neo-navy/80 hover:bg-neo-navy"
+          className="min-h-[48px] font-bold uppercase border-3 border-neo-lime text-neo-lime bg-neo-navy/80 hover:bg-neo-navy"
         >
           {t('common.home')}
         </Button>

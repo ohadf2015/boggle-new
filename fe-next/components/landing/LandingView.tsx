@@ -22,20 +22,44 @@ const LandingSocialProofBar = dynamic(() => import('./LandingSocialProofBar').th
   ssr: false,
   loading: () => <div className="h-10 w-full max-w-4xl mx-auto" />,
 });
-const LandingAvatarTeaser = dynamic(() => import('./LandingAvatarTeaser').then(m => m.LandingAvatarTeaser), { ssr: false });
+const LandingAvatarTeaser = dynamic(() => import('./LandingAvatarTeaser').then(m => m.LandingAvatarTeaser), {
+  ssr: false,
+  loading: () => <div className="h-48 w-full rounded-neo bg-neo-navy-light/50 animate-pulse" />,
+});
 import { LandingChallengeCards } from './LandingChallengeCards';
 import { LandingLeaderboardPreview } from './LandingLeaderboardPreview';
 
 // Below-the-fold sections — lazy load to speed up initial render
 // LiveActivityTicker moved out to reduce landing clutter
-const UrgencyCard = dynamic(() => import('./UrgencyCard').then(m => m.UrgencyCard), { ssr: false });
+const UrgencyCard = dynamic(() => import('./UrgencyCard').then(m => m.UrgencyCard), {
+  ssr: false,
+  loading: () => <div className="h-20 w-full rounded-neo bg-neo-navy-light/50 animate-pulse" />,
+});
 // Engagement widgets — only high-value conditional ones on landing
-const VaultCardConnected = dynamic(() => import('@/components/vault/VaultCardConnected').then(m => m.VaultCardConnected), { ssr: false });
-const GhostRivalWidget = dynamic(() => import('@/components/engagement/GhostRivalWidget').then(m => m.GhostRivalWidget), { ssr: false });
-const AnonymousTeaserWidgets = dynamic(() => import('./AnonymousTeaserWidgets').then(m => m.AnonymousTeaserWidgets), { ssr: false });
-const LandingYourRank = dynamic(() => import('./LandingYourRank').then(m => m.LandingYourRank), { ssr: false });
-const LandingShareBanner = dynamic(() => import('./LandingShareBanner').then(m => m.LandingShareBanner), { ssr: false });
-const LandingCommunityShowcase = dynamic(() => import('./LandingCommunityShowcase').then(m => m.LandingCommunityShowcase), { ssr: false });
+const VaultCardConnected = dynamic(() => import('@/components/vault/VaultCardConnected').then(m => m.VaultCardConnected), {
+  ssr: false,
+  loading: () => <div className="h-24 w-full rounded-neo bg-neo-navy-light/50 animate-pulse" />,
+});
+const GhostRivalWidget = dynamic(() => import('@/components/engagement/GhostRivalWidget').then(m => m.GhostRivalWidget), {
+  ssr: false,
+  loading: () => <div className="h-24 w-full rounded-neo bg-neo-navy-light/50 animate-pulse" />,
+});
+const AnonymousTeaserWidgets = dynamic(() => import('./AnonymousTeaserWidgets').then(m => m.AnonymousTeaserWidgets), {
+  ssr: false,
+  loading: () => <div className="h-32 w-full rounded-neo bg-neo-navy-light/50 animate-pulse" />,
+});
+const LandingYourRank = dynamic(() => import('./LandingYourRank').then(m => m.LandingYourRank), {
+  ssr: false,
+  loading: () => <div className="h-48 w-full rounded-neo bg-neo-navy-light/50 animate-pulse" />,
+});
+const LandingShareBanner = dynamic(() => import('./LandingShareBanner').then(m => m.LandingShareBanner), {
+  ssr: false,
+  loading: () => <div className="h-20 w-full rounded-neo bg-neo-navy-light/50 animate-pulse" />,
+});
+const LandingCommunityShowcase = dynamic(() => import('./LandingCommunityShowcase').then(m => m.LandingCommunityShowcase), {
+  ssr: false,
+  loading: () => <div className="h-48 w-full rounded-neo bg-neo-navy-light/50 animate-pulse" />,
+});
 // LeaguePositionBadge, WotdTeaser, WordPact, FriendsActivity moved to dedicated pages
 import Header from '@/components/Header';
 import { getPerfVariant } from '@/utils/perfVariant';
