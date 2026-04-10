@@ -197,15 +197,15 @@ const MASCOT_SRC = 'https://www.lexiclash.live/mascot/waving.gif';
 const C = {
   bg: '#14142b',          // slightly deeper than v1 navy
   bgAlt: '#1c1c3a',       // subtle panel background
-  badge: '#BFFF00',       // lime ring around mascot
+  badge: '#A8E600',       // lime ring around mascot
   hint: '#8B5CF6',        // purple label (new accent, not in v1)
-  letterFill: '#00FFFF',  // cyan tile
+  letterFill: '#5CE0D6',  // cyan tile
   letterBorder: '#3a3a6a',
   text: '#FFFFFF',
   muted: '#A1A1B5',
   dim: '#6b6b85',
   pink: '#FF1493',
-  lime: '#BFFF00',
+  lime: '#A8E600',
   black: '#000000',
   divider: '#2a2a48',
 } as const;

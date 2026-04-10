@@ -1,9 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { createAdminClient } from '@/utils/supabase/admin';
 import { captureApiError } from '@/utils/sentry';
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
 const COMEBACK_TIERS = [
   { minDays: 3, maxDays: 6, xpMultiplier: 1.5, durationHours: 48, hints: 2, streakFreezes: 1 },
@@ -17,7 +14,7 @@ async function getUserIdFromRequest(request: NextRequest): Promise<string | null
   const token = authHeader?.replace('Bearer ', '') || request.cookies.get('sb-access-token')?.value;
   if (!token) return null;
 
-  const supabase = createClient(supabaseUrl, supabaseServiceKey);
+  const supabase = createAdminClient()!;
   const { data: { user }, error } = await supabase.auth.getUser(token);
   if (error || !user) return null;
   return user.id;
@@ -34,7 +31,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    const supabase = createAdminClient()!;
     const { data: engagement } = await supabase
       .from('player_engagement')
       .select('last_played_at, comeback_bonus_expires_at')
@@ -91,7 +88,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    const supabase = createAdminClient()!;
     const { data: engagement } = await supabase
       .from('player_engagement')
       .select('last_played_at, comeback_bonus_expires_at')

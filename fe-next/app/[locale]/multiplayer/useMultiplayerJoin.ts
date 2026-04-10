@@ -248,6 +248,7 @@ export function useMultiplayerJoin({
             if (!joinedData?.isHost) return;
             logger.log('[QUICK_PLAY] Auto-starting game with random mode');
             socket.emit('startGame', {
+              letterGrid: [],
               gameMode: 'random',
               language: roomLang || language,
             });

@@ -132,13 +132,17 @@ export async function POST(request: NextRequest) {
 
       if (!engagement) {
         // Create new engagement record
-        await supabase.from('player_engagement').insert({
+        const { error: insertError } = await supabase.from('player_engagement').insert({
           player_id: user.id,
           current_streak: 1,
           longest_streak: 1,
           last_login_date: today,
           last_played_at: new Date().toISOString(),
         });
+        if (insertError) {
+          console.error('Error creating engagement record:', insertError);
+          return NextResponse.json({ error: 'Failed to create streak' }, { status: 500 });
+        }
         return NextResponse.json({
           currentStreak: 1,
           bestStreak: 1,
@@ -169,21 +173,29 @@ export async function POST(request: NextRequest) {
       ) {
         // Auto-use freeze if gap is small
         newStreak = engagement.current_streak + 1;
-        await supabase.from('player_engagement')
+        const { error: freezeError } = await supabase.from('player_engagement')
           .update({ streak_freezes_available: engagement.streak_freezes_available - 1 })
           .eq('player_id', user.id);
+        if (freezeError) {
+          console.error('Error decrementing streak freeze:', freezeError);
+        }
       } else {
         newStreak = 1;
       }
 
       const bestStreak = Math.max(newStreak, engagement.longest_streak || 0);
 
-      await supabase.from('player_engagement').update({
+      const { error: updateError } = await supabase.from('player_engagement').update({
         current_streak: newStreak,
         longest_streak: bestStreak,
         last_login_date: today,
         last_played_at: new Date().toISOString(),
       }).eq('player_id', user.id);
+
+      if (updateError) {
+        console.error('Error updating streak:', updateError);
+        return NextResponse.json({ error: 'Failed to update streak' }, { status: 500 });
+      }
 
       return NextResponse.json({
         currentStreak: newStreak,
@@ -207,19 +219,27 @@ export async function POST(request: NextRequest) {
       const mergedBest = Math.max(serverBest, localData.bestStreak || 0);
 
       if (!engagement) {
-        await supabase.from('player_engagement').insert({
+        const { error: mergeInsertError } = await supabase.from('player_engagement').insert({
           player_id: user.id,
           current_streak: mergedStreak,
           longest_streak: mergedBest,
           last_login_date: localData.lastWinDate?.split('T')[0] || today,
           last_played_at: new Date().toISOString(),
         });
+        if (mergeInsertError) {
+          console.error('Error inserting merged engagement:', mergeInsertError);
+          return NextResponse.json({ error: 'Failed to merge streak' }, { status: 500 });
+        }
       } else {
-        await supabase.from('player_engagement').update({
+        const { error: mergeUpdateError } = await supabase.from('player_engagement').update({
           current_streak: mergedStreak,
           longest_streak: mergedBest,
           last_played_at: new Date().toISOString(),
         }).eq('player_id', user.id);
+        if (mergeUpdateError) {
+          console.error('Error updating merged engagement:', mergeUpdateError);
+          return NextResponse.json({ error: 'Failed to merge streak' }, { status: 500 });
+        }
       }
 
       return NextResponse.json({

@@ -22,6 +22,7 @@ import {
   useCustomPuzzlePlayerRank,
   useCustomPuzzleBeatCreator,
   useCustomPuzzleActions,
+  useCustomPuzzleStore,
 } from '@/hooks/customPuzzleState';
 
 interface CustomPuzzleGameProps {
@@ -48,8 +49,9 @@ const CustomPuzzleGame: React.FC<CustomPuzzleGameProps> = ({ puzzleCode }) => {
     setLeaderboard,
     setPlayerRank,
     setBeatCreator,
-    resetAll,
   } = useCustomPuzzleActions();
+  // Select resetAll directly from store for stable ref (useCustomPuzzleActions returns a new object each render)
+  const resetAll = useCustomPuzzleStore((s) => s.resetAll);
 
   // Local state for fingerprint (not game state)
   const [fingerprint, setFingerprint] = React.useState<string | null>(null);

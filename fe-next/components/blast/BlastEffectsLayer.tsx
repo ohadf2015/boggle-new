@@ -42,7 +42,7 @@ export function BlastEffectsLayer({
   return (
     <div
       data-testid="blast-effects-layer"
-      className={`absolute inset-0 pointer-events-none z-30 rounded-neo ${pulseClass}`}
+      className={`absolute inset-0 pointer-events-none z-40 rounded-neo ${pulseClass}`}
       style={glowStyle}
     >
       <BlastComboFlash flash={comboFlash} onComplete={onComboFlashComplete} comboTypeName={comboTypeName} />

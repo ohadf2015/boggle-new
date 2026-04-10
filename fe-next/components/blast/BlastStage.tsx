@@ -211,22 +211,6 @@ export const BlastStage = memo(function BlastStage({
       )}
       {/* Reactive background */}
       <BlastBackground intensity={sequencerState?.chainLevel ?? 0} />
-      {/* Effects overlay */}
-      <BlastEffectsLayer
-        scoreFlyEvents={scoreFlyEvents}
-        onScoreFlyComplete={onScoreFlyComplete ?? (() => {})}
-        comboFlash={comboFlash}
-        onComboFlashComplete={onComboFlashComplete ?? (() => {})}
-        comboTypeName={comboTypeName}
-        intensity={sequencerState?.chainLevel ?? 0}
-      />
-
-      {/* Score milestone announcements */}
-      <BlastScoreMilestone score={score} t={t} />
-      {/* Combo milestone announcements */}
-      <ComboMilestoneAnnouncement comboLevel={comboLevel} />
-      {/* Mid-run micro-achievement toast */}
-      <BlastMicroToast id={microId} t={t} />
 
       {/* 1. HUD — z-40 to sit above BlastBackground (absolute inset-0) */}
       <div className="relative z-40">
@@ -370,6 +354,23 @@ export const BlastStage = memo(function BlastStage({
         <BlastWordPraise wordLength={lastWordLength} submitCount={wordSubmitCount} t={t} />
         <BlastWaveClearText waveCleared={waveCleared} movesRemaining={movesRemaining} t={t} />
       </div>
+
+      {/* Effects overlay — rendered after board (z-30) so combo flash / score flies appear above tiles */}
+      <BlastEffectsLayer
+        scoreFlyEvents={scoreFlyEvents}
+        onScoreFlyComplete={onScoreFlyComplete ?? (() => {})}
+        comboFlash={comboFlash}
+        onComboFlashComplete={onComboFlashComplete ?? (() => {})}
+        comboTypeName={comboTypeName}
+        intensity={sequencerState?.chainLevel ?? 0}
+      />
+
+      {/* Score milestone announcements */}
+      <BlastScoreMilestone score={score} t={t} />
+      {/* Combo milestone announcements */}
+      <ComboMilestoneAnnouncement comboLevel={comboLevel} />
+      {/* Mid-run micro-achievement toast */}
+      <BlastMicroToast id={microId} t={t} />
 
       {/* 4. Word forming area — golden ribbon style */}
       <div className={cn(

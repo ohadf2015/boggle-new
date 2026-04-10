@@ -7,7 +7,7 @@
 
 'use client';
 
-import React, { Suspense, useState, useCallback, useMemo, useRef } from 'react';
+import React, { Suspense, useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import nextDynamic from 'next/dynamic';
 import Link from 'next/link';
 import { ArrowLeft, Infinity as InfinityIcon, Trophy, Zap, Clock, Target } from 'lucide-react';
@@ -111,6 +111,12 @@ export default function EndlessPageClient(): React.JSX.Element {
     return generateAdventureGrid(levelConfig.gridSize, seed, language);
   }, [levelConfig, endless.currentFloor, language]);
 
+  // Track last known world/level so AdventureThemeProvider survives exit animations
+  const lastLevelRef = useRef<{ world: number; level: number }>({ world: 1, level: 1 });
+  if (levelConfig) {
+    lastLevelRef.current = { world: levelConfig.world, level: levelConfig.level };
+  }
+
   const diff = endless.difficulty;
 
   return (
@@ -118,6 +124,10 @@ export default function EndlessPageClient(): React.JSX.Element {
       <div className="h-full flex flex-col bg-neo-navy relative overflow-hidden">
         <PlayfulBackground intensity="medium" colorScheme="game" />
 
+        <AdventureThemeProvider
+          initialWorldId={lastLevelRef.current.world}
+          initialLevel={lastLevelRef.current.level}
+        >
         <AdaptiveAnimatePresence mode="wait">
           {/* === LOBBY === */}
           {phase === 'lobby' && (
@@ -201,23 +211,12 @@ export default function EndlessPageClient(): React.JSX.Element {
               </div>
 
               <div className="flex-1">
-                {/* AdventureThemeProvider wraps the entire playing div so that
-                    AnimatePresence exit animations can still access the theme
-                    context. Placing it inside the conditional prevents the
-                    "useAdventureTheme must be used within AdventureThemeProvider"
-                    error during floor transitions where levelConfig/grid briefly
-                    become null while the exiting tree is still mounted. */}
-                <AdventureThemeProvider
-                  initialWorldId={levelConfig.world}
-                  initialLevel={levelConfig.level}
-                >
                   <AdventureGame
                     levelConfig={levelConfig}
                     initialGrid={grid}
                     onLevelComplete={handleFloorComplete}
                     onExit={handleExit}
                   />
-                </AdventureThemeProvider>
               </div>
             </AdaptiveMotion.div>
           )}
@@ -348,6 +347,7 @@ export default function EndlessPageClient(): React.JSX.Element {
             </AdaptiveMotion.div>
           )}
         </AdaptiveAnimatePresence>
+        </AdventureThemeProvider>
       </div>
     </Suspense>
   );

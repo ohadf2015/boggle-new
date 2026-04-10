@@ -15,12 +15,9 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
-import { createClient as createServiceClient } from '@supabase/supabase-js';
+import { createAdminClient } from '@/utils/supabase/admin';
 import { captureApiError } from '@/utils/sentry';
 import { checkApiRateLimit } from '@/lib/apiRateLimit';
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
 // ---- Types ----
 
@@ -173,7 +170,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
     }
 
-    const supabase = createServiceClient(supabaseUrl, supabaseServiceKey);
+    const supabase = createAdminClient()!;
     const result = await handlePostComboCodex(user.id, body, supabase as unknown as ComboCodexSupabase);
     return NextResponse.json(result.data, { status: result.status });
   } catch (error) {
@@ -205,7 +202,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const supabase = createServiceClient(supabaseUrl, supabaseServiceKey);
+    const supabase = createAdminClient()!;
     const result = await handleGetComboCodex(user.id, supabase as unknown as ComboCodexSupabase);
     return NextResponse.json(result.data, { status: result.status });
   } catch (error) {

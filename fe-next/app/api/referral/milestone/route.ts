@@ -159,12 +159,23 @@ export async function POST(request: NextRequest) {
         statusCode: 500,
       });
       // Try direct update if RPC fails
-      await supabase
+      const { data: fallbackProfile } = await supabase
+        .from('profiles')
+        .select('referral_reward_xp, total_xp')
+        .eq('id', profile.referred_by)
+        .single();
+
+      const { error: fallbackError } = await supabase
         .from('profiles')
         .update({
-          referral_reward_xp: supabase.rpc('increment', { x: reward.xp }),
+          total_xp: (fallbackProfile?.total_xp || 0) + reward.xp,
+          referral_reward_xp: (fallbackProfile?.referral_reward_xp || 0) + reward.xp,
         })
         .eq('id', profile.referred_by);
+
+      if (fallbackError) {
+        console.error('Fallback XP update also failed:', fallbackError);
+      }
     }
 
     // Record the reward

@@ -7,8 +7,6 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
-import { createServerClient } from '@supabase/ssr';
-import { cookies } from 'next/headers';
 
 /**
  * Cookie-free Supabase client for public data queries (leaderboards, stats, etc.).
@@ -24,28 +22,4 @@ export function createSupabasePublicClient() {
   }
 
   return createClient(supabaseUrl, supabaseAnonKey);
-}
-
-export async function createSupabaseServerClient() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-  if (!supabaseUrl || !supabaseAnonKey) {
-    return null;
-  }
-
-  const cookieStore = await cookies();
-
-  return createServerClient(supabaseUrl, supabaseAnonKey, {
-    cookies: {
-      getAll() {
-        return cookieStore.getAll();
-      },
-      setAll(cookiesToSet) {
-        // Server Components can't set cookies — no-op.
-        // Route Handlers that need to set cookies should create their own client.
-        void cookiesToSet;
-      },
-    },
-  });
 }

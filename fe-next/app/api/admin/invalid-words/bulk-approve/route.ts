@@ -65,10 +65,11 @@ export async function handleBulkApprove(
     return { error: `Too many words. Maximum ${MAX_BATCH_SIZE} per batch.`, status: 400 };
   }
 
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+  const supabase = createClient(supabaseUrl, serviceKey, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  });
 
   // Fetch all words in batch
   const { data: words, error: fetchError } = await supabase

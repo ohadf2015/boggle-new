@@ -219,14 +219,11 @@ export async function POST(request: NextRequest) {
     // Grant initial referral reward to referrer (100 XP)
     const REFERRAL_REWARD_XP = 100;
 
-    // Update referrer's XP
-    const { error: xpError } = await supabase
-      .from('profiles')
-      .update({
-        total_xp: supabase.rpc('increment', { x: REFERRAL_REWARD_XP }),
-        referral_reward_xp: supabase.rpc('increment', { x: REFERRAL_REWARD_XP }),
-      })
-      .eq('id', referrer.id);
+    // Update referrer's XP via atomic RPC
+    const { error: xpError } = await supabase.rpc('increment_profile_xp', {
+      p_player_id: referrer.id,
+      p_xp_amount: REFERRAL_REWARD_XP,
+    });
 
     if (xpError) {
       console.error('Error granting referral XP:', xpError);
@@ -237,9 +234,27 @@ export async function POST(request: NextRequest) {
       });
     }
 
+    // Track referral-specific XP separately
+    const { data: referrerProfile } = await supabase
+      .from('profiles')
+      .select('referral_reward_xp')
+      .eq('id', referrer.id)
+      .single();
+
+    const { error: trackError } = await supabase
+      .from('profiles')
+      .update({
+        referral_reward_xp: (referrerProfile?.referral_reward_xp || 0) + REFERRAL_REWARD_XP,
+      })
+      .eq('id', referrer.id);
+
+    if (trackError) {
+      console.error('Error tracking referral XP:', trackError);
+    }
+
     // Record the reward
     if (referralRecord) {
-      await supabase.from('referral_rewards').insert({
+      const { error: rewardInsertError } = await supabase.from('referral_rewards').insert({
         player_id: referrer.id,
         referral_id: referralRecord.id,
         reward_type: 'new_referral_xp',
@@ -248,8 +263,12 @@ export async function POST(request: NextRequest) {
         metadata: { referred_user_id: user.id },
       });
 
+      if (rewardInsertError) {
+        console.error('Error recording referral reward:', rewardInsertError);
+      }
+
       // Mark reward as granted
-      await supabase
+      const { error: grantError } = await supabase
         .from('referrals')
         .update({
           reward_granted: true,
@@ -258,6 +277,10 @@ export async function POST(request: NextRequest) {
           reward_granted_at: new Date().toISOString(),
         })
         .eq('id', referralRecord.id);
+
+      if (grantError) {
+        console.error('Error marking referral reward as granted:', grantError);
+      }
     }
 
     return NextResponse.json({

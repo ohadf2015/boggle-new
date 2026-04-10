@@ -587,7 +587,10 @@ export async function POST(request: NextRequest) {
         });
 
         if (inventoryPayloads.length > 0) {
-          await supabase.from('player_inventory').upsert(inventoryPayloads, { onConflict: 'user_id,item_id' });
+          const { error: inventoryError } = await supabase.from('player_inventory').upsert(inventoryPayloads, { onConflict: 'user_id,item_id' });
+          if (inventoryError) {
+            console.error('[ADVENTURE COMPLETE API] Inventory upsert error:', inventoryError);
+          }
         }
       } catch (err) {
         console.error('[ADVENTURE COMPLETE API] Inventory persistence failed:', err);

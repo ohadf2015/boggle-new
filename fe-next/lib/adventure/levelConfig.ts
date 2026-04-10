@@ -256,7 +256,9 @@ export function getLevelConfig(
   const difficulty = getDifficultyForWorld(effectiveWorld);
 
   // Determine level archetype for gameplay flavor
-  const archetype = getArchetypeForLevel(effectiveWorld, level);
+  // Endless mode (world=0) cycles through archetypes using modular arithmetic
+  const archetypeLevel = world === 0 ? ((level - 1) % LEVELS_PER_WORLD) + 1 : level;
+  const archetype = getArchetypeForLevel(effectiveWorld, archetypeLevel);
   const archetypeConfig = getArchetypeConfig(archetype);
 
   // Apply archetype timer multiplier to base world timer

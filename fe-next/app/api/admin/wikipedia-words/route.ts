@@ -14,7 +14,7 @@ import {
   syncLocalJSONToDatabase
 } from '@/backend/services/wikipediaWordPopulator';
 import { triggerWikipediaWordPopulation } from '@/backend/services/cronScheduler';
-import { createClient } from '@supabase/supabase-js';
+import { createAdminClient } from '@/utils/supabase/admin';
 import type { Language } from '@/shared/types/game';
 
 // Allow 90 seconds for Wikipedia API calls + AI scoring
@@ -67,10 +67,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
     // Exclude words that already exist in community_words if requested
     if (excludeExisting && candidates.length > 0) {
-      const supabase = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.SUPABASE_SERVICE_ROLE_KEY!
-      );
+      const supabase = createAdminClient()!;
 
       // Get all words in community_words for this language
       const { data: existingWords } = await supabase
@@ -185,10 +182,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         const targetLanguage = language as Language | undefined;
 
         // Create Supabase client for word bank import
-        const supabase = createClient(
-          process.env.NEXT_PUBLIC_SUPABASE_URL!,
-          process.env.SUPABASE_SERVICE_ROLE_KEY!
-        );
+        const supabase = createAdminClient()!;
 
         const result = await syncLocalJSONToDatabase(targetLanguage);
 
@@ -243,10 +237,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
           );
         }
 
-        const supabase = createClient(
-          process.env.NEXT_PUBLIC_SUPABASE_URL!,
-          process.env.SUPABASE_SERVICE_ROLE_KEY!
-        );
+        const supabase = createAdminClient()!;
 
         // Get all pending candidates for this language
         const { data: pendingCandidates, error: fetchError } = await supabase
@@ -334,10 +325,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
           );
         }
 
-        const supabase = createClient(
-          process.env.NEXT_PUBLIC_SUPABASE_URL!,
-          process.env.SUPABASE_SERVICE_ROLE_KEY!
-        );
+        const supabase = createAdminClient()!;
 
         // Get all pending candidates
         const { data: pendingCandidates, error: fetchError } = await supabase
@@ -439,10 +427,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
           );
         }
 
-        const supabase = createClient(
-          process.env.NEXT_PUBLIC_SUPABASE_URL!,
-          process.env.SUPABASE_SERVICE_ROLE_KEY!
-        );
+        const supabase = createAdminClient()!;
 
         // Get approved Wikipedia words that meet criteria
         const { data: approvedWords, error: fetchError } = await supabase

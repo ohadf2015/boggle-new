@@ -109,9 +109,10 @@ export function useBlastAmbientEffects({
 
   /** Move ghost sprite to the given position (e.g. centroid of cleared tiles). */
   const moveGhostTo = useCallback((x: number, y: number) => {
-    if (ghostSpriteRef.current) {
-      ghostSpriteRef.current.x = x;
-      ghostSpriteRef.current.y = y;
+    const sprite = ghostSpriteRef.current;
+    if (sprite && !sprite.destroyed && sprite.position) {
+      sprite.x = x;
+      sprite.y = y;
     }
   }, []);
 
