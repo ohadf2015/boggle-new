@@ -7,13 +7,14 @@
  * and a collapsible ClassroomLeaderboard.
  */
 
-import { useState, useMemo, useRef } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ChevronDown, ChevronUp, Sparkles } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useStudentProgress } from '@/hooks/useStudentProgress';
 import { useSpacedRepetition } from '@/hooks/useSpacedRepetition';
+import { useClassroomRewardListener } from '@/hooks/useClassroomRewardListener';
 import { ReviewDueBadge } from '@/components/education/ReviewDueBadge';
 import { WordOfTheDay } from '@/components/education/animations/WordOfTheDay';
 import { ChallengePanel } from '@/components/education/challenges/ChallengePanel';
@@ -29,6 +30,14 @@ export function StudentHubLearnZone({ userId, classroomId }: StudentHubLearnZone
   const { t, language } = useLanguage();
   const router = useRouter();
   const [leaderboardOpen, setLeaderboardOpen] = useState(false);
+
+  // F-24: Surface classroom game rewards as a celebration toast
+  const { reward, clearReward } = useClassroomRewardListener(userId);
+  useEffect(() => {
+    if (!reward) return;
+    const timer = setTimeout(() => clearReward(), 5000);
+    return () => clearTimeout(timer);
+  }, [reward, clearReward]);
 
   // Spaced repetition data
   const { lessons } = useStudentProgress();
@@ -52,7 +61,34 @@ export function StudentHubLearnZone({ userId, classroomId }: StudentHubLearnZone
   }, [words]);
 
   return (
-    <section aria-label={t('student.hub.learnZone')} className="space-y-4">
+    <section aria-label={t('student.hub.learnZone')} className="space-y-4 relative">
+      {/* F-24: Classroom game reward toast */}
+      <AnimatePresence>
+        {reward && (
+          <motion.div
+            role="status"
+            aria-live="polite"
+            initial={{ opacity: 0, y: -16, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -8, scale: 0.95 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 22 }}
+            className="fixed top-4 left-1/2 -translate-x-1/2 z-[80] flex items-center gap-3 px-5 py-3 rounded-neo border-neo-thick border-black bg-neo-lime text-black font-neo-display font-black shadow-hard-lg"
+          >
+            <Sparkles className="w-6 h-6" aria-hidden="true" />
+            <span className="text-lg uppercase tracking-wide">
+              +{reward.xpEarned} XP
+            </span>
+            <button
+              onClick={clearReward}
+              className="ml-2 text-xs uppercase underline"
+              aria-label={t('common.dismiss')}
+            >
+              ×
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <h2 className="text-lg font-neo-display font-black text-neo-cyan mb-3 uppercase tracking-wide">
         {t('student.hub.learnZone')}
       </h2>
