@@ -194,11 +194,22 @@ export async function updateRivalScore(
 
   const weekStartDate = toDateString(getWeekStart());
 
-  const { data, error } = await supabase.rpc('increment_ghost_rival_score', {
-    p_player_id: playerId,
-    p_week_start: weekStartDate,
-    p_points: pointsEarned,
-  });
+  let data: unknown = null;
+  let error: { code?: string; message?: string } | null = null;
+
+  try {
+    const result = await supabase.rpc('increment_ghost_rival_score', {
+      p_player_id: playerId,
+      p_week_start: weekStartDate,
+      p_points: pointsEarned,
+    });
+    data = result.data;
+    error = result.error;
+  } catch (e: unknown) {
+    // Newer Supabase client versions may throw instead of returning {error}
+    const code = (e as { code?: string })?.code;
+    error = { code: code ?? 'UNKNOWN', message: String(e) };
+  }
 
   // Fallback: manual update if RPC doesn't exist
   // 42883 = Postgres "function does not exist"
@@ -224,7 +235,7 @@ export async function updateRivalScore(
   }
 
   if (error) {
-    logger.error('ghostRival', 'Failed to update score', { playerId, pointsEarned, error });
+    logger.debug('ghostRival', 'Failed to update score (non-critical)', { playerId, pointsEarned, error });
     return null;
   }
 

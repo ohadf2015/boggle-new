@@ -7942,7 +7942,7 @@ const es = {
     "bonusMoves": "¡+{count} Movimientos!",
     "outOfMoves": "¡Sin Movimientos!",
     "movesBonus": "Bonus de Movimientos",
-    "sugarCrush": "¡Sugar Crush!",
+    "sugarCrushLabel": "¡Sugar Crush!",
     "checkpointSaved": "¡Checkpoint guardado!",
     "waveIntro": {
       "title": "Oleada {wave}",

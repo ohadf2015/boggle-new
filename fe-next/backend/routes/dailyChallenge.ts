@@ -290,6 +290,10 @@ router.post('/submit', async (req: SubmitRequest, res: Response): Promise<void> 
       return;
     }
 
+    // Compute auth-only rank: count auth players ranked above this player + 1.
+    // The view's rank_position includes guests, so we can't use it directly —
+    // it would disagree with the reranked leaderboard list.
+    let rank: number | null = null;
     const { data: rankData } = await supabase
       .from('daily_puzzle_leaderboard')
       .select('rank_position')
@@ -298,11 +302,25 @@ router.post('/submit', async (req: SubmitRequest, res: Response): Promise<void> 
       .eq(playerId ? 'player_id' : 'guest_fingerprint', playerId || guestFingerprint)
       .single();
 
+    if (rankData && playerId) {
+      const { count: authPlayersAbove } = await supabase
+        .from('daily_puzzle_leaderboard')
+        .select('*', { count: 'exact', head: true })
+        .eq('puzzle_date', puzzleDate)
+        .eq('language', language)
+        .not('player_id', 'is', null)
+        .lt('rank_position', rankData.rank_position);
+
+      rank = (authPlayersAbove ?? 0) + 1;
+    } else if (rankData) {
+      rank = rankData.rank_position;
+    }
+
     res.json({
       success: true,
       alreadySubmitted: false,
       data,
-      rank: rankData?.rank_position || null
+      rank
     } as SubmitResponse);
   } catch (error) {
     const err = error as Error;

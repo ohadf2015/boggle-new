@@ -7871,7 +7871,7 @@ const sv = {
     "bonusMoves": "+{count} Drag!",
     "outOfMoves": "Inga drag kvar!",
     "movesBonus": "Dragbonus",
-    "sugarCrush": "Sockerkross!",
+    "sugarCrushLabel": "Sockerkross!",
     "checkpointSaved": "Checkpoint sparat!",
     "waveIntro": {
       "title": "Vag {wave}",

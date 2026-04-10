@@ -472,6 +472,9 @@ router.get('/stats/:date/:language', async (req: Request<WordHuntStatsParams>, r
       const { data: yourAttempt } = await yourAttemptQuery.single();
 
       if (yourAttempt && yourAttempt.solved && stats) {
+        // Compute auth-only rank: count auth players ranked above this player + 1.
+        // The view's rank_position includes guests, so using it directly would
+        // disagree with the reranked leaderboard list.
         let rankQuery = supabase
           .from('daily_word_hunt_leaderboard')
           .select('rank_position')
@@ -485,7 +488,20 @@ router.get('/stats/:date/:language', async (req: Request<WordHuntStatsParams>, r
         }
 
         const { data: rankData } = await rankQuery.single();
-        const rank = rankData?.rank_position;
+        let rank: number | undefined;
+        if (rankData && playerId) {
+          const { count: authPlayersAbove } = await supabase
+            .from('daily_word_hunt_leaderboard')
+            .select('*', { count: 'exact', head: true })
+            .eq('puzzle_date', date)
+            .eq('language', language)
+            .not('player_id', 'is', null)
+            .lt('rank_position', rankData.rank_position);
+
+          rank = (authPlayersAbove ?? 0) + 1;
+        } else if (rankData) {
+          rank = rankData.rank_position;
+        }
 
         let percentile = 0;
         if (rank && stats.total_players > 0) {

@@ -77,6 +77,22 @@ interface AdventureThemeContextType {
 
 const AdventureThemeContext = createContext<AdventureThemeContextType | null>(null);
 
+/** Safe fallback for components rendering outside the provider (e.g. exit animations) */
+const FALLBACK_THEME_CONTEXT: AdventureThemeContextType = {
+  theme: getWorldTheme(1),
+  worldId: 1,
+  currentLevel: 1,
+  currentChapter: 1,
+  isTransitioning: false,
+  isFullyImplemented: false,
+  setWorld: () => {},
+  setLevel: () => {},
+  getTileConfig: (tileType: TileType) => getTileVisualConfig(1, tileType),
+  getChapter: () => getChapterForLevel(1, 1),
+  isBoss: () => false,
+  getLevelPosition: () => 1,
+};
+
 // ==============================================
 // PROVIDER
 // ==============================================
@@ -227,7 +243,10 @@ export function AdventureThemeProvider({
 export function useAdventureTheme(): AdventureThemeContextType {
   const context = useContext(AdventureThemeContext);
   if (!context) {
-    throw new Error('useAdventureTheme must be used within AdventureThemeProvider');
+    // During AnimatePresence exit animations, components may briefly render
+    // after their AdventureThemeProvider has unmounted. Return a safe fallback
+    // instead of throwing so exit animations complete gracefully.
+    return FALLBACK_THEME_CONTEXT;
   }
   return context;
 }

@@ -201,9 +201,12 @@ export default function EndlessPageClient(): React.JSX.Element {
               </div>
 
               <div className="flex-1">
-                {/* AdventureGame depends on AdventureThemeContext (boss HUD, dialogue,
-                    arena styling). Without this provider it throws "useAdventureTheme
-                    must be used within AdventureThemeProvider" on every endless floor. */}
+                {/* AdventureThemeProvider wraps the entire playing div so that
+                    AnimatePresence exit animations can still access the theme
+                    context. Placing it inside the conditional prevents the
+                    "useAdventureTheme must be used within AdventureThemeProvider"
+                    error during floor transitions where levelConfig/grid briefly
+                    become null while the exiting tree is still mounted. */}
                 <AdventureThemeProvider
                   initialWorldId={levelConfig.world}
                   initialLevel={levelConfig.level}

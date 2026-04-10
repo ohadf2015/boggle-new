@@ -954,7 +954,7 @@ const he = {
     "heading": "!404 — מילה לא נמצאה",
     "message": ".נקודות. לא במילון. גם הקמע בדק פעמיים 0 קיבלה \"404\"",
     "button": "חזרה ללוח",
-    "mascotTooltip": "!זו לא מילה"
+    "mascotTooltip": "זו לא מילה!"
   },
   "validation": {
     "enterGameCode": "יש קוד? הכניסו כאן",
@@ -6237,7 +6237,7 @@ const he = {
   },
   "adventure": {
     "welcome": {
-      "title": "!ברוכים הבאים למצב הרפתקה",
+      "title": "ברוכים הבאים למצב הרפתקה!",
       "description": "חקרו 10 עולמות נושאיים, הילחמו בבוסים ושדרגו את כישורי המילים שלכם. לחצו על עולם 1 כדי להתחיל!",
       "startButton": "התחל עולם 1"
     },
@@ -7658,28 +7658,28 @@ const he = {
   "blast": {
     "chain": {
       "badge": "שרשרת x{level}",
-      "cascade": "!שרשרת",
-      "double": "!כפול",
-      "triple": "!משולש",
-      "mega": "!מגה",
-      "ultra": "!!אולטרה"
+      "cascade": "שרשרת!",
+      "double": "כפול!",
+      "triple": "משולש!",
+      "mega": "מגה!",
+      "ultra": "אולטרה!!"
     },
     "praise": {
-      "nice": "!יפה",
-      "great": "!מעולה",
-      "brilliant": "!גאוני",
-      "amazing": "!מדהים",
-      "legendary": "!!אגדי"
+      "nice": "יפה!",
+      "great": "מעולה!",
+      "brilliant": "גאוני!",
+      "amazing": "מדהים!",
+      "legendary": "אגדי!!"
     },
     "waveClear": {
-      "perfect": "!מושלם",
-      "great": "!מצוין",
-      "clear": "!נוקה"
+      "perfect": "מושלם!",
+      "great": "מצוין!",
+      "clear": "נוקה!"
     },
     "milestone": {
-      "100": "!100",
-      "250": "!250",
-      "500": "!500",
+      "100": "100!",
+      "250": "250!",
+      "500": "500!",
       "750": "!750",
       "1000": "!1000",
       "1500": "!1500",
@@ -7906,7 +7906,7 @@ const he = {
     "bonusMoves": "+{count} מהלכים!",
     "outOfMoves": "נגמרו המהלכים!",
     "movesBonus": "בונוס מהלכים",
-    "sugarCrush": "פיצוץ סופי!",
+    "sugarCrushLabel": "פיצוץ סופי!",
     "checkpointSaved": "נקודת שמירה נשמרה!",
     "waveIntro": {
       "title": "גל {wave}",
@@ -8521,7 +8521,7 @@ const he = {
       "wordsYouLearned": "מילים שלמדת",
       "found": "נמצאו",
       "wordsToLearn": "מילים ללמוד",
-      "studyTheseNext": "!למדו את אלה בפעם הבאה",
+      "studyTheseNext": "למדו את אלה בפעם הבאה!",
       "practiceTheseWords": "תרגלו את המילים האלה",
       "vocabScore": "מצאת {{found}} מתוך {{total}} מילות אוצר מילים!"
     },
@@ -9066,7 +9066,7 @@ const he = {
       "sendError": "שליחת ההתראה נכשלה. נסה שוב."
     },
     "prompt": {
-      "title": "!הישאר במשחק",
+      "title": "הישאר במשחק!",
       "body": "קבל תזכורות לאתגרים יומיים ואזהרות רצף",
       "enable": "הפעל התראות",
       "notNow": "לא עכשיו"
@@ -9535,7 +9535,7 @@ const he = {
   },
   "streakBar": {
     "streak": "רצף של {{count}} ימים",
-    "streakAtRisk": "!הרצף מסתיים הלילה",
+    "streakAtRisk": "הרצף מסתיים הלילה!",
     "level": "רמה {{level}}"
   },
   "autoPlay": {
@@ -9545,27 +9545,27 @@ const he = {
     "shuffling": "...מערבבים"
   },
   "urgency": {
-    "streakAtRisk": "!הרצף של {{count}} ימים מסתיים בעוד {{hoursLeft}} שעות",
+    "streakAtRisk": "הרצף של {{count}} ימים מסתיים בעוד {{hoursLeft}} שעות!",
     "streakAction": "שחקו עכשיו כדי לשמור אותו",
     "dailyUnsolved": "אתגר יומי #{{puzzleNumber}} — רק {{solveRate}}% פתרו. תצליחו?",
     "dailyAction": "קבלו את האתגר"
   },
   "dailyMissions": {
     "title": "משימות היום",
-    "grandSlam": "!גרנד סלאם",
+    "grandSlam": "גרנד סלאם!",
     "grandSlamDesc": "השלימו את כל 3 לבונוס",
     "grandSlamBonus": "קופסת מסתורין + XP 500+",
     "wordHunt": "ציד מילים יומי",
     "adventure": "הרפתקה יומית",
     "community": "משחק מרובה משתתפים",
-    "completed": "!הושלם",
+    "completed": "הושלם!",
     "progress": "משימות {{current}}/3"
   },
   "quests": {
     "title": "משימות",
     "dailyTitle": "המשימות של היום",
     "weeklyTitle": "משימה שבועית",
-    "grandSlam": "!גרנד סלאם",
+    "grandSlam": "גרנד סלאם!",
     "grandSlamBonus": "בונוס XP 500+",
     "grandSlamAvatar": "חלק אווטאר +1",
     "allComplete": "אלוף המשימות!",
@@ -9579,10 +9579,10 @@ const he = {
       "eyebrows": "גבות",
       "facialHair": "שיער פנים"
     },
-    "completedAll": "!הכל הושלם להיום",
+    "completedAll": "הכל הושלם להיום!",
     "progress": "{{completed}}/{{total}}",
     "go": "GO",
-    "done": "!בוצע",
+    "done": "בוצע!",
     "daily": {
       "wordHunt": {
         "name": "ציד מילים יומי",
@@ -9605,19 +9605,19 @@ const he = {
     "weeklyWordMasteryDesc": "שלוט ב-{target} מילים השבוע",
     "questOptions": "אפשרויות משימות",
     "completion": {
-      "title": "!משימה הושלמה",
-      "grandSlam": "!גרנד סלאם",
-      "grandSlamDesc": "!כל המשימות היומיות הושלמו",
+      "title": "משימה הושלמה!",
+      "grandSlam": "גרנד סלאם!",
+      "grandSlamDesc": "כל המשימות היומיות הושלמו!",
       "xpReward": "+{{xp}} XP",
       "goldReward": "+{{gold}} זהב"
     }
   },
   "wotd": {
     "teaser": "מילת היום",
-    "found": "!מצאתם את זה",
-    "foundPercent": "!רק {{percent}}% מהשחקנים מצאו את זה",
+    "found": "מצאתם את זה!",
+    "foundPercent": "רק {{percent}}% מהשחקנים מצאו את זה!",
     "missed": "מילת היום",
-    "missedHint": "!נסו שוב מחר",
+    "missedHint": "נסו שוב מחר!",
     "share": "שתפו את הגילוי",
     "loading": "...טוען את מילת היום",
     "play": "שחקו עכשיו"

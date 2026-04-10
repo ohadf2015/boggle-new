@@ -33,7 +33,7 @@ interface ModeCardProps {
   description: string;
   href: string;
   icon: React.ReactNode;
-  variant: 'cyan' | 'pink' | 'purple' | 'orange' | 'lime';
+  variant: 'cyan' | 'pink' | 'purple' | 'orange' | 'lime' | 'blue';
   className?: string;
   liveBadge?: LiveBadgeProps;
   /** Simple player count indicator - shows "X playing now" style badge */
@@ -162,6 +162,14 @@ const ModeCard: React.FC<ModeCardProps> = ({
       iconText: 'text-neo-lime-light',
       arrow: 'bg-neo-navy text-neo-lime',
       glowColor: 'rgba(163, 230, 53, 0.4)',
+    },
+    blue: {
+      bg: 'bg-linear-to-br from-blue-400 via-blue-500 to-blue-700',
+      hoverBg: 'hover:from-blue-300 hover:via-blue-400 hover:to-blue-700',
+      iconBg: 'bg-neo-navy',
+      iconText: 'text-blue-300',
+      arrow: 'bg-neo-navy text-blue-400',
+      glowColor: 'rgba(59, 130, 246, 0.4)',
     },
   };
 

@@ -8048,7 +8048,7 @@ const en = {
     "bonusMoves": "+{count} Moves!",
     "outOfMoves": "Out of Moves!",
     "movesBonus": "Move Bonus",
-    "sugarCrush": "Sugar Crush!",
+    "sugarCrushLabel": "Sugar Crush!",
     "checkpointSaved": "Checkpoint saved!",
     "waveIntro": {
       "title": "Wave {wave}",

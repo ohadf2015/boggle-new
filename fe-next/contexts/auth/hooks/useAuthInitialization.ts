@@ -206,7 +206,7 @@ export function useAuthInitialization({
       if (isMountedRef.current) {
         setLoading((currentLoading) => {
           if (currentLoading) {
-            logger.warn('Auth loading timeout - forcing loading to false');
+            logger.debug('Auth loading timeout - forcing loading to false');
             return false;
           }
           return currentLoading;

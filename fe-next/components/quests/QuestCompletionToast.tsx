@@ -27,6 +27,10 @@ interface QuestCompletionOptions {
   onComplete?: () => void;
 }
 
+// Dedup guard: prevent multiple callers from showing the same toast within a short window
+const recentToasts = new Set<string>();
+const DEDUP_WINDOW_MS = 2000;
+
 /**
  * Show a satisfying quest completion celebration.
  * Call this when a quest/mission is completed.
@@ -40,6 +44,12 @@ export function showQuestCompletionToast({
   t = (k) => k,
   onComplete,
 }: QuestCompletionOptions) {
+  // Deduplicate: skip if same toast was shown recently
+  const dedupKey = `${questName}:${isGrandSlam}:${isAllComplete}`;
+  if (recentToasts.has(dedupKey)) return;
+  recentToasts.add(dedupKey);
+  setTimeout(() => recentToasts.delete(dedupKey), DEDUP_WINDOW_MS);
+
   onComplete?.();
 
   // Fire confetti based on achievement tier

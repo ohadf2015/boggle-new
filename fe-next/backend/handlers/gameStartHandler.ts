@@ -212,7 +212,7 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
 
     // Mutex: prevent concurrent startGame flows for the same game
     if (gamesStarting.has(gameCode)) {
-      logger.warn('SOCKET', `Rejected duplicate startGame for ${gameCode} (mutex held)`);
+      logger.debug('SOCKET', `Rejected duplicate startGame for ${gameCode} (mutex held)`);
       emitError(socket, 'Game is already starting');
       return;
     }

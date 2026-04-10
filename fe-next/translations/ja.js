@@ -7923,7 +7923,7 @@ const ja = {
     "bonusMoves": "+{count} 手!",
     "outOfMoves": "手数切れ!",
     "movesBonus": "手数ボーナス",
-    "sugarCrush": "シュガークラッシュ!",
+    "sugarCrushLabel": "シュガークラッシュ!",
     "checkpointSaved": "チェックポイント保存！",
     "waveIntro": {
       "title": "ウェーブ {wave}",

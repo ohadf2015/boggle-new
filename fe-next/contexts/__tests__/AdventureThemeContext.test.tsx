@@ -239,11 +239,14 @@ describe('AdventureThemeProvider', () => {
 // ==============================================
 
 describe('useAdventureTheme', () => {
-  it('should throw error when used outside provider', () => {
-    // GIVEN/WHEN/THEN
-    expect(() => {
-      renderHook(() => useAdventureTheme());
-    }).toThrow('useAdventureTheme must be used within AdventureThemeProvider');
+  it('should return fallback context when used outside provider', () => {
+    // GIVEN/WHEN - outside provider (e.g. AnimatePresence exit animations)
+    const { result } = renderHook(() => useAdventureTheme());
+    // THEN - returns safe fallback instead of throwing
+    expect(result.current).toBeDefined();
+    expect(result.current.worldId).toBe(1);
+    expect(result.current.currentLevel).toBe(1);
+    expect(result.current.isTransitioning).toBe(false);
   });
 });
 

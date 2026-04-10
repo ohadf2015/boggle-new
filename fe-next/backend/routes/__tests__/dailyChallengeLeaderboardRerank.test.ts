@@ -56,6 +56,28 @@ describe('daily leaderboard rerank', () => {
     expect(rerankSequential<LeaderboardRow>([])).toEqual([]);
   });
 
+  it('computes auth-only rank by counting auth players above in the view', () => {
+    // Simulates the submit/stats logic: given a player's view-rank and
+    // all auth players' view-ranks, compute the sequential auth-only rank.
+    function computeAuthRank(
+      playerViewRank: number,
+      allAuthViewRanks: number[]
+    ): number {
+      const authAbove = allAuthViewRanks.filter((r) => r < playerViewRank).length;
+      return authAbove + 1;
+    }
+
+    // View has guests at ranks 1, 2, 4. Auth players at 3, 5, 6.
+    const authViewRanks = [3, 5, 6];
+
+    // Auth player at view-rank 3 → auth-only rank 1
+    expect(computeAuthRank(3, authViewRanks)).toBe(1);
+    // Auth player at view-rank 5 → auth-only rank 2
+    expect(computeAuthRank(5, authViewRanks)).toBe(2);
+    // Auth player at view-rank 6 → auth-only rank 3
+    expect(computeAuthRank(6, authViewRanks)).toBe(3);
+  });
+
   it('preserves ordering and other row fields', () => {
     const rows: LeaderboardRow[] = [
       { player_id: 'a', language: 'en', score: 100, rank_position: 9 },

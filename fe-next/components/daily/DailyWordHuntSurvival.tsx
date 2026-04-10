@@ -159,6 +159,8 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     return (
       <>
         <ScreenFlashOverlay trigger={flashTrigger} colorClass={flashColor} />
+        {/* react-rewards anchor — must exist in DOM for reward confetti to target */}
+        <span id={rewardId} className="fixed top-1/2 left-1/2 pointer-events-none" />
         <SurvivalDesktopLayout
           isTv={isTv}
           grid={grid}

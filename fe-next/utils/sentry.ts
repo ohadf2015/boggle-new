@@ -168,6 +168,17 @@ const EXPECTED_ERROR_PATTERNS = [
   /too many requests/i,
   /429/,
 
+  // Multiplayer race conditions (mutex guards working as designed)
+  /Game is already starting/i,
+  /Invalid start game request/i,
+  /duplicate startGame/i,
+
+  // Supabase auth token lock contention (expected under concurrent requests)
+  /Lock .* was released because another request stole it/i,
+
+  // Auth loading timeout (safety guard, not a bug)
+  /Auth loading timeout/i,
+
   // Network timeouts for non-critical operations
   /AbortError/i,
   /timeout/i,

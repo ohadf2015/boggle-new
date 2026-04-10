@@ -167,11 +167,16 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
     }
 
     // Regular game — blast mode always uses 6x6 grid
-    const difficultyConfig = DIFFICULTIES[difficulty];
+    const difficultyConfig = DIFFICULTIES[difficulty] ?? DIFFICULTIES.MEDIUM;
     const rows = gameMode === 'blast' ? 6 : difficultyConfig.rows;
     const cols = gameMode === 'blast' ? 6 : difficultyConfig.cols;
     const embedWords = roomLanguage !== 'ja' ? wordsForBoard : [];
     const newTable = generateRandomTable(rows, cols, roomLanguage, embedWords);
+
+    if (!newTable || !Array.isArray(newTable) || newTable.length === 0) {
+      logger.error('[HOST] Failed to generate letter grid', { difficulty, gameMode, rows, cols });
+      return;
+    }
 
     setTableData(newTable);
     const seconds = timerValue * 60;
@@ -308,11 +313,16 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
 
         // Immediately start a new game - skip the waiting room
         // This includes all current players and any waiting room players
-        const difficultyConfig = DIFFICULTIES[difficulty];
+        const difficultyConfig = DIFFICULTIES[difficulty] ?? DIFFICULTIES.MEDIUM;
         const rows = gameMode === 'blast' ? 6 : difficultyConfig.rows;
         const cols = gameMode === 'blast' ? 6 : difficultyConfig.cols;
         const embedWords = roomLanguage !== 'ja' ? wordsForBoard : [];
         const newTable = generateRandomTable(rows, cols, roomLanguage, embedWords);
+
+        if (!newTable || !Array.isArray(newTable) || newTable.length === 0) {
+          logger.error('[HOST] Failed to generate letter grid on restart', { difficulty, gameMode });
+          return;
+        }
 
         setTableData(newTable);
         const seconds = timerValue * 60;
