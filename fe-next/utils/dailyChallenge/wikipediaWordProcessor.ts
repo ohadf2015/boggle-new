@@ -67,6 +67,59 @@ const OVERUSED_WORDS: Record<Language, Set<string>> = {
 };
 
 /**
+ * Known Hebrew transliterations and foreign loanwords to reject.
+ * These are words written in Hebrew letters but originating from foreign languages.
+ * They make poor daily challenge words because players expect native Hebrew vocabulary.
+ */
+const HEBREW_TRANSLITERATION_BLOCKLIST = new Set([
+  // Scientific/chemical terms
+  'ניטרון', 'פרוטון', 'נויטרון', 'אלקטרון', 'פוטון', 'ביולוגיה', 'פיזיקה', 'כימיה',
+  // Technology
+  'טלוויזיה', 'אינטרנט', 'טלפון', 'קומפיוטר', 'טכנולוגיה', 'דיגיטל', 'וידאו',
+  // Names (common transliterations)
+  'ניקולאה', 'ניקולה', 'אלכסנדר', 'ויקטוריה', 'נפוליאון', 'קליאופטרה',
+  // Common loanwords
+  'אוניברסיטה', 'פוליטיקה', 'דמוקרטיה', 'אקדמיה', 'פילוסופיה', 'תיאטרון',
+  'קולנוע', 'סטודנט', 'פרופסור', 'דוקטור',
+]);
+
+/**
+ * Suffix patterns common in Hebrew transliterations of foreign words.
+ * These suffixes indicate the word is likely a phonetic adaptation, not a native Hebrew word.
+ */
+const HEBREW_TRANSLITERATION_SUFFIXES = [
+  'ציה',   // -tion/-zia (e.g., דמוקרטיציה, רבולוציה)
+  'ציון',  // -tion (e.g., אינפלציון)
+  'לוגיה', // -logy (e.g., ביולוגיה)
+  'גרפיה', // -graphy (e.g., ביוגרפיה)
+  'סקופ',  // -scope (e.g., טלסקופ)
+  'יסטי',  // -istic (e.g., אופטימיסטי)
+  'יזם',   // -ism (when transliterated)
+];
+
+/**
+ * Detect if a Hebrew word is likely a transliteration of a foreign word.
+ * Uses blocklist + suffix pattern matching.
+ */
+function isHebrewTransliteration(word: string): boolean {
+  // Check blocklist
+  if (HEBREW_TRANSLITERATION_BLOCKLIST.has(word)) {
+    return true;
+  }
+
+  // Check suffix patterns (only for words 5+ chars to avoid false positives)
+  if (word.length >= 5) {
+    for (const suffix of HEBREW_TRANSLITERATION_SUFFIXES) {
+      if (word.endsWith(suffix)) {
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
+/**
  * Result of word validation
  */
 export interface WordValidationResult {
@@ -153,6 +206,16 @@ export function validateGameWord(
     };
   }
 
+  // Hebrew: reject transliterations of foreign words and proper nouns
+  if (language === 'he' && isHebrewTransliteration(normalizedWord)) {
+    return {
+      valid: false,
+      reason: 'Word appears to be a transliteration of a foreign word',
+      word,
+      normalizedWord
+    };
+  }
+
   return {
     valid: true,
     reason: 'Valid',
@@ -233,6 +296,11 @@ export function calculateInterestingnessScore(
   const overused = OVERUSED_WORDS[language];
   if (overused.has(normalizedWord)) {
     score -= 25;
+  }
+
+  // Hebrew transliteration penalty
+  if (language === 'he' && isHebrewTransliteration(normalizedWord)) {
+    score -= 50;
   }
 
   // Double letter penalty (less interesting): BOOK, TREE, etc.

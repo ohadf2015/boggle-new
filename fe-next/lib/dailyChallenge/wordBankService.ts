@@ -12,6 +12,7 @@
 import type { Language } from '@/types';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { WORD_LENGTH_RANGE, STATIC_WORD_LISTS, type WordBankEntry } from './wordBankData';
+import { validateGameWord } from '@/utils/dailyChallenge/wikipediaWordProcessor';
 
 import logger from '@/backend/utils/logger';
 
@@ -61,12 +62,15 @@ export async function getWordsFromWordBank(
       return [];
     }
 
-    return (data || []).map((row: { word: string; source: string; difficulty_score: number; category: string }) => ({
-      word: row.word.toUpperCase(),
-      source: 'word_bank' as const,
-      difficulty_score: row.difficulty_score,
-      category: row.category,
-    }));
+    // Filter out words that fail validation (e.g., Hebrew transliterations)
+    return (data || [])
+      .filter((row: { word: string }) => validateGameWord(row.word, language).valid)
+      .map((row: { word: string; source: string; difficulty_score: number; category: string }) => ({
+        word: row.word.toUpperCase(),
+        source: 'word_bank' as const,
+        difficulty_score: row.difficulty_score,
+        category: row.category,
+      }));
   } catch (error) {
     logger.error('WORD_BANK', 'Word bank query failed:', error);
     return [];

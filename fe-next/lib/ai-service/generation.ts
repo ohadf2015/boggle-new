@@ -96,7 +96,7 @@ export async function generateBulkWords(
     },
     he: {
       good: 'חושך, מראה, ניצוץ, עננה, קרקע, שמיים, אוצר, גיבור, נהדר, מסתורי, אבקה, כוכב, לילה, בוקר, סערה, אגדה, עתיק, קסום, זוהר, מרהיב',
-      avoid: 'בית, יום, מים, אדם, שנה, עבודה, עולם, חיים'
+      avoid: 'בית, יום, מים, אדם, שנה, עבודה, עולם, חיים, ניטרון, ניקולאה, טלוויזיה, אינטרנט, ביולוגיה, פיזיקה, אלכסנדר'
     },
     sv: {
       good: 'SKYMNING, DIMMA, STJÄRNA, VINTER, ÅSKA, FJÄRIL, MYSTISK, FÖRUNDRA, GLITTER, KRISTALL, SMARAGD, FROSTIG, TROLLDOM, LABYRINT, GRYNING, OCEAN, VULKAN, GALAX, DIMMA, SKUGGA',
@@ -114,6 +114,24 @@ export async function generateBulkWords(
 
   const examples = languageExamples[language] || languageExamples.en;
 
+  // Language-specific rules to improve word quality
+  const languageRules: Record<string, string> = {
+    he: `
+HEBREW-SPECIFIC RULES (CRITICAL):
+- ONLY use native Hebrew words (שורש עברי). NO transliterations of foreign words.
+- REJECT words like: ניטרון, ניקולאה, טלוויזיה, אינטרנט, טלפון, ביולוגיה, פיזיקה
+- REJECT proper nouns, names of people, places, brands
+- REJECT scientific/technical terms borrowed from Latin/Greek/English
+- PREFER words from Hebrew roots (שורשים): e.g., כתיבה (כ.ת.ב), הליכה (ה.ל.כ), שמירה (ש.מ.ר)
+- Good native words: חלום, סערה, אגדה, ניצוץ, זוהר, קסם, מראה, כוכב`,
+    en: '',
+    sv: '',
+    ja: '',
+    es: '',
+  };
+
+  const langRules = languageRules[language] || '';
+
   const prompt = `Generate ${count} rich, diverse words for a word puzzle game.
 
 LANGUAGE: ${languageName}
@@ -129,7 +147,9 @@ VOCABULARY DIVERSITY REQUIREMENTS:
 - Mix word lengths: short (${lengthRange.min}-5), medium (5-6), long (6-${lengthRange.max})
 - Prioritize character variety (avoid double letters like BOOK, TREE)
 - Must be real, valid ${languageName} words
-
+- NO proper nouns, brand names, or person/place names
+- NO transliterations or foreign loanwords — only native ${languageName} vocabulary
+${langRules}
 GOOD EXAMPLES: ${examples.good}
 AVOID BASIC WORDS: ${examples.avoid}
 EXCLUDED (recently used): ${exclusionList || 'None'}${existingListStr}
