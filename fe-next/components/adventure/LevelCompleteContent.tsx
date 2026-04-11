@@ -6,7 +6,7 @@
 
 import { memo, useState } from 'react';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
-import { Check, X, Trophy, RotateCcw, DoorOpen, Coins, Zap, Share2 } from 'lucide-react';
+import { Check, X, Trophy, RotateCcw, DoorOpen, Coins, Zap, Share2, Crosshair, Heart, CircleDot } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { OBJECTIVE_TRANSLATION_KEYS } from '@/lib/adventure/constants';
 import { RollingNumber } from './ui/RollingNumber';
@@ -43,6 +43,19 @@ export interface LevelCompleteContentProps {
   bestAttempt?: LevelAttempt | null;
   /** Words on the board the player didn't find */
   missedWords?: string[];
+  /** Mode-specific stats for blast/hunt/wheel archetypes */
+  modeStats?: {
+    archetype: string;
+    /** Blast: moves remaining when level ended */
+    movesRemaining?: number;
+    movesTotal?: number;
+    /** Hunt: attempts used to find target word */
+    huntAttempts?: number;
+    huntFound?: boolean;
+    /** Wheel: words containing center letter */
+    centerLetterWords?: number;
+    totalWords?: number;
+  } | null;
   t: (key: string, params?: Record<string, string | number>) => string;
 }
 
@@ -51,6 +64,7 @@ const LevelCompleteContent = memo<LevelCompleteContentProps>(({
   xpEarned, goldEarned,
   lootDrops, storyBeatText,
   nextLevelPreview, bestAttempt, missedWords, t,
+  modeStats,
   // Kept in interface for backwards compat but used by LevelCompleteActions now
   onContinue: _onContinue, onRetry: _onRetry, onExit: _onExit,
   isLastLevelOfWorld: _isLastLevelOfWorld, onNextWorld: _onNextWorld,
@@ -88,6 +102,49 @@ const LevelCompleteContent = memo<LevelCompleteContentProps>(({
           <RollingNumber value={baseGold} variant="default" className="text-xl md:text-2xl text-neo-yellow" />
         </div>
       </AdaptiveMotion.div>
+
+      {/* Mode-specific stat badge */}
+      {modeStats && (
+        <AdaptiveMotion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.55 }}
+          className="flex justify-center mb-3"
+        >
+          {modeStats.archetype === 'blast' && modeStats.movesRemaining != null && modeStats.movesTotal != null && (
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-neo-pink/15 border border-neo-pink/30 rounded-neo">
+              <Crosshair className="w-4 h-4 text-neo-pink" />
+              <span className="text-sm font-bold text-neo-pink">
+                {t('adventure.modeStats.movesUsed', {
+                  used: modeStats.movesTotal - modeStats.movesRemaining,
+                  total: modeStats.movesTotal,
+                })}
+              </span>
+            </div>
+          )}
+          {modeStats.archetype === 'hunt' && (
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-neo-cyan/15 border border-neo-cyan/30 rounded-neo">
+              <Heart className="w-4 h-4 text-neo-cyan" />
+              <span className="text-sm font-bold text-neo-cyan">
+                {modeStats.huntFound
+                  ? t('adventure.modeStats.huntSuccess', { attempts: modeStats.huntAttempts ?? 0 })
+                  : t('adventure.modeStats.huntFailed')}
+              </span>
+            </div>
+          )}
+          {modeStats.archetype === 'wheel' && modeStats.centerLetterWords != null && (
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-neo-purple/15 border border-neo-purple/30 rounded-neo">
+              <CircleDot className="w-4 h-4 text-neo-purple" />
+              <span className="text-sm font-bold text-neo-purple">
+                {t('adventure.modeStats.wheelWords', {
+                  center: modeStats.centerLetterWords,
+                  total: modeStats.totalWords ?? 0,
+                })}
+              </span>
+            </div>
+          )}
+        </AdaptiveMotion.div>
+      )}
 
       {/* High Score Badge */}
       {isHighScore && (

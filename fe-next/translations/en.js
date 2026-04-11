@@ -4990,7 +4990,13 @@ const en = {
     },
     "requestChallenge": "Request Challenge",
     "requestSent": "Request Sent",
-    "watchAdRetry": "Watch Ad to Retry"
+    "watchAdRetry": "Watch Ad to Retry",
+    "streakFreezeTooltip": "Streak Freeze — protects your streak if you miss a day",
+    "streakFreezesAvailable": "{count} streak freezes available",
+    "todayReward": "Today: {{coins}} coins",
+    "tomorrowReward": "Tomorrow: {{coins}} coins",
+    "nearMilestone": "{{days}} days to {{badge}} badge!",
+    "rewardDay": "Day {day}"
   },
   "wordWheel": {
     "title": "Word Wheel",

@@ -4891,7 +4891,13 @@ const sv = {
     },
     "requestChallenge": "Begär utmaning",
     "requestSent": "Förfrågan skickad",
-    "watchAdRetry": "Se reklam för att försöka igen"
+    "watchAdRetry": "Se reklam för att försöka igen",
+    "streakFreezeTooltip": "Svitfrys — skyddar din svit om du missar en dag",
+    "streakFreezesAvailable": "{count} svitfrysar tillgängliga",
+    "todayReward": "Idag: {{coins}} mynt",
+    "tomorrowReward": "Imorgon: {{coins}} mynt",
+    "nearMilestone": "{{days}} dagar till {{badge}}-märke!",
+    "rewardDay": "Dag {day}"
   },
   "wordWheel": {
     "title": "Ordhjul",

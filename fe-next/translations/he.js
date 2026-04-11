@@ -4902,7 +4902,13 @@ const he = {
     },
     "requestChallenge": "בקש אתגר",
     "requestSent": "הבקשה נשלחה",
-    "watchAdRetry": "צפו בפרסומת כדי לנסות שוב"
+    "watchAdRetry": "צפו בפרסומת כדי לנסות שוב",
+    "streakFreezeTooltip": "הקפאת רצף — מגנה על הרצף שלך אם תפספס יום",
+    "streakFreezesAvailable": "{count} הקפאות רצף זמינות",
+    "todayReward": "היום: {{coins}} מטבעות",
+    "tomorrowReward": "מחר: {{coins}} מטבעות",
+    "nearMilestone": "{{days}} ימים לתג {{badge}}!",
+    "rewardDay": "יום {day}"
   },
   "wordWheel": {
     "title": "גלגל מילים",

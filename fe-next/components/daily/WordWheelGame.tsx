@@ -442,7 +442,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
             key={letter}
             letter={letter}
             isCenter={false}
-            angle={i * 45}
+            angle={i * 60}
             radius={wheelRadius}
             onPress={(l, _, el) => handleLetterPress(l, i, el)}
             isUsed={usedIndices.has(i)}

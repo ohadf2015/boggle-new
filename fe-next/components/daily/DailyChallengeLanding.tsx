@@ -7,7 +7,8 @@ import { Timer, CircleDot, Check, X, Eye } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
-import { getWordHuntStatusToday, hasPlayedWordWheelToday } from '@/utils/dailyChallenge/storage';
+import { hasPlayedWordWheelToday } from '@/utils/dailyChallenge/storage';
+import { useDailyChallengeStatus } from '@/hooks/useDailyChallengeStatus';
 import { getGuestFingerprint } from '@/utils/guestManager';
 import type { Language } from '@/types';
 
@@ -25,15 +26,6 @@ interface DailyChallengeLandingProps {
   onSelectWordHunt: () => void;
   onSelectWordWheel: () => void;
   currentLanguage: Language;
-}
-
-interface ChallengeStatus {
-  wordHunt: 'new' | 'won' | 'lost';
-  wordWheel: 'new' | 'played';
-}
-
-interface LoadingState {
-  wordHunt: boolean;
 }
 
 /**
@@ -56,34 +48,32 @@ export function DailyChallengeLanding({
     : null;
   const challengerEmoji = searchParams?.get('whChallengeEmoji') || null;
 
-  const [status, setStatus] = useState<ChallengeStatus>({
-    wordHunt: 'new',
-    wordWheel: 'new',
-  });
-  const [loadingStatus, setLoadingStatus] = useState<LoadingState>({
-    wordHunt: true,
-  });
-  const [streak, setStreak] = useState(0);
+  // Use the centralized hook for Word Hunt status + streak (fetches from server for authed users)
+  const dailyStatus = useDailyChallengeStatus(currentLanguage);
+
+  // Word Wheel status from localStorage (no server endpoint for it yet)
+  const [wordWheelStatus, setWordWheelStatus] = useState<'new' | 'played'>('new');
   const [freezeCount, setFreezeCount] = useState(0);
 
-  // Status check - synchronous local storage check
-  const checkStatuses = () => {
-    const wordHuntStatus = getWordHuntStatusToday(currentLanguage);
-    if (!wordHuntStatus) {
-      setStatus(prev => ({ ...prev, wordHunt: 'new' }));
-    } else {
-      setStatus(prev => ({
-        ...prev,
-        wordHunt: wordHuntStatus.solved ? 'won' : 'lost'
-      }));
-    }
+  // Derive Word Hunt status from hook (server-aware for cross-device play)
+  const wordHuntStatus: 'new' | 'won' | 'lost' = dailyStatus.loading
+    ? 'new'
+    : !dailyStatus.hasPlayed
+      ? 'new'
+      : dailyStatus.hasSolved
+        ? 'won'
+        : 'lost';
+
+  const streak = dailyStatus.currentStreak;
+
+  // Check Word Wheel status from localStorage
+  const checkWordWheelStatus = () => {
     const wwPlayed = hasPlayedWordWheelToday(currentLanguage);
-    setStatus(prev => ({ ...prev, wordWheel: wwPlayed ? 'played' : 'new' }));
-    setLoadingStatus(prev => ({ ...prev, wordHunt: false }));
+    setWordWheelStatus(wwPlayed ? 'played' : 'new');
   };
 
-  // Fetch streak data
-  const fetchStreak = async () => {
+  // Fetch streak freeze count
+  const fetchFreezeCount = async () => {
     try {
       const params = new URLSearchParams();
       if (user?.id) {
@@ -96,20 +86,18 @@ export function DailyChallengeLanding({
         const res = await fetch(`/api/daily-streak?${params.toString()}`);
         if (res.ok) {
           const data = await res.json();
-          setStreak(data.streak || 0);
           setFreezeCount(data.freezeCount || 0);
         }
       }
     } catch {
-      // Streak is optional — fail silently
+      // Freeze count is optional — fail silently
     }
   };
 
-  // Initial status check
+  // Initial check + fetch
   useEffect(() => {
-    setLoadingStatus({ wordHunt: true });
-    checkStatuses();
-    fetchStreak();
+    checkWordWheelStatus();
+    fetchFreezeCount();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentLanguage, user?.id]);
 
@@ -117,8 +105,9 @@ export function DailyChallengeLanding({
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
-        checkStatuses();
-        fetchStreak();
+        checkWordWheelStatus();
+        dailyStatus.refresh();
+        fetchFreezeCount();
       }
     };
     document.addEventListener('visibilitychange', handleVisibilityChange);
@@ -129,7 +118,8 @@ export function DailyChallengeLanding({
   // Refresh on popstate (browser back/forward)
   useEffect(() => {
     const handlePopState = () => {
-      checkStatuses();
+      checkWordWheelStatus();
+      dailyStatus.refresh();
     };
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
@@ -139,18 +129,19 @@ export function DailyChallengeLanding({
   // Refresh on pathname change (Next.js router.push)
   useEffect(() => {
     if (pathname && pathname.endsWith('/daily')) {
-      checkStatuses();
+      checkWordWheelStatus();
+      dailyStatus.refresh();
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
 
   // Completion count for progress bar
   const completedCount =
-    (status.wordHunt === 'won' ? 1 : 0) +
-    (status.wordWheel === 'played' ? 1 : 0);
+    (wordHuntStatus === 'won' ? 1 : 0) +
+    (wordWheelStatus === 'played' ? 1 : 0);
 
-  const wordHuntPlayed = status.wordHunt === 'won' || status.wordHunt === 'lost';
-  const wordWheelPlayed = status.wordWheel === 'played';
+  const wordHuntPlayed = wordHuntStatus === 'won' || wordHuntStatus === 'lost';
+  const wordWheelPlayed = wordWheelStatus === 'played';
 
   return (
     <motion.div
@@ -192,27 +183,27 @@ export function DailyChallengeLanding({
               'flex items-center gap-4',
               'focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-lime',
               'transition-all duration-200 group',
-              status.wordHunt === 'won'
+              wordHuntStatus === 'won'
                 ? 'bg-neo-lime/[0.06] hover:bg-neo-lime/[0.1]'
                 : 'bg-neo-pink/[0.06] hover:bg-neo-pink/[0.1]'
             )}
           >
             <div className={cn(
               'absolute inset-e-0 top-0 bottom-0 w-1.5 rounded-e-lg',
-              status.wordHunt === 'won' ? 'bg-neo-lime' : 'bg-neo-pink'
+              wordHuntStatus === 'won' ? 'bg-neo-lime' : 'bg-neo-pink'
             )} />
             <motion.div
-              data-testid={status.wordHunt === 'won' ? 'won-badge' : 'lost-badge'}
+              data-testid={wordHuntStatus === 'won' ? 'won-badge' : 'lost-badge'}
               className={cn(
                 'w-12 h-12 rounded-full border-2 border-neo-black shrink-0',
                 'flex items-center justify-center shadow-hard-xs',
-                status.wordHunt === 'won' ? 'bg-neo-lime' : 'bg-neo-pink'
+                wordHuntStatus === 'won' ? 'bg-neo-lime' : 'bg-neo-pink'
               )}
               initial={{ scale: 0, rotate: -180 }}
               animate={{ scale: 1, rotate: 0 }}
               transition={{ delay: 0.25, type: 'spring', stiffness: 200, damping: 15 }}
             >
-              {status.wordHunt === 'won'
+              {wordHuntStatus === 'won'
                 ? <Check className="w-6 h-6 text-neo-black" strokeWidth={3} />
                 : <X className="w-6 h-6 text-neo-black" strokeWidth={3} />
               }
@@ -223,11 +214,11 @@ export function DailyChallengeLanding({
               </h2>
               <span className={cn(
                 'inline-block mt-1.5 px-2.5 py-0.5 text-[10px] font-black uppercase rounded-md border-2',
-                status.wordHunt === 'won'
+                wordHuntStatus === 'won'
                   ? 'bg-neo-lime/20 text-neo-lime border-neo-lime/40'
                   : 'bg-neo-pink/20 text-neo-pink border-neo-pink/40'
               )}>
-                {status.wordHunt === 'won' ? t('daily.cleared') : t('daily.wordHunt.title')}
+                {wordHuntStatus === 'won' ? t('daily.cleared') : t('daily.wordHunt.title')}
               </span>
             </div>
             <div className={cn(
@@ -249,8 +240,8 @@ export function DailyChallengeLanding({
           tagline={t('daily.wordHunt.desc')}
           details={t('daily.wordHunt.details')}
           color="orange"
-          status={status.wordHunt}
-          isLoadingStatus={loadingStatus.wordHunt}
+          status={wordHuntStatus}
+          isLoadingStatus={dailyStatus.loading}
           onPlay={onSelectWordHunt}
           timeMode="timed"
           timeModeLabel={t('daily.timedQuest')}

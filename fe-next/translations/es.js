@@ -4928,7 +4928,13 @@ const es = {
     "continueMissions": "Continúa tus misiones diarias",
     "requestChallenge": "Solicitar desafío",
     "requestSent": "Solicitud enviada",
-    "watchAdRetry": "Ver anuncio para reintentar"
+    "watchAdRetry": "Ver anuncio para reintentar",
+    "streakFreezeTooltip": "Congelación de racha — protege tu racha si te saltas un día",
+    "streakFreezesAvailable": "{count} congelaciones de racha disponibles",
+    "todayReward": "Hoy: {{coins}} monedas",
+    "tomorrowReward": "Mañana: {{coins}} monedas",
+    "nearMilestone": "¡{{days}} días para la insignia {{badge}}!",
+    "rewardDay": "Día {day}"
   },
   "wordWheel": {
     "title": "Rueda de palabras",

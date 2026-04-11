@@ -4943,7 +4943,13 @@ const ja = {
     },
     "requestChallenge": "チャレンジをリクエスト",
     "requestSent": "リクエスト送信済み",
-    "watchAdRetry": "広告を見てリトライ"
+    "watchAdRetry": "広告を見てリトライ",
+    "streakFreezeTooltip": "ストリークフリーズ — 1日休んでもストリークを守ります",
+    "streakFreezesAvailable": "ストリークフリーズ{count}個利用可能",
+    "todayReward": "今日: {{coins}}コイン",
+    "tomorrowReward": "明日: {{coins}}コイン",
+    "nearMilestone": "{{badge}}バッジまであと{{days}}日！",
+    "rewardDay": "{day}日目"
   },
   "wordWheel": {
     "title": "ワードホイール",

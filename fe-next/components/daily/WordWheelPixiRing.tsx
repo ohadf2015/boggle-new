@@ -90,7 +90,7 @@ export default function WordWheelPixiRing({ selectedIndices, radius, combo }: Wo
         if (sel.length >= 1) {
           const pts = sel.map(idx => {
             if (idx === -1) return { x: cx, y: cy };
-            const rad = (idx * 45 * Math.PI) / 180;
+            const rad = (idx * 60 * Math.PI) / 180;
             return { x: cx + Math.sin(rad) * r, y: cy - Math.cos(rad) * r };
           });
 

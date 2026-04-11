@@ -70,6 +70,8 @@ interface LevelCompleteModalProps {
   wordsFoundCount?: number;
   /** Streak milestone reached this session, if any */
   streakMilestone?: { days: number; rewardGold: number; titleKey: string } | null;
+  /** Mode-specific stats for blast/hunt/wheel completion display */
+  modeStats?: { archetype: string; movesRemaining?: number; movesTotal?: number; huntAttempts?: number; huntFound?: boolean; centerLetterWords?: number; totalWords?: number } | null;
 }
 
 // ==============================================
@@ -124,6 +126,7 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
     bestWord,
     wordsFoundCount,
     streakMilestone,
+    modeStats,
   }) => {
     const { t } = useLanguage();
     const dialogRef = useRef<HTMLDivElement>(null);
@@ -328,6 +331,7 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
                 bossDefeatShare={null}
                 bestAttempt={bestAttempt}
                 missedWords={missedWords}
+                modeStats={modeStats}
                 t={t}
               />
             </div>

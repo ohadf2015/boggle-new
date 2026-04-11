@@ -258,7 +258,7 @@ const WordWheelChallenge: React.FC = () => {
                 {puzzle.centerLetter}
               </motion.div>
               {puzzle.outerLetters.map((letter, i) => {
-                const angle = i * 45;
+                const angle = i * 60;
                 const rad = (angle * Math.PI) / 180;
                 const x = Math.sin(rad) * 60;
                 const y = -Math.cos(rad) * 60;

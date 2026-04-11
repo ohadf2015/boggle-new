@@ -53,6 +53,7 @@ import { pickRuneOffering, MAX_EQUIPPED_RUNES, computeForgePickEffects } from '@
 import type { RuneCardDef, RuneCard as RuneCardType } from '@/types/wordForge';
 import { RunePicker } from '@/components/wordForge/RunePicker';
 import { RuneBar } from '@/components/wordForge/RuneBar';
+import { LowHPOverlay } from '@/components/wordhunt/LowHPOverlay';
 import dynamic from 'next/dynamic';
 const WordWheelPixiRing = dynamic(() => import('@/components/daily/WordWheelPixiRing'), { ssr: false });
 
@@ -848,6 +849,17 @@ const AdventureGame = memo<AdventureGameProps>(
               levelUpData={levelCompletion.levelUpData} handleLevelUpClose={levelCompletion.handleLevelUpClose}
               currentMilestone={init.currentMilestone}
               streakMilestone={streakMilestone}
+              modeStats={modeState.archetype !== 'classic' && modeState.archetype !== 'boss' ? {
+                archetype: modeState.archetype,
+                movesRemaining: gameState.movesRemaining,
+                movesTotal: modeState.movesLimit,
+                huntAttempts: gameState.huntAttempts?.length,
+                huntFound: gameState.huntFound,
+                centerLetterWords: modeState.centerLetterRequired
+                  ? gameState.wordsFound.filter(w => w.toLowerCase().includes((modeState.centerLetter ?? '').toLowerCase())).length
+                  : undefined,
+                totalWords: gameState.wordsFound.length,
+              } : null}
             />
           }
         />
@@ -855,6 +867,10 @@ const AdventureGame = memo<AdventureGameProps>(
           <div className="fixed inset-0 pointer-events-none z-10">
             <WordWheelPixiRing selectedIndices={selectedIndices} radius={Math.min(140, window.innerWidth * 0.18)} combo={gameState.comboCount} />
           </div>
+        )}
+        {/* Hunt mode: red vignette when HP is critically low — reused from WordHunt */}
+        {modeState.archetype === 'hunt' && currentHP != null && (
+          <LowHPOverlay hp={currentHP} />
         )}
         <AdventureToast
           upgradeTriggered={upgradeTriggered}

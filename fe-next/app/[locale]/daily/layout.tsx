@@ -147,6 +147,7 @@ interface DailyLayoutProps {
 export default async function DailyLayout({ children, params }: DailyLayoutProps): Promise<ReactNode> {
   const { locale } = await params;
   const localePath = `/${locale}`;
+  const localeSeo = seoContent[locale as keyof typeof seoContent] || seoContent.en;
 
   const breadcrumbSchema = {
     '@context': 'https://schema.org',
@@ -162,7 +163,7 @@ export default async function DailyLayout({ children, params }: DailyLayoutProps
       {
         '@type': 'ListItem',
         position: 2,
-        name: 'Daily Challenge',
+        name: localeSeo.title,
         item: `https://www.lexiclash.live${localePath}/daily`,
       },
     ],
@@ -173,8 +174,8 @@ export default async function DailyLayout({ children, params }: DailyLayoutProps
     '@type': 'WebPage',
     '@id': `https://www.lexiclash.live${localePath}/daily#webpage`,
     url: `https://www.lexiclash.live${localePath}/daily`,
-    name: 'Daily Challenge - LexiClash',
-    description: 'Play the daily Word Hunt Survival word search puzzle. Same puzzle for everyone worldwide. Share results like Wordle!',
+    name: `${localeSeo.title} - LexiClash`,
+    description: localeSeo.description,
     isPartOf: {
       '@id': 'https://www.lexiclash.live/#website',
     },
@@ -224,7 +225,7 @@ export default async function DailyLayout({ children, params }: DailyLayoutProps
     '@context': 'https://schema.org',
     '@type': 'WebApplication',
     '@id': 'https://www.lexiclash.live/#webapp-daily',
-    name: 'LexiClash Daily Challenge',
+    name: `LexiClash - ${localeSeo.title}`,
     url: `https://www.lexiclash.live${localePath}/daily`,
     applicationCategory: 'GameApplication',
     operatingSystem: 'Any',

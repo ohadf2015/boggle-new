@@ -93,7 +93,7 @@ export function DailyRewardPreview({ currentStreakDay, t }: DailyRewardPreviewPr
               {entry.coins}
             </motion.div>
             <span className={`text-[9px] font-bold ${entry.isToday ? 'text-neo-cyan' : 'text-neo-cream/30'}`}>
-              {entry.isToday ? '▼' : `D${entry.day}`}
+              {entry.isToday ? '▼' : t('daily.rewardDay').replace('{day}', String(entry.day))}
             </span>
           </div>
         ))}

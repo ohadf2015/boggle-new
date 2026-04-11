@@ -198,12 +198,14 @@ export const GameGridArea = memo(function GameGridArea({
         </div>
       </div>
 
-      {/* Center letter indicator (wheel mode) */}
+      {/* Center letter indicator (wheel mode) — prominent glow matching standalone WordWheel */}
       {centerLetter && (
-        <div className="shrink-0 flex items-center justify-center py-1">
-          <div className="flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-neo-purple/15 border border-neo-purple/30">
-            <span className="text-xs text-neo-white/60 font-medium">{t('adventure.mode.wheelMustInclude')}</span>
-            <span className="text-lg font-black text-neo-purple uppercase">{centerLetter}</span>
+        <div className="shrink-0 flex items-center justify-center py-1.5">
+          <div className="flex items-center gap-2 px-4 py-1 rounded-full bg-neo-purple/20 border-2 border-neo-purple/50 shadow-[0_0_12px_rgba(139,92,246,0.3)]">
+            <span className="text-xs text-neo-white/60 font-bold uppercase tracking-wide">{t('adventure.mode.wheelMustInclude')}</span>
+            <span className="w-8 h-8 rounded-full bg-neo-purple/30 border-2 border-neo-purple flex items-center justify-center text-lg font-black text-neo-purple uppercase shadow-[0_0_8px_rgba(139,92,246,0.4)]">
+              {centerLetter}
+            </span>
           </div>
         </div>
       )}

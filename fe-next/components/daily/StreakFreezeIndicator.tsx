@@ -22,7 +22,7 @@ export function StreakFreezeIndicator({ freezeCount, t, className = '' }: Streak
       className={`flex items-center gap-1 ${className}`}
       title={tooltip}
       role="img"
-      aria-label={`${freezeCount} streak freezes available`}
+      aria-label={t('daily.streakFreezesAvailable').replace('{count}', String(freezeCount))}
     >
       {Array.from({ length: MAX_SLOTS }, (_, i) => {
         const isFilled = i < freezeCount;

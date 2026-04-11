@@ -115,6 +115,8 @@ export interface AdventureGameOverlaysProps {
   handleLevelUpClose: () => void;
   currentMilestone: ComboMilestoneConfig | null;
   streakMilestone?: { days: number; rewardGold: number; titleKey: string } | null;
+  /** Mode-specific stats for blast/hunt/wheel completion display */
+  modeStats?: { archetype: string; movesRemaining?: number; movesTotal?: number; huntAttempts?: number; huntFound?: boolean; centerLetterWords?: number; totalWords?: number } | null;
 }
 
 const AdventureGameOverlays = memo<AdventureGameOverlaysProps>(({
@@ -134,7 +136,7 @@ const AdventureGameOverlays = memo<AdventureGameOverlaysProps>(({
   storyBeat, showStoryBeat,
   currentPopup, scoreDisplayRef, reaction, dismissReaction,
   chainBurstConfig, setChainBurstConfig, particleConfig, setParticleConfig,
-  pendingExplosions, removeExplosion, levelUpData, handleLevelUpClose, currentMilestone, streakMilestone,
+  pendingExplosions, removeExplosion, levelUpData, handleLevelUpClose, currentMilestone, streakMilestone, modeStats,
 }) => (
   <>
     <BossOverlay boss={bossConfig}
@@ -233,7 +235,8 @@ const AdventureGameOverlays = memo<AdventureGameOverlaysProps>(({
         saveFailed={saveFailed} onRetrySave={onRetrySave}
         bestWord={wordsFound.reduce((best, word) => word.length > best.length ? word : best, '')}
         wordsFoundCount={wordsFound.length}
-        streakMilestone={streakMilestone} />
+        streakMilestone={streakMilestone}
+        modeStats={modeStats} />
     )}
 
     {storyBeat && (

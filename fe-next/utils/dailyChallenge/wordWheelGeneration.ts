@@ -2,7 +2,7 @@
  * Word Wheel Puzzle Generation
  *
  * Generates deterministic Word Wheel puzzles seeded on date + language.
- * A Word Wheel has 9 letters: 1 center + 8 outer.
+ * A Word Wheel has 7 letters: 1 center + 6 outer.
  * Every valid word must include the center letter.
  */
 
@@ -110,19 +110,19 @@ export function generateWordWheelPuzzle(
   const sourceIndex = Math.floor(random() * sources.length);
   const sourceWord = sources[sourceIndex];
 
-  // Extract unique letters (take first 9 if more)
+  // Extract unique letters (take first 7 if more)
   let letters = getUniqueLetters(sourceWord);
-  if (letters.length > 9) letters = letters.slice(0, 9);
+  if (letters.length > 7) letters = letters.slice(0, 7);
 
-  // If fewer than 9 unique letters, pad with common letters
-  if (letters.length < 9) {
+  // If fewer than 7 unique letters, pad with common letters
+  if (letters.length < 7) {
     const commonLetters = language === 'he'
       ? ['א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ח', 'י', 'כ', 'ל', 'מ', 'נ', 'ר', 'ש', 'ת']
       : language === 'ja'
         ? ['日', '月', '火', '水', '木', '金', '土', '人', '大', '小', '上', '下']
         : ['E', 'T', 'A', 'O', 'I', 'N', 'S', 'H', 'R', 'D', 'L', 'C', 'U', 'M'];
     const available = commonLetters.filter(l => !letters.includes(l));
-    while (letters.length < 9 && available.length > 0) {
+    while (letters.length < 7 && available.length > 0) {
       const idx = Math.floor(random() * available.length);
       letters.push(available.splice(idx, 1)[0]);
     }
@@ -137,7 +137,7 @@ export function generateWordWheelPuzzle(
   // Center letter is the most "useful" — pick one that appears most in common words
   // For simplicity: use the first letter after shuffle (deterministic)
   const centerLetter = letters[0];
-  const outerLetters = letters.slice(1, 9);
+  const outerLetters = letters.slice(1, 7);
 
   return {
     centerLetter,

@@ -181,7 +181,7 @@ export const GameHeader = memo(function GameHeader({
             </span>
           </div>
         ) : showMoveCounter && movesRemaining != null ? (
-          /* Blast mode: move counter instead of timer */
+          /* Blast mode: rich circular move counter matching standalone BlastHUD */
           <div className={cn(
             'flex items-center gap-1.5',
             'bg-neo-pink/15 rounded-neo',
@@ -192,13 +192,23 @@ export const GameHeader = memo(function GameHeader({
               W{worldNumber}·L{levelNumber}
             </span>
             <span className="text-neo-white/20 text-[10px]">|</span>
-            <Crosshair className="w-3.5 h-3.5 text-neo-pink" />
-            <span className={cn(
-              'text-sm font-mono font-black tabular-nums',
-              movesRemaining <= 3 ? 'text-neo-red animate-pulse' : 'text-neo-pink'
+            {/* Circular counter with urgency thresholds from BlastHUD */}
+            <div className={cn(
+              'w-8 h-8 rounded-full flex items-center justify-center border-2 transition-colors',
+              movesRemaining <= 2 ? 'border-neo-red/80 bg-neo-red/15' :
+              movesRemaining <= 5 ? 'border-neo-pink/60 bg-neo-pink/10' :
+              'border-white/25 bg-white/8'
             )}>
-              {movesRemaining}
-            </span>
+              <span className={cn(
+                'text-base font-black tabular-nums leading-none',
+                movesRemaining <= 2 ? 'text-neo-red blast-heartbeat' :
+                movesRemaining <= 3 ? 'text-neo-red' :
+                movesRemaining <= 5 ? 'text-neo-yellow' :
+                'text-neo-pink'
+              )}>
+                {movesRemaining}
+              </span>
+            </div>
           </div>
         ) : showLifeBar && currentHP != null && maxHP != null ? (
           /* Hunt mode: HP bar instead of timer */
