@@ -8,7 +8,7 @@
  * Provides both game settings state and game runtime state.
  */
 
-import { useState, useCallback, useMemo, useRef, MutableRefObject } from 'react';
+import { useState, useCallback, useMemo, useRef, useEffect, MutableRefObject } from 'react';
 import { generateRandomTable } from '@/utils/utils';
 import { DIFFICULTIES, DEFAULT_DIFFICULTY, DEFAULT_MIN_WORD_LENGTH } from '@/utils/consts';
 import type { Language, LetterGrid, DifficultyLevel, Avatar } from '@/types';
@@ -240,6 +240,18 @@ export function useHostViewState(options: UseHostViewStateOptions = {}): UseHost
   const [timerValue, setTimerValue] = useState<number>(2);
   const [timerDirection, setTimerDirection] = useState<number>(0);
   const [hostPlayingEnabled, setHostPlayingEnabled] = useLocalStorageState<boolean>('host_broadcast_mode_enabled', true);
+
+  // On mobile devices, TV mode (broadcast) should always be off — force hostPlaying=true
+  // This prevents a desktop TV-mode toggle from carrying over to mobile via localStorage
+  const isMobileRef = useRef(
+    typeof window !== 'undefined' && window.matchMedia('(max-width: 1023px)').matches
+  );
+  useEffect(() => {
+    if (isMobileRef.current && !hostPlayingEnabled) {
+      setHostPlayingEnabled(true);
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   const [gameType, setGameType] = useState<'regular' | 'tournament'>('regular');
   const [tournamentRounds, setTournamentRounds] = useState<number>(3);
 
