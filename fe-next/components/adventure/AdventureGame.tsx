@@ -51,6 +51,13 @@ import { useAdventureKeyboardShortcuts } from './hooks/useAdventureKeyboardShort
 import { useAdventureSFX, useAdventureAnalytics } from './hooks/useAdventureSFXAndAnalytics';
 import { useAdventureMusic } from '@/hooks/useAdventureMusic';
 import type { LevelConfig, TileState, GridTileState } from '@/types/adventure';
+import { pickHuntTarget } from '@/lib/adventure/huntMode';
+import { pickRuneOffering, MAX_EQUIPPED_RUNES } from '@/lib/adventure/runeCatalog';
+import type { RuneCardDef, RuneCard as RuneCardType } from '@/types/wordForge';
+import { RunePicker } from '@/components/wordForge/RunePicker';
+import { RuneBar } from '@/components/wordForge/RuneBar';
+import dynamic from 'next/dynamic';
+const WordWheelPixiRing = dynamic(() => import('@/components/daily/WordWheelPixiRing'), { ssr: false });
 
 export interface GameTimerState { timeRemaining: number; totalTime: number; isPlaying: boolean; isPaused: boolean; }
 
@@ -121,6 +128,7 @@ const AdventureGame = memo<AdventureGameProps>(
       effectiveComboTimeout,
       upgradeState, upgradeTriggered, themedWordsFound, lastWordWasThemed,
       movesRemaining, currentHP, maxHP, takeDamage, heal,
+      huntTargetWord, huntAttempts, huntFound, setHuntTarget, submitHuntGuess,
     } = useAdventureGame({
       levelConfig: boostedLevelConfig, initialGrid,
       comboDecayMultiplier: init.upgradeEffects.comboDecayMultiplier * init.runeEffects.comboDecay,
@@ -298,10 +306,43 @@ const AdventureGame = memo<AdventureGameProps>(
     }), [init.skillEffects, init.runeEffects.bossDamage]);
 
     const minWordLength = levelConfig.minWordLength ?? 2;
-    const { validateWord, isValidating } = useAdventureWordValidation({
+    const { validateWord, isValidating, solvedWords } = useAdventureWordValidation({
       grid: initialGrid, language: language || 'en', minWordLength, foundWords: gameState.wordsFound, tiles: tiles2D,
       centerLetter: modeState.centerLetterRequired ? modeState.centerLetter : null,
     });
+    // Hunt mode: pick a target word from the solved word set once it loads
+    const huntTargetPickedRef = useRef(false);
+    useEffect(() => {
+      if (modeState.archetype !== 'hunt' || huntTargetPickedRef.current || !solvedWords) return;
+      const target = pickHuntTarget(solvedWords);
+      if (target) {
+        setHuntTarget(target);
+        huntTargetPickedRef.current = true;
+      }
+    }, [modeState.archetype, solvedWords, setHuntTarget]);
+
+    // Forge mode: pre-level rune picker + equipped runes for RuneBar display
+    const [forgePickerOpen, setForgePickerOpen] = useState(() => modeState.showRunePicker);
+    const [forgeEquippedRunes, setForgeEquippedRunes] = useState<RuneCardType[]>([]);
+    const forgeOffering = useMemo(
+      () => modeState.showRunePicker ? pickRuneOffering(3) : [],
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      [modeState.showRunePicker]
+    );
+    const handleForgePick = useCallback((rune: RuneCardDef, replaceIndex?: number) => {
+      setForgeEquippedRunes(prev => {
+        const card: RuneCardType = { def: rune, instanceId: `adv-pick-${rune.id}-${Date.now()}` };
+        if (replaceIndex !== undefined) {
+          const next = [...prev];
+          next[replaceIndex] = card;
+          return next;
+        }
+        return [...prev, card];
+      });
+      setForgePickerOpen(false);
+    }, []);
+    const handleForgeSkip = useCallback(() => { setForgePickerOpen(false); }, []);
+
     const gridRef = useRef<HTMLDivElement>(null);
     const clickSubmitRef = useRef<(word: string, indices: number[]) => void>(null);
     const handleClickSubmit = useCallback((word: string, indices: number[]) => {
@@ -631,6 +672,20 @@ const AdventureGame = memo<AdventureGameProps>(
       );
     }
 
+    // Forge mode: show rune picker before gameplay starts
+    if (forgePickerOpen && forgeOffering.length > 0) {
+      return (
+        <RunePicker
+          offering={forgeOffering}
+          equippedRunes={forgeEquippedRunes}
+          maxSlots={MAX_EQUIPPED_RUNES}
+          round={1}
+          onPick={handleForgePick}
+          onSkip={handleForgeSkip}
+        />
+      );
+    }
+
     return (
       <div ref={effects.shakeRef} data-testid="adventure-game" data-adventure-game role="main" aria-label={t('adventure.game.title')} className="h-full w-full overflow-hidden relative" style={{ '--mastery-aura': masteryAura } as React.CSSProperties}>
         <GameplayBackground className="absolute inset-0 -z-10" />
@@ -674,6 +729,8 @@ const AdventureGame = memo<AdventureGameProps>(
           sidebar={
             <GameSidebar objectives={objectives}
               showLifeBar={modeState.showLifeBar} currentHP={currentHP} maxHP={maxHP}
+              showTargetWordUI={modeState.showTargetWordUI} huntTargetLength={huntTargetWord?.length ?? 0}
+              huntAttempts={huntAttempts} onHuntGuess={submitHuntGuess} huntFound={huntFound ?? false}
               showSlideIn={entryPhase === 'objectives'} onSlideInComplete={handleEntryPhaseComplete}
               hasHintsAvailable={hasHintsAvailable} onHintClick={handleHintClick}
               showAutoHint={showAutoHint} currentHint={currentHint}
@@ -751,6 +808,18 @@ const AdventureGame = memo<AdventureGameProps>(
             />
           }
         />
+        {modeState.archetype === 'blast' && entryPhase === 'playing' && movesRemaining !== undefined && movesRemaining <= 3 && movesRemaining > 0 && (
+          <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-20 animate-pulse">
+            <div className="bg-neo-red/90 text-neo-cream font-neo-display font-black text-sm px-4 py-1.5 rounded-neo border-3 border-neo-black shadow-hard">
+              {movesRemaining} {t('adventure.mode.blast.movesLeft')}
+            </div>
+          </div>
+        )}
+        {modeState.archetype === 'wheel' && entryPhase === 'playing' && (
+          <div className="fixed inset-0 pointer-events-none z-10">
+            <WordWheelPixiRing selectedIndices={selectedIndices} radius={Math.min(140, window.innerWidth * 0.18)} combo={gameState.comboCount} />
+          </div>
+        )}
         <AdventureToast
           upgradeTriggered={upgradeTriggered}
           lastWordWasThemed={lastWordWasThemed}
@@ -805,6 +874,11 @@ const AdventureGame = memo<AdventureGameProps>(
         )}
         {showTutorial && (
           <AdventureTutorial onComplete={() => setShowTutorial(false)} />
+        )}
+        {modeState.archetype === 'forge' && forgeEquippedRunes.length > 0 && (
+          <div className="fixed bottom-0 left-0 right-0 z-30">
+            <RuneBar runes={forgeEquippedRunes} maxSlots={MAX_EQUIPPED_RUNES} />
+          </div>
         )}
       </div>
     );

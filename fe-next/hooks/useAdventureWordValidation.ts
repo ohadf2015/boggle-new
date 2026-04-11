@@ -57,6 +57,8 @@ export interface UseAdventureWordValidationReturn {
     word: string,
     path: Array<{ row: number; col: number }>
   ) => Promise<WordValidationResult>;
+  /** The pre-solved word set (null while loading) */
+  solvedWords: Set<string> | null;
 }
 
 // ==============================================
@@ -380,5 +382,7 @@ export function useAdventureWordValidation({
     isSolveGridLoading,
     lastValidationResult,
     validateWord,
+    /** The pre-solved word set for this grid (used by hunt mode to pick a target) */
+    solvedWords: solvedWords ?? null,
   };
 }

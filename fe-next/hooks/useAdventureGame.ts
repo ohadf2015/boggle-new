@@ -104,6 +104,14 @@ interface UseAdventureGameReturn {
   takeDamage: (amount: number) => void;
   /** Dispatch HEAL to restore HP (hunt mode) */
   heal: (amount: number) => void;
+  /** Hunt mode state */
+  huntTargetWord?: string;
+  huntAttempts?: Array<{ guess: string; feedback: import('@/shared/types/game').LetterFeedback[] }>;
+  huntFound?: boolean;
+  /** Set the hunt target word */
+  setHuntTarget: (word: string) => void;
+  /** Submit a hunt guess */
+  submitHuntGuess: (guess: string) => void;
 }
 
 // ==============================================
@@ -286,6 +294,14 @@ export function useAdventureGame({
     dispatch({ type: 'HEAL', payload: { amount } });
   }, []);
 
+  const setHuntTarget = useCallback((word: string) => {
+    dispatch({ type: 'SET_HUNT_TARGET', payload: { targetWord: word } });
+  }, []);
+
+  const submitHuntGuess = useCallback((guess: string) => {
+    dispatch({ type: 'SUBMIT_HUNT_GUESS', payload: { guess } });
+  }, []);
+
   const isShufflingRef = useRef(false);
   const useShuffle = useCallback(() => {
     if (state.shufflesRemaining <= 0 || isShufflingRef.current) return;
@@ -338,5 +354,10 @@ export function useAdventureGame({
     maxHP: state.maxHP,
     takeDamage,
     heal,
+    huntTargetWord: state.huntTargetWord,
+    huntAttempts: state.huntAttempts,
+    huntFound: state.huntFound,
+    setHuntTarget,
+    submitHuntGuess,
   };
 }

@@ -18,6 +18,7 @@ import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import AdventureObjectives from '../AdventureObjectives';
 import { WordHuntLifeBar } from '@/components/game/WordHuntLifeBar';
+import { WordHuntTargetArea } from '@/components/game/WordHuntTargetArea';
 import { ChapterQuestProgress } from './ChapterQuestProgress';
 import type { ChapterQuest, ChapterQuestProgress as QuestProgressType, LevelObjective, ObjectiveType } from '@/types/adventure';
 import { calculateStars } from '@/hooks/adventureGameReducer';
@@ -93,6 +94,16 @@ interface GameSidebarProps {
   currentHP?: number;
   /** Max HP for life bar (hunt mode) */
   maxHP?: number;
+  /** Hunt mode: show target word guessing UI */
+  showTargetWordUI?: boolean;
+  /** Hunt mode: target word length */
+  huntTargetLength?: number;
+  /** Hunt mode: previous guess attempts */
+  huntAttempts?: Array<{ guess: string; feedback: import('@/shared/types/game').LetterFeedback[] }>;
+  /** Hunt mode: submit a guess */
+  onHuntGuess?: (guess: string) => void;
+  /** Hunt mode: whether target has been found */
+  huntFound?: boolean;
   /** Chapter quests for progress display */
   chapterQuests?: ChapterQuest[];
   /** Chapter quest progress */
@@ -127,6 +138,11 @@ export const GameSidebar = memo(function GameSidebar({
   showLifeBar = false,
   currentHP,
   maxHP,
+  showTargetWordUI = false,
+  huntTargetLength = 0,
+  huntAttempts = [],
+  onHuntGuess,
+  huntFound = false,
   chapterQuests = [],
   chapterQuestProgress = [],
   className,
@@ -153,6 +169,18 @@ export const GameSidebar = memo(function GameSidebar({
       {showLifeBar && currentHP != null && maxHP != null && (
         <div className="px-3 py-1.5 border-b border-neo-white/10">
           <WordHuntLifeBar life={currentHP} maxLife={maxHP} />
+        </div>
+      )}
+
+      {/* Hunt mode: Target word guessing area (reuses WordHuntTargetArea) */}
+      {showTargetWordUI && huntTargetLength > 0 && onHuntGuess && (
+        <div className="px-3 py-2 border-b border-neo-white/10">
+          <WordHuntTargetArea
+            targetLength={huntTargetLength}
+            attempts={huntAttempts}
+            onSubmit={onHuntGuess}
+            found={huntFound}
+          />
         </div>
       )}
 

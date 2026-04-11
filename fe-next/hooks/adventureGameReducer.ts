@@ -9,6 +9,7 @@ import type {
   TileActivationEffect,
 } from '@/types/adventure';
 import { isThemedWord, getThemeBonusMultiplier } from '@/lib/adventure/themedWords';
+import { computeLetterFeedback, HUNT_WRONG_GUESS_DAMAGE } from '@/lib/adventure/huntMode';
 
 export type GameAction =
   | { type: 'START_GAME' }
@@ -40,7 +41,9 @@ export type GameAction =
   | { type: 'UPDATE_OBJECTIVE'; payload: { objectiveType: string; value: number; mode: 'set' | 'increment' } }
   | { type: 'USE_MOVE' }
   | { type: 'TAKE_DAMAGE'; payload: { amount: number } }
-  | { type: 'HEAL'; payload: { amount: number } };
+  | { type: 'HEAL'; payload: { amount: number } }
+  | { type: 'SET_HUNT_TARGET'; payload: { targetWord: string } }
+  | { type: 'SUBMIT_HUNT_GUESS'; payload: { guess: string } };
 
 /** Lightweight upgrade config stored in reducer state for tile effect processing */
 export interface ReducerUpgradeConfig {
@@ -88,6 +91,12 @@ export interface GameState {
   currentHP?: number;
   /** Hunt mode: maximum hit points */
   maxHP?: number;
+  /** Hunt mode: hidden target word (uppercase) */
+  huntTargetWord?: string;
+  /** Hunt mode: previous guess attempts with Wordle-style feedback */
+  huntAttempts?: Array<{ guess: string; feedback: import('@/shared/types/game').LetterFeedback[] }>;
+  /** Hunt mode: whether the target has been found */
+  huntFound?: boolean;
 }
 
 const GOLD_MULTIPLIER = 3;
@@ -738,6 +747,60 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
     case 'HEAL': {
       if (state.currentHP == null || state.maxHP == null) return state;
       return { ...state, currentHP: Math.min(state.currentHP + action.payload.amount, state.maxHP) };
+    }
+
+    case 'SET_HUNT_TARGET': {
+      return {
+        ...state,
+        huntTargetWord: action.payload.targetWord.toUpperCase(),
+        huntAttempts: [],
+        huntFound: false,
+      };
+    }
+
+    case 'SUBMIT_HUNT_GUESS': {
+      if (!state.huntTargetWord || state.huntFound) return state;
+      const guess = action.payload.guess.toUpperCase();
+      const target = state.huntTargetWord;
+      const feedback = computeLetterFeedback(guess, target);
+      const isCorrect = guess === target;
+      const newAttempts = [...(state.huntAttempts ?? []), { guess, feedback }];
+
+      if (isCorrect) {
+        // Found the target — complete the level
+        const updatedObjectives = state.objectives.map((obj) =>
+          obj.type === 'wordCount' ? { ...obj, current: obj.target, isComplete: true } : obj,
+        );
+        return {
+          ...state,
+          huntAttempts: newAttempts,
+          huntFound: true,
+          objectives: updatedObjectives,
+          gameState: {
+            ...state.gameState,
+            score: state.gameState.score + target.length * 100,
+            isComplete: true,
+            stars: calculateStars(updatedObjectives),
+          },
+          isPlaying: false,
+        };
+      }
+
+      // Wrong guess — take damage
+      const newHP = state.currentHP != null
+        ? Math.max(0, state.currentHP - HUNT_WRONG_GUESS_DAMAGE)
+        : undefined;
+      const isDead = newHP != null && newHP <= 0;
+
+      return {
+        ...state,
+        huntAttempts: newAttempts,
+        currentHP: newHP,
+        isPlaying: isDead ? false : state.isPlaying,
+        gameState: isDead
+          ? { ...state.gameState, isComplete: true, stars: calculateStars(state.objectives) }
+          : state.gameState,
+      };
     }
 
     default:

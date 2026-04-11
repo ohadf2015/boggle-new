@@ -108,6 +108,65 @@ const RUNE_MAP = new Map<string, RuneDefinition>(
 // FUNCTIONS
 // ==============================================
 
+// ==============================================
+// ADAPTER: RuneDefinition ↔ RuneCardDef / RuneCard
+// Allows reuse of WordForge's RunePicker & RuneBar in adventure forge levels.
+// ==============================================
+
+import type { RuneCardDef, RuneCard, RuneRarity as ForgeRuneRarity } from '@/types/wordForge';
+
+/** Map adventure effect channels to word-forge rune categories. */
+const CHANNEL_TO_CATEGORY: Record<RuneEffectChannel, import('@/types/wordForge').RuneCategory> = {
+  scoreMultiplier: 'chip',
+  goldMultiplier: 'mult',
+  timeBonus: 'special',
+  comboDecay: 'special',
+  hintBonus: 'special',
+  bossDamage: 'mult',
+};
+
+/** Emoji icons per rune ID for display in RunePicker / RuneBar. */
+const RUNE_ICONS: Record<string, string> = {
+  ember: '🔥', inferno: '🌋', midas: '💰', fortune: '🍀',
+  hourglass: '⏳', eternity: '♾️', flow: '🌊', torrent: '🌀',
+  insight: '💡', oracle: '🔮', valor: '⚔️', dragonslayer: '🐉',
+};
+
+/** Clamp adventure rarity to the forge rarity union (no 'epic'). */
+function toForgeRarity(r: RuneRarity): ForgeRuneRarity {
+  return r === 'epic' ? 'rare' : (r as ForgeRuneRarity);
+}
+
+/** Convert a RuneDefinition to a RuneCardDef for use in RunePicker. */
+export function toRuneCardDef(def: RuneDefinition): RuneCardDef {
+  return {
+    id: def.id,
+    name: def.nameKey, // RunePicker uses t() on descriptionKey; name is shown raw
+    descriptionKey: def.descriptionKey,
+    category: CHANNEL_TO_CATEGORY[def.effectChannel],
+    rarity: toForgeRarity(def.rarity),
+    icon: RUNE_ICONS[def.id] ?? '🔷',
+    unlockTier: 0,
+  };
+}
+
+/** Convert a PlayerRune to a RuneCard for use in RuneBar. */
+export function toRuneCard(playerRune: PlayerRune): RuneCard | null {
+  const def = RUNE_MAP.get(playerRune.runeId);
+  if (!def) return null;
+  return {
+    def: toRuneCardDef(def),
+    instanceId: `adv-${playerRune.runeId}`,
+  };
+}
+
+/** Pick N random rune offerings from the catalog for the pre-level picker. */
+export function pickRuneOffering(count = 3, excludeIds: string[] = []): RuneCardDef[] {
+  const pool = RUNE_CATALOG.filter(r => !excludeIds.includes(r.id));
+  const shuffled = [...pool].sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, count).map(toRuneCardDef);
+}
+
 /** Get rune definition by ID, or undefined if not found. */
 export function getRuneById(runeId: string): RuneDefinition | undefined {
   return RUNE_MAP.get(runeId);
