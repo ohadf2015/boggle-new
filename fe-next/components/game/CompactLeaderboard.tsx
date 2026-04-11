@@ -404,7 +404,7 @@ export const CompactLeaderboard = memo<CompactLeaderboardProps>(function Compact
                         initial={{ scale: 0, opacity: 0 }}
                         animate={{ scale: [1, 1.2, 1], opacity: 1 }}
                         exit={{ scale: 0, opacity: 0 }}
-                        transition={{ scale: { duration: 0.6, repeat: Infinity } }}
+                        transition={{ scale: { type: 'tween', duration: 0.6, repeat: Infinity } }}
                       >
                         <Flame className="w-3 h-3 text-neo-orange" />
                       </motion.div>

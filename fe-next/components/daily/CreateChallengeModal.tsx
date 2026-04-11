@@ -207,7 +207,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                   <motion.div
                     className="absolute -top-1 -right-1"
                     animate={{ scale: [1, 1.2, 1], rotate: [0, 10, 0] }}
-                    transition={{ repeat: Infinity, duration: 2 }}
+                    transition={{ type: 'tween', repeat: Infinity, duration: 2 }}
                   >
                     <Sparkles className="w-4 h-4 text-neo-pink" fill="currentColor" />
                   </motion.div>
@@ -390,7 +390,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                     <motion.div
                       className="absolute inset-0 flex items-center justify-center"
                       animate={{ scale: [1, 1.2, 1] }}
-                      transition={{ duration: 1.5, repeat: Infinity }}
+                      transition={{ type: 'tween', duration: 1.5, repeat: Infinity }}
                     >
                       <Sparkles className="w-10 h-10 sm:w-12 sm:h-12 text-neo-orange" strokeWidth={2.5} />
                     </motion.div>

@@ -93,7 +93,7 @@ export function useCrossTabSync({
               }
             }
           } catch (err) {
-            logger.warn('AuthContext: Error handling cross-tab session refresh:', err);
+            logger.debug('AuthContext: Error handling cross-tab session refresh:', err);
           }
           break;
 

@@ -182,7 +182,7 @@ const FloatingScoreAnimation = memo<FloatingScoreAnimationProps>(({
               {isFireRound && (
                 <AdaptiveMotion.span
                   animate={{ scale: [1, 1.2, 1] }}
-                  transition={{ duration: 0.3, repeat: 2 }}
+                  transition={{ type: 'tween', duration: 0.3, repeat: 2 }}
                 >
                   🔥
                 </AdaptiveMotion.span>

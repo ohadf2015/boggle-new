@@ -1001,16 +1001,6 @@
   -webkit-overflow-scrolling: touch;
 }
 
-/* Mobile-optimized touch targets (minimum 44x44px per WCAG) */
-
-input,
-select,
-button,
-[role="button"],
-.touch-target {
-  min-height: 44px;
-}
-
 /* Prevent iOS zoom on input focus (requires 16px min font) */
 input,
 select,
@@ -1594,7 +1584,6 @@ body.crazygames-embed {
 
   /* Improved button sizing */
   button:not(.icon-only) {
-    min-height: 48px;
     padding: 0.75rem 1rem;
   }
 
@@ -1839,14 +1828,6 @@ body.crazygames-embed {
 /* Single source of truth for mobile/tablet landscape touch targets */
 /* Max-width 1199px ensures desktop uses its own min-width based styles */
 @media (orientation: landscape) and (max-width: 1199px) {
-  /* All interactive elements must meet 48px minimum */
-  button,
-  a[role="button"],
-  [role="button"] {
-    min-height: 48px;
-    min-width: 48px;
-  }
-
   /* Header elements - ensure 48px minimum */
   header button,
   header a {
@@ -1891,13 +1872,6 @@ body.crazygames-embed {
   *:focus-visible {
     outline: 3px solid var(--neo-cyan);
     outline-offset: 2px;
-  }
-
-  /* Enforce accessible touch targets across all landscape heights */
-  button,
-  a[role="button"] {
-    min-height: 48px;
-    min-width: 48px;
   }
 
   input,
@@ -2038,13 +2012,6 @@ body.crazygames-embed {
   /* Hide decorative elements */
   .decorative-landscape {
     display: none !important;
-  }
-
-  /* Accessibility overrides: enforce 48px touch targets on very short heights */
-  button,
-  a[role="button"] {
-    min-height: 48px;
-    min-width: 48px;
   }
 
   /* Grid cells: removed min-width/min-height that caused overlap on tablets. */
@@ -3157,4 +3124,32 @@ html.reduce-motion *::after {
 }
 .animate-avatar-float {
   animation: avatar-float 3s ease-in-out infinite;
+}
+
+/* Crown bounce — neo-brutalist host crown swing (0.8s cycle, ±10°) */
+@keyframes crown-bounce {
+  0%, 100% { transform: translateX(-50%) rotate(0deg) translateY(0); }
+  25% { transform: translateX(-50%) rotate(10deg) translateY(-2px); }
+  75% { transform: translateX(-50%) rotate(-10deg) translateY(-2px); }
+}
+.animate-crown-bounce {
+  animation: crown-bounce 0.8s ease-in-out infinite;
+}
+
+/* Pulse-code — room code pulsing glow */
+@keyframes pulse-code {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.85; transform: scale(1.03); }
+}
+.animate-pulse-code {
+  animation: pulse-code 1.6s ease-in-out infinite;
+}
+
+/* Fade-in-up — staggered entrance for lobby sections */
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in-up {
+  animation: fade-in-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
 }

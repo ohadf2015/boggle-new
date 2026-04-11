@@ -146,12 +146,12 @@ export const EnhancedEmptyState: React.FC<EnhancedEmptyStateProps> = ({
               <motion.div
                 className="absolute -top-2 -right-2 w-4 h-4 bg-neo-pink rounded-full border-2 border-neo-black"
                 animate={{ scale: [1, 1.2, 1], opacity: [0.7, 1, 0.7] }}
-                transition={{ duration: 2, repeat: Infinity }}
+                transition={{ type: 'tween', duration: 2, repeat: Infinity }}
               />
               <motion.div
                 className="absolute -bottom-1 -left-2 w-3 h-3 bg-neo-cyan rounded-full border-2 border-neo-black"
                 animate={{ scale: [1, 1.3, 1], opacity: [0.7, 1, 0.7] }}
-                transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
+                transition={{ type: 'tween', duration: 2, repeat: Infinity, delay: 0.5 }}
               />
             </>
           )}

@@ -2,7 +2,7 @@
 
 import React, { memo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Crown, Bot, Minus, X } from 'lucide-react';
+import { Crown, X } from 'lucide-react';
 import Avatar from '../../../components/Avatar';
 import { useSocket } from '../../../utils/SocketContext';
 import { cn } from '../../../lib/utils';
@@ -32,6 +32,7 @@ interface PlayerRosterProps {
 }
 
 const AVATAR_COLORS = ['bg-neo-cyan', 'bg-neo-pink', 'bg-purple-400', 'bg-neo-lime', 'bg-neo-yellow', 'bg-orange-400', 'bg-teal-400', 'bg-rose-400'];
+const AVATAR_RING_COLORS = ['ring-neo-cyan/40', 'ring-neo-pink/40', 'ring-purple-400/40', 'ring-neo-lime/40', 'ring-neo-yellow/40', 'ring-orange-400/40', 'ring-teal-400/40', 'ring-rose-400/40'];
 
 const DIFFICULTY_CONFIG: Record<BotDifficulty, {
   bgColor: string;
@@ -69,12 +70,10 @@ const playerEntranceVariants = {
   },
 };
 
-export const PlayerRoster = memo(function PlayerRoster({ players, username, gameCode, maxPlayers, hostLabel, t, compact = false }: PlayerRosterProps): React.ReactElement {
+export const PlayerRoster = memo(function PlayerRoster({ players, username, gameCode, maxPlayers, t, compact = false }: PlayerRosterProps): React.ReactElement {
   const { socket } = useSocket();
 
   const isFull = players.length >= maxPlayers;
-  const bots = players.filter(p => typeof p === 'object' && p.isBot);
-  const botCount = bots.length;
 
   const handleAddBot = useCallback((difficulty: 'easy' | 'medium' | 'hard') => {
     socket?.emit('addBot', { difficulty, gameCode });
@@ -86,34 +85,21 @@ export const PlayerRoster = memo(function PlayerRoster({ players, username, game
     }
   }, [socket, t]);
 
-  const handleRemoveLastBot = useCallback(() => {
-    const lastBot = bots[bots.length - 1];
-    if (lastBot && typeof lastBot === 'object') {
-      socket?.emit('removeBot', { username: lastBot.username, gameCode });
-    }
-  }, [socket, gameCode, bots]);
+  const handleRemoveBot = useCallback((botUsername: string) => {
+    socket?.emit('removeBot', { username: botUsername, gameCode });
+  }, [socket, gameCode]);
 
   return (
     <section className={compact ? 'space-y-1' : 'space-y-3'}>
-      {/* Header row with player count badge */}
+      {/* Header row */}
       <div className="flex items-center justify-between px-1">
-        <h2 className="text-xs font-bold uppercase tracking-widest text-slate-500">
+        <h2 className={cn('font-bold uppercase tracking-widest text-slate-500', compact ? 'text-[10px]' : 'text-xs')}>
           {t('hostView.playersInRoom')}
         </h2>
-        <div className="flex items-center gap-2">
-          {hostLabel && (
-            <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">
-              {hostLabel}
-            </span>
-          )}
-          <span className="px-2.5 py-0.5 rounded-full bg-neo-lime/20 border-2 border-neo-lime/40 text-xs font-black text-neo-lime font-neo-display">
-            {players.length} / {maxPlayers}
-          </span>
-        </div>
       </div>
 
       {/* Player avatars grid — centered */}
-      <div className={cn('flex flex-wrap items-end justify-center', compact ? 'gap-3 pb-1' : 'gap-4 pb-2')}>
+      <div className={cn('flex flex-wrap items-end justify-center', compact ? 'gap-5 pb-1' : 'gap-4 pb-2')}>
         <AnimatePresence mode="popLayout">
           {players.map((player, index) => {
             const name = typeof player === 'string' ? player : player.username;
@@ -139,14 +125,9 @@ export const PlayerRoster = memo(function PlayerRoster({ players, username, game
                 <div className="relative">
                   {/* Host crown — larger, more prominent */}
                   {isHostPlayer && (
-                    <motion.div
-                      className="absolute -top-4 left-1/2 -translate-x-1/2 z-10"
-                      initial={{ y: -10, opacity: 0, rotate: -20 }}
-                      animate={{ y: 0, opacity: 1, rotate: [0, 5, -5, 0] }}
-                      transition={{ rotate: { duration: 2, repeat: Infinity, repeatDelay: 4 } }}
-                    >
+                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-10 animate-crown-bounce">
                       <Crown className={cn(compact ? 'w-5 h-5' : 'w-6 h-6', 'text-neo-yellow drop-shadow-[0_0_6px_rgba(255,225,53,0.6)]')} />
-                    </motion.div>
+                    </div>
                   )}
 
                   {/* Avatar — CSS animation replaces JS-driven infinite motion */}
@@ -164,10 +145,14 @@ export const PlayerRoster = memo(function PlayerRoster({ players, username, game
 
                     <div className={cn(
                       'rounded-full border-neo-black flex items-center justify-center overflow-hidden shadow-hard',
-                      compact ? 'w-16 h-16 border-2' : 'w-20 h-20 border-3',
+                      compact ? 'w-16 h-16 border-4' : 'w-20 h-20 border-3',
                       AVATAR_COLORS[index % AVATAR_COLORS.length],
-                      isMe && 'ring-3 ring-neo-lime ring-offset-2 ring-offset-neo-navy',
-                      isHostPlayer && 'ring-3 ring-neo-yellow ring-offset-2 ring-offset-neo-navy',
+                      compact
+                        ? cn('ring-4 ring-offset-2 ring-offset-neo-navy', AVATAR_RING_COLORS[index % AVATAR_RING_COLORS.length])
+                        : cn(
+                            isMe && 'ring-3 ring-neo-lime ring-offset-2 ring-offset-neo-navy',
+                            isHostPlayer && 'ring-3 ring-neo-yellow ring-offset-2 ring-offset-neo-navy',
+                          ),
                     )}>
                       {avatar?.customAvatar || avatar?.avatarImage ? (
                         <Avatar
@@ -183,15 +168,18 @@ export const PlayerRoster = memo(function PlayerRoster({ players, username, game
                     </div>
                   </div>
 
-                  {/* Kick button — visible on hover for non-self players */}
+                  {/* Remove/kick button — always visible for bots, hover-only for humans */}
                   {!isMe && (
                     <motion.button
-                      initial={{ opacity: 0, scale: 0.5 }}
+                      initial={{ opacity: isBot ? 1 : 0, scale: isBot ? 1 : 0.5 }}
                       whileHover={{ scale: 1.2 }}
                       whileTap={{ scale: 0.9 }}
-                      onClick={() => handleKick(name)}
-                      className="absolute -top-1 -inset-e-1 z-20 w-5 h-5 rounded-full bg-red-500 border-2 border-neo-black flex items-center justify-center opacity-0 group-hover/player:opacity-100 transition-opacity shadow-hard-sm"
-                      aria-label={t('hostView.kickPlayer')}
+                      onClick={() => isBot ? handleRemoveBot(name) : handleKick(name)}
+                      className={cn(
+                        'absolute -top-1 -inset-e-1 z-20 w-5 h-5 rounded-full bg-red-500 border-2 border-neo-black flex items-center justify-center transition-opacity shadow-hard-sm',
+                        isBot ? 'opacity-100' : 'opacity-0 group-hover/player:opacity-100'
+                      )}
+                      aria-label={isBot ? t('hostView.removeBot') : t('hostView.kickPlayer')}
                     >
                       <X className="w-3 h-3 text-white stroke-3" />
                     </motion.button>
@@ -214,43 +202,25 @@ export const PlayerRoster = memo(function PlayerRoster({ players, username, game
           })}
         </AnimatePresence>
 
-        {/* Add bot — inline difficulty chips */}
+        {/* Add bot button */}
         {!isFull && (
           <div className="shrink-0 flex flex-col items-center gap-2">
-            <div className="flex items-center gap-1">
-              {([
-                { key: 'easy' as const, label: 'EASY', color: 'bg-neo-lime text-neo-black border-neo-lime' },
-                { key: 'medium' as const, label: 'MED', color: 'bg-neo-yellow text-neo-black border-neo-yellow' },
-                { key: 'hard' as const, label: 'HARD', color: 'bg-neo-orange text-neo-black border-neo-orange' },
-              ]).map((diff) => (
-                <motion.button
-                  key={diff.key}
-                  whileTap={{ scale: 0.9 }}
-                  onClick={() => handleAddBot(diff.key)}
-                  className={cn(
-                    'px-2 py-1 rounded-neo border-2 text-[10px] font-black uppercase shadow-hard-sm hover:shadow-none transition-all',
-                    diff.color
-                  )}
-                >
-                  +{diff.label}
-                </motion.button>
-              ))}
-              {botCount > 0 && (
-                <motion.button
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  whileTap={{ scale: 0.9 }}
-                  onClick={handleRemoveLastBot}
-                  className="px-2 py-1 rounded-neo border-2 border-neo-red/50 text-[10px] font-black uppercase text-neo-red bg-neo-red/10 hover:bg-neo-red/20 transition-all"
-                >
-                  <Minus className="w-3 h-3" />
-                </motion.button>
+            <motion.button
+              whileTap={{ scale: 0.9 }}
+              onClick={() => handleAddBot('medium')}
+              className={cn(
+                'rounded-full border-4 border-dashed border-white/20 bg-white/5 flex items-center justify-center',
+                'hover:bg-white/10 hover:border-neo-cyan/60 transition-all group',
+                compact ? 'w-16 h-16' : 'w-20 h-20'
               )}
-            </div>
-            <span className="text-[10px] font-bold text-slate-600 uppercase flex items-center gap-1">
-              <Bot className="w-3 h-3" />
-              {t('hostView.addBot')}
-            </span>
+            >
+              <div className="flex flex-col items-center">
+                <span className="text-2xl text-white/60 group-hover:text-neo-cyan transition-colors">+</span>
+                <span className="text-[8px] font-black uppercase tracking-tighter text-white/40 group-hover:text-neo-cyan/80 mt-0.5">
+                  + BOT
+                </span>
+              </div>
+            </motion.button>
           </div>
         )}
       </div>

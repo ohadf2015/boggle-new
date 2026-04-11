@@ -134,7 +134,7 @@ const MusicControls: React.FC = memo(() => {
           <motion.div
             className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-neo-lime text-neo-black border-2 border-neo-black"
             animate={{ scale: [1, 1.2, 1] }}
-            transition={{ repeat: Infinity, duration: 1.5 }}
+            transition={{ type: 'tween', repeat: Infinity, duration: 1.5 }}
           />
         )}
       </Button>

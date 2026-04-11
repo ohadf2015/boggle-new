@@ -36,3 +36,11 @@ boggle-new/
 - **RTL**: Test Hebrew with `?locale=he`, shadows auto-flip
 - **Translations**: Use `t('key')`, never hardcode text
 - **WebSocket**: Rate limit 50 msg/10s, auto-reconnect enabled
+
+## Design Context
+- **Users**: Mixed casual + competitive, ages 15-40, phones + TV/party screens, 5 languages (Hebrew RTL)
+- **Brand**: Quirky, electric, loud — party energy + competitive edge + surprising charm
+- **Aesthetic**: Neo-Brutalist refined — dark navy, hard pixel shadows, solid borders, electric color-coded modes (lime/pink/cyan/purple), Fredoka + Rubik fonts, kawaii mascot
+- **Principles**: Energy with intention · Phone AND TV · Personality everywhere · Competitive clarity · Coherent chaos
+- **Anti-references**: Generic mobile game UI, soft gradients, glassmorphism, corporate aesthetics
+- **Full context**: See [.impeccable.md](.impeccable.md)

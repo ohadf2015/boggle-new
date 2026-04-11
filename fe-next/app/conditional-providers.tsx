@@ -93,10 +93,10 @@ export function ConditionalProviders({ children, lang, initialTranslations }: Co
           ) : (
             children
           )}
+          <Suspense fallback={null}>
+            <CommandPalette />
+          </Suspense>
         </EssentialProviders>
-        <Suspense fallback={null}>
-          <CommandPalette />
-        </Suspense>
       </NuqsAdapter>
     </NextIntlClientProvider>
   );

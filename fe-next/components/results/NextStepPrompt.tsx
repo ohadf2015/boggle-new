@@ -333,7 +333,7 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
       <motion.div
         className="absolute top-4 right-4 text-neo-black/50"
         animate={{ scale: [1, 1.2, 1], rotate: [0, 180, 360] }}
-        transition={{ duration: 4, repeat: inf, ease: 'easeInOut' }}
+        transition={{ type: 'tween', duration: 4, repeat: inf, ease: 'easeInOut' }}
       >
         <Sparkles className="w-6 h-6" />
       </motion.div>

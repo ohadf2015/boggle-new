@@ -60,7 +60,7 @@ export const PowerHourActivation: React.FC<PowerHourActivationProps> = memo(
                   ? {}
                   : { scale: [1, 1.2, 1], rotate: [0, -10, 10, 0] }
               }
-              transition={{ duration: 0.6, repeat: 2 }}
+              transition={{ type: 'tween', duration: 0.6, repeat: 2 }}
               className="text-neo-cyan"
             >
               <Zap className="w-10 h-10 fill-neo-cyan stroke-neo-cyan" />

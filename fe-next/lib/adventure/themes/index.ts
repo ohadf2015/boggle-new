@@ -7,6 +7,7 @@
 
 import type { WorldTheme, TileVisualConfig, ChapterConfig } from './types';
 import type { TileType } from '@/types/adventure';
+import logger from '@/utils/logger';
 
 // Import individual world themes
 import { WORLD_1_THEME } from './world1';
@@ -52,10 +53,15 @@ const WORLD_THEMES: Record<number, WorldTheme> = {
  * @throws Error if worldId is invalid (logs warning and returns World 1 as fallback)
  */
 export function getWorldTheme(worldId: number): WorldTheme {
+  // world=0 is a sentinel for endless/weekly modes — use World 1 theme
+  if (worldId === 0) {
+    return WORLD_THEMES[1];
+  }
+
   const theme = WORLD_THEMES[worldId];
 
   if (!theme) {
-    console.warn(`Invalid world ID: ${worldId}. Falling back to World 1 theme.`);
+    logger.debug(`Invalid world ID: ${worldId}. Falling back to World 1 theme.`);
     return WORLD_THEMES[1];
   }
 

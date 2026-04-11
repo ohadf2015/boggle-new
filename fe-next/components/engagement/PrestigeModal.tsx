@@ -135,7 +135,7 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
                 />
                 <motion.div
                   animate={{ rotate: [0, 10, -10, 0], scale: [1, 1.2, 1] }}
-                  transition={{ duration: 0.5, repeat: 3 }}
+                  transition={{ type: 'tween', duration: 0.5, repeat: 3 }}
                   className="text-7xl"
                 >
                   {PRESTIGE_CONFIG.DISPLAY[nextPrestigeLevel]?.icon || '⭐'}

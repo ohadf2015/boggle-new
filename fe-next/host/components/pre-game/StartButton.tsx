@@ -31,8 +31,6 @@ export const StartButton = memo<StartButtonProps>(function StartButton({
   className = '',
   compact = false,
 }) {
-  const isReady = playerCount >= 1 && !disabled;
-
   // Compact: single-line start button + status inline
   if (compact) {
     return (
@@ -66,51 +64,32 @@ export const StartButton = memo<StartButtonProps>(function StartButton({
   }
 
   return (
-    <div className={cn('space-y-2', className)}>
+    <div className={cn('relative', className)}>
       <motion.button
         onClick={onStartGame}
         disabled={disabled}
         className={cn(
-          'w-full h-[52px] lg:h-[60px] flex items-center justify-center gap-3',
-          'font-neo-display font-black text-2xl lg:text-3xl uppercase tracking-tight',
-          'border-3 border-neo-black rounded-neo transition-all',
+          'w-full h-14 flex items-center justify-center gap-3',
+          'font-neo-display font-black text-2xl uppercase tracking-tight',
+          'border-3 border-neo-black rounded-2xl transition-all',
           'active:translate-y-0.5 active:shadow-hard-pressed',
           'disabled:opacity-50 disabled:cursor-not-allowed',
           'focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan',
-          'bg-neo-lime text-neo-black shadow-hard'
+          'bg-neo-lime text-neo-black shadow-hard-lg'
         )}
       >
         {tournamentCreating ? (
           <span className="text-lg">{t('hostView.creatingTournament')}</span>
         ) : (
           <>
-            <Swords className="w-7 h-7" />
+            <Swords className="w-6 h-6" />
             <span>{t('hostView.startBattle')}</span>
           </>
         )}
       </motion.button>
-
-      {/* Expanding line animation + status text */}
-      <div className="flex flex-col items-center gap-1">
-        {isReady && (
-          <motion.div
-            className="h-0.5 bg-neo-lime rounded-full"
-            initial={{ width: '10%' }}
-            animate={{ width: ['10%', '80%', '10%'] }}
-            transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
-          />
-        )}
-        <p className="text-center text-xs font-bold text-slate-500 uppercase tracking-widest">
-          {playerCount > 0
-            ? `${playerCount} ${t('hostView.ofMaxWarriors', { max: String(maxPlayers) }) || `of ${maxPlayers} players ready`}`
-            : (t('hostView.waitingForPlayers'))
-          }
-        </p>
-        {playerCount === 0 && (
-          <p className="text-center text-xs text-slate-600 mt-1">
-            {t('hostView.shareCodeHint')}
-          </p>
-        )}
+      {/* Inline player count badge */}
+      <div className="absolute end-3 top-1/2 -translate-y-1/2 bg-neo-black text-neo-lime text-[10px] font-black px-3 py-1 rounded-full border-2 border-neo-black shadow-hard-sm">
+        {playerCount} / {maxPlayers}
       </div>
     </div>
   );

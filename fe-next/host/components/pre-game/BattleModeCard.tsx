@@ -102,8 +102,6 @@ export function BattleModeCard({
 
   return (
     <section className="rounded-neo-lg border-3 border-neo-black bg-slate-800/80 shadow-hard overflow-hidden">
-      {/* Accent bar */}
-      <div className="h-1 bg-linear-to-r from-neo-purple via-neo-cyan to-neo-pink" />
       <div className="p-3 space-y-2">
       {/* Section label */}
       <h3 className="text-[10px] font-bold uppercase tracking-widest text-neo-cream/50 px-0.5">
@@ -171,26 +169,13 @@ export function BattleModeCard({
           )}>
             {activeMode.largeIcon}
           </div>
-          <div className="flex-1 min-w-0 space-y-1.5">
+          <div className="flex-1 min-w-0 space-y-1">
             <h4 className={cn('font-neo-display text-lg leading-none tracking-tight uppercase', activeMode.activeText)}>
               {t(activeMode.nameKey)}
             </h4>
             <p className="text-[11px] text-neo-cream/60 leading-tight">
               {t(activeMode.descKey)}
             </p>
-            <div className="flex flex-wrap gap-1.5 pt-1">
-              {activeMode.featureKeys.map((key) => (
-                <span
-                  key={key}
-                  className={cn(
-                    'text-[7px] font-bold uppercase tracking-wider px-2 py-0.5 rounded border border-neo-white/10 bg-neo-black/40',
-                    activeMode.activeText
-                  )}
-                >
-                  {t(key)}
-                </span>
-              ))}
-            </div>
           </div>
         </motion.div>
       </AnimatePresence>

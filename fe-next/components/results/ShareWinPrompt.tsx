@@ -357,7 +357,7 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
         <div className="flex items-center gap-3 mb-4">
           <motion.div
             animate={{ rotate: [0, -10, 10, 0], scale: [1, 1.2, 1] }}
-            transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 2 }}
+            transition={{ type: 'tween', duration: 1.5, repeat: Infinity, repeatDelay: 2 }}
           >
             <Trophy className="text-3xl text-yellow-400 drop-shadow-lg" />
           </motion.div>

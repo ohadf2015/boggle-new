@@ -263,24 +263,26 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
 
   return (
     <div className={`${variant === 'standalone' ? 'speech-bubble rotate-[1deg] mb-4' : 'flex flex-col h-full'} flex flex-col ${className}`}>
-      {/* Header */}
-      <div className={`py-3 px-4 shrink-0 ${variant === 'standalone' ? 'border-b-3 border-neo-black' : 'border-b-2 border-neo-white/10'}`}>
-        <h2 className={`text-base font-black uppercase flex items-center gap-2 ${variant === 'standalone' ? 'text-neo-black' : 'text-neo-cream'}`}>
-          <MessageSquare className="text-neo-pink" />
-          {t('chat.title')}
-          {unreadCount > 0 && (
-            <AdaptiveMotion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              className="relative"
-            >
-              <Badge variant="destructive" className="animate-pulse">
-                {unreadCount}
-              </Badge>
-            </AdaptiveMotion.div>
-          )}
-        </h2>
-      </div>
+      {/* Header — hidden in embedded variant (parent provides its own) */}
+      {variant === 'standalone' && (
+        <div className="py-3 px-4 shrink-0 border-b-3 border-neo-black">
+          <h2 className="text-base font-black uppercase flex items-center gap-2 text-neo-black">
+            <MessageSquare className="text-neo-pink" />
+            {t('chat.title')}
+            {unreadCount > 0 && (
+              <AdaptiveMotion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                className="relative"
+              >
+                <Badge variant="destructive" className="animate-pulse">
+                  {unreadCount}
+                </Badge>
+              </AdaptiveMotion.div>
+            )}
+          </h2>
+        </div>
+      )}
       <CardContent className="flex-1 flex flex-col p-3 gap-3 min-h-0 overflow-hidden">
         {/* Messages Area with Virtual Scrolling */}
         <div

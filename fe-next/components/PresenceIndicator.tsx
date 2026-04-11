@@ -265,6 +265,7 @@ const PresenceIndicator = memo<PresenceIndicatorProps>(({
                 opacity: [0.8, 1, 0.8],
               }}
               transition={{
+                type: 'tween',
                 duration: 2,
                 repeat: Infinity,
                 ease: 'easeInOut',

@@ -249,9 +249,9 @@ async function handleSessionError(
   if (isRefreshTokenError(error)) {
     await clearAuthState('Invalid or expired refresh token');
   } else if (isRecoverableError(error)) {
-    logger.warn('Recoverable auth error:', getAuthErrorMessage(error));
+    logger.debug('Recoverable auth error:', getAuthErrorMessage(error));
   } else {
-    logger.warn('Session error:', getAuthErrorMessage(error));
+    logger.debug('Session error:', getAuthErrorMessage(error));
     if (!isNetworkError(error) && supabase) {
       await supabase.auth.signOut();
     }
@@ -271,9 +271,9 @@ async function handleInitError(
   } else if (isRefreshTokenError(error)) {
     await clearAuthState('Invalid or expired refresh token');
   } else if (isRecoverableError(error)) {
-    logger.warn('Recoverable auth error during init:', getAuthErrorMessage(error));
+    logger.debug('Recoverable auth error during init:', getAuthErrorMessage(error));
   } else {
-    logger.warn('Failed to get session:', getAuthErrorMessage(error));
+    logger.debug('Failed to get session:', getAuthErrorMessage(error));
   }
 }
 
@@ -298,7 +298,7 @@ async function handleAuthStateChange(
         if (isNewUser) {
           setUser(sessionUser);
           linkSessionToUser(sessionUser.id).catch((err) => {
-            logger.warn('Failed to link guest session to user:', err);
+            logger.debug('Failed to link guest session to user:', err);
             captureBackgroundError(err instanceof Error ? err : new Error(String(err)), {
               operation: 'link_session_to_user',
               service: 'sessionTracking',
@@ -353,7 +353,7 @@ async function handleAuthStateChange(
         if (isNewUser) {
           setUser(sessionUser);
           linkSessionToUser(sessionUser.id).catch((err) => {
-            logger.warn('Failed to link guest session to user:', err);
+            logger.debug('Failed to link guest session to user:', err);
             captureBackgroundError(err instanceof Error ? err : new Error(String(err)), {
               operation: 'link_session_to_user',
               service: 'sessionTracking',

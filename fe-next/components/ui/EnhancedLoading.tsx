@@ -94,6 +94,7 @@ export const LoadingDots: React.FC<LoadingDotsProps> = ({
             opacity: [0.5, 1, 0.5],
           }}
           transition={{
+            type: 'tween',
             duration: 1,
             repeat: Infinity,
             delay: i * 0.15,
@@ -128,6 +129,7 @@ export const LoadingPulse: React.FC<LoadingPulseProps> = ({ className }) => (
         opacity: [0.5, 0, 0.5],
       }}
       transition={{
+        type: 'tween',
         duration: 1.5,
         repeat: Infinity,
         ease: 'easeInOut',

@@ -104,7 +104,7 @@ export function WordForgeHUD({
             isOverTarget ? 'text-neo-lime' : 'text-tier-gold',
           )}
           animate={scorePopping ? { scale: [1, 1.2, 1] } : { scale: 1 }}
-          transition={{ duration: 0.25, ease: 'easeOut' }}
+          transition={{ type: 'tween', duration: 0.25, ease: 'easeOut' }}
         >
           <AnimatedNumber value={displayScore} />
         </motion.span>
@@ -129,7 +129,7 @@ export function WordForgeHUD({
         <motion.div
           className="flex justify-center"
           animate={wordsPopping ? { scale: [1, 1.15, 1] } : { scale: 1 }}
-          transition={{ duration: 0.2 }}
+          transition={{ type: 'tween', duration: 0.2 }}
         >
           <span className="text-[10px] font-bold text-neo-cream/50 bg-neo-cream/10 px-2 py-0.5 rounded-neo border border-neo-cream/20">
             {wordsFoundCount} {t('wordForge.wordsFound').toLowerCase()}

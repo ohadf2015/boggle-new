@@ -92,7 +92,7 @@ const PlayersReadyIndicator: React.FC<PlayersReadyIndicatorProps> = ({
             <div className="flex items-center gap-1.5 shrink-0">
               <motion.div
                 animate={allReady ? { scale: [1, 1.2, 1] } : { rotate: [0, 10, -10, 0] }}
-                transition={{ duration: 1.5, repeat: inf, repeatDelay: 0.5 }}
+                transition={{ type: 'tween', duration: 1.5, repeat: inf, repeatDelay: 0.5 }}
               >
                 {allReady ? (
                   <span className="text-sm">🎉</span>

@@ -65,86 +65,68 @@ export function InviteCard({
       <div
         data-testid="invite-card"
         className={cn(
-          'rounded-neo-lg border-3 border-neo-black bg-slate-800/80 shadow-hard overflow-hidden',
+          'rounded-neo-lg border-3 border-neo-cyan/50 bg-slate-800/90 shadow-hard overflow-hidden ring-1 ring-neo-cyan/20',
           className
         )}
       >
-        {/* Accent bar */}
-        <div className="h-1.5 bg-linear-to-r from-neo-pink via-neo-cyan to-neo-lime" />
-
-        {/* "BRING YOUR SQUAD" header */}
-        <div className="px-4 pt-3 pb-2">
-          <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-neo-pink font-neo-display">
-            {t('hostView.bringYourSquad')}
-          </h3>
-        </div>
-
-        <div className="px-4 pb-4 flex items-center gap-4">
-          {/* QR with "SCAN TO JOIN" label + enlarge overlay */}
+        {/* Compact horizontal row: QR thumbnail + code | COPY LINK | Share */}
+        <div className="px-4 py-3 flex items-center gap-3">
+          {/* QR thumbnail + room code */}
           <button
             onClick={() => setQrExpanded(true)}
-            className="relative shrink-0 group flex flex-col items-center gap-1.5"
+            className="relative shrink-0 group flex items-center gap-3 px-3 py-2 bg-white border-2 border-neo-black rounded-lg shadow-hard hover:scale-105 transition-transform"
             aria-label={t('hostView.showQrCode')}
           >
-            <div className="p-2 bg-white rounded-neo border-3 border-neo-black shadow-hard">
+            <div className="w-16 h-16 shrink-0">
               <QRCodeSVG
                 value={joinUrl}
-                size={72}
+                size={64}
                 level="M"
                 includeMargin={false}
                 bgColor="#ffffff"
                 fgColor="#000000"
+                className="w-full h-full"
               />
             </div>
-            <span className="text-[8px] font-black uppercase tracking-widest text-neo-cyan/60">
-              {t('hostView.scanToJoin')}
-            </span>
-            <div className="absolute inset-0 flex items-center justify-center bg-neo-black/0 group-hover:bg-neo-black/40 rounded-neo transition-colors">
-              <Maximize2 className="w-5 h-5 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="flex flex-col">
+              <span className="font-neo-display text-base text-neo-black tracking-widest leading-none font-black">
+                {gameCode}
+              </span>
+              <span className="text-[8px] font-bold text-slate-500 uppercase flex items-center gap-0.5 mt-1">
+                <Maximize2 className="w-2.5 h-2.5" /> {t('hostView.scanToJoin')}
+              </span>
             </div>
           </button>
 
-          {/* Room code + actions */}
-          <div className="flex-1 min-w-0">
-            <p className="text-[10px] font-bold uppercase text-neo-cream/40 tracking-widest">
-              {t('roomCode.title')}
-            </p>
-            <p className="text-2xl font-black tracking-[0.15em] text-neo-lime font-neo-display">
-              {gameCode}
-            </p>
+          {/* COPY LINK button */}
+          <motion.button
+            data-testid="copy-link-button"
+            onClick={handleCopyLink}
+            whileTap={{ scale: 0.95 }}
+            className={cn(
+              'flex-1 h-11 flex items-center justify-center gap-2 rounded-lg border-2 border-neo-black text-[10px] font-bold uppercase tracking-widest transition-all',
+              linkCopied
+                ? 'bg-neo-lime text-neo-black'
+                : 'bg-neo-navy-light text-neo-cream hover:bg-white hover:text-neo-black shadow-hard'
+            )}
+            aria-label={t('roomCode.copyLink')}
+          >
+            {linkCopied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+            <span>{linkCopied ? t('roomCode.copied') : t('roomCode.copyLink')}</span>
+          </motion.button>
 
-            {/* Action buttons row */}
-            <div className="flex gap-2 mt-2.5">
-              <motion.button
-                data-testid="copy-link-button"
-                onClick={handleCopyLink}
-                whileTap={{ scale: 0.95 }}
-                className={cn(
-                  'h-9 px-3 flex items-center justify-center gap-1.5 rounded-neo border-2 border-neo-black text-xs font-bold uppercase transition-all',
-                  linkCopied
-                    ? 'bg-neo-lime text-neo-black'
-                    : 'bg-white/10 text-neo-cream hover:bg-white/20 shadow-hard-sm'
-                )}
-                aria-label={t('roomCode.copyLink')}
-              >
-                {linkCopied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                <span>{linkCopied ? t('roomCode.copied') : t('roomCode.copyLink')}</span>
-              </motion.button>
-
-              {typeof navigator !== 'undefined' && typeof navigator.share === 'function' && (
-                <motion.button
-                  data-testid="native-share-button"
-                  onClick={handleNativeShare}
-                  whileTap={{ scale: 0.95 }}
-                  className="h-9 px-3 flex items-center justify-center gap-1.5 rounded-neo border-2 border-neo-black bg-neo-cyan text-neo-black shadow-hard-sm hover:shadow-none transition-all text-xs font-bold uppercase"
-                  aria-label={t('share.button')}
-                >
-                  <Share2 className="w-3.5 h-3.5" />
-                  <span>{t('share.button')}</span>
-                </motion.button>
-              )}
-            </div>
-          </div>
+          {/* Share button */}
+          {typeof navigator !== 'undefined' && typeof navigator.share === 'function' && (
+            <motion.button
+              data-testid="native-share-button"
+              onClick={handleNativeShare}
+              whileTap={{ scale: 0.95 }}
+              className="w-11 h-11 flex items-center justify-center rounded-lg border-2 border-neo-black bg-neo-cyan text-neo-black shadow-hard hover:translate-y-0.5 active:shadow-none transition-all shrink-0"
+              aria-label={t('share.button')}
+            >
+              <Share2 className="w-4 h-4" />
+            </motion.button>
+          )}
         </div>
       </div>
 
@@ -174,14 +156,14 @@ export function InviteCard({
                 <X className="w-4 h-4 text-neo-black" />
               </button>
 
-              <div className="flex flex-col items-center gap-4">
+              <div className="flex flex-col items-center gap-5">
                 <h3 className="text-sm font-bold uppercase tracking-widest text-neo-cream/60">
                   {t('hostView.scanToJoin')}
                 </h3>
-                <div className="p-4 bg-white rounded-neo border-4 border-neo-black shadow-hard">
+                <div className="p-4 bg-white rounded-neo border-4 border-neo-black shadow-hard-lg">
                   <QRCodeSVG
                     value={joinUrl}
-                    size={200}
+                    size={250}
                     level="H"
                     includeMargin={false}
                     bgColor="#ffffff"
@@ -189,9 +171,32 @@ export function InviteCard({
                     title={t('share.qrCodeAlt', { code: gameCode })}
                   />
                 </div>
-                <p className="text-3xl font-black tracking-[0.2em] text-neo-lime font-neo-display">
+                <p className="text-3xl font-black tracking-[0.2em] text-neo-lime font-neo-display animate-pulse-code">
                   {gameCode}
                 </p>
+                <div className="flex items-center gap-3 w-full">
+                  <motion.button
+                    onClick={handleCopyLink}
+                    whileTap={{ scale: 0.95 }}
+                    className={cn(
+                      'flex-1 h-11 flex items-center justify-center gap-2 rounded-lg border-2 border-neo-black text-xs font-bold uppercase tracking-widest transition-all',
+                      linkCopied
+                        ? 'bg-neo-lime text-neo-black'
+                        : 'bg-neo-navy-light text-neo-cream hover:bg-white/10 shadow-hard'
+                    )}
+                  >
+                    {linkCopied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                    <span>{linkCopied ? t('roomCode.copied') : t('roomCode.copyLink')}</span>
+                  </motion.button>
+                  <motion.button
+                    onClick={() => setQrExpanded(false)}
+                    whileTap={{ scale: 0.95 }}
+                    className="flex-1 h-11 flex items-center justify-center gap-2 rounded-lg border-3 border-neo-black bg-neo-lime text-neo-black text-sm font-black uppercase tracking-wider shadow-hard-lg active:translate-y-0.5 active:shadow-hard-pressed transition-all"
+                  >
+                    <Maximize2 className="w-4 h-4" />
+                    <span>{t('hostView.letsGo')}</span>
+                  </motion.button>
+                </div>
               </div>
             </motion.div>
           </motion.div>

@@ -1332,6 +1332,7 @@ const he = {
     "qrCode": "ברקוד",
     "showQrCode": "הצג ברקוד",
     "scanToJoin": "סרוק להצטרפות",
+    "letsGo": "!יאללה",
     "wonderhostLeader": "מנחה ראשי",
     "bringYourSquad": "הביאו את החבורה",
     "orEnterCode": "או הכנס קוד",
@@ -6792,11 +6793,11 @@ const he = {
       "wheel": "גלגל מילים",
       "forge": "כור מילים",
       "boss": "קרב בוס",
-      "classic.objective": "מצא מילים לפני שהזמן נגמר",
-      "blast.objective": "נקה את כל האריחים במגבלת מהלכים",
-      "hunt.objective": "מצא את מילת המטרה הנסתרת",
-      "wheel.objective": "מילים חייבות לכלול את האות המרכזית",
-      "forge.objective": "הגע ליעד הניקוד עם חיזוקי רונות"
+      "classicObjective": "מצא מילים לפני שהזמן נגמר",
+      "blastObjective": "נקה את כל האריחים במגבלת מהלכים",
+      "huntObjective": "מצא את מילת המטרה הנסתרת",
+      "wheelObjective": "מילים חייבות לכלול את האות המרכזית",
+      "forgeObjective": "הגע ליעד הניקוד עם חיזוקי רונות"
     },
     "objectives": {
       "wordCount": "מצאו מילים",
@@ -6854,16 +6855,16 @@ const he = {
 "mode": {
       "classic": "קלאסי",
       "blast": "בלאסט",
-      "blast.objective": "השתמשו במהלכים בחוכמה!",
+      "blastObjective": "השתמשו במהלכים בחוכמה!",
       "hunt": "ציד",
-      "hunt.objective": "שרדו כמה שיותר!",
+      "huntObjective": "שרדו כמה שיותר!",
       "wheel": "גלגל",
-      "wheel.objective": "כל מילה חייבת לכלול את האות המרכזית!",
-      "wheel.mustInclude": "חובה לכלול:",
+      "wheelObjective": "כל מילה חייבת לכלול את האות המרכזית!",
+      "wheelMustInclude": "חובה לכלול:",
       "forge": "כור",
-      "forge.objective": "הגיעו לניקוד היעד!",
+      "forgeObjective": "הגיעו לניקוד היעד!",
       "boss": "בוס",
-      "boss.objective": "הביסו את הבוס!",
+      "bossObjective": "הביסו את הבוס!",
       "movesLeft": "מהלכים נותרו"
     },
 "game": {

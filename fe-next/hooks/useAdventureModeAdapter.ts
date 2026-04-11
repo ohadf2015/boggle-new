@@ -66,7 +66,7 @@ export function useAdventureModeAdapter(levelConfig: LevelConfig | null): Advent
           showTargetWordUI: false,
           showRunePicker: false,
           modeDisplayKey: 'adventure.mode.blast',
-          modeObjectiveKey: 'adventure.mode.blast.objective',
+          modeObjectiveKey: 'adventure.mode.blastObjective',
         };
 
       case 'hunt':
@@ -83,7 +83,7 @@ export function useAdventureModeAdapter(levelConfig: LevelConfig | null): Advent
           showTargetWordUI: true,
           showRunePicker: false,
           modeDisplayKey: 'adventure.mode.hunt',
-          modeObjectiveKey: 'adventure.mode.hunt.objective',
+          modeObjectiveKey: 'adventure.mode.huntObjective',
         };
 
       case 'wheel':
@@ -100,7 +100,7 @@ export function useAdventureModeAdapter(levelConfig: LevelConfig | null): Advent
           showTargetWordUI: false,
           showRunePicker: false,
           modeDisplayKey: 'adventure.mode.wheel',
-          modeObjectiveKey: 'adventure.mode.wheel.objective',
+          modeObjectiveKey: 'adventure.mode.wheelObjective',
         };
 
       case 'forge':
@@ -117,7 +117,7 @@ export function useAdventureModeAdapter(levelConfig: LevelConfig | null): Advent
           showTargetWordUI: false,
           showRunePicker: levelConfig.hasRunePick ?? true,
           modeDisplayKey: 'adventure.mode.forge',
-          modeObjectiveKey: 'adventure.mode.forge.objective',
+          modeObjectiveKey: 'adventure.mode.forgeObjective',
         };
 
       case 'boss':
@@ -134,7 +134,7 @@ export function useAdventureModeAdapter(levelConfig: LevelConfig | null): Advent
           showTargetWordUI: false,
           showRunePicker: false,
           modeDisplayKey: 'adventure.mode.boss',
-          modeObjectiveKey: 'adventure.mode.boss.objective',
+          modeObjectiveKey: 'adventure.mode.bossObjective',
         };
 
       case 'classic':
@@ -158,6 +158,6 @@ function getDefaultModeState(): AdventureModeState {
     showTargetWordUI: false,
     showRunePicker: false,
     modeDisplayKey: 'adventure.mode.classic',
-    modeObjectiveKey: 'adventure.mode.classic.objective',
+    modeObjectiveKey: 'adventure.mode.classicObjective',
   };
 }

@@ -122,7 +122,7 @@ export const ConnectionDot: React.FC<{ className?: string }> = ({ className }) =
         {/* Pulsing dot */}
         <motion.div
           animate={{ scale: [1, 1.2, 1], opacity: [1, 0.7, 1] }}
-          transition={{ duration: 1, repeat: Infinity, ease: 'easeInOut' }}
+          transition={{ type: 'tween', duration: 1, repeat: Infinity, ease: 'easeInOut' }}
           className={cn(
             'w-2.5 h-2.5 rounded-full',
             status === 'disconnected' ? 'bg-neo-cream' : 'bg-neo-black'
@@ -351,7 +351,7 @@ export const ConnectionBanner: React.FC<ConnectionBannerProps> = ({ className, s
               <div className="relative">
                 <motion.div
                   animate={{ scale: [1, 1.2, 1] }}
-                  transition={{ duration: 1.5, repeat: Infinity }}
+                  transition={{ type: 'tween', duration: 1.5, repeat: Infinity }}
                   className={cn(
                     'w-4 h-4 rounded-full border-2 border-neo-black',
                     status === 'reconnecting' && 'bg-neo-yellow',

@@ -35,7 +35,7 @@ export const LifeGainAnimation: React.FC<LifeGainAnimationProps> = ({
             <motion.div
               initial={{ scale: 1 }}
               animate={{ scale: [1, 1.4, 1, 1.2, 1] }}
-              transition={{ duration: 0.5, times: [0, 0.2, 0.4, 0.6, 0.8] }}
+              transition={{ type: 'tween', duration: 0.5, times: [0, 0.2, 0.4, 0.6, 0.8] }}
             >
               <Heart className="w-6 h-6 sm:w-7 sm:h-7 text-white fill-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]" />
             </motion.div>

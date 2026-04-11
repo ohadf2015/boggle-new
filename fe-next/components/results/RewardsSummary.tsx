@@ -264,7 +264,7 @@ const RewardsSummary: React.FC<RewardsSummaryProps> = memo(({
                 </div>
                 <motion.div
                   animate={{ scale: [1, 1.2, 1] }}
-                  transition={{ duration: 0.5, repeat: 3 }}
+                  transition={{ type: 'tween', duration: 0.5, repeat: 3 }}
                   className="text-2xl"
                 >
                   🏆

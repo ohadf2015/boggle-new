@@ -271,6 +271,7 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
                 opacity: [0.5, 0.9, 0.5],
               }}
               transition={{
+                type: 'tween',
                 duration: 1.8,
                 repeat: Infinity,
                 ease: "easeInOut",

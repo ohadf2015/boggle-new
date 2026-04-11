@@ -145,6 +145,7 @@ const WinStreakDisplay = memo<WinStreakDisplayProps>(({
                 : { scale: [1, 1.05, 1] }
             }
             transition={{
+              type: 'tween',
               duration: showMilestone ? 0.5 : 2,
               repeat: showMilestone ? 2 : inf,
               repeatDelay: showMilestone ? 0 : 1,

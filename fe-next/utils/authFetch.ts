@@ -74,7 +74,7 @@ export async function fetchWithAuth(
     const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
 
     if (refreshError || !refreshData.session?.access_token) {
-      logger.warn('Token refresh failed:', refreshError?.message || 'No session');
+      logger.debug('Token refresh failed:', refreshError?.message || 'No session');
       return response; // Return original 401 response
     }
 

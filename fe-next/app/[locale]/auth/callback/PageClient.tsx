@@ -345,7 +345,7 @@ function AuthCallbackContent(): React.JSX.Element {
                 await redirectWithRole(finalCheck.session.user.id, next, isDefault);
                 return;
               }
-              logger.warn('Auth callback: Timed out waiting for session from other tab');
+              logger.debug('Auth callback: Timed out waiting for session from other tab');
               safeRedirect(`/${locale}?auth_error=true`);
             }
             return;
@@ -387,7 +387,7 @@ function AuthCallbackContent(): React.JSX.Element {
             // Check if error is recoverable (code already used, timeout, etc.)
             // In this case, wait and poll for session as other tab should have it
             if (isRecoverableError(authError) || isRefreshTokenError(authError)) {
-              logger.warn('Auth callback: Code exchange failed (possibly used by another tab or recoverable error), waiting for session:', getAuthErrorMessage(authError));
+              logger.debug('Auth callback: Code exchange failed (possibly used by another tab or recoverable error), waiting for session:', getAuthErrorMessage(authError));
 
               // Poll for session with retries - another tab may have succeeded
               const gotSession = await waitForSessionFromOtherTab(next, 5000);

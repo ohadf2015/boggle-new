@@ -127,7 +127,7 @@ const FirstTimeAchievement = memo<FirstTimeAchievementProps>(({
             <motion.span
               className="text-2xl"
               animate={{ scale: [1, 1.2, 1], rotate: [0, 10, -10, 0] }}
-              transition={{ duration: 0.5, ease: 'easeInOut' }}
+              transition={{ type: 'tween', duration: 0.5, ease: 'easeInOut' }}
             >
               {config.emoji}
             </motion.span>

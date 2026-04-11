@@ -160,6 +160,7 @@ export default function StreakCalendar({ currentStreak, lastWinDate }: StreakCal
                   rotate: [0, -5, 5, 0],
                 }}
                 transition={{
+                  type: 'tween',
                   duration: 2,
                   repeat: Infinity,
                   delay: day.index * 0.15,

@@ -1334,6 +1334,7 @@ const es = {
     "qrCode": "QR",
     "showQrCode": "Mostrar código QR",
     "scanToJoin": "Escanea para Unirte",
+    "letsGo": "¡VAMOS!",
     "wonderhostLeader": "Anfitrión Líder",
     "bringYourSquad": "Trae a Tu Escuadrón",
     "orEnterCode": "O ingresa el código",
@@ -7121,11 +7122,11 @@ const es = {
       "wheel": "Rueda de palabras",
       "forge": "Forja de palabras",
       "boss": "Batalla de jefe",
-      "classic.objective": "Encuentra palabras antes de que se acabe el tiempo",
-      "blast.objective": "Despeja todas las fichas dentro del límite de movimientos",
-      "hunt.objective": "Encuentra la palabra objetivo oculta",
-      "wheel.objective": "Las palabras deben incluir la letra central",
-      "forge.objective": "Alcanza el objetivo de puntuación con mejoras de runas"
+      "classicObjective": "Encuentra palabras antes de que se acabe el tiempo",
+      "blastObjective": "Despeja todas las fichas dentro del límite de movimientos",
+      "huntObjective": "Encuentra la palabra objetivo oculta",
+      "wheelObjective": "Las palabras deben incluir la letra central",
+      "forgeObjective": "Alcanza el objetivo de puntuación con mejoras de runas"
     },
     "objectives": {
       "wordCount": "Encuentra palabras",
@@ -7183,16 +7184,16 @@ const es = {
     "mode": {
       "classic": "Clásico",
       "blast": "Blast",
-      "blast.objective": "¡Usa tus movimientos sabiamente!",
+      "blastObjective": "¡Usa tus movimientos sabiamente!",
       "hunt": "Caza",
-      "hunt.objective": "¡Sobrevive el mayor tiempo posible!",
+      "huntObjective": "¡Sobrevive el mayor tiempo posible!",
       "wheel": "Rueda",
-      "wheel.objective": "¡Cada palabra debe incluir la letra central!",
-      "wheel.mustInclude": "Debe incluir:",
+      "wheelObjective": "¡Cada palabra debe incluir la letra central!",
+      "wheelMustInclude": "Debe incluir:",
       "forge": "Forja",
-      "forge.objective": "¡Alcanza la puntuación objetivo!",
+      "forgeObjective": "¡Alcanza la puntuación objetivo!",
       "boss": "Jefe",
-      "boss.objective": "¡Derrota al jefe!",
+      "bossObjective": "¡Derrota al jefe!",
       "movesLeft": "Movimientos restantes"
     },
     "game": {

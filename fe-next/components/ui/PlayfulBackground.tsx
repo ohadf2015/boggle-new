@@ -229,7 +229,7 @@ export const PlayfulBackground = memo(function PlayfulBackground({
               rotate: [0, -25, 0],
               scale: [1, 1.2, 1]
             }}
-            transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
+            transition={{ type: 'tween', duration: 3.5, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
             style={{ x: parallax.x * -0.4 }}
           >
             <Sparkles className="w-7 h-7 sm:w-10 sm:h-10" />

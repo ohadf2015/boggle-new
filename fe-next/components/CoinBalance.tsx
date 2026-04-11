@@ -126,6 +126,7 @@ export function CoinBalance({
             opacity: [0.7, 1, 0.7]
           }}
           transition={{
+            type: 'tween',
             duration: 1.5,
             repeat: Infinity,
             ease: "easeInOut"

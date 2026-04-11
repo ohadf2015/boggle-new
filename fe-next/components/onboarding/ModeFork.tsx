@@ -92,7 +92,7 @@ const ModeOption: React.FC<ModeOptionProps> = ({
         <motion.div
           className="absolute top-2 inset-e-2"
           animate={{ rotate: [0, 15, -15, 0], scale: [1, 1.2, 1] }}
-          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+          transition={{ type: 'tween', duration: 2, repeat: Infinity, ease: 'easeInOut' }}
         >
           <Sparkles className="w-4 h-4 text-neo-black/40" />
         </motion.div>

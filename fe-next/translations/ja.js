@@ -1316,6 +1316,7 @@ const ja = {
     "qrCode": "QRコード",
     "showQrCode": "QRコードを表示",
     "scanToJoin": "スキャンして参加",
+    "letsGo": "レッツゴー！",
     "wonderhostLeader": "ワンダーホスト リーダー",
     "bringYourSquad": "仲間を連れてこよう",
     "orEnterCode": "またはコードを入力",
@@ -6818,11 +6819,11 @@ const ja = {
       "wheel": "ワードホイール",
       "forge": "ワードフォージ",
       "boss": "ボス戦",
-      "classic.objective": "制限時間内に単語を見つけよう",
-      "blast.objective": "移動制限内にすべてのタイルをクリア",
-      "hunt.objective": "隠されたターゲットワードを見つけよう",
-      "wheel.objective": "中央の文字を含む単語を作ろう",
-      "forge.objective": "ルーンバフでスコア目標を達成"
+      "classicObjective": "制限時間内に単語を見つけよう",
+      "blastObjective": "移動制限内にすべてのタイルをクリア",
+      "huntObjective": "隠されたターゲットワードを見つけよう",
+      "wheelObjective": "中央の文字を含む単語を作ろう",
+      "forgeObjective": "ルーンバフでスコア目標を達成"
     },
     "objectives": {
       "wordCount": "単語を見つける",
@@ -6880,16 +6881,16 @@ const ja = {
 "mode": {
       "classic": "クラシック",
       "blast": "ブラスト",
-      "blast.objective": "手数を賢く使おう！",
+      "blastObjective": "手数を賢く使おう！",
       "hunt": "ハント",
-      "hunt.objective": "できるだけ長く生き残ろう！",
+      "huntObjective": "できるだけ長く生き残ろう！",
       "wheel": "ホイール",
-      "wheel.objective": "すべての単語に中心の文字を含めよう！",
-      "wheel.mustInclude": "必須文字：",
+      "wheelObjective": "すべての単語に中心の文字を含めよう！",
+      "wheelMustInclude": "必須文字：",
       "forge": "フォージ",
-      "forge.objective": "目標スコアに到達しよう！",
+      "forgeObjective": "目標スコアに到達しよう！",
       "boss": "ボス",
-      "boss.objective": "ボスを倒せ！",
+      "bossObjective": "ボスを倒せ！",
       "movesLeft": "残り手数"
     },
 "game": {

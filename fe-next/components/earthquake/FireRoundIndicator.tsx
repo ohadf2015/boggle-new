@@ -108,6 +108,7 @@ export const FireRoundIndicator: React.FC<FireRoundIndicatorProps> = ({
                   rotate: [0, -5, 5, 0],
                 }}
                 transition={{
+                  type: 'tween',
                   duration: 0.6,
                   repeat: Infinity,
                   ease: 'easeInOut',

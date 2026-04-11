@@ -46,7 +46,7 @@ export const UnauthenticatedCreateChallengeSection: React.FC<UnauthenticatedCrea
         <div className="absolute -top-2 -right-2 rtl:-right-auto rtl:-left-2 z-10">
           <motion.div
             animate={{ rotate: 360, scale: [1, 1.2, 1] }}
-            transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
+            transition={{ type: 'tween', duration: 3, repeat: Infinity, ease: 'linear' }}
           >
             <Sparkles className="w-7 h-7 text-neo-pink drop-shadow-lg" fill="currentColor" />
           </motion.div>

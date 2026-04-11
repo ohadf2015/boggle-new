@@ -314,7 +314,12 @@ export async function getThreads(userId?: string): Promise<MessageThread[]> {
       .filter((t): t is MessageThread => t !== null)
       .sort((a, b) => b.lastMessageAt - a.lastMessageAt);
   } catch (error) {
-    logger.error('FRIEND_MESSAGES', `Exception getting threads: ${(error as Error).message}`);
+    const msg = (error as Error).message;
+    if (msg?.includes('Lock broken') || msg?.includes('stole it')) {
+      logger.debug('FRIEND_MESSAGES', `Lock contention getting threads: ${msg}`);
+    } else {
+      logger.error('FRIEND_MESSAGES', `Exception getting threads: ${msg}`);
+    }
     return [];
   }
 }
@@ -620,7 +625,12 @@ export async function getPendingChallenges(userId?: string): Promise<{ sent: Cha
 
     return { sent, received };
   } catch (error) {
-    logger.error('FRIEND_MESSAGES', `Exception getting pending challenges: ${(error as Error).message}`);
+    const msg = (error as Error).message;
+    if (msg?.includes('Lock broken') || msg?.includes('stole it')) {
+      logger.debug('FRIEND_MESSAGES', `Lock contention getting challenges: ${msg}`);
+    } else {
+      logger.error('FRIEND_MESSAGES', `Exception getting pending challenges: ${msg}`);
+    }
     return { sent: [], received: [] };
   }
 }

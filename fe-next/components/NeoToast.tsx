@@ -286,7 +286,7 @@ export const wordAIValidatingToast = (word: string, options: WordAIValidatingOpt
             </div>
             <motion.div
               animate={{ scale: [1, 1.2, 1] }}
-              transition={{ duration: 0.6, repeat: Infinity }}
+              transition={{ type: 'tween', duration: 0.6, repeat: Infinity }}
               className="ms-auto"
             >
               <Loader size="sm" />

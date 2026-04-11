@@ -43,7 +43,7 @@ export function BossReveal({ constraint, round, roundTarget, onReady }: BossReve
           <motion.span
             className="text-3xl"
             animate={prefersReducedMotion ? {} : { scale: [1, 1.2, 1] }}
-            transition={{ duration: 1, repeat: Infinity, ease: 'easeInOut' }}
+            transition={{ type: 'tween', duration: 1, repeat: Infinity, ease: 'easeInOut' }}
           >
             ⚠️
           </motion.span>
@@ -53,7 +53,7 @@ export function BossReveal({ constraint, round, roundTarget, onReady }: BossReve
           <motion.span
             className="text-3xl"
             animate={prefersReducedMotion ? {} : { scale: [1, 1.2, 1] }}
-            transition={{ duration: 1, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
+            transition={{ type: 'tween', duration: 1, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
           >
             ⚠️
           </motion.span>

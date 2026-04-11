@@ -118,6 +118,7 @@ export const EarthquakeWarning: React.FC<EarthquakeWarningProps> = ({ isVisible 
                   rotate: [0, -5, 5, 0],
                 }}
                 transition={{
+                  type: 'tween',
                   duration: 0.5,
                   repeat: Infinity,
                   repeatDelay: 0.3,

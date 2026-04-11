@@ -85,6 +85,7 @@ export default function DrillUnlockProgress({
                 rotate: [0, 10, -10, 0],
               }}
               transition={{
+                type: 'tween',
                 duration: 1.5,
                 repeat: 3,
               }}

@@ -1316,6 +1316,7 @@ const sv = {
     "qrCode": "QR-kod",
     "showQrCode": "Visa QR-kod",
     "scanToJoin": "Skanna för att gå med",
+    "letsGo": "KÖÖÖR!",
     "wonderhostLeader": "Värdledare",
     "bringYourSquad": "Ta Med Ditt Gäng",
     "orEnterCode": "Eller ange kod",
@@ -6767,11 +6768,11 @@ const sv = {
       "wheel": "Ordhjulet",
       "forge": "Ordsmide",
       "boss": "Bosskamp",
-      "classic.objective": "Hitta ord innan tiden tar slut",
-      "blast.objective": "Rensa alla brickor inom dragbegränsning",
-      "hunt.objective": "Hitta det dolda målordet",
-      "wheel.objective": "Ord måste innehålla mittenbokstaven",
-      "forge.objective": "Nå poängmålet med runförstärkningar"
+      "classicObjective": "Hitta ord innan tiden tar slut",
+      "blastObjective": "Rensa alla brickor inom dragbegränsning",
+      "huntObjective": "Hitta det dolda målordet",
+      "wheelObjective": "Ord måste innehålla mittenbokstaven",
+      "forgeObjective": "Nå poängmålet med runförstärkningar"
     },
     "objectives": {
       "wordCount": "Hitta ord",
@@ -6829,16 +6830,16 @@ const sv = {
 "mode": {
       "classic": "Klassisk",
       "blast": "Blast",
-      "blast.objective": "Använd dina drag klokt!",
+      "blastObjective": "Använd dina drag klokt!",
       "hunt": "Jakt",
-      "hunt.objective": "Överlev så länge du kan!",
+      "huntObjective": "Överlev så länge du kan!",
       "wheel": "Hjul",
-      "wheel.objective": "Varje ord måste inkludera mittenbokstaven!",
-      "wheel.mustInclude": "Måste inkludera:",
+      "wheelObjective": "Varje ord måste inkludera mittenbokstaven!",
+      "wheelMustInclude": "Måste inkludera:",
       "forge": "Smedja",
-      "forge.objective": "Nå målpoängen!",
+      "forgeObjective": "Nå målpoängen!",
       "boss": "Boss",
-      "boss.objective": "Besegra bossen!",
+      "bossObjective": "Besegra bossen!",
       "movesLeft": "Drag kvar"
     },
 "game": {

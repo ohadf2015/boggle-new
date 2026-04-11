@@ -239,7 +239,7 @@ const RoundEventTileEffects = memo<RoundEventTileEffectsProps>(function RoundEve
           initial={{ scale: 0, y: -10 }}
           animate={{ scale: [1, 1.2, 1], y: 0 }}
           transition={{
-            scale: { duration: 0.8, repeat: Infinity, ease: 'easeInOut' },
+            scale: { type: 'tween', duration: 0.8, repeat: Infinity, ease: 'easeInOut' },
             y: { type: 'spring', stiffness: 500, damping: 15, delay: staggerDelay },
           }}
           aria-hidden="true"

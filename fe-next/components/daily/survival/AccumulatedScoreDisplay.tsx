@@ -102,8 +102,8 @@ export const AccumulatedScoreDisplay: React.FC<AccumulatedScoreDisplayProps> = (
         )}
         animate={isAnimating ? { scale: [1, 1.1, 1] } : { scale: 1 }}
         transition={{
+          type: 'tween',
           duration: 0.3,
-          type: 'spring',
           damping: 18,
           stiffness: 350,
         }}

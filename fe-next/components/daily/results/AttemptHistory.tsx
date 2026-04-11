@@ -142,7 +142,7 @@ export const AttemptHistory: React.FC<AttemptHistoryProps> = ({
                       }}
                       transition={{
                         delay: rowIdx * 0.1 + letterIdx * 0.06,
-                        type: 'spring',
+                        type: isTapped ? 'tween' : 'spring',
                         stiffness: 500,
                         damping: 25,
                       }}

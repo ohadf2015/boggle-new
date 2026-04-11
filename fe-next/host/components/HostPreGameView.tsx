@@ -2,13 +2,12 @@
 
 import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { BookOpen, LogOut, Pencil, Check, X, Monitor, Grid3X3, Zap, Crosshair, Lightbulb, ChevronLeft, ChevronRight } from 'lucide-react';
+import { BookOpen, LogOut, Pencil, Check, X, Monitor } from 'lucide-react';
 import { useCrazyGamesInvite } from '../../hooks/useCrazyGamesInvite';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useSocket } from '../../utils/SocketContext';
 import { useGameActions, useGameMode } from '@/hooks/gameState';
 import { useAuth } from '@/contexts/AuthContext';
-import { hasConsentDecision } from '@/utils/cookieConsent';
 
 import { GAME_PRESETS } from './pre-game/PresetSelector';
 import { StartButton } from './pre-game/StartButton';
@@ -17,8 +16,9 @@ import { PlayerRoster } from './pre-game/PlayerRoster';
 import { BattleModeCard } from './pre-game/BattleModeCard';
 import { AdvancedSettingsModal } from './pre-game/AdvancedSettingsModal';
 import { DesktopLobbyLayout, InviteCard } from './pre-game/desktop';
+import { GameInstructions } from './pre-game/GameInstructions';
 import TvTutorialOverlay, { isTvTutorialComplete } from './tv-broadcast/TvTutorialOverlay';
-import RoomChat from '../../components/RoomChat';
+import { ChatBubble } from './pre-game/ChatBubble';
 import Avatar from '@/components/Avatar';
 import dynamic from 'next/dynamic';
 const AvatarBuilderModal = dynamic(() => import('@/components/avatar/AvatarBuilderModal'), { ssr: false });
@@ -125,11 +125,6 @@ function HostPreGameView({
   const hasBlastAccess = !!profile?.blast_access;
   const { isOnCrazyGamesPlatform: _isOnCrazyGamesPlatform } = useCrazyGames();
 
-  // Track whether cookie consent banner is visible (no decision yet)
-  const [cookieConsentVisible, setCookieConsentVisible] = useState(false);
-  useEffect(() => {
-    setCookieConsentVisible(!hasConsentDecision());
-  }, []);
 
   // Avatar & name editing state
   const [isAvatarBuilderOpen, setIsAvatarBuilderOpen] = useState(false);
@@ -272,147 +267,11 @@ function HostPreGameView({
     socket?.emit('changeRoomLanguage', { gameCode, language: newLang });
   }, [socket, gameCode]);
 
-  // ==================== Interactive Game Instructions ====================
-  const [instructionStep, setInstructionStep] = useState(0);
-
-  const GAME_INSTRUCTIONS: Record<string, { icon: React.ReactNode; barClass: string; iconBgClass: string; dotClass: string; steps: { titleKey: string; descKey: string }[] }> = {
-    random: {
-      icon: <Grid3X3 className="w-5 h-5" />,
-      barClass: 'bg-neo-purple',
-      iconBgClass: 'bg-neo-purple',
-      dotClass: 'bg-neo-purple',
-      steps: [
-        { titleKey: 'howToPlay.steps.basics.title', descKey: 'help.swipeLetters' },
-        { titleKey: 'howToPlay.steps.grid.title', descKey: 'help.diagonalWorks' },
-        { titleKey: 'howToPlay.comboBonus', descKey: 'help.comboExplanation' },
-      ],
-    },
-    classic: {
-      icon: <Grid3X3 className="w-5 h-5" />,
-      barClass: 'bg-neo-cyan',
-      iconBgClass: 'bg-neo-cyan',
-      dotClass: 'bg-neo-cyan',
-      steps: [
-        { titleKey: 'howToPlay.steps.basics.title', descKey: 'help.swipeLetters' },
-        { titleKey: 'howToPlay.steps.grid.title', descKey: 'help.diagonalWorks' },
-        { titleKey: 'howToPlay.steps.scoring.title', descKey: 'howToPlay.steps.scoring.description' },
-      ],
-    },
-    blast: {
-      icon: <Zap className="w-5 h-5" />,
-      barClass: 'bg-neo-pink',
-      iconBgClass: 'bg-neo-pink',
-      dotClass: 'bg-neo-pink',
-      steps: [
-        { titleKey: 'gameModes.blast.name', descKey: 'gameModes.blast.description' },
-        { titleKey: 'howToPlay.steps.basics.title', descKey: 'help.swipeLetters' },
-        { titleKey: 'howToPlay.comboBonus', descKey: 'help.comboExplanation' },
-      ],
-    },
-    'word-hunt': {
-      icon: <Crosshair className="w-5 h-5" />,
-      barClass: 'bg-neo-lime',
-      iconBgClass: 'bg-neo-lime',
-      dotClass: 'bg-neo-lime',
-      steps: [
-        { titleKey: 'gameModes.wordHunt.name', descKey: 'gameModes.wordHunt.description' },
-        { titleKey: 'howToPlay.steps.basics.title', descKey: 'help.swipeLetters' },
-        { titleKey: 'howToPlay.steps.grid.title', descKey: 'help.diagonalWorks' },
-      ],
-    },
-  };
-
-  // Reset step when mode changes
-  useEffect(() => {
-    setInstructionStep(0);
-  }, [selectedGameMode]);
-
-  const renderGameInstructions = (): React.ReactElement | null => {
-    const config = GAME_INSTRUCTIONS[selectedGameMode];
-    if (!config) return null;
-    const { icon, barClass, iconBgClass, dotClass, steps } = config;
-    const step = steps[instructionStep] ?? steps[0];
-
-    return (
-      <motion.div
-        initial={{ opacity: 0, y: 15 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2, type: 'spring', stiffness: 300, damping: 24 }}
-        className="rounded-neo-lg border-3 border-neo-black bg-slate-800/80 shadow-hard overflow-hidden"
-      >
-        <div className={cn('h-1', barClass)} />
-        <div className="p-4">
-          <div className="flex items-center gap-2 mb-3">
-            <div className={cn('w-8 h-8 rounded-full border-2 border-neo-black flex items-center justify-center shadow-hard-sm text-neo-black', iconBgClass)}>
-              {icon}
-            </div>
-            <h3 className="text-sm font-black uppercase text-neo-cream flex items-center gap-1.5">
-              <Lightbulb className="w-3.5 h-3.5 text-neo-yellow" />
-              {t('help.howToPlay')}
-            </h3>
-          </div>
-
-          {/* Interactive step content */}
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={instructionStep}
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.2 }}
-              className="min-h-[48px] flex items-start gap-2 text-sm text-slate-300"
-            >
-              <span className={cn('mt-1.5 w-1.5 h-1.5 rounded-full shrink-0', dotClass)} />
-              <div>
-                <p className="font-bold text-neo-cream text-xs uppercase mb-0.5">{t(step.titleKey)}</p>
-                <p>{t(step.descKey)}</p>
-              </div>
-            </motion.div>
-          </AnimatePresence>
-
-          {/* Step navigation */}
-          <div className="flex items-center justify-center gap-3 mt-3">
-            <button
-              onClick={() => setInstructionStep(s => Math.max(0, s - 1))}
-              disabled={instructionStep === 0}
-              className="w-7 h-7 flex items-center justify-center rounded bg-neo-white/10 disabled:opacity-30 transition-opacity"
-              aria-label={t('common.previous')}
-            >
-              <ChevronLeft className="w-4 h-4 text-neo-cream" />
-            </button>
-            <div className="flex gap-1.5">
-              {steps.map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => setInstructionStep(i)}
-                  className={cn(
-                    'w-2 h-2 rounded-full transition-colors',
-                    i === instructionStep ? dotClass : 'bg-neo-white/20'
-                  )}
-                />
-              ))}
-            </div>
-            <button
-              onClick={() => setInstructionStep(s => Math.min(steps.length - 1, s + 1))}
-              disabled={instructionStep === steps.length - 1}
-              className="w-7 h-7 flex items-center justify-center rounded bg-neo-white/10 disabled:opacity-30 transition-opacity"
-              aria-label={t('common.next')}
-            >
-              <ChevronRight className="w-4 h-4 text-neo-cream" />
-            </button>
-          </div>
-        </div>
-      </motion.div>
-    );
-  };
-
   const cancelBotCountdown = useCallback(() => {
     if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
     if (aloneTimerRef.current) clearTimeout(aloneTimerRef.current);
     setBotCountdown(null);
   }, []);
-
-  const hostLabel = `${t('hostView.hostIs')} ${username}`;
 
   // Bot countdown banner
   const renderBotCountdown = (): React.ReactElement | null => {
@@ -438,34 +297,38 @@ function HostPreGameView({
     );
   };
 
-  // TV mode toggle — neo-brutalist pill toggle matching design
+  // TV mode toggle — neo-brutalist pill with hard shadow
   const tvModeToggle = (
-    <div className="flex items-center justify-between px-4 py-2.5 rounded-neo-lg border-2 border-neo-black bg-neo-navy-light shadow-hard">
-      <div className="flex items-center gap-3">
-        <Monitor className={cn('w-5 h-5', !hostPlaying ? 'text-neo-cyan' : 'text-neo-cream/60')} />
-        <span className="text-[10px] font-black uppercase tracking-widest text-neo-cream">
-          {t('hostView.broadcastModeTitle')}
-        </span>
-      </div>
-      <button
-        onClick={() => setHostPlaying(prev => !prev)}
-        className={cn(
-          'relative w-10 h-5 rounded-full border-2 border-neo-black transition-colors',
-          !hostPlaying ? 'bg-neo-lime' : 'bg-white/10'
-        )}
-        aria-label={t('hostView.broadcastModeTitle')}
-      >
-        <motion.div
-          className="absolute top-0.5 w-3 h-3 rounded-full bg-neo-black"
-          animate={{ x: !hostPlaying ? 18 : 2 }}
-          transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-        />
-      </button>
-    </div>
+    <button
+      onClick={() => setHostPlaying(prev => !prev)}
+      className={cn(
+        'flex items-center gap-2 px-3 py-1.5 rounded-lg border-2 border-neo-black transition-all text-[10px] font-bold uppercase tracking-wider shadow-hard-sm active:translate-y-0.5 active:shadow-none',
+        !hostPlaying
+          ? 'bg-neo-cyan/20 text-neo-cyan'
+          : 'bg-white/5 text-neo-cream/50 hover:bg-white/10'
+      )}
+      aria-label={t('hostView.broadcastModeTitle')}
+    >
+      <Monitor className="w-3.5 h-3.5" />
+      <span>{t('hostView.broadcastModeTitle')}</span>
+      <span className={cn(
+        'w-7 h-4 rounded-full border-2 border-neo-black relative transition-colors',
+        !hostPlaying ? 'bg-neo-cyan' : 'bg-white/10'
+      )}>
+        <span className={cn(
+          'absolute top-0.5 w-2.5 h-2.5 rounded-full bg-neo-black transition-all duration-200',
+          !hostPlaying ? 'inset-inline-end-0.5' : 'inset-inline-start-0.5'
+        )} />
+      </span>
+    </button>
   );
 
   return (
-    <div className="flex-1 flex flex-col min-h-0 bg-neo-navy lg:max-w-7xl lg:mx-auto w-full">
+    <div className="flex-1 flex flex-col min-h-0 bg-neo-navy lg:max-w-7xl lg:mx-auto w-full relative">
+      {/* Dot-grid background texture */}
+      <div className="absolute inset-0 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.07) 1px, transparent 1px)', backgroundSize: '20px 20px' }} />
+      {/* Top gradient accent bar */}
+      <div className="w-full h-1 bg-gradient-to-r from-neo-cyan via-neo-pink to-neo-lime shrink-0 z-20" />
       {/* Lesson Mode Banner */}
       {lessonData && (
         <div className="shrink-0 px-3 py-2 bg-neo-purple/20 border-b-2 border-neo-purple/50">
@@ -484,11 +347,11 @@ function HostPreGameView({
         </div>
       )}
 
-      {/* Header — host identity with "WONDERHOST LEADER" label */}
+      {/* Header */}
       <header className="shrink-0 px-3 py-2 bg-neo-navy/95 border-b-3 border-neo-black sticky top-0 z-20">
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-3 min-w-0">
-            {/* Clickable host avatar with prominent ring */}
+            {/* Clickable host avatar */}
             <button
               data-testid="host-edit-avatar-button"
               onClick={() => setIsAvatarBuilderOpen(true)}
@@ -506,7 +369,7 @@ function HostPreGameView({
               </div>
             </button>
 
-            {/* Host name + WONDERHOST LEADER label */}
+            {/* Host name + label */}
             <div className="min-w-0">
               {isEditingName ? (
                 <div className="flex items-center gap-1.5">
@@ -561,10 +424,6 @@ function HostPreGameView({
           </div>
 
           <div className="flex items-center gap-2 shrink-0">
-            {/* Player count badge */}
-            <span className="hidden sm:flex px-2.5 py-1 rounded-neo border-2 border-neo-lime/30 bg-neo-lime/10 text-sm font-black text-neo-lime font-neo-display tracking-wider">
-              {filteredPlayersForDisplay.length} / {maxPlayers}
-            </span>
             <div className="lg:hidden">
               <MobileShareSection gameCode={gameCode} t={t} showHint={actualPlayerCount === 0} compact />
             </div>
@@ -594,79 +453,47 @@ function HostPreGameView({
       <main className="flex-1 min-h-0 flex flex-col overflow-hidden">
         <h1 className="sr-only">{t('hostView.lobbyTitle')}</h1>
 
-        {/* Desktop Layout — two-column grid (hidden on mobile) */}
+        {/* Desktop Layout — two-column grid */}
         <div className="hidden lg:flex lg:flex-col flex-1 min-h-0">
           <DesktopLobbyLayout
             leftContent={
               <>
                 <AnimatePresence>{renderBotCountdown()}</AnimatePresence>
-                <StartButton
-                  onStartGame={onStartGame}
-                  disabled={isStartDisabled}
-                  tournamentCreating={tournamentCreating}
-                  playerCount={filteredPlayersForDisplay.length}
-                  maxPlayers={maxPlayers}
-                  t={t}
-                />
-                <div className="flex-1 min-h-0 flex flex-col items-center rounded-neo-lg border-3 border-neo-black bg-slate-800/80 shadow-hard p-4">
+                <div className="animate-fade-in-up flex-1 min-h-0 flex flex-col rounded-neo-lg border-3 border-neo-black bg-slate-800/80 shadow-hard p-4">
+                  <div className="flex justify-end mb-2">{tvModeToggle}</div>
                   <PlayerRoster
                     players={filteredPlayersForDisplay}
                     username={username}
                     gameCode={gameCode}
                     maxPlayers={maxPlayers}
-                    hostLabel={hostLabel}
+                    hostLabel={t('hostView.wonderhostLeader')}
                     t={t}
                   />
                 </div>
-                {tvModeToggle}
-                <BattleModeCard
-                  selectedGameMode={selectedGameMode}
-                  setSelectedGameMode={setSelectedGameMode}
-                  t={t}
-                  isAdmin={isAdmin}
-                  hasBlastAccess={hasBlastAccess}
-                />
-                {renderGameInstructions()}
-              </>
-            }
-            rightContent={
-              <>
-                <InviteCard gameCode={gameCode} t={t} />
-                <div data-testid="desktop-chat-area" className="flex-1 min-h-0 rounded-neo-lg border-3 border-neo-black bg-slate-800/60 shadow-hard overflow-hidden">
-                  <RoomChat gameCode={gameCode} username={username} isHost />
+                <div className="animate-fade-in-up" style={{ animationDelay: '80ms' }}>
+                  <BattleModeCard
+                    selectedGameMode={selectedGameMode}
+                    setSelectedGameMode={setSelectedGameMode}
+                    t={t}
+                    isAdmin={isAdmin}
+                    hasBlastAccess={hasBlastAccess}
+                  />
                 </div>
               </>
             }
+            rightContent={
+              <div data-testid="desktop-chat-area">
+                <div className="animate-fade-in-up" style={{ animationDelay: '60ms' }}>
+                  <InviteCard gameCode={gameCode} t={t} />
+                </div>
+                <div className="animate-fade-in-up" style={{ animationDelay: '140ms' }}>
+                  <GameInstructions selectedGameMode={selectedGameMode} t={t} />
+                </div>
+              </div>
+            }
           />
-        </div>
-
-        {/* Mobile Layout — single scroll (hidden on desktop) */}
-        <div className="lg:hidden flex flex-col flex-1 min-h-0">
-          <div className="flex-1 min-h-0 overflow-y-auto px-3 py-3 gap-3 flex flex-col">
-            <AnimatePresence>{renderBotCountdown()}</AnimatePresence>
-            <div className="flex-1 min-h-0 flex flex-col items-center">
-              <PlayerRoster
-                players={filteredPlayersForDisplay}
-                username={username}
-                gameCode={gameCode}
-                maxPlayers={maxPlayers}
-                hostLabel={hostLabel}
-                t={t}
-              />
-            </div>
-            {tvModeToggle}
-            <BattleModeCard
-              selectedGameMode={selectedGameMode}
-              setSelectedGameMode={setSelectedGameMode}
-              t={t}
-              isAdmin={isAdmin}
-              hasBlastAccess={hasBlastAccess}
-            />
-            {renderGameInstructions()}
-            <InviteCard gameCode={gameCode} t={t} />
-          </div>
-          {/* Sticky Start Button — sits above cookie consent banner when visible */}
-          <div className={cn('shrink-0 px-3 py-2 bg-neo-navy border-t-2 border-neo-black', cookieConsentVisible ? 'sm:mb-[140px]' : '')} style={{ paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom, 0px))' }}>
+          {/* Sticky bottom start button — desktop */}
+          <div className="shrink-0 px-6 py-3 border-t-3 border-neo-black bg-neo-navy/95">
             <StartButton
               onStartGame={onStartGame}
               disabled={isStartDisabled}
@@ -674,8 +501,46 @@ function HostPreGameView({
               playerCount={filteredPlayersForDisplay.length}
               maxPlayers={maxPlayers}
               t={t}
-              compact
             />
+          </div>
+        </div>
+
+        {/* Mobile Layout — single scroll + sticky bottom start */}
+        <div className="lg:hidden flex flex-col flex-1 min-h-0">
+          <div className="flex-1 min-h-0 overflow-y-auto relative z-10">
+            <div className="max-w-[600px] mx-auto px-5 py-4 gap-4 flex flex-col pb-4">
+              <AnimatePresence>{renderBotCountdown()}</AnimatePresence>
+              <PlayerRoster
+                players={filteredPlayersForDisplay}
+                username={username}
+                gameCode={gameCode}
+                maxPlayers={maxPlayers}
+                t={t}
+                compact
+              />
+              <BattleModeCard
+                selectedGameMode={selectedGameMode}
+                setSelectedGameMode={setSelectedGameMode}
+                t={t}
+                isAdmin={isAdmin}
+                hasBlastAccess={hasBlastAccess}
+              />
+              <GameInstructions selectedGameMode={selectedGameMode} t={t} />
+              <InviteCard gameCode={gameCode} t={t} />
+            </div>
+          </div>
+          {/* Sticky bottom start button — mobile */}
+          <div className="shrink-0 px-5 py-3 border-t-3 border-neo-black bg-neo-navy/95" style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom, 0px))' }}>
+            <div className="max-w-[600px] mx-auto">
+              <StartButton
+                onStartGame={onStartGame}
+                disabled={isStartDisabled}
+                tournamentCreating={tournamentCreating}
+                playerCount={filteredPlayersForDisplay.length}
+                maxPlayers={maxPlayers}
+                t={t}
+              />
+            </div>
           </div>
         </div>
       </main>
@@ -688,6 +553,7 @@ function HostPreGameView({
         initialConfig={currentAvatar}
         premium={avatarPremium}
       />
+      <ChatBubble gameCode={gameCode} username={username} isHost t={t} />
     </div>
   );
 }

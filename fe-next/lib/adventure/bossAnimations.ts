@@ -144,7 +144,7 @@ const BOSS_ANIMATIONS: Record<string, BossAnimationSet> = {
     },
     attack: {
       animate: { scale: [1, 1.2, 1.2, 0.9, 1], rotate: [0, 0, -8, 4, 0], y: [0, -2, -2, 3, 0] },
-      transition: { duration: 0.45, times: [0, 0.3, 0.5, 0.8, 1] },
+      transition: { type: 'tween', duration: 0.45, times: [0, 0.3, 0.5, 0.8, 1] },
     },
     enragedGlowColor: 'rgba(255, 140, 0, 0.5)',
     enragedFilter: 'sepia(0.2) saturate(1.3)',

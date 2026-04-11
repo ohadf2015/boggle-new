@@ -1300,6 +1300,7 @@ const en = {
     "qrCode": "QR Code",
     "showQrCode": "Show QR Code",
     "scanToJoin": "Scan to Join",
+    "letsGo": "LET'S GO!",
     "wonderhostLeader": "Wonderhost Leader",
     "bringYourSquad": "Bring Your Squad",
     "orEnterCode": "Or enter code",
@@ -6665,11 +6666,11 @@ const en = {
       "wheel": "Word Wheel",
       "forge": "Word Forge",
       "boss": "Boss Battle",
-      "classic.objective": "Find words before time runs out",
-      "blast.objective": "Clear all tiles within move limit",
-      "hunt.objective": "Find the hidden target word",
-      "wheel.objective": "Words must include the center letter",
-      "forge.objective": "Hit the score target with rune buffs"
+      "classicObjective": "Find words before time runs out",
+      "blastObjective": "Clear all tiles within move limit",
+      "huntObjective": "Find the hidden target word",
+      "wheelObjective": "Words must include the center letter",
+      "forgeObjective": "Hit the score target with rune buffs"
     },
     "objectives": {
       "wordCount": "Find words",
@@ -6921,16 +6922,16 @@ const en = {
 "mode": {
       "classic": "Classic",
       "blast": "Blast",
-      "blast.objective": "Use your moves wisely!",
+      "blastObjective": "Use your moves wisely!",
       "hunt": "Hunt",
-      "hunt.objective": "Survive as long as you can!",
+      "huntObjective": "Survive as long as you can!",
       "wheel": "Wheel",
-      "wheel.objective": "Every word must include the center letter!",
-      "wheel.mustInclude": "Must include:",
+      "wheelObjective": "Every word must include the center letter!",
+      "wheelMustInclude": "Must include:",
       "forge": "Forge",
-      "forge.objective": "Reach the target score!",
+      "forgeObjective": "Reach the target score!",
       "boss": "Boss",
-      "boss.objective": "Defeat the boss!",
+      "bossObjective": "Defeat the boss!",
       "movesLeft": "Moves Left"
     },
 "game": {

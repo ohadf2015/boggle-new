@@ -122,6 +122,7 @@ export function GameCanvas({
       const timeDilation = new TimeDilation();
 
       app.ticker.add((ticker) => {
+        if (destroyed) return;
         const rawDelta = ticker.deltaMS / 1000;
         // Apply time dilation to all game systems (not real-time UI)
         timeDilation.update(rawDelta);
