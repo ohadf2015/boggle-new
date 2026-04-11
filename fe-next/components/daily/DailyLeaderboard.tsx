@@ -210,15 +210,18 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
     const shareUrl = `${origin}/${language}/daily?share=${encodeURIComponent(ogParams.toString())}`;
 
     // Build share text based on game type
+    const gameLabel = gameType === 'wordHunt' ? 'Word Hunt'
+      : gameType === 'wordWheel' ? 'Word Wheel'
+      : 'Daily';
     const shareText = gameType === 'wordHunt'
-      ? `🎯 I ranked #${currentUserData.rank_position} on LexiClash Word Hunt #${puzzleNumber}! ${currentUserData.solved ? `Solved in ${currentUserData.attempts_used}/10` : 'X/10'}\n\n`
-      : `🎯 I ranked #${currentUserData.rank_position} on LexiClash Daily #${puzzleNumber}! ${currentUserData.score ?? 0} pts | ${currentUserData.word_count ?? 0} words\n\n`;
+      ? `🎯 I ranked #${currentUserData.rank_position} on LexiClash ${gameLabel} #${puzzleNumber}! ${currentUserData.solved ? `Solved in ${currentUserData.attempts_used}/10` : 'X/10'}\n\n`
+      : `🎯 I ranked #${currentUserData.rank_position} on LexiClash ${gameLabel} #${puzzleNumber}! ${currentUserData.score ?? 0} pts | ${currentUserData.word_count ?? 0} words\n\n`;
 
     // Try native share first
     if (navigator.share) {
       try {
         await navigator.share({
-          title: `LexiClash Daily #${puzzleNumber}`,
+          title: `LexiClash ${gameLabel} #${puzzleNumber}`,
           text: shareText,
           url: shareUrl,
         });

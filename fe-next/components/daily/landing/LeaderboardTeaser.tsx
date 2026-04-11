@@ -17,7 +17,11 @@ interface LeaderboardTeaserProps {
   onViewFull?: () => void;
 }
 
-const RANK_COLORS = ['text-neo-yellow', 'text-slate-300', 'text-neo-orange'];
+const RANK_STYLES = [
+  { text: 'text-neo-lime', bg: 'bg-neo-lime/20', border: 'border-neo-lime/40', medal: '🥇' },
+  { text: 'text-slate-300', bg: 'bg-white/5', border: 'border-white/10', medal: '🥈' },
+  { text: 'text-neo-pink', bg: 'bg-neo-pink/10', border: 'border-neo-pink/30', medal: '🥉' },
+];
 
 /**
  * Mini top-3 daily leaderboard teaser.
@@ -59,14 +63,14 @@ export function LeaderboardTeaser({ currentLanguage, onViewFull }: LeaderboardTe
 
   return (
     <div
-      className="bg-slate-900 border-3 border-black shadow-hard rounded-xl overflow-hidden w-full"
+      className="bg-slate-900/95 border-3 border-black shadow-hard rounded-xl overflow-hidden w-full"
       data-testid="leaderboard-teaser"
     >
       {/* Header */}
-      <div className="flex items-center justify-between px-3 py-2 border-b-2 border-black/30">
+      <div className="flex items-center justify-between px-3 py-2.5 border-b-2 border-black/30 bg-white/[0.03]">
         <div className="flex items-center gap-1.5">
-          <Crown className="w-4 h-4 text-neo-yellow" />
-          <span className="font-black text-white text-xs uppercase tracking-wide">
+          <Crown className="w-4 h-4 text-neo-lime" />
+          <span className="font-neo-display font-black text-white text-xs uppercase tracking-wide">
             {t('daily.todaysTopPlayers')}
           </span>
         </div>
@@ -80,51 +84,58 @@ export function LeaderboardTeaser({ currentLanguage, onViewFull }: LeaderboardTe
         )}
       </div>
 
-      {/* Entries - horizontal on mobile, vertical on sm+ */}
-      <div className="flex flex-row sm:flex-col divide-x-2 sm:divide-x-0 sm:divide-y-2 divide-black/20">
+      {/* Entries */}
+      <div className="flex flex-col">
         {loading ? (
           Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="flex-1 flex flex-col items-center gap-1 px-3 py-2.5 sm:flex-row sm:gap-3 sm:px-4 sm:py-2.5">
+            <div key={i} className="flex items-center gap-3 px-3 py-3 border-b border-black/10 last:border-b-0">
               <div className="w-6 h-6 rounded-full skeleton" />
-              <div className="w-16 h-3 skeleton rounded sm:flex-1 sm:h-4" />
+              <div className="w-24 h-3.5 skeleton rounded flex-1" />
+              <div className="w-12 h-3.5 skeleton rounded" />
             </div>
           ))
         ) : entries.length === 0 ? (
-          <div className="flex-1 px-3 py-4 text-center text-xs text-slate-500">
+          <div className="px-3 py-5 text-center text-xs text-slate-500">
             {t('daily.samePuzzle')}
           </div>
         ) : (
-          entries.map((entry) => (
-            <div
-              key={entry.rank}
-              className="flex-1 flex flex-col items-center gap-0.5 px-2 py-2.5 sm:flex-row sm:gap-3 sm:px-4 sm:py-2.5 hover:bg-white/5 transition-colors"
-            >
-              {/* Rank + Avatar */}
-              <div className="flex items-center gap-1.5">
-                <span className={cn(
-                  'font-black text-sm',
-                  RANK_COLORS[entry.rank - 1] || 'text-white'
-                )}>
-                  {entry.rank}
-                </span>
-                <div className="w-6 h-6 rounded-full bg-white/10 border border-black/30 flex items-center justify-center">
-                  <span className="text-[10px] font-bold text-white">
-                    {entry.name.charAt(0).toUpperCase()}
-                  </span>
+          entries.map((entry) => {
+            const style = RANK_STYLES[entry.rank - 1] || { text: 'text-white', bg: '', border: '', medal: '' };
+            return (
+              <div
+                key={entry.rank}
+                className={cn(
+                  'flex items-center gap-3 px-3 py-2.5',
+                  'border-b border-black/10 last:border-b-0',
+                  'hover:bg-white/5 transition-colors',
+                  entry.rank === 1 && 'bg-neo-lime/[0.04]'
+                )}
+              >
+                {/* Medal + Avatar */}
+                <div className="flex items-center gap-2 shrink-0">
+                  <span className="text-base leading-none" aria-hidden="true">{style.medal}</span>
+                  <div className={cn(
+                    'w-7 h-7 rounded-full border-2 border-black/30 flex items-center justify-center',
+                    style.bg
+                  )}>
+                    <span className={cn('text-[11px] font-black', style.text)}>
+                      {entry.name.charAt(0).toUpperCase()}
+                    </span>
+                  </div>
                 </div>
+
+                {/* Name */}
+                <span className="text-sm font-bold text-white truncate flex-1 min-w-0">
+                  {entry.name}
+                </span>
+
+                {/* Score */}
+                <span className={cn('text-sm font-black tabular-nums', style.text)}>
+                  {entry.score.toLocaleString()}
+                </span>
               </div>
-
-              {/* Name */}
-              <span className="text-[11px] sm:text-sm font-bold text-white truncate max-w-[80px] sm:max-w-none sm:flex-1">
-                {entry.name}
-              </span>
-
-              {/* Score */}
-              <span className="text-[11px] sm:text-sm font-black text-neo-lime tabular-nums">
-                {entry.score.toLocaleString()}
-              </span>
-            </div>
-          ))
+            );
+          })
         )}
       </div>
     </div>

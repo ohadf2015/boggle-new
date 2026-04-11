@@ -148,7 +148,7 @@ export function DailyChallengeLanding({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ type: 'spring', stiffness: 280, damping: 26 }}
-      className="flex-1 flex flex-col items-center px-3 py-2 sm:px-4 sm:py-2 max-w-3xl mx-auto w-full relative"
+      className="flex-1 flex flex-col items-center px-3 py-2 sm:px-4 sm:py-2 max-w-3xl mx-auto w-full relative gap-3"
     >
       {/* Ambient effects */}
       <ConfettiBackground />
@@ -170,9 +170,9 @@ export function DailyChallengeLanding({
         <>
           {/* Word Hunt Results Hero Card */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.15, type: 'spring', stiffness: 300, damping: 25 }}
+            transition={{ delay: 0.1, type: 'spring', stiffness: 300, damping: 25 }}
             className="w-full"
             data-testid="word-hunt-hero"
           >
@@ -180,15 +180,24 @@ export function DailyChallengeLanding({
               type="button"
               onClick={onSelectWordHunt}
               className={cn(
-                'relative w-full bg-slate-900/95 rounded-xl border-3 border-neo-black',
+                'relative w-full rounded-xl border-3 border-neo-black',
                 'shadow-hard overflow-hidden cursor-pointer p-4',
                 'flex items-center gap-4',
                 'focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-lime',
-                'transition-shadow duration-200 group'
+                'transition-all duration-200 group',
+                status.wordHunt === 'won'
+                  ? 'bg-neo-lime/[0.06] hover:bg-neo-lime/[0.1]'
+                  : 'bg-neo-pink/[0.06] hover:bg-neo-pink/[0.1]'
               )}
             >
+              {/* Accent strip */}
+              <div className={cn(
+                'absolute inset-e-0 top-0 bottom-0 w-1.5 rounded-e-lg',
+                status.wordHunt === 'won' ? 'bg-neo-lime' : 'bg-neo-pink'
+              )} />
+
               {/* Status icon */}
-              <div
+              <motion.div
                 data-testid={status.wordHunt === 'won' ? 'won-badge' : 'lost-badge'}
                 className={cn(
                   'w-12 h-12 rounded-full border-2 border-neo-black shrink-0',
@@ -196,23 +205,26 @@ export function DailyChallengeLanding({
                   'shadow-hard-xs',
                   status.wordHunt === 'won' ? 'bg-neo-lime' : 'bg-neo-pink'
                 )}
+                initial={{ scale: 0, rotate: -180 }}
+                animate={{ scale: 1, rotate: 0 }}
+                transition={{ delay: 0.25, type: 'spring', stiffness: 200, damping: 15 }}
               >
                 {status.wordHunt === 'won'
                   ? <Check className="w-6 h-6 text-neo-black" strokeWidth={3} />
                   : <X className="w-6 h-6 text-neo-black" strokeWidth={3} />
                 }
-              </div>
+              </motion.div>
 
               {/* Title + status badge */}
               <div className="flex-1 min-w-0">
-                <h2 className="text-xl font-neo-display font-black text-neo-orange leading-none">
+                <h2 className="text-xl font-neo-display font-black text-neo-cream leading-none">
                   {t('daily.wordHunt.title')}
                 </h2>
                 <span className={cn(
-                  'inline-block mt-1 px-2 py-0.5 text-[10px] font-black uppercase rounded-md border',
+                  'inline-block mt-1.5 px-2.5 py-0.5 text-[10px] font-black uppercase rounded-md border-2',
                   status.wordHunt === 'won'
-                    ? 'bg-neo-lime/20 text-neo-lime border-neo-lime'
-                    : 'bg-neo-pink/20 text-neo-pink border-neo-pink'
+                    ? 'bg-neo-lime/20 text-neo-lime border-neo-lime/40'
+                    : 'bg-neo-pink/20 text-neo-pink border-neo-pink/40'
                 )}>
                   {status.wordHunt === 'won' ? t('daily.cleared') : t('daily.wordHunt.title')}
                 </span>
@@ -220,11 +232,11 @@ export function DailyChallengeLanding({
 
               {/* View Results CTA */}
               <div className={cn(
-                'shrink-0 py-2 px-5 text-xs font-black uppercase rounded-lg text-center',
-                'bg-neo-orange text-neo-black border-2 border-neo-black shadow-hard-sm',
+                'shrink-0 py-2.5 px-5 text-xs font-black uppercase rounded-lg text-center',
+                'bg-neo-cyan text-neo-black border-2 border-neo-black shadow-hard-sm',
                 'active:translate-y-0.5 active:shadow-none transition-all',
                 'flex items-center gap-1.5',
-                'group-hover:scale-105 transition-transform'
+                'group-hover:scale-105'
               )}>
                 <Eye className="w-4 h-4" />
                 {t('daily.viewResults')}
@@ -232,23 +244,23 @@ export function DailyChallengeLanding({
             </button>
           </motion.div>
 
-          {/* Continue missions divider */}
+          {/* Divider */}
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.25 }}
-            className="w-full flex items-center gap-3 my-2.5"
+            initial={{ opacity: 0, scaleX: 0 }}
+            animate={{ opacity: 1, scaleX: 1 }}
+            transition={{ delay: 0.25, duration: 0.3 }}
+            className="w-full flex items-center gap-3"
           >
-            <div className="flex-1 h-px bg-slate-700" />
-            <span className="text-xs text-slate-500 font-bold uppercase tracking-wider whitespace-nowrap">
+            <div className="flex-1 h-px bg-gradient-to-e from-transparent via-slate-600 to-transparent" />
+            <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest whitespace-nowrap">
               {t('daily.continueMissions')}
             </span>
-            <div className="flex-1 h-px bg-slate-700" />
+            <div className="flex-1 h-px bg-gradient-to-e from-transparent via-slate-600 to-transparent" />
           </motion.div>
 
           {/* Streak counter + freeze */}
           <StreakCounter streak={streak} />
-          <StreakFreezeIndicator freezeCount={freezeCount} t={t} className="mt-1" />
+          <StreakFreezeIndicator freezeCount={freezeCount} t={t} />
           <DailyRewardPreview currentStreakDay={streak} t={t} />
         </>
       ) : (
@@ -274,15 +286,20 @@ export function DailyChallengeLanding({
 
           {/* Streak counter + freeze */}
           <StreakCounter streak={streak} />
-          <StreakFreezeIndicator freezeCount={freezeCount} t={t} className="mt-1" />
+          <StreakFreezeIndicator freezeCount={freezeCount} t={t} />
           <DailyRewardPreview currentStreakDay={streak} t={t} />
         </>
       )}
 
       {/* Leaderboard Teaser */}
-      <div className="mt-3 w-full">
+      <motion.div
+        className="w-full"
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.4, type: 'spring', stiffness: 300, damping: 25 }}
+      >
         <LeaderboardTeaser currentLanguage={currentLanguage} />
-      </div>
+      </motion.div>
     </motion.div>
   );
 }

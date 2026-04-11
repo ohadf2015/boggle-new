@@ -48,22 +48,21 @@ export const WheelLetter: React.FC<WheelLetterProps> = ({
             : 'bg-neo-white text-neo-navy shadow-[2px_2px_0px_black,0_0_8px_rgba(191,255,0,0.15)] hover:shadow-[2px_2px_0px_black,0_0_14px_rgba(191,255,0,0.35)] hover:bg-neo-cream active:bg-neo-lime/30',
         isUsed ? 'cursor-default' : 'cursor-pointer',
       )}
-      // Use CSS transform for stable positioning — avoids Framer Motion fighting on re-renders
-      style={{
-        transform: `translate(${offsetX}px, ${offsetY}px)`,
-      }}
       onClick={() => {
         if (!isUsed && btnRef.current) onPress(letter, index, btnRef.current);
       }}
-      whileTap={isUsed ? {} : { scale: 0.85 }}
-      animate={
-        isCenter && !isUsed
+      whileTap={isUsed ? {} : { scaleX: 1.12, scaleY: 0.82 }}
+      whileHover={!isCenter && !isUsed ? { scale: 1.1, boxShadow: '2px 2px 0px black, 0 0 18px rgba(191,255,0,0.5)' } : undefined}
+      animate={{
+        x: offsetX,
+        y: offsetY,
+        ...(isCenter && !isUsed
           ? { scale: [1, 1.06, 1], boxShadow: ['3px 3px 0px black, 0 0 20px rgba(191,255,0,0.5)', '3px 3px 0px black, 0 0 28px rgba(191,255,0,0.7)', '3px 3px 0px black, 0 0 20px rgba(191,255,0,0.5)'] }
-          : { scale: isUsed ? 0.9 : 1 }
-      }
+          : { scale: isUsed ? 0.9 : 1 }),
+      }}
       transition={isCenter && !isUsed
-        ? { duration: 2, repeat: Infinity, ease: 'easeInOut' }
-        : { type: 'spring', stiffness: 500, damping: 25 }
+        ? { duration: 2, repeat: Infinity, ease: 'easeInOut', x: { type: 'spring', stiffness: 300, damping: 25 }, y: { type: 'spring', stiffness: 300, damping: 25 } }
+        : { type: 'spring', stiffness: 400, damping: 22 }
       }
       disabled={isUsed}
       aria-label={letter}
@@ -98,7 +97,7 @@ export const WordTile: React.FC<WordTileProps> = ({ letter, index, onRemove, isC
     onClick={() => onRemove(index)}
     initial={{ scale: 0, y: 20 }}
     animate={{ scale: 1, y: 0 }}
-    exit={{ scale: 0, y: -20, opacity: 0 }}
+    exit={{ scale: 0, y: -35, opacity: 0 }}
     transition={{
       scale: { type: 'spring', stiffness: 600, damping: 20 },
       y: { type: 'spring', stiffness: 600, damping: 20 },

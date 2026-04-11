@@ -15,6 +15,11 @@ import dynamic from 'next/dynamic';
 
 const WordWheelPixiRing = dynamic(() => import('./WordWheelPixiRing'), { ssr: false });
 
+// Haptic feedback for mobile — distinct patterns per interaction type
+const haptic = (pattern: number | number[]) => {
+  try { navigator.vibrate?.(pattern); } catch { /* unsupported */ }
+};
+
 export interface WordWheelGameResult { wordsFound: string[]; score: number; timeSeconds: number }
 
 interface WordWheelGameProps {
@@ -46,6 +51,8 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
   const [lastWordScore, setLastWordScore] = useState<number | null>(null);
   const [combo, setCombo] = useState(0);
   const comboTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [wordBuilderShake, setWordBuilderShake] = useState(false);
+  const [lastFoundWord, setLastFoundWord] = useState<string | null>(null);
 
   const gameOverRef = useRef(false);
   const wordsFoundRef = useRef<string[]>([]);
@@ -106,6 +113,11 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
   const showFeedback = useCallback((message: string, type: 'success' | 'error') => {
     setFeedback({ message, type });
     setTimeout(() => setFeedback(null), 1500);
+    if (type === 'error') {
+      setWordBuilderShake(true);
+      haptic([30, 50, 30]);
+      setTimeout(() => setWordBuilderShake(false), 400);
+    }
   }, []);
 
   // ── Letter tap ──
@@ -113,6 +125,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
     if (gameOverRef.current) return;
     setBuiltLetters(prev => [...prev, { letter, wheelIndex }]);
     playTileSelectSound();
+    haptic(10);
     // Get element position for particle effect
     const rect = el.getBoundingClientRect();
     const containerRect = gameContainerRef.current?.getBoundingClientRect();
@@ -201,6 +214,8 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         setTimeout(() => setLastWordScore(null), 1200);
         showFeedback(`+${points}`, 'success');
         setBuiltLetters([]);
+        setLastFoundWord(word);
+        setTimeout(() => setLastFoundWord(null), 2000);
 
         // Combo tracker — resets after 5s of inactivity
         const hadActiveCombo = comboTimerRef.current !== null;
@@ -209,12 +224,14 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         setCombo(newCombo);
         comboTimerRef.current = setTimeout(() => { setCombo(0); comboTimerRef.current = null; }, 5000);
 
-        // Sound effects
+        // Sound + haptic feedback
         const isPangram = word.length >= 9;
         if (isPangram) {
           playLegendaryWordSound();
+          haptic([50, 30, 50, 30, 80]);
         } else {
           playWordAcceptedSound();
+          haptic(newCombo >= 2 ? [15, 30, 15, 30, 15] : 20);
         }
         if (newCombo >= 2) {
           playComboSound(newCombo);
@@ -320,7 +337,18 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
       </div>
 
       {/* ── Word Builder Area ── */}
-      <div className="relative w-full min-h-[52px] sm:min-h-[72px] flex items-center justify-center">
+      <motion.div
+        className="relative w-full min-h-[52px] sm:min-h-[72px] flex items-center justify-center"
+        animate={
+          wordBuilderShake
+            ? { x: [-4, 4, -3, 3, -1, 0] }
+            : { scale: 1 + builtLetters.length * 0.008 }
+        }
+        transition={wordBuilderShake
+          ? { duration: 0.35 }
+          : { type: 'spring', stiffness: 300, damping: 20 }
+        }
+      >
         <div className="flex items-center justify-center gap-1 sm:gap-2 flex-wrap max-w-full">
           <AnimatePresence mode="popLayout">
             {builtLetters.length === 0 ? (
@@ -379,7 +407,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
             </motion.div>
           )}
         </AnimatePresence>
-      </div>
+      </motion.div>
 
       {/* ── The Wheel ── */}
       <div ref={wheelContainerRef} className="relative w-52 h-52 sm:w-64 sm:h-64 md:w-72 md:h-72 flex items-center justify-center">
@@ -411,7 +439,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         {/* Outer letters */}
         {outerLetters.map((letter, i) => (
           <WheelLetter
-            key={`${letter}-${i}`}
+            key={letter}
             letter={letter}
             isCenter={false}
             angle={i * 45}
@@ -497,13 +525,21 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
               {t('wordWheel.foundWords')} ({wordsFound.length})
             </h3>
             <div className="flex flex-wrap gap-1.5">
-              {wordsFound.map((word, i) => (
+              {wordsFound.map((word) => (
                 <motion.span
                   key={word}
-                  className="px-2.5 py-1 rounded-neo border-2 border-neo-black bg-neo-navy-light text-neo-cream text-xs font-semibold shadow-hard-xs"
+                  className={cn(
+                    'px-2.5 py-1 rounded-neo border-2 text-neo-cream text-xs font-semibold shadow-hard-xs',
+                    word === lastFoundWord
+                      ? 'bg-neo-lime/20 border-neo-lime ring-1 ring-neo-lime/40'
+                      : 'bg-neo-navy-light border-neo-black',
+                  )}
                   initial={{ scale: 0, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ type: 'spring', stiffness: 500, delay: i === wordsFound.length - 1 ? 0 : 0 }}
+                  animate={word === lastFoundWord
+                    ? { scale: [0, 1.15, 1], opacity: 1 }
+                    : { scale: 1, opacity: 1 }
+                  }
+                  transition={{ type: 'spring', stiffness: 500 }}
                 >
                   {word} <span className="text-neo-lime font-black">+{scoreWord(word)}</span>
                 </motion.span>

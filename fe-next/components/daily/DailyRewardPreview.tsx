@@ -44,26 +44,23 @@ export function DailyRewardPreview({ currentStreakDay, t }: DailyRewardPreviewPr
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-neo-navy border-3 border-neo-black rounded-neo p-4 shadow-hard-sm space-y-3"
+      transition={{ delay: 0.35 }}
+      className="w-full bg-slate-900/80 border-3 border-neo-black rounded-xl p-4 shadow-hard-sm space-y-3"
     >
-      {/* Today's reward */}
-      <div className="text-center">
+      {/* Today's reward + tomorrow preview */}
+      <div className="flex items-center justify-between">
         <p className="text-neo-cream font-bold text-sm">
           {interpolateTranslation(t('daily.todayReward'), { coins: todayReward.coins })}
         </p>
-      </div>
-
-      {/* Tomorrow preview */}
-      <div className="text-center">
-        <p className="text-neo-cream/70 text-xs">
+        <p className="text-neo-cream/50 text-xs">
           {interpolateTranslation(t('daily.tomorrowReward'), { coins: tomorrowCoins })}
         </p>
       </div>
 
       {/* Milestone proximity */}
       {nextMilestone && (
-        <div className="text-center">
-          <p className="text-neo-yellow text-xs font-bold">
+        <div className="px-3 py-1.5 rounded-lg bg-neo-purple/10 border border-neo-purple/30 text-center">
+          <p className="text-neo-purple text-xs font-bold">
             {interpolateTranslation(t('daily.nearMilestone'), {
               days: nextMilestone.daysAway,
               badge: nextMilestone.label,
@@ -72,27 +69,30 @@ export function DailyRewardPreview({ currentStreakDay, t }: DailyRewardPreviewPr
         </div>
       )}
 
-      {/* Timeline */}
-      <div data-testid="reward-timeline" className="flex items-center justify-between gap-1 pt-2">
+      {/* Timeline — connected dots */}
+      <div data-testid="reward-timeline" className="relative flex items-center justify-between gap-1 pt-2">
+        {/* Connecting line behind dots */}
+        <div className="absolute top-[calc(50%+4px)] inset-x-4 h-0.5 bg-neo-navy-light rounded-full" aria-hidden="true" />
+
         {timelineDays.map((entry) => (
           <div
             key={entry.day}
-            className={`flex flex-col items-center gap-1 flex-1 ${
-              entry.isToday ? 'opacity-100' : 'opacity-50'
+            className={`relative flex flex-col items-center gap-1 flex-1 ${
+              entry.isToday ? 'opacity-100' : 'opacity-40'
             }`}
           >
             <motion.div
-              className={`w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold border-2 ${
+              className={`w-9 h-9 rounded-full flex items-center justify-center text-[10px] font-black border-2 ${
                 entry.isToday
                   ? 'bg-neo-cyan text-neo-black border-neo-black shadow-hard-sm'
                   : 'bg-neo-navy-light text-neo-cream/60 border-neo-black/30'
               }`}
-              animate={entry.isToday ? { scale: [1, 1.1, 1] } : undefined}
-              transition={{ repeat: Infinity, duration: 2 }}
+              animate={entry.isToday ? { scale: [1, 1.08, 1] } : undefined}
+              transition={entry.isToday ? { repeat: Infinity, duration: 2.5 } : undefined}
             >
               {entry.coins}
             </motion.div>
-            <span className="text-[9px] text-neo-cream/40">
+            <span className={`text-[9px] font-bold ${entry.isToday ? 'text-neo-cyan' : 'text-neo-cream/30'}`}>
               {entry.isToday ? '▼' : `D${entry.day}`}
             </span>
           </div>

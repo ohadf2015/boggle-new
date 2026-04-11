@@ -130,6 +130,7 @@ export function useBlastGameEnd(deps: GameEndDeps) {
         // Finale burst: flag all remaining tiles for a debris/shockwave explosion
         // before the game-end transition unmounts the canvas.
         const latestDeps = depsRef.current;
+        let finaleDestroyedCount = 0;
         if (latestDeps.onDeadEndFinale) {
           const finalTiles = engine.getLatestState().tileStates;
           const remaining: DeadEndFinaleTile[] = [];
@@ -142,6 +143,7 @@ export function useBlastGameEnd(deps: GameEndDeps) {
               }
             }
           }
+          finaleDestroyedCount = remaining.length;
           if (remaining.length > 0) {
             latestDeps.onDeadEndFinale(remaining);
             // Give debris time to render + physics to fling before phase transition.
@@ -153,7 +155,13 @@ export function useBlastGameEnd(deps: GameEndDeps) {
         setSugarCrushActive(false);
 
         // End game — read latest deps
-        const { score, wordsFound, tilesCleared, totalTiles } = engine.gameState;
+        const { score, wordsFound, totalTiles } = engine.gameState;
+
+        // Sugar Crush converts tiles to specials and the dead-end finale visually
+        // explodes all remaining tiles as debris, but neither path increments
+        // engine.gameState.tilesCleared. Count the finale-destroyed tiles so
+        // clearPct matches the visual outcome and wave advancement works correctly.
+        const tilesCleared = engine.gameState.tilesCleared + finaleDestroyedCount;
         const clearPct = totalTiles > 0 ? Math.min(100, Math.round((tilesCleared / totalTiles) * 100)) : 0;
 
         // Advance the wave if the primary board-clear objective (90%+) is met.

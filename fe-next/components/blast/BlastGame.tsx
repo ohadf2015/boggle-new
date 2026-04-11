@@ -335,11 +335,16 @@ export function BlastGame({
     setClearedTilesForEffects(tiles.map(t => ({
       row: t.row, col: t.col, type: 'bomb' as BlastTileType,
     })));
+    // Mark all finale tiles as cleared so they disappear from the board
+    const coords = new Set(tiles.map(t => `${t.row},${t.col}`));
+    engine.setTileStates(prev => prev.map((row, ri) =>
+      row.map((tile, ci) => coords.has(`${ri},${ci}`) ? { ...tile, isCleared: true } : tile),
+    ));
     sounds.playSpecialTileSound('bomb');
     if (explosionShakeTimerRef.current) clearTimeout(explosionShakeTimerRef.current);
     setExplosionShake(3);
     explosionShakeTimerRef.current = setTimeout(() => setExplosionShake(0), 800);
-  }, [sounds]);
+  }, [sounds, engine]);
 
   // Game end detection + Sugar Crush (extracted to useBlastGameEnd)
   const { sugarCrushActive } = useBlastGameEnd({

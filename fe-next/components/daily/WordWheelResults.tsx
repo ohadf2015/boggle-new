@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, animate as fmAnimate } from 'framer-motion';
 import { Star, ArrowRight, Flame, Crown, Zap } from 'lucide-react';
 import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -108,21 +108,15 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
   const [showConfetti, setShowConfetti] = useState(false);
   const [animatedScore, setAnimatedScore] = useState(0);
 
-  // Animate score counting up
+  // Animate score counting up with natural deceleration
   useEffect(() => {
     if (result.score === 0) return;
-    const step = Math.max(1, Math.floor(result.score / 30));
-    const interval = setInterval(() => {
-      setAnimatedScore(prev => {
-        const next = prev + step;
-        if (next >= result.score) {
-          clearInterval(interval);
-          return result.score;
-        }
-        return next;
-      });
-    }, 30);
-    return () => clearInterval(interval);
+    const controls = fmAnimate(0, result.score, {
+      duration: 1.5,
+      ease: [0.16, 1, 0.3, 1],
+      onUpdate: (v) => setAnimatedScore(Math.round(v)),
+    });
+    return () => controls.stop();
   }, [result.score]);
 
   // Trigger confetti for good scores
