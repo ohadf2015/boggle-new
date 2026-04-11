@@ -67,7 +67,7 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
     const { t, language } = useLanguage();
     const { isAuthenticated, isAdmin, profile, user, loading } = useAuth();
     const engagementStatus = useEngagementStatus();
-    const { missions, completedCount, isGrandSlam } = useDailyMissions();
+    const { missions, completedCount, isGrandSlam, loading: missionsLoading } = useDailyMissions();
     const { notifications, unreadCount: notificationCount, markAsRead, markAllAsRead, dismissNotification } = useRealtimeNotifications();
     const [showAllNotifications, setShowAllNotifications] = useState(false);
 
@@ -78,7 +78,12 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
     const { isCrazyGames } = useCrazyGamesAuth();
     const queryClient = useQueryClient();
     const [showMobileMenu, setShowMobileMenu] = useState(false);
-    const [badgeSeen, setBadgeSeen] = useState(false);
+    const [lastSeenBadgeCount, setLastSeenBadgeCount] = useState<number>(() => {
+        if (typeof window === 'undefined') return 0;
+        const raw = window.localStorage.getItem('mobileMenu.lastSeenBadgeCount');
+        const parsed = raw ? Number.parseInt(raw, 10) : 0;
+        return Number.isFinite(parsed) ? parsed : 0;
+    });
     const [giftBannerDismissed, setGiftBannerDismissed] = useState(false);
 
     // Guest name editing
@@ -114,12 +119,25 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
     // Aggregate badge: gifts + notifications + completed quests
     const badgeCount = unclaimedCount + (isAuthenticated ? notificationCount : 0) + completedCount;
 
-    // Reset "seen" when badge count increases (new notifications arrived)
-    const prevBadgeCount = useRef(badgeCount);
-    if (badgeCount > prevBadgeCount.current) {
-        setBadgeSeen(false);
-    }
-    prevBadgeCount.current = badgeCount;
+    // Badge is hidden when the user has already seen at least this many items.
+    // New items pushing the count above the persisted high-water mark resurface it.
+    const badgeSeen = badgeCount <= lastSeenBadgeCount;
+
+    const markBadgeSeen = useCallback((count: number) => {
+        setLastSeenBadgeCount(count);
+        if (typeof window !== 'undefined') {
+            window.localStorage.setItem('mobileMenu.lastSeenBadgeCount', String(count));
+        }
+    }, []);
+
+    // If the count drops (e.g. user dismissed notifications elsewhere), clamp the
+    // stored marker so a future increase still triggers the badge correctly.
+    // Skip while missions are loading — completedCount is temporarily 0 on mount.
+    useEffect(() => {
+        if (badgeCount < lastSeenBadgeCount && !missionsLoading) {
+            markBadgeSeen(badgeCount);
+        }
+    }, [badgeCount, lastSeenBadgeCount, markBadgeSeen, missionsLoading]);
     const mounted = useSyncExternalStore(() => () => {}, () => true, () => false);
     const mobileMenuRef = useRef<HTMLDivElement>(null);
     const isRtl = language === 'he';
@@ -204,12 +222,12 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
 
                 {/* Animated Hamburger Button */}
                 <button
-                    onClick={async () => {
+                    onClick={() => {
                         if (!showMobileMenu) {
+                            markBadgeSeen(badgeCount);
                             if (notificationCount > 0) {
-                                await markAllAsRead();
+                                markAllAsRead();
                             }
-                            setBadgeSeen(true);
                         }
                         setShowMobileMenu(!showMobileMenu);
                     }}

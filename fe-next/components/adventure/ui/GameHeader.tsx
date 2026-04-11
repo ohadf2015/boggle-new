@@ -11,7 +11,7 @@
 
 import { memo } from 'react';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
-import { Pause, Play, X, Swords } from 'lucide-react';
+import { Pause, Play, X, Swords, Crosshair } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useHUDTheme } from '@/contexts/AdventureThemeContext';
@@ -41,6 +41,12 @@ interface GameHeaderProps {
   elapsedTime?: number;
   comboCount?: number;
   comboTimeoutMs?: number;
+  /** Mode badge translation key (e.g. 'adventure.mode.blast') */
+  modeDisplayKey?: string;
+  /** Show move counter instead of timer (blast mode) */
+  showMoveCounter?: boolean;
+  /** Moves remaining (blast mode) */
+  movesRemaining?: number;
   className?: string;
 }
 
@@ -61,6 +67,9 @@ export const GameHeader = memo(function GameHeader({
   elapsedTime = 0,
   comboCount = 0,
   comboTimeoutMs = 3000,
+  modeDisplayKey,
+  showMoveCounter = false,
+  movesRemaining,
   className,
 }: GameHeaderProps) {
   const { t } = useLanguage();
@@ -138,9 +147,16 @@ export const GameHeader = memo(function GameHeader({
         </div>
       </div>
 
-      {/* Right: Level+Timer merged pill, then Pause */}
+      {/* Right: Level+Timer/Moves/HP pill, then Pause */}
       <div className="flex items-center gap-1 shrink-0">
-        {/* Merged Level + Timer pill */}
+        {/* Mode badge — shown for non-classic archetypes */}
+        {modeDisplayKey && (
+          <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-neo-purple/20 text-neo-purple border border-neo-purple/30">
+            {t(modeDisplayKey)}
+          </span>
+        )}
+
+        {/* Merged Level + resource pill */}
         {isBossLevel ? (
           <div className="flex items-center gap-1.5 px-2 py-1 bg-neo-red/15 rounded-neo border border-neo-red/30">
             <Swords className="w-3.5 h-3.5 text-neo-red" />
@@ -152,7 +168,28 @@ export const GameHeader = memo(function GameHeader({
               {Math.floor(elapsedTime / 60)}:{String(elapsedTime % 60).padStart(2, '0')}
             </span>
           </div>
+        ) : showMoveCounter && movesRemaining != null ? (
+          /* Blast mode: move counter instead of timer */
+          <div className={cn(
+            'flex items-center gap-1.5',
+            'bg-neo-pink/15 rounded-neo',
+            'border-2 border-neo-pink/30',
+            'px-2 py-0.5'
+          )}>
+            <span dir="ltr" className="text-[10px] font-mono font-bold tabular-nums text-neo-white/60">
+              W{worldNumber}·L{levelNumber}
+            </span>
+            <span className="text-neo-white/20 text-[10px]">|</span>
+            <Crosshair className="w-3.5 h-3.5 text-neo-pink" />
+            <span className={cn(
+              'text-sm font-mono font-black tabular-nums',
+              movesRemaining <= 3 ? 'text-neo-red animate-pulse' : 'text-neo-pink'
+            )}>
+              {movesRemaining}
+            </span>
+          </div>
         ) : (
+          /* Classic/wheel/forge: standard timer */
           <div className={cn(
             'flex items-center gap-1.5',
             hudTheme.levelBadgeColor, 'rounded-neo',

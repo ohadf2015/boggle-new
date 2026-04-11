@@ -41,6 +41,8 @@ export interface UseAdventureWordValidationProps {
   foundWords: string[];
   /** Optional tile states for special tile multiplier calculation */
   tiles?: TileStateForValidation[][];
+  /** Wheel mode: center letter that must be included in every word */
+  centerLetter?: string | null;
 }
 
 export interface UseAdventureWordValidationReturn {
@@ -177,6 +179,7 @@ export function useAdventureWordValidation({
   language,
   minWordLength,
   foundWords,
+  centerLetter,
 }: UseAdventureWordValidationProps): UseAdventureWordValidationReturn {
   const [isValidating, setIsValidating] = useState(false);
   const [lastValidationResult, setLastValidationResult] =
@@ -260,6 +263,16 @@ export function useAdventureWordValidation({
         const result: WordValidationResult = {
           isValid: false,
           errorKey: 'adventure.errors.wordMismatch',
+        };
+        setLastValidationResult(result);
+        return result;
+      }
+
+      // 3b. Wheel mode: word must include the center letter
+      if (centerLetter && !word.toLowerCase().includes(centerLetter.toLowerCase())) {
+        const result: WordValidationResult = {
+          isValid: false,
+          errorKey: 'adventure.errors.missingCenterLetter',
         };
         setLastValidationResult(result);
         return result;

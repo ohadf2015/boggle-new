@@ -41,7 +41,13 @@ export function CollectionGrid({ collectibles, className }: CollectionGridProps)
         'text-center py-8',
         isDarkMode ? 'text-gray-500' : 'text-gray-400'
       )}>
-        <span className="text-4xl mb-2 block">🎁</span>
+        <motion.span
+          className="text-4xl mb-2 block"
+          animate={{ scale: [1, 1.15, 1], rotate: [0, -8, 8, 0] }}
+          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+        >
+          🎁
+        </motion.span>
         <p>{t('collectibles.emptyCollection')}</p>
         <p className="text-sm mt-1">{t('collectibles.earnByPlaying')}</p>
       </div>

@@ -8,6 +8,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useProgression } from '@/contexts/ProgressionContext';
 import { useAdventureGame } from '@/hooks/useAdventureGame';
+import { useAdventureModeAdapter } from '@/hooks/useAdventureModeAdapter';
 import { useAdventureWordValidation } from '@/hooks/useAdventureWordValidation';
 import { useAdventureSelection } from '@/hooks/useAdventureSelection';
 import { useAdventureHints } from '@/hooks/useAdventureHints';
@@ -119,6 +120,7 @@ const AdventureGame = memo<AdventureGameProps>(
       activateFreeze, isFrozen, freezeUsed, useShuffle: shuffleTiles, shufflesRemaining, updateObjective,
       effectiveComboTimeout,
       upgradeState, upgradeTriggered, themedWordsFound, lastWordWasThemed,
+      movesRemaining, currentHP, maxHP, takeDamage, heal,
     } = useAdventureGame({
       levelConfig: boostedLevelConfig, initialGrid,
       comboDecayMultiplier: init.upgradeEffects.comboDecayMultiplier * init.runeEffects.comboDecay,
@@ -132,6 +134,7 @@ const AdventureGame = memo<AdventureGameProps>(
       language: language || 'en',
     });
 
+    const modeState = useAdventureModeAdapter(boostedLevelConfig);
     const tiles = useMemoizedFlatTiles(tiles2D, tilesVersion);
     const { recordAttempt, getLevelAttempt, getLevelCompletion, progression, updateWordAlbum, updateRunes, completeLevel: persistCompletion } = useProgression();
     // Wrap to ensure correct return type for saveCompletion prop
@@ -297,6 +300,7 @@ const AdventureGame = memo<AdventureGameProps>(
     const minWordLength = levelConfig.minWordLength ?? 2;
     const { validateWord, isValidating } = useAdventureWordValidation({
       grid: initialGrid, language: language || 'en', minWordLength, foundWords: gameState.wordsFound, tiles: tiles2D,
+      centerLetter: modeState.centerLetterRequired ? modeState.centerLetter : null,
     });
     const gridRef = useRef<HTMLDivElement>(null);
     const clickSubmitRef = useRef<(word: string, indices: number[]) => void>(null);
@@ -638,7 +642,9 @@ const AdventureGame = memo<AdventureGameProps>(
               onPauseToggle={gridInteraction.handlePauseToggle} onExit={handleExitWithConfirm}
               gold={init.gold} xpProgress={init.xpProgress.progressPercent / 100}
               isBossLevel={isBossLevel} elapsedTime={isBossLevel ? timeRemaining : undefined}
-              comboCount={gameState.comboCount} comboTimeoutMs={effectiveComboTimeout} />
+              comboCount={gameState.comboCount} comboTimeoutMs={effectiveComboTimeout}
+              modeDisplayKey={modeState.archetype !== 'classic' ? modeState.modeDisplayKey : undefined}
+              showMoveCounter={modeState.showMoveCounter} movesRemaining={movesRemaining} />
           }
           gridArea={
             <GameGridArea tiles={tiles} gridSize={levelConfig.gridSize}
@@ -660,12 +666,14 @@ const AdventureGame = memo<AdventureGameProps>(
               wordFeedback={wordSubmit.wordFeedback}
               currentWord={currentWord}
               worldId={levelConfig.world}
+              centerLetter={modeState.centerLetterRequired ? modeState.centerLetter : null}
               hintLevel={init.hintData.level}
               bossGridEffect={bossOrch.gridEffectTrigger}
               lockedTileIndices={bossOrch.lockedTiles} />
           }
           sidebar={
             <GameSidebar objectives={objectives}
+              showLifeBar={modeState.showLifeBar} currentHP={currentHP} maxHP={maxHP}
               showSlideIn={entryPhase === 'objectives'} onSlideInComplete={handleEntryPhaseComplete}
               hasHintsAvailable={hasHintsAvailable} onHintClick={handleHintClick}
               showAutoHint={showAutoHint} currentHint={currentHint}

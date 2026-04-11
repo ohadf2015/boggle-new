@@ -7164,7 +7164,23 @@ const es = {
       "notInDictionary": "La palabra no está en el diccionario",
       "validationFailed": "No se pudo validar la palabra",
       "validationTimeout": "La validación tardó demasiado — inténtalo de nuevo",
-      "validationCancelled": "La validación fue cancelada"
+      "validationCancelled": "La validación fue cancelada",
+      "missingCenterLetter": "¡Debe incluir la letra central!"
+    },
+    "mode": {
+      "classic": "Clásico",
+      "blast": "Blast",
+      "blast.objective": "¡Usa tus movimientos sabiamente!",
+      "hunt": "Caza",
+      "hunt.objective": "¡Sobrevive el mayor tiempo posible!",
+      "wheel": "Rueda",
+      "wheel.objective": "¡Cada palabra debe incluir la letra central!",
+      "wheel.mustInclude": "Debe incluir:",
+      "forge": "Forja",
+      "forge.objective": "¡Alcanza la puntuación objetivo!",
+      "boss": "Jefe",
+      "boss.objective": "¡Derrota al jefe!",
+      "movesLeft": "Movimientos restantes"
     },
     "game": {
       "title": "Modo Aventura",

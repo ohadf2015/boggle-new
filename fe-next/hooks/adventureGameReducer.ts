@@ -37,7 +37,10 @@ export type GameAction =
   | { type: 'REGENERATE_GRID'; payload: { grid: string[][] } }
   | { type: 'ACTIVATE_TIME_FREEZE'; payload: { seconds: number } }
   | { type: 'USE_SHUFFLE' }
-  | { type: 'UPDATE_OBJECTIVE'; payload: { objectiveType: string; value: number; mode: 'set' | 'increment' } };
+  | { type: 'UPDATE_OBJECTIVE'; payload: { objectiveType: string; value: number; mode: 'set' | 'increment' } }
+  | { type: 'USE_MOVE' }
+  | { type: 'TAKE_DAMAGE'; payload: { amount: number } }
+  | { type: 'HEAL'; payload: { amount: number } };
 
 /** Lightweight upgrade config stored in reducer state for tile effect processing */
 export interface ReducerUpgradeConfig {
@@ -79,6 +82,12 @@ export interface GameState {
   themedWordsFound: string[];
   /** Whether the most recently submitted word was a themed word */
   lastWordWasThemed: boolean;
+  /** Blast mode: moves remaining (undefined = not move-limited) */
+  movesRemaining?: number;
+  /** Hunt mode: current hit points (undefined = not life-based) */
+  currentHP?: number;
+  /** Hunt mode: maximum hit points */
+  maxHP?: number;
 }
 
 const GOLD_MULTIPLIER = 3;
@@ -158,6 +167,9 @@ export function createInitialState(
     freezeRemaining: 0,
     freezeUsed: false,
     shufflesRemaining: upgradeConfig?.shuffleUses ?? 0,
+    movesRemaining: levelConfig.movesLimit,
+    currentHP: levelConfig.lifePoints,
+    maxHP: levelConfig.lifePoints,
   };
 }
 
@@ -197,11 +209,12 @@ function processSpecialTileEffects(
   baseScore: number,
   upgradeConfig?: ReducerUpgradeConfig,
   upgradeState?: Record<string, number>,
-): { finalScore: number; iceClearedCount: number; timeBonusSeconds: number; deepDrillIceCleared: number } {
+): { finalScore: number; iceClearedCount: number; timeBonusSeconds: number; deepDrillIceCleared: number; triggeredUpgrades: Array<{ upgradeId: string; effectValue: number }> } {
   let finalScore = baseScore;
   let iceClearedCount = 0;
   let timeBonusSeconds = 0;
   let deepDrillIceCleared = 0;
+  const triggeredUpgrades: Array<{ upgradeId: string; effectValue: number }> = [];
   const activationTimestamp = Date.now();
 
   // Gold tile multiplier (3x)
@@ -246,6 +259,7 @@ function processSpecialTileEffects(
     }
     if (upgradeConfig?.bombTimerInvert) {
       timeBonusSeconds += TIME_TILE_BONUS_SECONDS;
+      triggeredUpgrades.push({ upgradeId: 'blastShield', effectValue: TIME_TILE_BONUS_SECONDS });
     }
   }
 
@@ -275,9 +289,15 @@ function processSpecialTileEffects(
   // Track ice cleared by deepDrill upgrade (when upgrade is active and ice was cleared)
   if (upgradeState && (upgradeState['deepDrill'] ?? 0) > 0 && iceClearedCount > 0) {
     deepDrillIceCleared = iceClearedCount;
+    triggeredUpgrades.push({ upgradeId: 'deepDrill', effectValue: iceClearedCount });
   }
 
-  return { finalScore, iceClearedCount, timeBonusSeconds, deepDrillIceCleared };
+  // Track gold multiplier from luckyPickaxe
+  if (upgradeState && (upgradeState['luckyPickaxe'] ?? 0) > 0 && goldPositions.length > 0) {
+    triggeredUpgrades.push({ upgradeId: 'luckyPickaxe', effectValue: goldPositions.length });
+  }
+
+  return { finalScore, iceClearedCount, timeBonusSeconds, deepDrillIceCleared, triggeredUpgrades };
 }
 
 export function gameReducer(state: GameState, action: GameAction): GameState {
@@ -295,6 +315,11 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       // Timer counts UP (elapsed time) for display purposes only.
       if (state.levelConfig.isBossLevel) {
         return { ...state, timeRemaining: state.timeRemaining + 1 };
+      }
+
+      // Move-based (blast) and life-based (hunt) levels have no timer
+      if (state.movesRemaining != null || state.currentHP != null) {
+        return state;
       }
 
       // Time Freeze: decrement freeze counter instead of game timer
@@ -420,7 +445,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       let finalScore = baseScore;
       let iceClearedCount = 0;
       let timeBonusSeconds = 0;
-      let deepDrillIceCleared = 0;
+      let tileTriggeredUpgrades: Array<{ upgradeId: string; effectValue: number }> = [];
 
       if (path && path.length > 0) {
         const effects = processSpecialTileEffects(
@@ -434,7 +459,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         finalScore = effects.finalScore;
         iceClearedCount = effects.iceClearedCount;
         timeBonusSeconds = effects.timeBonusSeconds;
-        deepDrillIceCleared = effects.deepDrillIceCleared;
+        tileTriggeredUpgrades = effects.triggeredUpgrades;
       }
 
       // Word Dynamite T3: detonate clears all tiles adjacent to the word path
@@ -525,12 +550,32 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       // so players have time to earn secondary objectives for 2-3 stars.
       // Level ends only when timer expires (TICK) or boss kills player.
 
-      const newUpgradeTriggered: { upgradeId: string; effectValue: number } | null =
-        deepDrillIceCleared > 0
-          ? { upgradeId: 'deepDrill', effectValue: deepDrillIceCleared }
-          : null;
+      // Collect all upgrade triggers from tile effects
+      const allTriggers = [...tileTriggeredUpgrades];
 
-      return {
+      // Word Dynamite detonation trigger
+      if (detonate && path && path.length > 0) {
+        allTriggers.push({ upgradeId: 'wordDynamite', effectValue: path.length });
+      }
+
+      // Pick the most impactful trigger to show (rarest/most visible first)
+      const triggerPriority = ['wordDynamite', 'blastShield', 'deepDrill', 'luckyPickaxe'];
+      const newUpgradeTriggered = allTriggers.length > 0
+        ? allTriggers.sort((a, b) =>
+            triggerPriority.indexOf(a.upgradeId) - triggerPriority.indexOf(b.upgradeId)
+          )[0]
+        : null;
+
+      // Blast mode: decrement moves remaining
+      const newMovesRemaining = state.movesRemaining != null
+        ? state.movesRemaining - 1
+        : undefined;
+      const movesExhausted = newMovesRemaining != null && newMovesRemaining <= 0;
+
+      // If moves exhausted, end the level
+      const isComplete = movesExhausted;
+
+      const resultState: GameState = {
         ...state,
         tiles: newTiles,
         tilesVersion: state.tilesVersion + 1,
@@ -541,13 +586,18 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         themedWordsFound: themed
           ? [...state.themedWordsFound, word]
           : state.themedWordsFound,
+        movesRemaining: newMovesRemaining,
         gameState: {
           ...state.gameState,
           score: state.gameState.score + finalScore,
           wordsFound: [...state.gameState.wordsFound, word],
           comboCount: newComboCount,
+          ...(isComplete ? { isComplete: true, stars: calculateStars(newObjectives) } : {}),
         },
+        ...(isComplete ? { isPlaying: false } : {}),
       };
+
+      return resultState;
     }
 
     case 'COMBO_TIMEOUT':
@@ -614,6 +664,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         ...state,
         freezeRemaining: action.payload.seconds,
         freezeUsed: true,
+        upgradeTriggered: { upgradeId: 'timeFreeze', effectValue: action.payload.seconds },
       };
     }
 
@@ -624,6 +675,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       return {
         ...state,
         shufflesRemaining: state.shufflesRemaining - 1,
+        upgradeTriggered: { upgradeId: 'wordDynamite', effectValue: state.shufflesRemaining },
       };
     }
 
@@ -653,6 +705,39 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
           stars: calculateStars(newObjectives),
         },
       };
+    }
+
+    case 'USE_MOVE': {
+      if (state.movesRemaining == null || state.movesRemaining <= 0) return state;
+      const remaining = state.movesRemaining - 1;
+      if (remaining <= 0) {
+        return {
+          ...state,
+          movesRemaining: 0,
+          isPlaying: false,
+          gameState: { ...state.gameState, isComplete: true, stars: calculateStars(state.objectives) },
+        };
+      }
+      return { ...state, movesRemaining: remaining };
+    }
+
+    case 'TAKE_DAMAGE': {
+      if (state.currentHP == null) return state;
+      const newHP = Math.max(0, state.currentHP - action.payload.amount);
+      if (newHP <= 0) {
+        return {
+          ...state,
+          currentHP: 0,
+          isPlaying: false,
+          gameState: { ...state.gameState, isComplete: true, stars: calculateStars(state.objectives) },
+        };
+      }
+      return { ...state, currentHP: newHP };
+    }
+
+    case 'HEAL': {
+      if (state.currentHP == null || state.maxHP == null) return state;
+      return { ...state, currentHP: Math.min(state.currentHP + action.payload.amount, state.maxHP) };
     }
 
     default:

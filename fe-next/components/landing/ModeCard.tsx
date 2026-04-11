@@ -270,8 +270,8 @@ const ModeCard: React.FC<ModeCardProps> = ({
             isRTL ? 'bottom-0 left-0' : 'bottom-0 right-0'
           )}
           style={{
-            width: 'clamp(5rem, 40cqw, 10rem)',
-            height: 'clamp(5rem, 40cqw, 10rem)',
+            width: 'clamp(5.5rem, 28cqw, 8rem)',
+            height: 'clamp(5.5rem, 28cqw, 8rem)',
           }}
           initial={{ scale: 0.6, opacity: 0, y: 20 }}
           whileInView={{ scale: 1, opacity: 1, y: 0 }}

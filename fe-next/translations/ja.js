@@ -6861,7 +6861,23 @@ const ja = {
       "notInDictionary": "辞書にない単語です",
       "validationFailed": "単語を検証できませんでした",
       "validationTimeout": "検証がタイムアウトしました — もう一度お試しください",
-      "validationCancelled": "検証がキャンセルされました"
+      "validationCancelled": "検証がキャンセルされました",
+      "missingCenterLetter": "中心の文字を含める必要があります！"
+    },
+"mode": {
+      "classic": "クラシック",
+      "blast": "ブラスト",
+      "blast.objective": "手数を賢く使おう！",
+      "hunt": "ハント",
+      "hunt.objective": "できるだけ長く生き残ろう！",
+      "wheel": "ホイール",
+      "wheel.objective": "すべての単語に中心の文字を含めよう！",
+      "wheel.mustInclude": "必須文字：",
+      "forge": "フォージ",
+      "forge.objective": "目標スコアに到達しよう！",
+      "boss": "ボス",
+      "boss.objective": "ボスを倒せ！",
+      "movesLeft": "残り手数"
     },
 "game": {
       "title": "アドベンチャーモード",

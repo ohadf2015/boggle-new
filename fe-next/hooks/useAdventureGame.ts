@@ -94,6 +94,16 @@ interface UseAdventureGameReturn {
   themedWordsFound: string[];
   /** Whether the most recently submitted word was a themed word */
   lastWordWasThemed: boolean;
+  /** Blast mode: moves remaining (undefined if not move-limited) */
+  movesRemaining?: number;
+  /** Hunt mode: current HP (undefined if not life-based) */
+  currentHP?: number;
+  /** Hunt mode: max HP */
+  maxHP?: number;
+  /** Dispatch TAKE_DAMAGE to reduce HP (hunt mode) */
+  takeDamage: (amount: number) => void;
+  /** Dispatch HEAL to restore HP (hunt mode) */
+  heal: (amount: number) => void;
 }
 
 // ==============================================
@@ -268,6 +278,14 @@ export function useAdventureGame({
     dispatch({ type: 'UPDATE_OBJECTIVE', payload: { objectiveType, value, mode } });
   }, []);
 
+  const takeDamage = useCallback((amount: number) => {
+    dispatch({ type: 'TAKE_DAMAGE', payload: { amount } });
+  }, []);
+
+  const heal = useCallback((amount: number) => {
+    dispatch({ type: 'HEAL', payload: { amount } });
+  }, []);
+
   const isShufflingRef = useRef(false);
   const useShuffle = useCallback(() => {
     if (state.shufflesRemaining <= 0 || isShufflingRef.current) return;
@@ -315,5 +333,10 @@ export function useAdventureGame({
     upgradeTriggered: state.upgradeTriggered,
     themedWordsFound: state.themedWordsFound,
     lastWordWasThemed: state.lastWordWasThemed,
+    movesRemaining: state.movesRemaining,
+    currentHP: state.currentHP,
+    maxHP: state.maxHP,
+    takeDamage,
+    heal,
   };
 }

@@ -6,6 +6,7 @@
  */
 
 import React from 'react';
+import { motion } from 'framer-motion';
 import { Play, DoorOpen, Check, Star } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -68,83 +69,108 @@ export function ResultsActionButtons({
   // Single player mode - just exit button
   if (!isMultiplayer) {
     return (
-      <button
+      <motion.button
         onClick={onExit}
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+        whileHover={{ scale: 1.04, y: -1 }}
+        whileTap={{ scale: 0.95 }}
         className="w-full max-w-xs bg-neo-orange text-neo-black font-black text-base py-3 px-6 uppercase border-3 border-neo-black rounded-neo shadow-hard flex items-center justify-center gap-2"
       >
         <DoorOpen className="w-5 h-5" />
         {t('common.exit')}
-      </button>
+      </motion.button>
     );
   }
 
   // Multiplayer mode
   return (
-    <div className="flex flex-col gap-2 w-full max-w-xs mt-2">
+    <motion.div
+      className="flex flex-col gap-2 w-full max-w-xs mt-2"
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ type: 'spring', stiffness: 250, damping: 20 }}
+    >
       {isHost ? (
         /* HOST: Start Game + Exit buttons */
         <>
-          <button
+          <motion.button
             onClick={onStartGame}
+            whileHover={{ scale: 1.04, y: -1 }}
+            whileTap={{ scale: 0.94 }}
             className="w-full bg-neo-green text-neo-black font-black text-base py-3 px-4 uppercase border-3 border-neo-black rounded-neo shadow-hard flex items-center justify-center gap-2"
           >
             <Play className="w-5 h-5" />
             {t('hostView.startGame')}
-          </button>
-          <button
+          </motion.button>
+          <motion.button
             onClick={onExit}
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.95 }}
             className="w-full bg-neo-red text-neo-cream font-bold text-sm py-2 px-3 uppercase border-2 border-neo-black rounded-neo shadow-hard-sm flex items-center justify-center gap-2"
           >
             <DoorOpen className="w-4 h-4" />
             {t('results.leaveRoom')}
-          </button>
+          </motion.button>
         </>
       ) : isCurrentPlayerReady ? (
         /* PLAYER: Ready state (disabled) + Exit button */
         <>
-          <button
+          <motion.button
             onClick={onMarkReady}
             disabled
+            initial={{ scale: 1 }}
+            animate={{ scale: [1, 1.02, 1] }}
+            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
             className="w-full bg-neo-green/80 text-neo-black font-bold text-base py-3 px-4 uppercase border-3 border-neo-black rounded-neo shadow-hard flex items-center justify-center gap-2 cursor-default"
           >
             <Check className="w-5 h-5" />
             {t('results.ready')}
-          </button>
+          </motion.button>
           <p className="text-center text-[10px] text-neo-cream/50">
             {t('results.waitingForHost')}
           </p>
-          <button
+          <motion.button
             onClick={onExit}
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.95 }}
             className="w-full bg-neo-red text-neo-cream font-bold text-sm py-2 px-3 uppercase border-2 border-neo-black rounded-neo shadow-hard-sm flex items-center justify-center gap-2"
           >
             <DoorOpen className="w-4 h-4" />
             {t('results.leaveRoom')}
-          </button>
+          </motion.button>
         </>
       ) : (
-        /* PLAYER: Not ready state (pulsing) + Explanation + Exit button */
+        /* PLAYER: Not ready state — bouncy attention-grab + Explanation + Exit button */
         <>
           <div className="space-y-1">
-            <button
+            <motion.button
               onClick={onMarkReady}
-              className="w-full bg-neo-lime text-neo-black font-black text-base py-3 px-4 uppercase border-3 border-neo-black rounded-neo shadow-hard flex items-center justify-center gap-2 animate-pulse"
+              animate={{ scale: [1, 1.05, 1] }}
+              transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+              whileHover={{ scale: 1.08 }}
+              whileTap={{ scale: 0.92 }}
+              className="w-full bg-neo-lime text-neo-black font-black text-base py-3 px-4 uppercase border-3 border-neo-black rounded-neo shadow-hard flex items-center justify-center gap-2"
             >
               <Star className="w-5 h-5" />
               {t('results.imReady')}
-            </button>
+            </motion.button>
             <p className="text-center text-[10px] text-neo-cream/50">
               {t('results.readyExplanation')}
             </p>
           </div>
-          <button
+          <motion.button
             onClick={onExit}
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.95 }}
             className="w-full bg-neo-red text-neo-cream font-bold text-sm py-2 px-3 uppercase border-2 border-neo-black rounded-neo shadow-hard-sm flex items-center justify-center gap-2"
           >
             <DoorOpen className="w-4 h-4" />
             {t('results.leaveRoom')}
-          </button>
+          </motion.button>
         </>
       )}
-    </div>
+    </motion.div>
   );
 }

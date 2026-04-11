@@ -22,20 +22,23 @@ export interface WheelLetterProps {
 export const WheelLetter: React.FC<WheelLetterProps> = ({
   letter, isCenter, angle = 0, radius = 0, onPress, isUsed, index, dir,
 }) => {
-  const isRTL = dir === 'rtl';
   const btnRef = useRef<HTMLButtonElement>(null);
 
-  const style = isCenter
-    ? {}
-    : { transform: `rotate(${angle}deg) translateY(-${radius}px) rotate(-${angle}deg)` };
+  // Position letters using inset-0 + m-auto for centering (no transform needed),
+  // then use Framer Motion x/y props for outer letter offsets.
+  // This avoids conflicts between CSS transform centering and Framer Motion's
+  // animate/scale which takes control of the transform property.
+  const rad = ((angle || 0) * Math.PI) / 180;
+  const offsetX = isCenter ? 0 : Math.sin(rad) * radius;
+  const offsetY = isCenter ? 0 : -Math.cos(rad) * radius;
 
   return (
     <motion.button
       ref={btnRef}
       type="button"
       className={cn(
-        'absolute flex items-center justify-center font-neo-display font-black uppercase select-none',
-        'border-3 border-neo-black rounded-full transition-all duration-150',
+        'absolute inset-0 m-auto flex items-center justify-center font-neo-display font-black uppercase select-none',
+        'border-3 border-neo-black rounded-full transition-colors duration-150',
         isCenter
           ? 'w-20 h-20 sm:w-24 sm:h-24 text-3xl sm:text-4xl z-10'
           : 'w-[52px] h-[52px] sm:w-[60px] sm:h-[60px] text-lg sm:text-xl',
@@ -46,17 +49,15 @@ export const WheelLetter: React.FC<WheelLetterProps> = ({
           : isUsed
             ? 'bg-neo-navy-light text-neo-cream/30 border-neo-cream/20 shadow-none'
             : 'bg-neo-white text-neo-navy shadow-[2px_2px_0px_black,0_0_8px_rgba(191,255,0,0.15)] hover:shadow-[2px_2px_0px_black,0_0_14px_rgba(191,255,0,0.35)] hover:bg-neo-cream active:bg-neo-lime/30',
-        isRTL ? 'active:-translate-x-px active:translate-y-px' : 'active:translate-x-px active:translate-y-px',
         isUsed ? 'cursor-default' : 'cursor-pointer',
       )}
-      style={isCenter ? {} : style}
       onClick={() => {
         if (!isUsed && btnRef.current) onPress(letter, index, btnRef.current);
       }}
       whileTap={isUsed ? {} : { scale: 0.85 }}
       animate={isCenter && !isUsed
-        ? { scale: [1, 1.06, 1], boxShadow: ['3px 3px 0px black, 0 0 20px rgba(191,255,0,0.5)', '3px 3px 0px black, 0 0 28px rgba(191,255,0,0.7)', '3px 3px 0px black, 0 0 20px rgba(191,255,0,0.5)'] }
-        : isUsed ? { scale: 0.9 } : { scale: 1 }
+        ? { x: offsetX, y: offsetY, scale: [1, 1.06, 1], boxShadow: ['3px 3px 0px black, 0 0 20px rgba(191,255,0,0.5)', '3px 3px 0px black, 0 0 28px rgba(191,255,0,0.7)', '3px 3px 0px black, 0 0 20px rgba(191,255,0,0.5)'] }
+        : { x: offsetX, y: offsetY, scale: isUsed ? 0.9 : 1 }
       }
       transition={isCenter && !isUsed
         ? { duration: 2, repeat: Infinity, ease: 'easeInOut' }

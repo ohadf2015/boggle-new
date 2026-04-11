@@ -62,6 +62,9 @@ interface GameGridAreaProps {
   // Locked tiles from boss abilities
   lockedTileIndices?: number[];
 
+  /** Center letter required for wheel mode (null = not required) */
+  centerLetter?: string | null;
+
   // Hint
   hintLevel: 'none' | 'length' | 'lengthAndStart' | 'fullReveal';
 
@@ -104,6 +107,7 @@ export const GameGridArea = memo(function GameGridArea({
   minWordLength,
   wordFeedback,
   currentWord: currentWordProp,
+  centerLetter,
   hintLevel,
   bossGridEffect,
   adjacentIndices,
@@ -193,6 +197,16 @@ export const GameGridArea = memo(function GameGridArea({
           </div>
         </div>
       </div>
+
+      {/* Center letter indicator (wheel mode) */}
+      {centerLetter && (
+        <div className="shrink-0 flex items-center justify-center py-1">
+          <div className="flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-neo-purple/15 border border-neo-purple/30">
+            <span className="text-xs text-neo-white/60 font-medium">{t('adventure.mode.wheel.mustInclude')}</span>
+            <span className="text-lg font-black text-neo-purple uppercase">{centerLetter}</span>
+          </div>
+        </div>
+      )}
 
       {/* Main Content - Centered vertically and horizontally (grid only) */}
       <div className="flex-1 flex flex-col items-center justify-center min-h-0 px-2 sm:px-4 py-1" style={{ containerType: 'size' }}>

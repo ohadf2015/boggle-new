@@ -6810,7 +6810,23 @@ const sv = {
       "notInDictionary": "Ordet finns inte i ordboken",
       "validationFailed": "Kunde inte validera ordet",
       "validationTimeout": "Valideringen tog för lång tid — försök igen",
-      "validationCancelled": "Valideringen avbröts"
+      "validationCancelled": "Valideringen avbröts",
+      "missingCenterLetter": "Måste inkludera mittenbokstaven!"
+    },
+"mode": {
+      "classic": "Klassisk",
+      "blast": "Blast",
+      "blast.objective": "Använd dina drag klokt!",
+      "hunt": "Jakt",
+      "hunt.objective": "Överlev så länge du kan!",
+      "wheel": "Hjul",
+      "wheel.objective": "Varje ord måste inkludera mittenbokstaven!",
+      "wheel.mustInclude": "Måste inkludera:",
+      "forge": "Smedja",
+      "forge.objective": "Nå målpoängen!",
+      "boss": "Boss",
+      "boss.objective": "Besegra bossen!",
+      "movesLeft": "Drag kvar"
     },
 "game": {
       "title": "Äventyrsläge",

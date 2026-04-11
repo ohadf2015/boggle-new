@@ -6835,7 +6835,23 @@ const he = {
       "notInDictionary": "המילה לא במילון",
       "validationFailed": "לא ניתן לאמת את המילה",
       "validationTimeout": "האימות נכשל — נסו שוב",
-      "validationCancelled": "האימות בוטל"
+      "validationCancelled": "האימות בוטל",
+      "missingCenterLetter": "חובה לכלול את האות המרכזית!"
+    },
+"mode": {
+      "classic": "קלאסי",
+      "blast": "בלאסט",
+      "blast.objective": "השתמשו במהלכים בחוכמה!",
+      "hunt": "ציד",
+      "hunt.objective": "שרדו כמה שיותר!",
+      "wheel": "גלגל",
+      "wheel.objective": "כל מילה חייבת לכלול את האות המרכזית!",
+      "wheel.mustInclude": "חובה לכלול:",
+      "forge": "כור",
+      "forge.objective": "הגיעו לניקוד היעד!",
+      "boss": "בוס",
+      "boss.objective": "הביסו את הבוס!",
+      "movesLeft": "מהלכים נותרו"
     },
 "game": {
       "title": "מצב הרפתקה",

@@ -6902,7 +6902,23 @@ const en = {
       "notInDictionary": "Word not in dictionary",
       "validationFailed": "Could not validate word",
       "validationTimeout": "Validation timed out — try again",
-      "validationCancelled": "Validation was cancelled"
+      "validationCancelled": "Validation was cancelled",
+      "missingCenterLetter": "Must include the center letter!"
+    },
+"mode": {
+      "classic": "Classic",
+      "blast": "Blast",
+      "blast.objective": "Use your moves wisely!",
+      "hunt": "Hunt",
+      "hunt.objective": "Survive as long as you can!",
+      "wheel": "Wheel",
+      "wheel.objective": "Every word must include the center letter!",
+      "wheel.mustInclude": "Must include:",
+      "forge": "Forge",
+      "forge.objective": "Reach the target score!",
+      "boss": "Boss",
+      "boss.objective": "Defeat the boss!",
+      "movesLeft": "Moves Left"
     },
 "game": {
       "title": "Adventure Mode",

@@ -36,6 +36,7 @@ export function ProfileStatsGrid({ profile, isDarkMode, delay = 0.1 }: ProfileSt
         isDarkMode={isDarkMode}
         color="cyan"
         progress={Math.min(100, (totalScore / 1000000) * 100)}
+        index={0}
       />
       <StatCard
         icon={<Trophy />}
@@ -44,6 +45,7 @@ export function ProfileStatsGrid({ profile, isDarkMode, delay = 0.1 }: ProfileSt
         isDarkMode={isDarkMode}
         color="pink"
         progress={Math.min(100, (totalWins / 500) * 100)}
+        index={1}
       />
       <StatCard
         icon={<span className="text-lg">📝</span>}
@@ -52,6 +54,7 @@ export function ProfileStatsGrid({ profile, isDarkMode, delay = 0.1 }: ProfileSt
         isDarkMode={isDarkMode}
         color="lime"
         progress={Math.min(100, (totalWords / 50000) * 100)}
+        index={2}
       />
       <StatCard
         icon={<Clock />}
@@ -60,6 +63,7 @@ export function ProfileStatsGrid({ profile, isDarkMode, delay = 0.1 }: ProfileSt
         isDarkMode={isDarkMode}
         color="purple"
         progress={Math.min(100, (totalTime / 500) * 100)}
+        index={3}
       />
     </motion.div>
   );

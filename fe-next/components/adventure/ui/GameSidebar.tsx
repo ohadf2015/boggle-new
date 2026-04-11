@@ -17,6 +17,7 @@ import {
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import AdventureObjectives from '../AdventureObjectives';
+import { WordHuntLifeBar } from '@/components/game/WordHuntLifeBar';
 import { ChapterQuestProgress } from './ChapterQuestProgress';
 import type { ChapterQuest, ChapterQuestProgress as QuestProgressType, LevelObjective, ObjectiveType } from '@/types/adventure';
 import { calculateStars } from '@/hooks/adventureGameReducer';
@@ -86,6 +87,12 @@ interface GameSidebarProps {
   detonateActive?: boolean;
   /** Toggle detonate mode */
   onDetonateToggle?: () => void;
+  /** Whether to show the life bar (hunt mode) */
+  showLifeBar?: boolean;
+  /** Current HP for life bar (hunt mode) */
+  currentHP?: number;
+  /** Max HP for life bar (hunt mode) */
+  maxHP?: number;
   /** Chapter quests for progress display */
   chapterQuests?: ChapterQuest[];
   /** Chapter quest progress */
@@ -117,6 +124,9 @@ export const GameSidebar = memo(function GameSidebar({
   canDetonate = false,
   detonateActive = false,
   onDetonateToggle,
+  showLifeBar = false,
+  currentHP,
+  maxHP,
   chapterQuests = [],
   chapterQuestProgress = [],
   className,
@@ -139,6 +149,13 @@ export const GameSidebar = memo(function GameSidebar({
         className
       )}
     >
+      {/* Hunt mode: Life bar (reuses WordHuntLifeBar component) */}
+      {showLifeBar && currentHP != null && maxHP != null && (
+        <div className="px-3 py-1.5 border-b border-neo-white/10">
+          <WordHuntLifeBar life={currentHP} maxLife={maxHP} />
+        </div>
+      )}
+
       {/* Mobile: Bottom action panel with objectives + action buttons */}
       <div className="lg:hidden flex flex-col h-full px-2.5 py-2 gap-1.5 overflow-y-auto scrollbar-hide">
         {/* Row 1: Stars + Objectives — compact chips with circular mini-progress */}

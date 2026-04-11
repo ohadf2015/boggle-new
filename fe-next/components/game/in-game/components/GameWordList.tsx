@@ -47,18 +47,27 @@ export const GameWordList = memo<GameWordListProps>(function GameWordList({
               {reversedWords.map((wordObj, index) => (
                   <AdaptiveMotion.span
                     key={`${wordObj.word}-${index}`}
-                    initial={{ scale: 0.8, opacity: 0 }}
+                    initial={index === 0 && wordObj.word.length >= 6
+                      ? { scale: 1.3, opacity: 0 }
+                      : { scale: 0.8, opacity: 0 }
+                    }
                     animate={{ scale: 1, opacity: 1 }}
-                    transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                    transition={index === 0 && wordObj.word.length >= 6
+                      ? { type: 'spring', stiffness: 350, damping: 12 }
+                      : { type: 'spring', stiffness: 500, damping: 30 }
+                    }
                     className={`inline-block px-2 py-1 text-xs font-bold uppercase rounded-neo border-2 border-neo-black ${
                       wordObj.isValid === false
                         ? 'bg-neo-red text-neo-cream line-through opacity-70'
-                        : index === 0
-                          ? 'bg-neo-lime text-neo-black'
-                          : 'bg-white text-neo-black'
+                        : index === 0 && wordObj.word.length >= 6
+                          ? 'bg-neo-lime text-neo-black shadow-[2px_2px_0px_black,0_0_10px_rgba(191,255,0,0.5)]'
+                          : index === 0
+                            ? 'bg-neo-lime text-neo-black'
+                            : 'bg-white text-neo-black'
                     }`}
                   >
                     {applyHebrewFinalLetters(wordObj.word)}
+                    {index === 0 && wordObj.word.length >= 7 && ' 🔥'}
                   </AdaptiveMotion.span>
                 ))}
             </div>
@@ -92,19 +101,37 @@ export const GameWordList = memo<GameWordListProps>(function GameWordList({
               return (
                 <AdaptiveMotion.div
                   key={`${wordText}-${foundWordObj.timestamp || index}`}
-                  initial={{ x: -30, opacity: 0 }}
-                  animate={{ x: 0, opacity: 1 }}
+                  initial={
+                    isLatest && wordText.length >= 6
+                      ? { x: -30, opacity: 0, scale: 1.3 }
+                      : { x: -30, opacity: 0 }
+                  }
+                  animate={
+                    isLatest && wordText.length >= 6
+                      ? { x: 0, opacity: 1, scale: [1.3, 1.08, 1] }
+                      : { x: 0, opacity: 1 }
+                  }
                   exit={{ x: -30, opacity: 0 }}
+                  transition={
+                    isLatest && wordText.length >= 6
+                      ? { type: 'spring', stiffness: 350, damping: 12 }
+                      : undefined
+                  }
                   className={`p-2 text-center font-black uppercase border-3 border-neo-black rounded-neo transition-all
                     ${
                       isInvalid
                         ? 'bg-neo-red text-neo-cream shadow-hard-sm line-through opacity-70'
-                        : isLatest
-                          ? 'bg-neo-lime text-neo-black shadow-hard'
-                          : 'bg-neo-cream text-neo-black shadow-hard-sm hover:-translate-x-px hover:-translate-y-px hover:shadow-hard'
+                        : isLatest && wordText.length >= 6
+                          ? 'bg-neo-lime text-neo-black shadow-[3px_3px_0px_black,0_0_16px_rgba(191,255,0,0.6)]'
+                          : isLatest
+                            ? 'bg-neo-lime text-neo-black shadow-hard'
+                            : 'bg-neo-cream text-neo-black shadow-hard-sm hover:-translate-x-px hover:-translate-y-px hover:shadow-hard'
                     }`}
                 >
                   {applyHebrewFinalLetters(wordText).toUpperCase()}
+                  {isLatest && wordText.length >= 7 && (
+                    <span className="ml-1 text-xs">🔥</span>
+                  )}
                 </AdaptiveMotion.div>
               );
             })}
