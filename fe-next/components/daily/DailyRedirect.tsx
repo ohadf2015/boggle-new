@@ -1,11 +1,31 @@
 'use client';
 
-import DailyHub from './DailyHub';
+import { useRouter } from 'next/navigation';
+import { DailyChallengeLanding } from './DailyChallengeLanding';
+import { useLanguage } from '@/contexts/LanguageContext';
+import type { Language } from '@/types';
 
 /**
- * DailyRedirect - Shows the Daily Hub with both Word Hunt and Word Wheel.
- * The /daily route shows the hub. Share links with OG params still work via metadata.
+ * DailyRedirect - Shows the Daily Challenge Landing with both Word Hunt and Word Wheel quests.
+ * The /daily route shows the landing. Share links with OG params still work via metadata.
  */
 export default function DailyRedirect() {
-  return <DailyHub />;
+  const { language } = useLanguage();
+  const router = useRouter();
+
+  const handleSelectWordHunt = () => {
+    router.push(`/${language}/daily/word-hunt`);
+  };
+
+  const handleSelectWordWheel = () => {
+    router.push(`/${language}/daily/word-wheel`);
+  };
+
+  return (
+    <DailyChallengeLanding
+      onSelectWordHunt={handleSelectWordHunt}
+      onSelectWordWheel={handleSelectWordWheel}
+      currentLanguage={language as Language}
+    />
+  );
 }

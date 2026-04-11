@@ -45,12 +45,17 @@ export default function DailyChallengeRouter() {
     router.push(`/${language}/daily/word-hunt`);
   };
 
+  const handleSelectWordWheel = () => {
+    router.push(`/${language}/daily/word-wheel`);
+  };
+
   return (
     <div className="flex-1 flex flex-col bg-neo-navy">
       <Header />
 
       <DailyChallengeLanding
         onSelectWordHunt={handleSelectWordHunt}
+        onSelectWordWheel={handleSelectWordWheel}
         currentLanguage={language as Language}
       />
     </div>

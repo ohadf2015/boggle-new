@@ -3,11 +3,11 @@
 import { useEffect, useState } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Timer, Check, X, Eye } from 'lucide-react';
+import { Timer, CircleDot, Check, X, Eye } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
-import { getWordHuntStatusToday } from '@/utils/dailyChallenge/storage';
+import { getWordHuntStatusToday, hasPlayedWordWheelToday } from '@/utils/dailyChallenge/storage';
 import { getGuestFingerprint } from '@/utils/guestManager';
 import type { Language } from '@/types';
 
@@ -23,11 +23,13 @@ import { FloatingDecorations } from './landing/FloatingDecorations';
 
 interface DailyChallengeLandingProps {
   onSelectWordHunt: () => void;
+  onSelectWordWheel: () => void;
   currentLanguage: Language;
 }
 
 interface ChallengeStatus {
   wordHunt: 'new' | 'won' | 'lost';
+  wordWheel: 'new' | 'played';
 }
 
 interface LoadingState {
@@ -40,6 +42,7 @@ interface LoadingState {
  */
 export function DailyChallengeLanding({
   onSelectWordHunt,
+  onSelectWordWheel,
   currentLanguage,
 }: DailyChallengeLandingProps) {
   const { t } = useLanguage();
@@ -55,6 +58,7 @@ export function DailyChallengeLanding({
 
   const [status, setStatus] = useState<ChallengeStatus>({
     wordHunt: 'new',
+    wordWheel: 'new',
   });
   const [loadingStatus, setLoadingStatus] = useState<LoadingState>({
     wordHunt: true,
@@ -62,8 +66,8 @@ export function DailyChallengeLanding({
   const [streak, setStreak] = useState(0);
   const [freezeCount, setFreezeCount] = useState(0);
 
-  // Word Hunt status check - synchronous local storage check
-  const checkWordHunt = () => {
+  // Status check - synchronous local storage check
+  const checkStatuses = () => {
     const wordHuntStatus = getWordHuntStatusToday(currentLanguage);
     if (!wordHuntStatus) {
       setStatus(prev => ({ ...prev, wordHunt: 'new' }));
@@ -73,6 +77,8 @@ export function DailyChallengeLanding({
         wordHunt: wordHuntStatus.solved ? 'won' : 'lost'
       }));
     }
+    const wwPlayed = hasPlayedWordWheelToday(currentLanguage);
+    setStatus(prev => ({ ...prev, wordWheel: wwPlayed ? 'played' : 'new' }));
     setLoadingStatus(prev => ({ ...prev, wordHunt: false }));
   };
 
@@ -102,7 +108,7 @@ export function DailyChallengeLanding({
   // Initial status check
   useEffect(() => {
     setLoadingStatus({ wordHunt: true });
-    checkWordHunt();
+    checkStatuses();
     fetchStreak();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentLanguage, user?.id]);
@@ -111,7 +117,7 @@ export function DailyChallengeLanding({
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
-        checkWordHunt();
+        checkStatuses();
         fetchStreak();
       }
     };
@@ -123,7 +129,7 @@ export function DailyChallengeLanding({
   // Refresh on popstate (browser back/forward)
   useEffect(() => {
     const handlePopState = () => {
-      checkWordHunt();
+      checkStatuses();
     };
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
@@ -133,15 +139,18 @@ export function DailyChallengeLanding({
   // Refresh on pathname change (Next.js router.push)
   useEffect(() => {
     if (pathname && pathname.endsWith('/daily')) {
-      checkWordHunt();
+      checkStatuses();
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
 
   // Completion count for progress bar
-  const completedCount = status.wordHunt === 'won' ? 1 : 0;
+  const completedCount =
+    (status.wordHunt === 'won' ? 1 : 0) +
+    (status.wordWheel === 'played' ? 1 : 0);
 
   const wordHuntPlayed = status.wordHunt === 'won' || status.wordHunt === 'lost';
+  const wordWheelPlayed = status.wordWheel === 'played';
 
   return (
     <motion.div
@@ -165,131 +174,174 @@ export function DailyChallengeLanding({
         t={t}
       />
 
-      {/* Word Hunt: hero results card when played, full QuestCard when new */}
+      {/* Quest 1: Word Hunt */}
       {wordHuntPlayed ? (
-        <>
-          {/* Word Hunt Results Hero Card */}
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1, type: 'spring', stiffness: 300, damping: 25 }}
-            className="w-full"
-            data-testid="word-hunt-hero"
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1, type: 'spring', stiffness: 300, damping: 25 }}
+          className="w-full"
+          data-testid="word-hunt-hero"
+        >
+          <button
+            type="button"
+            onClick={onSelectWordHunt}
+            className={cn(
+              'relative w-full rounded-xl border-3 border-neo-black',
+              'shadow-hard overflow-hidden cursor-pointer p-4',
+              'flex items-center gap-4',
+              'focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-lime',
+              'transition-all duration-200 group',
+              status.wordHunt === 'won'
+                ? 'bg-neo-lime/[0.06] hover:bg-neo-lime/[0.1]'
+                : 'bg-neo-pink/[0.06] hover:bg-neo-pink/[0.1]'
+            )}
           >
-            <button
-              type="button"
-              onClick={onSelectWordHunt}
+            <div className={cn(
+              'absolute inset-e-0 top-0 bottom-0 w-1.5 rounded-e-lg',
+              status.wordHunt === 'won' ? 'bg-neo-lime' : 'bg-neo-pink'
+            )} />
+            <motion.div
+              data-testid={status.wordHunt === 'won' ? 'won-badge' : 'lost-badge'}
               className={cn(
-                'relative w-full rounded-xl border-3 border-neo-black',
-                'shadow-hard overflow-hidden cursor-pointer p-4',
-                'flex items-center gap-4',
-                'focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-lime',
-                'transition-all duration-200 group',
-                status.wordHunt === 'won'
-                  ? 'bg-neo-lime/[0.06] hover:bg-neo-lime/[0.1]'
-                  : 'bg-neo-pink/[0.06] hover:bg-neo-pink/[0.1]'
-              )}
-            >
-              {/* Accent strip */}
-              <div className={cn(
-                'absolute inset-e-0 top-0 bottom-0 w-1.5 rounded-e-lg',
+                'w-12 h-12 rounded-full border-2 border-neo-black shrink-0',
+                'flex items-center justify-center shadow-hard-xs',
                 status.wordHunt === 'won' ? 'bg-neo-lime' : 'bg-neo-pink'
-              )} />
-
-              {/* Status icon */}
-              <motion.div
-                data-testid={status.wordHunt === 'won' ? 'won-badge' : 'lost-badge'}
-                className={cn(
-                  'w-12 h-12 rounded-full border-2 border-neo-black shrink-0',
-                  'flex items-center justify-center',
-                  'shadow-hard-xs',
-                  status.wordHunt === 'won' ? 'bg-neo-lime' : 'bg-neo-pink'
-                )}
-                initial={{ scale: 0, rotate: -180 }}
-                animate={{ scale: 1, rotate: 0 }}
-                transition={{ delay: 0.25, type: 'spring', stiffness: 200, damping: 15 }}
-              >
-                {status.wordHunt === 'won'
-                  ? <Check className="w-6 h-6 text-neo-black" strokeWidth={3} />
-                  : <X className="w-6 h-6 text-neo-black" strokeWidth={3} />
-                }
-              </motion.div>
-
-              {/* Title + status badge */}
-              <div className="flex-1 min-w-0">
-                <h2 className="text-xl font-neo-display font-black text-neo-cream leading-none">
-                  {t('daily.wordHunt.title')}
-                </h2>
-                <span className={cn(
-                  'inline-block mt-1.5 px-2.5 py-0.5 text-[10px] font-black uppercase rounded-md border-2',
-                  status.wordHunt === 'won'
-                    ? 'bg-neo-lime/20 text-neo-lime border-neo-lime/40'
-                    : 'bg-neo-pink/20 text-neo-pink border-neo-pink/40'
-                )}>
-                  {status.wordHunt === 'won' ? t('daily.cleared') : t('daily.wordHunt.title')}
-                </span>
-              </div>
-
-              {/* View Results CTA */}
-              <div className={cn(
-                'shrink-0 py-2.5 px-5 text-xs font-black uppercase rounded-lg text-center',
-                'bg-neo-cyan text-neo-black border-2 border-neo-black shadow-hard-sm',
-                'active:translate-y-0.5 active:shadow-none transition-all',
-                'flex items-center gap-1.5',
-                'group-hover:scale-105'
+              )}
+              initial={{ scale: 0, rotate: -180 }}
+              animate={{ scale: 1, rotate: 0 }}
+              transition={{ delay: 0.25, type: 'spring', stiffness: 200, damping: 15 }}
+            >
+              {status.wordHunt === 'won'
+                ? <Check className="w-6 h-6 text-neo-black" strokeWidth={3} />
+                : <X className="w-6 h-6 text-neo-black" strokeWidth={3} />
+              }
+            </motion.div>
+            <div className="flex-1 min-w-0">
+              <h2 className="text-xl font-neo-display font-black text-neo-cream leading-none">
+                {t('daily.wordHunt.title')}
+              </h2>
+              <span className={cn(
+                'inline-block mt-1.5 px-2.5 py-0.5 text-[10px] font-black uppercase rounded-md border-2',
+                status.wordHunt === 'won'
+                  ? 'bg-neo-lime/20 text-neo-lime border-neo-lime/40'
+                  : 'bg-neo-pink/20 text-neo-pink border-neo-pink/40'
               )}>
-                <Eye className="w-4 h-4" />
-                {t('daily.viewResults')}
-              </div>
-            </button>
-          </motion.div>
-
-          {/* Divider */}
-          <motion.div
-            initial={{ opacity: 0, scaleX: 0 }}
-            animate={{ opacity: 1, scaleX: 1 }}
-            transition={{ delay: 0.25, duration: 0.3 }}
-            className="w-full flex items-center gap-3"
-          >
-            <div className="flex-1 h-px bg-gradient-to-e from-transparent via-slate-600 to-transparent" />
-            <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest whitespace-nowrap">
-              {t('daily.continueMissions')}
-            </span>
-            <div className="flex-1 h-px bg-gradient-to-e from-transparent via-slate-600 to-transparent" />
-          </motion.div>
-
-          {/* Streak counter + freeze */}
-          <StreakCounter streak={streak} />
-          <StreakFreezeIndicator freezeCount={freezeCount} t={t} />
-          <DailyRewardPreview currentStreakDay={streak} t={t} />
-        </>
+                {status.wordHunt === 'won' ? t('daily.cleared') : t('daily.wordHunt.title')}
+              </span>
+            </div>
+            <div className={cn(
+              'shrink-0 py-2.5 px-5 text-xs font-black uppercase rounded-lg text-center',
+              'bg-neo-cyan text-neo-black border-2 border-neo-black shadow-hard-sm',
+              'active:translate-y-0.5 active:shadow-none transition-all',
+              'flex items-center gap-1.5 group-hover:scale-105'
+            )}>
+              <Eye className="w-4 h-4" />
+              {t('daily.viewResults')}
+            </div>
+          </button>
+        </motion.div>
       ) : (
-        <>
-          {/* Quest 1: Word Hunt (new — hasn't played) */}
-          <QuestCard
-            challengeId="wordHunt"
-            icon={<Timer className="w-8 h-8" />}
-            title={t('daily.wordHunt.title')}
-            tagline={t('daily.wordHunt.desc')}
-            details={t('daily.wordHunt.details')}
-            color="orange"
-            status={status.wordHunt}
-            isLoadingStatus={loadingStatus.wordHunt}
-            onPlay={onSelectWordHunt}
-            timeMode="timed"
-            timeModeLabel={t('daily.timedQuest')}
-            customPreview="word-hunt-grid"
-            currentLanguage={currentLanguage}
-            buttonText={t('daily.startQuest')}
-            delay={0.15}
-          />
-
-          {/* Streak counter + freeze */}
-          <StreakCounter streak={streak} />
-          <StreakFreezeIndicator freezeCount={freezeCount} t={t} />
-          <DailyRewardPreview currentStreakDay={streak} t={t} />
-        </>
+        <QuestCard
+          challengeId="wordHunt"
+          icon={<Timer className="w-8 h-8" />}
+          title={t('daily.wordHunt.title')}
+          tagline={t('daily.wordHunt.desc')}
+          details={t('daily.wordHunt.details')}
+          color="orange"
+          status={status.wordHunt}
+          isLoadingStatus={loadingStatus.wordHunt}
+          onPlay={onSelectWordHunt}
+          timeMode="timed"
+          timeModeLabel={t('daily.timedQuest')}
+          customPreview="word-hunt-grid"
+          currentLanguage={currentLanguage}
+          buttonText={t('daily.startQuest')}
+          delay={0.15}
+        />
       )}
+
+      {/* ── Dotted connector line ── */}
+      <div className="flex flex-col items-center gap-0 py-1">
+        <div className="w-0.5 h-3 border-s-2 border-dashed border-neo-cream/20" />
+        <div className={cn(
+          'w-5 h-5 rounded-full border-2 border-neo-black flex items-center justify-center',
+          completedCount >= 2 ? 'bg-neo-lime' : 'bg-neo-navy-light'
+        )}>
+          {completedCount >= 2 && <Check className="w-3 h-3 text-neo-black" strokeWidth={3} />}
+        </div>
+        <div className="w-0.5 h-3 border-s-2 border-dashed border-neo-cream/20" />
+      </div>
+
+      {/* Quest 2: Word Wheel */}
+      {wordWheelPlayed ? (
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2, type: 'spring', stiffness: 300, damping: 25 }}
+          className="w-full"
+          data-testid="word-wheel-hero"
+        >
+          <button
+            type="button"
+            onClick={onSelectWordWheel}
+            className={cn(
+              'relative w-full rounded-xl border-3 border-neo-black',
+              'shadow-hard overflow-hidden cursor-pointer p-4',
+              'flex items-center gap-4',
+              'focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-lime',
+              'transition-all duration-200 group',
+              'bg-neo-lime/[0.06] hover:bg-neo-lime/[0.1]'
+            )}
+          >
+            <div className="absolute inset-e-0 top-0 bottom-0 w-1.5 rounded-e-lg bg-neo-lime" />
+            <motion.div
+              className="w-12 h-12 rounded-full border-2 border-neo-black shrink-0 flex items-center justify-center shadow-hard-xs bg-neo-lime"
+              initial={{ scale: 0, rotate: -180 }}
+              animate={{ scale: 1, rotate: 0 }}
+              transition={{ delay: 0.35, type: 'spring', stiffness: 200, damping: 15 }}
+            >
+              <Check className="w-6 h-6 text-neo-black" strokeWidth={3} />
+            </motion.div>
+            <div className="flex-1 min-w-0">
+              <h2 className="text-xl font-neo-display font-black text-neo-cream leading-none">
+                {t('wordWheel.hub.wordWheelQuest')}
+              </h2>
+              <span className="inline-block mt-1.5 px-2.5 py-0.5 text-[10px] font-black uppercase rounded-md border-2 bg-neo-lime/20 text-neo-lime border-neo-lime/40">
+                {t('daily.cleared')}
+              </span>
+            </div>
+            <div className={cn(
+              'shrink-0 py-2.5 px-5 text-xs font-black uppercase rounded-lg text-center',
+              'bg-neo-purple text-neo-white border-2 border-neo-black shadow-hard-sm',
+              'active:translate-y-0.5 active:shadow-none transition-all',
+              'flex items-center gap-1.5 group-hover:scale-105'
+            )}>
+              <Eye className="w-4 h-4" />
+              {t('daily.viewResults')}
+            </div>
+          </button>
+        </motion.div>
+      ) : (
+        <QuestCard
+          challengeId="wordWheel"
+          icon={<CircleDot className="w-8 h-8" />}
+          title={t('wordWheel.hub.wordWheelQuest')}
+          tagline={t('wordWheel.hub.wordWheelDesc')}
+          color="yellow"
+          status="new"
+          onPlay={onSelectWordWheel}
+          timeMode="timed"
+          timeModeLabel={t('daily.timedQuest')}
+          buttonText={t('daily.startQuest')}
+          delay={0.25}
+        />
+      )}
+
+      {/* Streak counter + freeze */}
+      <StreakCounter streak={streak} />
+      <StreakFreezeIndicator freezeCount={freezeCount} t={t} />
+      <DailyRewardPreview currentStreakDay={streak} t={t} />
 
       {/* Leaderboard Teaser */}
       <motion.div

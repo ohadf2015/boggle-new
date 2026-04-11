@@ -88,8 +88,12 @@ const WordWheelChallenge: React.FC = () => {
           score: stored.result.score,
           timeSeconds: stored.result.timeSeconds,
         });
+        setPhase('already-played');
+      } else {
+        // Played but result corrupted/missing — show fallback result
+        setGameResult({ wordsFound: [], score: 0, timeSeconds: 0 });
+        setPhase('already-played');
       }
-      setPhase('already-played');
     } else {
       const generatedPuzzle = generateWordWheelPuzzle(date, gameLang);
       setPuzzle(generatedPuzzle);
