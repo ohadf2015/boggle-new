@@ -16,18 +16,15 @@ export interface WheelLetterProps {
   onPress: (letter: string, index: number, el: HTMLButtonElement) => void;
   isUsed: boolean;
   index: number;
-  dir: string;
 }
 
 export const WheelLetter: React.FC<WheelLetterProps> = ({
-  letter, isCenter, angle = 0, radius = 0, onPress, isUsed, index, dir,
+  letter, isCenter, angle = 0, radius = 0, onPress, isUsed, index,
 }) => {
   const btnRef = useRef<HTMLButtonElement>(null);
 
-  // Position letters using inset-0 + m-auto for centering (no transform needed),
-  // then use Framer Motion x/y props for outer letter offsets.
-  // This avoids conflicts between CSS transform centering and Framer Motion's
-  // animate/scale which takes control of the transform property.
+  // Position outer letters using CSS transform (stable, no Framer Motion fighting).
+  // Center letter stays at origin (inset-0 m-auto centers it).
   const rad = ((angle || 0) * Math.PI) / 180;
   const offsetX = isCenter ? 0 : Math.sin(rad) * radius;
   const offsetY = isCenter ? 0 : -Math.cos(rad) * radius;
@@ -51,13 +48,18 @@ export const WheelLetter: React.FC<WheelLetterProps> = ({
             : 'bg-neo-white text-neo-navy shadow-[2px_2px_0px_black,0_0_8px_rgba(191,255,0,0.15)] hover:shadow-[2px_2px_0px_black,0_0_14px_rgba(191,255,0,0.35)] hover:bg-neo-cream active:bg-neo-lime/30',
         isUsed ? 'cursor-default' : 'cursor-pointer',
       )}
+      // Use CSS transform for stable positioning — avoids Framer Motion fighting on re-renders
+      style={{
+        transform: `translate(${offsetX}px, ${offsetY}px)`,
+      }}
       onClick={() => {
         if (!isUsed && btnRef.current) onPress(letter, index, btnRef.current);
       }}
       whileTap={isUsed ? {} : { scale: 0.85 }}
-      animate={isCenter && !isUsed
-        ? { x: offsetX, y: offsetY, scale: [1, 1.06, 1], boxShadow: ['3px 3px 0px black, 0 0 20px rgba(191,255,0,0.5)', '3px 3px 0px black, 0 0 28px rgba(191,255,0,0.7)', '3px 3px 0px black, 0 0 20px rgba(191,255,0,0.5)'] }
-        : { x: offsetX, y: offsetY, scale: isUsed ? 0.9 : 1 }
+      animate={
+        isCenter && !isUsed
+          ? { scale: [1, 1.06, 1], boxShadow: ['3px 3px 0px black, 0 0 20px rgba(191,255,0,0.5)', '3px 3px 0px black, 0 0 28px rgba(191,255,0,0.7)', '3px 3px 0px black, 0 0 20px rgba(191,255,0,0.5)'] }
+          : { scale: isUsed ? 0.9 : 1 }
       }
       transition={isCenter && !isUsed
         ? { duration: 2, repeat: Infinity, ease: 'easeInOut' }
@@ -95,11 +97,11 @@ export const WordTile: React.FC<WordTileProps> = ({ letter, index, onRemove, isC
     )}
     onClick={() => onRemove(index)}
     initial={{ scale: 0, y: 20 }}
-    animate={{ scale: 1, y: [0, -3, 0] }}
+    animate={{ scale: 1, y: 0 }}
     exit={{ scale: 0, y: -20, opacity: 0 }}
     transition={{
       scale: { type: 'spring', stiffness: 600, damping: 20 },
-      y: { duration: 1.8, repeat: Infinity, ease: 'easeInOut', delay: index * 0.12 },
+      y: { type: 'spring', stiffness: 600, damping: 20 },
     }}
     whileTap={{ scale: 0.85 }}
     aria-label={`${letter}, tap to remove`}

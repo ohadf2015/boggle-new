@@ -4998,6 +4998,7 @@ const en = {
     "inputPlaceholder": "Type a word...",
     "tapLetters": "Tap letters to build a word",
     "tapDescription": "Tap letters on the wheel to spell words. Every word must include the center letter!",
+    "timeLimit": "2 minute time limit",
     "clear": "Clear",
     "shuffle": "Shuffle",
     "foundWords": "Found Words",

@@ -1,25 +1,11 @@
 'use client';
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { useLanguage } from '@/contexts/LanguageContext';
-import { PageLoader } from '@/components/ui/PageLoader';
+import DailyHub from './DailyHub';
 
 /**
- * DailyRedirect - Always redirects to word hunt (the only daily challenge).
- * The /daily route is kept for OG metadata on share links.
+ * DailyRedirect - Shows the Daily Hub with both Word Hunt and Word Wheel.
+ * The /daily route shows the hub. Share links with OG params still work via metadata.
  */
 export default function DailyRedirect() {
-  const { language } = useLanguage();
-  const router = useRouter();
-
-  useEffect(() => {
-    router.replace(`/${language}/daily/word-hunt`);
-  }, [language, router]);
-
-  return (
-    <div className="flex-1 flex items-center justify-center bg-neo-navy">
-      <PageLoader size="lg" />
-    </div>
-  );
+  return <DailyHub />;
 }

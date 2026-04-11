@@ -28,7 +28,7 @@ interface WordWheelGameProps {
 const WordWheelGame: React.FC<WordWheelGameProps> = ({
   puzzle, duration, onComplete, onValidateWord, onEffect,
 }) => {
-  const { t, dir } = useLanguage();
+  const { t } = useLanguage();
   const {
     playTileSelectSound, playWordAcceptedSound, playWordRejectedSound,
     playComboSound, playLegendaryWordSound, playEpicVictorySound,
@@ -51,6 +51,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
   const wordsFoundRef = useRef<string[]>([]);
   const scoreRef = useRef(0);
   const timeWarningFiredRef = useRef(false);
+  const gameContainerRef = useRef<HTMLDivElement>(null);
   const wheelContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => { wordsFoundRef.current = wordsFound; }, [wordsFound]);
@@ -114,7 +115,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
     playTileSelectSound();
     // Get element position for particle effect
     const rect = el.getBoundingClientRect();
-    const containerRect = wheelContainerRef.current?.getBoundingClientRect();
+    const containerRect = gameContainerRef.current?.getBoundingClientRect();
     if (containerRect) {
       onEffect({
         type: 'letterTap',
@@ -156,8 +157,8 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
     const word = builtWord.toUpperCase();
 
     // Container-relative center for effects
-    const cx = wheelContainerRef.current
-      ? wheelContainerRef.current.getBoundingClientRect().width / 2
+    const cx = gameContainerRef.current
+      ? gameContainerRef.current.getBoundingClientRect().width / 2
       : 200;
 
     // Client-side checks
@@ -238,14 +239,14 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
     }
   }, [builtWord, isValidating, puzzle, wordsFound, onValidateWord, showFeedback, t, onEffect, combo, playWordRejectedSound, playWordAcceptedSound, playLegendaryWordSound, playComboSound]);
 
-  // Responsive wheel radius based on container width
-  const [wheelRadius, setWheelRadius] = useState(96);
+  // Responsive wheel radius based on the wheel div width (not the game container)
+  const [wheelRadius, setWheelRadius] = useState(72);
   useEffect(() => {
     const update = () => {
       if (wheelContainerRef.current) {
         const w = wheelContainerRef.current.getBoundingClientRect().width;
-        // Scale radius: small phones (~224px container) → 72, tablets+ → 100
-        setWheelRadius(Math.max(64, Math.min(100, w * 0.38)));
+        // Radius should keep outer letters inside the wheel div (account for letter size ~52px)
+        setWheelRadius(Math.max(56, Math.min(96, (w - 56) / 2)));
       }
     };
     update();
@@ -267,7 +268,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
   const seconds = timeLeft % 60;
 
   return (
-    <div ref={wheelContainerRef} className="relative flex flex-col items-center gap-2 sm:gap-4 w-full max-w-lg mx-auto px-3 sm:px-4">
+    <div ref={gameContainerRef} className="relative flex flex-col items-center gap-2 sm:gap-4 w-full max-w-lg mx-auto px-3 sm:px-4">
       {/* ── Timer & Score Bar ── */}
       <div className="w-full space-y-1.5">
         <div className="flex items-center justify-between w-full gap-2">
@@ -381,7 +382,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
       </div>
 
       {/* ── The Wheel ── */}
-      <div className="relative w-48 h-48 sm:w-60 sm:h-60 md:w-64 md:h-64 flex items-center justify-center">
+      <div ref={wheelContainerRef} className="relative w-52 h-52 sm:w-64 sm:h-64 md:w-72 md:h-72 flex items-center justify-center">
         {/* PixiJS wheel decorations: orbital rings + connection lines */}
         <WordWheelPixiRing
           selectedIndices={builtLetters.map(bl => bl.wheelIndex)}
@@ -406,7 +407,6 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
           onPress={(letter, _, el) => handleLetterPress(letter, -1, el)}
           isUsed={usedIndices.has(-1)}
           index={-1}
-          dir={dir}
         />
         {/* Outer letters */}
         {outerLetters.map((letter, i) => (
@@ -419,7 +419,6 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
             onPress={(l, _, el) => handleLetterPress(l, i, el)}
             isUsed={usedIndices.has(i)}
             index={i}
-            dir={dir}
           />
         ))}
       </div>

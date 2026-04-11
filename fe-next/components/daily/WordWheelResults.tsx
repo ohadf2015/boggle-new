@@ -7,26 +7,32 @@ import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { scoreWord } from '@/utils/dailyChallenge/wordWheelScoring';
+import DailyLeaderboard from './DailyLeaderboard';
+import type { Language } from '@/types';
 import type { WordWheelGameResult } from './WordWheelGame';
 
 interface WordWheelResultsProps {
   result: WordWheelGameResult;
   puzzleNumber: number;
+  puzzleDate: string;
+  language: Language;
   hasPlayedWordHunt: boolean;
+  currentPlayerId?: string | null;
+  currentGuestFingerprint?: string | null;
 }
 
 function getResultTier(score: number): {
   key: string; color: string; bg: string; icon: React.ReactNode; glowColor: string;
 } {
-  if (score >= 50) return {
+  if (score >= 80) return {
     key: 'wordWheel.excellent', color: 'text-neo-lime', bg: 'bg-neo-lime/10',
     icon: <Crown className="w-8 h-8" />, glowColor: 'shadow-[0_0_30px_rgba(191,255,0,0.4)]',
   };
-  if (score >= 30) return {
+  if (score >= 50) return {
     key: 'wordWheel.great', color: 'text-neo-cyan', bg: 'bg-neo-cyan/10',
     icon: <Flame className="w-8 h-8" />, glowColor: 'shadow-[0_0_25px_rgba(0,255,255,0.3)]',
   };
-  if (score >= 15) return {
+  if (score >= 25) return {
     key: 'wordWheel.good', color: 'text-neo-purple', bg: 'bg-neo-purple/10',
     icon: <Zap className="w-8 h-8" />, glowColor: 'shadow-[0_0_20px_rgba(139,92,246,0.3)]',
   };
@@ -93,7 +99,8 @@ function ConfettiParticle({ delay, color, config }: { delay: number; color: stri
 const CONFETTI_COLORS = ['#BFFF00', '#00FFFF', '#FF1493', '#8B5CF6', '#FFD700', '#FF3366', '#44FF44'];
 
 const WordWheelResults: React.FC<WordWheelResultsProps> = ({
-  result, puzzleNumber, hasPlayedWordHunt,
+  result, puzzleNumber, puzzleDate, language: gameLang, hasPlayedWordHunt,
+  currentPlayerId, currentGuestFingerprint,
 }) => {
   const { t, language, dir } = useLanguage();
   const tier = getResultTier(result.score);
@@ -120,14 +127,14 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
 
   // Trigger confetti for good scores
   useEffect(() => {
-    if (result.score >= 15) {
+    if (result.score >= 25) {
       const timer = setTimeout(() => setShowConfetti(true), 600);
       return () => clearTimeout(timer);
     }
     return undefined;
   }, [result.score]);
 
-  const confettiCount = result.score >= 50 ? 40 : result.score >= 30 ? 25 : 15;
+  const confettiCount = result.score >= 80 ? 40 : result.score >= 50 ? 25 : 15;
 
   return (
     <motion.div
@@ -243,6 +250,25 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
           </div>
         </motion.div>
       )}
+
+      {/* Leaderboard */}
+      <motion.div
+        className="w-full z-10"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.8 }}
+      >
+        <DailyLeaderboard
+          puzzleDate={puzzleDate}
+          language={gameLang}
+          currentPlayerId={currentPlayerId}
+          currentGuestFingerprint={currentGuestFingerprint}
+          gameType="wordWheel"
+          t={t}
+          maxVisible={5}
+          compact
+        />
+      </motion.div>
 
       {/* CTA */}
       {!hasPlayedWordHunt && (

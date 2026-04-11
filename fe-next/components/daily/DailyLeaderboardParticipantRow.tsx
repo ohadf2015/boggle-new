@@ -18,7 +18,7 @@ const ParticipantRow = memo<{
   index: number;
   isCurrentUser: boolean;
   compact: boolean;
-  gameType: 'puzzle' | 'wordHunt';
+  gameType: 'puzzle' | 'wordHunt' | 'wordWheel';
   t: (key: string) => string;
 }>(({ participant, index, isCurrentUser, compact, gameType, t }) => {
   const rank = participant.rank_position;

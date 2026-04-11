@@ -22,6 +22,8 @@ import {
 } from '@/utils/dailyChallenge';
 import type { Language } from '@/types';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { getGuestFingerprint } from '@/utils/guestManager';
 import type { WordWheelEffect } from './WordWheelEffectsCanvas';
 
 // Lazy-load PixiJS effects canvas (no SSR)
@@ -45,6 +47,7 @@ const WORD_WHEEL_DURATION = 120; // 2 minutes
 const WordWheelChallenge: React.FC = () => {
   const { t, language } = useLanguage();
   const { setGameActive } = useSoundEffects();
+  const { profile, isAuthenticated } = useAuth();
 
   const [phase, setPhase] = useState<WordWheelPhase>('loading');
   const [puzzle, setPuzzle] = useState<WordWheelPuzzle | null>(null);
@@ -137,8 +140,35 @@ const WordWheelChallenge: React.FC = () => {
       completedAt: new Date().toISOString(),
     });
 
+    // Submit to server for leaderboard
+    const longestWord = result.wordsFound.reduce((a, b) => b.length > a.length ? b : a, '');
+    const submitBody = {
+      puzzleDate: date,
+      puzzleNumber,
+      language: gameLang,
+      playerId: isAuthenticated && profile ? profile.id : undefined,
+      guestFingerprint: !isAuthenticated ? (getGuestFingerprint() || undefined) : undefined,
+      displayName: profile?.display_name || 'Guest',
+      avatarEmoji: profile?.avatar_emoji || '🎯',
+      avatarColor: profile?.avatar_color || '#6366f1',
+      avatarImage: profile?.avatar_image || undefined,
+      countryCode: profile?.country_code || undefined,
+      score: result.score,
+      wordCount: result.wordsFound.length,
+      wordsFound: result.wordsFound,
+      longestWord: longestWord || undefined,
+      timeSeconds: result.timeSeconds,
+      centerLetter: puzzle?.centerLetter || undefined,
+    };
+
+    fetch('/api/daily-challenge/word-wheel/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(submitBody),
+    }).catch(() => { /* leaderboard submission is best-effort */ });
+
     setPhase('completed');
-  }, [language, puzzle, puzzleNumber, setGameActive]);
+  }, [language, puzzle, puzzleNumber, setGameActive, isAuthenticated, profile]);
 
   const handleEffect = useCallback((effect: WordWheelEffect) => {
     setEffects(prev => [...prev, effect]);
@@ -191,9 +221,21 @@ const WordWheelChallenge: React.FC = () => {
               </span>
             </div>
 
-            <p className="text-neo-cream/80 text-center max-w-sm">
-              {t('wordWheel.tapDescription')}
-            </p>
+            {/* Instruction cards */}
+            <div className="flex flex-col gap-2 max-w-xs w-full">
+              <div className="flex items-center gap-3 px-3 py-2 rounded-neo border-2 border-neo-black bg-neo-navy-light">
+                <span className="text-neo-lime text-lg">⭐</span>
+                <span className="text-neo-cream/80 text-sm">{t('wordWheel.centerLetterRule')}</span>
+              </div>
+              <div className="flex items-center gap-3 px-3 py-2 rounded-neo border-2 border-neo-black bg-neo-navy-light">
+                <span className="text-neo-cyan text-lg">🔤</span>
+                <span className="text-neo-cream/80 text-sm">{t('wordWheel.minLetters').replace('{min}', '3')}</span>
+              </div>
+              <div className="flex items-center gap-3 px-3 py-2 rounded-neo border-2 border-neo-black bg-neo-navy-light">
+                <span className="text-neo-pink text-lg">⏱</span>
+                <span className="text-neo-cream/80 text-sm">{t('wordWheel.timeLimit')}</span>
+              </div>
+            </div>
 
             {/* Preview wheel */}
             <div className="relative w-44 h-44 flex items-center justify-center my-4">
@@ -248,7 +290,7 @@ const WordWheelChallenge: React.FC = () => {
         {phase === 'playing' && puzzle && (
           <motion.div
             key="playing"
-            className="flex-1 flex flex-col items-center justify-start pt-4 sm:pt-6 pb-6 relative z-20 overflow-y-auto"
+            className="flex-1 flex flex-col items-center justify-start pt-3 sm:pt-4 pb-4 relative z-20 overflow-y-auto overscroll-contain"
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
@@ -276,7 +318,11 @@ const WordWheelChallenge: React.FC = () => {
             <WordWheelResults
               result={gameResult}
               puzzleNumber={puzzleNumber}
+              puzzleDate={getDailyChallengeDate()}
+              language={language as Language}
               hasPlayedWordHunt={hasPlayedWH}
+              currentPlayerId={isAuthenticated && profile ? profile.id : null}
+              currentGuestFingerprint={!isAuthenticated ? (getGuestFingerprint() || null) : null}
             />
           </motion.div>
         )}

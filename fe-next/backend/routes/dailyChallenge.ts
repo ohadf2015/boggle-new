@@ -12,6 +12,7 @@ import { generateDailyPuzzle } from '../../utils/dailyChallenge';
 import { generateDailyPuzzleAsync } from '../../utils/dailyChallenge/gridGeneration.server';
 import type { Language } from '../../types';
 import wordHuntRouter from './dailyChallenge/wordHuntRoutes';
+import wordWheelRouter from './dailyChallenge/wordWheelRoutes';
 
 // Import types and utilities from extracted modules
 import {
@@ -378,5 +379,8 @@ router.get('/stats/:date/:language', async (req: Request<LeaderboardParams>, res
 
 // Mount Word Hunt routes
 router.use('/word-hunt', wordHuntRouter);
+
+// Mount Word Wheel routes
+router.use('/word-wheel', wordWheelRouter);
 
 export default router;

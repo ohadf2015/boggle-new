@@ -352,7 +352,7 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
             <Button
               onClick={() => setShowCreateChallenge(true)}
               variant="outline"
-              className="w-full max-w-btn py-3.5 text-sm sm:text-base font-black bg-linear-to-r from-neo-purple to-neo-pink text-neo-white border-neo-thick border-neo-white rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 active:translate-y-0 active:shadow-hard-pressed transition-all flex items-center justify-center gap-2 uppercase text-center leading-tight"
+              className="w-full max-w-btn py-3.5 text-xs sm:text-sm font-black bg-linear-to-r from-neo-purple to-neo-pink text-neo-white border-neo-thick border-neo-white rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 active:translate-y-0 active:shadow-hard-pressed transition-all flex items-center justify-center gap-2 uppercase text-center leading-tight"
             >
               <Sparkles className="w-5 h-5" />
               {t('daily.createCustomChallenge')}

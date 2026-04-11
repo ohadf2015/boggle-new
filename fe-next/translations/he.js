@@ -4910,6 +4910,7 @@ const he = {
     "inputPlaceholder": "הקלד מילה...",
     "tapLetters": "הקש על אותיות כדי לבנות מילה",
     "tapDescription": "הקש על אותיות בגלגל כדי לאיית מילים. כל מילה חייבת לכלול את האות המרכזית!",
+    "timeLimit": "מגבלת זמן: 2 דקות",
     "clear": "נקה",
     "shuffle": "ערבב",
     "foundWords": "מילים שנמצאו",
@@ -4926,7 +4927,7 @@ const he = {
       "rank": "הדירוג שלך",
       "share": "שתף תוצאות",
       "playWordHunt": "שחק גם ב-Word Hunt!",
-      "playWordWheel": "!שחקו גם בגלגל מילים"
+      "playWordWheel": "שחק גם בגלגל מילים!"
     },
     "hub": {
       "wordWheelQuest": "גלגל מילים",

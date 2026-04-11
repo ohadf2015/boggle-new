@@ -128,10 +128,10 @@ export const DailyIntroCarousel: React.FC<DailyIntroCarouselProps> = ({
             aria-label={t('daily.carousel.goToStep').replace('{step}', String(idx + 1))}
             onClick={() => goToStep(idx)}
             className={cn(
-              'rounded-full border-2 border-neo-black transition-all duration-200',
+              'rounded-full border-2 border-neo-black transition-all duration-200 shrink-0 aspect-square',
               idx === currentStep
-                ? 'w-4 h-4 bg-neo-pink'
-                : 'w-3 h-3 bg-gray-300 hover:bg-neo-pink/30'
+                ? 'size-4 bg-neo-pink'
+                : 'size-3 bg-gray-300 hover:bg-neo-pink/30'
             )}
           />
         ))}

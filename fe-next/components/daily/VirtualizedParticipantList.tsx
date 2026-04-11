@@ -13,7 +13,7 @@ const VirtualizedParticipantList: React.FC<{
   participants: DailyParticipant[];
   isCurrentUser: (p: DailyParticipant) => boolean;
   compact: boolean;
-  gameType: 'puzzle' | 'wordHunt';
+  gameType: 'puzzle' | 'wordHunt' | 'wordWheel';
   t: (key: string) => string;
 }> = ({ participants, isCurrentUser, compact, gameType, t }) => {
   const parentRef = useRef<HTMLDivElement>(null);

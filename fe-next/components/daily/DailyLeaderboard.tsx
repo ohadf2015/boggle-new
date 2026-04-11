@@ -49,7 +49,7 @@ interface DailyLeaderboardProps {
   compact?: boolean;
   maxVisible?: number;
   t: (key: string) => string;
-  gameType?: 'puzzle' | 'wordHunt';
+  gameType?: 'puzzle' | 'wordHunt' | 'wordWheel';
 }
 
 // ==========================================
@@ -86,7 +86,9 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
       // Use the correct API endpoint based on game type
       const basePath = gameType === 'wordHunt'
         ? `/api/daily-challenge/word-hunt/leaderboard`
-        : `/api/daily-challenge/leaderboard`;
+        : gameType === 'wordWheel'
+          ? `/api/daily-challenge/word-wheel/leaderboard`
+          : `/api/daily-challenge/leaderboard`;
       const url = `${basePath}/${puzzleDate}/${language}?limit=50`;
       const response = await fetch(url);
 

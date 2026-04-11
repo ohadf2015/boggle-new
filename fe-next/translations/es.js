@@ -4936,6 +4936,7 @@ const es = {
     "inputPlaceholder": "Escribe una palabra...",
     "tapLetters": "Toca letras para formar una palabra",
     "tapDescription": "Toca las letras de la rueda para deletrear palabras. ¡Cada palabra debe incluir la letra central!",
+    "timeLimit": "Límite de tiempo: 2 minutos",
     "clear": "Borrar",
     "shuffle": "Mezclar",
     "foundWords": "Palabras encontradas",

@@ -4899,6 +4899,7 @@ const sv = {
     "inputPlaceholder": "Skriv ett ord...",
     "tapLetters": "Tryck på bokstäver för att bygga ett ord",
     "tapDescription": "Tryck på bokstäver på hjulet för att stava ord. Varje ord måste innehålla mittenbokstaven!",
+    "timeLimit": "2 minuters tidsgräns",
     "clear": "Rensa",
     "shuffle": "Blanda",
     "foundWords": "Hittade ord",

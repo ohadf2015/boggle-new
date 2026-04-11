@@ -4951,6 +4951,7 @@ const ja = {
     "inputPlaceholder": "単語を入力...",
     "tapLetters": "文字をタップして単語を作ろう",
     "tapDescription": "ホイールの文字をタップして単語を綴ります。すべての単語に中央の文字を含める必要があります！",
+    "timeLimit": "2分の制限時間",
     "clear": "クリア",
     "shuffle": "シャッフル",
     "foundWords": "見つかった単語",
