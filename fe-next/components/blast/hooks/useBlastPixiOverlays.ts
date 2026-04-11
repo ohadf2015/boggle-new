@@ -44,6 +44,10 @@ export function useBlastPixiOverlays({
   const pulseRingsRef = useRef<Map<Graphics, number>>(new Map());
   // Star bursts — radial glowing beams, same tracking contract as pulseRings.
   const starBurstsRef = useRef<Map<Graphics, number>>(new Map());
+  // Afterglow residue — fading luminous circles at clear positions.
+  const afterglowRef = useRef<Map<Graphics, number>>(new Map());
+  // Light sweep — horizontal bar that sweeps vertically on big clears.
+  const lightSweepRef = useRef<Map<Graphics, number>>(new Map());
 
   // ─── Bloom + Shockwave allocation ──────────────────────────────────────
   // Single `camera.filters = [...]` assignment avoids spread churn on re-render.
@@ -86,6 +90,8 @@ export function useBlastPixiOverlays({
     const cameraRef = camera;
     const pulseRings = pulseRingsRef.current;
     const starBursts = starBurstsRef.current;
+    const afterglows = afterglowRef.current;
+    const lightSweeps = lightSweepRef.current;
     return () => {
       cancelAnimationFrame(crossFlashRafRef.current);
       const cameraAlive = !cameraRef.destroyed;
@@ -97,24 +103,22 @@ export function useBlastPixiOverlays({
         if (!prev.destroyed) prev.destroy();
         crossFlashRef.current = null;
       }
-      for (const [ring, rafId] of pulseRings) {
-        cancelAnimationFrame(rafId);
-        if (ring.destroyed) continue;
-        if (cameraAlive) {
-          try { cameraRef.removeChild(ring); } catch { /* */ }
+      // Cleanup helper for all Map<Graphics, rafId> collections
+      const cleanupMap = (map: Map<Graphics, number>) => {
+        for (const [g, rafId] of map) {
+          cancelAnimationFrame(rafId);
+          if (g.destroyed) continue;
+          if (cameraAlive) {
+            try { cameraRef.removeChild(g); } catch { /* */ }
+          }
+          g.destroy();
         }
-        ring.destroy();
-      }
-      pulseRings.clear();
-      for (const [burst, rafId] of starBursts) {
-        cancelAnimationFrame(rafId);
-        if (burst.destroyed) continue;
-        if (cameraAlive) {
-          try { cameraRef.removeChild(burst); } catch { /* */ }
-        }
-        burst.destroy();
-      }
-      starBursts.clear();
+        map.clear();
+      };
+      cleanupMap(pulseRings);
+      cleanupMap(starBursts);
+      cleanupMap(afterglows);
+      cleanupMap(lightSweeps);
     };
   }, [camera]);
 
@@ -276,5 +280,72 @@ export function useBlastPixiOverlays({
     starBurstsRef.current.set(g, requestAnimationFrame(tick));
   }, [camera, width, height]);
 
-  return { fireShockwave, flashCross, spawnPulseRing, spawnStarBurst };
+  // ─── Afterglow residue — soft luminous halo that lingers at clear positions
+  // Drawn as a filled circle with low alpha, fading over 800ms. Creates a warm
+  // "heat map" effect where recent clears leave visible traces on the board.
+  const spawnAfterglow = useCallback((cx: number, cy: number, color = 0xbfff00) => {
+    if (isReducedMotionPreferred()) return;
+    const g = new Graphics();
+    const radius = cellSize * 0.6;
+    g.circle(0, 0, radius).fill({ color, alpha: 0.35 });
+    g.x = cx;
+    g.y = cy;
+    g.filters = [createGlowFilter(color, 2)];
+    camera.addChild(g);
+
+    const start = performance.now();
+    const duration = 800;
+    const tick = () => {
+      if (camera.destroyed || g.destroyed) {
+        afterglowRef.current.delete(g);
+        return;
+      }
+      const t = Math.min((performance.now() - start) / duration, 1);
+      g.alpha = 0.35 * (1 - t * t); // quadratic fade
+      g.scale.set(1 + t * 0.4); // gentle expand
+      if (t >= 1) {
+        try { camera.removeChild(g); } catch { /* */ }
+        g.destroy();
+        afterglowRef.current.delete(g);
+        return;
+      }
+      afterglowRef.current.set(g, requestAnimationFrame(tick));
+    };
+    afterglowRef.current.set(g, requestAnimationFrame(tick));
+  }, [camera, cellSize]);
+
+  // ─── Light sweep — horizontal luminous bar sweeping vertically on big clears
+  // A full-width white bar slides from top to bottom over 500ms, creating a
+  // cinematic "cleansing" effect. Used on wave clears and chain≥5.
+  const spawnLightSweep = useCallback(() => {
+    if (isReducedMotionPreferred()) return;
+    const g = new Graphics();
+    const barHeight = 6;
+    g.rect(0, -barHeight / 2, width, barHeight).fill({ color: 0xffffff, alpha: 0.7 });
+    g.y = -barHeight;
+    g.filters = [createGlowFilter(0xffffff, 4)];
+    camera.addChild(g);
+
+    const start = performance.now();
+    const duration = 500;
+    const tick = () => {
+      if (camera.destroyed || g.destroyed) {
+        lightSweepRef.current.delete(g);
+        return;
+      }
+      const t = Math.min((performance.now() - start) / duration, 1);
+      g.y = t * (height + barHeight) - barHeight;
+      g.alpha = 0.7 * (1 - t * t);
+      if (t >= 1) {
+        try { camera.removeChild(g); } catch { /* */ }
+        g.destroy();
+        lightSweepRef.current.delete(g);
+        return;
+      }
+      lightSweepRef.current.set(g, requestAnimationFrame(tick));
+    };
+    lightSweepRef.current.set(g, requestAnimationFrame(tick));
+  }, [camera, width, height]);
+
+  return { fireShockwave, flashCross, spawnPulseRing, spawnStarBurst, spawnAfterglow, spawnLightSweep };
 }

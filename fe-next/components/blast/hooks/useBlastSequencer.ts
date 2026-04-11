@@ -44,7 +44,7 @@ export const ANIM_TIMING = {
   anticipation: 120,
   /** Extended anticipation for paths containing special tiles — builds tension */
   anticipationSpecial: 220,
-  clearing: 180,
+  clearing: 360,
   clearStagger: 8,
   pauseAfterClear: 120,
   fallBase: 280,
@@ -209,20 +209,21 @@ export function useBlastSequencer(): UseBlastSequencerReturn {
         if (cancelled()) return;
       }
 
-      // Phase 2: Falling
+      // Phase 2: Falling — keep appearTiles in activeTiles so new tiles stay hidden
+      // until Phase 3 (prevents 1-frame flash at destination)
       if (gravity.fallingTiles.length > 0) {
-        commit({ ...workingRef.current, phase: 'falling', activeTiles: fallTiles, chainLevel }, token);
+        commit({ ...workingRef.current, phase: 'falling', activeTiles: [...fallTiles, ...appearTiles], chainLevel }, token);
         const maxFall = gravity.fallingTiles.reduce((m, t) => Math.max(m, t.fallDistance), 0);
         const fallDur = (ANIM_TIMING.fallBase + ANIM_TIMING.fallPerRow * maxFall) * speed;
         await wait(fallDur, timersRef.current);
         if (cancelled()) return;
 
-        // Landing phase — brief squish-bounce at destination
+        // Landing phase — brief squish-bounce at destination; keep appearTiles
         const landTiles: TileAnimState[] = gravity.fallingTiles.map((t) => ({
           row: t.row, col: t.col, phase: 'landing' as AnimPhase,
           fallDistance: t.fallDistance, column: t.col,
         }));
-        commit({ ...workingRef.current, phase: 'landing', activeTiles: landTiles, chainLevel }, token);
+        commit({ ...workingRef.current, phase: 'landing', activeTiles: [...landTiles, ...appearTiles], chainLevel }, token);
         await wait(ANIM_TIMING.landBounce * speed, timersRef.current);
         if (cancelled()) return;
       }

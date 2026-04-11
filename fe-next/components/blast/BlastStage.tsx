@@ -345,9 +345,30 @@ export const BlastStage = memo(function BlastStage({
           transition: 'transform 200ms ease-out',
         }}
       >
-        {/* Board frame — neo-brutalist with hard shadow */}
+        {/* Board frame — neo-brutalist with hard shadow + reactive glow */}
         <div
-          className="relative w-full max-w-[min(92vw,78dvh)] sm:max-w-[min(440px,75dvh)] md:max-w-[min(480px,72dvh)] lg:max-w-[min(560px,72dvh)] xl:max-w-[min(600px,75dvh)] p-1.5 rounded-neo border-3 border-neo-black shadow-hard-lg"
+          className={cn(
+            'relative w-full max-w-[min(92vw,78dvh)] sm:max-w-[min(440px,75dvh)] md:max-w-[min(480px,72dvh)] lg:max-w-[min(560px,72dvh)] xl:max-w-[min(600px,75dvh)] p-1.5 rounded-neo border-3 shadow-hard-lg transition-all duration-300',
+            (sequencerState?.chainLevel ?? 0) >= 4
+              ? 'border-yellow-400'
+              : (sequencerState?.chainLevel ?? 0) >= 2
+              ? 'border-neo-purple'
+              : comboFlashTier >= 2
+              ? 'border-neo-pink'
+              : 'border-neo-black',
+          )}
+          style={{
+            '--frame-glow-color': (sequencerState?.chainLevel ?? 0) >= 4
+              ? 'rgba(255,200,0,0.5)'
+              : (sequencerState?.chainLevel ?? 0) >= 2
+              ? 'rgba(139,92,246,0.4)'
+              : comboFlashTier >= 2
+              ? 'rgba(255,20,147,0.4)'
+              : 'transparent',
+            ...((sequencerState?.chainLevel ?? 0) >= 2 || comboFlashTier >= 2
+              ? { animation: 'blast-frame-glow 1.2s ease-in-out infinite' }
+              : {}),
+          } as React.CSSProperties}
         >
           {/* Inner board surface */}
           <div

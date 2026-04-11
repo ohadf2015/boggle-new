@@ -6,8 +6,19 @@ import {
 } from 'lucide-react';
 import type { BlastTileType } from './types';
 
-const SHADOW = '2px 2px 0px rgba(0,0,0,0.85)';
+const SHADOW = '2px 2px 0px rgba(0,0,0,0.85), inset 0 1px 0 rgba(255,255,255,0.25)';
 const BORDER_SPECIAL = '2px solid rgba(0,0,0,0.4)';
+
+/** Animated gradient shimmer: oversize the background and slide it.
+ *  Applied on special tiles to make gradients feel "alive". */
+const SHIMMER_STYLE: React.CSSProperties = {
+  backgroundSize: '200% 200%',
+  animation: 'blast-gradient-travel 3s ease-in-out infinite',
+};
+const SHIMMER_FAST: React.CSSProperties = {
+  backgroundSize: '300% 300%',
+  animation: 'blast-gradient-travel 2s ease-in-out infinite',
+};
 
 /** Visual config per tile type.
  *  `indicator` is a lucide-react component — inherits `currentColor` from the
@@ -15,27 +26,27 @@ const BORDER_SPECIAL = '2px solid rgba(0,0,0,0.4)';
 export const TILE_VISUALS: Record<BlastTileType, { bg: string; indicator?: LucideIcon; text?: string; style?: React.CSSProperties }> = {
   standard: {
     bg: '', text: 'text-neo-navy',
-    style: { background: 'rgba(255,255,255,0.85)', boxShadow: SHADOW, border: '2px solid rgba(0,0,0,0.3)' },
+    style: { background: 'linear-gradient(165deg, #FFFFFF 0%, #F0F0F5 50%, #E8E8F0 100%)', boxShadow: SHADOW, border: '2px solid rgba(0,0,0,0.3)' },
   },
   gold: {
     bg: '', indicator: Star, text: 'text-neo-navy',
-    style: { background: 'linear-gradient(165deg, #FFE566 0%, #FFD700 40%, #F0C800 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL },
+    style: { background: 'linear-gradient(165deg, #FFE566 0%, #FFD700 40%, #F0C800 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL, ...SHIMMER_STYLE },
   },
   bomb: {
     bg: '', indicator: Bomb, text: 'text-white',
-    style: { background: 'linear-gradient(165deg, #FF6B6B 0%, #FF3366 40%, #E0194D 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL },
+    style: { background: 'linear-gradient(165deg, #FF6B6B 0%, #FF3366 40%, #E0194D 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL, ...SHIMMER_STYLE },
   },
   lightning: {
     bg: '', indicator: Zap, text: 'text-neo-navy',
-    style: { background: 'linear-gradient(165deg, #66FFFF 0%, #00FFFF 40%, #00E0E0 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL },
+    style: { background: 'linear-gradient(165deg, #66FFFF 0%, #00FFFF 40%, #00E0E0 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL, ...SHIMMER_FAST },
   },
   prism: {
     bg: '', indicator: Triangle, text: 'text-white',
-    style: { background: 'conic-gradient(from 0deg, #FF1493, #8B5CF6, #00FFFF, #BFFF00, #FF1493)', boxShadow: SHADOW, border: BORDER_SPECIAL },
+    style: { background: 'conic-gradient(from 0deg, #FF1493, #8B5CF6, #00FFFF, #BFFF00, #FF1493)', boxShadow: SHADOW, border: BORDER_SPECIAL, ...SHIMMER_FAST },
   },
   rainbow: {
     bg: '', indicator: Rainbow, text: 'text-white',
-    style: { background: 'linear-gradient(135deg, #FF1493 0%, #8B5CF6 50%, #00FFFF 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL },
+    style: { background: 'linear-gradient(135deg, #FF1493 0%, #8B5CF6 50%, #00FFFF 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL, ...SHIMMER_FAST },
   },
   ice: {
     bg: '', indicator: Snowflake, text: 'text-neo-navy',
@@ -43,7 +54,7 @@ export const TILE_VISUALS: Record<BlastTileType, { bg: string; indicator?: Lucid
   },
   gem: {
     bg: '', indicator: Gem, text: 'text-white',
-    style: { background: 'linear-gradient(165deg, #7DFFB3 0%, #34D399 40%, #10B981 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL },
+    style: { background: 'linear-gradient(165deg, #7DFFB3 0%, #34D399 40%, #10B981 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL, ...SHIMMER_STYLE },
   },
   frozen: {
     bg: '', indicator: Snowflake, text: 'text-neo-navy',
@@ -55,7 +66,7 @@ export const TILE_VISUALS: Record<BlastTileType, { bg: string; indicator?: Lucid
   },
   diamond: {
     bg: '', indicator: Diamond, text: 'text-neo-navy',
-    style: { background: 'linear-gradient(165deg, #88FFFF 0%, #00EEFF 40%, #00DDEE 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL },
+    style: { background: 'linear-gradient(165deg, #88FFFF 0%, #00EEFF 40%, #00DDEE 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL, ...SHIMMER_STYLE },
   },
   countdown: {
     bg: '', indicator: Hourglass, text: 'text-white',
@@ -67,19 +78,19 @@ export const TILE_VISUALS: Record<BlastTileType, { bg: string; indicator?: Lucid
   },
   magma: {
     bg: '', indicator: Flame, text: 'text-white',
-    style: { background: 'linear-gradient(165deg, #FF6B35 0%, #FF4500 40%, #CC3700 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL },
+    style: { background: 'linear-gradient(165deg, #FF6B35 0%, #FF4500 40%, #CC3700 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL, ...SHIMMER_STYLE },
   },
   portal: {
     bg: '', indicator: Orbit, text: 'text-white',
-    style: { background: 'radial-gradient(circle, #7B68EE 0%, #5B3BD6 60%, #4B0082 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL },
+    style: { background: 'radial-gradient(circle, #7B68EE 0%, #5B3BD6 60%, #4B0082 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL, ...SHIMMER_FAST },
   },
   catalyst: {
     bg: '', indicator: FlaskConical, text: 'text-neo-navy',
-    style: { background: 'linear-gradient(165deg, #FFFACD 0%, #FFD700 40%, #F0C020 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL },
+    style: { background: 'linear-gradient(165deg, #FFFACD 0%, #FFD700 40%, #F0C020 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL, ...SHIMMER_STYLE },
   },
   crystal: {
     bg: '', indicator: Sparkles, text: 'text-white',
-    style: { background: 'linear-gradient(165deg, #F0C8FF 0%, #C084FC 40%, #8B5CF6 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL },
+    style: { background: 'linear-gradient(165deg, #F0C8FF 0%, #C084FC 40%, #8B5CF6 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL, ...SHIMMER_STYLE },
   },
   fuse: {
     bg: '', indicator: Flame, text: 'text-white',

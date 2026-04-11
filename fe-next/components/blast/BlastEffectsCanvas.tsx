@@ -188,7 +188,7 @@ function EffectsWorker({
   // ─── Pixi overlay pipeline ────────────────────────────────────────
   // Owns bloom+shockwave camera filters, cross flash, and combo pulse rings.
   // All teardown + camera.destroyed guards live inside the hook.
-  const { fireShockwave, flashCross, spawnPulseRing, spawnStarBurst } = useBlastPixiOverlays({
+  const { fireShockwave, flashCross, spawnPulseRing, spawnStarBurst, spawnAfterglow, spawnLightSweep } = useBlastPixiOverlays({
     camera, width, height, gridSize, cellSize, chainLevel,
   });
 
@@ -340,6 +340,8 @@ function EffectsWorker({
       const x = tile.col * cellSize + cellSize / 2;
       const y = tile.row * cellSize + cellSize / 2;
       particles.burst(LINGER_SPARKLE, x, y, 3);
+      // Afterglow residue — warm halo that lingers where tiles were cleared
+      spawnAfterglow(x, y, tile.type === 'bomb' ? 0xff3366 : tile.type === 'lightning' ? 0x00ffff : 0xbfff00);
     }
 
     // Move ghost sprite to centroid of cleared tiles (for chain ghost trail)
@@ -374,7 +376,7 @@ function EffectsWorker({
       else if (count >= 3) shake.medium();
       else shake.light();
     }
-  }, [clearedTiles, particles, shake, cellSize, gridSize, height, spawnDebris, spawnLightningBolt, spawnLightningDebris, firePrismBeams, spawnPrismDebris, flashCross, physics, fireShockwave, spawnPulseRing, spawnStarBurst, moveGhostTo]);
+  }, [clearedTiles, particles, shake, cellSize, gridSize, height, spawnDebris, spawnLightningBolt, spawnLightningDebris, firePrismBeams, spawnPrismDebris, flashCross, physics, fireShockwave, spawnPulseRing, spawnStarBurst, spawnAfterglow, moveGhostTo]);
 
   // Chain cascade sparkle + mega celebration at chain 5
   useEffect(() => {
@@ -389,6 +391,7 @@ function EffectsWorker({
         spawnStarBurst(width / 2, height / 2, 0xbfff00, 16);
         spawnPulseRing(width / 2, height / 2, 3);
         juiceRef.current?.megaPunch({ cx: width / 2, cy: height / 2 });
+        spawnLightSweep();
       } else if (chainLevel >= 3) {
         shake.medium();
       } else {
@@ -396,7 +399,7 @@ function EffectsWorker({
       }
     }
     prevChainRef.current = chainLevel;
-  }, [chainLevel, particles, shake, width, height, fireShockwave, spawnStarBurst, spawnPulseRing]);
+  }, [chainLevel, particles, shake, width, height, fireShockwave, spawnStarBurst, spawnPulseRing, spawnLightSweep]);
 
   // Combo flash particles + juice pulse (chromatic aberration + saturation bump)
   useEffect(() => {
@@ -416,10 +419,11 @@ function EffectsWorker({
       spawnStarBurst(width / 2, height / 2, 0xffffff, 18);
       spawnPulseRing(width / 2, height / 2, 3);
       juiceRef.current?.waveClearBurst({ cx: width / 2, cy: height / 2 });
+      spawnLightSweep();
       spawnWaveClearBurst(width / 2, height / 2, Math.min(width, height) * 0.45);
     }
     prevWaveRef.current = waveCleared;
-  }, [waveCleared, particles, width, height, fireShockwave, spawnStarBurst, spawnPulseRing, spawnWaveClearBurst]);
+  }, [waveCleared, particles, width, height, fireShockwave, spawnStarBurst, spawnPulseRing, spawnLightSweep, spawnWaveClearBurst]);
 
   return null;
 }

@@ -8,7 +8,8 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { getTileTooltip } from './utils/blastTileTooltips';
 import { TILE_VISUALS, CLEARING_COLORS, CLEARING_ANIMS } from './blastTileVisuals';
 
-const TILE_TEXT_SHADOW_STYLE = { textShadow: '0 1px 2px rgba(0,0,0,0.3)' } as const;
+const TILE_TEXT_SHADOW_STYLE = { textShadow: '0 1px 0 rgba(255,255,255,0.4), 0 2px 3px rgba(0,0,0,0.2)' } as const;
+const TILE_TEXT_SHADOW_LIGHT_STYLE = { textShadow: '0 1px 2px rgba(0,0,0,0.4)' } as const;
 
 export type TilePhase = 'idle' | 'selected' | 'anticipation' | 'clearing' | 'falling' | 'appearing' | 'landing';
 
@@ -198,7 +199,11 @@ export const BlastTile = memo(function BlastTile({
     if (activationEffect) setLiveActivationEffect(activationEffect);
   }, [activationEffect]);
 
-  if (isCleared) {
+  // Allow clearing/anticipation phases to render even when isCleared is true —
+  // during cascade chains, submitWord marks tiles cleared BEFORE the animation runs.
+  // Without this, cascade clearing animations never play (tile goes invisible instantly).
+  const isAnimatingClear = phase === 'clearing' || phase === 'anticipation' || phase === 'falling' || phase === 'appearing';
+  if (isCleared && !isAnimatingClear) {
     return <div className="aspect-square opacity-0 pointer-events-none" aria-hidden="true" />;
   }
 
@@ -266,7 +271,7 @@ export const BlastTile = memo(function BlastTile({
       aria-label={`${letter}${type !== 'standard' ? ` ${type} tile` : ''}`}
       title={tooltip ? `${tooltip.name}: ${tooltip.desc}` : undefined}
     >
-      <span className="relative z-10" style={TILE_TEXT_SHADOW_STYLE}>{letter}</span>
+      <span className="relative z-10" style={visual.text === 'text-white' ? TILE_TEXT_SHADOW_LIGHT_STYLE : TILE_TEXT_SHADOW_STYLE}>{letter}</span>
       {visual.indicator && (
         <span className={`absolute top-0.5 inset-e-0.5 leading-none pointer-events-none ${visual.text ?? ''}`} aria-hidden="true">
           <visual.indicator className="w-[clamp(9px,2.4cqw,15px)] h-[clamp(9px,2.4cqw,15px)]" strokeWidth={2.5} />
