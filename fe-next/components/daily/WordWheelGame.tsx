@@ -6,9 +6,14 @@ import { Clock, Shuffle, RotateCcw, Sparkles, Flame } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { isValidWordWheelWord, type WordWheelPuzzle } from '@/utils/dailyChallenge/wordWheelGeneration';
+import { scoreWord } from '@/utils/dailyChallenge/wordWheelScoring';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import type { WordWheelEffect } from './WordWheelEffectsCanvas';
 import { WheelLetter, WordTile } from './WordWheelParts';
+import { useWordWheelKeyboard } from '@/hooks/useWordWheelKeyboard';
+import dynamic from 'next/dynamic';
+
+const WordWheelPixiRing = dynamic(() => import('./WordWheelPixiRing'), { ssr: false });
 
 export interface WordWheelGameResult { wordsFound: string[]; score: number; timeSeconds: number }
 
@@ -18,18 +23,6 @@ interface WordWheelGameProps {
   onComplete: (result: WordWheelGameResult) => void;
   onValidateWord: (word: string) => Promise<boolean>;
   onEffect: (effect: WordWheelEffect) => void;
-}
-
-function scoreWord(word: string): number {
-  const len = word.length;
-  if (len <= 2) return 0;
-  if (len === 3) return 1;
-  if (len === 4) return 3;
-  if (len === 5) return 5;
-  if (len === 6) return 8;
-  if (len === 7) return 12;
-  if (len === 8) return 18;
-  return 25;
 }
 
 const WordWheelGame: React.FC<WordWheelGameProps> = ({
@@ -162,31 +155,36 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
 
     const word = builtWord.toUpperCase();
 
+    // Container-relative center for effects
+    const cx = wheelContainerRef.current
+      ? wheelContainerRef.current.getBoundingClientRect().width / 2
+      : 200;
+
     // Client-side checks
     if (word.length < 3) {
       showFeedback(t('wordWheel.tooShort').replace('{min}', '3'), 'error');
-      onEffect({ type: 'error', x: 200, y: 80 });
+      onEffect({ type: 'error', x: cx, y: 80 });
       playWordRejectedSound();
       return;
     }
 
     if (!word.includes(puzzle.centerLetter.toUpperCase())) {
       showFeedback(t('wordWheel.missingCenter').replace('{letter}', puzzle.centerLetter), 'error');
-      onEffect({ type: 'error', x: 200, y: 80 });
+      onEffect({ type: 'error', x: cx, y: 80 });
       playWordRejectedSound();
       return;
     }
 
     if (!isValidWordWheelWord(word, puzzle.centerLetter, puzzle.allLetters)) {
       showFeedback(t('wordWheel.invalidLetters'), 'error');
-      onEffect({ type: 'error', x: 200, y: 80 });
+      onEffect({ type: 'error', x: cx, y: 80 });
       playWordRejectedSound();
       return;
     }
 
     if (wordsFound.includes(word)) {
       showFeedback(t('wordWheel.alreadyFound'), 'error');
-      onEffect({ type: 'error', x: 200, y: 80 });
+      onEffect({ type: 'error', x: cx, y: 80 });
       playWordRejectedSound();
       return;
     }
@@ -204,10 +202,11 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         setBuiltLetters([]);
 
         // Combo tracker — resets after 5s of inactivity
-        const newCombo = (comboTimerRef.current ? combo + 1 : 1);
-        setCombo(prev => prev + 1);
-        if (comboTimerRef.current) clearTimeout(comboTimerRef.current);
-        comboTimerRef.current = setTimeout(() => setCombo(0), 5000);
+        const hadActiveCombo = comboTimerRef.current !== null;
+        if (comboTimerRef.current) { clearTimeout(comboTimerRef.current); comboTimerRef.current = null; }
+        const newCombo = hadActiveCombo ? combo + 1 : 1;
+        setCombo(newCombo);
+        comboTimerRef.current = setTimeout(() => { setCombo(0); comboTimerRef.current = null; }, 5000);
 
         // Sound effects
         const isPangram = word.length >= 9;
@@ -221,9 +220,6 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         }
 
         // Trigger celebration effects
-        const cx = wheelContainerRef.current
-          ? wheelContainerRef.current.getBoundingClientRect().width / 2
-          : 200;
         if (isPangram) {
           onEffect({ type: 'pangram', x: cx, y: 200 });
         } else {
@@ -235,14 +231,34 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         }
       } else {
         showFeedback(t('wordWheel.notInDictionary'), 'error');
-        onEffect({ type: 'error', x: 200, y: 80 });
+        onEffect({ type: 'error', x: cx, y: 80 });
       }
     } finally {
       setIsValidating(false);
     }
   }, [builtWord, isValidating, puzzle, wordsFound, onValidateWord, showFeedback, t, onEffect, combo, playWordRejectedSound, playWordAcceptedSound, playLegendaryWordSound, playComboSound]);
 
-  const wheelRadius = typeof window !== 'undefined' && window.innerWidth < 640 ? 80 : 96;
+  // Responsive wheel radius based on container width
+  const [wheelRadius, setWheelRadius] = useState(96);
+  useEffect(() => {
+    const update = () => {
+      if (wheelContainerRef.current) {
+        const w = wheelContainerRef.current.getBoundingClientRect().width;
+        // Scale radius: small phones (~224px container) → 72, tablets+ → 100
+        setWheelRadius(Math.max(64, Math.min(100, w * 0.38)));
+      }
+    };
+    update();
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, []);
+
+  // ── Keyboard input ──
+  useWordWheelKeyboard({
+    centerLetter: puzzle.centerLetter, outerLetters, usedIndices,
+    handleSubmit, handleClear, setBuiltLetters,
+    gameOver: gameOverRef.current, playTileSelectSound, playButtonClickSound,
+  });
 
   // Timer display
   const timerColor = timeLeft <= 10 ? 'text-neo-red' : timeLeft <= 30 ? 'text-neo-orange' : 'text-neo-white';
@@ -251,36 +267,36 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
   const seconds = timeLeft % 60;
 
   return (
-    <div ref={wheelContainerRef} className="relative flex flex-col items-center gap-3 sm:gap-5 w-full max-w-lg mx-auto px-4">
+    <div ref={wheelContainerRef} className="relative flex flex-col items-center gap-2 sm:gap-4 w-full max-w-lg mx-auto px-3 sm:px-4">
       {/* ── Timer & Score Bar ── */}
-      <div className="w-full space-y-2">
-        <div className="flex items-center justify-between w-full">
-          <div className={cn('flex items-center gap-2 font-neo-display font-black text-xl', timerColor, timerPulse)}>
-            <Clock className="w-5 h-5" />
+      <div className="w-full space-y-1.5">
+        <div className="flex items-center justify-between w-full gap-2">
+          <div className={cn('flex items-center gap-1.5 font-neo-display font-black text-lg sm:text-xl shrink-0', timerColor, timerPulse)}>
+            <Clock className="w-4 h-4 sm:w-5 sm:h-5" />
             <span className="tabular-nums">{minutes}:{seconds.toString().padStart(2, '0')}</span>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
             {/* Combo counter */}
             <AnimatePresence>
               {combo >= 2 && (
                 <motion.div
-                  className="flex items-center gap-1 px-2 py-0.5 rounded-neo border-2 border-neo-black bg-gradient-to-r from-neo-pink to-neo-red shadow-[0_0_10px_rgba(255,20,147,0.4)]"
+                  className="flex items-center gap-1 px-1.5 py-0.5 rounded-neo border-2 border-neo-black bg-gradient-to-r from-neo-pink to-neo-red shadow-[0_0_10px_rgba(255,20,147,0.4)] shrink-0"
                   initial={{ scale: 0, x: 20 }}
                   animate={{ scale: 1, x: 0 }}
                   exit={{ scale: 0, x: 20 }}
                   transition={{ type: 'spring', stiffness: 500 }}
                 >
-                  <Flame className="w-4 h-4 text-neo-white" />
-                  <span className="font-neo-display font-black text-neo-white text-sm">x{combo}</span>
+                  <Flame className="w-3.5 h-3.5 text-neo-white" />
+                  <span className="font-neo-display font-black text-neo-white text-xs sm:text-sm">x{combo}</span>
                 </motion.div>
               )}
             </AnimatePresence>
-            <span className="text-neo-cream/60 text-sm font-semibold">
+            <span className="text-neo-cream/60 text-xs sm:text-sm font-semibold truncate">
               {t('wordWheel.wordsFound').replace('{count}', String(wordsFound.length))}
             </span>
             <motion.span
               key={score}
-              className="font-neo-display font-black text-neo-lime text-xl"
+              className="font-neo-display font-black text-neo-lime text-lg sm:text-xl shrink-0"
               initial={{ scale: 1.4 }}
               animate={{ scale: 1 }}
               transition={{ type: 'spring', stiffness: 400 }}
@@ -303,8 +319,8 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
       </div>
 
       {/* ── Word Builder Area ── */}
-      <div className="relative w-full min-h-[60px] sm:min-h-[72px] flex items-center justify-center">
-        <div className="flex items-center gap-1.5 sm:gap-2">
+      <div className="relative w-full min-h-[52px] sm:min-h-[72px] flex items-center justify-center">
+        <div className="flex items-center justify-center gap-1 sm:gap-2 flex-wrap max-w-full">
           <AnimatePresence mode="popLayout">
             {builtLetters.length === 0 ? (
               <motion.span
@@ -365,7 +381,13 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
       </div>
 
       {/* ── The Wheel ── */}
-      <div className="relative w-56 h-56 sm:w-64 sm:h-64 flex items-center justify-center">
+      <div className="relative w-48 h-48 sm:w-60 sm:h-60 md:w-64 md:h-64 flex items-center justify-center">
+        {/* PixiJS wheel decorations: orbital rings + connection lines */}
+        <WordWheelPixiRing
+          selectedIndices={builtLetters.map(bl => bl.wheelIndex)}
+          radius={wheelRadius}
+          combo={combo}
+        />
         {/* Outer glow ring */}
         <motion.div
           className="absolute inset-0 rounded-full border-2 border-neo-lime/20"

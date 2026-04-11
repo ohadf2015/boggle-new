@@ -176,3 +176,6 @@ export {
   isValidWordWheelWord,
 } from './dailyChallenge/wordWheelGeneration';
 export type { WordWheelPuzzle } from './dailyChallenge/wordWheelGeneration';
+
+// Word Wheel scoring
+export { scoreWord as scoreWordWheelWord } from './dailyChallenge/wordWheelScoring';

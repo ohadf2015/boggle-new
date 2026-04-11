@@ -161,7 +161,7 @@ const WordWheelChallenge: React.FC = () => {
   }
 
   return (
-    <div ref={containerRef} className="relative flex-1 flex flex-col bg-neo-navy min-h-screen overflow-hidden">
+    <div ref={containerRef} className="relative flex-1 flex flex-col bg-neo-navy min-h-0 overflow-hidden">
       {/* PixiJS Effects Layer */}
       {phase === 'playing' && (
         <WordWheelEffectsCanvas
@@ -248,7 +248,7 @@ const WordWheelChallenge: React.FC = () => {
         {phase === 'playing' && puzzle && (
           <motion.div
             key="playing"
-            className="flex-1 flex flex-col items-center justify-center py-6 relative z-20"
+            className="flex-1 flex flex-col items-center justify-start pt-4 sm:pt-6 pb-6 relative z-20 overflow-y-auto"
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}

@@ -40,8 +40,8 @@ export const WheelLetter: React.FC<WheelLetterProps> = ({
         'absolute inset-0 m-auto flex items-center justify-center font-neo-display font-black uppercase select-none',
         'border-3 border-neo-black rounded-full transition-colors duration-150',
         isCenter
-          ? 'w-20 h-20 sm:w-24 sm:h-24 text-3xl sm:text-4xl z-10'
-          : 'w-[52px] h-[52px] sm:w-[60px] sm:h-[60px] text-lg sm:text-xl',
+          ? 'w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 text-2xl sm:text-3xl md:text-4xl z-10'
+          : 'w-10 h-10 sm:w-[52px] sm:h-[52px] md:w-[60px] md:h-[60px] text-base sm:text-lg md:text-xl',
         isCenter
           ? isUsed
             ? 'bg-neo-lime/40 text-neo-black/40 shadow-hard-lg'
@@ -86,8 +86,8 @@ export const WordTile: React.FC<WordTileProps> = ({ letter, index, onRemove, isC
   <motion.button
     type="button"
     className={cn(
-      'w-10 h-12 sm:w-12 sm:h-14 rounded-neo border-3 border-neo-black flex items-center justify-center',
-      'font-neo-display font-black text-lg sm:text-xl cursor-pointer',
+      'w-8 h-10 sm:w-10 sm:h-12 md:w-12 md:h-14 rounded-neo border-3 border-neo-black flex items-center justify-center',
+      'font-neo-display font-black text-base sm:text-lg md:text-xl cursor-pointer',
       'active:shadow-hard-pressed active:translate-x-px active:translate-y-px',
       isCenter
         ? 'bg-neo-lime text-neo-black shadow-[2px_2px_0px_black,0_0_12px_rgba(191,255,0,0.3)]'

@@ -1,29 +1,18 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Trophy, Star, ArrowRight, Flame, Crown, Zap } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Star, ArrowRight, Flame, Crown, Zap } from 'lucide-react';
 import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
+import { scoreWord } from '@/utils/dailyChallenge/wordWheelScoring';
 import type { WordWheelGameResult } from './WordWheelGame';
 
 interface WordWheelResultsProps {
   result: WordWheelGameResult;
   puzzleNumber: number;
   hasPlayedWordHunt: boolean;
-}
-
-function scoreWord(word: string): number {
-  const len = word.length;
-  if (len <= 2) return 0;
-  if (len === 3) return 1;
-  if (len === 4) return 3;
-  if (len === 5) return 5;
-  if (len === 6) return 8;
-  if (len === 7) return 12;
-  if (len === 8) return 18;
-  return 25;
 }
 
 function getResultTier(score: number): {
