@@ -408,6 +408,14 @@ export interface AdventureGameState {
   hintTiles?: Array<{ row: number; col: number }>;
   /** Timestamp when hint expires (Date.now() + 5000) */
   hintExpiresAt?: number;
+
+  // Hunt/survival mode state
+  /** Remaining moves in limited-move modes */
+  movesRemaining?: number;
+  /** Hunt mode attempts made */
+  huntAttempts?: string[];
+  /** Whether the hunt target word was found */
+  huntFound?: boolean;
 }
 
 // ==============================================
