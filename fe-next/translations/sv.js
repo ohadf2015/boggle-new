@@ -4897,6 +4897,10 @@ const sv = {
     "tooShort": "För kort (min {min} bokstäver)",
     "invalidLetters": "Kan bara använda hjulets bokstäver",
     "inputPlaceholder": "Skriv ett ord...",
+    "tapLetters": "Tryck på bokstäver för att bygga ett ord",
+    "tapDescription": "Tryck på bokstäver på hjulet för att stava ord. Varje ord måste innehålla mittenbokstaven!",
+    "clear": "Rensa",
+    "shuffle": "Blanda",
     "foundWords": "Hittade ord",
     "possibleWords": "Möjliga",
     "excellent": "Utmärkt!",
@@ -6305,7 +6309,12 @@ const sv = {
       "puzzle": "Pussel",
       "survival": "Överlevnad",
       "cascade": "Kaskad",
-      "boss": "Bosskamp"
+      "boss": "Bosskamp",
+      "classic": "Klassiskt läge",
+      "blast": "Sprängläge",
+      "hunt": "Ordjakt",
+      "wheel": "Ordhjulet",
+      "forge": "Ordsmide"
     },
     "mastery": {
       "title": "Arketypbehärskning",
@@ -6719,6 +6728,38 @@ const sv = {
       "multilingual": "Polyglott",
       "allMechanics": "Alla mekaniker"
     },
+    "theme": {
+      "bonus": "temaordsbonus",
+      "found": "temaord hittade"
+    },
+    "toast": {
+      "themedWord": "Temaord-bonus!"
+    },
+    "world": {
+      "1": { "theme": "Natur & Trädgård" },
+      "2": { "theme": "Vatten & Flöde" },
+      "3": { "theme": "Jord & Mineraler" },
+      "4": { "theme": "Hav & Resor" },
+      "5": { "theme": "Bygg & Hantverk" },
+      "6": { "theme": "Mysterium & Pussel" },
+      "7": { "theme": "Ljus & Reflektion" },
+      "8": { "theme": "Rymd & Vetenskap" },
+      "9": { "theme": "Kultur & Språk" },
+      "10": { "theme": "Makt & Kunskap" }
+    },
+    "mode": {
+      "classic": "Klassiskt läge",
+      "blast": "Sprängläge",
+      "hunt": "Ordjakt",
+      "wheel": "Ordhjulet",
+      "forge": "Ordsmide",
+      "boss": "Bosskamp",
+      "classic.objective": "Hitta ord innan tiden tar slut",
+      "blast.objective": "Rensa alla brickor inom dragbegränsning",
+      "hunt.objective": "Hitta det dolda målordet",
+      "wheel.objective": "Ord måste innehålla mittenbokstaven",
+      "forge.objective": "Nå poängmålet med runförstärkningar"
+    },
     "objectives": {
       "wordCount": "Hitta ord",
       "scoreTarget": "Nå poäng",
@@ -7008,6 +7049,19 @@ const sv = {
         "desc": "Stoppa klockan för att tänka",
         "t1": "Pausa timern i 5 sekunder",
         "t2": "10s paus + visa längsta ordet"
+      },
+      "toast": {
+        "wordRadar": "Ordradar hittade en väg!",
+        "deepDrill": "Djupborren rensade extra is!",
+        "gemDetector": "Ädelstensdetektorn hittade guld!",
+        "fuelTank": "Bränsletanken förlängde tiden!",
+        "armorPlating": "Pansaret absorberade skada!",
+        "blastShield": "Sprängskölden blockerade attack!",
+        "luckyPickaxe": "Lycklig hacka gav bonusguld!",
+        "cargoBay": "Lastutrymmet lagrade belöningar!",
+        "salvageClaw": "Bärgningsklon grep byte!",
+        "wordDynamite": "Orddynamit exploderade!",
+        "timeFreeze": "Tidsfrys aktiverad!"
       }
     },
     "shop": {

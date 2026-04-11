@@ -13,6 +13,7 @@ import {
   kanjiCompounds,
 } from '@/utils/consts';
 import { createNoise2D } from 'simplex-noise';
+import { getThemedWords } from './themedWords';
 
 // ==============================================
 // ENGLISH CONSTANTS (default)
@@ -197,34 +198,101 @@ function createSeededRandom(seed: number): () => number {
 type GridSize = 4 | 5 | 6 | 7;
 
 /**
+ * Seeds themed letters from a world's word pool into the grid.
+ * Picks 2-4 words that fit within the grid dimensions and places them
+ * horizontally or vertically, overwriting random cells.
+ * This increases the probability that themed words are findable on the grid.
+ *
+ * @param grid - The grid to modify (mutated in place and returned)
+ * @param world - Adventure world number (1-10)
+ * @param gridSize - Size of the grid (used to filter words by length)
+ * @param random - Seeded random function
+ * @returns Modified grid
+ */
+export function seedThemedLetters(
+  grid: string[][],
+  world: number,
+  gridSize: number,
+  random: () => number
+): string[][] {
+  const words = getThemedWords(world);
+  if (!words.length) return grid;
+
+  // Filter to words that can fit on the grid (length <= gridSize)
+  const fittingWords = words.filter((w) => w.length <= gridSize);
+  if (!fittingWords.length) return grid;
+
+  // Shuffle and pick 2-4 words
+  const shuffled = shuffleArray([...fittingWords], random);
+  const wordCount = 2 + Math.floor(random() * 3); // 2, 3, or 4
+  const selected = shuffled.slice(0, wordCount);
+
+  for (const word of selected) {
+    const horizontal = random() < 0.5;
+    if (horizontal) {
+      // Place word starting at a random column offset in a random row
+      const maxStartCol = gridSize - word.length;
+      const row = Math.floor(random() * gridSize);
+      const col = Math.floor(random() * (maxStartCol + 1));
+      for (let i = 0; i < word.length; i++) {
+        grid[row][col + i] = word[i];
+      }
+    } else {
+      // Place word vertically
+      const maxStartRow = gridSize - word.length;
+      const row = Math.floor(random() * (maxStartRow + 1));
+      const col = Math.floor(random() * gridSize);
+      for (let i = 0; i < word.length; i++) {
+        grid[row + i][col] = word[i];
+      }
+    }
+  }
+
+  return grid;
+}
+
+/**
  * Generate a letter grid for adventure mode
  *
  * @param size - Grid size (4, 5, 6, or 7)
  * @param seed - Optional seed for reproducible grids
  * @param language - Language for the grid (default: 'en')
+ * @param world - Optional adventure world number for themed letter seeding
  * @returns 2D array of letters appropriate for the language
  */
 export function generateAdventureGrid(
   size: GridSize,
   seed?: number,
-  language: Language = 'en'
+  language: Language = 'en',
+  world?: number
 ): string[][] {
   // Use seeded random if provided, otherwise Math.random
   const random =
     seed !== undefined ? createSeededRandom(seed) : Math.random.bind(Math);
 
   // Generate grid based on language
+  let grid: string[][];
   switch (language) {
     case 'he':
-      return generateHebrewGrid(size, random);
+      grid = generateHebrewGrid(size, random);
+      break;
     case 'sv':
-      return generateSwedishGrid(size, random);
+      grid = generateSwedishGrid(size, random);
+      break;
     case 'ja':
-      return generateJapaneseGrid(size, random);
+      grid = generateJapaneseGrid(size, random);
+      break;
     case 'en':
     default:
-      return generateEnglishGrid(size, random);
+      grid = generateEnglishGrid(size, random);
   }
+
+  // Seed themed letters when a world is provided (English only — other langs have their own word pools)
+  if (world !== undefined && language === 'en') {
+    seedThemedLetters(grid, world, size, random);
+  }
+
+  return grid;
 }
 
 /**

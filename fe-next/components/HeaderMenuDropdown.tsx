@@ -35,7 +35,7 @@ const HeaderMenuDropdown = memo<HeaderMenuDropdownProps>(({
     const { t, language } = useLanguage();
     const { isAuthenticated, isAdmin, profile, user } = useAuth();
     const engagementStatus = useEngagementStatus();
-    const { missions, completedCount, isGrandSlam } = useDailyMissions();
+    const { missions, completedCount, isGrandSlam, loading: missionsLoading } = useDailyMissions();
     const { notifications, unreadCount: notificationCount, markAsRead, markAllAsRead, dismissNotification, clearAllNotifications } = useRealtimeNotifications();
     const [showAllNotifications, setShowAllNotifications] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
@@ -96,11 +96,12 @@ const HeaderMenuDropdown = memo<HeaderMenuDropdownProps>(({
 
     // If the count drops (e.g. user dismissed notifications elsewhere), clamp the
     // stored marker so a future increase still triggers the badge correctly.
+    // Skip while missions are loading — completedCount is temporarily 0 on mount.
     useEffect(() => {
-        if (badgeCount < lastSeenBadgeCount) {
+        if (badgeCount < lastSeenBadgeCount && !missionsLoading) {
             markBadgeSeen(badgeCount);
         }
-    }, [badgeCount, lastSeenBadgeCount, markBadgeSeen]);
+    }, [badgeCount, lastSeenBadgeCount, markBadgeSeen, missionsLoading]);
 
     const closeMenu = useCallback(() => setIsOpen(false), []);
 

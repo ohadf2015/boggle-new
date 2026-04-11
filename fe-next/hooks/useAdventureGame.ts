@@ -86,6 +86,14 @@ interface UseAdventureGameReturn {
   updateObjective: (objectiveType: string, value: number, mode?: 'set' | 'increment') => void;
   /** Effective combo timeout in ms (accounts for upgrade multiplier) */
   effectiveComboTimeout: number;
+  /** Upgrade tier map for HUD display (upgradeId -> tier). */
+  upgradeState: Record<string, number>;
+  /** Set when an upgrade visually triggers this action. Cleared on next action. */
+  upgradeTriggered: { upgradeId: string; effectValue: number } | null;
+  /** Themed words found in the current level */
+  themedWordsFound: string[];
+  /** Whether the most recently submitted word was a themed word */
+  lastWordWasThemed: boolean;
 }
 
 // ==============================================
@@ -303,5 +311,9 @@ export function useAdventureGame({
     shufflesRemaining: state.shufflesRemaining,
     updateObjective,
     effectiveComboTimeout,
+    upgradeState: state.upgradeState ?? {},
+    upgradeTriggered: state.upgradeTriggered,
+    themedWordsFound: state.themedWordsFound,
+    lastWordWasThemed: state.lastWordWasThemed,
   };
 }

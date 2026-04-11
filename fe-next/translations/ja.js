@@ -4949,6 +4949,10 @@ const ja = {
     "tooShort": "短すぎます（最低{min}文字）",
     "invalidLetters": "ホイールの文字のみ使用できます",
     "inputPlaceholder": "単語を入力...",
+    "tapLetters": "文字をタップして単語を作ろう",
+    "tapDescription": "ホイールの文字をタップして単語を綴ります。すべての単語に中央の文字を含める必要があります！",
+    "clear": "クリア",
+    "shuffle": "シャッフル",
     "foundWords": "見つかった単語",
     "possibleWords": "可能",
     "excellent": "素晴らしい！",
@@ -6357,7 +6361,12 @@ const ja = {
       "puzzle": "パズル",
       "survival": "サバイバル",
       "cascade": "カスケード",
-      "boss": "ボスバトル"
+      "boss": "ボスバトル",
+      "classic": "クラシックモード",
+      "blast": "ブラストモード",
+      "hunt": "ワードハント",
+      "wheel": "ワードホイール",
+      "forge": "ワードフォージ"
     },
     "mastery": {
       "title": "アーキタイプ熟練度",
@@ -6770,6 +6779,38 @@ const ja = {
       "multilingual": "ポリグロット",
       "allMechanics": "全メカニクス"
     },
+    "theme": {
+      "bonus": "テーマ語ボーナス",
+      "found": "テーマ語発見"
+    },
+    "toast": {
+      "themedWord": "テーマワードボーナス！"
+    },
+    "world": {
+      "1": { "theme": "自然と庭園" },
+      "2": { "theme": "水と流れ" },
+      "3": { "theme": "大地と鉱物" },
+      "4": { "theme": "海と旅" },
+      "5": { "theme": "建築と工芸" },
+      "6": { "theme": "謎とパズル" },
+      "7": { "theme": "光と反射" },
+      "8": { "theme": "宇宙と科学" },
+      "9": { "theme": "文化と言語" },
+      "10": { "theme": "力と知識" }
+    },
+    "mode": {
+      "classic": "クラシックモード",
+      "blast": "ブラストモード",
+      "hunt": "ワードハント",
+      "wheel": "ワードホイール",
+      "forge": "ワードフォージ",
+      "boss": "ボス戦",
+      "classic.objective": "制限時間内に単語を見つけよう",
+      "blast.objective": "移動制限内にすべてのタイルをクリア",
+      "hunt.objective": "隠されたターゲットワードを見つけよう",
+      "wheel.objective": "中央の文字を含む単語を作ろう",
+      "forge.objective": "ルーンバフでスコア目標を達成"
+    },
     "objectives": {
       "wordCount": "単語を見つける",
       "scoreTarget": "スコア目標",
@@ -7059,6 +7100,19 @@ const ja = {
         "desc": "時計を止めて考える",
         "t1": "タイマーを5秒間停止",
         "t2": "10秒停止＋最長単語を表示"
+      },
+      "toast": {
+        "wordRadar": "ワードレーダーがパスを検出!",
+        "deepDrill": "ディープドリルが追加の氷を除去!",
+        "gemDetector": "ジェムディテクターがゴールドを発見!",
+        "fuelTank": "燃料タンクが時間を延長!",
+        "armorPlating": "アーマーがダメージを吸収!",
+        "blastShield": "ブラストシールドが攻撃をブロック!",
+        "luckyPickaxe": "ラッキーピッケルでボーナスゴールド!",
+        "cargoBay": "カーゴベイが報酬を保管!",
+        "salvageClaw": "サルベージクローが戦利品を獲得!",
+        "wordDynamite": "ワードダイナマイトが爆発!",
+        "timeFreeze": "タイムフリーズ発動!"
       }
     },
     "shop": {

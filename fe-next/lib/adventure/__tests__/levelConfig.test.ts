@@ -137,7 +137,8 @@ describe('Level Configuration', () => {
         expect(config.world).toBe(world);
         expect(config.level).toBe(level);
         expect([4, 5, 6, 7]).toContain(config.gridSize);
-        expect(config.timerSeconds).toBeGreaterThan(0);
+        // timerSeconds = 0 is valid for non-timer archetypes (blast, hunt)
+        expect(config.timerSeconds).toBeGreaterThanOrEqual(0);
         expect(['EASY', 'MEDIUM', 'HARD']).toContain(config.difficulty);
         expect(config.objectives.length).toBeGreaterThan(0);
       }
@@ -396,8 +397,8 @@ describe('Objective Generation', () => {
       expect(lateObjectives.length).toBeGreaterThanOrEqual(earlyObjectives.length);
     });
 
-    it('should add clearIce objective for excavation archetype levels', () => {
-      // World 2 levels 3 and 6 are 'excavation' archetype → clearIce primary
+    it('should add clearIce objective for blast archetype levels', () => {
+      // World 2 level 3 is 'blast' archetype → clearIce primary
       const objs = generateObjectives(2, 3);
       const clearIce = objs.find((o) => o.type === 'clearIce' && o.isPrimary);
       expect(clearIce).toBeDefined();
@@ -569,7 +570,7 @@ describe('Grid-aware objective generation', () => {
       expect(hasLongWords).toBe(false);
     });
 
-    it('should keep longWords objective when grid supports long paths (puzzle archetype)', () => {
+    it('should keep longWords objective when grid supports long paths (wheel archetype)', () => {
       // GIVEN: A 4x4 grid (supports paths well over 5)
       const grid = [
         ['A', 'B', 'C', 'D'],
@@ -578,17 +579,17 @@ describe('Grid-aware objective generation', () => {
         ['M', 'N', 'O', 'P'],
       ];
 
-      // World 3 level 6 is 'puzzle' archetype → longWords primary
-      const objectives = generateObjectives(3, 6, grid);
+      // World 3 level 4 is 'wheel' archetype → longWords secondary
+      const objectives = generateObjectives(3, 4, grid);
       const hasLongWords = objectives.some((o) => o.type === 'longWords');
 
       expect(hasLongWords).toBe(true);
     });
 
-    it('should still work without grid (puzzle archetype)', () => {
+    it('should still work without grid (wheel archetype)', () => {
       // Without grid, longWords is assumed valid (no grid to validate against)
-      // World 3 level 6 is 'puzzle' archetype → longWords primary
-      const objectives = generateObjectives(3, 6);
+      // World 3 level 4 is 'wheel' archetype → longWords secondary
+      const objectives = generateObjectives(3, 4);
       const hasLongWords = objectives.some((o) => o.type === 'longWords');
       expect(hasLongWords).toBe(true);
     });
@@ -628,7 +629,7 @@ describe('Granular star progression (1/2/3 stars reachable)', () => {
     const obj1 = generateObjectives(1, 1);
     const obj2 = generateObjectives(1, 2);
 
-    // Both levels have wordCount primary + scoreTarget secondary (standard archetype)
+    // Both levels have wordCount primary + scoreTarget secondary (classic archetype)
     const scoreSecondary1 = obj1.find(
       (o) => !o.isPrimary && o.type === 'scoreTarget'
     );
@@ -789,21 +790,21 @@ describe('Level Config Validation', () => {
 });
 
 describe('Score target calibration (Fix 1)', () => {
-  it('should base score targets on realistic word output for goldRush levels', () => {
-    // W3 L3 is goldRush archetype → scoreTarget primary, timer×0.7
-    const objectives = generateObjectives(3, 3);
+  it('should base score targets on realistic word output for forge levels', () => {
+    // W3 L6 is forge archetype → scoreTarget primary
+    const objectives = generateObjectives(3, 6);
     const scoreObj = objectives.find((o) => o.type === 'scoreTarget' && o.isPrimary);
 
     expect(scoreObj).toBeDefined();
-    // goldRush has 1.4× boost, shorter timer but gold-heavy board
+    // forge has 1.4× boost and gold-heavy board
     expect(scoreObj!.target).toBeGreaterThan(0);
   });
 
   it('should produce higher score targets in later worlds', () => {
-    // goldRush levels across worlds: W3L3, W6L2, W10L5
-    const world3 = generateObjectives(3, 3);
+    // forge levels across worlds: W3L6, W6L2, W10L4
+    const world3 = generateObjectives(3, 6);
     const world6 = generateObjectives(6, 2);
-    const world10 = generateObjectives(10, 5);
+    const world10 = generateObjectives(10, 4);
 
     const s3 = world3.find((o) => o.type === 'scoreTarget' && o.isPrimary)!.target;
     const s6 = world6.find((o) => o.type === 'scoreTarget' && o.isPrimary)!.target;
@@ -867,7 +868,7 @@ describe('Word count backpressure from timer (Fix 2)', () => {
   });
 
   it('World 7 word count is capped by backpressure from timer', () => {
-    // W7 L3 is 'standard' archetype → wordCount primary
+    // W7 L3 is 'classic' archetype → wordCount primary
     // Timer for world 7 = 140s (6x6 grid). Cap = floor((140/4)*0.8) = 28
     const objectives = generateObjectives(7, 3);
     const wordObj = objectives.find(
@@ -882,8 +883,8 @@ describe('Word count backpressure from timer (Fix 2)', () => {
   });
 
   describe('Early game score targets (difficulty curve audit)', () => {
-    it('W1 standard levels should have wordCount primary', () => {
-      // World 1 is all standard archetype → wordCount primary
+    it('W1 classic levels should have wordCount primary', () => {
+      // World 1 is all classic archetype → wordCount primary
       const config = getLevelConfig(1, 2);
       const wordObj = config.objectives.find(
         (o) => o.type === 'wordCount' && o.isPrimary
@@ -896,9 +897,9 @@ describe('Word count backpressure from timer (Fix 2)', () => {
       expect(scoreSecondary).toBeDefined();
     });
 
-    it('goldRush levels should have scoreTarget primary with appropriate targets', () => {
-      // W3 L3 is goldRush → scoreTarget primary
-      const config = getLevelConfig(3, 3);
+    it('forge levels should have scoreTarget primary with appropriate targets', () => {
+      // W3 L6 is forge → scoreTarget primary
+      const config = getLevelConfig(3, 6);
       const scoreObj = config.objectives.find(
         (o) => o.type === 'scoreTarget' && o.isPrimary
       );
@@ -906,9 +907,9 @@ describe('Word count backpressure from timer (Fix 2)', () => {
       expect(scoreObj!.target).toBeGreaterThan(0);
     });
 
-    it('difficulty should ramp up by W5+ for goldRush levels', () => {
-      // W5 L3 is goldRush, W3 L3 is goldRush
-      const w3config = getLevelConfig(3, 3);
+    it('difficulty should ramp up by W5+ for forge levels', () => {
+      // W5 L3 is forge, W3 L6 is forge
+      const w3config = getLevelConfig(3, 6);
       const w5config = getLevelConfig(5, 3);
       const s3 = w3config.objectives.find(
         (o) => o.type === 'scoreTarget' && o.isPrimary

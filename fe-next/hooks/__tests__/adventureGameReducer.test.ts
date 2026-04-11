@@ -444,6 +444,172 @@ describe('SUBMIT_WORD with detonate (Word Dynamite T3)', () => {
   });
 });
 
+// ==============================================
+// THEMED WORD BONUS (Sprint 2)
+// ==============================================
+
+describe('Themed word bonus on SUBMIT_WORD', () => {
+  // World 1 themed words include 'BLOOM', 'LEAF', etc. (see themedWords.ts)
+  const levelConfig = {
+    world: 1,
+    level: 1,
+    gridSize: 4,
+    timerSeconds: 60,
+    isBossLevel: false,
+    specialTiles: [],
+    objectives: [{ type: 'wordCount', target: 50, isPrimary: true }],
+    difficulty: 'EASY' as const,
+    chapterNumber: 1,
+    levelInChapter: 1,
+  } as LevelConfig;
+  const grid = [
+    ['B', 'L', 'O', 'M'],
+    ['A', 'B', 'C', 'D'],
+    ['E', 'F', 'G', 'H'],
+    ['I', 'J', 'K', 'L'],
+  ];
+
+  it('applies 1.25x bonus multiplier for a themed word', () => {
+    const state = createInitialState(levelConfig, grid);
+    const started = gameReducer(state, { type: 'START_GAME' });
+    const result = gameReducer(started, {
+      type: 'SUBMIT_WORD',
+      payload: { word: 'BLOOM', score: 100, path: [{ row: 0, col: 0 }, { row: 0, col: 1 }, { row: 0, col: 2 }, { row: 1, col: 1 }, { row: 0, col: 3 }] },
+    });
+    // 100 * 1.25 = 125
+    expect(result.gameState.score).toBe(125);
+  });
+
+  it('sets lastWordWasThemed to true for a themed word', () => {
+    const state = createInitialState(levelConfig, grid);
+    const started = gameReducer(state, { type: 'START_GAME' });
+    const result = gameReducer(started, {
+      type: 'SUBMIT_WORD',
+      payload: { word: 'BLOOM', score: 100 },
+    });
+    expect(result.lastWordWasThemed).toBe(true);
+  });
+
+  it('sets lastWordWasThemed to false for a non-themed word', () => {
+    const state = createInitialState(levelConfig, grid);
+    const started = gameReducer(state, { type: 'START_GAME' });
+    const result = gameReducer(started, {
+      type: 'SUBMIT_WORD',
+      payload: { word: 'BAD', score: 10 },
+    });
+    expect(result.lastWordWasThemed).toBe(false);
+  });
+
+  it('adds themed word to themedWordsFound array', () => {
+    const state = createInitialState(levelConfig, grid);
+    const started = gameReducer(state, { type: 'START_GAME' });
+    const result = gameReducer(started, {
+      type: 'SUBMIT_WORD',
+      payload: { word: 'BLOOM', score: 100 },
+    });
+    expect(result.themedWordsFound).toContain('BLOOM');
+  });
+
+  it('does not apply bonus for a non-themed word', () => {
+    const state = createInitialState(levelConfig, grid);
+    const started = gameReducer(state, { type: 'START_GAME' });
+    const result = gameReducer(started, {
+      type: 'SUBMIT_WORD',
+      payload: { word: 'BAD', score: 10 },
+    });
+    expect(result.gameState.score).toBe(10);
+  });
+
+  it('does not apply bonus when world is 0 (invalid)', () => {
+    const noWorldConfig = { ...levelConfig, world: 0 };
+    const state = createInitialState(noWorldConfig, grid);
+    const started = gameReducer(state, { type: 'START_GAME' });
+    const result = gameReducer(started, {
+      type: 'SUBMIT_WORD',
+      payload: { word: 'BLOOM', score: 100 },
+    });
+    expect(result.gameState.score).toBe(100); // no bonus
+  });
+});
+
+// ==============================================
+// UPGRADE TRIGGER TRACKING (Sprint 2)
+// ==============================================
+
+describe('upgradeTriggered state tracking', () => {
+  const levelConfig = {
+    world: 3,
+    level: 1,
+    gridSize: 4,
+    timerSeconds: 60,
+    isBossLevel: false,
+    specialTiles: [
+      { row: 0, col: 0, type: 'ice' as const },
+      { row: 0, col: 3, type: 'ice' as const },
+    ],
+    objectives: [{ type: 'clearIce', target: 5, isPrimary: true }],
+    difficulty: 'MEDIUM' as const,
+    chapterNumber: 1,
+    levelInChapter: 1,
+  } as LevelConfig;
+  const grid = [
+    ['I', 'A', 'B', 'I'],
+    ['C', 'D', 'E', 'F'],
+    ['G', 'H', 'I', 'J'],
+    ['K', 'L', 'M', 'N'],
+  ];
+
+  it('upgradeTriggered is null in initial state', () => {
+    const state = createInitialState(levelConfig, grid);
+    expect(state.upgradeTriggered).toBeNull();
+  });
+
+  it('sets upgradeTriggered when deepDrill upgrade is active and extra ice is cleared', () => {
+    // deepDrill T1 or higher: upgradeState.deepDrill >= 1
+    // word at (1,1) is adjacent to ice at (0,0) and (0,3) is outside range 1
+    // With deepDrill (range stays 1 for now, but we track the trigger when ice is cleared)
+    const state = createInitialState(levelConfig, grid, undefined, { deepDrill: 1 });
+    const started = gameReducer(state, { type: 'START_GAME' });
+    const result = gameReducer(started, {
+      type: 'SUBMIT_WORD',
+      // Path adjacent to ice at (0,0)
+      payload: { word: 'CD', score: 10, path: [{ row: 1, col: 0 }, { row: 1, col: 1 }] },
+    });
+    // deepDrill is active, ice was cleared, so upgradeTriggered should be set
+    expect(result.upgradeTriggered).not.toBeNull();
+    expect(result.upgradeTriggered?.upgradeId).toBe('deepDrill');
+    expect(result.upgradeTriggered?.effectValue).toBeGreaterThan(0);
+  });
+
+  it('upgradeTriggered is null after non-ice-clearing submission when deepDrill active', () => {
+    const state = createInitialState(levelConfig, grid, undefined, { deepDrill: 1 });
+    const started = gameReducer(state, { type: 'START_GAME' });
+    // Submit word in row 3 — far from ice tiles
+    const result = gameReducer(started, {
+      type: 'SUBMIT_WORD',
+      payload: { word: 'KL', score: 5, path: [{ row: 3, col: 0 }, { row: 3, col: 1 }] },
+    });
+    expect(result.upgradeTriggered).toBeNull();
+  });
+
+  it('upgradeTriggered is cleared on the next action after being set', () => {
+    const state = createInitialState(levelConfig, grid, undefined, { deepDrill: 1 });
+    const started = gameReducer(state, { type: 'START_GAME' });
+    const triggered = gameReducer(started, {
+      type: 'SUBMIT_WORD',
+      payload: { word: 'CD', score: 10, path: [{ row: 1, col: 0 }, { row: 1, col: 1 }] },
+    });
+    // Verify it was set
+    expect(triggered.upgradeTriggered).not.toBeNull();
+    // Next action (no ice adjacent) should clear it
+    const next = gameReducer(triggered, {
+      type: 'SUBMIT_WORD',
+      payload: { word: 'KL', score: 5, path: [{ row: 3, col: 0 }, { row: 3, col: 1 }] },
+    });
+    expect(next.upgradeTriggered).toBeNull();
+  });
+});
+
 describe('Blast Shield T1 (iceTileReduction) — extended ice melt range', () => {
   const levelConfig = {
     world: 5,

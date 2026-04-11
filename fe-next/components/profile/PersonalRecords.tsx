@@ -22,8 +22,8 @@ function RecordCard({ record, onShare }: { record: PersonalRecord; onShare: () =
   return (
     <div
       className={cn(
-        'bg-neo-navy/80 border-3 border-neo-black rounded-neo p-4',
-        'shadow-hard-sm flex flex-col gap-2'
+        'bg-slate-800/40 backdrop-blur-sm border border-white/[0.08] rounded-[20px] p-4',
+        'flex flex-col gap-2'
       )}
     >
       <div className="flex items-center gap-2 text-neo-cyan">
@@ -41,7 +41,7 @@ function RecordCard({ record, onShare }: { record: PersonalRecord; onShare: () =
         aria-label={t('profile.records.share')}
         className={cn(
           'mt-auto flex items-center gap-1 text-xs font-bold',
-          'text-neo-yellow hover:text-neo-orange transition-colors',
+          'text-neo-cyan hover:text-neo-cyan/70 transition-colors',
           'self-end'
         )}
       >

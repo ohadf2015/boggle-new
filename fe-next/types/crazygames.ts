@@ -88,12 +88,6 @@ export interface CrazyGamesSettings {
   disableChat: boolean;
 }
 
-// Xsolla purchase tracking
-export interface XsollaOrder {
-  orderId: string;
-  [key: string]: unknown;
-}
-
 export interface CrazyGamesSDKInterface {
   init: () => Promise<void>;
   getEnvironment: () => Promise<CrazyGamesEnvironment>;
@@ -144,10 +138,6 @@ export interface CrazyGamesSDKInterface {
     setItem: (key: string, value: string) => Promise<void>;
     removeItem: (key: string) => Promise<void>;
     clear: () => Promise<void>;
-  };
-  payment?: {
-    getXsollaUserToken: () => Promise<string | null>;
-    trackOrder: (provider: string, order: XsollaOrder) => Promise<void>;
   };
   leaderboard?: {
     submitScore: (score: number) => Promise<void>;
@@ -208,9 +198,6 @@ export interface CrazyGamesContextType {
   // Auth listener
   addAuthListener: (callback: (user: { username: string; profilePictureUrl: string }) => void) => void;
   removeAuthListener: (callback: (user: { username: string; profilePictureUrl: string }) => void) => void;
-  // In-game purchases (Xsolla)
-  getXsollaUserToken: () => Promise<string | null>;
-  trackOrder: (provider: string, order: XsollaOrder) => Promise<void>;
   // Leaderboard
   submitLeaderboardScore: (score: number) => Promise<void>;
 }
@@ -263,7 +250,5 @@ export const CRAZYGAMES_NOOP_CONTEXT: CrazyGamesContextType = {
   getUserToken: async () => null,
   listFriends: async () => ({ friends: [], hasMore: false }),
   showAccountLinkPrompt: async () => {},
-  getXsollaUserToken: async () => null,
-  trackOrder: async () => {},
   submitLeaderboardScore: async () => {},
 };

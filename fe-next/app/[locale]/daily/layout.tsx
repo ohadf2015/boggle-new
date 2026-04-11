@@ -14,6 +14,7 @@ const seoContent: Record<string, { title: string; description: string; features:
       'Same board for all players worldwide - fair competition',
       'Share emoji results with friends, just like Wordle',
       'Word Hunt Survival: find the hidden word in 10 attempts',
+      'Word Wheel: find words from a wheel of letters using the center letter',
       'Daily streaks reward consistent play',
       'Global leaderboard resets each day',
     ],
@@ -21,6 +22,7 @@ const seoContent: Record<string, { title: string; description: string; features:
       { question: 'When does the daily puzzle reset?', answer: 'A new puzzle is generated every day at midnight UTC. Your progress resets and a fresh leaderboard begins.' },
       { question: 'Can I share my results?', answer: 'Yes! After completing the puzzle, tap the share button to copy an emoji grid summary. Share it on social media or messaging apps without spoiling the answer.' },
       { question: 'What is Word Hunt Survival?', answer: 'Word Hunt is a daily word search challenge where you have 10 attempts to find the hidden target word on the board. Think of it as Wordle meets Boggle.' },
+      { question: 'What is the Daily Word Wheel?', answer: 'The Word Wheel is a daily puzzle where you find words using letters arranged in a wheel. Every word must include the center letter. Longer words earn more points. A new wheel appears every day.' },
     ],
   },
   he: {
@@ -191,7 +193,7 @@ export default async function DailyLayout({ children, params }: DailyLayoutProps
     '@id': `https://www.lexiclash.live${localePath}/daily#challenges`,
     name: 'Daily Word Challenges',
     description: 'Daily word challenge updated every day',
-    numberOfItems: 1,
+    numberOfItems: 2,
     itemListElement: [
       {
         '@type': 'ListItem',
@@ -199,6 +201,13 @@ export default async function DailyLayout({ children, params }: DailyLayoutProps
         name: 'Word Hunt Survival',
         description: 'Classic word search puzzle with 10 attempts to find the target word. Same board worldwide each day. Share emoji results like Wordle!',
         url: `https://www.lexiclash.live${localePath}/daily`,
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Daily Word Wheel',
+        description: 'Find words from a wheel of letters. Every word must include the center letter. New puzzle daily at midnight UTC. Compete for the world record!',
+        url: `https://www.lexiclash.live${localePath}/daily/word-wheel`,
       },
     ],
   };

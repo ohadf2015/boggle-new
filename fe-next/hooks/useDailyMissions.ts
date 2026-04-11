@@ -60,7 +60,7 @@ export function useDailyMissions(): UseDailyMissionsReturn {
   const { playQuestCompleteSound } = useSoundEffects();
   const playerId = user?.id ?? null;
   const isMounted = useRef(true);
-  const prevGrandSlamRef = useRef(false);
+  const prevGrandSlamRef = useRef<boolean>(false);
   const hasShownGrandSlamToast = useRef(false);
 
   const [missions, setMissions] = useState<Mission[]>(buildMissions(null));
@@ -165,21 +165,23 @@ export function useDailyMissions(): UseDailyMissionsReturn {
     prevMissionsMapRef.current = currentMap;
   }, [missions, loading, t, playQuestCompleteSound]);
 
-  // Show Grand Slam celebration toast when all missions are completed
+  // Show Grand Slam celebration toast only on false→true transition (not on mount)
   useEffect(() => {
-    if (isGrandSlam && !prevGrandSlamRef.current && !loading && !hasShownGrandSlamToast.current) {
-      hasShownGrandSlamToast.current = true;
-      import('@/components/quests/QuestCompletionToast').then(({ showQuestCompletionToast }) => {
-        showQuestCompletionToast({
-          questName: '',
-          xpReward: 500,
-          isGrandSlam: true,
-          t,
-          onComplete: playQuestCompleteSound,
+    if (!loading) {
+      if (isGrandSlam && prevGrandSlamRef.current === false && !hasShownGrandSlamToast.current) {
+        hasShownGrandSlamToast.current = true;
+        import('@/components/quests/QuestCompletionToast').then(({ showQuestCompletionToast }) => {
+          showQuestCompletionToast({
+            questName: '',
+            xpReward: 500,
+            isGrandSlam: true,
+            t,
+            onComplete: playQuestCompleteSound,
+          });
         });
-      });
+      }
+      prevGrandSlamRef.current = isGrandSlam;
     }
-    prevGrandSlamRef.current = isGrandSlam;
   }, [isGrandSlam, loading, t, playQuestCompleteSound]);
 
   const refresh = useCallback(async () => {

@@ -26,6 +26,7 @@ import { VOWELS } from './gridGenerator';
 import { getBossConfig } from './bossConfig';
 import { hasPathOfLength, hasWordPath } from './gridValidator';
 import { getArchetypeForLevel, getArchetypeConfig } from './levelArchetypes';
+import { getThemeDisplayKey, getThemedWords, getThemeBonusMultiplier } from './themedWords';
 
 // ==============================================
 // WORLD CONFIGURATION
@@ -262,9 +263,12 @@ export function getLevelConfig(
   const archetypeConfig = getArchetypeConfig(archetype);
 
   // Apply archetype timer multiplier to base world timer
-  // Floor at 80s to prevent unplayable timers (e.g., survival ×0.6 on W2 = 66s)
+  // timerMultiplier of 0 signals non-timer mode (blast = move-limited, hunt = life-based)
+  // Floor at 80s to prevent unplayable timers on timer-based archetypes
   const baseTimer = getTimerDuration(effectiveWorld);
-  const timerSeconds = Math.max(80, Math.round(baseTimer * archetypeConfig.timerMultiplier));
+  const timerSeconds = archetypeConfig.timerMultiplier === 0
+    ? 0
+    : Math.max(80, Math.round(baseTimer * archetypeConfig.timerMultiplier));
 
   // Generate level-specific content driven by archetype
   // Pass grid for vowel protection on ice tiles (prevents unfair levels)
@@ -307,6 +311,21 @@ export function getLevelConfig(
     config.worldMechanic = worldConfig.mechanic;
   }
 
+  // Archetype-specific config fields
+  if (archetype === 'blast') {
+    // Move-limited: ~60% of total tiles as move budget
+    config.movesLimit = Math.round(gridSize * gridSize * 0.6);
+  } else if (archetype === 'hunt') {
+    config.hasTargetWord = true;
+    config.lifePoints = 100;
+  } else if (archetype === 'wheel') {
+    config.centerLetterRequired = true;
+    const centerCandidates = ['A', 'E', 'I', 'O', 'U', 'R', 'S', 'T', 'N', 'L'];
+    config.centerLetter = centerCandidates[Math.floor(Math.random() * centerCandidates.length)];
+  } else if (archetype === 'forge') {
+    config.hasRunePick = true;
+  }
+
   // Add hidden word for milestone levels (5 and 10)
   // Only include if the word can actually be formed on the grid
   const hiddenWordKey = `${world}-${level}`;
@@ -317,6 +336,12 @@ export function getLevelConfig(
       config.hiddenWord = hiddenWord;
     }
   }
+
+  // Add theme display information for UI
+  config.themeDisplayKey = getThemeDisplayKey(effectiveWorld);
+  config.gameModeDisplayKey = archetypeConfig.nameKey;
+  config.themedWordCount = getThemedWords(effectiveWorld).length;
+  config.themedBonusMultiplier = getThemeBonusMultiplier(effectiveWorld);
 
   // Add boss twist mechanic for boss levels
   if (isBossLevel) {
@@ -442,7 +467,7 @@ export function generateObjectives(
       const difficultyFactor = 0.4 + (world - 1) * (0.7 / 9);
       const levelBonus = 1 + (globalLevel - 1) * 0.015;
       // Gold Rush gets a score boost since the board is loaded with multipliers
-      const archetypeBoost = effectiveArchetype === 'goldRush' ? 1.4 : 1;
+      const archetypeBoost = effectiveArchetype === 'forge' ? 1.4 : 1;
       const worldCap = Math.round(1500 + (world - 1) * (1500 / 9));
       const target = Math.min(
         Math.round(estimatedWordsInTime * AVERAGE_WORD_SCORE * difficultyFactor * levelBonus * archetypeBoost),
@@ -496,7 +521,7 @@ export function generateObjectives(
       // Standard / Cascade: find N words
       const baseWords = world <= 1 ? 5 : world <= 2 ? 6 : world <= 3 ? 7 : 8;
       // Cascade gets a higher word count (chains help find more words)
-      const archetypeBoost = effectiveArchetype === 'cascade' ? 1.2 : 1;
+      const archetypeBoost = effectiveArchetype === 'blast' ? 1.2 : 1;
       let target = Math.min(
         Math.round((baseWords + Math.floor(globalLevel / 5) * 2) * archetypeBoost),
         25
@@ -816,9 +841,9 @@ export function validateLevelConfig(config: LevelConfig): ValidationResult {
     errors.push('Invalid grid size: must be 4, 5, 6, or 7');
   }
 
-  // Validate timer
-  if (config.timerSeconds <= 0) {
-    errors.push('Invalid timer: must be positive');
+  // Validate timer — 0 is allowed for non-timer archetypes (blast = move-limited, hunt = life-based)
+  if (config.timerSeconds < 0) {
+    errors.push('Invalid timer: must be >= 0');
   }
 
   // Validate objectives

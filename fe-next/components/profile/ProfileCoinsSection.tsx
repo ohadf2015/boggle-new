@@ -28,9 +28,9 @@ export function ProfileCoinsSection({
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay }}
       className={cn(
-        'rounded-3xl mb-4 border-3 border-neo-yellow shadow-hard-yellow',
+        'rounded-[28px] mb-4 border border-white/[0.08]',
         compact ? 'p-4' : 'p-6',
-        'bg-slate-800/80'
+        'bg-slate-800/40 backdrop-blur-sm'
       )}
     >
       <div className="flex items-center justify-between mb-4">
@@ -39,10 +39,10 @@ export function ProfileCoinsSection({
           compact ? 'text-lg' : 'text-xl',
           'text-white'
         )}>
-          <span className="text-neo-yellow">💰</span>
+          <span className="w-8 h-8 rounded-lg bg-neo-lime/10 flex items-center justify-center text-sm">💰</span>
           {t('coins.title')}
         </h2>
-        <div className="flex items-center gap-2 bg-black p-3 rounded-xl border-3 border-neo-black shadow-hard-sm">
+        <div className="flex items-center gap-2 bg-white/[0.04] p-2.5 rounded-xl">
           <CoinBalance coins={profile?.total_coins || 0} size={compact ? 'sm' : 'md'} />
         </div>
       </div>
@@ -55,7 +55,7 @@ export function ProfileCoinsSection({
 
       {/* Coin earning breakdown */}
       <div className={cn(
-        'grid gap-3 p-3 rounded-xl bg-black/40 border-3 border-neo-black',
+        'grid gap-3 p-3 rounded-xl bg-white/[0.04]',
         compact ? 'grid-cols-2' : 'grid-cols-2 sm:grid-cols-4'
       )}>
         <div className="text-center p-2">
@@ -93,11 +93,11 @@ export function ProfileCoinsSection({
       </div>
 
       {/* Lifetime stats */}
-      <div className="mt-3 p-3 bg-black/40 rounded-xl border-3 border-neo-black flex items-center justify-between">
-        <span className="text-xs font-bold uppercase tracking-widest text-gray-400">
+      <div className="mt-3 p-3 bg-white/[0.04] rounded-xl flex items-center justify-between">
+        <span className="text-xs font-bold uppercase tracking-widest text-gray-500">
           {t('coins.lifetimeEarned')}
         </span>
-        <span className="font-black text-neo-yellow text-lg">
+        <span className="font-black text-neo-lime text-lg">
           {(profile?.lifetime_coins_earned || 0).toLocaleString()} 💰
         </span>
       </div>

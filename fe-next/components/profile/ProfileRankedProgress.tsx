@@ -29,15 +29,17 @@ export function ProfileRankedProgress({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay }}
-      className="rounded-3xl p-6 mb-4 bg-slate-800/80 border-3 border-neo-pink shadow-hard-pink"
+      className="rounded-[28px] p-6 mb-4 bg-slate-800/40 backdrop-blur-sm border border-neo-pink/20"
     >
       <h2 className="text-xl font-black font-neo-display uppercase mb-4 flex items-center gap-2 text-white">
-        <Trophy className="text-neo-yellow" />
+        <span className="w-8 h-8 rounded-lg bg-neo-pink/10 flex items-center justify-center">
+          <Trophy className="w-4 h-4 text-neo-pink" />
+        </span>
         {t('ranked.title')}
       </h2>
 
       {canPlayRanked ? (
-        <div className="flex items-center gap-3 p-4 rounded-xl bg-green-900/30 border-3 border-green-500/50">
+        <div className="flex items-center gap-3 p-4 rounded-xl bg-green-500/10 border border-green-500/20">
           <span className="text-3xl">🏆</span>
           <div>
             <p className="font-black text-green-400 uppercase">
@@ -58,7 +60,7 @@ export function ProfileRankedProgress({
               {gamesUntilRanked} {t('ranked.toGo')}
             </span>
           </div>
-          <div className="h-3 rounded-full overflow-hidden bg-black border-3 border-neo-black">
+          <div className="h-2 rounded-full overflow-hidden bg-white/[0.06]">
             <div
               className="h-full bg-linear-to-r from-neo-pink to-neo-cyan transition-all duration-500"
               style={{ width: `${Math.min(100, ((profile?.casual_games || 0) / 10) * 100)}%` }}

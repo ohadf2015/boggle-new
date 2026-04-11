@@ -302,10 +302,8 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
     setUsername(quickPlayUsername);
 
     // Create room immediately with host playing (dual mode).
-    // quickPlay: true tells useMultiplayerJoin to auto-emit `startGame` with
-    // a random mode as soon as the host's `joined` event arrives, so the user
-    // skips the lobby entirely. Bots get auto-filled by the backend's
-    // autoAddBotsForSoloPlayer service.
+    // quickPlay flag creates the room and drops the user into the lobby
+    // where they can invite friends and start when ready.
     handleJoin(true, defaultLanguage, gameCode, roomName, quickPlayUsername, { quickPlay: true });
 
     // Show CrazyGames invite button so host can invite friends
@@ -344,7 +342,16 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
     if (autoCreate) return;
     if (roomsLoading) return;
 
+    // Only auto-join on the very first visit this session — not after quitting a room
+    try {
+      if (sessionStorage.getItem('boggle_cg_auto_joined')) return;
+    } catch { /* storage blocked */ }
+
     cgAutoJoinHandledRef.current = true;
+
+    try {
+      sessionStorage.setItem('boggle_cg_auto_joined', '1');
+    } catch { /* storage blocked */ }
 
     const joinableRoom = activeRooms.find(
       (r) => r.gameState === 'waiting' && r.playerCount < (r.maxPlayers || 8),

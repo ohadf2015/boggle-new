@@ -163,7 +163,6 @@ Sentry.init({
     /Failed to check adblock/i,
     /Error checking CrazyGames user/i,
     /Failed to load CrazyGames friends/i,
-    /Failed to get Xsolla token/i,
     // Bots hitting routes with invalid locale params — not a bug
     /Incorrect locale information provided/i,
     // Clipboard writeText when document not focused — browser restriction, not a bug
@@ -255,6 +254,16 @@ Sentry.init({
     /addColorStop.*could not be parsed as a color/i,
     // PixiJS sprite lifecycle race — animation rAF fires after sprite destroyed on unmount
     /Cannot set properties of null \(setting '(x|y|width|height|alpha|scale|rotation)'\)/i,
+    // Supabase auth lock stolen — concurrent requests race for navigator lock (JAVASCRIPT-NEXTJS-10W)
+    /Lock.*was released because another request stole it/i,
+    /Lock broken by another request with the 'steal' option/i,
+    // Safari WebView messageHandlers — not our code (JAVASCRIPT-NEXTJS-119, 118)
+    /window\.webkit\.messageHandlers/i,
+    // HTML5 SDK requestInProgress — third-party SDK console log (JAVASCRIPT-NEXTJS-117)
+    /requestInProgress/i,
+    // shadowroot/route-announcer — browser extension noise (JAVASCRIPT-NEXTJS-116)
+    /shadowroot.*NEXT-ROUTE-ANNOUNCER/i,
+    /no txrsid/i,
   ],
 
   denyUrls: [

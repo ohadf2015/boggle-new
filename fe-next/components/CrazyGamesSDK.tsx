@@ -12,11 +12,10 @@ import {
   type SystemInfo,
   type FriendsListResponse,
   type CrazyGamesSettings,
-  type XsollaOrder,
 } from '@/types/crazygames';
 
 // Re-export types for consumers that import from this file
-export type { BannerSize, InviteLinkParams, SystemInfo, CrazyGamesFriend, FriendsListResponse, CrazyGamesSettings, XsollaOrder } from '@/types/crazygames';
+export type { BannerSize, InviteLinkParams, SystemInfo, CrazyGamesFriend, FriendsListResponse, CrazyGamesSettings } from '@/types/crazygames';
 
 const CrazyGamesContext = createContext<CrazyGamesContextType | null>(null);
 
@@ -332,15 +331,6 @@ export function CrazyGamesProvider({ children }: { children: ReactNode }) {
     if (isAvailable && window.CrazyGames?.SDK) await window.CrazyGames.SDK.user.showAccountLinkPrompt();
   }, [isAvailable]);
 
-  // In-game purchases (Xsolla)
-  const getXsollaUserToken = useCallback(async (): Promise<string | null> => {
-    if (isAvailable && window.CrazyGames?.SDK?.payment) return window.CrazyGames.SDK.payment.getXsollaUserToken();
-    return null;
-  }, [isAvailable]);
-
-  const trackOrder = useCallback(async (provider: string, order: XsollaOrder): Promise<void> => {
-    if (isAvailable && window.CrazyGames?.SDK?.payment) await window.CrazyGames.SDK.payment.trackOrder(provider, order);
-  }, [isAvailable]);
 
   // Leaderboard
   const submitLeaderboardScore = useCallback(async (score: number): Promise<void> => {
@@ -368,7 +358,6 @@ export function CrazyGamesProvider({ children }: { children: ReactNode }) {
     getSettings, addSettingsChangeListener, removeSettingsChangeListener,
     addAuthListener, removeAuthListener,
     getUserToken, listFriends, showAccountLinkPrompt,
-    getXsollaUserToken, trackOrder,
     submitLeaderboardScore,
   };
 

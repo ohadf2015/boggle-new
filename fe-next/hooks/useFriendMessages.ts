@@ -61,7 +61,7 @@ export function useFriendMessages(friendId?: string): UseFriendMessagesReturn {
    */
   const refreshThreads = useCallback(async () => {
     try {
-      const fetchedThreads = await friendMessages.getThreads();
+      const fetchedThreads = await friendMessages.getThreads(user?.id);
       setThreads(fetchedThreads);
 
       // Calculate total unread count
@@ -70,7 +70,7 @@ export function useFriendMessages(friendId?: string): UseFriendMessagesReturn {
     } catch (err) {
       logger.error('USE_FRIEND_MESSAGES', `Error refreshing threads: ${(err as Error).message}`);
     }
-  }, []);
+  }, [user?.id]);
 
   /**
    * Load messages for a specific friend
@@ -85,7 +85,8 @@ export function useFriendMessages(friendId?: string): UseFriendMessagesReturn {
       const { messages: fetchedMessages, hasMore } = await friendMessages.getConversation(
         targetFriendId,
         50,
-        before
+        before,
+        user?.id
       );
 
       // Messages come newest-first from DB — reverse to show oldest at top
@@ -104,7 +105,7 @@ export function useFriendMessages(friendId?: string): UseFriendMessagesReturn {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [user?.id]);
 
   /**
    * Send a message (optimistic UI update)
@@ -459,7 +460,7 @@ export function useFriendMessages(friendId?: string): UseFriendMessagesReturn {
   useEffect(() => {
     const loadChallenges = async () => {
       try {
-        const challenges = await friendMessages.getPendingChallenges();
+        const challenges = await friendMessages.getPendingChallenges(user?.id);
         setPendingChallenges(challenges);
       } catch (err) {
         logger.error('USE_FRIEND_MESSAGES', `Error loading challenges: ${(err as Error).message}`);
@@ -471,7 +472,7 @@ export function useFriendMessages(friendId?: string): UseFriendMessagesReturn {
     // Poll every 60 seconds
     const interval = setInterval(loadChallenges, 60000);
     return () => clearInterval(interval);
-  }, []);
+  }, [user?.id]);
 
   return {
     threads,

@@ -406,24 +406,27 @@ export function QuestHub() {
     useDailyMissions();
   const { isComplete: weeklyComplete } = useWeeklyQuest();
   const { addCoins } = useCoinsFromContext();
-  const hasShownAllCompleteToast = useRef(false);
+  const prevAllCompleteRef = useRef(false);
 
-  // Show "All Quests Complete" celebration when both daily + weekly are done
+  // Show "All Quests Complete" celebration when both daily + weekly TRANSITION to done.
+  // Only fires on false→true transition, not on mount when already complete.
   const allComplete = isGrandSlam && weeklyComplete;
   useEffect(() => {
-    if (allComplete && !loading && !hasShownAllCompleteToast.current) {
-      hasShownAllCompleteToast.current = true;
-      // Actually grant the gold reward
-      addCoins(200, 'all_quests_complete');
-      import('./QuestCompletionToast').then(({ showQuestCompletionToast }) => {
-        showQuestCompletionToast({
-          questName: '',
-          xpReward: 250,
-          goldReward: 200,
-          isAllComplete: true,
-          t,
+    if (!loading) {
+      if (allComplete && !prevAllCompleteRef.current) {
+        // Actually grant the gold reward
+        addCoins(200, 'all_quests_complete');
+        import('./QuestCompletionToast').then(({ showQuestCompletionToast }) => {
+          showQuestCompletionToast({
+            questName: '',
+            xpReward: 250,
+            goldReward: 200,
+            isAllComplete: true,
+            t,
+          });
         });
-      });
+      }
+      prevAllCompleteRef.current = allComplete;
     }
   }, [allComplete, loading, t, addCoins]);
 

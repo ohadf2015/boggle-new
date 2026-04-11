@@ -14,14 +14,13 @@ import type { LevelArchetype } from '@/types/adventure';
 
 describe('Level Archetypes', () => {
   describe('ARCHETYPE_CONFIGS', () => {
-    it('should define configs for all 7 archetypes', () => {
+    it('should define configs for all 6 archetypes', () => {
       const archetypes: LevelArchetype[] = [
-        'standard',
-        'excavation',
-        'goldRush',
-        'puzzle',
-        'survival',
-        'cascade',
+        'classic',
+        'blast',
+        'hunt',
+        'wheel',
+        'forge',
         'boss',
       ];
       for (const a of archetypes) {
@@ -29,36 +28,38 @@ describe('Level Archetypes', () => {
       }
     });
 
-    it('excavation should have high ice tile count and clearIce primary', () => {
-      const config = ARCHETYPE_CONFIGS.excavation;
+    it('blast should have high ice tile count and clearIce primary', () => {
+      const config = ARCHETYPE_CONFIGS.blast;
       expect(config.primaryObjective).toBe('clearIce');
       expect(config.tileModifiers.iceMultiplier).toBeGreaterThan(1);
     });
 
-    it('goldRush should have short timer and gold-heavy tiles', () => {
-      const config = ARCHETYPE_CONFIGS.goldRush;
-      expect(config.timerMultiplier).toBeLessThan(1);
+    it('forge should have high gold tile count and scoreTarget primary', () => {
+      const config = ARCHETYPE_CONFIGS.forge;
       expect(config.tileModifiers.goldMultiplier).toBeGreaterThan(1);
       expect(config.primaryObjective).toBe('scoreTarget');
     });
 
-    it('puzzle should have longWords primary and no ice', () => {
-      const config = ARCHETYPE_CONFIGS.puzzle;
-      expect(config.primaryObjective).toBe('longWords');
+    it('hunt should have no ice/bomb tiles and wordCount primary', () => {
+      const config = ARCHETYPE_CONFIGS.hunt;
+      expect(config.primaryObjective).toBe('wordCount');
       expect(config.tileModifiers.iceMultiplier).toBe(0);
     });
 
-    it('survival should have fast timer drain and time tile emphasis', () => {
-      const config = ARCHETYPE_CONFIGS.survival;
+    it('wheel should have shorter timer and wordCount primary', () => {
+      const config = ARCHETYPE_CONFIGS.wheel;
       expect(config.timerMultiplier).toBeLessThan(1);
-      expect(config.tileModifiers.timeMultiplier).toBeGreaterThan(1);
-      expect(config.primaryObjective).toBe('timeBonus');
+      expect(config.primaryObjective).toBe('wordCount');
     });
 
-    it('cascade should have bomb tile emphasis and wordCount primary', () => {
-      const config = ARCHETYPE_CONFIGS.cascade;
-      expect(config.tileModifiers.bombMultiplier).toBeGreaterThan(1);
-      expect(config.primaryObjective).toBe('wordCount');
+    it('blast should have 0 timerMultiplier (move-limited mode)', () => {
+      const config = ARCHETYPE_CONFIGS.blast;
+      expect(config.timerMultiplier).toBe(0);
+    });
+
+    it('hunt should have 0 timerMultiplier (life-based mode)', () => {
+      const config = ARCHETYPE_CONFIGS.hunt;
+      expect(config.timerMultiplier).toBe(0);
     });
 
     it('boss should use defeatBoss primary', () => {
@@ -66,8 +67,8 @@ describe('Level Archetypes', () => {
       expect(config.primaryObjective).toBe('defeatBoss');
     });
 
-    it('standard should have neutral multipliers', () => {
-      const config = ARCHETYPE_CONFIGS.standard;
+    it('classic should have neutral multipliers', () => {
+      const config = ARCHETYPE_CONFIGS.classic;
       expect(config.timerMultiplier).toBe(1);
     });
   });
@@ -89,10 +90,10 @@ describe('Level Archetypes', () => {
       }
     });
 
-    it('World 1 should be mostly standard (tutorial)', () => {
+    it('World 1 should be mostly classic (tutorial)', () => {
       const w1 = WORLD_ARCHETYPE_MAPS[1];
-      const standardCount = w1.filter((a) => a === 'standard').length;
-      expect(standardCount).toBeGreaterThanOrEqual(4);
+      const classicCount = w1.filter((a) => a === 'classic').length;
+      expect(classicCount).toBeGreaterThanOrEqual(4);
     });
 
     it('later worlds should have more archetype variety', () => {
@@ -115,7 +116,7 @@ describe('Level Archetypes', () => {
   describe('getArchetypeForLevel', () => {
     it('should return the archetype for a given world and level', () => {
       const archetype = getArchetypeForLevel(1, 1);
-      expect(archetype).toBe('standard');
+      expect(archetype).toBe('classic');
     });
 
     it('should return boss for level 7 of any world', () => {
@@ -137,7 +138,7 @@ describe('Level Archetypes', () => {
 
   describe('getArchetypeConfig', () => {
     it('should return full config for a valid archetype', () => {
-      const config = getArchetypeConfig('excavation');
+      const config = getArchetypeConfig('blast');
       expect(config.primaryObjective).toBe('clearIce');
       expect(config.tileModifiers).toBeDefined();
       expect(config.timerMultiplier).toBeDefined();
@@ -145,7 +146,7 @@ describe('Level Archetypes', () => {
 
     it('should return config for all archetype types', () => {
       const types: LevelArchetype[] = [
-        'standard', 'excavation', 'goldRush', 'puzzle', 'survival', 'cascade', 'boss',
+        'classic', 'blast', 'hunt', 'wheel', 'forge', 'boss',
       ];
       for (const t of types) {
         expect(getArchetypeConfig(t)).toBeDefined();

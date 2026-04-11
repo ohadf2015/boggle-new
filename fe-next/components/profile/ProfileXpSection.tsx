@@ -54,9 +54,9 @@ export function ProfileXpSection({
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay }}
       className={cn(
-        'rounded-3xl mb-4 border-3 border-neo-cyan shadow-hard-cyan',
+        'rounded-[28px] mb-4 border border-white/[0.08]',
         compact ? 'p-4' : 'p-6',
-        'bg-slate-800/80'
+        'bg-slate-800/40 backdrop-blur-sm'
       )}
     >
       <div className="flex items-center justify-between mb-4">
@@ -65,11 +65,11 @@ export function ProfileXpSection({
           compact ? 'text-lg' : 'text-xl',
           'text-white'
         )}>
-          <span className="text-neo-cyan">⚡</span>
+          <span className="w-8 h-8 rounded-lg bg-neo-cyan/10 flex items-center justify-center text-neo-cyan text-sm">⚡</span>
           {t('xp.title')}
         </h2>
-        <div className="bg-neo-yellow rounded-lg border-3 border-neo-black shadow-hard-sm px-3 py-1 rotate-2">
-          <span className="text-sm font-black text-neo-black">
+        <div className="bg-neo-cyan/10 rounded-xl px-3 py-1">
+          <span className="text-sm font-black text-neo-cyan">
             {t('xp.level')} {level}
           </span>
         </div>
@@ -85,8 +85,8 @@ export function ProfileXpSection({
       />
 
       {!compact && (
-        <div className="mt-4 p-3 bg-black/40 rounded-xl border-3 border-neo-black flex justify-between items-center">
-          <span className="text-xs font-bold uppercase tracking-widest text-gray-300">
+        <div className="mt-4 p-3 bg-white/[0.04] rounded-xl flex justify-between items-center">
+          <span className="text-xs font-bold uppercase tracking-widest text-gray-500">
             {t('xp.totalXpEarned')}
           </span>
           <span className="text-lg font-black text-neo-cyan">

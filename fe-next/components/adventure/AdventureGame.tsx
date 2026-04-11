@@ -24,6 +24,7 @@ import { useFlashChallenge } from '@/hooks/useFlashChallenge';
 import { useDailyQuests } from '@/hooks/useDailyQuests';
 import { useChapterQuests } from '@/hooks/useChapterQuests';
 import { getChapterNumber } from '@/lib/adventure/questConfig';
+import { getWorldConfig } from '@/lib/adventure/levelConfig';
 import { getMasteryAura } from '@/lib/adventure/powerGrowth';
 import { applyGemDetectorBoost, LEVELS_PER_WORLD } from '@/lib/adventure';
 import { getStoryBeat } from '@/lib/adventure/storyConfig';
@@ -36,6 +37,9 @@ import MechanicIndicator from './MechanicIndicator';
 import RetryAssistModal from './RetryAssistModal';
 import { getNearMissMessages } from '@/lib/adventure/nearMiss';
 import { AdventureTutorial, hasSeenTutorial } from './AdventureTutorial';
+import { AdventureUpgradeHUD } from './AdventureUpgradeHUD';
+import AdventureThemeBanner from './AdventureThemeBanner';
+import { AdventureToast } from './AdventureToast';
 import { useAdventureGameCallbacks } from './hooks/useAdventureGameCallbacks';
 import { useAdventureQuestTracking } from './hooks/useAdventureQuestTracking';
 import { useAdventureGridInteraction } from './hooks/useAdventureGridInteraction';
@@ -102,7 +106,7 @@ const AdventureGame = memo<AdventureGameProps>(
       playWordAcceptedSound, playComboSound, setGameActive, playCountdownBeep,
       playLevelUpSound, playBossEntranceSound, playBossHitSound, playBossPhaseChangeSound,
       playBossDefeatSound, playTimerUrgentSound,
-      playCoinCollectSound, playQuestCompleteSound, playBoardShuffleSound,
+      playCoinCollectSound, playQuestCompleteSound: _playQuestCompleteSound, playBoardShuffleSound,
       playBossDefeatLegendarySound, playLegendaryWordSound,
       playFlashChallengeSound,
     } = useSoundEffects();
@@ -114,6 +118,7 @@ const AdventureGame = memo<AdventureGameProps>(
       resetGame, markCascadeComplete, isCascading, cascadePhase, addTime,
       activateFreeze, isFrozen, freezeUsed, useShuffle: shuffleTiles, shufflesRemaining, updateObjective,
       effectiveComboTimeout,
+      upgradeState, upgradeTriggered, themedWordsFound, lastWordWasThemed,
     } = useAdventureGame({
       levelConfig: boostedLevelConfig, initialGrid,
       comboDecayMultiplier: init.upgradeEffects.comboDecayMultiplier * init.runeEffects.comboDecay,
@@ -738,6 +743,31 @@ const AdventureGame = memo<AdventureGameProps>(
             />
           }
         />
+        <AdventureToast
+          upgradeTriggered={upgradeTriggered}
+          lastWordWasThemed={lastWordWasThemed}
+          themedBonusMultiplier={levelConfig.themedBonusMultiplier}
+        />
+        {upgradeState && Object.keys(upgradeState).length > 0 && (
+          <div className="fixed top-2 right-16 z-10">
+            <AdventureUpgradeHUD
+              upgradeState={upgradeState}
+              upgradeTriggered={upgradeTriggered}
+            />
+          </div>
+        )}
+        {levelConfig.themeDisplayKey && levelConfig.gameModeDisplayKey && (
+          <div className="fixed top-16 left-1/2 -translate-x-1/2 z-10">
+            <AdventureThemeBanner
+              themeDisplayKey={levelConfig.themeDisplayKey}
+              gameModeDisplayKey={levelConfig.gameModeDisplayKey}
+              themedBonusMultiplier={levelConfig.themedBonusMultiplier ?? 1}
+              themedWordCount={levelConfig.themedWordCount ?? 0}
+              themedWordsFound={themedWordsFound.length}
+              worldColorPrimary={getWorldConfig(levelConfig.world).colorPrimary}
+            />
+          </div>
+        )}
         <MechanicBonusToast
           bonus={wordSubmit.mechanicBonus}
           onDismiss={wordSubmit.dismissMechanicBonus}

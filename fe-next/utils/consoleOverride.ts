@@ -80,7 +80,15 @@ const IGNORED_ERROR_PATTERNS = [
   /Failed to check adblock/i,
   /Error checking CrazyGames user/i,
   /Failed to load CrazyGames friends/i,
-  /Failed to get Xsolla token/i,
+  // Supabase auth lock contention — concurrent requests steal navigator lock (JAVASCRIPT-NEXTJS-10W, 10Q, XR)
+  /Lock.*released because another request stole it/i,
+  /Lock broken by another request/i,
+  // Cross-tab session refresh error — downstream of lock contention (JAVASCRIPT-NEXTJS-11A)
+  /Error handling cross-tab session refresh/i,
+  // HTML5 SDK requestInProgress — third-party SDK noise (JAVASCRIPT-NEXTJS-117)
+  /requestInProgress/i,
+  // shadowroot/route-announcer — browser extension noise (JAVASCRIPT-NEXTJS-116)
+  /shadowroot.*NEXT-ROUTE-ANNOUNCER/i,
 ] as const;
 
 // Store original console methods

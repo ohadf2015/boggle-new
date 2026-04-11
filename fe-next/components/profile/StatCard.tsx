@@ -5,33 +5,29 @@ import { cn } from '@/lib/utils';
 
 export type StatColor = 'cyan' | 'pink' | 'lime' | 'purple';
 
-const colorMap: Record<StatColor, { border: string; shadow: string; text: string; iconBg: string; bar: string }> = {
+const colorMap: Record<StatColor, { text: string; iconBg: string; iconText: string; bar: string }> = {
   cyan: {
-    border: 'border-neo-cyan',
-    shadow: 'shadow-hard-cyan',
     text: 'text-neo-cyan',
-    iconBg: 'bg-neo-cyan',
+    iconBg: 'bg-neo-cyan/10',
+    iconText: 'text-neo-cyan',
     bar: 'bg-neo-cyan',
   },
   pink: {
-    border: 'border-neo-pink',
-    shadow: 'shadow-hard-pink',
     text: 'text-neo-pink',
-    iconBg: 'bg-neo-pink',
+    iconBg: 'bg-neo-pink/10',
+    iconText: 'text-neo-pink',
     bar: 'bg-neo-pink',
   },
   lime: {
-    border: 'border-neo-lime',
-    shadow: 'shadow-hard-lime',
     text: 'text-neo-lime',
-    iconBg: 'bg-neo-lime',
+    iconBg: 'bg-neo-lime/10',
+    iconText: 'text-neo-lime',
     bar: 'bg-neo-lime',
   },
   purple: {
-    border: 'border-neo-purple',
-    shadow: 'shadow-hard-purple',
     text: 'text-neo-purple',
-    iconBg: 'bg-neo-purple',
+    iconBg: 'bg-neo-purple/10',
+    iconText: 'text-neo-purple',
     bar: 'bg-neo-purple',
   },
 };
@@ -51,26 +47,23 @@ export function StatCard({ icon, label, value, isDarkMode, highlight = false, co
   const c = color ? colorMap[color] : null;
 
   return (
-    <div className={cn(
-      'bg-slate-800/80 p-6 rounded-2xl border-3',
-      c ? `${c.border} ${c.shadow}` : 'border-slate-700'
-    )}>
+    <div className="bg-slate-800/40 backdrop-blur-sm p-5 rounded-[20px] border border-white/[0.08]">
       {/* Icon box */}
       <div className={cn(
-        'w-12 h-12 rounded-lg flex items-center justify-center text-xl mb-3',
-        c ? `${c.iconBg} text-neo-black` : 'bg-slate-700 text-gray-400'
+        'w-10 h-10 rounded-xl flex items-center justify-center text-lg mb-3',
+        c ? `${c.iconBg} ${c.iconText}` : 'bg-slate-700/50 text-gray-400'
       )}>
         {icon}
       </div>
 
       {/* Label */}
-      <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">
+      <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-1">
         {label}
       </p>
 
       {/* Value */}
       <p className={cn(
-        'text-3xl font-black',
+        'text-2xl font-black',
         c ? c.text : 'text-white'
       )}>
         {value}
@@ -78,7 +71,7 @@ export function StatCard({ icon, label, value, isDarkMode, highlight = false, co
 
       {/* Decorative progress bar */}
       {progress !== undefined && (
-        <div className="mt-3 h-1.5 bg-slate-700 rounded-full overflow-hidden">
+        <div className="mt-3 h-1 bg-white/[0.06] rounded-full overflow-hidden">
           <div
             className={cn('h-full rounded-full transition-all', c ? c.bar : 'bg-neo-cyan')}
             style={{ width: `${Math.min(100, Math.max(0, progress))}%` }}

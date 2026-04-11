@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import dynamic from 'next/dynamic';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { PageLoader } from '@/components/ui/PageLoader';
@@ -20,6 +21,14 @@ import {
   getDailyStreak,
 } from '@/utils/dailyChallenge';
 import type { Language } from '@/types';
+import { useSoundEffects } from '@/contexts/SoundEffectsContext';
+import type { WordWheelEffect } from './WordWheelEffectsCanvas';
+
+// Lazy-load PixiJS effects canvas (no SSR)
+const WordWheelEffectsCanvas = dynamic(
+  () => import('./WordWheelEffectsCanvas'),
+  { ssr: false },
+);
 
 // ==========================================
 // Types
@@ -35,12 +44,30 @@ const WORD_WHEEL_DURATION = 120; // 2 minutes
 
 const WordWheelChallenge: React.FC = () => {
   const { t, language } = useLanguage();
+  const { setGameActive } = useSoundEffects();
 
   const [phase, setPhase] = useState<WordWheelPhase>('loading');
   const [puzzle, setPuzzle] = useState<WordWheelPuzzle | null>(null);
   const [gameResult, setGameResult] = useState<WordWheelGameResult | null>(null);
   const [puzzleNumber, setPuzzleNumber] = useState(0);
   const [hasPlayedWH, setHasPlayedWH] = useState(false);
+  const [effects, setEffects] = useState<WordWheelEffect[]>([]);
+  const [canvasSize, setCanvasSize] = useState({ width: 400, height: 600 });
+
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Measure container for effects canvas
+  useEffect(() => {
+    const measure = () => {
+      if (containerRef.current) {
+        const rect = containerRef.current.getBoundingClientRect();
+        setCanvasSize({ width: Math.floor(rect.width), height: Math.floor(rect.height) });
+      }
+    };
+    measure();
+    window.addEventListener('resize', measure);
+    return () => window.removeEventListener('resize', measure);
+  }, []);
 
   // Initialize puzzle
   useEffect(() => {
@@ -50,7 +77,6 @@ const WordWheelChallenge: React.FC = () => {
 
     const gameLang = language as Language;
 
-    // Check if already played
     if (hasPlayedWordWheelToday(gameLang)) {
       const stored = getTodaysWordWheelResult(gameLang);
       if (stored) {
@@ -70,7 +96,6 @@ const WordWheelChallenge: React.FC = () => {
     setHasPlayedWH(hasPlayedWordHuntToday(gameLang));
   }, [language]);
 
-  // Server-side dictionary validation via existing /api/validate-word
   const handleValidateWord = useCallback(async (word: string): Promise<boolean> => {
     try {
       const res = await fetch('/api/validate-word', {
@@ -82,16 +107,17 @@ const WordWheelChallenge: React.FC = () => {
       const data = await res.json();
       return data.isValid === true;
     } catch {
-      // Fallback: accept word if server is unreachable (offline play)
       return word.length >= 3;
     }
   }, [language]);
 
   const handleStart = useCallback(() => {
+    setGameActive(true);
     setPhase('playing');
-  }, []);
+  }, [setGameActive]);
 
   const handleComplete = useCallback((result: WordWheelGameResult) => {
+    setGameActive(false);
     setGameResult(result);
 
     const gameLang = language as Language;
@@ -104,7 +130,7 @@ const WordWheelChallenge: React.FC = () => {
       language: gameLang,
       centerLetter: puzzle?.centerLetter || '',
       wordsFound: result.wordsFound,
-      totalPossible: 0, // Unknown without server
+      totalPossible: 0,
       score: result.score,
       timeSeconds: result.timeSeconds,
       streakDays: streak.currentStreak,
@@ -112,10 +138,18 @@ const WordWheelChallenge: React.FC = () => {
     });
 
     setPhase('completed');
-  }, [language, puzzle, puzzleNumber]);
+  }, [language, puzzle, puzzleNumber, setGameActive]);
+
+  const handleEffect = useCallback((effect: WordWheelEffect) => {
+    setEffects(prev => [...prev, effect]);
+  }, []);
+
+  const handleEffectsConsumed = useCallback(() => {
+    setEffects([]);
+  }, []);
 
   // ==========================================
-  // Render phases
+  // Render
   // ==========================================
 
   if (phase === 'loading') {
@@ -127,7 +161,17 @@ const WordWheelChallenge: React.FC = () => {
   }
 
   return (
-    <div className="flex-1 flex flex-col bg-neo-navy min-h-screen">
+    <div ref={containerRef} className="relative flex-1 flex flex-col bg-neo-navy min-h-screen overflow-hidden">
+      {/* PixiJS Effects Layer */}
+      {phase === 'playing' && (
+        <WordWheelEffectsCanvas
+          width={canvasSize.width}
+          height={canvasSize.height}
+          effects={effects}
+          onEffectsConsumed={handleEffectsConsumed}
+        />
+      )}
+
       <AnimatePresence mode="wait">
         {/* Ready screen */}
         {phase === 'ready' && puzzle && (
@@ -148,38 +192,55 @@ const WordWheelChallenge: React.FC = () => {
             </div>
 
             <p className="text-neo-cream/80 text-center max-w-sm">
-              {t('wordWheel.description')}
+              {t('wordWheel.tapDescription')}
             </p>
 
-            {/* Preview wheel (small) */}
-            <div className="relative w-36 h-36 flex items-center justify-center my-4">
-              <div className="w-12 h-12 rounded-full border-3 border-neo-black bg-neo-lime flex items-center justify-center font-neo-display font-black text-xl text-neo-black shadow-hard">
+            {/* Preview wheel */}
+            <div className="relative w-44 h-44 flex items-center justify-center my-4">
+              {/* Glow ring */}
+              <motion.div
+                className="absolute inset-0 rounded-full border-2 border-neo-lime/20"
+                style={{ boxShadow: '0 0 30px rgba(191,255,0,0.15)' }}
+                animate={{ opacity: [0.5, 1, 0.5] }}
+                transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+              />
+              <motion.div
+                className="w-16 h-16 rounded-full border-3 border-neo-black bg-neo-lime flex items-center justify-center font-neo-display font-black text-2xl text-neo-black shadow-[3px_3px_0px_black,0_0_20px_rgba(191,255,0,0.5)]"
+                animate={{ scale: [1, 1.08, 1] }}
+                transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+              >
                 {puzzle.centerLetter}
-              </div>
+              </motion.div>
               {puzzle.outerLetters.map((letter, i) => {
                 const angle = i * 45;
                 const rad = (angle * Math.PI) / 180;
-                const x = Math.sin(rad) * 52;
-                const y = -Math.cos(rad) * 52;
+                const x = Math.sin(rad) * 60;
+                const y = -Math.cos(rad) * 60;
                 return (
-                  <div
+                  <motion.div
                     key={`${letter}-${i}`}
-                    className="absolute w-9 h-9 rounded-full border-2 border-neo-black bg-neo-white flex items-center justify-center font-neo-display font-bold text-sm text-neo-navy shadow-hard-sm"
+                    className="absolute w-10 h-10 rounded-full border-2 border-neo-black bg-neo-white flex items-center justify-center font-neo-display font-bold text-sm text-neo-navy shadow-[2px_2px_0px_black,0_0_6px_rgba(191,255,0,0.12)]"
                     style={{ transform: `translate(${x}px, ${y}px)` }}
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ delay: i * 0.06, type: 'spring', stiffness: 400 }}
                   >
                     {letter}
-                  </div>
+                  </motion.div>
                 );
               })}
             </div>
 
-            <button
+            <motion.button
               type="button"
               onClick={handleStart}
-              className="px-8 py-3 rounded-neo border-3 border-neo-black bg-neo-lime text-neo-black font-neo-display font-black text-lg shadow-hard-lg hover:bg-neo-lime-light active:shadow-hard-pressed active:translate-x-px active:translate-y-px transition-all"
+              className="px-8 py-3 rounded-neo border-3 border-neo-black bg-gradient-to-r from-neo-lime to-neo-cyan text-neo-black font-neo-display font-black text-lg shadow-[3px_3px_0px_black,0_0_16px_rgba(191,255,0,0.3)] hover:shadow-[3px_3px_0px_black,0_0_22px_rgba(0,255,255,0.4)] active:shadow-hard-pressed active:translate-x-px active:translate-y-px transition-all"
+              whileTap={{ scale: 0.95 }}
+              animate={{ scale: [1, 1.03, 1] }}
+              transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
             >
               {t('daily.play')}
-            </button>
+            </motion.button>
           </motion.div>
         )}
 
@@ -187,16 +248,18 @@ const WordWheelChallenge: React.FC = () => {
         {phase === 'playing' && puzzle && (
           <motion.div
             key="playing"
-            className="flex-1 flex flex-col items-center justify-center py-6"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+            className="flex-1 flex flex-col items-center justify-center py-6 relative z-20"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.3 }}
           >
             <WordWheelGame
               puzzle={puzzle}
               duration={WORD_WHEEL_DURATION}
               onComplete={handleComplete}
               onValidateWord={handleValidateWord}
+              onEffect={handleEffect}
             />
           </motion.div>
         )}

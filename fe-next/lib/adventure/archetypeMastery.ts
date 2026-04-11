@@ -43,41 +43,35 @@ type BonusMap = Record<Exclude<ArchetypeMasteryTier, 'none'>, ArchetypeMasteryBo
  * Bonuses are cumulative — gold tier gets bronze + silver + gold.
  */
 export const ARCHETYPE_MASTERY_BONUSES: Record<MasterableArchetype, BonusMap> = {
-  standard: {
-    bronze:  { description: '+5% score on standard levels', bonusType: 'score', value: 0.05 },
-    silver:  { description: '+10% score on standard levels', bonusType: 'score', value: 0.10 },
-    gold:    { description: '+5s timer on standard levels', bonusType: 'timer', value: 5 },
-    diamond: { description: '+20% score on standard levels', bonusType: 'score', value: 0.20 },
+  classic: {
+    bronze:  { description: '+5% score on classic levels', bonusType: 'score', value: 0.05 },
+    silver:  { description: '+10% score on classic levels', bonusType: 'score', value: 0.10 },
+    gold:    { description: '+5s timer on classic levels', bonusType: 'timer', value: 5 },
+    diamond: { description: '+20% score on classic levels', bonusType: 'score', value: 0.20 },
   },
-  excavation: {
-    bronze:  { description: '+1 bomb tile on excavation levels', bonusType: 'tiles', value: 1 },
-    silver:  { description: '+10% score on excavation levels', bonusType: 'score', value: 0.10 },
-    gold:    { description: '+2 bomb tiles on excavation levels', bonusType: 'tiles', value: 2 },
-    diamond: { description: 'Start with 1 fewer ice layer on excavation', bonusType: 'objectives', value: 1 },
+  blast: {
+    bronze:  { description: '+1 bomb tile on blast levels', bonusType: 'tiles', value: 1 },
+    silver:  { description: '+2 bonus moves on blast levels', bonusType: 'objectives', value: 2 },
+    gold:    { description: '+2 bomb tiles on blast levels', bonusType: 'tiles', value: 2 },
+    diamond: { description: '+5 bonus moves on blast levels', bonusType: 'objectives', value: 5 },
   },
-  goldRush: {
-    bronze:  { description: '+5s timer on goldRush levels', bonusType: 'timer', value: 5 },
-    silver:  { description: '+1 gold tile on goldRush levels', bonusType: 'tiles', value: 1 },
-    gold:    { description: '+10s timer on goldRush levels', bonusType: 'timer', value: 10 },
-    diamond: { description: '+2 gold tiles on goldRush levels', bonusType: 'tiles', value: 2 },
+  hunt: {
+    bronze:  { description: '+10 life points on hunt levels', bonusType: 'objectives', value: 10 },
+    silver:  { description: '+10% score on hunt levels', bonusType: 'score', value: 0.10 },
+    gold:    { description: '+20 life points on hunt levels', bonusType: 'objectives', value: 20 },
+    diamond: { description: '+15% score on hunt levels', bonusType: 'score', value: 0.15 },
   },
-  puzzle: {
-    bronze:  { description: '+1 rainbow tile on puzzle levels', bonusType: 'tiles', value: 1 },
-    silver:  { description: '+5s timer on puzzle levels', bonusType: 'timer', value: 5 },
-    gold:    { description: '+2 rainbow tiles on puzzle levels', bonusType: 'tiles', value: 2 },
-    diamond: { description: 'Reduced long word threshold on puzzle', bonusType: 'objectives', value: 1 },
+  wheel: {
+    bronze:  { description: '+5s timer on wheel levels', bonusType: 'timer', value: 5 },
+    silver:  { description: '+1 gold tile on wheel levels', bonusType: 'tiles', value: 1 },
+    gold:    { description: '+10s timer on wheel levels', bonusType: 'timer', value: 10 },
+    diamond: { description: '+2 gold tiles on wheel levels', bonusType: 'tiles', value: 2 },
   },
-  survival: {
-    bronze:  { description: '+5s timer on survival levels', bonusType: 'timer', value: 5 },
-    silver:  { description: '+10s timer on survival levels', bonusType: 'timer', value: 10 },
-    gold:    { description: '+15% score on survival levels', bonusType: 'score', value: 0.15 },
-    diamond: { description: '+20s timer on survival levels', bonusType: 'timer', value: 20 },
-  },
-  cascade: {
-    bronze:  { description: '+1 chain tile on cascade levels', bonusType: 'tiles', value: 1 },
-    silver:  { description: '+10% score on cascade levels', bonusType: 'score', value: 0.10 },
-    gold:    { description: '+2 chain tiles on cascade levels', bonusType: 'tiles', value: 2 },
-    diamond: { description: '+15s timer on cascade levels', bonusType: 'timer', value: 15 },
+  forge: {
+    bronze:  { description: '+1 gold tile on forge levels', bonusType: 'tiles', value: 1 },
+    silver:  { description: '+10% score on forge levels', bonusType: 'score', value: 0.10 },
+    gold:    { description: '+2 gold tiles on forge levels', bonusType: 'tiles', value: 2 },
+    diamond: { description: '+15s timer on forge levels', bonusType: 'timer', value: 15 },
   },
 };
 

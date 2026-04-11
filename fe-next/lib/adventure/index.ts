@@ -69,10 +69,30 @@ export {
 export {
   generateAdventureGrid,
   getLevelSeed,
+  seedThemedLetters,
   VOWELS,
   COMMON_CONSONANTS,
   RARE_CONSONANTS,
 } from './gridGenerator';
+
+// Themed word pools for adventure worlds
+export {
+  getThemedWords,
+  isThemedWord,
+  getThemeBonusMultiplier,
+  getThemeDisplayKey,
+  WORLD_THEMED_WORDS,
+  type WorldThemeConfig,
+} from './themedWords';
+
+// Upgrade visual effects
+export {
+  getUpgradeVisualEffect,
+  getBoardVisualUpgrades,
+  getUpgradeIntensity,
+  getActiveUpgradeIndicators,
+  type UpgradeVisualEffect,
+} from './upgradeEffects';
 
 // Entry timing constants (DEBT-01 optimization)
 export {

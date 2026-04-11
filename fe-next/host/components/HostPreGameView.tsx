@@ -2,15 +2,15 @@
 
 import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { BookOpen, LogOut, Pencil, Check, X, Monitor } from 'lucide-react';
-import { LanguageSelector } from '../../components/join/LanguageSelector';
+import { BookOpen, LogOut, Pencil, Check, X, Monitor, Grid3X3, Zap, Crosshair, Lightbulb, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useCrazyGamesInvite } from '../../hooks/useCrazyGamesInvite';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useSocket } from '../../utils/SocketContext';
 import { useGameActions, useGameMode } from '@/hooks/gameState';
 import { useAuth } from '@/contexts/AuthContext';
+import { hasConsentDecision } from '@/utils/cookieConsent';
 
-import { GAME_PRESETS, type PresetKey } from './pre-game/PresetSelector';
+import { GAME_PRESETS } from './pre-game/PresetSelector';
 import { StartButton } from './pre-game/StartButton';
 import { MobileShareSection } from './pre-game/MobileShareSection';
 import { PlayerRoster } from './pre-game/PlayerRoster';
@@ -105,7 +105,7 @@ function HostPreGameView({
   t,
   timerValue,
   setTimerValue,
-  setTimerDirection,
+  setTimerDirection: _setTimerDirection,
   difficulty,
   setDifficulty,
   minWordLength,
@@ -123,7 +123,13 @@ function HostPreGameView({
   const { socket } = useSocket();
   const { isAdmin, isAuthenticated, updateProfile, profile } = useAuth();
   const hasBlastAccess = !!profile?.blast_access;
-  const { isOnCrazyGamesPlatform } = useCrazyGames();
+  const { isOnCrazyGamesPlatform: _isOnCrazyGamesPlatform } = useCrazyGames();
+
+  // Track whether cookie consent banner is visible (no decision yet)
+  const [cookieConsentVisible, setCookieConsentVisible] = useState(false);
+  useEffect(() => {
+    setCookieConsentVisible(!hasConsentDecision());
+  }, []);
 
   // Avatar & name editing state
   const [isAvatarBuilderOpen, setIsAvatarBuilderOpen] = useState(false);
@@ -266,6 +272,140 @@ function HostPreGameView({
     socket?.emit('changeRoomLanguage', { gameCode, language: newLang });
   }, [socket, gameCode]);
 
+  // ==================== Interactive Game Instructions ====================
+  const [instructionStep, setInstructionStep] = useState(0);
+
+  const GAME_INSTRUCTIONS: Record<string, { icon: React.ReactNode; barClass: string; iconBgClass: string; dotClass: string; steps: { titleKey: string; descKey: string }[] }> = {
+    random: {
+      icon: <Grid3X3 className="w-5 h-5" />,
+      barClass: 'bg-neo-purple',
+      iconBgClass: 'bg-neo-purple',
+      dotClass: 'bg-neo-purple',
+      steps: [
+        { titleKey: 'howToPlay.steps.basics.title', descKey: 'help.swipeLetters' },
+        { titleKey: 'howToPlay.steps.grid.title', descKey: 'help.diagonalWorks' },
+        { titleKey: 'howToPlay.comboBonus', descKey: 'help.comboExplanation' },
+      ],
+    },
+    classic: {
+      icon: <Grid3X3 className="w-5 h-5" />,
+      barClass: 'bg-neo-cyan',
+      iconBgClass: 'bg-neo-cyan',
+      dotClass: 'bg-neo-cyan',
+      steps: [
+        { titleKey: 'howToPlay.steps.basics.title', descKey: 'help.swipeLetters' },
+        { titleKey: 'howToPlay.steps.grid.title', descKey: 'help.diagonalWorks' },
+        { titleKey: 'howToPlay.steps.scoring.title', descKey: 'howToPlay.steps.scoring.description' },
+      ],
+    },
+    blast: {
+      icon: <Zap className="w-5 h-5" />,
+      barClass: 'bg-neo-pink',
+      iconBgClass: 'bg-neo-pink',
+      dotClass: 'bg-neo-pink',
+      steps: [
+        { titleKey: 'gameModes.blast.name', descKey: 'gameModes.blast.description' },
+        { titleKey: 'howToPlay.steps.basics.title', descKey: 'help.swipeLetters' },
+        { titleKey: 'howToPlay.comboBonus', descKey: 'help.comboExplanation' },
+      ],
+    },
+    'word-hunt': {
+      icon: <Crosshair className="w-5 h-5" />,
+      barClass: 'bg-neo-lime',
+      iconBgClass: 'bg-neo-lime',
+      dotClass: 'bg-neo-lime',
+      steps: [
+        { titleKey: 'gameModes.wordHunt.name', descKey: 'gameModes.wordHunt.description' },
+        { titleKey: 'howToPlay.steps.basics.title', descKey: 'help.swipeLetters' },
+        { titleKey: 'howToPlay.steps.grid.title', descKey: 'help.diagonalWorks' },
+      ],
+    },
+  };
+
+  // Reset step when mode changes
+  useEffect(() => {
+    setInstructionStep(0);
+  }, [selectedGameMode]);
+
+  const renderGameInstructions = (): React.ReactElement | null => {
+    const config = GAME_INSTRUCTIONS[selectedGameMode];
+    if (!config) return null;
+    const { icon, barClass, iconBgClass, dotClass, steps } = config;
+    const step = steps[instructionStep] ?? steps[0];
+
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 15 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2, type: 'spring', stiffness: 300, damping: 24 }}
+        className="rounded-neo-lg border-3 border-neo-black bg-slate-800/80 shadow-hard overflow-hidden"
+      >
+        <div className={cn('h-1', barClass)} />
+        <div className="p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <div className={cn('w-8 h-8 rounded-full border-2 border-neo-black flex items-center justify-center shadow-hard-sm text-neo-black', iconBgClass)}>
+              {icon}
+            </div>
+            <h3 className="text-sm font-black uppercase text-neo-cream flex items-center gap-1.5">
+              <Lightbulb className="w-3.5 h-3.5 text-neo-yellow" />
+              {t('help.howToPlay')}
+            </h3>
+          </div>
+
+          {/* Interactive step content */}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={instructionStep}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.2 }}
+              className="min-h-[48px] flex items-start gap-2 text-sm text-slate-300"
+            >
+              <span className={cn('mt-1.5 w-1.5 h-1.5 rounded-full shrink-0', dotClass)} />
+              <div>
+                <p className="font-bold text-neo-cream text-xs uppercase mb-0.5">{t(step.titleKey)}</p>
+                <p>{t(step.descKey)}</p>
+              </div>
+            </motion.div>
+          </AnimatePresence>
+
+          {/* Step navigation */}
+          <div className="flex items-center justify-center gap-3 mt-3">
+            <button
+              onClick={() => setInstructionStep(s => Math.max(0, s - 1))}
+              disabled={instructionStep === 0}
+              className="w-7 h-7 flex items-center justify-center rounded bg-neo-white/10 disabled:opacity-30 transition-opacity"
+              aria-label={t('common.previous')}
+            >
+              <ChevronLeft className="w-4 h-4 text-neo-cream" />
+            </button>
+            <div className="flex gap-1.5">
+              {steps.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setInstructionStep(i)}
+                  className={cn(
+                    'w-2 h-2 rounded-full transition-colors',
+                    i === instructionStep ? dotClass : 'bg-neo-white/20'
+                  )}
+                />
+              ))}
+            </div>
+            <button
+              onClick={() => setInstructionStep(s => Math.min(steps.length - 1, s + 1))}
+              disabled={instructionStep === steps.length - 1}
+              className="w-7 h-7 flex items-center justify-center rounded bg-neo-white/10 disabled:opacity-30 transition-opacity"
+              aria-label={t('common.next')}
+            >
+              <ChevronRight className="w-4 h-4 text-neo-cream" />
+            </button>
+          </div>
+        </div>
+      </motion.div>
+    );
+  };
+
   const cancelBotCountdown = useCallback(() => {
     if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
     if (aloneTimerRef.current) clearTimeout(aloneTimerRef.current);
@@ -300,7 +440,7 @@ function HostPreGameView({
 
   // TV mode toggle — full-width row, desktop only
   const tvModeToggle = (
-    <div className="hidden lg:flex items-center justify-between px-3 py-2 rounded-neo border-2 border-neo-white/10 bg-neo-navy-light/50">
+    <div className="hidden lg:flex items-center justify-between px-3 py-2 rounded-neo border-2 border-neo-black/50 bg-slate-800/60">
       <div className="flex items-center gap-2">
         <Monitor className="w-4 h-4 text-neo-cream/60" />
         <span className="text-xs font-bold uppercase tracking-widest text-neo-cream/60">
@@ -325,7 +465,7 @@ function HostPreGameView({
   );
 
   return (
-    <div className="flex-1 flex flex-col min-h-0 bg-neo-navy lg:max-w-5xl lg:mx-auto w-full">
+    <div className="flex-1 flex flex-col min-h-0 bg-neo-navy lg:max-w-7xl lg:mx-auto w-full">
       {/* Lesson Mode Banner */}
       {lessonData && (
         <div className="shrink-0 px-3 py-2 bg-neo-purple/20 border-b-2 border-neo-purple/50">
@@ -458,7 +598,7 @@ function HostPreGameView({
                   maxPlayers={maxPlayers}
                   t={t}
                 />
-                <div className="flex-1 min-h-0 flex flex-col items-center">
+                <div className="flex-1 min-h-0 flex flex-col items-center rounded-neo-lg border-3 border-neo-black bg-slate-800/80 shadow-hard p-4">
                   <PlayerRoster
                     players={filteredPlayersForDisplay}
                     username={username}
@@ -476,12 +616,13 @@ function HostPreGameView({
                   isAdmin={isAdmin}
                   hasBlastAccess={hasBlastAccess}
                 />
+                {renderGameInstructions()}
               </>
             }
             rightContent={
               <>
                 <InviteCard gameCode={gameCode} t={t} />
-                <div data-testid="desktop-chat-area" className="flex-1 min-h-0 overflow-hidden">
+                <div data-testid="desktop-chat-area" className="flex-1 min-h-0 rounded-neo-lg border-3 border-neo-black bg-slate-800/60 shadow-hard overflow-hidden">
                   <RoomChat gameCode={gameCode} username={username} isHost />
                 </div>
               </>
@@ -490,28 +631,32 @@ function HostPreGameView({
         </div>
 
         {/* Mobile Layout — single scroll (hidden on desktop) */}
-        <div className="lg:hidden flex flex-col flex-1 min-h-0 overflow-y-auto px-3 py-3 gap-3">
-          <AnimatePresence>{renderBotCountdown()}</AnimatePresence>
-          <div className="flex-1 min-h-0 flex flex-col items-center">
-            <PlayerRoster
-              players={filteredPlayersForDisplay}
-              username={username}
-              gameCode={gameCode}
-              maxPlayers={maxPlayers}
-              hostLabel={hostLabel}
+        <div className="lg:hidden flex flex-col flex-1 min-h-0">
+          <div className="flex-1 min-h-0 overflow-y-auto px-3 py-3 gap-3 flex flex-col">
+            <AnimatePresence>{renderBotCountdown()}</AnimatePresence>
+            <div className="flex-1 min-h-0 flex flex-col items-center">
+              <PlayerRoster
+                players={filteredPlayersForDisplay}
+                username={username}
+                gameCode={gameCode}
+                maxPlayers={maxPlayers}
+                hostLabel={hostLabel}
+                t={t}
+              />
+            </div>
+            {tvModeToggle}
+            <BattleModeCard
+              selectedGameMode={selectedGameMode}
+              setSelectedGameMode={setSelectedGameMode}
               t={t}
+              isAdmin={isAdmin}
+              hasBlastAccess={hasBlastAccess}
             />
+            {renderGameInstructions()}
+            <InviteCard gameCode={gameCode} t={t} />
           </div>
-          {tvModeToggle}
-          <BattleModeCard
-            selectedGameMode={selectedGameMode}
-            setSelectedGameMode={setSelectedGameMode}
-            t={t}
-            isAdmin={isAdmin}
-            hasBlastAccess={hasBlastAccess}
-          />
-          <InviteCard gameCode={gameCode} t={t} />
-          <div className="shrink-0 py-2 bg-neo-navy border-t-2 border-neo-black" style={{ paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom, 0px))' }}>
+          {/* Sticky Start Button — sits above cookie consent banner when visible */}
+          <div className={cn('shrink-0 px-3 py-2 bg-neo-navy border-t-2 border-neo-black', cookieConsentVisible ? 'sm:mb-[140px]' : '')} style={{ paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom, 0px))' }}>
             <StartButton
               onStartGame={onStartGame}
               disabled={isStartDisabled}

@@ -168,6 +168,26 @@ export interface LevelConfig {
   showBossIntro?: boolean;
   /** Level archetype that defines gameplay flavor */
   archetype?: LevelArchetype;
+  /** Move limit for blast archetype (replaces timer) */
+  movesLimit?: number;
+  /** Whether this level has a hidden target word (hunt archetype) */
+  hasTargetWord?: boolean;
+  /** Life points for hunt archetype (replaces timer) */
+  lifePoints?: number;
+  /** Whether the center letter is mandatory (wheel archetype) */
+  centerLetterRequired?: boolean;
+  /** The mandatory center letter for wheel archetype */
+  centerLetter?: string;
+  /** Whether the player picks a rune before the level (forge archetype) */
+  hasRunePick?: boolean;
+  /** Translation key for the world's theme (e.g., "Nature & Garden") */
+  themeDisplayKey?: string;
+  /** Translation key for the game mode name (e.g., "Blast Mode") */
+  gameModeDisplayKey?: string;
+  /** Number of themed words available in this world's pool */
+  themedWordCount?: number;
+  /** Themed word bonus multiplier for display (e.g., 1.25) */
+  themedBonusMultiplier?: number;
 }
 
 // ==============================================
@@ -175,25 +195,23 @@ export interface LevelConfig {
 // ==============================================
 
 /**
- * Level archetypes define distinct gameplay flavors.
- * Each archetype modifies objectives, tiles, and timer to create a unique feel,
- * even though the core mechanic (form words on a grid) stays the same.
+ * Level archetypes define distinct gameplay flavors based on game modes.
+ * Each archetype maps to a real game mode and modifies objectives, tiles, and
+ * timer to create a unique feel from the same core Boggle mechanic.
  *
- * - standard: Balanced wordCount/score — the baseline Boggle experience
- * - excavation: Board starts heavily iced. Chip away to reveal letters. Strategic tile clearing.
- * - goldRush: Loaded with gold/multiplier tiles, short timer. Maximize value per word.
- * - puzzle: Small effective area, find specific long/hidden words. Brain teaser.
- * - survival: Timer drains fast, time tiles are lifelines. Every second counts.
- * - cascade: Aggressive board reshuffling. Combo chains and positioning matter.
+ * - classic: Standard Boggle — find words on grid with timer and combo system.
+ * - blast: Tile-clearing puzzle with gravity and cascades. Move-limited.
+ * - hunt: Hidden target word with Wordle-style clues. Life bar instead of timer.
+ * - wheel: Center letter mandatory — all words must include it. Circular UI overlay.
+ * - forge: Score target with rune modifiers. Pick a rune before the level.
  * - boss: Boss battle with HP, phases, and twist mechanics. (Existing system.)
  */
 export type LevelArchetype =
-  | 'standard'
-  | 'excavation'
-  | 'goldRush'
-  | 'puzzle'
-  | 'survival'
-  | 'cascade'
+  | 'classic'
+  | 'blast'
+  | 'hunt'
+  | 'wheel'
+  | 'forge'
   | 'boss';
 
 // ==============================================

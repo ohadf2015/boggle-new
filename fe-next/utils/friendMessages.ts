@@ -85,20 +85,21 @@ export async function sendMessage(
 export async function getConversation(
   friendId: string,
   limit: number = 50,
-  before?: number
+  before?: number,
+  userId?: string
 ): Promise<{ messages: Message[]; hasMore: boolean; oldestTimestamp: number }> {
   try {
     const supabase = createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const uid = userId ?? (await supabase.auth.getUser()).data.user?.id;
 
-    if (!user) {
+    if (!uid) {
       return { messages: [], hasMore: false, oldestTimestamp: 0 };
     }
 
     let query = supabase
       .from('friend_messages')
       .select('*')
-      .or(`and(sender_id.eq.${user.id},recipient_id.eq.${friendId}),and(sender_id.eq.${friendId},recipient_id.eq.${user.id})`)
+      .or(`and(sender_id.eq.${uid},recipient_id.eq.${friendId}),and(sender_id.eq.${friendId},recipient_id.eq.${uid})`)
       .eq('deleted_for_sender', false)
       .eq('deleted_for_recipient', false)
       .order('created_at', { ascending: false })
@@ -123,7 +124,7 @@ export async function getConversation(
     const hasMore = data.length > limit;
     const messages = data.slice(0, limit);
 
-    const conversationId = [user.id, friendId].sort().join('_');
+    const conversationId = [uid, friendId].sort().join('_');
     const mappedMessages: Message[] = messages.map((msg) => ({
       messageId: msg.id,
       conversationId,
@@ -197,19 +198,19 @@ export async function markMessagesRead(
 /**
  * Get unread message count (optionally for specific friend)
  */
-export async function getUnreadCount(friendId?: string): Promise<number> {
+export async function getUnreadCount(friendId?: string, userId?: string): Promise<number> {
   try {
     const supabase = createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const uid = userId ?? (await supabase.auth.getUser()).data.user?.id;
 
-    if (!user) {
+    if (!uid) {
       return 0;
     }
 
     let query = supabase
       .from('friend_messages')
       .select('id', { count: 'exact', head: true })
-      .eq('recipient_id', user.id)
+      .eq('recipient_id', uid)
       .eq('read', false)
       .eq('deleted_for_recipient', false);
 
@@ -234,12 +235,12 @@ export async function getUnreadCount(friendId?: string): Promise<number> {
 /**
  * Get all message threads with friends
  */
-export async function getThreads(): Promise<MessageThread[]> {
+export async function getThreads(userId?: string): Promise<MessageThread[]> {
   try {
     const supabase = createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const uid = userId ?? (await supabase.auth.getUser()).data.user?.id;
 
-    if (!user) {
+    if (!uid) {
       return [];
     }
 
@@ -248,7 +249,7 @@ export async function getThreads(): Promise<MessageThread[]> {
       .from('friends')
       .select('user_id, friend_id')
       .eq('status', 'accepted')
-      .or(`user_id.eq.${user.id},friend_id.eq.${user.id}`);
+      .or(`user_id.eq.${uid},friend_id.eq.${uid}`);
 
     if (!friendships || friendships.length === 0) {
       return [];
@@ -256,7 +257,7 @@ export async function getThreads(): Promise<MessageThread[]> {
 
     const threads = await Promise.all(
       friendships.map(async (friendship) => {
-        const friendId = friendship.user_id === user.id
+        const friendId = friendship.user_id === uid
           ? friendship.friend_id
           : friendship.user_id;
 
@@ -264,7 +265,7 @@ export async function getThreads(): Promise<MessageThread[]> {
         const { data: lastMsg } = await supabase
           .from('friend_messages')
           .select('message, created_at, sender_id')
-          .or(`and(sender_id.eq.${user.id},recipient_id.eq.${friendId}),and(sender_id.eq.${friendId},recipient_id.eq.${user.id})`)
+          .or(`and(sender_id.eq.${uid},recipient_id.eq.${friendId}),and(sender_id.eq.${friendId},recipient_id.eq.${uid})`)
           .order('created_at', { ascending: false })
           .limit(1)
           .single();
@@ -280,10 +281,10 @@ export async function getThreads(): Promise<MessageThread[]> {
 
         if (!profile) return null;
 
-        // Get unread count
-        const unreadCount = await getUnreadCount(friendId);
+        // Get unread count — pass userId to avoid redundant auth.getUser() calls
+        const unreadCount = await getUnreadCount(friendId, uid);
 
-        const conversationId = [user.id, friendId].sort().join('_');
+        const conversationId = [uid, friendId].sort().join('_');
         const isOnline = profile.last_seen_at &&
           new Date(profile.last_seen_at) > new Date(Date.now() - 5 * 60 * 1000);
 
@@ -524,12 +525,12 @@ export async function declineChallenge(challengeId: string): Promise<{ success: 
 /**
  * Get pending challenges
  */
-export async function getPendingChallenges(): Promise<{ sent: Challenge[]; received: Challenge[] }> {
+export async function getPendingChallenges(userId?: string): Promise<{ sent: Challenge[]; received: Challenge[] }> {
   try {
     const supabase = createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const uid = userId ?? (await supabase.auth.getUser()).data.user?.id;
 
-    if (!user) {
+    if (!uid) {
       return { sent: [], received: [] };
     }
 
@@ -537,7 +538,7 @@ export async function getPendingChallenges(): Promise<{ sent: Challenge[]; recei
     const { data: receivedData } = await supabase
       .from('friend_challenges')
       .select('*')
-      .eq('challenged_id', user.id)
+      .eq('challenged_id', uid)
       .eq('status', 'pending')
       .order('created_at', { ascending: false });
 
@@ -545,7 +546,7 @@ export async function getPendingChallenges(): Promise<{ sent: Challenge[]; recei
     const { data: sentData } = await supabase
       .from('friend_challenges')
       .select('*')
-      .eq('challenger_id', user.id)
+      .eq('challenger_id', uid)
       .eq('status', 'pending')
       .order('created_at', { ascending: false });
 

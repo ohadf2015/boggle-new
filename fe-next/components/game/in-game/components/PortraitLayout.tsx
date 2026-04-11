@@ -363,7 +363,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
         t={t}
       />
 
-      <div className="flex flex-col lg:flex-row lg:items-stretch lg:justify-center gap-0 md:gap-2 lg:gap-2 desktop-tall:lg:gap-3 desktop-short:lg:gap-0 flex-1 w-full max-w-[1920px] mx-auto overflow-x-clip overflow-y-auto transition-all duration-500 ease-in-out pb-16 lg:pb-1 desktop-tall:lg:pb-2 desktop-short:lg:pb-0 px-2 lg:px-2 desktop-tall:lg:px-3 xl:px-4 lg:h-dvh lg:max-h-dvh">
+      <div className="flex flex-col lg:flex-row lg:items-stretch lg:justify-center gap-0 md:gap-2 lg:gap-2 desktop-tall:lg:gap-3 desktop-short:lg:gap-0 flex-1 w-full max-w-[1920px] mx-auto overflow-x-clip overflow-hidden transition-all duration-500 ease-in-out pb-16 lg:pb-1 desktop-tall:lg:pb-2 desktop-short:lg:pb-0 px-2 lg:px-2 desktop-tall:lg:px-3 xl:px-4 min-h-0">
         {/* Mobile Header */}
         <GameHeader
           onExitRoom={onExitRoom}
@@ -382,7 +382,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
         )}
 
         {/* Center Column: Timer, Score, Grid */}
-        <div className="flex-1 flex flex-col min-w-0 min-h-0 overflow-x-clip overflow-y-auto lg:overflow-y-auto lg:overflow-x-visible lg:max-h-full">
+        <div className="flex-1 flex flex-col min-w-0 min-h-0 overflow-x-clip overflow-y-hidden lg:overflow-y-hidden lg:overflow-x-visible">
           {/* Stats section with vertical stacking on mobile - reduced gap for tighter layout */}
           {remainingTime !== null && (
             <div
@@ -574,7 +574,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
               comboGlow
             )}
           >
-            <div className="relative w-full max-w-[min(600px,92vw)] lg:max-w-[clamp(260px,52dvh,520px)] desktop-short:lg:max-w-[clamp(220px,44dvh,420px)] mx-auto aspect-square">
+            <div className="relative w-full max-w-[min(600px,92vw)] lg:max-w-none lg:w-auto lg:h-full mx-auto aspect-square">
               <GridComponent
                 key={isPlaying ? 'playing-grid' : 'spectating-grid'}
                 grid={letterGrid}
@@ -636,7 +636,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
               Leaderboard only when there are other players; word list always shows while playing
               so single-player users can see their progress. */}
           {isPlaying && !gameplayFocusMode && (
-            <div className="block lg:hidden mt-0.5 md:mt-1 space-y-0.5 max-w-md mx-auto md:space-y-1 shrink-0 overflow-y-auto max-h-[120px] sm:max-h-[140px] short:max-h-[80px] scrollbar-thin">
+            <div className="block lg:hidden mt-0.5 md:mt-1 space-y-0.5 max-w-md mx-auto md:space-y-1 shrink overflow-y-auto min-h-0 max-h-[120px] sm:max-h-[140px] short:max-h-[80px] scrollbar-thin">
               {leaderboard && leaderboard.length > 0 && (
                 <CompactLeaderboard
                   players={compactLeaderboardPlayers}

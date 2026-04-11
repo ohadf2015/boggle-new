@@ -88,8 +88,6 @@ describe('OAuth Hiding on CrazyGames Platform', () => {
         getUserToken: vi.fn(),
         listFriends: vi.fn(),
         showAccountLinkPrompt: vi.fn(),
-        getXsollaUserToken: vi.fn(),
-        trackOrder: vi.fn(),
       });
     });
 
@@ -188,8 +186,6 @@ describe('OAuth Hiding on CrazyGames Platform', () => {
         getUserToken: vi.fn(),
         listFriends: vi.fn(),
         showAccountLinkPrompt: vi.fn(),
-        getXsollaUserToken: vi.fn(),
-        trackOrder: vi.fn(),
       });
     });
 

@@ -67,7 +67,7 @@ export function InviteCard({
       <div
         data-testid="invite-card"
         className={cn(
-          'flex items-center gap-3 px-3 py-2.5 rounded-neo-lg border-2 border-neo-white/10 bg-neo-navy-light/50',
+          'flex items-center gap-3 px-3 py-2.5 rounded-neo-lg border-3 border-neo-black bg-slate-800/80 shadow-hard',
           className
         )}
       >

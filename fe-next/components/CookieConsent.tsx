@@ -77,7 +77,7 @@ export default function CookieConsent() {
   // Add bottom padding to body when banner is visible so content isn't hidden behind it
   useEffect(() => {
     if (visible) {
-      document.body.style.paddingBottom = '80px';
+      document.body.style.paddingBottom = '140px';
     } else {
       document.body.style.paddingBottom = '';
     }
@@ -95,7 +95,7 @@ export default function CookieConsent() {
       aria-label={t('cookieConsent.title')}
       aria-modal="true"
       className={cn(
-        'fixed bottom-0 inset-x-0 z-[110] p-3 sm:p-4',
+        'fixed bottom-[calc(4rem+3.5rem)] sm:bottom-0 inset-x-0 z-[110] p-3 sm:p-4',
         'bg-neo-navy border-t-4 border-neo-black',
         'animate-fade-in-up'
       )}

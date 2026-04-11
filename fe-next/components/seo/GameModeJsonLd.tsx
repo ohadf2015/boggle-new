@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 
 const SITE_URL = 'https://www.lexiclash.live';
 
-type GameMode = 'classic' | 'blast' | 'wordHunt';
+type GameMode = 'classic' | 'blast' | 'wordHunt' | 'wordWheel';
 
 interface GameModeJsonLdProps {
     mode: GameMode;
@@ -63,6 +63,24 @@ const GAME_MODE_DATA = {
             { q: 'How many guesses do I get in Word Hunt?', a: 'You get 10 attempts to find the hidden target word. Use the feedback clues from each guess to narrow down the answer.' },
             { q: 'Can I share my Word Hunt results?', a: 'Yes! After completing the puzzle, you can share emoji-based results showing your attempt pattern - similar to Wordle sharing. No spoilers included.' },
             { q: 'What happens if I miss a day?', a: 'Each day has a unique puzzle. If you miss a day, that puzzle is gone. But you can always play the current day\'s Word Hunt and compete on the daily leaderboard.' },
+        ],
+    },
+    wordWheel: {
+        name: 'How to Play LexiClash Daily Word Wheel',
+        description: 'Learn how to play the Daily Word Wheel in LexiClash — a daily puzzle where you find words from a wheel of letters.',
+        totalTime: 'PT5M',
+        steps: [
+            { name: 'Open the Word Wheel', text: 'Navigate to the Daily Challenge section and select Word Wheel. A new puzzle is available every day at midnight UTC with the same letters for all players worldwide.' },
+            { name: 'Study the Wheel', text: 'Look at the letters arranged in a wheel. The center letter is highlighted — every word you form must include this letter.' },
+            { name: 'Form Words', text: 'Tap or swipe letters to form words. Each word must include the center letter and use only the letters shown in the wheel. Longer words earn more points.' },
+            { name: 'Beat the Clock', text: 'Find as many words as possible before time runs out. Speed and vocabulary both matter for your final score.' },
+            { name: 'Compare and Share', text: 'See how you rank on the daily leaderboard. Share your results with friends and track your daily streak.' },
+        ],
+        faq: [
+            { q: 'What is the Daily Word Wheel?', a: 'The Daily Word Wheel is a free daily word puzzle where you find words using letters arranged in a wheel. Every word must include the center letter. A new puzzle appears every day at midnight UTC with the same letters for everyone.' },
+            { q: 'How is the Word Wheel different from Word Hunt?', a: 'Word Hunt gives you a grid and 10 attempts to find one hidden word. The Word Wheel gives you a wheel of letters and you find as many words as possible, all including the center letter. Both reset daily.' },
+            { q: 'Do all words need the center letter?', a: 'Yes! Every word you submit must include the center letter of the wheel. This is the core constraint that makes the puzzle challenging and strategic.' },
+            { q: 'Can I play the Word Wheel on my phone?', a: 'Yes! The Word Wheel works in any modern browser on phone, tablet, or desktop. No download or signup required.' },
         ],
     },
 };

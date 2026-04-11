@@ -81,7 +81,14 @@ export function BattleModeCard({
   const activeMode = MODES.find(m => m.mode === selectedGameMode) ?? MODES[0];
 
   return (
-    <section className="space-y-2">
+    <section className="rounded-neo-lg border-3 border-neo-black bg-slate-800/80 shadow-hard overflow-hidden">
+      {/* Accent bar */}
+      <div className="h-1 bg-linear-to-r from-neo-purple via-neo-cyan to-neo-pink" />
+      <div className="p-3 space-y-2">
+      {/* Section label */}
+      <h3 className="text-[10px] font-bold uppercase tracking-widest text-neo-cream/50 px-0.5">
+        {t('hostView.battleMode')}
+      </h3>
       {/* Horizontal chips row — equal-width */}
       <div className="space-y-2">
         <div className="grid grid-cols-4 gap-1.5">
@@ -141,6 +148,7 @@ export function BattleModeCard({
           </p>
         </motion.div>
       </AnimatePresence>
+      </div>
     </section>
   );
 }

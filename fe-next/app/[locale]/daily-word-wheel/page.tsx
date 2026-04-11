@@ -61,28 +61,73 @@ const faqs = [
     q: "Can I see the world record for today's Daily Word Wheel?",
     a: 'Yes! After completing the puzzle, you can see the global leaderboard showing top scores for that day. The world record updates in real-time as players worldwide compete. Track your daily streak to see how many consecutive days you have played.',
   },
+  {
+    q: 'Do all words need the center letter?',
+    a: 'Yes! Every word you submit in the Daily Word Wheel must include the center letter of the wheel. This is the core constraint that makes the puzzle challenging and strategic — you cannot use just any combination of letters.',
+  },
+  {
+    q: 'What languages is the Daily Word Wheel available in?',
+    a: 'The Daily Word Wheel is available in English, Hebrew, Swedish, Japanese, and Spanish. Each language has its own dictionary and leaderboard, so you can play in your preferred language.',
+  },
 ];
 
 // Static JSON-LD — all content is hardcoded string literals, not user input
-const faqJsonLd = JSON.stringify({
-  '@context': 'https://schema.org',
-  '@type': 'FAQPage',
-  mainEntity: faqs.map((faq) => ({
-    '@type': 'Question',
-    name: faq.q,
-    acceptedAnswer: { '@type': 'Answer', text: faq.a },
-  })),
-});
+const structuredData = JSON.stringify([
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqs.map((faq) => ({
+      '@type': 'Question',
+      name: faq.q,
+      acceptedAnswer: { '@type': 'Answer', text: faq.a },
+    })),
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'HowTo',
+    name: 'How to Play the Daily Word Wheel',
+    description: 'Learn how to play the Daily Word Wheel puzzle on LexiClash — find words from a wheel of letters.',
+    totalTime: 'PT5M',
+    tool: { '@type': 'HowToTool', name: 'Web browser' },
+    supply: { '@type': 'HowToSupply', name: 'Internet connection' },
+    step: [
+      { '@type': 'HowToStep', position: 1, name: 'Open the Word Wheel', text: 'Visit LexiClash and navigate to Daily Challenge, then select Word Wheel. A new puzzle appears every day at midnight UTC.' },
+      { '@type': 'HowToStep', position: 2, name: 'Study the wheel of letters', text: 'Look at the letters arranged in a wheel. The center letter is highlighted — every word you form must include this letter.' },
+      { '@type': 'HowToStep', position: 3, name: 'Form words', text: 'Tap letters to form words using only the wheel letters. Every word must include the center letter. Longer words earn more points.' },
+      { '@type': 'HowToStep', position: 4, name: 'Compete for the world record', text: 'Find as many words as possible before time runs out. Check the global leaderboard to see where you rank and chase the daily world record.' },
+    ],
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebApplication',
+    name: 'LexiClash Daily Word Wheel',
+    url: `${BASE_URL}/en/daily/word-wheel`,
+    applicationCategory: 'GameApplication',
+    operatingSystem: 'Any',
+    offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+    aggregateRating: { '@type': 'AggregateRating', ratingValue: '4.7', ratingCount: '890', bestRating: '5', worstRating: '1' },
+    browserRequirements: 'Requires a modern web browser',
+    inLanguage: ['en', 'he', 'sv', 'ja', 'es'],
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'LexiClash', item: `${BASE_URL}/en` },
+      { '@type': 'ListItem', position: 2, name: 'Daily Word Wheel', item: `${BASE_URL}/en/daily-word-wheel` },
+    ],
+  },
+]);
 
 export default async function DailyWordWheelPage({ params }: PageProps) {
   const { locale } = await params;
 
   return (
     <main className="min-h-screen bg-neo-navy text-neo-white">
-      {/* JSON-LD structured data for FAQ rich results — static content only, no user input */}
+      {/* Static JSON-LD structured data — all hardcoded constants, no user input, safe for injection */}
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: faqJsonLd }}
+        dangerouslySetInnerHTML={{ __html: structuredData }}
       />
 
       <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">

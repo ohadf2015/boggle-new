@@ -4996,6 +4996,10 @@ const en = {
     "tooShort": "Too short (min {min} letters)",
     "invalidLetters": "Can only use wheel letters",
     "inputPlaceholder": "Type a word...",
+    "tapLetters": "Tap letters to build a word",
+    "tapDescription": "Tap letters on the wheel to spell words. Every word must include the center letter!",
+    "clear": "Clear",
+    "shuffle": "Shuffle",
     "foundWords": "Found Words",
     "possibleWords": "Possible",
     "excellent": "Excellent!",
@@ -6416,7 +6420,12 @@ const en = {
       "puzzle": "Puzzle",
       "survival": "Survival",
       "cascade": "Cascade",
-      "boss": "Boss Battle"
+      "boss": "Boss Battle",
+      "classic": "Classic Mode",
+      "blast": "Blast Mode",
+      "hunt": "Word Hunt",
+      "wheel": "Word Wheel",
+      "forge": "Word Forge"
     },
     "mastery": {
       "title": "Archetype Mastery",
@@ -6616,6 +6625,38 @@ const en = {
       "rareWords": "Rare Words",
       "multilingual": "Polyglot",
       "allMechanics": "All Mechanics"
+    },
+    "theme": {
+      "bonus": "themed word bonus",
+      "found": "themed words found"
+    },
+    "toast": {
+      "themedWord": "Themed word bonus!"
+    },
+    "world": {
+      "1": { "theme": "Nature & Garden" },
+      "2": { "theme": "Water & Flow" },
+      "3": { "theme": "Earth & Minerals" },
+      "4": { "theme": "Ocean & Travel" },
+      "5": { "theme": "Building & Craft" },
+      "6": { "theme": "Mystery & Puzzles" },
+      "7": { "theme": "Light & Reflection" },
+      "8": { "theme": "Space & Science" },
+      "9": { "theme": "Culture & Language" },
+      "10": { "theme": "Power & Knowledge" }
+    },
+    "mode": {
+      "classic": "Classic Mode",
+      "blast": "Blast Mode",
+      "hunt": "Word Hunt",
+      "wheel": "Word Wheel",
+      "forge": "Word Forge",
+      "boss": "Boss Battle",
+      "classic.objective": "Find words before time runs out",
+      "blast.objective": "Clear all tiles within move limit",
+      "hunt.objective": "Find the hidden target word",
+      "wheel.objective": "Words must include the center letter",
+      "forge.objective": "Hit the score target with rune buffs"
     },
     "objectives": {
       "wordCount": "Find words",
@@ -7100,6 +7141,19 @@ const en = {
         "desc": "Stop the clock to think",
         "t1": "Pause timer for 5 seconds",
         "t2": "10s pause + show longest word"
+      },
+      "toast": {
+        "wordRadar": "Word Radar detected a path!",
+        "deepDrill": "Deep Drill cleared extra ice!",
+        "gemDetector": "Gem Detector found gold!",
+        "fuelTank": "Fuel Tank extended time!",
+        "armorPlating": "Armor absorbed damage!",
+        "blastShield": "Blast Shield blocked attack!",
+        "luckyPickaxe": "Lucky Pickaxe bonus gold!",
+        "cargoBay": "Cargo Bay stored rewards!",
+        "salvageClaw": "Salvage Claw grabbed loot!",
+        "wordDynamite": "Word Dynamite exploded!",
+        "timeFreeze": "Time Freeze activated!"
       }
     },
     "shop": {

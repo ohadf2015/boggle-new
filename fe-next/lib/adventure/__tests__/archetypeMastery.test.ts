@@ -31,7 +31,7 @@ describe('ARCHETYPE_MASTERY_THRESHOLDS', () => {
 
 describe('ARCHETYPE_MASTERY_BONUSES', () => {
   const masterableArchetypes: MasterableArchetype[] = [
-    'standard', 'excavation', 'goldRush', 'puzzle', 'survival', 'cascade',
+    'classic', 'blast', 'hunt', 'wheel', 'forge',
   ];
 
   it('should define bonuses for every masterable archetype', () => {
@@ -110,15 +110,15 @@ describe('calculateArchetypeMastery', () => {
   });
 
   it('should aggregate stars per archetype across completions', () => {
-    // W1L1 is standard, W1L2 is standard — both contribute to standard mastery
+    // W1L1 is classic, W1L2 is classic — both contribute to classic mastery
     const completions = [
       makeCompletion(1, 1, 3),
       makeCompletion(1, 2, 2),
     ];
     const result = calculateArchetypeMastery(completions);
-    // Both W1 levels are standard archetype, so total = 3 + 2 = 5
-    expect(result['standard']).toBeDefined();
-    expect(result['standard']!.totalStars).toBe(5);
+    // Both W1 levels are classic archetype, so total = 3 + 2 = 5
+    expect(result['classic']).toBeDefined();
+    expect(result['classic']!.totalStars).toBe(5);
   });
 
   it('should exclude boss levels from mastery calculation', () => {
@@ -130,13 +130,13 @@ describe('calculateArchetypeMastery', () => {
 
   it('should compute correct tier based on accumulated stars', () => {
     const t = ARCHETYPE_MASTERY_THRESHOLDS;
-    // Create enough completions to reach bronze for standard
+    // Create enough completions to reach bronze for classic
     const completions: LevelCompletion[] = [];
     for (let i = 0; i < Math.ceil(t.bronze / 3); i++) {
       completions.push(makeCompletion(1, 1, 3));
     }
     const result = calculateArchetypeMastery(completions);
-    expect(result['standard']!.tier).toBe('bronze');
+    expect(result['classic']!.tier).toBe('bronze');
   });
 
   it('should handle duplicate completions (replayed levels) by summing all stars', () => {
@@ -146,7 +146,7 @@ describe('calculateArchetypeMastery', () => {
       makeCompletion(1, 1, 2),
     ];
     const result = calculateArchetypeMastery(completions);
-    expect(result['standard']!.totalStars).toBe(5);
+    expect(result['classic']!.totalStars).toBe(5);
   });
 });
 
@@ -156,23 +156,23 @@ describe('calculateArchetypeMastery', () => {
 
 describe('getMasteryBonusesForArchetype', () => {
   it('should return empty array for none tier', () => {
-    const bonuses = getMasteryBonusesForArchetype('standard', 'none');
+    const bonuses = getMasteryBonusesForArchetype('classic', 'none');
     expect(bonuses).toHaveLength(0);
   });
 
   it('should return cumulative bonuses up to current tier', () => {
     // Gold tier should include bronze + silver + gold bonuses
-    const bonuses = getMasteryBonusesForArchetype('standard', 'gold');
+    const bonuses = getMasteryBonusesForArchetype('classic', 'gold');
     expect(bonuses).toHaveLength(3);
   });
 
   it('should return all 4 bonuses for diamond tier', () => {
-    const bonuses = getMasteryBonusesForArchetype('excavation', 'diamond');
+    const bonuses = getMasteryBonusesForArchetype('blast', 'diamond');
     expect(bonuses).toHaveLength(4);
   });
 
   it('should return 1 bonus for bronze tier', () => {
-    const bonuses = getMasteryBonusesForArchetype('puzzle', 'bronze');
+    const bonuses = getMasteryBonusesForArchetype('forge', 'bronze');
     expect(bonuses).toHaveLength(1);
   });
 });
@@ -184,7 +184,7 @@ describe('getMasteryBonusesForArchetype', () => {
 describe('applyMasteryBonuses', () => {
   const baseLevelConfig: LevelConfig = {
     world: 3,
-    level: 3, // goldRush archetype
+    level: 6, // forge archetype
     gridSize: 5,
     timerSeconds: 60,
     objectives: [
@@ -195,23 +195,14 @@ describe('applyMasteryBonuses', () => {
       { type: 'gold', row: 1, col: 1 },
     ],
     difficulty: 'MEDIUM',
-    chapterNumber: 2,
-    levelInChapter: 1,
+    chapterNumber: 3,
+    levelInChapter: 2,
     isBossLevel: false,
-    archetype: 'goldRush',
+    archetype: 'forge',
   };
 
   it('should return config unchanged when mastery is undefined', () => {
     const result = applyMasteryBonuses(baseLevelConfig, undefined);
-    expect(result).toEqual(baseLevelConfig);
-  });
-
-  it('should return config unchanged when archetype has no mastery', () => {
-    const mastery: Partial<Record<MasterableArchetype, ArchetypeMasteryState>> = {
-      standard: { totalStars: 10, tier: 'silver' },
-    };
-    // Config is goldRush but mastery only has standard
-    const result = applyMasteryBonuses(baseLevelConfig, mastery);
     expect(result).toEqual(baseLevelConfig);
   });
 
@@ -223,36 +214,47 @@ describe('applyMasteryBonuses', () => {
       archetype: 'boss',
     };
     const mastery: Partial<Record<MasterableArchetype, ArchetypeMasteryState>> = {
-      goldRush: { totalStars: 50, tier: 'diamond' },
+      forge: { totalStars: 50, tier: 'diamond' },
     };
     const result = applyMasteryBonuses(bossConfig, mastery);
     expect(result).toEqual(bossConfig);
   });
 
-  it('should add timer bonus seconds for timer-type bonuses', () => {
-    // goldRush bronze gives +5s timer
+  it('should return config unchanged when archetype has no mastery', () => {
     const mastery: Partial<Record<MasterableArchetype, ArchetypeMasteryState>> = {
-      goldRush: { totalStars: 5, tier: 'bronze' },
+      classic: { totalStars: 10, tier: 'silver' },
     };
+    // Config is forge but mastery only has classic
     const result = applyMasteryBonuses(baseLevelConfig, mastery);
+    expect(result).toEqual(baseLevelConfig);
+  });
+
+  it('should add timer bonus seconds for timer-type bonuses (wheel bronze = +5s)', () => {
+    const wheelConfig: LevelConfig = { ...baseLevelConfig, archetype: 'wheel' };
+    const mastery: Partial<Record<MasterableArchetype, ArchetypeMasteryState>> = {
+      wheel: { totalStars: 5, tier: 'bronze' },
+    };
+    const result = applyMasteryBonuses(wheelConfig, mastery);
     expect(result.timerSeconds).toBe(65); // 60 + 5
   });
 
-  it('should accumulate multiple timer bonuses for higher tiers', () => {
-    // goldRush gold: bronze(+5s) + silver(tiles, no timer) + gold(+10s) = +15s
+  it('should accumulate multiple timer bonuses for higher tiers (wheel gold = bronze+silver+gold)', () => {
+    // wheel bronze(+5s) + silver(tiles, no timer) + gold(+10s) = +15s
+    const wheelConfig: LevelConfig = { ...baseLevelConfig, archetype: 'wheel' };
     const mastery: Partial<Record<MasterableArchetype, ArchetypeMasteryState>> = {
-      goldRush: { totalStars: 30, tier: 'gold' },
+      wheel: { totalStars: 30, tier: 'gold' },
     };
-    const result = applyMasteryBonuses(baseLevelConfig, mastery);
+    const result = applyMasteryBonuses(wheelConfig, mastery);
     expect(result.timerSeconds).toBe(75); // 60 + 5 + 10
   });
 
   it('should not mutate the original config', () => {
+    const wheelConfig: LevelConfig = { ...baseLevelConfig, archetype: 'wheel' };
     const mastery: Partial<Record<MasterableArchetype, ArchetypeMasteryState>> = {
-      goldRush: { totalStars: 5, tier: 'bronze' },
+      wheel: { totalStars: 5, tier: 'bronze' },
     };
-    const original = { ...baseLevelConfig };
-    applyMasteryBonuses(baseLevelConfig, mastery);
-    expect(baseLevelConfig).toEqual(original);
+    const original = { ...wheelConfig };
+    applyMasteryBonuses(wheelConfig, mastery);
+    expect(wheelConfig).toEqual(original);
   });
 });

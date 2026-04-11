@@ -79,7 +79,7 @@ export function ProfileAchievements({
         <h2 className="text-2xl font-black font-neo-display uppercase tracking-tight text-white">
           {t('profile.achievements')}
         </h2>
-        <span className="text-xs font-black uppercase text-neo-yellow bg-black px-3 py-1.5 rounded-full border-2 border-neo-yellow shadow-hard-sm">
+        <span className="text-xs font-black uppercase text-neo-lime bg-neo-lime/10 px-3 py-1.5 rounded-full">
           {totalEarned} / {totalAchievements}
         </span>
       </motion.div>
@@ -89,10 +89,10 @@ export function ProfileAchievements({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay }}
-        className="rounded-3xl p-6 mb-4 bg-slate-800/80 border-4 border-neo-yellow shadow-hard"
+        className="rounded-[28px] p-6 mb-4 bg-slate-800/40 backdrop-blur-sm border border-neo-lime/20"
       >
-        <div className="pb-3 border-b-2 border-neo-yellow/20 mb-4">
-          <h3 className="text-sm font-black uppercase text-neo-yellow tracking-widest flex items-center gap-2">
+        <div className="pb-3 border-b border-neo-lime/10 mb-4">
+          <h3 className="text-sm font-black uppercase text-neo-lime tracking-widest flex items-center gap-2">
             <span>🏆</span>
             {t('profile.hallOfFame')}
           </h3>
@@ -110,7 +110,7 @@ export function ProfileAchievements({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: delay + 0.05 }}
-        className="rounded-3xl p-6 bg-slate-800/80 border-3 border-slate-600"
+        className="rounded-[28px] p-6 bg-slate-800/40 backdrop-blur-sm border border-white/[0.08]"
       >
         <div className="flex flex-wrap gap-2">
           {regularAchievements.map((achievement, index) => renderAchievementBadge(achievement, index))}

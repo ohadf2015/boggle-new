@@ -4934,6 +4934,10 @@ const es = {
     "tooShort": "Demasiado corta (mín {min} letras)",
     "invalidLetters": "Solo puedes usar las letras de la rueda",
     "inputPlaceholder": "Escribe una palabra...",
+    "tapLetters": "Toca letras para formar una palabra",
+    "tapDescription": "Toca las letras de la rueda para deletrear palabras. ¡Cada palabra debe incluir la letra central!",
+    "clear": "Borrar",
+    "shuffle": "Mezclar",
     "foundWords": "Palabras encontradas",
     "possibleWords": "Posibles",
     "excellent": "¡Excelente!",
@@ -6571,7 +6575,12 @@ const es = {
       "puzzle": "Rompecabezas",
       "survival": "Supervivencia",
       "cascade": "Cascada",
-      "boss": "Batalla de Jefe"
+      "boss": "Batalla de jefe",
+      "classic": "Modo clásico",
+      "blast": "Modo explosión",
+      "hunt": "Caza de palabras",
+      "wheel": "Rueda de palabras",
+      "forge": "Forja de palabras"
     },
     "loading": "Cargando aventura...",
     "currency": {
@@ -7073,6 +7082,38 @@ const es = {
       "multilingual": "Bonificaciones de palabras multilingües",
       "allMechanics": "Todas las mecánicas combinadas"
     },
+    "theme": {
+      "bonus": "bono de palabras temáticas",
+      "found": "palabras temáticas encontradas"
+    },
+    "toast": {
+      "themedWord": "¡Bonificación por palabra temática!"
+    },
+    "world": {
+      "1": { "theme": "Naturaleza y jardín" },
+      "2": { "theme": "Agua y flujo" },
+      "3": { "theme": "Tierra y minerales" },
+      "4": { "theme": "Océano y viaje" },
+      "5": { "theme": "Construcción y artesanía" },
+      "6": { "theme": "Misterio y rompecabezas" },
+      "7": { "theme": "Luz y reflejo" },
+      "8": { "theme": "Espacio y ciencia" },
+      "9": { "theme": "Cultura e idioma" },
+      "10": { "theme": "Poder y conocimiento" }
+    },
+    "mode": {
+      "classic": "Modo clásico",
+      "blast": "Modo explosión",
+      "hunt": "Caza de palabras",
+      "wheel": "Rueda de palabras",
+      "forge": "Forja de palabras",
+      "boss": "Batalla de jefe",
+      "classic.objective": "Encuentra palabras antes de que se acabe el tiempo",
+      "blast.objective": "Despeja todas las fichas dentro del límite de movimientos",
+      "hunt.objective": "Encuentra la palabra objetivo oculta",
+      "wheel.objective": "Las palabras deben incluir la letra central",
+      "forge.objective": "Alcanza el objetivo de puntuación con mejoras de runas"
+    },
     "objectives": {
       "wordCount": "Encuentra palabras",
       "scoreTarget": "Alcanza puntuación",
@@ -7362,6 +7403,19 @@ const es = {
         "desc": "Detén el reloj para pensar",
         "t1": "Pausa el temporizador 5 segundos",
         "t2": "Pausa de 10s + muestra la palabra más larga"
+      },
+      "toast": {
+        "wordRadar": "¡El radar de palabras detectó un camino!",
+        "deepDrill": "¡El taladro profundo despejó hielo extra!",
+        "gemDetector": "¡El detector de gemas encontró oro!",
+        "fuelTank": "¡El tanque de combustible extendió el tiempo!",
+        "armorPlating": "¡La armadura absorbió daño!",
+        "blastShield": "¡El escudo de explosión bloqueó el ataque!",
+        "luckyPickaxe": "¡Pico de la suerte: oro extra!",
+        "cargoBay": "¡La bodega almacenó recompensas!",
+        "salvageClaw": "¡La garra de rescate agarró botín!",
+        "wordDynamite": "¡La dinamita de palabras explotó!",
+        "timeFreeze": "¡Congelación de tiempo activada!"
       }
     },
     "shop": {

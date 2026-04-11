@@ -175,6 +175,7 @@ const EXPECTED_ERROR_PATTERNS = [
 
   // Supabase auth token lock contention (expected under concurrent requests)
   /Lock .* was released because another request stole it/i,
+  /Lock broken by another request with the 'steal' option/i,
 
   // Auth loading timeout (safety guard, not a bug)
   /Auth loading timeout/i,

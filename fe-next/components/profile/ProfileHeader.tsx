@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { X, Edit, Check, Globe, Sparkles } from 'lucide-react';
+import { X, Edit, Check, Globe } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { Button } from '@/components/ui/button';
 import { Loader } from '@/components/ui/Loader';
@@ -115,29 +115,25 @@ export function ProfileHeader({
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       className={cn(
-        'relative bg-neo-navy/60 border-3 border-neo-cream/20 rounded-neo-lg shadow-hard-lg mb-4',
-        compact ? 'p-4' : 'p-8'
+        'relative bg-slate-800/40 backdrop-blur-sm border border-white/[0.08] rounded-[28px] mb-4',
+        compact ? 'p-4' : 'p-6'
       )}
     >
-      {/* Sparkle decorations */}
-      <Sparkles className="absolute top-4 inset-e-16 w-5 h-5 text-white/20 animate-pulse" aria-hidden="true" />
-      <Sparkles className="absolute bottom-6 inset-s-4 w-4 h-4 text-white/15 animate-pulse" aria-hidden="true" />
-
       {/* Level badge — top-right */}
       {!compact && (
-        <div className="absolute top-4 inset-e-4 bg-neo-yellow rounded-xl border-3 border-neo-black shadow-hard px-3 py-1.5 -rotate-6">
-          <span className="text-2xl font-black text-neo-black leading-none">{level}</span>
-          <span className="block text-[9px] font-bold uppercase tracking-wider text-neo-black/70">{t('xp.level')}</span>
+        <div className="absolute top-4 inset-e-4 bg-neo-cyan/10 rounded-xl px-3 py-1.5">
+          <span className="text-xl font-black text-neo-cyan leading-none">{level}</span>
+          <span className="block text-[9px] font-bold uppercase tracking-wider text-gray-400">{t('xp.level')}</span>
         </div>
       )}
 
-      <div className={cn('flex', compact ? 'flex-row gap-3 items-center' : 'flex-row gap-6 items-center')}>
-        {/* Avatar with overlay control buttons */}
+      <div className={cn('flex', compact ? 'flex-row gap-3 items-center' : 'flex-row gap-5 items-center')}>
+        {/* Avatar with subtle cyan ring */}
         <div className="relative shrink-0">
           <div
             className={cn(
-              'relative rounded-full border-3 border-neo-yellow shadow-hard-yellow overflow-hidden',
-              compact ? 'w-20 h-20' : 'w-28 h-28'
+              'relative rounded-full overflow-hidden ring-2 ring-neo-cyan/30 ring-offset-2 ring-offset-slate-800/40',
+              compact ? 'w-20 h-20' : 'w-24 h-24'
             )}
           >
             <Avatar
@@ -153,9 +149,9 @@ export function ProfileHeader({
             onClick={() => setIsAvatarBuilderOpen(true)}
             className={cn(
               'absolute -bottom-1 -inset-e-1 flex items-center justify-center',
-              'rounded-full bg-neo-pink border-3 border-neo-black shadow-hard-sm',
-              'text-white hover:bg-neo-pink/80 hover:scale-110 transition-all',
-              compact ? 'w-6 h-6' : 'w-9 h-9'
+              'rounded-full bg-neo-pink/90 border border-white/20',
+              'text-white hover:bg-neo-pink hover:scale-110 transition-all',
+              compact ? 'w-6 h-6' : 'w-8 h-8'
             )}
             title={t('profile.chooseAvatar')}
             aria-label={t('profile.chooseAvatar')}

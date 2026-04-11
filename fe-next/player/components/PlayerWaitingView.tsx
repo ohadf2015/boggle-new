@@ -1,8 +1,8 @@
 'use client';
 
-import React, { memo, useState, useCallback } from 'react';
+import React, { memo, useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Users, Crown, Bot, LogOut, Plus, Check, Pencil, X, Camera, Zap, Crosshair, Grid3X3, Lightbulb } from 'lucide-react';
+import { Users, Crown, Bot, LogOut, Plus, Check, Pencil, X, Camera, Zap, Crosshair, Grid3X3, Lightbulb, ChevronLeft, ChevronRight } from 'lucide-react';
 import Avatar from '../../components/Avatar';
 import AvatarBuilderModal from '../../components/avatar/AvatarBuilderModal';
 import { useAvatarPremium } from '@/hooks/useAvatarPremium';
@@ -283,17 +283,19 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
     </section>
   );
 
-  // ==================== Game Mode Tips ====================
-  const MODE_TIPS: Record<string, { icon: React.ReactNode; barClass: string; iconBgClass: string; dotClass: string; tips: string[] }> = {
+  // ==================== Interactive Game Instructions ====================
+  const [instructionStep, setInstructionStep] = useState(0);
+
+  const GAME_INSTRUCTIONS: Record<string, { icon: React.ReactNode; barClass: string; iconBgClass: string; dotClass: string; steps: { titleKey: string; descKey: string }[] }> = {
     classic: {
       icon: <Grid3X3 className="w-5 h-5" />,
       barClass: 'bg-neo-cyan',
       iconBgClass: 'bg-neo-cyan',
       dotClass: 'bg-neo-cyan',
-      tips: [
-        t('help.swipeLetters'),
-        t('help.diagonalWorks'),
-        t('help.comboExplanation'),
+      steps: [
+        { titleKey: 'howToPlay.steps.basics.title', descKey: 'help.swipeLetters' },
+        { titleKey: 'howToPlay.steps.grid.title', descKey: 'help.diagonalWorks' },
+        { titleKey: 'howToPlay.comboBonus', descKey: 'help.comboExplanation' },
       ],
     },
     blast: {
@@ -301,10 +303,10 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
       barClass: 'bg-neo-pink',
       iconBgClass: 'bg-neo-pink',
       dotClass: 'bg-neo-pink',
-      tips: [
-        t('blast.blastModeDesc'),
-        t('help.swipeLetters'),
-        t('help.comboExplanation'),
+      steps: [
+        { titleKey: 'gameModes.blast.name', descKey: 'gameModes.blast.description' },
+        { titleKey: 'howToPlay.steps.basics.title', descKey: 'help.swipeLetters' },
+        { titleKey: 'howToPlay.comboBonus', descKey: 'help.comboExplanation' },
       ],
     },
     'word-hunt': {
@@ -312,17 +314,23 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
       barClass: 'bg-neo-lime',
       iconBgClass: 'bg-neo-lime',
       dotClass: 'bg-neo-lime',
-      tips: [
-        t('tutorial.wordHunt.welcome.description'),
-        t('tutorial.wordHunt.lifeSystem.description'),
-        t('help.swipeLetters'),
+      steps: [
+        { titleKey: 'gameModes.wordHunt.name', descKey: 'gameModes.wordHunt.description' },
+        { titleKey: 'howToPlay.steps.basics.title', descKey: 'help.swipeLetters' },
+        { titleKey: 'howToPlay.steps.grid.title', descKey: 'help.diagonalWorks' },
       ],
     },
   };
 
+  // Reset step when mode changes
+  useEffect(() => {
+    setInstructionStep(0);
+  }, [gameMode]);
+
   const renderModeTips = (): React.ReactElement | null => {
-    if (!gameMode || !MODE_TIPS[gameMode]) return null;
-    const { icon, barClass, iconBgClass, dotClass, tips } = MODE_TIPS[gameMode];
+    if (!gameMode || !GAME_INSTRUCTIONS[gameMode]) return null;
+    const { icon, barClass, iconBgClass, dotClass, steps } = GAME_INSTRUCTIONS[gameMode];
+    const step = steps[instructionStep] ?? steps[0];
 
     return (
       <motion.div
@@ -342,20 +350,56 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
               {t('help.howToPlay')}
             </h3>
           </div>
-          <ul className="space-y-2">
-            {tips.map((tip, i) => (
-              <motion.li
-                key={i}
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.4 + i * 0.1 }}
-                className="flex items-start gap-2 text-sm text-slate-300"
-              >
-                <span className={cn('mt-1.5 w-1.5 h-1.5 rounded-full shrink-0', dotClass)} />
-                <span>{tip}</span>
-              </motion.li>
-            ))}
-          </ul>
+
+          {/* Interactive step content */}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={instructionStep}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.2 }}
+              className="min-h-[48px] flex items-start gap-2 text-sm text-slate-300"
+            >
+              <span className={cn('mt-1.5 w-1.5 h-1.5 rounded-full shrink-0', dotClass)} />
+              <div>
+                <p className="font-bold text-neo-cream text-xs uppercase mb-0.5">{t(step.titleKey)}</p>
+                <p>{t(step.descKey)}</p>
+              </div>
+            </motion.div>
+          </AnimatePresence>
+
+          {/* Step navigation */}
+          <div className="flex items-center justify-center gap-3 mt-3">
+            <button
+              onClick={() => setInstructionStep(s => Math.max(0, s - 1))}
+              disabled={instructionStep === 0}
+              className="w-7 h-7 flex items-center justify-center rounded bg-neo-white/10 disabled:opacity-30 transition-opacity"
+              aria-label={t('common.previous')}
+            >
+              <ChevronLeft className="w-4 h-4 text-neo-cream" />
+            </button>
+            <div className="flex gap-1.5">
+              {steps.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setInstructionStep(i)}
+                  className={cn(
+                    'w-2 h-2 rounded-full transition-colors',
+                    i === instructionStep ? dotClass : 'bg-neo-white/20'
+                  )}
+                />
+              ))}
+            </div>
+            <button
+              onClick={() => setInstructionStep(s => Math.min(steps.length - 1, s + 1))}
+              disabled={instructionStep === steps.length - 1}
+              className="w-7 h-7 flex items-center justify-center rounded bg-neo-white/10 disabled:opacity-30 transition-opacity"
+              aria-label={t('common.next')}
+            >
+              <ChevronRight className="w-4 h-4 text-neo-cream" />
+            </button>
+          </div>
         </div>
       </motion.div>
     );

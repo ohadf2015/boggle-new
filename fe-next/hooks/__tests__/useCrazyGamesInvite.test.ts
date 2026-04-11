@@ -63,8 +63,6 @@ describe('useCrazyGamesInvite - Room Lifecycle Auto-Hide', () => {
       getUserToken: vi.fn(),
       listFriends: vi.fn(),
       showAccountLinkPrompt: vi.fn(),
-      getXsollaUserToken: vi.fn(),
-      trackOrder: vi.fn(),
     });
   });
 
@@ -375,8 +373,6 @@ describe('useCrazyGamesInvite - Room Lifecycle Auto-Hide', () => {
         getUserToken: vi.fn(),
         listFriends: vi.fn(),
         showAccountLinkPrompt: vi.fn(),
-        getXsollaUserToken: vi.fn(),
-        trackOrder: vi.fn(),
       });
 
       const onInstantMultiplayer = vi.fn();

@@ -8,6 +8,7 @@ import type {
   TileType,
   TileActivationEffect,
 } from '@/types/adventure';
+import { isThemedWord, getThemeBonusMultiplier } from '@/lib/adventure/themedWords';
 
 export type GameAction =
   | { type: 'START_GAME' }
@@ -70,6 +71,14 @@ export interface GameState {
   freezeUsed: boolean;
   /** Shuffle uses remaining this level */
   shufflesRemaining: number;
+  /** Upgrade tier map for UI effects (upgradeId -> tier). Set at initialization. */
+  upgradeState?: Record<string, number>;
+  /** Set when an upgrade visually triggers this action (e.g. deepDrill melts extra ice). Cleared on next action. */
+  upgradeTriggered: { upgradeId: string; effectValue: number } | null;
+  /** Words from the current world's themed pool that the player has found */
+  themedWordsFound: string[];
+  /** Whether the most recently submitted word was a themed word */
+  lastWordWasThemed: boolean;
 }
 
 const GOLD_MULTIPLIER = 3;
@@ -120,6 +129,7 @@ export function createInitialState(
   levelConfig: LevelConfig,
   grid: string[][],
   upgradeConfig?: ReducerUpgradeConfig,
+  upgradeState?: Record<string, number>,
 ): GameState {
   return {
     gameState: {
@@ -141,6 +151,10 @@ export function createInitialState(
     levelConfig,
     cascadeComplete: false,
     upgradeConfig,
+    upgradeState,
+    upgradeTriggered: null,
+    themedWordsFound: [],
+    lastWordWasThemed: false,
     freezeRemaining: 0,
     freezeUsed: false,
     shufflesRemaining: upgradeConfig?.shuffleUses ?? 0,
@@ -182,10 +196,12 @@ function processSpecialTileEffects(
   gridSize: number,
   baseScore: number,
   upgradeConfig?: ReducerUpgradeConfig,
-): { finalScore: number; iceClearedCount: number; timeBonusSeconds: number } {
+  upgradeState?: Record<string, number>,
+): { finalScore: number; iceClearedCount: number; timeBonusSeconds: number; deepDrillIceCleared: number } {
   let finalScore = baseScore;
   let iceClearedCount = 0;
   let timeBonusSeconds = 0;
+  let deepDrillIceCleared = 0;
   const activationTimestamp = Date.now();
 
   // Gold tile multiplier (3x)
@@ -256,7 +272,12 @@ function processSpecialTileEffects(
     }
   }
 
-  return { finalScore, iceClearedCount, timeBonusSeconds };
+  // Track ice cleared by deepDrill upgrade (when upgrade is active and ice was cleared)
+  if (upgradeState && (upgradeState['deepDrill'] ?? 0) > 0 && iceClearedCount > 0) {
+    deepDrillIceCleared = iceClearedCount;
+  }
+
+  return { finalScore, iceClearedCount, timeBonusSeconds, deepDrillIceCleared };
 }
 
 export function gameReducer(state: GameState, action: GameAction): GameState {
@@ -386,22 +407,34 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         }
       }
 
+      // Clear upgradeTriggered from previous action
+      // Apply themed word bonus
+      const world = state.levelConfig.world;
+      const themed = world > 0 && isThemedWord(world, word);
+      let baseScore = score;
+      if (themed) {
+        baseScore = Math.round(score * getThemeBonusMultiplier(world));
+      }
+
       // Process tile effects
-      let finalScore = score;
+      let finalScore = baseScore;
       let iceClearedCount = 0;
       let timeBonusSeconds = 0;
+      let deepDrillIceCleared = 0;
 
       if (path && path.length > 0) {
         const effects = processSpecialTileEffects(
           path,
           newTiles,
           gridSize,
-          score,
+          baseScore,
           state.upgradeConfig,
+          state.upgradeState,
         );
         finalScore = effects.finalScore;
         iceClearedCount = effects.iceClearedCount;
         timeBonusSeconds = effects.timeBonusSeconds;
+        deepDrillIceCleared = effects.deepDrillIceCleared;
       }
 
       // Word Dynamite T3: detonate clears all tiles adjacent to the word path
@@ -492,12 +525,22 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       // so players have time to earn secondary objectives for 2-3 stars.
       // Level ends only when timer expires (TICK) or boss kills player.
 
+      const newUpgradeTriggered: { upgradeId: string; effectValue: number } | null =
+        deepDrillIceCleared > 0
+          ? { upgradeId: 'deepDrill', effectValue: deepDrillIceCleared }
+          : null;
+
       return {
         ...state,
         tiles: newTiles,
         tilesVersion: state.tilesVersion + 1,
         objectives: newObjectives,
         timeRemaining: newTimeRemaining,
+        upgradeTriggered: newUpgradeTriggered,
+        lastWordWasThemed: themed,
+        themedWordsFound: themed
+          ? [...state.themedWordsFound, word]
+          : state.themedWordsFound,
         gameState: {
           ...state.gameState,
           score: state.gameState.score + finalScore,

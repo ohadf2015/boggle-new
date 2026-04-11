@@ -93,24 +93,39 @@ describe('Gold economy', () => {
 // ==============================================
 
 describe('Timer floors', () => {
-  it('no level should have an effective timer below 80 seconds', () => {
+  it('timer-based levels should have an effective timer >= 80 seconds', () => {
+    // blast and hunt archetypes use timerSeconds=0 (non-timer modes)
     for (let world = 1; world <= WORLDS_COUNT; world++) {
       for (let level = 1; level <= LEVELS_PER_WORLD; level++) {
         const config = getLevelConfig(world, level);
-        expect(config.timerSeconds).toBeGreaterThanOrEqual(80);
+        if (config.timerSeconds > 0) {
+          expect(config.timerSeconds).toBeGreaterThanOrEqual(80);
+        }
       }
     }
   });
 
-  it('survival archetype levels should have timer >= 80s via getLevelConfig floor', () => {
-    // Survival has ×0.6 multiplier. W2 has 110s base → 66s without floor.
-    // The floor in getLevelConfig should clamp to 80s.
+  it('timer-based archetypes should have timerSeconds >= 80s via getLevelConfig floor', () => {
+    // Timer-based archetypes (classic, wheel, forge) apply a multiplier but floor at 80s.
+    // blast and hunt set timerSeconds = 0 (non-timer modes).
     for (let world = 1; world <= WORLDS_COUNT; world++) {
       for (let level = 1; level <= LEVELS_PER_WORLD; level++) {
         const archetype = getArchetypeForLevel(world, level);
-        if (archetype === 'survival') {
+        if (archetype !== 'blast' && archetype !== 'hunt' && archetype !== 'boss') {
           const config = getLevelConfig(world, level);
           expect(config.timerSeconds).toBeGreaterThanOrEqual(80);
+        }
+      }
+    }
+  });
+
+  it('blast and hunt archetype levels should have timerSeconds = 0 (non-timer mode)', () => {
+    for (let world = 1; world <= WORLDS_COUNT; world++) {
+      for (let level = 1; level <= LEVELS_PER_WORLD; level++) {
+        const archetype = getArchetypeForLevel(world, level);
+        if (archetype === 'blast' || archetype === 'hunt') {
+          const config = getLevelConfig(world, level);
+          expect(config.timerSeconds).toBe(0);
         }
       }
     }
@@ -175,7 +190,8 @@ describe('All 70 levels valid', () => {
         const config = getLevelConfig(world, level);
         expect(config.world).toBe(world);
         expect(config.level).toBe(level);
-        expect(config.timerSeconds).toBeGreaterThan(0);
+        // timerSeconds is 0 for non-timer archetypes (blast = move-limited, hunt = life-based)
+        expect(config.timerSeconds).toBeGreaterThanOrEqual(0);
         expect(config.objectives.length).toBeGreaterThanOrEqual(1);
         expect(config.gridSize).toBeGreaterThanOrEqual(4);
         expect(config.gridSize).toBeLessThanOrEqual(7);

@@ -54,83 +54,74 @@ const NEUTRAL_TILES: TileModifiers = {
 };
 
 /**
- * Archetype definitions — each creates a distinct gameplay experience.
+ * Archetype definitions — each maps to a real game mode.
  */
 export const ARCHETYPE_CONFIGS: Record<LevelArchetype, ArchetypeConfig> = {
-  standard: {
+  classic: {
     primaryObjective: 'wordCount',
-    timerMultiplier: 1,
+    timerMultiplier: 1.0,
     tileModifiers: { ...NEUTRAL_TILES },
-    nameKey: 'adventure.archetype.standard',
-    description: 'Balanced word-finding. The baseline Boggle experience.',
+    nameKey: 'adventure.archetype.classic',
+    description: 'Standard Boggle - find words on grid with timer and combo system.',
     secondaryObjectives: ['scoreTarget', 'longWords'],
   },
 
-  excavation: {
+  blast: {
     primaryObjective: 'clearIce',
-    timerMultiplier: 1.15,
+    // 0 signals move-limited mode (not time-limited)
+    timerMultiplier: 0,
     tileModifiers: {
-      ...NEUTRAL_TILES,
+      goldMultiplier: 1.5,
       iceMultiplier: 2.5,
-      goldMultiplier: 0.5,
       bombMultiplier: 2,
+      timeMultiplier: 0, // no time tiles in move mode
     },
-    nameKey: 'adventure.archetype.excavation',
-    description: 'Board heavily iced. Chip away strategically to reveal letters.',
+    nameKey: 'adventure.archetype.blast',
+    description: 'Tile-clearing puzzle with gravity and cascades. Move-limited.',
     secondaryObjectives: ['wordCount', 'scoreTarget'],
   },
 
-  goldRush: {
-    primaryObjective: 'scoreTarget',
-    timerMultiplier: 0.7,
+  hunt: {
+    primaryObjective: 'wordCount',
+    // 0 signals life-based mode (not timer-based)
+    timerMultiplier: 0,
     tileModifiers: {
-      ...NEUTRAL_TILES,
-      goldMultiplier: 3,
-      iceMultiplier: 0,
-    },
-    nameKey: 'adventure.archetype.goldRush',
-    description: 'Gold-loaded board, short timer. Maximize value per word.',
-    secondaryObjectives: ['collectGems', 'longWords'],
-  },
-
-  puzzle: {
-    primaryObjective: 'longWords',
-    timerMultiplier: 1.3,
-    tileModifiers: {
-      ...NEUTRAL_TILES,
+      goldMultiplier: 0.5,
       iceMultiplier: 0,
       bombMultiplier: 0,
+      timeMultiplier: 0,
     },
-    nameKey: 'adventure.archetype.puzzle',
-    description: 'Find specific long or hidden words. Brain teaser.',
-    secondaryObjectives: ['wordCount', 'scoreTarget'],
+    nameKey: 'adventure.archetype.hunt',
+    description: 'Hidden target word with Wordle-style clues. Life bar instead of timer.',
+    secondaryObjectives: ['scoreTarget', 'longWords'],
   },
 
-  survival: {
-    primaryObjective: 'timeBonus',
-    timerMultiplier: 0.6,
-    tileModifiers: {
-      ...NEUTRAL_TILES,
-      timeMultiplier: 3,
-      iceMultiplier: 1.5,
-      goldMultiplier: 0.5,
-    },
-    nameKey: 'adventure.archetype.survival',
-    description: 'Timer drains fast. Time tiles are your lifeline.',
-    secondaryObjectives: ['wordCount', 'scoreTarget'],
-  },
-
-  cascade: {
+  wheel: {
     primaryObjective: 'wordCount',
-    timerMultiplier: 0.9,
+    timerMultiplier: 0.7,
     tileModifiers: {
-      ...NEUTRAL_TILES,
-      bombMultiplier: 2,
-      goldMultiplier: 1.5,
+      goldMultiplier: 1,
+      iceMultiplier: 0,
+      bombMultiplier: 0,
+      timeMultiplier: 1.5,
     },
-    nameKey: 'adventure.archetype.cascade',
-    description: 'Aggressive board reshuffling. Bombs and combos matter.',
-    secondaryObjectives: ['scoreTarget', 'collectGems'],
+    nameKey: 'adventure.archetype.wheel',
+    description: 'Center letter mandatory - all words must include it. Circular UI overlay.',
+    secondaryObjectives: ['longWords', 'scoreTarget'],
+  },
+
+  forge: {
+    primaryObjective: 'scoreTarget',
+    timerMultiplier: 0.8,
+    tileModifiers: {
+      goldMultiplier: 2,
+      iceMultiplier: 1,
+      bombMultiplier: 1.5,
+      timeMultiplier: 1,
+    },
+    nameKey: 'adventure.archetype.forge',
+    description: 'Score target with rune modifiers. Pick a rune before the level.',
+    secondaryObjectives: ['wordCount', 'longWords'],
   },
 
   boss: {
@@ -159,35 +150,35 @@ export const ARCHETYPE_CONFIGS: Record<LevelArchetype, ArchetypeConfig> = {
  * - Pacing follows teach → practice → twist → challenge → rest → surprise → boss
  */
 export const WORLD_ARCHETYPE_MAPS: Record<number, LevelArchetype[]> = {
-  // World 1: Tutorial — gentle introduction
-  1: ['standard', 'standard', 'standard', 'standard', 'standard', 'standard', 'boss'],
+  // World 1: Tutorial — all classic, gentle introduction
+  1: ['classic', 'classic', 'classic', 'classic', 'classic', 'classic', 'boss'],
 
-  // World 2: Ice introduced — first excavation taste
-  2: ['standard', 'standard', 'excavation', 'standard', 'standard', 'excavation', 'boss'],
+  // World 2: Intro modes — first blast and wheel taste
+  2: ['classic', 'classic', 'blast', 'classic', 'wheel', 'classic', 'boss'],
 
   // World 3: Full variety begins
-  3: ['standard', 'excavation', 'goldRush', 'survival', 'standard', 'puzzle', 'boss'],
+  3: ['classic', 'blast', 'hunt', 'wheel', 'classic', 'forge', 'boss'],
 
-  // World 4: Idiom world — puzzle-heavy
-  4: ['standard', 'puzzle', 'excavation', 'cascade', 'goldRush', 'survival', 'boss'],
+  // World 4
+  4: ['classic', 'wheel', 'blast', 'forge', 'hunt', 'classic', 'boss'],
 
-  // World 5: Compound Canyon — cascade combos shine
-  5: ['standard', 'excavation', 'goldRush', 'survival', 'cascade', 'puzzle', 'boss'],
+  // World 5
+  5: ['blast', 'classic', 'forge', 'hunt', 'classic', 'wheel', 'boss'],
 
-  // World 6: Anagram Labyrinth — puzzle + survival pressure
-  6: ['excavation', 'goldRush', 'puzzle', 'cascade', 'survival', 'standard', 'boss'],
+  // World 6
+  6: ['hunt', 'forge', 'classic', 'blast', 'wheel', 'classic', 'boss'],
 
-  // World 7: Mirror Palace — strategic variety
-  7: ['goldRush', 'survival', 'standard', 'excavation', 'puzzle', 'cascade', 'boss'],
+  // World 7
+  7: ['forge', 'classic', 'wheel', 'hunt', 'blast', 'classic', 'boss'],
 
-  // World 8: Nebula — all archetypes, harder tuning
-  8: ['survival', 'cascade', 'excavation', 'goldRush', 'standard', 'puzzle', 'boss'],
+  // World 8
+  8: ['classic', 'hunt', 'blast', 'forge', 'wheel', 'hunt', 'boss'],
 
-  // World 9: Polyglot Peaks — pressure mounts
-  9: ['cascade', 'puzzle', 'goldRush', 'standard', 'excavation', 'survival', 'boss'],
+  // World 9
+  9: ['wheel', 'blast', 'forge', 'classic', 'hunt', 'forge', 'boss'],
 
-  // World 10: Final world — every archetype, maximum challenge
-  10: ['excavation', 'survival', 'cascade', 'puzzle', 'goldRush', 'standard', 'boss'],
+  // World 10: Final world — maximum variety and challenge
+  10: ['blast', 'hunt', 'wheel', 'forge', 'classic', 'hunt', 'boss'],
 };
 
 // ==============================================

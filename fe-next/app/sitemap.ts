@@ -88,6 +88,7 @@ function getAllRoutes(): MetadataRoute.Sitemap {
   addForAllLocales(routes, '/adventure', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.8 });
   addForAllLocales(routes, '/daily/word-hunt', { lastModified: LAST_DEPLOYED, changeFrequency: 'daily', priority: 0.8 });
   addForAllLocales(routes, '/daily/word-wheel', { lastModified: LAST_DEPLOYED, changeFrequency: 'daily', priority: 0.85 });
+  addForAllLocales(routes, '/daily/archive', { lastModified: LAST_DEPLOYED, changeFrequency: 'daily', priority: 0.7 });
 
   // ─── Brain training ───
   addForAllLocales(routes, '/brain', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.8 });

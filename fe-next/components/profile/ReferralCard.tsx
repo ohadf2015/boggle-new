@@ -137,7 +137,7 @@ export function ReferralCard() {
     return (
       <div className={cn(
         'rounded-3xl p-6 mb-4',
-        'bg-slate-800/80 border-3 border-neo-pink shadow-hard-pink'
+        'bg-slate-800/40 backdrop-blur-sm border border-neo-pink/20 rounded-[28px]'
       )}>
         <div className="flex items-center justify-center py-6">
           <Loader size="md" />
@@ -150,7 +150,7 @@ export function ReferralCard() {
     return (
       <div className={cn(
         'rounded-3xl p-6 mb-4',
-        'bg-slate-800/80 border-3 border-neo-pink shadow-hard-pink'
+        'bg-slate-800/40 backdrop-blur-sm border border-neo-pink/20 rounded-[28px]'
       )}>
         <p className="text-center text-red-500 text-sm">{error || 'Failed to load referral data'}</p>
       </div>
@@ -162,8 +162,8 @@ export function ReferralCard() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       className={cn(
-        'rounded-3xl p-4 sm:p-6 mb-4',
-        'bg-slate-800/80 border-3 border-neo-pink shadow-hard-pink'
+        'p-4 sm:p-6 mb-4',
+        'bg-slate-800/40 backdrop-blur-sm border border-neo-pink/20 rounded-[28px]'
       )}
     >
       {/* Header */}
@@ -225,7 +225,7 @@ export function ReferralCard() {
             )}>
               {t('profile.yourReferralCode')}
             </div>
-            <code className="text-xl font-black text-neo-black bg-neo-lime px-3 py-1 rounded-lg border-3 border-neo-black shadow-hard-sm tracking-wider">
+            <code className="text-xl font-black text-neo-lime bg-neo-lime/10 px-3 py-1 rounded-lg tracking-wider">
               {referralData.referralCode}
             </code>
           </div>

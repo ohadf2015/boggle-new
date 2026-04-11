@@ -6,8 +6,7 @@
  */
 
 import { getLevelConfig } from '@/lib/adventure/levelConfig';
-import type { LevelConfig } from '@/types/adventure';
-import type { DifficultyTier, TierAdjustments } from '@/types/difficulty';
+import type { DifficultyTier } from '@/types/difficulty';
 import { applyTierAdjustments, getTierAdjustments } from '../configAdjuster';
 
 describe('configAdjuster', () => {
@@ -90,7 +89,7 @@ describe('configAdjuster', () => {
 
       it('should decrease score target by 20% for easy tier', () => {
         // GIVEN
-        const baseConfig = getLevelConfig(3, 3); // goldRush archetype → scoreTarget primary
+        const baseConfig = getLevelConfig(3, 6); // forge archetype → scoreTarget primary
         const tier: DifficultyTier = 'easy';
 
         // WHEN
@@ -176,7 +175,7 @@ describe('configAdjuster', () => {
 
       it('should not modify score targets for hard tier', () => {
         // GIVEN
-        const baseConfig = getLevelConfig(3, 3); // goldRush archetype → scoreTarget primary
+        const baseConfig = getLevelConfig(3, 6); // forge archetype → scoreTarget primary
         const tier: DifficultyTier = 'hard';
 
         // WHEN

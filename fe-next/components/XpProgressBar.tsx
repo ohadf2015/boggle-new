@@ -98,7 +98,7 @@ const XpProgressBar = memo<XpProgressBarProps>(({
             {/* XP Multiplier indicator */}
             {showPrestige && prestigeMultiplier > 1 && (
               <span className="text-[10px] font-bold text-neo-lime bg-neo-lime/20 px-1.5 py-0.5 rounded">
-                {t('xp.xpBonus').replace('{{percent}}', String(Math.round((prestigeMultiplier - 1) * 100)))}
+                {t('xp.xpBonus', { percent: Math.round((prestigeMultiplier - 1) * 100) })}
               </span>
             )}
           </div>

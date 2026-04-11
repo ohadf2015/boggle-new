@@ -311,12 +311,13 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
           </div>
         </motion.div>
 
-        {/* PRIMARY PLAY BUTTON — inline, always visible early on ALL viewports */}
+        {/* PRIMARY PLAY BUTTON — inline on desktop, sticky on mobile */}
+        {/* Desktop inline button */}
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.15, type: 'spring', stiffness: 300, damping: 26 }}
-          className="w-full max-w-sm mx-auto"
+          className="hidden sm:block w-full max-w-sm mx-auto"
         >
           <button
             onClick={onStart}
@@ -368,23 +369,6 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
           transition={{ delay: 0.4, type: 'spring', stiffness: 280, damping: 26 }}
           className="flex items-center justify-center gap-4 pt-2"
         >
-          <button
-            onClick={onShowTutorial}
-            className={`text-sm font-bold transition-colors flex items-center gap-1 ${
-              !tutorialCompleted
-                ? 'text-neo-pink dark:text-neo-pink-light hover:text-neo-pink-dark'
-                : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
-            }`}
-          >
-            <span>?</span> {t('daily.howToPlay')}
-            {!tutorialCompleted && (
-              <span className="relative flex h-2 w-2 ms-1">
-                <span className="absolute inline-flex h-full w-full rounded-full bg-neo-pink opacity-75 animate-ping" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-neo-pink" />
-              </span>
-            )}
-          </button>
-          <span className="text-gray-300 dark:text-gray-600">|</span>
           <button
             onClick={() => setShowLeaderboard(!showLeaderboard)}
             className="text-sm font-bold text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors flex items-center gap-1"
@@ -461,7 +445,23 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
 
       </div>
 
-      {/* Sticky play button removed — inline CTA now appears above the fold on all viewports */}
+      {/* Mobile sticky play button — sits above bottom nav, below cookie consent */}
+      <div className="sm:hidden fixed bottom-16 inset-x-0 z-[100] px-4 pb-2 pointer-events-none">
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.15, type: 'spring', stiffness: 300, damping: 26 }}
+          className="max-w-sm mx-auto pointer-events-auto"
+        >
+          <button
+            onClick={onStart}
+            className="group w-full py-4 text-lg font-black uppercase rounded-neo border-3 border-neo-black bg-linear-to-r from-emerald-400 to-neo-cyan text-neo-black shadow-hard transition-all duration-200 active:translate-y-0.5 active:shadow-hard-pressed flex items-center justify-center gap-2 animate-breathing"
+          >
+            <Target className="w-6 h-6" />
+            {t('daily.playButton')}
+          </button>
+        </motion.div>
+      </div>
 
       <CreateChallengeModal
         isOpen={showCreateChallenge}

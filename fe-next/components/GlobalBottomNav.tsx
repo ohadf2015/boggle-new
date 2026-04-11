@@ -173,7 +173,7 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
                                 <motion.div
                                     layoutId="tab-indicator"
                                     className={cn(
-                                        "absolute top-0 w-8 h-1 rounded-b-full",
+                                        "absolute top-0 w-2 h-2 rounded-full -translate-y-1/2",
                                         INDICATOR_COLORS[tab.id]
                                     )}
                                     transition={{ type: 'spring' as const, damping: 25, stiffness: 300 }}
