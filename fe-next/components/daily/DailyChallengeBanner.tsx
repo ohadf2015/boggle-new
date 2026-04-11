@@ -191,7 +191,7 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
     // SSR placeholder — invisible to match motion wrapper's initial opacity:0
     return (
       <div className={cn(
-        "w-full h-full rounded-neo border-3 border-neo-black shadow-hard-lg bg-linear-to-br from-yellow-300 via-amber-400 to-orange-500 opacity-0",
+        "w-full h-full rounded-neo border-3 border-neo-black shadow-hard-lg bg-gradient-to-br from-amber-500 via-yellow-400 to-orange-400 opacity-0",
         compact ? "p-2 sm:p-3" : "p-3 sm:p-4",
         className
       )}>
@@ -209,12 +209,12 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
     );
   }
 
-  // Premium gold gradient for "daily treasure" feel
+  // Warm gold-to-amber gradient — premium daily challenge feel
   const gradientClass = hasPlayed
-    ? "bg-linear-to-br from-amber-400 via-orange-400 to-amber-500"
-    : "bg-linear-to-br from-yellow-300 via-amber-400 to-orange-500";
+    ? "bg-gradient-to-br from-amber-700/80 via-yellow-800/70 to-amber-700/80"
+    : "bg-gradient-to-br from-amber-500 via-yellow-400 to-orange-400";
 
-  const glowColor = 'rgba(255, 165, 0, 0.5)';
+  const glowColor = 'rgba(255, 215, 0, 0.5)';
 
   return (
     <Link href={`/${language}/daily`} className="block w-full h-full group">
@@ -261,7 +261,7 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
                 ease: "easeInOut"
               }}
             >
-              <Sparkles className="w-4 h-4 text-yellow-100" />
+              <Sparkles className="w-4 h-4 text-white" />
             </motion.div>
             <motion.div
               className="absolute top-1 right-8 rtl:right-auto rtl:left-8"
@@ -278,7 +278,7 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
                 delay: 0.5
               }}
             >
-              <Star className="w-3 h-3 text-yellow-100 fill-yellow-100" />
+              <Star className="w-3 h-3 text-white fill-white" />
             </motion.div>
             <motion.div
               className="absolute bottom-2 right-4 rtl:right-auto rtl:left-4"
@@ -294,7 +294,7 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
                 delay: 1
               }}
             >
-              <Zap className="w-3 h-3 text-yellow-100 fill-yellow-100" />
+              <Zap className="w-3 h-3 text-white fill-white" />
             </motion.div>
           </>
         )}
@@ -366,7 +366,7 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
               {/* Streak badge - more prominent */}
               {streak > 0 && (
                 <motion.span
-                  className="flex items-center gap-1 px-2 py-0.5 rounded-neo bg-neo-navy text-neo-orange border border-neo-black"
+                  className="flex items-center gap-1 px-2 py-0.5 rounded-neo bg-neo-navy text-neo-pink border border-neo-black"
                   animate={{ scale: [1, 1.05, 1] }}
                   transition={{ duration: 0.6, repeat: Infinity, repeatDelay: 2 }}
                 >
@@ -376,7 +376,7 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
               )}
               {/* Countdown */}
               <div className={cn(
-                "flex items-center gap-1.5 text-neo-black/70 font-semibold",
+                "flex items-center gap-1.5 text-neo-black/80 font-semibold",
                 compact ? "text-xs" : "text-xs sm:text-sm"
               )}>
                 <Clock className="w-3.5 h-3.5" />

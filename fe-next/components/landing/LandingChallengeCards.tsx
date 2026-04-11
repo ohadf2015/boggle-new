@@ -97,14 +97,15 @@ export function LandingChallengeCards({
         next.splice(dailyIdx >= 0 ? dailyIdx + 1 : 0, 0, 'quickPlay');
         return next;
       })();
-  const veteranFiltered: LandingCardKey[] = isVeteran
+  // Mutual exclusivity: newcomers see practice (not quickPlay), veterans see quickPlay (not practice)
+  const progressFiltered: LandingCardKey[] = isVeteran
     ? withQuickPlay.filter((m) => m !== 'practice')
-    : withQuickPlay;
+    : withQuickPlay.filter((m) => m !== 'quickPlay');
   const cardOrder: LandingCardKey[] = isNewbie && !isVeteran
-    ? (['practice', 'daily', ...veteranFiltered.filter((m) => m !== 'practice' && m !== 'daily')] as LandingCardKey[])
-    : veteranFiltered[0] === 'daily'
-    ? veteranFiltered
-    : (['daily', ...veteranFiltered.filter((m) => m !== 'daily')] as LandingCardKey[]);
+    ? (['practice', 'daily', ...progressFiltered.filter((m) => m !== 'practice' && m !== 'daily')] as LandingCardKey[])
+    : progressFiltered[0] === 'daily'
+    ? progressFiltered
+    : (['daily', ...progressFiltered.filter((m) => m !== 'daily')] as LandingCardKey[]);
 
   /** Renders a card by mode key with staggered CSS animation */
   const renderCard = (mode: LandingCardKey, index: number) => {

@@ -699,7 +699,8 @@ const AdventureGame = memo<AdventureGameProps>(
               isBossLevel={isBossLevel} elapsedTime={isBossLevel ? timeRemaining : undefined}
               comboCount={gameState.comboCount} comboTimeoutMs={effectiveComboTimeout}
               modeDisplayKey={modeState.archetype !== 'classic' ? modeState.modeDisplayKey : undefined}
-              showMoveCounter={modeState.showMoveCounter} movesRemaining={movesRemaining} />
+              showMoveCounter={modeState.showMoveCounter} movesRemaining={movesRemaining}
+              showLifeBar={modeState.showLifeBar} currentHP={currentHP} maxHP={maxHP} />
           }
           gridArea={
             <GameGridArea tiles={tiles} gridSize={levelConfig.gridSize}

@@ -19,32 +19,32 @@ export interface AttemptHistoryProps {
 
 const FEEDBACK_COLORS = {
   green: {
-    bg: 'bg-emerald-500',
-    border: 'border-emerald-400',
-    glow: 'shadow-[0_0_8px_rgba(16,185,129,0.4)]',
-    text: 'text-white',
+    bg: 'bg-neo-lime',
+    border: 'border-neo-lime-light',
+    glow: 'shadow-[0_0_8px_rgba(191,255,0,0.4)]',
+    text: 'text-neo-black',
   },
   yellow: {
-    bg: 'bg-amber-500',
-    border: 'border-amber-400',
-    glow: 'shadow-[0_0_8px_rgba(245,158,11,0.4)]',
-    text: 'text-white',
+    bg: 'bg-neo-cyan-muted',
+    border: 'border-neo-cyan',
+    glow: 'shadow-[0_0_8px_rgba(0,255,255,0.3)]',
+    text: 'text-neo-black',
   },
   gray: {
-    bg: 'bg-slate-600',
-    border: 'border-slate-500',
+    bg: 'bg-neo-navy-light',
+    border: 'border-neo-cream/20',
     glow: '',
-    text: 'text-slate-300',
+    text: 'text-neo-cream/60',
   },
 } as const;
 
 /** Get attempt label badge based on row index */
 function getAttemptBadge(idx: number, total: number, isCorrect: boolean): { emoji: string; color: string } | null {
   if (isCorrect) {
-    if (idx === 0) return { emoji: '🧠', color: 'text-neo-yellow' };
+    if (idx === 0) return { emoji: '🧠', color: 'text-neo-lime' };
     if (idx <= 2) return { emoji: '⚡', color: 'text-neo-cyan' };
     if (idx <= 4) return { emoji: '💪', color: 'text-neo-lime' };
-    if (idx >= total - 1) return { emoji: '😅', color: 'text-neo-orange' };
+    if (idx >= total - 1) return { emoji: '😅', color: 'text-neo-pink' };
   }
   return null;
 }
@@ -86,7 +86,7 @@ export const AttemptHistory: React.FC<AttemptHistoryProps> = ({
       </div>
 
       {/* Attempt grid */}
-      <div className="relative bg-slate-800/60 rounded-neo border-2 border-neo-black p-3 space-y-1.5 overflow-hidden">
+      <div className="relative bg-neo-navy-light/60 rounded-neo border-2 border-neo-black p-3 space-y-1.5 overflow-hidden">
         {/* Subtle grid background pattern */}
         <div
           className="absolute inset-0 opacity-[0.03] pointer-events-none"
@@ -114,13 +114,13 @@ export const AttemptHistory: React.FC<AttemptHistoryProps> = ({
               }}
               className={cn(
                 "relative flex items-center justify-center gap-1.5 py-1 rounded-md transition-colors",
-                isCorrectRow && "bg-emerald-500/10"
+                isCorrectRow && "bg-neo-lime/10"
               )}
             >
               {/* Row number */}
               <span className={cn(
                 "text-[11px] font-bold w-5 text-right tabular-nums",
-                isCorrectRow ? "text-emerald-400" : "text-slate-500"
+                isCorrectRow ? "text-neo-lime" : "text-neo-cream/30"
               )}>
                 {rowIdx + 1}
               </span>
@@ -169,7 +169,7 @@ export const AttemptHistory: React.FC<AttemptHistoryProps> = ({
                   initial={{ opacity: 0, scale: 0 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: rowIdx * 0.1 + 0.4 }}
-                  className="text-[10px] font-bold text-emerald-400/70 w-5"
+                  className="text-[10px] font-bold text-neo-lime/70 w-5"
                 >
                   {greenCount}✓
                 </motion.span>

@@ -11,7 +11,7 @@
 
 import { memo } from 'react';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
-import { Pause, Play, X, Swords, Crosshair } from 'lucide-react';
+import { Pause, Play, X, Swords, Crosshair, Heart } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useHUDTheme } from '@/contexts/AdventureThemeContext';
@@ -47,6 +47,12 @@ interface GameHeaderProps {
   showMoveCounter?: boolean;
   /** Moves remaining (blast mode) */
   movesRemaining?: number;
+  /** Show life bar in header (hunt mode) */
+  showLifeBar?: boolean;
+  /** Current HP (hunt mode) */
+  currentHP?: number;
+  /** Max HP (hunt mode) */
+  maxHP?: number;
   className?: string;
 }
 
@@ -70,6 +76,9 @@ export const GameHeader = memo(function GameHeader({
   modeDisplayKey,
   showMoveCounter = false,
   movesRemaining,
+  showLifeBar = false,
+  currentHP,
+  maxHP,
   className,
 }: GameHeaderProps) {
   const { t } = useLanguage();
@@ -187,6 +196,39 @@ export const GameHeader = memo(function GameHeader({
             )}>
               {movesRemaining}
             </span>
+          </div>
+        ) : showLifeBar && currentHP != null && maxHP != null ? (
+          /* Hunt mode: HP bar instead of timer */
+          <div className={cn(
+            'flex items-center gap-1.5',
+            'bg-neo-cyan/15 rounded-neo',
+            'border-2 border-neo-cyan/30',
+            'px-2 py-0.5'
+          )}>
+            <span dir="ltr" className="text-[10px] font-mono font-bold tabular-nums text-neo-white/60">
+              W{worldNumber}·L{levelNumber}
+            </span>
+            <span className="text-neo-white/20 text-[10px]">|</span>
+            <Heart className="w-3.5 h-3.5 text-neo-cyan fill-neo-cyan/50" />
+            <div className="flex items-center gap-1">
+              <div className="w-16 h-2 bg-neo-black/40 rounded-full overflow-hidden border border-neo-white/10">
+                <div
+                  className={cn(
+                    'h-full rounded-full transition-all duration-500',
+                    currentHP / maxHP > 0.5 ? 'bg-neo-cyan' :
+                    currentHP / maxHP > 0.25 ? 'bg-neo-yellow' : 'bg-neo-red'
+                  )}
+                  style={{ width: `${Math.max(0, (currentHP / maxHP) * 100)}%` }}
+                />
+              </div>
+              <span className={cn(
+                'text-xs font-mono font-black tabular-nums',
+                currentHP / maxHP > 0.5 ? 'text-neo-cyan' :
+                currentHP / maxHP > 0.25 ? 'text-neo-yellow' : 'text-neo-red'
+              )}>
+                {currentHP}
+              </span>
+            </div>
           </div>
         ) : (
           /* Classic/wheel/forge: standard timer */

@@ -72,14 +72,14 @@ const PlayersReadyIndicator: React.FC<PlayersReadyIndicatorProps> = ({
         {/* Combined header + avatars in one compact row */}
         <div className="relative">
           {/* Progress bar background */}
-          <div className="absolute inset-0 bg-slate-700/30" />
+          <div className="absolute inset-0 bg-neo-navy-light/30" />
 
           {/* Animated progress fill */}
           <motion.div
             className={`absolute inset-y-0 left-0 ${
               allReady
-                ? 'bg-linear-to-r from-emerald-500/30 to-teal-400/30'
-                : 'bg-linear-to-r from-neo-lime/20 to-amber-500/20'
+                ? 'bg-linear-to-r from-neo-lime/30 to-neo-cyan/30'
+                : 'bg-linear-to-r from-neo-lime/20 to-neo-pink/20'
             }`}
             initial={{ width: 0 }}
             animate={{ width: `${progressPercent}%` }}
@@ -100,7 +100,7 @@ const PlayersReadyIndicator: React.FC<PlayersReadyIndicatorProps> = ({
                   <Hourglass className="text-neo-lime w-3.5 h-3.5" />
                 )}
               </motion.div>
-              <span className="font-black text-[11px] uppercase tracking-wide text-white/80">
+              <span className="font-black text-[11px] uppercase tracking-wide text-neo-cream/80">
                 {allReady ? t('results.everyoneReady') : t('results.waitingForPlayers')}
               </span>
             </div>
@@ -137,7 +137,7 @@ const PlayersReadyIndicator: React.FC<PlayersReadyIndicatorProps> = ({
                         ${!isReady ? 'opacity-40 grayscale' : ''}
                       `}>
                         {isBot ? (
-                          <div className="w-8 h-8 rounded-full bg-slate-700 border-2 border-neo-black flex items-center justify-center">
+                          <div className="w-8 h-8 rounded-full bg-neo-navy-light border-2 border-neo-black flex items-center justify-center">
                             <Bot className="text-neo-cyan w-3.5 h-3.5" />
                           </div>
                         ) : (
@@ -158,16 +158,16 @@ const PlayersReadyIndicator: React.FC<PlayersReadyIndicatorProps> = ({
                             absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full
                             flex items-center justify-center
                             border-[1.5px] border-neo-navy
-                            ${isReady ? 'bg-emerald-500' : 'bg-slate-600'}
+                            ${isReady ? 'bg-neo-lime' : 'bg-neo-navy-light'}
                           `}
                         >
                           {isReady ? (
-                            <Check className="text-white w-2.5 h-2.5" />
+                            <Check className="text-neo-black w-2.5 h-2.5" />
                           ) : (
                             <motion.div
                               animate={{ opacity: [0.3, 1, 0.3] }}
                               transition={{ duration: 1.5, repeat: inf }}
-                              className="w-1.5 h-1.5 rounded-full bg-slate-400"
+                              className="w-1.5 h-1.5 rounded-full bg-neo-cream/40"
                             />
                           )}
                         </motion.div>
@@ -182,12 +182,12 @@ const PlayersReadyIndicator: React.FC<PlayersReadyIndicatorProps> = ({
             <div className={`
               shrink-0 flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-black
               ${allReady
-                ? 'bg-emerald-500/20 text-emerald-400'
-                : 'bg-slate-700/50 text-slate-300'
+                ? 'bg-neo-lime/20 text-neo-lime'
+                : 'bg-neo-navy-light/50 text-neo-cream/60'
               }
             `}>
-              <span className={allReady ? 'text-emerald-400' : 'text-neo-lime'}>{effectiveReadyCount}</span>
-              <span className="text-slate-500">/</span>
+              <span className={allReady ? 'text-neo-lime' : 'text-neo-lime'}>{effectiveReadyCount}</span>
+              <span className="text-neo-cream/30">/</span>
               <span>{totalPlayers}</span>
             </div>
           </div>
@@ -203,9 +203,9 @@ const PlayersReadyIndicator: React.FC<PlayersReadyIndicatorProps> = ({
               transition={{ duration: 0.2 }}
               className="overflow-hidden"
             >
-              <div className="px-3 py-1.5 bg-emerald-500/10 border-t border-emerald-500/20 flex items-center justify-center gap-2">
+              <div className="px-3 py-1.5 bg-neo-lime/10 border-t border-neo-lime/20 flex items-center justify-center gap-2">
                 <MascotWithEntrance variant="celebration" size="xs" delay={0.2} clipBorder="none" />
-                <p className="text-center text-xs font-bold text-emerald-300">
+                <p className="text-center text-xs font-bold text-neo-lime">
                   {isHost
                     ? (t('results.allReadyHostCanStart'))
                     : (t('results.allPlayersReadyWaitingHost'))}

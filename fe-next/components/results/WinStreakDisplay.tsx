@@ -4,7 +4,6 @@ import { useEffect, useState, useRef, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Flame, Zap, Crown, Gem, Star } from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { useTheme } from '../../utils/ThemeContext';
 import { cn } from '../../lib/utils';
 import { fireConfetti } from '@/utils/confettiUtils';
 import useReducedMotion from '@/hooks/useReducedMotion';
@@ -52,10 +51,8 @@ const WinStreakDisplay = memo<WinStreakDisplayProps>(({
   compact = false,
 }) => {
   const { t } = useLanguage();
-  const { theme } = useTheme();
   const reducedMotion = useReducedMotion();
   const inf = reducedMotion ? 0 : Infinity;
-  const isDarkMode = theme === 'dark';
   const [showMilestone, setShowMilestone] = useState(false);
   const hasShownMilestoneRef = useRef(false);
 
@@ -100,7 +97,7 @@ const WinStreakDisplay = memo<WinStreakDisplayProps>(({
           'inline-flex items-center gap-2 px-3 py-1.5 rounded-neo-pill',
           'border-2 border-neo-black shadow-hard-sm',
           'text-sm font-bold',
-          isDarkMode ? 'bg-neo-red text-neo-black' : 'bg-neo-red text-neo-black'
+          'bg-neo-red text-neo-black'
         )}
       >
         <Icon className="w-4 h-4" />
@@ -119,7 +116,7 @@ const WinStreakDisplay = memo<WinStreakDisplayProps>(({
       className={cn(
         'relative p-4 rounded-neo-lg border-3 border-neo-black overflow-hidden',
         'shadow-hard',
-        isDarkMode ? 'bg-slate-800' : 'bg-neo-cream'
+        'bg-neo-navy-light'
       )}
     >
       {/* Background pulse for milestones */}
@@ -162,13 +159,13 @@ const WinStreakDisplay = memo<WinStreakDisplayProps>(({
             <div className="flex items-center gap-2">
               <span className={cn(
                 'text-2xl font-black',
-                isDarkMode ? 'text-neo-white' : 'text-neo-black'
+                'text-neo-white'
               )}>
                 {currentStreak}
               </span>
               <span className={cn(
                 'text-sm font-bold',
-                isDarkMode ? 'text-neo-cream/80' : 'text-neo-black/70'
+                'text-neo-cream/80'
               )}>
                 {t('growth.dayStreak')}
               </span>
@@ -177,7 +174,7 @@ const WinStreakDisplay = memo<WinStreakDisplayProps>(({
             {tier && (
               <div className={cn(
                 'text-xs font-bold flex items-center gap-1',
-                isDarkMode ? 'text-gray-300' : 'text-neo-black/80'
+                'text-neo-cream/70'
               )}>
                 <span>{tier.emoji}</span>
                 <span className="uppercase tracking-wide">{tier.name}</span>
@@ -196,7 +193,7 @@ const WinStreakDisplay = memo<WinStreakDisplayProps>(({
           <div className="text-right">
             <div className={cn(
               'text-xs font-bold',
-              isDarkMode ? 'text-neo-cream/60' : 'text-neo-black/60'
+              'text-neo-cream/60'
             )}>
               {t('growth.nextTier')}
             </div>
@@ -204,7 +201,7 @@ const WinStreakDisplay = memo<WinStreakDisplayProps>(({
               <span className="text-lg">{nextTier.emoji}</span>
               <span className={cn(
                 'text-sm font-bold',
-                isDarkMode ? 'text-gray-200' : 'text-neo-black'
+                'text-neo-cream/80'
               )}>
                 {nextTier.min - currentStreak} {t('growth.daysAway')}
               </span>
@@ -218,7 +215,7 @@ const WinStreakDisplay = memo<WinStreakDisplayProps>(({
         <div className="relative z-10 mt-3">
           <div className={cn(
             'h-3 rounded-neo-pill border-2 border-neo-black overflow-hidden',
-            isDarkMode ? 'bg-slate-700' : 'bg-neo-cream'
+            'bg-neo-navy-light'
           )}>
             <motion.div
               initial={{ width: 0 }}

@@ -183,6 +183,13 @@ export const GameSidebar = memo(function GameSidebar({
           />
         </div>
       )}
+      {/* Hunt mode: loading state while target word is being picked */}
+      {showTargetWordUI && huntTargetLength === 0 && (
+        <div className="px-3 py-2 border-b border-neo-white/10 flex items-center gap-2">
+          <div className="w-3.5 h-3.5 border-2 border-neo-cyan/40 border-t-neo-cyan rounded-full animate-spin" />
+          <span className="text-xs text-neo-white/40 font-mono">{t('adventure.mode.huntLoadingTarget')}</span>
+        </div>
+      )}
 
       {/* Mobile: Bottom action panel with objectives + action buttons */}
       <div className="lg:hidden flex flex-col h-full px-2.5 py-2 gap-1.5 overflow-y-auto scrollbar-hide">

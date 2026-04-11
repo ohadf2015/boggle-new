@@ -7187,6 +7187,7 @@ const es = {
       "blastObjective": "¡Usa tus movimientos sabiamente!",
       "hunt": "Caza",
       "huntObjective": "¡Sobrevive el mayor tiempo posible!",
+      "huntLoadingTarget": "Buscando palabra oculta...",
       "wheel": "Rueda",
       "wheelObjective": "¡Cada palabra debe incluir la letra central!",
       "wheelMustInclude": "Debe incluir:",

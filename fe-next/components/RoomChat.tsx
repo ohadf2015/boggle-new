@@ -153,9 +153,9 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
             duration: 4000,
             position: 'top-right',
             style: {
-              background: '#FFFEF0',
-              border: '3px solid #000000',
-              boxShadow: '4px 4px 0px #000000',
+              background: 'var(--neo-cream)',
+              border: '3px solid var(--neo-black)',
+              boxShadow: '4px 4px 0px var(--neo-black)',
               borderRadius: '8px',
               padding: '12px 16px',
               cursor: 'pointer',
@@ -299,7 +299,7 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
                 className="relative"
               >
                 {/* Decorative background shapes - smaller */}
-                <div className="absolute -top-1 -right-1 w-10 h-10 bg-neo-pink text-white border-2 border-neo-black rotate-12 -z-10" />
+                <div className="absolute -top-1 -right-1 w-10 h-10 bg-neo-pink text-neo-cream border-2 border-neo-black rotate-12 -z-10" />
                 <div className="absolute -bottom-1 -left-1 w-8 h-8 bg-neo-cyan text-neo-black border-2 border-neo-black -rotate-6 -z-10" />
 
                 {/* Main icon container - smaller */}

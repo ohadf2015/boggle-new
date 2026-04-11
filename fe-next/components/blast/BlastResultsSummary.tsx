@@ -69,7 +69,7 @@ export function BlastResultsSummary({
 
   return (
     <div
-      className="flex-1 flex flex-col items-center justify-start gap-4 px-4 py-6 overflow-y-auto w-full max-w-md mx-auto"
+      className="flex-1 flex flex-col items-center justify-start gap-4 px-4 py-6 pb-24 overflow-y-auto w-full max-w-md mx-auto"
       data-testid="blast-results-summary"
     >
       {/* Mascot — expression reacts to run outcome via pure selector */}

@@ -18,33 +18,6 @@ import { Loader } from '@/components/ui/Loader';
  * Features: Thick borders, hard shadows, bold uppercase text, vibrant colors
  */
 
-// Custom toast styles for Neo-Brutalist design
-const neoToastStyles = {
-  success: {
-    background: 'var(--neo-lime)',
-    color: 'var(--neo-black)',
-    border: '3px solid var(--neo-black)',
-    boxShadow: '4px 4px 0px var(--neo-black)',
-  },
-  error: {
-    background: 'var(--neo-red)',
-    color: 'var(--neo-white)',
-    border: '3px solid var(--neo-black)',
-    boxShadow: '4px 4px 0px var(--neo-black)',
-  },
-  info: {
-    background: 'var(--neo-cyan)',
-    color: 'var(--neo-black)',
-    border: '3px solid var(--neo-black)',
-    boxShadow: '4px 4px 0px var(--neo-black)',
-  },
-  warning: {
-    background: 'var(--neo-yellow)',
-    color: 'var(--neo-black)',
-    border: '3px solid var(--neo-black)',
-    boxShadow: '4px 4px 0px var(--neo-black)',
-  },
-};
 
 interface WordAcceptedOptions {
   score?: number;

@@ -41,7 +41,7 @@ export const UnauthenticatedCreateChallengeSection: React.FC<UnauthenticatedCrea
       className="relative w-full"
     >
       {/* Main Card - Neo-Brutalist Style */}
-      <div className="relative overflow-hidden rounded-neo border-3 border-neo-black bg-linear-to-br from-neo-lime via-neo-orange to-neo-lime shadow-hard-lg">
+      <div className="relative overflow-hidden rounded-neo border-3 border-neo-black bg-linear-to-br from-neo-lime via-neo-pink to-neo-lime shadow-hard-lg">
         {/* Sparkle Decoration */}
         <div className="absolute -top-2 -right-2 rtl:-right-auto rtl:-left-2 z-10">
           <motion.div

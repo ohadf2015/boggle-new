@@ -46,8 +46,9 @@ function getProgress(
 
     case 'clear_percent': {
       const { tilesCleared, totalTiles } = gameState;
-      current = totalTiles > 0 ? Math.round((tilesCleared / totalTiles) * 100) : 0;
-      // target is already the percent threshold (e.g. 90)
+      // Use floor-safe percentage: avoid rounding down from e.g. 89.9% → 89
+      // when the player has genuinely cleared ≥90% of the board.
+      current = totalTiles > 0 ? Math.floor((tilesCleared / totalTiles) * 100 + 0.5) : 0;
       break;
     }
   }

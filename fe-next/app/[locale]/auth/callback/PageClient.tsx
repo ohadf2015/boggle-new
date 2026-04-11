@@ -97,7 +97,7 @@ function LoadingUI({ secondsRemaining, showRetry, onRetry, locale }: LoadingUIPr
             </p>
             <button
               onClick={onRetry}
-              className="px-6 py-3 bg-neo-orange text-neo-white font-neo-display font-bold
+              className="px-6 py-3 bg-neo-pink text-neo-white font-neo-display font-bold
                          rounded-neo border-neo-thick border-black shadow-hard
                          hover:shadow-hard-pressed hover:translate-x-[2px] hover:translate-y-[2px]
                          active:shadow-none active:translate-x-[4px] active:translate-y-[4px]
@@ -525,7 +525,7 @@ function AuthCallbackContent(): React.JSX.Element {
 function SuspenseFallback(): React.JSX.Element {
   return (
     <div className="flex-1 flex items-center justify-center bg-neo-navy">
-      <PageLoader size="lg" text="Loading..." />
+      <PageLoader size="lg" />
     </div>
   );
 }

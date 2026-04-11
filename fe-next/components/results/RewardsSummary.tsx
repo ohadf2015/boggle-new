@@ -106,7 +106,7 @@ const RewardsSummary: React.FC<RewardsSummaryProps> = memo(({
           transition={{ type: 'spring', stiffness: 200, damping: 20 }}
           className={cn(
             'relative overflow-hidden rounded-neo-lg border-4 border-neo-black shadow-hard-xl',
-            'bg-linear-to-br from-neo-navy via-slate-800 to-neo-navy',
+            'bg-linear-to-br from-neo-navy via-neo-navy-light to-neo-navy',
             className
           )}
         >
@@ -125,7 +125,7 @@ const RewardsSummary: React.FC<RewardsSummaryProps> = memo(({
           />
 
           {/* Header */}
-          <div className="relative z-10 px-4 py-3 border-b-2 border-white/10">
+          <div className="relative z-10 px-4 py-3 border-b-2 border-neo-cream/10">
             <div className="flex items-center justify-center gap-2">
               <motion.div
                 animate={{ rotate: [0, 10, -10, 0] }}
@@ -133,7 +133,7 @@ const RewardsSummary: React.FC<RewardsSummaryProps> = memo(({
               >
                 <Sparkles className="w-5 h-5 text-neo-lime" />
               </motion.div>
-              <h3 className="font-black text-white uppercase tracking-wider text-sm">
+              <h3 className="font-black text-neo-cream uppercase tracking-wider text-sm">
                 {t('results.rewardsEarned')}
               </h3>
               <motion.div
@@ -157,23 +157,23 @@ const RewardsSummary: React.FC<RewardsSummaryProps> = memo(({
                   'flex items-center justify-between p-3 rounded-neo border-2',
                   isAuthenticated
                     ? 'bg-neo-lime/20 border-neo-lime/50'
-                    : 'bg-slate-700/50 border-slate-500/50'
+                    : 'bg-neo-navy-light/50 border-neo-cream/20'
                 )}
               >
                 <div className="flex items-center gap-3">
                   <div className={cn(
                     'w-10 h-10 rounded-neo flex items-center justify-center border-2 border-neo-black',
-                    isAuthenticated ? 'bg-neo-lime' : 'bg-slate-600'
+                    isAuthenticated ? 'bg-neo-lime' : 'bg-neo-navy-light'
                   )}>
                     <Coins className={cn(
                       'w-5 h-5',
-                      isAuthenticated ? 'text-neo-black' : 'text-amber-400'
+                      isAuthenticated ? 'text-neo-black' : 'text-neo-pink'
                     )} />
                   </div>
                   <div>
                     <div className={cn(
                       'font-black text-xl tabular-nums',
-                      isAuthenticated ? 'text-neo-lime' : 'text-amber-400/70'
+                      isAuthenticated ? 'text-neo-lime' : 'text-neo-pink/70'
                     )}>
                       +<ScoreCountUp to={coinReward.awarded} duration={1200} delay={reducedMotion ? 0 : 400} />
                     </div>
@@ -186,7 +186,7 @@ const RewardsSummary: React.FC<RewardsSummaryProps> = memo(({
                 </div>
                 {/* Breakdown tooltip hint */}
                 {isAuthenticated && coinReward.breakdown && (
-                  <div className="text-xs text-white/60 space-y-0.5 text-right">
+                  <div className="text-xs text-neo-cream/60 space-y-0.5 text-right">
                     {coinReward.breakdown.base > 0 && (
                       <div>{t('reveal.base')}: +{coinReward.breakdown.base}</div>
                     )}
@@ -203,7 +203,7 @@ const RewardsSummary: React.FC<RewardsSummaryProps> = memo(({
                       <div>{t('coins.streak')}: +{coinReward.breakdown.streak}</div>
                     )}
                     {(coinReward.breakdown.streakBonus ?? 0) > 0 && (
-                      <div className="text-amber-400 font-semibold">🔥 +{coinReward.breakdown.streakBonus}</div>
+                      <div className="text-neo-pink font-semibold">🔥 +{coinReward.breakdown.streakBonus}</div>
                     )}
                   </div>
                 )}
@@ -249,7 +249,7 @@ const RewardsSummary: React.FC<RewardsSummaryProps> = memo(({
               >
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-neo bg-neo-pink flex items-center justify-center border-2 border-neo-black">
-                    <Trophy className="w-5 h-5 text-white" />
+                    <Trophy className="w-5 h-5 text-neo-black" />
                   </div>
                   <div>
                     <div className="font-black text-xl text-neo-pink tabular-nums">

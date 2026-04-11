@@ -156,7 +156,7 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.2, type: 'spring', stiffness: 300, damping: 26 }}
         className={cn(
-          'bg-linear-to-br from-neo-red to-neo-orange',
+          'bg-linear-to-br from-neo-red to-neo-pink',
           'border-4 border-neo-black rounded-neo-lg shadow-hard-xl',
           'p-6 relative overflow-hidden',
           className

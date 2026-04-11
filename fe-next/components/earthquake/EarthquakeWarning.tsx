@@ -52,11 +52,11 @@ export const EarthquakeWarning: React.FC<EarthquakeWarningProps> = ({ isVisible 
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none" role="alert" aria-live="assertive">
         <div className="absolute inset-0 bg-neo-black/40" />
-        <div className="relative z-10 mx-4 max-w-lg bg-neo-yellow text-neo-black border-4 border-neo-black rounded-neo-lg shadow-hard-xl px-8 py-6">
+        <div className="relative z-10 mx-4 max-w-lg bg-neo-red text-neo-cream border-4 border-neo-black rounded-neo-lg shadow-hard-xl px-8 py-6">
           <div className="text-center mb-3"><span className="text-6xl">⚠️</span></div>
           <div className="text-center">
-            <h2 className="text-3xl font-black uppercase text-neo-black mb-2 tracking-wide">{t('earthquake.warning')}</h2>
-            <p className="text-lg font-bold text-neo-black/80">{t('earthquake.brace')}</p>
+            <h2 className="text-3xl font-black uppercase text-neo-cream mb-2 tracking-wide">{t('earthquake.warning')}</h2>
+            <p className="text-lg font-bold text-neo-cream/80">{t('earthquake.brace')}</p>
           </div>
         </div>
       </div>
@@ -104,7 +104,7 @@ export const EarthquakeWarning: React.FC<EarthquakeWarningProps> = ({ isVisible 
             }}
           >
             <div
-              className="relative bg-neo-yellow text-neo-black border-4 border-neo-black rounded-neo-lg shadow-hard-xl px-8 py-6"
+              className="relative bg-neo-red text-neo-cream border-4 border-neo-black rounded-neo-lg shadow-hard-xl px-8 py-6"
               style={{
                 animation: 'warning-pulse 0.8s ease-in-out infinite',
                 transform: 'rotate(-2deg)',
@@ -129,10 +129,10 @@ export const EarthquakeWarning: React.FC<EarthquakeWarningProps> = ({ isVisible 
 
               {/* Warning Text */}
               <div className="text-center">
-                <h2 className="text-3xl font-black uppercase text-neo-black mb-2 tracking-wide">
+                <h2 className="text-3xl font-black uppercase text-neo-cream mb-2 tracking-wide">
                   {t('earthquake.warning')}
                 </h2>
-                <p className="text-lg font-bold text-neo-black/80">
+                <p className="text-lg font-bold text-neo-cream/80">
                   {t('earthquake.brace')}
                 </p>
               </div>
@@ -159,7 +159,7 @@ export const EarthquakeWarning: React.FC<EarthquakeWarningProps> = ({ isVisible 
             return (
               <motion.div
                 key={i}
-                className="absolute w-3 h-3 rounded-full bg-neo-yellow border-2 border-neo-black"
+                className="absolute w-3 h-3 rounded-full bg-neo-red border-2 border-neo-black"
                 style={{
                   left: '50%',
                   top: '50%',

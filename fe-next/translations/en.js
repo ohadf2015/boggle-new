@@ -6925,6 +6925,7 @@ const en = {
       "blastObjective": "Use your moves wisely!",
       "hunt": "Hunt",
       "huntObjective": "Survive as long as you can!",
+      "huntLoadingTarget": "Finding hidden word...",
       "wheel": "Wheel",
       "wheelObjective": "Every word must include the center letter!",
       "wheelMustInclude": "Must include:",

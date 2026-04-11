@@ -78,24 +78,21 @@ describe('LandingChallengeCards', () => {
     expect(screen.getByTestId('daily-banner')).toBeInTheDocument();
   });
 
-  describe('veteran gating', () => {
+  describe('quickPlay / practice mutual exclusivity', () => {
     afterEach(() => mockIsVeteran.mockReturnValue(false));
 
-    it('renders quick play card', () => {
-      render(<LandingChallengeCards {...baseProps} />);
-      expect(screen.getByText('landing.quickPlay')).toBeInTheDocument();
-    });
-
-    it('hides practice card for veterans', () => {
+    it('veterans see quickPlay but not practice', () => {
       mockIsVeteran.mockReturnValue(true);
       render(<LandingChallengeCards {...baseProps} />);
+      expect(screen.getByText('landing.quickPlay')).toBeInTheDocument();
       expect(screen.queryByText('landing.practice')).not.toBeInTheDocument();
     });
 
-    it('keeps practice card for newcomers', () => {
+    it('newcomers see practice but not quickPlay', () => {
       mockIsVeteran.mockReturnValue(false);
       render(<LandingChallengeCards {...baseProps} />);
       expect(screen.getByText('landing.practice')).toBeInTheDocument();
+      expect(screen.queryByText('landing.quickPlay')).not.toBeInTheDocument();
     });
   });
 });

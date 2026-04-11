@@ -6858,6 +6858,7 @@ const he = {
       "blastObjective": "השתמשו במהלכים בחוכמה!",
       "hunt": "ציד",
       "huntObjective": "שרדו כמה שיותר!",
+      "huntLoadingTarget": "מחפש מילה נסתרת...",
       "wheel": "גלגל",
       "wheelObjective": "כל מילה חייבת לכלול את האות המרכזית!",
       "wheelMustInclude": "חובה לכלול:",

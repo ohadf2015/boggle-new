@@ -117,20 +117,20 @@ const PresenceIndicator = memo<PresenceIndicatorProps>(({
   // Status configurations - memoized to prevent recreation
   const statusConfig: Record<PresenceStatus, StatusConfig> = useMemo(() => ({
     active: {
-      color: 'bg-green-500',
-      ringColor: 'ring-green-400/50',
+      color: 'bg-neo-lime',
+      ringColor: 'ring-neo-lime/50',
       tooltip: 'Active',
       pulse: true,
     },
     idle: {
-      color: 'bg-yellow-500',
-      ringColor: 'ring-yellow-400/50',
+      color: 'bg-neo-cream',
+      ringColor: 'ring-neo-cream/50',
       tooltip: 'Away',
       pulse: false,
     },
     afk: {
-      color: 'bg-slate-500',
-      ringColor: 'ring-slate-400/50',
+      color: 'bg-neo-cream/40',
+      ringColor: 'ring-neo-cream/30',
       tooltip: 'Away from keyboard',
       pulse: false,
     },

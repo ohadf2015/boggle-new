@@ -25,11 +25,11 @@ interface PrestigeModalProps {
 
 /** Tailwind classes for prestige tiers (extends PRESTIGE_CONFIG.DISPLAY) */
 const PRESTIGE_STYLES = {
-  1: { bg: 'bg-amber-600', text: 'text-amber-100', border: 'border-amber-500', gradient: 'from-amber-700 to-amber-500' },
-  2: { bg: 'bg-gray-400', text: 'text-gray-900', border: 'border-gray-300', gradient: 'from-gray-500 to-gray-300' },
-  3: { bg: 'bg-yellow-500', text: 'text-yellow-900', border: 'border-yellow-400', gradient: 'from-yellow-600 to-yellow-400' },
-  4: { bg: 'bg-cyan-400', text: 'text-cyan-900', border: 'border-cyan-300', gradient: 'from-cyan-500 to-cyan-300' },
-  5: { bg: 'bg-purple-600', text: 'text-purple-100', border: 'border-purple-400', gradient: 'from-purple-700 to-pink-500' },
+  1: { bg: 'bg-neo-pink-muted', text: 'text-neo-cream', border: 'border-neo-pink-muted', gradient: 'from-neo-pink-dark to-neo-pink-muted' },
+  2: { bg: 'bg-neo-cream/40', text: 'text-neo-black', border: 'border-neo-cream/30', gradient: 'from-neo-cream/50 to-neo-cream/30' },
+  3: { bg: 'bg-neo-lime', text: 'text-neo-black', border: 'border-neo-lime-light', gradient: 'from-neo-lime-dark to-neo-lime' },
+  4: { bg: 'bg-neo-cyan', text: 'text-neo-black', border: 'border-neo-cyan-light', gradient: 'from-neo-cyan to-neo-cyan-light' },
+  5: { bg: 'bg-neo-purple', text: 'text-neo-cream', border: 'border-neo-purple-light', gradient: 'from-neo-purple to-neo-pink' },
 } as const;
 
 export const PrestigeModal: React.FC<PrestigeModalProps> = ({
@@ -145,7 +145,7 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
                   <p className={cn('text-2xl font-black', colors.text.replace('text-', 'text-'))}>
                     {pm('prestigeAchievedLevel').replace('{{level}}', toRoman(nextPrestigeLevel))}
                   </p>
-                  <p className="text-white/70 text-sm mt-1">
+                  <p className="text-neo-cream/70 text-sm mt-1">
                     {pm('rewardsUnlocked')}
                   </p>
                 </div>
@@ -173,20 +173,20 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
                 exit={{ opacity: 0, x: -20 }}
                 className="space-y-4"
               >
-                <div className="flex items-start gap-3 p-4 rounded-neo bg-yellow-500/20 border-2 border-yellow-500/50">
-                  <AlertTriangle className="w-6 h-6 text-yellow-400 shrink-0 mt-0.5" />
+                <div className="flex items-start gap-3 p-4 rounded-neo bg-neo-lime/20 border-2 border-neo-lime/50">
+                  <AlertTriangle className="w-6 h-6 text-neo-lime shrink-0 mt-0.5" />
                   <div>
-                    <p className="font-bold text-yellow-300">
+                    <p className="font-bold text-neo-lime">
                       {pm('warning')}
                     </p>
-                    <p className="text-sm text-yellow-200/80 mt-1">
+                    <p className="text-sm text-neo-cream/80 mt-1">
                       {pm('warningText')}
                     </p>
                   </div>
                 </div>
 
                 {error && (
-                  <div className="p-3 rounded-neo bg-red-500/20 border-2 border-red-500/50 text-red-300 text-sm">
+                  <div className="p-3 rounded-neo bg-neo-red/20 border-2 border-neo-red/50 text-neo-red text-sm">
                     {error}
                   </div>
                 )}
@@ -198,7 +198,7 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
                     className={cn(
                       'flex-1 p-3 rounded-neo border-2 border-white/30',
                       'font-bold uppercase text-sm',
-                      'bg-white/10 text-white hover:bg-white/20',
+                      'bg-neo-cream/10 text-neo-cream hover:bg-neo-cream/20',
                       'transition-all',
                       'disabled:opacity-50'
                     )}
@@ -239,29 +239,29 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
                 className="space-y-4"
               >
                 {/* Current Status */}
-                <div className="flex items-center justify-between p-4 rounded-neo bg-white/5 border-2 border-white/10">
+                <div className="flex items-center justify-between p-4 rounded-neo bg-neo-cream/5 border-2 border-white/10">
                   <div>
-                    <p className="text-xs text-white/70 uppercase tracking-wide">
+                    <p className="text-xs text-neo-cream/70 uppercase tracking-wide">
                       {pm('currentLevel')}
                     </p>
-                    <p className="text-2xl font-black text-white">{currentLevel}</p>
+                    <p className="text-2xl font-black text-neo-cream">{currentLevel}</p>
                   </div>
                   <div className="text-center">
-                    <p className="text-xs text-white/70 uppercase tracking-wide">
+                    <p className="text-xs text-neo-cream/70 uppercase tracking-wide">
                       {pm('prestige')}
                     </p>
                     <p className="text-2xl font-black">
                       {currentPrestige > 0 ? (
-                        <span className={cn(PRESTIGE_STYLES[currentPrestige as keyof typeof PRESTIGE_STYLES]?.text || 'text-white')}>
+                        <span className={cn(PRESTIGE_STYLES[currentPrestige as keyof typeof PRESTIGE_STYLES]?.text || 'text-neo-cream')}>
                           {PRESTIGE_CONFIG.DISPLAY[currentPrestige]?.icon || '⭐'} {toRoman(currentPrestige)}
                         </span>
                       ) : (
-                        <span className="text-white/70">-</span>
+                        <span className="text-neo-cream/70">-</span>
                       )}
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-xs text-white/70 uppercase tracking-wide">
+                    <p className="text-xs text-neo-cream/70 uppercase tracking-wide">
                       {pm('xpMultiplier')}
                     </p>
                     <p className="text-2xl font-black text-neo-lime">
@@ -274,10 +274,10 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
                   /* Max Prestige Reached */
                   <div className="text-center py-6">
                     <div className="text-5xl mb-3">{PRESTIGE_CONFIG.DISPLAY[5]?.icon || '🌌'}</div>
-                    <p className="text-xl font-black text-purple-400">
+                    <p className="text-xl font-black text-neo-purple">
                       {pm('maxPrestige')}
                     </p>
-                    <p className="text-white/60 text-sm mt-1">
+                    <p className="text-neo-cream/60 text-sm mt-1">
                       {pm('maxPrestigeText')}
                     </p>
                   </div>
@@ -285,7 +285,7 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
                   <>
                     {/* Next Prestige Rewards Preview */}
                     <div className="space-y-2">
-                      <p className="text-xs text-white/70 uppercase tracking-wide flex items-center gap-1">
+                      <p className="text-xs text-neo-cream/70 uppercase tracking-wide flex items-center gap-1">
                         <Star className="w-3 h-3" />
                         {pm('rewardsFor').replace('{{level}}', toRoman(nextPrestigeLevel))}
                       </p>
@@ -299,22 +299,22 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
                             transition={{ delay: rewardIdx * 0.1 }}
                             className={cn(
                               'flex items-center gap-3 p-3 rounded-neo',
-                              'bg-white/5 border-2',
+                              'bg-neo-cream/5 border-2',
                               canPrestige ? colors.border : 'border-white/10'
                             )}
                           >
                             <span className="text-2xl">{reward.icon}</span>
                             <div className="flex-1 min-w-0">
-                              <p className={cn('font-bold text-sm', canPrestige ? colors.text.replace('text-', 'text-') : 'text-white')}>
+                              <p className={cn('font-bold text-sm', canPrestige ? colors.text.replace('text-', 'text-') : 'text-neo-cream')}>
                                 {reward.displayName}
                               </p>
-                              <p className="text-xs text-white/70 truncate">{reward.description}</p>
+                              <p className="text-xs text-neo-cream/70 truncate">{reward.description}</p>
                             </div>
                             {reward.type === 'multiplier' && (
-                              <Zap className={cn('w-4 h-4', canPrestige ? 'text-neo-lime' : 'text-white/60')} />
+                              <Zap className={cn('w-4 h-4', canPrestige ? 'text-neo-lime' : 'text-neo-cream/60')} />
                             )}
                             {reward.type === 'title' && (
-                              <Crown className={cn('w-4 h-4', canPrestige ? 'text-neo-lime' : 'text-white/60')} />
+                              <Crown className={cn('w-4 h-4', canPrestige ? 'text-neo-lime' : 'text-neo-cream/60')} />
                             )}
                           </motion.div>
                         ))}
@@ -340,11 +340,11 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
                         {pm('prestigeTo').replace('{{level}}', toRoman(nextPrestigeLevel))}
                       </motion.button>
                     ) : (
-                      <div className="p-4 rounded-neo bg-white/5 border-2 border-white/10 text-center">
-                        <p className="text-white/70 text-sm">
+                      <div className="p-4 rounded-neo bg-neo-cream/5 border-2 border-white/10 text-center">
+                        <p className="text-neo-cream/70 text-sm">
                           {pm('reachLevel')}
                         </p>
-                        <p className="text-white/60 text-xs mt-1">
+                        <p className="text-neo-cream/60 text-xs mt-1">
                           {pm('levelsRemaining').replace('{{count}}', String(100 - currentLevel))}
                         </p>
                       </div>

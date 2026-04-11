@@ -110,8 +110,8 @@ export const ConnectionDot: React.FC<{ className?: string }> = ({ className }) =
           'flex items-center gap-2',
           'px-3 py-1.5 rounded-full',
           'border-2 border-neo-black shadow-hard-sm',
-          status === 'connecting' && 'bg-neo-yellow',
-          status === 'reconnecting' && 'bg-neo-yellow',
+          status === 'connecting' && 'bg-neo-cream',
+          status === 'reconnecting' && 'bg-neo-cream',
           status === 'disconnected' && 'bg-neo-red',
           className
         )}
@@ -205,8 +205,8 @@ export const ConnectionStatus: React.FC<ConnectionStatusProps> = ({
           'w-3 h-3 rounded-full border-2 border-neo-black',
           'transition-all duration-300',
           status === 'connected' && 'bg-neo-lime',
-          status === 'connecting' && 'bg-neo-yellow animate-pulse',
-          status === 'reconnecting' && 'bg-neo-yellow animate-pulse',
+          status === 'connecting' && 'bg-neo-cream animate-pulse',
+          status === 'reconnecting' && 'bg-neo-cream animate-pulse',
           status === 'disconnected' && 'bg-neo-red'
         )}
         aria-hidden="true"
@@ -218,8 +218,8 @@ export const ConnectionStatus: React.FC<ConnectionStatusProps> = ({
           className={cn(
             'text-xs font-bold uppercase tracking-wide',
             status === 'connected' && 'text-neo-lime',
-            status === 'connecting' && 'text-neo-yellow',
-            status === 'reconnecting' && 'text-neo-yellow',
+            status === 'connecting' && 'text-neo-cream',
+            status === 'reconnecting' && 'text-neo-cream',
             status === 'disconnected' && 'text-neo-red'
           )}
         >
@@ -354,9 +354,9 @@ export const ConnectionBanner: React.FC<ConnectionBannerProps> = ({ className, s
                   transition={{ type: 'tween', duration: 1.5, repeat: Infinity }}
                   className={cn(
                     'w-4 h-4 rounded-full border-2 border-neo-black',
-                    status === 'reconnecting' && 'bg-neo-yellow',
+                    status === 'reconnecting' && 'bg-neo-cream',
                     status === 'disconnected' && 'bg-neo-red',
-                    status === 'connecting' && 'bg-neo-yellow'
+                    status === 'connecting' && 'bg-neo-cream'
                   )}
                 />
               </div>

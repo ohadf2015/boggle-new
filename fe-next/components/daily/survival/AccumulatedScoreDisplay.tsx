@@ -37,28 +37,28 @@ function getScoreColorClasses(score: number): {
   if (score < SCORE_TIERS.LOW) {
     // Low score - muted warm tone (not alarming red)
     return {
-      gradient: 'from-amber-400 to-orange-400',
+      gradient: 'from-neo-pink-muted to-neo-pink',
       iconColor: 'text-neo-black/80',
       textColor: 'text-neo-black',
     };
   }
   if (score < SCORE_TIERS.MEDIUM) {
-    // Medium score - standard yellow/orange (original style)
+    // Medium score - warm lime
     return {
-      gradient: 'from-neo-yellow to-neo-orange',
+      gradient: 'from-neo-lime-muted to-neo-lime',
       iconColor: 'text-neo-black/80',
       textColor: 'text-neo-black',
     };
   }
   if (score < SCORE_TIERS.GOOD) {
-    // Good score - subtle lime tint
+    // Good score - bright lime
     return {
-      gradient: 'from-neo-lime-light to-neo-yellow',
+      gradient: 'from-neo-lime-light to-neo-lime',
       iconColor: 'text-neo-black/80',
       textColor: 'text-neo-black',
     };
   }
-  // Excellent score - subtle cyan/lime
+  // Excellent score - cyan/lime
   return {
     gradient: 'from-neo-lime to-neo-cyan-light',
     iconColor: 'text-neo-black/80',

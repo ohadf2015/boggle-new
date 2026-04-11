@@ -1,10 +1,8 @@
 'use client';
 
-import React from 'react';
 import { motion } from 'framer-motion';
 import { Lock, Unlock, Shuffle, BookOpen, Sparkles, type LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { DrillType } from '@/shared/types/cognitive';
 
@@ -30,7 +28,7 @@ const LOCKED_DRILLS: LockedDrill[] = [
     drillType: 'rare-gems',
     gamesRequired: 10,
     icon: BookOpen,
-    color: 'bg-lime-400',
+    color: 'bg-neo-lime',
   },
 ];
 
@@ -44,9 +42,7 @@ const LOCKED_DRILLS: LockedDrill[] = [
 export default function DrillUnlockProgress({
   gamesPlayed,
 }: DrillUnlockProgressProps) {
-  const { theme } = useTheme();
   const { t } = useLanguage();
-  const isDarkMode = theme === 'dark';
 
   // Find drills that are close to being unlocked (within 3 games) or just unlocked
   const relevantDrills = LOCKED_DRILLS.filter((drill) => {
@@ -76,7 +72,7 @@ export default function DrillUnlockProgress({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             className={cn(
               'flex items-center gap-3 p-3 rounded-neo border-2 border-neo-black',
-              'bg-linear-to-r from-neo-green/20 to-neo-cyan/20'
+              'bg-linear-to-r from-neo-lime/20 to-neo-cyan/20'
             )}
           >
             <motion.div
@@ -102,14 +98,14 @@ export default function DrillUnlockProgress({
                 <Sparkles className="w-4 h-4 text-neo-lime" />
                 <p className={cn(
                   'text-sm font-black uppercase',
-                  isDarkMode ? 'text-neo-white' : 'text-neo-black'
+                  'text-neo-white'
                 )}>
                   {t('brain.unlock.newDrillUnlocked')}
                 </p>
               </div>
               <p className={cn(
                 'text-xs',
-                isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70'
+                'text-neo-white/70'
               )}>
                 {t(`brain.drills.${drill.drillType}.name`)} {t('brain.unlock.nowAvailable')}
               </p>
@@ -117,7 +113,7 @@ export default function DrillUnlockProgress({
 
             <Icon className={cn(
               'w-6 h-6',
-              isDarkMode ? 'text-neo-white' : 'text-neo-black'
+              'text-neo-white'
             )} />
           </motion.div>
         );
@@ -136,12 +132,12 @@ export default function DrillUnlockProgress({
             animate={{ opacity: 1, x: 0 }}
             className={cn(
               'flex items-center gap-3 p-3 rounded-neo border-2 border-neo-black',
-              isDarkMode ? 'bg-slate-700/50' : 'bg-neo-cream/50'
+              'bg-neo-navy-light/50'
             )}
           >
             <div className={cn(
               'w-10 h-10 rounded-neo border-2 border-neo-black flex items-center justify-center relative',
-              'bg-gray-300'
+              'bg-neo-cream/30'
             )}>
               <Lock className="w-5 h-5 text-neo-black/50" />
               {/* Small badge showing games left */}
@@ -158,13 +154,13 @@ export default function DrillUnlockProgress({
               <div className="flex items-center justify-between mb-1">
                 <p className={cn(
                   'text-xs font-bold',
-                  isDarkMode ? 'text-neo-white' : 'text-neo-black'
+                  'text-neo-white'
                 )}>
                   {t(`brain.drills.${drill.drillType}.name`)}
                 </p>
                 <p className={cn(
                   'text-[10px] font-bold',
-                  isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70'
+                  'text-neo-white/70'
                 )}>
                   {gamesLeft} {gamesLeft === 1 ? t('brain.unlock.gameLeft') : t('brain.unlock.gamesLeft')}
                 </p>
@@ -173,7 +169,7 @@ export default function DrillUnlockProgress({
               {/* Progress bar */}
               <div className={cn(
                 'h-2 rounded-full border border-neo-black overflow-hidden',
-                isDarkMode ? 'bg-slate-600' : 'bg-gray-200'
+                'bg-neo-navy-light'
               )}>
                 <motion.div
                   className={cn('h-full', drill.color)}
@@ -186,7 +182,7 @@ export default function DrillUnlockProgress({
 
             <Icon className={cn(
               'w-5 h-5',
-              isDarkMode ? 'text-neo-white/50' : 'text-neo-black/50'
+              'text-neo-white/50'
             )} />
           </motion.div>
         );

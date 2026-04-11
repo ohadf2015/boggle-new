@@ -6884,6 +6884,7 @@ const ja = {
       "blastObjective": "手数を賢く使おう！",
       "hunt": "ハント",
       "huntObjective": "できるだけ長く生き残ろう！",
+      "huntLoadingTarget": "隠された単語を探しています...",
       "wheel": "ホイール",
       "wheelObjective": "すべての単語に中心の文字を含めよう！",
       "wheelMustInclude": "必須文字：",

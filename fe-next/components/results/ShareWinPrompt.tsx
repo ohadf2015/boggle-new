@@ -4,7 +4,6 @@ import React, { useState, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Trophy, Flame, X, Share2 } from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { useTheme } from '../../utils/ThemeContext';
 import { cn } from '../../lib/utils';
 import UnifiedShareModal from '../modals/UnifiedShareModal';
 import { type GameResultForShare } from '../../utils/share';
@@ -204,8 +203,6 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
   longestWord,
 }) => {
   const { t, language } = useLanguage();
-  const { theme } = useTheme();
-  const isDarkMode = theme === 'dark';
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
   // Generate witty message based on score tier
@@ -276,12 +273,10 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
           animate={{ opacity: 1, y: 0 }}
           className={cn(
             'flex items-center justify-center gap-3 p-3 rounded-xl border-2',
-            isDarkMode
-              ? 'bg-slate-800/60 border-cyan-400/30'
-              : 'bg-linear-to-r from-cyan-50 to-blue-50 border-cyan-300'
+            'bg-neo-navy-light/60 border-neo-cyan/30'
           )}
         >
-          <span className={cn('text-sm font-bold', isDarkMode ? 'text-cyan-300' : 'text-cyan-700')}>
+          <span className={cn('text-sm font-bold', 'text-neo-cyan')}>
             {t('results.shareVictoryPrompt')}
           </span>
           <motion.button
@@ -328,12 +323,8 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
           className={cn(
           'relative p-4 sm:p-5 rounded-2xl border-3 overflow-hidden',
           isWinner
-            ? isDarkMode
-              ? 'bg-linear-to-br from-yellow-900/30 via-amber-900/20 to-orange-900/30 border-yellow-400/60 shadow-hard-lg'
-              : 'bg-linear-to-br from-yellow-50 via-amber-50 to-orange-50 border-yellow-400 shadow-hard-lg'
-            : isDarkMode
-            ? 'bg-linear-to-br from-cyan-900/30 via-blue-900/20 to-indigo-900/30 border-cyan-400/50 shadow-hard-md'
-            : 'bg-linear-to-br from-cyan-50 via-blue-50 to-indigo-50 border-cyan-400 shadow-hard-md'
+            ? 'bg-linear-to-br from-neo-lime/20 via-neo-navy to-neo-pink/20 border-neo-lime/60 shadow-hard-lg'
+            : 'bg-linear-to-br from-neo-cyan/20 via-neo-navy to-neo-purple/20 border-neo-cyan/50 shadow-hard-md'
         )}
       >
         {/* Background decoration */}
@@ -346,7 +337,7 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
             aria-label={t('common.close')}
             className={cn(
               'absolute top-2 right-2 p-1.5 rounded-full transition-colors',
-              isDarkMode ? 'hover:bg-white/10 text-gray-300' : 'hover:bg-black/5 text-gray-600'
+              'hover:bg-neo-cream/10 text-neo-cream/60'
             )}
           >
             <X size={14} />
@@ -359,12 +350,12 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
             animate={{ rotate: [0, -10, 10, 0], scale: [1, 1.2, 1] }}
             transition={{ type: 'tween', duration: 1.5, repeat: Infinity, repeatDelay: 2 }}
           >
-            <Trophy className="text-3xl text-yellow-400 drop-shadow-lg" />
+            <Trophy className="text-3xl text-neo-lime drop-shadow-lg" />
           </motion.div>
           <div>
             <h3 className={cn(
               'text-xl font-black uppercase tracking-wide',
-              isDarkMode ? 'text-white' : 'text-gray-900'
+              'text-neo-white'
             )}>
               {isWinner
                 ? t('results.victory')
@@ -372,7 +363,7 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
             </h3>
             <p className={cn(
               'text-sm font-bold italic',
-              isDarkMode ? 'text-neo-cream/80' : 'text-gray-600'
+              'text-neo-cream/80'
             )}>
               &ldquo;{wittyMessage}&rdquo;
             </p>
@@ -387,11 +378,11 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
             className={cn(
               'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-bold mb-4',
               streakDays >= 7
-                ? 'bg-orange-500/20 text-orange-400 border border-orange-500/30'
-                : 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'
+                ? 'bg-neo-pink/20 text-neo-pink border border-neo-pink/30'
+                : 'bg-neo-lime/20 text-neo-lime border border-neo-lime/30'
             )}
           >
-            <Flame className={streakDays >= 7 ? 'text-orange-500' : 'text-yellow-500'} />
+            <Flame className={streakDays >= 7 ? 'text-neo-pink' : 'text-neo-lime'} />
             {streakDays} {t('growth.dayStreak')}!
           </motion.div>
         )}
@@ -403,7 +394,7 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
             animate={{ opacity: 1, scale: 1 }}
             className={cn(
               'text-center py-2 px-4 rounded-neo border-2',
-              'bg-orange-500/20 border-orange-500/40 text-orange-400',
+              'bg-neo-pink/20 border-neo-pink/40 text-neo-pink',
               'font-bold text-sm animate-pulse'
             )}
           >
@@ -434,7 +425,7 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
         {/* Viral prompt */}
         <p className={cn(
           'mt-3 text-center text-sm font-bold',
-          isDarkMode ? 'text-neo-cream/60' : 'text-gray-500'
+          'text-neo-cream/60'
         )}>
           {t('results.challengeFriends')}
         </p>

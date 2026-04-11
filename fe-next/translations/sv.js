@@ -6833,6 +6833,7 @@ const sv = {
       "blastObjective": "Använd dina drag klokt!",
       "hunt": "Jakt",
       "huntObjective": "Överlev så länge du kan!",
+      "huntLoadingTarget": "Söker dolt ord...",
       "wheel": "Hjul",
       "wheelObjective": "Varje ord måste inkludera mittenbokstaven!",
       "wheelMustInclude": "Måste inkludera:",

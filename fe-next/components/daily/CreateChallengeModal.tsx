@@ -195,7 +195,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
 
         <div className="max-h-[90vh] overflow-y-auto">
           {/* Header */}
-            <div className="relative flex items-center justify-between p-3 sm:p-4 border-b-neo-thick border-neo-black bg-linear-to-br from-neo-lime to-neo-orange sticky top-0 z-10">
+            <div className="relative flex items-center justify-between p-3 sm:p-4 border-b-neo-thick border-neo-black bg-linear-to-br from-neo-lime to-neo-pink sticky top-0 z-10">
               <motion.div
                 className="flex items-center gap-3"
                 initial={{ x: -20, opacity: 0 }}
@@ -280,12 +280,12 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                         whileTap={{ scale: 0.95, y: 0 }}
                         className={`relative p-4 sm:p-5 rounded-xl border-neo-thick transition-all flex flex-col items-center gap-2 ${
                           boardSize === 7
-                            ? 'bg-neo-orange text-neo-black border-neo-black shadow-hard-lg'
-                            : 'bg-neo-white text-neo-black border-neo-black/30 hover:border-neo-orange hover:text-neo-orange shadow-hard-sm hover:shadow-hard'
+                            ? 'bg-neo-pink text-neo-black border-neo-black shadow-hard-lg'
+                            : 'bg-neo-white text-neo-black border-neo-black/30 hover:border-neo-pink hover:text-neo-pink shadow-hard-sm hover:shadow-hard'
                         }`}
                       >
-                        <div className={`p-3 rounded-lg ${boardSize === 7 ? 'bg-neo-white/20' : 'bg-neo-orange/10'}`}>
-                          <Grid3X3 className={`w-8 h-8 sm:w-10 sm:h-10 ${boardSize === 7 ? 'text-neo-black' : 'text-neo-orange'}`} strokeWidth={2.5} />
+                        <div className={`p-3 rounded-lg ${boardSize === 7 ? 'bg-neo-white/20' : 'bg-neo-pink/10'}`}>
+                          <Grid3X3 className={`w-8 h-8 sm:w-10 sm:h-10 ${boardSize === 7 ? 'text-neo-black' : 'text-neo-pink'}`} strokeWidth={2.5} />
                         </div>
                         <div className="text-center">
                           <span className="font-black text-2xl sm:text-3xl block">7×7</span>
@@ -392,7 +392,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                       animate={{ scale: [1, 1.2, 1] }}
                       transition={{ type: 'tween', duration: 1.5, repeat: Infinity }}
                     >
-                      <Sparkles className="w-10 h-10 sm:w-12 sm:h-12 text-neo-orange" strokeWidth={2.5} />
+                      <Sparkles className="w-10 h-10 sm:w-12 sm:h-12 text-neo-pink" strokeWidth={2.5} />
                     </motion.div>
                   </div>
 
@@ -442,7 +442,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                   <div className="relative flex items-center justify-center h-32 sm:h-40">
                     {/* Background circle */}
                     <motion.div
-                      className="absolute w-24 h-24 sm:w-32 sm:h-32 bg-linear-to-br from-neo-lime to-neo-orange rounded-full border-neo-thick border-neo-black shadow-hard-lg"
+                      className="absolute w-24 h-24 sm:w-32 sm:h-32 bg-linear-to-br from-neo-lime to-neo-pink rounded-full border-neo-thick border-neo-black shadow-hard-lg"
                       initial={{ opacity: 0, scale: 0.95 }}
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ type: 'spring', bounce: 0.6, duration: 0.6 }}
@@ -516,7 +516,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                       whileTap={{ scale: 0.9 }}
                       className={`shrink-0 p-3 rounded-lg border-3 border-neo-black transition-all ${
                         copied
-                          ? 'bg-neo-green text-neo-white shadow-hard-sm'
+                          ? 'bg-neo-lime text-neo-black shadow-hard-sm'
                           : 'bg-neo-white hover:bg-neo-lime shadow-hard-sm hover:shadow-hard'
                       }`}
                     >
@@ -568,7 +568,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                     className="pt-4 border-t-3 border-gray-200"
                   >
                     <p className="text-sm text-slate-600 dark:text-slate-400 font-medium flex items-center justify-center gap-2">
-                      <Sparkles className="w-4 h-4 text-neo-orange" />
+                      <Sparkles className="w-4 h-4 text-neo-pink" />
                       {t('daily.canPlayYourself')}
                     </p>
                   </motion.div>

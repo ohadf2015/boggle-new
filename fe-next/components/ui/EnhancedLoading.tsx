@@ -170,7 +170,7 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
     default: 'bg-neo-black',
     primary: 'bg-neo-lime',
     secondary: 'bg-neo-pink',
-    gradient: 'bg-linear-to-r from-neo-pink via-neo-orange to-neo-lime',
+    gradient: 'bg-linear-to-r from-neo-pink via-neo-cyan to-neo-lime',
   };
 
   return (

@@ -64,7 +64,7 @@ function getComboIcon(comboType: string) {
   switch (comboType) {
     case 'gem': return <Gem className="w-3 h-3 text-neo-pink" />;
     case 'frozen': return <Snowflake className="w-3 h-3 text-neo-cyan" />;
-    case 'bomb': return <Bomb className="w-3 h-3 text-neo-orange" />;
+    case 'bomb': return <Bomb className="w-3 h-3 text-neo-red" />;
     default: return <Zap className="w-3 h-3 text-neo-lime" />;
   }
 }
@@ -319,7 +319,7 @@ export const CompactLeaderboard = memo<CompactLeaderboardProps>(function Compact
                   <div className={cn(
                     'flex items-center gap-1 px-1.5 py-0.5 rounded-neo',
                     isLeader
-                      ? 'bg-linear-to-r from-neo-lime to-neo-orange border-2 border-neo-black shadow-hard-sm'
+                      ? 'bg-linear-to-r from-neo-lime to-neo-cyan border-2 border-neo-black shadow-hard-sm'
                       : isMe
                         ? 'bg-neo-cyan border-2 border-neo-black shadow-hard-sm'
                         : 'bg-neo-cream border border-neo-black/50'
@@ -464,7 +464,7 @@ export const CompactLeaderboard = memo<CompactLeaderboardProps>(function Compact
           <div className="flex items-center gap-1.5">
             {isLeading ? (
               <>
-                <Flame className="w-4 h-4 text-neo-orange" />
+                <Flame className="w-4 h-4 text-neo-pink" />
                 <span className="text-xs font-black text-neo-black">
                   {t('leaderboard.leading')}
                 </span>
@@ -518,7 +518,7 @@ export const CompactLeaderboard = memo<CompactLeaderboardProps>(function Compact
                 className={cn(
                   'h-full rounded-full',
                   isCloseToOvertaking
-                    ? 'bg-linear-to-r from-neo-pink to-neo-orange'
+                    ? 'bg-linear-to-r from-neo-pink to-neo-red'
                     : 'bg-linear-to-r from-neo-cyan to-neo-pink'
                 )}
                 initial={{ width: '0%' }}

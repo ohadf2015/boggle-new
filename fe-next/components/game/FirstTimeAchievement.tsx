@@ -18,22 +18,22 @@ const ACHIEVEMENT_CONFIG: Record<FirstTimeAchievementType, {
   firstWord: {
     title: 'First word found!',
     emoji: '🎯',
-    color: 'from-green-400 to-emerald-500',
+    color: 'from-neo-lime to-neo-lime-dark',
   },
   firstCombo: {
     title: 'Combo unlocked!',
     emoji: '🔥',
-    color: 'from-orange-400 to-red-500',
+    color: 'from-neo-pink to-neo-red',
   },
   firstLongWord: {
     title: 'Long word bonus!',
     emoji: '⭐',
-    color: 'from-yellow-400 to-amber-500',
+    color: 'from-neo-lime-light to-neo-lime',
   },
   firstUniqueWord: {
     title: 'Unique find!',
     emoji: '💎',
-    color: 'from-purple-400 to-pink-500',
+    color: 'from-neo-purple to-neo-pink',
   },
 };
 
@@ -133,7 +133,7 @@ const FirstTimeAchievement = memo<FirstTimeAchievementProps>(({
             </motion.span>
 
             {/* Text */}
-            <span className="text-white font-bold text-sm whitespace-nowrap drop-shadow-md">
+            <span className="text-neo-black font-bold text-sm whitespace-nowrap drop-shadow-md">
               {config.title}
             </span>
 

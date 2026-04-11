@@ -45,17 +45,16 @@ const baseProps = {
 };
 
 describe('LandingChallengeCards reordering', () => {
-  it('renders daily then arena first by default', () => {
+  it('renders daily then arena first by default (newcomer)', () => {
     render(<LandingChallengeCards {...baseProps} />);
-    // Daily banner first (pinned), then arena (pinned), then practice, blast, adventure
+    // Daily banner first (pinned), then practice (newcomer, no quickPlay), arena, blast, adventure
     expect(screen.getByTestId('daily-banner')).toBeInTheDocument();
     const cards = screen.getAllByTestId('mode-card');
-    // Quick Play is injected right after daily, so it leads the ModeCard list.
-    expect(cards[0]).toHaveTextContent('landing.quickPlay');
-    expect(cards[1]).toHaveTextContent('landing.arena');
-    expect(cards[2]).toHaveTextContent('landing.practice');
-    expect(cards[3]).toHaveTextContent('landing.blastMode');
-    expect(cards[4]).toHaveTextContent('landing.adventureMode');
+    // Newcomers see practice instead of quickPlay
+    expect(cards[0]).toHaveTextContent('landing.arena');
+    expect(cards[1]).toHaveTextContent('landing.practice');
+    expect(cards[2]).toHaveTextContent('landing.blastMode');
+    expect(cards[3]).toHaveTextContent('landing.adventureMode');
   });
 
   it('pins daily+arena first, keeps blast above adventure regardless of popularity', () => {
@@ -70,12 +69,11 @@ describe('LandingChallengeCards reordering', () => {
     const cardOrder = getCardOrder(stats);
     render(<LandingChallengeCards {...baseProps} cardOrder={cardOrder} />);
     const cards = screen.getAllByTestId('mode-card');
-    // Daily (banner) + injected quickPlay lead, then arena pinned, then blast always before adventure.
-    expect(cards[0]).toHaveTextContent('landing.quickPlay');
-    expect(cards[1]).toHaveTextContent('landing.arena');
-    expect(cards[2]).toHaveTextContent('landing.blastMode');
-    expect(cards[3]).toHaveTextContent('landing.adventureMode');
-    expect(cards[4]).toHaveTextContent('landing.practice');
+    // Newcomer: no quickPlay. Daily (banner), then arena pinned, blast before adventure.
+    expect(cards[0]).toHaveTextContent('landing.arena');
+    expect(cards[1]).toHaveTextContent('landing.blastMode');
+    expect(cards[2]).toHaveTextContent('landing.adventureMode');
+    expect(cards[3]).toHaveTextContent('landing.practice');
   });
 
   it('shows blast in regular order when most popular', () => {
@@ -89,9 +87,8 @@ describe('LandingChallengeCards reordering', () => {
     const cardOrder = getCardOrder(stats);
     render(<LandingChallengeCards {...baseProps} cardOrder={cardOrder} />);
     const cards = screen.getAllByTestId('mode-card');
-    // Blast is most popular, so after pinned daily+arena it comes first
-    expect(cards[0]).toHaveTextContent('landing.quickPlay');
-    expect(cards[1]).toHaveTextContent('landing.arena');
-    expect(cards[2]).toHaveTextContent('landing.blastMode');
+    // Newcomer: no quickPlay. Daily pinned (banner), arena pinned, then blast leads rest.
+    expect(cards[0]).toHaveTextContent('landing.arena');
+    expect(cards[1]).toHaveTextContent('landing.blastMode');
   });
 });

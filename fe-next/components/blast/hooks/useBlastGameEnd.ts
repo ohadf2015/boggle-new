@@ -66,15 +66,16 @@ export function useBlastGameEnd(deps: GameEndDeps) {
   // IMPORTANT: Do NOT include `engine` in deps — Sugar Crush mutates tileStates which would
   // recreate the engine object, cancel the async loop via cleanup, and restart it infinitely.
   useEffect(() => {
-    const { onGameEnd, onWaveComplete, maxCombo, waveConfig, sounds, setExplosionShake, explosionShakeTimerRef } = depsRef.current;
+    const { onGameEnd, onWaveComplete, maxCombo, sounds, setExplosionShake, explosionShakeTimerRef } = depsRef.current;
 
     // Board cleared — all tiles gone (SP only)
     if (!isMultiplayer && engine.gameState.isComplete) {
       const { score, wordsFound, tilesCleared, totalTiles } = engine.gameState;
       const clearPct = totalTiles > 0 ? Math.min(100, Math.round((tilesCleared / totalTiles) * 100)) : 0;
-      const scoreThreshold = waveConfig?.scoreThreshold;
 
-      if (onWaveComplete && objectives.allObjectivesComplete && (!scoreThreshold || score >= scoreThreshold)) {
+      // Full board clear always advances the wave — secondary objectives
+      // (collect_type, word_length, score_target) affect stars, not progression.
+      if (onWaveComplete) {
         const timer = setTimeout(() => onWaveComplete(score, wordsFound, clearPct), 2000);
         return () => clearTimeout(timer);
       }
@@ -154,9 +155,10 @@ export function useBlastGameEnd(deps: GameEndDeps) {
         // End game — read latest deps
         const { score, wordsFound, tilesCleared, totalTiles } = engine.gameState;
         const clearPct = totalTiles > 0 ? Math.min(100, Math.round((tilesCleared / totalTiles) * 100)) : 0;
-        const scoreThreshold = latestDeps.waveConfig?.scoreThreshold;
 
-        if (latestDeps.onWaveComplete && latestDeps.objectives.allObjectivesComplete && (!scoreThreshold || score >= scoreThreshold)) {
+        // Advance the wave if the primary board-clear objective (90%+) is met.
+        // Secondary objectives affect stars but don't block progression.
+        if (latestDeps.onWaveComplete && clearPct >= 90) {
           latestDeps.onWaveComplete(score, wordsFound, clearPct);
         } else {
           const results = engine.getResults(latestDeps.maxCombo);
