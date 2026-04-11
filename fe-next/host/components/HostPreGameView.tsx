@@ -438,26 +438,26 @@ function HostPreGameView({
     );
   };
 
-  // TV mode toggle — full-width row, desktop only
+  // TV mode toggle — neo-brutalist pill toggle matching design
   const tvModeToggle = (
-    <div className="hidden lg:flex items-center justify-between px-3 py-2 rounded-neo border-2 border-neo-black/50 bg-slate-800/60">
-      <div className="flex items-center gap-2">
-        <Monitor className="w-4 h-4 text-neo-cream/60" />
-        <span className="text-xs font-bold uppercase tracking-widest text-neo-cream/60">
+    <div className="flex items-center justify-between px-4 py-2.5 rounded-neo-lg border-2 border-neo-black bg-neo-navy-light shadow-hard">
+      <div className="flex items-center gap-3">
+        <Monitor className={cn('w-5 h-5', !hostPlaying ? 'text-neo-cyan' : 'text-neo-cream/60')} />
+        <span className="text-[10px] font-black uppercase tracking-widest text-neo-cream">
           {t('hostView.broadcastModeTitle')}
         </span>
       </div>
       <button
         onClick={() => setHostPlaying(prev => !prev)}
         className={cn(
-          'relative w-11 h-6 rounded-full border-2 border-neo-black transition-colors',
+          'relative w-10 h-5 rounded-full border-2 border-neo-black transition-colors',
           !hostPlaying ? 'bg-neo-lime' : 'bg-white/10'
         )}
         aria-label={t('hostView.broadcastModeTitle')}
       >
         <motion.div
-          className="absolute top-0.5 w-4 h-4 rounded-full bg-neo-black"
-          animate={{ x: !hostPlaying ? 20 : 2 }}
+          className="absolute top-0.5 w-3 h-3 rounded-full bg-neo-black"
+          animate={{ x: !hostPlaying ? 18 : 2 }}
           transition={{ type: 'spring', stiffness: 500, damping: 30 }}
         />
       </button>

@@ -1459,7 +1459,17 @@ const en = {
     "highestCombo": "Highest Combo",
     "hunting": "Hunting",
     "wordsHunted": "Words Hunted",
-    "activityPanel": "Activity"
+    "activityPanel": "Activity",
+    "livesRemaining": "Lives",
+    "eliminated": "OUT",
+    "eliminatedBadge": "Eliminated",
+    "playersAlive": "Alive",
+    "playersEliminated": "Eliminated",
+    "targetLength": "Target",
+    "letters": "letters",
+    "wave": "Wave",
+    "tilesCleared": "Tiles Cleared",
+    "blastWave": "WAVE {wave}"
   },
   "tvResults": {
     "title": "WE HAVE A WINNER!",
@@ -9598,18 +9608,30 @@ const en = {
   gameModes: {
     classic: {
       name: "Classic",
-      description: "Find as many words as you can!"
+      description: "Find as many words as you can!",
+      feature1: "Timed",
+      feature2: "Score-based",
+      feature3: "Free-form"
     },
     blast: {
       name: "Blast",
-      description: "Clear tiles with combos and special powers!"
+      description: "Clear tiles with combos and special powers!",
+      feature1: "Chain combos",
+      feature2: "Special tiles",
+      feature3: "Cascade"
     },
     wordHunt: {
       name: "Word Hunt",
-      description: "Race to find the target word!"
+      description: "Race to find the target word!",
+      feature1: "Target words",
+      feature2: "Speed race",
+      feature3: "Hints"
     },
     random: "Random",
     randomDescription: "Surprise me! Pick a random mode each round.",
+    randomFeature1: "Variety",
+    randomFeature2: "Surprise",
+    randomFeature3: "Mixed rules",
     nextMode: "Next Mode",
     randomizing: "Randomizing..."
   },

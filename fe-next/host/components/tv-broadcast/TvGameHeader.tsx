@@ -2,7 +2,7 @@
 
 import { memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Flame } from 'lucide-react';
+import { Flame, Crosshair, Zap } from 'lucide-react';
 import CircularTimer from '../../../components/CircularTimer';
 
 type UrgencyLevel = 'normal' | 'urgent' | 'critical' | 'extreme';
@@ -15,6 +15,9 @@ interface TvGameHeaderProps {
   earthquakeState?: 'idle' | 'warning' | 'shaking' | 'fire-round';
   urgencyLevel?: UrgencyLevel;
   gameMode?: string | null;
+  blastWave?: number;
+  wordHuntTargetLength?: number;
+  wordHuntAliveCount?: number;
   t: (path: string, params?: Record<string, string | number>) => string;
 }
 
@@ -49,6 +52,9 @@ const TvGameHeader = memo<TvGameHeaderProps>(({
   earthquakeState = 'idle',
   urgencyLevel = 'normal',
   gameMode,
+  blastWave = 1,
+  wordHuntTargetLength = 0,
+  wordHuntAliveCount = 0,
   t,
 }) => {
   const totalTimeSeconds = timerValue * 60;
@@ -155,7 +161,7 @@ const TvGameHeader = memo<TvGameHeaderProps>(({
             )}
           </AnimatePresence>
 
-          {/* Fire Round Badge */}
+          {/* Fire Round Badge (Classic mode) */}
           <AnimatePresence>
             {fireRoundActive && (
               <motion.div
@@ -176,6 +182,40 @@ const TvGameHeader = memo<TvGameHeaderProps>(({
               </motion.div>
             )}
           </AnimatePresence>
+
+          {/* Blast Wave Badge */}
+          {gameMode === 'blast' && blastWave > 0 && (
+            <motion.div
+              key={`wave-${blastWave}`}
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="flex items-center gap-2 bg-neo-orange text-neo-black px-4 py-2 rounded-neo border-3 border-neo-black shadow-hard-sm"
+            >
+              <Zap className="w-5 h-5" />
+              <span className="font-black text-lg uppercase">
+                {t('tvBroadcast.blastWave', { wave: blastWave })}
+              </span>
+            </motion.div>
+          )}
+
+          {/* Word Hunt Target + Alive Count */}
+          {gameMode === 'word-hunt' && wordHuntTargetLength > 0 && (
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="flex items-center gap-3 bg-neo-pink text-neo-cream px-4 py-2 rounded-neo border-3 border-neo-black shadow-hard-sm"
+            >
+              <Crosshair className="w-5 h-5" />
+              <div className="text-center">
+                <span className="font-black text-sm uppercase block">
+                  {t('tvBroadcast.targetLength')}: {wordHuntTargetLength} {t('tvBroadcast.letters')}
+                </span>
+                <span className="text-xs font-bold opacity-80">
+                  {wordHuntAliveCount} {t('tvBroadcast.playersAlive')}
+                </span>
+              </div>
+            </motion.div>
+          )}
         </div>
       </div>
     </div>

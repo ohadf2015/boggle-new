@@ -17,6 +17,9 @@ interface TvActivityPanelProps {
   fireRoundActive?: boolean;
   earthquakeShaking?: boolean;
   activityPulse?: boolean;
+  wordHuntTargetLength?: number;
+  wordHuntAliveCount?: number;
+  wordHuntTotalPlayers?: number;
 }
 
 interface ActivityEvent {
@@ -149,10 +152,28 @@ const TvWordHuntActivityPanel = memo<{
   wordsHunted: number;
   blipCount: number;
   reducedMotion: boolean;
+  targetLength: number;
+  aliveCount: number;
+  totalPlayers: number;
   t: TvActivityPanelProps['t'];
-}>(({ wordsHunted, blipCount: _blipCount, reducedMotion, t }) => {
+}>(({ wordsHunted, blipCount: _blipCount, reducedMotion, targetLength, aliveCount, totalPlayers, t }) => {
   return (
     <div data-testid="tv-wordhunt-panel" className="flex flex-col h-full">
+      {/* Target word length indicator */}
+      {targetLength > 0 && (
+        <div className="flex items-center justify-center gap-1.5 p-3 border-b-2 border-neo-black/20">
+          <p className="text-xs font-bold text-neo-cream/60 uppercase mr-2">{t('tvBroadcast.targetLength')}:</p>
+          {Array.from({ length: targetLength }, (_, i) => (
+            <div
+              key={i}
+              className="w-6 h-8 rounded border-2 border-neo-pink/60 bg-neo-pink/10 flex items-center justify-center"
+            >
+              <span className="text-neo-pink font-black text-lg">_</span>
+            </div>
+          ))}
+        </div>
+      )}
+
       {/* Radar visualization */}
       <div className="flex-1 flex items-center justify-center p-4">
         <div
@@ -185,6 +206,12 @@ const TvWordHuntActivityPanel = memo<{
           <p className="text-xs font-bold text-neo-cream/60 uppercase">{t('tvBroadcast.wordsHunted')}</p>
           <p className="text-xl font-black text-neo-cream">{wordsHunted}</p>
         </div>
+        {totalPlayers > 0 && (
+          <div className="text-center">
+            <p className="text-xs font-bold text-neo-cream/60 uppercase">{t('tvBroadcast.playersAlive')}</p>
+            <p className="text-xl font-black text-neo-lime">{aliveCount}<span className="text-neo-cream/40">/{totalPlayers}</span></p>
+          </div>
+        )}
         <div className="text-center">
           <p className={cn(
             'text-lg font-black text-neo-cyan uppercase tracking-wider',
@@ -215,6 +242,9 @@ const TvActivityPanel = memo<TvActivityPanelProps>(({
   fireRoundActive = false,
   earthquakeShaking = false,
   activityPulse,
+  wordHuntTargetLength = 0,
+  wordHuntAliveCount = 0,
+  wordHuntTotalPlayers = 0,
 }) => {
   const gameMode = useGameMode() || 'classic';
   const reducedMotion = useReducedMotion() ?? false;
@@ -372,6 +402,9 @@ const TvActivityPanel = memo<TvActivityPanelProps>(({
           wordsHunted={wordsHunted}
           blipCount={blipCount}
           reducedMotion={reducedMotion}
+          targetLength={wordHuntTargetLength}
+          aliveCount={wordHuntAliveCount}
+          totalPlayers={wordHuntTotalPlayers}
           t={t}
         />
       ) : (

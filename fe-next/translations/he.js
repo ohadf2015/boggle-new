@@ -1492,7 +1492,17 @@ const he = {
     "highestCombo": "קומבו הגבוה ביותר",
     "hunting": "ציד",
     "wordsHunted": "מילים שנצודו",
-    "activityPanel": "פעילות"
+    "activityPanel": "פעילות",
+    "livesRemaining": "חיים",
+    "eliminated": "הודח",
+    "eliminatedBadge": "הודח",
+    "playersAlive": "בחיים",
+    "playersEliminated": "הודחו",
+    "targetLength": "יעד",
+    "letters": "אותיות",
+    "wave": "גל",
+    "tilesCleared": "אריחים שנוקו",
+    "blastWave": "גל {wave}"
   },
   "tvResults": {
     "title": "יש לנו מנצח!",
@@ -9444,18 +9454,30 @@ const he = {
   gameModes: {
     classic: {
       name: "קלאסי",
-      description: "מצאו כמה שיותר מילים!"
+      description: "מצאו כמה שיותר מילים!",
+      feature1: "מתוזמן",
+      feature2: "ניקוד",
+      feature3: "חופשי"
     },
     blast: {
       name: "בלאסט",
-      description: "נקו אריחים עם קומבואים וכוחות מיוחדים!"
+      description: "נקו אריחים עם קומבואים וכוחות מיוחדים!",
+      feature1: "קומבו שרשרת",
+      feature2: "אריחים מיוחדים",
+      feature3: "מפל"
     },
     wordHunt: {
       name: "ציד מילים",
-      description: "מצאו את מילת היעד לפני כולם!"
+      description: "מצאו את מילת היעד לפני כולם!",
+      feature1: "מילות יעד",
+      feature2: "מרוץ מהירות",
+      feature3: "רמזים"
     },
     random: "אקראי",
     randomDescription: "הפתיעו אותי! מצב אקראי בכל סיבוב.",
+    randomFeature1: "מגוון",
+    randomFeature2: "הפתעה",
+    randomFeature3: "חוקים משולבים",
     nextMode: "מצב הבא",
     randomizing: "מגריל..."
   },

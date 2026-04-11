@@ -28,6 +28,9 @@ interface TvLeaderboardProps {
   players: LeaderboardEntry[];
   playerCombos?: Record<string, PlayerComboData>;
   hostUsername?: string;
+  gameMode?: string | null;
+  wordHuntPlayerLives?: Record<string, number>;
+  wordHuntEliminatedPlayers?: string[];
   t: (path: string, params?: Record<string, string | number>) => string;
 }
 
@@ -43,6 +46,9 @@ const TvLeaderboard = memo<TvLeaderboardProps>(({
   players,
   playerCombos = {},
   hostUsername,
+  gameMode,
+  wordHuntPlayerLives = {},
+  wordHuntEliminatedPlayers = [],
   t,
 }) => {
   const parentRef = useRef<HTMLDivElement>(null);
@@ -111,6 +117,9 @@ const TvLeaderboard = memo<TvLeaderboardProps>(({
                 presenceStatus={player.presenceStatus}
                 disconnected={player.disconnected}
                 index={index}
+                gameMode={gameMode}
+                lives={wordHuntPlayerLives[player.username]}
+                isEliminated={wordHuntEliminatedPlayers.includes(player.username)}
                 t={t}
               />
               {index === 0 && sortedPlayers.length >= 2 && (
@@ -177,6 +186,9 @@ const TvLeaderboard = memo<TvLeaderboardProps>(({
                   presenceStatus={player.presenceStatus}
                   disconnected={player.disconnected}
                   index={virtualRow.index}
+                  gameMode={gameMode}
+                  lives={wordHuntPlayerLives[player.username]}
+                  isEliminated={wordHuntEliminatedPlayers.includes(player.username)}
                   t={t}
                 />
               </div>

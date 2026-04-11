@@ -62,6 +62,14 @@ interface TvBroadcastViewProps {
   earthquakeState?: EarthquakeState;
   fireRoundActive?: boolean;
   fireRoundRemaining?: number;
+
+  // Word Hunt mode
+  wordHuntPlayerLives?: Record<string, number>;
+  wordHuntEliminatedPlayers?: string[];
+  wordHuntTargetLength?: number;
+
+  // Blast mode
+  blastWave?: number;
 }
 
 // ==================== Component ====================
@@ -98,6 +106,14 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
   earthquakeState = 'idle',
   fireRoundActive = false,
   fireRoundRemaining = 0,
+
+  // Word Hunt mode
+  wordHuntPlayerLives = {},
+  wordHuntEliminatedPlayers = [],
+  wordHuntTargetLength = 0,
+
+  // Blast mode
+  blastWave = 1,
 }) => {
   // CrazyGames platform detection - fullscreen is managed by CrazyGames, not us
   const { isOnCrazyGamesPlatform } = useCrazyGames();
@@ -314,6 +330,9 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
         earthquakeState={earthquakeState}
         urgencyLevel={urgencyLevel}
         gameMode={gameMode}
+        blastWave={blastWave}
+        wordHuntTargetLength={wordHuntTargetLength}
+        wordHuntAliveCount={Object.keys(wordHuntPlayerLives).length - wordHuntEliminatedPlayers.length}
         t={t}
       />
 
@@ -381,6 +400,9 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
             t={t}
             fireRoundActive={fireRoundActive}
             earthquakeShaking={earthquakeState === 'shaking'}
+            wordHuntTargetLength={wordHuntTargetLength}
+            wordHuntAliveCount={Object.keys(wordHuntPlayerLives).length - wordHuntEliminatedPlayers.length}
+            wordHuntTotalPlayers={Object.keys(wordHuntPlayerLives).length}
           />
         </div>
 
@@ -390,6 +412,9 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
             players={leaderboardData}
             playerCombos={playerCombos}
             hostUsername={username}
+            gameMode={gameMode}
+            wordHuntPlayerLives={wordHuntPlayerLives}
+            wordHuntEliminatedPlayers={wordHuntEliminatedPlayers}
             t={t}
           />
         </div>

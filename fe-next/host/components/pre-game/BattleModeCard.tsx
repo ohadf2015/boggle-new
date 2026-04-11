@@ -21,9 +21,13 @@ interface BattleModeCardProps {
 interface ModeVisualConfig {
   mode: GameModeOption;
   icon: React.ReactNode;
+  largeIcon: React.ReactNode;
   nameKey: string;
   descKey: string;
+  featureKeys: [string, string, string];
   accentColor: string;
+  accentBorder: string;
+  accentBg: string;
   activeText: string;
   activeBg: string;
 }
@@ -32,38 +36,54 @@ const MODES: ModeVisualConfig[] = [
   {
     mode: 'random',
     icon: <Shuffle className="w-4 h-4" />,
+    largeIcon: <Shuffle className="w-7 h-7" />,
     nameKey: 'gameModes.random',
     descKey: 'gameModes.randomDescription',
+    featureKeys: ['gameModes.randomFeature1', 'gameModes.randomFeature2', 'gameModes.randomFeature3'],
     accentColor: 'bg-neo-purple',
+    accentBorder: 'border-l-neo-purple',
+    accentBg: 'bg-neo-purple',
     activeText: 'text-neo-purple',
-    activeBg: 'bg-neo-purple/15 border-neo-purple',
+    activeBg: 'bg-neo-purple',
   },
   {
     mode: 'classic',
     icon: <FileText className="w-4 h-4" />,
+    largeIcon: <FileText className="w-7 h-7" />,
     nameKey: 'gameModes.classic.name',
     descKey: 'gameModes.classic.description',
+    featureKeys: ['gameModes.classic.feature1', 'gameModes.classic.feature2', 'gameModes.classic.feature3'],
     accentColor: 'bg-neo-cyan',
+    accentBorder: 'border-l-neo-cyan',
+    accentBg: 'bg-neo-cyan',
     activeText: 'text-neo-cyan',
-    activeBg: 'bg-neo-cyan/15 border-neo-cyan',
+    activeBg: 'bg-neo-cyan',
   },
   {
     mode: 'blast',
     icon: <Bomb className="w-4 h-4" />,
+    largeIcon: <Bomb className="w-7 h-7" />,
     nameKey: 'gameModes.blast.name',
     descKey: 'gameModes.blast.description',
+    featureKeys: ['gameModes.blast.feature1', 'gameModes.blast.feature2', 'gameModes.blast.feature3'],
     accentColor: 'bg-neo-orange',
+    accentBorder: 'border-l-neo-orange',
+    accentBg: 'bg-neo-orange',
     activeText: 'text-neo-orange',
-    activeBg: 'bg-neo-orange/15 border-neo-orange',
+    activeBg: 'bg-neo-orange',
   },
   {
     mode: 'word-hunt',
     icon: <Target className="w-4 h-4" />,
+    largeIcon: <Target className="w-7 h-7" />,
     nameKey: 'gameModes.wordHunt.name',
     descKey: 'gameModes.wordHunt.description',
+    featureKeys: ['gameModes.wordHunt.feature1', 'gameModes.wordHunt.feature2', 'gameModes.wordHunt.feature3'],
     accentColor: 'bg-neo-pink',
+    accentBorder: 'border-l-neo-pink',
+    accentBg: 'bg-neo-pink',
     activeText: 'text-neo-pink',
-    activeBg: 'bg-neo-pink/15 border-neo-pink',
+    activeBg: 'bg-neo-pink',
   },
 ];
 
@@ -92,7 +112,7 @@ export function BattleModeCard({
       {/* Horizontal chips row — equal-width */}
       <div className="space-y-2">
         <div className="grid grid-cols-4 gap-1.5">
-          {MODES.map(({ mode, icon, nameKey, activeText, activeBg }) => {
+          {MODES.map(({ mode, icon, nameKey, activeBg }) => {
             const isActive = selectedGameMode === mode;
 
             return (
@@ -103,13 +123,13 @@ export function BattleModeCard({
                 onClick={() => handleSelect(mode)}
                 data-testid={`game-mode-${mode}`}
                 className={cn(
-                  'flex items-center justify-center gap-1.5 px-2 py-2.5 rounded-neo border-2 text-xs font-bold uppercase transition-all whitespace-nowrap',
+                  'flex items-center justify-center gap-1.5 px-2 py-2.5 rounded-xl border-2 text-xs font-bold uppercase transition-all whitespace-nowrap',
                   isActive
-                    ? `${activeBg} ${activeText}`
+                    ? `${activeBg} border-neo-black text-neo-black shadow-hard-lg`
                     : 'bg-white/5 border-neo-white/15 text-neo-cream/60 hover:border-neo-white/30 hover:bg-white/10'
                 )}
               >
-                <span className={cn(isActive ? activeText : 'text-neo-cream/50')}>
+                <span className={cn(isActive ? 'text-neo-black' : 'text-neo-cream/50')}>
                   {icon}
                 </span>
                 <span>{t(nameKey)}</span>
@@ -122,7 +142,7 @@ export function BattleModeCard({
                       exit={{ scale: 0 }}
                       transition={{ type: 'spring', stiffness: 500, damping: 20 }}
                     >
-                      <Check className={cn('w-3 h-3', activeText)} strokeWidth={3} />
+                      <Check className="w-3 h-3 text-neo-black" strokeWidth={3} />
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -132,20 +152,46 @@ export function BattleModeCard({
         </div>
       </div>
 
-      {/* Active mode description — one line with colored pip */}
+      {/* Mode Explainer Card */}
       <AnimatePresence mode="wait">
         <motion.div
           key={activeMode.mode}
-          initial={{ opacity: 0, y: -4 }}
+          initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 4 }}
-          transition={{ duration: 0.15 }}
-          className="flex items-center gap-2 px-1"
+          exit={{ opacity: 0, y: -8 }}
+          transition={{ duration: 0.2 }}
+          className={cn(
+            'flex gap-3 p-3 rounded-neo border-2 border-neo-black border-l-4 bg-neo-navy-light/80 shadow-hard-sm',
+            activeMode.accentBorder
+          )}
         >
-          <div className={cn('w-1.5 h-1.5 rounded-full shrink-0', activeMode.accentColor)} />
-          <p className="text-xs text-neo-cream/50 font-medium truncate">
-            {t(activeMode.descKey)}
-          </p>
+          <div className={cn(
+            'w-14 h-14 rounded-neo border-2 border-neo-black flex items-center justify-center shrink-0 shadow-hard-sm text-neo-black',
+            activeMode.accentBg
+          )}>
+            {activeMode.largeIcon}
+          </div>
+          <div className="flex-1 min-w-0 space-y-1.5">
+            <h4 className={cn('font-neo-display text-lg leading-none tracking-tight uppercase', activeMode.activeText)}>
+              {t(activeMode.nameKey)}
+            </h4>
+            <p className="text-[11px] text-neo-cream/60 leading-tight">
+              {t(activeMode.descKey)}
+            </p>
+            <div className="flex flex-wrap gap-1.5 pt-1">
+              {activeMode.featureKeys.map((key) => (
+                <span
+                  key={key}
+                  className={cn(
+                    'text-[7px] font-bold uppercase tracking-wider px-2 py-0.5 rounded border border-neo-white/10 bg-neo-black/40',
+                    activeMode.activeText
+                  )}
+                >
+                  {t(key)}
+                </span>
+              ))}
+            </div>
+          </div>
         </motion.div>
       </AnimatePresence>
       </div>

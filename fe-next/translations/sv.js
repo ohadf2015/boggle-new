@@ -1475,7 +1475,17 @@ const sv = {
     "highestCombo": "Högsta kombo",
     "hunting": "Jagar",
     "wordsHunted": "Ord jagade",
-    "activityPanel": "Aktivitet"
+    "activityPanel": "Aktivitet",
+    "livesRemaining": "Liv",
+    "eliminated": "UTE",
+    "eliminatedBadge": "Eliminerad",
+    "playersAlive": "Kvar",
+    "playersEliminated": "Eliminerade",
+    "targetLength": "Mål",
+    "letters": "bokstäver",
+    "wave": "Våg",
+    "tilesCleared": "Brickor rensade",
+    "blastWave": "VÅG {wave}"
   },
   "tvResults": {
     "title": "VI HAR EN VINNARE!",
@@ -9409,18 +9419,30 @@ const sv = {
   gameModes: {
     classic: {
       name: "Klassiskt",
-      description: "Hitta så många ord du kan!"
+      description: "Hitta så många ord du kan!",
+      feature1: "Tidsbegränsat",
+      feature2: "Poängbaserat",
+      feature3: "Fritt"
     },
     blast: {
       name: "Blast",
-      description: "Rensa brickor med kombos och specialkrafter!"
+      description: "Rensa brickor med kombos och specialkrafter!",
+      feature1: "Kedjekombos",
+      feature2: "Specialbrickor",
+      feature3: "Kaskad"
     },
     wordHunt: {
       name: "Ordjakt",
-      description: "Tävla om att hitta målordet!"
+      description: "Tävla om att hitta målordet!",
+      feature1: "Målord",
+      feature2: "Snabblopp",
+      feature3: "Ledtrådar"
     },
     random: "Slumpmässigt",
     randomDescription: "Överraska mig! Slumpa läge varje runda.",
+    randomFeature1: "Variation",
+    randomFeature2: "Överraskning",
+    randomFeature3: "Blandade regler",
     nextMode: "Nästa läge",
     randomizing: "Slumpar..."
   },

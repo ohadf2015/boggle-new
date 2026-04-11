@@ -130,8 +130,8 @@ export const DailyIntroCarousel: React.FC<DailyIntroCarouselProps> = ({
             className={cn(
               'rounded-full border-2 border-neo-black transition-all duration-200 shrink-0 aspect-square',
               idx === currentStep
-                ? 'size-4 bg-neo-pink'
-                : 'size-3 bg-gray-300 hover:bg-neo-pink/30'
+                ? 'w-4 h-4 bg-neo-pink'
+                : 'w-3 h-3 bg-gray-300 hover:bg-neo-pink/30'
             )}
           />
         ))}

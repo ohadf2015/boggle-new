@@ -1493,7 +1493,17 @@ const es = {
     "highestCombo": "Combo más alto",
     "hunting": "Cazando",
     "wordsHunted": "Palabras cazadas",
-    "activityPanel": "Actividad"
+    "activityPanel": "Actividad",
+    "livesRemaining": "Vidas",
+    "eliminated": "FUERA",
+    "eliminatedBadge": "Eliminado",
+    "playersAlive": "Vivos",
+    "playersEliminated": "Eliminados",
+    "targetLength": "Objetivo",
+    "letters": "letras",
+    "wave": "Oleada",
+    "tilesCleared": "Casillas limpiadas",
+    "blastWave": "OLEADA {wave}"
   },
   "tvResults": {
     "title": "¡TENEMOS UN GANADOR!",
@@ -9298,18 +9308,30 @@ const es = {
   "gameModes": {
     "classic": {
       "name": "Clásico",
-      "description": "¡Encuentra todas las palabras que puedas!"
+      "description": "¡Encuentra todas las palabras que puedas!",
+      "feature1": "Cronometrado",
+      "feature2": "Puntuación",
+      "feature3": "Libre"
     },
     "blast": {
       "name": "Blast",
-      "description": "¡Elimina fichas con combos y poderes especiales!"
+      "description": "¡Elimina fichas con combos y poderes especiales!",
+      "feature1": "Combos en cadena",
+      "feature2": "Fichas especiales",
+      "feature3": "Cascada"
     },
     "wordHunt": {
       "name": "Caza de Palabras",
-      "description": "¡Compite por encontrar la palabra objetivo!"
+      "description": "¡Compite por encontrar la palabra objetivo!",
+      "feature1": "Palabras objetivo",
+      "feature2": "Carrera de velocidad",
+      "feature3": "Pistas"
     },
     "random": "Aleatorio",
     "randomDescription": "¡Sorpréndeme! Modo aleatorio en cada ronda.",
+    "randomFeature1": "Variedad",
+    "randomFeature2": "Sorpresa",
+    "randomFeature3": "Reglas mixtas",
     "nextMode": "Siguiente modo",
     "randomizing": "Aleatorizando..."
   },

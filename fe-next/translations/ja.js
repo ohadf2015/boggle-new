@@ -1475,7 +1475,17 @@ const ja = {
     "highestCombo": "最高コンボ",
     "hunting": "ハンティング中",
     "wordsHunted": "捕獲した単語",
-    "activityPanel": "アクティビティ"
+    "activityPanel": "アクティビティ",
+    "livesRemaining": "ライフ",
+    "eliminated": "脱落",
+    "eliminatedBadge": "脱落",
+    "playersAlive": "生存",
+    "playersEliminated": "脱落者",
+    "targetLength": "ターゲット",
+    "letters": "文字",
+    "wave": "ウェーブ",
+    "tilesCleared": "消したタイル",
+    "blastWave": "ウェーブ {wave}"
   },
   "tvResults": {
     "title": "勝者誕生!",
@@ -9409,18 +9419,30 @@ const ja = {
   gameModes: {
     classic: {
       name: "クラシック",
-      description: "できるだけ多くの単語を見つけよう！"
+      description: "できるだけ多くの単語を見つけよう！",
+      feature1: "タイム制",
+      feature2: "スコア制",
+      feature3: "自由形式"
     },
     blast: {
       name: "ブラスト",
-      description: "コンボと特殊パワーでタイルをクリア！"
+      description: "コンボと特殊パワーでタイルをクリア！",
+      feature1: "チェーンコンボ",
+      feature2: "特殊タイル",
+      feature3: "カスケード"
     },
     wordHunt: {
       name: "ワードハント",
-      description: "ターゲットの単語を最速で見つけよう！"
+      description: "ターゲットの単語を最速で見つけよう！",
+      feature1: "ターゲット単語",
+      feature2: "スピードレース",
+      feature3: "ヒント"
     },
     random: "ランダム",
     randomDescription: "お楽しみに！毎ラウンド違うモードを選びます。",
+    randomFeature1: "バラエティ",
+    randomFeature2: "サプライズ",
+    randomFeature3: "ミックスルール",
     nextMode: "次のモード",
     randomizing: "ランダム選択中..."
   },

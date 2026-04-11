@@ -2,7 +2,7 @@
 
 import { memo, useRef, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Flame, Crown, Medal, Award, WifiOff, Clock, ArrowUp, ArrowDown } from 'lucide-react';
+import { Flame, Crown, Medal, Award, WifiOff, Clock, ArrowUp, ArrowDown, Heart, Skull } from 'lucide-react';
 import Image from 'next/image';
 import Avatar from '../../../components/Avatar';
 import { AnimatedCounter } from '../../../components/ui/AnimatedCounter';
@@ -29,6 +29,9 @@ interface TvPlayerCardProps {
   disconnected?: boolean;
   index: number;
   leaderScore?: number;
+  gameMode?: string | null;
+  lives?: number;
+  isEliminated?: boolean;
   t: (path: string, params?: Record<string, string | number>) => string;
 }
 
@@ -81,6 +84,9 @@ const TvPlayerCard = memo<TvPlayerCardProps>(({
   disconnected = false,
   index: _index,
   leaderScore = 0,
+  gameMode,
+  lives,
+  isEliminated = false,
   t,
 }) => {
   const rankConfig = RANK_CONFIGS[rank as keyof typeof RANK_CONFIGS];
@@ -145,10 +151,13 @@ const TvPlayerCard = memo<TvPlayerCardProps>(({
       transition={{ type: 'spring', stiffness: 300, damping: 25 }}
       className={cn(
         'relative flex items-center gap-3 p-3 rounded-neo border-3 border-neo-black transition-colors overflow-hidden',
-        isTopThree
+        isEliminated && 'opacity-50',
+        isTopThree && !isEliminated
           ? `${rankConfig?.bgColor} ${rankConfig?.shadowColor}`
-          : 'bg-neo-cream shadow-hard-sm hover:shadow-hard hover:-translate-x-0.5 hover:-translate-y-0.5',
-        isFlashing && 'ring-2 ring-neo-yellow'
+          : isTopThree && isEliminated
+            ? 'bg-gray-400 shadow-hard-sm'
+            : 'bg-neo-cream shadow-hard-sm hover:shadow-hard hover:-translate-x-0.5 hover:-translate-y-0.5',
+        isFlashing && !isEliminated && 'ring-2 ring-neo-yellow'
       )}
     >
       {/* Rank Badge + Change Arrow */}
@@ -239,22 +248,39 @@ const TvPlayerCard = memo<TvPlayerCardProps>(({
 
       {/* Name & Word Count */}
       <div className="flex-1 min-w-0">
-        <p
-          className={cn(
-            'font-black text-lg uppercase truncate',
-            isTopThree ? rankConfig?.textColor : 'text-neo-black'
+        <div className="flex items-center gap-1.5">
+          <p
+            className={cn(
+              'font-black text-lg uppercase truncate',
+              isEliminated && 'line-through',
+              isTopThree ? rankConfig?.textColor : 'text-neo-black'
+            )}
+          >
+            {username}
+          </p>
+          {isEliminated && (
+            <span className="shrink-0 flex items-center gap-1 px-1.5 py-0.5 rounded bg-neo-red text-neo-cream text-[10px] font-black uppercase border border-neo-black">
+              <Skull className="w-3 h-3" />
+              {t('tvBroadcast.eliminated')}
+            </span>
           )}
-        >
-          {username}
-        </p>
-        <p
-          className={cn(
-            'text-sm font-bold',
-            isTopThree ? `${rankConfig?.textColor} opacity-80` : 'text-neo-black/60'
+        </div>
+        <div className="flex items-center gap-2">
+          <p
+            className={cn(
+              'text-sm font-bold',
+              isTopThree ? `${rankConfig?.textColor} opacity-80` : 'text-neo-black/60'
+            )}
+          >
+            {wordCount} {t('tvResults.words')}
+          </p>
+          {gameMode === 'word-hunt' && lives != null && !isEliminated && (
+            <span className="flex items-center gap-0.5 text-neo-red text-sm font-bold">
+              <Heart className="w-3.5 h-3.5 fill-neo-red" />
+              {lives}
+            </span>
           )}
-        >
-          {wordCount} {t('tvResults.words')}
-        </p>
+        </div>
       </div>
 
       {/* Combo Indicator */}
