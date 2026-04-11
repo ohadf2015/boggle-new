@@ -326,7 +326,7 @@ const AdventureGame = memo<AdventureGameProps>(
     const [forgeEquippedRunes, setForgeEquippedRunes] = useState<RuneCardType[]>([]);
     const forgeOffering = useMemo(
       () => modeState.showRunePicker ? pickRuneOffering(3) : [],
-      // eslint-disable-next-line react-hooks/exhaustive-deps
+       
       [modeState.showRunePicker]
     );
     const handleForgePick = useCallback((rune: RuneCardDef, replaceIndex?: number) => {

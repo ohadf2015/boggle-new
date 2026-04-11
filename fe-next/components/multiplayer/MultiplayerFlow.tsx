@@ -309,7 +309,7 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
     // Show CrazyGames invite button so host can invite friends
     cgShowInvite(gameCode);
 
-  }, [isAuthenticated, displayName, defaultLanguage, handleJoin, setGameCode, setRoomName, setHostUsername, setUsername, t, cgShowInvite]);
+  }, [isAuthenticated, displayName, defaultLanguage, handleJoin, setGameCode, setRoomName, setHostUsername, setUsername, cgShowInvite]);
 
   // Landing Quick Play auto-fire: when the user arrives via
   // `/multiplayer?quickPlay=true`, kick off `handleQuickPlay` exactly once on
