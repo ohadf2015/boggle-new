@@ -95,20 +95,25 @@ export const PlayerRoster = memo(function PlayerRoster({ players, username, game
 
   return (
     <section className={compact ? 'space-y-1' : 'space-y-3'}>
-      {/* Header row */}
+      {/* Header row with player count badge */}
       <div className="flex items-center justify-between px-1">
         <h2 className="text-xs font-bold uppercase tracking-widest text-slate-500">
           {t('hostView.playersInRoom')}
         </h2>
-        {hostLabel && (
-          <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">
-            {hostLabel}
+        <div className="flex items-center gap-2">
+          {hostLabel && (
+            <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">
+              {hostLabel}
+            </span>
+          )}
+          <span className="px-2.5 py-0.5 rounded-full bg-neo-lime/20 border-2 border-neo-lime/40 text-xs font-black text-neo-lime font-neo-display">
+            {players.length} / {maxPlayers}
           </span>
-        )}
+        </div>
       </div>
 
-      {/* Player avatars row — centered */}
-      <div className={cn('flex flex-wrap items-end justify-center', compact ? 'gap-2 pb-1' : 'gap-3 pb-2')}>
+      {/* Player avatars grid — centered */}
+      <div className={cn('flex flex-wrap items-end justify-center', compact ? 'gap-3 pb-1' : 'gap-4 pb-2')}>
         <AnimatePresence mode="popLayout">
           {players.map((player, index) => {
             const name = typeof player === 'string' ? player : player.username;
@@ -132,15 +137,15 @@ export const PlayerRoster = memo(function PlayerRoster({ players, username, game
                 className="shrink-0 flex flex-col items-center gap-2 group/player"
               >
                 <div className="relative">
-                  {/* Host crown with wobble */}
+                  {/* Host crown — larger, more prominent */}
                   {isHostPlayer && (
                     <motion.div
-                      className="absolute -top-3 left-1/2 -translate-x-1/2 z-10"
+                      className="absolute -top-4 left-1/2 -translate-x-1/2 z-10"
                       initial={{ y: -10, opacity: 0, rotate: -20 }}
                       animate={{ y: 0, opacity: 1, rotate: [0, 5, -5, 0] }}
                       transition={{ rotate: { duration: 2, repeat: Infinity, repeatDelay: 4 } }}
                     >
-                      <Crown className="w-4 h-4 text-neo-yellow" />
+                      <Crown className={cn(compact ? 'w-5 h-5' : 'w-6 h-6', 'text-neo-yellow drop-shadow-[0_0_6px_rgba(255,225,53,0.6)]')} />
                     </motion.div>
                   )}
 
@@ -158,19 +163,20 @@ export const PlayerRoster = memo(function PlayerRoster({ players, username, game
                     )}
 
                     <div className={cn(
-                      'rounded-full border-neo-black flex items-center justify-center overflow-hidden',
-                      compact ? 'w-14 h-14 border-2' : 'w-16 h-16 border-3',
+                      'rounded-full border-neo-black flex items-center justify-center overflow-hidden shadow-hard',
+                      compact ? 'w-16 h-16 border-2' : 'w-20 h-20 border-3',
                       AVATAR_COLORS[index % AVATAR_COLORS.length],
-                      isMe && 'ring-2 ring-neo-lime ring-offset-2 ring-offset-neo-navy',
+                      isMe && 'ring-3 ring-neo-lime ring-offset-2 ring-offset-neo-navy',
+                      isHostPlayer && 'ring-3 ring-neo-yellow ring-offset-2 ring-offset-neo-navy',
                     )}>
                       {avatar?.customAvatar || avatar?.avatarImage ? (
                         <Avatar
                           customAvatar={avatar?.customAvatar ?? undefined}
                           avatarImage={avatar?.avatarImage}
-                          size={compact ? 'lg' : 'xl'}
+                          size={compact ? 'xl' : '2xl'}
                         />
                       ) : (
-                        <span className={cn('font-black text-neo-black', compact ? 'text-2xl' : 'text-3xl')}>
+                        <span className={cn('font-black text-neo-black', compact ? 'text-3xl' : 'text-4xl')}>
                           {name.charAt(0).toUpperCase()}
                         </span>
                       )}
@@ -200,7 +206,7 @@ export const PlayerRoster = memo(function PlayerRoster({ players, username, game
                 </div>
 
                 {/* Name */}
-                <span className={cn('font-bold truncate text-center text-neo-cream', compact ? 'text-[11px] w-14' : 'text-xs w-16')}>
+                <span className={cn('font-bold truncate text-center text-neo-cream', compact ? 'text-[11px] w-16' : 'text-xs w-20')}>
                   {name}
                 </span>
               </motion.div>

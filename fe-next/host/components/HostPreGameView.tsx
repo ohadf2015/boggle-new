@@ -484,17 +484,17 @@ function HostPreGameView({
         </div>
       )}
 
-      {/* Header — compact with editable avatar & name */}
-      <header className="shrink-0 px-3 py-1.5 bg-neo-navy/95 border-b-2 border-neo-black sticky top-0 z-20">
+      {/* Header — host identity with "WONDERHOST LEADER" label */}
+      <header className="shrink-0 px-3 py-2 bg-neo-navy/95 border-b-3 border-neo-black sticky top-0 z-20">
         <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2 min-w-0">
-            {/* Clickable avatar */}
+          <div className="flex items-center gap-3 min-w-0">
+            {/* Clickable host avatar with prominent ring */}
             <button
               data-testid="host-edit-avatar-button"
               onClick={() => setIsAvatarBuilderOpen(true)}
               className="relative shrink-0 group"
             >
-              <div className="w-10 h-10 rounded-full border-2 border-neo-black overflow-hidden shadow-hard-sm ring-2 ring-neo-lime ring-offset-1 ring-offset-neo-navy transition-transform group-hover:scale-105 group-active:scale-95">
+              <div className="w-11 h-11 rounded-full border-3 border-neo-black overflow-hidden shadow-hard ring-2 ring-neo-lime ring-offset-2 ring-offset-neo-navy transition-transform group-hover:scale-105 group-active:scale-95">
                 <Avatar
                   customAvatar={currentAvatar}
                   size="lg"
@@ -506,55 +506,65 @@ function HostPreGameView({
               </div>
             </button>
 
-            {/* Editable name */}
-            {isEditingName ? (
-              <div className="flex items-center gap-1.5 min-w-0">
-                <input
-                  data-testid="host-name-edit-input"
-                  type="text"
-                  value={editNameValue}
-                  onChange={(e) => setEditNameValue(e.target.value)}
-                  maxLength={20}
-                  className="bg-white/10 text-neo-cream border-2 border-neo-black rounded-neo px-2 py-1 text-sm font-black focus:outline-hidden focus:ring-2 focus:ring-neo-cyan w-full max-w-[150px]"
-                  autoFocus
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') handleSaveName();
-                    if (e.key === 'Escape') { setIsEditingName(false); setEditNameValue(username); }
-                  }}
-                />
+            {/* Host name + WONDERHOST LEADER label */}
+            <div className="min-w-0">
+              {isEditingName ? (
+                <div className="flex items-center gap-1.5">
+                  <input
+                    data-testid="host-name-edit-input"
+                    type="text"
+                    value={editNameValue}
+                    onChange={(e) => setEditNameValue(e.target.value)}
+                    maxLength={20}
+                    className="bg-white/10 text-neo-cream border-2 border-neo-black rounded-neo px-2 py-1 text-sm font-black focus:outline-hidden focus:ring-2 focus:ring-neo-cyan w-full max-w-[150px]"
+                    autoFocus
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') handleSaveName();
+                      if (e.key === 'Escape') { setIsEditingName(false); setEditNameValue(username); }
+                    }}
+                  />
+                  <button
+                    data-testid="host-name-save-button"
+                    onClick={handleSaveName}
+                    className="w-7 h-7 flex items-center justify-center bg-neo-lime border-2 border-neo-black rounded-neo shadow-hard-sm shrink-0"
+                  >
+                    <Check className="w-3.5 h-3.5 text-neo-black" />
+                  </button>
+                  <button
+                    onClick={() => { setIsEditingName(false); setEditNameValue(username); }}
+                    className="w-7 h-7 flex items-center justify-center bg-white/10 border-2 border-neo-black rounded-neo shrink-0"
+                  >
+                    <X className="w-3.5 h-3.5 text-neo-cream" />
+                  </button>
+                </div>
+              ) : (
                 <button
-                  data-testid="host-name-save-button"
-                  onClick={handleSaveName}
-                  className="w-7 h-7 flex items-center justify-center bg-neo-lime border-2 border-neo-black rounded-neo shadow-hard-sm shrink-0"
+                  data-testid="host-edit-name-button"
+                  onClick={() => { setEditNameValue(username); setIsEditingName(true); }}
+                  className="flex items-center gap-1.5 min-w-0 group"
+                  {...(!isAuthenticated ? {} : { disabled: true })}
                 >
-                  <Check className="w-3.5 h-3.5 text-neo-black" />
+                  <span className="text-base font-neo-display font-bold text-neo-cream leading-none truncate"
+                    style={{ textShadow: '0 0 10px rgba(255, 255, 255, 0.15)' }}
+                  >
+                    {username}
+                  </span>
+                  {!isAuthenticated && (
+                    <Pencil className="w-3 h-3 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+                  )}
                 </button>
-                <button
-                  onClick={() => { setIsEditingName(false); setEditNameValue(username); }}
-                  className="w-7 h-7 flex items-center justify-center bg-white/10 border-2 border-neo-black rounded-neo shrink-0"
-                >
-                  <X className="w-3.5 h-3.5 text-neo-cream" />
-                </button>
-              </div>
-            ) : (
-              <button
-                data-testid="host-edit-name-button"
-                onClick={() => { setEditNameValue(username); setIsEditingName(true); }}
-                className="flex items-center gap-1.5 min-w-0 group"
-                {...(!isAuthenticated ? {} : { disabled: true })}
-              >
-                <span className="text-base font-neo-display font-bold text-neo-cream leading-none truncate"
-                  style={{ textShadow: '0 0 10px rgba(255, 255, 255, 0.15)' }}
-                >
-                  {username}
-                </span>
-                {!isAuthenticated && (
-                  <Pencil className="w-3 h-3 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
-                )}
-              </button>
-            )}
+              )}
+              <span className="text-[9px] font-black uppercase tracking-[0.2em] text-neo-lime/70 font-neo-display leading-none mt-0.5 block">
+                {t('hostView.wonderhostLeader')}
+              </span>
+            </div>
           </div>
+
           <div className="flex items-center gap-2 shrink-0">
+            {/* Player count badge */}
+            <span className="hidden sm:flex px-2.5 py-1 rounded-neo border-2 border-neo-lime/30 bg-neo-lime/10 text-sm font-black text-neo-lime font-neo-display tracking-wider">
+              {filteredPlayersForDisplay.length} / {maxPlayers}
+            </span>
             <div className="lg:hidden">
               <MobileShareSection gameCode={gameCode} t={t} showHint={actualPlayerCount === 0} compact />
             </div>
@@ -574,7 +584,7 @@ function HostPreGameView({
               className="w-8 h-8 flex items-center justify-center bg-neo-red border-2 border-neo-black shadow-hard-sm active:translate-y-0.5 active:shadow-none transition-all rounded"
               aria-label={t('common.exit')}
             >
-              <LogOut className="w-3.5 h-3.5 text-neo-black" />
+              <LogOut className="w-3.5 h-3.5 text-neo-black rtl:scale-x-[-1]" />
             </button>
           </div>
         </div>

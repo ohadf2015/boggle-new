@@ -28,8 +28,6 @@ export function InviteCard({
   gameCode,
   t,
   className,
-  compact = false,
-  desktop = false,
 }: InviteCardProps): React.ReactElement {
   const [linkCopied, setLinkCopied] = useState(false);
   const [qrExpanded, setQrExpanded] = useState(false);
@@ -61,75 +59,92 @@ export function InviteCard({
     }
   }, [gameCode, joinUrl, t, handleCopyLink]);
 
-  // Inline compact card — small QR with enlarge button + room code + copy
+  // Invite card with "BRING YOUR SQUAD" header and prominent QR
   return (
     <>
       <div
         data-testid="invite-card"
         className={cn(
-          'flex items-center gap-3 px-3 py-2.5 rounded-neo-lg border-3 border-neo-black bg-slate-800/80 shadow-hard',
+          'rounded-neo-lg border-3 border-neo-black bg-slate-800/80 shadow-hard overflow-hidden',
           className
         )}
       >
-        {/* Small QR with enlarge overlay */}
-        <button
-          onClick={() => setQrExpanded(true)}
-          className="relative shrink-0 group"
-          aria-label={t('hostView.showQrCode')}
-        >
-          <div className="p-1.5 bg-white rounded-sm border-2 border-neo-black shadow-hard-sm">
-            <QRCodeSVG
-              value={joinUrl}
-              size={48}
-              level="M"
-              includeMargin={false}
-              bgColor="#ffffff"
-              fgColor="#000000"
-            />
-          </div>
-          <div className="absolute inset-0 flex items-center justify-center bg-neo-black/0 group-hover:bg-neo-black/40 rounded-sm transition-colors">
-            <Maximize2 className="w-4 h-4 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
-          </div>
-        </button>
+        {/* Accent bar */}
+        <div className="h-1.5 bg-linear-to-r from-neo-pink via-neo-cyan to-neo-lime" />
 
-        {/* Room code */}
-        <div className="flex-1 min-w-0">
-          <p className="text-[10px] font-bold uppercase text-neo-cream/40 tracking-widest">
-            {t('roomCode.title')}
-          </p>
-          <p className="text-xl font-black tracking-wider text-neo-lime font-neo-display">
-            {gameCode}
-          </p>
+        {/* "BRING YOUR SQUAD" header */}
+        <div className="px-4 pt-3 pb-2">
+          <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-neo-pink font-neo-display">
+            {t('hostView.bringYourSquad')}
+          </h3>
         </div>
 
-        {/* Action buttons */}
-        <div className="flex gap-1.5 shrink-0">
-          <motion.button
-            data-testid="copy-link-button"
-            onClick={handleCopyLink}
-            whileTap={{ scale: 0.95 }}
-            className={cn(
-              'w-9 h-9 flex items-center justify-center rounded-neo border-2 border-neo-black transition-all',
-              linkCopied
-                ? 'bg-neo-lime text-neo-black'
-                : 'bg-white/10 text-neo-cream hover:bg-white/20 shadow-hard-sm'
-            )}
-            aria-label={t('roomCode.copyLink')}
+        <div className="px-4 pb-4 flex items-center gap-4">
+          {/* QR with "SCAN TO JOIN" label + enlarge overlay */}
+          <button
+            onClick={() => setQrExpanded(true)}
+            className="relative shrink-0 group flex flex-col items-center gap-1.5"
+            aria-label={t('hostView.showQrCode')}
           >
-            {linkCopied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-          </motion.button>
+            <div className="p-2 bg-white rounded-neo border-3 border-neo-black shadow-hard">
+              <QRCodeSVG
+                value={joinUrl}
+                size={72}
+                level="M"
+                includeMargin={false}
+                bgColor="#ffffff"
+                fgColor="#000000"
+              />
+            </div>
+            <span className="text-[8px] font-black uppercase tracking-widest text-neo-cyan/60">
+              {t('hostView.scanToJoin')}
+            </span>
+            <div className="absolute inset-0 flex items-center justify-center bg-neo-black/0 group-hover:bg-neo-black/40 rounded-neo transition-colors">
+              <Maximize2 className="w-5 h-5 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+            </div>
+          </button>
 
-          {typeof navigator !== 'undefined' && typeof navigator.share === 'function' && (
-            <motion.button
-              data-testid="native-share-button"
-              onClick={handleNativeShare}
-              whileTap={{ scale: 0.95 }}
-              className="w-9 h-9 flex items-center justify-center rounded-neo border-2 border-neo-black bg-neo-cyan text-neo-black shadow-hard-sm hover:shadow-none transition-all"
-              aria-label={t('share.button')}
-            >
-              <Share2 className="w-4 h-4" />
-            </motion.button>
-          )}
+          {/* Room code + actions */}
+          <div className="flex-1 min-w-0">
+            <p className="text-[10px] font-bold uppercase text-neo-cream/40 tracking-widest">
+              {t('roomCode.title')}
+            </p>
+            <p className="text-2xl font-black tracking-[0.15em] text-neo-lime font-neo-display">
+              {gameCode}
+            </p>
+
+            {/* Action buttons row */}
+            <div className="flex gap-2 mt-2.5">
+              <motion.button
+                data-testid="copy-link-button"
+                onClick={handleCopyLink}
+                whileTap={{ scale: 0.95 }}
+                className={cn(
+                  'h-9 px-3 flex items-center justify-center gap-1.5 rounded-neo border-2 border-neo-black text-xs font-bold uppercase transition-all',
+                  linkCopied
+                    ? 'bg-neo-lime text-neo-black'
+                    : 'bg-white/10 text-neo-cream hover:bg-white/20 shadow-hard-sm'
+                )}
+                aria-label={t('roomCode.copyLink')}
+              >
+                {linkCopied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                <span>{linkCopied ? t('roomCode.copied') : t('roomCode.copyLink')}</span>
+              </motion.button>
+
+              {typeof navigator !== 'undefined' && typeof navigator.share === 'function' && (
+                <motion.button
+                  data-testid="native-share-button"
+                  onClick={handleNativeShare}
+                  whileTap={{ scale: 0.95 }}
+                  className="h-9 px-3 flex items-center justify-center gap-1.5 rounded-neo border-2 border-neo-black bg-neo-cyan text-neo-black shadow-hard-sm hover:shadow-none transition-all text-xs font-bold uppercase"
+                  aria-label={t('share.button')}
+                >
+                  <Share2 className="w-3.5 h-3.5" />
+                  <span>{t('share.button')}</span>
+                </motion.button>
+              )}
+            </div>
+          </div>
         </div>
       </div>
 

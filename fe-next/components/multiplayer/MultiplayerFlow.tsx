@@ -309,14 +309,6 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
     // Show CrazyGames invite button so host can invite friends
     cgShowInvite(gameCode);
 
-    // Auto-copy invite link to clipboard for easy sharing
-    try {
-      const joinUrl = getJoinUrl(gameCode, 'quick-play');
-      navigator.clipboard.writeText(joinUrl).catch(() => {});
-      toast.success(t('multiplayerFlow.roomList.linkCopied'), { duration: 3000, icon: '\uD83D\uDD17' });
-    } catch {
-      // Clipboard API not available — no-op
-    }
   }, [isAuthenticated, displayName, defaultLanguage, handleJoin, setGameCode, setRoomName, setHostUsername, setUsername, t, cgShowInvite]);
 
   // Landing Quick Play auto-fire: when the user arrives via
