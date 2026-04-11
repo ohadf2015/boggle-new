@@ -30,7 +30,14 @@ vi.mock('@/contexts/AuthContext', () => ({
   }),
 }));
 
-vi.mock('@/utils/dailyChallenge/storage');
+vi.mock('@/utils/dailyChallenge/storage', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/utils/dailyChallenge/storage')>();
+  return {
+    ...actual,
+    getWordHuntStatusToday: vi.fn(() => null),
+    hasPlayedWordWheelToday: vi.fn(() => false),
+  };
+});
 vi.mock('@/utils/guestManager', () => ({
   getGuestFingerprint: vi.fn().mockResolvedValue('test-fingerprint'),
 }));
@@ -59,6 +66,7 @@ describe('DailyChallengeLanding - Navigation Refresh', () => {
       render(
         <DailyChallengeLanding
           onSelectWordHunt={mockOnSelectWordHunt}
+          onSelectWordWheel={vi.fn()}
           currentLanguage="en"
         />
       );
@@ -93,6 +101,7 @@ describe('DailyChallengeLanding - Navigation Refresh', () => {
       render(
         <DailyChallengeLanding
           onSelectWordHunt={mockOnSelectWordHunt}
+          onSelectWordWheel={vi.fn()}
           currentLanguage="en"
         />
       );
@@ -120,6 +129,7 @@ describe('DailyChallengeLanding - Navigation Refresh', () => {
       render(
         <DailyChallengeLanding
           onSelectWordHunt={mockOnSelectWordHunt}
+          onSelectWordWheel={vi.fn()}
           currentLanguage="en"
         />
       );
@@ -145,6 +155,7 @@ describe('DailyChallengeLanding - Navigation Refresh', () => {
       render(
         <DailyChallengeLanding
           onSelectWordHunt={mockOnSelectWordHunt}
+          onSelectWordWheel={vi.fn()}
           currentLanguage="en"
         />
       );

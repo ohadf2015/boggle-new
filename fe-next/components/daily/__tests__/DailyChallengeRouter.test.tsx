@@ -29,11 +29,14 @@ vi.mock('@/contexts/LanguageContext', () => ({
 vi.mock('../DailyChallengeLanding', () => ({
   DailyChallengeLanding: ({
     onSelectWordHunt,
+    onSelectWordWheel,
   }: {
     onSelectWordHunt: () => void;
+    onSelectWordWheel: () => void;
   }) => (
     <div data-testid="daily-challenge-landing">
       <button onClick={onSelectWordHunt} data-testid="select-word-hunt">Select Word Hunt</button>
+      <button onClick={onSelectWordWheel} data-testid="select-word-wheel">Select Word Wheel</button>
     </div>
   ),
 }));

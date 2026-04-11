@@ -55,6 +55,7 @@ vi.mock('@/hooks/useDevicePerformance', () => ({
 
 vi.mock('@/utils/dailyChallenge/storage', () => ({
   getWordHuntStatusToday: vi.fn(() => null),
+  hasPlayedWordWheelToday: vi.fn(() => false),
 }));
 
 vi.mock('@/utils/guestManager', () => ({
@@ -115,6 +116,7 @@ const Wrapper = ({ children }: { children: React.ReactNode }) => (
 describe('DailyChallengeLanding - Quest Card Layout', () => {
   const mockProps = {
     onSelectWordHunt: vi.fn(),
+    onSelectWordWheel: vi.fn(),
     currentLanguage: 'en' as const,
   };
 

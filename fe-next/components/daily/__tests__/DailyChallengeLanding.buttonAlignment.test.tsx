@@ -13,6 +13,7 @@ import { AuthProvider } from '@/contexts/AuthContext';
 // Mock dependencies
 vi.mock('@/utils/dailyChallenge/storage', () => ({
   getWordHuntStatusToday: vi.fn(() => null),
+  hasPlayedWordWheelToday: vi.fn(() => false),
 }));
 
 vi.mock('@/utils/guestManager', () => ({
@@ -89,6 +90,7 @@ global.fetch = vi.fn((url: string) => {
 describe('DailyChallengeLanding - Button Layout', () => {
   const mockProps = {
     onSelectWordHunt: vi.fn(),
+    onSelectWordWheel: vi.fn(),
     currentLanguage: 'en' as const,
   };
 

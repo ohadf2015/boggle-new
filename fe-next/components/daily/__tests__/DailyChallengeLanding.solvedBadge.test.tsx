@@ -17,6 +17,7 @@ import * as storage from '@/utils/dailyChallenge/storage';
 vi.mock('@/utils/dailyChallenge/storage', () => ({
   hasPlayedToday: vi.fn(() => false),
   getWordHuntStatusToday: vi.fn(() => null), // null = not played yet
+  hasPlayedWordWheelToday: vi.fn(() => false),
 }));
 
 vi.mock('@/utils/guestManager', () => ({
@@ -123,6 +124,7 @@ describe('DailyChallengeLanding Solved Badge', () => {
 
     const mockProps = {
       onSelectWordHunt: vi.fn(),
+    onSelectWordWheel: vi.fn(),
       currentLanguage: 'en' as const,
     };
 
@@ -143,6 +145,7 @@ describe('DailyChallengeLanding Solved Badge', () => {
 
     const mockProps = {
       onSelectWordHunt: vi.fn(),
+    onSelectWordWheel: vi.fn(),
       currentLanguage: 'en' as const,
     };
 
@@ -164,6 +167,7 @@ describe('DailyChallengeLanding Solved Badge', () => {
 
     const mockProps = {
       onSelectWordHunt: vi.fn(),
+    onSelectWordWheel: vi.fn(),
       currentLanguage: 'en' as const,
     };
 
@@ -188,6 +192,7 @@ describe('DailyChallengeLanding Solved Badge', () => {
 
     const mockProps = {
       onSelectWordHunt: vi.fn(),
+    onSelectWordWheel: vi.fn(),
       currentLanguage: 'en' as const,
     };
 

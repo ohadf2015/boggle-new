@@ -50,6 +50,7 @@ vi.mock('@/contexts/AuthContext', () => ({
 // --- Utility mocks ---
 vi.mock('@/utils/dailyChallenge/storage', () => ({
   getWordHuntStatusToday: vi.fn(() => null),
+  hasPlayedWordWheelToday: vi.fn(() => false),
 }));
 
 vi.mock('@/utils/guestManager', () => ({
@@ -107,6 +108,7 @@ beforeEach(() => {
 
 const defaultProps = {
   onSelectWordHunt: vi.fn(),
+    onSelectWordWheel: vi.fn(),
   currentLanguage: 'en' as const,
 };
 

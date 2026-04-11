@@ -24,11 +24,13 @@ vi.mock('../../Header', () => ({
 // Mock DailyChallengeLanding
 vi.mock('../DailyChallengeLanding', () => ({
   __esModule: true,
-  DailyChallengeLanding: ({ onSelectWordHunt }: {
+  DailyChallengeLanding: ({ onSelectWordHunt, onSelectWordWheel }: {
     onSelectWordHunt: () => void;
+    onSelectWordWheel: () => void;
   }) => (
     <div>
       <button data-testid="select-word-hunt" onClick={onSelectWordHunt}>Word Hunt</button>
+      <button data-testid="select-word-wheel" onClick={onSelectWordWheel}>Word Wheel</button>
     </div>
   ),
 }));

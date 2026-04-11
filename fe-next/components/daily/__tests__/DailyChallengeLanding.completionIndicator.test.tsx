@@ -18,6 +18,7 @@ import * as storage from '@/utils/dailyChallenge/storage';
 vi.mock('@/utils/dailyChallenge/storage', () => ({
   hasPlayedToday: vi.fn(() => false),
   getWordHuntStatusToday: vi.fn(() => null),
+  hasPlayedWordWheelToday: vi.fn(() => false),
 }));
 
 vi.mock('@/utils/guestManager', () => ({
@@ -125,6 +126,7 @@ describe('DailyChallengeLanding Completion Indicator', () => {
 
       const mockProps = {
         onSelectWordHunt: vi.fn(),
+    onSelectWordWheel: vi.fn(),
         currentLanguage: 'en' as const,
       };
 
@@ -144,6 +146,7 @@ describe('DailyChallengeLanding Completion Indicator', () => {
 
       const mockProps = {
         onSelectWordHunt: vi.fn(),
+    onSelectWordWheel: vi.fn(),
         currentLanguage: 'en' as const,
       };
 
@@ -167,6 +170,7 @@ describe('DailyChallengeLanding Completion Indicator', () => {
 
       const mockProps = {
         onSelectWordHunt: vi.fn(),
+    onSelectWordWheel: vi.fn(),
         currentLanguage: 'en' as const,
       };
 
@@ -206,6 +210,7 @@ describe('DailyChallengeLanding Completion Indicator', () => {
 
       const mockProps = {
         onSelectWordHunt: vi.fn(),
+    onSelectWordWheel: vi.fn(),
         currentLanguage: 'en' as const,
       };
 
@@ -226,6 +231,7 @@ describe('DailyChallengeLanding Completion Indicator', () => {
 
       const mockProps = {
         onSelectWordHunt: vi.fn(),
+    onSelectWordWheel: vi.fn(),
         currentLanguage: 'en' as const,
       };
 
