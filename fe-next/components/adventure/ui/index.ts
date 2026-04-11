@@ -10,3 +10,4 @@ export { GameSidebar } from './GameSidebar';
 export { GameGridArea } from './GameGridArea';
 export { PauseOverlay } from './PauseOverlay';
 export { GameLayout } from './GameLayout';
+export { GameInfoStrip } from './GameInfoStrip';

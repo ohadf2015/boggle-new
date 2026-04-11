@@ -141,7 +141,7 @@ function AdventureView(): React.JSX.Element {
   }, [completions, questProgressMap]);
 
   // Boss Rush
-  const bossRush = useBossRush(completions);
+  const bossRush = useBossRush(completions, language);
 
   const handleBossRushBossDefeated = useCallback((_stars: number, score: number) => {
     bossRush.addScore(score);

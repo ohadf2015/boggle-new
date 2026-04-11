@@ -1,6 +1,6 @@
 'use client';
 
-import React, { memo } from 'react';
+import { memo } from 'react';
 import { motion } from 'framer-motion';
 import { Swords } from 'lucide-react';
 import { cn } from '../../../lib/utils';
@@ -56,8 +56,11 @@ export const StartButton = memo<StartButtonProps>(function StartButton({
             </>
           )}
         </motion.button>
-        <span className="text-[10px] font-bold text-slate-500 uppercase whitespace-nowrap">
-          {playerCount}/{maxPlayers}
+        <span className={cn(
+          'text-[10px] font-bold uppercase whitespace-nowrap',
+          playerCount === 0 ? 'text-neo-red' : 'text-slate-500'
+        )}>
+          {playerCount === 0 ? t('hostView.needPlayers') : `${playerCount}/${maxPlayers}`}
         </span>
       </div>
     );

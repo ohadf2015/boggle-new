@@ -53,7 +53,7 @@ export function computeLetterFeedback(
 export const HUNT_WRONG_GUESS_DAMAGE = 15;
 
 /** Max attempts before auto-fail (0 = unlimited) */
-export const HUNT_MAX_ATTEMPTS = 0;
+export const HUNT_MAX_ATTEMPTS = 7;
 
 /**
  * Pick a target word from the solved word set.

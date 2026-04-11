@@ -1268,6 +1268,7 @@ const es = {
     "waitingForPlayers": "Esperando que llegue la banda...",
     "startGame": "¡GO!",
     "startBattle": "¡Iniciar batalla!",
+    "needPlayers": "¡Necesita jugadores!",
     "commandersJoined": "Comandantes unidos",
     "playersInRoom": "Jugadores en la sala",
     "noOneYet": "¿Nadie aún?",
@@ -7116,17 +7117,20 @@ const es = {
       "10": { "theme": "Poder y conocimiento" }
     },
     "mode": {
-      "classic": "Modo clásico",
-      "blast": "Modo explosión",
-      "hunt": "Caza de palabras",
-      "wheel": "Rueda de palabras",
-      "forge": "Forja de palabras",
-      "boss": "Batalla de jefe",
+      "classic": "Clásico",
+      "blast": "Blast",
+      "hunt": "Caza",
+      "wheel": "Rueda",
+      "forge": "Forja",
+      "boss": "Jefe",
       "classicObjective": "Encuentra palabras antes de que se acabe el tiempo",
-      "blastObjective": "Despeja todas las fichas dentro del límite de movimientos",
+      "blastObjective": "¡Usa tus movimientos sabiamente!",
       "huntObjective": "Encuentra la palabra objetivo oculta",
-      "wheelObjective": "Las palabras deben incluir la letra central",
-      "forgeObjective": "Alcanza el objetivo de puntuación con mejoras de runas"
+      "huntLoadingTarget": "Buscando palabra oculta...",
+      "wheelObjective": "¡Cada palabra debe incluir la letra central!",
+      "wheelMustInclude": "Debe incluir:",
+      "forgeObjective": "¡Alcanza la puntuación objetivo!",
+      "bossObjective": "¡Derrota al jefe!"
     },
     "objectives": {
       "wordCount": "Encuentra palabras",
@@ -7180,22 +7184,6 @@ const es = {
       "validationTimeout": "La validación tardó demasiado — inténtalo de nuevo",
       "validationCancelled": "La validación fue cancelada",
       "missingCenterLetter": "¡Debe incluir la letra central!"
-    },
-    "mode": {
-      "classic": "Clásico",
-      "blast": "Blast",
-      "blastObjective": "¡Usa tus movimientos sabiamente!",
-      "hunt": "Caza",
-      "huntObjective": "¡Sobrevive el mayor tiempo posible!",
-      "huntLoadingTarget": "Buscando palabra oculta...",
-      "wheel": "Rueda",
-      "wheelObjective": "¡Cada palabra debe incluir la letra central!",
-      "wheelMustInclude": "Debe incluir:",
-      "forge": "Forja",
-      "forgeObjective": "¡Alcanza la puntuación objetivo!",
-      "boss": "Jefe",
-      "bossObjective": "¡Derrota al jefe!",
-      "movesLeft": "Movimientos restantes"
     },
     "game": {
       "title": "Modo Aventura",

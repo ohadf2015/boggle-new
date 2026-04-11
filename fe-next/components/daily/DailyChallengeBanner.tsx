@@ -210,8 +210,9 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
   }
 
   // Warm gold-to-amber gradient — premium daily challenge feel
+  // Played state stays vibrant but slightly muted to signal completion
   const gradientClass = hasPlayed
-    ? "bg-gradient-to-br from-amber-700/80 via-yellow-800/70 to-amber-700/80"
+    ? "bg-gradient-to-br from-amber-600 via-yellow-500 to-orange-500"
     : "bg-gradient-to-br from-amber-500 via-yellow-400 to-orange-400";
 
   const glowColor = 'rgba(255, 215, 0, 0.5)';

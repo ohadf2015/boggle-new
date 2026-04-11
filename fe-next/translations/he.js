@@ -1267,6 +1267,7 @@ const he = {
     "waitingForPlayers": "אוספים לוחמים...",
     "startGame": "GO!",
     "startBattle": "התחל קרב!",
+    "needPlayers": "!צריך שחקנים",
     "commandersJoined": "לוחמים שהצטרפו",
     "playersInRoom": "שחקנים בחדר",
     "noOneYet": "עוד אף אחד?",
@@ -6787,17 +6788,20 @@ const he = {
       "10": { "theme": "עוצמה וידע" }
     },
     "mode": {
-      "classic": "מצב קלאסי",
-      "blast": "מצב פיצוץ",
-      "hunt": "ציד מילים",
-      "wheel": "גלגל מילים",
-      "forge": "כור מילים",
-      "boss": "קרב בוס",
+      "classic": "קלאסי",
+      "blast": "בלאסט",
+      "hunt": "ציד",
+      "wheel": "גלגל",
+      "forge": "כור",
+      "boss": "בוס",
       "classicObjective": "מצא מילים לפני שהזמן נגמר",
-      "blastObjective": "נקה את כל האריחים במגבלת מהלכים",
+      "blastObjective": "השתמשו במהלכים בחוכמה!",
       "huntObjective": "מצא את מילת המטרה הנסתרת",
-      "wheelObjective": "מילים חייבות לכלול את האות המרכזית",
-      "forgeObjective": "הגע ליעד הניקוד עם חיזוקי רונות"
+      "huntLoadingTarget": "מחפש מילה נסתרת...",
+      "wheelObjective": "כל מילה חייבת לכלול את האות המרכזית!",
+      "wheelMustInclude": "חובה לכלול:",
+      "forgeObjective": "הגיעו לניקוד היעד!",
+      "bossObjective": "הביסו את הבוס!"
     },
     "objectives": {
       "wordCount": "מצאו מילים",
@@ -6851,22 +6855,6 @@ const he = {
       "validationTimeout": "האימות נכשל — נסו שוב",
       "validationCancelled": "האימות בוטל",
       "missingCenterLetter": "חובה לכלול את האות המרכזית!"
-    },
-"mode": {
-      "classic": "קלאסי",
-      "blast": "בלאסט",
-      "blastObjective": "השתמשו במהלכים בחוכמה!",
-      "hunt": "ציד",
-      "huntObjective": "שרדו כמה שיותר!",
-      "huntLoadingTarget": "מחפש מילה נסתרת...",
-      "wheel": "גלגל",
-      "wheelObjective": "כל מילה חייבת לכלול את האות המרכזית!",
-      "wheelMustInclude": "חובה לכלול:",
-      "forge": "כור",
-      "forgeObjective": "הגיעו לניקוד היעד!",
-      "boss": "בוס",
-      "bossObjective": "הביסו את הבוס!",
-      "movesLeft": "מהלכים נותרו"
     },
 "game": {
       "title": "מצב הרפתקה",

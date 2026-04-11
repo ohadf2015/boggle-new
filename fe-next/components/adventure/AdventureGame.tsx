@@ -31,15 +31,12 @@ import { applyGemDetectorBoost, LEVELS_PER_WORLD } from '@/lib/adventure';
 import { getStoryBeat } from '@/lib/adventure/storyConfig';
 import { getStreakMilestone } from '@/lib/adventure/adventureStreak';
 import GameplayBackground from './themed/GameplayBackground';
-import { GameHeader, GameSidebar, GameGridArea, GameLayout } from './ui';
+import { GameHeader, GameSidebar, GameGridArea, GameLayout, GameInfoStrip } from './ui';
 import AdventureGameOverlays from './AdventureGameOverlays';
 import MechanicBonusToast from './MechanicBonusToast';
-import MechanicIndicator from './MechanicIndicator';
 import RetryAssistModal from './RetryAssistModal';
 import { getNearMissMessages } from '@/lib/adventure/nearMiss';
 import { AdventureTutorial, hasSeenTutorial } from './AdventureTutorial';
-import { AdventureUpgradeHUD } from './AdventureUpgradeHUD';
-import AdventureThemeBanner from './AdventureThemeBanner';
 import { AdventureToast } from './AdventureToast';
 import { useAdventureGameCallbacks } from './hooks/useAdventureGameCallbacks';
 import { useAdventureQuestTracking } from './hooks/useAdventureQuestTracking';
@@ -52,7 +49,7 @@ import { useAdventureSFX, useAdventureAnalytics } from './hooks/useAdventureSFXA
 import { useAdventureMusic } from '@/hooks/useAdventureMusic';
 import type { LevelConfig, TileState, GridTileState } from '@/types/adventure';
 import { pickHuntTarget } from '@/lib/adventure/huntMode';
-import { pickRuneOffering, MAX_EQUIPPED_RUNES } from '@/lib/adventure/runeCatalog';
+import { pickRuneOffering, MAX_EQUIPPED_RUNES, computeForgePickEffects } from '@/lib/adventure/runeCatalog';
 import type { RuneCardDef, RuneCard as RuneCardType } from '@/types/wordForge';
 import { RunePicker } from '@/components/wordForge/RunePicker';
 import { RuneBar } from '@/components/wordForge/RuneBar';
@@ -119,6 +116,35 @@ const AdventureGame = memo<AdventureGameProps>(
       playFlashChallengeSound,
     } = useSoundEffects();
 
+    // Forge mode: pre-level rune picker + equipped runes for RuneBar display
+    // Placed before useAdventureGame so forge effects can be wired into the game hook
+    const hasRunePick = boostedLevelConfig.hasRunePick ?? false;
+    const [forgePickerOpen, setForgePickerOpen] = useState(() => hasRunePick);
+    const [forgeEquippedRunes, setForgeEquippedRunes] = useState<RuneCardType[]>([]);
+    const forgeOffering = useMemo(
+      () => hasRunePick ? pickRuneOffering(3) : [],
+      [hasRunePick]
+    );
+    const handleForgePick = useCallback((rune: RuneCardDef, replaceIndex?: number) => {
+      setForgeEquippedRunes(prev => {
+        const card: RuneCardType = { def: rune, instanceId: `adv-pick-${rune.id}-${Date.now()}` };
+        if (replaceIndex !== undefined) {
+          const next = [...prev];
+          next[replaceIndex] = card;
+          return next;
+        }
+        return [...prev, card];
+      });
+      setForgePickerOpen(false);
+    }, []);
+    const handleForgeSkip = useCallback(() => { setForgePickerOpen(false); }, []);
+
+    // Compute forge-picked rune effects so they actually affect gameplay
+    const forgeEffects = useMemo(
+      () => computeForgePickEffects(forgeEquippedRunes.map(r => r.def)),
+      [forgeEquippedRunes]
+    );
+
     const {
       gameState, tiles: tiles2D, tilesVersion, objectives, timeRemaining,
       timerStore,
@@ -127,11 +153,11 @@ const AdventureGame = memo<AdventureGameProps>(
       activateFreeze, isFrozen, freezeUsed, useShuffle: shuffleTiles, shufflesRemaining, updateObjective,
       effectiveComboTimeout,
       upgradeState, upgradeTriggered, themedWordsFound, lastWordWasThemed,
-      movesRemaining, currentHP, maxHP, takeDamage, heal,
+      movesRemaining, currentHP, maxHP,
       huntTargetWord, huntAttempts, huntFound, setHuntTarget, submitHuntGuess,
     } = useAdventureGame({
       levelConfig: boostedLevelConfig, initialGrid,
-      comboDecayMultiplier: init.upgradeEffects.comboDecayMultiplier * init.runeEffects.comboDecay,
+      comboDecayMultiplier: init.upgradeEffects.comboDecayMultiplier * init.runeEffects.comboDecay * forgeEffects.comboDecay,
       upgradeConfig: {
         bombTimerInvert: init.upgradeEffects.bombTimerInvert,
         specialTileBoost: init.upgradeEffects.specialTileBoost,
@@ -302,8 +328,8 @@ const AdventureGame = memo<AdventureGameProps>(
     const getScoreMultiplier = useCallback(() => 1, []);
     const augmentedSkillEffects = useMemo(() => ({
       ...init.skillEffects,
-      bossDamageMultiplier: init.skillEffects.bossDamageMultiplier * init.runeEffects.bossDamage,
-    }), [init.skillEffects, init.runeEffects.bossDamage]);
+      bossDamageMultiplier: init.skillEffects.bossDamageMultiplier * init.runeEffects.bossDamage * forgeEffects.bossDamage,
+    }), [init.skillEffects, init.runeEffects.bossDamage, forgeEffects.bossDamage]);
 
     const minWordLength = levelConfig.minWordLength ?? 2;
     const { validateWord, isValidating, solvedWords } = useAdventureWordValidation({
@@ -321,27 +347,22 @@ const AdventureGame = memo<AdventureGameProps>(
       }
     }, [modeState.archetype, solvedWords, setHuntTarget]);
 
-    // Forge mode: pre-level rune picker + equipped runes for RuneBar display
-    const [forgePickerOpen, setForgePickerOpen] = useState(() => modeState.showRunePicker);
-    const [forgeEquippedRunes, setForgeEquippedRunes] = useState<RuneCardType[]>([]);
-    const forgeOffering = useMemo(
-      () => modeState.showRunePicker ? pickRuneOffering(3) : [],
-       
-      [modeState.showRunePicker]
-    );
-    const handleForgePick = useCallback((rune: RuneCardDef, replaceIndex?: number) => {
-      setForgeEquippedRunes(prev => {
-        const card: RuneCardType = { def: rune, instanceId: `adv-pick-${rune.id}-${Date.now()}` };
-        if (replaceIndex !== undefined) {
-          const next = [...prev];
-          next[replaceIndex] = card;
-          return next;
+    // Hunt mode: fallback timeout — if solvedWords never resolves within 10s,
+    // pick any 4-letter combination from the grid to avoid soft-lock spinner.
+    useEffect(() => {
+      if (modeState.archetype !== 'hunt' || huntTargetPickedRef.current) return;
+      const timeout = setTimeout(() => {
+        if (huntTargetPickedRef.current) return;
+        // Emergency fallback: construct a target from first few grid tiles
+        const fallbackWord = tiles.slice(0, 4).map(t => t.letter).join('');
+        if (fallbackWord.length >= 3) {
+          setHuntTarget(fallbackWord);
+          huntTargetPickedRef.current = true;
         }
-        return [...prev, card];
-      });
-      setForgePickerOpen(false);
-    }, []);
-    const handleForgeSkip = useCallback(() => { setForgePickerOpen(false); }, []);
+      }, 10000);
+      return () => clearTimeout(timeout);
+      // eslint-disable-next-line react-hooks/exhaustive-deps -- tiles stable after mount
+    }, [modeState.archetype, setHuntTarget]);
 
     const gridRef = useRef<HTMLDivElement>(null);
     const clickSubmitRef = useRef<(word: string, indices: number[]) => void>(null);
@@ -401,6 +422,12 @@ const AdventureGame = memo<AdventureGameProps>(
       return { x: window.innerWidth / 2, y: window.innerHeight / 2 };
     }, [selectedIndices, gridRef]);
 
+    // Merge forge-picked rune score bonus into upgrade bonuses
+    const forgeAugmentedBonuses = useMemo(() => ({
+      ...init.upgradeBonuses,
+      scoreBonus: init.upgradeBonuses.scoreBonus * forgeEffects.scoreMultiplier,
+    }), [init.upgradeBonuses, forgeEffects.scoreMultiplier]);
+
     const wordSubmit = useAdventureWordSubmit({
       isPlaying, isPaused, isValidating, isCascading, currentWord, selectedIndices, tiles,
       gridSize: levelConfig.gridSize, minWordLength, validateWord, submitWordWithPath,
@@ -411,7 +438,7 @@ const AdventureGame = memo<AdventureGameProps>(
       triggerBossTaunt: bossOrch.triggerBossTaunt, handleEarnAchievement: init.handleEarnAchievement,
       recordAIWord: init.recordAIWord, handleAITransition: init.handleAITransition,
       addScorePopup: effects.addScorePopup, getScoreMultiplier,
-      upgradeBonuses: init.upgradeBonuses, skillEffects: augmentedSkillEffects,
+      upgradeBonuses: forgeAugmentedBonuses, skillEffects: augmentedSkillEffects,
       worldMechanic: levelConfig.worldMechanic ?? null,
       bossCurrentPhase: (bossOrch.bossMechanicState?.mechanicState?.currentPhase as string) ?? null,
       bossHealPerWord: init.upgradeEffects.bossHealPerWord,
@@ -425,8 +452,8 @@ const AdventureGame = memo<AdventureGameProps>(
     const levelCompletion = useAdventureLevelCompletion({
       gameState, timeRemaining, timerSeconds: init.adjustedLevelConfig.timerSeconds,
       levelConfig, objectives, currentLevel: init.currentLevel,
-      upgradeBonuses: init.upgradeBonuses, upgradeEffects: init.upgradeEffects,
-      bonusGoldMultiplier: init.runeEffects.goldMultiplier * init.streakMultiplier,
+      upgradeBonuses: forgeAugmentedBonuses, upgradeEffects: init.upgradeEffects,
+      bonusGoldMultiplier: init.runeEffects.goldMultiplier * init.streakMultiplier * forgeEffects.goldMultiplier,
       isFirstCompletion: !bestAttempt,
       awardXp: init.awardXp, addGold: init.addGold,
       recordAttempt, recordCompletion: init.recordCompletion, saveCompletion: saveCompletionToDb, updateWordAlbum, updateRunes,
@@ -700,7 +727,22 @@ const AdventureGame = memo<AdventureGameProps>(
               comboCount={gameState.comboCount} comboTimeoutMs={effectiveComboTimeout}
               modeDisplayKey={modeState.archetype !== 'classic' ? modeState.modeDisplayKey : undefined}
               showMoveCounter={modeState.showMoveCounter} movesRemaining={movesRemaining}
-              showLifeBar={modeState.showLifeBar} currentHP={currentHP} maxHP={maxHP} />
+              showLifeBar={modeState.showLifeBar} currentHP={currentHP} maxHP={maxHP}
+              infoStrip={
+                (levelConfig.themeDisplayKey || (levelConfig.worldMechanic && !(isBossLevel && bossOrch.isBossActive)) || (upgradeState && Object.keys(upgradeState).length > 0)) ? (
+                  <GameInfoStrip
+                    themeDisplayKey={levelConfig.themeDisplayKey}
+                    themedWordsFound={themedWordsFound.length}
+                    themedWordCount={levelConfig.themedWordCount ?? 0}
+                    themedBonusMultiplier={levelConfig.themedBonusMultiplier ?? 1}
+                    worldColorPrimary={getWorldConfig(levelConfig.world).colorPrimary}
+                    mechanic={!(isBossLevel && bossOrch.isBossActive) ? (levelConfig.worldMechanic ?? null) : null}
+                    mechanicHitCount={wordSubmit.mechanicHitCount}
+                    upgradeState={upgradeState}
+                    upgradeTriggered={upgradeTriggered}
+                  />
+                ) : undefined
+              } />
           }
           gridArea={
             <GameGridArea tiles={tiles} gridSize={levelConfig.gridSize}
@@ -809,13 +851,6 @@ const AdventureGame = memo<AdventureGameProps>(
             />
           }
         />
-        {modeState.archetype === 'blast' && entryPhase === 'playing' && movesRemaining !== undefined && movesRemaining <= 3 && movesRemaining > 0 && (
-          <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-20 animate-pulse">
-            <div className="bg-neo-red/90 text-neo-cream font-neo-display font-black text-sm px-4 py-1.5 rounded-neo border-3 border-neo-black shadow-hard">
-              {movesRemaining} {t('adventure.mode.blast.movesLeft')}
-            </div>
-          </div>
-        )}
         {modeState.archetype === 'wheel' && entryPhase === 'playing' && (
           <div className="fixed inset-0 pointer-events-none z-10">
             <WordWheelPixiRing selectedIndices={selectedIndices} radius={Math.min(140, window.innerWidth * 0.18)} combo={gameState.comboCount} />
@@ -826,39 +861,11 @@ const AdventureGame = memo<AdventureGameProps>(
           lastWordWasThemed={lastWordWasThemed}
           themedBonusMultiplier={levelConfig.themedBonusMultiplier}
         />
-        {upgradeState && Object.keys(upgradeState).length > 0 && (
-          <div className="fixed top-2 right-16 z-10">
-            <AdventureUpgradeHUD
-              upgradeState={upgradeState}
-              upgradeTriggered={upgradeTriggered}
-            />
-          </div>
-        )}
-        {levelConfig.themeDisplayKey && levelConfig.gameModeDisplayKey && (
-          <div className="fixed top-16 left-1/2 -translate-x-1/2 z-10">
-            <AdventureThemeBanner
-              themeDisplayKey={levelConfig.themeDisplayKey}
-              gameModeDisplayKey={levelConfig.gameModeDisplayKey}
-              themedBonusMultiplier={levelConfig.themedBonusMultiplier ?? 1}
-              themedWordCount={levelConfig.themedWordCount ?? 0}
-              themedWordsFound={themedWordsFound.length}
-              worldColorPrimary={getWorldConfig(levelConfig.world).colorPrimary}
-            />
-          </div>
-        )}
         <MechanicBonusToast
           bonus={wordSubmit.mechanicBonus}
           onDismiss={wordSubmit.dismissMechanicBonus}
           bossActive={isBossLevel && bossOrch.isBossActive}
         />
-        {entryPhase === 'playing' && levelConfig.worldMechanic && !(isBossLevel && bossOrch.isBossActive) && (
-          <MechanicIndicator
-            mechanic={levelConfig.worldMechanic}
-            hitCount={wordSubmit.mechanicHitCount}
-            worldNumber={levelConfig.world}
-            className="fixed top-12 left-1/2 -translate-x-1/2 z-20"
-          />
-        )}
         {showRetryAssist && (
           <RetryAssistModal
             isOpen={showRetryAssist}

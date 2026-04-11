@@ -15,6 +15,7 @@ import { getLevelConfig, generateAdventureGrid, getLevelSeed, getGridSize } from
 import { LEVELS_PER_WORLD } from '@/lib/adventure/constants';
 import type { LevelCompletion, LevelConfig } from '@/types/adventure';
 import type { BossConfig } from '@/types/boss';
+import type { Language } from '@/types';
 
 // ==============================================
 // TYPES
@@ -68,7 +69,7 @@ const INITIAL_STATE: BossRushState = {
 // HOOK
 // ==============================================
 
-export function useBossRush(completions: LevelCompletion[]): UseBossRushReturn {
+export function useBossRush(completions: LevelCompletion[], language: Language = 'en'): UseBossRushReturn {
   const [state, setState] = useState<BossRushState>(INITIAL_STATE);
 
   // Compute which bosses the player has defeated (level 7 completions)
@@ -150,9 +151,9 @@ export function useBossRush(completions: LevelCompletion[]): UseBossRushReturn {
     if (worldId === null) return null;
     const gridSize = getGridSize(worldId) as 4 | 5 | 6 | 7;
     const seed = getLevelSeed(worldId, BOSS_LEVEL);
-    const grid = generateAdventureGrid(gridSize, seed, 'en');
+    const grid = generateAdventureGrid(gridSize, seed, language);
     return getLevelConfig(worldId, BOSS_LEVEL, grid);
-  }, [getCurrentBossWorldId]);
+  }, [getCurrentBossWorldId, language]);
 
   return {
     state,

@@ -52,6 +52,7 @@ const GAME_INSTRUCTIONS: Record<string, { icon: React.ReactNode; barClass: strin
 
 export function GameInstructions({ selectedGameMode, t }: GameInstructionsProps): React.ReactElement | null {
   const [instructionStep, setInstructionStep] = useState(0);
+  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => { setInstructionStep(0); }, [selectedGameMode]);
 
@@ -68,46 +69,63 @@ export function GameInstructions({ selectedGameMode, t }: GameInstructionsProps)
       className="rounded-neo-lg border-3 border-neo-black bg-slate-800/80 shadow-hard overflow-hidden"
     >
       <div className={cn('h-1', barClass)} />
-      <div className="p-4">
-        <div className="flex items-center gap-2 mb-3">
-          <div className={cn('w-8 h-8 rounded-full border-2 border-neo-black flex items-center justify-center shadow-hard-sm text-neo-black', iconBgClass)}>
-            {icon}
-          </div>
-          <h3 className="text-sm font-black uppercase text-neo-cream flex items-center gap-1.5">
-            <Lightbulb className="w-3.5 h-3.5 text-neo-yellow" />
-            {t('help.howToPlay')}
-          </h3>
+      <button
+        type="button"
+        onClick={() => setIsOpen(o => !o)}
+        className="w-full p-3 flex items-center gap-2"
+      >
+        <div className={cn('w-7 h-7 rounded-full border-2 border-neo-black flex items-center justify-center shadow-hard-sm text-neo-black shrink-0', iconBgClass)}>
+          {icon}
         </div>
-        <AnimatePresence mode="wait">
+        <h3 className="text-sm font-black uppercase text-neo-cream flex items-center gap-1.5 flex-1 text-start">
+          <Lightbulb className="w-3.5 h-3.5 text-neo-yellow" />
+          {t('help.howToPlay')}
+        </h3>
+        <ChevronRight className={cn('w-4 h-4 text-neo-cream/50 transition-transform', isOpen && 'rotate-90')} />
+      </button>
+      <AnimatePresence initial={false}>
+        {isOpen && (
           <motion.div
-            key={instructionStep}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="min-h-[48px] flex items-start gap-2 text-sm text-slate-300"
+            className="overflow-hidden"
           >
-            <span className={cn('mt-1.5 w-1.5 h-1.5 rounded-full shrink-0', dotClass)} />
-            <div>
-              <p className="font-bold text-neo-cream text-xs uppercase mb-0.5">{t(step.titleKey)}</p>
-              <p>{t(step.descKey)}</p>
+            <div className="px-3 pb-3">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={instructionStep}
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.2 }}
+                  className="min-h-[48px] flex items-start gap-2 text-sm text-slate-300"
+                >
+                  <span className={cn('mt-1.5 w-1.5 h-1.5 rounded-full shrink-0', dotClass)} />
+                  <div>
+                    <p className="font-bold text-neo-cream text-xs uppercase mb-0.5">{t(step.titleKey)}</p>
+                    <p>{t(step.descKey)}</p>
+                  </div>
+                </motion.div>
+              </AnimatePresence>
+              <div className="flex items-center justify-center gap-3 mt-3">
+                <button onClick={(e) => { e.stopPropagation(); setInstructionStep(s => Math.max(0, s - 1)); }} disabled={instructionStep === 0} className="w-7 h-7 flex items-center justify-center rounded bg-neo-white/10 disabled:opacity-30 transition-opacity" aria-label={t('common.previous')}>
+                  <ChevronLeft className="w-4 h-4 text-neo-cream rtl:rotate-180" />
+                </button>
+                <div className="flex gap-1.5">
+                  {steps.map((_, i) => (
+                    <button key={i} onClick={(e) => { e.stopPropagation(); setInstructionStep(i); }} className={cn('w-2 h-2 rounded-full transition-colors', i === instructionStep ? dotClass : 'bg-neo-white/20')} />
+                  ))}
+                </div>
+                <button onClick={(e) => { e.stopPropagation(); setInstructionStep(s => Math.min(steps.length - 1, s + 1)); }} disabled={instructionStep === steps.length - 1} className="w-7 h-7 flex items-center justify-center rounded bg-neo-white/10 disabled:opacity-30 transition-opacity" aria-label={t('common.next')}>
+                  <ChevronRight className="w-4 h-4 text-neo-cream rtl:rotate-180" />
+                </button>
+              </div>
             </div>
           </motion.div>
-        </AnimatePresence>
-        <div className="flex items-center justify-center gap-3 mt-3">
-          <button onClick={() => setInstructionStep(s => Math.max(0, s - 1))} disabled={instructionStep === 0} className="w-7 h-7 flex items-center justify-center rounded bg-neo-white/10 disabled:opacity-30 transition-opacity" aria-label={t('common.previous')}>
-            <ChevronLeft className="w-4 h-4 text-neo-cream rtl:rotate-180" />
-          </button>
-          <div className="flex gap-1.5">
-            {steps.map((_, i) => (
-              <button key={i} onClick={() => setInstructionStep(i)} className={cn('w-2 h-2 rounded-full transition-colors', i === instructionStep ? dotClass : 'bg-neo-white/20')} />
-            ))}
-          </div>
-          <button onClick={() => setInstructionStep(s => Math.min(steps.length - 1, s + 1))} disabled={instructionStep === steps.length - 1} className="w-7 h-7 flex items-center justify-center rounded bg-neo-white/10 disabled:opacity-30 transition-opacity" aria-label={t('common.next')}>
-            <ChevronRight className="w-4 h-4 text-neo-cream rtl:rotate-180" />
-          </button>
-        </div>
-      </div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }

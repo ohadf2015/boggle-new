@@ -508,7 +508,7 @@ function HostPreGameView({
         {/* Mobile Layout — single scroll + sticky bottom start */}
         <div className="lg:hidden flex flex-col flex-1 min-h-0">
           <div className="flex-1 min-h-0 overflow-y-auto relative z-10">
-            <div className="max-w-[600px] mx-auto px-5 py-4 gap-4 flex flex-col pb-4">
+            <div className="max-w-[600px] mx-auto px-4 py-3 gap-3 flex flex-col pb-3">
               <AnimatePresence>{renderBotCountdown()}</AnimatePresence>
               <PlayerRoster
                 players={filteredPlayersForDisplay}

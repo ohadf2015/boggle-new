@@ -1250,6 +1250,7 @@ const ja = {
     "waitingForPlayers": "戦士集合中...",
     "startGame": "GO！",
     "startBattle": "バトル開始！",
+    "needPlayers": "プレイヤーが必要！",
     "commandersJoined": "参加中の司令官",
     "playersInRoom": "ルーム内のプレイヤー",
     "noOneYet": "まだ誰もいない？",
@@ -6813,17 +6814,20 @@ const ja = {
       "10": { "theme": "力と知識" }
     },
     "mode": {
-      "classic": "クラシックモード",
-      "blast": "ブラストモード",
-      "hunt": "ワードハント",
-      "wheel": "ワードホイール",
-      "forge": "ワードフォージ",
-      "boss": "ボス戦",
+      "classic": "クラシック",
+      "blast": "ブラスト",
+      "hunt": "ハント",
+      "wheel": "ホイール",
+      "forge": "フォージ",
+      "boss": "ボス",
       "classicObjective": "制限時間内に単語を見つけよう",
-      "blastObjective": "移動制限内にすべてのタイルをクリア",
+      "blastObjective": "手数を賢く使おう！",
       "huntObjective": "隠されたターゲットワードを見つけよう",
-      "wheelObjective": "中央の文字を含む単語を作ろう",
-      "forgeObjective": "ルーンバフでスコア目標を達成"
+      "huntLoadingTarget": "隠された単語を探しています...",
+      "wheelObjective": "すべての単語に中心の文字を含めよう！",
+      "wheelMustInclude": "必須文字：",
+      "forgeObjective": "目標スコアに到達しよう！",
+      "bossObjective": "ボスを倒せ！"
     },
     "objectives": {
       "wordCount": "単語を見つける",
@@ -6877,22 +6881,6 @@ const ja = {
       "validationTimeout": "検証がタイムアウトしました — もう一度お試しください",
       "validationCancelled": "検証がキャンセルされました",
       "missingCenterLetter": "中心の文字を含める必要があります！"
-    },
-"mode": {
-      "classic": "クラシック",
-      "blast": "ブラスト",
-      "blastObjective": "手数を賢く使おう！",
-      "hunt": "ハント",
-      "huntObjective": "できるだけ長く生き残ろう！",
-      "huntLoadingTarget": "隠された単語を探しています...",
-      "wheel": "ホイール",
-      "wheelObjective": "すべての単語に中心の文字を含めよう！",
-      "wheelMustInclude": "必須文字：",
-      "forge": "フォージ",
-      "forgeObjective": "目標スコアに到達しよう！",
-      "boss": "ボス",
-      "bossObjective": "ボスを倒せ！",
-      "movesLeft": "残り手数"
     },
 "game": {
       "title": "アドベンチャーモード",

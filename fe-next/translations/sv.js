@@ -1250,6 +1250,7 @@ const sv = {
     "waitingForPlayers": "Samlar krigare...",
     "startGame": "KÖR!",
     "startBattle": "Starta strid!",
+    "needPlayers": "Behöver spelare!",
     "commandersJoined": "Befälhavare anslutna",
     "playersInRoom": "Spelare i rummet",
     "noOneYet": "Ingen ännu?",
@@ -6762,17 +6763,20 @@ const sv = {
       "10": { "theme": "Makt & Kunskap" }
     },
     "mode": {
-      "classic": "Klassiskt läge",
-      "blast": "Sprängläge",
-      "hunt": "Ordjakt",
-      "wheel": "Ordhjulet",
-      "forge": "Ordsmide",
-      "boss": "Bosskamp",
+      "classic": "Klassisk",
+      "blast": "Blast",
+      "hunt": "Jakt",
+      "wheel": "Hjul",
+      "forge": "Smedja",
+      "boss": "Boss",
       "classicObjective": "Hitta ord innan tiden tar slut",
-      "blastObjective": "Rensa alla brickor inom dragbegränsning",
+      "blastObjective": "Använd dina drag klokt!",
       "huntObjective": "Hitta det dolda målordet",
-      "wheelObjective": "Ord måste innehålla mittenbokstaven",
-      "forgeObjective": "Nå poängmålet med runförstärkningar"
+      "huntLoadingTarget": "Söker dolt ord...",
+      "wheelObjective": "Varje ord måste inkludera mittenbokstaven!",
+      "wheelMustInclude": "Måste inkludera:",
+      "forgeObjective": "Nå målpoängen!",
+      "bossObjective": "Besegra bossen!"
     },
     "objectives": {
       "wordCount": "Hitta ord",
@@ -6826,22 +6830,6 @@ const sv = {
       "validationTimeout": "Valideringen tog för lång tid — försök igen",
       "validationCancelled": "Valideringen avbröts",
       "missingCenterLetter": "Måste inkludera mittenbokstaven!"
-    },
-"mode": {
-      "classic": "Klassisk",
-      "blast": "Blast",
-      "blastObjective": "Använd dina drag klokt!",
-      "hunt": "Jakt",
-      "huntObjective": "Överlev så länge du kan!",
-      "huntLoadingTarget": "Söker dolt ord...",
-      "wheel": "Hjul",
-      "wheelObjective": "Varje ord måste inkludera mittenbokstaven!",
-      "wheelMustInclude": "Måste inkludera:",
-      "forge": "Smedja",
-      "forgeObjective": "Nå målpoängen!",
-      "boss": "Boss",
-      "bossObjective": "Besegra bossen!",
-      "movesLeft": "Drag kvar"
     },
 "game": {
       "title": "Äventyrsläge",

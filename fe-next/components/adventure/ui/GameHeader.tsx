@@ -53,6 +53,8 @@ interface GameHeaderProps {
   currentHP?: number;
   /** Max HP (hunt mode) */
   maxHP?: number;
+  /** Inline info strip content (theme, mechanic, upgrades) — rendered below header bar */
+  infoStrip?: React.ReactNode;
   className?: string;
 }
 
@@ -79,6 +81,7 @@ export const GameHeader = memo(function GameHeader({
   showLifeBar = false,
   currentHP,
   maxHP,
+  infoStrip,
   className,
 }: GameHeaderProps) {
   const { t } = useLanguage();
@@ -273,6 +276,17 @@ export const GameHeader = memo(function GameHeader({
         </AdaptiveMotion.button>
       </div>
     </header>
+    {/* Info strip — theme, mechanic, upgrades — in-flow, not floating */}
+    {infoStrip && (
+      <div className={cn(
+        'flex items-center justify-center gap-2 px-2 py-0.5',
+        'bg-neo-black/40 backdrop-blur-xs',
+        'border-b border-neo-white/5',
+        'text-[10px] min-h-0'
+      )}>
+        {infoStrip}
+      </div>
+    )}
     </div>
   );
 });

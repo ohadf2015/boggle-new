@@ -1235,6 +1235,7 @@ const en = {
     "waitingForPlayers": "Gathering warriors...",
     "startGame": "GO!",
     "startBattle": "Start Battle!",
+    "needPlayers": "Need players!",
     "commandersJoined": "Commanders Joined",
     "playersInRoom": "Players in Room",
     "noOneYet": "No one yet?",
@@ -6660,17 +6661,20 @@ const en = {
       "10": { "theme": "Power & Knowledge" }
     },
     "mode": {
-      "classic": "Classic Mode",
-      "blast": "Blast Mode",
-      "hunt": "Word Hunt",
-      "wheel": "Word Wheel",
-      "forge": "Word Forge",
-      "boss": "Boss Battle",
+      "classic": "Classic",
+      "blast": "Blast",
+      "hunt": "Hunt",
+      "wheel": "Wheel",
+      "forge": "Forge",
+      "boss": "Boss",
       "classicObjective": "Find words before time runs out",
-      "blastObjective": "Clear all tiles within move limit",
+      "blastObjective": "Use your moves wisely!",
       "huntObjective": "Find the hidden target word",
-      "wheelObjective": "Words must include the center letter",
-      "forgeObjective": "Hit the score target with rune buffs"
+      "huntLoadingTarget": "Finding hidden word...",
+      "wheelObjective": "Every word must include the center letter!",
+      "wheelMustInclude": "Must include:",
+      "forgeObjective": "Reach the target score!",
+      "bossObjective": "Defeat the boss!"
     },
     "objectives": {
       "wordCount": "Find words",
@@ -6918,22 +6922,6 @@ const en = {
       "validationTimeout": "Validation timed out — try again",
       "validationCancelled": "Validation was cancelled",
       "missingCenterLetter": "Must include the center letter!"
-    },
-"mode": {
-      "classic": "Classic",
-      "blast": "Blast",
-      "blastObjective": "Use your moves wisely!",
-      "hunt": "Hunt",
-      "huntObjective": "Survive as long as you can!",
-      "huntLoadingTarget": "Finding hidden word...",
-      "wheel": "Wheel",
-      "wheelObjective": "Every word must include the center letter!",
-      "wheelMustInclude": "Must include:",
-      "forge": "Forge",
-      "forgeObjective": "Reach the target score!",
-      "boss": "Boss",
-      "bossObjective": "Defeat the boss!",
-      "movesLeft": "Moves Left"
     },
 "game": {
       "title": "Adventure Mode",

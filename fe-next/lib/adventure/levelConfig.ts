@@ -320,8 +320,16 @@ export function getLevelConfig(
     config.lifePoints = 100;
   } else if (archetype === 'wheel') {
     config.centerLetterRequired = true;
+    // Pick center letter from the actual grid when available, falling back to common letters
     const centerCandidates = ['A', 'E', 'I', 'O', 'U', 'R', 'S', 'T', 'N', 'L'];
-    config.centerLetter = centerCandidates[Math.floor(Math.random() * centerCandidates.length)];
+    if (grid) {
+      const gridLetters = new Set(grid.flat().map(l => l.toUpperCase()));
+      const validCandidates = centerCandidates.filter(l => gridLetters.has(l));
+      const pool = validCandidates.length > 0 ? validCandidates : Array.from(gridLetters);
+      config.centerLetter = pool[Math.floor(Math.random() * pool.length)];
+    } else {
+      config.centerLetter = centerCandidates[Math.floor(Math.random() * centerCandidates.length)];
+    }
   } else if (archetype === 'forge') {
     config.hasRunePick = true;
   }

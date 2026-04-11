@@ -9,7 +9,7 @@ import type {
   TileActivationEffect,
 } from '@/types/adventure';
 import { isThemedWord, getThemeBonusMultiplier } from '@/lib/adventure/themedWords';
-import { computeLetterFeedback, HUNT_WRONG_GUESS_DAMAGE } from '@/lib/adventure/huntMode';
+import { computeLetterFeedback, HUNT_WRONG_GUESS_DAMAGE, HUNT_MAX_ATTEMPTS } from '@/lib/adventure/huntMode';
 
 export type GameAction =
   | { type: 'START_GAME' }
@@ -39,7 +39,6 @@ export type GameAction =
   | { type: 'ACTIVATE_TIME_FREEZE'; payload: { seconds: number } }
   | { type: 'USE_SHUFFLE' }
   | { type: 'UPDATE_OBJECTIVE'; payload: { objectiveType: string; value: number; mode: 'set' | 'increment' } }
-  | { type: 'USE_MOVE' }
   | { type: 'TAKE_DAMAGE'; payload: { amount: number } }
   | { type: 'HEAL'; payload: { amount: number } }
   | { type: 'SET_HUNT_TARGET'; payload: { targetWord: string } }
@@ -716,20 +715,6 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       };
     }
 
-    case 'USE_MOVE': {
-      if (state.movesRemaining == null || state.movesRemaining <= 0) return state;
-      const remaining = state.movesRemaining - 1;
-      if (remaining <= 0) {
-        return {
-          ...state,
-          movesRemaining: 0,
-          isPlaying: false,
-          gameState: { ...state.gameState, isComplete: true, stars: calculateStars(state.objectives) },
-        };
-      }
-      return { ...state, movesRemaining: remaining };
-    }
-
     case 'TAKE_DAMAGE': {
       if (state.currentHP == null) return state;
       const newHP = Math.max(0, state.currentHP - action.payload.amount);
@@ -791,13 +776,15 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         ? Math.max(0, state.currentHP - HUNT_WRONG_GUESS_DAMAGE)
         : undefined;
       const isDead = newHP != null && newHP <= 0;
+      const maxAttemptsReached = HUNT_MAX_ATTEMPTS > 0 && newAttempts.length >= HUNT_MAX_ATTEMPTS;
+      const isGameOver = isDead || maxAttemptsReached;
 
       return {
         ...state,
         huntAttempts: newAttempts,
         currentHP: newHP,
-        isPlaying: isDead ? false : state.isPlaying,
-        gameState: isDead
+        isPlaying: isGameOver ? false : state.isPlaying,
+        gameState: isGameOver
           ? { ...state.gameState, isComplete: true, stars: calculateStars(state.objectives) }
           : state.gameState,
       };

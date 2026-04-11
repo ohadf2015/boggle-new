@@ -109,7 +109,7 @@ export function BattleModeCard({
       </h3>
       {/* Horizontal chips row — equal-width */}
       <div className="space-y-2">
-        <div className="grid grid-cols-4 gap-1.5">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
           {MODES.map(({ mode, icon, nameKey, activeBg }) => {
             const isActive = selectedGameMode === mode;
 

@@ -167,6 +167,25 @@ export function pickRuneOffering(count = 3, excludeIds: string[] = []): RuneCard
   return shuffled.slice(0, count).map(toRuneCardDef);
 }
 
+/**
+ * Compute aggregate rune effects from forge-picked RuneCardDefs.
+ * Converts IDs back to RuneDefinitions and applies the same multiplicative/additive logic.
+ */
+export function computeForgePickEffects(picks: RuneCardDef[]): RuneEffects {
+  const result: RuneEffects = { ...DEFAULT_EFFECTS };
+  for (const pick of picks) {
+    const def = RUNE_MAP.get(pick.id);
+    if (!def) continue;
+    const ch = def.effectChannel;
+    if (MULTIPLICATIVE_CHANNELS.has(ch)) {
+      result[ch] = (result[ch] as number) * def.effectValue;
+    } else {
+      result[ch] = (result[ch] as number) + def.effectValue;
+    }
+  }
+  return result;
+}
+
 /** Get rune definition by ID, or undefined if not found. */
 export function getRuneById(runeId: string): RuneDefinition | undefined {
   return RUNE_MAP.get(runeId);
