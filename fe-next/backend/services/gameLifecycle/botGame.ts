@@ -31,9 +31,9 @@ import { restoreLife, getLifeBonus } from '../../modules/wordHuntManager';
 
 /** Score target ratios per difficulty — bots aim for this % of best human score */
 const BOT_SCORE_TARGET: Record<string, number> = {
-  easy: 0.55,    // Easy bots aim for ~55% of best human
-  medium: 0.80,  // Medium bots aim for ~80%
-  hard: 0.95,    // Hard bots aim for ~95% — close but usually beatable
+  easy: 0.75,    // Easy bots aim for ~75% of best human
+  medium: 0.95,  // Medium bots aim for ~95%
+  hard: 1.15,    // Hard bots aim for ~115% — can beat you
 };
 
 /**
@@ -44,13 +44,13 @@ const BOT_SCORE_TARGET: Record<string, number> = {
  * gate only on time: bots play without restriction until either a human
  * scores (switching to the relative target below) or the grace window ends.
  */
-const BOT_FREE_SCORING_GRACE_MS = 15_000;
+const BOT_FREE_SCORING_GRACE_MS = 25_000;
 
 /** Fallback ceiling applied only AFTER the grace window if no human has scored. */
 const BOT_POST_GRACE_CEILING: Record<string, number> = {
-  easy: 250,
-  medium: 400,
-  hard: 600,
+  easy: 400,
+  medium: 650,
+  hard: 900,
 };
 
 /** Per-game timestamps for when scoring started (used for grace-window logic). */
@@ -113,7 +113,11 @@ export function shouldBotScore(
   const variance = 0.9 + Math.random() * 0.2; // 0.9 to 1.1
   const scoreTarget = bestHuman * baseTarget * variance;
 
-  return projectedScore <= scoreTarget;
+  // Minimum floor: bots always get at least this many points before capping kicks in
+  const MIN_BOT_SCORE: Record<string, number> = { easy: 80, medium: 150, hard: 250 };
+  const floor = MIN_BOT_SCORE[botDifficulty] ?? MIN_BOT_SCORE.medium;
+
+  return projectedScore <= Math.max(scoreTarget, floor);
 }
 
 /**

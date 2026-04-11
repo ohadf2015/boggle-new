@@ -122,7 +122,7 @@ describe('Bot Score Cap', () => {
       vi.setSystemTime(new Date('2026-01-01T00:00:00Z'));
       markBotScoringStart('GAME1');
 
-      // Advance 5s (well within 15s grace)
+      // Advance 5s (well within 25s grace)
       vi.advanceTimersByTime(5_000);
 
       expect(shouldBotScore('GAME1', 'TestBot', 200, 50, 'easy')).toBe(true);
@@ -135,111 +135,112 @@ describe('Bot Score Cap', () => {
       expect(shouldBotScore('GAME1', 'TestBot', 999, 999, 'easy')).toBe(true);
     });
 
-    it('after grace window expires: easy bot capped at post-grace ceiling 250', () => {
+    it('after grace window expires: easy bot capped at post-grace ceiling 400', () => {
       vi.useFakeTimers();
       vi.setSystemTime(new Date('2026-01-01T00:00:00Z'));
       markBotScoringStart('GAME1');
-      vi.advanceTimersByTime(20_000); // > 15s grace
+      vi.advanceTimersByTime(30_000); // > 25s grace
 
-      expect(shouldBotScore('GAME1', 'TestBot', 240, 10, 'easy')).toBe(true);
-      expect(shouldBotScore('GAME1', 'TestBot', 245, 10, 'easy')).toBe(false);
+      expect(shouldBotScore('GAME1', 'TestBot', 390, 10, 'easy')).toBe(true);
+      expect(shouldBotScore('GAME1', 'TestBot', 395, 10, 'easy')).toBe(false);
     });
 
-    it('after grace window expires: medium bot capped at post-grace ceiling 400', () => {
+    it('after grace window expires: medium bot capped at post-grace ceiling 650', () => {
       vi.useFakeTimers();
       vi.setSystemTime(new Date('2026-01-01T00:00:00Z'));
       markBotScoringStart('GAME1');
-      vi.advanceTimersByTime(20_000);
+      vi.advanceTimersByTime(30_000);
 
-      expect(shouldBotScore('GAME1', 'TestBot', 390, 10, 'medium')).toBe(true);
-      expect(shouldBotScore('GAME1', 'TestBot', 395, 10, 'medium')).toBe(false);
+      expect(shouldBotScore('GAME1', 'TestBot', 640, 10, 'medium')).toBe(true);
+      expect(shouldBotScore('GAME1', 'TestBot', 645, 10, 'medium')).toBe(false);
     });
 
-    it('after grace window expires: hard bot capped at post-grace ceiling 600', () => {
+    it('after grace window expires: hard bot capped at post-grace ceiling 900', () => {
       vi.useFakeTimers();
       vi.setSystemTime(new Date('2026-01-01T00:00:00Z'));
       markBotScoringStart('GAME1');
-      vi.advanceTimersByTime(20_000);
+      vi.advanceTimersByTime(30_000);
 
-      expect(shouldBotScore('GAME1', 'TestBot', 590, 10, 'hard')).toBe(true);
-      expect(shouldBotScore('GAME1', 'TestBot', 595, 10, 'hard')).toBe(false);
+      expect(shouldBotScore('GAME1', 'TestBot', 890, 10, 'hard')).toBe(true);
+      expect(shouldBotScore('GAME1', 'TestBot', 895, 10, 'hard')).toBe(false);
     });
 
-    it('after grace window expires: unknown difficulty falls back to medium ceiling 400', () => {
+    it('after grace window expires: unknown difficulty falls back to medium ceiling 650', () => {
       vi.useFakeTimers();
       vi.setSystemTime(new Date('2026-01-01T00:00:00Z'));
       markBotScoringStart('GAME1');
-      vi.advanceTimersByTime(20_000);
+      vi.advanceTimersByTime(30_000);
 
-      expect(shouldBotScore('GAME1', 'TestBot', 390, 10, 'unknown')).toBe(true);
-      expect(shouldBotScore('GAME1', 'TestBot', 395, 10, 'unknown')).toBe(false);
+      expect(shouldBotScore('GAME1', 'TestBot', 640, 10, 'unknown')).toBe(true);
+      expect(shouldBotScore('GAME1', 'TestBot', 645, 10, 'unknown')).toBe(false);
     });
   });
 
   describe('shouldBotScore — percentage-based targeting', () => {
-    it('easy bot targets 55% of best human (with variance=1.0)', () => {
-      // Human at 300, easy target = 300 * 0.55 * 1.0 = 165
+    it('easy bot targets 75% of best human (with variance=1.0)', () => {
+      // Human at 300, easy target = 300 * 0.75 * 1.0 = 225
       getLeaderboard.mockReturnValue([
         { username: 'Alice', score: 300, isBot: false },
       ]);
 
-      expect(shouldBotScore('GAME1', 'TestBot', 160, 5, 'easy')).toBe(true);
-      expect(shouldBotScore('GAME1', 'TestBot', 160, 10, 'easy')).toBe(false);
+      expect(shouldBotScore('GAME1', 'TestBot', 220, 5, 'easy')).toBe(true);
+      expect(shouldBotScore('GAME1', 'TestBot', 220, 10, 'easy')).toBe(false);
     });
 
-    it('medium bot targets 80% of best human (with variance=1.0)', () => {
-      // Human at 300, medium target = 300 * 0.80 * 1.0 = 240
+    it('medium bot targets 95% of best human (with variance=1.0)', () => {
+      // Human at 300, medium target = 300 * 0.95 * 1.0 = 285
       getLeaderboard.mockReturnValue([
         { username: 'Alice', score: 300, isBot: false },
       ]);
 
-      expect(shouldBotScore('GAME1', 'TestBot', 230, 10, 'medium')).toBe(true);
-      expect(shouldBotScore('GAME1', 'TestBot', 235, 10, 'medium')).toBe(false);
+      expect(shouldBotScore('GAME1', 'TestBot', 280, 5, 'medium')).toBe(true);
+      expect(shouldBotScore('GAME1', 'TestBot', 280, 10, 'medium')).toBe(false);
     });
 
-    it('hard bot targets 95% of best human (with variance=1.0)', () => {
-      // Human at 300, hard target = 300 * 0.95 * 1.0 = 285
+    it('hard bot targets 115% of best human (with variance=1.0)', () => {
+      // Human at 300, hard target = 300 * 1.15 * 1.0 = 345
       getLeaderboard.mockReturnValue([
         { username: 'Alice', score: 300, isBot: false },
       ]);
 
-      expect(shouldBotScore('GAME1', 'TestBot', 280, 5, 'hard')).toBe(true);
-      expect(shouldBotScore('GAME1', 'TestBot', 280, 10, 'hard')).toBe(false);
+      expect(shouldBotScore('GAME1', 'TestBot', 340, 5, 'hard')).toBe(true);
+      expect(shouldBotScore('GAME1', 'TestBot', 340, 10, 'hard')).toBe(false);
     });
 
     it('variance affects the target range', () => {
-      // Human at 200, medium base = 200 * 0.80 = 160
+      // Human at 200, medium base = 200 * 0.95 = 190
       getLeaderboard.mockReturnValue([
         { username: 'Alice', score: 200, isBot: false },
       ]);
 
-      // Low variance (Math.random = 0 → variance = 0.9): target = 200 * 0.80 * 0.9 = 144
+      // Low variance (Math.random = 0 → variance = 0.9): target = 200 * 0.95 * 0.9 = 171
       mathRandomSpy.mockReturnValue(0);
-      expect(shouldBotScore('GAME1', 'TestBot', 140, 5, 'medium')).toBe(false);
+      expect(shouldBotScore('GAME1', 'TestBot', 170, 5, 'medium')).toBe(false);
 
-      // High variance (Math.random = 1 → variance = 1.1): target = 200 * 0.80 * 1.1 = 176
+      // High variance (Math.random = 1 → variance = 1.1): target = 200 * 0.95 * 1.1 = 209
       mathRandomSpy.mockReturnValue(1);
-      expect(shouldBotScore('GAME1', 'TestBot', 170, 5, 'medium')).toBe(true);
+      expect(shouldBotScore('GAME1', 'TestBot', 205, 3, 'medium')).toBe(true);
     });
 
     it('scales with human score — bots can reach high scores when human does', () => {
-      // Human at 1000, hard target = 1000 * 0.95 * 1.0 = 950
+      // Human at 1000, hard target = 1000 * 1.15 * 1.0 = 1150
       getLeaderboard.mockReturnValue([
         { username: 'Alice', score: 1000, isBot: false },
       ]);
 
-      expect(shouldBotScore('GAME1', 'TestBot', 900, 50, 'hard')).toBe(true);
-      expect(shouldBotScore('GAME1', 'TestBot', 945, 10, 'hard')).toBe(false);
+      expect(shouldBotScore('GAME1', 'TestBot', 1100, 50, 'hard')).toBe(true);
+      expect(shouldBotScore('GAME1', 'TestBot', 1145, 10, 'hard')).toBe(false);
     });
 
     it('defaults to medium when difficulty is omitted', () => {
-      // Human at 100, medium target = 100 * 0.80 * 1.0 = 80
+      // Human at 100, medium target = 100 * 0.95 * 1.0 = 95, but floor is 150
       getLeaderboard.mockReturnValue([
         { username: 'Alice', score: 100, isBot: false },
       ]);
 
-      expect(shouldBotScore('GAME1', 'TestBot', 75, 5)).toBe(true);
-      expect(shouldBotScore('GAME1', 'TestBot', 75, 10)).toBe(false);
+      // Floor of 150 applies since 95 < 150
+      expect(shouldBotScore('GAME1', 'TestBot', 145, 5)).toBe(true);
+      expect(shouldBotScore('GAME1', 'TestBot', 145, 10)).toBe(false);
     });
   });
 });

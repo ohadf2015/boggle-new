@@ -58,22 +58,22 @@ export const BOT_CONFIG: BotConfigType = {
   // Medium and hard bots are intentionally slower to feel more realistic
   TIMING: {
     easy: {
-      minDelay: 3000,    // Minimum time between words
-      maxDelay: 8000,    // Maximum time between words
-      startDelay: 2500,  // Initial delay before first word
-      typingSpeed: 200,  // Base ms per character "typing"
+      minDelay: 2000,    // Minimum time between words
+      maxDelay: 5500,    // Maximum time between words
+      startDelay: 2000,  // Initial delay before first word
+      typingSpeed: 150,  // Base ms per character "typing"
     },
     medium: {
-      minDelay: 2000,    // Thinks quickly
-      maxDelay: 6000,    // Occasional pauses
-      startDelay: 1800,  // Scans board then starts
-      typingSpeed: 150,  // Faster typing
+      minDelay: 1500,    // Thinks quickly
+      maxDelay: 4000,    // Occasional pauses
+      startDelay: 1500,  // Scans board then starts
+      typingSpeed: 120,  // Faster typing
     },
     hard: {
-      minDelay: 1500,    // Fast word recognition
-      maxDelay: 4500,    // Brief thinking pauses
-      startDelay: 1200,  // Quick scan
-      typingSpeed: 100,  // Expert typing speed
+      minDelay: 800,     // Fast word recognition
+      maxDelay: 2500,    // Brief thinking pauses
+      startDelay: 800,   // Quick scan
+      typingSpeed: 70,   // Expert typing speed
     }
   },
 
@@ -81,22 +81,22 @@ export const BOT_CONFIG: BotConfigType = {
   // Medium and hard bots find fewer words per minute for more realistic gameplay
   WORDS: {
     easy: {
-      maxWordLength: 5,       // Only find shorter words
-      wordsPerMinute: 5,      // Steady pace
+      maxWordLength: 6,       // Find short-medium words
+      wordsPerMinute: 7,      // Decent pace
       focusOnShort: true,     // Prefer 3-4 letter words
-      missChance: 0.15,       // 15% chance to "miss" a word
-      wrongWordChance: 0.10,  // 10% chance to submit a wrong word
+      missChance: 0.10,       // 10% chance to "miss" a word
+      wrongWordChance: 0.08,  // 8% chance to submit a wrong word
     },
     medium: {
-      maxWordLength: 7,
-      wordsPerMinute: 8,      // Competitive pace
+      maxWordLength: 8,
+      wordsPerMinute: 11,     // Competitive pace
       focusOnShort: false,
-      missChance: 0.08,       // Fewer mistakes
-      wrongWordChance: 0.06,  // 6% wrong word chance
+      missChance: 0.05,       // Fewer mistakes
+      wrongWordChance: 0.04,  // 4% wrong word chance
     },
     hard: {
-      maxWordLength: 10,      // Experts find long words
-      wordsPerMinute: 12,     // Fast and aggressive
+      maxWordLength: 12,      // Experts find long words
+      wordsPerMinute: 16,     // Fast and aggressive
       focusOnShort: false,
       missChance: 0.03,       // Rarely misses
       wrongWordChance: 0.02,  // Very few mistakes

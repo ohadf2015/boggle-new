@@ -73,16 +73,16 @@ export function useBotSimulation({
 
     // Base intervals: easy bots are slower, hard bots are faster
     const baseIntervals: Record<Difficulty, number> = {
-      easy: 8000,   // 8 seconds base
-      medium: 5000, // 5 seconds base
-      hard: 3000,   // 3 seconds base
+      easy: 5000,   // 5 seconds base
+      medium: 3000, // 3 seconds base
+      hard: 1800,   // 1.8 seconds base
     };
 
     // Add randomness to make bots feel more natural
     const randomFactors: Record<Difficulty, number> = {
-      easy: 4000,   // +0-4s random
-      medium: 3000, // +0-3s random
-      hard: 2000,   // +0-2s random
+      easy: 3000,   // +0-3s random
+      medium: 2000, // +0-2s random
+      hard: 1200,   // +0-1.2s random
     };
 
     const interval = baseIntervals[difficulty] + Math.random() * randomFactors[difficulty];
@@ -137,9 +137,9 @@ export function useBotSimulation({
 
     // Fallback: simulate with random word lengths if no words available
     const wordLengths: Record<Difficulty, number[]> = {
-      easy: [3, 4, 5],
-      medium: [4, 5, 6],
-      hard: [5, 6, 7, 8],
+      easy: [3, 4, 4, 5],
+      medium: [4, 5, 5, 6, 7],
+      hard: [5, 6, 6, 7, 7, 8],
     };
     const lengths = wordLengths[bot.difficulty];
     const length = lengths[Math.floor(Math.random() * lengths.length)];

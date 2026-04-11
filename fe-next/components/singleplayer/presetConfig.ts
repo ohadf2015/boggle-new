@@ -81,7 +81,7 @@ export const PRESETS: PresetConfig[] = [
       difficulty: 'HARD',
       timerSeconds: 180,
       bots: 2,
-      botDifficulty: 'medium',
+      botDifficulty: 'hard',
       minWordLength: 2, // Accept 2-letter words (especially for Japanese)
     },
     modes: ['solo-bots', 'practice', 'challenge'],
@@ -137,7 +137,7 @@ export const MODE_PRESETS: Record<SinglePlayerMode, PresetConfig[]> = {
         difficulty: 'HARD',
         timerSeconds: 180,
         bots: 3,
-        botDifficulty: 'medium',
+        botDifficulty: 'hard',
         minWordLength: 2, // Accept 2-letter words (especially for Japanese)
       },
       modes: ['solo-bots'],
