@@ -1316,6 +1316,8 @@ const sv = {
     "qrCode": "QR-kod",
     "showQrCode": "Visa QR-kod",
     "scanToJoin": "Skanna för att gå med",
+    "wonderhostLeader": "Värdledare",
+    "bringYourSquad": "Ta Med Ditt Gäng",
     "orEnterCode": "Eller ange kod",
     "scanQr": "Skanna QR-kod för att gå med eller använd kod",
     "hostPlays": "Jag vill spela",

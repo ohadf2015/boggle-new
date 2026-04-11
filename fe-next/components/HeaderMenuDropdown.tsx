@@ -33,8 +33,18 @@ const HeaderMenuDropdown = memo<HeaderMenuDropdownProps>(({
     onOpenGiftModal,
 }) => {
     const { t, language } = useLanguage();
-    const { isAuthenticated, isAdmin, profile, user } = useAuth();
+    const { isAuthenticated, isAdmin, profile, user, updateProfile } = useAuth();
     const engagementStatus = useEngagementStatus();
+
+    // Auto-sync: if authenticated user has no avatar_config in DB but has one in localStorage, persist it
+    useEffect(() => {
+        if (isAuthenticated && profile && !profile.avatar_config) {
+            const local = getStoredCustomAvatar();
+            if (local) {
+                updateProfile({ avatar_config: local }).catch(() => {});
+            }
+        }
+    }, [isAuthenticated, profile, updateProfile]);
     const { missions, completedCount, isGrandSlam, loading: missionsLoading } = useDailyMissions();
     const { notifications, unreadCount: notificationCount, markAsRead, markAllAsRead, dismissNotification, clearAllNotifications } = useRealtimeNotifications();
     const [showAllNotifications, setShowAllNotifications] = useState(false);
@@ -77,8 +87,12 @@ const HeaderMenuDropdown = memo<HeaderMenuDropdownProps>(({
     }, [editGuestNameValue]);
     const isRtl = language === 'he';
 
-    const guestAvatar = !isAuthenticated ? getStoredCustomAvatar() : null;
-    const avatarConfig = profile?.avatar_config ?? guestAvatar;
+    const storedAvatar = getStoredCustomAvatar();
+    // Authenticated users: prefer DB avatar, fall back to localStorage for migration
+    // Guests: use localStorage avatar
+    const avatarConfig = isAuthenticated
+        ? (profile?.avatar_config ?? storedAvatar)
+        : storedAvatar;
 
     // Aggregate badge: gifts + notifications + completed quests
     const badgeCount = unclaimedCount + (isAuthenticated ? notificationCount : 0) + completedCount;

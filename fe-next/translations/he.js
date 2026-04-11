@@ -1332,6 +1332,8 @@ const he = {
     "qrCode": "ברקוד",
     "showQrCode": "הצג ברקוד",
     "scanToJoin": "סרוק להצטרפות",
+    "wonderhostLeader": "מנחה ראשי",
+    "bringYourSquad": "הביאו את החבורה",
     "orEnterCode": "או הכנס קוד",
     "scanQr": "סרוק את הקוד כדי להצטרף למשחק או השתמש בקוד",
     "hostPlays": "אני רוצה לשדר",

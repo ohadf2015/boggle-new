@@ -398,6 +398,57 @@ export async function triggerAutoPromotion(): Promise<{
 }
 
 /**
+ * Start Re-engagement Email cron
+ * Runs every hour to send "first letter hint" emails to inactive daily challenge players.
+ * The recipient query filters by local time (7-9 AM), so hourly runs cover all timezones.
+ */
+export function startReengagementEmailCron() {
+  const task = cron.schedule('0 * * * *', async () => {
+    await withCronLock('cron:reengagement-email', 5 * 60 * 1000, async () => {
+      logger.info('CRON', 'Starting re-engagement email send...');
+      const startTime = Date.now();
+
+      try {
+        const { getReengagementRecipients, resolveUserLanguage, getFirstLetterForLanguage, sendReengagementEmail } =
+          await import('@/lib/reengagementEmail');
+        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://lexiclash.live';
+
+        const recipients = await getReengagementRecipients();
+        if (recipients.length === 0) {
+          logger.info('CRON', 'Re-engagement: no eligible recipients');
+          return;
+        }
+
+        let sent = 0;
+        let failed = 0;
+
+        for (const recipient of recipients) {
+          const language = await resolveUserLanguage(recipient.id, recipient.country_code);
+          let letterData = await getFirstLetterForLanguage(language);
+          if (!letterData) letterData = await getFirstLetterForLanguage('en');
+          if (!letterData) { failed++; continue; }
+
+          const result = await sendReengagementEmail(recipient, language, letterData.letter, baseUrl);
+          if (result.success) sent++;
+          else failed++;
+        }
+
+        const duration = Date.now() - startTime;
+        logger.info('CRON', `Re-engagement email complete in ${duration}ms`, { sent, failed, total: recipients.length });
+      } catch (error) {
+        const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+        logger.error('CRON', 'Re-engagement email failed', { error: errorMsg });
+      }
+    });
+  }, {
+    timezone: 'UTC',
+  });
+
+  logger.info('CRON', 'Re-engagement email cron started (runs hourly)');
+  return task;
+}
+
+/**
  * Start all cron jobs
  * Called from server startup
  */
@@ -418,6 +469,9 @@ export function startAllCronJobs(): ScheduledTask[] {
 
   // Auto-promotion pipeline (every 4 hours)
   tasks.push(startAutoPromotionCron());
+
+  // Re-engagement emails (hourly — filters by local time 7-9 AM)
+  tasks.push(startReengagementEmailCron());
 
   logger.info('CRON', `All ${tasks.length} cron jobs started`);
   return tasks;

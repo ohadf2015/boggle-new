@@ -188,8 +188,10 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
         if (shouldClose) setShowMobileMenu(false);
     }, [isRtl]);
 
-    const guestAvatar = !isAuthenticated ? getStoredCustomAvatar() : null;
-    const avatarConfig = profile?.avatar_config ?? guestAvatar;
+    const storedAvatar = getStoredCustomAvatar();
+    const avatarConfig = isAuthenticated
+        ? (profile?.avatar_config ?? storedAvatar)
+        : storedAvatar;
     const itemVariants = isRtl ? staggerItemRtl : staggerItem;
 
     return (

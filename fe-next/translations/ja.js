@@ -1316,6 +1316,8 @@ const ja = {
     "qrCode": "QRコード",
     "showQrCode": "QRコードを表示",
     "scanToJoin": "スキャンして参加",
+    "wonderhostLeader": "ワンダーホスト リーダー",
+    "bringYourSquad": "仲間を連れてこよう",
     "orEnterCode": "またはコードを入力",
     "scanQr": "QRコードをスキャンして参加するか、コードを使用してください",
     "hostPlays": "プレイしたい",

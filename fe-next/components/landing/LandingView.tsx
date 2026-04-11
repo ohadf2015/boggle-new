@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -150,19 +150,20 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
   // Start ambient music on the FIRST user gesture (tap / click / key).
   // Browsers block audio autoplay without interaction (WCAG 1.4.2 + Chrome
   // autoplay policy), so we arm a one-shot listener and remove it after use.
+  // A ref-based guard prevents duplicate playback when deps cause re-runs.
+  const musicStartedRef = useRef(false);
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    let started = false;
     const start = () => {
-      if (started) return;
-      started = true;
+      if (musicStartedRef.current) return;
+      musicStartedRef.current = true;
       unlockAudio();
       playTrack(TRACKS.BOSSA);
       window.removeEventListener('pointerdown', start);
       window.removeEventListener('keydown', start);
     };
-    window.addEventListener('pointerdown', start, { once: true });
-    window.addEventListener('keydown', start, { once: true });
+    window.addEventListener('pointerdown', start);
+    window.addEventListener('keydown', start);
     return () => {
       window.removeEventListener('pointerdown', start);
       window.removeEventListener('keydown', start);

@@ -1334,6 +1334,8 @@ const es = {
     "qrCode": "QR",
     "showQrCode": "Mostrar código QR",
     "scanToJoin": "Escanea para Unirte",
+    "wonderhostLeader": "Anfitrión Líder",
+    "bringYourSquad": "Trae a Tu Escuadrón",
     "orEnterCode": "O ingresa el código",
     "scanQr": "Escanea para unirte",
     "hostPlays": "Jugar",

@@ -1300,6 +1300,8 @@ const en = {
     "qrCode": "QR Code",
     "showQrCode": "Show QR Code",
     "scanToJoin": "Scan to Join",
+    "wonderhostLeader": "Wonderhost Leader",
+    "bringYourSquad": "Bring Your Squad",
     "orEnterCode": "Or enter code",
     "scanQr": "Scan QR code to join or use code",
     "hostPlays": "I want to broadcast",
