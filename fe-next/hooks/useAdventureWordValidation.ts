@@ -372,7 +372,7 @@ export function useAdventureWordValidation({
         return result;
       }
     },
-    [grid, language, minWordLength, normalizedFoundWords]
+    [grid, language, minWordLength, normalizedFoundWords, centerLetter]
   );
 
   return {
