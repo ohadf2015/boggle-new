@@ -4,7 +4,7 @@ export default function manifest() {
     name: 'LexiClash - Multiplayer Word Game',
     description: 'Fast-paced multiplayer word game perfect for parties, team building, and family fun. Find words, compete in real-time!',
     lang: 'en',
-    dir: 'ltr',
+    dir: 'auto',
     icons: [
       {
         src: '/favicon.ico',
@@ -44,7 +44,7 @@ export default function manifest() {
         purpose: 'any maskable',
       },
     ],
-    start_url: '/',
+    start_url: '/en',
     display: 'standalone',
     orientation: 'any',
     theme_color: '#667eea',

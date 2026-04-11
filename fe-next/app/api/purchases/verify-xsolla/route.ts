@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
+import logger from '@/utils/logger';
 import { captureApiError } from '@/utils/sentry';
 import { getPostHogServer } from '@/lib/posthog';
 
@@ -22,7 +23,7 @@ export async function POST(request: NextRequest) {
   try {
     const webhookSecret = process.env.XSOLLA_WEBHOOK_SECRET;
     if (!webhookSecret) {
-      console.error('[Xsolla] XSOLLA_WEBHOOK_SECRET not configured');
+      logger.error('[Xsolla] XSOLLA_WEBHOOK_SECRET not configured');
       return NextResponse.json(
         { error: 'Webhook verification not configured' },
         { status: 500 }
@@ -56,10 +57,16 @@ export async function POST(request: NextRequest) {
       .digest('hex');
 
     // Timing-safe comparison to prevent timing attacks
-    const isValid = crypto.timingSafeEqual(
-      Buffer.from(receivedSignature, 'hex'),
-      Buffer.from(expectedSignature, 'hex')
-    );
+    // Guard: timingSafeEqual throws if buffers differ in length
+    const receivedBuffer = Buffer.from(receivedSignature, 'hex');
+    const expectedBuffer = Buffer.from(expectedSignature, 'hex');
+    if (receivedBuffer.length !== expectedBuffer.length) {
+      return NextResponse.json(
+        { error: 'Invalid webhook signature' },
+        { status: 401 }
+      );
+    }
+    const isValid = crypto.timingSafeEqual(receivedBuffer, expectedBuffer);
 
     if (!isValid) {
       return NextResponse.json(
@@ -87,27 +94,29 @@ export async function POST(request: NextRequest) {
         // Payment completed — grant the purchased item
         const transaction = payload.transaction as Record<string, unknown> | undefined;
         const orderId = transaction?.id;
-        console.log(`[Xsolla] Payment received: order=${orderId}`);
+        logger.log(`[Xsolla] Payment received: order=${orderId}`);
         getPostHogServer()?.capture({
           distinctId: String(orderId),
           event: 'purchase_completed',
           properties: { order_id: String(orderId), provider: 'xsolla' },
         });
-        // TODO: Grant purchased item to user via Supabase
-        // TODO: Call CrazyGames trackOrder() analytics
+        // FIXME(P0): Grant purchased item to user via Supabase — purchases are accepted but NOT fulfilled
+        // FIXME(P0): Call CrazyGames trackOrder() analytics
+        logger.error(`[Xsolla] WARNING: Payment accepted but item NOT granted — order=${orderId}. Fulfillment not implemented.`);
         break;
       }
       case 'refund': {
         // Payment refunded — revoke the purchased item
         const transaction = payload.transaction as Record<string, unknown> | undefined;
         const orderId = transaction?.id;
-        console.log(`[Xsolla] Refund received: order=${orderId}`);
+        logger.log(`[Xsolla] Refund received: order=${orderId}`);
         getPostHogServer()?.capture({
           distinctId: String(orderId),
           event: 'purchase_refunded',
           properties: { order_id: String(orderId), provider: 'xsolla' },
         });
-        // TODO: Revoke purchased item
+        // FIXME(P0): Revoke purchased item — refunds are acknowledged but items NOT revoked
+        logger.error(`[Xsolla] WARNING: Refund accepted but item NOT revoked — order=${orderId}. Revocation not implemented.`);
         break;
       }
       case 'user_validation': {
@@ -115,7 +124,7 @@ export async function POST(request: NextRequest) {
         break;
       }
       default: {
-        console.log(`[Xsolla] Unknown notification type: ${notificationType}`);
+        logger.log(`[Xsolla] Unknown notification type: ${notificationType}`);
       }
     }
 

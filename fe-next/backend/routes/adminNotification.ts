@@ -3,12 +3,12 @@
  * Handles /api/admin/notification/* endpoints for sending push notifications
  */
 
-import express, { Request, Response, Router, NextFunction } from 'express';
+import express, { Request, Response, Router } from 'express';
 import { z } from 'zod';
 import logger from '../utils/logger';
 import { pushNotificationService, NotificationPayload } from '../services/pushNotificationService';
 
-const { getSupabase, isSupabaseConfigured } = require('../modules/supabaseServer');
+const { getSupabase } = require('../modules/supabaseServer');
 
 const router: Router = express.Router();
 
@@ -36,62 +36,8 @@ const sendNotificationSchema = z.object({
   actionUrl: z.string().max(200).optional().nullable(),
 });
 
-// ==================== Middleware ====================
-
-/**
- * Admin authentication middleware
- */
-async function adminAuth(req: AdminRequest, res: Response, next: NextFunction): Promise<void> {
-  const requestId = `notif-${Date.now()}-${Math.random().toString(36).substring(7)}`;
-  req.requestId = requestId;
-  res.setHeader('X-Request-Id', requestId);
-
-  const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    logger.warn('ADMIN_NOTIFICATION', `Missing auth header [${requestId}]`);
-    res.status(401).json({ error: 'Missing authorization header', requestId });
-    return;
-  }
-
-  const token = authHeader.substring(7);
-  if (!isSupabaseConfigured()) {
-    res.status(503).json({ error: 'Auth service not available', requestId });
-    return;
-  }
-
-  try {
-    const supabase = getSupabase();
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
-
-    if (authError || !user) {
-      logger.warn('ADMIN_NOTIFICATION', `Invalid token [${requestId}]`);
-      res.status(401).json({ error: 'Invalid token', requestId });
-      return;
-    }
-
-    const { data: profile, error: profileError } = await supabase
-      .from('profiles')
-      .select('is_admin, username')
-      .eq('id', user.id)
-      .single();
-
-    if (profileError || !profile?.is_admin) {
-      logger.warn('ADMIN_NOTIFICATION', `Non-admin access attempt by ${user.email} [${requestId}]`);
-      res.status(403).json({ error: 'Admin access required', requestId });
-      return;
-    }
-
-    req.adminUser = { id: user.id, email: user.email || '', username: profile.username };
-    logger.debug('ADMIN_NOTIFICATION', `Admin access: ${user.email} -> ${req.method} ${req.path} [${requestId}]`);
-    next();
-  } catch (error) {
-    const err = error as Error;
-    logger.error('ADMIN_NOTIFICATION', `Auth error: ${err.message} [${requestId}]`);
-    res.status(500).json({ error: 'Authentication failed', requestId });
-  }
-}
-
-router.use(adminAuth);
+// Auth + rate limiting are applied by the parent admin router (admin/index.ts)
+// Do NOT add duplicate adminAuth here — it would bypass RBAC and admin rate limiting.
 
 // ==================== Routes ====================
 
@@ -277,17 +223,18 @@ router.get('/stats', async (req: AdminRequest, res: Response): Promise<void> => 
       .select('*', { count: 'exact', head: true })
       .eq('read', true);
 
-    // Get counts by type
-    const { data: typeData } = await supabase
-      .from('user_notifications')
-      .select('notification_type');
-
+    // Get counts by type using individual count queries (not full table scan)
+    const notificationTypes = ['gift', 'system', 'achievement', 'social', 'marketing'] as const;
     const byType: Record<string, number> = {};
-    if (typeData) {
-      typeData.forEach((n: { notification_type: string }) => {
-        byType[n.notification_type] = (byType[n.notification_type] || 0) + 1;
-      });
-    }
+    await Promise.all(notificationTypes.map(async (type) => {
+      const { count } = await supabase
+        .from('user_notifications')
+        .select('*', { count: 'exact', head: true })
+        .eq('notification_type', type);
+      if (count && count > 0) {
+        byType[type] = count;
+      }
+    }));
 
     // Get active token count
     const { count: activeTokens } = await supabase

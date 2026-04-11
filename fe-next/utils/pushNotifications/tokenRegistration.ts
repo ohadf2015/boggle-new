@@ -92,7 +92,6 @@ async function registerTokenWithServer(
 export async function registerPushToken(): Promise<boolean> {
   // Only works on native platforms
   if (!isNative()) {
-    console.log('Push registration skipped - not a native platform');
     return false;
   }
 
@@ -104,7 +103,6 @@ export async function registerPushToken(): Promise<boolean> {
     const permStatus = await PushNotifications.checkPermissions();
 
     if (permStatus.receive === 'denied') {
-      console.log('Push notifications denied by user');
       return false;
     }
 
@@ -112,7 +110,6 @@ export async function registerPushToken(): Promise<boolean> {
     if (permStatus.receive !== 'granted') {
       const newStatus = await PushNotifications.requestPermissions();
       if (newStatus.receive !== 'granted') {
-        console.log('Push notification permission not granted');
         return false;
       }
     }
@@ -130,7 +127,6 @@ export async function registerPushToken(): Promise<boolean> {
         if (resolved) return;
         resolved = true;
 
-        console.log('FCM token received:', token.value.substring(0, 20) + '...');
         const success = await registerTokenWithServer(token.value, platform, deviceId);
         resolve(success);
       });
@@ -207,7 +203,6 @@ export async function setupPushListeners(
     const receivedListener = await PushNotifications.addListener(
       'pushNotificationReceived',
       (notification: { data?: Record<string, string> }) => {
-        console.log('Push notification received:', notification);
         if (onNotificationReceived && notification.data) {
           onNotificationReceived(notification.data as Record<string, string>);
         }
@@ -218,7 +213,6 @@ export async function setupPushListeners(
     const actionListener = await PushNotifications.addListener(
       'pushNotificationActionPerformed',
       (action: ActionPerformed) => {
-        console.log('Push notification action performed:', action);
         if (onNotificationTapped && action.notification.data) {
           onNotificationTapped(action.notification.data);
         }

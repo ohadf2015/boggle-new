@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { timingSafeEqual } from 'crypto';
+import logger from '@/utils/logger';
 import { verifyAdminAuth } from '@/lib/auth/adminAuth';
 import { captureApiError } from '@/utils/sentry';
 
@@ -36,18 +37,18 @@ export async function GET(request: NextRequest) {
 
     const expected = `Bearer ${cronSecret}`;
     if (!cronSecret || !authHeader || authHeader.length !== expected.length || !timingSafeEqual(Buffer.from(authHeader), Buffer.from(expected))) {
-      console.error('[Cron] Unauthorized: Invalid cron secret');
+      logger.error('[Cron] Unauthorized: Invalid cron secret');
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    console.log('[Cron] Starting bot difficulty calculation...');
+    logger.log('[Cron] Starting bot difficulty calculation...');
 
     // Call the Supabase Edge Function
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
     if (!supabaseUrl || !supabaseServiceKey) {
-      console.error('[Cron] Missing Supabase configuration');
+      logger.error('[Cron] Missing Supabase configuration');
       return NextResponse.json(
         { error: 'Missing Supabase configuration' },
         { status: 500 }
@@ -66,7 +67,7 @@ export async function GET(request: NextRequest) {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('[Cron] Edge Function error:', errorText);
+      logger.error('[Cron] Edge Function error:', errorText);
       return NextResponse.json(
         { error: 'Edge Function failed', details: errorText },
         { status: response.status }
@@ -74,7 +75,7 @@ export async function GET(request: NextRequest) {
     }
 
     const result = await response.json();
-    console.log('[Cron] Bot difficulty calculation complete:', result.summary);
+    logger.log('[Cron] Bot difficulty calculation complete:', result.summary);
 
     return NextResponse.json({
       success: true,
@@ -83,7 +84,7 @@ export async function GET(request: NextRequest) {
     });
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error('[Cron] Fatal error during bot difficulty calculation:', errorMessage);
+    logger.error('[Cron] Fatal error during bot difficulty calculation:', errorMessage);
     captureApiError(
       error instanceof Error ? error : new Error('Unknown error'),
       '/api/cron/calculate-bot-difficulty',
@@ -112,7 +113,7 @@ export async function POST(request: NextRequest) {
       return authResult.response!;
     }
 
-    console.log('[Admin] Manual bot difficulty calculation started');
+    logger.log('[Admin] Manual bot difficulty calculation started');
 
     // Call the Supabase Edge Function
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -138,7 +139,7 @@ export async function POST(request: NextRequest) {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('[Admin] Edge Function error:', errorText);
+      logger.error('[Admin] Edge Function error:', errorText);
       return NextResponse.json(
         { error: 'Edge Function failed', details: errorText },
         { status: response.status }
@@ -148,7 +149,7 @@ export async function POST(request: NextRequest) {
     const result = await response.json();
     const duration = Date.now() - startTime;
 
-    console.log(`[Admin] Bot difficulty calculation complete (${duration}ms)`);
+    logger.log(`[Admin] Bot difficulty calculation complete (${duration}ms)`);
 
     return NextResponse.json({
       success: true,
@@ -158,7 +159,7 @@ export async function POST(request: NextRequest) {
     });
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error('[Admin] Error during manual calculation:', errorMessage);
+    logger.error('[Admin] Error during manual calculation:', errorMessage);
     captureApiError(
       error instanceof Error ? error : new Error('Unknown error'),
       '/api/cron/calculate-bot-difficulty',

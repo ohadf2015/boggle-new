@@ -310,7 +310,16 @@ router.get('/players', async (req: AdminRequest, res: Response): Promise<void> =
 
     let query = supabase
       .from('profiles')
-      .select('*', { count: 'exact' });
+      .select(`
+        id, username, display_name, avatar_emoji, avatar_color, avatar_image,
+        total_score, total_games, total_words, total_time_played, total_xp, current_level,
+        casual_games, ranked_games, casual_wins, ranked_wins,
+        ranked_mmr, peak_mmr, longest_word, longest_word_length,
+        total_coins, lifetime_coins_earned, total_hints_used,
+        prestige_level, prestige_multiplier,
+        country_code, referral_count, user_role, is_admin,
+        daily_email_subscribed, last_seen_at, last_game_at, created_at
+      `, { count: 'exact' });
 
     if (search) {
       // Search by username or display_name

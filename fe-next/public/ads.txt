@@ -1,6 +1,0 @@
-# LexiClash - AdSense ads.txt
-# https://www.lexiclash.live
-# Generated: 2026-01-30
-
-# Google AdSense
-google.com, pub-1896836706464880, DIRECT, f08c47fec0942fa0

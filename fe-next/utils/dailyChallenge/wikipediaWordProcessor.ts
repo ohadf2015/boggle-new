@@ -4,6 +4,7 @@
  */
 
 import type { Language } from '@/shared/types/game';
+import logger from '@/utils/logger';
 
 // Minimum word lengths by language
 const MIN_WORD_LENGTH: Record<Language, number> = {
@@ -339,14 +340,14 @@ export async function getRecentlyUsedWords(
       .gte('puzzle_date', cutoffDate.toISOString().split('T')[0]);
 
     if (error) {
-      console.error('[WordProcessor] Error fetching recent words:', error.message);
+      logger.error('[WordProcessor] Error fetching recent words:', error.message);
       return new Set();
     }
 
     return new Set((data || []).map(d => normalizeWord(d.target_word, language)));
 
   } catch (error) {
-    console.error('[WordProcessor] Error fetching recent words:', error);
+    logger.error('[WordProcessor] Error fetching recent words:', error);
     return new Set();
   }
 }
@@ -394,14 +395,14 @@ export async function validateWordWithAI(
 
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    console.warn(`[WordProcessor] AI validation error for ${word}:`, errorMessage);
+    logger.warn(`[WordProcessor] AI validation error for ${word}:`, errorMessage);
 
     // FALLBACK: For high-scoring words, use format validation
     if (score !== undefined && score >= FORMAT_ONLY_FALLBACK_THRESHOLD) {
       const formatResult = validateGameWord(word, language);
 
       if (formatResult.valid) {
-        console.log(`[WordProcessor] Using format-only fallback for ${word} (score: ${score})`);
+        logger.log(`[WordProcessor] Using format-only fallback for ${word} (score: ${score})`);
         return {
           valid: true,
           reason: 'Format validated (AI unavailable)',
@@ -466,10 +467,10 @@ export async function updateWordValidationStatus(
       .eq('word', word.toUpperCase());
 
     if (error) {
-      console.error('[WordProcessor] Error updating validation status:', error.message);
+      logger.error('[WordProcessor] Error updating validation status:', error.message);
     }
 
   } catch (error) {
-    console.error('[WordProcessor] Error updating validation status:', error);
+    logger.error('[WordProcessor] Error updating validation status:', error);
   }
 }

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { Resend } from 'resend';
+import logger from '@/utils/logger';
 import { captureApiError } from '@/utils/sentry';
 import { checkApiRateLimit, rateLimitResponse, addRateLimitHeaders } from '@/lib/apiRateLimit';
 import { withTimeout, EMAIL_COLORS } from '@/lib/email';
@@ -63,7 +64,7 @@ async function sendEmailNotification(name: string, email: string, message: strin
   const fromEmail = process.env.RESEND_FROM_EMAIL;
 
   if (!resend || !fromEmail) {
-    console.log('[Contact Form] Resend not configured, skipping email notification');
+    logger.log('[Contact Form] Resend not configured, skipping email notification');
     return false;
   }
 
@@ -99,7 +100,7 @@ async function sendEmailNotification(name: string, email: string, message: strin
     );
 
     if (result.error) {
-      console.error('[Contact Form] Resend error:', result.error);
+      logger.error('[Contact Form] Resend error:', result.error);
       captureApiError(new Error(result.error.message), '/api/contact', {
         method: 'POST',
         statusCode: 500,
@@ -107,11 +108,11 @@ async function sendEmailNotification(name: string, email: string, message: strin
       return false;
     }
 
-    console.log('[Contact Form] Email notification sent successfully');
+    logger.log('[Contact Form] Email notification sent successfully');
     return true;
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error('[Contact Form] Failed to send email:', errorMessage);
+    logger.error('[Contact Form] Failed to send email:', errorMessage);
     captureApiError(
       error instanceof Error ? error : new Error(String(error)),
       '/api/contact',
@@ -125,7 +126,7 @@ export async function POST(request: NextRequest) {
   // Rate limit check - prevent spam and abuse
   const rateLimitResult = checkApiRateLimit(request, 'contact', CONTACT_RATE_LIMIT);
   if (!rateLimitResult.success) {
-    console.warn('[Contact Form] Rate limit exceeded for IP');
+    logger.warn('[Contact Form] Rate limit exceeded for IP');
     return rateLimitResponse(rateLimitResult);
   }
 
@@ -171,7 +172,7 @@ export async function POST(request: NextRequest) {
       });
 
       if (dbError) {
-        console.error('[Contact Form] Database error:', dbError);
+        logger.error('[Contact Form] Database error:', dbError);
         captureApiError(new Error(dbError.message), '/api/contact', {
           method: 'POST',
           statusCode: 500,
@@ -179,7 +180,7 @@ export async function POST(request: NextRequest) {
         // Continue even if DB fails - we'll try to send email
       } else {
         dbStored = true;
-        console.log('[Contact Form] Message stored in database');
+        logger.log('[Contact Form] Message stored in database');
       }
     }
 
@@ -201,7 +202,7 @@ export async function POST(request: NextRequest) {
     return addRateLimitHeaders(response, rateLimitResult, CONTACT_RATE_LIMIT.maxRequests);
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error('[Contact Form] Unexpected error:', errorMessage);
+    logger.error('[Contact Form] Unexpected error:', errorMessage);
     captureApiError(
       error instanceof Error ? error : new Error(String(error)),
       '/api/contact',

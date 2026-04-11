@@ -2,33 +2,18 @@
 
 import React, { useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Monitor, Shuffle, FileText, Bomb, Target, Check } from 'lucide-react';
-import { Checkbox } from '../../../components/ui/checkbox';
+import { Shuffle, FileText, Bomb, Target, Check } from 'lucide-react';
 import { cn } from '../../../lib/utils';
 import type { GameModeOption } from '@/components/GameModeSelector';
 
-interface PlayerData {
-  username: string;
-  isHost?: boolean;
-  isBot?: boolean;
-}
-
 interface BattleModeCardProps {
-  hostPlaying: boolean;
-  setHostPlaying: React.Dispatch<React.SetStateAction<boolean>>;
   selectedGameMode: GameModeOption;
   setSelectedGameMode: (mode: GameModeOption) => void;
-  gameCode?: string;
-  playersReady?: (string | PlayerData)[];
   t: (path: string, params?: Record<string, string | number>) => string;
   /** When false, blast mode is hidden from the mode selector */
   isAdmin?: boolean;
   /** When true, blast mode is visible (granted by admin) */
   hasBlastAccess?: boolean;
-  /** Compact layout with tighter padding for mobile */
-  compact?: boolean;
-  /** Optional slot rendered at the bottom of the card (e.g. language selector) */
-  children?: React.ReactNode;
 }
 
 // ==================== Mode Visual Configs ====================
@@ -37,121 +22,90 @@ interface ModeVisualConfig {
   mode: GameModeOption;
   icon: React.ReactNode;
   nameKey: string;
-  activeBorder: string;
+  descKey: string;
+  accentColor: string;
   activeText: string;
-  activeGlow: string;
+  activeBg: string;
 }
 
 const MODES: ModeVisualConfig[] = [
   {
     mode: 'random',
-    icon: <Shuffle className="w-5 h-5" />,
+    icon: <Shuffle className="w-4 h-4" />,
     nameKey: 'gameModes.random',
-    activeBorder: 'border-neo-purple',
+    descKey: 'gameModes.randomDescription',
+    accentColor: 'bg-neo-purple',
     activeText: 'text-neo-purple',
-    activeGlow: 'shadow-[0_0_0_2px_rgba(139,92,246,0.25)]',
+    activeBg: 'bg-neo-purple/15 border-neo-purple',
   },
   {
     mode: 'classic',
-    icon: <FileText className="w-5 h-5" />,
+    icon: <FileText className="w-4 h-4" />,
     nameKey: 'gameModes.classic.name',
-    activeBorder: 'border-neo-cyan',
+    descKey: 'gameModes.classic.description',
+    accentColor: 'bg-neo-cyan',
     activeText: 'text-neo-cyan',
-    activeGlow: 'shadow-[0_0_0_2px_rgba(0,255,255,0.25)]',
+    activeBg: 'bg-neo-cyan/15 border-neo-cyan',
   },
   {
     mode: 'blast',
-    icon: <Bomb className="w-5 h-5" />,
+    icon: <Bomb className="w-4 h-4" />,
     nameKey: 'gameModes.blast.name',
-    activeBorder: 'border-neo-orange',
+    descKey: 'gameModes.blast.description',
+    accentColor: 'bg-neo-orange',
     activeText: 'text-neo-orange',
-    activeGlow: 'shadow-[0_0_0_2px_rgba(255,107,53,0.25)]',
+    activeBg: 'bg-neo-orange/15 border-neo-orange',
   },
   {
     mode: 'word-hunt',
-    icon: <Target className="w-5 h-5" />,
+    icon: <Target className="w-4 h-4" />,
     nameKey: 'gameModes.wordHunt.name',
-    activeBorder: 'border-neo-pink',
+    descKey: 'gameModes.wordHunt.description',
+    accentColor: 'bg-neo-pink',
     activeText: 'text-neo-pink',
-    activeGlow: 'shadow-[0_0_0_2px_rgba(255,20,147,0.25)]',
+    activeBg: 'bg-neo-pink/15 border-neo-pink',
   },
 ];
-
-// One-time stagger entrance — plays on mount, doesn't loop
-const containerVariants = {
-  animate: { transition: { staggerChildren: 0.06, delayChildren: 0.05 } },
-};
-
-const cardVariants = {
-  initial: { opacity: 0, y: 8, scale: 0.96 },
-  animate: {
-    opacity: 1, y: 0, scale: 1,
-    transition: { type: 'spring' as const, stiffness: 420, damping: 26 },
-  },
-};
 
 // ==================== Main Component ====================
 
 export function BattleModeCard({
-  hostPlaying,
-  setHostPlaying,
   selectedGameMode,
   setSelectedGameMode,
   t,
-  isAdmin = false,
-  hasBlastAccess = false,
-  compact = false,
-  children,
 }: BattleModeCardProps): React.ReactElement {
-  const visibleModes = MODES;
-
   const handleSelect = useCallback((mode: GameModeOption) => {
     setSelectedGameMode(mode);
   }, [setSelectedGameMode]);
 
+  const activeMode = MODES.find(m => m.mode === selectedGameMode) ?? MODES[0];
+
   return (
-    <section>
-      <div className={cn('bg-neo-navy-light text-neo-cream rounded-xl border-3 border-neo-black shadow-hard', compact ? 'p-2.5' : 'p-3')}>
-        {/* Mode grid — stagger entrance + active glow ring, no continuous effects */}
-        <motion.div
-          variants={containerVariants}
-          initial="initial"
-          animate="animate"
-          className={cn('grid grid-cols-2', compact ? 'gap-1.5' : 'gap-2')}
-        >
-          {visibleModes.map(({ mode, icon, nameKey, activeBorder, activeText, activeGlow }) => {
+    <section className="space-y-2">
+      {/* Horizontal chips row — equal-width */}
+      <div className="space-y-2">
+        <div className="grid grid-cols-4 gap-1.5">
+          {MODES.map(({ mode, icon, nameKey, activeText, activeBg }) => {
             const isActive = selectedGameMode === mode;
 
             return (
               <motion.button
                 key={mode}
                 type="button"
-                variants={cardVariants}
-                whileHover={{ y: -1 }}
-                whileTap={{ scale: 0.97 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={() => handleSelect(mode)}
                 data-testid={`game-mode-${mode}`}
                 className={cn(
-                  'relative flex items-center rounded-neo border-2 text-start transition-[background-color,border-color,box-shadow] duration-200',
-                  compact ? 'gap-2 p-2' : 'gap-2.5 p-2.5',
+                  'flex items-center justify-center gap-1.5 px-2 py-2.5 rounded-neo border-2 text-xs font-bold uppercase transition-all whitespace-nowrap',
                   isActive
-                    ? `${activeBorder} bg-neo-navy ${activeGlow}`
-                    : 'bg-neo-navy/60 border-neo-white/15 hover:border-neo-white/35'
+                    ? `${activeBg} ${activeText}`
+                    : 'bg-white/5 border-neo-white/15 text-neo-cream/60 hover:border-neo-white/30 hover:bg-white/10'
                 )}
               >
-                <motion.div
-                  className={cn('shrink-0', isActive ? activeText : 'text-neo-cream/60')}
-                  animate={isActive ? { scale: [1, 1.15, 1] } : { scale: 1 }}
-                  transition={{ duration: 0.35, ease: 'easeOut' }}
-                >
+                <span className={cn(isActive ? activeText : 'text-neo-cream/50')}>
                   {icon}
-                </motion.div>
-                <p className={cn(
-                  'font-bold text-sm leading-tight flex-1 min-w-0 truncate',
-                  isActive ? activeText : 'text-neo-cream'
-                )}>
-                  {t(nameKey)}
-                </p>
+                </span>
+                <span>{t(nameKey)}</span>
                 <AnimatePresence mode="wait">
                   {isActive && (
                     <motion.div
@@ -160,41 +114,33 @@ export function BattleModeCard({
                       animate={{ scale: 1 }}
                       exit={{ scale: 0 }}
                       transition={{ type: 'spring', stiffness: 500, damping: 20 }}
-                      className="shrink-0"
                     >
-                      <Check className={cn('w-4 h-4', activeText)} strokeWidth={3} />
+                      <Check className={cn('w-3 h-3', activeText)} strokeWidth={3} />
                     </motion.div>
                   )}
                 </AnimatePresence>
               </motion.button>
             );
           })}
-        </motion.div>
-
-        {/* Broadcast Mode - desktop only */}
-        <div className="mt-3 pt-3 border-t border-neo-white/10 hidden lg:flex items-center gap-2">
-          <Monitor className="w-4 h-4 text-neo-cream/50 shrink-0" />
-          <Checkbox
-            id={`broadcastMode-${compact ? 'mobile' : 'desktop'}`}
-            checked={!hostPlaying}
-            onCheckedChange={(checked) => setHostPlaying(checked !== true)}
-            aria-label={t('hostView.broadcastModeTitle')}
-          />
-          <label
-            htmlFor={`broadcastMode-${compact ? 'mobile' : 'desktop'}`}
-            className="text-xs font-bold uppercase text-neo-cream/80 cursor-pointer flex-1"
-          >
-            {t('hostView.broadcastModeTitle')}
-          </label>
         </div>
-
-        {/* Optional footer slot (e.g. language selector) */}
-        {children && (
-          <div className="mt-3 pt-3 border-t border-neo-white/10">
-            {children}
-          </div>
-        )}
       </div>
+
+      {/* Active mode description — one line with colored pip */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={activeMode.mode}
+          initial={{ opacity: 0, y: -4 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 4 }}
+          transition={{ duration: 0.15 }}
+          className="flex items-center gap-2 px-1"
+        >
+          <div className={cn('w-1.5 h-1.5 rounded-full shrink-0', activeMode.accentColor)} />
+          <p className="text-xs text-neo-cream/50 font-medium truncate">
+            {t(activeMode.descKey)}
+          </p>
+        </motion.div>
+      </AnimatePresence>
     </section>
   );
 }

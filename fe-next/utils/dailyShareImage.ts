@@ -10,6 +10,7 @@
  */
 
 import type { Language } from '@/types';
+import logger from '@/utils/logger';
 
 // ==========================================
 // Types
@@ -599,7 +600,7 @@ export async function shareDailyImage(
         return true;
       }
     } catch (error) {
-      console.log('Image share failed, trying text only:', error);
+      logger.log('Image share failed, trying text only:', error);
     }
   }
 

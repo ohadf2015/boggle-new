@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import logger from '@/utils/logger';
 import { verifyAdminAuth } from '@/lib/auth/adminAuth';
 import { getSupabaseAdmin } from '@/lib/admin/server';
 import { regenerateDailyPuzzle } from '@/utils/dailyChallenge/gridGeneration.server';
@@ -97,7 +98,7 @@ export async function POST(request: NextRequest) {
         .eq('id', existing.id);
 
       if (updateError) {
-        console.error('Update word error:', updateError);
+        logger.error('Update word error:', updateError);
         captureApiError(new Error(updateError.message), '/api/admin/daily-word/replace', {
           method: 'POST',
           statusCode: 500,
@@ -134,7 +135,7 @@ export async function POST(request: NextRequest) {
         });
 
       if (insertError) {
-        console.error('Insert word error:', insertError);
+        logger.error('Insert word error:', insertError);
         captureApiError(new Error(insertError.message), '/api/admin/daily-word/replace', {
           method: 'POST',
           statusCode: 500,
@@ -157,7 +158,7 @@ export async function POST(request: NextRequest) {
     // This must happen BEFORE board regeneration so any concurrent requests
     // fetch the new word from the database
     const cacheInvalidated = await invalidateDailyPuzzleCache(puzzleDate, language);
-    console.log(`[Admin] Cache invalidation for ${puzzleDate}/${language}: ${cacheInvalidated ? 'success' : 'skipped/failed'}`);
+    logger.log(`[Admin] Cache invalidation for ${puzzleDate}/${language}: ${cacheInvalidated ? 'success' : 'skipped/failed'}`);
 
     // Regenerate board immediately if requested (default: true)
     let boardRegenerateResult = null;
@@ -173,7 +174,7 @@ export async function POST(request: NextRequest) {
         };
       } catch (regenerateError) {
         const errorMessage = regenerateError instanceof Error ? regenerateError.message : 'Unknown error';
-        console.error('Board regeneration error:', regenerateError);
+        logger.error('Board regeneration error:', regenerateError);
         captureApiError(
           regenerateError instanceof Error ? regenerateError : new Error('Unknown error'),
           '/api/admin/daily-word/replace',
@@ -212,7 +213,7 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Internal server error';
-    console.error('Replace word error:', error);
+    logger.error('Replace word error:', error);
     captureApiError(
       error instanceof Error ? error : new Error('Unknown error'),
       '/api/admin/daily-word/replace',

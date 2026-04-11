@@ -60,7 +60,10 @@ function getConnectionRateLimiter(): RateLimiterAbstract {
  */
 export function httpRateLimitMiddleware() {
   return async (req: any, res: any, next: any) => {
-    const ip = req.ip || req.headers['x-forwarded-for'] || 'unknown';
+    // Use rightmost IP from X-Forwarded-For (proxy-appended, not client-controlled)
+    const forwardedFor = req.headers['x-forwarded-for'];
+    const forwardedIps = typeof forwardedFor === 'string' ? forwardedFor.split(',').map((s: string) => s.trim()).filter(Boolean) : [];
+    const ip = (forwardedIps.length > 0 ? forwardedIps[forwardedIps.length - 1] : undefined) || req.socket?.remoteAddress || 'unknown';
     try {
       // Timeout rate limit check to prevent slow Redis from blocking all HTTP requests
       const result = await Promise.race([

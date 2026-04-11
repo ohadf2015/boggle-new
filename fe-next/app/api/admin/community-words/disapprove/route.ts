@@ -5,6 +5,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import logger from '@/utils/logger';
 import { verifyAdminAuth } from '@/lib/auth/adminAuth';
 import { getSupabaseAdmin } from '@/lib/admin/server';
 import { captureApiError } from '@/utils/sentry';
@@ -41,7 +42,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (fetchError) {
-      console.error('[admin/disapprove] Error fetching word:', fetchError);
+      logger.error('[admin/disapprove] Error fetching word:', fetchError);
       return NextResponse.json({ error: 'Word not found' }, { status: 404 });
     }
 
@@ -61,7 +62,7 @@ export async function POST(request: NextRequest) {
       .eq('language', language);
 
     if (updateError) {
-      console.error('[admin/disapprove] Error updating word:', updateError);
+      logger.error('[admin/disapprove] Error updating word:', updateError);
       captureApiError(new Error(updateError.message), '/api/admin/community-words/disapprove', {
         method: 'POST',
         statusCode: 500,
@@ -73,7 +74,7 @@ export async function POST(request: NextRequest) {
     // If blacklist is true, add to blacklist table (optional - implement if table exists)
     if (blacklist) {
       // TODO: Implement blacklist table if needed
-      console.log('[admin/disapprove] Blacklist not yet implemented');
+      logger.log('[admin/disapprove] Blacklist not yet implemented');
     }
 
     return NextResponse.json({
@@ -83,7 +84,7 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Internal server error';
-    console.error('[admin/disapprove] Error:', error);
+    logger.error('[admin/disapprove] Error:', error);
     captureApiError(
       error instanceof Error ? error : new Error('Unknown error'),
       '/api/admin/community-words/disapprove',

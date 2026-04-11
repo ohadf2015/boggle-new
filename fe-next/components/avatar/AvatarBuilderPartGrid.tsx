@@ -37,7 +37,7 @@ const BUTTON_SPRING = { type: 'spring' as const, stiffness: 400, damping: 17 };
 
 export interface PartPreviewGridProps<T extends string> {
   label: string;
-  partType: 'base' | 'eyes' | 'eyebrows' | 'mouth' | 'hair' | 'accessory' | 'facialHair';
+  partType: 'base' | 'eyes' | 'eyebrows' | 'mouth' | 'hair' | 'accessory' | 'facialHair' | 'nose';
   /** The avatar config category key used for premium checks */
   premiumCategory?: string;
   options: readonly T[];

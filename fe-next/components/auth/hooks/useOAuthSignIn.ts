@@ -116,8 +116,9 @@ export function useOAuthSignIn(options: UseOAuthSignInOptions = {}): UseOAuthSig
           return;
         }
 
-        // TODO: TEMPORARY DEBUG — catch-all for unexpected result shapes
-        setError(`DEBUG native result: ${JSON.stringify(nativeResult)}`);
+        // Unexpected result shape — log for debugging, show generic error to user
+        logger.error(`[useOAuthSignIn] Unexpected native OAuth result: ${JSON.stringify(nativeResult)}`);
+        setError('Sign in failed. Please try again.');
         return;
       }
 

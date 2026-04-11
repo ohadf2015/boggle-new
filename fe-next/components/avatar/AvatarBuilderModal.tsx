@@ -3,7 +3,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
 import { createPortal } from 'react-dom';
-import { X, Shuffle, Undo2, SmilePlus, Scissors, Eye, Smile, Sparkles, Palette, Coins, Brush } from 'lucide-react';
+import { X, Shuffle, Undo2, Download, SmilePlus, Scissors, Eye, Smile, Sparkles, Palette, Coins, Brush } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import AvatarRenderer from './AvatarRenderer';
@@ -122,6 +122,32 @@ export default function AvatarBuilderModal({
     onClose();
   }, [config, onSave, onClose]);
 
+  const previewRef = useRef<HTMLDivElement>(null);
+  const handleDownload = useCallback(() => {
+    const svgEl = previewRef.current?.querySelector('svg');
+    if (!svgEl) return;
+    const clone = svgEl.cloneNode(true) as SVGElement;
+    clone.setAttribute('width', '512');
+    clone.setAttribute('height', '512');
+    const xml = new XMLSerializer().serializeToString(clone);
+    const blob = new Blob([xml], { type: 'image/svg+xml;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = 512;
+      canvas.height = 512;
+      const ctx = canvas.getContext('2d')!;
+      ctx.drawImage(img, 0, 0);
+      URL.revokeObjectURL(url);
+      const link = document.createElement('a');
+      link.download = 'my-avatar.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    };
+    img.src = url;
+  }, []);
+
   const dialogRef = useRef<HTMLDivElement>(null);
   useFocusTrap(dialogRef, isOpen, onClose);
 
@@ -167,7 +193,7 @@ export default function AvatarBuilderModal({
         </div>
 
         {/* Preview — jelly wobble on every change */}
-        <div className="flex justify-center py-2 sm:py-5">
+        <div ref={previewRef} className="flex justify-center py-2 sm:py-5">
           <AdaptiveMotion.div
             key={previewKey}
             initial={{ scaleX: 1.06, scaleY: 0.94, rotate: -1.5 }}
@@ -251,6 +277,15 @@ export default function AvatarBuilderModal({
             title={t('avatar.builder.undo')}
           >
             <Undo2 size={16} />
+          </AdaptiveMotion.button>
+          <AdaptiveMotion.button
+            onClick={handleDownload}
+            whileTap={{ scale: 0.88 }}
+            transition={BUTTON_SPRING}
+            className="flex items-center gap-1.5 px-3 py-2 bg-neo-navy-light text-neo-white/70 font-bold rounded-neo border-2 border-neo-white/20 hover:border-neo-white/50 transition-all"
+            title={t('avatar.builder.download') || 'Download'}
+          >
+            <Download size={16} />
           </AdaptiveMotion.button>
           <div className="flex-1" />
           <button

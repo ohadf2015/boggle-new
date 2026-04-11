@@ -62,8 +62,7 @@ export function AnalyticsPageClient({ classroomId, locale }: AnalyticsPageClient
   } = useRealtimeClassroomProgress({
     classroomId,
     enabled: true,
-    onStudentActivity: (studentId, activity) => {
-      console.log(`Student ${studentId} activity: ${activity}`);
+    onStudentActivity: () => {
       // Activity updates will trigger re-renders in analytics hooks
     },
   });
@@ -96,19 +95,16 @@ export function AnalyticsPageClient({ classroomId, locale }: AnalyticsPageClient
     router.push(`/${locale}/teacher/classroom/${classroomId}`);
   };
 
-  const handleViewStudents = (filter: 'struggling') => {
+  const handleViewStudents = (_filter: 'struggling') => {
     // Navigate to students tab with filter
-    console.log('Filter students:', filter);
   };
 
-  const handleCreateReviewLesson = (words: string[]) => {
+  const handleCreateReviewLesson = (_words: string[]) => {
     // Navigate to lesson creation with pre-filled words
-    console.log('Create review lesson with words:', words);
   };
 
-  const handleStudentClick = (studentId: string) => {
+  const handleStudentClick = (_studentId: string) => {
     // Navigate to individual student detail
-    console.log('View student:', studentId);
   };
 
   // ==================== RENDER ====================

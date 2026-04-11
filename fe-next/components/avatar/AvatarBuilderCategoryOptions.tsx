@@ -7,6 +7,7 @@ import {
   AVATAR_HAIR_COLORS,
   AVATAR_EYE_STYLES,
   AVATAR_EYEBROW_STYLES,
+  AVATAR_NOSE_STYLES,
   AVATAR_MOUTH_STYLES,
   AVATAR_ACCESSORIES,
   AVATAR_ACCESSORY_COLORS,
@@ -14,6 +15,7 @@ import {
   AVATAR_SHIRT_COLORS,
   AVATAR_BODY_STYLES,
   AVATAR_FACIAL_HAIR_STYLES,
+  AVATAR_EYE_COLORS,
   FEMALE_HAIR_STYLES,
   MALE_HAIR_STYLES,
   isPremiumPart,
@@ -41,6 +43,27 @@ const COLOR_THEMES: ColorTheme[] = [
   { name: 'toxic', labelKey: 'avatarBuilder.theme.toxic', colors: { skinColor: '#D08B5B', hairColor: '#4A3728', bgColor: '#00897B', shirtColor: '#2C1B18', accessoryColor: '#BFFF00' } },
   { name: 'royal', labelKey: 'avatarBuilder.theme.royal', colors: { skinColor: '#694D3D', hairColor: '#2C1B18', bgColor: '#8B5CF6', shirtColor: '#FFD700', accessoryColor: '#FFD700' } },
   { name: 'pop', labelKey: 'avatarBuilder.theme.pop', colors: { skinColor: '#FFE0BD', hairColor: '#FF1493', bgColor: '#FFE135', shirtColor: '#FF6B35', accessoryColor: '#FF1493' } },
+];
+
+// ==================== Expression Presets ====================
+interface ExpressionPreset {
+  name: string;
+  labelKey: string;
+  emoji: string;
+  eyes: string;
+  eyebrows: string;
+  mouth: string;
+}
+
+const EXPRESSION_PRESETS: ExpressionPreset[] = [
+  { name: 'happy', labelKey: 'avatar.expression.happy', emoji: '😊', eyes: 'happy', eyebrows: 'natural', mouth: 'smile' },
+  { name: 'cool', labelKey: 'avatar.expression.cool', emoji: '😎', eyes: 'cool', eyebrows: 'flat', mouth: 'smirk' },
+  { name: 'angry', labelKey: 'avatar.expression.angry', emoji: '😠', eyes: 'angry', eyebrows: 'angry', mouth: 'flat' },
+  { name: 'sad', labelKey: 'avatar.expression.sad', emoji: '😢', eyes: 'sad', eyebrows: 'worried', mouth: 'frown' },
+  { name: 'silly', labelKey: 'avatar.expression.silly', emoji: '🤪', eyes: 'dizzy', eyebrows: 'raised', mouth: 'tongue' },
+  { name: 'sleepy', labelKey: 'avatar.expression.sleepy', emoji: '😴', eyes: 'sleepy', eyebrows: 'flat', mouth: 'flat' },
+  { name: 'wink', labelKey: 'avatar.expression.wink', emoji: '😉', eyes: 'wink', eyebrows: 'natural', mouth: 'smirk' },
+  { name: 'surprised', labelKey: 'avatar.expression.surprised', emoji: '😮', eyes: 'wide', eyebrows: 'raised', mouth: 'oh' },
 ];
 
 export interface CategoryOptionsProps {
@@ -111,6 +134,31 @@ export default function CategoryOptions({ category, config, updateConfig, t, pre
     case 'eyes':
       return (
         <div className="space-y-3">
+          {/* Expression Presets — one-click emotion combos */}
+          <div>
+            <p className="text-neo-white/60 text-xs font-bold uppercase mb-2">
+              {t('avatar.builder.expressions') || 'Expressions'}
+            </p>
+            <div className="flex flex-wrap gap-1.5">
+              {EXPRESSION_PRESETS.map(preset => (
+                <button
+                  key={preset.name}
+                  onClick={() => {
+                    updateConfig('eyes', preset.eyes as CustomAvatarConfig['eyes']);
+                    updateConfig('eyebrows', preset.eyebrows as CustomAvatarConfig['eyebrows']);
+                    updateConfig('mouth', preset.mouth as CustomAvatarConfig['mouth']);
+                  }}
+                  className="flex items-center gap-1 px-2 py-1.5 rounded-neo border-2 border-neo-white/15 hover:border-neo-white/40 bg-neo-navy-light hover:bg-neo-navy-light/80 transition-colors"
+                  title={t(preset.labelKey) || preset.name}
+                >
+                  <span className="text-base">{preset.emoji}</span>
+                  <span className="text-neo-white/70 text-xs font-bold capitalize">
+                    {t(preset.labelKey) || preset.name}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
           <PartPreviewGrid
             label={t('avatar.builder.style')}
             partType="eyes"
@@ -119,6 +167,25 @@ export default function CategoryOptions({ category, config, updateConfig, t, pre
             selected={config.eyes}
             onSelect={v => updateConfig('eyes', v)}
             config={config}
+            premium={premium}
+            t={t}
+            onCoinSpend={onCoinSpend}
+          />
+          <ColorStrip
+            label={t('avatar.builder.eyeColor') || 'Iris Color'}
+            colors={AVATAR_EYE_COLORS}
+            selected={config.eyeColor || '#4A6FA5'}
+            onSelect={v => updateConfig('eyeColor', v)}
+          />
+          <PartPreviewGrid
+            label={t('avatar.builder.nose') || 'Nose'}
+            partType="nose"
+            premiumCategory="nose"
+            options={AVATAR_NOSE_STYLES}
+            selected={config.noseStyle ?? 'none'}
+            onSelect={v => updateConfig('noseStyle', v)}
+            config={config}
+            noneLabel={t('avatar.builder.none')}
             premium={premium}
             t={t}
             onCoinSpend={onCoinSpend}

@@ -79,7 +79,6 @@ export function usePartySocket(authUserId?: string | null, enabled: boolean = tr
     if (!enabled) return;
 
     const socketUrl = getSocketURL();
-    console.log('[PARTY] Connecting to socket:', socketUrl, 'authUserId:', authUserId);
     const newSocket = io(socketUrl, {
       transports: ['websocket', 'polling'],
       auth: { userId: authUserId || undefined },
@@ -89,7 +88,6 @@ export function usePartySocket(authUserId?: string | null, enabled: boolean = tr
     socketRef.current = newSocket;
 
     newSocket.on('connect', () => {
-      console.log('[PARTY] Socket connected, id:', newSocket.id);
       setConnected(true);
       setError(null);
     });
@@ -99,14 +97,12 @@ export function usePartySocket(authUserId?: string | null, enabled: boolean = tr
       setError(err.message);
     });
 
-    newSocket.on('disconnect', (reason) => {
-      console.log('[PARTY] Socket disconnected:', reason);
+    newSocket.on('disconnect', () => {
       setConnected(false);
     });
 
     // Party events
     newSocket.on('party:joined', (data: { room: Record<string, unknown>; playerId: string }) => {
-      console.log('[PARTY] Joined room:', (data.room as any)?.roomCode, 'playerId:', data.playerId);
       setRoom(data.room as unknown as PartyRoomState);
       setGameState((data.room as Record<string, unknown>).gameState as PartyGameStatePublic);
       setPlayerId(data.playerId);

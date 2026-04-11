@@ -241,9 +241,9 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
                     textColor
                   )}
                 >
-                  {visibleFeedback?.type === 'accepted' && '✓'}
-                  {visibleFeedback?.type === 'rejected' && '✗'}
-                  {visibleFeedback?.type === 'duplicate' && '⟳'}
+                  {visibleFeedback?.type === 'accepted' && <span aria-label={t('wordFeedback.accepted')}>✓</span>}
+                  {visibleFeedback?.type === 'rejected' && <span aria-label={t('wordFeedback.rejected')}>✗</span>}
+                  {visibleFeedback?.type === 'duplicate' && <span aria-label={t('wordFeedback.duplicateWord')}>⟳</span>}
                   {visibleFeedback?.type === 'foundByOther' && (
                     <Avatar
                       customAvatar={visibleFeedback?.foundByAvatar?.customAvatar}
@@ -355,7 +355,8 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
                     'bg-linear-to-br from-neo-pink to-neo-purple text-white font-black rounded-neo border-2 border-neo-black',
                     compact ? 'text-sm px-2 py-0.5' : 'text-base px-2.5 py-1'
                   )}
-                  title="Lesson vocabulary word!"
+                  title={t('wordFeedback.lessonWordTitle')}
+                  aria-label={t('wordFeedback.lessonWordTitle')}
                 >
                   📚
                 </motion.span>

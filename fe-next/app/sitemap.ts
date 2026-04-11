@@ -4,8 +4,8 @@ const BASE_URL = 'https://www.lexiclash.live';
 const LOCALES = ['he', 'en', 'sv', 'ja', 'es'] as const;
 
 // Use stable dates instead of new Date() to avoid telling Google every page changed on every request.
-// Update these dates when actual content changes are deployed.
-const LAST_DEPLOYED = '2026-03-26T00:00:00.000Z';
+// NEXT_PUBLIC_BUILD_TIME is set in next.config.mjs at build time, so this auto-updates on deploy.
+const LAST_DEPLOYED = process.env.NEXT_PUBLIC_BUILD_TIME || '2026-03-26T00:00:00.000Z';
 const BLOG_UPDATED = '2026-03-16T00:00:00.000Z';
 const LEGAL_UPDATED = '2026-02-01T00:00:00.000Z';
 const GUIDES_UPDATED = '2026-03-01T00:00:00.000Z';

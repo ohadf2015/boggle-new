@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import logger from '@/utils/logger';
 import { isEmailServiceConfigured } from '@/lib/email';
 import {
   getReengagementRecipients,
@@ -32,9 +33,9 @@ export async function POST(request: NextRequest) {
   try {
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://lexiclash.com';
 
-    console.log('[Reengagement Cron] Starting...');
+    logger.log('[Reengagement Cron] Starting...');
     const recipients = await getReengagementRecipients();
-    console.log(`[Reengagement Cron] Found ${recipients.length} eligible recipients`);
+    logger.log(`[Reengagement Cron] Found ${recipients.length} eligible recipients`);
 
     if (recipients.length === 0) {
       return NextResponse.json({ success: true, message: 'No eligible recipients', sent: 0, failed: 0 });
@@ -68,7 +69,7 @@ export async function POST(request: NextRequest) {
       else { failed++; errors.push(`${recipient.email}: ${result.error}`); }
     }
 
-    console.log(`[Reengagement Cron] Done: ${sent} sent, ${failed} failed`);
+    logger.log(`[Reengagement Cron] Done: ${sent} sent, ${failed} failed`);
     return NextResponse.json({
       success: true,
       sent,
@@ -76,7 +77,7 @@ export async function POST(request: NextRequest) {
       errors: errors.length > 0 ? errors : undefined,
     });
   } catch (error) {
-    console.error('[Reengagement Cron] Error:', error);
+    logger.error('[Reengagement Cron] Error:', error);
     captureApiError(
       error instanceof Error ? error : new Error(String(error)),
       '/api/email/send-reengagement',

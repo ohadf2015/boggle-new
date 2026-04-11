@@ -4162,6 +4162,10 @@ const ja = {
   "wordFeedback": {
     "invalid": "無効な単語です",
     "duplicate": "発見済みです",
+    "accepted": "単語が認められました",
+    "rejected": "単語が拒否されました",
+    "duplicateWord": "重複した単語",
+    "lessonWordTitle": "レッスンの語彙!",
     "dictionaryTitle": "辞書を作ろう",
     "submittedBy": "提出者",
     "skipHint": "ESCでスキップ",
@@ -4926,6 +4930,47 @@ const ja = {
     "requestChallenge": "チャレンジをリクエスト",
     "requestSent": "リクエスト送信済み",
     "watchAdRetry": "広告を見てリトライ"
+  },
+  "wordWheel": {
+    "title": "ワードホイール",
+    "badge": "ワードホイール",
+    "subtitle": "ホイールの文字を使って単語を見つけよう",
+    "description": "すべての単語に中央の文字を含める必要があります",
+    "centerLetterRule": "中央の文字を使う必要があります",
+    "minLetters": "最低{min}文字",
+    "wordsFound": "{count}語見つかりました",
+    "scoreLabel": "スコア",
+    "timeLeft": "残り時間",
+    "gameOver": "時間切れ！",
+    "submit": "送信",
+    "alreadyFound": "すでに見つかりました！",
+    "notInDictionary": "有効な単語ではありません",
+    "missingCenter": "中央の文字（{letter}）を含める必要があります",
+    "tooShort": "短すぎます（最低{min}文字）",
+    "invalidLetters": "ホイールの文字のみ使用できます",
+    "inputPlaceholder": "単語を入力...",
+    "foundWords": "見つかった単語",
+    "possibleWords": "可能",
+    "excellent": "素晴らしい！",
+    "great": "よくできました！",
+    "good": "よく頑張りました！",
+    "tryAgain": "練習を続けましょう！",
+    "results": {
+      "title": "ワードホイール結果",
+      "wordsFound": "見つかった単語",
+      "score": "スコア",
+      "time": "時間",
+      "rank": "あなたの順位",
+      "share": "結果をシェア",
+      "playWordHunt": "ワードハントも遊ぼう！",
+      "playWordWheel": "ワードホイールもプレイ！"
+    },
+    "hub": {
+      "wordWheelQuest": "ワードホイール",
+      "wordWheelDesc": "ホイールで単語を見つけよう — 中央の文字必須！",
+      "wordHuntQuest": "ワードハント",
+      "wordHuntDesc": "10回以内に隠れた単語を当てよう"
+    }
   },
   "dailyChallenge": {
     "pointsPerWord": "単語あたりのポイント"
@@ -8480,6 +8525,12 @@ const ja = {
       "export": {
         "pdf": "PDF出力",
         "downloading": "ダウンロード中..."
+      },
+      "columns": {
+        "word": "単語",
+        "status": "ステータス",
+        "accuracy": "正確さ",
+        "attempts": "試行回数"
       }
     },
     "curriculum": {

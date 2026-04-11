@@ -7,6 +7,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import logger from '@/utils/logger';
 import { verifyAdminAuth } from '@/lib/auth/adminAuth';
 import {
   getWordCandidatesForAdmin,
@@ -25,12 +26,9 @@ export const maxDuration = 90;
 const SUPPORTED_LANGUAGES: Language[] = ['en', 'he', 'sv', 'ja', 'es', 'fr', 'de'];
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
-  console.log('[Admin Wikipedia] GET request received');
-
   // Verify admin authentication
   const authResult = await verifyAdminAuth(request);
   if (!authResult.success) {
-    console.log('[Admin Wikipedia] GET auth failed:', authResult.error);
     return authResult.response!;
   }
   // Auth passed — do not log user email (PII)
@@ -79,7 +77,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
         const existingSet = new Set(existingWords.map(w => w.word.toUpperCase()));
         const originalCount = candidates.length;
         candidates = candidates.filter(c => !existingSet.has(c.word.toUpperCase()));
-        console.log(`[Admin Wikipedia] Filtered out ${originalCount - candidates.length} existing words`);
+        logger.log(`[Admin Wikipedia] Filtered out ${originalCount - candidates.length} existing words`);
       }
     }
 
@@ -95,7 +93,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    console.error('[Admin Wikipedia] Error fetching candidates:', errorMessage);
+    logger.error('[Admin Wikipedia] Error fetching candidates:', errorMessage);
     return NextResponse.json(
       { error: 'Failed to fetch word candidates' },
       { status: 500 }
@@ -104,13 +102,11 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 }
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
-  console.log('[Admin Wikipedia] POST request received');
   const startTime = Date.now();
 
   // Verify admin authentication
   const authResult = await verifyAdminAuth(request);
   if (!authResult.success) {
-    console.log('[Admin Wikipedia] POST auth failed:', authResult.error);
     return authResult.response!;
   }
   // Auth passed — do not log user email (PII)
@@ -118,7 +114,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
     const body = await request.json();
     const { action, date, language, word, candidateId, status } = body;
-    console.log('[Admin Wikipedia] POST action:', action, 'language:', language, 'date:', date);
+    logger.log('[Admin Wikipedia] POST action:', action, 'language:', language, 'date:', date);
 
     // Validate language
     if (language && !SUPPORTED_LANGUAGES.includes(language as Language)) {
@@ -161,14 +157,14 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
       case 'populate': {
         // Trigger Wikipedia word population
-        console.log('[Admin Wikipedia] Starting population trigger...');
+        logger.log('[Admin Wikipedia] Starting population trigger...');
         const targetDate = date ? new Date(date) : new Date();
         const targetLanguage = language as Language | undefined;
 
         const result = await triggerWikipediaWordPopulation(targetDate, targetLanguage);
 
         const duration = Date.now() - startTime;
-        console.log(`[Admin Wikipedia] Population completed in ${duration}ms, success:`, result.success);
+        logger.log(`[Admin Wikipedia] Population completed in ${duration}ms, success:`, result.success);
 
         return NextResponse.json({
           success: result.success,
@@ -178,7 +174,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
       case 'sync-json': {
         // Sync local JSON files to database
-        console.log('[Admin Wikipedia] Starting JSON sync...');
+        logger.log('[Admin Wikipedia] Starting JSON sync...');
         const targetLanguage = language as Language | undefined;
 
         // Create Supabase client for word bank import
@@ -204,12 +200,12 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
                 if (validCandidates && validCandidates.length > 0) {
                   const words = validCandidates.map(c => c.word);
                   const importResult = await importWikipediaWordsToBank(supabase, lang as Language, words);
-                  console.log(
+                  logger.log(
                     `[Admin Wikipedia] Auto-imported ${importResult.inserted} words to word bank for ${lang} (${importResult.skipped} skipped, ${importResult.errors} errors)`
                   );
                 }
               } catch (importError) {
-                console.error(`[Admin Wikipedia] Word bank import failed for ${lang}:`, importError);
+                logger.error(`[Admin Wikipedia] Word bank import failed for ${lang}:`, importError);
                 // Don't fail the entire operation - sync succeeded
               }
             }
@@ -217,7 +213,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         }
 
         const duration = Date.now() - startTime;
-        console.log(`[Admin Wikipedia] JSON sync completed in ${duration}ms, success:`, result.success);
+        logger.log(`[Admin Wikipedia] JSON sync completed in ${duration}ms, success:`, result.success);
 
         return NextResponse.json({
           success: result.success,
@@ -227,7 +223,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
       case 'auto-approve-existing': {
         // Automatically approve candidates that already exist in dictionary
-        console.log('[Admin Wikipedia] Starting auto-approve existing words...');
+        logger.log('[Admin Wikipedia] Starting auto-approve existing words...');
         const targetLanguage = language as Language;
 
         if (!targetLanguage) {
@@ -247,7 +243,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
           .eq('validation_status', 'pending');
 
         if (fetchError) {
-          console.error('[Admin Wikipedia] Error fetching pending candidates:', fetchError);
+          logger.error('[Admin Wikipedia] Error fetching pending candidates:', fetchError);
           return NextResponse.json(
             { error: 'Failed to fetch pending candidates' },
             { status: 500 }
@@ -294,7 +290,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
           .in('id', toApprove.map(c => c.id));
 
         if (updateError) {
-          console.error('[Admin Wikipedia] Error updating candidates:', updateError);
+          logger.error('[Admin Wikipedia] Error updating candidates:', updateError);
           return NextResponse.json(
             { error: 'Failed to update candidate statuses' },
             { status: 500 }
@@ -302,7 +298,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         }
 
         const duration = Date.now() - startTime;
-        console.log(`[Admin Wikipedia] Auto-approved ${toApprove.length} existing words in ${duration}ms`);
+        logger.log(`[Admin Wikipedia] Auto-approved ${toApprove.length} existing words in ${duration}ms`);
 
         return NextResponse.json({
           success: true,
@@ -315,7 +311,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
       case 'approve-all-pending': {
         // Approve all pending candidates (add to dictionary without AI validation)
-        console.log('[Admin Wikipedia] Approving all pending candidates...');
+        logger.log('[Admin Wikipedia] Approving all pending candidates...');
         const targetLanguage = language as Language;
 
         if (!targetLanguage) {
@@ -382,7 +378,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
             });
 
           if (insertError) {
-            console.error('[Admin Wikipedia] Error inserting words:', insertError);
+            logger.error('[Admin Wikipedia] Error inserting words:', insertError);
           }
         }
 
@@ -393,7 +389,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
           .in('id', pendingCandidates.map(c => c.id));
 
         const duration = Date.now() - startTime;
-        console.log(`[Admin Wikipedia] Approved ${pendingCandidates.length} candidates (${newWords.length} new) in ${duration}ms`);
+        logger.log(`[Admin Wikipedia] Approved ${pendingCandidates.length} candidates (${newWords.length} new) in ${duration}ms`);
 
         return NextResponse.json({
           success: true,
@@ -406,7 +402,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
       case 'schedule-for-daily': {
         // Schedule approved Wikipedia words as daily challenge target words
-        console.log('[Admin Wikipedia] Scheduling words for daily challenges...');
+        logger.log('[Admin Wikipedia] Scheduling words for daily challenges...');
         const targetLanguage = language as Language;
         const startDate = body.startDate; // YYYY-MM-DD format
         const limit = body.limit || 30; // Number of words to schedule
@@ -439,7 +435,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
           .limit(limit * 3); // Fetch extra to account for filtering
 
         if (fetchError) {
-          console.error('[Admin Wikipedia] Error fetching approved words:', fetchError);
+          logger.error('[Admin Wikipedia] Error fetching approved words:', fetchError);
           return NextResponse.json(
             { error: 'Failed to fetch approved words' },
             { status: 500 }
@@ -516,7 +512,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
           .select();
 
         if (insertError) {
-          console.error('[Admin Wikipedia] Error scheduling words:', insertError);
+          logger.error('[Admin Wikipedia] Error scheduling words:', insertError);
           return NextResponse.json(
             { error: `Failed to schedule words: ${insertError.message}` },
             { status: 500 }
@@ -524,7 +520,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         }
 
         const duration = Date.now() - startTime;
-        console.log(`[Admin Wikipedia] Scheduled ${inserted?.length || 0} words in ${duration}ms`);
+        logger.log(`[Admin Wikipedia] Scheduled ${inserted?.length || 0} words in ${duration}ms`);
 
         return NextResponse.json({
           success: true,
@@ -548,7 +544,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    console.error('[Admin Wikipedia] Error processing request:', errorMessage);
+    logger.error('[Admin Wikipedia] Error processing request:', errorMessage);
     return NextResponse.json(
       { error: 'Failed to process request' },
       { status: 500 }

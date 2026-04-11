@@ -4,10 +4,14 @@
  */
 
 import { STROKE_INNER } from './avatarDesignConstants';
+import { useAvatarUid } from '../AvatarUidContext';
+import { useEyeColor, useEyeColorDark } from '../AvatarEyeColorContext';
 
 const S = STROKE_INNER;
 
 function Round() {
+  const ec = useEyeColor();
+  const ecd = useEyeColorDark();
   return (
     <g>
       {/* Sclera — bigger for caricature feel */}
@@ -16,10 +20,10 @@ function Round() {
       <path d="M31.5 40 Q38 36.5 44.5 40" fill="#000" opacity="0.06" />
       <path d="M55.5 40 Q62 36.5 68.5 40" fill="#000" opacity="0.06" />
       {/* Iris — two-tone for depth */}
-      <circle cx="39" cy="41.5" r="4.2" fill="#4A6FA5" />
-      <circle cx="63" cy="41.5" r="4.2" fill="#4A6FA5" />
-      <circle cx="39" cy="42.5" r="3.6" fill="#3A5A8A" opacity="0.4" />
-      <circle cx="63" cy="42.5" r="3.6" fill="#3A5A8A" opacity="0.4" />
+      <circle cx="39" cy="41.5" r="4.2" fill={ec} />
+      <circle cx="63" cy="41.5" r="4.2" fill={ec} />
+      <circle cx="39" cy="42.5" r="3.6" fill={ecd} opacity="0.4" />
+      <circle cx="63" cy="42.5" r="3.6" fill={ecd} opacity="0.4" />
       {/* Pupil — 55% of iris */}
       <circle cx="39" cy="41.5" r="2.5" fill="#000" />
       <circle cx="63" cy="41.5" r="2.5" fill="#000" />
@@ -48,16 +52,17 @@ function Sleepy() {
 }
 
 function Star() {
+  const u = useAvatarUid();
   return (
     <g>
       <defs>
-        <linearGradient id="starEyeGrad" x1="0" y1="0" x2="0" y2="1">
+        <linearGradient id={`${u}starEyeGrad`} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor="#FFF176" />
           <stop offset="100%" stopColor="#FFB300" />
         </linearGradient>
       </defs>
-      <polygon points="38,37 39.5,40.5 43,41 40.5,43.5 41,47 38,45 35,47 35.5,43.5 33,41 36.5,40.5" fill="url(#starEyeGrad)" stroke="#000" strokeWidth={1.5} />
-      <polygon points="62,37 63.5,40.5 67,41 64.5,43.5 65,47 62,45 59,47 59.5,43.5 57,41 60.5,40.5" fill="url(#starEyeGrad)" stroke="#000" strokeWidth={1.5} />
+      <polygon points="38,37 39.5,40.5 43,41 40.5,43.5 41,47 38,45 35,47 35.5,43.5 33,41 36.5,40.5" fill={`url(#${u}starEyeGrad)`} stroke="#000" strokeWidth={1.5} />
+      <polygon points="62,37 63.5,40.5 67,41 64.5,43.5 65,47 62,45 59,47 59.5,43.5 57,41 60.5,40.5" fill={`url(#${u}starEyeGrad)`} stroke="#000" strokeWidth={1.5} />
       <polygon points="38,39.5 38.8,41 40,41.3 39,42.3 39.2,43.5 38,42.8 36.8,43.5 37,42.3 36,41.3 37.2,41" fill="#fff" opacity="0.45" />
       <polygon points="62,39.5 62.8,41 64,41.3 63,42.3 63.2,43.5 62,42.8 60.8,43.5 61,42.3 60,41.3 61.2,41" fill="#fff" opacity="0.45" />
     </g>
@@ -65,11 +70,13 @@ function Star() {
 }
 
 function Wink() {
+  const ec = useEyeColor();
+  const ecd = useEyeColorDark();
   return (
     <g>
       {/* Open eye — scaled up to match Round */}
       <circle cx="38" cy="42" r="6.5" fill="#fff" stroke="#000" strokeWidth={S} />
-      <circle cx="39" cy="41.5" r="4.2" fill="#4A6FA5" />
+      <circle cx="39" cy="41.5" r="4.2" fill={ec} />
       <circle cx="39" cy="41.5" r="2.5" fill="#000" />
       <circle cx="36.8" cy="39.5" r="1.6" fill="#fff" />
       {/* Winking eye — bolder arc */}
@@ -111,17 +118,18 @@ function Angry() {
 }
 
 function Cool() {
+  const u = useAvatarUid();
   return (
     <g>
       <defs>
-        <linearGradient id="coolLensGrad" x1="0" y1="0" x2="0" y2="1">
+        <linearGradient id={`${u}coolLensGrad`} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor="#2a2a4e" />
           <stop offset="100%" stopColor="#0a0a18" />
         </linearGradient>
       </defs>
       <path d="M44 40 Q50 43 56 40" stroke="#000" strokeWidth={2} fill="none" strokeLinecap="round" />
-      <rect x="29" y="37" width="16" height="10" rx="3" fill="url(#coolLensGrad)" stroke="#000" strokeWidth={S} />
-      <rect x="55" y="37" width="16" height="10" rx="3" fill="url(#coolLensGrad)" stroke="#000" strokeWidth={S} />
+      <rect x="29" y="37" width="16" height="10" rx="3" fill={`url(#${u}coolLensGrad)`} stroke="#000" strokeWidth={S} />
+      <rect x="55" y="37" width="16" height="10" rx="3" fill={`url(#${u}coolLensGrad)`} stroke="#000" strokeWidth={S} />
       <line x1="32" y1="39.5" x2="37" y2="39.5" stroke="#fff" strokeWidth={1.8} strokeLinecap="round" opacity="0.5" />
       <line x1="58" y1="39.5" x2="63" y2="39.5" stroke="#fff" strokeWidth={1.8} strokeLinecap="round" opacity="0.5" />
       <line x1="32" y1="41.5" x2="34" y2="41.5" stroke="#fff" strokeWidth={1} strokeLinecap="round" opacity="0.25" />
@@ -131,6 +139,8 @@ function Cool() {
 }
 
 function Sparkle() {
+  const ec = useEyeColor();
+  const ecd = useEyeColorDark();
   return (
     <g>
       {/* Larger eyes for kawaii feel */}
@@ -140,8 +150,8 @@ function Sparkle() {
       <path d="M31 39 Q38 35 45 39" fill="#000" opacity="0.05" />
       <path d="M55 39 Q62 35 69 39" fill="#000" opacity="0.05" />
       {/* Two-tone iris */}
-      <circle cx="39" cy="41" r="4" fill="#4A6FA5" />
-      <circle cx="63" cy="41" r="4" fill="#4A6FA5" />
+      <circle cx="39" cy="41" r="4" fill={ec} />
+      <circle cx="63" cy="41" r="4" fill={ec} />
       <circle cx="39" cy="42.5" r="3.5" fill="#3A5080" opacity="0.3" />
       <circle cx="63" cy="42.5" r="3.5" fill="#3A5080" opacity="0.3" />
       {/* Pupil */}
@@ -193,11 +203,13 @@ function Dizzy() {
 }
 
 function Cyclops() {
+  const ec = useEyeColor();
+  const ecd = useEyeColorDark();
   return (
     <g>
       <path d="M42 38 Q50 35 58 38" fill="none" stroke="#000" strokeWidth={S} strokeLinecap="round" />
       <circle cx="50" cy="42" r="8" fill="#fff" stroke="#000" strokeWidth={S} />
-      <circle cx="51" cy="41" r="5" fill="#4A6FA5" />
+      <circle cx="51" cy="41" r="5" fill={ec} />
       <circle cx="51" cy="41" r="3" fill="#000" />
       <circle cx="48.5" cy="39" r="2" fill="#fff" />
       <circle cx="52" cy="43" r="0.8" fill="#fff" opacity="0.5" />
@@ -206,6 +218,8 @@ function Cyclops() {
 }
 
 function Lashes() {
+  const ec = useEyeColor();
+  const ecd = useEyeColorDark();
   return (
     <g>
       <circle cx="38" cy="42" r="5" fill="#fff" stroke="#000" strokeWidth={S} />
@@ -243,12 +257,14 @@ function MonocleEye() {
 }
 
 function CrossEyed() {
+  const ec = useEyeColor();
+  const ecd = useEyeColorDark();
   return (
     <g>
       <circle cx="38" cy="42" r="5" fill="#fff" stroke="#000" strokeWidth={S} />
       <circle cx="62" cy="42" r="5" fill="#fff" stroke="#000" strokeWidth={S} />
-      <circle cx="42" cy="42" r="3" fill="#4A6FA5" />
-      <circle cx="58" cy="42" r="3" fill="#4A6FA5" />
+      <circle cx="42" cy="42" r="3" fill={ec} />
+      <circle cx="58" cy="42" r="3" fill={ec} />
       <circle cx="42" cy="42" r="1.8" fill="#000" />
       <circle cx="58" cy="42" r="1.8" fill="#000" />
       <circle cx="41" cy="40.5" r="0.9" fill="#fff" />
@@ -356,18 +372,19 @@ function Crying() {
 }
 
 function Galaxy() {
+  const u = useAvatarUid();
   return (
     <g>
       <defs>
         {/* Static nebula gradient — no color cycling */}
-        <radialGradient id="galaxyEyeGrad" cx="50%" cy="50%" r="50%">
+        <radialGradient id={`${u}galaxyEyeGrad`} cx="50%" cy="50%" r="50%">
           <stop offset="0%" stopColor="#E040FB" />
           <stop offset="50%" stopColor="#7C4DFF" />
           <stop offset="100%" stopColor="#1A237E" />
         </radialGradient>
       </defs>
-      <circle cx="38" cy="42" r="7" fill="url(#galaxyEyeGrad)" stroke="#000" strokeWidth={S} />
-      <circle cx="62" cy="42" r="7" fill="url(#galaxyEyeGrad)" stroke="#000" strokeWidth={S} />
+      <circle cx="38" cy="42" r="7" fill={`url(#${u}galaxyEyeGrad)`} stroke="#000" strokeWidth={S} />
+      <circle cx="62" cy="42" r="7" fill={`url(#${u}galaxyEyeGrad)`} stroke="#000" strokeWidth={S} />
       {/* Slow orbit arcs */}
       <path d="M34 40 Q38 38 42 40" fill="none" stroke="#E040FB" strokeWidth={0.6} opacity="0.3">
         <animateTransform attributeName="transform" type="rotate" from="0 38 42" to="360 38 42" dur="15s" repeatCount="indefinite" />
@@ -388,10 +405,11 @@ function Galaxy() {
 }
 
 function FlameEyes() {
+  const u = useAvatarUid();
   return (
     <g>
       <defs>
-        <linearGradient id="flameEyeGrad" x1="0" y1="1" x2="0" y2="0">
+        <linearGradient id={`${u}flameEyeGrad`} x1="0" y1="1" x2="0" y2="0">
           <stop offset="0%" stopColor="#FF6D00" />
           <stop offset="50%" stopColor="#FF9100" />
           <stop offset="100%" stopColor="#FFD600" />
@@ -400,10 +418,10 @@ function FlameEyes() {
       <circle cx="38" cy="42" r="9" fill="#FF6D00" opacity="0.08" />
       <circle cx="62" cy="42" r="9" fill="#FF6D00" opacity="0.08" />
       {/* Flame shape — slow gentle breathing instead of fast flicker */}
-      <path d="M38 48 C32 44 32 38 38 34 C44 38 44 44 38 48Z" fill="url(#flameEyeGrad)" stroke="#000" strokeWidth={1.5}>
+      <path d="M38 48 C32 44 32 38 38 34 C44 38 44 44 38 48Z" fill={`url(#${u}flameEyeGrad)`} stroke="#000" strokeWidth={1.5}>
         <animateTransform attributeName="transform" type="scale" values="1 1;1.01 1.04;1 1" dur="3s" repeatCount="indefinite" additive="sum" />
       </path>
-      <path d="M62 48 C56 44 56 38 62 34 C68 38 68 44 62 48Z" fill="url(#flameEyeGrad)" stroke="#000" strokeWidth={1.5}>
+      <path d="M62 48 C56 44 56 38 62 34 C68 38 68 44 62 48Z" fill={`url(#${u}flameEyeGrad)`} stroke="#000" strokeWidth={1.5}>
         <animateTransform attributeName="transform" type="scale" values="1 1;1.01 1.04;1 1" dur="3.5s" repeatCount="indefinite" additive="sum" />
       </path>
       <path d="M38 46 C35 43 35 39 38 37 C41 39 41 43 38 46Z" fill="#FFD600" opacity="0.6" />
@@ -443,11 +461,12 @@ function Robot() {
 }
 
 function Void() {
-  const vg = 'url(#voidEyeGrad)';
+  const u = useAvatarUid();
+  const vg = `url(#${u}voidEyeGrad)`;
   return (
     <g>
       <defs>
-        <radialGradient id="voidEyeGrad" cx="50%" cy="50%" r="50%">
+        <radialGradient id={`${u}voidEyeGrad`} cx="50%" cy="50%" r="50%">
           <stop offset="0%" stopColor="#000" /><stop offset="70%" stopColor="#1A0033" /><stop offset="100%" stopColor="#4A0080" />
         </radialGradient>
       </defs>
@@ -468,15 +487,16 @@ function Void() {
 }
 
 function Infinity() {
-  const rb = 'url(#infinityRainbow)';
-  const vo = 'url(#infinityRing1)';
+  const u = useAvatarUid();
+  const rb = `url(#${u}infinityRainbow)`;
+  const vo = `url(#${u}infinityRing1)`;
   return (
     <g>
       <defs>
-        <radialGradient id="infinityRing1" cx="50%" cy="50%" r="50%">
+        <radialGradient id={`${u}infinityRing1`} cx="50%" cy="50%" r="50%">
           <stop offset="0%" stopColor="#000" /><stop offset="30%" stopColor="#1A0033" /><stop offset="60%" stopColor="#4A00E0" /><stop offset="100%" stopColor="#000" />
         </radialGradient>
-        <linearGradient id="infinityRainbow" x1="0" y1="0" x2="1" y2="1">
+        <linearGradient id={`${u}infinityRainbow`} x1="0" y1="0" x2="1" y2="1">
           <stop offset="0%" stopColor="#FF0000"><animate attributeName="stopColor" values="#FF0000;#FF8C00;#00FF88;#0088FF;#8B00FF;#FF0000" dur="4s" repeatCount="indefinite" /></stop>
           <stop offset="33%" stopColor="#00FF88"><animate attributeName="stopColor" values="#00FF88;#0088FF;#8B00FF;#FF0000;#FF8C00;#00FF88" dur="4s" repeatCount="indefinite" /></stop>
           <stop offset="66%" stopColor="#0088FF"><animate attributeName="stopColor" values="#0088FF;#8B00FF;#FF0000;#FF8C00;#00FF88;#0088FF" dur="4s" repeatCount="indefinite" /></stop>
@@ -518,9 +538,7 @@ function Curious() {
       <circle cx="64.5" cy="41.5" r="2" fill="#000" />
       <circle cx="39.5" cy="40" r="1" fill="#fff" />
       <circle cx="63.5" cy="40" r="1" fill="#fff" />
-      {/* Raised eyebrow on one side for quizzical look */}
-      <path d="M33 36 Q38 34 43 36" fill="none" stroke="#000" strokeWidth={1.5} strokeLinecap="round" />
-      <path d="M57 34 Q62 32 67 35" fill="none" stroke="#000" strokeWidth={1.5} strokeLinecap="round" />
+      {/* Quizzical look conveyed via pupil shift — eyebrows handled by EyebrowParts */}
     </g>
   );
 }
@@ -596,6 +614,8 @@ function Closed() {
 
 /** Cat/dragon eyes — normal sclera with vertical slit pupils */
 function CatPupils() {
+  const ec = useEyeColor();
+  const ecd = useEyeColorDark();
   return (
     <g>
       {/* Sclera */}
@@ -624,6 +644,8 @@ function CatPupils() {
 
 /** Extra large shocked/surprised eyes — tiny irises, maximum white */
 function Wide() {
+  const ec = useEyeColor();
+  const ecd = useEyeColorDark();
   return (
     <g>
       {/* Large sclera — bigger than normal */}
@@ -633,8 +655,8 @@ function Wide() {
       <path d="M31 38 Q38 34 45 38" fill="#000" opacity="0.05" />
       <path d="M55 38 Q62 34 69 38" fill="#000" opacity="0.05" />
       {/* Tiny iris — maximum white showing */}
-      <circle cx="38" cy="42" r="2.2" fill="#4A6FA5" />
-      <circle cx="62" cy="42" r="2.2" fill="#4A6FA5" />
+      <circle cx="38" cy="42" r="2.2" fill={ec} />
+      <circle cx="62" cy="42" r="2.2" fill={ec} />
       {/* Tiny pupil */}
       <circle cx="38" cy="42" r="1.3" fill="#000" />
       <circle cx="62" cy="42" r="1.3" fill="#000" />
@@ -679,6 +701,8 @@ function Squint() {
 
 /** Downturned sad eyes — droopy outer corners */
 function Sad() {
+  const ec = useEyeColor();
+  const ecd = useEyeColorDark();
   return (
     <g>
       {/* Sclera */}
@@ -691,10 +715,10 @@ function Sad() {
       <path d="M33 40 Q36 38 38 38 Q41 38 43 42" fill="none" stroke="#000" strokeWidth={1} strokeLinecap="round" opacity="0.4" />
       <path d="M57 42 Q59 38 62 38 Q64 38 67 40" fill="none" stroke="#000" strokeWidth={1} strokeLinecap="round" opacity="0.4" />
       {/* Iris — looking slightly down */}
-      <circle cx="38" cy="43" r="3" fill="#4A6FA5" />
-      <circle cx="62" cy="43" r="3" fill="#4A6FA5" />
-      <circle cx="38" cy="43.5" r="2.5" fill="#3A5A8A" opacity="0.4" />
-      <circle cx="62" cy="43.5" r="2.5" fill="#3A5A8A" opacity="0.4" />
+      <circle cx="38" cy="43" r="3" fill={ec} />
+      <circle cx="62" cy="43" r="3" fill={ec} />
+      <circle cx="38" cy="43.5" r="2.5" fill={ecd} opacity="0.4" />
+      <circle cx="62" cy="43.5" r="2.5" fill={ecd} opacity="0.4" />
       {/* Pupil */}
       <circle cx="38" cy="43" r="1.8" fill="#000" />
       <circle cx="62" cy="43" r="1.8" fill="#000" />
@@ -711,6 +735,8 @@ function Sad() {
 }
 
 function WingedLiner() {
+  const ec = useEyeColor();
+  const ecd = useEyeColorDark();
   return (
     <g>
       {/* Eyes with bold winged eyeliner — cat-eye makeup look */}
@@ -720,7 +746,7 @@ function WingedLiner() {
       {/* Wing flick — left */}
       <path d="M44 40 L48 35 L46 39" fill="#1a1a2e" stroke="#1a1a2e" strokeWidth={1} />
       {/* Iris + pupil */}
-      <circle cx="39" cy="42" r="3" fill="#4A6FA5" />
+      <circle cx="39" cy="42" r="3" fill={ec} />
       <circle cx="39" cy="42" r="1.8" fill="#000" />
       <circle cx="37.5" cy="40.5" r="1" fill="#fff" />
       {/* Right eye */}
@@ -729,7 +755,7 @@ function WingedLiner() {
       {/* Wing flick — right */}
       <path d="M68 40 L72 35 L70 39" fill="#1a1a2e" stroke="#1a1a2e" strokeWidth={1} />
       {/* Iris + pupil */}
-      <circle cx="63" cy="42" r="3" fill="#4A6FA5" />
+      <circle cx="63" cy="42" r="3" fill={ec} />
       <circle cx="63" cy="42" r="1.8" fill="#000" />
       <circle cx="61.5" cy="40.5" r="1" fill="#fff" />
       {/* Lower lash line — subtle */}
@@ -771,6 +797,8 @@ function SmokyEye() {
 
 /** Confident eyes — slightly hooded, relaxed, brown iris. No built-in brows (uses eyebrow system) */
 function Confident() {
+  const ec = useEyeColor();
+  const ecd = useEyeColorDark();
   return (
     <g>
       {/* Slightly hooded sclera — flatter top than round, relaxed lower lid */}
@@ -804,6 +832,8 @@ function Confident() {
 
 /** Relaxed eyes — half-open, calm, green iris. Natural everyday look */
 function Relaxed() {
+  const ec = useEyeColor();
+  const ecd = useEyeColorDark();
   return (
     <g>
       {/* Semi-open sclera — heavy upper lid, relaxed */}

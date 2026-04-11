@@ -162,7 +162,7 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
       setHasPlayed(!!status);
       setHasSolved(status?.solved ?? false);
       setStreak(getDailyStreak().currentStreak);
-    };
+      };
 
     // Refresh on page visibility change
     const handleVisibilityChange = () => {

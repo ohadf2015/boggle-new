@@ -53,6 +53,16 @@ export const AVATAR_HAIR_COLORS = [
   '#FFFFFF', '#C0C0C0', '#808080',
 ] as const;
 
+// ==================== Eye Colors ====================
+export const AVATAR_EYE_COLORS = [
+  '#4A6FA5', '#3B82F6', '#2563EB', '#1D4ED8',  // Blues
+  '#059669', '#10B981', '#047857',                // Greens
+  '#92400E', '#78350F', '#6B4423',                // Browns
+  '#6B7280', '#9CA3AF',                           // Grays
+  '#7C3AED', '#A855F7',                           // Violet
+  '#B45309', '#D97706',                           // Amber/Hazel
+] as const;
+
 // ==================== Eyes ====================
 export const AVATAR_EYE_STYLES = [
   'none', 'round', 'sleepy', 'star', 'wink', 'happy', 'angry', 'cool', 'sparkle',
@@ -74,6 +84,11 @@ export const AVATAR_FACIAL_HAIR_STYLES = [
   'none', 'stubble', 'mustache', 'goatee', 'shortBeard', 'fullBeard',
   'soulPatch', 'chinStrap', 'muttonChops', 'vanDyke', 'handlebar',
   'wizardBeard', 'pencilMustache', 'braidedBeard', 'fuManchu', 'trimmedBeard',
+] as const;
+
+// ==================== Nose ====================
+export const AVATAR_NOSE_STYLES = [
+  'none', 'button', 'pointed', 'round', 'snub', 'long', 'wide', 'roman', 'dot', 'cat', 'clown',
 ] as const;
 
 // ==================== Mouth ====================
@@ -128,6 +143,10 @@ export const customAvatarSchema = z.object({
   hair: z.enum(AVATAR_HAIR_STYLES),
   hairColor: hexColorSchema,
   eyes: z.enum(AVATAR_EYE_STYLES),
+  /** Eye/iris color — optional for backward compat (defaults to classic blue) */
+  eyeColor: hexColorSchema.optional(),
+  /** Nose style — optional for backward compat (defaults to none) */
+  noseStyle: z.enum(AVATAR_NOSE_STYLES).optional(),
   /** Eyebrow style — optional for backward compatibility with saved avatars */
   eyebrows: z.enum(AVATAR_EYEBROW_STYLES).optional(),
   facialHair: z.enum(AVATAR_FACIAL_HAIR_STYLES).optional(),
@@ -152,6 +171,8 @@ export const DEFAULT_AVATAR_CONFIG: CustomAvatarConfig = {
   hair: 'spiky',
   hairColor: '#2C1B18',
   eyes: 'round',
+  eyeColor: '#4A6FA5',
+  noseStyle: 'button',
   eyebrows: 'none',
   mouth: 'smile',
   accessory: 'none',
@@ -365,6 +386,8 @@ export function getRandomAvatarConfig(): CustomAvatarConfig {
     hair: pick(FREE_HAIR_STYLES),
     hairColor: pick(AVATAR_HAIR_COLORS),
     eyes: pick(FREE_EYE_STYLES),
+    eyeColor: pick(AVATAR_EYE_COLORS),
+    noseStyle: pick(AVATAR_NOSE_STYLES),
     eyebrows: pick(FREE_EYEBROW_STYLES),
     facialHair: gender === 'male' ? pick(FREE_FACIAL_HAIR_STYLES) : 'none',
     mouth: pick(FREE_MOUTH_STYLES),
@@ -397,6 +420,8 @@ export function getSeededAvatarConfig(seed: number): CustomAvatarConfig {
     hair: pick(FREE_HAIR_STYLES),
     hairColor: pick(AVATAR_HAIR_COLORS),
     eyes: pick(FREE_EYE_STYLES),
+    eyeColor: pick(AVATAR_EYE_COLORS),
+    noseStyle: pick(AVATAR_NOSE_STYLES),
     eyebrows: pick(FREE_EYEBROW_STYLES),
     facialHair: gender === 'male' ? pick(FREE_FACIAL_HAIR_STYLES) : 'none',
     mouth: pick(FREE_MOUTH_STYLES),

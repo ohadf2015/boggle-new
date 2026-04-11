@@ -151,10 +151,16 @@ export function useMultiplayerSession(
         }
       }
 
+      // Skip auto-join if the player just intentionally exited
+      let intentionalExit = false;
+      try {
+        intentionalExit = !!sessionStorage.getItem('boggle_intentional_exit');
+      } catch { /* storage blocked */ }
+
       let joiningNewRoomViaInvitation = false;
       const hasSession = savedSession && savedSession.gameCode;
 
-      if (roomFromUrl) {
+      if (roomFromUrl && !intentionalExit) {
         logger.log('[Init] Setting prefilledRoomCode to:', roomFromUrl);
         onSetGameCode(roomFromUrl);
         setPrefilledRoomCode(roomFromUrl);

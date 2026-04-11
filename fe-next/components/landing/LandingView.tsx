@@ -183,7 +183,7 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
   return (
     <div
       className={cn(
-        'flex flex-col bg-gray-100 dark:bg-neo-navy relative page-content-safe',
+        'flex flex-col bg-neo-navy relative page-content-safe',
       )}
     >
       {enableHeavyBackground && !isMobilePortrait && <PlayfulBackground intensity="high" colorScheme="default" />}

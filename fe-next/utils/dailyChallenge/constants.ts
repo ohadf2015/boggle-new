@@ -58,6 +58,7 @@ export function normalizeHebrewFinalLetters(text: string): string {
 
 export const DAILY_STORAGE_KEY = 'lexiclash_daily';
 export const WORD_HUNT_STORAGE_KEY = 'lexiclash_word_hunt';
+export const WORD_WHEEL_STORAGE_KEY = 'lexiclash_word_wheel';
 export const DAILY_STREAK_KEY = 'lexiclash_daily_streak';
 export const GUEST_DAILY_PLAYER_KEY = 'lexiclash_guest_daily_player';
 export const GUEST_FINGERPRINT_KEY = 'lexiclash_guest_fingerprint';
@@ -80,6 +81,12 @@ export const getWordHuntTutorialKey = (lang: Language): string =>
  */
 export const getWordHuntResultKey = (lang: Language, date: string): string =>
   `${WORD_HUNT_STORAGE_KEY}_${lang}_${date}`;
+
+/**
+ * Get storage key for Word Wheel result by language and date
+ */
+export const getWordWheelResultKey = (lang: Language, date: string): string =>
+  `${WORD_WHEEL_STORAGE_KEY}_${lang}_${date}`;
 
 /**
  * Get storage key for daily coin award by date and language

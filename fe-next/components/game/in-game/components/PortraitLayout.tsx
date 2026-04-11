@@ -363,7 +363,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
         t={t}
       />
 
-      <div className="flex flex-col lg:flex-row lg:items-stretch lg:justify-center gap-0 md:gap-2 lg:gap-3 flex-1 w-full max-w-[1920px] mx-auto overflow-x-clip overflow-y-auto transition-all duration-500 ease-in-out pb-16 lg:pb-2 px-2 lg:px-3 xl:px-4 lg:h-dvh lg:max-h-dvh">
+      <div className="flex flex-col lg:flex-row lg:items-stretch lg:justify-center gap-0 md:gap-2 lg:gap-2 desktop-tall:lg:gap-3 desktop-short:lg:gap-0 flex-1 w-full max-w-[1920px] mx-auto overflow-x-clip overflow-y-auto transition-all duration-500 ease-in-out pb-16 lg:pb-1 desktop-tall:lg:pb-2 desktop-short:lg:pb-0 px-2 lg:px-2 desktop-tall:lg:px-3 xl:px-4 lg:h-dvh lg:max-h-dvh">
         {/* Mobile Header */}
         <GameHeader
           onExitRoom={onExitRoom}
@@ -408,7 +408,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
 
               {/* Stats row - Timer centered on mobile, Timer + controls on desktop */}
               <div
-                className="flex w-full items-center justify-start relative min-h-[56px] md:min-h-[70px] lg:min-h-[clamp(48px,8dvh,64px)] gap-2"
+                className="flex w-full items-center justify-start relative min-h-[56px] md:min-h-[70px] lg:min-h-[clamp(40px,7dvh,64px)] desktop-short:lg:min-h-[40px] gap-2"
                 data-testid="stats-row"
               >
                 {/* Desktop header */}
@@ -429,7 +429,10 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
                   animate={{ scale: 1, opacity: 1 }}
                   className="relative z-20 shrink-0"
                 >
-                  <div className="hidden lg:block">
+                  <div className="hidden desktop-short:lg:block lg:hidden">
+                    <CircularTimer remainingTime={remainingTime} totalTime={timerValue * 60} size="sm" onTimerState={onTimerState} />
+                  </div>
+                  <div className="hidden desktop-tall:lg:block">
                     <CircularTimer remainingTime={remainingTime} totalTime={timerValue * 60} size="md" onTimerState={onTimerState} />
                   </div>
                   <div className="hidden md:block lg:hidden">
@@ -498,7 +501,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
 
           {/* Word Forming Area - inside header area for tighter integration */}
           {isPlaying && gameMode !== 'word-hunt' && (
-            <div className="relative flex items-center justify-center shrink-0 -mt-1 mb-0.5">
+            <div className="relative flex items-center justify-center shrink-0 -mt-1 mb-0.5 desktop-short:lg:-mt-2 desktop-short:lg:mb-0">
               <LeadChangeBanner event={leadChangeEvent ?? null} />
               <WordFormingArea
                 word={isTypingMode ? typedWord : formedWord}
@@ -566,12 +569,12 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
           <div
             data-testid="grid-container"
             className={cn(
-              'flex-1 flex flex-col items-center justify-center min-h-0 overflow-visible pt-1 md:pt-0 gap-2',
+              'flex-1 flex flex-col items-center justify-center min-h-0 overflow-visible pt-1 md:pt-0 gap-2 desktop-short:lg:gap-0 desktop-short:lg:pt-0',
               'transition-shadow duration-500',
               comboGlow
             )}
           >
-            <div className="relative w-full max-w-[min(600px,92vw)] lg:max-w-[clamp(300px,48dvh,520px)] mx-auto aspect-square">
+            <div className="relative w-full max-w-[min(600px,92vw)] lg:max-w-[clamp(260px,52dvh,520px)] desktop-short:lg:max-w-[clamp(220px,44dvh,420px)] mx-auto aspect-square">
               <GridComponent
                 key={isPlaying ? 'playing-grid' : 'spectating-grid'}
                 grid={letterGrid}
@@ -681,7 +684,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
                 username={isHost ? 'Host' : username}
                 isHost={isHost}
                 gameCode={gameCode}
-                className="max-h-[200px] min-h-[120px]"
+                className="max-h-[200px] min-h-[80px] desktop-tall:min-h-[120px]"
               />
             </AdaptiveMotion.div>
           </div>

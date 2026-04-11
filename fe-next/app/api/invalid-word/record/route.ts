@@ -8,6 +8,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import logger from '@/utils/logger';
 import { createClient } from '@supabase/supabase-js';
 import type { Language } from '@/types';
 import { captureApiError } from '@/utils/sentry';
@@ -121,7 +122,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<RecordInv
 
     if (!supabaseUrl || !supabaseKey) {
       // Silently succeed if Supabase is not configured (non-critical feature)
-      console.warn('[InvalidWord] Supabase not configured, skipping record');
+      logger.warn('[InvalidWord] Supabase not configured, skipping record');
       return NextResponse.json({ success: true });
     }
 
@@ -136,17 +137,17 @@ export async function POST(request: NextRequest): Promise<NextResponse<RecordInv
 
     if (error) {
       // Log error but still return success (non-critical functionality)
-      console.warn(`[InvalidWord] Failed to record "${normalizedWord}" (${reason}): ${error.message}`);
+      logger.warn(`[InvalidWord] Failed to record "${normalizedWord}" (${reason}): ${error.message}`);
       // Still return success - this is non-critical
       return NextResponse.json({ success: true });
     }
 
-    console.log(`[InvalidWord] Recorded "${normalizedWord}" (${language}, ${reason}, ${gameMode || 'unknown'})`);
+    logger.log(`[InvalidWord] Recorded "${normalizedWord}" (${language}, ${reason}, ${gameMode || 'unknown'})`);
     return NextResponse.json({ success: true });
   } catch (error) {
     captureApiError(error instanceof Error ? error : new Error(String(error)), '/api/invalid-word/record', { method: 'POST' });
     const err = error as Error;
-    console.error('[InvalidWord] Error:', err.message);
+    logger.error('[InvalidWord] Error:', err.message);
     // Return success even on error - this is non-critical functionality
     return NextResponse.json({ success: true });
   }

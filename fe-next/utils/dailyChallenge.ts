@@ -12,6 +12,8 @@
 export type {
   DailyPuzzle,
   WordHuntResult,
+  WordWheelResult,
+  StoredWordWheelResult,
   DailyChallengeResult,
   StoredDailyResult,
   StoredWordHuntResult,
@@ -50,6 +52,8 @@ export {
   MIN_SAME_LENGTH_WORDS,
   getWordHuntTutorialKey,
   getWordHuntResultKey,
+  getWordWheelResultKey,
+  WORD_WHEEL_STORAGE_KEY,
   getDailyCoinAwardKey,
 } from './dailyChallenge/constants';
 
@@ -81,6 +85,10 @@ export {
   markWordHuntResultSubmitted,
   getAllWordHuntResults,
   mapServerResultToStoredResult,
+  hasPlayedWordWheelToday,
+  getWordWheelStatusToday,
+  getTodaysWordWheelResult,
+  saveWordWheelResult,
 } from './dailyChallenge/storage';
 export type { ServerWordHuntResult } from './dailyChallenge/storage';
 
@@ -161,3 +169,10 @@ export {
   selectDailyTargetWord,
   getTodaysTargetWord,
 } from './dailyChallenge/gridGeneration';
+
+// Word Wheel generation
+export {
+  generateWordWheelPuzzle,
+  isValidWordWheelWord,
+} from './dailyChallenge/wordWheelGeneration';
+export type { WordWheelPuzzle } from './dailyChallenge/wordWheelGeneration';

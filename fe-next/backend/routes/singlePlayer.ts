@@ -122,6 +122,16 @@ router.post('/heartbeat', (req: HeartbeatRequest, res: Response): void => {
       return;
     }
 
+    // Guard against abuse: limit sessionId length and total map size
+    if (sessionId.length > 128) {
+      res.status(400).json({ error: 'sessionId too long' } as HeartbeatResponse);
+      return;
+    }
+    if (activeSinglePlayers.size >= 10000 && !activeSinglePlayers.has(sessionId)) {
+      res.status(429).json({ error: 'Too many active sessions' } as HeartbeatResponse);
+      return;
+    }
+
     // Update or create session
     activeSinglePlayers.set(sessionId, {
       timestamp: Date.now(),

@@ -2,9 +2,7 @@
 
 import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { BookOpen, LogOut, Pencil, Check, X } from 'lucide-react';
-import RoomChat from '../../components/RoomChat';
-import { LobbyTutorialPanel } from '../../components/lobby/LobbyTutorialPanel';
+import { BookOpen, LogOut, Pencil, Check, X, Monitor } from 'lucide-react';
 import { LanguageSelector } from '../../components/join/LanguageSelector';
 import { useCrazyGamesInvite } from '../../hooks/useCrazyGamesInvite';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
@@ -15,19 +13,18 @@ import { useAuth } from '@/contexts/AuthContext';
 import { GAME_PRESETS, type PresetKey } from './pre-game/PresetSelector';
 import { StartButton } from './pre-game/StartButton';
 import { MobileShareSection } from './pre-game/MobileShareSection';
-import { PresetInfoDrawer } from './pre-game/PresetInfoDrawer';
 import { PlayerRoster } from './pre-game/PlayerRoster';
 import { BattleModeCard } from './pre-game/BattleModeCard';
-import {
-  DesktopLobbyLayout,
-  InviteCard,
-} from './pre-game/desktop';
+import { AdvancedSettingsModal } from './pre-game/AdvancedSettingsModal';
+import { DesktopLobbyLayout, InviteCard } from './pre-game/desktop';
 import TvTutorialOverlay, { isTvTutorialComplete } from './tv-broadcast/TvTutorialOverlay';
+import RoomChat from '../../components/RoomChat';
 import Avatar from '@/components/Avatar';
 import dynamic from 'next/dynamic';
 const AvatarBuilderModal = dynamic(() => import('@/components/avatar/AvatarBuilderModal'), { ssr: false });
 import { useAvatarPremium } from '@/hooks/useAvatarPremium';
 import { getOrCreateStoredCustomAvatar, setStoredCustomAvatar } from '@/utils/profileStorage';
+import { cn } from '@/lib/utils';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 import type { Language, LetterGrid, Avatar as AvatarType, PresenceStatus, DifficultyLevel } from '@/shared/types/game';
 import type { GameModeOption } from '@/components/GameModeSelector';
@@ -109,7 +106,9 @@ function HostPreGameView({
   timerValue,
   setTimerValue,
   setTimerDirection,
+  difficulty,
   setDifficulty,
+  minWordLength,
   setMinWordLength,
   hostPlaying,
   setHostPlaying,
@@ -151,17 +150,12 @@ function HostPreGameView({
   const [hasInitialized, setHasInitialized] = useState(false);
   const [showTvTutorial, setShowTvTutorial] = useState(false);
   const storeGameMode = useGameMode();
-  // If stored mode is blast but user isn't admin, fall back to random
   const initialMode = (storeGameMode === 'blast' && !isAdmin && !hasBlastAccess) ? 'random' : (storeGameMode || 'random');
   const [selectedGameMode, setSelectedGameMode] = useState<GameModeOption>(initialMode);
   const { setGameMode: setStoreGameMode } = useGameActions();
 
   useEffect(() => {
-    if (selectedGameMode !== 'random') {
-      setStoreGameMode(selectedGameMode);
-    } else {
-      setStoreGameMode('random');
-    }
+    setStoreGameMode(selectedGameMode || 'random');
   }, [selectedGameMode, setStoreGameMode]);
 
   // Apply default preset on mount
@@ -185,19 +179,13 @@ function HostPreGameView({
       prevHostPlayingRef.current = hostPlaying;
       return;
     }
-
     const wasHostPlaying = prevHostPlayingRef.current;
     const isNowTvMode = !hostPlaying;
-
     if (wasHostPlaying && isNowTvMode && !isTvTutorialComplete()) {
       setShowTvTutorial(true);
     }
-
     prevHostPlayingRef.current = hostPlaying;
   }, [hostPlaying, tvTutorialInitialized]);
-
-  // Preset info drawer for long-press info (still available)
-  const [presetInfoOpen, setPresetInfoOpen] = useState<PresetKey | null>(null);
 
   // Filter out host when TV mode is enabled
   const filteredPlayersForDisplay = useMemo(() => {
@@ -274,8 +262,7 @@ function HostPreGameView({
     };
   }, [botCountdown, socket, gameCode, onStartGame]);
 
-  // Handle host changing the room language
-  const handleRoomLanguageChange = useCallback((newLang: import('@/shared/types/game').Language) => {
+  const handleRoomLanguageChange = useCallback((newLang: Language) => {
     socket?.emit('changeRoomLanguage', { gameCode, language: newLang });
   }, [socket, gameCode]);
 
@@ -287,7 +274,7 @@ function HostPreGameView({
 
   const hostLabel = `${t('hostView.hostIs')} ${username}`;
 
-  // Bot countdown banner (shared between mobile and desktop)
+  // Bot countdown banner
   const renderBotCountdown = (): React.ReactElement | null => {
     if (botCountdown === null) return null;
     return (
@@ -296,7 +283,7 @@ function HostPreGameView({
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -20 }}
         transition={{ type: 'spring', stiffness: 300, damping: 24 }}
-        className="bg-neo-orange/20 border border-neo-orange/50 rounded-xl px-4 py-3 flex items-center justify-between"
+        className="bg-neo-orange/20 border border-neo-orange/50 rounded-xl px-4 py-2 flex items-center justify-between"
       >
         <span className="text-neo-orange font-bold text-sm">
           {t('hostView.noOneYet')} {t('hostView.startingWithBots')} {botCountdown}...
@@ -311,8 +298,34 @@ function HostPreGameView({
     );
   };
 
+  // TV mode toggle — full-width row, desktop only
+  const tvModeToggle = (
+    <div className="hidden lg:flex items-center justify-between px-3 py-2 rounded-neo border-2 border-neo-white/10 bg-neo-navy-light/50">
+      <div className="flex items-center gap-2">
+        <Monitor className="w-4 h-4 text-neo-cream/60" />
+        <span className="text-xs font-bold uppercase tracking-widest text-neo-cream/60">
+          {t('hostView.broadcastModeTitle')}
+        </span>
+      </div>
+      <button
+        onClick={() => setHostPlaying(prev => !prev)}
+        className={cn(
+          'relative w-11 h-6 rounded-full border-2 border-neo-black transition-colors',
+          !hostPlaying ? 'bg-neo-lime' : 'bg-white/10'
+        )}
+        aria-label={t('hostView.broadcastModeTitle')}
+      >
+        <motion.div
+          className="absolute top-0.5 w-4 h-4 rounded-full bg-neo-black"
+          animate={{ x: !hostPlaying ? 20 : 2 }}
+          transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+        />
+      </button>
+    </div>
+  );
+
   return (
-    <div className="flex-1 flex flex-col min-h-0 bg-neo-navy lg:max-w-7xl lg:mx-auto">
+    <div className="flex-1 flex flex-col min-h-0 bg-neo-navy lg:max-w-5xl lg:mx-auto w-full">
       {/* Lesson Mode Banner */}
       {lessonData && (
         <div className="shrink-0 px-3 py-2 bg-neo-purple/20 border-b-2 border-neo-purple/50">
@@ -405,6 +418,17 @@ function HostPreGameView({
             <div className="lg:hidden">
               <MobileShareSection gameCode={gameCode} t={t} showHint={actualPlayerCount === 0} compact />
             </div>
+            <AdvancedSettingsModal
+              timerValue={timerValue}
+              setTimerValue={setTimerValue}
+              difficulty={difficulty}
+              setDifficulty={setDifficulty}
+              minWordLength={minWordLength}
+              setMinWordLength={setMinWordLength}
+              roomLanguage={roomLanguage}
+              onRoomLanguageChange={handleRoomLanguageChange}
+              t={t}
+            />
             <button
               onClick={onExitRoom}
               className="w-8 h-8 flex items-center justify-center bg-neo-red border-2 border-neo-black shadow-hard-sm active:translate-y-0.5 active:shadow-none transition-all rounded"
@@ -417,64 +441,90 @@ function HostPreGameView({
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 min-h-0 overflow-y-auto bg-neo-navy/95 flex flex-col">
+      <main className="flex-1 min-h-0 flex flex-col overflow-hidden">
         <h1 className="sr-only">{t('hostView.lobbyTitle')}</h1>
-        {/* Desktop Layout */}
+
+        {/* Desktop Layout — two-column grid (hidden on mobile) */}
         <div className="hidden lg:flex lg:flex-col flex-1 min-h-0">
           <DesktopLobbyLayout
             leftContent={
               <>
                 <AnimatePresence>{renderBotCountdown()}</AnimatePresence>
-                <StartButton onStartGame={onStartGame} disabled={isStartDisabled} tournamentCreating={tournamentCreating} playerCount={filteredPlayersForDisplay.length} t={t} />
-                <PlayerRoster players={filteredPlayersForDisplay} username={username} gameCode={gameCode} maxPlayers={maxPlayers} hostLabel={hostLabel} t={t} />
-                <BattleModeCard hostPlaying={hostPlaying} setHostPlaying={setHostPlaying} selectedGameMode={selectedGameMode} setSelectedGameMode={setSelectedGameMode} gameCode={gameCode} playersReady={playersReady} t={t} isAdmin={isAdmin} hasBlastAccess={hasBlastAccess}>
-                  <LanguageSelector selectedLanguage={roomLanguage} onLanguageChange={handleRoomLanguageChange} hideLabel />
-                </BattleModeCard>
+                <StartButton
+                  onStartGame={onStartGame}
+                  disabled={isStartDisabled}
+                  tournamentCreating={tournamentCreating}
+                  playerCount={filteredPlayersForDisplay.length}
+                  maxPlayers={maxPlayers}
+                  t={t}
+                />
+                <div className="flex-1 min-h-0 flex flex-col items-center">
+                  <PlayerRoster
+                    players={filteredPlayersForDisplay}
+                    username={username}
+                    gameCode={gameCode}
+                    maxPlayers={maxPlayers}
+                    hostLabel={hostLabel}
+                    t={t}
+                  />
+                </div>
+                {tvModeToggle}
+                <BattleModeCard
+                  selectedGameMode={selectedGameMode}
+                  setSelectedGameMode={setSelectedGameMode}
+                  t={t}
+                  isAdmin={isAdmin}
+                  hasBlastAccess={hasBlastAccess}
+                />
               </>
             }
             rightContent={
               <>
-                <InviteCard gameCode={gameCode} t={t} desktop />
-                <div data-testid="desktop-chat-area" className="flex-1 min-h-0 bg-neo-navy-light/50 rounded-neo-lg border-3 border-neo-white/10 overflow-hidden">
-                  {isOnCrazyGamesPlatform ? (
-                    <LobbyTutorialPanel t={t} />
-                  ) : (
-                    <RoomChat username="Host" isHost={true} gameCode={gameCode} className="h-full" onNewMessage={() => {}} variant="embedded" />
-                  )}
+                <InviteCard gameCode={gameCode} t={t} />
+                <div data-testid="desktop-chat-area" className="flex-1 min-h-0 overflow-hidden">
+                  <RoomChat gameCode={gameCode} username={username} isHost />
                 </div>
               </>
             }
           />
         </div>
 
-        {/* Mobile Layout — scrollable content + sticky CTA at bottom */}
-        <div className="lg:hidden flex flex-col flex-1 min-h-0">
-          {/* Scrollable content area */}
-          <div className="flex-1 overflow-y-auto overscroll-contain min-h-0 px-3 py-2 space-y-2">
-            <AnimatePresence>{renderBotCountdown()}</AnimatePresence>
-            <PlayerRoster players={filteredPlayersForDisplay} username={username} gameCode={gameCode} maxPlayers={maxPlayers} hostLabel={hostLabel} t={t} />
-            <BattleModeCard hostPlaying={hostPlaying} setHostPlaying={setHostPlaying} selectedGameMode={selectedGameMode} setSelectedGameMode={setSelectedGameMode} gameCode={gameCode} playersReady={playersReady} t={t} isAdmin={isAdmin} hasBlastAccess={hasBlastAccess}>
-              <LanguageSelector selectedLanguage={roomLanguage} onLanguageChange={handleRoomLanguageChange} hideLabel />
-            </BattleModeCard>
-
-            {/* Chat or Tutorial (CrazyGames) */}
-            <div className="bg-neo-navy-light/50 rounded-neo-lg border-2 border-neo-white/10 overflow-hidden h-64">
-              {isOnCrazyGamesPlatform ? (
-                <LobbyTutorialPanel t={t} />
-              ) : (
-                <RoomChat username="Host" isHost={true} gameCode={gameCode} className="h-full" onNewMessage={() => {}} variant="embedded" />
-              )}
-            </div>
+        {/* Mobile Layout — single scroll (hidden on desktop) */}
+        <div className="lg:hidden flex flex-col flex-1 min-h-0 overflow-y-auto px-3 py-3 gap-3">
+          <AnimatePresence>{renderBotCountdown()}</AnimatePresence>
+          <div className="flex-1 min-h-0 flex flex-col items-center">
+            <PlayerRoster
+              players={filteredPlayersForDisplay}
+              username={username}
+              gameCode={gameCode}
+              maxPlayers={maxPlayers}
+              hostLabel={hostLabel}
+              t={t}
+            />
           </div>
-
-          {/* Sticky CTA at bottom */}
-          <div className="shrink-0 px-3 py-2 bg-neo-navy border-t-2 border-neo-black" style={{ paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom, 0px))' }}>
-            <StartButton onStartGame={onStartGame} disabled={isStartDisabled} tournamentCreating={tournamentCreating} playerCount={filteredPlayersForDisplay.length} maxPlayers={maxPlayers} t={t} compact />
+          {tvModeToggle}
+          <BattleModeCard
+            selectedGameMode={selectedGameMode}
+            setSelectedGameMode={setSelectedGameMode}
+            t={t}
+            isAdmin={isAdmin}
+            hasBlastAccess={hasBlastAccess}
+          />
+          <InviteCard gameCode={gameCode} t={t} />
+          <div className="shrink-0 py-2 bg-neo-navy border-t-2 border-neo-black" style={{ paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom, 0px))' }}>
+            <StartButton
+              onStartGame={onStartGame}
+              disabled={isStartDisabled}
+              tournamentCreating={tournamentCreating}
+              playerCount={filteredPlayersForDisplay.length}
+              maxPlayers={maxPlayers}
+              t={t}
+              compact
+            />
           </div>
         </div>
       </main>
 
-      <PresetInfoDrawer openPreset={presetInfoOpen} onClose={() => setPresetInfoOpen(null)} onSelectPreset={() => setPresetInfoOpen(null)} t={t} />
       <TvTutorialOverlay onComplete={() => setShowTvTutorial(false)} onSkip={() => setShowTvTutorial(false)} t={t} forceShow={showTvTutorial} />
       <AvatarBuilderModal
         isOpen={isAvatarBuilderOpen}

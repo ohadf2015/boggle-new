@@ -47,8 +47,7 @@ import singlePlayerRoutes from '../backend/routes/singlePlayer';
 import singlePlayerLeaderboardRoutes from '../backend/routes/singlePlayerLeaderboard';
 import dailyChallengeRoutes from '../backend/routes/dailyChallenge';
 import aiHintsRoutes from '../backend/routes/aiHints';
-import adminGiftRoutes from '../backend/routes/adminGift';
-import adminNotificationRoutes from '../backend/routes/adminNotification';
+// adminGift and adminNotification now mounted inside admin/index.ts for RBAC + rate limiting
 import ugcPacksRoutes from '../backend/routes/ugcPacks';
 import ugcBoardsRoutes from '../backend/routes/ugcBoards';
 import playerProfileRoutes from '../backend/routes/playerProfile';
@@ -102,8 +101,6 @@ async function start(): Promise<void> {
   app.use('/api/geolocation', geolocationRoutes);
   app.use('/api/analytics', analyticsRoutes);
   app.use('/api/admin', adminRoutes);
-  app.use('/api/admin/gift', adminGiftRoutes);
-  app.use('/api/admin/notification', adminNotificationRoutes);
   app.use('/api/dictionary', dictionaryRoutes);
   app.use('/api/solve-grid', solveGridRoutes);
   app.use('/api/single-player', singlePlayerRoutes);

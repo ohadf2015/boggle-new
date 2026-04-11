@@ -5,6 +5,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import logger from '@/utils/logger';
 import { verifyAdminAuth } from '@/lib/auth/adminAuth';
 import { getSupabaseAdmin } from '@/lib/admin/server';
 import { captureApiError } from '@/utils/sentry';
@@ -83,7 +84,7 @@ export async function POST(
         .eq('word', submission.word)
         .eq('language', submission.language);
 
-      console.log(`[Admin] Approved word: "${submission.word}" (${submission.language}) by ${authResult.user?.email}`);
+      logger.log(`[Admin] Approved word: "${submission.word}" (${submission.language}) by ${authResult.user?.email}`);
 
       return NextResponse.json({
         success: true,
@@ -110,7 +111,7 @@ export async function POST(
         .eq('id', id);
     }
 
-    console.log(`[Admin] Rejected word: "${submission.word}" (${submission.language}) by ${authResult.user?.email}`);
+    logger.log(`[Admin] Rejected word: "${submission.word}" (${submission.language}) by ${authResult.user?.email}`);
 
     return NextResponse.json({
       success: true,
@@ -120,7 +121,7 @@ export async function POST(
     });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Internal server error';
-    console.error('[admin/invalid-words/action] Error:', error);
+    logger.error('[admin/invalid-words/action] Error:', error);
     captureApiError(
       error instanceof Error ? error : new Error('Unknown error'),
       '/api/admin/invalid-words/[id]/[action]',

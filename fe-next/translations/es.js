@@ -4209,6 +4209,10 @@ const es = {
   "wordFeedback": {
     "invalid": "Palabra no válida",
     "duplicate": "Ya encontrada",
+    "accepted": "Palabra aceptada",
+    "rejected": "Palabra rechazada",
+    "duplicateWord": "Palabra duplicada",
+    "lessonWordTitle": "¡Palabra del vocabulario de la lección!",
     "dictionaryTitle": "Construye Nuestro Diccionario",
     "submittedBy": "Enviado por",
     "skipHint": "Presiona ESC para saltar",
@@ -4911,6 +4915,47 @@ const es = {
     "requestChallenge": "Solicitar desafío",
     "requestSent": "Solicitud enviada",
     "watchAdRetry": "Ver anuncio para reintentar"
+  },
+  "wordWheel": {
+    "title": "Rueda de palabras",
+    "badge": "RUEDA DE PALABRAS",
+    "subtitle": "Encuentra palabras usando las letras de la rueda",
+    "description": "Cada palabra debe incluir la letra central",
+    "centerLetterRule": "Debe usar la letra central",
+    "minLetters": "Mín {min} letras",
+    "wordsFound": "{count} palabras encontradas",
+    "scoreLabel": "Puntuación",
+    "timeLeft": "Tiempo restante",
+    "gameOver": "¡Se acabó el tiempo!",
+    "submit": "ENVIAR",
+    "alreadyFound": "¡Ya encontrada!",
+    "notInDictionary": "No es una palabra válida",
+    "missingCenter": "Debe incluir la letra central ({letter})",
+    "tooShort": "Demasiado corta (mín {min} letras)",
+    "invalidLetters": "Solo puedes usar las letras de la rueda",
+    "inputPlaceholder": "Escribe una palabra...",
+    "foundWords": "Palabras encontradas",
+    "possibleWords": "Posibles",
+    "excellent": "¡Excelente!",
+    "great": "¡Genial!",
+    "good": "¡Buen esfuerzo!",
+    "tryAgain": "¡Sigue practicando!",
+    "results": {
+      "title": "Resultados de la rueda de palabras",
+      "wordsFound": "Palabras encontradas",
+      "score": "Puntuación",
+      "time": "Tiempo",
+      "rank": "Tu posición",
+      "share": "Compartir resultados",
+      "playWordHunt": "¡Juega también a Word Hunt!",
+      "playWordWheel": "¡Juega Rueda de palabras también!"
+    },
+    "hub": {
+      "wordWheelQuest": "Rueda de palabras",
+      "wordWheelDesc": "Encuentra palabras con la rueda — ¡la letra central es obligatoria!",
+      "wordHuntQuest": "Caza de palabras",
+      "wordHuntDesc": "Descifra la palabra oculta en 10 intentos"
+    }
   },
   "dailyChallenge": {
     "pointsPerWord": "Puntos por palabra"
@@ -8430,6 +8475,12 @@ const es = {
       "export": {
         "pdf": "Exportar PDF",
         "downloading": "Descargando..."
+      },
+      "columns": {
+        "word": "Palabra",
+        "status": "Estado",
+        "accuracy": "Precisión",
+        "attempts": "Intentos"
       }
     },
     "teacher": {

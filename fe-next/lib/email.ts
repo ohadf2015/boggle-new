@@ -104,6 +104,21 @@ interface EmailRecipient {
   username: string;
   timezone: string | null;
   email_unsubscribe_token: string | null;
+  country_code: string | null;
+}
+
+/**
+ * Map country code to app locale for email links.
+ * Falls back to 'en' for unknown countries.
+ */
+function getLocaleFromCountry(countryCode: string | null): string {
+  if (!countryCode) return 'en';
+  const cc = countryCode.toUpperCase();
+  if (cc === 'IL') return 'he';
+  if (cc === 'SE') return 'sv';
+  if (cc === 'JP') return 'ja';
+  if (['ES', 'MX', 'AR', 'CO', 'CL', 'PE', 'VE', 'EC', 'GT', 'CU', 'DO', 'HN', 'SV', 'NI', 'CR', 'PA', 'UY', 'PY', 'BO'].includes(cc)) return 'es';
+  return 'en';
 }
 
 /**
@@ -127,6 +142,7 @@ export async function getEligibleRecipients(_targetHourUTC: number): Promise<Ema
       username,
       timezone,
       email_unsubscribe_token,
+      country_code,
       last_daily_email_sent_at
     `)
     .eq('daily_email_subscribed', true);
@@ -184,6 +200,7 @@ export async function getEligibleRecipients(_targetHourUTC: number): Promise<Ema
         username: profile.username,
         timezone: profile.timezone,
         email_unsubscribe_token: profile.email_unsubscribe_token,
+        country_code: profile.country_code ?? null,
       });
     }
   }
@@ -566,7 +583,8 @@ export async function sendDailyChallengeEmail(
 
   const puzzleNumber = getPuzzleNumber();
   const unsubscribeUrl = `${baseUrl}/api/email/unsubscribe?token=${unsubscribeToken}`;
-  const playUrl = `${baseUrl}/en/daily`; // TODO: Use user's preferred language
+  const locale = getLocaleFromCountry(recipient.country_code);
+  const playUrl = `${baseUrl}/${locale}/daily`;
   const recipientName = recipient.display_name || recipient.username || 'Word Hunter';
 
   const { subject, html, text } = generateDailyChallengeEmail(

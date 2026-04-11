@@ -112,7 +112,13 @@ export const clearSessionPreservingUsername = (username?: string): void => {
     logger.error('Error preserving username:', error);
   }
 
-  // Clear the session cookie
+  // Clear the session from cookie AND storage (prevents auto-rejoin on reconnect)
   Cookies.remove(SESSION_COOKIE_NAME);
+  try {
+    sessionStorage.removeItem(SESSION_COOKIE_NAME);
+    localStorage.removeItem(SESSION_COOKIE_NAME);
+  } catch {
+    // Storage blocked
+  }
 };
 

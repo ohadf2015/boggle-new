@@ -105,6 +105,15 @@ export function useCrazyGamesInvite(options: UseCrazyGamesInviteOptions = {}): U
         return;
       }
 
+      // Skip invite auto-join if the player just intentionally exited a room
+      try {
+        if (sessionStorage.getItem('boggle_intentional_exit')) {
+          sessionStorage.removeItem('boggle_intentional_exit');
+          setIsReady(true);
+          return;
+        }
+      } catch { /* storage blocked */ }
+
       // Check for roomId in invite params
       const roomId = getInviteParam('roomId');
       if (roomId) {

@@ -33,7 +33,17 @@ const MAX_CONNECTIONS = parseInt(process.env.MAX_SOCKET_CONNECTIONS || '500', 10
 export function createSocketServer(httpServer: HttpServer, corsOrigin: string): Server {
   const io = new Server(httpServer, {
     cors: {
-      origin: corsOrigin === '*' ? true : corsOrigin.split(','),
+      origin: (() => {
+        if (corsOrigin === '*') {
+          const isDev = process.env.NODE_ENV !== 'production';
+          if (!isDev) {
+            socketLogger.fatal('CORS_ORIGIN=* is not allowed in production for Socket.IO. Set explicit origins.');
+            return false;
+          }
+          return true;
+        }
+        return corsOrigin.split(',');
+      })(),
       methods: ['GET', 'POST'],
       credentials: true
     },

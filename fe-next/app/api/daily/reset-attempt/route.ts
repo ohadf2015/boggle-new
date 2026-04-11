@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import logger from '@/utils/logger';
 import { createClient } from '@/utils/supabase/server';
 
 /**
@@ -68,7 +69,7 @@ export async function POST(request: Request) {
     const { data: existing, error: fetchError } = await query.maybeSingle();
 
     if (fetchError) {
-      console.error('Failed to fetch attempt for reset:', fetchError.message);
+      logger.error('Failed to fetch attempt for reset:', fetchError.message);
       return NextResponse.json(
         { success: false, error: 'Failed to fetch attempt' },
         { status: 500 }
@@ -88,7 +89,7 @@ export async function POST(request: Request) {
       .eq('id', existing.id);
 
     if (updateError) {
-      console.error('Failed to increment extra_tries:', updateError.message);
+      logger.error('Failed to increment extra_tries:', updateError.message);
       return NextResponse.json(
         { success: false, error: 'Failed to reset attempt' },
         { status: 500 }
@@ -96,7 +97,7 @@ export async function POST(request: Request) {
     }
 
     const identifier = playerId || guestFingerprint?.substring(0, 8) + '...';
-    console.log(`Incremented extra_tries to ${newExtraTries} for ${identifier} on ${puzzleDate}/${language}`);
+    logger.log(`Incremented extra_tries to ${newExtraTries} for ${identifier} on ${puzzleDate}/${language}`);
 
     return NextResponse.json({
       success: true,
@@ -104,7 +105,7 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error('Reset attempt error:', errorMessage);
+    logger.error('Reset attempt error:', errorMessage);
     return NextResponse.json(
       { success: false, error: 'Internal server error' },
       { status: 500 }

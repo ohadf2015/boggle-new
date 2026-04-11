@@ -1,6 +1,6 @@
 'use client';
 
-import { memo } from 'react';
+import { memo, useId } from 'react';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 import { BASE_PARTS } from './parts/BaseParts';
 import { EYE_PARTS } from './parts/EyeParts';
@@ -9,9 +9,10 @@ import { MOUTH_PARTS } from './parts/MouthParts';
 import { HAIR_PARTS } from './parts/HairParts';
 import { ACCESSORY_PARTS } from './parts/AccessoryParts';
 import { FACIAL_HAIR_PARTS } from './parts/FacialHairParts';
+import { NOSE_PARTS } from './parts/NoseParts';
 
 interface PartPreviewProps {
-  partType: 'base' | 'eyes' | 'eyebrows' | 'mouth' | 'hair' | 'accessory' | 'facialHair';
+  partType: 'base' | 'eyes' | 'eyebrows' | 'mouth' | 'hair' | 'accessory' | 'facialHair' | 'nose';
   partName: string;
   config: CustomAvatarConfig;
   size?: number;
@@ -22,15 +23,16 @@ interface PartPreviewProps {
  * Shows the part on a neutral background so the user can see what it looks like.
  */
 const PartPreview = memo<PartPreviewProps>(({ partType, partName, config, size = 48 }) => {
+  const filterId = useId();
   return (
     <svg viewBox="0 0 100 100" width={size} height={size} aria-hidden="true">
-      <rect x="0" y="0" width="100" height="100" rx="12" fill="#2a2a4e" />
-      {renderPart(partType, partName, config)}
+      <rect x="0" y="0" width="100" height="100" rx="12" fill={config.bgColor || '#2a2a4e'} />
+      {renderPart(partType, partName, config, filterId)}
     </svg>
   );
 });
 
-function renderPart(partType: string, partName: string, config: CustomAvatarConfig) {
+function renderPart(partType: string, partName: string, config: CustomAvatarConfig, filterId: string) {
   switch (partType) {
     case 'base': {
       const Part = BASE_PARTS[partName as keyof typeof BASE_PARTS];
@@ -51,12 +53,12 @@ function renderPart(partType: string, partName: string, config: CustomAvatarConf
       return Part ? (
         <g>
           <defs>
-            <filter id="preview-invert">
+            <filter id={filterId}>
               <feColorMatrix type="matrix" values="-1 0 0 0 1  0 -1 0 0 1  0 0 -1 0 1  0 0 0 1 0" />
             </filter>
           </defs>
           <circle cx="50" cy="52" r="32" fill={config.skinColor} opacity="0.35" />
-          <g filter="url(#preview-invert)">
+          <g filter={`url(#${filterId})`}>
             <Part fill={config.hairColor} />
           </g>
         </g>
@@ -98,6 +100,16 @@ function renderPart(partType: string, partName: string, config: CustomAvatarConf
         <>
           <circle cx="50" cy="52" r="32" fill="#d4a574" opacity="0.2" />
           <Part fill={config.hairColor} />
+        </>
+      );
+    }
+    case 'nose': {
+      const Part = NOSE_PARTS[partName as keyof typeof NOSE_PARTS];
+      if (!Part) return null;
+      return (
+        <>
+          <circle cx="50" cy="52" r="32" fill={config.skinColor} opacity="0.35" />
+          <Part fill={config.skinColor} />
         </>
       );
     }

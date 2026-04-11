@@ -3,6 +3,8 @@
 import { memo, useId } from 'react';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 import { darken, lighten } from './parts/avatarDesignConstants';
+import AvatarUidContext from './AvatarUidContext';
+import AvatarEyeColorContext from './AvatarEyeColorContext';
 import { BASE_PARTS } from './parts/BaseParts';
 import { EYE_PARTS } from './parts/EyeParts';
 import { MOUTH_PARTS } from './parts/MouthParts';
@@ -10,6 +12,7 @@ import { HAIR_PARTS, HAIR_FRONT_PARTS } from './parts/HairParts';
 import { ACCESSORY_PARTS } from './parts/AccessoryParts';
 import { EYEBROW_PARTS } from './parts/EyebrowParts';
 import { FACIAL_HAIR_PARTS } from "./parts/FacialHairParts";
+import { NOSE_PARTS } from './parts/NoseParts';
 import { BODY_PARTS } from './parts/BodyParts';
 import AvatarTierEffects, { type Tier } from './AvatarTierEffects';
 
@@ -75,6 +78,7 @@ const AvatarRenderer = memo<AvatarRendererProps>(({ config, size = 64, className
   const AccessoryPart = ACCESSORY_PARTS[config.accessory] ?? ACCESSORY_PARTS.none;
   const EyebrowPart = EYEBROW_PARTS[config.eyebrows ?? 'none'] ?? EYEBROW_PARTS.none;
   const FacialHairPart = FACIAL_HAIR_PARTS[config.facialHair ?? 'none'] ?? FACIAL_HAIR_PARTS.none;
+  const NosePart = NOSE_PARTS[config.noseStyle ?? 'none'] ?? NOSE_PARTS.none;
   const bodyKey = config.bodyStyle && config.bodyStyle !== 'default'
     ? config.bodyStyle
     : (config.gender ?? 'male');
@@ -88,6 +92,8 @@ const AvatarRenderer = memo<AvatarRendererProps>(({ config, size = 64, className
   const canBlink = !SKIP_BLINK_EYES.has(config.eyes) && !disableEffects;
 
   const svgElement = (
+    <AvatarUidContext.Provider value={uid}>
+    <AvatarEyeColorContext.Provider value={config.eyeColor || '#4A6FA5'}>
     <svg
       viewBox="0 0 100 100"
       width={size}
@@ -165,6 +171,9 @@ const AvatarRenderer = memo<AvatarRendererProps>(({ config, size = 64, className
         <ellipse cx="50" cy="75" rx="14" ry="3" fill={skinShadow} opacity="0.15" />
       )}
 
+      {/* Nose */}
+      {config.noseStyle && config.noseStyle !== 'none' && <NosePart fill={config.skinColor} />}
+
       {/* Cheek blush (skin-tone-aware) — skip for non-human face shapes */}
       {showDepth && (
         <>
@@ -238,6 +247,8 @@ const AvatarRenderer = memo<AvatarRendererProps>(({ config, size = 64, className
       {/* Accessories (on top, unless it's a back-layer accessory already rendered) */}
       {!isBackAccessory && <AccessoryPart fill={config.accessoryColor} />}
     </svg>
+    </AvatarEyeColorContext.Provider>
+    </AvatarUidContext.Provider>
   );
 
   if (disableEffects) return svgElement;

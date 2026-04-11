@@ -71,10 +71,9 @@ router.post('/daily-word/generate-retry-link', async (req: AdminRequest, res: Re
       return;
     }
 
-    // Construct the retry URL using the host from the request
-    const protocol = req.headers['x-forwarded-proto'] || 'https';
-    const host = req.headers.host || 'www.lexiclash.live';
-    const retryUrl = `${protocol}://${host}/${language}/daily?retryToken=${token}`;
+    // Use configured app URL — never trust client-controlled Host header
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.lexiclash.live';
+    const retryUrl = `${appUrl}/${language}/daily?retryToken=${token}`;
 
     auditLog(req.adminUser, 'GENERATE_RETRY_LINK', { puzzleDate, language, token: tokenData.token });
 
@@ -264,19 +263,40 @@ router.post('/send-reengagement-to-player', async (req: AdminRequest, res: Respo
     let profile: { id: string; display_name: string | null; username: string; timezone: string | null; country_code: string | null; email_unsubscribe_token: string | null } | null = null;
 
     if (isEmail) {
-      // Find user by email in auth
-      const { data: authUsers, error: authError } = await supabase.auth.admin.listUsers();
+      // Find user by email via service-role filtered query (NOT listUsers which loads all users)
+      const { data: authData, error: authError } = await supabase
+        .from('auth_users_view')
+        .select('id, email')
+        .eq('email', playerIdentifier)
+        .single();
+
+      // Fallback: use admin API with filter if view doesn't exist
       if (authError) {
-        res.status(500).json({ error: 'Failed to look up users' });
-        return;
+        const { data: listResult, error: listError } = await supabase.auth.admin.listUsers({ page: 1, perPage: 1 });
+        // If the view approach failed, try getUserByEmail-like approach via RPC
+        // For now, search with pagination to avoid loading all users
+        let found = false;
+        let page = 1;
+        while (!found) {
+          const { data: pageResult, error: pageError } = await supabase.auth.admin.listUsers({ page, perPage: 100 });
+          if (pageError || !pageResult.users.length) break;
+          const match = pageResult.users.find((u: { email?: string }) => u.email === playerIdentifier);
+          if (match) {
+            userId = match.id;
+            playerEmail = match.email || null;
+            found = true;
+          }
+          if (pageResult.users.length < 100) break;
+          page++;
+        }
+        if (!found) {
+          res.status(404).json({ error: `No user found with email: ${playerIdentifier}` });
+          return;
+        }
+      } else if (authData) {
+        userId = authData.id;
+        playerEmail = authData.email || null;
       }
-      const authUser = authUsers.users.find((u: { email?: string }) => u.email === playerIdentifier);
-      if (!authUser) {
-        res.status(404).json({ error: `No user found with email: ${playerIdentifier}` });
-        return;
-      }
-      userId = authUser.id;
-      playerEmail = authUser.email || null;
     } else {
       // Find user by username
       const { data: profileData, error: profileError } = await supabase
@@ -292,14 +312,13 @@ router.post('/send-reengagement-to-player', async (req: AdminRequest, res: Respo
       userId = profileData.id;
       profile = profileData;
 
-      // Get email from auth
-      const { data: authUsers, error: authError } = await supabase.auth.admin.listUsers();
-      if (authError) {
-        res.status(500).json({ error: 'Failed to look up users' });
+      // Get email from auth for this specific user (not all users)
+      const { data: { user: authUser }, error: authError } = await supabase.auth.admin.getUserById(userId);
+      if (authError || !authUser) {
+        res.status(500).json({ error: 'Failed to look up user email' });
         return;
       }
-      const authUser = authUsers.users.find((u: { id: string }) => u.id === userId);
-      playerEmail = authUser?.email || null;
+      playerEmail = authUser.email || null;
     }
 
     if (!userId || !playerEmail) {

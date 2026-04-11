@@ -13,6 +13,7 @@
  */
 
 import type { Language } from '@/types';
+import logger from '@/utils/logger';
 
 // Re-export scoring module for backward compatibility
 export {
@@ -174,13 +175,13 @@ export async function generateProgressiveHints(
   const { timeoutMs, retryCount, retryDelayMs } = { ...DEFAULT_CONFIG, ...config };
 
   if (!targetWord || typeof targetWord !== 'string') {
-    console.error('[HintGenerator] Invalid target word:', targetWord);
+    logger.error('[HintGenerator] Invalid target word:', targetWord);
     return generateFallbackHints('WORD', 'en');
   }
 
   const normalizedWord = targetWord.toUpperCase().trim();
   if (normalizedWord.length < 2) {
-    console.error('[HintGenerator] Word too short:', normalizedWord);
+    logger.error('[HintGenerator] Word too short:', normalizedWord);
     return generateFallbackHints(normalizedWord || 'WORD', language);
   }
 
@@ -189,7 +190,7 @@ export async function generateProgressiveHints(
 
   for (let attempt = 0; attempt <= retryCount; attempt++) {
     if (attempt > 0) {
-      console.info(`[HintGenerator] Retry attempt ${attempt} for ${normalizedWord}`);
+      logger.log(`[HintGenerator] Retry attempt ${attempt} for ${normalizedWord}`);
       await sleep(retryDelayMs);
     }
 
@@ -218,18 +219,18 @@ export async function generateProgressiveHints(
         lastError = new Error(`API error ${response.status}: ${errorText}`);
 
         if (isRetryableError(null, response) && attempt < retryCount) {
-          console.warn(`[HintGenerator] Retryable error: ${response.status}`);
+          logger.warn(`[HintGenerator] Retryable error: ${response.status}`);
           continue;
         }
 
-        console.error('[HintGenerator] API error:', response.status, errorText);
+        logger.error('[HintGenerator] API error:', response.status, errorText);
         return generateFallbackHints(normalizedWord, language);
       }
 
       const contentType = response.headers.get('content-type');
       if (!contentType?.includes('application/json')) {
         const responseText = await response.text().catch(() => '');
-        console.warn('[HintGenerator] Non-JSON response received:', contentType, responseText.substring(0, 100));
+        logger.warn('[HintGenerator] Non-JSON response received:', contentType, responseText.substring(0, 100));
         return generateFallbackHints(normalizedWord, language);
       }
 
@@ -237,12 +238,12 @@ export async function generateProgressiveHints(
       try {
         data = await response.json();
       } catch (parseError) {
-        console.warn('[HintGenerator] Failed to parse JSON response:', parseError);
+        logger.warn('[HintGenerator] Failed to parse JSON response:', parseError);
         return generateFallbackHints(normalizedWord, language);
       }
 
       if (!validateHintResponse(data)) {
-        console.warn('[HintGenerator] Invalid API response structure, using fallback');
+        logger.warn('[HintGenerator] Invalid API response structure, using fallback');
         return generateFallbackHints(normalizedWord, language);
       }
 
@@ -270,22 +271,22 @@ export async function generateProgressiveHints(
         lastError = error;
 
         if (error.name === 'AbortError') {
-          console.log('[HintGenerator] Request timed out');
+          logger.log('[HintGenerator] Request timed out');
           if (attempt < retryCount) {
             continue;
           }
         } else if (isRetryableError(error, lastResponse) && attempt < retryCount) {
-          console.log(`[HintGenerator] Retryable error: ${error.message}`);
+          logger.log(`[HintGenerator] Retryable error: ${error.message}`);
           continue;
         }
       }
 
-      console.log('[HintGenerator] Error generating hints:', error);
+      logger.log('[HintGenerator] Error generating hints:', error);
     }
   }
 
   if (lastError) {
-    console.log('[HintGenerator] All attempts failed:', lastError.message);
+    logger.log('[HintGenerator] All attempts failed:', lastError.message);
   }
   return generateFallbackHints(normalizedWord, language);
 }

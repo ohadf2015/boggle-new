@@ -6,6 +6,7 @@
  */
 
 import { STROKE_DETAIL } from './avatarDesignConstants';
+import { useAvatarUid } from '../AvatarUidContext';
 
 const S = STROKE_DETAIL;
 
@@ -20,41 +21,41 @@ function None() {
 function Stubble({ fill }: FacialHairProps) {
   return (
     <g opacity="0.55">
-      <circle cx="34" cy="62" r="0.5" fill={fill} />
-      <circle cx="36" cy="64" r="0.5" fill={fill} />
-      <circle cx="33" cy="66" r="0.5" fill={fill} />
-      <circle cx="35" cy="68" r="0.5" fill={fill} />
-      <circle cx="37" cy="66" r="0.5" fill={fill} />
-      <circle cx="38" cy="63" r="0.5" fill={fill} />
-      <circle cx="36" cy="60" r="0.5" fill={fill} />
-      <circle cx="44" cy="68" r="0.5" fill={fill} />
-      <circle cx="46" cy="70" r="0.5" fill={fill} />
-      <circle cx="48" cy="69" r="0.5" fill={fill} />
-      <circle cx="50" cy="71" r="0.5" fill={fill} />
-      <circle cx="52" cy="69" r="0.5" fill={fill} />
-      <circle cx="54" cy="70" r="0.5" fill={fill} />
-      <circle cx="56" cy="68" r="0.5" fill={fill} />
-      <circle cx="50" cy="67" r="0.5" fill={fill} />
-      <circle cx="47" cy="67" r="0.5" fill={fill} />
-      <circle cx="53" cy="67" r="0.5" fill={fill} />
-      <circle cx="43" cy="58" r="0.4" fill={fill} />
-      <circle cx="45" cy="57" r="0.4" fill={fill} />
-      <circle cx="47" cy="58" r="0.4" fill={fill} />
-      <circle cx="50" cy="57" r="0.4" fill={fill} />
-      <circle cx="53" cy="58" r="0.4" fill={fill} />
-      <circle cx="55" cy="57" r="0.4" fill={fill} />
-      <circle cx="57" cy="58" r="0.4" fill={fill} />
-      <circle cx="66" cy="62" r="0.5" fill={fill} />
-      <circle cx="64" cy="64" r="0.5" fill={fill} />
-      <circle cx="67" cy="66" r="0.5" fill={fill} />
-      <circle cx="65" cy="68" r="0.5" fill={fill} />
-      <circle cx="63" cy="66" r="0.5" fill={fill} />
-      <circle cx="62" cy="63" r="0.5" fill={fill} />
-      <circle cx="64" cy="60" r="0.5" fill={fill} />
-      <circle cx="40" cy="65" r="0.4" fill={fill} />
-      <circle cx="42" cy="67" r="0.4" fill={fill} />
-      <circle cx="58" cy="67" r="0.4" fill={fill} />
-      <circle cx="60" cy="65" r="0.4" fill={fill} />
+      <circle cx="34" cy="62" r="1.5" fill={fill} />
+      <circle cx="36" cy="64" r="1.5" fill={fill} />
+      <circle cx="33" cy="66" r="1.5" fill={fill} />
+      <circle cx="35" cy="68" r="1.5" fill={fill} />
+      <circle cx="37" cy="66" r="1.5" fill={fill} />
+      <circle cx="38" cy="63" r="1.5" fill={fill} />
+      <circle cx="36" cy="60" r="1.5" fill={fill} />
+      <circle cx="44" cy="68" r="1.5" fill={fill} />
+      <circle cx="46" cy="70" r="1.5" fill={fill} />
+      <circle cx="48" cy="69" r="1.5" fill={fill} />
+      <circle cx="50" cy="71" r="1.5" fill={fill} />
+      <circle cx="52" cy="69" r="1.5" fill={fill} />
+      <circle cx="54" cy="70" r="1.5" fill={fill} />
+      <circle cx="56" cy="68" r="1.5" fill={fill} />
+      <circle cx="50" cy="67" r="1.5" fill={fill} />
+      <circle cx="47" cy="67" r="1.5" fill={fill} />
+      <circle cx="53" cy="67" r="1.5" fill={fill} />
+      <circle cx="43" cy="58" r="1.2" fill={fill} />
+      <circle cx="45" cy="57" r="1.2" fill={fill} />
+      <circle cx="47" cy="58" r="1.2" fill={fill} />
+      <circle cx="50" cy="57" r="1.2" fill={fill} />
+      <circle cx="53" cy="58" r="1.2" fill={fill} />
+      <circle cx="55" cy="57" r="1.2" fill={fill} />
+      <circle cx="57" cy="58" r="1.2" fill={fill} />
+      <circle cx="66" cy="62" r="1.5" fill={fill} />
+      <circle cx="64" cy="64" r="1.5" fill={fill} />
+      <circle cx="67" cy="66" r="1.5" fill={fill} />
+      <circle cx="65" cy="68" r="1.5" fill={fill} />
+      <circle cx="63" cy="66" r="1.5" fill={fill} />
+      <circle cx="62" cy="63" r="1.5" fill={fill} />
+      <circle cx="64" cy="60" r="1.5" fill={fill} />
+      <circle cx="40" cy="65" r="1.2" fill={fill} />
+      <circle cx="42" cy="67" r="1.2" fill={fill} />
+      <circle cx="58" cy="67" r="1.2" fill={fill} />
+      <circle cx="60" cy="65" r="1.2" fill={fill} />
     </g>
   );
 }
@@ -160,17 +161,18 @@ function Handlebar({ fill }: FacialHairProps) {
 }
 
 function WizardBeard({ fill }: FacialHairProps) {
+  const u = useAvatarUid();
   return (
     <g>
       <defs>
-        <linearGradient id="wizardBeardGrad" x1="0" y1="0" x2="0" y2="1">
+        <linearGradient id={`${u}wizardBeardGrad`} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor={fill} />
           <stop offset="60%" stopColor={fill} stopOpacity="0.9" />
           <stop offset="100%" stopColor="#fff" stopOpacity="0.15" />
         </linearGradient>
       </defs>
       {/* Main flowing beard shape */}
-      <path d="M34 58 Q36 56 40 57 Q44 58 47 58 Q50 58 53 58 Q56 58 60 57 Q64 56 66 58 Q70 64 68 74 Q66 82 62 88 Q58 94 54 97 Q52 98 50 99 Q48 98 46 97 Q42 94 38 88 Q34 82 32 74 Q30 64 34 58Z" fill="url(#wizardBeardGrad)" stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      <path d="M34 58 Q36 56 40 57 Q44 58 47 58 Q50 58 53 58 Q56 58 60 57 Q64 56 66 58 Q70 64 68 74 Q66 82 62 88 Q58 94 54 97 Q52 98 50 99 Q48 98 46 97 Q42 94 38 88 Q34 82 32 74 Q30 64 34 58Z" fill={`url(#${u}wizardBeardGrad)`} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
       {/* Mustache portion */}
       <path d="M40 57 Q44 55 47 56 Q50 57.5 50 57.5 Q50 57.5 53 56 Q56 55 60 57" fill="none" stroke="#000" strokeWidth={1} opacity="0.3" />
       {/* Wispy flow lines */}
@@ -275,7 +277,7 @@ function TrimmedBeard({ fill }: FacialHairProps) {
         {x:62,y:58},{x:63,y:60},{x:61,y:62},{x:62,y:64},{x:61,y:66},
         {x:60,y:59},{x:60,y:61},{x:60,y:63},{x:59,y:65},
       ].map((p,i) => (
-        <circle key={`ch${i}`} cx={p.x} cy={p.y} r={0.8} fill={fill} opacity={0.5} />
+        <circle key={`ch${i}`} cx={p.x} cy={p.y} r={1.5} fill={fill} opacity={0.5} />
       ))}
       {/* Chin beard — dense stubble filling chin area */}
       {[
@@ -285,7 +287,7 @@ function TrimmedBeard({ fill }: FacialHairProps) {
         {x:44,y:71},{x:46,y:72},{x:48,y:72},{x:50,y:73},{x:52,y:72},{x:54,y:72},{x:56,y:71},
         {x:46,y:74},{x:48,y:74},{x:50,y:75},{x:52,y:74},{x:54,y:74},
       ].map((p,i) => (
-        <circle key={`cb${i}`} cx={p.x} cy={p.y} r={0.9} fill={fill} opacity={0.65} />
+        <circle key={`cb${i}`} cx={p.x} cy={p.y} r={1.5} fill={fill} opacity={0.65} />
       ))}
       {/* Jawline contour — thicker band along the jaw */}
       <path d="M34 66 Q38 70 42 72 Q46 74 50 75 Q54 74 58 72 Q62 70 66 66"

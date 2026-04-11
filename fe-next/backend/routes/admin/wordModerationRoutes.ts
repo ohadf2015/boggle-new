@@ -25,11 +25,17 @@ const { getSupabase } = require('../../modules/supabaseServer');
 const router: Router = express.Router();
 
 // Validation Schemas
-const blacklistAddSchema = z.object({
+const supportedLanguages = ['en', 'he', 'sv', 'ja', 'es', 'fr', 'de'] as const;
+
+const wordModSchema = z.object({
   word: z.string().min(1).max(50).transform((s: string) => s.toLowerCase().trim()),
-  language: z.enum(['en', 'he', 'sv', 'ja', 'es', 'fr', 'de']),
+  language: z.enum(supportedLanguages),
   reason: z.string().max(200).optional().nullable(),
+  addToDictionary: z.boolean().optional(),
+  addToBlacklist: z.boolean().optional(),
 });
+
+const blacklistAddSchema = wordModSchema.pick({ word: true, language: true, reason: true });
 
 // ==================== Bot Words Routes ====================
 
@@ -165,10 +171,11 @@ router.delete('/bot-blacklist/:id', async (req: AdminRequest, res: Response): Pr
 
 router.post('/bot-words/approve', async (req: AdminRequest, res: Response): Promise<void> => {
   const supabase = getSupabase();
-  const { word, language } = req.body;
-  if (!word || !language) { res.status(400).json({ error: 'Missing word or language' }); return; }
+  const validation = wordModSchema.safeParse(req.body);
+  if (!validation.success) { res.status(400).json({ error: 'Invalid request', details: validation.error.issues }); return; }
 
-  const normalizedWord = (word as string).toLowerCase().trim();
+  const normalizedWord = validation.data.word;
+  const language = validation.data.language;
 
   try {
     await supabase.from('bot_word_blacklist').delete().eq('word', normalizedWord).eq('language', language);
@@ -208,10 +215,12 @@ router.post('/bot-words/approve', async (req: AdminRequest, res: Response): Prom
 
 router.post('/bot-words/disapprove', async (req: AdminRequest, res: Response): Promise<void> => {
   const supabase = getSupabase();
-  const { word, language, reason } = req.body;
-  if (!word || !language) { res.status(400).json({ error: 'Missing word or language' }); return; }
+  const validation = wordModSchema.safeParse(req.body);
+  if (!validation.success) { res.status(400).json({ error: 'Invalid request', details: validation.error.issues }); return; }
 
-  const normalizedWord = (word as string).toLowerCase().trim();
+  const normalizedWord = validation.data.word;
+  const language = validation.data.language;
+  const reason = validation.data.reason;
 
   try {
     await supabase.from('bot_word_blacklist').upsert({
@@ -313,10 +322,12 @@ router.get('/community-words', async (req: AdminRequest, res: Response): Promise
 
 router.post('/community-words/approve', async (req: AdminRequest, res: Response): Promise<void> => {
   const supabase = getSupabase();
-  const { word, language, addToDictionary } = req.body;
-  if (!word || !language) { res.status(400).json({ error: 'Missing word or language' }); return; }
+  const validation = wordModSchema.safeParse(req.body);
+  if (!validation.success) { res.status(400).json({ error: 'Invalid request', details: validation.error.issues }); return; }
 
-  const normalizedWord = (word as string).toLowerCase().trim();
+  const normalizedWord = validation.data.word;
+  const language = validation.data.language;
+  const addToDictionary = validation.data.addToDictionary;
 
   try {
     const { data: currentScore } = await supabase.from('word_scores')
@@ -366,10 +377,13 @@ router.post('/community-words/approve', async (req: AdminRequest, res: Response)
 
 router.post('/community-words/disapprove', async (req: AdminRequest, res: Response): Promise<void> => {
   const supabase = getSupabase();
-  const { word, language, reason, addToBlacklist } = req.body;
-  if (!word || !language) { res.status(400).json({ error: 'Missing word or language' }); return; }
+  const validation = wordModSchema.safeParse(req.body);
+  if (!validation.success) { res.status(400).json({ error: 'Invalid request', details: validation.error.issues }); return; }
 
-  const normalizedWord = (word as string).toLowerCase().trim();
+  const normalizedWord = validation.data.word;
+  const language = validation.data.language;
+  const reason = validation.data.reason;
+  const addToBlacklist = validation.data.addToBlacklist;
 
   try {
     const { data: currentScore } = await supabase.from('word_scores')

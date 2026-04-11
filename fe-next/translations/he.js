@@ -4181,6 +4181,10 @@ const he = {
   "wordFeedback": {
     "invalid": "מילה לא תקינה",
     "duplicate": "כבר נמצאה",
+    "accepted": "המילה התקבלה",
+    "rejected": "המילה נדחתה",
+    "duplicateWord": "מילה כפולה",
+    "lessonWordTitle": "מילת אוצר מלים מהשיעור!",
     "dictionaryTitle": "בנה את המילון שלנו",
     "submittedBy": "נשלח על ידי",
     "skipHint": "לחץ ESC לדילוג",
@@ -4885,6 +4889,47 @@ const he = {
     "requestChallenge": "בקש אתגר",
     "requestSent": "הבקשה נשלחה",
     "watchAdRetry": "צפו בפרסומת כדי לנסות שוב"
+  },
+  "wordWheel": {
+    "title": "גלגל מילים",
+    "badge": "גלגל מילים",
+    "subtitle": "מצא מילים באמצעות אותיות הגלגל",
+    "description": "כל מילה חייבת לכלול את האות המרכזית",
+    "centerLetterRule": "חייב להשתמש באות המרכזית",
+    "minLetters": "מינימום {min} אותיות",
+    "wordsFound": "נמצאו {count} מילים",
+    "scoreLabel": "ניקוד",
+    "timeLeft": "זמן שנותר",
+    "gameOver": "הזמן נגמר!",
+    "submit": "שלח",
+    "alreadyFound": "כבר נמצאה!",
+    "notInDictionary": "מילה לא חוקית",
+    "missingCenter": "חייב לכלול את האות המרכזית ({letter})",
+    "tooShort": "קצר מדי (מינימום {min} אותיות)",
+    "invalidLetters": "ניתן להשתמש רק באותיות הגלגל",
+    "inputPlaceholder": "הקלד מילה...",
+    "foundWords": "מילים שנמצאו",
+    "possibleWords": "אפשרי",
+    "excellent": "מצוין!",
+    "great": "נהדר!",
+    "good": "כל הכבוד!",
+    "tryAgain": "המשך להתאמן!",
+    "results": {
+      "title": "תוצאות גלגל מילים",
+      "wordsFound": "מילים שנמצאו",
+      "score": "ניקוד",
+      "time": "זמן",
+      "rank": "הדירוג שלך",
+      "share": "שתף תוצאות",
+      "playWordHunt": "שחק גם ב-Word Hunt!",
+      "playWordWheel": "!שחקו גם בגלגל מילים"
+    },
+    "hub": {
+      "wordWheelQuest": "גלגל מילים",
+      "wordWheelDesc": "מצא מילים בגלגל — האות המרכזית חובה!",
+      "wordHuntQuest": "ציד מילים",
+      "wordHuntDesc": "פצח את המילה הנסתרת ב-10 ניסיונות"
+    }
   },
   "dailyChallenge": {
     "pointsPerWord": "נקודות למילה"
@@ -8463,6 +8508,12 @@ const he = {
       "export": {
         "pdf": "ייצוא PDF",
         "downloading": "מוריד..."
+      },
+      "columns": {
+        "word": "מילה",
+        "status": "סטטוס",
+        "accuracy": "דיוק",
+        "attempts": "ניסיונות"
       }
     },
     "curriculum": {

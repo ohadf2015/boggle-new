@@ -3,12 +3,12 @@
  * Handles /api/admin/gift/* endpoints for sending gifts to players
  */
 
-import express, { Request, Response, Router, NextFunction } from 'express';
+import express, { Request, Response, Router } from 'express';
 import { z } from 'zod';
 import logger from '../utils/logger';
 import { pushNotificationService, GiftNotificationData } from '../services/pushNotificationService';
 
-const { getSupabase, isSupabaseConfigured } = require('../modules/supabaseServer');
+const { getSupabase } = require('../modules/supabaseServer');
 
 const router: Router = express.Router();
 
@@ -64,62 +64,8 @@ const sendGiftSchema = z.object({
   badgeId: z.string().max(100).optional().nullable(),
 });
 
-// ==================== Middleware ====================
-
-/**
- * Admin authentication middleware (reuses main admin auth pattern)
- */
-async function adminAuth(req: AdminRequest, res: Response, next: NextFunction): Promise<void> {
-  const requestId = `gift-${Date.now()}-${Math.random().toString(36).substring(7)}`;
-  req.requestId = requestId;
-  res.setHeader('X-Request-Id', requestId);
-
-  const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    logger.warn('ADMIN_GIFT', `Missing auth header [${requestId}]`);
-    res.status(401).json({ error: 'Missing authorization header', requestId });
-    return;
-  }
-
-  const token = authHeader.substring(7);
-  if (!isSupabaseConfigured()) {
-    res.status(503).json({ error: 'Auth service not available', requestId });
-    return;
-  }
-
-  try {
-    const supabase = getSupabase();
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
-
-    if (authError || !user) {
-      logger.warn('ADMIN_GIFT', `Invalid token [${requestId}]`);
-      res.status(401).json({ error: 'Invalid token', requestId });
-      return;
-    }
-
-    const { data: profile, error: profileError } = await supabase
-      .from('profiles')
-      .select('is_admin, username')
-      .eq('id', user.id)
-      .single();
-
-    if (profileError || !profile?.is_admin) {
-      logger.warn('ADMIN_GIFT', `Non-admin access attempt by ${user.email} [${requestId}]`);
-      res.status(403).json({ error: 'Admin access required', requestId });
-      return;
-    }
-
-    req.adminUser = { id: user.id, email: user.email || '', username: profile.username };
-    logger.debug('ADMIN_GIFT', `Admin access: ${user.email} -> ${req.method} ${req.path} [${requestId}]`);
-    next();
-  } catch (error) {
-    const err = error as Error;
-    logger.error('ADMIN_GIFT', `Auth error: ${err.message} [${requestId}]`);
-    res.status(500).json({ error: 'Authentication failed', requestId });
-  }
-}
-
-router.use(adminAuth);
+// Auth + rate limiting are applied by the parent admin router (admin/index.ts)
+// Do NOT add duplicate adminAuth here — it would bypass RBAC and admin rate limiting.
 
 // ==================== Routes ====================
 

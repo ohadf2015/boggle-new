@@ -4,6 +4,7 @@
  */
 
 import { STROKE_INNER } from './avatarDesignConstants';
+import { useAvatarUid } from '../AvatarUidContext';
 
 const S = STROKE_INNER;
 
@@ -51,15 +52,16 @@ function Tongue() {
 }
 
 function Oh() {
+  const u = useAvatarUid();
   return (
     <g>
       <defs>
-        <radialGradient id="ohShadow" cx="50%" cy="40%" r="50%">
+        <radialGradient id={`${u}ohShadow`} cx="50%" cy="40%" r="50%">
           <stop offset="0%" stopColor="#333" />
           <stop offset="100%" stopColor="#000" />
         </radialGradient>
       </defs>
-      <ellipse cx="50" cy="62" rx="5" ry="7" fill="url(#ohShadow)" stroke="#000" strokeWidth={S} />
+      <ellipse cx="50" cy="62" rx="5" ry="7" fill={`url(#${u}ohShadow)`} stroke="#000" strokeWidth={S} />
       <ellipse cx="50" cy="62" rx="5.8" ry="7.8" fill="none" stroke="#E88" strokeWidth={1} opacity="0.4" />
       <path d="M46 56 Q44 54 45 53" fill="none" stroke="#000" strokeWidth={0.8} opacity="0.3" />
       <path d="M54 56 Q56 54 55 53" fill="none" stroke="#000" strokeWidth={0.8} opacity="0.3" />
@@ -225,18 +227,26 @@ function Whistle() {
       <ellipse cx="48" cy="59.5" rx="1.2" ry="0.8" fill="#FF9999" opacity="0.5" />
       <path d="M56 58 Q58 56 60 58" fill="none" stroke="#000" strokeWidth={1} opacity="0.3" />
       <path d="M58 56 Q60 54 62 56" fill="none" stroke="#000" strokeWidth={1} opacity="0.2" />
-      <text x="58" y="52" fontSize="8" fill="#000" opacity="0.6" fontFamily="serif">&#9835;</text>
-      <text x="66" y="48" fontSize="6" fill="#000" opacity="0.4" fontFamily="serif">&#9834;</text>
-      <text x="62" y="44" fontSize="5" fill="#000" opacity="0.3" fontFamily="serif">&#9833;</text>
+      {/* Music notes as SVG paths — cross-font reliable */}
+      <g opacity="0.5">
+        <circle cx="59" cy="52" r="1.5" fill="#000" /><path d="M60.5 52 L60.5 46" stroke="#000" strokeWidth={0.8} /><path d="M60.5 46 Q62 45 63 46" stroke="#000" strokeWidth={0.8} fill="none" />
+      </g>
+      <g opacity="0.35">
+        <circle cx="66" cy="48" r="1.2" fill="#000" /><path d="M67.2 48 L67.2 43" stroke="#000" strokeWidth={0.7} />
+      </g>
+      <g opacity="0.25">
+        <circle cx="63" cy="44" r="1" fill="#000" /><path d="M64 44 L64 40" stroke="#000" strokeWidth={0.6} />
+      </g>
     </g>
   );
 }
 
 function Zipper() {
+  const u = useAvatarUid();
   return (
     <g>
       <defs>
-        <linearGradient id="zipperMetal" x1="0" y1="0" x2="0" y2="1">
+        <linearGradient id={`${u}zipperMetal`} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor="#DDD" />
           <stop offset="50%" stopColor="#999" />
           <stop offset="100%" stopColor="#666" />
@@ -245,7 +255,7 @@ function Zipper() {
       <line x1="38" y1="62" x2="62" y2="62" stroke="#000" strokeWidth={S} strokeLinecap="round" />
       <path d="M39 60.5 Q50 59 61 60.5" fill="none" stroke="#000" strokeWidth={0.5} opacity="0.15" />
       {[40, 44, 48, 52, 56, 60].map(x => (
-        <rect key={x} x={x - 1} y={60} width={2} height={4} rx={0.3} fill="url(#zipperMetal)" stroke="#555" strokeWidth={0.5} />
+        <rect key={x} x={x - 1} y={60} width={2} height={4} rx={0.3} fill={`url(#${u}zipperMetal)`} stroke="#555" strokeWidth={0.5} />
       ))}
       <rect x="35" y="59.5" width="5" height="5" rx="1.5" fill="#FFD700" stroke="#000" strokeWidth={1.2} />
       <rect x="36.5" y="61" width="2" height="1.5" rx="0.5" fill="#FFF" opacity="0.3" />
@@ -320,13 +330,13 @@ function Dragon() {
       <path d="M48 64 Q50 70 52 64" fill="#FF3333" stroke="#CC0000" strokeWidth={0.8} />
       <path d="M49.5 68 L48.5 72 M50.5 68 L51.5 72" fill="none" stroke="#CC0000" strokeWidth={0.8} />
       <path d="M40 68 Q42 60 45 68 Q47 58 50 68 Q53 58 55 68 Q58 60 60 68" fill="none" stroke="#FF6D00" strokeWidth={2}>
-        <animate attributeName="opacity" values="0.8;0.4;0.9;0.6;0.8" dur="0.5s" repeatCount="indefinite" />
+        <animate attributeName="opacity" values="0.8;0.4;0.9;0.6;0.8" dur="3s" repeatCount="indefinite" />
       </path>
       <path d="M43 70 Q45 63 48 70 Q50 62 52 70 Q55 63 57 70" fill="none" stroke="#FFD600" strokeWidth={1.2}>
-        <animate attributeName="opacity" values="0.6;0.9;0.3;0.7;0.6" dur="0.6s" repeatCount="indefinite" />
+        <animate attributeName="opacity" values="0.6;0.9;0.3;0.7;0.6" dur="3.5s" repeatCount="indefinite" />
       </path>
       <path d="M46 71 Q48 66 50 72 Q52 66 54 71" fill="none" stroke="#FFF176" strokeWidth={0.8}>
-        <animate attributeName="opacity" values="0.4;0.7;0.2;0.5;0.4" dur="0.45s" repeatCount="indefinite" />
+        <animate attributeName="opacity" values="0.4;0.7;0.2;0.5;0.4" dur="4s" repeatCount="indefinite" />
       </path>
       <circle cx="42" cy="69" r="0.5" fill="#4CAF50" opacity="0.7" />
       <path d="M42 69 L41 72" fill="none" stroke="#4CAF50" strokeWidth={0.5} opacity="0.5" />
@@ -335,20 +345,21 @@ function Dragon() {
 }
 
 function DiamondMouth() {
+  const u = useAvatarUid();
   return (
     <g>
       <defs>
-        <linearGradient id="diamondMouthGrad" x1="0" y1="0" x2="1" y2="1">
+        <linearGradient id={`${u}diamondMouthGrad`} x1="0" y1="0" x2="1" y2="1">
           <stop offset="0%" stopColor="#E0F7FA" />
           <stop offset="50%" stopColor="#80DEEA" />
           <stop offset="100%" stopColor="#00ACC1" />
         </linearGradient>
       </defs>
       <path d="M37 58 Q50 68 63 58" fill="#fff" stroke="#000" strokeWidth={S} strokeLinecap="round" />
-      <polygon points="41,58 43,64 39,64" fill="url(#diamondMouthGrad)" stroke="#000" strokeWidth={0.8} />
-      <polygon points="47,59 49,65 45,65" fill="url(#diamondMouthGrad)" stroke="#000" strokeWidth={0.8} />
-      <polygon points="53,59 55,65 51,65" fill="url(#diamondMouthGrad)" stroke="#000" strokeWidth={0.8} />
-      <polygon points="59,58 61,64 57,64" fill="url(#diamondMouthGrad)" stroke="#000" strokeWidth={0.8} />
+      <polygon points="41,58 43,64 39,64" fill={`url(#${u}diamondMouthGrad)`} stroke="#000" strokeWidth={0.8} />
+      <polygon points="47,59 49,65 45,65" fill={`url(#${u}diamondMouthGrad)`} stroke="#000" strokeWidth={0.8} />
+      <polygon points="53,59 55,65 51,65" fill={`url(#${u}diamondMouthGrad)`} stroke="#000" strokeWidth={0.8} />
+      <polygon points="59,58 61,64 57,64" fill={`url(#${u}diamondMouthGrad)`} stroke="#000" strokeWidth={0.8} />
       <line x1="41" y1="60" x2="43" y2="64" fill="none" stroke="#fff" strokeWidth={0.4} opacity="0.5" />
       <line x1="47" y1="61" x2="49" y2="65" fill="none" stroke="#fff" strokeWidth={0.4} opacity="0.5" />
       <line x1="53" y1="61" x2="55" y2="65" fill="none" stroke="#fff" strokeWidth={0.4} opacity="0.5" />
@@ -511,21 +522,22 @@ function SideSmile() {
 }
 
 function Lipstick() {
+  const u = useAvatarUid();
   return (
     <g>
       {/* Full lipstick — bold colored lips */}
       <defs>
-        <linearGradient id="lipstickGrad" x1="0" y1="0" x2="0" y2="1">
+        <linearGradient id={`${u}lipstickGrad`} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor="#D4264F" />
           <stop offset="100%" stopColor="#A01B3A" />
         </linearGradient>
       </defs>
       {/* Upper lip — cupid's bow */}
       <path d="M40 59 Q44 56 48 58 L50 56 L52 58 Q56 56 60 59 Q50 61 40 59Z"
-        fill="url(#lipstickGrad)" stroke="#8B1538" strokeWidth={1} />
+        fill={`url(#${u}lipstickGrad)`} stroke="#8B1538" strokeWidth={1} />
       {/* Lower lip — fuller bottom */}
       <path d="M40 59 Q50 67 60 59 Q50 61 40 59Z"
-        fill="url(#lipstickGrad)" stroke="#8B1538" strokeWidth={1} />
+        fill={`url(#${u}lipstickGrad)`} stroke="#8B1538" strokeWidth={1} />
       {/* Lip highlight — glossy top */}
       <path d="M44 58 Q48 56.5 52 58" fill="none" stroke="#FF6B8A" strokeWidth={1} opacity="0.5" strokeLinecap="round" />
       {/* Lower lip shine */}

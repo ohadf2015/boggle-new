@@ -75,6 +75,7 @@ interface UseMultiplayerSocketReturn {
   setAttemptingReconnect: (value: boolean) => void;
   setRoomsLoading: (value: boolean) => void;
   refreshRooms: () => void;
+  signalIntentionalLeave: () => void;
 }
 
 /**
@@ -96,6 +97,7 @@ export function useMultiplayerSocket(
 
   const socketRef = useRef<Socket | null>(null);
   const wasConnectedRef = useRef<boolean>(false);
+  const intentionalLeaveRef = useRef<boolean>(false);
   const hostKeepAliveIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const attemptingReconnectRef = useRef<boolean>(attemptingReconnect);
   const hostLeftReloadTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -176,7 +178,7 @@ export function useMultiplayerSocket(
       // Uses getSession() which reads from the cookie (same source as saveSession)
       // This is critical for CrazyGames iframe where the socket can disconnect/reconnect
       // due to visibility changes, giving the socket a new ID and losing server mappings
-      if (wasConnectedRef.current) {
+      if (wasConnectedRef.current && !intentionalLeaveRef.current) {
         const savedSession = getSession();
         if (savedSession && savedSession.gameCode && savedSession.username) {
           logger.log('[SOCKET.IO] Reconnecting to game:', savedSession.gameCode);
@@ -377,6 +379,7 @@ export function useMultiplayerSocket(
     });
 
     socketInstance.on('hostLeftRoomClosing', (data) => {
+      intentionalLeaveRef.current = true;
       const opts = optionsRef.current;
       toast.error(data.message || opts.t('playerView.roomClosed'), {
         icon: '🚪',
@@ -389,6 +392,7 @@ export function useMultiplayerSocket(
     });
 
     socketInstance.on('kicked', (data: { reason: 'host' | 'inactive' }) => {
+      intentionalLeaveRef.current = true;
       const opts = optionsRef.current;
       const message = data.reason === 'inactive'
         ? opts.t('hostView.youWereKickedInactive')
@@ -417,6 +421,7 @@ export function useMultiplayerSocket(
     });
 
     socketInstance.on('sessionMigrated', (data) => {
+      intentionalLeaveRef.current = true;
       logger.log('[SOCKET.IO] Session migrated:', data);
       toast(data.message || 'Your session was moved to another tab', {
         icon: '🔄',
@@ -573,6 +578,11 @@ export function useMultiplayerSocket(
     };
   }, [isActive, isHost, socket, isConnected, gameCode]);
 
+  // Signal that the player intentionally left — prevents auto-rejoin on reconnect
+  const signalIntentionalLeave = useCallback(() => {
+    intentionalLeaveRef.current = true;
+  }, []);
+
   const refreshRooms = useCallback(() => {
     if (socket && isConnected) {
       setRoomsLoading(true);
@@ -588,5 +598,6 @@ export function useMultiplayerSocket(
     setAttemptingReconnect,
     setRoomsLoading,
     refreshRooms,
+    signalIntentionalLeave,
   };
 }

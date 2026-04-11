@@ -8,6 +8,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import logger from '@/utils/logger';
 import { verifyAdminAuth, type AdminUser } from '@/lib/auth/adminAuth';
 import { createClient } from '@supabase/supabase-js';
 import type { Language } from '@/types';
@@ -78,7 +79,7 @@ export async function handleBulkApprove(
     .in('id', wordIds);
 
   if (fetchError) {
-    console.error('[BulkApprove] Fetch error:', fetchError.message);
+    logger.error('[BulkApprove] Fetch error:', fetchError.message);
     return { error: 'Failed to fetch words', status: 500 };
   }
 
@@ -146,7 +147,7 @@ export async function handleBulkApprove(
         .eq('id', wordId);
 
       if (approveError) {
-        console.warn('[BulkApprove] Failed to mark word approved:', approveError.message);
+        logger.warn('[BulkApprove] Failed to mark word approved:', approveError.message);
         // Continue - word is already in word_scores
       }
 
@@ -163,7 +164,7 @@ export async function handleBulkApprove(
           const dictionary = await import('@/backend/dictionary');
           await dictionary.addApprovedWord(word.word, word.language);
         } catch (dictError) {
-          console.warn(`[BulkApprove] Dictionary add failed for ${word.word}:`, (dictError as Error).message);
+          logger.warn(`[BulkApprove] Dictionary add failed for ${word.word}:`, (dictError as Error).message);
         }
       }
 
@@ -172,11 +173,11 @@ export async function handleBulkApprove(
       const err = error as Error;
       results.failed!++;
       results.errors!.push({ wordId, word: word.word, reason: err.message });
-      console.error('[BulkApprove] Word error:', err.message);
+      logger.error('[BulkApprove] Word error:', err.message);
     }
   }
 
-  console.log(`[BulkApprove] Complete: ${results.approved} approved, ${results.skipped} skipped, ${results.failed} failed`);
+  logger.log(`[BulkApprove] Complete: ${results.approved} approved, ${results.skipped} skipped, ${results.failed} failed`);
 
   return results;
 }
@@ -185,7 +186,7 @@ export async function handleBulkApprove(
  * POST handler for bulk approve
  */
 export async function POST(request: NextRequest): Promise<NextResponse> {
-  console.log('[BulkApprove] POST request received');
+  logger.log('[BulkApprove] POST request received');
 
   // Verify admin authentication
   const authResult = await verifyAdminAuth(request);
@@ -204,7 +205,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     return NextResponse.json(result);
   } catch (error) {
     const err = error as Error;
-    console.error('[BulkApprove] Error:', err.message);
+    logger.error('[BulkApprove] Error:', err.message);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

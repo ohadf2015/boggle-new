@@ -20,6 +20,9 @@ import AnimationsLoader from '@/components/AnimationsLoader';
 import NativeOAuthInitializer from '@/components/NativeOAuthInitializer';
 import { ToastContainer } from '@/components/ui/EnhancedToast';
 import { ChurnSignalTracker } from '@/components/engagement/ChurnSignalTracker';
+import SocialMediaPixels from '@/components/SocialMediaPixels';
+import { OrganizationJsonLd } from '@/components/seo/OrganizationJsonLd';
+import { VideoGameJsonLd } from '@/components/seo/VideoGameJsonLd';
 import { fredokaLatin, fredokaHebrew, rubikLatin, rubikHebrew, heeboHebrew } from '../fonts';
 
 // Dynamic import for EmailCaptureModal (shown conditionally, not needed immediately)
@@ -546,6 +549,9 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 <link rel="preconnect" href="https://www.lexiclash.live" />
                 <link rel="preconnect" href="https://hdtmpkicuxvtmvrmtybx.supabase.co" />
                 <link rel="dns-prefetch" href="https://hdtmpkicuxvtmvrmtybx.supabase.co" />
+                {/* PostHog EU analytics — preconnect for faster first event */}
+                <link rel="preconnect" href="https://eu.i.posthog.com" />
+                <link rel="dns-prefetch" href="https://eu.i.posthog.com" />
                 {/* GIF preload removed — 571KB blocks critical resources (Lighthouse: LCP 24s → should drop significantly) */}
                 {/* Favicon and icons - use relative paths for development, absolute for production */}
                 {/* PNG icons FIRST - Google requires multiples of 48px and prefers PNG over SVG/ICO */}
@@ -574,6 +580,8 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 {/* CrazyGames SDK must load in <head> with beforeInteractive
                     so it's detected by their QA tool before hydration */}
                 <CrazyGamesScriptServer />
+                <OrganizationJsonLd />
+                <VideoGameJsonLd />
             </head>
             <body className="antialiased screen-fit" suppressHydrationWarning>
                 {/* Dark-only theme — static string literal, no user input, safe from XSS */}
@@ -595,6 +603,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 {/* Load external scripts with optimized strategies to prevent blocking */}
                 <GoogleAnalytics />
                 <GoogleAdSense />
+                <SocialMediaPixels />
                 <WebVitalsReporter />
                 <ServiceWorkerRegistration />
                 {/* Defer loading animations.css (60KB) after page mount */}

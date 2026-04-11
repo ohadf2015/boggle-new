@@ -11,11 +11,15 @@ import type {
   StoredDailyResult,
   StoredWordHuntResult,
   WordHuntResult,
+  WordWheelResult,
+  StoredWordWheelResult,
   DailyStreak,
 } from './types';
 import {
   DAILY_STORAGE_KEY,
   WORD_HUNT_STORAGE_KEY,
+  WORD_WHEEL_STORAGE_KEY,
+  getWordWheelResultKey,
 } from './constants';
 import { getDailyChallengeDate } from './dateUtils';
 import { updateDailyStreak } from './streaks';
@@ -242,6 +246,55 @@ export function getAllWordHuntResults(language: Language): StoredWordHuntResult[
 
   // Sort by date descending
   return results.sort((a, b) => b.date.localeCompare(a.date));
+}
+
+// ==========================================
+// Word Wheel Storage
+// ==========================================
+
+/**
+ * Check if user has already played today's Word Wheel
+ */
+export function hasPlayedWordWheelToday(language: Language): boolean {
+  const today = getDailyChallengeDate();
+  const key = getWordWheelResultKey(language, today);
+  return getFromLocalStorage(key) !== null;
+}
+
+/**
+ * Get Word Wheel status for today
+ */
+export function getWordWheelStatusToday(language: Language): { wordsFound: number; score: number } | null {
+  const result = getTodaysWordWheelResult(language);
+  if (!result) return null;
+  return { wordsFound: result.result.wordsFound.length, score: result.result.score };
+}
+
+/**
+ * Get stored Word Wheel result for today
+ */
+export function getTodaysWordWheelResult(language: Language): StoredWordWheelResult | null {
+  const today = getDailyChallengeDate();
+  const key = getWordWheelResultKey(language, today);
+  return getJsonFromLocalStorage<StoredWordWheelResult | null>(key, null);
+}
+
+/**
+ * Save Word Wheel result
+ */
+export function saveWordWheelResult(result: WordWheelResult): void {
+  const today = result.puzzleDate || getDailyChallengeDate();
+  const key = getWordWheelResultKey(result.language, today);
+
+  const storedResult: StoredWordWheelResult = {
+    date: today,
+    puzzleNumber: result.puzzleNumber,
+    result,
+    completedAt: new Date().toISOString(),
+    submittedToServer: false,
+  };
+
+  saveJsonToLocalStorage(key, storedResult);
 }
 
 // ==========================================

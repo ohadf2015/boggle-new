@@ -1,4 +1,5 @@
 import toast from 'react-hot-toast';
+import posthog from 'posthog-js';
 import logger from '@/utils/logger';
 import { trackReferralInviteSent } from '@/utils/viralTracking';
 
@@ -16,7 +17,10 @@ type TranslationFunction = (key: string) => string;
 export const getJoinUrl = (gameCode: string, utmSource?: string): string => {
   if (typeof window === 'undefined') return '';
   if (!gameCode) return '';
-  const publicUrl = process.env.REACT_APP_PUBLIC_URL || window.location.origin;
+  const origin = window.location.origin;
+  // Extract current locale from the URL path (e.g. /en/..., /he/...)
+  const localeMatch = window.location.pathname.match(/^\/([a-z]{2})(\/|$)/);
+  const locale = localeMatch?.[1] || 'en';
   const params = new URLSearchParams();
   params.set('room', gameCode);
   if (utmSource) {
@@ -24,7 +28,7 @@ export const getJoinUrl = (gameCode: string, utmSource?: string): string => {
     params.set('utm_medium', 'referral');
     params.set('utm_campaign', 'player_invite');
   }
-  return `${publicUrl}?${params.toString()}`;
+  return `${origin}/${locale}?${params.toString()}`;
 };
 
 /**
@@ -469,6 +473,13 @@ const trackVariantEvent = (variantId: string, event: 'shown' | 'clicked' | 'conv
     localStorage.setItem(PERFORMANCE_STORAGE_KEY, JSON.stringify(performance));
   } catch {
     // Storage full or unavailable
+  }
+
+  // Send to PostHog so A/B test data can be analyzed at scale
+  try {
+    posthog.capture('share_variant_event', { variantId, event });
+  } catch {
+    // PostHog not initialized
   }
 };
 

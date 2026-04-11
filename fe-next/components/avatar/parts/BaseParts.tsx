@@ -4,6 +4,7 @@
  */
 
 import { STROKE_OUTER } from './avatarDesignConstants';
+import { useAvatarUid } from '../AvatarUidContext';
 
 const S = STROKE_OUTER;
 
@@ -84,10 +85,11 @@ function Oval({ fill }: BasePartProps) {
 }
 
 function Heart({ fill }: BasePartProps) {
+  const u = useAvatarUid();
   return (
     <g>
       <defs>
-        <radialGradient id="heartGlow" cx="50%" cy="35%" r="55%">
+        <radialGradient id={`${u}heartGlow`} cx="50%" cy="35%" r="55%">
           <stop offset="0%" stopColor="#fff" stopOpacity="0.18" />
           <stop offset="100%" stopColor="#000" stopOpacity="0.03" />
         </radialGradient>
@@ -96,7 +98,7 @@ function Heart({ fill }: BasePartProps) {
       <path d="M50 80 C28 66 14 50 22 36 C28 26 40 26 50 36 C60 26 72 26 78 36 C86 50 72 66 50 80Z"
         fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
       <path d="M50 80 C28 66 14 50 22 36 C28 26 40 26 50 36 C60 26 72 26 78 36 C86 50 72 66 50 80Z"
-        fill="url(#heartGlow)" />
+        fill={`url(#${u}heartGlow)`} />
       {/* Lobe highlights — makes them look round and plump */}
       <ellipse cx="34" cy="36" rx="6" ry="5" fill="#fff" opacity="0.12" />
       <ellipse cx="66" cy="36" rx="6" ry="5" fill="#fff" opacity="0.12" />
@@ -168,8 +170,8 @@ function Skull({ fill }: BasePartProps) {
       <path d="M64 50 Q70 46 76 50" fill="none" stroke="#000" strokeWidth={1.5} opacity="0.35" />
       {/* Nasal cavity (replaces standard nose) */}
       <path d="M45 53 L50 59 L55 53Z" fill="#000" opacity="0.45" stroke="#000" strokeWidth={1} />
-      {/* Jaw teeth — prominent zigzag */}
-      <path d="M33 72 L35 78 L37 72 L39 78 L41 72 L43 78 L45 72 L47 78 L49 72 L51 78 L53 72 L55 78 L57 72 L59 78 L61 72 L63 78 L65 72 L67 78"
+      {/* Jaw teeth — varied sizes for organic look */}
+      <path d="M33 72 L34 77 L37 72 L39.5 79 L42 72 L44 76 L47 72 L49 78 L51 72 L53.5 77 L56 72 L58 79 L61 72 L63 76 L65 72 L67 78"
         fill="#fff" stroke="#000" strokeWidth={1.2} strokeLinejoin="round" />
       <path d="M32 72 L68 72" stroke="#000" strokeWidth={1.5} />
       {/* Temple cracks */}
@@ -205,15 +207,16 @@ function Shield({ fill }: BasePartProps) {
 
 
 function DragonHead({ fill }: BasePartProps) {
+  const u = useAvatarUid();
   return (
     <g>
       <defs>
-        <linearGradient id="dragonScaleGrad" x1="0" y1="0" x2="0" y2="1">
+        <linearGradient id={`${u}dragonScaleGrad`} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor={fill} />
           <stop offset="60%" stopColor={fill} />
           <stop offset="100%" stopColor="#1A1A2E" stopOpacity="0.4" />
         </linearGradient>
-        <linearGradient id="dragonHornGrad" x1="0" y1="1" x2="0" y2="0">
+        <linearGradient id={`${u}dragonHornGrad`} x1="0" y1="1" x2="0" y2="0">
           <stop offset="0%" stopColor="#5D4037" />
           <stop offset="50%" stopColor="#8D6E63" />
           <stop offset="100%" stopColor="#D7CCC8" />
@@ -222,13 +225,13 @@ function DragonHead({ fill }: BasePartProps) {
 
       {/* Main head shape */}
       <path d="M20 58 C16 46 18 32 26 24 C32 18 40 14 50 14 C60 14 68 18 74 24 C82 32 84 46 80 58 L76 66 Q68 74 50 74 Q32 74 24 66Z"
-        fill="url(#dragonScaleGrad)" stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+        fill={`url(#${u}dragonScaleGrad)`} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
 
       {/* Big curved horns */}
       <path d="M28 26 C24 18 18 8 12 -2 C16 2 20 4 22 0 C20 10 24 18 30 22"
-        fill="url(#dragonHornGrad)" stroke="#000" strokeWidth={2} strokeLinejoin="round" />
+        fill={`url(#${u}dragonHornGrad)`} stroke="#000" strokeWidth={2} strokeLinejoin="round" />
       <path d="M72 26 C76 18 82 8 88 -2 C84 2 80 4 78 0 C80 10 76 18 70 22"
-        fill="url(#dragonHornGrad)" stroke="#000" strokeWidth={2} strokeLinejoin="round" />
+        fill={`url(#${u}dragonHornGrad)`} stroke="#000" strokeWidth={2} strokeLinejoin="round" />
       {/* Horn ridges */}
       <path d="M24 20 L20 12 M22 16 L16 6" stroke="#000" strokeWidth={0.8} opacity="0.2" />
       <path d="M76 20 L80 12 M78 16 L84 6" stroke="#000" strokeWidth={0.8} opacity="0.2" />

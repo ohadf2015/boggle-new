@@ -4162,6 +4162,10 @@ const sv = {
   "wordFeedback": {
     "invalid": "Ogiltigt ord",
     "duplicate": "Redan hittad",
+    "accepted": "Ord godkänt",
+    "rejected": "Ord avvisat",
+    "duplicateWord": "Dubblettord",
+    "lessonWordTitle": "Lektionens ordförråd!",
     "dictionaryTitle": "Bygg vår ordbok",
     "submittedBy": "Skickad av",
     "skipHint": "Tryck ESC för att hoppa över",
@@ -4874,6 +4878,47 @@ const sv = {
     "requestChallenge": "Begär utmaning",
     "requestSent": "Förfrågan skickad",
     "watchAdRetry": "Se reklam för att försöka igen"
+  },
+  "wordWheel": {
+    "title": "Ordhjul",
+    "badge": "ORDHJUL",
+    "subtitle": "Hitta ord med hjulets bokstäver",
+    "description": "Varje ord måste innehålla mittenbokstaven",
+    "centerLetterRule": "Måste använda mittenbokstaven",
+    "minLetters": "Min {min} bokstäver",
+    "wordsFound": "{count} ord hittade",
+    "scoreLabel": "Poäng",
+    "timeLeft": "Tid kvar",
+    "gameOver": "Tiden är ute!",
+    "submit": "SKICKA",
+    "alreadyFound": "Redan hittad!",
+    "notInDictionary": "Inte ett giltigt ord",
+    "missingCenter": "Måste innehålla mittenbokstaven ({letter})",
+    "tooShort": "För kort (min {min} bokstäver)",
+    "invalidLetters": "Kan bara använda hjulets bokstäver",
+    "inputPlaceholder": "Skriv ett ord...",
+    "foundWords": "Hittade ord",
+    "possibleWords": "Möjliga",
+    "excellent": "Utmärkt!",
+    "great": "Bra jobbat!",
+    "good": "Bra försök!",
+    "tryAgain": "Fortsätt öva!",
+    "results": {
+      "title": "Ordhjulsresultat",
+      "wordsFound": "Hittade ord",
+      "score": "Poäng",
+      "time": "Tid",
+      "rank": "Din placering",
+      "share": "Dela resultat",
+      "playWordHunt": "Spela Word Hunt också!",
+      "playWordWheel": "Spela Ordhjul också!"
+    },
+    "hub": {
+      "wordWheelQuest": "Ordhjul",
+      "wordWheelDesc": "Hitta ord med hjulet — mittenbokstaven krävs!",
+      "wordHuntQuest": "Ordjakt",
+      "wordHuntDesc": "Knäck det dolda ordet på 10 försök"
+    }
   },
   "dailyChallenge": {
     "pointsPerWord": "Poäng per ord"
@@ -8428,6 +8473,12 @@ const sv = {
       "export": {
         "pdf": "Exportera PDF",
         "downloading": "Laddar ner..."
+      },
+      "columns": {
+        "word": "Ord",
+        "status": "Status",
+        "accuracy": "Precision",
+        "attempts": "Försök"
       }
     },
     "curriculum": {

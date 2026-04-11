@@ -26,6 +26,7 @@
 @custom-variant tall (@media (min-height: 800px));
 @custom-variant short (@media (max-height: 600px));
 @custom-variant desktop-tall (@media (min-width: 1024px) and (min-height: 700px));
+@custom-variant desktop-short (@media (min-width: 1024px) and (max-height: 699px));
 
 @utility text-balance {
   text-wrap: balance;

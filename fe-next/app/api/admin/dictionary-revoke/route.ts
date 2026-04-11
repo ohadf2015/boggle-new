@@ -6,6 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import logger from '@/utils/logger';
 import { verifyAdminAuth } from '@/lib/auth/adminAuth';
 import { getSupabaseAdmin } from '@/lib/admin/server';
 import { captureApiError } from '@/utils/sentry';
@@ -92,7 +93,7 @@ export async function POST(request: NextRequest) {
     await invalidateMilogCache(trimmedWord);
 
     // Audit log
-    console.log(
+    logger.log(
       `[Admin] Dictionary revoke: "${trimmedWord}" (${language}) by ${authResult.user?.email}` +
       (addToBlacklist ? ' [blacklisted]' : '') +
       (reason ? ` reason: ${reason}` : '')
@@ -106,7 +107,7 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Internal server error';
-    console.error('[admin/dictionary-revoke] Error:', error);
+    logger.error('[admin/dictionary-revoke] Error:', error);
     captureApiError(
       error instanceof Error ? error : new Error('Unknown error'),
       '/api/admin/dictionary-revoke',

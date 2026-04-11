@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { timingSafeEqual } from 'crypto';
+import logger from '@/utils/logger';
 import { captureApiError } from '@/utils/sentry';
 
 // Weekly reset may take a while for many leagues
@@ -27,15 +28,15 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    console.log('[Cron] Starting weekly league reset...');
+    logger.log('[Cron] Starting weekly league reset...');
     const { processWeeklyReset } = await import('@/backend/modules/leagueManager');
     const result = await processWeeklyReset();
-    console.log('[Cron] Weekly league reset complete:', result);
+    logger.log('[Cron] Weekly league reset complete:', result);
 
     return NextResponse.json({ success: true, ...result });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : String(error);
-    console.error('[Cron] Weekly league reset failed:', message);
+    logger.error('[Cron] Weekly league reset failed:', message);
     captureApiError(
       error instanceof Error ? error : new Error(message),
       '/api/cron/weekly-league-reset',

@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useCallback, useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { QRCodeSVG } from 'qrcode.react';
-import { Copy, Check, Share2, Link as LinkIcon } from 'lucide-react';
+import { Copy, Check, Share2, Maximize2, X } from 'lucide-react';
 import { getJoinUrl, copyJoinUrl } from '../../../../utils/share';
 import { cn } from '../../../../lib/utils';
 
@@ -24,16 +24,6 @@ export interface InviteCardProps {
 
 // ==================== Component ====================
 
-/**
- * Invite card with QR code and share options
- *
- * Features:
- * - QR code for easy scanning (smaller in compact mode)
- * - Room code display
- * - Copy link button
- * - Share via native share API (if available)
- * - Compact horizontal layout option for space-constrained views
- */
 export function InviteCard({
   gameCode,
   t,
@@ -42,6 +32,7 @@ export function InviteCard({
   desktop = false,
 }: InviteCardProps): React.ReactElement {
   const [linkCopied, setLinkCopied] = useState(false);
+  const [qrExpanded, setQrExpanded] = useState(false);
   const joinUrl = getJoinUrl(gameCode);
 
   const handleCopyLink = useCallback(async () => {
@@ -54,11 +45,9 @@ export function InviteCard({
 
   const handleNativeShare = useCallback(async () => {
     if (!navigator.share) {
-      // Fallback to copy
       await handleCopyLink();
       return;
     }
-
     try {
       await navigator.share({
         title: t('share.title'),
@@ -66,270 +55,68 @@ export function InviteCard({
         url: joinUrl,
       });
     } catch (err) {
-      // User cancelled or share failed - fallback to copy
       if ((err as Error).name !== 'AbortError') {
         await handleCopyLink();
       }
     }
   }, [gameCode, joinUrl, t, handleCopyLink]);
 
-  // Desktop-optimized two-column layout with larger QR and better horizontal space usage
-  if (desktop) {
-    return (
-      <div
-        data-testid="invite-card"
-        className={cn(
-          'relative rounded-neo-lg border-4 border-neo-black overflow-hidden w-full',
-          'bg-slate-800',
-          'shadow-hard-lg',
-          className
-        )}
-      >
-        {/* Decorative accent */}
-        <div className="absolute top-0 left-0 right-0 h-2 bg-neo-lime" />
-
-        <div className="p-5 xl:p-4 pt-7 xl:pt-6">
-          {/* Two-column layout: QR + Content side by side */}
-          <div className="grid grid-cols-[auto_1fr] gap-5 xl:gap-4 items-start">
-            {/* Left: QR Code - larger for desktop visibility */}
-            <div className="flex flex-col items-center gap-3">
-              <motion.div
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                className="p-3 xl:p-2.5 bg-white rounded-neo border-4 border-neo-black shadow-hard"
-              >
-                <QRCodeSVG
-                  value={joinUrl}
-                  size={150}
-                  level="H"
-                  includeMargin={false}
-                  bgColor="#ffffff"
-                  fgColor="#000000"
-                  title={t('share.qrCodeAlt', { code: gameCode })}
-                />
-              </motion.div>
-              {/* Room Code below QR */}
-              <div className="text-center">
-                <p className="text-xs font-bold uppercase text-neo-cream/60 mb-0.5">
-                  {t('roomCode.title')}
-                </p>
-                <p className="text-3xl font-black tracking-wider text-neo-lime">{gameCode}</p>
-              </div>
-            </div>
-
-            {/* Right: Share Options */}
-            <div className="flex flex-col justify-center h-full min-h-[180px] xl:min-h-[160px] py-1">
-              {/* Share Buttons - stacked vertically for desktop */}
-              <div className="flex flex-col gap-3">
-                <motion.button
-                  data-testid="copy-link-button"
-                  onClick={handleCopyLink}
-                  whileTap={{ scale: 0.98 }}
-                  className={cn(
-                    'flex items-center justify-center gap-2 px-5 py-3.5 rounded-neo border-3 border-neo-black font-bold text-base transition-all',
-                    linkCopied
-                      ? 'bg-neo-lime text-neo-black shadow-none'
-                      : 'bg-neo-navy hover:bg-neo-navy-light text-neo-cream shadow-hard-sm hover:shadow-none'
-                  )}
-                >
-                  {linkCopied ? (
-                    <>
-                      <Check className="w-5 h-5" />
-                      <span>{t('common.copied')}</span>
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="w-5 h-5" />
-                      <span>{t('roomCode.copyLink')}</span>
-                    </>
-                  )}
-                </motion.button>
-
-                {typeof navigator !== 'undefined' && typeof navigator.share === 'function' && (
-                  <motion.button
-                    data-testid="native-share-button"
-                    onClick={handleNativeShare}
-                    whileTap={{ scale: 0.98 }}
-                    className="flex items-center justify-center gap-2 px-5 py-3.5 rounded-neo border-3 border-neo-black bg-neo-cyan text-neo-black font-bold text-base shadow-hard-sm hover:shadow-none transition-all"
-                  >
-                    <Share2 className="w-5 h-5" />
-                    <span>{t('share.button')}</span>
-                  </motion.button>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Compact horizontal layout
-  if (compact) {
-    return (
-      <div
-        data-testid="invite-card"
-        className={cn(
-          'relative rounded-neo-lg border-4 border-neo-black overflow-hidden w-full max-w-md',
-          'bg-slate-800',
-          'shadow-hard',
-          className
-        )}
-      >
-        {/* Decorative accent */}
-        <div className="absolute top-0 left-0 right-0 h-1.5 bg-neo-lime" />
-
-        <div className="p-4 pt-5">
-          {/* Horizontal layout: QR + Content */}
-          <div className="flex items-center gap-4">
-            {/* QR Code - smaller in compact mode */}
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              className="shrink-0 p-2 bg-white rounded-neo border-3 border-neo-black shadow-hard-sm"
-            >
-              <QRCodeSVG
-                value={joinUrl}
-                size={100}
-                level="H"
-                includeMargin={false}
-                bgColor="#ffffff"
-                fgColor="#000000"
-                title={t('share.qrCodeAlt', { code: gameCode })}
-              />
-            </motion.div>
-
-            {/* Content */}
-            <div className="flex-1 min-w-0">
-              {/* Room Code */}
-              <div className="mb-3">
-                <p className="text-xs font-bold uppercase text-neo-cream/60 mb-0.5">
-                  {t('roomCode.title')}
-                </p>
-                <p className="text-2xl font-black tracking-wider text-neo-lime">{gameCode}</p>
-              </div>
-
-              {/* Share Buttons */}
-              <div className="flex gap-2">
-                <motion.button
-                  data-testid="copy-link-button"
-                  onClick={handleCopyLink}
-                  whileTap={{ scale: 0.95 }}
-                  className={cn(
-                    'flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-neo border-2 border-neo-black text-sm font-bold transition-all',
-                    linkCopied
-                      ? 'bg-neo-lime text-neo-black shadow-none'
-                      : 'bg-neo-navy hover:bg-neo-navy-light text-neo-cream shadow-hard-sm'
-                  )}
-                >
-                  {linkCopied ? (
-                    <>
-                      <Check className="w-4 h-4" />
-                      <span>{t('common.copied')}</span>
-                    </>
-                  ) : (
-                    <>
-                      <LinkIcon className="w-4 h-4" />
-                      <span>{t('roomCode.copyLink')}</span>
-                    </>
-                  )}
-                </motion.button>
-
-                {typeof navigator !== 'undefined' && typeof navigator.share === 'function' && (
-                  <motion.button
-                    data-testid="native-share-button"
-                    onClick={handleNativeShare}
-                    whileTap={{ scale: 0.95 }}
-                    className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-neo border-2 border-neo-black bg-neo-cyan text-neo-black font-bold shadow-hard-sm hover:shadow-none transition-all"
-                  >
-                    <Share2 className="w-4 h-4" />
-                  </motion.button>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Standard vertical layout
+  // Inline compact card — small QR with enlarge button + room code + copy
   return (
-    <div
-      data-testid="invite-card"
-      className={cn(
-        'relative rounded-neo-lg border-4 border-neo-black overflow-hidden w-full max-w-md',
-        'bg-slate-800',
-        'shadow-hard-lg',
-        className
-      )}
-    >
-      {/* Decorative accent */}
-      <div className="absolute top-0 left-0 right-0 h-2 bg-neo-lime" />
-
-      <div className="p-6 pt-8">
-        {/* Header */}
-        <div className="text-center mb-4">
-          <Share2 className="w-8 h-8 mx-auto text-neo-cyan mb-2" />
-          <h2 className="text-xl font-black uppercase text-neo-cream">
-            {t('hostView.inviteFriends')}
-          </h2>
-          <p className="text-sm text-neo-cream/60">
-            {t('hostView.scanOrShare')}
-          </p>
-        </div>
-
-        {/* QR Code */}
-        <div className="flex justify-center mb-4">
-          <motion.div
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            className="p-4 bg-white rounded-neo border-4 border-neo-black shadow-hard"
-          >
+    <>
+      <div
+        data-testid="invite-card"
+        className={cn(
+          'flex items-center gap-3 px-3 py-2.5 rounded-neo-lg border-2 border-neo-white/10 bg-neo-navy-light/50',
+          className
+        )}
+      >
+        {/* Small QR with enlarge overlay */}
+        <button
+          onClick={() => setQrExpanded(true)}
+          className="relative shrink-0 group"
+          aria-label={t('hostView.showQrCode')}
+        >
+          <div className="p-1.5 bg-white rounded-sm border-2 border-neo-black shadow-hard-sm">
             <QRCodeSVG
               value={joinUrl}
-              size={160}
-              level="H"
+              size={48}
+              level="M"
               includeMargin={false}
               bgColor="#ffffff"
               fgColor="#000000"
-              title={t('share.qrCodeAlt', { code: gameCode })}
             />
-          </motion.div>
-        </div>
+          </div>
+          <div className="absolute inset-0 flex items-center justify-center bg-neo-black/0 group-hover:bg-neo-black/40 rounded-sm transition-colors">
+            <Maximize2 className="w-4 h-4 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+          </div>
+        </button>
 
-        {/* Room Code */}
-        <div className="text-center mb-4">
-          <p className="text-xs font-bold uppercase text-neo-cream/60 mb-1">
+        {/* Room code */}
+        <div className="flex-1 min-w-0">
+          <p className="text-[10px] font-bold uppercase text-neo-cream/40 tracking-widest">
             {t('roomCode.title')}
           </p>
-          <p className="text-3xl font-black tracking-wider text-neo-lime">{gameCode}</p>
+          <p className="text-xl font-black tracking-wider text-neo-lime font-neo-display">
+            {gameCode}
+          </p>
         </div>
 
-        {/* Share Buttons */}
-        <div className="flex gap-2">
+        {/* Action buttons */}
+        <div className="flex gap-1.5 shrink-0">
           <motion.button
             data-testid="copy-link-button"
             onClick={handleCopyLink}
             whileTap={{ scale: 0.95 }}
             className={cn(
-              'flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-neo border-3 border-neo-black font-bold transition-all',
+              'w-9 h-9 flex items-center justify-center rounded-neo border-2 border-neo-black transition-all',
               linkCopied
-                ? 'bg-neo-lime text-neo-black shadow-none'
-                : 'bg-neo-navy hover:bg-neo-navy-light text-neo-cream shadow-hard-sm'
+                ? 'bg-neo-lime text-neo-black'
+                : 'bg-white/10 text-neo-cream hover:bg-white/20 shadow-hard-sm'
             )}
+            aria-label={t('roomCode.copyLink')}
           >
-            {linkCopied ? (
-              <>
-                <Check className="w-5 h-5" />
-                <span>{t('common.copied')}</span>
-              </>
-            ) : (
-              <>
-                <LinkIcon className="w-5 h-5" />
-                <span>{t('roomCode.copyLink')}</span>
-              </>
-            )}
+            {linkCopied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
           </motion.button>
 
           {typeof navigator !== 'undefined' && typeof navigator.share === 'function' && (
@@ -337,14 +124,65 @@ export function InviteCard({
               data-testid="native-share-button"
               onClick={handleNativeShare}
               whileTap={{ scale: 0.95 }}
-              className="flex items-center justify-center gap-2 px-4 py-3 rounded-neo border-3 border-neo-black bg-neo-cyan text-neo-black font-bold shadow-hard-sm hover:shadow-none transition-all"
+              className="w-9 h-9 flex items-center justify-center rounded-neo border-2 border-neo-black bg-neo-cyan text-neo-black shadow-hard-sm hover:shadow-none transition-all"
+              aria-label={t('share.button')}
             >
-              <Share2 className="w-5 h-5" />
+              <Share2 className="w-4 h-4" />
             </motion.button>
           )}
         </div>
       </div>
-    </div>
+
+      {/* Expanded QR Modal */}
+      <AnimatePresence>
+        {qrExpanded && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-90 flex items-center justify-center bg-neo-black/80"
+            onClick={() => setQrExpanded(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+              className="relative bg-neo-navy border-4 border-neo-black rounded-neo-lg shadow-hard-xl p-6 max-w-xs"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                onClick={() => setQrExpanded(false)}
+                className="absolute top-2 end-2 w-8 h-8 flex items-center justify-center bg-neo-red border-2 border-neo-black rounded-neo shadow-hard-sm"
+                aria-label={t('hostView.close')}
+              >
+                <X className="w-4 h-4 text-neo-black" />
+              </button>
+
+              <div className="flex flex-col items-center gap-4">
+                <h3 className="text-sm font-bold uppercase tracking-widest text-neo-cream/60">
+                  {t('hostView.scanToJoin')}
+                </h3>
+                <div className="p-4 bg-white rounded-neo border-4 border-neo-black shadow-hard">
+                  <QRCodeSVG
+                    value={joinUrl}
+                    size={200}
+                    level="H"
+                    includeMargin={false}
+                    bgColor="#ffffff"
+                    fgColor="#000000"
+                    title={t('share.qrCodeAlt', { code: gameCode })}
+                  />
+                </div>
+                <p className="text-3xl font-black tracking-[0.2em] text-neo-lime font-neo-display">
+                  {gameCode}
+                </p>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
   );
 }
 

@@ -59,7 +59,6 @@ export function subscribeToNotifications(
         filter: `user_id=eq.${userId}`,
       },
       (payload) => {
-        console.log('New notification received:', payload);
         const notification = payload.new as RealtimeNotification;
         onNewNotification(notification);
       }

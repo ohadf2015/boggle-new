@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import logger from '@/utils/logger';
 import { createClient } from '@supabase/supabase-js';
 import { captureApiError } from '@/utils/sentry';
 import { getPostHogServer } from '@/lib/posthog';
@@ -173,7 +174,7 @@ export async function POST(request: NextRequest) {
         );
 
       if (dbError) {
-        console.error('[Email Subscription DB Error]', dbError);
+        logger.error('[Email Subscription DB Error]', dbError);
         captureApiError(new Error(dbError.message), '/api/subscribe-email', {
           method: 'POST',
           statusCode: 500,
@@ -183,10 +184,10 @@ export async function POST(request: NextRequest) {
           throw new Error('Failed to save email subscription');
         }
       } else {
-        console.log('[Email Subscription] Saved to database:', email);
+        logger.log('[Email Subscription] Saved to database:', email);
       }
     } else {
-      console.warn('[Email Subscription] No Supabase admin client available');
+      logger.warn('[Email Subscription] No Supabase admin client available');
     }
 
     getPostHogServer()?.capture({
@@ -206,7 +207,7 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error('[Email Subscription Error]', errorMessage);
+    logger.error('[Email Subscription Error]', errorMessage);
     captureApiError(
       error instanceof Error ? error : new Error(String(error)),
       '/api/subscribe-email',

@@ -157,7 +157,7 @@ export default function MultiplayerPageClient(): React.JSX.Element {
 
   const {
     socket, isConnected, roomsLoading, attemptingReconnect,
-    setAttemptingReconnect, refreshRooms,
+    setAttemptingReconnect, refreshRooms, signalIntentionalLeave,
   } = useMultiplayerSocket({
     language: language as Language, gameCode, username, roomName,
     isActive, isHost, roomLanguage,
@@ -407,6 +407,8 @@ export default function MultiplayerPageClient(): React.JSX.Element {
         <div tabIndex={-1} className="h-dvh flex flex-col min-h-0 w-full overflow-x-clip">
           {/* Banners inside h-dvh so they participate in flex layout */}
           {isActive ? <ConnectionBanner showScoreSafe onLeaveGame={() => {
+            signalIntentionalLeave();
+            socket?.emit('leaveRoom', { gameCode });
             setIsActive(false); setIsHost(false); setGameCode('');
             clearSession();
             toast(t('multiplayerFlow.roomList.leftGame'), { icon: '👋' });

@@ -125,7 +125,6 @@ export function useRealtimeNotifications(): UseRealtimeNotificationsReturn {
     const startPollingFallback = () => {
       if (pollingIntervalRef.current) return; // Already polling
 
-      console.log('Starting notification polling fallback');
       usePollingFallbackRef.current = true;
 
       // Track the last notification we've seen to detect new ones

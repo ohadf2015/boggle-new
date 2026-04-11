@@ -259,7 +259,6 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
       });
     } else if (shouldUseSimulation) {
       // Priority 2: Simulation fallback for development/testing
-      console.log('[RewardedAd] Using simulation mode - no real ads configured');
       setStatus('showing');
       onAdStarted?.();
 
@@ -268,8 +267,7 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
         awardCoinsAndNotify();
       }, 3000);
     } else {
-      // Priority 3: No ad platform — grant coins immediately, log for admin
-      console.log('[RewardedAd] No ad platform available — granting placeholder reward');
+      // Priority 3: No ad platform — grant coins immediately
       setStatus('showing');
       onAdStarted?.();
       awardCoinsAndNotify();

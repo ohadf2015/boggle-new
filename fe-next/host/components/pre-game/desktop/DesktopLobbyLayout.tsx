@@ -38,9 +38,9 @@ export function DesktopLobbyLayout({
       animate={{ opacity: 1 }}
       transition={{ type: 'spring', stiffness: 300, damping: 26 }}
       className={cn(
-        'grid h-full p-6 xl:p-8 bg-neo-navy',
+        'grid h-full p-4 desktop-tall:p-6 xl:desktop-tall:p-8 bg-neo-navy',
         'grid-cols-12',
-        'gap-5 xl:gap-8',
+        'gap-4 desktop-tall:gap-5 xl:desktop-tall:gap-8',
         className
       )}
     >

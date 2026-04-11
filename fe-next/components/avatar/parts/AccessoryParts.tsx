@@ -4,6 +4,7 @@
  */
 
 import { STROKE_INNER, STROKE_OUTER } from './avatarDesignConstants';
+import { useAvatarUid } from '../AvatarUidContext';
 
 /** Most accessories use inner stroke; head accessories (hats, crowns) use outer */
 const S = STROKE_INNER;
@@ -34,16 +35,17 @@ function Glasses({ fill }: AccessoryPartProps) {
 }
 
 function Sunglasses({ fill }: AccessoryPartProps) {
+  const u = useAvatarUid();
   return (
     <g>
       <defs>
-        <linearGradient id="sunglassLensGrad" x1="0" y1="0" x2="0" y2="1">
+        <linearGradient id={`${u}sunglassLensGrad`} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor={fill} />
           <stop offset="100%" stopColor="#000" stopOpacity="0.6" />
         </linearGradient>
       </defs>
-      <rect x="26" y="35" width="20" height="13" rx="4" fill="url(#sunglassLensGrad)" stroke="#000" strokeWidth={S} />
-      <rect x="54" y="35" width="20" height="13" rx="4" fill="url(#sunglassLensGrad)" stroke="#000" strokeWidth={S} />
+      <rect x="26" y="35" width="20" height="13" rx="4" fill={`url(#${u}sunglassLensGrad)`} stroke="#000" strokeWidth={S} />
+      <rect x="54" y="35" width="20" height="13" rx="4" fill={`url(#${u}sunglassLensGrad)`} stroke="#000" strokeWidth={S} />
       <path d="M46 41 L54 41" stroke="#000" strokeWidth={S + 0.5} />
       <path d="M26 39 L18 36" stroke="#000" strokeWidth={S + 0.5} strokeLinecap="round" />
       <path d="M74 39 L82 36" stroke="#000" strokeWidth={S + 0.5} strokeLinecap="round" />
@@ -143,16 +145,17 @@ function Bandana({ fill }: AccessoryPartProps) {
 }
 
 function Horns({ fill }: AccessoryPartProps) {
+  const u = useAvatarUid();
   return (
     <g>
       <defs>
-        <linearGradient id="hornGrad" x1="0" y1="1" x2="0" y2="0">
+        <linearGradient id={`${u}hornGrad`} x1="0" y1="1" x2="0" y2="0">
           <stop offset="0%" stopColor={fill} />
           <stop offset="100%" stopColor="#fff" stopOpacity="0.3" />
         </linearGradient>
       </defs>
-      <path d="M30 30 Q22 15 28 5 Q32 10 35 25" fill="url(#hornGrad)" stroke="#000" strokeWidth={S} strokeLinejoin="round" />
-      <path d="M70 30 Q78 15 72 5 Q68 10 65 25" fill="url(#hornGrad)" stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      <path d="M30 30 Q22 15 28 5 Q32 10 35 25" fill={`url(#${u}hornGrad)`} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      <path d="M70 30 Q78 15 72 5 Q68 10 65 25" fill={`url(#${u}hornGrad)`} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
       <path d="M29 22 L33 20" stroke="#000" strokeWidth={1} opacity="0.3" />
       <path d="M28 16 L32 15" stroke="#000" strokeWidth={1} opacity="0.3" />
       <path d="M27.5 10 L31 9.5" stroke="#000" strokeWidth={1} opacity="0.25" />
@@ -413,8 +416,7 @@ function DevilHorns({ fill }: AccessoryPartProps) {
     <g>
       <path d="M28 28 Q20 12 24 0 Q30 8 34 22" fill={c} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
       <path d="M72 28 Q80 12 76 0 Q70 8 66 22" fill={c} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
-      <path d="M50 98 Q55 90 60 92 Q65 88 62 82" stroke={c} strokeWidth={3} fill="none" strokeLinecap="round" />
-      <path d="M60 80 L62 82 L64 78" fill={c} stroke="#000" strokeWidth={1.5} />
+      {/* Tail removed — conflicts with body layer at y=80-98 */}
     </g>
   );
 }
@@ -438,14 +440,15 @@ function Headphones({ fill }: AccessoryPartProps) {
 function ChefHat({ fill }: AccessoryPartProps) {
   return (
     <g>
-      <circle cx="38" cy="6" r="13" fill={fill} stroke="#000" strokeWidth={SO} />
-      <circle cx="62" cy="6" r="13" fill={fill} stroke="#000" strokeWidth={SO} />
-      <circle cx="50" cy="2" r="14" fill={fill} stroke="#000" strokeWidth={SO} />
-      <circle cx="44" cy="12" r="11" fill={fill} stroke="#000" strokeWidth={SO} />
-      <circle cx="56" cy="12" r="11" fill={fill} stroke="#000" strokeWidth={SO} />
+      {/* Puffy top — single smooth cloud shape */}
+      <path d="M30 22 Q28 14 34 8 Q38 2 44 2 Q48 -2 50 -2 Q52 -2 56 2 Q62 2 66 8 Q72 14 70 22Z"
+        fill={fill} stroke="#000" strokeWidth={SO} strokeLinejoin="round" />
+      {/* Subtle puff bumps */}
+      <path d="M34 8 Q38 4 44 4 Q48 0 52 2 Q58 2 62 6" fill="none" stroke="#000" strokeWidth={0.5} opacity="0.08" />
+      {/* Hat band */}
       <rect x="30" y="20" width="40" height="8" rx="2" fill={fill} stroke="#000" strokeWidth={SO} />
-      <circle cx="45" cy="6" r="1" fill="#000" opacity="0.06" />
-      <circle cx="55" cy="8" r="0.8" fill="#000" opacity="0.05" />
+      {/* Band detail line */}
+      <path d="M32 24 L68 24" stroke="#000" strokeWidth={0.5} opacity="0.1" />
     </g>
   );
 }
@@ -475,15 +478,16 @@ function Plunger({ fill }: AccessoryPartProps) {
 }
 
 function Samurai({ fill }: AccessoryPartProps) {
+  const u = useAvatarUid();
   return (
     <g>
       <defs>
-        <linearGradient id="samuraiGrad" x1="0" y1="0" x2="0" y2="1">
+        <linearGradient id={`${u}samuraiGrad`} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor={fill} />
           <stop offset="100%" stopColor="#333" />
         </linearGradient>
       </defs>
-      <path d="M20 35 Q50 8 80 35 L75 30 Q50 12 25 30Z" fill="url(#samuraiGrad)" stroke="#000" strokeWidth={S} />
+      <path d="M20 35 Q50 8 80 35 L75 30 Q50 12 25 30Z" fill={`url(#${u}samuraiGrad)`} stroke="#000" strokeWidth={S} />
       <path d="M50 8 L48 20 L52 20Z" fill="#FFD700" stroke="#000" strokeWidth={1.5} />
       <circle cx="50" cy="22" r="3" fill="#FFD700" stroke="#000" strokeWidth={1} />
       <circle cx="50" cy="21.5" r="1" fill="#fff" opacity="0.3" />
@@ -496,10 +500,11 @@ function Samurai({ fill }: AccessoryPartProps) {
 }
 
 function Astronaut({ fill }: AccessoryPartProps) {
+  const u = useAvatarUid();
   return (
     <g>
       <defs>
-        <linearGradient id="visorGrad" x1="0" y1="0" x2="1" y2="1">
+        <linearGradient id={`${u}visorGrad`} x1="0" y1="0" x2="1" y2="1">
           <stop offset="0%" stopColor="#1A237E" stopOpacity="0.25" />
           <stop offset="100%" stopColor="#4FC3F7" stopOpacity="0.1" />
         </linearGradient>
@@ -510,7 +515,7 @@ function Astronaut({ fill }: AccessoryPartProps) {
       <rect x="70" y="58" width="8" height="6" rx="2" fill={fill} stroke="#000" strokeWidth={1} />
       <line x1="50" y1="12" x2="50" y2="6" stroke={fill} strokeWidth={2} />
       <circle cx="50" cy="5" r="2.5" fill="#FF0000" stroke="#000" strokeWidth={1} />
-      <ellipse cx="50" cy="42" rx="28" ry="24" fill="url(#visorGrad)" />
+      <ellipse cx="50" cy="42" rx="28" ry="24" fill={`url(#${u}visorGrad)`} />
       <path d="M20 44 L22 44 M78 44 L80 44" stroke={fill} strokeWidth={1.5} opacity="0.5" />
       <circle cx="30" cy="62" r="1.5" fill={fill} stroke="#000" strokeWidth={0.5} opacity="0.6" />
     </g>
@@ -518,15 +523,16 @@ function Astronaut({ fill }: AccessoryPartProps) {
 }
 
 function WizardHat({ fill }: AccessoryPartProps) {
+  const u = useAvatarUid();
   return (
     <g>
       <defs>
-        <linearGradient id="wizardGrad" x1="0" y1="1" x2="0" y2="0">
+        <linearGradient id={`${u}wizardGrad`} x1="0" y1="1" x2="0" y2="0">
           <stop offset="0%" stopColor={fill} />
           <stop offset="100%" stopColor="#1A0033" />
         </linearGradient>
       </defs>
-      <path d="M25 32 L50 -5 L75 32 Q62 28 50 30 Q38 28 25 32Z" fill="url(#wizardGrad)" stroke="#000" strokeWidth={SO} />
+      <path d="M25 32 L50 -5 L75 32 Q62 28 50 30 Q38 28 25 32Z" fill={`url(#${u}wizardGrad)`} stroke="#000" strokeWidth={SO} />
       <ellipse cx="50" cy="32" rx="30" ry="5" fill={fill} stroke="#000" strokeWidth={SO} />
       <polygon points="40,10 41,13 44,13 41.5,15 42.5,18 40,16 37.5,18 38.5,15 36,13 39,13" fill="#FFD700" />
       <polygon points="58,16 59,18 61,18 59.5,19.5 60,21.5 58,20 56,21.5 56.5,19.5 55,18 57,18" fill="#FFD700" />
@@ -553,37 +559,38 @@ function NinjaScarf({ fill }: AccessoryPartProps) {
 }
 
 function PhoenixCrown({ fill }: AccessoryPartProps) {
+  const u = useAvatarUid();
   return (
     <g>
       <defs>
-        <linearGradient id="phoenixCrownGrad" x1="0" y1="1" x2="0" y2="0">
+        <linearGradient id={`${u}phoenixCrownGrad`} x1="0" y1="1" x2="0" y2="0">
           <stop offset="0%" stopColor="#B71C1C" />
           <stop offset="40%" stopColor="#FF6D00" />
           <stop offset="100%" stopColor="#FFD600" />
         </linearGradient>
-        <linearGradient id="phoenixWingGrad" x1="0" y1="1" x2="0" y2="0">
+        <linearGradient id={`${u}phoenixWingGrad`} x1="0" y1="1" x2="0" y2="0">
           <stop offset="0%" stopColor={fill} />
           <stop offset="30%" stopColor="#FF6D00" />
           <stop offset="60%" stopColor="#FFAB00" />
           <stop offset="100%" stopColor="#FFD600" />
         </linearGradient>
-        <radialGradient id="phoenixGemGrad" cx="50%" cy="30%" r="50%">
+        <radialGradient id={`${u}phoenixGemGrad`} cx="50%" cy="30%" r="50%">
           <stop offset="0%" stopColor="#fff" />
           <stop offset="40%" stopColor="#FF1744" />
           <stop offset="100%" stopColor="#B71C1C" />
         </radialGradient>
       </defs>
       <path d="M22 28 C14 18 8 6 18 -2 C22 8 26 4 28 12 C30 6 34 2 32 14 L28 26Z"
-        fill="url(#phoenixWingGrad)" stroke="#000" strokeWidth={1.5} strokeLinejoin="round" />
+        fill={`url(#${u}phoenixWingGrad)`} stroke="#000" strokeWidth={1.5} strokeLinejoin="round" />
       <path d="M78 28 C86 18 92 6 82 -2 C78 8 74 4 72 12 C70 6 66 2 68 14 L72 26Z"
-        fill="url(#phoenixWingGrad)" stroke="#000" strokeWidth={1.5} strokeLinejoin="round" />
-      <path d="M25 30 L75 30 L73 26 L27 26Z" fill="url(#phoenixCrownGrad)" stroke="#000" strokeWidth={S} />
-      <path d="M28 26 L35 14 L42 26" fill="url(#phoenixCrownGrad)" stroke="#000" strokeWidth={1.5} />
-      <path d="M42 26 L50 8 L58 26" fill="url(#phoenixCrownGrad)" stroke="#000" strokeWidth={1.5} />
-      <path d="M58 26 L65 14 L72 26" fill="url(#phoenixCrownGrad)" stroke="#000" strokeWidth={1.5} />
-      <circle cx="50" cy="18" r="4" fill="url(#phoenixGemGrad)" stroke="#000" strokeWidth={1.5} />
-      <circle cx="35" cy="22" r="2.5" fill="url(#phoenixGemGrad)" stroke="#000" strokeWidth={1} />
-      <circle cx="65" cy="22" r="2.5" fill="url(#phoenixGemGrad)" stroke="#000" strokeWidth={1} />
+        fill={`url(#${u}phoenixWingGrad)`} stroke="#000" strokeWidth={1.5} strokeLinejoin="round" />
+      <path d="M25 30 L75 30 L73 26 L27 26Z" fill={`url(#${u}phoenixCrownGrad)`} stroke="#000" strokeWidth={S} />
+      <path d="M28 26 L35 14 L42 26" fill={`url(#${u}phoenixCrownGrad)`} stroke="#000" strokeWidth={1.5} />
+      <path d="M42 26 L50 8 L58 26" fill={`url(#${u}phoenixCrownGrad)`} stroke="#000" strokeWidth={1.5} />
+      <path d="M58 26 L65 14 L72 26" fill={`url(#${u}phoenixCrownGrad)`} stroke="#000" strokeWidth={1.5} />
+      <circle cx="50" cy="18" r="4" fill={`url(#${u}phoenixGemGrad)`} stroke="#000" strokeWidth={1.5} />
+      <circle cx="35" cy="22" r="2.5" fill={`url(#${u}phoenixGemGrad)`} stroke="#000" strokeWidth={1} />
+      <circle cx="65" cy="22" r="2.5" fill={`url(#${u}phoenixGemGrad)`} stroke="#000" strokeWidth={1} />
       <circle cx="20" cy="8" r="1" fill="#FFD600" opacity="0.7" />
       <circle cx="42" cy="2" r="0.8" fill="#FF6D00" opacity="0.6" />
       <circle cx="58" cy="4" r="1" fill="#FFD600" opacity="0.7" />
@@ -708,10 +715,11 @@ function BunnyEars({ fill }: AccessoryPartProps) {
 }
 
 function CyberpunkVisor({ fill }: AccessoryPartProps) {
+  const u = useAvatarUid();
   return (
     <g>
       <defs>
-        <linearGradient id="cyberpunkVisorGrad" x1="0" y1="0" x2="1" y2="0">
+        <linearGradient id={`${u}cyberpunkVisorGrad`} x1="0" y1="0" x2="1" y2="0">
           <stop offset="0%" stopColor="#0ff" stopOpacity="0.4" />
           <stop offset="50%" stopColor="#f0f" stopOpacity="0.3" />
           <stop offset="100%" stopColor="#0ff" stopOpacity="0.4" />
@@ -720,7 +728,7 @@ function CyberpunkVisor({ fill }: AccessoryPartProps) {
       {/* Frame */}
       <path d="M20 38 Q22 34 30 33 Q40 32 50 32 Q60 32 70 33 Q78 34 80 38 L82 44 Q80 48 70 49 Q60 50 50 50 Q40 50 30 49 Q22 48 18 44Z" fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
       {/* Visor lens */}
-      <path d="M24 38 Q26 35 34 34 Q42 33 50 33 Q58 33 66 34 Q74 35 76 38 L78 43 Q76 46 66 47 Q58 48 50 48 Q42 48 34 47 Q26 46 22 43Z" fill="url(#cyberpunkVisorGrad)" />
+      <path d="M24 38 Q26 35 34 34 Q42 33 50 33 Q58 33 66 34 Q74 35 76 38 L78 43 Q76 46 66 47 Q58 48 50 48 Q42 48 34 47 Q26 46 22 43Z" fill={`url(#${u}cyberpunkVisorGrad)`} />
       {/* Neon accent line */}
       <path d="M24 41 Q37 39 50 39 Q63 39 76 41" fill="none" stroke="#0ff" strokeWidth={1.5} opacity="0.8" />
       <path d="M28 41 Q50 39.5 72 41" fill="none" stroke="#fff" strokeWidth={0.5} opacity="0.4" />
@@ -798,22 +806,23 @@ function Pearls({ fill }: AccessoryPartProps) {
 }
 
 function HeartGlasses({ fill }: AccessoryPartProps) {
+  const u = useAvatarUid();
   const frameColor = fill || '#FF1493';
   return (
     <g>
       {/* Heart-shaped sunglasses */}
       <defs>
-        <linearGradient id="heartLensGrad" x1="0" y1="0" x2="0" y2="1">
+        <linearGradient id={`${u}heartLensGrad`} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor={frameColor} stopOpacity="0.7" />
           <stop offset="100%" stopColor="#000" stopOpacity="0.3" />
         </linearGradient>
       </defs>
       {/* Left heart lens */}
       <path d="M30 40 C30 34 36 34 38 38 C40 34 46 34 46 40 C46 48 38 52 38 52 C38 52 30 48 30 40Z"
-        fill="url(#heartLensGrad)" stroke={frameColor} strokeWidth={S} />
+        fill={`url(#${u}heartLensGrad)`} stroke={frameColor} strokeWidth={S} />
       {/* Right heart lens */}
       <path d="M54 40 C54 34 60 34 62 38 C64 34 70 34 70 40 C70 48 62 52 62 52 C62 52 54 48 54 40Z"
-        fill="url(#heartLensGrad)" stroke={frameColor} strokeWidth={S} />
+        fill={`url(#${u}heartLensGrad)`} stroke={frameColor} strokeWidth={S} />
       {/* Bridge */}
       <path d="M46 42 Q50 44 54 42" stroke={frameColor} strokeWidth={S} fill="none" />
       {/* Arms */}

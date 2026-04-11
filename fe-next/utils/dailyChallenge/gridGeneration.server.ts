@@ -12,6 +12,7 @@ import { generateDailyPuzzle, isWordOnGrid } from './gridGeneration';
 import { MAX_TARGET_WORD_LENGTH } from './constants';
 import { loadNounList, createSafeReadFile } from '@/backend/dictionaryLoaders';
 import { normalizeHebrewWord } from '@/shared/utils/wordNormalization';
+import logger from '@/utils/logger';
 
 // ==========================================
 // Database Operations
@@ -110,7 +111,7 @@ async function saveGridToDatabase(
         .eq('language', language);
 
       if (error) {
-        console.error('[Daily Puzzle] Failed to update grid:', error.message);
+        logger.error('[Daily Puzzle] Failed to update grid:', error.message);
         return false;
       }
     } else {
@@ -127,14 +128,14 @@ async function saveGridToDatabase(
       });
 
       if (error) {
-        console.error('[Daily Puzzle] Failed to insert grid:', error.message);
+        logger.error('[Daily Puzzle] Failed to insert grid:', error.message);
         return false;
       }
     }
 
     return true;
   } catch (error) {
-    console.error('[Daily Puzzle] Failed to save grid:', error);
+    logger.error('[Daily Puzzle] Failed to save grid:', error);
     return false;
   }
 }
@@ -201,7 +202,7 @@ export async function generateDailyPuzzleAsync(
     if (puzzleData.grid && puzzleData.grid.length > 0) {
       // Validate that the target word is actually on the grid
       if (isWordOnGrid(targetWord, puzzleData.grid)) {
-        console.log(`[Daily Puzzle] Using stored grid for ${dateString}/${language}`);
+        logger.log(`[Daily Puzzle] Using stored grid for ${dateString}/${language}`);
         return {
           grid: puzzleData.grid,
           targetWord: targetWord.toUpperCase(),
@@ -216,7 +217,7 @@ export async function generateDailyPuzzleAsync(
         );
       }
     } else {
-      console.log(`[Daily Puzzle] No stored grid for ${dateString}/${language} - generating new one`);
+      logger.log(`[Daily Puzzle] No stored grid for ${dateString}/${language} - generating new one`);
     }
 
     // Generate new puzzle with the pre-selected word + noun enrichment
@@ -225,14 +226,14 @@ export async function generateDailyPuzzleAsync(
     // Save the generated grid to database for future players
     const saved = await saveGridToDatabase(dateString, language, puzzle.grid, puzzle.targetWord);
     if (saved) {
-      console.log(`[Daily Puzzle] Saved new grid for ${dateString}/${language}`);
+      logger.log(`[Daily Puzzle] Saved new grid for ${dateString}/${language}`);
     }
 
     return puzzle;
   }
 
   // No puzzle data in database - generate from scratch
-  console.log(
+  logger.log(
     `[Daily Puzzle] No puzzle data in DB for ${dateString}/${language} - generating deterministically`
   );
   const puzzle = generateDailyPuzzle(dateString, language, undefined, undefined, undefined, nounWords);
@@ -240,7 +241,7 @@ export async function generateDailyPuzzleAsync(
   // Try to save the generated grid
   const saved = await saveGridToDatabase(dateString, language, puzzle.grid, puzzle.targetWord);
   if (saved) {
-    console.log(`[Daily Puzzle] Saved generated grid for ${dateString}/${language}`);
+    logger.log(`[Daily Puzzle] Saved generated grid for ${dateString}/${language}`);
   }
 
   return puzzle;

@@ -6,6 +6,7 @@
  */
 
 import type { DailyChallengeResult, DailyStreak } from './dailyChallenge';
+import logger from '@/utils/logger';
 
 // ==========================================
 // Neo-Brutalist Color Palette
@@ -587,7 +588,7 @@ export async function shareImageWithNativeShare(
       }
     } catch (error) {
       // User cancelled or error - fall through to text-only share
-      console.log('Image share failed, trying text only:', error);
+      logger.log('Image share failed, trying text only:', error);
     }
   }
 

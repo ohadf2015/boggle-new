@@ -212,7 +212,7 @@ export const BlastStage = memo(function BlastStage({
       {/* Reactive background */}
       <BlastBackground intensity={sequencerState?.chainLevel ?? 0} />
 
-      {/* 1. HUD — z-40 to sit above BlastBackground (absolute inset-0) */}
+      {/* 1. HUD — z-40, shown on all sizes */}
       <div className="relative z-40">
       <BlastHUD
         score={score}
@@ -230,18 +230,75 @@ export const BlastStage = memo(function BlastStage({
       />
       </div>
 
-      {/* 1b. Live leaderboard strip (MP only) — inline, non-overlapping,
-             surfaces opponent word-finds so the match feels shared. */}
+      {/* 1b. Live leaderboard strip (MP only) */}
       {leaderboard && leaderboard.length > 0 && (
         <div className="relative z-40">
           <BlastMPLeaderboard leaderboard={leaderboard} username={username} />
         </div>
       )}
 
-      {/* 2. Objective progress — primary (clear_percent) + secondary bars */}
+      {/* Desktop: horizontal layout (board center + side panels). Mobile: vertical stack. */}
+      <div className="flex-1 flex flex-col lg:flex-row lg:items-stretch lg:justify-center lg:gap-4 min-h-0 relative z-30 lg:px-4 xl:px-8 lg:max-w-[1400px] lg:mx-auto lg:w-full">
+
+      {/* Left panel — objectives + word area on desktop */}
+      <div className="hidden lg:flex lg:flex-col lg:w-56 xl:w-64 lg:justify-center lg:gap-4 shrink-0">
+        {/* Objectives (desktop) */}
+        {objectiveProgress && objectiveProgress.length > 0 && (
+          <div className="w-full">
+            {objectiveProgress.filter(o => o.objective.type === 'clear_percent').map((obj, i) => {
+              const pct = Math.min(100, obj.objective.target > 0 ? (obj.current / obj.objective.target) * 100 : 0);
+              return (
+                <div key={`primary-${i}`} className="mb-1.5">
+                  <div className="flex justify-between text-xs font-bold mb-0.5">
+                    <span className={obj.isComplete ? 'text-neo-lime' : 'text-neo-white'}>
+                      {formatObjectiveLabel(obj.objective, t)}
+                    </span>
+                    <span className={cn('tabular-nums', obj.isComplete ? 'text-neo-lime' : 'text-neo-white')}>
+                      {obj.current}%
+                    </span>
+                  </div>
+                  <div className="h-2.5 bg-white/10 rounded-full overflow-hidden border border-white/20">
+                    <div
+                      className={cn(
+                        'h-full rounded-full transition-all duration-500',
+                        obj.isComplete ? 'bg-neo-lime shadow-[0_0_8px_rgba(191,255,0,0.5)]' : 'bg-neo-cyan',
+                      )}
+                      style={{ width: `${pct}%` }}
+                    />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Word forming area (desktop) */}
+        <div className="w-full">
+          <div
+            className={cn(
+              'flex items-center justify-center gap-2 px-4 py-2 w-full',
+              formedWord ? 'opacity-100' : 'opacity-40',
+            )}
+            style={{
+              borderRadius: '8px',
+              border: formedWord ? '2px solid rgba(0,0,0,0.4)' : '2px solid transparent',
+              background: formedWord ? 'rgba(255,255,255,0.05)' : 'transparent',
+            }}
+          >
+            <WordFormingArea word={formedWord} letterCount={formedWord.length} feedback={currentFeedback} compact />
+            <BlastWordRewardPreview wordLength={formedWord.length} />
+            {formedWord && (
+              <span className="text-[10px] font-bold text-white/50 tabular-nums">
+                {formedWord.length}
+              </span>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* 2. Objective progress — mobile only */}
       {objectiveProgress && objectiveProgress.length > 0 && (
-        <div className="px-4 py-1 max-w-md mx-auto w-full shrink-0 relative z-40">
-          {/* Primary objective: clear_percent — shown large and prominent */}
+        <div className="px-4 py-1 max-w-md mx-auto w-full shrink-0 relative z-40 lg:hidden">
           {objectiveProgress.filter(o => o.objective.type === 'clear_percent').map((obj, i) => {
             const pct = Math.min(100, obj.objective.target > 0 ? (obj.current / obj.objective.target) * 100 : 0);
             return (
@@ -266,14 +323,13 @@ export const BlastStage = memo(function BlastStage({
               </div>
             );
           })}
-          {/* Secondary objectives are hidden — revealed as surprise bonuses when completed */}
         </div>
       )}
 
-      {/* 3. Board — AAA Royal Blast ornate frame, constrained to leave room for HUD + word area */}
+      {/* 3. Board — center column, expands on desktop */}
       <div
         className={cn(
-          'flex-1 flex flex-col items-center justify-center px-4 sm:px-6 py-2 relative z-30 min-h-0',
+          'flex-1 flex flex-col items-center justify-center px-4 sm:px-6 py-2 min-h-0',
           explosionShake && explosionShake >= 2 ? 'animate-neo-shake' :
           explosionShake === 1 ? 'animate-neo-wobble' :
           sequencerState?.chainLevel && sequencerState.chainLevel >= 3 ? 'animate-neo-shake' :
@@ -291,7 +347,7 @@ export const BlastStage = memo(function BlastStage({
       >
         {/* Board frame — neo-brutalist with hard shadow */}
         <div
-          className="relative w-full max-w-[min(92vw,78dvh)] sm:max-w-[min(440px,75dvh)] md:max-w-[min(480px,72dvh)] lg:max-w-[min(520px,60dvh)] p-1.5 rounded-neo border-3 border-neo-black shadow-hard-lg"
+          className="relative w-full max-w-[min(92vw,78dvh)] sm:max-w-[min(440px,75dvh)] md:max-w-[min(480px,72dvh)] lg:max-w-[min(560px,72dvh)] xl:max-w-[min(600px,75dvh)] p-1.5 rounded-neo border-3 border-neo-black shadow-hard-lg"
         >
           {/* Inner board surface */}
           <div
@@ -355,7 +411,75 @@ export const BlastStage = memo(function BlastStage({
         <BlastWaveClearText waveCleared={waveCleared} movesRemaining={movesRemaining} t={t} />
       </div>
 
-      {/* Effects overlay — rendered after board (z-30) so combo flash / score flies appear above tiles */}
+      {/* Right panel — notices on desktop */}
+      <div className="hidden lg:flex lg:flex-col lg:w-56 xl:w-64 lg:justify-center lg:gap-3 shrink-0">
+        {/* Out of moves (desktop) */}
+        <AdaptiveAnimatePresence>
+          {movesRemaining <= 0 && isDeadEnd && !isComplete && !noWordsRemaining && (
+            <AdaptiveMotion.div
+              initial={{ scale: 0.6, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              transition={{ type: 'spring', stiffness: 380, damping: 22 }}
+              data-testid="blast-out-of-moves-notice-desktop"
+            >
+              <div
+                className={cn(
+                  'flex items-center justify-center gap-2 px-4 py-2.5',
+                  'rounded-neo border-3 border-neo-black shadow-hard',
+                  'bg-linear-to-r from-neo-red via-orange-400 to-neo-red',
+                  'font-neo-display font-black uppercase tracking-wider text-base text-neo-black',
+                )}
+                style={{ boxShadow: '0 0 24px rgba(255,51,102,0.55), 3px 3px 0 #000' }}
+              >
+                <AlertTriangle className="w-5 h-5 shrink-0" strokeWidth={2.75} />
+                <span>{t('blast.outOfMoves')}</span>
+              </div>
+            </AdaptiveMotion.div>
+          )}
+        </AdaptiveAnimatePresence>
+
+        {/* Dead-end + shuffle (desktop) */}
+        <AdaptiveAnimatePresence>
+          {noWordsRemaining && !isComplete && (
+            <AdaptiveMotion.div
+              initial={{ scale: 0.6, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              transition={{ type: 'spring', stiffness: 380, damping: 22 }}
+              data-testid="blast-stuck-notice-desktop"
+            >
+              <div
+                className={cn(
+                  'flex flex-col items-center gap-2 px-4 py-3',
+                  'rounded-neo border-3 border-neo-black shadow-hard',
+                  'bg-linear-to-r from-neo-purple via-neo-pink to-neo-purple',
+                  'font-neo-display font-black uppercase tracking-wider text-sm text-neo-white',
+                )}
+                style={{ textShadow: '0 0 12px rgba(255,20,147,0.65)', boxShadow: '0 0 24px rgba(139,92,246,0.55), 3px 3px 0 #000' }}
+              >
+                <div className="flex items-center gap-2">
+                  <Lightbulb className="w-5 h-5 shrink-0" strokeWidth={2.75} />
+                  <span>{t('blast.stuck')}</span>
+                </div>
+                <Button
+                  size="sm"
+                  onClick={onShuffle}
+                  className="border-2 border-neo-black shadow-hard-sm hover:shadow-hard active:shadow-hard-pressed bg-neo-lime text-neo-black font-neo-display font-black uppercase text-xs w-full"
+                >
+                  <Shuffle className="h-3.5 w-3.5 me-1" strokeWidth={2.75} />
+                  {t('blast.shuffle')}
+                </Button>
+              </div>
+            </AdaptiveMotion.div>
+          )}
+        </AdaptiveAnimatePresence>
+      </div>
+
+      {/* end desktop flex-row wrapper */}
+      </div>
+
+      {/* Effects overlay */}
       <BlastEffectsLayer
         scoreFlyEvents={scoreFlyEvents}
         onScoreFlyComplete={onScoreFlyComplete ?? (() => {})}
@@ -367,14 +491,12 @@ export const BlastStage = memo(function BlastStage({
 
       {/* Score milestone announcements */}
       <BlastScoreMilestone score={score} t={t} />
-      {/* Combo milestone announcements */}
       <ComboMilestoneAnnouncement comboLevel={comboLevel} />
-      {/* Mid-run micro-achievement toast */}
       <BlastMicroToast id={microId} t={t} />
 
-      {/* 4. Word forming area — golden ribbon style */}
+      {/* 4. Word forming area — mobile only */}
       <div className={cn(
-        'flex items-center justify-center shrink-0 relative z-40 px-4 py-2',
+        'flex items-center justify-center shrink-0 relative z-40 px-4 py-2 lg:hidden',
         'max-w-[360px] md:max-w-[480px] mx-auto w-full overflow-visible',
         'min-h-[44px]',
       )}>
@@ -399,7 +521,7 @@ export const BlastStage = memo(function BlastStage({
         </div>
       </div>
 
-      {/* 5a. Out of moves notification — terminal urgency, red gradient */}
+      {/* 5a. Out of moves — mobile only */}
       <AdaptiveAnimatePresence>
         {movesRemaining <= 0 && isDeadEnd && !isComplete && !noWordsRemaining && (
           <AdaptiveMotion.div
@@ -407,7 +529,7 @@ export const BlastStage = memo(function BlastStage({
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.8, opacity: 0, y: 10 }}
             transition={{ type: 'spring', stiffness: 380, damping: 22 }}
-            className="px-4 max-w-[360px] md:max-w-[480px] mx-auto w-full shrink-0 pb-safe"
+            className="px-4 max-w-[360px] md:max-w-[480px] mx-auto w-full shrink-0 pb-safe lg:hidden"
             data-testid="blast-out-of-moves-notice"
           >
             <div
@@ -426,7 +548,7 @@ export const BlastStage = memo(function BlastStage({
         )}
       </AdaptiveAnimatePresence>
 
-      {/* 5b. Dead-end notification — recoverable, purple gradient + shuffle CTA */}
+      {/* 5b. Dead-end — mobile only */}
       <AdaptiveAnimatePresence>
         {noWordsRemaining && !isComplete && (
           <AdaptiveMotion.div
@@ -434,7 +556,7 @@ export const BlastStage = memo(function BlastStage({
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.8, opacity: 0, y: 10 }}
             transition={{ type: 'spring', stiffness: 380, damping: 22 }}
-            className="px-4 max-w-[360px] md:max-w-[480px] mx-auto w-full shrink-0 pb-safe"
+            className="px-4 max-w-[360px] md:max-w-[480px] mx-auto w-full shrink-0 pb-safe lg:hidden"
             data-testid="blast-stuck-notice"
           >
             <div

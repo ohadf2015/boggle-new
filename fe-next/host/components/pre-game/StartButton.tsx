@@ -71,8 +71,8 @@ export const StartButton = memo<StartButtonProps>(function StartButton({
         onClick={onStartGame}
         disabled={disabled}
         className={cn(
-          'w-full h-[60px] lg:h-[80px] flex items-center justify-center gap-3',
-          'font-neo-display font-black text-2xl lg:text-4xl uppercase tracking-tight',
+          'w-full h-[52px] lg:h-[60px] flex items-center justify-center gap-3',
+          'font-neo-display font-black text-2xl lg:text-3xl uppercase tracking-tight',
           'border-3 border-neo-black transition-all',
           'active:translate-y-0.5 active:shadow-hard-pressed',
           'disabled:opacity-50 disabled:cursor-not-allowed',

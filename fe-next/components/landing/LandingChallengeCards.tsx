@@ -119,7 +119,7 @@ export function LandingChallengeCards({
               description={t('landing.quickPlayDesc')}
               href={`/${language}/multiplayer?quickPlay=true`}
               icon={<Zap className="w-6 h-6" />}
-              modeImage="/modes/arena.png"
+              modeImage="/modes/quick-play.png"
               variant="cyan"
               highlighted={isVeteran}
               highlightLabel={isVeteran ? t('onboarding.welcome.startHere') : undefined}

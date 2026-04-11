@@ -53,6 +53,16 @@ export function usePlayerExit({
 
     clearSessionPreservingUsername(username);
 
+    // Mark intentional exit so CrazyGames invite hook doesn't auto-rejoin on reload
+    try { sessionStorage.setItem('boggle_intentional_exit', '1'); } catch { /* blocked */ }
+
+    // Clean up ?room= URL param to prevent auto-rejoin on reload
+    if (typeof window !== 'undefined' && window.location.search.includes('room=')) {
+      const url = new URL(window.location.href);
+      url.searchParams.delete('room');
+      window.history.replaceState({}, '', url.pathname + (url.search || ''));
+    }
+
     setTimeout(() => {
       try {
         if (socket) {

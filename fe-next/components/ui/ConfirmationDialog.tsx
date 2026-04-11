@@ -109,8 +109,8 @@ export function ConfirmationDialog({
             {title}
           </AlertDialogTitle>
           <AlertDialogDescription className={cn(
-            variant === 'danger' && 'text-neo-black/70 font-medium',
-            variant === 'warning' && 'text-neo-black/70 font-medium',
+            variant === 'danger' && 'text-neo-black font-medium',
+            variant === 'warning' && 'text-neo-black font-medium',
             'text-center'
           )}>
             {description}

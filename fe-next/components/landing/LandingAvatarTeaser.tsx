@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { motion } from 'framer-motion';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { ArrowRight, ArrowLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -46,7 +45,7 @@ export function LandingAvatarTeaser({ onBuilderOpenChange }: LandingAvatarTeaser
 
   return (
     <>
-    <motion.button
+    <AdaptiveMotion.button
       type="button"
       onClick={openBuilder}
       className={cn(
@@ -92,7 +91,7 @@ export function LandingAvatarTeaser({ onBuilderOpenChange }: LandingAvatarTeaser
           </AdaptiveMotion.span>
         </p>
       </div>
-    </motion.button>
+    </AdaptiveMotion.button>
     <AvatarBuilderModal
       isOpen={isBuilderOpen}
       onClose={closeBuilder}

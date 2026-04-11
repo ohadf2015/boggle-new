@@ -11,13 +11,15 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Eye } from 'lucide-react';
+import { Eye, CircleDot, ArrowRight } from 'lucide-react';
+import Link from 'next/link';
 import NextStepPrompt from '@/components/results/NextStepPrompt';
 import DailyChallengeInlineSignup from '@/components/auth/DailyChallengeInlineSignup';
 import TabbedDailyLeaderboard from './TabbedDailyLeaderboard';
 import WatchAdButton from './WatchAdButton';
 import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
 import { MascotWithEntrance } from '@/components/ui/Mascot';
+import { hasPlayedWordWheelToday } from '@/utils/dailyChallenge/storage';
 import type { WordHuntResult } from '@/utils/dailyChallenge/types';
 import type { Language } from '@/shared/types/game';
 import {
@@ -300,6 +302,31 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
           onBackToLobby={onBackToLobby}
           variant="mobile"
         />
+      </motion.div>
+    )}
+
+    {/* Word Wheel CTA — only show if not yet played today */}
+    {!hasPlayedWordWheelToday(language) && (
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.9, type: 'spring', stiffness: 300, damping: 26 }}
+      >
+        <Link
+          href={`/${language}/daily/word-wheel`}
+          className="flex items-center justify-between gap-3 w-full p-4 rounded-neo border-3 border-neo-black bg-neo-navy-light shadow-hard-lg hover:scale-[1.02] active:translate-x-px active:translate-y-px active:shadow-hard-pressed transition-all"
+        >
+          <div className="flex items-center gap-3">
+            <CircleDot className="w-6 h-6 text-neo-purple shrink-0" />
+            <div>
+              <span className="font-neo-display font-black text-neo-white text-sm">
+                {t('wordWheel.results.playWordWheel', 'Play Word Wheel too!')}
+              </span>
+              <p className="text-neo-cream/50 text-xs">{t('wordWheel.description', 'Every word must include the center letter')}</p>
+            </div>
+          </div>
+          <ArrowRight className="w-5 h-5 text-neo-purple shrink-0" />
+        </Link>
       </motion.div>
     )}
 

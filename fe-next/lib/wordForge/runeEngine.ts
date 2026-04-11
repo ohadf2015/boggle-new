@@ -23,7 +23,10 @@ export function evaluateRune(
   context: ScoringContext,
 ): RuneEffect | null {
   const evaluator = evaluators[def.id];
-  if (!evaluator) return null;
+  if (!evaluator) {
+    console.warn(`[RuneEngine] No evaluator registered for rune "${def.id}" — effect skipped`);
+    return null;
+  }
   return evaluator(context);
 }
 

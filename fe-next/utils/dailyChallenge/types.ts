@@ -88,6 +88,33 @@ export interface WordHuntResult {
   completedAt: string;
 }
 
+/**
+ * Result for Word Wheel daily challenge
+ */
+export interface WordWheelResult {
+  puzzleNumber: number;
+  puzzleDate: string;
+  language: Language;
+  centerLetter: string;
+  wordsFound: string[];
+  totalPossible: number;
+  score: number;
+  timeSeconds: number;
+  streakDays: number;
+  completedAt: string;
+}
+
+/**
+ * Stored Word Wheel result interface
+ */
+export interface StoredWordWheelResult {
+  date: string;
+  puzzleNumber: number;
+  result: WordWheelResult;
+  completedAt: string;
+  submittedToServer?: boolean;
+}
+
 // Legacy interface for backward compatibility
 export interface DailyChallengeResult {
   puzzleNumber: number;

@@ -50,9 +50,11 @@ const CircularTimer = memo<CircularTimerProps>(({ remainingTime, totalTime = 180
   const isCriticalTime = remainingTime <= 5 && remainingTime > 0;
 
   // Preload results page chunks when timer is low (idempotent — safe to call repeatedly)
-  if (isVeryLowTime) {
-    preloadResultsChunks();
-  }
+  useEffect(() => {
+    if (isVeryLowTime) {
+      preloadResultsChunks();
+    }
+  }, [isVeryLowTime]);
 
   // Notify parent of timer urgency state changes
   const currentState: 'normal' | 'low' | 'veryLow' | 'critical' = isCriticalTime

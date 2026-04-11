@@ -4268,6 +4268,10 @@ const en = {
   "wordFeedback": {
     "invalid": "Not a valid word",
     "duplicate": "Already found",
+    "accepted": "Word accepted",
+    "rejected": "Word rejected",
+    "duplicateWord": "Duplicate word",
+    "lessonWordTitle": "Lesson vocabulary word!",
     "dictionaryTitle": "Build Our Dictionary",
     "submittedBy": "Submitted by",
     "skipHint": "Press ESC to skip",
@@ -4973,6 +4977,47 @@ const en = {
     "requestChallenge": "Request Challenge",
     "requestSent": "Request Sent",
     "watchAdRetry": "Watch Ad to Retry"
+  },
+  "wordWheel": {
+    "title": "Word Wheel",
+    "badge": "WORD WHEEL",
+    "subtitle": "Find words using the wheel letters",
+    "description": "Every word must include the center letter",
+    "centerLetterRule": "Must use center letter",
+    "minLetters": "Min {min} letters",
+    "wordsFound": "{count} words found",
+    "scoreLabel": "Score",
+    "timeLeft": "Time Left",
+    "gameOver": "Time's Up!",
+    "submit": "SUBMIT",
+    "alreadyFound": "Already found!",
+    "notInDictionary": "Not a valid word",
+    "missingCenter": "Must include center letter ({letter})",
+    "tooShort": "Too short (min {min} letters)",
+    "invalidLetters": "Can only use wheel letters",
+    "inputPlaceholder": "Type a word...",
+    "foundWords": "Found Words",
+    "possibleWords": "Possible",
+    "excellent": "Excellent!",
+    "great": "Great!",
+    "good": "Good effort!",
+    "tryAgain": "Keep practicing!",
+    "results": {
+      "title": "Word Wheel Results",
+      "wordsFound": "Words Found",
+      "score": "Score",
+      "time": "Time",
+      "rank": "Your Rank",
+      "share": "Share Results",
+      "playWordHunt": "Play Word Hunt too!",
+      "playWordWheel": "Play Word Wheel too!"
+    },
+    "hub": {
+      "wordWheelQuest": "Word Wheel",
+      "wordWheelDesc": "Find words using the wheel — center letter required!",
+      "wordHuntQuest": "Word Hunt",
+      "wordHuntDesc": "Crack the hidden word in 10 tries"
+    }
   },
   "dailyChallenge": {
     "pointsPerWord": "Points per word"
@@ -8620,6 +8665,12 @@ const en = {
       "export": {
         "pdf": "Export PDF",
         "downloading": "Downloading..."
+      },
+      "columns": {
+        "word": "Word",
+        "status": "Status",
+        "accuracy": "Accuracy",
+        "attempts": "Attempts"
       }
     },
     "curriculum": {

@@ -38,6 +38,8 @@ import systemHealthRoutes from './systemHealthRoutes';
 import analyticsRoutes from './analyticsRoutes';
 import moderationRoutes from './moderationRoutes';
 import cheatDetectionRoutes from './cheatDetectionRoutes';
+import adminGiftRoutes from '../adminGift';
+import adminNotificationRoutes from '../adminNotification';
 
 const router: Router = express.Router();
 
@@ -75,6 +77,12 @@ router.use('/', systemHealthRoutes);
 
 // Utility routes (/api/admin/daily-word/*, /api/admin/send-test-email)
 router.use('/', utilityRoutes);
+
+// Gift routes (/api/admin/gift/*)
+router.use('/gift', adminGiftRoutes);
+
+// Notification routes (/api/admin/notification/*)
+router.use('/notification', adminNotificationRoutes);
 
 export default router;
 

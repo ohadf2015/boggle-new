@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { timingSafeEqual } from 'crypto';
+import logger from '@/utils/logger';
 
 export const maxDuration = 60;
 
@@ -94,7 +95,7 @@ async function createAndPublish(
   label: string
 ): Promise<{ mediaId: string }> {
   // Step 1: Create media container
-  console.log(`[IG:${label}] Creating container for ${imageUrl}`);
+  logger.log(`[IG:${label}] Creating container for ${imageUrl}`);
   const containerRes = await fetch(`${GRAPH_API}/${accountId}/media`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -104,11 +105,11 @@ async function createAndPublish(
   if (container.error) throw new Error(`Container: ${container.error.message}`);
 
   // Step 2: Wait for processing
-  console.log(`[IG:${label}] Waiting for image processing...`);
+  logger.log(`[IG:${label}] Waiting for image processing...`);
   await new Promise((r) => setTimeout(r, 12_000));
 
   // Step 3: Publish
-  console.log(`[IG:${label}] Publishing...`);
+  logger.log(`[IG:${label}] Publishing...`);
   const publishRes = await fetch(`${GRAPH_API}/${accountId}/media_publish`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -119,7 +120,7 @@ async function createAndPublish(
 
   // Step 4: Hashtags as first comment
   if (hashtags) {
-    console.log(`[IG:${label}] Adding hashtags comment...`);
+    logger.log(`[IG:${label}] Adding hashtags comment...`);
     await fetch(`${GRAPH_API}/${published.id}/comments`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -127,7 +128,7 @@ async function createAndPublish(
     });
   }
 
-  console.log(`[IG:${label}] Done! Media ID: ${published.id}`);
+  logger.log(`[IG:${label}] Done! Media ID: ${published.id}`);
   return { mediaId: published.id! };
 }
 
@@ -191,7 +192,7 @@ export async function GET(request: NextRequest) {
           results.push({ lang: 'en', status: 'published', mediaId });
         } catch (e) {
           const msg = e instanceof Error ? e.message : String(e);
-          console.error('[IG:EN] Failed:', msg);
+          logger.error('[IG:EN] Failed:', msg);
           results.push({ lang: 'en', status: 'failed', error: msg });
         }
       } else {
@@ -212,7 +213,7 @@ export async function GET(request: NextRequest) {
           results.push({ lang: 'he', status: 'published', mediaId });
         } catch (e) {
           const msg = e instanceof Error ? e.message : String(e);
-          console.error('[IG:HE] Failed:', msg);
+          logger.error('[IG:HE] Failed:', msg);
           results.push({ lang: 'he', status: 'failed', error: msg });
         }
       } else {
@@ -222,7 +223,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ day: dayOfWeek, results });
   } catch (error) {
-    console.error('[IG Cron] Unexpected error:', error);
+    logger.error('[IG Cron] Unexpected error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

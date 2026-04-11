@@ -6,6 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import logger from '@/utils/logger';
 import { verifyAdminAuth } from '@/lib/auth/adminAuth';
 import { createAdminClient } from '@/utils/supabase/admin';
 import type { Language } from '@/types';
@@ -30,8 +31,6 @@ interface BulkApproveResult {
 }
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
-  console.log('[Admin BulkApprove] POST request received');
-
   // Verify admin authentication
   const authResult = await verifyAdminAuth(request);
   if (!authResult.success) {
@@ -103,14 +102,14 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         if (existing.source === 'database' && existing.isValid) {
           // Already in dictionary - update status but don't re-add
           result.skipped++;
-          console.log(`[BulkApprove] Skipped ${candidate.word} - already in dictionary`);
+          logger.log(`[BulkApprove] Skipped ${candidate.word} - already in dictionary`);
         } else {
           // Add to dictionary via validateAndSaveWord
           const validationResult = await gameAIService.validateAndSaveWord(candidate.word, language);
 
           if (validationResult.isValid) {
             result.approved++;
-            console.log(`[BulkApprove] Approved ${candidate.word} to dictionary`);
+            logger.log(`[BulkApprove] Approved ${candidate.word} to dictionary`);
           } else {
             result.failed++;
             result.errors.push({
@@ -135,7 +134,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       }
     }
 
-    console.log(`[BulkApprove] Complete: ${result.approved} approved, ${result.skipped} skipped, ${result.failed} failed`);
+    logger.log(`[BulkApprove] Complete: ${result.approved} approved, ${result.skipped} skipped, ${result.failed} failed`);
 
     // Update success field based on failures
     result.success = result.failed === 0;
@@ -144,7 +143,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    console.error('[Admin BulkApprove] Error:', errorMessage);
+    logger.error('[Admin BulkApprove] Error:', errorMessage);
     return NextResponse.json(
       { error: 'Failed to process bulk approval' },
       { status: 500 }

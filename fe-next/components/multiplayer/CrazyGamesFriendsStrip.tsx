@@ -4,6 +4,7 @@ import { useEffect, useCallback, memo } from 'react';
 import Image from 'next/image';
 import { Users, UserPlus } from 'lucide-react';
 import { motion } from 'framer-motion';
+import toast from 'react-hot-toast';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useCrazyGamesFriends } from '@/hooks/useCrazyGamesFriends';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -42,9 +43,11 @@ const CrazyGamesFriendsStrip = memo(function CrazyGamesFriendsStrip({ roomId }: 
     if (!roomId) return;
     const link = inviteLink({ roomId });
     if (link) {
-      navigator.clipboard.writeText(link).catch(() => {});
+      navigator.clipboard.writeText(link)
+        .then(() => toast.success(t('common.copiedToClipboard', 'Link copied!')))
+        .catch(() => {});
     }
-  }, [roomId, inviteLink]);
+  }, [roomId, inviteLink, t]);
 
   if (!isOnCrazyGamesPlatform || (friends.length === 0 && !isLoading)) {
     return null;
@@ -79,6 +82,7 @@ const CrazyGamesFriendsStrip = memo(function CrazyGamesFriendsStrip({ roomId }: 
             <button
               key={friend.id}
               onClick={handleFriendClick}
+              aria-label={t('multiplayerFlow.inviteFriend', 'Invite {{name}}').replace('{{name}}', friend.username)}
               title={t('multiplayerFlow.inviteFriend', 'Invite {{name}}').replace('{{name}}', friend.username)}
               className={cn(
                 'flex flex-col items-center gap-1.5 w-16 shrink-0',
