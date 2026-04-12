@@ -133,13 +133,13 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
       title: meta.ogTitle,
       description: meta.ogDesc,
       siteName: 'LexiClash',
-      images: [{ url: `${BASE_URL}/og-image-${validLocale === 'he' ? 'he' : 'en'}.webp`, width: 1200, height: 630, alt: meta.ogTitle }],
+      images: [{ url: `${BASE_URL}/${validLocale}/daily-word-wheel/opengraph-image`, width: 1200, height: 630, alt: meta.ogTitle }],
     },
     twitter: {
       card: 'summary_large_image',
       title: meta.ogTitle,
       description: meta.ogDesc,
-      images: [`${BASE_URL}/og-image-${validLocale === 'he' ? 'he' : 'en'}.webp`],
+      images: [`${BASE_URL}/${validLocale}/daily-word-wheel/opengraph-image`],
     },
     alternates: {
       canonical: `${BASE_URL}${localePath}/daily/word-wheel`,

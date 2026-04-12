@@ -1,213 +1,180 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
+import { loadTranslation } from '@/translations/loadTranslation';
+import type { Language } from '@/types';
+import { AnimatedLanding } from './AnimatedLanding';
 
 interface PageProps {
   params: Promise<{ locale: string }>;
 }
 
 const BASE_URL = 'https://www.lexiclash.live';
+type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es';
+const LOCALES: Locale[] = ['en', 'he', 'sv', 'ja', 'es'];
+
+// SEO keywords per locale
+const KEYWORDS: Record<Locale, string> = {
+  en: 'daily word wheel, daily word puzzle, word wheel game, free daily word game, word wheel online, daily word challenge, wordle alternative daily',
+  he: 'גלגל מילים יומי, פאזל מילים, משחק מילים חינם, משחק מילים יומי, אתגר מילים',
+  sv: 'dagligt ordhjul, ordpussel, gratis ordspel, dagligt ordspel, ordhjul online',
+  ja: 'デイリーワードホイール, ワードパズル, 無料ワードゲーム, 毎日のワードゲーム',
+  es: 'rueda de palabras diaria, puzzle de palabras, juego de palabras gratis, juego de palabras diario',
+};
+
+function getNestedValue(obj: Record<string, unknown>, path: string): string | undefined {
+  const parts = path.split('.');
+  let current: unknown = obj;
+  for (const part of parts) {
+    if (current == null || typeof current !== 'object') return undefined;
+    current = (current as Record<string, unknown>)[part];
+  }
+  return typeof current === 'string' ? current : undefined;
+}
+
+function getNestedArray(obj: Record<string, unknown>, path: string): Array<Record<string, string>> {
+  const parts = path.split('.');
+  let current: unknown = obj;
+  for (const part of parts) {
+    if (current == null || typeof current !== 'object') return [];
+    current = (current as Record<string, unknown>)[part];
+  }
+  return Array.isArray(current) ? current as Array<Record<string, string>> : [];
+}
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale } = await params;
-  const pageUrl = `${BASE_URL}/en/daily-word-wheel`;
+  const validLocale = (LOCALES.includes(locale as Locale) ? locale : 'en') as Locale;
+  const t = await loadTranslation(validLocale as Language) as Record<string, unknown>;
+  const resolve = (key: string, fallback: string) => getNestedValue(t, key) || fallback;
+
+  const pageUrl = `${BASE_URL}/${validLocale}/daily-word-wheel`;
+
+  const languages: Record<string, string> = { 'x-default': `${BASE_URL}/en/daily-word-wheel` };
+  LOCALES.forEach((l) => { languages[l] = `${BASE_URL}/${l}/daily-word-wheel`; });
+  languages['en-US'] = `${BASE_URL}/en/daily-word-wheel`;
+  languages['en-GB'] = `${BASE_URL}/en/daily-word-wheel`;
+  languages['he-IL'] = `${BASE_URL}/he/daily-word-wheel`;
+  languages['sv-SE'] = `${BASE_URL}/sv/daily-word-wheel`;
+  languages['ja-JP'] = `${BASE_URL}/ja/daily-word-wheel`;
+  languages['es-ES'] = `${BASE_URL}/es/daily-word-wheel`;
+  languages['es-MX'] = `${BASE_URL}/es/daily-word-wheel`;
+  languages['es-US'] = `${BASE_URL}/es/daily-word-wheel`;
+
+  const ogLocaleMap: Record<string, string> = { en: 'en_US', he: 'he_IL', sv: 'sv_SE', ja: 'ja_JP', es: 'es_ES' };
 
   return {
-    title: 'Daily Word Wheel — Free Daily Word Puzzle | LexiClash',
-    description: "Play the Daily Word Wheel — a free daily word puzzle where you find words from a wheel of letters. New puzzle every day, compete for the world record. Like Wordle but for word-finding fans. Track your streak, compare scores globally. No download needed.",
-    keywords: 'daily word wheel, daily word puzzle, word wheel game, daily word wheel world record, free daily word game, word wheel online, daily word challenge, word puzzle of the day, wordle alternative daily, daily word game free',
+    title: resolve('meta.dailyWordWheel.title', 'Daily Word Wheel - Free Daily Puzzle | LexiClash'),
+    description: resolve('meta.dailyWordWheel.description', 'Spin the daily word wheel! Find all possible words from a set of letters. New puzzle every day.'),
+    keywords: KEYWORDS[validLocale],
     openGraph: {
-      title: 'Daily Word Wheel — Free Daily Puzzle | LexiClash',
-      description: 'New word wheel puzzle every day. Find all the words, chase the world record. Free, no download!',
-      locale: 'en_US',
+      title: resolve('meta.dailyWordWheel.ogTitle', 'Daily Word Wheel - Free Puzzle'),
+      description: resolve('meta.dailyWordWheel.ogDescription', 'Spin the word wheel and find all possible words. New puzzle daily!'),
+      locale: ogLocaleMap[validLocale] || 'en_US',
       type: 'website',
       url: pageUrl,
-      images: [{ url: `${BASE_URL}/og-image-en.webp`, width: 1200, height: 630, alt: 'LexiClash Daily Word Wheel' }],
+      siteName: 'LexiClash',
+      images: [{ url: `${BASE_URL}/${validLocale}/daily-word-wheel/opengraph-image`, width: 1200, height: 630, alt: resolve('meta.dailyWordWheel.ogTitle', 'Daily Word Wheel') }],
     },
     twitter: {
       card: 'summary_large_image',
-      title: 'Daily Word Wheel — Free Daily Puzzle | LexiClash',
-      description: 'New word wheel every day. Find words, beat friends, chase the world record!',
-      images: [`${BASE_URL}/og-image-en.webp`],
+      title: resolve('meta.dailyWordWheel.ogTitle', 'Daily Word Wheel - Free Puzzle'),
+      description: resolve('meta.dailyWordWheel.ogDescription', 'Spin the word wheel and find all possible words. New puzzle daily!'),
+      images: [`${BASE_URL}/${validLocale}/daily-word-wheel/opengraph-image`],
     },
     alternates: {
       canonical: pageUrl,
-      languages: {
-        'x-default': pageUrl,
-        en: pageUrl,
-        he: `${BASE_URL}/he/hebrew-multiplayer-word-game`,
-        sv: `${BASE_URL}/sv/swedish-multiplayer-word-game`,
-        ja: `${BASE_URL}/ja/japanese-word-game`,
-        es: `${BASE_URL}/es/juego-de-palabras-multijugador`,
-      },
+      languages,
     },
     robots: { index: true, follow: true },
   };
 }
 
-const faqs = [
-  {
-    q: 'What is the Daily Word Wheel?',
-    a: "The Daily Word Wheel is a free daily word puzzle on LexiClash. Every day at midnight UTC, a new wheel of letters appears. Your goal is to find as many words as possible using those letters. Everyone worldwide plays the same puzzle, so you can compare scores and compete for the daily world record.",
-  },
-  {
-    q: 'How do I play the Daily Word Wheel?',
-    a: 'Visit LexiClash and tap "Daily Challenge" to find the Word Wheel. You get a set of letters arranged in a wheel with one center letter. Form words using the letters — every word must include the center letter. Find as many words as possible before time runs out. Longer words score more points.',
-  },
-  {
-    q: 'Is the Daily Word Wheel free?',
-    a: 'Yes, completely free. No download, no signup, no ads interrupting gameplay. Play in your browser on any device. A new puzzle is available every day.',
-  },
-  {
-    q: "Can I see the world record for today's Daily Word Wheel?",
-    a: 'Yes! After completing the puzzle, you can see the global leaderboard showing top scores for that day. The world record updates in real-time as players worldwide compete. Track your daily streak to see how many consecutive days you have played.',
-  },
-  {
-    q: 'Do all words need the center letter?',
-    a: 'Yes! Every word you submit in the Daily Word Wheel must include the center letter of the wheel. This is the core constraint that makes the puzzle challenging and strategic — you cannot use just any combination of letters.',
-  },
-  {
-    q: 'What languages is the Daily Word Wheel available in?',
-    a: 'The Daily Word Wheel is available in English, Hebrew, Swedish, Japanese, and Spanish. Each language has its own dictionary and leaderboard, so you can play in your preferred language.',
-  },
-];
-
-// Static JSON-LD — all content is hardcoded string literals, not user input
-const structuredData = JSON.stringify([
-  {
-    '@context': 'https://schema.org',
-    '@type': 'FAQPage',
-    mainEntity: faqs.map((faq) => ({
-      '@type': 'Question',
-      name: faq.q,
-      acceptedAnswer: { '@type': 'Answer', text: faq.a },
-    })),
-  },
-  {
-    '@context': 'https://schema.org',
-    '@type': 'HowTo',
-    name: 'How to Play the Daily Word Wheel',
-    description: 'Learn how to play the Daily Word Wheel puzzle on LexiClash — find words from a wheel of letters.',
-    totalTime: 'PT5M',
-    tool: { '@type': 'HowToTool', name: 'Web browser' },
-    supply: { '@type': 'HowToSupply', name: 'Internet connection' },
-    step: [
-      { '@type': 'HowToStep', position: 1, name: 'Open the Word Wheel', text: 'Visit LexiClash and navigate to Daily Challenge, then select Word Wheel. A new puzzle appears every day at midnight UTC.' },
-      { '@type': 'HowToStep', position: 2, name: 'Study the wheel of letters', text: 'Look at the letters arranged in a wheel. The center letter is highlighted — every word you form must include this letter.' },
-      { '@type': 'HowToStep', position: 3, name: 'Form words', text: 'Tap letters to form words using only the wheel letters. Every word must include the center letter. Longer words earn more points.' },
-      { '@type': 'HowToStep', position: 4, name: 'Compete for the world record', text: 'Find as many words as possible before time runs out. Check the global leaderboard to see where you rank and chase the daily world record.' },
-    ],
-  },
-  {
-    '@context': 'https://schema.org',
-    '@type': 'WebApplication',
-    name: 'LexiClash Daily Word Wheel',
-    url: `${BASE_URL}/en/daily/word-wheel`,
-    applicationCategory: 'GameApplication',
-    operatingSystem: 'Any',
-    offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
-    aggregateRating: { '@type': 'AggregateRating', ratingValue: '4.7', ratingCount: '890', bestRating: '5', worstRating: '1' },
-    browserRequirements: 'Requires a modern web browser',
-    inLanguage: ['en', 'he', 'sv', 'ja', 'es'],
-  },
-  {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'LexiClash', item: `${BASE_URL}/en` },
-      { '@type': 'ListItem', position: 2, name: 'Daily Word Wheel', item: `${BASE_URL}/en/daily-word-wheel` },
-    ],
-  },
-]);
-
 export default async function DailyWordWheelPage({ params }: PageProps) {
   const { locale } = await params;
+  const validLocale = (LOCALES.includes(locale as Locale) ? locale : 'en') as Locale;
+  const t = await loadTranslation(validLocale as Language) as Record<string, unknown>;
+  const resolve = (key: string, fallback: string) => getNestedValue(t, key) || fallback;
+  const faqItems = getNestedArray(t, 'dailyWordWheelLanding.faq.items');
+
+  const steps = [
+    { step: '1', title: resolve('dailyWordWheelLanding.steps.1.title', 'New puzzle daily'), desc: resolve('dailyWordWheelLanding.steps.1.desc', 'A fresh wheel of letters appears every day at midnight UTC.') },
+    { step: '2', title: resolve('dailyWordWheelLanding.steps.2.title', 'Find words'), desc: resolve('dailyWordWheelLanding.steps.2.desc', 'Form words using the wheel letters.') },
+    { step: '3', title: resolve('dailyWordWheelLanding.steps.3.title', 'Beat the clock'), desc: resolve('dailyWordWheelLanding.steps.3.desc', 'Find as many words as possible before time runs out.') },
+    { step: '4', title: resolve('dailyWordWheelLanding.steps.4.title', 'Compare globally'), desc: resolve('dailyWordWheelLanding.steps.4.desc', 'See how you rank on the daily leaderboard.') },
+  ];
+
+  // All content below is from static translation constants — safe for structured data injection
+  const structuredDataPayload = [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: faqItems.map((faq) => ({
+        '@type': 'Question',
+        name: faq.q,
+        acceptedAnswer: { '@type': 'Answer', text: faq.a },
+      })),
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'HowTo',
+      name: resolve('dailyWordWheelLanding.steps.heading', 'How to Play the Daily Word Wheel'),
+      description: resolve('dailyWordWheelLanding.hero.description', 'Learn how to play the Daily Word Wheel puzzle.'),
+      totalTime: 'PT5M',
+      tool: { '@type': 'HowToTool', name: 'Web browser' },
+      supply: { '@type': 'HowToSupply', name: 'Internet connection' },
+      step: steps.map((s, i) => ({
+        '@type': 'HowToStep', position: i + 1, name: s.title, text: s.desc,
+      })),
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'WebApplication',
+      name: 'LexiClash Daily Word Wheel',
+      url: `${BASE_URL}/${validLocale}/daily/word-wheel`,
+      applicationCategory: 'GameApplication',
+      operatingSystem: 'Any',
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+      aggregateRating: { '@type': 'AggregateRating', ratingValue: '4.7', ratingCount: '890', bestRating: '5', worstRating: '1' },
+      browserRequirements: 'Requires a modern web browser',
+      inLanguage: LOCALES,
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'LexiClash', item: `${BASE_URL}/${validLocale}` },
+        { '@type': 'ListItem', position: 2, name: resolve('dailyWordWheelLanding.hero.title', 'Daily Word Wheel'), item: `${BASE_URL}/${validLocale}/daily-word-wheel` },
+      ],
+    },
+  ];
 
   return (
     <main className="min-h-screen bg-neo-navy text-neo-white">
-      {/* Static JSON-LD structured data — all hardcoded constants, no user input, safe for injection */}
+      {/* Static JSON-LD — all content from translation constants, no user input, safe */}
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: structuredData }}
+         
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredDataPayload) }}
       />
 
-      <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
-        <h1 className="mb-6 font-neo-display text-4xl font-bold leading-tight sm:text-5xl">
-          Daily Word Wheel — Free Daily Word Puzzle
-        </h1>
-
-        <p className="mb-8 text-lg leading-relaxed text-neo-gray-200">
-          A new word wheel puzzle every day. Find words from a wheel of letters, compete for the world record,
-          and track your daily streak. Like Wordle but for word-finding fans — and it&apos;s free with no download.
-        </p>
-
-        <section className="mb-12 flex flex-col gap-3 sm:flex-row sm:gap-4">
-          <Link
-            href={`/${locale}/daily/word-wheel`}
-            className="rounded-neo border-4 border-neo-lime bg-neo-lime px-6 py-3 text-center font-bold text-neo-navy shadow-hard transition-all hover:shadow-hard-lg sm:px-8 sm:py-4"
-          >
-            Play Today&apos;s Word Wheel
-          </Link>
-          <Link
-            href={`/${locale}/leaderboard`}
-            className="rounded-neo border-4 border-neo-cyan bg-transparent px-6 py-3 text-center font-bold text-neo-cyan shadow-hard transition-all hover:bg-neo-cyan/10 sm:px-8 sm:py-4"
-          >
-            View World Record
-          </Link>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">How the Daily Word Wheel Works</h2>
-          <div className="space-y-4">
-            {[
-              { step: '1', title: 'New puzzle daily', desc: 'A fresh wheel of letters appears every day at midnight UTC. Everyone worldwide gets the same letters.' },
-              { step: '2', title: 'Find words', desc: 'Form words using the wheel letters. Every word must include the center letter. Longer words = more points.' },
-              { step: '3', title: 'Beat the clock', desc: 'Find as many words as possible before time runs out. Speed and vocabulary both matter.' },
-              { step: '4', title: 'Compare globally', desc: 'See how you rank on the daily leaderboard. Chase the world record and track your streak.' },
-            ].map((item) => (
-              <div key={item.step} className="flex gap-4 rounded-neo border-3 border-neo-cyan bg-neo-navy/50 p-5 shadow-hard">
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-3 border-neo-lime font-neo-display text-lg font-bold text-neo-lime">
-                  {item.step}
-                </span>
-                <div>
-                  <h3 className="font-neo-display font-bold text-neo-cyan">{item.title}</h3>
-                  <p className="text-sm text-neo-gray-200">{item.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">Frequently Asked Questions</h2>
-          <div className="space-y-4">
-            {faqs.map((faq, idx) => (
-              <details key={idx} className="group rounded-neo border-3 border-neo-gray-400 bg-neo-navy/50 shadow-hard">
-                <summary className="flex cursor-pointer items-center justify-between px-6 py-4 font-bold">
-                  <span>{faq.q}</span>
-                  <span className="text-neo-lime transition-transform group-open:rotate-180">&#9660;</span>
-                </summary>
-                <div className="border-t border-neo-gray-400 px-6 py-4 text-neo-gray-200">{faq.a}</div>
-              </details>
-            ))}
-          </div>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="font-neo-display text-2xl font-bold sm:text-3xl">Play Today&apos;s Puzzle</h2>
-          <p className="mt-4 text-neo-gray-200">
-            The Daily Word Wheel resets every day — don&apos;t miss today&apos;s puzzle! Build your streak,
-            improve your vocabulary, and compete with players around the world. Completely free, no download needed.
-          </p>
-          <div className="mt-6">
-            <Link
-              href={`/${locale}/daily/word-wheel`}
-              className="inline-block rounded-neo border-4 border-neo-lime bg-neo-lime px-8 py-4 font-bold text-neo-navy shadow-hard transition-all hover:shadow-hard-lg"
-            >
-              Play Daily Word Wheel Now
-            </Link>
-          </div>
-        </section>
-      </div>
+      <AnimatedLanding
+        locale={validLocale}
+        hero={{
+          title: resolve('dailyWordWheelLanding.hero.title', 'Daily Word Wheel'),
+          subtitle: resolve('dailyWordWheelLanding.hero.subtitle', 'Free Daily Word Puzzle'),
+          description: resolve('dailyWordWheelLanding.hero.description', 'A new word wheel puzzle every day.'),
+          cta: resolve('dailyWordWheelLanding.hero.cta', "Play Today's Word Wheel"),
+          leaderboard: resolve('dailyWordWheelLanding.hero.leaderboard', 'View World Record'),
+        }}
+        steps={steps}
+        stepsHeading={resolve('dailyWordWheelLanding.steps.heading', 'How the Daily Word Wheel Works')}
+        faqHeading={resolve('dailyWordWheelLanding.faq.heading', 'Frequently Asked Questions')}
+        faqItems={faqItems}
+        finalCta={{
+          heading: resolve('dailyWordWheelLanding.finalCta.heading', "Play Today's Puzzle"),
+          description: resolve('dailyWordWheelLanding.finalCta.description', 'The Daily Word Wheel resets every day.'),
+          button: resolve('dailyWordWheelLanding.finalCta.button', 'Play Daily Word Wheel Now'),
+        }}
+      />
     </main>
   );
 }
