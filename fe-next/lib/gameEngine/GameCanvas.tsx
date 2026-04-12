@@ -184,9 +184,9 @@ export function GameCanvas({
       ref={containerRef}
       className={className}
       style={{
-        width: config.width,
-        height: config.height,
-        position: 'relative',
+        width: className?.includes('absolute') ? undefined : config.width,
+        height: className?.includes('absolute') ? undefined : config.height,
+        position: className?.includes('absolute') ? undefined : 'relative',
         overflow: 'hidden',
         touchAction: 'none',
       }}
