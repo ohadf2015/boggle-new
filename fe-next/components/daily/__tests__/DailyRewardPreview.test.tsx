@@ -15,13 +15,21 @@ jest.mock('framer-motion', () => ({
   AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
 }));
 
-const mockT = (key: string) => {
+const mockT = (key: string, params?: Record<string, string | number>) => {
   const translations: Record<string, string> = {
     'daily.todayReward': "Today's reward: {{coins}} coins",
     'daily.tomorrowReward': 'Tomorrow: {{coins}} coins',
     'daily.nearMilestone': '{{days}} more days to {{badge}}!',
+    'daily.rewardDay': 'Day {{day}}',
   };
-  return translations[key] || key;
+  let result = translations[key] || key;
+  if (params) {
+    for (const [k, v] of Object.entries(params)) {
+      result = result.replace(`{{${k}}}`, String(v));
+      result = result.replace(`{${k}}`, String(v));
+    }
+  }
+  return result;
 };
 
 describe('DailyRewardPreview', () => {
