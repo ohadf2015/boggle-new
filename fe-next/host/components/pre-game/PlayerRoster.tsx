@@ -1,8 +1,8 @@
 'use client';
 
-import React, { memo, useCallback } from 'react';
+import React, { memo, useCallback, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Crown, X } from 'lucide-react';
+import { Crown, X, Pencil, Check } from 'lucide-react';
 import Avatar from '../../../components/Avatar';
 import { useSocket } from '../../../utils/SocketContext';
 import { cn } from '../../../lib/utils';
@@ -29,6 +29,12 @@ interface PlayerRosterProps {
   t: (path: string, params?: Record<string, string | number>) => string;
   /** Compact layout with smaller avatars for mobile */
   compact?: boolean;
+  /** Fired when the self/host taps their avatar — open the avatar builder */
+  onSelfAvatarClick?: () => void;
+  /** Called with a trimmed new name when the self/host renames themselves */
+  onSelfNameChange?: (newName: string) => void;
+  /** Gate name editing (e.g., disallow for authenticated users with server-side names) */
+  canEditSelfName?: boolean;
 }
 
 const AVATAR_COLORS = ['bg-neo-cyan', 'bg-neo-pink', 'bg-purple-400', 'bg-neo-lime', 'bg-neo-yellow', 'bg-orange-400', 'bg-teal-400', 'bg-rose-400'];
@@ -70,8 +76,27 @@ const playerEntranceVariants = {
   },
 };
 
-export const PlayerRoster = memo(function PlayerRoster({ players, username, gameCode, maxPlayers, t, compact = false }: PlayerRosterProps): React.ReactElement {
+export const PlayerRoster = memo(function PlayerRoster({ players, username, gameCode, maxPlayers, t, compact = false, onSelfAvatarClick, onSelfNameChange, canEditSelfName = false }: PlayerRosterProps): React.ReactElement {
   const { socket } = useSocket();
+
+  const [isEditingSelfName, setIsEditingSelfName] = useState(false);
+  const [selfNameDraft, setSelfNameDraft] = useState(username);
+
+  const startSelfNameEdit = useCallback(() => {
+    setSelfNameDraft(username);
+    setIsEditingSelfName(true);
+  }, [username]);
+
+  const commitSelfNameEdit = useCallback(() => {
+    const trimmed = selfNameDraft.trim();
+    if (trimmed && trimmed !== username) onSelfNameChange?.(trimmed);
+    setIsEditingSelfName(false);
+  }, [selfNameDraft, username, onSelfNameChange]);
+
+  const cancelSelfNameEdit = useCallback(() => {
+    setIsEditingSelfName(false);
+    setSelfNameDraft(username);
+  }, [username]);
 
   const isFull = players.length >= maxPlayers;
 
@@ -143,29 +168,50 @@ export const PlayerRoster = memo(function PlayerRoster({ players, username, game
                       />
                     )}
 
-                    <div className={cn(
-                      'rounded-full border-neo-black flex items-center justify-center overflow-hidden shadow-hard',
-                      compact ? 'w-16 h-16 border-4' : 'w-20 h-20 border-3',
-                      AVATAR_COLORS[index % AVATAR_COLORS.length],
-                      compact
-                        ? cn('ring-4 ring-offset-2 ring-offset-neo-navy', AVATAR_RING_COLORS[index % AVATAR_RING_COLORS.length])
-                        : cn(
-                            isMe && 'ring-3 ring-neo-lime ring-offset-2 ring-offset-neo-navy',
-                            isHostPlayer && 'ring-3 ring-neo-yellow ring-offset-2 ring-offset-neo-navy',
-                          ),
-                    )}>
-                      {avatar?.customAvatar || avatar?.avatarImage ? (
-                        <Avatar
-                          customAvatar={avatar?.customAvatar ?? undefined}
-                          avatarImage={avatar?.avatarImage}
-                          size={compact ? 'xl' : '2xl'}
-                        />
-                      ) : (
-                        <span className={cn('font-black text-neo-black', compact ? 'text-3xl' : 'text-4xl')}>
-                          {name.charAt(0).toUpperCase()}
-                        </span>
-                      )}
-                    </div>
+                    {(() => {
+                      const tileInner = (
+                        <div className={cn(
+                          'rounded-full border-neo-black flex items-center justify-center overflow-hidden shadow-hard',
+                          compact ? 'w-16 h-16 border-4' : 'w-20 h-20 border-3',
+                          AVATAR_COLORS[index % AVATAR_COLORS.length],
+                          compact
+                            ? cn('ring-4 ring-offset-2 ring-offset-neo-navy', AVATAR_RING_COLORS[index % AVATAR_RING_COLORS.length])
+                            : cn(
+                                isMe && 'ring-3 ring-neo-lime ring-offset-2 ring-offset-neo-navy',
+                                isHostPlayer && 'ring-3 ring-neo-yellow ring-offset-2 ring-offset-neo-navy',
+                              ),
+                        )}>
+                          {avatar?.customAvatar || avatar?.avatarImage ? (
+                            <Avatar
+                              customAvatar={avatar?.customAvatar ?? undefined}
+                              avatarImage={avatar?.avatarImage}
+                              size={compact ? 'xl' : '2xl'}
+                            />
+                          ) : (
+                            <span className={cn('font-black text-neo-black', compact ? 'text-3xl' : 'text-4xl')}>
+                              {name.charAt(0).toUpperCase()}
+                            </span>
+                          )}
+                        </div>
+                      );
+                      if (isMe && onSelfAvatarClick) {
+                        return (
+                          <button
+                            type="button"
+                            onClick={onSelfAvatarClick}
+                            data-testid="self-edit-avatar-button"
+                            className="relative transition-transform hover:scale-105 active:scale-95"
+                            aria-label={t('playerView.editAvatar')}
+                          >
+                            {tileInner}
+                            <span className="absolute -bottom-0.5 -inset-e-0.5 w-6 h-6 rounded-full bg-neo-cyan border-2 border-neo-black shadow-hard-sm flex items-center justify-center">
+                              <Pencil className="w-3 h-3 text-neo-black" />
+                            </span>
+                          </button>
+                        );
+                      }
+                      return tileInner;
+                    })()}
                   </div>
 
                   {/* Remove/kick button — always visible for bots, hover-only for humans */}
@@ -193,10 +239,52 @@ export const PlayerRoster = memo(function PlayerRoster({ players, username, game
                   )}
                 </div>
 
-                {/* Name */}
-                <span className={cn('font-bold truncate text-center text-neo-cream', compact ? 'text-[11px] w-16' : 'text-xs w-20')}>
-                  {name}
-                </span>
+                {/* Name (inline editable for self) */}
+                {isMe && isEditingSelfName ? (
+                  <div className="flex items-center gap-1">
+                    <input
+                      data-testid="self-name-edit-input"
+                      type="text"
+                      value={selfNameDraft}
+                      onChange={(e) => setSelfNameDraft(e.target.value)}
+                      maxLength={20}
+                      autoFocus
+                      onBlur={commitSelfNameEdit}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') commitSelfNameEdit();
+                        if (e.key === 'Escape') cancelSelfNameEdit();
+                      }}
+                      className={cn(
+                        'bg-white/10 text-neo-cream border-2 border-neo-black rounded-neo px-1.5 py-0.5 text-center font-bold focus:outline-hidden focus:ring-2 focus:ring-neo-cyan',
+                        compact ? 'text-[11px] w-16' : 'text-xs w-20',
+                      )}
+                    />
+                    <button
+                      type="button"
+                      onMouseDown={(e) => e.preventDefault()}
+                      onClick={commitSelfNameEdit}
+                      className="w-5 h-5 flex items-center justify-center bg-neo-lime border-2 border-neo-black rounded shadow-hard-sm"
+                      aria-label={t('common.save')}
+                    >
+                      <Check className="w-2.5 h-2.5 text-neo-black" />
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={isMe && canEditSelfName ? startSelfNameEdit : undefined}
+                    data-testid={isMe ? 'self-edit-name-button' : undefined}
+                    className={cn(
+                      'font-bold truncate text-center text-neo-cream flex items-center gap-1 justify-center',
+                      compact ? 'text-[11px] w-16' : 'text-xs w-20',
+                      isMe && canEditSelfName ? 'hover:text-neo-cyan transition-colors cursor-text' : 'cursor-default',
+                    )}
+                    disabled={!(isMe && canEditSelfName)}
+                  >
+                    <span className="truncate">{name}</span>
+                    {isMe && canEditSelfName && <Pencil className="w-2.5 h-2.5 shrink-0 opacity-60" />}
+                  </button>
+                )}
               </motion.div>
             );
           })}

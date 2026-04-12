@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { BookOpen, LogOut, Pencil, Check, X, Monitor } from 'lucide-react';
+import { BookOpen, LogOut, Monitor } from 'lucide-react';
 import { useCrazyGamesInvite } from '../../hooks/useCrazyGamesInvite';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useSocket } from '../../utils/SocketContext';
@@ -19,7 +19,6 @@ import { DesktopLobbyLayout, InviteCard } from './pre-game/desktop';
 import { GameInstructions } from './pre-game/GameInstructions';
 import TvTutorialOverlay, { isTvTutorialComplete } from './tv-broadcast/TvTutorialOverlay';
 import { ChatBubble } from './pre-game/ChatBubble';
-import Avatar from '@/components/Avatar';
 import dynamic from 'next/dynamic';
 const AvatarBuilderModal = dynamic(() => import('@/components/avatar/AvatarBuilderModal'), { ssr: false });
 import { useAvatarPremium } from '@/hooks/useAvatarPremium';
@@ -126,12 +125,10 @@ function HostPreGameView({
   const { isOnCrazyGamesPlatform: _isOnCrazyGamesPlatform } = useCrazyGames();
 
 
-  // Avatar & name editing state
+  // Avatar & name editing state (UI lives in PlayerRoster, modal lives here)
   const [isAvatarBuilderOpen, setIsAvatarBuilderOpen] = useState(false);
   const avatarPremium = useAvatarPremium();
   const currentAvatar = getOrCreateStoredCustomAvatar();
-  const [isEditingName, setIsEditingName] = useState(false);
-  const [editNameValue, setEditNameValue] = useState(username);
 
   const handleAvatarSave = useCallback(async (config: CustomAvatarConfig) => {
     setStoredCustomAvatar(config);
@@ -140,13 +137,12 @@ function HostPreGameView({
     await updateProfile({ avatar_config: config }).catch(() => {});
   }, [onAvatarChange, updateProfile]);
 
-  const handleSaveName = useCallback(() => {
-    const trimmed = editNameValue.trim();
-    if (trimmed && trimmed !== username) {
-      onNameChange?.(trimmed);
-    }
-    setIsEditingName(false);
-  }, [editNameValue, username, onNameChange]);
+  const handleSelfNameChange = useCallback((newName: string) => {
+    const trimmed = newName.trim();
+    if (trimmed && trimmed !== username) onNameChange?.(trimmed);
+  }, [username, onNameChange]);
+
+  const handleOpenAvatarBuilder = useCallback(() => setIsAvatarBuilderOpen(true), []);
 
   const [hasInitialized, setHasInitialized] = useState(false);
   const [showTvTutorial, setShowTvTutorial] = useState(false);
@@ -349,80 +345,7 @@ function HostPreGameView({
 
       {/* Header */}
       <header className="shrink-0 px-3 py-2 bg-neo-navy/95 border-b-3 border-neo-black sticky top-0 z-20">
-        <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-3 min-w-0">
-            {/* Clickable host avatar */}
-            <button
-              data-testid="host-edit-avatar-button"
-              onClick={() => setIsAvatarBuilderOpen(true)}
-              className="relative shrink-0 group"
-            >
-              <div className="w-11 h-11 rounded-full border-3 border-neo-black overflow-hidden shadow-hard ring-2 ring-neo-lime ring-offset-2 ring-offset-neo-navy transition-transform group-hover:scale-105 group-active:scale-95">
-                <Avatar
-                  customAvatar={currentAvatar}
-                  size="lg"
-                  className="w-full h-full"
-                />
-              </div>
-              <div className="absolute -bottom-0.5 -inset-e-0.5 w-5 h-5 rounded-full bg-neo-cyan border-2 border-neo-black shadow-hard-sm flex items-center justify-center">
-                <Pencil className="w-2.5 h-2.5 text-neo-black" />
-              </div>
-            </button>
-
-            {/* Host name + label */}
-            <div className="min-w-0">
-              {isEditingName ? (
-                <div className="flex items-center gap-1.5">
-                  <input
-                    data-testid="host-name-edit-input"
-                    type="text"
-                    value={editNameValue}
-                    onChange={(e) => setEditNameValue(e.target.value)}
-                    maxLength={20}
-                    className="bg-white/10 text-neo-cream border-2 border-neo-black rounded-neo px-2 py-1 text-sm font-black focus:outline-hidden focus:ring-2 focus:ring-neo-cyan w-full max-w-[150px]"
-                    autoFocus
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') handleSaveName();
-                      if (e.key === 'Escape') { setIsEditingName(false); setEditNameValue(username); }
-                    }}
-                  />
-                  <button
-                    data-testid="host-name-save-button"
-                    onClick={handleSaveName}
-                    className="w-7 h-7 flex items-center justify-center bg-neo-lime border-2 border-neo-black rounded-neo shadow-hard-sm shrink-0"
-                  >
-                    <Check className="w-3.5 h-3.5 text-neo-black" />
-                  </button>
-                  <button
-                    onClick={() => { setIsEditingName(false); setEditNameValue(username); }}
-                    className="w-7 h-7 flex items-center justify-center bg-white/10 border-2 border-neo-black rounded-neo shrink-0"
-                  >
-                    <X className="w-3.5 h-3.5 text-neo-cream" />
-                  </button>
-                </div>
-              ) : (
-                <button
-                  data-testid="host-edit-name-button"
-                  onClick={() => { setEditNameValue(username); setIsEditingName(true); }}
-                  className="flex items-center gap-1.5 min-w-0 group"
-                  {...(!isAuthenticated ? {} : { disabled: true })}
-                >
-                  <span className="text-base font-neo-display font-bold text-neo-cream leading-none truncate"
-                    style={{ textShadow: '0 0 10px rgba(255, 255, 255, 0.15)' }}
-                  >
-                    {username}
-                  </span>
-                  {!isAuthenticated && (
-                    <Pencil className="w-3 h-3 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
-                  )}
-                </button>
-              )}
-              <span className="text-[9px] font-black uppercase tracking-[0.2em] text-neo-lime/70 font-neo-display leading-none mt-0.5 block">
-                {t('hostView.wonderhostLeader')}
-              </span>
-            </div>
-          </div>
-
+        <div className="flex items-center justify-end gap-2">
           <div className="flex items-center gap-2 shrink-0">
             <div className="lg:hidden">
               <MobileShareSection gameCode={gameCode} t={t} showHint={actualPlayerCount === 0} compact />
@@ -468,6 +391,9 @@ function HostPreGameView({
                     maxPlayers={maxPlayers}
                     hostLabel={t('hostView.wonderhostLeader')}
                     t={t}
+                    onSelfAvatarClick={handleOpenAvatarBuilder}
+                    onSelfNameChange={handleSelfNameChange}
+                    canEditSelfName={!isAuthenticated}
                   />
                 </div>
                 <div className="animate-fade-in-up" style={{ animationDelay: '80ms' }}>
@@ -515,8 +441,12 @@ function HostPreGameView({
                 username={username}
                 gameCode={gameCode}
                 maxPlayers={maxPlayers}
+                hostLabel={t('hostView.wonderhostLeader')}
                 t={t}
                 compact
+                onSelfAvatarClick={handleOpenAvatarBuilder}
+                onSelfNameChange={handleSelfNameChange}
+                canEditSelfName={!isAuthenticated}
               />
               <BattleModeCard
                 selectedGameMode={selectedGameMode}
