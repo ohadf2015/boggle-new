@@ -14,7 +14,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title: 'Play Boggle Online Free — No Download, No Signup | LexiClash',
     description: 'Play boggle online free — no download, no signup. Solo or real-time multiplayer with 2-20+ friends. 4x4, 5x5, 6x6 grids, daily challenges, boss battles. The best free Boggle alternative in 2026.',
-    keywords: 'play boggle online free no download, boggle online free no download, play boggle online free, free boggle online no download, boggle game free no download, play boggle online free with other players, boggle alternatives 2026, games like boggle online free, word game no download, boggle word shake free, online web based multiplayer words games, word multiplayer, word games online free, word making games, word hunt game online, free word game no download, word puzzle game free',
+    keywords: 'play boggle online free no download, boggle online free no download, play boggle online free, free boggle online no download, free online boggle no download, boggle game free no download, play boggle word shake free no download, play boggle online free with other players, boggle alternatives 2026, games like boggle online free, word game no download, boggle word shake free, word games online free, word making games, word hunt game online, free word game no download, word puzzle game free',
     openGraph: {
       title: 'Play Boggle Online Free - No Download Needed | LexiClash',
       description: 'Play boggle online free — no download, no signup. Solo or multiplayer with friends. Instant play in your browser!',
@@ -136,13 +136,15 @@ const softwareAppJsonLd = JSON.stringify({
     price: '0',
     priceCurrency: 'USD',
   },
-  aggregateRating: {
-    '@type': 'AggregateRating',
-    ratingValue: '4.7',
-    ratingCount: '1240',
-    bestRating: '5',
-    worstRating: '1',
-  },
+  featureList: [
+    'Real-time multiplayer up to 20 players',
+    'No download required — play in browser',
+    'Daily Word Wheel puzzle',
+    '5 language support (EN, HE, SV, JA, ES)',
+    '4x4, 5x5, 6x6 grid sizes',
+    'Adventure mode with boss battles',
+    'Combo scoring system',
+  ],
   browserRequirements: 'Requires a modern web browser',
   inLanguage: ['en', 'he', 'sv', 'ja', 'es'],
 });
@@ -322,7 +324,11 @@ export default async function PlayBoggleOnlineFreePage({ params }: PageProps) {
 
         <section className="mb-12">
           <h2 className="mb-4 font-neo-display text-2xl font-bold sm:text-3xl">Compare Word Games</h2>
-          <div className="grid gap-3 sm:grid-cols-3">
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <Link href={`/${locale}/daily-word-wheel`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-lime/40">
+              <h3 className="font-bold text-neo-lime">Daily Word Wheel</h3>
+              <p className="mt-1 text-xs text-neo-gray-200">New letter puzzle every day</p>
+            </Link>
             <Link href={`/${locale}/lexiclash-vs-wordle`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-lime/40">
               <h3 className="font-bold text-neo-cyan">LexiClash vs Wordle</h3>
               <p className="mt-1 text-xs text-neo-gray-200">Unlimited play vs 1 puzzle/day</p>

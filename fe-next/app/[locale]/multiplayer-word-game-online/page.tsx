@@ -14,9 +14,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const pageUrl = `${BASE_URL}/en/multiplayer-word-game-online`;
 
   return {
-    title: 'Free Multiplayer Word Game Online With Friends — No Download | LexiClash',
-    description: 'Play the best free multiplayer word game online with friends! Words With Friends alternative where everyone plays at once. Create a room, send a link, compete in real-time word battles with 2-20+ players. Like Boggle meets Scrabble — no download, no signup, instant play.',
-    keywords: 'multiplayer word game, word games multiplayer, word game online free, multiplayer word game online, words with friends multiplayer free online, online multiplayer word games like hanging with friends, word game with friends, free word games, online word battles, word game like wordle, word game like scrabble, word games multiplayer online free, word battle game, word game for groups, word games for parties, competitive word game, word race online, online web based multiplayer words games, word combo game, real-time word battle, word game you type in words',
+    title: 'Multiplayer Word Game Online — Free, 2-20 Players | LexiClash',
+    description: 'Free multiplayer word game — everyone plays the same grid at once, not turn-based. Create a room, share a link, compete with 2-20+ friends. No download, no signup.',
+    keywords: 'multiplayer word game, word games multiplayer, word game online free, multiplayer word game online, online multiplayer word games like hanging with friends, word game with friends, free word games, online word battles, word games multiplayer online free, word battle game, word game for groups, word games for parties, competitive word game, word race online, real-time word battle, word games live with people, online multiplayer word find, word multiplayer',
     openGraph: {
       title: 'Free Multiplayer Word Game Online With Friends | LexiClash',
       description: 'Words With Friends alternative — everyone plays at once! Create a room, invite 2-20+ friends, compete in real-time word battles. Free, no download.',
@@ -193,6 +193,24 @@ export default async function MultiplayerWordGameOnlinePage({ params }: PageProp
                 <div className="border-t border-neo-gray-400 px-6 py-4 text-neo-gray-200">{faq.a}</div>
               </details>
             ))}
+          </div>
+        </section>
+
+        <section className="mb-12">
+          <h2 className="mb-4 font-neo-display text-2xl font-bold sm:text-3xl">Explore More</h2>
+          <div className="grid gap-3 sm:grid-cols-3">
+            <Link href={`/${validLocale}/daily-word-wheel`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-lime/40">
+              <h3 className="font-bold text-neo-lime">Daily Word Wheel</h3>
+              <p className="mt-1 text-xs text-neo-gray-200">New letter puzzle every day — compete globally</p>
+            </Link>
+            <Link href={`/${validLocale}/play-boggle-online-free`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-cyan/40">
+              <h3 className="font-bold text-neo-cyan">Play Boggle Free</h3>
+              <p className="mt-1 text-xs text-neo-gray-200">No download, instant browser play</p>
+            </Link>
+            <Link href={`/${validLocale}/words-with-friends-alternative`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-pink/40">
+              <h3 className="font-bold text-neo-pink">vs Words With Friends</h3>
+              <p className="mt-1 text-xs text-neo-gray-200">Real-time, not turn-based</p>
+            </Link>
           </div>
         </section>
 

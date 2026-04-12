@@ -166,6 +166,7 @@ function getAllRoutes(): MetadataRoute.Sitemap {
     { locale: 'ja', path: '/japanese-word-game', img: 'ja' },
     { locale: 'en', path: '/multiplayer-word-game-online', img: 'en' },
     { locale: 'en', path: '/play-boggle-online-free', img: 'en' },
+    { locale: 'en', path: '/boggle-word-shake-free', img: 'en' },
     { locale: 'en', path: '/word-games-online-free', img: 'en' },
     { locale: 'en', path: '/daily-word-wheel', img: 'en' },
     { locale: 'en', path: '/online-word-games-with-friends', img: 'en' },

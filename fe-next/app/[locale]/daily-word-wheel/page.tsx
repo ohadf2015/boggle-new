@@ -13,7 +13,7 @@ const LOCALES: Locale[] = ['en', 'he', 'sv', 'ja', 'es'];
 
 // SEO keywords per locale
 const KEYWORDS: Record<Locale, string> = {
-  en: 'daily word wheel, daily word puzzle, word wheel game, free daily word game, word wheel online, daily word challenge, wordle alternative daily',
+  en: 'daily word wheel, daily word wheel game, daily word puzzle, word wheel game, free daily word game, word wheel online, daily word challenge, wordle alternative daily, daily word game free, word wheel puzzle',
   he: 'גלגל מילים יומי, פאזל מילים, משחק מילים חינם, משחק מילים יומי, אתגר מילים',
   sv: 'dagligt ordhjul, ordpussel, gratis ordspel, dagligt ordspel, ordhjul online',
   ja: 'デイリーワードホイール, ワードパズル, 無料ワードゲーム, 毎日のワードゲーム',
@@ -62,8 +62,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const ogLocaleMap: Record<string, string> = { en: 'en_US', he: 'he_IL', sv: 'sv_SE', ja: 'ja_JP', es: 'es_ES' };
 
   return {
-    title: resolve('meta.dailyWordWheel.title', 'Daily Word Wheel - Free Daily Puzzle | LexiClash'),
-    description: resolve('meta.dailyWordWheel.description', 'Spin the daily word wheel! Find all possible words from a set of letters. New puzzle every day.'),
+    title: resolve('meta.dailyWordWheel.title', 'Daily Word Wheel — Play Today\'s Free Puzzle | LexiClash'),
+    description: resolve('meta.dailyWordWheel.description', 'A new letter wheel drops every day. Find every word before time runs out — no signup, no download. See how you rank worldwide on the daily leaderboard.'),
     keywords: KEYWORDS[validLocale],
     openGraph: {
       title: resolve('meta.dailyWordWheel.ogTitle', 'Daily Word Wheel - Free Puzzle'),
@@ -133,7 +133,7 @@ export default async function DailyWordWheelPage({ params }: PageProps) {
       applicationCategory: 'GameApplication',
       operatingSystem: 'Any',
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
-      aggregateRating: { '@type': 'AggregateRating', ratingValue: '4.7', ratingCount: '890', bestRating: '5', worstRating: '1' },
+      featureList: ['New puzzle every day at midnight UTC', 'Global daily leaderboard', 'No download or signup required', '5 language support', 'Mobile-friendly browser game'],
       browserRequirements: 'Requires a modern web browser',
       inLanguage: LOCALES,
     },

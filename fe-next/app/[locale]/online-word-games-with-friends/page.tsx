@@ -12,9 +12,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const pageUrl = `${BASE_URL}/en/online-word-games-with-friends`;
 
   return {
-    title: 'Online Word Games With Friends — Play Free Multiplayer | LexiClash',
-    description: 'Play online word games with friends — free, no download. LexiClash lets you create a room, share a link, and compete in real-time word battles with 2-20+ players. Like Boggle meets Words With Friends but everyone plays at the same time. Perfect for parties, game nights, and remote hangouts.',
-    keywords: 'online word games with friends, play word games with friends, multiplayer word game online, word games for groups, word game with friends free, online multiplayer word games like hanging with friends, word battle with friends, play boggle online free with other players, party word game online, word game for groups no download',
+    title: 'Online Word Games With Friends — Free, No Download | LexiClash',
+    description: 'Play word games with friends online — create a room, share a link, compete in real-time. 2-20+ players on the same grid simultaneously. Free, no download needed.',
+    keywords: 'online word games with friends, play word games with friends, multiplayer word game online, word games for groups, word game with friends free, online multiplayer word games like hanging with friends, word battle with friends, party word game online, word game for groups no download, online free word cloud game multiplayer, word games live with people',
     openGraph: {
       title: 'Play Word Games With Friends Online — Free | LexiClash',
       description: 'Create a room, share the link, compete in real-time word battles. 2-20+ players, no download!',
@@ -166,6 +166,24 @@ export default async function OnlineWordGamesWithFriendsPage({ params }: PagePro
                 <div className="border-t border-neo-gray-400 px-6 py-4 text-neo-gray-200">{faq.a}</div>
               </details>
             ))}
+          </div>
+        </section>
+
+        <section className="mb-12">
+          <h2 className="mb-4 font-neo-display text-2xl font-bold sm:text-3xl">More Ways to Play</h2>
+          <div className="grid gap-3 sm:grid-cols-3">
+            <Link href={`/${locale}/daily-word-wheel`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-lime/40">
+              <h3 className="font-bold text-neo-lime">Daily Word Wheel</h3>
+              <p className="mt-1 text-xs text-neo-gray-200">Play the daily puzzle and compare scores with friends</p>
+            </Link>
+            <Link href={`/${locale}/play-boggle-online-free`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-cyan/40">
+              <h3 className="font-bold text-neo-cyan">Free Boggle Online</h3>
+              <p className="mt-1 text-xs text-neo-gray-200">No download, no signup required</p>
+            </Link>
+            <Link href={`/${locale}/best-online-word-games`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-pink/40">
+              <h3 className="font-bold text-neo-pink">Best Word Games 2026</h3>
+              <p className="mt-1 text-xs text-neo-gray-200">Complete comparison guide</p>
+            </Link>
           </div>
         </section>
 

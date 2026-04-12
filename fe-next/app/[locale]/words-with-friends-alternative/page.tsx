@@ -11,9 +11,9 @@ export async function generateMetadata(_props: PageProps): Promise<Metadata> {
   const pageUrl = `${BASE_URL}/en/words-with-friends-alternative`;
 
   return {
-    title: 'Words With Friends Alternative — Free Multiplayer Online | LexiClash',
-    description: 'Free Words With Friends alternative — play multiplayer word games online with no download. Real-time battles, not turn-based. 2-20+ players, 5 languages, daily challenges.',
-    keywords: 'words with friends multiplayer free online, words with friends alternative, word games multiplayer, multiplayer word games online, free word game with friends online, word game like words with friends, online multiplayer word games like hanging with friends, word multiplayer, word battle online free',
+    title: 'Words With Friends Alternative — Real-Time Free | LexiClash',
+    description: 'Skip the waiting. LexiClash is a free word game where 2-20 players compete on the same grid at the same time. No turns, no download, no ads. Play in 30 seconds.',
+    keywords: 'words with friends multiplayer free online, words with friends alternative, word games multiplayer, multiplayer word games online, free word game with friends online, word game like words with friends, online multiplayer word games like hanging with friends, word battle online free, online word games with friends free, web word games with friends, spell game with friends online',
     openGraph: {
       title: 'Words With Friends Alternative — Real-Time Multiplayer | LexiClash',
       description: 'Free multiplayer word game — everyone plays at once, not turn-based. No download needed!',
@@ -205,6 +205,10 @@ export default async function WordsWithFriendsAlternativePage({ params }: PagePr
             <Link href={`/${locale}/play-boggle-online-free`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-lime/40">
               <h3 className="font-bold text-neo-cyan">Free Boggle Online</h3>
               <p className="mt-1 text-xs text-neo-gray-200">No download, play instantly</p>
+            </Link>
+            <Link href={`/${locale}/daily-word-wheel`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-lime/40">
+              <h3 className="font-bold text-neo-lime">Daily Word Wheel</h3>
+              <p className="mt-1 text-xs text-neo-gray-200">New puzzle daily — free to play</p>
             </Link>
           </div>
         </section>
