@@ -23,112 +23,61 @@ const SHIMMER_FAST: React.CSSProperties = {
 /** Visual config per tile type.
  *  `indicator` is a lucide-react component — inherits `currentColor` from the
  *  tile's `text-*` class so gold/ice tiles get dark strokes, bombs get white. */
-export const TILE_VISUALS: Record<BlastTileType, { bg: string; indicator?: LucideIcon; text?: string; style?: React.CSSProperties }> = {
-  standard: {
-    bg: '', text: 'text-neo-navy',
-    style: { background: 'linear-gradient(165deg, #FFFFFF 0%, #F0F0F5 50%, #E8E8F0 100%)', boxShadow: SHADOW, border: '2px solid rgba(0,0,0,0.3)' },
-  },
-  gold: {
-    bg: '', indicator: Star, text: 'text-neo-navy',
-    style: { background: 'linear-gradient(165deg, #FFE566 0%, #FFD700 40%, #F0C800 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL, ...SHIMMER_STYLE },
-  },
-  bomb: {
-    bg: '', indicator: Bomb, text: 'text-white',
-    style: { background: 'linear-gradient(165deg, #FF6B6B 0%, #FF3366 40%, #E0194D 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL, ...SHIMMER_STYLE },
-  },
-  lightning: {
-    bg: '', indicator: Zap, text: 'text-neo-navy',
-    style: { background: 'linear-gradient(165deg, #66FFFF 0%, #00FFFF 40%, #00E0E0 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL, ...SHIMMER_FAST },
-  },
-  prism: {
-    bg: '', indicator: Triangle, text: 'text-white',
-    style: { background: 'conic-gradient(from 0deg, #FF1493, #8B5CF6, #00FFFF, #BFFF00, #FF1493)', boxShadow: SHADOW, border: BORDER_SPECIAL, ...SHIMMER_FAST },
-  },
-  rainbow: {
-    bg: '', indicator: Rainbow, text: 'text-white',
-    style: { background: 'linear-gradient(135deg, #FF1493 0%, #8B5CF6 50%, #00FFFF 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL, ...SHIMMER_FAST },
-  },
-  ice: {
-    bg: '', indicator: Snowflake, text: 'text-neo-navy',
-    style: { background: 'linear-gradient(165deg, #E0FFFF 0%, #99EEFF 40%, #80DDEE 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL },
-  },
-  gem: {
-    bg: '', indicator: Gem, text: 'text-white',
-    style: { background: 'linear-gradient(165deg, #7DFFB3 0%, #34D399 40%, #10B981 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL, ...SHIMMER_STYLE },
-  },
-  frozen: {
-    bg: '', indicator: Snowflake, text: 'text-neo-navy',
-    style: { background: 'linear-gradient(165deg, #E8F4FF 0%, #B8DDFF 40%, #A0CCEE 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL },
-  },
-  magnet: {
-    bg: '', indicator: Magnet, text: 'text-white',
-    style: { background: 'linear-gradient(165deg, #A78BFA 0%, #8B5CF6 40%, #7C3AED 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL },
-  },
-  diamond: {
-    bg: '', indicator: Diamond, text: 'text-neo-navy',
-    style: { background: 'linear-gradient(165deg, #88FFFF 0%, #00EEFF 40%, #00DDEE 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL, ...SHIMMER_STYLE },
-  },
-  countdown: {
-    bg: '', indicator: Hourglass, text: 'text-white',
-    style: { background: 'linear-gradient(165deg, #FF9966 0%, #FF6633 40%, #EE5522 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL },
-  },
-  shuffle: {
-    bg: '', indicator: Shuffle, text: 'text-neo-navy',
-    style: { background: 'linear-gradient(165deg, #FFB347 0%, #FF8C00 40%, #E07700 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL },
-  },
-  magma: {
-    bg: '', indicator: Flame, text: 'text-white',
-    style: { background: 'linear-gradient(165deg, #FF6B35 0%, #FF4500 40%, #CC3700 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL, ...SHIMMER_STYLE },
-  },
-  portal: {
-    bg: '', indicator: Orbit, text: 'text-white',
-    style: { background: 'radial-gradient(circle, #7B68EE 0%, #5B3BD6 60%, #4B0082 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL, ...SHIMMER_FAST },
-  },
-  catalyst: {
-    bg: '', indicator: FlaskConical, text: 'text-neo-navy',
-    style: { background: 'linear-gradient(165deg, #FFFACD 0%, #FFD700 40%, #F0C020 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL, ...SHIMMER_STYLE },
-  },
-  crystal: {
-    bg: '', indicator: Sparkles, text: 'text-white',
-    style: { background: 'linear-gradient(165deg, #F0C8FF 0%, #C084FC 40%, #8B5CF6 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL, ...SHIMMER_STYLE },
-  },
-  fuse: {
-    bg: '', indicator: Flame, text: 'text-white',
-    style: { background: 'linear-gradient(165deg, #FF7755 0%, #E33E1E 40%, #B02810 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL },
-  },
-  locked: {
-    bg: '', indicator: Lock, text: 'text-neo-navy',
-    style: { background: 'linear-gradient(165deg, #9CA3AF 0%, #6B7280 40%, #4B5563 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL },
-  },
-  key: {
-    bg: '', indicator: Key, text: 'text-neo-navy',
-    style: { background: 'linear-gradient(165deg, #FDE68A 0%, #F59E0B 40%, #D97706 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL },
-  },
-  anchor: {
-    bg: '', indicator: Anchor, text: 'text-white',
-    style: { background: 'linear-gradient(165deg, #60A5FA 0%, #2563EB 40%, #1E3A8A 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL },
-  },
+/* Pink tonal family — all tiles share a hue range (rose → magenta).
+ * Type identity comes from the indicator icon, not hue contrast. */
+const PK = {
+  blush:   'linear-gradient(165deg, #FFE4EF 0%, #FFC2D8 45%, #FFA8C6 100%)',
+  rose:    'linear-gradient(165deg, #FFB8D4 0%, #FF8FB8 45%, #F06BA0 100%)',
+  pink:    'linear-gradient(165deg, #FF9FC4 0%, #FF5C97 45%, #E63C7E 100%)',
+  hot:     'linear-gradient(165deg, #FF6BA3 0%, #FF1F7A 45%, #C8145C 100%)',
+  magenta: 'linear-gradient(165deg, #FF4D9E 0%, #E01579 45%, #9C0A52 100%)',
+  deep:    'linear-gradient(165deg, #E63978 0%, #B21458 45%, #70083A 100%)',
 };
 
-/** Clearing phase background color per tile type */
+export const TILE_VISUALS: Record<BlastTileType, { bg: string; indicator?: LucideIcon; text?: string; style?: React.CSSProperties }> = {
+  standard:  { bg: '', text: 'text-neo-navy', style: { background: PK.blush,   boxShadow: SHADOW, border: '2px solid rgba(0,0,0,0.3)' } },
+  gold:      { bg: '', indicator: Star,         text: 'text-neo-navy', style: { background: PK.rose,    boxShadow: SHADOW, border: BORDER_SPECIAL, ...SHIMMER_STYLE } },
+  bomb:      { bg: '', indicator: Bomb,         text: 'text-white',    style: { background: PK.deep,    boxShadow: SHADOW, border: BORDER_SPECIAL, ...SHIMMER_STYLE } },
+  lightning: { bg: '', indicator: Zap,          text: 'text-neo-navy', style: { background: PK.pink,    boxShadow: SHADOW, border: BORDER_SPECIAL, ...SHIMMER_FAST } },
+  prism:     { bg: '', indicator: Triangle,     text: 'text-white',    style: { background: 'conic-gradient(from 0deg, #FF4D9E, #FF1F7A, #E01579, #FF6BA3, #FF4D9E)', boxShadow: SHADOW, border: BORDER_SPECIAL, ...SHIMMER_FAST } },
+  rainbow:   { bg: '', indicator: Rainbow,      text: 'text-white',    style: { background: 'linear-gradient(135deg, #FF9FC4 0%, #FF1F7A 50%, #9C0A52 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL, ...SHIMMER_FAST } },
+  ice:       { bg: '', indicator: Snowflake,    text: 'text-neo-navy', style: { background: PK.blush,   boxShadow: SHADOW, border: BORDER_SPECIAL } },
+  gem:       { bg: '', indicator: Gem,          text: 'text-white',    style: { background: PK.hot,     boxShadow: SHADOW, border: BORDER_SPECIAL, ...SHIMMER_STYLE } },
+  frozen:    { bg: '', indicator: Snowflake,    text: 'text-neo-navy', style: { background: PK.blush,   boxShadow: SHADOW, border: BORDER_SPECIAL } },
+  magnet:    { bg: '', indicator: Magnet,       text: 'text-white',    style: { background: PK.magenta, boxShadow: SHADOW, border: BORDER_SPECIAL } },
+  diamond:   { bg: '', indicator: Diamond,      text: 'text-neo-navy', style: { background: PK.rose,    boxShadow: SHADOW, border: BORDER_SPECIAL, ...SHIMMER_STYLE } },
+  countdown: { bg: '', indicator: Hourglass,    text: 'text-white',    style: { background: PK.hot,     boxShadow: SHADOW, border: BORDER_SPECIAL } },
+  shuffle:   { bg: '', indicator: Shuffle,      text: 'text-neo-navy', style: { background: PK.pink,    boxShadow: SHADOW, border: BORDER_SPECIAL } },
+  magma:     { bg: '', indicator: Flame,        text: 'text-white',    style: { background: PK.deep,    boxShadow: SHADOW, border: BORDER_SPECIAL, ...SHIMMER_STYLE } },
+  portal:    { bg: '', indicator: Orbit,        text: 'text-white',    style: { background: 'radial-gradient(circle, #FF4D9E 0%, #B21458 60%, #5C0530 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL, ...SHIMMER_FAST } },
+  catalyst:  { bg: '', indicator: FlaskConical, text: 'text-neo-navy', style: { background: PK.rose,    boxShadow: SHADOW, border: BORDER_SPECIAL, ...SHIMMER_STYLE } },
+  crystal:   { bg: '', indicator: Sparkles,     text: 'text-white',    style: { background: PK.magenta, boxShadow: SHADOW, border: BORDER_SPECIAL, ...SHIMMER_STYLE } },
+  fuse:      { bg: '', indicator: Flame,        text: 'text-white',    style: { background: PK.deep,    boxShadow: SHADOW, border: BORDER_SPECIAL } },
+  locked:    { bg: '', indicator: Lock,         text: 'text-neo-navy', style: { background: 'linear-gradient(165deg, #D8A5B8 0%, #A67888 45%, #78525F 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL } },
+  key:       { bg: '', indicator: Key,          text: 'text-neo-navy', style: { background: PK.rose,    boxShadow: SHADOW, border: BORDER_SPECIAL } },
+  anchor:    { bg: '', indicator: Anchor,       text: 'text-white',    style: { background: PK.magenta, boxShadow: SHADOW, border: BORDER_SPECIAL } },
+};
+
+/** Clearing phase background color per tile type — pink tonal family */
+const CB = '2px solid rgba(0,0,0,0.5)';
 export const CLEARING_COLORS: Partial<Record<BlastTileType, { background: string; border: string }>> = {
-  gold:      { background: 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)', border: '2px solid rgba(0,0,0,0.5)' },
-  bomb:      { background: 'radial-gradient(circle, #FF4444 0%, #CC0000 100%)', border: '2px solid rgba(0,0,0,0.5)' },
-  rainbow:   { background: 'linear-gradient(135deg, #FF69B4 0%, #A855F7 50%, #00BFFF 100%)', border: '2px solid rgba(0,0,0,0.5)' },
-  ice:       { background: 'linear-gradient(135deg, #B4E6FF 0%, #82C8FF 100%)', border: '2px solid rgba(0,0,0,0.5)' },
-  lightning: { background: 'linear-gradient(135deg, #FFE100 0%, #00BFFF 100%)', border: '2px solid rgba(0,0,0,0.5)' },
-  prism:     { background: 'conic-gradient(from 0deg, #f00, #f90, #ff0, #0f0, #06f, #93f, #f00)', border: '2px solid rgba(0,0,0,0.5)' },
-  gem:       { background: 'radial-gradient(circle, #50C878 0%, #009450 100%)', border: '2px solid rgba(0,0,0,0.5)' },
-  frozen:    { background: 'linear-gradient(135deg, #C8DCFF 0%, #A0C8F0 100%)', border: '2px solid rgba(0,0,0,0.5)' },
-  magnet:    { background: 'radial-gradient(circle, #8B00FF 0%, #FF0040 100%)', border: '2px solid rgba(0,0,0,0.5)' },
-  diamond:   { background: 'radial-gradient(circle, #B9F2FF 0%, #00CED1 100%)', border: '2px solid rgba(0,0,0,0.5)' },
-  countdown:{ background: 'radial-gradient(circle, #FF9966 0%, #CC3300 100%)', border: '2px solid rgba(0,0,0,0.5)' },
-  shuffle:   { background: 'radial-gradient(circle, #FFB347 0%, #CC7000 100%)', border: '2px solid rgba(0,0,0,0.5)' },
-  magma:     { background: 'radial-gradient(circle, #FF6B35 0%, #CC2200 100%)', border: '2px solid rgba(0,0,0,0.5)' },
-  portal:    { background: 'radial-gradient(circle, #7B68EE 0%, #2E0054 100%)', border: '2px solid rgba(0,0,0,0.5)' },
-  catalyst:  { background: 'radial-gradient(circle, #FFD700 0%, #DAA520 100%)', border: '2px solid rgba(0,0,0,0.5)' },
-  crystal:   { background: 'radial-gradient(circle, #E0B0FF 0%, #7C3AED 100%)', border: '2px solid rgba(0,0,0,0.5)' },
-  fuse:      { background: 'radial-gradient(circle, #FF7755 0%, #B02810 100%)', border: '2px solid rgba(0,0,0,0.5)' },
+  gold:      { background: 'linear-gradient(135deg, #FFB8D4 0%, #F06BA0 100%)', border: CB },
+  bomb:      { background: 'radial-gradient(circle, #FF1F7A 0%, #70083A 100%)', border: CB },
+  rainbow:   { background: 'linear-gradient(135deg, #FF9FC4 0%, #FF1F7A 50%, #9C0A52 100%)', border: CB },
+  ice:       { background: 'linear-gradient(135deg, #FFE4EF 0%, #FFA8C6 100%)', border: CB },
+  lightning: { background: 'linear-gradient(135deg, #FF9FC4 0%, #E63C7E 100%)', border: CB },
+  prism:     { background: 'conic-gradient(from 0deg, #FF4D9E, #FF1F7A, #E01579, #FF6BA3, #FF4D9E)', border: CB },
+  gem:       { background: 'radial-gradient(circle, #FF6BA3 0%, #C8145C 100%)', border: CB },
+  frozen:    { background: 'linear-gradient(135deg, #FFE4EF 0%, #FFA8C6 100%)', border: CB },
+  magnet:    { background: 'radial-gradient(circle, #FF4D9E 0%, #9C0A52 100%)', border: CB },
+  diamond:   { background: 'radial-gradient(circle, #FFC2D8 0%, #F06BA0 100%)', border: CB },
+  countdown: { background: 'radial-gradient(circle, #FF6BA3 0%, #B21458 100%)', border: CB },
+  shuffle:   { background: 'radial-gradient(circle, #FF9FC4 0%, #E63C7E 100%)', border: CB },
+  magma:     { background: 'radial-gradient(circle, #FF4D9E 0%, #70083A 100%)', border: CB },
+  portal:    { background: 'radial-gradient(circle, #FF4D9E 0%, #5C0530 100%)', border: CB },
+  catalyst:  { background: 'radial-gradient(circle, #FFB8D4 0%, #F06BA0 100%)', border: CB },
+  crystal:   { background: 'radial-gradient(circle, #FF4D9E 0%, #9C0A52 100%)', border: CB },
+  fuse:      { background: 'radial-gradient(circle, #FF1F7A 0%, #70083A 100%)', border: CB },
 };
 
 /** Type-specific clearing transform overrides — visually distinct death animations.

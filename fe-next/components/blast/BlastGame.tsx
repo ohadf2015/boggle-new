@@ -392,7 +392,6 @@ export function BlastGame({
         gameState={engine.gameState}
         waveNumber={waveNumber}
         comboLevel={combo.comboLevel}
-        objectiveProgress={objectives.objectiveProgress}
         formedWord={formedWord}
         currentFeedback={wordSubmission.currentFeedback}
         sequencerState={sequencer.state}

@@ -3,8 +3,6 @@
 import { memo, useRef, useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { Shuffle, AlertTriangle, Lightbulb } from 'lucide-react';
-import { formatObjectiveLabel } from './utils/blastObjectiveUtils';
-
 const BlastTileGuide = dynamic(() => import('./BlastTileGuide'), { ssr: false });
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { Button } from '@/components/ui/button';
@@ -31,7 +29,7 @@ import type { ScoreFlyEvent } from './BlastScoreFly';
 import { BlastBackground } from './BlastBackground';
 import { cn } from '@/lib/utils';
 import type { LetterGrid, Language } from '@/shared/types/game';
-import type { BlastTileState, BlastGameState, BlastObjectiveProgress } from './types';
+import type { BlastTileState, BlastGameState } from './types';
 import type { SequencerState } from './hooks/useBlastSequencer';
 import type { ClearedTileEvent } from './BlastEffectsCanvas';
 import type { ComboStreakState } from './hooks/useBlastComboStreak';
@@ -47,8 +45,6 @@ interface BlastStageProps {
   waveNumber: number;
   // Combo
   comboLevel: number;
-  // Objectives
-  objectiveProgress?: BlastObjectiveProgress[];
   // Word forming
   formedWord: string;
   currentFeedback: WordFeedback | null;
@@ -106,7 +102,6 @@ export const BlastStage = memo(function BlastStage({
   gameState,
   waveNumber,
   comboLevel,
-  objectiveProgress,
   formedWord,
   currentFeedback,
   interactive,
@@ -240,91 +235,18 @@ export const BlastStage = memo(function BlastStage({
       {/* Desktop: horizontal layout (board center + side panels). Mobile: vertical stack. */}
       <div className="flex-1 flex flex-col lg:flex-row lg:items-stretch lg:justify-center lg:gap-4 min-h-0 relative z-30 lg:px-4 xl:px-8 lg:max-w-[1400px] lg:mx-auto lg:w-full">
 
-      {/* Left panel — objectives + word area on desktop */}
-      <div className="hidden lg:flex lg:flex-col lg:w-56 xl:w-64 lg:justify-center lg:gap-4 shrink-0">
-        {/* Objectives (desktop) */}
-        {objectiveProgress && objectiveProgress.length > 0 && (
-          <div className="w-full">
-            {objectiveProgress.filter(o => o.objective.type === 'clear_percent').map((obj, i) => {
-              const pct = Math.min(100, obj.objective.target > 0 ? (obj.current / obj.objective.target) * 100 : 0);
-              return (
-                <div key={`primary-${i}`} className="mb-1.5">
-                  <div className="flex justify-between text-xs font-bold mb-0.5">
-                    <span className={obj.isComplete ? 'text-neo-lime' : 'text-neo-white'}>
-                      {formatObjectiveLabel(obj.objective, t)}
-                    </span>
-                    <span className={cn('tabular-nums', obj.isComplete ? 'text-neo-lime' : 'text-neo-white')}>
-                      {obj.current}%
-                    </span>
-                  </div>
-                  <div className="h-2.5 bg-white/10 rounded-full overflow-hidden border border-white/20">
-                    <div
-                      className={cn(
-                        'h-full rounded-full transition-all duration-500',
-                        obj.isComplete ? 'bg-neo-lime shadow-[0_0_8px_rgba(191,255,0,0.5)]' : 'bg-neo-cyan',
-                      )}
-                      style={{ width: `${pct}%` }}
-                    />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-
-        {/* Word forming area (desktop) */}
-        <div className="w-full">
-          <div
-            className={cn(
-              'flex items-center justify-center gap-2 px-4 py-2 w-full',
-              formedWord ? 'opacity-100' : 'opacity-40',
-            )}
-            style={{
-              borderRadius: '8px',
-              border: formedWord ? '2px solid rgba(0,0,0,0.4)' : '2px solid transparent',
-              background: formedWord ? 'rgba(255,255,255,0.05)' : 'transparent',
-            }}
-          >
-            <WordFormingArea word={formedWord} letterCount={formedWord.length} feedback={currentFeedback} compact />
-            <BlastWordRewardPreview wordLength={formedWord.length} />
-            {formedWord && (
-              <span className="text-[10px] font-bold text-white/50 tabular-nums">
-                {formedWord.length}
-              </span>
-            )}
-          </div>
+      {/* Left panel — word area on desktop */}
+      <div className="hidden lg:flex lg:flex-col lg:w-56 xl:w-64 lg:justify-center shrink-0">
+        <div
+          className={cn(
+            'flex items-center justify-center gap-2 px-3 py-2 w-full transition-opacity',
+            formedWord ? 'opacity-100' : 'opacity-30',
+          )}
+        >
+          <WordFormingArea word={formedWord} letterCount={formedWord.length} feedback={currentFeedback} compact />
+          <BlastWordRewardPreview wordLength={formedWord.length} />
         </div>
       </div>
-
-      {/* 2. Objective progress — mobile only */}
-      {objectiveProgress && objectiveProgress.length > 0 && (
-        <div className="px-4 py-1 max-w-md mx-auto w-full shrink-0 relative z-40 lg:hidden">
-          {objectiveProgress.filter(o => o.objective.type === 'clear_percent').map((obj, i) => {
-            const pct = Math.min(100, obj.objective.target > 0 ? (obj.current / obj.objective.target) * 100 : 0);
-            return (
-              <div key={`primary-${i}`} className="mb-1.5">
-                <div className="flex justify-between text-xs font-bold mb-0.5">
-                  <span className={obj.isComplete ? 'text-neo-lime' : 'text-neo-white'}>
-                    {formatObjectiveLabel(obj.objective, t)}
-                  </span>
-                  <span className={cn('tabular-nums', obj.isComplete ? 'text-neo-lime' : 'text-neo-white')}>
-                    {obj.current}%
-                  </span>
-                </div>
-                <div className="h-2.5 bg-white/10 rounded-full overflow-hidden border border-white/20">
-                  <div
-                    className={cn(
-                      'h-full rounded-full transition-all duration-500',
-                      obj.isComplete ? 'bg-neo-lime shadow-[0_0_8px_rgba(191,255,0,0.5)]' : 'bg-neo-cyan',
-                    )}
-                    style={{ width: `${pct}%` }}
-                  />
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
 
       {/* 3. Board — center column, expands on desktop */}
       <div

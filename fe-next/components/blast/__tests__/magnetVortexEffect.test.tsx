@@ -107,14 +107,13 @@ describe('Magnet/Vortex Effect', () => {
       expect(button.className).toContain('blast-tile-magnet');
     });
 
-    it('magnet clearing uses purple theme styling', () => {
+    it('magnet clearing uses pink tonal styling', () => {
       const { container } = render(
         <BlastTile {...baseProps} phase="clearing" />
       );
       const button = container.querySelector('button');
-      // Verify purple via style attribute — jsdom may keep hex or convert to rgb
       const styleAttr = button?.getAttribute('style') ?? '';
-      expect(styleAttr).toContain('#8B00FF');
+      expect(styleAttr).toContain('#FF4D9E');
     });
   });
 });
