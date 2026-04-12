@@ -17,6 +17,12 @@ interface LeaderboardTeaserProps {
   onViewFull?: () => void;
 }
 
+interface RawLeaderboardRow {
+  player_id?: string;
+  display_name?: string;
+  score?: number;
+}
+
 const RANK_STYLES = [
   { text: 'text-neo-lime', bg: 'bg-neo-lime/20', border: 'border-neo-lime/40', medal: '🥇' },
   { text: 'text-slate-300', bg: 'bg-white/5', border: 'border-white/10', medal: '🥈' },
@@ -24,8 +30,38 @@ const RANK_STYLES = [
 ];
 
 /**
- * Mini top-3 daily leaderboard teaser.
- * Fetches from /api/daily-leaderboard and shows skeleton while loading.
+ * Merge word-hunt + word-wheel leaderboard rows by player_id,
+ * summing scores, and return the top 3.
+ */
+function mergeLeaderboards(wordHunt: RawLeaderboardRow[], wordWheel: RawLeaderboardRow[]): LeaderboardEntry[] {
+  const playerMap = new Map<string, { name: string; score: number }>();
+
+  for (const row of [...wordHunt, ...wordWheel]) {
+    if (!row.player_id) continue;
+    const existing = playerMap.get(row.player_id);
+    if (existing) {
+      existing.score += row.score || 0;
+      // Prefer non-'Player' display name
+      if (row.display_name && existing.name === 'Player') {
+        existing.name = row.display_name;
+      }
+    } else {
+      playerMap.set(row.player_id, {
+        name: row.display_name || 'Player',
+        score: row.score || 0,
+      });
+    }
+  }
+
+  return Array.from(playerMap.values())
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 3)
+    .map((p, i) => ({ rank: i + 1, name: p.name, score: p.score }));
+}
+
+/**
+ * Mini top-3 unified daily leaderboard teaser.
+ * Fetches word-hunt + word-wheel leaderboards, sums scores per player.
  */
 export function LeaderboardTeaser({ currentLanguage, onViewFull }: LeaderboardTeaserProps) {
   const { t } = useLanguage();
@@ -39,17 +75,17 @@ export function LeaderboardTeaser({ currentLanguage, onViewFull }: LeaderboardTe
       setLoading(true);
       try {
         const today = new Date().toISOString().split('T')[0];
-        const res = await fetch(`/api/daily-challenge/leaderboard/${today}/${currentLanguage}?limit=3`);
-        if (res.ok && !cancelled) {
-          const data = await res.json();
-          if (data.data && Array.isArray(data.data)) {
-            setEntries(data.data.slice(0, 3).map((e: { display_name?: string; score?: number }, i: number) => ({
-              rank: i + 1,
-              name: e.display_name || 'Player',
-              score: e.score || 0,
-            })));
-          }
-        }
+        const [huntResult, wheelResult] = await Promise.allSettled([
+          fetch(`/api/daily-challenge/word-hunt/leaderboard/${today}/${currentLanguage}?limit=50`).then(r => r.ok ? r.json() : null),
+          fetch(`/api/daily-challenge/word-wheel/leaderboard/${today}/${currentLanguage}?limit=50`).then(r => r.ok ? r.json() : null),
+        ]);
+
+        if (cancelled) return;
+
+        const huntData: RawLeaderboardRow[] = huntResult.status === 'fulfilled' && huntResult.value?.data ? huntResult.value.data : [];
+        const wheelData: RawLeaderboardRow[] = wheelResult.status === 'fulfilled' && wheelResult.value?.data ? wheelResult.value.data : [];
+
+        setEntries(mergeLeaderboards(huntData, wheelData));
       } catch {
         // Graceful fallback - show nothing
       } finally {
@@ -96,7 +132,7 @@ export function LeaderboardTeaser({ currentLanguage, onViewFull }: LeaderboardTe
           ))
         ) : entries.length === 0 ? (
           <div className="px-3 py-5 text-center text-xs text-slate-500">
-            {t('daily.samePuzzle')}
+            {t('daily.beFirstToPlay')}
           </div>
         ) : (
           entries.map((entry) => {

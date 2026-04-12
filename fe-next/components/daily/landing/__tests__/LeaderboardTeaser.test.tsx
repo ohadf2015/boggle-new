@@ -11,7 +11,15 @@ function renderWithProviders(ui: React.ReactElement) {
   );
 }
 
-const LEADERBOARD_URL_PATTERN = '*/api/daily-challenge/leaderboard/*/*';
+const WORD_HUNT_URL = '*/api/daily-challenge/word-hunt/leaderboard/*/*';
+const WORD_WHEEL_URL = '*/api/daily-challenge/word-wheel/leaderboard/*/*';
+
+function mockBothEndpoints(huntData: unknown[] = [], wheelData: unknown[] = []) {
+  server.use(
+    http.get(WORD_HUNT_URL, () => HttpResponse.json({ data: huntData })),
+    http.get(WORD_WHEEL_URL, () => HttpResponse.json({ data: wheelData })),
+  );
+}
 
 describe('LeaderboardTeaser', () => {
   beforeEach(() => {
@@ -19,19 +27,15 @@ describe('LeaderboardTeaser', () => {
   });
 
   test('renders leaderboard container', () => {
-    server.use(
-      http.get(LEADERBOARD_URL_PATTERN, () => HttpResponse.json({ data: [] }))
-    );
-
+    mockBothEndpoints();
     renderWithProviders(<LeaderboardTeaser currentLanguage="en" />);
-
     expect(screen.getByTestId('leaderboard-teaser')).toBeInTheDocument();
   });
 
   test('shows skeleton loading state initially', () => {
-    // Never resolve fetch to keep loading state
     server.use(
-      http.get(LEADERBOARD_URL_PATTERN, () => new Promise(() => {}))
+      http.get(WORD_HUNT_URL, () => new Promise(() => {})),
+      http.get(WORD_WHEEL_URL, () => new Promise(() => {})),
     );
 
     const { container } = renderWithProviders(
@@ -42,16 +46,12 @@ describe('LeaderboardTeaser', () => {
     expect(skeletons.length).toBeGreaterThan(0);
   });
 
-  test('renders top 3 players after fetch', async () => {
-    server.use(
-      http.get(LEADERBOARD_URL_PATTERN, () => HttpResponse.json({
-        data: [
-          { display_name: 'JellyDrifter', score: 12450 },
-          { display_name: 'ZenithX', score: 11920 },
-          { display_name: 'WordWiz99', score: 10105 },
-        ],
-      }))
-    );
+  test('renders top 3 players from word-hunt scores', async () => {
+    mockBothEndpoints([
+      { player_id: 'p1', display_name: 'JellyDrifter', score: 12450 },
+      { player_id: 'p2', display_name: 'ZenithX', score: 11920 },
+      { player_id: 'p3', display_name: 'WordWiz99', score: 10105 },
+    ]);
 
     renderWithProviders(<LeaderboardTeaser currentLanguage="en" />);
 
@@ -62,45 +62,69 @@ describe('LeaderboardTeaser', () => {
     });
   });
 
-  test('fetches from correct daily-challenge leaderboard URL', async () => {
-    let capturedUrl: string | null = null;
-    server.use(
-      http.get(LEADERBOARD_URL_PATTERN, ({ request }) => {
-        capturedUrl = request.url;
-        return HttpResponse.json({ data: [] });
-      })
+  test('sums scores from both word-hunt and word-wheel', async () => {
+    mockBothEndpoints(
+      [
+        { player_id: 'p1', display_name: 'Alice', score: 5000 },
+        { player_id: 'p2', display_name: 'Bob', score: 8000 },
+      ],
+      [
+        { player_id: 'p1', display_name: 'Alice', score: 6000 },
+        { player_id: 'p3', display_name: 'Charlie', score: 3000 },
+      ],
     );
 
     renderWithProviders(<LeaderboardTeaser currentLanguage="en" />);
 
     await waitFor(() => {
-      expect(capturedUrl).toMatch(/\/api\/daily-challenge\/leaderboard\/\d{4}-\d{2}-\d{2}\/en\?limit=3/);
+      // Alice: 5000+6000=11000 (1st), Bob: 8000 (2nd), Charlie: 3000 (3rd)
+      expect(screen.getByText('Alice')).toBeInTheDocument();
+      expect(screen.getByText('11,000')).toBeInTheDocument();
+      expect(screen.getByText('Bob')).toBeInTheDocument();
+      expect(screen.getByText('8,000')).toBeInTheDocument();
+      expect(screen.getByText('Charlie')).toBeInTheDocument();
+      expect(screen.getByText('3,000')).toBeInTheDocument();
     });
   });
 
   test('handles empty leaderboard gracefully', async () => {
-    server.use(
-      http.get(LEADERBOARD_URL_PATTERN, () => HttpResponse.json({ data: [] }))
-    );
+    mockBothEndpoints();
 
     renderWithProviders(<LeaderboardTeaser currentLanguage="en" />);
 
     await waitFor(() => {
-      // Should show fallback text instead of players
       expect(screen.queryByText('JellyDrifter')).not.toBeInTheDocument();
     });
   });
 
   test('handles fetch error gracefully', async () => {
     server.use(
-      http.get(LEADERBOARD_URL_PATTERN, () => HttpResponse.error())
+      http.get(WORD_HUNT_URL, () => HttpResponse.error()),
+      http.get(WORD_WHEEL_URL, () => HttpResponse.error()),
     );
 
     renderWithProviders(<LeaderboardTeaser currentLanguage="en" />);
 
     await waitFor(() => {
-      // Should still render the container without crashing
       expect(screen.getByTestId('leaderboard-teaser')).toBeInTheDocument();
+    });
+  });
+
+  test('works when only one endpoint returns data', async () => {
+    server.use(
+      http.get(WORD_HUNT_URL, () => HttpResponse.error()),
+      http.get(WORD_WHEEL_URL, () => HttpResponse.json({
+        data: [
+          { player_id: 'p1', display_name: 'Solo', score: 7777 },
+        ],
+      })),
+    );
+
+    renderWithProviders(<LeaderboardTeaser currentLanguage="en" />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Solo')).toBeInTheDocument();
+      expect(screen.getByText('7,777')).toBeInTheDocument();
     });
   });
 });

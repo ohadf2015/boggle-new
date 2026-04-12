@@ -1,20 +1,11 @@
 'use client';
 
-import React from 'react';
 import { motion } from 'framer-motion';
-import { getRewardForDay, getRewardCoins, getNextMilestone, DAILY_REWARD_SCHEDULE } from '@/lib/dailyRewards';
+import { getRewardForDay, getRewardCoins, DAILY_REWARD_SCHEDULE } from '@/lib/dailyRewards';
 
 interface DailyRewardPreviewProps {
   currentStreakDay: number;
-  t: (key: string) => string;
-}
-
-function interpolateTranslation(template: string, vars: Record<string, string | number>): string {
-  let result = template;
-  for (const [key, value] of Object.entries(vars)) {
-    result = result.replace(`{{${key}}}`, String(value));
-  }
-  return result;
+  t: (key: string, params?: Record<string, string | number>) => string;
 }
 
 /**
@@ -50,10 +41,10 @@ export function DailyRewardPreview({ currentStreakDay, t }: DailyRewardPreviewPr
       {/* Today's reward + tomorrow preview */}
       <div className="flex items-center justify-between">
         <p className="text-neo-cream font-bold text-sm">
-          {interpolateTranslation(t('daily.todayReward'), { coins: todayReward.coins })}
+          {t('daily.todayReward', { coins: todayReward.coins })}
         </p>
         <p className="text-neo-cream/50 text-xs">
-          {interpolateTranslation(t('daily.tomorrowReward'), { coins: tomorrowCoins })}
+          {t('daily.tomorrowReward', { coins: tomorrowCoins })}
         </p>
       </div>
 
@@ -61,7 +52,7 @@ export function DailyRewardPreview({ currentStreakDay, t }: DailyRewardPreviewPr
       {nextMilestone && (
         <div className="px-3 py-1.5 rounded-lg bg-neo-purple/10 border border-neo-purple/30 text-center">
           <p className="text-neo-purple text-xs font-bold">
-            {interpolateTranslation(t('daily.nearMilestone'), {
+            {t('daily.nearMilestone', {
               days: nextMilestone.daysAway,
               badge: nextMilestone.label,
             })}
@@ -93,7 +84,7 @@ export function DailyRewardPreview({ currentStreakDay, t }: DailyRewardPreviewPr
               {entry.coins}
             </motion.div>
             <span className={`text-[9px] font-bold ${entry.isToday ? 'text-neo-cyan' : 'text-neo-cream/30'}`}>
-              {entry.isToday ? '▼' : t('daily.rewardDay').replace('{day}', String(entry.day))}
+              {entry.isToday ? '▼' : t('daily.rewardDay', { day: entry.day })}
             </span>
           </div>
         ))}
