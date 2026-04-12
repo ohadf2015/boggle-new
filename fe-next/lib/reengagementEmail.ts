@@ -2,8 +2,8 @@
  * Re-engagement Email Module
  *
  * Sends localized "first letter hint" emails to inactive daily challenge players.
- * Players who haven't played for 5+ days receive a teaser showing the first letter
- * of today's daily word, with 14-day anti-spam intervals.
+ * Players who haven't played for 11+ days (~1.5 weeks) receive a teaser showing
+ * the first letter of today's daily word, with 14-day anti-spam intervals.
  *
  * HTML template: ./reengagementEmailTemplate.ts
  */
@@ -30,7 +30,7 @@ export {
 // Constants
 // ==========================================
 
-const INACTIVITY_DAYS = 5;
+const INACTIVITY_DAYS = 11;
 const MIN_INTERVAL_DAYS = 14;
 
 /** Country code -> supported language mapping */
@@ -134,7 +134,7 @@ export async function getFirstLetterForLanguage(
 /**
  * Get users eligible for re-engagement emails:
  * - daily_email_subscribed = true
- * - No daily_puzzle_attempts in last 5 days
+ * - No daily_puzzle_attempts in last 11 days (~1.5 weeks)
  * - last_reengagement_email_sent_at is null or > 14 days ago
  * - Local time is 7-9 AM
  */
