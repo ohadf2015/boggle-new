@@ -4936,6 +4936,38 @@ const es = {
     "nearMilestone": "¡{{days}} días para la insignia {{badge}}!",
     "rewardDay": "Día {day}"
   },
+  "dailyWordWheelLanding": {
+    "hero": {
+      "title": "Rueda de Palabras Diaria",
+      "subtitle": "Puzzle de Palabras Diario Gratis",
+      "description": "Un nuevo puzzle de rueda de palabras cada día. Encuentra palabras en una rueda de letras, compite por el récord mundial y sigue tu racha diaria. Gratis, sin descargas.",
+      "cta": "Juega la Rueda de Hoy",
+      "leaderboard": "Ver Récord Mundial"
+    },
+    "steps": {
+      "heading": "Cómo Funciona la Rueda de Palabras Diaria",
+      "1": { "title": "Nuevo puzzle diario", "desc": "Una nueva rueda de letras aparece cada día a medianoche UTC. Todos los jugadores del mundo reciben las mismas letras." },
+      "2": { "title": "Encuentra palabras", "desc": "Forma palabras con las letras de la rueda. Cada palabra debe incluir la letra central. Palabras más largas = más puntos." },
+      "3": { "title": "Vence al reloj", "desc": "Encuentra tantas palabras como puedas antes de que se acabe el tiempo. Velocidad y vocabulario importan." },
+      "4": { "title": "Compara globalmente", "desc": "Ve tu posición en la tabla de clasificación diaria. Persigue el récord mundial y sigue tu racha." }
+    },
+    "faq": {
+      "heading": "Preguntas Frecuentes",
+      "items": [
+        { "q": "¿Qué es la Rueda de Palabras Diaria?", "a": "La Rueda de Palabras Diaria es un puzzle de palabras gratuito en LexiClash. Cada día a medianoche UTC aparece una nueva rueda de letras. Tu objetivo es encontrar tantas palabras como sea posible. Todos juegan el mismo puzzle." },
+        { "q": "¿Cómo se juega?", "a": "Recibes letras dispuestas en una rueda con una letra central. Forma palabras — cada palabra debe incluir la letra central. Encuentra tantas palabras como puedas antes de que se acabe el tiempo." },
+        { "q": "¿Es gratis?", "a": "Sí, completamente gratis. Sin descargas, sin registro, sin anuncios. Juega en el navegador de cualquier dispositivo." },
+        { "q": "¿Puedo ver el récord mundial?", "a": "¡Sí! Después de completar el puzzle, puedes ver la tabla de clasificación global con las puntuaciones más altas del día." },
+        { "q": "¿Todas las palabras necesitan la letra central?", "a": "¡Sí! Cada palabra que envíes debe incluir la letra central de la rueda. Es la restricción principal que hace el puzzle desafiante." },
+        { "q": "¿En qué idiomas está disponible?", "a": "La Rueda de Palabras Diaria está disponible en inglés, hebreo, sueco, japonés y español. Cada idioma tiene su propio diccionario y tabla de clasificación." }
+      ]
+    },
+    "finalCta": {
+      "heading": "Juega el Puzzle de Hoy",
+      "description": "La Rueda de Palabras Diaria se reinicia cada día — ¡no te pierdas el puzzle de hoy! Construye tu racha, mejora tu vocabulario y compite con jugadores de todo el mundo.",
+      "button": "Juega la Rueda de Palabras Ahora"
+    }
+  },
   "wordWheel": {
     "title": "Rueda de palabras",
     "badge": "RUEDA DE PALABRAS",
@@ -7818,7 +7850,13 @@ const es = {
       "phase1Zone": "Zona fase 1",
       "healthLabel": "Salud de {{bossName}}: {{percentage}}%"
     },
-    "comboExplainer": "Encuentra palabras rápido en fila para crear combos. ¡Cada combo aumenta tu multiplicador de puntuación!"
+    "comboExplainer": "Encuentra palabras rápido en fila para crear combos. ¡Cada combo aumenta tu multiplicador de puntuación!",
+    "modeStats": {
+      "movesUsed": "{{used}}/{{total}} movimientos usados",
+      "huntSuccess": "¡Objetivo encontrado en {{attempts}} intentos!",
+      "huntFailed": "Palabra objetivo no encontrada",
+      "wheelWords": "{{center}}/{{total}} palabras con letra central"
+    }
   },
   "blast": {
     "chain": {

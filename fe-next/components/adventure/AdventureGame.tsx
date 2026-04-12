@@ -872,6 +872,12 @@ const AdventureGame = memo<AdventureGameProps>(
         {modeState.archetype === 'hunt' && currentHP != null && (
           <LowHPOverlay hp={currentHP} />
         )}
+        {/* Blast mode: last move warning overlay */}
+        {modeState.archetype === 'blast' && movesRemaining === 1 && isPlaying && (
+          <div className="fixed inset-0 z-40 pointer-events-none animate-pulse" style={{
+            background: 'radial-gradient(ellipse at center, transparent 40%, rgba(255,20,147,0.15) 100%)',
+          }} />
+        )}
         <AdventureToast
           upgradeTriggered={upgradeTriggered}
           lastWordWasThemed={lastWordWasThemed}

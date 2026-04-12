@@ -4899,6 +4899,38 @@ const sv = {
     "nearMilestone": "{{days}} dagar till {{badge}}-märke!",
     "rewardDay": "Dag {day}"
   },
+  "dailyWordWheelLanding": {
+    "hero": {
+      "title": "Dagligt Ordhjul",
+      "subtitle": "Gratis Dagligt Ordpussel",
+      "description": "Ett nytt ordhjulspussel varje dag. Hitta ord från ett hjul av bokstäver, tävla om världsrekordet och följ din dagliga svit. Gratis, ingen nedladdning.",
+      "cta": "Spela Dagens Ordhjul",
+      "leaderboard": "Visa Världsrekordet"
+    },
+    "steps": {
+      "heading": "Så Fungerar Dagliga Ordhjulet",
+      "1": { "title": "Nytt pussel varje dag", "desc": "Ett nytt hjul med bokstäver dyker upp varje dag vid midnatt UTC. Alla spelare världen över får samma bokstäver." },
+      "2": { "title": "Hitta ord", "desc": "Bilda ord med hjulets bokstäver. Varje ord måste innehålla mittenbokstaven. Längre ord = fler poäng." },
+      "3": { "title": "Slå klockan", "desc": "Hitta så många ord som möjligt innan tiden tar slut. Både snabbhet och ordförråd räknas." },
+      "4": { "title": "Jämför globalt", "desc": "Se hur du rankas på den dagliga topplistan. Jaga världsrekordet och följ din svit." }
+    },
+    "faq": {
+      "heading": "Vanliga Frågor",
+      "items": [
+        { "q": "Vad är Dagliga Ordhjulet?", "a": "Dagliga Ordhjulet är ett gratis dagligt ordpussel på LexiClash. Varje dag vid midnatt UTC dyker ett nytt hjul av bokstäver upp. Målet är att hitta så många ord som möjligt. Alla spelare världen över spelar samma pussel." },
+        { "q": "Hur spelar man?", "a": "Du får bokstäver arrangerade i ett hjul med en mittenbokstav. Bilda ord — varje ord måste innehålla mittenbokstaven. Hitta så många ord som möjligt innan tiden tar slut." },
+        { "q": "Är det gratis?", "a": "Ja, helt gratis. Ingen nedladdning, ingen registrering, inga annonser. Spela i webbläsaren på valfri enhet." },
+        { "q": "Kan jag se världsrekordet?", "a": "Ja! Efter att du löst pusslet kan du se den globala topplistan med dagens högsta poäng." },
+        { "q": "Måste alla ord ha mittenbokstaven?", "a": "Ja! Varje ord du skickar in måste innehålla mittenbokstaven i hjulet. Det är den centrala utmaningen." },
+        { "q": "Vilka språk finns?", "a": "Dagliga Ordhjulet finns på engelska, hebreiska, svenska, japanska och spanska. Varje språk har eget lexikon och topplista." }
+      ]
+    },
+    "finalCta": {
+      "heading": "Spela Dagens Pussel",
+      "description": "Dagliga Ordhjulet nollställs varje dag — missa inte dagens pussel! Bygg din svit, förbättra ditt ordförråd och tävla med spelare från hela världen.",
+      "button": "Spela Dagliga Ordhjulet Nu"
+    }
+  },
   "wordWheel": {
     "title": "Ordhjul",
     "badge": "ORDHJUL",
@@ -7746,7 +7778,13 @@ const sv = {
       "phase1Zone": "Fas 1-zon",
       "healthLabel": "{{bossName}} hälsa: {{percentage}}%"
     },
-    "comboExplainer": "Hitta ord snabbt i rad för att bygga kombos. Varje kombo ökar din poängmultiplikator!"
+    "comboExplainer": "Hitta ord snabbt i rad för att bygga kombos. Varje kombo ökar din poängmultiplikator!",
+    "modeStats": {
+      "movesUsed": "{{used}}/{{total}} drag använda",
+      "huntSuccess": "Målord hittat på {{attempts}} försök!",
+      "huntFailed": "Målordet hittades inte",
+      "wheelWords": "{{center}}/{{total}} ord med mittenbokstaven"
+    }
   },
   "blast": {
     "chain": {
