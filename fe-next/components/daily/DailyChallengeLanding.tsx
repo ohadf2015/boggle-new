@@ -319,6 +319,7 @@ export function DailyChallengeLanding({
           icon={<CircleDot className="w-8 h-8" />}
           title={t('wordWheel.hub.wordWheelQuest')}
           tagline={t('wordWheel.hub.wordWheelDesc')}
+          details={t('wordWheel.hub.wordWheelDetails')}
           color="yellow"
           status="new"
           onPlay={onSelectWordWheel}

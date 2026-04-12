@@ -40,6 +40,7 @@ export function QuestCard({
   icon,
   title,
   tagline,
+  details,
   color,
   status,
   isLoadingStatus = false,
@@ -271,6 +272,11 @@ export function QuestCard({
           {!isSecondary && (
             <p className="text-[13px] text-slate-400 line-clamp-2">
               {tagline}
+            </p>
+          )}
+          {!isSecondary && details && (
+            <p className="text-[11px] text-slate-500 font-semibold mt-1 line-clamp-2">
+              {details}
             </p>
           )}
         </div>

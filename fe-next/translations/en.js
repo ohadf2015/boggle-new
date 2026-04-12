@@ -5009,7 +5009,7 @@ const en = {
     "steps": {
       "heading": "How the Daily Word Wheel Works",
       "1": { "title": "New puzzle daily", "desc": "A fresh wheel of letters appears every day at midnight UTC. Everyone worldwide gets the same letters." },
-      "2": { "title": "Find words", "desc": "Form words using the wheel letters. Every word must include the center letter. Longer words = more points." },
+      "2": { "title": "Find words", "desc": "Form words using the wheel letters. Every word must include the center letter and be at least 3 letters long. Longer words = more points." },
       "3": { "title": "Beat the clock", "desc": "Find as many words as possible before time runs out. Speed and vocabulary both matter." },
       "4": { "title": "Compare globally", "desc": "See how you rank on the daily leaderboard. Chase the world record and track your streak." }
     },
@@ -5017,7 +5017,7 @@ const en = {
       "heading": "Frequently Asked Questions",
       "items": [
         { "q": "What is the Daily Word Wheel?", "a": "The Daily Word Wheel is a free daily word puzzle on LexiClash. Every day at midnight UTC, a new wheel of letters appears. Your goal is to find as many words as possible using those letters. Everyone worldwide plays the same puzzle." },
-        { "q": "How do I play?", "a": "You get a set of letters arranged in a wheel with one center letter. Form words using the letters — every word must include the center letter. Find as many words as possible before time runs out. Longer words score more points." },
+        { "q": "How do I play?", "a": "You get a set of letters arranged in a wheel with one center letter. Form words using the letters — every word must include the center letter and be at least 3 letters long. Find as many words as possible before time runs out. Longer words score more points." },
         { "q": "Is it free?", "a": "Yes, completely free. No download, no signup, no ads interrupting gameplay. Play in your browser on any device." },
         { "q": "Can I see the world record?", "a": "Yes! After completing the puzzle, you can see the global leaderboard showing top scores for that day. The world record updates in real-time." },
         { "q": "Do all words need the center letter?", "a": "Yes! Every word you submit must include the center letter of the wheel. This is the core constraint that makes the puzzle challenging." },
@@ -5034,7 +5034,7 @@ const en = {
     "title": "Word Wheel",
     "badge": "WORD WHEEL",
     "subtitle": "Find words using the wheel letters",
-    "description": "Every word must include the center letter",
+    "description": "Every word must use the center letter and be at least 3 letters long",
     "centerLetterRule": "Must use center letter",
     "minLetters": "Min {min} letters",
     "wordsFound": "{count} words found",
@@ -5049,7 +5049,7 @@ const en = {
     "invalidLetters": "Can only use wheel letters",
     "inputPlaceholder": "Type a word...",
     "tapLetters": "Tap letters to build a word",
-    "tapDescription": "Tap letters on the wheel to spell words. Every word must include the center letter!",
+    "tapDescription": "Tap letters on the wheel to spell words. Every word must include the center letter and be at least 3 letters long!",
     "timeLimit": "2 minute time limit",
     "clear": "Clear",
     "shuffle": "Shuffle",
@@ -5072,6 +5072,7 @@ const en = {
     "hub": {
       "wordWheelQuest": "Word Wheel",
       "wordWheelDesc": "Find words using the wheel — center letter required!",
+      "wordWheelDetails": "Spell as many words as you can in 90s. Every word must use the center letter.",
       "wordHuntQuest": "Word Hunt",
       "wordHuntDesc": "Crack the hidden word in 10 tries"
     }
@@ -6709,7 +6710,7 @@ const en = {
       "blastObjective": "Use your moves wisely!",
       "huntObjective": "Find the hidden target word",
       "huntLoadingTarget": "Finding hidden word...",
-      "wheelObjective": "Every word must include the center letter!",
+      "wheelObjective": "Every word must use the center letter and be at least 3 letters long!",
       "wheelMustInclude": "Must include:",
       "forgeObjective": "Reach the target score!",
       "bossObjective": "Defeat the boss!"

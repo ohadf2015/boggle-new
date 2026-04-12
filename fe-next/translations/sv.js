@@ -4910,7 +4910,7 @@ const sv = {
     "steps": {
       "heading": "Så Fungerar Dagliga Ordhjulet",
       "1": { "title": "Nytt pussel varje dag", "desc": "Ett nytt hjul med bokstäver dyker upp varje dag vid midnatt UTC. Alla spelare världen över får samma bokstäver." },
-      "2": { "title": "Hitta ord", "desc": "Bilda ord med hjulets bokstäver. Varje ord måste innehålla mittenbokstaven. Längre ord = fler poäng." },
+      "2": { "title": "Hitta ord", "desc": "Bilda ord med hjulets bokstäver. Varje ord måste innehålla mittenbokstaven och vara minst 3 bokstäver långt. Längre ord = fler poäng." },
       "3": { "title": "Slå klockan", "desc": "Hitta så många ord som möjligt innan tiden tar slut. Både snabbhet och ordförråd räknas." },
       "4": { "title": "Jämför globalt", "desc": "Se hur du rankas på den dagliga topplistan. Jaga världsrekordet och följ din svit." }
     },
@@ -4918,7 +4918,7 @@ const sv = {
       "heading": "Vanliga Frågor",
       "items": [
         { "q": "Vad är Dagliga Ordhjulet?", "a": "Dagliga Ordhjulet är ett gratis dagligt ordpussel på LexiClash. Varje dag vid midnatt UTC dyker ett nytt hjul av bokstäver upp. Målet är att hitta så många ord som möjligt. Alla spelare världen över spelar samma pussel." },
-        { "q": "Hur spelar man?", "a": "Du får bokstäver arrangerade i ett hjul med en mittenbokstav. Bilda ord — varje ord måste innehålla mittenbokstaven. Hitta så många ord som möjligt innan tiden tar slut." },
+        { "q": "Hur spelar man?", "a": "Du får bokstäver arrangerade i ett hjul med en mittenbokstav. Bilda ord — varje ord måste innehålla mittenbokstaven och vara minst 3 bokstäver långt. Hitta så många ord som möjligt innan tiden tar slut." },
         { "q": "Är det gratis?", "a": "Ja, helt gratis. Ingen nedladdning, ingen registrering, inga annonser. Spela i webbläsaren på valfri enhet." },
         { "q": "Kan jag se världsrekordet?", "a": "Ja! Efter att du löst pusslet kan du se den globala topplistan med dagens högsta poäng." },
         { "q": "Måste alla ord ha mittenbokstaven?", "a": "Ja! Varje ord du skickar in måste innehålla mittenbokstaven i hjulet. Det är den centrala utmaningen." },
@@ -4935,7 +4935,7 @@ const sv = {
     "title": "Ordhjul",
     "badge": "ORDHJUL",
     "subtitle": "Hitta ord med hjulets bokstäver",
-    "description": "Varje ord måste innehålla mittenbokstaven",
+    "description": "Varje ord måste använda mittenbokstaven och vara minst 3 bokstäver långt",
     "centerLetterRule": "Måste använda mittenbokstaven",
     "minLetters": "Min {min} bokstäver",
     "wordsFound": "{count} ord hittade",
@@ -4950,7 +4950,7 @@ const sv = {
     "invalidLetters": "Kan bara använda hjulets bokstäver",
     "inputPlaceholder": "Skriv ett ord...",
     "tapLetters": "Tryck på bokstäver för att bygga ett ord",
-    "tapDescription": "Tryck på bokstäver på hjulet för att stava ord. Varje ord måste innehålla mittenbokstaven!",
+    "tapDescription": "Tryck på bokstäver på hjulet för att stava ord. Varje ord måste innehålla mittenbokstaven och vara minst 3 bokstäver långt!",
     "timeLimit": "2 minuters tidsgräns",
     "clear": "Rensa",
     "shuffle": "Blanda",
@@ -4973,6 +4973,7 @@ const sv = {
     "hub": {
       "wordWheelQuest": "Ordhjul",
       "wordWheelDesc": "Hitta ord med hjulet — mittenbokstaven krävs!",
+      "wordWheelDetails": "Bilda så många ord du kan på 90s. Varje ord måste innehålla mittenbokstaven.",
       "wordHuntQuest": "Ordjakt",
       "wordHuntDesc": "Knäck det dolda ordet på 10 försök"
     }
@@ -6811,7 +6812,7 @@ const sv = {
       "blastObjective": "Använd dina drag klokt!",
       "huntObjective": "Hitta det dolda målordet",
       "huntLoadingTarget": "Söker dolt ord...",
-      "wheelObjective": "Varje ord måste inkludera mittenbokstaven!",
+      "wheelObjective": "Varje ord måste inkludera mittenbokstaven och vara minst 3 bokstäver långt!",
       "wheelMustInclude": "Måste inkludera:",
       "forgeObjective": "Nå målpoängen!",
       "bossObjective": "Besegra bossen!"

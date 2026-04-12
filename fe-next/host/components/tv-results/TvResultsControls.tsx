@@ -1,10 +1,12 @@
 'use client';
 
-import { memo } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Play, SkipForward, QrCode, Users } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
 import { cn } from '../../../lib/utils';
+
+const MIN_WAIT_MS = 15_000;
 
 interface TvResultsControlsProps {
   visible: boolean;
@@ -39,6 +41,27 @@ const TvResultsControls = memo<TvResultsControlsProps>(({
 }) => {
   const allReady = playersReadyCount === totalPlayers && totalPlayers > 0;
   const showNextRound = isTournament && !isLastRound;
+
+  // Minimum 15s gate from when controls become visible — prevents
+  // accidentally skipping past the score reveal even if everyone is ready.
+  const [secondsLeft, setSecondsLeft] = useState(Math.ceil(MIN_WAIT_MS / 1000));
+  useEffect(() => {
+    if (!visible) {
+      setSecondsLeft(Math.ceil(MIN_WAIT_MS / 1000));
+      return;
+    }
+    const startedAt = Date.now();
+    const tick = () => {
+      const left = Math.max(0, Math.ceil((MIN_WAIT_MS - (Date.now() - startedAt)) / 1000));
+      setSecondsLeft(left);
+      if (left === 0 && interval) clearInterval(interval);
+    };
+    const interval: ReturnType<typeof setInterval> | null = setInterval(tick, 250);
+    tick();
+    return () => { if (interval) clearInterval(interval); };
+  }, [visible]);
+  const gateLocked = secondsLeft > 0;
+  const continueDisabled = gateLocked || (totalPlayers > 0 && !allReady);
 
   return (
     <AnimatePresence>
@@ -107,37 +130,24 @@ const TvResultsControls = memo<TvResultsControlsProps>(({
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.1 }}
               >
-                {showNextRound ? (
-                  <Button
-                    onClick={onNextRound}
-                    className={cn(
-                      'h-14 px-8 text-lg font-black uppercase',
-                      'bg-neo-lime text-neo-black border-4 border-neo-black',
-                      'shadow-hard-lg hover:shadow-hard-xl',
-                      'hover:translate-x-[-3px] hover:translate-y-[-3px]',
-                      'active:shadow-hard active:translate-x-px active:translate-y-px',
-                      'transition-all'
-                    )}
-                  >
-                    <Play className="w-6 h-6 me-2" />
-                    {t('tvResults.nextRound')}
-                  </Button>
-                ) : (
-                  <Button
-                    onClick={onStartNewGame}
-                    className={cn(
-                      'h-14 px-8 text-lg font-black uppercase',
-                      'bg-neo-lime text-neo-black border-4 border-neo-black',
-                      'shadow-hard-lg hover:shadow-hard-xl',
-                      'hover:translate-x-[-3px] hover:translate-y-[-3px]',
-                      'active:shadow-hard active:translate-x-px active:translate-y-px',
-                      'transition-all'
-                    )}
-                  >
-                    <Play className="w-6 h-6 me-2" />
-                    {t('tvResults.startNewGame')}
-                  </Button>
-                )}
+                <Button
+                  onClick={showNextRound ? onNextRound : onStartNewGame}
+                  disabled={continueDisabled}
+                  className={cn(
+                    'h-14 px-8 text-lg font-black uppercase',
+                    'bg-neo-lime text-neo-black border-4 border-neo-black',
+                    'shadow-hard-lg hover:shadow-hard-xl',
+                    'hover:translate-x-[-3px] hover:translate-y-[-3px]',
+                    'active:shadow-hard active:translate-x-px active:translate-y-px',
+                    'transition-all',
+                    continueDisabled && 'opacity-60 cursor-not-allowed hover:translate-x-0 hover:translate-y-0 hover:shadow-hard-lg'
+                  )}
+                >
+                  <Play className="w-6 h-6 me-2" />
+                  {gateLocked
+                    ? `${showNextRound ? t('tvResults.nextRound') : t('tvResults.startNewGame')} (${secondsLeft}s)`
+                    : (showNextRound ? t('tvResults.nextRound') : t('tvResults.startNewGame'))}
+                </Button>
               </motion.div>
             </div>
 

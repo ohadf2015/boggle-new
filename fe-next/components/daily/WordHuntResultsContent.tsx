@@ -19,7 +19,6 @@ import TabbedDailyLeaderboard from './TabbedDailyLeaderboard';
 import WatchAdButton from './WatchAdButton';
 import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
 import { MascotWithEntrance } from '@/components/ui/Mascot';
-import { hasPlayedWordWheelToday } from '@/utils/dailyChallenge/storage';
 import type { WordHuntResult } from '@/utils/dailyChallenge/types';
 import type { Language } from '@/shared/types/game';
 import {
@@ -301,18 +300,18 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
           currentMode="word-hunt"
           onBackToLobby={onBackToLobby}
           variant="mobile"
+          hideBackButton
         />
       </motion.div>
     )}
 
-    {/* Word Wheel CTA — only show if not yet played today */}
-    {!hasPlayedWordWheelToday(language) && (
-      <motion.div
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.9, type: 'spring', stiffness: 300, damping: 26 }}
-      >
-        <Link
+    {/* Word Wheel CTA — always visible as a direct path to the second daily quest */}
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.9, type: 'spring', stiffness: 300, damping: 26 }}
+    >
+      <Link
           href={`/${language}/daily/word-wheel`}
           className="flex items-center justify-between gap-3 w-full p-4 rounded-neo border-3 border-neo-black bg-neo-navy-light shadow-hard-lg hover:scale-[1.02] active:translate-x-px active:translate-y-px active:shadow-hard-pressed transition-all"
         >
@@ -326,9 +325,8 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
             </div>
           </div>
           <ArrowRight className="w-5 h-5 text-neo-purple shrink-0" />
-        </Link>
-      </motion.div>
-    )}
+      </Link>
+    </motion.div>
 
     {/* Create Your Own Board + Language Options — visible, not collapsed */}
     <MoreOptionsAccordion

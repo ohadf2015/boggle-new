@@ -30,6 +30,8 @@ interface NextStepPromptProps {
   scoreDifference?: number;
   /** Callback for rematch action */
   onRematch?: () => void;
+  /** Hide the secondary "back to lobby" button (when a top-level back button already exists) */
+  hideBackButton?: boolean;
 }
 
 interface ModeConfig {
@@ -59,6 +61,7 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
   isCloseLoss: isCloseLossProp = false,
   scoreDifference,
   onRematch,
+  hideBackButton = false,
 }) => {
   const { t, language, dir } = useLanguage();
   const reducedMotion = useReducedMotion();
@@ -296,13 +299,15 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
           </div>
         </button>
 
-        <button
-          onClick={onBackToLobby}
-          className="w-full py-3 text-sm font-bold uppercase text-neo-cream bg-neo-navy-light border-3 border-neo-black rounded-neo shadow-hard flex items-center justify-center gap-2 hover:shadow-hard-lg active:shadow-hard-pressed active:translate-x-0.5 active:translate-y-0.5 transition-all duration-150"
-        >
-          <ArrowLeft className="w-4 h-4 rtl:rotate-180" />
-          {backText}
-        </button>
+        {!hideBackButton && (
+          <button
+            onClick={onBackToLobby}
+            className="w-full py-3 text-sm font-bold uppercase text-neo-cream bg-neo-navy-light border-3 border-neo-black rounded-neo shadow-hard flex items-center justify-center gap-2 hover:shadow-hard-lg active:shadow-hard-pressed active:translate-x-0.5 active:translate-y-0.5 transition-all duration-150"
+          >
+            <ArrowLeft className="w-4 h-4 rtl:rotate-180" />
+            {backText}
+          </button>
+        )}
       </div>
     );
   }

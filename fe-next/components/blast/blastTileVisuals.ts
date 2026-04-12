@@ -25,17 +25,19 @@ const SHIMMER_FAST: React.CSSProperties = {
  *  tile's `text-*` class so gold/ice tiles get dark strokes, bombs get white. */
 /* Pink tonal family — all tiles share a hue range (rose → magenta).
  * Type identity comes from the indicator icon, not hue contrast. */
+/* Radial sun-spot gradients: bright warm hot-spot bleeds into pink body.
+ * Off-center focal point + 200% size lets `background-position` slide it. */
 const PK = {
   blush:   'linear-gradient(165deg, #FFE4EF 0%, #FFC2D8 45%, #FFA8C6 100%)',
-  rose:    'linear-gradient(165deg, #FFB8D4 0%, #FF8FB8 45%, #F06BA0 100%)',
-  pink:    'linear-gradient(165deg, #FF9FC4 0%, #FF5C97 45%, #E63C7E 100%)',
-  hot:     'linear-gradient(165deg, #FF6BA3 0%, #FF1F7A 45%, #C8145C 100%)',
-  magenta: 'linear-gradient(165deg, #FF4D9E 0%, #E01579 45%, #9C0A52 100%)',
-  deep:    'linear-gradient(165deg, #E63978 0%, #B21458 45%, #70083A 100%)',
+  rose:    'radial-gradient(circle at 30% 30%, #FFE08A 0%, #FFB8D4 35%, #F06BA0 75%, #C8145C 100%)',
+  pink:    'radial-gradient(circle at 30% 30%, #FFD86B 0%, #FF9FC4 35%, #E63C7E 75%, #9C0A52 100%)',
+  hot:     'radial-gradient(circle at 30% 30%, #FFB347 0%, #FF6BA3 30%, #C8145C 70%, #70083A 100%)',
+  magenta: 'radial-gradient(circle at 30% 30%, #FFC56B 0%, #FF4D9E 30%, #9C0A52 75%, #5C0530 100%)',
+  deep:    'radial-gradient(circle at 30% 30%, #FF9347 0%, #E63978 30%, #70083A 75%, #3E0420 100%)',
 };
 
 export const TILE_VISUALS: Record<BlastTileType, { bg: string; indicator?: LucideIcon; text?: string; style?: React.CSSProperties }> = {
-  standard:  { bg: '', text: 'text-neo-navy', style: { background: PK.blush,   boxShadow: SHADOW, border: '2px solid rgba(0,0,0,0.3)' } },
+  standard:  { bg: '', text: 'text-neo-navy', style: { background: '#FFFFFF', boxShadow: SHADOW, border: '2px solid rgba(0,0,0,0.3)' } },
   gold:      { bg: '', indicator: Star,         text: 'text-neo-navy', style: { background: PK.rose,    boxShadow: SHADOW, border: BORDER_SPECIAL, ...SHIMMER_STYLE } },
   bomb:      { bg: '', indicator: Bomb,         text: 'text-white',    style: { background: PK.deep,    boxShadow: SHADOW, border: BORDER_SPECIAL, ...SHIMMER_STYLE } },
   lightning: { bg: '', indicator: Zap,          text: 'text-neo-navy', style: { background: PK.pink,    boxShadow: SHADOW, border: BORDER_SPECIAL, ...SHIMMER_FAST } },

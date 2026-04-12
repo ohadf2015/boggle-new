@@ -4947,7 +4947,7 @@ const es = {
     "steps": {
       "heading": "Cómo Funciona la Rueda de Palabras Diaria",
       "1": { "title": "Nuevo puzzle diario", "desc": "Una nueva rueda de letras aparece cada día a medianoche UTC. Todos los jugadores del mundo reciben las mismas letras." },
-      "2": { "title": "Encuentra palabras", "desc": "Forma palabras con las letras de la rueda. Cada palabra debe incluir la letra central. Palabras más largas = más puntos." },
+      "2": { "title": "Encuentra palabras", "desc": "Forma palabras con las letras de la rueda. Cada palabra debe incluir la letra central y tener al menos 3 letras. Palabras más largas = más puntos." },
       "3": { "title": "Vence al reloj", "desc": "Encuentra tantas palabras como puedas antes de que se acabe el tiempo. Velocidad y vocabulario importan." },
       "4": { "title": "Compara globalmente", "desc": "Ve tu posición en la tabla de clasificación diaria. Persigue el récord mundial y sigue tu racha." }
     },
@@ -4955,7 +4955,7 @@ const es = {
       "heading": "Preguntas Frecuentes",
       "items": [
         { "q": "¿Qué es la Rueda de Palabras Diaria?", "a": "La Rueda de Palabras Diaria es un puzzle de palabras gratuito en LexiClash. Cada día a medianoche UTC aparece una nueva rueda de letras. Tu objetivo es encontrar tantas palabras como sea posible. Todos juegan el mismo puzzle." },
-        { "q": "¿Cómo se juega?", "a": "Recibes letras dispuestas en una rueda con una letra central. Forma palabras — cada palabra debe incluir la letra central. Encuentra tantas palabras como puedas antes de que se acabe el tiempo." },
+        { "q": "¿Cómo se juega?", "a": "Recibes letras dispuestas en una rueda con una letra central. Forma palabras — cada palabra debe incluir la letra central y tener al menos 3 letras. Encuentra tantas palabras como puedas antes de que se acabe el tiempo." },
         { "q": "¿Es gratis?", "a": "Sí, completamente gratis. Sin descargas, sin registro, sin anuncios. Juega en el navegador de cualquier dispositivo." },
         { "q": "¿Puedo ver el récord mundial?", "a": "¡Sí! Después de completar el puzzle, puedes ver la tabla de clasificación global con las puntuaciones más altas del día." },
         { "q": "¿Todas las palabras necesitan la letra central?", "a": "¡Sí! Cada palabra que envíes debe incluir la letra central de la rueda. Es la restricción principal que hace el puzzle desafiante." },
@@ -4972,7 +4972,7 @@ const es = {
     "title": "Rueda de palabras",
     "badge": "RUEDA DE PALABRAS",
     "subtitle": "Encuentra palabras usando las letras de la rueda",
-    "description": "Cada palabra debe incluir la letra central",
+    "description": "Cada palabra debe usar la letra central y tener al menos 3 letras",
     "centerLetterRule": "Debe usar la letra central",
     "minLetters": "Mín {min} letras",
     "wordsFound": "{count} palabras encontradas",
@@ -4987,7 +4987,7 @@ const es = {
     "invalidLetters": "Solo puedes usar las letras de la rueda",
     "inputPlaceholder": "Escribe una palabra...",
     "tapLetters": "Toca letras para formar una palabra",
-    "tapDescription": "Toca las letras de la rueda para deletrear palabras. ¡Cada palabra debe incluir la letra central!",
+    "tapDescription": "Toca las letras de la rueda para deletrear palabras. ¡Cada palabra debe incluir la letra central y tener al menos 3 letras!",
     "timeLimit": "Límite de tiempo: 2 minutos",
     "clear": "Borrar",
     "shuffle": "Mezclar",
@@ -5010,6 +5010,7 @@ const es = {
     "hub": {
       "wordWheelQuest": "Rueda de palabras",
       "wordWheelDesc": "Encuentra palabras con la rueda — ¡la letra central es obligatoria!",
+      "wordWheelDetails": "Forma tantas palabras como puedas en 90s. Cada palabra debe usar la letra central.",
       "wordHuntQuest": "Caza de palabras",
       "wordHuntDesc": "Descifra la palabra oculta en 10 intentos"
     }
@@ -7165,7 +7166,7 @@ const es = {
       "blastObjective": "¡Usa tus movimientos sabiamente!",
       "huntObjective": "Encuentra la palabra objetivo oculta",
       "huntLoadingTarget": "Buscando palabra oculta...",
-      "wheelObjective": "¡Cada palabra debe incluir la letra central!",
+      "wheelObjective": "¡Cada palabra debe incluir la letra central y tener al menos 3 letras!",
       "wheelMustInclude": "Debe incluir:",
       "forgeObjective": "¡Alcanza la puntuación objetivo!",
       "bossObjective": "¡Derrota al jefe!"
