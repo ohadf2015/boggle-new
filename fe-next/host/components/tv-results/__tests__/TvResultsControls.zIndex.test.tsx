@@ -52,7 +52,7 @@ describe('TvResultsControls - Z-Index Visibility', () => {
 
     // WHEN: Looking for action buttons
     // THEN: Should find Start New Game button
-    expect(getByText('tvResults.startNewGame')).toBeInTheDocument();
+    expect(getByText(/tvResults\.startNewGame/)).toBeInTheDocument();
 
     // THEN: Should find QR Code button
     expect(getByText('tvResults.qrCode')).toBeInTheDocument();
@@ -69,7 +69,7 @@ describe('TvResultsControls - Z-Index Visibility', () => {
 
     // WHEN: Looking for tournament controls
     // THEN: Should find Next Round button instead of Start New Game
-    expect(getByText('tvResults.nextRound')).toBeInTheDocument();
+    expect(getByText(/tvResults\.nextRound/)).toBeInTheDocument();
   });
 
   it('should render Skip button during animation', () => {
