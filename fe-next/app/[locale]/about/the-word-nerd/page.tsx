@@ -40,14 +40,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     const url = `${SITE_URL}/${locale}/about/the-word-nerd`;
 
     return {
-        title: 'The Word Nerd - Senior Word Game Researcher & Game Designer',
+        title: 'Ohad Fisher (The Word Nerd) - Founder & Editor, LexiClash',
         description:
-            'Meet The Word Nerd — cognitive science enthusiast with 8+ years researching word games, linguistics, and brain health. Creator of LexiClash.',
+            'Meet Ohad Fisher — founder of LexiClash, word-game designer, and cognitive-science enthusiast with 8+ years researching word games, linguistics, and brain health.',
         openGraph: {
             type: 'profile',
-            title: 'The Word Nerd - Word Game Researcher & Game Designer',
+            title: 'Ohad Fisher (The Word Nerd) - Founder & Editor, LexiClash',
             description:
-                'Cognitive science enthusiast with 8+ years researching word games, linguistics, and brain health. Creator of LexiClash.',
+                'Founder of LexiClash, word-game designer, and cognitive-science enthusiast with 8+ years researching word games, linguistics, and brain health.',
             url,
             siteName: 'LexiClash',
             images: [{ url: `${SITE_URL}/images/author-word-nerd.jpg`, width: 400, height: 400, alt: 'The Word Nerd' }],
@@ -91,13 +91,19 @@ export default async function TheWordNerdPage({ params }: PageProps) {
         '@context': 'https://schema.org',
         '@type': 'Person',
         '@id': `${SITE_URL}/about/the-word-nerd#person`,
-        name: 'The Word Nerd',
+        name: 'Ohad Fisher',
+        alternateName: 'The Word Nerd',
         url: `${SITE_URL}/about/the-word-nerd`,
-        jobTitle: 'Senior Word Game Researcher & Game Designer',
+        jobTitle: 'Founder & Editor-in-Chief, LexiClash',
         description:
-            'Cognitive science enthusiast with 8+ years researching word games, linguistics, and brain health. Creator of LexiClash.',
-        image: `${SITE_URL}/images/author-word-nerd.jpg`,
-        sameAs: [`${SITE_URL}/about/the-word-nerd`],
+            'Founder of LexiClash. Word-game designer and cognitive-science enthusiast with 8+ years researching word games, linguistics, and brain health.',
+        image: `${SITE_URL}/images/author-ohad.jpg`,
+        email: 'editor@lexiclash.live',
+        sameAs: [
+            `${SITE_URL}/about/the-word-nerd`,
+            `${SITE_URL}/editorial-policy`,
+            'https://github.com/lexiclash',
+        ],
         knowsAbout: ['Word Games', 'Cognitive Science', 'Linguistics', 'Brain Training', 'Game Design', 'Multilingual Learning'],
         worksFor: {
             '@type': 'Organization',
@@ -128,43 +134,96 @@ export default async function TheWordNerdPage({ params }: PageProps) {
                     {/* Author Header */}
                     <div className="mb-10 flex flex-col items-center gap-6 sm:flex-row sm:items-start">
                         <Image
-                            src="/images/author-word-nerd.jpg"
-                            alt="The Word Nerd — Word Game Researcher and Game Designer"
+                            src="/images/author-ohad.jpg"
+                            alt="Ohad Fisher — Founder and Editor-in-Chief of LexiClash"
                             width={112}
                             height={112}
                             className="h-28 w-28 shrink-0 rounded-neo border-3 border-black object-cover shadow-hard-lg"
                             priority
                         />
                         <div className="text-center sm:text-start">
-                            <h1 className="font-neo-display text-3xl font-bold text-neo-white sm:text-4xl">The Word Nerd</h1>
-                            <p className="mt-1 font-neo-body text-lg text-neo-yellow">
-                                Senior Word Game Researcher &amp; Game Designer
+                            <h1 className="font-neo-display text-3xl font-bold text-neo-white sm:text-4xl">Ohad Fisher</h1>
+                            <p className="mt-1 font-neo-body text-sm text-gray-400">also known as &ldquo;The Word Nerd&rdquo;</p>
+                            <p className="mt-2 font-neo-body text-lg text-neo-lime">
+                                Founder &amp; Editor-in-Chief, LexiClash
                             </p>
+                            <div className="mt-3 flex flex-wrap justify-center gap-2 sm:justify-start">
+                                <a href="mailto:editor@lexiclash.live" className="rounded-neo border-3 border-black bg-neo-cyan px-3 py-1 font-neo-body text-xs font-bold text-black shadow-hard-sm hover:shadow-hard">
+                                    editor@lexiclash.live
+                                </a>
+                                <a href="https://github.com/lexiclash" rel="me noopener" target="_blank" className="rounded-neo border-3 border-black bg-neo-lime px-3 py-1 font-neo-body text-xs font-bold text-black shadow-hard-sm hover:shadow-hard">
+                                    GitHub
+                                </a>
+                                <Link href={`/${locale}/editorial-policy`} className="rounded-neo border-3 border-black bg-neo-pink px-3 py-1 font-neo-body text-xs font-bold text-black shadow-hard-sm hover:shadow-hard">
+                                    Editorial Policy
+                                </Link>
+                            </div>
                         </div>
                     </div>
 
                     {/* Bio */}
                     <section className="mb-10 rounded-neo border-3 border-black bg-neo-navy/80 p-6 shadow-hard">
-                        <h2 className="mb-4 font-neo-display text-xl font-bold text-neo-white">About</h2>
+                        <h2 className="mb-4 font-neo-display text-xl font-bold text-neo-white">About Ohad</h2>
                         <div className="space-y-4 font-neo-body text-base leading-relaxed text-gray-300">
                             <p>
-                                I am passionate about the intersection of word games, cognitive science, and game design. For over
-                                eight years I have been researching how word games impact brain health, language acquisition, and
-                                learning outcomes. That research is the foundation of everything we build at LexiClash.
+                                I&apos;m Ohad Fisher, the founder and editor-in-chief of LexiClash. I&apos;ve spent the last eight
+                                years building, playing, and studying word games — first as an obsessive competitive Boggle player,
+                                then as a developer who wanted a faster, smarter, friendlier version of the games I loved. That
+                                obsession turned into LexiClash: a multiplayer word game built around what we actually know about
+                                how the brain learns language.
                             </p>
                             <p>
-                                My background is in linguistics and cognitive science. I spent years analyzing what makes word games
-                                genuinely engaging and cognitively beneficial — not just fun, but measurably good for the brain. I
-                                founded LexiClash to put that knowledge into practice: building word games that are accessible in
-                                multiple languages and backed by real research.
+                                My background is in software engineering and cognitive-science reading. I&apos;m not a neuroscientist,
+                                and I don&apos;t pretend to be one — when I write about memory, vocabulary, or brain health, every
+                                factual claim is sourced from peer-reviewed research and linked in the article so you can check it
+                                yourself. Our full approach is documented in the{' '}
+                                <Link href={`/${locale}/editorial-policy`} className="text-neo-lime underline">
+                                    LexiClash Editorial Policy
+                                </Link>
+                                .
                             </p>
                             <p>
-                                I believe word games are more than entertainment. They sharpen memory, expand vocabulary, and
-                                strengthen mental agility at every age. I write about the science, strategy, and psychology behind
-                                word games so that players can get the most from their gaming experience — whether they are casual
-                                puzzlers or competitive word athletes.
+                                I write about the science, strategy, and psychology behind word games so players can get more out of
+                                their time with them — whether that&apos;s a casual daily puzzle or a serious run at a tournament
+                                leaderboard. I answer every email personally at{' '}
+                                <a href="mailto:editor@lexiclash.live" className="text-neo-lime underline">
+                                    editor@lexiclash.live
+                                </a>
+                                .
                             </p>
                         </div>
+                    </section>
+
+                    {/* Editorial Standards snapshot */}
+                    <section className="mb-10 rounded-neo border-3 border-black bg-neo-navy/80 p-6 shadow-hard">
+                        <h2 className="mb-4 font-neo-display text-xl font-bold text-neo-white">How I Research &amp; Fact-Check</h2>
+                        <ul className="list-disc space-y-2 pl-5 font-neo-body text-base leading-relaxed text-gray-300">
+                            <li>
+                                <strong>I play every game I write about.</strong> Every review or comparison is based on at least
+                                ten hours of real play — no press kits, no second-hand opinions.
+                            </li>
+                            <li>
+                                <strong>I cite primary sources.</strong> Cognitive-science claims link directly to peer-reviewed
+                                journals, university publications, or institutional research (NIH, WHO, Oxford, Cambridge).
+                            </li>
+                            <li>
+                                <strong>I correct errors publicly.</strong> If something is wrong, I fix it and add a dated note at
+                                the bottom of the article. Email me at{' '}
+                                <a href="mailto:editor@lexiclash.live" className="text-neo-lime underline">
+                                    editor@lexiclash.live
+                                </a>{' '}
+                                with the URL and I&apos;ll respond within five business days.
+                            </li>
+                            <li>
+                                <strong>I disclose AI use.</strong> I use AI tools as a research assistant, never as a ghostwriter.
+                                Every word you read on LexiClash was written, rewritten, or signed off on by me. Full disclosure in
+                                the{' '}
+                                <Link href={`/${locale}/editorial-policy`} className="text-neo-lime underline">
+                                    Editorial Policy
+                                </Link>
+                                .
+                            </li>
+                        </ul>
                     </section>
 
                     {/* Expertise */}
@@ -174,7 +233,7 @@ export default async function TheWordNerdPage({ params }: PageProps) {
                             {EXPERTISE.map((area) => (
                                 <span
                                     key={area}
-                                    className="rounded-neo border-3 border-black bg-neo-yellow px-3 py-1 font-neo-body text-sm font-bold text-black shadow-hard-sm"
+                                    className="rounded-neo border-3 border-black bg-neo-lime px-3 py-1 font-neo-body text-sm font-bold text-black shadow-hard-sm"
                                 >
                                     {area}
                                 </span>

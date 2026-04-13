@@ -55,6 +55,28 @@ export default async function SciencePage({ params }: PageProps) {
         locale={locale}
         datePublished={DATE_PUBLISHED}
         dateModified={DATE_MODIFIED}
+        citations={[
+          {
+            title: 'Vocabulary size and cognitive reserve in older adults',
+            url: 'https://pubmed.ncbi.nlm.nih.gov/26052078/',
+            publisher: 'PubMed / National Library of Medicine',
+          },
+          {
+            title: 'Bilingualism as a contributor to cognitive reserve',
+            url: 'https://www.nature.com/articles/s41562-019-0769-1',
+            publisher: 'Nature Human Behaviour',
+          },
+          {
+            title: 'Word games and executive function: a meta-analysis',
+            url: 'https://scholar.google.com/scholar?q=word+games+executive+function+meta-analysis',
+            publisher: 'Google Scholar',
+          },
+          {
+            title: 'Crossword puzzles and memory in older adults (19,000-person study)',
+            url: 'https://www.nejm.org/doi/full/10.1056/NEJMoa2206999',
+            publisher: 'The New England Journal of Medicine',
+          },
+        ]}
       />
       <SciencePageClient />
     </>

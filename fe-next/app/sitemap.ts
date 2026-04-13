@@ -213,6 +213,9 @@ function getAllRoutes(): MetadataRoute.Sitemap {
   // ─── Author page ───
   addForAllLocales(routes, '/about/the-word-nerd', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.7 });
 
+  // ─── Editorial policy (E-E-A-T / AdSense trust) ───
+  addForAllLocales(routes, '/editorial-policy', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.6 });
+
   // ─── Words hub ───
   addForAllLocales(routes, '/words', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.7 });
 

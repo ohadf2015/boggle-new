@@ -22,6 +22,14 @@ function getBlogImage(slug: string): string {
     return `${SITE_URL}${BLOG_IMAGE_MAP[slug] || FALLBACK_IMAGE}`;
 }
 
+interface CitationRef {
+    title: string;
+    url: string;
+    author?: string;
+    publisher?: string;
+    datePublished?: string;
+}
+
 interface BlogPostingJsonLdProps {
     title: string;
     description: string;
@@ -30,6 +38,7 @@ interface BlogPostingJsonLdProps {
     datePublished: string;
     dateModified?: string;
     wordCount?: number;
+    citations?: CitationRef[];
 }
 
 export function BlogPostingJsonLd({
@@ -40,6 +49,7 @@ export function BlogPostingJsonLd({
     datePublished,
     dateModified,
     wordCount,
+    citations,
 }: BlogPostingJsonLdProps): ReactNode {
     const articleUrl = `${SITE_URL}/${locale}/blog/${slug}`;
     const imageUrl = getBlogImage(slug);
@@ -63,13 +73,19 @@ export function BlogPostingJsonLd({
         },
         author: {
             '@type': 'Person',
-            name: 'The Word Nerd',
+            name: 'Ohad Fisher',
+            alternateName: 'The Word Nerd',
             url: `${SITE_URL}/about/the-word-nerd`,
-            jobTitle: 'Senior Word Game Researcher & Game Designer',
+            jobTitle: 'Founder & Editor-in-Chief, LexiClash',
             description:
-                'Cognitive science enthusiast with 8+ years researching word games, linguistics, and brain health. Creator of LexiClash.',
-            image: `${SITE_URL}/images/author-word-nerd.jpg`,
-            sameAs: ['https://www.lexiclash.live/about/the-word-nerd'],
+                'Founder of LexiClash. Word-game designer and cognitive-science enthusiast with 8+ years researching word games, linguistics, and brain health.',
+            image: `${SITE_URL}/images/author-ohad.jpg`,
+            email: 'editor@lexiclash.live',
+            sameAs: [
+                'https://www.lexiclash.live/about/the-word-nerd',
+                'https://www.lexiclash.live/editorial-policy',
+                'https://github.com/lexiclash',
+            ],
             knowsAbout: [
                 'Word Games',
                 'Cognitive Science',
@@ -83,6 +99,21 @@ export function BlogPostingJsonLd({
                 name: 'LexiClash Ltd',
                 url: SITE_URL,
             },
+        },
+        ...(citations && citations.length > 0 && {
+            citation: citations.map((c) => ({
+                '@type': 'CreativeWork',
+                name: c.title,
+                url: c.url,
+                ...(c.author && { author: { '@type': 'Person', name: c.author } }),
+                ...(c.publisher && { publisher: { '@type': 'Organization', name: c.publisher } }),
+                ...(c.datePublished && { datePublished: c.datePublished }),
+            })),
+        }),
+        reviewedBy: {
+            '@type': 'Organization',
+            name: 'LexiClash Editorial Team',
+            url: `${SITE_URL}/editorial-policy`,
         },
         publisher: {
             '@type': 'Organization',
@@ -144,7 +175,7 @@ export function generateBlogMetadata({
             images: [{ url: imageUrl, width: 1200, height: 630, alt: title }],
             publishedTime: datePublished,
             modifiedTime: dateModified || datePublished,
-            authors: ['The Word Nerd'],
+            authors: ['Ohad Fisher'],
         },
         twitter: {
             card: 'summary_large_image',
