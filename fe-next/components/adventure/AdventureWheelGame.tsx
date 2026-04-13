@@ -5,6 +5,8 @@ import { X } from 'lucide-react';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import { useProgressionActions, useProgressionData } from '@/contexts/ProgressionContext';
 import { useUpgradeEffects } from '@/hooks/useUpgradeEffects';
+import { useChapterQuests } from '@/hooks/useChapterQuests';
+import { getChapterNumber } from '@/lib/adventure/questConfig';
 import type { LevelConfig } from '@/types/adventure';
 import type { Language } from '@/types';
 import WordWheelGame, { type WordWheelGameResult } from '@/components/daily/WordWheelGame';
@@ -31,6 +33,10 @@ const AdventureWheelGame: React.FC<Props> = ({ levelConfig, onLevelComplete, onE
   const { completeLevel } = useProgressionActions();
   const { progression } = useProgressionData();
   const upgradeEffects = useUpgradeEffects(progression?.upgrades ?? {});
+  const chapterQuests = useChapterQuests({
+    worldId: levelConfig.world,
+    chapterNumber: getChapterNumber(levelConfig.level),
+  });
   const [effects, setEffects] = useState<WordWheelEffect[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ width: 400, height: 600 });
@@ -91,10 +97,14 @@ const AdventureWheelGame: React.FC<Props> = ({ levelConfig, onLevelComplete, onE
         stars, result.score, result.wordsFound.length,
         gold, longWords, result.wordsFound
       );
+      chapterQuests.recordWordsFound(result.wordsFound.length);
+      chapterQuests.recordScoreChallenge(result.score);
+      if (stars >= 3) chapterQuests.recordLevelPerfect();
+      for (let i = 0; i < longWords; i++) chapterQuests.recordLongWord();
     }
     onLevelComplete(stars, result.score, result.wordsFound.length, gold, longWords, result.wordsFound);
   }, [scoreTarget, onLevelComplete, completeLevel, levelConfig.world, levelConfig.level,
-      upgradeEffects.goldMultiplier, upgradeEffects.longWordGoldBonus]);
+      upgradeEffects.goldMultiplier, upgradeEffects.longWordGoldBonus, chapterQuests]);
 
   return (
     <div className="relative h-full w-full bg-neo-navy flex flex-col">

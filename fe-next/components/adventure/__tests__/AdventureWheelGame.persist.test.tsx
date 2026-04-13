@@ -14,6 +14,15 @@ const completeLevelMock = vi.fn().mockResolvedValue(true);
 vi.mock('@/contexts/ProgressionContext', () => ({
   useProgressionActions: () => ({ completeLevel: completeLevelMock }),
   useProgressionData: () => ({ progression: { upgrades: {} } }),
+  useProgression: () => ({
+    progression: { upgrades: {}, chapterQuests: {} },
+    updateChapterQuestProgress: vi.fn(),
+  }),
+}));
+
+vi.mock('@/lib/adventure/questConfig', () => ({
+  getQuestsForChapter: () => [],
+  getChapterNumber: () => 1,
 }));
 
 vi.mock('@/contexts/LanguageContext', () => ({
