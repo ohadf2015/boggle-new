@@ -5,6 +5,7 @@ import { X } from 'lucide-react';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import { useProgressionActions, useProgressionData } from '@/contexts/ProgressionContext';
 import { useUpgradeEffects } from '@/hooks/useUpgradeEffects';
+import { useAdventureMusic } from '@/hooks/useAdventureMusic';
 import { useChapterQuests } from '@/hooks/useChapterQuests';
 import { getChapterNumber } from '@/lib/adventure/questConfig';
 import { useAdventureAchievements } from '@/hooks/useAdventureAchievements';
@@ -40,6 +41,17 @@ const AdventureWheelGame: React.FC<Props> = ({ levelConfig, onLevelComplete, onE
     worldId: levelConfig.world,
     chapterNumber: getChapterNumber(levelConfig.level),
   });
+  const totalTime = (levelConfig.timerSeconds || 120) + upgradeEffects.bonusTimeSeconds;
+  useAdventureMusic({
+    worldNumber: levelConfig.world,
+    isPlaying: true,
+    isPaused: false,
+    timeRemaining: totalTime,
+    totalTime,
+    enabled: true,
+    isBossLevel: false,
+  });
+
   const { earnAchievement, getCount } = useAdventureAchievements();
   const handleEarnAchievement = useCallback((id: keyof typeof ADVENTURE_ACHIEVEMENTS) => {
     const isNew = earnAchievement(id);
