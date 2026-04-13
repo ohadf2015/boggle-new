@@ -76,10 +76,4 @@ describe('GameHeader — HUD Theme Integration', () => {
     expect(badges.length).toBeGreaterThan(0);
   });
 
-  it('should apply levelBadgeText from theme to level number', () => {
-    const { container } = render(<GameHeader {...defaultProps} />);
-    // The level number uses levelBadgeText color
-    const elements = container.querySelectorAll('[class*="text-emerald-400"]');
-    expect(elements.length).toBeGreaterThan(0);
-  });
 });

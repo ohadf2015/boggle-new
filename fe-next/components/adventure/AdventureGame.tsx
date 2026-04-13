@@ -54,8 +54,6 @@ import type { RuneCardDef, RuneCard as RuneCardType } from '@/types/wordForge';
 import { RunePicker } from '@/components/wordForge/RunePicker';
 import { RuneBar } from '@/components/wordForge/RuneBar';
 import { LowHPOverlay } from '@/components/wordhunt/LowHPOverlay';
-import dynamic from 'next/dynamic';
-const WordWheelPixiRing = dynamic(() => import('@/components/daily/WordWheelPixiRing'), { ssr: false });
 
 export interface GameTimerState { timeRemaining: number; totalTime: number; isPlaying: boolean; isPaused: boolean; }
 
@@ -863,11 +861,6 @@ const AdventureGame = memo<AdventureGameProps>(
             />
           }
         />
-        {modeState.archetype === 'wheel' && entryPhase === 'playing' && (
-          <div className="fixed inset-0 pointer-events-none z-10">
-            <WordWheelPixiRing selectedIndices={selectedIndices} radius={Math.min(140, window.innerWidth * 0.18)} combo={gameState.comboCount} />
-          </div>
-        )}
         {/* Hunt mode: red vignette when HP is critically low — reused from WordHunt */}
         {modeState.archetype === 'hunt' && currentHP != null && (
           <LowHPOverlay hp={currentHP} />

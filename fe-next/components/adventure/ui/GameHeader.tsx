@@ -75,7 +75,6 @@ export const GameHeader = memo(function GameHeader({
   elapsedTime = 0,
   comboCount = 0,
   comboTimeoutMs = 3000,
-  modeDisplayKey,
   showMoveCounter = false,
   movesRemaining,
   showLifeBar = false,
@@ -161,13 +160,6 @@ export const GameHeader = memo(function GameHeader({
 
       {/* Right: Level+Timer/Moves/HP pill, then Pause */}
       <div className="flex items-center gap-1 shrink-0">
-        {/* Mode badge — shown for non-classic archetypes */}
-        {modeDisplayKey && (
-          <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-neo-purple/20 text-neo-purple border border-neo-purple/30">
-            {t(modeDisplayKey)}
-          </span>
-        )}
-
         {/* Merged Level + resource pill */}
         {isBossLevel ? (
           <div className="flex items-center gap-1.5 px-2 py-1 bg-neo-red/15 rounded-neo border border-neo-red/30">
@@ -188,10 +180,6 @@ export const GameHeader = memo(function GameHeader({
             'border-2 border-neo-pink/30',
             'px-2 py-0.5'
           )}>
-            <span dir="ltr" className="text-[10px] font-mono font-bold tabular-nums text-neo-white/60">
-              W{worldNumber}·L{levelNumber}
-            </span>
-            <span className="text-neo-white/20 text-[10px]">|</span>
             {/* Circular counter with urgency thresholds from BlastHUD */}
             <div className={cn(
               'w-8 h-8 rounded-full flex items-center justify-center border-2 transition-colors',
@@ -218,10 +206,6 @@ export const GameHeader = memo(function GameHeader({
             'border-2 border-neo-cyan/30',
             'px-2 py-0.5'
           )}>
-            <span dir="ltr" className="text-[10px] font-mono font-bold tabular-nums text-neo-white/60">
-              W{worldNumber}·L{levelNumber}
-            </span>
-            <span className="text-neo-white/20 text-[10px]">|</span>
             <Heart className="w-3.5 h-3.5 text-neo-cyan fill-neo-cyan/50" />
             <div className="flex items-center gap-1">
               <div className="w-16 h-2 bg-neo-black/40 rounded-full overflow-hidden border border-neo-white/10">
@@ -251,10 +235,6 @@ export const GameHeader = memo(function GameHeader({
             'border-2 border-neo-black/30',
             'px-2 py-0.5'
           )}>
-            <span dir="ltr" className={cn('text-[10px] font-mono font-bold tabular-nums', hudTheme.levelBadgeText)}>
-              W{worldNumber}·L{levelNumber}
-            </span>
-            <span className="text-neo-white/20 text-[10px]">|</span>
             <AdventureTimer
               timerStore={timerStore}
               timeRemaining={timeRemaining}

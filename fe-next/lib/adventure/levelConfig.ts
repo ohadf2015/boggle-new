@@ -319,17 +319,10 @@ export function getLevelConfig(
     config.hasTargetWord = true;
     config.lifePoints = 100;
   } else if (archetype === 'wheel') {
-    config.centerLetterRequired = true;
-    // Pick center letter from the actual grid when available, falling back to common letters
-    const centerCandidates = ['A', 'E', 'I', 'O', 'U', 'R', 'S', 'T', 'N', 'L'];
-    if (grid) {
-      const gridLetters = new Set(grid.flat().map(l => l.toUpperCase()));
-      const validCandidates = centerCandidates.filter(l => gridLetters.has(l));
-      const pool = validCandidates.length > 0 ? validCandidates : Array.from(gridLetters);
-      config.centerLetter = pool[Math.floor(Math.random() * pool.length)];
-    } else {
-      config.centerLetter = centerCandidates[Math.floor(Math.random() * centerCandidates.length)];
-    }
+    // Wheel archetype plays as classic on the adventure grid — its secondary
+    // "longWords" objective (assigned in generateObjectives) is what differentiates it.
+    // The "must include center letter" rule was removed because it created a mismatch
+    // with the boggle board (daily Word Wheel uses a ring layout instead).
   } else if (archetype === 'forge') {
     config.hasRunePick = true;
   }

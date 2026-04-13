@@ -680,11 +680,9 @@ describe('AdventureGame', () => {
       // GIVEN / WHEN
       render(<AdventureGame {...defaultProps} />, { wrapper: createWrapper() });
 
-      // THEN - Level badge shows compact "W1 · L1" format
+      // THEN - Adventure game renders (level label removed from header)
       const gameContainer = screen.getByTestId('adventure-game');
       expect(gameContainer).toBeInTheDocument();
-      const levelBadge = screen.getByText(/W1\s*·\s*L1/);
-      expect(levelBadge).toBeInTheDocument();
     });
 
     it('should render the game grid', () => {

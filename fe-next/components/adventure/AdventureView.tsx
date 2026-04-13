@@ -172,9 +172,12 @@ function AdventureView(): React.JSX.Element {
     [selectedWorld, selectedLevel, language]
   );
 
-  const levelConfig = selectedWorld && selectedLevel
-    ? getLevelConfig(selectedWorld, selectedLevel, gameGrid ?? undefined)
-    : null;
+  const levelConfig = useMemo(
+    () => selectedWorld && selectedLevel
+      ? getLevelConfig(selectedWorld, selectedLevel, gameGrid ?? undefined)
+      : null,
+    [selectedWorld, selectedLevel, gameGrid]
+  );
 
   const handleShopPurchase = useCallback((upgradeId: string, newState: UpgradeState, newGold: number) => {
     updateCurrency(upgradeId, newGold, newState);

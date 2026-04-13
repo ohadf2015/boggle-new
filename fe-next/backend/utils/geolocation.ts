@@ -68,6 +68,13 @@ export const GEOLOCATION_CACHE_TTL = 24 * 60 * 60;
 const memoryCache = new Map<string, MemoryCacheEntry>();
 const MAX_MEMORY_CACHE_SIZE = 1000;
 
+// Circuit breaker: when ip-api.com rate-limits us (HTTP 429), back off for this
+// long before issuing another request. ip-api's free tier resets per-minute, so
+// 60s gives the rate-limit window time to drain instead of cascading into more
+// 429s on every subsequent request.
+const RATE_LIMIT_COOLDOWN_MS = 60_000;
+let rateLimitedUntil = 0;
+
 // ==========================================
 // IP Extraction Functions
 // ==========================================
@@ -230,6 +237,15 @@ export async function lookupIP(ip: string): Promise<GeoData> {
       };
     }
 
+    // Circuit breaker: short-circuit while upstream is known rate-limited.
+    if (Date.now() < rateLimitedUntil) {
+      return {
+        status: 'error',
+        message: 'rate-limited (cooldown)',
+        countryCode: null
+      };
+    }
+
     // ip-api.com provides free geolocation without API key
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 3000); // 3 second timeout
@@ -245,7 +261,17 @@ export async function lookupIP(ip: string): Promise<GeoData> {
     }
 
     if (!response.ok) {
-      logger.warn('GEOLOCATION', 'API returned HTTP error', { status: response.status });
+      // 429 → trip the circuit breaker so we stop hammering ip-api for the
+      // next minute. Any other HTTP error is still debug-level noise since
+      // callers degrade gracefully.
+      if (response.status === 429) {
+        rateLimitedUntil = Date.now() + RATE_LIMIT_COOLDOWN_MS;
+        logger.debug('GEOLOCATION', 'API rate-limited, cooldown engaged', {
+          cooldownMs: RATE_LIMIT_COOLDOWN_MS
+        });
+      } else {
+        logger.debug('GEOLOCATION', 'API returned HTTP error', { status: response.status });
+      }
       return {
         status: 'error',
         message: `HTTP ${response.status}`,
@@ -256,7 +282,7 @@ export async function lookupIP(ip: string): Promise<GeoData> {
     const data = await response.json() as GeoData;
 
     if (data.status === 'fail') {
-      logger.warn('GEOLOCATION', 'API returned failure', { message: data.message });
+      logger.debug('GEOLOCATION', 'API returned failure', { message: data.message });
       return {
         status: 'fail',
         message: data.message,

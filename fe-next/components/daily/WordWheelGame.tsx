@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Clock, Shuffle, RotateCcw, Sparkles, Flame } from 'lucide-react';
+import { Clock, Shuffle, RotateCcw, Sparkles, Flame, TrendingUp, ChevronUp } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { isValidWordWheelWord, type WordWheelPuzzle } from '@/utils/dailyChallenge/wordWheelGeneration';
@@ -28,10 +28,16 @@ interface WordWheelGameProps {
   onComplete: (result: WordWheelGameResult) => void;
   onValidateWord: (word: string) => Promise<boolean>;
   onEffect: (effect: WordWheelEffect) => void;
+  language: string;
 }
 
+// Rough avg points per word for "X words to pass" estimate
+const AVG_POINTS_PER_WORD = 6;
+
+interface RivalScore { name: string; score: number }
+
 const WordWheelGame: React.FC<WordWheelGameProps> = ({
-  puzzle, duration, onComplete, onValidateWord, onEffect,
+  puzzle, duration, onComplete, onValidateWord, onEffect, language,
 }) => {
   const { t } = useLanguage();
   const {
@@ -61,8 +67,58 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
   const gameContainerRef = useRef<HTMLDivElement>(null);
   const wheelContainerRef = useRef<HTMLDivElement>(null);
 
+  // ── Live leaderboard rivals (snapshot on mount) ──
+  const [rivals, setRivals] = useState<RivalScore[]>([]);
+  const [passToast, setPassToast] = useState<string | null>(null);
+  const passedNamesRef = useRef<Set<string>>(new Set());
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const today = new Date().toISOString().split('T')[0];
+        const res = await fetch(`/api/daily-challenge/word-wheel/leaderboard/${today}/${language}?limit=100`);
+        if (!res.ok) return;
+        const json = await res.json();
+        if (cancelled) return;
+        const list: RivalScore[] = (json.data || [])
+          .filter((r: { score?: number; display_name?: string }) => typeof r.score === 'number' && r.display_name)
+          .map((r: { score: number; display_name: string }) => ({ name: r.display_name, score: r.score }))
+          .sort((a: RivalScore, b: RivalScore) => a.score - b.score);
+        setRivals(list);
+      } catch { /* leaderboard is best-effort */ }
+    })();
+    return () => { cancelled = true; };
+  }, [language]);
+
+  // Closest rival above me + pass detection
+  const nextRival = useMemo(
+    () => rivals.find(r => r.score > score) || null,
+    [rivals, score],
+  );
+  const wordsToPass = nextRival
+    ? Math.max(1, Math.ceil((nextRival.score - score) / AVG_POINTS_PER_WORD))
+    : 0;
+
   useEffect(() => { wordsFoundRef.current = wordsFound; }, [wordsFound]);
   useEffect(() => { scoreRef.current = score; }, [score]);
+
+  // Detect newly-passed rivals when score changes
+  useEffect(() => {
+    if (!rivals.length) return;
+    for (const r of rivals) {
+      if (r.score > 0 && r.score <= score && !passedNamesRef.current.has(r.name)) {
+        passedNamesRef.current.add(r.name);
+        setPassToast(r.name);
+        haptic([20, 40, 20]);
+        setTimeout(() => setPassToast(null), 2400);
+      }
+    }
+  }, [score, rivals]);
+
+  // ── Drag-to-build support ── (handlers defined after handleLetterPress)
+  const draggingRef = useRef(false);
+  const lastDragIdxRef = useRef<number | null>(null);
 
   // Track which wheel indices are used in current word
   const usedIndices = useMemo(() => {
@@ -137,6 +193,30 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
       });
     }
   }, [onEffect, playTileSelectSound]);
+
+  // ── Drag-to-build handlers ──
+  const tryDragHit = useCallback((clientX: number, clientY: number) => {
+    const el = document.elementFromPoint(clientX, clientY) as HTMLElement | null;
+    const btn = el?.closest<HTMLButtonElement>('[data-wheel-letter]');
+    if (!btn || btn.disabled) return;
+    const idx = Number(btn.dataset.wheelIndex);
+    if (idx === lastDragIdxRef.current) return;
+    lastDragIdxRef.current = idx;
+    handleLetterPress(btn.dataset.wheelLetter || '', idx, btn);
+  }, [handleLetterPress]);
+  const handlePointerDown = useCallback((e: React.PointerEvent) => {
+    draggingRef.current = true;
+    lastDragIdxRef.current = null;
+    tryDragHit(e.clientX, e.clientY);
+  }, [tryDragHit]);
+  const handlePointerMove = useCallback((e: React.PointerEvent) => {
+    if (!draggingRef.current) return;
+    tryDragHit(e.clientX, e.clientY);
+  }, [tryDragHit]);
+  const handlePointerUp = useCallback(() => {
+    draggingRef.current = false;
+    lastDragIdxRef.current = null;
+  }, []);
 
   // ── Remove built letter ──
   const handleRemoveLetter = useCallback((index: number) => {
@@ -285,7 +365,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
   const seconds = timeLeft % 60;
 
   return (
-    <div ref={gameContainerRef} className="relative flex flex-col items-center gap-2 sm:gap-4 w-full max-w-lg mx-auto px-3 sm:px-4">
+    <div ref={gameContainerRef} className="relative flex flex-col items-center w-full flex-1 max-w-lg mx-auto px-3 sm:px-4 pb-3">
       {/* ── Timer & Score Bar ── */}
       <div className="w-full space-y-1.5">
         <div className="flex items-center justify-between w-full gap-2">
@@ -409,8 +489,60 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         </AnimatePresence>
       </motion.div>
 
+      {/* Words-to-pass next-rival hint (under word builder, above wheel) */}
+      <AnimatePresence>
+        {nextRival && (
+          <motion.div
+            className="mt-2 mb-1 px-2.5 py-1 rounded-neo border-2 border-neo-cream/20 bg-neo-navy-light/60 text-[11px] sm:text-xs text-neo-cream/80 font-semibold flex items-center gap-1.5"
+            initial={{ opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+          >
+            <ChevronUp className="w-3 h-3 text-neo-lime" />
+            <span>
+              {t('wordWheel.wordsToPass')
+                .replace('{count}', String(wordsToPass))
+                .replace('{name}', nextRival.name)}
+            </span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Pass notification toast */}
+      <AnimatePresence>
+        {passToast && (
+          <motion.div
+            className="absolute top-16 left-1/2 -translate-x-1/2 z-30 px-3 py-1.5 rounded-neo border-3 border-neo-black bg-gradient-to-r from-neo-pink to-neo-purple text-neo-white font-neo-display font-black text-sm shadow-[3px_3px_0px_black,0_0_18px_rgba(255,20,147,0.5)] flex items-center gap-1.5 whitespace-nowrap"
+            initial={{ opacity: 0, y: -20, scale: 0.8 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -20, scale: 0.8 }}
+          >
+            <TrendingUp className="w-4 h-4" />
+            {t('wordWheel.passedPlayer').replace('{name}', passToast)}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Spacer pushes the wheel toward the bottom */}
+      <div className="flex-1 min-h-2" />
+
+      {/* Tap-to-remove hint */}
+      {builtLetters.length > 0 && (
+        <p className="text-neo-cream/40 text-[10px] sm:text-xs text-center mb-1">
+          {t('wordWheel.tapToRemove')}
+        </p>
+      )}
+
       {/* ── The Wheel ── */}
-      <div ref={wheelContainerRef} className="relative w-52 h-52 sm:w-64 sm:h-64 md:w-72 md:h-72 flex items-center justify-center">
+      <div
+        ref={wheelContainerRef}
+        className="relative w-52 h-52 sm:w-64 sm:h-64 md:w-72 md:h-72 flex items-center justify-center touch-none"
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        onPointerCancel={handlePointerUp}
+        onPointerLeave={handlePointerUp}
+      >
         {/* PixiJS wheel decorations: orbital rings + connection lines */}
         <WordWheelPixiRing
           selectedIndices={builtLetters.map(bl => bl.wheelIndex)}

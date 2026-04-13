@@ -47,12 +47,12 @@ describe('useAdventureModeAdapter', () => {
     expect(result.current.showTimer).toBe(false);
   });
 
-  it('returns wheel mode state with centerLetterRequired=true', () => {
+  it('returns wheel mode state that plays as classic boggle (no center-letter rule)', () => {
     const config = makeLevelConfig({ archetype: 'wheel', centerLetter: 'A' });
     const { result } = renderHook(() => useAdventureModeAdapter(config));
     expect(result.current.archetype).toBe('wheel');
-    expect(result.current.centerLetterRequired).toBe(true);
-    expect(result.current.centerLetter).toBe('A');
+    expect(result.current.centerLetterRequired).toBe(false);
+    expect(result.current.centerLetter).toBe(null);
     expect(result.current.showTimer).toBe(true);
   });
 
