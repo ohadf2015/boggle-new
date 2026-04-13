@@ -42,10 +42,11 @@ const AdventureWheelGame: React.FC<Props> = ({ levelConfig, onLevelComplete, onE
     chapterNumber: getChapterNumber(levelConfig.level),
   });
   const totalTime = (levelConfig.timerSeconds || 120) + upgradeEffects.bonusTimeSeconds;
+  const [paused, setPaused] = useState(false);
   useAdventureMusic({
     worldNumber: levelConfig.world,
     isPlaying: true,
-    isPaused: false,
+    isPaused: paused,
     timeRemaining: totalTime,
     totalTime,
     enabled: true,
@@ -64,6 +65,14 @@ const AdventureWheelGame: React.FC<Props> = ({ levelConfig, onLevelComplete, onE
   const [effects, setEffects] = useState<WordWheelEffect[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ width: 400, height: 600 });
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setPaused(p => !p);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
 
   useEffect(() => {
     const measure = () => {
@@ -175,7 +184,17 @@ const AdventureWheelGame: React.FC<Props> = ({ levelConfig, onLevelComplete, onE
           onValidateWord={handleValidateWord}
           onEffect={handleEffect}
           language={language}
+          paused={paused}
         />
+        {paused && (
+          <div
+            className="absolute inset-0 z-30 bg-neo-navy/85 flex flex-col items-center justify-center gap-4"
+            onClick={() => setPaused(false)}
+          >
+            <div className="text-neo-white font-neo-display text-3xl">{t('common.pause')}</div>
+            <div className="text-neo-white/70 text-sm">{t('common.toResume')}</div>
+          </div>
+        )}
       </div>
     </div>
   );

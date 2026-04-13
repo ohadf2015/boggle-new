@@ -29,6 +29,7 @@ interface WordWheelGameProps {
   onValidateWord: (word: string) => Promise<boolean>;
   onEffect: (effect: WordWheelEffect) => void;
   language: string;
+  paused?: boolean;
 }
 
 // Rough avg points per word for "X words to pass" estimate
@@ -37,7 +38,7 @@ const AVG_POINTS_PER_WORD = 6;
 interface RivalScore { name: string; score: number }
 
 const WordWheelGame: React.FC<WordWheelGameProps> = ({
-  puzzle, duration, onComplete, onValidateWord, onEffect, language,
+  puzzle, duration, onComplete, onValidateWord, onEffect, language, paused = false,
 }) => {
   const { t } = useLanguage();
   const {
@@ -134,7 +135,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
 
   // Timer
   useEffect(() => {
-    if (gameOverRef.current) return;
+    if (gameOverRef.current || paused) return;
     const interval = setInterval(() => {
       setTimeLeft(prev => {
         if (prev <= 1) {
@@ -163,7 +164,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
       });
     }, 1000);
     return () => clearInterval(interval);
-  }, [duration, onComplete, onEffect, playEpicVictorySound, playCountdownBeep]);
+  }, [duration, onComplete, onEffect, playEpicVictorySound, playCountdownBeep, paused]);
 
   // ── Feedback toast ──
   const showFeedback = useCallback((message: string, type: 'success' | 'error') => {
