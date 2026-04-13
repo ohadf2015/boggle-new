@@ -1,4 +1,3 @@
-import { withFeedbackSDK } from '@feedback/sdk/next';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import createNextIntlPlugin from 'next-intl/plugin';
@@ -427,4 +426,4 @@ const sentryConfig = withSentryConfig(nextConfig, {
   },
 });
 
-export default withFeedbackSDK(withNextIntl);(withBundleAnalyzer(sentryConfig));
+export default withNextIntl(withBundleAnalyzer(sentryConfig));
