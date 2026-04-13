@@ -7,6 +7,9 @@ import { useProgressionActions, useProgressionData } from '@/contexts/Progressio
 import { useUpgradeEffects } from '@/hooks/useUpgradeEffects';
 import { useChapterQuests } from '@/hooks/useChapterQuests';
 import { getChapterNumber } from '@/lib/adventure/questConfig';
+import { useAdventureAchievements } from '@/hooks/useAdventureAchievements';
+import { showAchievementToast } from '@/components/achievements/AchievementToast';
+import { ADVENTURE_ACHIEVEMENTS } from '@/utils/adventureAchievementUtils';
 import type { LevelConfig } from '@/types/adventure';
 import type { Language } from '@/types';
 import WordWheelGame, { type WordWheelGameResult } from '@/components/daily/WordWheelGame';
@@ -37,6 +40,15 @@ const AdventureWheelGame: React.FC<Props> = ({ levelConfig, onLevelComplete, onE
     worldId: levelConfig.world,
     chapterNumber: getChapterNumber(levelConfig.level),
   });
+  const { earnAchievement, getCount } = useAdventureAchievements();
+  const handleEarnAchievement = useCallback((id: keyof typeof ADVENTURE_ACHIEVEMENTS) => {
+    const isNew = earnAchievement(id);
+    if (isNew) {
+      const count = getCount(id) + 1;
+      showAchievementToast({ achievement: ADVENTURE_ACHIEVEMENTS[id], count, isNew: count === 1 });
+    }
+    return isNew;
+  }, [earnAchievement, getCount]);
   const [effects, setEffects] = useState<WordWheelEffect[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ width: 400, height: 600 });
@@ -101,10 +113,19 @@ const AdventureWheelGame: React.FC<Props> = ({ levelConfig, onLevelComplete, onE
       chapterQuests.recordScoreChallenge(result.score);
       if (stars >= 3) chapterQuests.recordLevelPerfect();
       for (let i = 0; i < longWords; i++) chapterQuests.recordLongWord();
+
+      if (result.wordsFound.length > 0) handleEarnAchievement('FIRST_WORD');
+      if (result.wordsFound.some(w => w.length >= 6)) handleEarnAchievement('LONG_WORD_6');
+      if (result.wordsFound.some(w => w.length >= 8)) handleEarnAchievement('LONG_WORD_8');
+      if (stars >= 3) handleEarnAchievement('PERFECT_LEVEL');
+      const newTotalStars = (progression?.totalStars ?? 0) + stars;
+      if (newTotalStars >= 50) handleEarnAchievement('STAR_COLLECTOR_50');
+      if (newTotalStars >= 100) handleEarnAchievement('STAR_COLLECTOR_100');
     }
     onLevelComplete(stars, result.score, result.wordsFound.length, gold, longWords, result.wordsFound);
   }, [scoreTarget, onLevelComplete, completeLevel, levelConfig.world, levelConfig.level,
-      upgradeEffects.goldMultiplier, upgradeEffects.longWordGoldBonus, chapterQuests]);
+      upgradeEffects.goldMultiplier, upgradeEffects.longWordGoldBonus, chapterQuests,
+      handleEarnAchievement, progression?.totalStars]);
 
   return (
     <div className="relative h-full w-full bg-neo-navy flex flex-col">

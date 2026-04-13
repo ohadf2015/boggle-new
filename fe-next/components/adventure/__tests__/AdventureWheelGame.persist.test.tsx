@@ -25,6 +25,17 @@ vi.mock('@/lib/adventure/questConfig', () => ({
   getChapterNumber: () => 1,
 }));
 
+vi.mock('@/hooks/useAdventureAchievements', () => ({
+  useAdventureAchievements: () => ({
+    earnAchievement: vi.fn().mockReturnValue(false),
+    getCount: vi.fn().mockReturnValue(0),
+  }),
+}));
+
+vi.mock('@/components/achievements/AchievementToast', () => ({
+  showAchievementToast: vi.fn(),
+}));
+
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguageSafe: () => ({ t: (k: string) => k, language: 'en' }),
   useLanguage: () => ({ t: (k: string) => k, language: 'en' }),
