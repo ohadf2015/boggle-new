@@ -4993,6 +4993,7 @@ const en = {
     "watchAdRetry": "Watch Ad to Retry",
     "streakFreezeTooltip": "Streak Freeze — protects your streak if you miss a day",
     "streakFreezesAvailable": "{count} streak freezes available",
+    "watchAdForFreeze": "Watch ad → earn a streak freeze",
     "todayReward": "Today: {{coins}} coins",
     "tomorrowReward": "Tomorrow: {{coins}} coins",
     "nearMilestone": "{{days}} days to {{badge}} badge!",
@@ -6849,6 +6850,7 @@ const en = {
     },
     "bossRush": {
       "backToHub": "Back to Hub",
+      "watchAdToContinue": "Watch ad → continue rush",
       "bossOf": "Boss of",
       "defeated": "Defeated!",
       "fighting": "Fighting",
@@ -7026,6 +7028,7 @@ const en = {
       "tryAgain": "Try Again",
       "bonusTime": "Try with Bonus Time",
       "bonusTimeDesc": "+30 seconds to find words",
+      "watchAdForBonus": "Watch ad → bonus time",
       "startWithHint": "Start with a Hint",
       "startWithHintDesc": "Shows one word to get started",
       "yourProgress": "Your Progress",

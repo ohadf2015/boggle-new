@@ -17,6 +17,7 @@ import { Swords, Trophy, Clock, Star, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import { useInterstitialAd } from '@/hooks/useInterstitialAd';
+import { useRewardedAd } from '@/hooks/useRewardedAd';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { getBossConfig } from '@/lib/adventure/bossConfig';
@@ -59,6 +60,8 @@ const BossRushResults = memo<BossRushResultsProps>(({ state, onRetry, onExit }) 
 
   const { showInterstitial } = useInterstitialAd();
   const { submitLeaderboardScore } = useCrazyGames();
+  // R5 — rewarded continue on failure
+  const rewarded = useRewardedAd({ onRewardEarned: () => onRetry() });
 
   // Ads + leaderboard on mount
   useEffect(() => {
@@ -173,6 +176,27 @@ const BossRushResults = memo<BossRushResultsProps>(({ state, onRetry, onExit }) 
           <CrazyGamesBanner size="320x50" />
         </div>
         <NativeBannerAd />
+
+        {/* R5 — Rewarded continue on failure */}
+        {!isVictory && rewarded.canShowAd && !rewarded.isDailyLimitReached && (
+          <button
+            data-testid="rewarded-continue-btn"
+            onClick={() => rewarded.showAd()}
+            disabled={rewarded.status === 'loading' || rewarded.status === 'showing'}
+            className={cn(
+              'w-full mb-3 py-3 px-4',
+              'flex items-center justify-center gap-2',
+              'bg-neo-purple text-neo-white',
+              'font-black text-sm uppercase tracking-tight',
+              'border-3 border-neo-black rounded-neo shadow-hard',
+              'hover:-translate-y-0.5 transition-all',
+              'disabled:opacity-50 disabled:cursor-not-allowed'
+            )}
+          >
+            <Swords className="w-4 h-4" />
+            {t('adventure.bossRush.watchAdToContinue')}
+          </button>
+        )}
 
         {/* Action buttons */}
         <div className="flex gap-3">

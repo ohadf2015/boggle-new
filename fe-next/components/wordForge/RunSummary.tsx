@@ -6,6 +6,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { calculateRunXp, XP_THRESHOLDS } from '@/lib/wordForge/scoring';
+import WatchAdButton from '@/components/daily/WatchAdButton';
 
 interface RunSummaryProps {
   state: WordForgeRunState;
@@ -87,6 +88,11 @@ export function RunSummary({ state, onPlayAgain, onExit }: RunSummaryProps): Rea
           </div>
         </div>
       )}
+
+      {/* R3 — Rewarded gold top-up */}
+      <div className="w-full max-w-sm">
+        <WatchAdButton onCoinsEarned={() => {}} t={t} />
+      </div>
 
       {/* Actions */}
       <div className="flex gap-3">

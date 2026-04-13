@@ -4894,6 +4894,7 @@ const sv = {
     "watchAdRetry": "Se reklam för att försöka igen",
     "streakFreezeTooltip": "Svitfrys — skyddar din svit om du missar en dag",
     "streakFreezesAvailable": "{count} svitfrysar tillgängliga",
+    "watchAdForFreeze": "Se reklam → få en svitfrys",
     "todayReward": "Idag: {{coins}} mynt",
     "tomorrowReward": "Imorgon: {{coins}} mynt",
     "nearMilestone": "{{days}} dagar till {{badge}}-märke!",
@@ -6532,6 +6533,7 @@ const sv = {
     },
     "bossRush": {
       "backToHub": "Tillbaka till hubben",
+      "watchAdToContinue": "Se reklam → fortsätt",
       "bossOf": "Boss av",
       "defeated": "Besegrad!",
       "fighting": "Strider",
@@ -6934,6 +6936,7 @@ const sv = {
       "tryAgain": "Försök igen",
       "bonusTime": "Försök med bonustid",
       "bonusTimeDesc": "+30 sekunder att hitta ord",
+      "watchAdForBonus": "Se reklam → bonustid",
       "startWithHint": "Börja med ett tips",
       "startWithHintDesc": "Visar ett ord för att komma igång",
       "yourProgress": "Dina framsteg",

@@ -169,15 +169,15 @@ describe('HostPreGameView Game Mode Selection', () => {
 
     // Game mode cards should be visible immediately (no collapse)
     const gameModeButtons = screen.getAllByTestId(/^game-mode-/);
-    expect(gameModeButtons.length).toBeGreaterThanOrEqual(4); // random, classic, blast, word-hunt (×2 for mobile+desktop)
+    expect(gameModeButtons.length).toBeGreaterThanOrEqual(3); // random, classic, word-hunt (×2 for mobile+desktop)
   });
 
 
   it('game mode buttons are clickable', () => {
     render(<HostPreGameView {...defaultProps} />);
 
-    const blastButtons = screen.getAllByTestId('game-mode-blast');
-    fireEvent.click(blastButtons[0]);
+    const wordHuntButtons = screen.getAllByTestId('game-mode-word-hunt');
+    fireEvent.click(wordHuntButtons[0]);
 
     // Should not throw — mode selection is handled via state
   });

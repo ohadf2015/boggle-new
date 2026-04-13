@@ -3,6 +3,8 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { markModePlayedLogic } from '@/hooks/useDailyModeQuest';
 import { motion, AnimatePresence } from 'framer-motion';
+import WatchAdButton from './WatchAdButton';
+import CrazyGamesBanner from '@/components/CrazyGamesBanner';
 import { Share2, Flame, BookOpen, ArrowLeft, Copy, Check, Image as ImageIcon, ChevronDown, ChevronUp } from 'lucide-react';
 import { useDailyConfetti } from './results/useDailyConfetti';
 import { Loader } from '@/components/ui/Loader';
@@ -242,11 +244,14 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
 
         {/* Daily Reward Claim */}
         {isNewCompletion && streak && (
-          <DailyRewardClaim
-            coinsEarned={getRewardCoins(streak.currentStreak)}
-            currentStreakDay={streak.currentStreak}
-            t={t}
-          />
+          <>
+            <DailyRewardClaim
+              coinsEarned={getRewardCoins(streak.currentStreak)}
+              currentStreakDay={streak.currentStreak}
+              t={t}
+            />
+            <WatchAdButton onCoinsEarned={() => {}} t={t} />
+          </>
         )}
 
         {/* Share Section - Streamlined */}
@@ -437,6 +442,14 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
       </div>{/* end right column */}
 
       </div>{/* end lg:grid */}
+
+      {/* CrazyGames banner — 728x90 desktop, 320x50 mobile */}
+      <div className="hidden md:flex justify-center py-2">
+        <CrazyGamesBanner size="728x90" />
+      </div>
+      <div className="flex justify-center py-2 md:hidden">
+        <CrazyGamesBanner size="320x50" />
+      </div>
       </div>{/* end outer width wrapper */}
 
       {/* Share panel for browsers without native share */}

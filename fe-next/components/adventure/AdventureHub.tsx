@@ -9,8 +9,10 @@
 'use client';
 
 import { memo, useMemo } from 'react';
+import dynamic from 'next/dynamic';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import Image from 'next/image';
+const CrazyGamesBanner = dynamic(() => import('@/components/CrazyGamesBanner'), { ssr: false });
 import { Flame, ChevronRight, Map, Swords, Target, Check, Coins, Star, BookOpen, ShoppingBag, Home, Crown, Zap, Infinity as InfinityIcon, Gem, Trophy } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
@@ -536,6 +538,10 @@ const AdventureHub = memo<AdventureHubProps>(({
           )}
         </AdaptiveMotion.div>
 
+        </div>
+        {/* B6 — CrazyGames Adventure Hub banner */}
+        <div className="w-full flex justify-center mt-4 mb-2">
+          <CrazyGamesBanner responsive />
         </div>
       </div>
     </div>

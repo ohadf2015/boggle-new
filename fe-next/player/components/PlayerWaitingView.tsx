@@ -1,7 +1,9 @@
 'use client';
 
 import React, { memo, useState, useCallback, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import { motion, AnimatePresence } from 'framer-motion';
+const CrazyGamesBanner = dynamic(() => import('@/components/CrazyGamesBanner'), { ssr: false });
 import { Users, Crown, Bot, LogOut, Plus, Check, Pencil, X, Camera, Zap, Crosshair, Grid3X3, Lightbulb, ChevronLeft, ChevronRight } from 'lucide-react';
 import Avatar from '../../components/Avatar';
 import AvatarBuilderModal from '../../components/avatar/AvatarBuilderModal';
@@ -507,6 +509,11 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
           {renderMobileContent()}
         </div>
       </main>
+
+      {/* B4 — CrazyGames waiting-room banner */}
+      <div className="w-full flex justify-center py-2">
+        <CrazyGamesBanner size="320x50" />
+      </div>
 
       {/* Avatar Builder Modal */}
       <AvatarBuilderModal

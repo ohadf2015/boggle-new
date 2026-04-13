@@ -65,6 +65,9 @@ vi.mock('@/contexts/AuthContext', () => ({
 vi.mock('@/contexts/CoinContext', () => ({
   useCoinContext: () => ({
     awardGameCompletion: vi.fn().mockResolvedValue(null),
+    awardWatchedAd: vi.fn(),
+    rewards: { WATCH_AD: 30 },
+    coins: 0,
   }),
 }));
 
@@ -136,6 +139,11 @@ vi.mock('framer-motion', () => ({
 }));
 
 // Mock RewardedAdGoldButton (uses ThemeProvider)
+vi.mock('../results/components/SinglePlayerGoldTopUp', () => ({
+  __esModule: true,
+  default: () => null,
+}));
+
 vi.mock('@/components/ads/RewardedAdGoldButton', () => ({
   __esModule: true,
   default: () => null,

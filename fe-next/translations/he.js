@@ -4905,6 +4905,7 @@ const he = {
     "watchAdRetry": "צפו בפרסומת כדי לנסות שוב",
     "streakFreezeTooltip": "הקפאת רצף — מגנה על הרצף שלך אם תפספס יום",
     "streakFreezesAvailable": "{count} הקפאות רצף זמינות",
+    "watchAdForFreeze": "צפו בפרסומת ← קבלו הקפאת רצף",
     "todayReward": "היום: {{coins}} מטבעות",
     "tomorrowReward": "מחר: {{coins}} מטבעות",
     "nearMilestone": "{{days}} ימים לתג {{badge}}!",
@@ -6599,6 +6600,7 @@ const he = {
     },
     "bossRush": {
       "backToHub": "חזרה למרכז",
+      "watchAdToContinue": "צפו בפרסומת ← המשך",
       "bossOf": "הבוס של",
       "defeated": "הובס!",
       "fighting": "נלחם",
@@ -6959,6 +6961,7 @@ const he = {
       "tryAgain": "נסו שוב",
       "bonusTime": "נסו עם זמן בונוס",
       "bonusTimeDesc": "+30 שניות למצוא מילים",
+      "watchAdForBonus": "צפו בפרסומת ← זמן בונוס",
       "startWithHint": "התחילו עם רמז",
       "startWithHintDesc": "מציג מילה אחת להתחלה",
       "yourProgress": "ההתקדמות שלכם",

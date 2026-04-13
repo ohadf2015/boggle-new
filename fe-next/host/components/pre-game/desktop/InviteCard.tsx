@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { QRCodeSVG } from 'qrcode.react';
 import { Copy, Check, Share2, Maximize2, X } from 'lucide-react';
@@ -31,6 +32,8 @@ export function InviteCard({
 }: InviteCardProps): React.ReactElement {
   const [linkCopied, setLinkCopied] = useState(false);
   const [qrExpanded, setQrExpanded] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
   const joinUrl = getJoinUrl(gameCode);
 
   const handleCopyLink = useCallback(async () => {
@@ -58,6 +61,78 @@ export function InviteCard({
       }
     }
   }, [gameCode, joinUrl, t, handleCopyLink]);
+
+  const qrModal = (
+    <AnimatePresence>
+      {qrExpanded && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-[9999] flex items-center justify-center bg-neo-black/80"
+          onClick={() => setQrExpanded(false)}
+        >
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.8, opacity: 0 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+            className="relative bg-neo-navy border-4 border-neo-black rounded-neo-lg shadow-hard-xl p-6 max-w-xs"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setQrExpanded(false)}
+              className="absolute top-2 end-2 w-8 h-8 flex items-center justify-center bg-neo-red border-2 border-neo-black rounded-neo shadow-hard-sm"
+              aria-label={t('hostView.close')}
+            >
+              <X className="w-4 h-4 text-neo-black" />
+            </button>
+            <div className="flex flex-col items-center gap-5">
+              <h3 className="text-sm font-bold uppercase tracking-widest text-neo-cream/60">
+                {t('hostView.scanToJoin')}
+              </h3>
+              <div className="p-4 bg-white rounded-neo border-4 border-neo-black shadow-hard-lg">
+                <QRCodeSVG
+                  value={joinUrl}
+                  size={250}
+                  level="H"
+                  bgColor="#ffffff"
+                  fgColor="#000000"
+                  title={t('share.qrCodeAlt', { code: gameCode })}
+                />
+              </div>
+              <p className="text-3xl font-black tracking-[0.2em] text-neo-lime font-neo-display animate-pulse-code">
+                {gameCode}
+              </p>
+              <div className="flex items-center gap-3 w-full">
+                <motion.button
+                  onClick={handleCopyLink}
+                  whileTap={{ scale: 0.95 }}
+                  className={cn(
+                    'flex-1 h-11 flex items-center justify-center gap-2 rounded-lg border-2 border-neo-black text-xs font-bold uppercase tracking-widest transition-all',
+                    linkCopied
+                      ? 'bg-neo-lime text-neo-black'
+                      : 'bg-neo-navy-light text-neo-cream hover:bg-white/10 shadow-hard'
+                  )}
+                >
+                  {linkCopied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                  <span>{linkCopied ? t('roomCode.copied') : t('roomCode.copyLink')}</span>
+                </motion.button>
+                <motion.button
+                  onClick={() => setQrExpanded(false)}
+                  whileTap={{ scale: 0.95 }}
+                  className="flex-1 h-11 flex items-center justify-center gap-2 rounded-lg border-3 border-neo-black bg-neo-lime text-neo-black text-sm font-black uppercase tracking-wider shadow-hard-lg active:translate-y-0.5 active:shadow-hard-pressed transition-all"
+                >
+                  <Maximize2 className="w-4 h-4" />
+                  <span>{t('hostView.letsGo')}</span>
+                </motion.button>
+              </div>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
 
   // Invite card with "BRING YOUR SQUAD" header and prominent QR
   return (
@@ -130,78 +205,7 @@ export function InviteCard({
         </div>
       </div>
 
-      {/* Expanded QR Modal */}
-      <AnimatePresence>
-        {qrExpanded && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-90 flex items-center justify-center bg-neo-black/80"
-            onClick={() => setQrExpanded(false)}
-          >
-            <motion.div
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.8, opacity: 0 }}
-              transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-              className="relative bg-neo-navy border-4 border-neo-black rounded-neo-lg shadow-hard-xl p-6 max-w-xs"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <button
-                onClick={() => setQrExpanded(false)}
-                className="absolute top-2 end-2 w-8 h-8 flex items-center justify-center bg-neo-red border-2 border-neo-black rounded-neo shadow-hard-sm"
-                aria-label={t('hostView.close')}
-              >
-                <X className="w-4 h-4 text-neo-black" />
-              </button>
-
-              <div className="flex flex-col items-center gap-5">
-                <h3 className="text-sm font-bold uppercase tracking-widest text-neo-cream/60">
-                  {t('hostView.scanToJoin')}
-                </h3>
-                <div className="p-4 bg-white rounded-neo border-4 border-neo-black shadow-hard-lg">
-                  <QRCodeSVG
-                    value={joinUrl}
-                    size={250}
-                    level="H"
-                    includeMargin={false}
-                    bgColor="#ffffff"
-                    fgColor="#000000"
-                    title={t('share.qrCodeAlt', { code: gameCode })}
-                  />
-                </div>
-                <p className="text-3xl font-black tracking-[0.2em] text-neo-lime font-neo-display animate-pulse-code">
-                  {gameCode}
-                </p>
-                <div className="flex items-center gap-3 w-full">
-                  <motion.button
-                    onClick={handleCopyLink}
-                    whileTap={{ scale: 0.95 }}
-                    className={cn(
-                      'flex-1 h-11 flex items-center justify-center gap-2 rounded-lg border-2 border-neo-black text-xs font-bold uppercase tracking-widest transition-all',
-                      linkCopied
-                        ? 'bg-neo-lime text-neo-black'
-                        : 'bg-neo-navy-light text-neo-cream hover:bg-white/10 shadow-hard'
-                    )}
-                  >
-                    {linkCopied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                    <span>{linkCopied ? t('roomCode.copied') : t('roomCode.copyLink')}</span>
-                  </motion.button>
-                  <motion.button
-                    onClick={() => setQrExpanded(false)}
-                    whileTap={{ scale: 0.95 }}
-                    className="flex-1 h-11 flex items-center justify-center gap-2 rounded-lg border-3 border-neo-black bg-neo-lime text-neo-black text-sm font-black uppercase tracking-wider shadow-hard-lg active:translate-y-0.5 active:shadow-hard-pressed transition-all"
-                  >
-                    <Maximize2 className="w-4 h-4" />
-                    <span>{t('hostView.letsGo')}</span>
-                  </motion.button>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {mounted ? createPortal(qrModal, document.body) : null}
     </>
   );
 }

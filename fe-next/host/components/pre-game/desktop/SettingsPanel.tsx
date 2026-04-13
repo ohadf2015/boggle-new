@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Check, Monitor, Shuffle, FileText, Bomb, Target } from 'lucide-react';
+import { Check, Monitor, Shuffle, FileText, Target } from 'lucide-react';
 import { cn } from '../../../../lib/utils';
 import type { GameModeOption } from '@/components/GameModeSelector';
 
@@ -43,13 +43,6 @@ const MODE_CONFIG: {
     nameKey: 'gameModes.classic.name',
     descKey: 'gameModes.classic.description',
     colors: { bg: 'bg-neo-cyan/20', border: 'border-neo-cyan', text: 'text-neo-cyan' },
-  },
-  {
-    mode: 'blast',
-    icon: Bomb,
-    nameKey: 'gameModes.blast.name',
-    descKey: 'gameModes.blast.description',
-    colors: { bg: 'bg-neo-orange/20', border: 'border-neo-orange', text: 'text-neo-orange' },
   },
   {
     mode: 'word-hunt',

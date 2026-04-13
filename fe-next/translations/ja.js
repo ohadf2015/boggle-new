@@ -4946,6 +4946,7 @@ const ja = {
     "watchAdRetry": "広告を見てリトライ",
     "streakFreezeTooltip": "ストリークフリーズ — 1日休んでもストリークを守ります",
     "streakFreezesAvailable": "ストリークフリーズ{count}個利用可能",
+    "watchAdForFreeze": "広告を見てストリークフリーズを獲得",
     "todayReward": "今日: {{coins}}コイン",
     "tomorrowReward": "明日: {{coins}}コイン",
     "nearMilestone": "{{badge}}バッジまであと{{days}}日！",
@@ -6584,6 +6585,7 @@ const ja = {
     },
     "bossRush": {
       "backToHub": "ハブに戻る",
+      "watchAdToContinue": "広告を見て続行",
       "bossOf": "のボス",
       "defeated": "撃破！",
       "fighting": "戦闘中",
@@ -6985,6 +6987,7 @@ const ja = {
       "tryAgain": "もう一度",
       "bonusTime": "ボーナスタイム付きで挑戦",
       "bonusTimeDesc": "+30秒で言葉を探す",
+      "watchAdForBonus": "広告を見て ボーナスタイム",
       "startWithHint": "ヒント付きでスタート",
       "startWithHintDesc": "最初の言葉を表示",
       "yourProgress": "あなたの進捗",

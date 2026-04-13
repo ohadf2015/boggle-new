@@ -12,6 +12,7 @@ import WordFeedbackModal from '@/components/voting/WordFeedbackModal';
 import UnfinishedBoardTeaser from '@/components/results/UnfinishedBoardTeaser';
 import BonusBadgesRow from '@/components/results/BonusBadgesRow';
 import CoinRewardDisplay from '@/components/results/CoinRewardDisplay';
+import SinglePlayerGoldTopUp from './results/components/SinglePlayerGoldTopUp';
 
 import NextStepPrompt, { type NextStepMode } from '@/components/results/NextStepPrompt';
 import AutoPlayCountdown from '@/components/results/AutoPlayCountdown';
@@ -370,6 +371,8 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
               <div className="space-y-4">
                 {statsBlock}
                 <CoinRewardDisplay reward={coinReward} variant="compact" mode={isAuthenticated ? 'earned' : 'teasing'} />
+                {/* R7 — Rewarded gold top-up */}
+                <SinglePlayerGoldTopUp t={t} />
                 {!showShareImmediate && shareBlock}
                 {achievementsBlock}
                 {globalRank && <GlobalRankBadge rank={globalRank} label={t('leaderboard.globalRank')} />}
@@ -387,6 +390,8 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
             {showShareImmediate && <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>{shareBlock}</motion.div>}
             <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>{leaderboardBlock}</motion.div>
             <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>{statsBlock}</motion.div>
+            {/* R7 — Rewarded gold top-up */}
+            <SinglePlayerGoldTopUp t={t} />
             {!showShareImmediate && <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}>{shareBlock}</motion.div>}
             <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>{achievementsBlock}</motion.div>
             {globalRank && <GlobalRankBadge rank={globalRank} label={t('leaderboard.globalRank')} />}

@@ -61,7 +61,8 @@ const TvResultsControls = memo<TvResultsControlsProps>(({
     return () => { if (interval) clearInterval(interval); };
   }, [visible]);
   const gateLocked = secondsLeft > 0;
-  const continueDisabled = gateLocked || (totalPlayers > 0 && !allReady);
+  // Unlock when EITHER all players ready OR 15s elapsed.
+  const continueDisabled = gateLocked && !(totalPlayers > 0 && allReady);
 
   return (
     <AnimatePresence>

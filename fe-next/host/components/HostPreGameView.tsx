@@ -345,7 +345,22 @@ function HostPreGameView({
 
       {/* Header */}
       <header className="shrink-0 px-3 py-2 bg-neo-navy/95 border-b-3 border-neo-black sticky top-0 z-20">
-        <div className="flex items-center justify-end gap-2">
+        <div className="flex items-center justify-between gap-2">
+          {/* Game language chip — prominent so hosts see the board language before starting */}
+          <div
+            data-testid="lobby-language-chip"
+            className="flex items-center gap-2 px-3 py-1.5 rounded-neo border-2 border-neo-lime/70 bg-neo-navy-light shadow-hard-sm"
+            aria-label={t('joinView.selectLanguage')}
+          >
+            <span className="text-base leading-none" aria-hidden>
+              {({ en: '🇺🇸', he: '🇮🇱', sv: '🇸🇪', ja: '🇯🇵', es: '🇪🇸' } as Record<Language, string>)[roomLanguage]}
+            </span>
+            <span className="text-[10px] font-bold uppercase tracking-widest text-neo-lime">
+              {t(`joinView.${
+                ({ en: 'english', he: 'hebrew', sv: 'swedish', ja: 'japanese', es: 'spanish' } as Record<Language, string>)[roomLanguage]
+              }`)}
+            </span>
+          </div>
           <div className="flex items-center gap-2 shrink-0">
             <div className="lg:hidden">
               <MobileShareSection gameCode={gameCode} t={t} showHint={actualPlayerCount === 0} compact />

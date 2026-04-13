@@ -13,6 +13,7 @@ import { RotateCcw, Clock, Lightbulb, LogOut, Target } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
+import { useRewardedAd } from '@/hooks/useRewardedAd';
 import type { NearMissMessage } from '@/lib/adventure/nearMiss';
 
 // ==============================================
@@ -96,6 +97,9 @@ const RetryAssistModal = memo<RetryAssistModalProps>(
     const { t } = useLanguage();
     const dialogRef = useRef<HTMLDivElement>(null);
     useFocusTrap(dialogRef, isOpen, onExit);
+
+    // R4 — rewarded ad grants bonus-time retry without failure threshold
+    const rewarded = useRewardedAd({ onRewardEarned: () => onRetryWithBonus() });
 
     // Determine which assists are unlocked
     const showBonusTime = consecutiveFailures >= BONUS_TIME_THRESHOLD;
@@ -221,6 +225,27 @@ const RetryAssistModal = memo<RetryAssistModalProps>(
 
               {/* Action Buttons */}
               <div className="p-4 space-y-3">
+                {/* R4 — Rewarded retry (bonus time via ad) */}
+                {rewarded.canShowAd && !rewarded.isDailyLimitReached && (
+                  <button
+                    data-testid="rewarded-retry-btn"
+                    onClick={() => rewarded.showAd()}
+                    disabled={rewarded.status === 'loading' || rewarded.status === 'showing'}
+                    className={cn(
+                      'w-full py-3 px-4',
+                      'flex items-center justify-center gap-2',
+                      'bg-neo-purple text-neo-white',
+                      'font-black text-sm uppercase',
+                      'border-3 border-neo-black rounded-neo',
+                      'shadow-hard hover:-translate-y-0.5 transition-all',
+                      'disabled:opacity-50 disabled:cursor-not-allowed'
+                    )}
+                  >
+                    <Clock className="w-4 h-4" />
+                    {t('adventure.retry.watchAdForBonus')}
+                  </button>
+                )}
+
                 {/* Try Again - Always visible */}
                 <button
                   onClick={onRetry}

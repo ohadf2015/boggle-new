@@ -220,21 +220,21 @@ describe('RetryAssistModal', () => {
       render(<RetryAssistModal {...defaultProps} consecutiveFailures={1} />);
 
       const buttons = screen.getAllByRole('button');
-      expect(buttons).toHaveLength(2); // Try Again, Exit
+      expect(buttons).toHaveLength(3); // Rewarded, Try Again, Exit
     });
 
     it('should show Try Again, Bonus Time, and Exit after 2 failures', () => {
       render(<RetryAssistModal {...defaultProps} consecutiveFailures={2} />);
 
       const buttons = screen.getAllByRole('button');
-      expect(buttons).toHaveLength(3); // Try Again, Bonus Time, Exit
+      expect(buttons).toHaveLength(4); // Rewarded, Try Again, Bonus Time, Exit
     });
 
     it('should show all options after 3+ failures', () => {
       render(<RetryAssistModal {...defaultProps} consecutiveFailures={3} />);
 
       const buttons = screen.getAllByRole('button');
-      expect(buttons).toHaveLength(4); // Try Again, Bonus Time, Hint, Exit
+      expect(buttons).toHaveLength(5); // Rewarded, Try Again, Bonus Time, Hint, Exit
     });
   });
 

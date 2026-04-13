@@ -138,14 +138,14 @@ describe('computeUpgradeEffects', () => {
 
   // ── Fuel Tank ──
   describe('fuelTank', () => {
-    it('T1 gives 10 bonus seconds', () => {
+    it('T1 gives 8 bonus seconds', () => {
       const effects = computeUpgradeEffects({ fuelTank: 1 });
-      expect(effects.bonusTimeSeconds).toBe(10);
+      expect(effects.bonusTimeSeconds).toBe(8);
     });
 
-    it('T4 gives 40 bonus seconds', () => {
+    it('T4 gives 25 bonus seconds', () => {
       const effects = computeUpgradeEffects({ fuelTank: 4 });
-      expect(effects.bonusTimeSeconds).toBe(40);
+      expect(effects.bonusTimeSeconds).toBe(25);
     });
   });
 
@@ -241,7 +241,7 @@ describe('computeUpgradeEffects', () => {
         wordDynamite: 3,
         timeFreeze: 2,
       });
-      expect(effects.bonusTimeSeconds).toBe(40);
+      expect(effects.bonusTimeSeconds).toBe(25);
       expect(effects.freeStartHint).toBe(true);
       expect(effects.scrambleImmunity).toBe(true);
       expect(effects.canDetonateWords).toBe(true);

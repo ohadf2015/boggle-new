@@ -15,6 +15,7 @@ import { useTopPlayers } from '@/hooks/useTopPlayers';
 import { trackModeSelected } from '@/utils/growthTracking';
 import { useLandingStats } from '@/hooks/useLandingStats';
 import { AdPlaceholder } from '@/components/ads';
+const CrazyGamesBanner = dynamic(() => import('@/components/CrazyGamesBanner'), { ssr: false });
 import { hasCompletedOnboarding, markOnboardingComplete } from '@/utils/onboardingStorage';
 import { LandingSEOSection, ScrollIndicator } from './LandingSEOSection';
 import { LandingHero } from './LandingHero';
@@ -279,6 +280,8 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
       {!isMobilePortrait && (
         <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <AdPlaceholder zone="menu" className="my-4" />
+          {/* B2 — CrazyGames home banner */}
+          <CrazyGamesBanner size="728x90" className="my-4" />
         </div>
       )}
 

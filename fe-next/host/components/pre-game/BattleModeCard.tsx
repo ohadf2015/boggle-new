@@ -2,7 +2,7 @@
 
 import React, { useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Shuffle, FileText, Bomb, Target, Check } from 'lucide-react';
+import { Shuffle, FileText, Target, Check } from 'lucide-react';
 import { cn } from '../../../lib/utils';
 import type { GameModeOption } from '@/components/GameModeSelector';
 
@@ -58,19 +58,6 @@ const MODES: ModeVisualConfig[] = [
     accentBg: 'bg-neo-cyan',
     activeText: 'text-neo-cyan',
     activeBg: 'bg-neo-cyan',
-  },
-  {
-    mode: 'blast',
-    icon: <Bomb className="w-4 h-4" />,
-    largeIcon: <Bomb className="w-7 h-7" />,
-    nameKey: 'gameModes.blast.name',
-    descKey: 'gameModes.blast.description',
-    featureKeys: ['gameModes.blast.feature1', 'gameModes.blast.feature2', 'gameModes.blast.feature3'],
-    accentColor: 'bg-neo-orange',
-    accentBorder: 'border-l-neo-orange',
-    accentBg: 'bg-neo-orange',
-    activeText: 'text-neo-orange',
-    activeBg: 'bg-neo-orange',
   },
   {
     mode: 'word-hunt',

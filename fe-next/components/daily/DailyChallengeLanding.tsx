@@ -15,6 +15,7 @@ import type { Language } from '@/types';
 import { ScoreGauntletBanner } from './ScoreGauntletBanner';
 import { DailyRewardPreview } from './DailyRewardPreview';
 import { StreakFreezeIndicator } from './StreakFreezeIndicator';
+import WatchAdForFreezeButton from './WatchAdForFreezeButton';
 import { DailyMissionsHeader } from './landing/DailyMissionsHeader';
 import { QuestCard } from './landing/QuestCard';
 import { StreakCounter } from './landing/StreakCounter';
@@ -333,6 +334,11 @@ export function DailyChallengeLanding({
       {/* Streak counter + freeze */}
       <StreakCounter streak={streak} />
       <StreakFreezeIndicator freezeCount={freezeCount} t={t} />
+      {streak > 0 && (
+        <div className="flex justify-center mt-2">
+          <WatchAdForFreezeButton t={t} />
+        </div>
+      )}
       <DailyRewardPreview currentStreakDay={streak} t={t} />
 
       {/* Leaderboard Teaser */}

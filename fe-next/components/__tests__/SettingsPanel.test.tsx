@@ -42,12 +42,11 @@ describe('SettingsPanel', () => {
     expect(screen.getByTestId('settings-panel')).toBeInTheDocument();
   });
 
-  it('should render all four game mode options', () => {
+  it('should render all three game mode options', () => {
     render(<SettingsPanel {...defaultProps} />);
 
     expect(screen.getByTestId('game-mode-random')).toBeInTheDocument();
     expect(screen.getByTestId('game-mode-classic')).toBeInTheDocument();
-    expect(screen.getByTestId('game-mode-blast')).toBeInTheDocument();
     expect(screen.getByTestId('game-mode-word-hunt')).toBeInTheDocument();
   });
 
@@ -61,8 +60,8 @@ describe('SettingsPanel', () => {
   it('should call onGameModeClick when a mode is clicked', () => {
     render(<SettingsPanel {...defaultProps} />);
 
-    fireEvent.click(screen.getByTestId('game-mode-blast'));
-    expect(mockOnGameModeClick).toHaveBeenCalledWith('blast');
+    fireEvent.click(screen.getByTestId('game-mode-word-hunt'));
+    expect(mockOnGameModeClick).toHaveBeenCalledWith('word-hunt');
   });
 
   it('should render TV mode toggle', () => {

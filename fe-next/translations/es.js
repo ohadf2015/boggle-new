@@ -4931,6 +4931,7 @@ const es = {
     "watchAdRetry": "Ver anuncio para reintentar",
     "streakFreezeTooltip": "Congelación de racha — protege tu racha si te saltas un día",
     "streakFreezesAvailable": "{count} congelaciones de racha disponibles",
+    "watchAdForFreeze": "Ver anuncio → gana una congelación",
     "todayReward": "Hoy: {{coins}} monedas",
     "tomorrowReward": "Mañana: {{coins}} monedas",
     "nearMilestone": "¡{{days}} días para la insignia {{badge}}!",
@@ -6505,6 +6506,7 @@ const es = {
     },
     "bossRush": {
       "backToHub": "Volver al centro",
+      "watchAdToContinue": "Ver anuncio → continuar",
       "bossOf": "Jefe de",
       "defeated": "¡Derrotado!",
       "fighting": "Luchando",
@@ -7288,6 +7290,7 @@ const es = {
       "tryAgain": "Intentar de nuevo",
       "bonusTime": "Intentar con tiempo extra",
       "bonusTimeDesc": "+30 segundos para encontrar palabras",
+      "watchAdForBonus": "Ver anuncio → tiempo extra",
       "startWithHint": "Empezar con una pista",
       "startWithHintDesc": "Muestra una palabra para empezar",
       "yourProgress": "Tu progreso",
