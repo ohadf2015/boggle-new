@@ -3,7 +3,7 @@
  * Centralized type definitions for game state management
  */
 
-import type { LetterGrid, Language, GameMode, BlastModeState as SharedBlastModeState, WordHuntModeState as SharedWordHuntModeState } from '@/shared/types/game';
+import type { LetterGrid, Language, GameMode, BlastModeState as SharedBlastModeState, WordHuntModeState as SharedWordHuntModeState, WheelRushModeState as SharedWheelRushModeState } from '@/shared/types/game';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 
 // Redis client interface
@@ -60,6 +60,7 @@ export interface PlayerAchievement {
 // Re-export shared types for backward compatibility
 export type BlastModeState = SharedBlastModeState;
 export type WordHuntState = SharedWordHuntModeState;
+export type WheelRushState = SharedWheelRushModeState;
 
 // Game state interface
 export interface GameState {
@@ -120,6 +121,7 @@ export interface GameState {
   modeHistory?: GameMode[];
   blastModeState?: BlastModeState | null;
   wordHuntState?: WordHuntState | null;
+  wheelRushState?: WheelRushState | null;
   kickedPlayers?: Set<string>;
   /** O(1) duplicate-word lookup set, parallel to playerWords (not persisted to Redis) */
   playerWordsSet?: Record<string, Set<string>>;

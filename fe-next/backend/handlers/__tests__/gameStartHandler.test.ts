@@ -632,7 +632,7 @@ describe('registerStartGameHandler', () => {
       );
     });
 
-    it('clamps timerSeconds between 30 and 120', async () => {
+    it('clamps timerSeconds between 30 and 600', async () => {
       const { socket, handlers } = createMockSocket('socket-host');
       registerStartGameHandler(mockIo, socket);
 
@@ -642,7 +642,7 @@ describe('registerStartGameHandler', () => {
         mockIo,
         'room:GAME1',
         'startGame',
-        expect.objectContaining({ timerSeconds: 120 })
+        expect.objectContaining({ timerSeconds: 600 })
       );
     });
 

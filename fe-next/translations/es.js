@@ -9368,6 +9368,13 @@ const es = {
       "feature2": "Carrera de velocidad",
       "feature3": "Pistas"
     },
+    "wheelRush": {
+      "name": "Rueda Veloz",
+      "description": "¡Corre la rueda — roba palabras para ganar!",
+      "feature1": "Ventana de bloqueo",
+      "feature2": "Niebla de guerra",
+      "feature3": "Bonus pangrama"
+    },
     "random": "Aleatorio",
     "randomDescription": "¡Sorpréndeme! Modo aleatorio en cada ronda.",
     "randomFeature1": "Variedad",

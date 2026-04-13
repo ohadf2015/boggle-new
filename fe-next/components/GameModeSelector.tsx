@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Shuffle, FileText, Bomb, Target } from 'lucide-react';
+import { Shuffle, FileText, Bomb, Target, CircleDot } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { GameMode } from '@/shared/types/game';
 
@@ -26,6 +26,7 @@ export const MODE_ICONS: Record<GameModeOption, React.ReactNode> = {
   classic: <FileText className="w-4 h-4" />,
   blast: <Bomb className="w-4 h-4" />,
   'word-hunt': <Target className="w-4 h-4" />,
+  'wheel-rush': <CircleDot className="w-4 h-4" />,
 };
 
 export const MODE_ACTIVE_COLORS: Record<GameModeOption, string> = {
@@ -33,6 +34,7 @@ export const MODE_ACTIVE_COLORS: Record<GameModeOption, string> = {
   classic: 'bg-neo-cyan/30 text-neo-cyan border-neo-cyan/60',
   blast: 'bg-neo-orange/30 text-neo-orange border-neo-orange/60',
   'word-hunt': 'bg-neo-pink/30 text-neo-pink border-neo-pink/60',
+  'wheel-rush': 'bg-neo-lime/30 text-neo-lime border-neo-lime/60',
 };
 
 const MODE_GLOW: Record<GameModeOption, string> = {
@@ -40,6 +42,7 @@ const MODE_GLOW: Record<GameModeOption, string> = {
   classic: 'shadow-[0_0_10px_rgba(0,255,255,0.25)]',
   blast: 'shadow-[0_0_10px_rgba(255,107,53,0.25)]',
   'word-hunt': 'shadow-[0_0_10px_rgba(255,20,147,0.25)]',
+  'wheel-rush': 'shadow-[0_0_10px_rgba(191,255,0,0.25)]',
 };
 
 export function getModeLabel(mode: GameModeOption, t: GameModeSelectorProps['t']): string {
@@ -48,6 +51,7 @@ export function getModeLabel(mode: GameModeOption, t: GameModeSelectorProps['t']
     classic: t('gameModes.classic.name'),
     blast: t('gameModes.blast.name'),
     'word-hunt': t('gameModes.wordHunt.name'),
+    'wheel-rush': t('gameModes.wheelRush.name'),
   };
   return labels[mode];
 }
@@ -62,6 +66,7 @@ export function getModeDescription(mode: GameModeOption, t: GameModeSelectorProp
     classic: t('gameModes.classic.description'),
     blast: t('gameModes.blast.description'),
     'word-hunt': t('gameModes.wordHunt.description'),
+    'wheel-rush': t('gameModes.wheelRush.description'),
   };
   return descriptions[mode];
 }
@@ -77,18 +82,28 @@ export function GameModeSelector({
   showRandom = true,
   compact = false,
 }: GameModeSelectorProps) {
-  const modes: GameModeOption[] = showRandom
-    ? ['random', 'classic', 'blast', 'word-hunt']
-    : ['classic', 'blast', 'word-hunt'];
+  const wheelRushEnabled = process.env.NEXT_PUBLIC_FF_WHEEL_RUSH === 'true';
+  const baseModes: GameModeOption[] = wheelRushEnabled
+    ? ['classic', 'word-hunt', 'wheel-rush']
+    : ['classic', 'word-hunt'];
+  const modes: GameModeOption[] = showRandom ? ['random', ...baseModes] : baseModes;
+  const [tooltipMode, setTooltipMode] = React.useState<GameModeOption | null>(null);
+  const activeTooltip = tooltipMode ?? selectedMode;
 
   return (
-    <div className={cn('grid gap-1.5', showRandom ? 'grid-cols-4' : 'grid-cols-3')}>
+    <div className="flex flex-col gap-1">
+    <div className={cn('grid gap-1.5', modes.length === 4 ? 'grid-cols-4' : modes.length === 3 ? 'grid-cols-3' : 'grid-cols-2')}>
       {modes.map((mode) => {
         const isActive = selectedMode === mode;
         return (
           <motion.button
             key={mode}
-            onClick={() => onSelectMode(mode)}
+            onClick={() => {
+              setTooltipMode(mode);
+              onSelectMode(mode);
+            }}
+            onPointerEnter={() => setTooltipMode(mode)}
+            onPointerLeave={(e) => { if (e.pointerType === 'mouse') setTooltipMode(null); }}
             whileHover={{ scale: 1.06 }}
             whileTap={{ scale: 0.92 }}
             transition={{ type: 'spring' as const, stiffness: 400, damping: 20 }}
@@ -116,6 +131,13 @@ export function GameModeSelector({
           </motion.button>
         );
       })}
+    </div>
+    <div
+      className="min-h-[14px] text-center text-[10px] leading-tight text-neo-cream/60 px-2"
+      aria-live="polite"
+    >
+      {activeTooltip ? getModeDescription(activeTooltip, t) : ''}
+    </div>
     </div>
   );
 }

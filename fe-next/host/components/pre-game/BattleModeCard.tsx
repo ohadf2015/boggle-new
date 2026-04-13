@@ -72,6 +72,19 @@ const MODES: ModeVisualConfig[] = [
     activeText: 'text-neo-pink',
     activeBg: 'bg-neo-pink',
   },
+  {
+    mode: 'wheel-rush',
+    icon: <Target className="w-4 h-4" />,
+    largeIcon: <Target className="w-7 h-7" />,
+    nameKey: 'gameModes.wheelRush.name',
+    descKey: 'gameModes.wheelRush.description',
+    featureKeys: ['gameModes.wheelRush.feature1', 'gameModes.wheelRush.feature2', 'gameModes.wheelRush.feature3'],
+    accentColor: 'bg-neo-lime',
+    accentBorder: 'border-l-neo-lime',
+    accentBg: 'bg-neo-lime',
+    activeText: 'text-neo-lime',
+    activeBg: 'bg-neo-lime',
+  },
 ];
 
 // ==================== Main Component ====================
@@ -85,7 +98,9 @@ export function BattleModeCard({
     setSelectedGameMode(mode);
   }, [setSelectedGameMode]);
 
-  const activeMode = MODES.find(m => m.mode === selectedGameMode) ?? MODES[0];
+  const wheelRushEnabled = process.env.NEXT_PUBLIC_FF_WHEEL_RUSH === 'true';
+  const visibleModes = wheelRushEnabled ? MODES : MODES.filter(m => m.mode !== 'wheel-rush');
+  const activeMode = visibleModes.find(m => m.mode === selectedGameMode) ?? visibleModes[0];
 
   return (
     <section className="rounded-neo-lg border-3 border-neo-black bg-slate-800/80 shadow-hard overflow-hidden">
@@ -97,7 +112,7 @@ export function BattleModeCard({
       {/* Horizontal chips row — equal-width */}
       <div className="space-y-2">
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
-          {MODES.map(({ mode, icon, nameKey, activeBg }) => {
+          {visibleModes.map(({ mode, icon, nameKey, activeBg }) => {
             const isActive = selectedGameMode === mode;
 
             return (

@@ -26,6 +26,7 @@ import InGameScreen from '../game/InGameScreen';
 import { BlastGame } from '@/components/blast/BlastGame';
 import { useBlastMultiplayerBridge } from '@/components/blast/hooks/useBlastMultiplayerBridge';
 import { WordHuntGame } from '@/components/wordhunt/WordHuntGame';
+import { WheelRushView } from '@/components/multiplayer/WheelRushView';
 import type {
   Language,
   LetterGrid,
@@ -317,6 +318,19 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
         onWordWithComboType={handleBlastWordWithCombo}
         initialTileStates={blastBridge.initialTileStates}
         blastSeed={blastBridge.blastSeed}
+      />
+    );
+  }
+
+  // Wheel Rush mode
+  if (gameMode === 'wheel-rush') {
+    return (
+      <WheelRushView
+        socket={socket}
+        username={username}
+        leaderboard={leaderboard}
+        onQuit={handleQuit}
+        t={t}
       />
     );
   }

@@ -1,3 +1,4 @@
+import { FeedbackToolbar } from '@feedback/sdk';
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import nextDynamic from 'next/dynamic';
@@ -652,6 +653,9 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                     {/* Toast notifications container */}
                     <ToastContainer position="bottom-right" />
                 </ConditionalProviders>
+                {process.env.NODE_ENV !== 'production' && (
+                    <FeedbackToolbar projectToken={process.env.NEXT_PUBLIC_FEEDBACK_TOKEN!} />
+                )}
             </body>
         </html>
     );

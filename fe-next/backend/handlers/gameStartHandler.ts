@@ -48,6 +48,7 @@ import { BLAST_MP_DEFAULT_TIMER } from '@/shared/constants/gameConstants';
 import { getClassroomGame } from '../modules/classroomGameManager.js';
 import { initBlastModeState, hashStringToSeed } from '../modules/blastModeManager.js';
 import { initWordHuntState, selectTargetWordWithFallback } from '../modules/wordHuntManager.js';
+import { initWheelRushState, generateWheelPuzzle } from '../modules/wheelRushManager.js';
 import { getSupabase } from '../modules/supabase/client.js';
 import { autoAddBotsForSoloPlayer } from '../services/gameLifecycle/autoAddBots.js';
 import { scheduleRoundEvent } from '../modules/roundEventsManager.js';
@@ -244,7 +245,7 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
       logger.info('SOCKET', `Game ${gameCode} auto-reset successful, state now: ${game.gameState}`);
     }
 
-    let validTimer = Math.max(30, Math.min(120, parseInt(String(timerSeconds), 10) || 120));
+    let validTimer = Math.max(30, Math.min(600, parseInt(String(timerSeconds), 10) || 120));
 
     let resolvedMode: GameMode = (!gameMode || gameMode === 'random')
       ? selectNextGameMode(game.modeHistory || [], ALL_GAME_MODES)
@@ -406,6 +407,20 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
       if (currentGame) {
         currentGame.blastModeState = blastState;
       }
+    }
+
+    // Initialize wheel rush mode state if needed
+    if (resolvedMode === 'wheel-rush' && process.env.FF_WHEEL_RUSH !== 'true') {
+      resolvedMode = 'classic';
+    }
+    if (resolvedMode === 'wheel-rush') {
+      const puzzle = generateWheelPuzzle(gameCode, gameLang);
+      const wheelState = initWheelRushState(puzzle, playerUsernames);
+      const currentGame = getGame(gameCode);
+      if (currentGame) {
+        currentGame.wheelRushState = wheelState;
+      }
+      broadcastToRoom(io, getGameRoom(gameCode), 'wheelRushInit', { puzzle, startedAt: wheelState.startedAt });
     }
 
     // Initialize word hunt mode state if needed

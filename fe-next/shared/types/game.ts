@@ -12,7 +12,7 @@ export type Language = 'he' | 'en' | 'sv' | 'ja' | 'es' | 'fr' | 'de';
 
 export type GameState = 'waiting' | 'in-progress' | 'finished' | 'validating';
 
-export type GameMode = 'classic' | 'blast' | 'word-hunt';
+export type GameMode = 'classic' | 'blast' | 'word-hunt' | 'wheel-rush';
 export type GameModeSelection = GameMode | 'random';
 
 export type DifficultyLevel = 'EASY' | 'MEDIUM' | 'HARD';
@@ -290,6 +290,37 @@ export interface WordHuntModeState {
   lastLifeUpdateAt?: number;
   /** Per-player timestamp of last clue broadcast (throttling) */
   lastClueAt?: Record<string, number>;
+}
+
+// ==================== Wheel Rush Types ====================
+
+/** Puzzle definition for wheel-rush MP mode (mirrors daily WordWheelPuzzle) */
+export interface WheelPuzzle {
+  centerLetter: string;
+  outerLetters: string[];
+  allLetters: string[];
+  /** Dictionary words formable from {center+outer} that include centerLetter */
+  solutions?: string[];
+}
+
+/** Lock claimed by first finder — word is temporarily stealable, then permanently closed */
+export interface WheelWordLock {
+  by: string;
+  /** Absolute epoch ms when steal window expires */
+  until: number;
+}
+
+/** Wheel Rush mode state tracked per game */
+export interface WheelRushModeState {
+  puzzle: WheelPuzzle;
+  /** Words each player has claimed (after lock resolved) */
+  foundWords: Record<string, string[]>;
+  /** Words currently stealable — keyed by word */
+  locks: Record<string, WheelWordLock>;
+  /** Words permanently closed (anyone tries → already-found feedback) */
+  closed: string[];
+  /** Timestamp when round started, for fog-of-war reveal gating */
+  startedAt: number;
 }
 
 // ==================== Tournament Types ====================

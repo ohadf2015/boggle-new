@@ -9514,6 +9514,13 @@ const he = {
       feature2: "מרוץ מהירות",
       feature3: "רמזים"
     },
+    wheelRush: {
+      name: "ריצת גלגל",
+      description: "גלגל אותיות — גנבו מילים כדי לנצח!",
+      feature1: "חלון נעילה",
+      feature2: "ערפל קרב",
+      feature3: "בונוס פנגרם"
+    },
     random: "אקראי",
     randomDescription: "הפתיעו אותי! מצב אקראי בכל סיבוב.",
     randomFeature1: "מגוון",

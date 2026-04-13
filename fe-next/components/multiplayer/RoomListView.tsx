@@ -112,6 +112,15 @@ const MODE_CONFIG: Record<string, {
     labelKey: 'multiplayerFlow.roomList.gameModes.wordHunt',
     descKey: 'gameModes.wordHunt.description',
   },
+  'wheel-rush': {
+    icon: Search,
+    borderColor: 'border-s-neo-lime',
+    iconBg: 'bg-neo-lime',
+    iconColor: 'text-neo-black',
+    textColor: 'text-neo-lime',
+    labelKey: 'multiplayerFlow.roomList.gameModes.wheelRush',
+    descKey: 'gameModes.wheelRush.description',
+  },
 };
 
 const DEFAULT_MODE_CONFIG = {

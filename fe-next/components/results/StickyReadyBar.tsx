@@ -39,7 +39,7 @@ interface StickyReadyBarProps {
   isClassroom?: boolean;
 }
 
-const ALL_MODES: GameModeOption[] = ['word-hunt', 'blast', 'classic', 'random'];
+const ALL_MODES: GameModeOption[] = ['word-hunt', 'classic', 'random'];
 const AUTO_SECONDS = 35;
 
 /**
@@ -100,6 +100,7 @@ export default function StickyReadyBar({
     catch { return false; }
   });
   const [secondsLeft, setSecondsLeft] = useState(AUTO_SECONDS);
+  const [tooltipMode, setTooltipMode] = useState<GameModeOption | null>(null);
   const completedRef = useRef(false);
   const countdownStartedRef = useRef(false);
 
@@ -323,27 +324,47 @@ export default function StickyReadyBar({
     <div className="flex flex-col gap-2 flex-1 min-w-0 pb-[env(safe-area-inset-bottom)]">
         {/* Host mode selector — always-visible horizontal pills */}
         {isHost && selectedGameMode !== undefined && onSelectGameMode && (
-          <div className="flex items-center gap-1 px-0.5">
-            {ALL_MODES.map((mode) => {
-              const isActive = selectedGameMode === mode;
-              return (
-                <button
-                  key={mode}
-                  onClick={() => onSelectGameMode(mode)}
-                  title={getModeDescription(mode, t)}
-                  aria-label={`${getModeLabel(mode, t)} — ${getModeDescription(mode, t)}`}
-                  className={cn(
-                    'flex-1 flex items-center justify-center gap-1.5 py-1.5 text-[9px] font-black uppercase rounded-lg border-2 transition-all',
-                    isActive
-                      ? cn(MODE_ACTIVE_COLORS[mode], 'border-current/30 shadow-xs')
-                      : 'text-neo-cream/40 border-transparent hover:text-neo-cream/70 hover:bg-neo-white/5'
-                  )}
-                >
-                  <span className="[&>svg]:w-3 [&>svg]:h-3">{MODE_ICONS[mode]}</span>
-                  <span className="hidden xs:inline">{getModeLabel(mode, t)}</span>
-                </button>
-              );
-            })}
+          <div className="flex flex-col gap-1">
+            <div className="flex items-center gap-1 px-0.5">
+              {ALL_MODES.map((mode) => {
+                const isActive = selectedGameMode === mode;
+                return (
+                  <button
+                    key={mode}
+                    onClick={() => {
+                      if (tooltipMode !== mode) {
+                        setTooltipMode(mode);
+                      }
+                      onSelectGameMode(mode);
+                    }}
+                    onPointerEnter={() => setTooltipMode(mode)}
+                    onPointerLeave={(e) => {
+                      if (e.pointerType === 'mouse') setTooltipMode(null);
+                    }}
+                    title={getModeDescription(mode, t)}
+                    aria-label={`${getModeLabel(mode, t)} — ${getModeDescription(mode, t)}`}
+                    className={cn(
+                      'flex-1 flex items-center justify-center gap-1.5 py-1.5 text-[9px] font-black uppercase rounded-lg border-2 transition-all',
+                      isActive
+                        ? cn(MODE_ACTIVE_COLORS[mode], 'border-current/30 shadow-xs')
+                        : 'text-neo-cream/40 border-transparent hover:text-neo-cream/70 hover:bg-neo-white/5'
+                    )}
+                  >
+                    <span className="[&>svg]:w-3 [&>svg]:h-3">{MODE_ICONS[mode]}</span>
+                    <span className="hidden xs:inline">{getModeLabel(mode, t)}</span>
+                  </button>
+                );
+              })}
+            </div>
+            <div
+              className="min-h-[14px] text-center text-[10px] leading-tight text-neo-cream/60 px-2 transition-opacity duration-150"
+              aria-live="polite"
+            >
+              {(() => {
+                const m = tooltipMode ?? selectedGameMode;
+                return m ? getModeDescription(m, t) : '';
+              })()}
+            </div>
           </div>
         )}
 

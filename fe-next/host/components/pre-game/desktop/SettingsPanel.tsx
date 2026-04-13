@@ -51,6 +51,13 @@ const MODE_CONFIG: {
     descKey: 'gameModes.wordHunt.description',
     colors: { bg: 'bg-neo-pink/20', border: 'border-neo-pink', text: 'text-neo-pink' },
   },
+  {
+    mode: 'wheel-rush',
+    icon: Target,
+    nameKey: 'gameModes.wheelRush.name',
+    descKey: 'gameModes.wheelRush.description',
+    colors: { bg: 'bg-neo-lime/20', border: 'border-neo-lime', text: 'text-neo-lime' },
+  },
 ];
 
 // ==================== Component ====================
@@ -77,7 +84,7 @@ export function SettingsPanel({
           </p>
 
           <div className="flex flex-col gap-2 xl:gap-3">
-            {MODE_CONFIG.map(({ mode, icon: Icon, nameKey, descKey, colors }) => {
+            {MODE_CONFIG.filter(m => m.mode !== 'wheel-rush' || process.env.NEXT_PUBLIC_FF_WHEEL_RUSH === 'true').map(({ mode, icon: Icon, nameKey, descKey, colors }) => {
               const isSelected = selectedGameMode === mode;
 
               return (

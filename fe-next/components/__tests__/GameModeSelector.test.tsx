@@ -14,7 +14,7 @@ const mockT = (key: string) => {
 };
 
 describe('GameModeSelector', () => {
-  it('should render all 4 modes when showRandom is true', () => {
+  it('should render random + classic + word-hunt when showRandom is true', () => {
     render(
       <GameModeSelector
         selectedMode="random"
@@ -26,11 +26,11 @@ describe('GameModeSelector', () => {
 
     expect(screen.getByTestId('game-mode-random')).toBeInTheDocument();
     expect(screen.getByTestId('game-mode-classic')).toBeInTheDocument();
-    expect(screen.getByTestId('game-mode-blast')).toBeInTheDocument();
     expect(screen.getByTestId('game-mode-word-hunt')).toBeInTheDocument();
+    expect(screen.queryByTestId('game-mode-blast')).not.toBeInTheDocument();
   });
 
-  it('should render only 3 modes when showRandom is false', () => {
+  it('should render classic + word-hunt when showRandom is false', () => {
     render(
       <GameModeSelector
         selectedMode="classic"
@@ -42,26 +42,23 @@ describe('GameModeSelector', () => {
 
     expect(screen.queryByTestId('game-mode-random')).not.toBeInTheDocument();
     expect(screen.getByTestId('game-mode-classic')).toBeInTheDocument();
-    expect(screen.getByTestId('game-mode-blast')).toBeInTheDocument();
     expect(screen.getByTestId('game-mode-word-hunt')).toBeInTheDocument();
   });
 
   it('should highlight the selected mode with active styling', () => {
     render(
       <GameModeSelector
-        selectedMode="blast"
+        selectedMode="word-hunt"
         onSelectMode={vi.fn()}
         t={mockT}
         showRandom
       />
     );
 
-    const blastButton = screen.getByTestId('game-mode-blast');
-    // Blast mode uses its own orange active color
-    expect(blastButton.className).toContain('bg-neo-orange/30');
+    const huntButton = screen.getByTestId('game-mode-word-hunt');
+    expect(huntButton.className).toContain('bg-neo-pink/30');
 
     const classicButton = screen.getByTestId('game-mode-classic');
-    // Non-selected modes use the navy inactive style
     expect(classicButton.className).toContain('bg-neo-navy/60');
   });
 
@@ -76,11 +73,11 @@ describe('GameModeSelector', () => {
       />
     );
 
-    fireEvent.click(screen.getByTestId('game-mode-blast'));
-    expect(onSelectMode).toHaveBeenCalledWith('blast');
-
     fireEvent.click(screen.getByTestId('game-mode-word-hunt'));
     expect(onSelectMode).toHaveBeenCalledWith('word-hunt');
+
+    fireEvent.click(screen.getByTestId('game-mode-classic'));
+    expect(onSelectMode).toHaveBeenCalledWith('classic');
   });
 
   it('should render icons instead of emojis', () => {
@@ -93,14 +90,12 @@ describe('GameModeSelector', () => {
       />
     );
 
-    // Lucide icons render as SVG elements
+    // Lucide icons render as SVG elements (one per visible mode)
     const svgs = container.querySelectorAll('svg');
-    expect(svgs.length).toBe(4); // One icon per mode
+    expect(svgs.length).toBe(3);
 
-    // No emoji characters should be present
     const buttons = screen.getAllByRole('button');
     buttons.forEach((button) => {
-      // Check that button text doesn't contain common emoji codepoints
       expect(button.textContent).not.toMatch(/[\u{1F3B2}\u{1F4DD}\u{1F4A5}\u{1F3AF}]/u);
     });
   });
@@ -117,7 +112,6 @@ describe('GameModeSelector', () => {
 
     expect(screen.getByText('Random')).toBeInTheDocument();
     expect(screen.getByText('Classic')).toBeInTheDocument();
-    expect(screen.getByText('Blast')).toBeInTheDocument();
     expect(screen.getByText('Word Hunt')).toBeInTheDocument();
   });
 });

@@ -8,6 +8,7 @@ const MODE_ICONS: Record<GameMode, string> = {
   'classic': '📝',
   'blast': '💥',
   'word-hunt': '🎯',
+  'wheel-rush': '🎡',
 };
 
 /** Translation key mapping for each mode */
@@ -15,6 +16,7 @@ const MODE_TRANSLATION_KEYS: Record<GameMode, { name: string; description: strin
   'classic': { name: 'gameModes.classic.name', description: 'gameModes.classic.description' },
   'blast': { name: 'gameModes.blast.name', description: 'gameModes.blast.description' },
   'word-hunt': { name: 'gameModes.wordHunt.name', description: 'gameModes.wordHunt.description' },
+  'wheel-rush': { name: 'gameModes.wheelRush.name', description: 'gameModes.wheelRush.description' },
 };
 
 const RADIAL_GRADIENT_STYLE = { background: 'radial-gradient(circle, var(--tw-gradient-stops))' } as const;
@@ -24,6 +26,7 @@ const MODE_COLORS: Record<GameMode, { from: string; via: string }> = {
   'classic': { from: 'from-neo-cyan/30', via: 'via-neo-cyan/5' },
   'blast': { from: 'from-neo-orange/30', via: 'via-neo-orange/5' },
   'word-hunt': { from: 'from-neo-pink/30', via: 'via-neo-pink/5' },
+  'wheel-rush': { from: 'from-neo-purple/30', via: 'via-neo-purple/5' },
 };
 
 interface GameModeIntroProps {

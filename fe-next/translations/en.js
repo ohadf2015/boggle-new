@@ -9668,6 +9668,13 @@ const en = {
       feature2: "Speed race",
       feature3: "Hints"
     },
+    wheelRush: {
+      name: "Wheel Rush",
+      description: "Race the wheel — steal words to win!",
+      feature1: "Steal-lock window",
+      feature2: "Fog of war",
+      feature3: "Pangram bonus"
+    },
     random: "Random",
     randomDescription: "Surprise me! Pick a random mode each round.",
     randomFeature1: "Variety",

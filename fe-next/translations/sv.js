@@ -9479,6 +9479,13 @@ const sv = {
       feature2: "Snabblopp",
       feature3: "Ledtrådar"
     },
+    wheelRush: {
+      name: "Hjulrusning",
+      description: "Kapplöpning på hjulet — stjäl ord för att vinna!",
+      feature1: "Låsfönster",
+      feature2: "Stridsdimma",
+      feature3: "Pangrambonus"
+    },
     random: "Slumpmässigt",
     randomDescription: "Överraska mig! Slumpa läge varje runda.",
     randomFeature1: "Variation",

@@ -60,7 +60,7 @@ describe('gameModeSelector', () => {
     });
 
     it('should produce a weighted distribution (classic ~40%, blast ~30%, word-hunt ~30%)', () => {
-      const counts: Record<GameMode, number> = { 'classic': 0, 'blast': 0, 'word-hunt': 0 };
+      const counts: Record<GameMode, number> = { 'classic': 0, 'blast': 0, 'word-hunt': 0, 'wheel-rush': 0 };
       const iterations = 10000;
 
       for (let i = 0; i < iterations; i++) {
@@ -98,8 +98,8 @@ describe('gameModeSelector', () => {
   });
 
   describe('constants', () => {
-    it('should export ALL_GAME_MODES with 3 modes', () => {
-      expect(ALL_GAME_MODES).toEqual(['classic', 'blast', 'word-hunt']);
+    it('should export ALL_GAME_MODES with 4 modes', () => {
+      expect(ALL_GAME_MODES).toEqual(['classic', 'blast', 'word-hunt', 'wheel-rush']);
     });
 
     it('should export GAME_MODE_WEIGHTS that sum to 1 (approximately)', () => {

@@ -9479,6 +9479,13 @@ const ja = {
       feature2: "スピードレース",
       feature3: "ヒント"
     },
+    wheelRush: {
+      name: "ホイールラッシュ",
+      description: "ホイールで競争 — 単語を奪って勝利！",
+      feature1: "ロック窓",
+      feature2: "戦場の霧",
+      feature3: "パングラムボーナス"
+    },
     random: "ランダム",
     randomDescription: "お楽しみに！毎ラウンド違うモードを選びます。",
     randomFeature1: "バラエティ",
