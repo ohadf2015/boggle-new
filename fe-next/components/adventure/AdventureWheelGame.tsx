@@ -2,7 +2,9 @@
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { X } from 'lucide-react';
-import { useLanguage } from '@/contexts/LanguageContext';
+import { useLanguageSafe } from '@/contexts/LanguageContext';
+import { useProgressionActions, useProgressionData } from '@/contexts/ProgressionContext';
+import { useUpgradeEffects } from '@/hooks/useUpgradeEffects';
 import type { LevelConfig } from '@/types/adventure';
 import type { Language } from '@/types';
 import WordWheelGame, { type WordWheelGameResult } from '@/components/daily/WordWheelGame';
@@ -12,7 +14,7 @@ import { cn } from '@/lib/utils';
 
 interface Props {
   levelConfig: LevelConfig;
-  onLevelComplete: (stars: number, score: number, wordsFound: number, goldEarned: number, longWords?: number) => void;
+  onLevelComplete: (stars: number, score: number, wordsFound: number, goldEarned: number, longWords?: number, wordList?: string[]) => void;
   onExit: () => void;
 }
 
@@ -25,7 +27,10 @@ function computeStars(score: number, target: number): 0 | 1 | 2 | 3 {
 }
 
 const AdventureWheelGame: React.FC<Props> = ({ levelConfig, onLevelComplete, onExit }) => {
-  const { t, language } = useLanguage();
+  const { t, language } = useLanguageSafe();
+  const { completeLevel } = useProgressionActions();
+  const { progression } = useProgressionData();
+  const upgradeEffects = useUpgradeEffects(progression?.upgrades ?? {});
   const [effects, setEffects] = useState<WordWheelEffect[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ width: 400, height: 600 });
@@ -75,9 +80,21 @@ const AdventureWheelGame: React.FC<Props> = ({ levelConfig, onLevelComplete, onE
   const handleComplete = useCallback((result: WordWheelGameResult) => {
     const stars = computeStars(result.score, scoreTarget);
     const longWords = result.wordsFound.filter(w => w.length >= 6).length;
-    const gold = Math.floor(result.score / 10) + stars * 5;
-    onLevelComplete(stars, result.score, result.wordsFound.length, gold, longWords);
-  }, [scoreTarget, onLevelComplete]);
+    const baseGold = Math.floor(result.score / 10) + stars * 5;
+    const longWordBonus = upgradeEffects.longWordGoldBonus * longWords;
+    const gold = Math.floor(baseGold * upgradeEffects.goldMultiplier) + longWordBonus;
+    // Persist to DB via ProgressionContext — server is source of truth for
+    // gold/XP/unlocks. Fire-and-forget; UI advances via onLevelComplete.
+    if (stars > 0) {
+      void completeLevel(
+        levelConfig.world, levelConfig.level,
+        stars, result.score, result.wordsFound.length,
+        gold, longWords, result.wordsFound
+      );
+    }
+    onLevelComplete(stars, result.score, result.wordsFound.length, gold, longWords, result.wordsFound);
+  }, [scoreTarget, onLevelComplete, completeLevel, levelConfig.world, levelConfig.level,
+      upgradeEffects.goldMultiplier, upgradeEffects.longWordGoldBonus]);
 
   return (
     <div className="relative h-full w-full bg-neo-navy flex flex-col">
@@ -110,7 +127,7 @@ const AdventureWheelGame: React.FC<Props> = ({ levelConfig, onLevelComplete, onE
         />
         <WordWheelGame
           puzzle={puzzle}
-          duration={levelConfig.timerSeconds || 120}
+          duration={(levelConfig.timerSeconds || 120) + upgradeEffects.bonusTimeSeconds}
           onComplete={handleComplete}
           onValidateWord={handleValidateWord}
           onEffect={handleEffect}

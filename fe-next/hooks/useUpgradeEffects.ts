@@ -97,8 +97,8 @@ export function computeUpgradeEffects(upgrades: UpgradeState): UpgradeEffects {
 
   // ── Fuel Tank ──
   const fuelTank = getUpgradeTier(upgrades, 'fuelTank');
-  // Values must match upgradeConfig.ts fuelTank tiers: T1=10, T2=20, T3=30, T4=40
-  if (fuelTank >= 1) effects.bonusTimeSeconds = [0, 10, 20, 30, 40][fuelTank];
+  // Mirrors upgradeConfig.ts fuelTank tier values (player sees these in the shop).
+  if (fuelTank >= 1) effects.bonusTimeSeconds = [0, 8, 15, 20, 25][fuelTank];
 
   // ── Armor Plating ──
   const armor = getUpgradeTier(upgrades, 'armorPlating');

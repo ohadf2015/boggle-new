@@ -319,10 +319,8 @@ export function getLevelConfig(
     config.hasTargetWord = true;
     config.lifePoints = 100;
   } else if (archetype === 'wheel') {
-    // Wheel archetype plays as classic on the adventure grid — its secondary
-    // "longWords" objective (assigned in generateObjectives) is what differentiates it.
-    // The "must include center letter" rule was removed because it created a mismatch
-    // with the boggle board (daily Word Wheel uses a ring layout instead).
+    // Wheel archetype routes to AdventureWheelGame (ring layout, center-letter rule).
+    // Boggle-grid config below is unused for wheel levels but kept as a fallback shape.
   } else if (archetype === 'forge') {
     config.hasRunePick = true;
   }

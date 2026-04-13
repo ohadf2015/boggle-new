@@ -42,7 +42,7 @@ interface UseAdventureGameCallbacksParams {
   handleEarnAchievement: (id: AdventureAchievementId) => void;
   upgradeRetryScoreRetention: number;
   // Parent callbacks
-  onLevelComplete: (stars: number, score: number, wordsFound: number, goldEarned: number, longWords?: number) => void;
+  onLevelComplete: (stars: number, score: number, wordsFound: number, goldEarned: number, longWords?: number, wordList?: string[]) => void;
   // Other
   totalStars?: number;
   clearSelection: () => void;
@@ -114,7 +114,7 @@ export function useAdventureGameCallbacks(params: UseAdventureGameCallbacksParam
     // instead of showing the loot modal (the cinematic IS the transition)
     if (showWorldUnlockCinematic && isBossLevel && gameStars > 0) {
       const longWords = wordsFoundList.filter(w => w.length >= 6).length;
-      onLevelComplete(gameStars, gameScore, wordsFoundList.length, earnedGold, longWords);
+      onLevelComplete(gameStars, gameScore, wordsFoundList.length, earnedGold, longWords, wordsFoundList);
       return;
     }
 
@@ -164,7 +164,7 @@ export function useAdventureGameCallbacks(params: UseAdventureGameCallbacksParam
       });
     }
 
-    onLevelComplete(gameStars, gameScore, wordsFoundList.length, earnedGold, longWords);
+    onLevelComplete(gameStars, gameScore, wordsFoundList.length, earnedGold, longWords, wordsFoundList);
   }, [gameStars, gameScore, wordsFoundList, comboCount, earnedGold, onLevelComplete,
     recordLevelPerfect, recordBossDefeatedNoHint, recordScoreChallenge, recordBossHighHealth,
     recordFullComboLevel, isBossLevel, bossHealthPhase, playerHealthCurrentHP, playerHealthMaxHP,

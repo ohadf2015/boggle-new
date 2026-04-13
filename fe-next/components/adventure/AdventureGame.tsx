@@ -60,7 +60,7 @@ export interface GameTimerState { timeRemaining: number; totalTime: number; isPl
 interface AdventureGameProps {
   levelConfig: LevelConfig;
   initialGrid: string[][];
-  onLevelComplete: (stars: number, score: number, wordsFound: number, goldEarned: number, longWords?: number) => void;
+  onLevelComplete: (stars: number, score: number, wordsFound: number, goldEarned: number, longWords?: number, wordList?: string[]) => void;
   onExit: () => void;
   onTimerStateChange?: (timerState: GameTimerState) => void;
   totalStars?: number;
@@ -319,10 +319,10 @@ const AdventureGame = memo<AdventureGameProps>(
     const prevIsCompleteRef = useRef(false);
     useEffect(() => {
       if (gameState.isComplete && !prevIsCompleteRef.current) {
-        showInterstitial('adventure-level-complete');
+        showInterstitial(`adventure-level-complete-${levelConfig.world}-${levelConfig.level}`);
       }
       prevIsCompleteRef.current = gameState.isComplete;
-    }, [gameState.isComplete, showInterstitial]);
+    }, [gameState.isComplete, showInterstitial, levelConfig.world, levelConfig.level]);
 
     const getScoreMultiplier = useCallback(() => 1, []);
     const augmentedSkillEffects = useMemo(() => ({
@@ -346,22 +346,19 @@ const AdventureGame = memo<AdventureGameProps>(
       }
     }, [modeState.archetype, solvedWords, setHuntTarget]);
 
-    // Hunt mode: fallback timeout — if solvedWords never resolves within 10s,
-    // pick any 4-letter combination from the grid to avoid soft-lock spinner.
+    // Hunt mode: 10s safety timeout. If solvedWords never resolves we previously
+    // synthesized a target from raw grid letters — that produced unsolvable
+    // garbage like "QKZF". Now fail closed: leave huntTargetWord unset so the
+    // mode UI shows its own "no target" state instead of a softlock disguised
+    // as gameplay. Caller can retry/exit the level.
     useEffect(() => {
       if (modeState.archetype !== 'hunt' || huntTargetPickedRef.current) return;
       const timeout = setTimeout(() => {
         if (huntTargetPickedRef.current) return;
-        // Emergency fallback: construct a target from first few grid tiles
-        const fallbackWord = tiles.slice(0, 4).map(t => t.letter).join('');
-        if (fallbackWord.length >= 3) {
-          setHuntTarget(fallbackWord);
-          huntTargetPickedRef.current = true;
-        }
+        huntTargetPickedRef.current = true;
       }, 10000);
       return () => clearTimeout(timeout);
-      // eslint-disable-next-line react-hooks/exhaustive-deps -- tiles stable after mount
-    }, [modeState.archetype, setHuntTarget]);
+    }, [modeState.archetype]);
 
     const gridRef = useRef<HTMLDivElement>(null);
     const clickSubmitRef = useRef<(word: string, indices: number[]) => void>(null);
@@ -825,11 +822,12 @@ const AdventureGame = memo<AdventureGameProps>(
               isLastLevelOfWorld={levelConfig.level === LEVELS_PER_WORLD} onNextWorld={onNextWorld}
               saveFailed={!isGuest && levelCompletion.completionSaveFailedRef?.current && showLevelComplete}
               onRetrySave={() => {
+                const longWords = gameState.wordsFound.filter((w: string) => w.length >= 6).length;
                 saveCompletionToDb(
                   levelConfig.world, levelConfig.level,
                   gameState.stars as 0 | 1 | 2 | 3,
                   gameState.score, gameState.wordsFound.length,
-                  levelCompletion.earnedGold
+                  levelCompletion.earnedGold, longWords
                 ).then((ok) => {
                   if (ok) {
                     if (levelCompletion.completionSaveFailedRef) levelCompletion.completionSaveFailedRef.current = false;

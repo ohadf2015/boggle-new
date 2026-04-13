@@ -388,6 +388,7 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
             words: gameState.wordsFound.length,
             goldEarned: earnedGoldRef.current,
             longWords: gameState.wordsFound.filter(w => w.length >= 6).length,
+            flashChallengeCompleted: (props.flashChallengeGold ?? 0) > 0,
           };
           if (typeof navigator !== 'undefined' && navigator.sendBeacon) {
             navigator.sendBeacon(
@@ -401,7 +402,7 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
 
     window.addEventListener('beforeunload', handleBeforeUnload);
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, [levelConfig.world, levelConfig.level, gameState.stars, gameState.score, gameState.wordsFound]);
+  }, [levelConfig.world, levelConfig.level, gameState.stars, gameState.score, gameState.wordsFound, props.flashChallengeGold]);
 
   // Reset rewards flag (needed for retry)
   const resetRewards = useCallback(() => {
