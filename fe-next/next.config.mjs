@@ -410,6 +410,10 @@ const nextConfig = {
     useSystemTlsCerts: true,
     resolveAlias: {
       '@arvidbt/swedish-words': '@arvidbt/swedish-words/out/index.js',
+      ...(feedbackSdkAvailable ? {} : {
+        '@feedback/sdk': './lib/feedback-stub.tsx',
+        '@feedback/sdk/next': './lib/feedback-stub.tsx',
+      }),
     },
   },
 
