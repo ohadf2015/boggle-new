@@ -144,11 +144,14 @@ export function useSurvivalHints({
     let success = false;
     
     if (nextHintItem.id === 'reveal_letter') {
-         const unrevealed = [...Array(targetWord.length).keys()].filter(i => !revealedLetters.has(i));
+         const hintChars = currentHint?.hint.split(' ').filter(c => c !== '') ?? [];
+         const unrevealed = [...Array(targetWord.length).keys()].filter(
+           i => !revealedLetters.has(i) && (hintChars[i] === '_' || hintChars[i] === undefined)
+         );
         // Keep 1 letter hidden logic
-        if (unrevealed.length > 1) { 
-             const randomIdx = unrevealed[Math.floor(Math.random() * unrevealed.length)];
-             setRevealedLetters(prev => new Set([...prev, randomIdx]));
+        if (unrevealed.length > 1) {
+             const nextIdx = unrevealed[0];
+             setRevealedLetters(prev => new Set([...prev, nextIdx]));
              success = true;
         } else {
              showToast('invalid-word', 'All letters revealed!');
@@ -170,7 +173,7 @@ export function useSurvivalHints({
         showToast('valid-word', `${nextHintItem.name} Unlocked! (-${nextHintItem.cost} Coins)`);
     }
     
-  }, [nextHintItem, targetWord, revealedLetters, playWordAcceptedSound, showToast, t]);
+  }, [nextHintItem, targetWord, revealedLetters, currentHint, playWordAcceptedSound, showToast, t]);
 
 
   // Auto-Unlock logic
@@ -209,14 +212,17 @@ export function useSurvivalHints({
   }, [nextHintItem, buyNextHint]);
 
   const autoRevealLetter = useCallback((): number => {
-      const unrevealed = [...Array(targetWord.length).keys()].filter(i => !revealedLetters.has(i));
+      const hintChars = currentHint?.hint.split(' ').filter(c => c !== '') ?? [];
+      const unrevealed = [...Array(targetWord.length).keys()].filter(
+        i => !revealedLetters.has(i) && (hintChars[i] === '_' || hintChars[i] === undefined)
+      );
       if (unrevealed.length > 1) {
-        const randomIdx = unrevealed[Math.floor(Math.random() * unrevealed.length)];
-        setRevealedLetters(prev => new Set([...prev, randomIdx]));
-        return randomIdx;
+        const nextIdx = unrevealed[0];
+        setRevealedLetters(prev => new Set([...prev, nextIdx]));
+        return nextIdx;
       }
       return -1;
-    }, [targetWord.length, revealedLetters]);
+    }, [targetWord.length, revealedLetters, currentHint]);
 
   const revealCategory = useCallback(() => setShowCategory(true), []);
   const revealExample = useCallback(() => setShowExample(true), []);
