@@ -217,4 +217,59 @@ router.get('/leaderboard/:date/:language', async (req: Request<LeaderboardParams
   }
 });
 
+// ==========================================
+// GET /api/daily-challenge/word-wheel/alltime-leaderboard/:language
+// ==========================================
+
+router.get('/alltime-leaderboard/:language', async (req: Request<{ language: string }, unknown, unknown, LeaderboardQuery>, res: Response): Promise<void> => {
+  try {
+    if (!isSupabaseConfigured()) {
+      res.status(503).json({ error: 'Leaderboard service not available' });
+      return;
+    }
+
+    const { language } = req.params;
+    const limit = Math.min(parseInt(req.query.limit || '50') || 50, 100);
+
+    if (!isValidLanguage(language)) {
+      res.status(400).json({ error: 'Invalid language code' });
+      return;
+    }
+
+    const supabase = getSupabase();
+    if (!supabase) {
+      res.status(503).json({ error: 'Database connection unavailable' });
+      return;
+    }
+
+    const { data, error } = await supabase
+      .from('word_wheel_alltime_leaderboard')
+      .select('*')
+      .eq('language', language)
+      .order('rank_position', { ascending: true })
+      .limit(limit);
+
+    if (error) {
+      logger.error('API', `Word Wheel all-time leaderboard error: ${error.message}`);
+      res.status(500).json({ error: 'Failed to fetch leaderboard' });
+      return;
+    }
+
+    const { count } = await supabase
+      .from('word_wheel_alltime_leaderboard')
+      .select('*', { count: 'exact', head: true })
+      .eq('language', language);
+
+    res.json({
+      data: data || [],
+      totalParticipants: count || data?.length || 0,
+      language,
+    });
+  } catch (error) {
+    const err = error as Error;
+    logger.error('API', `Word Wheel all-time leaderboard error: ${err.message}`);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 export default router;

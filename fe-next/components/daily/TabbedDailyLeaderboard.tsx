@@ -32,6 +32,9 @@ export interface DailyParticipant {
   solved?: boolean;
   attempts_used?: number;
   efficiency_score?: number;
+  // Per-challenge breakdown for combined view
+  word_hunt_score?: number;
+  word_wheel_score?: number;
 }
 
 export interface AllTimeParticipant {
@@ -55,6 +58,7 @@ export interface AllTimeParticipant {
 }
 
 type LeaderboardTab = 'today' | 'alltime' | 'friends';
+export type LeaderboardScope = 'combined' | 'word-hunt' | 'word-wheel';
 
 interface TabbedDailyLeaderboardProps {
   puzzleDate: string;
@@ -67,6 +71,7 @@ interface TabbedDailyLeaderboardProps {
   maxVisible?: number;
   t: (key: string) => string;
   defaultTab?: LeaderboardTab;
+  scope?: LeaderboardScope;
 }
 
 // ==========================================
@@ -118,6 +123,7 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
   maxVisible = 10,
   t,
   defaultTab = 'today',
+  scope = 'combined',
 }) => {
   const [activeTab, setActiveTab] = useState<LeaderboardTab>(defaultTab);
 
@@ -142,33 +148,92 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
   // Windowed pagination state — initialized around the current user
   const [windowRange, setWindowRange] = useState<{ start: number; end: number } | null>(null);
 
-  // Fetch today's leaderboard
+  // Fetch today's leaderboard — merges Word Hunt + Word Wheel into combined score
   const fetchTodayLeaderboard = useCallback(async () => {
-    // Guard against empty puzzleDate
-    if (!puzzleDate) {
-      return;
-    }
+    if (!puzzleDate) return;
 
     try {
       setTodayLoading(true);
       setTodayError(null);
 
-      // Use API endpoint for reliable server-side data fetching
-      const url = `/api/daily-challenge/word-hunt/leaderboard/${puzzleDate}/${language}?limit=100`;
-      const response = await fetch(url);
+      const wantHunt = scope !== 'word-wheel';
+      const wantWheel = scope !== 'word-hunt';
+      const [huntRes, wheelRes] = await Promise.all([
+        wantHunt ? fetch(`/api/daily-challenge/word-hunt/leaderboard/${puzzleDate}/${language}?limit=100`) : Promise.resolve(null),
+        wantWheel ? fetch(`/api/daily-challenge/word-wheel/leaderboard/${puzzleDate}/${language}?limit=100`) : Promise.resolve(null),
+      ]);
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('[TabbedDailyLeaderboard] API error:', response.status, errorText);
+      if ((wantHunt && !huntRes?.ok) && (wantWheel && !wheelRes?.ok)) {
         throw new Error('Failed to fetch leaderboard');
       }
 
-      const responseData = await response.json();
-      const data = responseData.data || [];
-      // Use totalPlayers for ALL who attempted, totalSolved for ALL who solved (including guests)
-      const totalPlayers = responseData.totalPlayers || responseData.totalParticipants || 0;
-      const totalSolved = responseData.totalSolved || 0;
-      const guestCount = responseData.guestPlayerCount || 0;
+      const huntJson = huntRes?.ok ? await huntRes.json() : { data: [], totalPlayers: 0, totalSolved: 0, guestPlayerCount: 0 };
+      const wheelJson = wheelRes?.ok ? await wheelRes.json() : { data: [], totalParticipants: 0, guestPlayerCount: 0 };
+
+      const huntRows: DailyParticipant[] = huntJson.data || [];
+      const wheelRows: Array<DailyParticipant & { score: number }> = wheelJson.data || [];
+
+      const keyOf = (p: { player_id: string | null; guest_fingerprint: string | null }) =>
+        p.player_id ? `u:${p.player_id}` : p.guest_fingerprint ? `g:${p.guest_fingerprint}` : null;
+
+      const merged = new Map<string, DailyParticipant>();
+
+      for (const h of huntRows) {
+        const k = keyOf(h);
+        if (!k) continue;
+        const hs = h.efficiency_score ?? h.score ?? 0;
+        merged.set(k, {
+          ...h,
+          score: hs,
+          word_hunt_score: hs,
+          word_wheel_score: 0,
+        });
+      }
+
+      for (const w of wheelRows) {
+        const k = keyOf(w);
+        if (!k) continue;
+        const ws = w.score ?? 0;
+        const existing = merged.get(k);
+        if (existing) {
+          merged.set(k, {
+            ...existing,
+            score: (existing.score ?? 0) + ws,
+            word_wheel_score: ws,
+            avatar_image: existing.avatar_image ?? w.avatar_image ?? null,
+            custom_avatar: existing.custom_avatar ?? w.custom_avatar ?? null,
+            profile_picture_url: existing.profile_picture_url ?? w.profile_picture_url ?? null,
+            country_code: existing.country_code ?? w.country_code ?? null,
+          });
+        } else {
+          merged.set(k, {
+            ...w,
+            score: ws,
+            solved: undefined,
+            attempts_used: undefined,
+            efficiency_score: undefined,
+            word_hunt_score: 0,
+            word_wheel_score: ws,
+          });
+        }
+      }
+
+      // Sort by combined score desc, tie-break on completed_at asc, then re-rank
+      const data: DailyParticipant[] = Array.from(merged.values())
+        .sort((a, b) => {
+          const s = (b.score ?? 0) - (a.score ?? 0);
+          if (s !== 0) return s;
+          return (a.completed_at || '').localeCompare(b.completed_at || '');
+        })
+        .map((p, i) => ({ ...p, rank_position: i + 1 }));
+
+      const totalPlayers = Math.max(
+        merged.size,
+        huntJson.totalPlayers || 0,
+        wheelJson.totalParticipants || 0,
+      );
+      const totalSolved = huntJson.totalSolved || 0;
+      const guestCount = (huntJson.guestPlayerCount || 0) + (wheelJson.guestPlayerCount || 0);
 
       setTodayParticipants(data);
       setTodayTotalCount(totalPlayers);
@@ -184,33 +249,72 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
     } finally {
       setTodayLoading(false);
     }
-  }, [puzzleDate, language, onParticipantCountChange, activeTab]);
+  }, [puzzleDate, language, onParticipantCountChange, activeTab, scope]);
 
-  // Fetch all-time leaderboard
+  // Fetch all-time leaderboard — merges Word Hunt + Word Wheel
   const fetchAllTimeLeaderboard = useCallback(async () => {
     try {
       setAllTimeLoading(true);
       setAllTimeError(null);
 
-      // Use API endpoint for reliable server-side data fetching
-      const url = `/api/daily-challenge/word-hunt/alltime-leaderboard/${language}?limit=50`;
-      const response = await fetch(url);
+      const wantHunt = scope !== 'word-wheel';
+      const wantWheel = scope !== 'word-hunt';
+      const [huntRes, wheelRes] = await Promise.all([
+        wantHunt ? fetch(`/api/daily-challenge/word-hunt/alltime-leaderboard/${language}?limit=100`) : Promise.resolve(null),
+        wantWheel ? fetch(`/api/daily-challenge/word-wheel/alltime-leaderboard/${language}?limit=100`) : Promise.resolve(null),
+      ]);
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('[TabbedDailyLeaderboard] All-time API error:', response.status, errorText);
+      if ((wantHunt && !huntRes?.ok) && (wantWheel && !wheelRes?.ok)) {
         throw new Error('Failed to fetch all-time leaderboard');
       }
 
-      const responseData = await response.json();
-      const data = responseData.data || [];
-      const totalParticipants = responseData.totalParticipants || 0;
+      const huntJson = huntRes?.ok ? await huntRes.json() : { data: [] };
+      const wheelJson = wheelRes?.ok ? await wheelRes.json() : { data: [] };
+      const huntRows: AllTimeParticipant[] = huntJson.data || [];
+      const wheelRows: AllTimeParticipant[] = wheelJson.data || [];
+
+      const keyOf = (p: { player_id: string | null; guest_fingerprint: string | null }) =>
+        p.player_id ? `u:${p.player_id}` : p.guest_fingerprint ? `g:${p.guest_fingerprint}` : null;
+
+      const merged = new Map<string, AllTimeParticipant>();
+
+      for (const h of huntRows) {
+        const k = keyOf(h);
+        if (!k) continue;
+        merged.set(k, { ...h });
+      }
+
+      for (const w of wheelRows) {
+        const k = keyOf(w);
+        if (!k) continue;
+        const e = merged.get(k);
+        if (e) {
+          merged.set(k, {
+            ...e,
+            total_efficiency_score: (e.total_efficiency_score || 0) + (w.total_efficiency_score || 0),
+            total_games: (e.total_games || 0) + (w.total_games || 0),
+            games_won: (e.games_won || 0) + (w.games_won || 0),
+            best_efficiency: Math.max(e.best_efficiency || 0, w.best_efficiency || 0),
+            last_played_at: (e.last_played_at || '') > (w.last_played_at || '') ? e.last_played_at : w.last_played_at,
+            avatar_image: e.avatar_image ?? w.avatar_image ?? null,
+            custom_avatar: e.custom_avatar ?? w.custom_avatar ?? null,
+            profile_picture_url: e.profile_picture_url ?? w.profile_picture_url ?? null,
+            country_code: e.country_code ?? w.country_code ?? null,
+          });
+        } else {
+          merged.set(k, { ...w });
+        }
+      }
+
+      const data = Array.from(merged.values())
+        .sort((a, b) => (b.total_efficiency_score || 0) - (a.total_efficiency_score || 0))
+        .map((p, i) => ({ ...p, rank_position: i + 1 }));
 
       setAllTimeParticipants(data);
-      setAllTimeTotalCount(totalParticipants);
+      setAllTimeTotalCount(data.length);
 
       if (onParticipantCountChange && activeTab === 'alltime') {
-        onParticipantCountChange(totalParticipants);
+        onParticipantCountChange(data.length);
       }
     } catch (err) {
       console.error('Failed to fetch all-time leaderboard:', err);
@@ -218,7 +322,7 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
     } finally {
       setAllTimeLoading(false);
     }
-  }, [language, onParticipantCountChange, activeTab]);
+  }, [language, onParticipantCountChange, activeTab, scope]);
 
   // Initial fetch and polling
   const pollingInterval = useSafeInterval();
@@ -476,8 +580,27 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
           <Trophy className="w-5 h-5 sm:w-6 sm:h-6 text-amber-300" />
         </div>
         <div className="flex-1 min-w-0">
-          <h3 className="font-black text-base sm:text-lg uppercase tracking-wide text-slate-800 dark:text-white">
-            {t('wordHunt.leaderboard.title')}
+          <h3 className="font-black text-base sm:text-lg uppercase tracking-wide text-slate-800 dark:text-white flex items-center gap-2 flex-wrap">
+            <span>{t('wordHunt.leaderboard.title')}</span>
+            <span
+              className={`
+                text-[10px] sm:text-xs font-black px-2 py-0.5 rounded-full border-2 border-neo-black shadow-xs normal-case tracking-normal
+                ${scope === 'word-hunt' ? 'bg-neo-cyan text-neo-black' : ''}
+                ${scope === 'word-wheel' ? 'bg-neo-purple text-white' : ''}
+                ${scope === 'combined' ? 'bg-neo-lime text-neo-black' : ''}
+              `}
+              title={
+                scope === 'combined'
+                  ? 'Combined score: Word Hunt + Word Wheel'
+                  : scope === 'word-hunt'
+                    ? 'Word Hunt only'
+                    : 'Word Wheel only'
+              }
+            >
+              {scope === 'combined' && <>🎯 + 🎡 {t('daily.leaderboard.scopeCombined') || 'Combined'}</>}
+              {scope === 'word-hunt' && <>🎯 {t('daily.leaderboard.scopeWordHunt') || 'Word Hunt'}</>}
+              {scope === 'word-wheel' && <>🎡 {t('daily.leaderboard.scopeWordWheel') || 'Word Wheel'}</>}
+            </span>
           </h3>
           {!isLoading && (
             <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium truncate">

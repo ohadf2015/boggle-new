@@ -410,6 +410,8 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
     }
 
     // Initialize wheel rush mode state if needed
+    // NOTE: Do NOT broadcast wheelRushInit here — client hasn't mounted WheelRushView yet
+    // (it only mounts after receiving startGame). Broadcast happens after startGame below.
     if (resolvedMode === 'wheel-rush') {
       const puzzle = generateWheelPuzzle(gameCode, gameLang);
       const wheelState = initWheelRushState(puzzle, playerUsernames);
@@ -417,7 +419,6 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
       if (currentGame) {
         currentGame.wheelRushState = wheelState;
       }
-      broadcastToRoom(io, getGameRoom(gameCode), 'wheelRushInit', { puzzle, startedAt: wheelState.startedAt });
     }
 
     // Initialize word hunt mode state if needed
@@ -451,6 +452,18 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
     broadcastToRoom(io, getGameRoom(gameCode), 'startGame',
       buildStartGamePayload(gameCode, letterGrid, validTimer, gameLang, effectiveMinWordLength, messageId, game.gameSessionId, boardTheme, resolvedMode)
     );
+
+    // Broadcast wheel-rush init AFTER startGame so client has time to mount WheelRushView
+    // and subscribe. Also handles late joiners via requestWheelRushState (see wheelRushHandler).
+    if (resolvedMode === 'wheel-rush') {
+      const cg = getGame(gameCode);
+      if (cg?.wheelRushState) {
+        broadcastToRoom(io, getGameRoom(gameCode), 'wheelRushInit', {
+          puzzle: cg.wheelRushState.puzzle,
+          startedAt: cg.wheelRushState.startedAt,
+        });
+      }
+    }
 
     // Calculate and emit total words on board (skip if word-hunt already computed it)
     if (wordHuntSolveReused) {

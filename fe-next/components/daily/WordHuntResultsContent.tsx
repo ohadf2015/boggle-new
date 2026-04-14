@@ -253,6 +253,7 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
       compact
       t={t}
       defaultTab="today"
+      scope="word-hunt"
     />
 
     {/* Share/Retry Section */}

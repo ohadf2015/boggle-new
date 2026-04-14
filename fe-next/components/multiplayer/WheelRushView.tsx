@@ -107,12 +107,19 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
     socket.on('wheelWordLocked', onLocked);
     socket.on('wheelWordStolen', onStolen);
     socket.on('wheelWordClosed', onClosed);
+
+    // Ask server for state — covers race where init broadcast arrived before mount,
+    // and recovers on reconnect. Server replies idempotently via wheelRushInit.
+    socket.emit('requestWheelRushState');
+    const onReconnect = () => socket.emit('requestWheelRushState');
+    socket.on('connect', onReconnect);
     return () => {
       socket.off('wheelRushInit', onInit);
       socket.off('wheelWordResult', onResult);
       socket.off('wheelWordLocked', onLocked);
       socket.off('wheelWordStolen', onStolen);
       socket.off('wheelWordClosed', onClosed);
+      socket.off('connect', onReconnect);
     };
   }, [socket, flash]);
 

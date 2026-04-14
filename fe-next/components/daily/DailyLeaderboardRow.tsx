@@ -107,17 +107,25 @@ export const TodayParticipantRow = memo<{
           )}
         </div>
         <div className="text-xs sm:text-sm flex items-center gap-2 mt-0.5">
-          <span className={`font-bold ${participant.solved ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-500 dark:text-rose-400'}`}>
-            {participant.solved ? `✓ ${participant.attempts_used}/10` : `✗ X/10`}
-          </span>
-          {/* Show efficiency score */}
-          {participant.efficiency_score !== undefined && participant.efficiency_score > 0 && (
+          {participant.solved !== undefined && (
+            <span className={`font-bold ${participant.solved ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-500 dark:text-rose-400'}`}>
+              {participant.solved ? `✓ ${participant.attempts_used}/10` : `✗ X/10`}
+            </span>
+          )}
+          {participant.score != null && participant.score > 0 && (
             <>
-              <span className="text-slate-400 dark:text-slate-500">•</span>
+              {participant.solved !== undefined && (
+                <span className="text-slate-400 dark:text-slate-500">•</span>
+              )}
               <span className="text-purple-600 dark:text-purple-400 font-bold">
-                {participant.efficiency_score} {t('wordHunt.leaderboard.pts')}
+                {participant.score} {t('wordHunt.leaderboard.pts')}
               </span>
             </>
+          )}
+          {(participant.word_hunt_score ?? 0) > 0 && (participant.word_wheel_score ?? 0) > 0 && (
+            <span className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 font-medium ms-1">
+              🎯 {participant.word_hunt_score} · 🎡 {participant.word_wheel_score}
+            </span>
           )}
         </div>
       </div>

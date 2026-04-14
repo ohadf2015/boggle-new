@@ -18,7 +18,6 @@ let _redisClient: RedisClient | null = null;
 let _rateLimitClient: RedisClient | null = null; // Dedicated connection for rate limiting
 let _isRedisAvailable = false;
 let _errorReported = false; // Prevent repeated error events to Sentry
-let _highLatencyReported = false; // Prevent repeated high-latency warnings to Sentry
 let lastHealthCheck = Date.now();
 let healthCheckInterval: NodeJS.Timeout | null = null;
 let memoryCheckInterval: NodeJS.Timeout | null = null;
@@ -112,15 +111,9 @@ export async function healthCheck(): Promise<boolean> {
     const latency = Date.now() - start;
 
     if (latency > 100) {
-      // Only warn (→ Sentry) on first occurrence; subsequent spikes use debug
-      if (!_highLatencyReported) {
-        logger.warn('REDIS', `High latency: ${latency}ms`);
-        _highLatencyReported = true;
-      } else {
-        logger.debug('REDIS', `High latency: ${latency}ms`);
-      }
-    } else {
-      _highLatencyReported = false; // Reset when latency returns to normal
+      // Transient network jitter — dev-only signal, never page Sentry for a single slow ping.
+      // Persistent degradation is caught by the connection-failure path below.
+      logger.debug('REDIS', `High latency: ${latency}ms`);
     }
 
     lastHealthCheck = Date.now();

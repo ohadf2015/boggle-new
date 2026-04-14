@@ -106,6 +106,17 @@ export function handleSubmitWheelWord(io: Server, socket: Socket, data: SubmitWh
 }
 
 export function registerWheelRushHandlers(io: Server, socket: Socket): void {
+  socket.on('requestWheelRushState', () => {
+    const gameCode = getGameBySocketId(socket.id);
+    if (!gameCode) return;
+    const game = getGame(gameCode);
+    if (!game || game.gameMode !== 'wheel-rush' || !game.wheelRushState) return;
+    socket.emit('wheelRushInit', {
+      puzzle: game.wheelRushState.puzzle,
+      startedAt: game.wheelRushState.startedAt,
+    });
+  });
+
   socket.on('submitWheelWord', (data: unknown) => {
     if (!checkRateLimit(socket.id, 10)) {
       socket.emit('rateLimited', { message: 'Too many submissions, slow down' });
