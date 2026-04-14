@@ -410,9 +410,6 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
     }
 
     // Initialize wheel rush mode state if needed
-    if (resolvedMode === 'wheel-rush' && process.env.FF_WHEEL_RUSH !== 'true') {
-      resolvedMode = 'classic';
-    }
     if (resolvedMode === 'wheel-rush') {
       const puzzle = generateWheelPuzzle(gameCode, gameLang);
       const wheelState = initWheelRushState(puzzle, playerUsernames);

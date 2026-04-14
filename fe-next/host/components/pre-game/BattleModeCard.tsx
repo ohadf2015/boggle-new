@@ -98,8 +98,7 @@ export function BattleModeCard({
     setSelectedGameMode(mode);
   }, [setSelectedGameMode]);
 
-  const wheelRushEnabled = process.env.NEXT_PUBLIC_FF_WHEEL_RUSH === 'true';
-  const visibleModes = wheelRushEnabled ? MODES : MODES.filter(m => m.mode !== 'wheel-rush');
+  const visibleModes = MODES;
   const activeMode = visibleModes.find(m => m.mode === selectedGameMode) ?? visibleModes[0];
 
   return (

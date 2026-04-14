@@ -92,7 +92,7 @@ describe('GameModeSelector', () => {
 
     // Lucide icons render as SVG elements (one per visible mode)
     const svgs = container.querySelectorAll('svg');
-    expect(svgs.length).toBe(3);
+    expect(svgs.length).toBe(4);
 
     const buttons = screen.getAllByRole('button');
     buttons.forEach((button) => {

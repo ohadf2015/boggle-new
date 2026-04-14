@@ -82,10 +82,7 @@ export function GameModeSelector({
   showRandom = true,
   compact = false,
 }: GameModeSelectorProps) {
-  const wheelRushEnabled = process.env.NEXT_PUBLIC_FF_WHEEL_RUSH === 'true';
-  const baseModes: GameModeOption[] = wheelRushEnabled
-    ? ['classic', 'word-hunt', 'wheel-rush']
-    : ['classic', 'word-hunt'];
+  const baseModes: GameModeOption[] = ['classic', 'word-hunt', 'wheel-rush'];
   const modes: GameModeOption[] = showRandom ? ['random', ...baseModes] : baseModes;
   const [tooltipMode, setTooltipMode] = React.useState<GameModeOption | null>(null);
   const activeTooltip = tooltipMode ?? selectedMode;

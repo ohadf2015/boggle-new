@@ -9,10 +9,10 @@ import type { GameMode } from '@/shared/types/game';
 export const ALL_GAME_MODES: GameMode[] = ['classic', 'blast', 'word-hunt', 'wheel-rush'];
 
 export const GAME_MODE_WEIGHTS: Record<GameMode, number> = {
-  'classic': 0.4,
-  'blast': 0.3,
-  'word-hunt': 0.3,
-  'wheel-rush': 0, // flag-gated, opt-in only via enabledModes
+  'classic': 0.35,
+  'blast': 0.25,
+  'word-hunt': 0.25,
+  'wheel-rush': 0.15,
 };
 
 /**

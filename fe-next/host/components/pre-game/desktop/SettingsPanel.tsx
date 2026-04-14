@@ -84,7 +84,7 @@ export function SettingsPanel({
           </p>
 
           <div className="flex flex-col gap-2 xl:gap-3">
-            {MODE_CONFIG.filter(m => m.mode !== 'wheel-rush' || process.env.NEXT_PUBLIC_FF_WHEEL_RUSH === 'true').map(({ mode, icon: Icon, nameKey, descKey, colors }) => {
+            {MODE_CONFIG.map(({ mode, icon: Icon, nameKey, descKey, colors }) => {
               const isSelected = selectedGameMode === mode;
 
               return (

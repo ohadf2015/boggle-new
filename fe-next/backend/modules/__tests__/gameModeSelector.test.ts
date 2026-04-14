@@ -28,8 +28,8 @@ describe('gameModeSelector', () => {
       for (let i = 0; i < 200; i++) {
         results.add(selectNextGameMode([], ALL_GAME_MODES));
       }
-      // With 200 iterations and 3 modes, all should appear
-      expect(results.size).toBe(3);
+      // With 200 iterations and 4 modes, all should appear
+      expect(results.size).toBe(4);
     });
 
     it('should only return modes from the enabled list', () => {
