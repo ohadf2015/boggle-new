@@ -31,7 +31,11 @@ import type { WordHuntStats } from './types';
 interface DailyWordHuntFactsProps {
   result: WordHuntResult;
   stats: WordHuntStats;
-  t: (key: string, params?: Record<string, string | number>) => string;
+  t: (
+    key: string,
+    fallbackOrParams?: string | Record<string, string | number>,
+    paramsWhenFallback?: Record<string, string | number>,
+  ) => string;
 }
 
 // ---------------------------------------------------------------------------
@@ -97,7 +101,7 @@ const DailyWordHuntFacts: React.FC<DailyWordHuntFactsProps> = ({ result, stats, 
       <h3 className="text-sm font-bold text-neo-cream/70 uppercase tracking-wider text-center">
         {t('wordHunt.facts.title')}
       </h3>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+      <div className="grid grid-cols-1 gap-2">
         {facts.map((fact, index) => {
           const IconComponent = ICON_MAP[fact.icon] || Zap;
           const styles = COLOR_STYLES[fact.color];
@@ -123,7 +127,9 @@ const DailyWordHuntFacts: React.FC<DailyWordHuntFactsProps> = ({ result, stats, 
                 <IconComponent className="w-5 h-5" />
               </div>
               <p className="min-w-0 flex-1 text-xs text-neo-cream/80">
-                {t(fact.translationKey, fact.translationParams)}
+                {fact.translationFallback
+                  ? t(fact.translationKey, fact.translationFallback, fact.translationParams)
+                  : t(fact.translationKey, fact.translationParams)}
               </p>
               {fact.value != null && (
                 <motion.span
