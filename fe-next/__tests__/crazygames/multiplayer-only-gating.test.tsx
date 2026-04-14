@@ -20,6 +20,11 @@ import { useAuth } from '@/contexts/AuthContext';
 
 vi.mock('@/components/CrazyGamesSDK');
 vi.mock('@/contexts/AuthContext');
+// NextStepPrompt reads t/dir from useLanguage — without a mock the real
+// provider resolves translation keys to English text, breaking getByText(key).
+vi.mock('@/contexts/LanguageContext', () => ({
+  useLanguage: () => ({ t: (k: string) => k, language: 'en', dir: 'ltr' }),
+}));
 // Heavy children of PostGameEngagement — stub so we can assert the shell renders
 vi.mock('@/components/leagues/LeagueRivalsCard', () => ({
   LeagueRivalsCard: () => <div data-testid="league-rivals-card" />,
@@ -142,11 +147,12 @@ describe('CrazyGames multiplayer-only gating', () => {
       expect(screen.queryByTestId('wotd-teaser')).not.toBeInTheDocument();
     });
 
-    it('renders engagement cards off CG', () => {
+    it('renders engagement cards off CG', async () => {
       mockUseCrazyGames.mockReturnValue(cgContext(false));
       render(<PostGameEngagement />);
       expect(screen.getByTestId('post-game-engagement')).toBeInTheDocument();
-      expect(screen.getByTestId('wotd-teaser')).toBeInTheDocument();
+      // WotdTeaser is loaded via next/dynamic — await the async mount.
+      expect(await screen.findByTestId('wotd-teaser')).toBeInTheDocument();
     });
   });
 
