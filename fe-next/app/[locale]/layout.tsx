@@ -24,6 +24,7 @@ import SocialMediaPixels from '@/components/SocialMediaPixels';
 import { OrganizationJsonLd } from '@/components/seo/OrganizationJsonLd';
 import { VideoGameJsonLd } from '@/components/seo/VideoGameJsonLd';
 import { fredokaLatin, fredokaHebrew, rubikLatin, rubikHebrew, heeboHebrew } from '../fonts';
+import { FeedbackToolbar } from '@feedback/sdk';
 
 // Dynamic import for EmailCaptureModal (shown conditionally, not needed immediately)
 const EmailCaptureModal = nextDynamic(() => import('@/components/EmailCaptureModal'), {
@@ -651,6 +652,9 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                     <ChurnSignalTracker />
                     {/* Toast notifications container */}
                     <ToastContainer position="bottom-right" />
+                    {process.env.NODE_ENV !== 'production' && (
+                      <FeedbackToolbar projectToken={process.env.NEXT_PUBLIC_FEEDBACK_TOKEN!} />
+                    )}
                 </ConditionalProviders>
             </body>
         </html>

@@ -3,6 +3,22 @@ import { fileURLToPath } from 'url';
 import createNextIntlPlugin from 'next-intl/plugin';
 import { withSentryConfig } from '@sentry/nextjs';
 
+// Optional local-only dev toolbar. Swap to no-op when the SDK isn't installed.
+let withFeedbackSDK = (c) => c;
+let feedbackSdkAvailable = false;
+try {
+  ({ withFeedbackSDK } = await import('@feedback/sdk/next'));
+  feedbackSdkAvailable = true;
+} catch {
+  // SDK not installed — production build path.
+}
+
+const isDevMode = process.env.NODE_ENV !== 'production';
+// Localhost origins allowed to embed the dev site + receive SDK traffic
+const feedbackDevCsp = isDevMode
+  ? ' http://localhost:* ws://localhost:*'
+  : '';
+
 const withNextIntl = createNextIntlPlugin();
 
 const __filename = fileURLToPath(import.meta.url);
@@ -379,9 +395,9 @@ const nextConfig = {
             // When force-disabled, strip SDK/ad domains from script-src and connect-src.
             value: isCrazyGamesForceDisabled
               // Force-disabled: no SDK script, but still allow iframe embedding for other portals
-              ? "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://cdn.lgrckt-in.com https://cdn.lr-in-prod.com https://cdn.lr-ingest.com https://pagead2.googlesyndication.com https://imasdk.googleapis.com https://*.googleadservices.com https://ep2.adtrafficquality.google https://*.posthog.com https://eu.i.posthog.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: https: blob:; media-src 'self' data:; connect-src 'self' https://*.supabase.co https://*.sentry.io https://*.logrocket.io https://*.lr-in-prod.com https://*.lgrckt-in.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://*.googlesyndication.com https://*.doubleclick.net https://*.googleadservices.com https://*.adtrafficquality.google https://*.posthog.com https://eu.i.posthog.com wss: ws:; worker-src 'self' blob:; frame-src 'self' https://*.googlesyndication.com https://*.doubleclick.net https://googleads.g.doubleclick.net; frame-ancestors 'self' https://*.crazygames.com https://crazygames.com https://poki.com https://www.poki.com;"
+              ? "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://cdn.lgrckt-in.com https://cdn.lr-in-prod.com https://cdn.lr-ingest.com https://pagead2.googlesyndication.com https://imasdk.googleapis.com https://*.googleadservices.com https://ep2.adtrafficquality.google https://*.posthog.com https://eu.i.posthog.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: https: blob:; media-src 'self' data:; connect-src 'self' https://*.supabase.co https://*.sentry.io https://*.logrocket.io https://*.lr-in-prod.com https://*.lgrckt-in.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://*.googlesyndication.com https://*.doubleclick.net https://*.googleadservices.com https://*.adtrafficquality.google https://*.posthog.com https://eu.i.posthog.com wss: ws:; worker-src 'self' blob:; frame-src 'self' https://*.googlesyndication.com https://*.doubleclick.net https://googleads.g.doubleclick.net; frame-ancestors 'self' https://*.crazygames.com https://crazygames.com https://poki.com https://www.poki.com" + feedbackDevCsp + ";"
               // Default: SDK auto-detection enabled — allow CrazyGames SDK script + ads + iframe embedding
-              : "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://cdn.lgrckt-in.com https://cdn.lr-in-prod.com https://cdn.lr-ingest.com https://sdk.crazygames.com https://*.crazygames.com https://pagead2.googlesyndication.com https://imasdk.googleapis.com https://*.googleadservices.com https://ep2.adtrafficquality.google https://*.posthog.com https://eu.i.posthog.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: https: blob:; media-src 'self' data:; connect-src 'self' https://*.supabase.co https://*.sentry.io https://*.logrocket.io https://*.lr-in-prod.com https://*.lgrckt-in.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://*.crazygames.com https://*.googlesyndication.com https://*.doubleclick.net https://*.googleadservices.com https://*.adtrafficquality.google https://*.posthog.com https://eu.i.posthog.com wss: ws:; worker-src 'self' blob:; frame-src 'self' https://*.crazygames.com https://*.googlesyndication.com https://*.doubleclick.net https://googleads.g.doubleclick.net; frame-ancestors 'self' https://*.crazygames.com https://crazygames.com https://poki.com https://www.poki.com;",
+              : "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://cdn.lgrckt-in.com https://cdn.lr-in-prod.com https://cdn.lr-ingest.com https://sdk.crazygames.com https://*.crazygames.com https://pagead2.googlesyndication.com https://imasdk.googleapis.com https://*.googleadservices.com https://ep2.adtrafficquality.google https://*.posthog.com https://eu.i.posthog.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: https: blob:; media-src 'self' data:; connect-src 'self' https://*.supabase.co https://*.sentry.io https://*.logrocket.io https://*.lr-in-prod.com https://*.lgrckt-in.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://*.crazygames.com https://*.googlesyndication.com https://*.doubleclick.net https://*.googleadservices.com https://*.adtrafficquality.google https://*.posthog.com https://eu.i.posthog.com wss: ws:; worker-src 'self' blob:; frame-src 'self' https://*.crazygames.com https://*.googlesyndication.com https://*.doubleclick.net https://googleads.g.doubleclick.net; frame-ancestors 'self' https://*.crazygames.com https://crazygames.com https://poki.com https://www.poki.com" + feedbackDevCsp + ";",
           },
         ],
       },
@@ -402,6 +418,13 @@ const nextConfig = {
     // Alias the TypeScript index to the compiled JavaScript version
     config.resolve.alias['@arvidbt/swedish-words'] = path.resolve(__dirname, 'node_modules/@arvidbt/swedish-words/out/index.js');
 
+    // When @feedback/sdk isn't installed (prod/CI), redirect imports to a no-op stub.
+    if (!feedbackSdkAvailable) {
+      const stub = path.resolve(__dirname, 'lib/feedback-stub.tsx');
+      config.resolve.alias['@feedback/sdk'] = stub;
+      config.resolve.alias['@feedback/sdk/next'] = stub;
+    }
+
     return config;
   },
 };
@@ -409,7 +432,7 @@ const nextConfig = {
 // Sentry configuration - only needs NEXT_PUBLIC_SENTRY_DSN to work
 // Source map upload only in CI/production (SENTRY_AUTH_TOKEN present) — saves ~10-20s locally
 const hasSentryToken = !!process.env.SENTRY_AUTH_TOKEN;
-const sentryConfig = withSentryConfig(nextConfig, {
+const sentryConfig = withSentryConfig(withFeedbackSDK(nextConfig), {
   org: process.env.SENTRY_ORG,
   project: process.env.SENTRY_PROJECT,
   authToken: process.env.SENTRY_AUTH_TOKEN,
