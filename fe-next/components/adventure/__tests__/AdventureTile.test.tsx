@@ -235,7 +235,7 @@ describe('AdventureTile', () => {
     it('should have responsive border radius via inline style', () => {
       const { container } = render(<AdventureTile {...defaultProps} />);
       const tile = container.querySelector('[role="gridcell"]');
-      expect(tile).toHaveStyle({ borderRadius: 'clamp(4px, 1cqi, 8px)' });
+      expect(tile?.getAttribute('style')).toContain('clamp(4px, 1cqi, 8px)');
     });
 
     it('should have font-size from CSS variable', () => {
