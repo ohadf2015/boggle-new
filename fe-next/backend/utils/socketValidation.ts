@@ -241,7 +241,7 @@ export const startGameSchema = z.object({
     emoji: z.string(),
     isHoliday: z.boolean().optional(),
   }).nullable().optional(),
-  gameMode: z.enum(['classic', 'blast', 'word-hunt', 'random']).optional(),
+  gameMode: z.enum(['classic', 'blast', 'word-hunt', 'wheel-rush', 'random']).optional(),
 });
 
 export const startGameAckSchema = compiledSchemas?.startGameAckSchema || z.object({
