@@ -4,6 +4,12 @@ import { createServerClient } from '@supabase/ssr';
 const VALID_LOCALES = ['en', 'he', 'sv', 'ja', 'es'] as const;
 const DEFAULT_LOCALE = 'en';
 
+// Bot probes for secrets / admin panels. Short-circuit with 404 before
+// App Router renders `/[locale]` — renders crashed with
+// `controller[kState].transformAlgorithm is not a function` on Node 22
+// (Sentry JAVASCRIPT-NEXTJS-NE).
+const PROBE_RE = /^\/(\.env|\.git|\.aws|\.ssh|\.DS_Store|wp-admin|wp-login|wp-includes|wp-content|phpmyadmin|phpinfo|xmlrpc\.php|config\.json|credentials|secrets\.json|backup\.zip|admin\.php|\.well-known\/security\.txt)(\/|$)/i;
+
 // SEO and social bot user-agent fragments (lowercase)
 const BOT_SIGNATURES = [
   // SEO crawlers
@@ -33,6 +39,11 @@ function isBotRequest(request: NextRequest): boolean {
  */
 export async function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
+
+  if (PROBE_RE.test(pathname)) {
+    return new NextResponse(null, { status: 404 });
+  }
+
   const pathnameHasLocale = VALID_LOCALES.some(
     (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
   );
