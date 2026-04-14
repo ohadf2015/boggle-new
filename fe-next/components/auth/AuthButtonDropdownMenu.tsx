@@ -38,6 +38,12 @@ interface AuthButtonDropdownMenuProps {
   setShowUserMenu: (show: boolean) => void;
   setShowCalendarModal: (show: boolean) => void;
   onSignOut: () => Promise<void>;
+  /**
+   * When true, the game is running inside the CrazyGames iframe and only
+   * the multiplayer mode is allowed. Hides Profile / Leaderboard / Friends /
+   * Settings / Admin links, leaving language switching and sign out.
+   */
+  isCrazyGames?: boolean;
 }
 
 export function AuthButtonDropdownMenu({
@@ -56,6 +62,7 @@ export function AuthButtonDropdownMenu({
   setShowUserMenu,
   setShowCalendarModal,
   onSignOut,
+  isCrazyGames = false,
 }: AuthButtonDropdownMenuProps): React.JSX.Element {
   const [isLanguageExpanded, setIsLanguageExpanded] = useState(false);
 
@@ -91,90 +98,99 @@ export function AuthButtonDropdownMenu({
           ...(isRTL ? { left: dropdownPosition.left } : { right: dropdownPosition.right })
         }}
       >
-        {/* Profile Link */}
-        <Button
-          role="menuitem"
-          variant="ghost"
-          onClick={() => { router.push(`/${language}/profile`); setShowUserMenu(false); }}
-          className={cn(menuItemClass, 'rounded-t-lg')}
-        >
-          <User size={14} />
-          <span>{t('profile.title')}</span>
-        </Button>
+        {/*
+          CrazyGames distribution: only the multiplayer mode is published.
+          Hide every link that navigates off-mode (profile, leaderboard,
+          friends, settings, daily rewards calendar, admin dashboard).
+        */}
+        {!isCrazyGames && (
+          <>
+            {/* Profile Link */}
+            <Button
+              role="menuitem"
+              variant="ghost"
+              onClick={() => { router.push(`/${language}/profile`); setShowUserMenu(false); }}
+              className={cn(menuItemClass, 'rounded-t-lg')}
+            >
+              <User size={14} />
+              <span>{t('profile.title')}</span>
+            </Button>
 
-        {/* Leaderboard Link */}
-        <Button
-          role="menuitem"
-          variant="ghost"
-          onClick={() => { router.push(`/${language}/leaderboard`); setShowUserMenu(false); }}
-          className={menuItemClass}
-        >
-          <Trophy size={14} aria-hidden="true" />
-          <span>{t('leaderboard.title')}</span>
-        </Button>
+            {/* Leaderboard Link */}
+            <Button
+              role="menuitem"
+              variant="ghost"
+              onClick={() => { router.push(`/${language}/leaderboard`); setShowUserMenu(false); }}
+              className={menuItemClass}
+            >
+              <Trophy size={14} aria-hidden="true" />
+              <span>{t('leaderboard.title')}</span>
+            </Button>
 
-        {/* Friends Link */}
-        <Button
-          role="menuitem"
-          variant="ghost"
-          onClick={() => { router.push(`/${language}/friends`); setShowUserMenu(false); }}
-          className={menuItemClass}
-        >
-          <Users size={14} aria-hidden="true" />
-          <span>{t('friends.title')}</span>
-        </Button>
+            {/* Friends Link */}
+            <Button
+              role="menuitem"
+              variant="ghost"
+              onClick={() => { router.push(`/${language}/friends`); setShowUserMenu(false); }}
+              className={menuItemClass}
+            >
+              <Users size={14} aria-hidden="true" />
+              <span>{t('friends.title')}</span>
+            </Button>
 
-        <div className={dividerClass} />
+            <div className={dividerClass} />
 
-        {/* Settings Link */}
-        <Button
-          role="menuitem"
-          variant="ghost"
-          onClick={() => { router.push(`/${language}/settings`); setShowUserMenu(false); }}
-          className={menuItemClass}
-        >
-          <Settings size={14} aria-hidden="true" />
-          <span>{t('settings.title')}</span>
-        </Button>
+            {/* Settings Link */}
+            <Button
+              role="menuitem"
+              variant="ghost"
+              onClick={() => { router.push(`/${language}/settings`); setShowUserMenu(false); }}
+              className={menuItemClass}
+            >
+              <Settings size={14} aria-hidden="true" />
+              <span>{t('settings.title')}</span>
+            </Button>
 
-        {/* Daily Rewards Calendar */}
-        <Button
-          role="menuitem"
-          variant="ghost"
-          onClick={() => setShowCalendarModal(true)}
-          className={cn(menuItemClass, 'relative')}
-        >
-          <div className="relative">
-            <Calendar size={14} aria-hidden="true" />
-            {hasUnclaimedReward && (
-              <div className="absolute -top-1.5 -right-1.5 rtl:-right-auto rtl:-left-1.5 w-2.5 h-2.5 bg-neo-lime rounded-full border border-neo-black" />
+            {/* Daily Rewards Calendar */}
+            <Button
+              role="menuitem"
+              variant="ghost"
+              onClick={() => setShowCalendarModal(true)}
+              className={cn(menuItemClass, 'relative')}
+            >
+              <div className="relative">
+                <Calendar size={14} aria-hidden="true" />
+                {hasUnclaimedReward && (
+                  <div className="absolute -top-1.5 -right-1.5 rtl:-right-auto rtl:-left-1.5 w-2.5 h-2.5 bg-neo-lime rounded-full border border-neo-black" />
+                )}
+              </div>
+              <span>{t('calendar.title')}</span>
+              {hasUnclaimedReward && (
+                <Gift size={12} className="ms-auto text-neo-lime" aria-label={t('calendar.rewardAvailable')} />
+              )}
+            </Button>
+
+            {/* Admin Dashboard Link */}
+            {isAdmin && (
+              <Button
+                role="menuitem"
+                variant="ghost"
+                onClick={() => { router.push(`/${language}/admin`); setShowUserMenu(false); }}
+                className={cn(
+                  'w-full justify-start gap-3',
+                  isDarkMode
+                    ? 'text-neo-pink hover:bg-slate-700 hover:text-neo-pink'
+                    : 'text-neo-pink hover:bg-gray-50 hover:text-neo-pink'
+                )}
+              >
+                <Shield size={14} aria-hidden="true" />
+                <span>{t('common.adminDashboard')}</span>
+              </Button>
             )}
-          </div>
-          <span>{t('calendar.title')}</span>
-          {hasUnclaimedReward && (
-            <Gift size={12} className="ms-auto text-neo-lime" aria-label={t('calendar.rewardAvailable')} />
-          )}
-        </Button>
 
-        {/* Admin Dashboard Link */}
-        {isAdmin && (
-          <Button
-            role="menuitem"
-            variant="ghost"
-            onClick={() => { router.push(`/${language}/admin`); setShowUserMenu(false); }}
-            className={cn(
-              'w-full justify-start gap-3',
-              isDarkMode
-                ? 'text-neo-pink hover:bg-slate-700 hover:text-neo-pink'
-                : 'text-neo-pink hover:bg-gray-50 hover:text-neo-pink'
-            )}
-          >
-            <Shield size={14} aria-hidden="true" />
-            <span>{t('common.adminDashboard')}</span>
-          </Button>
+            <div className={dividerClass} />
+          </>
         )}
-
-        <div className={dividerClass} />
 
         {/* Language Section - Collapsible */}
         <div>

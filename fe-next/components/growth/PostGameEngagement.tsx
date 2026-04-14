@@ -10,6 +10,7 @@
 import React, { memo } from 'react';
 import dynamic from 'next/dynamic';
 import { useAuth } from '@/contexts/AuthContext';
+import { useCrazyGames } from '@/components/CrazyGamesSDK';
 
 const LeagueRivalsCard = dynamic(
   () => import('@/components/leagues/LeagueRivalsCard').then(m => m.LeagueRivalsCard),
@@ -26,9 +27,13 @@ const WordCollectionCard = dynamic(
 
 export const PostGameEngagement: React.FC = memo(function PostGameEngagement() {
   const { isAuthenticated } = useAuth();
+  const { isOnCrazyGamesPlatform } = useCrazyGames();
 
   // Only show for authenticated users — guests see the sign-up CTA instead
   if (!isAuthenticated) return null;
+  // CrazyGames distribution is multiplayer-only — WotdTeaser links to /daily,
+  // which would navigate the player off-mode. Hide the whole block.
+  if (isOnCrazyGamesPlatform) return null;
 
   return (
     <div

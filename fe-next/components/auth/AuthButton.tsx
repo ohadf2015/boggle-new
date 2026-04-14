@@ -233,6 +233,7 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
             setShowUserMenu={setShowUserMenu}
             setShowCalendarModal={setShowCalendarModal}
             onSignOut={handleSignOut}
+            isCrazyGames={isCrazyGames}
           />,
           document.body
         )}
