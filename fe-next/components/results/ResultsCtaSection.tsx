@@ -7,6 +7,7 @@ import type { Player } from '@/components/results/types';
 import NextStepPrompt from '@/components/results/NextStepPrompt';
 import ShareButton from '@/components/results/ShareButton';
 import { GameModeSelector, type GameModeOption } from '@/components/GameModeSelector';
+import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import type { ShareParams } from '@/shared/utils/shareResultGenerator';
 
 type TFunction = (key: string, params?: Record<string, string | number>) => string;
@@ -54,13 +55,19 @@ export const ResultsCtaSection: React.FC<ResultsCtaSectionProps> = ({
   ctaDelay,
   t,
 }) => {
+  const { isOnCrazyGamesPlatform } = useCrazyGames();
+  // On CrazyGames the only published mode is multiplayer, so the
+  // bots-only NextStepPrompt (which suggests Daily Challenge) would
+  // navigate the player off-mode. Fall through to the normal ready/back UI.
+  const showBotsOnlyNextStep = isBotsOnlyGame && !isHost && !isOnCrazyGamesPlatform;
+
   return (
     <motion.div
       initial={reducedMotion ? undefined : { opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ type: 'spring', stiffness: 200, damping: 20, delay: ctaDelay }}
     >
-      {isBotsOnlyGame && !isHost ? (
+      {showBotsOnlyNextStep ? (
         <NextStepPrompt
           currentMode="multiplayer-bots"
           onBackToLobby={onExit}
