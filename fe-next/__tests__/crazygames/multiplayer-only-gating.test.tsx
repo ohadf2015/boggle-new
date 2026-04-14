@@ -30,7 +30,7 @@ vi.mock('@/components/leagues/LeagueRivalsCard', () => ({
   LeagueRivalsCard: () => <div data-testid="league-rivals-card" />,
 }));
 vi.mock('@/components/landing/WotdTeaser', () => ({
-  WotdTeaser: () => <a href="/daily" data-testid="wotd-teaser">WOTD</a>,
+  WotdTeaser: () => <div data-testid="wotd-teaser">WOTD</div>,
 }));
 vi.mock('@/components/vocabulary/WordCollectionCard', () => ({
   WordCollectionCard: () => <div data-testid="word-collection-card" />,
