@@ -8,6 +8,7 @@ import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { useFriends } from '@/hooks/useFriends';
 import type { Language } from '@/types';
 import { TodayParticipantRow, AllTimeParticipantRow, SkeletonRow } from './DailyLeaderboardRow';
+import { WordWheelWordsModal } from './WordWheelWordsModal';
 
 // ==========================================
 // Types
@@ -126,6 +127,11 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
   scope = 'combined',
 }) => {
   const [activeTab, setActiveTab] = useState<LeaderboardTab>(defaultTab);
+
+  // Word Wheel words modal (lazy fetch of submitted words)
+  const [wordsModalPlayer, setWordsModalPlayer] = useState<DailyParticipant | null>(null);
+  const openWheelWords = useCallback((p: DailyParticipant) => setWordsModalPlayer(p), []);
+  const closeWheelWords = useCallback(() => setWordsModalPlayer(null), []);
 
   // Friends data for filtering
   const { friends } = useFriends();
@@ -535,6 +541,7 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
                 isCurrentUser={isCurrentUserToday(participant)}
                 compact={compact}
                 t={t}
+                onViewWheelWords={openWheelWords}
               />
             ))
           ) : (
@@ -563,6 +570,7 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
   };
 
   return (
+    <>
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
@@ -597,9 +605,9 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
                     : 'Word Wheel only'
               }
             >
-              {scope === 'combined' && <>🎯 + 🎡 {t('daily.leaderboard.scopeCombined') || 'Combined'}</>}
-              {scope === 'word-hunt' && <>🎯 {t('daily.leaderboard.scopeWordHunt') || 'Word Hunt'}</>}
-              {scope === 'word-wheel' && <>🎡 {t('daily.leaderboard.scopeWordWheel') || 'Word Wheel'}</>}
+              {scope === 'combined' && <>🎯 + 🎡 {t('wordHunt.leaderboard.scopeCombined') || 'Combined'}</>}
+              {scope === 'word-hunt' && <>🎯 {t('wordHunt.leaderboard.scopeWordHunt') || 'Word Hunt'}</>}
+              {scope === 'word-wheel' && <>🎡 {t('wordHunt.leaderboard.scopeWordWheel') || 'Word Wheel'}</>}
             </span>
           </h3>
           {!isLoading && (
@@ -634,6 +642,17 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
       {/* Content area - loading/empty/participants */}
       {renderContent()}
     </motion.div>
+
+    <WordWheelWordsModal
+      isOpen={!!wordsModalPlayer}
+      onClose={closeWheelWords}
+      puzzleDate={puzzleDate}
+      language={language}
+      playerId={wordsModalPlayer?.player_id ?? null}
+      playerName={wordsModalPlayer?.display_name ?? ''}
+      t={t}
+    />
+    </>
   );
 };
 

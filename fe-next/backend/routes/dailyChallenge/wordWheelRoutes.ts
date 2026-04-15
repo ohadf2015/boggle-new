@@ -272,4 +272,82 @@ router.get('/alltime-leaderboard/:language', async (req: Request<{ language: str
   }
 });
 
+// ==========================================
+// GET /api/daily-challenge/word-wheel/words/:date/:language/:playerId
+// Lazy fetch of words submitted by a specific player (for leaderboard row expansion)
+// ==========================================
+
+interface WordsRouteParams {
+  date: string;
+  language: string;
+  playerId: string;
+}
+
+router.get('/words/:date/:language/:playerId', async (req: Request<WordsRouteParams>, res: Response): Promise<void> => {
+  try {
+    if (!isSupabaseConfigured()) {
+      res.status(503).json({ error: 'Service not available' });
+      return;
+    }
+
+    const { date, language, playerId } = req.params;
+
+    if (!isValidDateFormat(date)) {
+      res.status(400).json({ error: 'Invalid date format. Use YYYY-MM-DD' });
+      return;
+    }
+    if (!isValidLanguage(language)) {
+      res.status(400).json({ error: 'Invalid language code' });
+      return;
+    }
+    if (!playerId || typeof playerId !== 'string' || playerId.length > 128) {
+      res.status(400).json({ error: 'Invalid playerId' });
+      return;
+    }
+
+    const supabase = getSupabase();
+    if (!supabase) {
+      res.status(503).json({ error: 'Database connection unavailable' });
+      return;
+    }
+
+    const { data, error } = await supabase
+      .from('daily_word_wheel_attempts')
+      .select('words_found, score, word_count, longest_word, display_name, avatar_emoji, avatar_color, avatar_image')
+      .eq('puzzle_date', date)
+      .eq('language', language)
+      .eq('player_id', playerId)
+      .maybeSingle();
+
+    if (error) {
+      logger.error('API', `Word Wheel words fetch error: ${error.message}`);
+      res.status(500).json({ error: 'Failed to fetch words' });
+      return;
+    }
+
+    if (!data) {
+      res.status(404).json({ error: 'No attempt found for this player' });
+      return;
+    }
+
+    const raw = Array.isArray(data.words_found) ? (data.words_found as unknown[]) : [];
+    const wordsFound = raw.filter((w): w is string => typeof w === 'string');
+
+    res.json({
+      wordsFound,
+      wordCount: data.word_count ?? wordsFound.length,
+      score: data.score ?? 0,
+      longestWord: data.longest_word ?? null,
+      displayName: data.display_name ?? 'Anonymous',
+      avatarEmoji: data.avatar_emoji ?? '🎯',
+      avatarColor: data.avatar_color ?? '#6366f1',
+      avatarImage: data.avatar_image ?? null,
+    });
+  } catch (error) {
+    const err = error as Error;
+    logger.error('API', `Word Wheel words fetch error: ${err.message}`);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 export default router;

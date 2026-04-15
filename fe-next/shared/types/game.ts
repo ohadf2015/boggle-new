@@ -12,6 +12,15 @@ export type Language = 'he' | 'en' | 'sv' | 'ja' | 'es' | 'fr' | 'de';
 
 export type GameState = 'waiting' | 'in-progress' | 'finished' | 'validating';
 
+/**
+ * Canonical multiplayer game mode. Identifies live rules + state for an
+ * in-progress MP room (classic Boggle, blast, word-hunt, wheel-rush).
+ *
+ * This is NOT the right type for:
+ * - Share cards → use `ShareGameMode` from `shared/utils/shareResultGenerator`
+ * - Standalone modes (daily / adventure / endless / drill / single player)
+ *   which have their own local types in their respective modules.
+ */
 export type GameMode = 'classic' | 'blast' | 'word-hunt' | 'wheel-rush';
 export type GameModeSelection = GameMode | 'random';
 

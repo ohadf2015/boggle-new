@@ -24,20 +24,40 @@ vi.mock('qrcode.react', () => ({
 
 // ── contexts ──────────────────────────────────────────────────────────────────
 
+const stableLangCtx = {
+  t: (key: string) => key,
+  language: 'en' as const,
+  dir: 'ltr' as const,
+};
 vi.mock('@/contexts/LanguageContext', () => ({
-  useLanguage: () => ({
-    t: (key: string) => key,
-    language: 'en',
-    dir: 'ltr',
-  }),
+  useLanguage: () => stableLangCtx,
 }));
 
+// Stabilize next/navigation — global setup mock returns a fresh router object
+// each call, which destabilizes effects that list `router` in deps and causes
+// an infinite re-fetch loop in this component.
+const stableRouter = {
+  push: vi.fn(),
+  replace: vi.fn(),
+  prefetch: vi.fn(),
+  back: vi.fn(),
+  forward: vi.fn(),
+  refresh: vi.fn(),
+};
+vi.mock('next/navigation', () => ({
+  useRouter: () => stableRouter,
+  usePathname: () => '/',
+  useSearchParams: () => new URLSearchParams(),
+  useParams: () => ({}),
+}));
+
+const stableAuthCtx = {
+  user: { id: 'teacher-1', email: 'teacher@test.com' },
+  profile: { display_name: 'Test Teacher' },
+  isLoading: false,
+};
 vi.mock('@/contexts/AuthContext', () => ({
-  useAuth: () => ({
-    user: { id: 'teacher-1', email: 'teacher@test.com' },
-    profile: { display_name: 'Test Teacher' },
-    isLoading: false,
-  }),
+  useAuth: () => stableAuthCtx,
 }));
 
 // ── supabase data layer ────────────────────────────────────────────────────────
@@ -161,19 +181,19 @@ describe('ClassroomGameLobby — QR code', () => {
     render(<ClassroomGameLobby onBack={vi.fn()} />);
 
     // Step 1: wait for data load, select lessons, advance.
-    // The component has a re-fetch loop (fetchTeacherData depends on
-    // selectedClassroomId which it sets during fetch), so the setup step
-    // may briefly unmount between fetch cycles. Use findByTestId to retry.
-    const selectBtn = await screen.findByTestId('select-lessons', {}, { timeout: 8000 });
-    fireEvent.click(selectBtn);
-
-    // Wait for the Next button to be enabled after the re-fetch loop settles.
-    const nextBtn = await screen.findByTestId('wizard-next', {}, { timeout: 8000 });
+    // The component can unmount/remount the setup step between fetch cycles,
+    // so poll: re-query + re-click until the Next button is live and enabled.
+    // This avoids stale-node clicks whose handlers don't fire on the new tree.
     await waitFor(
-      () => expect(nextBtn).not.toBeDisabled(),
-      { timeout: 5000 }
+      () => {
+        const btn = screen.getByTestId('select-lessons');
+        fireEvent.click(btn);
+        const next = screen.getByTestId('wizard-next');
+        expect(next).not.toBeDisabled();
+      },
+      { timeout: 10000 }
     );
-    fireEvent.click(nextBtn);
+    fireEvent.click(screen.getByTestId('wizard-next'));
 
     // Step 2: QR code appears with correct URL format
     let qrValue = '';

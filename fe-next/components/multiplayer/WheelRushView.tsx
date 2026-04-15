@@ -1,13 +1,25 @@
 'use client';
 
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { Socket } from 'socket.io-client';
 import { AnimatePresence, motion } from 'framer-motion';
+import dynamic from 'next/dynamic';
+import { RotateCcw, Shuffle, Sparkles } from 'lucide-react';
 import { WheelLetter, WordTile } from '@/components/daily/WordWheelParts';
+import { useWordWheelKeyboard } from '@/hooks/useWordWheelKeyboard';
+import { useSoundEffects } from '@/contexts/SoundEffectsContext';
+import { isValidWordWheelWord } from '@/utils/dailyChallenge/wordWheelGeneration';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { WHEEL_RUSH_FOG_MS } from '@/shared/constants/wheelRushConstants';
 import type { Avatar as AvatarType, PresenceStatus } from '@/shared/types/game';
+import { StealableLocks, MyWordsChips, type WheelLockInfo, type WordEntry } from './WheelRushPieces';
+
+const WordWheelPixiRing = dynamic(() => import('@/components/daily/WordWheelPixiRing'), { ssr: false });
+
+const haptic = (pattern: number | number[]) => {
+  try { navigator.vibrate?.(pattern); } catch { /* unsupported */ }
+};
 
 interface WheelPuzzle {
   centerLetter: string;
@@ -23,20 +35,7 @@ interface LeaderboardEntry {
   presenceStatus?: PresenceStatus;
 }
 
-interface WheelLockInfo {
-  word: string;
-  by: string;
-  lockUntil: number;
-}
-
-interface WordEntry {
-  word: string;
-  kind: 'locked' | 'stolen' | 'closed';
-  score?: number;
-  lockUntil?: number;
-  stolenFrom?: string;
-  ts: number;
-}
+interface BuiltLetter { letter: string; wheelIndex: number }
 
 interface Props {
   socket: Socket | null;
@@ -46,17 +45,29 @@ interface Props {
   t: (path: string, params?: Record<string, string | number>) => string;
 }
 
-const OUTER_RADIUS = 110;
+const MIN_LEN = 3;
 
 export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, onQuit, t }) => {
+  const {
+    playTileSelectSound, playWordAcceptedSound, playWordRejectedSound,
+    playButtonClickSound, playBoardShuffleSound,
+  } = useSoundEffects();
+
   const [puzzle, setPuzzle] = useState<WheelPuzzle | null>(null);
+  const [outerLetters, setOuterLetters] = useState<string[]>([]);
   const [startedAt, setStartedAt] = useState<number | null>(null);
-  const [built, setBuilt] = useState<Array<{ letter: string; index: number }>>([]);
+  const [builtLetters, setBuiltLetters] = useState<BuiltLetter[]>([]);
   const [myWords, setMyWords] = useState<WordEntry[]>([]);
   const [activeLocks, setActiveLocks] = useState<WheelLockInfo[]>([]);
   const [feedback, setFeedback] = useState<{ type: 'ok' | 'err'; msg: string } | null>(null);
+  const [wordBuilderShake, setWordBuilderShake] = useState(false);
   const [now, setNow] = useState<number>(() => Date.now());
+  const [wheelRadius, setWheelRadius] = useState(72);
+
   const fbTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const wheelContainerRef = useRef<HTMLDivElement>(null);
+  const draggingRef = useRef(false);
+  const lastDragIdxRef = useRef<number | null>(null);
 
   // 100ms tick for countdowns + fog window
   useEffect(() => {
@@ -64,22 +75,42 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
     return () => clearInterval(id);
   }, []);
 
+  // Track which wheel indices are used (-1 for center)
+  const usedIndices = useMemo(() => {
+    const set = new Set<number>();
+    for (const bl of builtLetters) set.add(bl.wheelIndex);
+    return set;
+  }, [builtLetters]);
+
+  const builtWord = useMemo(
+    () => builtLetters.map(bl => bl.letter).join(''),
+    [builtLetters],
+  );
+
   const flash = useCallback((type: 'ok' | 'err', msg: string) => {
     setFeedback({ type, msg });
+    if (type === 'err') {
+      setWordBuilderShake(true);
+      haptic([30, 50, 30]);
+      setTimeout(() => setWordBuilderShake(false), 400);
+    }
     if (fbTimer.current) clearTimeout(fbTimer.current);
     fbTimer.current = setTimeout(() => setFeedback(null), 1200);
   }, []);
 
+  // Socket wiring
   useEffect(() => {
     if (!socket) return;
 
     const onInit = (data: { puzzle: WheelPuzzle; startedAt?: number }) => {
       setPuzzle(data.puzzle);
+      setOuterLetters(data.puzzle.outerLetters);
       setStartedAt(data.startedAt ?? Date.now());
     };
     const onResult = (data: { word: string; accepted: boolean; kind?: string; score?: number; lockUntil?: number; stolenFrom?: string; error?: string }) => {
       if (!data.accepted) {
-        flash('err', data.error || 'rejected');
+        flash('err', data.error || t('wordWheel.notInDictionary') || 'rejected');
+        playWordRejectedSound();
         return;
       }
       if (data.kind === 'locked') {
@@ -89,7 +120,9 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
         setMyWords(prev => [{ word: data.word, kind: 'stolen', score: data.score, stolenFrom: data.stolenFrom, ts: Date.now() }, ...prev]);
         flash('ok', `STEAL +${data.score}`);
       }
-      setBuilt([]);
+      playWordAcceptedSound();
+      haptic(20);
+      setBuiltLetters([]);
     };
     const onLocked = (data: { word: string; by: string; lockUntil: number }) => {
       setActiveLocks(prev => [...prev.filter(l => l.word !== data.word), data]);
@@ -108,8 +141,6 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
     socket.on('wheelWordStolen', onStolen);
     socket.on('wheelWordClosed', onClosed);
 
-    // Ask server for state — covers race where init broadcast arrived before mount,
-    // and recovers on reconnect. Server replies idempotently via wheelRushInit.
     socket.emit('requestWheelRushState');
     const onReconnect = () => socket.emit('requestWheelRushState');
     socket.on('connect', onReconnect);
@@ -121,45 +152,109 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
       socket.off('wheelWordClosed', onClosed);
       socket.off('connect', onReconnect);
     };
-  }, [socket, flash]);
+  }, [socket, flash, t, playWordAcceptedSound, playWordRejectedSound]);
 
-  const handlePressLetter = useCallback((letter: string, index: number) => {
-    setBuilt(prev => [...prev, { letter, index }]);
+  // Letter tap handler (matches SP signature)
+  const handleLetterPress = useCallback((letter: string, wheelIndex: number, _el: HTMLButtonElement) => {
+    setBuiltLetters(prev => [...prev, { letter, wheelIndex }]);
+    playTileSelectSound();
+    haptic(10);
+  }, [playTileSelectSound]);
+
+  // Drag-to-build
+  const tryDragHit = useCallback((clientX: number, clientY: number) => {
+    const el = document.elementFromPoint(clientX, clientY) as HTMLElement | null;
+    const btn = el?.closest<HTMLButtonElement>('[data-wheel-letter]');
+    if (!btn || btn.disabled) return;
+    const idx = Number(btn.dataset.wheelIndex);
+    if (idx === lastDragIdxRef.current) return;
+    lastDragIdxRef.current = idx;
+    handleLetterPress(btn.dataset.wheelLetter || '', idx, btn);
+  }, [handleLetterPress]);
+  const handlePointerDown = useCallback((e: React.PointerEvent) => {
+    draggingRef.current = true;
+    lastDragIdxRef.current = null;
+    tryDragHit(e.clientX, e.clientY);
+  }, [tryDragHit]);
+  const handlePointerMove = useCallback((e: React.PointerEvent) => {
+    if (!draggingRef.current) return;
+    tryDragHit(e.clientX, e.clientY);
+  }, [tryDragHit]);
+  const handlePointerUp = useCallback(() => {
+    draggingRef.current = false;
+    lastDragIdxRef.current = null;
   }, []);
 
-  const handleRemove = useCallback((idx: number) => {
-    setBuilt(prev => prev.filter((_, i) => i !== idx));
-  }, []);
+  const handleRemoveLetter = useCallback((index: number) => {
+    setBuiltLetters(prev => prev.filter((_, i) => i !== index));
+    playButtonClickSound();
+  }, [playButtonClickSound]);
 
-  const handleClear = useCallback(() => setBuilt([]), []);
-
-  const handleSubmit = useCallback(() => {
-    if (!socket || built.length === 0) return;
-    const word = built.map(b => b.letter).join('');
-    socket.emit('submitWheelWord', { word });
-  }, [socket, built]);
+  const handleClear = useCallback(() => {
+    setBuiltLetters([]);
+    playButtonClickSound();
+  }, [playButtonClickSound]);
 
   const handleShuffle = useCallback(() => {
-    if (!puzzle) return;
-    const shuffled = [...puzzle.outerLetters].sort(() => Math.random() - 0.5);
-    setPuzzle({ ...puzzle, outerLetters: shuffled });
+    setOuterLetters(prev => {
+      const arr = [...prev];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    });
+    playBoardShuffleSound();
+  }, [playBoardShuffleSound]);
+
+  const handleSubmit = useCallback(() => {
+    if (!socket || !puzzle || builtLetters.length === 0) return;
+    const word = builtWord.toUpperCase();
+
+    if (word.length < MIN_LEN) {
+      flash('err', (t('wordWheel.tooShort') || 'Too short').replace('{min}', String(MIN_LEN)));
+      playWordRejectedSound();
+      return;
+    }
+    if (!word.includes(puzzle.centerLetter.toUpperCase())) {
+      flash('err', (t('wordWheel.missingCenter') || 'Missing center letter').replace('{letter}', puzzle.centerLetter));
+      playWordRejectedSound();
+      return;
+    }
+    if (!isValidWordWheelWord(word, puzzle.centerLetter, puzzle.allLetters)) {
+      flash('err', t('wordWheel.invalidLetters') || 'Invalid letters');
+      playWordRejectedSound();
+      return;
+    }
+
+    socket.emit('submitWheelWord', { word });
+  }, [socket, puzzle, builtLetters.length, builtWord, flash, t, playWordRejectedSound]);
+
+  // Responsive wheel radius
+  useEffect(() => {
+    const update = () => {
+      if (wheelContainerRef.current) {
+        const w = wheelContainerRef.current.getBoundingClientRect().width;
+        setWheelRadius(Math.max(56, Math.min(96, (w - 56) / 2)));
+      }
+    };
+    update();
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
   }, [puzzle]);
 
-  // Keyboard input
-  useEffect(() => {
-    if (!puzzle) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Enter') { handleSubmit(); return; }
-      if (e.key === 'Backspace') { setBuilt(prev => prev.slice(0, -1)); return; }
-      if (e.key === 'Escape') { handleClear(); return; }
-      const k = e.key.toUpperCase();
-      const all = puzzle.allLetters;
-      const idx = all.indexOf(k);
-      if (idx >= 0) setBuilt(prev => [...prev, { letter: k, index: idx }]);
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [puzzle, handleSubmit, handleClear]);
+  // Keyboard input (shared hook)
+  useWordWheelKeyboard({
+    centerLetter: puzzle?.centerLetter ?? '',
+    outerLetters,
+    usedIndices,
+    handleSubmit,
+    handleClear,
+    setBuiltLetters,
+    gameOver: false,
+    playTileSelectSound,
+    playButtonClickSound,
+  });
 
   const fogEndsAt = (startedAt ?? 0) + WHEEL_RUSH_FOG_MS;
   const fogActive = startedAt != null && now < fogEndsAt;
@@ -168,16 +263,14 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
   if (!puzzle) {
     return (
       <div className="flex-1 flex items-center justify-center bg-neo-navy text-neo-cream">
-        <div className="animate-pulse">{t('wheel.rush.loading') || 'Loading wheel...'}</div>
+        <div className="animate-pulse font-neo-display">{t('wheel.rush.loading') || 'Loading wheel...'}</div>
       </div>
     );
   }
 
-  const builtWord = built.map(b => b.letter).join('');
-
   return (
-    <div className="flex-1 flex flex-col min-h-0 bg-neo-navy p-3 md:p-4 gap-3">
-      {/* Top bar: leaderboard + quit. Fog hides opponent scores for first WHEEL_RUSH_FOG_MS */}
+    <div className="flex-1 flex flex-col min-h-0 bg-neo-navy p-3 md:p-4 gap-2 overflow-hidden">
+      {/* Top bar: leaderboard (fog-of-war) + quit */}
       <div className="flex items-center justify-between gap-3">
         <div className="flex flex-wrap gap-2">
           {leaderboard.map(p => {
@@ -187,7 +280,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
               <div
                 key={p.username}
                 className={cn(
-                  'px-3 py-1.5 rounded-neo border-2 border-neo-black font-neo-display font-bold text-sm',
+                  'px-3 py-1.5 rounded-neo border-2 border-neo-black font-neo-display font-bold text-sm shadow-hard',
                   isSelf ? 'bg-neo-lime text-neo-black' : 'bg-neo-navy-light text-neo-cream',
                 )}
               >
@@ -208,114 +301,168 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
         </div>
       )}
 
-      {/* Built word */}
-      <div className="flex items-center justify-center gap-2 min-h-[60px]">
-        <AnimatePresence mode="popLayout">
-          {built.map((b, i) => (
-            <WordTile
-              key={`${b.letter}-${i}-${b.index}`}
-              letter={b.letter}
-              index={i}
-              onRemove={handleRemove}
-              isCenter={b.letter === puzzle.centerLetter}
-            />
-          ))}
+      {/* Word builder (shared shake + motion) */}
+      <motion.div
+        className="relative w-full min-h-[52px] sm:min-h-[72px] flex items-center justify-center"
+        animate={
+          wordBuilderShake
+            ? { x: [-4, 4, -3, 3, -1, 0] }
+            : { scale: 1 + builtLetters.length * 0.008 }
+        }
+        transition={wordBuilderShake
+          ? { duration: 0.35 }
+          : { type: 'spring', stiffness: 300, damping: 20 }
+        }
+      >
+        <div className="flex items-center justify-center gap-1 sm:gap-2 flex-wrap max-w-full">
+          <AnimatePresence mode="popLayout">
+            {builtLetters.length === 0 ? (
+              <motion.span
+                key="placeholder"
+                className="text-neo-cream/30 font-neo-display text-base sm:text-lg"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              >
+                {t('wordWheel.tapLetters') || 'Tap letters to build a word'}
+              </motion.span>
+            ) : (
+              builtLetters.map((bl, i) => (
+                <WordTile
+                  key={`${bl.wheelIndex}-${i}`}
+                  letter={bl.letter}
+                  index={i}
+                  onRemove={handleRemoveLetter}
+                  isCenter={bl.wheelIndex === -1}
+                />
+              ))
+            )}
+          </AnimatePresence>
+        </div>
+        <AnimatePresence>
+          {feedback && (
+            <motion.div
+              className={cn(
+                'absolute -bottom-7 left-1/2 -translate-x-1/2 px-3 py-1 rounded-neo border-2 border-neo-black text-sm font-bold whitespace-nowrap z-20',
+                feedback.type === 'ok' ? 'bg-neo-lime text-neo-black' : 'bg-neo-red text-neo-white',
+              )}
+              initial={{ opacity: 0, y: -10, scale: 0.8 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 10, scale: 0.8 }}
+            >
+              {feedback.msg}
+            </motion.div>
+          )}
         </AnimatePresence>
-        {built.length === 0 && (
-          <div className="text-neo-cream/40 font-neo-body text-sm">{t('wheel.rush.tapLetters') || 'Tap letters to build a word'}</div>
-        )}
-      </div>
+      </motion.div>
+
+      <div className="flex-1 min-h-2" />
 
       {/* Wheel */}
-      <div className="flex-1 flex items-center justify-center">
-        <div className="relative w-[280px] h-[280px] sm:w-[340px] sm:h-[340px]">
+      <div className="flex items-center justify-center">
+        <div
+          ref={wheelContainerRef}
+          className="relative w-52 h-52 sm:w-64 sm:h-64 md:w-72 md:h-72 flex items-center justify-center touch-none"
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          onPointerUp={handlePointerUp}
+          onPointerCancel={handlePointerUp}
+          onPointerLeave={handlePointerUp}
+        >
+          <WordWheelPixiRing
+            selectedIndices={builtLetters.map(bl => bl.wheelIndex)}
+            radius={wheelRadius}
+            combo={0}
+          />
+          <motion.div
+            className="absolute inset-0 rounded-full border-2 border-neo-lime/20"
+            style={{ boxShadow: '0 0 24px rgba(191,255,0,0.12), inset 0 0 24px rgba(191,255,0,0.06)' }}
+            animate={{ opacity: [0.6, 1, 0.6] }}
+            transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+          />
+          <div className="absolute inset-4 sm:inset-5 rounded-full border border-neo-cyan/10" />
+          <div className="absolute inset-8 sm:inset-10 rounded-full border border-neo-cream/5" />
+
           <WheelLetter
             letter={puzzle.centerLetter}
             isCenter
-            onPress={handlePressLetter}
-            isUsed={false}
-            index={0}
+            onPress={(letter, _i, el) => handleLetterPress(letter, -1, el)}
+            isUsed={usedIndices.has(-1)}
+            index={-1}
           />
-          {puzzle.outerLetters.map((letter, i) => (
+          {outerLetters.map((letter, i) => (
             <WheelLetter
               key={`${letter}-${i}`}
               letter={letter}
               isCenter={false}
-              angle={(360 / puzzle.outerLetters.length) * i}
-              radius={OUTER_RADIUS}
-              onPress={(l) => handlePressLetter(l, i + 1)}
-              isUsed={false}
-              index={i + 1}
+              angle={(360 / outerLetters.length) * i}
+              radius={wheelRadius}
+              onPress={(l, _idx, el) => handleLetterPress(l, i, el)}
+              isUsed={usedIndices.has(i)}
+              index={i}
             />
           ))}
         </div>
       </div>
 
-      {/* Actions */}
-      <div className="flex items-center justify-center gap-2">
-        <Button variant="outline" size="sm" onClick={handleShuffle}>{t('wheel.rush.shuffle') || 'Shuffle'}</Button>
-        <Button variant="outline" size="sm" onClick={handleClear} disabled={built.length === 0}>{t('wheel.rush.clear') || 'Clear'}</Button>
-        <Button size="sm" onClick={handleSubmit} disabled={built.length === 0}>
-          {t('wheel.rush.submit') || 'Submit'} {builtWord && `(${builtWord})`}
-        </Button>
-      </div>
+      <p className="text-neo-cream/40 text-xs text-center mt-1">
+        {t('wordWheel.centerLetterRule') || 'Must include center letter'} &middot; {(t('wordWheel.minLetters') || 'Min {min} letters').replace('{min}', String(MIN_LEN))}
+      </p>
 
-      {/* Feedback + active locks */}
-      <div className="flex flex-col items-center gap-2 min-h-[40px]">
-        {feedback && (
-          <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            className={cn(
-              'px-3 py-1 rounded-neo border-2 border-neo-black font-neo-display font-bold text-sm',
-              feedback.type === 'ok' ? 'bg-neo-lime text-neo-black' : 'bg-neo-red text-neo-white',
-            )}
-          >
-            {feedback.msg}
-          </motion.div>
-        )}
-        {stealableLocks.length > 0 && (
-          <div className="flex flex-wrap gap-1.5 justify-center">
-            {stealableLocks.map(lock => {
-              const msLeft = Math.max(0, lock.lockUntil - now);
-              const pct = Math.max(0, Math.min(100, (msLeft / 3000) * 100));
-              return (
-                <div
-                  key={lock.word}
-                  className="relative px-2 py-0.5 rounded border-2 border-neo-black bg-neo-pink text-neo-white text-xs font-bold font-neo-body overflow-hidden"
-                  title={`Locked by ${lock.by} — ${(msLeft / 1000).toFixed(1)}s to steal`}
-                >
-                  <span className="relative z-10">
-                    {lock.by === username ? lock.word : `??? (${Math.ceil(msLeft / 100) / 10}s)`}
-                  </span>
-                  <span
-                    aria-hidden
-                    className="absolute inset-y-0 left-0 bg-neo-pink-dark/60"
-                    style={{ width: `${pct}%` }}
-                  />
-                </div>
-              );
-            })}
+      {/* Actions (Clear / Submit / Shuffle) */}
+      <div className="flex items-center justify-center gap-3 mt-1">
+        <motion.button
+          type="button"
+          onClick={handleClear}
+          disabled={builtLetters.length === 0}
+          className={cn(
+            'p-3 rounded-neo border-3 border-neo-black bg-neo-navy-light text-neo-cream shadow-hard',
+            'hover:bg-neo-navy active:shadow-hard-pressed active:translate-x-px active:translate-y-px',
+            'disabled:opacity-30 disabled:cursor-not-allowed',
+          )}
+          whileTap={{ scale: 0.9 }}
+          aria-label={t('wordWheel.clear') || 'Clear'}
+        >
+          <RotateCcw className="w-5 h-5" />
+        </motion.button>
+
+        <motion.button
+          type="button"
+          onClick={handleSubmit}
+          disabled={builtWord.length < MIN_LEN}
+          className={cn(
+            'px-8 py-3 rounded-neo border-3 border-neo-black font-neo-display font-black text-lg',
+            builtWord.length >= MIN_LEN
+              ? 'bg-gradient-to-r from-neo-lime to-neo-cyan text-neo-black shadow-[3px_3px_0px_black,0_0_16px_rgba(191,255,0,0.3)] hover:shadow-[3px_3px_0px_black,0_0_22px_rgba(0,255,255,0.4)]'
+              : 'bg-neo-navy-light text-neo-cream/40 shadow-hard-lg',
+            'active:shadow-hard-pressed active:translate-x-px active:translate-y-px',
+            'disabled:cursor-not-allowed',
+          )}
+          whileTap={builtWord.length >= MIN_LEN ? { scale: 0.92 } : {}}
+        >
+          <div className="flex items-center gap-2">
+            <Sparkles className="w-5 h-5" />
+            {t('wordWheel.submit') || 'Submit'}
           </div>
-        )}
+        </motion.button>
+
+        <motion.button
+          type="button"
+          onClick={handleShuffle}
+          className={cn(
+            'p-3 rounded-neo border-3 border-neo-black bg-neo-navy-light text-neo-cream shadow-hard',
+            'hover:bg-neo-navy active:shadow-hard-pressed active:translate-x-px active:translate-y-px',
+          )}
+          whileTap={{ scale: 0.9, rotate: 180 }}
+          transition={{ type: 'spring', stiffness: 300 }}
+          aria-label={t('wordWheel.shuffle') || 'Shuffle'}
+        >
+          <Shuffle className="w-5 h-5" />
+        </motion.button>
       </div>
 
-      {/* My words list */}
-      <div className="max-h-24 overflow-y-auto flex flex-wrap gap-1.5 justify-center">
-        {myWords.slice(0, 20).map((w, i) => (
-          <span
-            key={`${w.word}-${i}`}
-            className={cn(
-              'px-2 py-0.5 rounded border-2 border-neo-black text-xs font-neo-body font-bold',
-              w.kind === 'stolen' ? 'bg-neo-pink text-neo-white' :
-              w.kind === 'closed' ? 'bg-neo-cyan text-neo-black' :
-              'bg-neo-lime text-neo-black',
-            )}
-          >
-            {w.word}{w.score ? ` +${w.score}` : ''}
-          </span>
-        ))}
-      </div>
+      <StealableLocks locks={stealableLocks} now={now} username={username} />
+      <MyWordsChips words={myWords} />
     </div>
   );
 };

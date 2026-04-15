@@ -286,6 +286,19 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
     (onStopGame ?? onExitRoom)?.();
   }, [onStopGame, onExitRoom]);
 
+  // Wheel Rush mode — no letter grid; render before grid placeholder guard
+  if (gameMode === 'wheel-rush') {
+    return (
+      <WheelRushView
+        socket={socket}
+        username={username}
+        leaderboard={leaderboard}
+        onQuit={handleQuit}
+        t={t}
+      />
+    );
+  }
+
   // No grid placeholder (player-only edge case)
   if (!effectiveGrid) {
     return (
@@ -318,19 +331,6 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
         onWordWithComboType={handleBlastWordWithCombo}
         initialTileStates={blastBridge.initialTileStates}
         blastSeed={blastBridge.blastSeed}
-      />
-    );
-  }
-
-  // Wheel Rush mode
-  if (gameMode === 'wheel-rush') {
-    return (
-      <WheelRushView
-        socket={socket}
-        username={username}
-        leaderboard={leaderboard}
-        onQuit={handleQuit}
-        t={t}
       />
     );
   }

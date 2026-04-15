@@ -1,8 +1,11 @@
 /**
- * useBossRush Hook
+ * useBossRushArcade — standalone arcade boss-rush mode.
  *
- * Manages boss rush mode — fight 5 bosses in sequence.
+ * Fight 5 bosses drawn from a predefined random sequence (see `lib/adventure/bossRush`).
  * Defeat ends the run. Full clear gives bonus rewards.
+ *
+ * NOT the same as `components/adventure/hooks/useBossRush`, which runs inside
+ * the adventure hub and only sequences bosses the player has already beaten.
  */
 
 'use client';
@@ -16,7 +19,7 @@ import {
   type BossRushReward,
 } from '@/lib/adventure/bossRush';
 
-export interface UseBossRushReturn {
+export interface UseBossRushArcadeReturn {
   /** Current boss rush state */
   state: BossRushState;
   /** Current boss world ID (null if complete) */
@@ -33,7 +36,7 @@ export interface UseBossRushReturn {
   reset: () => void;
 }
 
-export function useBossRush(): UseBossRushReturn {
+export function useBossRushArcade(): UseBossRushArcadeReturn {
   const [state, setState] = useState<BossRushState>(createBossRushState);
   const [isActive, setIsActive] = useState(false);
 

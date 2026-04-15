@@ -265,56 +265,8 @@ export function DailyChallengeLanding({
         <div className="w-0.5 h-3 border-s-2 border-dashed border-neo-cream/20" />
       </div>
 
-      {/* Quest 2: Word Wheel */}
-      {wordWheelPlayed ? (
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2, type: 'spring', stiffness: 300, damping: 25 }}
-          className="w-full"
-          data-testid="word-wheel-hero"
-        >
-          <button
-            type="button"
-            onClick={onSelectWordWheel}
-            className={cn(
-              'relative w-full rounded-xl border-3 border-neo-black',
-              'shadow-hard overflow-hidden cursor-pointer p-4',
-              'flex items-center gap-4',
-              'focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-lime',
-              'transition-all duration-200 group',
-              'bg-neo-lime/[0.06] hover:bg-neo-lime/[0.1]'
-            )}
-          >
-            <div className="absolute inset-e-0 top-0 bottom-0 w-1.5 rounded-e-lg bg-neo-lime" />
-            <motion.div
-              className="w-12 h-12 rounded-full border-2 border-neo-black shrink-0 flex items-center justify-center shadow-hard-xs bg-neo-lime"
-              initial={{ scale: 0, rotate: -180 }}
-              animate={{ scale: 1, rotate: 0 }}
-              transition={{ delay: 0.35, type: 'spring', stiffness: 200, damping: 15 }}
-            >
-              <Check className="w-6 h-6 text-neo-black" strokeWidth={3} />
-            </motion.div>
-            <div className="flex-1 min-w-0">
-              <h2 className="text-xl font-neo-display font-black text-neo-cream leading-none">
-                {t('wordWheel.hub.wordWheelQuest')}
-              </h2>
-              <span className="inline-block mt-1.5 px-2.5 py-0.5 text-[10px] font-black uppercase rounded-md border-2 bg-neo-lime/20 text-neo-lime border-neo-lime/40">
-                {t('daily.cleared')}
-              </span>
-            </div>
-            <div className={cn(
-              'shrink-0 py-2.5 px-5 text-xs font-black uppercase rounded-lg text-center',
-              'bg-neo-purple text-neo-white border-2 border-neo-black shadow-hard-sm',
-              'active:translate-y-0.5 active:shadow-none transition-all',
-              'flex items-center gap-1.5 group-hover:scale-105'
-            )}>
-              <Eye className="w-4 h-4" />
-              {t('daily.viewResults')}
-            </div>
-          </button>
-        </motion.div>
-      ) : (
+      {/* Quest 2: Word Wheel — hide entirely once the player has already played it today */}
+      {!wordWheelPlayed && (
         <QuestCard
           challengeId="wordWheel"
           icon={<CircleDot className="w-8 h-8" />}

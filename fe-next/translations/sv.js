@@ -4964,6 +4964,10 @@ const sv = {
     "great": "Bra jobbat!",
     "good": "Bra försök!",
     "tryAgain": "Fortsätt öva!",
+    "longest": "Längsta",
+    "viewSubmittedWords": "Visa inskickade ord",
+    "submittedWordsTitle": "Inskickade ord",
+    "noWordsSubmitted": "Inga ord inskickade ännu",
     "results": {
       "title": "Ordhjulsresultat",
       "wordsFound": "Hittade ord",
@@ -5064,7 +5068,8 @@ const sv = {
       "tipExploration": "{words} sidoord. Varje extra = +10 p, upp till 20. Lätta +{gain} väntar nästa gång.",
       "tipSpeed": "Livet kraschade till {life}. Längre sidoord läker snabbare — 7+ bokstäver = +25 liv. Ett rejält ord ≈ +100 poäng.",
       "tipAccuracy": "{attempts} gissningar = −{lost} precisionspoäng. Återanvänd aldrig en grå bokstav, flytta alltid gula. Lös på ≤3 för att behålla alla {lost} nästa gång.",
-      "tipShortTarget": "{length}-bokstavsmål är sega. Öppna med ord med 4 vokaler som ADIEU — gissning #1 blir en vokalskanning."
+      "tipShortTarget": "{length}-bokstavsmål är sega. Öppna med ord med 4 vokaler som ADIEU — gissning #1 blir en vokalskanning.",
+      "lossEffort": "{words} sidoord hittade. Pusslet vann den här gången — men din blick var ändå vass. I morgon vänder du på det."
     },
     "stats": {
       "title": "Statistik",
@@ -6463,6 +6468,8 @@ const sv = {
     "exitToMap": "Avsluta till karta",
     "startLevel": "Starta nivå",
     "progressNotSaved": "Kunde inte spara framstegen. Logga in för att behålla ditt äventyr!",
+    "progressSaveRetryHint": "Framstegen kunde inte sparas. Vi försöker igen nästa gång.",
+    "weeklyChallengeRank": "#{{rank}} på topplistan!",
     "guestTitle": "Registrera dig för att spara framsteg",
     "guestHint": "Skapa ett gratis konto för att spara dina framsteg, tjäna belöningar och tävla på topplistor.",
     "guestSignup": "Registrera dig",

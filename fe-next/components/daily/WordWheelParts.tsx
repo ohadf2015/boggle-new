@@ -46,12 +46,12 @@ export const WheelLetter: React.FC<WheelLetterProps> = ({
           : isUsed
             ? 'bg-neo-navy-light text-neo-cream/30 border-neo-cream/20 shadow-none'
             : 'bg-neo-white text-neo-navy shadow-[2px_2px_0px_black,0_0_8px_rgba(191,255,0,0.15)] hover:shadow-[2px_2px_0px_black,0_0_14px_rgba(191,255,0,0.35)] hover:bg-neo-cream active:bg-neo-lime/30',
-        isUsed ? 'cursor-default' : 'cursor-pointer',
+        'cursor-pointer',
       )}
       onClick={() => {
-        if (!isUsed && btnRef.current) onPress(letter, index, btnRef.current);
+        if (btnRef.current) onPress(letter, index, btnRef.current);
       }}
-      whileTap={isUsed ? {} : { scaleX: 1.12, scaleY: 0.82 }}
+      whileTap={{ scaleX: 1.12, scaleY: 0.82 }}
       whileHover={!isCenter && !isUsed ? { scale: 1.1, boxShadow: '2px 2px 0px black, 0 0 18px rgba(191,255,0,0.5)' } : undefined}
       animate={{
         x: offsetX,
@@ -64,10 +64,11 @@ export const WheelLetter: React.FC<WheelLetterProps> = ({
         ? { duration: 2, repeat: Infinity, ease: 'easeInOut', x: { type: 'spring', stiffness: 300, damping: 25 }, y: { type: 'spring', stiffness: 300, damping: 25 } }
         : { type: 'spring', stiffness: 400, damping: 22 }
       }
-      disabled={isUsed}
-      aria-label={letter}
+      aria-label={isUsed ? `${letter}, tap to remove` : letter}
+      aria-pressed={isUsed}
       data-wheel-letter={letter}
       data-wheel-index={index}
+      data-wheel-used={isUsed ? 'true' : 'false'}
     >
       {letter}
     </motion.button>

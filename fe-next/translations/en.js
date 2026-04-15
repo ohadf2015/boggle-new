@@ -5063,6 +5063,10 @@ const en = {
     "great": "Great!",
     "good": "Good effort!",
     "tryAgain": "Keep practicing!",
+    "longest": "Longest",
+    "viewSubmittedWords": "View submitted words",
+    "submittedWordsTitle": "Submitted Words",
+    "noWordsSubmitted": "No words submitted yet",
     "results": {
       "title": "Word Wheel Results",
       "wordsFound": "Words Found",
@@ -5163,7 +5167,8 @@ const en = {
       "tipExploration": "{words} side-words. Every extra one = +10 pts, up to 20. Easy +{gain} waiting next time.",
       "tipSpeed": "Life crashed to {life}. Longer side-words heal faster — 7+ letters = +25 life. One chunky word ≈ +100 score.",
       "tipAccuracy": "{attempts} guesses = −{lost} Accuracy pts. Never reuse a grey letter, always shuffle yellows. Solve in ≤3 to keep all {lost} next time.",
-      "tipShortTarget": "{length}-letter targets bite. Open with 4-vowel words like ADIEU — guess #1 becomes a vowel scan."
+      "tipShortTarget": "{length}-letter targets bite. Open with 4-vowel words like ADIEU — guess #1 becomes a vowel scan.",
+      "lossEffort": "{words} side-words found. Puzzle won this round — your grid-scanning still showed up. Flip it tomorrow."
     },
     "stats": {
       "title": "Statistics",
@@ -6780,6 +6785,8 @@ const en = {
     "exitToMap": "Exit to Map",
     "startLevel": "Start Level",
     "progressNotSaved": "Couldn't save your progress. Sign in to keep your adventure!",
+    "progressSaveRetryHint": "Progress could not be saved. It will retry next time.",
+    "weeklyChallengeRank": "#{{rank}} on the leaderboard!",
     "guestTitle": "Sign up to save your progress",
     "guestHint": "Create a free account to save your adventure progress, earn rewards, and compete on leaderboards.",
     "guestSignup": "Sign Up",

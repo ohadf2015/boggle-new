@@ -5001,6 +5001,10 @@ const es = {
     "great": "¡Genial!",
     "good": "¡Buen esfuerzo!",
     "tryAgain": "¡Sigue practicando!",
+    "longest": "Más larga",
+    "viewSubmittedWords": "Ver palabras enviadas",
+    "submittedWordsTitle": "Palabras enviadas",
+    "noWordsSubmitted": "Aún no se han enviado palabras",
     "results": {
       "title": "Resultados de la rueda de palabras",
       "wordsFound": "Palabras encontradas",
@@ -5286,7 +5290,8 @@ const es = {
       "tipExploration": "{words} palabras laterales. Cada extra = +10 pts, hasta 20. Fácil +{gain} esperándote la próxima vez.",
       "tipSpeed": "La vida cayó a {life}. Las palabras largas curan más rápido — 7+ letras = +25 vida. Una palabra gorda ≈ +100 puntos.",
       "tipAccuracy": "{attempts} intentos = −{lost} pts de Precisión. Regla del francotirador: nunca reutilices una gris, siempre mueve las amarillas. Resuelve en ≤3 para mantener los {lost} la próxima.",
-      "tipShortTarget": "Objetivos de {length} letras son difíciles. Abre con palabras de 4 vocales como ADIEU — el intento #1 se convierte en escaneo de vocales."
+      "tipShortTarget": "Objetivos de {length} letras son difíciles. Abre con palabras de 4 vocales como ADIEU — el intento #1 se convierte en escaneo de vocales.",
+      "lossEffort": "{words} palabras laterales encontradas. El puzzle ganó esta vez — pero tu vista siguió afilada. Mañana le das la vuelta."
     },
     "attempts": "Intentos"
   },
@@ -6436,6 +6441,8 @@ const es = {
     "exitToMap": "Salir al mapa",
     "startLevel": "Iniciar nivel",
     "progressNotSaved": "No se pudo guardar tu progreso. ¡Inicia sesión para conservar tu aventura!",
+    "progressSaveRetryHint": "No se pudo guardar el progreso. Lo intentaremos de nuevo la próxima vez.",
+    "weeklyChallengeRank": "¡#{{rank}} en la tabla de clasificación!",
     "guestTitle": "Regístrate para guardar tu progreso",
     "guestHint": "Crea una cuenta gratuita para guardar tu progreso, ganar recompensas y competir en las tablas de clasificación.",
     "guestSignup": "Registrarse",

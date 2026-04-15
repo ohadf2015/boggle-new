@@ -10,6 +10,7 @@ import type { UpgradeState } from '@/lib/adventure/upgradeConfig';
 import WordAlbumPanel from './WordAlbumPanel';
 import WeeklyChallengePanel from './WeeklyChallengePanel';
 import CollectionPanel from './CollectionPanel';
+import type { InventoryItem } from '@/hooks/useAdventureInventory';
 
 interface AdventureViewModalsProps {
   showShop: boolean;
@@ -28,6 +29,7 @@ interface AdventureViewModalsProps {
   onShopPurchase: (upgradeId: string, newState: UpgradeState, newGold: number) => void;
   showCollection: boolean;
   onCloseCollection: () => void;
+  collectionInventory: InventoryItem[];
   t: (key: string) => string;
 }
 
@@ -48,6 +50,7 @@ export default function AdventureViewModals({
   onShopPurchase,
   showCollection,
   onCloseCollection,
+  collectionInventory,
   t,
 }: AdventureViewModalsProps): React.JSX.Element {
   const shopRef = useRef<HTMLDivElement>(null);
@@ -126,7 +129,7 @@ export default function AdventureViewModals({
           key="collection"
           isOpen={showCollection}
           onClose={onCloseCollection}
-          inventory={[]}
+          inventory={collectionInventory}
         />
       )}
     </AdaptiveAnimatePresence>

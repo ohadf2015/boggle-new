@@ -31,6 +31,7 @@ export type WordHuntFactType =
   | 'tipAccuracy'
   | 'tipShortTarget'
   | 'tipLoss'
+  | 'lossEffort'
   | 'eliteClub'
   | 'palindrome'
   | 'rareLetter'
@@ -362,6 +363,27 @@ function getRareLetterFact(result: WordHuntResult): WordHuntFact | null {
   };
 }
 
+function getLossEffortFact(result: WordHuntResult): WordHuntFact | null {
+  if (result.solved) return null;
+  const words = result.wordsDiscovered?.length ?? 0;
+
+  const variants = [
+    `${words} side-words found. Puzzle won this round — your grid-scanning still showed up.`,
+    `Not today. But ${words} discoveries is nothing to sneeze at. Come back tomorrow and flip it.`,
+    `Missed the target, still pulled ${words} words out of the chaos. Next run, you crack it.`,
+  ];
+
+  return {
+    type: 'lossEffort',
+    translationKey: 'wordHunt.facts.lossEffort',
+    translationFallback: pickVariant(variants, result),
+    translationParams: { words },
+    icon: 'Sparkles',
+    color: 'neo-cyan',
+    value: words,
+  };
+}
+
 function getLongWordFact(result: WordHuntResult): WordHuntFact | null {
   if (result.targetWord.length < LONG_WORD_MIN_LENGTH) return null;
 
@@ -436,7 +458,8 @@ export function getWordHuntInsights(
   result: WordHuntResult,
   stats: WordHuntStats
 ): WordHuntInsights {
-  // Encouragement: brag-worthy first, otherwise a witty observation.
+  // Encouragement: brag-worthy first, witty observation, then a loss-safe fallback
+  // so losers always receive an encouragement card alongside their coach tip.
   const encouragementChain = [
     () => getFirstTryFact(result, stats),
     () => getPerfectScoreFact(result),
@@ -446,6 +469,7 @@ export function getWordHuntInsights(
     () => getPalindromeFact(result),
     () => getRareLetterFact(result),
     () => getLongWordFact(result),
+    () => getLossEffortFact(result),
   ];
 
   // Coach tip: the single highest-leverage actionable suggestion.

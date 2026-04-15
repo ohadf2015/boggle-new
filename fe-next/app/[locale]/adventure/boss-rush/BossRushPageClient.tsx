@@ -1,7 +1,7 @@
 /**
  * BossRushPageClient — Client component for the Boss Rush page.
  *
- * Uses useBossRush hook to manage rush state.
+ * Uses useBossRushArcade hook to manage rush state.
  * Embeds AdventureGame for actual boss fights (same pattern as Endless mode).
  * Gated behind having defeated at least 1 boss (level 7 completion).
  */
@@ -15,7 +15,7 @@ import { ArrowLeft, Swords, Skull, Trophy, Coins, Zap, Lock, RotateCcw } from 'l
 import { cn } from '@/lib/utils';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import { useProgressionData } from '@/contexts/ProgressionContext';
-import { useBossRush } from '@/hooks/useBossRush';
+import { useBossRushArcade } from '@/hooks/useBossRushArcade';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { LEVELS_PER_WORLD, generateAdventureGrid } from '@/lib/adventure';
@@ -37,7 +37,7 @@ const AdventureGame = nextDynamic(
 export function BossRushPageClient() {
   const { t, language } = useLanguageSafe();
   const { progression, isLoading } = useProgressionData();
-  const { state, currentBossWorldId, isActive, startRush, reportResult, rewards, reset } = useBossRush();
+  const { state, currentBossWorldId, isActive, startRush, reportResult, rewards, reset } = useBossRushArcade();
 
   // Generate boss level config for AdventureGame
   const [seed] = useState(() => Date.now());

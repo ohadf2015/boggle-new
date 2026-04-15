@@ -1,11 +1,18 @@
 /**
  * Universal share text generator for all game modes.
+ *
+ * `ShareGameMode` is the surface identifier for the share card (maps to
+ * `shareResult.<mode>` translation keys). It is NOT the same as the core
+ * multiplayer `GameMode` in `shared/types/game.ts`, which only covers live
+ * MP rules (`classic | blast | word-hunt | wheel-rush`). Standalone modes
+ * like daily/adventure/singleplayer have no meaning in core game state but
+ * need their own share variants.
  */
 
-export type GameMode = 'singleplayer' | 'multiplayer' | 'blast' | 'daily' | 'adventure' | 'wordHunt';
+export type ShareGameMode = 'singleplayer' | 'multiplayer' | 'blast' | 'daily' | 'adventure' | 'wordHunt';
 
 export interface ShareParams {
-  gameMode: GameMode;
+  gameMode: ShareGameMode;
   score: number;
   wordsFound: number;
   longestWord?: string;

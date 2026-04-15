@@ -1,8 +1,12 @@
 /**
- * Boss Rush Hook
+ * useBossRush (adventure hub) — per-player boss-rush sequencing.
  *
- * Manages the Boss Rush state machine — sequential boss fights
- * with shared player health. Player heals 20% between bosses.
+ * Used inside the adventure hub (`AdventureView`). Computes the boss sequence
+ * from the player's completed level-7 fights. Shared player health across the
+ * run, 20% heal between bosses.
+ *
+ * NOT the same as `hooks/useBossRushArcade`, which runs the standalone
+ * `/adventure/boss-rush` page with a predefined random sequence.
  *
  * Usage:
  * - Pass completions to determine which bosses are available

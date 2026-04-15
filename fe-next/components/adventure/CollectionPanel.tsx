@@ -11,21 +11,13 @@ import {
   type CollectibleCategory,
   type CollectibleRarity,
 } from '@/lib/adventure/collectibleConfig';
+import type { InventoryItem } from '@/hooks/useAdventureInventory';
 
 // ==============================================
 // TYPES
 // ==============================================
 
-export interface InventoryItem {
-  item_id: string;
-  item_type: string;
-  category: string;
-  rarity: string;
-  quantity: number;
-  source_world: number | null;
-  source_level: number | null;
-  earned_at: string;
-}
+export type { InventoryItem } from '@/hooks/useAdventureInventory';
 
 interface CollectionPanelProps {
   isOpen: boolean;

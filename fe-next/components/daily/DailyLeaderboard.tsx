@@ -7,6 +7,7 @@ import { Users, Trophy, ChevronDown, ChevronUp, Share2, Check } from 'lucide-rea
 import { Button } from '@/components/ui/button';
 import { Loader } from '@/components/ui/Loader';
 import { getPuzzleNumber } from '@/utils/dailyChallenge';
+import { shareWithFallback } from '@/utils/shareWithFallback';
 import { getCountryFlag } from '@/shared/utils';
 import Avatar from '@/components/Avatar';
 import type { Language } from '@/types';
@@ -217,27 +218,16 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
       ? `🎯 I ranked #${currentUserData.rank_position} on LexiClash ${gameLabel} #${puzzleNumber}! ${currentUserData.solved ? `Solved in ${currentUserData.attempts_used}/10` : 'X/10'}\n\n`
       : `🎯 I ranked #${currentUserData.rank_position} on LexiClash ${gameLabel} #${puzzleNumber}! ${currentUserData.score ?? 0} pts | ${currentUserData.word_count ?? 0} words\n\n`;
 
-    // Try native share first
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: `LexiClash ${gameLabel} #${puzzleNumber}`,
-          text: shareText,
-          url: shareUrl,
-        });
-        return;
-      } catch (err) {
-        // User cancelled or error - fall through to copy
-      }
-    }
+    const result = await shareWithFallback({
+      title: `LexiClash ${gameLabel} #${puzzleNumber}`,
+      text: shareText,
+      url: shareUrl,
+      clipboardText: shareText + shareUrl,
+    });
 
-    // Fallback to clipboard
-    try {
-      await navigator.clipboard.writeText(shareText + shareUrl);
+    if (result === 'copied') {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
-      console.error('Failed to copy:', err);
     }
   }, [currentUserData, puzzleDate, language, gameType]);
 

@@ -5016,6 +5016,10 @@ const ja = {
     "great": "よくできました！",
     "good": "よく頑張りました！",
     "tryAgain": "練習を続けましょう！",
+    "longest": "最長",
+    "viewSubmittedWords": "提出した単語を見る",
+    "submittedWordsTitle": "提出した単語",
+    "noWordsSubmitted": "まだ単語が提出されていません",
     "results": {
       "title": "ワードホイール結果",
       "wordsFound": "見つかった単語",
@@ -5116,7 +5120,8 @@ const ja = {
       "tipExploration": "サブ単語{words}個。1個追加ごとに+10点、最大20個まで。次回は簡単に+{gain}点。",
       "tipSpeed": "ライフが{life}まで急降下。長いサブ単語ほど回復が速い — 7文字以上 = +25ライフ。太い単語一つ ≈ +100点。",
       "tipAccuracy": "{attempts}回の推測 = −{lost}精度ポイント。灰色の文字は二度使わない、黄色は必ず動かす。次は3回以内で解いて{lost}点を全て守ろう。",
-      "tipShortTarget": "{length}文字のターゲットは厄介。ADIEUのような母音4つの単語で開幕 — 最初の推測が母音スキャンになる。"
+      "tipShortTarget": "{length}文字のターゲットは厄介。ADIEUのような母音4つの単語で開幕 — 最初の推測が母音スキャンになる。",
+      "lossEffort": "サブ単語を{words}個発見。今回はパズルの勝ち — でも目のキレはしっかり見せた。明日ひっくり返そう。"
     },
     "stats": {
       "title": "統計",
@@ -6515,6 +6520,8 @@ const ja = {
     "exitToMap": "マップに戻る",
     "startLevel": "レベル開始",
     "progressNotSaved": "進行状況を保存できませんでした。サインインして冒険を続けよう！",
+    "progressSaveRetryHint": "進行状況を保存できませんでした。次回に再試行します。",
+    "weeklyChallengeRank": "リーダーボード#{{rank}}位！",
     "guestTitle": "サインアップして進行状況を保存",
     "guestHint": "無料アカウントを作成して、冒険の進行状況を保存し、報酬を獲得し、リーダーボードで競いましょう。",
     "guestSignup": "サインアップ",

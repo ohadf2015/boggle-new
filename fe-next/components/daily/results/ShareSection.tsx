@@ -128,7 +128,7 @@ export const ShareSection: React.FC<ShareSectionProps> = ({
         /* Winners: Challenge Friends CTA (falls back to native share) */
         <Button
           onClick={onChallengeShare ?? onShare}
-          className="w-full max-w-btn mx-auto py-3.5 text-lg font-black uppercase bg-linear-to-r from-neo-lime via-neo-lime to-neo-pink text-neo-black border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 transition-all"
+          className="w-full sm:max-w-btn sm:mx-auto py-3.5 text-lg font-black uppercase bg-linear-to-r from-neo-lime via-neo-lime to-neo-pink text-neo-black border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 transition-all"
         >
           <Share2 className="me-2 w-5 h-5" />
           {t('wordHunt.results.challengeFriends')}

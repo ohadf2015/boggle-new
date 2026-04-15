@@ -22,7 +22,8 @@ export const TodayParticipantRow = memo<{
   isCurrentUser: boolean;
   compact: boolean;
   t: (key: string) => string;
-}>(({ participant, index, isCurrentUser, compact, t }) => {
+  onViewWheelWords?: (participant: DailyParticipant) => void;
+}>(({ participant, index, isCurrentUser, compact, t, onViewWheelWords }) => {
   const rank = participant.rank_position;
   const countryFlag = getCountryFlag(participant.country_code);
 
@@ -123,8 +124,22 @@ export const TodayParticipantRow = memo<{
             </>
           )}
           {(participant.word_hunt_score ?? 0) > 0 && (participant.word_wheel_score ?? 0) > 0 && (
-            <span className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 font-medium ms-1">
-              🎯 {participant.word_hunt_score} · 🎡 {participant.word_wheel_score}
+            <span className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 font-medium ms-1 inline-flex items-center gap-1">
+              🎯 {participant.word_hunt_score}
+              <span aria-hidden>·</span>
+              {onViewWheelWords && participant.player_id ? (
+                <button
+                  type="button"
+                  onClick={(e) => { e.stopPropagation(); onViewWheelWords(participant); }}
+                  className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-neo border border-neo-black/30 bg-neo-lime/10 hover:bg-neo-lime/25 text-neo-cyan dark:text-neo-lime font-bold transition-colors cursor-pointer"
+                  aria-label={t('wordWheel.viewSubmittedWords')}
+                  title={t('wordWheel.viewSubmittedWords')}
+                >
+                  🎡 {participant.word_wheel_score}
+                </button>
+              ) : (
+                <span>🎡 {participant.word_wheel_score}</span>
+              )}
             </span>
           )}
         </div>

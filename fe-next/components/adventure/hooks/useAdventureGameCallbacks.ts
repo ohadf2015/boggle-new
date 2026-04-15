@@ -160,7 +160,7 @@ export function useAdventureGameCallbacks(params: UseAdventureGameCallbacksParam
         gameStars as 0 | 1 | 2 | 3,
         gameScore, wordsFoundList.length, earnedGold, longWords
       ).catch(() => {
-        toast.error('Progress could not be saved. It will retry next time.', { duration: 4000 });
+        toast.error(t('adventure.progressSaveRetryHint'), { duration: 4000 });
       });
     }
 
@@ -169,7 +169,7 @@ export function useAdventureGameCallbacks(params: UseAdventureGameCallbacksParam
     recordLevelPerfect, recordBossDefeatedNoHint, recordScoreChallenge, recordBossHighHealth,
     recordFullComboLevel, isBossLevel, bossHealthPhase, playerHealthCurrentHP, playerHealthMaxHP,
     totalStars, handleEarnAchievement, worldNumber, levelNumber, setShowLevelComplete, hintsUsed,
-    completionSaveFailedRef, retrySaveCompletion]);
+    completionSaveFailedRef, retrySaveCompletion, t]);
 
   const handleRetry = useCallback(() => {
     setShowLevelComplete(false);

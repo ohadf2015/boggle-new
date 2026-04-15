@@ -128,6 +128,12 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
     return set;
   }, [builtLetters]);
 
+  // Refs mirroring builtLetters / usedIndices for stable callbacks
+  const builtLettersRef = useRef(builtLetters);
+  const usedIndicesRef = useRef(usedIndices);
+  useEffect(() => { builtLettersRef.current = builtLetters; }, [builtLetters]);
+  useEffect(() => { usedIndicesRef.current = usedIndices; }, [usedIndices]);
+
   const builtWord = useMemo(
     () => builtLetters.map(bl => bl.letter).join(''),
     [builtLetters],
@@ -177,9 +183,17 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
     }
   }, []);
 
-  // ── Letter tap ──
+  // ── Letter tap (toggle: add if unused, remove matching if already used) ──
   const handleLetterPress = useCallback((letter: string, wheelIndex: number, el: HTMLButtonElement) => {
     if (gameOverRef.current) return;
+    const current = builtLettersRef.current;
+    const existingIdx = current.findIndex(bl => bl.wheelIndex === wheelIndex);
+    if (existingIdx !== -1) {
+      setBuiltLetters(prev => prev.filter((_, i) => i !== existingIdx));
+      playButtonClickSound();
+      haptic(8);
+      return;
+    }
     setBuiltLetters(prev => [...prev, { letter, wheelIndex }]);
     playTileSelectSound();
     haptic(10);
@@ -193,14 +207,15 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         y: rect.top - containerRect.top + rect.height / 2,
       });
     }
-  }, [onEffect, playTileSelectSound]);
+  }, [onEffect, playTileSelectSound, playButtonClickSound]);
 
-  // ── Drag-to-build handlers ──
+  // ── Drag-to-build handlers (additive only — skips letters already used) ──
   const tryDragHit = useCallback((clientX: number, clientY: number) => {
     const el = document.elementFromPoint(clientX, clientY) as HTMLElement | null;
     const btn = el?.closest<HTMLButtonElement>('[data-wheel-letter]');
-    if (!btn || btn.disabled) return;
+    if (!btn) return;
     const idx = Number(btn.dataset.wheelIndex);
+    if (usedIndicesRef.current.has(idx)) return;
     if (idx === lastDragIdxRef.current) return;
     lastDragIdxRef.current = idx;
     handleLetterPress(btn.dataset.wheelLetter || '', idx, btn);
@@ -524,12 +539,11 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         )}
       </AnimatePresence>
 
-      {/* Spacer pushes the wheel toward the bottom */}
-      <div className="flex-1 min-h-2" />
-
+      {/* ── Centered wheel region (absorbs leftover vertical space) ── */}
+      <div className="flex-1 flex flex-col items-center justify-center w-full min-h-0 gap-1.5 py-2">
       {/* Tap-to-remove hint */}
       {builtLetters.length > 0 && (
-        <p className="text-neo-cream/40 text-[10px] sm:text-xs text-center mb-1">
+        <p className="text-neo-cream/40 text-[10px] sm:text-xs text-center">
           {t('wordWheel.tapToRemove')}
         </p>
       )}
@@ -537,7 +551,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
       {/* ── The Wheel ── */}
       <div
         ref={wheelContainerRef}
-        className="relative w-52 h-52 sm:w-64 sm:h-64 md:w-72 md:h-72 flex items-center justify-center touch-none"
+        className="relative w-52 h-52 sm:w-64 sm:h-64 md:w-72 md:h-72 shrink-0 flex items-center justify-center touch-none"
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
@@ -588,6 +602,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
       <p className="text-neo-cream/40 text-xs text-center">
         {t('wordWheel.centerLetterRule')} &middot; {t('wordWheel.minLetters').replace('{min}', '3')}
       </p>
+      </div>
 
       {/* ── Action Buttons ── */}
       <div className="flex items-center gap-3">

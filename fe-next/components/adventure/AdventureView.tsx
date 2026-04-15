@@ -14,6 +14,7 @@ import { useMusic } from '@/contexts/MusicContext';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 import type { UpgradeState } from '@/lib/adventure/upgradeConfig';
 import { useAdventureMusic } from '@/hooks/useAdventureMusic';
+import { useAdventureInventory } from '@/hooks/useAdventureInventory';
 import { getWeeklyChallengeConfig, getCurrentWeekId } from '@/lib/adventure/weeklyChallenge';
 import { getWeeklyModifiers, applyModifiers } from '@/lib/adventure/weeklyModifiers';
 import {
@@ -89,6 +90,7 @@ function AdventureView(): React.JSX.Element {
 
   // Daily quests and streak for hub
   const { quests: dailyQuests } = useDailyQuests({ currentWorld: progression?.currentWorld });
+  const { inventory } = useAdventureInventory();
   const streakDays = progression?.streak?.currentStreak ?? 0;
   const bestStreak = progression?.streak?.bestStreak ?? 0;
 
@@ -226,13 +228,13 @@ function AdventureView(): React.JSX.Element {
       if (res.ok) {
         const data = await res.json().catch(() => null);
         if (data?.rank) {
-          toast.success(`#${data.rank} on the leaderboard!`);
+          toast.success(t('adventure.weeklyChallengeRank', { rank: data.rank }));
         }
       }
     }).catch(() => { /* Network error — silent */ });
     setViewState('worldMap');
     setShowWeeklyChallenge(true);
-  }, [userId, profile, setViewState]);
+  }, [userId, profile, setViewState, t]);
 
   const handleLevelComplete = useCallback(
     async (stars: number, score: number, wordsFound: number, goldEarned: number, longWords?: number) => {
@@ -442,6 +444,7 @@ function AdventureView(): React.JSX.Element {
         onShopPurchase={handleShopPurchase}
         showCollection={showCollection}
         onCloseCollection={closeCollection}
+        collectionInventory={inventory}
         t={t}
       />
 
@@ -470,7 +473,7 @@ function AdventureView(): React.JSX.Element {
                 runeCount={progression?.runes?.length}
                 onOpenWordAlbum={() => setShowWordAlbum(true)}
                 onOpenCollection={openCollection}
-                collectionCount={0}
+                collectionCount={inventory.length}
                 weeklyModifiers={weeklyModifiers}
               />
             </AdaptiveMotion.div>
