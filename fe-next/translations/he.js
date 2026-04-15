@@ -5050,21 +5050,32 @@ const he = {
     },
     "facts": {
       "title": "עובדות מעניינות",
+      "coachLabel": "טיפ מהמאמן",
       "firstTry": "בניסיון הראשון! רק {solveRate}% מצליחים ככה.",
       "firstTryPersonal": "בניסיון הראשון! פתרת את זה מהניחוש הראשון!",
+      "firstTryRare": "ניסיון אחד. בול. המילון רועד. רק {solveRate}% פותרים מהניחוש הראשון.",
       "speedSolver": "סיימת תוך {seconds} שניות. המוח שלך בקושי התחמם.",
       "topPerformer": "טופ {percentile}%! עברת {others} שחקנים.",
+      "topPerformerElite": "טופ {percentile}%. לא שיחקת את החידה — בריונת אותה.",
       "eliteClub": "רק {solveRate}% פתרו היום. אתה באליטה.",
+      "eliteClubRare": "רק {solveRate}% פתרו היום. האוויר בפסגה דליל.",
       "efficiencyMachine": "יעילות {score}. דיוק כירורגי.",
       "letterDetective": "הניחוש הראשון תפס {correct}/{total} אותיות.",
       "streakLegend": "רצף של {days} ימים! יותר אמין מזריחת השמש.",
+      "streakLegendBig": "רצף של {days} ימים רצוף. יותר עקבי מהשעון המעורר שלך.",
+      "perfectScore": "1000/1000. ניצחון מושלם. מהירות, דיוק, חקר — הכול מקסימום.",
       "closeCall": "פתרת עם {life} חיים. על הקצה!",
       "lifeSaver": "{life} חיים נשארו. יכולת לשחק בעיניים עצומות.",
       "wordExplorer": "{count} מילים נמצאו! מיפית את כל הלוח.",
       "fewerGuesses": "{attempts} ניחושים לעומת ממוצע {avg}. יעיל!",
       "palindrome": "פלינדרום! אותו דבר מההתחלה ומהסוף.",
       "rareLetter": "מילה עם '{letter}'? אותיות נדירות, כישרון נדיר.",
-      "longWord": "מילה בת {length} אותיות? אתגר אמיתי."
+      "longWord": "מילה בת {length} אותיות? אתגר אמיתי.",
+      "tipLoss": "טיפ לסיבוב הבא: תפוס 2–3 מילים קצרות קודם. אותיות חינם, חיים חינם, ניחושים זולים יותר.",
+      "tipExploration": "מצאת {words} מילים צדדיות. כל אחת = +10 נק׳, עד 20. בקלות +{gain} נק׳ בפעם הבאה.",
+      "tipSpeed": "החיים צנחו ל-{life}. מילים ארוכות מרפאות מהר יותר — 7+ אותיות = +25 חיים. מילה שמנה ≈ +100 ניקוד.",
+      "tipAccuracy": "{attempts} ניחושים = ‎−{lost} נק׳ דיוק. כלל הצלף: אל תחזור על אות אפורה, תמיד הזז צהובות. פתרון ב-3 או פחות שומר את כל ה-{lost}.",
+      "tipShortTarget": "יעדים קצרים ({length} אותיות) קשים. פתח במילים עם 4 תנועות כמו ADIEU — הניחוש הראשון נעשה סריקת תנועות."
     },
     "stats": {
       "title": "סטטיסטיקה",
@@ -5209,7 +5220,10 @@ const he = {
       "daysAgo": "לפני {count} ימים",
       "justNow": "עכשיו",
       "minutesAgo": "לפני {count} דק'",
-      "hoursAgo": "לפני {count} שע'"
+      "hoursAgo": "לפני {count} שע'",
+      "scopeCombined": "משולב",
+      "scopeWordHunt": "ציד מילים",
+      "scopeWordWheel": "גלגל המילים"
     },
     "shareMessage": {
       "header": "LexiClash ציד מילים #{number}",

@@ -5138,21 +5138,32 @@ const en = {
     },
     "facts": {
       "title": "Fun Facts",
+      "coachLabel": "Coach tip",
       "firstTry": "One and done! Only {solveRate}% solve it first try.",
       "firstTryPersonal": "One and done! Nailed it on the first guess!",
+      "firstTryRare": "One shot. Bullseye. Only {solveRate}% solve in 1.",
       "speedSolver": "Done in {seconds}s. Your brain barely broke a sweat.",
       "topPerformer": "Top {percentile}%! You outperformed {others} players.",
+      "topPerformerElite": "Top {percentile}%. You didn't play the puzzle — you bullied it.",
       "eliteClub": "Only {solveRate}% solved today. You're in elite company.",
+      "eliteClubRare": "Only {solveRate}% solved today. You're in rarefied air.",
       "efficiencyMachine": "Efficiency of {score}. Surgeon-level precision.",
       "letterDetective": "First guess nailed {correct}/{total} letters.",
       "streakLegend": "{days}-day streak! More reliable than sunrise.",
+      "streakLegendBig": "{days}-day streak. More consistent than your morning alarm.",
+      "perfectScore": "1000/1000. Flawless victory — speed, accuracy, exploration all maxed.",
       "closeCall": "Solved with {life} life left. Living on the edge!",
       "lifeSaver": "{life} life left. Could've played blindfolded.",
       "wordExplorer": "{count} words found! You mapped the whole grid.",
       "fewerGuesses": "{attempts} vs average {avg}. Efficient!",
       "palindrome": "A palindrome! Same forward and backward.",
       "rareLetter": "A word with '{letter}'? Rare letters, rarer skill.",
-      "longWord": "{length}-letter target? That's a proper challenge."
+      "longWord": "{length}-letter target? That's a proper challenge.",
+      "tipLoss": "Next round: scout 2–3 short side-words FIRST. Free letters, free life, cheaper guesses.",
+      "tipExploration": "{words} side-words. Every extra one = +10 pts, up to 20. Easy +{gain} waiting next time.",
+      "tipSpeed": "Life crashed to {life}. Longer side-words heal faster — 7+ letters = +25 life. One chunky word ≈ +100 score.",
+      "tipAccuracy": "{attempts} guesses = −{lost} Accuracy pts. Never reuse a grey letter, always shuffle yellows. Solve in ≤3 to keep all {lost} next time.",
+      "tipShortTarget": "{length}-letter targets bite. Open with 4-vowel words like ADIEU — guess #1 becomes a vowel scan."
     },
     "stats": {
       "title": "Statistics",
@@ -5297,7 +5308,10 @@ const en = {
       "daysAgo": "{count}d ago",
       "justNow": "just now",
       "minutesAgo": "{count}m ago",
-      "hoursAgo": "{count}h ago"
+      "hoursAgo": "{count}h ago",
+      "scopeCombined": "Combined",
+      "scopeWordHunt": "Word Hunt",
+      "scopeWordWheel": "Word Wheel"
     },
     "shareMessage": {
       "header": "LexiClash Word Hunt #{number}",

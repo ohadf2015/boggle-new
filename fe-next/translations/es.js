@@ -5204,7 +5204,10 @@ const es = {
       "daysAgo": "hace {count}d",
       "justNow": "ahora mismo",
       "minutesAgo": "hace {count}m",
-      "hoursAgo": "hace {count}h"
+      "hoursAgo": "hace {count}h",
+      "scopeCombined": "Combinado",
+      "scopeWordHunt": "Caza de Palabras",
+      "scopeWordWheel": "Rueda de Palabras"
     },
     "shareMessage": {
       "header": "LexiClash Caza de Palabras #{number}",
@@ -5258,21 +5261,32 @@ const es = {
     },
     "facts": {
       "title": "Datos Curiosos",
+      "coachLabel": "Consejo del coach",
       "firstTry": "¡A la primera! Solo {solveRate}% lo logra al primer intento.",
       "firstTryPersonal": "¡A la primera! ¡Lo clavaste en el primer intento!",
+      "firstTryRare": "Un tiro. Diana. Solo {solveRate}% resuelve al primer intento.",
       "speedSolver": "Listo en {seconds}s. Tu cerebro ni sudó.",
       "topPerformer": "¡Top {percentile}%! Superaste a {others} jugadores.",
+      "topPerformerElite": "Top {percentile}%. No jugaste el puzzle — lo humillaste.",
       "eliteClub": "Solo {solveRate}% resolvió hoy. Estás en la élite.",
+      "eliteClubRare": "Solo {solveRate}% resolvió hoy. El aire en la cima es escaso.",
       "efficiencyMachine": "Eficiencia de {score}. Precisión de cirujano.",
       "letterDetective": "El primer intento acertó {correct}/{total} letras.",
       "streakLegend": "¡{days} días de racha! Más confiable que el amanecer.",
+      "streakLegendBig": "{days} días seguidos. Más constante que tu alarma matutina.",
+      "perfectScore": "1000/1000. Victoria impecable — velocidad, precisión, exploración al máximo.",
       "closeCall": "¡Resolviste con {life} vida! Viviendo al límite.",
       "lifeSaver": "{life} vida restante. Podrías haber jugado con los ojos cerrados.",
       "wordExplorer": "¡{count} palabras encontradas! Mapeaste toda la grilla.",
       "fewerGuesses": "{attempts} vs promedio {avg}. ¡Eficiente!",
       "palindrome": "¡Un palíndromo! Igual al derecho y al revés.",
       "rareLetter": "¿Una palabra con '{letter}'? Letras raras, habilidad más rara.",
-      "longWord": "¿Objetivo de {length} letras? Eso sí es un reto."
+      "longWord": "¿Objetivo de {length} letras? Eso sí es un reto.",
+      "tipLoss": "Próxima ronda: busca 2–3 palabras cortas laterales PRIMERO. Letras gratis, vida gratis, intentos más baratos.",
+      "tipExploration": "{words} palabras laterales. Cada extra = +10 pts, hasta 20. Fácil +{gain} esperándote la próxima vez.",
+      "tipSpeed": "La vida cayó a {life}. Las palabras largas curan más rápido — 7+ letras = +25 vida. Una palabra gorda ≈ +100 puntos.",
+      "tipAccuracy": "{attempts} intentos = −{lost} pts de Precisión. Regla del francotirador: nunca reutilices una gris, siempre mueve las amarillas. Resuelve en ≤3 para mantener los {lost} la próxima.",
+      "tipShortTarget": "Objetivos de {length} letras son difíciles. Abre con palabras de 4 vocales como ADIEU — el intento #1 se convierte en escaneo de vocales."
     },
     "attempts": "Intentos"
   },

@@ -5091,21 +5091,32 @@ const ja = {
     },
     "facts": {
       "title": "おもしろ事実",
+      "coachLabel": "コーチの助言",
       "firstTry": "一発正解！{solveRate}%だけが初回で解けます。",
       "firstTryPersonal": "一発正解！最初の推測で見事に当てました！",
+      "firstTryRare": "一撃必中。辞書も震えてる。初回で解けるのは{solveRate}%だけ。",
       "speedSolver": "{seconds}秒でクリア。脳はほとんど汗をかいていません。",
       "topPerformer": "トップ{percentile}%！{others}人のプレイヤーを上回りました。",
+      "topPerformerElite": "トップ{percentile}%。パズルと遊んだんじゃない — 叩きのめしたんだ。",
       "eliteClub": "今日は{solveRate}%だけが解けました。あなたはエリートです。",
+      "eliteClubRare": "今日解けたのは{solveRate}%だけ。頂上の空気は薄い。",
       "efficiencyMachine": "効率スコア{score}。外科医レベルの精密さ。",
       "letterDetective": "最初の推測で{correct}/{total}文字を当てました。",
       "streakLegend": "{days}日連続！日の出より確実です。",
+      "streakLegendBig": "{days}日連続。朝の目覚まし時計より安定している。",
+      "perfectScore": "1000/1000。完璧な勝利 — スピード、精度、探索すべて最大。",
       "closeCall": "ライフ{life}で解決。ギリギリの勝利！",
       "lifeSaver": "ライフ{life}残り。目隠しでもできたかも。",
       "wordExplorer": "{count}語発見！グリッド全体を探索しました。",
       "fewerGuesses": "{attempts}回 vs 平均{avg}回。効率的！",
       "palindrome": "回文！前からも後ろからも同じです。",
       "rareLetter": "'{letter}'を含む単語？珍しい文字、珍しいスキル。",
-      "longWord": "{length}文字のターゲット？本格的な挑戦です。"
+      "longWord": "{length}文字のターゲット？本格的な挑戦です。",
+      "tipLoss": "次のラウンドのコツ: 先に短いサブ単語を2〜3個見つけよう。無料の文字、無料のライフ、安い推測。",
+      "tipExploration": "サブ単語{words}個。1個追加ごとに+10点、最大20個まで。次回は簡単に+{gain}点。",
+      "tipSpeed": "ライフが{life}まで急降下。長いサブ単語ほど回復が速い — 7文字以上 = +25ライフ。太い単語一つ ≈ +100点。",
+      "tipAccuracy": "{attempts}回の推測 = −{lost}精度ポイント。灰色の文字は二度使わない、黄色は必ず動かす。次は3回以内で解いて{lost}点を全て守ろう。",
+      "tipShortTarget": "{length}文字のターゲットは厄介。ADIEUのような母音4つの単語で開幕 — 最初の推測が母音スキャンになる。"
     },
     "stats": {
       "title": "統計",
@@ -5250,7 +5261,10 @@ const ja = {
       "daysAgo": "{count}日前",
       "justNow": "たった今",
       "minutesAgo": "{count}分前",
-      "hoursAgo": "{count}時間前"
+      "hoursAgo": "{count}時間前",
+      "scopeCombined": "総合",
+      "scopeWordHunt": "ワードハント",
+      "scopeWordWheel": "ワードホイール"
     },
     "shareMessage": {
       "header": "LexiClash ワードハント #{number}",

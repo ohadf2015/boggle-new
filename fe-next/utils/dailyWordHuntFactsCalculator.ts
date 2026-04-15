@@ -87,9 +87,9 @@ function getFirstTryFact(result: WordHuntResult, stats: WordHuntStats): WordHunt
   if (!result.solved || result.attemptsUsed !== 1) return null;
 
   const variants = [
-    "One shot. One kill. The dictionary is scared of you.",
-    "First try?! Either clairvoyant or wildly lucky. We'll take both.",
-    "Nailed it before coffee kicked in. Flawless opener.",
+    "One shot. Bullseye. Dictionary's shaking.",
+    "First-guess magic. Either psychic or scary good.",
+    "Nailed it before your coffee cooled. Showoff.",
   ];
   const fallback = pickVariant(variants, result);
 
@@ -188,9 +188,9 @@ function getLossTip(result: WordHuntResult): WordHuntFact | null {
 
   const wordsFound = result.wordsDiscovered?.length ?? 0;
   const variants = [
-    `Stuck? Next time, build 2-3 short survival words FIRST. Each reveals a letter AND banks life — guesses get cheaper.`,
-    `Tip: survival words (3-4 letters) are free intel. They show which letters the grid even contains before you spend a guess.`,
-    `Lost? Hunt short side-words early. 3 survival words ≈ 30 life + letter hints. Target guesses land way better.`,
+    `Try this next round: scout 2–3 short side-words FIRST. Free letters, free life, cheaper guesses.`,
+    `Secret weapon: side-words. 3–4 letter combos spill intel before you risk a real guess.`,
+    `Pro move: hunt short words early. Three tiny wins = ~30 life + hints. Your guesses land sharper.`,
   ];
 
   return {
@@ -210,9 +210,9 @@ function getExplorationTip(result: WordHuntResult): WordHuntFact | null {
 
   const potentialGain = Math.min(20, 10) * 10 - words * 10; // up to +100 easy pts
   const variants = [
-    `Only ${words} survival words found. Each non-target word = +10 score (cap 20). Easy +${potentialGain} pts next time — scan for 3-4 letter words hiding between grid letters.`,
-    `Biggest leak: exploration. You left ~${potentialGain} pts on the board. Short words count the same as long ones for Exploration — speed-tap them.`,
-    `${words} side-words. Pros find 15-20. Any valid word that isn't the target still scores. Swipe aggressively on short combos.`,
+    `${words} side-words. Every extra one = +10 pts, up to 20. Easy +${potentialGain} waiting for you next time.`,
+    `Biggest leak: exploration. Roughly +${potentialGain} pts just sitting there — short words score the same as long ones.`,
+    `Pros scoop 15–20 side-words. You grabbed ${words}. Swipe every 3–4 letter combo you spot — the grid's a buffet.`,
   ];
 
   return {
@@ -231,9 +231,10 @@ function getSpeedTip(result: WordHuntResult): WordHuntFact | null {
   const life = result.lifeRemaining;
   if (life == null || life >= LOW_LIFE_THRESHOLD) return null;
 
+  const lifeRounded = Math.round(life);
   const variants = [
-    `Life bottomed at ${life}. Speed pillar = life × 4. Fix: long survival words regen life — 7+ letters = 25 life. One fat word ≈ +100 score.`,
-    `${life} life left — Speed score suffered. Longer survival words refill faster (5 letters = 15 life, 7+ = 25). Prioritize length over quantity.`,
+    `Life crashed to ${lifeRounded}. Longer side-words heal faster — 7+ letters = +25 life. One chunky word ≈ +100 score.`,
+    `${lifeRounded} life at the end. Trade quantity for length: 5-letter = +15, 7+ = +25. Your health bar will thank you.`,
     `Low life = low Speed score. Every 7-letter side-word banks 25 life AND 4 clue tokens. Hunt long BEFORE guessing.`,
   ];
 
@@ -254,9 +255,9 @@ function getAccuracyTip(result: WordHuntResult): WordHuntFact | null {
 
   const lost = (result.attemptsUsed - 1) * 40;
   const variants = [
-    `${result.attemptsUsed} guesses cost you ${lost} Accuracy pts (-40 each). Rule: never reuse a grey letter, always reposition yellows. Solve in ≤3 for +${lost} pts.`,
-    `Accuracy pillar dropped ${lost} pts. Before guessing, list the letters you KNOW are wrong — force each new guess to exclude them all.`,
-    `${result.attemptsUsed} tries = -${lost} score. The fix isn't speed, it's patience: treat every yellow like a puzzle clue before firing your next word.`,
+    `${result.attemptsUsed} guesses = −${lost} Accuracy pts. Sniper rule: never reuse a grey letter, always shuffle yellows. Solve in ≤3 to keep all ${lost} next time.`,
+    `Lost ${lost} pts to extra tries. Before guessing, mentally list the letters you KNOW are wrong — then force every new word to exclude them.`,
+    `${result.attemptsUsed} tries stings (−${lost}). The fix isn't speed, it's patience: treat every yellow like a clue, not a suggestion.`,
   ];
 
   return {
@@ -276,9 +277,9 @@ function getShortTargetTip(result: WordHuntResult): WordHuntFact | null {
   if (result.attemptsUsed <= 2) return null;
 
   const variants = [
-    `${result.targetWord.length}-letter targets have fewer anchors. Open with vowel-heavy words (ADIEU, AUDIO) to map possible letters in one shot.`,
-    `Short target = trickier. First-guess strategy: pack 3-4 common vowels. You'll know the vowel set before spending a real guess.`,
-    `Short words hide better. Use your first guess as a scan, not a shot — pick a word with 4 distinct vowels.`,
+    `Short targets bite. Open with 4-vowel words like ADIEU or AUDIO — first guess becomes a vowel scan.`,
+    `${result.targetWord.length}-letter target? Tricky. Pack your opener with vowels so you map the whole set in one move.`,
+    `Little words hide the best. Use guess #1 as recon, not a shot — load it with distinct vowels.`,
   ];
 
   return {
@@ -420,4 +421,53 @@ export function getWordHuntFacts(
     }
   }
   return facts;
+}
+
+// ---------------------------------------------------------------------------
+// New API — encouragement + coach tip pair (distinct UI surfaces)
+// ---------------------------------------------------------------------------
+
+export interface WordHuntInsights {
+  encouragement: WordHuntFact | null;
+  tip: WordHuntFact | null;
+}
+
+export function getWordHuntInsights(
+  result: WordHuntResult,
+  stats: WordHuntStats
+): WordHuntInsights {
+  // Encouragement: brag-worthy first, otherwise a witty observation.
+  const encouragementChain = [
+    () => getFirstTryFact(result, stats),
+    () => getPerfectScoreFact(result),
+    () => getTopPerformerFact(result, stats),
+    () => getStreakLegendFact(result),
+    () => getEliteClubFact(result, stats),
+    () => getPalindromeFact(result),
+    () => getRareLetterFact(result),
+    () => getLongWordFact(result),
+  ];
+
+  // Coach tip: the single highest-leverage actionable suggestion.
+  const tipChain = [
+    () => getLossTip(result),
+    () => getExplorationTip(result),
+    () => getAccuracyTip(result),
+    () => getSpeedTip(result),
+    () => getShortTargetTip(result),
+  ];
+
+  let encouragement: WordHuntFact | null = null;
+  for (const gen of encouragementChain) {
+    const f = gen();
+    if (f) { encouragement = f; break; }
+  }
+
+  let tip: WordHuntFact | null = null;
+  for (const gen of tipChain) {
+    const f = gen();
+    if (f) { tip = f; break; }
+  }
+
+  return { encouragement, tip };
 }

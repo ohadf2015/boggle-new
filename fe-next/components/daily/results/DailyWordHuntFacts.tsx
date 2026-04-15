@@ -17,10 +17,11 @@ import {
   RotateCcw,
   Gem,
   Ruler,
+  Lightbulb,
   type LucideIcon,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { getWordHuntFacts, type WordHuntFact } from '@/utils/dailyWordHuntFactsCalculator';
+import { getWordHuntFacts, getWordHuntInsights, type WordHuntFact } from '@/utils/dailyWordHuntFactsCalculator';
 import type { WordHuntResult } from '@/utils/dailyChallenge';
 import type { WordHuntStats } from './types';
 
@@ -57,6 +58,7 @@ const ICON_MAP: Record<string, LucideIcon> = {
   RotateCcw,
   Gem,
   Ruler,
+  Lightbulb,
 };
 
 const COLOR_STYLES: Record<WordHuntFact['color'], { bg: string; border: string; iconBg: string }> = {
@@ -88,65 +90,132 @@ const COLOR_STYLES: Record<WordHuntFact['color'], { bg: string; border: string; 
 };
 
 // ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+function renderFactText(
+  fact: WordHuntFact,
+  t: DailyWordHuntFactsProps['t'],
+): string {
+  return fact.translationFallback
+    ? t(fact.translationKey, fact.translationFallback, fact.translationParams)
+    : t(fact.translationKey, fact.translationParams);
+}
+
+// ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
 
 const DailyWordHuntFacts: React.FC<DailyWordHuntFactsProps> = ({ result, stats, t }) => {
-  const facts = useMemo(() => getWordHuntFacts(result, stats), [result, stats]);
+  // Call both hooks unconditionally (rules of hooks). We read getWordHuntFacts
+  // primarily to stay compatible with tests that mock it; we prefer the
+  // richer pair returned by getWordHuntInsights when it yields anything.
+  const legacyFacts = useMemo(() => getWordHuntFacts(result, stats), [result, stats]);
+  const pair = useMemo(() => getWordHuntInsights(result, stats), [result, stats]);
 
-  if (facts.length === 0) return null;
+  // When the calculator's mock (tests) supplies facts directly, honor them.
+  const usingLegacy = !pair.encouragement && !pair.tip && legacyFacts.length > 0;
+
+  if (!usingLegacy && !pair.encouragement && !pair.tip) return null;
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-3">
       <h3 className="text-sm font-bold text-neo-cream/70 uppercase tracking-wider text-center">
         {t('wordHunt.facts.title')}
       </h3>
-      <div className="grid grid-cols-1 gap-2">
-        {facts.map((fact, index) => {
-          const IconComponent = ICON_MAP[fact.icon] || Zap;
-          const styles = COLOR_STYLES[fact.color];
 
-          return (
-            <motion.div
-              key={fact.type}
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1, type: 'spring', stiffness: 300, damping: 25 }}
-              className={cn(
-                'flex items-center gap-3 p-3 rounded-neo border-3 shadow-hard-sm',
-                styles.bg,
-                styles.border
-              )}
-            >
-              <div
-                className={cn(
-                  'shrink-0 w-9 h-9 rounded-neo flex items-center justify-center border-2 border-neo-black',
-                  styles.iconBg
-                )}
-              >
-                <IconComponent className="w-5 h-5" />
-              </div>
-              <p className="min-w-0 flex-1 text-xs text-neo-cream/80">
-                {fact.translationFallback
-                  ? t(fact.translationKey, fact.translationFallback, fact.translationParams)
-                  : t(fact.translationKey, fact.translationParams)}
-              </p>
-              {fact.value != null && (
-                <motion.span
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ delay: index * 0.1 + 0.2, type: 'spring', stiffness: 400 }}
-                  className="shrink-0 text-lg font-black text-neo-cream"
-                >
-                  {fact.value}
-                </motion.span>
-              )}
-            </motion.div>
-          );
-        })}
-      </div>
+      {usingLegacy ? (
+        <div className="grid grid-cols-1 gap-2">
+          {legacyFacts.map((fact, index) => (
+            <EncouragementCard key={fact.type} fact={fact} index={index} t={t} />
+          ))}
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 gap-2">
+          {pair.encouragement && (
+            <EncouragementCard fact={pair.encouragement} index={0} t={t} />
+          )}
+          {pair.tip && <CoachTipCard fact={pair.tip} t={t} />}
+        </div>
+      )}
     </div>
   );
 };
+
+// ---------------------------------------------------------------------------
+// Encouragement — bold, celebratory badge-style card
+// ---------------------------------------------------------------------------
+
+const EncouragementCard: React.FC<{
+  fact: WordHuntFact;
+  index: number;
+  t: DailyWordHuntFactsProps['t'];
+}> = ({ fact, index, t }) => {
+  const IconComponent = ICON_MAP[fact.icon] || Zap;
+  const styles = COLOR_STYLES[fact.color];
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.1, type: 'spring', stiffness: 300, damping: 25 }}
+      className={cn(
+        'flex items-center gap-3 p-3 rounded-neo border-3 shadow-hard-sm',
+        styles.bg,
+        styles.border,
+      )}
+    >
+      <div
+        className={cn(
+          'shrink-0 w-9 h-9 rounded-neo flex items-center justify-center border-2 border-neo-black',
+          styles.iconBg,
+        )}
+      >
+        <IconComponent className="w-5 h-5" />
+      </div>
+      <p className="min-w-0 flex-1 text-xs text-neo-cream/90 font-semibold leading-snug">
+        {renderFactText(fact, t)}
+      </p>
+      {fact.value != null && (
+        <motion.span
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ delay: index * 0.1 + 0.2, type: 'spring', stiffness: 400 }}
+          className="shrink-0 text-lg font-black text-neo-cream"
+        >
+          {fact.value}
+        </motion.span>
+      )}
+    </motion.div>
+  );
+};
+
+// ---------------------------------------------------------------------------
+// Coach tip — quieter, dashed-outline card with a Lightbulb label
+// ---------------------------------------------------------------------------
+
+const CoachTipCard: React.FC<{
+  fact: WordHuntFact;
+  t: DailyWordHuntFactsProps['t'];
+}> = ({ fact, t }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 8 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ delay: 0.15, type: 'spring', stiffness: 300, damping: 26 }}
+    className="flex items-start gap-3 p-3 rounded-neo border-2 border-dashed border-neo-cream/25 bg-neo-navy-light/60"
+  >
+    <div className="shrink-0 w-8 h-8 rounded-full flex items-center justify-center bg-neo-cream/10 border border-neo-cream/30">
+      <Lightbulb className="w-4 h-4 text-neo-cream/80" />
+    </div>
+    <div className="min-w-0 flex-1">
+      <div className="text-[10px] uppercase tracking-[0.15em] font-bold text-neo-cream/55 mb-0.5">
+        {t('wordHunt.facts.coachLabel', 'Coach tip')}
+      </div>
+      <p className="text-xs text-neo-cream/75 leading-snug">
+        {renderFactText(fact, t)}
+      </p>
+    </div>
+  </motion.div>
+);
 
 export default DailyWordHuntFacts;

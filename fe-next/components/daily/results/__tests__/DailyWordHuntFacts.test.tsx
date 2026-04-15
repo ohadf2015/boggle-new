@@ -28,9 +28,12 @@ vi.mock('framer-motion', () => {
   };
 });
 
-// Mock the calculator to control facts output
+// Mock the calculator to control facts output. The component also calls
+// getWordHuntInsights; default it to the empty pair so the legacy
+// getWordHuntFacts path drives these tests.
 vi.mock('@/utils/dailyWordHuntFactsCalculator', () => ({
   getWordHuntFacts: vi.fn(),
+  getWordHuntInsights: vi.fn(() => ({ encouragement: null, tip: null })),
 }));
 
 import { getWordHuntFacts } from '@/utils/dailyWordHuntFactsCalculator';

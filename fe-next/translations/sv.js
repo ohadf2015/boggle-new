@@ -5039,21 +5039,32 @@ const sv = {
     },
     "facts": {
       "title": "Roliga fakta",
+      "coachLabel": "Tränartips",
       "firstTry": "Första försöket! Bara {solveRate}% klarar det direkt.",
       "firstTryPersonal": "Första försöket! Du klarade det på första gissningen!",
+      "firstTryRare": "Ett skott. Mitt i prick. Bara {solveRate}% löser på första försöket.",
       "speedSolver": "Klart på {seconds}s. Din hjärna knappt svettas.",
       "topPerformer": "Topp {percentile}%! Du slog {others} spelare.",
+      "topPerformerElite": "Topp {percentile}%. Du spelade inte pusslet — du mobbade det.",
       "eliteClub": "Bara {solveRate}% löste idag. Du tillhör eliten.",
+      "eliteClubRare": "Bara {solveRate}% löste idag. Tunn luft på toppen.",
       "efficiencyMachine": "Effektivitet {score}. Kirurgisk precision.",
       "letterDetective": "Första gissningen träffade {correct}/{total} bokstäver.",
       "streakLegend": "{days} dagars svit! Mer pålitlig än soluppgången.",
+      "streakLegendBig": "{days} dagars svit rakt igenom. Stabilare än din morgonväckning.",
+      "perfectScore": "1000/1000. Felfri seger — fart, precision, utforskning maxade.",
       "closeCall": "Löst med {life} liv kvar. Lever på gränsen!",
       "lifeSaver": "{life} liv kvar. Kunde spelat med ögonen stängda.",
       "wordExplorer": "{count} ord hittade! Du kartlade hela rutnätet.",
       "fewerGuesses": "{attempts} vs genomsnitt {avg}. Effektivt!",
       "palindrome": "Ett palindrom! Samma framifrån och bakifrån.",
       "rareLetter": "Ett ord med '{letter}'? Sällsynta bokstäver, sällsynt skicklighet.",
-      "longWord": "{length} bokstäver? Det är en ordentlig utmaning."
+      "longWord": "{length} bokstäver? Det är en ordentlig utmaning.",
+      "tipLoss": "Nästa runda: scouta 2–3 korta sidoord FÖRST. Gratis bokstäver, gratis liv, billigare gissningar.",
+      "tipExploration": "{words} sidoord. Varje extra = +10 p, upp till 20. Lätta +{gain} väntar nästa gång.",
+      "tipSpeed": "Livet kraschade till {life}. Längre sidoord läker snabbare — 7+ bokstäver = +25 liv. Ett rejält ord ≈ +100 poäng.",
+      "tipAccuracy": "{attempts} gissningar = −{lost} precisionspoäng. Återanvänd aldrig en grå bokstav, flytta alltid gula. Lös på ≤3 för att behålla alla {lost} nästa gång.",
+      "tipShortTarget": "{length}-bokstavsmål är sega. Öppna med ord med 4 vokaler som ADIEU — gissning #1 blir en vokalskanning."
     },
     "stats": {
       "title": "Statistik",
@@ -5198,7 +5209,10 @@ const sv = {
       "daysAgo": "{count}d sedan",
       "justNow": "just nu",
       "minutesAgo": "{count}m sedan",
-      "hoursAgo": "{count}h sedan"
+      "hoursAgo": "{count}h sedan",
+      "scopeCombined": "Kombinerat",
+      "scopeWordHunt": "Ordjakt",
+      "scopeWordWheel": "Ordhjul"
     },
     "shareMessage": {
       "header": "LexiClash Ordjakt #{number}",
