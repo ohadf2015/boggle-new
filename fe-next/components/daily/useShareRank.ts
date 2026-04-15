@@ -80,6 +80,7 @@ export function useShareRank({
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
+      if (err instanceof DOMException && err.name === 'NotAllowedError') return;
       console.error('Failed to copy:', err);
     }
   }, [currentUserData, puzzleDate, language, gameType]);

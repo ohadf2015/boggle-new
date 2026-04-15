@@ -18,6 +18,10 @@ const WordHuntGame = dynamic(
   () => import('@/components/wordhunt/WordHuntGame').then(m => ({ default: m.WordHuntGame })),
   { ssr: false },
 );
+const WheelRushView = dynamic(
+  () => import('@/components/multiplayer/WheelRushView').then(m => ({ default: m.WheelRushView })),
+  { ssr: false },
+);
 import type { LetterGrid, Language, Avatar as AvatarType, TournamentStanding } from '@/shared/types/game';
 import type { BoardTheme } from '@/shared/types/socket';
 import { cn } from '@/lib/utils';
@@ -240,6 +244,19 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
   const handleCloseTournamentStandings = useCallback(() => {
     setShowTournamentStandings(false);
   }, [setShowTournamentStandings]);
+
+  // Wheel-rush has no letter grid — render dedicated view before grid guard
+  if (gameMode === 'wheel-rush') {
+    return (
+      <WheelRushView
+        socket={socket}
+        username={username}
+        leaderboard={leaderboard}
+        onQuit={onExitRoom}
+        t={t}
+      />
+    );
+  }
 
   // Use letterGrid or shufflingGrid
   const effectiveGrid = letterGrid || shufflingGrid;

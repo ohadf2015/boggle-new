@@ -1,14 +1,14 @@
 /**
- * ClassroomGameLobby - Wizard Version
+ * ClassroomGameLobby
  *
- * Simplified 2-step wizard for creating classroom games:
- * Step 1: Select classroom & lessons
- * Step 2: Review, share code, and start
+ * Single-step classroom game creator: teacher picks classroom + lessons + mode,
+ * then clicking Start Game creates the room and enters the multiplayer lobby
+ * where game code, QR, and education details are displayed.
  */
 
 'use client';
 
-import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import logger from '@/utils/logger';
 import { BookOpen, School } from 'lucide-react';
@@ -21,7 +21,6 @@ import { io, Socket } from 'socket.io-client';
 import { getSocketURL } from '@/utils/SocketContext';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { ClassroomSetupStep } from './ClassroomSetupStep';
-import { ClassroomReviewStep } from './ClassroomReviewStep';
 
 export interface ClassroomGameLobbyProps {
   initialLessonId?: string;
@@ -32,12 +31,7 @@ export function ClassroomGameLobby({ initialLessonId, onBack }: ClassroomGameLob
   const { t, language } = useLanguage();
   const { user, profile } = useAuth();
   const router = useRouter();
-  const tRef = useRef(t);
 
-  // Wizard state
-  const [currentStep, setCurrentStep] = useState(1);
-
-  // Data state
   const [lessons, setLessons] = useState<VocabularyLesson[]>([]);
   const [classrooms, setClassrooms] = useState<Classroom[]>([]);
   const [selectedLessonIds, setSelectedLessonIds] = useState<string[]>(
@@ -45,22 +39,19 @@ export function ClassroomGameLobby({ initialLessonId, onBack }: ClassroomGameLob
   );
   const [selectedClassroomId, setSelectedClassroomId] = useState<string>('');
   const [gameCode, setGameCode] = useState<string>('');
-  const [joinUrl, setJoinUrl] = useState<string>('');
-  const [copied, setCopied] = useState(false);
   const [isStarting, setIsStarting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [socket, setSocket] = useState<Socket | null>(null);
-  const [showAdvanced, setShowAdvanced] = useState(false);
-
-  // Game mode selection
   const [gameMode, setGameMode] = useState<'classic' | 'wordHunt' | 'blast'>('classic');
 
-  // Game settings with smart defaults
-  const [settings, setSettings] = useState({
-    timerMinutes: 3,
-    boardSize: 'medium' as 'small' | 'medium' | 'large',
-    allowLateJoin: true,
-  });
+  const settings = useMemo(
+    () => ({
+      timerMinutes: 3,
+      boardSize: 'medium' as const,
+      allowLateJoin: true,
+    }),
+    []
+  );
 
   // Fetch teacher data
   const fetchTeacherData = useCallback(async () => {
@@ -122,7 +113,7 @@ export function ClassroomGameLobby({ initialLessonId, onBack }: ClassroomGameLob
       socketInstance.on('classroomGameCreated', (data: { success: boolean; gameCode: string }) => {
         if (data.success) {
           toast.success(t('education.classroomGame.gameCreated'));
-          router.push(`/${language}/multiplayer?code=${data.gameCode}&classroom=true`);
+          router.push(`/${language}/multiplayer?room=${data.gameCode}&classroom=true`);
         }
       });
       socketInstance.on('classroomGameError', (data: { error: string }) => {
@@ -147,13 +138,6 @@ export function ClassroomGameLobby({ initialLessonId, onBack }: ClassroomGameLob
     setGameCode(code);
   }, []);
 
-  // Build SSR-safe join URL
-  useEffect(() => {
-    if (gameCode && typeof window !== 'undefined') {
-      setJoinUrl(`${window.location.origin}/join?code=${gameCode}`);
-    }
-  }, [gameCode]);
-
   const selectedLessons = useMemo(() => {
     return lessons.filter((l) => selectedLessonIds.includes(l.id));
   }, [lessons, selectedLessonIds]);
@@ -164,17 +148,6 @@ export function ClassroomGameLobby({ initialLessonId, onBack }: ClassroomGameLob
     );
     return [...new Set(words)];
   }, [selectedLessons]);
-
-  const handleCopyCode = useCallback(async () => {
-    try {
-      await navigator.clipboard.writeText(gameCode);
-      setCopied(true);
-      toast.success(t('share.codeCopied'));
-      setTimeout(() => setCopied(false), 2000);
-    } catch {
-      toast.error(t('share.codeCopyError'));
-    }
-  }, [gameCode, t]);
 
   const handleStartGame = useCallback(() => {
     if (!user || !socket || selectedLessonIds.length === 0 || !selectedClassroomId) {
@@ -195,6 +168,7 @@ export function ClassroomGameLobby({ initialLessonId, onBack }: ClassroomGameLob
       lessonName: selectedLessons.map(l => l.name).join(', '),
       vocabularyWords: allPlayableWords,
       language,
+      gameMode,
       templateSettings: {
         timerSeconds: settings.timerMinutes * 60,
         difficulty: settings.boardSize,
@@ -267,37 +241,20 @@ export function ClassroomGameLobby({ initialLessonId, onBack }: ClassroomGameLob
     );
   }
 
-  if (currentStep === 1) {
-    return (
-      <ClassroomSetupStep
-        classrooms={classrooms}
-        lessons={lessons}
-        selectedClassroomId={selectedClassroomId}
-        selectedLessonIds={selectedLessonIds}
-        allPlayableWords={allPlayableWords}
-        onSelectClassroom={setSelectedClassroomId}
-        onSelectLessons={setSelectedLessonIds}
-        onNext={() => setCurrentStep(2)}
-        onBack={onBack}
-      />
-    );
-  }
-
   return (
-    <ClassroomReviewStep
-      gameCode={gameCode}
-      joinUrl={joinUrl}
-      copied={copied}
-      isStarting={isStarting}
-      settings={settings}
-      showAdvanced={showAdvanced}
+    <ClassroomSetupStep
+      classrooms={classrooms}
+      lessons={lessons}
+      selectedClassroomId={selectedClassroomId}
+      selectedLessonIds={selectedLessonIds}
+      allPlayableWords={allPlayableWords}
       gameMode={gameMode}
+      isStarting={isStarting}
+      onSelectClassroom={setSelectedClassroomId}
+      onSelectLessons={setSelectedLessonIds}
       onGameModeChange={setGameMode}
-      onCopyCode={handleCopyCode}
-      onStartGame={handleStartGame}
-      onBack={() => setCurrentStep(1)}
-      onToggleAdvanced={() => setShowAdvanced(!showAdvanced)}
-      onSettingsChange={setSettings}
+      onNext={handleStartGame}
+      onBack={onBack}
     />
   );
 }

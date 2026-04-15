@@ -114,7 +114,8 @@ export default function MultiplayerPageClient(): React.JSX.Element {
 
   const [lessonDataState, setLessonDataState] = useState<{
     lessonId: string; lessonName: string; vocabularyWords: string[];
-    language: Language; templateSettings?: { timerSeconds: number; difficulty: string; minWordLength: number; allowLateJoin: boolean } | null;
+    language: Language; gameMode?: 'classic' | 'wordHunt' | 'blast';
+    templateSettings?: { timerSeconds: number; difficulty: string; minWordLength: number; allowLateJoin: boolean } | null;
   } | null>(null);
 
   // Ref bridge: allows hooks called before useMultiplayerSocket to access the socket
@@ -420,7 +421,11 @@ export default function MultiplayerPageClient(): React.JSX.Element {
             isActive && !showResults ? null : (
               <>
                 <EducationHeader showBackButton title={t('education.classroomGame.title')} />
-                <ClassroomModeBanner lessonData={lessonDataState} />
+                <ClassroomModeBanner
+                  lessonData={lessonDataState}
+                  gameCode={gameCode}
+                  expanded={!isActive}
+                />
               </>
             )
           ) : (

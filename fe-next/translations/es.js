@@ -4988,7 +4988,8 @@ const es = {
     "invalidLetters": "Solo puedes usar las letras de la rueda",
     "inputPlaceholder": "Escribe una palabra...",
     "tapLetters": "Toca o arrastra letras para formar una palabra",
-    "tapToRemove": "Toca una letra para quitarla",
+    "tapToRemove": "Toca otra vez una letra añadida para quitarla",
+    "doubleTapToSubmit": "Doble toque a una letra para enviar",
     "wordsToPass": "{count} palabras más para pasar a {name}",
     "passedPlayer": "¡Pasaste a {name}!",
     "tapDescription": "Toca las letras de la rueda para deletrear palabras. ¡Cada palabra debe incluir la letra central y tener al menos 3 letras!",
@@ -8944,7 +8945,7 @@ const es = {
       "roleGuest": "Invitado",
       "roleStudent": "Estudiante",
       "roleTeacher": "Profesor",
-      "socialProof": "Únete a {{count}} estudiantes",
+      "socialProof": "Únete a miles de estudiantes",
       "student": "Estudiante",
       "studentCta": "Empezar a aprender",
       "studentDesc": "Aprende vocabulario jugando",
@@ -9221,8 +9222,8 @@ const es = {
       }
     },
     "wordOfTheDay": {
-      "title": "Palabra del Dia",
-      "learnMore": "Saber Mas"
+      "title": "Palabra del Día",
+      "learnMore": "Saber Más"
     },
   },
   "crazygames": {

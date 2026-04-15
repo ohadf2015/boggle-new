@@ -1,7 +1,9 @@
 /**
- * ClassroomGameLobby Tests (Wizard Version)
+ * ClassroomGameLobby Tests (Single-Step Version)
  *
- * Tests for simplified 2-step wizard game creation flow
+ * Tests for single-step game creation flow. Clicking Start Game
+ * creates the room and navigates straight to the multiplayer lobby,
+ * where richer room info lives in ClassroomModeBanner.
  */
 
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
@@ -66,7 +68,7 @@ const mockClassrooms = [
   { id: 'class-2', name: 'Class B', member_count: 18 },
 ];
 
-describe('ClassroomGameLobby (Wizard)', () => {
+describe('ClassroomGameLobby (Single Step)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     (supabaseTeacher.getLessons as jest.Mock).mockResolvedValue({
@@ -101,12 +103,12 @@ describe('ClassroomGameLobby (Wizard)', () => {
     });
   });
 
-  describe('Step 1: Selection', () => {
-    it('should show step 1 of 2', async () => {
+  describe('Selection', () => {
+    it('should show step 1 of 1', async () => {
       render(<ClassroomGameLobby initialLessonId="" onBack={vi.fn()} />);
 
       await waitFor(() => {
-        expect(screen.getByText(/Step 1 of 2/i)).toBeInTheDocument();
+        expect(screen.getByText(/Step 1 of 1/i)).toBeInTheDocument();
       });
     });
 
@@ -163,24 +165,24 @@ describe('ClassroomGameLobby (Wizard)', () => {
       });
     });
 
-    it('should disable Next button when no lessons selected', async () => {
+    it('should disable Start Game button when no lessons selected', async () => {
       render(<ClassroomGameLobby initialLessonId="" onBack={vi.fn()} />);
 
       await waitFor(() => {
-        const nextButton = screen.getByText('common.next');
-        expect(nextButton).toBeDisabled();
+        const startButton = screen.getByText('education.classroomGame.startGame');
+        expect(startButton).toBeDisabled();
       });
     });
 
-    it('should enable Next button when lessons selected', async () => {
+    it('should enable Start Game button when lessons selected', async () => {
       render(<ClassroomGameLobby initialLessonId="" onBack={vi.fn()} />);
 
       await waitFor(() => {
         const lesson1Button = screen.getByText(/Unit 1: Colors/i).closest('button');
         fireEvent.click(lesson1Button!);
 
-        const nextButton = screen.getByText('common.next');
-        expect(nextButton).not.toBeDisabled();
+        const startButton = screen.getByText('education.classroomGame.startGame');
+        expect(startButton).not.toBeDisabled();
       });
     });
 
@@ -200,157 +202,15 @@ describe('ClassroomGameLobby (Wizard)', () => {
     });
   });
 
-  describe('Step 2: Review & Start', () => {
-    it('should show step 2 of 2 after clicking Next', async () => {
-      render(<ClassroomGameLobby initialLessonId="" onBack={vi.fn()} />);
-
-      await waitFor(() => {
-        const lesson1Button = screen.getByText(/Unit 1: Colors/i).closest('button');
-        fireEvent.click(lesson1Button!);
-
-        const nextButton = screen.getByText('common.next');
-        fireEvent.click(nextButton);
-      });
-
-      await waitFor(() => {
-        expect(screen.getByText(/Step 2 of 2/i)).toBeInTheDocument();
-      });
-    });
-
-    it('should display generated game code', async () => {
-      render(<ClassroomGameLobby initialLessonId="" onBack={vi.fn()} />);
-
-      await waitFor(() => {
-        const lesson1Button = screen.getByText(/Unit 1: Colors/i).closest('button');
-        fireEvent.click(lesson1Button!);
-
-        const nextButton = screen.getByText('common.next');
-        fireEvent.click(nextButton);
-      });
-
-      await waitFor(() => {
-        // Game code should be 6 characters (look for font-mono class)
-        const codeElement = document.querySelector('.font-mono');
-        expect(codeElement).toBeInTheDocument();
-        expect(codeElement?.textContent).toMatch(/^[A-Z0-9]{6}$/);
-      });
-    });
-
-    it('should show Copy Code button', async () => {
-      render(<ClassroomGameLobby initialLessonId="" onBack={vi.fn()} />);
-
-      await waitFor(() => {
-        const lesson1Button = screen.getByText(/Unit 1: Colors/i).closest('button');
-        fireEvent.click(lesson1Button!);
-
-        const nextButton = screen.getByText('common.next');
-        fireEvent.click(nextButton);
-      });
-
-      await waitFor(() => {
-        expect(screen.getByLabelText('share.copy')).toBeInTheDocument();
-      });
-    });
-
-    it('should show smart defaults for settings', async () => {
-      render(<ClassroomGameLobby initialLessonId="" onBack={vi.fn()} />);
-
-      await waitFor(() => {
-        const lesson1Button = screen.getByText(/Unit 1: Colors/i).closest('button');
-        fireEvent.click(lesson1Button!);
-
-        const nextButton = screen.getByText('common.next');
-        fireEvent.click(nextButton);
-      });
-
-      await waitFor(() => {
-        expect(screen.getByText(/3/)).toBeInTheDocument();
-        expect(screen.getByText(/5x5/)).toBeInTheDocument();
-        expect(screen.getByText(/✓/)).toBeInTheDocument();
-      });
-    });
-
-    it('should collapse advanced settings by default', async () => {
-      render(<ClassroomGameLobby initialLessonId="" onBack={vi.fn()} />);
-
-      await waitFor(() => {
-        const lesson1Button = screen.getByText(/Unit 1: Colors/i).closest('button');
-        fireEvent.click(lesson1Button!);
-
-        const nextButton = screen.getByText('common.next');
-        fireEvent.click(nextButton);
-      });
-
-      await waitFor(() => {
-        // Settings detail controls should be hidden
-        expect(screen.queryByRole('slider')).not.toBeInTheDocument();
-        expect(screen.queryByRole('combobox')).not.toBeInTheDocument();
-      });
-    });
-
-    it('should show Back button to return to step 1', async () => {
-      render(<ClassroomGameLobby initialLessonId="" onBack={vi.fn()} />);
-
-      await waitFor(() => {
-        const lesson1Button = screen.getByText(/Unit 1: Colors/i).closest('button');
-        fireEvent.click(lesson1Button!);
-
-        const nextButton = screen.getByText('common.next');
-        fireEvent.click(nextButton);
-      });
-
-      await waitFor(() => {
-        const backButtons = screen.getAllByText('common.back');
-        expect(backButtons.length).toBeGreaterThan(0);
-      });
-    });
-
-    it('should return to step 1 when Back is clicked', async () => {
-      render(<ClassroomGameLobby initialLessonId="" onBack={vi.fn()} />);
-
-      // Go to step 2
-      await waitFor(() => {
-        const lesson1Button = screen.getByText(/Unit 1: Colors/i).closest('button');
-        fireEvent.click(lesson1Button!);
-
-        const nextButton = screen.getByText('common.next');
-        fireEvent.click(nextButton);
-      });
-
-      await waitFor(() => {
-        expect(screen.getByText(/Step 2 of 2/i)).toBeInTheDocument();
-      });
-
-      // Go back to step 1
-      await waitFor(() => {
-        const backButtons = screen.getAllByText('common.back');
-        const wizardBackButton = backButtons[backButtons.length - 1]; // Last one is from WizardStep
-        fireEvent.click(wizardBackButton);
-      });
-
-      await waitFor(() => {
-        expect(screen.getByText(/Step 1 of 2/i)).toBeInTheDocument();
-      });
-    });
-  });
-
   describe('Game Creation', () => {
     it('should emit createClassroomGame event when Start Game clicked', async () => {
       render(<ClassroomGameLobby initialLessonId="" onBack={vi.fn()} />);
 
-      // Select lesson
       await waitFor(() => {
         const lesson1Button = screen.getByText(/Unit 1: Colors/i).closest('button');
         fireEvent.click(lesson1Button!);
       });
 
-      // Go to step 2
-      await waitFor(() => {
-        const nextButton = screen.getByText('common.next');
-        fireEvent.click(nextButton);
-      });
-
-      // Start game
       await waitFor(() => {
         const startButton = screen.getByText('education.classroomGame.startGame');
         fireEvent.click(startButton);
@@ -366,22 +226,15 @@ describe('ClassroomGameLobby (Wizard)', () => {
       });
     });
 
-    it('should stay in education section until game starts', async () => {
+    it('should not navigate before classroomGameCreated event fires', async () => {
       render(<ClassroomGameLobby initialLessonId="" onBack={vi.fn()} />);
 
-      // Select lesson
       await waitFor(() => {
         const lesson1Button = screen.getByText(/Unit 1: Colors/i).closest('button');
         fireEvent.click(lesson1Button!);
       });
 
-      // Navigate to step 2
-      await waitFor(() => {
-        const nextButton = screen.getByText('common.next');
-        fireEvent.click(nextButton);
-      });
-
-      // Router push should NOT be called yet (still in education section)
+      // No router push until socket confirms creation
       expect(mockPush).not.toHaveBeenCalled();
     });
 
@@ -439,13 +292,7 @@ describe('ClassroomGameLobby (Wizard)', () => {
         fireEvent.click(lesson1Button!);
       });
 
-      // Go to step 2
-      await waitFor(() => {
-        const nextButton = screen.getByText('common.next');
-        fireEvent.click(nextButton);
-      });
-
-      // Start game
+      // Start game directly
       await waitFor(() => {
         const startButton = screen.getByText('education.classroomGame.startGame');
         fireEvent.click(startButton);

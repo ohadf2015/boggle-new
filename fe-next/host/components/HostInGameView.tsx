@@ -14,6 +14,10 @@ const WordHuntGame = dynamic(
   () => import('@/components/wordhunt/WordHuntGame').then(m => ({ default: m.WordHuntGame })),
   { ssr: false },
 );
+const WheelRushView = dynamic(
+  () => import('@/components/multiplayer/WheelRushView').then(m => ({ default: m.WheelRushView })),
+  { ssr: false },
+);
 import type { Language, LetterGrid, Avatar as AvatarType, PresenceStatus } from '@/shared/types/game';
 import type { EarthquakeState } from '@/shared/types/earthquake';
 import type { BoardTheme } from '@/shared/types/socket';
@@ -195,6 +199,19 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
       timestamp: index,
     }));
   }, [hostFoundWords]);
+
+  // Wheel-rush: dedicated view (no TV variant yet, host always renders it)
+  if (gameMode === 'wheel-rush') {
+    return (
+      <WheelRushView
+        socket={socket}
+        username={username}
+        leaderboard={leaderboard}
+        onQuit={onStopGame}
+        t={t}
+      />
+    );
+  }
 
   // Blast with host playing: use dedicated BlastGame (same as PlayerInGameView)
   if (gameMode === 'blast' && hostPlaying) {

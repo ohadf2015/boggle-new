@@ -121,6 +121,11 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
   const draggingRef = useRef(false);
   const lastDragIdxRef = useRef<number | null>(null);
 
+  // ── Double-tap-to-submit support ──
+  const lastTapRef = useRef<{ idx: number; time: number } | null>(null);
+  const handleSubmitRef = useRef<() => void>(() => {});
+  const DOUBLE_TAP_MS = 280;
+
   // Track which wheel indices are used in current word
   const usedIndices = useMemo(() => {
     const set = new Set<number>();
@@ -183,20 +188,34 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
     }
   }, []);
 
-  // ── Letter tap (toggle: add if unused, remove matching if already used) ──
+  // ── Letter tap (toggle: add if unused, remove matching if already used;
+  //    double-tap within DOUBLE_TAP_MS submits the built word) ──
   const handleLetterPress = useCallback((letter: string, wheelIndex: number, el: HTMLButtonElement) => {
     if (gameOverRef.current) return;
+    const now = Date.now();
+    const last = lastTapRef.current;
+    const isDoubleTap = last && last.idx === wheelIndex && now - last.time < DOUBLE_TAP_MS;
     const current = builtLettersRef.current;
     const existingIdx = current.findIndex(bl => bl.wheelIndex === wheelIndex);
+
+    // Double-tap on a letter already in the word → submit (keep the letter).
+    if (isDoubleTap && existingIdx !== -1) {
+      lastTapRef.current = null;
+      handleSubmitRef.current();
+      return;
+    }
+
     if (existingIdx !== -1) {
       setBuiltLetters(prev => prev.filter((_, i) => i !== existingIdx));
       playButtonClickSound();
       haptic(8);
+      lastTapRef.current = { idx: wheelIndex, time: now };
       return;
     }
     setBuiltLetters(prev => [...prev, { letter, wheelIndex }]);
     playTileSelectSound();
     haptic(10);
+    lastTapRef.current = { idx: wheelIndex, time: now };
     // Get element position for particle effect
     const rect = el.getBoundingClientRect();
     const containerRect = gameContainerRef.current?.getBoundingClientRect();
@@ -351,6 +370,9 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
       setIsValidating(false);
     }
   }, [builtWord, isValidating, puzzle, wordsFound, onValidateWord, showFeedback, t, onEffect, combo, playWordRejectedSound, playWordAcceptedSound, playLegendaryWordSound, playComboSound]);
+
+  // Keep submit ref fresh so double-tap handler (created earlier) can reach the latest closure.
+  useEffect(() => { handleSubmitRef.current = handleSubmit; }, [handleSubmit]);
 
   // Responsive wheel radius based on the wheel div width (not the game container)
   const [wheelRadius, setWheelRadius] = useState(72);
@@ -541,10 +563,10 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
 
       {/* ── Centered wheel region (absorbs leftover vertical space) ── */}
       <div className="flex-1 flex flex-col items-center justify-center w-full min-h-0 gap-1.5 py-2">
-      {/* Tap-to-remove hint */}
+      {/* Tap-to-remove + double-tap-to-submit hint */}
       {builtLetters.length > 0 && (
         <p className="text-neo-cream/40 text-[10px] sm:text-xs text-center">
-          {t('wordWheel.tapToRemove')}
+          {t('wordWheel.tapToRemove')} &middot; {t('wordWheel.doubleTapToSubmit')}
         </p>
       )}
 

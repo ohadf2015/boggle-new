@@ -1,4 +1,4 @@
-import { loadTranslation, type TranslationData } from '@/translations/loadTranslation';
+import { loadTranslation } from '@/translations/loadTranslation';
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
@@ -7,8 +7,8 @@ type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es';
 
 const seoContent: Record<string, { title: string; description: string; features: string[]; faq: { question: string; answer: string }[] }> = {
   en: {
-    title: 'Daily Word Challenge - Same Puzzle Worldwide',
-    description: 'A new word puzzle every day at midnight UTC. Everyone plays the same board. Share your results and compete on the global daily leaderboard.',
+    title: 'Daily Word Wheel & Word Hunt — Free Daily Word Puzzle | LexiClash',
+    description: 'Play today\'s Daily Word Wheel and Word Hunt free — new puzzle every day at midnight UTC. Same board worldwide, no download, no signup. Track streaks, share results, climb the global leaderboard.',
     features: [
       'New puzzle every day at midnight UTC',
       'Same board for all players worldwide - fair competition',
@@ -40,13 +40,14 @@ const seoContent: Record<string, { title: string; description: string; features:
     ],
   },
   ja: {
-    title: 'デイリーワードチャレンジ - 世界共通パズル',
-    description: '毎日UTC午前0時に新しいワードパズル。全プレイヤーが同じボードでプレイ。結果を共有してグローバルランキングで競いましょう。',
+    title: 'ワードハント & デイリーワードホイール — 無料ワードパズル | LexiClash',
+    description: 'ワードハントとは？ 毎日新しい単語パズル — デイリーワードホイールとワードハントサバイバルを無料でプレイ。ダウンロード不要、登録不要。全プレイヤー同じ問題で世界ランキングに挑戦。',
     features: [
-      '毎日UTC午前0時に新パズル',
-      '世界中の全プレイヤーが同じボード',
+      '毎日UTC午前0時に新パズル（ワードハント & ワードホイール）',
+      'ワードハントとは：隠された単語を10回以内に見つける日替わりパズル',
+      '世界中の全プレイヤーが同じボード — 公平な競争',
+      'ダウンロード・登録不要、ブラウザで即プレイ',
       '絵文字で結果を友達にシェア',
-      'ワードハント：隠された単語を10回以内に見つけよう',
       '連続プレイでストリーク報酬をゲット',
       'グローバルランキングで毎日競争',
     ],
@@ -58,16 +59,38 @@ const seoContent: Record<string, { title: string; description: string; features:
     ],
   },
   sv: {
-    title: 'Daglig Ordutmaning - Samma Pussel Varldsomspannande',
-    description: 'Ett nytt ordpussel varje dag. Alla spelar paa samma braede.',
-    features: ['Nytt pussel varje dag', 'Samma braede foer alla spelare', 'Dela emoji-resultat'],
-    faq: [],
+    title: 'Dagligt Ordhjul & Ordjakt — Gratis Dagligt Ordpussel | LexiClash',
+    description: 'Spela dagens Ordhjul och Ordjakt gratis — nytt pussel varje dag. Samma braede foer alla, ingen nedladdning, ingen registrering. Taevla paa den globala dagliga topplistan.',
+    features: [
+      'Nytt pussel varje dag vid midnatt UTC',
+      'Samma braede foer alla spelare vaerldsomspaennande',
+      'Ordhjul: hitta ord fraan ett bokstavshjul',
+      'Ordjakt: hitta det dolda ordet paa 10 foersoek',
+      'Dela emoji-resultat precis som Wordle',
+      'Daglig strak belonar regelbundet spel',
+    ],
+    faq: [
+      { question: 'Naer aaterstaells det dagliga pusslet?', answer: 'Ett nytt pussel genereras varje dag vid midnatt UTC. Dina framsteg aaterstaells och en ny topplista boerjar.' },
+      { question: 'Kan jag dela mina resultat?', answer: 'Ja! Efter pusslet, tryck paa dela-knappen foer att kopiera en emoji-rutnaet. Dela det paa sociala medier utan att avsloeja svaret.' },
+      { question: 'Vad aer Ordhjul?', answer: 'Ordhjulet aer ett dagligt pussel daer du hittar ord med bokstaever arrangerade i ett hjul. Varje ord maaste innehaalla mittenbokstaven. Nytt hjul varje dag.' },
+    ],
   },
   es: {
-    title: 'Desafio Diario de Palabras - Mismo Puzzle Mundial',
-    description: 'Un nuevo puzzle de palabras cada dia. Todos juegan el mismo tablero. Comparte resultados y compite en el ranking global.',
-    features: ['Nuevo puzzle cada dia', 'Mismo tablero para todos', 'Comparte resultados emoji'],
-    faq: [],
+    title: 'Rueda de Palabras & Caza de Palabras Diaria — Puzzle Gratis | LexiClash',
+    description: 'Juega la Rueda de Palabras y Caza de Palabras diarias gratis — nuevo puzzle cada dia a medianoche UTC. Mismo tablero mundial, sin descargas ni registro. Compite en el ranking global.',
+    features: [
+      'Nuevo puzzle cada dia a medianoche UTC',
+      'Mismo tablero para todos los jugadores del mundo',
+      'Rueda de Palabras: encuentra palabras en una rueda de letras',
+      'Caza de Palabras: encuentra la palabra oculta en 10 intentos',
+      'Comparte resultados emoji como Wordle',
+      'Rachas diarias recompensan el juego constante',
+    ],
+    faq: [
+      { question: 'Cuando se reinicia el puzzle diario?', answer: 'Un nuevo puzzle se genera cada dia a medianoche UTC. Tu progreso se reinicia y un ranking fresco comienza.' },
+      { question: 'Puedo compartir mis resultados?', answer: 'Si! Despues del puzzle, toca el boton compartir para copiar una cuadricula emoji. Compartela en redes sociales sin revelar la respuesta.' },
+      { question: 'Que es la Rueda de Palabras Diaria?', answer: 'La Rueda de Palabras es un puzzle diario donde encuentras palabras usando letras en una rueda. Cada palabra debe incluir la letra central. Nueva rueda cada dia.' },
+    ],
   },
 };
 
@@ -234,13 +257,7 @@ export default async function DailyLayout({ children, params }: DailyLayoutProps
       price: '0',
       priceCurrency: 'USD',
     },
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue: '4.7',
-      ratingCount: '1240',
-      bestRating: '5',
-      worstRating: '1',
-    },
+    // aggregateRating removed — hardcoded ratings risk a Google manual action. TODO: Wire to real user ratings from Supabase when available.
     browserRequirements: 'Requires a modern web browser',
     inLanguage: ['en', 'he', 'sv', 'ja', 'es'],
   };

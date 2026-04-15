@@ -175,15 +175,11 @@ export async function getClassReportData(
   }
 
   try {
-    // Get classroom info with teacher
+    // Get classroom info (teacher profile fetched separately — classrooms.teacher_id
+    // references auth.users, not profiles, so PostgREST cannot embed directly)
     const { data: classroom, error: classroomError } = await supabase
       .from('classrooms')
-      .select(`
-        id,
-        name,
-        teacher_id,
-        profiles!classrooms_teacher_id_fkey(display_name)
-      `)
+      .select('id, name, teacher_id')
       .eq('id', classroomId)
       .single();
 
@@ -192,23 +188,37 @@ export async function getClassReportData(
       return { data: null, error: { message: classroomError.message } };
     }
 
-    // Get all students in classroom
-    const { data: students, error: studentsError } = await supabase
+    const { data: teacherProfile } = await supabase
+      .from('profiles')
+      .select('display_name')
+      .eq('id', classroom.teacher_id)
+      .maybeSingle();
+
+    // Get all students in classroom (profiles fetched separately — student_id
+    // references auth.users, not profiles)
+    const { data: memberships, error: studentsError } = await supabase
       .from('classroom_memberships')
-      .select(`
-        student_id,
-        profiles!classroom_memberships_student_id_fkey(id, display_name, avatar_config)
-      `)
-      .eq('classroom_id', classroomId)
-      .eq('status', 'active');
+      .select('student_id')
+      .eq('classroom_id', classroomId);
 
     if (studentsError) {
       logger.error('Error fetching students:', studentsError);
       return { data: null, error: { message: studentsError.message } };
     }
 
-    const totalStudents = students?.length || 0;
-    const studentIds = students?.map(s => s.student_id) || [];
+    const studentIds = memberships?.map(m => m.student_id) || [];
+    const totalStudents = studentIds.length;
+
+    const { data: studentProfiles } = studentIds.length > 0
+      ? await supabase
+          .from('profiles')
+          .select('id, display_name, avatar_config')
+          .in('id', studentIds)
+      : { data: [] as Array<{ id: string; display_name: string | null; avatar_config: Record<string, unknown> | null }> };
+
+    const profileById = new Map(
+      (studentProfiles || []).map(p => [p.id, p])
+    );
 
     // Get progress data for all students
     const { data: progressData, error: progressError } = await supabase
@@ -232,10 +242,9 @@ export async function getClassReportData(
       lastActive: string | null;
     }> = [];
 
-    students?.forEach((studentRecord) => {
-      const profilesData = studentRecord.profiles;
-      const profile = (Array.isArray(profilesData) ? profilesData[0] : profilesData) as { id: string; display_name: string | null; avatar_config: Record<string, unknown> | null } | null;
-      const studentProgress = progressData?.filter(p => p.student_id === studentRecord.student_id) || [];
+    studentIds.forEach((studentId) => {
+      const profile = profileById.get(studentId) || null;
+      const studentProgress = progressData?.filter(p => p.student_id === studentId) || [];
 
       let studentCorrect = 0;
       let studentAttempts = 0;
@@ -265,7 +274,7 @@ export async function getClassReportData(
       totalWordsLearned += studentWords;
 
       studentMetrics.push({
-        studentId: studentRecord.student_id,
+        studentId,
         studentName: profile?.display_name || 'Unknown',
         accuracy: studentAccuracy,
         wordsLearned: studentWords,
@@ -317,9 +326,6 @@ export async function getClassReportData(
         lastActive: s.lastActive,
         issue: s.accuracy < 50 ? 'Low accuracy' : 'Inactive',
       }));
-
-    const teacherProfilesData = classroom.profiles;
-    const teacherProfile = (Array.isArray(teacherProfilesData) ? teacherProfilesData[0] : teacherProfilesData) as { display_name: string | null } | null;
 
     const reportData: ClassReportData = {
       classroomId,

@@ -81,9 +81,11 @@ describe('LeaderboardTeaser', () => {
       expect(screen.getByText('Alice')).toBeInTheDocument();
       expect(screen.getByText('11,000')).toBeInTheDocument();
       expect(screen.getByText('Bob')).toBeInTheDocument();
-      expect(screen.getByText('8,000')).toBeInTheDocument();
+      // 8,000 appears twice: accumulated total + hunt breakdown line
+      expect(screen.getAllByText('8,000').length).toBeGreaterThan(0);
       expect(screen.getByText('Charlie')).toBeInTheDocument();
-      expect(screen.getByText('3,000')).toBeInTheDocument();
+      // 3,000 appears twice: accumulated total + wheel breakdown line
+      expect(screen.getAllByText('3,000').length).toBeGreaterThan(0);
     });
   });
 
@@ -124,7 +126,8 @@ describe('LeaderboardTeaser', () => {
 
     await waitFor(() => {
       expect(screen.getByText('Solo')).toBeInTheDocument();
-      expect(screen.getByText('7,777')).toBeInTheDocument();
+      // 7,777 appears twice: accumulated total + wheel breakdown line
+      expect(screen.getAllByText('7,777').length).toBeGreaterThan(0);
     });
   });
 });

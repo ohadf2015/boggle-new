@@ -17,6 +17,7 @@ interface LessonData {
   lessonName: string;
   vocabularyWords: string[];
   language: Language;
+  gameMode?: 'classic' | 'wordHunt' | 'blast';
   templateSettings?: {
     timerSeconds: number;
     difficulty: string;

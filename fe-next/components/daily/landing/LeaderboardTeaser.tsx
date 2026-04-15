@@ -4,12 +4,19 @@ import { useEffect, useState } from 'react';
 import { Crown } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
+import Avatar from '@/components/Avatar';
 import type { Language } from '@/types';
+import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 
 interface LeaderboardEntry {
   rank: number;
   name: string;
   score: number;
+  huntScore: number;
+  wheelScore: number;
+  playerId: string | null;
+  customAvatar: CustomAvatarConfig | null;
+  seed: string;
 }
 
 interface LeaderboardTeaserProps {
@@ -18,9 +25,12 @@ interface LeaderboardTeaserProps {
 }
 
 interface RawLeaderboardRow {
-  player_id?: string;
+  player_id?: string | null;
+  guest_fingerprint?: string | null;
   display_name?: string;
   score?: number;
+  efficiency_score?: number;
+  custom_avatar?: CustomAvatarConfig | null;
 }
 
 const RANK_STYLES = [
@@ -29,34 +39,49 @@ const RANK_STYLES = [
   { text: 'text-neo-pink', bg: 'bg-neo-pink/10', border: 'border-neo-pink/30', medal: '🥉' },
 ];
 
-/**
- * Merge word-hunt + word-wheel leaderboard rows by player_id,
- * summing scores, and return the top 3.
- */
-function mergeLeaderboards(wordHunt: RawLeaderboardRow[], wordWheel: RawLeaderboardRow[]): LeaderboardEntry[] {
-  const playerMap = new Map<string, { name: string; score: number }>();
+type Kind = 'hunt' | 'wheel';
 
-  for (const row of [...wordHunt, ...wordWheel]) {
-    if (!row.player_id) continue;
-    const existing = playerMap.get(row.player_id);
+/**
+ * Merge word-hunt + word-wheel leaderboard rows by player_id or guest fingerprint,
+ * summing scores, preserving avatar data, and returning the top 3.
+ */
+function mergeLeaderboards(
+  wordHunt: RawLeaderboardRow[],
+  wordWheel: RawLeaderboardRow[]
+): LeaderboardEntry[] {
+  const map = new Map<string, Omit<LeaderboardEntry, 'rank'>>();
+
+  const ingest = (row: RawLeaderboardRow, kind: Kind) => {
+    const key = row.player_id ? `u:${row.player_id}` : row.guest_fingerprint ? `g:${row.guest_fingerprint}` : null;
+    if (!key) return;
+    const rowScore = kind === 'hunt' ? (row.efficiency_score ?? row.score ?? 0) : (row.score ?? 0);
+    const existing = map.get(key);
     if (existing) {
-      existing.score += row.score || 0;
-      // Prefer non-'Player' display name
-      if (row.display_name && existing.name === 'Player') {
-        existing.name = row.display_name;
-      }
+      existing.score += rowScore;
+      if (kind === 'hunt') existing.huntScore += rowScore;
+      else existing.wheelScore += rowScore;
+      if (row.display_name && existing.name === 'Player') existing.name = row.display_name;
+      existing.customAvatar = existing.customAvatar ?? row.custom_avatar ?? null;
     } else {
-      playerMap.set(row.player_id, {
+      map.set(key, {
         name: row.display_name || 'Player',
-        score: row.score || 0,
+        score: rowScore,
+        huntScore: kind === 'hunt' ? rowScore : 0,
+        wheelScore: kind === 'wheel' ? rowScore : 0,
+        playerId: row.player_id ?? null,
+        customAvatar: row.custom_avatar ?? null,
+        seed: key,
       });
     }
-  }
+  };
 
-  return Array.from(playerMap.values())
+  for (const row of wordHunt) ingest(row, 'hunt');
+  for (const row of wordWheel) ingest(row, 'wheel');
+
+  return Array.from(map.values())
     .sort((a, b) => b.score - a.score)
     .slice(0, 3)
-    .map((p, i) => ({ rank: i + 1, name: p.name, score: p.score }));
+    .map((p, i) => ({ rank: i + 1, ...p }));
 }
 
 /**
@@ -151,22 +176,31 @@ export function LeaderboardTeaser({ currentLanguage, onViewFull }: LeaderboardTe
                 <div className="flex items-center gap-2 shrink-0">
                   <span className="text-base leading-none" aria-hidden="true">{style.medal}</span>
                   <div className={cn(
-                    'w-7 h-7 rounded-full border-2 border-black/30 flex items-center justify-center',
-                    style.bg
+                    'rounded-full border-2 border-black/40 shrink-0 overflow-hidden',
+                    entry.rank === 1 && 'ring-2 ring-neo-lime/60'
                   )}>
-                    <span className={cn('text-[11px] font-black', style.text)}>
-                      {entry.name.charAt(0).toUpperCase()}
-                    </span>
+                    <Avatar
+                      size="sm"
+                      customAvatar={entry.customAvatar}
+                      userId={entry.playerId ?? entry.seed}
+                    />
                   </div>
                 </div>
 
-                {/* Name */}
-                <span className="text-sm font-bold text-white truncate flex-1 min-w-0">
-                  {entry.name}
-                </span>
+                {/* Name + per-challenge breakdown */}
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm font-bold text-white truncate">
+                    {entry.name}
+                  </div>
+                  <div className="text-[10px] text-slate-400 font-mono tabular-nums">
+                    <span className="text-neo-pink">{entry.huntScore.toLocaleString()}</span>
+                    <span className="mx-1 opacity-40">+</span>
+                    <span className="text-neo-cyan">{entry.wheelScore.toLocaleString()}</span>
+                  </div>
+                </div>
 
-                {/* Score */}
-                <span className={cn('text-sm font-black tabular-nums', style.text)}>
+                {/* Accumulated score */}
+                <span className={cn('text-base font-black tabular-nums', style.text)}>
                   {entry.score.toLocaleString()}
                 </span>
               </div>
