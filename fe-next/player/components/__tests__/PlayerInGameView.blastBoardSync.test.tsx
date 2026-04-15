@@ -106,6 +106,13 @@ vi.mock('@/components/TournamentStandings', () => ({
   default: () => null,
 }));
 
+vi.mock('@/components/wordhunt/WordHuntGame', () => ({
+  WordHuntGame: () => <div data-testid="word-hunt-game" />,
+}));
+vi.mock('@/components/multiplayer/WheelRushView', () => ({
+  WheelRushView: () => <div data-testid="wheel-rush-view" />,
+}));
+
 // ---------------------------------------------------------------------------
 // Import
 // ---------------------------------------------------------------------------
