@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback, useMemo } from 'react';
+import { Howler } from 'howler';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useAdPlacement } from '@/hooks/useAdPlacement';
 import { useAdMob } from '@/hooks/useAdMob';
@@ -222,17 +223,24 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
 
     if (shouldUseCrazyGames) {
       // Priority 1: CrazyGames SDK for rewarded ads
+      // Full-launch QA requires gameplayStop + audio mute around ads.
+      crazyGames.gameplayStop();
+      let settled = false;
+      const settleCg = (cb: () => void) => {
+        if (settled) return;
+        settled = true;
+        try { Howler.mute(false); } catch { /* Howler not initialized */ }
+        crazyGames.gameplayStart();
+        cb();
+      };
       crazyGames.showRewardedAd({
         adStarted: () => {
+          try { Howler.mute(true); } catch { /* Howler not initialized */ }
           setStatus('showing');
           onAdStarted?.();
         },
-        adFinished: () => {
-          awardCoinsAndNotify();
-        },
-        adError: (errorMsg: string) => {
-          handleAdError(errorMsg || 'Ad failed to load');
-        },
+        adFinished: () => settleCg(() => { awardCoinsAndNotify(); }),
+        adError: (errorMsg: string) => settleCg(() => { handleAdError(errorMsg || 'Ad failed to load'); }),
       });
     } else if (shouldUseAdMob) {
       // Priority 1.5: AdMob SDK for native Capacitor apps
