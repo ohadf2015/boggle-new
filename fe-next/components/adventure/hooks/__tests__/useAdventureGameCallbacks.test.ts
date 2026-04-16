@@ -78,6 +78,8 @@ describe('useAdventureGameCallbacks', () => {
     resetFlashChallenge: mockResetFlashChallenge,
     completionSaveFailedRef: { current: false },
     retrySaveCompletion: mockRetrySaveCompletion,
+    timeRemaining: 60,
+    timerSeconds: 120,
   };
 
   beforeEach(() => {
@@ -150,6 +152,70 @@ describe('useAdventureGameCallbacks', () => {
       });
 
       expect(mockHandleEarnAchievement).toHaveBeenCalledWith('WORLD_COMPLETE');
+    });
+  });
+
+  describe('handleContinue - timePlayed propagation (Sentry 11J)', () => {
+    it('should forward computed timePlayed as 7th arg to onLevelComplete', () => {
+      const { result } = renderHook(() =>
+        useAdventureGameCallbacks({
+          ...defaultParams,
+          gameStars: 3,
+          timeRemaining: 45,
+          timerSeconds: 120,
+        })
+      );
+
+      act(() => {
+        result.current.handleContinue();
+      });
+
+      // timePlayed = timerSeconds - timeRemaining = 120 - 45 = 75
+      expect(mockOnLevelComplete).toHaveBeenCalledWith(
+        3, 500, 3, 50, 0, ['cat', 'dog', 'bat'], 75
+      );
+    });
+
+    it('should clamp negative timePlayed to 0 when timeRemaining exceeds timerSeconds', () => {
+      const { result } = renderHook(() =>
+        useAdventureGameCallbacks({
+          ...defaultParams,
+          gameStars: 1,
+          timeRemaining: 150,
+          timerSeconds: 120,
+        })
+      );
+
+      act(() => {
+        result.current.handleContinue();
+      });
+
+      expect(mockOnLevelComplete).toHaveBeenCalledWith(
+        1, 500, 3, 50, 0, ['cat', 'dog', 'bat'], 0
+      );
+    });
+  });
+
+  describe('handleCinematicComplete - timePlayed on world-unlock boss path', () => {
+    it('should forward timePlayed when auto-navigating after WorldUnlockCinematic', () => {
+      const { result } = renderHook(() =>
+        useAdventureGameCallbacks({
+          ...defaultParams,
+          isBossLevel: true,
+          gameStars: 3,
+          showWorldUnlockCinematic: true,
+          timeRemaining: 30,
+          timerSeconds: 120,
+        })
+      );
+
+      act(() => {
+        result.current.handleCinematicComplete();
+      });
+
+      expect(mockOnLevelComplete).toHaveBeenCalledWith(
+        3, 500, 3, 50, 0, ['cat', 'dog', 'bat'], 90
+      );
     });
   });
 });

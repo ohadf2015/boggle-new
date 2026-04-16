@@ -31,6 +31,7 @@ import {
   dequeueCompletion,
   peekQueue,
 } from '@/lib/adventure/offlineCompletionQueue';
+import { buildCompleteLevelBody } from './progressionRequestBody';
 
 // ==============================================
 // LOCAL STORAGE CACHE
@@ -143,7 +144,8 @@ interface ProgressionContextType {
     goldEarned?: number,
     longWords?: number,
     wordsFound?: string[],
-    flashChallengeGold?: number
+    flashChallengeGold?: number,
+    timePlayed?: number
   ) => Promise<boolean>;
   /** Record a level attempt (including failures) */
   recordAttempt: (
@@ -413,7 +415,8 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
       goldEarned?: number,
       longWords?: number,
       wordsFound?: string[],
-      flashChallengeGold?: number
+      flashChallengeGold?: number,
+      timePlayed?: number
     ) => {
       if (!user?.id) {
         // Guest users can't save progress
@@ -436,16 +439,9 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
 
       const promise = (async (): Promise<boolean> => {
       try {
-        const requestBody = JSON.stringify({
-          world,
-          level,
-          stars,
-          score,
-          words,
-          ...(goldEarned !== undefined && { goldEarned }),
-          ...(longWords !== undefined && { longWords }),
-          ...(wordsFound && wordsFound.length > 0 && { wordsFound }),
-          ...(flashChallengeGold !== undefined && flashChallengeGold > 0 && { flashChallengeGold }),
+        const requestBody = buildCompleteLevelBody({
+          world, level, stars, score, words,
+          goldEarned, longWords, wordsFound, flashChallengeGold, timePlayed,
         });
 
         let response = await fetch('/api/adventure/complete', {

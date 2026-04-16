@@ -41,8 +41,11 @@ interface UseAdventureGameCallbacksParams {
   // Init
   handleEarnAchievement: (id: AdventureAchievementId) => void;
   upgradeRetryScoreRetention: number;
+  // Timer state (for server-side anti-cheat timePlayed validation)
+  timeRemaining: number;
+  timerSeconds: number;
   // Parent callbacks
-  onLevelComplete: (stars: number, score: number, wordsFound: number, goldEarned: number, longWords?: number, wordList?: string[]) => void;
+  onLevelComplete: (stars: number, score: number, wordsFound: number, goldEarned: number, longWords?: number, wordList?: string[], timePlayed?: number) => void;
   // Other
   totalStars?: number;
   clearSelection: () => void;
@@ -64,7 +67,11 @@ interface UseAdventureGameCallbacksParams {
   resetFlashChallenge: () => void;
   // Save failure tracking
   completionSaveFailedRef: React.RefObject<boolean>;
-  retrySaveCompletion: (world: number, level: number, stars: 0 | 1 | 2 | 3, score: number, words: number, goldEarned?: number, longWords?: number) => Promise<boolean>;
+  retrySaveCompletion: (
+    world: number, level: number, stars: 0 | 1 | 2 | 3, score: number, words: number,
+    goldEarned?: number, longWords?: number, wordsFound?: string[],
+    flashChallengeGold?: number, timePlayed?: number
+  ) => Promise<boolean>;
 }
 
 export function useAdventureGameCallbacks(params: UseAdventureGameCallbacksParams) {
@@ -85,6 +92,7 @@ export function useAdventureGameCallbacks(params: UseAdventureGameCallbacksParam
     t, hintsUsed,
     resetWordSubmitState, resetFlashChallenge,
     completionSaveFailedRef, retrySaveCompletion,
+    timeRemaining, timerSeconds,
   } = params;
 
   const handleCinematicComplete = useCallback(() => {
@@ -114,7 +122,8 @@ export function useAdventureGameCallbacks(params: UseAdventureGameCallbacksParam
     // instead of showing the loot modal (the cinematic IS the transition)
     if (showWorldUnlockCinematic && isBossLevel && gameStars > 0) {
       const longWords = wordsFoundList.filter(w => w.length >= 6).length;
-      onLevelComplete(gameStars, gameScore, wordsFoundList.length, earnedGold, longWords, wordsFoundList);
+      const timePlayed = Math.max(0, Math.floor(timerSeconds - timeRemaining));
+      onLevelComplete(gameStars, gameScore, wordsFoundList.length, earnedGold, longWords, wordsFoundList, timePlayed);
       return;
     }
 
@@ -124,7 +133,8 @@ export function useAdventureGameCallbacks(params: UseAdventureGameCallbacksParam
       showLootOrComplete();
     }
   }, [showVictoryCinematic, isBossLevel, gameStars, gameScore, worldNumber, showWorldUnlockCinematic,
-    handleCinematicCompleteBase, showWorldUnlock, t, storyBeat, showLootOrComplete, setShowStoryBeat, onLevelComplete, earnedGold, wordsFoundList]);
+    handleCinematicCompleteBase, showWorldUnlock, t, storyBeat, showLootOrComplete, setShowStoryBeat, onLevelComplete, earnedGold, wordsFoundList,
+    timeRemaining, timerSeconds]);
 
   const handleContinue = useCallback(() => {
     if (gameStars >= 3) recordLevelPerfect();
@@ -153,24 +163,26 @@ export function useAdventureGameCallbacks(params: UseAdventureGameCallbacksParam
 
     setShowLevelComplete(false);
     const longWords = wordsFoundList.filter(w => w.length >= 6).length;
+    const timePlayed = Math.max(0, Math.floor(timerSeconds - timeRemaining));
 
     // If the eager save failed, retry before navigating away
     if (completionSaveFailedRef?.current && gameStars > 0) {
       retrySaveCompletion(
         worldNumber, levelNumber,
         gameStars as 0 | 1 | 2 | 3,
-        gameScore, wordsFoundList.length, earnedGold, longWords
+        gameScore, wordsFoundList.length,
+        earnedGold, longWords, wordsFoundList, undefined, timePlayed
       ).catch(() => {
         toast.error(t('adventure.progressSaveRetryHint'), { duration: 4000 });
       });
     }
 
-    onLevelComplete(gameStars, gameScore, wordsFoundList.length, earnedGold, longWords, wordsFoundList);
+    onLevelComplete(gameStars, gameScore, wordsFoundList.length, earnedGold, longWords, wordsFoundList, timePlayed);
   }, [gameStars, gameScore, wordsFoundList, comboCount, earnedGold, onLevelComplete,
     recordLevelPerfect, recordBossDefeatedNoHint, recordScoreChallenge, recordBossHighHealth,
     recordFullComboLevel, isBossLevel, bossHealthPhase, playerHealthCurrentHP, playerHealthMaxHP,
     totalStars, handleEarnAchievement, worldNumber, levelNumber, setShowLevelComplete, hintsUsed,
-    completionSaveFailedRef, retrySaveCompletion, t]);
+    completionSaveFailedRef, retrySaveCompletion, t, timeRemaining, timerSeconds]);
 
   const handleRetry = useCallback(() => {
     setShowLevelComplete(false);

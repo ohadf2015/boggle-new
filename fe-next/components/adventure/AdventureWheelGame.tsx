@@ -20,7 +20,7 @@ import { cn } from '@/lib/utils';
 
 interface Props {
   levelConfig: LevelConfig;
-  onLevelComplete: (stars: number, score: number, wordsFound: number, goldEarned: number, longWords?: number, wordList?: string[]) => void;
+  onLevelComplete: (stars: number, score: number, wordsFound: number, goldEarned: number, longWords?: number, wordList?: string[], timePlayed?: number) => void;
   onExit: () => void;
 }
 
@@ -143,7 +143,7 @@ const AdventureWheelGame: React.FC<Props> = ({ levelConfig, onLevelComplete, onE
       if (newTotalStars >= 50) handleEarnAchievement('STAR_COLLECTOR_50');
       if (newTotalStars >= 100) handleEarnAchievement('STAR_COLLECTOR_100');
     }
-    onLevelComplete(stars, result.score, result.wordsFound.length, gold, longWords, result.wordsFound);
+    onLevelComplete(stars, result.score, result.wordsFound.length, gold, longWords, result.wordsFound, Math.max(0, Math.floor(result.timeSeconds)));
   }, [scoreTarget, onLevelComplete, completeLevel, levelConfig.world, levelConfig.level,
       upgradeEffects.goldMultiplier, upgradeEffects.longWordGoldBonus, chapterQuests,
       handleEarnAchievement, progression?.totalStars]);

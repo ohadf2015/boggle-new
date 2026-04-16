@@ -19,6 +19,7 @@ export interface QueuedCompletion {
   longWords?: number;
   wordsFound?: string[];
   flashChallengeGold?: number;
+  timePlayed?: number;
   queuedAt: number;
 }
 

@@ -63,7 +63,8 @@ export interface UseAdventureLevelCompletionProps {
     goldEarned?: number,
     longWords?: number,
     wordsFound?: string[],
-    flashChallengeGold?: number
+    flashChallengeGold?: number,
+    timePlayed?: number
   ) => Promise<boolean>;
   /** Gold earned from completed flash challenge (persisted server-side) */
   flashChallengeGold?: number;
@@ -337,12 +338,13 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
         // but track actual success separately so we can retry on failure.
         completionSavedRef.current = true;
         const longWords = gameState.wordsFound.filter(w => w.length >= 6).length;
+        const timePlayed = Math.max(0, Math.floor(timerSeconds - timeRemaining));
         saveCompletionRef.current(
           levelConfig.world, levelConfig.level,
           gameState.stars as 0 | 1 | 2 | 3,
           gameState.score, gameState.wordsFound.length,
           earnedGoldRef.current, longWords, gameState.wordsFound,
-          props.flashChallengeGold
+          props.flashChallengeGold, timePlayed
         ).then((success) => {
           saveResolvedRef.current = true;
           if (!success) {
@@ -389,6 +391,7 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
             goldEarned: earnedGoldRef.current,
             longWords: gameState.wordsFound.filter(w => w.length >= 6).length,
             flashChallengeCompleted: (props.flashChallengeGold ?? 0) > 0,
+            timePlayed: Math.max(0, Math.floor(timerSeconds - timeRemaining)),
           };
           if (typeof navigator !== 'undefined' && navigator.sendBeacon) {
             navigator.sendBeacon(
@@ -402,7 +405,7 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
 
     window.addEventListener('beforeunload', handleBeforeUnload);
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, [levelConfig.world, levelConfig.level, gameState.stars, gameState.score, gameState.wordsFound, props.flashChallengeGold]);
+  }, [levelConfig.world, levelConfig.level, gameState.stars, gameState.score, gameState.wordsFound, props.flashChallengeGold, timeRemaining, timerSeconds]);
 
   // Reset rewards flag (needed for retry)
   const resetRewards = useCallback(() => {

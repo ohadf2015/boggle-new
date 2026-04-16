@@ -60,7 +60,7 @@ export interface GameTimerState { timeRemaining: number; totalTime: number; isPl
 interface AdventureGameProps {
   levelConfig: LevelConfig;
   initialGrid: string[][];
-  onLevelComplete: (stars: number, score: number, wordsFound: number, goldEarned: number, longWords?: number, wordList?: string[]) => void;
+  onLevelComplete: (stars: number, score: number, wordsFound: number, goldEarned: number, longWords?: number, wordList?: string[], timePlayed?: number) => void;
   onExit: () => void;
   onTimerStateChange?: (timerState: GameTimerState) => void;
   totalStars?: number;
@@ -173,8 +173,15 @@ const AdventureGame = memo<AdventureGameProps>(
     const { recordAttempt, getLevelAttempt, getLevelCompletion, progression, updateWordAlbum, updateRunes, completeLevel: persistCompletion } = useProgression();
     // Wrap to ensure correct return type for saveCompletion prop
     const saveCompletionToDb = useCallback(
-      async (world: number, level: number, stars: 0 | 1 | 2 | 3, score: number, words: number, goldEarned?: number, longWords?: number): Promise<boolean> => {
-        const result = await persistCompletion(world, level, stars, score, words, goldEarned, longWords);
+      async (
+        world: number, level: number, stars: 0 | 1 | 2 | 3, score: number, words: number,
+        goldEarned?: number, longWords?: number, wordsFound?: string[],
+        flashChallengeGold?: number, timePlayed?: number
+      ): Promise<boolean> => {
+        const result = await persistCompletion(
+          world, level, stars, score, words,
+          goldEarned, longWords, wordsFound, flashChallengeGold, timePlayed
+        );
         return result ?? false;
       },
       [persistCompletion]
@@ -589,6 +596,8 @@ const AdventureGame = memo<AdventureGameProps>(
       resetFlashChallenge: flashChallenge.reset,
       completionSaveFailedRef: levelCompletion.completionSaveFailedRef,
       retrySaveCompletion: saveCompletionToDb,
+      timeRemaining,
+      timerSeconds: init.adjustedLevelConfig.timerSeconds ?? 120,
     });
 
     const handleRetry = useCallback(() => {
@@ -824,11 +833,13 @@ const AdventureGame = memo<AdventureGameProps>(
               saveFailed={!isGuest && levelCompletion.completionSaveFailedRef?.current && showLevelComplete}
               onRetrySave={() => {
                 const longWords = gameState.wordsFound.filter((w: string) => w.length >= 6).length;
+                const timePlayed = Math.max(0, Math.floor((init.adjustedLevelConfig.timerSeconds ?? 120) - timeRemaining));
                 saveCompletionToDb(
                   levelConfig.world, levelConfig.level,
                   gameState.stars as 0 | 1 | 2 | 3,
                   gameState.score, gameState.wordsFound.length,
-                  levelCompletion.earnedGold, longWords
+                  levelCompletion.earnedGold, longWords, gameState.wordsFound,
+                  undefined, timePlayed
                 ).then((ok) => {
                   if (ok) {
                     if (levelCompletion.completionSaveFailedRef) levelCompletion.completionSaveFailedRef.current = false;

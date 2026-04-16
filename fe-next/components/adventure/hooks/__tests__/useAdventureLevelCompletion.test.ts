@@ -344,7 +344,8 @@ describe('useAdventureLevelCompletion', () => {
         26, // earnedGold — must NOT be 0 (the race condition bug)
         0, // longWords (no words >= 6 chars)
         ['cat', 'dog'], // wordsFound for word album persistence
-        undefined // flashChallengeGold (no flash challenge)
+        undefined, // flashChallengeGold (no flash challenge)
+        60 // timePlayed (timerSeconds=60 - timeRemaining=0)
       );
     });
 
@@ -362,7 +363,8 @@ describe('useAdventureLevelCompletion', () => {
         89, // 3*13 + 50 perfect bonus
         0,
         ['cat', 'dog'],
-        undefined // flashChallengeGold
+        undefined, // flashChallengeGold
+        60 // timePlayed
       );
     });
   });
