@@ -1,12 +1,13 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Play, Coins, CheckCircle, AlertCircle } from 'lucide-react';
 import { Loader } from '@/components/ui/Loader';
 import { Button } from '@/components/ui/button';
 import { useRewardedAd, AdStatus } from '@/hooks/useRewardedAd';
 import { useCoinContext } from '@/contexts/CoinContext';
+import { trackRewardedAdOffered } from '@/utils/growthTracking';
 import { cn } from '@/lib/utils';
 
 interface WatchAdButtonProps {
@@ -18,6 +19,8 @@ interface WatchAdButtonProps {
   className?: string;
   /** Whether to show as a compact button or full card */
   variant?: 'button' | 'card';
+  /** Placement tag for PostHog funnel (e.g. 'daily_watch', 'word_hunt_results'). */
+  surface: string;
 }
 
 /**
@@ -35,7 +38,13 @@ const WatchAdButton: React.FC<WatchAdButtonProps> = ({
   t,
   className,
   variant = 'button',
+  surface,
 }) => {
+  useEffect(() => {
+    trackRewardedAdOffered(surface);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const [showSuccess, setShowSuccess] = useState(false);
   const [earnedAmount, setEarnedAmount] = useState(0);
 

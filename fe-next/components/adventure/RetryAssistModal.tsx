@@ -7,13 +7,14 @@
 
 'use client';
 
-import React, { memo, useRef } from 'react';
+import React, { memo, useRef, useEffect } from 'react';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { RotateCcw, Clock, Lightbulb, LogOut, Target } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
 import { useRewardedAd } from '@/hooks/useRewardedAd';
+import { trackRewardedAdOffered } from '@/utils/growthTracking';
 import type { NearMissMessage } from '@/lib/adventure/nearMiss';
 
 // ==============================================
@@ -100,6 +101,14 @@ const RetryAssistModal = memo<RetryAssistModalProps>(
 
     // R4 — rewarded ad grants bonus-time retry without failure threshold
     const rewarded = useRewardedAd({ onRewardEarned: () => onRetryWithBonus() });
+
+    // Fire offered-event each time the modal opens with CTA visible.
+    useEffect(() => {
+      if (isOpen && rewarded.canShowAd && !rewarded.isDailyLimitReached) {
+        trackRewardedAdOffered('retry_assist');
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isOpen]);
 
     // Determine which assists are unlocked
     const showBonusTime = consecutiveFailures >= BONUS_TIME_THRESHOLD;

@@ -9,7 +9,7 @@ interface Props {
 }
 
 const SinglePlayerGoldTopUp: React.FC<Props> = ({ t, className }) => (
-  <WatchAdButton t={t} onCoinsEarned={() => {}} className={className} />
+  <WatchAdButton t={t} onCoinsEarned={() => {}} className={className} surface="gold_top_up" />
 );
 
 export default SinglePlayerGoldTopUp;

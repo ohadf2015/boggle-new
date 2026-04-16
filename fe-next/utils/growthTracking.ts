@@ -638,6 +638,39 @@ export const trackHintUsed = (mode: string, hintType: string = 'standard'): void
  * all subsequent events auto-carry it — critical for per-locale cohorting.
  * Also writes last-touch + first-touch person props.
  */
+/**
+ * Rewarded-ad funnel: surface = which UI showed the CTA.
+ * Fires when the button/modal is rendered for the user (before click).
+ */
+export const trackRewardedAdOffered = (
+  surface: string,
+  extras: Record<string, unknown> = {},
+): void => {
+  trackGrowthEvent('rewarded_ad_offered', { surface, ...extras });
+};
+
+/**
+ * Rewarded-ad success: reward granted. `platform` is the ad network that served.
+ */
+export const trackRewardedAdWatched = (
+  platform: string,
+  reward: number,
+  surface?: string,
+): void => {
+  trackGrowthEvent('rewarded_ad_watched', { platform, reward, surface });
+};
+
+/**
+ * Rewarded-ad dismiss/error: no reward granted. `reason` classifies drop-off.
+ */
+export const trackRewardedAdDeclined = (
+  reason: string,
+  platform?: string,
+  surface?: string,
+): void => {
+  trackGrowthEvent('rewarded_ad_declined', { reason, platform, surface });
+};
+
 export const trackLanguageChanged = (from: string, to: string): void => {
   if (from === to) return;
   trackGrowthEvent('language_changed', { from, to });
@@ -669,6 +702,9 @@ const growthTracking = {
   trackDailyPuzzle,
   trackHintUsed,
   trackLanguageChanged,
+  trackRewardedAdOffered,
+  trackRewardedAdWatched,
+  trackRewardedAdDeclined,
 };
 
 export default growthTracking;

@@ -50,13 +50,13 @@ describe('RewardedAdGoldButton', () => {
   });
 
   test('renders with gold amount', () => {
-    render(<RewardedAdGoldButton goldAmount={25} />);
+    render(<RewardedAdGoldButton goldAmount={25} surface="test" />);
     expect(screen.getByRole('button')).toBeInTheDocument();
     expect(mockT).toHaveBeenCalledWith('ads.rewarded.watchForGold');
   });
 
   test('calls showAd on click', () => {
-    render(<RewardedAdGoldButton goldAmount={25} />);
+    render(<RewardedAdGoldButton goldAmount={25} surface="test" />);
     fireEvent.click(screen.getByRole('button'));
     expect(mockShowAd).toHaveBeenCalled();
   });
@@ -70,12 +70,12 @@ describe('RewardedAdGoldButton', () => {
       error: null,
       rewardAmount: 25,
     });
-    render(<RewardedAdGoldButton goldAmount={25} />);
+    render(<RewardedAdGoldButton goldAmount={25} surface="test" />);
     expect(screen.getByRole('button')).toBeDisabled();
   });
 
   test('has accessible aria-label', () => {
-    render(<RewardedAdGoldButton goldAmount={25} />);
+    render(<RewardedAdGoldButton goldAmount={25} surface="test" />);
     const button = screen.getByRole('button');
     expect(button).toHaveAttribute('aria-label');
   });
@@ -89,18 +89,18 @@ describe('RewardedAdGoldButton', () => {
       error: null,
       rewardAmount: 25,
     });
-    render(<RewardedAdGoldButton goldAmount={25} />);
+    render(<RewardedAdGoldButton goldAmount={25} surface="test" />);
     expect(screen.getByRole('button')).toBeDisabled();
     expect(screen.getByText('Available soon')).toBeInTheDocument();
   });
 
   test('is enabled when placeholder cooldown is not active', () => {
-    render(<RewardedAdGoldButton goldAmount={25} />);
+    render(<RewardedAdGoldButton goldAmount={25} surface="test" />);
     expect(screen.getByRole('button')).not.toBeDisabled();
   });
 
   test('applies custom className', () => {
-    render(<RewardedAdGoldButton goldAmount={25} className="mt-4" />);
+    render(<RewardedAdGoldButton goldAmount={25} surface="test" className="mt-4" />);
     expect(screen.getByRole('button')).toHaveClass('mt-4');
   });
 });

@@ -1,23 +1,32 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useRewardedAd } from '@/hooks/useRewardedAd';
 import { useStreakFreeze, MAX_FREEZES } from '@/hooks/useStreakFreeze';
+import { trackRewardedAdOffered } from '@/utils/growthTracking';
 
 interface WatchAdForFreezeButtonProps {
   t: (key: string) => string;
   className?: string;
+  /** Placement tag for PostHog funnel (e.g. 'daily_freeze'). */
+  surface: string;
 }
 
 /**
  * R2 — Rewarded ad → streak freeze (saves a missed day).
  * Hides at cap. Uses useRewardedAd for daily cap + platform routing.
  */
-const WatchAdForFreezeButton: React.FC<WatchAdForFreezeButtonProps> = ({ t, className = '' }) => {
+const WatchAdForFreezeButton: React.FC<WatchAdForFreezeButtonProps> = ({ t, className = '', surface }) => {
   const { freezeCount, earnFreeze } = useStreakFreeze();
   const { showAd, status, isDailyLimitReached } = useRewardedAd({
     onRewardEarned: () => earnFreeze(),
   });
+
+  const offered = freezeCount < MAX_FREEZES;
+  useEffect(() => {
+    if (offered) trackRewardedAdOffered(surface);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   if (freezeCount >= MAX_FREEZES) return null;
 

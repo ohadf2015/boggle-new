@@ -348,7 +348,7 @@ export function DailyChallengeLanding({
       <StreakFreezeIndicator freezeCount={freezeCount} t={t} />
       {streak > 0 && (
         <div className="flex justify-center mt-2">
-          <WatchAdForFreezeButton t={t} />
+          <WatchAdForFreezeButton t={t} surface="daily_freeze" />
         </div>
       )}
       <DailyRewardPreview currentStreakDay={streak} t={t} />

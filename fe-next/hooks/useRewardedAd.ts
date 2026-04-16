@@ -5,6 +5,7 @@ import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useAdPlacement } from '@/hooks/useAdPlacement';
 import { useAdMob } from '@/hooks/useAdMob';
 import { useCoinContext } from '@/contexts/CoinContext';
+import { trackRewardedAdWatched, trackRewardedAdDeclined } from '@/utils/growthTracking';
 
 export type AdStatus = 'idle' | 'loading' | 'showing' | 'completed' | 'error';
 
@@ -163,8 +164,12 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
       return; // Don't allow multiple simultaneous ads
     }
 
+    // Determine platform early for declined-event tagging
+    const platformForDecline = shouldUseCrazyGames ? 'crazygames' : shouldUseAdMob ? 'admob' : shouldUseAdSense ? 'adsense' : shouldUseSimulation ? 'simulation' : 'no-ad-placeholder';
+
     // Enforce daily limit across all platforms
     if (isDailyLimitReached()) {
+      trackRewardedAdDeclined('daily_limit_reached', platformForDecline, undefined);
       onAdError?.('Daily ad limit reached');
       return;
     }
@@ -172,6 +177,7 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
     // Enforce placeholder cooldown
     if (isPlaceholder && isPlaceholderCapped()) {
       setPlaceholderCooldownFlag(true);
+      trackRewardedAdDeclined('placeholder_cooldown', platformForDecline, undefined);
       onAdError?.('Cooldown active — try again later');
       return;
     }
@@ -191,8 +197,10 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
       recordDailyView();
       setDailyViewCount(getDailyViewCount());
       const result = await awardWatchedAd(platform);
+      const awarded = result?.awarded ?? rewardAmount;
+      trackRewardedAdWatched(platform, awarded);
       setStatus('completed');
-      await onRewardEarned?.(result?.awarded ?? rewardAmount);
+      await onRewardEarned?.(awarded);
 
       // Reset to idle after a short delay
       setTimeout(() => setStatus('idle'), 1500);
@@ -202,6 +210,7 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
     const handleAdError = (errorMsg: string) => {
       setStatus('error');
       setError(errorMsg);
+      trackRewardedAdDeclined(errorMsg, platform, undefined);
       onAdError?.(errorMsg);
 
       // Reset to idle after showing error

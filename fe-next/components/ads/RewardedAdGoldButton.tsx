@@ -1,23 +1,32 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Play, Coins, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useRewardedAd } from '@/hooks/useRewardedAd';
+import { trackRewardedAdOffered } from '@/utils/growthTracking';
 
 interface RewardedAdGoldButtonProps {
   goldAmount: number;
   onRewardEarned?: (amount: number) => void;
   className?: string;
+  /** Placement tag for PostHog funnel (e.g. 'gold_top_up', 'player_waiting'). */
+  surface: string;
 }
 
 export const RewardedAdGoldButton: React.FC<RewardedAdGoldButtonProps> = ({
   goldAmount,
   onRewardEarned,
   className,
+  surface,
 }) => {
+  useEffect(() => {
+    trackRewardedAdOffered(surface);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const { theme } = useTheme();
   const isDark = theme === 'dark';
   const { t } = useLanguage();

@@ -47,12 +47,12 @@ describe('WatchAdForFreezeButton (R2)', () => {
   });
 
   it('renders when freezeCount < MAX', () => {
-    render(<WatchAdForFreezeButton t={t} />);
+    render(<WatchAdForFreezeButton t={t} surface="test" />);
     expect(screen.getByRole('button')).toBeInTheDocument();
   });
 
   it('shows ad and grants a freeze on reward', () => {
-    render(<WatchAdForFreezeButton t={t} />);
+    render(<WatchAdForFreezeButton t={t} surface="test" />);
     fireEvent.click(screen.getByRole('button'));
     expect(showAdMock).toHaveBeenCalled();
     expect(earnFreezeMock).toHaveBeenCalled();
@@ -60,7 +60,7 @@ describe('WatchAdForFreezeButton (R2)', () => {
 
   it('renders nothing when freezes are at cap', () => {
     freezeCountRef.current = 3;
-    const { container } = render(<WatchAdForFreezeButton t={t} />);
+    const { container } = render(<WatchAdForFreezeButton t={t} surface="test" />);
     expect(container).toBeEmptyDOMElement();
   });
 });

@@ -91,7 +91,7 @@ export function RunSummary({ state, onPlayAgain, onExit }: RunSummaryProps): Rea
 
       {/* R3 — Rewarded gold top-up */}
       <div className="w-full max-w-sm">
-        <WatchAdButton onCoinsEarned={() => {}} t={t} />
+        <WatchAdButton onCoinsEarned={() => {}} t={t} surface="word_forge_run_summary" />
       </div>
 
       {/* Actions */}

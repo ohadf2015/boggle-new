@@ -21,6 +21,7 @@ import { useRewardedAd } from '@/hooks/useRewardedAd';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { getBossConfig } from '@/lib/adventure/bossConfig';
+import { trackRewardedAdOffered } from '@/utils/growthTracking';
 import type { BossRushState } from './hooks/useBossRush';
 
 const CrazyGamesBanner = dynamic(() => import('@/components/CrazyGamesBanner'), { ssr: false });
@@ -68,6 +69,9 @@ const BossRushResults = memo<BossRushResultsProps>(({ state, onRetry, onExit }) 
     showInterstitial('boss-rush-complete');
     if (state.totalScore > 0) {
       submitLeaderboardScore(state.totalScore);
+    }
+    if (!isVictory && rewarded.canShowAd && !rewarded.isDailyLimitReached) {
+      trackRewardedAdOffered('boss_rush_results');
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 

@@ -236,7 +236,7 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
               <span>{t('wordHunt.ad.needMoreCoins')}</span>
               <div className="flex-1 h-px bg-slate-700" />
             </div>
-            <WatchAdButton onCoinsEarned={() => {}} t={t} />
+            <WatchAdButton onCoinsEarned={() => {}} t={t} surface="word_hunt_results" />
           </div>
         )}
       </div>

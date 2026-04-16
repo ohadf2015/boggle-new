@@ -251,7 +251,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
               currentStreakDay={streak.currentStreak}
               t={t}
             />
-            <WatchAdButton onCoinsEarned={() => {}} t={t} />
+            <WatchAdButton onCoinsEarned={() => {}} t={t} surface="daily_challenge_results" />
           </>
         )}
 
