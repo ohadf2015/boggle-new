@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/select';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
+import { trackLanguageChanged } from '@/utils/growthTracking';
 import type { Language } from '@/types';
 
 interface LanguageOption {
@@ -53,7 +54,13 @@ export const QuickLanguageSwitcher = memo<QuickLanguageSwitcherProps>(({
   const selectedOption = LANGUAGE_OPTIONS.find(opt => opt.code === language);
 
   return (
-    <Select value={language} onValueChange={(val) => setLanguage(val as Language)}>
+    <Select
+      value={language}
+      onValueChange={(val) => {
+        trackLanguageChanged(language, val);
+        setLanguage(val as Language);
+      }}
+    >
       <SelectTrigger
         className={cn(
           "flex items-center justify-center gap-1",

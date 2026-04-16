@@ -7,6 +7,7 @@ import DailyChallengeBanner from '@/components/daily/DailyChallengeBanner';
 import { shouldShowGuidance } from '@/utils/contextualGuidanceStorage';
 import { hasCompletedOnboarding } from '@/utils/onboardingStorage';
 import { isNewPlayer } from '@/utils/multiplayerProgressStorage';
+import { trackModeSelected } from '@/utils/growthTracking';
 import { useIsPracticeVeteran } from '@/hooks/useIsPracticeVeteran';
 import type { LandingGameMode } from '@/lib/landing/fetchGameModeStats';
 
@@ -127,6 +128,7 @@ export function LandingChallengeCards({
               duration={t('landing.duration').replace('{time}', '1-3')}
               difficulty={2}
               difficultyLabel={t('landing.difficultyMedium')}
+              onClick={() => trackModeSelected('quickPlay', 'home')}
             />
           </div>
         );
@@ -148,6 +150,7 @@ export function LandingChallengeCards({
               duration={t('landing.duration').replace('{time}', '1-3')}
               difficulty={2}
               difficultyLabel={t('landing.difficultyMedium')}
+              onClick={() => trackModeSelected('arena', 'home')}
             />
           </div>
         );
@@ -168,6 +171,7 @@ export function LandingChallengeCards({
               duration={t('landing.duration').replace('{time}', '1-3')}
               difficulty={1}
               difficultyLabel={t('landing.difficultyEasy')}
+              onClick={() => trackModeSelected('practice', 'home')}
             />
           </div>
         );
@@ -193,6 +197,7 @@ export function LandingChallengeCards({
               duration={t('landing.duration').replace('{time}', '2-5')}
               difficulty={3}
               difficultyLabel={t('landing.difficultyHard')}
+              onClick={() => trackModeSelected('blast', 'home')}
             />
           </div>
         );
@@ -210,6 +215,7 @@ export function LandingChallengeCards({
               duration={t('landing.duration').replace('{time}', '2-5')}
               difficulty={2}
               difficultyLabel={t('landing.difficultyMedium')}
+              onClick={() => trackModeSelected('adventure', 'home')}
             />
           </div>
         );

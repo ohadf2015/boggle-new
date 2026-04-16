@@ -15,6 +15,7 @@ import posthog from 'posthog-js';
 import {
   setPostHogUserProps,
   setPostHogUserPropsOnce,
+  setPostHogSuperProps,
   incrementPostHogUserProp,
   trackRageQuit,
   trackSessionDepth,
@@ -78,7 +79,9 @@ export type GrowthEvent =
   | 'iap_purchased'
   | 'rewarded_ad_offered'
   | 'rewarded_ad_watched'
-  | 'rewarded_ad_declined';
+  | 'rewarded_ad_declined'
+  // Preference
+  | 'language_changed';
 
 export interface GrowthEventData {
   // Common properties
@@ -630,6 +633,19 @@ export const trackHintUsed = (mode: string, hintType: string = 'standard'): void
   trackGrowthEvent('hint_used', { gameMode: mode, hintType });
 };
 
+/**
+ * Track UI language switches. Registers `locale` as a PostHog super prop so
+ * all subsequent events auto-carry it — critical for per-locale cohorting.
+ * Also writes last-touch + first-touch person props.
+ */
+export const trackLanguageChanged = (from: string, to: string): void => {
+  if (from === to) return;
+  trackGrowthEvent('language_changed', { from, to });
+  setPostHogSuperProps({ locale: to });
+  setPostHogUserProps({ locale_last_used: to });
+  setPostHogUserPropsOnce({ locale_first_used: to });
+};
+
 const growthTracking = {
   trackGrowthEvent,
   trackShare,
@@ -652,6 +668,7 @@ const growthTracking = {
   trackFeatureFirstUse,
   trackDailyPuzzle,
   trackHintUsed,
+  trackLanguageChanged,
 };
 
 export default growthTracking;

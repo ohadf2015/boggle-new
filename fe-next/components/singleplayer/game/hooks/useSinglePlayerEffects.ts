@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import type { LetterGrid } from '@/shared/types/game';
 import type { FoundWord } from '../types';
+import { trackGameStart } from '@/utils/growthTracking';
 
 interface UseSinglePlayerEffectsOptions {
   grid: LetterGrid | null;
@@ -77,9 +78,12 @@ export function useSinglePlayerEffects({
   const lastWordFoundTimeRef = useRef<number>(0);
   const gameStartTimeRef = useRef<number>(0);
 
-  // Game start time
+  // Game start time + analytics
   useEffect(() => {
     gameStartTimeRef.current = Date.now();
+    trackGameStart('singleplayer', { mode, boardSize: grid?.length ?? 0 });
+    // Mount-only — one event per game instance; remount = new game.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Set game active for sound context

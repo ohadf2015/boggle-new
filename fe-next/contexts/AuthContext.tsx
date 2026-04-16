@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useMemo, useRef, ReactNode } from 'react';
 import { setSentryUser, clearSentryUser } from '@/utils/sentry';
-import posthog from 'posthog-js';
+import { identifyUserForAnalytics, resetUserAnalytics } from '@/utils/authAnalytics';
 
 // Import types and hooks from auth module
 import {
@@ -97,22 +97,20 @@ export function AuthProvider({ children }: AuthProviderProps): React.ReactElemen
   useEffect(() => {
     if (user && profile) {
       setSentryUser(user, profile);
-      posthog.identify(user.id, {
-        display_name: profile.display_name,
-        is_admin: isAdmin,
-        is_teacher: isTeacher,
-      });
-      posthog.capture('user_identified', {
-        user_id: user.id,
-        display_name: profile.display_name,
-        is_guest: false,
-        is_admin: isAdmin,
-        is_teacher: isTeacher,
+      const docLang = typeof document !== 'undefined' ? document.documentElement.lang : '';
+      const navLang =
+        typeof navigator !== 'undefined' ? navigator.language?.split('-')[0] ?? '' : '';
+      const locale = docLang || navLang || 'en';
+      identifyUserForAnalytics({
+        userId: user.id,
+        displayName: profile.display_name ?? profile.username,
+        isAdmin,
+        isTeacher,
+        locale,
       });
     } else {
       clearSentryUser();
-      posthog.reset();
-      posthog.capture('user_logged_out');
+      resetUserAnalytics();
     }
   }, [user, profile, isAdmin, isTeacher]);
 
