@@ -191,6 +191,7 @@ export async function calculateAndBroadcastFinalScores(
     wordHuntSummary,
     blastSummary,
     wheelRushSummary,
+    tvMode: game.tvMode ?? false,
   };
   // Cache results on game state so reconnecting clients can retrieve them
   game.cachedResultsPayload = resultsPayload;

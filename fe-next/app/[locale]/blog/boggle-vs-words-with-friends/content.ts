@@ -23,7 +23,7 @@ export const contentByLocale: Record<string, LocaleContent> = {
     subtitle: 'Real-time grid chaos vs async tile placement. Which one actually respects your time (and your wallet)?',
     category: 'Versus',
     readTime: '9 min read',
-    authorName: 'The Word Nerd',
+    authorName: 'Ohad Fisher',
     authorBio: 'Has strong opinions about word games and zero patience for pay-to-win mechanics.',
     sections: [
       {

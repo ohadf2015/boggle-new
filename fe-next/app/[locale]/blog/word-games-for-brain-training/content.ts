@@ -23,7 +23,7 @@ export const contentByLocale: Record<string, LocaleContent> = {
     subtitle: "What 19,000-person studies actually say about word games and brain health. Spoiler: it's more nuanced than the clickbait claims.",
     category: 'Brain Health',
     readTime: '12 min read',
-    authorName: 'The Word Nerd',
+    authorName: 'Ohad Fisher',
     authorBio: 'Obsessive word game player, amateur neuroscience reader, and the person who fact-checks every "brain training" claim before sharing it.',
     sections: [
       {
@@ -291,7 +291,7 @@ And if you're looking for a place to start, well, I might know a game. It has le
     subtitle: 'Vad studier med 19 000 deltagare faktiskt säger om ordspel och hjärnhälsa. Spoiler: det är mer nyanserat än klickbetesrubrikerna.',
     category: 'Hjärnhälsa',
     readTime: '12 min läsning',
-    authorName: 'The Word Nerd',
+    authorName: 'Ohad Fisher',
     authorBio: 'Besatt ordspelsspelare, amatörneurovetenskap-läsare, och personen som faktagranskar varje påstående om "hjärnträning" innan hen delar det.',
     sections: [
       {
@@ -424,7 +424,7 @@ Spela dina ordspel. Utmana dig själv. Lita bara inte på den som säger att det
     subtitle: '19,000人規模の研究が言葉のゲームと脳の健康について本当に言っていること。ネタバレ：クリックベイトの見出しほど単純ではない。',
     category: '脳の健康',
     readTime: '12分で読める',
-    authorName: 'The Word Nerd',
+    authorName: 'Ohad Fisher',
     authorBio: 'ワードゲーム中毒者、アマチュア脳科学読者、そして「脳トレ」の主張を共有する前に必ずファクトチェックする人間。',
     sections: [
       {

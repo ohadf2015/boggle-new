@@ -1,10 +1,14 @@
 'use client';
 
-import React, { useMemo, useEffect, useRef } from 'react';
+import React, { useMemo, useEffect, useRef, useCallback } from 'react';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { useAchievementQueue } from '@/components/achievements';
 import FirstTimeEncouragement from '@/components/game/FirstTimeEncouragement';
 import { useFirstTimeEncouragement } from '@/hooks/useFirstTimeEncouragement';
+import { useIdleDetection } from '@/hooks/useIdleDetection';
+import { trackDeadTime } from '@/utils/growthTracking';
+
+const DEAD_TIME_THRESHOLD_MS = 15000;
 import {
   useSinglePlayerCore,
   LandscapeGameLayout,
@@ -103,6 +107,33 @@ function SinglePlayerGame({
     prevScoreRef.current = core.score;
   }, [core.score, core.foundWords]);
 
+  // Dead-time growth signal: fire once per round after N seconds of no letter selection
+  const sessionKey = core.grid
+    ? (core.grid as LetterGrid).map((row) => row.join('')).join('|')
+    : 'nogrid';
+  const idleEnabled = Boolean(core.grid) && !core.isPaused && !core.isGameOver;
+  const handleIdle = useCallback(() => {
+    trackDeadTime(settings.mode, DEAD_TIME_THRESHOLD_MS, {
+      wordsFound: core.foundWords.length,
+      score: core.score,
+    });
+  }, [settings.mode, core.foundWords.length, core.score]);
+  const { reportActivity } = useIdleDetection({
+    enabled: idleEnabled,
+    thresholdMs: DEAD_TIME_THRESHOLD_MS,
+    onIdle: handleIdle,
+    sessionKey,
+  });
+
+  const coreWordChange = core.handleWordChange;
+  const wrappedWordChange = useCallback(
+    (word: string, count: number) => {
+      reportActivity();
+      coreWordChange(word, count);
+    },
+    [reportActivity, coreWordChange]
+  );
+
   // Common props for all layouts - memoized to prevent unnecessary re-renders
   // Must be called before any conditional returns to follow React hooks rules
   const commonProps = useMemo(() => {
@@ -147,7 +178,7 @@ function SinglePlayerGame({
       training: core.training,
       onWordSubmit: core.handleWordSubmit,
       onPathSubmit: core.handlePathSubmit,
-      onWordChange: core.handleWordChange,
+      onWordChange: wrappedWordChange,
       onPauseToggle: core.handlePauseToggle,
       onFinishPractice: core.handleFinishPractice,
       onQuitRequest: core.handleQuitRequest,
@@ -192,7 +223,7 @@ function SinglePlayerGame({
     core.training,
     core.handleWordSubmit,
     core.handlePathSubmit,
-    core.handleWordChange,
+    wrappedWordChange,
     core.handlePauseToggle,
     core.handleFinishPractice,
     core.handleQuitRequest,

@@ -1,6 +1,7 @@
 'use client';
 
 import { memo, useMemo, useState, useRef, useEffect } from 'react';
+import { fireConfetti } from '@/utils/confettiUtils';
 import type { Socket } from 'socket.io-client';
 import { Maximize, Minimize } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -11,12 +12,14 @@ import TvLeaderboard from './tv-broadcast/TvLeaderboard';
 import TvActivityPanel from './tv-broadcast/TvActivityPanel';
 import TvMomentumTicker from './tv-broadcast/TvMomentumTicker';
 import TvNotificationQueue from './tv-broadcast/TvNotificationQueue';
+import TvTimesUpOverlay from './tv-broadcast/TvTimesUpOverlay';
 import { useTvPlayerCombos } from '../hooks/useTvPlayerCombos';
 import { useTvNotifications } from '../hooks/useTvNotifications';
 import { useTvSounds } from '../hooks/useTvSounds';
 import { useTvFullscreen } from '../hooks/useTvFullscreen';
 import { useTvFinalMinute } from '../hooks/useTvFinalMinute';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
+import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useGameMode } from '@/hooks/gameState/store';
 import Image from 'next/image';
 import type { Language, LetterGrid, Avatar as AvatarType } from '@/shared/types/game';
@@ -169,9 +172,8 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
     volume: 0.7,
   });
 
-  // Confetti state for mega events
-  const [showConfetti, setShowConfetti] = useState(false);
-  const confettiTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  // Times-up sound from global SFX context
+  const { playTimesUpSound } = useSoundEffects();
 
   // Notifications with sound integration
   const { notifications, dismissNotification } = useTvNotifications({
@@ -179,11 +181,8 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
     enabled: true,
     onNotification: (notification) => {
       playSound(notification.tier);
-      // Trigger confetti on mega events
       if (notification.tier === 'mega') {
-        setShowConfetti(true);
-        if (confettiTimeoutRef.current) clearTimeout(confettiTimeoutRef.current);
-        confettiTimeoutRef.current = setTimeout(() => setShowConfetti(false), 3000);
+        fireConfetti();
       }
     },
     t,
@@ -420,27 +419,15 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
         </div>
       </div>
 
-      {/* Confetti celebration overlay for mega events */}
-      <AnimatePresence>
-        {showConfetti && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="absolute inset-0 pointer-events-none z-30"
-            aria-hidden="true"
-          >
-            <Image
-              src="/images/tv-broadcast/fx-confetti-celebration.png"
-              alt=""
-              fill
-              className="object-cover mix-blend-screen"
-              sizes="100vw"
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Countdown + TIME'S UP overlay */}
+      <TvTimesUpOverlay
+        remainingTime={remainingTime}
+        t={t}
+        onTimesUp={() => {
+          playTimesUpSound();
+          fireConfetti();
+        }}
+      />
 
       {/* Notification Overlay */}
       <TvNotificationQueue

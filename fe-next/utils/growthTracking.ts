@@ -87,7 +87,9 @@ export type GrowthEvent =
   | 'onboarding_step_completed'
   | 'onboarding_first_word_found'
   // Modals / confirmation dialogs
-  | 'modal_interaction';
+  | 'modal_interaction'
+  // Friction / engagement
+  | 'dead_time_detected';
 
 /** Onboarding funnel step identifiers (FTUE state machine). */
 export type OnboardingStep =
@@ -732,6 +734,18 @@ export const trackModalInteraction = (
   trackGrowthEvent('modal_interaction', { modalId, action, ...extras });
 };
 
+/**
+ * Dead-time detected — fires once per round when user is idle past threshold.
+ * Signal for engagement friction (stuck, distracted, or interface issue).
+ */
+export const trackDeadTime = (
+  gameMode: string,
+  thresholdMs: number,
+  extras: Record<string, unknown> = {},
+): void => {
+  trackGrowthEvent('dead_time_detected', { gameMode, thresholdMs, ...extras });
+};
+
 export const trackLanguageChanged = (from: string, to: string): void => {
   if (from === to) return;
   trackGrowthEvent('language_changed', { from, to });
@@ -767,6 +781,7 @@ const growthTracking = {
   trackOnboardingStep,
   trackOnboardingFirstWord,
   trackModalInteraction,
+  trackDeadTime,
   trackRewardedAdOffered,
   trackRewardedAdWatched,
   trackRewardedAdDeclined,

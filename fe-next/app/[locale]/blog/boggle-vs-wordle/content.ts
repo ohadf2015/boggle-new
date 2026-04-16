@@ -23,7 +23,7 @@ export const contentByLocale: Record<string, LocaleContent> = {
     subtitle: 'An honest head-to-head from someone who plays both every single day.',
     category: 'Comparison',
     readTime: '9 min read',
-    authorName: 'The Word Nerd',
+    authorName: 'Ohad Fisher',
     authorBio: 'Has played more word games than is socially acceptable. Still can\'t beat my mom at Scrabble.',
     sections: [
       {

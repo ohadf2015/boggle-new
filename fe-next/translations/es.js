@@ -623,6 +623,7 @@ const es = {
   "countdown": {
     "hint": "¡Desliza letras para formar palabras!",
     "go": "¡YA!",
+    "round": "RONDA {{number}}",
     "modeReveal": {
       "blast": "¡BLAST!",
       "wordHunt": "¡CAZA DE PALABRAS!",
@@ -1480,7 +1481,9 @@ const es = {
       "nLetters": "¡{count} letras!",
       "sameWordFound": "¡Misma palabra de {length} letras!",
       "finalMinute": "¡ÚLTIMO MINUTO!",
-      "everySecondCounts": "¡Cada segundo cuenta!"
+      "everySecondCounts": "¡Cada segundo cuenta!",
+      "timesUp": "¡SE ACABÓ EL TIEMPO!",
+      "timesUpSub": "¡Lápices abajo!"
     },
     "modeClassic": "CLÁSICO",
     "modeBlast": "BLAST",
@@ -1512,6 +1515,11 @@ const es = {
     "wave": "Oleada",
     "tilesCleared": "Casillas limpiadas",
     "blastWave": "OLEADA {wave}"
+  },
+  "tvLobby": {
+    "waitingForPlayers": "Esperando jugadores...",
+    "seconds": "segundos",
+    "switchToPlayer": "Cambiar a modo jugador"
   },
   "tvResults": {
     "title": "¡TENEMOS UN GANADOR!",
@@ -4296,7 +4304,7 @@ const es = {
     "community": "Comunidad y contenido",
     "communityPage": "Comunidad",
     "about": "Acerca de y legal",
-    "theWordNerd": "El Nerd de las Palabras",
+    "theWordNerd": "Ohad Fisher",
     "disclaimer": "Descargo de responsabilidad",
     "accessibility": "Accesibilidad"
   },

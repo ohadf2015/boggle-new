@@ -23,7 +23,7 @@ export const contentByLocale: Record<string, LocaleContent> = {
     subtitle: 'What fMRI scans, tile tracking, and a devastating loss to a 14-year-old taught me about how top players actually think.',
     category: 'Competitive Play',
     readTime: '10 min read',
-    authorName: 'The Word Nerd',
+    authorName: 'Ohad Fisher',
     authorBio: 'Obsessive word game player, amateur neuroscience reader, and the person who ruins game night by taking too long on their turn.',
     sections: [
       {

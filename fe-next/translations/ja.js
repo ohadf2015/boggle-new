@@ -642,6 +642,7 @@ const ja = {
   "countdown": {
     "hint": "スワイプして単語を作ろう！",
     "go": "スタート！",
+    "round": "ラウンド {{number}}",
     "modeReveal": {
       "blast": "ブラスト！",
       "wordHunt": "ワードハント！",
@@ -1462,7 +1463,9 @@ const ja = {
       "nLetters": "{count}文字!",
       "sameWordFound": "同じ{length}文字の単語!",
       "finalMinute": "残り1分！",
-      "everySecondCounts": "一秒一秒が大切！"
+      "everySecondCounts": "一秒一秒が大切！",
+      "timesUp": "タイムアップ！",
+      "timesUpSub": "ペンを置いて！"
     },
     "modeClassic": "クラシック",
     "modeBlast": "ブラスト",
@@ -1494,6 +1497,11 @@ const ja = {
     "wave": "ウェーブ",
     "tilesCleared": "消したタイル",
     "blastWave": "ウェーブ {wave}"
+  },
+  "tvLobby": {
+    "waitingForPlayers": "プレイヤーを待っています...",
+    "seconds": "秒",
+    "switchToPlayer": "プレイヤーモードに切替"
   },
   "tvResults": {
     "title": "勝者誕生!",
@@ -4249,7 +4257,7 @@ const ja = {
     "community": "コミュニティ＆コンテンツ",
     "communityPage": "コミュニティ",
     "about": "概要＆法的情報",
-    "theWordNerd": "ワードナード",
+    "theWordNerd": "Ohad Fisher",
     "disclaimer": "免責事項",
     "accessibility": "アクセシビリティ"
   },

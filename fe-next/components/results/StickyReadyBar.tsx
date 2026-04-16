@@ -39,7 +39,7 @@ interface StickyReadyBarProps {
   isClassroom?: boolean;
 }
 
-const ALL_MODES: GameModeOption[] = ['word-hunt', 'classic', 'random'];
+const ALL_MODES: GameModeOption[] = ['word-hunt', 'classic', 'wheel-rush', 'random'];
 const AUTO_SECONDS = 35;
 
 /**

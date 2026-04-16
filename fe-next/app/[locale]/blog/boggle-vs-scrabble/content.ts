@@ -23,7 +23,7 @@ export const contentByLocale: Record<string, LocaleContent> = {
     subtitle: 'Two titans of the word game world. One chaotic, one strategic. Which one deserves your Friday night?',
     category: 'Versus',
     readTime: '12 min read',
-    authorName: 'The Word Nerd',
+    authorName: 'Ohad Fisher',
     authorBio: 'Owns three different editions of Scrabble and a Boggle set held together with duct tape. Has strong opinions about both.',
     sections: [
       {

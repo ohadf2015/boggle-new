@@ -31,7 +31,7 @@ export const contentByLocale: Record<string, GuideContent> = {
     subtitle: 'Everything I\'ve learned about combos, tile effects, and not choking at level 7 after 1,000+ boards.',
     category: 'Strategy',
     readTime: '9 min read',
-    authorName: 'The Word Nerd',
+    authorName: 'Ohad Fisher',
     authorBio: 'Blast mode enthusiast who has cleared over 1,000 boards and reached combo level 15+.',
     quickTips: [
       'Speed over everything. Your next word matters more than your best word.',

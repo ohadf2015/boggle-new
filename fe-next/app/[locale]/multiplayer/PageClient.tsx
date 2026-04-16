@@ -57,7 +57,7 @@ const ResultsPage = nextDynamic(() => import('@/components/views/ResultsPage'), 
   ssr: false,
 });
 
-const VALID_MODES: GameMode[] = ['classic', 'blast', 'word-hunt'];
+export const VALID_MODES: GameMode[] = ['classic', 'blast', 'word-hunt', 'wheel-rush'];
 
 function ViewLoadingSkeleton(): React.JSX.Element {
   return (
@@ -398,6 +398,7 @@ export default function MultiplayerPageClient(): React.JSX.Element {
           pendingGameStart={pendingGameStart}
           onGameStartConsumed={() => setPendingGameStart(null)}
           roomLanguage={roomLanguage} onUsernameChange={setUsername}
+          seriesRoundNumber={seriesTracker.roundNumber}
         />
       </FeatureErrorBoundary>
     );

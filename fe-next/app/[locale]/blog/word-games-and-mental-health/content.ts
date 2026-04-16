@@ -23,7 +23,7 @@ export const contentByLocale: Record<string, LocaleContent> = {
     subtitle: 'Flow states, digital meditation, and the surprisingly thin line between healthy coping and avoidance. A personal story backed by real research.',
     category: 'Mental Health',
     readTime: '11 min read',
-    authorName: 'The Word Nerd',
+    authorName: 'Ohad Fisher',
     authorBio: 'Anxious overthinker who discovered that rearranging letters is cheaper than therapy — though she still goes to therapy too.',
     sections: [
       {
@@ -359,7 +359,7 @@ Now if you'll excuse me, it's 7:47 AM, my coffee is ready, and there's a daily c
     subtitle: 'Flow-tillstånd, digital meditation och den förvånansvärt tunna gränsen mellan hälsosam coping och undvikande. En personlig berättelse stödd av forskning.',
     category: 'Mental Hälsa',
     readTime: '11 min läsning',
-    authorName: 'The Word Nerd',
+    authorName: 'Ohad Fisher',
     authorBio: 'Ångestfylld övertänkare som upptäckte att bokstavssortering är billigare än terapi — men som fortfarande går i terapi också.',
     sections: [
       {
@@ -466,7 +466,7 @@ Om du känner igen dig är du förmodligen okej. Att vara medveten nog att stäl
     subtitle: 'フロー状態、デジタル瞑想、健全な対処法と回避の驚くほど薄い境界線。研究に裏付けられた個人的な物語。',
     category: 'メンタルヘルス',
     readTime: '11分で読めます',
-    authorName: 'The Word Nerd',
+    authorName: 'Ohad Fisher',
     authorBio: '文字を並べ替えることがセラピーより安いと気づいた心配性の考えすぎ屋。でもセラピーにも通っています。',
     sections: [
       {
@@ -575,7 +575,7 @@ Computers in Human Behavior（2023年）の研究では、20分間認知的に�
     subtitle: 'Estados de flujo, meditación digital y la línea sorprendentemente delgada entre el afrontamiento saludable y la evasión. Una historia personal respaldada por investigación real.',
     category: 'Salud Mental',
     readTime: '11 min de lectura',
-    authorName: 'The Word Nerd',
+    authorName: 'Ohad Fisher',
     authorBio: 'Pensadora ansiosa que descubrió que reordenar letras es más barato que la terapia — aunque sigue yendo a terapia también.',
     sections: [
       {

@@ -131,6 +131,8 @@ export interface GameState {
   goldenLetters?: Array<{ row: number; col: number }>;
   /** Special high-value words solvable on the board */
   specialWords?: Array<{ word: string; foundBy?: string }>;
+  /** Whether host is in TV display mode (phones should delay results) */
+  tvMode?: boolean;
   /** Scheduled round event type and trigger time */
   roundEventSchedule?: { eventType: string; triggerAtPercent: number } | null;
   /** Currently active round event */

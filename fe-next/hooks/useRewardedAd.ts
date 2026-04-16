@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback } from 'react';
 import { Howler } from 'howler';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useAdPlacement } from '@/hooks/useAdPlacement';
@@ -107,6 +107,8 @@ interface UseRewardedAdReturn {
   maxViews: number;
   /** Whether the daily limit has been reached */
   isDailyLimitReached: boolean;
+  /** Whether the hook is in placeholder mode (no real ad provider wired) */
+  isPlaceholder: boolean;
 }
 
 /**
@@ -298,10 +300,11 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
     showAd,
     error,
     rewardAmount,
-    canShowAd: !isDailyLimitReached(),
+    canShowAd: !isDailyLimitReached() && !(isPlaceholder && !isDev),
     viewsToday: dailyViewCount,
     maxViews: MAX_DAILY_AD_VIEWS,
     isDailyLimitReached: isDailyLimitReached(),
+    isPlaceholder,
   };
 }
 

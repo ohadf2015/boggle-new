@@ -18,6 +18,8 @@ import { ResultsRevengeSection } from '@/components/results/ResultsRevengeSectio
 import type { GameModeOption } from '@/components/GameModeSelector';
 import type { SeriesStanding } from '@/hooks/useSeriesTracker';
 import SeriesStandingsBanner from '@/components/results/SeriesStandingsBanner';
+import RewardsSummary from '@/components/results/RewardsSummary';
+import type { CoinReward } from '@/components/results/CoinRewardDisplay';
 
 import { ResultsWordsSection } from '@/components/results/ResultsWordsSection';
 import { WinStreakBadge } from '@/components/multiplayer/WinStreakBadge';
@@ -89,6 +91,8 @@ export interface ResultsMainContentProps {
     targetFoundBy: string | null;
     survivalTime?: number;
   };
+  /** Coin reward earned this game */
+  coinReward?: CoinReward | null;
 }
 
 // ==============================================
@@ -120,6 +124,9 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
   seriesTotalGames,
   seriesLeader,
   missedWords: _missedWords,
+  coinReward,
+  isAuthenticated,
+  isCurrentUserWinner,
 }) {
   const reducedMotion = useReducedMotion();
   const { dir: _dir, language } = useLanguage();
@@ -221,6 +228,16 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
       {/* 2. HIGHLIGHTS BAR */}
       {currentPlayerData && (
         <HighlightsBar stats={highlightStats} />
+      )}
+
+      {/* 2.5 REWARDS SUMMARY */}
+      {coinReward && (
+        <RewardsSummary
+          coinReward={coinReward}
+          isAuthenticated={isAuthenticated}
+          winStreak={null}
+          isWinner={isCurrentUserWinner}
+        />
       )}
 
       {/* 3. TOP 3 PODIUM */}

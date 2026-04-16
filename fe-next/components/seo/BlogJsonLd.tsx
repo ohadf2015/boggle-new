@@ -74,12 +74,12 @@ export function BlogPostingJsonLd({
         author: {
             '@type': 'Person',
             name: 'Ohad Fisher',
-            alternateName: 'The Word Nerd',
+            alternateName: 'Ohad Fisher',
             url: `${SITE_URL}/about/the-word-nerd`,
             jobTitle: 'Founder & Editor-in-Chief, LexiClash',
             description:
                 'Founder of LexiClash. Word-game designer and cognitive-science enthusiast with 8+ years researching word games, linguistics, and brain health.',
-            image: `${SITE_URL}/images/author-ohad.jpg`,
+            image: `${SITE_URL}/images/author-ohad.png`,
             email: 'editor@lexiclash.live',
             sameAs: [
                 'https://www.lexiclash.live/about/the-word-nerd',

@@ -642,6 +642,7 @@ const he = {
   "countdown": {
     "hint": "גררו אותיות כדי ליצור מילים!",
     "go": "קדימה!",
+    "round": "סיבוב {{number}}",
     "modeReveal": {
       "blast": "פיצוץ!",
       "wordHunt": "ציד מילים!",
@@ -1479,7 +1480,9 @@ const he = {
       "nLetters": "{count} אותיות!",
       "sameWordFound": "אותה מילה בת {length} אותיות!",
       "finalMinute": "הדקה האחרונה!",
-      "everySecondCounts": "כל שנייה חשובה!"
+      "everySecondCounts": "כל שנייה חשובה!",
+      "timesUp": "!נגמר הזמן",
+      "timesUpSub": "עפרונות למטה!"
     },
     "modeClassic": "קלאסי",
     "modeBlast": "בלאסט",
@@ -1511,6 +1514,11 @@ const he = {
     "wave": "גל",
     "tilesCleared": "אריחים שנוקו",
     "blastWave": "גל {wave}"
+  },
+  "tvLobby": {
+    "waitingForPlayers": "...ממתינים לשחקנים",
+    "seconds": "שניות",
+    "switchToPlayer": "מעבר למצב שחקן"
   },
   "tvResults": {
     "title": "יש לנו מנצח!",
@@ -4268,7 +4276,7 @@ const he = {
     "community": "קהילה ותוכן",
     "communityPage": "קהילה",
     "about": "אודות ומשפטי",
-    "theWordNerd": "חנון המילים",
+    "theWordNerd": "Ohad Fisher",
     "disclaimer": "הבהרה",
     "accessibility": "נגישות"
   },

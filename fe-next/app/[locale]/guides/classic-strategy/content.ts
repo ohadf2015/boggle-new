@@ -29,7 +29,7 @@ export const contentByLocale: Record<string, GuideContent> = {
     subtitle: 'Real strategies from someone who has embarrassingly logged 500+ hours staring at letter grids.',
     category: 'Strategy',
     readTime: '8 min read',
-    authorName: 'The Word Nerd',
+    authorName: 'Ohad Fisher',
     authorBio: 'I play Classic mode way too much. My friends have stopped inviting me to game nights because of it. Worth it.',
     quickTips: [
       'Start from corners. Seriously. I ignored this advice for months and my scores suffered for it.',

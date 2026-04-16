@@ -23,7 +23,7 @@ export const contentByLocale: Record<string, LocaleContent> = {
     subtitle: 'Stolen ideas, crossword mania, a stay-at-home dad\'s invention, and one five-letter word that broke the internet.',
     category: 'History',
     readTime: '11 min read',
-    authorName: 'The Word Nerd',
+    authorName: 'Ohad Fisher',
     authorBio: 'Obsessive word game player, amateur historian of useless knowledge, and the person who owns three different editions of Scrabble.',
     sections: [
       {
@@ -291,7 +291,7 @@ Words With Friends עשה משהו שסקרבל מעולם לא יכל: הוא �
     subtitle: 'Stulna idéer, korsordsvansinne, en hemmapappas uppfinning och ett ord med fem bokstäver som krossade internet.',
     category: 'Historia',
     readTime: '11 min läsning',
-    authorName: 'The Word Nerd',
+    authorName: 'Ohad Fisher',
     authorBio: 'Besatt ordspelare, amatörhistoriker av onödig kunskap, och personen som äger tre olika utgåvor av Scrabble.',
     sections: [
       {
@@ -381,7 +381,7 @@ Det som gör mig mest entusiastisk är att ordspel blir sociala igen. Från rome
     subtitle: '盗まれたアイデア、クロスワードパニック、あるお父さんの発明、そしてインターネットを壊した5文字の単語。',
     category: '歴史',
     readTime: '読了時間：11分',
-    authorName: 'The Word Nerd',
+    authorName: 'Ohad Fisher',
     authorBio: 'ワードゲームに取り憑かれたプレイヤー、無駄な知識のアマチュア歴史家、スクラブルを3つの異なるエディションで持っている人間。',
     sections: [
       {
@@ -471,7 +471,7 @@ Det som gör mig mest entusiastisk är att ordspel blir sociala igen. Från rome
     subtitle: 'Ideas robadas, manía de crucigramas, la invención de un padre en casa, y una palabra de cinco letras que rompió internet.',
     category: 'Historia',
     readTime: '11 min de lectura',
-    authorName: 'The Word Nerd',
+    authorName: 'Ohad Fisher',
     authorBio: 'Jugador obsesivo de juegos de palabras, historiador aficionado de conocimiento inútil, y la persona que tiene tres ediciones diferentes de Scrabble.',
     sections: [
       {

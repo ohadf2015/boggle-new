@@ -98,6 +98,9 @@ export interface ClientToServerEvents {
 
   // Kick events
   kickPlayer: (data: { targetUsername: string }) => void;
+
+  // TV mode events
+  resultsRevealed: () => void;
 }
 
 // ==================== Hint Types ====================
@@ -165,6 +168,9 @@ export interface ServerToClientEvents {
   peerVoteRecorded: (data: PeerVoteRecordedPayload) => void;
   peerValidationResult: (data: PeerValidationResultPayload) => void;
   validationComplete: (data: { success: boolean }) => void;
+
+  // TV mode events
+  resultsRevealed: (data: Record<string, never>) => void;
 
   // Chat events
   chatMessage: (data: ChatMessagePayload) => void;

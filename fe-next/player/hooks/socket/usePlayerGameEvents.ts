@@ -364,23 +364,13 @@ export function usePlayerGameEvents({
       }
     };
 
-    const handleValidatedScores = (data: any) => {
-      // Deduplicate by game session — prevents processing results twice for the same game
-      // but does NOT block the initial event (unlike the old waitingForResults guard which
-      // caused a race condition when validatedScores arrived before endGame)
-      if (hasProcessedResultsRef.current === gameSessionIdRef.current) {
-        logger.log('[PLAYER] Ignoring duplicate validatedScores - already processed for session', gameSessionIdRef.current);
-        return;
-      }
-      hasProcessedResultsRef.current = gameSessionIdRef.current;
+    // --- TV mode sync: defer results until host reveals on TV ---
+    let tvRevealTimeoutId: ReturnType<typeof setTimeout> | null = null;
+    const pendingTvResultsRef = { current: null as any };
+    let tvRevealedBeforeData = false;
 
-      // Clear the results fallback timeout — we got real results
-      if (resultsTimeoutId) { clearTimeout(resultsTimeoutId); resultsTimeoutId = null; }
-
-      logger.log('[PLAYER] Received validatedScores event:', data);
-
-      // Sync blast stats from server — overrides locally accumulated values
-      // to ensure results page shows correct data even if events were missed
+    const showResultsFromData = (data: any) => {
+      // Sync blast stats from server
       if (data.blastSummary) {
         const store = useGameStore.getState();
         if (data.blastSummary.playerStats) {
@@ -404,8 +394,7 @@ export function usePlayerGameEvents({
         useGameStore.getState().setWheelRushPlayerStats(data.wheelRushSummary.playerStats);
       }
 
-      // Transition directly to results — no validation modal delay
-      // Also ensures game is marked inactive as fallback (in case endGame hasn't arrived yet)
+      // Transition to results
       setGameActive(false);
       gameActiveRef.current = false;
       setWaitingForResults(false);
@@ -425,6 +414,53 @@ export function usePlayerGameEvents({
           wheelRushSummary: data.wheelRushSummary,
         });
       }
+    };
+
+    const handleResultsRevealed = () => {
+      if (tvRevealTimeoutId) { clearTimeout(tvRevealTimeoutId); tvRevealTimeoutId = null; }
+      const pending = pendingTvResultsRef.current;
+      if (!pending) {
+        // resultsRevealed arrived before validatedScores — flag it so data shows immediately
+        tvRevealedBeforeData = true;
+        return;
+      }
+      pendingTvResultsRef.current = null;
+      logger.log('[PLAYER] TV reveal received — showing results');
+      showResultsFromData(pending);
+    };
+
+    const handleValidatedScores = (data: any) => {
+      // Deduplicate by game session — prevents processing results twice for the same game
+      if (hasProcessedResultsRef.current === gameSessionIdRef.current) {
+        logger.log('[PLAYER] Ignoring duplicate validatedScores - already processed for session', gameSessionIdRef.current);
+        return;
+      }
+      hasProcessedResultsRef.current = gameSessionIdRef.current;
+
+      // Clear the results fallback timeout — we got real results
+      if (resultsTimeoutId) { clearTimeout(resultsTimeoutId); resultsTimeoutId = null; }
+
+      logger.log('[PLAYER] Received validatedScores event:', data);
+
+      // If TV mode active, defer showing results until host signals reveal is done
+      if (data.tvMode && !tvRevealedBeforeData) {
+        pendingTvResultsRef.current = data;
+        // Mark game inactive immediately so UI stops gameplay
+        setGameActive(false);
+        gameActiveRef.current = false;
+        setWaitingForResults(true);
+        // 25s fallback — if host never reveals (disconnect, etc), show results anyway
+        tvRevealTimeoutId = setTimeout(() => {
+          if (pendingTvResultsRef.current) {
+            logger.log('[PLAYER] TV reveal timeout — showing results anyway');
+            pendingTvResultsRef.current = null;
+            showResultsFromData(data);
+          }
+        }, 25000);
+        return;
+      }
+
+      showResultsFromData(data);
     };
 
     const handleFinalScores = (data: any) => {
@@ -633,6 +669,7 @@ export function usePlayerGameEvents({
     socket.on('endGame', handleEndGame);
     socket.on('timeUpdate', handleTimeUpdate);
     socket.on('validatedScores', handleValidatedScores);
+    socket.on('resultsRevealed', handleResultsRevealed);
     socket.on('finalScores', handleFinalScores);
     socket.on('resetGame', handleResetGame);
     socket.on('hostLeftRoomClosing', handleHostLeftRoomClosing);
@@ -675,7 +712,9 @@ export function usePlayerGameEvents({
       socket.off('endGame', handleEndGame);
       socket.off('timeUpdate', handleTimeUpdate);
       socket.off('validatedScores', handleValidatedScores);
+      socket.off('resultsRevealed', handleResultsRevealed);
       socket.off('finalScores', handleFinalScores);
+      if (tvRevealTimeoutId) { clearTimeout(tvRevealTimeoutId); tvRevealTimeoutId = null; }
       socket.off('resetGame', handleResetGame);
       socket.off('hostLeftRoomClosing', handleHostLeftRoomClosing);
       // Earthquake handlers cleanup

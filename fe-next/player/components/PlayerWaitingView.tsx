@@ -188,7 +188,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
           </div>
 
           <div className="mt-3">
-            <RewardedAdGoldButton goldAmount={20} />
+            <RewardedAdGoldButton goldAmount={20} surface="player_waiting" />
           </div>
         </div>
       </div>

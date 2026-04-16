@@ -17,7 +17,7 @@ export const contentByLocale: Record<string, LocaleContent> = {
     subtitle: 'Three months of obsessive score-tracking, competitive Scrabble tactics, and information theory. Distilled into something actually useful.',
     category: 'Strategy',
     readTime: '12 min read',
-    authorName: 'The Word Nerd',
+    authorName: 'Ohad Fisher',
     authorBio: 'Obsessive word game player, amateur neuroscience reader, and the person who ruins game night by taking too long on their turn.',
     sections: [
       {

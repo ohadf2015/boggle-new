@@ -242,6 +242,7 @@ export const startGameSchema = z.object({
     isHoliday: z.boolean().optional(),
   }).nullable().optional(),
   gameMode: z.enum(['classic', 'blast', 'word-hunt', 'wheel-rush', 'random']).optional(),
+  tvMode: z.boolean().optional(),
 });
 
 export const startGameAckSchema = compiledSchemas?.startGameAckSchema || z.object({

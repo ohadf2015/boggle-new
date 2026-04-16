@@ -23,7 +23,7 @@ export const contentByLocale: Record<string, LocaleContent> = {
     subtitle: 'Spaced repetition, active recall, morphology hacks, and the daily routines that actually stick. No flashcard apps required.',
     category: 'Learning',
     readTime: '12 min read',
-    authorName: 'The Word Nerd',
+    authorName: 'Ohad Fisher',
     authorBio: 'Self-taught vocabulary obsessive who keeps a word journal, plays word games competitively, and once cried tears of joy over the word "defenestration."',
     sections: [
       {

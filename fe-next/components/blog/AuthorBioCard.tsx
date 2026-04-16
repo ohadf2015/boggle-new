@@ -46,7 +46,7 @@ export function AuthorBioCard() {
       isDarkMode ? 'bg-slate-800' : 'bg-neo-cream'
     )}>
       <Image
-        src="/images/author-ohad.jpg"
+        src="/images/author-ohad.png"
         alt="Ohad Fisher, Founder and Editor-in-Chief of LexiClash"
         width={72}
         height={72}

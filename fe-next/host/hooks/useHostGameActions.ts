@@ -197,6 +197,7 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
       difficulty: difficulty,
       boardTheme: boardTheme,
       gameMode: gameMode || 'random',
+      tvMode: !hostPlaying,
     });
 
     neoSuccessToast(t('common.gameStarted'), {
@@ -342,6 +343,7 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
           difficulty: difficulty,
           boardTheme: boardTheme,
           gameMode: gameMode || 'random',
+          tvMode: !hostPlaying,
         });
 
         neoSuccessToast(t('common.gameStarted'), {

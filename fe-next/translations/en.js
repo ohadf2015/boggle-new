@@ -627,6 +627,7 @@ const en = {
   "countdown": {
     "hint": "Swipe letters to form words!",
     "go": "GO!",
+    "round": "ROUND {{number}}",
     "modeReveal": {
       "blast": "BLAST!",
       "wordHunt": "WORD HUNT!",
@@ -1446,7 +1447,9 @@ const en = {
       "nLetters": "{count} letters!",
       "sameWordFound": "Same {length}-letter word!",
       "finalMinute": "FINAL MINUTE!",
-      "everySecondCounts": "Every second counts!"
+      "everySecondCounts": "Every second counts!",
+      "timesUp": "TIME'S UP!",
+      "timesUpSub": "Pencils down!"
     },
     "modeClassic": "CLASSIC",
     "modeBlast": "BLAST",
@@ -1478,6 +1481,11 @@ const en = {
     "wave": "Wave",
     "tilesCleared": "Tiles Cleared",
     "blastWave": "WAVE {wave}"
+  },
+  "tvLobby": {
+    "waitingForPlayers": "Waiting for Players...",
+    "seconds": "seconds",
+    "switchToPlayer": "Switch to Player Mode"
   },
   "tvResults": {
     "title": "WE HAVE A WINNER!",
@@ -4355,7 +4363,7 @@ const en = {
     "community": "Community & Content",
     "communityPage": "Community",
     "about": "About & Legal",
-    "theWordNerd": "The Word Nerd",
+    "theWordNerd": "Ohad Fisher",
     "disclaimer": "Disclaimer",
     "accessibility": "Accessibility"
   },

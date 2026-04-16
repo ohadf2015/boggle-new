@@ -24,7 +24,7 @@ export const contentByLocale: Record<string, LocaleContent> = {
     subtitle: 'An honest, slightly unhinged ranking of the best word games in 2026.',
     category: 'Reviews',
     readTime: '10 min read',
-    authorName: 'The Word Nerd',
+    authorName: 'Ohad Fisher',
     authorBio: 'Has played more word games than is socially acceptable. Still can\'t beat my mom at Scrabble.',
     sections: [
       {

@@ -66,6 +66,7 @@ interface StartGamePayload {
   difficulty?: DifficultyLevel;
   boardTheme?: { nameKey: string; emoji: string; isHoliday: boolean } | null;
   gameMode?: GameMode | 'random';
+  tvMode?: boolean;
 }
 
 /**
@@ -192,7 +193,7 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
 
     const validatedData = validation.data as StartGamePayload;
     let { letterGrid } = validatedData;
-    const { timerSeconds, language, minWordLength, difficulty, boardTheme, gameMode } = validatedData;
+    const { timerSeconds, language, minWordLength, difficulty, boardTheme, gameMode, tvMode } = validatedData;
     const gameCode = getGameBySocketId(socket.id);
 
     if (!gameCode) {
@@ -348,7 +349,8 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
       boardTheme: boardTheme || null,
       lessonVocabulary: lessonVocabulary,
       gameMode: resolvedMode,
-      modeHistory: [...(game.modeHistory || []), resolvedMode]
+      modeHistory: [...(game.modeHistory || []), resolvedMode],
+      tvMode: tvMode ?? false,
     });
 
     const positions = makePositionsMap(letterGrid);

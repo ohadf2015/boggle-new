@@ -19,7 +19,7 @@ export const contentByLocale: Record<string, GuideContent> = {
     subtitle: 'Real tactics from hundreds of rounds. Opener picks, clue reading tricks, and the traps I kept falling into.',
     category: 'Strategy',
     readTime: '8 min read',
-    authorName: 'The Word Nerd',
+    authorName: 'Ohad Fisher',
     authorBio: 'I track my stats obsessively. 95% solve rate, 3.2 average attempts. Yes, I have a spreadsheet.',
     quickTips: [
       'STARE or CRANE as openers. I flip between them depending on my mood. Both cover the letters that matter.',

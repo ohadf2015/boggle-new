@@ -23,7 +23,7 @@ export const contentByLocale: Record<string, LocaleContent> = {
     subtitle: 'The actually useful stuff fits on a napkin. The rest is ego and Scrabble Twitter drama.',
     category: 'Techniques',
     readTime: '9 min read',
-    authorName: 'The Word Nerd',
+    authorName: 'Ohad Fisher',
     authorBio: 'Obsessive word game player, amateur neuroscience reader, and the person who ruins game night by taking too long on their turn.',
     sections: [
       {
@@ -158,7 +158,7 @@ That's it. That's the napkin version. Everything else is details.`,
     subtitle: 'הדברים שבאמת עובדים נכנסים על מפית. השאר זה אגו ודרמות פורומים.',
     category: 'טכניקות',
     readTime: 'זמן קריאה: 9 דקות',
-    authorName: 'The Word Nerd',
+    authorName: 'Ohad Fisher',
     authorBio: 'שחקן משחקי מילים אובססיבי, קורא חובב מדעי המוח, והאדם שהורס את ערב המשחקים כי הוא לוקח יותר מדי זמן בתור שלו.',
     sections: [
       {
@@ -289,7 +289,7 @@ That's it. That's the napkin version. Everything else is details.`,
     subtitle: 'Det som faktiskt fungerar ryms på en servett. Resten är ego och Scrabble-drama.',
     category: 'Tekniker',
     readTime: '9 min läsning',
-    authorName: 'The Word Nerd',
+    authorName: 'Ohad Fisher',
     authorBio: 'Besatt ordspelare, amatörmässig neurovetenskapsläsare och personen som förstör spelkvällen genom att ta för lång tid på sin tur.',
     sections: [
       {
@@ -418,7 +418,7 @@ Det är det. Det är servettversionen. Allt annat är detaljer.`,
     subtitle: '本当に役立つことはナプキン1枚に収まる。残りは自己満足とネット論争。',
     category: 'テクニック',
     readTime: '読了時間：9分',
-    authorName: 'The Word Nerd',
+    authorName: 'Ohad Fisher',
     authorBio: 'ワードゲーム中毒者、素人脳科学愛好家、そしてゲームの夜を台無しにする「考えすぎて時間切れ」の人。',
     sections: [
       {
@@ -551,7 +551,7 @@ fMRIを使って競技スクラブルプレイヤーを研究した科学者た�
     subtitle: 'Lo que realmente funciona cabe en una servilleta. El resto es ego y drama de Scrabble.',
     category: 'Técnicas',
     readTime: '9 min de lectura',
-    authorName: 'The Word Nerd',
+    authorName: 'Ohad Fisher',
     authorBio: 'Jugador obsesivo de juegos de palabras, lector amateur de neurociencia, y la persona que arruina la noche de juegos por tardar demasiado en su turno.',
     sections: [
       {

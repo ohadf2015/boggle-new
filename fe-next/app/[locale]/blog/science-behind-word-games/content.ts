@@ -23,7 +23,7 @@ export const contentByLocale: Record<string, LocaleContent> = {
     subtitle: 'fMRI scans, a $50 million scandal, and why your grandma might be onto something with her crossword puzzles.',
     category: 'Science',
     readTime: '9 min read',
-    authorName: 'The Word Nerd',
+    authorName: 'Ohad Fisher',
     authorBio: 'Obsessive word game player, amateur neuroscience reader, and the person who ruins game night by taking too long on their turn.',
     sections: [
       {
@@ -377,7 +377,7 @@ Anyway, I've got a grid waiting and I've already spent too long writing about wo
     subtitle: 'fMRI-skanningar, en skandal på 50 miljoner dollar, och varför din mormor kanske har rätt med sina korsord.',
     category: 'Vetenskap',
     readTime: '9 min läsning',
-    authorName: 'The Word Nerd',
+    authorName: 'Ohad Fisher',
     authorBio: 'Besatt ordspelsspelare, amatörneurovetenskap-nörd, och den personen som förstör spelkvällen genom att ta alldeles för lång tid på sin tur.',
     sections: [
       {
@@ -555,7 +555,7 @@ Hur som helst, jag har ett rutnät som väntar och jag har redan lagt för lång
     subtitle: 'fMRIスキャン、5000万ドルのスキャンダル、そしておばあちゃんのクロスワードパズルが正しかったかもしれない理由。',
     category: '科学',
     readTime: '読了時間：9分',
-    authorName: 'The Word Nerd',
+    authorName: 'Ohad Fisher',
     authorBio: 'ワードゲームに取り憑かれたプレイヤー、神経科学のアマチュア読者、そしてゲームナイトで自分の番に時間をかけすぎて場をシラけさせる人間。',
     sections: [
       {
@@ -733,7 +733,7 @@ FTCは、Lumosityが「加齢に伴う認知機能低下に対する消費者の
     subtitle: 'Escáneres fMRI, un escándalo de 50 millones de dólares, y por qué tu abuela quizás tenga razón con sus crucigramas.',
     category: 'Ciencia',
     readTime: '9 min de lectura',
-    authorName: 'The Word Nerd',
+    authorName: 'Ohad Fisher',
     authorBio: 'Jugador obsesivo de juegos de palabras, lector amateur de neurociencia, y la persona que arruina la noche de juegos por tomarse demasiado tiempo en su turno.',
     sections: [
       {

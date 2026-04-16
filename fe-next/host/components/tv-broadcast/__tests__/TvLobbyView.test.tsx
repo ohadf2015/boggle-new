@@ -1,0 +1,108 @@
+'use client';
+
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen } from '@testing-library/react';
+import TvLobbyView from '../TvLobbyView';
+
+// Mock Zustand game state hooks
+vi.mock('@/hooks/gameState/store', () => ({
+  useGameMode: () => 'random',
+}));
+
+vi.mock('@/hooks/gameState', () => ({
+  useGameActions: () => ({ setGameMode: vi.fn() }),
+}));
+
+// Mock sub-components to isolate TvLobbyView layout logic
+vi.mock('../TvJoinBar', () => ({
+  default: ({ gameCode }: { gameCode: string }) => (
+    <div data-testid="tv-join-bar">JoinBar-{gameCode}</div>
+  ),
+}));
+
+vi.mock('../../pre-game/PlayerRoster', () => ({
+  PlayerRoster: ({ players }: { players: unknown[] }) => (
+    <div data-testid="player-roster">Players: {players.length}</div>
+  ),
+}));
+
+vi.mock('../../pre-game/StartButton', () => ({
+  StartButton: ({ onStartGame }: { onStartGame: () => void }) => (
+    <button data-testid="start-button" onClick={onStartGame}>Start</button>
+  ),
+}));
+
+vi.mock('../../pre-game/BattleModeCard', () => ({
+  BattleModeCard: ({ selectedGameMode }: { selectedGameMode: string }) => (
+    <div data-testid="battle-mode-card">Mode: {selectedGameMode}</div>
+  ),
+}));
+
+const mockT = (key: string) => key;
+
+const defaultProps = {
+  gameCode: 'ABC123',
+  roomLanguage: 'en' as const,
+  username: 'HostUser',
+  t: mockT,
+  playersReady: [
+    { username: 'Player1', avatar: null },
+    { username: 'Player2', avatar: null },
+  ],
+  selectedGameMode: 'random' as const,
+  setSelectedGameMode: vi.fn(),
+  timerValue: 120,
+  difficulty: 'normal' as const,
+  onStartGame: vi.fn(),
+  onExitRoom: vi.fn(),
+  tournamentCreating: false,
+};
+
+describe('TvLobbyView', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('renders TvJoinBar with game code', () => {
+    render(<TvLobbyView {...defaultProps} />);
+    expect(screen.getByTestId('tv-join-bar')).toHaveTextContent('ABC123');
+  });
+
+  it('renders PlayerRoster with players', () => {
+    render(<TvLobbyView {...defaultProps} />);
+    expect(screen.getByTestId('player-roster')).toHaveTextContent('Players: 2');
+  });
+
+  it('renders StartButton', () => {
+    render(<TvLobbyView {...defaultProps} />);
+    expect(screen.getByTestId('start-button')).toBeInTheDocument();
+  });
+
+  it('renders BattleModeCard with selected mode', () => {
+    render(<TvLobbyView {...defaultProps} />);
+    expect(screen.getByTestId('battle-mode-card')).toHaveTextContent('Mode: random');
+  });
+
+  it('renders lobby title translation key', () => {
+    render(<TvLobbyView {...defaultProps} />);
+    expect(screen.getByText('tvLobby.waitingForPlayers')).toBeInTheDocument();
+  });
+
+  it('renders game settings summary (timer + difficulty)', () => {
+    render(<TvLobbyView {...defaultProps} />);
+    // Should show timer and difficulty in a settings summary area
+    expect(screen.getByTestId('tv-lobby-settings')).toBeInTheDocument();
+    expect(screen.getByText('120')).toBeInTheDocument();
+  });
+
+  it('passes onStartGame to StartButton', () => {
+    render(<TvLobbyView {...defaultProps} />);
+    screen.getByTestId('start-button').click();
+    expect(defaultProps.onStartGame).toHaveBeenCalled();
+  });
+
+  it('has tv-lobby-view root testid', () => {
+    render(<TvLobbyView {...defaultProps} />);
+    expect(screen.getByTestId('tv-lobby-view')).toBeInTheDocument();
+  });
+});

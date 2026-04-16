@@ -29,6 +29,22 @@ const mockTranslations: Record<string, string> = {
   'common.exit': 'Exit',
 };
 
+vi.mock('@/hooks/useRewardedAd', () => ({
+  useRewardedAd: () => ({
+    status: 'idle',
+    isAdAvailable: true,
+    isPlaceholderCooldown: false,
+    showAd: vi.fn(),
+    error: null,
+    rewardAmount: 30,
+    canShowAd: true,
+    viewsToday: 0,
+    maxViews: 10,
+    isDailyLimitReached: false,
+    isPlaceholder: false,
+  }),
+}));
+
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => mockTranslations[key] || key,

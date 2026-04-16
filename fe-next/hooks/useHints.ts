@@ -12,6 +12,7 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import type { Socket } from 'socket.io-client';
 import type { HintPayload } from '@/shared/types/socket';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
+import { trackHintUsed } from '@/utils/growthTracking';
 
 interface HintState {
   hint: string | null;
@@ -28,12 +29,13 @@ interface UseHintsOptions {
   socket: Socket | null;
   playerCount: number;
   gameActive: boolean;
+  mode?: string;
 }
 
 const MAX_HINTS = 3;
 const HINT_DISPLAY_DURATION = 8000; // Show hint for 8 seconds
 
-export function useHints({ socket, playerCount, gameActive }: UseHintsOptions) {
+export function useHints({ socket, playerCount, gameActive, mode = 'singleplayer' }: UseHintsOptions) {
   const { playHintRevealSound } = useSoundEffects();
   const [state, setState] = useState<HintState>({
     hint: null,
@@ -79,6 +81,7 @@ export function useHints({ socket, playerCount, gameActive }: UseHintsOptions) {
 
     const handleHintResponse = (data: HintPayload) => {
       playHintRevealSound();
+      trackHintUsed(mode, data.hintType);
       setState(prev => ({
         ...prev,
         hint: data.hint,
@@ -148,7 +151,7 @@ export function useHints({ socket, playerCount, gameActive }: UseHintsOptions) {
         errorClearTimerRef.current = null;
       }
     };
-  }, [socket, gameActive, playHintRevealSound]);
+  }, [socket, gameActive, playHintRevealSound, mode]);
 
   const requestHint = useCallback(() => {
     if (!socket || !state.isAvailable || state.isLoading) return;

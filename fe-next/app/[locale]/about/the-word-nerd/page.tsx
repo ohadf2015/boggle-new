@@ -92,12 +92,12 @@ export default async function TheWordNerdPage({ params }: PageProps) {
         '@type': 'Person',
         '@id': `${SITE_URL}/about/the-word-nerd#person`,
         name: 'Ohad Fisher',
-        alternateName: 'The Word Nerd',
+        alternateName: 'Ohad Fisher',
         url: `${SITE_URL}/about/the-word-nerd`,
         jobTitle: 'Founder & Editor-in-Chief, LexiClash',
         description:
             'Founder of LexiClash. Word-game designer and cognitive-science enthusiast with 8+ years researching word games, linguistics, and brain health.',
-        image: `${SITE_URL}/images/author-ohad.jpg`,
+        image: `${SITE_URL}/images/author-ohad.png`,
         email: 'editor@lexiclash.live',
         sameAs: [
             `${SITE_URL}/about/the-word-nerd`,
@@ -134,7 +134,7 @@ export default async function TheWordNerdPage({ params }: PageProps) {
                     {/* Author Header */}
                     <div className="mb-10 flex flex-col items-center gap-6 sm:flex-row sm:items-start">
                         <Image
-                            src="/images/author-ohad.jpg"
+                            src="/images/author-ohad.png"
                             alt="Ohad Fisher — Founder and Editor-in-Chief of LexiClash"
                             width={112}
                             height={112}

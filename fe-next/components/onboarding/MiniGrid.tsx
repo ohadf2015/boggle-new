@@ -96,10 +96,6 @@ const MiniGrid: React.FC<MiniGridProps> = ({
       clearTimeout(successTimer.current);
       successTimer.current = null;
     }
-    if (autoFillTimer.current) {
-      clearTimeout(autoFillTimer.current);
-      autoFillTimer.current = null;
-    }
   }, [demoWord]);
 
   // Show "start here" hint after a delay
@@ -109,11 +105,9 @@ const MiniGrid: React.FC<MiniGridProps> = ({
     return () => clearTimeout(timer);
   }, [showHints, autoTrace, demoWord]);
 
-  // Cleanup timers
   useEffect(() => {
     return () => {
       if (successTimer.current) clearTimeout(successTimer.current);
-      if (autoFillTimer.current) clearTimeout(autoFillTimer.current);
     };
   }, []);
 
@@ -146,14 +140,18 @@ const MiniGrid: React.FC<MiniGridProps> = ({
     return { row, col };
   }, [letters, size]);
 
-  // Track last select time to auto-fill remaining cells on sustained drag
-  const lastSelectTime = useRef(0);
-  const autoFillTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const selectNext = useCallback(() => {
+  const trySelect = useCallback((row: number, col: number) => {
+    if (showSuccess || autoTrace) return;
     const sel = selectedRef.current;
+    if (sel.length >= demoPath.length) return;
+
+    // Ignore re-touch of already-selected cell (avoids double-advance on drag)
+    const last = sel[sel.length - 1];
+    if (last && last.row === row && last.col === col) return;
+
+    // Only advance when touched cell matches the next expected path step
     const next = demoPath[sel.length];
-    if (!next || showSuccess) return;
+    if (!next || next.row !== row || next.col !== col) return;
 
     setShowStartHint(false);
     setCellFlash(`${next.row}-${next.col}`);
@@ -167,33 +165,7 @@ const MiniGrid: React.FC<MiniGridProps> = ({
       if (navigator?.vibrate) navigator.vibrate([30, 50, 30, 50, 60]);
       successTimer.current = setTimeout(() => onDemoComplete(), 1200);
     }
-  }, [showSuccess, demoPath, letters, onDemoComplete]);
-
-  const trySelect = useCallback((_row: number, _col: number) => {
-    if (showSuccess || autoTrace) return;
-    const sel = selectedRef.current;
-    if (sel.length >= demoPath.length) return;
-
-    // Any touch/drag movement advances to the next cell in the path
-    selectNext();
-    lastSelectTime.current = Date.now();
-
-    // On sustained drag, auto-fill remaining cells with a fast cascade
-    const prevTimer = autoFillTimer.current;
-    if (prevTimer) clearTimeout(prevTimer);
-    if (sel.length + 1 < demoPath.length) {
-      const timer = setTimeout(() => {
-        // If still dragging (no touchEnd yet), cascade remaining cells
-        if (isDragging.current) {
-          const remaining = demoPath.length - selectedRef.current.length;
-          for (let i = 0; i < remaining; i++) {
-            setTimeout(() => selectNext(), i * 120);
-          }
-        }
-      }, 300);
-      autoFillTimer.current = timer; // eslint-disable-line react-hooks/immutability
-    }
-  }, [showSuccess, autoTrace, demoPath.length, selectNext]);
+  }, [showSuccess, autoTrace, demoPath, letters, onDemoComplete]);
 
   // Touch handlers with passive: false for smooth dragging
   const handleTouchStart = useCallback((e: React.TouchEvent) => {

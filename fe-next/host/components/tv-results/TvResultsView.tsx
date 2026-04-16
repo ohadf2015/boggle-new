@@ -144,6 +144,15 @@ const TvResultsView = memo<TvResultsViewProps>(({
     }
   }, [audioUnlocked, sfxMuted, musicMuted, sfxVolume]);
 
+  // Notify players when TV reveal animation is done
+  const revealSentRef = useRef(false);
+  const handlePhaseChange = useCallback((phase: string) => {
+    if (phase === 'controls' && !revealSentRef.current && socket?.connected) {
+      revealSentRef.current = true;
+      socket.emit('resultsRevealed');
+    }
+  }, [socket]);
+
   // Animation orchestration
   const {
     currentPhase,
@@ -156,6 +165,7 @@ const TvResultsView = memo<TvResultsViewProps>(({
     isTournament: !!tournamentData,
     playerCount: filteredScores.length,
     onSound: playSound,
+    onPhaseChange: handlePhaseChange,
   });
 
   // Cleanup audio on unmount

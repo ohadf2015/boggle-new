@@ -29,7 +29,11 @@ import { useBlastObjectiveEffects } from './hooks/useBlastObjectiveEffects';
 import type { ScoreFlyEvent } from './BlastScoreFly';
 import type { ClearedTileEvent } from './BlastEffectsCanvas';
 import { useGameStore } from '@/hooks/gameState';
+import { useIdleDetection } from '@/hooks/useIdleDetection';
+import { trackDeadTime } from '@/utils/growthTracking';
 import type { LetterGrid } from '@/shared/types';
+
+const BLAST_DEAD_TIME_THRESHOLD_MS = 15000;
 
 interface BlastGameProps {
   config: BlastGameConfig;
@@ -238,7 +242,21 @@ export function BlastGame({
     lastPathRef.current = cells;
   }, []);
 
+  const handleIdle = useCallback(() => {
+    trackDeadTime(isMultiplayer ? 'blast_multiplayer' : 'blast', BLAST_DEAD_TIME_THRESHOLD_MS, {
+      waveNumber,
+      score: engine.gameState.score,
+    });
+  }, [isMultiplayer, waveNumber, engine.gameState.score]);
+  const { reportActivity: reportIdleActivity } = useIdleDetection({
+    enabled: !engine.gameState.isComplete && !engine.gameState.isDeadEnd,
+    thresholdMs: BLAST_DEAD_TIME_THRESHOLD_MS,
+    onIdle: handleIdle,
+    sessionKey: `${waveNumber}`,
+  });
+
   const handleWordChange = useCallback((word: string, _count: number) => {
+    reportIdleActivity();
     setFormedWord(word);
     if (word.length > prevWordLenRef.current) {
       sounds.playTileSelect();
@@ -248,7 +266,7 @@ export function BlastGame({
     }
     prevWordLenRef.current = word.length;
     if (word.length > 0) sounds.playPathTone(word.length);
-  }, [sounds]);
+  }, [sounds, reportIdleActivity]);
 
   // Play rejection sound + consume a move when word is rejected
   const prevFeedbackIdRef = useRef<string | null>(null);

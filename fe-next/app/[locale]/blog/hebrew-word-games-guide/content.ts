@@ -23,7 +23,7 @@ export const contentByLocale: Record<string, LocaleContent> = {
     subtitle: 'Root systems, missing vowels, and why designing a word game for Hebrew is like solving a puzzle inside a puzzle. A love letter to the most stubborn language I\'ve ever played in.',
     category: 'Language',
     readTime: '12 min read',
-    authorName: 'The Word Nerd',
+    authorName: 'Ohad Fisher',
     authorBio: 'Multilingual word game obsessive who spent six months learning Hebrew roots just to be less terrible at Israeli Scrabble nights.',
     sections: [
       {
@@ -352,7 +352,7 @@ And if you're a native Hebrew speaker who's been nodding along to this entire ar
     subtitle: 'Rotsystem, saknade vokaler och varför att designa ett ordspel för hebreiska är som att lösa ett pussel inuti ett pussel.',
     category: 'Språk',
     readTime: '12 min läsning',
-    authorName: 'The Word Nerd',
+    authorName: 'Ohad Fisher',
     authorBio: 'Flerspråkig ordspelsentusiast som ägnade sex månader åt att lära sig hebreiska rötter bara för att vara mindre dålig på israeliska Scrabble-kvällar.',
     sections: [
       {
@@ -452,7 +452,7 @@ Det ständigt utvecklande slanglandskapet håller ordspelen fräscha.`,
     subtitle: 'ルートシステム、消えた母音、そしてヘブライ語のワードゲームをデザインすることがパズルの中のパズルである理由。',
     category: '言語',
     readTime: '12分で読めます',
-    authorName: 'The Word Nerd',
+    authorName: 'Ohad Fisher',
     authorBio: 'イスラエルのスクラブルナイトでマシになるためだけに6ヶ月間ヘブライ語の語根を学んだ多言語ワードゲームマニア。',
     sections: [
       {
@@ -551,7 +551,7 @@ UI要素はミラーリングが必要です。ナビゲーション矢印、プ
     subtitle: 'Sistemas de raíces, vocales ausentes y por qué diseñar un juego de palabras para hebreo es como resolver un rompecabezas dentro de otro.',
     category: 'Idioma',
     readTime: '12 min de lectura',
-    authorName: 'The Word Nerd',
+    authorName: 'Ohad Fisher',
     authorBio: 'Obsesivo multilingüe de juegos de palabras que pasó seis meses aprendiendo raíces hebreas solo para ser menos terrible en las noches de Scrabble israelíes.',
     sections: [
       {

@@ -23,7 +23,7 @@ export const contentByLocale: Record<string, LocaleContent> = {
     subtitle: 'The vocabulary gap is real, the research is compelling, and your students are already gamers — so meet them where they are.',
     category: 'Education',
     readTime: '12 min read',
-    authorName: 'The Word Nerd',
+    authorName: 'Ohad Fisher',
     authorBio: 'Former ESL tutor, obsessive word game player, and the person who once convinced a room of skeptical teachers that Boggle counts as assessment.',
     sections: [
       {
@@ -192,7 +192,7 @@ Marcus did.`,
     subtitle: 'הפער באוצר המילים הוא אמיתי, המחקר משכנע, והתלמידים שלכם כבר גיימרים — אז תפגשו אותם במגרש שלהם.',
     category: 'חינוך',
     readTime: 'זמן קריאה: 12 דקות',
-    authorName: 'The Word Nerd',
+    authorName: 'Ohad Fisher',
     authorBio: 'מורה לאנגלית כשפה שנייה לשעבר, שחקן משחקי מילים אובססיבי, והאדם שפעם שכנע חדר מלא מורות סקפטיות שבוגל נחשב כהערכה.',
     sections: [
       {
@@ -329,7 +329,7 @@ Marcus did.`,
     subtitle: 'Ordförrådsgapet är verkligt, forskningen är övertygande, och dina elever är redan spelare. Möt dem där de är.',
     category: 'Utbildning',
     readTime: '12 min läsning',
-    authorName: 'The Word Nerd',
+    authorName: 'Ohad Fisher',
     authorBio: 'Före detta ESL-handledare, besatt ordspelare, och personen som en gång övertygade ett rum fullt av skeptiska lärare att Boggle räknas som bedömning.',
     sections: [
       {
@@ -435,7 +435,7 @@ Det verkliga testet för varje utbildningsverktyg är inte "undervisar det?" uta
     subtitle: '語彙の格差は深刻、研究の裏付けもある、そして生徒たちはとっくにゲーマー ― なら、ゲームで迎えにいこう。',
     category: '教育',
     readTime: '読了時間：12分',
-    authorName: 'The Word Nerd',
+    authorName: 'Ohad Fisher',
     authorBio: '元ESLチューター、ワードゲームに取り憑かれたプレイヤー、かつて懐疑的な教師たちの部屋でボグルが評価として使えると説得した人間。',
     sections: [
       {
@@ -541,7 +541,7 @@ Aghlara & Tamjid（2011年）の研究では、ワードゲームを使ったイ
     subtitle: 'La brecha de vocabulario es real, la investigación es convincente, y tus estudiantes ya son gamers — así que encuéntralos donde están.',
     category: 'Educación',
     readTime: '12 min de lectura',
-    authorName: 'The Word Nerd',
+    authorName: 'Ohad Fisher',
     authorBio: 'Ex tutor de ESL, jugador obsesivo de juegos de palabras, y la persona que una vez convenció a una sala de profesores escépticos de que Boggle cuenta como evaluación.',
     sections: [
       {

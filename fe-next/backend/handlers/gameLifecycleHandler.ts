@@ -578,6 +578,22 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
     logger.info('SOCKET', `Guest ${username} changed name to ${trimmedName} in ${gameCode}`);
   });
 
+  // Relay resultsRevealed from TV host to all players in room
+  socket.on('resultsRevealed', () => {
+    if (!checkRateLimit(socket.id)) return;
+    const gameCode = getGameBySocketId(socket.id);
+    if (!gameCode) return;
+
+    const game = getGame(gameCode);
+    if (!game) return;
+
+    // Only the host (TV) can trigger reveal
+    if (game.hostSocketId !== socket.id) return;
+
+    broadcastToRoom(io, getGameRoom(gameCode), 'resultsRevealed', {});
+    logger.info('SOCKET', `TV host revealed results in ${gameCode}`);
+  });
+
   // Handle request to get current ready count
   socket.on('getPlayersReadyCount', () => {
     const gameCode = getGameBySocketId(socket.id);

@@ -92,6 +92,8 @@ export interface UseResultsSideEffectsReturn {
   showFirstWinModal: boolean;
   /** Set first win modal visibility */
   setShowFirstWinModal: (show: boolean) => void;
+  /** Coin reward earned this game (null if none) */
+  coinReward: { awarded: number; breakdown: { base: number; scoreBonus?: number; placement?: number; efficiency?: number; streak?: number; streakBonus?: number } } | null;
 }
 
 // ==============================================
@@ -223,6 +225,8 @@ export function useResultsSideEffects({
   // EFFECT 2: Award Coins
   // ==============================================
 
+  const [coinReward, setCoinReward] = useState<{ awarded: number; breakdown: { base: number; scoreBonus?: number; placement?: number; efficiency?: number; streak?: number; streakBonus?: number } } | null>(null);
+
   useEffect(() => {
     if (hasAwardedCoinsRef.current || !currentPlayerData || !gameCode) return;
 
@@ -238,6 +242,7 @@ export function useResultsSideEffects({
     );
 
     if (reward && reward.awarded > 0) {
+      setCoinReward(reward);
       if (user?.id) {
         // Authenticated: Sync to DB AND Refresh Profile
         syncCoinsToDatabase(
@@ -494,5 +499,6 @@ export function useResultsSideEffects({
     setShowAuthModal,
     showFirstWinModal,
     setShowFirstWinModal,
+    coinReward,
   };
 }

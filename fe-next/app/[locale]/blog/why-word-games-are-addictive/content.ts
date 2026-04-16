@@ -23,7 +23,7 @@ export const contentByLocale: Record<string, LocaleContent> = {
     subtitle: 'The science behind word game addiction — dopamine, flow states, and the psychology that keeps you coming back for "just one more round."',
     category: 'Psychology',
     readTime: '11 min read',
-    authorName: 'The Word Nerd',
+    authorName: 'Ohad Fisher',
     authorBio: 'Self-diagnosed word game addict, psychology enthusiast, and the person who whispers "just one more round" at 2am like a mantra.',
     sections: [
       {
@@ -198,7 +198,7 @@ It's late. I should stop. But there's a seven-letter word hiding in that grid an
     subtitle: 'המדע מאחורי ההתמכרות למשחקי מילים — דופמין, מצבי זרימה, והפסיכולוגיה ששומרת אתכם ב"עוד סיבוב אחד."',
     category: 'פסיכולוגיה',
     readTime: 'זמן קריאה: 11 דקות',
-    authorName: 'The Word Nerd',
+    authorName: 'Ohad Fisher',
     authorBio: 'מכור מאובחן-עצמית למשחקי מילים, חובב פסיכולוגיה, והבן אדם שלוחש "עוד סיבוב אחד" בשתיים בלילה כמו מנטרה.',
     sections: [
       {
@@ -351,7 +351,7 @@ It's late. I should stop. But there's a seven-letter word hiding in that grid an
     subtitle: 'Vetenskapen bakom ordspelsberoende — dopamin, flowtillstånd och psykologin som får dig att komma tillbaka för "bara en runda till."',
     category: 'Psykologi',
     readTime: '11 min läsning',
-    authorName: 'The Word Nerd',
+    authorName: 'Ohad Fisher',
     authorBio: 'Självdiagnostiserad ordspelsmissbrukare, psykologientusiast och personen som viskar "bara en runda till" klockan två på natten som ett mantra.',
     sections: [
       {
@@ -500,7 +500,7 @@ Det är sent. Jag borde sluta. Men det finns ett sjubokstavsord gömt i det där
     subtitle: 'ワードゲーム中毒の科学 ― ドーパミン、フロー状態、そして「あと1ラウンドだけ」と思わせる心理学。',
     category: '心理学',
     readTime: '11分で読めます',
-    authorName: 'The Word Nerd',
+    authorName: 'Ohad Fisher',
     authorBio: '自己診断済みワードゲーム中毒者、心理学愛好家、深夜2時に「あと1ラウンドだけ」と呪文のように唱える人。',
     sections: [
       {

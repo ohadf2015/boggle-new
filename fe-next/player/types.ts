@@ -38,4 +38,5 @@ export interface PlayerViewProps {
   onGameStartConsumed?: () => void;
   roomLanguage?: Language | null;
   onUsernameChange?: (newName: string) => void;
+  seriesRoundNumber?: number;
 }

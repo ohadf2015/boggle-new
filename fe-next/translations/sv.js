@@ -642,6 +642,7 @@ const sv = {
   "countdown": {
     "hint": "Svep bokstäver för att bilda ord!",
     "go": "KÖR!",
+    "round": "RUNDA {{number}}",
     "modeReveal": {
       "blast": "BLAST!",
       "wordHunt": "ORDJAKT!",
@@ -1462,7 +1463,9 @@ const sv = {
       "nLetters": "{count} bokstäver!",
       "sameWordFound": "Samma {length}-bokstavsord!",
       "finalMinute": "SISTA MINUTEN!",
-      "everySecondCounts": "Varje sekund räknas!"
+      "everySecondCounts": "Varje sekund räknas!",
+      "timesUp": "TIDEN ÄR UTE!",
+      "timesUpSub": "Pennorna ner!"
     },
     "modeClassic": "KLASSISK",
     "modeBlast": "BLAST",
@@ -1494,6 +1497,11 @@ const sv = {
     "wave": "Våg",
     "tilesCleared": "Brickor rensade",
     "blastWave": "VÅG {wave}"
+  },
+  "tvLobby": {
+    "waitingForPlayers": "Väntar på spelare...",
+    "seconds": "sekunder",
+    "switchToPlayer": "Byt till spelarläge"
   },
   "tvResults": {
     "title": "VI HAR EN VINNARE!",
@@ -4249,7 +4257,7 @@ const sv = {
     "community": "Community & innehåll",
     "communityPage": "Community",
     "about": "Om oss & juridiskt",
-    "theWordNerd": "Ordnörden",
+    "theWordNerd": "Ohad Fisher",
     "disclaimer": "Ansvarsfriskrivning",
     "accessibility": "Tillgänglighet"
   },

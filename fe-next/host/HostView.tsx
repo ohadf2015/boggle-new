@@ -21,6 +21,7 @@ import { useWordHuntPlayerLives, useWordHuntEliminatedPlayers, useWordHuntTarget
 import HostPreGameView from './components/HostPreGameView';
 import HostInGameView from './components/HostInGameView';
 import TvBroadcastView from './components/TvBroadcastView';
+import TvLobbyView from './components/tv-broadcast/TvLobbyView';
 import { TvResultsView } from './components/tv-results';
 import {
   QRCodeDialog,
@@ -514,8 +515,8 @@ const HostView: React.FC<HostViewProps> = memo(({
 
 
 
-      {/* Pre-Game View */}
-      {!runtime.gameStarted && !runtime.waitingForResults && !runtime.showStartAnimation && !hasActiveGameData && (
+      {/* Pre-Game View — phone lobby (host playing) */}
+      {!runtime.gameStarted && !runtime.waitingForResults && !runtime.showStartAnimation && !hasActiveGameData && settings.hostPlaying && (
         <HostPreGameView
           gameCode={gameCode}
           roomLanguage={state.roomLanguage}
@@ -550,6 +551,23 @@ const HostView: React.FC<HostViewProps> = memo(({
           lessonData={lessonData}
           onNameChange={handleHostNameChange}
           onAvatarChange={handleHostAvatarChange}
+        />
+      )}
+
+      {/* Pre-Game View — TV lobby (host NOT playing / spectator mode) */}
+      {!runtime.gameStarted && !runtime.waitingForResults && !runtime.showStartAnimation && !hasActiveGameData && !settings.hostPlaying && (
+        <TvLobbyView
+          gameCode={gameCode}
+          roomLanguage={state.roomLanguage}
+          username={username}
+          t={t}
+          playersReady={players.playersReady as any}
+          timerValue={settings.timerValue}
+          difficulty={settings.difficulty}
+          onStartGame={actions.startGame}
+          onExitRoom={actions.handleExitRoom}
+          tournamentCreating={tournament.tournamentCreating}
+          setHostPlaying={state.setHostPlaying}
         />
       )}
 

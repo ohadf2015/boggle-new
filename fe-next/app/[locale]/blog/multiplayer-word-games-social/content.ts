@@ -23,7 +23,7 @@ export const contentByLocale: Record<string, LocaleContent> = {
     subtitle: 'What happens in your brain when you add other humans to the mix, and why solo puzzling only gets you halfway there.',
     category: 'Social Science',
     readTime: '11 min read',
-    authorName: 'The Word Nerd',
+    authorName: 'Ohad Fisher',
     authorBio: 'Once made a stranger on a train play Boggle four stops past their destination. No regrets on either side.',
     sections: [
       {
