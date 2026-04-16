@@ -490,6 +490,8 @@ export function PortraitGameLayout({
         cancelText={t('common.cancel')}
         onConfirm={onConfirmQuit}
         variant="danger"
+        analyticsId="sp_quit_confirm"
+        analyticsExtras={{ layout: 'portrait' }}
       />
     </div>
   );

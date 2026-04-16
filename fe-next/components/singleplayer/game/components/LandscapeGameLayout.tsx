@@ -382,6 +382,8 @@ export function LandscapeGameLayout({
         cancelText={t('common.cancel')}
         onConfirm={onConfirmQuit}
         variant="danger"
+        analyticsId="sp_quit_confirm"
+        analyticsExtras={{ layout: 'landscape' }}
       />
 
       {/* Screen reader status announcements */}

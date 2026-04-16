@@ -229,6 +229,8 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
           cancelText={t('common.cancel')}
           onConfirm={handleQuitConfirm}
           variant="danger"
+          analyticsId="daily_survival_quit_confirm"
+          analyticsExtras={{ orientation: 'landscape' }}
         />
       </>
     );
@@ -391,6 +393,8 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         cancelText={t('common.cancel')}
         onConfirm={handleQuitConfirm}
         variant="danger"
+        analyticsId="daily_survival_quit_confirm"
+        analyticsExtras={{ orientation: 'portrait' }}
       />
     </motion.div>
   );

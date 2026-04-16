@@ -369,6 +369,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     setShowAuthModal,
     showFirstWinModal,
     setShowFirstWinModal,
+    coinReward,
   } = useResultsSideEffects({
     currentPlayerData,
     currentPlayerValidWords,
@@ -655,6 +656,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     gameDuration,
     wordHuntSummary,
     onPodiumReaction: sendReaction,
+    coinReward,
   };
 
   // Word Hunt results data (shared between tabs) — memoized to avoid O(n²) per render
@@ -940,6 +942,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
         cancelText={t('common.cancel')}
         onConfirm={confirmExitRoom}
         variant="default"
+        analyticsId="exit_room_confirm"
       />
 
       </div>

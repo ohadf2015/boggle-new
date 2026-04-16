@@ -85,7 +85,9 @@ export type GrowthEvent =
   // Onboarding funnel
   | 'onboarding_started'
   | 'onboarding_step_completed'
-  | 'onboarding_first_word_found';
+  | 'onboarding_first_word_found'
+  // Modals / confirmation dialogs
+  | 'modal_interaction';
 
 /** Onboarding funnel step identifiers (FTUE state machine). */
 export type OnboardingStep =
@@ -715,6 +717,21 @@ export const trackOnboardingFirstWord = (
   trackGrowthEvent('onboarding_first_word_found', { word, attemptNumber, ...extras });
 };
 
+/** Modal action discriminator for funnel analysis. */
+export type ModalAction = 'shown' | 'dismissed' | 'confirmed';
+
+/**
+ * Track modal shown / dismissed / confirmed (quit-confirm, streak-broken, etc).
+ * Single event + action discriminator → clean PostHog funnels.
+ */
+export const trackModalInteraction = (
+  modalId: string,
+  action: ModalAction,
+  extras: Record<string, unknown> = {},
+): void => {
+  trackGrowthEvent('modal_interaction', { modalId, action, ...extras });
+};
+
 export const trackLanguageChanged = (from: string, to: string): void => {
   if (from === to) return;
   trackGrowthEvent('language_changed', { from, to });
@@ -749,6 +766,7 @@ const growthTracking = {
   trackOnboardingStart,
   trackOnboardingStep,
   trackOnboardingFirstWord,
+  trackModalInteraction,
   trackRewardedAdOffered,
   trackRewardedAdWatched,
   trackRewardedAdDeclined,

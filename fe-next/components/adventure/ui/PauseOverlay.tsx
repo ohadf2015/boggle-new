@@ -191,6 +191,7 @@ export const PauseOverlay = memo(function PauseOverlay({
         description={t('adventure.game.confirmRestartDesc')}
         onConfirm={onRestart}
         variant="warning"
+        analyticsId="adventure_restart_confirm"
       />
 
       <ConfirmationDialog
@@ -200,6 +201,7 @@ export const PauseOverlay = memo(function PauseOverlay({
         description={t('adventure.game.confirmExitDesc')}
         onConfirm={onExit}
         variant="danger"
+        analyticsId="adventure_exit_confirm"
       />
     </>
   );

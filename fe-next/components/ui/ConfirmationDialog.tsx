@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useRef, useCallback } from 'react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -12,6 +13,7 @@ import {
 } from './alert-dialog';
 import { cn } from '../../lib/utils';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { trackModalInteraction } from '../../utils/growthTracking';
 
 export type ConfirmationDialogVariant = 'danger' | 'warning' | 'default';
 
@@ -34,6 +36,11 @@ interface ConfirmationDialogProps {
   variant?: ConfirmationDialogVariant;
   /** Additional className for the content wrapper */
   className?: string;
+  /** Opt-in analytics id. When set, fires `modal_interaction` growth events
+   *  (`shown` / `dismissed` / `confirmed`) for funnel tracking. */
+  analyticsId?: string;
+  /** Extra context merged into all analytics payloads for this dialog. */
+  analyticsExtras?: Record<string, unknown>;
 }
 
 const variantStyles: Record<ConfirmationDialogVariant, {
@@ -92,10 +99,41 @@ export function ConfirmationDialog({
   onConfirm,
   variant = 'danger',
   className,
+  analyticsId,
+  analyticsExtras,
 }: ConfirmationDialogProps) {
   const { dir, t } = useLanguage();
   const styles = variantStyles[variant];
   const isRtl = dir === 'rtl';
+
+  const prevOpenRef = useRef(false);
+  const confirmedRef = useRef(false);
+
+  useEffect(() => {
+    if (!analyticsId) {
+      prevOpenRef.current = open;
+      return;
+    }
+    const prev = prevOpenRef.current;
+    if (!prev && open) {
+      confirmedRef.current = false;
+      trackModalInteraction(analyticsId, 'shown', analyticsExtras);
+    } else if (prev && !open) {
+      if (!confirmedRef.current) {
+        trackModalInteraction(analyticsId, 'dismissed', analyticsExtras);
+      }
+      confirmedRef.current = false;
+    }
+    prevOpenRef.current = open;
+  }, [open, analyticsId, analyticsExtras]);
+
+  const handleConfirm = useCallback(() => {
+    if (analyticsId) {
+      confirmedRef.current = true;
+      trackModalInteraction(analyticsId, 'confirmed', analyticsExtras);
+    }
+    onConfirm();
+  }, [analyticsId, analyticsExtras, onConfirm]);
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
@@ -127,7 +165,7 @@ export function ConfirmationDialog({
             {cancelText || t('common.cancel')}
           </AlertDialogCancel>
           <AlertDialogAction
-            onClick={onConfirm}
+            onClick={handleConfirm}
             className={styles.confirm}
           >
             {confirmText || t('common.confirm')}

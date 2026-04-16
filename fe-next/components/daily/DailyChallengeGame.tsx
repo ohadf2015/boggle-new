@@ -516,6 +516,7 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
         cancelText={t('common.cancel')}
         onConfirm={handleConfirmQuit}
         variant="danger"
+        analyticsId="daily_quit_confirm"
       />
 
       {/* Score popup fly animation - shows +N when a word is accepted */}

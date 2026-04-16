@@ -364,6 +364,8 @@ export function DesktopGameLayout({
         cancelText={t('common.cancel')}
         onConfirm={onConfirmQuit}
         variant="danger"
+        analyticsId="sp_quit_confirm"
+        analyticsExtras={{ layout: 'desktop' }}
       />
 
       {/* Screen reader status */}
