@@ -6356,6 +6356,11 @@ const sv = {
       "description": "Utforska 10 temavärldar, bekämpa bossar och förbättra dina ordkunskaper. Tryck på Värld 1 för att börja!",
       "startButton": "Starta Värld 1"
     },
+    "hubWelcome": {
+      "title": "Du klarade det!",
+      "description": "Det här är ditt Center — kolla sviter, dagliga uppdrag och hoppa in i nästa nivå. Det blir bättre ju mer du spelar!",
+      "exploreButton": "Kör igång"
+    },
     "story": {
       "lexi": "Lexi",
       "w1": {

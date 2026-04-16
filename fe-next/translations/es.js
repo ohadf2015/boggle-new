@@ -6393,6 +6393,11 @@ const es = {
       "description": "Explora 10 mundos temáticos, lucha contra jefes y mejora tus habilidades con las palabras. ¡Toca Mundo 1 para comenzar!",
       "startButton": "Iniciar Mundo 1"
     },
+    "hubWelcome": {
+      "title": "¡Lo lograste!",
+      "description": "Este es tu Centro — revisa rachas, misiones diarias y salta al siguiente nivel. ¡Mejora cuanto más juegues!",
+      "exploreButton": "¡Vamos!"
+    },
     "story": {
       "lexi": "Lexi",
       "w1": {

@@ -39,6 +39,7 @@ import { AdventureGameErrorBoundary } from './AdventureGameErrorBoundary';
 import { useBossRush } from './hooks/useBossRush';
 import BossRushResults from './BossRushResults';
 import AdventureHub from './AdventureHub';
+import { HubWelcomeBanner } from './HubWelcomeBanner';
 import RunePanel from './RunePanel';
 import { useDailyQuests } from '@/hooks/useDailyQuests';
 import { forgeRune as forgeRuneLogic, equipRune as equipRuneLogic, unequipRune as unequipRuneLogic } from '@/lib/adventure/runeCatalog';
@@ -65,6 +66,10 @@ function AdventureView(): React.JSX.Element {
   const [showRunes, setShowRunes] = useState(false);
   const [showCollection, setShowCollection] = useState(false);
   const [showAchievements, setShowAchievements] = useState(false);
+  const [hubWelcomeDismissed, setHubWelcomeDismissed] = useState(() => {
+    if (typeof window === 'undefined') return true;
+    return localStorage.getItem('adventure_hub_welcome_dismissed') === '1';
+  });
 
   // Stable callbacks for modal toggles — prevents child re-renders via memo
   const openShop = useCallback(() => setShowShop(true), []);
@@ -77,6 +82,10 @@ function AdventureView(): React.JSX.Element {
   const closeCollection = useCallback(() => setShowCollection(false), []);
   const openAchievements = useCallback(() => setShowAchievements(true), []);
   const closeAchievements = useCallback(() => setShowAchievements(false), []);
+  const dismissHubWelcome = useCallback(() => {
+    setHubWelcomeDismissed(true);
+    localStorage.setItem('adventure_hub_welcome_dismissed', '1');
+  }, []);
   const { stopMusic: stopGlobalMusic } = useMusic();
   const setIsInGame = useHideNavigation();
 
@@ -481,6 +490,7 @@ function AdventureView(): React.JSX.Element {
                 collectionCount={inventory.length}
                 onOpenAchievements={openAchievements}
                 weeklyModifiers={weeklyModifiers}
+                welcomeBanner={!hubWelcomeDismissed ? <HubWelcomeBanner t={t} onDismiss={dismissHubWelcome} /> : undefined}
               />
             </AdaptiveMotion.div>
           )}

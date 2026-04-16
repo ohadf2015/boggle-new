@@ -60,6 +60,7 @@ interface AdventureHubProps {
   onOpenAchievements?: () => void;
   ascensionLevel?: number;
   weeklyModifiers?: WeeklyModifier[];
+  welcomeBanner?: React.ReactNode;
 }
 
 // ==============================================
@@ -110,6 +111,7 @@ const AdventureHub = memo<AdventureHubProps>(({
   onOpenAchievements,
   ascensionLevel = 0,
   weeklyModifiers = [],
+  welcomeBanner,
 }) => {
   const { t } = useLanguageSafe();
   const multiplier = getStreakMultiplier(streakDays);
@@ -186,6 +188,7 @@ const AdventureHub = memo<AdventureHubProps>(({
 
       {/* Content area */}
       <div className="flex flex-col gap-4 px-4 py-4 pb-20 flex-1">
+        {welcomeBanner}
 
         {/* Streak + Daily Quests — single compact row */}
         <AdaptiveMotion.div

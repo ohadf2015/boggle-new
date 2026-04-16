@@ -26,6 +26,11 @@ import {
   isWorldUnlocked as checkWorldUnlocked,
   isLevelUnlocked as checkLevelUnlocked,
 } from '@/lib/adventure';
+import {
+  enqueueCompletion,
+  dequeueCompletion,
+  peekQueue,
+} from '@/lib/adventure/offlineCompletionQueue';
 
 // ==============================================
 // LOCAL STORAGE CACHE
@@ -559,6 +564,21 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
         return true;
       } catch (err) {
         logger.warn('[ProgressionContext] Complete level error:', err instanceof Error ? err.message : err);
+
+        // Queue for offline replay only on network errors (TypeError = fetch failed).
+        // Server 4xx rejections would fail again on replay, so skip those.
+        if (err instanceof TypeError) {
+          enqueueCompletion({
+            world, level, stars, score, words,
+            ...(goldEarned !== undefined && { goldEarned }),
+            ...(longWords !== undefined && { longWords }),
+            ...(wordsFound && wordsFound.length > 0 && { wordsFound }),
+            ...(flashChallengeGold !== undefined && flashChallengeGold > 0 && { flashChallengeGold }),
+            queuedAt: Date.now(),
+          });
+          logger.info('[ProgressionContext] Queued level completion for offline replay:', `${world}-${level}`);
+        }
+
         return false;
       } finally {
         completeLevelInFlightRef.current = null;
@@ -859,6 +879,27 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
       }
     };
   }, [flushQuestProgress]);
+
+  // Flush offline completion queue when connectivity returns
+  useEffect(() => {
+    const flushOfflineQueue = async () => {
+      const queued = peekQueue();
+      if (queued.length === 0) return;
+      logger.info('[ProgressionContext] Online — flushing', queued.length, 'queued completions');
+
+      let item = dequeueCompletion();
+      while (item) {
+        await completeLevel(
+          item.world, item.level, item.stars, item.score, item.words,
+          item.goldEarned, item.longWords, item.wordsFound, item.flashChallengeGold,
+        );
+        item = dequeueCompletion();
+      }
+    };
+
+    window.addEventListener('online', flushOfflineQueue);
+    return () => window.removeEventListener('online', flushOfflineQueue);
+  }, [completeLevel]);
 
   // Split context values for selective re-rendering
   const dataValue = useMemo<ProgressionDataContextType>(

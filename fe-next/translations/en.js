@@ -6437,6 +6437,11 @@ const en = {
       "description": "Explore 10 themed worlds, battle bosses, and level up your word skills. Tap World 1 to begin your journey!",
       "startButton": "Start World 1"
     },
+    "hubWelcome": {
+      "title": "You Made It!",
+      "description": "This is your Hub — check streaks, daily quests, and jump into the next level. It gets better the more you play!",
+      "exploreButton": "Let's Go"
+    },
     "story": {
       "lexi": "Lexi",
       "w1": {
