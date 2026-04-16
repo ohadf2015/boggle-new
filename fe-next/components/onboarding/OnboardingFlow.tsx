@@ -1,12 +1,16 @@
 'use client';
 
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { markOnboardingComplete, consumePendingRoomInvite, hasPendingRoomInvite } from '@/utils/onboardingStorage';
 import { markGuidanceShown } from '@/utils/contextualGuidanceStorage';
 import { setStoredCustomAvatar } from '@/utils/profileStorage';
+import {
+  trackOnboardingStart,
+  trackOnboardingStep,
+} from '@/utils/growthTracking';
 import { type CustomAvatarConfig } from '@/shared/types/customAvatar';
 import LanguageSelect from './LanguageSelect';
 import TutorialGame from './TutorialGame';
@@ -47,12 +51,17 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
   const [step, setStep] = useState<FlowStep>('language');
   const [tutorialScore, setTutorialScore] = useState(0);
   const [, setTutorialWords] = useState<string[]>([]);
+  const [tutorialAttempt, setTutorialAttempt] = useState(1);
   const [playerName, setPlayerName] = useState('');
   const [, setPlayerAvatar] = useState<CustomAvatarConfig | null>(null);
   // Gate re-entry + show overlay once we've committed to a route navigation.
   // Route transitions are outside React's lifecycle, so the modal would otherwise
   // sit silently while Next.js fetches the destination page.
   const [isNavigating, setIsNavigating] = useState(false);
+
+  useEffect(() => {
+    trackOnboardingStart();
+  }, []);
 
   const stepIndex = useMemo(() => STEPS.indexOf(step), [step]);
   const accent = STEP_ACCENTS[step];
@@ -63,6 +72,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
       setTutorialScore(score);
       setTutorialWords(wordsFound);
       markGuidanceShown('firstPlayTutorialCompleted');
+      trackOnboardingStep('tutorial', { score, wordCount: wordsFound.length });
       setStep('profile');
     },
     []
@@ -75,8 +85,11 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
       setPlayerAvatar(avatar);
       setStoredCustomAvatar(avatar);
 
+      const pendingInvite = hasPendingRoomInvite();
+      trackOnboardingStep('profile', { hasPendingInvite: pendingInvite });
+
       // If player arrived via room invite, skip scoreReveal + fork — go straight to the room
-      if (hasPendingRoomInvite()) {
+      if (pendingInvite) {
         markOnboardingComplete({
           avatarId: 'custom',
           displayName: name,
@@ -95,13 +108,16 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
   );
 
 
-  // Step 3: Try again (restart tutorial)
+  // Step 3: Try again (restart tutorial) — retries are a friction signal for PostHog
   const handleTryAgain = useCallback(() => {
+    trackOnboardingStep('score_reveal', { action: 'retry' });
+    setTutorialAttempt((n) => n + 1);
     setStep('tutorial');
   }, []);
 
   // Step 3: Continue to fork
   const handleContinue = useCallback(() => {
+    trackOnboardingStep('score_reveal', { action: 'continue' });
     setStep('fork');
   }, []);
 
@@ -111,6 +127,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
       // Prevent double-taps from stacking router pushes during navigation
       if (isNavigating) return;
       setIsNavigating(true);
+      trackOnboardingStep('mode_select', { mode });
       markOnboardingComplete({
         avatarId: 'custom',
         displayName: playerName || 'Player',
@@ -142,6 +159,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
 
   // Step 0: Language selected — proceed to tutorial
   const handleLanguageSelect = useCallback(() => {
+    trackOnboardingStep('language');
     setStep('tutorial');
   }, []);
 
@@ -150,7 +168,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
       case 'language':
         return <LanguageSelect onSelect={handleLanguageSelect} />;
       case 'tutorial':
-        return <TutorialGame onComplete={handleTutorialComplete} />;
+        return <TutorialGame onComplete={handleTutorialComplete} attemptNumber={tutorialAttempt} />;
       case 'profile':
         return (
           <QuickProfileSetup

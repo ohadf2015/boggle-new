@@ -81,7 +81,19 @@ export type GrowthEvent =
   | 'rewarded_ad_watched'
   | 'rewarded_ad_declined'
   // Preference
-  | 'language_changed';
+  | 'language_changed'
+  // Onboarding funnel
+  | 'onboarding_started'
+  | 'onboarding_step_completed'
+  | 'onboarding_first_word_found';
+
+/** Onboarding funnel step identifiers (FTUE state machine). */
+export type OnboardingStep =
+  | 'language'
+  | 'tutorial'
+  | 'profile'
+  | 'score_reveal'
+  | 'mode_select';
 
 export interface GrowthEventData {
   // Common properties
@@ -671,6 +683,38 @@ export const trackRewardedAdDeclined = (
   trackGrowthEvent('rewarded_ad_declined', { reason, platform, surface });
 };
 
+/**
+ * Onboarding funnel — fires once on mount of OnboardingFlow.
+ * Paired with `onboarding_step_completed` to build FTUE funnel in PostHog.
+ */
+export const trackOnboardingStart = (extras: Record<string, unknown> = {}): void => {
+  trackGrowthEvent('onboarding_started', extras);
+};
+
+/**
+ * Onboarding step completion — fires as the user advances through the FTUE.
+ * For `score_reveal`, `action: 'retry' | 'continue'` discriminates friction
+ * (retries hit the tutorial loop; continues progress to mode fork).
+ */
+export const trackOnboardingStep = (
+  step: OnboardingStep,
+  extras: Record<string, unknown> = {},
+): void => {
+  trackGrowthEvent('onboarding_step_completed', { step, ...extras });
+};
+
+/**
+ * Onboarding tutorial activation — fires on first word found per attempt.
+ * `attemptNumber` preserves retry-loop signal (1 = first try; >1 = after score-reveal retry).
+ */
+export const trackOnboardingFirstWord = (
+  word: string,
+  attemptNumber: number,
+  extras: Record<string, unknown> = {},
+): void => {
+  trackGrowthEvent('onboarding_first_word_found', { word, attemptNumber, ...extras });
+};
+
 export const trackLanguageChanged = (from: string, to: string): void => {
   if (from === to) return;
   trackGrowthEvent('language_changed', { from, to });
@@ -702,6 +746,9 @@ const growthTracking = {
   trackDailyPuzzle,
   trackHintUsed,
   trackLanguageChanged,
+  trackOnboardingStart,
+  trackOnboardingStep,
+  trackOnboardingFirstWord,
   trackRewardedAdOffered,
   trackRewardedAdWatched,
   trackRewardedAdDeclined,

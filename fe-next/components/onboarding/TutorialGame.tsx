@@ -5,11 +5,15 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Mascot } from '@/components/ui/Mascot';
+import { trackOnboardingFirstWord } from '@/utils/growthTracking';
 import MiniGrid from './MiniGrid';
 import { getTutorialBoard, isValidTutorialWord } from './tutorialBoardConfig';
 
 interface TutorialGameProps {
   onComplete: (score: number, wordsFound: string[]) => void;
+  /** Retry index from parent — increments on each "Try Again". PostHog uses it
+   *  to join the first-word event to score_reveal:retry friction. */
+  attemptNumber?: number;
 }
 
 const WORDS_GOAL = 3;
@@ -21,14 +25,13 @@ const LONG_WORD_LENGTH = 5;
  * After 3 words: combo celebration.
  * After 5+ letter word: confetti + "AMAZING!" celebration.
  */
-const TutorialGame: React.FC<TutorialGameProps> = ({ onComplete }) => {
+const TutorialGame: React.FC<TutorialGameProps> = ({ onComplete, attemptNumber = 1 }) => {
   const { t, language } = useLanguage();
 
   const board = useMemo(() => getTutorialBoard(language), [language]);
   const [wordsFound, setWordsFound] = useState<string[]>([]);
   const [score, setScore] = useState(0);
   const [showAmazing, setShowAmazing] = useState(false);
-  const [showCombo, setShowCombo] = useState(false);
   const [completed, setCompleted] = useState(false);
 
   // Current demo word to guide the player (first target not yet found)
@@ -41,6 +44,12 @@ const TutorialGame: React.FC<TutorialGameProps> = ({ onComplete }) => {
       const upperWord = word.toUpperCase();
       if (wordsFound.includes(upperWord)) return;
       if (!isValidTutorialWord(upperWord, language)) return;
+
+      // First valid word this mount — friction-signal event for the FTUE funnel.
+      // Checked BEFORE setWordsFound so the fire can't leak twice under StrictMode.
+      if (wordsFound.length === 0) {
+        trackOnboardingFirstWord(upperWord, attemptNumber);
+      }
 
       const newWords = [...wordsFound, upperWord];
       const wordScore = upperWord.length * 10;
@@ -57,14 +66,13 @@ const TutorialGame: React.FC<TutorialGameProps> = ({ onComplete }) => {
 
       // Check for 3 words goal
       if (newWords.length >= WORDS_GOAL && !completed) {
-        setShowCombo(true);
         setCompleted(true);
         setTimeout(() => {
           onComplete(newScore, newWords);
-        }, 2000);
+        }, 600);
       }
     },
-    [wordsFound, score, language, showAmazing, completed, onComplete]
+    [wordsFound, score, language, showAmazing, completed, onComplete, attemptNumber]
   );
 
   const handleDemoComplete = useCallback(() => {
@@ -170,24 +178,6 @@ const TutorialGame: React.FC<TutorialGameProps> = ({ onComplete }) => {
         )}
       </AnimatePresence>
 
-      {/* Combo celebration for reaching 3 words */}
-      <AnimatePresence>
-        {showCombo && (
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            exit={{ scale: 0, opacity: 0 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-            className="absolute inset-0 flex items-center justify-center pointer-events-none z-40"
-          >
-            <div className="bg-neo-cyan border-4 border-neo-black rounded-neo px-6 py-3 shadow-hard-lg">
-              <span className="text-2xl font-black text-neo-white">
-                {t('onboarding.ftue.keepGoing', 'COMBO!')}
-              </span>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 };
