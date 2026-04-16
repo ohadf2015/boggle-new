@@ -140,6 +140,7 @@ export function useAdventureGameCallbacks(params: UseAdventureGameCallbacksParam
     if (gameStars > 0 && comboCount >= wordsFoundList.length && wordsFoundList.length > 0) {
       recordFullComboLevel();
     }
+    if (gameStars === 3) handleEarnAchievement('LEVEL_MASTER');
     const newTotalStars = (totalStars ?? 0) + gameStars;
     if (newTotalStars >= 50) handleEarnAchievement('STAR_COLLECTOR_50');
     if (newTotalStars >= 100) handleEarnAchievement('STAR_COLLECTOR_100');

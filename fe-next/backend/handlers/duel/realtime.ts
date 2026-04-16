@@ -279,6 +279,7 @@ async function completeRealtimeDuel(
       })
       .eq('id', duelId)
       .eq('status', 'active') // Only update if still active
+      .eq('xp_awarded', false) // Prevent double XP if completion races with forfeit
       .select();
 
     if (updateError) {

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import AboutPageClient from './PageClient';
+import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
 
 interface PageProps {
   params: Promise<{ locale: string }>;
@@ -23,9 +24,26 @@ const descriptionMap: Record<string, string> = {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale } = await params;
+  const title = titleMap[locale] || titleMap.en;
+  const description = descriptionMap[locale] || descriptionMap.en;
+
   return {
-    title: titleMap[locale] || titleMap.en,
-    description: descriptionMap[locale] || descriptionMap.en,
+    title,
+    description,
+    openGraph: {
+      type: 'website',
+      title,
+      description,
+      url: `https://www.lexiclash.live/${locale}/about`,
+      siteName: 'LexiClash',
+      images: [{ url: 'https://www.lexiclash.live/og-image-en.webp', width: 1200, height: 630, alt: title }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: ['https://www.lexiclash.live/og-image-en.webp'],
+    },
     alternates: {
       canonical: `https://www.lexiclash.live/${locale}/about`,
       languages: {
@@ -108,6 +126,65 @@ export default async function AboutPage({ params }: PageProps) {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schemas) }} />
       <AboutPageClient />
+      {(() => {
+        const aboutSeoContent: Record<string, {
+          title: string; description: string; features: string[];
+          faq: { question: string; answer: string }[];
+        }> = {
+          en: {
+            title: 'About LexiClash — Our Story, Mission & Team',
+            description: 'LexiClash is a free, real-time multiplayer word game built for players who love language. Founded in 2024, our mission is to make word games accessible, competitive, and fun for everyone — in any language.',
+            features: [
+              'Free multiplayer word game with no ads blocking gameplay',
+              'Available in 5 languages — English, Hebrew, Swedish, Japanese, and Spanish',
+              'Multiple game modes — Classic, Blast, Word Hunt, Adventure, and Daily Challenges',
+              'Built for phones, tablets, and Party TV screens',
+              'Open to players worldwide with real-time matchmaking',
+            ],
+            faq: [
+              { question: 'Who made LexiClash?', answer: 'LexiClash was created by a small team passionate about word games and language learning. We are based in Israel and serve players worldwide.' },
+              { question: 'Is LexiClash free?', answer: 'Yes — LexiClash is completely free to play. All game modes, daily challenges, and multiplayer features are available without payment.' },
+              { question: 'How can I contact the LexiClash team?', answer: 'Visit our Contact page to reach us with feedback, bug reports, partnership inquiries, or any questions.' },
+            ],
+          },
+          he: {
+            title: 'אודות LexiClash — הסיפור, המשימה והצוות שלנו',
+            description: 'LexiClash הוא משחק מילים מרובה משתתפים חינמי בזמן אמת. הוקם ב-2024 עם המטרה להנגיש משחקי מילים לכולם.',
+            features: ['משחק מילים מרובה משתתפים חינמי', 'זמין ב-5 שפות', 'מצבי משחק מגוונים — קלאסי, בלאסט, ציד מילים, הרפתקה ואתגרים יומיים'],
+            faq: [{ question: 'מי יצר את LexiClash?', answer: 'LexiClash נוצר על ידי צוות קטן שנלהב ממשחקי מילים ולמידת שפות. אנחנו מבוססים בישראל ומשרתים שחקנים ברחבי העולם.' }],
+          },
+          sv: {
+            title: 'Om LexiClash — Vårt Uppdrag, Berättelse & Team',
+            description: 'LexiClash är ett gratis multiplayer-ordspel i realtid. Grundat 2024 med uppdraget att göra ordspel tillgängliga för alla.',
+            features: ['Gratis multiplayer-ordspel utan annonser', 'Tillgängligt på 5 språk', 'Flera spellägen — Klassiskt, Blast, Word Hunt och mer'],
+            faq: [{ question: 'Vem skapade LexiClash?', answer: 'LexiClash skapades av ett litet team som brinner för ordspel. Vi är baserade i Israel och betjänar spelare världen över.' }],
+          },
+          ja: {
+            title: 'LexiClashについて — ミッション、ストーリーとチーム',
+            description: 'LexiClashは無料のリアルタイムマルチプレイヤーワードゲーム。2024年設立、すべての人にワードゲームを届けることが使命です。',
+            features: ['広告なしの無料マルチプレイヤーワードゲーム', '5言語対応', '複数のゲームモード — クラシック、ブラスト、ワードハントなど'],
+            faq: [{ question: 'LexiClashを作ったのは？', answer: 'LexiClashはワードゲームと言語学習に情熱を持つ小さなチームが作りました。イスラエルを拠点に世界中のプレイヤーにサービスを提供しています。' }],
+          },
+          es: {
+            title: 'Sobre LexiClash — Nuestra Historia, Misión y Equipo',
+            description: 'LexiClash es un juego de palabras multijugador gratuito en tiempo real. Fundado en 2024, nuestra misión es hacer los juegos de palabras accesibles para todos.',
+            features: ['Juego de palabras multijugador gratuito sin anuncios', 'Disponible en 5 idiomas', 'Múltiples modos de juego — Clásico, Blast, Word Hunt y más'],
+            faq: [
+              { question: '¿Quién creó LexiClash?', answer: 'LexiClash fue creado por un equipo apasionado por los juegos de palabras. Estamos basados en Israel y servimos a jugadores de todo el mundo.' },
+              { question: '¿Es LexiClash gratis?', answer: 'Sí — LexiClash es completamente gratis. Todos los modos, desafíos diarios y funciones multijugador están disponibles sin pago.' },
+            ],
+          },
+        };
+        const aboutData = aboutSeoContent[locale] ?? aboutSeoContent.en;
+        return (
+          <GamePageSeoContent
+            title={aboutData.title}
+            description={aboutData.description}
+            features={aboutData.features}
+            faq={aboutData.faq}
+          />
+        );
+      })()}
     </>
   );
 }

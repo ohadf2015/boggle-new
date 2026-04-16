@@ -642,6 +642,7 @@ export async function unsubscribeByToken(token: string): Promise<{ success: bool
     return { success: false, error: 'Database not configured' };
   }
 
+  // Try profiles first (registered users)
   const { data, error } = await supabase
     .from('profiles')
     .update({ daily_email_subscribed: false })
@@ -649,13 +650,62 @@ export async function unsubscribeByToken(token: string): Promise<{ success: bool
     .select('id')
     .single();
 
-  if (error || !data) {
-    logger.error('EMAIL', 'Unsubscribe error:', error);
+  if (data && !error) {
+    logger.info('EMAIL', `User ${data.id} unsubscribed successfully`);
+    return { success: true };
+  }
+
+  // Fallback: check email_subscribers (marketing signups)
+  const { data: subData, error: subError } = await supabase
+    .from('email_subscribers')
+    .update({ is_active: false })
+    .eq('unsubscribe_token', token)
+    .select('email');
+
+  if (subError || !subData || subData.length === 0) {
+    logger.error('EMAIL', 'Unsubscribe error: token not found in profiles or subscribers');
     return { success: false, error: 'Invalid or expired unsubscribe link' };
   }
 
-  logger.info('EMAIL', `User ${data.id} unsubscribed successfully`);
+  logger.info('EMAIL', `Subscriber ${subData[0].email} unsubscribed successfully`);
   return { success: true };
+}
+
+export interface SubscriberRecipient {
+  id: number;
+  email: string;
+  language: string;
+  unsubscribe_token: string;
+}
+
+const CAMPAIGN_ANTI_SPAM_DAYS = 14;
+
+/**
+ * Get eligible marketing subscribers for campaign emails.
+ * Filters: is_active = true, anti-spam interval (14 days), deduped against registered user emails.
+ */
+export async function getSubscriberRecipients(
+  registeredEmails: Set<string>
+): Promise<SubscriberRecipient[]> {
+  const supabase = getSupabaseAdmin();
+  if (!supabase) return [];
+
+  const cutoff = new Date(Date.now() - CAMPAIGN_ANTI_SPAM_DAYS * 24 * 60 * 60 * 1000).toISOString();
+
+  const { data, error } = await supabase
+    .from('email_subscribers')
+    .select('id, email, language, unsubscribe_token, last_campaign_email_sent_at')
+    .eq('is_active', true)
+    .or(`last_campaign_email_sent_at.is.null,last_campaign_email_sent_at.lte.${cutoff}`);
+
+  if (error || !data) {
+    logger.error('EMAIL', 'Failed to fetch subscriber recipients:', error);
+    return [];
+  }
+
+  return data.filter(
+    (s: { email: string }) => !registeredEmails.has(s.email)
+  ) as SubscriberRecipient[];
 }
 
 /**

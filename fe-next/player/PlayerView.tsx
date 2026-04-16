@@ -464,7 +464,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
   const showGameView = gameActive || (hasGameData && !waitingForResults);
 
   // Map game mode to display label
-  const modeRevealLabel = gameMode === 'blast' ? t('countdown.modeReveal.blast') : gameMode === 'word-hunt' ? t('countdown.modeReveal.wordHunt') : t('countdown.modeReveal.classic');
+  const modeRevealLabel = gameMode === 'blast' ? t('countdown.modeReveal.blast') : gameMode === 'word-hunt' ? t('countdown.modeReveal.wordHunt') : gameMode === 'wheel-rush' ? t('countdown.modeReveal.wheelRush') : t('countdown.modeReveal.classic');
 
   if (!showGameView && !waitingForResults) {
     // Show loading indicator when server is preparing the game

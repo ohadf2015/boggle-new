@@ -510,6 +510,11 @@ const he = {
       "navigation": "ניווט"
     }
   },
+  "presence": {
+    "active": "פעיל",
+    "idle": "לא זמין",
+    "afk": "לא ליד המכשיר"
+  },
   "nav": {
     "bottomNavigation": "ניווט תחתון",
     "gameNavigation": "ניווט משחק",
@@ -640,6 +645,7 @@ const he = {
     "modeReveal": {
       "blast": "פיצוץ!",
       "wordHunt": "ציד מילים!",
+      "wheelRush": "!גלגל מהיר",
       "classic": "קלאסי!"
     }
   },
@@ -6496,6 +6502,16 @@ const he = {
       "valor": { "name": "רונת אומץ", "desc": "+20% נזק לבוס" },
       "dragonslayer": { "name": "רונת קוטל דרקונים", "desc": "+50% נזק לבוס" }
     },
+    "achievements": {
+      "title": "הישגים",
+      "earned": "הושגו",
+      "categories": {
+        "gameplay": "משחק",
+        "bosses": "בוסים",
+        "progression": "התקדמות",
+        "mastery": "שליטה"
+      }
+    },
     "loading": "טוען הרפתקה...",
     "currency": {
       "goldAmount": "{amount} זהב",
@@ -10189,6 +10205,7 @@ const he = {
     "spectators": "צופים",
     "playersJoined": "שחקנים הצטרפו",
     "needMore": "צריך עוד שחקנים",
+    "host": "מארח",
     "waiting": "...",
     "startGame": "התחל משחק",
     "round": "סיבוב",

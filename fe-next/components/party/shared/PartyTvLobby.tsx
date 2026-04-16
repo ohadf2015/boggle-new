@@ -77,7 +77,7 @@ function PartyTvLobbyInner({ room, gameDef, isHost, onStartGame, error }: PartyT
           {/* Room Code */}
           <div className="text-center">
             <p className="text-neo-cream/50 font-neo-body text-sm uppercase tracking-wider mb-2">
-              {t('party.roomCode') || 'Room Code'}
+              {t('party.roomCode')}
             </p>
             <div className={`border-4 ${accentClasses.split(' ')[1]} rounded-neo-lg px-8 py-4 bg-neo-navy`}>
               <span className={`font-neo-display text-6xl tracking-[0.4em] ${accentClasses.split(' ')[0]}`}>
@@ -85,7 +85,7 @@ function PartyTvLobbyInner({ room, gameDef, isHost, onStartGame, error }: PartyT
               </span>
             </div>
             <p className="text-neo-cream/30 font-neo-body text-xs mt-2">
-              {t('party.scanOrEnter') || 'Scan QR or enter code at lexiclash.live'}
+              {t('party.scanOrEnter')}
             </p>
           </div>
         </div>
@@ -101,7 +101,7 @@ function PartyTvLobbyInner({ room, gameDef, isHost, onStartGame, error }: PartyT
                 {p.username}
               </span>
               {p.isHost && (
-                <span className="ml-2 text-neo-lime text-xs font-bold uppercase">Host</span>
+                <span className="ms-2 text-neo-lime text-xs font-bold uppercase">{t('party.host')}</span>
               )}
             </div>
           ))}
@@ -113,7 +113,7 @@ function PartyTvLobbyInner({ room, gameDef, isHost, onStartGame, error }: PartyT
               className="border-3 border-dashed border-neo-cream/15 rounded-neo-lg px-4 py-3 animate-pulse"
             >
               <span className="font-neo-body text-neo-cream/20 text-lg">
-                {t('party.waiting') || '...'}
+                {t('party.waiting')}
               </span>
             </div>
           ))}
@@ -121,11 +121,11 @@ function PartyTvLobbyInner({ room, gameDef, isHost, onStartGame, error }: PartyT
 
         {/* Player Count */}
         <p className="text-center text-neo-cream/40 font-neo-body text-sm mb-6">
-          {playerCount}/{gameDef.maxPlayers} {t('party.players') || 'players'}
-          {spectators.length > 0 && ` + ${spectators.length} ${t('party.spectators') || 'spectators'}`}
+          {playerCount}/{gameDef.maxPlayers} {t('party.players')}
+          {spectators.length > 0 && ` + ${spectators.length} ${t('party.spectators')}`}
           {!canStart && (
-            <span className="ml-2 text-neo-red">
-              ({t('party.needMore') || `Need ${gameDef.minPlayers - playerCount} more`})
+            <span className="ms-2 text-neo-red">
+              ({t('party.needMore')})
             </span>
           )}
         </p>

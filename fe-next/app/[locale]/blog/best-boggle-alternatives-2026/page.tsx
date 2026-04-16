@@ -3,6 +3,7 @@ import { BlogPostingJsonLd, generateBlogMetadata } from '@/components/seo/BlogJs
 import { BreadcrumbJsonLd } from '@/components/seo/BreadcrumbJsonLd';
 import BoggleAlternativesPageClient from './PageClient';
 import { contentByLocale } from './content';
+import { faqByLocale } from './faq';
 
 interface PageProps {
   params: Promise<{ locale: string }>;
@@ -13,19 +14,19 @@ const DATE_PUBLISHED = '2025-12-01';
 const DATE_MODIFIED = '2026-03-15';
 
 const metaTitles: Record<string, string> = {
-  en: 'Best Boggle Alternatives 2026 - Free Online Games Like Boggle (No Download)',
-  he: 'חלופות הבוגל הטובות ביותר 2026 - משחקים כמו בוגל אונליין חינם',
-  sv: 'Bästa Boggle-Alternativen 2026 - Gratis Onlinespel Som Boggle',
-  ja: '2026年ベストBoggle代替ゲーム - 無料オンラインワードゲーム比較',
-  es: 'Mejores Alternativas a Boggle 2026 - Juegos Gratis Online Sin Descargar',
+  en: 'I Tried Every Boggle Alternative (2026) — Here\'s What\'s Actually Worth Playing',
+  he: 'ניסיתי כל חלופת בוגל ב-2026 — הנה מה שבאמת שווה לשחק',
+  sv: 'Jag testade alla Boggle-alternativ 2026 — Här är vad som faktiskt är värt att spela',
+  ja: 'Boggle代替ゲームを全部試した（2026年）— 本当に遊ぶ価値があるのはこれだ',
+  es: 'Probé todas las alternativas a Boggle (2026) — Esto es lo que vale la pena jugar',
 };
 
 const metaDescriptions: Record<string, string> = {
-  en: 'Looking for games like Boggle online free? Honest reviews of every Boggle alternative in 2026: Wordle, Words With Friends, Wordscapes, LexiClash — compared with real pros and cons. Play free, no download needed.',
-  he: 'מחפשים משחקים כמו בוגל אונליין חינם? ביקורות כנות על כל חלופת בוגל ב-2026 — וורדל, מילים עם חברים, LexiClash ועוד. ללא הורדה.',
-  sv: 'Letar du efter spel som Boggle online gratis? Ärliga recensioner av alla Boggle-alternativ 2026. Wordle, Words With Friends, LexiClash och fler — utan nedladdning.',
-  ja: 'Boggleのような無料オンラインゲームを探していますか？2026年のBoggle代替ゲームを本音レビュー。Wordle、Words With Friends、LexiClashなど — ダウンロード不要。',
-  es: '¿Buscas juegos como Boggle online gratis? Reseñas honestas de todas las alternativas a Boggle en 2026. Wordle, Words With Friends, LexiClash y más — sin descargar.',
+  en: 'Honest, slightly unhinged reviews of 6 Boggle alternatives. Which are pay-to-win garbage? Which are genuinely great? Wordle, Words With Friends, Wordscapes, LexiClash compared — play free, no download.',
+  he: 'ביקורות כנות (ומעט מטורפות) של 6 חלופות בוגל. מי זבל של pay-to-win ומי באמת שווה? וורדל, מילים עם חברים, LexiClash ועוד — חינם וללא הורדה.',
+  sv: 'Ärliga (och lite galna) recensioner av 6 Boggle-alternativ. Vilka är pay-to-win-skräp? Vilka är genuint bra? Wordle, Words With Friends, LexiClash jämförda — gratis, ingen nedladdning.',
+  ja: '6つのBoggle代替ゲームを本音レビュー。課金ゲーはどれ？本当に面白いのは？Wordle、Words With Friends、LexiClashを比較 — 無料・ダウンロード不要。',
+  es: 'Reseñas honestas (y algo locas) de 6 alternativas a Boggle. ¿Cuáles son basura pay-to-win? ¿Cuáles valen la pena? Wordle, Words With Friends, LexiClash comparados — gratis, sin descargar.',
 };
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -39,6 +40,26 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function BoggleAlternativesPage({ params }: PageProps) {
   const { locale } = await params;
   const content = contentByLocale[locale] || contentByLocale.en;
+  const faqs = faqByLocale[locale] || faqByLocale.en;
+
+  const wordCount = content.sections.reduce(
+    (sum, s) => sum + (s.title?.split(/\s+/).length ?? 0) + s.content.split(/\s+/).length,
+    0,
+  );
+
+  // Safe: all content from static faq.ts constants, not user input
+  const faqSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqs.map((faq) => ({
+      '@type': 'Question',
+      name: faq.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: faq.answer,
+      },
+    })),
+  };
 
   const siteUrl = 'https://www.lexiclash.live';
   return (
@@ -55,6 +76,11 @@ export default async function BoggleAlternativesPage({ params }: PageProps) {
         locale={locale}
         datePublished={DATE_PUBLISHED}
         dateModified={DATE_MODIFIED}
+        wordCount={wordCount}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
       <BoggleAlternativesPageClient />
     </>

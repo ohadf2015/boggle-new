@@ -64,6 +64,7 @@ function AdventureView(): React.JSX.Element {
   const [showWeeklyChallenge, setShowWeeklyChallenge] = useState(false);
   const [showRunes, setShowRunes] = useState(false);
   const [showCollection, setShowCollection] = useState(false);
+  const [showAchievements, setShowAchievements] = useState(false);
 
   // Stable callbacks for modal toggles — prevents child re-renders via memo
   const openShop = useCallback(() => setShowShop(true), []);
@@ -74,6 +75,8 @@ function AdventureView(): React.JSX.Element {
   const closeRunes = useCallback(() => setShowRunes(false), []);
   const openCollection = useCallback(() => setShowCollection(true), []);
   const closeCollection = useCallback(() => setShowCollection(false), []);
+  const openAchievements = useCallback(() => setShowAchievements(true), []);
+  const closeAchievements = useCallback(() => setShowAchievements(false), []);
   const { stopMusic: stopGlobalMusic } = useMusic();
   const setIsInGame = useHideNavigation();
 
@@ -445,6 +448,8 @@ function AdventureView(): React.JSX.Element {
         showCollection={showCollection}
         onCloseCollection={closeCollection}
         collectionInventory={inventory}
+        showAchievements={showAchievements}
+        onCloseAchievements={closeAchievements}
         t={t}
       />
 
@@ -469,11 +474,12 @@ function AdventureView(): React.JSX.Element {
                 wordAlbumCount={progression?.wordAlbum?.length}
                 onBossRush={() => { bossRush.startRush(); setViewState('bossRush'); }}
                 canBossRush={bossRush.canStartBossRush}
-                onOpenRunes={openRunes}
+                onOpenRunes={(progression?.currentWorld ?? 0) >= 3 ? openRunes : undefined}
                 runeCount={progression?.runes?.length}
-                onOpenWordAlbum={() => setShowWordAlbum(true)}
+                onOpenWordAlbum={(progression?.currentWorld ?? 0) >= 3 ? () => setShowWordAlbum(true) : undefined}
                 onOpenCollection={openCollection}
                 collectionCount={inventory.length}
+                onOpenAchievements={openAchievements}
                 weeklyModifiers={weeklyModifiers}
               />
             </AdaptiveMotion.div>

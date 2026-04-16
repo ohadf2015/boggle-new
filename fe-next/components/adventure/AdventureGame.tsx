@@ -164,6 +164,7 @@ const AdventureGame = memo<AdventureGameProps>(
         shuffleUses: init.upgradeEffects.shuffleUsesPerLevel,
         iceTileReduction: init.upgradeEffects.iceTileReduction,
       },
+      upgradeState: init.upgrades,
       language: language || 'en',
     });
 

@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { loadTranslation, type TranslationData } from '@/translations/loadTranslation';
 import WordSolverPageClient from './PageClient';
 import { getContent, type Locale } from './content';
+import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
 
 type ValidLocale = 'en' | 'he' | 'sv' | 'ja' | 'es';
 
@@ -142,6 +143,12 @@ export default async function WordSolverPage({ params }: PageParams) {
         />
       ))}
       <WordSolverPageClient />
+      <GamePageSeoContent
+        title={content.title}
+        description={content.metaDescription}
+        features={content.howToSteps}
+        faq={content.faqs}
+      />
     </>
   );
 }

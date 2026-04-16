@@ -13,6 +13,7 @@ import {
 import { ScrollReveal, StaggerReveal } from '../../_components/ScrollReveal';
 import { AnimatedCounter } from '../../_components/AnimatedCounter';
 import { PulseCTA } from '../../_components/PulseCTA';
+import { LETTER_CONTENT } from './letterContent';
 
 export const revalidate = 86400;
 
@@ -73,7 +74,7 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
         ['es-CO', `${BASE_URL}/es/words/starting-with/${letter}`],
       ]),
     },
-    robots: { index: true, follow: true },
+    robots: { index: locale === 'en', follow: true },
   };
 }
 
@@ -107,6 +108,7 @@ function buildSchemaJson(letter: string, locale: string, words: string[]): strin
       url: `${BASE_URL}/${locale}/words/${word}`,
     })),
   };
+  const letterInfo = LETTER_CONTENT[letter.toLowerCase()];
   const faq = {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
@@ -116,7 +118,7 @@ function buildSchemaJson(letter: string, locale: string, words: string[]): strin
         name: `How many words start with ${upper}?`,
         acceptedAnswer: {
           '@type': 'Answer',
-          text: `There are ${totalWords} words that start with the letter ${upper} in the LexiClash dictionary, ranging from ${shortest} to ${longest} letters long.`,
+          text: `There are ${totalWords} words that start with the letter ${upper} in the LexiClash dictionary, ranging from ${shortest} to ${longest} letters long. ${letterInfo?.funFact ?? ''}`,
         },
       },
       {
@@ -124,7 +126,7 @@ function buildSchemaJson(letter: string, locale: string, words: string[]): strin
         name: `What are common words that start with ${upper}?`,
         acceptedAnswer: {
           '@type': 'Answer',
-          text: `Some popular ${upper}- words include ${words.slice(0, 8).map(w => w.toUpperCase()).join(', ')}. Browse the full list organized by word length.`,
+          text: `Some popular ${upper}-words include ${words.slice(0, 8).map(w => w.toUpperCase()).join(', ')}. ${letterInfo?.intro ?? ''} Browse the full list organized by word length above.`,
         },
       },
       {
@@ -132,7 +134,15 @@ function buildSchemaJson(letter: string, locale: string, words: string[]): strin
         name: `Can I practice words starting with ${upper}?`,
         acceptedAnswer: {
           '@type': 'Answer',
-          text: `Yes! LexiClash is a free word game where you find words on a letter grid. Play singleplayer to practice ${upper}- words, or challenge friends in real-time multiplayer.`,
+          text: `Yes! LexiClash is a free word game where you find words on a letter grid. ${letterInfo?.strategy ?? ''} Play singleplayer to practice ${upper}-words, or challenge friends in real-time multiplayer.`,
+        },
+      },
+      {
+        '@type': 'Question',
+        name: `What is the highest-scoring ${upper}-word?`,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: `The highest-scoring word starting with ${upper} in LexiClash is ${words[words.length - 1]?.toUpperCase() ?? upper}, worth ${getWordScore(words[words.length - 1])} points. Longer words earn more points — find them on the grid to boost your score.`,
         },
       },
     ],
@@ -161,10 +171,10 @@ export default async function StartingWithLetterPage({ params }: PageParams) {
   const upper = letter.toUpperCase();
   const schemaJson = buildSchemaJson(letter, locale, words);
 
-  // Adjacent letters for navigation
   const letterIndex = VALID_LETTERS.indexOf(letter);
   const prevLetter = letterIndex > 0 ? VALID_LETTERS[letterIndex - 1] : null;
   const nextLetter = letterIndex < VALID_LETTERS.length - 1 ? VALID_LETTERS[letterIndex + 1] : null;
+  const letterInfo = LETTER_CONTENT[letter];
 
   return (
     <>
@@ -174,7 +184,6 @@ export default async function StartingWithLetterPage({ params }: PageParams) {
       <div className="min-h-screen bg-neo-navy text-neo-white">
         <div className="max-w-4xl mx-auto px-4 py-8">
 
-          {/* Breadcrumb */}
           <nav aria-label="Breadcrumb" className="mb-6 text-sm text-slate-400 flex items-center gap-2">
             <Link href={`/${locale}`} className="hover:text-neo-cyan transition-colors">Home</Link>
             <span aria-hidden="true">/</span>
@@ -195,7 +204,12 @@ export default async function StartingWithLetterPage({ params }: PageParams) {
                 </h1>
               </div>
             </div>
-            <p className="text-slate-300 text-lg leading-relaxed max-w-2xl">
+            {letterInfo && (
+              <p className="text-slate-300 text-lg leading-relaxed max-w-2xl mb-3">
+                {letterInfo.intro}
+              </p>
+            )}
+            <p className="text-slate-400 text-base leading-relaxed max-w-2xl">
               Complete list of words starting with {upper}, from {sortedLengths[0]}-letter
               to {sortedLengths[sortedLengths.length - 1]}-letter words. Each word shows its
               game score — tap any word for its definition.
@@ -271,7 +285,6 @@ export default async function StartingWithLetterPage({ params }: PageParams) {
             )}
           </div>
 
-          {/* Words by length — each group scroll-reveals */}
           <div className="space-y-8">
             {sortedLengths.map((len, groupIndex) => (
               <div key={len}>
@@ -363,33 +376,46 @@ export default async function StartingWithLetterPage({ params }: PageParams) {
                   How many words start with {upper}?
                   <span className="text-slate-500 group-open:rotate-180 transition-transform">▾</span>
                 </summary>
-                <p className="mt-3 text-slate-300 text-sm leading-relaxed">
-                  There are <strong className="text-neo-lime">{totalWords} words</strong> that start with the letter {upper} in the
-                  LexiClash dictionary, ranging from {sortedLengths[0]} to {sortedLengths[sortedLengths.length - 1]} letters long.
-                  The most common lengths are {sortedLengths.filter(l => (grouped[l]?.length ?? 0) > 5).slice(0, 3).join(', ')} letters.
-                </p>
+                <div className="mt-3 text-slate-300 text-sm leading-relaxed space-y-2">
+                  <p>
+                    There are <strong className="text-neo-lime">{totalWords} words</strong> that start with the letter {upper} in the
+                    LexiClash dictionary, ranging from {sortedLengths[0]} to {sortedLengths[sortedLengths.length - 1]} letters long.
+                    The most common lengths are {sortedLengths.filter(l => (grouped[l]?.length ?? 0) > 5).slice(0, 3).join(', ')} letters.
+                  </p>
+                  {letterInfo && (
+                    <p className="text-slate-400">{letterInfo.funFact}</p>
+                  )}
+                </div>
               </details>
               <details className="bg-slate-900 border-2 border-slate-700 rounded-neo p-4 group">
                 <summary className="font-bold text-neo-white cursor-pointer list-none flex items-center justify-between">
                   What are common words that start with {upper}?
                   <span className="text-slate-500 group-open:rotate-180 transition-transform">▾</span>
                 </summary>
-                <p className="mt-3 text-slate-300 text-sm leading-relaxed">
-                  Some popular {upper}-words include{' '}
-                  <strong>{words.slice(0, 8).map(w => w.toUpperCase()).join(', ')}</strong>.
-                  Browse the full list above organized by word length, with game scores for each word.
-                </p>
+                <div className="mt-3 text-slate-300 text-sm leading-relaxed space-y-2">
+                  <p>
+                    Some popular {upper}-words include{' '}
+                    <strong>{words.slice(0, 8).map(w => w.toUpperCase()).join(', ')}</strong>.
+                    Browse the full list above organized by word length, with game scores for each word.
+                  </p>
+                  {letterInfo && (
+                    <p className="text-slate-400">{letterInfo.intro}</p>
+                  )}
+                </div>
               </details>
               <details className="bg-slate-900 border-2 border-slate-700 rounded-neo p-4 group">
                 <summary className="font-bold text-neo-white cursor-pointer list-none flex items-center justify-between">
                   How can I practice words starting with {upper}?
                   <span className="text-slate-500 group-open:rotate-180 transition-transform">▾</span>
                 </summary>
-                <div className="mt-3 text-slate-300 text-sm leading-relaxed">
-                  <p className="mb-2">
+                <div className="mt-3 text-slate-300 text-sm leading-relaxed space-y-2">
+                  <p>
                     LexiClash is a free word game where you find words on a letter grid under time pressure.
                     It&apos;s the best way to practice vocabulary and improve your word skills.
                   </p>
+                  {letterInfo && (
+                    <p className="text-slate-400">{letterInfo.strategy}</p>
+                  )}
                   <Link
                     href={`/${locale}/singleplayer`}
                     className="inline-block bg-neo-lime text-neo-black font-bold px-4 py-2 rounded-neo border-2 border-neo-black shadow-hard-sm hover:shadow-hard-pressed active:translate-y-0.5 transition-all text-sm"
@@ -413,7 +439,6 @@ export default async function StartingWithLetterPage({ params }: PageParams) {
             </div>
           </ScrollReveal>
 
-          {/* Bottom CTA — final conversion push */}
           <ScrollReveal direction="scale" className="mt-10">
             <div className="bg-linear-to-r from-neo-lime/10 to-neo-pink/10 border-3 border-neo-lime rounded-neo p-6 shadow-hard text-center">
               <p className="font-neo-display font-black text-2xl text-neo-white mb-2">
@@ -433,7 +458,6 @@ export default async function StartingWithLetterPage({ params }: PageParams) {
             </div>
           </ScrollReveal>
 
-          {/* All letters grid */}
           <div className="mt-12 pt-8 border-t-2 border-slate-700">
             <h2 className="text-sm font-bold text-neo-cyan uppercase tracking-wider mb-4">Browse All Letters</h2>
             <div className="flex flex-wrap gap-1.5">
@@ -454,7 +478,6 @@ export default async function StartingWithLetterPage({ params }: PageParams) {
             </div>
           </div>
 
-          {/* Related lengths */}
           <div className="mt-6">
             <h2 className="text-sm font-bold text-neo-cyan uppercase tracking-wider mb-4">Browse by Word Length</h2>
             <div className="flex flex-wrap gap-2">

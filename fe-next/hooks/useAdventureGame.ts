@@ -34,6 +34,8 @@ interface UseAdventureGameProps {
   comboDecayMultiplier?: number;
   /** Upgrade config for tile effect processing in the reducer */
   upgradeConfig?: ReducerUpgradeConfig;
+  /** Upgrade tier map (upgradeId → tier) for HUD trigger tracking */
+  upgradeState?: Record<string, number>;
   /** Language for grid generation (used by shuffle). Defaults to 'en'. */
   language?: Language;
 }
@@ -129,6 +131,7 @@ export function useAdventureGame({
   initialGrid,
   comboDecayMultiplier = 1,
   upgradeConfig,
+  upgradeState,
   language = 'en',
 }: UseAdventureGameProps): UseAdventureGameReturn {
   // world=0 is valid for weekly challenges (special non-progression mode)
@@ -140,7 +143,7 @@ export function useAdventureGame({
   }
 
   const initialState = useMemo(
-    () => createInitialState(levelConfig, initialGrid, upgradeConfig),
+    () => createInitialState(levelConfig, initialGrid, upgradeConfig, upgradeState),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [levelConfig, initialGrid]
   );
@@ -254,12 +257,12 @@ export function useAdventureGame({
       clearTimeout(comboTimeoutRef.current);
     }
 
-    const fresh = createInitialState(levelConfig, initialGrid, upgradeConfig);
+    const fresh = createInitialState(levelConfig, initialGrid, upgradeConfig, upgradeState);
     if (options?.retainedScore && options.retainedScore > 0) {
       fresh.gameState = { ...fresh.gameState, score: options.retainedScore };
     }
     dispatch({ type: 'RESET_GAME', payload: { initialState: fresh } });
-  }, [levelConfig, initialGrid, upgradeConfig]);
+  }, [levelConfig, initialGrid, upgradeConfig, upgradeState]);
 
 
   const markCascadeComplete = useCallback(() => {

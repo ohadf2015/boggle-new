@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
@@ -156,9 +156,14 @@ const RoomListView: React.FC<RoomListViewProps> = ({
   onQuickPlay,
   isQuickPlayLoading = false,
 }) => {
-  const { t, dir } = useLanguage();
+  const { t, dir, language } = useLanguage();
   const [showHowToPlay, setShowHowToPlay] = useState(false);
   const [showWelcomeCard, setShowWelcomeCard] = useState(false);
+  const hasMountedRef = useRef(false);
+
+  useEffect(() => {
+    hasMountedRef.current = true;
+  }, []);
 
   useEffect(() => {
     if (shouldShowGuidance('multiplayerTutorialShown')) {
@@ -201,12 +206,12 @@ const RoomListView: React.FC<RoomListViewProps> = ({
         {/* Header — Arena Hub style */}
         <motion.header
           variants={headerVariants}
-          initial="hidden"
+          initial={hasMountedRef.current ? false : "hidden"}
           animate="visible"
           className="flex items-center justify-between py-3 px-4 lg:px-6 shrink-0 border-b-2 border-white/10"
         >
           <Link
-            href="/"
+            href={`/${language}`}
             aria-label={t('common.back')}
             className="flex items-center justify-center w-10 h-10 min-w-[44px] min-h-[44px] rounded-lg border-2 border-neo-black bg-neo-navy shadow-hard-sm hover:shadow-hard active:shadow-hard-pressed active:translate-y-0.5 transition-all focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-lime"
           >
@@ -262,7 +267,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
           {onQuickPlay && (
             <motion.section
               variants={quickPlayVariants}
-              initial="hidden"
+              initial={hasMountedRef.current ? false : "hidden"}
               animate="visible"
               className="flex flex-col sm:flex-row gap-2.5"
             >

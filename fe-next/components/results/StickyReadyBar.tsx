@@ -291,12 +291,12 @@ export default function StickyReadyBar({
           transition={{ type: 'spring', stiffness: 300, damping: 20 }}
           className="flex items-center justify-center gap-3 py-2"
         >
-          <Trophy className="w-6 h-6 text-neo-yellow" />
+          <Trophy className="w-6 h-6 text-neo-lime" />
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full border-2 border-neo-yellow overflow-hidden shadow-hard-sm bg-neo-navy">
+            <div className="w-8 h-8 rounded-full border-2 border-neo-lime overflow-hidden shadow-hard-sm bg-neo-navy">
               <Avatar userId={seriesWinnerUsername} customAvatar={seriesWinnerAvatar?.customAvatar} size="sm" className="w-full h-full" />
             </div>
-            <span className="text-neo-yellow font-black text-sm">{seriesWinnerUsername}</span>
+            <span className="text-neo-lime font-black text-sm">{seriesWinnerUsername}</span>
           </div>
           <span className="text-neo-cream/60 text-xs font-bold uppercase">{t('results.series.winner')}</span>
         </motion.div>

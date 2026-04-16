@@ -1,6 +1,7 @@
 import FAQPageClient from './PageClient';
 import { loadTranslation, type TranslationData } from '@/translations/loadTranslation';
 import type { Metadata } from 'next';
+import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
 
 type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es';
 
@@ -77,6 +78,124 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
   };
 }
 
-export default function FAQPage() {
-  return <FAQPageClient />;
+const faqSeoContent: Record<string, {
+  title: string;
+  description: string;
+  features: string[];
+  faq: { question: string; answer: string }[];
+}> = {
+  en: {
+    title: 'Frequently Asked Questions — LexiClash Help Center',
+    description:
+      'Find answers to the most common questions about LexiClash. Learn about game modes, scoring, accounts, multiplayer, and more. Our FAQ covers everything from getting started to advanced strategies.',
+    features: [
+      'Comprehensive answers about Classic, Blast, Word Hunt, and Adventure modes',
+      'Account setup, profile customization, and streak tracking explained',
+      'Multiplayer and Party TV room creation, joining, and host controls',
+      'Scoring system breakdown — word length, combos, bonus tiles, and multipliers',
+      'Language support details — play in English, Hebrew, Swedish, Japanese, or Spanish',
+    ],
+    faq: [
+      {
+        question: 'What is LexiClash?',
+        answer:
+          'LexiClash is a free, real-time multiplayer word game. Find words on a letter grid, compete against friends or strangers, and climb the leaderboard. Available in 5 languages with multiple game modes.',
+      },
+      {
+        question: 'How do I start a multiplayer game?',
+        answer:
+          'Click "Create Room" from the main menu, choose your game mode and settings, then share the room code with friends. They enter the code to join. You can also join random public rooms.',
+      },
+      {
+        question: 'Is LexiClash free to play?',
+        answer:
+          'Yes — LexiClash is completely free. All game modes, daily challenges, and multiplayer features are available without payment or ads blocking gameplay.',
+      },
+    ],
+  },
+  he: {
+    title: 'שאלות נפוצות — מרכז העזרה של LexiClash',
+    description:
+      'מצאו תשובות לשאלות הנפוצות ביותר על LexiClash. למדו על מצבי משחק, ניקוד, חשבונות ומשחק מרובה משתתפים.',
+    features: [
+      'תשובות מקיפות על מצבי קלאסי, בלאסט, ציד מילים והרפתקה',
+      'הגדרת חשבון, התאמה אישית של פרופיל ומעקב רצפים',
+      'יצירת חדרי מרובי משתתפים והצטרפות אליהם',
+    ],
+    faq: [
+      {
+        question: 'מה זה LexiClash?',
+        answer: 'LexiClash הוא משחק מילים מרובה משתתפים חינמי בזמן אמת. מצאו מילים על לוח אותיות, התחרו מול חברים וטפסו בטבלת המובילים.',
+      },
+    ],
+  },
+  sv: {
+    title: 'Vanliga Frågor — LexiClash Hjälpcenter',
+    description:
+      'Hitta svar på de vanligaste frågorna om LexiClash. Lär dig om spellägen, poängsättning, konton och multiplayer.',
+    features: [
+      'Omfattande svar om Klassiskt, Blast, Word Hunt och Äventyrslägen',
+      'Kontoinställning, profilanpassning och streak-spårning förklarad',
+      'Multiplayer-rumsskapande och värdkontroller',
+    ],
+    faq: [
+      {
+        question: 'Vad är LexiClash?',
+        answer: 'LexiClash är ett gratis multiplayer-ordspel i realtid. Hitta ord på ett bokstavsrutnät, tävla mot vänner och klättra på topplistan.',
+      },
+    ],
+  },
+  ja: {
+    title: 'よくある質問 — LexiClash ヘルプセンター',
+    description:
+      'LexiClashについてよくある質問への回答。ゲームモード、スコアリング、アカウント、マルチプレイヤーについて学びましょう。',
+    features: [
+      'クラシック、ブラスト、ワードハント、アドベンチャーモードの総合回答',
+      'アカウント設定、プロフィールカスタマイズ、連続記録の説明',
+      'マルチプレイヤールームの作成と参加方法',
+    ],
+    faq: [
+      {
+        question: 'LexiClashとは？',
+        answer: 'LexiClashは無料のリアルタイムマルチプレイヤーワードゲームです。レターグリッドで単語を見つけ、友達と競い、リーダーボードを上がりましょう。',
+      },
+    ],
+  },
+  es: {
+    title: 'Preguntas Frecuentes — Centro de Ayuda LexiClash',
+    description:
+      'Encuentra respuestas a las preguntas más comunes sobre LexiClash. Aprende sobre modos de juego, puntuación, cuentas y multijugador.',
+    features: [
+      'Respuestas completas sobre los modos Clásico, Blast, Word Hunt y Aventura',
+      'Configuración de cuenta, personalización de perfil y seguimiento de rachas',
+      'Creación de salas multijugador y controles de anfitrión',
+      'Desglose del sistema de puntuación — longitud de palabras, combos y multiplicadores',
+    ],
+    faq: [
+      {
+        question: '¿Qué es LexiClash?',
+        answer: 'LexiClash es un juego de palabras multijugador gratuito en tiempo real. Encuentra palabras en una cuadrícula de letras, compite contra amigos y sube en la tabla de clasificación.',
+      },
+      {
+        question: '¿Es LexiClash gratis?',
+        answer: 'Sí — LexiClash es completamente gratis. Todos los modos de juego, desafíos diarios y funciones multijugador están disponibles sin pago.',
+      },
+    ],
+  },
+};
+
+export default async function FAQPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  const content = faqSeoContent[locale] ?? faqSeoContent.en;
+  return (
+    <>
+      <FAQPageClient />
+      <GamePageSeoContent
+        title={content.title}
+        description={content.description}
+        features={content.features}
+        faq={content.faq}
+      />
+    </>
+  );
 }

@@ -148,7 +148,7 @@ function getAllRoutes(): MetadataRoute.Sitemap {
   addForAllLocales(routes, '/faq', { lastModified: GUIDES_UPDATED, changeFrequency: 'monthly', priority: 0.8 });
   addForAllLocales(routes, '/about', { lastModified: GUIDES_UPDATED, changeFrequency: 'monthly', priority: 0.6 });
   addForAllLocales(routes, '/contact', { lastModified: GUIDES_UPDATED, changeFrequency: 'monthly', priority: 0.5 });
-  addForAllLocales(routes, '/profile', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.6 });
+  // /profile is noindexed — excluded from sitemap to avoid wasting crawl budget
   addForAllLocales(routes, '/accessibility', { lastModified: LEGAL_UPDATED, changeFrequency: 'monthly', priority: 0.4 });
   addForAllLocales(routes, '/sitemap', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.4 });
 

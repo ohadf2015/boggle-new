@@ -72,7 +72,7 @@ function makeInvalidJsonRequest(): NextRequest {
   } as unknown as NextRequest;
 }
 
-const validBody = { world: 1, level: 1, stars: 3, score: 500, words: 10 };
+const validBody = { world: 1, level: 1, stars: 3, score: 500, words: 10, timePlayed: 60 };
 
 /**
  * Reusable level_completions table mock.
@@ -108,6 +108,13 @@ function mockLevelCompletionsTable(completionData: Record<string, unknown> | nul
         single: vi.fn().mockResolvedValue({
           data: { world: 1, level: 1, stars: 3, best_score: 500, best_words: 10, completed_at: '2026-01-01T00:00:00Z' },
           error: null,
+        }),
+      }),
+    }),
+    update: vi.fn().mockReturnValue({
+      eq: vi.fn().mockReturnValue({
+        eq: vi.fn().mockReturnValue({
+          eq: vi.fn().mockResolvedValue({ data: null, error: null }),
         }),
       }),
     }),
@@ -214,6 +221,13 @@ function setupDbMocks({
                 completed_at: '2026-01-01T00:00:00Z',
               },
               error: upsertError,
+            }),
+          }),
+        }),
+        update: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            eq: vi.fn().mockReturnValue({
+              eq: vi.fn().mockResolvedValue({ data: null, error: null }),
             }),
           }),
         }),
@@ -747,7 +761,7 @@ describe('POST /api/adventure/complete', () => {
       expect(res.data.goldEarned).toBe(26);
     });
 
-    it('awards fixed 25 gold when flashChallengeCompleted is true (server-side amount)', async () => {
+    it('awards fixed 25 gold when flashChallengeCompleted is true with valid words (server-side amount)', async () => {
       setupDbMocks({
         completionData: null,
         completionError: { code: 'PGRST116', message: 'not found' },
@@ -756,6 +770,7 @@ describe('POST /api/adventure/complete', () => {
       const res = await POST(makeRequest({
         ...validBody, stars: 2,
         flashChallengeCompleted: true,
+        wordsFound: ['cat'],  // H2: at least one dict-valid word required
       }));
       expect(res.status).toBe(200);
       // baseGold=(10+3)*2=26, flash=25 → 51
@@ -845,15 +860,10 @@ describe('POST /api/adventure/complete', () => {
       expect(res.status).toBe(200);
     });
 
-    it('accepts completion without timePlayed field (backward compat)', async () => {
-      setupDbMocks({
-        completionData: null,
-        completionError: { code: 'PGRST116', message: 'not found' },
-      });
-
-      // No timePlayed field — legacy clients should still work
-      const res = await POST(makeRequest(validBody));
-      expect(res.status).toBe(200);
+    it('rejects completion without timePlayed field (defaults to 0, fails min check)', async () => {
+      const bodyWithoutTime = { world: 1, level: 1, stars: 3, score: 500, words: 10 };
+      const res = await POST(makeRequest(bodyWithoutTime));
+      expect(res.status).toBe(400);
     });
   });
 
@@ -1112,13 +1122,174 @@ describe('POST /api/adventure/complete', () => {
       const FLASH_GOLD = 25; // fixed server-side constant
       const res = await POST(makeRequest({
         ...validBody,
-        flashChallengeCompleted: true, // triggers fixed 25 gold server-side (replaces client flashChallengeGold)
+        flashChallengeCompleted: true,
+        wordsFound: ['cat'],  // H2: at least one dict-valid word required for flash gold
       }));
 
       expect(res.status).toBe(200);
       // Flash gold (25) must be included in the response even on optimistic lock retry.
       // baseGold = (10 + world*3) * stars = (10+3)*3 = 39, flashGold = 25 → total >= 25
       expect(res.data.goldEarned).toBeGreaterThanOrEqual(FLASH_GOLD);
+    });
+  });
+
+  // ===== SPRINT 2: M4 — DICTIONARY-VALIDATED LONG WORDS =====
+  describe('SECURITY: longWords requires dictionary validation (M4)', () => {
+    it('does not count non-dictionary 6+ char strings as long words', async () => {
+      // cargoBay active → 5 gold per long word
+      mockGetUpgradeEffect.mockImplementation((_state: unknown, id: string) =>
+        id === 'cargoBay' ? 5 : 0
+      );
+      setupDbMocks({
+        progressionData: { ...mockProgression, upgrades: { cargoBay: 1 } },
+        completionData: null,
+        completionError: { code: 'PGRST116', message: 'not found' },
+      });
+
+      // 'abcdef' and 'ghijkl' are 6+ chars but NOT in mock dictionary
+      // Only 'cat' is valid but too short for long word bonus
+      const res = await POST(makeRequest({
+        ...validBody, stars: 2,
+        wordsFound: ['abcdef', 'ghijkl', 'cat'],
+      }));
+      expect(res.status).toBe(200);
+      // baseGold=(10+3)*2=26, longWordBonus=0 (no dict-valid 6+ words) → 26
+      expect(res.data.goldEarned).toBe(26);
+      mockGetUpgradeEffect.mockReturnValue(0);
+    });
+
+    it('counts only dictionary-valid 6+ char words for longWordBonus', async () => {
+      mockGetUpgradeEffect.mockImplementation((_state: unknown, id: string) =>
+        id === 'cargoBay' ? 5 : 0
+      );
+      setupDbMocks({
+        progressionData: { ...mockProgression, upgrades: { cargoBay: 1 } },
+        completionData: null,
+        completionError: { code: 'PGRST116', message: 'not found' },
+      });
+
+      // 'castle' (6 chars, in dict) counts. 'bridge' (6, in dict) counts. 'zzzzzz' (6, NOT in dict) doesn't.
+      const res = await POST(makeRequest({
+        ...validBody, stars: 2,
+        wordsFound: ['castle', 'bridge', 'zzzzzz'],
+      }));
+      expect(res.status).toBe(200);
+      // baseGold=26, longWordBonus=5*2=10 → 36
+      expect(res.data.goldEarned).toBe(36);
+      mockGetUpgradeEffect.mockReturnValue(0);
+    });
+  });
+
+  // ===== SPRINT 2: H2 — FLASH CHALLENGE REQUIRES VALIDATED WORDS =====
+  describe('SECURITY: flash challenge requires validated words (H2)', () => {
+    it('denies flashChallengeGold when wordsFound is empty', async () => {
+      setupDbMocks({
+        completionData: null,
+        completionError: { code: 'PGRST116', message: 'not found' },
+      });
+
+      // Client claims flash challenge completed but found zero words
+      const res = await POST(makeRequest({
+        ...validBody, stars: 2,
+        flashChallengeCompleted: true,
+        wordsFound: [],
+      }));
+      expect(res.status).toBe(200);
+      // baseGold=26, flashGold=0 (no validated words → challenge can't be real) → 26
+      expect(res.data.goldEarned).toBe(26);
+    });
+
+    it('denies flashChallengeGold when all wordsFound are invalid dictionary words', async () => {
+      setupDbMocks({
+        completionData: null,
+        completionError: { code: 'PGRST116', message: 'not found' },
+      });
+
+      // Client sends words but none are in dictionary
+      const res = await POST(makeRequest({
+        ...validBody, stars: 2,
+        flashChallengeCompleted: true,
+        wordsFound: ['xxxxx', 'yyyyy'],
+      }));
+      expect(res.status).toBe(200);
+      // baseGold=26, flashGold=0 (no dict-valid words) → 26
+      expect(res.data.goldEarned).toBe(26);
+    });
+
+    it('awards flashChallengeGold when at least one word is dictionary-valid', async () => {
+      setupDbMocks({
+        completionData: null,
+        completionError: { code: 'PGRST116', message: 'not found' },
+      });
+
+      const res = await POST(makeRequest({
+        ...validBody, stars: 2,
+        flashChallengeCompleted: true,
+        wordsFound: ['cat', 'xxxxx'],  // 'cat' is in mock dict
+      }));
+      expect(res.status).toBe(200);
+      // baseGold=26 + flashGold=25 → 51
+      expect(res.data.goldEarned).toBe(51);
+    });
+  });
+
+  // ===== SPRINT 2: M5 — DAILY CAP ON RETRY PATH =====
+  describe('SECURITY: daily gold cap enforced on optimistic lock retry (M5)', () => {
+    it('does not increase DB gold on retry when daily cap is hit', async () => {
+      // Bug: retry path does updatePayload.gold = freshGold + freshGoldEarned
+      //   without re-checking dailyGoldEarned >= DAILY_GOLD_CAP. The response
+      //   goldEarned is correct (0), but the DB gets freshGold + uncapped gold.
+      let updateCallCount = 0;
+      const capturedPayloads: Record<string, unknown>[] = [];
+      const FRESH_GOLD = 200;
+
+      mockFrom.mockImplementation((table: string) => {
+        if (table === 'player_progression') {
+          const freshProg = { ...mockProgression, gold: FRESH_GOLD, total_stars: 5, upgrades: {} };
+
+          // Spy on update(payload) to capture what gold value is written to DB
+          const updateSpy = vi.fn().mockImplementation((payload: Record<string, unknown>) => {
+            capturedPayloads.push({ ...payload });
+            updateCallCount++;
+            const currentCall = updateCallCount;
+            const maybeSingleFn = vi.fn().mockImplementation(() => {
+              if (currentCall === 1) {
+                return Promise.resolve({ data: null, error: null });
+              }
+              return Promise.resolve({ data: freshProg, error: null });
+            });
+            const selectFn = vi.fn().mockReturnValue({ maybeSingle: maybeSingleFn });
+            const eqStars = vi.fn().mockReturnValue({ select: selectFn });
+            const eqGold = vi.fn().mockReturnValue({ eq: eqStars, select: selectFn });
+            const eqUser = vi.fn().mockReturnValue({ eq: eqGold, select: selectFn });
+            return { eq: eqUser };
+          });
+
+          return {
+            select: vi.fn().mockReturnValue({
+              eq: vi.fn().mockReturnValue({
+                single: vi.fn().mockResolvedValue({ data: freshProg, error: null }),
+              }),
+            }),
+            insert: vi.fn().mockResolvedValue({ error: null }),
+            update: updateSpy,
+          };
+        }
+        if (table === 'level_completions') {
+          return mockLevelCompletionsTable(null, { code: 'PGRST116', message: 'not found' }, [{ gold_earned: 5000 }]);
+        }
+        if (table === 'profiles') return mockProfilesTable();
+        return {};
+      });
+
+      const res = await POST(makeRequest({ ...validBody, stars: 3 }));
+      expect(res.status).toBe(200);
+      expect(res.data.goldEarned).toBe(0);
+      // The retry path (2nd update call) must write gold = freshGold + 0, NOT freshGold + freshGoldEarned
+      // capturedPayloads[0] = initial update, capturedPayloads[1] = retry update
+      expect(capturedPayloads.length).toBeGreaterThanOrEqual(2);
+      const retryPayload = capturedPayloads[1];
+      expect(retryPayload.gold).toBe(FRESH_GOLD); // freshGold + 0 = 200, not 200 + goldEarned
     });
   });
 });

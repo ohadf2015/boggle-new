@@ -510,6 +510,11 @@ const ja = {
       "navigation": "ナビゲーション"
     }
   },
+  "presence": {
+    "active": "オンライン",
+    "idle": "離席中",
+    "afk": "離席中"
+  },
   "nav": {
     "bottomNavigation": "下部ナビゲーション",
     "gameNavigation": "ゲームナビ",
@@ -640,6 +645,7 @@ const ja = {
     "modeReveal": {
       "blast": "ブラスト！",
       "wordHunt": "ワードハント！",
+      "wheelRush": "ホイールラッシュ！",
       "classic": "クラシック！"
     }
   },
@@ -6496,6 +6502,16 @@ const ja = {
       "valor": { "name": "ヴァラールーン", "desc": "+20% ボスダメージ" },
       "dragonslayer": { "name": "ドラゴンスレイヤールーン", "desc": "+50% ボスダメージ" }
     },
+    "achievements": {
+      "title": "実績",
+      "earned": "獲得済み",
+      "categories": {
+        "gameplay": "ゲームプレイ",
+        "bosses": "ボス",
+        "progression": "進行",
+        "mastery": "マスタリー"
+      }
+    },
     "worldMap": "ワールドマップ",
     "subtitle": "10のテーマワールドを旅し、100レベルを制覇して、究極のワードマスターになろう！",
     "adminOnly": "管理者のみ",
@@ -10154,6 +10170,7 @@ const ja = {
     "spectators": "観客",
     "playersJoined": "人が参加",
     "needMore": "もっとプレイヤーが必要",
+    "host": "ホスト",
     "waiting": "...",
     "startGame": "ゲーム開始",
     "round": "ラウンド",

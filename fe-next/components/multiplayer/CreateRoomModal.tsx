@@ -241,11 +241,11 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
                       exit={{ opacity: 0 }}
                       className="text-[10px] font-bold text-neo-lime"
                     >
-                      {isAuthenticated ? `✓ ${t('common.verified') || 'Verified'}` : `✓ ${t('common.looksGood') || 'Ready'}`}
+                      {isAuthenticated ? `✓ ${t('common.verified')}` : `✓ ${t('common.looksGood')}`}
                     </AdaptiveMotion.span>
                   ) : (
                     <span className="text-[10px] text-neo-white/25">
-                      {t('multiplayerFlow.profileSetup.usernameHint') || '2-20 characters'}
+                      {t('multiplayerFlow.profileSetup.usernameHint')}
                     </span>
                   )}
                 </AdaptiveAnimatePresence>

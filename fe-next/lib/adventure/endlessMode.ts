@@ -94,7 +94,7 @@ export function getEndlessMilestone(floor: number): EndlessMilestone | null {
 export const ENDLESS_MODE_CONFIG = {
   startingGridSize: 4 as 4 | 5 | 6 | 7,
   startingTimerSeconds: 120,
-  minTimerSeconds: 30,
+  minTimerSeconds: 45,
   timerDecayPerFloor: 3,
   gridSizeUpEvery: 8, // grid grows every 8 floors
   specialTileBase: 2,

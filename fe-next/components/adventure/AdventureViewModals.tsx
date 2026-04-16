@@ -10,6 +10,7 @@ import type { UpgradeState } from '@/lib/adventure/upgradeConfig';
 import WordAlbumPanel from './WordAlbumPanel';
 import WeeklyChallengePanel from './WeeklyChallengePanel';
 import CollectionPanel from './CollectionPanel';
+import { AchievementGrid } from './achievements/AchievementGrid';
 import type { InventoryItem } from '@/hooks/useAdventureInventory';
 
 interface AdventureViewModalsProps {
@@ -30,6 +31,8 @@ interface AdventureViewModalsProps {
   showCollection: boolean;
   onCloseCollection: () => void;
   collectionInventory: InventoryItem[];
+  showAchievements: boolean;
+  onCloseAchievements: () => void;
   t: (key: string) => string;
 }
 
@@ -51,6 +54,8 @@ export default function AdventureViewModals({
   showCollection,
   onCloseCollection,
   collectionInventory,
+  showAchievements,
+  onCloseAchievements,
   t,
 }: AdventureViewModalsProps): React.JSX.Element {
   const shopRef = useRef<HTMLDivElement>(null);
@@ -131,6 +136,45 @@ export default function AdventureViewModals({
           onClose={onCloseCollection}
           inventory={collectionInventory}
         />
+      )}
+      {/* Achievement Grid */}
+      {showAchievements && (
+        <AdaptiveMotion.div
+          key="achievements-overlay"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4"
+          onClick={onCloseAchievements}
+        >
+          <AdaptiveMotion.div
+            role="dialog"
+            aria-modal="true"
+            aria-label={t('adventure.achievements.title')}
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.9, opacity: 0 }}
+            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+            className={cn(
+              'relative w-full max-w-lg lg:max-w-2xl max-h-[min(80dvh,600px)] lg:max-h-[min(85dvh,800px)] overflow-y-auto',
+              'bg-neo-navy border-3 border-neo-black rounded-neo shadow-hard-lg p-4 lg:p-6'
+            )}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={onCloseAchievements}
+              className={cn(
+                'absolute top-3 inset-e-3 z-10 p-1.5',
+                'bg-neo-navy border-2 border-neo-white/20 rounded-neo',
+                'text-neo-white hover:bg-neo-red/30 transition-colors'
+              )}
+              aria-label={t('common.close')}
+            >
+              <X className="w-4 h-4" />
+            </button>
+            <AchievementGrid />
+          </AdaptiveMotion.div>
+        </AdaptiveMotion.div>
       )}
     </AdaptiveAnimatePresence>
   );

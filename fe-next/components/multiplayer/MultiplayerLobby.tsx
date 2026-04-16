@@ -219,7 +219,7 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
           className="flex items-center gap-3 mb-3 shrink-0"
         >
           <Link
-            href="/"
+            href={`/${language}`}
             className="flex items-center justify-center w-10 h-10 rounded-neo border-3 border-neo-black bg-neo-cream shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-px active:translate-y-px active:shadow-hard-pressed focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-lime transition-all text-neo-black"
             aria-label={t('common.back')}
           >

@@ -510,6 +510,11 @@ const es = {
     },
     "email": "Correo"
   },
+  "presence": {
+    "active": "Activo",
+    "idle": "Ausente",
+    "afk": "Lejos del teclado"
+  },
   "nav": {
     "bottomNavigation": "Navegación inferior",
     "gameNavigation": "Navegación del juego",
@@ -621,6 +626,7 @@ const es = {
     "modeReveal": {
       "blast": "¡BLAST!",
       "wordHunt": "¡CAZA DE PALABRAS!",
+      "wheelRush": "¡RUEDA RÁPIDA!",
       "classic": "¡CLÁSICO!"
     }
   },
@@ -6597,6 +6603,16 @@ const es = {
       "valor": { "name": "Runa de Valor", "desc": "+20% daño al jefe" },
       "dragonslayer": { "name": "Runa Matadragones", "desc": "+50% daño al jefe" }
     },
+    "achievements": {
+      "title": "Logros",
+      "earned": "obtenidos",
+      "categories": {
+        "gameplay": "Jugabilidad",
+        "bosses": "Jefes",
+        "progression": "Progresión",
+        "mastery": "Maestría"
+      }
+    },
     "share": {
       "bossDefeated": "¡Derroté a {{boss}} en {{world}}!",
       "shareCard": "Compartir victoria",
@@ -10239,6 +10255,7 @@ const es = {
     "spectators": "espectadores",
     "playersJoined": "jugadores unidos",
     "needMore": "Se necesitan más jugadores",
+    "host": "Anfitrión",
     "waiting": "...",
     "startGame": "Iniciar juego",
     "round": "Ronda",

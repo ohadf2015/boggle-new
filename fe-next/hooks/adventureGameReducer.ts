@@ -537,7 +537,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
             // Count gold tiles collected in this word
             if (path) {
               newCurrent += path.filter(
-                (pos) => state.gameState.tiles[pos.row]?.[pos.col]?.type === 'gold'
+                (pos) => state.tiles[pos.row]?.[pos.col]?.type === 'gold'
               ).length;
             }
             break;

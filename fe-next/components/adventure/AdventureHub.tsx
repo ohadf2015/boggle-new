@@ -13,7 +13,7 @@ import dynamic from 'next/dynamic';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import Image from 'next/image';
 const CrazyGamesBanner = dynamic(() => import('@/components/CrazyGamesBanner'), { ssr: false });
-import { Flame, ChevronRight, Map, Swords, Target, Check, Coins, Star, BookOpen, ShoppingBag, Home, Crown, Zap, Infinity as InfinityIcon, Gem, Trophy } from 'lucide-react';
+import { Flame, ChevronRight, Map, Swords, Target, Check, Coins, Star, BookOpen, ShoppingBag, Home, Crown, Zap, Infinity as InfinityIcon, Gem, Trophy, Award } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { GhostRivalWidget } from '@/components/engagement/GhostRivalWidget';
@@ -57,6 +57,7 @@ interface AdventureHubProps {
   onOpenWordAlbum?: () => void;
   onOpenCollection?: () => void;
   collectionCount?: number;
+  onOpenAchievements?: () => void;
   ascensionLevel?: number;
   weeklyModifiers?: WeeklyModifier[];
 }
@@ -106,6 +107,7 @@ const AdventureHub = memo<AdventureHubProps>(({
   onOpenWordAlbum,
   onOpenCollection,
   collectionCount = 0,
+  onOpenAchievements,
   ascensionLevel = 0,
   weeklyModifiers = [],
 }) => {
@@ -534,6 +536,26 @@ const AdventureHub = memo<AdventureHubProps>(({
                   {collectionCount}
                 </span>
               )}
+            </AdaptiveMotion.button>
+          )}
+
+          {onOpenAchievements && (
+            <AdaptiveMotion.button
+              data-testid="hub-open-achievements"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={onOpenAchievements}
+              className={cn(
+                'flex-1 py-2.5 px-3',
+                'flex items-center justify-center gap-1.5',
+                'bg-neo-purple/10 text-neo-purple',
+                'font-bold text-xs',
+                'border border-neo-purple/30 rounded-neo',
+                'hover:bg-neo-purple/20 transition-colors'
+              )}
+            >
+              <Award className="w-4 h-4" />
+              {t('adventure.achievements.title')}
             </AdaptiveMotion.button>
           )}
         </AdaptiveMotion.div>

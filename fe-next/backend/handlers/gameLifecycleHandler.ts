@@ -337,7 +337,7 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
       playerCount: game ? Object.keys(game.users || {}).length : 0,
       timestamp: Date.now()
     });
-    logger.info('DEBUG', `Game state query for ${gameCode}: ${game?.gameState || 'NO_GAME'}`);
+    logger.debug('SOCKET', `Game state query for ${gameCode}: ${game?.gameState || 'NO_GAME'}`);
   });
 
   // Handle requestGameState - recovery for players who missed startGame

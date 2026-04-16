@@ -302,7 +302,12 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
   // No grid placeholder (player-only edge case)
   if (!effectiveGrid) {
     return (
-      <div className="flex-1 flex flex-col min-h-0 bg-neo-cream dark:bg-neo-navy p-4 items-center justify-center">
+      <div
+        className="flex-1 flex flex-col min-h-0 bg-neo-cream dark:bg-neo-navy p-4 items-center justify-center"
+        role="status"
+        aria-busy="true"
+        aria-label="Loading game board"
+      >
         <div className="w-full max-w-2xl aspect-square grid grid-cols-4 gap-3 p-4">
           {Array.from({ length: 16 }).map((_, i) => (
             <div

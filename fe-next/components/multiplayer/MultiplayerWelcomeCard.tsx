@@ -27,7 +27,7 @@ const MultiplayerWelcomeCard: React.FC<MultiplayerWelcomeCardProps> = ({ onDismi
     },
     {
       icon: Trophy,
-      bg: 'bg-neo-yellow',
+      bg: 'bg-neo-lime',
       title: t('howToPlay.earnPointsTitle'),
       desc: t('howToPlay.earnPointsDesc'),
     },

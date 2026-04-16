@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
 
     // Minimum time-in-level prevents W1L1 speed-replay gold farming.
     const timePlayed = validation.data.timePlayed;
-    if (typeof timePlayed === 'number' && timePlayed < MIN_TIME_PLAYED_SECONDS) {
+    if (timePlayed < MIN_TIME_PLAYED_SECONDS) {
       return NextResponse.json(
         { error: `Invalid timePlayed: must be at least ${MIN_TIME_PLAYED_SECONDS} seconds` },
         { status: 400 }
@@ -179,8 +179,19 @@ export async function POST(request: NextRequest) {
     const newPlayerLevel = getLevelFromXp(newTotalXp);
 
     const playerUpgrades = (existingProgression?.upgrades as UpgradeState) ?? {};
-    const clampedLongWords = countLongWords(validation.data.wordsFound);
-    const flashChallengeCompleted = validation.data.flashChallengeCompleted === true;
+
+    // Dictionary-validate wordsFound BEFORE gold calculations (M4, H2 security fixes)
+    const dictWords = await loadDictionaryWords('en');
+    const dictSet = new Set(dictWords.map((w: string) => w.toLowerCase()));
+    const validatedWordsFound = Array.isArray(validation.data.wordsFound)
+      ? validation.data.wordsFound.filter(
+          (w: unknown) => typeof w === 'string' && dictSet.has((w as string).toLowerCase())
+        )
+      : [];
+
+    const clampedLongWords = countLongWords(validatedWordsFound);
+    // H2: flash challenge requires at least one dictionary-valid word found
+    const flashChallengeCompleted = validation.data.flashChallengeCompleted === true && validatedWordsFound.length > 0;
 
     let goldEarned = calcGoldEarned({
       stars, world, isReplay, isFirstCompletion, starsGained,
@@ -201,6 +212,14 @@ export async function POST(request: NextRequest) {
     if (dailyGoldEarned >= DAILY_GOLD_CAP) {
       goldEarned = 0;
     }
+
+    // Persist gold_earned to level_completions so daily cap query works
+    await supabase
+      .from('level_completions')
+      .update({ gold_earned: goldEarned })
+      .eq('user_id', userId)
+      .eq('world', world)
+      .eq('level', level);
 
     const currentGold = (existingProgression?.gold as number) ?? 0;
     const newGold = currentGold + goldEarned;
@@ -225,9 +244,7 @@ export async function POST(request: NextRequest) {
     const MAX_ALBUM_SIZE = 5000;
     let wordAlbumUpdate: string[] | undefined;
     if (words > 0 && Array.isArray(validation.data.wordsFound) && validation.data.wordsFound.length > 0) {
-      const dictWords = await loadDictionaryWords('en');
-      const dictSet = new Set(dictWords.map((w: string) => w.toLowerCase()));
-
+      // dictSet already loaded above for gold calculations — reuse it
       const { data: albumRow } = await supabase
         .from('player_progression')
         .select('word_album')
@@ -300,10 +317,14 @@ export async function POST(request: NextRequest) {
         .single();
       if (freshProg) {
         const freshUpgrades = (freshProg.upgrades as UpgradeState) ?? {};
-        const freshGoldEarned = calcGoldEarned({
+        let freshGoldEarned = calcGoldEarned({
           stars, world, isReplay, isFirstCompletion, starsGained,
           upgrades: freshUpgrades, clampedLongWords, flashChallengeCompleted,
         });
+        // M5 fix: re-apply daily gold cap on retry path
+        if (dailyGoldEarned >= DAILY_GOLD_CAP) {
+          freshGoldEarned = 0;
+        }
         const freshGold = freshProg.gold as number;
         const freshTotalStars = freshProg.total_stars as number;
         updatePayload.gold = freshGold + freshGoldEarned;

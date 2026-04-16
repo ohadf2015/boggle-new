@@ -1,24 +1,12 @@
 import React, { Suspense } from 'react';
 import dynamicImport from 'next/dynamic';
 import type { Metadata } from 'next';
-import { loadTranslation, type TranslationData } from '@/translations/loadTranslation';
-import { PageLoader } from '@/components/ui/PageLoader';
+import { generatePageMetadata } from '@/lib/seo/generatePageMetadata';
 
-type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es';
+import { PageLoader } from '@/components/ui/PageLoader';
 
 interface PageParams {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{
-    share?: string;
-    wh?: string;
-    whSolved?: string;
-    whAttempts?: string;
-    whPuzzle?: string;
-    whName?: string;
-    whEmoji?: string;
-    whStreak?: string;
-    whAvatar?: string;
-  }>;
 }
 
 const LoadingFallback = () => (
@@ -35,15 +23,7 @@ export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({ params }: PageParams): Promise<Metadata> {
   const { locale } = await params;
-  const validLocale = (locale as Locale) || 'en';
-  const t = await loadTranslation(validLocale) as Record<string, any>;
-  const enT = await loadTranslation('en') as Record<string, any>;
-  const seo = t?.seo?.daily || enT.seo.daily;
-
-  return {
-    title: `${seo.title} - Word Hunt`,
-    description: seo.description,
-  };
+  return generatePageMetadata({ seoKey: 'daily', path: '/daily/word-hunt', locale });
 }
 
 /**

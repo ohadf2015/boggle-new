@@ -305,7 +305,7 @@ export function useMultiplayerSocket(
     }, SOCKET_CONFIG.ROOMS_LOADING_TIMEOUT);
 
     socketInstance.on('debugGameStateResponse', (data) => {
-      logger.log('[DEBUG] Server game state:', data);
+      logger.debug('[useMultiplayerSocket] Server game state:', data);
     });
 
     socketInstance.on('error', (data) => {

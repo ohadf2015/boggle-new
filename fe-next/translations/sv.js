@@ -510,6 +510,11 @@ const sv = {
       "navigation": "Navigation"
     }
   },
+  "presence": {
+    "active": "Aktiv",
+    "idle": "Borta",
+    "afk": "Borta från tangentbordet"
+  },
   "nav": {
     "bottomNavigation": "Nedre navigering",
     "gameNavigation": "Spelnavigering",
@@ -640,6 +645,7 @@ const sv = {
     "modeReveal": {
       "blast": "BLAST!",
       "wordHunt": "ORDJAKT!",
+      "wheelRush": "HJULRUSH!",
       "classic": "KLASSISKT!"
     }
   },
@@ -6444,6 +6450,16 @@ const sv = {
       "valor": { "name": "Modsruna", "desc": "+20% bossskada" },
       "dragonslayer": { "name": "Drakdödarruna", "desc": "+50% bossskada" }
     },
+    "achievements": {
+      "title": "Prestationer",
+      "earned": "uppnådda",
+      "categories": {
+        "gameplay": "Spelande",
+        "bosses": "Bossar",
+        "progression": "Framsteg",
+        "mastery": "Mästerskap"
+      }
+    },
     "worldMap": "Världskarta",
     "subtitle": "Res genom 10 temavärldar, erövra 100 nivåer och bli den ultimata ordmästaren!",
     "adminOnly": "Endast admin",
@@ -10154,6 +10170,7 @@ const sv = {
     "spectators": "åskådare",
     "playersJoined": "spelare anslutna",
     "needMore": "Behöver fler spelare",
+    "host": "Värd",
     "waiting": "...",
     "startGame": "Starta spel",
     "round": "Runda",

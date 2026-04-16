@@ -16,7 +16,7 @@ export interface ValidatedCompletionData {
   retainedScore?: number;
   wordsFound?: string[];
   flashChallengeCompleted?: boolean;
-  timePlayed?: number;
+  timePlayed: number;
 }
 
 export interface ValidationResult {
@@ -72,14 +72,13 @@ export function validateRequestBody(body: Record<string, unknown>): ValidationRe
     return { valid: false, error: 'Invalid words: must be between 0 and 500' };
   }
 
-  return {
-    valid: true,
-    data: {
-      world, level, stars, score, words,
-      ...(typeof retainedScore === 'number' && { retainedScore }),
-      ...(Array.isArray(body.wordsFound) && { wordsFound: body.wordsFound as string[] }),
-      ...(body.flashChallengeCompleted === true && { flashChallengeCompleted: true }),
-      ...(typeof body.timePlayed === 'number' && { timePlayed: body.timePlayed }),
-    },
+  const data: ValidatedCompletionData = {
+    world, level, stars, score, words,
+    timePlayed: typeof body.timePlayed === 'number' ? body.timePlayed : 0,
   };
+  if (typeof retainedScore === 'number') data.retainedScore = retainedScore;
+  if (Array.isArray(body.wordsFound)) data.wordsFound = body.wordsFound as string[];
+  if (body.flashChallengeCompleted === true) data.flashChallengeCompleted = true;
+
+  return { valid: true, data };
 }

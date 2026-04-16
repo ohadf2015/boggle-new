@@ -4,6 +4,7 @@ import {
   getSupabaseAdmin,
   isEmailServiceConfigured,
   generateUnsubscribeToken,
+  getSubscriberRecipients,
 } from '@/lib/email';
 import {
   resolveUserLanguage,
@@ -13,8 +14,10 @@ import {
 } from '@/lib/reengagementEmail';
 import {
   sendGameModeAnnouncementToPlayer,
+  generateGameModeAnnouncementHtml,
   type GameModeKey,
 } from '@/lib/gameModeAnnouncementEmail';
+import { Resend } from 'resend';
 import { captureApiError } from '@/utils/sentry';
 import logger from '@/backend/utils/logger';
 
@@ -57,9 +60,17 @@ export async function POST(request: NextRequest) {
     const emailType: BulkEmailType = body.emailType;
     const dryRun = body.dryRun === true;
     const mode: GameModeKey = body.mode || 'blast';
+    const includeSubscribers = body.includeSubscribers === true;
 
     if (!['reengagement', 'game-mode-announcement'].includes(emailType)) {
       return NextResponse.json({ error: 'Invalid emailType' }, { status: 400 });
+    }
+
+    if (includeSubscribers && emailType !== 'game-mode-announcement') {
+      return NextResponse.json(
+        { error: 'includeSubscribers not valid for reengagement emails' },
+        { status: 400 }
+      );
     }
 
     const adminSupabase = getSupabaseAdmin();
@@ -97,12 +108,21 @@ export async function POST(request: NextRequest) {
     const eligible = players.filter((p) => emailMap.has(p.id));
 
     if (dryRun) {
-      return NextResponse.json({
+      const dryRunResponse: Record<string, unknown> = {
         success: true,
         dryRun: true,
         total: eligible.length,
         message: `Would send ${emailType} email to ${eligible.length} players`,
-      });
+      };
+
+      if (includeSubscribers) {
+        const registeredEmailSet = new Set(emailMap.values());
+        const subscribers = await getSubscriberRecipients(registeredEmailSet);
+        dryRunResponse.subscriberTotal = subscribers.length;
+        dryRunResponse.message += ` + ${subscribers.length} subscribers`;
+      }
+
+      return NextResponse.json(dryRunResponse);
     }
 
     logger.info('BULK_EMAIL', `Starting bulk ${emailType} send to ${eligible.length} players`);
@@ -157,11 +177,71 @@ export async function POST(request: NextRequest) {
 
     logger.info('BULK_EMAIL', `Bulk ${emailType} done: ${sent} sent, ${failed} failed out of ${eligible.length}`);
 
+    // ── Subscriber campaign sends ────────────────────────────────
+    let subscribersSent: number | undefined;
+    let subscribersFailed = 0;
+
+    if (includeSubscribers && emailType === 'game-mode-announcement') {
+      const registeredEmailSet = new Set(emailMap.values());
+      const subscribers = await getSubscriberRecipients(registeredEmailSet);
+
+      const resendClient = new Resend(process.env.RESEND_API_KEY);
+      const fromEmail = process.env.RESEND_FROM_EMAIL!;
+      subscribersSent = 0;
+
+      for (const sub of subscribers) {
+        try {
+          const language = sub.language || 'en';
+          const locale = language === 'en' ? 'en' : language;
+          const unsubscribeUrl = `${baseUrl}/api/email/unsubscribe?token=${sub.unsubscribe_token}`;
+          const playUrl = `${baseUrl}/${locale}/${mode}`;
+
+          const { subject, html, text } = await generateGameModeAnnouncementHtml({
+            recipientName: 'Word Hunter',
+            language,
+            mode,
+            unsubscribeUrl,
+            playUrl,
+          });
+
+          const result = await resendClient.emails.send({
+            from: fromEmail,
+            to: sub.email,
+            subject,
+            html,
+            text,
+            headers: {
+              'List-Unsubscribe': `<${unsubscribeUrl}>`,
+              'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+            },
+          });
+
+          if (result.error) {
+            subscribersFailed++;
+            errors.push(`[sub] ${sub.email}: ${result.error.message}`);
+          } else {
+            subscribersSent++;
+            // Update anti-spam timestamp
+            await adminSupabase
+              .from('email_subscribers')
+              .update({ last_campaign_email_sent_at: new Date().toISOString() })
+              .eq('id', sub.id);
+          }
+        } catch (err) {
+          subscribersFailed++;
+          errors.push(`[sub] ${sub.email}: ${err instanceof Error ? err.message : 'Unknown error'}`);
+        }
+      }
+
+      logger.info('BULK_EMAIL', `Subscriber sends: ${subscribersSent} sent, ${subscribersFailed} failed`);
+    }
+
     return NextResponse.json({
       success: true,
       total: eligible.length,
       sent,
       failed,
+      ...(subscribersSent !== undefined && { subscribersSent, subscribersFailed }),
       errors: errors.length > 0 ? errors.slice(0, 20) : undefined,
     });
   } catch (error) {

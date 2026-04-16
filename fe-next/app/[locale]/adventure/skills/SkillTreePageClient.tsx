@@ -13,13 +13,16 @@ import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useProgressionData } from '@/contexts/ProgressionContext';
 import { useSkillTreeStore } from '@/hooks/useSkillTreeStore';
+import { useAdventureAchievements } from '@/hooks/useAdventureAchievements';
 import { SkillTreeView, SkillUnlockModal } from '@/components/adventure/SkillTree';
+import { SKILL_CATALOG } from '@/utils/skillTreeUtils';
 import type { SkillNode } from '@/types/adventure';
 
 export function SkillTreePageClient() {
   const { t } = useLanguage();
   const { progression } = useProgressionData();
   const hydrateFromDB = useSkillTreeStore((s) => s.hydrateFromDB);
+  const { earnAchievement } = useAdventureAchievements();
   const [unlockedSkill, setUnlockedSkill] = useState<SkillNode | null>(null);
 
   // Hydrate skill tree from DB on first load
@@ -31,7 +34,15 @@ export function SkillTreePageClient() {
 
   const handleSkillUnlock = useCallback((skill: SkillNode) => {
     setUnlockedSkill(skill);
-  }, []);
+    earnAchievement('SKILL_UNLOCKED');
+
+    // Check if entire path is now complete (read fresh from Zustand store)
+    const { unlockedSkills } = useSkillTreeStore.getState();
+    const pathSkills = SKILL_CATALOG.filter(s => s.path === skill.path);
+    if (pathSkills.length > 0 && pathSkills.every(s => unlockedSkills.has(s.id))) {
+      earnAchievement('SKILL_PATH_COMPLETE');
+    }
+  }, [earnAchievement]);
 
   const handleCloseModal = useCallback(() => {
     setUnlockedSkill(null);

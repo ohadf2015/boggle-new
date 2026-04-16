@@ -164,7 +164,7 @@ const ResultsHeroSection = memo<ResultsHeroSectionProps>(
                   'text-red-500 drop-shadow-[0_0_35px_rgba(255,0,0,0.5)] drop-shadow-[4px_4px_0px_rgba(0,0,0,1)]',
                 )}
               >
-                {t('results.eliminated') ?? 'ELIMINATED'}
+                {t('results.eliminated')}
               </motion.span>
             ) : (
               <motion.span
@@ -269,7 +269,7 @@ const ResultsHeroSection = memo<ResultsHeroSectionProps>(
                 transition={{ delay: 1.2 }}
                 className="text-[10px] font-bold text-white/40 uppercase tracking-widest"
               >
-                {t('results.totalPoints') ?? 'Total Points'}
+                {t('results.totalPoints')}
               </motion.p>
             </div>
 
@@ -278,7 +278,7 @@ const ResultsHeroSection = memo<ResultsHeroSectionProps>(
               <div className="flex items-center gap-2 sm:gap-4 mt-4">
                 <div className="bg-neo-black/40 border-2 border-white/10 px-3 sm:px-4 py-1.5 rounded-neo">
                   <p className="text-[9px] font-black text-white/40 uppercase tracking-[0.2em] mb-0.5">
-                    {t('results.target') || 'Target'}
+                    {t('results.target')}
                   </p>
                   <p className="text-xl font-neo-display font-black text-white uppercase">
                     {wordHuntTarget || '—'}
@@ -286,7 +286,7 @@ const ResultsHeroSection = memo<ResultsHeroSectionProps>(
                 </div>
                 <div className="bg-neo-black/40 border-2 border-white/10 px-3 sm:px-4 py-1.5 rounded-neo">
                   <p className="text-[9px] font-black text-white/40 uppercase tracking-[0.2em] mb-0.5">
-                    {t('results.wordsFound') || 'Your Words'}
+                    {t('results.wordsFound')}
                   </p>
                   <p className={cn('text-xl font-neo-display font-black uppercase', displayAccent.text)}>
                     {wordsFound ?? 0}
@@ -304,7 +304,7 @@ const ResultsHeroSection = memo<ResultsHeroSectionProps>(
                   'opacity-70',
                 )}
               >
-                {(t('results.soClose') ?? 'So close!').replace('{points}', String(gap)) || `So close! Just ${gap} pts behind #1.`}
+                {t('results.soClose', { points: gap })}
               </p>
             )}
           </motion.div>

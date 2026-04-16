@@ -268,11 +268,11 @@ function registerScorecardHandlers(io: Server, socket: Socket): void {
       return;
     }
 
-    const { gameCode: providedGameCode, username: providedUsername } = validation.data as GenerateScoreCardRequest;
+    const { gameCode: providedGameCode } = validation.data as GenerateScoreCardRequest;
 
-    // Get game code and username from context if not provided
+    // Always use server-side identity to prevent spoofing
     const gameCode = providedGameCode || getGameBySocketId(socket.id);
-    const username = providedUsername || getUsernameBySocketId(socket.id);
+    const username = getUsernameBySocketId(socket.id);
 
     // Validate game code and username
     if (!gameCode) {

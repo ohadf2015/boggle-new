@@ -36,9 +36,17 @@ describe('endlessMode', () => {
       expect(d100.gridSize).toBeLessThanOrEqual(7);
     });
 
-    it('should not reduce timer below minimum', () => {
+    it('should not reduce timer below minimum (45s)', () => {
       const d100 = getEndlessDifficulty(100);
-      expect(d100.timerSeconds).toBeGreaterThanOrEqual(30);
+      expect(d100.timerSeconds).toBe(45);
+    });
+
+    it('should clamp timer at exactly minTimerSeconds for extreme floors', () => {
+      // Floor 100: 120 - 99*3 = -177 → clamped to minTimerSeconds
+      const d100 = getEndlessDifficulty(100);
+      const d50 = getEndlessDifficulty(50);
+      expect(d100.timerSeconds).toBe(ENDLESS_MODE_CONFIG.minTimerSeconds);
+      expect(d50.timerSeconds).toBe(ENDLESS_MODE_CONFIG.minTimerSeconds);
     });
 
     it('should increase special tile count', () => {

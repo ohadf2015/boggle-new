@@ -510,6 +510,11 @@ const en = {
       "navigation": "Navigation"
     }
   },
+  "presence": {
+    "active": "Active",
+    "idle": "Away",
+    "afk": "Away from keyboard"
+  },
   "nav": {
     "bottomNavigation": "Bottom navigation",
     "gameNavigation": "Game navigation",
@@ -625,6 +630,7 @@ const en = {
     "modeReveal": {
       "blast": "BLAST!",
       "wordHunt": "WORD HUNT!",
+      "wheelRush": "WHEEL RUSH!",
       "classic": "CLASSIC!"
     }
   },
@@ -6555,6 +6561,16 @@ const en = {
       "valor": { "name": "Valor Rune", "desc": "+20% boss damage" },
       "dragonslayer": { "name": "Dragonslayer Rune", "desc": "+50% boss damage" }
     },
+    "achievements": {
+      "title": "Achievements",
+      "earned": "earned",
+      "categories": {
+        "gameplay": "Gameplay",
+        "bosses": "Bosses",
+        "progression": "Progression",
+        "mastery": "Mastery"
+      }
+    },
     "loading": "Loading adventure...",
     "currency": {
       "goldAmount": "{amount} gold",
@@ -10216,6 +10232,7 @@ const en = {
     "spectators": "spectators",
     "playersJoined": "players joined",
     "needMore": "Need more players",
+    "host": "Host",
     "waiting": "...",
     "startGame": "Start Game",
     "round": "Round",

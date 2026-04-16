@@ -13,6 +13,7 @@ import AutoHideHeader from '@/components/AutoHideHeader';
 import { AdPlaceholder } from '@/components/ads';
 import { RelatedArticles } from '@/components/blog/RelatedArticles';
 import { contentByLocale } from './content';
+import { faqByLocale, faqHeadingByLocale } from './faq';
 import { AuthorBioCard } from '@/components/blog/AuthorBioCard';
 
 export default function BoggleAlternativesPageClient(): React.ReactElement {
@@ -23,6 +24,54 @@ export default function BoggleAlternativesPageClient(): React.ReactElement {
   const isDarkMode = theme === 'dark';
 
   const content = contentByLocale[locale] || contentByLocale.en;
+  const faqs = faqByLocale[locale] || faqByLocale.en;
+  const faqHeading = faqHeadingByLocale[locale] || faqHeadingByLocale.en;
+
+  const tocSections = content.sections.filter((s) => s.title && s.slug && s.slug !== 'intro');
+
+  const tocLabel: Record<string, string> = {
+    en: 'In this article',
+    he: 'במאמר הזה',
+    sv: 'I den här artikeln',
+    ja: 'この記事の内容',
+    es: 'En este artículo',
+  };
+
+  const comparisonHeadingByLocale: Record<string, string> = {
+    en: 'Quick Comparison',
+    he: 'השוואה מהירה',
+    sv: 'Snabb jämförelse',
+    ja: '比較一覧',
+    es: 'Comparación rápida',
+  };
+
+  const comparisonHeaders: Record<string, { game: string; realtime: string; payToWin: string; modes: string; free: string }> = {
+    en: { game: 'Game', realtime: 'Real-time', payToWin: 'Pay-to-Win', modes: 'Modes', free: 'Free' },
+    he: { game: 'משחק', realtime: 'זמן אמת', payToWin: 'Pay-to-Win', modes: 'מצבים', free: 'חינמי' },
+    sv: { game: 'Spel', realtime: 'Realtid', payToWin: 'Pay-to-Win', modes: 'Lägen', free: 'Gratis' },
+    ja: { game: 'ゲーム', realtime: 'リアルタイム', payToWin: '課金勝利', modes: 'モード', free: '無料' },
+    es: { game: 'Juego', realtime: 'Tiempo real', payToWin: 'Pay-to-Win', modes: 'Modos', free: 'Gratis' },
+  };
+
+  const headers = comparisonHeaders[locale] || comparisonHeaders.en;
+
+  const comparisonRows = [
+    { name: 'Wordle', realtime: false, p2w: false, modes: '1', free: true },
+    { name: 'Words With Friends 2', realtime: false, p2w: true, modes: '2', free: false },
+    { name: 'Wordscapes', realtime: false, p2w: false, modes: '1', free: false },
+    { name: 'Boggle With Friends', realtime: true, p2w: true, modes: '2', free: false },
+    { name: 'Word Blitz', realtime: true, p2w: false, modes: '1', free: true },
+    { name: 'LexiClash', realtime: true, p2w: false, modes: '6+', free: true },
+  ];
+
+  const tryCtaByLocale: Record<string, string> = {
+    en: 'Try LexiClash free — no download, no ads',
+    he: 'נסו LexiClash בחינם — ללא הורדה, ללא פרסומות',
+    sv: 'Prova LexiClash gratis — ingen nedladdning, inga annonser',
+    ja: 'LexiClashを無料で試す — ダウンロード不要、広告なし',
+    es: 'Prueba LexiClash gratis — sin descarga, sin anuncios',
+  };
+
   const relatedHeadingByLocale: Record<string, string> = {
     en: 'You Might Also Like',
     he: 'אולי יעניין אותך גם',
@@ -71,7 +120,7 @@ export default function BoggleAlternativesPageClient(): React.ReactElement {
           <div className="mb-4">
             <span className={cn(
               'inline-block px-3 py-1 text-xs font-bold uppercase rounded-neo border-2 border-neo-black',
-              'bg-neo-orange text-white'
+              'bg-neo-pink text-white'
             )}>
               {content.category}
             </span>
@@ -124,17 +173,48 @@ export default function BoggleAlternativesPageClient(): React.ReactElement {
 
         <AdPlaceholder zone="content-page" className="my-6" />
 
+        {/* Table of Contents */}
+        <nav
+          aria-label="Table of Contents"
+          className={cn(
+            'mb-8 p-4 rounded-neo border-3 border-neo-black',
+            isDarkMode ? 'bg-slate-800' : 'bg-neo-cream'
+          )}
+        >
+          <p className={cn('font-bold text-sm mb-2', isDarkMode ? 'text-white' : 'text-neo-black')}>
+            {tocLabel[locale] || tocLabel.en}
+          </p>
+          <ol className="list-decimal list-inside space-y-1">
+            {tocSections.map((s) => (
+              <li key={s.slug}>
+                <a
+                  href={`#${s.slug}`}
+                  className={cn(
+                    'text-sm hover:underline',
+                    isDarkMode ? 'text-neo-cyan' : 'text-neo-pink-dark'
+                  )}
+                >
+                  {s.title}
+                </a>
+              </li>
+            ))}
+          </ol>
+        </nav>
+
         <div className={cn(
           'prose prose-lg max-w-none',
           isDarkMode ? 'prose-invert' : ''
         )}>
           {content.sections.map((section, index) => (
-            <div key={index} className="mb-6">
+            <div key={section.slug || index} className="mb-6">
               {section.title && (
-                <h2 className={cn(
-                  'text-xl font-bold mb-3 mt-8',
-                  isDarkMode ? 'text-white' : 'text-neo-black'
-                )}>
+                <h2
+                  id={section.slug}
+                  className={cn(
+                    'text-xl font-bold mb-3 mt-8 scroll-mt-20',
+                    isDarkMode ? 'text-white' : 'text-neo-black'
+                  )}
+                >
                   {section.title}
                 </h2>
               )}
@@ -149,6 +229,65 @@ export default function BoggleAlternativesPageClient(): React.ReactElement {
                   {paragraph}
                 </p>
               ))}
+
+              {/* Inline CTA after LexiClash section */}
+              {section.slug === 'lexiclash' && (
+                <div className={cn(
+                  'my-6 p-4 rounded-neo border-3 border-neo-black text-center',
+                  isDarkMode ? 'bg-neo-lime/10 border-neo-lime' : 'bg-neo-lime/20'
+                )}>
+                  <Link href={`/${locale}/daily`}>
+                    <Button className="rounded-neo border-3 border-neo-black bg-neo-lime text-neo-black font-bold shadow-hard hover:shadow-hard-lg text-base px-6 py-3">
+                      {tryCtaByLocale[locale] || tryCtaByLocale.en}
+                    </Button>
+                  </Link>
+                </div>
+              )}
+
+              {/* Comparison table after comparison section */}
+              {section.slug === 'comparison' && (
+                <div className="my-6 overflow-x-auto">
+                  <h3 className={cn(
+                    'text-lg font-bold mb-3',
+                    isDarkMode ? 'text-white' : 'text-neo-black'
+                  )}>
+                    {comparisonHeadingByLocale[locale] || comparisonHeadingByLocale.en}
+                  </h3>
+                  <table className={cn(
+                    'w-full text-sm border-3 border-neo-black rounded-neo overflow-hidden',
+                    isDarkMode ? 'bg-slate-800' : 'bg-white'
+                  )}>
+                    <thead>
+                      <tr className={cn('border-b-2 border-neo-black', isDarkMode ? 'bg-slate-700' : 'bg-neo-cream')}>
+                        <th className="px-3 py-2 text-start font-bold">{headers.game}</th>
+                        <th className="px-3 py-2 text-center font-bold">{headers.realtime}</th>
+                        <th className="px-3 py-2 text-center font-bold">{headers.payToWin}</th>
+                        <th className="px-3 py-2 text-center font-bold">{headers.modes}</th>
+                        <th className="px-3 py-2 text-center font-bold">{headers.free}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {comparisonRows.map((row) => (
+                        <tr
+                          key={row.name}
+                          className={cn(
+                            'border-b border-neo-black/20',
+                            row.name === 'LexiClash' && (isDarkMode ? 'bg-neo-lime/10' : 'bg-neo-lime/15')
+                          )}
+                        >
+                          <td className={cn('px-3 py-2 font-semibold', isDarkMode ? 'text-white' : 'text-neo-black')}>
+                            {row.name}
+                          </td>
+                          <td className="px-3 py-2 text-center">{row.realtime ? '\u2705' : '\u274c'}</td>
+                          <td className="px-3 py-2 text-center">{row.p2w ? '\u274c' : '\u2705'}</td>
+                          <td className="px-3 py-2 text-center">{row.modes}</td>
+                          <td className="px-3 py-2 text-center">{row.free ? '\u2705' : '\u274c'}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </div>
           ))}
 
@@ -159,7 +298,7 @@ export default function BoggleAlternativesPageClient(): React.ReactElement {
             <div className="flex items-start gap-3">
               <div className={cn(
                 'w-10 h-10 rounded-full border-2 border-neo-black flex items-center justify-center shrink-0',
-                'bg-neo-orange text-white font-bold text-lg'
+                'bg-neo-pink text-white font-bold text-lg'
               )}>
                 {content.authorName.charAt(0)}
               </div>
@@ -176,15 +315,50 @@ export default function BoggleAlternativesPageClient(): React.ReactElement {
 
           <AdPlaceholder zone="content-page" className="my-6" />
 
+          {/* FAQ Section */}
+          <section className="mt-12" id="faq">
+            <h2 className={cn(
+              'text-xl font-bold mb-6 scroll-mt-20',
+              isDarkMode ? 'text-white' : 'text-neo-black'
+            )}>
+              {faqHeading}
+            </h2>
+            <div className="space-y-4">
+              {faqs.map((faq, i) => (
+                <details
+                  key={i}
+                  className={cn(
+                    'group rounded-neo border-3 border-neo-black overflow-hidden',
+                    isDarkMode ? 'bg-slate-800' : 'bg-white'
+                  )}
+                >
+                  <summary className={cn(
+                    'cursor-pointer px-4 py-3 font-semibold text-sm list-none flex items-center justify-between',
+                    isDarkMode ? 'text-white hover:bg-slate-700' : 'text-neo-black hover:bg-neo-cream'
+                  )}>
+                    {faq.question}
+                    <span className="ms-2 text-xs transition-transform group-open:rotate-180">&#9660;</span>
+                  </summary>
+                  <div className={cn(
+                    'px-4 pb-3 text-sm leading-relaxed border-t border-neo-black/20',
+                    isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                  )}>
+                    {faq.answer}
+                  </div>
+                </details>
+              ))}
+            </div>
+          </section>
+
           <div className={cn('mt-12 pt-6 border-t', isDarkMode ? 'border-slate-700' : 'border-gray-200')}>
             <div className="flex gap-4">
               <Link href={`/${locale}/daily`}>
-                <Button className="rounded-neo border-3 border-neo-black bg-neo-orange text-white font-bold shadow-hard hover:shadow-hard-lg">
+                <Button className="rounded-neo border-3 border-neo-black bg-neo-pink text-white font-bold shadow-hard hover:shadow-hard-lg">
                   {content.playDaily}
                 </Button>
               </Link>
               <Link href={`/${locale}/singleplayer`}>
-                <Button className="rounded-neo border-3 border-neo-black bg-neo-yellow text-neo-black font-bold shadow-hard hover:shadow-hard-lg">
+                <Button className="rounded-neo border-3 border-neo-black bg-neo-cyan text-neo-black font-bold shadow-hard hover:shadow-hard-lg">
                   {content.startPracticing}
                 </Button>
               </Link>

@@ -679,3 +679,212 @@ describe('Blast Shield T1 (iceTileReduction) — extended ice melt range', () =>
     expect(result.tiles[0][0].isFrozen).toBe(true);
   });
 });
+
+// ==============================================
+// COMPLETE_LEVEL action (Sprint 3 backfill — H15)
+// ==============================================
+
+describe('COMPLETE_LEVEL action', () => {
+  const levelConfig = {
+    world: 1, level: 3, gridSize: 4, timerSeconds: 60,
+    isBossLevel: false, specialTiles: [], difficulty: 'EASY' as const,
+    chapterNumber: 1, levelInChapter: 3,
+    objectives: [
+      { type: 'scoreTarget', target: 100, isPrimary: true },
+      { type: 'timeBonus', target: 30, isPrimary: false },
+    ],
+  } as LevelConfig;
+  const grid = Array.from({ length: 4 }, () => Array.from({ length: 4 }, () => 'A'));
+
+  it('sets isPlaying to false and isComplete to true', () => {
+    const state = createInitialState(levelConfig, grid);
+    const started = gameReducer(state, { type: 'START_GAME' });
+    const result = gameReducer(started, { type: 'COMPLETE_LEVEL' });
+    expect(result.isPlaying).toBe(false);
+    expect(result.gameState.isComplete).toBe(true);
+  });
+
+  it('finalizes timeBonus objective against timeRemaining', () => {
+    const state = createInitialState(levelConfig, grid);
+    const started = gameReducer(state, { type: 'START_GAME' });
+    // Simulate some time passing — 45 seconds left
+    const midGame = { ...started, timeRemaining: 45 };
+    const result = gameReducer(midGame, { type: 'COMPLETE_LEVEL' });
+    const timeBonus = result.objectives.find(o => o.type === 'timeBonus');
+    expect(timeBonus?.current).toBe(45);
+    expect(timeBonus?.isComplete).toBe(true); // 45 >= 30 target
+  });
+
+  it('timeBonus marked incomplete when time below target', () => {
+    const state = createInitialState(levelConfig, grid);
+    const started = gameReducer(state, { type: 'START_GAME' });
+    const lowTime = { ...started, timeRemaining: 10 };
+    const result = gameReducer(lowTime, { type: 'COMPLETE_LEVEL' });
+    const timeBonus = result.objectives.find(o => o.type === 'timeBonus');
+    expect(timeBonus?.current).toBe(10);
+    expect(timeBonus?.isComplete).toBe(false); // 10 < 30
+  });
+
+  it('calculates stars correctly with all objectives met', () => {
+    const state = createInitialState(levelConfig, grid);
+    const started = gameReducer(state, { type: 'START_GAME' });
+    // Complete primary objective
+    const withScore = gameReducer(started, {
+      type: 'UPDATE_OBJECTIVE',
+      payload: { objectiveType: 'scoreTarget', value: 100, mode: 'set' },
+    });
+    // Leave enough time for timeBonus
+    const withTime = { ...withScore, timeRemaining: 40 };
+    const result = gameReducer(withTime, { type: 'COMPLETE_LEVEL' });
+    expect(result.gameState.stars).toBe(2); // primary + timeBonus secondary
+  });
+
+  it('calculates 0 stars when primary not met', () => {
+    const state = createInitialState(levelConfig, grid);
+    const started = gameReducer(state, { type: 'START_GAME' });
+    // Primary scoreTarget not met — current still 0
+    const withTime = { ...started, timeRemaining: 40 };
+    const result = gameReducer(withTime, { type: 'COMPLETE_LEVEL' });
+    expect(result.gameState.stars).toBe(0);
+  });
+
+  it('does not affect non-timeBonus objectives', () => {
+    const state = createInitialState(levelConfig, grid);
+    const started = gameReducer(state, { type: 'START_GAME' });
+    const withScore = gameReducer(started, {
+      type: 'UPDATE_OBJECTIVE',
+      payload: { objectiveType: 'scoreTarget', value: 75, mode: 'set' },
+    });
+    const result = gameReducer(withScore, { type: 'COMPLETE_LEVEL' });
+    const scoreObj = result.objectives.find(o => o.type === 'scoreTarget');
+    expect(scoreObj?.current).toBe(75); // unchanged
+  });
+});
+
+// ==============================================
+// TAKE_DAMAGE action (Sprint 3 backfill — H15)
+// ==============================================
+
+describe('TAKE_DAMAGE action', () => {
+  const hpLevelConfig = {
+    world: 2, level: 7, gridSize: 5, timerSeconds: 120,
+    isBossLevel: true, showBossIntro: true, specialTiles: [],
+    difficulty: 'HARD' as const, chapterNumber: 3, levelInChapter: 3,
+    lifePoints: 100,
+    objectives: [
+      { type: 'defeatBoss', target: 100, isPrimary: true },
+    ],
+  } as LevelConfig;
+  const grid = Array.from({ length: 5 }, () => Array.from({ length: 5 }, () => 'A'));
+
+  const noHpConfig = {
+    world: 1, level: 1, gridSize: 4, timerSeconds: 60,
+    isBossLevel: false, specialTiles: [], difficulty: 'EASY' as const,
+    chapterNumber: 1, levelInChapter: 1,
+    objectives: [makeObjective({ isPrimary: true, target: 100 })],
+  } as LevelConfig;
+  const smallGrid = Array.from({ length: 4 }, () => Array.from({ length: 4 }, () => 'A'));
+
+  it('is a no-op when currentHP is null (no HP system)', () => {
+    const state = createInitialState(noHpConfig, smallGrid);
+    const started = gameReducer(state, { type: 'START_GAME' });
+    expect(started.currentHP).toBeUndefined();
+    const result = gameReducer(started, { type: 'TAKE_DAMAGE', payload: { amount: 25 } });
+    expect(result).toBe(started); // exact same reference — no-op
+  });
+
+  it('reduces HP by damage amount', () => {
+    const state = createInitialState(hpLevelConfig, grid);
+    const started = gameReducer(state, { type: 'START_GAME' });
+    expect(started.currentHP).toBe(100);
+    const result = gameReducer(started, { type: 'TAKE_DAMAGE', payload: { amount: 25 } });
+    expect(result.currentHP).toBe(75);
+    expect(result.isPlaying).toBe(true);
+  });
+
+  it('triggers game over when HP reaches 0', () => {
+    const state = createInitialState(hpLevelConfig, grid);
+    const started = gameReducer(state, { type: 'START_GAME' });
+    const result = gameReducer(started, { type: 'TAKE_DAMAGE', payload: { amount: 100 } });
+    expect(result.currentHP).toBe(0);
+    expect(result.isPlaying).toBe(false);
+    expect(result.gameState.isComplete).toBe(true);
+  });
+
+  it('clamps HP to 0 when damage exceeds remaining HP', () => {
+    const state = createInitialState(hpLevelConfig, grid);
+    const started = gameReducer(state, { type: 'START_GAME' });
+    const hurt = gameReducer(started, { type: 'TAKE_DAMAGE', payload: { amount: 60 } });
+    const overkill = gameReducer(hurt, { type: 'TAKE_DAMAGE', payload: { amount: 999 } });
+    expect(overkill.currentHP).toBe(0);
+    expect(overkill.isPlaying).toBe(false);
+  });
+
+  it('calculates stars at death based on current objective state', () => {
+    const state = createInitialState(hpLevelConfig, grid);
+    const started = gameReducer(state, { type: 'START_GAME' });
+    // Partially complete boss objective — not enough for star
+    const partial = gameReducer(started, {
+      type: 'UPDATE_OBJECTIVE',
+      payload: { objectiveType: 'defeatBoss', value: 50, mode: 'set' },
+    });
+    const dead = gameReducer(partial, { type: 'TAKE_DAMAGE', payload: { amount: 100 } });
+    expect(dead.gameState.stars).toBe(0); // primary not met
+  });
+});
+
+// ==============================================
+// HEAL action (Sprint 3 backfill — H15)
+// ==============================================
+
+describe('HEAL action', () => {
+  const hpLevelConfig = {
+    world: 2, level: 7, gridSize: 5, timerSeconds: 120,
+    isBossLevel: true, showBossIntro: true, specialTiles: [],
+    difficulty: 'HARD' as const, chapterNumber: 3, levelInChapter: 3,
+    lifePoints: 100,
+    objectives: [
+      { type: 'defeatBoss', target: 100, isPrimary: true },
+    ],
+  } as LevelConfig;
+  const grid = Array.from({ length: 5 }, () => Array.from({ length: 5 }, () => 'A'));
+
+  const noHpConfig = {
+    world: 1, level: 1, gridSize: 4, timerSeconds: 60,
+    isBossLevel: false, specialTiles: [], difficulty: 'EASY' as const,
+    chapterNumber: 1, levelInChapter: 1,
+    objectives: [makeObjective({ isPrimary: true, target: 100 })],
+  } as LevelConfig;
+  const smallGrid = Array.from({ length: 4 }, () => Array.from({ length: 4 }, () => 'A'));
+
+  it('is a no-op when HP system absent', () => {
+    const state = createInitialState(noHpConfig, smallGrid);
+    const started = gameReducer(state, { type: 'START_GAME' });
+    const result = gameReducer(started, { type: 'HEAL', payload: { amount: 20 } });
+    expect(result).toBe(started);
+  });
+
+  it('heals HP by given amount', () => {
+    const state = createInitialState(hpLevelConfig, grid);
+    const started = gameReducer(state, { type: 'START_GAME' });
+    const hurt = gameReducer(started, { type: 'TAKE_DAMAGE', payload: { amount: 40 } });
+    expect(hurt.currentHP).toBe(60);
+    const healed = gameReducer(hurt, { type: 'HEAL', payload: { amount: 20 } });
+    expect(healed.currentHP).toBe(80);
+  });
+
+  it('clamps HP to maxHP', () => {
+    const state = createInitialState(hpLevelConfig, grid);
+    const started = gameReducer(state, { type: 'START_GAME' });
+    const hurt = gameReducer(started, { type: 'TAKE_DAMAGE', payload: { amount: 10 } });
+    const overhealed = gameReducer(hurt, { type: 'HEAL', payload: { amount: 999 } });
+    expect(overhealed.currentHP).toBe(100); // clamped to maxHP
+  });
+
+  it('does not exceed maxHP when already at full', () => {
+    const state = createInitialState(hpLevelConfig, grid);
+    const started = gameReducer(state, { type: 'START_GAME' });
+    const result = gameReducer(started, { type: 'HEAL', payload: { amount: 50 } });
+    expect(result.currentHP).toBe(100);
+  });
+});

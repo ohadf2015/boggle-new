@@ -26,8 +26,7 @@ import logger from '../utils/logger.js';
 import { validatePayload, addBotSchema, removeBotSchema } from '../utils/socketValidation.js';
 import { isInProgress } from '../utils/gameStateMachine.js';
 
-// Configuration
-const MAX_PLAYERS_PER_ROOM = 50;
+import { MAX_PLAYERS_PER_ROOM } from '@/shared/constants/gameConstants';
 
 // Types for payloads
 interface AddBotPayload {

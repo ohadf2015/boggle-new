@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef, memo, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 /**
  * Status types
@@ -55,6 +56,7 @@ const PresenceIndicator = memo<PresenceIndicatorProps>(({
   showTooltip = true,
   className = '',
 }) => {
+  const { t } = useLanguage();
   const [tooltipVisible, setTooltipVisible] = useState(false);
   const tooltipTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -119,22 +121,22 @@ const PresenceIndicator = memo<PresenceIndicatorProps>(({
     active: {
       color: 'bg-neo-lime',
       ringColor: 'ring-neo-lime/50',
-      tooltip: 'Active',
+      tooltip: t('presence.active') ?? 'Active',
       pulse: true,
     },
     idle: {
       color: 'bg-neo-cream',
       ringColor: 'ring-neo-cream/50',
-      tooltip: 'Away',
+      tooltip: t('presence.idle') ?? 'Away',
       pulse: false,
     },
     afk: {
       color: 'bg-neo-cream/40',
       ringColor: 'ring-neo-cream/30',
-      tooltip: 'Away from keyboard',
+      tooltip: t('presence.afk') ?? 'Away from keyboard',
       pulse: false,
     },
-  }), []);
+  }), [t]);
 
   const config = statusConfig[status] || statusConfig.active;
 
