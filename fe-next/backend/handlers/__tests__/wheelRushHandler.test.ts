@@ -18,11 +18,17 @@ vi.mock('../../utils/socketHelpers', () => ({
 
 vi.mock('../../utils/timerManager', () => ({
   __esModule: true,
-  default: { setTimeout: vi.fn(), clearTimer: vi.fn() },
+  default: { setTimeout: vi.fn(), clearTimer: vi.fn(), clearTimersWithPrefix: vi.fn() },
 }));
 
+const { cleanupCallbacks } = vi.hoisted(() => ({
+  cleanupCallbacks: {} as { onGameEnd?: (p: { gameCode: string }) => void; onGameReset?: (p: { gameCode: string }) => void },
+}));
 vi.mock('../../events/gameCleanup', () => ({
-  gameCleanupEmitter: { onGameEnd: vi.fn(), onGameReset: vi.fn() },
+  gameCleanupEmitter: {
+    onGameEnd: vi.fn((cb: (p: { gameCode: string }) => void) => { cleanupCallbacks.onGameEnd = cb; }),
+    onGameReset: vi.fn((cb: (p: { gameCode: string }) => void) => { cleanupCallbacks.onGameReset = cb; }),
+  },
 }));
 
 vi.mock('../../modules/gameStateManager', () => ({
@@ -42,6 +48,7 @@ import { handleSubmitWheelWord } from '../wheelRushHandler';
 import { broadcastToRoom } from '../../utils/socketHelpers';
 import { getGame, updatePlayerScore } from '../../modules/gameStateManager';
 import { validateWheelSubmission, applyWheelWord } from '../../modules/wheelRushManager';
+import timerManager from '../../utils/timerManager';
 
 const mkSocket = () => ({ id: 's1', emit: vi.fn() } as unknown as Socket);
 const mkIo = () => ({} as Server);
@@ -110,5 +117,17 @@ describe('wheelRushHandler', () => {
     handleSubmitWheelWord(mkIo(), sock, { word: 'CANE' });
     expect(sock.emit).toHaveBeenCalledWith('error', { message: 'Not a wheel-rush game' });
     expect(validateWheelSubmission).not.toHaveBeenCalled();
+  });
+
+  describe('cleanup on game end/reset', () => {
+    it('clears all per-word reap timers for the game on game end', () => {
+      cleanupCallbacks.onGameEnd?.({ gameCode: 'GAME1' });
+      expect(timerManager.clearTimersWithPrefix).toHaveBeenCalledWith('wheelRushReap:GAME1:');
+    });
+
+    it('clears all per-word reap timers for the game on game reset', () => {
+      cleanupCallbacks.onGameReset?.({ gameCode: 'GAME1' });
+      expect(timerManager.clearTimersWithPrefix).toHaveBeenCalledWith('wheelRushReap:GAME1:');
+    });
   });
 });

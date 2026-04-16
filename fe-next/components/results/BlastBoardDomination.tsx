@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, useReducedMotion } from 'framer-motion';
-import { Bomb, Crown, Flame, Gem, Sparkles, Sword, Trophy, Zap, Waves } from 'lucide-react';
+import { Bomb, Crown, Flame, Gem, Sparkles, Sword, Trophy, Waves } from 'lucide-react';
 import { useMemo } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { ScoreCountUp } from '@/components/results/shared';
@@ -375,49 +375,6 @@ export default function BlastBoardDomination({ playerStats, currentUsername }: B
         </div>
       )}
 
-      {/* ── Per-player stat rows (compact) ── */}
-      {ranked.length > 1 && (
-        <motion.div variants={v} className="space-y-1.5">
-          <h4 className="text-[10px] font-bold uppercase tracking-wider text-neo-cream/50 px-1">
-            {t('blast.multiplayer.playerStats')}
-          </h4>
-          {ranked.map(([username, stats]) => {
-            const color = colorMap[username];
-            const isMe = username === currentUsername;
-            return (
-              <motion.div
-                key={username}
-                variants={v}
-                className={`flex items-center gap-3 px-3 py-2 bg-neo-navy/40 rounded-neo border-2 ${isMe ? (color?.border || 'border-neo-lime') + ' border-opacity-60' : 'border-neo-black/60'}`}
-              >
-                {/* Color dot + name */}
-                <div className="flex items-center gap-1.5 min-w-0 shrink-0">
-                  <div className={`w-2 h-2 rounded-full ${color?.fill || 'bg-neo-lime'}`} />
-                  <span className={`text-xs font-bold truncate ${isMe ? 'text-neo-white' : 'text-neo-cream/80'}`}>
-                    {username}
-                  </span>
-                </div>
-
-                {/* Stats chips */}
-                <div className="flex items-center gap-3 ml-auto text-[10px] text-neo-cream/60 tabular-nums">
-                  <span className="flex items-center gap-0.5" title={t('blast.results.tilesCleared')}>
-                    <Zap className="w-3 h-3 text-neo-yellow" />{stats.tilesCleared}
-                  </span>
-                  <span className="flex items-center gap-0.5" title={t('blast.results.maxCombo')}>
-                    <Flame className="w-3 h-3 text-neo-orange" />{stats.maxCombo}x
-                  </span>
-                  <span className="flex items-center gap-0.5" title={t('blast.results.gemsCollected')}>
-                    <Gem className="w-3 h-3 text-neo-cyan" />{stats.gemsCollected}
-                  </span>
-                  <span className="flex items-center gap-0.5 font-bold text-neo-cream/70" title={t('blast.results.bestWord')}>
-                    {stats.bestWord?.toUpperCase() || '—'}
-                  </span>
-                </div>
-              </motion.div>
-            );
-          })}
-        </motion.div>
-      )}
     </motion.div>
   );
 }

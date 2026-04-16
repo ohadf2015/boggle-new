@@ -25,7 +25,7 @@ interface UsePlayerGameEventsProps {
   socket: Socket | null;
   t: (key: string) => string;
   username: string;
-  onShowResults?: (data: { scores: any; letterGrid: any; duplicateRuleDisabled?: boolean; playerCount?: number; wordHuntSummary?: any; blastSummary?: any }) => void;
+  onShowResults?: (data: { scores: any; letterGrid: any; duplicateRuleDisabled?: boolean; playerCount?: number; wordHuntSummary?: any; blastSummary?: any; wheelRushSummary?: any }) => void;
 
   // Local state (not in GameState context)
   setShowWordFeedback: React.Dispatch<React.SetStateAction<boolean>>;
@@ -222,7 +222,8 @@ export function usePlayerGameEvents({
       if (data.gameMode) storeUpdates.gameMode = data.gameMode;
       if ((data as any).blastTileOverlay) {
         storeUpdates.blastTileOverlay = (data as any).blastTileOverlay;
-        storeUpdates.blastMovesUsed = 0;
+        const reconnectMoves = (data as any).blastPlayerMoves as Record<string, number> | undefined;
+        storeUpdates.blastMovesUsed = reconnectMoves?.[username] ?? 0;
         if ((data as any).blastSeed != null) storeUpdates.blastSeed = (data as any).blastSeed;
         if ((data as any).blastWave != null) storeUpdates.blastWave = (data as any).blastWave;
         // Reconnect/late-join: apply current server board state if available
@@ -233,7 +234,7 @@ export function usePlayerGameEvents({
             clearedBy: '__server_reconnect__',
             word: '',
             clearedCount: 0,
-            totalMoves: 0,
+            totalMoves: storeUpdates.blastMovesUsed,
           };
         }
       }
@@ -398,6 +399,11 @@ export function usePlayerGameEvents({
         }
       }
 
+      // Sync wheel rush stats from server for results screen
+      if (data.wheelRushSummary?.playerStats) {
+        useGameStore.getState().setWheelRushPlayerStats(data.wheelRushSummary.playerStats);
+      }
+
       // Transition directly to results — no validation modal delay
       // Also ensures game is marked inactive as fallback (in case endGame hasn't arrived yet)
       setGameActive(false);
@@ -416,6 +422,7 @@ export function usePlayerGameEvents({
           playerCount: data.playerCount,
           wordHuntSummary: data.wordHuntSummary,
           blastSummary: data.blastSummary,
+          wheelRushSummary: data.wheelRushSummary,
         });
       }
     };

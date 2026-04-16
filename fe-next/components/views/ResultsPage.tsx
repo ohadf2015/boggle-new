@@ -41,11 +41,12 @@ import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useInterstitialAd } from '@/hooks/useInterstitialAd';
 import { useGameKeyboardShortcuts } from '@/hooks/useGameKeyboardShortcuts';
 import type { GameModeOption } from '@/components/GameModeSelector';
-import { useGameMode, useWordHuntPlayerLives, useWordHuntEliminatedPlayers, useBlastMovesUsed, useBlastTotalTileBonus, useBlastTotalTilesCleared, useBlastPlayerStats } from '@/hooks/gameState/store';
-import type { BlastPlayerStats } from '@/shared/types/game';
+import { useGameMode, useWordHuntPlayerLives, useWordHuntEliminatedPlayers, useBlastMovesUsed, useBlastTotalTileBonus, useBlastTotalTilesCleared, useBlastPlayerStats, useWheelRushPlayerStats } from '@/hooks/gameState/store';
+import type { BlastPlayerStats, WheelRushPlayerStats } from '@/shared/types/game';
 const WordHuntResultsSummary = dynamic(() => import('@/components/results/WordHuntResultsSummary'), { ssr: false });
 const BlastResultsSummary = dynamic(() => import('@/components/results/BlastResultsSummary'), { ssr: false });
 const BlastBoardDomination = dynamic(() => import('@/components/results/BlastBoardDomination'), { ssr: false });
+const WheelRushDomination = dynamic(() => import('@/components/results/WheelRushDomination'), { ssr: false });
 const CrazyGamesBanner = dynamic(() => import('@/components/CrazyGamesBanner'), { ssr: false });
 const PostGameWordReview = dynamic(() => import('@/components/education/PostGameWordReview'), { ssr: false });
 
@@ -68,6 +69,7 @@ interface DesktopResultsLayoutProps {
   blastTotalTilesCleared: number;
   blastTotalTileBonus: number;
   blastPlayerStats: Record<string, BlastPlayerStats>;
+  wheelRushPlayerStats: Record<string, WheelRushPlayerStats>;
   currentUsername?: string;
   gameCode?: string;
   sortedScores: any[];
@@ -87,6 +89,7 @@ function DesktopResultsLayout({
   blastTotalTilesCleared,
   blastTotalTileBonus,
   blastPlayerStats,
+  wheelRushPlayerStats,
   currentUsername,
   gameCode,
   sortedScores,
@@ -157,6 +160,12 @@ function DesktopResultsLayout({
                   tileBonus={blastTotalTileBonus}
                 />
               )
+            )}
+            {resolvedGameMode === 'wheel-rush' && Object.keys(wheelRushPlayerStats).length >= 2 && (
+              <WheelRushDomination
+                playerStats={wheelRushPlayerStats}
+                currentUsername={currentUsername}
+              />
             )}
             {gameCode && sortedScores.length > 1 && (
               <PostGameSocialActions
@@ -267,6 +276,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
   const blastTotalTileBonus = useBlastTotalTileBonus();
   const blastTotalTilesCleared = useBlastTotalTilesCleared();
   const blastPlayerStats = useBlastPlayerStats();
+  const wheelRushPlayerStats = useWheelRushPlayerStats();
 
   // Socket events for word feedback, XP, engagement features, and player ready state
   const {
@@ -706,6 +716,14 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
           )}
         </div>
       )}
+      {resolvedGameMode === 'wheel-rush' && Object.keys(wheelRushPlayerStats).length >= 2 && (
+        <div className="mb-3">
+          <WheelRushDomination
+            playerStats={wheelRushPlayerStats}
+            currentUsername={username}
+          />
+        </div>
+      )}
       {/* Social actions: Add Friend for non-friend opponents (E-10, E-14) */}
       {gameCode && sortedScores.length > 1 && (
         <PostGameSocialActions
@@ -878,6 +896,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
         blastTotalTilesCleared={blastTotalTilesCleared}
         blastTotalTileBonus={blastTotalTileBonus}
         blastPlayerStats={blastPlayerStats}
+        wheelRushPlayerStats={wheelRushPlayerStats}
         currentUsername={username}
         gameCode={gameCode}
         sortedScores={sortedScores}

@@ -4,7 +4,7 @@
  * puzzle generation, word validation, steal-lock resolution.
  */
 
-import type { WheelRushModeState, WheelPuzzle, Language } from '@/shared/types/game';
+import type { WheelRushModeState, WheelPuzzle, Language, WheelRushPlayerStats } from '@/shared/types/game';
 import {
   WHEEL_RUSH_LOCK_MS,
   WHEEL_RUSH_STEAL_BONUS,
@@ -79,14 +79,37 @@ export function initWheelRushState(
   now: number = Date.now(),
 ): WheelRushModeState {
   const foundWords: Record<string, string[]> = {};
-  for (const p of players) foundWords[p] = [];
+  const playerStats: Record<string, WheelRushPlayerStats> = {};
+  for (const p of players) {
+    foundWords[p] = [];
+    playerStats[p] = { wordsLocked: 0, wordsStolen: 0, wordsStolenFromMe: 0, bestWord: '', totalScore: 0 };
+  }
   return {
     puzzle,
     foundWords,
     locks: {},
     closed: [],
     startedAt: now,
+    playerStats,
   };
+}
+
+function ensureStats(
+  state: WheelRushModeState,
+  username: string,
+): WheelRushPlayerStats {
+  if (!state.playerStats) state.playerStats = {};
+  if (!state.playerStats[username]) {
+    state.playerStats[username] = { wordsLocked: 0, wordsStolen: 0, wordsStolenFromMe: 0, bestWord: '', totalScore: 0 };
+  }
+  return state.playerStats[username];
+}
+
+function bumpBestWord(
+  stats: WheelRushPlayerStats,
+  word: string,
+): void {
+  if (word.length > stats.bestWord.length) stats.bestWord = word;
 }
 
 /** True if word is in the language trie (node.isWord). */
@@ -166,6 +189,10 @@ export function applyWheelWord(
     state.locks[upper] = { by: username, until: now + WHEEL_RUSH_LOCK_MS };
     userList.push(upper);
     const score = Math.round(base * WHEEL_RUSH_FIRST_FINDER_MULT);
+    const stats = ensureStats(state, username);
+    stats.wordsLocked += 1;
+    stats.totalScore += score;
+    bumpBestWord(stats, upper);
     return { kind: 'locked', lockUntil: state.locks[upper].until, score };
   }
 
@@ -175,6 +202,12 @@ export function applyWheelWord(
   userList.push(upper);
   state.closed.push(upper);
   delete state.locks[upper];
+  const stealerStats = ensureStats(state, username);
+  stealerStats.wordsStolen += 1;
+  stealerStats.totalScore += base + WHEEL_RUSH_STEAL_BONUS;
+  bumpBestWord(stealerStats, upper);
+  const victimStats = ensureStats(state, lock.by);
+  victimStats.wordsStolenFromMe += 1;
   return { kind: 'stolen', score: base, stealBonus: WHEEL_RUSH_STEAL_BONUS, from: lock.by };
 }
 

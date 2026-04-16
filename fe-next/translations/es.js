@@ -4971,6 +4971,7 @@ const es = {
   },
   "wordWheel": {
     "title": "Rueda de palabras",
+    "loading": "Cargando Rueda de Palabras...",
     "badge": "RUEDA DE PALABRAS",
     "subtitle": "Encuentra palabras usando las letras de la rueda",
     "description": "Cada palabra debe usar la letra central y tener al menos 3 letras",
@@ -4986,6 +4987,9 @@ const es = {
     "missingCenter": "Debe incluir la letra central ({letter})",
     "tooShort": "Demasiado corta (mín {min} letras)",
     "invalidLetters": "Solo puedes usar las letras de la rueda",
+    "alreadyClosed": "Palabra ya cerrada",
+    "lockedByOther": "Bloqueada por otro jugador",
+    "yourWordStolen": "¡{by} te robó la palabra {word}!",
     "inputPlaceholder": "Escribe una palabra...",
     "tapLetters": "Toca o arrastra letras para formar una palabra",
     "tapToRemove": "Toca otra vez una letra añadida para quitarla",
@@ -7887,6 +7891,22 @@ const es = {
       "wheelWords": "{{center}}/{{total}} palabras con letra central"
     }
   },
+  "wheelRush": {
+    "title": "Rueda Veloz",
+    "description": "Bloquea letras rápido. Roba palabras a tus rivales.",
+    "results": {
+      "matchRecap": "Resumen de Rueda Veloz",
+      "totalLocks": "Palabras Bloqueadas",
+      "stealRate": "Tasa de Robo",
+      "locks": "Bloqueos",
+      "steals": "Robos",
+      "boardDomination": "Dominio de Rueda",
+      "pts": "pts",
+      "locksmith": "Cerrajero",
+      "bandit": "Bandido",
+      "wordsmith": "Maestro de Palabras"
+    }
+  },
   "blast": {
     "chain": {
       "badge": "Cadena x{level}",
@@ -8006,6 +8026,11 @@ const es = {
     },
     "results": {
       "boardDomination": "Dominación del Tablero",
+      "matchRecap": "Resumen de Blast",
+      "totalTilesDemolished": "Fichas Destruidas",
+      "intensity": "Intensidad",
+      "peakCombo": "Mayor Combo",
+      "totalGems": "Gemas",
       "demolitionKing": "Rey de la Demolición",
       "comboMaster": "Maestro del Combo",
       "gemCollector": "Recolector de Gemas",

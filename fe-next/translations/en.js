@@ -5033,6 +5033,7 @@ const en = {
   },
   "wordWheel": {
     "title": "Word Wheel",
+    "loading": "Loading Word Wheel...",
     "badge": "WORD WHEEL",
     "subtitle": "Find words using the wheel letters",
     "description": "Every word must use the center letter and be at least 3 letters long",
@@ -5048,6 +5049,9 @@ const en = {
     "missingCenter": "Must include center letter ({letter})",
     "tooShort": "Too short (min {min} letters)",
     "invalidLetters": "Can only use wheel letters",
+    "alreadyClosed": "Word already closed",
+    "lockedByOther": "Locked by another player",
+    "yourWordStolen": "{by} stole your word {word}!",
     "inputPlaceholder": "Type a word...",
     "tapLetters": "Tap or drag letters to build a word",
     "tapToRemove": "Tap an added letter again to remove it",
@@ -7984,6 +7988,22 @@ const en = {
       "huntSuccess": "Target found in {{attempts}} attempts!",
       "huntFailed": "Target word not found",
       "wheelWords": "{{center}}/{{total}} words with center letter"
+    }
+  },
+  "wheelRush": {
+    "title": "Wheel Rush",
+    "description": "Lock letters fast. Steal opponents' words.",
+    "results": {
+      "matchRecap": "Wheel Rush Recap",
+      "totalLocks": "Words Locked",
+      "stealRate": "Steal Rate",
+      "locks": "Locks",
+      "steals": "Steals",
+      "boardDomination": "Wheel Domination",
+      "pts": "pts",
+      "locksmith": "Locksmith",
+      "bandit": "Bandit",
+      "wordsmith": "Wordsmith"
     }
   },
   "blast": {

@@ -7,6 +7,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { PageLoader } from '@/components/ui/PageLoader';
 import WordWheelGame, { type WordWheelGameResult } from './WordWheelGame';
 import WordWheelResults from './WordWheelResults';
+import TabbedDailyLeaderboard from './TabbedDailyLeaderboard';
 import {
   generateWordWheelPuzzle,
   type WordWheelPuzzle,
@@ -56,6 +57,11 @@ const WordWheelChallenge: React.FC = () => {
   const [hasPlayedWH, setHasPlayedWH] = useState(false);
   const [effects, setEffects] = useState<WordWheelEffect[]>([]);
   const [canvasSize, setCanvasSize] = useState({ width: 400, height: 600 });
+  const [guestFingerprint, setGuestFingerprint] = useState<string | null>(null);
+
+  useEffect(() => {
+    setGuestFingerprint(getGuestFingerprint());
+  }, []);
 
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -189,7 +195,7 @@ const WordWheelChallenge: React.FC = () => {
   if (phase === 'loading') {
     return (
       <div className="flex-1 flex items-center justify-center bg-neo-navy">
-        <PageLoader size="lg" text="Loading Word Wheel..." />
+        <PageLoader size="lg" text={t('wordWheel.loading')} />
       </div>
     );
   }
@@ -287,6 +293,21 @@ const WordWheelChallenge: React.FC = () => {
             >
               {t('daily.play')}
             </motion.button>
+
+            {/* Tabbed leaderboard — parity with Word Hunt ready screen */}
+            <div className="w-full max-w-md mt-2">
+              <TabbedDailyLeaderboard
+                puzzleDate={getDailyChallengeDate()}
+                language={language as Language}
+                currentPlayerId={isAuthenticated && profile ? profile.id : null}
+                currentGuestFingerprint={!isAuthenticated ? guestFingerprint : null}
+                scope="word-wheel"
+                defaultTab="today"
+                t={t}
+                maxVisible={5}
+                compact
+              />
+            </div>
           </motion.div>
         )}
 

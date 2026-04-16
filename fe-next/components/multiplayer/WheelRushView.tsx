@@ -11,9 +11,11 @@ import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { isValidWordWheelWord } from '@/utils/dailyChallenge/wordWheelGeneration';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { WHEEL_RUSH_FOG_MS } from '@/shared/constants/wheelRushConstants';
+import { WHEEL_RUSH_FOG_MS, WHEEL_RUSH_MIN_WORD_LEN } from '@/shared/constants/wheelRushConstants';
 import type { Avatar as AvatarType, PresenceStatus } from '@/shared/types/game';
 import { StealableLocks, MyWordsChips, type WheelLockInfo, type WordEntry } from './WheelRushPieces';
+import { QuickReactions, FloatingReaction } from '@/components/game/QuickReactions';
+import { useQuickReactions } from '@/hooks/useQuickReactions';
 
 const WordWheelPixiRing = dynamic(() => import('@/components/daily/WordWheelPixiRing'), { ssr: false });
 
@@ -45,7 +47,21 @@ interface Props {
   t: (path: string, params?: Record<string, string | number>) => string;
 }
 
-const MIN_LEN = 3;
+const MIN_LEN = WHEEL_RUSH_MIN_WORD_LEN;
+
+type WheelErrorCode =
+  | 'too-short' | 'no-center' | 'bad-letters' | 'not-a-word'
+  | 'already-closed' | 'locked-by-other' | 'duplicate';
+
+const ERROR_KEY: Record<WheelErrorCode, string> = {
+  'too-short': 'wordWheel.tooShort',
+  'no-center': 'wordWheel.missingCenter',
+  'bad-letters': 'wordWheel.invalidLetters',
+  'not-a-word': 'wordWheel.notInDictionary',
+  'already-closed': 'wordWheel.alreadyClosed',
+  'locked-by-other': 'wordWheel.lockedByOther',
+  'duplicate': 'wordWheel.alreadyFound',
+};
 
 export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, onQuit, t }) => {
   const {
@@ -63,6 +79,8 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
   const [wordBuilderShake, setWordBuilderShake] = useState(false);
   const [now, setNow] = useState<number>(() => Date.now());
   const [wheelRadius, setWheelRadius] = useState(72);
+
+  const { floatingReactions, sendReaction, dismissReaction } = useQuickReactions({ socket, username });
 
   const fbTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const wheelContainerRef = useRef<HTMLDivElement>(null);
@@ -109,7 +127,10 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
     };
     const onResult = (data: { word: string; accepted: boolean; kind?: string; score?: number; lockUntil?: number; stolenFrom?: string; error?: string }) => {
       if (!data.accepted) {
-        flash('err', data.error || t('wordWheel.notInDictionary') || 'rejected');
+        const code = data.error as WheelErrorCode | undefined;
+        const key = code && ERROR_KEY[code] ? ERROR_KEY[code] : 'wordWheel.notInDictionary';
+        const msg = t(key, { min: MIN_LEN, letter: puzzle?.centerLetter ?? '' }) || key;
+        flash('err', msg);
         playWordRejectedSound();
         return;
       }
@@ -127,8 +148,18 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
     const onLocked = (data: { word: string; by: string; lockUntil: number }) => {
       setActiveLocks(prev => [...prev.filter(l => l.word !== data.word), data]);
     };
-    const onStolen = (data: { word: string }) => {
+    const onStolen = (data: { word: string; by?: string; from?: string }) => {
       setActiveLocks(prev => prev.filter(l => l.word !== data.word));
+      if (data.from === username) {
+        setMyWords(prev => prev.map(w =>
+          w.word === data.word && w.kind === 'locked'
+            ? { ...w, kind: 'stolen-from-me' as const, stolenFrom: data.by }
+            : w,
+        ));
+        flash('err', t('wordWheel.yourWordStolen', { word: data.word, by: data.by ?? '' }) || 'Stolen!');
+        playWordRejectedSound();
+        haptic([40, 30, 40]);
+      }
     };
     const onClosed = (data: { word: string; finder: string }) => {
       setActiveLocks(prev => prev.filter(l => l.word !== data.word));
@@ -152,7 +183,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
       socket.off('wheelWordClosed', onClosed);
       socket.off('connect', onReconnect);
     };
-  }, [socket, flash, t, playWordAcceptedSound, playWordRejectedSound]);
+  }, [socket, flash, t, puzzle, username, playWordAcceptedSound, playWordRejectedSound]);
 
   // Letter tap handler (matches SP signature)
   const handleLetterPress = useCallback((letter: string, wheelIndex: number, _el: HTMLButtonElement) => {
@@ -269,7 +300,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
   }
 
   return (
-    <div className="flex-1 flex flex-col min-h-0 bg-neo-navy p-3 md:p-4 gap-2 overflow-hidden">
+    <div className="relative flex-1 flex flex-col min-h-0 bg-neo-navy p-3 md:p-4 gap-2 overflow-hidden">
       {/* Top bar: leaderboard (fog-of-war) + quit */}
       <div className="flex items-center justify-between gap-3">
         <div className="flex flex-wrap gap-2">
@@ -292,7 +323,10 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
             );
           })}
         </div>
-        <Button size="sm" variant="destructive" onClick={onQuit}>{t('common.quit') || 'Quit'}</Button>
+        <div className="flex items-center gap-2">
+          <QuickReactions onReaction={sendReaction} layout="bar" />
+          <Button size="sm" variant="destructive" onClick={onQuit}>{t('common.quit') || 'Quit'}</Button>
+        </div>
       </div>
 
       {fogActive && (
@@ -463,6 +497,20 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
 
       <StealableLocks locks={stealableLocks} now={now} username={username} />
       <MyWordsChips words={myWords} />
+
+      <div className="pointer-events-none absolute inset-0 z-40">
+        {floatingReactions.map(r => (
+          <FloatingReaction
+            key={r.id}
+            id={r.id}
+            emoji={r.emoji}
+            username={r.username}
+            x={r.x}
+            y={r.y}
+            onComplete={dismissReaction}
+          />
+        ))}
+      </div>
     </div>
   );
 };

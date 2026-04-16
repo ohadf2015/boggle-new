@@ -319,6 +319,15 @@ export interface WheelWordLock {
   until: number;
 }
 
+/** Per-player wheel-rush stats tracked during a game */
+export interface WheelRushPlayerStats {
+  wordsLocked: number;
+  wordsStolen: number;
+  wordsStolenFromMe: number;
+  bestWord: string;
+  totalScore: number;
+}
+
 /** Wheel Rush mode state tracked per game */
 export interface WheelRushModeState {
   puzzle: WheelPuzzle;
@@ -330,6 +339,8 @@ export interface WheelRushModeState {
   closed: string[];
   /** Timestamp when round started, for fog-of-war reveal gating */
   startedAt: number;
+  /** Per-player domination stats for end-game awards screen */
+  playerStats: Record<string, WheelRushPlayerStats>;
 }
 
 // ==================== Tournament Types ====================

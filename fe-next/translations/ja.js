@@ -4986,6 +4986,7 @@ const ja = {
   },
   "wordWheel": {
     "title": "ワードホイール",
+    "loading": "ワードホイールを読み込み中...",
     "badge": "ワードホイール",
     "subtitle": "ホイールの文字を使って単語を見つけよう",
     "description": "すべての単語は中央の文字を使い、3文字以上である必要があります",
@@ -5001,6 +5002,9 @@ const ja = {
     "missingCenter": "中央の文字（{letter}）を含める必要があります",
     "tooShort": "短すぎます（最低{min}文字）",
     "invalidLetters": "ホイールの文字のみ使用できます",
+    "alreadyClosed": "単語はすでに確定済みです",
+    "lockedByOther": "他のプレイヤーがロック中",
+    "yourWordStolen": "{by}に単語{word}を奪われました！",
     "inputPlaceholder": "単語を入力...",
     "tapLetters": "文字をタップまたはドラッグして単語を作ろう",
     "tapToRemove": "追加した文字をもう一度タップで削除",
@@ -7867,6 +7871,22 @@ const ja = {
       "wheelWords": "{{center}}/{{total}}語が中心文字を含む"
     }
   },
+  "wheelRush": {
+    "title": "ホイールラッシュ",
+    "description": "文字を素早くロック。相手の単語を奪え。",
+    "results": {
+      "matchRecap": "ホイールラッシュ要約",
+      "totalLocks": "ロックされた単語",
+      "stealRate": "奪取率",
+      "locks": "ロック",
+      "steals": "スティール",
+      "boardDomination": "ホイール制覇",
+      "pts": "pt",
+      "locksmith": "ロックスミス",
+      "bandit": "バンディット",
+      "wordsmith": "言葉の達人"
+    }
+  },
   "blast": {
     "chain": {
       "badge": "チェイン x{level}",
@@ -7996,6 +8016,11 @@ const ja = {
     },
     "results": {
       "boardDomination": "ボード制覇",
+      "matchRecap": "ブラストマッチ要約",
+      "totalTilesDemolished": "破壊タイル",
+      "intensity": "激しさ",
+      "peakCombo": "最高コンボ",
+      "totalGems": "宝石",
       "demolitionKing": "破壊王",
       "comboMaster": "コンボマスター",
       "gemCollector": "宝石コレクター",

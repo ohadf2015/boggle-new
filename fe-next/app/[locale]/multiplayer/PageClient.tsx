@@ -353,6 +353,7 @@ export default function MultiplayerPageClient(): React.JSX.Element {
             onResetSeries={seriesTracker.reset}
             wordHuntSummary={resultsData?.wordHuntSummary}
             blastSummary={resultsData?.blastSummary}
+            wheelRushSummary={resultsData?.wheelRushSummary}
           />
         </FeatureErrorBoundary>
       );

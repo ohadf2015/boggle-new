@@ -25,10 +25,10 @@ import { gameCleanupEmitter } from '../events/gameCleanup.js';
 import type { Language } from '@/shared/types/game';
 
 gameCleanupEmitter.onGameEnd(({ gameCode }) => {
-  timerManager.clearTimer(`wheelRushReap:${gameCode}`);
+  timerManager.clearTimersWithPrefix(`wheelRushReap:${gameCode}:`);
 });
 gameCleanupEmitter.onGameReset(({ gameCode }) => {
-  timerManager.clearTimer(`wheelRushReap:${gameCode}`);
+  timerManager.clearTimersWithPrefix(`wheelRushReap:${gameCode}:`);
 });
 
 const submitWheelWordSchema = z.object({
@@ -118,7 +118,7 @@ export function registerWheelRushHandlers(io: Server, socket: Socket): void {
   });
 
   socket.on('submitWheelWord', (data: unknown) => {
-    if (!checkRateLimit(socket.id, 10)) {
+    if (!checkRateLimit(socket.id, 20)) {
       socket.emit('rateLimited', { message: 'Too many submissions, slow down' });
       return;
     }

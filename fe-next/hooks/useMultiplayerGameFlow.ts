@@ -22,6 +22,7 @@ interface ResultsData {
   playerCount?: number;
   wordHuntSummary?: WordHuntSummary;
   blastSummary?: { playerMoves?: Record<string, number>; playerStats?: Record<string, any> };
+  wheelRushSummary?: { playerStats?: Record<string, any> };
 }
 
 interface GameStartData {

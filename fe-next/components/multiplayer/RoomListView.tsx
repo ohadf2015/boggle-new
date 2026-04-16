@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
-import { ArrowLeft, Zap, Ghost, RefreshCw, HelpCircle, Sword, Bomb, Search, ChevronRight, Eye, Users } from 'lucide-react';
+import { ArrowLeft, Zap, Ghost, RefreshCw, HelpCircle, Sword, Bomb, Search, CircleDot, ChevronRight, Eye, Users } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { PullToRefreshIndicator } from '@/components/ui/PullToRefreshIndicator';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
@@ -113,7 +113,7 @@ const MODE_CONFIG: Record<string, {
     descKey: 'gameModes.wordHunt.description',
   },
   'wheel-rush': {
-    icon: Search,
+    icon: CircleDot,
     borderColor: 'border-s-neo-lime',
     iconBg: 'bg-neo-lime',
     iconColor: 'text-neo-black',

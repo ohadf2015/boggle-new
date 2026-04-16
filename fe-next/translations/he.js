@@ -4945,6 +4945,7 @@ const he = {
   },
   "wordWheel": {
     "title": "גלגל מילים",
+    "loading": "טוען את גלגל המילים...",
     "badge": "גלגל מילים",
     "subtitle": "מצא מילים באמצעות אותיות הגלגל",
     "description": "כל מילה חייבת להשתמש באות המרכזית ולהיות באורך של 3 אותיות לפחות",
@@ -4960,6 +4961,9 @@ const he = {
     "missingCenter": "חייב לכלול את האות המרכזית ({letter})",
     "tooShort": "קצר מדי (מינימום {min} אותיות)",
     "invalidLetters": "ניתן להשתמש רק באותיות הגלגל",
+    "alreadyClosed": "המילה כבר נסגרה",
+    "lockedByOther": "נעול על ידי שחקן אחר",
+    "yourWordStolen": "{by} גנב לך את המילה {word}!",
     "inputPlaceholder": "הקלד מילה...",
     "tapLetters": "הקש או גרור אותיות כדי לבנות מילה",
     "tapToRemove": "הקש שוב על אות שהוספת כדי להסיר",
@@ -7850,6 +7854,22 @@ const he = {
       "wheelWords": "{{center}}/{{total}} מילים עם האות המרכזית"
     }
   },
+  "wheelRush": {
+    "title": "גלגל מרוץ",
+    "description": "נעל אותיות במהירות. גנוב מילים מהיריבים.",
+    "results": {
+      "matchRecap": "סיכום גלגל מרוץ",
+      "totalLocks": "מילים נעולות",
+      "stealRate": "אחוז גניבה",
+      "locks": "נעילות",
+      "steals": "גניבות",
+      "boardDomination": "שליטה בגלגל",
+      "pts": "נק'",
+      "locksmith": "מנעולן",
+      "bandit": "שודד",
+      "wordsmith": "אמן מילים"
+    }
+  },
   "blast": {
     "chain": {
       "badge": "שרשרת x{level}",
@@ -7979,6 +7999,11 @@ const he = {
     },
     "results": {
       "boardDomination": "שליטה בלוח",
+      "matchRecap": "סיכום קרב בלאסט",
+      "totalTilesDemolished": "אריחים שהושמדו",
+      "intensity": "עוצמה",
+      "peakCombo": "שיא קומבו",
+      "totalGems": "אבני חן",
       "demolitionKing": "מלך ההרס",
       "comboMaster": "אלוף הקומבו",
       "gemCollector": "אספן האבנים",

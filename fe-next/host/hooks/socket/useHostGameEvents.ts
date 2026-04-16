@@ -62,7 +62,7 @@ interface UseHostGameEventsProps {
   intentionalExitRef: RefObject<boolean>;
 
   // Callbacks
-  onShowResults?: (data: { scores: any; letterGrid: any; duplicateRuleDisabled?: boolean; playerCount?: number; wordHuntSummary?: any; blastSummary?: any }) => void;
+  onShowResults?: (data: { scores: any; letterGrid: any; duplicateRuleDisabled?: boolean; playerCount?: number; wordHuntSummary?: any; blastSummary?: any; wheelRushSummary?: any }) => void;
   onGameStart?: () => void;
 }
 
@@ -372,6 +372,11 @@ export function useHostGameEvents({
         }
       }
 
+      // Sync wheel rush stats from server for results screen
+      if (data.wheelRushSummary?.playerStats) {
+        useGameStore.getState().setWheelRushPlayerStats(data.wheelRushSummary.playerStats);
+      }
+
       // Transition directly to results — no validation modal delay
       const currentOnShowResults = onShowResultsRef.current;
       const currentTableData = tableDataRef.current;
@@ -400,6 +405,7 @@ export function useHostGameEvents({
           playerCount: data.playerCount,
           wordHuntSummary: data.wordHuntSummary,
           blastSummary: data.blastSummary,
+          wheelRushSummary: data.wheelRushSummary,
         });
       }
     };

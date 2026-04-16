@@ -63,11 +63,11 @@ const RANK_ACCENTS: Record<number, RankAccent> = {
 };
 
 const DEFAULT_ACCENT: RankAccent = {
-  text: 'text-neo-purple',
-  bg: 'bg-neo-purple',
-  border: 'border-neo-purple',
-  glow: 'drop-shadow-[0_0_35px_rgba(128,0,255,0.5)]',
-  ring: 'bg-neo-purple/30',
+  text: 'text-neo-cream',
+  bg: 'bg-neo-cream',
+  border: 'border-neo-cream',
+  glow: 'drop-shadow-[0_0_35px_rgba(255,254,240,0.35)]',
+  ring: 'bg-neo-cream/20',
 };
 
 function getAccent(rank: number): RankAccent {
@@ -149,7 +149,7 @@ const ResultsHeroSection = memo<ResultsHeroSectionProps>(
           initial={reducedMotion ? undefined : { opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.3 }}
-          className="flex flex-col items-center text-center relative pt-6 pb-4"
+          className="flex flex-col items-center text-center relative pt-8 pb-4"
           data-testid="results-hero-section"
         >
           {/* Rank Display — dramatic slam entrance */}
@@ -188,7 +188,7 @@ const ResultsHeroSection = memo<ResultsHeroSectionProps>(
                 transition={{ type: 'spring', stiffness: 300, damping: 18, delay: 0.45 }}
                 className={cn(
                   displayAccent.bg,
-                  'text-black px-6 py-2 rounded-full border-3 border-neo-black shadow-hard-sm -mt-6 relative z-20',
+                  'text-black px-6 py-2 rounded-full border-3 border-neo-black shadow-hard-sm mt-2 sm:-mt-4 md:-mt-8 relative z-20',
                 )}
               >
                 <p className="text-xs font-black uppercase tracking-[0.2em]">

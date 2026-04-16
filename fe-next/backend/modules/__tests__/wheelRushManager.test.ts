@@ -132,6 +132,56 @@ describe('wheelRushManager', () => {
     });
   });
 
+  describe('playerStats tracking', () => {
+    const puzzle = { centerLetter: 'C', outerLetters: ['A','N','E','S','T','X'], allLetters: ['C','A','N','E','S','T','X'] };
+
+    it('initWheelRushState seeds empty playerStats per player', () => {
+      const s = initWheelRushState(puzzle, ['p1','p2'], 1000);
+      expect(s.playerStats).toEqual({
+        p1: { wordsLocked: 0, wordsStolen: 0, wordsStolenFromMe: 0, bestWord: '', totalScore: 0 },
+        p2: { wordsLocked: 0, wordsStolen: 0, wordsStolenFromMe: 0, bestWord: '', totalScore: 0 },
+      });
+    });
+
+    it('locked outcome increments wordsLocked and totalScore', () => {
+      const s = initWheelRushState(puzzle, ['p1','p2'], 1000);
+      const r = applyWheelWord(s, 'p1', 'CANE', 1000);
+      expect(r.kind).toBe('locked');
+      expect(s.playerStats.p1.wordsLocked).toBe(1);
+      if (r.kind === 'locked') {
+        expect(s.playerStats.p1.totalScore).toBe(r.score);
+      }
+      expect(s.playerStats.p1.bestWord).toBe('CANE');
+    });
+
+    it('stolen outcome credits stealer and debits original locker', () => {
+      const s = initWheelRushState(puzzle, ['p1','p2'], 1000);
+      applyWheelWord(s, 'p1', 'CANE', 1000);
+      const r = applyWheelWord(s, 'p2', 'CANE', 1500);
+      expect(r.kind).toBe('stolen');
+      expect(s.playerStats.p2.wordsStolen).toBe(1);
+      expect(s.playerStats.p1.wordsStolenFromMe).toBe(1);
+      if (r.kind === 'stolen') {
+        expect(s.playerStats.p2.totalScore).toBe(r.score + r.stealBonus);
+      }
+      expect(s.playerStats.p2.bestWord).toBe('CANE');
+    });
+
+    it('bestWord tracks longest word', () => {
+      const s = initWheelRushState(puzzle, ['p1'], 1000);
+      applyWheelWord(s, 'p1', 'CANE', 1000);
+      applyWheelWord(s, 'p1', 'CANES', 1000 + WHEEL_RUSH_LOCK_MS + 2);
+      expect(s.playerStats.p1.bestWord).toBe('CANES');
+    });
+
+    it('bestWord does not shrink when shorter word follows', () => {
+      const s = initWheelRushState(puzzle, ['p1'], 1000);
+      applyWheelWord(s, 'p1', 'CANES', 1000);
+      applyWheelWord(s, 'p1', 'SCAN', 1000 + WHEEL_RUSH_LOCK_MS + 2);
+      expect(s.playerStats.p1.bestWord).toBe('CANES');
+    });
+  });
+
   describe('reapExpiredLocks', () => {
     const puzzle = { centerLetter: 'C', outerLetters: ['A','N','E','S','T','X'], allLetters: ['C','A','N','E','S','T','X'] };
     it('moves expired locks to closed', () => {

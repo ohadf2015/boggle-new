@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { scoreWord } from '@/utils/dailyChallenge/wordWheelScoring';
-import DailyLeaderboard from './DailyLeaderboard';
+import TabbedDailyLeaderboard from './TabbedDailyLeaderboard';
 import type { Language } from '@/types';
 import type { WordWheelGameResult } from './WordWheelGame';
 
@@ -252,12 +252,13 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.8 }}
       >
-        <DailyLeaderboard
+        <TabbedDailyLeaderboard
           puzzleDate={puzzleDate}
           language={gameLang}
           currentPlayerId={currentPlayerId}
           currentGuestFingerprint={currentGuestFingerprint}
-          gameType="wordWheel"
+          scope="word-wheel"
+          defaultTab="today"
           t={t}
           maxVisible={5}
           compact

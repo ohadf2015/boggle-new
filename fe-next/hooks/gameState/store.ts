@@ -61,6 +61,7 @@ const initialState: GameState = {
   blastComboSync: null,
   blastOpponentActivity: [],
   blastPlayerStats: {},
+  wheelRushPlayerStats: {},
   blastBoardUpdate: null,
   wordHuntTargetLength: 0,
   wordHuntTargetCategory: null as string | null,
@@ -342,6 +343,10 @@ export const useGameStore = create<GameStore>()(
       blastPlayerStats: applySetState(value, state.blastPlayerStats)
     })),
 
+    setWheelRushPlayerStats: (value) => set((state) => ({
+      wheelRushPlayerStats: applySetState(value, state.wheelRushPlayerStats)
+    })),
+
     setBlastBoardUpdate: (value) => set({ blastBoardUpdate: value }),
 
     // ==========================================
@@ -461,6 +466,7 @@ export const useGameStore = create<GameStore>()(
         blastComboSync: null,
         blastOpponentActivity: [],
         blastPlayerStats: {},
+        wheelRushPlayerStats: {},
         blastBoardUpdate: null,
         wordHuntTargetLength: 0,
         wordHuntTargetCategory: null,
@@ -520,6 +526,7 @@ export {
   useBlastComboSync,
   useBlastOpponentActivity,
   useBlastPlayerStats,
+  useWheelRushPlayerStats,
   useWordHuntTargetLength,
   useWordHuntTargetCategory,
   useWordHuntMyLife,

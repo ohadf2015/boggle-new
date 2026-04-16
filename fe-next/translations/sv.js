@@ -4934,6 +4934,7 @@ const sv = {
   },
   "wordWheel": {
     "title": "Ordhjul",
+    "loading": "Laddar Ordhjul...",
     "badge": "ORDHJUL",
     "subtitle": "Hitta ord med hjulets bokstäver",
     "description": "Varje ord måste använda mittenbokstaven och vara minst 3 bokstäver långt",
@@ -4949,6 +4950,9 @@ const sv = {
     "missingCenter": "Måste innehålla mittenbokstaven ({letter})",
     "tooShort": "För kort (min {min} bokstäver)",
     "invalidLetters": "Kan bara använda hjulets bokstäver",
+    "alreadyClosed": "Ordet är redan stängt",
+    "lockedByOther": "Låst av en annan spelare",
+    "yourWordStolen": "{by} stal ditt ord {word}!",
     "inputPlaceholder": "Skriv ett ord...",
     "tapLetters": "Tryck eller dra bokstäver för att bygga ett ord",
     "tapToRemove": "Tryck igen på en tillagd bokstav för att ta bort",
@@ -7815,6 +7819,22 @@ const sv = {
       "wheelWords": "{{center}}/{{total}} ord med mittenbokstaven"
     }
   },
+  "wheelRush": {
+    "title": "Hjulrush",
+    "description": "Lås bokstäver snabbt. Stjäl motståndarnas ord.",
+    "results": {
+      "matchRecap": "Hjulrush Sammanfattning",
+      "totalLocks": "Låsta Ord",
+      "stealRate": "Stöldfrekvens",
+      "locks": "Lås",
+      "steals": "Stölder",
+      "boardDomination": "Hjuldominans",
+      "pts": "p",
+      "locksmith": "Låssmed",
+      "bandit": "Bandit",
+      "wordsmith": "Ordsmed"
+    }
+  },
   "blast": {
     "chain": {
       "badge": "Kedja x{level}",
@@ -7944,6 +7964,11 @@ const sv = {
     },
     "results": {
       "boardDomination": "Brädkontroll",
+      "matchRecap": "Blast Matchsammanfattning",
+      "totalTilesDemolished": "Brickor Rivna",
+      "intensity": "Intensitet",
+      "peakCombo": "Toppkombo",
+      "totalGems": "Ädelstenar",
       "demolitionKing": "Rivningskung",
       "comboMaster": "Kombomästare",
       "gemCollector": "Ädelstenssamlare",

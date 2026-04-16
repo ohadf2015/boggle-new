@@ -173,6 +173,12 @@ export async function calculateAndBroadcastFinalScores(
     playerStats: blastState.playerStats ?? {},
   } : undefined;
 
+  // Build wheel rush summary if applicable
+  const wheelRushState = game.gameMode === 'wheel-rush' ? game.wheelRushState : null;
+  const wheelRushSummary = wheelRushState ? {
+    playerStats: wheelRushState.playerStats ?? {},
+  } : undefined;
+
   // Broadcast results to all clients
   // Host expects 'validationComplete', players expect 'validatedScores'
   // Include duplicateRuleDisabled flag so frontend can display a notice
@@ -184,6 +190,7 @@ export async function calculateAndBroadcastFinalScores(
     gameMode: game.gameMode,
     wordHuntSummary,
     blastSummary,
+    wheelRushSummary,
   };
   // Cache results on game state so reconnecting clients can retrieve them
   game.cachedResultsPayload = resultsPayload;

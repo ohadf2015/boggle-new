@@ -118,6 +118,8 @@ export interface ResultsPageProps {
   wordHuntSummary?: { targetWord: string; playerLives: Record<string, number>; eliminatedPlayers: string[]; targetFoundBy: string | null; survivalTime?: number; discoveryWords?: number };
   /** Blast mode summary from server */
   blastSummary?: { playerMoves?: Record<string, number>; playerStats?: Record<string, import('@/shared/types/game').BlastPlayerStats> };
+  /** Wheel Rush mode summary from server */
+  wheelRushSummary?: { playerStats?: Record<string, import('@/shared/types/game').WheelRushPlayerStats> };
 }
 
 export interface VoteInfo {

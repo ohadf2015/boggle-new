@@ -13,6 +13,10 @@ vi.mock('@/contexts/SoundEffectsContext', () => ({
   }),
 }));
 
+vi.mock('@/contexts/LanguageContext', () => ({
+  useLanguage: () => ({ t: (k: string) => k, language: 'en' }),
+}));
+
 vi.mock('next/dynamic', () => ({
   default: () => () => null,
 }));
@@ -157,12 +161,118 @@ describe('WheelRushView', () => {
     });
     socket.emit.mockClear();
 
-    // Type CAT via separate flushes so each state update commits before the next keydown
+    // Type CRANE (5 letters ≥ server min 4, center A, letters all present)
+    act(() => { fireEvent.keyDown(window, { key: 'C' }); });
+    act(() => { fireEvent.keyDown(window, { key: 'R' }); });
+    act(() => { fireEvent.keyDown(window, { key: 'A' }); });
+    act(() => { fireEvent.keyDown(window, { key: 'N' }); });
+    act(() => { fireEvent.keyDown(window, { key: 'E' }); });
+    act(() => { fireEvent.keyDown(window, { key: 'Enter' }); });
+
+    expect(socket.emit).toHaveBeenCalledWith('submitWheelWord', { word: 'CRANE' });
+  });
+
+  it('rejects 3-letter word locally without emitting (matches server min 4)', () => {
+    const socket = makeMockSocket();
+    render(
+      <WheelRushView
+        socket={socket}
+        username="alice"
+        leaderboard={[{ username: 'alice', score: 0 }]}
+        onQuit={vi.fn()}
+        t={tStub}
+      />,
+    );
+    act(() => {
+      socket.fire('wheelRushInit', { puzzle, startedAt: Date.now() });
+    });
+    socket.emit.mockClear();
+
     act(() => { fireEvent.keyDown(window, { key: 'C' }); });
     act(() => { fireEvent.keyDown(window, { key: 'A' }); });
     act(() => { fireEvent.keyDown(window, { key: 'T' }); });
     act(() => { fireEvent.keyDown(window, { key: 'Enter' }); });
 
-    expect(socket.emit).toHaveBeenCalledWith('submitWheelWord', { word: 'CAT' });
+    expect(socket.emit).not.toHaveBeenCalledWith('submitWheelWord', expect.anything());
+  });
+
+  it('maps server error codes to translation keys instead of showing raw codes', () => {
+    const socket = makeMockSocket();
+    render(
+      <WheelRushView
+        socket={socket}
+        username="alice"
+        leaderboard={[{ username: 'alice', score: 0 }]}
+        onQuit={vi.fn()}
+        t={tStub}
+      />,
+    );
+    act(() => {
+      socket.fire('wheelRushInit', { puzzle, startedAt: Date.now() });
+    });
+
+    act(() => {
+      socket.fire('wheelWordResult', { word: 'XYZW', accepted: false, error: 'not-a-word' });
+    });
+    expect(screen.getByText(/wordWheel\.notInDictionary/)).toBeTruthy();
+    expect(screen.queryByText(/^not-a-word$/)).toBeNull();
+  });
+
+  it('renders QuickReactions trigger and emits quickReaction on emoji click', () => {
+    const socket = makeMockSocket();
+    render(
+      <WheelRushView
+        socket={socket}
+        username="alice"
+        leaderboard={[{ username: 'alice', score: 0 }]}
+        onQuit={vi.fn()}
+        t={tStub}
+      />,
+    );
+    act(() => {
+      socket.fire('wheelRushInit', { puzzle, startedAt: Date.now() });
+    });
+
+    const trigger = screen.getByRole('button', { name: /reactions\.label/i });
+    expect(trigger).toBeTruthy();
+
+    socket.emit.mockClear();
+    fireEvent.click(trigger);
+    const fireBtn = screen.getByRole('button', { name: /reactions\.fire/i });
+    fireEvent.click(fireBtn);
+    expect(socket.emit).toHaveBeenCalledWith('quickReaction', { reactionId: 'fire', username: 'alice' });
+  });
+
+  it('marks word as stolen-from-me when wheelWordStolen targets self', () => {
+    const socket = makeMockSocket();
+    render(
+      <WheelRushView
+        socket={socket}
+        username="alice"
+        leaderboard={[{ username: 'alice', score: 0 }]}
+        onQuit={vi.fn()}
+        t={tStub}
+      />,
+    );
+    act(() => {
+      socket.fire('wheelRushInit', { puzzle, startedAt: Date.now() });
+    });
+
+    // Alice locks CRANE
+    act(() => {
+      socket.fire('wheelWordResult', {
+        word: 'CRANE', accepted: true, kind: 'locked', score: 15, lockUntil: Date.now() + 3000,
+      });
+    });
+    expect(screen.getByText(/CRANE/)).toBeTruthy();
+
+    // Bob steals it from Alice
+    act(() => {
+      socket.fire('wheelWordStolen', { word: 'CRANE', by: 'bob', from: 'alice' });
+    });
+
+    // Chip should now reflect stolen-from-me state (red variant renders with data-kind)
+    const chip = screen.getByText(/CRANE/);
+    expect(chip.className).toMatch(/neo-red|bg-neo-red/);
   });
 });

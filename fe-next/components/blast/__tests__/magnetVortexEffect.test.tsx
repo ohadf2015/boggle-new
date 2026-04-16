@@ -107,13 +107,13 @@ describe('Magnet/Vortex Effect', () => {
       expect(button.className).toContain('blast-tile-magnet');
     });
 
-    it('magnet clearing uses pink tonal styling', () => {
+    it('magnet clearing uses violet tonal styling', () => {
       const { container } = render(
         <BlastTile {...baseProps} phase="clearing" />
       );
       const button = container.querySelector('button');
       const styleAttr = button?.getAttribute('style') ?? '';
-      expect(styleAttr).toContain('#FF4D9E');
+      expect(styleAttr).toContain('#D8A0E8');
     });
   });
 });

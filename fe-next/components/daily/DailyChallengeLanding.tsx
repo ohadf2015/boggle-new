@@ -19,7 +19,7 @@ import WatchAdForFreezeButton from './WatchAdForFreezeButton';
 import { DailyMissionsHeader } from './landing/DailyMissionsHeader';
 import { QuestCard } from './landing/QuestCard';
 import { StreakCounter } from './landing/StreakCounter';
-import { LeaderboardTeaser } from './landing/LeaderboardTeaser';
+import TabbedDailyLeaderboard from './TabbedDailyLeaderboard';
 import { ConfettiBackground } from './landing/ConfettiBackground';
 import { FloatingDecorations } from './landing/FloatingDecorations';
 
@@ -55,6 +55,13 @@ export function DailyChallengeLanding({
   // Word Wheel status from localStorage (no server endpoint for it yet)
   const [wordWheelStatus, setWordWheelStatus] = useState<'new' | 'played'>('new');
   const [freezeCount, setFreezeCount] = useState(0);
+  const [guestFingerprint, setGuestFingerprint] = useState<string | null>(null);
+
+  useEffect(() => {
+    setGuestFingerprint(getGuestFingerprint());
+  }, []);
+
+  const todayIso = new Date().toISOString().split('T')[0];
 
   // Derive Word Hunt status from hook (server-aware for cross-device play)
   const wordHuntStatus: 'new' | 'won' | 'lost' = dailyStatus.loading
@@ -353,7 +360,17 @@ export function DailyChallengeLanding({
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4, type: 'spring', stiffness: 300, damping: 25 }}
       >
-        <LeaderboardTeaser currentLanguage={currentLanguage} />
+        <TabbedDailyLeaderboard
+          puzzleDate={todayIso}
+          language={currentLanguage}
+          currentPlayerId={user?.id ?? null}
+          currentGuestFingerprint={guestFingerprint}
+          scope="combined"
+          defaultTab="today"
+          t={t}
+          maxVisible={5}
+          compact
+        />
       </motion.div>
     </motion.div>
   );

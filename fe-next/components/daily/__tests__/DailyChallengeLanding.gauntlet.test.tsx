@@ -72,8 +72,9 @@ vi.mock('../landing/StreakCounter', () => ({
   StreakCounter: () => <div data-testid="streak-counter" />,
 }));
 
-vi.mock('../landing/LeaderboardTeaser', () => ({
-  LeaderboardTeaser: () => <div data-testid="leaderboard-teaser" />,
+vi.mock('../TabbedDailyLeaderboard', () => ({
+  __esModule: true,
+  default: () => <div data-testid="tabbed-daily-leaderboard" />,
 }));
 
 vi.mock('../landing/ConfettiBackground', () => ({

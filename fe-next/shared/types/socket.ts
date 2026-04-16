@@ -247,6 +247,7 @@ export interface ServerToClientEvents {
     gameMode?: string;
     wordHuntSummary?: unknown;
     blastSummary?: unknown;
+    wheelRushSummary?: unknown;
     reconnect?: boolean;
   }) => void;
   playing: (data: Record<string, never>) => void;
