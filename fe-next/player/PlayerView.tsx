@@ -24,7 +24,8 @@ import type {
 import PlayerWaitingView from './components/PlayerWaitingView';
 import PlayerInGameView from './components/PlayerInGameView';
 import FirstTimeAchievement, { useFirstTimeAchievement } from '../components/game/FirstTimeAchievement';
-import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
+import ModeRevealOverlay from '@/components/game/ModeRevealOverlay';
+import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { Loader2 } from 'lucide-react';
 
 // Custom hooks
@@ -43,6 +44,7 @@ import {
   useGameStore,
 } from '@/hooks/gameState';
 import { useNavigationGuard } from '@/hooks/useNavigationGuard';
+import { useCrazyGamesLifecycle } from '@/hooks/useCrazyGamesLifecycle';
 
 import type { Player, WordToVote, PlayerViewProps } from './types';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
@@ -64,6 +66,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
   onGameStartConsumed,
   roomLanguage,
   onUsernameChange,
+  seriesRoundNumber,
 }) => {
   const { t, dir } = useLanguage();
   const { socket } = useSocket();
@@ -194,6 +197,14 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
 
   // Combo timer visual feedback (RAF-based, threshold updates)
   const { comboTimeRemaining, comboDanger } = useComboTimer(comboLevel, lastWordTime);
+
+  // CrazyGames SDK lifecycle (gameplayStart/Stop, happyTime) — required for full launch
+  useCrazyGamesLifecycle({
+    isGameActive: gameActive,
+    isGameOver: waitingForResults,
+    score: leaderboard.find(p => p.username === username)?.score ?? 0,
+    maxCombo: comboLevel,
+  });
 
   // Tournament state
   const [tournamentData, _setTournamentData] = useState<TournamentData | null>(null);
@@ -484,28 +495,11 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
     // Show dramatic mode reveal overlay before countdown
     if (showModeReveal) {
       return (
-        <div className="h-full bg-neo-navy flex items-center justify-center overflow-hidden">
-          <AdaptiveAnimatePresence>
-            <AdaptiveMotion.div
-              key="mode-reveal"
-              initial={{ scale: 0.3, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 1.5, opacity: 0 }}
-              transition={{ type: 'spring', stiffness: 200, damping: 15 }}
-              className="flex flex-col items-center gap-4"
-            >
-              <div className="text-7xl font-neo-display font-black text-neo-lime uppercase tracking-wider drop-shadow-[0_0_40px_rgba(163,230,53,0.5)]">
-                {modeRevealLabel}
-              </div>
-              <AdaptiveMotion.div
-                initial={{ width: 0 }}
-                animate={{ width: '80%' }}
-                transition={{ delay: 0.3, duration: 0.6, ease: 'easeOut' }}
-                className="h-1 bg-neo-lime rounded-full"
-              />
-            </AdaptiveMotion.div>
-          </AdaptiveAnimatePresence>
-        </div>
+        <ModeRevealOverlay
+          modeLabel={modeRevealLabel}
+          seriesRoundNumber={seriesRoundNumber}
+          t={t}
+        />
       );
     }
 
