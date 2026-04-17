@@ -3,7 +3,6 @@
 
 import { memo, useCallback, useState, useMemo, useRef } from 'react';
 import { usePreviousValue } from '@/hooks/usePreviousValue';
-import { trackLevelRetried } from '@/utils/posthogEngagement';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useProgression } from '@/contexts/ProgressionContext';
@@ -41,6 +40,7 @@ import { getChapterNumber } from '@/lib/adventure/questConfig';
 import { applyGemDetectorBoost, LEVELS_PER_WORLD } from '@/lib/adventure';
 import AdventureGameShell from './AdventureGameShell';
 import { useAdventureDerivations } from './hooks/useAdventureDerivations';
+import { useAdventureActions } from './hooks/useAdventureActions';
 import { hasSeenTutorial } from './AdventureTutorial';
 import { useAdventureGameCallbacks } from './hooks/useAdventureGameCallbacks';
 import { useAdventureOverlayProps } from './hooks/useAdventureOverlayProps';
@@ -463,18 +463,12 @@ const AdventureGame = memo<AdventureGameProps>(
       timerSeconds: init.adjustedLevelConfig.timerSeconds ?? 120,
     });
 
-    const handleRetry = useCallback(() => {
-      trackLevelRetried({
-        world: levelConfig.world,
-        level: levelConfig.level,
-        attempt: (bestAttempt?.attemptCount ?? 0) + 1,
-      });
-      hintsUsedRef.current = 0;
-      resetFlashGoldAward();
-      resetTracking();
-      resetLastWordTileTypes();
-      handleRetryBase();
-    }, [handleRetryBase, resetTracking, resetFlashGoldAward, resetLastWordTileTypes, levelConfig.world, levelConfig.level, bestAttempt]);
+    const { handleExitWithConfirm, handleRetry } = useAdventureActions({
+      showLevelComplete, onExit, t,
+      world: levelConfig.world, level: levelConfig.level,
+      attemptCount: bestAttempt?.attemptCount ?? 0,
+      hintsUsedRef, resetFlashGoldAward, resetTracking, resetLastWordTileTypes, handleRetryBase,
+    });
 
     const consecutiveFailures = (bestAttempt?.consecutiveFailures ?? 0) + (showLevelComplete && gameState.stars === 0 ? 1 : 0);
     const {
@@ -504,13 +498,6 @@ const AdventureGame = memo<AdventureGameProps>(
       gemDetectorHighlights,
     });
 
-
-    // Exit confirmation — prevents accidental game loss from stray taps
-    const handleExitWithConfirm = useCallback(() => {
-      // Skip confirmation if game is already complete
-      if (showLevelComplete) { onExit(); return; }
-      if (window.confirm(t('adventure.game.confirmExitDesc'))) onExit();
-    }, [onExit, showLevelComplete, t]);
 
     useAdventureKeyboardShortcuts({
       entryPhase, showLevelComplete, hasHintsAvailable, onHintClick: handleHintClick,
