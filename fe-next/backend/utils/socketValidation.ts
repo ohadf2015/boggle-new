@@ -65,7 +65,7 @@ interface CompiledSchemas {
 }
 
 // Fail-fast: compiled bridge required. Run `npm run build:schemas` if missing.
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+ 
 const compiledModule: Partial<CompiledSchemas> = require('../dist/backend/utils/schemas');
 const compiled = compiledModule;
 
