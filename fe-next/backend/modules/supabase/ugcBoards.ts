@@ -78,7 +78,7 @@ export async function createBoard(
       rating_sum: 0,
       rating_count: 0,
       featured: false,
-      moderation_status: 'pending',
+      moderation_status: 'approved',
     })
     .select()
     .single();
@@ -270,6 +270,7 @@ export async function getFeaturedBoards(limit: number): Promise<CommunityBoard[]
     .select('*')
     .eq('featured', true)
     .eq('is_public', true)
+    .eq('moderation_status', 'approved')
     .order('created_at', { ascending: false })
     .limit(limit);
 
