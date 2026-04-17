@@ -1,7 +1,7 @@
 /** AdventureGame — Main orchestrator for adventure mode gameplay. */
 'use client';
 
-import React, { memo, useCallback, useState, useMemo, useRef } from 'react';
+import { memo, useCallback, useState, useMemo, useRef } from 'react';
 import { usePreviousValue } from '@/hooks/usePreviousValue';
 import { trackLevelRetried } from '@/utils/posthogEngagement';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -38,15 +38,11 @@ import { useFlashChallenge } from '@/hooks/useFlashChallenge';
 import { useDailyQuests } from '@/hooks/useDailyQuests';
 import { useChapterQuests } from '@/hooks/useChapterQuests';
 import { getChapterNumber } from '@/lib/adventure/questConfig';
-import { getWorldConfig } from '@/lib/adventure/levelConfig';
 import { getMasteryAura } from '@/lib/adventure/powerGrowth';
 import { applyGemDetectorBoost, LEVELS_PER_WORLD } from '@/lib/adventure';
 import { getStoryBeat } from '@/lib/adventure/storyConfig';
 import { getStreakMilestone } from '@/lib/adventure/adventureStreak';
-import GameplayBackground from './themed/GameplayBackground';
-import { GameHeader, GameSidebar, GameGridArea, GameLayout, GameInfoStrip } from './ui';
-import AdventureGameOverlays from './AdventureGameOverlays';
-import AdventureTailOverlays from './AdventureTailOverlays';
+import AdventureGameShell from './AdventureGameShell';
 import { hasSeenTutorial } from './AdventureTutorial';
 import { useAdventureGameCallbacks } from './hooks/useAdventureGameCallbacks';
 import { useAdventureOverlayProps } from './hooks/useAdventureOverlayProps';
@@ -591,114 +587,76 @@ const AdventureGame = memo<AdventureGameProps>(
     }
 
     return (
-      <div ref={effects.shakeRef} data-testid="adventure-game" data-adventure-game role="main" aria-label={t('adventure.game.title')} className="h-full w-full overflow-hidden relative" style={{ '--mastery-aura': masteryAura } as React.CSSProperties}>
-        <GameplayBackground className="absolute inset-0 -z-10" />
-        <GameLayout
-          isBossActive={isBossLevel && bossOrch.isBossActive && !bossOrch.showBossIntro && !showLevelComplete}
-          header={
-            <GameHeader worldNumber={levelConfig.world} levelNumber={levelConfig.level}
-              score={gameState.score} timerStore={timerStore} isPaused={isPaused}
-              onPauseToggle={gridInteraction.handlePauseToggle} onExit={handleExitWithConfirm}
-              gold={init.gold} xpProgress={init.xpProgress.progressPercent / 100}
-              isBossLevel={isBossLevel} elapsedTime={isBossLevel ? timeRemaining : undefined}
-              comboCount={gameState.comboCount} comboTimeoutMs={effectiveComboTimeout}
-              modeDisplayKey={modeState.archetype !== 'classic' ? modeState.modeDisplayKey : undefined}
-              showMoveCounter={modeState.showMoveCounter} movesRemaining={movesRemaining}
-              showLifeBar={modeState.showLifeBar} currentHP={currentHP} maxHP={maxHP}
-              infoStrip={
-                (levelConfig.themeDisplayKey || (levelConfig.worldMechanic && !(isBossLevel && bossOrch.isBossActive)) || (upgradeState && Object.keys(upgradeState).length > 0)) ? (
-                  <GameInfoStrip
-                    themeDisplayKey={levelConfig.themeDisplayKey}
-                    themedWordsFound={themedWordsFound.length}
-                    themedWordCount={levelConfig.themedWordCount ?? 0}
-                    themedBonusMultiplier={levelConfig.themedBonusMultiplier ?? 1}
-                    worldColorPrimary={getWorldConfig(levelConfig.world).colorPrimary}
-                    mechanic={!(isBossLevel && bossOrch.isBossActive) ? (levelConfig.worldMechanic ?? null) : null}
-                    mechanicHitCount={wordSubmit.mechanicHitCount}
-                    upgradeState={upgradeState}
-                    upgradeTriggered={upgradeTriggered}
-                  />
-                ) : undefined
-              } />
-          }
-          gridArea={
-            <GameGridArea tiles={tiles} gridSize={levelConfig.gridSize}
-              selectedIndices={selectedIndices} onTileSelect={gridInteraction.handleTileSelect}
-              onWordSubmit={wordSubmit.handleWordSubmit}
-              onDragStart={gridInteraction.handleDragStart} onDragEnter={gridInteraction.handleDragEnter} onDragEnd={gridInteraction.handleDragEnd}
-              gridRef={gridRef}
-              isInteractive={entryPhase === 'playing' && isPlaying && !isPaused}
-              isDisabled={entryPhase !== 'playing' || !isPlaying || isPaused}
-              entryPhase={entryPhase} showCascade={entryPhase === 'cascade'}
-              onCascadeComplete={handleCascadeComplete}
-              hintHighlightIndices={hintHighlightIndices} adjacentIndices={adjacentIndices} pathPoints={pathPoints}
-              validationError={wordSubmit.validationFeedback.error}
-              isValidating={isValidating}
-              isWordValid={wordSubmit.validationFeedback.isValid}
-              wasWordSubmitted={wordSubmit.validationFeedback.wasSubmitted}
-              lastAccepted={wordSubmit.lastAccepted}
-              selectedLength={selectedIndices.length} minWordLength={minWordLength}
-              wordFeedback={wordSubmit.wordFeedback}
-              currentWord={currentWord}
-              worldId={levelConfig.world}
-              centerLetter={modeState.centerLetterRequired ? modeState.centerLetter : null}
-              hintLevel={init.hintData.level}
-              bossGridEffect={bossOrch.gridEffectTrigger}
-              lockedTileIndices={bossOrch.lockedTiles} />
-          }
-          sidebar={
-            <GameSidebar objectives={objectives}
-              showLifeBar={modeState.showLifeBar} currentHP={currentHP} maxHP={maxHP}
-              showTargetWordUI={modeState.showTargetWordUI} huntTargetLength={huntTargetWord?.length ?? 0}
-              huntAttempts={huntAttempts} onHuntGuess={submitHuntGuess} huntFound={huntFound ?? false}
-              showSlideIn={entryPhase === 'objectives'} onSlideInComplete={handleEntryPhaseComplete}
-              hasHintsAvailable={hasHintsAvailable} onHintClick={handleHintClick}
-              showAutoHint={showAutoHint} currentHint={currentHint}
-              hintLevel={init.hintData.level}
-              nextHintCost={nextHintCost}
-              hintGoldPending={hintGoldPending}
-              freezeSeconds={init.upgradeEffects.timeFreezeSeconds}
-              freezeUsed={freezeUsed}
-              isFrozen={isFrozen}
-              onFreezeClick={() => activateFreeze(init.upgradeEffects.timeFreezeSeconds)}
-              shufflesRemaining={shufflesRemaining}
-              onShuffleClick={() => { shuffleTiles(); playBoardShuffleSound(); }}
-              canDetonate={init.upgradeEffects.canDetonateWords}
-              detonateActive={detonateActive}
-              onDetonateToggle={() => setDetonateActive(prev => !prev)}
-              chapterQuests={chapterQuests.quests}
-              chapterQuestProgress={chapterQuests.progress}
-              className="border-b-2 lg:border-b-0 lg:border-s-2 border-neo-black/30" />
-          }
-          overlays={<AdventureGameOverlays {...overlayProps} />}
-        />
-        <AdventureTailOverlays
-          archetype={modeState.archetype}
-          currentHP={currentHP}
-          movesRemaining={movesRemaining}
-          isPlaying={isPlaying}
-          upgradeTriggered={upgradeTriggered}
-          lastWordWasThemed={lastWordWasThemed}
-          themedBonusMultiplier={levelConfig.themedBonusMultiplier}
-          mechanicBonus={wordSubmit.mechanicBonus}
-          dismissMechanicBonus={wordSubmit.dismissMechanicBonus}
-          bossActive={isBossLevel && bossOrch.isBossActive}
-          showRetryAssist={showRetryAssist}
-          consecutiveFailures={consecutiveFailures}
-          wordsFoundCount={gameState.wordsFound.length}
-          score={gameState.score}
-          bestAttempt={bestAttempt ?? null}
-          objectives={objectives}
-          onRetryFromAssist={handleRetryFromAssist}
-          onRetryWithBonus={handleRetryWithBonus}
-          onRetryWithHint={handleRetryWithHint}
-          onExit={onExit}
-          showTutorial={showTutorial}
-          onTutorialComplete={() => setShowTutorial(false)}
-          forgeEquippedRunes={forgeEquippedRunes}
-          maxRuneSlots={MAX_EQUIPPED_RUNES}
-        />
-      </div>
+      <AdventureGameShell
+        bossOrch={bossOrch as never}
+        wordSubmit={wordSubmit as never}
+        gridInteraction={gridInteraction as never}
+        modeState={modeState as never}
+        init={init as never}
+        gameState={gameState as never}
+        effects={effects as never}
+        levelConfig={levelConfig as never}
+        chapterQuests={chapterQuests as never}
+        overlayProps={overlayProps}
+        timerStore={timerStore}
+        isBossLevel={isBossLevel}
+        showLevelComplete={showLevelComplete}
+        isPaused={isPaused}
+        isPlaying={isPlaying}
+        entryPhase={entryPhase}
+        timeRemaining={timeRemaining}
+        effectiveComboTimeout={effectiveComboTimeout}
+        masteryAura={masteryAura}
+        currentHP={currentHP}
+        maxHP={maxHP}
+        movesRemaining={movesRemaining}
+        themedWordsFound={themedWordsFound}
+        upgradeState={upgradeState as never}
+        upgradeTriggered={upgradeTriggered}
+        lastWordWasThemed={lastWordWasThemed}
+        showTutorial={showTutorial}
+        showRetryAssist={showRetryAssist}
+        consecutiveFailures={consecutiveFailures}
+        showAutoHint={showAutoHint}
+        currentHint={currentHint}
+        nextHintCost={nextHintCost}
+        hintGoldPending={hintGoldPending}
+        freezeUsed={freezeUsed}
+        isFrozen={isFrozen}
+        shufflesRemaining={shufflesRemaining}
+        detonateActive={detonateActive}
+        hasHintsAvailable={hasHintsAvailable}
+        minWordLength={minWordLength}
+        currentWord={currentWord}
+        isValidating={isValidating}
+        tiles={tiles}
+        selectedIndices={selectedIndices}
+        hintHighlightIndices={hintHighlightIndices}
+        adjacentIndices={adjacentIndices}
+        pathPoints={pathPoints}
+        objectives={objectives}
+        huntTargetWord={huntTargetWord}
+        huntAttempts={huntAttempts}
+        huntFound={huntFound ?? false}
+        bestAttempt={bestAttempt ?? null}
+        forgeEquippedRunes={forgeEquippedRunes}
+        gridRef={gridRef}
+        handleExitWithConfirm={handleExitWithConfirm}
+        handleCascadeComplete={handleCascadeComplete}
+        handleEntryPhaseComplete={handleEntryPhaseComplete}
+        handleHintClick={handleHintClick}
+        activateFreeze={activateFreeze}
+        shuffleTiles={shuffleTiles}
+        playBoardShuffleSound={playBoardShuffleSound}
+        setDetonateActive={setDetonateActive}
+        handleRetryFromAssist={handleRetryFromAssist}
+        handleRetryWithBonus={handleRetryWithBonus}
+        handleRetryWithHint={handleRetryWithHint}
+        onExit={onExit}
+        setShowTutorial={setShowTutorial}
+        submitHuntGuess={submitHuntGuess}
+        t={t}
+      />
     );
   }
 );
