@@ -9,7 +9,7 @@ import { getGame, getGameBySocketId, getUsernameBySocketId } from '../modules/ga
 import { broadcastToRoom, getGameRoom } from '../utils/socketHelpers';
 import { cleanProfanity } from '../utils/profanityFilter';
 import { sanitizeHtml } from '../utils/sanitize';
-import { emitError, ErrorMessages } from '../utils/errorHandler';
+import { emitError, ErrorCodes } from '../utils/errorHandler';
 import { checkRateLimit } from '../utils/rateLimiter';
 import { checkSocketRateLimit } from '../middleware/rateLimiterRedis';
 import { inc } from '../utils/metrics';
@@ -58,7 +58,7 @@ function registerChatHandlers(io: Server, socket: Socket): void {
     // Validate payload
     const validation = validatePayload(chatMessageSchema, data);
     if (!validation.success) {
-      emitError(socket, `Invalid request: ${validation.error}`);
+      emitError(socket, ErrorCodes.VALIDATION_INVALID_PAYLOAD, { message: `Invalid request: ${validation.error}` });
       return;
     }
 
@@ -67,13 +67,13 @@ function registerChatHandlers(io: Server, socket: Socket): void {
     const username = getUsernameBySocketId(socket.id);
 
     if (!gameCode || !message || !username) {
-      emitError(socket, ErrorMessages.INVALID_MESSAGE);
+      emitError(socket, ErrorCodes.PLAYER_NOT_IN_GAME);
       return;
     }
 
     const game = getGame(gameCode);
     if (!game) {
-      emitError(socket, ErrorMessages.GAME_NOT_FOUND);
+      emitError(socket, ErrorCodes.GAME_NOT_FOUND);
       return;
     }
 

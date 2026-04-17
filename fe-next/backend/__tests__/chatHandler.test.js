@@ -24,7 +24,7 @@ import { registerChatHandlers } from '../handlers/chatHandler';
 import { getGame, getGameBySocketId, getUsernameBySocketId } from '../modules/gameStateManager';
 import { broadcastToRoom, getGameRoom } from '../utils/socketHelpers';
 import { cleanProfanity } from '../utils/profanityFilter';
-import { emitError, ErrorMessages } from '../utils/errorHandler';
+import { emitError, ErrorCodes, ErrorMessages } from '../utils/errorHandler';
 import { checkRateLimit } from '../utils/rateLimiter';
 import { inc } from '../utils/metrics';
 import { isSocketMigrating } from '../handlers/shared';
@@ -156,7 +156,7 @@ describe('Chat Handler', () => {
       expect(game.chatHistory[99].message).toBe('New message');
     });
 
-    it('should emit error if game not found', async () => {
+    it('should emit GAME_NOT_FOUND when game lookup fails', async () => {
       getGame.mockReturnValue(null);
 
       await eventHandlers.chatMessage({
@@ -164,8 +164,29 @@ describe('Chat Handler', () => {
         gameCode: 'INVALID'
       });
 
-      expect(emitError).toHaveBeenCalled();
+      expect(emitError).toHaveBeenCalledWith(mockSocket, ErrorCodes.GAME_NOT_FOUND);
       expect(broadcastToRoom).not.toHaveBeenCalled();
+    });
+
+    it('should emit VALIDATION_INVALID_PAYLOAD when schema validation fails', async () => {
+      validatePayload.mockReturnValue({ success: false, error: 'bad shape' });
+
+      await eventHandlers.chatMessage({});
+
+      expect(emitError).toHaveBeenCalledWith(
+        mockSocket,
+        ErrorCodes.VALIDATION_INVALID_PAYLOAD,
+        expect.objectContaining({ message: expect.stringContaining('bad shape') })
+      );
+    });
+
+    it('should emit PLAYER_NOT_IN_GAME when game/username unresolved', async () => {
+      getGameBySocketId.mockReturnValue(null);
+      getUsernameBySocketId.mockReturnValue(null);
+
+      await eventHandlers.chatMessage({ message: 'Hello' });
+
+      expect(emitError).toHaveBeenCalledWith(mockSocket, ErrorCodes.PLAYER_NOT_IN_GAME);
     });
 
     it('should check rate limit and block if exceeded', () => {
