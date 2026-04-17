@@ -859,7 +859,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
               initial={{ y: 60, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ type: 'spring', stiffness: 200, damping: 24, delay: 0.3 }}
-              className="bg-neo-navy/95 backdrop-blur-xl border-t border-neo-white/8 shadow-[0_-4px_24px_rgba(0,0,0,0.5)]"
+              className="bg-neo-navy/95 border-t border-neo-white/8 shadow-[0_-4px_24px_rgba(0,0,0,0.5)]"
             >
               <div className="px-3 pt-2.5 pb-[max(0.625rem,env(safe-area-inset-bottom))]">
                 <StickyReadyBar

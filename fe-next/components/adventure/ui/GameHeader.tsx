@@ -92,7 +92,7 @@ export const GameHeader = memo(function GameHeader({
       className={cn(
         'flex items-center justify-between relative',
         'px-2 py-1 gap-1',
-        hudTheme.headerBg, 'backdrop-blur-md',
+        hudTheme.headerBg,
         'border-b-2', hudTheme.headerBorder,
         className
       )}
@@ -270,7 +270,7 @@ export const GameHeader = memo(function GameHeader({
     {infoStrip && (
       <div className={cn(
         'flex items-center justify-center gap-2 px-2 py-0.5',
-        'bg-neo-black/40 backdrop-blur-xs',
+        'bg-neo-black/40',
         'border-b border-neo-white/5',
         'text-[10px] min-h-0'
       )}>

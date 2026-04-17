@@ -87,7 +87,7 @@ export const AdventureHUD = memo<AdventureHUDProps>(
           data-testid="hud-top-bar"
           className={cn(
             'flex items-center justify-between gap-2 p-2',
-            hudTheme.headerBg, 'backdrop-blur-xs',
+            hudTheme.headerBg,
             'border-b-2', hudTheme.headerBorder,
             'pointer-events-auto'
           )}
@@ -140,7 +140,7 @@ export const AdventureHUD = memo<AdventureHUDProps>(
           className={cn(
             'fixed bottom-0 inset-x-0',
             'flex items-end justify-between gap-2 p-2 pb-[max(0.5rem,env(safe-area-inset-bottom,0.5rem))]',
-            hudTheme.headerBg, 'backdrop-blur-xs',
+            hudTheme.headerBg,
             'border-t-2', hudTheme.headerBorder,
             'pointer-events-auto'
           )}
