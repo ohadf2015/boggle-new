@@ -17,6 +17,7 @@ import { cn } from '@/lib/utils';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { OAuthButtonGroup } from './shared';
 import { useOAuthSignIn } from './hooks/useOAuthSignIn';
+import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import type { AccumulatedStats } from '@/hooks/useMultiplayerSignupNudge';
 
 interface MultiplayerSignupSheetProps {
@@ -32,6 +33,7 @@ export const MultiplayerSignupSheet: React.FC<MultiplayerSignupSheetProps> = ({
 }) => {
   const { t } = useLanguage();
   const { theme } = useTheme();
+  const { isOnCrazyGamesPlatform } = useCrazyGames();
   const isDarkMode = theme === 'dark';
 
   const { signIn, loadingProvider, error } = useOAuthSignIn({
@@ -44,6 +46,8 @@ export const MultiplayerSignupSheet: React.FC<MultiplayerSignupSheetProps> = ({
       } as any);
     },
   });
+
+  if (isOnCrazyGamesPlatform) return null;
 
   return (
     <AnimatePresence>

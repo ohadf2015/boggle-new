@@ -2,7 +2,7 @@
 export const PUBLIC_ROUTES: string[] = [
   "",
   "/about",
-  "/about/the-word-nerd",
+  "/about/ohad-fisher",
   "/accessibility",
   "/account/delete",
   "/adventure",

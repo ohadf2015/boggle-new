@@ -16,7 +16,7 @@ interface CoinBalanceProps {
 export function CoinBalance({
   coins = 0,
   size = 'md',
-  showAnimation = true,
+  showAnimation = false,
   showSparkle = false,
   className
 }: CoinBalanceProps) {
@@ -74,30 +74,30 @@ export function CoinBalance({
         className
       )}
     >
-      {/* Animated shine overlay */}
-      <div
-        className="absolute inset-0 opacity-40 pointer-events-none"
-        style={{
-          background: 'linear-gradient(110deg, transparent 25%, rgba(255,255,255,0.5) 50%, transparent 75%)',
-          backgroundSize: '200% 100%',
-          animation: 'shimmer 3s ease-in-out infinite',
-        }}
-      />
+      {/* Animated shine overlay — only when showAnimation explicitly enabled */}
+      {showAnimation && (
+        <div
+          className="absolute inset-0 opacity-40 pointer-events-none"
+          style={{
+            background: 'linear-gradient(110deg, transparent 25%, rgba(255,255,255,0.5) 50%, transparent 75%)',
+            backgroundSize: '200% 100%',
+            animation: 'shimmer 3s ease-in-out infinite',
+          }}
+        />
+      )}
 
       {/* Inner glow effect */}
       <div className="absolute inset-0 rounded-neo-lg opacity-30 pointer-events-none bg-linear-to-t from-transparent via-white/20 to-white/40" />
 
-      {/* Coin icon with subtle animation */}
+      {/* Coin icon — rotate only when showAnimation explicitly enabled */}
       <motion.div
-        animate={{
-          rotate: [0, -5, 5, 0],
-        }}
-        transition={{
+        animate={showAnimation ? { rotate: [0, -5, 5, 0] } : undefined}
+        transition={showAnimation ? {
           duration: 2,
           repeat: Infinity,
           repeatDelay: 3,
           ease: "easeInOut"
-        }}
+        } : undefined}
         className="relative z-10"
       >
         <Coins

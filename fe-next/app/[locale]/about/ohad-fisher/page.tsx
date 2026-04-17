@@ -37,70 +37,53 @@ const EXPERTISE = [
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
     const { locale } = await params;
-    const url = `${SITE_URL}/${locale}/about/the-word-nerd`;
+    const url = `${SITE_URL}/${locale}/about/ohad-fisher`;
+    const isEnglish = locale === 'en';
 
     return {
-        title: 'Ohad Fisher (The Word Nerd) - Founder & Editor, LexiClash',
+        title: 'Ohad Fisher - Founder & Editor-in-Chief, LexiClash',
         description:
             'Meet Ohad Fisher — founder of LexiClash, word-game designer, and cognitive-science enthusiast with 8+ years researching word games, linguistics, and brain health.',
         openGraph: {
             type: 'profile',
-            title: 'Ohad Fisher (The Word Nerd) - Founder & Editor, LexiClash',
+            title: 'Ohad Fisher - Founder & Editor-in-Chief, LexiClash',
             description:
                 'Founder of LexiClash, word-game designer, and cognitive-science enthusiast with 8+ years researching word games, linguistics, and brain health.',
             url,
             siteName: 'LexiClash',
-            images: [{ url: `${SITE_URL}/images/author-word-nerd.jpg`, width: 400, height: 400, alt: 'The Word Nerd' }],
+            images: [{ url: `${SITE_URL}/images/author-ohad.png`, width: 400, height: 400, alt: 'Ohad Fisher' }],
         },
         alternates: {
-            canonical: url,
+            canonical: `${SITE_URL}/en/about/ohad-fisher`,
             languages: {
-                'x-default': `${SITE_URL}/en/about/the-word-nerd`,
-                he: `${SITE_URL}/he/about/the-word-nerd`,
-                en: `${SITE_URL}/en/about/the-word-nerd`,
-                sv: `${SITE_URL}/sv/about/the-word-nerd`,
-                ja: `${SITE_URL}/ja/about/the-word-nerd`,
-                es: `${SITE_URL}/es/about/the-word-nerd`,
-                'en-IL': `${SITE_URL}/en/about/the-word-nerd`,
-                'he-IL': `${SITE_URL}/he/about/the-word-nerd`,
-                'en-US': `${SITE_URL}/en/about/the-word-nerd`,
-                'es-US': `${SITE_URL}/es/about/the-word-nerd`,
-                'en-GB': `${SITE_URL}/en/about/the-word-nerd`,
-                'en-SE': `${SITE_URL}/en/about/the-word-nerd`,
-                'sv-SE': `${SITE_URL}/sv/about/the-word-nerd`,
-                'en-JP': `${SITE_URL}/en/about/the-word-nerd`,
-                'ja-JP': `${SITE_URL}/ja/about/the-word-nerd`,
-                'en-ES': `${SITE_URL}/en/about/the-word-nerd`,
-                'es-ES': `${SITE_URL}/es/about/the-word-nerd`,
-                'en-MX': `${SITE_URL}/en/about/the-word-nerd`,
-                'es-MX': `${SITE_URL}/es/about/the-word-nerd`,
-                'en-AU': `${SITE_URL}/en/about/the-word-nerd`,
-                'es-AR': `${SITE_URL}/es/about/the-word-nerd`,
-                'es-CO': `${SITE_URL}/es/about/the-word-nerd`,
+                'x-default': `${SITE_URL}/en/about/ohad-fisher`,
+                he: `${SITE_URL}/he/about/ohad-fisher`,
+                en: `${SITE_URL}/en/about/ohad-fisher`,
+                sv: `${SITE_URL}/sv/about/ohad-fisher`,
+                ja: `${SITE_URL}/ja/about/ohad-fisher`,
+                es: `${SITE_URL}/es/about/ohad-fisher`,
             },
         },
-        robots: { index: true, follow: true },
+        robots: isEnglish ? { index: true, follow: true } : { index: false, follow: true },
     };
 }
 
-export default async function TheWordNerdPage({ params }: PageProps) {
+export default async function OhadFisherPage({ params }: PageProps) {
     const { locale } = await params;
 
-    // All schema content is hardcoded constants — no user input, safe for JSON serialization
     const personSchema = {
         '@context': 'https://schema.org',
         '@type': 'Person',
-        '@id': `${SITE_URL}/about/the-word-nerd#person`,
+        '@id': `${SITE_URL}/about/ohad-fisher#person`,
         name: 'Ohad Fisher',
-        alternateName: 'Ohad Fisher',
-        url: `${SITE_URL}/about/the-word-nerd`,
+        url: `${SITE_URL}/about/ohad-fisher`,
         jobTitle: 'Founder & Editor-in-Chief, LexiClash',
         description:
             'Founder of LexiClash. Word-game designer and cognitive-science enthusiast with 8+ years researching word games, linguistics, and brain health.',
         image: `${SITE_URL}/images/author-ohad.png`,
         email: 'editor@lexiclash.live',
         sameAs: [
-            `${SITE_URL}/about/the-word-nerd`,
+            `${SITE_URL}/about/ohad-fisher`,
             `${SITE_URL}/editorial-policy`,
             'https://github.com/lexiclash',
         ],
@@ -118,20 +101,21 @@ export default async function TheWordNerdPage({ params }: PageProps) {
         itemListElement: [
             { '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE_URL}/${locale}` },
             { '@type': 'ListItem', position: 2, name: 'About', item: `${SITE_URL}/${locale}/about` },
-            { '@type': 'ListItem', position: 3, name: 'The Word Nerd', item: `${SITE_URL}/${locale}/about/the-word-nerd` },
+            { '@type': 'ListItem', position: 3, name: 'Ohad Fisher', item: `${SITE_URL}/${locale}/about/ohad-fisher` },
         ],
     };
 
-    // Safe: schemas built from static constants above, no user-supplied data
+    // Safe: schemas built from static hardcoded constants above; no user input is serialized.
+    const jsonLd = JSON.stringify([personSchema, breadcrumbSchema]);
+
     return (
         <>
             <script
                 type="application/ld+json"
-                dangerouslySetInnerHTML={{ __html: JSON.stringify([personSchema, breadcrumbSchema]) }}
+                dangerouslySetInnerHTML={{ __html: jsonLd }}
             />
             <main className="min-h-screen bg-neo-navy px-4 py-12 sm:px-6 lg:px-8">
                 <div className="mx-auto max-w-3xl">
-                    {/* Author Header */}
                     <div className="mb-10 flex flex-col items-center gap-6 sm:flex-row sm:items-start">
                         <Image
                             src="/images/author-ohad.png"
@@ -143,7 +127,6 @@ export default async function TheWordNerdPage({ params }: PageProps) {
                         />
                         <div className="text-center sm:text-start">
                             <h1 className="font-neo-display text-3xl font-bold text-neo-white sm:text-4xl">Ohad Fisher</h1>
-                            <p className="mt-1 font-neo-body text-sm text-gray-400">also known as &ldquo;The Word Nerd&rdquo;</p>
                             <p className="mt-2 font-neo-body text-lg text-neo-lime">
                                 Founder &amp; Editor-in-Chief, LexiClash
                             </p>
@@ -161,7 +144,6 @@ export default async function TheWordNerdPage({ params }: PageProps) {
                         </div>
                     </div>
 
-                    {/* Bio */}
                     <section className="mb-10 rounded-neo border-3 border-black bg-neo-navy/80 p-6 shadow-hard">
                         <h2 className="mb-4 font-neo-display text-xl font-bold text-neo-white">About Ohad</h2>
                         <div className="space-y-4 font-neo-body text-base leading-relaxed text-gray-300">
@@ -194,7 +176,6 @@ export default async function TheWordNerdPage({ params }: PageProps) {
                         </div>
                     </section>
 
-                    {/* Editorial Standards snapshot */}
                     <section className="mb-10 rounded-neo border-3 border-black bg-neo-navy/80 p-6 shadow-hard">
                         <h2 className="mb-4 font-neo-display text-xl font-bold text-neo-white">How I Research &amp; Fact-Check</h2>
                         <ul className="list-disc space-y-2 pl-5 font-neo-body text-base leading-relaxed text-gray-300">
@@ -226,7 +207,6 @@ export default async function TheWordNerdPage({ params }: PageProps) {
                         </ul>
                     </section>
 
-                    {/* Expertise */}
                     <section className="mb-10">
                         <h2 className="mb-4 font-neo-display text-xl font-bold text-neo-white">Areas of Expertise</h2>
                         <div className="flex flex-wrap gap-3">
@@ -241,10 +221,9 @@ export default async function TheWordNerdPage({ params }: PageProps) {
                         </div>
                     </section>
 
-                    {/* Articles */}
                     <section className="mb-10">
                         <h2 className="mb-4 font-neo-display text-xl font-bold text-neo-white">
-                            Articles by The Word Nerd
+                            Articles by Ohad Fisher
                         </h2>
                         <ul className="space-y-3">
                             {BLOG_POSTS.map((post) => (
@@ -260,7 +239,6 @@ export default async function TheWordNerdPage({ params }: PageProps) {
                         </ul>
                     </section>
 
-                    {/* Back link */}
                     <Link
                         href={`/${locale}/about`}
                         className="inline-block rounded-neo border-3 border-black bg-neo-yellow px-4 py-2 font-neo-body font-bold text-black shadow-hard-sm transition-shadow hover:shadow-hard"

@@ -127,6 +127,17 @@ const nextConfig = {
         destination: '/en',
         permanent: true,
       },
+      // Author route rename: the-word-nerd → ohad-fisher
+      {
+        source: '/:locale(en|he|sv|ja|es)/about/the-word-nerd',
+        destination: '/:locale/about/ohad-fisher',
+        permanent: true,
+      },
+      {
+        source: '/about/the-word-nerd',
+        destination: '/en/about/ohad-fisher',
+        permanent: true,
+      },
       // Redirect non-www to www (handled by hosting platform like Vercel/Railway)
       // This is a fallback for any requests that slip through
       {

@@ -259,7 +259,7 @@ function ConsentToggle({ label, description, checked, disabled, requiredLabel, o
           className={cn(
             'absolute top-0.5 w-5 h-5 rounded-full transition-transform',
             'bg-white border-2 border-neo-black shadow-xs',
-            checked ? 'translate-x-[18px]' : 'translate-x-0.5'
+            checked ? 'translate-x-[18px] rtl:-translate-x-[18px]' : 'translate-x-0.5 rtl:-translate-x-0.5'
           )}
         />
       </div>

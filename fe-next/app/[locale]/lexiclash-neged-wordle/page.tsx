@@ -8,6 +8,8 @@ interface PageProps {
 const BASE_URL = 'https://www.lexiclash.live';
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { locale } = await params;
+  const isTargetLocale = locale === 'he';
   const pageUrl = `${BASE_URL}/he/lexiclash-neged-wordle`;
 
   return {
@@ -61,15 +63,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         'es-CO': `${BASE_URL}/es/lexiclash-contra-wordle`,
       },
     },
-    robots: {
-      index: true,
-      follow: true,
-    },
+    robots: { index: false, follow: true },
   };
 }
 
 export default async function LexiClashVsWordlePage({ params }: PageProps) {
   const { locale } = await params;
+  const isTargetLocale = locale === 'he';
 
   // Static FAQ data — all hardcoded strings, safe for dangerouslySetInnerHTML (no user input)
   const faqs = [

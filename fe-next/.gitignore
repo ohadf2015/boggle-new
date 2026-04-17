@@ -67,3 +67,10 @@ public/logos-png-backup/
 # Capacitor build artifacts
 .capacitor/
 
+
+# Play Store release automation
+play-console-sa.json
+**/play-console-sa*.json
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/README.md

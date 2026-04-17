@@ -75,14 +75,14 @@ export function BlogPostingJsonLd({
             '@type': 'Person',
             name: 'Ohad Fisher',
             alternateName: 'Ohad Fisher',
-            url: `${SITE_URL}/about/the-word-nerd`,
+            url: `${SITE_URL}/about/ohad-fisher`,
             jobTitle: 'Founder & Editor-in-Chief, LexiClash',
             description:
                 'Founder of LexiClash. Word-game designer and cognitive-science enthusiast with 8+ years researching word games, linguistics, and brain health.',
             image: `${SITE_URL}/images/author-ohad.png`,
             email: 'editor@lexiclash.live',
             sameAs: [
-                'https://www.lexiclash.live/about/the-word-nerd',
+                'https://www.lexiclash.live/about/ohad-fisher',
                 'https://www.lexiclash.live/editorial-policy',
                 'https://github.com/lexiclash',
             ],
@@ -150,6 +150,8 @@ interface BlogMetadataOptions {
     description: string;
     datePublished: string;
     dateModified?: string;
+    /** When false, emit noindex — used for locales that fall back to English body. */
+    hasTranslation?: boolean;
 }
 
 export function generateBlogMetadata({
@@ -159,6 +161,7 @@ export function generateBlogMetadata({
     description,
     datePublished,
     dateModified,
+    hasTranslation = true,
 }: BlogMetadataOptions): Metadata {
     const imageUrl = getBlogImage(slug);
     const articleUrl = `https://www.lexiclash.live/${locale}/blog/${slug}`;
@@ -210,6 +213,6 @@ export function generateBlogMetadata({
                 'es-CO': `https://www.lexiclash.live/es/blog/${slug}`,
             },
         },
-        robots: { index: true, follow: true },
+        robots: hasTranslation ? { index: true, follow: true } : { index: false, follow: true },
     };
 }

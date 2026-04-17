@@ -7,6 +7,8 @@ import { cn } from '@/lib/utils';
 import { SocketContext } from '@/utils/SocketContext';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import RoomChat from '@/components/RoomChat';
+import { useCrazyGamesChatDisabled } from '@/hooks/useCrazyGamesSettingsBridge';
+import { useCrazyGames } from '@/components/CrazyGamesSDK';
 
 interface MobileChatFabProps {
   username: string;
@@ -35,6 +37,8 @@ export const MobileChatFab = memo<MobileChatFabProps>(({ username, isHost, gameC
   const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const socketCtx = useContext(SocketContext);
   const socket = socketCtx?.socket ?? null;
+  const isChatDisabled = useCrazyGamesChatDisabled();
+  const { isOnCrazyGamesPlatform } = useCrazyGames();
 
   const clearHideTimer = useCallback(() => {
     if (hideTimerRef.current) {
@@ -76,6 +80,8 @@ export const MobileChatFab = memo<MobileChatFabProps>(({ username, isHost, gameC
     setHasUnread(false);
     clearHideTimer();
   };
+
+  if (isChatDisabled || isOnCrazyGamesPlatform) return null;
 
   return (
     <div className="lg:hidden">

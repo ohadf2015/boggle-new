@@ -1,6 +1,7 @@
 import { memo, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '../lib/utils';
+import { useLanguage } from '../contexts/LanguageContext';
 
 /**
  * Level tier type
@@ -132,8 +133,10 @@ const LevelBadge = memo<LevelBadgeProps>(({
   animate = true,
   className,
 }) => {
+  const { t } = useLanguage();
   const tier = useMemo(() => getTierForLevel(level), [level]);
   const sizeConfig = SIZES[size] || SIZES.md;
+  const levelLabel = t('streakBar.level', { level });
 
   const badge = (
     <div
@@ -150,7 +153,7 @@ const LevelBadge = memo<LevelBadgeProps>(({
         'hover:scale-110 hover:shadow-hard',
         className
       )}
-      title={`Level ${level}`}
+      title={levelLabel}
     >
       {/* Level number */}
       <span className={cn(sizeConfig.text, 'drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)]')}>
@@ -181,7 +184,7 @@ const LevelBadge = memo<LevelBadgeProps>(({
         {badge}
         {showLabel && (
           <span className="text-xs font-bold text-gray-700 dark:text-gray-200 uppercase">
-            Lvl {level}
+            {levelLabel}
           </span>
         )}
       </motion.div>
@@ -193,7 +196,7 @@ const LevelBadge = memo<LevelBadgeProps>(({
       {badge}
       {showLabel && (
         <span className="text-xs font-bold text-gray-700 dark:text-gray-200 uppercase">
-          Lvl {level}
+          {levelLabel}
         </span>
       )}
     </div>

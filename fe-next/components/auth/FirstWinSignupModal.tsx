@@ -19,6 +19,7 @@ import {
   type AuthBenefit,
 } from './shared';
 import { useOAuthSignIn } from './hooks/useOAuthSignIn';
+import { useCrazyGames } from '@/components/CrazyGamesSDK';
 
 interface FirstWinSignupModalProps {
   isOpen: boolean;
@@ -45,6 +46,7 @@ const FirstWinSignupModal: React.FC<FirstWinSignupModalProps> = ({
 }) => {
   const { theme } = useTheme();
   const { t } = useLanguage();
+  const { isOnCrazyGamesPlatform } = useCrazyGames();
   const isDarkMode = theme === 'dark';
 
   const { signIn, loadingProvider, error } = useOAuthSignIn();
@@ -67,6 +69,8 @@ const FirstWinSignupModal: React.FC<FirstWinSignupModalProps> = ({
     }
     return undefined;
   }, [isOpen, isMultiGamesVariant]);
+
+  if (isOnCrazyGamesPlatform) return null;
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>

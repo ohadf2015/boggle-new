@@ -67,7 +67,7 @@ const SECTIONS = [
     fallback: 'About & Legal',
     links: [
       { href: '/about', labelKey: 'footer.about', fallback: 'About' },
-      { href: '/about/the-word-nerd', labelKey: 'sitemap.theWordNerd', fallback: 'Ohad Fisher' },
+      { href: '/about/ohad-fisher', labelKey: 'sitemap.theWordNerd', fallback: 'Ohad Fisher' },
       { href: '/contact', labelKey: 'footer.contact', fallback: 'Contact' },
       { href: '/legal', labelKey: 'legal.title', fallback: 'Legal' },
       { href: '/legal/privacy', labelKey: 'legal.privacyPolicy', fallback: 'Privacy Policy' },

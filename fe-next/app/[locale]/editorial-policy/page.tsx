@@ -54,7 +54,7 @@ export default async function EditorialPolicyPage({ params }: PageProps) {
         <Section title="Who Writes for LexiClash">
           <p>
             Articles are authored by{' '}
-            <Link href={`/${locale}/about/the-word-nerd`} className="underline text-neo-lime">
+            <Link href={`/${locale}/about/ohad-fisher`} className="underline text-neo-lime">
               Ohad Fisher
             </Link>
             , founder and editor-in-chief of LexiClash, with eight-plus years of hands-on word-game
@@ -164,7 +164,7 @@ export default async function EditorialPolicyPage({ params }: PageProps) {
             </Link>
             <br />
             Author profile:{' '}
-            <Link href={`/${locale}/about/the-word-nerd`} className="underline text-neo-lime">
+            <Link href={`/${locale}/about/ohad-fisher`} className="underline text-neo-lime">
               Ohad Fisher
             </Link>
           </p>

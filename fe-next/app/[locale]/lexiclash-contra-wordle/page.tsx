@@ -9,6 +9,7 @@ const BASE_URL = 'https://www.lexiclash.live';
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale } = await params;
+  const isTargetLocale = locale === 'es';
   const pageUrl = `${BASE_URL}/${locale}/lexiclash-contra-wordle`;
 
   return {
@@ -47,10 +48,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         ja: `${BASE_URL}/ja/japanese-word-game`,
       },
     },
-    robots: {
-      index: true,
-      follow: true,
-    },
+    robots: { index: false, follow: true },
   };
 }
 

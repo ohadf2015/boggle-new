@@ -1,4 +1,4 @@
-// Article content — "The Word Nerd" persona
+// Article content — "Ohad Fisher" persona
 // Each language is culturally adapted, NOT translated
 
 export type LocaleContent = {

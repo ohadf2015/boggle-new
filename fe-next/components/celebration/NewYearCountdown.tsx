@@ -25,7 +25,20 @@ interface NewYearCountdownProps {
  *
  * All times calculated in player's local timezone.
  */
-export default function NewYearCountdown({ enabled = true }: NewYearCountdownProps) {
+function isWithinNewYearWindow(): boolean {
+  const now = new Date();
+  const month = now.getMonth();
+  const day = now.getDate();
+  return (month === 11 && day >= 29) || (month === 0 && day <= 2);
+}
+
+export default function NewYearCountdown(props: NewYearCountdownProps) {
+  const { enabled = true } = props;
+  if (!enabled || !isWithinNewYearWindow()) return null;
+  return <NewYearCountdownInner {...props} />;
+}
+
+function NewYearCountdownInner({ enabled = true }: NewYearCountdownProps) {
   const { t } = useLanguage();
   const newYearState = useNewYearDetection({ enabled });
 

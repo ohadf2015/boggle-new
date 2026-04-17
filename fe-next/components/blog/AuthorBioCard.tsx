@@ -55,7 +55,7 @@ export function AuthorBioCard() {
 
       <div className="text-center sm:text-start flex-1">
         <Link
-          href={`/${locale}/about/the-word-nerd`}
+          href={`/${locale}/about/ohad-fisher`}
           className={cn('font-bold text-base hover:underline', isDarkMode ? 'text-white' : 'text-neo-black')}
         >
           Ohad Fisher

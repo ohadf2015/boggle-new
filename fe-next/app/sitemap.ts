@@ -139,6 +139,9 @@ function getAllRoutes(): MetadataRoute.Sitemap {
     'word-game-history',
     'word-games-and-mental-health',
     'word-games-for-kids-education',
+    'boggle-vs-wordle',
+    'boggle-vs-scrabble',
+    'boggle-vs-words-with-friends',
   ];
   blogArticles.forEach((slug) => {
     addForAllLocales(routes, `/blog/${slug}`, { lastModified: BLOG_UPDATED, changeFrequency: 'monthly', priority: 0.85 });
@@ -160,23 +163,10 @@ function getAllRoutes(): MetadataRoute.Sitemap {
   addForAllLocales(routes, '/legal/cookies', { lastModified: LEGAL_UPDATED, changeFrequency: 'monthly', priority: 0.3 });
 
   // ─── SEO landing pages (market-specific, single locale) ───
+  // Doorway SEO pages flipped to noindex for AdSense thin-content remediation — excluded from sitemap.
+  // Only real game pages remain (e.g., /daily-word-wheel).
   const seoLandings = [
-    { locale: 'he', path: '/hebrew-multiplayer-word-game', img: 'he' },
-    { locale: 'sv', path: '/swedish-multiplayer-word-game', img: 'sv' },
-    { locale: 'ja', path: '/japanese-word-game', img: 'ja' },
-    { locale: 'en', path: '/multiplayer-word-game-online', img: 'en' },
-    { locale: 'en', path: '/play-boggle-online-free', img: 'en' },
-    { locale: 'en', path: '/boggle-word-shake-free', img: 'en' },
-    { locale: 'en', path: '/word-games-online-free', img: 'en' },
     { locale: 'en', path: '/daily-word-wheel', img: 'en' },
-    { locale: 'en', path: '/online-word-games-with-friends', img: 'en' },
-    { locale: 'es', path: '/juego-de-palabras-multijugador', img: 'es' },
-    { locale: 'en', path: '/lexiclash-vs-wordle', img: 'en' },
-    { locale: 'en', path: '/lexiclash-vs-scrabble', img: 'en' },
-    { locale: 'en', path: '/best-online-word-games', img: 'en' },
-    { locale: 'en', path: '/words-with-friends-alternative', img: 'en' },
-    { locale: 'he', path: '/lexiclash-neged-wordle', img: 'he' },
-    { locale: 'es', path: '/lexiclash-contra-wordle', img: 'es' },
   ] as const;
   seoLandings.forEach(({ locale, path, img }) => {
     routes.push({
@@ -211,7 +201,7 @@ function getAllRoutes(): MetadataRoute.Sitemap {
   });
 
   // ─── Author page ───
-  addForAllLocales(routes, '/about/the-word-nerd', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.7 });
+  addForAllLocales(routes, '/about/ohad-fisher', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.7 });
 
   // ─── Editorial policy (E-E-A-T / AdSense trust) ───
   addForAllLocales(routes, '/editorial-policy', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.6 });

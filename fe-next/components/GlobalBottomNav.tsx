@@ -146,6 +146,7 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
                                 "min-w-[64px] min-h-[48px]",
                                 "px-3 py-2",
                                 "transition-all duration-150",
+                                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy rounded",
                                 isActive ? tab.color : "text-neo-white/40"
                             )}
                             aria-label={t(tab.labelKey)}
@@ -232,7 +233,7 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
                                 {tab.id === 'friends' && pendingCount > 0 && (
                                     <span
                                         className="absolute -top-1 -inset-e-2 flex items-center justify-center w-4 h-4 rounded-full bg-neo-pink border-2 border-neo-navy text-[8px] font-black text-neo-white leading-none"
-                                        aria-label={`${pendingCount} pending`}
+                                        aria-label={`${pendingCount} ${t('friends.pendingRequests')}`}
                                         data-testid="friend-request-badge"
                                     >
                                         {pendingCount > 9 ? '9+' : pendingCount}

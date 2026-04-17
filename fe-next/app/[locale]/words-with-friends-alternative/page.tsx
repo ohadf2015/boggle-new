@@ -7,7 +7,9 @@ interface PageProps {
 
 const BASE_URL = 'https://www.lexiclash.live';
 
-export async function generateMetadata(_props: PageProps): Promise<Metadata> {
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { locale } = await params;
+  const isTargetLocale = locale === 'en';
   const pageUrl = `${BASE_URL}/en/words-with-friends-alternative`;
 
   return {
@@ -39,7 +41,7 @@ export async function generateMetadata(_props: PageProps): Promise<Metadata> {
         es: `${BASE_URL}/es/juego-de-palabras-multijugador`,
       },
     },
-    robots: { index: true, follow: true },
+    robots: { index: false, follow: true },
   };
 }
 
@@ -79,6 +81,7 @@ const faqJsonLd = JSON.stringify({
 
 export default async function WordsWithFriendsAlternativePage({ params }: PageProps) {
   const { locale } = await params;
+  const isTargetLocale = locale === 'en';
 
   return (
     <main className="min-h-screen bg-neo-navy text-neo-white">

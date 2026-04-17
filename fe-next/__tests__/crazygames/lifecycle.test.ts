@@ -1,4 +1,4 @@
-import { vi, type Mock, } from 'vitest';
+import { vi } from 'vitest';
 /**
  * CrazyGames Lifecycle Event Tests
  *

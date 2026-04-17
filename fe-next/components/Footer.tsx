@@ -29,17 +29,25 @@ export default function Footer({ className }: FooterProps): React.ReactElement {
     <footer
       role="contentinfo"
       className={cn(
-        'hidden sm:block mt-auto border-t-3 border-neo-black bg-neo-navy text-white',
+        'mt-auto border-t-3 border-neo-black bg-neo-navy text-white',
         className
       )}
     >
-      <div className="max-w-6xl mx-auto px-4 py-8">
-        {/* On CrazyGames: hide entire footer content (external links prohibited) */}
+      <div className="max-w-6xl mx-auto px-4 py-6 sm:py-8">
+        {/* On CrazyGames: minimal legal strip (Privacy + Terms required by CrazyGames QA) */}
         {isOnCrazyGamesPlatform ? (
-          <div className="text-center">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-6 text-center">
             <p className="text-xs text-neo-cream/50">
               {t('legal.copyright', { year: new Date().getFullYear() })}
             </p>
+            <nav aria-label={t('legal.title')} className="flex items-center gap-4">
+              <Link href={`/${language}/legal/privacy`} className={legalLinkClass}>
+                {t('legal.privacyPolicy')}
+              </Link>
+              <Link href={`/${language}/legal/terms`} className={legalLinkClass}>
+                {t('legal.termsOfService')}
+              </Link>
+            </nav>
           </div>
         ) : (
         <>

@@ -12,6 +12,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { AlertTriangle } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/utils/ThemeContext';
+import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { cn } from '@/lib/utils';
 
 interface SignupToastProps {
@@ -29,6 +30,7 @@ export const SignupToast: React.FC<SignupToastProps> = ({
 }) => {
   const { t } = useLanguage();
   const { theme } = useTheme();
+  const { isOnCrazyGamesPlatform } = useCrazyGames();
   const isDarkMode = theme === 'dark';
 
   useEffect(() => {
@@ -36,6 +38,8 @@ export const SignupToast: React.FC<SignupToastProps> = ({
     const timer = setTimeout(onDismiss, AUTO_DISMISS_MS);
     return () => clearTimeout(timer);
   }, [isVisible, onDismiss]);
+
+  if (isOnCrazyGamesPlatform) return null;
 
   return (
     <AnimatePresence>

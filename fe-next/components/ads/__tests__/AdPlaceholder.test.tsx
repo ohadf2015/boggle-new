@@ -2,7 +2,6 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { AdPlaceholder } from '../AdPlaceholder';
 
-// Mock AdUnit to verify it gets rendered in production mode
 vi.mock('../AdUnit', () => ({
   AdUnit: (props: Record<string, unknown>) => (
     <div data-testid="ad-unit" data-slot={props.adSlot} data-width={props.width} data-height={props.height} />
@@ -14,6 +13,14 @@ vi.mock('@/utils/ThemeContext', () => ({
 }));
 
 describe('AdPlaceholder', () => {
+  const prevApproved = process.env.NEXT_PUBLIC_ADSENSE_APPROVED;
+  beforeAll(() => {
+    process.env.NEXT_PUBLIC_ADSENSE_APPROVED = 'true';
+  });
+  afterAll(() => {
+    process.env.NEXT_PUBLIC_ADSENSE_APPROVED = prevApproved;
+  });
+
   it('renders dev placeholder when showPlaceholder is true', () => {
     render(<AdPlaceholder zone="content-page" showPlaceholder />);
     expect(screen.getByText('Safe Zone: Content Page')).toBeInTheDocument();

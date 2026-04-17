@@ -123,7 +123,7 @@ const HintButton = memo<HintButtonProps>(({
             initial={{ opacity: 0, y: -10, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -10, scale: 0.95 }}
-            className="absolute top-full right-0 mt-2 z-50 max-w-[calc(100vw-1rem)] w-64 md:w-80 pointer-events-none"
+            className="absolute top-full inset-x-0 mx-auto mt-2 z-50 max-w-[calc(100vw-1rem)] w-64 md:w-80 pointer-events-none"
           >
             <div
               id="hint-content"

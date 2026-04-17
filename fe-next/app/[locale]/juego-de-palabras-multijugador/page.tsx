@@ -9,6 +9,7 @@ const BASE_URL = 'https://www.lexiclash.live';
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale } = await params;
+  const isTargetLocale = locale === 'es';
   const pageUrl = `${BASE_URL}/es/juego-de-palabras-multijugador`;
 
   return {
@@ -63,10 +64,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         'es-CO': `${BASE_URL}/es/juego-de-palabras-multijugador`,
       },
     },
-    robots: {
-      index: true,
-      follow: true,
-    },
+    robots: { index: false, follow: true },
   };
 }
 

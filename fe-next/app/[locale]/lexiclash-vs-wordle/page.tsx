@@ -9,7 +9,10 @@ const BASE_URL = 'https://www.lexiclash.live';
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale } = await params;
-  const pageUrl = `${BASE_URL}/${locale}/lexiclash-vs-wordle`;
+  const isEnglish = locale === 'en';
+  // Body is English-only. Non-English routes exist only because of the [locale] dynamic segment.
+  // Canonical must always point to the English URL to avoid cross-locale duplicate-content flags.
+  const pageUrl = `${BASE_URL}/en/lexiclash-vs-wordle`;
 
   return {
     title: 'LexiClash vs Wordle — Which Word Game Is Better in 2026? | LexiClash',
@@ -40,7 +43,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         es: `${BASE_URL}/es/lexiclash-contra-wordle`,
       },
     },
-    robots: { index: true, follow: true },
+    // Only English body exists; noindex non-en routes so crawler treats /en/ as the single indexable version.
+    robots: { index: false, follow: true },
   };
 }
 

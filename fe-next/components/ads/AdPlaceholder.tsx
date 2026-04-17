@@ -59,6 +59,13 @@ export const AdPlaceholder: React.FC<AdPlaceholderProps> = ({
 }) => {
   // Production / test: render real AdSense unit (no theme dependency)
   if (!showPlaceholder) {
+    // Gate real ad rendering behind approval flag. Prevents broken
+    // `adSlot="PENDING_APPROVAL"` <ins> tags from shipping site-wide
+    // (which AdSense crawler reads as policy violation → rejection).
+    const approved = process.env.NEXT_PUBLIC_ADSENSE_APPROVED === 'true';
+    if (!approved) {
+      return null;
+    }
     const { width, height } = ZONE_SIZES[zone];
     return (
       <div data-ad-zone={zone} className={cn('ad-zone', className)}>

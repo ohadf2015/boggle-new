@@ -6,6 +6,7 @@
  * showRewardedAd call in the CG branch was missing both.
  */
 import { renderHook, act } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 const gameplayStart = vi.fn();
 const gameplayStop = vi.fn();

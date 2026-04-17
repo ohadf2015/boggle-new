@@ -1,4 +1,4 @@
-// Article content — "The Word Nerd" persona
+// Article content — "Ohad Fisher" persona
 // Each language is culturally adapted, NOT translated
 
 export type LocaleContent = {
@@ -39,7 +39,7 @@ Within five minutes, the noise stopped. Not because I was distracting myself fro
 
 That was three years ago. I've played almost every day since. And I started wondering: is this actually healthy? Or am I just swapping one anxiety behavior for another?
 
-So I did what any self-respecting Word Nerd would do. I went looking for the research.`,
+So I did what any self-respecting Ohad Fisher would do. I went looking for the research.`,
       },
       {
         title: 'The flow state: when your brain finally shuts up',

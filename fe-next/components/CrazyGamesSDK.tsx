@@ -395,7 +395,8 @@ export function isCrazyGamesEnvironment(): boolean {
  * @deprecated Prefer using `useCrazyGames().isOnCrazyGamesPlatform` in React components
  */
 export function shouldHideExternalLogin(): boolean {
-  return isCrazyGamesEnvironment();
+  if (typeof window === 'undefined') return false;
+  return window.__crazyGamesEnvironment === 'crazygames';
 }
 
 export default CrazyGamesProvider;

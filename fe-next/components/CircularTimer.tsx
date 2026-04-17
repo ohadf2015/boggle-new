@@ -87,7 +87,7 @@ const CircularTimer = memo<CircularTimerProps>(({ remainingTime, totalTime = 180
         className={`
           relative
           ${config.frameClasses}
-          ${isCriticalTime ? 'animate-pulse drop-shadow-[0_0_15px_rgb(255_50_50/0.6)]' : ''}
+          ${isCriticalTime ? 'drop-shadow-[0_0_15px_rgb(255_50_50/0.6)]' : ''}
         `}
       >
         <div className="relative">

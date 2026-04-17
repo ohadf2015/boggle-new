@@ -78,6 +78,9 @@ const WordHuntLoginModal: React.FC<WordHuntLoginModalProps> = ({ isOpen, onClose
     await oauthSignIn(provider);
   };
 
+  // CrazyGames: route through native auth, never render our modal UI
+  if (isOnCrazyGamesPlatform) return null;
+
   const handleEmailChange = (value: string) => {
     setEmail(value);
     if (value) {

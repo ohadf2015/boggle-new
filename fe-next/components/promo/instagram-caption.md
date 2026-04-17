@@ -34,7 +34,7 @@ Who's the real word nerd? Find out at lexiclash.live 🔗
 ---
 
 ## Story Sticker Ideas
-- Poll: "Are you a Word Nerd? YES / OBVIOUSLY"
+- Poll: "Are you a Ohad Fisher? YES / OBVIOUSLY"
 - Quiz: "How many 4+ letter words can you find?" (answer: 47)
 - Countdown: "Daily Challenge resets at midnight"
 - Question: "What's the longest word you know?"

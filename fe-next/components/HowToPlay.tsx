@@ -450,7 +450,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
                     : 'rgba(255,255,255,0.08)',
                   boxShadow: isActive ? `0 0 12px ${activeStep.accentColor}40` : 'none',
                 }}
-                aria-label={`Step ${index + 1}: ${step.title}`}
+                aria-label={`${t('tutorial.stepLabel', { current: index + 1, total: steps.length })}: ${step.title}`}
               >
                 {isActive && (
                   <motion.div
@@ -522,7 +522,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
                 key={step.id}
                 onClick={() => setCurrentStep(index)}
                 className="relative transition-all duration-200"
-                aria-label={`Step ${index + 1}: ${step.title}`}
+                aria-label={`${t('tutorial.stepLabel', { current: index + 1, total: steps.length })}: ${step.title}`}
               >
                 <div
                   className={`rounded-full transition-all duration-300 ${

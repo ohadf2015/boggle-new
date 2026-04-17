@@ -3,6 +3,7 @@
 import React, { useRef } from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 // ==========================================
 // Interactive Wheel Letter
@@ -22,6 +23,7 @@ export const WheelLetter: React.FC<WheelLetterProps> = ({
   letter, isCenter, angle = 0, radius = 0, onPress, isUsed, index,
 }) => {
   const btnRef = useRef<HTMLButtonElement>(null);
+  const { t } = useLanguage();
 
   // Position outer letters using CSS transform (stable, no Framer Motion fighting).
   // Center letter stays at origin (inset-0 m-auto centers it).
@@ -64,7 +66,7 @@ export const WheelLetter: React.FC<WheelLetterProps> = ({
         ? { duration: 2, repeat: Infinity, ease: 'easeInOut', x: { type: 'spring', stiffness: 300, damping: 25 }, y: { type: 'spring', stiffness: 300, damping: 25 } }
         : { type: 'spring', stiffness: 400, damping: 22 }
       }
-      aria-label={isUsed ? `${letter}, tap to remove` : letter}
+      aria-label={isUsed ? `${letter}. ${t('wordWheel.tapToRemove')}` : letter}
       aria-pressed={isUsed}
       data-wheel-letter={letter}
       data-wheel-index={index}
@@ -86,7 +88,9 @@ export interface WordTileProps {
   isCenter: boolean;
 }
 
-export const WordTile: React.FC<WordTileProps> = ({ letter, index, onRemove, isCenter }) => (
+export const WordTile: React.FC<WordTileProps> = ({ letter, index, onRemove, isCenter }) => {
+  const { t } = useLanguage();
+  return (
   <motion.button
     type="button"
     className={cn(
@@ -106,14 +110,15 @@ export const WordTile: React.FC<WordTileProps> = ({ letter, index, onRemove, isC
       y: { type: 'spring', stiffness: 600, damping: 20 },
     }}
     whileTap={{ scale: 0.85 }}
-    aria-label={`${letter}, tap to remove`}
+    aria-label={`${letter}. ${t('wordWheel.tapToRemove')}`}
   >
     {letter}
     <span
       aria-hidden
-      className="pointer-events-none absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full border-2 border-neo-black bg-neo-red text-neo-white text-[9px] leading-none flex items-center justify-center font-black shadow-hard-xs"
+      className="pointer-events-none absolute -top-1.5 -inset-e-1.5 w-4 h-4 rounded-full border-2 border-neo-black bg-neo-red text-neo-white text-[9px] leading-none flex items-center justify-center font-black shadow-hard-xs"
     >
       ×
     </span>
   </motion.button>
-);
+  );
+};

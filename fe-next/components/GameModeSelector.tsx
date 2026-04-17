@@ -32,7 +32,7 @@ export const MODE_ICONS: Record<GameModeOption, React.ReactNode> = {
 export const MODE_ACTIVE_COLORS: Record<GameModeOption, string> = {
   random: 'bg-neo-purple/30 text-neo-purple border-neo-purple/60',
   classic: 'bg-neo-cyan/30 text-neo-cyan border-neo-cyan/60',
-  blast: 'bg-neo-orange/30 text-neo-orange border-neo-orange/60',
+  blast: 'bg-neo-pink/30 text-neo-pink border-neo-pink/60',
   'word-hunt': 'bg-neo-pink/30 text-neo-pink border-neo-pink/60',
   'wheel-rush': 'bg-neo-lime/30 text-neo-lime border-neo-lime/60',
 };
@@ -110,7 +110,7 @@ export function GameModeSelector({
             className={cn(
               'rounded-lg font-bold text-[9px] uppercase border-2 border-neo-black flex flex-col items-center gap-0.5',
               'transition-[background-color,color,border-color,box-shadow] duration-200',
-              compact ? 'py-1' : 'py-1.5',
+              compact ? 'min-h-10 py-1' : 'min-h-11 py-1.5',
               isActive
                 ? `${MODE_ACTIVE_COLORS[mode]} ${MODE_GLOW[mode]} shadow-hard-sm`
                 : 'bg-neo-navy/60 text-neo-cream/70 border-neo-white/20 hover:bg-neo-navy hover:text-neo-cream'
