@@ -149,11 +149,23 @@ const en = {
       "ogTitle": "Community Boards - Player-Created Puzzles",
       "ogDescription": "Play and create community word puzzles. Share custom boards and compete on player-made challenges!"
     },
+    "communityCreate": {
+      "title": "Create a Word Puzzle - Custom Board Builder | LexiClash",
+      "description": "Build your own word puzzle board and share with friends. Design custom letter grids, pick a theme, and publish to the LexiClash community.",
+      "ogTitle": "Create a Custom Word Puzzle - LexiClash",
+      "ogDescription": "Design a custom word puzzle, share with friends, and publish to the LexiClash community."
+    },
     "education": {
       "title": "LexiClash Education - Word Games for Classrooms & Teachers",
       "description": "Bring word games into the classroom! LexiClash Education helps teachers create vocabulary lessons, track student progress, and make learning engaging with multiplayer word battles.",
       "ogTitle": "LexiClash Education - Classroom Word Games",
       "ogDescription": "Word games for classrooms! Create lessons, track progress, and make vocabulary learning fun."
+    },
+    "educationClassroomGame": {
+      "title": "Classroom Word Game Live - Teacher-Led Multiplayer | LexiClash",
+      "description": "Launch a live word game for your classroom. The teacher dashboard runs a real-time multiplayer round — students join from any device, no signup needed.",
+      "ogTitle": "Classroom Word Game Live - Teacher Dashboard",
+      "ogDescription": "Start a live multiplayer word round for your class — join from any device, no signup."
     },
     "friends": {
       "title": "Friends & Social - Play Word Games With Friends | LexiClash",

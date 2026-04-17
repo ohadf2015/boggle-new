@@ -149,11 +149,23 @@ const sv = {
       "ogTitle": "Gemenskapsbrädspel - Spelarskapade Pussel",
       "ogDescription": "Spela och skapa gemenskapsordpussel. Dela brädspel och tävla!"
     },
+    "communityCreate": {
+      "title": "Skapa ett Ordpussel - Anpassad Brädbyggare | LexiClash",
+      "description": "Bygg ditt eget ordpusselbräde och dela med vänner. Designa anpassade bokstavsrutor, välj tema och publicera till LexiClash-gemenskapen.",
+      "ogTitle": "Skapa ett Anpassat Ordpussel - LexiClash",
+      "ogDescription": "Designa ett ordpussel, dela med vänner och publicera till LexiClash-gemenskapen."
+    },
     "education": {
       "title": "LexiClash Utbildning - Ordspel för Klassrum & Lärare",
       "description": "Använd ordspel i klassrummet! LexiClash Utbildning hjälper lärare skapa ordförrådslektioner och följa elevernas framsteg.",
       "ogTitle": "LexiClash Utbildning - Ordspel för Klassrum",
       "ogDescription": "Ordspel för klassrum! Skapa lektioner, följ framsteg och gör ordlärande roligt."
+    },
+    "educationClassroomGame": {
+      "title": "Ordspel för Klassrum Live - Lärardashboard | LexiClash",
+      "description": "Starta ett live-ordspel för klassrummet. Lärardashboarden kör en flerspelarrunda i realtid — elever ansluter från valfri enhet, ingen registrering.",
+      "ogTitle": "Ordspel för Klassrum Live - Lärardashboard",
+      "ogDescription": "Starta en flerspelarrunda för klassen — anslut från valfri enhet, ingen registrering."
     },
     "friends": {
       "title": "Vänner & Socialt - Spela Ordspel med Vänner | LexiClash",

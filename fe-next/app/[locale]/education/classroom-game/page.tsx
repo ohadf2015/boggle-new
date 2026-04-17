@@ -6,7 +6,7 @@ import PageClient from './PageClient';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
-  return generatePageMetadata({ seoKey: 'education', path: '/education/classroom-game', locale });
+  return generatePageMetadata({ seoKey: 'educationClassroomGame', path: '/education/classroom-game', locale });
 }
 
 export default function ClassroomGamePage() {

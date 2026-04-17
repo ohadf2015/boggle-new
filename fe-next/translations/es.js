@@ -149,11 +149,23 @@ const es = {
       "ogTitle": "Tableros Comunitarios - Puzzles de Jugadores",
       "ogDescription": "Juega y crea puzzles de palabras comunitarios. Comparte tableros y compite!"
     },
+    "communityCreate": {
+      "title": "Crea un Puzzle de Palabras - Constructor de Tableros | LexiClash",
+      "description": "Construye tu propio tablero de puzzle de palabras y compartelo con amigos. Disena cuadriculas de letras personalizadas, elige un tema y publica en la comunidad LexiClash.",
+      "ogTitle": "Crea un Puzzle de Palabras Personalizado - LexiClash",
+      "ogDescription": "Disena un puzzle de palabras, comparte con amigos y publica en la comunidad LexiClash."
+    },
     "education": {
       "title": "LexiClash Educacion - Juegos de Palabras para Aulas y Profesores",
       "description": "Lleva juegos de palabras al aula! LexiClash Educacion ayuda a profesores a crear lecciones de vocabulario y seguir el progreso de los alumnos.",
       "ogTitle": "LexiClash Educacion - Juegos para Aulas",
       "ogDescription": "Juegos de palabras para aulas! Crea lecciones, sigue el progreso y haz divertido el aprendizaje."
+    },
+    "educationClassroomGame": {
+      "title": "Juego de Palabras para el Aula en Vivo - Panel del Profesor | LexiClash",
+      "description": "Inicia un juego de palabras en vivo para tu clase. El panel del profesor ejecuta una ronda multijugador en tiempo real — los alumnos se unen desde cualquier dispositivo, sin registro.",
+      "ogTitle": "Juego de Palabras para Aula en Vivo - Panel del Profesor",
+      "ogDescription": "Inicia una ronda multijugador para la clase — unete desde cualquier dispositivo, sin registro."
     },
     "friends": {
       "title": "Amigos y Social - Juega con Amigos | LexiClash",

@@ -149,11 +149,23 @@ const ja = {
       "ogTitle": "コミュニティボード - プレイヤー作成パズル",
       "ogDescription": "コミュニティワードパズルをプレイ＆作成。ボードを共有して競争！"
     },
+    "communityCreate": {
+      "title": "ワードパズルを作成 - カスタムボードビルダー | LexiClash",
+      "description": "自分だけのワードパズルボードを作成し、友達と共有。カスタム文字グリッドを設計、テーマを選び、LexiClashコミュニティに公開。",
+      "ogTitle": "カスタムワードパズルを作成 - LexiClash",
+      "ogDescription": "ワードパズルを設計、友達と共有、LexiClashコミュニティに公開。"
+    },
     "education": {
       "title": "LexiClash教育 - 教室＆教師向けワードゲーム",
       "description": "教室にワードゲームを！LexiClash教育で語彙レッスン作成、生徒の進捗追跡、学習を楽しくしよう。",
       "ogTitle": "LexiClash教育 - 教室向けワードゲーム",
       "ogDescription": "教室向けワードゲーム！レッスン作成、進捗追跡、楽しい語彙学習。"
+    },
+    "educationClassroomGame": {
+      "title": "ライブ教室ワードゲーム - 教師ダッシュボード | LexiClash",
+      "description": "教室向けライブワードゲームを起動。教師ダッシュボードがリアルタイムマルチプレイヤーラウンドを実行 — 生徒は任意の端末から参加、登録不要。",
+      "ogTitle": "ライブ教室ワードゲーム - 教師ダッシュボード",
+      "ogDescription": "クラス向けマルチプレイヤーラウンドを開始 — 任意の端末から参加、登録不要。"
     },
     "friends": {
       "title": "フレンド＆ソーシャル - 友達とワードゲーム | LexiClash",

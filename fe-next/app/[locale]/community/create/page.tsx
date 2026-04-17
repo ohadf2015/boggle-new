@@ -4,7 +4,7 @@ import { BoardCreatorWizard } from '@/components/ugc/BoardCreatorWizard';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
-  return generatePageMetadata({ seoKey: 'community', path: '/community/create', locale });
+  return generatePageMetadata({ seoKey: 'communityCreate', path: '/community/create', locale });
 }
 
 export default function CreateBoardPage() {

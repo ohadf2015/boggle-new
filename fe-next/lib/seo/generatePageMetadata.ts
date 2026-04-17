@@ -44,12 +44,21 @@ export async function generatePageMetadata({
 
   const seo = t?.seo?.[seoKey] || enT.seo[seoKey];
   if (!seo) {
-    // Fallback: use root SEO if key doesn't exist
+    // Missing seoKey: synthesize a unique title/description from the path so
+    // crawlers don't see identical root-inherited metadata across pages.
+    const slug = (path.replace(/^\/+/, '').replace(/[-/]+/g, ' ').trim()) || 'home';
+    const pretty = slug.replace(/\b\w/g, (c) => c.toUpperCase());
+    if (process.env.NODE_ENV !== 'production') {
+      console.warn(`[generatePageMetadata] missing seo key "${seoKey}" for path "${path}" (locale=${locale})`);
+    }
     return {
+      title: `${pretty} | LexiClash`,
+      description: `LexiClash ${pretty} — free multiplayer word game. Play instantly, no download required.`,
       alternates: {
         canonical: `${BASE_URL}/${locale}${path}`,
         languages: Object.fromEntries(LOCALES.map((l) => [l, `${BASE_URL}/${l}${path}`])),
       },
+      robots: noIndex ? { index: false, follow: false } : { index: true, follow: true },
     };
   }
 
