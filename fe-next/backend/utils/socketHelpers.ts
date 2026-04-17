@@ -115,9 +115,12 @@ export function _resetBroadcastThrottle(): void {
 }
 
 // Expose reset on globalThis so tests can reach it regardless of which
-// module instance Vitest resolved (dual-specifier .ts vs .js issue)
- 
-(globalThis as any).__resetBroadcastThrottle = _resetBroadcastThrottle;
+// module instance Vitest resolved (dual-specifier .ts vs .js issue).
+// Test-only — production bundles must not leak internals.
+if (process.env.NODE_ENV === 'test' || process.env.VITEST) {
+
+  (globalThis as any).__resetBroadcastThrottle = _resetBroadcastThrottle;
+}
 
 // ==========================================
 // Room Query Functions

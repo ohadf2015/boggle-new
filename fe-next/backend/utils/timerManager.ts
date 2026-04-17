@@ -166,9 +166,12 @@ export const clearGameTimer = (gameCode: string): boolean => {
   return timerManager.clearTimer(`game:${gameCode}`);
 };
 
-// Expose clearAll on globalThis for test cleanup across module instances
- 
-(globalThis as any).__clearAllGameTimers = () => timerManager.clearAll();
+// Expose clearAll on globalThis for test cleanup across module instances.
+// Test-only — production bundles must not leak timer-control surface.
+if (process.env.NODE_ENV === 'test' || process.env.VITEST) {
+
+  (globalThis as any).__clearAllGameTimers = () => timerManager.clearAll();
+}
 
 export default timerManager;
 export { TimerManager };

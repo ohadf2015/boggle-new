@@ -654,6 +654,9 @@ Object.defineProperty(cjsExports, 'games', {
 module.exports = cjsExports;
 
 // Expose game query helpers on globalThis so integration tests can access
-// the same module instance used by handlers (avoids Vitest dual-specifier issues)
- 
-(globalThis as any).__gameStateManager = { gameExists, getGame, clearAllGames };
+// the same module instance used by handlers (avoids Vitest dual-specifier issues).
+// Test-only — production bundles must not leak game-state surface.
+if (process.env.NODE_ENV === 'test' || process.env.VITEST) {
+
+  (globalThis as any).__gameStateManager = { gameExists, getGame, clearAllGames };
+}
