@@ -19,7 +19,6 @@ import type { GameState } from '../modules/gameState/types.js';
 
 import { getGame, getGameBySocketId, getUsernameBySocketId } from '../modules/gameStateManager.js';
 import { safeEmit } from '../utils/socketHelpers.js';
-import { emitError, ErrorMessages } from '../utils/errorHandler.js';
 import { checkRateLimit } from '../utils/rateLimiter.js';
 import { inc } from '../utils/metrics.js';
 import { isSocketMigrating } from './shared';
