@@ -4964,7 +4964,13 @@ const ja = {
     "todayReward": "今日: {{coins}}コイン",
     "tomorrowReward": "明日: {{coins}}コイン",
     "nearMilestone": "{{badge}}バッジまであと{{days}}日！",
-    "rewardDay": "{day}日目"
+    "rewardDay": "{day}日目",
+    "badges": {
+      "weekWarrior": "ウィークウォリアー",
+      "fortnightFighter": "フォートナイトファイター",
+      "monthlyMaster": "マンスリーマスター",
+      "centurion": "センチュリオン"
+    }
   },
   "dailyWordWheelLanding": {
     "hero": {

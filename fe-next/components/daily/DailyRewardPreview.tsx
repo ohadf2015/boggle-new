@@ -54,7 +54,7 @@ export function DailyRewardPreview({ currentStreakDay, t }: DailyRewardPreviewPr
           <p className="text-neo-purple text-xs font-bold">
             {t('daily.nearMilestone', {
               days: nextMilestone.daysAway,
-              badge: nextMilestone.label,
+              badge: t(`daily.badges.${nextMilestone.label}`),
             })}
           </p>
         </div>

@@ -5011,7 +5011,13 @@ const en = {
     "todayReward": "Today: {{coins}} coins",
     "tomorrowReward": "Tomorrow: {{coins}} coins",
     "nearMilestone": "{{days}} days to {{badge}} badge!",
-    "rewardDay": "Day {day}"
+    "rewardDay": "Day {day}",
+    "badges": {
+      "weekWarrior": "Week Warrior",
+      "fortnightFighter": "Fortnight Fighter",
+      "monthlyMaster": "Monthly Master",
+      "centurion": "Centurion"
+    }
   },
   "dailyWordWheelLanding": {
     "hero": {

@@ -4912,7 +4912,13 @@ const sv = {
     "todayReward": "Idag: {{coins}} mynt",
     "tomorrowReward": "Imorgon: {{coins}} mynt",
     "nearMilestone": "{{days}} dagar till {{badge}}-märke!",
-    "rewardDay": "Dag {day}"
+    "rewardDay": "Dag {day}",
+    "badges": {
+      "weekWarrior": "Veckokrigare",
+      "fortnightFighter": "Tvåveckorskämpe",
+      "monthlyMaster": "Månadsmästare",
+      "centurion": "Centurion"
+    }
   },
   "dailyWordWheelLanding": {
     "hero": {

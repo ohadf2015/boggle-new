@@ -4949,7 +4949,13 @@ const es = {
     "todayReward": "Hoy: {{coins}} monedas",
     "tomorrowReward": "Mañana: {{coins}} monedas",
     "nearMilestone": "¡{{days}} días para la insignia {{badge}}!",
-    "rewardDay": "Día {day}"
+    "rewardDay": "Día {day}",
+    "badges": {
+      "weekWarrior": "Guerrero Semanal",
+      "fortnightFighter": "Luchador Quincenal",
+      "monthlyMaster": "Maestro Mensual",
+      "centurion": "Centurión"
+    }
   },
   "dailyWordWheelLanding": {
     "hero": {

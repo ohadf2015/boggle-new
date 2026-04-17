@@ -120,6 +120,8 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
   // ── Drag-to-build support ── (handlers defined after handleLetterPress)
   const draggingRef = useRef(false);
   const lastDragIdxRef = useRef<number | null>(null);
+  const dragStartIdxRef = useRef<number | null>(null);
+  const dragEngagedRef = useRef(false);
 
   // ── Double-tap-to-submit support ──
   const lastTapRef = useRef<{ idx: number; time: number } | null>(null);
@@ -229,21 +231,39 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
   }, [onEffect, playTileSelectSound, playButtonClickSound]);
 
   // ── Drag-to-build handlers (additive only — skips letters already used) ──
+  // Drag only engages once pointer moves to a DIFFERENT letter than the start,
+  // so single taps stay handled by the button's native onClick (preserving
+  // double-tap-to-submit without a duplicate press from pointerdown).
   const tryDragHit = useCallback((clientX: number, clientY: number) => {
     const el = document.elementFromPoint(clientX, clientY) as HTMLElement | null;
     const btn = el?.closest<HTMLButtonElement>('[data-wheel-letter]');
     if (!btn) return;
     const idx = Number(btn.dataset.wheelIndex);
-    if (usedIndicesRef.current.has(idx)) return;
     if (idx === lastDragIdxRef.current) return;
+    if (!dragEngagedRef.current) {
+      const startIdx = dragStartIdxRef.current;
+      if (startIdx === null || idx === startIdx) return;
+      dragEngagedRef.current = true;
+      lastDragIdxRef.current = startIdx;
+      const startBtn = document.querySelector<HTMLButtonElement>(
+        `[data-wheel-index="${startIdx}"]`,
+      );
+      if (startBtn && !usedIndicesRef.current.has(startIdx)) {
+        handleLetterPress(startBtn.dataset.wheelLetter || '', startIdx, startBtn);
+      }
+    }
+    if (usedIndicesRef.current.has(idx)) return;
     lastDragIdxRef.current = idx;
     handleLetterPress(btn.dataset.wheelLetter || '', idx, btn);
   }, [handleLetterPress]);
   const handlePointerDown = useCallback((e: React.PointerEvent) => {
     draggingRef.current = true;
+    dragEngagedRef.current = false;
     lastDragIdxRef.current = null;
-    tryDragHit(e.clientX, e.clientY);
-  }, [tryDragHit]);
+    const el = document.elementFromPoint(e.clientX, e.clientY) as HTMLElement | null;
+    const btn = el?.closest<HTMLButtonElement>('[data-wheel-letter]');
+    dragStartIdxRef.current = btn ? Number(btn.dataset.wheelIndex) : null;
+  }, []);
   const handlePointerMove = useCallback((e: React.PointerEvent) => {
     if (!draggingRef.current) return;
     tryDragHit(e.clientX, e.clientY);
@@ -251,6 +271,8 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
   const handlePointerUp = useCallback(() => {
     draggingRef.current = false;
     lastDragIdxRef.current = null;
+    dragStartIdxRef.current = null;
+    dragEngagedRef.current = false;
   }, []);
 
   // ── Remove built letter ──

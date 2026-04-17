@@ -21,6 +21,10 @@ const mockT = (key: string, params?: Record<string, string | number>) => {
     'daily.tomorrowReward': 'Tomorrow: {{coins}} coins',
     'daily.nearMilestone': '{{days}} more days to {{badge}}!',
     'daily.rewardDay': 'Day {{day}}',
+    'daily.badges.weekWarrior': 'Week Warrior',
+    'daily.badges.fortnightFighter': 'Fortnight Fighter',
+    'daily.badges.monthlyMaster': 'Monthly Master',
+    'daily.badges.centurion': 'Centurion',
   };
   let result = translations[key] || key;
   if (params) {
@@ -47,6 +51,12 @@ describe('DailyRewardPreview', () => {
     // Day 5, next badge milestone is day 7 (weekly_warrior) = 2 days away
     render(<DailyRewardPreview currentStreakDay={5} t={mockT} />);
     expect(screen.getByText(/2 more days/)).toBeInTheDocument();
+  });
+
+  it('translates the badge label (not raw key) in milestone proximity', () => {
+    render(<DailyRewardPreview currentStreakDay={5} t={mockT} />);
+    expect(screen.getByText(/Week Warrior/)).toBeInTheDocument();
+    expect(screen.queryByText(/weekWarrior/)).not.toBeInTheDocument();
   });
 
   it('renders timeline dots for upcoming days', () => {

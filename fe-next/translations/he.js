@@ -4923,7 +4923,13 @@ const he = {
     "todayReward": "היום: {{coins}} מטבעות",
     "tomorrowReward": "מחר: {{coins}} מטבעות",
     "nearMilestone": "{{days}} ימים לתג {{badge}}!",
-    "rewardDay": "יום {day}"
+    "rewardDay": "יום {day}",
+    "badges": {
+      "weekWarrior": "לוחם שבועי",
+      "fortnightFighter": "לוחם שבועיים",
+      "monthlyMaster": "אלוף חודשי",
+      "centurion": "קנטוריון"
+    }
   },
   "dailyWordWheelLanding": {
     "hero": {
