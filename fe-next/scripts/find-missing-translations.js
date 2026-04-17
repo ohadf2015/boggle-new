@@ -23,7 +23,8 @@ try {
 const PROJECT_ROOT = path.resolve(__dirname, '..');
 const TRANSLATIONS_FILE = path.join(PROJECT_ROOT, 'translations/index.js');
 const EXTENSIONS_TO_SCAN = ['.ts', '.tsx', '.js', '.jsx'];
-const DIRS_TO_EXCLUDE = ['node_modules', '.next', 'dist', 'build', '.git', 'playwright-report', 'scripts', '.venv', 'venv', '.venv-rembg', '__pycache__'];
+const DIRS_TO_EXCLUDE = ['node_modules', '.next', 'dist', 'build', '.git', 'playwright-report', 'scripts', '.venv', 'venv', '.venv-rembg', '__pycache__', '__tests__', '__mocks__', 'e2e', 'playwright'];
+const FILE_PATTERNS_TO_EXCLUDE = [/\.test\.[tj]sx?$/, /\.spec\.[tj]sx?$/, /\.stories\.[tj]sx?$/];
 
 // Track dynamic/risky translation patterns that might fail at runtime
 const dynamicPatterns = [];
@@ -154,7 +155,7 @@ function getAllFiles(dir, files = []) {
       }
     } else if (entry.isFile()) {
       const ext = path.extname(entry.name);
-      if (EXTENSIONS_TO_SCAN.includes(ext)) {
+      if (EXTENSIONS_TO_SCAN.includes(ext) && !FILE_PATTERNS_TO_EXCLUDE.some(p => p.test(entry.name))) {
         files.push(fullPath);
       }
     }
