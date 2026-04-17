@@ -98,7 +98,7 @@ const ScoreReveal: React.FC<ScoreRevealProps> = ({
       initial={{ scale: 0.9, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
       transition={{ type: 'spring', stiffness: 300, damping: 26 }}
-      className="w-full max-w-sm lg:max-w-md mx-auto relative"
+      className="w-full max-w-sm lg:max-w-md mx-auto relative overflow-hidden"
       dir={dir}
     >
       {/* Floating sparkle decorations — positions randomized per render */}
@@ -142,7 +142,7 @@ const ScoreReveal: React.FC<ScoreRevealProps> = ({
           transition={{ delay: 0.2 }}
           className="text-xs font-black uppercase tracking-widest text-neo-black/50 mb-1"
         >
-          {t('onboarding.ftue.niceWork', 'Nice work!')}
+          {t('onboarding.ftue.niceWork')}
         </motion.div>
 
         {/* Score display with decorative circle */}
@@ -182,7 +182,7 @@ const ScoreReveal: React.FC<ScoreRevealProps> = ({
                 'text-xs font-black text-neo-black/80 uppercase tracking-wide'
               )}
             >
-              {t('onboarding.ftue.aboveAverage', 'Above average!')}
+              {t('onboarding.ftue.aboveAverage')}
             </motion.div>
           )}
         </motion.div>
@@ -195,8 +195,8 @@ const ScoreReveal: React.FC<ScoreRevealProps> = ({
           className="mb-5 px-2"
         >
           <div className="flex items-center justify-between text-[10px] font-bold text-neo-black/50 uppercase tracking-wider mb-1.5">
-            <span>{t('onboarding.ftue.yourScore', { score: '' }).replace('{{score}}', '').trim()}</span>
-            <span>{t('onboarding.ftue.averageScore', { average: '' }).replace('{{average}}', '').trim()}</span>
+            <span>{t('onboarding.ftue.yourScoreLabel')}</span>
+            <span>{t('onboarding.ftue.averageScoreLabel')}</span>
           </div>
           <div className="relative h-5 bg-neo-black/10 rounded-full border-2 border-neo-black/20 overflow-hidden">
             <motion.div
@@ -238,7 +238,7 @@ const ScoreReveal: React.FC<ScoreRevealProps> = ({
               'flex items-center justify-center gap-2'
             )}
           >
-            {t('onboarding.ftue.continue', 'Continue')}
+            {t('onboarding.ftue.continue')}
             <ArrowRight className="w-5 h-5" />
           </motion.button>
           <button

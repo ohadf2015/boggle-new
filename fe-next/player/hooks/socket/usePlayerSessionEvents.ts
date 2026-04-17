@@ -8,6 +8,7 @@ import { useEffect, useMemo, MutableRefObject } from 'react';
 import { Socket } from 'socket.io-client';
 import { neoSuccessToast, neoInfoToast, wordErrorToast, TOAST_ICONS } from '../../../components/NeoToast';
 import { clearSessionPreservingUsername } from '../../../utils/session';
+import { socketErrorMessage } from '../../../utils/socketErrorMessage';
 import { processAchievements } from '@/shared/utils/achievementUtils';
 import { createXpGainedHandler, createLevelUpHandler } from '@/shared/utils/xpUtils';
 import { createConnectionHandlers } from '@/shared/utils/connectionUtils';
@@ -133,7 +134,7 @@ export function usePlayerSessionEvents({
     };
 
     const handleError = (data: any) => {
-      const message = data?.message || t('playerView.errorOccurred') || 'An error occurred';
+      const message = socketErrorMessage(data, t);
       wordErrorToast(message, { duration: 3000 });
     };
 

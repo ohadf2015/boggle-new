@@ -70,7 +70,7 @@ export function AdventureToast({
                 : 'bg-neo-lime/90 text-neo-navy',
             ].join(' ')}
           >
-            <span className="mr-1">{toast.icon}</span>
+            <span className="me-1" aria-hidden="true">{toast.icon}</span>
             {toast.message}
           </AdaptiveMotion.div>
         ))}

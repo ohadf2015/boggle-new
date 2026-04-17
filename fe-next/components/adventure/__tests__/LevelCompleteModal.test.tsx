@@ -58,13 +58,17 @@ vi.mock('@/components/ads/RewardedAdGoldButton', () => ({
   default: () => <div data-testid="rewarded-ad-gold-button">Ad</div>,
 }));
 
-vi.mock('@/contexts/LanguageContext', () => ({
-  useLanguage: () => ({
+vi.mock('@/contexts/LanguageContext', () => {
+  const ctx = {
     t: (key: string) => mockTranslations[key] || key,
     language: 'en',
     dir: 'ltr',
-  }),
-}));
+  };
+  return {
+    useLanguage: () => ctx,
+    useLanguageSafe: () => ctx,
+  };
+});
 
 // Mock framer-motion
 vi.mock('framer-motion', () => {

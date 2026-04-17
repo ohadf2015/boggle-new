@@ -7,10 +7,11 @@
 
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useId, useRef } from 'react';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useFocusTrap } from '@/hooks/useFocusTrap';
 import type { SkillNode, SkillPath } from '@/types/adventure';
 
 // ==============================================
@@ -30,16 +31,16 @@ interface SkillUnlockModalProps {
 
 const PATH_COLORS: Record<SkillPath, { gradient: string; glow: string }> = {
   power: {
-    gradient: 'from-neo-red to-neo-orange',
-    glow: 'shadow-[0_0_30px_rgba(255,107,53,0.5)]',
+    gradient: 'from-neo-red to-neo-pink',
+    glow: 'shadow-[0_0_30px_rgba(255,51,102,0.5)]',
   },
   strategy: {
     gradient: 'from-neo-cyan to-neo-lime',
     glow: 'shadow-[0_0_30px_rgba(0,255,255,0.5)]',
   },
   utility: {
-    gradient: 'from-neo-yellow to-neo-orange',
-    glow: 'shadow-[0_0_30px_rgba(255,225,53,0.5)]',
+    gradient: 'from-neo-lime to-neo-cyan',
+    glow: 'shadow-[0_0_30px_rgba(191,255,0,0.5)]',
   },
 };
 
@@ -49,6 +50,9 @@ const PATH_COLORS: Record<SkillPath, { gradient: string; glow: string }> = {
 
 export function SkillUnlockModal({ skill, onClose }: SkillUnlockModalProps) {
   const { t } = useLanguage();
+  const dialogRef = useRef<HTMLDivElement | null>(null);
+  const titleId = useId();
+  useFocusTrap(dialogRef, !!skill, onClose);
 
   // Auto-close after 3 seconds
   useEffect(() => {
@@ -88,6 +92,10 @@ export function SkillUnlockModal({ skill, onClose }: SkillUnlockModalProps) {
           data-testid="skill-unlock-modal"
         >
           <AdaptiveMotion.div
+            ref={dialogRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={titleId}
             initial={{ scale: 0.5, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.5, opacity: 0 }}
@@ -118,6 +126,7 @@ export function SkillUnlockModal({ skill, onClose }: SkillUnlockModalProps) {
 
             {/* Title */}
             <AdaptiveMotion.h2
+              id={titleId}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}

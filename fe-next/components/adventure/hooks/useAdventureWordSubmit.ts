@@ -225,9 +225,16 @@ export function useAdventureWordSubmit(props: UseAdventureWordSubmitProps): UseA
             const mechResult = checkBossWord(word);
             scoreValue = Math.floor(scoreValue * mechResult.scoreMultiplier);
 
-            let baseDamage = Math.max(1, Math.ceil(scoreValue / 3));
-            baseDamage = Math.ceil(baseDamage * skillEffects.bossDamageMultiplier);
-            baseDamage = Math.ceil(baseDamage * skillEffects.getLongWordDamageMultiplier(word.length));
+            // Round once after all multipliers; stacked ceils would inflate damage up to +3.
+            const rawBase = Math.max(1, scoreValue / 3);
+            const baseDamage = Math.max(
+              1,
+              Math.ceil(
+                rawBase
+                  * skillEffects.bossDamageMultiplier
+                  * skillEffects.getLongWordDamageMultiplier(word.length)
+              )
+            );
 
             const mechanicMultiplier = mechResult.meetsRequirement ? 2.0 : 1.0;
             dealBossDamage(baseDamage, mechanicMultiplier);

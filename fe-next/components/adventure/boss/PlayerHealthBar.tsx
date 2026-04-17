@@ -153,7 +153,7 @@ export default function PlayerHealthBar({
         {/* HP fill (animated) */}
         <AdaptiveMotion.div
           className={cn(
-            'absolute inset-y-0 left-0 transition-colors duration-300',
+            'absolute inset-y-0 start-0 transition-colors duration-300',
             hpBarColor,
             hpBarGlow
           )}

@@ -177,7 +177,7 @@ const LevelGridHeader = memo(function LevelGridHeader({
 
         {/* Subtle ambient glow at bottom */}
         <div
-          className="absolute bottom-0 left-0 right-0 h-16 pointer-events-none"
+          className="absolute bottom-0 inset-x-0 h-16 pointer-events-none"
           style={{ background: `linear-gradient(to top, ${glowColor.replace(/[\d.]+\)$/, '0.04)')}, transparent)` }}
         />
       </div>

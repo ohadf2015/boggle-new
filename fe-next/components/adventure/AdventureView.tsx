@@ -321,7 +321,7 @@ function AdventureView(): React.JSX.Element {
       <div className="h-screen bg-neo-navy flex items-center justify-center">
         <div className="flex flex-col items-center gap-5 text-center px-4 max-w-sm">
           <div className="w-16 h-16 rounded-full flex items-center justify-center bg-neo-cyan/20">
-            <span className="text-3xl">🗺️</span>
+            <span className="text-3xl" aria-hidden="true">🗺️</span>
           </div>
           <p className="text-neo-white font-bold text-lg">
             {t('adventure.guestTitle')}
@@ -369,7 +369,7 @@ function AdventureView(): React.JSX.Element {
             'w-16 h-16 rounded-full flex items-center justify-center',
             isAuthError ? 'bg-neo-yellow/20' : 'bg-neo-red/20'
           )}>
-            <span className="text-3xl">{isAuthError ? '🔑' : '!'}</span>
+            <span className="text-3xl" aria-hidden="true">{isAuthError ? '🔑' : '!'}</span>
           </div>
           <p className="text-neo-white font-bold">
             {isAuthError ? t('adventure.sessionExpired') : t('adventure.loadError')}

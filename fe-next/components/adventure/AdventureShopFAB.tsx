@@ -40,7 +40,7 @@ export default function AdventureShopFAB({
         aria-label={t('adventure.shop.open')}
         className={cn(
           'relative flex items-center gap-2.5',
-          'pl-3.5 pr-2 py-2.5',
+          'ps-3.5 pe-2 py-2.5',
           'bg-linear-to-b from-neo-orange to-neo-orange-hover',
           'text-neo-black font-neo-display font-black text-sm uppercase tracking-wider',
           'border-3 border-neo-black rounded-neo-lg',

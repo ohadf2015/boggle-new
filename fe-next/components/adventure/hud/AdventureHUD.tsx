@@ -73,7 +73,7 @@ export const AdventureHUD = memo<AdventureHUDProps>(
     className,
   }) => {
     const prefersReducedMotion = usePrefersReducedMotion();
-    const { t } = useLanguage();
+    const { t, language } = useLanguage();
     const hudTheme = useHUDTheme();
 
     return (
@@ -138,7 +138,7 @@ export const AdventureHUD = memo<AdventureHUDProps>(
         <div
           data-testid="hud-bottom-bar"
           className={cn(
-            'fixed bottom-0 left-0 right-0',
+            'fixed bottom-0 inset-x-0',
             'flex items-end justify-between gap-2 p-2 pb-[max(0.5rem,env(safe-area-inset-bottom,0.5rem))]',
             hudTheme.headerBg, 'backdrop-blur-xs',
             'border-t-2', hudTheme.headerBorder,
@@ -185,12 +185,12 @@ export const AdventureHUD = memo<AdventureHUDProps>(
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.8 }}
                     className={cn(
-                      'absolute -top-8 right-0',
+                      'absolute -top-8 end-0',
                       'text-neo-lime font-neo-display font-black text-lg',
                       'pointer-events-none'
                     )}
                   >
-                    +{recentScoreGain.toLocaleString('en-US')}
+                    +{recentScoreGain.toLocaleString(language)}
                   </AdaptiveMotion.div>
                 )}
               </AdaptiveAnimatePresence>

@@ -93,7 +93,7 @@ function LegacyBossHPBar({ healthState, bossName }: LegacyBossHPBarProps) {
       >
         {/* HP fill (animated) */}
         <AdaptiveMotion.div
-          className={`absolute inset-y-0 left-0 ${hpBarColor} ${hpBarGlow} transition-colors duration-300`}
+          className={`absolute inset-y-0 start-0 ${hpBarColor} ${hpBarGlow} transition-colors duration-300`}
           initial={{ width: '100%' }}
           animate={{ width: `${hpPercentage}%` }}
           transition={{
@@ -202,7 +202,7 @@ export const BossHPBar = memo(function BossHPBar({
         <AdaptiveMotion.div
           animate={{ width: `${pct}%` }}
           transition={{ type: 'spring', stiffness: 200, damping: 30 }}
-          className={cn('absolute inset-y-0 left-0 rounded-neo', barColor, isEnraged && 'animate-pulse motion-reduce:animate-none')}
+          className={cn('absolute inset-y-0 start-0 rounded-neo', barColor, isEnraged && 'animate-pulse motion-reduce:animate-none')}
         />
 
         {/* White flash overlay on hit */}
@@ -245,7 +245,7 @@ export const BossHPBar = memo(function BossHPBar({
             initial={{ y: 0, opacity: 1 }}
             animate={{ y: -32, opacity: 0 }}
             transition={{ duration: 1.0, ease: 'easeOut' }}
-            className="absolute right-2 top-0 text-lg font-black text-neo-red pointer-events-none"
+            className="absolute end-2 top-0 text-lg font-black text-neo-red pointer-events-none"
           >
             -{onDamage}
           </AdaptiveMotion.div>

@@ -188,7 +188,7 @@ const TileBadge = memo<TileBadgeProps>(({ text, background, config }) => {
   return (
     <span
       className={cn(
-        'absolute -top-1 -right-1 z-20',
+        'absolute -top-1 -end-1 z-20',
         'min-w-5 h-5',
         'flex items-center justify-center',
         'text-[10px] font-black text-neo-white',
@@ -326,7 +326,7 @@ const ThemedTile = memo<ThemedTileProps>(
 
         {/* Icon for bomb, chain, time tiles */}
         {icon && (
-          <span className="absolute top-0.5 right-0.5 z-20">
+          <span className="absolute top-0.5 end-0.5 z-20">
             {icon}
           </span>
         )}

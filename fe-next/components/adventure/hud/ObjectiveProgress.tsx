@@ -204,7 +204,7 @@ export const ObjectiveProgress = memo<ObjectiveProgressProps>(
                     <AdaptiveMotion.div
                       data-testid={`progress-${objective.id}`}
                       className={cn(
-                        'absolute inset-y-0 left-0 rounded-full',
+                        'absolute inset-y-0 start-0 rounded-full',
                         objective.isComplete
                           ? 'bg-neo-lime'
                           : colors.iconBg

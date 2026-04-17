@@ -36,7 +36,8 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
   const previouslyValidRef = useRef(false);
 
   const trimmedName = name.trim();
-  const isNameValid = trimmedName.length >= 2 && trimmedName.length <= 20 && /^[\p{L}\p{N}\s._-]+$/u.test(name);
+  const nameCharCount = Array.from(trimmedName).length;
+  const isNameValid = nameCharCount >= 2 && nameCharCount <= 20 && /^[\p{L}\p{N}\s._-]+$/u.test(trimmedName);
 
   // Pulse the input once, the first frame a name transitions invalid → valid.
   // Using a ref guard keeps this a single celebration per validation flip.
@@ -67,7 +68,19 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
   }, []);
 
   const handleSubmit = useCallback(() => {
-    if (!isNameValid) {
+    // Read from DOM as source of truth — mobile IME/autofill sometimes
+    // commits text without firing React's synthetic onChange, so `name`
+    // state may lag the actual input value (classic "need to add a space
+    // before it works" symptom).
+    const domValue = inputRef.current?.value ?? name;
+    const liveTrimmed = domValue.trim();
+    const liveCount = Array.from(liveTrimmed).length;
+    const liveValid =
+      liveCount >= 2 && liveCount <= 20 && /^[\p{L}\p{N}\s._-]+$/u.test(liveTrimmed);
+
+    if (domValue !== name) setName(domValue);
+
+    if (!liveValid) {
       setShowShake(true);
       setTimeout(() => setShowShake(false), 500);
       inputRef.current?.focus();
@@ -75,8 +88,8 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
     }
     // Send-off burst in the brand pink — steps forward into the score reveal
     fireOnboardingBurst({ y: 0.6 }, ['#FF1493', '#BFFF00', '#FFE135']);
-    onComplete(trimmedName, avatar);
-  }, [trimmedName, isNameValid, avatar, onComplete]);
+    onComplete(liveTrimmed, avatar);
+  }, [name, avatar, onComplete]);
 
   const staggerChild = {
     hidden: { opacity: 0, y: 20 },
@@ -249,7 +262,7 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
             </AnimatePresence>
           </motion.div>
           <div className="flex justify-between text-[10px] font-bold text-neo-black/40 mb-4 px-0.5">
-            <span>{trimmedName.length < 2 && name.length > 0 ? t('validation.usernameTooShort') : '2-20 chars'}</span>
+            <span>{trimmedName.length < 2 && name.length > 0 ? t('validation.usernameTooShort') : t('onboarding.ftue.nameHint')}</span>
             <span>{name.length}/20</span>
           </div>
         </motion.div>

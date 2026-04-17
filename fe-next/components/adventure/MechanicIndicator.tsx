@@ -46,7 +46,7 @@ const MechanicIndicator = memo(function MechanicIndicator({
       {hitCount > 0 && (
         <AdaptiveMotion.span
           className={cn(
-            'font-black ml-auto',
+            'font-black ms-auto',
             hitCount >= 3 ? 'text-neo-pink' : hitCount >= 2 ? 'text-neo-cyan' : 'text-neo-lime'
           )}
           initial={{ scale: 1.4 }}

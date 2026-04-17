@@ -1,7 +1,7 @@
 /** AdventureGame — Main orchestrator for adventure mode gameplay. */
 'use client';
 
-import React, { memo, useCallback, useState, useEffect, useMemo, useRef } from 'react';
+import React, { memo, useCallback, useState, useMemo, useRef } from 'react';
 import { usePreviousValue } from '@/hooks/usePreviousValue';
 import { trackLevelRetried, trackModalDismissed } from '@/utils/posthogEngagement';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -19,6 +19,19 @@ import { useAdventureGameInit } from './hooks/useAdventureGameInit';
 import { useAdventureWordSubmit } from './hooks/useAdventureWordSubmit';
 import { useAdventureLevelCompletion } from './hooks/useAdventureLevelCompletion';
 import { useAdventureBossOrchestration } from './hooks/useAdventureBossOrchestration';
+import { useAdventureTimerReport } from './hooks/useAdventureTimerReport';
+import { useAutoPauseOnHidden } from './hooks/useAutoPauseOnHidden';
+import { useHintGoldConfirm } from './hooks/useHintGoldConfirm';
+import { useRetryAssistFlow } from './hooks/useRetryAssistFlow';
+import { useAdventureForgePicker } from './hooks/useAdventureForgePicker';
+import { useHintHighlightIndices } from './hooks/useHintHighlightIndices';
+import { useFlashChallengeRewards } from './hooks/useFlashChallengeRewards';
+import { useLootCompletionFlow } from './hooks/useLootCompletionFlow';
+import { useHuntTargetPicker } from './hooks/useHuntTargetPicker';
+import { useEntryPhaseHandlers } from './hooks/useEntryPhaseHandlers';
+import { useCombatComboMilestone } from './hooks/useCombatComboMilestone';
+import { useLastWordTileTypes } from './hooks/useLastWordTileTypes';
+import { useInterstitialOnLevelComplete } from './hooks/useInterstitialOnLevelComplete';
 import { useLexiStuckDetection } from '@/hooks/useLexiStuckDetection';
 import { useGemDetectorHighlights } from '@/hooks/useGemDetectorHighlights';
 import { useFlashChallenge } from '@/hooks/useFlashChallenge';
@@ -48,9 +61,7 @@ import { useAdventureKeyboardShortcuts } from './hooks/useAdventureKeyboardShort
 import { useAdventureSFX, useAdventureAnalytics } from './hooks/useAdventureSFXAndAnalytics';
 import { useAdventureMusic } from '@/hooks/useAdventureMusic';
 import type { LevelConfig, TileState, GridTileState } from '@/types/adventure';
-import { pickHuntTarget } from '@/lib/adventure/huntMode';
-import { pickRuneOffering, MAX_EQUIPPED_RUNES, computeForgePickEffects } from '@/lib/adventure/runeCatalog';
-import type { RuneCardDef, RuneCard as RuneCardType } from '@/types/wordForge';
+import { MAX_EQUIPPED_RUNES } from '@/lib/adventure/runeCatalog';
 import { RunePicker } from '@/components/wordForge/RunePicker';
 import { RuneBar } from '@/components/wordForge/RuneBar';
 import { LowHPOverlay } from '@/components/wordhunt/LowHPOverlay';
@@ -68,7 +79,6 @@ interface AdventureGameProps {
   onNextWorld?: () => void;
 }
 
-interface LastReportedTimerState { isPlaying: boolean; isPaused: boolean; phase: string; timeRemaining: number; }
 
 function flattenTiles(tiles2D: TileState[][]): GridTileState[] {
   const flat: GridTileState[] = [];
@@ -116,33 +126,11 @@ const AdventureGame = memo<AdventureGameProps>(
     } = useSoundEffects();
 
     // Forge mode: pre-level rune picker + equipped runes for RuneBar display
-    // Placed before useAdventureGame so forge effects can be wired into the game hook
     const hasRunePick = boostedLevelConfig.hasRunePick ?? false;
-    const [forgePickerOpen, setForgePickerOpen] = useState(() => hasRunePick);
-    const [forgeEquippedRunes, setForgeEquippedRunes] = useState<RuneCardType[]>([]);
-    const forgeOffering = useMemo(
-      () => hasRunePick ? pickRuneOffering(3) : [],
-      [hasRunePick]
-    );
-    const handleForgePick = useCallback((rune: RuneCardDef, replaceIndex?: number) => {
-      setForgeEquippedRunes(prev => {
-        const card: RuneCardType = { def: rune, instanceId: `adv-pick-${rune.id}-${Date.now()}` };
-        if (replaceIndex !== undefined) {
-          const next = [...prev];
-          next[replaceIndex] = card;
-          return next;
-        }
-        return [...prev, card];
-      });
-      setForgePickerOpen(false);
-    }, []);
-    const handleForgeSkip = useCallback(() => { setForgePickerOpen(false); }, []);
-
-    // Compute forge-picked rune effects so they actually affect gameplay
-    const forgeEffects = useMemo(
-      () => computeForgePickEffects(forgeEquippedRunes.map(r => r.def)),
-      [forgeEquippedRunes]
-    );
+    const {
+      forgePickerOpen, forgeEquippedRunes, forgeOffering, forgeEffects,
+      handleForgePick, handleForgeSkip,
+    } = useAdventureForgePicker({ hasRunePick });
 
     const {
       gameState, tiles: tiles2D, tilesVersion, objectives, timeRemaining,
@@ -223,14 +211,8 @@ const AdventureGame = memo<AdventureGameProps>(
       scrambleImmunity: init.upgradeEffects.scrambleImmunity,
     });
 
-    const [lastWordTileTypes, setLastWordTileTypes] = useState<string[]>([]);
+    const { lastWordTileTypes, resetLastWordTileTypes } = useLastWordTileTypes({ wordsFoundLength: gameState.wordsFound.length, tiles });
     const prevWordsFoundLen = usePreviousValue(gameState.wordsFound.length);
-    useEffect(() => {
-      if (prevWordsFoundLen !== undefined && gameState.wordsFound.length > prevWordsFoundLen) {
-        const activatedTypes = tiles.filter(t => t.activationEffect).map(t => t.type);
-        setLastWordTileTypes(activatedTypes);
-      }
-    }, [gameState.wordsFound.length, prevWordsFoundLen, tiles]);
 
     // Flash challenges disabled during boss fights — boss mechanics are the challenge
     const flashChallenge = useFlashChallenge({
@@ -243,30 +225,13 @@ const AdventureGame = memo<AdventureGameProps>(
       locale: language,
     });
 
-    // Play sound when a new flash challenge appears
-    const prevChallengeIdRef = useRef<string | null>(null);
-    useEffect(() => {
-      if (flashChallenge.activeChallenge && flashChallenge.activeChallenge.id !== prevChallengeIdRef.current) {
-        prevChallengeIdRef.current = flashChallenge.activeChallenge.id;
-        playFlashChallengeSound();
-      }
-      if (!flashChallenge.activeChallenge) {
-        prevChallengeIdRef.current = null;
-      }
-    }, [flashChallenge.activeChallenge, playFlashChallengeSound]);
-
-    const hasAwardedFlashGoldRef = useRef(false);
-    useEffect(() => {
-      if (flashChallenge.isChallengeComplete && flashChallenge.activeChallenge && !hasAwardedFlashGoldRef.current) {
-        hasAwardedFlashGoldRef.current = true;
-        init.addGold(flashChallenge.activeChallenge.rewardCoins);
-        playCoinCollectSound();
-      }
-      if (!flashChallenge.isChallengeComplete) {
-        hasAwardedFlashGoldRef.current = false;
-      }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [flashChallenge.isChallengeComplete, flashChallenge.activeChallenge, init.addGold]);
+    const { resetFlashGoldAward } = useFlashChallengeRewards({
+      activeChallenge: flashChallenge.activeChallenge,
+      isChallengeComplete: flashChallenge.isChallengeComplete,
+      addGold: init.addGold,
+      playFlashChallengeSound,
+      playCoinCollectSound,
+    });
 
     const { recordProgress: recordQuestProgress } = useDailyQuests({
       initialProgress: progression?.dailyQuestProgress,
@@ -322,15 +287,11 @@ const AdventureGame = memo<AdventureGameProps>(
       maxCombo: gameState.comboCount,
       wordsFound: gameState.wordsFound.length,
     });
-    // Show interstitial ad between adventure levels (natural break point)
     const { showInterstitial } = useInterstitialAd();
-    const prevIsCompleteRef = useRef(false);
-    useEffect(() => {
-      if (gameState.isComplete && !prevIsCompleteRef.current) {
-        showInterstitial(`adventure-level-complete-${levelConfig.world}-${levelConfig.level}`);
-      }
-      prevIsCompleteRef.current = gameState.isComplete;
-    }, [gameState.isComplete, showInterstitial, levelConfig.world, levelConfig.level]);
+    useInterstitialOnLevelComplete({
+      isComplete: gameState.isComplete, showInterstitial,
+      worldNumber: levelConfig.world, levelNumber: levelConfig.level,
+    });
 
     const getScoreMultiplier = useCallback(() => 1, []);
     const augmentedSkillEffects = useMemo(() => ({
@@ -343,30 +304,7 @@ const AdventureGame = memo<AdventureGameProps>(
       grid: initialGrid, language: language || 'en', minWordLength, foundWords: gameState.wordsFound, tiles: tiles2D,
       centerLetter: modeState.centerLetterRequired ? modeState.centerLetter : null,
     });
-    // Hunt mode: pick a target word from the solved word set once it loads
-    const huntTargetPickedRef = useRef(false);
-    useEffect(() => {
-      if (modeState.archetype !== 'hunt' || huntTargetPickedRef.current || !solvedWords) return;
-      const target = pickHuntTarget(solvedWords);
-      if (target) {
-        setHuntTarget(target);
-        huntTargetPickedRef.current = true;
-      }
-    }, [modeState.archetype, solvedWords, setHuntTarget]);
-
-    // Hunt mode: 10s safety timeout. If solvedWords never resolves we previously
-    // synthesized a target from raw grid letters — that produced unsolvable
-    // garbage like "QKZF". Now fail closed: leave huntTargetWord unset so the
-    // mode UI shows its own "no target" state instead of a softlock disguised
-    // as gameplay. Caller can retry/exit the level.
-    useEffect(() => {
-      if (modeState.archetype !== 'hunt' || huntTargetPickedRef.current) return;
-      const timeout = setTimeout(() => {
-        if (huntTargetPickedRef.current) return;
-        huntTargetPickedRef.current = true;
-      }, 10000);
-      return () => clearTimeout(timeout);
-    }, [modeState.archetype]);
+    useHuntTargetPicker({ archetype: modeState.archetype, solvedWords, setHuntTarget });
 
     const gridRef = useRef<HTMLDivElement>(null);
     const clickSubmitRef = useRef<(word: string, indices: number[]) => void>(null);
@@ -473,58 +411,33 @@ const AdventureGame = memo<AdventureGameProps>(
       flashChallengeGold: flashChallenge.isChallengeComplete && flashChallenge.activeChallenge
         ? flashChallenge.activeChallenge.rewardCoins : undefined,
     });
-    const lastReportedStateRef = useRef<LastReportedTimerState | null>(null);
-    useEffect(() => {
-      const actuallyPlaying = isPlaying && entryPhase === 'playing';
-      const lastState = lastReportedStateRef.current;
-      const isSignificantChange = !lastState ||
-        lastState.isPlaying !== actuallyPlaying || lastState.isPaused !== isPaused ||
-        lastState.phase !== entryPhase ||
-        Math.floor(lastState.timeRemaining / 5) !== Math.floor(timeRemaining / 5) ||
-        timeRemaining <= 10;
+    useAdventureTimerReport({
+      timeRemaining,
+      totalTime: init.adjustedLevelConfig.timerSeconds,
+      isPlaying,
+      isPaused,
+      entryPhase,
+      onTimerStateChange,
+    });
 
-      if (isSignificantChange && onTimerStateChange) {
-        lastReportedStateRef.current = { isPlaying: actuallyPlaying, isPaused, phase: entryPhase, timeRemaining };
-        onTimerStateChange({ timeRemaining, totalTime: init.adjustedLevelConfig.timerSeconds, isPlaying: actuallyPlaying, isPaused });
-      }
-    }, [timeRemaining, isPlaying, isPaused, entryPhase, onTimerStateChange, init.adjustedLevelConfig.timerSeconds]);
+    useCombatComboMilestone({
+      comboCount: gameState.comboCount,
+      isPlaying, entryPhase, isPaused,
+      checkMilestone: init.checkMilestone,
+      prevComboCountRef: wordSubmit.prevComboCountRef,
+    });
 
-    useEffect(() => {
-      if (isPlaying && entryPhase === 'playing' && !isPaused) {
-        init.checkMilestone(gameState.comboCount);
-      }
-      wordSubmit.prevComboCountRef.current = gameState.comboCount;
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [gameState.comboCount, isPlaying, entryPhase, isPaused, init]);
+    useAutoPauseOnHidden({ isPlaying, isPaused, entryPhase, pauseGame, setIsPaused });
 
-    // Auto-pause when tab/app goes to background (prevents timer drain on mobile)
-    useEffect(() => {
-      const handleVisibilityChange = () => {
-        if (document.hidden && isPlaying && entryPhase === 'playing' && !isPaused) {
-          pauseGame();
-          setIsPaused(true);
-        }
-      };
-      document.addEventListener('visibilitychange', handleVisibilityChange);
-      return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
-    }, [isPlaying, entryPhase, isPaused, pauseGame]);
-
-    const hintTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-    useEffect(() => () => { if (hintTimerRef.current) clearTimeout(hintTimerRef.current); }, []);
-
-    const handleCascadeComplete = useCallback(() => {
-      markCascadeComplete();
-      entryPhaseManager.advanceToPlaying();
-      if (!isPlaying) { startGame(); init.startAIDirector(); }
-      if (init.upgradeEffects.freeStartHint) {
-        hintTimerRef.current = setTimeout(() => { hintTimerRef.current = null; getHint(); }, 500);
-      }
-    }, [markCascadeComplete, entryPhaseManager, isPlaying, startGame, init, getHint]);
-
-    const handleEntryPhaseComplete = useCallback(() => {
-      entryPhaseManager.advanceToPlaying();
-      if (!isPlaying) { startGame(); init.startAIDirector(); }
-    }, [entryPhaseManager, isPlaying, startGame, init]);
+    const { handleCascadeComplete, handleEntryPhaseComplete } = useEntryPhaseHandlers({
+      markCascadeComplete,
+      advanceToPlaying: entryPhaseManager.advanceToPlaying,
+      isPlaying,
+      startGame,
+      startAIDirector: init.startAIDirector,
+      freeStartHint: init.upgradeEffects.freeStartHint,
+      getHint,
+    });
 
     const gridInteraction = useAdventureGridInteraction({
       isPlaying, isPaused, isValidating, selectTile, clearSelection,
@@ -534,13 +447,12 @@ const AdventureGame = memo<AdventureGameProps>(
       gridRef, gridSize: levelConfig.gridSize, effects,
     });
 
-    const showLootOrComplete = useCallback(() => {
-      if (levelCompletion.lootDrops.length > 0 && gameState.stars > 0) {
-        setShowLootChest(true);
-      } else {
-        setShowLevelComplete(true);
-      }
-    }, [levelCompletion.lootDrops, gameState.stars]);
+    const { showLootOrComplete, handleStoryBeatContinue, handleLootChestComplete } = useLootCompletionFlow({
+      lootDropsLength: levelCompletion.lootDrops?.length ?? 0,
+      stars: gameState.stars,
+      nonBossCompleted: levelCompletion.nonBossCompleted,
+      setShowLootChest, setShowLevelComplete, setShowStoryBeat,
+    });
 
     const { resetTracking } = useAdventureAnalytics({
       isPlaying, entryPhase, worldNumber: levelConfig.world, levelNumber: levelConfig.level,
@@ -550,22 +462,6 @@ const AdventureGame = memo<AdventureGameProps>(
       showDefeatCinematic: cinematics.showDefeatCinematic,
       consecutiveFailures: (bestAttempt?.consecutiveFailures ?? 0) + 1,
     });
-
-    useEffect(() => {
-      if (levelCompletion.nonBossCompleted) {
-        showLootOrComplete();
-      }
-    }, [levelCompletion.nonBossCompleted, showLootOrComplete]);
-
-    const handleStoryBeatContinue = useCallback(() => {
-      setShowStoryBeat(false);
-      showLootOrComplete();
-    }, [showLootOrComplete]);
-
-    const handleLootChestComplete = useCallback(() => {
-      setShowLootChest(false);
-      setShowLevelComplete(true);
-    }, []);
 
     const hintsUsedRef = useRef(0);
     const { handleCinematicComplete, handleContinue, handleRetry: handleRetryBase } = useAdventureGameCallbacks({
@@ -607,79 +503,39 @@ const AdventureGame = memo<AdventureGameProps>(
         attempt: (bestAttempt?.attemptCount ?? 0) + 1,
       });
       hintsUsedRef.current = 0;
-      hasAwardedFlashGoldRef.current = false;
+      resetFlashGoldAward();
       resetTracking();
-      setLastWordTileTypes([]);
+      resetLastWordTileTypes();
       handleRetryBase();
-    }, [handleRetryBase, resetTracking, levelConfig.world, levelConfig.level, bestAttempt]);
+    }, [handleRetryBase, resetTracking, resetFlashGoldAward, resetLastWordTileTypes, levelConfig.world, levelConfig.level, bestAttempt]);
 
-    // RetryAssistModal — progressive assists for consecutive failures
-    const [showRetryAssist, setShowRetryAssist] = useState(false);
     const consecutiveFailures = (bestAttempt?.consecutiveFailures ?? 0) + (showLevelComplete && gameState.stars === 0 ? 1 : 0);
+    const {
+      showRetryAssist,
+      handleRetryWithBonus, handleRetryWithHint, handleRetryFromAssist,
+    } = useRetryAssistFlow({
+      handleRetry, addTime, getHint,
+      showLevelComplete, stars: gameState.stars, consecutiveFailures,
+    });
 
-    // Show RetryAssistModal after defeat cinematic when player has failed multiple times
-    useEffect(() => {
-      if (showLevelComplete && gameState.stars === 0 && consecutiveFailures >= 2) {
-        setShowRetryAssist(true);
-      }
-    }, [showLevelComplete, gameState.stars, consecutiveFailures]);
+    const { hintGoldPending, handleHintClick } = useHintGoldConfirm({
+      hasHintsAvailable,
+      nextHintCost,
+      getHint,
+      dismissAutoHint,
+      onHintConsumed: useCallback(() => { hintsUsedRef.current += 1; }, []),
+    });
 
-    const handleRetryWithBonus = useCallback(() => {
-      setShowRetryAssist(false);
-      addTime(15); // 15 second bonus
-      handleRetry();
-    }, [handleRetry, addTime]);
-
-    const handleRetryWithHint = useCallback(() => {
-      setShowRetryAssist(false);
-      handleRetry();
-      // Hint will be auto-triggered after game starts via a short delay
-      setTimeout(() => { if (getHint) getHint(); }, 1500);
-    }, [handleRetry, getHint]);
-
-    const handleRetryFromAssist = useCallback(() => {
-      setShowRetryAssist(false);
-      handleRetry();
-    }, [handleRetry]);
-
-    const [hintGoldPending, setHintGoldPending] = useState(false);
-    const executeHintAction = useCallback(() => {
-      getHint(); dismissAutoHint(); hintsUsedRef.current += 1;
-      setHintGoldPending(false);
-    }, [getHint, dismissAutoHint]);
-
-    const handleHintClick = useCallback(() => {
-      if (!hasHintsAvailable) return;
-      // Confirm gold spend when hint isn't free
-      if (nextHintCost > 0 && !hintGoldPending) {
-        setHintGoldPending(true);
-        // Auto-dismiss after 5s — track timer to prevent setState on unmount
-        if (hintTimerRef.current) clearTimeout(hintTimerRef.current);
-        hintTimerRef.current = setTimeout(() => setHintGoldPending(false), 5000);
-        return;
-      }
-      executeHintAction();
-    }, [hasHintsAvailable, nextHintCost, hintGoldPending, executeHintAction]);
-
-    const hintHighlightIndices = useMemo(() => {
-      if (init.hintData.level !== 'none' && (init.hintData.highlightTiles?.length ?? 0) > 0) {
-        return init.hintData.highlightTiles!.map(pos => pos.row * levelConfig.gridSize + pos.col);
-      }
-      // Time Freeze T2: highlight longest findable word while frozen
-      if (isFrozen && init.upgradeEffects.freezeHighlightsWord && remainingHintWords.length > 0) {
-        const longestWord = remainingHintWords.reduce((a, b) => b.length > a.length ? b : a, '');
-        const path = findPathForWord(longestWord);
-        if (path) return path.map(pos => pos.row * levelConfig.gridSize + pos.col);
-      }
-      if (currentHint?.path) {
-        return currentHint.path.map(pos => pos.row * levelConfig.gridSize + pos.col);
-      }
-      // Gem Detector: subtly highlight starting tiles of high-value words
-      if (gemDetectorHighlights.length > 0) {
-        return gemDetectorHighlights;
-      }
-      return [];
-    }, [init.hintData, currentHint, levelConfig.gridSize, isFrozen, init.upgradeEffects.freezeHighlightsWord, remainingHintWords, findPathForWord, gemDetectorHighlights]);
+    const hintHighlightIndices = useHintHighlightIndices({
+      hintData: init.hintData,
+      currentHint,
+      gridSize: levelConfig.gridSize,
+      isFrozen,
+      freezeHighlightsWord: init.upgradeEffects.freezeHighlightsWord,
+      remainingHintWords,
+      findPathForWord,
+      gemDetectorHighlights,
+    });
 
 
     // Exit confirmation — prevents accidental game loss from stray taps
@@ -909,7 +765,7 @@ const AdventureGame = memo<AdventureGameProps>(
           <AdventureTutorial onComplete={() => setShowTutorial(false)} />
         )}
         {modeState.archetype === 'forge' && forgeEquippedRunes.length > 0 && (
-          <div className="fixed bottom-0 left-0 right-0 z-30">
+          <div className="fixed bottom-0 inset-x-0 z-30">
             <RuneBar runes={forgeEquippedRunes} maxSlots={MAX_EQUIPPED_RUNES} />
           </div>
         )}

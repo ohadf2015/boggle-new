@@ -206,6 +206,37 @@ describe('useAdventureWordSubmit', () => {
     expect(mockDealBossDamage).toHaveBeenCalled();
   });
 
+  it('should not inflate boss damage by stacking Math.ceil across multipliers', async () => {
+    // scoreValue=5, mechanic x1, boss skill x1.3, long-word x1.2
+    // Consolidated: ceil(max(1, 5/3) * 1.3 * 1.2) = ceil(2.6) = 3
+    // Stacked-ceil (buggy): ceil(ceil(ceil(5/3)*1.3)*1.2) = ceil(ceil(2*1.3)*1.2) = ceil(3*1.2) = 4
+    mockValidateWord.mockResolvedValue({ isValid: true, score: 5 });
+    mockCheckBossWord.mockReturnValue({
+      scoreMultiplier: 1,
+      meetsRequirement: false,
+      triggerTaunt: null,
+    });
+
+    const { result } = renderHook(() =>
+      useAdventureWordSubmit({
+        ...defaultProps,
+        isBossActive: true,
+        bossConfig: { id: 'boss' } as any,
+        skillEffects: {
+          bossDamageMultiplier: 1.3,
+          comboMultiplierBonus: 0,
+          getLongWordDamageMultiplier: vi.fn().mockReturnValue(1.2),
+        },
+      })
+    );
+
+    await act(async () => {
+      await result.current.handleWordSubmit('cat', [0, 1, 2]);
+    });
+
+    expect(mockDealBossDamage).toHaveBeenCalledWith(3, 1.0);
+  });
+
   it('should trigger boss taunt on bad word when boss active', async () => {
     mockValidateWord.mockResolvedValue({ isValid: false, errorKey: 'error.notAWord' });
 

@@ -11,6 +11,7 @@ import React, { useEffect, useState, useRef, memo } from 'react';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { useSpring, useTransform } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { useLanguageSafe } from '@/contexts/LanguageContext';
 
 // ==============================================
 // TYPES
@@ -54,8 +55,8 @@ function formatCompactNumber(num: number): string {
   return num.toString();
 }
 
-function formatNumber(num: number, minDigits: number): string {
-  return num.toLocaleString('en-US').padStart(minDigits, '0');
+export function formatNumber(num: number, minDigits: number, locale?: string): string {
+  return num.toLocaleString(locale).padStart(minDigits, '0');
 }
 
 // ==============================================
@@ -102,9 +103,10 @@ export const RollingNumber = memo(function RollingNumber({
     return unsubscribe;
   }, [roundedValue]);
 
-  const formattedValue = compact 
+  const { language } = useLanguageSafe();
+  const formattedValue = compact
     ? formatCompactNumber(displayValue)
-    : formatNumber(displayValue, minDigits);
+    : formatNumber(displayValue, minDigits, language);
 
   const variantClasses = {
     default: 'text-neo-white',

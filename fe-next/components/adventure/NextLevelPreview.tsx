@@ -65,7 +65,10 @@ export function NextLevelPreview({
             )}
 
             <div className="flex items-center justify-between">
-              <button onClick={onDismiss} className="text-xs text-neo-white/40 hover:text-neo-white/60">
+              <button
+                onClick={onDismiss}
+                className="text-xs text-neo-white/40 hover:text-neo-white/60 px-3 py-2 min-h-11 min-w-11"
+              >
                 {t('adventure.later')}
               </button>
               <AdaptiveAnimatePresence>

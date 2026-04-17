@@ -8,6 +8,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { useAutoFillBots } from '../hooks/useAutoFillBots';
 import type { Socket } from 'socket.io-client';
 import Avatar from '@/components/Avatar';
+import { socketErrorMessage, isBotErrorCode } from '../utils/socketErrorMessage';
 
 type BotDifficulty = 'easy' | 'medium' | 'hard';
 
@@ -108,12 +109,10 @@ const BotControls: React.FC<BotControlsProps> = ({
       }
     };
 
-    const handleError = (message: string | { message: string }): void => {
-      const errorMsg = typeof message === 'string' ? message : message.message;
-      if (errorMsg && errorMsg.toLowerCase().includes('bot')) {
-        setError(errorMsg);
-        setTimeout(() => setError(null), 3000);
-      }
+    const handleError = (data: string | { code?: string; message?: string }): void => {
+      if (!isBotErrorCode(data)) return;
+      setError(socketErrorMessage(data, t));
+      setTimeout(() => setError(null), 3000);
     };
 
     socket.on('botAdded', handleBotAdded);
