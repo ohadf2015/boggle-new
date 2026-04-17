@@ -56,6 +56,19 @@ export const HUNT_WRONG_GUESS_DAMAGE = 15;
 export const HUNT_MAX_ATTEMPTS = 7;
 
 /**
+ * Hunt-mode starting HP scaled by world difficulty bucket.
+ *   EASY   (worlds 1-3, world=0 endless base) → 120 HP (8 wrong guesses)
+ *   MEDIUM (worlds 4-6)                       → 100 HP (~6 wrong guesses)
+ *   HARD   (worlds 7-10)                      →  75 HP (5 wrong guesses)
+ * Matches `getDifficultyForWorld` buckets so hunt tension scales with world.
+ */
+export function getHuntLifePoints(world: number): number {
+  if (world === 0 || world <= 3) return 120;
+  if (world <= 6) return 100;
+  return 75;
+}
+
+/**
  * Pick a target word from the solved word set.
  * Prefers words of length 4-6 for good gameplay.
  * Returns null if no suitable words found.

@@ -8,6 +8,7 @@ import {
   pickHuntTarget,
   HUNT_WRONG_GUESS_DAMAGE,
   HUNT_MAX_ATTEMPTS,
+  getHuntLifePoints,
 } from '../huntMode';
 
 describe('computeLetterFeedback', () => {
@@ -122,5 +123,32 @@ describe('constants', () => {
 
   it('HUNT_MAX_ATTEMPTS is 7', () => {
     expect(HUNT_MAX_ATTEMPTS).toBe(7);
+  });
+});
+
+describe('getHuntLifePoints', () => {
+  it('returns 120 for EASY worlds (1-3)', () => {
+    expect(getHuntLifePoints(1)).toBe(120);
+    expect(getHuntLifePoints(2)).toBe(120);
+    expect(getHuntLifePoints(3)).toBe(120);
+  });
+
+  it('returns 100 for MEDIUM worlds (4-6)', () => {
+    expect(getHuntLifePoints(4)).toBe(100);
+    expect(getHuntLifePoints(5)).toBe(100);
+    expect(getHuntLifePoints(6)).toBe(100);
+  });
+
+  it('returns 75 for HARD worlds (7-10)', () => {
+    expect(getHuntLifePoints(7)).toBe(75);
+    expect(getHuntLifePoints(10)).toBe(75);
+  });
+
+  it('treats endless (world=0) as EASY baseline', () => {
+    expect(getHuntLifePoints(0)).toBe(120);
+  });
+
+  it('allows at least 5 wrong guesses on hardest worlds', () => {
+    expect(getHuntLifePoints(10)).toBeGreaterThanOrEqual(HUNT_WRONG_GUESS_DAMAGE * 5);
   });
 });

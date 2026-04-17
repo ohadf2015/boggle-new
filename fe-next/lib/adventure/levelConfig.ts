@@ -19,6 +19,7 @@ import {
   getDifficultyForWorld,
 } from './constants';
 import { getBossConfig } from './bossConfig';
+import { getHuntLifePoints } from './huntMode';
 import { hasWordPath } from './gridValidator';
 import { getArchetypeForLevel, getArchetypeConfig } from './levelArchetypes';
 import { getThemeDisplayKey, getThemedWords, getThemeBonusMultiplier } from './themedWords';
@@ -151,7 +152,7 @@ export function getLevelConfig(
     config.movesLimit = Math.round(gridSize * gridSize * 0.6);
   } else if (archetype === 'hunt') {
     config.hasTargetWord = true;
-    config.lifePoints = 100;
+    config.lifePoints = getHuntLifePoints(world);
   } else if (archetype === 'wheel') {
     // Wheel archetype routes to AdventureWheelGame (ring layout, center-letter rule).
     // Boggle-grid config below is unused for wheel levels but kept as a fallback shape.
