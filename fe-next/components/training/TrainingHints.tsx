@@ -258,7 +258,7 @@ const TrainingHints: React.FC<TrainingHintsProps> = ({
             <button
               onClick={() => setShowCelebration(false)}
               className={cn(
-                'rounded-xl border-2 px-4 py-2.5 shadow-lg backdrop-blur-xs pointer-events-auto cursor-pointer',
+                'rounded-xl border-2 px-4 py-2.5 shadow-lg pointer-events-auto cursor-pointer',
                 'bg-linear-to-r from-green-50 to-emerald-50 border-green-300',
                 'dark:from-green-900/50 dark:to-emerald-900/50 dark:border-green-500/50',
                 'hover:scale-105 transition-transform'

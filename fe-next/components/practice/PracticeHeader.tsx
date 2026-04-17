@@ -96,7 +96,7 @@ export const PracticeHeader = memo<PracticeHeaderProps>(({
       data-testid="practice-header"
       className={cn(
         'sticky top-0 z-50',
-        'bg-neo-navy/95 backdrop-blur-xs',
+        'bg-neo-navy/95',
         'border-b-neo border-neo-black/30',
         className
       )}

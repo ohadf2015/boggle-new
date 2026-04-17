@@ -100,7 +100,7 @@ const WordHuntDeathRecap = memo<WordHuntDeathRecapProps>(({ stats, t }) => {
       data-testid="death-recap"
     >
       {/* Card */}
-      <div className="bg-neo-navy/95 backdrop-blur-xs border-3 border-neo-red/60 rounded-neo shadow-hard-lg overflow-hidden">
+      <div className="bg-neo-navy/95 border-3 border-neo-red/60 rounded-neo shadow-hard-lg overflow-hidden">
         {/* Header strip */}
         <div className="bg-neo-red/20 border-b-2 border-neo-red/30 px-4 py-2 flex items-center gap-2">
           <CauseIcon size={16} className="text-neo-red" />

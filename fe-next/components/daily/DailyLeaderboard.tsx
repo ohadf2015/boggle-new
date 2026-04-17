@@ -257,7 +257,7 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
           bg-linear-to-br from-white/95 to-slate-50/95 dark:from-neo-navy/95 dark:to-neo-navy/90
           rounded-2xl border-2 border-slate-200 dark:border-slate-700
           ${compact ? 'p-3' : 'p-4 sm:p-5'}
-          shadow-lg backdrop-blur-xs
+          shadow-lg
         `}
       >
         <div className="flex items-center gap-3 mb-4">
@@ -302,7 +302,7 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
         bg-linear-to-br from-white/95 to-slate-50/95 dark:from-neo-navy/95 dark:to-neo-navy/90
         rounded-2xl border-2 border-slate-200 dark:border-slate-700
         ${compact ? 'p-3' : 'p-4 sm:p-5'}
-        shadow-lg backdrop-blur-xs
+        shadow-lg
       `}
     >
       {/* Header */}

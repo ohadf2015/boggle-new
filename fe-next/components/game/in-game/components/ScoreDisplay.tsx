@@ -51,7 +51,7 @@ export const ScoreDisplay = memo<ScoreDisplayProps>(function ScoreDisplay({
       <AdaptiveMotion.div
         initial={{ scale: 0, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        className="relative border-2 border-neo-lime/30 rounded-neo shadow-none px-4 py-1.5 min-w-[90px] overflow-hidden bg-neo-lime/10 backdrop-blur-xs"
+        className="relative border-2 border-neo-lime/30 rounded-neo shadow-none px-4 py-1.5 min-w-[90px] overflow-hidden bg-neo-lime/10"
         whileHover={{ scale: 1.05 }}
         role="status"
         aria-live="polite"
@@ -106,7 +106,7 @@ export const ScoreDisplay = memo<ScoreDisplayProps>(function ScoreDisplay({
     <AdaptiveMotion.div
       initial={{ scale: 0, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
-      className="relative border-2 border-neo-lime/30 rounded-neo shadow-none px-1.5 md:px-4 py-0.5 md:py-1.5 min-w-[50px] md:min-w-[90px] overflow-visible bg-neo-lime/10 backdrop-blur-xs"
+      className="relative border-2 border-neo-lime/30 rounded-neo shadow-none px-1.5 md:px-4 py-0.5 md:py-1.5 min-w-[50px] md:min-w-[90px] overflow-visible bg-neo-lime/10"
       role="status"
       aria-live="polite"
       aria-label={scoreLabel}

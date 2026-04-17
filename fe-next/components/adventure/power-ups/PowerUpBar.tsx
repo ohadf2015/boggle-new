@@ -296,7 +296,7 @@ export function PowerUpBar({
 
           // Styling - neo-brutalist with mobile padding
           'px-2 sm:px-4 py-2 sm:py-3 rounded-neo',
-          'bg-neo-navy/80 backdrop-blur-xs',
+          'bg-neo-navy/80',
           'border-2 border-neo-black/30',
           'shadow-hard',
 

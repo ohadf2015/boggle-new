@@ -149,7 +149,7 @@ export const QuickReactions = memo<QuickReactionsProps>(({
             exit={{ opacity: 0, scale: 0.8 }}
             transition={{ duration: 0.15 }}
             className={`absolute z-50 flex ${isVertical ? 'flex-col' : 'flex-row'} gap-1.5
-              bg-neo-navy/95 border-2 border-neo-white/15 rounded-xl p-1.5 backdrop-blur-xs
+              bg-neo-navy/95 border-2 border-neo-white/15 rounded-xl p-1.5
               ${isVertical ? 'bottom-full mb-2 left-1/2 -translate-x-1/2' : 'bottom-full mb-2 left-0'}`}
           >
             {REACTIONS.map((reaction) => (

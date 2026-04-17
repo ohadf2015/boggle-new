@@ -102,7 +102,6 @@ export const MobileChatFab = memo<MobileChatFabProps>(({ username, isHost, gameC
               'w-10 h-10 min-w-[44px] min-h-[44px]',
               'flex items-center justify-center',
               'bg-neo-navy/90 border-2 border-neo-lime/60 rounded-full',
-              'backdrop-blur-xs',
             )}
             aria-label={t('common.chat')}
           >

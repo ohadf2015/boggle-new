@@ -98,7 +98,7 @@ const ChapterIndicator = memo<ChapterIndicatorProps>(({
       className={cn(
         'flex items-center gap-3',
         'px-3 py-2 rounded-neo',
-        'bg-neo-black/40 backdrop-blur-xs',
+        'bg-neo-black/40',
         'border border-neo-white/20',
         className
       )}

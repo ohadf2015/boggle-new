@@ -57,7 +57,7 @@ export const FlashChallengeToast = memo(function FlashChallengeToast({
             ? 'bg-neo-red/20 border-neo-red'
             : isComplete
               ? 'bg-neo-lime border-neo-black'
-              : 'bg-neo-navy/95 border-neo-yellow/70 backdrop-blur-xs'
+              : 'bg-neo-navy/95 border-neo-yellow/70'
         )}
         onClick={onDismiss}
         role="status"

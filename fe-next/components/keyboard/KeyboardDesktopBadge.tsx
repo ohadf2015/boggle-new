@@ -63,7 +63,6 @@ export function KeyboardDesktopBadge({
           'rounded-neo border-2 border-neo-black',
           'bg-neo-cyan/90 text-neo-black',
           'shadow-hard-sm',
-          'backdrop-blur-xs'
         )}
       >
         <Keyboard className="w-4 h-4" />

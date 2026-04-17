@@ -69,7 +69,7 @@ export const StreakBar: React.FC = memo(() => {
         transition={{ duration: 0.2 }}
         className={cn(
           'flex items-center justify-between gap-2 px-3 py-1.5 sm:px-4',
-          'bg-neo-navy-dark/80 backdrop-blur-xs',
+          'bg-neo-navy-dark/80',
           'border-b border-neo-white/10',
           'text-xs sm:text-sm font-bold',
           'select-none',

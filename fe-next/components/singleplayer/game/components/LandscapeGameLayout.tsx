@@ -336,7 +336,7 @@ export function LandscapeGameLayout({
           <AdaptiveMotion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-neo-cream/95 backdrop-blur-xs border-2 border-neo-black rounded-full shadow-hard-sm"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-neo-cream/95 border-2 border-neo-black rounded-full shadow-hard-sm"
           >
             <List className="w-4 h-4 text-neo-black/70" />
             {foundWords.slice(-3).reverse().map((fw, i) => (

@@ -105,7 +105,7 @@ export const SurvivalMobileInfoBar: React.FC<SurvivalMobileInfoBarProps> = ({
         onClick={() => setIsExpanded(!isExpanded)}
         className={cn(
           'w-full flex items-center justify-between px-3 py-2',
-          'bg-neo-black/40 backdrop-blur-xs border-2 border-neo-black/30 rounded-neo',
+          'bg-neo-black/40 border-2 border-neo-black/30 rounded-neo',
           'transition-colors active:bg-neo-black/60',
         )}
       >
@@ -157,7 +157,7 @@ export const SurvivalMobileInfoBar: React.FC<SurvivalMobileInfoBarProps> = ({
             transition={{ duration: 0.2 }}
             className="overflow-hidden"
           >
-            <div className="bg-neo-black/50 backdrop-blur-xs border-2 border-t-0 border-neo-black/30 rounded-b-neo">
+            <div className="bg-neo-black/50 border-2 border-t-0 border-neo-black/30 rounded-b-neo">
               {/* Tab switches */}
               <div className="flex border-b border-neo-black/30">
                 <button

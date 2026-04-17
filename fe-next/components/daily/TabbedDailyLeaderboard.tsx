@@ -579,7 +579,7 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
         bg-white/95 dark:bg-slate-800/95
         rounded-2xl border-2 border-slate-200 dark:border-slate-700
         ${compact ? 'p-3' : 'p-4 sm:p-5'}
-        shadow-lg backdrop-blur-xs
+        shadow-lg
       `}
     >
       {/* Header - always visible */}

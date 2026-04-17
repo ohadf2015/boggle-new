@@ -267,7 +267,7 @@ const LevelEntryOverlay = memo<LevelEntryOverlayProps>(
               {/* World mechanic intro on first level of W2+ */}
               {levelNumber === 1 && worldNumber >= 2 && (
                 <AdaptiveMotion.div
-                  className="mt-4 px-4 py-2 rounded-neo border-neo bg-neo-navy/80 backdrop-blur-xs"
+                  className="mt-4 px-4 py-2 rounded-neo border-neo bg-neo-navy/80"
                   initial={{ y: 16, opacity: 0, scale: 0.9 }}
                   animate={{ y: 0, opacity: 1, scale: 1 }}
                   transition={{ delay: 0.3, duration: 0.5, type: 'spring', stiffness: 300, damping: 25 }}

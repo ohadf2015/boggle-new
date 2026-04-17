@@ -114,7 +114,7 @@ export function KeyboardInlineHint({
           onClick={handleDismiss}
           className={cn(
             'flex items-center gap-1.5 px-3 py-1.5',
-            'bg-neo-navy/80 backdrop-blur-xs',
+            'bg-neo-navy/80',
             'text-neo-cream/90 hover:text-neo-cream',
             'border-2 border-neo-cream/20 hover:border-neo-cyan/50',
             'rounded-neo',

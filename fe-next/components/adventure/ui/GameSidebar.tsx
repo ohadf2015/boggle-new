@@ -161,7 +161,7 @@ export const GameSidebar = memo(function GameSidebar({
       className={cn(
         'flex flex-col',
         'h-full',
-        'bg-neo-navy/60 backdrop-blur-xs',
+        'bg-neo-navy/60',
         className
       )}
     >
@@ -391,7 +391,7 @@ export const GameSidebar = memo(function GameSidebar({
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
           className={cn(
-            'bg-neo-black/30 backdrop-blur-xs',
+            'bg-neo-black/30',
             'border-2 rounded-neo-lg p-3',
             'transition-all duration-500',
             allComplete

@@ -404,7 +404,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
       </div>
 
       {!isDesktop && (
-        <div className="fixed bottom-0 inset-x-0 z-50 bg-neo-navy/95 backdrop-blur-xs border-t-3 border-neo-black safe-area-bottom px-3 py-2.5">
+        <div className="fixed bottom-0 inset-x-0 z-50 bg-neo-navy/95 border-t-3 border-neo-black safe-area-bottom px-3 py-2.5">
           <NextStepPrompt currentMode={nextStepMode} onBackToLobby={handleBackToLobby} variant="landscape" />
         </div>
       )}
