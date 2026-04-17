@@ -144,6 +144,10 @@ export function CrazyGamesProvider({ children }: { children: ReactNode }) {
     if (isAvailable && typeof window.CrazyGames?.SDK?.game?.happyTime === 'function') window.CrazyGames.SDK.game.happyTime();
   }, [isAvailable]);
 
+  const trackEvent = useCallback((eventName: string) => {
+    if (isAvailable && typeof window.CrazyGames?.SDK?.game?.trackEvent === 'function') window.CrazyGames.SDK.game.trackEvent(eventName);
+  }, [isAvailable]);
+
   // Ad handlers
   const showMidgameAd = useCallback((callbacks?: AdCallbacks) => {
     if (isAvailable && window.CrazyGames?.SDK) {
@@ -347,7 +351,7 @@ export function CrazyGamesProvider({ children }: { children: ReactNode }) {
     deviceType,
     isLandscape,
     viewportSize,
-    gameplayStart, gameplayStop, loadingStart, loadingStop, happyTime,
+    gameplayStart, gameplayStop, loadingStart, loadingStop, happyTime, trackEvent,
     showMidgameAd, showRewardedAd, hasAdblock,
     requestBanner, requestResponsiveBanner, clearBanner, clearAllBanners,
     saveData, loadData, removeData, clearData,

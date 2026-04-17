@@ -107,6 +107,7 @@ export interface CrazyGamesSDKInterface {
     loadingStart: () => void;
     loadingStop: () => void;
     happyTime: () => void;
+    trackEvent?: (eventName: string) => void;
     sdkGameLoadingStart: () => void;
     sdkGameLoadingStop: () => void;
     inviteLink: (params: InviteLinkParams) => string;
@@ -160,6 +161,7 @@ export interface CrazyGamesContextType {
   loadingStart: () => void;
   loadingStop: () => void;
   happyTime: () => void;
+  trackEvent: (eventName: string) => void;
   // Ads
   showMidgameAd: (callbacks?: AdCallbacks) => void;
   showRewardedAd: (callbacks?: AdCallbacks) => void;
@@ -219,6 +221,7 @@ export const CRAZYGAMES_NOOP_CONTEXT: CrazyGamesContextType = {
   loadingStart: () => {},
   loadingStop: () => {},
   happyTime: () => {},
+  trackEvent: () => {},
   showMidgameAd: (callbacks) => callbacks?.adFinished?.(),
   showRewardedAd: (callbacks) => callbacks?.adError?.('SDK not available'),
   hasAdblock: async () => false,

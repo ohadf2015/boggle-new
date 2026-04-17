@@ -72,7 +72,6 @@ function SinglePlayerGame({
   // Score popup — shows "+30" when score increases
   const [scorePopup, setScorePopup] = React.useState<{ id: number; value: number; x: number; y: number; word?: string; bonus?: string } | null>(null);
   const prevScoreRef = useRef(0);
-  const scoreDisplayRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const achievements = core.liveAchievements;
