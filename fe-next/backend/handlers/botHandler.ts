@@ -18,7 +18,7 @@ import {
 } from '../modules/gameStateManager.js';
 
 import { broadcastToRoom, broadcastActiveRooms, getGameRoom } from '../utils/socketHelpers.js';
-import { emitError, ErrorMessages } from '../utils/errorHandler.js';
+import { emitError, ErrorCodes } from '../utils/errorHandler.js';
 import { checkRateLimit } from '../utils/rateLimiter.js';
 import * as botManager from '../modules/botManager.js';
 import { clearGameTimer } from '../utils/timerManager.js';
@@ -78,7 +78,7 @@ function registerBotHandlers(io: Server, socket: Socket): void {
     // Validate payload
     const validation = validatePayload(addBotSchema, data || {});
     if (!validation.success) {
-      emitError(socket, `Invalid request: ${validation.error}`);
+      emitError(socket, ErrorCodes.VALIDATION_INVALID_PAYLOAD, { message: `Invalid request: ${validation.error}` });
       return;
     }
 
@@ -86,25 +86,25 @@ function registerBotHandlers(io: Server, socket: Socket): void {
     const gameCode = getGameBySocketId(socket.id);
 
     if (!gameCode) {
-      emitError(socket, ErrorMessages.NOT_IN_GAME);
+      emitError(socket, ErrorCodes.PLAYER_NOT_IN_GAME);
       return;
     }
 
     const game = getGame(gameCode);
     if (!game) {
-      emitError(socket, ErrorMessages.GAME_NOT_FOUND);
+      emitError(socket, ErrorCodes.GAME_NOT_FOUND);
       return;
     }
 
     // Verify sender is host
     if (game.hostSocketId !== socket.id) {
-      emitError(socket, 'Only the host can add bots');
+      emitError(socket, ErrorCodes.PLAYER_NOT_HOST, { message: 'Only the host can add bots' });
       return;
     }
 
     // Check if game is in progress (use state machine helper)
     if (isInProgress(game.gameState)) {
-      emitError(socket, 'Cannot add bots during a game');
+      emitError(socket, ErrorCodes.GAME_ALREADY_STARTED, { message: 'Cannot add bots during a game' });
       return;
     }
 
@@ -112,7 +112,7 @@ function registerBotHandlers(io: Server, socket: Socket): void {
     const currentPlayerCount = Object.keys(game.users).length;
     const currentBotCount: number = botManager.getGameBots(gameCode).length;
     if (currentPlayerCount + currentBotCount >= MAX_PLAYERS_PER_ROOM) {
-      emitError(socket, 'Room is full');
+      emitError(socket, ErrorCodes.GAME_FULL);
       return;
     }
 
@@ -166,26 +166,26 @@ function registerBotHandlers(io: Server, socket: Socket): void {
     const gameCode = getGameBySocketId(socket.id);
 
     if (!gameCode) {
-      emitError(socket, ErrorMessages.NOT_IN_GAME);
+      emitError(socket, ErrorCodes.PLAYER_NOT_IN_GAME);
       return;
     }
 
     const game = getGame(gameCode);
     if (!game) {
-      emitError(socket, ErrorMessages.GAME_NOT_FOUND);
+      emitError(socket, ErrorCodes.GAME_NOT_FOUND);
       return;
     }
 
     // Verify sender is host
     if (game.hostSocketId !== socket.id) {
-      emitError(socket, 'Only the host can remove bots');
+      emitError(socket, ErrorCodes.PLAYER_NOT_HOST, { message: 'Only the host can remove bots' });
       return;
     }
 
     // Check if game is in progress (use state machine helper)
     // Allow removal in waiting, finished, or validating states
     if (isInProgress(game.gameState)) {
-      emitError(socket, 'Cannot remove bots during a game');
+      emitError(socket, ErrorCodes.GAME_ALREADY_STARTED, { message: 'Cannot remove bots during a game' });
       return;
     }
 
@@ -233,13 +233,13 @@ function registerBotHandlers(io: Server, socket: Socket): void {
     }
 
     if (!botToRemove) {
-      emitError(socket, 'Bot not found');
+      emitError(socket, ErrorCodes.VALIDATION_INVALID_PAYLOAD, { message: 'Bot not found' });
       return;
     }
 
     // Verify bot belongs to this game (skip if gameCode is undefined - older bot format)
     if (botToRemove.gameCode && botToRemove.gameCode !== gameCode) {
-      emitError(socket, 'Bot does not belong to this game');
+      emitError(socket, ErrorCodes.AUTH_FORBIDDEN, { message: 'Bot does not belong to this game' });
       return;
     }
 
@@ -314,25 +314,25 @@ function registerBotHandlers(io: Server, socket: Socket): void {
     const gameCode = getGameBySocketId(socket.id);
 
     if (!gameCode) {
-      emitError(socket, ErrorMessages.NOT_IN_GAME);
+      emitError(socket, ErrorCodes.PLAYER_NOT_IN_GAME);
       return;
     }
 
     const game = getGame(gameCode);
     if (!game) {
-      emitError(socket, ErrorMessages.GAME_NOT_FOUND);
+      emitError(socket, ErrorCodes.GAME_NOT_FOUND);
       return;
     }
 
     // Verify sender is host
     if (game.hostSocketId !== socket.id) {
-      emitError(socket, 'Only the host can enable auto-fill');
+      emitError(socket, ErrorCodes.PLAYER_NOT_HOST, { message: 'Only the host can enable auto-fill' });
       return;
     }
 
     // Check if game is in progress
     if (isInProgress(game.gameState)) {
-      emitError(socket, 'Cannot auto-fill during a game');
+      emitError(socket, ErrorCodes.GAME_ALREADY_STARTED, { message: 'Cannot auto-fill during a game' });
       return;
     }
 
@@ -391,25 +391,25 @@ function registerBotHandlers(io: Server, socket: Socket): void {
     const gameCode = getGameBySocketId(socket.id);
 
     if (!gameCode) {
-      emitError(socket, ErrorMessages.NOT_IN_GAME);
+      emitError(socket, ErrorCodes.PLAYER_NOT_IN_GAME);
       return;
     }
 
     const game = getGame(gameCode);
     if (!game) {
-      emitError(socket, ErrorMessages.GAME_NOT_FOUND);
+      emitError(socket, ErrorCodes.GAME_NOT_FOUND);
       return;
     }
 
     // Verify sender is host
     if (game.hostSocketId !== socket.id) {
-      emitError(socket, 'Only the host can enable auto-start');
+      emitError(socket, ErrorCodes.PLAYER_NOT_HOST, { message: 'Only the host can enable auto-start' });
       return;
     }
 
     // Check if game is in progress
     if (isInProgress(game.gameState)) {
-      emitError(socket, 'Cannot enable auto-start during a game');
+      emitError(socket, ErrorCodes.GAME_ALREADY_STARTED, { message: 'Cannot enable auto-start during a game' });
       return;
     }
 
@@ -429,7 +429,7 @@ function registerBotHandlers(io: Server, socket: Socket): void {
     // Check minimum players
     const playerCount = Object.keys(game.users).length;
     if (playerCount < 2) {
-      emitError(socket, 'Need at least 2 players to auto-start');
+      emitError(socket, ErrorCodes.VALIDATION_INVALID_PAYLOAD, { message: 'Need at least 2 players to auto-start' });
       return;
     }
 
