@@ -55,7 +55,7 @@ export default function Footer({ className }: FooterProps): React.ReactElement {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
           {/* Explore */}
           <nav aria-label={t('footer.explore', 'Explore')}>
-            <h3 className="text-xs font-black uppercase tracking-widest text-neo-yellow mb-3">
+            <h3 className="text-xs font-black uppercase tracking-widest text-neo-lime mb-3">
               {t('footer.explore', 'Explore')}
             </h3>
             <ul className="space-y-2">
@@ -69,7 +69,7 @@ export default function Footer({ className }: FooterProps): React.ReactElement {
 
           {/* Resources */}
           <nav aria-label={t('footer.resources', 'Resources')}>
-            <h3 className="text-xs font-black uppercase tracking-widest text-neo-yellow mb-3">
+            <h3 className="text-xs font-black uppercase tracking-widest text-neo-lime mb-3">
               {t('footer.resources', 'Resources')}
             </h3>
             <ul className="space-y-2">
@@ -83,7 +83,7 @@ export default function Footer({ className }: FooterProps): React.ReactElement {
 
           {/* Legal */}
           <nav aria-label={t('legal.title')}>
-            <h3 className="text-xs font-black uppercase tracking-widest text-neo-yellow mb-3">
+            <h3 className="text-xs font-black uppercase tracking-widest text-neo-lime mb-3">
               {t('legal.title')}
             </h3>
             <ul className="space-y-2">
@@ -96,7 +96,7 @@ export default function Footer({ className }: FooterProps): React.ReactElement {
 
           {/* Connect */}
           <div>
-            <h3 className="text-xs font-black uppercase tracking-widest text-neo-yellow mb-3">
+            <h3 className="text-xs font-black uppercase tracking-widest text-neo-lime mb-3">
               {t('footer.connect', 'Connect')}
             </h3>
             <ul className="space-y-3">

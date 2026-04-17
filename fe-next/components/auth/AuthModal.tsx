@@ -442,7 +442,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                   <Button
                     onClick={() => showAuthPrompt()}
                     disabled={isAnyLoading}
-                    className="w-full h-12 text-base font-bold rounded-neo border-3 border-neo-black bg-neo-orange text-white hover:bg-neo-orange/90 shadow-hard transition-all"
+                    className="w-full h-12 text-base font-bold rounded-neo border-3 border-neo-black bg-neo-lime text-neo-black hover:bg-neo-lime-light shadow-hard transition-all"
                     asChild={false}
                   >
                     {isLoading === 'crazygames' ? (

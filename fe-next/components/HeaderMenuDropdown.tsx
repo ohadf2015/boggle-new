@@ -361,12 +361,12 @@ const HeaderMenuDropdown = memo<HeaderMenuDropdownProps>(({
                                 <div className="mt-1">
                                     <div className="flex items-center justify-between mb-1.5">
                                         <div className="flex items-center gap-2">
-                                            <Bell className="w-3.5 h-3.5 text-neo-yellow" />
+                                            <Bell className="w-3.5 h-3.5 text-neo-lime" />
                                             <span className="text-[10px] font-black text-neo-white/30 uppercase tracking-widest">
                                                 {t('notifications.title')}
                                             </span>
                                             {notificationCount > 0 && (
-                                                <span className="min-w-[16px] h-4 px-1 flex items-center justify-center bg-neo-yellow rounded-full border border-black text-[9px] font-black text-black">
+                                                <span className="min-w-[16px] h-4 px-1 flex items-center justify-center bg-neo-lime rounded-full border border-black text-[9px] font-black text-black">
                                                     {notificationCount}
                                                 </span>
                                             )}
@@ -375,7 +375,7 @@ const HeaderMenuDropdown = memo<HeaderMenuDropdownProps>(({
                                             {notificationCount > 0 && (
                                                 <button
                                                     onClick={() => markAllAsRead()}
-                                                    className="flex items-center gap-1 text-[10px] text-neo-cyan hover:text-neo-yellow transition-colors font-bold"
+                                                    className="flex items-center gap-1 text-[10px] text-neo-cyan hover:text-neo-lime transition-colors font-bold"
                                                 >
                                                     <Check size={10} />
                                                     {t('notifications.markAllRead')}

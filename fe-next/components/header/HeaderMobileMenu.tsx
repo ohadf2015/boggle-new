@@ -496,12 +496,12 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                     <div className="mx-4 mt-2">
                                         <div className="flex items-center justify-between mb-1.5">
                                             <div className="flex items-center gap-2">
-                                                <Bell className="w-3.5 h-3.5 text-neo-yellow" />
+                                                <Bell className="w-3.5 h-3.5 text-neo-lime" />
                                                 <span className="text-[10px] font-black text-neo-white/30 uppercase tracking-widest">
                                                     {t('notifications.title')}
                                                 </span>
                                                 {notificationCount > 0 && (
-                                                    <span className="min-w-[16px] h-4 px-1 flex items-center justify-center bg-neo-yellow rounded-full border border-black text-[9px] font-black text-black">
+                                                    <span className="min-w-[16px] h-4 px-1 flex items-center justify-center bg-neo-lime rounded-full border border-black text-[9px] font-black text-black">
                                                         {notificationCount}
                                                     </span>
                                                 )}
@@ -509,7 +509,7 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                             {notificationCount > 0 && (
                                                 <button
                                                     onClick={() => markAllAsRead()}
-                                                    className="flex items-center gap-1 text-[10px] text-neo-cyan hover:text-neo-yellow transition-colors font-bold"
+                                                    className="flex items-center gap-1 text-[10px] text-neo-cyan hover:text-neo-lime transition-colors font-bold"
                                                 >
                                                     <Check size={10} />
                                                     {t('notifications.markAllRead')}
@@ -700,7 +700,7 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                     <m.div variants={itemVariants}>
                                         <div className="grid grid-cols-2 gap-1.5">
                                             <InfoLink href={`/${language}/about`} onClick={closeMenu} icon={<Info className="w-3.5 h-3.5" />} color="bg-neo-cyan/20 text-neo-cyan">{t('footer.about')}</InfoLink>
-                                            <InfoLink href={`/${language}/faq`} onClick={closeMenu} icon={<HelpCircle className="w-3.5 h-3.5" />} color="bg-neo-yellow/20 text-neo-yellow">{t('footer.faq')}</InfoLink>
+                                            <InfoLink href={`/${language}/faq`} onClick={closeMenu} icon={<HelpCircle className="w-3.5 h-3.5" />} color="bg-neo-purple/20 text-neo-purple">{t('footer.faq')}</InfoLink>
                                             <InfoLink href={`/${language}/leaderboard`} onClick={closeMenu} icon={<Trophy className="w-3.5 h-3.5" />} color="bg-neo-lime/20 text-neo-lime">{t('footer.leaderboard')}</InfoLink>
                                             <InfoLink href={`/${language}/contact`} onClick={closeMenu} icon={<Mail className="w-3.5 h-3.5" />} color="bg-neo-white/10 text-neo-white/60">{t('footer.contact')}</InfoLink>
                                             <InfoLink href={`/${language}/legal`} onClick={closeMenu} icon={<ScrollText className="w-3.5 h-3.5" />} color="bg-neo-pink/20 text-neo-pink-light">{t('legal.title')}</InfoLink>

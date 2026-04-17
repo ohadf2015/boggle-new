@@ -267,7 +267,7 @@ const MusicControls: React.FC = memo(() => {
                 )}
 
                 {!audioUnlocked && (
-                  <span className="text-xs font-bold text-neo-orange">
+                  <span className="text-xs font-bold text-neo-cream/70">
                     {t('music.clickToEnable')}
                   </span>
                 )}

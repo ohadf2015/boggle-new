@@ -52,7 +52,7 @@ export default function FAQPageClient(): React.ReactElement {
               'text-4xl font-black uppercase flex items-center gap-3',
               isDarkMode ? 'text-white' : 'text-neo-black'
             )}>
-              <HelpCircle className="w-8 h-8 text-neo-yellow" />
+              <HelpCircle className="w-8 h-8 text-neo-lime" />
               {c.title}
             </h1>
             <p className={cn('text-sm mt-2', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>
@@ -93,7 +93,7 @@ export default function FAQPageClient(): React.ReactElement {
                     >
                       <button
                         onClick={() => setOpenIndex(isOpen ? null : globalIndex)}
-                        className="w-full flex items-center justify-between p-4 text-left"
+                        className="w-full flex items-center justify-between p-4 text-start"
                         aria-expanded={isOpen}
                       >
                         <span className={cn(
@@ -103,7 +103,7 @@ export default function FAQPageClient(): React.ReactElement {
                           {item.question}
                         </span>
                         {isOpen ? (
-                          <ChevronUp className="w-5 h-5 shrink-0 text-neo-yellow" />
+                          <ChevronUp className="w-5 h-5 shrink-0 text-neo-lime" />
                         ) : (
                           <ChevronDown className="w-5 h-5 shrink-0 text-gray-500" />
                         )}
@@ -133,7 +133,7 @@ export default function FAQPageClient(): React.ReactElement {
         {/* Contact CTA */}
         <div className={cn(
           'mt-12 p-6 rounded-neo border-3 border-neo-black text-center',
-          isDarkMode ? 'bg-slate-800' : 'bg-neo-yellow/20'
+          isDarkMode ? 'bg-slate-800' : 'bg-neo-lime/20'
         )}>
           <h3 className={cn('text-xl font-bold mb-2', isDarkMode ? 'text-white' : 'text-neo-black')}>
             {c.stillHaveQuestions}

@@ -20,7 +20,11 @@
 - Error: `neo-red` (#FF3366)
 - Background: `neo-navy` (#1a1a2e), `neo-navy-light` (#16213e)
 - Text: `neo-white`, `neo-cream` (#FFFEF0)
-- DEPRECATED (do not use in new code): `neo-yellow`, `neo-orange`
+- Semantic Accents (RESERVED — do NOT use for generic chrome/CTAs):
+  - `neo-yellow` (#FFE135): celebration/gold — star ratings, level completion, daily-challenge winner, podium gold, boss victory, coin/XP rewards
+  - `neo-orange` (#FF6B35): warmth/streak — streak fire, on-fire combos, comeback bonus, urgency (timer nearing zero)
+  - Warning semantic — yellow/orange also allowed for non-critical warnings (alert `warning` variant, toast `warning` type, error-boundary soft warnings). `neo-red` stays for destructive/critical errors.
+  - For any other use (buttons, backgrounds, borders, icons without celebratory/warning meaning), pick from the 4 primary families above.
 
 **Typography:**
 - Display: Fredoka (`font-neo-display`)
