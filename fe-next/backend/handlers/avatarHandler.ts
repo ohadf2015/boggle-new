@@ -6,7 +6,7 @@
 import type { Server, Socket } from 'socket.io';
 import { getGame, getGameBySocketId, getUsernameBySocketId } from '../modules/gameStateManager';
 import { broadcastToRoom, getGameRoom } from '../utils/socketHelpers';
-import { emitError, ErrorMessages } from '../utils/errorHandler';
+import { emitError, ErrorCodes } from '../utils/errorHandler';
 import { checkRateLimit } from '../utils/rateLimiter';
 import { isSocketMigrating } from './shared';
 import { z } from 'zod';
@@ -35,7 +35,7 @@ function registerAvatarHandlers(io: Server, socket: Socket): void {
 
     const parsed = updateAvatarSchema.safeParse(data);
     if (!parsed.success) {
-      emitError(socket, 'Invalid avatar data');
+      emitError(socket, ErrorCodes.VALIDATION_INVALID_PAYLOAD, { message: 'Invalid avatar data' });
       return;
     }
 
@@ -44,13 +44,13 @@ function registerAvatarHandlers(io: Server, socket: Socket): void {
     const username = getUsernameBySocketId(socket.id);
 
     if (!gameCode || !username) {
-      emitError(socket, ErrorMessages.INVALID_MESSAGE);
+      emitError(socket, ErrorCodes.PLAYER_NOT_IN_GAME);
       return;
     }
 
     const game = getGame(gameCode);
     if (!game) {
-      emitError(socket, ErrorMessages.GAME_NOT_FOUND);
+      emitError(socket, ErrorCodes.GAME_NOT_FOUND);
       return;
     }
 
