@@ -14,10 +14,11 @@ import { useFeatureFlag } from '@/hooks/useFeatureFlag';
 import { usePartySocket } from '@/hooks/usePartySocket';
 import { PARTY_GAMES, type PartyGameId } from '@/shared/types/partyGame';
 import dynamic from 'next/dynamic';
+import { GameLoadingFallback } from '@/components/ui/GameLoadingFallback';
 
-const CaptionClashPhone = dynamic(() => import('@/components/party/caption-clash/CaptionClashPhone'), { ssr: false });
-const PixelClashPhone = dynamic(() => import('@/components/party/pixel-clash/PixelClashPhone'), { ssr: false });
-const ShadowClashPhone = dynamic(() => import('@/components/party/shadow-clash/ShadowClashPhone'), { ssr: false });
+const CaptionClashPhone = dynamic(() => import('@/components/party/caption-clash/CaptionClashPhone'), { ssr: false, loading: () => <GameLoadingFallback /> });
+const PixelClashPhone = dynamic(() => import('@/components/party/pixel-clash/PixelClashPhone'), { ssr: false, loading: () => <GameLoadingFallback /> });
+const ShadowClashPhone = dynamic(() => import('@/components/party/shadow-clash/ShadowClashPhone'), { ssr: false, loading: () => <GameLoadingFallback /> });
 
 export default function PartyPlayClient() {
   const params = useParams();

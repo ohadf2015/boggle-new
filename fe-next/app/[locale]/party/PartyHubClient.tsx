@@ -107,7 +107,7 @@ export default function PartyHubClient() {
                 className={`
                   ${accent.bg} ${accent.shadow}
                   border-3 border-neo-black rounded-neo-lg
-                  p-5 text-left
+                  p-5 text-start
                   transition-all duration-100
                   hover:-translate-x-px hover:-translate-y-px hover:shadow-hard-lg
                   active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed

@@ -15,10 +15,11 @@ import { usePartySocket } from '@/hooks/usePartySocket';
 import { PARTY_GAMES, type PartyGameId } from '@/shared/types/partyGame';
 import PartyTvLobby from '@/components/party/shared/PartyTvLobby';
 import dynamic from 'next/dynamic';
+import { GameLoadingFallback } from '@/components/ui/GameLoadingFallback';
 
-const CaptionClashTv = dynamic(() => import('@/components/party/caption-clash/CaptionClashTv'), { ssr: false });
-const PixelClashTv = dynamic(() => import('@/components/party/pixel-clash/PixelClashTv'), { ssr: false });
-const ShadowClashTv = dynamic(() => import('@/components/party/shadow-clash/ShadowClashTv'), { ssr: false });
+const CaptionClashTv = dynamic(() => import('@/components/party/caption-clash/CaptionClashTv'), { ssr: false, loading: () => <GameLoadingFallback /> });
+const PixelClashTv = dynamic(() => import('@/components/party/pixel-clash/PixelClashTv'), { ssr: false, loading: () => <GameLoadingFallback /> });
+const ShadowClashTv = dynamic(() => import('@/components/party/shadow-clash/ShadowClashTv'), { ssr: false, loading: () => <GameLoadingFallback /> });
 
 export default function PartyHostClient() {
   const params = useParams();
