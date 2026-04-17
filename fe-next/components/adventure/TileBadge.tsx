@@ -96,7 +96,6 @@ export function TileBadge({ type, isFrozen = false }: TileBadgeProps) {
         className={cn(
           'frost-overlay absolute inset-0 rounded-neo',
           'bg-linear-to-br from-white/50 via-cyan-100/40 to-blue-200/50',
-          'backdrop-blur-[2px]',
           'pointer-events-none z-5'
         )}
       />

@@ -353,7 +353,7 @@ export const BlastTile = memo(function BlastTile({
         <span
           data-testid="locked-overlay"
           className={`absolute inset-0 rounded-neo pointer-events-none z-20 flex flex-col items-center justify-center gap-0 ${
-            isDiamondRevealed ? 'bg-white/15 border-2 border-dashed border-cyan-300/50' : 'bg-blue-900/40 backdrop-blur-[1px]'
+            isDiamondRevealed ? 'bg-white/15 border-2 border-dashed border-cyan-300/50' : 'bg-blue-900/40'
           }`}
           aria-hidden="true"
         >

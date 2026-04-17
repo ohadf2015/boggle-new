@@ -98,12 +98,12 @@ describe('TileBadge', () => {
       expect(frostOverlay).not.toBeInTheDocument();
     });
 
-    it('should have gradient and blur-sm on frost overlay', () => {
+    it('should have gradient on frost overlay without backdrop-blur (perf: removed sub-perceptible blur)', () => {
       const { container } = render(<TileBadge type="ice" isFrozen={true} />);
 
       const frostOverlay = container.querySelector('.frost-overlay');
       expect(frostOverlay).toHaveClass('bg-linear-to-br');
-      expect(frostOverlay).toHaveClass('backdrop-blur-[2px]');
+      expect(frostOverlay).not.toHaveClass('backdrop-blur-[2px]');
     });
   });
 
