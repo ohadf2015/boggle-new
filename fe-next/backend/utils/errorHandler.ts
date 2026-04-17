@@ -428,7 +428,8 @@ export function emitError(socket: Socket, codeOrMessage: string, options: EmitEr
       code: options.code || ErrorCodes.INTERNAL_ERROR,
       message: codeOrMessage
     };
-    logger.debug('SOCKET_ERROR', `[LEGACY] ${codeOrMessage}`, { socketId: socket.id });
+    // Warn (not debug) so prod logs surface remaining untyped emit sites — guides migration to typed ErrorCodes.
+    logger.warn('SOCKET_ERROR', `[LEGACY] ${codeOrMessage}`, { socketId: socket.id });
   }
 
   socket.emit('error', errorPayload);
