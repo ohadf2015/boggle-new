@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, memo } from 'react';
+import React, { useState, useEffect, useCallback, memo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Hand } from 'lucide-react';
 
@@ -61,13 +61,32 @@ const SwipeTipTooltip = memo<SwipeTipTooltipProps>(
     const [showSuccess, setShowSuccess] = useState(false);
     const [fingerPosition, setFingerPosition] = useState<{ x: number; y: number } | null>(null);
     const [isPopping, setIsPopping] = useState(false);
+    const timerIdsRef = useRef<Set<ReturnType<typeof setTimeout>>>(new Set());
+
+    const scheduleTimer = useCallback((cb: () => void, delay: number) => {
+      const id = setTimeout(() => {
+        timerIdsRef.current.delete(id);
+        cb();
+      }, delay);
+      timerIdsRef.current.add(id);
+      return id;
+    }, []);
+
+    // Clear all pending timeouts on unmount
+    useEffect(() => {
+      const timerIds = timerIdsRef.current;
+      return () => {
+        timerIds.forEach(id => clearTimeout(id));
+        timerIds.clear();
+      };
+    }, []);
 
     // Handle dismiss with pop animation
     const handleDismiss = useCallback(() => {
       setIsPopping(true);
       // Let animation play before actual dismiss
-      setTimeout(onDismiss, 300);
-    }, [onDismiss]);
+      scheduleTimer(onDismiss, 300);
+    }, [onDismiss, scheduleTimer]);
 
     // Select grid and path based on direction
     const isRTL = dir === 'rtl';
@@ -89,7 +108,7 @@ const SwipeTipTooltip = memo<SwipeTipTooltipProps>(
 
       // Animate each cell selection with delay and finger movement
       DEMO_PATH.forEach((cell, index) => {
-        setTimeout(() => {
+        scheduleTimer(() => {
           setSelectedCells((prev) => [...prev, cell]);
           // Position finger at current cell
           setFingerPosition({
@@ -100,13 +119,13 @@ const SwipeTipTooltip = memo<SwipeTipTooltipProps>(
       });
 
       // Show success after path completes
-      setTimeout(
+      scheduleTimer(
         () => {
           setShowSuccess(true);
           setFingerPosition(null); // Hide finger on success
 
           // Reset and replay after showing success
-          setTimeout(() => {
+          scheduleTimer(() => {
             setSelectedCells([]);
             setShowSuccess(false);
             setIsAnimating(false);
@@ -114,7 +133,7 @@ const SwipeTipTooltip = memo<SwipeTipTooltipProps>(
         },
         DEMO_PATH.length * 350 + 300
       );
-    }, [isAnimating, DEMO_PATH]);
+    }, [isAnimating, DEMO_PATH, scheduleTimer]);
 
     // Auto-start animation when visible
     useEffect(() => {
