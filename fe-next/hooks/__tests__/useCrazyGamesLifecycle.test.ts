@@ -6,12 +6,13 @@ import { renderHook, act } from '@testing-library/react';
 import { useCrazyGamesLifecycle } from '../useCrazyGamesLifecycle';
 
 // Mock the CrazyGames SDK
-const { mockGameplayStart, mockGameplayStop, mockHappyTime, mockShowMidgameAd } = vi.hoisted(() => {
+const { mockGameplayStart, mockGameplayStop, mockHappyTime, mockShowMidgameAd, mockTrackEvent } = vi.hoisted(() => {
   const mockGameplayStart = vi.fn();
   const mockGameplayStop = vi.fn();
   const mockHappyTime = vi.fn();
   const mockShowMidgameAd = vi.fn();
-  return { mockGameplayStart, mockGameplayStop, mockHappyTime, mockShowMidgameAd };
+  const mockTrackEvent = vi.fn();
+  return { mockGameplayStart, mockGameplayStop, mockHappyTime, mockShowMidgameAd, mockTrackEvent };
 });
 vi.mock('@/components/CrazyGamesSDK', () => ({
   useCrazyGames: () => ({
@@ -19,6 +20,7 @@ vi.mock('@/components/CrazyGamesSDK', () => ({
     gameplayStop: mockGameplayStop,
     happyTime: mockHappyTime,
     showMidgameAd: mockShowMidgameAd,
+    trackEvent: mockTrackEvent,
     isAvailable: true,
     isOnCrazyGamesPlatform: true,
   }),

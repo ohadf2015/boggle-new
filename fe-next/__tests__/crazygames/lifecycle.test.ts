@@ -29,6 +29,7 @@ vi.mock('@/components/CrazyGamesSDK', () => ({
     gameplayStop: mockGameplayStop,
     happyTime: mockHappyTime,
     showMidgameAd: mockShowMidgameAd,
+    trackEvent: vi.fn(),
   }),
 }));
 

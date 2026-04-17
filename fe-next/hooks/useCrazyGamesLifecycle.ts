@@ -122,6 +122,7 @@ export function useCrazyGamesLifecycle({
     happyTime,
     loadingStart,
     loadingStop,
+    trackEvent,
     showMidgameAd: sdkShowMidgameAd,
     isAvailable,
     isOnCrazyGamesPlatform,
@@ -231,6 +232,7 @@ export function useCrazyGamesLifecycle({
       lastMaxComboRef.current = maxCombo;
       lastWordsFoundRef.current = wordsFound;
       gameplayStart();
+      trackEvent('game_start');
       onGameplayStart?.();
 
       if (process.env.NODE_ENV === 'development') {
@@ -238,7 +240,7 @@ export function useCrazyGamesLifecycle({
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps -- score/maxCombo/wordsFound intentionally excluded: only snapshot initial values via refs
-  }, [isGameActive, isGameOver, gameplayStart, loadingStop, onGameplayStart]);
+  }, [isGameActive, isGameOver, gameplayStart, loadingStop, onGameplayStart, trackEvent]);
 
   // Handle gameplay end
   useEffect(() => {
@@ -248,13 +250,14 @@ export function useCrazyGamesLifecycle({
       setHasEnded(true);
       setIsPlaying(false);
       gameplayStop();
+      trackEvent('game_end');
       onGameplayStop?.();
 
       if (process.env.NODE_ENV === 'development') {
         console.log('[CrazyGames Lifecycle] gameplayStop called (game over)');
       }
     }
-  }, [isGameOver, gameplayStop, onGameplayStop]);
+  }, [isGameOver, gameplayStop, onGameplayStop, trackEvent]);
 
   // Handle happyTime for winner
   useEffect(() => {

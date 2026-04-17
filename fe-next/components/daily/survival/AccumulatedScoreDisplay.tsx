@@ -138,7 +138,7 @@ export const AccumulatedScoreDisplay: React.FC<AccumulatedScoreDisplayProps> = (
                 exit={{ opacity: 0, scale: 0 }}
                 transition={{ duration: 0.55, ease: 'easeOut' }}
                 className={cn(
-                  'absolute -top-5 -right-4',
+                  'absolute -top-5 left-1/2 -translate-x-1/2',
                   'px-1.5 py-0.5',
                   'text-[11px] font-black font-neo-display',
                   'rounded-full',
