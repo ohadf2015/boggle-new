@@ -38,11 +38,9 @@ import { useFlashChallenge } from '@/hooks/useFlashChallenge';
 import { useDailyQuests } from '@/hooks/useDailyQuests';
 import { useChapterQuests } from '@/hooks/useChapterQuests';
 import { getChapterNumber } from '@/lib/adventure/questConfig';
-import { getMasteryAura } from '@/lib/adventure/powerGrowth';
 import { applyGemDetectorBoost, LEVELS_PER_WORLD } from '@/lib/adventure';
-import { getStoryBeat } from '@/lib/adventure/storyConfig';
-import { getStreakMilestone } from '@/lib/adventure/adventureStreak';
 import AdventureGameShell from './AdventureGameShell';
+import { useAdventureDerivations } from './hooks/useAdventureDerivations';
 import { hasSeenTutorial } from './AdventureTutorial';
 import { useAdventureGameCallbacks } from './hooks/useAdventureGameCallbacks';
 import { useAdventureOverlayProps } from './hooks/useAdventureOverlayProps';
@@ -166,19 +164,6 @@ const AdventureGame = memo<AdventureGameProps>(
       },
       [persistCompletion]
     );
-    const bestAttempt = useMemo(
-      () => getLevelAttempt(levelConfig.world, levelConfig.level),
-      [getLevelAttempt, levelConfig.world, levelConfig.level]
-    );
-    const streakMilestone = useMemo(
-      () => getStreakMilestone(progression?.streak?.currentStreak ?? 0),
-      [progression?.streak?.currentStreak]
-    );
-    const previousBestStars = useMemo(
-      () => getLevelCompletion?.(levelConfig.world, levelConfig.level)?.stars ?? 0,
-      [getLevelCompletion, levelConfig.world, levelConfig.level]
-    );
-
     const [isPaused, setIsPaused] = useState(false);
     const [showLevelComplete, setShowLevelComplete] = useState(false);
     const [showLootChest, setShowLootChest] = useState(false);
@@ -186,8 +171,6 @@ const AdventureGame = memo<AdventureGameProps>(
     const [showStoryBeat, setShowStoryBeat] = useState(false);
     const [showTutorial, setShowTutorial] = useState(() => !hasSeenTutorial());
     const [detonateActive, setDetonateActive] = useState(false);
-    const masteryAura = useMemo(() => getMasteryAura(init.currentLevel), [init.currentLevel]);
-    const storyBeat = useMemo(() => getStoryBeat(levelConfig.world, levelConfig.level), [levelConfig.world, levelConfig.level]);
     const cinematics = useAdventureCinematics();
     const entryPhaseManager = useAdventureEntryPhase();
     const { entryPhase } = entryPhaseManager;
@@ -286,10 +269,6 @@ const AdventureGame = memo<AdventureGameProps>(
     });
 
     const getScoreMultiplier = useCallback(() => 1, []);
-    const augmentedSkillEffects = useMemo(() => ({
-      ...init.skillEffects,
-      bossDamageMultiplier: init.skillEffects.bossDamageMultiplier * init.runeEffects.bossDamage * forgeEffects.bossDamage,
-    }), [init.skillEffects, init.runeEffects.bossDamage, forgeEffects.bossDamage]);
 
     const minWordLength = levelConfig.minWordLength ?? 2;
     const { validateWord, isValidating, solvedWords } = useAdventureWordValidation({
@@ -338,29 +317,25 @@ const AdventureGame = memo<AdventureGameProps>(
       isPlaying: isPlaying && entryPhase === 'playing', isPaused, isModalOpen, isBossLevel,
     });
 
-    // Coarsen timeRemaining to avoid re-render every second — only changes at the 10s threshold
-    const coarseTimeRemaining = timeRemaining <= 10 ? timeRemaining : 11;
-    const lexiGameState = useMemo(() => ({
-      wordsFound: gameState.wordsFound, comboCount: gameState.comboCount, timeRemaining: coarseTimeRemaining,
-      isComplete: gameState.isComplete, stars: gameState.stars, worldId: levelConfig.world,
-    }), [gameState.wordsFound, gameState.comboCount, coarseTimeRemaining, gameState.isComplete, gameState.stars, levelConfig.world]);
+    const {
+      bestAttempt, streakMilestone, previousBestStars, masteryAura, storyBeat,
+      augmentedSkillEffects, forgeAugmentedBonuses, lexiGameState, getPopupStartPosition,
+    } = useAdventureDerivations({
+      init,
+      forgeEffects,
+      levelConfig,
+      progression,
+      getLevelAttempt,
+      getLevelCompletion,
+      gameState,
+      timeRemaining,
+      selectedIndices,
+      gridRef,
+    });
 
     const effects = useAdventureEffects({
       gameStateForReactions: { gameState: lexiGameState, isPlaying: isPlaying && entryPhase === 'playing' && !isPaused },
     });
-
-    const getPopupStartPosition = useCallback(() => {
-      if (selectedIndices.length === 0) return { x: window.innerWidth / 2, y: window.innerHeight / 2 };
-      const el = gridRef.current?.querySelectorAll('[role="gridcell"]')[selectedIndices[selectedIndices.length - 1]];
-      if (el) { const r = el.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; }
-      return { x: window.innerWidth / 2, y: window.innerHeight / 2 };
-    }, [selectedIndices, gridRef]);
-
-    // Merge forge-picked rune score bonus into upgrade bonuses
-    const forgeAugmentedBonuses = useMemo(() => ({
-      ...init.upgradeBonuses,
-      scoreBonus: init.upgradeBonuses.scoreBonus * forgeEffects.scoreMultiplier,
-    }), [init.upgradeBonuses, forgeEffects.scoreMultiplier]);
 
     const wordSubmit = useAdventureWordSubmit({
       isPlaying, isPaused, isValidating, isCascading, currentWord, selectedIndices, tiles,
