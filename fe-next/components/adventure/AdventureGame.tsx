@@ -49,6 +49,7 @@ import AdventureGameOverlays from './AdventureGameOverlays';
 import AdventureTailOverlays from './AdventureTailOverlays';
 import { hasSeenTutorial } from './AdventureTutorial';
 import { useAdventureGameCallbacks } from './hooks/useAdventureGameCallbacks';
+import { useAdventureOverlayProps } from './hooks/useAdventureOverlayProps';
 import { useAdventureQuestTracking } from './hooks/useAdventureQuestTracking';
 import { useAdventureGridInteraction } from './hooks/useAdventureGridInteraction';
 import { useCrazyGamesLifecycle } from '@/hooks/useCrazyGamesLifecycle';
@@ -548,6 +549,25 @@ const AdventureGame = memo<AdventureGameProps>(
       setDetonateActive, handlePauseToggle: gridInteraction.handlePauseToggle,
     });
 
+    const overlayProps = useAdventureOverlayProps({
+      bossOrch, cinematics, effects, levelCompletion, flashChallenge,
+      gameState, modeState, init, levelConfig,
+      isBossLevel, showLevelComplete, showLootChest, showStoryBeat, storyBeat,
+      isPaused, entryPhase, timeRemaining, retriesUsed,
+      objectives, totalStars, bestAttempt: bestAttempt ?? null, previousBestStars,
+      streakMilestone, isGuest,
+      isLastLevelOfWorld: levelConfig.level === LEVELS_PER_WORLD,
+      t, saveCompletionToDb,
+      handleContinue, handleRetry, onExit,
+      handleCinematicComplete,
+      handlePauseToggle: gridInteraction.handlePauseToggle,
+      handleEntryPhaseComplete,
+      handleStoryBeatContinue,
+      handleLootChestComplete,
+      handlePopupComplete: gridInteraction.handlePopupComplete,
+      onNextWorld,
+    });
+
     if (!isValidConfig) {
       return (
         <div data-testid="adventure-game" role="main" className="flex items-center justify-center h-full">
@@ -650,77 +670,7 @@ const AdventureGame = memo<AdventureGameProps>(
               chapterQuestProgress={chapterQuests.progress}
               className="border-b-2 lg:border-b-0 lg:border-s-2 border-neo-black/30" />
           }
-          overlays={
-            <AdventureGameOverlays
-              bossConfig={bossOrch.bossConfig}
-              bossTaunt={bossOrch.bossTaunt} showBossIntro={bossOrch.showBossIntro}
-              handleBossIntroStart={bossOrch.handleBossIntroStart}
-              handleBossIntroSkip={bossOrch.handleBossIntroSkip}
-              bossHealthState={bossOrch.bossHealthState} bossEffectCallbacks={bossOrch.bossEffectCallbacks}
-              isBossLevel={isBossLevel} isBossActive={bossOrch.isBossActive}
-              showBossFireworks={bossOrch.showBossFireworks} defeatedBossTier={bossOrch.defeatedBossTier}
-              showEdgeVignette={bossOrch.showEdgeVignette} playerHealthState={bossOrch.playerHealthState}
-              showLevelComplete={showLevelComplete} gameStars={gameState.stars}
-              gameScore={gameState.score} wordsFound={gameState.wordsFound} gameState={gameState}
-              handleContinue={handleContinue} handleRetry={handleRetry} onExit={onExit}
-              handleCinematicComplete={handleCinematicComplete} handlePauseToggle={gridInteraction.handlePauseToggle}
-              handleEntryPhaseComplete={handleEntryPhaseComplete}
-              handleStoryBeatContinue={handleStoryBeatContinue} handleLootChestComplete={handleLootChestComplete}
-              handlePopupComplete={gridInteraction.handlePopupComplete}
-              activeChallenge={flashChallenge.activeChallenge} isChallengeComplete={flashChallenge.isChallengeComplete}
-              isChallengeFailed={flashChallenge.isChallengeFailed}
-              dismissChallenge={flashChallenge.dismiss} challengeTimeLeft={flashChallenge.challengeTimeLeft}
-              isPaused={isPaused} entryPhase={entryPhase}
-              levelNumber={levelConfig.level} worldNumber={levelConfig.world}
-              showVictoryCinematic={cinematics.showVictoryCinematic}
-              showDefeatCinematic={cinematics.showDefeatCinematic}
-              showWorldUnlockCinematic={cinematics.showWorldUnlockCinematic}
-              worldUnlockProps={cinematics.worldUnlockProps}
-              timeRemaining={timeRemaining} t={t}
-              showLootChest={showLootChest} lootDrops={levelCompletion.lootDrops}
-              objectives={objectives} totalStars={totalStars} bestAttempt={bestAttempt ?? null} previousBestStars={previousBestStars}
-              earnedXp={levelCompletion.earnedXp} earnedGold={levelCompletion.earnedGold}
-              isLastLevelOfWorld={levelConfig.level === LEVELS_PER_WORLD} onNextWorld={onNextWorld}
-              saveFailed={!isGuest && levelCompletion.completionSaveFailedRef?.current && showLevelComplete}
-              onRetrySave={() => {
-                const longWords = gameState.wordsFound.filter((w: string) => w.length >= 6).length;
-                const timePlayed = Math.max(0, Math.floor((init.adjustedLevelConfig.timerSeconds ?? 120) - timeRemaining));
-                saveCompletionToDb(
-                  levelConfig.world, levelConfig.level,
-                  gameState.stars as 0 | 1 | 2 | 3,
-                  gameState.score, gameState.wordsFound.length,
-                  levelCompletion.earnedGold, longWords, gameState.wordsFound,
-                  undefined, timePlayed
-                ).then((ok) => {
-                  if (ok) {
-                    if (levelCompletion.completionSaveFailedRef) levelCompletion.completionSaveFailedRef.current = false;
-                    if (levelCompletion.completionSavedRef) levelCompletion.completionSavedRef.current = true;
-                  }
-                });
-              }}
-              retriesUsed={retriesUsed} freeRetriesPerWorld={init.upgradeEffects.freeRetriesPerWorld ?? 0}
-              storyBeat={storyBeat} showStoryBeat={showStoryBeat}
-              currentPopup={effects.currentPopup} scoreDisplayRef={effects.scoreDisplayRef}
-              reaction={effects.reaction} dismissReaction={effects.dismissReaction}
-              chainBurstConfig={effects.chainBurstConfig} setChainBurstConfig={effects.setChainBurstConfig}
-              particleConfig={effects.particleConfig} setParticleConfig={effects.setParticleConfig}
-              pendingExplosions={effects.pendingExplosions} removeExplosion={effects.removeExplosion}
-              levelUpData={levelCompletion.levelUpData} handleLevelUpClose={levelCompletion.handleLevelUpClose}
-              currentMilestone={init.currentMilestone}
-              streakMilestone={streakMilestone}
-              modeStats={modeState.archetype !== 'classic' && modeState.archetype !== 'boss' ? {
-                archetype: modeState.archetype,
-                movesRemaining: gameState.movesRemaining,
-                movesTotal: modeState.movesLimit,
-                huntAttempts: gameState.huntAttempts?.length,
-                huntFound: gameState.huntFound,
-                centerLetterWords: modeState.centerLetterRequired
-                  ? gameState.wordsFound.filter(w => w.toLowerCase().includes((modeState.centerLetter ?? '').toLowerCase())).length
-                  : undefined,
-                totalWords: gameState.wordsFound.length,
-              } : null}
-            />
-          }
+          overlays={<AdventureGameOverlays {...overlayProps} />}
         />
         <AdventureTailOverlays
           archetype={modeState.archetype}
