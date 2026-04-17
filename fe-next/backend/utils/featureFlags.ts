@@ -23,12 +23,35 @@ export interface FeatureFlag {
   created_at: string;
 }
 
+export const FLAG_CACHE_TTL_MS = 60_000;
+
+interface CacheEntry {
+  value: FeatureFlag | null;
+  expiresAt: number;
+}
+
+const flagCache = new Map<string, CacheEntry>();
+
+/** Test-only: clear the in-memory cache. */
+export function __clearFlagCache(): void {
+  flagCache.clear();
+}
+
+function invalidateFlag(flagName: string): void {
+  flagCache.delete(flagName);
+}
+
 /**
- * Get feature flag configuration from database
- * @param flagName Name of the feature flag
- * @returns Feature flag configuration or null if not found
+ * Get feature flag configuration from database (with 60s in-memory cache).
+ * Null (missing flag) is also cached to avoid repeated PGRST116 errors.
  */
 export async function getFeatureFlag(flagName: string): Promise<FeatureFlag | null> {
+  const now = Date.now();
+  const cached = flagCache.get(flagName);
+  if (cached && cached.expiresAt > now) {
+    return cached.value;
+  }
+
   const client = getSupabase();
   if (!client) {
     logger.warn('FLAGS', 'Supabase not configured - feature flags unavailable');
@@ -40,7 +63,7 @@ export async function getFeatureFlag(flagName: string): Promise<FeatureFlag | nu
       .from('feature_flags')
       .select('*')
       .eq('flag_name', flagName)
-      .single();
+      .maybeSingle();
 
     if (error) {
       const errorMessage = error.message || 'Unknown error';
@@ -48,7 +71,9 @@ export async function getFeatureFlag(flagName: string): Promise<FeatureFlag | nu
       return null;
     }
 
-    return data;
+    const value = (data as FeatureFlag | null) ?? null;
+    flagCache.set(flagName, { value, expiresAt: now + FLAG_CACHE_TTL_MS });
+    return value;
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     logger.error('FLAGS', `Error fetching feature flag ${flagName}`, { error: errorMessage });
@@ -190,6 +215,7 @@ export async function setFeatureFlag(
       return false;
     }
 
+    invalidateFlag(flagName);
     return true;
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
@@ -222,6 +248,7 @@ export async function deleteFeatureFlag(flagName: string): Promise<boolean> {
       return false;
     }
 
+    invalidateFlag(flagName);
     return true;
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
