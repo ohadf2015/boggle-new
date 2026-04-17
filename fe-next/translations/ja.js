@@ -10352,6 +10352,18 @@ const ja = {
       "nullifier": "最初の2つのルーンスロットが無効",
       "inverter": "チップルーン無効、倍率のみ有効"
     }
+  },
+  "socketErrors": {
+    "AUTH_REQUIRED": "この操作にはサインインが必要です",
+    "GAME_NOT_FOUND": "ゲームが見つかりません。コードを確認してください！",
+    "GAME_NOT_IN_PROGRESS": "ゲームは現在進行中ではありません",
+    "PLAYER_NOT_IN_GAME": "ゲームに参加していません",
+    "PLAYER_NOT_HOST": "ホストのみが実行できます",
+    "VALIDATION_FAILED": "無効なリクエスト",
+    "VALIDATION_INVALID_PAYLOAD": "無効なリクエストデータ",
+    "VALIDATION_MISSING_FIELD": "必須フィールドがありません",
+    "WORD_PROCESSING_ERROR": "単語を処理できませんでした。もう一度お試しください。",
+    "INTERNAL_ERROR": "問題が発生しました。もう一度お試しください。"
   }
 };
 

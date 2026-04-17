@@ -10436,6 +10436,18 @@ const es = {
       "nullifier": "Tus 2 primeras ranuras de runas están desactivadas",
       "inverter": "Runas de chip desactivadas, solo funcionan los multiplicadores"
     }
+  },
+  "socketErrors": {
+    "AUTH_REQUIRED": "Se requiere iniciar sesión para esta acción",
+    "GAME_NOT_FOUND": "Partida no encontrada. ¡Revisa el código!",
+    "GAME_NOT_IN_PROGRESS": "La partida no está en curso ahora",
+    "PLAYER_NOT_IN_GAME": "No estás en una partida",
+    "PLAYER_NOT_HOST": "Solo el anfitrión puede hacer eso",
+    "VALIDATION_FAILED": "Solicitud no válida",
+    "VALIDATION_INVALID_PAYLOAD": "Datos de solicitud no válidos",
+    "VALIDATION_MISSING_FIELD": "Falta un campo obligatorio",
+    "WORD_PROCESSING_ERROR": "No se pudo procesar tu palabra. Inténtalo de nuevo.",
+    "INTERNAL_ERROR": "Algo falló. Inténtalo de nuevo."
   }
 };
 

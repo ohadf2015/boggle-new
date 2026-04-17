@@ -10352,6 +10352,18 @@ const sv = {
       "nullifier": "Dina 2 första runplatser är avaktiverade",
       "inverter": "Chiprunor avaktiverade, bara multiplikatorer fungerar"
     }
+  },
+  "socketErrors": {
+    "AUTH_REQUIRED": "Inloggning krävs för denna åtgärd",
+    "GAME_NOT_FOUND": "Spelet hittades inte. Kontrollera koden!",
+    "GAME_NOT_IN_PROGRESS": "Spelet pågår inte just nu",
+    "PLAYER_NOT_IN_GAME": "Du är inte i ett spel",
+    "PLAYER_NOT_HOST": "Endast värden kan göra det",
+    "VALIDATION_FAILED": "Ogiltig förfrågan",
+    "VALIDATION_INVALID_PAYLOAD": "Ogiltig förfrågningsdata",
+    "VALIDATION_MISSING_FIELD": "Obligatoriskt fält saknas",
+    "WORD_PROCESSING_ERROR": "Kunde inte bearbeta ditt ord. Försök igen.",
+    "INTERNAL_ERROR": "Något gick sönder. Försök igen."
   }
 };
 

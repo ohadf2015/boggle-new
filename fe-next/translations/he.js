@@ -10387,6 +10387,18 @@ const he = {
       "nullifier": "2 חריצי הרונות הראשונים מושבתים",
       "inverter": "רונות צ׳יפ מושבתות, רק מכפילים עובדים"
     }
+  },
+  "socketErrors": {
+    "AUTH_REQUIRED": "נדרשת התחברות לפעולה זו",
+    "GAME_NOT_FOUND": "משחק לא נמצא. בדוק את הקוד!",
+    "GAME_NOT_IN_PROGRESS": "המשחק לא פעיל כעת",
+    "PLAYER_NOT_IN_GAME": "אתה לא במשחק",
+    "PLAYER_NOT_HOST": "רק המארח יכול לעשות זאת",
+    "VALIDATION_FAILED": "בקשה לא חוקית",
+    "VALIDATION_INVALID_PAYLOAD": "נתוני בקשה לא חוקיים",
+    "VALIDATION_MISSING_FIELD": "חסר שדה חובה",
+    "WORD_PROCESSING_ERROR": "לא ניתן לעבד את המילה. נסה שוב.",
+    "INTERNAL_ERROR": "משהו השתבש. נסה שוב."
   }
 };
 

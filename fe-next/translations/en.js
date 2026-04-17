@@ -10413,6 +10413,18 @@ const en = {
       "nullifier": "Your first 2 rune slots are disabled",
       "inverter": "Chip runes disabled, only mult works"
     }
+  },
+  "socketErrors": {
+    "AUTH_REQUIRED": "Sign in required for this action",
+    "GAME_NOT_FOUND": "Game not found. Check the code!",
+    "GAME_NOT_IN_PROGRESS": "Game isn't running right now",
+    "PLAYER_NOT_IN_GAME": "You're not in a game",
+    "PLAYER_NOT_HOST": "Only the host can do that",
+    "VALIDATION_FAILED": "Invalid request",
+    "VALIDATION_INVALID_PAYLOAD": "Invalid request data",
+    "VALIDATION_MISSING_FIELD": "Missing required field",
+    "WORD_PROCESSING_ERROR": "Couldn't process your word. Try again.",
+    "INTERNAL_ERROR": "Something broke. Please try again."
   }
 };
 
