@@ -5,7 +5,7 @@
 
 import type { Server, Socket } from 'socket.io';
 import { checkRateLimit } from '../utils/rateLimiter';
-import { emitError } from '../utils/errorHandler';
+import { emitError, ErrorCodes } from '../utils/errorHandler';
 import logger from '../utils/logger';
 import * as friendsManager from '../modules/friendsManager';
 import { getSupabase } from '../modules/supabaseServer';
@@ -42,7 +42,7 @@ export function registerFriendMessagingHandlers(io: Server, socket: Socket): voi
     }
 
     if (!authUserId) {
-      emitError(socket, 'Must be authenticated to send messages');
+      emitError(socket, ErrorCodes.AUTH_REQUIRED, { message: 'Must be authenticated to send messages' });
       return;
     }
 
@@ -116,7 +116,7 @@ export function registerFriendMessagingHandlers(io: Server, socket: Socket): voi
     }
 
     if (!authUserId) {
-      emitError(socket, 'Must be authenticated');
+      emitError(socket, ErrorCodes.AUTH_REQUIRED);
       return;
     }
 
@@ -164,7 +164,7 @@ export function registerFriendMessagingHandlers(io: Server, socket: Socket): voi
     }
 
     if (!authUserId) {
-      emitError(socket, 'Must be authenticated');
+      emitError(socket, ErrorCodes.AUTH_REQUIRED);
       return;
     }
 
@@ -253,7 +253,7 @@ export function registerFriendMessagingHandlers(io: Server, socket: Socket): voi
     }
 
     if (!authUserId) {
-      emitError(socket, 'Must be authenticated');
+      emitError(socket, ErrorCodes.AUTH_REQUIRED);
       return;
     }
 
@@ -318,7 +318,7 @@ export function registerFriendMessagingHandlers(io: Server, socket: Socket): voi
     }
 
     if (!authUserId) {
-      emitError(socket, 'Must be authenticated');
+      emitError(socket, ErrorCodes.AUTH_REQUIRED);
       return;
     }
 
