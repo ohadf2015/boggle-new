@@ -19,14 +19,14 @@ const STACK_SIZES = {
   sm: {
     avatarSize: 'sm' as const,
     container: 'h-6',
-    overlap: '-ml-2 rtl:-mr-2 rtl:ml-0',
+    overlap: '-ms-2',
     overflow: 'w-6 h-6 text-[7px]',
     ring: 'ring-2',
   },
   md: {
     avatarSize: 'sm' as const,
     container: 'h-7',
-    overlap: '-ml-2.5 rtl:-mr-2.5 rtl:ml-0',
+    overlap: '-ms-2.5',
     overflow: 'w-7 h-7 text-[8px]',
     ring: 'ring-2',
   },
