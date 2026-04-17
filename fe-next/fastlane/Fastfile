@@ -8,11 +8,12 @@ platform :android do
     supply(
       track: "internal",
       aab: aab,
+      skip_upload_apk: true,
       release_status: "draft",
       skip_upload_metadata: true,
       skip_upload_images: true,
       skip_upload_screenshots: true,
-      changelogs_from_android_txt: false
+      skip_upload_changelogs: true
     )
     UI.success("Uploaded #{aab} to internal. Changelog: #{changelog}")
   end
