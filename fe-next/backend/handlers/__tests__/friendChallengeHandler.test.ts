@@ -13,10 +13,10 @@ vi.mock('../../utils/rateLimiter', () => ({ checkRateLimit: vi.fn().mockReturnVa
   checkRateLimit: vi.fn().mockReturnValue(true),
 } }));
 
-vi.mock('../../utils/errorHandler', () => ({
-  __esModule: true,
-  emitError: vi.fn(),
-}));
+vi.mock('../../utils/errorHandler', async () => {
+  const actual = await vi.importActual<typeof import('../../utils/errorHandler')>('../../utils/errorHandler');
+  return { ...actual, emitError: vi.fn() };
+});
 
 vi.mock('../../modules/friendsManager');
 vi.mock('../../modules/supabaseServer');

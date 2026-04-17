@@ -5,7 +5,7 @@
 
 import type { Server, Socket } from 'socket.io';
 import { checkRateLimit } from '../utils/rateLimiter';
-import { emitError } from '../utils/errorHandler';
+import { emitError, ErrorCodes } from '../utils/errorHandler';
 import logger from '../utils/logger';
 import * as friendsManager from '../modules/friendsManager';
 import { notifyGameInvite, notifyChallengeAccepted, notifyChallengeDeclined } from '../modules/pushNotificationTriggers';
@@ -56,7 +56,7 @@ export function registerFriendChallengeHandlers(io: Server, socket: Socket): voi
       return;
     }
     if (!authUserId) {
-      emitError(socket, 'Must be authenticated to send challenges');
+      emitError(socket, ErrorCodes.AUTH_REQUIRED, { message: 'Must be authenticated to send challenges' });
       return;
     }
 
@@ -158,7 +158,7 @@ export function registerFriendChallengeHandlers(io: Server, socket: Socket): voi
       return;
     }
     if (!authUserId) {
-      emitError(socket, 'Must be authenticated');
+      emitError(socket, ErrorCodes.AUTH_REQUIRED);
       return;
     }
 
@@ -262,7 +262,7 @@ export function registerFriendChallengeHandlers(io: Server, socket: Socket): voi
       return;
     }
     if (!authUserId) {
-      emitError(socket, 'Must be authenticated');
+      emitError(socket, ErrorCodes.AUTH_REQUIRED);
       return;
     }
 
@@ -360,7 +360,7 @@ export function registerFriendChallengeHandlers(io: Server, socket: Socket): voi
       return;
     }
     if (!authUserId) {
-      emitError(socket, 'Must be authenticated');
+      emitError(socket, ErrorCodes.AUTH_REQUIRED);
       return;
     }
 
@@ -420,7 +420,7 @@ export function registerFriendChallengeHandlers(io: Server, socket: Socket): voi
       return;
     }
     if (!authUserId) {
-      emitError(socket, 'Must be authenticated');
+      emitError(socket, ErrorCodes.AUTH_REQUIRED);
       return;
     }
 
