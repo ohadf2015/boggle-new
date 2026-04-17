@@ -23,6 +23,8 @@ Rollup of six-track audit (code architecture, UX/UI, a11y + i18n/RTL, performanc
 - **socketErrors i18n namespace** (`1b2cc1c98`) — client-side code→message mapping for 5 languages.
 - **adventure decomposition** — 6 extractions off `AdventureGame.tsx`: `AdventureGameShell`, `AdventureTailOverlays`, `useAdventureOverlayProps`, `useAdventureDerivations`, `useAdventureActions`, level hooks + tests.
 - **shared bridge schemas** (`724202b57`) — single-source from `shared/`, fail-fast on missing import.
+- **RTL logical-props sweep** (`567f131c8` Slice 2 + `fe7069cb6` Slice 3) — ~36 direction-semantic sites converted `pl/pr/ml/mr` → `ps/pe/ms/me` across legal, tv-results, admin panels, daily stats, chat, onboarding, wordForge HUD, emoji picker, game word list. Skipped 2 tabular leaderboard sites (`WheelRushDomination`, `BlastBoardDomination`) — numeric columns should not flip per advisor rule.
+- **SEO duplicate metadata** (`20bd0286d`) — `community/create` + `education/classroom-game` were inheriting parent seo blocks. Added dedicated `seo.communityCreate` + `seo.educationClassroomGame` across all 5 locales + hardened `generatePageMetadata` fallback to synthesize unique title/description from path (warn in dev) instead of leaking root metadata.
 
 ### P2 — UX polish / dev ergonomics
 - **dynamic() loading-flash fix** (`57145dc9c`, `771d485a1`) — `GameLoadingFallback` component + test, applied to 12 full-viewport `dynamic()` sites (HostInGameView, PlayerInGameView, AdventureWheelGame, Party Caption/Pixel/Shadow Clash phone+TV, JoinRedirect). Modals, ads, effect canvases explicitly classified as acceptable-without-loading (overlay or below-fold).
@@ -36,7 +38,7 @@ Rollup of six-track audit (code architecture, UX/UI, a11y + i18n/RTL, performanc
 - **P0 backdrop-blur audit** — 132 occurrences across 107 files. Performance impact on mobile significant but a blanket sweep risks dropping intentional depth cues. Needs design decision per-surface.
 - **P1 SEO-page hardcoded English** — 30+ pages in `app/[locale]/*/`. Content-project scope, not refactor-scope. Needs translator pipeline.
 - **P1 HIDDEN_WORDS localization** — curated thematic word lists per world currently English-only. Needs curated 10-word × 5-language × 10-world = 500 entries from language specialist, not a code-only fix.
-- **P1 logical-props sweep outside adventure** — `ml-*` / `mr-*` → `ms-*` / `me-*` for RTL correctness. Mechanical, but touches ~200 sites.
+- ~~**P1 logical-props sweep outside adventure**~~ — **CLOSED** in Slices 2+3 (`567f131c8`, `fe7069cb6`).
 
 ### Needs game-design review before implementation
 - **P3 surface hidden-word gating** — `hiddenWord` set on `LevelConfig` but never displayed; `hasWordPath` silently drops when grid can't form it. Either guarantee presence (regenerate grid) or add explicit bonus-objective UI. Picking either is a design call.
