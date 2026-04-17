@@ -28,9 +28,9 @@ export function ProfileCoinsSection({
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay }}
       className={cn(
-        'rounded-[28px] mb-4 border border-white/[0.08]',
+        'rounded-neo-xl mb-4 border border-white/[0.08]',
         compact ? 'p-4' : 'p-6',
-        'bg-slate-800/40 backdrop-blur-sm'
+        'bg-neo-navy-light'
       )}
     >
       <div className="flex items-center justify-between mb-4">

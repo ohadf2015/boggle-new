@@ -51,6 +51,8 @@ export interface WordHuntGameLayoutProps {
   formedWord?: string;
   letterCount?: number;
   wordFeedback?: unknown;
+  /** Currently formed word length equals targetLength — surface warning in clue boxes. */
+  matchesTargetLength?: boolean;
 
   // Leaderboard
   playerLives: Record<string, number>;
@@ -92,6 +94,9 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
 
   // Clue animation
   isClueGaining,
+
+  // Match warning
+  matchesTargetLength,
 
   // Grid
   grid,
@@ -140,6 +145,7 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
             skipAnimations={false}
             gameDir={gameDir}
             t={t}
+            matchesTargetLength={matchesTargetLength}
           />
         </div>
 

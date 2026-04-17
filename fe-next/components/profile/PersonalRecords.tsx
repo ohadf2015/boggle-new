@@ -22,7 +22,7 @@ function RecordCard({ record, onShare }: { record: PersonalRecord; onShare: () =
   return (
     <div
       className={cn(
-        'bg-slate-800/40 backdrop-blur-sm border border-white/[0.08] rounded-[20px] p-4',
+        'bg-neo-navy-light border border-white/[0.08] rounded-neo-xl p-4',
         'flex flex-col gap-2'
       )}
     >

@@ -25,6 +25,7 @@ import {
   ResultDisplay,
   PerformanceSection,
   RankBadge,
+  StatsBlurb,
   DailyWordHuntFacts,
   ShareSection,
   CoinUnlockCard,
@@ -186,6 +187,17 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
         transition={{ delay: 0.5, type: 'spring', stiffness: 300, damping: 26 }}
       >
         <RankBadge stats={stats} t={t} />
+      </motion.div>
+    )}
+
+    {/* Single-stat narrative blurb — one compelling number in a sentence */}
+    {stats && (
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.52, type: 'spring', stiffness: 300, damping: 26 }}
+      >
+        <StatsBlurb stats={stats} solved={result.solved} t={t} />
       </motion.div>
     )}
 

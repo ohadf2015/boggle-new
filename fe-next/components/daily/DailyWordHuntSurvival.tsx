@@ -301,7 +301,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
                 }`}
               >
                 {state.feedbackWord && state.feedbackType === 'valid-word' && (
-                  <span className="font-black uppercase tracking-wider mr-1">{state.feedbackWord}</span>
+                  <span className="font-black uppercase tracking-wider me-1">{state.feedbackWord}</span>
                 )}
                 {state.feedbackMessage}
                 {/* Sparkle burst on positive feedback */}

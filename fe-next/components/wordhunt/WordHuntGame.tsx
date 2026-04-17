@@ -274,6 +274,12 @@ export const WordHuntGame = memo<WordHuntGameProps>(({
       formedWord={keyboard.isTypingMode ? keyboard.typedWord : formedWord}
       letterCount={keyboard.isTypingMode ? keyboard.typedWord.length : letterCount}
       wordFeedback={wordFeedback}
+      matchesTargetLength={
+        !bridge.targetFound &&
+        !bridge.showFeedbackOverlay &&
+        bridge.targetLength > 0 &&
+        (keyboard.isTypingMode ? keyboard.typedWord.length : letterCount) === bridge.targetLength
+      }
 
       // Leaderboard (from bridge + props)
       playerLives={bridge.playerLives}

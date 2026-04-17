@@ -119,7 +119,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
               onRetry={this.handleReset}
             />
             {process.env.NODE_ENV === 'development' && this.state.error && (
-              <details className="mt-4 text-left bg-neo-navy-light p-3 rounded-neo border-2 border-neo-black/30 text-xs">
+              <details className="mt-4 text-start bg-neo-navy-light p-3 rounded-neo border-2 border-neo-black/30 text-xs">
                 <summary className="cursor-pointer mb-2 text-neo-cyan font-bold">
                   {t('errors.errorDetails')}
                 </summary>

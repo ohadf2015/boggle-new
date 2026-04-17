@@ -80,7 +80,7 @@ export function StudentHubLearnZone({ userId, classroomId }: StudentHubLearnZone
             </span>
             <button
               onClick={clearReward}
-              className="ml-2 text-xs uppercase underline"
+              className="ms-2 text-xs uppercase underline"
               aria-label={t('common.dismiss')}
             >
               ×

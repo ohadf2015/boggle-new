@@ -22,6 +22,8 @@ export interface SurvivalClueBoxesProps {
   skipAnimations: boolean;
   gameDir: 'ltr' | 'rtl';
   t: (key: string) => string;
+  /** Formed word currently equals target length — submitting will consume a try. */
+  matchesTargetLength?: boolean;
 }
 
 /**
@@ -40,8 +42,11 @@ export const SurvivalClueBoxes = forwardRef<HTMLDivElement, SurvivalClueBoxesPro
   skipAnimations,
   gameDir,
   t,
+  matchesTargetLength = false,
 }, ref) => {
   if (!currentHint) return null;
+
+  const showMatchWarning = matchesTargetLength && !showFeedbackOverlay;
 
   return (
     <AdaptiveMotion.div
@@ -53,11 +58,23 @@ export const SurvivalClueBoxes = forwardRef<HTMLDivElement, SurvivalClueBoxesPro
         "bg-neo-navy/30 dark:bg-neo-navy/50 border-2 border-neo-black/20",
         showFeedbackOverlay
           ? "clue-feedback-active clue-container-attention animate-pulse ring-2 ring-neo-lime/60"
-          : isClueGaining
-            ? "clue-container-green-glow"
-            : "clue-container-glow"
+          : showMatchWarning
+            ? "animate-pulse ring-2 ring-neo-pink/80 shadow-hard"
+            : isClueGaining
+              ? "clue-container-green-glow"
+              : "clue-container-glow"
       )}
     >
+      {showMatchWarning && (
+        <div
+          data-testid="match-target-warning"
+          className="text-center mb-1 text-sm sm:text-base font-black text-neo-pink animate-neo-pop"
+          role="status"
+          aria-live="polite"
+        >
+          ⚠ {t('wordHunt.survival.matchesTargetWarning')}
+        </div>
+      )}
       {/* Tries counter - only count non-discovery attempts */}
       {(() => {
         const targetAttempts = attempts.filter(a => !a.isDiscovery).length;

@@ -5150,7 +5150,19 @@ const ja = {
       "tipSpeed": "ライフが{life}まで急降下。長いサブ単語ほど回復が速い — 7文字以上 = +25ライフ。太い単語一つ ≈ +100点。",
       "tipAccuracy": "{attempts}回の推測 = −{lost}精度ポイント。灰色の文字は二度使わない、黄色は必ず動かす。次は3回以内で解いて{lost}点を全て守ろう。",
       "tipShortTarget": "{length}文字のターゲットは厄介。ADIEUのような母音4つの単語で開幕 — 最初の推測が母音スキャンになる。",
-      "lossEffort": "サブ単語を{words}個発見。今回はパズルの勝ち — でも目のキレはしっかり見せた。明日ひっくり返そう。"
+      "lossEffort": "サブ単語を{words}個発見。今回はパズルの勝ち — でも目のキレはしっかり見せた。明日ひっくり返そう。",
+      "insightLabel": "知ってた?",
+      "yourJourneyLabel": "あなたの歩み",
+      "personalBest": "自己ベスト更新! {score}点 — 旧記録を{delta}点上回った。",
+      "personalMilestone": "パズル{count}問クリア。継続こそ語彙力向上の最強の予測因子。",
+      "personalImprovement": "2週間前より約{delta}回少ない推測で解けている。間隔効果が効いている。",
+      "personalConsistency": "{total}回中の正解率{rate}%。才能より意図的練習。",
+      "researchProtect": "毎日語彙パズルをする大人は、言語推論テストで約10歳若い世代と同等のスコアを出す(PROTECT研究, 2019)。",
+      "researchSpacing": "間隔効果: 短い毎日セッションは長時間の詰め込みより約2倍の定着率(Cepeda他, 2006)。",
+      "researchCrossword": "定期的なクロスワード習慣は加速的記憶低下を約2.5年遅らせる関連がある(Pillai他, 2011)。",
+      "researchRecall": "テスト効果: ヒントから単語を推測すると受動的な読み返しより約50%多く定着する(Karpicke & Roediger, 2008)。",
+      "researchExposures": "新しい単語の多くは、定着するまでに10〜20回の意味ある接触が必要。各パズルもその一回。",
+      "researchBilingual": "頻繁な語彙検索は生涯にわたる作業記憶の強化と関連がある(Bialystok, 2017)。"
     },
     "stats": {
       "title": "統計",
@@ -5160,7 +5172,9 @@ const ja = {
       "distribution": "試行回数の分布",
       "top": "トップ",
       "solved": "解決",
-      "betterThan": "他のプレイヤーより上位"
+      "betterThan": "他のプレイヤーより上位",
+      "blurbPercentile": "今日の上位{percentile}%に入っています。",
+      "blurbSolveRate": "今日解いたのはわずか{solveRate}%のプレイヤーです。"
     },
     "survival": {
       "keyboardTip": "グリッドをスワイプするかキーボードで入力",
@@ -5177,6 +5191,7 @@ const ja = {
       "category": "カテゴリ：{category}",
       "wordsLabel": "単語",
       "triesLeft": "回残り",
+      "matchesTargetWarning": "同じ文字数 — 送信すると1回消費",
       "knownLetters": "位置違い:",
       "accumulatedScore": "スコア",
       "autoClueUnlocked": "ヒント解放！",

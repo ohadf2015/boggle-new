@@ -29,7 +29,7 @@ export function StreakFreezeEarnedToast({ freezeCount, t, onDismiss }: StreakFre
     >
       <span className="text-lg">{'\u2744\uFE0F'}</span>
       <span>{t('daily.streakFreezeEarned')}</span>
-      <span className="ml-1 px-2 py-0.5 bg-neo-black/20 rounded text-xs font-black">
+      <span className="ms-1 px-2 py-0.5 bg-neo-black/20 rounded text-xs font-black">
         {freezeCount}/3
       </span>
     </motion.div>

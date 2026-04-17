@@ -162,7 +162,7 @@ const TvWordHuntActivityPanel = memo<{
       {/* Target word length indicator */}
       {targetLength > 0 && (
         <div className="flex items-center justify-center gap-1.5 p-3 border-b-2 border-neo-black/20">
-          <p className="text-xs font-bold text-neo-cream/60 uppercase mr-2">{t('tvBroadcast.targetLength')}:</p>
+          <p className="text-xs font-bold text-neo-cream/60 uppercase me-2">{t('tvBroadcast.targetLength')}:</p>
           {Array.from({ length: targetLength }, (_, i) => (
             <div
               key={i}

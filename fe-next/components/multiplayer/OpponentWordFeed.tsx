@@ -42,7 +42,7 @@ export function OpponentWordFeed({ feedItems, t }: OpponentWordFeedProps) {
               }`}
             >
               <span>{t(translationKey, { name: item.playerName, length: item.wordLength })}</span>
-              <span className="ml-1.5 text-neo-lime font-bold">+{item.score}</span>
+              <span className="ms-1.5 text-neo-lime font-bold">+{item.score}</span>
             </AdaptiveMotion.div>
           );
         })}

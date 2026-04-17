@@ -5,9 +5,12 @@
  * Priority: rare brag → actionable coach tip → witty fallback.
  */
 
-import type { WordHuntResult } from '@/utils/dailyChallenge';
+import type { WordHuntResult, StoredWordHuntResult } from '@/utils/dailyChallenge';
 import type { WordHuntStats } from '@/components/daily/results/types';
-import { getWordHuntFacts } from '../dailyWordHuntFactsCalculator';
+import { getWordHuntFacts, getWordHuntInsights } from '../dailyWordHuntFactsCalculator';
+
+const wd = (words: string[]) =>
+  words.map((word, i) => ({ word, timestamp: i * 1000, lifeGained: 0, tokensGained: 0 }));
 
 function makeResult(overrides: Partial<WordHuntResult> = {}): WordHuntResult {
   return {
@@ -18,7 +21,7 @@ function makeResult(overrides: Partial<WordHuntResult> = {}): WordHuntResult {
     attemptsUsed: 3,
     targetWord: 'CRANE',
     attempts: [],
-    wordsDiscovered: ['CAR', 'RAN', 'ACE', 'ARC', 'CANE', 'NEAR'],
+    wordsDiscovered: wd(['CAR', 'RAN', 'ACE', 'ARC', 'CANE', 'NEAR']),
     lifeRemaining: 80,
     efficiencyScore: 720,
     streakDays: 3,
@@ -81,13 +84,13 @@ describe('getWordHuntFacts', () => {
   });
 
   it('returns exploration tip when solved with few survival words', () => {
-    const result = makeResult({ wordsDiscovered: ['CAR'], attemptsUsed: 2 });
+    const result = makeResult({ wordsDiscovered: wd(['CAR']), attemptsUsed: 2 });
     const facts = getWordHuntFacts(result, makeStats());
     expect(facts[0].type).toBe('tipExploration');
   });
 
   it('returns accuracy tip when solved with many guesses', () => {
-    const result = makeResult({ attemptsUsed: 6, wordsDiscovered: Array(10).fill('CAR') });
+    const result = makeResult({ attemptsUsed: 6, wordsDiscovered: wd(Array(10).fill('CAR')) });
     const facts = getWordHuntFacts(result, makeStats());
     expect(facts[0].type).toBe('tipAccuracy');
   });
@@ -96,7 +99,7 @@ describe('getWordHuntFacts', () => {
     const result = makeResult({
       lifeRemaining: 20,
       attemptsUsed: 3,
-      wordsDiscovered: Array(10).fill('CAR'),
+      wordsDiscovered: wd(Array(10).fill('CAR')),
     });
     const facts = getWordHuntFacts(result, makeStats());
     expect(facts[0].type).toBe('tipSpeed');
@@ -107,7 +110,7 @@ describe('getWordHuntFacts', () => {
       targetWord: 'RACECAR',
       attemptsUsed: 2,
       lifeRemaining: 90,
-      wordsDiscovered: Array(10).fill('CAR'),
+      wordsDiscovered: wd(Array(10).fill('CAR')),
     });
     const facts = getWordHuntFacts(result, makeStats());
     expect(facts[0].type).toBe('palindrome');
@@ -118,7 +121,7 @@ describe('getWordHuntFacts', () => {
       targetWord: 'ABSTRACT',
       attemptsUsed: 2,
       lifeRemaining: 90,
-      wordsDiscovered: Array(10).fill('CAR'),
+      wordsDiscovered: wd(Array(10).fill('CAR')),
     });
     const facts = getWordHuntFacts(result, makeStats());
     expect(facts[0].type).toBe('longWord');
@@ -136,5 +139,71 @@ describe('getWordHuntFacts', () => {
     const a = getWordHuntFacts(r, makeStats());
     const b = getWordHuntFacts(r, makeStats());
     expect(a[0].translationFallback).toBe(b[0].translationFallback);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Insight slot (personal progression + research fallback)
+// ---------------------------------------------------------------------------
+
+function makeStored(
+  date: string,
+  overrides: Partial<WordHuntResult> = {},
+): StoredWordHuntResult {
+  return {
+    date,
+    puzzleNumber: 1,
+    completedAt: `${date}T12:00:00Z`,
+    result: makeResult({ puzzleDate: date, ...overrides }),
+  };
+}
+
+describe('getWordHuntInsights — insight slot', () => {
+  it('always returns a research fact when no history', () => {
+    const { insight } = getWordHuntInsights(makeResult(), makeStats());
+    expect(insight).not.toBeNull();
+    expect(insight!.type).toBe('researchFact');
+  });
+
+  it('prefers personal best over research when today beats prior history', () => {
+    const history: StoredWordHuntResult[] = [
+      makeStored('2026-03-01', { efficiencyScore: 500 }),
+      makeStored('2026-03-02', { efficiencyScore: 600 }),
+      makeStored('2026-02-28', { efficiencyScore: 450 }),
+    ];
+    const today = makeResult({ puzzleDate: '2026-03-03', efficiencyScore: 800 });
+    const { insight } = getWordHuntInsights(today, makeStats(), history);
+    expect(insight!.type).toBe('personalBest');
+    expect(insight!.value).toBe(800);
+  });
+
+  it('fires milestone at 10 completions', () => {
+    const history: StoredWordHuntResult[] = Array.from({ length: 9 }, (_, i) =>
+      makeStored(`2026-03-${String(i + 1).padStart(2, '0')}`),
+    );
+    const today = makeResult({ puzzleDate: '2026-03-10' });
+    const { insight } = getWordHuntInsights(today, makeStats(), history);
+    expect(insight!.type).toBe('personalMilestone');
+    expect(insight!.value).toBe(10);
+  });
+
+  it('reports improvement when recent avg guesses < older avg', () => {
+    const recent: StoredWordHuntResult[] = Array.from({ length: 7 }, (_, i) =>
+      makeStored(`2026-03-${String(i + 10).padStart(2, '0')}`, { attemptsUsed: 2 }),
+    );
+    const older: StoredWordHuntResult[] = Array.from({ length: 5 }, (_, i) =>
+      makeStored(`2026-03-${String(i + 1).padStart(2, '0')}`, { attemptsUsed: 5 }),
+    );
+    const history = [...recent, ...older]; // storage returns desc by date already
+    const today = makeResult({ puzzleDate: '2026-03-18', efficiencyScore: 500 });
+    const { insight } = getWordHuntInsights(today, makeStats(), history);
+    expect(['personalBest', 'personalImprovement']).toContain(insight!.type);
+  });
+
+  it('is deterministic — same puzzle picks same research fallback', () => {
+    const r = makeResult({ puzzleNumber: 42 });
+    const a = getWordHuntInsights(r, makeStats()).insight;
+    const b = getWordHuntInsights(r, makeStats()).insight;
+    expect(a!.translationKey).toBe(b!.translationKey);
   });
 });

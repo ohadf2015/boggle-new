@@ -130,7 +130,7 @@ export const GameWordList = memo<GameWordListProps>(function GameWordList({
                 >
                   {applyHebrewFinalLetters(wordText).toUpperCase()}
                   {isLatest && wordText.length >= 7 && (
-                    <span className="ml-1 text-xs">🔥</span>
+                    <span className="ms-1 text-xs">🔥</span>
                   )}
                 </AdaptiveMotion.div>
               );

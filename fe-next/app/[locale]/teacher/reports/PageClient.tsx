@@ -103,7 +103,7 @@ export default function ReportsPageClient() {
                 <button
                   key={classroom.id}
                   onClick={() => handleClassroomSelect(classroom.id)}
-                  className="w-full flex items-center justify-between p-4 bg-neo-navy border-neo border-black rounded-neo shadow-hard hover:shadow-hard-pressed hover:bg-neo-navy/80 transition-all text-left"
+                  className="w-full flex items-center justify-between p-4 bg-neo-navy border-neo border-black rounded-neo shadow-hard hover:shadow-hard-pressed hover:bg-neo-navy/80 transition-all text-start"
                 >
                   <span className="text-neo-white font-medium">
                     {classroom.name}

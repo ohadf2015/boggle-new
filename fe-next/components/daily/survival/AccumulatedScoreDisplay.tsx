@@ -94,9 +94,9 @@ export const AccumulatedScoreDisplay: React.FC<AccumulatedScoreDisplayProps> = (
         className={cn(
           'relative flex items-center gap-2',
           'px-3 py-1.5',
-          'bg-neo-black/60 backdrop-blur-sm',
-          'border-2 border-neo-cream/15',
-          'rounded-full',
+          'bg-neo-navy-light',
+          'border-neo border-neo-cream/30',
+          'rounded-full shadow-hard-sm',
           'min-w-[72px]',
           isAnimating && 'score-glow-pulse',
         )}

@@ -115,7 +115,7 @@ export function ProfileHeader({
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       className={cn(
-        'relative bg-slate-800/40 backdrop-blur-sm border border-white/[0.08] rounded-[28px] mb-4',
+        'relative bg-neo-navy-light border border-white/[0.08] rounded-neo-xl mb-4',
         compact ? 'p-4' : 'p-6'
       )}
     >

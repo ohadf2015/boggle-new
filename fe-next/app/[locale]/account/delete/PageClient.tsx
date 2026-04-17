@@ -201,7 +201,7 @@ export default function DeleteAccountPageClient() {
                   isDarkMode ? 'bg-slate-700 text-white' : 'bg-white text-neo-black'
                 )}
               >
-                <ArrowLeft className="w-4 h-4 inline mr-2" />
+                <ArrowLeft className="w-4 h-4 inline me-2" />
                 {t('deleteAccountWeb.backToHome')}
               </Link>
             </div>

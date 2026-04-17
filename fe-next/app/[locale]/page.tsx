@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import HomePageClient from './PageClient';
 import { fetchLandingData } from '@/lib/landing/fetchLandingData';
 import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
+import { buildHomepageFaqJsonLd } from '@/lib/seo/homepageFaqJsonLd';
 
 /**
  * Main landing page - Game mode selection
@@ -204,8 +205,13 @@ export default async function HomePage({ params }: PageProps) {
   ]).catch(() => undefined);
 
   const content = seoContent[locale] ?? seoContent.en;
+  const faqJsonLd = JSON.stringify(buildHomepageFaqJsonLd(locale));
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: faqJsonLd }}
+      />
       <HomePageClient initialData={initialData} />
       <GamePageSeoContent
         title={content.title}

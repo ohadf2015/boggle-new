@@ -340,7 +340,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
               >
                 {p.username}: {fogged ? '???' : p.score}
                 {fogged && p.wordCount != null && (
-                  <span className="ml-1 text-xs opacity-60">({p.wordCount}w)</span>
+                  <span className="ms-1 text-xs opacity-60">({p.wordCount}w)</span>
                 )}
               </div>
             );

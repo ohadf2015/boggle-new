@@ -5098,7 +5098,19 @@ const sv = {
       "tipSpeed": "Livet kraschade till {life}. Längre sidoord läker snabbare — 7+ bokstäver = +25 liv. Ett rejält ord ≈ +100 poäng.",
       "tipAccuracy": "{attempts} gissningar = −{lost} precisionspoäng. Återanvänd aldrig en grå bokstav, flytta alltid gula. Lös på ≤3 för att behålla alla {lost} nästa gång.",
       "tipShortTarget": "{length}-bokstavsmål är sega. Öppna med ord med 4 vokaler som ADIEU — gissning #1 blir en vokalskanning.",
-      "lossEffort": "{words} sidoord hittade. Pusslet vann den här gången — men din blick var ändå vass. I morgon vänder du på det."
+      "lossEffort": "{words} sidoord hittade. Pusslet vann den här gången — men din blick var ändå vass. I morgon vänder du på det.",
+      "insightLabel": "Visste du?",
+      "yourJourneyLabel": "Din resa",
+      "personalBest": "Nytt personligt rekord! {score} p — slog ditt gamla rekord med {delta}.",
+      "personalMilestone": "{count} pussel avklarade. Konsekvens är den starkaste prediktorn för ordförrådstillväxt.",
+      "personalImprovement": "Du löser ~{delta} gissningar snabbare än för två veckor sedan. Spridningseffekten i arbete.",
+      "personalConsistency": "{rate}% lösningsgrad över {total} omgångar. Medveten träning slår talang.",
+      "researchProtect": "Vuxna som spelar ordpussel dagligen presterar som ~10 år yngre på verbala resonemangstester (PROTECT-studien, 2019).",
+      "researchSpacing": "Spridningseffekten: en kort daglig session ger ~2× retention jämfört med lång plugg (Cepeda m.fl., 2006).",
+      "researchCrossword": "Regelbundet korsordsspel kopplas till ~2,5 års fördröjning av accelererad minnesförlust (Pillai m.fl., 2011).",
+      "researchRecall": "Testeffekten: att gissa ett ord från ledtrådar bevarar det ~50% bättre än passiv läsning (Karpicke & Roediger, 2008).",
+      "researchExposures": "De flesta nya ord kräver 10–20 meningsfulla möten innan de fastnar. Varje pussel är ett sådant möte.",
+      "researchBilingual": "Frekvent lexikal återhämtning kopplas till starkare arbetsminne genom livet (Bialystok, 2017)."
     },
     "stats": {
       "title": "Statistik",
@@ -5108,7 +5120,9 @@ const sv = {
       "distribution": "Fördelning av försök",
       "top": "Topp",
       "solved": "löste",
-      "betterThan": "bättre än andra spelare"
+      "betterThan": "bättre än andra spelare",
+      "blurbPercentile": "Du är bland de {percentile}% bästa idag.",
+      "blurbSolveRate": "Bara {solveRate}% av spelarna löste idag."
     },
     "survival": {
       "keyboardTip": "Svep på rutnätet eller skriv med tangentbordet",
@@ -5125,6 +5139,7 @@ const sv = {
       "category": "Kategori: {category}",
       "wordsLabel": "Ord",
       "triesLeft": "försök kvar",
+      "matchesTargetWarning": "Samma längd — skicka förbrukar 1 försök",
       "knownLetters": "Fel plats:",
       "accumulatedScore": "Poäng",
       "autoClueUnlocked": "Ledtråd upplåst!",

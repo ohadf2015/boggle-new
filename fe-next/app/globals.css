@@ -1996,11 +1996,12 @@
     --neo-navy: #1a1a2e;
     --neo-navy-light: #16213e;
 
-    /* DEPRECATED - Keep for backward compatibility during migration */
-    --neo-yellow: #ffe135; /* DEPRECATED - USE neo-lime */
-    --neo-yellow-hover: #ffd000; /* DEPRECATED - USE neo-lime-light */
-    --neo-orange: #ff6b35; /* DEPRECATED - USE neo-lime-dark */
-    --neo-orange-hover: #ff5722; /* DEPRECATED - USE neo-lime-dark */
+    /* Semantic accents — reserved for celebration/star/warmth signals.
+       Do NOT use for primary CTAs, backgrounds, or generic chrome (use lime family). */
+    --neo-yellow: #ffe135;
+    --neo-yellow-hover: #ffd000;
+    --neo-orange: #ff6b35;
+    --neo-orange-hover: #ff5722;
     --neo-cream: #fffef0;
     --neo-black: 0 0 0;
     --neo-white: 255 255 255;

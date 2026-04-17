@@ -5196,7 +5196,19 @@ const en = {
       "tipSpeed": "Life crashed to {life}. Longer side-words heal faster — 7+ letters = +25 life. One chunky word ≈ +100 score.",
       "tipAccuracy": "{attempts} guesses = −{lost} Accuracy pts. Never reuse a grey letter, always shuffle yellows. Solve in ≤3 to keep all {lost} next time.",
       "tipShortTarget": "{length}-letter targets bite. Open with 4-vowel words like ADIEU — guess #1 becomes a vowel scan.",
-      "lossEffort": "{words} side-words found. Puzzle won this round — your grid-scanning still showed up. Flip it tomorrow."
+      "lossEffort": "{words} side-words found. Puzzle won this round — your grid-scanning still showed up. Flip it tomorrow.",
+      "insightLabel": "Did you know",
+      "yourJourneyLabel": "Your journey",
+      "personalBest": "New personal best! {score} pts — beat your old record by {delta}.",
+      "personalMilestone": "{count} puzzles completed. Consistency is the strongest predictor of vocab growth.",
+      "personalImprovement": "You're solving ~{delta} guesses faster than two weeks ago. Spacing effect at work.",
+      "personalConsistency": "{rate}% solve rate across {total} runs. Deliberate practice beats talent.",
+      "researchProtect": "Adults who play word puzzles daily score as if ~10 years younger on verbal reasoning tests (PROTECT study, 2019).",
+      "researchSpacing": "Spacing effect: one short daily session produces ~2× the retention of a long cram (Cepeda et al., 2006).",
+      "researchCrossword": "Regular crossword-style play is linked to a ~2.5-year delay in accelerated memory decline (Pillai et al., 2011).",
+      "researchRecall": "Testing effect: guessing a word from clues retains it ~50% better than just reading it (Karpicke & Roediger, 2008).",
+      "researchExposures": "Most new words need 10–20 meaningful encounters before they stick. Each puzzle is one of those.",
+      "researchBilingual": "Frequent lexical retrieval is linked to stronger working memory across the lifespan (Bialystok, 2017)."
     },
     "stats": {
       "title": "Statistics",
@@ -5206,7 +5218,9 @@ const en = {
       "distribution": "Attempt Distribution",
       "top": "Top",
       "solved": "solved",
-      "betterThan": "better than other players"
+      "betterThan": "better than other players",
+      "blurbPercentile": "You're in the top {percentile}% today.",
+      "blurbSolveRate": "Only {solveRate}% of players solved today."
     },
     "survival": {
       "keyboardTip": "Swipe on grid or type with keyboard",
@@ -5223,6 +5237,7 @@ const en = {
       "category": "Category: {category}",
       "wordsLabel": "Words",
       "triesLeft": "tries left",
+      "matchesTargetWarning": "Same length — submitting uses 1 try",
       "knownLetters": "Wrong spot:",
       "accumulatedScore": "Score",
       "autoClueUnlocked": "Clue Unlocked!",

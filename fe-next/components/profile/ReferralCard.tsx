@@ -138,7 +138,7 @@ export function ReferralCard() {
     return (
       <div className={cn(
         'rounded-3xl p-6 mb-4',
-        'bg-slate-800/40 backdrop-blur-sm border border-neo-pink/20 rounded-[28px]'
+        'bg-neo-navy-light border border-neo-pink/20 rounded-neo-xl'
       )}>
         <div className="flex items-center justify-center py-6">
           <Loader size="md" />
@@ -151,7 +151,7 @@ export function ReferralCard() {
     return (
       <div className={cn(
         'rounded-3xl p-6 mb-4',
-        'bg-slate-800/40 backdrop-blur-sm border border-neo-pink/20 rounded-[28px]'
+        'bg-neo-navy-light border border-neo-pink/20 rounded-neo-xl'
       )}>
         <p className="text-center text-red-500 text-sm">{error || 'Failed to load referral data'}</p>
       </div>
@@ -164,7 +164,7 @@ export function ReferralCard() {
       animate={{ opacity: 1, y: 0 }}
       className={cn(
         'p-4 sm:p-6 mb-4',
-        'bg-slate-800/40 backdrop-blur-sm border border-neo-pink/20 rounded-[28px]'
+        'bg-neo-navy-light border border-neo-pink/20 rounded-neo-xl'
       )}
     >
       {/* Header */}

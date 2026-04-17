@@ -22,7 +22,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getWordHuntFacts, getWordHuntInsights, type WordHuntFact } from '@/utils/dailyWordHuntFactsCalculator';
-import type { WordHuntResult } from '@/utils/dailyChallenge';
+import { getAllWordHuntResults, type WordHuntResult } from '@/utils/dailyChallenge';
 import type { WordHuntStats } from './types';
 
 // ---------------------------------------------------------------------------
@@ -111,12 +111,19 @@ const DailyWordHuntFacts: React.FC<DailyWordHuntFactsProps> = ({ result, stats, 
   // primarily to stay compatible with tests that mock it; we prefer the
   // richer pair returned by getWordHuntInsights when it yields anything.
   const legacyFacts = useMemo(() => getWordHuntFacts(result, stats), [result, stats]);
-  const pair = useMemo(() => getWordHuntInsights(result, stats), [result, stats]);
+  const personalHistory = useMemo(
+    () => (typeof window === 'undefined' ? [] : getAllWordHuntResults(result.language)),
+    [result.language],
+  );
+  const pair = useMemo(
+    () => getWordHuntInsights(result, stats, personalHistory),
+    [result, stats, personalHistory],
+  );
 
   // When the calculator's mock (tests) supplies facts directly, honor them.
   const usingLegacy = !pair.encouragement && !pair.tip && legacyFacts.length > 0;
 
-  if (!usingLegacy && !pair.encouragement && !pair.tip) return null;
+  if (!usingLegacy && !pair.encouragement && !pair.tip && !pair.insight) return null;
 
   return (
     <div className="space-y-3">
@@ -136,6 +143,7 @@ const DailyWordHuntFacts: React.FC<DailyWordHuntFactsProps> = ({ result, stats, 
             <EncouragementCard fact={pair.encouragement} index={0} t={t} />
           )}
           {pair.tip && <CoachTipCard fact={pair.tip} t={t} />}
+          {pair.insight && <InsightCard fact={pair.insight} t={t} />}
         </div>
       )}
     </div>
@@ -217,5 +225,51 @@ const CoachTipCard: React.FC<{
     </div>
   </motion.div>
 );
+
+// ---------------------------------------------------------------------------
+// Insight — personal progression / research "did you know" card.
+// Softer tone than Encouragement, warmer than Coach tip.
+// ---------------------------------------------------------------------------
+
+const InsightCard: React.FC<{
+  fact: WordHuntFact;
+  t: DailyWordHuntFactsProps['t'];
+}> = ({ fact, t }) => {
+  const IconComponent = ICON_MAP[fact.icon] || Sparkles;
+  const styles = COLOR_STYLES[fact.color] ?? COLOR_STYLES['neo-cyan'];
+  const isPersonal = fact.type.startsWith('personal');
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.25, type: 'spring', stiffness: 300, damping: 26 }}
+      className={cn(
+        'flex items-start gap-3 p-3 rounded-neo border-2 shadow-hard-sm',
+        styles.bg,
+        styles.border,
+      )}
+    >
+      <div
+        className={cn(
+          'shrink-0 w-8 h-8 rounded-neo flex items-center justify-center border-2 border-neo-black',
+          styles.iconBg,
+        )}
+      >
+        <IconComponent className="w-4 h-4" />
+      </div>
+      <div className="min-w-0 flex-1">
+        <div className="text-[10px] uppercase tracking-[0.15em] font-bold text-neo-cream/60 mb-0.5">
+          {isPersonal
+            ? t('wordHunt.facts.yourJourneyLabel', 'Your journey')
+            : t('wordHunt.facts.insightLabel', 'Did you know')}
+        </div>
+        <p className="text-xs text-neo-cream/85 leading-snug">
+          {renderFactText(fact, t)}
+        </p>
+      </div>
+    </motion.div>
+  );
+};
 
 export default DailyWordHuntFacts;

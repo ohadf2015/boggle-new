@@ -85,7 +85,7 @@ export function BlastReadyScreen({ onStart, onBack, t }: BlastReadyScreenProps) 
               filter: 'drop-shadow(0 3px 6px rgba(0,0,0,0.5))',
             }}
           >
-            <Zap className="inline w-10 h-10 mr-2 text-neo-cyan" style={{ WebkitTextFillColor: 'initial' }} />
+            <Zap className="inline w-10 h-10 me-2 text-neo-cyan" style={{ WebkitTextFillColor: 'initial' }} />
             {t('blast.ready.title')}
           </h1>
           <p className="text-white/50 font-neo-body text-lg">
@@ -126,7 +126,7 @@ export function BlastReadyScreen({ onStart, onBack, t }: BlastReadyScreenProps) 
         variant="outline"
         className="border-3 border-neo-lime text-neo-lime bg-neo-navy/80 hover:bg-neo-navy"
       >
-        <ArrowLeft className="w-4 h-4 mr-1" />
+        <ArrowLeft className="w-4 h-4 me-1" />
         {t('common.back')}
       </Button>
     </div>
@@ -489,7 +489,7 @@ export function BlastResultsScreen({ results, onPlayAgain, onBack, t }: BlastRes
               color: '#1a1a2e',
             }}
           >
-            <RotateCcw className="w-4 h-4 mr-1" />
+            <RotateCcw className="w-4 h-4 me-1" />
             {t('blast.playAgain')}
           </Button>
           <Button

@@ -77,6 +77,9 @@ export type { AttemptHistoryProps } from './AttemptHistory';
 export { StatsSection } from './StatsSection';
 export type { StatsSectionProps } from './StatsSection';
 
+export { StatsBlurb } from './StatsBlurb';
+export type { StatsBlurbProps } from './StatsBlurb';
+
 export { DesktopStatsCard } from './DesktopStatsCard';
 export type { DesktopStatsCardProps } from './DesktopStatsCard';
 

@@ -53,3 +53,4 @@ Next.js 16.0.7 App Router · TypeScript 5.9.3 (mixed JS/TS) · Node 18+ · Expre
 @.claude/docs/design-system.md
 @.claude/docs/responsive-design.md
 @.claude/docs/backend-patterns.md
+@.claude/notes/android-release-status.md

@@ -72,7 +72,7 @@ function PhoneBallotInner({ options, onVote, voted, timeRemaining, accentColor =
           >
             <span className="font-neo-body text-sm">{option.label}</span>
             {option.isOwn && (
-              <span className="ml-2 text-xs opacity-50">({t('party.yours') || 'yours'})</span>
+              <span className="ms-2 text-xs opacity-50">({t('party.yours') || 'yours'})</span>
             )}
           </button>
         );

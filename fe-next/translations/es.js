@@ -5101,7 +5101,9 @@ const es = {
       "distribution": "Distribución de Intentos",
       "top": "Top",
       "solved": "resuelto",
-      "betterThan": "mejor que otros jugadores"
+      "betterThan": "mejor que otros jugadores",
+      "blurbPercentile": "Estás en el top {percentile}% hoy.",
+      "blurbSolveRate": "Solo el {solveRate}% de los jugadores resolvió hoy."
     },
     "survival": {
       "keyboardTip": "Desliza en la cuadrícula o escribe con el teclado",
@@ -5118,6 +5120,7 @@ const es = {
       "category": "Categoría: {category}",
       "wordsLabel": "Palabras",
       "triesLeft": "intentos restantes",
+      "matchesTargetWarning": "Misma longitud — enviar gasta 1 intento",
       "knownLetters": "Mal ubicada:",
       "accumulatedScore": "Puntuación",
       "autoClueUnlocked": "¡Pista Desbloqueada!",
@@ -5319,7 +5322,19 @@ const es = {
       "tipSpeed": "La vida cayó a {life}. Las palabras largas curan más rápido — 7+ letras = +25 vida. Una palabra gorda ≈ +100 puntos.",
       "tipAccuracy": "{attempts} intentos = −{lost} pts de Precisión. Regla del francotirador: nunca reutilices una gris, siempre mueve las amarillas. Resuelve en ≤3 para mantener los {lost} la próxima.",
       "tipShortTarget": "Objetivos de {length} letras son difíciles. Abre con palabras de 4 vocales como ADIEU — el intento #1 se convierte en escaneo de vocales.",
-      "lossEffort": "{words} palabras laterales encontradas. El puzzle ganó esta vez — pero tu vista siguió afilada. Mañana le das la vuelta."
+      "lossEffort": "{words} palabras laterales encontradas. El puzzle ganó esta vez — pero tu vista siguió afilada. Mañana le das la vuelta.",
+      "insightLabel": "¿Sabías que?",
+      "yourJourneyLabel": "Tu recorrido",
+      "personalBest": "¡Nuevo récord personal! {score} pts — superaste tu marca anterior por {delta}.",
+      "personalMilestone": "{count} puzzles completados. La consistencia es el predictor más fuerte del crecimiento de vocabulario.",
+      "personalImprovement": "Resuelves ~{delta} intentos más rápido que hace dos semanas. Efecto de espaciado en acción.",
+      "personalConsistency": "Tasa de acierto del {rate}% en {total} partidas. La práctica deliberada vence al talento.",
+      "researchProtect": "Los adultos que juegan puzzles de palabras a diario puntúan como si fueran ~10 años más jóvenes en pruebas de razonamiento verbal (estudio PROTECT, 2019).",
+      "researchSpacing": "Efecto de espaciado: una sesión diaria corta produce ~2× la retención de un atracón largo (Cepeda et al., 2006).",
+      "researchCrossword": "El juego regular tipo crucigrama se asocia con un retraso de ~2,5 años en el declive acelerado de la memoria (Pillai et al., 2011).",
+      "researchRecall": "Efecto de prueba: adivinar una palabra a partir de pistas la retiene ~50% mejor que solo leerla (Karpicke & Roediger, 2008).",
+      "researchExposures": "La mayoría de palabras nuevas necesitan 10–20 encuentros significativos para fijarse. Cada puzzle es uno de ellos.",
+      "researchBilingual": "La recuperación léxica frecuente se asocia con mayor memoria de trabajo a lo largo de la vida (Bialystok, 2017)."
     },
     "attempts": "Intentos"
   },

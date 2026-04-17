@@ -405,7 +405,7 @@ export function BlastEngineView() {
               <span className="font-neo-display text-white text-xl font-black tracking-wider" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>
                 {game.currentWord.toUpperCase()}
               </span>
-              <span className={`ml-2 text-xs font-bold ${game.currentWord.length >= 3 ? 'text-neo-lime' : 'text-white/30'}`}>
+              <span className={`ms-2 text-xs font-bold ${game.currentWord.length >= 3 ? 'text-neo-lime' : 'text-white/30'}`}>
                 {game.currentWord.length >= 3 ? '✓' : `${3 - game.currentWord.length} more`}
               </span>
             </div>
@@ -435,7 +435,7 @@ export function BlastEngineView() {
                   {game.comboLevel}x
                 </span>
               )}
-              <span className="text-white/30 text-xs font-neo-body tabular-nums ml-1">
+              <span className="text-white/30 text-xs font-neo-body tabular-nums ms-1">
                 {game.wordsFound.length} {t('blast.words') || 'words'}
               </span>
             </motion.div>

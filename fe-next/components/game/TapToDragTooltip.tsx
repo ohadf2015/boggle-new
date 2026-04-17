@@ -161,7 +161,7 @@ const TapToDragTooltip = memo<TapToDragTooltipProps>(
           >
             <div
               className="
-                bg-neo-cream/95 backdrop-blur-md text-neo-black border-3 border-neo-black rounded-neo-lg shadow-hard-lg
+                bg-neo-cream text-neo-black border-3 border-neo-black rounded-neo-lg shadow-hard-lg
                 px-3 py-2.5 w-[200px] relative cursor-pointer
                 hover:shadow-hard-xl transition-shadow active:scale-[0.98]
               "

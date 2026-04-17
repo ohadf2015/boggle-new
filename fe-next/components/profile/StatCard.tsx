@@ -91,7 +91,7 @@ export function StatCard({ icon, label, value, isDarkMode, highlight = false, co
       animate={inView ? { opacity: 1, y: 0, scale: 1 } : {}}
       transition={{ type: 'spring', stiffness: 300, damping: 20, delay: index * 0.08 }}
       whileHover={{ scale: 1.03, y: -2 }}
-      className="bg-slate-800/40 backdrop-blur-sm p-5 rounded-[20px] border border-white/[0.08]"
+      className="bg-neo-navy-light p-5 rounded-neo-xl border border-white/[0.08]"
     >
       {/* Icon box */}
       <motion.div

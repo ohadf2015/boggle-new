@@ -89,7 +89,7 @@ export function ProfileAchievements({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay }}
-        className="rounded-[28px] p-6 mb-4 bg-slate-800/40 backdrop-blur-sm border border-neo-lime/20"
+        className="rounded-neo p-6 mb-4 bg-neo-navy-light border-neo border-neo-lime shadow-hard"
       >
         <div className="pb-3 border-b border-neo-lime/10 mb-4">
           <h3 className="text-sm font-black uppercase text-neo-lime tracking-widest flex items-center gap-2">
@@ -110,7 +110,7 @@ export function ProfileAchievements({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: delay + 0.05 }}
-        className="rounded-[28px] p-6 bg-slate-800/40 backdrop-blur-sm border border-white/[0.08]"
+        className="rounded-neo p-6 bg-neo-navy-light border-neo border-neo-white/20 shadow-hard"
       >
         <div className="flex flex-wrap gap-2">
           {regularAchievements.map((achievement, index) => renderAchievementBadge(achievement, index))}

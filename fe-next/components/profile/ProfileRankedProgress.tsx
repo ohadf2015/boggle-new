@@ -29,7 +29,7 @@ export function ProfileRankedProgress({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay }}
-      className="rounded-[28px] p-6 mb-4 bg-slate-800/40 backdrop-blur-sm border border-neo-pink/20"
+      className="rounded-neo-xl p-6 mb-4 bg-neo-navy-light border border-neo-pink/20"
     >
       <h2 className="text-xl font-black font-neo-display uppercase mb-4 flex items-center gap-2 text-white">
         <span className="w-8 h-8 rounded-lg bg-neo-pink/10 flex items-center justify-center">

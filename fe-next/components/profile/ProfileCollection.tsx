@@ -30,7 +30,7 @@ export function ProfileCollection({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay }}
-      className="rounded-[28px] p-6 mb-4 bg-slate-800/40 backdrop-blur-sm border border-white/[0.08]"
+      className="rounded-neo-xl p-6 mb-4 bg-neo-navy-light border border-white/[0.08]"
     >
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-black font-neo-display uppercase flex items-center gap-2 text-white">
