@@ -130,7 +130,7 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
 
     // Block kicked players from re-joining
     if (game.kickedPlayers?.has(username)) {
-      emitError(socket, 'You have been kicked from this room');
+      emitError(socket, ErrorCodes.PLAYER_KICKED, { message: 'You have been kicked from this room' });
       return;
     }
 
@@ -138,7 +138,7 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
     if (game.isRanked && isInProgress(game.gameState) && !game.allowLateJoin) {
       const existingSocketId = getSocketIdByUsername(gameCode, username);
       if (!existingSocketId) {
-        emitError(socket, 'Cannot join ranked game in progress');
+        emitError(socket, ErrorCodes.GAME_CLOSED, { message: 'Cannot join ranked game in progress' });
         return;
       }
     }
@@ -359,7 +359,7 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
     const spectator = spectators.find(s => s.socketId === socket.id);
 
     if (!spectator) {
-      emitError(socket, 'You are not a spectator in this game');
+      emitError(socket, ErrorCodes.AUTH_FORBIDDEN, { message: 'You are not a spectator in this game' });
       return;
     }
 
@@ -367,7 +367,7 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
 
     // Check if room has space
     if (Object.keys(game.users).length >= MAX_PLAYERS_PER_ROOM) {
-      emitError(socket, 'Room is still full. Please wait for a slot to open.');
+      emitError(socket, ErrorCodes.GAME_FULL, { message: 'Room is still full. Please wait for a slot to open.' });
       return;
     }
 
@@ -375,7 +375,7 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
     // Prevent upgrades during 'finished' or 'validating' which could corrupt results
     const isLateJoin = isInProgress(game.gameState);
     if (game.gameState !== 'waiting' && !isLateJoin) {
-      emitError(socket, 'Cannot join while game is ending. Wait for the next round.');
+      emitError(socket, ErrorCodes.GAME_CLOSED, { message: 'Cannot join while game is ending. Wait for the next round.' });
       return;
     }
 
@@ -383,7 +383,7 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
     const success = upgradeSpectatorToPlayer(gameCode, username);
 
     if (!success) {
-      emitError(socket, 'Failed to join game');
+      emitError(socket, ErrorCodes.INTERNAL_ERROR, { message: 'Failed to join game' });
       return;
     }
 
