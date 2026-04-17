@@ -8,7 +8,7 @@
     "email": "email dev --dir emails --port 3030",
     "lsp": "typescript-language-server --stdio",
     "clean": "npx rimraf .next",
-    "build": "(npm run build:schemas || true) && node scripts/generate-routes.mjs && next build",
+    "build": "npm run build:schemas && node scripts/generate-routes.mjs && next build",
     "build:fast": "next build",
     "build:server": "node scripts/bundle-server.mjs",
     "build:analyze": "cross-env ANALYZE=true npm run build",

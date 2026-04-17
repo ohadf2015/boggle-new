@@ -184,7 +184,7 @@ Vote on a word's validity during community validation.
 interface SubmitWordVotePayload {
   gameCode?: string;
   word: string;
-  voteType?: 'valid' | 'invalid';
+  voteType?: 'like' | 'dislike';
   isValid?: boolean;
   language?: Language;
   submittedBy?: string;

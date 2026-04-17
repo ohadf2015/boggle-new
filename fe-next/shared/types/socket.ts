@@ -429,7 +429,7 @@ export interface PlayerResultPayload {
 
 export interface SubmitWordVotePayload {
   word: string;
-  voteType: 'valid' | 'invalid';
+  voteType: 'like' | 'dislike';
   gameCode?: string;
   submittedBy?: string;
   isBot?: boolean;

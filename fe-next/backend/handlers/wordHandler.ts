@@ -51,7 +51,7 @@ interface SubmitWordPayload {
 
 interface SubmitWordVotePayload {
   word: string;
-  voteType: 'valid' | 'invalid';
+  voteType: 'like' | 'dislike';
   gameCode?: string;
   submittedBy?: string;
 }
@@ -451,22 +451,19 @@ function registerWordHandlers(io: Server, socket: Socket): void {
         return;
       }
 
-      // Map 'valid'/'invalid' to 'like'/'dislike' for the community word system
-      const mappedVoteType: 'like' | 'dislike' = voteType === 'valid' ? 'like' : 'dislike';
-
       const result = await recordVote({
         word,
         language: game.language || 'en',
         userId,
         guestId,
         gameCode,
-        voteType: mappedVoteType,
+        voteType,
         submitter: data.submittedBy || 'unknown',
         isBotWord: game.users?.[data.submittedBy || '']?.isBot === true
       });
 
       if (result.success) {
-        updatePendingCache(word, game.language || 'en', mappedVoteType);
+        updatePendingCache(word, game.language || 'en', voteType);
         socket.emit('voteRecorded', { word, success: true });
         logger.info('VOTE', `${username} voted ${voteType} on "${word}"`);
 

@@ -79,7 +79,25 @@ export const AvatarSchema = z.object({
 export const GameCodeSchema = z.string()
   .min(6, 'Game code must be at least 6 characters')
   .max(10, 'Game code must be at most 10 characters')
-  .regex(/^[A-Za-z0-9]+$/, 'Game code must be alphanumeric');
+  .regex(/^[A-Za-z0-9]+$/, 'Game code must be alphanumeric')
+  .transform(s => s.toUpperCase());
+
+export const RoomNameSchema = z.string()
+  .max(50, 'Room name must be at most 50 characters')
+  .regex(/^[a-zA-Z0-9\s._\-\u0590-\u05FF\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF]+$/, 'Room name can only contain letters, numbers, spaces, dots, underscores, and hyphens')
+  .transform(s => s.trim())
+  .refine((val) => !/[\u0000-\u001F\u007F-\u009F\u200B-\u200D\uFEFF]/.test(val), 'Room name contains invalid characters')
+  .optional();
+
+export const PlayerIdSchema = z.string()
+  .regex(/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i, 'Player ID must be a valid UUID v4')
+  .optional()
+  .nullable();
+
+export const GuestTokenHashSchema = z.string()
+  .regex(/^[a-f0-9]{64}$/i, 'Guest token hash must be a valid SHA-256 hash')
+  .optional()
+  .nullable();
 
 export const UsernameSchema = z.string()
   .min(1, 'Username is required')
@@ -113,14 +131,15 @@ export const PresenceStatusSchema = z.enum(['active', 'idle', 'afk']);
  */
 export const CreateGameSchema = z.object({
   gameCode: GameCodeSchema,
-  roomName: z.string().max(50).optional(),
+  roomName: RoomNameSchema,
   language: LanguageSchema.optional().default('en'),
   hostUsername: UsernameSchema.optional(),
-  playerId: z.string().max(64).optional().nullable(),
+  playerId: PlayerIdSchema,
   avatar: AvatarSchema.optional(),
-  authUserId: z.uuid().optional().nullable(),
-  guestTokenHash: z.string().max(128).optional().nullable(),
+  authUserId: z.string().uuid().optional().nullable(),
+  guestTokenHash: GuestTokenHashSchema,
   isRanked: z.boolean().optional().default(false),
+  isPrivate: z.boolean().optional().default(false),
 });
 
 /**
@@ -129,10 +148,10 @@ export const CreateGameSchema = z.object({
 export const JoinGameSchema = z.object({
   gameCode: GameCodeSchema,
   username: UsernameSchema,
-  playerId: z.string().max(64).optional().nullable(),
+  playerId: PlayerIdSchema,
   avatar: AvatarSchema.optional(),
-  authUserId: z.uuid().optional().nullable(),
-  guestTokenHash: z.string().max(128).optional().nullable(),
+  authUserId: z.string().uuid().optional().nullable(),
+  guestTokenHash: GuestTokenHashSchema,
 });
 
 /**
@@ -148,11 +167,18 @@ export const LeaveRoomSchema = z.object({
  */
 export const StartGameSchema = z.object({
   gameCode: GameCodeSchema.optional(),
-  letterGrid: z.array(z.array(z.string())),
-  timerSeconds: z.number().int().min(30).max(600).optional().default(180),
+  letterGrid: z.array(z.array(z.string().max(5)).max(15)).max(15).optional().default([]),
+  timerSeconds: z.number().int().optional().default(120),
   language: LanguageSchema.optional(),
   difficulty: DifficultySchema.optional().default('MEDIUM'),
   minWordLength: z.number().int().min(2).max(5).optional().default(2),
+  boardTheme: z.object({
+    nameKey: z.string(),
+    emoji: z.string(),
+    isHoliday: z.boolean().optional(),
+  }).nullable().optional(),
+  gameMode: z.enum(['classic', 'blast', 'word-hunt', 'wheel-rush', 'random']).optional(),
+  tvMode: z.boolean().optional(),
 });
 
 /**
@@ -170,10 +196,9 @@ export const SubmitWordSchema = z.object({
   username: UsernameSchema.optional(),
   word: WordSchema,
   path: z.array(GridPositionSchema).optional(),
-  comboLevel: z.number().int().min(0).max(100).optional(),
-  fireRoundActive: z.boolean().optional().default(false),
+  // comboLevel and fireRoundActive deliberately omitted — derived server-side
+  // to prevent clients from spoofing score multipliers.
   // comboType is trusted from client (server has no tile state to detect combos).
-  // Used to re-broadcast blast combo effects to all players in the room.
   comboType: z.string().optional().nullable(),
 });
 
@@ -188,7 +213,7 @@ export const SubmitWordVoteSchema = z.object({
   isValid: z.boolean().optional(),
   language: LanguageSchema.optional(),
   submittedBy: UsernameSchema.optional(),
-  isBot: z.boolean().optional(),
+  // isBot intentionally omitted — derived from server-side game.users state
 });
 
 /**
@@ -244,6 +269,8 @@ export const PresenceUpdateSchema = z.object({
   username: UsernameSchema.optional(),
   status: PresenceStatusSchema.optional(),
   isWindowFocused: z.boolean().optional(),
+  isActive: z.boolean().optional(),
+  isIdle: z.boolean().optional(),
   lastActivityAt: z.number().optional(),
 });
 
@@ -279,7 +306,7 @@ export const CreateTournamentSchema = z.object({
   name: z.string().min(1).max(100),
   totalRounds: z.number().int().min(2).max(10).default(3),
   settings: z.object({
-    timerSeconds: z.number().int().min(30).max(600).optional(),
+    timerSeconds: z.number().int().min(30).max(120).optional(),
     difficulty: DifficultySchema.optional(),
     minWordLength: z.number().int().min(2).max(5).optional(),
   }).optional(),
@@ -316,8 +343,8 @@ export const CloseRoomSchema = z.object({
 export const ReconnectSchema = z.object({
   gameCode: GameCodeSchema,
   username: UsernameSchema,
-  authUserId: z.uuid().optional().nullable(),
-  guestTokenHash: z.string().max(128).optional().nullable(),
+  authUserId: z.string().uuid().optional().nullable(),
+  guestTokenHash: GuestTokenHashSchema,
 });
 
 /**
@@ -326,7 +353,7 @@ export const ReconnectSchema = z.object({
 export const UpdateGameSettingsSchema = z.object({
   gameCode: GameCodeSchema,
   settings: z.object({
-    timerSeconds: z.number().int().min(30).max(600).optional(),
+    timerSeconds: z.number().int().min(30).max(120).optional(),
     difficulty: DifficultySchema.optional(),
     minWordLength: z.number().int().min(2).max(5).optional(),
     language: LanguageSchema.optional(),
@@ -338,6 +365,14 @@ export const UpdateGameSettingsSchema = z.object({
  */
 export const BroadcastShufflingGridSchema = z.object({
   gridState: z.unknown(),
+});
+
+/**
+ * scorecard:generate event payload
+ */
+export const GenerateScoreCardSchema = z.object({
+  gameCode: GameCodeSchema.optional(),
+  username: UsernameSchema.optional(),
 });
 
 // ==================== Schema Map for Validation ====================
@@ -354,6 +389,7 @@ export const ClientEventSchemas = {
   submitWordVote: SubmitWordVoteSchema,
   submitPeerValidationVote: SubmitPeerValidationVoteSchema,
   sendChatMessage: ChatMessageSchema,
+  chatMessage: ChatMessageSchema,
   addBot: AddBotSchema,
   removeBot: RemoveBotSchema,
   heartbeat: HeartbeatSchema,
@@ -366,6 +402,7 @@ export const ClientEventSchemas = {
   reconnect: ReconnectSchema,
   updateGameSettings: UpdateGameSettingsSchema,
   broadcastShufflingGrid: BroadcastShufflingGridSchema,
+  'scorecard:generate': GenerateScoreCardSchema,
 } as const;
 
 // ==================== Validation Helpers ====================
