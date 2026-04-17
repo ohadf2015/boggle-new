@@ -167,6 +167,12 @@ const en = {
       "ogTitle": "Classroom Word Game Live - Teacher Dashboard",
       "ogDescription": "Start a live multiplayer word round for your class — join from any device, no signup."
     },
+    "dailyArchive": {
+      "title": "Daily Challenge Archive - Past Word Puzzles & Leaderboards | LexiClash",
+      "description": "Browse every past LexiClash daily word puzzle. Replay old boards, compare your scores, and explore leaderboards from every challenge since launch.",
+      "ogTitle": "Daily Challenge Archive - Every Past Puzzle | LexiClash",
+      "ogDescription": "Explore past daily word puzzles with full stats and leaderboards — revisit any challenge."
+    },
     "friends": {
       "title": "Friends & Social - Play Word Games With Friends | LexiClash",
       "description": "Connect with friends on LexiClash! Send challenges, track friend activity, compete head-to-head, and climb together on the leaderboard.",

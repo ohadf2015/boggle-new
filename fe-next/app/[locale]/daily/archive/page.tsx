@@ -1,7 +1,7 @@
-import React from 'react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { loadTranslation, type TranslationData } from '@/translations/loadTranslation';
+import { loadTranslation } from '@/translations/loadTranslation';
+import { generatePageMetadata } from '@/lib/seo/generatePageMetadata';
 import { DAILY_CHALLENGE_EPOCH } from '@/utils/dailyChallenge/constants';
 import { safeToLocaleDateString } from '@/utils/bcp47Locale';
 
@@ -37,57 +37,7 @@ function getArchiveDates(): Array<{ date: string; puzzleNumber: number }> {
 
 export async function generateMetadata({ params }: PageParams): Promise<Metadata> {
   const { locale } = await params;
-  const validLocale = (locale as Locale) || 'en';
-  const t = await loadTranslation(validLocale) as Record<string, any>;
-  const archiveT = t?.daily?.archive || {
-    title: 'Daily Challenge Archive',
-    description: 'Browse past LexiClash daily challenges. See stats, leaderboards, and results from every puzzle.',
-    ogTitle: 'Daily Challenge Archive - LexiClash',
-    ogDescription: 'Explore past daily word puzzles with stats and leaderboards.',
-  };
-
-  const localePath = `/${locale}`;
-  const baseUrl = 'https://www.lexiclash.live';
-
-  return {
-    title: archiveT.title,
-    description: archiveT.description,
-    openGraph: {
-      type: 'website',
-      url: `${baseUrl}${localePath}/daily/archive`,
-      title: archiveT.ogTitle,
-      description: archiveT.ogDescription,
-      siteName: 'LexiClash',
-    },
-    alternates: {
-      canonical: `${baseUrl}${localePath}/daily/archive`,
-      languages: {
-        'x-default': `${baseUrl}/en/daily/archive`,
-        he: `${baseUrl}/he/daily/archive`,
-        en: `${baseUrl}/en/daily/archive`,
-        sv: `${baseUrl}/sv/daily/archive`,
-        ja: `${baseUrl}/ja/daily/archive`,
-        es: `${baseUrl}/es/daily/archive`,
-        'en-IL': `${baseUrl}/en/daily/archive`,
-        'he-IL': `${baseUrl}/he/daily/archive`,
-        'en-US': `${baseUrl}/en/daily/archive`,
-        'es-US': `${baseUrl}/es/daily/archive`,
-        'en-GB': `${baseUrl}/en/daily/archive`,
-        'en-SE': `${baseUrl}/en/daily/archive`,
-        'sv-SE': `${baseUrl}/sv/daily/archive`,
-        'en-JP': `${baseUrl}/en/daily/archive`,
-        'ja-JP': `${baseUrl}/ja/daily/archive`,
-        'en-ES': `${baseUrl}/en/daily/archive`,
-        'es-ES': `${baseUrl}/es/daily/archive`,
-        'en-MX': `${baseUrl}/en/daily/archive`,
-        'es-MX': `${baseUrl}/es/daily/archive`,
-        'en-AU': `${baseUrl}/en/daily/archive`,
-        'es-AR': `${baseUrl}/es/daily/archive`,
-        'es-CO': `${baseUrl}/es/daily/archive`,
-      },
-    },
-    robots: { index: true, follow: true },
-  };
+  return generatePageMetadata({ seoKey: 'dailyArchive', path: '/daily/archive', locale });
 }
 
 export default async function DailyArchivePage({ params }: PageParams) {

@@ -167,6 +167,12 @@ const sv = {
       "ogTitle": "Ordspel för Klassrum Live - Lärardashboard",
       "ogDescription": "Starta en flerspelarrunda för klassen — anslut från valfri enhet, ingen registrering."
     },
+    "dailyArchive": {
+      "title": "Dagliga Utmaningens Arkiv - Tidigare Ordpussel & Topplistor | LexiClash",
+      "description": "Utforska alla tidigare dagliga ordpussel från LexiClash. Spela om gamla brädor, jämför dina poäng och se topplistor från varje utmaning sedan starten.",
+      "ogTitle": "Dagliga Utmaningens Arkiv - Alla Tidigare Pussel | LexiClash",
+      "ogDescription": "Utforska tidigare dagliga ordpussel med statistik och topplistor — återbesök vilken utmaning som helst."
+    },
     "friends": {
       "title": "Vänner & Socialt - Spela Ordspel med Vänner | LexiClash",
       "description": "Anslut med vänner på LexiClash! Skicka utmaningar, följ vänners aktivitet och tävla mot varandra.",

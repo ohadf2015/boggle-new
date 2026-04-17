@@ -167,6 +167,12 @@ const es = {
       "ogTitle": "Juego de Palabras para Aula en Vivo - Panel del Profesor",
       "ogDescription": "Inicia una ronda multijugador para la clase — unete desde cualquier dispositivo, sin registro."
     },
+    "dailyArchive": {
+      "title": "Archivo del Desafio Diario - Puzzles Pasados y Clasificaciones | LexiClash",
+      "description": "Explora todos los desafios diarios de LexiClash. Revive tableros antiguos, compara tus puntajes y consulta las clasificaciones de cada puzzle publicado.",
+      "ogTitle": "Archivo del Desafio Diario - Todos los Puzzles | LexiClash",
+      "ogDescription": "Explora puzzles diarios pasados con estadisticas y clasificaciones — revisita cualquier desafio."
+    },
     "friends": {
       "title": "Amigos y Social - Juega con Amigos | LexiClash",
       "description": "Conecta con amigos en LexiClash! Envia desafios, sigue la actividad de amigos y compite cara a cara.",
