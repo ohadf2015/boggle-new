@@ -143,7 +143,7 @@ const TvResultsPlayerSpotlight = memo<TvResultsPlayerSpotlightProps>(({
                   </div>
 
                   {/* Archetype Title */}
-                  <h4 className="font-black text-base uppercase text-neo-black mb-1 pr-10">
+                  <h4 className="font-black text-base uppercase text-neo-black mb-1 pe-10">
                     {t(archetype.titleKey)}
                   </h4>
 

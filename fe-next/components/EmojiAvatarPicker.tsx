@@ -197,7 +197,7 @@ const EmojiAvatarPicker: React.FC<AvatarPickerProps> = ({
 
           {/* Avatar Gallery Grid */}
           <div className="p-4">
-            <div className="grid grid-cols-5 gap-2.5 max-h-64 overflow-y-auto pr-1">
+            <div className="grid grid-cols-5 gap-2.5 max-h-64 overflow-y-auto pe-1">
               {/* Profile Picture Option (if available) */}
               {/* Character Avatars */}
               {AVATARS.map((avatar) => {

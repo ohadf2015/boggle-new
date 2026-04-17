@@ -134,7 +134,7 @@ const WordComparisonGrid: React.FC<WordComparisonGridProps> = ({
                   {words.length}
                 </span>
               </div>
-              <ul className="flex flex-col gap-0.5 max-h-48 overflow-y-auto pr-1">
+              <ul className="flex flex-col gap-0.5 max-h-48 overflow-y-auto pe-1">
                 {words.map((w) => (
                   <li
                     key={w.word}

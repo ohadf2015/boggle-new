@@ -527,7 +527,7 @@ const TvResultsAwards = memo<TvResultsAwardsProps>(({
                 </motion.div>
 
                 {/* Award Title */}
-                <h4 className="font-black text-lg uppercase text-neo-black mb-1 pr-8">
+                <h4 className="font-black text-lg uppercase text-neo-black mb-1 pe-8">
                   {award.title}
                 </h4>
 

@@ -61,7 +61,7 @@ export function IndexNowPanel() {
       <div className="flex items-center gap-2 mb-4">
         <Globe className="w-5 h-5 text-cyan-400" />
         <h2 className="text-lg font-neo-display text-neo-white">IndexNow</h2>
-        <span className="text-xs text-slate-400 ml-auto">Bing, Yandex, Naver</span>
+        <span className="text-xs text-slate-400 ms-auto">Bing, Yandex, Naver</span>
       </div>
 
       <p className="text-sm text-slate-400 mb-4">

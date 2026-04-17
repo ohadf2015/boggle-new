@@ -153,7 +153,7 @@ export function WikipediaCandidatesList({
           <span className="text-sm font-bold text-white">
             {selectedIds.size} selected
           </span>
-          <div className="flex flex-wrap gap-2 md:ml-auto">
+          <div className="flex flex-wrap gap-2 md:ms-auto">
             <BulkApproveButton
               selectedCount={selectedIds.size}
               onApprove={handleBulkApprove}

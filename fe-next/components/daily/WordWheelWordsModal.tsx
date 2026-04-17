@@ -82,7 +82,7 @@ export const WordWheelWordsModal: React.FC<WordWheelWordsModalProps> = ({
 
         {/* Header */}
         <div className="relative bg-neo-lime text-neo-black p-4 border-b-3 border-neo-black">
-          <h2 className="font-neo-display font-black text-xl sm:text-2xl uppercase tracking-wide pr-10 truncate">
+          <h2 className="font-neo-display font-black text-xl sm:text-2xl uppercase tracking-wide pe-10 truncate">
             🎡 {playerName}
           </h2>
           <p className="text-sm font-bold opacity-80 mt-0.5">

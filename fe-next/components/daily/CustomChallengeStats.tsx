@@ -215,7 +215,7 @@ export const CustomChallengeStats: React.FC<CustomChallengeStatsProps> = ({ puzz
                         initial={{ width: 0 }}
                         animate={{ width: `${percentage}%` }}
                         transition={{ duration: 0.5, delay: 0.1 * parseInt(attempts) }}
-                        className="h-full bg-linear-to-r from-neo-cyan to-neo-pink flex items-center justify-end pr-2"
+                        className="h-full bg-linear-to-r from-neo-cyan to-neo-pink flex items-center justify-end pe-2"
                       >
                         <span className="text-xs font-black text-neo-white">{count}</span>
                       </motion.div>

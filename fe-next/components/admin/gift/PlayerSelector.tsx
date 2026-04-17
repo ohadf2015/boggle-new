@@ -148,7 +148,7 @@ export function PlayerSelector({
             setShowResults(true);
           }}
           onFocus={() => setShowResults(true)}
-          className="pl-10 bg-white dark:bg-slate-800"
+          className="ps-10 bg-white dark:bg-slate-800"
           disabled={selectedPlayers.length >= maxSelection}
         />
 

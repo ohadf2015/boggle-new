@@ -49,7 +49,7 @@ export const ScheduleManager: React.FC<ScheduleManagerProps> = ({
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 max-h-[400px] overflow-y-auto pr-2">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 max-h-[400px] overflow-y-auto pe-2">
         {schedule.map(item => {
           const dateObj = new Date(item.puzzle_date);
           const isToday = new Date().toISOString().split('T')[0] === item.puzzle_date;

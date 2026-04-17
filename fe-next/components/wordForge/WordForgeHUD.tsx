@@ -119,7 +119,7 @@ export function WordForgeHUD({
           )}
           style={{ width: `${Math.min(progress, 100)}%` }}
         />
-        <span className="absolute inset-0 flex items-center justify-end pr-2 text-[10px] font-bold text-neo-black/70">
+        <span className="absolute inset-0 flex items-center justify-end pe-2 text-[10px] font-bold text-neo-black/70">
           {roundScore}/{roundTarget}
         </span>
       </div>

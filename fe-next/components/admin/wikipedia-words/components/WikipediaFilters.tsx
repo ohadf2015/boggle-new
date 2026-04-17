@@ -108,7 +108,7 @@ export function WikipediaFilters({
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
             placeholder="Search words..."
-            className="w-full pl-9 pr-3 py-2 border-2 border-gray-200 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-700 text-gray-800 dark:text-gray-200"
+            className="w-full ps-9 pe-3 py-2 border-2 border-gray-200 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-700 text-gray-800 dark:text-gray-200"
           />
         </div>
       </div>

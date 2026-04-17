@@ -494,7 +494,7 @@ export function InvalidWordsManager({ authToken }: InvalidWordsManagerProps) {
                         />
                       </div>
                       {/* Word Header */}
-                      <div className="flex items-start justify-between pl-6">
+                      <div className="flex items-start justify-between ps-6">
                         <div>
                           <h3 className="text-lg font-bold text-white">{word.word}</h3>
                           <div className="flex items-center gap-2 mt-1">

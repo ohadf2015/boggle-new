@@ -229,7 +229,7 @@ export default async function NLetterWordsPage({ params }: PageParams) {
                     {WORD_LENGTH_CONTENT[n].strategy}
                   </p>
                 </div>
-                <div className="border-l-4 border-neo-lime pl-4">
+                <div className="border-s-4 border-neo-lime ps-4">
                   <p className="text-xs font-bold text-neo-lime uppercase tracking-wider mb-1">Fun Fact</p>
                   <p className="text-slate-300 text-sm leading-relaxed">
                     {WORD_LENGTH_CONTENT[n].funFact}

@@ -126,7 +126,7 @@ export function KeyboardHintTooltip({
             </motion.div>
 
             {/* Text */}
-            <div className="flex-1 min-w-0 pr-2">
+            <div className="flex-1 min-w-0 pe-2">
               <div className="font-black text-xs uppercase mb-0.5">
                 {t('keyboardHint.title')}
               </div>

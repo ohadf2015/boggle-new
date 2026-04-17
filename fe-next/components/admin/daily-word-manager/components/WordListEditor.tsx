@@ -86,7 +86,7 @@ export const WordListEditor: React.FC<WordListEditorProps> = ({
               value={searchQuery}
               onChange={e => onSearchChange(e.target.value)}
               placeholder="Search..."
-              className="w-full pl-9 pr-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-700"
+              className="w-full ps-9 pe-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-700"
             />
           </div>
         </div>

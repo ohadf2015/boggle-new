@@ -16,7 +16,7 @@ export default function PrivacyPolicyPageClient(): React.ReactElement {
 
   const headingClass = cn('text-xl font-bold mb-3', isDarkMode ? 'text-white' : 'text-gray-900');
   const textClass = cn('leading-relaxed', isDarkMode ? 'text-gray-300' : 'text-gray-600');
-  const listClass = cn('list-disc pl-6 space-y-2', isDarkMode ? 'text-gray-300' : 'text-gray-600');
+  const listClass = cn('list-disc ps-6 space-y-2', isDarkMode ? 'text-gray-300' : 'text-gray-600');
   const subheadingClass = cn('text-lg font-semibold mb-2 mt-4', isDarkMode ? 'text-white' : 'text-gray-900');
 
   return (

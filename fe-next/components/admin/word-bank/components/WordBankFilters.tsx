@@ -132,7 +132,7 @@ export function WordBankFilters({
               value={searchQuery}
               onChange={e => onSearchChange(e.target.value)}
               placeholder={t('admin.wordBank.filters.search')}
-              className="w-full bg-gray-900 border border-gray-700 text-white rounded-lg pl-10 pr-3 py-2 focus:outline-hidden focus:ring-2 focus:ring-neo-yellow"
+              className="w-full bg-gray-900 border border-gray-700 text-white rounded-lg ps-10 pe-3 py-2 focus:outline-hidden focus:ring-2 focus:ring-neo-yellow"
             />
           </div>
         </div>
