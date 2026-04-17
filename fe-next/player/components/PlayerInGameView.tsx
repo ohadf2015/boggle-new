@@ -9,18 +9,19 @@ import TournamentStandings from '../../components/TournamentStandings';
 import dynamic from 'next/dynamic';
 import InGameScreen from '../../components/game/InGameScreen';
 import { useBlastMultiplayerBridge } from '@/components/blast/hooks/useBlastMultiplayerBridge';
+import { GameLoadingFallback } from '@/components/ui/GameLoadingFallback';
 
 const BlastGame = dynamic(
   () => import('@/components/blast/BlastGame').then(m => ({ default: m.BlastGame })),
-  { ssr: false },
+  { ssr: false, loading: () => <GameLoadingFallback /> },
 );
 const WordHuntGame = dynamic(
   () => import('@/components/wordhunt/WordHuntGame').then(m => ({ default: m.WordHuntGame })),
-  { ssr: false },
+  { ssr: false, loading: () => <GameLoadingFallback /> },
 );
 const WheelRushView = dynamic(
   () => import('@/components/multiplayer/WheelRushView').then(m => ({ default: m.WheelRushView })),
-  { ssr: false },
+  { ssr: false, loading: () => <GameLoadingFallback /> },
 );
 import type { LetterGrid, Language, Avatar as AvatarType, TournamentStanding } from '@/shared/types/game';
 import type { BoardTheme } from '@/shared/types/socket';

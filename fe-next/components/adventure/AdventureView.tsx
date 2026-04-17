@@ -45,7 +45,7 @@ import { useDailyQuests } from '@/hooks/useDailyQuests';
 import { forgeRune as forgeRuneLogic, equipRune as equipRuneLogic, unequipRune as unequipRuneLogic } from '@/lib/adventure/runeCatalog';
 
 const AdventureGame = dynamic(() => import('./AdventureGame'), { ssr: false, loading: () => <div className="h-screen bg-neo-navy flex items-center justify-center"><Loader2 className="w-12 h-12 text-neo-yellow animate-spin" /></div> });
-const AdventureWheelGame = dynamic(() => import('./AdventureWheelGame'), { ssr: false });
+const AdventureWheelGame = dynamic(() => import('./AdventureWheelGame'), { ssr: false, loading: () => <div className="h-screen bg-neo-navy flex items-center justify-center"><Loader2 className="w-12 h-12 text-neo-yellow animate-spin" /></div> });
 const AuthModal = dynamic(() => import('@/components/auth/AuthModal'), { ssr: false });
 
 
