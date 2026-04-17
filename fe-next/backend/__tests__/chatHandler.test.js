@@ -24,7 +24,7 @@ import { registerChatHandlers } from '../handlers/chatHandler';
 import { getGame, getGameBySocketId, getUsernameBySocketId } from '../modules/gameStateManager';
 import { broadcastToRoom, getGameRoom } from '../utils/socketHelpers';
 import { cleanProfanity } from '../utils/profanityFilter';
-import { emitError, ErrorCodes, ErrorMessages } from '../utils/errorHandler';
+import { emitError, ErrorCodes } from '../utils/errorHandler';
 import { checkRateLimit } from '../utils/rateLimiter';
 import { inc } from '../utils/metrics';
 import { isSocketMigrating } from '../handlers/shared';

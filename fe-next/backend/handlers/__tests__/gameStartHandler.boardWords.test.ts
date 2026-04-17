@@ -51,7 +51,10 @@ vi.mock('../../../backend/utils/logger', () => ({
   default: mockLogger,
 }));
 vi.mock('../../../backend/modules/wordValidator', () => ({ makePositionsMap: vi.fn(() => new Map()) }));
-vi.mock('../../../backend/utils/errorHandler', () => ({ emitError: vi.fn(), ErrorMessages: {} }));
+vi.mock('../../../backend/utils/errorHandler', async () => {
+  const actual = await vi.importActual<typeof import('../../../backend/utils/errorHandler')>('../../../backend/utils/errorHandler');
+  return { ...actual, emitError: vi.fn() };
+});
 vi.mock('../../../backend/utils/rateLimiter', () => ({ checkRateLimit: vi.fn(() => true), default: { checkRateLimit: vi.fn(() => true) } }));
 vi.mock('../../../backend/utils/gameStartCoordinator', () => ({ default: { prepareGame: vi.fn() } }));
 vi.mock('../../../backend/utils/timerManager', () => ({ default: { clearGameTimer: vi.fn() }, clearGameTimer: vi.fn() }));

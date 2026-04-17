@@ -612,24 +612,3 @@ export function isAppError(error: unknown): error is AppError {
   return error instanceof AppError;
 }
 
-// ==========================================
-// Legacy Support (ErrorMessages)
-// ==========================================
-
-/**
- * Legacy error messages for backwards compatibility
- * @deprecated Use ErrorCodes + createError() instead. Will be removed in v2.0.
- */
-export const ErrorMessages = {
-  INVALID_GAME_CODE: ErrorRegistry[ErrorCodes.GAME_INVALID_CODE].message,
-  GAME_NOT_FOUND: ErrorRegistry[ErrorCodes.GAME_NOT_FOUND].message,
-  NOT_IN_GAME: ErrorRegistry[ErrorCodes.PLAYER_NOT_IN_GAME].message,
-  USERNAME_REQUIRED: 'Game code and username are required',
-  ROOM_FULL: (max: number): string => `Room is full (maximum ${max} players)`,
-  ONLY_HOST_CAN_START: ErrorRegistry[ErrorCodes.PLAYER_NOT_HOST].message,
-  ONLY_HOST_CAN_END: ErrorRegistry[ErrorCodes.PLAYER_NOT_HOST].message,
-  RATE_LIMIT_EXCEEDED: ErrorRegistry[ErrorCodes.RATE_LIMIT_EXCEEDED].message,
-  INVALID_WORD_SUBMISSION: 'Invalid word submission - missing required fields',
-  INVALID_MESSAGE: 'Invalid message',
-  GAME_NOT_IN_PROGRESS: ErrorRegistry[ErrorCodes.GAME_NOT_IN_PROGRESS].message
-};

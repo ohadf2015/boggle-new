@@ -64,10 +64,10 @@ vi.mock('../../utils/socketHelpers', () => ({
   isSocketMigrating: vi.fn().mockReturnValue(false),
 }));
 
-vi.mock('../../utils/errorHandler', () => ({
-  emitError: vi.fn(),
-  ErrorMessages: { GAME_NOT_FOUND: 'Game not found' },
-}));
+vi.mock('../../utils/errorHandler', async () => {
+  const actual = await vi.importActual<typeof import('../../utils/errorHandler')>('../../utils/errorHandler');
+  return { ...actual, emitError: vi.fn() };
+});
 
 vi.mock('../../utils/rateLimiter', () => ({ checkRateLimit: vi.fn().mockReturnValue(true), default: {
   checkRateLimit: vi.fn().mockReturnValue(true),

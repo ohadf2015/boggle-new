@@ -118,10 +118,10 @@ vi.mock('../../../backend/modules/wordValidator', () => ({
   makePositionsMap: vi.fn().mockReturnValue(new Map()),
 }));
 
-vi.mock('../../../backend/utils/errorHandler', () => ({
-  emitError: vi.fn(),
-  ErrorMessages: { NOT_IN_GAME: 'Not in game', GAME_NOT_FOUND: 'Game not found', ONLY_HOST_CAN_START: 'Only host' },
-}));
+vi.mock('../../../backend/utils/errorHandler', async () => {
+  const actual = await vi.importActual<typeof import('../../../backend/utils/errorHandler')>('../../../backend/utils/errorHandler');
+  return { ...actual, emitError: vi.fn() };
+});
 
 vi.mock('../../../backend/utils/rateLimiter', () => ({ checkRateLimit: vi.fn().mockReturnValue(true), default: {
   checkRateLimit: vi.fn().mockReturnValue(true),
