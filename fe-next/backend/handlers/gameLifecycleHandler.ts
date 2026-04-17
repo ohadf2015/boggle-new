@@ -121,7 +121,7 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
       const validation = validatePayload(createGameSchema, data);
       if (!validation.success) {
         logger.warn('SOCKET', `Create game validation failed: ${validation.error}`, { data });
-        emitError(socket, `Invalid request: ${validation.error}`);
+        emitError(socket, ErrorCodes.VALIDATION_INVALID_PAYLOAD, { message: `Invalid request: ${validation.error}` });
         return;
       }
 
@@ -137,7 +137,7 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
 
       if (gameExists(gameCode) || gamesBeingCreated.has(gameCode)) {
         logger.warn('SOCKET', `Game code already exists or in-flight: ${gameCode}`);
-        emitError(socket, 'Game code already in use');
+        emitError(socket, ErrorCodes.GAME_ALREADY_EXISTS);
         return;
       }
 
@@ -152,7 +152,7 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
       // Re-check after async yield — another socket may have created it
       if (gameExists(gameCode)) {
         logger.warn('SOCKET', `Game code created by another socket during async: ${gameCode}`);
-        emitError(socket, 'Game code already in use');
+        emitError(socket, ErrorCodes.GAME_ALREADY_EXISTS);
         return;
       }
 
@@ -241,7 +241,7 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
         socketId: socket.id,
         data
       });
-      emitError(socket, 'Failed to create game. Please try again.');
+      emitError(socket, ErrorCodes.INTERNAL_ERROR, { message: 'Failed to create game. Please try again.' });
     }
   });
 
@@ -255,7 +255,7 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
     const validation = validatePayload(getWordsForBoardSchema, data);
     if (!validation.success) {
       logger.warn('SOCKET', `getWordsForBoard validation failed: ${validation.error}`, { data });
-      emitError(socket, `Invalid request: ${validation.error}`);
+      emitError(socket, ErrorCodes.VALIDATION_INVALID_PAYLOAD, { message: `Invalid request: ${validation.error}` });
       return;
     }
 
@@ -419,7 +419,7 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
         !!hostUser?.authUserId &&
         hostUser.authUserId === verifiedUserId;
       if (!isHostBySocketId && !isHostByAuthId) {
-        emitError(socket, 'Only host can reset the game');
+        emitError(socket, ErrorCodes.PLAYER_NOT_HOST, { message: 'Only host can reset the game' });
         if (typeof callback === 'function') callback({ success: false, error: 'Only host can reset' });
         return;
       }
