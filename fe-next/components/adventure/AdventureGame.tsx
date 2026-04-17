@@ -38,6 +38,7 @@ import { useDailyQuests } from '@/hooks/useDailyQuests';
 import { useChapterQuests } from '@/hooks/useChapterQuests';
 import { getChapterNumber } from '@/lib/adventure/questConfig';
 import { applyGemDetectorBoost, LEVELS_PER_WORLD } from '@/lib/adventure';
+import { useMemoizedFlatTiles } from '@/lib/adventure/flattenTiles';
 import AdventureGameShell from './AdventureGameShell';
 import { useAdventureDerivations } from './hooks/useAdventureDerivations';
 import { useAdventureActions } from './hooks/useAdventureActions';
@@ -52,7 +53,7 @@ import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useAdventureKeyboardShortcuts } from './hooks/useAdventureKeyboardShortcuts';
 import { useAdventureSFX, useAdventureAnalytics } from './hooks/useAdventureSFXAndAnalytics';
 import { useAdventureMusic } from '@/hooks/useAdventureMusic';
-import type { LevelConfig, TileState, GridTileState } from '@/types/adventure';
+import type { LevelConfig } from '@/types/adventure';
 import { MAX_EQUIPPED_RUNES } from '@/lib/adventure/runeCatalog';
 import { RunePicker } from '@/components/wordForge/RunePicker';
 
@@ -69,21 +70,6 @@ interface AdventureGameProps {
   onNextWorld?: () => void;
 }
 
-
-function flattenTiles(tiles2D: TileState[][]): GridTileState[] {
-  const flat: GridTileState[] = [];
-  for (let row = 0; row < tiles2D.length; row++) {
-    for (let col = 0; col < tiles2D[row].length; col++) {
-      flat.push({ ...tiles2D[row][col], id: `tile-${row}-${col}`, row, col });
-    }
-  }
-  return flat;
-}
-
-function useMemoizedFlatTiles(tiles2D: TileState[][], tilesVersion: number): GridTileState[] {
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  return useMemo(() => flattenTiles(tiles2D), [tilesVersion]);
-}
 
 const AdventureGame = memo<AdventureGameProps>(
   ({ levelConfig, initialGrid, onLevelComplete, onExit, onTimerStateChange, totalStars, onNextWorld }) => {
