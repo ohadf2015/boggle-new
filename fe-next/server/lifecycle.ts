@@ -13,6 +13,7 @@ import { restoreTournamentsFromRedis } from '../backend/modules/tournamentManage
 import { pool as wordValidatorPool } from '../backend/modules/wordValidatorPool';
 import { setEventLoopLag } from '../backend/utils/metrics';
 import { setupRedisAdapter, cleanupRedisAdapter, type ExtendedSocketServer } from './redisAdapter';
+import { shutdownInMemorySingletons } from './shutdownSingletons';
 import { clearCleanupTimers } from './socketSetup';
 import { stopConnectionHealthCheck } from '../backend/handlers/presenceHandler';
 import { stopEmptyRoomCleanup } from '../backend/socketHandlers';
@@ -212,6 +213,9 @@ export function createShutdownHandler(httpServer: HttpServer, io: Server): Shutd
 
     // Close socket connections
     io.close(() => lifecycleLogger.info('Socket.IO server closed'));
+
+    // Stop in-memory singleton intervals (rate limiters + spam detector)
+    shutdownInMemorySingletons();
 
     // Clean up Redis adapter clients
     await cleanupRedisAdapter(extendedIo);
