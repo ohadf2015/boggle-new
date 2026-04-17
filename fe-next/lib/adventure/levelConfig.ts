@@ -224,7 +224,7 @@ export interface ValidationResult {
 export function validateLevelConfig(config: LevelConfig): ValidationResult {
   const errors: string[] = [];
 
-  if (config.world < 1 || config.world > WORLDS_COUNT) {
+  if (config.world !== 0 && (config.world < 1 || config.world > WORLDS_COUNT)) {
     errors.push('Invalid world: must be 1-10');
   }
 

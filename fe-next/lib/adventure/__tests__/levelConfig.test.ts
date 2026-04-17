@@ -721,7 +721,7 @@ describe('Level Config Validation', () => {
 
     it('should fail for invalid world', () => {
       const config: LevelConfig = {
-        world: 0, // Invalid
+        world: -1, // Invalid — negative world
         level: 1,
         gridSize: 5,
         timerSeconds: 90,
@@ -736,6 +736,24 @@ describe('Level Config Validation', () => {
       const result = validateLevelConfig(config);
       expect(result.valid).toBe(false);
       expect(result.errors).toContain('Invalid world: must be 1-10');
+    });
+
+    it('should allow world 0 as endless mode', () => {
+      const config: LevelConfig = {
+        world: 0, // Endless mode
+        level: 1,
+        gridSize: 5,
+        timerSeconds: 90,
+        objectives: [{ type: 'score', target: 100, isPrimary: true }],
+        specialTiles: [],
+        difficulty: 'EASY',
+        chapterNumber: 1,
+        levelInChapter: 1,
+        isBossLevel: false,
+      };
+
+      const result = validateLevelConfig(config);
+      expect(result.valid).toBe(true);
     });
 
     it('should fail for empty objectives', () => {

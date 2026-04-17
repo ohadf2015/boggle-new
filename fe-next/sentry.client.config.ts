@@ -165,6 +165,8 @@ Sentry.init({
     /Failed to load CrazyGames friends/i,
     // Bots hitting routes with invalid locale params — not a bug
     /Incorrect locale information provided/i,
+    /RangeError.*invalid language tag/i,
+    /Invalid language tag/i,
     // Clipboard writeText when document not focused — browser restriction, not a bug
     /Document is not focused/i,
     /Failed to execute 'writeText' on 'Clipboard'/i,

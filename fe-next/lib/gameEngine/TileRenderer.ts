@@ -185,6 +185,10 @@ export class TileRenderer {
     const cleared: string[] = [];
 
     for (const [id, sprite] of this.tiles) {
+      if (sprite.container.destroyed || !sprite.container.position) {
+        this.tiles.delete(id);
+        continue;
+      }
       switch (sprite.animState) {
         case 'appearing': {
           sprite.animProgress += deltaSec / 0.2; // 200ms appear
