@@ -277,7 +277,7 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
             href={`/${language}/daily/word-hunt`}
             className={cn(
               'flex items-center gap-2 px-6 py-3 rounded-neo border-3 border-neo-black',
-              'bg-gradient-to-r from-neo-lime to-neo-cyan text-neo-black font-neo-display font-black',
+              'bg-linear-to-r from-neo-lime to-neo-cyan text-neo-black font-neo-display font-black',
               'shadow-[3px_3px_0px_black,0_0_16px_rgba(191,255,0,0.3)] hover:shadow-[3px_3px_0px_black,0_0_22px_rgba(0,255,255,0.4)] transition-all',
               isRTL ? 'active:-translate-x-px active:translate-y-px' : 'active:translate-x-px active:translate-y-px',
               'active:shadow-hard-pressed',

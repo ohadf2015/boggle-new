@@ -324,7 +324,7 @@ function HostPreGameView({
       {/* Dot-grid background texture */}
       <div className="absolute inset-0 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.07) 1px, transparent 1px)', backgroundSize: '20px 20px' }} />
       {/* Top gradient accent bar */}
-      <div className="w-full h-1 bg-gradient-to-r from-neo-cyan via-neo-pink to-neo-lime shrink-0 z-20" />
+      <div className="w-full h-1 bg-linear-to-r from-neo-cyan via-neo-pink to-neo-lime shrink-0 z-20" />
       {/* Lesson Mode Banner */}
       {lessonData && (
         <div className="shrink-0 px-3 py-2 bg-neo-purple/20 border-b-2 border-neo-purple/50">

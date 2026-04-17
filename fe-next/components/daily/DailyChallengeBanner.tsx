@@ -191,7 +191,7 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
     // SSR placeholder — invisible to match motion wrapper's initial opacity:0
     return (
       <div className={cn(
-        "w-full h-full rounded-neo border-3 border-neo-black shadow-hard-lg bg-gradient-to-br from-amber-500 via-yellow-400 to-orange-400 opacity-0",
+        "w-full h-full rounded-neo border-3 border-neo-black shadow-hard-lg bg-linear-to-br from-amber-500 via-yellow-400 to-orange-400 opacity-0",
         compact ? "p-2 sm:p-3" : "p-3 sm:p-4",
         className
       )}>
@@ -212,8 +212,8 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
   // Warm gold-to-amber gradient — premium daily challenge feel
   // Played state stays vibrant but slightly muted to signal completion
   const gradientClass = hasPlayed
-    ? "bg-gradient-to-br from-amber-600 via-yellow-500 to-orange-500"
-    : "bg-gradient-to-br from-amber-500 via-yellow-400 to-orange-400";
+    ? "bg-linear-to-br from-amber-600 via-yellow-500 to-orange-500"
+    : "bg-linear-to-br from-amber-500 via-yellow-400 to-orange-400";
 
   const glowColor = 'rgba(255, 215, 0, 0.5)';
 

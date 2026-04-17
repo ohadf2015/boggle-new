@@ -59,7 +59,7 @@ const PrestigeBadge = memo<PrestigeBadgeProps>(({
       className={cn(
         'inline-flex items-center rounded-md font-black text-white shadow-hard-sm',
         'border border-black/40 leading-none align-middle',
-        `bg-gradient-to-r ${gradient}`,
+        `bg-linear-to-r ${gradient}`,
         SIZE_CLASSES[size],
         className,
       )}

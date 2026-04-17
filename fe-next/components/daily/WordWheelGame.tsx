@@ -438,7 +438,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
             <AnimatePresence>
               {combo >= 2 && (
                 <motion.div
-                  className="flex items-center gap-1 px-1.5 py-0.5 rounded-neo border-2 border-neo-black bg-gradient-to-r from-neo-pink to-neo-red shadow-[0_0_10px_rgba(255,20,147,0.4)] shrink-0"
+                  className="flex items-center gap-1 px-1.5 py-0.5 rounded-neo border-2 border-neo-black bg-linear-to-r from-neo-pink to-neo-red shadow-[0_0_10px_rgba(255,20,147,0.4)] shrink-0"
                   initial={{ scale: 0, x: 20 }}
                   animate={{ scale: 1, x: 0 }}
                   exit={{ scale: 0, x: 20 }}
@@ -468,7 +468,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
           <motion.div
             className={cn(
               'h-full rounded-full',
-              timeLeft <= 10 ? 'bg-neo-red' : timeLeft <= 30 ? 'bg-neo-orange' : 'bg-gradient-to-r from-neo-lime to-neo-cyan',
+              timeLeft <= 10 ? 'bg-neo-red' : timeLeft <= 30 ? 'bg-neo-orange' : 'bg-linear-to-r from-neo-lime to-neo-cyan',
             )}
             style={{ width: `${(timeLeft / duration) * 100}%` }}
             transition={{ duration: 0.3 }}
@@ -572,7 +572,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
       <AnimatePresence>
         {passToast && (
           <motion.div
-            className="absolute top-16 left-1/2 -translate-x-1/2 z-30 px-3 py-1.5 rounded-neo border-3 border-neo-black bg-gradient-to-r from-neo-pink to-neo-purple text-neo-white font-neo-display font-black text-sm shadow-[3px_3px_0px_black,0_0_18px_rgba(255,20,147,0.5)] flex items-center gap-1.5 whitespace-nowrap"
+            className="absolute top-16 left-1/2 -translate-x-1/2 z-30 px-3 py-1.5 rounded-neo border-3 border-neo-black bg-linear-to-r from-neo-pink to-neo-purple text-neo-white font-neo-display font-black text-sm shadow-[3px_3px_0px_black,0_0_18px_rgba(255,20,147,0.5)] flex items-center gap-1.5 whitespace-nowrap"
             initial={{ opacity: 0, y: -20, scale: 0.8 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -20, scale: 0.8 }}
@@ -674,7 +674,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
           className={cn(
             'px-8 py-3 rounded-neo border-3 border-neo-black font-neo-display font-black text-lg',
             builtWord.length >= 3
-              ? 'bg-gradient-to-r from-neo-lime to-neo-cyan text-neo-black shadow-[3px_3px_0px_black,0_0_16px_rgba(191,255,0,0.3)] hover:shadow-[3px_3px_0px_black,0_0_22px_rgba(0,255,255,0.4)]'
+              ? 'bg-linear-to-r from-neo-lime to-neo-cyan text-neo-black shadow-[3px_3px_0px_black,0_0_16px_rgba(191,255,0,0.3)] hover:shadow-[3px_3px_0px_black,0_0_22px_rgba(0,255,255,0.4)]'
               : 'bg-neo-navy-light text-neo-cream/40 shadow-hard-lg',
             'active:shadow-hard-pressed active:translate-x-px active:translate-y-px',
             'disabled:cursor-not-allowed',

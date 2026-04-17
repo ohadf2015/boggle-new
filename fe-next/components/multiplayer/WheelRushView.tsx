@@ -490,7 +490,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
           className={cn(
             'px-8 py-3 rounded-neo border-3 border-neo-black font-neo-display font-black text-lg',
             builtWord.length >= MIN_LEN
-              ? 'bg-gradient-to-r from-neo-lime to-neo-cyan text-neo-black shadow-[3px_3px_0px_black,0_0_16px_rgba(191,255,0,0.3)] hover:shadow-[3px_3px_0px_black,0_0_22px_rgba(0,255,255,0.4)]'
+              ? 'bg-linear-to-r from-neo-lime to-neo-cyan text-neo-black shadow-[3px_3px_0px_black,0_0_16px_rgba(191,255,0,0.3)] hover:shadow-[3px_3px_0px_black,0_0_22px_rgba(0,255,255,0.4)]'
               : 'bg-neo-navy-light text-neo-cream/40 shadow-hard-lg',
             'active:shadow-hard-pressed active:translate-x-px active:translate-y-px',
             'disabled:cursor-not-allowed',
