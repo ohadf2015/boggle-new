@@ -3,7 +3,7 @@
 
 import React, { memo, useCallback, useState, useMemo, useRef } from 'react';
 import { usePreviousValue } from '@/hooks/usePreviousValue';
-import { trackLevelRetried, trackModalDismissed } from '@/utils/posthogEngagement';
+import { trackLevelRetried } from '@/utils/posthogEngagement';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useProgression } from '@/contexts/ProgressionContext';
@@ -46,11 +46,8 @@ import { getStreakMilestone } from '@/lib/adventure/adventureStreak';
 import GameplayBackground from './themed/GameplayBackground';
 import { GameHeader, GameSidebar, GameGridArea, GameLayout, GameInfoStrip } from './ui';
 import AdventureGameOverlays from './AdventureGameOverlays';
-import MechanicBonusToast from './MechanicBonusToast';
-import RetryAssistModal from './RetryAssistModal';
-import { getNearMissMessages } from '@/lib/adventure/nearMiss';
-import { AdventureTutorial, hasSeenTutorial } from './AdventureTutorial';
-import { AdventureToast } from './AdventureToast';
+import AdventureTailOverlays from './AdventureTailOverlays';
+import { hasSeenTutorial } from './AdventureTutorial';
 import { useAdventureGameCallbacks } from './hooks/useAdventureGameCallbacks';
 import { useAdventureQuestTracking } from './hooks/useAdventureQuestTracking';
 import { useAdventureGridInteraction } from './hooks/useAdventureGridInteraction';
@@ -63,8 +60,6 @@ import { useAdventureMusic } from '@/hooks/useAdventureMusic';
 import type { LevelConfig, TileState, GridTileState } from '@/types/adventure';
 import { MAX_EQUIPPED_RUNES } from '@/lib/adventure/runeCatalog';
 import { RunePicker } from '@/components/wordForge/RunePicker';
-import { RuneBar } from '@/components/wordForge/RuneBar';
-import { LowHPOverlay } from '@/components/wordhunt/LowHPOverlay';
 
 export interface GameTimerState { timeRemaining: number; totalTime: number; isPlaying: boolean; isPaused: boolean; }
 
@@ -727,48 +722,32 @@ const AdventureGame = memo<AdventureGameProps>(
             />
           }
         />
-        {/* Hunt mode: red vignette when HP is critically low — reused from WordHunt */}
-        {modeState.archetype === 'hunt' && currentHP != null && (
-          <LowHPOverlay hp={currentHP} />
-        )}
-        {/* Blast mode: last move warning overlay */}
-        {modeState.archetype === 'blast' && movesRemaining === 1 && isPlaying && (
-          <div className="fixed inset-0 z-40 pointer-events-none animate-pulse" style={{
-            background: 'radial-gradient(ellipse at center, transparent 40%, rgba(255,20,147,0.15) 100%)',
-          }} />
-        )}
-        <AdventureToast
+        <AdventureTailOverlays
+          archetype={modeState.archetype}
+          currentHP={currentHP}
+          movesRemaining={movesRemaining}
+          isPlaying={isPlaying}
           upgradeTriggered={upgradeTriggered}
           lastWordWasThemed={lastWordWasThemed}
           themedBonusMultiplier={levelConfig.themedBonusMultiplier}
-        />
-        <MechanicBonusToast
-          bonus={wordSubmit.mechanicBonus}
-          onDismiss={wordSubmit.dismissMechanicBonus}
+          mechanicBonus={wordSubmit.mechanicBonus}
+          dismissMechanicBonus={wordSubmit.dismissMechanicBonus}
           bossActive={isBossLevel && bossOrch.isBossActive}
+          showRetryAssist={showRetryAssist}
+          consecutiveFailures={consecutiveFailures}
+          wordsFoundCount={gameState.wordsFound.length}
+          score={gameState.score}
+          bestAttempt={bestAttempt ?? null}
+          objectives={objectives}
+          onRetryFromAssist={handleRetryFromAssist}
+          onRetryWithBonus={handleRetryWithBonus}
+          onRetryWithHint={handleRetryWithHint}
+          onExit={onExit}
+          showTutorial={showTutorial}
+          onTutorialComplete={() => setShowTutorial(false)}
+          forgeEquippedRunes={forgeEquippedRunes}
+          maxRuneSlots={MAX_EQUIPPED_RUNES}
         />
-        {showRetryAssist && (
-          <RetryAssistModal
-            isOpen={showRetryAssist}
-            consecutiveFailures={consecutiveFailures}
-            bestWords={Math.max(gameState.wordsFound.length, bestAttempt?.bestWords ?? 0)}
-            bestScore={Math.max(gameState.score, bestAttempt?.bestScore ?? 0)}
-            attemptCount={(bestAttempt?.attemptCount ?? 0) + 1}
-            nearMissMessages={getNearMissMessages(objectives)}
-            onRetry={handleRetryFromAssist}
-            onRetryWithBonus={handleRetryWithBonus}
-            onRetryWithHint={handleRetryWithHint}
-            onExit={() => { trackModalDismissed({ modalId: 'retry_assist', method: 'cta' }); onExit(); }}
-          />
-        )}
-        {showTutorial && (
-          <AdventureTutorial onComplete={() => setShowTutorial(false)} />
-        )}
-        {modeState.archetype === 'forge' && forgeEquippedRunes.length > 0 && (
-          <div className="fixed bottom-0 inset-x-0 z-30">
-            <RuneBar runes={forgeEquippedRunes} maxSlots={MAX_EQUIPPED_RUNES} />
-          </div>
-        )}
       </div>
     );
   }
