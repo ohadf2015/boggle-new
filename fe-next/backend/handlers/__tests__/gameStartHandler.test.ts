@@ -70,14 +70,10 @@ vi.mock('../../../backend/utils/socketValidation', () => ({
   validatePayload: mockValidatePayload,
   startGameSchema: {},
 }));
-vi.mock('../../../backend/utils/errorHandler', () => ({
-  emitError: mockEmitError,
-  ErrorMessages: {
-    NOT_IN_GAME: 'NOT_IN_GAME',
-    GAME_NOT_FOUND: 'GAME_NOT_FOUND',
-    ONLY_HOST_CAN_START: 'ONLY_HOST_CAN_START',
-  },
-}));
+vi.mock('../../../backend/utils/errorHandler', async () => {
+  const actual = await vi.importActual<typeof import('../../../backend/utils/errorHandler')>('../../../backend/utils/errorHandler');
+  return { ...actual, emitError: mockEmitError };
+});
 vi.mock('../../../backend/modules/gameStateManager', () => ({
   getGame: mockGetGame,
   updateGame: mockUpdateGame,
@@ -282,7 +278,7 @@ describe('registerStartGameHandler', () => {
 
       await triggerStartGame(handlers);
 
-      expect(mockEmitError).toHaveBeenCalledWith(socket, 'ONLY_HOST_CAN_START');
+      expect(mockEmitError).toHaveBeenCalledWith(socket, 'PLAYER_NOT_HOST');
       expect(mockTransitionGameState).not.toHaveBeenCalled();
     });
 
@@ -292,7 +288,7 @@ describe('registerStartGameHandler', () => {
 
       await triggerStartGame(handlers);
 
-      expect(mockEmitError).not.toHaveBeenCalledWith(expect.anything(), 'ONLY_HOST_CAN_START');
+      expect(mockEmitError).not.toHaveBeenCalledWith(expect.anything(), 'PLAYER_NOT_HOST');
       expect(mockTransitionGameState).toHaveBeenCalledWith('GAME1', 'START');
     });
 
@@ -303,7 +299,7 @@ describe('registerStartGameHandler', () => {
 
       await triggerStartGame(handlers);
 
-      expect(mockEmitError).toHaveBeenCalledWith(socket, 'NOT_IN_GAME');
+      expect(mockEmitError).toHaveBeenCalledWith(socket, 'PLAYER_NOT_IN_GAME');
     });
   });
 
@@ -499,7 +495,7 @@ describe('registerStartGameHandler', () => {
 
       await triggerStartGame(handlers);
 
-      expect(mockEmitError).toHaveBeenCalledWith(socket, 'Failed to start game');
+      expect(mockEmitError).toHaveBeenCalledWith(socket, 'INTERNAL_ERROR', { message: 'Failed to start game' });
       expect(mockBroadcastToRoom).not.toHaveBeenCalledWith(
         expect.anything(),
         expect.anything(),

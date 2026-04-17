@@ -27,7 +27,7 @@ import {
 } from '../utils/socketHelpers.js';
 
 import { makePositionsMap } from '../modules/wordValidator.js';
-import { emitError, ErrorMessages } from '../utils/errorHandler.js';
+import { emitError, ErrorCodes } from '../utils/errorHandler.js';
 import { checkRateLimit } from '../utils/rateLimiter.js';
 import gameStartCoordinator from '../utils/gameStartCoordinator.js';
 import { clearGameTimer } from '../utils/timerManager.js';
@@ -197,25 +197,25 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
     const gameCode = getGameBySocketId(socket.id);
 
     if (!gameCode) {
-      emitError(socket, ErrorMessages.NOT_IN_GAME);
+      emitError(socket, ErrorCodes.PLAYER_NOT_IN_GAME);
       return;
     }
 
     const game = getGame(gameCode);
     if (!game) {
-      emitError(socket, ErrorMessages.GAME_NOT_FOUND);
+      emitError(socket, ErrorCodes.GAME_NOT_FOUND);
       return;
     }
 
     if (game.hostSocketId !== socket.id) {
-      emitError(socket, ErrorMessages.ONLY_HOST_CAN_START);
+      emitError(socket, ErrorCodes.PLAYER_NOT_HOST);
       return;
     }
 
     // Mutex: prevent concurrent startGame flows for the same game
     if (gamesStarting.has(gameCode)) {
       logger.debug('SOCKET', `Rejected duplicate startGame for ${gameCode} (mutex held)`);
-      emitError(socket, 'Game is already starting');
+      emitError(socket, ErrorCodes.GAME_ALREADY_STARTED, { message: 'Game is already starting' });
       return;
     }
     gamesStarting.add(gameCode);
@@ -278,7 +278,7 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
       if (!blastAllowed) {
         gamesStarting.delete(gameCode);
         logger.debug('SOCKET', `Rejected blast mode for ${gameCode}: host lacks blast_access`);
-        emitError(socket, 'Blast mode requires special access');
+        emitError(socket, ErrorCodes.AUTH_FORBIDDEN, { message: 'Blast mode requires special access' });
         return;
       }
     }
@@ -289,7 +289,7 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
     if (!transitionResult.success) {
       gamesStarting.delete(gameCode);
       logger.warn('SOCKET', `Rejected concurrent startGame for ${gameCode}: ${transitionResult.error}`);
-      emitError(socket, 'Failed to start game');
+      emitError(socket, ErrorCodes.INTERNAL_ERROR, { message: 'Failed to start game' });
       return;
     }
 
