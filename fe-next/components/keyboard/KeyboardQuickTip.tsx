@@ -36,7 +36,7 @@ export function KeyboardQuickTip({
           className={cn(
             'fixed top-4 left-1/2 -translate-x-1/2 z-50',
             'max-w-[90%] sm:max-w-md',
-            'bg-neo-pink/95 backdrop-blur-md text-white',
+            'bg-neo-pink/95 backdrop-blur-xs text-white',
             'border-3 border-neo-black',
             'rounded-neo shadow-hard-lg',
             'px-3 py-2'

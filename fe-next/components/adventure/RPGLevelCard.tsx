@@ -88,7 +88,7 @@ const RPGLevelCard = memo(function RPGLevelCard({
       {/* Card background */}
       <div className={cn(
         'relative',
-        'bg-[rgba(15,15,35,0.9)] backdrop-blur-md',
+        'bg-[rgba(15,15,35,0.9)] backdrop-blur-xs',
         isBoss && 'min-h-[160px]',
       )}>
         {/* Top accent strip — world-colored gradient for unlocked, muted for locked */}

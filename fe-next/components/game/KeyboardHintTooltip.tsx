@@ -97,7 +97,7 @@ export function KeyboardHintTooltip({
           className={cn(
             'fixed top-28 left-4 z-40',
             'max-w-[220px]',
-            'bg-neo-pink/95 backdrop-blur-md text-white',
+            'bg-neo-pink/95 backdrop-blur-xs text-white',
             'border-3 border-neo-black',
             'rounded-neo-lg shadow-hard-lg',
             'p-3'

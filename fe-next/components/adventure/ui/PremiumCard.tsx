@@ -135,7 +135,7 @@ export const PremiumCard = memo(function PremiumCard({
   const variantStyles = {
     default: {
       border: 'border-4 border-neo-black',
-      bg: 'bg-neo-black/50 backdrop-blur-md',
+      bg: 'bg-neo-black/50 backdrop-blur-xs',
       shadow: '6px 6px 0px black',
       hoverShadow: '8px 8px 0px black',
       glowColor: 'rgba(0,0,0,0)',
@@ -143,7 +143,7 @@ export const PremiumCard = memo(function PremiumCard({
     },
     gold: {
       border: 'border-4 border-neo-yellow',
-      bg: 'bg-linear-to-br from-neo-yellow/20 via-neo-yellow/10 to-transparent backdrop-blur-md',
+      bg: 'bg-linear-to-br from-neo-yellow/20 via-neo-yellow/10 to-transparent backdrop-blur-xs',
       shadow: '6px 6px 0px #8B7508',
       hoverShadow: '8px 8px 0px #8B7508',
       glowColor: 'rgba(255, 225, 53, 0.4)',
@@ -159,7 +159,7 @@ export const PremiumCard = memo(function PremiumCard({
     },
     perfect: {
       border: 'border-4 border-neo-yellow',
-      bg: 'bg-linear-to-br from-neo-yellow/15 via-white/5 to-transparent backdrop-blur-md',
+      bg: 'bg-linear-to-br from-neo-yellow/15 via-white/5 to-transparent backdrop-blur-xs',
       shadow: '6px 6px 0px #8B7508',
       hoverShadow: '8px 8px 0px #8B7508',
       glowColor: 'rgba(255, 225, 53, 0.3)',
@@ -167,7 +167,7 @@ export const PremiumCard = memo(function PremiumCard({
     },
     mythic: {
       border: 'border-4 border-transparent',
-      bg: 'bg-linear-to-br from-purple-500/20 via-pink-500/20 to-cyan-500/20 backdrop-blur-md',
+      bg: 'bg-linear-to-br from-purple-500/20 via-pink-500/20 to-cyan-500/20 backdrop-blur-xs',
       shadow: '6px 6px 0px #4B0082',
       hoverShadow: '8px 8px 0px #4B0082',
       glowColor: 'rgba(255, 0, 255, 0.4)',
