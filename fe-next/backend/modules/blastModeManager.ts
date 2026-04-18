@@ -279,7 +279,7 @@ export function advanceBlastWave(
   gameCode: string,
   grid: string[][],
 ): BlastModeState {
-  const nextWave = state.wave + 1;
+  const nextWave = (state.wave ?? 1) + 1;
   const overlaySeed = hashStringToSeed(`${gameCode}:wave${nextWave}`);
   const players = Object.keys(state.playerMoves);
   const fresh = initBlastModeState(grid, players, nextWave, overlaySeed);

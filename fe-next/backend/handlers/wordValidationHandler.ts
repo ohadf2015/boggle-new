@@ -158,7 +158,8 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
               playerBonusMoves: next.playerBonusMoves,
               totalMoves: next.totalMoves,
             });
-            const archetype = getWaveConfig(next.wave).archetype;
+            const nextWaveNum = next.wave ?? currentWave + 1;
+            const archetype = getWaveConfig(nextWaveNum).archetype;
             logger.info('BLAST', `Board cleared in ${gameCode} by ${username} — advancing to wave ${next.wave} (${archetype})`);
             broadcastToRoom(io, getGameRoom(gameCode), 'blastWaveAdvance', {
               wave: next.wave,
