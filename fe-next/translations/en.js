@@ -522,6 +522,12 @@ const en = {
     "toResume": "to resume",
     "delete": "Delete",
     "gold": "Gold",
+    "copiedToClipboard": "Copied to clipboard!",
+    "navigation": "Navigation",
+    "noResults": "No results",
+    "search": "Search",
+    "searchPlaceholder": "Search...",
+    "toClose": "to close",
     "aria": {
       "levelProgress": "Level progress",
       "overallProgress": "Overall progress",
@@ -1017,6 +1023,10 @@ const en = {
       "facialHairStyle": "Style",
       "colorTheme": "Color Theme",
       "bodyStyle": "Outfit",
+      "download": "Download",
+      "expressions": "Expressions",
+      "eyeColor": "Eye Color",
+      "nose": "Nose",
       bodyStyles: {
         default: "Default",
         hoodie: "Hoodie",
@@ -1135,6 +1145,8 @@ const en = {
     "host": "Host",
     "roomClosed": "Room closed",
     "rateLimited": "Slow down, speedster!",
+    "crazyGamesFriends": "Play with Friends on CrazyGames",
+    "inviteFriend": "Invite a Friend",
     "roomList": {
       "activeRooms": "Jump In!",
       "activeBattles": "Active Battles",
@@ -1498,7 +1510,9 @@ const en = {
     "letters": "letters",
     "wave": "Wave",
     "tilesCleared": "Tiles Cleared",
-    "blastWave": "WAVE {wave}"
+    "blastWave": "WAVE {wave}",
+    "timesUp": "TIME'S UP!",
+    "timesUpSub": "Pencils down!"
   },
   "tvLobby": {
     "waitingForPlayers": "Waiting for Players...",
@@ -3229,6 +3243,8 @@ const en = {
       "sendCode": "Send me a code",
       "noPassword": "No password needed",
       "codeSentTo": "Code sent to",
+      "codeSent": "Code sent!",
+      "enterCode": "Enter your code",
       "verify": "Verify code",
       "changeEmail": "Change email",
       "resend": "Resend code"
@@ -4303,7 +4319,13 @@ const en = {
     "name": "Season {{number}}: {{theme}}",
     "endingSoon": "Season ending soon!",
     "endsIn": "Ends in {{days}} days",
-    "peakTier": "Peak: {{tier}}"
+    "peakTier": "Peak: {{tier}}",
+    "complete": "Season Complete!",
+    "continue": "Continue",
+    "gamesPlayed": "Games Played",
+    "newSeason": "New Season",
+    "rewardCoins": "Coins Earned",
+    "softReset": "Rank Reset"
   },
   "growth": {
     "dayStreak": "day streak",
@@ -5038,7 +5060,11 @@ const en = {
       "fortnightFighter": "Fortnight Fighter",
       "monthlyMaster": "Monthly Master",
       "centurion": "Centurion"
-    }
+    },
+    "comeBackTomorrow": "Come back tomorrow!",
+    "milestoneReached": "Milestone reached!",
+    "rewardClaimed": "Reward claimed!",
+    "streakFreezeEarned": "Streak freeze earned!"
   },
   "dailyWordWheelLanding": {
     "hero": {
@@ -5136,6 +5162,11 @@ const en = {
   },
   "wordHunt": {
     "title": "Word Hunt",
+    "play": "Play Word Hunt",
+    "categoryHint": "Category: {{category}}",
+    "dangerAlert": "Danger! Low on lives!",
+    "eliminatedAlert": "You've been eliminated!",
+    "lastStanding": "Last one standing!",
     "welcome": {
       "title": "Daily Word Hunt"
     },
@@ -5534,7 +5565,12 @@ const en = {
     "youEliminated": "You're out!",
     "playerLastLife": "is on their last life!",
     "yourLastLife": "FINAL LIFE!",
-    "botsJoined": "No humans? {{count}} bots jumped in to keep you company!"
+    "botsJoined": "No humans? {{count}} bots jumped in to keep you company!",
+    "nearRank": "So close to rank up!",
+    "oneMoreWin": "One more win!",
+    "rankUp": "Rank Up!",
+    "welcomeToTier": "Welcome to {{tier}}!",
+    "winStreak": "{{count}} Win Streak!"
   },
   "stats": {
     "games": "Games",
@@ -5581,7 +5617,14 @@ const en = {
         "blitz": "Blitz",
         "survival": "Survival"
       },
-      "sent": "Challenge sent!"
+      "sent": "Challenge sent!",
+      "accept": "Accept",
+      "accepted": "Challenge accepted!",
+      "acceptFailed": "Failed to accept challenge",
+      "decline": "Decline",
+      "declined": "Challenge declined",
+      "friendAccepted": "{{name}} accepted your challenge!",
+      "received": "Challenge received!"
     },
     "copyInviteLink": "Copy invite link",
     "linkCopied": "Link copied!",
@@ -6541,7 +6584,6 @@ const en = {
       "achievements": "Achievements"
     },
     "worldLabel": "World",
-    "world": "World",
     "stars": "stars",
     "levelsCompleted": "levels completed",
     "locked": "Locked",
@@ -6890,11 +6932,6 @@ const en = {
     "retryLevel": "Retry",
     "backToLevels": "World Map",
     "freeRetry": "Free Retry",
-    "share": {
-      "perfectClear": "Perfect Clear",
-      "bestWord": "Best Word",
-      "wordsFound": "words found"
-    },
     "streak": {
       "days": "day streak",
       "milestone3": "3-Day Streak!",
@@ -6989,7 +7026,10 @@ const en = {
     "share": {
       "bossDefeated": "I defeated {{boss}} in {{world}}!",
       "shareCard": "Share Victory",
-      "killingWord": "Killing Word"
+      "killingWord": "Killing Word",
+      "perfectClear": "Perfect Clear",
+      "bestWord": "Best Word",
+      "wordsFound": "words found"
     },
     "quest": {
       "title": "Chapter Quests",
@@ -7107,7 +7147,11 @@ const en = {
       "timerFrozen": "Timer frozen for {seconds}s!",
       "shieldBlocked": "Shield blocked {percent}% damage!",
       "allObjectivesComplete": "All Objectives Complete!",
-      "gridAriaLabel": "Adventure game board"
+      "gridAriaLabel": "Adventure game board",
+      "wordsYouMissed": "Words You Missed",
+      "missedWordsSummary": "{{count}} words you could have found",
+      "showLess": "Show less",
+      "showMore": "Show more"
     },
     "nearMiss": {
       "almostThere": "Almost There!",
@@ -7327,6 +7371,8 @@ const en = {
       "bossDefeated": "Boss Defeated!",
       "bossWins": "Boss Wins...",
       "nearMiss": "SO CLOSE!",
+      "newMechanic": "New mechanic unlocked!",
+      "tutorialGotIt": "Got it!",
       "nearMissDesc": "Only {{hp}}% HP left! You almost had them!",
       "fragmentCollected": "LEXICON FRAGMENT RECOVERED!",
       "fragmentCount": "Fragment {{current}} of {{total}} collected",
@@ -7890,7 +7936,41 @@ const en = {
       "goldenQuill": "Golden Quill",
       "worldEssence": "World Essence",
       "ancientRelic": "Ancient Relic",
-      "cosmicShard": "Cosmic Shard"
+      "cosmicShard": "Cosmic Shard",
+      "fragment": "Fragment",
+      "luckyBonus": "Lucky Bonus!"
+    },
+    "ascension": {
+      "level1": "Novice",
+      "level2": "Apprentice",
+      "level3": "Adept",
+      "level4": "Skilled",
+      "level5": "Expert",
+      "level6": "Master",
+      "level7": "Grandmaster",
+      "level8": "Legend",
+      "level9": "Mythic",
+      "level10": "Transcendent"
+    },
+    "consumables": {
+      "bossRevive": { "name": "Boss Revive" },
+      "bossShield": { "name": "Boss Shield" },
+      "doubleGold": { "name": "Double Gold" },
+      "extraHint": { "name": "Extra Hint" },
+      "gridReroll": { "name": "Grid Reroll" },
+      "objectiveSkip": { "name": "Objective Skip" },
+      "perfectStar": { "name": "Perfect Star" },
+      "timerExtension": { "name": "Timer Extension" }
+    },
+    "mutators": {
+      "blindMode": { "name": "Blind Mode" },
+      "chaosGrid": { "name": "Chaos Grid" },
+      "fragile": { "name": "Fragile" },
+      "ironMan": { "name": "Iron Man" },
+      "minimalist": { "name": "Minimalist" },
+      "noHints": { "name": "No Hints" },
+      "speedRun": { "name": "Speed Run" },
+      "wordMaster": { "name": "Word Master" }
     },
     "collection": {
       "title": "Collection",
@@ -9161,7 +9241,8 @@ const en = {
       "teacherFeature1": "Real-time analytics",
       "teacherFeature2": "Custom word lists",
       "teacherFeature3": "Classroom games",
-      "title": "LexiClash Education"
+      "title": "LexiClash Education",
+      "startGame": "Start Game"
     },
     "leaderboard": {
       "allTime": "All Time",
@@ -10078,6 +10159,7 @@ const en = {
     }
   },
   "wotd": {
+    "title": "Word of the Day",
     "teaser": "Word of the Day",
     "found": "You found it!",
     "foundPercent": "Only {{percent}}% of players found this!",
@@ -10385,6 +10467,7 @@ const en = {
   "wordForge": {
     "title": "Word Forge",
     "subtitle": "Spell words. Collect runes. Break the score.",
+    "go": "Go!",
     "startRun": "Start Run",
     "round": "Round",
     "roundOf": "Round {{round}} of {{max}}",
@@ -10445,6 +10528,12 @@ const en = {
       "escalator": "Target increases 5% per word",
       "nullifier": "Your first 2 rune slots are disabled",
       "inverter": "Chip runes disabled, only mult works"
+    }
+  },
+  "wheel": {
+    "rush": {
+      "loading": "Loading...",
+      "fogActive": "Fog of War active!"
     }
   },
   "socketErrors": {

@@ -522,6 +522,12 @@ const sv = {
     "toResume": "för att fortsätta",
     "delete": "Radera",
     "gold": "Guld",
+    "copiedToClipboard": "Kopierat till urklipp!",
+    "navigation": "Navigation",
+    "noResults": "Inga resultat",
+    "search": "Sök",
+    "searchPlaceholder": "Sök...",
+    "toClose": "att stänga",
     "aria": {
       "levelProgress": "Nivåprogression",
       "overallProgress": "Övergripande progression",
@@ -1032,6 +1038,10 @@ const sv = {
       "facialHairStyle": "Stil",
       "colorTheme": "Färgtema",
       "bodyStyle": "Kläder",
+      "download": "Ladda ner",
+      "expressions": "Uttryck",
+      "eyeColor": "Ögonfärg",
+      "nose": "Näsa",
       bodyStyles: {
         default: "Standard",
         hoodie: "Hoodie",
@@ -1147,6 +1157,8 @@ const sv = {
     ]
   },
   "multiplayerFlow": {
+    "crazyGamesFriends": "Spela med vänner på CrazyGames",
+    "inviteFriend": "Bjud in en vän",
     "host": "Värd",
     "roomClosed": "Rummet stängt",
     "rateLimited": "Lugna ner dig!",
@@ -1514,7 +1526,9 @@ const sv = {
     "letters": "bokstäver",
     "wave": "Våg",
     "tilesCleared": "Brickor rensade",
-    "blastWave": "VÅG {wave}"
+    "blastWave": "VÅG {wave}",
+    "timesUp": "TIDEN ÄR UTE!",
+    "timesUpSub": "Pennorna ner!"
   },
   "tvLobby": {
     "waitingForPlayers": "Väntar på spelare...",
@@ -3123,6 +3137,8 @@ const sv = {
       "noPassword": "Inget lösenord behövs"
     },
     "otp": {
+      "codeSent": "Kod skickad!",
+      "enterCode": "Ange din kod",
       "sendCode": "Skicka mig en kod",
       "noPassword": "Inget lösenord behövs",
       "codeSentTo": "Kod skickad till",
@@ -4198,7 +4214,13 @@ const sv = {
     "name": "Säsong {{number}}: {{theme}}",
     "endingSoon": "Säsongen slutar snart!",
     "endsIn": "Slutar om {{days}} dagar",
-    "peakTier": "Topp: {{tier}}"
+    "peakTier": "Topp: {{tier}}",
+    "complete": "Säsongen klar!",
+    "continue": "Fortsätt",
+    "gamesPlayed": "Spelade spel",
+    "newSeason": "Ny säsong",
+    "rewardCoins": "Mynt intjänade",
+    "softReset": "Rankåterställning"
   },
   "growth": {
     "dayStreak": "dagars svit",
@@ -4940,7 +4962,11 @@ const sv = {
       "fortnightFighter": "Tvåveckorskämpe",
       "monthlyMaster": "Månadsmästare",
       "centurion": "Centurion"
-    }
+    },
+    "comeBackTomorrow": "Kom tillbaka imorgon!",
+    "milestoneReached": "Milstolpe nådd!",
+    "rewardClaimed": "Belöning hämtad!",
+    "streakFreezeEarned": "Svitfrysning tjänad!"
   },
   "dailyWordWheelLanding": {
     "hero": {
@@ -5037,6 +5063,11 @@ const sv = {
     "pointsPerWord": "Poäng per ord"
   },
   "wordHunt": {
+    "play": "Spela Ordjakt",
+    "categoryHint": "Kategori: {{category}}",
+    "dangerAlert": "Fara! Lågt på liv!",
+    "eliminatedAlert": "Du har eliminerats!",
+    "lastStanding": "Sist man stående!",
     "title": "Ordjakt",
     "welcome": {
       "title": "Daglig Ordjakt"
@@ -5391,6 +5422,13 @@ const sv = {
     "blockedUsers": "Blockerade användare",
     "unblock": "Avblockera",
     "challenges": {
+      "accept": "Acceptera",
+      "accepted": "Utmaning accepterad!",
+      "acceptFailed": "Kunde inte acceptera utmaning",
+      "decline": "Avvisa",
+      "declined": "Utmaning avvisad",
+      "friendAccepted": "{{name}} accepterade din utmaning!",
+      "received": "Utmaning mottagen!",
       "send": "Skicka Utmaning",
       "pending": "Väntande Utmaning",
       "customMessage": "Lägg till ett meddelande (valfritt)",
@@ -5456,7 +5494,12 @@ const sv = {
     "youEliminated": "Du har eliminerats!",
     "playerLastLife": "har ett liv kvar!",
     "yourLastLife": "SISTA LIVET!",
-    "botsJoined": "{{count}} motståndare anslöt — inga riktiga spelare, så du fick bottar!"
+    "botsJoined": "{{count}} motståndare anslöt — inga riktiga spelare, så du fick bottar!",
+    "nearRank": "Så nära rankstigning!",
+    "oneMoreWin": "En vinst till!",
+    "rankUp": "Rankstigning!",
+    "welcomeToTier": "Välkommen till {{tier}}!",
+    "winStreak": "{{count}} vinstsvit!"
   },
   "stats": {
     "games": "Matcher",
@@ -6574,11 +6617,6 @@ const sv = {
       "allQuestsComplete": "Alla dagliga uppdrag klara! Bonus!",
       "dailyQuestBonusComplete": "Alla uppdrag klara! +50 bonusguld"
     },
-    "share": {
-      "perfectClear": "Perfekt klart",
-      "bestWord": "Bästa ord",
-      "wordsFound": "ord hittade"
-    },
     "streak": {
       "days": "dagars svit",
       "milestone3": "3-dagars svit!",
@@ -6661,7 +6699,10 @@ const sv = {
     "share": {
       "bossDefeated": "Jag besegrade {{boss}} i {{world}}!",
       "shareCard": "Dela seger",
-      "killingWord": "Dödande ord"
+      "killingWord": "Dödande ord",
+      "perfectClear": "Perfekt klart",
+      "bestWord": "Bästa ord",
+      "wordsFound": "ord hittade"
     },
     "weeklyChallenge": {
       "title": "Veckoutmaning",
@@ -7016,7 +7057,11 @@ const sv = {
       "timerFrozen": "Timer frusen i {seconds}s!",
       "shieldBlocked": "Sköld blockerade {percent}% skada!",
       "allObjectivesComplete": "Alla mål uppnådda!",
-      "gridAriaLabel": "Äventyrsspelbräde"
+      "gridAriaLabel": "Äventyrsspelbräde",
+      "wordsYouMissed": "Ord du missade",
+      "missedWordsSummary": "{{count}} ord du kunde ha hittat",
+      "showLess": "Visa mindre",
+      "showMore": "Visa mer"
     },
     "nearMiss": {
       "almostThere": "Nästan där!",
@@ -7231,6 +7276,8 @@ const sv = {
       "open": "Öppna butiken"
     },
     "bosses": {
+      "newMechanic": "Ny mekanik upplåst!",
+      "tutorialGotIt": "Förstått!",
       "fightBoss": "Bekampa bossen",
       "bossIntro": "Bosskamp!",
       "bossDefeated": "Bossen besegrad!",
@@ -7799,9 +7846,38 @@ const sv = {
       "goldenQuill": "Gyllene fjäderpenna",
       "worldEssence": "Världsessens",
       "ancientRelic": "Forntida relik",
-      "cosmicShard": "Kosmisk skärva"
+      "cosmicShard": "Kosmisk skärva",
+      "fragment": "Fragment",
+      "luckyBonus": "Lyckobonusen!"
+    },
+    "ascension": {
+      "level1": "Nybörjare", "level2": "Lärling", "level3": "Adept",
+      "level4": "Skicklig", "level5": "Expert", "level6": "Mästare",
+      "level7": "Stormästare", "level8": "Legend", "level9": "Mytisk",
+      "level10": "Transcendent"
+    },
+    "consumables": {
+      "bossRevive": { "name": "Bossliv" },
+      "bossShield": { "name": "Bosssköld" },
+      "doubleGold": { "name": "Dubbelt guld" },
+      "extraHint": { "name": "Extra tips" },
+      "gridReroll": { "name": "Rutnätsomrullning" },
+      "objectiveSkip": { "name": "Hoppa mål" },
+      "perfectStar": { "name": "Perfekt stjärna" },
+      "timerExtension": { "name": "Tidförlängning" }
+    },
+    "mutators": {
+      "blindMode": { "name": "Blindläge" },
+      "chaosGrid": { "name": "Kaosrutnät" },
+      "fragile": { "name": "Skör" },
+      "ironMan": { "name": "Järnman" },
+      "minimalist": { "name": "Minimalist" },
+      "noHints": { "name": "Inga tips" },
+      "speedRun": { "name": "Speedrun" },
+      "wordMaster": { "name": "Ordmästare" }
     },
     "collection": {
+      "title": "Samling",
       "title": "Samling",
       "collected": "samlade",
       "items": "föremål",
@@ -8984,7 +9060,8 @@ const sv = {
       "teacherFeature1": "Liveanalys",
       "teacherFeature2": "Egna ordlistor",
       "teacherFeature3": "Klassrumsspel",
-      "title": "LexiClash Utbildning"
+      "title": "LexiClash Utbildning",
+      "startGame": "Starta spel"
     },
     "leaderboard": {
       "allTime": "Alla tider",
@@ -9895,6 +9972,7 @@ const sv = {
     }
   },
   "wotd": {
+    "title": "Dagens Ord",
     "teaser": "Dagens Ord",
     "found": "Du hittade det!",
     "foundPercent": "Bara {{percent}}% av spelarna hittade detta!",
@@ -10322,6 +10400,7 @@ const sv = {
     "everyoneVoting": "Alla röstar..."
   },
   "wordForge": {
+    "go": "Kör!",
     "title": "Ordsmedjan",
     "subtitle": "Stava ord. Samla runor. Slå rekordet.",
     "startRun": "Starta körning",
@@ -10384,6 +10463,12 @@ const sv = {
       "escalator": "Målet ökar med 5% per ord",
       "nullifier": "Dina 2 första runplatser är avaktiverade",
       "inverter": "Chiprunor avaktiverade, bara multiplikatorer fungerar"
+    }
+  },
+  "wheel": {
+    "rush": {
+      "loading": "Laddar...",
+      "fogActive": "Dimmans krig aktivt!"
     }
   },
   "socketErrors": {
