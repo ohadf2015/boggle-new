@@ -1,14 +1,15 @@
 /**
  * ELO Rating System
  *
- * Glicko-2 inspired but simplified for web game use.
- * Supports 1v1 and multiplayer (2-8 players) ranked games.
+ * 1v1: Glicko-2 inspired ELO with K-factor adaptation.
+ * Multiplayer: openskill Weng-Lin algorithm (proper N-player ranking).
  *
  * Key concepts:
  * - Rating: skill estimate (default 1000)
  * - RD (rating deviation): uncertainty in rating (default 350, min 50)
  * - K factor: 40 for new players (<30 games), 32 for veterans
  */
+import { rating as osRating, rate as osRate } from 'openskill';
 
 export const DEFAULT_RATING = 1000;
 export const DEFAULT_RD = 350;
@@ -80,13 +81,14 @@ export function calculateNewRatings(
   };
 }
 
+// Scale between our rating domain (default 1000) and openskill mu domain (default 25)
+const RATING_SCALE = 0.025;
+
 /**
  * Calculate new ratings for a multiplayer game (2-8 players).
  *
- * Each player is compared pairwise against every other player.
- * A player "wins" against everyone placed below them and "loses"
- * against everyone placed above them. Rating changes are averaged
- * across all pairwise comparisons.
+ * Uses the openskill Weng-Lin algorithm — a proper N-player ranking model
+ * that correctly handles field size and uncertainty reduction.
  *
  * @param players - Array of players with id, current rating, and final placement
  * @returns Map of player id to new rating
@@ -104,32 +106,22 @@ export function calculateMultiplayerRatings(
     return result;
   }
 
-  // For each player, accumulate ELO changes from pairwise comparisons
-  for (const player of players) {
-    let totalRatingChange = 0;
-    let pairCount = 0;
-    const k = getKFactor(player.rating.gamesPlayed);
+  // Sort ascending by placement so osRate receives teams in finish order
+  const sorted = [...players].sort((a, b) => a.placement - b.placement);
 
-    for (const opponent of players) {
-      if (opponent.id === player.id) continue;
+  const teams = sorted.map((p) =>
+    [osRating({ mu: p.rating.rating * RATING_SCALE, sigma: Math.max(p.rating.rd * RATING_SCALE, 0.01) })]
+  );
 
-      const expected = expectedScore(player.rating.rating, opponent.rating.rating);
+  const updated = osRate(teams);
 
-      // Actual score: 1 if placed higher (lower number), 0 if placed lower
-      const actual = player.placement < opponent.placement ? 1 : 0;
-
-      totalRatingChange += k * (actual - expected);
-      pairCount++;
-    }
-
-    // Average the change across all pairwise comparisons
-    const avgChange = pairCount > 0 ? totalRatingChange / pairCount : 0;
-    const newRating = Math.max(0, Math.round(player.rating.rating + avgChange));
-
-    result.set(player.id, {
-      rating: newRating,
-      rd: Math.max(MIN_RD, Math.round(player.rating.rd * RD_DECAY * 100) / 100),
-      gamesPlayed: player.rating.gamesPlayed + 1,
+  for (let i = 0; i < sorted.length; i++) {
+    const p = sorted[i];
+    const os = updated[i][0];
+    result.set(p.id, {
+      rating: Math.max(0, Math.round(os.mu / RATING_SCALE)),
+      rd: Math.max(MIN_RD, Math.round(os.sigma / RATING_SCALE)),
+      gamesPlayed: p.rating.gamesPlayed + 1,
     });
   }
 

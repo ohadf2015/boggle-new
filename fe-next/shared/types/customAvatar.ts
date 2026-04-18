@@ -23,6 +23,7 @@ export const AVATAR_HAIR_STYLES = [
   'curtainBangs', 'halfUp', 'himecut',
   'frenchBob', 'shag', 'flatTop', 'lob', 'fingerWaves', 'curlyBangs', 'quiff', 'sideSwept',
   'fadeCurly',
+  'frizzle', 'durag', 'locsShort',
 ] as const;
 
 /** Styles that look feminine — shown when gender is female */
@@ -32,6 +33,7 @@ export const FEMALE_HAIR_STYLES = [
   'pixie', 'spaceBuns', 'straight', 'wolfCut', 'cornrows',
   'curtainBangs', 'halfUp', 'himecut',
   'frenchBob', 'shag', 'lob', 'fingerWaves', 'curlyBangs', 'sideSwept',
+  'frizzle', 'locsShort',
 ] as const;
 
 /** Styles that look masculine — shown when gender is male */
@@ -40,6 +42,7 @@ export const MALE_HAIR_STYLES = [
   'mullet', 'combover', 'elvis', 'ramen',
   'undercut', 'fade', 'cornrows', 'wolfCut', 'ponytail', 'bun', 'straight',
   'flatTop', 'quiff', 'shag', 'sideSwept', 'fadeCurly',
+  'frizzle', 'durag', 'locsShort',
 ] as const;
 
 /** Default hair when switching to female */

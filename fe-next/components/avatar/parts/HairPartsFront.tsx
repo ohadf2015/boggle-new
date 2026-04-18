@@ -1,6 +1,5 @@
-/** Back hair variants — see hairShared.tsx for props + helpers. */
-import { useAvatarUid } from '../AvatarUidContext';
-import { HairPartProps, HairPolishDefs, HairPolish, S } from './hairShared';
+/** Front hair overlay variants — see hairShared.tsx for props + helpers. */
+import { HairPartProps, S } from './hairShared';
 
 function BangsFront({ fill }: HairPartProps) {
   return (
@@ -320,6 +319,54 @@ function SideSweptFront({ fill }: HairPartProps) {
 }
 
 
+function FrizzleFront({ fill }: HairPartProps) {
+  return (
+    <g>
+      {/* Side frizz puffs beside face — wilder than AfroFront */}
+      <path d="M4 38 Q2 50 6 58 Q10 62 12 56 Q8 48 8 38 Q6 34 4 38Z"
+        fill={fill} stroke="#000" strokeWidth={2} strokeLinejoin="round" />
+      <path d="M96 38 Q98 50 94 58 Q90 62 88 56 Q92 48 92 38 Q94 34 96 38Z"
+        fill={fill} stroke="#000" strokeWidth={2} strokeLinejoin="round" />
+      {/* Bumpy forehead hairline — irregular bumps */}
+      <path d="M16 38 C18 30 26 26 34 28 C40 24 46 24 50 26 C54 24 60 24 66 28 C74 26 82 30 84 38 L78 40 Q66 32 56 34 Q50 30 44 34 Q34 32 22 40Z"
+        fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      {/* Extra frizz tufts at hairline */}
+      <circle cx="28" cy="36" r="3.5" fill={fill} stroke="#000" strokeWidth={1.3} />
+      <circle cx="72" cy="36" r="3.5" fill={fill} stroke="#000" strokeWidth={1.3} />
+      <circle cx="50" cy="32" r="3" fill={fill} stroke="#000" strokeWidth={1.2} />
+    </g>
+  );
+}
+
+function DuragFront({ fill }: HairPartProps) {
+  return (
+    <g>
+      {/* Forehead fabric band — the front edge of the durag */}
+      <path d="M18 38 Q18 28 50 24 Q82 28 82 38 L80 42 Q66 36 50 34 Q34 36 20 42Z"
+        fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      {/* Fabric sheen on band */}
+      <path d="M30 30 Q42 26 50 26 Q58 26 70 30" fill="none" stroke="#fff" strokeWidth={1} opacity="0.18" />
+      <path d="M26 34 Q38 30 50 30 Q62 30 74 34" fill="none" stroke="#fff" strokeWidth={0.6} opacity="0.1" />
+    </g>
+  );
+}
+
+function LocsShortFront({ fill }: HairPartProps) {
+  return (
+    <g>
+      {/* 3 short front-hanging locs — neat, shoulder-length-ish */}
+      <path d="M34 26 C33 30 32 36 34 42 Q37.5 44 41 42 C43 36 42 30 41 26 Q37.5 24 34 26Z"
+        fill={fill} stroke="#000" strokeWidth={1.5} strokeLinejoin="round" />
+      <path d="M46 24 C45 28 44 34 46 38 Q49.5 40 53 38 C55 34 54 28 53 24 Q49.5 22 46 24Z"
+        fill={fill} stroke="#000" strokeWidth={1.5} strokeLinejoin="round" />
+      <path d="M58 26 C57 30 56 36 58 42 Q61.5 44 65 42 C67 36 66 30 65 26 Q61.5 24 58 26Z"
+        fill={fill} stroke="#000" strokeWidth={1.5} strokeLinejoin="round" />
+      <path d="M35 32 L40 32 M36 36 L39 36 M47 30 L52 30 M48 34 L51 34 M59 32 L64 32 M60 36 L63 36"
+        stroke="#000" strokeWidth={0.6} opacity="0.12" />
+    </g>
+  );
+}
+
 export const HAIR_FRONT_MAP = {
   bangs: BangsFront, long: LongFront, bob: BobFront, wavy: WavyFront,
   sideshave: SideshaveFront, afro: AfroFront, dreads: DreadsFront, pigtails: PigtailsFront,
@@ -328,4 +375,5 @@ export const HAIR_FRONT_MAP = {
   wolfCut: WolfCutFront, cornrows: CornrowsFront, curtainBangs: CurtainBangsFront,
   halfUp: HalfUpFront, himecut: HimecutFront, lob: LobFront, shag: ShagFront,
   curlyBangs: CurlyBangsFront, sideSwept: SideSweptFront,
+  frizzle: FrizzleFront, durag: DuragFront, locsShort: LocsShortFront,
 } as const;

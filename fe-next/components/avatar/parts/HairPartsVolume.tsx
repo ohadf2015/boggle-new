@@ -311,7 +311,97 @@ function Mullet({ fill }: HairPartProps) {
 }
 
 
+function Frizzle({ fill }: HairPartProps) {
+  const u = useAvatarUid();
+  /* Spiky polygon silhouette — clearly distinct from Afro's smooth bumps */
+  const spiky = "M18 52 L8 44 L14 36 L6 28 L14 20 L8 12 L18 8 L16 0 L26 4 L30 -6 L38 0 L42 -8 L50 -2 L56 -8 L62 0 L70 -6 L74 4 L82 0 L84 8 L92 12 L82 20 L94 28 L86 36 L92 44 L82 52Z";
+  return (
+    <g>
+      <defs><HairPolishDefs uid={u} keyName="frizzle" /></defs>
+      <path d={spiky} fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      <path d={spiky} fill={`url(#${u}hair-frizzle-shade)`} stroke="none" />
+      <path d={spiky} fill={`url(#${u}hair-frizzle-light)`} stroke="none" />
+      {/* Face reveal */}
+      <path d="M20 44 Q50 18 80 44 Q82 36 82 26 Q82 18 50 18 Q18 18 18 26 Q18 36 20 44Z" fill={fill} stroke="none" />
+      {/* Wild frizz texture strokes */}
+      <path d="M22 30 L18 24 M30 16 L26 10 M40 8 L38 2 M50 5 L50 -2 M60 8 L62 2 M70 16 L74 10 M78 30 L82 24"
+        stroke="#000" strokeWidth={0.8} opacity="0.15" />
+      <path d="M25 26 L20 20 M36 12 L34 6 M46 6 L44 0 M54 6 L56 0 M64 12 L66 6 M75 26 L80 20"
+        stroke="#000" strokeWidth={0.6} opacity="0.1" />
+      <path d="M28 8 Q42 0 50 -2 Q58 0 72 8" fill="none" stroke="#fff" strokeWidth={1.5} opacity="0.18" />
+    </g>
+  );
+}
+
+function Durag({ fill }: HairPartProps) {
+  const u = useAvatarUid();
+  const cap = "M18 52 Q16 36 20 26 Q28 12 50 10 Q72 12 80 26 Q84 36 82 52Z";
+  return (
+    <g>
+      <defs><HairPolishDefs uid={u} keyName="durag" /></defs>
+      {/* Main cap dome — smooth, hugging the head */}
+      <path d={cap} fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      <HairPolish uid={u} keyName="durag" d={cap} />
+      {/* Left tail flap — hangs beside/behind head */}
+      <path d="M18 50 Q14 58 12 68 Q10 78 14 82 Q18 84 20 76 Q20 64 22 54Z"
+        fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      {/* Right tail flap */}
+      <path d="M82 50 Q86 58 88 68 Q90 78 86 82 Q82 84 80 76 Q80 64 78 54Z"
+        fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      {/* Center back fabric gather / tie nub */}
+      <path d="M44 76 Q50 82 56 76 Q54 70 50 68 Q46 70 44 76Z"
+        fill={fill} stroke="#000" strokeWidth={1.5} strokeLinejoin="round" />
+      {/* Fabric sheen lines */}
+      <path d="M26 28 Q38 24 50 24 Q62 24 74 28" fill="none" stroke="#fff" strokeWidth={1.2} opacity="0.16" />
+      <path d="M24 36 Q38 32 50 32 Q62 32 76 36" fill="none" stroke="#fff" strokeWidth={0.8} opacity="0.11" />
+      <path d="M22 44 Q38 40 50 40 Q62 40 78 44" fill="none" stroke="#fff" strokeWidth={0.5} opacity="0.08" />
+    </g>
+  );
+}
+
+function LocsShort({ fill }: HairPartProps) {
+  const u = useAvatarUid();
+  const cap = "M12 32 Q12 14 50 10 Q88 14 88 32";
+  const locs: [number,number,number,number,number,number][] = [
+    [16,32, 14,64, -2, 6],
+    [24,30, 20,62, -1, 5.5],
+    [32,28, 30,58, 1, 5.5],
+    [40,26, 40,54, 0, 5.5],
+    [50,25, 50,52, 0, 6],
+    [60,26, 60,54, 0, 5.5],
+    [68,28, 70,58, 1, 5.5],
+    [76,30, 80,62, 1, 5.5],
+    [84,32, 86,64, 1, 6],
+  ];
+  return (
+    <g>
+      <defs><HairPolishDefs uid={u} keyName="locsShort" /></defs>
+      <path d={cap} fill={fill} stroke="#000" strokeWidth={S} />
+      <HairPolish uid={u} keyName="locsShort" d={cap} />
+      {locs.map(([sx,sy,ex,ey,bulge,w],i) => {
+        const mx = (sx+ex)/2 + bulge;
+        const my = (sy+ey)/2;
+        const hw = w/2;
+        const tw = hw * 0.55;
+        return (
+          <g key={i}>
+            <path d={`M${sx-hw} ${sy} C${mx-hw-1} ${my-3} ${ex-tw-1} ${ey-6} ${ex-tw} ${ey} Q${ex} ${ey+3} ${ex+tw} ${ey} C${ex+tw+1} ${ey-6} ${mx+hw+1} ${my-3} ${sx+hw} ${sy}Z`}
+              fill={fill} stroke="#000" strokeWidth={1.5} strokeLinejoin="round" />
+            {[0.3, 0.55, 0.75].map((t, j) => {
+              const px = sx + (ex-sx)*t + bulge*(t < 0.5 ? t*2 : 1);
+              const py = sy + (ey-sy)*t;
+              const rw = hw - (hw-tw)*t;
+              return <path key={j} d={`M${px-rw+0.5} ${py} L${px+rw-0.5} ${py}`} stroke="#000" strokeWidth={0.7} opacity={0.12+j*0.02} />;
+            })}
+          </g>
+        );
+      })}
+    </g>
+  );
+}
+
 export const HAIR_PARTS_VOLUME = {
   afro: Afro, wavy: Wavy, pigtails: Pigtails, sideshave: Sideshave, dreads: Dreads,
   braids: Braids, bun: Bun, bangs: Bangs, twintails: Twintails, mullet: Mullet,
+  frizzle: Frizzle, durag: Durag, locsShort: LocsShort,
 } as const;

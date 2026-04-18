@@ -54,6 +54,9 @@ export const HAIR_PARTS = {
   quiff: HAIR_PARTS_TRENDY.quiff,
   sideSwept: HAIR_PARTS_TRENDY.sideSwept,
   fadeCurly: HAIR_PARTS_TRENDY.fadeCurly,
+  frizzle: HAIR_PARTS_VOLUME.frizzle,
+  durag: HAIR_PARTS_VOLUME.durag,
+  locsShort: HAIR_PARTS_VOLUME.locsShort,
 } as const;
 
 export type HairPart = keyof typeof HAIR_PARTS;

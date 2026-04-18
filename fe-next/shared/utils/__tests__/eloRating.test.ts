@@ -180,6 +180,35 @@ describe('eloRating', () => {
       const result = calculateMultiplayerRatings(players);
       expect(result.get('solo')!.rating).toBe(1200);
     });
+
+    it('should maintain strict monotonic ordering in 8-player game', () => {
+      const baseRating: PlayerRating = { rating: 1000, rd: 200, gamesPlayed: 30 };
+      const eightPlayers = Array.from({ length: 8 }, (_, i) => ({
+        id: `p${i + 1}`,
+        rating: { ...baseRating },
+        placement: i + 1,
+      }));
+
+      const result = calculateMultiplayerRatings(eightPlayers);
+
+      for (let i = 1; i < 8; i++) {
+        expect(result.get(`p${i}`)!.rating).toBeGreaterThan(result.get(`p${i + 1}`)!.rating);
+      }
+    });
+
+    it('should increment gamesPlayed for all players in multiplayer', () => {
+      const players = [
+        { id: 'a', rating: { rating: 1000, rd: 200, gamesPlayed: 5 }, placement: 1 },
+        { id: 'b', rating: { rating: 1000, rd: 200, gamesPlayed: 10 }, placement: 2 },
+        { id: 'c', rating: { rating: 1000, rd: 200, gamesPlayed: 15 }, placement: 3 },
+      ];
+
+      const result = calculateMultiplayerRatings(players);
+
+      expect(result.get('a')!.gamesPlayed).toBe(6);
+      expect(result.get('b')!.gamesPlayed).toBe(11);
+      expect(result.get('c')!.gamesPlayed).toBe(16);
+    });
   });
 
   describe('getRankTier', () => {
