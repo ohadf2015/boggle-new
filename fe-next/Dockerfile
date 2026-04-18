@@ -43,6 +43,9 @@ ARG NEXT_PUBLIC_CRAZYGAMES_ENABLED
 ARG NEXT_PUBLIC_POSTHOG_KEY
 ARG NEXT_PUBLIC_POSTHOG_HOST
 
+# Compile CJS schemas first (bundle-server expects backend/dist/ to exist for copy step)
+RUN npm run build:schemas
+
 # Build the Express server bundle (esbuild — ~2s)
 RUN node scripts/bundle-server.mjs
 
