@@ -86,14 +86,24 @@ export function Dizzy() {
 }
 
 export function Cyclops() {
+  const u = useAvatarUid();
   const ec = useEyeColor();
   const ecd = useEyeColorDark();
-  void ecd;
   return (
     <g>
+      <defs>
+        <radialGradient id={`${u}cyclopsIris`} cx="50%" cy="50%" r="60%">
+          <stop offset="0%" stopColor={ec} />
+          <stop offset="100%" stopColor={ecd} />
+        </radialGradient>
+        <radialGradient id={`${u}cyclopsSclera`} cx="50%" cy="35%" r="70%">
+          <stop offset="0%" stopColor="#fff" />
+          <stop offset="100%" stopColor="#E5E7EB" />
+        </radialGradient>
+      </defs>
       <path d="M42 38 Q50 35 58 38" fill="none" stroke="#000" strokeWidth={S} strokeLinecap="round" />
-      <circle cx="50" cy="42" r="8" fill="#fff" stroke="#000" strokeWidth={S} />
-      <circle cx="51" cy="41" r="5" fill={ec} />
+      <circle cx="50" cy="42" r="8" fill={`url(#${u}cyclopsSclera)`} stroke="#000" strokeWidth={S} />
+      <circle cx="51" cy="41" r="5" fill={`url(#${u}cyclopsIris)`} />
       <circle cx="51" cy="41" r="3" fill="#000" />
       <circle cx="48.5" cy="39" r="2" fill="#fff" />
       <circle cx="52" cy="43" r="0.8" fill="#fff" opacity="0.5" />
@@ -102,12 +112,24 @@ export function Cyclops() {
 }
 
 export function Laser() {
+  const u = useAvatarUid();
   return (
     <g>
-      <circle cx="38" cy="42" r="8" fill="#FF0000" opacity="0.12" />
-      <circle cx="62" cy="42" r="8" fill="#FF0000" opacity="0.12" />
-      <circle cx="38" cy="42" r="5" fill="#FF0000" stroke="#000" strokeWidth={S} />
-      <circle cx="62" cy="42" r="5" fill="#FF0000" stroke="#000" strokeWidth={S} />
+      <defs>
+        <radialGradient id={`${u}laserCore`} cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="#FFD6D6" />
+          <stop offset="45%" stopColor="#FF3333" />
+          <stop offset="100%" stopColor="#8B0000" />
+        </radialGradient>
+        <radialGradient id={`${u}laserHalo`} cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="#FF0000" stopOpacity="0.35" />
+          <stop offset="100%" stopColor="#FF0000" stopOpacity="0" />
+        </radialGradient>
+      </defs>
+      <circle cx="38" cy="42" r="8" fill={`url(#${u}laserHalo)`} />
+      <circle cx="62" cy="42" r="8" fill={`url(#${u}laserHalo)`} />
+      <circle cx="38" cy="42" r="5" fill={`url(#${u}laserCore)`} stroke="#000" strokeWidth={S} />
+      <circle cx="62" cy="42" r="5" fill={`url(#${u}laserCore)`} stroke="#000" strokeWidth={S} />
       <circle cx="38" cy="42" r="2" fill="#FFD700" />
       <circle cx="62" cy="42" r="2" fill="#FFD700" />
       <circle cx="38" cy="42" r="0.8" fill="#fff" />
@@ -123,10 +145,21 @@ export function Laser() {
 }
 
 export function Hypno() {
+  const u = useAvatarUid();
   return (
     <g>
-      <circle cx="38" cy="42" r="7" fill="#fff" stroke="#000" strokeWidth={S} />
-      <circle cx="62" cy="42" r="7" fill="#fff" stroke="#000" strokeWidth={S} />
+      <defs>
+        <radialGradient id={`${u}hypnoBg`} cx="50%" cy="40%" r="70%">
+          <stop offset="0%" stopColor="#F5F3FF" />
+          <stop offset="100%" stopColor="#C4B5FD" />
+        </radialGradient>
+        <linearGradient id={`${u}hypnoSwirl`} x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#8B5CF6" />
+          <stop offset="100%" stopColor="#D946EF" />
+        </linearGradient>
+      </defs>
+      <circle cx="38" cy="42" r="7" fill={`url(#${u}hypnoBg)`} stroke="#000" strokeWidth={S} />
+      <circle cx="62" cy="42" r="7" fill={`url(#${u}hypnoBg)`} stroke="#000" strokeWidth={S} />
       <circle cx="38" cy="42" r="6" fill="none" stroke="#8B5CF6" strokeWidth={1.2} />
       <circle cx="38" cy="42" r="4" fill="none" stroke="#D946EF" strokeWidth={1.2} />
       <circle cx="38" cy="42" r="2" fill="none" stroke="#8B5CF6" strokeWidth={1.2} />
@@ -140,10 +173,24 @@ export function Hypno() {
 }
 
 export function Money() {
+  const u = useAvatarUid();
   return (
     <g>
-      <circle cx="38" cy="42" r="7" fill="#BFFF00" stroke="#000" strokeWidth={S} />
-      <circle cx="62" cy="42" r="7" fill="#BFFF00" stroke="#000" strokeWidth={S} />
+      <defs>
+        <radialGradient id={`${u}moneyBill`} cx="50%" cy="35%" r="75%">
+          <stop offset="0%" stopColor="#E8FF9E" />
+          <stop offset="60%" stopColor="#BFFF00" />
+          <stop offset="100%" stopColor="#6B8E00" />
+        </radialGradient>
+        <linearGradient id={`${u}moneyShine`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#fff" stopOpacity="0.55" />
+          <stop offset="100%" stopColor="#fff" stopOpacity="0" />
+        </linearGradient>
+      </defs>
+      <circle cx="38" cy="42" r="7" fill={`url(#${u}moneyBill)`} stroke="#000" strokeWidth={S} />
+      <circle cx="62" cy="42" r="7" fill={`url(#${u}moneyBill)`} stroke="#000" strokeWidth={S} />
+      <circle cx="38" cy="42" r="7" fill={`url(#${u}moneyShine)`} />
+      <circle cx="62" cy="42" r="7" fill={`url(#${u}moneyShine)`} />
       <path d="M36 39 Q36 37.5 38 37.5 Q40 37.5 40 39 Q40 40 38 40.5 Q36 41 36 42.5 Q36 44.5 38 44.5 Q40 44.5 40 43" fill="none" stroke="#228B22" strokeWidth={1.8} strokeLinecap="round" />
       <line x1="38" y1="36" x2="38" y2="46" stroke="#228B22" strokeWidth={1} />
       <path d="M60 39 Q60 37.5 62 37.5 Q64 37.5 64 39 Q64 40 62 40.5 Q60 41 60 42.5 Q60 44.5 62 44.5 Q64 44.5 64 43" fill="none" stroke="#228B22" strokeWidth={1.8} strokeLinecap="round" />
@@ -155,12 +202,24 @@ export function Money() {
 }
 
 export function Alien() {
+  const u = useAvatarUid();
   return (
     <g>
-      <ellipse cx="36" cy="42" rx="11" ry="8" fill="none" stroke="#00FF00" strokeWidth={0.8} opacity="0.25" transform="rotate(-10 36 42)" />
-      <ellipse cx="64" cy="42" rx="11" ry="8" fill="none" stroke="#00FF00" strokeWidth={0.8} opacity="0.25" transform="rotate(10 64 42)" />
-      <ellipse cx="36" cy="42" rx="10" ry="7" fill="#0a2a0a" stroke="#00FF00" strokeWidth={S} transform="rotate(-10 36 42)" />
-      <ellipse cx="64" cy="42" rx="10" ry="7" fill="#0a2a0a" stroke="#00FF00" strokeWidth={S} transform="rotate(10 64 42)" />
+      <defs>
+        <radialGradient id={`${u}alienLens`} cx="40%" cy="35%" r="75%">
+          <stop offset="0%" stopColor="#1F5A1F" />
+          <stop offset="70%" stopColor="#0A2A0A" />
+          <stop offset="100%" stopColor="#000" />
+        </radialGradient>
+        <linearGradient id={`${u}alienRim`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#66FF66" />
+          <stop offset="100%" stopColor="#008800" />
+        </linearGradient>
+      </defs>
+      <ellipse cx="36" cy="42" rx="11" ry="8" fill="none" stroke={`url(#${u}alienRim)`} strokeWidth={0.8} opacity="0.5" transform="rotate(-10 36 42)" />
+      <ellipse cx="64" cy="42" rx="11" ry="8" fill="none" stroke={`url(#${u}alienRim)`} strokeWidth={0.8} opacity="0.5" transform="rotate(10 64 42)" />
+      <ellipse cx="36" cy="42" rx="10" ry="7" fill={`url(#${u}alienLens)`} stroke="#00FF00" strokeWidth={S} transform="rotate(-10 36 42)" />
+      <ellipse cx="64" cy="42" rx="10" ry="7" fill={`url(#${u}alienLens)`} stroke="#00FF00" strokeWidth={S} transform="rotate(10 64 42)" />
       <ellipse cx="36" cy="42" rx="9" ry="6" fill="none" stroke="#00FF00" strokeWidth={0.5} opacity="0.25" transform="rotate(-10 36 42)" />
       <path d="M30 40 Q33 42 30 44" fill="none" stroke="#00AA00" strokeWidth={0.4} opacity="0.3" />
       <path d="M42 40 Q39 42 42 44" fill="none" stroke="#00AA00" strokeWidth={0.4} opacity="0.3" />
