@@ -138,7 +138,9 @@ export function useBlastPixiOverlays({
   // Mutate center fields in place (no object alloc per call).
   const fireShockwave = useCallback((cx: number, cy: number, amplitude = 20) => {
     const sw = shockwaveRef.current;
-    if (!sw) return;
+    // Pixi v8 `ShockwaveFilter.destroy()` nulls `_center` before the ref clears,
+    // so writing `sw.center.x` mid-teardown throws "Cannot set properties of null".
+    if (!sw || !sw.center) return;
     // Cancel any in-flight shockwave rAF before reseeding — without this, two
     // concurrent loops race on `sw.time`/`sw.enabled`, so a finished wave can
     // re-enable briefly because the second loop overwrites the first's final tick.
@@ -151,13 +153,14 @@ export function useBlastPixiOverlays({
     const start = performance.now();
     const duration = 600;
     const tick = () => {
-      if (!shockwaveRef.current) return;
+      const live = shockwaveRef.current;
+      if (!live || !live.center) return;
       const t = Math.min((performance.now() - start) / duration, 1);
-      sw.time = t;
+      live.time = t;
       if (t < 1) {
         shockwaveRafRef.current = requestAnimationFrame(tick);
       } else {
-        sw.enabled = false;
+        live.enabled = false;
       }
     };
     shockwaveRafRef.current = requestAnimationFrame(tick);

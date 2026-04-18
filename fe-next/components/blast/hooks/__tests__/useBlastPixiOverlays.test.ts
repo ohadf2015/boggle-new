@@ -218,6 +218,28 @@ describe('useBlastPixiOverlays', () => {
     expect(sw.amplitude).toBe(25);
   });
 
+  it('fireShockwave is a no-op when filter center was nulled by Pixi v8 destroy race', () => {
+    const camera = makeMockCamera();
+    const { result } = renderHook(() =>
+      useBlastPixiOverlays({ camera: camera as unknown as never, width: 400, height: 400, gridSize: 8, cellSize: 50, chainLevel: 0 }),
+    );
+    const sw = shockwaveInstances[0];
+    sw.center = null as unknown as { x: number; y: number };
+    expect(() => act(() => { result.current.fireShockwave(10, 20, 5); })).not.toThrow();
+    expect(sw.enabled).toBe(false);
+  });
+
+  it('shockwave rAF tick exits cleanly if filter center is nulled mid-animation', () => {
+    const camera = makeMockCamera();
+    const { result } = renderHook(() =>
+      useBlastPixiOverlays({ camera: camera as unknown as never, width: 400, height: 400, gridSize: 8, cellSize: 50, chainLevel: 0 }),
+    );
+    act(() => { result.current.fireShockwave(10, 20, 5); });
+    const sw = shockwaveInstances[0];
+    sw.center = null as unknown as { x: number; y: number };
+    expect(() => flushRaf()).not.toThrow();
+  });
+
   it('spawnPulseRing adds a Graphics to camera and removes it after animation completes', () => {
     const camera = makeMockCamera();
     const { result } = renderHook(() =>
