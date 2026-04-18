@@ -162,9 +162,9 @@ export const GameSidebar = memo(function GameSidebar({
         className
       )}
     >
-      {/* Hunt mode: Life bar (reuses WordHuntLifeBar component) */}
+      {/* Hunt mode: Life bar rendered on desktop sidebar only — portrait mobile uses the header HP pill to save vertical space */}
       {showLifeBar && currentHP != null && maxHP != null && (
-        <div className="px-3 py-1.5 border-b border-neo-white/10">
+        <div className="hidden lg:block px-3 py-1.5 border-b border-neo-white/10">
           <WordHuntLifeBar life={currentHP} maxLife={maxHP} />
         </div>
       )}
@@ -177,9 +177,9 @@ export const GameSidebar = memo(function GameSidebar({
         </div>
       )}
 
-      {/* Hunt mode: daily-challenge-style clue boxes */}
+      {/* Hunt mode: daily-challenge-style clue boxes (desktop only — mobile renders them below the header via GameLayout.belowHeader) */}
       {showTargetWordUI && huntTargetLength > 0 && (
-        <div className="px-3 py-2 border-b border-neo-white/10">
+        <div className="hidden lg:block px-3 py-2 border-b border-neo-white/10">
           <AdventureHuntClueBoxes
             targetLength={huntTargetLength}
             attempts={huntAttempts}

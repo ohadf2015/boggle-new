@@ -29,8 +29,6 @@ export function Star() {
 
 export function Sparkle() {
   const ec = useEyeColor();
-  const ecd = useEyeColorDark();
-  void ecd;
   return (
     <g>
       <circle cx="38" cy="42" r="7" fill="#fff" stroke="#000" strokeWidth={S} />

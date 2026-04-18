@@ -172,7 +172,7 @@ describe('WheelRushView', () => {
     expect(socket.emit).toHaveBeenCalledWith('submitWheelWord', { word: 'CRANE' });
   });
 
-  it('rejects 3-letter word locally without emitting (matches server min 4)', () => {
+  it('rejects 2-letter word locally without emitting (matches server min 3)', () => {
     const socket = makeMockSocket();
     render(
       <WheelRushView
@@ -190,7 +190,6 @@ describe('WheelRushView', () => {
 
     act(() => { fireEvent.keyDown(window, { key: 'C' }); });
     act(() => { fireEvent.keyDown(window, { key: 'A' }); });
-    act(() => { fireEvent.keyDown(window, { key: 'T' }); });
     act(() => { fireEvent.keyDown(window, { key: 'Enter' }); });
 
     expect(socket.emit).not.toHaveBeenCalledWith('submitWheelWord', expect.anything());
@@ -218,7 +217,7 @@ describe('WheelRushView', () => {
     expect(screen.queryByText(/^not-a-word$/)).toBeNull();
   });
 
-  it('renders QuickReactions trigger and emits quickReaction on emoji click', () => {
+  it('does not render QuickReactions picker in-game', () => {
     const socket = makeMockSocket();
     render(
       <WheelRushView
@@ -232,18 +231,10 @@ describe('WheelRushView', () => {
     act(() => {
       socket.fire('wheelRushInit', { puzzle, startedAt: Date.now() });
     });
-
-    const trigger = screen.getByRole('button', { name: /reactions\.label/i });
-    expect(trigger).toBeTruthy();
-
-    socket.emit.mockClear();
-    fireEvent.click(trigger);
-    const fireBtn = screen.getByRole('button', { name: /reactions\.fire/i });
-    fireEvent.click(fireBtn);
-    expect(socket.emit).toHaveBeenCalledWith('quickReaction', { reactionId: 'fire', username: 'alice' });
+    expect(screen.queryByRole('button', { name: /reactions\.label/i })).toBeNull();
   });
 
-  it('marks word as stolen-from-me when wheelWordStolen targets self', () => {
+it('marks word as stolen-from-me when wheelWordStolen targets self', () => {
     const socket = makeMockSocket();
     render(
       <WheelRushView

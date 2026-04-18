@@ -130,7 +130,12 @@ export function BlastGame({
     // eslint-disable-next-line react-hooks/exhaustive-deps -- intentionally using engine.* properties, not full engine object
   }, [blastBoardUpdate, isMultiplayer, username, engine.isCascading, engine.applyServerBoard]);
 
-  // Flush queued board updates after cascade completes — only apply the last (each is a full snapshot)
+  // Flush queued board updates after cascade completes.
+  // Coalesce to last is intentional: each blastBoardUpdate is a full (grid, tileStates)
+  // snapshot that supersedes prior snapshots. Queued entries are terminal states of N
+  // distinct moves (self + opponents), not animation frames of one cascade. Server does
+  // not broadcast in-flight frames, so sequential apply cannot recover intermediate FX —
+  // it would just waste work and still land on the same final state.
   useEffect(() => {
     if (!engine.isCascading && pendingBoardUpdatesRef.current.length > 0) {
       const queue = pendingBoardUpdatesRef.current;

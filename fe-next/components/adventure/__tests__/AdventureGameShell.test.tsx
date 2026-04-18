@@ -11,8 +11,8 @@ vi.mock('../themed/GameplayBackground', () => ({
   default: () => <div data-testid="bg" />,
 }));
 vi.mock('../ui', () => ({
-  GameLayout: ({ header, gridArea, sidebar, overlays }: { header: React.ReactNode; gridArea: React.ReactNode; sidebar: React.ReactNode; overlays: React.ReactNode }) => (
-    <div data-testid="layout">{header}{gridArea}{sidebar}{overlays}</div>
+  GameLayout: ({ header, belowHeader, gridArea, sidebar, overlays }: { header: React.ReactNode; belowHeader?: React.ReactNode; gridArea: React.ReactNode; sidebar: React.ReactNode; overlays: React.ReactNode }) => (
+    <div data-testid="layout">{header}{belowHeader}{gridArea}{sidebar}{overlays}</div>
   ),
   GameHeader: (p: Record<string, unknown>) => (
     <button data-testid="header" onClick={p.onExit as () => void}>header</button>
@@ -20,6 +20,9 @@ vi.mock('../ui', () => ({
   GameSidebar: () => <div data-testid="sidebar" />,
   GameGridArea: () => <div data-testid="grid" />,
   GameInfoStrip: () => <div data-testid="info-strip" />,
+  AdventureHuntClueBoxes: (p: { targetLength: number }) => (
+    <div data-testid="clue-boxes" data-length={p.targetLength} />
+  ),
 }));
 vi.mock('../AdventureGameOverlays', () => ({
   default: (p: { handlePauseToggle?: () => void }) => (
@@ -138,6 +141,30 @@ describe('AdventureGameShell', () => {
     render(<AdventureGameShell {...(props as never)} />);
     fireEvent.click(screen.getByTestId('overlays'));
     expect(props._spies.handlePauseToggle).toHaveBeenCalled();
+  });
+
+  it('renders hunt clue boxes in belowHeader slot when hunt mode + target loaded', () => {
+    const props = {
+      ...(makeProps() as object),
+      modeState: { archetype: 'hunt', modeDisplayKey: 'adventure.mode.hunt', showMoveCounter: false, showLifeBar: true, showTargetWordUI: true, centerLetterRequired: false, centerLetter: null },
+      huntTargetWord: 'APPLE',
+      huntAttempts: [],
+      huntFound: false,
+    };
+    render(<AdventureGameShell {...(props as never)} />);
+    const box = screen.getByTestId('clue-boxes');
+    expect(box).toBeInTheDocument();
+    expect(box.getAttribute('data-length')).toBe('5');
+  });
+
+  it('does NOT render clue boxes when target word not yet loaded', () => {
+    const props = {
+      ...(makeProps() as object),
+      modeState: { archetype: 'hunt', modeDisplayKey: 'adventure.mode.hunt', showMoveCounter: false, showLifeBar: true, showTargetWordUI: true, centerLetterRequired: false, centerLetter: null },
+      huntTargetWord: null,
+    };
+    render(<AdventureGameShell {...(props as never)} />);
+    expect(screen.queryByTestId('clue-boxes')).not.toBeInTheDocument();
   });
 
   it('applies mastery-aura CSS var on root', () => {

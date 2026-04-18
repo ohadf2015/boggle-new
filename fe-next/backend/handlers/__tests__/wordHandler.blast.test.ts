@@ -140,6 +140,18 @@ vi.mock('../../../backend/modules/blastModeManager', () => ({
   recordBlastMove: vi.fn().mockReturnValue(null),
   getWordPath: vi.fn().mockReturnValue([]),
   isBlastBoardCleared: vi.fn().mockReturnValue(false),
+  advanceBlastWave: vi.fn((state: any, _code: string, grid: string[][]) => ({
+    overlay: [],
+    overlayMap: new Map(),
+    playerMoves: Object.fromEntries(Object.keys(state.playerMoves).map((u) => [u, 0])),
+    playerBonusMoves: Object.fromEntries(Object.keys(state.playerMoves).map((u) => [u, 0])),
+    playerStats: state.playerStats,
+    seed: 99999,
+    wave: state.wave + 1,
+    totalMoves: 0,
+    grid,
+    tileStates: grid.map((row) => row.map((letter) => ({ letter, type: 'standard', isCleared: false }))),
+  })),
 }));
 
 vi.mock('../../../backend/services/gameLifecycle/gameEnd', () => ({
@@ -170,7 +182,7 @@ import { isWordOnBoardAsync } from '../../../backend/modules/wordValidatorPool';
 import { isDictionaryWord, isValidWordCached } from '../../../backend/dictionary';
 import { isWordCommunityValid, isWordValidForScoring } from '../../../backend/modules/communityWordManager';
 import { broadcastToRoom } from '../../../backend/utils/socketHelpers';
-import { calculateBlastTileBonus, getTilesOnPath, recordBlastMove, isBlastBoardCleared } from '../../../backend/modules/blastModeManager';
+import { calculateBlastTileBonus, getTilesOnPath, recordBlastMove, isBlastBoardCleared, advanceBlastWave } from '../../../backend/modules/blastModeManager';
 import { endGame } from '../../../backend/services/gameLifecycle/gameEnd';
 import timerManager from '../../../backend/utils/timerManager';
 import { registerWordHandlers } from '../wordHandler';
@@ -291,6 +303,7 @@ describe('wordHandler - blastComboSync broadcast (52-02)', () => {
   });
 
   describe('win condition — board cleared (fix #6)', () => {
+    // Final wave so a board clear triggers endGame (not wave-advance).
     const blastStateWithBoard = {
       overlay: [],
       overlayMap: new Map(),
@@ -298,7 +311,7 @@ describe('wordHandler - blastComboSync broadcast (52-02)', () => {
       playerBonusMoves: { testUser: 0 },
       playerStats: { testUser: { maxCombo: 0, gemsCollected: 0, wordsFound: [], bestWord: '', tilesCleared: 0, totalTileBonus: 0 } },
       seed: 12345,
-      wave: 1,
+      wave: 3,
       totalMoves: 0,
       grid: [['A']],
       tileStates: [[{ letter: 'A', type: 'standard', isCleared: false }]],
@@ -357,6 +370,60 @@ describe('wordHandler - blastComboSync broadcast (52-02)', () => {
       (getGame as Mock).mockReturnValue(makeBlastGame({ gameState: 'ended', blastModeState: blastStateWithBoard }));
       scheduled[1]();
       expect(endGame as Mock).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('wave advancement (MP blast multi-wave)', () => {
+    const makeCleared = (wave: number) => ({
+      overlay: [],
+      overlayMap: new Map(),
+      playerMoves: { testUser: 3 },
+      playerBonusMoves: { testUser: 0 },
+      playerStats: { testUser: { maxCombo: 2, gemsCollected: 4, wordsFound: ['hi'], bestWord: 'hi', tilesCleared: 6, totalTileBonus: 10 } },
+      seed: 12345,
+      wave,
+      totalMoves: 0,
+      grid: [['A']],
+      tileStates: [[{ letter: 'A', type: 'standard', isCleared: true }]],
+    });
+
+    it('advances wave and emits blastWaveAdvance when wave < max on clear', async () => {
+      (isBlastBoardCleared as Mock).mockReturnValue(true);
+      (getGame as Mock).mockReturnValue(makeBlastGame({ blastModeState: makeCleared(1) }));
+
+      await handlers['submitWord']({ word: 'test' });
+
+      expect(advanceBlastWave as Mock).toHaveBeenCalled();
+      const calls = (broadcastToRoom as Mock).mock.calls;
+      const waveCall = calls.find((c: any[]) => c[2] === 'blastWaveAdvance');
+      expect(waveCall).toBeDefined();
+      expect(waveCall[3].wave).toBe(2);
+      expect(waveCall[3].grid).toBeDefined();
+      expect(waveCall[3].tileStates).toBeDefined();
+      expect(waveCall[3].seed).toBeDefined();
+    });
+
+    it('does NOT schedule endGame when advancing mid-run', async () => {
+      (isBlastBoardCleared as Mock).mockReturnValue(true);
+      (getGame as Mock).mockReturnValue(makeBlastGame({ blastModeState: makeCleared(1) }));
+
+      await handlers['submitWord']({ word: 'test' });
+
+      const setTimeoutMock = timerManager.setTimeout as unknown as Mock;
+      const scheduled = setTimeoutMock.mock.calls.find((c: any[]) => c[0] === 'blastEnd:BLAST1');
+      expect(scheduled).toBeUndefined();
+    });
+
+    it('schedules endGame (not advance) when final wave cleared', async () => {
+      (isBlastBoardCleared as Mock).mockReturnValue(true);
+      (getGame as Mock).mockReturnValue(makeBlastGame({ blastModeState: makeCleared(3) }));
+
+      await handlers['submitWord']({ word: 'test' });
+
+      expect(advanceBlastWave as Mock).not.toHaveBeenCalled();
+      const setTimeoutMock = timerManager.setTimeout as unknown as Mock;
+      const scheduled = setTimeoutMock.mock.calls.find((c: any[]) => c[0] === 'blastEnd:BLAST1');
+      expect(scheduled).toBeDefined();
     });
   });
 

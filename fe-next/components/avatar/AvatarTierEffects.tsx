@@ -14,6 +14,8 @@ function getAvatarTier(config: CustomAvatarConfig): Tier {
     ['accessory', config.accessory],
     ['hair', config.hair],
     ['base', config.base],
+    ['eyebrows', config.eyebrows ?? 'none'],
+    ['facialHair', config.facialHair ?? 'none'],
   ];
 
   let hasEpic = false;

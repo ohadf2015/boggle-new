@@ -25,13 +25,14 @@ import { addWordToBlacklist } from '../modules/botManager.js';
 import { inc, incPerGame } from '../utils/metrics.js';
 import logger from '../utils/logger.js';
 import { processLongWordEngagement } from './engagementHandler';
-import { calculateBlastTileBonus, getTilesOnPath, recordBlastMove, getWordPath, isBlastBoardCleared } from '../modules/blastModeManager.js';
+import { calculateBlastTileBonus, getTilesOnPath, recordBlastMove, getWordPath, isBlastBoardCleared, advanceBlastWave } from '../modules/blastModeManager.js';
 import { endGame } from '../services/gameLifecycle/gameEnd.js';
 import timerManager from '../utils/timerManager.js';
 import { processTilesForWord } from '@/components/blast/utils/clearTilesProcessor';
 import { computeGravityResult } from '@/components/blast/utils/blastGravity';
 import { createSeededRandom } from '@/components/blast/utils/blastLetterGenerator';
-import { BLAST_SPECIAL_TILE_CHANCE } from '@/shared/constants/blastMultiplayerConstants';
+import { BLAST_SPECIAL_TILE_CHANCE, BLAST_MP_DEFAULT_MAX_WAVES } from '@/shared/constants/blastMultiplayerConstants';
+import { getWaveConfig } from '@/components/blast/utils/blastWaveConfig';
 import { restoreLife, getLifeBonus, computeDiscoveryClues } from '../modules/wordHuntManager.js';
 import { BOARD_WORD_SCORE_PER_LETTER } from '@/shared/constants/wordHuntMultiplayerConstants';
 
@@ -139,18 +140,45 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
           totalMoves,
         });
 
-        // 5. MP win condition: board fully cleared — schedule delayed endGame
-        //    so clients render the clear animation before the results modal fires.
-        //    Guard against double-end by re-checking gameState inside the timer.
+        // 5. MP board-clear: advance wave or schedule endGame on final wave.
         if (isBlastBoardCleared(gravityResult.newTileStates)) {
-          logger.info('BLAST', `Board cleared in ${gameCode} by ${username} via "${normalizedWord}" — scheduling endGame`);
-          timerManager.setTimeout(`blastEnd:${gameCode}`, () => {
-            const currentGame = getGame(gameCode);
-            if (currentGame && currentGame.gameState === 'in-progress') {
-              logger.info('BLAST', `Ending game ${gameCode} after board clear`);
-              endGame(io, gameCode);
-            }
-          }, 1500);
+          const currentWave = blastState.wave ?? 1;
+          const maxWaves = BLAST_MP_DEFAULT_MAX_WAVES;
+          if (currentWave < maxWaves) {
+            // Mid-run: advance to next wave with fresh overlay/grid/seed.
+            const next = advanceBlastWave(blastState, gameCode, gravityResult.newGrid);
+            Object.assign(blastState, {
+              wave: next.wave,
+              overlay: next.overlay,
+              overlayMap: next.overlayMap,
+              tileStates: next.tileStates,
+              seed: next.seed,
+              grid: next.grid,
+              playerMoves: next.playerMoves,
+              playerBonusMoves: next.playerBonusMoves,
+              totalMoves: next.totalMoves,
+            });
+            const archetype = getWaveConfig(next.wave).archetype;
+            logger.info('BLAST', `Board cleared in ${gameCode} by ${username} — advancing to wave ${next.wave} (${archetype})`);
+            broadcastToRoom(io, getGameRoom(gameCode), 'blastWaveAdvance', {
+              wave: next.wave,
+              archetype,
+              grid: next.grid,
+              tileStates: next.tileStates,
+              overlay: next.overlay,
+              seed: next.seed,
+            });
+          } else {
+            // Final wave cleared — schedule delayed endGame.
+            logger.info('BLAST', `Final wave ${currentWave} cleared in ${gameCode} by ${username} — scheduling endGame`);
+            timerManager.setTimeout(`blastEnd:${gameCode}`, () => {
+              const currentGame = getGame(gameCode);
+              if (currentGame && currentGame.gameState === 'in-progress') {
+                logger.info('BLAST', `Ending game ${gameCode} after final wave clear`);
+                endGame(io, gameCode);
+              }
+            }, 1500);
+          }
         }
       }
     } catch (err: unknown) {

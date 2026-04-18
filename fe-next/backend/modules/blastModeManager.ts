@@ -132,10 +132,15 @@ export function initBlastModeState(
     playerStats[player] = { maxCombo: 0, gemsCollected: 0, wordsFound: [], bestWord: '', tilesCleared: 0, totalTileBonus: 0 };
   }
 
-  // Generate a seed for deterministic multiplayer refills.
-  // XOR of timestamp and a random value to minimize collisions.
-  // Use >>> 0 to ensure unsigned 32-bit positive integer; || 1 avoids zero.
-  const seed = (Date.now() ^ Math.floor(Math.random() * 0xFFFFFFFF)) >>> 0 || 1;
+  // Refill seed for gravity RNG.
+  // MP: derive deterministically from overlaySeed so reconnecting clients (and
+  //     all peers) can reproduce refill sequence. XOR with golden-ratio constant
+  //     (0x9E3779B9) to decorrelate from the overlay seed itself.
+  // Solo: keep non-deterministic (no multi-peer sync requirement).
+  // Use >>> 0 for unsigned 32-bit; || 1 avoids zero.
+  const seed = overlaySeed !== undefined
+    ? ((overlaySeed ^ 0x9E3779B9) >>> 0) || 1
+    : ((Date.now() ^ Math.floor(Math.random() * 0xFFFFFFFF)) >>> 0) || 1;
 
   // Build cached overlay lookup map for O(1) getTilesOnPath queries
   const overlayMap = new Map<string, BlastTileType>();
@@ -261,6 +266,26 @@ export function isBlastBoardCleared(tileStates: BlastTileState[][]): boolean {
     }
   }
   return true;
+}
+
+/**
+ * Advance blast state to the next wave (pure; caller applies via Object.assign).
+ * Preserves cumulative playerStats; resets playerMoves / playerBonusMoves per wave.
+ * Overlay seed is derived as hashStringToSeed(`{gameCode}:wave{N}`) so it is
+ * deterministic across peers and reproducible on reconnect.
+ */
+export function advanceBlastWave(
+  state: BlastModeState,
+  gameCode: string,
+  grid: string[][],
+): BlastModeState {
+  const nextWave = state.wave + 1;
+  const overlaySeed = hashStringToSeed(`${gameCode}:wave${nextWave}`);
+  const players = Object.keys(state.playerMoves);
+  const fresh = initBlastModeState(grid, players, nextWave, overlaySeed);
+  // Preserve cumulative stats.
+  fresh.playerStats = state.playerStats;
+  return fresh;
 }
 
 /**

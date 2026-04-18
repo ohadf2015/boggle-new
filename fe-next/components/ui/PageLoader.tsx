@@ -61,9 +61,9 @@ export const PageLoader = memo(function PageLoader({
       <div className={cn(containerClass, className)} data-testid="page-loader">
         <div className="flex flex-col items-center justify-center">
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 bg-neo-lime rounded-full animate-pulse" />
-            <div className="w-3 h-3 bg-neo-cyan rounded-full animate-pulse" style={{ animationDelay: '0.2s' }} />
-            <div className="w-3 h-3 bg-neo-pink rounded-full animate-pulse" style={{ animationDelay: '0.4s' }} />
+            <div className="w-3 h-3 bg-neo-cream/70 rounded-full animate-pulse" />
+            <div className="w-3 h-3 bg-neo-cream/70 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }} />
+            <div className="w-3 h-3 bg-neo-cream/70 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }} />
           </div>
           {text && (
             <p className="text-sm mt-3 font-neo-body opacity-70">{text}</p>

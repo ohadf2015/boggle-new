@@ -90,8 +90,8 @@ export const GameHeader = memo(function GameHeader({
     <div className="shrink-0">
     <header
       className={cn(
-        'flex items-center justify-between relative',
-        'px-2 py-1 gap-1',
+        'flex items-center justify-between',
+        'px-2 py-1 gap-2',
         hudTheme.headerBg,
         'border-b-2', hudTheme.headerBorder,
         className
@@ -116,9 +116,9 @@ export const GameHeader = memo(function GameHeader({
         </AdaptiveMotion.button>
       </div>
 
-      {/* Center: Score with combo glow ring — no separate combo text/bar */}
+      {/* Center: Score with combo glow ring — flex-based so it never overlaps side pills */}
       <div
-        className="absolute left-1/2 -translate-x-1/2 flex items-center justify-center pointer-events-none"
+        className="flex-1 min-w-0 flex items-center justify-center"
         aria-live="polite"
         aria-atomic="true"
         data-testid="score-display"

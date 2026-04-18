@@ -296,6 +296,10 @@ describe('gameLifecycleHandler - gameMode', () => {
             ...(recoveryGameMode === 'blast' && game.blastModeState ? {
               blastTileOverlay: game.blastModeState.overlay || [],
               blastSeed: game.blastModeState.seed ?? null,
+              blastWave: game.blastModeState.wave ?? 1,
+              blastPlayerMoves: game.blastModeState.playerMoves || {},
+              ...(game.blastModeState.grid ? { blastGrid: game.blastModeState.grid } : {}),
+              ...(game.blastModeState.tileStates ? { blastTileStates: game.blastModeState.tileStates } : {}),
             } : {}),
           });
         }
@@ -554,6 +558,77 @@ describe('gameLifecycleHandler - gameMode', () => {
           blastSeed: 42,
         })
       );
+    });
+
+    it('should include live blastGrid, blastTileStates, blastWave, blastPlayerMoves for mid-game recovery', () => {
+      // GIVEN: blast game in progress with full live state (post-clears)
+      const liveGrid = [['E', 'F'], ['G', 'H']];
+      const liveTileStates = [
+        [{ letter: 'E', isCleared: false }, { letter: 'F', isCleared: true }],
+        [{ letter: 'G', isCleared: false }, { letter: 'H', isCleared: false }],
+      ];
+      (getGameBySocketId as Mock).mockReturnValue('TEST');
+      (getGame as Mock).mockReturnValue({
+        gameState: 'in-progress',
+        letterGrid: [['A', 'B'], ['C', 'D']],
+        remainingTime: 100,
+        timerSeconds: 180,
+        language: 'en',
+        minWordLength: 2,
+        gameMode: 'blast',
+        blastModeState: {
+          overlay: [],
+          overlayMap: new Map(),
+          seed: 42,
+          wave: 2,
+          playerMoves: { alice: 3, bob: 1 },
+          grid: liveGrid,
+          tileStates: liveTileStates,
+        },
+      });
+
+      const handler = getHandler('requestGameState');
+
+      // WHEN
+      handler();
+
+      // THEN: recovery payload contains live state so reconnecting player sees post-clear board
+      expect(safeEmit).toHaveBeenCalledWith(
+        socket,
+        'startGame',
+        expect.objectContaining({
+          blastGrid: liveGrid,
+          blastTileStates: liveTileStates,
+          blastWave: 2,
+          blastPlayerMoves: { alice: 3, bob: 1 },
+        })
+      );
+    });
+
+    it('should omit blastGrid/blastTileStates when absent on state (pre-live-state blast games)', () => {
+      (getGameBySocketId as Mock).mockReturnValue('TEST');
+      (getGame as Mock).mockReturnValue({
+        gameState: 'in-progress',
+        letterGrid: [['A']],
+        remainingTime: 100,
+        timerSeconds: 180,
+        language: 'en',
+        minWordLength: 2,
+        gameMode: 'blast',
+        blastModeState: {
+          overlay: [],
+          seed: 7,
+        },
+      });
+
+      const handler = getHandler('requestGameState');
+      handler();
+
+      const payload = (safeEmit as Mock).mock.calls[0][2];
+      expect(payload).not.toHaveProperty('blastGrid');
+      expect(payload).not.toHaveProperty('blastTileStates');
+      expect(payload.blastWave).toBe(1);
+      expect(payload.blastPlayerMoves).toEqual({});
     });
 
     it('should NOT include blast fields in recovery when gameMode is classic', () => {

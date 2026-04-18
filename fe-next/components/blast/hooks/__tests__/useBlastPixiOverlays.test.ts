@@ -17,6 +17,8 @@ vi.mock('pixi.js', () => {
     rect() { return this; }
     stroke() { return this; }
     fill() { return this; }
+    moveTo() { return this; }
+    lineTo() { return this; }
     destroy() { this.destroyed = true; }
   }
   return { Graphics: MockGraphics };
@@ -75,6 +77,8 @@ interface MockGraphics {
   rect: () => unknown;
   stroke: () => unknown;
   fill: () => unknown;
+  moveTo: () => unknown;
+  lineTo: () => unknown;
   destroy: () => void;
 }
 interface MockBloom {
@@ -264,6 +268,51 @@ describe('useBlastPixiOverlays', () => {
     act(() => { result.current.flashCross(60, 60); });
     expect(first.destroyed).toBe(true);
     expect(camera.children).toHaveLength(1);
+  });
+
+  it('caps concurrent pulse rings to bound GPU churn under MP burst', () => {
+    const camera = makeMockCamera();
+    const { result } = renderHook(() =>
+      useBlastPixiOverlays({ camera: camera as unknown as never, width: 400, height: 400, gridSize: 8, cellSize: 50, chainLevel: 0 }),
+    );
+    // Spawn far more than the cap; expect camera children bounded.
+    act(() => {
+      for (let i = 0; i < 50; i++) result.current.spawnPulseRing(i, i, 1);
+    });
+    expect(camera.children.length).toBeLessThanOrEqual(8);
+  });
+
+  it('caps concurrent star bursts under MP burst', () => {
+    const camera = makeMockCamera();
+    const { result } = renderHook(() =>
+      useBlastPixiOverlays({ camera: camera as unknown as never, width: 400, height: 400, gridSize: 8, cellSize: 50, chainLevel: 0 }),
+    );
+    act(() => {
+      for (let i = 0; i < 50; i++) result.current.spawnStarBurst(i, i);
+    });
+    expect(camera.children.length).toBeLessThanOrEqual(8);
+  });
+
+  it('caps concurrent afterglows under MP burst', () => {
+    const camera = makeMockCamera();
+    const { result } = renderHook(() =>
+      useBlastPixiOverlays({ camera: camera as unknown as never, width: 400, height: 400, gridSize: 8, cellSize: 50, chainLevel: 0 }),
+    );
+    act(() => {
+      for (let i = 0; i < 100; i++) result.current.spawnAfterglow(i, i);
+    });
+    expect(camera.children.length).toBeLessThanOrEqual(20);
+  });
+
+  it('caps concurrent light sweeps under MP burst', () => {
+    const camera = makeMockCamera();
+    const { result } = renderHook(() =>
+      useBlastPixiOverlays({ camera: camera as unknown as never, width: 400, height: 400, gridSize: 8, cellSize: 50, chainLevel: 0 }),
+    );
+    act(() => {
+      for (let i = 0; i < 20; i++) result.current.spawnLightSweep();
+    });
+    expect(camera.children.length).toBeLessThanOrEqual(4);
   });
 
   it('cleans up pulse rings on unmount even if animation in flight', () => {

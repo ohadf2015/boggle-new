@@ -17,6 +17,7 @@ import {
 import { useLetterGrid, useGameLanguage, useShowStartAnimation, useGameActions, useGameStore } from '@/hooks/gameState';
 import type { BlastComboSyncPayload, StartGameBroadcast } from '@/shared/types/socket';
 import type { BlastTileState } from '@/shared/types/blast';
+import type { BlastTileOverlay } from '@/shared/types/game';
 import { createEarthquakeSocketHandlers } from '@/shared/utils/earthquakeSocketHandlers';
 import logger from '@/utils/logger';
 import type { GameTimerReturn } from '@/hooks/useGameTimer';
@@ -616,6 +617,24 @@ export function usePlayerGameEvents({
       setBlastBoardUpdate(data);
     };
 
+    const handleBlastWaveAdvance = (data: { wave: number; archetype: string; grid: string[][]; tileStates: BlastTileState[][]; overlay: BlastTileOverlay[]; seed: number }) => {
+      logger.log('[PLAYER] Blast wave advance to wave', data.wave, '(', data.archetype, ')');
+      useGameStore.setState({
+        blastWave: data.wave,
+        blastTileOverlay: data.overlay,
+        blastSeed: data.seed,
+        blastMovesUsed: 0,
+        blastBoardUpdate: {
+          grid: data.grid,
+          tileStates: data.tileStates,
+          clearedBy: '__wave_advance__',
+          word: '',
+          clearedCount: 0,
+          totalMoves: 0,
+        },
+      });
+    };
+
     // Handle total board words count (for "words remaining" display)
     const handleTotalBoardWords = (data: { count: number }) => {
       logger.log('[PLAYER] Received totalBoardWords:', data.count);
@@ -682,6 +701,7 @@ export function usePlayerGameEvents({
     socket.on('blastComboSync', handleBlastComboSync);
     socket.on('playerFoundWord', handlePlayerFoundWord);
     socket.on('blastBoardUpdate', handleBlastBoardUpdate);
+    socket.on('blastWaveAdvance', handleBlastWaveAdvance);
     socket.on('wordHuntLifeUpdate', handleWordHuntLifeUpdate);
     socket.on('wordHuntTargetResult', handleWordHuntTargetResult);
     socket.on('wordHuntTargetFound', handleWordHuntTargetFound);
@@ -727,6 +747,7 @@ export function usePlayerGameEvents({
       socket.off('blastComboSync', handleBlastComboSync);
       socket.off('playerFoundWord', handlePlayerFoundWord);
       socket.off('blastBoardUpdate', handleBlastBoardUpdate);
+      socket.off('blastWaveAdvance', handleBlastWaveAdvance);
       socket.off('wordHuntLifeUpdate', handleWordHuntLifeUpdate);
       socket.off('wordHuntTargetResult', handleWordHuntTargetResult);
       socket.off('wordHuntTargetFound', handleWordHuntTargetFound);

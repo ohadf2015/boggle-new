@@ -16,6 +16,8 @@ import { cn } from '@/lib/utils';
 
 interface GameLayoutProps {
   header: React.ReactNode;
+  /** Optional row rendered directly beneath the header — stays outside the grid/sidebar split so it can't be clipped by the portrait sidebar height cap. */
+  belowHeader?: React.ReactNode;
   gridArea: React.ReactNode;
   sidebar: React.ReactNode;
   overlays?: React.ReactNode;
@@ -30,6 +32,7 @@ interface GameLayoutProps {
 
 export const GameLayout = memo(function GameLayout({
   header,
+  belowHeader,
   gridArea,
   sidebar,
   overlays,
@@ -51,6 +54,13 @@ export const GameLayout = memo(function GameLayout({
       <div className="shrink-0 z-20">
         {header}
       </div>
+
+      {/* Below-header row — mode-critical strip (e.g. hunt clue boxes) that must stay visible outside the sidebar scroll/cap */}
+      {belowHeader && (
+        <div className="shrink-0 z-10">
+          {belowHeader}
+        </div>
+      )}
 
       {/*
         Main Content Area — portrait: column (grid top, sidebar bottom);

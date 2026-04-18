@@ -27,6 +27,7 @@ import logger from '../../utils/logger';
 import type { BotSubmission } from './types';
 import type { Bot } from '../../modules/botBehavior';
 import { startBotsForWordHunt } from './botWordHunt';
+import { startBotsForWheelRush } from './botWheelRush';
 import { restoreLife, getLifeBonus } from '../../modules/wordHuntManager';
 
 /** Score target ratios per difficulty — bots aim for this % of best human score */
@@ -138,6 +139,13 @@ export function startBotsForGame(
 
   const game = getGame(gameCode);
   const isWordHunt = game?.gameMode === 'word-hunt' && game.wordHuntState;
+
+  // Wheel-rush has no grid; dispatch to its dedicated bot driver.
+  if (game?.gameMode === 'wheel-rush' && game.wheelRushState) {
+    markBotScoringStart(gameCode);
+    startBotsForWheelRush(io, gameCode, bots, game.wheelRushState, language, timerSeconds);
+    return;
+  }
 
   // Safety check: ensure letterGrid is valid before starting bots
   if (!letterGrid || !Array.isArray(letterGrid) || letterGrid.length === 0) {

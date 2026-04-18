@@ -14,7 +14,7 @@ import { cn } from '@/lib/utils';
 import { WHEEL_RUSH_FOG_MS, WHEEL_RUSH_MIN_WORD_LEN } from '@/shared/constants/wheelRushConstants';
 import type { Avatar as AvatarType, PresenceStatus } from '@/shared/types/game';
 import { StealableLocks, MyWordsChips, type WheelLockInfo, type WordEntry } from './WheelRushPieces';
-import { QuickReactions, FloatingReaction } from '@/components/game/QuickReactions';
+import { FloatingReaction } from '@/components/game/QuickReactions';
 import { useQuickReactions } from '@/hooks/useQuickReactions';
 
 const WordWheelPixiRing = dynamic(() => import('@/components/daily/WordWheelPixiRing'), { ssr: false });
@@ -80,7 +80,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
   const [now, setNow] = useState<number>(() => Date.now());
   const [wheelRadius, setWheelRadius] = useState(72);
 
-  const { floatingReactions, sendReaction, dismissReaction } = useQuickReactions({ socket, username });
+  const { floatingReactions, dismissReaction } = useQuickReactions({ socket, username });
 
   const fbTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const wheelContainerRef = useRef<HTMLDivElement>(null);
@@ -347,7 +347,6 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
           })}
         </div>
         <div className="flex items-center gap-2">
-          <QuickReactions onReaction={sendReaction} layout="bar" />
           <Button size="sm" variant="destructive" onClick={onQuit}>{t('common.quit') || 'Quit'}</Button>
         </div>
       </div>

@@ -365,6 +365,10 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
         ...(recoveryGameMode === 'blast' && game.blastModeState ? {
           blastTileOverlay: game.blastModeState.overlay || [],
           blastSeed: game.blastModeState.seed ?? null,
+          blastWave: game.blastModeState.wave ?? 1,
+          blastPlayerMoves: game.blastModeState.playerMoves || {},
+          ...(game.blastModeState.grid ? { blastGrid: game.blastModeState.grid } : {}),
+          ...(game.blastModeState.tileStates ? { blastTileStates: game.blastModeState.tileStates } : {}),
         } : {}),
         ...(recoveryGameMode === 'word-hunt' && game.wordHuntState ? {
           wordHuntTargetLength: game.wordHuntState.targetWordLength ?? 0,

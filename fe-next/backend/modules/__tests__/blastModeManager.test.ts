@@ -11,6 +11,7 @@ import {
   getTilesOnPath,
   hashStringToSeed,
   isBlastBoardCleared,
+  advanceBlastWave,
 } from '../blastModeManager';
 import type { BlastTileState } from '@/shared/types/blast';
 
@@ -491,6 +492,19 @@ describe('blastModeManager', () => {
       expect(typeof s.seed).toBe('number');
       expect(s.seed).toBeGreaterThan(0);
     });
+
+    it('should produce identical refill seed when called with the same overlaySeed (MP determinism)', () => {
+      const seed = hashStringToSeed('ROOM42');
+      const s1 = initBlastModeState(grid, players, 1, seed);
+      const s2 = initBlastModeState(grid, players, 1, seed);
+      expect(s1.seed).toBe(s2.seed);
+    });
+
+    it('refill seed should differ from overlay seed to decorrelate overlay vs gravity RNG', () => {
+      const overlaySeed = hashStringToSeed('ROOM42');
+      const s = initBlastModeState(grid, players, 1, overlaySeed);
+      expect(s.seed).not.toBe(overlaySeed);
+    });
   });
 
   // ==========================================
@@ -539,6 +553,77 @@ describe('blastModeManager', () => {
         [makeTile(true), makeTile(true), makeTile(true)],
       ];
       expect(isBlastBoardCleared(tileStates)).toBe(true);
+    });
+  });
+
+  // ==========================================
+  // advanceBlastWave
+  // ==========================================
+  describe('advanceBlastWave', () => {
+    const gameCode = 'ABCD';
+    const grid: string[][] = [
+      ['A', 'B', 'C', 'D'],
+      ['E', 'F', 'G', 'H'],
+      ['I', 'J', 'K', 'L'],
+      ['M', 'N', 'O', 'P'],
+    ];
+    const players = ['alice', 'bob'];
+
+    it('increments wave by 1', () => {
+      const state = initBlastModeState(grid, players, 1, hashStringToSeed(`${gameCode}:wave1`));
+      const next = advanceBlastWave(state, gameCode, grid);
+      expect(next.wave).toBe(2);
+    });
+
+    it('preserves cumulative playerStats across waves', () => {
+      const state = initBlastModeState(grid, players, 1, hashStringToSeed(`${gameCode}:wave1`));
+      state.playerStats['alice'] = {
+        maxCombo: 5,
+        gemsCollected: 12,
+        wordsFound: ['hello', 'world'],
+        bestWord: 'world',
+        tilesCleared: 20,
+        totalTileBonus: 45,
+      };
+      const next = advanceBlastWave(state, gameCode, grid);
+      expect(next.playerStats['alice']).toEqual(state.playerStats['alice']);
+    });
+
+    it('resets playerMoves per wave', () => {
+      const state = initBlastModeState(grid, players, 1, hashStringToSeed(`${gameCode}:wave1`));
+      state.playerMoves['alice'] = 7;
+      state.playerMoves['bob'] = 3;
+      const next = advanceBlastWave(state, gameCode, grid);
+      expect(next.playerMoves['alice']).toBe(0);
+      expect(next.playerMoves['bob']).toBe(0);
+    });
+
+    it('produces deterministic overlay per (gameCode, wave)', () => {
+      const s1 = initBlastModeState(grid, players, 1, hashStringToSeed(`${gameCode}:wave1`));
+      const s2 = initBlastModeState(grid, players, 1, hashStringToSeed(`${gameCode}:wave1`));
+      const a = advanceBlastWave(s1, gameCode, grid);
+      const b = advanceBlastWave(s2, gameCode, grid);
+      expect(a.overlay).toEqual(b.overlay);
+      expect(a.seed).toBe(b.seed);
+    });
+
+    it('decorrelates overlay seed across waves', () => {
+      const state = initBlastModeState(grid, players, 1, hashStringToSeed(`${gameCode}:wave1`));
+      const wave2 = advanceBlastWave(state, gameCode, grid);
+      expect(wave2.seed).not.toBe(state.seed);
+    });
+
+    it('uses provided grid for new tileStates', () => {
+      const state = initBlastModeState(grid, players, 1, hashStringToSeed(`${gameCode}:wave1`));
+      const newGrid: string[][] = [
+        ['Q', 'R', 'S', 'T'],
+        ['U', 'V', 'W', 'X'],
+        ['Y', 'Z', 'A', 'B'],
+        ['C', 'D', 'E', 'F'],
+      ];
+      const next = advanceBlastWave(state, gameCode, newGrid);
+      expect(next.grid).toEqual(newGrid);
+      expect(next.tileStates.length).toBe(newGrid.length);
     });
   });
 });

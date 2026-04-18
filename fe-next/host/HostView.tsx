@@ -80,6 +80,8 @@ interface HostViewProps {
   lessonData?: LessonData | null;
   /** Callback when host changes their display name */
   onUsernameChange?: (newName: string) => void;
+  /** Quick Play: auto-start solo game immediately after room join */
+  autoStart?: boolean;
 }
 
 // ==========================================
@@ -96,6 +98,7 @@ const HostView: React.FC<HostViewProps> = memo(({
   onGameStartConsumed,
   lessonData,
   onUsernameChange,
+  autoStart = false,
 }) => {
   const { t, language } = useLanguage();
   const { socket } = useSocket();
@@ -264,6 +267,18 @@ const HostView: React.FC<HostViewProps> = memo(({
     intentionalExitRef: state.refs.intentionalExitRef,
     tournamentTimeoutRef: state.refs.tournamentTimeoutRef,
   });
+
+  // Quick Play: auto-start solo game once room is joined and socket ready.
+  // Ref-guarded so StrictMode double-mount or rerun only fires once.
+  const autoStartFiredRef = useRef(false);
+  useEffect(() => {
+    if (!autoStart) return;
+    if (autoStartFiredRef.current) return;
+    if (!socket?.connected || !gameCode) return;
+    if (state.runtime.gameStarted) return;
+    autoStartFiredRef.current = true;
+    actions.confirmSoloStart();
+  }, [autoStart, socket, gameCode, state.runtime.gameStarted, actions]);
 
   // Destructure stable setters for useEffect dependencies
   const { setWordsForBoard } = state;

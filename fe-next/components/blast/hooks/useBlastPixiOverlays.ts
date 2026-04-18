@@ -17,6 +17,15 @@ import { createGlowFilter } from '../effects/pixiFilterPresets';
 import { computePulseRingFrame, pulseRingTierColor } from '../effects/pulseRingCurve';
 import { isReducedMotionPreferred } from '@/utils/accessibility';
 
+// Concurrency caps per FX category. Bounds GPU buffer + filter churn when
+// multiple opponents clear simultaneously in MP. Hitting the cap drops the
+// excess spawn — already-running FX finish normally. Numbers chosen to keep
+// mobile GPUs comfortable while still reading as "a lot happened".
+const MAX_PULSE_RINGS = 8;
+const MAX_STAR_BURSTS = 8;
+const MAX_AFTERGLOWS = 20;
+const MAX_LIGHT_SWEEPS = 4;
+
 interface UseBlastPixiOverlaysParams {
   camera: Container;
   width: number;
@@ -214,6 +223,7 @@ export function useBlastPixiOverlays({
     // Accessibility: honor prefers-reduced-motion. Skip entirely (additive
     // glow bursts can't be safely "toned down" for users who opt out).
     if (isReducedMotionPreferred()) return;
+    if (pulseRingsRef.current.size >= MAX_PULSE_RINGS) return;
     const g = new Graphics();
     const baseRadius = Math.min(width, height) * 0.18;
     g.circle(0, 0, baseRadius).stroke({ color: 0xffffff, width: 6, alpha: 1 });
@@ -249,6 +259,7 @@ export function useBlastPixiOverlays({
   // bloom kick. Great for "beam pop" moments on prism/rainbow/catalyst clears.
   const spawnStarBurst = useCallback((cx: number, cy: number, color = 0xffffff, points = 8) => {
     if (isReducedMotionPreferred()) return;
+    if (starBurstsRef.current.size >= MAX_STAR_BURSTS) return;
     const g = new Graphics();
     const radius = Math.min(width, height) * 0.22;
     for (let i = 0; i < points; i++) {
@@ -288,6 +299,7 @@ export function useBlastPixiOverlays({
   // "heat map" effect where recent clears leave visible traces on the board.
   const spawnAfterglow = useCallback((cx: number, cy: number, color = 0xbfff00) => {
     if (isReducedMotionPreferred()) return;
+    if (afterglowRef.current.size >= MAX_AFTERGLOWS) return;
     const g = new Graphics();
     const radius = cellSize * 0.6;
     g.circle(0, 0, radius).fill({ color, alpha: 0.35 });
@@ -322,6 +334,7 @@ export function useBlastPixiOverlays({
   // cinematic "cleansing" effect. Used on wave clears and chain≥5.
   const spawnLightSweep = useCallback(() => {
     if (isReducedMotionPreferred()) return;
+    if (lightSweepRef.current.size >= MAX_LIGHT_SWEEPS) return;
     const g = new Graphics();
     const barHeight = 6;
     g.rect(0, -barHeight / 2, width, barHeight).fill({ color: 0xffffff, alpha: 0.7 });

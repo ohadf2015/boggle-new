@@ -12,18 +12,6 @@ interface BasePartProps {
   fill: string;
 }
 
-const Nose = () => (
-  <g>
-    {/* Kawaii button nose — soft rounded shape with highlight */}
-    <ellipse cx="50" cy="55" rx="3.5" ry="2.8" fill="#000" opacity="0.1" />
-    <path d="M47.5 53 C48 56.5 50 58 50 58 C50 58 52 56.5 52.5 53" fill="none" stroke="#000" strokeWidth={1.8} opacity="0.45" strokeLinecap="round" />
-    {/* Nose highlight for 3D feel */}
-    <ellipse cx="49" cy="54" rx="1.5" ry="1" fill="#fff" opacity="0.15" />
-    {/* Soft nostril hints */}
-    <ellipse cx="48" cy="56" rx="1" ry="0.6" fill="#000" opacity="0.15" />
-    <ellipse cx="52" cy="56" rx="1" ry="0.6" fill="#000" opacity="0.15" />
-  </g>
-);
 
 function Round({ fill }: BasePartProps) {
   return (
@@ -39,7 +27,7 @@ function Round({ fill }: BasePartProps) {
       <path d="M36 34 Q50 28 64 34" fill="none" stroke="#fff" strokeWidth={1.5} opacity="0.18" strokeLinecap="round" />
       {/* Chin softness */}
       <path d="M40 72 Q50 78 60 72" fill="#fff" opacity="0.08" />
-      <Nose />
+
     </g>
   );
 }
@@ -58,7 +46,7 @@ function Square({ fill }: BasePartProps) {
       <path d="M32 30 Q50 24 68 30" fill="none" stroke="#fff" strokeWidth={1.5} opacity="0.14" strokeLinecap="round" />
       {/* Jaw shadow */}
       <path d="M28 72 Q50 78 72 72" fill="#000" opacity="0.05" />
-      <Nose />
+
     </g>
   );
 }
@@ -79,7 +67,7 @@ function Oval({ fill }: BasePartProps) {
       <ellipse cx="68" cy="50" rx="4" ry="6" fill="#000" opacity="0.03" />
       {/* Chin */}
       <path d="M44 78 Q50 84 56 78" fill="#fff" opacity="0.06" />
-      <Nose />
+
     </g>
   );
 }
@@ -104,7 +92,7 @@ function Heart({ fill }: BasePartProps) {
       <ellipse cx="66" cy="36" rx="6" ry="5" fill="#fff" opacity="0.12" />
       {/* Cleft hint at top */}
       <path d="M47 36 Q50 32 53 36" fill="none" stroke="#000" strokeWidth={1} opacity="0.12" />
-      <Nose />
+
     </g>
   );
 }
@@ -120,7 +108,7 @@ function Diamond({ fill }: BasePartProps) {
       <path d="M34 50 L66 50" stroke="#fff" strokeWidth={0.5} opacity="0.12" />
       {/* Top facet highlight */}
       <ellipse cx="42" cy="40" rx="5" ry="7" fill="#fff" opacity="0.08" />
-      <Nose />
+
     </g>
   );
 }
@@ -132,7 +120,7 @@ function Hexagon({ fill }: BasePartProps) {
       <polygon points="50,14 82,30 82,72 50,88 18,72 18,30" fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
       <polygon points="50,19 77,33 77,69 50,83 23,69 23,33" fill="none" stroke="#fff" strokeWidth={1} opacity="0.12" />
       <polygon points="50,24 72,36 72,66 50,78 28,66 28,36" fill="none" stroke="#000" strokeWidth={0.5} opacity="0.06" />
-      <Nose />
+
     </g>
   );
 }
@@ -149,7 +137,7 @@ function Blob({ fill }: BasePartProps) {
       <path d="M38 30 Q52 24 66 32" fill="none" stroke="#fff" strokeWidth={1.5} opacity="0.16" strokeLinecap="round" />
       {/* Chin */}
       <path d="M42 74 Q52 80 60 74" fill="#fff" opacity="0.06" />
-      <Nose />
+
     </g>
   );
 }
@@ -200,7 +188,7 @@ function Shield({ fill }: BasePartProps) {
       <circle cx="26" cy="28" r="2.5" fill="#FFD700" />
       <circle cx="74" cy="28" r="2.5" fill="#FFD700" />
       <circle cx="50" cy="80" r="2.5" fill="#FFD700" />
-      <Nose />
+
     </g>
   );
 }
@@ -297,7 +285,7 @@ function Triangle({ fill }: BasePartProps) {
       <path d="M76 30 Q68 38 64 48" fill="none" stroke="#000" strokeWidth={0.7} opacity="0.1" />
       {/* Chin shadow */}
       <path d="M40 70 L50 82 L60 70" fill="#000" opacity="0.06" />
-      <Nose />
+
     </g>
   );
 }
@@ -344,7 +332,7 @@ function CatFace({ fill }: BasePartProps) {
       <circle cx="66" cy="56" r="1.2" fill="#000" opacity="0.18" />
       {/* Chin shadow */}
       <path d="M44 76 Q50 82 56 76" fill="#000" opacity="0.06" />
-      <Nose />
+
     </g>
   );
 }
@@ -363,7 +351,7 @@ function Oblong({ fill }: BasePartProps) {
       <path d="M40 26 Q50 20 60 26" fill="none" stroke="#fff" strokeWidth={1.5} opacity="0.14" strokeLinecap="round" />
       {/* Chin */}
       <path d="M44 78 Q50 84 56 78" fill="#fff" opacity="0.06" />
-      <Nose />
+
     </g>
   );
 }
@@ -383,7 +371,7 @@ function Rectangular({ fill }: BasePartProps) {
       <path d="M34 26 Q50 20 66 26" fill="none" stroke="#fff" strokeWidth={1.5} opacity="0.14" strokeLinecap="round" />
       {/* Jaw shadow */}
       <path d="M24 68 Q30 74 50 78 Q70 74 76 68" fill="#000" opacity="0.05" />
-      <Nose />
+
     </g>
   );
 }
@@ -406,7 +394,7 @@ function Pear({ fill }: BasePartProps) {
       <ellipse cx="72" cy="58" rx="4" ry="6" fill="#000" opacity="0.03" />
       {/* Jaw */}
       <path d="M30 72 Q40 80 50 82 Q60 80 70 72" fill="#000" opacity="0.04" />
-      <Nose />
+
     </g>
   );
 }

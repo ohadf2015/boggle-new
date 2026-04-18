@@ -382,7 +382,7 @@ export default function MultiplayerPageClient(): React.JSX.Element {
             initialPlayers={playersInRoom} username={username}
             onShowResults={handleShowResults} pendingGameStart={pendingGameStart}
             onGameStartConsumed={() => setPendingGameStart(null)} lessonData={lessonData}
-            onUsernameChange={setUsername}
+            onUsernameChange={setUsername} autoStart={quickPlay}
           />
         </FeatureErrorBoundary>
       );

@@ -57,7 +57,7 @@ describe('wheelRushManager', () => {
     const state = () => initWheelRushState(puzzle, ['p1', 'p2'], 1000);
 
     it('rejects too-short', () => {
-      expect(validateWheelSubmission(state(), 'CAN', 'en').error).toBe('too-short');
+      expect(validateWheelSubmission(state(), 'CA', 'en').error).toBe('too-short');
     });
     it('rejects no-center', () => {
       expect(validateWheelSubmission(state(), 'NEST', 'en').error).toBe('no-center');

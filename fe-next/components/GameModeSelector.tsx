@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Shuffle, FileText, Bomb, Target, CircleDot } from 'lucide-react';
+import { Shuffle, FileText, Bomb, Crosshair, Disc3 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { GameMode } from '@/shared/types/game';
 
@@ -25,8 +25,8 @@ export const MODE_ICONS: Record<GameModeOption, React.ReactNode> = {
   random: <Shuffle className="w-4 h-4" />,
   classic: <FileText className="w-4 h-4" />,
   blast: <Bomb className="w-4 h-4" />,
-  'word-hunt': <Target className="w-4 h-4" />,
-  'wheel-rush': <CircleDot className="w-4 h-4" />,
+  'word-hunt': <Crosshair className="w-4 h-4" />,
+  'wheel-rush': <Disc3 className="w-4 h-4" />,
 };
 
 export const MODE_ACTIVE_COLORS: Record<GameModeOption, string> = {

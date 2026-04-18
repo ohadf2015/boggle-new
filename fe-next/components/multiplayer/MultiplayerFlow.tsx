@@ -5,12 +5,10 @@ import RoomListView from './RoomListView';
 import JoinRoomModal from './JoinRoomModal';
 import CreateRoomModal from './CreateRoomModal';
 import type { Language, ActiveRoom } from '@/shared/types/game';
-import toast from 'react-hot-toast';
 import {
   getStoredUsername,
   hasCompleteStoredProfile,
 } from '@/utils/profileStorage';
-import { getJoinUrl } from '@/utils/share';
 import { useCrazyGamesInvite } from '@/hooks/useCrazyGamesInvite';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -301,10 +299,8 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
     setHostUsername(quickPlayUsername);
     setUsername(quickPlayUsername);
 
-    // Create room immediately with host playing (dual mode).
-    // quickPlay flag creates the room and drops the user into the lobby
-    // where they can invite friends and start when ready.
-    handleJoin(true, defaultLanguage, gameCode, roomName, quickPlayUsername, { quickPlay: true });
+    // Create private room immediately with host playing and auto-start the game.
+    handleJoin(true, defaultLanguage, gameCode, roomName, quickPlayUsername, { quickPlay: true, isPrivate: true });
 
     // Show CrazyGames invite button so host can invite friends
     cgShowInvite(gameCode);

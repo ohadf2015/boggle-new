@@ -14,6 +14,7 @@ import { DailyChallengeLanding } from '../DailyChallengeLanding';
 vi.mock('next/navigation', () => ({
   usePathname: vi.fn(() => '/en/daily'),
   useSearchParams: vi.fn(() => ({ get: vi.fn(() => null) })),
+  useRouter: vi.fn(() => ({ push: vi.fn(), back: vi.fn(), replace: vi.fn() })),
 }));
 
 vi.mock('@/contexts/LanguageContext', () => ({

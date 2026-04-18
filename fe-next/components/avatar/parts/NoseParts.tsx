@@ -12,6 +12,19 @@ interface NoseProps {
 
 function None() { return <g />; }
 
+/** Kawaii button nose — matches the inline nose previously embedded in BaseParts */
+function Kawaii() {
+  return (
+    <g>
+      <ellipse cx="50" cy="55" rx="3.5" ry="2.8" fill="#000" opacity="0.1" />
+      <path d="M47.5 53 C48 56.5 50 58 50 58 C50 58 52 56.5 52.5 53" fill="none" stroke="#000" strokeWidth={1.8} opacity="0.45" strokeLinecap="round" />
+      <ellipse cx="49" cy="54" rx="1.5" ry="1" fill="#fff" opacity="0.15" />
+      <ellipse cx="48" cy="56" rx="1" ry="0.6" fill="#000" opacity="0.15" />
+      <ellipse cx="52" cy="56" rx="1" ry="0.6" fill="#000" opacity="0.15" />
+    </g>
+  );
+}
+
 /** Simple small nose — two subtle nostril dots */
 function Button({ fill }: NoseProps) {
   const shadow = darken(fill, 0.2);
@@ -101,7 +114,7 @@ function Dot({ fill }: NoseProps) {
 }
 
 /** Animal/cat triangle nose */
-function Cat({ fill }: NoseProps) {
+function Cat() {
   return (
     <g>
       <polygon points="50,52 47,56 53,56" fill="#FF8FA3" stroke="#000" strokeWidth={0.8} />
@@ -123,6 +136,7 @@ function Clown() {
 
 export const NOSE_PARTS: Record<string, React.FC<NoseProps> | React.FC> = {
   none: None,
+  kawaii: Kawaii,
   button: Button,
   pointed: Pointed,
   round: Round,

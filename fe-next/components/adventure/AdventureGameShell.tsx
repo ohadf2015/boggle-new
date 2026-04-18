@@ -6,7 +6,7 @@
  */
 import React, { memo } from 'react';
 import GameplayBackground from './themed/GameplayBackground';
-import { GameHeader, GameSidebar, GameGridArea, GameLayout, GameInfoStrip } from './ui';
+import { GameHeader, GameSidebar, GameGridArea, GameLayout, GameInfoStrip, AdventureHuntClueBoxes } from './ui';
 import AdventureGameOverlays, { type AdventureGameOverlaysProps } from './AdventureGameOverlays';
 import AdventureTailOverlays from './AdventureTailOverlays';
 import { getWorldConfig } from '@/lib/adventure/levelConfig';
@@ -109,6 +109,17 @@ const AdventureGameShell = memo<AdventureGameShellProps>((p) => {
       <GameplayBackground className="absolute inset-0 -z-10" />
       <GameLayout
         isBossActive={isBossLevel && bossOrch.isBossActive && !bossOrch.showBossIntro && !showLevelComplete}
+        belowHeader={
+          modeState.showTargetWordUI && huntTargetWord && huntTargetWord.length > 0 ? (
+            <div className="lg:hidden px-3 py-2 bg-neo-navy/70 border-b-2 border-neo-black/30">
+              <AdventureHuntClueBoxes
+                targetLength={huntTargetWord.length}
+                attempts={huntAttempts as never}
+                huntFound={huntFound}
+              />
+            </div>
+          ) : undefined
+        }
         header={
           <GameHeader worldNumber={levelConfig.world} levelNumber={levelConfig.level}
             score={gameState.score} timerStore={timerStore as never} isPaused={isPaused}
