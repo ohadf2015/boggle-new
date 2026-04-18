@@ -83,20 +83,17 @@ export function useDailyMissions(): UseDailyMissionsReturn {
         .select('word_hunt_completed, adventure_completed, community_completed, grand_slam_claimed')
         .eq('player_id', playerId)
         .eq('mission_date', today)
-        .single();
+        .maybeSingle();
 
       if (!isMounted.current) return;
 
-      if (error && error.code === 'PGRST116') {
-        // No row yet — all incomplete
-        setMissions(buildMissions(null));
-        setGrandSlamClaimed(false);
-      } else if (error) {
+      if (error || !data) {
+        // No row yet (or fetch error) — all incomplete
         setMissions(buildMissions(null));
         setGrandSlamClaimed(false);
       } else {
         setMissions(buildMissions(data));
-        setGrandSlamClaimed(data?.grand_slam_claimed ?? false);
+        setGrandSlamClaimed(data.grand_slam_claimed ?? false);
       }
     } catch {
       if (isMounted.current) {

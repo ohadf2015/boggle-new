@@ -62,7 +62,7 @@ export function useDailySolveRate(language: string, options: UseDailySolveRateOp
         .select('solve_rate')
         .eq('puzzle_date', today)
         .eq('language', language)
-        .single();
+        .maybeSingle();
 
       if (cancelled) return;
 

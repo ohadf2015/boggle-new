@@ -1,14 +1,14 @@
 {
   "summary": {
-    "totalKeysInCode": 4439,
+    "totalKeysInCode": 4438,
     "keyCountByLanguage": {
-      "en": 8239,
+      "en": 8324,
       "he": 8368,
-      "sv": 8386,
+      "sv": 8471,
       "ja": 8389,
       "es": 8405
     },
-    "missingFromEnglish": 86,
+    "missingFromEnglish": 0,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
       "templateLiterals": 12,
@@ -154,811 +154,270 @@
     "ja": [],
     "es": []
   },
-  "missingFromEnglish": [
-    {
-      "key": "adventure.ascension.level1",
-      "usages": [
-        {
-          "file": "lib/adventure/ascensionConfig.ts",
-          "line": 29
-        }
-      ]
-    },
-    {
-      "key": "adventure.ascension.level10",
-      "usages": [
-        {
-          "file": "lib/adventure/ascensionConfig.ts",
-          "line": 38
-        }
-      ]
-    },
-    {
-      "key": "adventure.ascension.level2",
-      "usages": [
-        {
-          "file": "lib/adventure/ascensionConfig.ts",
-          "line": 30
-        }
-      ]
-    },
-    {
-      "key": "adventure.ascension.level3",
-      "usages": [
-        {
-          "file": "lib/adventure/ascensionConfig.ts",
-          "line": 31
-        }
-      ]
-    },
-    {
-      "key": "adventure.ascension.level4",
-      "usages": [
-        {
-          "file": "lib/adventure/ascensionConfig.ts",
-          "line": 32
-        }
-      ]
-    },
-    {
-      "key": "adventure.ascension.level5",
-      "usages": [
-        {
-          "file": "lib/adventure/ascensionConfig.ts",
-          "line": 33
-        }
-      ]
-    },
-    {
-      "key": "adventure.ascension.level6",
-      "usages": [
-        {
-          "file": "lib/adventure/ascensionConfig.ts",
-          "line": 34
-        }
-      ]
-    },
-    {
-      "key": "adventure.ascension.level7",
-      "usages": [
-        {
-          "file": "lib/adventure/ascensionConfig.ts",
-          "line": 35
-        }
-      ]
-    },
-    {
-      "key": "adventure.ascension.level8",
-      "usages": [
-        {
-          "file": "lib/adventure/ascensionConfig.ts",
-          "line": 36
-        }
-      ]
-    },
-    {
-      "key": "adventure.ascension.level9",
-      "usages": [
-        {
-          "file": "lib/adventure/ascensionConfig.ts",
-          "line": 37
-        }
-      ]
-    },
-    {
-      "key": "adventure.bosses.newMechanic",
-      "usages": [
-        {
-          "file": "components/adventure/boss/BossMechanicTutorial.tsx",
-          "line": 83
-        }
-      ]
-    },
-    {
-      "key": "adventure.bosses.tutorialGotIt",
-      "usages": [
-        {
-          "file": "components/adventure/boss/BossMechanicTutorial.tsx",
-          "line": 109
-        },
-        {
-          "file": "components/adventure/boss/BossMechanicTutorial.tsx",
-          "line": 120
-        }
-      ]
-    },
-    {
-      "key": "adventure.consumables.bossRevive.name",
-      "usages": [
-        {
-          "file": "lib/adventure/consumables.ts",
-          "line": 25
-        }
-      ]
-    },
-    {
-      "key": "adventure.consumables.bossShield.name",
-      "usages": [
-        {
-          "file": "lib/adventure/consumables.ts",
-          "line": 23
-        }
-      ]
-    },
-    {
-      "key": "adventure.consumables.doubleGold.name",
-      "usages": [
-        {
-          "file": "lib/adventure/consumables.ts",
-          "line": 24
-        }
-      ]
-    },
-    {
-      "key": "adventure.consumables.extraHint.name",
-      "usages": [
-        {
-          "file": "lib/adventure/consumables.ts",
-          "line": 20
-        }
-      ]
-    },
-    {
-      "key": "adventure.consumables.gridReroll.name",
-      "usages": [
-        {
-          "file": "lib/adventure/consumables.ts",
-          "line": 22
-        }
-      ]
-    },
-    {
-      "key": "adventure.consumables.objectiveSkip.name",
-      "usages": [
-        {
-          "file": "lib/adventure/consumables.ts",
-          "line": 26
-        }
-      ]
-    },
-    {
-      "key": "adventure.consumables.perfectStar.name",
-      "usages": [
-        {
-          "file": "lib/adventure/consumables.ts",
-          "line": 27
-        }
-      ]
-    },
-    {
-      "key": "adventure.consumables.timerExtension.name",
-      "usages": [
-        {
-          "file": "lib/adventure/consumables.ts",
-          "line": 21
-        }
-      ]
-    },
-    {
-      "key": "adventure.game.missedWordsSummary",
-      "usages": [
-        {
-          "file": "components/adventure/MissedWordsPanel.tsx",
-          "line": 72
-        }
-      ]
-    },
-    {
-      "key": "adventure.game.showLess",
-      "usages": [
-        {
-          "file": "components/adventure/MissedWordsPanel.tsx",
-          "line": 109
-        }
-      ]
-    },
-    {
-      "key": "adventure.game.showMore",
-      "usages": [
-        {
-          "file": "components/adventure/MissedWordsPanel.tsx",
-          "line": 110
-        }
-      ]
-    },
-    {
-      "key": "adventure.game.wordsYouMissed",
-      "usages": [
-        {
-          "file": "components/adventure/MissedWordsPanel.tsx",
-          "line": 69
-        },
-        {
-          "file": "components/adventure/MissedWordsPanel.tsx",
-          "line": 77
-        }
-      ]
-    },
-    {
-      "key": "adventure.loot.fragment",
-      "usages": [
-        {
-          "file": "lib/adventure/lootConfig.ts",
-          "line": 65
-        }
-      ]
-    },
-    {
-      "key": "adventure.loot.luckyBonus",
-      "usages": [
-        {
-          "file": "lib/adventure/lootConfig.ts",
-          "line": 72
-        }
-      ]
-    },
-    {
-      "key": "adventure.mutators.blindMode.name",
-      "usages": [
-        {
-          "file": "lib/adventure/worldMutators.ts",
-          "line": 34
-        }
-      ]
-    },
-    {
-      "key": "adventure.mutators.chaosGrid.name",
-      "usages": [
-        {
-          "file": "lib/adventure/worldMutators.ts",
-          "line": 36
-        }
-      ]
-    },
-    {
-      "key": "adventure.mutators.fragile.name",
-      "usages": [
-        {
-          "file": "lib/adventure/worldMutators.ts",
-          "line": 32
-        }
-      ]
-    },
-    {
-      "key": "adventure.mutators.ironMan.name",
-      "usages": [
-        {
-          "file": "lib/adventure/worldMutators.ts",
-          "line": 35
-        }
-      ]
-    },
-    {
-      "key": "adventure.mutators.minimalist.name",
-      "usages": [
-        {
-          "file": "lib/adventure/worldMutators.ts",
-          "line": 33
-        }
-      ]
-    },
-    {
-      "key": "adventure.mutators.noHints.name",
-      "usages": [
-        {
-          "file": "lib/adventure/worldMutators.ts",
-          "line": 30
-        }
-      ]
-    },
-    {
-      "key": "adventure.mutators.speedRun.name",
-      "usages": [
-        {
-          "file": "lib/adventure/worldMutators.ts",
-          "line": 31
-        }
-      ]
-    },
-    {
-      "key": "adventure.mutators.wordMaster.name",
-      "usages": [
-        {
-          "file": "lib/adventure/worldMutators.ts",
-          "line": 37
-        }
-      ]
-    },
-    {
-      "key": "adventure.share.bestWord",
-      "usages": [
-        {
-          "file": "components/adventure/LevelShareCard.tsx",
-          "line": 125
-        }
-      ]
-    },
-    {
-      "key": "adventure.share.perfectClear",
-      "usages": [
-        {
-          "file": "components/adventure/LevelShareCard.tsx",
-          "line": 85
-        }
-      ]
-    },
-    {
-      "key": "adventure.share.wordsFound",
-      "usages": [
-        {
-          "file": "components/adventure/LevelShareCard.tsx",
-          "line": 135
-        }
-      ]
-    },
-    {
-      "key": "adventure.world",
-      "usages": [
-        {
-          "file": "components/adventure/LevelCompleteModal.tsx",
-          "line": 220
-        }
-      ]
-    },
-    {
-      "key": "auth.otp.codeSent",
-      "usages": [
-        {
-          "file": "components/auth/DailyChallengeInlineSignup.tsx",
-          "line": 215
-        },
-        {
-          "file": "components/auth/WordHuntLoginModal.tsx",
-          "line": 123
-        }
-      ]
-    },
-    {
-      "key": "auth.otp.enterCode",
-      "usages": [
-        {
-          "file": "components/auth/DailyChallengeInlineSignup.tsx",
-          "line": 480
-        },
-        {
-          "file": "components/auth/DailyChallengeInlineSignup.tsx",
-          "line": 489
-        },
-        {
-          "file": "components/auth/WordHuntLoginModal.tsx",
-          "line": 267
-        }
-      ]
-    },
-    {
-      "key": "avatar.builder.download",
-      "usages": [
-        {
-          "file": "components/avatar/AvatarBuilderModal.tsx",
-          "line": 286
-        }
-      ]
-    },
-    {
-      "key": "avatar.builder.expressions",
-      "usages": [
-        {
-          "file": "components/avatar/AvatarBuilderCategoryOptions.tsx",
-          "line": 140
-        }
-      ]
-    },
-    {
-      "key": "avatar.builder.eyeColor",
-      "usages": [
-        {
-          "file": "components/avatar/AvatarBuilderCategoryOptions.tsx",
-          "line": 175
-        }
-      ]
-    },
-    {
-      "key": "avatar.builder.nose",
-      "usages": [
-        {
-          "file": "components/avatar/AvatarBuilderCategoryOptions.tsx",
-          "line": 181
-        }
-      ]
-    },
-    {
-      "key": "common.copiedToClipboard",
-      "usages": [
-        {
-          "file": "components/multiplayer/CrazyGamesFriendsStrip.tsx",
-          "line": 47
-        }
-      ]
-    },
-    {
-      "key": "common.navigation",
-      "usages": [
-        {
-          "file": "components/CommandPalette.tsx",
-          "line": 89
-        }
-      ]
-    },
-    {
-      "key": "common.noResults",
-      "usages": [
-        {
-          "file": "components/CommandPalette.tsx",
-          "line": 85
-        }
-      ]
-    },
-    {
-      "key": "common.search",
-      "usages": [
-        {
-          "file": "components/CommandPalette.tsx",
-          "line": 77
-        }
-      ]
-    },
-    {
-      "key": "common.searchPlaceholder",
-      "usages": [
-        {
-          "file": "components/CommandPalette.tsx",
-          "line": 80
-        }
-      ]
-    },
-    {
-      "key": "common.toClose",
-      "usages": [
-        {
-          "file": "components/CommandPalette.tsx",
-          "line": 125
-        }
-      ]
-    },
-    {
-      "key": "daily.comeBackTomorrow",
-      "usages": [
-        {
-          "file": "components/daily/DailyRewardClaim.tsx",
-          "line": 66
-        }
-      ]
-    },
-    {
-      "key": "daily.milestoneReached",
-      "usages": [
-        {
-          "file": "components/daily/DailyRewardClaim.tsx",
-          "line": 54
-        }
-      ]
-    },
-    {
-      "key": "daily.rewardClaimed",
-      "usages": [
-        {
-          "file": "components/daily/DailyRewardClaim.tsx",
-          "line": 42
-        }
-      ]
-    },
-    {
-      "key": "daily.streakFreezeEarned",
-      "usages": [
-        {
-          "file": "components/daily/StreakFreezeEarnedToast.tsx",
-          "line": 31
-        }
-      ]
-    },
-    {
-      "key": "education.landing.startGame",
-      "usages": [
-        {
-          "file": "app/[locale]/education/PageClient.tsx",
-          "line": 287
-        }
-      ]
-    },
-    {
-      "key": "friends.challenges.accept",
-      "usages": [
-        {
-          "file": "components/friends/ChallengeRow.tsx",
-          "line": 78
-        }
-      ]
-    },
-    {
-      "key": "friends.challenges.accepted",
-      "usages": [
-        {
-          "file": "components/friends/FriendsList.tsx",
-          "line": 278
-        }
-      ]
-    },
-    {
-      "key": "friends.challenges.acceptFailed",
-      "usages": [
-        {
-          "file": "components/friends/FriendsList.tsx",
-          "line": 281
-        }
-      ]
-    },
-    {
-      "key": "friends.challenges.decline",
-      "usages": [
-        {
-          "file": "components/friends/ChallengeRow.tsx",
-          "line": 92
-        }
-      ]
-    },
-    {
-      "key": "friends.challenges.declined",
-      "usages": [
-        {
-          "file": "components/friends/FriendsList.tsx",
-          "line": 287
-        }
-      ]
-    },
-    {
-      "key": "friends.challenges.friendAccepted",
-      "usages": [
-        {
-          "file": "components/friends/FriendsList.tsx",
-          "line": 105
-        }
-      ]
-    },
-    {
-      "key": "friends.challenges.received",
-      "usages": [
-        {
-          "file": "components/friends/FriendsList.tsx",
-          "line": 112
-        }
-      ]
-    },
-    {
-      "key": "multiplayer.nearRank",
-      "usages": [
-        {
-          "file": "components/multiplayer/NearRankTeaser.tsx",
-          "line": 21
-        }
-      ]
-    },
-    {
-      "key": "multiplayer.oneMoreWin",
-      "usages": [
-        {
-          "file": "components/multiplayer/NearRankTeaser.tsx",
-          "line": 20
-        }
-      ]
-    },
-    {
-      "key": "multiplayer.rankUp",
-      "usages": [
-        {
-          "file": "components/multiplayer/RankUpCinematic.tsx",
-          "line": 99
-        }
-      ]
-    },
-    {
-      "key": "multiplayer.welcomeToTier",
-      "usages": [
-        {
-          "file": "components/multiplayer/RankUpCinematic.tsx",
-          "line": 110
-        }
-      ]
-    },
-    {
-      "key": "multiplayer.winStreak",
-      "usages": [
-        {
-          "file": "components/multiplayer/WinStreakBadge.tsx",
-          "line": 25
-        }
-      ]
-    },
-    {
-      "key": "multiplayerFlow.crazyGamesFriends",
-      "usages": [
-        {
-          "file": "components/multiplayer/CrazyGamesFriendsStrip.tsx",
-          "line": 66
-        }
-      ]
-    },
-    {
-      "key": "multiplayerFlow.inviteFriend",
-      "usages": [
-        {
-          "file": "components/multiplayer/CrazyGamesFriendsStrip.tsx",
-          "line": 85
-        },
-        {
-          "file": "components/multiplayer/CrazyGamesFriendsStrip.tsx",
-          "line": 86
-        }
-      ]
-    },
-    {
-      "key": "season.complete",
-      "usages": [
-        {
-          "file": "components/multiplayer/SeasonEndSummary.tsx",
-          "line": 71
-        }
-      ]
-    },
-    {
-      "key": "season.continue",
-      "usages": [
-        {
-          "file": "components/multiplayer/SeasonEndSummary.tsx",
-          "line": 126
-        }
-      ]
-    },
-    {
-      "key": "season.gamesPlayed",
-      "usages": [
-        {
-          "file": "components/multiplayer/SeasonEndSummary.tsx",
-          "line": 77
-        }
-      ]
-    },
-    {
-      "key": "season.newSeason",
-      "usages": [
-        {
-          "file": "components/multiplayer/SeasonEndSummary.tsx",
-          "line": 114
-        }
-      ]
-    },
-    {
-      "key": "season.rewardCoins",
-      "usages": [
-        {
-          "file": "components/multiplayer/SeasonEndSummary.tsx",
-          "line": 96
-        }
-      ]
-    },
-    {
-      "key": "season.softReset",
-      "usages": [
-        {
-          "file": "components/multiplayer/SeasonEndSummary.tsx",
-          "line": 90
-        }
-      ]
-    },
-    {
-      "key": "tvBroadcast.timesUp",
-      "usages": [
-        {
-          "file": "host/components/tv-broadcast/TvTimesUpOverlay.tsx",
-          "line": 58
-        }
-      ]
-    },
-    {
-      "key": "tvBroadcast.timesUpSub",
-      "usages": [
-        {
-          "file": "host/components/tv-broadcast/TvTimesUpOverlay.tsx",
-          "line": 61
-        }
-      ]
-    },
-    {
-      "key": "wheel.rush.fogActive",
-      "usages": [
-        {
-          "file": "components/multiplayer/WheelRushView.tsx",
-          "line": 357
-        }
-      ]
-    },
-    {
-      "key": "wheel.rush.loading",
-      "usages": [
-        {
-          "file": "components/multiplayer/WheelRushView.tsx",
-          "line": 320
-        }
-      ]
-    },
-    {
-      "key": "wordForge.go",
-      "usages": [
-        {
-          "file": "components/wordForge/BossReveal.tsx",
-          "line": 107
-        }
-      ]
-    },
-    {
-      "key": "wordHunt.categoryHint",
-      "usages": [
-        {
-          "file": "components/wordhunt/WordHuntCategoryHint.tsx",
-          "line": 36
-        }
-      ]
-    },
-    {
-      "key": "wordHunt.dangerAlert",
-      "usages": [
-        {
-          "file": "components/wordhunt/WordHuntDangerToast.tsx",
-          "line": 55
-        }
-      ]
-    },
-    {
-      "key": "wordHunt.eliminatedAlert",
-      "usages": [
-        {
-          "file": "components/wordhunt/WordHuntDangerToast.tsx",
-          "line": 58
-        }
-      ]
-    },
-    {
-      "key": "wordHunt.lastStanding",
-      "usages": [
-        {
-          "file": "components/wordhunt/WordHuntDangerToast.tsx",
-          "line": 61
-        }
-      ]
-    },
-    {
-      "key": "wordHunt.play",
-      "usages": [
-        {
-          "file": "components/daily/DailyHub.tsx",
-          "line": 90
-        }
-      ]
-    },
-    {
-      "key": "wotd.title",
-      "usages": [
-        {
-          "file": "components/results/WotdReveal.tsx",
-          "line": 51
-        }
-      ]
-    }
-  ],
+  "missingFromEnglish": [],
   "missingByLanguage": {
-    "he": [],
+    "he": [
+      "common.copiedToClipboard",
+      "common.navigation",
+      "common.noResults",
+      "common.search",
+      "common.searchPlaceholder",
+      "common.toClose",
+      "avatar.builder.download",
+      "avatar.builder.expressions",
+      "avatar.builder.eyeColor",
+      "avatar.builder.nose",
+      "multiplayerFlow.crazyGamesFriends",
+      "multiplayerFlow.inviteFriend",
+      "tvBroadcast.timesUp",
+      "tvBroadcast.timesUpSub",
+      "auth.otp.codeSent",
+      "auth.otp.enterCode",
+      "season.complete",
+      "season.continue",
+      "season.gamesPlayed",
+      "season.newSeason",
+      "season.rewardCoins",
+      "season.softReset",
+      "daily.comeBackTomorrow",
+      "daily.milestoneReached",
+      "daily.rewardClaimed",
+      "daily.streakFreezeEarned",
+      "wordHunt.play",
+      "wordHunt.categoryHint",
+      "wordHunt.dangerAlert",
+      "wordHunt.eliminatedAlert",
+      "wordHunt.lastStanding",
+      "multiplayer.nearRank",
+      "multiplayer.oneMoreWin",
+      "multiplayer.rankUp",
+      "multiplayer.welcomeToTier",
+      "multiplayer.winStreak",
+      "friends.challenges.accept",
+      "friends.challenges.accepted",
+      "friends.challenges.acceptFailed",
+      "friends.challenges.decline",
+      "friends.challenges.declined",
+      "friends.challenges.friendAccepted",
+      "friends.challenges.received",
+      "adventure.share.perfectClear",
+      "adventure.share.bestWord",
+      "adventure.share.wordsFound",
+      "adventure.game.wordsYouMissed",
+      "adventure.game.missedWordsSummary",
+      "adventure.game.showLess",
+      "adventure.game.showMore",
+      "adventure.bosses.newMechanic",
+      "adventure.bosses.tutorialGotIt",
+      "adventure.loot.fragment",
+      "adventure.loot.luckyBonus",
+      "adventure.ascension.level1",
+      "adventure.ascension.level2",
+      "adventure.ascension.level3",
+      "adventure.ascension.level4",
+      "adventure.ascension.level5",
+      "adventure.ascension.level6",
+      "adventure.ascension.level7",
+      "adventure.ascension.level8",
+      "adventure.ascension.level9",
+      "adventure.ascension.level10",
+      "adventure.consumables.bossRevive.name",
+      "adventure.consumables.bossShield.name",
+      "adventure.consumables.doubleGold.name",
+      "adventure.consumables.extraHint.name",
+      "adventure.consumables.gridReroll.name",
+      "adventure.consumables.objectiveSkip.name",
+      "adventure.consumables.perfectStar.name",
+      "adventure.consumables.timerExtension.name",
+      "adventure.mutators.blindMode.name",
+      "adventure.mutators.chaosGrid.name",
+      "adventure.mutators.fragile.name",
+      "adventure.mutators.ironMan.name",
+      "adventure.mutators.minimalist.name",
+      "adventure.mutators.noHints.name",
+      "adventure.mutators.speedRun.name",
+      "adventure.mutators.wordMaster.name",
+      "education.landing.startGame",
+      "wotd.title",
+      "wordForge.go",
+      "wheel.rush.loading",
+      "wheel.rush.fogActive"
+    ],
     "sv": [],
-    "ja": [],
-    "es": []
+    "ja": [
+      "common.copiedToClipboard",
+      "common.navigation",
+      "common.noResults",
+      "common.search",
+      "common.searchPlaceholder",
+      "common.toClose",
+      "avatar.builder.download",
+      "avatar.builder.expressions",
+      "avatar.builder.eyeColor",
+      "avatar.builder.nose",
+      "multiplayerFlow.crazyGamesFriends",
+      "multiplayerFlow.inviteFriend",
+      "tvBroadcast.timesUp",
+      "tvBroadcast.timesUpSub",
+      "auth.otp.codeSent",
+      "auth.otp.enterCode",
+      "season.complete",
+      "season.continue",
+      "season.gamesPlayed",
+      "season.newSeason",
+      "season.rewardCoins",
+      "season.softReset",
+      "daily.comeBackTomorrow",
+      "daily.milestoneReached",
+      "daily.rewardClaimed",
+      "daily.streakFreezeEarned",
+      "wordHunt.play",
+      "wordHunt.categoryHint",
+      "wordHunt.dangerAlert",
+      "wordHunt.eliminatedAlert",
+      "wordHunt.lastStanding",
+      "multiplayer.nearRank",
+      "multiplayer.oneMoreWin",
+      "multiplayer.rankUp",
+      "multiplayer.welcomeToTier",
+      "multiplayer.winStreak",
+      "friends.challenges.accept",
+      "friends.challenges.accepted",
+      "friends.challenges.acceptFailed",
+      "friends.challenges.decline",
+      "friends.challenges.declined",
+      "friends.challenges.friendAccepted",
+      "friends.challenges.received",
+      "adventure.share.perfectClear",
+      "adventure.share.bestWord",
+      "adventure.share.wordsFound",
+      "adventure.game.wordsYouMissed",
+      "adventure.game.missedWordsSummary",
+      "adventure.game.showLess",
+      "adventure.game.showMore",
+      "adventure.bosses.newMechanic",
+      "adventure.bosses.tutorialGotIt",
+      "adventure.loot.fragment",
+      "adventure.loot.luckyBonus",
+      "adventure.ascension.level1",
+      "adventure.ascension.level2",
+      "adventure.ascension.level3",
+      "adventure.ascension.level4",
+      "adventure.ascension.level5",
+      "adventure.ascension.level6",
+      "adventure.ascension.level7",
+      "adventure.ascension.level8",
+      "adventure.ascension.level9",
+      "adventure.ascension.level10",
+      "adventure.consumables.bossRevive.name",
+      "adventure.consumables.bossShield.name",
+      "adventure.consumables.doubleGold.name",
+      "adventure.consumables.extraHint.name",
+      "adventure.consumables.gridReroll.name",
+      "adventure.consumables.objectiveSkip.name",
+      "adventure.consumables.perfectStar.name",
+      "adventure.consumables.timerExtension.name",
+      "adventure.mutators.blindMode.name",
+      "adventure.mutators.chaosGrid.name",
+      "adventure.mutators.fragile.name",
+      "adventure.mutators.ironMan.name",
+      "adventure.mutators.minimalist.name",
+      "adventure.mutators.noHints.name",
+      "adventure.mutators.speedRun.name",
+      "adventure.mutators.wordMaster.name",
+      "education.landing.startGame",
+      "wotd.title",
+      "wordForge.go",
+      "wheel.rush.loading",
+      "wheel.rush.fogActive"
+    ],
+    "es": [
+      "common.copiedToClipboard",
+      "common.navigation",
+      "common.noResults",
+      "common.search",
+      "common.searchPlaceholder",
+      "common.toClose",
+      "avatar.builder.download",
+      "avatar.builder.expressions",
+      "avatar.builder.eyeColor",
+      "avatar.builder.nose",
+      "multiplayerFlow.crazyGamesFriends",
+      "multiplayerFlow.inviteFriend",
+      "tvBroadcast.timesUp",
+      "tvBroadcast.timesUpSub",
+      "auth.otp.codeSent",
+      "auth.otp.enterCode",
+      "season.complete",
+      "season.continue",
+      "season.gamesPlayed",
+      "season.newSeason",
+      "season.rewardCoins",
+      "season.softReset",
+      "daily.comeBackTomorrow",
+      "daily.milestoneReached",
+      "daily.rewardClaimed",
+      "daily.streakFreezeEarned",
+      "wordHunt.play",
+      "wordHunt.categoryHint",
+      "wordHunt.dangerAlert",
+      "wordHunt.eliminatedAlert",
+      "wordHunt.lastStanding",
+      "multiplayer.nearRank",
+      "multiplayer.oneMoreWin",
+      "multiplayer.rankUp",
+      "multiplayer.welcomeToTier",
+      "multiplayer.winStreak",
+      "friends.challenges.accept",
+      "friends.challenges.accepted",
+      "friends.challenges.acceptFailed",
+      "friends.challenges.decline",
+      "friends.challenges.declined",
+      "friends.challenges.friendAccepted",
+      "friends.challenges.received",
+      "adventure.share.perfectClear",
+      "adventure.share.bestWord",
+      "adventure.share.wordsFound",
+      "adventure.game.wordsYouMissed",
+      "adventure.game.missedWordsSummary",
+      "adventure.game.showLess",
+      "adventure.game.showMore",
+      "adventure.bosses.newMechanic",
+      "adventure.bosses.tutorialGotIt",
+      "adventure.loot.fragment",
+      "adventure.loot.luckyBonus",
+      "adventure.ascension.level1",
+      "adventure.ascension.level2",
+      "adventure.ascension.level3",
+      "adventure.ascension.level4",
+      "adventure.ascension.level5",
+      "adventure.ascension.level6",
+      "adventure.ascension.level7",
+      "adventure.ascension.level8",
+      "adventure.ascension.level9",
+      "adventure.ascension.level10",
+      "adventure.consumables.bossRevive.name",
+      "adventure.consumables.bossShield.name",
+      "adventure.consumables.doubleGold.name",
+      "adventure.consumables.extraHint.name",
+      "adventure.consumables.gridReroll.name",
+      "adventure.consumables.objectiveSkip.name",
+      "adventure.consumables.perfectStar.name",
+      "adventure.consumables.timerExtension.name",
+      "adventure.mutators.blindMode.name",
+      "adventure.mutators.chaosGrid.name",
+      "adventure.mutators.fragile.name",
+      "adventure.mutators.ironMan.name",
+      "adventure.mutators.minimalist.name",
+      "adventure.mutators.noHints.name",
+      "adventure.mutators.speedRun.name",
+      "adventure.mutators.wordMaster.name",
+      "education.landing.startGame",
+      "wotd.title",
+      "wordForge.go",
+      "wheel.rush.loading",
+      "wheel.rush.fogActive"
+    ]
   },
   "keysNotInEnglish": {
     "he": [

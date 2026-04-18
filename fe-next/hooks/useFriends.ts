@@ -288,6 +288,27 @@ export function useFriends(): UseFriendsReturn {
     }
   }, [isAuthenticated, fetchAll]);
 
+  // Realtime friend events — refresh on incoming/accepted/declined/removed
+  useEffect(() => {
+    if (!isAuthenticated || !socket || !isSocketConnected) return;
+
+    const onRefresh = () => { fetchAll(); };
+
+    socket.on('friends:requestReceived', onRefresh);
+    socket.on('friends:requestAccepted', onRefresh);
+    socket.on('friends:requestDeclined', onRefresh);
+    socket.on('friends:requestSent', onRefresh);
+    socket.on('friends:friendRemoved', onRefresh);
+
+    return () => {
+      socket.off('friends:requestReceived', onRefresh);
+      socket.off('friends:requestAccepted', onRefresh);
+      socket.off('friends:requestDeclined', onRefresh);
+      socket.off('friends:requestSent', onRefresh);
+      socket.off('friends:friendRemoved', onRefresh);
+    };
+  }, [isAuthenticated, socket, isSocketConnected, fetchAll]);
+
   return {
     ...state,
     refresh,

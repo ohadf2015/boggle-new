@@ -29,6 +29,7 @@ vi.mock('../../utils/socketHelpers', () => ({
 
 vi.mock('./../../handlers/kickHandler', () => ({
   checkAutoKickInactive: vi.fn(),
+  checkAfkWarnings: vi.fn(),
 }));
 
 vi.mock('../../utils/socketValidation', () => ({
@@ -37,8 +38,9 @@ vi.mock('../../utils/socketValidation', () => ({
 }));
 
 import { vi, type Mock, type MockInstance } from 'vitest';
-import { registerPresenceHandlers } from '../presenceHandler';
-import { getGame, getGameBySocketId, getUsernameBySocketId, updateUserPresence, updateUserHeartbeat } from '../../modules/gameStateManager';
+import { registerPresenceHandlers, startConnectionHealthCheck, stopConnectionHealthCheck } from '../presenceHandler';
+import { getGame, getGameBySocketId, getUsernameBySocketId, updateUserPresence, updateUserHeartbeat, forEachGame } from '../../modules/gameStateManager';
+import logger from '../../utils/logger';
 import { volatileBroadcastToRoom } from '../../utils/socketHelpers';
 import { checkRateLimit } from '../../utils/rateLimiter';
 import { validatePayload } from '../../utils/socketValidation';
@@ -176,6 +178,70 @@ describe('presenceHandler', () => {
       const { trigger } = createTestHarness();
       trigger('presenceHeartbeat');
       expect(mockUpdateUserHeartbeat).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('startConnectionHealthCheck stale dedup', () => {
+    afterEach(() => {
+      stopConnectionHealthCheck();
+      vi.useRealTimers();
+    });
+
+    it('logs stale user once per stale span, not every tick', () => {
+      vi.useFakeTimers();
+      const now = Date.now();
+      const staleHeartbeat = now - 120_000; // 2 min ago (past 60s threshold)
+      const gameUsers: Record<string, any> = {
+        Alice: { disconnected: false, isBot: false, lastHeartbeat: staleHeartbeat },
+      };
+      (forEachGame as any).mockImplementation((cb: any) => {
+        cb('GAME01', { users: gameUsers });
+      });
+
+      const io: any = { to: vi.fn().mockReturnThis(), emit: vi.fn() };
+      const infoSpy = (logger as any).info as Mock;
+      infoSpy.mockClear();
+
+      startConnectionHealthCheck(io);
+
+      // Advance 3 ticks (90s) — should only log once for same stale span
+      vi.advanceTimersByTime(30_000);
+      vi.advanceTimersByTime(30_000);
+      vi.advanceTimersByTime(30_000);
+
+      const staleLogs = infoSpy.mock.calls.filter((c: any[]) =>
+        String(c[1] || '').startsWith('Stale user Alice'),
+      );
+      expect(staleLogs.length).toBe(1);
+    });
+
+    it('re-logs after heartbeat recovers and goes stale again', () => {
+      vi.useFakeTimers();
+      const gameUsers: Record<string, any> = {
+        Alice: { disconnected: false, isBot: false, lastHeartbeat: Date.now() - 120_000 },
+      };
+      (forEachGame as any).mockImplementation((cb: any) => {
+        cb('GAME01', { users: gameUsers });
+      });
+
+      const io: any = { to: vi.fn().mockReturnThis(), emit: vi.fn() };
+      const infoSpy = (logger as any).info as Mock;
+      infoSpy.mockClear();
+
+      startConnectionHealthCheck(io);
+
+      vi.advanceTimersByTime(30_000); // log #1
+      // Recover
+      gameUsers.Alice.lastHeartbeat = Date.now();
+      vi.advanceTimersByTime(30_000); // no log, flag resets
+      // Go stale again
+      gameUsers.Alice.lastHeartbeat = Date.now() - 120_000;
+      vi.advanceTimersByTime(30_000); // log #2
+
+      const staleLogs = infoSpy.mock.calls.filter((c: any[]) =>
+        String(c[1] || '').startsWith('Stale user Alice'),
+      );
+      expect(staleLogs.length).toBe(2);
     });
   });
 

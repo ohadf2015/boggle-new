@@ -6956,6 +6956,7 @@ const sv = {
       "blastObjective": "Använd dina drag klokt!",
       "huntObjective": "Hitta det dolda målordet",
       "huntLoadingTarget": "Söker dolt ord...",
+      "huntTriesLeft": "{{count}}/{{max}} försök kvar",
       "wheelObjective": "Varje ord måste inkludera mittenbokstaven och vara minst 3 bokstäver långt!",
       "wheelMustInclude": "Måste inkludera:",
       "forgeObjective": "Nå målpoängen!",

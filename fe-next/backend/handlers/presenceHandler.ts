@@ -140,8 +140,12 @@ function startConnectionHealthCheck(io: Server): void {
         if (userData.disconnected || userData.isBot) continue;
 
         const lastHeartbeat = userData.lastHeartbeat || userData.lastActivity || 0;
-        if (Date.now() - lastHeartbeat > STALE_THRESHOLD) {
+        const isStale = Date.now() - lastHeartbeat > STALE_THRESHOLD;
+        if (isStale && !userData._staleLogged) {
+          userData._staleLogged = true;
           logger.info('PRESENCE', `Stale user ${username} in game ${gameCode} (${Math.round((Date.now() - lastHeartbeat) / 1000)}s since last heartbeat)`);
+        } else if (!isStale && userData._staleLogged) {
+          userData._staleLogged = false;
         }
       }
     });

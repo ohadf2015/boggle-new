@@ -197,7 +197,8 @@ function registerTournamentHandlers(io: Server, socket: Socket): void {
     }
 
     // Initialize game start coordination
-    const messageId = gameStartCoordinator.initializeSequence(gameCode, playerUsernames, timerSeconds);
+    const humanUsernames = users.filter(u => !u.isBot).map(u => u.username);
+    const messageId = gameStartCoordinator.initializeSequence(gameCode, humanUsernames, timerSeconds);
 
     // Broadcast round start
     broadcastToRoom(io, getGameRoom(gameCode), 'tournamentRoundStarting', {

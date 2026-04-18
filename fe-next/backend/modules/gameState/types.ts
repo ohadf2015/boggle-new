@@ -31,6 +31,8 @@ export interface GameUser {
   presence?: 'active' | 'idle' | 'afk';
   lastActivity?: number;
   lastHeartbeat?: number;
+  _staleLogged?: boolean;
+  _afkWarned?: boolean;
 }
 
 // Spectator interface

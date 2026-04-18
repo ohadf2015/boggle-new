@@ -78,6 +78,12 @@ export interface UseAdventureWordSubmitProps {
   bossCurrentPhase?: string | null;
   /** Word Dynamite T3: detonate mode active */
   detonateActive?: boolean;
+  /** Archetype — when 'hunt', valid words matching target length register as hunt guesses */
+  archetype?: string;
+  /** Hunt mode: target word (uppercase) */
+  huntTargetWord?: string | null;
+  /** Hunt mode: dispatch guess to reducer */
+  submitHuntGuess?: (guess: string) => void;
 }
 
 export interface MechanicBonusData {
@@ -115,6 +121,9 @@ export function useAdventureWordSubmit(props: UseAdventureWordSubmitProps): UseA
     bossHealPerWord = 0,
     healPlayerHealth,
     detonateActive = false,
+    archetype,
+    huntTargetWord,
+    submitHuntGuess,
   } = props;
 
   const { tap, success: hapticSuccess } = useHaptics();
@@ -276,6 +285,15 @@ export function useAdventureWordSubmit(props: UseAdventureWordSubmitProps): UseA
           lastSubmittedWordRef.current = { word, path };
 
           submitWordWithPath(word, scoreValue, path, { detonate: detonateActive });
+
+          if (
+            archetype === 'hunt' &&
+            huntTargetWord &&
+            word.length === huntTargetWord.length &&
+            submitHuntGuess
+          ) {
+            submitHuntGuess(word);
+          }
           clearCurrentHint();
           recordActivity();
           resetOnGameAction();

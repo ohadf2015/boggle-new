@@ -16,7 +16,7 @@ vi.mock('@/lib/supabase', () => ({
       select: vi.fn().mockReturnValue({
         eq: vi.fn().mockReturnValue({
           eq: vi.fn().mockReturnValue({
-            single: (...args: unknown[]) => mockSingle(...args),
+            maybeSingle: (...args: unknown[]) => mockSingle(...args),
           }),
         }),
       }),

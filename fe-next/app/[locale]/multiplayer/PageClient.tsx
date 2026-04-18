@@ -61,11 +61,9 @@ export const VALID_MODES: GameMode[] = ['classic', 'blast', 'word-hunt', 'wheel-
 
 function ViewLoadingSkeleton(): React.JSX.Element {
   return (
-    <div className="flex-1 flex items-center justify-center bg-neo-navy relative">
+    <div className="flex-1 flex relative">
       <PlayfulBackground intensity="medium" colorScheme="game" />
-      <div className="relative z-10">
-        <PageLoader size="md" />
-      </div>
+      <PageLoader size="md" className="relative z-10" />
     </div>
   );
 }

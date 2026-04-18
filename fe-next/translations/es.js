@@ -7268,6 +7268,7 @@ const es = {
       "blastObjective": "¡Usa tus movimientos sabiamente!",
       "huntObjective": "Encuentra la palabra objetivo oculta",
       "huntLoadingTarget": "Buscando palabra oculta...",
+      "huntTriesLeft": "{{count}}/{{max}} intentos restantes",
       "wheelObjective": "¡Cada palabra debe incluir la letra central y tener al menos 3 letras!",
       "wheelMustInclude": "Debe incluir:",
       "forgeObjective": "¡Alcanza la puntuación objetivo!",

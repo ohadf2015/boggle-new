@@ -68,8 +68,28 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
     const { isAuthenticated, isAdmin, profile, user, loading } = useAuth();
     const engagementStatus = useEngagementStatus();
     const { missions, completedCount, isGrandSlam, loading: missionsLoading } = useDailyMissions();
-    const { notifications, unreadCount: notificationCount, markAsRead, markAllAsRead, dismissNotification } = useRealtimeNotifications();
+    const {
+        notifications,
+        unreadCount: notificationCount,
+        markAsRead,
+        markAllAsRead,
+        dismissNotification,
+        fetchPreviousNotifications,
+        previousNotifications,
+        isLoadingPrevious,
+    } = useRealtimeNotifications();
     const [showAllNotifications, setShowAllNotifications] = useState(false);
+    const [showPreviousNotifications, setShowPreviousNotifications] = useState(false);
+    const [hasFetchedPrevious, setHasFetchedPrevious] = useState(false);
+
+    const togglePreviousNotifications = useCallback(async () => {
+        const next = !showPreviousNotifications;
+        setShowPreviousNotifications(next);
+        if (next && !hasFetchedPrevious) {
+            setHasFetchedPrevious(true);
+            await fetchPreviousNotifications();
+        }
+    }, [showPreviousNotifications, hasFetchedPrevious, fetchPreviousNotifications]);
 
     // Filter out gift notifications when the gift button is already visible (prevents duplication)
     const filteredNotifications = (unclaimedCount > 0
@@ -492,7 +512,7 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                 )}
 
                                 {/* ── Notifications Section (in-menu) ── */}
-                                {isAuthenticated && filteredNotifications.length > 0 && (
+                                {isAuthenticated && (
                                     <div className="mx-4 mt-2">
                                         <div className="flex items-center justify-between mb-1.5">
                                             <div className="flex items-center gap-2">
@@ -516,44 +536,93 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                                 </button>
                                             )}
                                         </div>
-                                        <div className={cn(
-                                            "rounded-neo border-2 border-neo-white/10 overflow-hidden",
-                                            "bg-neo-white/5"
-                                        )}>
-                                            {(showAllNotifications
-                                                ? filteredNotifications
-                                                : filteredNotifications.slice(0, 3)
-                                            ).map((n) => (
-                                                <NotificationItem
-                                                    key={n.id}
-                                                    notification={n}
-                                                    onClick={() => {
-                                                        if (n.notification_type === 'gift') {
-                                                            closeMenu();
-                                                            window.dispatchEvent(new CustomEvent('openGiftModal', {
-                                                                detail: { giftId: n.related_entity_id },
-                                                            }));
-                                                        } else if (n.action_url) {
-                                                            closeMenu();
-                                                            const url = n.action_url.startsWith('/') ? `/${language}${n.action_url}` : n.action_url;
-                                                            window.location.href = url;
+                                        {filteredNotifications.length > 0 ? (
+                                            <>
+                                                <div className={cn(
+                                                    "rounded-neo border-2 border-neo-white/10 overflow-hidden",
+                                                    "bg-neo-white/5"
+                                                )}>
+                                                    {(showAllNotifications
+                                                        ? filteredNotifications
+                                                        : filteredNotifications.slice(0, 3)
+                                                    ).map((n) => (
+                                                        <NotificationItem
+                                                            key={n.id}
+                                                            notification={n}
+                                                            onClick={() => {
+                                                                if (n.notification_type === 'gift') {
+                                                                    closeMenu();
+                                                                    window.dispatchEvent(new CustomEvent('openGiftModal', {
+                                                                        detail: { giftId: n.related_entity_id },
+                                                                    }));
+                                                                } else if (n.action_url) {
+                                                                    closeMenu();
+                                                                    const url = n.action_url.startsWith('/') ? `/${language}${n.action_url}` : n.action_url;
+                                                                    window.location.href = url;
+                                                                }
+                                                            }}
+                                                            onMarkAsRead={() => markAsRead(n.id)}
+                                                            onDismiss={() => dismissNotification(n.id)}
+                                                        />
+                                                    ))}
+                                                </div>
+                                                {filteredNotifications.length > 3 && (
+                                                    <button
+                                                        onClick={() => setShowAllNotifications(!showAllNotifications)}
+                                                        className="w-full mt-1 text-center text-[10px] text-neo-white/40 hover:text-neo-cyan transition-colors font-bold py-1"
+                                                    >
+                                                        {showAllNotifications
+                                                            ? t('common.showLess')
+                                                            : t('notifications.viewAll') + ` (${filteredNotifications.length})`
                                                         }
-                                                    }}
-                                                    onMarkAsRead={() => markAsRead(n.id)}
-                                                    onDismiss={() => dismissNotification(n.id)}
-                                                />
-                                            ))}
-                                        </div>
-                                        {filteredNotifications.length > 3 && (
-                                            <button
-                                                onClick={() => setShowAllNotifications(!showAllNotifications)}
-                                                className="w-full mt-1 text-center text-[10px] text-neo-white/40 hover:text-neo-cyan transition-colors font-bold py-1"
-                                            >
-                                                {showAllNotifications
-                                                    ? t('common.showLess')
-                                                    : t('notifications.viewAll') + ` (${filteredNotifications.length})`
-                                                }
-                                            </button>
+                                                    </button>
+                                                )}
+                                            </>
+                                        ) : (
+                                            <div className="text-[10px] text-neo-white/40 text-center py-2 font-bold">
+                                                {t('notifications.empty')}
+                                            </div>
+                                        )}
+                                        <button
+                                            onClick={togglePreviousNotifications}
+                                            className="w-full mt-1 text-center text-[10px] text-neo-white/40 hover:text-neo-cyan transition-colors font-bold py-1"
+                                            aria-expanded={showPreviousNotifications}
+                                        >
+                                            {showPreviousNotifications
+                                                ? t('notifications.hidePrevious')
+                                                : t('notifications.showPrevious')}
+                                        </button>
+                                        {showPreviousNotifications && (
+                                            <div className={cn(
+                                                "mt-1 rounded-neo border-2 border-neo-white/10 overflow-hidden",
+                                                "bg-neo-white/5"
+                                            )}>
+                                                {isLoadingPrevious ? (
+                                                    <div className="text-[10px] text-neo-white/40 text-center py-2">
+                                                        …
+                                                    </div>
+                                                ) : previousNotifications.length === 0 ? (
+                                                    <div className="text-[10px] text-neo-white/40 text-center py-2 font-bold">
+                                                        {t('notifications.noPrevious')}
+                                                    </div>
+                                                ) : (
+                                                    previousNotifications.map((n) => (
+                                                        <NotificationItem
+                                                            key={`prev-${n.id}`}
+                                                            notification={n as NotificationData}
+                                                            onClick={() => {
+                                                                if (n.action_url) {
+                                                                    closeMenu();
+                                                                    const url = n.action_url.startsWith('/') ? `/${language}${n.action_url}` : n.action_url;
+                                                                    window.location.href = url;
+                                                                }
+                                                            }}
+                                                            onMarkAsRead={() => markAsRead(n.id)}
+                                                            onDismiss={() => dismissNotification(n.id)}
+                                                        />
+                                                    ))
+                                                )}
+                                            </div>
                                         )}
                                     </div>
                                 )}

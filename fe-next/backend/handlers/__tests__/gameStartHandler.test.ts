@@ -642,6 +642,31 @@ describe('registerStartGameHandler', () => {
       );
     });
 
+    it('excludes bots from gameStartCoordinator expected players (RW-BOT-ACK)', async () => {
+      // Bots never ack — including them causes timeout spam "Missing: BotEasy"
+      mockGetGameUsers.mockReturnValue([
+        { username: 'Host', isBot: false },
+        { username: 'BotEasy', isBot: true },
+      ]);
+      mockGetGame.mockReturnValue(makeGame({
+        users: {
+          Host: { socketId: 'socket-host', isHost: true },
+          BotEasy: { socketId: null, isHost: false, isBot: true },
+        },
+      }));
+      const { socket, handlers } = createMockSocket('socket-host');
+      registerStartGameHandler(mockIo, socket);
+
+      // Use blast mode to skip scheduleRoundEvent (classic+2 triggers roundEventsManager)
+      await triggerStartGame(handlers, makePayload({ gameMode: 'blast' }));
+
+      expect(mockGameStartCoordinator.initializeSequence).toHaveBeenCalledWith(
+        'GAME1',
+        ['Host'],
+        expect.any(Number),
+      );
+    });
+
     it('sets blast timer to BLAST_MP_DEFAULT_TIMER when no timerSeconds given', async () => {
       mockSelectNextGameMode.mockReturnValue('blast');
       const { socket, handlers } = createMockSocket('socket-host');

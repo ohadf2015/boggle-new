@@ -36,6 +36,9 @@ export interface HintActions {
   autoRevealLetter: () => number;
   revealCategory: () => void;
   revealExample: () => void;
+  // Free auto-unlock (no token deduction). Reveals next available hint tier.
+  // Never reveals the final letter of the target word.
+  autoUnlockNextHint: () => ClueShopItem | null;
 }
 
 /**
@@ -145,11 +148,12 @@ export function useSurvivalHints({
     
     if (nextHintItem.id === 'reveal_letter') {
          const hintChars = currentHint?.hint.split(' ').filter(c => c !== '') ?? [];
+         const lastIdx = targetWord.length - 1;
          const unrevealed = [...Array(targetWord.length).keys()].filter(
-           i => !revealedLetters.has(i) && (hintChars[i] === '_' || hintChars[i] === undefined)
+           i => i !== lastIdx && !revealedLetters.has(i) && (hintChars[i] === '_' || hintChars[i] === undefined)
          );
-        // Keep 1 letter hidden logic
-        if (unrevealed.length > 1) {
+        // Last index already excluded above, so any non-empty unrevealed is safe to reveal.
+        if (unrevealed.length > 0) {
              const nextIdx = unrevealed[0];
              setRevealedLetters(prev => new Set([...prev, nextIdx]));
              success = true;
@@ -213,16 +217,36 @@ export function useSurvivalHints({
 
   const autoRevealLetter = useCallback((): number => {
       const hintChars = currentHint?.hint.split(' ').filter(c => c !== '') ?? [];
+      const lastIdx = targetWord.length - 1;
       const unrevealed = [...Array(targetWord.length).keys()].filter(
-        i => !revealedLetters.has(i) && (hintChars[i] === '_' || hintChars[i] === undefined)
+        i => i !== lastIdx && !revealedLetters.has(i) && (hintChars[i] === '_' || hintChars[i] === undefined)
       );
-      if (unrevealed.length > 1) {
+      if (unrevealed.length > 0) {
         const nextIdx = unrevealed[0];
         setRevealedLetters(prev => new Set([...prev, nextIdx]));
         return nextIdx;
       }
       return -1;
     }, [targetWord.length, revealedLetters, currentHint]);
+
+  const autoUnlockNextHint = useCallback((): ClueShopItem | null => {
+      if (!nextHintItem) return null;
+      if (nextHintItem.id === 'reveal_letter') {
+          const hintChars = currentHint?.hint.split(' ').filter(c => c !== '') ?? [];
+          const lastIdx = targetWord.length - 1;
+          const unrevealed = [...Array(targetWord.length).keys()].filter(
+            i => i !== lastIdx && !revealedLetters.has(i) && (hintChars[i] === '_' || hintChars[i] === undefined)
+          );
+          if (unrevealed.length === 0) return null;
+          setRevealedLetters(prev => new Set([...prev, unrevealed[0]]));
+      } else if (nextHintItem.id === 'reveal_category') {
+          setShowCategory(true);
+      } else if (nextHintItem.id === 'example_sentence') {
+          setShowExample(true);
+      }
+      playWordAcceptedSound?.();
+      return nextHintItem;
+  }, [nextHintItem, targetWord.length, revealedLetters, currentHint, playWordAcceptedSound]);
 
   const revealCategory = useCallback(() => setShowCategory(true), []);
   const revealExample = useCallback(() => setShowExample(true), []);
@@ -247,7 +271,8 @@ export function useSurvivalHints({
     autoRevealLetter,
     revealCategory,
     revealExample,
-  }), [buyNextHint, getNextAffordableClue, handlePurchase, autoRevealLetter, revealCategory, revealExample]);
+    autoUnlockNextHint,
+  }), [buyNextHint, getNextAffordableClue, handlePurchase, autoRevealLetter, revealCategory, revealExample, autoUnlockNextHint]);
 
   return [state, actions];
 }

@@ -6940,6 +6940,7 @@ const he = {
       "blastObjective": "השתמשו במהלכים בחוכמה!",
       "huntObjective": "מצא את מילת המטרה הנסתרת",
       "huntLoadingTarget": "מחפש מילה נסתרת...",
+      "huntTriesLeft": "נותרו {{count}}/{{max}} ניסיונות",
       "wheelObjective": "כל מילה חייבת לכלול את האות המרכזית ולהיות באורך של 3 אותיות לפחות!",
       "wheelMustInclude": "חובה לכלול:",
       "forgeObjective": "הגיעו לניקוד היעד!",

@@ -361,7 +361,10 @@ export function calculateNextDelay(bot: Bot): number {
 /**
  * Submit a word from the bot
  */
-export function submitBotWord(bot: Bot, onWordSubmit: ((data: WordSubmissionData) => void) | null): void {
+export async function submitBotWord(
+  bot: Bot,
+  onWordSubmit: ((data: WordSubmissionData) => boolean | void | Promise<boolean | void>) | null
+): Promise<void> {
   if (!bot.isActive || bot.currentWordIndex >= bot.wordsToFind.length) {
     return;
   }
@@ -373,21 +376,29 @@ export function submitBotWord(bot: Bot, onWordSubmit: ((data: WordSubmissionData
     return;
   }
 
-  bot.wordsFound.push(word);
-
   const score = calculateWordScore(word, bot.comboLevel);
 
+  let accepted = true;
   if (onWordSubmit && typeof onWordSubmit === 'function') {
-    onWordSubmit({
+    const result = await onWordSubmit({
       botId: bot.id,
       username: bot.username,
       word,
       score,
       comboLevel: bot.comboLevel,
     });
+    if (result === false) accepted = false;
   }
 
-  // Update bot state AFTER callback so shouldBotScore sees accurate currentBotScore
+  // Only mutate score/combo/wordsFound when the callback accepted the word.
+  // Previously these ran unconditionally, so cap-rejected words still inflated
+  // bot.score and starved shouldBotScore for every future submission.
+  if (!accepted) {
+    bot.comboLevel = 0;
+    return;
+  }
+
+  bot.wordsFound.push(word);
   bot.score += score;
   bot.comboLevel++;
 

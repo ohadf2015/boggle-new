@@ -282,6 +282,37 @@ describe('useSurvivalHints', () => {
   });
 
   describe('auto-hint final letter protection', () => {
+    it('should never include the last index in revealedLetters (explicit guard)', () => {
+      const { result } = renderHook(() => useSurvivalHints(defaultProps));
+
+      // Try to reveal many times
+      for (let i = 0; i < 20; i++) {
+        act(() => { result.current[1].autoRevealLetter(); });
+      }
+
+      // targetWord APPLE has length 5 => final index is 4
+      expect(result.current[0].revealedLetters.has(4)).toBe(false);
+    });
+
+    it('autoUnlockNextHint should reveal a letter without touching last index and return the item', () => {
+      const { result } = renderHook(() => useSurvivalHints(defaultProps));
+
+      let item: { id: string } | null = null;
+      act(() => {
+        item = result.current[1].autoUnlockNextHint();
+      });
+      expect(item?.id).toBe('reveal_letter');
+      expect(result.current[0].revealedLetters.has(4)).toBe(false);
+      expect(result.current[0].revealedLetters.size).toBe(1);
+    });
+
+    it('autoUnlockNextHint should NOT spend tokens (no token arg / no setter used)', () => {
+      // Signature must not accept a token setter — that proves it cannot deduct.
+      const { result } = renderHook(() => useSurvivalHints(defaultProps));
+      // autoUnlockNextHint takes zero args: length 0
+      expect(result.current[1].autoUnlockNextHint.length).toBe(0);
+    });
+
     it('should never auto-reveal the final letter - player must guess it', () => {
       // For a 5-letter word, should be able to reveal at most 4 letters
       const { result } = renderHook(() => useSurvivalHints(defaultProps));

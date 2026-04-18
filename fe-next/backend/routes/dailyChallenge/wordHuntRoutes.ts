@@ -429,9 +429,9 @@ router.get('/stats/:date/:language', async (req: Request<WordHuntStatsParams>, r
       .select('*')
       .eq('puzzle_date', date)
       .eq('language', language)
-      .single();
+      .maybeSingle();
 
-    if (statsError && statsError.code !== 'PGRST116') {
+    if (statsError) {
       logger.error('API', `Word Hunt stats error: ${statsError.message}`);
       res.status(500).json({ error: 'Failed to fetch stats' });
       return;

@@ -6851,6 +6851,7 @@ const en = {
       "blastObjective": "Use your moves wisely!",
       "huntObjective": "Find the hidden target word",
       "huntLoadingTarget": "Finding hidden word...",
+      "huntTriesLeft": "{{count}}/{{max}} tries left",
       "wheelObjective": "Every word must use the center letter and be at least 3 letters long!",
       "wheelMustInclude": "Must include:",
       "forgeObjective": "Reach the target score!",

@@ -10,11 +10,9 @@ import { useLanguageSafe } from '@/contexts/LanguageContext';
 function LoadingFallback(): React.JSX.Element {
   const { t } = useLanguageSafe();
   return (
-    <div className="flex-1 flex items-center justify-center bg-neo-navy relative">
+    <div className="flex-1 flex relative">
       <PlayfulBackground intensity="medium" colorScheme="game" />
-      <div className="relative z-10">
-        <PageLoader size="lg" text={t('adventure.loading')} mascotVariant="explorer" />
-      </div>
+      <PageLoader size="lg" text={t('adventure.loading')} mascotVariant="explorer" className="relative z-10" />
     </div>
   );
 }

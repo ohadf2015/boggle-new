@@ -101,7 +101,7 @@ const AdventureGameShell = memo<AdventureGameShellProps>((p) => {
     gridRef, handleExitWithConfirm, handleCascadeComplete, handleEntryPhaseComplete,
     handleHintClick, activateFreeze, shuffleTiles, playBoardShuffleSound,
     setDetonateActive, handleRetryFromAssist, handleRetryWithBonus, handleRetryWithHint,
-    onExit, setShowTutorial, submitHuntGuess, t,
+    onExit, setShowTutorial, t,
   } = p;
 
   return (
@@ -164,7 +164,7 @@ const AdventureGameShell = memo<AdventureGameShellProps>((p) => {
           <GameSidebar objectives={objectives as never}
             showLifeBar={modeState.showLifeBar} currentHP={currentHP ?? undefined} maxHP={maxHP ?? undefined}
             showTargetWordUI={modeState.showTargetWordUI} huntTargetLength={huntTargetWord?.length ?? 0}
-            huntAttempts={huntAttempts as never} onHuntGuess={submitHuntGuess} huntFound={huntFound}
+            huntAttempts={huntAttempts as never} huntFound={huntFound}
             showSlideIn={entryPhase === 'objectives'} onSlideInComplete={handleEntryPhaseComplete}
             hasHintsAvailable={hasHintsAvailable} onHintClick={handleHintClick}
             showAutoHint={showAutoHint} currentHint={currentHint as never}

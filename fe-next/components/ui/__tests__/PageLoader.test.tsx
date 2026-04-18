@@ -74,6 +74,27 @@ describe('PageLoader', () => {
     expect(wrapper).toHaveClass('justify-center');
   });
 
+  it('should not paint bg-neo-navy so loader blends over decorative parents', () => {
+    const { container } = render(<PageLoader />);
+    const wrapper = container.firstChild as HTMLElement;
+    expect(wrapper).not.toHaveClass('bg-neo-navy');
+  });
+
+  it('should not paint bg-neo-navy in nested mode', () => {
+    const { container } = render(<PageLoader nested />);
+    const wrapper = container.firstChild as HTMLElement;
+    expect(wrapper).not.toHaveClass('bg-neo-navy');
+  });
+
+  it('should render minimal loader without colorful spinner rings', () => {
+    const { container } = render(<PageLoader />);
+    const html = container.innerHTML;
+    expect(html).not.toMatch(/border-neo-cyan/);
+    expect(html).not.toMatch(/border-neo-pink/);
+    expect(html).not.toMatch(/border-t-neo-cyan/);
+    expect(html).not.toMatch(/border-r-neo-pink/);
+  });
+
   it('should not use min-h-0 in non-nested mode (default)', () => {
     const { container } = render(<PageLoader />);
 

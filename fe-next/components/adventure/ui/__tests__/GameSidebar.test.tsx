@@ -46,4 +46,22 @@ describe('GameSidebar mobile layout', () => {
     );
     expect(screen.getByText('3/10')).toBeInTheDocument();
   });
+
+  it('does not render WordHuntTargetArea text input when hunt target UI is active', () => {
+    render(
+      <GameSidebar
+        objectives={objectives}
+        hasHintsAvailable={false}
+        onHintClick={vi.fn()}
+        showAutoHint={false}
+        currentHint={null}
+        hintLevel="none"
+        showTargetWordUI={true}
+        huntTargetLength={5}
+        huntAttempts={[]}
+        huntFound={false}
+      />
+    );
+    expect(screen.queryByTestId('word-hunt-target-area')).not.toBeInTheDocument();
+  });
 });

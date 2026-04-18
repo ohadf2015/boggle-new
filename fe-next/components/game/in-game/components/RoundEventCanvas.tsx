@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useCallback, memo } from 'react';
 import type { RoundEventState } from './RoundEventOverlay';
+import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 
 // ─── Particle Types ────────────────────────────────────────────────────
 
@@ -42,7 +43,7 @@ interface LightningBolt {
 
 const SNOW_COUNT = 120;
 const METEOR_INTERVAL_MS = 350;
-const LIGHTNING_INTERVAL_MS = 500;
+const LIGHTNING_INTERVAL_MS = 750;
 
 // ─── Component ─────────────────────────────────────────────────────────
 
@@ -58,6 +59,7 @@ export const RoundEventCanvas = memo<RoundEventCanvasProps>(function RoundEventC
   const boltsRef = useRef<LightningBolt[]>([]);
   const spawnTimerRef = useRef(0);
   const fadeOpacityRef = useRef(0);
+  const prefersReducedMotion = usePrefersReducedMotion();
 
   // ─── Snowflake spawner ───────────────────────────────────────────────
 
@@ -283,7 +285,7 @@ export const RoundEventCanvas = memo<RoundEventCanvasProps>(function RoundEventC
 
     // Outer glow
     ctx.shadowColor = bolt.glowColor;
-    ctx.shadowBlur = 20;
+    ctx.shadowBlur = 18;
     ctx.strokeStyle = bolt.glowColor;
     ctx.lineWidth = bolt.width + 4;
     ctx.lineCap = 'round';
@@ -334,7 +336,7 @@ export const RoundEventCanvas = memo<RoundEventCanvasProps>(function RoundEventC
       try {
         const hslMatch = bolt.glowColor.match(/^hsl\(([^)]+)\)$/);
         const midColor = hslMatch ? `hsla(${hslMatch[1]}, 0.4)` : 'rgba(100, 150, 255, 0.4)';
-        flashGrad.addColorStop(0, 'rgba(255, 255, 255, 0.8)');
+        flashGrad.addColorStop(0, 'rgba(255, 255, 255, 0.7)');
         flashGrad.addColorStop(0.4, midColor);
         flashGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
       } catch { /* skip frame if color parse fails */ }
@@ -489,30 +491,31 @@ export const RoundEventCanvas = memo<RoundEventCanvasProps>(function RoundEventC
 
       if (eventType === 'lightning') {
         // Spawn lightning bolts with randomized intervals for unpredictability
-        const interval = LIGHTNING_INTERVAL_MS + (Math.sin(now * 0.003) * 150);
+        const interval = LIGHTNING_INTERVAL_MS + (Math.sin(now * 0.002) * 200);
         if (spawnTimerRef.current > interval) {
           spawnTimerRef.current = 0;
           spawnLightning(w, h);
-          // Occasionally spawn a second bolt for dramatic double-strikes
-          if (Math.random() > 0.6) {
+          // Occasional double-strike for drama, tuned below WCAG 2.3.1 flash threshold
+          if (Math.random() > 0.8) {
             spawnLightning(w, h);
           }
         }
 
-        // Screen flash that decays — bright on spawn, darkens over time between bolts
+        // Soft screen flash — capped peak and faster decay to stay under photosensitivity threshold.
+        // Skip entirely when user prefers reduced motion (WCAG 2.1 seizure guideline).
         const flashAge = spawnTimerRef.current;
-        if (flashAge < 80) {
+        if (!prefersReducedMotion && flashAge < 70) {
           ctx.save();
-          ctx.globalAlpha = (1 - flashAge / 80) * 0.25 * fadeOpacityRef.current;
-          ctx.fillStyle = '#ffffff';
+          ctx.globalAlpha = (1 - flashAge / 70) * 0.12 * fadeOpacityRef.current;
+          ctx.fillStyle = '#e8ecff';
           ctx.fillRect(0, 0, w, h);
           ctx.restore();
         }
 
-        // Ambient dark storm atmosphere with periodic flicker
+        // Ambient dark storm atmosphere with slow sine pulse (no random strobe)
         ctx.save();
-        const flicker = Math.random() > 0.95 ? 0.06 : 0.03;
-        ctx.globalAlpha = flicker * fadeOpacityRef.current;
+        const ambientPulse = 0.035 + Math.sin(now * 0.0012) * 0.01;
+        ctx.globalAlpha = ambientPulse * fadeOpacityRef.current;
         ctx.fillStyle = '#2a1a4e';
         ctx.fillRect(0, 0, w, h);
         ctx.restore();
@@ -549,7 +552,7 @@ export const RoundEventCanvas = memo<RoundEventCanvasProps>(function RoundEventC
       cancelAnimationFrame(animFrameRef.current);
       window.removeEventListener('resize', resize);
     };
-  }, [event, spawnSnowflakes, spawnMeteor, spawnLightning, drawSnowflake, drawMeteor, drawLightningBolt]);
+  }, [event, prefersReducedMotion, spawnSnowflakes, spawnMeteor, spawnLightning, drawSnowflake, drawMeteor, drawLightningBolt]);
 
   if (!event || event.phase !== 'active') return null;
 

@@ -49,12 +49,15 @@ const GAME_ROUTES = [
   '/student',
   '/auth/callback',  // Auth callback needs full providers
   '/hebrew-multiplayer-word-game',  // SEO page
+  // Social routes need Socket.IO for realtime gift/friend-request delivery
+  '/friends',
+  '/profile',
 ];
 
 /**
  * Determines if the current route needs game-specific providers
  */
-function needsGameProviders(pathname: string | null): boolean {
+export function needsGameProviders(pathname: string | null): boolean {
   if (!pathname) return false;
 
   // Remove locale prefix (e.g., /en/multiplayer -> /multiplayer)

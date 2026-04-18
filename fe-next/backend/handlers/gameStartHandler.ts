@@ -399,6 +399,7 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
 
     const users = getGameUsers(gameCode);
     const playerUsernames = users.map(u => u.username);
+    const humanUsernames = users.filter(u => !u.isBot).map(u => u.username);
 
     // Initialize blast mode state if needed
     if (resolvedMode === 'blast') {
@@ -447,7 +448,7 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
       }
     }
 
-    const messageId = gameStartCoordinator.initializeSequence(gameCode, playerUsernames, timerSeconds);
+    const messageId = gameStartCoordinator.initializeSequence(gameCode, humanUsernames, timerSeconds);
     const effectiveMinWordLength = minWordLength || 2;
 
     // Broadcast start
@@ -513,7 +514,7 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
     }
 
     // Schedule retries for players who don't acknowledge quickly
-    gameStartCoordinator.scheduleRetries(gameCode, playerUsernames, (username: string) => {
+    gameStartCoordinator.scheduleRetries(gameCode, humanUsernames, (username: string) => {
       const targetSocketId = getSocketIdByUsername(gameCode, username);
       if (!targetSocketId) return false;
       const targetSocket = getSocketById(io, targetSocketId);

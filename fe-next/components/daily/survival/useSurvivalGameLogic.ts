@@ -404,45 +404,44 @@ export function useSurvivalGameLogic({
     hintActions.buyNextHint(state.clueTokens, setClueTokens);
   }, [hintActions, state.clueTokens, hintState.nextHintItem, adjustTokens]);
 
-  // Track the token count that last triggered an auto-unlock to prevent cascading
-  const lastAutoUnlockTokensRef = useRef<number | null>(null);
+  // Cumulative cost threshold consumed by prior auto-unlocks. Tokens are never
+  // actually deducted — this ref gates the next unlock so auto-reveal still
+  // follows a "save up N tokens per hint" cadence while remaining FREE.
+  const autoUnlockConsumedRef = useRef<number>(0);
 
-  // Auto-Unlock Effect: fires when tokens increase from word discovery
+  // Auto-Unlock Effect: fires when earned tokens cross next tier threshold.
+  // Does NOT spend tokens (the notification copy advertises free auto-unlock).
   useEffect(() => {
     const nextItem = hintState.nextHintItem;
 
-    // Skip if no next item, not enough tokens, or already unlocking this item
-    if (!nextItem || state.clueTokens < nextItem.cost || pendingUnlockRef.current === nextItem.id) {
+    if (!nextItem || pendingUnlockRef.current === nextItem.id) {
       return undefined;
     }
 
-    // Prevent cascading: if tokens decreased (from a previous auto-unlock), skip.
-    // Only auto-unlock when tokens increase from an external source (word discovery).
-    if (lastAutoUnlockTokensRef.current !== null && state.clueTokens <= lastAutoUnlockTokensRef.current) {
+    // Threshold: tokens earned since last unlock must meet next tier cost.
+    const threshold = autoUnlockConsumedRef.current + nextItem.cost;
+    if (state.clueTokens < threshold) {
       return undefined;
     }
 
-    // Mark this hint as pending unlock to prevent race conditions
     pendingUnlockRef.current = nextItem.id;
 
-    // Auto-unlock with a small delay for smooth UX
     const timer = setTimeout(() => {
-      lastAutoUnlockTokensRef.current = state.clueTokens;
-      buyNextHint();
-      showAutoClueNotification(nextItem.id);
-      // Keep pendingUnlockRef set to prevent immediate re-trigger;
-      // it will be bypassed when tokens next increase above current level
+      const revealed = hintActions.autoUnlockNextHint();
+      if (revealed) {
+        autoUnlockConsumedRef.current += revealed.cost;
+        showAutoClueNotification(revealed.id);
+      }
       pendingUnlockRef.current = null;
     }, 500);
 
     return () => {
       clearTimeout(timer);
-      // Only clear pending if it matches (prevents clearing if a new hint started)
       if (pendingUnlockRef.current === nextItem.id) {
         pendingUnlockRef.current = null;
       }
     };
-  }, [state.clueTokens, hintState.nextHintItem, buyNextHint, showAutoClueNotification]);
+  }, [state.clueTokens, hintState.nextHintItem, hintActions, showAutoClueNotification]);
 
   // Keep callback ref in sync — assign synchronously (not in useEffect)
   // to avoid a one-render lag where the ref holds a stale callback

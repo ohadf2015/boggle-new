@@ -236,8 +236,8 @@ export function startBotsForGame(
 
         // Score cap: keep bot within competitive range of best human
         if (!shouldBotScore(gameCode, username, bot.score, totalScore, bot.difficulty)) {
-          logger.debug('BOT', `Bot "${username}" score capped at ${bot.score} (target reached for ${bot.difficulty})`);
-          return;
+          logger.info('BOT', `Bot "${username}" score capped at ${bot.score} (target reached for ${bot.difficulty})`);
+          return false;
         }
 
         // Bug fix: Sync combo to server state (mirrors wordValidationHandler)
@@ -295,6 +295,7 @@ export function startBotsForGame(
         volatileBroadcastToRoom(io, getGameRoom(gameCode), 'updateLeaderboard', {
           leaderboard,
         });
+        return true;
       },
       timerSeconds,
       gameStartTime

@@ -8,11 +8,9 @@ import { PlayfulBackground } from '@/components/ui/PlayfulBackground';
 // Loading fallback component with playful design
 function LoadingFallback(): React.JSX.Element {
   return (
-    <div className="flex-1 flex items-center justify-center bg-neo-navy relative">
+    <div className="flex-1 flex relative">
       <PlayfulBackground intensity="medium" colorScheme="game" />
-      <div className="relative z-10">
-        <PageLoader size="lg" text="Loading single player..." />
-      </div>
+      <PageLoader size="lg" text="Loading single player..." className="relative z-10" />
     </div>
   );
 }

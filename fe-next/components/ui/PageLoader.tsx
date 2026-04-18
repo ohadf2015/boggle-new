@@ -22,11 +22,10 @@ interface PageLoaderProps {
   className?: string;
 }
 
-// Size mappings for the spinner ring
-const SPINNER_SIZES = {
-  sm: { ring: 'w-32 h-32', mascot: 'xs' as const },
-  md: { ring: 'w-36 h-36', mascot: 'xs' as const },
-  lg: { ring: 'w-44 h-44', mascot: 'sm' as const },
+const MASCOT_SIZES = {
+  sm: 'xs' as const,
+  md: 'xs' as const,
+  lg: 'sm' as const,
 };
 
 /**
@@ -53,8 +52,8 @@ export const PageLoader = memo(function PageLoader({
   const { prefersReducedMotion, enableComplexAnimations } = useDevicePerformance();
 
   const containerClass = nested
-    ? 'flex-1 min-h-0 flex items-center justify-center bg-neo-navy'
-    : 'flex-1 flex items-center justify-center bg-neo-navy';
+    ? 'flex-1 min-h-0 flex items-center justify-center'
+    : 'flex-1 flex items-center justify-center';
 
   // Simple dots loader for reduced motion or low-end devices
   if (prefersReducedMotion || !enableComplexAnimations) {
@@ -74,37 +73,24 @@ export const PageLoader = memo(function PageLoader({
     );
   }
 
-  const spinnerSize = SPINNER_SIZES[size];
+  const mascotSize = MASCOT_SIZES[size];
 
   return (
     <div className={cn(containerClass, className)} data-testid="page-loader">
       <div className="flex flex-col items-center justify-center gap-4">
-        {/* Spinner ring with mascot inside */}
-        <div className={`${spinnerSize.ring} relative`}>
-          {/* Background ring */}
-          <div className="absolute inset-0 rounded-full border-4 border-neo-cyan/20" />
-          {/* Animated spinner ring */}
-          <AdaptiveMotion.div
-            className="absolute inset-0 rounded-full border-4 border-transparent border-t-neo-cyan border-r-neo-pink"
-            animate={{ rotate: 360 }}
-            transition={{
-              duration: 1,
-              repeat: Infinity,
-              ease: 'linear',
-            }}
+        <AdaptiveMotion.div
+          animate={{ opacity: [0.7, 1, 0.7], scale: [0.98, 1.02, 0.98] }}
+          transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
+        >
+          <Mascot
+            variant={mascotVariant}
+            size={mascotSize}
+            animated={true}
+            priority={true}
+            clipShape="none"
+            clipBorder="none"
           />
-          {/* Mascot centered inside the ring */}
-          <div className="absolute inset-0 flex items-center justify-center">
-            <Mascot
-              variant={mascotVariant}
-              size={spinnerSize.mascot}
-              animated={true}
-              priority={true}
-              clipShape="circle"
-              clipBorder="none"
-            />
-          </div>
-        </div>
+        </AdaptiveMotion.div>
         {text && (
           <AdaptiveMotion.p
             className="text-sm font-neo-body text-neo-cream/70"

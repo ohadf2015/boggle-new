@@ -6,9 +6,10 @@ import { vi, type Mock, type MockInstance } from 'vitest';
 import { getDailyMissions, completeMission, checkAndClaimGrandSlam } from '../dailyMissionsManager';
 
 // Mock supabaseServer
-const { mockSelect, mockEq, mockSingle, mockUpdate, mockUpsert, mockRpc, mockFrom, mockSupabase, chainable } = vi.hoisted(() => {
+const { mockSelect, mockEq, mockMaybeSingle, mockSingle, mockUpdate, mockUpsert, mockRpc, mockFrom, mockSupabase, chainable } = vi.hoisted(() => {
   const mockSelect = vi.fn();
   const mockEq = vi.fn();
+  const mockMaybeSingle = vi.fn();
   const mockSingle = vi.fn();
   const mockUpdate = vi.fn();
   const mockUpsert = vi.fn();
@@ -16,6 +17,7 @@ const { mockSelect, mockEq, mockSingle, mockUpdate, mockUpsert, mockRpc, mockFro
   const chainable = {
     select: mockSelect,
     eq: mockEq,
+    maybeSingle: mockMaybeSingle,
     single: mockSingle,
     update: mockUpdate,
     upsert: mockUpsert,
@@ -26,7 +28,7 @@ const { mockSelect, mockEq, mockSingle, mockUpdate, mockUpsert, mockRpc, mockFro
   mockUpsert.mockReturnValue(chainable);
   const mockFrom = vi.fn().mockReturnValue(chainable);
   const mockSupabase = { from: mockFrom, rpc: mockRpc };
-  return { mockSelect, mockEq, mockSingle, mockUpdate, mockUpsert, mockRpc, mockFrom, mockSupabase, chainable };
+  return { mockSelect, mockEq, mockMaybeSingle, mockSingle, mockUpdate, mockUpsert, mockRpc, mockFrom, mockSupabase, chainable };
 });
 
 
@@ -73,7 +75,7 @@ beforeEach(() => {
 
 describe('getDailyMissions', () => {
   it('returns missions from existing row', async () => {
-    mockSingle.mockResolvedValueOnce({ data: EMPTY_ROW, error: null });
+    mockMaybeSingle.mockResolvedValueOnce({ data: EMPTY_ROW, error: null });
 
     const result = await getDailyMissions(PLAYER_ID);
 
@@ -85,12 +87,11 @@ describe('getDailyMissions', () => {
     expect(mockFrom).toHaveBeenCalledWith('player_daily_missions');
   });
 
-  it('upserts a new row when none exists (PGRST116)', async () => {
-    // First call: no row
-    mockSingle
-      .mockResolvedValueOnce({ data: null, error: { code: 'PGRST116', message: 'No rows' } })
-      // After upsert
-      .mockResolvedValueOnce({ data: EMPTY_ROW, error: null });
+  it('upserts a new row when none exists (null data)', async () => {
+    // First call: no row — maybeSingle returns null data, no error
+    mockMaybeSingle.mockResolvedValueOnce({ data: null, error: null });
+    // After upsert, single() returns the inserted row
+    mockSingle.mockResolvedValueOnce({ data: EMPTY_ROW, error: null });
 
     const result = await getDailyMissions(PLAYER_ID);
 
@@ -99,7 +100,7 @@ describe('getDailyMissions', () => {
   });
 
   it('returns defaults on unexpected error', async () => {
-    mockSingle.mockResolvedValueOnce({ data: null, error: { code: 'OTHER', message: 'fail' } });
+    mockMaybeSingle.mockResolvedValueOnce({ data: null, error: { code: 'OTHER', message: 'fail' } });
 
     const result = await getDailyMissions(PLAYER_ID);
 
@@ -108,7 +109,7 @@ describe('getDailyMissions', () => {
   });
 
   it('counts completed missions correctly', async () => {
-    mockSingle.mockResolvedValueOnce({
+    mockMaybeSingle.mockResolvedValueOnce({
       data: { ...EMPTY_ROW, word_hunt_completed: true, adventure_completed: true },
       error: null,
     });
@@ -124,7 +125,7 @@ describe('getDailyMissions', () => {
 describe('completeMission', () => {
   it('marks a mission as complete and returns updated missions', async () => {
     // getDailyMissions (ensure row exists)
-    mockSingle
+    mockMaybeSingle
       .mockResolvedValueOnce({ data: EMPTY_ROW, error: null });
 
     // update call
@@ -132,7 +133,7 @@ describe('completeMission', () => {
     mockUpdate.mockReturnValue({ eq: vi.fn().mockReturnValue({ eq: vi.fn().mockResolvedValue({ error: null }) }) });
 
     // getDailyMissions (return updated)
-    mockSingle
+    mockMaybeSingle
       .mockResolvedValueOnce({ data: { ...EMPTY_ROW, word_hunt_completed: true }, error: null });
 
     const result = await completeMission(PLAYER_ID, 'word_hunt');
@@ -143,7 +144,7 @@ describe('completeMission', () => {
 
 describe('checkAndClaimGrandSlam', () => {
   it('returns not claimed when missions incomplete', async () => {
-    mockSingle.mockResolvedValueOnce({ data: EMPTY_ROW, error: null });
+    mockMaybeSingle.mockResolvedValueOnce({ data: EMPTY_ROW, error: null });
 
     const result = await checkAndClaimGrandSlam(PLAYER_ID);
 
@@ -153,7 +154,7 @@ describe('checkAndClaimGrandSlam', () => {
 
   it('claims grand slam when all 3 complete and grants XP', async () => {
     // getDailyMissions
-    mockSingle.mockResolvedValueOnce({ data: FULL_ROW, error: null });
+    mockMaybeSingle.mockResolvedValueOnce({ data: FULL_ROW, error: null });
 
     // update grand_slam_claimed
     mockUpdate.mockReturnValue({ eq: vi.fn().mockReturnValue({ eq: vi.fn().mockResolvedValue({ error: null }) }) });
@@ -170,7 +171,7 @@ describe('checkAndClaimGrandSlam', () => {
   });
 
   it('returns already claimed when grand_slam_claimed is true', async () => {
-    mockSingle.mockResolvedValueOnce({
+    mockMaybeSingle.mockResolvedValueOnce({
       data: { ...FULL_ROW, grand_slam_claimed: true },
       error: null,
     });
@@ -184,7 +185,7 @@ describe('checkAndClaimGrandSlam', () => {
   });
 
   it('does not grant XP when missions are incomplete', async () => {
-    mockSingle.mockResolvedValueOnce({ data: EMPTY_ROW, error: null });
+    mockMaybeSingle.mockResolvedValueOnce({ data: EMPTY_ROW, error: null });
 
     const result = await checkAndClaimGrandSlam(PLAYER_ID);
 

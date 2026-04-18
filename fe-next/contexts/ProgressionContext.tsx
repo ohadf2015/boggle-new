@@ -437,6 +437,7 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
       }
       completeLevelInFlightRef.current = levelKey;
 
+      let shouldQueueOnFailure = false;
       const promise = (async (): Promise<boolean> => {
       try {
         const requestBody = buildCompleteLevelBody({
@@ -466,6 +467,11 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
           });
         }
 
+        // After retry, if still 5xx the server is genuinely unhealthy — durably queue.
+        if (response.status >= 500 && response.status < 600) {
+          shouldQueueOnFailure = true;
+        }
+
         // Retry on 403 "Level not unlocked" — stale DB state from a prior failed save.
         // Refresh progression (which updates the server's view) and retry once.
         if (response.status === 403) {
@@ -489,7 +495,8 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
 
         if (!data.success || !data.progression || !data.completion) {
           logger.warn('[ProgressionContext] Server returned unexpected response for completeLevel');
-          return false;
+          shouldQueueOnFailure = true;
+          throw new Error('Unexpected response shape for completeLevel');
         }
 
         // Merge server response into local progression state
@@ -561,9 +568,12 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
       } catch (err) {
         logger.warn('[ProgressionContext] Complete level error:', err instanceof Error ? err.message : err);
 
-        // Queue for offline replay only on network errors (TypeError = fetch failed).
-        // Server 4xx rejections would fail again on replay, so skip those.
-        if (err instanceof TypeError) {
+        // Queue for offline replay on:
+        //  - network errors (TypeError = fetch failed)
+        //  - 5xx after retries (server unhealthy, retryable)
+        //  - unexpected response shape (server bug — don't silently drop user's progress)
+        // Skip 4xx: those are deterministic rejections and will fail again on replay.
+        if (err instanceof TypeError || shouldQueueOnFailure) {
           enqueueCompletion({
             world, level, stars, score, words,
             ...(goldEarned !== undefined && { goldEarned }),

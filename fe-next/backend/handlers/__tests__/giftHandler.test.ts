@@ -99,6 +99,27 @@ describe('giftHandler', () => {
       expect(result.error).toContain('friends');
     });
 
+    test('should allow retry after failed send (dedup commits only on success)', async () => {
+      // First attempt fails at friend check
+      (areFriends as Mock).mockResolvedValueOnce(false);
+      const first = await handleGiftSend(
+        mockSocket as any,
+        mockIo as any,
+        { recipientId: 'user-2', giftType: 'hints' }
+      );
+      expect(first.success).toBe(false);
+      expect(first.error).toContain('friends');
+
+      // Retry within dedup window must not be blocked by dedup
+      (areFriends as Mock).mockResolvedValue(true);
+      const second = await handleGiftSend(
+        mockSocket as any,
+        mockIo as any,
+        { recipientId: 'user-2', giftType: 'hints' }
+      );
+      expect(second.error).not.toMatch(/already processing/i);
+    });
+
     test('should reject gift when daily limit reached', async () => {
       mockSupabaseSelect.mockResolvedValue({ count: 3, error: null });
 

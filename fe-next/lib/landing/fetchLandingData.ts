@@ -67,7 +67,7 @@ export async function fetchLandingData(language: string): Promise<LandingInitial
         .select('solve_rate')
         .eq('puzzle_date', today)
         .eq('language', language)
-        .single(),
+        .maybeSingle(),
     ]),
     fetchGameModeStats(7),
   ]);

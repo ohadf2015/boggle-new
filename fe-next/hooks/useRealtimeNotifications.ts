@@ -127,28 +127,31 @@ export function useRealtimeNotifications(): UseRealtimeNotificationsReturn {
 
       usePollingFallbackRef.current = true;
 
-      // Track the last notification we've seen to detect new ones
-      let lastSeenId: string | null = null;
+      // Track all notification ids we've processed so dismissed ones don't reappear.
+      // Using a Set (not a single watermark) — once an id is seen, it stays seen even if
+      // the user dismisses it and it drops out of subsequent server responses.
+      const seenIds = new Set<string>();
+      let seeded = false;
 
       pollingIntervalRef.current = setInterval(async () => {
         try {
           const data = await fetchNotifications({ limit: 5 });
           setUnreadCount(data.unreadCount);
 
-          // Check for new notifications
-          if (data.notifications.length > 0) {
-            const newest = data.notifications[0];
-            if (lastSeenId && newest.id !== lastSeenId) {
-              // New notification arrived - find all new ones
-              const lastSeenIndex = data.notifications.findIndex(n => n.id === lastSeenId);
-              const newNotifications = lastSeenIndex === -1
-                ? data.notifications
-                : data.notifications.slice(0, lastSeenIndex);
+          if (!seeded) {
+            // First tick: mark everything as seen without firing handler —
+            // initial fetch already populated the list.
+            data.notifications.forEach((n) => seenIds.add(n.id));
+            seeded = true;
+            return;
+          }
 
-              // Process new notifications (oldest first so newest ends up on top)
-              newNotifications.reverse().forEach(handleNewNotification);
+          // Oldest→newest so newest ends up on top of the list
+          for (const n of [...data.notifications].reverse()) {
+            if (!seenIds.has(n.id)) {
+              seenIds.add(n.id);
+              handleNewNotification(n);
             }
-            lastSeenId = newest.id;
           }
         } catch {
           // Silently fail - polling is best-effort fallback

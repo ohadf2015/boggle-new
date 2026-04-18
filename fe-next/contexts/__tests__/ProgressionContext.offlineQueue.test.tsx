@@ -209,6 +209,67 @@ describe('ProgressionContext — offline queue wiring (S6-4)', () => {
     expect(completeCalls.length).toBeGreaterThanOrEqual(1);
   });
 
+  it('enqueues completion when server returns 5xx after retry exhausted', async () => {
+    // GIVEN — every /api/adventure/complete call returns 500
+    mockFetch.mockImplementation((url: string) => {
+      if (url.includes('/api/adventure/state')) return Promise.resolve(makeStateResponse());
+      if (url.includes('/api/adventure/complete')) {
+        return Promise.resolve({
+          ok: false,
+          status: 500,
+          headers: { get: () => null },
+          text: async () => 'Internal Server Error',
+        });
+      }
+      return Promise.resolve({ ok: true, json: async () => ({}) });
+    });
+
+    const { result } = renderHook(() => useProgression(), { wrapper });
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    let success: boolean | undefined;
+    await act(async () => {
+      success = await result.current.completeLevel(1, 2, 2, 450, 8, 25);
+    });
+
+    // THEN — 5xx after retry exhaustion should enqueue for replay
+    expect(success).toBe(false);
+    expect(enqueueSpy).toHaveBeenCalledTimes(1);
+    expect(enqueueSpy).toHaveBeenCalledWith(
+      expect.objectContaining({ world: 1, level: 2, stars: 2, score: 450 })
+    );
+  });
+
+  it('enqueues completion when server returns unexpected response shape', async () => {
+    // GIVEN — 200 OK but missing success/progression/completion fields
+    mockFetch.mockImplementation((url: string) => {
+      if (url.includes('/api/adventure/state')) return Promise.resolve(makeStateResponse());
+      if (url.includes('/api/adventure/complete')) {
+        return Promise.resolve({
+          ok: true,
+          status: 200,
+          json: async () => ({ success: false }),
+        });
+      }
+      return Promise.resolve({ ok: true, json: async () => ({}) });
+    });
+
+    const { result } = renderHook(() => useProgression(), { wrapper });
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    let success: boolean | undefined;
+    await act(async () => {
+      success = await result.current.completeLevel(1, 2, 2, 450, 8, 25);
+    });
+
+    // THEN — malformed response should not be silently lost
+    expect(success).toBe(false);
+    expect(enqueueSpy).toHaveBeenCalledTimes(1);
+    expect(enqueueSpy).toHaveBeenCalledWith(
+      expect.objectContaining({ world: 1, level: 2, stars: 2 })
+    );
+  });
+
   it('does not flush when queue is empty on reconnect', async () => {
     // GIVEN — empty queue
     peekSpy.mockReturnValue([]);

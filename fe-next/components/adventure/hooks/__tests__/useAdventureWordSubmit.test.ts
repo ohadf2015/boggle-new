@@ -340,6 +340,40 @@ describe('useAdventureWordSubmit', () => {
     expect(result.current.validationFeedback.isValid).toBe(true);
   });
 
+  it('dispatches submitHuntGuess when archetype=hunt and word length matches target', async () => {
+    mockValidateWord.mockResolvedValue({ isValid: true, score: 50 });
+    const submitHuntGuess = vi.fn();
+    const { result } = renderHook(() => useAdventureWordSubmit({
+      ...defaultProps,
+      archetype: 'hunt',
+      huntTargetWord: 'HELLO',
+      submitHuntGuess,
+    } as any));
+
+    await act(async () => {
+      await result.current.handleWordSubmit('hello', [0, 1, 2, 3, 4]);
+    });
+
+    expect(submitHuntGuess).toHaveBeenCalledWith('hello');
+  });
+
+  it('does NOT dispatch submitHuntGuess when word length differs from target', async () => {
+    mockValidateWord.mockResolvedValue({ isValid: true, score: 50 });
+    const submitHuntGuess = vi.fn();
+    const { result } = renderHook(() => useAdventureWordSubmit({
+      ...defaultProps,
+      archetype: 'hunt',
+      huntTargetWord: 'HELLO',
+      submitHuntGuess,
+    } as any));
+
+    await act(async () => {
+      await result.current.handleWordSubmit('hi', [0, 1]);
+    });
+
+    expect(submitHuntGuess).not.toHaveBeenCalled();
+  });
+
   it('should store last submitted word path for explosion effects', async () => {
     mockValidateWord.mockResolvedValue({ isValid: true, score: 50 });
 

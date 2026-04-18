@@ -217,7 +217,7 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
               >
                 <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-neo-black/50 border-2 border-neo-white/20 rounded-neo">
                   <span className="text-neo-white/60 text-sm font-bold uppercase">
-                    {t('adventure.world')} {worldNumber}
+                    {t('adventure.worldLabel')} {worldNumber}
                   </span>
                   <span className="text-neo-white/30">|</span>
                   <span className="text-neo-white/80 text-sm font-bold">

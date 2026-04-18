@@ -17,8 +17,8 @@ import {
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import AdventureObjectives from '../AdventureObjectives';
+import AdventureHuntClueBoxes from './AdventureHuntClueBoxes';
 import { WordHuntLifeBar } from '@/components/game/WordHuntLifeBar';
-import { WordHuntTargetArea } from '@/components/game/WordHuntTargetArea';
 import { ChapterQuestProgress } from './ChapterQuestProgress';
 import type { ChapterQuest, ChapterQuestProgress as QuestProgressType, LevelObjective, ObjectiveType } from '@/types/adventure';
 import { calculateStars } from '@/hooks/adventureGameReducer';
@@ -100,8 +100,6 @@ interface GameSidebarProps {
   huntTargetLength?: number;
   /** Hunt mode: previous guess attempts */
   huntAttempts?: Array<{ guess: string; feedback: import('@/shared/types/game').LetterFeedback[] }>;
-  /** Hunt mode: submit a guess */
-  onHuntGuess?: (guess: string) => void;
   /** Hunt mode: whether target has been found */
   huntFound?: boolean;
   /** Chapter quests for progress display */
@@ -141,7 +139,6 @@ export const GameSidebar = memo(function GameSidebar({
   showTargetWordUI = false,
   huntTargetLength = 0,
   huntAttempts = [],
-  onHuntGuess,
   huntFound = false,
   chapterQuests = [],
   chapterQuestProgress = [],
@@ -172,22 +169,22 @@ export const GameSidebar = memo(function GameSidebar({
         </div>
       )}
 
-      {/* Hunt mode: Target word guessing area (reuses WordHuntTargetArea) */}
-      {showTargetWordUI && huntTargetLength > 0 && onHuntGuess && (
-        <div className="px-3 py-2 border-b border-neo-white/10">
-          <WordHuntTargetArea
-            targetLength={huntTargetLength}
-            attempts={huntAttempts}
-            onSubmit={onHuntGuess}
-            found={huntFound}
-          />
-        </div>
-      )}
       {/* Hunt mode: loading state while target word is being picked */}
       {showTargetWordUI && huntTargetLength === 0 && (
         <div className="px-3 py-2 border-b border-neo-white/10 flex items-center gap-2">
           <div className="w-3.5 h-3.5 border-2 border-neo-cyan/40 border-t-neo-cyan rounded-full animate-spin" />
           <span className="text-xs text-neo-white/40 font-mono">{t('adventure.mode.huntLoadingTarget')}</span>
+        </div>
+      )}
+
+      {/* Hunt mode: daily-challenge-style clue boxes */}
+      {showTargetWordUI && huntTargetLength > 0 && (
+        <div className="px-3 py-2 border-b border-neo-white/10">
+          <AdventureHuntClueBoxes
+            targetLength={huntTargetLength}
+            attempts={huntAttempts}
+            huntFound={huntFound}
+          />
         </div>
       )}
 

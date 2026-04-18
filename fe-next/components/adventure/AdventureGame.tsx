@@ -339,6 +339,9 @@ const AdventureGame = memo<AdventureGameProps>(
       bossHealPerWord: init.upgradeEffects.bossHealPerWord,
       healPlayerHealth: bossOrch.isBossActive ? bossOrch.healPlayer : undefined,
       detonateActive,
+      archetype: modeState.archetype,
+      huntTargetWord,
+      submitHuntGuess,
       t, getPopupStartPosition,
     });
 

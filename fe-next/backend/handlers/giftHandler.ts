@@ -29,21 +29,23 @@ const GIFT_DEDUP_WINDOW_MS = 5000;
 // by ensuring only one gift operation per sender at a time
 const sendersInFlight = new Set<string>();
 
-function isDuplicateGift(senderId: string, recipientId: string, giftType: string): boolean {
-  const key = `${senderId}:${recipientId}:${giftType}`;
-  const lastSent = recentGifts.get(key);
-  if (lastSent && Date.now() - lastSent < GIFT_DEDUP_WINDOW_MS) {
-    return true;
-  }
-  recentGifts.set(key, Date.now());
-  // Cleanup old entries periodically (every 100 gifts)
+function dedupKey(senderId: string, recipientId: string, giftType: string): string {
+  return `${senderId}:${recipientId}:${giftType}`;
+}
+
+function wasRecentlySent(senderId: string, recipientId: string, giftType: string): boolean {
+  const lastSent = recentGifts.get(dedupKey(senderId, recipientId, giftType));
+  return !!lastSent && Date.now() - lastSent < GIFT_DEDUP_WINDOW_MS;
+}
+
+function markGiftSent(senderId: string, recipientId: string, giftType: string): void {
+  recentGifts.set(dedupKey(senderId, recipientId, giftType), Date.now());
   if (recentGifts.size > 500) {
     const now = Date.now();
     for (const [k, ts] of recentGifts) {
       if (now - ts > GIFT_DEDUP_WINDOW_MS) recentGifts.delete(k);
     }
   }
-  return false;
 }
 
 /** Clear dedup cache (for testing) */
@@ -100,8 +102,9 @@ async function handleGiftSendInner(
   socket: Socket,
   io: Server
 ): Promise<GiftResult> {
-  // Dedup: reject rapid duplicate gifts (same sender→recipient→type within 5s)
-  if (isDuplicateGift(senderId, params.recipientId, params.giftType)) {
+  // Dedup: reject rapid duplicate gifts (same sender→recipient→type within 5s).
+  // Peek only — commit the marker after successful RPC so failed sends can be retried.
+  if (wasRecentlySent(senderId, params.recipientId, params.giftType)) {
     return { success: false, error: 'Gift already processing, please wait' };
   }
 
@@ -185,6 +188,9 @@ async function handleGiftSendInner(
     logger.error('GIFT', `Failed to process gift: ${deductError.message}`);
     return { success: false, error: 'Failed to process gift' };
   }
+
+  // Commit dedup marker only after RPC success — prevents retry-block on failures.
+  markGiftSent(senderId, params.recipientId, params.giftType);
 
   logger.info('GIFT', `${senderId} sent ${params.giftType} to ${params.recipientId}`);
 

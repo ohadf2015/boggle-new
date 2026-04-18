@@ -6966,6 +6966,7 @@ const ja = {
       "blastObjective": "手数を賢く使おう！",
       "huntObjective": "隠されたターゲットワードを見つけよう",
       "huntLoadingTarget": "隠された単語を探しています...",
+      "huntTriesLeft": "残り{{count}}/{{max}}回",
       "wheelObjective": "すべての単語に中心の文字を含め、3文字以上にしよう！",
       "wheelMustInclude": "必須文字：",
       "forgeObjective": "目標スコアに到達しよう！",

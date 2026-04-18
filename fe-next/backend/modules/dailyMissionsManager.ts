@@ -83,9 +83,14 @@ export async function getDailyMissions(playerId: string, date?: string): Promise
     .select('word_hunt_completed, adventure_completed, community_completed, grand_slam_claimed')
     .eq('player_id', playerId)
     .eq('mission_date', today)
-    .single();
+    .maybeSingle();
 
-  if (error && error.code === 'PGRST116') {
+  if (error) {
+    logger.error('DAILY_MISSIONS', `Get failed for ${playerId}: ${error.message}`);
+    return toMissions(DEFAULT_ROW);
+  }
+
+  if (!data) {
     // No row for today — upsert a fresh one
     const { data: inserted, error: insertErr } = await supabase
       .from('player_daily_missions')
@@ -100,12 +105,7 @@ export async function getDailyMissions(playerId: string, date?: string): Promise
     return toMissions(inserted!);
   }
 
-  if (error) {
-    logger.error('DAILY_MISSIONS', `Get failed for ${playerId}: ${error.message}`);
-    return toMissions(DEFAULT_ROW);
-  }
-
-  return toMissions(data!);
+  return toMissions(data);
 }
 
 const COLUMN_MAP: Record<MissionType, string> = {
