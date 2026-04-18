@@ -25,17 +25,17 @@ export function AutoHideFooter({ className }: AutoHideFooterProps) {
   const pathname = usePathname();
   const isDesktop = useIsDesktop();
 
-  // TV fullscreen or desktop gameplay: no footer at all
-  if (isTvFullscreen || (isInGame && isDesktop)) {
-    return null;
-  }
-
   const cleanPath = pathname.replace(`/${language}`, '');
   const isGameRoute = ['/singleplayer', '/multiplayer', '/daily', '/adventure', '/education', '/student', '/teacher'].some(
     path => cleanPath.startsWith(path)
   );
 
-  // Game routes or active gameplay on mobile: compact legal-only footer (AdSense requirement)
+  // TV fullscreen, desktop gameplay, or any mobile game/lobby screen: no footer
+  if (isTvFullscreen || (isInGame && isDesktop) || (!isDesktop && (isInGame || isGameRoute))) {
+    return null;
+  }
+
+  // Desktop game routes (lobby/landing): compact legal-only footer (AdSense requirement)
   if (isInGame || isGameRoute) {
     return (
       <footer
