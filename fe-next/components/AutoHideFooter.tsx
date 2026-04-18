@@ -26,9 +26,25 @@ export function AutoHideFooter({ className }: AutoHideFooterProps) {
   const isDesktop = useIsDesktop();
 
   const cleanPath = pathname.replace(`/${language}`, '');
-  const isGameRoute = ['/singleplayer', '/multiplayer', '/daily', '/adventure', '/education', '/student', '/teacher'].some(
-    path => cleanPath.startsWith(path)
-  );
+  const isGameRoute = [
+    '/singleplayer',
+    '/multiplayer',
+    '/daily',
+    '/adventure',
+    '/education',
+    '/student',
+    '/teacher',
+    '/blast',
+    '/word-of-the-day',
+    '/challenge',
+    '/party',
+    '/brain',
+    '/join',
+    '/create',
+    '/custom',
+    '/quests',
+    '/word-forge',
+  ].some(path => cleanPath.startsWith(path));
 
   // TV fullscreen, desktop gameplay, or any mobile game/lobby screen: no footer
   if (isTvFullscreen || (isInGame && isDesktop) || (!isDesktop && (isInGame || isGameRoute))) {
