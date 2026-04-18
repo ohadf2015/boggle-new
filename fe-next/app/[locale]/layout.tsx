@@ -22,8 +22,7 @@ import NativeOAuthInitializer from '@/components/NativeOAuthInitializer';
 import { ToastContainer } from '@/components/ui/EnhancedToast';
 import { ChurnSignalTracker } from '@/components/engagement/ChurnSignalTracker';
 import SocialMediaPixels from '@/components/SocialMediaPixels';
-import { OrganizationJsonLd } from '@/components/seo/OrganizationJsonLd';
-import { VideoGameJsonLd } from '@/components/seo/VideoGameJsonLd';
+
 import { fredokaLatin, fredokaHebrew, rubikLatin, rubikHebrew, heeboHebrew } from '../fonts';
 
 // Dynamic import for EmailCaptureModal (shown conditionally, not needed immediately)
@@ -536,8 +535,6 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 {/* CrazyGames SDK must load in <head> with beforeInteractive
                     so it's detected by their QA tool before hydration */}
                 <CrazyGamesScriptServer />
-                <OrganizationJsonLd />
-                <VideoGameJsonLd />
             </head>
             <body className="antialiased screen-fit" suppressHydrationWarning>
                 {/* Dark-only theme — static string literal, no user input, safe from XSS */}

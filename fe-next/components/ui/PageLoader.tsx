@@ -53,7 +53,7 @@ export const PageLoader = memo(function PageLoader({
 
   const containerClass = nested
     ? 'flex-1 min-h-0 flex items-center justify-center'
-    : 'flex-1 flex items-center justify-center';
+    : 'flex-1 flex items-center justify-center bg-neo-navy';
 
   // Simple dots loader for reduced motion or low-end devices
   if (prefersReducedMotion || !enableComplexAnimations) {

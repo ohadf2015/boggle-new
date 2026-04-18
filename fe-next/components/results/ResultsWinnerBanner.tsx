@@ -2,7 +2,8 @@ import React, { useEffect, useCallback, useRef, useState, memo } from 'react';
 import { motion, useMotionValue, useTransform, animate } from 'framer-motion';
 import { Crown, Medal, Hand } from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { fireRankConfetti } from '@/utils/confettiUtils';
+import { fireEquippedVictoryEffect } from '@/utils/victoryEffects';
+import { useEquippedCosmetic } from '@/hooks/useEquippedCosmetic';
 import useReducedMotion from '@/hooks/useReducedMotion';
 import Avatar from '../Avatar';
 import { type CustomAvatarConfig } from '@/shared/types/customAvatar';
@@ -129,6 +130,7 @@ const ResultsWinnerBanner = memo<ResultsWinnerBannerProps>(({
 }) => {
   const { t } = useLanguage();
   const reducedMotion = useReducedMotion();
+  const equippedEffect = useEquippedCosmetic('victoryEffect');
 
   // Determine if confetti should fire (skip in reduced-motion)
   const shouldShowConfetti = !reducedMotion && (showConfettiProp ?? (variant === 'ranking' ? rank <= 3 : variant !== 'completion'));
@@ -146,9 +148,9 @@ const ResultsWinnerBanner = memo<ResultsWinnerBannerProps>(({
   // Memoize the confetti function for this rank
   const handleConfetti = useCallback(() => {
     if (shouldShowConfetti) {
-      fireRankConfetti(rank);
+      fireEquippedVictoryEffect(rank, equippedEffect);
     }
-  }, [rank, shouldShowConfetti]);
+  }, [rank, shouldShowConfetti, equippedEffect]);
 
   // Fire confetti on mount - using refs to prevent cleanup issues when deps change
   // IMPORTANT: Set ref INSIDE callback so confetti can retry if cleanup runs before timeout
@@ -157,11 +159,11 @@ const ResultsWinnerBanner = memo<ResultsWinnerBannerProps>(({
     if (winner && shouldShowConfetti && !hasFiredConfettiRef.current) {
       confettiTimeoutRef.current = setTimeout(() => {
         hasFiredConfettiRef.current = true;
-        fireRankConfetti(rank, 'light');
+        fireEquippedVictoryEffect(rank, equippedEffect);
         confettiTimeoutRef.current = null;
       }, 400);
     }
-  }, [winner, shouldShowConfetti, rank]);
+  }, [winner, shouldShowConfetti, rank, equippedEffect]);
 
   // Separate cleanup effect - only runs on unmount
   useEffect(() => {

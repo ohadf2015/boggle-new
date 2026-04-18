@@ -1051,6 +1051,16 @@ const ja = {
       "vipBadge": "VIP",
       "filterAll": "すべて",
       "filterVip": "VIPのみ"
+    },
+    "expression": {
+      "happy": "嬉しい",
+      "cool": "クール",
+      "angry": "怒り",
+      "sad": "悲しい",
+      "silly": "おかしい",
+      "sleepy": "眠い",
+      "wink": "ウィンク",
+      "surprised": "驚き"
     }
   },
   "error": {

@@ -74,10 +74,10 @@ describe('PageLoader', () => {
     expect(wrapper).toHaveClass('justify-center');
   });
 
-  it('should not paint bg-neo-navy so loader blends over decorative parents', () => {
+  it('should paint bg-neo-navy to block body halftone pattern on full-page loaders', () => {
     const { container } = render(<PageLoader />);
     const wrapper = container.firstChild as HTMLElement;
-    expect(wrapper).not.toHaveClass('bg-neo-navy');
+    expect(wrapper).toHaveClass('bg-neo-navy');
   });
 
   it('should not paint bg-neo-navy in nested mode', () => {

@@ -1061,6 +1061,16 @@ const sv = {
       "vipBadge": "VIP",
       "filterAll": "Alla",
       "filterVip": "Bara VIP"
+    },
+    "expression": {
+      "happy": "Glad",
+      "cool": "Cool",
+      "angry": "Arg",
+      "sad": "Ledsen",
+      "silly": "Tokig",
+      "sleepy": "Sömnig",
+      "wink": "Blinka",
+      "surprised": "Förvånad"
     }
   },
   "error": {

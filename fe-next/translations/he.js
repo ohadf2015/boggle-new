@@ -1051,6 +1051,16 @@ const he = {
       "vipBadge": "VIP",
       "filterAll": "הכל",
       "filterVip": "VIP בלבד"
+    },
+    "expression": {
+      "happy": "שמח",
+      "cool": "מגניב",
+      "angry": "כועס",
+      "sad": "עצוב",
+      "silly": "מצחיק",
+      "sleepy": "ישנוני",
+      "wink": "עצום עין",
+      "surprised": "מופתע"
     }
   },
   "error": {

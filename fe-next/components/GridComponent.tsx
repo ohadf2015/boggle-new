@@ -22,6 +22,7 @@ import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useEarthquakeAnimation } from '../hooks/useEarthquakeAnimation';
 import GridCell, { type HighlightedCell } from './grid/GridCell';
+import { useEquippedCosmetic } from '@/hooks/useEquippedCosmetic';
 
 export type { HighlightedCell } from './grid/GridCell';
 
@@ -101,6 +102,9 @@ const GridComponent = memo<GridComponentProps>(({
   const prevSelectedLengthRef = useRef(0);
   const [hintAnimationPhase, setHintAnimationPhase] = useState<'blink' | 'fadeout' | null>(null);
   const hintTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const equippedBoardTheme = useEquippedCosmetic('boardTheme');
+  const equippedTileSkin = useEquippedCosmetic('tileSkin');
 
   const disableEarthquakeEffects = useDisableEarthquakeEffects();
   const accessibilityLargeLetters = useLargeLetters();
@@ -392,7 +396,7 @@ const GridComponent = memo<GridComponentProps>(({
       )}
 
       <motion.div
-        className="game-board-frame relative"
+        className={cn("game-board-frame relative", equippedBoardTheme && `cosmetic-board-${equippedBoardTheme.replace('board-', '')}`)}
         animate={earthquakePhase === 'quake' && useEnhancedMode ? {
           x: [0, -8, 8, -6, 6, -4, 4, -2, 2, 0],
           y: [0, -4, 4, -3, 3, -2, 2, -1, 1, 0],
@@ -411,6 +415,7 @@ const GridComponent = memo<GridComponentProps>(({
           ref={gridRef}
           dir="ltr"
           data-tutorial="grid"
+          {...(equippedTileSkin && { 'data-tile-skin': equippedTileSkin.replace('tile-', '') })}
           className={cn(
             "grid touch-none select-none absolute rounded-neo",
             gridDimensions.gap,

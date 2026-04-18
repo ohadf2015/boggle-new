@@ -1046,6 +1046,16 @@ const en = {
       "vipBadge": "VIP",
       "filterAll": "All",
       "filterVip": "VIP Only"
+    },
+    "expression": {
+      "happy": "Happy",
+      "cool": "Cool",
+      "angry": "Angry",
+      "sad": "Sad",
+      "silly": "Silly",
+      "sleepy": "Sleepy",
+      "wink": "Wink",
+      "surprised": "Surprised"
     }
   },
   "error": {

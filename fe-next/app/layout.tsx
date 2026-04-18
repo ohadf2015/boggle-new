@@ -92,6 +92,7 @@ export const metadata: Metadata = {
         ],
     },
     other: {
+        'google-site-verification': '4Blim0yOh_Hl4uX9TFnRX71lagbldOOxg7PwrcEbhrc',
         'google-adsense-account': 'ca-pub-1896836706464880',
         'rating': 'General',
         'msapplication-TileColor': '#1a1a2e',

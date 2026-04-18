@@ -26,6 +26,7 @@ import { initUtmCapture } from '@/utils/utmCapture';
 import { initConsoleOverride } from '@/utils/consoleOverride';
 import { initSessionTracking } from '@/utils/sessionTracking';
 import { linkLogRocketSession } from '@/utils/sentry';
+import { hasConsent } from '@/utils/cookieConsent';
 import { LogRocketIdentify } from '@/components/providers/LogRocketIdentify';
 import { PostHogProvider } from '@/components/providers/PostHogProvider';
 
@@ -87,12 +88,13 @@ if (typeof window !== 'undefined') {
     initResizeObserverErrorHandler();
 }
 
-// Lazy load LogRocket — always enabled (consent check bypassed for now).
+// Lazy load LogRocket — requires analytics consent (GDPR compliance).
 // Deferred to 3 seconds OR first user interaction (whichever comes first).
 let logRocketInitialized = false;
 const initLogRocket = () => {
     if (logRocketInitialized) return;
     if (typeof window === 'undefined' || window.location.hostname === 'localhost') return;
+    if (!hasConsent('analytics')) return;
 
     logRocketInitialized = true;
     import('logrocket').then(({ default: LogRocket }) => {
