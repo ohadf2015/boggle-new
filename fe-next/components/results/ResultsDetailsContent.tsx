@@ -190,7 +190,7 @@ export const ResultsDetailsContent: React.FC<ResultsDetailsContentProps> = ({
 
       {/* Multiplayer comparison: high-level insights + per-player word drill-down */}
       {otherPlayers.length > 0 && (
-        <>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 items-start">
           <ComparativeInsights
             allPlayerWords={allPlayerWords}
             currentUsername={username || ''}
@@ -201,7 +201,7 @@ export const ResultsDetailsContent: React.FC<ResultsDetailsContentProps> = ({
             currentUsername={username || ''}
             t={t}
           />
-        </>
+        </div>
       )}
 
       {/* Rarest Achievement */}
