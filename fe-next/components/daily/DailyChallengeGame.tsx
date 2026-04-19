@@ -27,6 +27,7 @@ import { useKeyboardWordInput } from '@/hooks/useKeyboardWordInput';
 import DirectionGuidanceTooltip from '@/components/game/DirectionGuidanceTooltip';
 import KeyboardHintTooltip from '@/components/game/KeyboardHintTooltip';
 import { cn } from '@/lib/utils';
+import { trackGameEnd } from '@/utils/growthTracking';
 import { useCoinContext } from '@/contexts/CoinContext';
 import { Mascot } from '@/components/ui/Mascot';
 import { PANIC_TIMER_THRESHOLD, ONFIRE_COMBO_THRESHOLD } from '@/utils/mascotConfig';
@@ -269,6 +270,15 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
       longestWord,
     };
 
+    trackGameEnd(
+      'daily-challenge',
+      finalScore,
+      words.length,
+      true,
+      gameResult.timeSeconds,
+      { isWinner: words.length > 0, puzzleNumber }
+    );
+
     // Only call onComplete if component is still mounted
     if (isMountedRef.current) {
       onComplete(gameResult);
@@ -302,6 +312,7 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
       words: [],
       longestWord: '',
     };
+    trackGameEnd('daily-challenge', 0, 0, false, result.timeSeconds, { puzzleNumber });
     onComplete(result);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [duration, onComplete]);

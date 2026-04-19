@@ -26,6 +26,7 @@ import { useSurvivalHints } from './useSurvivalHints';
 import { survivalGameReducer, createInitialState } from './survivalGameReducer';
 import { useSafeTimeout, useSafeInterval } from '@/hooks/useSafeTimeout';
 import { useSurvivalWordSubmission } from './useSurvivalWordSubmission';
+import { trackGameEnd } from '@/utils/growthTracking';
 
 export interface UseSurvivalGameLogicProps {
   grid: LetterGrid;
@@ -369,6 +370,15 @@ export function useSurvivalGameLogic({
 
     // Track daily challenge completion for new player detection
     incrementDailyChallengesCompleted();
+
+    trackGameEnd(
+      'survival',
+      result.efficiencyScore,
+      state.discoveredWords.length,
+      true,
+      Math.floor((Date.now() - gameStartTimeRef.current) / 1000),
+      { isWinner: won, attemptsUsed: targetAttemptsCount, lifeRemaining: state.lifePoints }
+    );
 
     onComplete(result);
   }, [state.attempts, state.discoveredWords, state.lifePoints, state.clueTokens, state.gameSessionId, hintState.tokensSpent, hintState.currentHint, targetWord, onComplete, lifeDrainInterval, fadeToTrack, TRACKS]);

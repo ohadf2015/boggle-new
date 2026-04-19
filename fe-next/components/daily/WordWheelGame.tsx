@@ -11,6 +11,7 @@ import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import type { WordWheelEffect } from './WordWheelEffectsCanvas';
 import { WheelLetter, WordTile } from './WordWheelParts';
 import { useWordWheelKeyboard } from '@/hooks/useWordWheelKeyboard';
+import { trackGameEnd } from '@/utils/growthTracking';
 import dynamic from 'next/dynamic';
 
 const WordWheelPixiRing = dynamic(() => import('./WordWheelPixiRing'), { ssr: false });
@@ -156,6 +157,14 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
           gameOverRef.current = true;
           onEffect({ type: 'gameComplete', score: scoreRef.current });
           playEpicVictorySound();
+          trackGameEnd(
+            'word-wheel',
+            scoreRef.current,
+            wordsFoundRef.current.length,
+            true,
+            duration,
+            { isWinner: wordsFoundRef.current.length > 0 }
+          );
           onComplete({
             wordsFound: wordsFoundRef.current,
             score: scoreRef.current,
