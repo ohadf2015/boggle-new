@@ -127,9 +127,18 @@ const AdventureHuntGame: React.FC<Props> = ({ levelConfig, initialGrid, onLevelC
     onLevelComplete(stars, score, state.foundWords.length, gold);
   }, [state.targetFound, targetLength, state.foundWords, completeLevel, levelConfig.world, levelConfig.level, onLevelComplete]);
 
+  // Handle game over without finding target → trigger retry/exit flow
+  React.useEffect(() => {
+    if (!state.isGameOver || state.targetFound || completedRef.current) return;
+    completedRef.current = true;
+    onLevelComplete(0, 0, state.foundWords.length, 0);
+  }, [state.isGameOver, state.targetFound, state.foundWords.length, onLevelComplete]);
+
   const handleWordSubmit = useCallback((word: string) => {
+    // Only accept grid words — prevents accidental HP drain from invalid traces
+    if (!solvedWords || !solvedWords.has(word.toLowerCase())) return;
     dispatch({ type: 'SUBMIT_WORD', word });
-  }, []);
+  }, [solvedWords]);
 
   // Convert reducer attempts (LetterFeedback from wordHuntFeedback) to TargetAttempt[]
   // Already in correct format since we use getLetterFeedback which returns object form

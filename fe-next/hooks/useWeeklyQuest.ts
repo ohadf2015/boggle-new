@@ -126,34 +126,24 @@ export function useWeeklyQuest(): UseWeeklyQuestReturn {
   }, [activeQuest, loading, t, playQuestCompleteSound]);
 
   const handleSelectQuest = useCallback(async (questId: string) => {
-    if (!user?.id || !supabase) return;
-
-    const template = available.find(q => q.id === questId);
-    if (!template) return;
+    if (!user?.id) return;
 
     setSelectingQuestId(questId);
-    const weekStart = getWeekStart();
-    const { data, error } = await supabase
-      .from('weekly_quests')
-      .insert({
-        player_id: user.id,
-        week_start: weekStart,
-        quest_type: template.type,
-        title: template.description,
-        description: template.description,
-        requirements: JSON.stringify({ target: template.target, type: template.type }),
-        current_progress: JSON.stringify({ current: 0 }),
-        xp_reward: template.xpReward,
-        completed: false,
-      })
-      .select('id, quest_type, title, description, requirements, current_progress, xp_reward, completed, week_start')
-      .single();
-
-    if (!error && data) {
-      setActiveQuest(parseRow(data as Record<string, unknown>));
+    try {
+      const res = await fetch('/api/weekly-quest/select', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ questId }),
+      });
+      if (res.ok) {
+        const json = await res.json();
+        if (json.quest) setActiveQuest(json.quest as ActiveQuest);
+      }
+    } catch {
+      // silently ignore — user will see no quest selected
     }
     setSelectingQuestId(null);
-  }, [user?.id, available]);
+  }, [user?.id]);
 
   return {
     activeQuest,

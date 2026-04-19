@@ -5,6 +5,7 @@
  */
 
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { createAdminClient } from '@/utils/supabase/admin';
 import {
   getWeekStart,
   getDifficultyFromType,
@@ -65,18 +66,22 @@ export async function updateWeeklyQuestProgress(
     updatePayload.completed_at = new Date().toISOString();
   }
 
-  await supabase
-    .from('weekly_quests')
-    .update(updatePayload)
-    .eq('id', quest.id);
+  // RLS blocks UPDATE for non-service-role clients — must use admin client
+  const admin = createAdminClient();
+  if (admin) {
+    await admin
+      .from('weekly_quests')
+      .update(updatePayload)
+      .eq('id', quest.id);
+  }
 
-  if (completed) {
+  if (completed && admin) {
     const difficulty = getDifficultyFromType(quest.quest_type);
     const weekNum = getWeekNumber(quest.week_start);
     const reward = pickAvatarReward(difficulty, weekNum);
     const partKey = `${reward.category}:${reward.partId}`;
 
-    const { data: profile } = await supabase
+    const { data: profile } = await admin
       .from('profiles')
       .select('premium_avatar_parts')
       .eq('id', userId)
@@ -84,7 +89,7 @@ export async function updateWeeklyQuestProgress(
 
     const existing: string[] = (profile?.premium_avatar_parts as string[]) ?? [];
     if (!existing.includes(partKey)) {
-      await supabase
+      await admin
         .from('profiles')
         .update({ premium_avatar_parts: [...existing, partKey] })
         .eq('id', userId);

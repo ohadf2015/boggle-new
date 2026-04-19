@@ -108,6 +108,12 @@ const AdventureGame = memo<AdventureGameProps>(
       handleForgePick, handleForgeSkip,
     } = useAdventureForgePicker({ hasRunePick });
 
+    // Apply forge timeBonus AFTER forgeEffects is available (can't fold into boostedLevelConfig due to hook order)
+    const finalLevelConfig = useMemo(() => {
+      if (forgeEffects.timeBonus === 0) return boostedLevelConfig;
+      return { ...boostedLevelConfig, timerSeconds: (boostedLevelConfig.timerSeconds ?? 120) + forgeEffects.timeBonus };
+    }, [boostedLevelConfig, forgeEffects.timeBonus]);
+
     const {
       gameState, tiles: tiles2D, tilesVersion, objectives, timeRemaining,
       timerStore,
@@ -119,7 +125,7 @@ const AdventureGame = memo<AdventureGameProps>(
       movesRemaining, currentHP, maxHP,
       huntTargetWord, huntAttempts, huntFound, setHuntTarget, submitHuntGuess,
     } = useAdventureGame({
-      levelConfig: boostedLevelConfig, initialGrid,
+      levelConfig: finalLevelConfig, initialGrid,
       comboDecayMultiplier: init.upgradeEffects.comboDecayMultiplier * init.runeEffects.comboDecay * forgeEffects.comboDecay,
       upgradeConfig: {
         bombTimerInvert: init.upgradeEffects.bombTimerInvert,
@@ -284,7 +290,7 @@ const AdventureGame = memo<AdventureGameProps>(
     const { hasHintsAvailable, getHint, currentHint, clearCurrentHint, recordActivity, showAutoHint, dismissAutoHint, remainingHintWords, findPathForWord, nextHintCost } = useAdventureHints({
       grid: initialGrid, language: language || 'en', foundWords: gameState.wordsFound,
       isPlaying: isPlaying && entryPhase === 'playing' && !isPaused, inactivityThresholdMs: init.adjustedInactivityThresholdMs,
-      maxHintsPerLevel: init.upgradeEffects.hintsPerLevel + init.upgradeEffects.bonusHintsPerLevel,
+      maxHintsPerLevel: init.upgradeEffects.hintsPerLevel + init.upgradeEffects.bonusHintsPerLevel + init.runeEffects.hintBonus + forgeEffects.hintBonus,
       freeHintsPerLevel: init.upgradeEffects.hintsPerLevel,
       onSpendGold: handleSpendGold,
     });
