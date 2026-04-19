@@ -586,6 +586,24 @@ export const trackGameEnd = (
       first_mode_played: mode,
       first_played_at: new Date().toISOString(),
     });
+
+    // Activation funnel: fire first_game_played / first_game_won exactly once
+    // per device, regardless of mode. Dedupe via localStorage so MP's explicit
+    // trackGameCompletion caller stays idempotent.
+    if (typeof window !== 'undefined') {
+      const playedKey = 'lexiclash_first_game_played';
+      const wonKey = 'lexiclash_first_game_won';
+      if (!localStorage.getItem(playedKey)) {
+        localStorage.setItem(playedKey, '1');
+        trackGrowthEvent('first_game_played', { score, wordCount, gameMode: mode });
+        trackGA4Event('funnel_first_game', { mode });
+      }
+      const isWinner = extras.isWinner === true;
+      if (isWinner && !localStorage.getItem(wonKey)) {
+        localStorage.setItem(wonKey, '1');
+        trackGrowthEvent('first_game_won', { score, wordCount, gameMode: mode });
+      }
+    }
   } else if (durationSec !== undefined && durationSec < 15) {
     // Rage-quit: abandoned a game within 15s — strong onboarding-friction signal.
     trackRageQuit({ mode, durationMs: durationSec * 1000, wordsFound: wordCount });

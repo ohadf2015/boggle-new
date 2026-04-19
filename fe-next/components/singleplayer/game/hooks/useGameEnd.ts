@@ -177,13 +177,19 @@ export function useGameEnd({
         language: settings.language,
       };
 
-      // Track game end analytics
+      const maxBotScore = settings.bots.reduce(
+        (max, bot) => Math.max(max, botScoresRef.current[bot.id] || 0),
+        0
+      );
+      const isWinner = finalScore > maxBotScore;
+
       trackGameEnd(
         'singleplayer',
         finalScore,
         validWords.length,
         true,
-        actualGameDuration
+        actualGameDuration,
+        { isWinner }
       );
 
       // Mark training session as complete if in practice mode
