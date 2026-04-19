@@ -170,6 +170,7 @@ const AdventureGame = memo<AdventureGameProps>(
       bossDamageMultiplier: init.upgradeEffects.bossDamageMultiplier,
       blockFirstAttack: init.upgradeEffects.blockFirstAttack,
       scrambleImmunity: init.upgradeEffects.scrambleImmunity,
+      scrambleTiles: shuffleTiles,
     });
 
     const { lastWordTileTypes, resetLastWordTileTypes } = useLastWordTileTypes({ wordsFoundLength: gameState.wordsFound.length, tiles });

@@ -31,6 +31,7 @@ export interface UseAdventureBossOrchestrationProps {
   bossDamageMultiplier?: number;
   blockFirstAttack?: boolean;
   scrambleImmunity?: boolean;
+  scrambleTiles?: () => void;
 }
 
 export function useAdventureBossOrchestration(props: UseAdventureBossOrchestrationProps) {
@@ -39,6 +40,7 @@ export function useAdventureBossOrchestration(props: UseAdventureBossOrchestrati
     timeRemaining: _timeRemaining, isPlaying, startGame, startAIDirector,
     addTime, shake,
     bossDamageMultiplier = 1, blockFirstAttack = false, scrambleImmunity = false,
+    scrambleTiles,
   } = props;
 
   // Boss intro state
@@ -93,6 +95,7 @@ export function useAdventureBossOrchestration(props: UseAdventureBossOrchestrati
     if (attack.type === 'scramble') {
       if (scrambleImmunity) return; // Blast Shield T3
       shake(3);
+      scrambleTiles?.();
     } else if (attack.type === 'lockTiles') {
       shake(2);
     } else if (attack.type === 'damage' && attack.damage) {
@@ -104,7 +107,7 @@ export function useAdventureBossOrchestration(props: UseAdventureBossOrchestrati
       setGridEffectTrigger({ name: attack.gridEffect, id: gridEffectIdRef.current });
       shake(3);
     }
-  }, [shake, playerHealth, bossDamageMultiplier, blockFirstAttack, scrambleImmunity]);
+  }, [shake, playerHealth, bossDamageMultiplier, blockFirstAttack, scrambleImmunity, scrambleTiles]);
 
   // Victory handler
   const handleVictory = useCallback(() => {
@@ -285,8 +288,9 @@ export function useAdventureBossOrchestration(props: UseAdventureBossOrchestrati
     },
     onScramble: () => {
       shake(3);
+      scrambleTiles?.();
     },
-  }), [playerHealth, addTime, shake]);
+  }), [playerHealth, addTime, shake, scrambleTiles]);
 
   return {
     // Boss state

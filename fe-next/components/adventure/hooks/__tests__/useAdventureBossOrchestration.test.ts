@@ -138,6 +138,20 @@ describe('useAdventureBossOrchestration', () => {
       result.current.bossEffectCallbacks.onDamageFlash?.();
       result.current.bossEffectCallbacks.onScramble?.();
     });
+
+    it('should call scrambleTiles when onScramble fires', () => {
+      const mockScrambleTiles = vi.fn();
+      const { result } = renderHook(() =>
+        useAdventureBossOrchestration({ ...defaultProps, scrambleTiles: mockScrambleTiles })
+      );
+
+      act(() => {
+        result.current.bossEffectCallbacks.onScramble?.();
+      });
+
+      expect(mockScrambleTiles).toHaveBeenCalledTimes(1);
+      expect(mockShake).toHaveBeenCalled();
+    });
   });
 
   describe('handleBossIntroStart', () => {
