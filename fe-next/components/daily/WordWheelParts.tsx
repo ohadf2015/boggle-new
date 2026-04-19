@@ -40,7 +40,7 @@ export const WheelLetter: React.FC<WheelLetterProps> = ({
         'border-3 border-neo-black rounded-full transition-colors duration-150',
         isCenter
           ? 'w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 text-2xl sm:text-3xl md:text-4xl z-10'
-          : 'w-10 h-10 sm:w-[52px] sm:h-[52px] md:w-[60px] md:h-[60px] text-base sm:text-lg md:text-xl',
+          : 'w-11 h-11 sm:w-[52px] sm:h-[52px] md:w-[60px] md:h-[60px] text-base sm:text-lg md:text-xl',
         isCenter
           ? isUsed
             ? 'bg-neo-lime/40 text-neo-black/40 shadow-hard-lg'
