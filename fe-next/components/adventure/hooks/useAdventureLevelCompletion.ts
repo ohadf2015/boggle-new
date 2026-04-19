@@ -11,6 +11,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { calculateAdventureXp } from '@/shared/utils/adventureXpUtils';
 import { generateLevelLoot } from '@/lib/adventure/lootGenerator';
+import { trackGameEnd } from '@/utils/growthTracking';
 import type { LootDrop } from '@/types/adventure';
 import type { LevelUpPayload } from '@/components/education/LevelUpCelebration';
 import type { BossTauntEvent } from '@/types/boss';
@@ -364,6 +365,15 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
       if (gameState.wordsFound.length > 0) {
         updateWordAlbumRef.current?.(gameState.wordsFound);
       }
+
+      trackGameEnd(
+        isBossLevel ? 'adventure-boss' : 'adventure',
+        gameState.score,
+        gameState.wordsFound.length,
+        gameState.stars > 0,
+        Math.max(0, Math.floor(timerSeconds - timeRemaining)),
+        { isWinner: gameState.stars > 0, stars: gameState.stars, world: levelConfig.world, level: levelConfig.level }
+      );
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps -- wordsFound via ref (.length sufficient); earnedGoldRef instead of earnedGold state (stale closure)
   }, [gameState.isComplete, gameState.stars, gameState.wordsFound.length, gameState.score, timeRemaining, objectives, levelConfig.world, levelConfig.level, timerSeconds, lootDrops, props.retainedScore]);
