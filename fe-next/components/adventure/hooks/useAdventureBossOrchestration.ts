@@ -58,6 +58,10 @@ export function useAdventureBossOrchestration(props: UseAdventureBossOrchestrati
   // Player health (for boss levels with player damage) — must be before handleAttack
   const playerHealth = usePlayerHealth(isBossLevel ? 100 : 0);
 
+  // Ability-system locked tiles (from onLockTiles callback)
+  const [abilityLockedTiles, setAbilityLockedTiles] = useState<number[]>([]);
+  const abilityLockTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   // Track first attack for blockFirstAttack upgrade
   const firstAttackBlockedRef = useRef(false);
 
@@ -71,6 +75,7 @@ export function useAdventureBossOrchestration(props: UseAdventureBossOrchestrati
     return () => {
       if (vignetteTimeoutRef.current) clearTimeout(vignetteTimeoutRef.current);
       if (fireworksTimeoutRef.current) clearTimeout(fireworksTimeoutRef.current);
+      if (abilityLockTimerRef.current) clearTimeout(abilityLockTimerRef.current);
     };
   }, []);
 
@@ -290,7 +295,17 @@ export function useAdventureBossOrchestration(props: UseAdventureBossOrchestrati
       shake(3);
       scrambleTiles?.();
     },
+    onLockTiles: (indices: number[], durationMs: number) => {
+      setAbilityLockedTiles(indices);
+      if (abilityLockTimerRef.current) clearTimeout(abilityLockTimerRef.current);
+      abilityLockTimerRef.current = setTimeout(() => setAbilityLockedTiles([]), durationMs);
+    },
   }), [playerHealth, addTime, shake, scrambleTiles]);
+
+  const mergedLockedTiles = useMemo(
+    () => [...new Set([...bossLockedTiles, ...abilityLockedTiles])],
+    [bossLockedTiles, abilityLockedTiles]
+  );
 
   return {
     // Boss state
@@ -309,7 +324,7 @@ export function useAdventureBossOrchestration(props: UseAdventureBossOrchestrati
     bossPhase: bossPhaseValue,
     bossCurrentHP: bossHP,
     bossMaxHP,
-    lockedTiles: bossLockedTiles,
+    lockedTiles: mergedLockedTiles,
 
     // Boss mechanic state (for W10 finalWord rotating phase)
     bossMechanicState: bossMechanics.bossState,

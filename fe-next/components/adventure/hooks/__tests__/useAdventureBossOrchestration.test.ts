@@ -215,4 +215,50 @@ describe('useAdventureBossOrchestration', () => {
       );
     });
   });
+
+  describe('onLockTiles (ability-system)', () => {
+    it('bossEffectCallbacks includes onLockTiles', () => {
+      const { result } = renderHook(() => useAdventureBossOrchestration(defaultProps));
+      expect(result.current.bossEffectCallbacks.onLockTiles).toBeInstanceOf(Function);
+    });
+
+    it('onLockTiles merges indices into lockedTiles', () => {
+      vi.useFakeTimers();
+      const { result } = renderHook(() => useAdventureBossOrchestration(defaultProps));
+
+      act(() => {
+        result.current.bossEffectCallbacks.onLockTiles?.([3, 7], 2000);
+      });
+
+      expect(result.current.lockedTiles).toContain(3);
+      expect(result.current.lockedTiles).toContain(7);
+
+      act(() => {
+        vi.advanceTimersByTime(2001);
+      });
+
+      expect(result.current.lockedTiles).not.toContain(3);
+      expect(result.current.lockedTiles).not.toContain(7);
+      vi.useRealTimers();
+    });
+
+    it('state-machine lockedTiles and ability lockedTiles merge without duplicates', () => {
+      mockUseAdventureBossNew.mockReturnValue({
+        ...mockBossReturn,
+        lockedTiles: [0, 3],
+      });
+      vi.useFakeTimers();
+      const { result } = renderHook(() => useAdventureBossOrchestration(defaultProps));
+
+      act(() => {
+        result.current.bossEffectCallbacks.onLockTiles?.([3, 9], 2000);
+      });
+
+      expect(result.current.lockedTiles).toContain(0);
+      expect(result.current.lockedTiles).toContain(3);
+      expect(result.current.lockedTiles).toContain(9);
+      expect(result.current.lockedTiles.filter((i: number) => i === 3).length).toBe(1);
+      vi.useRealTimers();
+    });
+  });
 });
