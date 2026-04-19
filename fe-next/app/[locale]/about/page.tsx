@@ -178,6 +178,7 @@ export default async function AboutPage({ params }: PageProps) {
         const aboutData = aboutSeoContent[locale] ?? aboutSeoContent.en;
         return (
           <GamePageSeoContent
+            asH1
             title={aboutData.title}
             description={aboutData.description}
             features={aboutData.features}

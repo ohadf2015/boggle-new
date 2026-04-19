@@ -695,6 +695,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
       <ResultsMainContent
         {...mainContentProps}
         hideInlineCta={!isBotsOnlyGame}
+        hideDetailsToggle
       />
       {/* Game mode summary after hero banner — hero stays on top */}
       {resolvedGameMode === 'word-hunt' && wordHuntResultsData && (
@@ -826,14 +827,8 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
 
       {/* MOBILE VIEW — single scroll, no tabs */}
       <div className="md:hidden flex flex-col flex-1 min-h-0">
-        {/* Header with pulsing indicator + exit */}
-        <div className="shrink-0 w-full flex items-center justify-between px-2 py-2">
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 bg-neo-cyan rounded-full animate-pulse" />
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/50">
-              {t('results.matchResults') || 'Match Summary'}
-            </span>
-          </div>
+        {/* Exit-only header — podium already renders the 'matchResults' label */}
+        <div className="shrink-0 w-full flex items-center justify-end px-2 py-2">
           <ExitRoomButton onClick={handleExitRoom} label="" className="w-11 h-11 min-w-[44px] min-h-[44px] p-0" />
         </div>
 

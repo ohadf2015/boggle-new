@@ -35,10 +35,6 @@ vi.mock('@/components/results/WordHuntResultsSummary', () => ({
   __esModule: true,
   default: () => null,
 }));
-vi.mock('@/components/results/ComparativeInsights', () => ({
-  __esModule: true,
-  default: () => <div data-testid="comparative-insights" />,
-}));
 vi.mock('@/components/results/WordComparisonGrid', () => ({
   __esModule: true,
   default: () => <div data-testid="word-comparison-grid" />,
@@ -88,7 +84,7 @@ const baseProps = {
   username: 'Alice',
   currentPlayerValidWords: [{ word: 'cat', score: 30 }, { word: 'dog', score: 30 }],
   shareCardStats: { maxCombo: 0, longestWord: 'dog' },
-  otherPlayers: [makePlayer('Bob', 80)],
+  otherPlayers: [{ ...makePlayer('Bob', 80), allWords: [makeWord('cat'), makeWord('fish')] }],
   playerArchetypes: new Map(),
   missedWords: [],
   isHost: false,
@@ -97,19 +93,13 @@ const baseProps = {
 };
 
 describe('ResultsDetailsContent — word comparison wiring', () => {
-  it('renders ComparativeInsights when there are other players', () => {
-    render(<ResultsDetailsContent {...baseProps} />);
-    expect(screen.getByTestId('comparative-insights')).toBeInTheDocument();
-  });
-
   it('renders WordComparisonGrid when there are other players', () => {
     render(<ResultsDetailsContent {...baseProps} />);
     expect(screen.getByTestId('word-comparison-grid')).toBeInTheDocument();
   });
 
-  it('does NOT render comparison components in solo play (no other players)', () => {
+  it('does NOT render WordComparisonGrid in solo play (no other players)', () => {
     render(<ResultsDetailsContent {...baseProps} otherPlayers={[]} />);
-    expect(screen.queryByTestId('comparative-insights')).not.toBeInTheDocument();
     expect(screen.queryByTestId('word-comparison-grid')).not.toBeInTheDocument();
   });
 });

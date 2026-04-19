@@ -3,7 +3,7 @@
 import React, { memo, useMemo, useState } from 'react';
 import { useReducedMotion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Sparkles, Type, Zap, ChevronDown, ChevronUp } from 'lucide-react';
+import { Sparkles, Type, Star, ChevronDown, ChevronUp } from 'lucide-react';
 import type { Player, WordObject } from '@/components/results/types';
 import { assignConsolationCrowns } from '@/utils/consolationCrowns';
 import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
@@ -76,6 +76,8 @@ export interface ResultsMainContentProps {
   missedWords?: Array<{ word: string; score: number; foundBy: string[] }>;
   emojiReactions?: Array<{ id: string; emoji: string; username: string; timestamp: number }>;
   hideInlineCta?: boolean;
+  /** Hide the "show details" toggle (e.g. mobile where details are already inline below) */
+  hideDetailsToggle?: boolean;
   allPlayerWords?: Record<string, WordObject[]>;
   gameDuration?: number;
   /** Callback for podium emoji reactions */
@@ -127,6 +129,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
   coinReward,
   isAuthenticated,
   isCurrentUserWinner,
+  hideDetailsToggle,
 }) {
   const reducedMotion = useReducedMotion();
   const { dir: _dir, language } = useLanguage();
@@ -160,6 +163,19 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
     return assignConsolationCrowns(playersWithStats, topThree);
   }, [sortedScores, podiumPlayers, allPlayerWords]);
 
+  // Count words only current player found (not found by any opponent)
+  const uniqueWordsCount = useMemo(() => {
+    if (!currentPlayerData || !allPlayerWords || !username) return 0;
+    const otherWords = new Set<string>();
+    Object.entries(allPlayerWords).forEach(([uname, words]) => {
+      if (uname === username) return;
+      words.forEach(w => {
+        if (w.validated) otherWords.add(w.word.toLowerCase());
+      });
+    });
+    return currentPlayerValidWords.filter(w => !otherWords.has(w.word.toLowerCase())).length;
+  }, [currentPlayerData, allPlayerWords, currentPlayerValidWords, username]);
+
   // Compute highlights stats
   const highlightStats = useMemo(() => {
     if (!currentPlayerData) return [];
@@ -182,13 +198,13 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
         color: 'text-neo-lime',
       },
       {
-        label: t('results.score') || 'Score',
-        value: currentPlayerData.score.toLocaleString(),
-        icon: <Zap className="w-3 h-3" />,
-        color: 'text-neo-orange',
+        label: t('results.uniqueWords') || 'Only You',
+        value: uniqueWordsCount,
+        icon: <Star className="w-3 h-3" />,
+        color: 'text-neo-cyan',
       },
     ];
-  }, [currentPlayerData, currentPlayerValidWords, t, language]);
+  }, [currentPlayerData, currentPlayerValidWords, uniqueWordsCount, t, language]);
 
   // Word Hunt status for current player
   const wordHuntStatus = useMemo(() => {
@@ -287,8 +303,8 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
         />
       )}
 
-      {/* 6. DETAILS (collapsed by default) */}
-      {currentPlayerData && (
+      {/* 6. DETAILS (collapsed by default — hidden on mobile where details are already inline) */}
+      {currentPlayerData && !hideDetailsToggle && (
         <div>
           <button
             onClick={() => setShowDetails(v => !v)}

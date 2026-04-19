@@ -179,6 +179,7 @@ export default async function AdventurePage({ params }: { params: Promise<{ loca
     <>
       <AdventurePageClient />
       <GamePageSeoContent
+        asH1
         title={content.title}
         description={content.description}
         features={content.features}

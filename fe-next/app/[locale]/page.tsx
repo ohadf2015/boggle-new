@@ -19,7 +19,7 @@ interface PageProps {
 }
 
 const titleMap: Record<string, string> = {
-  en: 'LexiClash – Free Multiplayer Word Game Online | No Download, Play Now',
+  en: 'LexiClash – Free Multiplayer Word Game Online, Play Now',
   he: 'לקסיקלאש – משחק מילים מרובה משתתפים חינם | בוגל אונליין בעברית',
   sv: 'LexiClash – Gratis Ordspel Online Med Vänner | Ingen Nedladdning',
   ja: 'LexiClash – 無料マルチプレイヤーワードゲーム | ブラウザで即プレイ',
@@ -27,7 +27,7 @@ const titleMap: Record<string, string> = {
 };
 
 const descriptionMap: Record<string, string> = {
-  en: 'Play the best free multiplayer word game online — no download, no signup. Real-time word battles with friends like Boggle & Words With Friends combined. Daily word wheel, adventure mode, brain training. 2-20+ players, 5 languages, instant play in your browser.',
+  en: 'Free multiplayer word game — no download, no signup. Real-time Boggle-style battles with friends, daily word wheel, adventure mode, brain drills. 5 languages, instant play in any browser.',
   he: 'משחק מילים מרובה משתתפים חינם בעברית — ללא הורדה! כמו בוגל וסקראבל אבל בזמן אמת עם חברים. אתגר מילים יומי, מצב הרפתקה, אימון מוח. 10,000+ מילים בעברית, מושלם למסיבות וערבי משפחה.',
   sv: 'Spela gratis ordspel online med vänner — ingen nedladdning. Realtids multiplayer-ordstrider som Alfapet och Boggle men snabbare. Dagligt ordhjul, äventyrsläge, hjärnträning. Perfekt för spelkvällar och fester. 5 språk, spela direkt.',
   ja: '友達と無料マルチプレイヤーワードゲームをプレイ — ダウンロード不要。リアルタイムワードバトル、デイリーワードホイール、アドベンチャーモード、脳トレ。ブラウザゲームで即座にプレイ。',
@@ -214,6 +214,7 @@ export default async function HomePage({ params }: PageProps) {
       />
       <HomePageClient initialData={initialData} />
       <GamePageSeoContent
+        asH1
         title={content.title}
         description={content.description}
         features={content.features}

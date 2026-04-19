@@ -181,6 +181,7 @@ export default async function WordOfTheDayPage({ params }: PageProps) {
         const seoData = wotdSeoContent[locale] ?? wotdSeoContent.en;
         return (
           <GamePageSeoContent
+            asH1
             title={seoData.title}
             description={seoData.description}
             features={seoData.features}

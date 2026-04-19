@@ -83,7 +83,7 @@ describe('WordComparisonGrid', () => {
     cats.forEach(c => expect(c).toHaveAttribute('data-unique', 'false'));
   });
 
-  it('marks shared words (found by all players) with data-shared', () => {
+  it('marks shared words (found by multiple players) as non-unique', () => {
     render(
       <WordComparisonGrid
         allPlayerWords={{
@@ -97,7 +97,7 @@ describe('WordComparisonGrid', () => {
     );
     const cats = screen.getAllByText('cat').map(el => el.closest('[data-word]'));
     expect(cats.length).toBe(3);
-    cats.forEach(c => expect(c).toHaveAttribute('data-shared', 'true'));
+    cats.forEach(c => expect(c).toHaveAttribute('data-unique', 'false'));
   });
 
   it('highlights the current player column with data-current="true"', () => {

@@ -57,17 +57,19 @@ export async function calculateAndBroadcastFinalScores(
     string,
     string[]
   ][]) {
-    // Skip bot players — their words shouldn't inflate wordCountMap or strip
-    // uniqueness bonuses from human players
-    if (game.users?.[username]?.isBot) continue;
+    const isBot = game.users?.[username]?.isBot;
     for (const word of words) {
-      wordCountMap[word] = (wordCountMap[word] || 0) + 1;
+      // Only humans affect wordCountMap/submitters — bots must not strip uniqueness bonuses
+      if (!isBot) {
+        wordCountMap[word] = (wordCountMap[word] || 0) + 1;
 
-      if (!wordToSubmitters.has(word)) {
-        wordToSubmitters.set(word, []);
+        if (!wordToSubmitters.has(word)) {
+          wordToSubmitters.set(word, []);
+        }
+        wordToSubmitters.get(word)!.push(username);
       }
-      wordToSubmitters.get(word)!.push(username);
 
+      // All players (including bots) get dictionary validation so their words show up in results
       if (!seenWords.has(word)) {
         seenWords.add(word);
 

@@ -1,10 +1,8 @@
 'use client';
 
 import React from 'react';
-import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
-import { Users, Check } from 'lucide-react';
-import CollapsibleSection from '@/components/ui/CollapsibleSection';
+import { Check } from 'lucide-react';
 import type { PlayerArchetype } from '@/utils/playerArchetypes';
 import type {
   WordObject,
@@ -13,13 +11,8 @@ import type {
   LevelUpData,
 } from '@/components/results/types';
 
-// Dynamic imports for heavy components
-import ComparativeInsights from '@/components/results/ComparativeInsights';
 import WordComparisonGrid from '@/components/results/WordComparisonGrid';
-
-const ResultsPlayerCard = dynamic(() => import('@/components/results/ResultsPlayerCard'), { ssr: false });
-const BlastResultsSummary = dynamic(() => import('@/components/results/BlastResultsSummary'), { ssr: false });
-const WordHuntResultsSummary = dynamic(() => import('@/components/results/WordHuntResultsSummary'), { ssr: false });
+import MissedWords from '@/components/results/MissedWords';
 
 // ==============================================
 // TYPES
@@ -110,130 +103,31 @@ export interface ResultsDetailsContentProps {
  * Used across mobile, desktop, and landscape layouts.
  */
 export const ResultsDetailsContent: React.FC<ResultsDetailsContentProps> = ({
-  sortedScores,
   allPlayerWords,
-  duplicateRuleDisabled,
   username,
-  achievements,
   gameCode,
   otherPlayers,
-  playerArchetypes,
   missedWords,
   isHost,
   t,
-  hideRankAndScore = false,
-  gameMode,
-  blastResults,
-  wordHuntResults,
   isCurrentPlayerReady,
   onMarkReady,
 }) => {
   return (
     <div className="space-y-3">
-      {/* Game-mode specific summary */}
-      {gameMode === 'blast' && blastResults && (
-        <BlastResultsSummary
-          movesUsed={blastResults.movesUsed}
-          tilesCleared={blastResults.tilesCleared}
-          tileBonus={blastResults.tileBonus}
-          playerStats={blastResults.playerStats}
-        />
-      )}
-      {gameMode === 'word-hunt' && wordHuntResults && (
-        <WordHuntResultsSummary
-          targetWord={wordHuntResults.targetWord}
-          foundTarget={wordHuntResults.foundTarget}
-          isFirstFinder={wordHuntResults.isFirstFinder}
-          survivalTime={wordHuntResults.survivalTime}
-          discoveryWords={wordHuntResults.discoveryWords}
-          playerResults={wordHuntResults.playerResults}
-          currentUsername={wordHuntResults.currentUsername}
+      {/* Multiplayer word comparison — who found what, current player's uniques highlighted */}
+      {otherPlayers.length > 0 && (
+        <WordComparisonGrid
+          allPlayerWords={allPlayerWords}
+          currentUsername={username || ''}
+          t={t}
         />
       )}
 
-      {/* Other Players — collapsed by default, compact cards */}
-      {otherPlayers.length > 0 && (
-        <CollapsibleSection
-          title={otherPlayers.length === 1
-            ? `${otherPlayers[0].username} ${t('results.foundWords')}`
-            : (t('results.otherPlayers'))
-          }
-          icon={<Users className="w-4 h-4" />}
-          badge={otherPlayers.length === 1 ? undefined : otherPlayers.length}
-          summary={otherPlayers.slice(0, 3).map(p => p.username).join(', ') + (otherPlayers.length > 3 ? ` +${otherPlayers.length - 3}` : '')}
-          defaultExpanded={hideRankAndScore}
-          variant="tertiary"
-          className="shadow-hard"
-        >
-          <div className="space-y-1.5">
-            {otherPlayers.map((player) => {
-              const originalIndex = sortedScores.findIndex(p => p.username === player.username);
-              return (
-                <ResultsPlayerCard
-                  key={player.username}
-                  player={player}
-                  index={originalIndex}
-                  allPlayerWords={allPlayerWords}
-                  currentUsername={username}
-                  isWinner={originalIndex === 0}
-                  xpGainedData={null}
-                  levelUpData={null}
-                  duplicateRuleDisabled={duplicateRuleDisabled}
-                  archetype={playerArchetypes.get(player.username) || null}
-                  compact
-                />
-              );
-            })}
-          </div>
-        </CollapsibleSection>
+      {/* Words on the board you missed — most conversation-driving data */}
+      {missedWords && missedWords.length > 0 && (
+        <MissedWords missedWords={missedWords} />
       )}
-
-      {/* Multiplayer comparison: high-level insights + per-player word drill-down */}
-      {otherPlayers.length > 0 && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 items-start">
-          <ComparativeInsights
-            allPlayerWords={allPlayerWords}
-            currentUsername={username || ''}
-            t={t}
-          />
-          <WordComparisonGrid
-            allPlayerWords={allPlayerWords}
-            currentUsername={username || ''}
-            t={t}
-          />
-        </div>
-      )}
-
-      {/* Rarest Achievement */}
-      {achievements && achievements.length > 0 && (() => {
-        const rarest = achievements[achievements.length - 1];
-        return (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8, y: 15 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            transition={{ type: 'spring', stiffness: 250, damping: 14, delay: 0.4 }}
-            className="flex items-center gap-3 px-4 py-3 bg-neo-navy border-3 border-neo-black shadow-hard-lg relative overflow-hidden"
-          >
-            <div className="absolute inset-0 pointer-events-none opacity-[0.03] bg-[radial-gradient(circle,#fff_1px,transparent_1px)] bg-size-[6px_6px]" />
-            <motion.span
-              className="text-2xl relative z-10"
-              initial={{ scale: 0, rotate: -180 }}
-              animate={{ scale: [0, 1.3, 1], rotate: [0, -10, 10, 0] }}
-              transition={{ delay: 0.8, duration: 0.6, ease: 'easeOut' }}
-            >
-              {rarest.icon || '🏆'}
-            </motion.span>
-            <div className="flex-1 min-w-0 relative z-10">
-              <span className="text-[10px] font-black uppercase text-neo-cream/40 tracking-[0.2em] block">
-                {t('results.rarestAchievement')}
-              </span>
-              <span className="text-sm font-black text-white truncate block">
-                {rarest.name || rarest.key}
-              </span>
-            </div>
-          </motion.div>
-        );
-      })()}
 
       {/* Sticky Ready chip — lets multiplayer users mark ready without tab-switching */}
       {gameCode && !isHost && onMarkReady && isCurrentPlayerReady === false && (

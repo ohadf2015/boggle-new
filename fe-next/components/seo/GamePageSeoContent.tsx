@@ -11,6 +11,8 @@ interface GamePageSeoContentProps {
   features?: string[];
   faq?: FaqItem[];
   className?: string;
+  /** Render title as h1 when the host page has no visible h1. Default false → h2. */
+  asH1?: boolean;
 }
 
 /**
@@ -24,12 +26,14 @@ export function GamePageSeoContent({
   features,
   faq,
   className,
+  asH1 = false,
 }: GamePageSeoContentProps) {
+  const Title = asH1 ? 'h1' : 'h2';
   return (
     <section
       className={cn('sr-only', className)}
     >
-      <h2>{title}</h2>
+      <Title>{title}</Title>
       <p>{description}</p>
 
       {features && features.length > 0 && (

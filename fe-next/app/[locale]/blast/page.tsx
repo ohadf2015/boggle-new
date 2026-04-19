@@ -176,6 +176,7 @@ export default async function BlastPage({ params }: { params: Promise<{ locale: 
     <>
       <BlastPageClient />
       <GamePageSeoContent
+        asH1
         title={content.title}
         description={content.description}
         features={content.features}

@@ -35,6 +35,33 @@ export default function robots(): MetadataRoute.Robots {
     '/*?gclid=*',
   ];
 
+  // AI crawlers — explicit Allow signals welcome for citation/training.
+  // Same disallow set as default to block share/UTM duplicates.
+  const aiBots = [
+    'GPTBot',
+    'ChatGPT-User',
+    'OAI-SearchBot',
+    'ClaudeBot',
+    'Claude-Web',
+    'anthropic-ai',
+    'PerplexityBot',
+    'Perplexity-User',
+    'Google-Extended',
+    'Googlebot',
+    'Bingbot',
+    'CCBot',
+    'Applebot',
+    'Applebot-Extended',
+    'FacebookBot',
+    'Meta-ExternalAgent',
+    'Bytespider',
+    'Amazonbot',
+    'cohere-ai',
+    'DuckAssistBot',
+    'MistralAI-User',
+    'YouBot',
+  ];
+
   return {
     rules: [
       // AdSense crawler — must be explicitly allowed for ad serving
@@ -47,6 +74,12 @@ export default function robots(): MetadataRoute.Robots {
         userAgent: 'Google-Display-Ads-Bot',
         allow: '/',
       },
+      // Explicit AI/search crawlers — welcome for citation, subject to duplicate-content guards
+      ...aiBots.map((userAgent) => ({
+        userAgent,
+        allow: '/',
+        disallow: disallowPaths,
+      })),
       // Default rule for all other crawlers
       {
         userAgent: '*',
