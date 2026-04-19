@@ -549,7 +549,7 @@ export const trackGameStart = (
   extras: Record<string, unknown> = {}
 ): void => {
   sessionGameCount += 1;
-  trackGrowthEvent('game_started', { ...extras, gameMode: mode });
+  trackGrowthEvent('game_started', { ...extras, mode, gameMode: mode });
   trackSessionDepth(sessionGameCount);
 };
 
@@ -566,6 +566,7 @@ export const trackGameEnd = (
 ): void => {
   trackGrowthEvent(completed ? 'game_completed' : 'game_abandoned', {
     ...extras,
+    mode,
     gameMode: mode,
     score,
     wordCount,

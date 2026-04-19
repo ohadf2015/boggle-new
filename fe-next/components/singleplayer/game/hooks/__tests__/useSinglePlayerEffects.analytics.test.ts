@@ -2,8 +2,9 @@
  * useSinglePlayerEffects — game_started tracking
  *
  * When the SP game view mounts, we must fire `trackGameStart('singleplayer',
- * { mode, boardSize })` so the PostHog funnel records every SP session
- * start keyed by mode (practice/classic/…) and grid dimension.
+ * { subMode, boardSize })` so the PostHog funnel records every SP session
+ * start keyed by sub-variant (practice/classic/solo-bots/…) and grid dim.
+ * `mode` (canonical, top-level) is injected by trackGameStart itself.
  *
  * Fires exactly once per hook instance (mount-only). Must not re-fire on
  * grid changes, mode changes, or re-renders — each SP game is one
@@ -83,7 +84,7 @@ describe('useSinglePlayerEffects — game_started tracking', () => {
 
     expect(trackGameStart).toHaveBeenCalledTimes(1);
     expect(trackGameStart).toHaveBeenCalledWith('singleplayer', {
-      mode: 'practice',
+      subMode: 'practice',
       boardSize: 4,
     });
   });
@@ -92,7 +93,7 @@ describe('useSinglePlayerEffects — game_started tracking', () => {
     renderHook(() => useSinglePlayerEffects(baseOptions({ mode: 'classic', grid: grid5 })));
 
     expect(trackGameStart).toHaveBeenCalledWith('singleplayer', {
-      mode: 'classic',
+      subMode: 'classic',
       boardSize: 5,
     });
   });
@@ -101,7 +102,7 @@ describe('useSinglePlayerEffects — game_started tracking', () => {
     renderHook(() => useSinglePlayerEffects(baseOptions({ mode: 'practice', grid: null })));
 
     expect(trackGameStart).toHaveBeenCalledWith('singleplayer', {
-      mode: 'practice',
+      subMode: 'practice',
       boardSize: 0,
     });
   });

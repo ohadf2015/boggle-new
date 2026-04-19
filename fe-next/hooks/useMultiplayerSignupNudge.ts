@@ -101,6 +101,8 @@ export function useMultiplayerSignupNudge({
       const newCount = prev + 1;
       setMpSessionGames(newCount);
       trackGrowthEvent('game_completed', {
+        mode: 'multiplayer',
+        gameMode: 'multiplayer',
         gameCode: undefined,
         isGuest: true,
         mpSessionGame: newCount,

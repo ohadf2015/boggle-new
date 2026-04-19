@@ -81,7 +81,7 @@ export function useSinglePlayerEffects({
   // Game start time + analytics
   useEffect(() => {
     gameStartTimeRef.current = Date.now();
-    trackGameStart('singleplayer', { mode, boardSize: grid?.length ?? 0 });
+    trackGameStart('singleplayer', { subMode: mode, boardSize: grid?.length ?? 0 });
     // Mount-only — one event per game instance; remount = new game.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

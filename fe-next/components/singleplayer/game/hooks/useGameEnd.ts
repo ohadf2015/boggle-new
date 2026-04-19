@@ -189,7 +189,7 @@ export function useGameEnd({
         validWords.length,
         true,
         actualGameDuration,
-        { isWinner }
+        { isWinner, subMode: settings.mode }
       );
 
       // Mark training session as complete if in practice mode
