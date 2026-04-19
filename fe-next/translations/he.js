@@ -2183,6 +2183,9 @@ const he = {
       "unique": "רק את/ה",
       "shared": "כולם"
     },
+    "uniqueWords": {
+      "title": "המילים הייחודיות שלך"
+    },
     "sessionStats": {
       "title": "נקודות עיקריות מהסשן",
       "improved": "השתפר/ה ב-{percent}% מהסיבוב הראשון!",

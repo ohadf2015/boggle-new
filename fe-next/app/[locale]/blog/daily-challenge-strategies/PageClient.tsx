@@ -7,7 +7,7 @@ import { useTheme } from '@/utils/ThemeContext';
 import { safeToLocaleDateString } from '@/utils/bcp47Locale';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
-import { ArrowLeft, Calendar, Clock, User } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import AutoHideHeader from '@/components/AutoHideHeader';
 import { AdPlaceholder } from '@/components/ads';
@@ -113,33 +113,6 @@ export default function StrategiesPageClient(): React.ReactElement {
               <Clock className="w-4 h-4" />
               {content.readTime}
             </span>
-          </div>
-
-          {/* Author byline card */}
-          <div className={cn(
-            'flex items-center gap-3 p-4 rounded-neo border-3 border-neo-black shadow-hard-sm',
-            isDarkMode ? 'bg-slate-800' : 'bg-white'
-          )}>
-            <div className={cn(
-              'flex items-center justify-center w-10 h-10 rounded-full border-2 border-neo-black',
-              'bg-neo-cyan text-neo-black'
-            )}>
-              <User className="w-5 h-5" />
-            </div>
-            <div>
-              <p className={cn(
-                'font-bold text-sm',
-                isDarkMode ? 'text-white' : 'text-neo-black'
-              )}>
-                {content.authorName}
-              </p>
-              <p className={cn(
-                'text-xs',
-                isDarkMode ? 'text-gray-400' : 'text-gray-500'
-              )}>
-                {content.authorBio}
-              </p>
-            </div>
           </div>
 
           {/* Hero Image */}

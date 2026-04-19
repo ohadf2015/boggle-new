@@ -111,6 +111,12 @@ function registerEarthquakeHandlers(io: Server, socket: Socket): void {
       return;
     }
 
+    // Block earthquake if a round event (blizzard/lightning/meteor) is active
+    if (game.activeRoundEvent) {
+      logger.warn('EARTHQUAKE', `Cannot trigger earthquake - round event '${game.activeRoundEvent}' active in game ${gameCode}`);
+      return;
+    }
+
     // Atomically check and set earthquake flag to prevent race conditions
     // Two hosts might emit triggerEarthquake at the same time
     if (game.earthquakeTriggered) {

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
-import { getMascotImagePath, MASCOT_IMAGES, type MascotVariant } from '@/components/ui/Mascot';
+import { getMascotImagePath, type MascotVariant } from '@/components/ui/Mascot';
 import { getBaseVariant, type ExtendedMascotVariant, type ActivityVariant } from '@/components/ui/mascotUtils';
 
 /**

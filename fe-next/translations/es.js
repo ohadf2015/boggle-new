@@ -2176,6 +2176,9 @@ const es = {
       "unique": "Solo tú",
       "shared": "Todos"
     },
+    "uniqueWords": {
+      "title": "Tus palabras únicas"
+    },
     "sessionStats": {
       "title": "Momentos de la Sesión",
       "improved": "¡Mejoraste {percent}% desde la ronda 1!",

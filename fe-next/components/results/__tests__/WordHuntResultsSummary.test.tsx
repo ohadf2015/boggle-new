@@ -45,9 +45,25 @@ const playerResults = [
 ];
 
 describe('WordHuntResultsSummary', () => {
-  it('should show the target word in the highlights bar', () => {
+  it('should show the target word prominently', () => {
     render(<WordHuntResultsSummary {...baseProps} />);
+    expect(screen.getByTestId('target-word-hero')).toBeInTheDocument();
     expect(screen.getByText('PUZZLE')).toBeInTheDocument();
+  });
+
+  it('should show FOUND badge when target was found', () => {
+    render(<WordHuntResultsSummary {...baseProps} foundTarget={true} isFirstFinder={false} />);
+    expect(screen.getByTestId('target-found-badge')).toBeInTheDocument();
+  });
+
+  it('should show NOT FOUND badge when target was not found', () => {
+    render(<WordHuntResultsSummary {...baseProps} foundTarget={false} />);
+    expect(screen.getByTestId('target-not-found-badge')).toBeInTheDocument();
+  });
+
+  it('should show first finder badge when current user found the target first', () => {
+    render(<WordHuntResultsSummary {...baseProps} foundTarget={true} isFirstFinder={true} />);
+    expect(screen.getByTestId('target-first-finder-badge')).toBeInTheDocument();
   });
 
   it('should show formatted survival time', () => {
@@ -214,9 +230,9 @@ describe('WordHuntResultsSummary', () => {
       expect(screen.queryByText('wordHunt.results.matchSummary')).not.toBeInTheDocument();
     });
 
-    it('should still show highlights bar without player results', () => {
+    it('should still show target word hero without player results', () => {
       render(<WordHuntResultsSummary {...baseProps} />);
-      expect(screen.getByText('PUZZLE')).toBeInTheDocument();
+      expect(screen.getByTestId('target-word-hero')).toBeInTheDocument();
     });
   });
 

@@ -2281,6 +2281,9 @@ const en = {
       "unique": "Only you",
       "shared": "Everyone"
     },
+    "uniqueWords": {
+      "title": "Your Unique Words"
+    },
     "sessionStats": {
       "title": "Session Highlights",
       "improved": "Improved {percent}% from round 1!",

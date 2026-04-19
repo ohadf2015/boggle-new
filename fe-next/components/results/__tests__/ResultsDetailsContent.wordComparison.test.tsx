@@ -1,5 +1,5 @@
 /**
- * Wiring test: ResultsDetailsContent mounts ComparativeInsights + WordComparisonGrid
+ * Wiring test: ResultsDetailsContent mounts UniqueWordsSection
  * in multiplayer results when there are other players.
  */
 
@@ -10,43 +10,15 @@ import type { Player, WordObject } from '../types';
 
 vi.mock('framer-motion', () => ({
   motion: {
-    div: ({ children, ...props }: React.HTMLAttributes<HTMLDivElement> & { children?: React.ReactNode }) => (
-      <div {...props}>{children}</div>
-    ),
-    span: ({ children, ...props }: React.HTMLAttributes<HTMLSpanElement> & { children?: React.ReactNode }) => (
-      <span {...props}>{children}</span>
-    ),
     button: ({ children, ...props }: React.ButtonHTMLAttributes<HTMLButtonElement> & { children?: React.ReactNode }) => (
       <button {...props}>{children}</button>
     ),
   },
 }));
 
-// Mock heavy dynamic children — we only care about the comparison components being mounted
-vi.mock('@/components/results/ResultsPlayerCard', () => ({
+vi.mock('@/components/results/UniqueWordsSection', () => ({
   __esModule: true,
-  default: () => <div data-testid="results-player-card" />,
-}));
-vi.mock('@/components/results/BlastResultsSummary', () => ({
-  __esModule: true,
-  default: () => null,
-}));
-vi.mock('@/components/results/WordHuntResultsSummary', () => ({
-  __esModule: true,
-  default: () => null,
-}));
-vi.mock('@/components/results/WordComparisonGrid', () => ({
-  __esModule: true,
-  default: () => <div data-testid="word-comparison-grid" />,
-}));
-vi.mock('@/components/ui/CollapsibleSection', () => ({
-  __esModule: true,
-  default: ({ children, title }: { children?: React.ReactNode; title?: React.ReactNode }) => (
-    <div data-testid="collapsible-section">
-      <div>{title}</div>
-      {children}
-    </div>
-  ),
+  default: () => <div data-testid="unique-words-section" />,
 }));
 
 import { ResultsDetailsContent } from '../ResultsDetailsContent';
@@ -68,38 +40,26 @@ const makePlayer = (username: string, score: number): Player => ({
 });
 
 const baseProps = {
-  currentPlayerData: makePlayer('Alice', 100),
-  currentPlayerRank: 1,
-  sortedScores: [makePlayer('Alice', 100), makePlayer('Bob', 80)],
-  winner: makePlayer('Alice', 100),
   allPlayerWords: {
     Alice: [makeWord('cat'), makeWord('dog')],
     Bob: [makeWord('cat'), makeWord('fish')],
   },
-  xpGainedData: null,
-  levelUpData: null,
-  currentPlayerArchetype: null,
-  duplicateRuleDisabled: false,
-  isCurrentUserWinner: true,
   username: 'Alice',
-  currentPlayerValidWords: [{ word: 'cat', score: 30 }, { word: 'dog', score: 30 }],
-  shareCardStats: { maxCombo: 0, longestWord: 'dog' },
+  gameCode: 'ABCD',
   otherPlayers: [{ ...makePlayer('Bob', 80), allWords: [makeWord('cat'), makeWord('fish')] }],
-  playerArchetypes: new Map(),
   missedWords: [],
   isHost: false,
-  currentStreakCount: 0,
   t,
 };
 
-describe('ResultsDetailsContent — word comparison wiring', () => {
-  it('renders WordComparisonGrid when there are other players', () => {
+describe('ResultsDetailsContent — unique words wiring', () => {
+  it('renders UniqueWordsSection when there are other players', () => {
     render(<ResultsDetailsContent {...baseProps} />);
-    expect(screen.getByTestId('word-comparison-grid')).toBeInTheDocument();
+    expect(screen.getByTestId('unique-words-section')).toBeInTheDocument();
   });
 
-  it('does NOT render WordComparisonGrid in solo play (no other players)', () => {
+  it('does NOT render UniqueWordsSection in solo play (no other players)', () => {
     render(<ResultsDetailsContent {...baseProps} otherPlayers={[]} />);
-    expect(screen.queryByTestId('word-comparison-grid')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('unique-words-section')).not.toBeInTheDocument();
   });
 });

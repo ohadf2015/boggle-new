@@ -68,6 +68,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
   const timeWarningFiredRef = useRef(false);
   const gameContainerRef = useRef<HTMLDivElement>(null);
   const wheelContainerRef = useRef<HTMLDivElement>(null);
+  const idleSubmitTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // ── Live leaderboard rivals (snapshot on mount) ──
   const [rivals, setRivals] = useState<RivalScore[]>([]);
@@ -141,6 +142,18 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
   const usedIndicesRef = useRef(usedIndices);
   useEffect(() => { builtLettersRef.current = builtLetters; }, [builtLetters]);
   useEffect(() => { usedIndicesRef.current = usedIndices; }, [usedIndices]);
+
+  // Auto-submit after 2s idle when word is long enough
+  useEffect(() => {
+    if (idleSubmitTimerRef.current) { clearTimeout(idleSubmitTimerRef.current); idleSubmitTimerRef.current = null; }
+    if (builtLetters.length >= 3 && !gameOverRef.current) {
+      idleSubmitTimerRef.current = setTimeout(() => {
+        idleSubmitTimerRef.current = null;
+        handleSubmitRef.current();
+      }, 2000);
+    }
+    return () => { if (idleSubmitTimerRef.current) { clearTimeout(idleSubmitTimerRef.current); idleSubmitTimerRef.current = null; } };
+  }, [builtLetters]);
 
   const builtWord = useMemo(
     () => builtLetters.map(bl => bl.letter).join(''),
@@ -278,10 +291,15 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
     tryDragHit(e.clientX, e.clientY);
   }, [tryDragHit]);
   const handlePointerUp = useCallback(() => {
+    const wasEngaged = dragEngagedRef.current;
     draggingRef.current = false;
     lastDragIdxRef.current = null;
     dragStartIdxRef.current = null;
     dragEngagedRef.current = false;
+    if (wasEngaged && builtLettersRef.current.length >= 3) {
+      if (idleSubmitTimerRef.current) { clearTimeout(idleSubmitTimerRef.current); idleSubmitTimerRef.current = null; }
+      handleSubmitRef.current();
+    }
   }, []);
 
   // ── Remove built letter ──

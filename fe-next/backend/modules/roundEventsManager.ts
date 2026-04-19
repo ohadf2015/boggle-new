@@ -121,6 +121,10 @@ export function scheduleRoundEvent(
         clearRoundEventTimers(gameCode);
         return;
       }
+      if (currentGame.earthquakeTriggered || currentGame.fireRoundActive) {
+        clearRoundEventTimers(gameCode);
+        return;
+      }
       executeRoundEvent(io, gameCode, currentGame, eventType as RoundEventType);
     },
     triggerDelayMs

@@ -22,7 +22,7 @@ export interface WordHuntGameLayoutProps {
 
   // Clue boxes
   targetLength: number;
-  currentHint: HintLevel;
+  currentHint: HintLevel | null;
   attempts: TargetAttempt[];
   accumulatedClues: Map<number, AccumulatedClue>;
   knownLetters: Set<string>;

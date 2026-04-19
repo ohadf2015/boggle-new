@@ -120,6 +120,24 @@ describe('roundEventsManager', () => {
       expect(delayMs).toBeLessThanOrEqual(120_000 * 0.75);
     });
 
+    it('does NOT fire if earthquake already triggered', () => {
+      const game = makeGame();
+      scheduleRoundEvent(io, 'ABCD', game, 120);
+      const triggerCallback = mockTimerSet.mock.calls[0][1] as () => void;
+      mockGetGame.mockReturnValueOnce(makeGame({ gameState: 'in-progress', earthquakeTriggered: true }));
+      triggerCallback();
+      expect(mockBroadcastToRoom).not.toHaveBeenCalled();
+    });
+
+    it('does NOT fire if fire round is active', () => {
+      const game = makeGame();
+      scheduleRoundEvent(io, 'ABCD', game, 120);
+      const triggerCallback = mockTimerSet.mock.calls[0][1] as () => void;
+      mockGetGame.mockReturnValueOnce(makeGame({ gameState: 'in-progress', fireRoundActive: true }));
+      triggerCallback();
+      expect(mockBroadcastToRoom).not.toHaveBeenCalled();
+    });
+
     it('does NOT fire the event if game is no longer in-progress', () => {
       const game = makeGame();
       scheduleRoundEvent(io, 'ABCD', game, 120);

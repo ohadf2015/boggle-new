@@ -105,15 +105,6 @@ export default function WordGameHistoryPageClient(): React.ReactElement {
             'flex flex-wrap items-center gap-4 text-sm mb-6',
             isDarkMode ? 'text-gray-400' : 'text-gray-600'
           )}>
-            {/* Author byline for E-E-A-T */}
-            <div className="flex items-start gap-2">
-              <User className="w-4 h-4 mt-0.5 shrink-0" />
-              <div>
-                <span className="font-semibold">{content.authorName}</span>
-                <span className="mx-1">·</span>
-                <span className="italic">{content.authorBio}</span>
-              </div>
-            </div>
             <span className="flex items-center gap-1">
               <Calendar className="w-4 h-4" />
               {safeToLocaleDateString(new Date('2026-01-08'), language, { month: 'long', day: 'numeric', year: 'numeric' })}

@@ -7,7 +7,7 @@ import { useTheme } from '@/utils/ThemeContext';
 import { safeToLocaleDateString } from '@/utils/bcp47Locale';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
-import { ArrowLeft, Calendar, Clock, User } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import AutoHideHeader from '@/components/AutoHideHeader';
 import { AdPlaceholder } from '@/components/ads';
@@ -104,15 +104,6 @@ export default function BenefitsPageClient(): React.ReactElement {
             'flex flex-wrap items-center gap-4 text-sm mb-6',
             isDarkMode ? 'text-gray-400' : 'text-gray-600'
           )}>
-            {/* Author byline for E-E-A-T */}
-            <div className="flex items-start gap-2">
-              <User className="w-4 h-4 mt-0.5 shrink-0" />
-              <div>
-                <span className="font-semibold">{content.authorName}</span>
-                <span className="mx-1">·</span>
-                <span className="italic">{content.authorBio}</span>
-              </div>
-            </div>
             <span className="flex items-center gap-1">
               <Calendar className="w-4 h-4" />
               {safeToLocaleDateString(new Date('2025-06-15'), language, { month: 'long', day: 'numeric', year: 'numeric' })}

@@ -2165,6 +2165,9 @@ const ja = {
       "unique": "あなただけ",
       "shared": "全員"
     },
+    "uniqueWords": {
+      "title": "あなただけの単語"
+    },
     "sessionStats": {
       "title": "セッションハイライト",
       "improved": "ラウンド1から{percent}%向上！",

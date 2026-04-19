@@ -91,6 +91,35 @@ export default function WordHuntResultsSummary({
       animate="show"
       className="space-y-6"
     >
+      {/* Target Word Hero — prominent reveal at the top */}
+      <motion.section
+        variants={variant}
+        data-testid="target-word-hero"
+        className="flex flex-col items-center gap-2 py-5 px-4 bg-neo-pink/10 border-2 border-neo-pink/30 rounded-neo shadow-hard"
+      >
+        <p className="text-[9px] font-black text-neo-pink/60 uppercase tracking-widest">
+          {t('wordHunt.multiplayer.targetWord') || 'Target Word'}
+        </p>
+        <span className="text-5xl font-black uppercase font-neo-display tracking-wider text-neo-pink drop-shadow-[0_2px_0_rgba(0,0,0,0.8)]">
+          {displayTargetWord}
+        </span>
+        {foundTarget ? (
+          isFirstFinder ? (
+            <span data-testid="target-first-finder-badge" className="px-3 py-1 bg-neo-lime text-neo-black text-[10px] font-black uppercase rounded-neo border-2 border-neo-black shadow-hard-sm tracking-wider">
+              {t('wordHunt.multiplayer.firstFinder') || 'YOU FOUND IT!'}
+            </span>
+          ) : (
+            <span data-testid="target-found-badge" className="px-3 py-1 bg-neo-lime/20 text-neo-lime text-[10px] font-black uppercase rounded-neo border border-neo-lime/30 tracking-wider">
+              {t('wordHunt.multiplayer.found') || 'FOUND'}
+            </span>
+          )
+        ) : (
+          <span data-testid="target-not-found-badge" className="px-3 py-1 bg-neo-red/20 text-neo-red text-[10px] font-black uppercase rounded-neo border border-neo-red/30 tracking-wider">
+            {t('wordHunt.multiplayer.notFound') || 'NOT FOUND'}
+          </span>
+        )}
+      </motion.section>
+
       {/* Elimination History — eliminated players with order and word counts */}
       {eliminated && eliminated.length > 0 && (
         <motion.section variants={variant} className="space-y-3">
@@ -181,7 +210,7 @@ export default function WordHuntResultsSummary({
         </motion.section>
       )}
 
-      {/* Highlights Bar — Survival, Words, Best Word */}
+      {/* Highlights Bar — Survival, Words */}
       <motion.section
         variants={variant}
         className="flex justify-between items-center py-4 px-4 sm:px-6 bg-neo-gray/20 rounded-neo-lg border border-white/5"
@@ -199,15 +228,6 @@ export default function WordHuntResultsSummary({
           </p>
           <span className="text-sm font-black text-neo-lime tabular-nums">
             <ScoreCountUp to={currentValidWords || discoveryWords} duration={800} delay={reducedMotion ? 0 : 200} />
-          </span>
-        </div>
-        <div className="w-px h-6 bg-white/10 shrink-0" />
-        <div className="text-center flex-1">
-          <p className="text-[8px] font-black text-white/40 uppercase tracking-widest mb-1">
-            {t('wordHunt.multiplayer.targetWord') || 'Target'}
-          </p>
-          <span className="text-sm font-black text-neo-pink uppercase font-neo-display">
-            {displayTargetWord}
           </span>
         </div>
       </motion.section>

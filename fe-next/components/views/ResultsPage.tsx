@@ -508,6 +508,11 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     return generateRandomTable(difficultyConfig.rows, difficultyConfig.cols, roomLanguage, []);
   }, [roomLanguage]);
 
+  const startGameTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => () => {
+    if (startGameTimeoutRef.current) clearTimeout(startGameTimeoutRef.current);
+  }, []);
+
   // Handle host starting a new game directly from results page
   // Must reset game state first (like handleStartNewGame in useHostGameActions)
   const handleStartGame = useCallback(() => {
@@ -516,7 +521,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
 
     // Timeout guard: if resetGame callback never fires (socket issue), recover
     let callbackFired = false;
-    const timeout = setTimeout(() => {
+    startGameTimeoutRef.current = setTimeout(() => {
       if (!callbackFired) {
         logger.debug('[RESULTS] resetGame callback timed out — attempting startGame anyway');
         socket.emit('startGame', {
@@ -536,7 +541,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     // Pass gameCode as fallback for mobile reconnects where socket mapping may be stale
     socket.emit('resetGame', { gameCode }, (response: { success: boolean; error?: string; gameState?: string }) => {
       callbackFired = true;
-      clearTimeout(timeout);
+      if (startGameTimeoutRef.current) clearTimeout(startGameTimeoutRef.current);
       if (response?.success) {
         logger.log('[RESULTS] Game reset confirmed, starting new game');
 
@@ -739,42 +744,13 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
 
   // Shared props for details content component
   const detailsContentProps = {
-    currentPlayerData: currentPlayerData ?? null,
-    currentPlayerRank,
-    sortedScores,
-    winner: winner ?? null,
     allPlayerWords,
-    xpGainedData: xpGainedData ?? null,
-    levelUpData: levelUpData ?? null,
-    currentPlayerArchetype: currentPlayerArchetype ?? null,
-    duplicateRuleDisabled: duplicateRuleDisabled ?? false,
-    isCurrentUserWinner,
     username,
-    currentPlayerValidWords,
-    achievements,
     gameCode,
-    shareCardStats: {
-      maxCombo: shareCardStats.maxCombo ?? 0,
-      longestWord: shareCardStats.longestWord ?? '',
-    },
     otherPlayers,
-    playerArchetypes,
     missedWords,
     isHost,
-    currentStreakCount: winStreakData?.currentStreak || 0,
     t,
-    gameMode: resolvedGameMode,
-    ...(resolvedGameMode === 'blast' ? {
-      blastResults: {
-        movesUsed: blastMovesUsed,
-        tilesCleared: blastTotalTilesCleared,
-        tileBonus: blastTotalTileBonus,
-        playerStats: blastPlayerStats,
-      },
-    } : {}),
-    ...(resolvedGameMode === 'word-hunt' && wordHuntResultsData ? {
-      wordHuntResults: wordHuntResultsData,
-    } : {}),
     isCurrentPlayerReady,
     onMarkReady: handleMarkReady,
   };

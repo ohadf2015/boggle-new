@@ -9,6 +9,7 @@ import { ArrowLeft, Clock, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import AutoHideHeader from '@/components/AutoHideHeader';
 import { AdPlaceholder } from '@/components/ads';
+import { AuthorBioCard } from '@/components/blog/AuthorBioCard';
 import { contentByLocale } from './content';
 
 export default function BlastStrategyPageClient(): React.ReactElement {
@@ -68,7 +69,7 @@ export default function BlastStrategyPageClient(): React.ReactElement {
           )}>
             <span className="flex items-center gap-1">
               <User className="w-4 h-4" />
-              {content.authorName}
+              Ohad Fisher
             </span>
             <span className="flex items-center gap-1">
               <Clock className="w-4 h-4" />
@@ -191,28 +192,7 @@ export default function BlastStrategyPageClient(): React.ReactElement {
             </div>
           </section>
 
-          {/* Author Bio */}
-          <div className={cn(
-            'mt-10 p-4 rounded-neo border-3 border-neo-black',
-            isDarkMode ? 'bg-slate-800' : 'bg-neo-cream'
-          )}>
-            <div className="flex items-start gap-3">
-              <div className={cn(
-                'w-10 h-10 rounded-full border-2 border-neo-black flex items-center justify-center shrink-0',
-                'bg-neo-orange text-neo-black font-bold text-lg'
-              )}>
-                {content.authorName.charAt(0)}
-              </div>
-              <div>
-                <p className={cn('font-bold text-sm', isDarkMode ? 'text-white' : 'text-neo-black')}>
-                  {content.authorName}
-                </p>
-                <p className={cn('text-xs mt-1', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>
-                  {content.authorBio}
-                </p>
-              </div>
-            </div>
-          </div>
+          <AuthorBioCard />
 
           <AdPlaceholder zone="content-page" className="my-6" />
 

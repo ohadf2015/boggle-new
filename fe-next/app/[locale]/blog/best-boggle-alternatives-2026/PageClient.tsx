@@ -141,15 +141,6 @@ export default function BoggleAlternativesPageClient(): React.ReactElement {
             'flex flex-wrap items-center gap-4 text-sm mb-6',
             isDarkMode ? 'text-gray-400' : 'text-gray-600'
           )}>
-            {/* Author byline for E-E-A-T */}
-            <div className="flex items-start gap-2">
-              <User className="w-4 h-4 mt-0.5 shrink-0" />
-              <div>
-                <span className="font-semibold">{content.authorName}</span>
-                <span className="mx-1">·</span>
-                <span className="italic">{content.authorBio}</span>
-              </div>
-            </div>
             <span className="flex items-center gap-1">
               <Calendar className="w-4 h-4" />
               {safeToLocaleDateString(new Date('2025-12-01'), language, { month: 'long', day: 'numeric', year: 'numeric' })}
@@ -290,28 +281,6 @@ export default function BoggleAlternativesPageClient(): React.ReactElement {
               )}
             </div>
           ))}
-
-          <div className={cn(
-            'mt-10 p-4 rounded-neo border-3 border-neo-black',
-            isDarkMode ? 'bg-slate-800' : 'bg-neo-cream'
-          )}>
-            <div className="flex items-start gap-3">
-              <div className={cn(
-                'w-10 h-10 rounded-full border-2 border-neo-black flex items-center justify-center shrink-0',
-                'bg-neo-pink text-white font-bold text-lg'
-              )}>
-                {content.authorName.charAt(0)}
-              </div>
-              <div>
-                <p className={cn('font-bold text-sm', isDarkMode ? 'text-white' : 'text-neo-black')}>
-                  {content.authorName}
-                </p>
-                <p className={cn('text-xs mt-1', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>
-                  {content.authorBio}
-                </p>
-              </div>
-            </div>
-          </div>
 
           <AdPlaceholder zone="content-page" className="my-6" />
 

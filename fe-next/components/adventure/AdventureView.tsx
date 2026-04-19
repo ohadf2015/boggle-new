@@ -46,6 +46,7 @@ import { forgeRune as forgeRuneLogic, equipRune as equipRuneLogic, unequipRune a
 
 const AdventureGame = dynamic(() => import('./AdventureGame'), { ssr: false, loading: () => <div className="h-screen bg-neo-navy flex items-center justify-center"><Loader2 className="w-12 h-12 text-neo-yellow animate-spin" /></div> });
 const AdventureWheelGame = dynamic(() => import('./AdventureWheelGame'), { ssr: false, loading: () => <div className="h-screen bg-neo-navy flex items-center justify-center"><Loader2 className="w-12 h-12 text-neo-yellow animate-spin" /></div> });
+const AdventureHuntGame = dynamic(() => import('./AdventureHuntGame'), { ssr: false, loading: () => <div className="h-screen bg-neo-navy flex items-center justify-center"><Loader2 className="w-12 h-12 text-neo-yellow animate-spin" /></div> });
 const AuthModal = dynamic(() => import('@/components/auth/AuthModal'), { ssr: false });
 
 
@@ -512,6 +513,8 @@ function AdventureView(): React.JSX.Element {
               <AdventureGameErrorBoundary onExit={handleGameExit}>
                 {levelConfig.archetype === 'wheel' ? (
                   <AdventureWheelGame levelConfig={levelConfig} onLevelComplete={handleLevelComplete} onExit={handleGameExit} />
+                ) : levelConfig.archetype === 'hunt' ? (
+                  <AdventureHuntGame levelConfig={levelConfig} initialGrid={gameGrid} onLevelComplete={handleLevelComplete} onExit={handleGameExit} />
                 ) : (
                   <AdventureGame levelConfig={levelConfig} initialGrid={gameGrid} onLevelComplete={handleLevelComplete} onExit={handleGameExit} totalStars={totalStars} onNextWorld={navigateToWorldMap} />
                 )}

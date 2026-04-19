@@ -2178,6 +2178,9 @@ const sv = {
       "unique": "Bara du",
       "shared": "Alla"
     },
+    "uniqueWords": {
+      "title": "Dina unika ord"
+    },
     "sessionStats": {
       "title": "Sessionhöjdpunkter",
       "improved": "Förbättrade {percent}% från omgång 1!",
