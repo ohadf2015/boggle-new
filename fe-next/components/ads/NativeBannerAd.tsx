@@ -1,22 +1,26 @@
 'use client';
 
 import { useEffect } from 'react';
+import { Capacitor } from '@capacitor/core';
 import { useAdMob } from '@/hooks/useAdMob';
 
 /**
  * Shows an AdMob banner ad on native (Capacitor) platforms.
- * Renders nothing on web. Automatically shows on mount and hides on unmount.
+ * Renders a spacer div on native so the OS-layer overlay doesn't cover content.
+ * Returns null on web. Automatically shows on mount and hides on unmount.
  */
 export function NativeBannerAd() {
   const { showBanner, hideBanner } = useAdMob();
+  const isNative = Capacitor.isNativePlatform();
 
   useEffect(() => {
     showBanner();
     return () => { hideBanner(); };
   }, [showBanner, hideBanner]);
 
-  // Native banner is rendered by the OS overlay — no DOM element needed
-  return null;
+  if (!isNative) return null;
+
+  return <div style={{ height: 60 }} aria-hidden="true" />;
 }
 
 export default NativeBannerAd;
