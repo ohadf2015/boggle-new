@@ -76,7 +76,7 @@ describe('useSafeArea', () => {
     });
   });
 
-  it('should handle errors gracefully', async () => {
+  it('should handle errors gracefully with silent fallback', async () => {
     mockIsNative.mockReturnValue(true);
     mockSafeArea.getSafeAreaInsets.mockRejectedValue(new Error('Plugin error'));
     mockSafeArea.addListener.mockResolvedValue({ remove: vi.fn() });
@@ -85,10 +85,11 @@ describe('useSafeArea', () => {
 
     const { result } = renderHook(() => useSafeArea());
 
-    // Should return zero insets on error
-    await waitFor(() => {
-      expect(consoleSpy).toHaveBeenCalledWith('Failed to get safe area insets:', expect.any(Error));
-    });
+    // Let the rejected promise settle
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    // Silent fallback — no console.warn (avoids Sentry noise)
+    expect(consoleSpy).not.toHaveBeenCalled();
 
     expect(result.current).toEqual({
       top: 0,
