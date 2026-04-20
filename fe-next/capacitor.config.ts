@@ -44,6 +44,13 @@ const config: CapacitorConfig = {
     PushNotifications: {
       presentationOptions: ['badge', 'sound', 'alert'],
     },
+    AdMob: {
+      appId: {
+        ios: process.env.ADMOB_APP_ID_IOS ?? 'ca-app-pub-3940256099942544~1458002511',
+        android: process.env.ADMOB_APP_ID_ANDROID ?? 'ca-app-pub-3940256099942544~3347511713',
+      },
+      initializeForTesting: process.env.NODE_ENV !== 'production',
+    },
   },
 
   ios: {
