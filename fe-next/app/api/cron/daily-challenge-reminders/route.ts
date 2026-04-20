@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
     cronSecret !== expectedSecret &&
     cronSecret !== `Bearer ${expectedSecret}`
   ) {
-    logger.warn('[Push Cron] Unauthorized request attempted');
+    logger.debug('[Push Cron] Unauthorized request attempted');
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 

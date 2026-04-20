@@ -89,38 +89,38 @@ function registerEarthquakeHandlers(io: Server, socket: Socket): void {
 
     const game = getGame(gameCode);
     if (!game) {
-      logger.warn('EARTHQUAKE', `Game ${gameCode} not found`);
+      logger.debug('EARTHQUAKE', `Game ${gameCode} not found`);
       return;
     }
 
     // Verify socket is the host
     if (game.hostSocketId !== socket.id) {
-      logger.warn('EARTHQUAKE', `Non-host ${socket.id} tried to trigger earthquake in game ${gameCode}`);
+      logger.debug('EARTHQUAKE', `Non-host ${socket.id} tried to trigger earthquake in game ${gameCode}`);
       return;
     }
 
     // Verify game is in progress
     if (game.gameState !== 'in-progress') {
-      logger.warn('EARTHQUAKE', `Cannot trigger earthquake - game ${gameCode} not in progress (state: ${game.gameState})`);
+      logger.debug('EARTHQUAKE', `Cannot trigger earthquake - game ${gameCode} not in progress (state: ${game.gameState})`);
       return;
     }
 
     // Earthquake only applies to classic mode
     if (game.gameMode && game.gameMode !== 'classic') {
-      logger.warn('EARTHQUAKE', `Cannot trigger earthquake in ${game.gameMode} mode for game ${gameCode}`);
+      logger.debug('EARTHQUAKE', `Cannot trigger earthquake in ${game.gameMode} mode for game ${gameCode}`);
       return;
     }
 
     // Block earthquake if a round event (blizzard/lightning/meteor) is active
     if (game.activeRoundEvent) {
-      logger.warn('EARTHQUAKE', `Cannot trigger earthquake - round event '${game.activeRoundEvent}' active in game ${gameCode}`);
+      logger.debug('EARTHQUAKE', `Cannot trigger earthquake - round event '${game.activeRoundEvent}' active in game ${gameCode}`);
       return;
     }
 
     // Atomically check and set earthquake flag to prevent race conditions
     // Two hosts might emit triggerEarthquake at the same time
     if (game.earthquakeTriggered) {
-      logger.warn('EARTHQUAKE', `Earthquake already triggered for game ${gameCode}, ignoring duplicate`);
+      logger.debug('EARTHQUAKE', `Earthquake already triggered for game ${gameCode}, ignoring duplicate`);
       return;
     }
 

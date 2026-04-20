@@ -63,9 +63,8 @@ export function useSafeArea(): SafeAreaInsets {
         setInsets(fetchedInsets);
         updateCSSProperties(fetchedInsets);
       })
-      .catch((error) => {
-        console.warn('Failed to get safe area insets:', error);
-        // Keep default zero insets
+      .catch(() => {
+        // Plugin unavailable — keep default zero insets (expected when capacitor-plugin-safe-area not registered)
       });
 
     // Listen for changes (e.g., orientation change)
@@ -74,8 +73,8 @@ export function useSafeArea(): SafeAreaInsets {
       updateCSSProperties(newInsets);
     })).then((handle) => {
       listenerHandle = handle;
-    }).catch((error) => {
-      console.warn('Failed to register safe area listener:', error);
+    }).catch(() => {
+      // Listener unavailable — safe to ignore
     });
 
     return () => {
