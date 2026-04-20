@@ -6,7 +6,7 @@ export function useAdMob() {
   const { recordGameEnd, shouldShowInterstitial, hasNoAds, getConfig } = useAdMobContext();
   const isDev = process.env.NODE_ENV !== 'production';
 
-  const showRewarded = useCallback(async (onReward: () => void) => {
+  const showRewarded = useCallback(async (onReward: () => void, onError?: (err: string) => void) => {
     if (hasNoAds()) return;
     const config = getConfig();
     if (!config) return;
@@ -14,7 +14,10 @@ export function useAdMob() {
       await AdMob.prepareRewardVideoAd({ adId: config.rewardedAdId });
       await AdMob.showRewardVideoAd();
       onReward();
-    } catch {}
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Ad failed';
+      onError?.(msg);
+    }
   }, [hasNoAds, getConfig]);
 
   const showInterstitial = useCallback(async () => {

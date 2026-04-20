@@ -249,9 +249,10 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
       // Priority 1.5: AdMob SDK for native Capacitor apps
       setStatus('showing');
       onAdStarted?.();
-      adMob.showRewarded(() => {
-        awardCoinsAndNotify();
-      });
+      adMob.showRewarded(
+        () => { awardCoinsAndNotify(); },
+        (errMsg) => { handleAdError(errMsg || 'Ad dismissed without reward'); },
+      );
     } else if (shouldUseAdSense) {
       // Priority 1.5: AdSense for Games rewarded ads
       setStatus('showing');

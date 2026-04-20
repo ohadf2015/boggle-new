@@ -54,6 +54,19 @@ describe('useAdMob', () => {
     expect(onReward).toHaveBeenCalledTimes(1);
   });
 
+  it('showRewarded calls onError when AdMob throws', async () => {
+    vi.mocked(AdMob.showRewardVideoAd).mockRejectedValueOnce(new Error('dismissed'));
+    const wrapper = makeWrapper(true);
+    const { result } = renderHook(() => useAdMob(), { wrapper });
+    const onReward = vi.fn();
+    const onError = vi.fn();
+    await act(async () => {
+      await result.current.showRewarded(onReward, onError);
+    });
+    expect(onReward).not.toHaveBeenCalled();
+    expect(onError).toHaveBeenCalledWith('dismissed');
+  });
+
   it('showRewarded is no-op on web (getConfig returns null)', async () => {
     const wrapper = makeWrapper(false);
     const { result } = renderHook(() => useAdMob(), { wrapper });
