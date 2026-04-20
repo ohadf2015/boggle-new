@@ -3,7 +3,7 @@
  * Tests for game event → push notification wiring
  */
 
-import { vi, type Mock, type MockInstance } from 'vitest';
+import { vi } from 'vitest';
 import {
   notifyFriendRequest,
   notifyFriendAccepted,
@@ -123,23 +123,30 @@ describe('pushNotificationTriggers', () => {
     });
   });
 
-  describe('policy: in_app_only (self-generated / low-value)', () => {
-    it('notifyAchievement saves in-app row but does NOT push', async () => {
+  describe('policy: milestone events push + save in-app (re-engagement)', () => {
+    it('notifyAchievement pushes AND saves in-app row', async () => {
       await notifyAchievement('uid', 'Word Wizard');
-      expect(mockSendToUser).not.toHaveBeenCalled();
+      expect(mockSendToUser).toHaveBeenCalledWith('uid', expect.objectContaining({
+        title: 'Achievement Unlocked!',
+        body: 'You earned: Word Wizard',
+      }));
       expect(mockInsert).toHaveBeenCalledWith(
         expect.objectContaining({ user_id: 'uid', notification_type: 'achievement' })
       );
     });
 
-    it('notifyLevelUp saves in-app row but does NOT push', async () => {
+    it('notifyLevelUp pushes AND saves in-app row', async () => {
       await notifyLevelUp('uid', 7);
-      expect(mockSendToUser).not.toHaveBeenCalled();
+      expect(mockSendToUser).toHaveBeenCalledWith('uid', expect.objectContaining({
+        title: 'Level 7!',
+      }));
       expect(mockInsert).toHaveBeenCalledWith(
         expect.objectContaining({ user_id: 'uid', notification_type: 'achievement' })
       );
     });
+  });
 
+  describe('policy: in_app_only (negative UX on lock screen)', () => {
     it('notifyChallengeDeclined saves in-app row but does NOT push', async () => {
       await notifyChallengeDeclined('uid', 'Maya');
       expect(mockSendToUser).not.toHaveBeenCalled();

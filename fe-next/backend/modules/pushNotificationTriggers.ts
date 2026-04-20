@@ -187,7 +187,7 @@ export async function notifyAchievement(
       type: 'achievement',
       deepLink: '/adventure/achievements',
     },
-  }, 'in_app_only');
+  }, 'both');
 }
 
 /**
@@ -312,5 +312,5 @@ export async function notifyLevelUp(
       type: 'level_up',
       deepLink: '/adventure',
     },
-  }, 'in_app_only');
+  }, 'both');
 }

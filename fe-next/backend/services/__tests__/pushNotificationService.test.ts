@@ -23,6 +23,30 @@ const VALID_APP_ROUTES = [
 const INVALID_ROUTES = ['/gifts'];
 
 describe('pushNotificationService', () => {
+  describe('projectId resolution (FCM send path)', () => {
+    it('sendToToken must resolve projectId from GOOGLE_CREDENTIALS_JSON when FCM_PROJECT_ID is unset', () => {
+      // GIVEN: Source of pushNotificationService
+      const fs = require('fs');
+      const path = require('path');
+      const serviceFilePath = path.join(__dirname, '..', 'pushNotificationService.ts');
+      const serviceContent = fs.readFileSync(serviceFilePath, 'utf-8');
+
+      // WHEN: We inspect the sendToToken function body
+      const sendFnMatch = serviceContent.match(
+        /async function sendToToken\([\s\S]*?\n\}\n/
+      );
+      expect(sendFnMatch).not.toBeNull();
+      const sendBody = sendFnMatch![0];
+
+      // THEN: sendToToken must NOT read FCM_PROJECT_ID directly without fallback.
+      // Either it receives projectId as a parameter, or it calls a shared resolver.
+      // The raw `process.env.FCM_PROJECT_ID` read with no GOOGLE_CREDENTIALS_JSON
+      // fallback is the bug — assert it's gone.
+      const rawEnvRead = /const\s+projectId\s*=\s*process\.env\.FCM_PROJECT_ID\s*;/;
+      expect(sendBody).not.toMatch(rawEnvRead);
+    });
+  });
+
   describe('gift notification action URL', () => {
     it('should use a valid action_url that does not lead to 404', async () => {
       // GIVEN: We read the pushNotificationService source

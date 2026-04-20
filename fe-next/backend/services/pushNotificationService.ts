@@ -77,16 +77,21 @@ interface TokenRecord {
 // ==================== FCM Authentication ====================
 
 let cachedAccessToken: string | null = null;
+let cachedProjectId: string | null = null;
 let tokenExpiresAt: number = 0;
 
+interface FCMAuth {
+  accessToken: string;
+  projectId: string;
+}
+
 /**
- * Get FCM access token using service account credentials
- * Uses Google OAuth2 JWT flow
+ * Get FCM access token + projectId using service account credentials.
+ * Returns both so send URL and auth share one resolution path.
  */
-async function getFCMAccessToken(): Promise<string | null> {
-  // Return cached token if still valid (with 5 min buffer)
-  if (cachedAccessToken && Date.now() < tokenExpiresAt - 300000) {
-    return cachedAccessToken;
+async function getFCMAccessToken(): Promise<FCMAuth | null> {
+  if (cachedAccessToken && cachedProjectId && Date.now() < tokenExpiresAt - 300000) {
+    return { accessToken: cachedAccessToken, projectId: cachedProjectId };
   }
 
   let projectId = process.env.FCM_PROJECT_ID;
@@ -156,10 +161,11 @@ async function getFCMAccessToken(): Promise<string | null> {
 
     const data = await response.json() as { access_token: string; expires_in: number };
     cachedAccessToken = data.access_token;
+    cachedProjectId = projectId;
     tokenExpiresAt = Date.now() + (data.expires_in * 1000);
 
     logger.debug('PUSH_SERVICE', 'FCM access token obtained');
-    return cachedAccessToken;
+    return { accessToken: cachedAccessToken, projectId };
   } catch (error) {
     const err = error as Error;
     logger.error('PUSH_SERVICE', `FCM auth error: ${err.message}`);
@@ -175,12 +181,9 @@ async function getFCMAccessToken(): Promise<string | null> {
 async function sendToToken(
   token: string,
   notification: NotificationPayload,
-  accessToken: string
+  auth: FCMAuth
 ): Promise<{ success: boolean; error?: string }> {
-  const projectId = process.env.FCM_PROJECT_ID;
-  if (!projectId) {
-    return { success: false, error: 'FCM not configured' };
-  }
+  const { accessToken, projectId } = auth;
 
   const message: FCMMessage = {
     message: {
@@ -299,9 +302,9 @@ export async function sendToUsers(
 
   logger.info('PUSH_SERVICE', `Created ${insertedNotifications.length} notification records`);
 
-  // Get FCM access token
-  const accessToken = await getFCMAccessToken();
-  if (!accessToken) {
+  // Get FCM access token + projectId
+  const auth = await getFCMAccessToken();
+  if (!auth) {
     logger.warn('PUSH_SERVICE', 'FCM not available - notifications saved but push not sent');
     return result;
   }
@@ -329,7 +332,7 @@ export async function sendToUsers(
   const invalidTokenIds: string[] = [];
 
   for (const tokenRecord of tokens as TokenRecord[]) {
-    const sendResult = await sendToToken(tokenRecord.token, notification, accessToken);
+    const sendResult = await sendToToken(tokenRecord.token, notification, auth);
 
     if (sendResult.success) {
       result.sent++;
