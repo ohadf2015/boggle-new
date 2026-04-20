@@ -114,3 +114,19 @@ export const hasPendingRoomInvite = (): boolean => {
   if (typeof window === 'undefined') return false;
   return !!sessionStorage.getItem(PENDING_ROOM_KEY);
 };
+
+/**
+ * Check if a Supabase auth session exists in localStorage.
+ * Supabase stores sessions under keys matching sb-<projectRef>-auth-token.
+ * Used to skip FTUE for users with a real auth account on a cleared device.
+ */
+export const hasSupabaseSession = (): boolean => {
+  if (typeof window === 'undefined') return false;
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key && key.startsWith('sb-') && key.endsWith('-auth-token')) {
+      return !!localStorage.getItem(key);
+    }
+  }
+  return false;
+};

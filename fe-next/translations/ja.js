@@ -1737,6 +1737,13 @@ const ja = {
       "yourTurn": "あなたの番！スペル：",
       "letterCount": "{current}/{total}"
     },
+    "returningUser": {
+      "title": "おかえりなさい！",
+      "subtitle": "サインインして続きから始めるか、新しく始めましょう。",
+      "haveAccount": "アカウントを持っています",
+      "newHere": "初めてです",
+      "skip": "今はスキップ"
+    },
     "name": {
       "placeholder": "名前を入力",
       "errorInvalid": "文字、数字、スペースのみ",
@@ -4329,8 +4336,8 @@ const ja = {
       "vaultSubtitle": "コインを貯めて報酬を解除"
     },
     "playingNow": "プレイ中",
-    "welcomeTitle": "準備OK？",
-    "welcomeSubtitle": "チャレンジを選ぼう！",
+    "welcomeTitle": "言葉。ライバル。栄光。",
+    "welcomeSubtitle": "無料。登録不要。広告なし。",
     "singlePlayer": "クイックプレイ",
     "singlePlayerDesc": "すぐにプレイ開始",
     "badgeBots": "ボット",
@@ -4340,6 +4347,10 @@ const ja = {
     "multiPlayer": "マルチプレイヤー",
     "multiplayer": "マルチプレイヤー",
     "multiplayerDesc": "リアルタイムで友達と対戦！",
+    "sectionMultiplayerTitle": "みんなでプレイ",
+    "sectionMultiplayerSubtitle": "ライブバトル＆レース",
+    "sectionSoloTitle": "ソロプレイ",
+    "sectionSoloSubtitle": "スキルを磨こう",
     "arena": "マルチプレイヤー",
     "arenaDesc": "ソロでもフレンドとでも！",
     "quickPlay": "クイックプレイ",
@@ -4352,6 +4363,8 @@ const ja = {
     "adventureModeDesc": "10の世界で100レベル",
     "blastMode": "ブラストモード",
     "blastModeDesc": "ボードをクリアしよう！",
+    "wordChainMode": "ワードチェーン",
+    "wordChainModeDesc": "1つの言葉で2つの言葉をつなごう",
     "wordForgeMode": "ワードフォージ",
     "wordForgeModeDesc": "ローグライク単語ゲーム",
     "wordForgeModeBadge": "NEW",

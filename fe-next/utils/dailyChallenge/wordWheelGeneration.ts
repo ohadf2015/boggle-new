@@ -10,6 +10,7 @@ import type { Language } from '@/types';
 import { SEED_SALT } from './constants';
 import { mulberry32, hashString } from './prng';
 import { getDailyChallengeDate, getPuzzleNumber } from './dateUtils';
+import { normalizeHebrewLetter } from '@/shared/utils/wordNormalization';
 
 // ==========================================
 // Word Wheel Puzzle Types
@@ -77,14 +78,17 @@ const NINE_LETTER_SOURCES: Record<Language, string[]> = {
  * Extract unique letters from a source word.
  * For languages like Japanese, characters are treated individually.
  */
-function getUniqueLetters(word: string): string[] {
+function getUniqueLetters(word: string, language?: Language): string[] {
   const seen = new Set<string>();
   const unique: string[] = [];
   for (const char of word) {
     const upper = char.toUpperCase();
-    if (upper === ' ' || seen.has(upper)) continue;
-    seen.add(upper);
-    unique.push(upper);
+    if (upper === ' ') continue;
+    // Normalize Hebrew final forms (sofit) so tiles show regular letter forms
+    const normalized = language === 'he' ? normalizeHebrewLetter(upper) : upper;
+    if (seen.has(normalized)) continue;
+    seen.add(normalized);
+    unique.push(normalized);
   }
   return unique;
 }
@@ -111,7 +115,7 @@ export function generateWordWheelPuzzle(
   const sourceWord = sources[sourceIndex];
 
   // Extract unique letters (take first 7 if more)
-  let letters = getUniqueLetters(sourceWord);
+  let letters = getUniqueLetters(sourceWord, language);
   if (letters.length > 7) letters = letters.slice(0, 7);
 
   // If fewer than 7 unique letters, pad with common letters

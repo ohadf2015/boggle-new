@@ -41,20 +41,27 @@ const WRONG_BURST: ParticleConfig = {
 };
 
 function EffectsLayer({ width, height }: { width: number; height: number }) {
-  const { particles } = useGameEngine();
+  const { particles, flash, shake } = useGameEngine();
   const cx = width / 2;
   const cy = height / 2;
 
   useEffect(() => {
-    const handleCorrect = () => particles.burst(CORRECT_BURST, cx, cy);
-    const handleWrong = () => particles.burst(WRONG_BURST, cx, cy);
+    const handleCorrect = () => {
+      particles.burst(CORRECT_BURST, cx, cy);
+      flash.white();
+    };
+    const handleWrong = () => {
+      particles.burst(WRONG_BURST, cx, cy);
+      flash.danger();
+      shake.light();
+    };
     window.addEventListener('connections:correct', handleCorrect);
     window.addEventListener('connections:wrong', handleWrong);
     return () => {
       window.removeEventListener('connections:correct', handleCorrect);
       window.removeEventListener('connections:wrong', handleWrong);
     };
-  }, [particles, cx, cy]);
+  }, [particles, flash, shake, cx, cy]);
 
   return null;
 }

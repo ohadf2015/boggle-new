@@ -56,6 +56,22 @@ vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, language: 'en', dir: 'ltr' }),
 }));
 
+vi.mock('@/contexts/AuthContext', () => ({
+  useAuth: () => ({ isAuthenticated: false, user: null }),
+}));
+
+vi.mock('@/components/auth/AuthModal', () => ({
+  __esModule: true,
+  default: () => null,
+}));
+
+vi.mock('../ReturningUserStep', () => ({
+  __esModule: true,
+  default: ({ onNew }: any) => (
+    <button data-testid="new-btn" onClick={onNew}>new</button>
+  ),
+}));
+
 vi.mock('../LanguageSelect', () => ({
   __esModule: true,
   default: ({ onSelect }: any) => (
@@ -120,6 +136,8 @@ describe('OnboardingFlow analytics', () => {
     mockConsumePendingRoom.mockReturnValue(null);
   });
 
+  const goNew = () => fireEvent.click(screen.getByTestId('new-btn'));
+
   it('fires onboarding_started once on mount', () => {
     render(<OnboardingFlow onComplete={vi.fn()} />);
     expect(trackOnboardingStart).toHaveBeenCalledTimes(1);
@@ -127,12 +145,14 @@ describe('OnboardingFlow analytics', () => {
 
   it('fires step=language on language select', () => {
     render(<OnboardingFlow onComplete={vi.fn()} />);
+    goNew();
     fireEvent.click(screen.getByTestId('lang-btn'));
     expect(trackOnboardingStep).toHaveBeenCalledWith('language');
   });
 
   it('fires step=tutorial with score/wordCount on tutorial complete', () => {
     render(<OnboardingFlow onComplete={vi.fn()} />);
+    goNew();
     fireEvent.click(screen.getByTestId('lang-btn'));
     fireEvent.click(screen.getByTestId('tut-btn'));
     expect(trackOnboardingStep).toHaveBeenCalledWith('tutorial', {
@@ -143,6 +163,7 @@ describe('OnboardingFlow analytics', () => {
 
   it('fires step=profile with hasPendingInvite=false', () => {
     render(<OnboardingFlow onComplete={vi.fn()} />);
+    goNew();
     fireEvent.click(screen.getByTestId('lang-btn'));
     fireEvent.click(screen.getByTestId('tut-btn'));
     fireEvent.click(screen.getByTestId('profile-btn'));
@@ -155,6 +176,7 @@ describe('OnboardingFlow analytics', () => {
     mockHasPendingRoom.mockReturnValue(true);
     mockConsumePendingRoom.mockReturnValue('ABC123');
     render(<OnboardingFlow onComplete={vi.fn()} />);
+    goNew();
     fireEvent.click(screen.getByTestId('lang-btn'));
     fireEvent.click(screen.getByTestId('tut-btn'));
     fireEvent.click(screen.getByTestId('profile-btn'));
@@ -165,6 +187,7 @@ describe('OnboardingFlow analytics', () => {
 
   it('fires step=score_reveal action=continue on Continue', () => {
     render(<OnboardingFlow onComplete={vi.fn()} />);
+    goNew();
     fireEvent.click(screen.getByTestId('lang-btn'));
     fireEvent.click(screen.getByTestId('tut-btn'));
     fireEvent.click(screen.getByTestId('profile-btn'));
@@ -176,6 +199,7 @@ describe('OnboardingFlow analytics', () => {
 
   it('fires step=score_reveal action=retry on Try Again (friction signal)', () => {
     render(<OnboardingFlow onComplete={vi.fn()} />);
+    goNew();
     fireEvent.click(screen.getByTestId('lang-btn'));
     fireEvent.click(screen.getByTestId('tut-btn'));
     fireEvent.click(screen.getByTestId('profile-btn'));
@@ -187,6 +211,7 @@ describe('OnboardingFlow analytics', () => {
 
   it('fires step=mode_select with mode param', () => {
     render(<OnboardingFlow onComplete={vi.fn()} />);
+    goNew();
     fireEvent.click(screen.getByTestId('lang-btn'));
     fireEvent.click(screen.getByTestId('tut-btn'));
     fireEvent.click(screen.getByTestId('profile-btn'));

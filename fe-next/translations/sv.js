@@ -1752,6 +1752,13 @@ const sv = {
       "yourTurn": "Din tur! Stava:",
       "letterCount": "{current}/{total}"
     },
+    "returningUser": {
+      "title": "Välkommen tillbaka!",
+      "subtitle": "Logga in för att fortsätta där du slutade, eller börja om.",
+      "haveAccount": "Jag har ett konto",
+      "newHere": "Jag är ny här",
+      "skip": "Hoppa över tills vidare"
+    },
     "name": {
       "placeholder": "Ange ditt namn",
       "errorInvalid": "Endast bokstäver, siffror och mellanslag",
@@ -4351,8 +4358,8 @@ const sv = {
       "vaultSubtitle": "Samla mynt, lås upp belöningar"
     },
     "playingNow": "Spelar Nu",
-    "welcomeTitle": "Redo att spela?",
-    "welcomeSubtitle": "Välj din utmaning!",
+    "welcomeTitle": "Ord. Rivaler. Ära.",
+    "welcomeSubtitle": "Gratis. Ingen registrering. Inga annonser.",
     "singlePlayer": "Snabbspel",
     "singlePlayerDesc": "Hoppa in och spela direkt",
     "badgeBots": "Bottar",
@@ -4362,6 +4369,10 @@ const sv = {
     "multiPlayer": "Flerspelarläge",
     "multiplayer": "Flerspelarläge",
     "multiplayerDesc": "Tävla med vänner i realtid!",
+    "sectionMultiplayerTitle": "Spela med andra",
+    "sectionMultiplayerSubtitle": "Liveduell & tävlingar",
+    "sectionSoloTitle": "Spela ensam",
+    "sectionSoloSubtitle": "Slipa dina färdigheter",
     "arena": "Multiplayer",
     "arenaDesc": "Spela ensam eller utmana vänner!",
     "quickPlay": "Snabbspel",
@@ -4374,6 +4385,8 @@ const sv = {
     "adventureModeDesc": "100 nivåer i 10 världar",
     "blastMode": "Blast-läge",
     "blastModeDesc": "Rensa brädet!",
+    "wordChainMode": "Ordkedja",
+    "wordChainModeDesc": "Länka två ord med ett ord",
     "wordForgeMode": "Ordsmedjan",
     "wordForgeModeDesc": "Roguelike-ordspel",
     "wordForgeModeBadge": "NYTT",

@@ -3744,6 +3744,13 @@ const es = {
       "yourTurn": "¡Tu turno! Deletrea:",
       "letterCount": "{current}/{total}"
     },
+    "returningUser": {
+      "title": "¡Bienvenido de vuelta!",
+      "subtitle": "Inicia sesión para continuar donde lo dejaste, o empieza de nuevo.",
+      "haveAccount": "Tengo una cuenta",
+      "newHere": "Soy nuevo aquí",
+      "skip": "Omitir por ahora"
+    },
     "name": {
       "placeholder": "Ingresa tu nombre",
       "errorInvalid": "Solo letras, números y espacios",
@@ -4375,8 +4382,8 @@ const es = {
       "vaultSubtitle": "Acumula monedas, desbloquea recompensas"
     },
     "playingNow": "jugando",
-    "welcomeTitle": "¿Listos para jugar?",
-    "welcomeSubtitle": "¡Elige tu desafío!",
+    "welcomeTitle": "Palabras. Rivales. Gloria.",
+    "welcomeSubtitle": "Gratis. Sin registro. Sin anuncios.",
     "singlePlayer": "Juego Rápido",
     "singlePlayerDesc": "¡Salta y juega al instante!",
     "badgeBots": "Bots",
@@ -4386,6 +4393,10 @@ const es = {
     "multiPlayer": "Multijugador",
     "multiplayer": "Multijugador",
     "multiplayerDesc": "¡Compite con amigos en tiempo real!",
+    "sectionMultiplayerTitle": "Juega con otros",
+    "sectionMultiplayerSubtitle": "Batallas y carreras en vivo",
+    "sectionSoloTitle": "Juega solo",
+    "sectionSoloSubtitle": "Afila tus habilidades",
     "arena": "Multijugador",
     "arenaDesc": "¡Juega solo o desafía amigos!",
     "quickPlay": "Juego Rápido",
@@ -4398,6 +4409,8 @@ const es = {
     "adventureModeDesc": "100 niveles en 10 mundos",
     "blastMode": "Modo Blast",
     "blastModeDesc": "¡Limpia el tablero!",
+    "wordChainMode": "Cadena de Palabras",
+    "wordChainModeDesc": "Conecta dos palabras con una",
     "wordForgeMode": "Forja de Palabras",
     "wordForgeModeDesc": "Juego de palabras roguelike",
     "wordForgeModeBadge": "NUEVO",

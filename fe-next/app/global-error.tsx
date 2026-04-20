@@ -1,10 +1,7 @@
 "use client";
 
-export const dynamic = 'force-dynamic';
-
 import { useEffect } from "react";
 import { Sparkles, RefreshCw } from "lucide-react";
-import { getCachedTranslation } from "@/translations/loadTranslation";
 import type { Language } from "@/types";
 
 function isChunkLoadError(error: Error): boolean {
@@ -73,23 +70,7 @@ export default function GlobalError({
   })();
   const isRTL = detectedLocale === 'he';
 
-  // Use cached translations if available (from LanguageContext's dynamic loader),
-  // fall back to hardcoded strings. This avoids importing all 1.26MB of translations.
   const t = (path: string): string => {
-    try {
-      const cached = getCachedTranslation(detectedLocale) || getCachedTranslation('en');
-      if (cached) {
-        const keys = path.split(".");
-        let current: unknown = cached;
-        for (const key of keys) {
-          current = (current as Record<string, unknown>)[key];
-          if (current === undefined) break;
-        }
-        if (typeof current === 'string') return current;
-      }
-    } catch { /* fall through to hardcoded */ }
-
-    // Hardcoded fallbacks for when translations aren't cached
     const fallbacks: Record<string, Record<string, string>> = {
       en: {
         'errors.somethingWentWrong': 'Something Went Wrong',

@@ -19,10 +19,13 @@ export interface GameState {
   streak: number;
   lives: number;
   wrongAttempts: number;
-  status: 'playing' | 'correct' | 'wrong' | 'hint' | 'finished';
+  status: 'playing' | 'correct' | 'wrong' | 'hint' | 'gaveUp' | 'finished';
   input: string;
   completedIds: Set<string>;
+  ratedIds: Set<string>;
 }
+
+export type PuzzleRating = 'like' | 'dislike';
 
 export interface GuessResult {
   correct: boolean;

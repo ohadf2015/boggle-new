@@ -44,20 +44,32 @@ const baseProps = {
   dailyChallengeStats: { hasPlayed: false, hasSolved: null, currentStreak: 0, puzzleNumber: 1, loading: false },
 };
 
-describe('LandingChallengeCards reordering', () => {
-  it('renders daily then arena first by default (newcomer)', () => {
+describe('LandingChallengeCards reordering (MP/SP split)', () => {
+  it('renders daily banner as hero, arena in MP section, practice/blast/adventure in SP section', () => {
     render(<LandingChallengeCards {...baseProps} />);
-    // Daily banner first (pinned), then practice (newcomer, no quickPlay), arena, blast, adventure
     expect(screen.getByTestId('daily-banner')).toBeInTheDocument();
-    const cards = screen.getAllByTestId('mode-card');
-    // Newcomers see practice instead of quickPlay
-    expect(cards[0]).toHaveTextContent('landing.arena');
-    expect(cards[1]).toHaveTextContent('landing.practice');
-    expect(cards[2]).toHaveTextContent('landing.blastMode');
-    expect(cards[3]).toHaveTextContent('landing.adventureMode');
+    const mpSection = screen.getByTestId('landing-section-mp');
+    const spSection = screen.getByTestId('landing-section-sp');
+    expect(mpSection).toHaveTextContent('landing.arena');
+    expect(mpSection).not.toHaveTextContent('landing.practice');
+    expect(spSection).toHaveTextContent('landing.practice');
+    expect(spSection).toHaveTextContent('landing.blastMode');
+    expect(spSection).toHaveTextContent('landing.adventureMode');
   });
 
-  it('pins daily+arena first, keeps blast above adventure regardless of popularity', () => {
+  it('renders MP section before SP section in DOM (discovery hierarchy)', () => {
+    render(<LandingChallengeCards {...baseProps} />);
+    const cards = screen.getAllByTestId('mode-card');
+    // Arena (MP) comes before any SP card
+    expect(cards[0]).toHaveTextContent('landing.arena');
+    // Remaining are SP
+    const spTexts = cards.slice(1).map((c) => c.textContent);
+    expect(spTexts).toEqual(
+      expect.arrayContaining(['landing.practice', 'landing.blastMode', 'landing.adventureMode'])
+    );
+  });
+
+  it('keeps blast above adventure inside SP section regardless of popularity', () => {
     const stats: GameModeStats[] = [
       { mode: 'adventure', playCount: 500 },
       { mode: 'daily', playCount: 300 },
@@ -65,18 +77,16 @@ describe('LandingChallengeCards reordering', () => {
       { mode: 'arena', playCount: 100 },
       { mode: 'blast', playCount: 50 },
     ];
-    // Pre-compute order server-side (like production does)
     const cardOrder = getCardOrder(stats);
     render(<LandingChallengeCards {...baseProps} cardOrder={cardOrder} />);
     const cards = screen.getAllByTestId('mode-card');
-    // Newcomer: no quickPlay. Daily (banner), then arena pinned, blast before adventure.
-    expect(cards[0]).toHaveTextContent('landing.arena');
-    expect(cards[1]).toHaveTextContent('landing.blastMode');
-    expect(cards[2]).toHaveTextContent('landing.adventureMode');
-    expect(cards[3]).toHaveTextContent('landing.practice');
+    const blastIdx = cards.findIndex((c) => c.textContent?.includes('landing.blastMode'));
+    const adventureIdx = cards.findIndex((c) => c.textContent?.includes('landing.adventureMode'));
+    expect(blastIdx).toBeGreaterThanOrEqual(0);
+    expect(adventureIdx).toBeGreaterThan(blastIdx);
   });
 
-  it('shows blast in regular order when most popular', () => {
+  it('renders blast when most popular (still inside SP section)', () => {
     const stats: GameModeStats[] = [
       { mode: 'blast', playCount: 9999 },
       { mode: 'practice', playCount: 10 },
@@ -86,9 +96,10 @@ describe('LandingChallengeCards reordering', () => {
     ];
     const cardOrder = getCardOrder(stats);
     render(<LandingChallengeCards {...baseProps} cardOrder={cardOrder} />);
-    const cards = screen.getAllByTestId('mode-card');
-    // Newcomer: no quickPlay. Daily pinned (banner), arena pinned, then blast leads rest.
-    expect(cards[0]).toHaveTextContent('landing.arena');
-    expect(cards[1]).toHaveTextContent('landing.blastMode');
+    const spSection = screen.getByTestId('landing-section-sp');
+    expect(spSection).toHaveTextContent('landing.blastMode');
+    // arena (MP) stays in MP section even though practice/blast/arena stats vary
+    const mpSection = screen.getByTestId('landing-section-mp');
+    expect(mpSection).toHaveTextContent('landing.arena');
   });
 });

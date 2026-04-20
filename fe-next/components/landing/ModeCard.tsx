@@ -124,51 +124,51 @@ const ModeCard: React.FC<ModeCardProps> = ({
 
   const variantStyles = {
     cyan: {
-      bg: 'bg-linear-to-br from-neo-cyan via-cyan-400 to-neo-cyan-dark',
-      hoverBg: 'hover:from-neo-cyan-light hover:via-neo-cyan hover:to-neo-cyan-dark',
-      iconBg: 'bg-neo-navy',
-      iconText: 'text-neo-cyan-light',
-      arrow: 'bg-neo-navy text-neo-cyan',
+      bg: 'bg-linear-to-br from-neo-navy via-neo-navy to-neo-cyan/25',
+      hoverBg: 'hover:to-neo-cyan/40',
+      iconBg: 'bg-neo-cyan',
+      iconText: 'text-neo-navy',
+      arrow: 'bg-neo-cyan text-neo-navy',
       glowColor: 'rgba(0, 255, 255, 0.4)',
     },
     pink: {
-      bg: 'bg-linear-to-br from-neo-pink via-pink-400 to-neo-pink-dark',
-      hoverBg: 'hover:from-neo-pink-light hover:via-neo-pink hover:to-neo-pink-dark',
-      iconBg: 'bg-neo-navy',
-      iconText: 'text-neo-pink-light',
-      arrow: 'bg-neo-navy text-neo-pink',
+      bg: 'bg-linear-to-br from-neo-navy via-neo-navy to-neo-pink/25',
+      hoverBg: 'hover:to-neo-pink/40',
+      iconBg: 'bg-neo-pink',
+      iconText: 'text-neo-navy',
+      arrow: 'bg-neo-pink text-neo-navy',
       glowColor: 'rgba(255, 20, 147, 0.4)',
     },
     purple: {
-      bg: 'bg-linear-to-br from-neo-purple via-purple-400 to-neo-purple-dark',
-      hoverBg: 'hover:from-neo-purple-light hover:via-neo-purple hover:to-neo-purple-dark',
-      iconBg: 'bg-neo-navy',
-      iconText: 'text-neo-purple-light',
-      arrow: 'bg-neo-navy text-neo-purple',
+      bg: 'bg-linear-to-br from-neo-navy via-neo-navy to-neo-purple/25',
+      hoverBg: 'hover:to-neo-purple/40',
+      iconBg: 'bg-neo-purple',
+      iconText: 'text-neo-white',
+      arrow: 'bg-neo-purple text-neo-white',
       glowColor: 'rgba(139, 92, 246, 0.4)',
     },
     orange: {
-      bg: 'bg-linear-to-br from-neo-orange via-amber-500 to-amber-600',
-      hoverBg: 'hover:from-amber-400 hover:via-neo-orange hover:to-amber-600',
-      iconBg: 'bg-neo-navy',
-      iconText: 'text-amber-400',
-      arrow: 'bg-neo-navy text-neo-orange',
+      bg: 'bg-linear-to-br from-neo-navy via-neo-navy to-neo-orange/25',
+      hoverBg: 'hover:to-neo-orange/40',
+      iconBg: 'bg-neo-orange',
+      iconText: 'text-neo-navy',
+      arrow: 'bg-neo-orange text-neo-navy',
       glowColor: 'rgba(255, 107, 53, 0.4)',
     },
     lime: {
-      bg: 'bg-linear-to-br from-neo-lime via-lime-400 to-neo-lime-dark',
-      hoverBg: 'hover:from-neo-lime-light hover:via-neo-lime hover:to-neo-lime-dark',
-      iconBg: 'bg-neo-navy',
-      iconText: 'text-neo-lime-light',
-      arrow: 'bg-neo-navy text-neo-lime',
+      bg: 'bg-linear-to-br from-neo-navy via-neo-navy to-neo-lime/25',
+      hoverBg: 'hover:to-neo-lime/40',
+      iconBg: 'bg-neo-lime',
+      iconText: 'text-neo-navy',
+      arrow: 'bg-neo-lime text-neo-navy',
       glowColor: 'rgba(163, 230, 53, 0.4)',
     },
     blue: {
-      bg: 'bg-linear-to-br from-blue-400 via-blue-500 to-blue-700',
-      hoverBg: 'hover:from-blue-300 hover:via-blue-400 hover:to-blue-700',
-      iconBg: 'bg-neo-navy',
-      iconText: 'text-blue-300',
-      arrow: 'bg-neo-navy text-blue-400',
+      bg: 'bg-linear-to-br from-neo-navy via-neo-navy to-blue-500/25',
+      hoverBg: 'hover:to-blue-500/40',
+      iconBg: 'bg-blue-500',
+      iconText: 'text-neo-white',
+      arrow: 'bg-blue-500 text-neo-white',
       glowColor: 'rgba(59, 130, 246, 0.4)',
     },
   };
@@ -325,8 +325,8 @@ const ModeCard: React.FC<ModeCardProps> = ({
         {/* Title */}
         <h2
           className={cn(
-            'font-black uppercase tracking-tight flex-1 min-w-0 drop-shadow-lg',
-            locked ? 'text-neo-white' : 'text-neo-black',
+            'font-black uppercase tracking-tight flex-1 min-w-0',
+            'text-neo-white',
             secondary && 'text-sm sm:text-base'
           )}
           style={secondary ? undefined : {
@@ -370,8 +370,8 @@ const ModeCard: React.FC<ModeCardProps> = ({
       {!secondary && (
         <p
           className={cn(
-            'font-medium drop-shadow-md',
-            locked ? 'text-neo-white' : 'text-neo-black'
+            'font-medium',
+            'text-neo-white/80'
           )}
           style={{
             fontSize: 'clamp(0.75rem, 3cqw, 1.125rem)',
@@ -387,7 +387,7 @@ const ModeCard: React.FC<ModeCardProps> = ({
         <div className="flex flex-wrap" style={{ gap: 'clamp(0.375rem, 1.5cqw, 0.5rem)', marginBottom: 'clamp(0.25rem, 1cqw, 0.5rem)' }}>
           {duration && (
             <span
-              className="inline-flex items-center bg-neo-navy/20 text-neo-black font-bold rounded-neo border-2 border-neo-black/30"
+              className="inline-flex items-center bg-neo-white/10 text-neo-white font-bold rounded-neo border-2 border-neo-white/20"
               style={{
                 gap: 'clamp(0.25rem, 1cqw, 0.375rem)',
                 padding: 'clamp(0.125rem, 0.5cqw, 0.25rem) clamp(0.375rem, 1.5cqw, 0.5rem)',
@@ -400,7 +400,7 @@ const ModeCard: React.FC<ModeCardProps> = ({
           )}
           {difficulty && difficultyLabel && (
             <span
-              className="inline-flex items-center bg-neo-navy/20 text-neo-black font-bold rounded-neo border-2 border-neo-black/30"
+              className="inline-flex items-center bg-neo-white/10 text-neo-white font-bold rounded-neo border-2 border-neo-white/20"
               style={{
                 gap: 'clamp(0.25rem, 1cqw, 0.375rem)',
                 padding: 'clamp(0.125rem, 0.5cqw, 0.25rem) clamp(0.375rem, 1.5cqw, 0.5rem)',

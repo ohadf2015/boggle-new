@@ -4,7 +4,8 @@ import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { markOnboardingComplete, consumePendingRoomInvite, hasPendingRoomInvite } from '@/utils/onboardingStorage';
+import { useAuth } from '@/contexts/AuthContext';
+import { markOnboardingComplete, markOnboardingSkipped, consumePendingRoomInvite, hasPendingRoomInvite } from '@/utils/onboardingStorage';
 import { markGuidanceShown } from '@/utils/contextualGuidanceStorage';
 import { setStoredCustomAvatar } from '@/utils/profileStorage';
 import {
@@ -18,13 +19,16 @@ import QuickProfileSetup from './QuickProfileSetup';
 import ScoreReveal from './ScoreReveal';
 import ModeFork from './ModeFork';
 import OnboardingProgress from './OnboardingProgress';
+import ReturningUserStep from './ReturningUserStep';
+import AuthModal from '@/components/auth/AuthModal';
 
-type FlowStep = 'language' | 'tutorial' | 'profile' | 'scoreReveal' | 'fork';
+type FlowStep = 'returningUser' | 'language' | 'tutorial' | 'profile' | 'scoreReveal' | 'fork';
 
-const STEPS: FlowStep[] = ['language', 'tutorial', 'profile', 'scoreReveal', 'fork'];
+const STEPS: FlowStep[] = ['returningUser', 'language', 'tutorial', 'profile', 'scoreReveal', 'fork'];
 
 /** Step-specific accent colors for the floating background shapes */
 const STEP_ACCENTS: Record<FlowStep, { color1: string; color2: string }> = {
+  returningUser: { color1: 'rgba(191,255,0,0.07)', color2: 'rgba(139,92,246,0.06)' },
   language: { color1: 'rgba(191,255,0,0.07)', color2: 'rgba(0,255,255,0.05)' },
   tutorial: { color1: 'rgba(0,255,255,0.06)', color2: 'rgba(191,255,0,0.04)' },
   profile: { color1: 'rgba(255,20,147,0.06)', color2: 'rgba(191,255,0,0.04)' },
@@ -46,9 +50,11 @@ const DEFAULT_AVERAGE_SCORE = 62;
  */
 const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
   const { language, dir, t } = useLanguage();
+  const { isAuthenticated } = useAuth();
   const router = useRouter();
 
-  const [step, setStep] = useState<FlowStep>('language');
+  const [step, setStep] = useState<FlowStep>('returningUser');
+  const [showAuthModal, setShowAuthModal] = useState(false);
   const [tutorialScore, setTutorialScore] = useState(0);
   const [, setTutorialWords] = useState<string[]>([]);
   const [tutorialAttempt, setTutorialAttempt] = useState(1);
@@ -62,6 +68,28 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
   useEffect(() => {
     trackOnboardingStart();
   }, []);
+
+  // When user signs in during the returningUser step, skip FTUE entirely
+  useEffect(() => {
+    if (isAuthenticated && step === 'returningUser') {
+      markOnboardingComplete({ avatarId: 'custom', displayName: '', selectedMode: null });
+      onComplete();
+    }
+  }, [isAuthenticated, step, onComplete]);
+
+  const handleHaveAccount = useCallback(() => {
+    setShowAuthModal(true);
+  }, []);
+
+  const handleNewUser = useCallback(() => {
+    trackOnboardingStep('language');
+    setStep('language');
+  }, []);
+
+  const handleSkipOnboarding = useCallback(() => {
+    markOnboardingSkipped();
+    onComplete();
+  }, [onComplete]);
 
   const stepIndex = useMemo(() => STEPS.indexOf(step), [step]);
   const accent = STEP_ACCENTS[step];
@@ -165,6 +193,14 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
 
   const renderStep = () => {
     switch (step) {
+      case 'returningUser':
+        return (
+          <ReturningUserStep
+            onHaveAccount={handleHaveAccount}
+            onNew={handleNewUser}
+            onSkip={handleSkipOnboarding}
+          />
+        );
       case 'language':
         return <LanguageSelect onSelect={handleLanguageSelect} />;
       case 'tutorial':
@@ -280,6 +316,12 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        initialMode="signin"
+      />
     </div>
   );
 };

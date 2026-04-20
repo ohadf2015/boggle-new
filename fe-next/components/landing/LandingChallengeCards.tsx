@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Swords, BookOpen, Map, Bomb, Zap } from 'lucide-react';
+import { Swords, BookOpen, Map, Bomb, Zap, Link2 } from 'lucide-react';
 import ModeCard from './ModeCard';
 import DailyChallengeBanner from '@/components/daily/DailyChallengeBanner';
 import { shouldShowGuidance } from '@/utils/contextualGuidanceStorage';
@@ -9,6 +9,7 @@ import { hasCompletedOnboarding } from '@/utils/onboardingStorage';
 import { isNewPlayer } from '@/utils/multiplayerProgressStorage';
 import { trackModeSelected } from '@/utils/growthTracking';
 import { useIsPracticeVeteran } from '@/hooks/useIsPracticeVeteran';
+import { usePostHogFlag } from '@/hooks/usePostHogFlag';
 import type { LandingGameMode } from '@/lib/landing/fetchGameModeStats';
 
 interface DailyChallengePreloadedStats {
@@ -39,8 +40,9 @@ interface LandingChallengeCardsProps {
  * Landing card identifiers — `'quickPlay'` is a landing-only synthetic mode
  * that routes into `/multiplayer?quickPlay=true` (auto-creates a bot room and
  * starts a random game). It is not part of `LandingGameMode` (server stats).
+ * `'connections'` is feature-flagged via PostHog `connections_game`.
  */
-type LandingCardKey = LandingGameMode | 'quickPlay';
+type LandingCardKey = LandingGameMode | 'quickPlay' | 'connections';
 
 /** Default card order when no server data available */
 const DEFAULT_ORDER: LandingCardKey[] = ['daily', 'quickPlay', 'arena', 'practice', 'blast', 'adventure'];
@@ -58,6 +60,8 @@ export function LandingChallengeCards({
   dailyChallengeStats,
   cardOrder: cardOrderProp,
 }: LandingChallengeCardsProps) {
+  const connectionsEnabled = usePostHogFlag<boolean>('connections_game', false);
+
   // Synchronous init from localStorage — avoids post-mount card reorder CLS
   const [isFirstTimer] = useState(() => {
     if (typeof window === 'undefined') return false;
@@ -78,7 +82,10 @@ export function LandingChallengeCards({
   //   3. Strip `'practice'` for veterans.
   //   4. Surface `'practice'` first for brand-new players (< 3 games).
   //   5. Guarantee `'daily'` lands in the top 2 — it must never be buried.
-  const rawOrder: LandingCardKey[] = cardOrderProp ?? DEFAULT_ORDER;
+  const baseOrder: LandingCardKey[] = cardOrderProp ?? DEFAULT_ORDER;
+  const rawOrder: LandingCardKey[] = connectionsEnabled
+    ? [...baseOrder, 'connections']
+    : baseOrder;
   // Guarantee blast always appears before adventure (regardless of popularity ranking)
   const serverOrder: LandingCardKey[] = (() => {
     const order = [...rawOrder];
@@ -220,16 +227,87 @@ export function LandingChallengeCards({
           </div>
         );
 
+      case 'connections':
+        return (
+          <div key="connections" className="w-full h-full animate-[fadeInUp_0.4s_ease-out_both]" style={style}>
+            <ModeCard
+              title={t('landing.wordChainMode')}
+              description={t('landing.wordChainModeDesc')}
+              href={`/${language}/connections`}
+              icon={<Link2 className="w-6 h-6" />}
+              modeImage="/modes/connections.png"
+              variant="purple"
+              badge="NEW"
+              duration={t('landing.duration').replace('{time}', '2-5')}
+              difficulty={2}
+              difficultyLabel={t('landing.difficultyMedium')}
+              onClick={() => trackModeSelected('connections', 'home')}
+            />
+          </div>
+        );
+
       default:
         return null;
     }
   };
 
+  const MP_MODES = new Set<LandingCardKey>(['arena', 'quickPlay']);
+  const SP_MODES = new Set<LandingCardKey>(['practice', 'blast', 'adventure', 'connections']);
+
+  const heroCards = cardOrder.filter((m) => m === 'daily');
+  const mpCards = cardOrder.filter((m) => MP_MODES.has(m));
+  const spCards = cardOrder.filter((m) => SP_MODES.has(m));
+
+  let runningIndex = 0;
+  const nextIndex = () => runningIndex++;
+
   return (
-    <div className="w-full max-w-5xl mx-auto xl:max-w-6xl">
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6 items-stretch">
-        {cardOrder.map((mode, index) => renderCard(mode, index))}
-      </div>
+    <div className="w-full max-w-5xl mx-auto xl:max-w-6xl space-y-6 md:space-y-8">
+      {heroCards.length > 0 && (
+        <div className="grid grid-cols-1">
+          {heroCards.map((mode) => renderCard(mode, nextIndex()))}
+        </div>
+      )}
+
+      {mpCards.length > 0 && (
+        <section
+          data-testid="landing-section-mp"
+          aria-label={t('landing.sectionMultiplayerTitle')}
+          className="relative rounded-neo border-neo border-l-[6px] border-black bg-neo-pink-muted/15 p-3 sm:p-4 md:p-5 shadow-hard"
+        >
+          <header className="mb-3 md:mb-4 flex items-baseline gap-3">
+            <span className="inline-block px-2.5 py-1 rounded-neo bg-neo-pink text-black font-neo-display font-bold text-xs sm:text-sm uppercase tracking-wide border-neo border-black shadow-hard-sm">
+              {t('landing.sectionMultiplayerTitle')}
+            </span>
+            <span className="font-neo-body text-xs sm:text-sm text-neo-white/70">
+              {t('landing.sectionMultiplayerSubtitle')}
+            </span>
+          </header>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 md:gap-5 items-stretch">
+            {mpCards.map((mode) => renderCard(mode, nextIndex()))}
+          </div>
+        </section>
+      )}
+
+      {spCards.length > 0 && (
+        <section
+          data-testid="landing-section-sp"
+          aria-label={t('landing.sectionSoloTitle')}
+          className="relative rounded-neo border-neo border-l-[6px] border-black bg-neo-cyan-muted/15 p-3 sm:p-4 md:p-5 shadow-hard"
+        >
+          <header className="mb-3 md:mb-4 flex items-baseline gap-3">
+            <span className="inline-block px-2.5 py-1 rounded-neo bg-neo-cyan text-black font-neo-display font-bold text-xs sm:text-sm uppercase tracking-wide border-neo border-black shadow-hard-sm">
+              {t('landing.sectionSoloTitle')}
+            </span>
+            <span className="font-neo-body text-xs sm:text-sm text-neo-white/70">
+              {t('landing.sectionSoloSubtitle')}
+            </span>
+          </header>
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-5 items-stretch">
+            {spCards.map((mode) => renderCard(mode, nextIndex()))}
+          </div>
+        </section>
+      )}
     </div>
   );
 }

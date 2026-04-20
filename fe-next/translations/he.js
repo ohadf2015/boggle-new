@@ -1755,6 +1755,13 @@ const he = {
       "yourTurn": "תורכם! כתבו:",
       "letterCount": "{current}/{total}"
     },
+    "returningUser": {
+      "title": "ברוכים השבים!",
+      "subtitle": "התחברו כדי להמשיך מאיפה שעצרתם, או התחילו מחדש.",
+      "haveAccount": "יש לי חשבון",
+      "newHere": "אני חדש כאן",
+      "skip": "דלג לעת עתה"
+    },
     "name": {
       "placeholder": "הכניסו שם",
       "errorInvalid": "רק אותיות, מספרים ורווחים",
@@ -4348,8 +4355,8 @@ const he = {
       "vaultSubtitle": "אספו מטבעות, פתחו פרסים"
     },
     "playingNow": "משחקים עכשיו",
-    "welcomeTitle": "מוכנים לשחק?",
-    "welcomeSubtitle": "בחרו את האתגר שלכם!",
+    "welcomeTitle": "מילים. יריבים. תהילה.",
+    "welcomeSubtitle": "חינם. בלי הרשמה. בלי פרסומות.",
     "singlePlayer": "משחק מהיר",
     "singlePlayerDesc": "קפצו פנימה ושחקו מיד",
     "badgeBots": "בוטים",
@@ -4359,6 +4366,10 @@ const he = {
     "multiPlayer": "רב משתתפים",
     "multiplayer": "רב משתתפים",
     "multiplayerDesc": "התחרה עם חברים בזמן אמת!",
+    "sectionMultiplayerTitle": "שחקו עם אחרים",
+    "sectionMultiplayerSubtitle": "קרבות ומרוצים חיים",
+    "sectionSoloTitle": "שחקו לבד",
+    "sectionSoloSubtitle": "חדדו את הכישורים",
     "arena": "מולטיפלייר",
     "arenaDesc": "שחקו לבד או אתגרו חברים!",
     "quickPlay": "משחק מהיר",
@@ -4371,6 +4382,8 @@ const he = {
     "adventureModeDesc": "100 שלבים ב-10 עולמות",
     "blastMode": "מצב פיצוץ",
     "blastModeDesc": "נקו את הלוח!",
+    "wordChainMode": "שרשרת מילים",
+    "wordChainModeDesc": "חברו שתי מילים באמצעות מילה אחת",
     "wordForgeMode": "מסדת המילים",
     "wordForgeModeDesc": "משחק מילים רוגלייק",
     "wordForgeModeBadge": "חדש",
@@ -10455,7 +10468,14 @@ const he = {
     "noAccess": "מצב משחק זה אינו זמין.",
     "hintLabel": "רמז",
     "bonusPoints": "בונוס רצף!",
-    "wordChain": "מילה1 + ? + מילה2"
+    "wordChain": "מילה1 + ? + מילה2",
+    "giveUp": "אני מוותר",
+    "solutionIs": "הפתרון",
+    "like": "אהבתי",
+    "dislike": "לא אהבתי",
+    "next": "הבא",
+    "rateThis": "דרג את החידה",
+    "thanks": "תודה על המשוב"
   },
   "socketErrors": {
     "AUTH_REQUIRED": "נדרשת התחברות לפעולה זו",

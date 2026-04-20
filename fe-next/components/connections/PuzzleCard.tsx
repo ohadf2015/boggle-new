@@ -1,98 +1,372 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
+import { motion, AnimatePresence, useAnimationControls } from 'framer-motion';
+import { ThumbsUp, ThumbsDown, ArrowRight, Flag, Check, Lightbulb } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import type { ConnectionPuzzle, GameState } from '@/lib/connections/types';
+import type { ConnectionPuzzle, GameState, PuzzleRating } from '@/lib/connections/types';
 
 interface PuzzleCardProps {
   puzzle: ConnectionPuzzle;
   state: GameState;
   onInputChange: (value: string) => void;
   onSubmit: () => void;
+  onGiveUp: () => void;
+  onRate: (rating: PuzzleRating) => void;
+  onNext: () => void;
 }
 
-const STATUS_STYLES: Record<string, string> = {
-  correct: 'border-neo-lime bg-neo-lime/10',
-  wrong: 'border-neo-red bg-neo-red/10',
-  hint: 'border-neo-yellow bg-neo-yellow/10',
-  playing: 'border-neo-navy-light bg-neo-navy-light',
-  finished: 'border-neo-navy-light bg-neo-navy-light',
+const CARD_SPRING = { type: 'spring' as const, stiffness: 320, damping: 26 };
+
+const WORD_CHIP_VARIANTS = {
+  initial: { opacity: 0, scale: 0.75, y: 10 },
+  animate: (delay: number) => ({
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    transition: { type: 'spring' as const, stiffness: 300, damping: 20, delay },
+  }),
+  exit: { opacity: 0, scale: 0.85, transition: { duration: 0.12 } },
 };
 
-export default function PuzzleCard({ puzzle, state, onInputChange, onSubmit }: PuzzleCardProps) {
+const STATUS_BORDER: Record<string, string> = {
+  correct: 'border-neo-lime',
+  wrong: 'border-neo-red',
+  hint: 'border-neo-yellow',
+  playing: 'border-neo-purple',
+  finished: 'border-neo-navy-light',
+  gaveUp: 'border-neo-red',
+};
+
+const STATUS_BG: Record<string, string> = {
+  correct: 'bg-neo-lime/10',
+  wrong: 'bg-neo-red/10',
+  hint: 'bg-neo-yellow/10',
+  playing: 'bg-neo-navy-light/80',
+  finished: 'bg-neo-navy-light',
+  gaveUp: 'bg-neo-red/10',
+};
+
+const DIFFICULTY_STYLE: Record<string, string> = {
+  easy: 'border-neo-lime/50 text-neo-lime',
+  medium: 'border-neo-cyan/50 text-neo-cyan',
+  hard: 'border-neo-pink/50 text-neo-pink',
+};
+
+export default function PuzzleCard({ puzzle, state, onInputChange, onSubmit, onGiveUp, onRate, onNext }: PuzzleCardProps) {
   const { t, language } = useLanguage();
   const isRTL = language === 'he';
-  const borderStyle = STATUS_STYLES[state.status] ?? STATUS_STYLES.playing;
+  const shakeControls = useAnimationControls();
+  const prevStatus = useRef(state.status);
+
+  const borderColor = STATUS_BORDER[state.status] ?? STATUS_BORDER.playing;
+  const bgColor = STATUS_BG[state.status] ?? STATUS_BG.playing;
+  const isCorrect = state.status === 'correct';
+  const isGaveUp = state.status === 'gaveUp';
+  const isResolved = isCorrect || isGaveUp;
+  const isDisabled = isResolved || state.status === 'finished';
+  const bridgeRevealed = isCorrect || isGaveUp;
+  const hasRated = state.ratedIds.has(puzzle.id);
+
+  // Shake on wrong — fires only on transition to 'wrong', not re-render
+  useEffect(() => {
+    if (state.status === 'wrong' && prevStatus.current !== 'wrong') {
+      shakeControls.start({
+        x: [0, -14, 14, -11, 11, -7, 7, -3, 3, 0],
+        transition: { duration: 0.5, ease: 'easeInOut' },
+      });
+    }
+    prevStatus.current = state.status;
+  }, [state.status, state.wrongAttempts, shakeControls]);
 
   const handleKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') onSubmit();
   };
 
   return (
-    <div
-      className={`relative rounded-neo border-neo-thick ${borderStyle} p-6 transition-colors duration-200`}
-      dir={isRTL ? 'rtl' : 'ltr'}
-    >
-      <div className="flex items-center justify-center gap-4 mb-6">
-        <span className="font-neo-display text-2xl text-neo-cream font-bold tracking-wider">
-          {puzzle.word1}
-        </span>
-        <span className="text-neo-white/40 text-xl">+</span>
-        <span className="text-neo-white/40 text-base font-mono">?</span>
-        <span className="text-neo-white/40 text-xl">+</span>
-        <span className="font-neo-display text-2xl text-neo-cream font-bold tracking-wider">
-          {puzzle.word2}
-        </span>
-      </div>
+    <AnimatePresence mode="wait">
+      <motion.div
+        key={puzzle.id}
+        animate={shakeControls}
+        initial={{ opacity: 0, y: 32, scale: 0.96 }}
+        whileInView={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: -16, scale: 0.97, transition: { duration: 0.18 } }}
+        transition={CARD_SPRING}
+        viewport={{ once: true }}
+        className={[
+          'relative rounded-neo border-neo-thick shadow-hard',
+          borderColor,
+          bgColor,
+          'p-6 transition-colors duration-200',
+        ].join(' ')}
+        dir={isRTL ? 'rtl' : 'ltr'}
+      >
+        {/* Difficulty badge */}
+        {puzzle.difficulty && (
+          <span
+            className={[
+              'absolute top-3 font-mono text-xs uppercase tracking-widest',
+              'px-2 py-0.5 rounded border',
+              isRTL ? 'left-3' : 'right-3',
+              DIFFICULTY_STYLE[puzzle.difficulty] ?? 'border-neo-white/20 text-neo-white/40',
+            ].join(' ')}
+          >
+            {puzzle.difficulty}
+          </span>
+        )}
 
-      {state.status === 'hint' && puzzle.hint && (
-        <p className="text-neo-yellow text-sm text-center mb-4 animate-neo-pop">
-          💡 {puzzle.hint}
-        </p>
-      )}
+        {/* Word chain: WORD1 + [?] + WORD2 */}
+        <AnimatePresence mode="wait">
+          <div key={`chain-${puzzle.id}`} className="flex items-center justify-center gap-3 mb-6 flex-wrap">
+            <motion.span
+              custom={0}
+              variants={WORD_CHIP_VARIANTS}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              className="font-neo-display text-2xl text-neo-cream font-bold tracking-wider px-3 py-1 rounded-neo border border-neo-white/20 bg-neo-navy shadow-hard-sm"
+            >
+              {puzzle.word1}
+            </motion.span>
 
-      {state.status === 'correct' && (
-        <p className="text-neo-lime text-center text-lg font-bold mb-4 animate-neo-pop">
-          {t('connections.correct')} ✓
-        </p>
-      )}
+            <motion.span
+              custom={0.06}
+              variants={WORD_CHIP_VARIANTS}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              className="text-neo-white/30 text-xl font-mono select-none"
+            >
+              +
+            </motion.span>
 
-      {(state.status === 'wrong' || state.status === 'hint') && (
-        <p className="text-neo-red text-center text-sm mb-4 animate-neo-shake">
-          {t('connections.wrong')}
-        </p>
-      )}
+            {/* Bridge slot */}
+            <motion.div
+              custom={0.12}
+              variants={WORD_CHIP_VARIANTS}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              className={[
+                'min-w-[56px] h-10 px-3 rounded-neo border-2 flex items-center justify-center',
+                'font-neo-display font-bold text-lg transition-all duration-300',
+                isCorrect
+                  ? 'border-neo-lime bg-neo-lime/20 text-neo-lime'
+                  : isGaveUp
+                  ? 'border-neo-red bg-neo-red/20 text-neo-red'
+                  : 'border-neo-purple/70 bg-neo-purple/10 text-neo-purple',
+              ].join(' ')}
+            >
+              {bridgeRevealed ? (
+                <motion.span
+                  initial={{ scale: 0, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ type: 'spring' as const, stiffness: 400, damping: 14 }}
+                >
+                  {puzzle.bridge}
+                </motion.span>
+              ) : (
+                <motion.span
+                  animate={{ opacity: [0.5, 1, 0.5] }}
+                  transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
+                >
+                  ?
+                </motion.span>
+              )}
+            </motion.div>
 
-      <div className="flex gap-3" dir={isRTL ? 'rtl' : 'ltr'}>
-        <input
-          type="text"
-          value={state.input}
-          onChange={e => onInputChange(e.target.value)}
-          onKeyDown={handleKey}
-          placeholder={t('connections.placeholder')}
-          disabled={state.status === 'correct' || state.status === 'finished'}
-          className={[
-            'flex-1 rounded-neo border-neo bg-neo-navy text-neo-white font-neo-body',
-            'px-4 py-3 text-lg outline-none focus:border-neo-cyan transition-colors',
-            'placeholder:text-neo-white/30 shadow-hard',
-            isRTL ? 'text-right' : 'text-left',
-          ].join(' ')}
-          autoComplete="off"
-          autoCapitalize="none"
-          spellCheck={false}
-        />
-        <button
-          onClick={onSubmit}
-          disabled={!state.input.trim() || state.status === 'correct' || state.status === 'finished'}
-          className={[
-            'rounded-neo border-neo-thick border-neo-cyan bg-neo-cyan text-neo-navy',
-            'font-neo-display font-bold px-6 py-3 shadow-hard hover:shadow-hard-pressed',
-            'active:shadow-hard-pressed active:translate-y-0.5 transition-all',
-            'disabled:opacity-40 disabled:cursor-not-allowed',
-          ].join(' ')}
-        >
-          {t('connections.submit')}
-        </button>
-      </div>
-    </div>
+            <motion.span
+              custom={0.18}
+              variants={WORD_CHIP_VARIANTS}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              className="text-neo-white/30 text-xl font-mono select-none"
+            >
+              +
+            </motion.span>
+
+            <motion.span
+              custom={0.24}
+              variants={WORD_CHIP_VARIANTS}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              className="font-neo-display text-2xl text-neo-cream font-bold tracking-wider px-3 py-1 rounded-neo border border-neo-white/20 bg-neo-navy shadow-hard-sm"
+            >
+              {puzzle.word2}
+            </motion.span>
+          </div>
+        </AnimatePresence>
+
+        {/* Status feedback messages */}
+        <AnimatePresence mode="wait">
+          {state.status === 'hint' && puzzle.hint && (
+            <motion.p
+              key="hint"
+              initial={{ opacity: 0, y: -6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.2 }}
+              className="text-neo-yellow text-sm text-center mb-4 inline-flex items-center justify-center gap-2 w-full"
+            >
+              <Lightbulb className="w-4 h-4" aria-hidden="true" />
+              {puzzle.hint}
+            </motion.p>
+          )}
+
+          {isCorrect && (
+            <motion.p
+              key="correct"
+              initial={{ opacity: 0, scale: 0.6 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ type: 'spring', stiffness: 350, damping: 14 }}
+              className="text-neo-lime text-center text-lg font-bold mb-4 inline-flex items-center justify-center gap-2 w-full"
+            >
+              {t('connections.correct')}
+              <Check className="w-5 h-5" aria-hidden="true" />
+            </motion.p>
+          )}
+
+          {state.status === 'wrong' && (
+            <motion.p
+              key="wrong"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="text-neo-red text-center text-sm mb-4"
+            >
+              {t('connections.wrong')}
+            </motion.p>
+          )}
+
+          {isGaveUp && (
+            <motion.p
+              key="gaveUp"
+              initial={{ opacity: 0, y: -6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ type: 'spring', stiffness: 320, damping: 18 }}
+              className="text-neo-red text-center text-sm font-bold mb-4"
+            >
+              {t('connections.solutionIs')}: <span className="text-neo-cream">{puzzle.bridge}</span>
+            </motion.p>
+          )}
+        </AnimatePresence>
+
+        {/* Input + submit */}
+        <div className="flex gap-3" dir={isRTL ? 'rtl' : 'ltr'}>
+          <input
+            type="text"
+            value={state.input}
+            onChange={e => onInputChange(e.target.value)}
+            onKeyDown={handleKey}
+            placeholder={t('connections.placeholder')}
+            disabled={isDisabled}
+            className={[
+              'flex-1 rounded-neo border-neo bg-neo-navy text-neo-white font-neo-body',
+              'px-4 py-3 text-lg outline-none transition-colors duration-200',
+              'placeholder:text-neo-white/30 shadow-hard',
+              isRTL ? 'text-right' : 'text-left',
+              isCorrect
+                ? 'border-neo-lime'
+                : 'border-neo-white/20 focus:border-neo-cyan',
+            ].join(' ')}
+            autoComplete="off"
+            autoCapitalize="none"
+            spellCheck={false}
+          />
+          <motion.button
+            onClick={onSubmit}
+            disabled={!state.input.trim() || isDisabled}
+            whileHover={{ scale: 1.04, y: -1 }}
+            whileTap={{ scale: 0.96, y: 1 }}
+            className={[
+              'rounded-neo border-neo-thick border-neo-cyan bg-neo-cyan text-neo-navy',
+              'font-neo-display font-bold px-6 py-3 shadow-hard transition-colors',
+              'disabled:opacity-40 disabled:cursor-not-allowed disabled:pointer-events-none',
+            ].join(' ')}
+          >
+            {t('connections.submit')}
+          </motion.button>
+        </div>
+
+        {/* Give Up — active play only */}
+        {(state.status === 'playing' || state.status === 'wrong' || state.status === 'hint') && (
+          <div className="mt-4 flex justify-center">
+            <motion.button
+              onClick={onGiveUp}
+              whileHover={{ scale: 1.04 }}
+              whileTap={{ scale: 0.96 }}
+              className={[
+                'rounded-neo border-neo border-neo-red/70 bg-transparent text-neo-red',
+                'font-neo-body text-sm px-4 py-2 transition-colors',
+                'hover:bg-neo-red/10',
+                'inline-flex items-center gap-2',
+              ].join(' ')}
+            >
+              <Flag className="w-4 h-4" aria-hidden="true" />
+              {t('connections.giveUp')}
+            </motion.button>
+          </div>
+        )}
+
+        {/* Like / Dislike + Next — after puzzle resolved */}
+        {isResolved && (
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.25, type: 'spring', stiffness: 300, damping: 22 }}
+            className="mt-5 flex flex-col items-center gap-3"
+          >
+            {!hasRated ? (
+              <>
+                <p className="text-neo-white/60 text-xs uppercase tracking-widest">
+                  {t('connections.rateThis')}
+                </p>
+                <div className="flex gap-3">
+                  <motion.button
+                    onClick={() => onRate('like')}
+                    whileHover={{ scale: 1.08, y: -1 }}
+                    whileTap={{ scale: 0.94 }}
+                    aria-label={t('connections.like')}
+                    className="rounded-neo border-neo-thick border-neo-lime bg-neo-lime/15 text-neo-lime font-neo-display font-bold px-5 py-2 shadow-hard-sm hover:bg-neo-lime/25 transition-colors inline-flex items-center gap-2"
+                  >
+                    <ThumbsUp className="w-4 h-4" aria-hidden="true" />
+                    {t('connections.like')}
+                  </motion.button>
+                  <motion.button
+                    onClick={() => onRate('dislike')}
+                    whileHover={{ scale: 1.08, y: -1 }}
+                    whileTap={{ scale: 0.94 }}
+                    aria-label={t('connections.dislike')}
+                    className="rounded-neo border-neo-thick border-neo-red bg-neo-red/15 text-neo-red font-neo-display font-bold px-5 py-2 shadow-hard-sm hover:bg-neo-red/25 transition-colors inline-flex items-center gap-2"
+                  >
+                    <ThumbsDown className="w-4 h-4" aria-hidden="true" />
+                    {t('connections.dislike')}
+                  </motion.button>
+                </div>
+              </>
+            ) : (
+              <p className="text-neo-cyan text-sm inline-flex items-center gap-2">
+                <Check className="w-4 h-4" aria-hidden="true" />
+                {t('connections.thanks')}
+              </p>
+            )}
+
+            {isGaveUp && (
+              <motion.button
+                onClick={onNext}
+                whileHover={{ scale: 1.05, y: -1 }}
+                whileTap={{ scale: 0.96 }}
+                className="mt-1 rounded-neo border-neo-thick border-neo-cyan bg-neo-cyan text-neo-navy font-neo-display font-bold px-6 py-2 shadow-hard inline-flex items-center gap-2"
+              >
+                {t('connections.next')}
+                <ArrowRight className={`w-4 h-4 ${isRTL ? 'rotate-180' : ''}`} aria-hidden="true" />
+              </motion.button>
+            )}
+          </motion.div>
+        )}
+      </motion.div>
+    </AnimatePresence>
   );
 }

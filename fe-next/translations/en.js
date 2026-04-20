@@ -1855,6 +1855,13 @@ const en = {
       "yourTurn": "Your turn! Spell:",
       "letterCount": "{current}/{total}"
     },
+    "returningUser": {
+      "title": "Welcome Back!",
+      "subtitle": "Sign in to pick up where you left off, or start fresh.",
+      "haveAccount": "I Have an Account",
+      "newHere": "I'm New Here",
+      "skip": "Skip for now"
+    },
     "name": {
       "placeholder": "Your name",
       "errorInvalid": "Letters & numbers only",
@@ -4456,8 +4463,8 @@ const en = {
       "vaultSubtitle": "Stash coins, unlock rewards"
     },
     "playingNow": "Playing Now",
-    "welcomeTitle": "Ready to Play?",
-    "welcomeSubtitle": "Pick your challenge!",
+    "welcomeTitle": "Words. Rivals. Glory.",
+    "welcomeSubtitle": "Free. No sign-up. No ads.",
     "singlePlayer": "Quick Play",
     "singlePlayerDesc": "Jump in and play instantly",
     "badgeBots": "Bots",
@@ -4467,6 +4474,10 @@ const en = {
     "multiPlayer": "Multiplayer",
     "multiplayer": "Multiplayer",
     "multiplayerDesc": "Live word battles!",
+    "sectionMultiplayerTitle": "Play with Others",
+    "sectionMultiplayerSubtitle": "Live battles & races",
+    "sectionSoloTitle": "Play Solo",
+    "sectionSoloSubtitle": "Sharpen your skills",
     "arena": "Multiplayer",
     "arenaDesc": "Play solo or challenge friends!",
     "quickPlay": "Quick Play",
@@ -4479,6 +4490,8 @@ const en = {
     "adventureModeDesc": "100 levels across 10 worlds",
     "blastMode": "Blast Mode",
     "blastModeDesc": "Clear the board!",
+    "wordChainMode": "Word Chain",
+    "wordChainModeDesc": "Bridge two words with one",
     "wordForgeMode": "Word Forge",
     "wordForgeModeDesc": "Roguelike word game",
     "wordForgeModeBadge": "NEW",
@@ -10570,7 +10583,14 @@ const en = {
     "noAccess": "This game mode is not available.",
     "hintLabel": "Hint",
     "bonusPoints": "Streak Bonus!",
-    "wordChain": "WORD1 + ? + WORD2"
+    "wordChain": "WORD1 + ? + WORD2",
+    "giveUp": "Give up",
+    "solutionIs": "Solution",
+    "like": "Like",
+    "dislike": "Dislike",
+    "next": "Next",
+    "rateThis": "Rate this puzzle",
+    "thanks": "Thanks for your feedback"
   },
   "socketErrors": {
     "AUTH_REQUIRED": "Sign in required for this action",

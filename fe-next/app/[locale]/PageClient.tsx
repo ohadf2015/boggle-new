@@ -3,7 +3,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
-import { hasCompletedOnboarding, savePendingRoomInvite } from '@/utils/onboardingStorage';
+import { hasCompletedOnboarding, hasSupabaseSession, savePendingRoomInvite } from '@/utils/onboardingStorage';
 import { LandingView } from '@/components/landing';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -35,16 +35,15 @@ export default function HomePageClient({ initialData }: HomePageClientProps): Re
   const router = useRouter();
   const { language } = useLanguage();
 
-  // Synchronous check — runs during first render, not in an effect
+  // Synchronous check — runs during first render, not in an effect.
+  // hasSupabaseSession() is Layer 1: skip FTUE for auth users whose localStorage was cleared.
   const [showFTUE, setShowFTUE] = useState(() => {
     if (typeof window === 'undefined') return false;
-    const needsOnboarding = !hasCompletedOnboarding();
+    if (hasCompletedOnboarding() || hasSupabaseSession()) return false;
     // Save room invite before onboarding replaces the view
-    if (needsOnboarding) {
-      const roomCode = new URLSearchParams(window.location.search).get('room');
-      if (roomCode) savePendingRoomInvite(roomCode);
-    }
-    return needsOnboarding;
+    const roomCode = new URLSearchParams(window.location.search).get('room');
+    if (roomCode) savePendingRoomInvite(roomCode);
+    return true;
   });
 
   const handleFTUEComplete = useCallback(() => {

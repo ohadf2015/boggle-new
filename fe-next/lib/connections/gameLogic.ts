@@ -35,7 +35,20 @@ export function initGameState(puzzles: ConnectionPuzzle[]): GameState {
     status: 'playing',
     input: '',
     completedIds: new Set(),
+    ratedIds: new Set(),
   };
+}
+
+export function giveUp(state: GameState): GameState {
+  if (state.status === 'finished' || state.status === 'correct' || state.status === 'gaveUp') return state;
+  return { ...state, status: 'gaveUp', lives: Math.max(0, state.lives - 1), streak: 0, wrongAttempts: 0 };
+}
+
+export function markRated(state: GameState, puzzleId: string): GameState {
+  if (state.ratedIds.has(puzzleId)) return state;
+  const ratedIds = new Set(state.ratedIds);
+  ratedIds.add(puzzleId);
+  return { ...state, ratedIds };
 }
 
 export function applyGuess(state: GameState, input: string): GameState {

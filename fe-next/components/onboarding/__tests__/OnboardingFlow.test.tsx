@@ -69,6 +69,24 @@ vi.mock('@/utils/profileStorage', () => ({
   getStoredCustomAvatar: vi.fn(() => null),
 }));
 
+vi.mock('@/contexts/AuthContext', () => ({
+  useAuth: () => ({ isAuthenticated: false, user: null }),
+}));
+
+vi.mock('@/components/auth/AuthModal', () => ({
+  __esModule: true,
+  default: () => null,
+}));
+
+vi.mock('../ReturningUserStep', () => ({
+  __esModule: true,
+  default: ({ onNew }: any) => (
+    <div data-testid="returning-user-step">
+      <button onClick={onNew}>I&apos;m New Here</button>
+    </div>
+  ),
+}));
+
 vi.mock('../LanguageSelect', () => {
   return {
     __esModule: true,
@@ -131,10 +149,20 @@ describe('OnboardingFlow', () => {
     mockConsumePendingRoom.mockReturnValue(null);
   });
 
-  const selectLanguage = () => fireEvent.click(screen.getByText('Select Language'));
+  const goNewUser = () => fireEvent.click(screen.getByText("I'm New Here"));
+  const selectLanguage = () => {
+    goNewUser();
+    fireEvent.click(screen.getByText('Select Language'));
+  };
 
-  it('starts with the language select step', () => {
+  it('starts with the returning user step', () => {
     render(<OnboardingFlow {...defaultProps} />);
+    expect(screen.getByTestId('returning-user-step')).toBeInTheDocument();
+  });
+
+  it('transitions to language select when user chooses new here', () => {
+    render(<OnboardingFlow {...defaultProps} />);
+    goNewUser();
     expect(screen.getByTestId('language-select')).toBeInTheDocument();
   });
 
