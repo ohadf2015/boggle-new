@@ -58,6 +58,7 @@ export default function PuzzleCard({ puzzle, state, onInputChange, onSubmit, onG
   const isRTL = language === 'he';
   const shakeControls = useAnimationControls();
   const prevStatus = useRef(state.status);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const borderColor = STATUS_BORDER[state.status] ?? STATUS_BORDER.playing;
   const bgColor = STATUS_BG[state.status] ?? STATUS_BG.playing;
@@ -79,8 +80,21 @@ export default function PuzzleCard({ puzzle, state, onInputChange, onSubmit, onG
     prevStatus.current = state.status;
   }, [state.status, state.wrongAttempts, shakeControls]);
 
+  const commitAndSubmit = () => {
+    const el = inputRef.current;
+    if (el) {
+      el.blur();
+      const buffered = el.value;
+      if (buffered !== state.input) onInputChange(buffered);
+    }
+    onSubmit();
+  };
+
   const handleKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') onSubmit();
+    if (e.key !== 'Enter') return;
+    if (e.nativeEvent.isComposing || e.keyCode === 229) return;
+    e.preventDefault();
+    commitAndSubmit();
   };
 
   return (
@@ -256,9 +270,11 @@ export default function PuzzleCard({ puzzle, state, onInputChange, onSubmit, onG
         {/* Input + submit */}
         <div className="flex gap-3" dir={isRTL ? 'rtl' : 'ltr'}>
           <input
+            ref={inputRef}
             type="text"
             value={state.input}
             onChange={e => onInputChange(e.target.value)}
+            onCompositionEnd={e => onInputChange(e.currentTarget.value)}
             onKeyDown={handleKey}
             placeholder={t('connections.placeholder')}
             disabled={isDisabled}
@@ -276,8 +292,8 @@ export default function PuzzleCard({ puzzle, state, onInputChange, onSubmit, onG
             spellCheck={false}
           />
           <motion.button
-            onClick={onSubmit}
-            disabled={!state.input.trim() || isDisabled}
+            onClick={commitAndSubmit}
+            disabled={isDisabled}
             whileHover={{ scale: 1.04, y: -1 }}
             whileTap={{ scale: 0.96, y: 1 }}
             className={[

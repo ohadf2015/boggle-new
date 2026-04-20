@@ -70,7 +70,6 @@ export const HE_EASY: ConnectionPuzzle[] = [
   { id: 'he-e-062', word1: 'שיעורי', word2: 'חולים', bridge: 'בית', difficulty: 'easy' },
   { id: 'he-e-063', word1: 'משק', word2: 'מלון', bridge: 'בית', difficulty: 'easy' },
   { id: 'he-e-064', word1: 'חצר', word2: 'פרטי', bridge: 'בית', difficulty: 'easy' },
-  { id: 'he-e-065', word1: 'אמצע', word2: 'שקט', bridge: 'לילה', difficulty: 'easy' },
   { id: 'he-e-066', word1: 'חצות', word2: 'טוב', bridge: 'לילה', difficulty: 'easy' },
   { id: 'he-e-067', word1: 'קרני', word2: 'חמה', bridge: 'שמש', difficulty: 'easy' },
   { id: 'he-e-068', word1: 'שקיעת', word2: 'חורפית', bridge: 'שמש', difficulty: 'easy' },
@@ -85,7 +84,6 @@ export const HE_EASY: ConnectionPuzzle[] = [
   { id: 'he-e-077', word1: 'פסגת', word2: 'געש', bridge: 'הר', difficulty: 'easy' },
   { id: 'he-e-078', word1: 'צמחי', word2: 'חם', bridge: 'מדבר', difficulty: 'easy' },
   { id: 'he-e-079', word1: 'חיות', word2: 'יבש', bridge: 'מדבר', difficulty: 'easy' },
-  { id: 'he-e-080', word1: 'חצי', word2: 'טוב', bridge: 'יום', difficulty: 'easy' },
   { id: 'he-e-081', word1: 'אמצע', word2: 'הולדת', bridge: 'יום', difficulty: 'easy' },
   { id: 'he-e-082', word1: 'סוף', word2: 'הבא', bridge: 'שבוע', difficulty: 'easy' },
   { id: 'he-e-083', word1: 'ראש', word2: 'שלם', bridge: 'חודש', difficulty: 'easy' },
@@ -120,7 +118,6 @@ export const HE_EASY: ConnectionPuzzle[] = [
   { id: 'he-e-113', word1: 'כללי', word2: 'מחשב', bridge: 'משחק', difficulty: 'easy' },
   { id: 'he-e-115', word1: 'מסגרת', word2: 'משפחתית', bridge: 'תמונה', difficulty: 'easy' },
   { id: 'he-e-116', word1: 'בן', word2: 'אוהבת', bridge: 'משפחה', difficulty: 'easy' },
-  { id: 'he-e-117', word1: 'בן', word2: 'טוב', bridge: 'זוג', difficulty: 'easy' },
   { id: 'he-e-118', word1: 'ערב', word2: 'סוערת', bridge: 'מסיבה', difficulty: 'easy' },
   { id: 'he-e-119', word1: 'פרוסת', word2: 'טעימה', bridge: 'עוגה', difficulty: 'easy' },
 ];
