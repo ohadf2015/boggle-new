@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Mail, Send, CheckCircle, XCircle, Loader2, Eye, Calendar, UserX, Rocket } from 'lucide-react';
+import { Mail, Send, CheckCircle, XCircle, Loader2, Eye, Calendar, UserX, Rocket, Smartphone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -17,7 +17,7 @@ interface EmailTestPanelProps {
 }
 
 type SendStatus = 'idle' | 'sending' | 'success' | 'error';
-type EmailType = 'reengagement' | 'daily-challenge' | 'game-mode-announcement';
+type EmailType = 'reengagement' | 'daily-challenge' | 'game-mode-announcement' | 'android-beta-launch';
 type GameMode = 'blast' | 'wordhunt' | 'adventure';
 
 const EMAIL_TYPE_CONFIG = {
@@ -56,6 +56,18 @@ const EMAIL_TYPE_CONFIG = {
     bgClass: 'bg-neo-pink',
     borderClass: 'border-neo-pink',
     textClass: 'text-neo-pink',
+  },
+  'android-beta-launch': {
+    label: 'Android Beta',
+    icon: Smartphone,
+    endpoint: '/api/admin/send-test-android-beta-launch',
+    previewEndpoint: '/api/admin/android-beta-launch-preview',
+    previewTitle: 'Android Beta Launch Preview',
+    infoText: 'Sends a test [TEST] Android closed-beta invite with Play Store CTA and LexiClash reminder block.',
+    color: 'neo-lime',
+    bgClass: 'bg-neo-lime',
+    borderClass: 'border-neo-lime',
+    textClass: 'text-neo-lime',
   },
 } as const;
 
@@ -129,11 +141,12 @@ export function EmailTestPanel({ authToken, userEmail, userName }: EmailTestPane
     ? window.location.origin
     : process.env.NEXT_PUBLIC_APP_URL || 'https://lexiclash.com';
 
-  const previewUrl = emailType === 'reengagement'
-    ? `${baseUrl}${config.previewEndpoint}?language=${language}`
-    : emailType === 'game-mode-announcement'
-      ? `${baseUrl}${config.previewEndpoint}?language=${language}&mode=${gameMode}`
-      : `${baseUrl}${config.previewEndpoint}`;
+  const previewUrl =
+    emailType === 'reengagement' || emailType === 'android-beta-launch'
+      ? `${baseUrl}${config.previewEndpoint}?language=${language}`
+      : emailType === 'game-mode-announcement'
+        ? `${baseUrl}${config.previewEndpoint}?language=${language}&mode=${gameMode}`
+        : `${baseUrl}${config.previewEndpoint}`;
 
   return (
     <Card className={cn(
@@ -313,7 +326,7 @@ export function EmailTestPanel({ authToken, userEmail, userName }: EmailTestPane
           emailType={emailType}
           emailLabel={config.label}
           gameMode={gameMode}
-          showBulk={emailType !== 'daily-challenge'}
+          showBulk={emailType !== 'daily-challenge' && emailType !== 'android-beta-launch'}
         />
 
         {/* Info Box */}

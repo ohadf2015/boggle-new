@@ -107,6 +107,7 @@ export function AuthProvider({ children }: AuthProviderProps): React.ReactElemen
         isAdmin,
         isTeacher,
         locale,
+        email: user.email ?? null,
       });
     } else {
       clearSentryUser();

@@ -17,6 +17,7 @@ export interface IdentifyArgs {
   isAdmin: boolean;
   isTeacher: boolean;
   locale: string;
+  email?: string | null;
 }
 
 type PHFn = (...args: unknown[]) => unknown;
@@ -33,13 +34,14 @@ function safe<T>(fn: () => T): T | undefined {
 }
 
 export function identifyUserForAnalytics(args: IdentifyArgs): void {
-  const { userId, displayName, isAdmin, isTeacher, locale } = args;
+  const { userId, displayName, isAdmin, isTeacher, locale, email } = args;
 
   safe(() =>
     (posthog.identify as PHFn)(userId, {
       display_name: displayName,
       is_admin: isAdmin,
       is_teacher: isTeacher,
+      ...(email ? { email } : {}),
     })
   );
 

@@ -57,6 +57,24 @@ describe('identifyUserForAnalytics', () => {
     });
   });
 
+  it('includes email in identify when provided (for flag targeting)', () => {
+    identifyUserForAnalytics({
+      userId: 'user-1',
+      displayName: 'Alice',
+      isAdmin: false,
+      isTeacher: false,
+      locale: 'en',
+      email: 'alice@example.com',
+    });
+
+    expect(identify).toHaveBeenCalledWith('user-1', {
+      display_name: 'Alice',
+      is_admin: false,
+      is_teacher: false,
+      email: 'alice@example.com',
+    });
+  });
+
   it('captures user_identified event', () => {
     identifyUserForAnalytics({
       userId: 'user-1',
