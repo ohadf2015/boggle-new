@@ -14,14 +14,38 @@ const POINTS_BY_DIFFICULTY: Record<ConnectionPuzzle['difficulty'], number> = {
   hard: POINTS_HARD,
 };
 
+export function xpForPuzzle(difficulty: ConnectionPuzzle['difficulty'], streak: number): number {
+  const base = POINTS_BY_DIFFICULTY[difficulty];
+  const bonus = streak >= STREAK_BONUS_THRESHOLD ? Math.floor(base * (STREAK_BONUS_MULTIPLIER - 1)) : 0;
+  return Math.round((base + bonus) / 10);
+}
+
 export function normalizeGuess(input: string): string {
   return input.trim().toLowerCase();
+}
+
+function stripPunctuation(s: string): string {
+  // keep Unicode letters + digits; drop everything else (quotes, punctuation, whitespace edges)
+  return s.replace(/[^\p{L}\p{N}]/gu, '');
+}
+
+function depluralize(s: string): string {
+  if (s.length > 3 && s.endsWith('es')) return s.slice(0, -2);
+  if (s.length > 2 && s.endsWith('s')) return s.slice(0, -1);
+  return s;
+}
+
+function canonicalize(s: string): string {
+  return depluralize(stripPunctuation(normalizeGuess(s)));
 }
 
 export function checkGuess(input: string, puzzle: ConnectionPuzzle): GuessResult {
   const normalizedGuess = normalizeGuess(input);
   const normalizedAnswer = normalizeGuess(puzzle.bridge);
-  return { correct: normalizedGuess === normalizedAnswer, normalizedGuess, normalizedAnswer };
+  const guessKey = canonicalize(input);
+  const candidates = [puzzle.bridge, ...(puzzle.acceptedAnswers ?? [])];
+  const correct = candidates.some((c) => canonicalize(c) === guessKey) && guessKey.length > 0;
+  return { correct, normalizedGuess, normalizedAnswer };
 }
 
 export function initGameState(puzzles: ConnectionPuzzle[]): GameState {

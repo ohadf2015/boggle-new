@@ -10475,7 +10475,8 @@ const he = {
     "dislike": "לא אהבתי",
     "next": "הבא",
     "rateThis": "דרג את החידה",
-    "thanks": "תודה על המשוב"
+    "thanks": "תודה על המשוב",
+    "xpEarned": "נק׳ ניסיון"
   },
   "socketErrors": {
     "AUTH_REQUIRED": "נדרשת התחברות לפעולה זו",

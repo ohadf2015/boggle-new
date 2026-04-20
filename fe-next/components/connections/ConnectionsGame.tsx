@@ -5,7 +5,7 @@ import dynamic from 'next/dynamic';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getShuffledPuzzles } from '@/lib/connections/puzzles';
-import { initGameState, applyGuess, advancePuzzle, giveUp as giveUpLogic, markRated } from '@/lib/connections/gameLogic';
+import { initGameState, applyGuess, advancePuzzle, giveUp as giveUpLogic, markRated, xpForPuzzle } from '@/lib/connections/gameLogic';
 import type { GameState, PuzzleRating } from '@/lib/connections/types';
 import { submitConnectionsFeedback } from '@/lib/connections/feedback';
 import PuzzleCard from './PuzzleCard';
@@ -51,6 +51,8 @@ export default function ConnectionsGame() {
 
   const puzzles = getShuffledPuzzles(language, PUZZLE_COUNT);
   const [state, dispatch] = useReducer(reducer, puzzles, initGameState);
+  const [xpEarned, setXpEarned] = useState(0);
+  const xpAwardedIdsRef = useRef<Set<string>>(new Set());
 
   // Track container dimensions for the PixiJS canvas overlay
   useEffect(() => {
@@ -64,13 +66,24 @@ export default function ConnectionsGame() {
     return () => ro.disconnect();
   }, []);
 
-  // Auto-advance after correct answer
+  // Auto-advance after correct answer + award XP
   useEffect(() => {
     if (state.status !== 'correct') return;
     window.dispatchEvent(new CustomEvent('connections:correct'));
+    const puzzle = state.puzzles[state.currentIndex];
+    if (puzzle && !xpAwardedIdsRef.current.has(puzzle.id)) {
+      xpAwardedIdsRef.current.add(puzzle.id);
+      const xp = xpForPuzzle(puzzle.difficulty, state.streak);
+      setXpEarned((prev) => prev + xp);
+      void fetch('/api/education/record-xp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ xpAmount: xp, lessonId: 'connections-game', activityType: 'connections' }),
+      }).catch(() => {});
+    }
     const timer = setTimeout(() => dispatch({ type: 'ADVANCE' }), ADVANCE_DELAY_MS);
     return () => clearTimeout(timer);
-  }, [state.status, state.currentIndex]);
+  }, [state.status, state.currentIndex, state.puzzles, state.streak]);
 
   // Dispatch wrong event
   useEffect(() => {
@@ -90,6 +103,8 @@ export default function ConnectionsGame() {
   const handleReset = useCallback(() => {
     const fresh = getShuffledPuzzles(language, PUZZLE_COUNT);
     dispatch({ type: 'RESET', puzzles: fresh });
+    setXpEarned(0);
+    xpAwardedIdsRef.current = new Set();
   }, [language]);
 
   const handleGiveUp = useCallback(() => {
@@ -143,6 +158,11 @@ export default function ConnectionsGame() {
         >
           <p className="text-neo-white/60 text-sm uppercase tracking-widest mb-2">{t('connections.finalScore')}</p>
           <p className="font-neo-display text-6xl text-neo-yellow">{state.score.toLocaleString()}</p>
+          {xpEarned > 0 && (
+            <p className="mt-4 font-neo-body text-neo-lime text-lg">
+              +{xpEarned} {t('connections.xpEarned')}
+            </p>
+          )}
         </motion.div>
         <motion.button
           onClick={handleReset}
@@ -231,7 +251,7 @@ export default function ConnectionsGame() {
       </div>
 
       {/* Puzzle counter */}
-      <p className="text-neo-white/40 text-xs text-center font-mono">
+      <p className="text-neo-white/40 text-xs text-center font-mono" dir="ltr">
         {state.currentIndex + 1} / {state.puzzles.length}
       </p>
 

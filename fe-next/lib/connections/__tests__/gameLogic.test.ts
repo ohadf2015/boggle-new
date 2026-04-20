@@ -5,6 +5,7 @@ import {
   initGameState,
   applyGuess,
   advancePuzzle,
+  xpForPuzzle,
   INITIAL_LIVES,
   POINTS_EASY,
   POINTS_MEDIUM,
@@ -46,6 +47,30 @@ describe('checkGuess', () => {
     const result = checkGuess('WORM', puzzle);
     expect(result.normalizedGuess).toBe('worm');
     expect(result.normalizedAnswer).toBe('worm');
+  });
+
+  it('accepts plural form of bridge (worms -> worm)', () => {
+    expect(checkGuess('worms', puzzle).correct).toBe(true);
+    expect(checkGuess('WORMS', puzzle).correct).toBe(true);
+  });
+
+  it('accepts singular form when bridge stored plural (cats -> cat)', () => {
+    const pluralPuzzle: ConnectionPuzzle = { ...puzzle, bridge: 'CATS' };
+    expect(checkGuess('cat', pluralPuzzle).correct).toBe(true);
+  });
+
+  it('strips trailing punctuation from guess', () => {
+    expect(checkGuess('worm.', puzzle).correct).toBe(true);
+    expect(checkGuess('worm!', puzzle).correct).toBe(true);
+    expect(checkGuess('"worm"', puzzle).correct).toBe(true);
+  });
+
+  it('accepts any entry in acceptedAnswers in addition to bridge', () => {
+    const multi: ConnectionPuzzle = { ...puzzle, acceptedAnswers: ['CASE', 'SHELF'] };
+    expect(checkGuess('case', multi).correct).toBe(true);
+    expect(checkGuess('SHELF', multi).correct).toBe(true);
+    expect(checkGuess('worm', multi).correct).toBe(true);
+    expect(checkGuess('nope', multi).correct).toBe(false);
   });
 });
 
@@ -136,5 +161,24 @@ describe('advancePuzzle', () => {
     const state = initGameState(MOCK_PUZZLES);
     const next = advancePuzzle(state);
     expect(next.completedIds.has('p1')).toBe(true);
+  });
+});
+
+describe('xpForPuzzle', () => {
+  it('awards 10 XP for easy with no streak bonus', () => {
+    expect(xpForPuzzle('easy', 1)).toBe(10);
+  });
+
+  it('awards 20 XP for medium', () => {
+    expect(xpForPuzzle('medium', 1)).toBe(20);
+  });
+
+  it('awards 35 XP for hard', () => {
+    expect(xpForPuzzle('hard', 1)).toBe(35);
+  });
+
+  it('applies streak bonus at threshold', () => {
+    expect(xpForPuzzle('easy', STREAK_BONUS_THRESHOLD)).toBe(15);
+    expect(xpForPuzzle('hard', STREAK_BONUS_THRESHOLD)).toBe(53);
   });
 });

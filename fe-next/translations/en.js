@@ -10590,7 +10590,8 @@ const en = {
     "dislike": "Dislike",
     "next": "Next",
     "rateThis": "Rate this puzzle",
-    "thanks": "Thanks for your feedback"
+    "thanks": "Thanks for your feedback",
+    "xpEarned": "XP Earned"
   },
   "socketErrors": {
     "AUTH_REQUIRED": "Sign in required for this action",

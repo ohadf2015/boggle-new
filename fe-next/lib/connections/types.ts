@@ -5,6 +5,8 @@ export interface ConnectionPuzzle {
   word1: string;
   word2: string;
   bridge: string;
+  /** Additional accepted answers beyond the canonical bridge */
+  acceptedAnswers?: string[];
   /** Human-readable hint shown after 2 wrong attempts */
   hint?: string;
   difficulty: Difficulty;

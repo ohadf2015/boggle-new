@@ -66,6 +66,7 @@ export async function POST(request: NextRequest) {
       'duel_async',
       'duel_realtime',
       'daily_challenge',
+      'connections',
     ];
     if (!validTypes.includes(activityType)) {
       return NextResponse.json({ error: 'Invalid activityType' }, { status: 400 });

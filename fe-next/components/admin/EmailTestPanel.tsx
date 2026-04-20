@@ -166,7 +166,7 @@ export function EmailTestPanel({ authToken, userEmail, userName }: EmailTestPane
 
       <CardContent className="space-y-4">
         {/* Email Type Selector */}
-        <div className="flex gap-2">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
           {(Object.entries(EMAIL_TYPE_CONFIG) as [EmailType, typeof EMAIL_TYPE_CONFIG[EmailType]][]).map(([type, cfg]) => {
             const Icon = cfg.icon;
             const isActive = emailType === type;
@@ -175,14 +175,14 @@ export function EmailTestPanel({ authToken, userEmail, userName }: EmailTestPane
                 key={type}
                 onClick={() => handleTypeChange(type)}
                 className={cn(
-                  'flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-neo border-2 font-bold text-sm transition-all',
+                  'w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-neo border-2 font-bold text-sm transition-all min-w-0',
                   isActive
                     ? `${cfg.bgClass} text-neo-black border-neo-black shadow-hard-sm`
                     : `bg-neo-navy ${cfg.borderClass} ${cfg.textClass} hover:opacity-80`
                 )}
               >
-                <Icon className="w-4 h-4" />
-                {cfg.label}
+                <Icon className="w-4 h-4 shrink-0" />
+                <span className="truncate">{cfg.label}</span>
               </button>
             );
           })}

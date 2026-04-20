@@ -263,7 +263,7 @@ export default function PuzzleCard({ puzzle, state, onInputChange, onSubmit, onG
             placeholder={t('connections.placeholder')}
             disabled={isDisabled}
             className={[
-              'flex-1 rounded-neo border-neo bg-neo-navy text-neo-white font-neo-body',
+              'flex-1 min-w-0 rounded-neo border-neo bg-neo-navy text-neo-white font-neo-body',
               'px-4 py-3 text-lg outline-none transition-colors duration-200',
               'placeholder:text-neo-white/30 shadow-hard',
               isRTL ? 'text-right' : 'text-left',

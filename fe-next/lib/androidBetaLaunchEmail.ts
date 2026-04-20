@@ -136,8 +136,11 @@ export async function sendAndroidBetaLaunchToPlayer(
   let resolvedEmail: string | null = null;
 
   if (isEmail) {
-    const { data: authUsers, error: authError } =
-      await supabase.auth.admin.listUsers();
+    const { data: authUsers, error: authError } = await withTimeout(
+      supabase.auth.admin.listUsers({ perPage: 1000 }),
+      8000,
+      'Supabase listUsers timed out after 8 seconds'
+    );
     if (authError) {
       return { success: false, error: 'Failed to look up auth users' };
     }
@@ -186,11 +189,12 @@ export async function sendAndroidBetaLaunchToPlayer(
   }
 
   if (!resolvedEmail) {
-    const { data: authUsers } = await supabase.auth.admin.listUsers();
-    const match = authUsers?.users.find(
-      (u: { id: string; email?: string }) => u.id === profileId
+    const { data: authUser } = await withTimeout(
+      supabase.auth.admin.getUserById(profileId),
+      8000,
+      'Supabase getUserById timed out after 8 seconds'
     );
-    resolvedEmail = match?.email ?? null;
+    resolvedEmail = authUser?.user?.email ?? null;
   }
 
   if (!resolvedEmail) {

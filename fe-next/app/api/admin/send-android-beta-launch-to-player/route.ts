@@ -4,6 +4,8 @@ import { sendAndroidBetaLaunchToPlayer } from '@/lib/androidBetaLaunchEmail';
 import { isEmailServiceConfigured } from '@/lib/email';
 import { captureApiError } from '@/utils/sentry';
 
+export const maxDuration = 30;
+
 /**
  * POST /api/admin/send-android-beta-launch-to-player
  * Admin-only. Sends a real Android beta launch email to a specific player.
