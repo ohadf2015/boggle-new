@@ -1,8 +1,9 @@
 "use client";
 
+export const dynamic = 'force-dynamic';
+
 import { useEffect } from "react";
 import { Sparkles, RefreshCw } from "lucide-react";
-import { captureError } from "@/utils/sentry";
 import { getCachedTranslation } from "@/translations/loadTranslation";
 import type { Language } from "@/types";
 
@@ -51,11 +52,13 @@ export default function GlobalError({
       sessionStorage.removeItem("chunk_error_refresh");
     }
 
-    captureError(error, {
-      errorBoundary: {
-        type: "global-error",
-        digest: error.digest,
-      },
+    import("@/utils/sentry").then(({ captureError }) => {
+      captureError(error, {
+        errorBoundary: {
+          type: "global-error",
+          digest: error.digest,
+        },
+      });
     });
   }, [error]);
 

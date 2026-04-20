@@ -35,6 +35,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 import ChallengePageClient from './PageClient';
 
+export const dynamic = 'force-dynamic';
+
 export default function ChallengePage() {
   return <ChallengePageClient />;
 }

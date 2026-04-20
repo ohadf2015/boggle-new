@@ -3,6 +3,8 @@ import { BreadcrumbJsonLd } from '@/components/seo/BreadcrumbJsonLd';
 import BlastStrategyPageClient from './PageClient';
 import { contentByLocale } from './content';
 
+export const dynamic = 'force-dynamic';
+
 interface PageProps {
   params: Promise<{ locale: string }>;
 }

@@ -8,6 +8,7 @@ import type { Server } from 'socket.io';
 import type { WordDetail } from '@/shared/types';
 import type { GameState } from '../../modules/gameState/types';
 import { processGameResults, isSupabaseConfigured } from '../../modules/supabaseServer';
+import { notifyLevelUp, notifyAchievement } from '../../modules/pushNotificationTriggers';
 import type { GameResultsOutput } from '../../modules/supabase/gameProcessing';
 import type { UserAuthInfo } from '../../modules/supabase/client';
 import { updateQuestProgress } from '../../modules/weeklyQuestManager';
@@ -195,6 +196,10 @@ function emitXpEvents(io: Server, results: any, game: GameState): void {
             'XP',
             `Emitted levelUp to ${username}: ${xpInfo.oldLevel} -> ${xpInfo.newLevel}`
           );
+          const authUserId = (game.users?.[username] as UserData | undefined)?.authUserId;
+          if (authUserId) {
+            notifyLevelUp(authUserId, xpInfo.newLevel);
+          }
         }
       }
     }
@@ -227,6 +232,15 @@ function emitLifetimeAchievements(
             'ACHIEVEMENT',
             `Emitted ${achievements.length} lifetime achievement(s) to ${username}: ${achievements.map((a) => a.key).join(', ')}`
           );
+        }
+      }
+      if (userData?.authUserId) {
+        for (const achievement of achievements) {
+          const displayName = (achievement.key as string)
+            .toLowerCase()
+            .replace(/_/g, ' ')
+            .replace(/\b\w/g, (c: string) => c.toUpperCase());
+          notifyAchievement(userData.authUserId, displayName);
         }
       }
     }

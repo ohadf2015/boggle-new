@@ -11,7 +11,7 @@ import {
 } from '../_utils/wordListData';
 import { getNLetterWordsFaqs } from '../_utils/wordPageFaqSchema';
 
-export const revalidate = 86400;
+export const dynamic = 'force-dynamic';
 
 type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es';
 const LOCALES: Locale[] = ['en', 'he', 'sv', 'ja', 'es'];
@@ -65,16 +65,6 @@ const WORD_LENGTH_CONTENT: Record<number, { strategy: string; funFact: string; d
     difficulty: 'Elite — most players go entire sessions without finding one. When you do, it\'s worth announcing. These words are the reason the highest LexiClash score multipliers exist.',
   },
 };
-
-export async function generateStaticParams() {
-  const params: { locale: string; n: string }[] = [];
-  for (const locale of LOCALES) {
-    for (const n of VALID_LENGTHS) {
-      params.push({ locale, n: String(n) });
-    }
-  }
-  return params;
-}
 
 export async function generateMetadata({ params }: PageParams): Promise<Metadata> {
   const { locale, n: rawN } = await params;

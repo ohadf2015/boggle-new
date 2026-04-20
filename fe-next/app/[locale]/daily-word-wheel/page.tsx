@@ -3,6 +3,8 @@ import { loadTranslation } from '@/translations/loadTranslation';
 import type { Language } from '@/types';
 import { AnimatedLanding } from './AnimatedLanding';
 
+export const dynamic = 'force-dynamic';
+
 interface PageProps {
   params: Promise<{ locale: string }>;
 }

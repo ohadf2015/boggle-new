@@ -8,6 +8,8 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 
 import StudentAchievementsPageClient from './PageClient';
 
+export const dynamic = 'force-dynamic';
+
 export default function StudentAchievementsPage() {
   return <StudentAchievementsPageClient />;
 }

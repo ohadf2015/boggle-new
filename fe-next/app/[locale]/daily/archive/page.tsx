@@ -5,6 +5,8 @@ import { generatePageMetadata } from '@/lib/seo/generatePageMetadata';
 import { DAILY_CHALLENGE_EPOCH } from '@/utils/dailyChallenge/constants';
 import { safeToLocaleDateString } from '@/utils/bcp47Locale';
 
+export const dynamic = 'force-dynamic';
+
 type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es';
 
 interface PageParams {

@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 import AboutPageClient from './PageClient';
+
+export const dynamic = 'force-dynamic';
 import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
 
 interface PageProps {

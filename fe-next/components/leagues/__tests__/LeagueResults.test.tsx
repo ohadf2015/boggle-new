@@ -19,6 +19,15 @@ vi.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
+vi.mock('@/hooks/useInterstitialAd', () => ({
+  useInterstitialAd: () => ({ showInterstitial: vi.fn() }),
+  default: () => ({ showInterstitial: vi.fn() }),
+}));
+
+vi.mock('@/components/CrazyGamesSDK', () => ({
+  useCrazyGames: () => ({ submitLeaderboardScore: vi.fn() }),
+}));
+
 vi.mock('@/components/motion/AdaptiveMotion', () => ({
   AdaptiveMotion: {
     div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (

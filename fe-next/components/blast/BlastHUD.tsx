@@ -109,11 +109,6 @@ export function BlastHUD({
           W{waveNumber}
         </span>
 
-        {/* Combo streak badge */}
-        {comboStreak && comboStreakArcRef && (
-          <BlastComboStreakBadge streak={comboStreak} arcRef={comboStreakArcRef} />
-        )}
-
         <div className="flex items-center gap-1.5">
           {onShowHelp && (
             <button
@@ -135,11 +130,11 @@ export function BlastHUD({
         </div>
       </div>
 
-      {/* Bottom row: score | moves | progress — the three key stats */}
-      <div className="flex items-center justify-between px-3 py-1.5 gap-2">
+      {/* Bottom row: score | moves + combo | progress */}
+      <div className="flex items-center px-3 py-2 gap-3">
         {/* Score */}
-        <div className="flex items-center gap-1.5 min-w-0" aria-label={`${t('blast.score')}: ${animatedScore}`}>
-          <span className="text-amber-400 text-base">★</span>
+        <div className="flex items-center gap-1.5 flex-1 min-w-0" aria-label={`${t('blast.score')}: ${animatedScore}`}>
+          <span className="text-amber-400 text-base shrink-0">★</span>
           <span
             className={cn(
               'text-2xl font-black tabular-nums truncate transition-transform duration-150 text-neo-cream',
@@ -150,27 +145,27 @@ export function BlastHUD({
           </span>
         </div>
 
-        {/* Move counter / word count */}
-        <div className="flex flex-col items-center gap-0.5 shrink-0" aria-live="polite">
+        {/* Move counter + combo streak — same row */}
+        <div className="flex items-center gap-2 shrink-0" aria-live="polite">
           {isFiniteMoves ? (
-            <>
+            <div className="flex flex-col items-center gap-0.5">
               <div
                 className={cn(
-                  'w-11 h-11 rounded-full flex flex-col items-center justify-center border-2',
+                  'w-14 h-14 rounded-full flex flex-col items-center justify-center border-2',
                   movesRemaining <= 3 ? 'border-neo-red/80 bg-neo-red/15' : 'border-white/25 bg-white/8',
                 )}
               >
-                <span className={cn('text-xl font-black tabular-nums leading-none', moveColorClass)}>
+                <span className={cn('text-2xl font-black tabular-nums leading-none', moveColorClass)}>
                   {movesRemaining}
                 </span>
               </div>
               <span className={cn('text-[9px] font-bold uppercase tracking-wider leading-none', movesRemaining <= 3 ? 'text-neo-red' : 'text-white/50')}>
                 {t('blast.movesLeft')}
               </span>
-            </>
+            </div>
           ) : (
             <div className="flex flex-col items-center gap-0.5">
-              <span className="text-lg font-black text-neo-cream tabular-nums">
+              <span className="text-2xl font-black text-neo-cream tabular-nums">
                 {wordsFoundCount}
               </span>
               <span className="text-[9px] font-bold uppercase tracking-wider text-white/50">
@@ -178,14 +173,17 @@ export function BlastHUD({
               </span>
             </div>
           )}
+          {comboStreak && comboStreakArcRef && (
+            <BlastComboStreakBadge streak={comboStreak} arcRef={comboStreakArcRef} />
+          )}
         </div>
 
         {/* Tile clear progress */}
-        <div className="flex flex-col items-end gap-0.5">
-          <span className="text-xs font-bold text-white/70 tabular-nums">
+        <div className="flex flex-col items-end gap-1 flex-1">
+          <span className="text-sm font-black text-neo-cream tabular-nums">
             {clearPct}%
           </span>
-          <div className="w-16 h-2 bg-white/10 rounded-full overflow-hidden">
+          <div className="w-full h-3.5 bg-white/10 rounded-full overflow-hidden border border-white/10">
             <div
               className="h-full rounded-full transition-all duration-300"
               style={{
@@ -196,8 +194,8 @@ export function BlastHUD({
               }}
             />
           </div>
-          <span className="text-[8px] font-bold uppercase tracking-wider text-white/40">
-            {t('blast.cleared')}
+          <span className="text-[9px] font-bold uppercase tracking-wider text-white/40">
+            {tilesCleared}/{totalTiles} {t('blast.cleared')}
           </span>
         </div>
       </div>

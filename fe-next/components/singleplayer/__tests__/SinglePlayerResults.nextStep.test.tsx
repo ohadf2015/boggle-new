@@ -89,6 +89,15 @@ vi.mock('@/hooks/useAutoShowWithInteraction', () => ({
   useAutoShowWithInteraction: vi.fn(),
 }));
 
+vi.mock('@/hooks/useInterstitialAd', () => ({
+  useInterstitialAd: () => ({ showInterstitial: vi.fn() }),
+  default: () => ({ showInterstitial: vi.fn() }),
+}));
+
+vi.mock('@/components/CrazyGamesSDK', () => ({
+  useCrazyGames: () => ({ submitLeaderboardScore: vi.fn() }),
+}));
+
 vi.mock('@/hooks/useWordHuntPromo', () => ({
   useWordHuntPromo: () => ({
     canShow: false,

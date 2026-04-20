@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import GuidesIndexPageClient from './PageClient';
 import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
 
+export const dynamic = 'force-dynamic';
+
 interface PageProps {
   params: Promise<{ locale: string }>;
 }

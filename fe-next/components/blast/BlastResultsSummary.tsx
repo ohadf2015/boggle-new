@@ -1,28 +1,9 @@
 'use client';
 
-/**
- * BlastResultsSummary — post-game results screen for Blast Mode.
- *
- * Renders the final score, percentile rank band, PB delta, best-moment card,
- * achievement ribbon, and CTAs. Pure presentational component — owns no
- * mutable state other than the badge-unlock side effect (delegated to
- * `useBlastBadgeUnlocks`).
- *
- * Sections render conditionally on data availability so the component is
- * resilient while the `saveBlastResult` round-trip is in flight:
- *  - Score card always shows immediately
- *  - Percentile band fades in once `results.percentile != null`
- *  - PB delta only when `previousBest` exists AND was beaten
- *
- * Iconography: lucide-react only (no emoji). Badge icon names come from the
- * registry as strings; we resolve them through a local lookup map so the
- * registry stays serializable.
- */
-
 import { type ComponentType } from 'react';
 import {
   Trophy, Star, Sparkles, Waves, Flag, Link as LinkIcon, Crown,
-  BookOpen, Target, TrendingUp, Award, Zap,
+  BookOpen, Target, TrendingUp, Award, Zap, LayoutGrid,
 } from 'lucide-react';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { Button } from '@/components/ui/button';
@@ -35,7 +16,6 @@ import type { BlastResultsData } from './types';
 
 type IconType = ComponentType<{ className?: string; strokeWidth?: number }>;
 
-/** Resolves the string icon names stored in `blastBadges.ts` to components. */
 const BADGE_ICONS: Record<string, IconType> = {
   Sparkles, Waves, Flag, Link: LinkIcon, Crown, BookOpen, Target, Trophy,
 };
@@ -50,10 +30,8 @@ interface BlastResultsSummaryProps {
 export function BlastResultsSummary({
   results, t, onPlayAgain, onQuit,
 }: BlastResultsSummaryProps) {
-  // Side-effect: persist + toast new badges. Returns enriched list w/ isNew flag.
   const badges = useBlastBadgeUnlocks({ results, t });
 
-  // Pure selector: results → mascot key → public asset path.
   const mascotKey = getMascotForResults(results);
   const mascotSrc = MASCOT_IMAGES[mascotKey];
 
@@ -67,12 +45,24 @@ export function BlastResultsSummary({
       ? results.waveResults.reduce((a, b) => (b.score > a.score ? b : a))
       : null);
 
+  // Derived skill stats from words found
+  const wordCount = results.wordsFound.length;
+  const avgLength = wordCount > 0
+    ? Math.round(results.wordsFound.reduce((s, w) => s + w.length, 0) / wordCount * 10) / 10
+    : 0;
+  const longWords = results.wordsFound.filter(w => w.length >= 6).length;
+
+  // Top words for chip display — sort by length desc, take top 8
+  const topWords = [...results.wordsFound]
+    .sort((a, b) => b.length - a.length)
+    .slice(0, 8);
+
   return (
     <div
       className="flex-1 flex flex-col items-center justify-start gap-4 px-4 py-6 pb-24 overflow-y-auto w-full max-w-md mx-auto"
       data-testid="blast-results-summary"
     >
-      {/* Mascot — expression reacts to run outcome via pure selector */}
+      {/* Mascot */}
       <AdaptiveMotion.div
         initial={{ scale: 0, rotate: -10, opacity: 0 }}
         animate={{ scale: 1, rotate: 0, opacity: 1 }}
@@ -89,15 +79,18 @@ export function BlastResultsSummary({
         />
       </AdaptiveMotion.div>
 
-      {/* Header */}
-      <AdaptiveMotion.h2
-        initial={{ scale: 0.6, opacity: 0, y: -10 }}
-        animate={{ scale: 1, opacity: 1, y: 0 }}
-        transition={{ type: 'spring', stiffness: 380, damping: 22 }}
-        className="text-3xl font-black uppercase text-neo-pink font-neo-display tracking-wider drop-shadow-[3px_3px_0_#000]"
-      >
-        {t('blast.gameOver')}
-      </AdaptiveMotion.h2>
+      {/* Header + star rating */}
+      <div className="flex flex-col items-center gap-1.5">
+        <AdaptiveMotion.h2
+          initial={{ scale: 0.6, opacity: 0, y: -10 }}
+          animate={{ scale: 1, opacity: 1, y: 0 }}
+          transition={{ type: 'spring', stiffness: 380, damping: 22 }}
+          className="text-3xl font-black uppercase text-neo-pink font-neo-display tracking-wider drop-shadow-[3px_3px_0_#000]"
+        >
+          {t('blast.gameOver')}
+        </AdaptiveMotion.h2>
+        <StarRating stars={results.stars} label={t(`blast.stars${results.stars}`)} />
+      </div>
 
       {/* Score card */}
       <AdaptiveMotion.div
@@ -139,12 +132,35 @@ export function BlastResultsSummary({
             {t('blast.results.pbDelta', { delta: pbDelta.toLocaleString() })}
           </p>
         )}
+        {/* Tiles cleared progress bar */}
+        <div className="mt-3 pt-3 border-t border-white/10">
+          <div className="flex justify-between items-center mb-1.5">
+            <span className="text-[10px] uppercase tracking-wider font-bold text-white/50">
+              {t('blast.results.tilesCleared')}
+            </span>
+            <span className="text-[11px] font-black text-neo-cyan tabular-nums">
+              {results.tilesCleared}/{results.totalTiles} &middot; {results.clearPercentage}%
+            </span>
+          </div>
+          <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden border border-white/10">
+            <AdaptiveMotion.div
+              initial={{ width: 0 }}
+              animate={{ width: `${results.clearPercentage}%` }}
+              transition={{ duration: 0.8, delay: 0.2, ease: 'easeOut' }}
+              className={cn(
+                'h-full rounded-full',
+                results.clearPercentage >= 90 ? 'bg-neo-lime' :
+                results.clearPercentage >= 60 ? 'bg-neo-cyan' : 'bg-neo-pink',
+              )}
+            />
+          </div>
+        </div>
       </AdaptiveMotion.div>
 
-      {/* Brag card — richer comparison + share CTA. Self-hides until backend responds. */}
+      {/* Brag card */}
       <BlastBragCard results={results} t={t} />
 
-      {/* Best-moment card: best wave + biggest combo + best word */}
+      {/* Best-moment grid */}
       <AdaptiveMotion.div
         initial={{ scale: 0.85, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
@@ -181,12 +197,118 @@ export function BlastResultsSummary({
         )}
       </AdaptiveMotion.div>
 
+      {/* Wave breakdown */}
+      {results.waveResults.length > 0 && (
+        <AdaptiveMotion.div
+          initial={{ y: 10, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.2 }}
+          className="w-full"
+          data-testid="blast-results-wave-breakdown"
+        >
+          <p className="text-[10px] uppercase tracking-widest font-bold text-white/60 mb-2 px-1">
+            {t('blast.waveBreakdown')}
+          </p>
+          <div className="flex flex-col gap-1.5">
+            {results.waveResults.map((wave) => {
+              const isBest = bestWave?.waveNumber === wave.waveNumber;
+              const pct = wave.clearPercentage;
+              return (
+                <div
+                  key={wave.waveNumber}
+                  className={cn(
+                    'flex items-center gap-2 px-3 py-2 rounded-neo border-2',
+                    isBest
+                      ? 'border-neo-lime bg-neo-lime/10'
+                      : 'border-white/10 bg-neo-navy',
+                  )}
+                >
+                  <span className={cn(
+                    'font-neo-display font-black text-xs min-w-[48px]',
+                    isBest ? 'text-neo-lime' : 'text-white/60',
+                  )}>
+                    {t('blast.results.wave', { n: String(wave.waveNumber) })}
+                  </span>
+                  <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                    <div
+                      className={cn('h-full rounded-full', isBest ? 'bg-neo-lime' : 'bg-neo-cyan/60')}
+                      style={{ width: `${pct}%` }}
+                    />
+                  </div>
+                  <span className="font-black text-xs text-white tabular-nums min-w-[44px] text-right">
+                    {wave.score.toLocaleString()}
+                  </span>
+                  <span className="text-[10px] text-white/40 tabular-nums min-w-[30px] text-right">
+                    {pct}%
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </AdaptiveMotion.div>
+      )}
+
+      {/* Skill stats */}
+      <AdaptiveMotion.div
+        initial={{ y: 10, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.25 }}
+        className="w-full"
+        data-testid="blast-results-skills"
+      >
+        <p className="text-[10px] uppercase tracking-widest font-bold text-white/60 mb-2 px-1">
+          {t('blast.skillBreakdown')}
+        </p>
+        <div className="grid grid-cols-2 gap-2">
+          <SkillCell icon={LayoutGrid} label={t('blast.skillBoardClear')} value={`${results.clearPercentage}%`} tint="text-neo-cyan" />
+          <SkillCell icon={Zap} label={t('blast.skillLongWords')} value={`${longWords}`} tint="text-neo-pink" />
+          <SkillCell icon={BookOpen} label={t('blast.skillAvgLength')} value={`${avgLength}`} tint="text-neo-lime" />
+          <SkillCell icon={Trophy} label={t('blast.results.biggestCombo')} value={`x${results.maxCombo}`} tint="text-yellow-400" />
+        </div>
+      </AdaptiveMotion.div>
+
+      {/* Words found chips */}
+      {topWords.length > 0 && (
+        <AdaptiveMotion.div
+          initial={{ y: 10, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.3 }}
+          className="w-full"
+          data-testid="blast-results-words"
+        >
+          <p className="text-[10px] uppercase tracking-widest font-bold text-white/60 mb-2 px-1">
+            {t('blast.foundWords')} ({wordCount})
+          </p>
+          <div className="flex flex-wrap gap-1.5">
+            {topWords.map((word) => (
+              <span
+                key={word}
+                className={cn(
+                  'px-2.5 py-1 rounded-neo border-2 border-neo-black shadow-hard-sm',
+                  'font-neo-display font-black uppercase text-[11px] tracking-wide',
+                  word.length >= 6 ? 'bg-neo-lime text-neo-black' :
+                  word.length >= 4 ? 'bg-neo-navy text-neo-cyan border-neo-cyan/40' :
+                  'bg-neo-navy text-white/60 border-white/10',
+                )}
+              >
+                {word}
+              </span>
+            ))}
+            {wordCount > 8 && (
+              <span className="px-2.5 py-1 text-[11px] text-white/40 font-bold">
+                +{wordCount - 8}
+              </span>
+            )}
+          </div>
+        </AdaptiveMotion.div>
+      )}
+
       {/* Achievement ribbon */}
       {badges.length > 0 && (
         <AdaptiveMotion.div
           initial={{ y: 10, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.25 }}
+          transition={{ delay: 0.35 }}
           className="w-full"
           data-testid="blast-results-badges"
         >
@@ -217,7 +339,7 @@ export function BlastResultsSummary({
                         animate={{ scale: 1, rotate: 0 }}
                         transition={{
                           type: 'spring', stiffness: 380, damping: 16,
-                          delay: 0.3 + i * 0.08,
+                          delay: 0.4 + i * 0.08,
                         }}
                         className={cn(
                           'relative flex items-center gap-1.5 px-3 py-2 cursor-help',
@@ -275,8 +397,8 @@ export function BlastResultsSummary({
       <AdaptiveMotion.div
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.4 }}
-        className="flex flex-col gap-3 w-full mt-2"
+        transition={{ delay: 0.45 }}
+        className="flex flex-col gap-2 w-full mt-2"
       >
         <Button
           data-testid="play-again-button"
@@ -287,10 +409,10 @@ export function BlastResultsSummary({
           {t('blast.playAgain')}
         </Button>
         <Button
-          variant="outline"
-          size="lg"
+          variant="ghost"
+          size="sm"
           onClick={onQuit}
-          className="min-h-[48px] font-bold uppercase border-3 border-neo-lime text-neo-lime bg-neo-navy/80 hover:bg-neo-navy"
+          className="font-semibold text-white/40 hover:text-white/70 hover:bg-transparent uppercase tracking-wider text-xs"
         >
           {t('common.home')}
         </Button>
@@ -320,6 +442,60 @@ function BestMomentCell({ icon: Icon, label, value, sub, tint }: BestMomentCellP
       {sub && (
         <p className="text-[10px] text-white/60 tabular-nums leading-tight">{sub}</p>
       )}
+    </div>
+  );
+}
+
+interface SkillCellProps {
+  icon: IconType;
+  label: string;
+  value: string;
+  tint: string;
+}
+
+function SkillCell({ icon: Icon, label, value, tint }: SkillCellProps) {
+  return (
+    <div className={cn(
+      'flex items-center gap-2.5 px-3 py-2.5 rounded-neo border-2 border-white/10 bg-neo-navy',
+    )}>
+      <Icon className={cn('w-4 h-4 shrink-0', tint)} strokeWidth={2.5} />
+      <div className="flex-1 min-w-0">
+        <p className="text-[9px] uppercase tracking-wider font-bold text-white/40 leading-none mb-0.5">
+          {label}
+        </p>
+        <p className={cn('font-neo-display font-black text-base leading-none tabular-nums', tint)}>
+          {value}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+interface StarRatingProps {
+  stars: 1 | 2 | 3;
+  label: string;
+}
+
+function StarRating({ stars, label }: StarRatingProps) {
+  return (
+    <div className="flex flex-col items-center gap-1">
+      <div className="flex gap-1">
+        {[1, 2, 3].map((n) => (
+          <Star
+            key={n}
+            className={cn(
+              'w-6 h-6 transition-all',
+              n <= stars
+                ? 'text-yellow-400 fill-yellow-400 drop-shadow-[1px_1px_0_#000]'
+                : 'text-white/20',
+            )}
+            strokeWidth={2}
+          />
+        ))}
+      </div>
+      <span className="text-[10px] uppercase tracking-widest font-black text-yellow-400/80">
+        {label}
+      </span>
     </div>
   );
 }

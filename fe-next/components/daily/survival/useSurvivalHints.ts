@@ -12,6 +12,7 @@ export interface UseSurvivalHintsProps {
   playWordAcceptedSound?: () => void;
   showToast: (type: FeedbackType, message: string) => void;
   t: (key: string) => string;
+  accumulatedClues?: Map<number, { letter: string; type: string }>;
 }
 
 
@@ -50,6 +51,7 @@ export function useSurvivalHints({
   playWordAcceptedSound,
   showToast,
   t,
+  accumulatedClues,
 }: UseSurvivalHintsProps): [HintState, HintActions] {
   const [currentHint, setCurrentHint] = useState<HintLevel | null>(null);
   const [category, setCategory] = useState('');
@@ -78,11 +80,26 @@ export function useSurvivalHints({
     }
   }, [initialHints]);
 
+  // Positions still hidden from the player (excludes last index, shop reveals, gameplay greens)
+  const unrevealedPositions = useMemo(() => {
+    if (!targetWord) return [];
+    const hintChars = currentHint?.hint.split(' ').filter(c => c !== '') ?? [];
+    const lastIdx = targetWord.length - 1;
+    return [...Array(targetWord.length).keys()].filter(
+      i =>
+        i !== lastIdx &&
+        !revealedLetters.has(i) &&
+        !accumulatedClues?.has(i) &&
+        (hintChars[i] === '_' || hintChars[i] === undefined)
+    );
+  }, [targetWord, revealedLetters, accumulatedClues, currentHint]);
+
   // Determine hint availability based on state
   const unrevealedCount = useMemo(() => {
     if (!targetWord) return 0;
-    return targetWord.length - revealedLetters.size;
-  }, [targetWord, revealedLetters]);
+    const greenPositions = accumulatedClues ? accumulatedClues.size : 0;
+    return targetWord.length - revealedLetters.size - greenPositions;
+  }, [targetWord, revealedLetters, accumulatedClues]);
 
   // We can reveal letters until only 1 is left hidden
   const canRevealLetter = unrevealedCount > 1;
@@ -147,14 +164,8 @@ export function useSurvivalHints({
     let success = false;
     
     if (nextHintItem.id === 'reveal_letter') {
-         const hintChars = currentHint?.hint.split(' ').filter(c => c !== '') ?? [];
-         const lastIdx = targetWord.length - 1;
-         const unrevealed = [...Array(targetWord.length).keys()].filter(
-           i => i !== lastIdx && !revealedLetters.has(i) && (hintChars[i] === '_' || hintChars[i] === undefined)
-         );
-        // Last index already excluded above, so any non-empty unrevealed is safe to reveal.
-        if (unrevealed.length > 0) {
-             const nextIdx = unrevealed[0];
+        if (unrevealedPositions.length > 0) {
+             const nextIdx = unrevealedPositions[0];
              setRevealedLetters(prev => new Set([...prev, nextIdx]));
              success = true;
         } else {
@@ -177,7 +188,7 @@ export function useSurvivalHints({
         showToast('valid-word', `${nextHintItem.name} Unlocked! (-${nextHintItem.cost} Coins)`);
     }
     
-  }, [nextHintItem, targetWord, revealedLetters, currentHint, playWordAcceptedSound, showToast, t]);
+  }, [nextHintItem, unrevealedPositions, playWordAcceptedSound, showToast, t]);
 
 
   // Auto-Unlock logic
@@ -216,29 +227,21 @@ export function useSurvivalHints({
   }, [nextHintItem, buyNextHint]);
 
   const autoRevealLetter = useCallback((): number => {
-      const hintChars = currentHint?.hint.split(' ').filter(c => c !== '') ?? [];
-      const lastIdx = targetWord.length - 1;
-      const unrevealed = [...Array(targetWord.length).keys()].filter(
-        i => i !== lastIdx && !revealedLetters.has(i) && (hintChars[i] === '_' || hintChars[i] === undefined)
-      );
-      if (unrevealed.length > 0) {
-        const nextIdx = unrevealed[0];
+      if (unrevealedPositions.length > 0) {
+        const nextIdx = unrevealedPositions[0];
         setRevealedLetters(prev => new Set([...prev, nextIdx]));
         return nextIdx;
       }
       return -1;
-    }, [targetWord.length, revealedLetters, currentHint]);
+    }, [unrevealedPositions]);
 
   const autoUnlockNextHint = useCallback((): ClueShopItem | null => {
       if (!nextHintItem) return null;
+      // Don't auto-unlock anything when only 1 letter remains — player must guess it
+      if (!canRevealLetter) return null;
       if (nextHintItem.id === 'reveal_letter') {
-          const hintChars = currentHint?.hint.split(' ').filter(c => c !== '') ?? [];
-          const lastIdx = targetWord.length - 1;
-          const unrevealed = [...Array(targetWord.length).keys()].filter(
-            i => i !== lastIdx && !revealedLetters.has(i) && (hintChars[i] === '_' || hintChars[i] === undefined)
-          );
-          if (unrevealed.length === 0) return null;
-          setRevealedLetters(prev => new Set([...prev, unrevealed[0]]));
+          if (unrevealedPositions.length === 0) return null;
+          setRevealedLetters(prev => new Set([...prev, unrevealedPositions[0]]));
       } else if (nextHintItem.id === 'reveal_category') {
           setShowCategory(true);
       } else if (nextHintItem.id === 'example_sentence') {
@@ -246,7 +249,7 @@ export function useSurvivalHints({
       }
       playWordAcceptedSound?.();
       return nextHintItem;
-  }, [nextHintItem, targetWord.length, revealedLetters, currentHint, playWordAcceptedSound]);
+  }, [nextHintItem, canRevealLetter, unrevealedPositions, playWordAcceptedSound]);
 
   const revealCategory = useCallback(() => setShowCategory(true), []);
   const revealExample = useCallback(() => setShowExample(true), []);

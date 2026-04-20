@@ -40,18 +40,6 @@ const PushNotificationPrompt = nextDynamic(
 const CookieConsent = nextDynamic(() => import('@/components/CookieConsent'));
 
 
-export const dynamicParams = false;
-
-export function generateStaticParams() {
-    return [
-        { locale: 'en' },
-        { locale: 'he' },
-        { locale: 'sv' },
-        { locale: 'ja' },
-        { locale: 'es' },
-    ];
-}
-
 type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es';
 
 interface LocaleLayoutProps {

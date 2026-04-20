@@ -3,6 +3,8 @@ import { wordsByLocale, getTodayWord, type Locale } from './content';
 import WordOfTheDayClient from './PageClient';
 import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
 
+export const dynamic = 'force-dynamic';
+
 const SITE_URL = 'https://www.lexiclash.live';
 
 interface PageProps {

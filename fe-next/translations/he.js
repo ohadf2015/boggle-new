@@ -10435,6 +10435,25 @@ const he = {
       "inverter": "רונות צ׳יפ מושבתות, רק מכפילים עובדים"
     }
   },
+  "connections": {
+    "title": "שרשרת מילים",
+    "subtitle": "מצא את המילה המקשרת!",
+    "placeholder": "הקלד את מילת הגשר...",
+    "submit": "שלח",
+    "correct": "נכון!",
+    "wrong": "תשובה שגויה",
+    "lives": "חיים",
+    "score": "ניקוד",
+    "streak": "רצף",
+    "finished": "סיימת!",
+    "finalScore": "ניקוד סופי",
+    "playAgain": "שחק שוב",
+    "loading": "טוען...",
+    "noAccess": "מצב משחק זה אינו זמין.",
+    "hintLabel": "רמז",
+    "bonusPoints": "בונוס רצף!",
+    "wordChain": "מילה1 + ? + מילה2"
+  },
   "socketErrors": {
     "AUTH_REQUIRED": "נדרשת התחברות לפעולה זו",
     "GAME_NOT_FOUND": "משחק לא נמצא. בדוק את הקוד!",

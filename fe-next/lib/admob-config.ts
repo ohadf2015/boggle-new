@@ -24,12 +24,15 @@ export function getAdmobConfig(platform: AdPlatform): AdmobConfig {
   return {
     rewardedAdId:
       process.env[`NEXT_PUBLIC_ADMOB_REWARDED_${suffix}`] ||
+      process.env['NEXT_PUBLIC_ADMOB_REWARDED_ID'] ||
       DEFAULTS[platform].rewardedAdId,
     interstitialAdId:
       process.env[`NEXT_PUBLIC_ADMOB_INTERSTITIAL_${suffix}`] ||
+      process.env['NEXT_PUBLIC_ADMOB_INTERSTITIAL_ID'] ||
       DEFAULTS[platform].interstitialAdId,
     bannerAdId:
       process.env[`NEXT_PUBLIC_ADMOB_BANNER_${suffix}`] ||
+      process.env['NEXT_PUBLIC_ADMOB_BANNER_ID'] ||
       DEFAULTS[platform].bannerAdId,
   };
 }

@@ -8,6 +8,8 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 
 import ReportsPageClient from './PageClient';
 
+export const dynamic = 'force-dynamic';
+
 export default function TeacherReportsPage() {
   return <ReportsPageClient />;
 }

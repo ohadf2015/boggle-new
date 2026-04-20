@@ -148,6 +148,11 @@ export async function registerAllCronJobs(): Promise<void> {
     const { runAutoPromotion } = await import('../modules/autoPromotion');
     await runAutoPromotion();
   });
+
+  await registerCronJob('daily-challenge-reminder', '0 17 * * *', async () => {
+    const { sendDailyChallengeReminders } = await import('../services/dailyChallengeReminder');
+    await sendDailyChallengeReminders();
+  });
 }
 
 /**

@@ -201,6 +201,7 @@ export function useSurvivalGameLogic({
     playWordAcceptedSound,
     showToast,
     t,
+    accumulatedClues: clueState.accumulatedClues,
   });
 
   // Callback ref for game over (needed by word submission hook)

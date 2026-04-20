@@ -15,7 +15,7 @@ import { AnimatedCounter } from '../../_components/AnimatedCounter';
 import { PulseCTA } from '../../_components/PulseCTA';
 import { LETTER_CONTENT } from './letterContent';
 
-export const revalidate = 86400;
+export const dynamic = 'force-dynamic';
 
 type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es';
 const LOCALES: Locale[] = ['en', 'he', 'sv', 'ja', 'es'];
@@ -23,16 +23,6 @@ const BASE_URL = 'https://www.lexiclash.live';
 
 interface PageParams {
   params: Promise<{ locale: string; letter: string }>;
-}
-
-export async function generateStaticParams() {
-  const params: { locale: string; letter: string }[] = [];
-  for (const locale of LOCALES) {
-    for (const letter of VALID_LETTERS) {
-      params.push({ locale, letter });
-    }
-  }
-  return params;
 }
 
 export async function generateMetadata({ params }: PageParams): Promise<Metadata> {

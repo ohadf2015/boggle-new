@@ -3,6 +3,8 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { calculateWordScore, getComboBonus } from '@/shared/utils/scoring';
 
+export const dynamic = 'force-dynamic';
+
 type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es';
 const LOCALES: Locale[] = ['en', 'he', 'sv', 'ja', 'es'];
 const BASE_URL = 'https://www.lexiclash.live';

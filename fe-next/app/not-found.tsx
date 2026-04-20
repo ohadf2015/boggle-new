@@ -3,6 +3,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { headers } from 'next/headers';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: '404 - Page Not Found | LexiClash',
   robots: { index: false, follow: false },

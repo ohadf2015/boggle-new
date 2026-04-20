@@ -41,6 +41,7 @@ export const PUBLIC_ROUTES: string[] = [
   "/comeback-test",
   "/community",
   "/community/create",
+  "/connections",
   "/contact",
   "/create/board",
   "/custom",

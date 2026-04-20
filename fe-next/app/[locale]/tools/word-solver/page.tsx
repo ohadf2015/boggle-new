@@ -4,6 +4,8 @@ import WordSolverPageClient from './PageClient';
 import { getContent, type Locale } from './content';
 import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
 
+export const dynamic = 'force-dynamic';
+
 type ValidLocale = 'en' | 'he' | 'sv' | 'ja' | 'es';
 
 interface PageParams {

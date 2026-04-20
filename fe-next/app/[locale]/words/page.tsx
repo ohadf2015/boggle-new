@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
+export const dynamic = 'force-dynamic';
+
 type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es';
 const LOCALES: Locale[] = ['en', 'he', 'sv', 'ja', 'es'];
 const BASE_URL = 'https://www.lexiclash.live';

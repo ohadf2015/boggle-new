@@ -5,6 +5,8 @@ import BoggleAlternativesPageClient from './PageClient';
 import { contentByLocale } from './content';
 import { faqByLocale } from './faq';
 
+export const dynamic = 'force-dynamic';
+
 interface PageProps {
   params: Promise<{ locale: string }>;
 }

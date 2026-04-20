@@ -4,6 +4,8 @@ import { loadTranslation, type TranslationData } from '@/translations/loadTransl
 import type { Metadata } from 'next';
 import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
 
+export const dynamic = 'force-dynamic';
+
 type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es';
 
 interface PageParams {

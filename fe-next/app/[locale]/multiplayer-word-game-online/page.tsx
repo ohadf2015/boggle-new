@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
+export const dynamic = 'force-dynamic';
+
 type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es';
 
 interface PageProps {

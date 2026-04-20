@@ -1,6 +1,8 @@
 // This page is outside the [locale] route group and needs its own LanguageProvider.
 // It is a server component so metadata can be exported.
 import type { Metadata } from 'next';
+
+export const dynamic = 'force-dynamic';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import PartyScreenContent from './PartyScreenContent';
 

@@ -4,6 +4,8 @@ import { Suspense } from 'react';
 import { PageLoader } from '@/components/ui/PageLoader';
 import PageClient from './PageClient';
 
+export const dynamic = 'force-dynamic';
+
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
   return generatePageMetadata({ seoKey: 'educationClassroomGame', path: '/education/classroom-game', locale });

@@ -1,9 +1,13 @@
 # Android Release Status — live.lexiclash.app
 
-**Updated:** 2026-04-18
+**Updated:** 2026-04-20
 
 ## Current Blocker
-Google upload-key reset request pending (24-48h, manual approval). Everything else green.
+None. Upload-key reset approved by Google on 2026-04-20. v2 keystore fully active.
+
+## Last Release
+versionCode 3706 (AdMob implementation) uploaded to Internal track on 2026-04-20.
+Promote to Production manually via Play Console (API promotion blocked until internal testers install first).
 
 ## Keystore (v2 — new upload key)
 - Path: `android/lexiclash-upload-v2.keystore` (also referenced as `lexiclash-release.keystore` via env)

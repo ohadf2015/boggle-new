@@ -3,6 +3,8 @@ import { Suspense } from 'react';
 import { generatePageMetadata } from '@/lib/seo/generatePageMetadata';
 import PageClient from './PageClient';
 
+export const dynamic = 'force-dynamic';
+
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
   return generatePageMetadata({ seoKey: 'educationDuels', path: '/education/duels', locale });

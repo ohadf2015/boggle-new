@@ -5,6 +5,8 @@ import { DAILY_CHALLENGE_EPOCH } from '@/utils/dailyChallenge/constants';
 import { getPuzzleNumber } from '@/utils/dailyChallenge';
 import { safeToLocaleDateString, safeToLocaleString } from '@/utils/bcp47Locale';
 
+export const dynamic = 'force-dynamic';
+
 type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es';
 const LOCALES: Locale[] = ['en', 'he', 'sv', 'ja', 'es'];
 const BASE_URL = 'https://www.lexiclash.live';
@@ -41,26 +43,6 @@ async function fetchPuzzleStats(date: string, language: string) {
     return null;
   }
 }
-
-export async function generateStaticParams() {
-  const params: Array<{ locale: string; date: string }> = [];
-  const now = new Date();
-  const yesterday = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() - 1));
-
-  for (let i = 0; i < 30; i++) {
-    const date = new Date(yesterday);
-    date.setUTCDate(date.getUTCDate() - i);
-    if (date < DAILY_CHALLENGE_EPOCH) break;
-    const dateStr = date.toISOString().split('T')[0];
-    for (const locale of LOCALES) {
-      params.push({ locale, date: dateStr });
-    }
-  }
-  return params;
-}
-
-export const dynamicParams = true;
-export const revalidate = 21600;
 
 export async function generateMetadata({ params }: PageParams): Promise<Metadata> {
   const { locale, date } = await params;

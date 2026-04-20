@@ -3,6 +3,8 @@ import { notFound } from 'next/navigation';
 import { generatePageMetadata } from '@/lib/seo/generatePageMetadata';
 import BoardPlayPageClient from './PageClient';
 
+export const dynamic = 'force-dynamic';
+
 export async function generateMetadata({ params }: { params: Promise<{ locale: string; boardCode: string }> }): Promise<Metadata> {
   const { locale } = await params;
   return generatePageMetadata({ seoKey: 'communityBoard', path: '/community', locale });

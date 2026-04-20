@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import GlossaryPageClient from './PageClient';
 import { contentByLocale } from './content';
 
+export const dynamic = 'force-dynamic';
+
 interface PageProps {
   params: Promise<{ locale: string }>;
 }

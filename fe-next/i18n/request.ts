@@ -12,10 +12,14 @@ import { locales, type Locale } from './config';
 import { normalizeMessages } from './normalizeMessages';
 
 export default getRequestConfig(async ({ requestLocale }) => {
-  let locale = await requestLocale;
-
-  // Validate locale
-  if (!locale || !locales.includes(locale as Locale)) {
+  let locale: string = 'en';
+  try {
+    const resolved = await requestLocale;
+    if (resolved && locales.includes(resolved as Locale)) {
+      locale = resolved;
+    }
+  } catch {
+    // No request context during prerender (e.g. /_global-error) — fall back to default
     locale = 'en';
   }
 

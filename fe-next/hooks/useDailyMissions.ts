@@ -60,7 +60,7 @@ export function useDailyMissions(): UseDailyMissionsReturn {
   const { playQuestCompleteSound } = useSoundEffects();
   const playerId = user?.id ?? null;
   const isMounted = useRef(true);
-  const prevGrandSlamRef = useRef<boolean>(false);
+  const prevGrandSlamRef = useRef<boolean | null>(null);
   const hasShownGrandSlamToast = useRef(false);
 
   const [missions, setMissions] = useState<Mission[]>(buildMissions(null));

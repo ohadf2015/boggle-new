@@ -1,5 +1,7 @@
 import FAQPageClient from './PageClient';
 import { loadTranslation, type TranslationData } from '@/translations/loadTranslation';
+
+export const dynamic = 'force-dynamic';
 import type { Metadata } from 'next';
 import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
 

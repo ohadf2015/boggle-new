@@ -4,6 +4,8 @@ import { fetchLandingData } from '@/lib/landing/fetchLandingData';
 import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
 import { buildHomepageFaqJsonLd } from '@/lib/seo/homepageFaqJsonLd';
 
+export const dynamic = 'force-dynamic';
+
 /**
  * Main landing page - Game mode selection
  * Users choose between Single Player and Multiplayer modes

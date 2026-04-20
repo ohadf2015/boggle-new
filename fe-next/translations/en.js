@@ -10550,6 +10550,25 @@ const en = {
       "fogActive": "Fog of War active!"
     }
   },
+  "connections": {
+    "title": "Word Chain",
+    "subtitle": "Find the word that connects both!",
+    "placeholder": "Type the bridge word...",
+    "submit": "Submit",
+    "correct": "Correct!",
+    "wrong": "Wrong answer",
+    "lives": "Lives",
+    "score": "Score",
+    "streak": "Streak",
+    "finished": "You finished!",
+    "finalScore": "Final Score",
+    "playAgain": "Play Again",
+    "loading": "Loading...",
+    "noAccess": "This game mode is not available.",
+    "hintLabel": "Hint",
+    "bonusPoints": "Streak Bonus!",
+    "wordChain": "WORD1 + ? + WORD2"
+  },
   "socketErrors": {
     "AUTH_REQUIRED": "Sign in required for this action",
     "GAME_NOT_FOUND": "Game not found. Check the code!",

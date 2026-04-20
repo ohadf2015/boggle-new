@@ -373,6 +373,115 @@ describe('useSurvivalHints', () => {
     });
   });
 
+  describe('accumulatedClues awareness — last-letter protection', () => {
+    it('canRevealLetter is false when only 1 letter hidden (gameplay greens cover the rest)', () => {
+      // APPLE: gameplay reveals positions 0,1,2,3 via green feedback; only position 4 is hidden.
+      // Without accumulatedClues awareness, unrevealedCount = 5 → canRevealLetter = true (BUG).
+      const accumulatedClues = new Map([
+        [0, { letter: 'A', type: 'green' as const }],
+        [1, { letter: 'P', type: 'green' as const }],
+        [2, { letter: 'P', type: 'green' as const }],
+        [3, { letter: 'L', type: 'green' as const }],
+      ]);
+
+      const { result } = renderHook(() =>
+        useSurvivalHints({ ...defaultProps, accumulatedClues })
+      );
+
+      // nextHintItem should NOT be reveal_letter (only 1 truly hidden letter remains)
+      const nextClue = result.current[1].getNextAffordableClue(10);
+      expect(nextClue?.id).not.toBe('reveal_letter');
+    });
+
+    it('autoRevealLetter returns -1 when only 1 letter is hidden via gameplay clues', () => {
+      const accumulatedClues = new Map([
+        [0, { letter: 'A', type: 'green' as const }],
+        [1, { letter: 'P', type: 'green' as const }],
+        [2, { letter: 'P', type: 'green' as const }],
+        [3, { letter: 'L', type: 'green' as const }],
+      ]);
+
+      const { result } = renderHook(() =>
+        useSurvivalHints({ ...defaultProps, accumulatedClues })
+      );
+
+      let revealed = 0;
+      act(() => {
+        revealed = result.current[1].autoRevealLetter();
+      });
+
+      expect(revealed).toBe(-1);
+      expect(result.current[0].revealedLetters.size).toBe(0);
+    });
+
+    it('autoUnlockNextHint returns null when only 1 letter hidden via gameplay clues', () => {
+      const accumulatedClues = new Map([
+        [0, { letter: 'A', type: 'green' as const }],
+        [1, { letter: 'P', type: 'green' as const }],
+        [2, { letter: 'P', type: 'green' as const }],
+        [3, { letter: 'L', type: 'green' as const }],
+      ]);
+
+      const { result } = renderHook(() =>
+        useSurvivalHints({ ...defaultProps, accumulatedClues })
+      );
+
+      let item: { id: string } | null = { id: 'placeholder' };
+      act(() => {
+        item = result.current[1].autoUnlockNextHint();
+      });
+
+      expect(item).toBeNull();
+      expect(result.current[0].revealedLetters.size).toBe(0);
+    });
+
+    it('autoRevealLetter skips positions already in accumulatedClues', () => {
+      // Positions 0 and 1 are green via gameplay; only positions 2,3 available (not lastIdx=4)
+      const accumulatedClues = new Map([
+        [0, { letter: 'A', type: 'green' as const }],
+        [1, { letter: 'P', type: 'green' as const }],
+      ]);
+
+      const { result } = renderHook(() =>
+        useSurvivalHints({ ...defaultProps, accumulatedClues })
+      );
+
+      let revealed = -1;
+      act(() => {
+        revealed = result.current[1].autoRevealLetter();
+      });
+
+      // Should reveal position 2 or 3, NOT 0 or 1
+      expect(revealed).not.toBe(0);
+      expect(revealed).not.toBe(1);
+      expect(revealed).not.toBe(4); // never last position
+      expect(revealed).toBeGreaterThanOrEqual(0);
+    });
+
+    it('combined shop + gameplay reveals correctly gate to 1 hidden', () => {
+      // Shop revealed position 0; gameplay revealed positions 1,2,3; only position 4 hidden
+      const accumulatedClues = new Map([
+        [1, { letter: 'P', type: 'green' as const }],
+        [2, { letter: 'P', type: 'green' as const }],
+        [3, { letter: 'L', type: 'green' as const }],
+      ]);
+
+      const { result } = renderHook(() =>
+        useSurvivalHints({ ...defaultProps, accumulatedClues })
+      );
+
+      // Shop reveals position 0 first
+      act(() => {
+        result.current[1].autoRevealLetter();
+      });
+
+      // Now revealedLetters={0}, accumulatedClues covers 1,2,3 → only pos 4 hidden
+      // canRevealLetter should be false now
+      const nextClue = result.current[1].getNextAffordableClue(10);
+      expect(nextClue?.id).not.toBe('reveal_letter');
+    });
+  });
+
   describe('integration: multiple token spending', () => {
     it('should allow buying multiple reveals before moving to next tier', () => {
       const { result } = renderHook(() => useSurvivalHints(defaultProps));
