@@ -47,6 +47,28 @@ describe('pushNotificationService', () => {
     });
   });
 
+  describe('push_error observability', () => {
+    it('sendToUsers must persist real FCM error body in push_error, not a count string', () => {
+      const fs = require('fs');
+      const path = require('path');
+      const serviceFilePath = path.join(__dirname, '..', 'pushNotificationService.ts');
+      const serviceContent = fs.readFileSync(serviceFilePath, 'utf-8');
+
+      // Find the UPDATE payload on user_notifications
+      const updateBlock = serviceContent.match(
+        /\.from\(['"]user_notifications['"]\)\s*\.update\(\{[\s\S]*?push_error:[\s\S]*?\}\)/
+      );
+      expect(updateBlock).not.toBeNull();
+      const body = updateBlock![0];
+
+      // The old bug: literal "tokens failed" count string — must be gone.
+      expect(body).not.toMatch(/\$\{result\.failed\}\s*tokens\s*failed/);
+
+      // Must serialize result.errors so real FCM error text is diagnosable in DB.
+      expect(body).toMatch(/result\.errors/);
+    });
+  });
+
   describe('gift notification action URL', () => {
     it('should use a valid action_url that does not lead to 404', async () => {
       // GIVEN: We read the pushNotificationService source

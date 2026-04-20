@@ -368,7 +368,9 @@ export async function sendToUsers(
     .update({
       push_sent: result.sent > 0,
       push_sent_at: new Date().toISOString(),
-      push_error: result.failed > 0 ? `${result.failed} tokens failed` : null,
+      push_error: result.failed > 0
+        ? result.errors.map(e => e.error).join('; ').slice(0, 500)
+        : null,
     })
     .in('id', notificationIds);
 
