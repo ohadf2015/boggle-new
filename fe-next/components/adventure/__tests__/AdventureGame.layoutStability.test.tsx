@@ -539,6 +539,12 @@ vi.mock('@/lib/adventure/weeklyModifiers', () => ({
 }));
 // runeSystem removed — useAdventureGameInit uses inline defaults now
 
+vi.mock('@/hooks/useInterstitialAd', () => ({
+  useInterstitialAd: () => ({
+    showInterstitial: vi.fn().mockResolvedValue(undefined),
+  }),
+}));
+
 // ==============================================
 // TEST FIXTURES
 // ==============================================

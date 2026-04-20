@@ -44,6 +44,12 @@ vi.mock('@/contexts/SoundEffectsContext', () => ({
   useSoundEffects: () => ({ playQuestCompleteSound: vi.fn() }),
 }));
 
+vi.mock('@/hooks/useInterstitialAd', () => ({
+  useInterstitialAd: () => ({
+    showInterstitial: vi.fn().mockResolvedValue(undefined),
+  }),
+}));
+
 import { useDailyMissions } from '../useDailyMissions';
 import { showQuestCompletionToast } from '@/components/quests/QuestCompletionToast';
 

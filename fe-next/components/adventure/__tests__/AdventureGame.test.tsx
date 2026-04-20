@@ -646,6 +646,12 @@ vi.mock('../themed/GameplayBackground', () => ({
   default: () => null,
 }));
 
+vi.mock('@/hooks/useInterstitialAd', () => ({
+  useInterstitialAd: () => ({
+    showInterstitial: vi.fn().mockResolvedValue(undefined),
+  }),
+}));
+
 // ==============================================
 // TESTS
 // ==============================================

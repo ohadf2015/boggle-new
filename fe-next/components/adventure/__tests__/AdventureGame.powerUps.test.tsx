@@ -425,6 +425,12 @@ vi.mock('@/hooks/usePowerUpInventory', () => ({
 }));
 
 // Mock PowerUpBar component for controlled testing
+vi.mock('@/hooks/useInterstitialAd', () => ({
+  useInterstitialAd: () => ({
+    showInterstitial: vi.fn().mockResolvedValue(undefined),
+  }),
+}));
+
 vi.mock('../power-ups', () => ({
   PowerUpBar: ({
     onFreezeTime,

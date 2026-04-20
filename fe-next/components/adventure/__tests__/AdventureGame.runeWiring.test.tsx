@@ -221,6 +221,12 @@ vi.mock('../hooks/useAdventureGridInteraction', () => ({ useAdventureGridInterac
 vi.mock('../AdventureGameOverlays', () => ({ __esModule: true, default: () => null }));
 vi.mock('../themed/GameplayBackground', () => ({ __esModule: true, default: () => null }));
 
+vi.mock('@/hooks/useInterstitialAd', () => ({
+  useInterstitialAd: () => ({
+    showInterstitial: vi.fn().mockResolvedValue(undefined),
+  }),
+}));
+
 // ── Fixtures ──
 
 const mockLevelConfig: LevelConfig = {

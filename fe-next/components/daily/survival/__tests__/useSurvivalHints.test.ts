@@ -9,6 +9,7 @@
  * Key behavior: Must exhaust current tier before moving to next tier.
  */
 
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useSurvivalHints } from '../useSurvivalHints';
 import type { Language } from '@/types';

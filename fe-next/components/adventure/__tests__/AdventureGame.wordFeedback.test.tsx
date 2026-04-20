@@ -614,6 +614,12 @@ vi.mock('../ui', () => {
   };
 });
 
+vi.mock('@/hooks/useInterstitialAd', () => ({
+  useInterstitialAd: () => ({
+    showInterstitial: vi.fn().mockResolvedValue(undefined),
+  }),
+}));
+
 // ==============================================
 // TESTS
 // ==============================================

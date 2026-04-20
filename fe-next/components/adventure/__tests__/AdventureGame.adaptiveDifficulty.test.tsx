@@ -364,6 +364,12 @@ vi.mock('@/hooks/useAdaptiveDifficulty', () => ({
   useAdaptiveDifficulty: (...args: unknown[]) => mockUseAdaptiveDifficulty(...args),
 }));
 
+vi.mock('@/hooks/useInterstitialAd', () => ({
+  useInterstitialAd: () => ({
+    showInterstitial: vi.fn().mockResolvedValue(undefined),
+  }),
+}));
+
 describe('AdventureGame - Adaptive Difficulty Integration', () => {
   const baseConfig: LevelConfig = {
     world: 1,

@@ -221,6 +221,12 @@ vi.mock('@/components/results/WordHuntPromoPopup', () => {
   });
 });
 
+vi.mock('@/hooks/useInterstitialAd', () => ({
+  useInterstitialAd: () => ({
+    showInterstitial: vi.fn().mockResolvedValue(undefined),
+  }),
+}));
+
 // ── Import component AFTER all mocks ─────────────────────────────────────────
 import DailyWordHuntResults from '../DailyWordHuntResults';
 import type { DailyWordHuntResultsProps } from '../results';

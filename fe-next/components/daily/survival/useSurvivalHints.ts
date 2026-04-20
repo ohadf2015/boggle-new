@@ -57,7 +57,7 @@ export function useSurvivalHints({
   const [category, setCategory] = useState('');
   const [exampleSentence, setExampleSentence] = useState('');
   const [revealedLetters, setRevealedLetters] = useState<Set<number>>(new Set());
-  const [eliminatedLetters, setEliminatedLetters] = useState<Set<string>>(new Set());
+  const [eliminatedLetters] = useState<Set<string>>(new Set());
   const [showCategory, setShowCategory] = useState(false);
   const [showExample, setShowExample] = useState(false);
   const [tokensSpent, setTokensSpent] = useState(0);

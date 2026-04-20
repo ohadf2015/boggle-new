@@ -144,6 +144,28 @@ vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => mockUseAuth(),
 }));
 
+vi.mock('@/hooks/useInterstitialAd', () => ({
+  useInterstitialAd: () => ({
+    showInterstitial: vi.fn().mockResolvedValue(undefined),
+  }),
+}));
+
+vi.mock('@/hooks/useRewardedAd', () => ({
+  useRewardedAd: () => ({
+    status: 'idle',
+    isAdAvailable: false,
+    isPlaceholderCooldown: false,
+    showAd: vi.fn().mockResolvedValue(undefined),
+    error: null,
+    rewardAmount: 0,
+    canShowAd: false,
+    viewsToday: 0,
+    maxViews: 3,
+    isDailyLimitReached: false,
+    isPlaceholder: false,
+  }),
+}));
+
 import DailyChallengeResults from '../DailyChallengeResults';
 import type { DailyChallengeResult, DailyStreak } from '@/utils/dailyChallenge';
 

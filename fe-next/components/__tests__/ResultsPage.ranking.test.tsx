@@ -238,6 +238,12 @@ vi.mock('@/utils/confettiUtils', () => ({
   fireRankConfetti: vi.fn(),
 }));
 
+vi.mock('@/hooks/useInterstitialAd', () => ({
+  useInterstitialAd: () => ({
+    showInterstitial: vi.fn().mockResolvedValue(undefined),
+  }),
+}));
+
 // Import after all mocks are set up
 import ResultsPage from '@/components/views/ResultsPage';
 

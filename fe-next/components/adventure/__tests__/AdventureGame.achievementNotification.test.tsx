@@ -544,6 +544,12 @@ vi.mock('@/hooks/useAdventureMusic', () => ({
   useAdventureMusic: () => ({ currentTrack: 1, stopMusic: vi.fn(), hasMusic: false }),
 }));
 
+vi.mock('@/hooks/useInterstitialAd', () => ({
+  useInterstitialAd: () => ({
+    showInterstitial: vi.fn().mockResolvedValue(undefined),
+  }),
+}));
+
 // ==============================================
 // TESTS
 // ==============================================
