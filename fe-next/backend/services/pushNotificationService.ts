@@ -6,7 +6,7 @@
 
 import logger from '../utils/logger';
 
-const { getSupabase, isSupabaseConfigured } = require('../modules/supabaseServer');
+import { getSupabase, isSupabaseConfigured } from '../modules/supabaseServer';
 
 // ==================== Types ====================
 
@@ -276,6 +276,10 @@ export async function sendToUsers(
   }
 
   const supabase = getSupabase();
+  if (!supabase) {
+    logger.error('PUSH_SERVICE', 'Supabase client unavailable');
+    return { ...result, success: false };
+  }
 
   // Create notification records for all users
   const notificationRecords = userIds.map(userId => ({
