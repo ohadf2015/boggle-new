@@ -2,10 +2,6 @@ import type { ConnectionPuzzle } from '../types';
 
 export const EN_EASY: ConnectionPuzzle[] = [
   { id: 'en-e-001', word1: 'BOOK', word2: 'HOLE', bridge: 'WORM', difficulty: 'easy' },
-  { id: 'en-e-002', word1: 'SUN', word2: 'SHINE', bridge: 'FLOWER', difficulty: 'easy' },
-  { id: 'en-e-003', word1: 'FIRE', word2: 'SIDE', bridge: 'PLACE', difficulty: 'easy' },
-  { id: 'en-e-004', word1: 'BACK', word2: 'YARD', bridge: 'DOOR', difficulty: 'easy' },
-  { id: 'en-e-005', word1: 'OVER', word2: 'BOARD', bridge: 'BOARD', difficulty: 'easy', hint: 'Think surfing' },
   { id: 'en-e-006', word1: 'EYE', word2: 'OUT', bridge: 'BALL', difficulty: 'easy' },
   { id: 'en-e-007', word1: 'HAND', word2: 'HOLD', bridge: 'SHAKE', difficulty: 'easy' },
   { id: 'en-e-008', word1: 'RAIN', word2: 'FALL', bridge: 'DROP', difficulty: 'easy' },
@@ -46,7 +42,6 @@ export const EN_EASY: ConnectionPuzzle[] = [
   { id: 'en-e-043', word1: 'BLACK', word2: 'BOARD', bridge: 'BIRD', difficulty: 'easy' },
   { id: 'en-e-044', word1: 'GREEN', word2: 'HOUSE', bridge: 'CARD', difficulty: 'easy' },
   { id: 'en-e-045', word1: 'BLUE', word2: 'PRINT', bridge: 'BELL', difficulty: 'easy' },
-  { id: 'en-e-046', word1: 'GOLD', word2: 'FISH', bridge: 'EN', difficulty: 'easy' },
   { id: 'en-e-047', word1: 'IRON', word2: 'WORK', bridge: 'STONE', difficulty: 'easy' },
   { id: 'en-e-048', word1: 'WOOD', word2: 'PECKER', bridge: 'LAND', difficulty: 'easy' },
   { id: 'en-e-049', word1: 'AIR', word2: 'CRAFT', bridge: 'PORT', difficulty: 'easy' },
@@ -90,7 +85,6 @@ export const EN_EASY: ConnectionPuzzle[] = [
   { id: 'en-e-087', word1: 'WATER', word2: 'OUT', bridge: 'FALL', difficulty: 'easy' },
   { id: 'en-e-088', word1: 'BLACK', word2: 'HOUSE', bridge: 'BIRD', difficulty: 'easy' },
   { id: 'en-e-089', word1: 'FLASH', word2: 'HOUSE', bridge: 'LIGHT', difficulty: 'easy' },
-  { id: 'en-e-090', word1: 'BACK', word2: 'STICK', bridge: 'YARD', difficulty: 'easy' },
   { id: 'en-e-091', word1: 'SNOW', word2: 'ROOM', bridge: 'BALL', difficulty: 'easy' },
   { id: 'en-e-092', word1: 'HORSE', word2: 'GROUND', bridge: 'PLAY', difficulty: 'easy' },
   { id: 'en-e-093', word1: 'DOOR', word2: 'MOTHER', bridge: 'STEP', difficulty: 'easy' },

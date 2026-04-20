@@ -97,7 +97,7 @@ export default function PuzzleCard({ puzzle, state, onInputChange, onSubmit, onG
           'relative rounded-neo border-neo-thick shadow-hard',
           borderColor,
           bgColor,
-          'p-6 transition-colors duration-200',
+          'px-6 pb-6 pt-10 transition-colors duration-200',
         ].join(' ')}
         dir={isRTL ? 'rtl' : 'ltr'}
       >
