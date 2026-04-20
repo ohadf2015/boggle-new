@@ -8,14 +8,14 @@ interface LayoutParams {
 // Localized metadata for rules page
 const rulesMetadata: Record<string, { title: string; description: string; ogDescription: string }> = {
     en: {
-        title: 'How to Play LexiClash - Game Rules & Strategy Guide',
-        description: 'Learn how to play LexiClash, the real-time multiplayer word game. Complete guide covering game rules, scoring system, winning strategies, and tips for beginners.',
-        ogDescription: 'Learn how to play LexiClash, the real-time multiplayer word game. Complete guide covering game rules, scoring system, and winning strategies.',
+        title: 'How to Play LexiClash (2026): Rules, Scoring & 7 Winning Tips',
+        description: 'The complete 2026 LexiClash guide: game rules, scoring system, 7 proven beginner tips, and pro strategies to climb the leaderboard. Free, real-time multiplayer word game — no download.',
+        ogDescription: 'Rules + scoring + 7 winning tips. The up-to-date LexiClash playbook.',
     },
     he: {
-        title: 'איך לשחק לקסיקלאש - חוקי המשחק ומדריך אסטרטגיה',
-        description: 'למדו איך לשחק לקסיקלאש, משחק המילים המרובה משתתפים בזמן אמת. מדריך מלא הכולל חוקי משחק, מערכת ניקוד, אסטרטגיות ניצחון וטיפים למתחילים.',
-        ogDescription: 'למדו איך לשחק לקסיקלאש, משחק המילים המרובה משתתפים בזמן אמת. מדריך מלא הכולל חוקי משחק ואסטרטגיות ניצחון.',
+        title: 'איך לשחק לקסיקלאש | חוקים, ניקוד ו-7 טיפים לניצחון (2026)',
+        description: 'המדריך המלא ללקסיקלאש ב-2026: חוקי המשחק, שיטת הניקוד, שבעה טיפים מוכחים לשחקנים מתחילים ואסטרטגיות למנצחים. משחק מילים מרובה משתתפים, חינם לגמרי.',
+        ogDescription: 'חוקים + ניקוד + 7 טיפים לניצחון. המדריך המעודכן ביותר ללקסיקלאש.',
     },
     sv: {
         title: 'Hur Man Spelar LexiClash - Spelregler & Strategiguide',
