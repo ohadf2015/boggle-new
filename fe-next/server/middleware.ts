@@ -243,8 +243,14 @@ function wwwRedirect(): RequestHandler {
   return (req: Request, res: Response, next: NextFunction): void => {
     const host = req.get('host') || '';
 
-    // Only redirect in production and for the apex domain
-    if (!dev && host === 'lexiclash.live') {
+    // Only redirect in production and for the apex domain.
+    // Exempt Android App Links assetlinks.json — the verifier refuses redirects,
+    // so the file must be served directly at the apex host.
+    if (
+      !dev &&
+      host === 'lexiclash.live' &&
+      req.path !== '/.well-known/assetlinks.json'
+    ) {
       const redirectUrl = `https://www.lexiclash.live${req.originalUrl}`;
       res.redirect(301, redirectUrl);
       return;

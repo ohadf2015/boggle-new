@@ -4,7 +4,7 @@ import { sendAndroidBetaLaunchToPlayer } from '@/lib/androidBetaLaunchEmail';
 import { isEmailServiceConfigured } from '@/lib/email';
 import { captureApiError } from '@/utils/sentry';
 
-export const maxDuration = 30;
+export const maxDuration = 60;
 
 /**
  * POST /api/admin/send-android-beta-launch-to-player

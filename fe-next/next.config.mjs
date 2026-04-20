@@ -141,14 +141,14 @@ const nextConfig = {
       // Redirect non-www to www (handled by hosting platform like Vercel/Railway)
       // This is a fallback for any requests that slip through
       {
-        source: '/:path*',
+        source: '/:path((?!\\.well-known/assetlinks\\.json$).*)',
         has: [
           {
             type: 'host',
             value: 'lexiclash.live',
           },
         ],
-        destination: 'https://www.lexiclash.live/:path*',
+        destination: 'https://www.lexiclash.live/:path',
         permanent: true,
       },
       // Catch-all: redirect any path without a locale prefix to /en/...

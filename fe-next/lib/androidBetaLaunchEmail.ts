@@ -136,18 +136,28 @@ export async function sendAndroidBetaLaunchToPlayer(
   let resolvedEmail: string | null = null;
 
   if (isEmail) {
-    const { data: authUsers, error: authError } = await withTimeout(
-      supabase.auth.admin.listUsers({ perPage: 1000 }),
-      8000,
-      'Supabase listUsers timed out after 8 seconds'
-    );
-    if (authError) {
-      return { success: false, error: 'Failed to look up auth users' };
+    const target = playerIdentifier.toLowerCase();
+    const perPage = 200;
+    let page = 1;
+    let match: { id: string; email?: string } | null = null;
+    while (page <= 25 && !match) {
+      const { data, error: authError } = await withTimeout(
+        supabase.auth.admin.listUsers({ page, perPage }),
+        8000,
+        `Supabase listUsers page ${page} timed out after 8 seconds`
+      );
+      if (authError) {
+        return { success: false, error: `Auth lookup failed: ${authError.message}` };
+      }
+      const users = data?.users ?? [];
+      match =
+        users.find(
+          (u: { id: string; email?: string }) =>
+            u.email?.toLowerCase() === target
+        ) ?? null;
+      if (users.length < perPage) break;
+      page += 1;
     }
-    const match = authUsers.users.find(
-      (u: { id: string; email?: string }) =>
-        u.email?.toLowerCase() === playerIdentifier.toLowerCase()
-    );
     if (!match) {
       return {
         success: false,
@@ -191,8 +201,8 @@ export async function sendAndroidBetaLaunchToPlayer(
   if (!resolvedEmail) {
     const { data: authUser } = await withTimeout(
       supabase.auth.admin.getUserById(profileId),
-      8000,
-      'Supabase getUserById timed out after 8 seconds'
+      15000,
+      'Supabase getUserById timed out after 15 seconds'
     );
     resolvedEmail = authUser?.user?.email ?? null;
   }
