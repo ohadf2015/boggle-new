@@ -273,13 +273,12 @@ export function LandingChallengeCards({
         <section
           data-testid="landing-section-mp"
           aria-label={t('landing.sectionMultiplayerTitle')}
-          className="relative rounded-neo border-neo border-l-[6px] border-black bg-neo-pink-muted/15 p-3 sm:p-4 md:p-5 shadow-hard"
         >
-          <header className="mb-3 md:mb-4 flex items-baseline gap-3">
-            <span className="inline-block px-2.5 py-1 rounded-neo bg-neo-pink text-black font-neo-display font-bold text-xs sm:text-sm uppercase tracking-wide border-neo border-black shadow-hard-sm">
+          <header className="mb-3 md:mb-4 flex items-baseline gap-2 px-1">
+            <span className="font-neo-display font-bold text-sm sm:text-base uppercase tracking-wide text-neo-pink">
               {t('landing.sectionMultiplayerTitle')}
             </span>
-            <span className="font-neo-body text-xs sm:text-sm text-neo-white/70">
+            <span className="font-neo-body text-xs sm:text-sm text-neo-white/60">
               {t('landing.sectionMultiplayerSubtitle')}
             </span>
           </header>
@@ -293,13 +292,12 @@ export function LandingChallengeCards({
         <section
           data-testid="landing-section-sp"
           aria-label={t('landing.sectionSoloTitle')}
-          className="relative rounded-neo border-neo border-l-[6px] border-black bg-neo-cyan-muted/15 p-3 sm:p-4 md:p-5 shadow-hard"
         >
-          <header className="mb-3 md:mb-4 flex items-baseline gap-3">
-            <span className="inline-block px-2.5 py-1 rounded-neo bg-neo-cyan text-black font-neo-display font-bold text-xs sm:text-sm uppercase tracking-wide border-neo border-black shadow-hard-sm">
+          <header className="mb-3 md:mb-4 flex items-baseline gap-2 px-1">
+            <span className="font-neo-display font-bold text-sm sm:text-base uppercase tracking-wide text-neo-cyan">
               {t('landing.sectionSoloTitle')}
             </span>
-            <span className="font-neo-body text-xs sm:text-sm text-neo-white/70">
+            <span className="font-neo-body text-xs sm:text-sm text-neo-white/60">
               {t('landing.sectionSoloSubtitle')}
             </span>
           </header>
