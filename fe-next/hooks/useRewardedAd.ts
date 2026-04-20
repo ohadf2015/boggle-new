@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import { Capacitor } from '@capacitor/core';
 import { Howler } from 'howler';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useAdPlacement } from '@/hooks/useAdPlacement';
@@ -148,7 +149,7 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
 
   // Determine which ad platform to use (priority order)
   const shouldUseCrazyGames = crazyGames.isAvailable && crazyGames.isOnCrazyGamesPlatform;
-  const shouldUseAdMob = !shouldUseCrazyGames && adMob.isAvailable;
+  const shouldUseAdMob = !shouldUseCrazyGames && Capacitor.isNativePlatform();
   const shouldUseAdSense = !shouldUseCrazyGames && !shouldUseAdMob && adPlacement.isReady;
   // Simulation only in development — never award free gold in production
   const isDev = process.env.NODE_ENV === 'development';
@@ -248,19 +249,8 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
       // Priority 1.5: AdMob SDK for native Capacitor apps
       setStatus('showing');
       onAdStarted?.();
-      let rewarded = false;
-      adMob.showRewarded({
-        onReward: () => {
-          rewarded = true;
-          awardCoinsAndNotify();
-        },
-        onDismiss: () => {
-          // Dismiss fires after reward — only treat as error if no reward was granted
-          if (!rewarded) handleAdError('Ad dismissed without reward');
-        },
-        onError: (errorMsg: string) => {
-          handleAdError(errorMsg || 'Ad failed to load');
-        },
+      adMob.showRewarded(() => {
+        awardCoinsAndNotify();
       });
     } else if (shouldUseAdSense) {
       // Priority 1.5: AdSense for Games rewarded ads

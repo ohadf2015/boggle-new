@@ -8,13 +8,12 @@ import { useAdMob } from '@/hooks/useAdMob';
  * Renders nothing on web. Automatically shows on mount and hides on unmount.
  */
 export function NativeBannerAd() {
-  const { isAvailable, showBanner, hideBanner } = useAdMob();
+  const { showBanner, hideBanner } = useAdMob();
 
   useEffect(() => {
-    if (!isAvailable) return;
     showBanner();
     return () => { hideBanner(); };
-  }, [isAvailable, showBanner, hideBanner]);
+  }, [showBanner, hideBanner]);
 
   // Native banner is rendered by the OS overlay — no DOM element needed
   return null;

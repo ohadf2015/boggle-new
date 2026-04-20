@@ -27,12 +27,7 @@ export function useInterstitialAd() {
       requestMidgameAd();
 
       // AdMob interstitial (native only — hook returns no-ops on web)
-      if (adMob.isAvailable) {
-        adMob.showInterstitial({
-          onDismiss: () => {},
-          onError: (err) => console.warn('[InterstitialAd] AdMob error:', err),
-        });
-      }
+      adMob.showInterstitial();
 
       // AdSense H5 interstitial (web only — no-ops on native)
       showAdSenseInterstitial(name);
