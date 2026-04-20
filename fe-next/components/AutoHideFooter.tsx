@@ -44,6 +44,7 @@ export function AutoHideFooter({ className }: AutoHideFooterProps) {
     '/custom',
     '/quests',
     '/word-forge',
+    '/connections',
   ].some(path => cleanPath.startsWith(path));
 
   // TV fullscreen, desktop gameplay, or any mobile game/lobby screen: no footer
