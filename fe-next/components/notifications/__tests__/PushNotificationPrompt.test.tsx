@@ -5,6 +5,7 @@
 
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { PushNotificationPrompt } from '../PushNotificationPrompt';
+import { registerPushToken } from '@/utils/pushNotifications/tokenRegistration';
 import type { ReactNode } from 'react';
 
 // Mock framer-motion
@@ -125,17 +126,11 @@ describe('PushNotificationPrompt', () => {
       expect(mockDismiss).toHaveBeenCalled();
     });
 
-    it('should request permission when Enable is clicked', async () => {
-      // GIVEN - Permission can be requested
-      const mockRequestPermission = vi.fn().mockResolvedValue('granted');
-      Object.defineProperty(window, 'Notification', {
-        value: {
-          permission: 'default',
-          requestPermission: mockRequestPermission,
-        },
-        writable: true,
-        configurable: true,
-      });
+    it('should call registerPushToken when Enable is clicked', async () => {
+      // GIVEN - Prompt visible; component delegates to registerPushToken
+      // (handles native Capacitor perms, no-op on web). Do NOT assert on
+      // window.Notification.requestPermission — native WebView exposes it
+      // but it does not trigger the native push-perm dialog.
       mockShouldShow.mockReturnValue(true);
 
       render(<PushNotificationPrompt />);
@@ -145,7 +140,7 @@ describe('PushNotificationPrompt', () => {
 
       // THEN
       await waitFor(() => {
-        expect(mockRequestPermission).toHaveBeenCalled();
+        expect(registerPushToken).toHaveBeenCalled();
       });
     });
   });
