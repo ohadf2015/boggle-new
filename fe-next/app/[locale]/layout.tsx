@@ -295,6 +295,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
             '@type': 'Organization',
             '@id': 'https://www.lexiclash.live/#organization',
             name: 'LexiClash',
+            alternateName: ['לקסיקלאש', 'לקסי קלאש', 'Lexi Clash'],
             url: 'https://www.lexiclash.live',
             logo: {
                 '@type': 'ImageObject',
@@ -330,6 +331,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
             '@id': 'https://www.lexiclash.live/#website',
             url: 'https://www.lexiclash.live',
             name: 'LexiClash',
+            alternateName: ['לקסיקלאש', 'לקסי קלאש', 'Lexi Clash', 'LexiClash Word Game'],
             description: seo.description,
             publisher: {
                 '@id': 'https://www.lexiclash.live/#organization',
