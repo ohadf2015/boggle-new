@@ -74,19 +74,27 @@ async function saveNotificationHistory(
 }
 
 /**
- * Send push + save history (fire-and-forget wrapper)
+ * Delivery mode per notification-policy matrix:
+ *  - 'both': relational + time-sensitive (push + in-app row)
+ *  - 'push_only': scheduled nudge, no in-app surface after open (daily reminder)
+ *  - 'in_app_only': self-generated celebration / low-value alert (achievement, level-up, challenge declined)
  */
+type DeliveryMode = 'both' | 'push_only' | 'in_app_only';
+
 async function triggerPush(
   userId: string,
   type: PushNotificationType,
   payload: FCMPayload,
+  mode: DeliveryMode = 'both',
   senderId?: string
 ): Promise<void> {
   try {
-    await Promise.allSettled([
-      sendToUser(userId, payload),
-      saveNotificationHistory(userId, type, payload, payload.data?.deepLink, senderId),
-    ]);
+    const jobs: Promise<unknown>[] = [];
+    if (mode !== 'in_app_only') jobs.push(sendToUser(userId, payload));
+    if (mode !== 'push_only') {
+      jobs.push(saveNotificationHistory(userId, type, payload, payload.data?.deepLink, senderId));
+    }
+    await Promise.allSettled(jobs);
   } catch (error) {
     logger.error('PUSH_TRIGGER', `Trigger failed for ${type}: ${(error as Error).message}`);
   }
@@ -107,7 +115,7 @@ export async function notifyFriendRequest(
       type: 'friend_request',
       deepLink: '/adventure?tab=friends',
     },
-  }, fromUserId);
+  }, 'both', fromUserId);
 }
 
 /**
@@ -125,7 +133,7 @@ export async function notifyFriendAccepted(
       type: 'friend_accepted',
       deepLink: '/adventure?tab=friends',
     },
-  }, acceptorUserId);
+  }, 'both', acceptorUserId);
 }
 
 /**
@@ -144,7 +152,7 @@ export async function notifyGameInvite(
       type: 'game_invite',
       deepLink: `/join/${roomCode}`,
     },
-  }, inviterUserId);
+  }, 'both', inviterUserId);
 }
 
 /**
@@ -179,7 +187,7 @@ export async function notifyAchievement(
       type: 'achievement',
       deepLink: '/adventure/achievements',
     },
-  });
+  }, 'in_app_only');
 }
 
 /**
@@ -202,7 +210,7 @@ export async function notifyDirectMessage(
       type: 'direct_message',
       deepLink: '/friends?tab=messages',
     },
-  }, fromUserId);
+  }, 'both', fromUserId);
 }
 
 /**
@@ -221,7 +229,7 @@ export async function notifyChallengeAccepted(
       type: 'challenge_accepted',
       deepLink: `/join/${roomCode}`,
     },
-  }, acceptorUserId);
+  }, 'both', acceptorUserId);
 }
 
 /**
@@ -239,7 +247,7 @@ export async function notifyChallengeDeclined(
       type: 'challenge_declined',
       deepLink: '/friends',
     },
-  }, declinerUserId);
+  }, 'in_app_only', declinerUserId);
 }
 
 /**
@@ -265,7 +273,7 @@ export async function notifyGiftReceived(
       type: 'gift_received',
       deepLink: '/friends',
     },
-  }, senderId);
+  }, 'both', senderId);
 }
 
 /**
@@ -282,7 +290,7 @@ export async function notifyDailyChallengeReminder(
       type: 'daily_challenge',
       deepLink: '/daily-challenge',
     },
-  });
+  }, 'push_only');
 }
 
 /**
@@ -299,5 +307,5 @@ export async function notifyLevelUp(
       type: 'level_up',
       deepLink: '/adventure',
     },
-  });
+  }, 'in_app_only');
 }

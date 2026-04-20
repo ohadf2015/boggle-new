@@ -9,6 +9,9 @@ import {
   notifyFriendAccepted,
   notifyGameInvite,
   notifyDailyChallengeReminder,
+  notifyAchievement,
+  notifyLevelUp,
+  notifyChallengeDeclined,
 } from '../pushNotificationTriggers';
 
 // Mock fcmService
@@ -108,21 +111,41 @@ describe('pushNotificationTriggers', () => {
       });
     });
 
-    it('should save notification to history as system type', async () => {
+    it('should NOT save in-app row (push_only — scheduled nudge, no post-open value)', async () => {
       await notifyDailyChallengeReminder('target-user-id');
 
-      expect(mockInsert).toHaveBeenCalledWith(
-        expect.objectContaining({
-          user_id: 'target-user-id',
-          notification_type: 'system',
-          title: '🎯 Daily Challenge awaits',
-        })
-      );
+      expect(mockInsert).not.toHaveBeenCalled();
     });
 
     it('should not throw on FCM failure', async () => {
       mockSendToUser.mockRejectedValue(new Error('FCM down'));
       await expect(notifyDailyChallengeReminder('user')).resolves.toBeUndefined();
+    });
+  });
+
+  describe('policy: in_app_only (self-generated / low-value)', () => {
+    it('notifyAchievement saves in-app row but does NOT push', async () => {
+      await notifyAchievement('uid', 'Word Wizard');
+      expect(mockSendToUser).not.toHaveBeenCalled();
+      expect(mockInsert).toHaveBeenCalledWith(
+        expect.objectContaining({ user_id: 'uid', notification_type: 'achievement' })
+      );
+    });
+
+    it('notifyLevelUp saves in-app row but does NOT push', async () => {
+      await notifyLevelUp('uid', 7);
+      expect(mockSendToUser).not.toHaveBeenCalled();
+      expect(mockInsert).toHaveBeenCalledWith(
+        expect.objectContaining({ user_id: 'uid', notification_type: 'achievement' })
+      );
+    });
+
+    it('notifyChallengeDeclined saves in-app row but does NOT push', async () => {
+      await notifyChallengeDeclined('uid', 'Maya');
+      expect(mockSendToUser).not.toHaveBeenCalled();
+      expect(mockInsert).toHaveBeenCalledWith(
+        expect.objectContaining({ user_id: 'uid', notification_type: 'social' })
+      );
     });
   });
 
