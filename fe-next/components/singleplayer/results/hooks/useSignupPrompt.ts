@@ -36,32 +36,36 @@ export function useSignupPrompt({
 }: UseSignupPromptParams): SignupPromptResult {
   const [showSignupModal, setShowSignupModal] = useState(false);
 
-  // A/B test: show signup after first win vs after 3rd game
-  // 'after-first-win' = show after 1 game, 'after-third-game' = show after 3 games
+  // A/B test: 'after-first-win' gates on actual win (with 5-game fallback for non-winners);
+  // 'after-third-game' gates purely on games count.
   const signupVariant = usePostHogFlag<string>('show-signup-after-first-win', 'after-first-win');
-  const gameThreshold = signupVariant === 'after-third-game' ? 3 : 2;
 
   useEffect(() => {
-    // Skip if disabled, authenticated, has a user session (profile may still be loading), or auth is still loading
     if (disabled || isAuthenticated || hasUser || authLoading) return;
     if (typeof window === 'undefined') return;
 
-    // Check if already shown this session
     const alreadyShown = sessionStorage.getItem(SIGNUP_PROMPT_SHOWN_KEY);
     if (alreadyShown) return;
 
-    // Check if user has played enough games (controlled by feature flag)
     const stats = getGuestStats();
-    if ((stats.games || 0) < gameThreshold) return;
+    const games = stats.games || 0;
+    const wins = stats.wins || 0;
 
-    // Show modal after 3.5 seconds delay
+    // Emotional peak gating: ride the celebration. Fallback ensures non-winners
+    // still convert before churning out.
+    const qualifies = signupVariant === 'after-third-game'
+      ? games >= 3
+      : wins >= 1 || games >= 5;
+
+    if (!qualifies) return;
+
     const timer = setTimeout(() => {
       setShowSignupModal(true);
       sessionStorage.setItem(SIGNUP_PROMPT_SHOWN_KEY, 'true');
     }, 3500);
 
     return () => clearTimeout(timer);
-  }, [isAuthenticated, hasUser, authLoading, disabled, gameThreshold]);
+  }, [isAuthenticated, hasUser, authLoading, disabled, signupVariant]);
 
   return { showSignupModal, setShowSignupModal };
 }
