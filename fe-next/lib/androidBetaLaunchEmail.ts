@@ -137,35 +137,51 @@ export async function sendAndroidBetaLaunchToPlayer(
 
   if (isEmail) {
     const target = playerIdentifier.toLowerCase();
-    const perPage = 200;
-    let page = 1;
-    let match: { id: string; email?: string } | null = null;
-    while (page <= 25 && !match) {
-      const { data, error: authError } = await withTimeout(
-        supabase.auth.admin.listUsers({ page, perPage }),
-        8000,
-        `Supabase listUsers page ${page} timed out after 8 seconds`
-      );
-      if (authError) {
-        return { success: false, error: `Auth lookup failed: ${authError.message}` };
+
+    // Fast path: indexed view lookup (O(1) vs paginated scan of auth.users).
+    const { data: viewRow, error: viewError } = await supabase
+      .from('auth_users_view')
+      .select('id, email')
+      .eq('email', target)
+      .maybeSingle();
+
+    if (!viewError && viewRow?.id) {
+      profileId = viewRow.id;
+      resolvedEmail = viewRow.email ?? target;
+    } else {
+      // Fallback: bounded pagination if the view is missing. Capped so we
+      // never exceed the route's maxDuration (5 pages × 5s ≈ 25s worst case).
+      const perPage = 200;
+      const maxPages = 5;
+      let page = 1;
+      let match: { id: string; email?: string } | null = null;
+      while (page <= maxPages && !match) {
+        const { data, error: authError } = await withTimeout(
+          supabase.auth.admin.listUsers({ page, perPage }),
+          5000,
+          `Supabase listUsers page ${page} timed out after 5 seconds`
+        );
+        if (authError) {
+          return { success: false, error: `Auth lookup failed: ${authError.message}` };
+        }
+        const users = data?.users ?? [];
+        match =
+          users.find(
+            (u: { id: string; email?: string }) =>
+              u.email?.toLowerCase() === target
+          ) ?? null;
+        if (users.length < perPage) break;
+        page += 1;
       }
-      const users = data?.users ?? [];
-      match =
-        users.find(
-          (u: { id: string; email?: string }) =>
-            u.email?.toLowerCase() === target
-        ) ?? null;
-      if (users.length < perPage) break;
-      page += 1;
+      if (!match) {
+        return {
+          success: false,
+          error: `No user found with email ${playerIdentifier}`,
+        };
+      }
+      profileId = match.id;
+      resolvedEmail = match.email ?? null;
     }
-    if (!match) {
-      return {
-        success: false,
-        error: `No user found with email ${playerIdentifier}`,
-      };
-    }
-    profileId = match.id;
-    resolvedEmail = match.email ?? null;
   } else {
     const { data: profileByName } = await supabase
       .from('profiles')

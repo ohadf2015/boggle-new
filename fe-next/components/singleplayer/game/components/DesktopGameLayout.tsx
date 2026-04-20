@@ -125,8 +125,8 @@ export function DesktopGameLayout({
   onReveal,
   setShowHintPrompt,
   training,
-  progressBarExpanded,
-  onToggleProgressBar,
+  progressBarExpanded: _progressBarExpanded,
+  onToggleProgressBar: _onToggleProgressBar,
   isTv,
   onWordSubmit,
   onPathSubmit,
@@ -187,13 +187,13 @@ export function DesktopGameLayout({
           gridTemplateColumns: isTv
             ? '300px 1fr 300px'
             : isPracticeMode
-              ? '200px 1fr 240px'
+              ? '300px 1fr 240px'
               : '230px 1fr 230px',
           gridTemplateRows: '1fr',
         }}
       >
-        {/* Left Sidebar - Stats Panel */}
-        <div className="desktop-stats-panel h-full overflow-hidden">
+        {/* Left Sidebar - Stats Panel (+ Training details in practice mode) */}
+        <div className="desktop-stats-panel h-full overflow-y-auto flex flex-col gap-3">
           <DesktopStatsPanel
             score={score}
             remainingTime={remainingTime}
@@ -210,6 +210,18 @@ export function DesktopGameLayout({
             onCoinAnimationComplete={onCoinAnimationComplete}
             t={tSafe}
           />
+          {isPracticeMode && training && (
+            <TrainingProgressBar
+              completedSkills={training.completedSkills}
+              score={score}
+              wordsFound={validWordCount}
+              compact
+              expanded
+              justUnlocked={training.justUnlocked}
+              onUnlockAnimationComplete={training.clearJustUnlocked}
+              isComplete={training.isComplete}
+            />
+          )}
         </div>
 
         {/* Center - Game Area */}
@@ -264,23 +276,6 @@ export function DesktopGameLayout({
               </button>
             )}
           </div>
-
-          {/* Training Progress Bar - practice mode */}
-          {isPracticeMode && training && (
-            <div className="w-full max-w-2xl px-4 shrink-0">
-              <TrainingProgressBar
-                completedSkills={training.completedSkills}
-                score={score}
-                wordsFound={validWordCount}
-                compact
-                expanded={progressBarExpanded}
-                onToggleExpand={onToggleProgressBar}
-                justUnlocked={training.justUnlocked}
-                onUnlockAnimationComplete={training.clearJustUnlocked}
-                isComplete={training.isComplete}
-              />
-            </div>
-          )}
 
           {/* Word Forming Area */}
           <div className="flex items-center justify-center shrink-0">

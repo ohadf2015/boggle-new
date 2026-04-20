@@ -43,7 +43,6 @@ import {
   useCoinRewards,
   useWinStreakTracking,
 
-  useSignupPrompt,
   useAchievementsSave,
   useWordValidation,
   useBannerConfig,
@@ -64,7 +63,7 @@ import ResultsWinnerBanner from '@/components/results/ResultsWinnerBanner';
 import { GameEmojiShareCard, type SingleplayerShareData } from '@/components/shared/GameEmojiShareCard';
 
 const PerformanceChart = dynamic(() => import('@/components/results/PerformanceChart'), { ssr: false });
-const FirstWinSignupModal = dynamic(() => import('@/components/auth/FirstWinSignupModal'), { ssr: false });
+const InlineSignupCard = dynamic(() => import('@/components/auth/InlineSignupCard'), { ssr: false });
 const PlacementHero = dynamic(() => import('@/components/results/PlacementHero'), { ssr: false });
 const MobileCompactLeaderboard = dynamic(() => import('@/components/results/MobileCompactLeaderboard'), { ssr: false });
 
@@ -169,10 +168,6 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
     }
   }, [missedWordStrings, results.grid, mode, results.playerScore, saveUnfinishedBoard]);
 
-  const { showSignupModal, setShowSignupModal } = useSignupPrompt({
-    isAuthenticated, hasUser: !!user, authLoading,
-  });
-
   useAchievementsSave({ isAuthenticated, profile, results, updateProfile });
 
   const {
@@ -181,7 +176,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
     botWordsForValidation: results.botWordsForValidation,
     gameSessionId: results.gameSessionId,
     language: results.language,
-    disabled: showSignupModal,
+    disabled: false,
   });
 
   const validWordCount = results.playerWordData?.filter(w => w.isValid).length || 0;
@@ -262,6 +257,10 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
       { label: t('results.coinsEarned'), value: coinReward ? `+${coinReward.awarded}` : '-', icon: '🪙', accent: 'amber' as const },
     ]} />
   );
+
+  const signupBlock = !isAuthenticated && !authLoading ? (
+    <InlineSignupCard isAuthenticated={isAuthenticated} />
+  ) : null;
 
   const shareBlock = results.playerScore > 0 ? (
     <GameEmojiShareCard data={shareData} t={t} />
@@ -376,6 +375,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
                 {!showShareImmediate && shareBlock}
                 {achievementsBlock}
                 {globalRank && <GlobalRankBadge rank={globalRank} label={t('leaderboard.globalRank')} />}
+                {signupBlock}
                 {ctaBlock}
               </div>
             </div>
@@ -395,6 +395,11 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
             {!showShareImmediate && <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}>{shareBlock}</motion.div>}
             <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>{achievementsBlock}</motion.div>
             {globalRank && <GlobalRankBadge rank={globalRank} label={t('leaderboard.globalRank')} />}
+            {signupBlock && (
+              <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }}>
+                {signupBlock}
+              </motion.div>
+            )}
             {/* Banner ads — CrazyGames (web iframe) / AdMob (native) */}
             <CrazyGamesBanner size="320x50" />
             <NativeBannerAd />
@@ -422,7 +427,6 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
           timeoutSeconds={15} onVote={handleWordVote}
           onSkip={() => setShowWordValidation(false)} onTimeout={() => setShowWordValidation(false)} />
       )}
-      <FirstWinSignupModal isOpen={showSignupModal} onClose={() => setShowSignupModal(false)} variant="multiGames" />
     </div>
   );
 };

@@ -1756,7 +1756,7 @@ const he = {
       "letterCount": "{current}/{total}"
     },
     "returningUser": {
-      "title": "ברוכים השבים!",
+      "title": "!ברוכים השבים",
       "subtitle": "התחברו כדי להמשיך מאיפה שעצרתם, או התחילו מחדש.",
       "haveAccount": "יש לי חשבון",
       "newHere": "אני חדש כאן",

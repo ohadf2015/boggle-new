@@ -7,7 +7,7 @@ import {
   shouldShowGuidance,
   markGuidanceShown,
 } from '@/utils/contextualGuidanceStorage';
-import { hasCompletedOnboarding, markOnboardingComplete } from '@/utils/onboardingStorage';
+import { hasCompletedOnboarding, markOnboardingComplete, hasPlayedBotsGame } from '@/utils/onboardingStorage';
 import { getStoredUsername } from '@/utils/profileStorage';
 import { useAuth } from '@/contexts/AuthContext';
 import type { DifficultyLevel, Language, LetterGrid } from '@/shared/types/game';
@@ -120,6 +120,19 @@ export function useSinglePlayerConfig({ searchParams }: UseSinglePlayerConfigOpt
 
   const hasAutoStartedRef = useRef(false);
   const wasFirstTimerPracticeRef = useRef(false);
+  const hasRedirectedRef = useRef(false);
+
+  // Returning-player gate: SP-vs-bots is FTUE-only. Once flag is set,
+  // autoStart=bots / preset=bots entries redirect to multiplayer Quick Play.
+  useEffect(() => {
+    if (hasRedirectedRef.current) return;
+    const isBotsEntry = autoStart === 'bots' || presetParam === 'bots';
+    if (!isBotsEntry) return;
+    if (!hasPlayedBotsGame()) return;
+    hasRedirectedRef.current = true;
+    hasAutoStartedRef.current = true; // suppress subsequent auto-start effects
+    router.replace(`/${uiLanguage}/multiplayer?quickPlay=true`);
+  }, [autoStart, presetParam, router, uiLanguage]);
 
   // Auto-start practice mode (autoStart=practice)
   useEffect(() => {

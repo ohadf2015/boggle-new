@@ -17,6 +17,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import { useFeatureUnlockNotifications } from '@/hooks/useFeatureUnlockNotifications';
 import { incrementTrainingGames } from '@/utils/playerProgressStorage';
+import { markBotsGamePlayed } from '@/utils/onboardingStorage';
 import { awardCreatorCoins } from '@/utils/creatorRewards';
 import type { DifficultyLevel, Language, LetterGrid } from '@/shared/types/game';
 import { useHideNavigation } from '@/contexts/NavigationContext';
@@ -159,6 +160,12 @@ const SinglePlayerView: React.FC = () => {
 
   const handleGameEnd = useCallback((results: SinglePlayerResultsData) => {
     incrementTrainingGames();
+
+    // Flip returning-player flag so next /singleplayer?autoStart=bots entry
+    // routes to Quick Play instead of replaying the FTUE bots flow.
+    if (gameState.mode === 'solo-bots') {
+      markBotsGamePlayed();
+    }
 
     const longestWord = (results.playerWords || []).reduce(
       (longest, word) => word.length > (longest?.length || 0) ? word : longest,

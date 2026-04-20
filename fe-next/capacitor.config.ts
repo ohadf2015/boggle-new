@@ -66,8 +66,11 @@ const config: CapacitorConfig = {
     captureInput: true,
     webContentsDebuggingEnabled: isDev,
     backgroundColor: '#1a1a2e',
+    loggingBehavior: isDev ? 'debug' : 'none',
     // CRITICAL: Do NOT add useLegacyBridge or use CapacitorHttp
   },
+
+  loggingBehavior: isDev ? 'debug' : 'none',
 };
 
 export default config;

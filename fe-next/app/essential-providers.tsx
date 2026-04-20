@@ -24,7 +24,7 @@ import { QueryProvider } from '@/components/providers/QueryProvider';
 import { QueryErrorResetBoundary } from '@tanstack/react-query';
 import { AdMobProvider } from '@/contexts/AdMobContext';
 import { initUtmCapture } from '@/utils/utmCapture';
-import { initConsoleOverride } from '@/utils/consoleOverride';
+import { initConsoleOverride, initCapacitorLogFilter } from '@/utils/consoleOverride';
 import { initSessionTracking } from '@/utils/sessionTracking';
 import { linkLogRocketSession } from '@/utils/sentry';
 import { hasConsent } from '@/utils/cookieConsent';
@@ -64,6 +64,7 @@ const initConsole = () => {
 
     consoleOverrideInitialized = true;
     initConsoleOverride();
+    initCapacitorLogFilter();
 };
 
 if (typeof window !== 'undefined') {

@@ -15,6 +15,7 @@ import {
 const STORAGE_KEYS = {
   ONBOARDING_COMPLETED: 'lexiclash_onboarding_completed',
   ONBOARDING_DATA: 'lexiclash_onboarding_data',
+  BOTS_GAME_PLAYED: 'lexiclash_bots_game_played',
 } as const;
 
 export interface OnboardingData {
@@ -120,6 +121,23 @@ export const hasPendingRoomInvite = (): boolean => {
  * Supabase stores sessions under keys matching sb-<projectRef>-auth-token.
  * Used to skip FTUE for users with a real auth account on a cleared device.
  */
+/**
+ * Returning-player gate: flipped after the user's first Single-Player-vs-Bots
+ * game finishes. Once true, subsequent entries to /singleplayer should route
+ * to Quick Play instead of replaying the bots-vs-player flow.
+ */
+export const hasPlayedBotsGame = (): boolean => {
+  return getFromLocalStorage(STORAGE_KEYS.BOTS_GAME_PLAYED) === 'true';
+};
+
+export const markBotsGamePlayed = (): void => {
+  saveToLocalStorage(STORAGE_KEYS.BOTS_GAME_PLAYED, 'true');
+};
+
+export const clearBotsGamePlayed = (): void => {
+  removeFromLocalStorage(STORAGE_KEYS.BOTS_GAME_PLAYED);
+};
+
 export const hasSupabaseSession = (): boolean => {
   if (typeof window === 'undefined') return false;
   for (let i = 0; i < localStorage.length; i++) {

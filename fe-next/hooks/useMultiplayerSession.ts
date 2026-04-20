@@ -173,7 +173,7 @@ export function useMultiplayerSession(
           onSetUsername(savedUsername);
           setShouldAutoJoin(true);
         }
-      } else if (hasSession) {
+      } else if (hasSession && !intentionalExit) {
         // Only auto-reconnect if this is a page refresh
         const isPageRefresh = (() => {
           try {
@@ -197,6 +197,15 @@ export function useMultiplayerSession(
           logger.log('[Init] User navigated to main page, clearing session');
           clearSession();
         }
+      } else if (hasSession && intentionalExit) {
+        logger.log('[Init] Intentional exit detected, clearing session');
+        clearSession();
+      }
+
+      if (intentionalExit) {
+        try {
+          sessionStorage.removeItem('boggle_intentional_exit');
+        } catch { /* storage blocked */ }
       }
 
       if (roomFromUrl && savedUsername) {

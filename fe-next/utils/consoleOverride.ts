@@ -95,7 +95,31 @@ const IGNORED_ERROR_PATTERNS = [
 const originalConsole = {
   error: console.error,
   warn: console.warn,
+  debug: console.debug,
 };
+
+/**
+ * Noisy debug-level logs emitted by Capacitor's native-bridge.js
+ * (unconditional `console.debug('Removing listener', plugin, event)` on every
+ * listener cleanup). These are not actionable — suppress in all environments.
+ */
+const IGNORED_DEBUG_PATTERNS = [
+  /^Removing listener$/,
+] as const;
+
+/**
+ * Filter Capacitor bridge debug noise ("Removing listener ...") from the
+ * browser console on every platform. Safe to run once at startup.
+ */
+export function initCapacitorLogFilter(): void {
+  if (typeof window === 'undefined') return;
+  const original = originalConsole.debug.bind(console);
+  console.debug = (...args: unknown[]): void => {
+    const first = typeof args[0] === 'string' ? args[0] : '';
+    if (IGNORED_DEBUG_PATTERNS.some((p) => p.test(first))) return;
+    original(...args);
+  };
+}
 
 /**
  * Initialize console overrides in production
