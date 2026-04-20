@@ -18,7 +18,6 @@ export function AdMobProvider({ children }: { children: ReactNode }) {
   const isNative = useMemo(() => Capacitor.isNativePlatform(), []);
   const platform = useMemo(() => Capacitor.getPlatform() as AdPlatform, []);
   const totalGameEnds = useRef(0);
-  const sessionGameCount = useRef(0);
   const isInitialized = useRef(false);
 
   useEffect(() => {
@@ -33,7 +32,6 @@ export function AdMobProvider({ children }: { children: ReactNode }) {
 
   function recordGameEnd() {
     totalGameEnds.current += 1;
-    sessionGameCount.current += 1;
   }
 
   function shouldShowInterstitial(): boolean {
