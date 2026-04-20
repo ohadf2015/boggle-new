@@ -22,6 +22,7 @@ import { Toaster } from 'react-hot-toast';
 import ErrorBoundary from './components/ErrorBoundary';
 import { QueryProvider } from '@/components/providers/QueryProvider';
 import { QueryErrorResetBoundary } from '@tanstack/react-query';
+import { AdMobProvider } from '@/contexts/AdMobContext';
 import { initUtmCapture } from '@/utils/utmCapture';
 import { initConsoleOverride } from '@/utils/consoleOverride';
 import { initSessionTracking } from '@/utils/sessionTracking';
@@ -177,9 +178,11 @@ export function EssentialProviders({ children, lang, initialTranslations }: Esse
                                 <MusicProvider>
                                     <SoundEffectsProvider>
                                         <HapticsProvider>
+                                            <AdMobProvider>
                                             <NavigationProvider>
                                                 {memoizedChildren}
                                             </NavigationProvider>
+                                            </AdMobProvider>
                                         </HapticsProvider>
                                         <Toaster
                                             position="top-center"
