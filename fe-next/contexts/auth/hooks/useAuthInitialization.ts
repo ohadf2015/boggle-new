@@ -126,6 +126,7 @@ export function useAuthInitialization({
                 userId: session.user.id,
               });
             });
+            registerPushToken().catch(() => {});
           }
         }
       } catch (err) {
