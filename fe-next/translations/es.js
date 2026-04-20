@@ -6751,6 +6751,9 @@ const es = {
       "wheel": "Rueda de palabras",
       "forge": "Forja de palabras"
     },
+    "hunt": {
+      "preparingPuzzle": "Preparando el puzzle..."
+    },
     "loading": "Cargando aventura...",
     "currency": {
       "goldAmount": "{amount} oro",

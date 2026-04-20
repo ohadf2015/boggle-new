@@ -64,6 +64,9 @@ export interface WordHuntGameLayoutProps {
   // Death recap
   deathRecapStats?: DeathRecapStats | null;
 
+  /** Suppress the MP game-over overlay entirely (e.g. in adventure mode). */
+  hideGameOverOverlay?: boolean;
+
   // Common
   t: (key: string, params?: Record<string, string | number>) => string;
   gameDir: 'ltr' | 'rtl';
@@ -113,6 +116,8 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
 
   // Death recap
   deathRecapStats,
+
+  hideGameOverOverlay,
 
   // Common
   t,
@@ -174,11 +179,13 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
           />
 
           {/* Game over overlay — death or victory, then spectator mode */}
-          <WordHuntGameOverOverlay
-            reason={isGameOver ? (targetFound ? (targetFoundBy != null && targetFoundBy !== currentUsername ? 'otherFound' : 'found') : 'eliminated') : null}
-            t={t}
-            deathRecapStats={deathRecapStats}
-          />
+          {!hideGameOverOverlay && (
+            <WordHuntGameOverOverlay
+              reason={isGameOver ? (targetFound ? (targetFoundBy != null && targetFoundBy !== currentUsername ? 'otherFound' : 'found') : 'eliminated') : null}
+              t={t}
+              deathRecapStats={deathRecapStats}
+            />
+          )}
         </div>
 
         {/* MP Leaderboard — mobile: compact horizontal strip */}

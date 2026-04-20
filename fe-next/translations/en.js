@@ -6681,6 +6681,9 @@ const en = {
         "mastery": "Mastery"
       }
     },
+    "hunt": {
+      "preparingPuzzle": "Preparing puzzle..."
+    },
     "loading": "Loading adventure...",
     "currency": {
       "goldAmount": "{amount} gold",

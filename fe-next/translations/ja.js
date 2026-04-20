@@ -6796,6 +6796,9 @@ const ja = {
     "perfect": "パーフェクト！",
     "restart": "リスタート",
     "gold": "ゴールド",
+    "hunt": {
+      "preparingPuzzle": "パズルを準備中..."
+    },
     "loading": "アドベンチャーを読み込み中...",
     "currency": {
       "goldAmount": "{amount} ゴールド",

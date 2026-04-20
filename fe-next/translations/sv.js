@@ -6767,6 +6767,9 @@ const sv = {
     "perfect": "Perfekt!",
     "restart": "Börja om",
     "gold": "Guld",
+    "hunt": {
+      "preparingPuzzle": "Förbereder pussel..."
+    },
     "loading": "Laddar äventyr...",
     "currency": {
       "goldAmount": "{amount} guld",

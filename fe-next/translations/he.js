@@ -6581,6 +6581,9 @@ const he = {
         "mastery": "שליטה"
       }
     },
+    "hunt": {
+      "preparingPuzzle": "מכין פאזל..."
+    },
     "loading": "טוען הרפתקה...",
     "currency": {
       "goldAmount": "{amount} זהב",
