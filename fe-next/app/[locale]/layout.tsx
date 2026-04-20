@@ -13,6 +13,7 @@ import GoogleAdSense from '@/components/GoogleAdSense';
 import CrazyGamesScriptServer from '@/components/CrazyGamesScriptServer';
 import WebVitalsReporter from '@/components/WebVitalsReporter';
 import PWAInstallPrompt from '@/components/PWAInstallPrompt';
+import AndroidAppRedirect from '@/components/AndroidAppRedirect';
 import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration';
 import VersionChecker from '@/components/VersionChecker';
 import { CrazyGamesRouteGuard } from '@/components/CrazyGamesRouteGuard';
@@ -585,6 +586,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                         {/* Global bottom navigation - mobile only, hidden during gameplay */}
                         <GlobalBottomNav />
                     </div>
+                    <AndroidAppRedirect />
                     <PWAInstallPrompt />
                     <PushNotificationPrompt />
                     <EmailCaptureModal />
