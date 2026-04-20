@@ -68,7 +68,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         'es-CO': `${BASE_URL}/es/juego-de-palabras-multijugador`,
       },
     },
-    robots: { index: false, follow: true },
+    robots: { index: true, follow: true },
   };
 }
 
@@ -120,14 +120,14 @@ export default async function HebrewMultiplayerWordGamePage({ params }: PageProp
 
       <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
         <h1 className="mb-6 font-neo-display text-4xl font-bold leading-tight sm:text-5xl">
-          משחק מילים מרובה משתתפים בעברית - קרבות מילים בזמן אמת
+          משחק מילים בעברית אונליין — סקראבל, בוגל וראש בראש מרובה משתתפים
         </h1>
 
         <p className="mb-8 text-lg leading-relaxed text-neo-gray-200">
-          ברוכים הבאים ללקסיקלאש - משחק המילים המרובה משתתפים הטוב בעברית! אם אתם אוהבי בוגל, סקראבל או וורדל,
-          הפלטפורמה שלנו משלבת את הטוב ביותר מכל אחד. צרו חדר, שלחו לינק לחברים שלכם, והתחרו בקרבות מילים
-          מרגשים בזמן אמת. עם 10,000+ מילים במילון בעברית, ללא הורדה, וגישה לגמרי חינם, לקסיקלאש היא משחק
-          המילים האידיאלי לכם.
+          ברוכים הבאים ללקסיקלאש - משחק המילים בעברית הטוב באינטרנט למשחק ראש בראש אונליין עם חברים. אם אתם
+          מחפשים סקראבל אונליין, בוגל בעברית או אתגר יומי בסגנון וורדל — הפלטפורמה שלנו משלבת את הטוב ביותר
+          מכל אחד. צרו חדר, שלחו לינק, והתחרו בקרבות מילים בזמן אמת, ראש בראש, מול חברים או שחקנים מכל העולם.
+          עם 10,000+ מילים במילון בעברית, ללא הורדה וללא הרשמה, לקסיקלאש היא משחק המילים האידיאלי לכם.
         </p>
 
         <section className="mb-12">

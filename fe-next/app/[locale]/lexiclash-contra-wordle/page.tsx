@@ -50,7 +50,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         ja: `${BASE_URL}/ja/japanese-word-game`,
       },
     },
-    robots: { index: false, follow: true },
+    robots: { index: true, follow: true },
   };
 }
 
