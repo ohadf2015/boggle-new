@@ -3,11 +3,12 @@
 **Updated:** 2026-04-20
 
 ## Current Blocker
-None. Upload-key reset approved by Google on 2026-04-20. v2 keystore fully active.
+**Production access gate** (Play policy, not technical): need ≥12 closed-test opt-ins × 14 days before "Apply for production access" unlocks. Dashboard: "2 testers currently opted in". No API bypass.
 
 ## Last Release
-versionCode 3706 (AdMob implementation) uploaded to Internal track on 2026-04-20.
-Promote to Production manually via Play Console (API promotion blocked until internal testers install first).
+versionCode **3734** uploaded 2026-04-20 to **closed-testing ("alpha")** track, release_status=completed. Visible in bundle-explorer: `3734 | 3733 | 3711 | 3707 | 3706`. 3733 burned (duplicate-code error before bump).
+
+Fastfile `track: "alpha"` for both `internal` and `promote_to_production` lanes — the script echo "Track=internal" is misleading. Promote lane fails with `Precondition check failed` until production access granted.
 
 ## Keystore (v2 — new upload key)
 - Path: `android/lexiclash-upload-v2.keystore` (also referenced as `lexiclash-release.keystore` via env)
