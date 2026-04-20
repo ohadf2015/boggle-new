@@ -326,7 +326,10 @@ export default function ReferralDashboardClient() {
   return (
     <div className="min-h-screen bg-neo-navy pb-24">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-neo-navy/95 backdrop-blur-sm border-b-3 border-neo-black/30 px-4 py-3 flex items-center gap-3">
+      <div
+        className="sticky top-0 z-10 bg-neo-navy/95 backdrop-blur-sm border-b-3 border-neo-black/30 px-4 py-3 flex items-center gap-3"
+        style={{ paddingTop: 'max(0.75rem, env(safe-area-inset-top, 0.75rem))' }}
+      >
         <button
           onClick={() => router.back()}
           className="p-2 rounded-neo hover:bg-neo-white/10 transition-colors"

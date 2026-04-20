@@ -31,13 +31,10 @@ export function PushNotificationPrompt() {
 
   async function handleEnable() {
     try {
-      if (typeof window.Notification !== 'undefined' && Notification.requestPermission) {
-        const permission = await Notification.requestPermission();
-        if (permission === 'granted') {
-          // Attempt FCM token registration (native only, no-op on web)
-          await registerPushToken();
-        }
-      }
+      // registerPushToken handles Capacitor perms on native and no-ops on web.
+      // Do NOT gate on window.Notification.requestPermission — native WebView
+      // exposes that API but it does not trigger the native push-perm dialog.
+      await registerPushToken();
     } catch {
       // Permission request failed — close prompt silently
     }

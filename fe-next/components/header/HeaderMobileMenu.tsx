@@ -326,10 +326,13 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                 style={{ touchAction: 'pan-y' }}
                             >
                                 {/* ── Close button (top corner) ── */}
-                                <div className={cn(
-                                    "absolute top-3 z-10",
-                                    isRtl ? "right-3" : "left-3"
-                                )}>
+                                <div
+                                    className={cn(
+                                        "absolute z-10",
+                                        isRtl ? "right-3" : "left-3"
+                                    )}
+                                    style={{ top: 'max(0.75rem, calc(env(safe-area-inset-top, 0px) + 0.25rem))' }}
+                                >
                                     <button
                                         onClick={closeMenu}
                                         className={cn(
@@ -349,11 +352,14 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                 </div>
 
                                 {/* ── Profile Hero Section ── */}
-                                <div className={cn(
-                                    "relative px-5 pt-12 pb-5",
-                                    "bg-linear-to-b from-neo-purple/30 via-neo-navy to-neo-navy",
-                                    "border-b-3 border-neo-black/40"
-                                )}>
+                                <div
+                                    className={cn(
+                                        "relative px-5 pb-5",
+                                        "bg-linear-to-b from-neo-purple/30 via-neo-navy to-neo-navy",
+                                        "border-b-3 border-neo-black/40"
+                                    )}
+                                    style={{ paddingTop: 'max(3rem, calc(env(safe-area-inset-top, 0px) + 2.25rem))' }}
+                                >
                                     {/* Decorative dots */}
                                     <div className="absolute top-2 right-4 flex gap-1 opacity-30">
                                         <div className="w-1.5 h-1.5 rounded-full bg-neo-pink" />

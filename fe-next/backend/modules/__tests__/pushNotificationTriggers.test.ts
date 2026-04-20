@@ -58,7 +58,7 @@ describe('pushNotificationTriggers', () => {
         body: 'Ohad sent you a friend request!',
         data: {
           type: 'friend_request',
-          deepLink: '/adventure?tab=friends',
+          deepLink: '/friends?tab=requests',
         },
       });
     });
@@ -91,7 +91,7 @@ describe('pushNotificationTriggers', () => {
         body: 'Maya accepted your friend request!',
         data: {
           type: 'friend_accepted',
-          deepLink: '/adventure?tab=friends',
+          deepLink: '/friends?tab=friends',
         },
       });
     });

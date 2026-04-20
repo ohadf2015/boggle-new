@@ -41,6 +41,11 @@ vi.mock('../../hooks/useFriends', () => ({
     useFriends: () => mockUseFriends(),
 }));
 
+const mockUseFriendMessages = vi.fn();
+vi.mock('../../hooks/useFriendMessages', () => ({
+    useFriendMessages: () => mockUseFriendMessages(),
+}));
+
 vi.mock('../../utils/ThemeContext', () => ({
     useTheme: vi.fn(() => ({ theme: 'dark' })),
 }));
@@ -100,6 +105,14 @@ describe('GlobalBottomNav', () => {
             outgoingRequests: [],
             pendingChallenges: [],
             isLoading: false,
+            error: null,
+        });
+        mockUseFriendMessages.mockReturnValue({
+            unreadCount: 0,
+            threads: [],
+            messages: [],
+            isLoadingThreads: false,
+            isLoadingMessages: false,
             error: null,
         });
         mockUseDailyMissions.mockReturnValue({
@@ -447,6 +460,56 @@ describe('GlobalBottomNav', () => {
             const badge = screen.getByTestId('quest-progress-badge');
             expect(badge).toBeInTheDocument();
             expect(badge).toHaveTextContent('3');
+        });
+    });
+
+    describe('Social Badge (friends + unread messages)', () => {
+        it('should not show badge when no pending requests and no unread messages', () => {
+            render(<GlobalBottomNav />);
+            expect(screen.queryByTestId('friend-social-badge')).not.toBeInTheDocument();
+        });
+
+        it('should show count equal to pending requests when no unread messages', () => {
+            mockUseFriends.mockReturnValue({
+                pendingRequests: [{ id: 'r1' }, { id: 'r2' }],
+                friends: [], outgoingRequests: [], pendingChallenges: [],
+                isLoading: false, error: null,
+            });
+            render(<GlobalBottomNav />);
+            const badge = screen.getByTestId('friend-social-badge');
+            expect(badge).toHaveTextContent('2');
+        });
+
+        it('should show combined count of pending requests plus unread messages', () => {
+            mockUseFriends.mockReturnValue({
+                pendingRequests: [{ id: 'r1' }],
+                friends: [], outgoingRequests: [], pendingChallenges: [],
+                isLoading: false, error: null,
+            });
+            mockUseFriendMessages.mockReturnValue({
+                unreadCount: 3,
+                threads: [], messages: [],
+                isLoadingThreads: false, isLoadingMessages: false, error: null,
+            });
+            render(<GlobalBottomNav />);
+            const badge = screen.getByTestId('friend-social-badge');
+            expect(badge).toHaveTextContent('4');
+        });
+
+        it('should cap display at 9+ when combined count exceeds 9', () => {
+            mockUseFriends.mockReturnValue({
+                pendingRequests: [{ id: 'r1' }, { id: 'r2' }],
+                friends: [], outgoingRequests: [], pendingChallenges: [],
+                isLoading: false, error: null,
+            });
+            mockUseFriendMessages.mockReturnValue({
+                unreadCount: 12,
+                threads: [], messages: [],
+                isLoadingThreads: false, isLoadingMessages: false, error: null,
+            });
+            render(<GlobalBottomNav />);
+            const badge = screen.getByTestId('friend-social-badge');
+            expect(badge).toHaveTextContent('9+');
         });
     });
 

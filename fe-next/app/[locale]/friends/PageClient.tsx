@@ -53,10 +53,13 @@ export default function FriendsPageClient(): React.JSX.Element {
         threshold={60}
       />
       {/* Header */}
-      <header className={cn(
-        'sticky top-0 z-40 px-4 py-3 border-b-3 border-neo-black',
-        isDark ? 'bg-slate-800/95 backdrop-blur-sm' : 'bg-white/95 backdrop-blur-sm'
-      )}>
+      <header
+        className={cn(
+          'sticky top-0 z-40 px-4 py-3 border-b-3 border-neo-black',
+          isDark ? 'bg-slate-800/95 backdrop-blur-sm' : 'bg-white/95 backdrop-blur-sm'
+        )}
+        style={{ paddingTop: 'max(0.75rem, env(safe-area-inset-top, 0.75rem))' }}
+      >
         <div className="max-w-2xl mx-auto flex items-center gap-4">
           <button
             onClick={() => router.push(`/${language}`)}

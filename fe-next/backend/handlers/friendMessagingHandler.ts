@@ -85,12 +85,16 @@ export function registerFriendMessagingHandlers(io: Server, socket: Socket): voi
       broadcastToUser(io, data.recipientUserId, 'friends:messageReceived', result.message);
 
       // Push notification for offline recipients (N-1)
+      // If recipient has an active socket, the in-app toast handles it — skip FCM push
+      const recipientSockets = await io.in(`user:${data.recipientUserId}`).fetchSockets();
+      const recipientOnline = recipientSockets.length > 0;
       const senderProfile = await getUserProfile(authUserId);
       notifyDirectMessage(
         data.recipientUserId,
         senderProfile?.username ?? 'Someone',
         cleanMessage,
-        authUserId
+        authUserId,
+        recipientOnline ? 'in_app_only' : 'both'
       ).catch(() => {});
 
       logger.info('MESSAGING', `Message sent from ${authUserId} to ${data.recipientUserId}`);

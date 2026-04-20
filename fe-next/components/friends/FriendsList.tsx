@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 import {
@@ -14,7 +14,7 @@ import {
   ShieldOff,
   Handshake,
 } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { SkeletonCard } from '@/components/ui/EnhancedLoading';
 import { EnhancedEmptyState } from '@/components/ui/EnhancedEmptyState';
 import { useFriends } from '@/hooks/useFriends';
@@ -76,8 +76,15 @@ const FriendsList: React.FC<FriendsListProps> = ({
   } = useFriends();
 
   const router = useRouter();
+  const searchParams = useSearchParams();
 
-  const [activeTab, setActiveTab] = useState<TabType>('friends');
+  const initialTab: TabType = (() => {
+    const t = searchParams?.get('tab');
+    return t === 'requests' || t === 'messages' || t === 'friends' ? t : 'friends';
+  })();
+
+  const [activeTab, setActiveTab] = useState<TabType>(initialTab);
+  const autoOpenedFriendRef = useRef<string | null>(null);
   const [showAddFriend, setShowAddFriend] = useState(false);
   const [selectedFriend, setSelectedFriend] = useState<Friend | null>(null);
   const [selectedBlockedUser, setSelectedBlockedUser] = useState<Friend | null>(null);
@@ -172,6 +179,14 @@ const FriendsList: React.FC<FriendsListProps> = ({
     toast(t('friends.requestCancelled'), { icon: '✕' });
   }, [cancelRequest, t]);
 
+  // Keep activeTab synced to ?tab= when URL changes (e.g., from push/toast deep-link)
+  useEffect(() => {
+    const t = searchParams?.get('tab');
+    if (t === 'requests' || t === 'messages' || t === 'friends') {
+      setActiveTab((prev) => (prev === t ? prev : t));
+    }
+  }, [searchParams]);
+
   const handleThreadClick = useCallback((thread: MessageThreadType) => {
     setSelectedThread(thread);
     setIsInGame(true);
@@ -209,6 +224,31 @@ const FriendsList: React.FC<FriendsListProps> = ({
     // Switch to messages tab
     setActiveTab('messages');
   }, [threads, handleThreadClick, loadMessages, setIsInGame]);
+
+  // Auto-open thread when deep-link includes ?friendUserId=X (from push / toast / share)
+  useEffect(() => {
+    const friendUserId = searchParams?.get('friendUserId');
+    if (!friendUserId) {
+      autoOpenedFriendRef.current = null;
+      return;
+    }
+    if (autoOpenedFriendRef.current === friendUserId) return;
+    if (selectedThread?.friendUserId === friendUserId) {
+      autoOpenedFriendRef.current = friendUserId;
+      return;
+    }
+    const existing = threads.find((thr) => thr.friendUserId === friendUserId);
+    if (existing) {
+      autoOpenedFriendRef.current = friendUserId;
+      handleThreadClick(existing);
+      return;
+    }
+    const friend = friends.find((f) => f.odUserId === friendUserId);
+    if (friend) {
+      autoOpenedFriendRef.current = friendUserId;
+      handleOpenMessageForFriend(friend);
+    }
+  }, [searchParams, threads, friends, selectedThread, handleThreadClick, handleOpenMessageForFriend]);
 
   const handleSendMessage = useCallback(async (text: string) => {
     if (selectedThread) {

@@ -60,7 +60,10 @@ function Header({ isDarkMode, onBack, title, backText }: HeaderProps) {
       'border-b-4 border-neo-black',
       isDarkMode ? 'bg-neo-navy' : 'bg-neo-cream'
     )}>
-      <div className="flex items-center justify-between px-4 py-3">
+      <div
+        className="flex items-center justify-between px-4 py-3"
+        style={{ paddingTop: 'max(0.75rem, env(safe-area-inset-top, 0.75rem))' }}
+      >
         <button
           onClick={onBack}
           className={cn(

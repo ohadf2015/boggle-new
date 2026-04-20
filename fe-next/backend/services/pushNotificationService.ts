@@ -89,12 +89,28 @@ async function getFCMAccessToken(): Promise<string | null> {
     return cachedAccessToken;
   }
 
-  const projectId = process.env.FCM_PROJECT_ID;
-  const privateKey = process.env.FCM_PRIVATE_KEY?.replace(/\\n/g, '\n');
-  const clientEmail = process.env.FCM_CLIENT_EMAIL;
+  let projectId = process.env.FCM_PROJECT_ID;
+  let privateKey = process.env.FCM_PRIVATE_KEY?.replace(/\\n/g, '\n');
+  let clientEmail = process.env.FCM_CLIENT_EMAIL;
+
+  // Fallback to shared GOOGLE_CREDENTIALS_JSON (same var fcmService.ts uses).
+  // Lets one service-account JSON drive both the firebase-admin path and this HTTP v1 path.
+  if (!projectId || !privateKey || !clientEmail) {
+    const sharedJson = process.env.GOOGLE_CREDENTIALS_JSON;
+    if (sharedJson) {
+      try {
+        const creds = JSON.parse(sharedJson);
+        projectId = projectId || creds.project_id;
+        privateKey = privateKey || creds.private_key;
+        clientEmail = clientEmail || creds.client_email;
+      } catch (err) {
+        logger.warn('PUSH_SERVICE', 'Failed to parse GOOGLE_CREDENTIALS_JSON', { error: (err as Error).message });
+      }
+    }
+  }
 
   if (!projectId || !privateKey || !clientEmail) {
-    logger.warn('PUSH_SERVICE', 'FCM credentials not configured - push notifications disabled');
+    logger.warn('PUSH_SERVICE', 'FCM credentials not configured (set GOOGLE_CREDENTIALS_JSON or FCM_PROJECT_ID/FCM_PRIVATE_KEY/FCM_CLIENT_EMAIL) - push notifications disabled');
     return null;
   }
 

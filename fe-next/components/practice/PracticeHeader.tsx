@@ -102,7 +102,10 @@ export const PracticeHeader = memo<PracticeHeaderProps>(({
       )}
       dir={isRTL ? 'rtl' : 'ltr'}
     >
-      <div className="max-w-2xl mx-auto px-4 py-3">
+      <div
+        className="max-w-2xl mx-auto px-4 py-3"
+        style={{ paddingTop: 'max(0.75rem, env(safe-area-inset-top, 0.75rem))' }}
+      >
         {/* Top row: Back button, title, XP/streak */}
         <div className="flex items-center gap-3">
           {/* Back button */}

@@ -36,8 +36,15 @@ interface UseFriendMessagesReturn {
   pendingChallenges: { sent: Challenge[]; received: Challenge[] };
 }
 
-export function useFriendMessages(friendId?: string): UseFriendMessagesReturn {
+export function useFriendMessages(
+  friendId?: string,
+  onMessage?: (message: Message) => void
+): UseFriendMessagesReturn {
   const { user } = useAuth();
+  const onMessageRef = useRef(onMessage);
+  useEffect(() => {
+    onMessageRef.current = onMessage;
+  }, [onMessage]);
   const socketContext = useSocketOptional();
   const socket = socketContext?.socket ?? null;
   const isConnected = socketContext?.isConnected ?? false;
@@ -333,6 +340,7 @@ export function useFriendMessages(friendId?: string): UseFriendMessagesReturn {
       if (friendId && (message.fromUserId === friendId || message.toUserId === friendId)) {
         setMessages((prev) => [message, ...prev]);
       }
+      onMessageRef.current?.(message);
       refreshThreads();
     };
 

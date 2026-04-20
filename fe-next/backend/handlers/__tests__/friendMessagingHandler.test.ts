@@ -57,9 +57,12 @@ function createTestHarness() {
     }),
     authUserId: 'user-a',
   };
+  const fetchSocketsMock = vi.fn().mockResolvedValue([]);
   const io: any = {
     to: vi.fn().mockReturnThis(),
     emit: vi.fn(),
+    in: vi.fn(() => ({ fetchSockets: fetchSocketsMock })),
+    _fetchSocketsMock: fetchSocketsMock,
   };
 
   registerFriendMessagingHandlers(io, socket);
@@ -174,6 +177,50 @@ describe('friendMessagingHandler', () => {
       const { socket, trigger } = createTestHarness();
       await trigger('friends:sendMessage', { recipientUserId: 'user-b', message: 'hi' });
       expect(socket.emit).toHaveBeenCalledWith('rateLimited');
+    });
+  });
+
+  describe('friends:sendMessage presence gate (N-1)', () => {
+    const mockMessage = {
+      messageId: 'msg-1',
+      conversationId: 'user-a_user-b',
+      fromUserId: 'user-a',
+      toUserId: 'user-b',
+      message: 'hello',
+      timestamp: Date.now(),
+      isRead: false,
+      isDeleted: false,
+    };
+
+    beforeEach(() => {
+      (friendsManager.sendMessage as Mock).mockResolvedValue({
+        success: true,
+        message: mockMessage,
+      });
+    });
+
+    it('should pass in_app_only when recipient socket online (no FCM)', async () => {
+      const { notifyDirectMessage } = await import('../../modules/pushNotificationTriggers');
+      const { io, trigger } = createTestHarness();
+      (io._fetchSocketsMock as Mock).mockResolvedValue([{ id: 's-b' }]);
+
+      await trigger('friends:sendMessage', { recipientUserId: 'user-b', message: 'hi' });
+
+      expect(io.in).toHaveBeenCalledWith('user:user-b');
+      expect(notifyDirectMessage).toHaveBeenCalledWith(
+        'user-b', 'alice', 'hi', 'user-a', 'in_app_only',
+      );
+    });
+
+    it('should pass both when recipient offline (FCM + in-app)', async () => {
+      const { notifyDirectMessage } = await import('../../modules/pushNotificationTriggers');
+      const { trigger } = createTestHarness();
+
+      await trigger('friends:sendMessage', { recipientUserId: 'user-b', message: 'hi' });
+
+      expect(notifyDirectMessage).toHaveBeenCalledWith(
+        'user-b', 'alice', 'hi', 'user-a', 'both',
+      );
     });
   });
 

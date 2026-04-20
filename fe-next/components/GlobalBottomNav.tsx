@@ -1,7 +1,7 @@
 'use client';
 
-import { memo, useCallback, useMemo, useState } from 'react';
-import { usePathname, useRouter } from 'next/navigation';
+import { memo, useCallback, useMemo, useRef, useState } from 'react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { Home, Swords, ScrollText, Users } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -13,6 +13,9 @@ import { useSafeArea } from '../hooks/useSafeArea';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useDailyMissions } from '../hooks/useDailyMissions';
 import { useFriends } from '../hooks/useFriends';
+import { useFriendMessages } from '../hooks/useFriendMessages';
+import { toast } from './ui/EnhancedToast';
+import type { Message } from '@/shared/types/friends';
 
 // 3 daily missions shown in the Quests tab (no brain drill)
 const QUEST_MISSION_TYPES = ['wordHunt', 'adventure', 'community'] as const;
@@ -72,11 +75,55 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
     const { isOnCrazyGamesPlatform } = useCrazyGames();
     const router = useRouter();
     const pathname = usePathname();
+    const searchParams = useSearchParams();
     const safeArea = useSafeArea();
+    const { user } = useAuth();
     const [showAuthModal, setShowAuthModal] = useState(false);
     const { missions } = useDailyMissions();
-    const { pendingRequests } = useFriends();
-    const pendingCount = pendingRequests.length;
+    const { pendingRequests, friends } = useFriends();
+
+    // Refs with fresh values so onMessage callback can decide whether to toast
+    const pathnameRef = useRef(pathname);
+    pathnameRef.current = pathname;
+    const searchParamsRef = useRef(searchParams);
+    searchParamsRef.current = searchParams;
+    const currentUserIdRef = useRef(user?.id);
+    currentUserIdRef.current = user?.id;
+    const friendsRef = useRef(friends);
+    friendsRef.current = friends;
+
+    const handleIncomingMessage = useCallback((message: Message) => {
+        // Ignore messages sent by me (echoed to other tabs/devices)
+        if (!currentUserIdRef.current || message.fromUserId === currentUserIdRef.current) return;
+
+        // Suppress when the user is already viewing this exact thread
+        const path = pathnameRef.current || '';
+        const sp = searchParamsRef.current;
+        const onFriends = path.includes('/friends');
+        const onMessagesTab = sp?.get('tab') === 'messages';
+        const viewingThisFriend = sp?.get('friendUserId') === message.fromUserId;
+        if (onFriends && onMessagesTab && viewingThisFriend) return;
+
+        const sender = friendsRef.current.find((f) => f.odUserId === message.fromUserId);
+        const senderName = sender?.displayName || sender?.username || t('friends.newMessage');
+        const preview = message.message.length > 80
+            ? message.message.substring(0, 77) + '...'
+            : message.message;
+
+        toast.info(
+            t('friends.messageFrom', { name: senderName }),
+            preview,
+            {
+                label: t('friends.open'),
+                onClick: () => router.push(
+                    `/${language}/friends?tab=messages&friendUserId=${message.fromUserId}`
+                ),
+            }
+        );
+    }, [t, router, language]);
+
+    const { unreadCount } = useFriendMessages(undefined, handleIncomingMessage);
+    const socialBadgeCount = pendingRequests.length + unreadCount;
 
     // Count completed quests (3 shown: wordHunt, adventure, community — no brain drill)
     const questsCompleted = useMemo(() =>
@@ -229,14 +276,14 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
                                     </span>
                                 )}
 
-                                {/* Friend request badge — dot with count on Friends tab */}
-                                {tab.id === 'friends' && pendingCount > 0 && (
+                                {/* Social badge — pending friend requests + unread messages */}
+                                {tab.id === 'friends' && socialBadgeCount > 0 && (
                                     <span
                                         className="absolute -top-1 -inset-e-2 flex items-center justify-center w-4 h-4 rounded-full bg-neo-pink border-2 border-neo-navy text-[8px] font-black text-neo-white leading-none"
-                                        aria-label={`${pendingCount} ${t('friends.pendingRequests')}`}
-                                        data-testid="friend-request-badge"
+                                        aria-label={t('friends.socialBadge', { count: socialBadgeCount })}
+                                        data-testid="friend-social-badge"
                                     >
-                                        {pendingCount > 9 ? '9+' : pendingCount}
+                                        {socialBadgeCount > 9 ? '9+' : socialBadgeCount}
                                     </span>
                                 )}
                             </motion.div>

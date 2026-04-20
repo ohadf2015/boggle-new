@@ -390,6 +390,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
               className="flex flex-col gap-0 w-full px-1 md:px-2 sticky top-0 z-40 shrink-0"
               role="status"
               aria-label="Game status"
+              style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
             >
               {/* Combo row - mobile only, centered. Container always present to prevent layout shift */}
               {isPlaying && (

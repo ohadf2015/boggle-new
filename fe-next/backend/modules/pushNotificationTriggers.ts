@@ -113,7 +113,7 @@ export async function notifyFriendRequest(
     body: `${fromUsername} sent you a friend request!`,
     data: {
       type: 'friend_request',
-      deepLink: '/adventure?tab=friends',
+      deepLink: '/friends?tab=requests',
     },
   }, 'both', fromUserId);
 }
@@ -131,7 +131,7 @@ export async function notifyFriendAccepted(
     body: `${acceptorUsername} accepted your friend request!`,
     data: {
       type: 'friend_accepted',
-      deepLink: '/adventure?tab=friends',
+      deepLink: '/friends?tab=friends',
     },
   }, 'both', acceptorUserId);
 }
@@ -197,20 +197,25 @@ export async function notifyDirectMessage(
   toUserId: string,
   fromUsername: string,
   messagePreview: string,
-  fromUserId?: string
+  fromUserId?: string,
+  modeOverride?: 'both' | 'in_app_only'
 ): Promise<void> {
   const preview = messagePreview.length > 50
     ? messagePreview.substring(0, 47) + '...'
     : messagePreview;
+
+  const deepLink = fromUserId
+    ? `/friends?tab=messages&friendUserId=${fromUserId}`
+    : '/friends?tab=messages';
 
   return triggerPush(toUserId, 'direct_message', {
     title: `Message from ${fromUsername}`,
     body: preview,
     data: {
       type: 'direct_message',
-      deepLink: '/friends?tab=messages',
+      deepLink,
     },
-  }, 'both', fromUserId);
+  }, modeOverride ?? 'both', fromUserId);
 }
 
 /**

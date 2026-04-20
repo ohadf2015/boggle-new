@@ -5400,6 +5400,9 @@ const he = {
   "friends": {
     "title": "חברים",
     "messages": "הודעות",
+    "newMessage": "הודעה חדשה",
+    "messageFrom": "הודעה מ-{name}",
+    "open": "פתח",
     "noMessages": "עדיין אין הודעות",
     "startConversation": "התחל שיחה!",
     "typeMessage": "כתוב הודעה...",
@@ -5415,6 +5418,7 @@ const he = {
     "noUsersFound": "לא נמצאו משתמשים",
     "pending": "ממתין",
     "pendingRequests": "בקשות ממתינות",
+    "socialBadge": "{count} התראות חברים",
     "remove": "הסר",
     "requests": "בקשות",
     "searchByUsername": "חפש לפי שם משתמש",

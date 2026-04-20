@@ -5420,6 +5420,9 @@ const sv = {
   "friends": {
     "title": "Vänner",
     "messages": "Meddelanden",
+    "newMessage": "Nytt meddelande",
+    "messageFrom": "Meddelande från {name}",
+    "open": "Öppna",
     "noMessages": "Inga meddelanden än",
     "startConversation": "Starta en konversation!",
     "typeMessage": "Skriv ett meddelande...",
@@ -5435,6 +5438,7 @@ const sv = {
     "noUsersFound": "Inga användare hittades",
     "pending": "Väntar",
     "pendingRequests": "Väntande förfrågningar",
+    "socialBadge": "{count} vänaviseringar",
     "remove": "Ta bort",
     "requests": "Förfrågningar",
     "searchByUsername": "Sök efter användarnamn...",
