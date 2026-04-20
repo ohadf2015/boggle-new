@@ -559,6 +559,38 @@ export const trackPageView = (path?: string): void => {
 let sessionGameCount = 0;
 
 /**
+ * Fire activation funnel events once per device.
+ *
+ * Callers: trackGameEnd (all modes) + tutorial completion (engineered win).
+ * Dedup via localStorage so whichever fires first wins the slot.
+ */
+export const markFirstGameActivation = (args: {
+  won: boolean;
+  score: number;
+  wordCount: number;
+  mode: string;
+}): void => {
+  if (typeof window === 'undefined') return;
+  const { won, score, wordCount, mode } = args;
+  const playedKey = 'lexiclash_first_game_played';
+  const wonKey = 'lexiclash_first_game_won';
+
+  try {
+    if (!localStorage.getItem(playedKey)) {
+      localStorage.setItem(playedKey, '1');
+      trackGrowthEvent('first_game_played', { score, wordCount, gameMode: mode });
+      trackGA4Event('funnel_first_game', { mode });
+    }
+    if (won && !localStorage.getItem(wonKey)) {
+      localStorage.setItem(wonKey, '1');
+      trackGrowthEvent('first_game_won', { score, wordCount, gameMode: mode });
+    }
+  } catch {
+    /* localStorage unavailable (private mode, quota) — activation best-effort */
+  }
+};
+
+/**
  * Track game start across any mode (SP, MP, daily, adventure, drill, blast)
  */
 export const trackGameStart = (
@@ -605,23 +637,12 @@ export const trackGameEnd = (
       first_played_at: new Date().toISOString(),
     });
 
-    // Activation funnel: fire first_game_played / first_game_won exactly once
-    // per device, regardless of mode. Dedupe via localStorage so MP's explicit
-    // trackGameCompletion caller stays idempotent.
-    if (typeof window !== 'undefined') {
-      const playedKey = 'lexiclash_first_game_played';
-      const wonKey = 'lexiclash_first_game_won';
-      if (!localStorage.getItem(playedKey)) {
-        localStorage.setItem(playedKey, '1');
-        trackGrowthEvent('first_game_played', { score, wordCount, gameMode: mode });
-        trackGA4Event('funnel_first_game', { mode });
-      }
-      const isWinner = extras.isWinner === true;
-      if (isWinner && !localStorage.getItem(wonKey)) {
-        localStorage.setItem(wonKey, '1');
-        trackGrowthEvent('first_game_won', { score, wordCount, gameMode: mode });
-      }
-    }
+    markFirstGameActivation({
+      won: extras.isWinner === true,
+      score,
+      wordCount,
+      mode,
+    });
   } else if (durationSec !== undefined && durationSec < 15) {
     // Rage-quit: abandoned a game within 15s — strong onboarding-friction signal.
     trackRageQuit({ mode, durationMs: durationSec * 1000, wordsFound: wordCount });

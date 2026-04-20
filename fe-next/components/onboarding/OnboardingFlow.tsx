@@ -11,6 +11,7 @@ import { setStoredCustomAvatar } from '@/utils/profileStorage';
 import {
   trackOnboardingStart,
   trackOnboardingStep,
+  markFirstGameActivation,
 } from '@/utils/growthTracking';
 import { type CustomAvatarConfig } from '@/shared/types/customAvatar';
 import LanguageSelect from './LanguageSelect';
@@ -101,6 +102,12 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
       setTutorialWords(wordsFound);
       markGuidanceShown('firstPlayTutorialCompleted');
       trackOnboardingStep('tutorial', { score, wordCount: wordsFound.length });
+      markFirstGameActivation({
+        won: true,
+        score,
+        wordCount: wordsFound.length,
+        mode: 'tutorial',
+      });
       setStep('profile');
     },
     []
