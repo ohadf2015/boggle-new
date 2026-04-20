@@ -5,13 +5,14 @@
  * funnel can split retry friction vs clean continues.
  */
 import React from 'react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 vi.mock('@/utils/growthTracking', () => ({
   trackOnboardingStart: vi.fn(),
   trackOnboardingStep: vi.fn(),
+  markFirstGameActivation: vi.fn(),
 }));
 
 vi.mock('framer-motion', () => {
