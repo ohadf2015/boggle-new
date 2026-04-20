@@ -269,6 +269,23 @@ export async function notifyGiftReceived(
 }
 
 /**
+ * Remind user to complete today's daily challenge (server-side cron)
+ * Only called for users who haven't played today (gate enforced by cron query)
+ */
+export async function notifyDailyChallengeReminder(
+  toUserId: string
+): Promise<void> {
+  return triggerPush(toUserId, 'daily_challenge', {
+    title: '🎯 Daily Challenge awaits',
+    body: 'Keep your streak alive — 60 seconds to play!',
+    data: {
+      type: 'daily_challenge',
+      deepLink: '/daily-challenge',
+    },
+  });
+}
+
+/**
  * Notify user of a level up (N-11)
  */
 export async function notifyLevelUp(

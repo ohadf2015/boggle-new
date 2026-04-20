@@ -8,6 +8,7 @@ import {
   notifyFriendRequest,
   notifyFriendAccepted,
   notifyGameInvite,
+  notifyDailyChallengeReminder,
 } from '../pushNotificationTriggers';
 
 // Mock fcmService
@@ -90,6 +91,38 @@ describe('pushNotificationTriggers', () => {
           deepLink: '/adventure?tab=friends',
         },
       });
+    });
+  });
+
+  describe('notifyDailyChallengeReminder', () => {
+    it('should send push with daily_challenge deep link', async () => {
+      await notifyDailyChallengeReminder('target-user-id');
+
+      expect(mockSendToUser).toHaveBeenCalledWith('target-user-id', {
+        title: '🎯 Daily Challenge awaits',
+        body: 'Keep your streak alive — 60 seconds to play!',
+        data: {
+          type: 'daily_challenge',
+          deepLink: '/daily-challenge',
+        },
+      });
+    });
+
+    it('should save notification to history as system type', async () => {
+      await notifyDailyChallengeReminder('target-user-id');
+
+      expect(mockInsert).toHaveBeenCalledWith(
+        expect.objectContaining({
+          user_id: 'target-user-id',
+          notification_type: 'system',
+          title: '🎯 Daily Challenge awaits',
+        })
+      );
+    });
+
+    it('should not throw on FCM failure', async () => {
+      mockSendToUser.mockRejectedValue(new Error('FCM down'));
+      await expect(notifyDailyChallengeReminder('user')).resolves.toBeUndefined();
     });
   });
 
