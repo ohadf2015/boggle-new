@@ -23,6 +23,9 @@ export function trackBlastRunStarted(params: {
   language: string;
 }): void {
   safeCapture('blast_run_started', { ...params });
+  // Canonical cross-mode funnel event so Blast runs appear in unified
+  // `game_started` dashboards without a blast-specific union.
+  safeCapture('game_started', { mode: 'blast', gameMode: 'blast', ...params });
 }
 
 export function trackBlastWaveCompleted(params: {
@@ -44,6 +47,17 @@ export function trackBlastRunEnded(params: {
   difficulty: Difficulty;
 }): void {
   safeCapture('blast_run_ended', { ...params });
+  safeCapture('game_completed', {
+    mode: 'blast',
+    gameMode: 'blast',
+    score: params.finalScore,
+    wordCount: params.wordCount,
+    difficulty: params.difficulty,
+    wavesCompleted: params.wavesCompleted,
+    maxCombo: params.maxCombo,
+    clearPct: params.clearPct,
+    bestWordLength: params.bestWordLength,
+  });
 }
 
 export function trackBlastBadgeUnlocked(params: {

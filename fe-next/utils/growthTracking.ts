@@ -131,6 +131,18 @@ let sessionId: string | null = null;
 const eventQueue: Array<{ event: GrowthEvent; data: GrowthEventData }> = [];
 const MAX_QUEUE_SIZE = 50;
 
+// Funnel-critical events also emitted under their canonical (unprefixed)
+// name so PostHog dashboards resolve without a `growth:` rewrite.
+const CANONICAL_DUAL_EMIT: ReadonlySet<GrowthEvent> = new Set<GrowthEvent>([
+  'game_started',
+  'game_completed',
+  'game_abandoned',
+  'first_game_played',
+  'first_game_won',
+  'first_word_found',
+  'session_start',
+]);
+
 /**
  * Generate or retrieve session ID
  */
@@ -196,6 +208,11 @@ export const trackGrowthEvent = (event: GrowthEvent, data: GrowthEventData = {})
   // Send to PostHog (no-ops when opted out or not initialized)
   try {
     posthog.capture(`growth:${event}`, enrichedData);
+    // Dual-emit canonical name for funnel/retention dashboards that query
+    // unprefixed events. Whitelisted to avoid doubling event volume.
+    if (CANONICAL_DUAL_EMIT.has(event)) {
+      posthog.capture(event, enrichedData);
+    }
   } catch {
     // Silently fail if PostHog not initialized
   }
