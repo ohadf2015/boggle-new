@@ -55,6 +55,10 @@ import { showQuestCompletionToast } from '@/components/quests/QuestCompletionToa
 
 beforeEach(() => {
   vi.clearAllMocks();
+  global.fetch = vi.fn().mockResolvedValue({
+    ok: true,
+    json: async () => ({ newlyCelebrated: true }),
+  }) as unknown as typeof fetch;
 });
 
 const EMPTY_DATA = {
@@ -147,7 +151,15 @@ describe('useDailyMissions', () => {
   });
 
   it('shows Grand Slam toast when all 3 missions complete', async () => {
-    mockSingle.mockResolvedValueOnce({ data: FULL_DATA, error: null });
+    mockSingle.mockResolvedValueOnce({
+      data: {
+        ...FULL_DATA,
+        word_hunt_celebrated: true,
+        adventure_celebrated: true,
+        community_celebrated: true,
+      },
+      error: null,
+    });
 
     renderHook(() => useDailyMissions());
 
@@ -174,7 +186,11 @@ describe('useDailyMissions', () => {
   it('does NOT fire per-quest toast on initial mount (pre-existing completions)', async () => {
     // One mission already completed at mount — this is the initial state, not a transition.
     mockSingle.mockResolvedValueOnce({
-      data: { ...EMPTY_DATA, word_hunt_completed: true },
+      data: {
+        ...EMPTY_DATA,
+        word_hunt_completed: true,
+        word_hunt_celebrated: true,
+      },
       error: null,
     });
 
@@ -184,7 +200,7 @@ describe('useDailyMissions', () => {
       expect(result.current.loading).toBe(false);
     });
 
-    // Should not celebrate a mission that was already complete when the hook mounted.
+    // Should not celebrate a mission that was already celebrated server-side.
     expect(showQuestCompletionToast).not.toHaveBeenCalled();
   });
 

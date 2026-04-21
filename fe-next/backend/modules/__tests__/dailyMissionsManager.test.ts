@@ -2,8 +2,8 @@
  * Tests for dailyMissionsManager
  */
 
-import { vi, type Mock, type MockInstance } from 'vitest';
-import { getDailyMissions, completeMission, checkAndClaimGrandSlam } from '../dailyMissionsManager';
+import { vi } from 'vitest';
+import { getDailyMissions, completeMission, checkAndClaimGrandSlam, markCelebrated } from '../dailyMissionsManager';
 
 // Mock supabaseServer
 const { mockSelect, mockEq, mockMaybeSingle, mockSingle, mockUpdate, mockUpsert, mockRpc, mockFrom, mockSupabase, chainable } = vi.hoisted(() => {
@@ -47,13 +47,16 @@ vi.mock('../../utils/logger', () => ({
 }));
 
 const PLAYER_ID = 'player-123';
-const TODAY = new Date().toISOString().split('T')[0];
 
 const EMPTY_ROW = {
   word_hunt_completed: false,
   adventure_completed: false,
   community_completed: false,
   grand_slam_claimed: false,
+  word_hunt_celebrated: false,
+  adventure_celebrated: false,
+  community_celebrated: false,
+  grand_slam_celebrated: false,
 };
 
 const FULL_ROW = {
@@ -61,6 +64,10 @@ const FULL_ROW = {
   adventure_completed: true,
   community_completed: true,
   grand_slam_claimed: false,
+  word_hunt_celebrated: false,
+  adventure_celebrated: false,
+  community_celebrated: false,
+  grand_slam_celebrated: false,
 };
 
 beforeEach(() => {
@@ -191,5 +198,84 @@ describe('checkAndClaimGrandSlam', () => {
 
     expect(result.claimed).toBe(false);
     expect(mockRpc).not.toHaveBeenCalled();
+  });
+});
+
+describe('getDailyMissions — celebrated flags', () => {
+  it('surfaces celebrated flags on the row (defaults to false when absent)', async () => {
+    mockMaybeSingle.mockResolvedValueOnce({
+      data: {
+        ...EMPTY_ROW,
+        word_hunt_completed: true,
+        word_hunt_celebrated: true,
+        adventure_celebrated: null,
+      },
+      error: null,
+    });
+
+    const result = await getDailyMissions(PLAYER_ID);
+
+    expect(result.wordHuntCelebrated).toBe(true);
+    expect(result.adventureCelebrated).toBe(false);
+    expect(result.communityCelebrated).toBe(false);
+    expect(result.grandSlamCelebrated).toBe(false);
+  });
+});
+
+describe('markCelebrated', () => {
+  function setupCelebrationChain(affectedRows: Array<Record<string, unknown>>) {
+    // Build an update().eq().eq().eq(col, false).select(col) chain that
+    // resolves to { data: affectedRows, error: null } at the final .select().
+    const finalThenable = { data: affectedRows, error: null };
+    const selectFn = vi.fn().mockResolvedValue(finalThenable);
+    const eqCol = vi.fn().mockReturnValue({ select: selectFn });
+    const eqDate = vi.fn().mockReturnValue({ eq: eqCol });
+    const eqPlayer = vi.fn().mockReturnValue({ eq: eqDate });
+    mockUpdate.mockReturnValueOnce({ eq: eqPlayer });
+    return { selectFn, eqCol, eqDate, eqPlayer };
+  }
+
+  it('returns newlyCelebrated=true when update affects a row (false→true transition)', async () => {
+    // getDailyMissions (ensure row exists)
+    mockMaybeSingle.mockResolvedValueOnce({ data: EMPTY_ROW, error: null });
+    const { eqCol } = setupCelebrationChain([{ word_hunt_celebrated: true }]);
+
+    const result = await markCelebrated(PLAYER_ID, 'word_hunt');
+
+    expect(result.newlyCelebrated).toBe(true);
+    // conditional flip: last .eq() filters on the column being false
+    expect(eqCol).toHaveBeenCalledWith('word_hunt_celebrated', false);
+  });
+
+  it('returns newlyCelebrated=false when update affects zero rows (already celebrated)', async () => {
+    mockMaybeSingle.mockResolvedValueOnce({
+      data: { ...EMPTY_ROW, word_hunt_celebrated: true },
+      error: null,
+    });
+    setupCelebrationChain([]);
+
+    const result = await markCelebrated(PLAYER_ID, 'word_hunt');
+
+    expect(result.newlyCelebrated).toBe(false);
+  });
+
+  it('returns newlyCelebrated=false on db error', async () => {
+    mockMaybeSingle.mockResolvedValueOnce({ data: EMPTY_ROW, error: null });
+    const selectFn = vi.fn().mockResolvedValue({ data: null, error: { message: 'boom' } });
+    const eqCol = vi.fn().mockReturnValue({ select: selectFn });
+    const eqDate = vi.fn().mockReturnValue({ eq: eqCol });
+    const eqPlayer = vi.fn().mockReturnValue({ eq: eqDate });
+    mockUpdate.mockReturnValueOnce({ eq: eqPlayer });
+
+    const result = await markCelebrated(PLAYER_ID, 'grand_slam');
+
+    expect(result.newlyCelebrated).toBe(false);
+  });
+
+  it('returns newlyCelebrated=false for invalid celebration key', async () => {
+    // @ts-expect-error — deliberately passing invalid key to test guard
+    const result = await markCelebrated(PLAYER_ID, 'not_a_key');
+    expect(result.newlyCelebrated).toBe(false);
+    expect(mockUpdate).not.toHaveBeenCalled();
   });
 });

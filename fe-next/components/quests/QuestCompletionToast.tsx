@@ -23,46 +23,22 @@ interface QuestCompletionOptions {
   goldReward?: number;
   isGrandSlam?: boolean;
   isAllComplete?: boolean;
+  /**
+   * Stable, translation-independent key for in-memory dedup within a short
+   * window (defends against double-invocation from the same tab). Cross-device
+   * / cross-session dedup is handled server-side via player_daily_missions
+   * celebrated flags — callers should only invoke this function when the
+   * server has signalled the flag transitioned false→true.
+   */
+  dedupKey?: string;
   t?: (key: string, params?: Record<string, string | number>) => string;
   onComplete?: () => void;
 }
 
-// Dedup guard: prevent multiple callers from showing the same toast within a short window
+// Short in-memory dedup window: swallows rapid duplicate invocations from the
+// same tab (e.g. React strict-mode double-effect, concurrent state updates).
 const recentToasts = new Set<string>();
 const DEDUP_WINDOW_MS = 2000;
-
-// Persistent dedup: prevent toasts from re-firing after page refresh or new tab.
-// Keys are stored in localStorage (keyed by date) so they survive across tabs/sessions
-// but auto-expire the next day for daily quests.
-const STORAGE_KEY = 'quest_toast_shown';
-
-function getShownSet(): Set<string> {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return new Set();
-    const parsed = JSON.parse(raw);
-    // Auto-clean stale entries from previous days
-    const today = new Date().toISOString().split('T')[0];
-    if (parsed.date !== today) {
-      localStorage.removeItem(STORAGE_KEY);
-      return new Set();
-    }
-    return new Set(parsed.keys);
-  } catch {
-    return new Set();
-  }
-}
-
-function markShown(dedupKey: string) {
-  try {
-    const today = new Date().toISOString().split('T')[0];
-    const set = getShownSet();
-    set.add(dedupKey);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({ date: today, keys: [...set] }));
-  } catch {
-    // localStorage unavailable (SSR, private mode) — fall through
-  }
-}
 
 /**
  * Show a satisfying quest completion celebration.
@@ -74,19 +50,21 @@ export function showQuestCompletionToast({
   goldReward,
   isGrandSlam = false,
   isAllComplete = false,
+  dedupKey,
   t = (k) => k,
   onComplete,
 }: QuestCompletionOptions) {
-  // Deduplicate: skip if same toast was shown recently (in-memory, 2s window)
-  const dedupKey = `${questName}:${isGrandSlam}:${isAllComplete}`;
-  if (recentToasts.has(dedupKey)) return;
+  // Prefer caller-supplied stable key (translation-independent) so language
+  // switches don't defeat dedup. Fall back to composite of variant flags.
+  const key = dedupKey ?? `${questName}:${isGrandSlam}:${isAllComplete}`;
+  if (recentToasts.has(key)) return;
+  recentToasts.add(key);
+  setTimeout(() => recentToasts.delete(key), DEDUP_WINDOW_MS);
 
-  // Persistent dedup: skip if already shown today (survives refresh + new tabs)
-  if (getShownSet().has(dedupKey)) return;
-
-  recentToasts.add(dedupKey);
-  setTimeout(() => recentToasts.delete(dedupKey), DEDUP_WINDOW_MS);
-  markShown(dedupKey);
+  // Dismiss any already-visible celebration toasts so only one shows at a
+  // time — prevents the stacked-toast bug when multiple missions complete
+  // near-simultaneously.
+  toast.dismiss();
 
   onComplete?.();
 
