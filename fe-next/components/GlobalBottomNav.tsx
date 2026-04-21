@@ -173,9 +173,8 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
                 "sm:hidden",
             )}
             style={{
-                bottom: 'var(--admob-banner-height, 0px)',
-                // Banner at screen bottom absorbs safe-area. Subtract banner height from nav's safe-area padding so no gap appears above banner. When banner hidden (height=0), full safe-area applies.
-                paddingBottom: `max(0px, ${safeArea.bottom > 0 ? `${safeArea.bottom}px` : 'env(safe-area-inset-bottom, 0px)'} - var(--admob-banner-height, 0px))`,
+                // Nav sits at screen bottom. Banner (when shown) floats above nav via AdMob margin, so nav keeps the full safe-area as its own padding.
+                paddingBottom: safeArea.bottom > 0 ? `${safeArea.bottom}px` : 'env(safe-area-inset-bottom, 0px)',
             }}
             aria-label={t('nav.bottomNavigation')}
         >

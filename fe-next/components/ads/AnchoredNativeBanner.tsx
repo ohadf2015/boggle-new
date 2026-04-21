@@ -5,6 +5,10 @@ import { usePathname } from 'next/navigation';
 import { Capacitor } from '@capacitor/core';
 import { AdMob, BannerAdPluginEvents, BannerAdPosition } from '@capacitor-community/admob';
 import { useAdMob } from '@/hooks/useAdMob';
+import { useSafeArea } from '@/hooks/useSafeArea';
+
+// GlobalBottomNav height (h-16 = 64px). Keep in sync if nav height changes.
+const NAV_HEIGHT_PX = 64;
 
 const GAME_ROUTES = [
   '/multiplayer',
@@ -33,6 +37,7 @@ function isAllowedRoute(pathname: string | null): boolean {
 export default function AnchoredNativeBanner() {
   const pathname = usePathname();
   const { showBanner, hideBanner } = useAdMob();
+  const safeArea = useSafeArea();
 
   useEffect(() => {
     if (!Capacitor.isNativePlatform()) return;
@@ -58,12 +63,14 @@ export default function AnchoredNativeBanner() {
     if (!Capacitor.isNativePlatform()) return;
 
     if (isAllowedRoute(pathname)) {
-      showBanner(BannerAdPosition.BOTTOM_CENTER);
+      // Stack banner above GlobalBottomNav: margin = nav height + safe-area bottom.
+      const margin = NAV_HEIGHT_PX + (safeArea.bottom || 0);
+      showBanner(BannerAdPosition.BOTTOM_CENTER, margin);
     } else {
       hideBanner();
       document.documentElement.style.setProperty('--admob-banner-height', '0px');
     }
-  }, [pathname, showBanner, hideBanner]);
+  }, [pathname, showBanner, hideBanner, safeArea.bottom]);
 
   return null;
 }

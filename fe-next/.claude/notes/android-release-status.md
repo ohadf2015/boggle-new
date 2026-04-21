@@ -52,6 +52,27 @@ set -a && source ~/.config/lexiclash-keystore-creds.env && set +a && \
 4. `fastlane android internal` → upload to Internal track
 5. Optional: `fastlane android promote_to_production`
 
+## Crashlytics Wiring (android/ is gitignored — reapply after fresh clone/sync)
+
+`android/build.gradle` classpath block needs:
+```gradle
+classpath 'com.google.firebase:firebase-crashlytics-gradle:3.0.2'
+```
+
+`android/app/build.gradle` dependencies:
+```gradle
+implementation platform('com.google.firebase:firebase-bom:33.5.1')
+implementation 'com.google.firebase:firebase-crashlytics'
+implementation 'com.google.firebase:firebase-analytics'
+```
+
+And inside the existing `try { servicesJSON ... }` block, alongside `google-services`:
+```gradle
+apply plugin: 'com.google.firebase.crashlytics'
+```
+
+`cap sync` regenerates android/ but preserves `build.gradle` if already edited — verify after sync.
+
 ## Key Files
 - `android/app/build.gradle` — signingConfigs.release reads env vars
 - `fastlane/Appfile` + `android/fastlane/Appfile` — `json_key_file(ENV["PLAY_SA_JSON"] || "~/.config/play-console-sa.json")`

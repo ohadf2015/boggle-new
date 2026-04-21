@@ -31,7 +31,7 @@ export function useAdMob() {
     } catch {}
   }, [recordGameEnd, shouldShowInterstitial, getConfig]);
 
-  const showBanner = useCallback(async (position = BannerAdPosition.BOTTOM_CENTER) => {
+  const showBanner = useCallback(async (position = BannerAdPosition.BOTTOM_CENTER, margin?: number) => {
     if (hasNoAds()) return;
     const config = getConfig();
     if (!config) return;
@@ -41,6 +41,7 @@ export function useAdMob() {
         adSize: BannerAdSize.ADAPTIVE_BANNER,
         position,
         isTesting: isDev,
+        ...(typeof margin === 'number' ? { margin } : {}),
       });
     } catch {}
   }, [hasNoAds, getConfig, isDev]);
