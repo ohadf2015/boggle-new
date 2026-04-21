@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { motion, animate as fmAnimate } from 'framer-motion';
-import { Star, ArrowRight, Flame, Crown, Zap } from 'lucide-react';
+import { Star, ArrowRight, ArrowLeft, Flame, Crown, Zap } from 'lucide-react';
 import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -150,6 +150,17 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
           ))}
         </div>
       )}
+
+      {/* Back to home */}
+      <div className="w-full flex justify-start z-10">
+        <Link
+          href={`/${language}`}
+          className="inline-flex items-center text-sm text-neo-cream/70 hover:text-neo-white transition-colors"
+        >
+          <ArrowLeft className="me-2 rtl:rotate-180 w-4 h-4" />
+          {t('daily.home')}
+        </Link>
+      </div>
 
       {/* Title */}
       <motion.div
