@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback, useRef } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -87,7 +87,7 @@ interface LandingViewProps {
 const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
   const { t, language } = useLanguage();
   const router = useRouter();
-  const { playTrack, unlockAudio, TRACKS } = useMusic();
+  const { playTrack, TRACKS } = useMusic();
   const { isAuthenticated, isAdmin, profile } = useAuth();
   const isMobilePortrait = useMobilePortrait();
 
@@ -139,8 +139,6 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
   }, [language, router]);
 
   const handlePlayClick = () => {
-    unlockAudio();
-    playTrack(TRACKS.BOSSA);
     trackModeSelected('arena', 'home_mobile_cta');
     router.push(`/${language}/multiplayer?autoCreate=true`);
   };
@@ -148,28 +146,13 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
   const [enableHeavyBackground, setEnableHeavyBackground] = useState(false);
   useEffect(() => { setEnableHeavyBackground(getPerfVariant() === 'control'); }, []);
 
-  // Start ambient music on the FIRST user gesture (tap / click / key).
-  // Browsers block audio autoplay without interaction (WCAG 1.4.2 + Chrome
-  // autoplay policy), so we arm a one-shot listener and remove it after use.
-  // A ref-based guard prevents duplicate playback when deps cause re-runs.
-  const musicStartedRef = useRef(false);
+  // Queue ambient music on mount. If audio is locked, MusicContext queues the
+  // track in pendingUnlockTrackRef and plays it when its own document-level
+  // auto-unlock listener fires on the first gesture. Single code path — no
+  // duplicate playback.
   useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const start = () => {
-      if (musicStartedRef.current) return;
-      musicStartedRef.current = true;
-      unlockAudio();
-      playTrack(TRACKS.BOSSA);
-      window.removeEventListener('pointerdown', start);
-      window.removeEventListener('keydown', start);
-    };
-    window.addEventListener('pointerdown', start);
-    window.addEventListener('keydown', start);
-    return () => {
-      window.removeEventListener('pointerdown', start);
-      window.removeEventListener('keydown', start);
-    };
-  }, [playTrack, unlockAudio, TRACKS]);
+    playTrack(TRACKS.BOSSA);
+  }, [playTrack, TRACKS]);
 
   const dailyChallengeStats = {
     hasPlayed: dailyChallengeStatus.hasPlayed,
