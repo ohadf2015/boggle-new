@@ -23,15 +23,29 @@ const LanguageSelect: React.FC<LanguageSelectProps> = ({ onSelect }) => {
 
   const handleSelect = useCallback((lang: Language) => {
     if (lang === selected) {
+      // Tap-again confirms selection. Apply language only if it differs from
+      // the context (no-op when the user sticks with the default) so we don't
+      // trigger a router.push during the FTUE.
+      if (lang !== language) {
+        setLanguage(lang);
+      }
       onSelect();
       return;
     }
+    // Defer setLanguage until the user confirms. Calling it here triggers
+    // router.push() to `/{locale}`, which remounts the OnboardingFlow and
+    // loops the user back to this step.
     setSelected(lang);
-    setLanguage(lang);
-    // Celebratory burst from the tapped card area — gives tactile feedback
-    // that language actually changed under the hood.
     fireOnboardingBurst({ y: 0.45 });
-  }, [selected, onSelect, setLanguage]);
+  }, [selected, onSelect, setLanguage, language]);
+
+  const handleConfirm = useCallback(() => {
+    fireOnboardingBurst({ y: 0.7 }, ['#BFFF00', '#FFE135', '#00FFFF']);
+    if (selected !== language) {
+      setLanguage(selected);
+    }
+    onSelect();
+  }, [selected, language, setLanguage, onSelect]);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] max-w-sm lg:max-w-2xl mx-auto gap-5 lg:gap-7">
@@ -126,10 +140,7 @@ const LanguageSelect: React.FC<LanguageSelectProps> = ({ onSelect }) => {
         transition={{ delay: 0.5, type: 'spring', stiffness: 300, damping: 22 }}
         whileHover={{ scale: 1.03, y: -2 }}
         whileTap={{ scale: 0.97, y: 2 }}
-        onClick={() => {
-          fireOnboardingBurst({ y: 0.7 }, ['#BFFF00', '#FFE135', '#00FFFF']);
-          onSelect();
-        }}
+        onClick={handleConfirm}
         className={cn(
           'mt-1 w-full lg:w-auto lg:px-12 py-3.5 lg:py-4 lg:self-center rounded-neo border-3 border-neo-black',
           'bg-neo-lime text-neo-navy font-neo-display font-black text-lg uppercase tracking-wide',

@@ -22,7 +22,14 @@ const config: CapacitorConfig = {
 
   plugins: {
     SplashScreen: {
-      launchShowDuration: 2000,
+      // NativeAppProvider calls SplashScreen.hide() as soon as React mounts
+      // the first frame, so the splash disappears the instant the UI is ready.
+      // The 5s auto-hide is a safety net: if the WebView fails to bootstrap,
+      // users still see *something* (the error.html fallback) instead of an
+      // infinite splash. Previously this was 2s, which hid the splash before
+      // the remote WebView had finished the /→/{locale} redirect on slow
+      // connections, leaving a black screen.
+      launchShowDuration: 5000,
       launchAutoHide: true,
       backgroundColor: '#1a1a2e', // neo-navy from design system
       showSpinner: false,
