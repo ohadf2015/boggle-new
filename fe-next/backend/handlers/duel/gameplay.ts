@@ -145,6 +145,28 @@ export function registerGameplayHandlers(
         serverScore += result.score;
       }
 
+      // Reject duplicate submissions from same player — prevents solo duel-win farm
+      // where a client fires duel:submit-score twice to hit turnsCount===2 alone.
+      // DB-level UNIQUE(duel_id, player_id) recommended as defense-in-depth.
+      const { data: existingTurn, error: existingTurnError } = await supabase
+        .from('duel_turns')
+        .select('id')
+        .eq('duel_id', payload.duelId)
+        .eq('player_id', userId)
+        .maybeSingle();
+
+      if (existingTurnError) {
+        socket.emit('duel:error', { message: 'Failed to check turn state' });
+        logger.error('DUEL', `Turn lookup failed: ${existingTurnError.message}`);
+        return;
+      }
+
+      if (existingTurn) {
+        socket.emit('duel:error', { message: 'Turn already submitted' });
+        logger.warn('DUEL', `Duplicate submit blocked: duel=${payload.duelId} player=${userId}`);
+        return;
+      }
+
       // Insert duel turn
       const { data: turn, error: turnError } = await supabase
         .from('duel_turns')

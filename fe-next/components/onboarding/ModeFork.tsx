@@ -2,10 +2,11 @@
 
 import React, { useCallback, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Trophy, Target, Users, Home, Sparkles } from 'lucide-react';
+import { Trophy, Target, Users, Sparkles } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { fireOnboardingBurst } from '@/utils/confettiUtils';
 import { cn } from '@/lib/utils';
+import { Mascot, type MascotVariant } from '@/components/ui/Mascot';
 
 interface ModeForkProps {
   onSelectMode: (mode: 'daily' | 'practice' | 'home' | 'joinRoom') => void;
@@ -25,6 +26,7 @@ interface ModeOptionProps {
   testId?: string;
   featured?: boolean;
   dark?: boolean;
+  mascot?: MascotVariant;
 }
 
 const ModeOption: React.FC<ModeOptionProps> = ({
@@ -40,6 +42,7 @@ const ModeOption: React.FC<ModeOptionProps> = ({
   testId,
   featured,
   dark,
+  mascot,
 }) => {
   const [hovered, setHovered] = useState(false);
 
@@ -49,8 +52,8 @@ const ModeOption: React.FC<ModeOptionProps> = ({
       initial={{ y: 30, opacity: 0, scale: 0.92 }}
       animate={{ y: 0, opacity: 1, scale: 1 }}
       transition={{ delay, type: 'spring', stiffness: 260, damping: 20 }}
-      whileHover={{ scale: 1.04, y: -4 }}
-      whileTap={{ scale: 0.96, y: 2 }}
+      whileHover={{ scale: 1.03, y: -4 }}
+      whileTap={{ scale: 0.97, y: 2 }}
       onClick={onClick}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
@@ -58,12 +61,11 @@ const ModeOption: React.FC<ModeOptionProps> = ({
         'w-full relative overflow-hidden rounded-neo-lg border-3',
         'shadow-hard-lg active:shadow-hard-pressed active:translate-y-[2px]',
         'transition-shadow duration-200',
-        'flex flex-col items-center text-center',
-        featured ? 'py-6 px-5 gap-3' : 'py-5 px-5 gap-2.5',
+        'flex items-center text-start gap-4 py-5 ps-5 pe-28 min-h-[104px]',
         dark
           ? 'border-neo-white/20 bg-neo-navy-light'
           : 'border-neo-black',
-        featured && 'ring-2 ring-neo-lime/50 ring-offset-2 ring-offset-neo-navy'
+        featured && 'ring-2 ring-neo-lime/60 ring-offset-2 ring-offset-neo-navy'
       )}
       style={{
         background: `linear-gradient(135deg, ${gradientFrom}, ${gradientTo})`,
@@ -90,17 +92,16 @@ const ModeOption: React.FC<ModeOptionProps> = ({
       {/* Decorative corner sparkle for featured */}
       {featured && (
         <motion.div
-          className="absolute top-2 inset-e-2"
+          className="absolute top-2 start-2 z-10"
           animate={{ rotate: [0, 15, -15, 0], scale: [1, 1.2, 1] }}
           transition={{ type: 'tween', duration: 2, repeat: Infinity, ease: 'easeInOut' }}
         >
-          <Sparkles className="w-4 h-4 text-neo-black/40" />
+          <Sparkles className="w-4 h-4 text-neo-black/50" />
         </motion.div>
       )}
 
       {/* Icon with glow halo */}
-      <div className="relative">
-        {/* Glow halo behind icon */}
+      <div className="relative shrink-0">
         <motion.div
           className="absolute inset-0 rounded-full blur-xl"
           style={{ background: glowColor }}
@@ -120,26 +121,43 @@ const ModeOption: React.FC<ModeOptionProps> = ({
         </motion.div>
       </div>
 
-      {/* Title */}
-      <span
-        className={cn(
-          'font-black text-lg uppercase tracking-tight drop-shadow-md relative z-10',
-          dark ? 'text-neo-white' : 'text-neo-black'
-        )}
-      >
-        {title}
-      </span>
-
-      {/* Description */}
-      {description && (
+      {/* Text block */}
+      <div className="flex flex-col gap-1 relative z-10 min-w-0 flex-1">
         <span
           className={cn(
-            'text-sm font-medium leading-snug relative z-10 max-w-[220px]',
-            dark ? 'text-neo-white/50' : 'text-neo-black/60'
+            'font-black text-xl lg:text-2xl uppercase tracking-tight drop-shadow-md',
+            dark ? 'text-neo-white' : 'text-neo-black'
           )}
         >
-          {description}
+          {title}
         </span>
+        {description && (
+          <span
+            className={cn(
+              'text-sm font-semibold leading-snug',
+              dark ? 'text-neo-white/60' : 'text-neo-black/70'
+            )}
+          >
+            {description}
+          </span>
+        )}
+      </div>
+
+      {/* Mascot peeking from trailing edge */}
+      {mascot && (
+        <motion.div
+          className="absolute inset-e-2 bottom-0 pointer-events-none z-10"
+          initial={{ y: 10, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: delay + 0.25, type: 'spring', stiffness: 200, damping: 18 }}
+        >
+          <motion.div
+            animate={hovered ? { y: -4, rotate: [-3, 3, -3] } : { y: 0 }}
+            transition={{ duration: 0.6, repeat: hovered ? Infinity : 0, ease: 'easeInOut' }}
+          >
+            <Mascot variant={mascot} size="md" clipShape="none" />
+          </motion.div>
+        </motion.div>
       )}
     </motion.button>
   );
@@ -173,6 +191,12 @@ const ModeFork: React.FC<ModeForkProps> = ({ onSelectMode, hasPendingInvite }) =
     [onSelectMode]
   );
 
+  // Skip bypasses confetti — it's a quiet "take me out of onboarding" exit,
+  // not a celebratory mode pick. Routes to home via existing parent handler.
+  const handleSkip = useCallback(() => {
+    onSelectMode('home');
+  }, [onSelectMode]);
+
   return (
     <div
       data-testid="mode-fork"
@@ -191,13 +215,13 @@ const ModeFork: React.FC<ModeForkProps> = ({ onSelectMode, hasPendingInvite }) =
         </h2>
       </motion.div>
 
-      {/* Cards container — vertical on mobile, 3-col grid on desktop.
-          When a pending invite adds a 4th card we collapse to 2-col so the
-          featured Join card can stay prominent. */}
+      {/* Primary mode cards — single bold column on mobile, 2-col on desktop.
+          Home/explore removed; users who don't want either primary path can
+          tap the secondary Skip link below. */}
       <div
         className={cn(
           'w-full grid grid-cols-1 gap-3',
-          hasPendingInvite ? 'lg:grid-cols-2 lg:gap-5' : 'lg:grid-cols-3 lg:gap-5'
+          hasPendingInvite ? 'lg:grid-cols-3 lg:gap-5' : 'lg:grid-cols-2 lg:gap-5'
         )}
       >
       {/* Join Friend's Game — shown only when user arrived via room invite link */}
@@ -214,6 +238,7 @@ const ModeFork: React.FC<ModeForkProps> = ({ onSelectMode, hasPendingInvite }) =
           delay={0.05}
           onClick={() => handleSelect('joinRoom')}
           featured
+          mascot="celebration"
         />
       )}
 
@@ -229,6 +254,7 @@ const ModeFork: React.FC<ModeForkProps> = ({ onSelectMode, hasPendingInvite }) =
         delay={baseDelay}
         onClick={() => handleSelect('daily')}
         featured={!hasPendingInvite}
+        mascot="trophy"
       />
 
       {/* Practice Mode card */}
@@ -242,32 +268,22 @@ const ModeFork: React.FC<ModeForkProps> = ({ onSelectMode, hasPendingInvite }) =
         description={t('onboarding.ftue.practiceModeDesc')}
         delay={baseDelay + 0.1}
         onClick={() => handleSelect('practice')}
-      />
-
-      {/* Explore All Modes card */}
-      <ModeOption
-        icon={<Home className="w-7 h-7 text-neo-white" />}
-        glowColor="rgba(139, 92, 246, 0.35)"
-        gradientFrom="#2d2150"
-        gradientTo="#1a1a2e"
-        iconBg="bg-neo-purple/20"
-        title={t('onboarding.ftue.homePage')}
-        description={t('onboarding.ftue.homePageDesc')}
-        delay={baseDelay + 0.2}
-        onClick={() => handleSelect('home')}
-        dark
+        mascot="gaming"
       />
       </div>
 
-      {/* Subtitle */}
-      <motion.p
+      {/* Secondary skip — minimal link style, no confetti, routes to home. */}
+      <motion.button
+        type="button"
+        data-testid="mode-fork-skip"
+        onClick={handleSkip}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: baseDelay + 0.45 }}
-        className="text-sm text-neo-white/60 font-bold text-center mt-1"
+        transition={{ delay: baseDelay + 0.35 }}
+        className="mt-2 text-sm text-neo-white/55 hover:text-neo-white font-semibold underline underline-offset-4 decoration-neo-white/30 hover:decoration-neo-white transition-colors"
       >
-        {t('onboarding.ftue.moreModesUnlock')}
-      </motion.p>
+        {t('onboarding.ftue.skip', 'Skip')}
+      </motion.button>
     </div>
   );
 };

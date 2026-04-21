@@ -84,6 +84,7 @@ describe('registerEngagementHandlers', () => {
       id: 'socket-abc',
       emit: vi.fn(),
       on: vi.fn(),
+      data: { verifiedUserId: 'player-1' },
     } as unknown as Mocked<Socket>;
 
     mockIo = {} as Mocked<Server>;
@@ -137,14 +138,15 @@ describe('registerEngagementHandlers', () => {
       );
     });
 
-    it('emits error when playerId is missing', async () => {
+    it('emits error when socket is not authenticated', async () => {
+      (mockSocket.data as { verifiedUserId?: string }).verifiedUserId = undefined;
       const handler = getHandler(mockSocket, 'engagement:getDailyChallenges');
       await handler({});
 
       expect(safeEmit).toHaveBeenCalledWith(
         mockSocket,
         'engagement:error',
-        expect.objectContaining({ message: 'Player ID required' })
+        expect.objectContaining({ message: 'Authentication required' })
       );
       expect(getTodaysChallenges).not.toHaveBeenCalled();
     });
@@ -187,15 +189,28 @@ describe('registerEngagementHandlers', () => {
       expect(safeEmit).toHaveBeenCalledWith(mockSocket, 'engagement:rewardClaimed', reward);
     });
 
-    it('emits error when playerId or challengeId missing', async () => {
+    it('emits error when challengeId missing', async () => {
       const handler = getHandler(mockSocket, 'engagement:claimChallengeReward');
-      await handler({ playerId: 'player-1' }); // no challengeId
+      await handler({}); // no challengeId
 
       expect(safeEmit).toHaveBeenCalledWith(
         mockSocket,
         'engagement:error',
-        expect.objectContaining({ message: 'Player ID and Challenge ID required' })
+        expect.objectContaining({ message: 'Challenge ID required' })
       );
+    });
+
+    it('emits error when socket is not authenticated', async () => {
+      (mockSocket.data as { verifiedUserId?: string }).verifiedUserId = undefined;
+      const handler = getHandler(mockSocket, 'engagement:claimChallengeReward');
+      await handler({ challengeId: 'ch-1' });
+
+      expect(safeEmit).toHaveBeenCalledWith(
+        mockSocket,
+        'engagement:error',
+        expect.objectContaining({ message: 'Authentication required' })
+      );
+      expect(claimChallengeReward).not.toHaveBeenCalled();
     });
 
     it('emits error when claim throws', async () => {
@@ -230,14 +245,15 @@ describe('registerEngagementHandlers', () => {
       expect(safeEmit).toHaveBeenCalledWith(mockSocket, 'engagement:calendarStatus', calendarData);
     });
 
-    it('emits error when playerId missing', async () => {
+    it('emits error when socket is not authenticated', async () => {
+      (mockSocket.data as { verifiedUserId?: string }).verifiedUserId = undefined;
       const handler = getHandler(mockSocket, 'engagement:getCalendarStatus');
       await handler({});
 
       expect(safeEmit).toHaveBeenCalledWith(
         mockSocket,
         'engagement:error',
-        expect.objectContaining({ message: 'Player ID required' })
+        expect.objectContaining({ message: 'Authentication required' })
       );
     });
 

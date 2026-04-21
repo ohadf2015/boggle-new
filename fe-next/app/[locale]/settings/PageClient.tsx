@@ -15,6 +15,7 @@ import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useAccessibility } from '@/contexts/AccessibilityContext';
 import { cn } from '@/lib/utils';
 import DeleteAccountSection from '@/components/settings/DeleteAccountSection';
+import { NotificationCategoryPreferences } from '@/components/notifications/NotificationCategoryPreferences';
 
 // Language options
 const LANGUAGES = [
@@ -377,6 +378,22 @@ export default function SettingsPageClient(): React.JSX.Element {
                 />
               </SettingRow>
             </div>
+          </motion.section>
+
+          {/* Notifications */}
+          <motion.section
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.35 }}
+          >
+            <h2 className={cn(
+              'text-sm font-black uppercase mb-3 flex items-center gap-2',
+              isDarkMode ? 'text-gray-400' : 'text-gray-600'
+            )}>
+              <Bell className="w-4 h-4" />
+              {t('settings.notifications')}
+            </h2>
+            <NotificationCategoryPreferences />
           </motion.section>
 
           {/* Support & Feedback */}

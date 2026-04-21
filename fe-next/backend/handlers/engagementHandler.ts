@@ -55,18 +55,11 @@ import { safeEmit } from '../utils/socketHelpers';
 import { checkRateLimit } from '../utils/rateLimiter';
 import logger from '../utils/logger';
 
-// Types for payloads
-interface PlayerIdPayload {
-  playerId: string;
-}
-
 interface ClaimChallengePayload {
-  playerId: string;
   challengeId: string;
 }
 
 interface CompleteMissionPayload {
-  playerId: string;
   missionType: MissionType;
 }
 
@@ -135,9 +128,18 @@ interface ChallengeStatsType {
 }
 
 /**
+ * Resolve authenticated user from socket auth middleware.
+ * Rejects client-supplied IDs — prevents victim-impersonation on progression endpoints.
+ */
+function getAuthedPlayerId(socket: Socket): string | null {
+  const verified = (socket.data as Record<string, unknown> | undefined)?.verifiedUserId;
+  return typeof verified === 'string' && verified.length > 0 ? verified : null;
+}
+
+/**
  * Transform a database challenge record to the client DailyChallenge format.
  */
- 
+
 function transformDbChallenge(c: any): DailyChallenge {
   return {
     id: (c.id as string) || '',
@@ -162,18 +164,15 @@ function registerEngagementHandlers(io: Server, socket: Socket): void {
 
   // ==================== Daily Challenges ====================
 
-  /**
-   * Get today's daily challenges for the player
-   */
-  socket.on('engagement:getDailyChallenges', async (data: PlayerIdPayload) => {
+  socket.on('engagement:getDailyChallenges', async () => {
     if (!checkRateLimit(socket.id)) {
       socket.emit('rateLimited');
       return;
     }
 
-    const { playerId } = data || {};
+    const playerId = getAuthedPlayerId(socket);
     if (!playerId) {
-      safeEmit(socket, 'engagement:error', { message: 'Player ID required' });
+      safeEmit(socket, 'engagement:error', { message: 'Authentication required' });
       return;
     }
 
@@ -189,18 +188,21 @@ function registerEngagementHandlers(io: Server, socket: Socket): void {
     }
   });
 
-  /**
-   * Claim reward for a completed challenge
-   */
   socket.on('engagement:claimChallengeReward', async (data: ClaimChallengePayload) => {
     if (!checkRateLimit(socket.id)) {
       socket.emit('rateLimited');
       return;
     }
 
-    const { playerId, challengeId } = data || {};
-    if (!playerId || !challengeId) {
-      safeEmit(socket, 'engagement:error', { message: 'Player ID and Challenge ID required' });
+    const playerId = getAuthedPlayerId(socket);
+    if (!playerId) {
+      safeEmit(socket, 'engagement:error', { message: 'Authentication required' });
+      return;
+    }
+
+    const { challengeId } = data || {};
+    if (!challengeId) {
+      safeEmit(socket, 'engagement:error', { message: 'Challenge ID required' });
       return;
     }
 
@@ -220,18 +222,15 @@ function registerEngagementHandlers(io: Server, socket: Socket): void {
 
   // ==================== Streak System ====================
 
-  /**
-   * Record player login and return streak status
-   */
-  socket.on('engagement:recordLogin', async (data: PlayerIdPayload) => {
+  socket.on('engagement:recordLogin', async () => {
     if (!checkRateLimit(socket.id)) {
       socket.emit('rateLimited');
       return;
     }
 
-    const { playerId } = data || {};
+    const playerId = getAuthedPlayerId(socket);
     if (!playerId) {
-      safeEmit(socket, 'engagement:error', { message: 'Player ID required' });
+      safeEmit(socket, 'engagement:error', { message: 'Authentication required' });
       return;
     }
 
@@ -239,7 +238,6 @@ function registerEngagementHandlers(io: Server, socket: Socket): void {
       const loginResult: LoginResultType = await recordLogin(playerId);
       safeEmit(socket, 'engagement:loginResult', loginResult);
 
-      // Check for comeback bonus
       const comebackStatus: ComebackStatusType = await checkComebackBonus(playerId);
       if (comebackStatus.eligible) {
         safeEmit(socket, 'engagement:comebackAvailable', comebackStatus);
@@ -255,18 +253,15 @@ function registerEngagementHandlers(io: Server, socket: Socket): void {
 
   // ==================== Calendar Rewards ====================
 
-  /**
-   * Get calendar status for the player
-   */
-  socket.on('engagement:getCalendarStatus', async (data: PlayerIdPayload) => {
+  socket.on('engagement:getCalendarStatus', async () => {
     if (!checkRateLimit(socket.id)) {
       socket.emit('rateLimited');
       return;
     }
 
-    const { playerId } = data || {};
+    const playerId = getAuthedPlayerId(socket);
     if (!playerId) {
-      safeEmit(socket, 'engagement:error', { message: 'Player ID required' });
+      safeEmit(socket, 'engagement:error', { message: 'Authentication required' });
       return;
     }
 
@@ -280,18 +275,15 @@ function registerEngagementHandlers(io: Server, socket: Socket): void {
     }
   });
 
-  /**
-   * Claim today's calendar reward
-   */
-  socket.on('engagement:claimCalendarReward', async (data: PlayerIdPayload) => {
+  socket.on('engagement:claimCalendarReward', async () => {
     if (!checkRateLimit(socket.id)) {
       socket.emit('rateLimited');
       return;
     }
 
-    const { playerId } = data || {};
+    const playerId = getAuthedPlayerId(socket);
     if (!playerId) {
-      safeEmit(socket, 'engagement:error', { message: 'Player ID required' });
+      safeEmit(socket, 'engagement:error', { message: 'Authentication required' });
       return;
     }
 
@@ -311,18 +303,15 @@ function registerEngagementHandlers(io: Server, socket: Socket): void {
 
   // ==================== Come-back Campaigns ====================
 
-  /**
-   * Get comeback bonus status
-   */
-  socket.on('engagement:getComebackStatus', async (data: PlayerIdPayload) => {
+  socket.on('engagement:getComebackStatus', async () => {
     if (!checkRateLimit(socket.id)) {
       socket.emit('rateLimited');
       return;
     }
 
-    const { playerId } = data || {};
+    const playerId = getAuthedPlayerId(socket);
     if (!playerId) {
-      safeEmit(socket, 'engagement:error', { message: 'Player ID required' });
+      safeEmit(socket, 'engagement:error', { message: 'Authentication required' });
       return;
     }
 
@@ -336,18 +325,15 @@ function registerEngagementHandlers(io: Server, socket: Socket): void {
     }
   });
 
-  /**
-   * Claim comeback bonus
-   */
-  socket.on('engagement:claimComebackBonus', async (data: PlayerIdPayload) => {
+  socket.on('engagement:claimComebackBonus', async () => {
     if (!checkRateLimit(socket.id)) {
       socket.emit('rateLimited');
       return;
     }
 
-    const { playerId } = data || {};
+    const playerId = getAuthedPlayerId(socket);
     if (!playerId) {
-      safeEmit(socket, 'engagement:error', { message: 'Player ID required' });
+      safeEmit(socket, 'engagement:error', { message: 'Authentication required' });
       return;
     }
 
@@ -367,18 +353,15 @@ function registerEngagementHandlers(io: Server, socket: Socket): void {
 
   // ==================== Daily Missions ====================
 
-  /**
-   * Get daily missions status for a player
-   */
-  socket.on('engagement:getDailyMissions', async (data: PlayerIdPayload) => {
+  socket.on('engagement:getDailyMissions', async () => {
     if (!checkRateLimit(socket.id)) {
       socket.emit('rateLimited');
       return;
     }
 
-    const { playerId } = data || {};
+    const playerId = getAuthedPlayerId(socket);
     if (!playerId) {
-      safeEmit(socket, 'engagement:error', { message: 'Player ID required' });
+      safeEmit(socket, 'engagement:error', { message: 'Authentication required' });
       return;
     }
 
@@ -393,18 +376,21 @@ function registerEngagementHandlers(io: Server, socket: Socket): void {
     }
   });
 
-  /**
-   * Complete a daily mission
-   */
   socket.on('engagement:completeMission', async (data: CompleteMissionPayload) => {
     if (!checkRateLimit(socket.id)) {
       socket.emit('rateLimited');
       return;
     }
 
-    const { playerId, missionType } = data || {};
-    if (!playerId || !missionType) {
-      safeEmit(socket, 'engagement:error', { message: 'Player ID and mission type required' });
+    const playerId = getAuthedPlayerId(socket);
+    if (!playerId) {
+      safeEmit(socket, 'engagement:error', { message: 'Authentication required' });
+      return;
+    }
+
+    const { missionType } = data || {};
+    if (!missionType) {
+      safeEmit(socket, 'engagement:error', { message: 'Mission type required' });
       return;
     }
 
@@ -412,13 +398,11 @@ function registerEngagementHandlers(io: Server, socket: Socket): void {
       const missions = await completeMission(playerId, missionType);
       safeEmit(socket, 'engagement:dailyMissions', { missions });
 
-      // Auto-check grand slam
       if (missions.completedCount >= 3 && !missions.grandSlamClaimed) {
         const grandSlam = await checkAndClaimGrandSlam(playerId);
         if (grandSlam.claimed) {
           safeEmit(socket, 'engagement:grandSlamClaimed', grandSlam);
 
-          // Track daily missions streak for weekly quest
           try {
             const { updateQuestProgress } = await import('../modules/weeklyQuestManager');
             await updateQuestProgress(playerId, { dailyMissionDaysCompleted: 1 });
@@ -438,18 +422,15 @@ function registerEngagementHandlers(io: Server, socket: Socket): void {
 
   // ==================== Full Engagement Status ====================
 
-  /**
-   * Get complete engagement status for player
-   */
-  socket.on('engagement:getStatus', async (data: PlayerIdPayload) => {
+  socket.on('engagement:getStatus', async () => {
     if (!checkRateLimit(socket.id)) {
       socket.emit('rateLimited');
       return;
     }
 
-    const { playerId } = data || {};
+    const playerId = getAuthedPlayerId(socket);
     if (!playerId) {
-      safeEmit(socket, 'engagement:error', { message: 'Player ID required' });
+      safeEmit(socket, 'engagement:error', { message: 'Authentication required' });
       return;
     }
 
@@ -474,9 +455,6 @@ function registerEngagementHandlers(io: Server, socket: Socket): void {
 
   // ==================== Word of the Day ====================
 
-  /**
-   * Get today's Word of the Day
-   */
   socket.on('engagement:getWotd', async (data: { language: string; date?: string }) => {
     if (!checkRateLimit(socket.id)) {
       socket.emit('rateLimited');
@@ -500,11 +478,7 @@ function registerEngagementHandlers(io: Server, socket: Socket): void {
     }
   });
 
-  /**
-   * Record player's WOTD attempt
-   */
   socket.on('engagement:recordWotd', async (data: {
-    playerId: string;
     word: string;
     found: boolean;
     language: string;
@@ -515,9 +489,15 @@ function registerEngagementHandlers(io: Server, socket: Socket): void {
       return;
     }
 
-    const { playerId, word, language, found, date } = data || {};
-    if (!playerId || !word || !language) {
-      safeEmit(socket, 'engagement:error', { message: 'Player ID, word, and language required' });
+    const playerId = getAuthedPlayerId(socket);
+    if (!playerId) {
+      safeEmit(socket, 'engagement:error', { message: 'Authentication required' });
+      return;
+    }
+
+    const { word, language, found, date } = data || {};
+    if (!word || !language) {
+      safeEmit(socket, 'engagement:error', { message: 'Word and language required' });
       return;
     }
 
@@ -525,7 +505,6 @@ function registerEngagementHandlers(io: Server, socket: Socket): void {
       const result = await recordWotdAttempt(playerId, word, found, language, date);
       safeEmit(socket, 'engagement:wotdRecorded', result);
 
-      // Also send updated stats
       const stats = await getWotdStats(language, date);
       safeEmit(socket, 'engagement:wotdStats', stats);
 

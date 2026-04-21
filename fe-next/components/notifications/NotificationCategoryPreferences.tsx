@@ -2,13 +2,13 @@
 
 /**
  * NotificationCategoryPreferences
- * Settings panel with per-category notification toggles.
- * Can be embedded in profile/settings pages.
+ * Settings panel with master push toggle + per-category notification toggles.
+ * Hydrates from server on mount; localStorage stays source of truth for SSR/offline.
  */
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Bell, Calendar, Flame, Users, BarChart3 } from 'lucide-react';
+import { Bell, BellOff, Calendar, Flame, Users, BarChart3 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import {
   loadCategoryPreferences,
@@ -22,11 +22,12 @@ interface CategoryToggleProps {
   checked: boolean;
   onChange: (checked: boolean) => void;
   icon: React.ReactNode;
+  disabled?: boolean;
 }
 
-function CategoryToggle({ label, checked, onChange, icon }: CategoryToggleProps) {
+function CategoryToggle({ label, checked, onChange, icon, disabled }: CategoryToggleProps) {
   return (
-    <div className="flex items-center justify-between py-3">
+    <div className={cn('flex items-center justify-between py-3', disabled && 'opacity-50')}>
       <div className="flex items-center gap-3">
         <span className="text-neo-cyan">{icon}</span>
         <span className="text-sm font-medium text-neo-white">{label}</span>
@@ -35,10 +36,12 @@ function CategoryToggle({ label, checked, onChange, icon }: CategoryToggleProps)
         role="switch"
         aria-checked={checked}
         aria-label={label}
+        disabled={disabled}
         onClick={() => onChange(!checked)}
         className={cn(
           'relative w-11 h-6 rounded-full transition-colors duration-200 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan',
-          checked ? 'bg-neo-lime' : 'bg-slate-600'
+          checked ? 'bg-neo-lime' : 'bg-slate-600',
+          disabled && 'cursor-not-allowed'
         )}
       >
         <span
@@ -56,14 +59,39 @@ export function NotificationCategoryPreferences() {
   const { t } = useLanguage();
   const [prefs, setPrefs] = useState<CategoryPrefs>(loadCategoryPreferences);
 
+  useEffect(() => {
+    let cancelled = false;
+    fetch('/api/notifications/preferences')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (cancelled || !data || typeof data !== 'object') return;
+        if (typeof data.pushEnabled !== 'boolean') return;
+        const hydrated: CategoryPrefs = {
+          pushEnabled: data.pushEnabled,
+          dailyChallenge: data.dailyChallenge,
+          streakWarning: data.streakWarning,
+          friendInvites: data.friendInvites,
+          weeklySummary: data.weeklySummary,
+        };
+        setPrefs(hydrated);
+        saveCategoryPreferences(hydrated);
+      })
+      .catch(() => {
+        // Offline / unauthenticated — localStorage already loaded
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   function handleToggle(key: keyof CategoryPrefs, value: boolean) {
     const updated = { ...prefs, [key]: value };
     setPrefs(updated);
     saveCategoryPreferences(updated);
-
-    // Fire-and-forget sync to backend if user is authenticated
     syncToBackend(updated);
   }
+
+  const masterOff = !prefs.pushEnabled;
 
   return (
     <motion.div
@@ -76,39 +104,55 @@ export function NotificationCategoryPreferences() {
         {t('notifications.preferences.title')}
       </h3>
 
-      <div className="divide-y divide-slate-700/50">
+      <div className="pb-3 border-b-2 border-slate-700">
+        <CategoryToggle
+          label={t('notifications.preferences.pushEnabled')}
+          checked={prefs.pushEnabled}
+          onChange={(v) => handleToggle('pushEnabled', v)}
+          icon={masterOff ? <BellOff className="w-4 h-4" /> : <Bell className="w-4 h-4" />}
+        />
+      </div>
+
+      <div
+        className={cn(
+          'divide-y divide-slate-700/50 transition-opacity',
+          masterOff && 'opacity-50 pointer-events-none'
+        )}
+        aria-disabled={masterOff}
+      >
         <CategoryToggle
           label={t('notifications.preferences.dailyChallenge')}
           checked={prefs.dailyChallenge}
           onChange={(v) => handleToggle('dailyChallenge', v)}
           icon={<Calendar className="w-4 h-4" />}
+          disabled={masterOff}
         />
         <CategoryToggle
           label={t('notifications.preferences.streakWarning')}
           checked={prefs.streakWarning}
           onChange={(v) => handleToggle('streakWarning', v)}
           icon={<Flame className="w-4 h-4" />}
+          disabled={masterOff}
         />
         <CategoryToggle
           label={t('notifications.preferences.friendInvites')}
           checked={prefs.friendInvites}
           onChange={(v) => handleToggle('friendInvites', v)}
           icon={<Users className="w-4 h-4" />}
+          disabled={masterOff}
         />
         <CategoryToggle
           label={t('notifications.preferences.weeklySummary')}
           checked={prefs.weeklySummary}
           onChange={(v) => handleToggle('weeklySummary', v)}
           icon={<BarChart3 className="w-4 h-4" />}
+          disabled={masterOff}
         />
       </div>
     </motion.div>
   );
 }
 
-/**
- * Sync preferences to backend (fire-and-forget)
- */
 async function syncToBackend(prefs: CategoryPrefs): Promise<void> {
   try {
     await fetch('/api/notifications/preferences', {

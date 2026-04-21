@@ -786,6 +786,7 @@ const es = {
     "theme": "Tema",
     "dark": "Oscuro",
     "light": "Claro",
+    "notifications": "Notificaciones",
     "support": "Soporte y Feedback",
     "contactDescription": "Preguntas, sugerencias, o solo saludar!",
     "dangerZone": "Zona de peligro",
@@ -5085,7 +5086,12 @@ const es = {
       "rank": "Tu posición",
       "share": "Compartir resultados",
       "playWordHunt": "¡Juega también a Word Hunt!",
-      "playWordWheel": "¡Juega Rueda de palabras también!"
+      "playWordWheel": "¡Juega Rueda de palabras también!",
+      "stepBadge": "PASO 2 DE 2",
+      "completeDailyTitle": "Termina el reto de hoy",
+      "completeDailyDesc": "Juega Rueda de palabras para completar tu Reto Diario",
+      "dailyComplete": "¡Reto Diario completado!",
+      "dailyCompleteDesc": "Ambos juegos hechos. ¡Vuelve mañana!"
     },
     "hub": {
       "wordWheelQuest": "Rueda de palabras",
@@ -5447,6 +5453,8 @@ const es = {
     "noUsersFound": "No encontramos usuarios",
     "pending": "Pendiente",
     "pendingRequests": "Solicitudes Pendientes",
+    "requestReceivedToast": "{{name}} te envió una solicitud de amistad",
+    "challengeDeclinedToast": "{{name}} rechazó tu desafío",
     "socialBadge": "{count} notificaciones de amigos",
     "remove": "Eliminar",
     "requests": "Solicitudes",
@@ -8155,6 +8163,10 @@ const es = {
       "wave": "Oleada {n}",
       "badgesEarned": "Insignias Ganadas",
       "newBadge": "NUEVO",
+      "waveFailed": "Oleada Fallida",
+      "needClearPct": "Necesitabas {required}% despejado — lograste {got}%",
+      "failHint": "Despeja al menos el 90% del tablero para avanzar",
+      "tryAgain": "Intentar de Nuevo",
       "share": "Compartir",
       "brag": {
         "legend": "Leyenda",
@@ -9437,6 +9449,7 @@ const es = {
     },
     "preferences": {
       "title": "Configuración de notificaciones",
+      "pushEnabled": "Notificaciones push",
       "dailyChallenge": "Recordatorio de desafío diario",
       "streakWarning": "Advertencia de racha en riesgo",
       "friendInvites": "Invitaciones de desafío de amigos",

@@ -58,9 +58,8 @@ vi.mock('@/contexts/LanguageContext', () => ({
       const translations: Record<string, string> = {
         'onboarding.ftue.dailyChallenge': 'Daily Challenge',
         'onboarding.ftue.practiceMode': 'Practice Mode',
-        'onboarding.ftue.homePage': 'Home Page',
+        'onboarding.ftue.skip': 'Skip',
         'onboarding.ftue.joinFriendsGame': "Join Friend's Game",
-        'onboarding.ftue.moreModesUnlock': 'More modes unlock as you play!',
       };
       return translations[key] || key;
     },
@@ -85,18 +84,11 @@ describe('ModeFork', () => {
     expect(screen.getByTestId('mode-fork')).toBeInTheDocument();
   });
 
-  it('shows all 3 mode options', () => {
+  it('shows primary mode options plus skip', () => {
     render(<ModeFork {...defaultProps} />);
     expect(screen.getByText('Daily Challenge')).toBeInTheDocument();
     expect(screen.getByText('Practice Mode')).toBeInTheDocument();
-    expect(screen.getByText('Home Page')).toBeInTheDocument();
-  });
-
-  it('shows unlock subtitle', () => {
-    render(<ModeFork {...defaultProps} />);
-    expect(
-      screen.getByText('More modes unlock as you play!')
-    ).toBeInTheDocument();
+    expect(screen.getByTestId('mode-fork-skip')).toBeInTheDocument();
   });
 
   it('calls onSelectMode with "daily" when Daily Challenge clicked', () => {
@@ -121,14 +113,9 @@ describe('ModeFork', () => {
     expect(screen.getByTestId('target-icon')).toBeInTheDocument();
   });
 
-  it('renders home icon for home page', () => {
+  it('calls onSelectMode with "home" when Skip clicked', () => {
     render(<ModeFork {...defaultProps} />);
-    expect(screen.getByTestId('home-icon')).toBeInTheDocument();
-  });
-
-  it('calls onSelectMode with "home" when Home Page clicked', () => {
-    render(<ModeFork {...defaultProps} />);
-    fireEvent.click(screen.getByText('Home Page'));
+    fireEvent.click(screen.getByTestId('mode-fork-skip'));
     expect(defaultProps.onSelectMode).toHaveBeenCalledWith('home');
   });
 
@@ -159,7 +146,7 @@ describe('ModeFork', () => {
       render(<ModeFork {...defaultProps} hasPendingInvite />);
       expect(screen.getByText('Daily Challenge')).toBeInTheDocument();
       expect(screen.getByText('Practice Mode')).toBeInTheDocument();
-      expect(screen.getByText('Home Page')).toBeInTheDocument();
+      expect(screen.getByTestId('mode-fork-skip')).toBeInTheDocument();
       expect(screen.getByText("Join Friend's Game")).toBeInTheDocument();
     });
   });

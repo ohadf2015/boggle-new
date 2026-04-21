@@ -89,7 +89,7 @@ export function useFriendMessages(
     setError(null);
 
     try {
-      const { messages: fetchedMessages, hasMore } = await friendMessages.getConversation(
+      const { messages: fetchedMessages } = await friendMessages.getConversation(
         targetFriendId,
         50,
         before,
@@ -139,8 +139,8 @@ export function useFriendMessages(
       isDeleted: false,
     };
 
-    // Optimistic update
-    setMessages((prev) => [tempMessage, ...prev]);
+    // Optimistic update — append to end (newest-last, chronological)
+    setMessages((prev) => [...prev, tempMessage]);
 
     try {
       // Send via Socket.IO if connected, otherwise fallback to HTTP
@@ -338,7 +338,7 @@ export function useFriendMessages(
     const handleMessageReceived = (message: Message) => {
       // Only add if viewing this conversation or update thread
       if (friendId && (message.fromUserId === friendId || message.toUserId === friendId)) {
-        setMessages((prev) => [message, ...prev]);
+        setMessages((prev) => [...prev, message]);
       }
       onMessageRef.current?.(message);
       refreshThreads();
@@ -433,6 +433,26 @@ export function useFriendMessages(
       }
     };
   }, [isConnected, refreshThreads]);
+
+  /**
+   * Refresh immediately when a push notification arrives for a friend message
+   * while the socket may not be connected yet (e.g. app foregrounded from
+   * background). Without this, recipients wait up to 30s for the next poll.
+   */
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const handler = (evt: Event) => {
+      const detail = (evt as CustomEvent<Record<string, string>>).detail;
+      if (detail?.type === 'direct_message') {
+        refreshThreads();
+        if (friendId) loadMessages(friendId);
+      }
+    };
+    window.addEventListener('lexiclash:push-received', handler as EventListener);
+    return () => {
+      window.removeEventListener('lexiclash:push-received', handler as EventListener);
+    };
+  }, [friendId, refreshThreads, loadMessages]);
 
   /**
    * Polling fallback for active conversation messages (when Socket.IO disconnected)

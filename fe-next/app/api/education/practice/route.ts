@@ -388,6 +388,17 @@ export async function PATCH(request: NextRequest) {
             `Awarded ${serverCalculatedXp} XP (server-calculated, streak=${streakDays}d) to student ${session.student_id} for lesson ${session.lesson_id}`
           );
         }
+
+        // BUG-02 fix: also bump global profile XP (single server-owned write path).
+        // Previously the client called /api/education/record-xp separately, double-counting profile XP.
+        const { error: profileXpError } = await supabase.rpc('increment_player_xp', {
+          p_player_id: session.student_id,
+          p_xp_amount: serverCalculatedXp,
+        });
+
+        if (profileXpError) {
+          logger.error('Failed to increment profile XP:', profileXpError);
+        }
       }
 
       // B12 fix: Update daily challenge progress after practice completion

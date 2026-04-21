@@ -123,6 +123,7 @@ export const MessageThread: React.FC<MessageThreadProps> = ({
           exit={{ opacity: 0, x: isRTL ? -20 : 20 }}
           className={cn(
             'fixed inset-0 z-50 flex flex-col',
+            'pt-[env(safe-area-inset-top)]',
             isDark ? 'bg-slate-900' : 'bg-white',
             className
           )}

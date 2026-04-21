@@ -20,7 +20,6 @@ import TomorrowPreview from '@/components/results/TomorrowPreview';
 
 const UGCFeaturedStrip = dynamic(() => import('@/components/ugc/UGCFeaturedStrip'), { ssr: false });
 const CrazyGamesBanner = dynamic(() => import('@/components/CrazyGamesBanner'), { ssr: false });
-const NativeBannerAd = dynamic(() => import('@/components/ads/NativeBannerAd'), { ssr: false });
 
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -47,14 +46,10 @@ import {
   useWordValidation,
   useBannerConfig,
   GlobalRankBadge,
-  LandscapeBanner,
-  LandscapeWordsSection,
-  ScoreDisplay,
   PerformanceSection,
   YourWordsSection,
   AchievementsSection,
   BotWordsSection,
-  RankingsSection,
   ChallengeButton,
 } from './results';
 
@@ -380,9 +375,8 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
               </div>
             </div>
             <div className="mt-8">{analysisBlock}</div>
-            {/* Banner ads — CrazyGames (web iframe) / AdMob (native) */}
+            {/* Inline banner ad (web iframe; native shows no inline banner) */}
             <CrazyGamesBanner size="728x90" className="mt-6" />
-            <NativeBannerAd />
           </>
         ) : (
           <div className="space-y-4">
@@ -400,9 +394,8 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
                 {signupBlock}
               </motion.div>
             )}
-            {/* Banner ads — CrazyGames (web iframe) / AdMob (native) */}
+            {/* Inline banner ad (web iframe; native shows no inline banner) */}
             <CrazyGamesBanner size="320x50" />
-            <NativeBannerAd />
             {ctaBlock}{analysisBlock}
           </div>
         )}

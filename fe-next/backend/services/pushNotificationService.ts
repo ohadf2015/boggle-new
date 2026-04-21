@@ -7,18 +7,73 @@
 import logger from '../utils/logger';
 
 import { getSupabase, isSupabaseConfigured } from '../modules/supabaseServer';
+import { translatePush, isPushLocale, type PushLocale } from '../utils/pushTranslations';
+
+// ==================== Mascot Imagery ====================
+
+/**
+ * Maps a semantic mood to a public mascot asset URL served from /public/mascot/.
+ * FCM `notification.image` pulls this over HTTPS, so we need a fully-qualified URL.
+ * Android shows it as a big picture; iOS as an attachment (mutable-content=1 required).
+ */
+export type MascotMood =
+  | 'celebration'   // gift, reward, level up
+  | 'waving'        // friend request / accepted
+  | 'onfire'        // streak, combos
+  | 'trophy'        // game win, leaderboard
+  | 'crying'        // loss, streak broken
+  | 'play'          // challenge invite
+  | 'encouraging'   // nudge / daily reminder
+  | 'mindblown'     // achievement unlock
+  | 'spectating';   // friend message
+
+function publicBaseUrl(): string {
+  return process.env.NEXT_PUBLIC_APP_URL || 'https://lexiclash.live';
+}
+
+export function mascotImageUrl(mood: MascotMood): string {
+  return `${publicBaseUrl()}/mascot/${mood}.gif`;
+}
 
 // ==================== Types ====================
 
 export interface NotificationPayload {
+  /** Raw title used when no titleKey is provided (legacy callers). */
   title: string;
+  /** Raw body used when no bodyKey is provided (legacy callers). */
   body: string;
+  /** Optional translation key. If set, overrides `title` per-recipient via translatePush. */
+  titleKey?: string;
+  /** Optional translation key. If set, overrides `body` per-recipient via translatePush. */
+  bodyKey?: string;
+  /** Params for {var} interpolation in titleKey/bodyKey templates. */
+  params?: Record<string, string | number>;
   notificationType: 'gift' | 'system' | 'achievement' | 'social' | 'marketing';
   imageUrl?: string;
   actionUrl?: string;
   relatedEntityType?: string;
   relatedEntityId?: string;
   senderId?: string;
+}
+
+/**
+ * Render a payload's title/body for a single recipient's locale.
+ * - If titleKey/bodyKey present → translate via translatePush (with params).
+ * - Else → return raw title/body.
+ * Exported for testing and for callers that need per-user strings.
+ */
+export function renderNotification(
+  payload: NotificationPayload,
+  locale: PushLocale | string | null | undefined
+): { title: string; body: string } {
+  const loc: PushLocale = isPushLocale(locale) ? locale : 'en';
+  const title = payload.titleKey
+    ? translatePush(loc, payload.titleKey, payload.params)
+    : payload.title;
+  const body = payload.bodyKey
+    ? translatePush(loc, payload.bodyKey, payload.params)
+    : payload.body;
+  return { title, body };
 }
 
 export interface GiftNotificationData {
@@ -281,18 +336,37 @@ export async function sendToUsers(
     return { ...result, success: false };
   }
 
-  // Create notification records for all users
-  const notificationRecords = userIds.map(userId => ({
-    user_id: userId,
-    title: notification.title,
-    body: notification.body,
-    notification_type: notification.notificationType,
-    image_url: notification.imageUrl || null,
-    action_url: notification.actionUrl || null,
-    related_entity_type: notification.relatedEntityType || null,
-    related_entity_id: notification.relatedEntityId || null,
-    sender_id: notification.senderId || null,
-  }));
+  // Fetch each recipient's preferred language so the persisted row matches
+  // what we'll send via FCM. Missing/unknown locales fall back to 'en' inside renderNotification.
+  const userLocales = new Map<string, PushLocale>();
+  const { data: profileRows, error: profileError } = await supabase
+    .from('profiles')
+    .select('id, language')
+    .in('id', userIds);
+
+  if (profileError) {
+    logger.warn('PUSH_SERVICE', `Failed to fetch profile languages (falling back to en): ${profileError.message}`);
+  } else if (profileRows) {
+    for (const row of profileRows as Array<{ id: string; language: string | null }>) {
+      userLocales.set(row.id, isPushLocale(row.language) ? row.language : 'en');
+    }
+  }
+
+  // Create notification records for all users, each rendered in their own language
+  const notificationRecords = userIds.map(userId => {
+    const { title, body } = renderNotification(notification, userLocales.get(userId) ?? 'en');
+    return {
+      user_id: userId,
+      title,
+      body,
+      notification_type: notification.notificationType,
+      image_url: notification.imageUrl || null,
+      action_url: notification.actionUrl || null,
+      related_entity_type: notification.relatedEntityType || null,
+      related_entity_id: notification.relatedEntityId || null,
+      sender_id: notification.senderId || null,
+    };
+  });
 
   const { data: insertedNotifications, error: insertError } = await supabase
     .from('user_notifications')
@@ -336,7 +410,10 @@ export async function sendToUsers(
   const invalidTokenIds: string[] = [];
 
   for (const tokenRecord of tokens as TokenRecord[]) {
-    const sendResult = await sendToToken(tokenRecord.token, notification, auth);
+    const locale = userLocales.get(tokenRecord.user_id) ?? 'en';
+    const { title, body } = renderNotification(notification, locale);
+    const localizedPayload: NotificationPayload = { ...notification, title, body };
+    const sendResult = await sendToToken(tokenRecord.token, localizedPayload, auth);
 
     if (sendResult.success) {
       result.sent++;
@@ -403,23 +480,29 @@ export async function sendGiftNotifications(
 
   // Send notification to each recipient
   for (const [recipientId, gift] of byRecipient) {
-    let body: string;
-    if (gift.xpAmount > 0 && gift.coinAmount > 0) {
-      body = `${gift.senderName} sent you ${gift.xpAmount} XP and ${gift.coinAmount} coins!`;
-    } else if (gift.xpAmount > 0) {
-      body = `${gift.senderName} sent you ${gift.xpAmount} XP!`;
-    } else if (gift.coinAmount > 0) {
-      body = `${gift.senderName} sent you ${gift.coinAmount} coins!`;
-    } else if (gift.badgeId) {
-      body = `${gift.senderName} sent you a special badge!`;
-    } else {
-      body = `${gift.senderName} sent you a message!`;
-    }
+    // Pick body translation key by gift shape. Literal string form matters for regression
+    // regex in tests — keep the `bodyKey: 'gift.bodyXp...'` shape inline.
+    const bodyKey =
+      gift.xpAmount > 0 && gift.coinAmount > 0 ? 'gift.bodyXpAndCoins'
+      : gift.xpAmount > 0 ? 'gift.bodyXpOnly'
+      : gift.coinAmount > 0 ? 'gift.bodyCoinsOnly'
+      : gift.badgeId ? 'gift.bodyBadge'
+      : 'gift.bodyGeneric';
 
+    // title/body are unused when titleKey/bodyKey are set — left blank since translatePush
+    // always resolves (falls back to 'en' internally).
     const notification: NotificationPayload = {
-      title: "You've received a gift! 🎁",
-      body,
+      title: '',
+      body: '',
+      titleKey: 'gift.title',
+      bodyKey,
+      params: {
+        sender: gift.senderName,
+        xp: gift.xpAmount,
+        coins: gift.coinAmount,
+      },
       notificationType: 'gift',
+      imageUrl: mascotImageUrl('celebration'),
       actionUrl: '/',  // Navigate to home - gift modal auto-shows in Header
       relatedEntityType: 'gift',
       relatedEntityId: gift.giftId,

@@ -60,6 +60,29 @@ export async function getDailyChallengePushRecipients(): Promise<string[]> {
     (playedRows ?? []).map((r: { player_id: string }) => r.player_id)
   );
 
+  // Batch-fetch notification preferences. Users with push_enabled=false or
+  // daily_challenge=false are excluded. Missing row = defaults (both on).
+  const { data: prefRows, error: prefsErr } = await supabase
+    .from('user_notification_preferences')
+    .select('user_id, push_enabled, daily_challenge')
+    .in('user_id', userIds);
+
+  if (prefsErr) {
+    logger.error?.('PUSH_REMINDER', `prefs query failed: ${prefsErr.message}`);
+    return [];
+  }
+
+  const optedOut = new Set<string>();
+  for (const row of (prefRows ?? []) as Array<{
+    user_id: string;
+    push_enabled: boolean | null;
+    daily_challenge: boolean | null;
+  }>) {
+    if (row.push_enabled === false || row.daily_challenge === false) {
+      optedOut.add(row.user_id);
+    }
+  }
+
   const recipients: string[] = [];
   for (const p of profiles as Array<{
     id: string;
@@ -67,6 +90,7 @@ export async function getDailyChallengePushRecipients(): Promise<string[]> {
     last_daily_push_sent_at: string | null;
   }>) {
     if (playedIds.has(p.id)) continue;
+    if (optedOut.has(p.id)) continue;
 
     if (p.last_daily_push_sent_at) {
       const lastDate = new Date(p.last_daily_push_sent_at).toISOString().split('T')[0];

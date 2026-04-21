@@ -19,7 +19,6 @@ import { useInterstitialAd } from '@/hooks/useInterstitialAd';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 
 const CrazyGamesBanner = dynamic(() => import('@/components/CrazyGamesBanner'), { ssr: false });
-const NativeBannerAd = dynamic(() => import('@/components/ads/NativeBannerAd'), { ssr: false });
 import {
   getGuestFingerprint,
   getGuestDailyPlayer,
@@ -407,14 +406,13 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
         </div>
       </div>
 
-      {/* Banner Ads — CrazyGames (web iframe) / AdMob (native) */}
+      {/* Inline banner ad (web iframe; native shows no inline banner) */}
       <div className="hidden md:flex justify-center py-2">
         <CrazyGamesBanner size="728x90" />
       </div>
       <div className="flex justify-center py-2 md:hidden">
         <CrazyGamesBanner size="320x50" />
       </div>
-      <NativeBannerAd />
 
       {/* Mobile Tab Bar */}
       <div className="shrink-0 fixed bottom-0 inset-x-0 z-50 bg-neo-navy border-t-4 border-neo-black md:hidden">

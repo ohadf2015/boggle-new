@@ -811,6 +811,7 @@ const sv = {
     "theme": "Tema",
     "dark": "Mörkt",
     "light": "Ljust",
+    "notifications": "Aviseringar",
     "support": "Support & Feedback",
     "contactDescription": "Frågor, feedback, eller bara säg hej!",
     "dangerZone": "Riskzon",
@@ -5075,7 +5076,12 @@ const sv = {
       "rank": "Din placering",
       "share": "Dela resultat",
       "playWordHunt": "Spela Word Hunt också!",
-      "playWordWheel": "Spela Ordhjul också!"
+      "playWordWheel": "Spela Ordhjul också!",
+      "stepBadge": "STEG 2 AV 2",
+      "completeDailyTitle": "Avsluta dagens utmaning",
+      "completeDailyDesc": "Spela Ordhjul för att slutföra din dagliga utmaning",
+      "dailyComplete": "Daglig utmaning klar!",
+      "dailyCompleteDesc": "Båda spelen klara. Kom tillbaka imorgon!"
     },
     "hub": {
       "wordWheelQuest": "Ordhjul",
@@ -5438,6 +5444,8 @@ const sv = {
     "noUsersFound": "Inga användare hittades",
     "pending": "Väntar",
     "pendingRequests": "Väntande förfrågningar",
+    "requestReceivedToast": "{{name}} skickade en vänförfrågan",
+    "challengeDeclinedToast": "{{name}} avböjde din utmaning",
     "socialBadge": "{count} vänaviseringar",
     "remove": "Ta bort",
     "requests": "Förfrågningar",
@@ -8170,6 +8178,10 @@ const sv = {
       "wave": "Våg {n}",
       "badgesEarned": "Märken intjänade",
       "newBadge": "NY",
+      "waveFailed": "Våg misslyckades",
+      "needClearPct": "Behövde {required}% rensat — du fick {got}%",
+      "failHint": "Rensa minst 90% av brädet för att gå vidare",
+      "tryAgain": "Försök igen",
       "share": "Dela",
       "brag": {
         "legend": "Legend",
@@ -9447,6 +9459,7 @@ const sv = {
     },
     "preferences": {
       "title": "Aviseringsinställningar",
+      "pushEnabled": "Push-aviseringar",
       "dailyChallenge": "Daglig utmaningspåminnelse",
       "streakWarning": "Varning för hotad svit",
       "friendInvites": "Kompis-utmaningar",

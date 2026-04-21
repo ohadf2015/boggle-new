@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import logger from '@/utils/logger';
 import { getDailyChallengePushRecipients, markDailyPushSent } from '@/lib/pushReminders';
 import { notifyDailyChallengeReminder } from '@/backend/modules/pushNotificationTriggers';
+import { pickDailyReminderCopy } from '@/lib/dailyReminderCopy';
+import { getLocalHour, getTodayDate } from '@/lib/email';
 import { captureApiError } from '@/utils/sentry';
 
 /**
@@ -35,9 +37,19 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: true, sent: 0, failed: 0 });
     }
 
+    const date = getTodayDate();
+
     const results = await Promise.allSettled(
       recipients.map(async (userId) => {
-        await notifyDailyChallengeReminder(userId);
+        const localHour = getLocalHour('UTC');
+        const hoursLeft = Math.max(1, 24 - localHour);
+        const copy = pickDailyReminderCopy({ userId, date, hoursLeft });
+        await notifyDailyChallengeReminder(userId, {
+          title: copy.title,
+          body: copy.body,
+          deepLink: copy.deepLink,
+          variant: copy.variant,
+        });
         await markDailyPushSent(userId);
       })
     );

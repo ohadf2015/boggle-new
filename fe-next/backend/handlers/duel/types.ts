@@ -91,6 +91,17 @@ export const cancelDuelSchema = z.object({
 export type CancelDuelPayload = z.infer<typeof cancelDuelSchema>;
 
 /**
+ * Rematch duel payload validation
+ * Requester becomes new challenger; classroom_id + duel_type inherited from prior duel.
+ */
+export const rematchDuelSchema = z.object({
+  opponentId: z.string().uuid('Invalid opponent ID'),
+  lessonId: z.string().uuid('Invalid lesson ID'),
+});
+
+export type RematchDuelPayload = z.infer<typeof rematchDuelSchema>;
+
+/**
  * Submit word payload validation (real-time duels)
  */
 export const submitWordSchema = z.object({

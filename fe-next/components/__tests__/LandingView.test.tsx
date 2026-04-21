@@ -123,7 +123,7 @@ vi.mock('@/components/ui/PullToRefreshIndicator', () => ({
   PullToRefreshIndicator: () => null,
 }));
 
-import { render, screen, act } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import LandingView from '../landing/LandingView';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -181,17 +181,11 @@ describe('LandingView', () => {
     expect(hasSinglePlayer || hasMultiplayer).toBe(true);
   });
 
-  it('plays lobby music on first user gesture (browser autoplay policy)', async () => {
+  it('queues lobby music on mount (MusicContext handles autoplay unlock)', () => {
     render(<LandingView />, { wrapper: createWrapper() });
 
-    // Music should NOT play until user interacts (Chrome autoplay policy)
-    expect(mockPlayTrack).not.toHaveBeenCalled();
-
-    // Simulate first user gesture
-    act(() => {
-      window.dispatchEvent(new Event('pointerdown'));
-    });
-
+    // Component calls playTrack unconditionally on mount; MusicContext queues
+    // the track via pendingUnlockTrackRef and plays on first gesture.
     expect(mockPlayTrack).toHaveBeenCalledWith('bossa');
   });
 

@@ -9,6 +9,7 @@ import { createClient } from '@/utils/supabase/server';
 import { z } from 'zod';
 
 const preferencesSchema = z.object({
+  pushEnabled: z.boolean(),
   dailyChallenge: z.boolean(),
   streakWarning: z.boolean(),
   friendInvites: z.boolean(),
@@ -47,6 +48,7 @@ export async function PUT(request: NextRequest) {
       .upsert(
         {
           user_id: user.id,
+          push_enabled: validation.data.pushEnabled,
           daily_challenge: validation.data.dailyChallenge,
           streak_warning: validation.data.streakWarning,
           friend_invites: validation.data.friendInvites,
@@ -93,7 +95,7 @@ export async function GET() {
     const { data, error } = await supabase
       .from('user_notification_preferences')
       .select(
-        'daily_challenge, streak_warning, friend_invites, weekly_summary'
+        'push_enabled, daily_challenge, streak_warning, friend_invites, weekly_summary'
       )
       .eq('user_id', user.id)
       .single();
@@ -109,6 +111,7 @@ export async function GET() {
 
     if (!data) {
       return NextResponse.json({
+        pushEnabled: true,
         dailyChallenge: true,
         streakWarning: true,
         friendInvites: true,
@@ -117,6 +120,7 @@ export async function GET() {
     }
 
     return NextResponse.json({
+      pushEnabled: data.push_enabled,
       dailyChallenge: data.daily_challenge,
       streakWarning: data.streak_warning,
       friendInvites: data.friend_invites,

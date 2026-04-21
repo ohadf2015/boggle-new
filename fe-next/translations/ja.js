@@ -805,6 +805,7 @@ const ja = {
     "theme": "テーマ",
     "dark": "ダーク",
     "light": "ライト",
+    "notifications": "通知",
     "support": "サポート＆フィードバック",
     "contactDescription": "質問、フィードバック、またはご挨拶!",
     "dangerZone": "危険ゾーン",
@@ -5101,7 +5102,12 @@ const ja = {
       "rank": "あなたの順位",
       "share": "結果をシェア",
       "playWordHunt": "ワードハントも遊ぼう！",
-      "playWordWheel": "ワードホイールもプレイ！"
+      "playWordWheel": "ワードホイールもプレイ！",
+      "stepBadge": "ステップ 2 / 2",
+      "completeDailyTitle": "今日のチャレンジを完了",
+      "completeDailyDesc": "ワードホイールをプレイしてデイリーチャレンジを達成",
+      "dailyComplete": "デイリーチャレンジ達成！",
+      "dailyCompleteDesc": "両方のゲーム完了。また明日！"
     },
     "hub": {
       "wordWheelQuest": "ワードホイール",
@@ -5468,6 +5474,8 @@ const ja = {
     "noUsersFound": "ユーザーが見つかりません",
     "pending": "保留中",
     "pendingRequests": "保留中のリクエスト",
+    "requestReceivedToast": "{{name}}さんからフレンドリクエストが届きました",
+    "challengeDeclinedToast": "{{name}}さんがチャレンジを辞退しました",
     "socialBadge": "{count}件のフレンド通知",
     "remove": "削除",
     "requests": "リクエスト",
@@ -8146,6 +8154,10 @@ const ja = {
       "wave": "ウェーブ{n}",
       "badgesEarned": "獲得バッジ",
       "newBadge": "NEW",
+      "waveFailed": "ウェーブ失敗",
+      "needClearPct": "{required}%クリアが必要 — 結果は{got}%",
+      "failHint": "進むにはボードの90%以上をクリアしてください",
+      "tryAgain": "もう一度",
       "share": "共有",
       "brag": {
         "legend": "レジェンド",
@@ -9422,6 +9434,7 @@ const ja = {
     },
     "preferences": {
       "title": "通知設定",
+      "pushEnabled": "プッシュ通知",
       "dailyChallenge": "デイリーチャレンジリマインダー",
       "streakWarning": "ストリーク危険警告",
       "friendInvites": "フレンドチャレンジ招待",

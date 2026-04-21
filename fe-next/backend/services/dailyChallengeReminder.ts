@@ -1,53 +1,60 @@
-import { isSupabaseConfigured, getSupabase } from '../modules/supabase';
-import { sendToUsers } from '../modules/fcmService';
+import { isSupabaseConfigured } from '../modules/supabase';
+import { notifyDailyChallengeReminder } from '../modules/pushNotificationTriggers';
+import {
+  getDailyChallengePushRecipients,
+  markDailyPushSent,
+} from '@/lib/pushReminders';
+import { pickDailyReminderCopy } from '@/lib/dailyReminderCopy';
+import { getLocalHour, getTodayDate } from '@/lib/email';
 import logger from '../utils/logger';
 
-const WITTY_MESSAGES = [
-  { title: 'Your brain called 📞', body: "It wants you to finish today's challenge. Don't keep it waiting!" },
-  { title: 'Tick tock, word jock! ⏰', body: "Today's challenge won't solve itself. Get in there!" },
-  { title: 'Hey, word wizard! 🧙', body: 'Your daily challenge is waiting. The letters miss you.' },
-  { title: "Plot twist: you haven't played yet 📖", body: "Finish today's challenge before the day slips away!" },
-  { title: 'The daily challenge is lonely 😢', body: 'Go give it some love before midnight!' },
-  { title: 'Words are waiting for you 🎯', body: "Jump in and smash today's daily challenge!" },
-  { title: 'Almost forgot? 🤔', body: "Your daily challenge streak depends on you. No pressure!" },
-  { title: 'Daily challenge: unsolved 🔍', body: 'The board is set. The letters are ready. Are you?' },
-  { title: "Don't let today slip by! 🌙", body: "Solve the daily challenge before the clock strikes midnight." },
-  { title: 'One puzzle. Your name on it. ✍️', body: "Today's daily challenge is still waiting for a champion." },
-];
-
+/**
+ * BullMQ cron entry. Delegates recipient selection to the shared HTTP-path
+ * gate so "didn't play today" is the single source of truth.
+ * Per-user dynamic copy via pickDailyReminderCopy — variant hashes from
+ * (userId,date), so analytics can attribute opens to a template.
+ */
 export async function sendDailyChallengeReminders(): Promise<void> {
   if (!isSupabaseConfigured()) {
     logger.info('DAILY_REMINDER', 'Supabase not configured, skipping');
     return;
   }
 
-  const today = new Date().toISOString().slice(0, 10);
-  const supabase = getSupabase();
-
-  const { data, error } = await (supabase as any)
-    .from('daily_challenges')
-    .select('player_id')
-    .eq('challenge_date', today)
-    .eq('completed', false);
-
-  if (error) {
-    logger.error('DAILY_REMINDER', `Failed to query daily challenges: ${error.message}`);
+  const recipients = await getDailyChallengePushRecipients();
+  if (recipients.length === 0) {
+    logger.info('DAILY_REMINDER', 'No eligible recipients');
     return;
   }
 
-  if (!data || data.length === 0) {
-    logger.info('DAILY_REMINDER', 'No uncompleted challenges today');
-    return;
+  const date = getTodayDate();
+
+  const results = await Promise.allSettled(
+    recipients.map(async (userId) => {
+      const localHour = getLocalHour('UTC');
+      const hoursLeft = Math.max(1, 24 - localHour);
+      const copy = pickDailyReminderCopy({ userId, date, hoursLeft });
+      await notifyDailyChallengeReminder(userId, {
+        title: copy.title,
+        body: copy.body,
+        deepLink: copy.deepLink,
+        variant: copy.variant,
+      });
+      await markDailyPushSent(userId);
+    })
+  );
+
+  let sent = 0;
+  let failed = 0;
+  for (const r of results) {
+    if (r.status === 'fulfilled') sent++;
+    else {
+      failed++;
+      logger.error(
+        'DAILY_REMINDER',
+        `send failed: ${r.reason instanceof Error ? r.reason.message : String(r.reason)}`
+      );
+    }
   }
 
-  const playerIds = [...new Set<string>(data.map((row: { player_id: string }) => row.player_id))];
-  const message = WITTY_MESSAGES[Math.floor(Math.random() * WITTY_MESSAGES.length)];
-
-  await sendToUsers(playerIds, {
-    title: message.title,
-    body: message.body,
-    data: { deepLink: '/challenges' },
-  });
-
-  logger.info('DAILY_REMINDER', `Sent daily challenge reminder to ${playerIds.length} players`);
+  logger.info('DAILY_REMINDER', `Sent ${sent}, failed ${failed}`);
 }

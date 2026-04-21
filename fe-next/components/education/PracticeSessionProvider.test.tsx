@@ -534,6 +534,85 @@ describe('PracticeSessionProvider', () => {
       });
     });
 
+    it('does not count flashcard sessions as completed lessons', async () => {
+      const user = userEvent.setup();
+
+      render(
+        <PracticeSessionProvider studentId="student-lc-1" lessonId="lesson-A">
+          <TestConsumer />
+        </PracticeSessionProvider>
+      );
+
+      await user.click(screen.getByTestId('complete-btn'));
+
+      await waitFor(() => {
+        expect(mockCheckForUnlocks).toHaveBeenCalledWith(
+          expect.objectContaining({
+            practiceSessions: 1,
+            lessonsCompleted: 0,
+            lessonsCollected: 0,
+          })
+        );
+      });
+    });
+
+    it('counts distinct lesson IDs on lesson_completion sessions', async () => {
+      try { localStorage.removeItem('education_completed_lessons_student-lc-2'); } catch { /* noop */ }
+
+      function LessonCompletionConsumer() {
+        const ctx = usePracticeSession();
+        return (
+          <button
+            data-testid="lc-btn"
+            onClick={() => ctx.completePracticeSession({ type: 'lesson_completion', masteryLevel: 'mastered' })}
+          >
+            Complete Lesson
+          </button>
+        );
+      }
+
+      const user = userEvent.setup();
+
+      const { unmount } = render(
+        <PracticeSessionProvider studentId="student-lc-2" lessonId="lesson-A">
+          <LessonCompletionConsumer />
+        </PracticeSessionProvider>
+      );
+
+      // Complete lesson-A twice — should count as 1 distinct lesson
+      await user.click(screen.getByTestId('lc-btn'));
+      await user.click(screen.getByTestId('lc-btn'));
+
+      await waitFor(() => {
+        expect(mockCheckForUnlocks).toHaveBeenLastCalledWith(
+          expect.objectContaining({
+            lessonsCompleted: 1,
+            lessonsCollected: 1,
+          })
+        );
+      });
+
+      unmount();
+
+      // Now complete a different lesson — should become 2 distinct
+      render(
+        <PracticeSessionProvider studentId="student-lc-2" lessonId="lesson-B">
+          <LessonCompletionConsumer />
+        </PracticeSessionProvider>
+      );
+
+      await user.click(screen.getByTestId('lc-btn'));
+
+      await waitFor(() => {
+        expect(mockCheckForUnlocks).toHaveBeenLastCalledWith(
+          expect.objectContaining({
+            lessonsCompleted: 2,
+            lessonsCollected: 2,
+          })
+        );
+      });
+    });
+
     it('tracks total words mastered from flashcard sessions', async () => {
       const user = userEvent.setup();
 

@@ -205,6 +205,16 @@ export const LanguageProvider = ({ children, initialLanguage, initialTranslation
                 document.cookie = `boggle_language=${newLang}; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax`;
             }
 
+            // Fire-and-forget: persist to profiles.language so per-recipient push
+            // notifications can be localized server-side. Ignored if unauthenticated.
+            if (typeof fetch !== 'undefined') {
+                fetch('/api/user/language', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ language: newLang }),
+                }).catch(() => { /* non-blocking */ });
+            }
+
             // Navigate to new locale preserving FULL path (everything after locale)
             const segments = pathname.split('/');
             // segments[0] is empty string, segments[1] is locale

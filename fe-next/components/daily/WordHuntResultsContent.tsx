@@ -9,15 +9,16 @@
  * leaderboard, and more options.
  */
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Eye, CircleDot, ArrowRight } from 'lucide-react';
+import { Eye, CircleDot, ArrowRight, CheckCircle2 } from 'lucide-react';
 import Link from 'next/link';
 import NextStepPrompt from '@/components/results/NextStepPrompt';
 import DailyChallengeInlineSignup from '@/components/auth/DailyChallengeInlineSignup';
 import TabbedDailyLeaderboard from './TabbedDailyLeaderboard';
 import WatchAdButton from './WatchAdButton';
 import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
+import { hasPlayedWordWheelToday } from '@/utils/dailyChallenge/storage';
 import { MascotWithEntrance } from '@/components/ui/Mascot';
 import type { WordHuntResult } from '@/utils/dailyChallenge/types';
 import type { Language } from '@/shared/types/game';
@@ -119,7 +120,13 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
   freezesAvailable = 0,
   isStreakProtected = false,
   t,
-}) => (
+}) => {
+  const [wordWheelPlayed, setWordWheelPlayed] = useState(false);
+  useEffect(() => {
+    setWordWheelPlayed(hasPlayedWordWheelToday(language));
+  }, [language]);
+
+  return (
   <div className="space-y-4">
     {/* Performance mascot — reacts to how many words the player found */}
     {showFlexing && (
@@ -302,12 +309,72 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
       />
     )}
 
-    {/* Next Step — play with friends */}
-    {onBackToLobby && (
+    {/* Daily Challenge next-step — PRIMARY CTA when Word Wheel not yet played */}
+    {!wordWheelPlayed && (
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.75, type: 'spring', stiffness: 300, damping: 26 }}
+        transition={{ delay: 0.72, type: 'spring', stiffness: 300, damping: 26 }}
+      >
+        <div className="relative">
+          <span className="absolute -top-2 left-4 z-10 inline-block px-2 py-0.5 rounded-full bg-neo-purple text-neo-white text-[10px] font-neo-display font-black tracking-wider border-2 border-neo-black shadow-hard-sm">
+            {t('wordWheel.results.stepBadge', 'STEP 2 OF 2')}
+          </span>
+          <Link
+            href={`/${language}/daily/word-wheel`}
+            className="flex items-center justify-between gap-3 w-full p-5 rounded-neo border-3 border-neo-black bg-neo-purple shadow-hard-lg hover:scale-[1.02] active:translate-x-px active:translate-y-px active:shadow-hard-pressed transition-all"
+          >
+            <div className="flex items-center gap-3">
+              <div className="flex items-center justify-center w-12 h-12 rounded-neo border-2 border-neo-black bg-neo-navy shrink-0">
+                <CircleDot className="w-7 h-7 text-neo-purple-light" />
+              </div>
+              <div>
+                <span className="block font-neo-display font-black text-neo-white text-base leading-tight">
+                  {t('wordWheel.results.completeDailyTitle', "Finish today's challenge")}
+                </span>
+                <p className="text-neo-cream/80 text-xs mt-0.5">
+                  {t('wordWheel.results.completeDailyDesc', 'Play Word Wheel to complete your Daily Challenge')}
+                </p>
+              </div>
+            </div>
+            <motion.div
+              animate={{ x: [0, 4, 0] }}
+              transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
+            >
+              <ArrowRight className="w-6 h-6 text-neo-white shrink-0" />
+            </motion.div>
+          </Link>
+        </div>
+      </motion.div>
+    )}
+
+    {/* Daily complete badge — shown once both games done */}
+    {wordWheelPlayed && (
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.72, type: 'spring', stiffness: 300, damping: 26 }}
+      >
+        <div className="flex items-center gap-3 w-full p-4 rounded-neo border-3 border-neo-black bg-neo-lime shadow-hard-lg">
+          <CheckCircle2 className="w-6 h-6 text-neo-black shrink-0" />
+          <div>
+            <span className="font-neo-display font-black text-neo-black text-sm">
+              {t('wordWheel.results.dailyComplete', 'Daily Challenge complete!')}
+            </span>
+            <p className="text-neo-black/70 text-xs">
+              {t('wordWheel.results.dailyCompleteDesc', 'Both games done. Come back tomorrow!')}
+            </p>
+          </div>
+        </div>
+      </motion.div>
+    )}
+
+    {/* Multiplayer next-step — only after Daily Challenge is complete */}
+    {onBackToLobby && wordWheelPlayed && (
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.82, type: 'spring', stiffness: 300, damping: 26 }}
       >
         <NextStepPrompt
           currentMode="word-hunt"
@@ -317,29 +384,6 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
         />
       </motion.div>
     )}
-
-    {/* Word Wheel CTA — always visible as a direct path to the second daily quest */}
-    <motion.div
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.9, type: 'spring', stiffness: 300, damping: 26 }}
-    >
-      <Link
-          href={`/${language}/daily/word-wheel`}
-          className="flex items-center justify-between gap-3 w-full p-4 rounded-neo border-3 border-neo-black bg-neo-navy-light shadow-hard-lg hover:scale-[1.02] active:translate-x-px active:translate-y-px active:shadow-hard-pressed transition-all"
-        >
-          <div className="flex items-center gap-3">
-            <CircleDot className="w-6 h-6 text-neo-purple shrink-0" />
-            <div>
-              <span className="font-neo-display font-black text-neo-white text-sm">
-                {t('wordWheel.results.playWordWheel', 'Play Word Wheel too!')}
-              </span>
-              <p className="text-neo-cream/50 text-xs">{t('wordWheel.description', 'Every word must include the center letter')}</p>
-            </div>
-          </div>
-          <ArrowRight className="w-5 h-5 text-neo-purple shrink-0" />
-      </Link>
-    </motion.div>
 
     {/* Create Your Own Board + Language Options — visible, not collapsed */}
     <MoreOptionsAccordion
@@ -352,4 +396,5 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
     />
 
   </div>
-);
+  );
+};

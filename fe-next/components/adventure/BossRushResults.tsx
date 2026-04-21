@@ -25,7 +25,6 @@ import { trackRewardedAdOffered } from '@/utils/growthTracking';
 import type { BossRushState } from './hooks/useBossRush';
 
 const CrazyGamesBanner = dynamic(() => import('@/components/CrazyGamesBanner'), { ssr: false });
-const NativeBannerAd = dynamic(() => import('@/components/ads/NativeBannerAd'), { ssr: false });
 
 // ==============================================
 // TYPES
@@ -179,7 +178,6 @@ const BossRushResults = memo<BossRushResultsProps>(({ state, onRetry, onExit }) 
         <div className="md:hidden mb-4">
           <CrazyGamesBanner size="320x50" />
         </div>
-        <NativeBannerAd />
 
         {/* R5 — Rewarded continue on failure */}
         {!isVictory && rewarded.canShowAd && !rewarded.isDailyLimitReached && (

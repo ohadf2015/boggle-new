@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useInterstitialAd } from '@/hooks/useInterstitialAd';
@@ -9,7 +9,6 @@ import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import type { LeagueTier, LeagueZone } from '@/hooks/useLeague';
 
 const CrazyGamesBanner = dynamic(() => import('@/components/CrazyGamesBanner'), { ssr: false });
-const NativeBannerAd = dynamic(() => import('@/components/ads/NativeBannerAd'), { ssr: false });
 
 const ZONE_MESSAGES: Record<LeagueZone, string> = {
   promotion: 'league.promoted',
@@ -69,11 +68,10 @@ export function LeagueResults({ tier, position, zone, coinsEarned, onClose }: Le
           <p className="font-neo-display text-2xl font-bold text-neo-yellow">{coinsEarned}</p>
         </div>
 
-        {/* Banner Ads — CrazyGames (web iframe) / AdMob (native) */}
+        {/* Inline banner ad (web iframe; native shows no inline banner) */}
         <div className="mb-4">
           <CrazyGamesBanner size="300x250" />
         </div>
-        <NativeBannerAd />
 
         <button
           onClick={onClose}

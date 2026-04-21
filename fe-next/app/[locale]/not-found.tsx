@@ -6,7 +6,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { InteractiveMascot } from '@/components/ui/InteractiveMascot';
 
 export default function NotFound() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   useEffect(() => {
     document.title = '404 - ' + (t('notFound.heading') || 'Page Not Found') + ' | LexiClash';
@@ -60,7 +60,7 @@ export default function NotFound() {
 
         {/* Action Button */}
         <Link
-          href="/"
+          href={`/${language}`}
           className="inline-flex items-center justify-center px-8 py-4 bg-neo-cyan text-neo-black font-black uppercase border-4 border-neo-black rounded-neo shadow-hard-lg hover:shadow-hard-xl hover:translate-x-[-2px] hover:translate-y-[-2px] active:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] transition-all duration-150 text-lg font-neo-display"
         >
           {t('notFound.button')}

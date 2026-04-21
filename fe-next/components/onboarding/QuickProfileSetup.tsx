@@ -37,7 +37,7 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
 
   const trimmedName = name.trim();
   const nameCharCount = Array.from(trimmedName).length;
-  const isNameValid = nameCharCount >= 2 && nameCharCount <= 20 && /^[\p{L}\p{N}\s._-]+$/u.test(trimmedName);
+  const isNameValid = nameCharCount >= 1 && nameCharCount <= 20 && /^[\p{L}\p{N}\s._-]+$/u.test(trimmedName);
 
   // Pulse the input once, the first frame a name transitions invalid → valid.
   // Using a ref guard keeps this a single celebration per validation flip.
@@ -76,7 +76,7 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
     const liveTrimmed = domValue.trim();
     const liveCount = Array.from(liveTrimmed).length;
     const liveValid =
-      liveCount >= 2 && liveCount <= 20 && /^[\p{L}\p{N}\s._-]+$/u.test(liveTrimmed);
+      liveCount >= 1 && liveCount <= 20 && /^[\p{L}\p{N}\s._-]+$/u.test(liveTrimmed);
 
     if (domValue !== name) setName(domValue);
 
@@ -139,7 +139,7 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
           className="flex flex-col items-center mb-4"
         >
           <div className="flex items-center justify-center gap-3">
-            <div className="flex flex-col items-center gap-1">
+            <div className="flex flex-col items-center gap-1 shrink-0">
               <motion.button
                 onClick={handleRandomize}
                 whileHover={{ scale: 1.1, rotate: 180 }}
@@ -155,7 +155,7 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
               </motion.button>
               <span className="text-[10px] font-bold text-neo-black/50">{t('onboarding.ftue.randomize', 'Randomize')}</span>
             </div>
-            <div className="flex flex-col items-center gap-1">
+            <div className="flex flex-col items-center gap-1 shrink-0">
               <motion.button
                 data-testid="avatar-edit-button"
                 onClick={() => setIsBuilderOpen(true)}
@@ -165,7 +165,7 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
                 aria-label={t('onboarding.ftue.editAvatar', 'Customize avatar')}
               >
                 <div className={cn(
-                  'w-20 h-20 rounded-full border-3 border-neo-black',
+                  'w-20 h-20 shrink-0 rounded-full border-3 border-neo-black',
                   'overflow-hidden bg-neo-white shadow-hard-sm'
                 )}>
                   <AnimatePresence mode="wait">
@@ -262,7 +262,7 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
             </AnimatePresence>
           </motion.div>
           <div className="flex justify-between text-[10px] font-bold text-neo-black/40 mb-4 px-0.5">
-            <span>{trimmedName.length < 2 && name.length > 0 ? t('validation.usernameTooShort') : t('onboarding.ftue.nameHint')}</span>
+            <span>{t('onboarding.ftue.nameHint')}</span>
             <span>{name.length}/20</span>
           </div>
         </motion.div>

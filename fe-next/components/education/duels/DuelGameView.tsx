@@ -73,6 +73,10 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
   const [timeRemaining, setTimeRemaining] = useState(DUEL_TIME_LIMIT_SECONDS);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const autoSubmitTriggered = useRef(false);
+  const wordsFoundRef = useRef<string[]>([]);
+  useEffect(() => {
+    wordsFoundRef.current = wordsFound;
+  }, [wordsFound]);
 
   // ============================================
   // EFFECTS
@@ -131,12 +135,8 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
             autoSubmitTriggered.current = true;
             // Use setTimeout to avoid state update during render
             setTimeout(() => {
-              if (wordsFound.length > 0) {
-                submitScore(duelId, wordsFound);
-              } else {
-                // Submit empty to register a 0-score turn
-                submitScore(duelId, []);
-              }
+              const words = wordsFoundRef.current;
+              submitScore(duelId, words);
               setPhase('submitting');
             }, 0);
           }
@@ -152,7 +152,7 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
         timerRef.current = null;
       }
     };
-  }, [phase, duelId, wordsFound, submitScore]);
+  }, [phase, duelId, submitScore]);
 
   // Socket event listeners
   useEffect(() => {

@@ -120,10 +120,27 @@ const FriendsList: React.FC<FriendsListProps> = ({
     };
     giftSocket.on('friends:challengeReceived', handleChallengeReceived);
 
+    // Toast when a challenge we SENT gets declined
+    const handleChallengeDeclined = (data: { toUserId?: string; fromUserId?: string; fromUsername?: string; toUsername?: string }) => {
+      // Only toast the challenger (fromUserId === challenger). Decliner already sees UI feedback.
+      const name = data.toUsername || '';
+      toast(t('friends.challengeDeclinedToast', { name }), { icon: '🚫' });
+    };
+    giftSocket.on('friends:challengeDeclined', handleChallengeDeclined);
+
+    // Toast when a new friend request arrives
+    const handleRequestReceived = (data: { fromUsername?: string; fromDisplayName?: string }) => {
+      const name = data.fromDisplayName || data.fromUsername || '';
+      toast(t('friends.requestReceivedToast', { name }), { icon: '👋' });
+    };
+    giftSocket.on('friends:requestReceived', handleRequestReceived);
+
     return () => {
       giftSocket.off('gift:receive', handleGiftReceive);
       giftSocket.off('friends:challengeAccepted', handleChallengeAccepted);
       giftSocket.off('friends:challengeReceived', handleChallengeReceived);
+      giftSocket.off('friends:challengeDeclined', handleChallengeDeclined);
+      giftSocket.off('friends:requestReceived', handleRequestReceived);
     };
   }, [giftSocket, isGiftSocketConnected, t, router, language]);
 

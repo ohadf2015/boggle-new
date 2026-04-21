@@ -56,6 +56,7 @@ describe('categoryPreferences', () => {
     it('should load stored preferences', () => {
       // GIVEN - Custom preferences in localStorage
       const custom = {
+        pushEnabled: true,
         dailyChallenge: false,
         streakWarning: true,
         friendInvites: false,
@@ -81,6 +82,7 @@ describe('categoryPreferences', () => {
       const prefs = loadCategoryPreferences();
 
       // THEN
+      expect(prefs.pushEnabled).toBe(true);
       expect(prefs.dailyChallenge).toBe(false);
       expect(prefs.streakWarning).toBe(true);
       expect(prefs.friendInvites).toBe(true);
@@ -103,6 +105,7 @@ describe('categoryPreferences', () => {
     it('should save preferences to localStorage', () => {
       // GIVEN - Custom preferences
       const custom = {
+        pushEnabled: true,
         dailyChallenge: false,
         streakWarning: false,
         friendInvites: true,

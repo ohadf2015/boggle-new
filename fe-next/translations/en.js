@@ -796,6 +796,7 @@ const en = {
     "theme": "Theme",
     "dark": "Dark",
     "light": "Light",
+    "notifications": "Notifications",
     "support": "Support & Feedback",
     "contactDescription": "Questions, feedback, or just say hi!",
     "dangerZone": "Danger Zone",
@@ -5173,7 +5174,12 @@ const en = {
       "rank": "Your Rank",
       "share": "Share Results",
       "playWordHunt": "Play Word Hunt too!",
-      "playWordWheel": "Play Word Wheel too!"
+      "playWordWheel": "Play Word Wheel too!",
+      "stepBadge": "STEP 2 OF 2",
+      "completeDailyTitle": "Finish today's challenge",
+      "completeDailyDesc": "Play Word Wheel to complete your Daily Challenge",
+      "dailyComplete": "Daily Challenge complete!",
+      "dailyCompleteDesc": "Both games done. Come back tomorrow!"
     },
     "hub": {
       "wordWheelQuest": "Word Wheel",
@@ -5615,6 +5621,8 @@ const en = {
     "noUsersFound": "Nobody matches that",
     "pending": "Pending",
     "pendingRequests": "Pending Requests",
+    "requestReceivedToast": "{{name}} sent you a friend request",
+    "challengeDeclinedToast": "{{name}} declined your challenge",
     "socialBadge": "{count} friend notifications",
     "remove": "Remove",
     "requests": "Requests",
@@ -8344,6 +8352,10 @@ const en = {
       "wave": "Wave {n}",
       "badgesEarned": "Badges Earned",
       "newBadge": "NEW",
+      "waveFailed": "Wave Failed",
+      "needClearPct": "Needed {required}% cleared — you got {got}%",
+      "failHint": "Clear at least 90% of the board to advance",
+      "tryAgain": "Try Again",
       "share": "Share",
       "brag": {
         "legend": "Legend",
@@ -9633,6 +9645,7 @@ const en = {
     },
     "preferences": {
       "title": "Notification Settings",
+      "pushEnabled": "Push Notifications",
       "dailyChallenge": "Daily Challenge Reminder",
       "streakWarning": "Streak at Risk Warning",
       "friendInvites": "Friend Challenge Invites",

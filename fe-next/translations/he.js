@@ -805,6 +805,7 @@ const he = {
     "theme": "ערכת נושא",
     "dark": "כהה",
     "light": "בהיר",
+    "notifications": "התראות",
     "support": "תמיכה ומשוב",
     "contactDescription": "שאלות, משוב, או סתם להגיד שלום!",
     "dangerZone": "אזור סכנה",
@@ -5060,7 +5061,12 @@ const he = {
       "rank": "הדירוג שלך",
       "share": "שתף תוצאות",
       "playWordHunt": "שחק גם ב-Word Hunt!",
-      "playWordWheel": "שחק גם בגלגל מילים!"
+      "playWordWheel": "שחק גם בגלגל מילים!",
+      "stepBadge": "שלב 2 מתוך 2",
+      "completeDailyTitle": "סיים את האתגר היומי",
+      "completeDailyDesc": "שחק בגלגל מילים כדי להשלים את האתגר היומי",
+      "dailyComplete": "האתגר היומי הושלם!",
+      "dailyCompleteDesc": "שני המשחקים הושלמו. חזור מחר!"
     },
     "hub": {
       "wordWheelQuest": "גלגל מילים",
@@ -5418,6 +5424,8 @@ const he = {
     "noUsersFound": "לא נמצאו משתמשים",
     "pending": "ממתין",
     "pendingRequests": "בקשות ממתינות",
+    "requestReceivedToast": "{{name}} שלח/ה לך בקשת חברות",
+    "challengeDeclinedToast": "{{name}} דחה/תה את האתגר שלך",
     "socialBadge": "{count} התראות חברים",
     "remove": "הסר",
     "requests": "בקשות",
@@ -8129,6 +8137,10 @@ const he = {
       "wave": "גל {n}",
       "badgesEarned": "תגים שהושגו",
       "newBadge": "חדש",
+      "waveFailed": "הגל נכשל",
+      "needClearPct": "נדרש ניקוי של {required}% — ניקית {got}%",
+      "failHint": "יש לנקות לפחות 90% מהלוח כדי להתקדם",
+      "tryAgain": "נסה שוב",
       "share": "שתף",
       "brag": {
         "legend": "אגדה",
@@ -9405,6 +9417,7 @@ const he = {
     },
     "preferences": {
       "title": "הגדרות התראות",
+      "pushEnabled": "התראות דחיפה",
       "dailyChallenge": "תזכורת אתגר יומי",
       "streakWarning": "אזהרת רצף בסיכון",
       "friendInvites": "הזמנות אתגר מחברים",

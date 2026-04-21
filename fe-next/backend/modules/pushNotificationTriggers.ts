@@ -5,7 +5,9 @@
  */
 
 import logger from '../utils/logger';
+import { translatePush, type PushLocale, isPushLocale } from '../utils/pushTranslations';
 import { sendToUser, type FCMPayload } from './fcmService';
+import { mascotImageUrl } from '../services/pushNotificationService';
 import { getSupabase, isSupabaseConfigured } from './supabase';
 
 export type PushNotificationType =
@@ -37,6 +39,29 @@ const NOTIFICATION_TYPE_MAP: Record<PushNotificationType, string> = {
   daily_challenge: 'system',
   level_up: 'achievement',
 };
+
+/**
+ * Look up recipient's preferred locale from profiles.language.
+ * Fail-open to 'en' — missing locale must not block delivery.
+ */
+async function getUserLocale(userId: string): Promise<PushLocale> {
+  try {
+    if (!isSupabaseConfigured()) return 'en';
+    const supabase = getSupabase();
+    if (!supabase) return 'en';
+
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('language')
+      .eq('id', userId)
+      .maybeSingle();
+
+    if (error || !data) return 'en';
+    return isPushLocale(data.language) ? data.language : 'en';
+  } catch {
+    return 'en';
+  }
+}
 
 /**
  * Save notification to user_notifications table for in-app history
@@ -81,6 +106,67 @@ async function saveNotificationHistory(
  */
 type DeliveryMode = 'both' | 'push_only' | 'in_app_only';
 
+/**
+ * Map push types → user preference category. Unmapped types (achievement,
+ * level_up) are master-gated only.
+ */
+type PreferenceCategory =
+  | 'daily_challenge'
+  | 'streak_warning'
+  | 'friend_invites'
+  | 'weekly_summary';
+
+const CATEGORY_MAP: Partial<Record<PushNotificationType, PreferenceCategory>> = {
+  daily_challenge: 'daily_challenge',
+  friend_request: 'friend_invites',
+  friend_accepted: 'friend_invites',
+  game_invite: 'friend_invites',
+  challenge_accepted: 'friend_invites',
+  challenge_declined: 'friend_invites',
+  gift_received: 'friend_invites',
+  direct_message: 'friend_invites',
+  turn_reminder: 'friend_invites',
+};
+
+/**
+ * Returns true if push should be sent for this (user, type). Loads row from
+ * user_notification_preferences; missing row = defaults (all on except
+ * weekly_summary). Fail-open on query errors — we'd rather deliver than drop.
+ */
+export async function isPushAllowed(
+  userId: string,
+  type: PushNotificationType
+): Promise<boolean> {
+  try {
+    if (!isSupabaseConfigured()) return true;
+    const supabase = getSupabase();
+    if (!supabase) return true;
+
+    const { data, error } = await supabase
+      .from('user_notification_preferences')
+      .select('push_enabled, daily_challenge, streak_warning, friend_invites, weekly_summary')
+      .eq('user_id', userId)
+      .maybeSingle();
+
+    if (error) {
+      logger.warn('PUSH_TRIGGER', `Preference lookup failed, allowing send: ${error.message}`);
+      return true;
+    }
+
+    if (!data) return true; // no row → defaults (all on)
+
+    if (data.push_enabled === false) return false;
+
+    const category = CATEGORY_MAP[type];
+    if (!category) return true; // unmapped type → master-only
+
+    return data[category] !== false;
+  } catch (error) {
+    logger.error('PUSH_TRIGGER', `isPushAllowed error: ${(error as Error).message}`);
+    return true;
+  }
+}
+
 async function triggerPush(
   userId: string,
   type: PushNotificationType,
@@ -90,7 +176,10 @@ async function triggerPush(
 ): Promise<void> {
   try {
     const jobs: Promise<unknown>[] = [];
-    if (mode !== 'in_app_only') jobs.push(sendToUser(userId, payload));
+    if (mode !== 'in_app_only') {
+      const allowed = await isPushAllowed(userId, type);
+      if (allowed) jobs.push(sendToUser(userId, payload));
+    }
     if (mode !== 'push_only') {
       jobs.push(saveNotificationHistory(userId, type, payload, payload.data?.deepLink, senderId));
     }
@@ -108,9 +197,11 @@ export async function notifyFriendRequest(
   fromUsername: string,
   fromUserId?: string
 ): Promise<void> {
+  const locale = await getUserLocale(toUserId);
   return triggerPush(toUserId, 'friend_request', {
-    title: 'Friend Request',
-    body: `${fromUsername} sent you a friend request!`,
+    title: translatePush(locale, 'friendRequest.title'),
+    body: translatePush(locale, 'friendRequest.body', { sender: fromUsername }),
+    imageUrl: mascotImageUrl('waving'),
     data: {
       type: 'friend_request',
       deepLink: '/friends?tab=requests',
@@ -126,9 +217,11 @@ export async function notifyFriendAccepted(
   acceptorUsername: string,
   acceptorUserId?: string
 ): Promise<void> {
+  const locale = await getUserLocale(toUserId);
   return triggerPush(toUserId, 'friend_accepted', {
-    title: 'Friend Request Accepted',
-    body: `${acceptorUsername} accepted your friend request!`,
+    title: translatePush(locale, 'friendAccepted.title'),
+    body: translatePush(locale, 'friendAccepted.body', { sender: acceptorUsername }),
+    imageUrl: mascotImageUrl('waving'),
     data: {
       type: 'friend_accepted',
       deepLink: '/friends?tab=friends',
@@ -145,9 +238,11 @@ export async function notifyGameInvite(
   roomCode: string,
   inviterUserId?: string
 ): Promise<void> {
+  const locale = await getUserLocale(toUserId);
   return triggerPush(toUserId, 'game_invite', {
-    title: 'Game Invite',
-    body: `${inviterUsername} invited you to play!`,
+    title: translatePush(locale, 'gameInvite.title'),
+    body: translatePush(locale, 'gameInvite.body', { sender: inviterUsername }),
+    imageUrl: mascotImageUrl('play'),
     data: {
       type: 'game_invite',
       deepLink: `/join/${roomCode}`,
@@ -163,9 +258,11 @@ export async function notifyTurnReminder(
   opponentUsername: string,
   roomCode: string
 ): Promise<void> {
+  const locale = await getUserLocale(toUserId);
   return triggerPush(toUserId, 'turn_reminder', {
-    title: 'Your Turn!',
-    body: `${opponentUsername} played — your turn now!`,
+    title: translatePush(locale, 'turnReminder.title'),
+    body: translatePush(locale, 'turnReminder.body', { opponent: opponentUsername }),
+    imageUrl: mascotImageUrl('encouraging'),
     data: {
       type: 'turn_reminder',
       deepLink: `/join/${roomCode}`,
@@ -180,9 +277,11 @@ export async function notifyAchievement(
   toUserId: string,
   achievementName: string
 ): Promise<void> {
+  const locale = await getUserLocale(toUserId);
   return triggerPush(toUserId, 'achievement', {
-    title: 'Achievement Unlocked!',
-    body: `You earned: ${achievementName}`,
+    title: translatePush(locale, 'achievement.title'),
+    body: translatePush(locale, 'achievement.body', { name: achievementName }),
+    imageUrl: mascotImageUrl('mindblown'),
     data: {
       type: 'achievement',
       deepLink: '/adventure/achievements',
@@ -208,9 +307,11 @@ export async function notifyDirectMessage(
     ? `/friends?tab=messages&friendUserId=${fromUserId}`
     : '/friends?tab=messages';
 
+  const locale = await getUserLocale(toUserId);
   return triggerPush(toUserId, 'direct_message', {
-    title: `Message from ${fromUsername}`,
-    body: preview,
+    title: translatePush(locale, 'directMessage.title', { sender: fromUsername }),
+    body: translatePush(locale, 'directMessage.body', { preview }),
+    imageUrl: mascotImageUrl('spectating'),
     data: {
       type: 'direct_message',
       deepLink,
@@ -227,9 +328,11 @@ export async function notifyChallengeAccepted(
   roomCode: string,
   acceptorUserId?: string
 ): Promise<void> {
+  const locale = await getUserLocale(toUserId);
   return triggerPush(toUserId, 'challenge_accepted', {
-    title: 'Challenge Accepted!',
-    body: `${acceptorUsername} accepted your challenge — join now!`,
+    title: translatePush(locale, 'challengeAccepted.title'),
+    body: translatePush(locale, 'challengeAccepted.body', { sender: acceptorUsername }),
+    imageUrl: mascotImageUrl('play'),
     data: {
       type: 'challenge_accepted',
       deepLink: `/join/${roomCode}`,
@@ -245,9 +348,11 @@ export async function notifyChallengeDeclined(
   declinerUsername: string,
   declinerUserId?: string
 ): Promise<void> {
+  const locale = await getUserLocale(toUserId);
   return triggerPush(toUserId, 'challenge_declined', {
-    title: 'Challenge Declined',
-    body: `${declinerUsername} declined your challenge`,
+    title: translatePush(locale, 'challengeDeclined.title'),
+    body: translatePush(locale, 'challengeDeclined.body', { sender: declinerUsername }),
+    imageUrl: mascotImageUrl('crying'),
     data: {
       type: 'challenge_declined',
       deepLink: '/friends',
@@ -264,16 +369,16 @@ export async function notifyGiftReceived(
   giftType: string,
   senderId?: string
 ): Promise<void> {
-  const giftLabels: Record<string, string> = {
-    hints: 'a hint',
-    streak_freeze: 'a streak freeze',
-    coins: 'coins',
-  };
-  const label = giftLabels[giftType] || giftType;
+  const locale = await getUserLocale(toUserId);
+  const labelKey = `giftLabel.${giftType}`;
+  // Fall through to raw giftType if no label key exists in dict
+  const label = translatePush(locale, labelKey);
+  const resolvedLabel = label === labelKey ? giftType : label;
 
   return triggerPush(toUserId, 'gift_received', {
-    title: 'Gift Received!',
-    body: `${senderUsername} sent you ${label}!`,
+    title: translatePush(locale, 'giftReceived.title'),
+    body: translatePush(locale, 'giftReceived.body', { sender: senderUsername, label: resolvedLabel }),
+    imageUrl: mascotImageUrl('celebration'),
     data: {
       type: 'gift_received',
       deepLink: '/friends',
@@ -286,14 +391,21 @@ export async function notifyGiftReceived(
  * Only called for users who haven't played today (gate enforced by cron query)
  */
 export async function notifyDailyChallengeReminder(
-  toUserId: string
+  toUserId: string,
+  override?: { title?: string; body?: string; deepLink?: string; variant?: number }
 ): Promise<void> {
+  const locale = await getUserLocale(toUserId);
+  const title = override?.title ?? translatePush(locale, 'dailyChallenge.title');
+  const body = override?.body ?? translatePush(locale, 'dailyChallenge.body');
+  const deepLink = override?.deepLink ?? '/daily-challenge';
   return triggerPush(toUserId, 'daily_challenge', {
-    title: '🎯 Daily Challenge awaits',
-    body: 'Keep your streak alive — 60 seconds to play!',
+    title,
+    body,
+    imageUrl: mascotImageUrl('encouraging'),
     data: {
       type: 'daily_challenge',
-      deepLink: '/daily-challenge',
+      deepLink,
+      ...(override?.variant !== undefined ? { variant: String(override.variant) } : {}),
     },
   }, 'push_only');
 }
@@ -305,9 +417,11 @@ export async function notifyLevelUp(
   toUserId: string,
   newLevel: number
 ): Promise<void> {
+  const locale = await getUserLocale(toUserId);
   return triggerPush(toUserId, 'level_up', {
-    title: `Level ${newLevel}!`,
-    body: `Congratulations — you reached level ${newLevel}!`,
+    title: translatePush(locale, 'levelUp.title', { level: newLevel }),
+    body: translatePush(locale, 'levelUp.body', { level: newLevel }),
+    imageUrl: mascotImageUrl('celebration'),
     data: {
       type: 'level_up',
       deepLink: '/adventure',

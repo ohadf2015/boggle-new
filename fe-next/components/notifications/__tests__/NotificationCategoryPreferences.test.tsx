@@ -22,6 +22,7 @@ vi.mock('@/contexts/LanguageContext', () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
         'notifications.preferences.title': 'Notification Settings',
+        'notifications.preferences.pushEnabled': 'Push Notifications',
         'notifications.preferences.dailyChallenge': 'Daily Challenge Reminder',
         'notifications.preferences.streakWarning': 'Streak at Risk Warning',
         'notifications.preferences.friendInvites': 'Friend Challenge Invites',
@@ -45,6 +46,7 @@ describe('NotificationCategoryPreferences', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockLoad.mockReturnValue({
+      pushEnabled: true,
       dailyChallenge: true,
       streakWarning: true,
       friendInvites: true,
@@ -74,12 +76,13 @@ describe('NotificationCategoryPreferences', () => {
       render(<NotificationCategoryPreferences />);
       const switches = screen.getAllByRole('switch');
 
-      // THEN - 4 toggles, first 3 checked, last unchecked
-      expect(switches).toHaveLength(4);
+      // THEN - master + 4 category toggles; first 4 on, weeklySummary off
+      expect(switches).toHaveLength(5);
       expect(switches[0]).toHaveAttribute('aria-checked', 'true');
       expect(switches[1]).toHaveAttribute('aria-checked', 'true');
       expect(switches[2]).toHaveAttribute('aria-checked', 'true');
-      expect(switches[3]).toHaveAttribute('aria-checked', 'false');
+      expect(switches[3]).toHaveAttribute('aria-checked', 'true');
+      expect(switches[4]).toHaveAttribute('aria-checked', 'false');
     });
   });
 
@@ -89,8 +92,8 @@ describe('NotificationCategoryPreferences', () => {
       render(<NotificationCategoryPreferences />);
       const switches = screen.getAllByRole('switch');
 
-      // WHEN - Toggle daily challenge off
-      fireEvent.click(switches[0]);
+      // WHEN - Toggle daily challenge off (index 1; index 0 is master)
+      fireEvent.click(switches[1]);
 
       // THEN
       expect(mockSave).toHaveBeenCalledWith(
@@ -104,7 +107,7 @@ describe('NotificationCategoryPreferences', () => {
       const switches = screen.getAllByRole('switch');
 
       // WHEN - Toggle weekly summary on (last switch)
-      fireEvent.click(switches[3]);
+      fireEvent.click(switches[4]);
 
       // THEN
       expect(mockSave).toHaveBeenCalledWith(

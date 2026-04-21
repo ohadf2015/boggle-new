@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
-import { headers } from 'next/headers';
+import { headers, cookies } from 'next/headers';
 
 export const dynamic = 'force-dynamic';
 
@@ -10,9 +10,22 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-function detectLocaleFromPath(pathname: string): string {
+const SUPPORTED_LOCALES = ['he', 'en', 'sv', 'ja', 'es'] as const;
+type SupportedLocale = (typeof SUPPORTED_LOCALES)[number];
+
+function detectLocaleFromPath(pathname: string): SupportedLocale | null {
   const match = pathname.match(/^\/(he|en|sv|ja|es)\b/);
-  return match?.[1] || 'en';
+  return (match?.[1] as SupportedLocale) || null;
+}
+
+function detectLocaleFromAcceptLang(header: string | null): SupportedLocale | null {
+  if (!header) return null;
+  const langs = header.split(',').map((s) => s.trim().split(';')[0].toLowerCase());
+  for (const l of langs) {
+    const base = l.split('-')[0];
+    if ((SUPPORTED_LOCALES as readonly string[]).includes(base)) return base as SupportedLocale;
+  }
+  return null;
 }
 
 const notFoundTranslations: Record<string, {
@@ -72,8 +85,17 @@ const TILES = [
 
 export default async function GlobalNotFound() {
   const headersList = await headers();
-  const pathname = headersList.get('x-next-url') || headersList.get('x-invoke-path') || '/en';
-  const locale = detectLocaleFromPath(pathname);
+  const cookieStore = await cookies();
+  const pathname = headersList.get('x-next-url') || headersList.get('x-invoke-path') || '';
+  const cookieLang = cookieStore.get('boggle_language')?.value;
+  const cookieLocale = cookieLang && (SUPPORTED_LOCALES as readonly string[]).includes(cookieLang)
+    ? (cookieLang as SupportedLocale)
+    : null;
+  const locale: SupportedLocale =
+    detectLocaleFromPath(pathname) ||
+    cookieLocale ||
+    detectLocaleFromAcceptLang(headersList.get('accept-language')) ||
+    'en';
   const isRTL = locale === 'he';
   const t = notFoundTranslations[locale] || notFoundTranslations.en;
 

@@ -150,6 +150,8 @@ export interface DailyScheduleOptions {
  * Controls which types of notifications the user receives
  */
 export interface NotificationCategoryPreferences {
+  /** Master switch — false suppresses ALL push sends (default: true) */
+  pushEnabled: boolean;
   /** Daily challenge reminder (default: true) */
   dailyChallenge: boolean;
   /** Streak at risk warning (default: true) */
@@ -164,6 +166,7 @@ export interface NotificationCategoryPreferences {
  * Default category preferences
  */
 export const DEFAULT_CATEGORY_PREFERENCES: NotificationCategoryPreferences = {
+  pushEnabled: true,
   dailyChallenge: true,
   streakWarning: true,
   friendInvites: true,

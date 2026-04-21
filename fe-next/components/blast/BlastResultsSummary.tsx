@@ -57,11 +57,16 @@ export function BlastResultsSummary({
     .sort((a, b) => b.length - a.length)
     .slice(0, 8);
 
+  // Fail signal mirrors advance gate in useBlastGameEnd.ts (clearPct >= 90)
+  const didFail = results.clearPercentage < 90;
+
   return (
     <div
-      className="flex-1 flex flex-col items-center justify-start gap-4 px-4 py-6 pb-24 overflow-y-auto w-full max-w-md mx-auto"
+      className="flex-1 flex flex-col w-full max-w-md mx-auto min-h-0"
       data-testid="blast-results-summary"
+      data-fail={didFail ? 'true' : 'false'}
     >
+      <div className="flex-1 overflow-y-auto px-4 pt-6 pb-4 flex flex-col items-center gap-4">
       {/* Mascot */}
       <AdaptiveMotion.div
         initial={{ scale: 0, rotate: -10, opacity: 0 }}
@@ -85,12 +90,39 @@ export function BlastResultsSummary({
           initial={{ scale: 0.6, opacity: 0, y: -10 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
           transition={{ type: 'spring', stiffness: 380, damping: 22 }}
-          className="text-3xl font-black uppercase text-neo-pink font-neo-display tracking-wider drop-shadow-[3px_3px_0_#000]"
+          className={cn(
+            'text-3xl font-black uppercase font-neo-display tracking-wider drop-shadow-[3px_3px_0_#000]',
+            didFail ? 'text-neo-red' : 'text-neo-pink',
+          )}
         >
-          {t('blast.gameOver')}
+          {didFail ? t('blast.results.waveFailed') : t('blast.gameOver')}
         </AdaptiveMotion.h2>
-        <StarRating stars={results.stars} label={t(`blast.stars${results.stars}`)} />
+        {!didFail && (
+          <StarRating stars={results.stars} label={t(`blast.stars${results.stars}`)} />
+        )}
       </div>
+
+      {/* Fail banner — shown when player didn't hit the 90% advance threshold */}
+      {didFail && (
+        <AdaptiveMotion.div
+          initial={{ scale: 0.85, opacity: 0, y: -4 }}
+          animate={{ scale: 1, opacity: 1, y: 0 }}
+          transition={{ type: 'spring', stiffness: 380, damping: 20, delay: 0.05 }}
+          className={cn(
+            'w-full flex flex-col items-center gap-1 px-4 py-3',
+            'rounded-neo border-3 border-neo-black shadow-hard',
+            'bg-neo-red/90 text-white',
+          )}
+          data-testid="blast-results-fail-banner"
+        >
+          <p className="font-neo-display font-black uppercase tracking-wider text-sm">
+            {t('blast.results.needClearPct', { required: 90, got: results.clearPercentage })}
+          </p>
+          <p className="text-[11px] uppercase tracking-wider font-bold text-white/80">
+            {t('blast.results.failHint')}
+          </p>
+        </AdaptiveMotion.div>
+      )}
 
       {/* Score card */}
       <AdaptiveMotion.div
@@ -393,12 +425,19 @@ export function BlastResultsSummary({
         </AdaptiveMotion.div>
       )}
 
-      {/* CTAs */}
+      </div>
+
+      {/* Sticky CTA footer — always visible without scrolling */}
       <AdaptiveMotion.div
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.45 }}
-        className="flex flex-col gap-2 w-full mt-2"
+        className={cn(
+          'shrink-0 flex flex-col gap-2 w-full px-4 py-3',
+          'bg-neo-navy/95 backdrop-blur-sm border-t-3 border-neo-black',
+          'pb-[max(0.75rem,env(safe-area-inset-bottom))]',
+        )}
+        data-testid="blast-results-cta-footer"
       >
         <Button
           data-testid="play-again-button"
@@ -406,7 +445,7 @@ export function BlastResultsSummary({
           onClick={onPlayAgain}
           className="min-h-[56px] font-black text-xl uppercase border-3 border-neo-black shadow-hard-lg bg-neo-lime text-neo-black hover:bg-neo-lime/90"
         >
-          {t('blast.playAgain')}
+          {didFail ? t('blast.results.tryAgain') : t('blast.playAgain')}
         </Button>
         <Button
           variant="ghost"

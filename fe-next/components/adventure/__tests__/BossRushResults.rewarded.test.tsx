@@ -24,10 +24,6 @@ vi.mock('@/components/CrazyGamesBanner', () => ({
   __esModule: true,
   default: () => <div data-testid="cg-banner" />,
 }));
-vi.mock('@/components/ads/NativeBannerAd', () => ({
-  __esModule: true,
-  default: () => null,
-}));
 vi.mock('@/hooks/useRewardedAd', () => ({
   useRewardedAd: (opts: { onRewardEarned?: () => void }) => {
     capturedRewardRef.current = opts.onRewardEarned;

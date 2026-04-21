@@ -80,7 +80,7 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
     const { user } = useAuth();
     const [showAuthModal, setShowAuthModal] = useState(false);
     const { missions } = useDailyMissions();
-    const { pendingRequests, friends } = useFriends();
+    const { pendingRequests, pendingChallenges, friends } = useFriends();
 
     // Refs with fresh values so onMessage callback can decide whether to toast
     const pathnameRef = useRef(pathname);
@@ -123,7 +123,7 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
     }, [t, router, language]);
 
     const { unreadCount } = useFriendMessages(undefined, handleIncomingMessage);
-    const socialBadgeCount = pendingRequests.length + unreadCount;
+    const socialBadgeCount = pendingRequests.length + pendingChallenges.length + unreadCount;
 
     // Count completed quests (3 shown: wordHunt, adventure, community — no brain drill)
     const questsCompleted = useMemo(() =>
@@ -173,6 +173,7 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
                 "sm:hidden",
             )}
             style={{
+                bottom: 'var(--admob-banner-height, 0px)',
                 paddingBottom: safeArea.bottom > 0
                     ? `${safeArea.bottom}px`
                     : 'env(safe-area-inset-bottom, 0px)',

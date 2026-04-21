@@ -675,8 +675,8 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
       </p>
       </div>
 
-      {/* ── Action Buttons ── */}
-      <div className="flex items-center gap-3">
+      {/* ── Action Buttons (sticky so Submit stays in view as found-words list grows) ── */}
+      <div className="sticky bottom-0 z-30 w-full flex items-center justify-center gap-3 py-2 bg-linear-to-t from-neo-navy via-neo-navy/95 to-transparent">
         {/* Clear */}
         <motion.button
           type="button"

@@ -161,7 +161,16 @@ describe('Duel Gameplay Handlers', () => {
           return { select: lessonSelectMock };
         }
         if (table === 'duel_turns') {
-          return { insert: turnInsertMock };
+          return {
+            insert: turnInsertMock,
+            select: vi.fn().mockReturnValue({
+              eq: vi.fn().mockReturnValue({
+                eq: vi.fn().mockReturnValue({
+                  maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null }),
+                }),
+              }),
+            }),
+          };
         }
         return {};
       });
@@ -322,6 +331,82 @@ describe('Duel Gameplay Handlers', () => {
       expect(errorEvent?.data.message).toContain('not active');
     });
 
+    it('should reject duplicate turn submission (anti-farm)', async () => {
+      const payload = {
+        duelId: '550e8400-e29b-41d4-a716-446655440001',
+        wordsFound: ['test'],
+      };
+
+      mockedIsDictionaryWord.mockReturnValue(true);
+      mockedIsWordOnBoardAsync.mockResolvedValue(true);
+      mockedCalculateWordScore.mockReturnValue(5);
+
+      const turnInsertMock = vi.fn();
+
+      mockFrom.mockImplementation((table: string) => {
+        if (table === 'student_duels') {
+          return {
+            select: vi.fn().mockReturnValue({
+              eq: vi.fn().mockReturnValue({
+                single: vi.fn().mockResolvedValue({
+                  data: {
+                    id: '550e8400-e29b-41d4-a716-446655440001',
+                    status: 'active',
+                    challenger_id: 'user-1',
+                    opponent_id: 'user-2',
+                    board_state: [['T', 'E', 'S', 'T']],
+                    lesson_id: '550e8400-e29b-41d4-a716-446655440001',
+                  },
+                  error: null,
+                }),
+              }),
+            }),
+          };
+        }
+        if (table === 'vocabulary_lessons') {
+          return {
+            select: vi.fn().mockReturnValue({
+              eq: vi.fn().mockReturnValue({
+                single: vi.fn().mockResolvedValue({
+                  data: { language: 'en' },
+                  error: null,
+                }),
+              }),
+            }),
+          };
+        }
+        if (table === 'duel_turns') {
+          return {
+            insert: turnInsertMock,
+            select: vi.fn().mockReturnValue({
+              eq: vi.fn().mockReturnValue({
+                eq: vi.fn().mockReturnValue({
+                  maybeSingle: vi.fn().mockResolvedValue({
+                    data: { id: 'existing-turn-id' },
+                    error: null,
+                  }),
+                }),
+              }),
+            }),
+          };
+        }
+        return {};
+      });
+
+      registerGameplayHandlers(mockNamespace as Namespace, mockSocket as DuelSocket);
+
+      const submitScoreHandler = (mockSocket.on as Mock).mock.calls.find(
+        (call) => call[0] === 'duel:submit-score'
+      )?.[1];
+
+      await submitScoreHandler(payload);
+
+      const errorEvent = emittedEvents.find((e) => e.event === 'duel:error');
+      expect(errorEvent).toBeDefined();
+      expect(errorEvent?.data.message).toBe('Turn already submitted');
+      expect(turnInsertMock).not.toHaveBeenCalled();
+    });
+
     it('should handle empty words array (score = 0)', async () => {
       const payload = {
         duelId: '550e8400-e29b-41d4-a716-446655440001',
@@ -355,6 +440,7 @@ describe('Duel Gameplay Handlers', () => {
         }),
       });
 
+      let duelTurnsCallCount = 0;
       mockFrom.mockImplementation((table: string) => {
         if (table === 'student_duels') {
           return {
@@ -389,7 +475,26 @@ describe('Duel Gameplay Handlers', () => {
           };
         }
         if (table === 'duel_turns') {
-          return { insert: turnInsertMock };
+          duelTurnsCallCount++;
+          if (duelTurnsCallCount === 1) {
+            return {
+              select: vi.fn().mockReturnValue({
+                eq: vi.fn().mockReturnValue({
+                  eq: vi.fn().mockReturnValue({
+                    maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null }),
+                  }),
+                }),
+              }),
+            };
+          }
+          if (duelTurnsCallCount === 2) {
+            return { insert: turnInsertMock };
+          }
+          return {
+            select: vi.fn().mockReturnValue({
+              eq: vi.fn().mockResolvedValue({ count: 1, error: null }),
+            }),
+          };
         }
         return {};
       });
@@ -503,7 +608,19 @@ describe('Duel Gameplay Handlers', () => {
         if (table === 'duel_turns') {
           duelTurnsCallCount++;
           if (duelTurnsCallCount === 1) {
-            // First call: insert turn
+            // First call: duplicate-turn pre-check
+            return {
+              select: vi.fn().mockReturnValue({
+                eq: vi.fn().mockReturnValue({
+                  eq: vi.fn().mockReturnValue({
+                    maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null }),
+                  }),
+                }),
+              }),
+            };
+          }
+          if (duelTurnsCallCount === 2) {
+            // Second call: insert turn
             return {
               insert: vi.fn().mockReturnValue({
                 select: vi.fn().mockReturnValue({
@@ -514,17 +631,16 @@ describe('Duel Gameplay Handlers', () => {
                 }),
               }),
             };
-          } else {
-            // Second call: count query (check if both players submitted)
-            return {
-              select: vi.fn().mockReturnValue({
-                eq: vi.fn().mockResolvedValue({
-                  count: 2,
-                  error: null,
-                }),
-              }),
-            };
           }
+          // Third call: count query (check if both players submitted)
+          return {
+            select: vi.fn().mockReturnValue({
+              eq: vi.fn().mockResolvedValue({
+                count: 2,
+                error: null,
+              }),
+            }),
+          };
         }
         return {};
       });

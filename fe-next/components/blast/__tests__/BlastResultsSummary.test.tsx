@@ -181,6 +181,71 @@ describe('BlastResultsSummary', () => {
     expect(sad.src).toContain('mascot-new-oops');
   });
 
+  it('shows fail banner + hides stars when clearPercentage < 90', () => {
+    render(
+      <BlastResultsSummary
+        results={makeResults({ clearPercentage: 75, stars: 1 })}
+        t={t}
+        onPlayAgain={noop}
+        onQuit={noop}
+      />,
+    );
+    const banner = screen.getByTestId('blast-results-fail-banner');
+    expect(banner).toBeDefined();
+    // Interpolated copy carries both required (90) and actual (75) percents.
+    expect(banner.textContent).toContain('90');
+    expect(banner.textContent).toContain('75');
+    expect(banner.textContent).toContain('blast.results.failHint');
+    // Stars row suppressed on fail; star-label key should not render.
+    expect(screen.queryByText('blast.stars1')).toBeNull();
+    // Header flips to fail copy.
+    expect(screen.getByText('blast.results.waveFailed')).toBeDefined();
+  });
+
+  it('hides fail banner and shows stars when clearPercentage >= 90', () => {
+    render(
+      <BlastResultsSummary
+        results={makeResults({ clearPercentage: 95, stars: 3 })}
+        t={t}
+        onPlayAgain={noop}
+        onQuit={noop}
+      />,
+    );
+    expect(screen.queryByTestId('blast-results-fail-banner')).toBeNull();
+    expect(screen.getByText('blast.stars3')).toBeDefined();
+    expect(screen.queryByText('blast.results.waveFailed')).toBeNull();
+  });
+
+  it('renders sticky CTA footer containing play-again + home', () => {
+    render(
+      <BlastResultsSummary
+        results={makeResults()}
+        t={t}
+        onPlayAgain={noop}
+        onQuit={noop}
+      />,
+    );
+    const footer = screen.getByTestId('blast-results-cta-footer');
+    expect(footer).toBeDefined();
+    // Footer is the actual parent of the CTAs (not just the document).
+    expect(footer.contains(screen.getByTestId('play-again-button'))).toBe(true);
+    expect(footer.contains(screen.getByText('common.home'))).toBe(true);
+  });
+
+  it('uses tryAgain copy on play-again button when wave failed', () => {
+    render(
+      <BlastResultsSummary
+        results={makeResults({ clearPercentage: 50 })}
+        t={t}
+        onPlayAgain={noop}
+        onQuit={noop}
+      />,
+    );
+    const btn = screen.getByTestId('play-again-button');
+    expect(btn.textContent).toContain('blast.results.tryAgain');
+    expect(btn.textContent).not.toContain('blast.playAgain');
+  });
+
   it('invokes callbacks for play-again and quit', () => {
     const onPlayAgain = vi.fn();
     const onQuit = vi.fn();

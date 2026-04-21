@@ -14,7 +14,7 @@
 import type { Namespace } from 'socket.io';
 import { z } from 'zod';
 import type { DuelSocket } from './types';
-import { getPendingDuelsForStudent } from '@/lib/supabase/education/duels';
+import { getPendingDuelsForStudent, type DuelRow } from '@/lib/supabase/education/duels';
 import { getSupabaseAdmin } from '@/lib/admin/server';
 import logger from '@/backend/utils/logger';
 import { checkRateLimit } from '../../utils/rateLimiter';
@@ -31,7 +31,7 @@ interface OpponentInfo {
 
 interface LobbyState {
   availableOpponents: OpponentInfo[];
-  pendingChallenges?: unknown[]; // Will populate when pending duels function is ready
+  pendingChallenges?: DuelRow[];
 }
 
 // ==========================================

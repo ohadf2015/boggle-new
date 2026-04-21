@@ -8,6 +8,7 @@
  * the push becomes visible regardless of app state.
  */
 
+import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { setupPushListeners } from '../tokenRegistration';
 
 vi.mock('../../platform', () => ({

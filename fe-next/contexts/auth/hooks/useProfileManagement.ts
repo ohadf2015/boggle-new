@@ -26,6 +26,7 @@ import { getRandomAvatarConfig } from '@/shared/types/customAvatar';
 import { captureBackgroundError } from '@/utils/sentry';
 import logger from '@/utils/logger';
 import { fetchGeolocation, fetchRandomPlayerName, extractOAuthDisplayName } from '../authUtils';
+import { getOnboardingData } from '@/utils/onboardingStorage';
 import type { ProfileData, AuthStateSetters } from '../authTypes';
 
 interface UseProfileManagementParams {
@@ -114,22 +115,29 @@ async function createNewProfile(
 ): Promise<void> {
   logger.info('Profile not found, creating minimal profile for user:', userId);
 
+  // FTUE-captured data (if user completed onboarding before signing up) wins
+  // over OAuth/random — this preserves the name/avatar they already picked.
+  const onboardingData = getOnboardingData();
+  const ftueName = onboardingData?.displayName?.trim();
+  const ftueAvatarId = onboardingData?.avatarId;
+
   // Extract name from OAuth provider (Google, Discord, Apple)
   const oauthName = extractOAuthDisplayName(userMetadata);
 
   // Username is a non-user-facing unique slug derived from UUID (guaranteed unique).
-  // display_name is the human-visible name from OAuth or a fun random name.
+  // display_name is the human-visible name from FTUE, OAuth, or a fun random name.
   const username = `user_${userId.replace(/-/g, '').slice(0, 12)}`;
   let displayName: string;
 
-  // Always assign a random character avatar for new users as fallback
-  const randomAvatar = getRandomAvatar();
-  const finalAvatarImage = randomAvatar.id;
+  // Prefer FTUE avatar if present, else random character avatar.
+  const finalAvatarImage = ftueAvatarId || getRandomAvatar().id;
 
-  if (oauthName) {
+  if (ftueName) {
+    displayName = ftueName;
+  } else if (oauthName) {
     displayName = oauthName;
   } else {
-    // No OAuth display name - generate a fun random name
+    // No FTUE/OAuth display name - generate a fun random name
     const randomData = await fetchRandomPlayerName();
     displayName = randomData.name;
   }
@@ -147,7 +155,7 @@ async function createNewProfile(
     avatar_color: avatarColor,
     avatar_image: finalAvatarImage,
     avatar_config: randomCustomAvatar,
-    has_customized_profile: false, // Will prompt user to customize after sign-in
+    has_customized_profile: Boolean(ftueName), // FTUE pick counts as customized; else prompt after sign-in
   });
 
   if (createError) {

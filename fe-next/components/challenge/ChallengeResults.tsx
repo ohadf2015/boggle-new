@@ -15,7 +15,6 @@ import ResultsWinnerBanner from '@/components/results/ResultsWinnerBanner';
 import type { SinglePlayerResultsData } from '@/components/singleplayer/SinglePlayerView';
 
 const CrazyGamesBanner = dynamic(() => import('@/components/CrazyGamesBanner'), { ssr: false });
-const NativeBannerAd = dynamic(() => import('@/components/ads/NativeBannerAd'), { ssr: false });
 
 interface ChallengeResultsProps {
   results: SinglePlayerResultsData;
@@ -245,7 +244,6 @@ const ChallengeResults: React.FC<ChallengeResultsProps> = ({
           <div className="md:hidden">
             <CrazyGamesBanner size="320x50" />
           </div>
-          <NativeBannerAd />
         </motion.div>
       </motion.div>
     </div>

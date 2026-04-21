@@ -13,6 +13,13 @@ import { useDuelSocket } from '../useDuelSocket';
 // Mock socket.io-client
 vi.mock('socket.io-client');
 
+// Mock @/lib/supabase so auth callback can resolve a JWT
+vi.mock('@/lib/supabase', () => ({
+  getSession: vi.fn().mockResolvedValue({
+    data: { session: { access_token: 'test-jwt-token' } },
+  }),
+}));
+
 describe('useDuelSocket', () => {
   let mockSocket: any;
   let mockIo: ReturnType<typeof vi.fn>;
@@ -47,6 +54,21 @@ describe('useDuelSocket', () => {
       expect(mockIo).toHaveBeenCalledWith(
         expect.stringContaining('/duel'),
         expect.any(Object)
+      );
+    });
+
+    it('should pass a Supabase JWT in the auth handshake', async () => {
+      renderHook(() => useDuelSocket());
+
+      const opts = mockIo.mock.calls[0][1] as { auth: unknown };
+      expect(typeof opts.auth).toBe('function');
+
+      const cb = vi.fn();
+      (opts.auth as (cb: (p: unknown) => void) => void)(cb);
+      await waitFor(() => expect(cb).toHaveBeenCalled());
+
+      expect(cb).toHaveBeenCalledWith(
+        expect.objectContaining({ token: 'test-jwt-token' })
       );
     });
 

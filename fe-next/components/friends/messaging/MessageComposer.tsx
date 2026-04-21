@@ -126,7 +126,9 @@ export const MessageComposer: React.FC<MessageComposerProps> = ({
    * Handle Enter key (Shift+Enter for newline)
    */
   const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    // Skip during IME composition (Hebrew/Japanese/Chinese) — Enter commits the
+    // composition, not the message. keyCode 229 is the legacy IME indicator.
+    if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) {
       e.preventDefault();
       handleSend();
     }

@@ -27,6 +27,7 @@ export function loadCategoryPreferences(): NotificationCategoryPreferences {
     if (stored) {
       const parsed = JSON.parse(stored);
       return {
+        pushEnabled: parsed.pushEnabled ?? DEFAULT_CATEGORY_PREFERENCES.pushEnabled,
         dailyChallenge: parsed.dailyChallenge ?? DEFAULT_CATEGORY_PREFERENCES.dailyChallenge,
         streakWarning: parsed.streakWarning ?? DEFAULT_CATEGORY_PREFERENCES.streakWarning,
         friendInvites: parsed.friendInvites ?? DEFAULT_CATEGORY_PREFERENCES.friendInvites,

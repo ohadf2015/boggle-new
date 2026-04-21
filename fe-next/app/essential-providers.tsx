@@ -23,6 +23,7 @@ import ErrorBoundary from './components/ErrorBoundary';
 import { QueryProvider } from '@/components/providers/QueryProvider';
 import { QueryErrorResetBoundary } from '@tanstack/react-query';
 import { AdMobProvider } from '@/contexts/AdMobContext';
+import AnchoredNativeBanner from '@/components/ads/AnchoredNativeBanner';
 import { initUtmCapture } from '@/utils/utmCapture';
 import { initConsoleOverride, initCapacitorLogFilter } from '@/utils/consoleOverride';
 import { initSessionTracking } from '@/utils/sessionTracking';
@@ -182,6 +183,7 @@ export function EssentialProviders({ children, lang, initialTranslations }: Esse
                                             <AdMobProvider>
                                             <NavigationProvider>
                                                 {memoizedChildren}
+                                                <AnchoredNativeBanner />
                                             </NavigationProvider>
                                             </AdMobProvider>
                                         </HapticsProvider>

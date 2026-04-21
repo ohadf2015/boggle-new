@@ -70,11 +70,11 @@ const ReturningUserStep: React.FC<ReturningUserStepProps> = ({
           <motion.div
             animate={{ rotate: [0, -3, 3, 0] }}
             transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-            className="relative w-32 h-32 rounded-full bg-neo-lime border-neo-thick border-black shadow-hard-lg flex items-center justify-center overflow-hidden"
+            className="relative w-32 h-32 shrink-0 rounded-full bg-neo-lime border-neo-thick border-black shadow-hard-lg flex items-center justify-center overflow-hidden"
           >
             {/* eslint-disable-next-line @next/next/no-img-element -- animated GIF, next/image doesn't animate */}
             <img
-              src="/mascot/v1/spectating-nobg.gif"
+              src="/mascot/spectating.gif"
               alt={t('onboarding.returningUser.title')}
               className="w-28 h-28 object-contain"
               draggable={false}
@@ -108,7 +108,7 @@ const ReturningUserStep: React.FC<ReturningUserStepProps> = ({
 
         <motion.p
           variants={itemVariants}
-          className="font-neo-body text-neo-cream/75 text-base sm:text-lg max-w-[22rem] leading-relaxed"
+          className="font-neo-body font-medium text-neo-cream text-base sm:text-lg max-w-[22rem] leading-relaxed"
         >
           {t('onboarding.returningUser.subtitle')}
         </motion.p>

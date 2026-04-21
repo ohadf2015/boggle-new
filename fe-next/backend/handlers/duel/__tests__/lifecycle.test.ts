@@ -591,4 +591,100 @@ describe('Duel Lifecycle Handlers', () => {
       }));
     });
   });
+
+  describe('duel:rematch handler', () => {
+    const VALID_OPPONENT = '550e8400-e29b-41d4-a716-446655440099';
+    const VALID_LESSON = '550e8400-e29b-41d4-a716-446655440001';
+
+    // Build a per-test `from` dispatcher: lesson lookup, prior-duel `or/maybeSingle`,
+    // then insert/select/single for the new row.
+    const installRematchMocks = (priorDuel: { classroom_id: string | null; duel_type: string } | null) => {
+      const lessonSingle = vi.fn().mockResolvedValue({ data: { language: 'en' }, error: null });
+      const lessonEq = vi.fn(() => ({ single: lessonSingle }));
+      const lessonSelect = vi.fn(() => ({ eq: lessonEq }));
+
+      const maybeSingle = vi.fn().mockResolvedValue({ data: priorDuel, error: null });
+      const limit = vi.fn(() => ({ maybeSingle }));
+      const order = vi.fn(() => ({ limit }));
+      const or = vi.fn(() => ({ order }));
+      const duelEq = vi.fn(() => ({ or }));
+      const duelSelect = vi.fn(() => ({ eq: duelEq }));
+
+      const insertSingle = vi.fn().mockResolvedValue({
+        data: { id: 'rematch-duel-1', classroom_id: priorDuel?.classroom_id ?? null },
+        error: null,
+      });
+      const insertSelect = vi.fn(() => ({ single: insertSingle }));
+      const insertFn = vi.fn(() => ({ select: insertSelect }));
+
+      let duelCallCount = 0;
+      mockSupabaseFrom.mockImplementation((table: string) => {
+        if (table === 'vocabulary_lessons') return { select: lessonSelect };
+        if (table === 'student_duels') {
+          duelCallCount += 1;
+          return duelCallCount === 1
+            ? { select: duelSelect }
+            : { insert: insertFn };
+        }
+        return {};
+      });
+
+      return { insertFn, or };
+    };
+
+    test('should reject payload with invalid opponent UUID', async () => {
+      await socketHandlers['duel:rematch']({ opponentId: 'not-a-uuid', lessonId: VALID_LESSON });
+
+      expect(mockSocket.emit).toHaveBeenCalledWith('duel:error', expect.objectContaining({
+        message: expect.stringContaining('Invalid opponent ID'),
+      }));
+    });
+
+    test('should inherit classroom_id and duel_type from prior duel', async () => {
+      const { insertFn, or } = installRematchMocks({
+        classroom_id: '550e8400-e29b-41d4-a716-446655440002',
+        duel_type: 'async',
+      });
+
+      await socketHandlers['duel:rematch']({ opponentId: VALID_OPPONENT, lessonId: VALID_LESSON });
+
+      // Bidirectional filter covers both player orderings
+      expect(or).toHaveBeenCalledWith(expect.stringContaining(`challenger_id.eq.user-123,opponent_id.eq.${VALID_OPPONENT}`));
+      expect(or).toHaveBeenCalledWith(expect.stringContaining(`challenger_id.eq.${VALID_OPPONENT},opponent_id.eq.user-123`));
+
+      expect(insertFn).toHaveBeenCalledWith(expect.objectContaining({
+        challenger_id: 'user-123',
+        opponent_id: VALID_OPPONENT,
+        lesson_id: VALID_LESSON,
+        classroom_id: '550e8400-e29b-41d4-a716-446655440002',
+        duel_type: 'async',
+        status: 'pending',
+      }));
+    });
+
+    test('should default to realtime duel_type when no prior duel exists', async () => {
+      const { insertFn } = installRematchMocks(null);
+
+      await socketHandlers['duel:rematch']({ opponentId: VALID_OPPONENT, lessonId: VALID_LESSON });
+
+      expect(insertFn).toHaveBeenCalledWith(expect.objectContaining({
+        duel_type: 'realtime',
+        classroom_id: null,
+      }));
+    });
+
+    test('should emit duel:created to requester and isRematch challenge to opponent', async () => {
+      installRematchMocks({ classroom_id: null, duel_type: 'realtime' });
+
+      await socketHandlers['duel:rematch']({ opponentId: VALID_OPPONENT, lessonId: VALID_LESSON });
+
+      expect(mockSocket.emit).toHaveBeenCalledWith('duel:created', expect.objectContaining({
+        duelId: 'rematch-duel-1',
+      }));
+      expect(opponentSocket.emit).toHaveBeenCalledWith('duel:challenge-received', expect.objectContaining({
+        duelId: 'rematch-duel-1',
+        isRematch: true,
+      }));
+    });
+  });
 });

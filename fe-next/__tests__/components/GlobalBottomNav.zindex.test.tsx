@@ -72,6 +72,7 @@ vi.mock('@/hooks/useFriends', () => ({
     friends: [],
     onlineFriends: [],
     pendingRequests: [],
+    pendingChallenges: [],
     loading: false,
   }),
 }));

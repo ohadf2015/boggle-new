@@ -27,6 +27,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { useAuth } from '@/contexts/AuthContext';
+import { getSession } from '@/lib/supabase';
 import type {
   UseDuelSocketReturn,
   ChallengeReceivedData,
@@ -75,7 +76,27 @@ export function useDuelSocket(options?: UseDuelSocketOptions): UseDuelSocketRetu
   const [isConnected, setIsConnected] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>('disconnected');
   const socketRef = useRef<Socket | null>(null);
-  const listenersRef = useRef<Map<string, Function>>(new Map());
+  const listenersRef = useRef<Map<string, Set<Function>>>(new Map());
+
+  const registerListener = useCallback((event: string, cb: Function) => {
+    const socket = socketRef.current;
+    if (!socket) return () => {};
+    socket.on(event, cb as any);
+    let set = listenersRef.current.get(event);
+    if (!set) {
+      set = new Set();
+      listenersRef.current.set(event, set);
+    }
+    set.add(cb);
+    return () => {
+      socket.off(event, cb as any);
+      const s = listenersRef.current.get(event);
+      if (s) {
+        s.delete(cb);
+        if (s.size === 0) listenersRef.current.delete(event);
+      }
+    };
+  }, []);
   const wasConnectedRef = useRef(false);
   const { user, profile } = useAuth();
 
@@ -104,9 +125,18 @@ export function useDuelSocket(options?: UseDuelSocketOptions): UseDuelSocketRetu
       reconnection: true,
       reconnectionDelay: 1000,
       reconnectionAttempts: 5,
-      auth: {
-        userId: user?.id || '',
-        displayName,
+      auth: (cb: (payload: Record<string, string>) => void) => {
+        getSession()
+          .then(({ data }) => {
+            cb({
+              token: data.session?.access_token ?? '',
+              userId: user?.id || '',
+              displayName,
+            });
+          })
+          .catch(() => {
+            cb({ token: '', userId: user?.id || '', displayName });
+          });
       },
     });
 
@@ -153,8 +183,8 @@ export function useDuelSocket(options?: UseDuelSocketOptions): UseDuelSocketRetu
       const listeners = listenersRef.current;
 
       // Remove all registered listeners
-      listeners.forEach((handler, event) => {
-        socket.off(event, handler as any);
+      listeners.forEach((handlers, event) => {
+        handlers.forEach((handler) => socket.off(event, handler as any));
       });
       listeners.clear();
 
@@ -223,212 +253,61 @@ export function useDuelSocket(options?: UseDuelSocketOptions): UseDuelSocketRetu
   // ==========================================
 
   const onChallengeReceived = useCallback(
-    (cb: (data: ChallengeReceivedData) => void) => {
-      const event = 'duel:challenge-received';
-      const socket = socketRef.current;
-      if (!socket) return () => {};
-
-      socket.on(event, cb);
-      listenersRef.current.set(event, cb);
-
-      return () => {
-        socket.off(event, cb);
-        listenersRef.current.delete(event);
-      };
-    },
-    []
+    (cb: (data: ChallengeReceivedData) => void) => registerListener('duel:challenge-received', cb),
+    [registerListener]
   );
-
-  const onLobbyUpdate = useCallback((cb: (data: LobbyUpdateData) => void) => {
-    const event = 'duel:lobby-update';
-    const socket = socketRef.current;
-    if (!socket) return () => {};
-
-    socket.on(event, cb);
-    listenersRef.current.set(event, cb);
-
-    return () => {
-      socket.off(event, cb);
-      listenersRef.current.delete(event);
-    };
-  }, []);
-
-  const onDuelAccepted = useCallback((cb: (data: DuelAcceptedData) => void) => {
-    const event = 'duel:accepted';
-    const socket = socketRef.current;
-    if (!socket) return () => {};
-
-    socket.on(event, cb);
-    listenersRef.current.set(event, cb);
-
-    return () => {
-      socket.off(event, cb);
-      listenersRef.current.delete(event);
-    };
-  }, []);
-
+  const onLobbyUpdate = useCallback(
+    (cb: (data: LobbyUpdateData) => void) => registerListener('duel:lobby-update', cb),
+    [registerListener]
+  );
+  const onDuelAccepted = useCallback(
+    (cb: (data: DuelAcceptedData) => void) => registerListener('duel:accepted', cb),
+    [registerListener]
+  );
   const onDuelDeclined = useCallback(
-    (cb: (data: { duelId: string }) => void) => {
-      const event = 'duel:declined';
-      const socket = socketRef.current;
-      if (!socket) return () => {};
-
-      socket.on(event, cb);
-      listenersRef.current.set(event, cb);
-
-      return () => {
-        socket.off(event, cb);
-        listenersRef.current.delete(event);
-      };
-    },
-    []
+    (cb: (data: { duelId: string }) => void) => registerListener('duel:declined', cb),
+    [registerListener]
   );
-
   const onDuelCompleted = useCallback(
-    (cb: (data: DuelCompletedData) => void) => {
-      const event = 'duel:completed';
-      const socket = socketRef.current;
-      if (!socket) return () => {};
-
-      socket.on(event, cb);
-      listenersRef.current.set(event, cb);
-
-      return () => {
-        socket.off(event, cb);
-        listenersRef.current.delete(event);
-      };
-    },
-    []
+    (cb: (data: DuelCompletedData) => void) => registerListener('duel:completed', cb),
+    [registerListener]
   );
-
   const onScoreSubmitted = useCallback(
-    (cb: (data: ScoreSubmittedData) => void) => {
-      const event = 'duel:score-submitted';
-      const socket = socketRef.current;
-      if (!socket) return () => {};
-
-      socket.on(event, cb);
-      listenersRef.current.set(event, cb);
-
-      return () => {
-        socket.off(event, cb);
-        listenersRef.current.delete(event);
-      };
-    },
-    []
+    (cb: (data: ScoreSubmittedData) => void) => registerListener('duel:score-submitted', cb),
+    [registerListener]
   );
-
-  const onError = useCallback((cb: (data: { message: string }) => void) => {
-    const event = 'duel:error';
-    const socket = socketRef.current;
-    if (!socket) return () => {};
-
-    socket.on(event, cb);
-    listenersRef.current.set(event, cb);
-
-    return () => {
-      socket.off(event, cb);
-      listenersRef.current.delete(event);
-    };
-  }, []);
-
-  const onDuelStarted = useCallback((cb: (data: DuelStartedData) => void) => {
-    const event = 'duel:started';
-    const socket = socketRef.current;
-    if (!socket) return () => {};
-
-    socket.on(event, cb);
-    listenersRef.current.set(event, cb);
-
-    return () => {
-      socket.off(event, cb);
-      listenersRef.current.delete(event);
-    };
-  }, []);
-
-  const onWordAccepted = useCallback((cb: (data: WordAcceptedData) => void) => {
-    const event = 'duel:word-accepted';
-    const socket = socketRef.current;
-    if (!socket) return () => {};
-
-    socket.on(event, cb);
-    listenersRef.current.set(event, cb);
-
-    return () => {
-      socket.off(event, cb);
-      listenersRef.current.delete(event);
-    };
-  }, []);
-
-  const onWordRejected = useCallback((cb: (data: WordRejectedData) => void) => {
-    const event = 'duel:word-rejected';
-    const socket = socketRef.current;
-    if (!socket) return () => {};
-
-    socket.on(event, cb);
-    listenersRef.current.set(event, cb);
-
-    return () => {
-      socket.off(event, cb);
-      listenersRef.current.delete(event);
-    };
-  }, []);
-
-  const onOpponentProgress = useCallback((cb: (data: OpponentProgressData) => void) => {
-    const event = 'duel:opponent-progress';
-    const socket = socketRef.current;
-    if (!socket) return () => {};
-
-    socket.on(event, cb);
-    listenersRef.current.set(event, cb);
-
-    return () => {
-      socket.off(event, cb);
-      listenersRef.current.delete(event);
-    };
-  }, []);
-
-  const onOpponentDisconnected = useCallback((cb: (data: OpponentDisconnectedData) => void) => {
-    const event = 'duel:opponent-disconnected';
-    const socket = socketRef.current;
-    if (!socket) return () => {};
-
-    socket.on(event, cb);
-    listenersRef.current.set(event, cb);
-
-    return () => {
-      socket.off(event, cb);
-      listenersRef.current.delete(event);
-    };
-  }, []);
-
-  const onOpponentReconnected = useCallback((cb: (data: OpponentReconnectedData) => void) => {
-    const event = 'duel:opponent-reconnected';
-    const socket = socketRef.current;
-    if (!socket) return () => {};
-
-    socket.on(event, cb);
-    listenersRef.current.set(event, cb);
-
-    return () => {
-      socket.off(event, cb);
-      listenersRef.current.delete(event);
-    };
-  }, []);
-
-  const onStateSynced = useCallback((cb: (data: StateSyncedData) => void) => {
-    const event = 'duel:state-synced';
-    const socket = socketRef.current;
-    if (!socket) return () => {};
-
-    socket.on(event, cb);
-    listenersRef.current.set(event, cb);
-
-    return () => {
-      socket.off(event, cb);
-      listenersRef.current.delete(event);
-    };
-  }, []);
+  const onError = useCallback(
+    (cb: (data: { message: string }) => void) => registerListener('duel:error', cb),
+    [registerListener]
+  );
+  const onDuelStarted = useCallback(
+    (cb: (data: DuelStartedData) => void) => registerListener('duel:started', cb),
+    [registerListener]
+  );
+  const onWordAccepted = useCallback(
+    (cb: (data: WordAcceptedData) => void) => registerListener('duel:word-accepted', cb),
+    [registerListener]
+  );
+  const onWordRejected = useCallback(
+    (cb: (data: WordRejectedData) => void) => registerListener('duel:word-rejected', cb),
+    [registerListener]
+  );
+  const onOpponentProgress = useCallback(
+    (cb: (data: OpponentProgressData) => void) => registerListener('duel:opponent-progress', cb),
+    [registerListener]
+  );
+  const onOpponentDisconnected = useCallback(
+    (cb: (data: OpponentDisconnectedData) => void) => registerListener('duel:opponent-disconnected', cb),
+    [registerListener]
+  );
+  const onOpponentReconnected = useCallback(
+    (cb: (data: OpponentReconnectedData) => void) => registerListener('duel:opponent-reconnected', cb),
+    [registerListener]
+  );
+  const onStateSynced = useCallback(
+    (cb: (data: StateSyncedData) => void) => registerListener('duel:state-synced', cb),
+    [registerListener]
+  );
 
   // ==========================================
   // Return API

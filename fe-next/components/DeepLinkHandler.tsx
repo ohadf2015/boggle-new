@@ -2,10 +2,12 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
 import logger from '@/utils/logger';
 import { defaultLocale, locales } from '@/lib/i18n';
 import { isNative } from '@/utils/platform';
 import { setupPushListeners } from '@/utils/pushNotifications/tokenRegistration';
+import { handlePushData } from '@/utils/pushNotifications/handlePushData';
 
 /**
  * DeepLinkHandler Component
@@ -15,6 +17,7 @@ import { setupPushListeners } from '@/utils/pushNotifications/tokenRegistration'
  */
 export default function DeepLinkHandler() {
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     if (typeof window === 'undefined' || !isNative()) return;
@@ -124,8 +127,11 @@ export default function DeepLinkHandler() {
     async function initPush() {
       try {
         pushCleanup = await setupPushListeners(
-          undefined,
           (data) => {
+            handlePushData(queryClient, data);
+          },
+          (data) => {
+            handlePushData(queryClient, data);
             const deepLink = data.deepLink;
             if (deepLink) {
               const validLocale = (typeof window !== 'undefined' && locales.find((l) => window.location.pathname.startsWith(`/${l}`))) || defaultLocale;
@@ -147,7 +153,7 @@ export default function DeepLinkHandler() {
       cleanup?.();
       pushCleanup?.();
     };
-  }, [router]);
+  }, [router, queryClient]);
 
   return null;
 }

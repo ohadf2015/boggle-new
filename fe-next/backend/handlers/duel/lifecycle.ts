@@ -16,6 +16,8 @@ import {
   acceptDuelSchema,
   declineDuelSchema,
   cancelDuelSchema,
+  rematchDuelSchema,
+  type RematchDuelPayload,
   VALID_TRANSITIONS,
 } from './types';
 import { generateRandomTable } from '@/backend/utils/gameUtils';
@@ -449,6 +451,121 @@ export function registerLifecycleHandlers(
       socket.emit('duel:error', {
         message: 'Internal server error',
       });
+    }
+  });
+
+  // ==========================================
+  // duel:rematch - Create a rematch between the same two players
+  // Requester becomes the new challenger. classroom_id + duel_type inherited
+  // from the most recent completed/declined duel between the two users on this lesson.
+  // ==========================================
+  socket.on('duel:rematch', async (data: unknown) => {
+    if (!checkRateLimit(socket.id)) {
+      socket.emit('duel:error', { error: 'Rate limited' });
+      return;
+    }
+    try {
+      const validation = rematchDuelSchema.safeParse(data);
+      if (!validation.success) {
+        socket.emit('duel:error', {
+          message: validation.error.issues[0]?.message || 'Invalid payload',
+        });
+        return;
+      }
+
+      const payload: RematchDuelPayload = validation.data;
+      const userId = socket.data.userId;
+      const displayName = socket.data.displayName;
+
+      const supabase = getSupabase();
+      if (!supabase) {
+        socket.emit('duel:error', { message: 'Database not available' });
+        logger.error('DUEL', 'Supabase client not initialized');
+        return;
+      }
+
+      // Fetch lesson language for fresh board
+      const { data: lesson, error: lessonError } = await supabase
+        .from('vocabulary_lessons')
+        .select('language')
+        .eq('id', payload.lessonId)
+        .single();
+
+      if (lessonError || !lesson) {
+        socket.emit('duel:error', { message: 'Lesson not found' });
+        return;
+      }
+
+      // Inherit classroom_id + duel_type from prior duel between these users on this lesson.
+      // Default to 'realtime' since rematch is triggered from realtime completion UI.
+      const { data: priorDuel } = await supabase
+        .from('student_duels')
+        .select('classroom_id, duel_type')
+        .eq('lesson_id', payload.lessonId)
+        .or(
+          `and(challenger_id.eq.${userId},opponent_id.eq.${payload.opponentId}),and(challenger_id.eq.${payload.opponentId},opponent_id.eq.${userId})`
+        )
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      const classroomId = priorDuel?.classroom_id ?? null;
+      const duelType = priorDuel?.duel_type ?? 'realtime';
+
+      // Fresh board for rematch
+      const boardState = generateRandomTable(4, 4, lesson.language);
+
+      const expiresAt = new Date();
+      expiresAt.setHours(expiresAt.getHours() + 24);
+
+      const { data: duel, error: insertError } = await supabase
+        .from('student_duels')
+        .insert({
+          challenger_id: userId,
+          opponent_id: payload.opponentId,
+          lesson_id: payload.lessonId,
+          classroom_id: classroomId,
+          duel_type: duelType,
+          status: 'pending',
+          board_state: boardState,
+          expires_at: expiresAt.toISOString(),
+        })
+        .select()
+        .single();
+
+      if (insertError || !duel) {
+        socket.emit('duel:error', { message: 'Failed to create rematch' });
+        logger.error('DUEL', `Failed to create rematch: ${insertError?.message}`);
+        return;
+      }
+
+      socket.emit('duel:created', { duelId: duel.id });
+
+      const opponentSocket = Array.from(namespace.sockets.values()).find(
+        (s) => (s as DuelSocket).data.userId === payload.opponentId
+      );
+
+      if (opponentSocket) {
+        opponentSocket.emit('duel:challenge-received', {
+          duelId: duel.id,
+          challengerName: displayName,
+          lessonId: payload.lessonId,
+          duelType,
+          isRematch: true,
+        });
+      }
+
+      if (classroomId) {
+        namespace.to(`duel:lobby:${classroomId}`).emit('duel:lobby-update', {
+          action: 'challenge-created',
+          duelId: duel.id,
+        });
+      }
+
+      logger.info('DUEL', `Rematch created: ${duel.id} by ${userId}`);
+    } catch (error) {
+      logger.error('DUEL', `Error in duel:rematch: ${(error as Error).message}`);
+      socket.emit('duel:error', { message: 'Internal server error' });
     }
   });
 }

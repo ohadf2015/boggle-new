@@ -140,6 +140,8 @@ export function PracticeSessionProvider({
   const [morningPractices, setMorningPractices] = useState<number>(0);
   const modesTriedRef = useRef<Set<string>>(new Set());
   const [, setModesTriedCount] = useState<number>(1);
+  const completedLessonsRef = useRef<Set<string>>(new Set());
+  const [, setCompletedLessonsCount] = useState<number>(0);
   const uniqueWordsRef = useRef<Set<string>>(new Set());
   const [, setUniqueWordsCount] = useState<number>(0);
   const [practiceDaysThisMonth, setPracticeDaysThisMonth] = useState<number>(0);
@@ -152,6 +154,13 @@ export function PracticeSessionProvider({
 
       const storedMorning = localStorage.getItem(`edu_morning_practices_${studentId}`);
       if (storedMorning) setMorningPractices(parseInt(storedMorning, 10) || 0);
+
+      const storedLessons = localStorage.getItem(`education_completed_lessons_${studentId}`);
+      if (storedLessons) {
+        const parsed: string[] = JSON.parse(storedLessons);
+        completedLessonsRef.current = new Set(parsed);
+        setCompletedLessonsCount(completedLessonsRef.current.size);
+      }
 
       const storedModes = localStorage.getItem(`education_modes_tried_${studentId}`);
       if (storedModes) {
@@ -263,6 +272,14 @@ export function PracticeSessionProvider({
           try { localStorage.setItem(`edu_morning_practices_${studentId}`, String(newMorningPractices)); } catch { /* noop */ }
         }
 
+        // completedLessons: track unique lesson IDs finished (only on lesson_completion)
+        if (sessionData.type === 'lesson_completion') {
+          completedLessonsRef.current.add(lessonId);
+          try { localStorage.setItem(`education_completed_lessons_${studentId}`, JSON.stringify([...completedLessonsRef.current])); } catch { /* noop */ }
+        }
+        const newCompletedLessonsCount = completedLessonsRef.current.size;
+        setCompletedLessonsCount(newCompletedLessonsCount);
+
         // modesTried: track unique practice mode types
         modesTriedRef.current.add(sessionData.type);
         const newModesTriedCount = modesTriedRef.current.size;
@@ -302,7 +319,7 @@ export function PracticeSessionProvider({
           currentLevel: result.newLevel || currentLevel,
           currentStreak: streak.currentStreak,
           practiceSessions: newSessionCount,
-          lessonsCompleted: newSessionCount,
+          lessonsCompleted: newCompletedLessonsCount,
           wordsInGame,
           perfectGames: newPerfectGames,
           bossesDefeated: 0,
@@ -312,7 +329,7 @@ export function PracticeSessionProvider({
           weeksWith5Days: 0,
           longestStreak: streak.longestStreak || 0,
           modesTried: newModesTriedCount,
-          lessonsCollected: newModesTriedCount,
+          lessonsCollected: newCompletedLessonsCount,
           classroomsJoined: 0,
           uniqueWords: newUniqueWordsCount,
         });
@@ -334,6 +351,7 @@ export function PracticeSessionProvider({
       morningPractices,
       practiceDaysThisMonth,
       studentId,
+      lessonId,
     ]
   );
 
