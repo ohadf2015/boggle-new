@@ -27,6 +27,8 @@ export interface RankedParticipant {
   rd?: number;
   /** Number of ranked games played */
   gamesPlayed?: number;
+  /** Cumulative wins before this game (used to increment wins column) */
+  priorWins?: number;
 }
 
 /**
@@ -91,7 +93,7 @@ export async function updateRankedMmr(participants: RankedParticipant[]): Promis
             rating: newRating.rating,
             rating_deviation: newRating.rd,
             games_played: newRating.gamesPlayed,
-            wins: isWin ? (p.gamesPlayed || 0) + 1 : undefined,
+            wins: isWin ? (p.priorWins ?? 0) + 1 : undefined,
             peak_rating: Math.max(newRating.rating, p.peakMmr || DEFAULT_RATING),
             last_game_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
@@ -123,7 +125,55 @@ export async function updateRankedMmr(participants: RankedParticipant[]): Promis
   }
 }
 
+export interface RankedBaseline {
+  currentMmr: number;
+  peakMmr: number;
+  rd: number;
+  gamesPlayed: number;
+  priorWins: number;
+}
+
+/**
+ * Batch-fetch existing MMR baselines for a set of player IDs (authUserIds).
+ * Returns a Map keyed by user_id. Players without a row are omitted —
+ * callers should fall back to DEFAULT_RATING / DEFAULT_RD / 0 gamesPlayed.
+ */
+export async function fetchRankedBaselines(
+  playerIds: string[]
+): Promise<Map<string, RankedBaseline>> {
+  const result = new Map<string, RankedBaseline>();
+  const client = getSupabase();
+  if (!client || playerIds.length === 0) return result;
+
+  try {
+    const { data, error } = await client
+      .from('player_ratings')
+      .select('user_id, rating, rating_deviation, games_played, peak_rating, wins')
+      .in('user_id', playerIds);
+
+    if (error) {
+      logger.error('SUPABASE', `fetchRankedBaselines error: ${error.message}`);
+      return result;
+    }
+
+    for (const row of data || []) {
+      result.set(row.user_id as string, {
+        currentMmr: (row.rating as number) ?? DEFAULT_RATING,
+        peakMmr: (row.peak_rating as number) ?? (row.rating as number) ?? DEFAULT_RATING,
+        rd: (row.rating_deviation as number) ?? DEFAULT_RD,
+        gamesPlayed: (row.games_played as number) ?? 0,
+        priorWins: (row.wins as number) ?? 0,
+      });
+    }
+  } catch (error) {
+    logger.error('SUPABASE', 'fetchRankedBaselines threw', error);
+  }
+
+  return result;
+}
+
 // CommonJS exports for backward compatibility
 module.exports = {
   updateRankedMmr,
+  fetchRankedBaselines,
 };

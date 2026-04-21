@@ -16,7 +16,8 @@ import type { GameStats } from '@/shared/weeklyQuestTemplates';
 import { getSocketById, safeEmit } from '../../utils/socketHelpers';
 import { incrementWordApproval } from '../../redis/wordApproval';
 import { processGameEndEngagement, processAchievementEngagement } from '../../handlers/engagementHandler';
-import { updateRankedMmr, type RankedParticipant } from '../../modules/supabase/rankedMmr';
+import { updateRankedMmr, fetchRankedBaselines, type RankedParticipant } from '../../modules/supabase/rankedMmr';
+import { DEFAULT_RATING, DEFAULT_RD } from '@/shared/utils/eloRating';
 import logger from '../../utils/logger';
 import type { PlayerResult, UserData } from './types';
 
@@ -120,15 +121,42 @@ export async function recordGameResultsToSupabase(
     logger.info('SUPABASE', `Game ${gameCode} results recorded`);
 
     // Update ranked MMR if this was a ranked game
-    if (gameInfo.isRanked && scoresArray.length >= 2) {
+    // Farming guards: minimum duration + minimum max-score to prevent
+    // forfeit/rage-quit MMR boosting (start game → opponent leaves → free win).
+    const MIN_RANKED_DURATION_SEC = 60;
+    const MIN_RANKED_MAX_SCORE = 20;
+    const maxScore = scoresArray.reduce(
+      (m, p) => ((p.totalScore || 0) > m ? (p.totalScore || 0) : m),
+      0
+    );
+    const durationOk = (gameInfo.timePlayed || 0) >= MIN_RANKED_DURATION_SEC;
+    const scoreOk = maxScore >= MIN_RANKED_MAX_SCORE;
+    if (gameInfo.isRanked && scoresArray.length >= 2 && !(durationOk && scoreOk)) {
+      logger.warn(
+        'RANKED',
+        `Skipping MMR for ${gameCode}: duration=${gameInfo.timePlayed}s maxScore=${maxScore} (floor ${MIN_RANKED_DURATION_SEC}s / ${MIN_RANKED_MAX_SCORE}pts)`
+      );
+    }
+    if (gameInfo.isRanked && scoresArray.length >= 2 && durationOk && scoreOk) {
       try {
         const sortedForRanked = [...scoresArray].sort((a, b) => b.totalScore - a.totalScore);
+        const playerIds = sortedForRanked
+          .map(p => (game.users?.[p.username] as UserData | undefined)?.authUserId)
+          .filter((id): id is string => !!id);
+        const baselines = await fetchRankedBaselines(playerIds);
         const rankedParticipants: RankedParticipant[] = sortedForRanked.map((p, i) => {
           const userData = game.users?.[p.username] as UserData | undefined;
+          const playerId = userData?.authUserId || '';
+          const baseline = baselines.get(playerId);
           return {
-            playerId: userData?.authUserId || '',
+            playerId,
             placement: i + 1,
             score: p.totalScore,
+            currentMmr: baseline?.currentMmr ?? DEFAULT_RATING,
+            peakMmr: baseline?.peakMmr ?? DEFAULT_RATING,
+            rd: baseline?.rd ?? DEFAULT_RD,
+            gamesPlayed: baseline?.gamesPlayed ?? 0,
+            priorWins: baseline?.priorWins ?? 0,
           };
         }).filter(p => p.playerId);
 
