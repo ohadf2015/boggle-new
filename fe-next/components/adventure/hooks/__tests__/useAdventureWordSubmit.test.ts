@@ -131,7 +131,7 @@ describe('useAdventureWordSubmit', () => {
     expect(mockValidateWord).not.toHaveBeenCalled();
   });
 
-  it('should block submission during cascade to prevent state overlap', async () => {
+  it('should defer submission during cascade (not validate immediately)', async () => {
     mockValidateWord.mockResolvedValue({ isValid: true, score: 50 });
 
     const { result } = renderHook(() =>
@@ -142,7 +142,64 @@ describe('useAdventureWordSubmit', () => {
       await result.current.handleWordSubmit('hello', [0, 1, 2, 3, 4]);
     });
 
+    // While cascade is active, validation is deferred
     expect(mockValidateWord).not.toHaveBeenCalled();
+  });
+
+  it('flushes a queued submission after cascade ends', async () => {
+    mockValidateWord.mockResolvedValue({ isValid: true, score: 50 });
+
+    const { result, rerender } = renderHook(
+      ({ isCascading }: { isCascading: boolean }) =>
+        useAdventureWordSubmit({ ...defaultProps, isCascading }),
+      { initialProps: { isCascading: true } }
+    );
+
+    // Submit a word while cascade is in progress — it should queue
+    await act(async () => {
+      await result.current.handleWordSubmit('hello', [0, 1, 2, 3, 4]);
+    });
+    expect(mockValidateWord).not.toHaveBeenCalled();
+
+    // Cascade ends → queued submission flushes
+    await act(async () => {
+      rerender({ isCascading: false });
+    });
+
+    expect(mockValidateWord).toHaveBeenCalledWith('hello', expect.any(Array));
+  });
+
+  it('allows different concurrent words without silently dropping the second', async () => {
+    mockValidateWord.mockResolvedValue({ isValid: true, score: 50 });
+
+    const { result } = renderHook(() => useAdventureWordSubmit(defaultProps));
+
+    // Fire two different words back-to-back before the first's validation
+    // promise microtask settles. Second call must not be silently dropped.
+    await act(async () => {
+      const p1 = result.current.handleWordSubmit('hello', [0, 1, 2, 3, 4]);
+      const p2 = result.current.handleWordSubmit('world', [5, 6, 7, 8, 9]);
+      await Promise.all([p1, p2]);
+    });
+
+    expect(mockValidateWord).toHaveBeenCalledWith('hello', expect.any(Array));
+    expect(mockValidateWord).toHaveBeenCalledWith('world', expect.any(Array));
+  });
+
+  it('drops duplicate submission of the same in-flight word', async () => {
+    mockValidateWord.mockResolvedValue({ isValid: true, score: 50 });
+
+    const { result } = renderHook(() => useAdventureWordSubmit(defaultProps));
+
+    // Fire the SAME word twice before the first validation settles.
+    // The second must be dropped so we don't emit double popups/feedback.
+    await act(async () => {
+      const p1 = result.current.handleWordSubmit('hello', [0, 1, 2, 3, 4]);
+      const p2 = result.current.handleWordSubmit('hello', [0, 1, 2, 3, 4]);
+      await Promise.all([p1, p2]);
+    });
+
+    expect(mockValidateWord).toHaveBeenCalledTimes(1);
   });
 
   it('should handle valid word submission', async () => {

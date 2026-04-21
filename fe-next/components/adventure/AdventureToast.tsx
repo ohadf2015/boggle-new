@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getUpgradeVisualEffect } from '@/lib/adventure/upgradeEffects';
@@ -13,6 +13,8 @@ interface AdventureToastProps {
 
 interface ToastItem {
   id: string;
+  /** Stable key used to dedupe repeated triggers of the same upgrade/type. */
+  dedupeKey: string;
   icon: string;
   message: string;
   type: 'upgrade' | 'themed';
@@ -20,36 +22,88 @@ interface ToastItem {
 
 let _seq = 0;
 
+const THEMED_DEDUPE_KEY = 'themed';
+
 export function AdventureToast({
   upgradeTriggered,
   lastWordWasThemed,
 }: AdventureToastProps) {
   const { t } = useLanguage();
   const [toasts, setToasts] = useState<ToastItem[]>([]);
+  const dismissTimersRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
 
   const dismiss = useCallback((id: string) => {
     setToasts(prev => prev.filter(t => t.id !== id));
+    const timer = dismissTimersRef.current.get(id);
+    if (timer) {
+      clearTimeout(timer);
+      dismissTimersRef.current.delete(id);
+    }
   }, []);
+
+  // Replace any existing toast with the same dedupeKey — rapid repeats of the
+  // same upgrade (e.g. collecting gold on consecutive words) must not stack.
+  const pushToast = useCallback((next: ToastItem, autoDismissMs: number) => {
+    setToasts(prev => {
+      const filtered = prev.filter(t => t.dedupeKey !== next.dedupeKey);
+      // Cancel the timer for any toast we're replacing so it can't dismiss the new one.
+      for (const t of prev) {
+        if (t.dedupeKey === next.dedupeKey) {
+          const existing = dismissTimersRef.current.get(t.id);
+          if (existing) {
+            clearTimeout(existing);
+            dismissTimersRef.current.delete(t.id);
+          }
+        }
+      }
+      return [...filtered, next];
+    });
+    const timer = setTimeout(() => dismiss(next.id), autoDismissMs);
+    dismissTimersRef.current.set(next.id, timer);
+  }, [dismiss]);
 
   useEffect(() => {
     if (!upgradeTriggered) return;
     const effect = getUpgradeVisualEffect(upgradeTriggered.upgradeId);
     if (!effect) return;
-    const id = `upg-${++_seq}`;
-    setToasts(prev => [...prev, { id, icon: effect.hudIcon, message: t(effect.triggerToastKey), type: 'upgrade' }]);
-    const timer = setTimeout(() => dismiss(id), 2000);
-    return () => clearTimeout(timer);
+    pushToast(
+      {
+        id: `upg-${++_seq}`,
+        dedupeKey: `upg-${upgradeTriggered.upgradeId}`,
+        icon: effect.hudIcon,
+        message: t(effect.triggerToastKey),
+        type: 'upgrade',
+      },
+      2000,
+    );
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [upgradeTriggered]);
 
   useEffect(() => {
     if (!lastWordWasThemed) return;
-    const id = `themed-${++_seq}`;
-    setToasts(prev => [...prev, { id, icon: '🌿', message: t('adventure.toast.themedWord'), type: 'themed' }]);
-    const timer = setTimeout(() => dismiss(id), 1500);
-    return () => clearTimeout(timer);
+    pushToast(
+      {
+        id: `themed-${++_seq}`,
+        dedupeKey: THEMED_DEDUPE_KEY,
+        icon: '🌿',
+        message: t('adventure.toast.themedWord'),
+        type: 'themed',
+      },
+      1500,
+    );
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lastWordWasThemed]);
+
+  // Clean up pending dismiss timers on unmount.
+  useEffect(() => {
+    const timers = dismissTimersRef.current;
+    return () => {
+      for (const timer of timers.values()) {
+        clearTimeout(timer);
+      }
+      timers.clear();
+    };
+  }, []);
 
   return (
     <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-30 flex flex-col items-center gap-2 pointer-events-none">
