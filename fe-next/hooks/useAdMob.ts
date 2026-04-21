@@ -3,7 +3,7 @@ import { AdMob, BannerAdSize, BannerAdPosition } from '@capacitor-community/admo
 import { useAdMobContext } from '@/contexts/AdMobContext';
 
 export function useAdMob() {
-  const { recordGameEnd, shouldShowInterstitial, hasNoAds, getConfig } = useAdMobContext();
+  const { recordGameEnd, shouldShowInterstitial, hasNoAds, getConfig, whenReady } = useAdMobContext();
   const isDev = process.env.NODE_ENV !== 'production';
 
   const showRewarded = useCallback(async (onReward: () => void, onError?: (err: string) => void) => {
@@ -11,6 +11,7 @@ export function useAdMob() {
     const config = getConfig();
     if (!config) return;
     try {
+      await whenReady();
       await AdMob.prepareRewardVideoAd({ adId: config.rewardedAdId });
       await AdMob.showRewardVideoAd();
       onReward();
@@ -18,7 +19,7 @@ export function useAdMob() {
       const msg = err instanceof Error ? err.message : 'Ad failed';
       onError?.(msg);
     }
-  }, [hasNoAds, getConfig]);
+  }, [hasNoAds, getConfig, whenReady]);
 
   const showInterstitial = useCallback(async () => {
     recordGameEnd();
@@ -26,16 +27,18 @@ export function useAdMob() {
     const config = getConfig();
     if (!config) return;
     try {
+      await whenReady();
       await AdMob.prepareInterstitial({ adId: config.interstitialAdId });
       await AdMob.showInterstitial();
     } catch {}
-  }, [recordGameEnd, shouldShowInterstitial, getConfig]);
+  }, [recordGameEnd, shouldShowInterstitial, getConfig, whenReady]);
 
   const showBanner = useCallback(async (position = BannerAdPosition.BOTTOM_CENTER, margin?: number) => {
     if (hasNoAds()) return;
     const config = getConfig();
     if (!config) return;
     try {
+      await whenReady();
       await AdMob.showBanner({
         adId: config.bannerAdId,
         adSize: BannerAdSize.ADAPTIVE_BANNER,
@@ -44,13 +47,14 @@ export function useAdMob() {
         ...(typeof margin === 'number' ? { margin } : {}),
       });
     } catch {}
-  }, [hasNoAds, getConfig, isDev]);
+  }, [hasNoAds, getConfig, isDev, whenReady]);
 
   const hideBanner = useCallback(async () => {
     try {
+      await whenReady();
       await AdMob.hideBanner();
     } catch {}
-  }, []);
+  }, [whenReady]);
 
   return { showRewarded, showInterstitial, showBanner, hideBanner };
 }

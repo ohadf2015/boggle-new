@@ -113,6 +113,43 @@ describe('AdMobProvider', () => {
     expect(captured!.getConfig()).toBeNull();
   });
 
+  it('exposes whenReady() that resolves after AdMob.initialize settles on native', async () => {
+    vi.mocked(Capacitor.isNativePlatform).mockReturnValue(true);
+    vi.mocked(Capacitor.getPlatform).mockReturnValue('android');
+    let resolveInit: (() => void) | null = null;
+    vi.mocked(AdMob.initialize).mockImplementationOnce(
+      () => new Promise<void>((res) => { resolveInit = () => res(); })
+    );
+    let captured: ReturnType<typeof useAdMobContext> | null = null;
+    await act(async () => {
+      render(
+        <AdMobProvider>
+          <TestConsumer onMount={(ctx) => { captured = ctx; }} />
+        </AdMobProvider>
+      );
+    });
+    let resolved = false;
+    const ready = captured!.whenReady().then(() => { resolved = true; });
+    await Promise.resolve();
+    expect(resolved).toBe(false);
+    resolveInit!();
+    await ready;
+    expect(resolved).toBe(true);
+  });
+
+  it('whenReady() resolves immediately on web', async () => {
+    vi.mocked(Capacitor.isNativePlatform).mockReturnValue(false);
+    let captured: ReturnType<typeof useAdMobContext> | null = null;
+    await act(async () => {
+      render(
+        <AdMobProvider>
+          <TestConsumer onMount={(ctx) => { captured = ctx; }} />
+        </AdMobProvider>
+      );
+    });
+    await expect(captured!.whenReady()).resolves.toBeUndefined();
+  });
+
   it('throws when used outside provider', () => {
     expect(() => {
       render(<TestConsumer onMount={vi.fn()} />);

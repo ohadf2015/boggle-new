@@ -10,6 +10,7 @@ interface AdMobContextValue {
   shouldShowInterstitial: () => boolean;
   hasNoAds: () => boolean;
   getConfig: () => AdmobConfig | null;
+  whenReady: () => Promise<void>;
 }
 
 const AdMobContext = createContext<AdMobContextValue | null>(null);
@@ -18,13 +19,23 @@ export function AdMobProvider({ children }: { children: ReactNode }) {
   const isNative = useMemo(() => Capacitor.isNativePlatform(), []);
   const platform = useMemo(() => Capacitor.getPlatform() as AdPlatform, []);
   const totalGameEnds = useRef(0);
-  const isInitialized = useRef(false);
+  const initPromise = useRef<Promise<void> | null>(null);
+
+  if (initPromise.current === null) {
+    initPromise.current = isNative
+      ? AdMob.initialize({ initializeForTesting: process.env.NODE_ENV !== 'production' })
+          .then(() => undefined)
+          .catch(() => undefined)
+      : Promise.resolve();
+  }
 
   useEffect(() => {
-    if (!isNative || isInitialized.current) return;
-    isInitialized.current = true;
-    AdMob.initialize({ initializeForTesting: process.env.NODE_ENV !== 'production' }).catch(() => {});
-  }, [isNative]);
+    void initPromise.current;
+  }, []);
+
+  function whenReady(): Promise<void> {
+    return initPromise.current ?? Promise.resolve();
+  }
 
   function hasNoAds(): boolean {
     return false;
@@ -47,7 +58,7 @@ export function AdMobProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AdMobContext.Provider value={{ recordGameEnd, shouldShowInterstitial, hasNoAds, getConfig }}>
+    <AdMobContext.Provider value={{ recordGameEnd, shouldShowInterstitial, hasNoAds, getConfig, whenReady }}>
       {children}
     </AdMobContext.Provider>
   );

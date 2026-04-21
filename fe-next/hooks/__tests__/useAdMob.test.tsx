@@ -113,6 +113,54 @@ describe('useAdMob', () => {
     );
   });
 
+  it('showBanner awaits AdMob.initialize before calling showBanner (fixes NPE race)', async () => {
+    const order: string[] = [];
+    let resolveInit: (() => void) | null = null;
+    vi.mocked(AdMob.initialize).mockImplementationOnce(
+      () => new Promise<void>((res) => {
+        resolveInit = () => { order.push('init'); res(); };
+      })
+    );
+    vi.mocked(AdMob.showBanner).mockImplementationOnce(async () => { order.push('showBanner'); });
+    const wrapper = makeWrapper(true);
+    const { result } = renderHook(() => useAdMob(), { wrapper });
+    let bannerPromise: Promise<void>;
+    await act(async () => {
+      bannerPromise = result.current.showBanner();
+      await Promise.resolve();
+    });
+    expect(order).not.toContain('showBanner');
+    await act(async () => {
+      resolveInit!();
+      await bannerPromise!;
+    });
+    expect(order).toEqual(['init', 'showBanner']);
+  });
+
+  it('hideBanner awaits AdMob.initialize before calling hideBanner', async () => {
+    const order: string[] = [];
+    let resolveInit: (() => void) | null = null;
+    vi.mocked(AdMob.initialize).mockImplementationOnce(
+      () => new Promise<void>((res) => {
+        resolveInit = () => { order.push('init'); res(); };
+      })
+    );
+    vi.mocked(AdMob.hideBanner).mockImplementationOnce(async () => { order.push('hideBanner'); });
+    const wrapper = makeWrapper(true);
+    const { result } = renderHook(() => useAdMob(), { wrapper });
+    let hidePromise: Promise<void>;
+    await act(async () => {
+      hidePromise = result.current.hideBanner();
+      await Promise.resolve();
+    });
+    expect(order).not.toContain('hideBanner');
+    await act(async () => {
+      resolveInit!();
+      await hidePromise!;
+    });
+    expect(order).toEqual(['init', 'hideBanner']);
+  });
+
   it('hideBanner calls AdMob.hideBanner', async () => {
     const wrapper = makeWrapper(true);
     const { result } = renderHook(() => useAdMob(), { wrapper });
