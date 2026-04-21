@@ -262,9 +262,9 @@ export function LandingChallengeCards({
   const nextIndex = () => runningIndex++;
 
   return (
-    <div className="w-full max-w-5xl mx-auto xl:max-w-6xl space-y-6 md:space-y-8">
+    <div className="w-full max-w-5xl mx-auto xl:max-w-6xl space-y-5 md:space-y-6">
       {heroCards.length > 0 && (
-        <div className="grid grid-cols-1">
+        <div className="grid grid-cols-1 max-w-3xl mx-auto">
           {heroCards.map((mode) => renderCard(mode, nextIndex()))}
         </div>
       )}
@@ -301,7 +301,7 @@ export function LandingChallengeCards({
               {t('landing.sectionSoloSubtitle')}
             </span>
           </header>
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-5 items-stretch">
+          <div className={`grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 md:gap-5 items-stretch ${spCards.length >= 4 ? 'xl:grid-cols-4' : 'md:grid-cols-3'}`}>
             {spCards.map((mode) => renderCard(mode, nextIndex()))}
           </div>
         </section>
