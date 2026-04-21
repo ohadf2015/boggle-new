@@ -9,14 +9,8 @@ import android.os.Bundle;
 import com.getcapacitor.BridgeActivity;
 import ee.forgr.capacitor.social.login.ModifiedMainActivityForSocialLoginPlugin;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.PrintWriter;
-import java.util.Date;
-
 public class MainActivity extends BridgeActivity implements ModifiedMainActivityForSocialLoginPlugin {
 
-    private static final String CRASH_LOG = "last_crash.txt";
     private static final String DEFAULT_CHANNEL_ID = "default";
 
     @Override
@@ -26,7 +20,8 @@ public class MainActivity extends BridgeActivity implements ModifiedMainActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        installCrashLogger();
+        // Crash logger installed in LexiClashApplication.attachBaseContext —
+        // earlier than this hook so ContentProvider init failures get captured too.
         super.onCreate(savedInstanceState);
         ensureDefaultNotificationChannel();
         handleDeepLinkIntent(getIntent());
@@ -37,27 +32,6 @@ public class MainActivity extends BridgeActivity implements ModifiedMainActivity
         super.onNewIntent(intent);
         setIntent(intent);
         handleDeepLinkIntent(intent);
-    }
-
-    private void installCrashLogger() {
-        final Thread.UncaughtExceptionHandler previous =
-            Thread.getDefaultUncaughtExceptionHandler();
-        Thread.setDefaultUncaughtExceptionHandler((thread, throwable) -> {
-            try {
-                File out = new File(getFilesDir(), CRASH_LOG);
-                try (PrintWriter pw = new PrintWriter(new FileWriter(out, false))) {
-                    pw.println("timestamp=" + new Date().toString());
-                    pw.println("thread=" + thread.getName());
-                    throwable.printStackTrace(pw);
-                }
-                android.util.Log.e("LexiclashCrash", "Fatal", throwable);
-            } catch (Throwable ignored) {
-                // never let the logger itself mask the crash
-            }
-            if (previous != null) {
-                previous.uncaughtException(thread, throwable);
-            }
-        });
     }
 
     private void ensureDefaultNotificationChannel() {

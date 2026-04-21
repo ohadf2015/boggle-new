@@ -63,6 +63,23 @@ public/logos-png-backup/
 # Capacitor native platforms (generated, don't commit)
 /ios/
 /android/
+# Exceptions: files we hand-edit and must survive fresh clones
+!/android/
+/android/*
+!/android/app/
+/android/app/*
+!/android/app/src/
+/android/app/src/*
+!/android/app/src/main/
+/android/app/src/main/*
+!/android/app/src/main/AndroidManifest.xml
+!/android/app/src/main/java/
+/android/app/src/main/java/**
+!/android/app/src/main/java/live/
+!/android/app/src/main/java/live/lexiclash/
+!/android/app/src/main/java/live/lexiclash/app/
+!/android/app/src/main/java/live/lexiclash/app/MainActivity.java
+!/android/app/src/main/java/live/lexiclash/app/LexiClashApplication.java
 
 # Capacitor build artifacts
 .capacitor/
