@@ -677,4 +677,48 @@ describe('useEducationXp', () => {
       expect(awardResult!.newTitles).toContain('WORD_SEEKER');
     });
   });
+
+  describe('Stale closure on consecutive awards (BUG-05)', () => {
+    it('accumulates totalXp correctly across back-to-back awards within one act', async () => {
+      mockCalculatePracticeXp.mockReturnValue({
+        totalXp: 50,
+        breakdown: { flashcardCorrect: 50 },
+        masteryMessage: 'Nice!',
+      });
+      mockGetLevelFromXp.mockImplementation((xp: number) => {
+        if (xp >= 100) return 2;
+        if (xp >= 50) return 1;
+        return 1;
+      });
+      mockCheckLevelUp.mockReturnValue({
+        leveledUp: false,
+        levelsGained: 0,
+        newTitles: [],
+      });
+
+      const { result } = renderHook(
+        () =>
+          useEducationXp({
+            studentId: 'student-1',
+            lessonId: 'lesson-1',
+          }),
+        { wrapper }
+      );
+
+      const session: PracticeSessionXp = {
+        type: 'flashcard',
+        sessionData: { cardsReviewed: 5, cardsCorrect: 5 },
+      };
+
+      await act(async () => {
+        await result.current.awardPracticeXp(session);
+        await result.current.awardPracticeXp(session);
+      });
+
+      // After two back-to-back awards of 50 XP each, pendingUpdate should reflect 100
+      expect(result.current.pendingUpdate?.totalXp).toBe(100);
+      expect(result.current.totalXp).toBe(100);
+    });
+  });
+
 });

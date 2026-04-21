@@ -15,9 +15,7 @@
  *       Use pendingUpdate for external persistence (wired in Plan 05).
  */
 
-import { useState, useMemo, useCallback } from 'react';
-import { useMutation } from '@tanstack/react-query';
-import logger from '@/utils/logger';
+import { useState, useMemo, useCallback, useRef } from 'react';
 import {
   calculatePracticeXp,
   EDUCATION_XP_CONFIG,
@@ -144,8 +142,13 @@ export function useEducationXp(options: UseEducationXpOptions): UseEducationXpRe
 
   const [totalXp, setTotalXp] = useState<number>(initialXp);
   const [currentLevel, setCurrentLevel] = useState<number>(
-    initialLevel ?? getLevelFromXp(initialXp)
+    () => initialLevel ?? getLevelFromXp(initialXp)
   );
+  // BUG-05: refs mirror latest state to survive back-to-back awards before rerender
+  const totalXpRef = useRef<number>(initialXp);
+  const currentLevelRef = useRef<number>(0);
+  currentLevelRef.current = currentLevel;
+  totalXpRef.current = totalXp;
   const [streak, setStreak] = useState<DailyStreak>(() => {
     const currentStreak = getDailyStreak();
     if (initialStreak !== undefined) {
@@ -160,25 +163,6 @@ export function useEducationXp(options: UseEducationXpOptions): UseEducationXpRe
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<Error | null>(null);
   const [pendingUpdate, setPendingUpdate] = useState<PendingXpUpdate | null>(null);
-
-  const recordXpMutation = useMutation({
-    mutationFn: async (params: { xpAmount: number; lessonId: string; activityType: string }) => {
-      const response = await fetch('/api/education/record-xp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(params),
-      });
-      if (!response.ok) {
-        const text = await response.text().catch(() => response.statusText);
-        throw new Error(`record-xp failed (${response.status}): ${text}`);
-      }
-    },
-    onSuccess: () => setPendingUpdate(null),
-    onError: (err) => {
-      logger.error('useEducationXp: failed to record XP', err);
-      // pendingUpdate stays set for retry
-    },
-  });
 
   // ==================== Derived State ====================
 
@@ -232,16 +216,19 @@ export function useEducationXp(options: UseEducationXpOptions): UseEducationXpRe
           ? getStreakMilestoneMessage(milestoneDay)
           : null;
 
-        // Calculate new total XP (use functional update to avoid stale closure)
-        const newTotalXp = totalXp + xpResult.totalXp;
-        const oldLevel = currentLevel;
+        // BUG-05: read from ref to avoid stale closure on consecutive awards
+        const newTotalXp = totalXpRef.current + xpResult.totalXp;
+        const oldLevel = currentLevelRef.current;
         const newLevel = getLevelFromXp(newTotalXp);
 
         // Check for level up
         const levelUpResult: LevelUpResult = checkLevelUp(oldLevel, newLevel);
 
-        // Update state (functional update avoids stale closure race)
-        setTotalXp(prev => prev + xpResult.totalXp);
+        // Update refs synchronously so next call sees fresh values
+        totalXpRef.current = newTotalXp;
+        currentLevelRef.current = newLevel;
+
+        setTotalXp(newTotalXp);
         setCurrentLevel(newLevel);
 
         // Create pending update for database persistence
@@ -254,12 +241,10 @@ export function useEducationXp(options: UseEducationXpOptions): UseEducationXpRe
         };
         setPendingUpdate(update);
 
-        // Persist XP to Supabase via API (fire-and-forget)
-        recordXpMutation.mutate({
-          xpAmount: xpResult.totalXp,
-          lessonId,
-          activityType: session.type,
-        });
+        // BUG-02 fix: XP persistence is owned by server PATCH /api/education/practice,
+        // which writes both student_lesson_progress (award_education_xp) and profiles
+        // (increment_player_xp). Client previously also hit /api/education/record-xp
+        // which double-counted profile XP.
 
         // Build result
         const result: AwardPracticeXpResult = {
@@ -287,7 +272,7 @@ export function useEducationXp(options: UseEducationXpOptions): UseEducationXpRe
         };
       }
     },
-    [totalXp, currentLevel, studentId, lessonId, recordXpMutation]
+    [studentId, lessonId]
   );
 
   /**
