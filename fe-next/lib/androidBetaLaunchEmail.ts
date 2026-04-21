@@ -63,6 +63,7 @@ export async function sendTestAndroidBetaLaunch(
   recipientName: string = 'Test User',
   language: string = 'en'
 ): Promise<{ success: boolean; error?: string }> {
+  const t0 = Date.now();
   if (!isEmailServiceConfigured()) {
     return { success: false, error: 'Email service not configured' };
   }
@@ -76,14 +77,26 @@ export async function sendTestAndroidBetaLaunch(
   const baseUrl = resolveBaseUrl();
   const unsubscribeUrl = `${baseUrl}/api/email/unsubscribe?token=${'0'.repeat(64)}`;
 
-  const { subject, html, text } = await generateAndroidBetaLaunchHtml({
-    recipientName,
-    language,
-    unsubscribeUrl,
-    playUrl: PLAY_STORE_URL,
-  });
+  logger.info('EMAIL', `[android-beta-test] render-start lang=${language} +${Date.now() - t0}ms`);
+  const renderStart = Date.now();
+  const { subject, html, text } = await withTimeout(
+    generateAndroidBetaLaunchHtml({
+      recipientName,
+      language,
+      unsubscribeUrl,
+      playUrl: PLAY_STORE_URL,
+    }),
+    15000,
+    'Email render timed out after 15 seconds'
+  );
+  logger.info(
+    'EMAIL',
+    `[android-beta-test] render-done html=${html.length}B text=${text.length}B in ${Date.now() - renderStart}ms`
+  );
 
   try {
+    logger.info('EMAIL', `[android-beta-test] resend-send-start to=${toEmail} +${Date.now() - t0}ms`);
+    const sendStart = Date.now();
     const result = await withTimeout(
       resend.emails.send({
         from: fromEmail,
@@ -95,12 +108,20 @@ export async function sendTestAndroidBetaLaunch(
       10000,
       'Resend API timed out after 10 seconds'
     );
+    logger.info(
+      'EMAIL',
+      `[android-beta-test] resend-send-done in ${Date.now() - sendStart}ms total=${Date.now() - t0}ms`
+    );
 
     if (result.error) {
       return { success: false, error: result.error.message };
     }
     return { success: true };
   } catch (err) {
+    logger.error(
+      'EMAIL',
+      `[android-beta-test] failed after ${Date.now() - t0}ms: ${(err as Error).message}`
+    );
     return { success: false, error: (err as Error).message };
   }
 }
