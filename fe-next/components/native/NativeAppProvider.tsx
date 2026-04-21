@@ -18,6 +18,7 @@ import { isNative } from '@/utils/platform';
 import logger from '@/utils/logger';
 
 const DeepLinkHandler = dynamic(() => import('@/components/DeepLinkHandler'), { ssr: false });
+const NativeColdStartGuard = dynamic(() => import('./NativeColdStartGuard'), { ssr: false });
 
 interface NativeAppProviderProps {
   children: React.ReactNode;
@@ -43,6 +44,22 @@ export function NativeAppProvider({ children }: NativeAppProviderProps): React.R
     });
   }, []);
 
+  // Hide the splash screen as soon as React has mounted the first frame.
+  // Capacitor's `launchAutoHide` fires after a fixed duration regardless of
+  // whether the WebView has finished loading the remote URL, which leaves
+  // Android users on a black WebView when the 301→locale redirect is slow.
+  useEffect(() => {
+    if (!isNative()) return;
+
+    import('@capacitor/splash-screen').then(({ SplashScreen }) => {
+      SplashScreen.hide().catch(() => {
+        // Splash already hidden or plugin unavailable — safe to ignore
+      });
+    }).catch((err) => {
+      logger.warn('[NativeAppProvider] Failed to hide splash screen:', err);
+    });
+  }, []);
+
   // Handle app lifecycle transitions
   useAppLifecycle({
     onForeground: () => {
@@ -64,6 +81,7 @@ export function NativeAppProvider({ children }: NativeAppProviderProps): React.R
 
   return (
     <>
+      <NativeColdStartGuard />
       <DeepLinkHandler />
       {children}
     </>

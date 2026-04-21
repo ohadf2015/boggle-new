@@ -5,16 +5,43 @@
  */
 
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { NativeAppProvider } from '../NativeAppProvider';
 import { useSafeArea } from '@/hooks/useSafeArea';
 import { useAppLifecycle } from '@/hooks/useAppLifecycle';
 import { getSharedSocketIfExists } from '@/utils/SocketContext';
+import { isNative } from '@/utils/platform';
 
 // Mock dependencies
 vi.mock('@/hooks/useSafeArea');
 vi.mock('@/hooks/useAppLifecycle');
 vi.mock('@/utils/SocketContext');
+vi.mock('@/utils/platform', () => ({
+  isNative: vi.fn(() => false),
+}));
+
+const mockSplashHide = vi.fn(() => Promise.resolve());
+vi.mock('@capacitor/splash-screen', () => ({
+  SplashScreen: {
+    hide: (...args: unknown[]) => mockSplashHide(...args),
+  },
+}));
+
+vi.mock('@capacitor/status-bar', () => ({
+  StatusBar: {
+    setOverlaysWebView: vi.fn(() => Promise.resolve()),
+    setBackgroundColor: vi.fn(() => Promise.resolve()),
+    setStyle: vi.fn(() => Promise.resolve()),
+  },
+  Style: { Dark: 'DARK' },
+}));
+
+vi.mock('@capacitor/app', () => ({
+  App: {
+    addListener: vi.fn(() => Promise.resolve({ remove: vi.fn() })),
+  },
+}));
+
 vi.mock('@/utils/logger', () => ({
   log: vi.fn(),
   __esModule: true,
@@ -30,6 +57,7 @@ const mockUseAppLifecycle = useAppLifecycle as jest.MockedFunction<typeof useApp
 const mockGetSharedSocketIfExists = getSharedSocketIfExists as jest.MockedFunction<
   typeof getSharedSocketIfExists
 >;
+const mockIsNative = isNative as jest.MockedFunction<typeof isNative>;
 
 describe('NativeAppProvider', () => {
   beforeEach(() => {
@@ -214,6 +242,43 @@ describe('NativeAppProvider', () => {
       // THEN
       expect(screen.getByTestId('child-1')).toBeInTheDocument();
       expect(screen.getByTestId('child-2')).toBeInTheDocument();
+    });
+  });
+
+  describe('splash screen', () => {
+    it('hides the Capacitor splash screen once the app has mounted on native', async () => {
+      // Regression: splash auto-hides at 2s regardless of WebView readiness,
+      // leaving users staring at a black WebView on slow networks. Hiding
+      // explicitly from the client guarantees the splash only goes away once
+      // React has painted the first screen.
+      // GIVEN
+      mockIsNative.mockReturnValue(true);
+
+      // WHEN
+      render(
+        <NativeAppProvider>
+          <div>Content</div>
+        </NativeAppProvider>
+      );
+
+      // THEN
+      await waitFor(() => expect(mockSplashHide).toHaveBeenCalled());
+    });
+
+    it('does not call SplashScreen.hide on web', async () => {
+      // GIVEN
+      mockIsNative.mockReturnValue(false);
+
+      // WHEN
+      render(
+        <NativeAppProvider>
+          <div>Content</div>
+        </NativeAppProvider>
+      );
+
+      // THEN - allow any pending microtasks to flush before asserting
+      await Promise.resolve();
+      expect(mockSplashHide).not.toHaveBeenCalled();
     });
   });
 });

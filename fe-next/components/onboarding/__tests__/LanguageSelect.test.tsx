@@ -58,18 +58,44 @@ describe('LanguageSelect', () => {
     expect(englishButton.className).toContain('border-neo-lime');
   });
 
-  it('calls setLanguage when a language card is clicked', () => {
+  it('does NOT call setLanguage immediately when tapping a language card', () => {
+    // Regression: setLanguage triggers router.push() to a new locale path,
+    // which remounts OnboardingFlow and loops the user back to LanguageSelect.
+    // Defer language change until the user confirms.
     render(<LanguageSelect onSelect={mockOnSelect} />);
     fireEvent.click(screen.getByTestId('lang-he'));
-    expect(mockSetLanguage).toHaveBeenCalledWith('he');
+    expect(mockSetLanguage).not.toHaveBeenCalled();
   });
 
-  it('calls onSelect after selecting and clicking continue', () => {
+  it('visually highlights the tapped language card', () => {
     render(<LanguageSelect onSelect={mockOnSelect} />);
     fireEvent.click(screen.getByTestId('lang-he'));
-    // Click the continue button
-    const continueBtn = screen.getByTestId('language-continue');
-    fireEvent.click(continueBtn);
+    const hebrewButton = screen.getByTestId('lang-he');
+    expect(hebrewButton.className).toContain('border-neo-lime');
+  });
+
+  it('applies the selected language and advances when the continue button is clicked', () => {
+    render(<LanguageSelect onSelect={mockOnSelect} />);
+    fireEvent.click(screen.getByTestId('lang-he'));
+    // Language change happens on confirmation, not on tap
+    expect(mockSetLanguage).not.toHaveBeenCalled();
+
+    fireEvent.click(screen.getByTestId('language-continue'));
+
+    expect(mockSetLanguage).toHaveBeenCalledWith('he');
+    expect(mockOnSelect).toHaveBeenCalled();
+  });
+
+  it('does not call setLanguage when confirming with the current language unchanged', () => {
+    render(<LanguageSelect onSelect={mockOnSelect} />);
+    fireEvent.click(screen.getByTestId('language-continue'));
+    expect(mockSetLanguage).not.toHaveBeenCalled();
+    expect(mockOnSelect).toHaveBeenCalled();
+  });
+
+  it('tapping the already-selected language advances immediately', () => {
+    render(<LanguageSelect onSelect={mockOnSelect} />);
+    fireEvent.click(screen.getByTestId('lang-en')); // already selected
     expect(mockOnSelect).toHaveBeenCalled();
   });
 
