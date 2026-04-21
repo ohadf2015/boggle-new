@@ -42,7 +42,6 @@ interface RenderParams {
 interface RenderedEmail {
   subject: string;
   html: string;
-  text: string;
 }
 
 // ==========================================
@@ -62,12 +61,9 @@ export async function generateGameModeAnnouncementHtml(
 
   const props = { recipientName, language, mode, unsubscribeUrl, playUrl };
 
-  const [html, text] = await Promise.all([
-    render(GameModeAnnouncementEmail(props)),
-    render(GameModeAnnouncementEmail(props), { plainText: true }),
-  ]);
+  const html = await render(GameModeAnnouncementEmail(props));
 
-  return { subject, html, text };
+  return { subject, html };
 }
 
 // ==========================================
@@ -128,13 +124,17 @@ export async function sendTestGameModeAnnouncement(
   const unsubscribeUrl = `${baseUrl}/api/email/unsubscribe?token=${'0'.repeat(64)}`;
   const playUrl = `${baseUrl}${resolvePlayPath(mode, locale)}`;
 
-  const { subject, html, text } = await generateGameModeAnnouncementHtml({
-    recipientName,
-    language,
-    mode,
-    unsubscribeUrl,
-    playUrl,
-  });
+  const { subject, html } = await withTimeout(
+    generateGameModeAnnouncementHtml({
+      recipientName,
+      language,
+      mode,
+      unsubscribeUrl,
+      playUrl,
+    }),
+    30000,
+    'Email render timed out after 30 seconds'
+  );
 
   try {
     const result = await withTimeout(
@@ -143,10 +143,9 @@ export async function sendTestGameModeAnnouncement(
         to: toEmail,
         subject: `[TEST] ${subject}`,
         html,
-        text,
       }),
-      10000,
-      'Resend API timed out after 10 seconds'
+      20000,
+      'Resend API timed out after 20 seconds'
     );
 
     if (result.error) {
@@ -199,19 +198,17 @@ export async function sendGameModeAnnouncementToPlayer(
   let resolvedEmail: string | null = null;
 
   if (isEmail) {
-    const { data: authUsers, error: authError } = await supabase.auth.admin.listUsers();
-    if (authError) {
-      return { success: false, error: 'Failed to look up auth users' };
-    }
-    const match = authUsers.users.find(
-      (u: { id: string; email?: string }) =>
-        u.email?.toLowerCase() === playerIdentifier.toLowerCase()
-    );
-    if (!match) {
+    const target = playerIdentifier.toLowerCase();
+    const { data: viewRow, error: viewError } = await supabase
+      .from('auth_users_view')
+      .select('id, email')
+      .eq('email', target)
+      .maybeSingle();
+    if (viewError || !viewRow) {
       return { success: false, error: `No user found with email ${playerIdentifier}` };
     }
-    profileId = match.id;
-    resolvedEmail = match.email ?? null;
+    profileId = viewRow.id;
+    resolvedEmail = viewRow.email ?? null;
   } else {
     const { data: profileByName } = await supabase
       .from('profiles')
@@ -242,9 +239,12 @@ export async function sendGameModeAnnouncementToPlayer(
   }
 
   if (!resolvedEmail) {
-    const { data: authUsers } = await supabase.auth.admin.listUsers();
-    const match = authUsers?.users.find((u: { id: string; email?: string }) => u.id === profileId);
-    resolvedEmail = match?.email ?? null;
+    const { data: authResp, error: authErr } =
+      await supabase.auth.admin.getUserById(profileId);
+    if (authErr) {
+      return { success: false, error: `Auth lookup failed: ${authErr.message}` };
+    }
+    resolvedEmail = authResp?.user?.email ?? null;
   }
 
   if (!resolvedEmail) {
@@ -267,13 +267,17 @@ export async function sendGameModeAnnouncementToPlayer(
   const playUrl = `${baseUrl}${resolvePlayPath(mode, locale)}`;
   const recipientName = displayName || username || 'Word Hunter';
 
-  const { subject, html, text } = await generateGameModeAnnouncementHtml({
-    recipientName,
-    language,
-    mode,
-    unsubscribeUrl,
-    playUrl,
-  });
+  const { subject, html } = await withTimeout(
+    generateGameModeAnnouncementHtml({
+      recipientName,
+      language,
+      mode,
+      unsubscribeUrl,
+      playUrl,
+    }),
+    30000,
+    'Email render timed out after 30 seconds'
+  );
 
   try {
     const result = await withTimeout(
@@ -282,14 +286,13 @@ export async function sendGameModeAnnouncementToPlayer(
         to: resolvedEmail,
         subject,
         html,
-        text,
         headers: {
           'List-Unsubscribe': `<${unsubscribeUrl}>`,
           'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
         },
       }),
-      10000,
-      'Resend API timed out after 10 seconds'
+      20000,
+      'Resend API timed out after 20 seconds'
     );
 
     if (result.error) {

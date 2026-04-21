@@ -21,6 +21,8 @@ import { Resend } from 'resend';
 import { captureApiError } from '@/utils/sentry';
 import logger from '@/backend/utils/logger';
 
+export const maxDuration = 60;
+
 type BulkEmailType = 'reengagement' | 'game-mode-announcement';
 
 /**
@@ -196,7 +198,7 @@ export async function POST(request: NextRequest) {
           const unsubscribeUrl = `${baseUrl}/api/email/unsubscribe?token=${sub.unsubscribe_token}`;
           const playUrl = `${baseUrl}/${locale}/${mode}`;
 
-          const { subject, html, text } = await generateGameModeAnnouncementHtml({
+          const { subject, html } = await generateGameModeAnnouncementHtml({
             recipientName: 'Word Hunter',
             language,
             mode,
@@ -209,7 +211,6 @@ export async function POST(request: NextRequest) {
             to: sub.email,
             subject,
             html,
-            text,
             headers: {
               'List-Unsubscribe': `<${unsubscribeUrl}>`,
               'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',

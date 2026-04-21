@@ -255,14 +255,18 @@ export async function sendReengagementEmail(
   const recipientName = recipient.display_name || recipient.username || 'Word Hunter';
 
   const { generateReengagementEmailHtml } = await import('./reengagementEmailTemplate');
-  const { subject, html, text } = await generateReengagementEmailHtml({
-    recipientName,
-    firstLetter,
-    language,
-    unsubscribeUrl,
-    playUrl,
-    baseUrl,
-  });
+  const { subject, html } = await withTimeout(
+    generateReengagementEmailHtml({
+      recipientName,
+      firstLetter,
+      language,
+      unsubscribeUrl,
+      playUrl,
+      baseUrl,
+    }),
+    30000,
+    'Email render timed out after 30 seconds'
+  );
 
   try {
     const result = await withTimeout(
@@ -271,14 +275,13 @@ export async function sendReengagementEmail(
         to: recipient.email,
         subject,
         html,
-        text,
         headers: {
           'List-Unsubscribe': `<${unsubscribeUrl}>`,
           'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
         },
       }),
-      10000,
-      'Resend API timed out after 10 seconds'
+      20000,
+      'Resend API timed out after 20 seconds'
     );
 
     if (result.error) {
@@ -323,14 +326,18 @@ export async function sendTestReengagementEmail(
   const locale = language === 'he' ? 'he' : language === 'sv' ? 'sv' : language === 'ja' ? 'ja' : language === 'es' ? 'es' : 'en';
 
   const { generateReengagementEmailHtml } = await import('./reengagementEmailTemplate');
-  const { subject, html, text } = await generateReengagementEmailHtml({
-    recipientName,
-    firstLetter,
-    language,
-    unsubscribeUrl: `${baseUrl}/api/email/unsubscribe?token=${'0'.repeat(64)}`,
-    playUrl: `${baseUrl}/${locale}/daily`,
-    baseUrl,
-  });
+  const { subject, html } = await withTimeout(
+    generateReengagementEmailHtml({
+      recipientName,
+      firstLetter,
+      language,
+      unsubscribeUrl: `${baseUrl}/api/email/unsubscribe?token=${'0'.repeat(64)}`,
+      playUrl: `${baseUrl}/${locale}/daily`,
+      baseUrl,
+    }),
+    30000,
+    'Email render timed out after 30 seconds'
+  );
 
   try {
     const result = await withTimeout(
@@ -339,10 +346,9 @@ export async function sendTestReengagementEmail(
         to: toEmail,
         subject: `[TEST] ${subject}`,
         html,
-        text,
       }),
-      10000,
-      'Resend API timed out after 10 seconds'
+      20000,
+      'Resend API timed out after 20 seconds'
     );
 
     if (result.error) {

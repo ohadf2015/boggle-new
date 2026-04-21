@@ -542,6 +542,7 @@ const es = {
     "adventure": "Aventura",
     "blast": "Blast",
     "brain": "Cerebro",
+    "education": "Educación",
     "leaderboard": "Ranking",
     "profile": "Perfil",
     "friends": "Amigos",
@@ -3746,7 +3747,7 @@ const es = {
       "letterCount": "{current}/{total}"
     },
     "returningUser": {
-      "title": "¡Bienvenido de vuelta!",
+      "title": "Bienvenido",
       "subtitle": "Inicia sesión para continuar donde lo dejaste, o empieza de nuevo.",
       "haveAccount": "Tengo una cuenta",
       "newHere": "Soy nuevo aquí",
@@ -4956,6 +4957,8 @@ const es = {
     "fullStandings": "Clasificación Completa",
     "dailyDouble": "Doble Diario",
     "dailyDoubleBonus": "Completa ambas misiones para XP extra",
+    "lastSevenDays": "Últimos 7 días",
+    "dedicationProgress": "Juega 7 días para ganar DEDICACIÓN",
     "browseArchive": "Archivo: Desafíos Anteriores",
     "bonusXP": "XP Extra",
     "chooseChallengeHint": "¡Escoge tu desafío de hoy. Completa ambos para XP extra!",

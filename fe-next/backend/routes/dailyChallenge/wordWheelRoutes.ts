@@ -15,6 +15,7 @@ import {
   isValidDateFormat,
   isValidLanguage,
 } from './utils';
+import { updateDailyProfileStats } from './profileStats';
 
 const router: Router = express.Router();
 
@@ -127,6 +128,16 @@ router.post('/submit', async (req: Request<unknown, unknown, WordWheelSubmitBody
         .gt('score', score);
 
       rank = (playersAbove ?? 0) + 1;
+    }
+
+    // Bump authenticated players' lifetime stats + unique_days_played so
+    // daily-challenge-only players can unlock DEDICATION (7d) / LOYAL_PLAYER (30d).
+    if (playerId) {
+      try {
+        await updateDailyProfileStats({ supabase, playerId, scoreToAdd: score });
+      } catch (scoreError) {
+        logger.error('API', `[WordWheel] Failed to update profile stats for ${playerId}: ${(scoreError as Error).message}`);
+      }
     }
 
     res.json({ success: true, alreadySubmitted: false, data, rank });

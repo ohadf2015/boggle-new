@@ -138,14 +138,20 @@ export async function listenForOAuthCallback(
   }
   if (!AppPlugin) return () => {};
 
-  const listener = await Promise.resolve(AppPlugin.addListener('appUrlOpen', (event: { url: string }) => {
-    if (event.url.includes('auth/callback')) {
-      logger.log('[MobileOAuth] Received OAuth callback:', event.url);
-      onCallback(event.url);
-    }
-  }));
+  try {
+    const listener = await Promise.resolve(AppPlugin.addListener('appUrlOpen', (event: { url: string }) => {
+      if (event.url.includes('auth/callback')) {
+        logger.log('[MobileOAuth] Received OAuth callback:', event.url);
+        onCallback(event.url);
+      }
+    }));
 
-  return () => {
-    listener.remove();
-  };
+    return () => {
+      listener.remove();
+    };
+  } catch (err) {
+    // UNIMPLEMENTED on bridge race; non-actionable.
+    logger.debug('[MobileOAuth] App.addListener unavailable:', err);
+    return () => {};
+  }
 }

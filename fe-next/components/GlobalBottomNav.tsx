@@ -155,7 +155,7 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
 
     // pathsWithOwnNav — these routes render their own nav, so we hide the global one
     const shouldHideOnCurrentPath = useMemo(() => {
-        const pathsWithOwnNav = ['/multiplayer', '/singleplayer', '/daily', '/adventure', '/education', '/student', '/teacher', '/admin'];
+        const pathsWithOwnNav = ['/multiplayer', '/singleplayer', '/daily', '/adventure', '/education', '/student', '/teacher', '/admin', '/brain', '/challenge', '/custom', '/join'];
         const cleanPath = pathname.replace(`/${language}`, '');
         return pathsWithOwnNav.some(p => cleanPath.startsWith(p));
     }, [pathname, language]);

@@ -86,6 +86,7 @@ vi.mock('next/navigation', () => ({
     useRouter: () => ({
         push: vi.fn(),
     }),
+    usePathname: () => '/',
 }));
 
 const mockUseLanguage = useLanguage as jest.MockedFunction<typeof useLanguage>;

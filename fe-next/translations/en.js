@@ -548,6 +548,7 @@ const en = {
     "adventure": "Adventure",
     "blast": "Blast",
     "brain": "Brain",
+    "education": "Education",
     "leaderboard": "Ranks",
     "profile": "Profile",
     "friends": "Friends",
@@ -1857,7 +1858,7 @@ const en = {
       "letterCount": "{current}/{total}"
     },
     "returningUser": {
-      "title": "Welcome Back!",
+      "title": "Welcome",
       "subtitle": "Sign in to pick up where you left off, or start fresh.",
       "haveAccount": "I Have an Account",
       "newHere": "I'm New Here",
@@ -4897,6 +4898,8 @@ const en = {
     "fullStandings": "Full Standings",
     "dailyDouble": "Daily Double",
     "dailyDoubleBonus": "Complete both quests for bonus XP",
+    "lastSevenDays": "Last 7 Days",
+    "dedicationProgress": "Play 7 days to earn DEDICATION",
     "bonusChallenge": "Bonus Challenge",
     "browseArchive": "Archive: View Past Challenges",
     "continueMissions": "Continue your daily missions",

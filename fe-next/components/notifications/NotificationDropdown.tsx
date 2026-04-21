@@ -196,7 +196,7 @@ export function NotificationDropdown({
               {t('notifications.previousTitle', 'Previously cleared')}
             </span>
           </div>
-          <div className="overflow-y-auto max-h-48 opacity-70">
+          <div className="overflow-y-auto overscroll-contain max-h-64 bg-neo-white/5">
             {isLoadingPrevious ? (
               <div className="py-4 text-center text-neo-white/40 text-xs">
                 {t('common.loading', 'Loading...')}

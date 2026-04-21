@@ -53,7 +53,9 @@ export function useAppLifecycle({
         listenerHandle = handle;
       }
     }).catch((error: unknown) => {
-      console.error('Failed to register app lifecycle listener:', error);
+      // UNIMPLEMENTED when native bridge hasn't bound App plugin yet (remote WebView load race).
+      // Non-actionable: plugin IS registered in capacitor.plugins.json; downgrade to debug.
+      console.debug('App lifecycle listener unavailable:', error);
     });
 
     return () => {

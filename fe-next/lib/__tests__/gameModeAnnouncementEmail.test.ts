@@ -57,7 +57,7 @@ describe('generateGameModeAnnouncementHtml', () => {
   };
 
   it('renders HTML + plain text for blast/en', async () => {
-    const { subject, html, text } = await generateGameModeAnnouncementHtml({
+    const { subject, html } = await generateGameModeAnnouncementHtml({
       ...baseParams,
       language: 'en',
       mode: 'blast',
@@ -67,7 +67,6 @@ describe('generateGameModeAnnouncementHtml', () => {
     expect(html).toContain('<html');
     expect(html).toContain('</html>');
     expect(html.toLowerCase()).toContain('blast');
-    expect(text.length).toBeGreaterThan(20);
   });
 
   it('includes the recipient name in the rendered output', async () => {
@@ -103,14 +102,13 @@ describe('generateGameModeAnnouncementHtml', () => {
   it('renders successfully for all mode × language combinations', async () => {
     for (const mode of MODES) {
       for (const lang of LANGUAGES) {
-        const { html, text, subject } = await generateGameModeAnnouncementHtml({
+        const { html, subject } = await generateGameModeAnnouncementHtml({
           ...baseParams,
           language: lang,
           mode,
         });
         expect(subject).toBeTruthy();
         expect(html).toContain('<html');
-        expect(text).toBeTruthy();
       }
     }
   });

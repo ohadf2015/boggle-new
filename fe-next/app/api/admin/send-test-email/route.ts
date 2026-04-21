@@ -4,6 +4,8 @@ import { createClient } from '@/utils/supabase/server';
 import { sendTestEmail, isEmailServiceConfigured } from '@/lib/email';
 import { captureApiError } from '@/utils/sentry';
 
+export const maxDuration = 60;
+
 /**
  * POST /api/admin/send-test-email
  * Send a test daily challenge email to a specified address

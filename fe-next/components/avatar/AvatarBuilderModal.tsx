@@ -79,6 +79,13 @@ export default function AvatarBuilderModal({
   const [coinSpendAmount, setCoinSpendAmount] = useState<number | null>(null);
   const historyRef = useRef<CustomAvatarConfig[]>([]);
 
+  useEffect(() => {
+    if (!isOpen) return;
+    setConfig(initialConfig ?? DEFAULT_AVATAR_CONFIG);
+    historyRef.current = [];
+    setPreviewKey(k => k + 1);
+  }, [isOpen, initialConfig]);
+
   const pushHistory = useCallback((current: CustomAvatarConfig) => {
     historyRef.current = [...historyRef.current.slice(-19), current];
   }, []);
@@ -193,13 +200,13 @@ export default function AvatarBuilderModal({
         </div>
 
         {/* Preview — jelly wobble on every change */}
-        <div ref={previewRef} className="flex justify-center py-2 sm:py-5">
+        <div ref={previewRef} className="flex justify-center py-2 sm:py-3 desktop-tall:sm:py-5 shrink-0">
           <AdaptiveMotion.div
             key={previewKey}
             initial={{ scaleX: 1.06, scaleY: 0.94, rotate: -1.5 }}
             animate={{ scaleX: 1, scaleY: 1, rotate: 0 }}
             transition={JELLY_SPRING}
-            className="border-3 border-black shadow-hard rounded-neo-lg overflow-hidden cursor-pointer w-[100px] h-[100px] sm:w-[160px] sm:h-[160px]"
+            className="border-3 border-black shadow-hard rounded-neo-lg overflow-hidden cursor-pointer w-[88px] h-[88px] sm:w-[120px] sm:h-[120px] desktop-tall:sm:w-[160px] desktop-tall:sm:h-[160px]"
           >
             <AvatarRenderer config={config} size={160} className="w-full h-full" />
           </AdaptiveMotion.div>
@@ -226,7 +233,7 @@ export default function AvatarBuilderModal({
         </div>
 
         {/* Options Grid — animated category transition */}
-        <div className="flex-1 overflow-y-auto p-3 sm:p-4 min-h-[120px] sm:min-h-[200px]">
+        <div className="flex-1 overflow-y-auto p-3 sm:p-4 min-h-[80px]">
           <AdaptiveAnimatePresence mode="wait">
             <AdaptiveMotion.div
               key={activeCategory}
@@ -248,7 +255,7 @@ export default function AvatarBuilderModal({
         </div>
 
         {/* Actions — spring bounce buttons */}
-        <div className="flex flex-wrap gap-2 p-3 sm:p-4 border-t-3 border-black">
+        <div className="flex flex-wrap gap-2 p-3 sm:p-4 border-t-3 border-black shrink-0 bg-neo-navy">
           <AdaptiveMotion.button
             onClick={handleRandomize}
             whileHover={{ scale: 1.05 }}
@@ -299,7 +306,7 @@ export default function AvatarBuilderModal({
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.92 }}
             transition={BUTTON_SPRING}
-            className="w-full xs:w-auto px-6 py-2 bg-neo-lime text-neo-black font-bold rounded-neo border-2 border-black shadow-hard-sm transition-shadow"
+            className="px-6 py-2 bg-neo-lime text-neo-black font-bold rounded-neo border-2 border-black shadow-hard-sm transition-shadow"
           >
             {t('avatar.builder.save')}
           </AdaptiveMotion.button>

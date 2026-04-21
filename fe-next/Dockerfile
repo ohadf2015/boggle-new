@@ -17,7 +17,7 @@ WORKDIR /app
 
 COPY package.json package-lock.json .npmrc ./
 
-RUN npm ci --no-audit --no-fund --omit=dev
+RUN npm ci --no-audit --no-fund --omit=dev --ignore-scripts
 
 # ── Stage 3: Build Next.js (standalone) + bundle server ──────────────
 FROM node:22-alpine AS builder

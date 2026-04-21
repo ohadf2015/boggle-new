@@ -13,6 +13,7 @@ import {
   Users,
   LogOut,
   ArrowLeft,
+  Home,
 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -393,6 +394,22 @@ export const EducationHeader = memo<EducationHeaderProps>(({
                       </span>
                       <span>{t('education.header.educationHome')}</span>
                     </Link>
+
+                    {/* Back to Main App */}
+                    <Link
+                      href={`/${language}`}
+                      onClick={() => setShowMobileMenu(false)}
+                      className={cn(
+                        'flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-3 border-neo-black dark:border-slate-500 transition-all w-full',
+                        'bg-neo-cream dark:bg-neo-navy hover:bg-neo-pink/30 dark:hover:bg-neo-navy-light text-neo-black dark:text-white',
+                        'shadow-hard-sm hover:shadow-hard'
+                      )}
+                    >
+                      <span className="flex items-center justify-center w-7 h-7 rounded-neo bg-neo-pink/50 border-3 border-neo-black text-neo-black">
+                        <Home className="w-4 h-4" aria-hidden="true" />
+                      </span>
+                      <span>{t('common.backToHome')}</span>
+                    </Link>
                   </div>
 
                   {isAuthenticated && (
@@ -552,6 +569,18 @@ const EducationMenuDropdown = memo<EducationMenuDropdownProps>(({
               >
                 <GraduationCap className="w-4 h-4" />
                 {t('education.header.educationHome')}
+              </Link>
+
+              <Link
+                href={`/${language}`}
+                onClick={() => setIsOpen(false)}
+                className={cn(
+                  'flex items-center gap-2 px-3 py-2 text-sm font-bold rounded-neo transition-colors',
+                  'text-neo-black dark:text-white hover:bg-neo-pink/30'
+                )}
+              >
+                <Home className="w-4 h-4" />
+                {t('common.backToHome')}
               </Link>
             </div>
 

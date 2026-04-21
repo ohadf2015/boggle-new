@@ -12,6 +12,8 @@ import {
 } from '@/lib/reengagementEmail';
 import { captureApiError } from '@/utils/sentry';
 
+export const maxDuration = 60;
+
 /**
  * POST /api/admin/send-reengagement-to-player
  * Send a real re-engagement email to a specific player (by email or username).

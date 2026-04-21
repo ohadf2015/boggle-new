@@ -58,7 +58,6 @@ vi.mock('@/lib/gameModeAnnouncementEmail', () => ({
   generateGameModeAnnouncementHtml: vi.fn(async () => ({
     subject: 'Test Subject',
     html: '<html>test</html>',
-    text: 'test text',
   })),
 }));
 

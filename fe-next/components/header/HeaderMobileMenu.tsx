@@ -1,8 +1,9 @@
 import { memo, useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { createPortal } from 'react-dom';
 import { LazyMotion, domAnimation, m, AnimatePresence, type PanInfo } from 'framer-motion';
-import { Menu, X, Settings, Trophy, ScrollText, Coffee, Accessibility, Info, HelpCircle, Mail, Cookie, Gift, Users, ChevronRight, Sparkles, User, Flame, Bell, Check, Pencil } from 'lucide-react';
+import { Menu, X, Settings, Trophy, ScrollText, Coffee, Accessibility, Info, HelpCircle, Mail, Cookie, Gift, Users, UserPlus, ChevronRight, Sparkles, User, Flame, Bell, Check, Pencil } from 'lucide-react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useAuth } from '../../contexts/AuthContext';
@@ -24,6 +25,8 @@ import { useEngagementStatus } from '@/hooks/useEngagementStatus';
 import { useDailyMissions } from '@/hooks/useDailyMissions';
 import { useRealtimeNotifications } from '@/hooks/useRealtimeNotifications';
 import { useCrazyGamesAuth } from '@/hooks/useCrazyGamesAuth';
+import { useFriends } from '@/hooks/useFriends';
+import { useFriendMessages } from '@/hooks/useFriendMessages';
 import { queryKeys } from '@/lib/queryKeys';
 
 interface HeaderMobileMenuProps {
@@ -158,6 +161,40 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
             markBadgeSeen(badgeCount);
         }
     }, [badgeCount, lastSeenBadgeCount, markBadgeSeen, missionsLoading]);
+
+    // Friends activity badge — surfaces incoming requests, pending challenges, unread DMs
+    const pathname = usePathname();
+    const { pendingRequests, pendingChallenges } = useFriends();
+    const { unreadCount: friendMessageUnread } = useFriendMessages();
+    const friendsActivityCount = isAuthenticated
+        ? pendingRequests.length + pendingChallenges.length + friendMessageUnread
+        : 0;
+    const [lastSeenFriendsCount, setLastSeenFriendsCount] = useState<number>(() => {
+        if (typeof window === 'undefined') return 0;
+        const raw = window.localStorage.getItem('mobileMenu.lastSeenFriendsCount');
+        const parsed = raw ? Number.parseInt(raw, 10) : 0;
+        return Number.isFinite(parsed) ? parsed : 0;
+    });
+    const markFriendsSeen = useCallback((count: number) => {
+        setLastSeenFriendsCount(count);
+        if (typeof window !== 'undefined') {
+            window.localStorage.setItem('mobileMenu.lastSeenFriendsCount', String(count));
+        }
+    }, []);
+    // Clamp high-water mark down when count drops (items handled elsewhere)
+    useEffect(() => {
+        if (friendsActivityCount < lastSeenFriendsCount) {
+            markFriendsSeen(friendsActivityCount);
+        }
+    }, [friendsActivityCount, lastSeenFriendsCount, markFriendsSeen]);
+    // Clear badge when user navigates to /friends (via menu click OR direct URL)
+    useEffect(() => {
+        if (pathname?.includes('/friends')) {
+            markFriendsSeen(friendsActivityCount);
+        }
+    }, [pathname, friendsActivityCount, markFriendsSeen]);
+    const friendsBadgeCount = Math.max(0, friendsActivityCount - lastSeenFriendsCount);
+
     const mounted = useSyncExternalStore(() => () => {}, () => true, () => false);
     const mobileMenuRef = useRef<HTMLDivElement>(null);
     const isRtl = language === 'he';
@@ -545,8 +582,9 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                         {filteredNotifications.length > 0 ? (
                                             <>
                                                 <div className={cn(
-                                                    "rounded-neo border-2 border-neo-white/10 overflow-hidden",
-                                                    "bg-neo-white/5"
+                                                    "rounded-neo border-2 border-neo-white/10",
+                                                    "bg-neo-white/5",
+                                                    "max-h-72 overflow-y-auto overscroll-contain"
                                                 )}>
                                                     {(showAllNotifications
                                                         ? filteredNotifications
@@ -600,8 +638,9 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                         </button>
                                         {showPreviousNotifications && (
                                             <div className={cn(
-                                                "mt-1 rounded-neo border-2 border-neo-white/10 overflow-hidden",
-                                                "bg-neo-white/5"
+                                                "mt-1 rounded-neo border-2 border-neo-white/10",
+                                                "bg-neo-white/5",
+                                                "max-h-64 overflow-y-auto overscroll-contain"
                                             )}>
                                                 {isLoadingPrevious ? (
                                                     <div className="text-[10px] text-neo-white/40 text-center py-2">
@@ -737,6 +776,16 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                             </MenuIcon>
                                             <span>{t('ugc.nav.community')}</span>
                                         </MenuLink>
+                                    </m.div>
+
+                                    <m.div variants={itemVariants} className="relative">
+                                        <MenuLink href={`/${language}/friends`} onClick={closeMenu} accentColor="cyan">
+                                            <MenuIcon className="bg-neo-cyan/20 border-neo-cyan/40">
+                                                <UserPlus className="w-4 h-4 text-neo-cyan" aria-hidden="true" />
+                                            </MenuIcon>
+                                            <span>{t('nav.friends')}</span>
+                                        </MenuLink>
+                                        <GiftNotificationBadge count={friendsBadgeCount} />
                                     </m.div>
 
                                     {/* ─ Admin ─ */}

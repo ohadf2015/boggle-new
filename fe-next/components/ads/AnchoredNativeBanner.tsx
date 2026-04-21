@@ -62,14 +62,25 @@ export default function AnchoredNativeBanner() {
   useEffect(() => {
     if (!Capacitor.isNativePlatform()) return;
 
+    let cancelled = false;
+
     if (isAllowedRoute(pathname)) {
       // Stack banner above GlobalBottomNav: margin = nav height + safe-area bottom.
+      // Plugin ignores margin on re-show of existing banner, so hide first.
       const margin = NAV_HEIGHT_PX + (safeArea.bottom || 0);
-      showBanner(BannerAdPosition.BOTTOM_CENTER, margin);
+      (async () => {
+        await hideBanner();
+        if (cancelled) return;
+        await showBanner(BannerAdPosition.BOTTOM_CENTER, margin);
+      })();
     } else {
       hideBanner();
       document.documentElement.style.setProperty('--admob-banner-height', '0px');
     }
+
+    return () => {
+      cancelled = true;
+    };
   }, [pathname, showBanner, hideBanner, safeArea.bottom]);
 
   return null;

@@ -232,7 +232,7 @@ describe('getFirstLetterForLanguage', () => {
 // ==========================================
 describe('generateReengagementEmailHtml', () => {
   test('should generate valid HTML for English', async () => {
-    const { html, text, subject } = await generateReengagementEmailHtml({
+    const { html, subject } = await generateReengagementEmailHtml({
       recipientName: 'John',
       firstLetter: 'H',
       language: 'en',
@@ -247,8 +247,6 @@ describe('generateReengagementEmailHtml', () => {
     expect(html).toContain('https://example.com/en/daily');
     expect(html).toContain('https://example.com/unsub');
     expect(subject).toBeTruthy();
-    expect(text.toUpperCase()).toContain('JOHN');
-    expect(text).toContain('H');
   });
 
   test('should include mascot image in email', async () => {

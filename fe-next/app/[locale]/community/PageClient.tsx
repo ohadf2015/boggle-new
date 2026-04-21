@@ -336,8 +336,7 @@ export default function CommunityPageClient() {
       {/* ═══════════════════════════════════════════════
           FLOATING CREATE CTA — spring entrance + subtle pulse
           ═══════════════════════════════════════════════ */}
-      {/* Position above the bottom nav (h-16 + border + safe area ≈ 80px) */}
-      <div className="fixed bottom-24 sm:bottom-6 inset-x-0 z-30 flex justify-center pointer-events-none">
+      <div className="fixed bottom-(--mobile-bottom-safe) sm:bottom-6 inset-x-0 z-30 flex justify-center pointer-events-none">
         <AdaptiveMotion.div
           initial={{ opacity: 0, y: 24, scale: 0.9 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}

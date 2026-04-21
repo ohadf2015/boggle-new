@@ -548,6 +548,7 @@ const sv = {
     "adventure": "Äventyr",
     "blast": "Blast",
     "brain": "Hjärna",
+    "education": "Utbildning",
     "leaderboard": "Rankning",
     "profile": "Profil",
     "friends": "Vänner",
@@ -1754,7 +1755,7 @@ const sv = {
       "letterCount": "{current}/{total}"
     },
     "returningUser": {
-      "title": "Välkommen tillbaka!",
+      "title": "Välkommen",
       "subtitle": "Logga in för att fortsätta där du slutade, eller börja om.",
       "haveAccount": "Jag har ett konto",
       "newHere": "Jag är ny här",
@@ -4796,6 +4797,8 @@ const sv = {
     "fullStandings": "Hela Listan",
     "dailyDouble": "Daglig Dubbel",
     "dailyDoubleBonus": "Klara båda uppdragen för bonus-XP",
+    "lastSevenDays": "Senaste 7 dagarna",
+    "dedicationProgress": "Spela 7 dagar för att få DEDIKATION",
     "bonusChallenge": "Bonusutmaning",
     "browseArchive": "Arkiv: Tidigare Utmaningar",
     "continueMissions": "Fortsätt dina dagliga uppdrag",

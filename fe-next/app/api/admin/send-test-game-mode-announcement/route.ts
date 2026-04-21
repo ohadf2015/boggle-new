@@ -7,6 +7,8 @@ import {
 import { isEmailServiceConfigured } from '@/lib/email';
 import { captureApiError } from '@/utils/sentry';
 
+export const maxDuration = 60;
+
 const ALLOWED_MODES: GameModeKey[] = ['blast', 'wordhunt', 'adventure'];
 const ALLOWED_LANGUAGES = ['en', 'he', 'sv', 'ja', 'es'];
 

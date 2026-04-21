@@ -4,6 +4,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import {
+  Home,
   LayoutDashboard,
   BarChart3,
   ShieldAlert,
@@ -27,7 +28,15 @@ export function AdminBottomNav({ moderationCount = 0 }: AdminBottomNavProps) {
 
   const basePath = `/${language}/admin`;
 
-  const tabs = [
+  const tabs: Array<{
+    key: string;
+    icon: typeof Home;
+    label: string;
+    path: string;
+    isHome?: boolean;
+    badge?: number;
+  }> = [
+    { key: 'home', icon: Home, label: t('nav.home'), path: '', isHome: true },
     { key: 'overview', icon: LayoutDashboard, label: t('admin.sidebar.overview'), path: '' },
     { key: 'analytics', icon: BarChart3, label: t('admin.sidebar.analytics'), path: '/analytics' },
     { key: 'moderation', icon: ShieldAlert, label: t('admin.sidebar.moderation'), path: '/moderation', badge: moderationCount },
@@ -36,9 +45,10 @@ export function AdminBottomNav({ moderationCount = 0 }: AdminBottomNavProps) {
     { key: 'system', icon: Settings, label: t('admin.sidebar.system'), path: '/system' },
   ];
 
-  function isActive(path: string): boolean {
-    const fullPath = `${basePath}${path}`;
-    if (path === '') return pathname === basePath || pathname === `${basePath}/`;
+  function isActive(tab: { path: string; isHome?: boolean }): boolean {
+    if (tab.isHome) return false;
+    const fullPath = `${basePath}${tab.path}`;
+    if (tab.path === '') return pathname === basePath || pathname === `${basePath}/`;
     return pathname.startsWith(fullPath);
   }
 
@@ -49,13 +59,13 @@ export function AdminBottomNav({ moderationCount = 0 }: AdminBottomNavProps) {
     >
       <div className="flex justify-around">
         {tabs.map((tab) => {
-          const active = isActive(tab.path);
+          const active = isActive(tab);
           const Icon = tab.icon;
 
           return (
             <button
               key={tab.key}
-              onClick={() => router.push(`${basePath}${tab.path}`)}
+              onClick={() => router.push(tab.isHome ? `/${language}` : `${basePath}${tab.path}`)}
               className={cn(
                 'flex flex-col items-center gap-0.5 py-2 px-1 flex-1 text-xs transition-colors',
                 active ? 'text-neo-lime' : 'text-slate-500'

@@ -2,8 +2,14 @@ import { memo, useState, useRef, useEffect, useCallback } from 'react';
 import { LazyMotion, domAnimation, m, AnimatePresence } from 'framer-motion';
 import {
     Menu, X, Accessibility, Settings, Sparkles, BarChart3,
-    Gift, Users, Flame, Trophy, HelpCircle, Mail, Coffee, Info, Bell, Check, Pencil
+    Gift, Users, Flame, Trophy, HelpCircle, Mail, Coffee, Info, Bell, Check, Pencil, History,
+    GraduationCap, Brain
 } from 'lucide-react';
+
+const BETA_NAV_ALLOWLIST = new Set([
+    'ohadf2015@gmail.com',
+    'eden320@gmail.com',
+]);
 import Link from 'next/link';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -46,8 +52,28 @@ const HeaderMenuDropdown = memo<HeaderMenuDropdownProps>(({
         }
     }, [isAuthenticated, profile, updateProfile]);
     const { missions, completedCount, isGrandSlam, loading: missionsLoading } = useDailyMissions();
-    const { notifications, unreadCount: notificationCount, markAsRead, markAllAsRead, dismissNotification, clearAllNotifications } = useRealtimeNotifications();
+    const {
+        notifications,
+        unreadCount: notificationCount,
+        markAsRead,
+        markAllAsRead,
+        dismissNotification,
+        clearAllNotifications,
+        fetchPreviousNotifications,
+        previousNotifications,
+        isLoadingPrevious,
+    } = useRealtimeNotifications();
     const [showAllNotifications, setShowAllNotifications] = useState(false);
+    const [showPreviousNotifications, setShowPreviousNotifications] = useState(false);
+    const [hasFetchedPrevious, setHasFetchedPrevious] = useState(false);
+    const togglePreviousNotifications = useCallback(async () => {
+        const next = !showPreviousNotifications;
+        setShowPreviousNotifications(next);
+        if (next && !hasFetchedPrevious) {
+            setHasFetchedPrevious(true);
+            await fetchPreviousNotifications();
+        }
+    }, [showPreviousNotifications, hasFetchedPrevious, fetchPreviousNotifications]);
     const [isOpen, setIsOpen] = useState(false);
     const [lastSeenBadgeCount, setLastSeenBadgeCount] = useState<number>(() => {
         if (typeof window === 'undefined') return 0;
@@ -122,9 +148,13 @@ const HeaderMenuDropdown = memo<HeaderMenuDropdownProps>(({
     useEffect(() => {
         if (!isOpen) return;
         const handleClickOutside = (event: MouseEvent) => {
-            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-                setIsOpen(false);
-            }
+            const target = event.target as Node | null;
+            if (!target) return;
+            if (dropdownRef.current?.contains(target)) return;
+            // Ignore clicks inside Radix portals (Select/Popover content) — they render
+            // outside the dropdown DOM but are logically part of it.
+            if (target instanceof Element && target.closest('[data-radix-popper-content-wrapper]')) return;
+            setIsOpen(false);
         };
         const handleEscape = (event: KeyboardEvent) => {
             if (event.key === 'Escape') setIsOpen(false);
@@ -357,7 +387,7 @@ const HeaderMenuDropdown = memo<HeaderMenuDropdownProps>(({
                             )}
 
                             {/* Notifications (inline) */}
-                            {isAuthenticated && ((notifications as NotificationData[]) ?? []).length > 0 && (
+                            {isAuthenticated && (
                                 <div className="mt-1">
                                     <div className="flex items-center justify-between mb-1.5">
                                         <div className="flex items-center gap-2">
@@ -381,53 +411,105 @@ const HeaderMenuDropdown = memo<HeaderMenuDropdownProps>(({
                                                     {t('notifications.markAllRead')}
                                                 </button>
                                             )}
-                                            <button
-                                                onClick={() => clearAllNotifications()}
-                                                className="flex items-center gap-1 text-[10px] text-neo-white/40 hover:text-neo-red transition-colors font-bold"
-                                            >
-                                                <X size={10} />
-                                                {t('notifications.clearAll', 'Clear all')}
-                                            </button>
+                                            {((notifications as NotificationData[]) ?? []).length > 0 && (
+                                                <button
+                                                    onClick={() => clearAllNotifications()}
+                                                    className="flex items-center gap-1 text-[10px] text-neo-white/40 hover:text-neo-red transition-colors font-bold"
+                                                >
+                                                    <X size={10} />
+                                                    {t('notifications.clearAll', 'Clear all')}
+                                                </button>
+                                            )}
                                         </div>
                                     </div>
-                                    <div className={cn(
-                                        "rounded-neo border-2 border-neo-white/10 overflow-hidden",
-                                        "bg-neo-white/5"
-                                    )}>
-                                        {(showAllNotifications
-                                            ? (notifications as NotificationData[])
-                                            : (notifications as NotificationData[]).slice(0, 3)
-                                        ).map((n) => (
-                                            <NotificationItem
-                                                key={n.id}
-                                                notification={n}
-                                                onClick={() => {
-                                                    if (n.notification_type === 'gift') {
-                                                        closeMenu();
-                                                        window.dispatchEvent(new CustomEvent('openGiftModal', {
-                                                            detail: { giftId: n.related_entity_id },
-                                                        }));
-                                                    } else if (n.action_url) {
-                                                        closeMenu();
-                                                        const url = n.action_url.startsWith('/') ? `/${language}${n.action_url}` : n.action_url;
-                                                        window.location.href = url;
+                                    {((notifications as NotificationData[]) ?? []).length === 0 ? (
+                                        <div className="text-[10px] text-neo-white/40 text-center py-2 font-bold">
+                                            {t('notifications.empty')}
+                                        </div>
+                                    ) : (
+                                        <>
+                                            <div className={cn(
+                                                "rounded-neo border-2 border-neo-white/10",
+                                                "bg-neo-white/5",
+                                                "max-h-72 overflow-y-auto overscroll-contain"
+                                            )}>
+                                                {(showAllNotifications
+                                                    ? (notifications as NotificationData[])
+                                                    : (notifications as NotificationData[]).slice(0, 3)
+                                                ).map((n) => (
+                                                    <NotificationItem
+                                                        key={n.id}
+                                                        notification={n}
+                                                        onClick={() => {
+                                                            if (n.notification_type === 'gift') {
+                                                                closeMenu();
+                                                                window.dispatchEvent(new CustomEvent('openGiftModal', {
+                                                                    detail: { giftId: n.related_entity_id },
+                                                                }));
+                                                            } else if (n.action_url) {
+                                                                closeMenu();
+                                                                const url = n.action_url.startsWith('/') ? `/${language}${n.action_url}` : n.action_url;
+                                                                window.location.href = url;
+                                                            }
+                                                        }}
+                                                        onMarkAsRead={() => markAsRead(n.id)}
+                                                        onDismiss={() => dismissNotification(n.id)}
+                                                    />
+                                                ))}
+                                            </div>
+                                            {(notifications as NotificationData[]).length > 3 && (
+                                                <button
+                                                    onClick={() => setShowAllNotifications(!showAllNotifications)}
+                                                    className="w-full mt-1 text-center text-[10px] text-neo-white/40 hover:text-neo-cyan transition-colors font-bold py-1"
+                                                >
+                                                    {showAllNotifications
+                                                        ? t('common.showLess')
+                                                        : t('notifications.viewAll') + ` (${(notifications as NotificationData[]).length})`
                                                     }
-                                                }}
-                                                onMarkAsRead={() => markAsRead(n.id)}
-                                                onDismiss={() => dismissNotification(n.id)}
-                                            />
-                                        ))}
-                                    </div>
-                                    {(notifications as NotificationData[]).length > 3 && (
-                                        <button
-                                            onClick={() => setShowAllNotifications(!showAllNotifications)}
-                                            className="w-full mt-1 text-center text-[10px] text-neo-white/40 hover:text-neo-cyan transition-colors font-bold py-1"
-                                        >
-                                            {showAllNotifications
-                                                ? t('common.showLess')
-                                                : t('notifications.viewAll') + ` (${(notifications as NotificationData[]).length})`
-                                            }
-                                        </button>
+                                                </button>
+                                            )}
+                                        </>
+                                    )}
+                                    <button
+                                        onClick={togglePreviousNotifications}
+                                        className="w-full mt-1 flex items-center justify-center gap-1.5 text-[10px] text-neo-white/50 hover:text-neo-cyan transition-colors font-bold py-1"
+                                        aria-expanded={showPreviousNotifications}
+                                    >
+                                        <History size={12} />
+                                        {showPreviousNotifications
+                                            ? t('notifications.hidePrevious', 'Hide previous')
+                                            : t('notifications.showPrevious', 'Previous notifications')}
+                                    </button>
+                                    {showPreviousNotifications && (
+                                        <div className={cn(
+                                            "mt-1 rounded-neo border-2 border-neo-white/10",
+                                            "bg-neo-white/5",
+                                            "max-h-64 overflow-y-auto overscroll-contain"
+                                        )}>
+                                            {isLoadingPrevious ? (
+                                                <div className="text-[10px] text-neo-white/40 text-center py-2">…</div>
+                                            ) : previousNotifications.length === 0 ? (
+                                                <div className="text-[10px] text-neo-white/40 text-center py-2 font-bold">
+                                                    {t('notifications.noPrevious', 'No previous notifications')}
+                                                </div>
+                                            ) : (
+                                                (previousNotifications as unknown as NotificationData[]).map((n) => (
+                                                    <NotificationItem
+                                                        key={`prev-${n.id}`}
+                                                        notification={n}
+                                                        onClick={() => {
+                                                            if (n.action_url) {
+                                                                closeMenu();
+                                                                const url = n.action_url.startsWith('/') ? `/${language}${n.action_url}` : n.action_url;
+                                                                window.location.href = url;
+                                                            }
+                                                        }}
+                                                        onMarkAsRead={() => markAsRead(n.id)}
+                                                        onDismiss={() => dismissNotification(n.id)}
+                                                    />
+                                                ))
+                                            )}
+                                        </div>
                                     )}
                                 </div>
                             )}
@@ -449,6 +531,22 @@ const HeaderMenuDropdown = memo<HeaderMenuDropdownProps>(({
                                 label={t('footer.leaderboard')}
                                 onClick={closeMenu}
                             />
+                            {BETA_NAV_ALLOWLIST.has((user?.email ?? '').toLowerCase()) && (
+                                <>
+                                    <MenuLink
+                                        href={`/${language}/education`}
+                                        icon={<GraduationCap size={16} />}
+                                        label={t('nav.education')}
+                                        onClick={closeMenu}
+                                    />
+                                    <MenuLink
+                                        href={`/${language}/brain`}
+                                        icon={<Brain size={16} />}
+                                        label={t('nav.brain')}
+                                        onClick={closeMenu}
+                                    />
+                                </>
+                            )}
                         </div>
 
                         {/* Divider */}

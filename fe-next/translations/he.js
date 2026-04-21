@@ -542,6 +542,7 @@ const he = {
     "adventure": "הרפתקה",
     "blast": "בלאסט",
     "brain": "מוח",
+    "education": "חינוך",
     "leaderboard": "דירוג",
     "profile": "פרופיל",
     "friends": "חברים",
@@ -1757,7 +1758,7 @@ const he = {
       "letterCount": "{current}/{total}"
     },
     "returningUser": {
-      "title": "!ברוכים השבים",
+      "title": "ברוכים הבאים",
       "subtitle": "התחברו כדי להמשיך מאיפה שעצרתם, או התחילו מחדש.",
       "haveAccount": "יש לי חשבון",
       "newHere": "אני חדש כאן",
@@ -4933,6 +4934,8 @@ const he = {
     "fullStandings": "טבלה מלאה",
     "dailyDouble": "דאבל יומי",
     "dailyDoubleBonus": "השלימו את שני האתגרים לבונוס XP",
+    "lastSevenDays": "7 הימים האחרונים",
+    "dedicationProgress": "שחק 7 ימים כדי לזכות במסירות",
     "bonusChallenge": "אתגר בונוס",
     "browseArchive": "ארכיון: אתגרים קודמים",
     "continueMissions": "המשיכו במשימות היומיות",

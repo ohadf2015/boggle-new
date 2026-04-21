@@ -7,6 +7,8 @@ import logger from '@/backend/utils/logger';
 
 const ALLOWED_LANGUAGES = ['en', 'he', 'sv', 'ja', 'es'];
 
+export const maxDuration = 60;
+
 /**
  * POST /api/admin/send-test-android-beta-launch
  * Admin-only. Sends a [TEST] Android closed beta launch email.

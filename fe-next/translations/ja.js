@@ -542,6 +542,7 @@ const ja = {
     "adventure": "アドベンチャー",
     "blast": "ブラスト",
     "brain": "脳トレ",
+    "education": "教育",
     "leaderboard": "ランキング",
     "profile": "プロフィール",
     "friends": "フレンド",
@@ -1739,7 +1740,7 @@ const ja = {
       "letterCount": "{current}/{total}"
     },
     "returningUser": {
-      "title": "おかえりなさい！",
+      "title": "ようこそ",
       "subtitle": "サインインして続きから始めるか、新しく始めましょう。",
       "haveAccount": "アカウントを持っています",
       "newHere": "初めてです",
@@ -4819,6 +4820,8 @@ const ja = {
     "fullStandings": "全ランキング",
     "dailyDouble": "デイリーダブル",
     "dailyDoubleBonus": "両方クリアでボーナスXP獲得",
+    "lastSevenDays": "過去7日間",
+    "dedicationProgress": "7日プレイでDEDICATION獲得",
     "bonusChallenge": "ボーナスチャレンジ",
     "browseArchive": "アーカイブ：過去のチャレンジ",
     "continueMissions": "デイリーミッションを続ける",

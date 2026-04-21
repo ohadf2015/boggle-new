@@ -27,6 +27,7 @@ import {
   isValidLanguage,
 } from './utils';
 import { completeMission } from '../../modules/dailyMissionsManager';
+import { updateDailyProfileStats } from './profileStats';
 
 const router: Router = express.Router();
 
@@ -213,44 +214,16 @@ router.post('/submit', async (req: WordHuntSubmitRequest, res: Response): Promis
       });
     }
 
-    // Update profile stats for authenticated users (all attempts count for games played)
+    // Update profile stats for authenticated users (all attempts count for games played).
+    // Helper also bumps `unique_days_played`, which backs the DEDICATION (7d) and
+    // LOYAL_PLAYER (30d) achievements — bypassing /api/stats/record-game is why
+    // daily-challenge-only players never unlocked the 7-day title.
     if (playerId) {
+      const scoreToAdd = solved && efficiencyScore !== undefined && efficiencyScore > 0
+        ? Math.round(efficiencyScore)
+        : 0;
       try {
-        const scoreToAdd = solved && efficiencyScore !== undefined && efficiencyScore > 0
-          ? Math.round(efficiencyScore)
-          : 0;
-        // Atomic increment to prevent multi-tab race conditions
-        const { error: updateError } = await supabase.rpc('increment_profile_stats', {
-          p_user_id: playerId,
-          p_score: scoreToAdd,
-          p_games: 1,
-        });
-
-        if (updateError) {
-          // Fallback to non-atomic update if RPC doesn't exist yet
-          if (updateError.code === '42883' || updateError.message?.includes('function')) {
-            const { data: profile } = await supabase
-              .from('profiles')
-              .select('total_score, total_games')
-              .eq('id', playerId)
-              .single();
-
-            if (profile) {
-              await supabase
-                .from('profiles')
-                .update({
-                  total_score: (profile.total_score || 0) + scoreToAdd,
-                  total_games: (profile.total_games || 0) + 1,
-                  last_game_at: new Date().toISOString(),
-                })
-                .eq('id', playerId);
-            }
-          } else {
-            logger.error('API', `[WordHunt] Failed to update profile stats for ${playerId}: ${updateError.message}`);
-          }
-        } else {
-          logger.info('API', `[WordHunt] Updated profile stats atomically for ${playerId}: +${scoreToAdd} points`);
-        }
+        await updateDailyProfileStats({ supabase, playerId, scoreToAdd });
       } catch (scoreError) {
         logger.error('API', `[WordHunt] Failed to update profile stats for ${playerId}: ${(scoreError as Error).message}`);
       }

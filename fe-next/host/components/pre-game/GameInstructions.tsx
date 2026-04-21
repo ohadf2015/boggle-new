@@ -13,7 +13,7 @@ interface GameInstructionsProps {
 
 const GAME_INSTRUCTIONS: Record<string, { icon: React.ReactNode; barClass: string; iconBgClass: string; dotClass: string; steps: { titleKey: string; descKey: string }[] }> = {
   random: {
-    icon: <Grid3X3 className="w-5 h-5" />,
+    icon: <Grid3X3 className="w-4 h-4" />,
     barClass: 'bg-neo-purple', iconBgClass: 'bg-neo-purple', dotClass: 'bg-neo-purple',
     steps: [
       { titleKey: 'howToPlay.steps.basics.title', descKey: 'help.swipeLetters' },
@@ -22,7 +22,7 @@ const GAME_INSTRUCTIONS: Record<string, { icon: React.ReactNode; barClass: strin
     ],
   },
   classic: {
-    icon: <Grid3X3 className="w-5 h-5" />,
+    icon: <Grid3X3 className="w-4 h-4" />,
     barClass: 'bg-neo-cyan', iconBgClass: 'bg-neo-cyan', dotClass: 'bg-neo-cyan',
     steps: [
       { titleKey: 'howToPlay.steps.basics.title', descKey: 'help.swipeLetters' },
@@ -31,7 +31,7 @@ const GAME_INSTRUCTIONS: Record<string, { icon: React.ReactNode; barClass: strin
     ],
   },
   blast: {
-    icon: <Zap className="w-5 h-5" />,
+    icon: <Zap className="w-4 h-4" />,
     barClass: 'bg-neo-pink', iconBgClass: 'bg-neo-pink', dotClass: 'bg-neo-pink',
     steps: [
       { titleKey: 'gameModes.blast.name', descKey: 'gameModes.blast.description' },
@@ -40,7 +40,7 @@ const GAME_INSTRUCTIONS: Record<string, { icon: React.ReactNode; barClass: strin
     ],
   },
   'word-hunt': {
-    icon: <Crosshair className="w-5 h-5" />,
+    icon: <Crosshair className="w-4 h-4" />,
     barClass: 'bg-neo-lime', iconBgClass: 'bg-neo-lime', dotClass: 'bg-neo-lime',
     steps: [
       { titleKey: 'gameModes.wordHunt.name', descKey: 'gameModes.wordHunt.description' },
@@ -52,7 +52,7 @@ const GAME_INSTRUCTIONS: Record<string, { icon: React.ReactNode; barClass: strin
 
 export function GameInstructions({ selectedGameMode, t }: GameInstructionsProps): React.ReactElement | null {
   const [instructionStep, setInstructionStep] = useState(0);
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
 
   useEffect(() => { setInstructionStep(0); }, [selectedGameMode]);
 
@@ -72,9 +72,9 @@ export function GameInstructions({ selectedGameMode, t }: GameInstructionsProps)
       <button
         type="button"
         onClick={() => setIsOpen(o => !o)}
-        className="w-full p-3 flex items-center gap-2"
+        className="w-full p-2.5 flex items-center gap-2"
       >
-        <div className={cn('w-7 h-7 rounded-full border-2 border-neo-black flex items-center justify-center shadow-hard-sm text-neo-black shrink-0', iconBgClass)}>
+        <div className={cn('w-6 h-6 rounded-full border-2 border-neo-black flex items-center justify-center shadow-hard-sm text-neo-black shrink-0', iconBgClass)}>
           {icon}
         </div>
         <h3 className="text-sm font-black uppercase text-neo-cream flex items-center gap-1.5 flex-1 text-start">
@@ -110,7 +110,7 @@ export function GameInstructions({ selectedGameMode, t }: GameInstructionsProps)
                 </motion.div>
               </AnimatePresence>
               <div className="flex items-center justify-center gap-3 mt-3">
-                <button onClick={(e) => { e.stopPropagation(); setInstructionStep(s => Math.max(0, s - 1)); }} disabled={instructionStep === 0} className="w-7 h-7 flex items-center justify-center rounded bg-neo-white/10 disabled:opacity-30 transition-opacity" aria-label={t('common.previous')}>
+                <button onClick={(e) => { e.stopPropagation(); setInstructionStep(s => Math.max(0, s - 1)); }} disabled={instructionStep === 0} className="w-6 h-6 flex items-center justify-center rounded bg-neo-white/10 disabled:opacity-30 transition-opacity" aria-label={t('common.previous')}>
                   <ChevronLeft className="w-4 h-4 text-neo-cream rtl:rotate-180" />
                 </button>
                 <div className="flex gap-1.5">
@@ -118,7 +118,7 @@ export function GameInstructions({ selectedGameMode, t }: GameInstructionsProps)
                     <button key={i} onClick={(e) => { e.stopPropagation(); setInstructionStep(i); }} className={cn('w-2 h-2 rounded-full transition-colors', i === instructionStep ? dotClass : 'bg-neo-white/20')} />
                   ))}
                 </div>
-                <button onClick={(e) => { e.stopPropagation(); setInstructionStep(s => Math.min(steps.length - 1, s + 1)); }} disabled={instructionStep === steps.length - 1} className="w-7 h-7 flex items-center justify-center rounded bg-neo-white/10 disabled:opacity-30 transition-opacity" aria-label={t('common.next')}>
+                <button onClick={(e) => { e.stopPropagation(); setInstructionStep(s => Math.min(steps.length - 1, s + 1)); }} disabled={instructionStep === steps.length - 1} className="w-6 h-6 flex items-center justify-center rounded bg-neo-white/10 disabled:opacity-30 transition-opacity" aria-label={t('common.next')}>
                   <ChevronRight className="w-4 h-4 text-neo-cream rtl:rotate-180" />
                 </button>
               </div>

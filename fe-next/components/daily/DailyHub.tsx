@@ -14,6 +14,8 @@ import {
   hasPlayedWordWheelToday,
   getDailyStreak,
 } from '@/utils/dailyChallenge';
+import { getLastSevenDaysCompletion } from '@/utils/dailyChallenge/storage';
+import LastSevenDaysIndicator from './LastSevenDaysIndicator';
 import { formatTimeHHMMSS } from '@/shared/utils/timeFormatting';
 import type { Language } from '@/types';
 
@@ -109,6 +111,7 @@ export default function DailyHub() {
   const playedWH = hasPlayedWordHuntToday(gameLang);
   const playedWW = hasPlayedWordWheelToday(gameLang);
   const bothDone = playedWH && playedWW;
+  const lastSevenDays = React.useMemo(() => getLastSevenDaysCompletion(gameLang), [gameLang]);
 
   // Countdown timer
   const [countdown, setCountdown] = React.useState('');
@@ -161,6 +164,9 @@ export default function DailyHub() {
             ✨ {t('daily.dailyDouble')}
           </motion.div>
         )}
+
+        {/* Last 7 days progress (DEDICATION) */}
+        <LastSevenDaysIndicator days={lastSevenDays} />
 
         {/* Quest Cards */}
         <div className="flex flex-col gap-3">

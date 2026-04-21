@@ -146,15 +146,15 @@ describe('OnboardingFlow analytics', () => {
 
   it('fires step=language on language select', () => {
     render(<OnboardingFlow onComplete={vi.fn()} />);
-    goNew();
     fireEvent.click(screen.getByTestId('lang-btn'));
+    goNew();
     expect(trackOnboardingStep).toHaveBeenCalledWith('language');
   });
 
   it('fires step=tutorial with score/wordCount on tutorial complete', () => {
     render(<OnboardingFlow onComplete={vi.fn()} />);
-    goNew();
     fireEvent.click(screen.getByTestId('lang-btn'));
+    goNew();
     fireEvent.click(screen.getByTestId('tut-btn'));
     expect(trackOnboardingStep).toHaveBeenCalledWith('tutorial', {
       score: 47,
@@ -164,8 +164,8 @@ describe('OnboardingFlow analytics', () => {
 
   it('fires step=profile with hasPendingInvite=false', () => {
     render(<OnboardingFlow onComplete={vi.fn()} />);
-    goNew();
     fireEvent.click(screen.getByTestId('lang-btn'));
+    goNew();
     fireEvent.click(screen.getByTestId('tut-btn'));
     fireEvent.click(screen.getByTestId('profile-btn'));
     expect(trackOnboardingStep).toHaveBeenCalledWith('profile', {
@@ -177,8 +177,8 @@ describe('OnboardingFlow analytics', () => {
     mockHasPendingRoom.mockReturnValue(true);
     mockConsumePendingRoom.mockReturnValue('ABC123');
     render(<OnboardingFlow onComplete={vi.fn()} />);
-    goNew();
     fireEvent.click(screen.getByTestId('lang-btn'));
+    goNew();
     fireEvent.click(screen.getByTestId('tut-btn'));
     fireEvent.click(screen.getByTestId('profile-btn'));
     expect(trackOnboardingStep).toHaveBeenCalledWith('profile', {
@@ -188,8 +188,8 @@ describe('OnboardingFlow analytics', () => {
 
   it('fires step=score_reveal action=continue on Continue', () => {
     render(<OnboardingFlow onComplete={vi.fn()} />);
-    goNew();
     fireEvent.click(screen.getByTestId('lang-btn'));
+    goNew();
     fireEvent.click(screen.getByTestId('tut-btn'));
     fireEvent.click(screen.getByTestId('profile-btn'));
     fireEvent.click(screen.getByTestId('continue-btn'));
@@ -200,8 +200,8 @@ describe('OnboardingFlow analytics', () => {
 
   it('fires step=score_reveal action=retry on Try Again (friction signal)', () => {
     render(<OnboardingFlow onComplete={vi.fn()} />);
-    goNew();
     fireEvent.click(screen.getByTestId('lang-btn'));
+    goNew();
     fireEvent.click(screen.getByTestId('tut-btn'));
     fireEvent.click(screen.getByTestId('profile-btn'));
     fireEvent.click(screen.getByTestId('retry-btn'));
@@ -212,8 +212,8 @@ describe('OnboardingFlow analytics', () => {
 
   it('fires step=mode_select with mode param', () => {
     render(<OnboardingFlow onComplete={vi.fn()} />);
-    goNew();
     fireEvent.click(screen.getByTestId('lang-btn'));
+    goNew();
     fireEvent.click(screen.getByTestId('tut-btn'));
     fireEvent.click(screen.getByTestId('profile-btn'));
     fireEvent.click(screen.getByTestId('continue-btn'));

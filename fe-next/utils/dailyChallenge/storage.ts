@@ -19,9 +19,10 @@ import {
   DAILY_STORAGE_KEY,
   WORD_HUNT_STORAGE_KEY,
   WORD_WHEEL_STORAGE_KEY,
+  getWordHuntResultKey,
   getWordWheelResultKey,
 } from './constants';
-import { getDailyChallengeDate } from './dateUtils';
+import { getDailyChallengeDate, getPreviousDate } from './dateUtils';
 import { updateDailyStreak } from './streaks';
 import {
   getJsonFromLocalStorage,
@@ -104,6 +105,33 @@ export function hasPlayedWordHuntToday(language: Language): boolean {
   const today = getDailyChallengeDate();
   const key = `${WORD_HUNT_STORAGE_KEY}_${language}_${today}`;
   return getFromLocalStorage(key) !== null;
+}
+
+export interface DailyCompletionDay {
+  date: string;
+  wordHunt: boolean;
+  wordWheel: boolean;
+}
+
+/**
+ * Last 7 UTC days (oldest → newest, ending today), with per-mode
+ * completion flags. Powers the DEDICATION progress indicator.
+ */
+export function getLastSevenDaysCompletion(language: Language): DailyCompletionDay[] {
+  const dates: string[] = [];
+  let cursor = getDailyChallengeDate();
+  dates.push(cursor);
+  for (let i = 0; i < 6; i++) {
+    cursor = getPreviousDate(cursor);
+    dates.push(cursor);
+  }
+  dates.reverse();
+
+  return dates.map((date) => ({
+    date,
+    wordHunt: getFromLocalStorage(getWordHuntResultKey(language, date)) !== null,
+    wordWheel: getFromLocalStorage(getWordWheelResultKey(language, date)) !== null,
+  }));
 }
 
 /**

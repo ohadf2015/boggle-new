@@ -38,7 +38,7 @@ export function DesktopLobbyLayout({
       animate={{ opacity: 1 }}
       transition={{ type: 'spring', stiffness: 300, damping: 26 }}
       className={cn(
-        'grid h-full p-4 desktop-tall:p-6 xl:desktop-tall:p-8 bg-neo-navy',
+        'grid flex-1 min-h-0 p-4 desktop-tall:p-6 xl:desktop-tall:p-8 bg-neo-navy',
         'grid-cols-12',
         'gap-4 desktop-tall:gap-5 xl:desktop-tall:gap-8',
         className
@@ -55,7 +55,7 @@ export function DesktopLobbyLayout({
       {/* Right Column - QR + Share + Chat */}
       <div
         data-testid="desktop-right-column"
-        className="col-span-5 xl:col-span-4 flex flex-col gap-4 overflow-hidden min-h-0"
+        className="col-span-5 xl:col-span-4 flex flex-col gap-4 overflow-y-auto overscroll-contain scrollable-area min-h-0"
       >
         {rightContent}
       </div>

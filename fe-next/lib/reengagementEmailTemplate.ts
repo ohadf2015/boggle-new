@@ -30,7 +30,6 @@ interface EmailTemplateParams {
 export async function generateReengagementEmailHtml(params: EmailTemplateParams): Promise<{
   subject: string;
   html: string;
-  text: string;
 }> {
   const { recipientName, firstLetter, language, unsubscribeUrl, playUrl } = params;
 
@@ -38,10 +37,7 @@ export async function generateReengagementEmailHtml(params: EmailTemplateParams)
 
   const props = { recipientName, firstLetter, language, unsubscribeUrl, playUrl };
 
-  const [html, text] = await Promise.all([
-    render(ReengagementEmailV2(props)),
-    render(ReengagementEmailV2(props), { plainText: true }),
-  ]);
+  const html = await render(ReengagementEmailV2(props));
 
-  return { subject, html, text };
+  return { subject, html };
 }

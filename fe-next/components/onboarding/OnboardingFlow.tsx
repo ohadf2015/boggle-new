@@ -25,7 +25,7 @@ import AuthModal from '@/components/auth/AuthModal';
 
 type FlowStep = 'returningUser' | 'language' | 'tutorial' | 'profile' | 'scoreReveal' | 'fork';
 
-const STEPS: FlowStep[] = ['returningUser', 'language', 'tutorial', 'profile', 'scoreReveal', 'fork'];
+const STEPS: FlowStep[] = ['language', 'returningUser', 'tutorial', 'profile', 'scoreReveal', 'fork'];
 
 /** Step-specific accent colors for the floating background shapes */
 const STEP_ACCENTS: Record<FlowStep, { color1: string; color2: string }> = {
@@ -54,7 +54,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
   const { isAuthenticated } = useAuth();
   const router = useRouter();
 
-  const [step, setStep] = useState<FlowStep>('returningUser');
+  const [step, setStep] = useState<FlowStep>('language');
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [tutorialScore, setTutorialScore] = useState(0);
   const [, setTutorialWords] = useState<string[]>([]);
@@ -83,8 +83,8 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
   }, []);
 
   const handleNewUser = useCallback(() => {
-    trackOnboardingStep('language');
-    setStep('language');
+    trackOnboardingStep('tutorial');
+    setStep('tutorial');
   }, []);
 
   const handleSkipOnboarding = useCallback(() => {
@@ -192,10 +192,10 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
     [language, router, onComplete, playerName, isNavigating]
   );
 
-  // Step 0: Language selected — proceed to tutorial
+  // Step 0: Language selected — proceed to returningUser prompt
   const handleLanguageSelect = useCallback(() => {
     trackOnboardingStep('language');
-    setStep('tutorial');
+    setStep('returningUser');
   }, []);
 
   const renderStep = () => {

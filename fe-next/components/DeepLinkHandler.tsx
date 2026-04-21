@@ -98,13 +98,13 @@ export default function DeepLinkHandler() {
           listenerResult.then((listener: { remove: () => void }) => {
             if (mounted) cleanup = () => listener.remove();
           }).catch((error: unknown) => {
-            logger.error('Failed to register deep link listener:', error);
+            logger.debug('Deep link listener unavailable:', error);
           });
         } else if (listenerResult?.remove) {
           cleanup = () => listenerResult.remove();
         }
       } catch (error) {
-        logger.error('Failed to register deep link listener:', error);
+        logger.debug('Deep link listener unavailable:', error);
       }
     } else {
       // Async fallback for dynamic import path
@@ -116,10 +116,10 @@ export default function DeepLinkHandler() {
               if (mounted) cleanup = () => listener.remove();
             })
             .catch((error: unknown) => {
-              logger.error('Failed to register deep link listener:', error);
+              logger.debug('Deep link listener unavailable:', error);
             });
         } catch (error) {
-          logger.error('Failed to register deep link listener:', error);
+          logger.debug('Deep link listener unavailable:', error);
         }
       });
     }

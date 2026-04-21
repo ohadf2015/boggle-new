@@ -126,9 +126,10 @@ export const MessageComposer: React.FC<MessageComposerProps> = ({
    * Handle Enter key (Shift+Enter for newline)
    */
   const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    // Skip during IME composition (Hebrew/Japanese/Chinese) — Enter commits the
-    // composition, not the message. keyCode 229 is the legacy IME indicator.
-    if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) {
+    // Skip only when the keydown is an IME composition commit (keyCode 229).
+    // `isComposing` is unreliable on Android GBoard with Hebrew/RTL — it stays
+    // true until a space/punctuation commits the word, blocking Enter-to-send.
+    if (e.key === 'Enter' && !e.shiftKey && e.nativeEvent.keyCode !== 229) {
       e.preventDefault();
       handleSend();
     }

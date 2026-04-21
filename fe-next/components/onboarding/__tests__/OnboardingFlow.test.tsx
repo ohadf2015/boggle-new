@@ -149,24 +149,25 @@ describe('OnboardingFlow', () => {
     mockConsumePendingRoom.mockReturnValue(null);
   });
 
+  const pickLanguage = () => fireEvent.click(screen.getByText('Select Language'));
   const goNewUser = () => fireEvent.click(screen.getByText("I'm New Here"));
   const selectLanguage = () => {
+    pickLanguage();
     goNewUser();
-    fireEvent.click(screen.getByText('Select Language'));
   };
 
-  it('starts with the returning user step', () => {
+  it('starts with the language select step', () => {
     render(<OnboardingFlow {...defaultProps} />);
-    expect(screen.getByTestId('returning-user-step')).toBeInTheDocument();
-  });
-
-  it('transitions to language select when user chooses new here', () => {
-    render(<OnboardingFlow {...defaultProps} />);
-    goNewUser();
     expect(screen.getByTestId('language-select')).toBeInTheDocument();
   });
 
-  it('transitions to tutorial after language select', () => {
+  it('transitions to returning user after language select', () => {
+    render(<OnboardingFlow {...defaultProps} />);
+    pickLanguage();
+    expect(screen.getByTestId('returning-user-step')).toBeInTheDocument();
+  });
+
+  it('transitions to tutorial when returning user chooses new here', () => {
     render(<OnboardingFlow {...defaultProps} />);
     selectLanguage();
     expect(screen.getByTestId('tutorial-game')).toBeInTheDocument();

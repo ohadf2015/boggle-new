@@ -97,6 +97,7 @@ vi.mock('next/navigation', () => ({
     replace: vi.fn(),
   }),
   useParams: () => ({ locale: 'en' }),
+  usePathname: () => '/',
 }));
 vi.mock('@/utils/onboardingStorage', () => ({
   hasCompletedOnboarding: () => true,

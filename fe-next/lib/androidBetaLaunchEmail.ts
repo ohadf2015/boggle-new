@@ -32,7 +32,6 @@ interface RenderParams {
 interface RenderedEmail {
   subject: string;
   html: string;
-  text: string;
 }
 
 export async function generateAndroidBetaLaunchHtml(
@@ -43,12 +42,9 @@ export async function generateAndroidBetaLaunchHtml(
     params.recipientName
   );
 
-  const [html, text] = await Promise.all([
-    render(AndroidBetaLaunchEmail(params)),
-    render(AndroidBetaLaunchEmail(params), { plainText: true }),
-  ]);
+  const html = await render(AndroidBetaLaunchEmail(params));
 
-  return { subject, html, text };
+  return { subject, html };
 }
 
 function resolveBaseUrl(): string {
@@ -79,19 +75,19 @@ export async function sendTestAndroidBetaLaunch(
 
   logger.info('EMAIL', `[android-beta-test] render-start lang=${language} +${Date.now() - t0}ms`);
   const renderStart = Date.now();
-  const { subject, html, text } = await withTimeout(
+  const { subject, html } = await withTimeout(
     generateAndroidBetaLaunchHtml({
       recipientName,
       language,
       unsubscribeUrl,
       playUrl: PLAY_STORE_URL,
     }),
-    15000,
-    'Email render timed out after 15 seconds'
+    30000,
+    'Email render timed out after 30 seconds'
   );
   logger.info(
     'EMAIL',
-    `[android-beta-test] render-done html=${html.length}B text=${text.length}B in ${Date.now() - renderStart}ms`
+    `[android-beta-test] render-done html=${html.length}B in ${Date.now() - renderStart}ms`
   );
 
   try {
@@ -103,10 +99,9 @@ export async function sendTestAndroidBetaLaunch(
         to: toEmail,
         subject: `[TEST] ${subject}`,
         html,
-        text,
       }),
-      10000,
-      'Resend API timed out after 10 seconds'
+      20000,
+      'Resend API timed out after 20 seconds'
     );
     logger.info(
       'EMAIL',
@@ -230,12 +225,16 @@ export async function sendAndroidBetaLaunchToPlayer(
   const unsubscribeUrl = `${baseUrl}/api/email/unsubscribe?token=${unsubscribeToken}`;
   const recipientName = displayName || username || 'Word Hunter';
 
-  const { subject, html, text } = await generateAndroidBetaLaunchHtml({
-    recipientName,
-    language,
-    unsubscribeUrl,
-    playUrl: PLAY_STORE_URL,
-  });
+  const { subject, html } = await withTimeout(
+    generateAndroidBetaLaunchHtml({
+      recipientName,
+      language,
+      unsubscribeUrl,
+      playUrl: PLAY_STORE_URL,
+    }),
+    30000,
+    'Email render timed out after 30 seconds'
+  );
 
   try {
     const result = await withTimeout(
@@ -244,14 +243,13 @@ export async function sendAndroidBetaLaunchToPlayer(
         to: resolvedEmail,
         subject,
         html,
-        text,
         headers: {
           'List-Unsubscribe': `<${unsubscribeUrl}>`,
           'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
         },
       }),
-      10000,
-      'Resend API timed out after 10 seconds'
+      20000,
+      'Resend API timed out after 20 seconds'
     );
 
     if (result.error) {

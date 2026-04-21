@@ -1162,7 +1162,7 @@ body.crazygames-embed {
  * The calc accounts for PARENT elements only (not siblings):
  * - 100dvh: Full viewport (dynamic - adjusts when browser UI changes)
  * - AutoHideHeader: 60px (global header with logo/menu)
- * - main.pb-16: 64px (layout padding for GlobalBottomNav, present even when hidden)
+ * - GlobalBottomNav: 64px (h-16 fixed bar; reserved here so content doesn't sit under it on routes where the nav shows)
  * - Safe area: env(safe-area-inset-bottom) for notched devices
  *
  * IMPORTANT: This class does NOT subtract sibling elements like "Compact Header"
@@ -1174,7 +1174,7 @@ body.crazygames-embed {
  * pb-[--mobile-bottom-safe] padding to scroll past the fixed bar.
  */
 .isolate-scroll {
-  /* Fixed height = viewport - AutoHideHeader(60) - main.pb-16(64) - safe-area */
+  /* Fixed height = viewport - AutoHideHeader(60) - GlobalBottomNav(64) - safe-area */
   /* Note: Sibling elements (compact headers) are handled by flex layout, not subtracted here */
   height: calc(100dvh - 60px - 64px - env(safe-area-inset-bottom, 0px));
   max-height: calc(100dvh - 60px - 64px - env(safe-area-inset-bottom, 0px));

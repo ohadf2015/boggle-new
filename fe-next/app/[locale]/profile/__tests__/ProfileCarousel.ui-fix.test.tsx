@@ -71,7 +71,8 @@ vi.mock('next/navigation', () => ({
   }),
   useSearchParams: () => ({
     get: vi.fn(() => null)
-  })
+  }),
+  usePathname: () => '/'
 }));
 
 // Mock NavigationContext - AutoHideHeader uses useNavigation
