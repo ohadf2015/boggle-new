@@ -27,6 +27,7 @@ import AnchoredNativeBanner from '@/components/ads/AnchoredNativeBanner';
 import { initUtmCapture } from '@/utils/utmCapture';
 import { initConsoleOverride, initCapacitorLogFilter } from '@/utils/consoleOverride';
 import { initSessionTracking } from '@/utils/sessionTracking';
+import { initCrashlytics } from '@/utils/crashlytics';
 import { linkLogRocketSession } from '@/utils/sentry';
 import { hasConsent } from '@/utils/cookieConsent';
 import { LogRocketIdentify } from '@/components/providers/LogRocketIdentify';
@@ -122,6 +123,9 @@ export function EssentialProviders({ children, lang, initialTranslations }: Esse
     // Initialize session tracking for analytics
     useEffect(() => {
         initSessionTracking();
+        // Native-only: enable Firebase Crashlytics so launch crashes are captured.
+        // No-ops on web; errors are swallowed internally — never blocks launch.
+        void initCrashlytics();
     }, []);
 
     // Defer LogRocket initialization for optimal performance

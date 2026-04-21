@@ -17,6 +17,7 @@ const config: CapacitorConfig = {
     // Production: Load from hosted webapp
     url: 'https://www.lexiclash.live',
     cleartext: false, // HTTPS only in production
+    errorPath: 'error.html', // Offline/network fallback — prevents blank-screen "crash"
   },
 
   plugins: {

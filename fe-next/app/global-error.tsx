@@ -57,6 +57,13 @@ export default function GlobalError({
         },
       });
     });
+
+    import("@/utils/crashlytics").then(({ recordNativeError }) => {
+      void recordNativeError(error, {
+        boundary: "global-error",
+        digest: error.digest ?? "",
+      });
+    });
   }, [error]);
 
   // Detect locale from URL path (e.g. /he/...) or fallback to 'en'
