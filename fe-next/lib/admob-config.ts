@@ -8,9 +8,9 @@ export interface AdmobConfig {
 
 export const DEFAULTS: Record<AdPlatform, AdmobConfig> = {
   android: {
-    rewardedAdId: 'ca-app-pub-3940256099942544/5224354917',
-    interstitialAdId: 'ca-app-pub-3940256099942544/1033173712',
-    bannerAdId: 'ca-app-pub-3940256099942544/6300978111',
+    rewardedAdId: 'ca-app-pub-1896836706464880/3688045325',
+    interstitialAdId: 'ca-app-pub-1896836706464880/2374963657',
+    bannerAdId: 'ca-app-pub-1896836706464880/7714920248',
   },
   ios: {
     rewardedAdId: 'ca-app-pub-3940256099942544/1712485313',

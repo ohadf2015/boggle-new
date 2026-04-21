@@ -145,8 +145,6 @@ Sentry.init({
     /\[SOLVE-GRID\].*Blacklist query error/i,
     // Friends fetch fails downstream of Supabase lock contention — non-actionable
     /Error fetching friends/i,
-    // Capacitor addListener().then() — WebView compatibility issue on specific Android devices
-    /addListener\(.*\)\.then is not a function/i,
     // Next.js router state header parse — transient internal error, not actionable
     /router state header was sent but could not be parsed/i,
     // Progression quest-progress 429 — rate limited, non-critical background save
@@ -266,6 +264,8 @@ Sentry.init({
     // shadowroot/route-announcer — browser extension noise (JAVASCRIPT-NEXTJS-116)
     /shadowroot.*NEXT-ROUTE-ANNOUNCER/i,
     /no txrsid/i,
+    // console.warn(stack) from React internals — no message, just stack frames (JAVASCRIPT-NEXTJS-11C)
+    /^\s*at https?:\/\/[^\s]+\/_next\/static\/chunks\//,
   ],
 
   denyUrls: [

@@ -12,11 +12,11 @@ describe('getAdmobConfig', () => {
     process.env = originalEnv;
   });
 
-  it('returns android test IDs by default', () => {
+  it('returns android default IDs when env vars are missing', () => {
     const config = getAdmobConfig('android');
-    expect(config.rewardedAdId).toBe('ca-app-pub-3940256099942544/5224354917');
-    expect(config.interstitialAdId).toBe('ca-app-pub-3940256099942544/1033173712');
-    expect(config.bannerAdId).toBe('ca-app-pub-3940256099942544/6300978111');
+    expect(config.rewardedAdId).toBe(DEFAULTS.android.rewardedAdId);
+    expect(config.interstitialAdId).toBe(DEFAULTS.android.interstitialAdId);
+    expect(config.bannerAdId).toBe(DEFAULTS.android.bannerAdId);
   });
 
   it('returns ios test IDs by default', () => {

@@ -164,7 +164,7 @@ describe('GlobalBottomNav', () => {
 
             const { container } = render(<GlobalBottomNav />);
             const nav = container.querySelector('nav');
-            expect(nav).toHaveStyle({ paddingBottom: '34px' });
+            expect(nav).toHaveStyle({ paddingBottom: 'max(0px, 34px - var(--admob-banner-height, 0px))' });
         });
     });
 
