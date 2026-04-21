@@ -199,12 +199,34 @@ export async function setupPushListeners(
       return () => {}; // Plugin not available (e.g., Android WebView without Capacitor)
     }
 
-    // Handle notification received while app is in foreground
+    const LocalNotifications = (globalThis as any).Capacitor?.Plugins?.LocalNotifications;
+
+    // Handle notification received while app is in foreground.
+    // Capacitor's PushNotifications plugin does NOT display a system-tray
+    // notification when the app is foregrounded — we must bridge to
+    // LocalNotifications ourselves, otherwise users see nothing.
     const receivedListener = await PushNotifications.addListener(
       'pushNotificationReceived',
-      (notification: { data?: Record<string, string> }) => {
+      async (notification: { title?: string; body?: string; data?: Record<string, string> }) => {
         if (onNotificationReceived && notification.data) {
           onNotificationReceived(notification.data as Record<string, string>);
+        }
+
+        if (LocalNotifications && (notification.title || notification.body)) {
+          try {
+            await LocalNotifications.schedule({
+              notifications: [
+                {
+                  id: Date.now() % 2147483647,
+                  title: notification.title || '',
+                  body: notification.body || '',
+                  extra: notification.data || {},
+                },
+              ],
+            });
+          } catch (err) {
+            console.debug('LocalNotifications.schedule failed:', err);
+          }
         }
       }
     );
