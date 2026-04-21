@@ -4361,6 +4361,7 @@ const sv = {
     "playingNow": "Spelar Nu",
     "welcomeTitle": "Ord. Rivaler. Ära.",
     "welcomeSubtitle": "Gratis. Ingen registrering. Inga annonser.",
+    "playTodayChallenge": "Spela dagens utmaning",
     "singlePlayer": "Snabbspel",
     "singlePlayerDesc": "Hoppa in och spela direkt",
     "badgeBots": "Bottar",

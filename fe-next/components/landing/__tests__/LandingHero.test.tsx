@@ -61,4 +61,11 @@ describe('LandingHero', () => {
     // On mobile the leaderboard sidebar is not rendered
     expect(screen.queryByTestId('leaderboard-preview')).not.toBeInTheDocument();
   });
+
+  it('renders Daily Challenge CTA linking to localized daily route', () => {
+    render(<LandingHero {...baseProps} />);
+    const cta = screen.getByRole('link', { name: 'landing.playTodayChallenge' });
+    expect(cta).toBeInTheDocument();
+    expect(cta).toHaveAttribute('href', '/en/daily');
+  });
 });

@@ -4339,6 +4339,7 @@ const ja = {
     "playingNow": "プレイ中",
     "welcomeTitle": "言葉。ライバル。栄光。",
     "welcomeSubtitle": "無料。登録不要。広告なし。",
+    "playTodayChallenge": "今日のチャレンジをプレイ",
     "singlePlayer": "クイックプレイ",
     "singlePlayerDesc": "すぐにプレイ開始",
     "badgeBots": "ボット",

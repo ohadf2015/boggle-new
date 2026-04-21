@@ -4385,6 +4385,7 @@ const es = {
     "playingNow": "jugando",
     "welcomeTitle": "Palabras. Rivales. Gloria.",
     "welcomeSubtitle": "Gratis. Sin registro. Sin anuncios.",
+    "playTodayChallenge": "Jugar el desafío de hoy",
     "singlePlayer": "Juego Rápido",
     "singlePlayerDesc": "¡Salta y juega al instante!",
     "badgeBots": "Bots",

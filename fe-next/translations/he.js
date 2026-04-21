@@ -4358,6 +4358,7 @@ const he = {
     "playingNow": "משחקים עכשיו",
     "welcomeTitle": "מילים. יריבים. תהילה.",
     "welcomeSubtitle": "חינם. בלי הרשמה. בלי פרסומות.",
+    "playTodayChallenge": "שחקו באתגר היומי",
     "singlePlayer": "משחק מהיר",
     "singlePlayerDesc": "קפצו פנימה ושחקו מיד",
     "badgeBots": "בוטים",

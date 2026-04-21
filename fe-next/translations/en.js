@@ -4466,6 +4466,7 @@ const en = {
     "playingNow": "Playing Now",
     "welcomeTitle": "Words. Rivals. Glory.",
     "welcomeSubtitle": "Free. No sign-up. No ads.",
+    "playTodayChallenge": "Play Today's Challenge",
     "singlePlayer": "Quick Play",
     "singlePlayerDesc": "Jump in and play instantly",
     "badgeBots": "Bots",
