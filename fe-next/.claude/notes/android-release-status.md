@@ -6,7 +6,9 @@
 **Production access gate** (Play policy, not technical): need ≥12 closed-test opt-ins × 14 days before "Apply for production access" unlocks. Dashboard: "2 testers currently opted in". No API bypass.
 
 ## Last Release
-versionCode **3765** uploaded 2026-04-21 to **internal** track, release_status=completed. Ships Sentry Capacitor-WebView filter removal (`addListener(...).then is not a function` class now reaches Sentry) + i18n'd `capacitor-assets/error.html` (5 locales, RTL shadow flip). Prior: 3761 (native crash logger `MainActivity.installCrashLogger` → `filesDir/last_crash.txt` + default notification channel), 3734 (2026-04-20), 3733 burned (duplicate-code error before bump).
+versionCode **3766** uploaded 2026-04-21 to **internal** track. Ships **launch-crash fix**: disabled AdMob `MobileAdsInitProvider` via `tools:node="remove"` (auto-init ran before `Application.onCreate`, crashes there bypassed the UncaughtExceptionHandler). Crash logger moved from `MainActivity.onCreate` to new `LexiClashApplication.attachBaseContext` — earliest hook, captures ContentProvider failures. Un-gitignored `AndroidManifest.xml` + `LexiClashApplication.java` + `MainActivity.java` so fresh clones don't regenerate templates. Commit `d60e5bac9`.
+
+Prior: 3765 (Sentry Capacitor-WebView filter removal, i18n error.html 5 locales + RTL), 3761 (native crash logger first added, MainActivity only), 3734 (2026-04-20), 3733 burned.
 
 Fastfile retargeted 2026-04-21: both `internal` and `promote_to_production` lanes now use `track: "internal"` (was `"alpha"`). Internal track exempts the 12-tester × 14-day production gate and propagates in minutes. Prereq: Play Console → Testing → Internal testing must have an active release created manually once, otherwise `supply` returns `Precondition check failed`.
 

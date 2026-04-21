@@ -158,21 +158,20 @@ export async function sendAndroidBetaLaunchToPlayer(
 
   if (isEmail) {
     const target = playerIdentifier.toLowerCase();
-    const { data: authUsers, error: listError } = await supabase.auth.admin.listUsers();
-    if (listError) {
-      return { success: false, error: `Auth lookup failed: ${listError.message}` };
-    }
-    const match = authUsers.users.find(
-      (u: { id: string; email?: string }) => u.email?.toLowerCase() === target
-    );
-    if (!match) {
+    const { data: viewRow, error: viewError } = await supabase
+      .from('auth_users_view')
+      .select('id, email')
+      .eq('email', target)
+      .maybeSingle();
+
+    if (viewError || !viewRow) {
       return {
         success: false,
         error: `No user found with email ${playerIdentifier}`,
       };
     }
-    profileId = match.id;
-    resolvedEmail = match.email ?? null;
+    profileId = viewRow.id;
+    resolvedEmail = viewRow.email ?? null;
   } else {
     const { data: profileByName } = await supabase
       .from('profiles')
@@ -206,11 +205,12 @@ export async function sendAndroidBetaLaunchToPlayer(
   }
 
   if (!resolvedEmail) {
-    const { data: authUsers } = await supabase.auth.admin.listUsers();
-    const match = authUsers?.users.find(
-      (u: { id: string; email?: string }) => u.id === profileId
-    );
-    resolvedEmail = match?.email ?? null;
+    const { data: authResp, error: authErr } =
+      await supabase.auth.admin.getUserById(profileId);
+    if (authErr) {
+      return { success: false, error: `Auth lookup failed: ${authErr.message}` };
+    }
+    resolvedEmail = authResp?.user?.email ?? null;
   }
 
   if (!resolvedEmail) {
