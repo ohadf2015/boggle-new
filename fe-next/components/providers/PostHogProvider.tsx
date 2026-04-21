@@ -20,6 +20,7 @@ import {
   setPostHogSuperPropsOnce,
   installTabVisibilityTracker,
 } from '@/utils/posthogEngagement';
+import { filterEmptyException } from '@/utils/posthogExceptionFilter';
 
 let posthogInitialized = false;
 
@@ -42,6 +43,7 @@ function initPostHog() {
     capture_pageview: false, // We track manually on route change
     capture_pageleave: true,
     capture_exceptions: true, // Capture unhandled JS errors and promise rejections
+    before_send: filterEmptyException,
     persistence: 'localStorage+cookie',
     loaded: (ph) => {
       // If the user has already granted analytics consent in a prior session,

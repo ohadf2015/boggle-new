@@ -23,6 +23,7 @@ import NativeOAuthInitializer from '@/components/NativeOAuthInitializer';
 import { ToastContainer } from '@/components/ui/EnhancedToast';
 import { ChurnSignalTracker } from '@/components/engagement/ChurnSignalTracker';
 import SocialMediaPixels from '@/components/SocialMediaPixels';
+import { getLocalizedSchemaStrings } from '@/utils/seoLocalizedSchema';
 
 import { fredokaLatin, fredokaHebrew, rubikLatin, rubikHebrew, heeboHebrew } from '../fonts';
 
@@ -173,6 +174,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
     const seo = translations[validLocale]?.seo || translations.en.seo;
     const localePath = getLocalePath(validLocale);
     const languageCode = getLanguageCode(validLocale);
+    const schemaStrings = getLocalizedSchemaStrings(validLocale);
 
     // Locale-aware font preloading: Hebrew pages get all 4 font variables,
     // non-Hebrew pages skip Hebrew font preloads (~60-80KB saved)
@@ -408,55 +410,25 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
             '@context': 'https://schema.org',
             '@type': 'HowTo',
             '@id': 'https://www.lexiclash.live/#howto',
-            name: languageCode === 'he' ? 'איך לשחק ב-LexiClash' : 'How to Play LexiClash',
-            description: languageCode === 'he'
-                ? 'למדו כיצד לשחק במשחק המילים המרובה משתתפים LexiClash'
-                : 'Learn how to play the multiplayer word game LexiClash',
+            name: schemaStrings.howToName,
+            description: schemaStrings.howToDescription,
             totalTime: 'PT3M',
-            step: [
-                {
-                    '@type': 'HowToStep',
-                    name: languageCode === 'he' ? 'צרו או הצטרפו לחדר' : 'Create or Join a Room',
-                    text: languageCode === 'he'
-                        ? 'צרו חדר משחק חדש או הצטרפו לחדר קיים באמצעות קוד חדר או סריקת QR'
-                        : 'Create a new game room or join an existing one using a room code or QR scan',
-                    position: 1,
-                },
-                {
-                    '@type': 'HowToStep',
-                    name: languageCode === 'he' ? 'מצאו מילים בלוח' : 'Find Words on the Grid',
-                    text: languageCode === 'he'
-                        ? 'החליקו או לחצו על אותיות סמוכות כדי ליצור מילים - ככל שהמילה ארוכה יותר, יותר נקודות!'
-                        : 'Swipe or click adjacent letters to form words - longer words score more points!',
-                    position: 2,
-                },
-                {
-                    '@type': 'HowToStep',
-                    name: languageCode === 'he' ? 'בנו קומבו' : 'Build Combos',
-                    text: languageCode === 'he'
-                        ? 'מצאו מילים במהירות רצופה לבניית קומבו ולהכפלת הניקוד שלכם'
-                        : 'Find words in quick succession to build combos and multiply your score',
-                    position: 3,
-                },
-                {
-                    '@type': 'HowToStep',
-                    name: languageCode === 'he' ? 'נצחו את היריבים!' : 'Beat Your Opponents!',
-                    text: languageCode === 'he'
-                        ? 'השחקן עם הכי הרבה נקודות בסוף הזמן מנצח. מילים שנמצאו על ידי כולם לא נותנות נקודות!'
-                        : 'The player with the most points when time runs out wins. Words found by everyone score nothing!',
-                    position: 4,
-                },
-            ],
+            inLanguage: languageCode,
+            step: schemaStrings.steps.map((s, i) => ({
+                '@type': 'HowToStep',
+                name: s.name,
+                text: s.text,
+                position: i + 1,
+            })),
         },
         // Event schema for Daily Challenge - improves discoverability for recurring events
         {
             '@context': 'https://schema.org',
             '@type': 'Event',
             '@id': 'https://www.lexiclash.live/#daily-challenge',
-            name: languageCode === 'he' ? 'אתגר יומי של LexiClash' : 'LexiClash Daily Challenge',
-            description: languageCode === 'he'
-                ? 'פאזל מילים יומי - אותו לוח לכולם ברחבי העולם! שתפו את התוצאות שלכם כמו וורדל'
-                : 'Daily word puzzle - same board for everyone worldwide! Share your results like Wordle',
+            name: schemaStrings.dailyEventName,
+            description: schemaStrings.dailyEventDescription,
+            inLanguage: languageCode,
             startDate: '2024-01-01',
             endDate: '2099-12-31',
             eventStatus: 'https://schema.org/EventScheduled',
