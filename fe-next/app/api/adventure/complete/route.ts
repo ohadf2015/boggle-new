@@ -86,7 +86,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // TODO: persist retainedScore once retry scoring schema exists
+    // retainedScore already folded into `score` client-side (useAdventureGame resetGame
+    // seeds gameState.score with retainedScore before the retry starts). Field kept in
+    // payload for future analytics split (retained vs earned); no separate persistence needed.
     void _retainedScore;
 
     // Fetch progression + existing completion in parallel
