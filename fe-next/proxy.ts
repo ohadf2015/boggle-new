@@ -8,7 +8,7 @@ const DEFAULT_LOCALE = 'en';
 // App Router renders `/[locale]` — renders crashed with
 // `controller[kState].transformAlgorithm is not a function` on Node 22
 // (Sentry JAVASCRIPT-NEXTJS-NE).
-const PROBE_RE = /^\/(\.env|\.git|\.aws|\.ssh|\.DS_Store|wp-admin|wp-login|wp-includes|wp-content|phpmyadmin|phpinfo|xmlrpc\.php|config\.json|credentials|secrets\.json|backup\.zip|admin\.php|\.well-known\/security\.txt)(\/|$)/i;
+const PROBE_RE = /^\/(?:\.(?:env|git|aws|ssh|DS_Store)|wp-admin|wp-login|wp-includes|wp-content|phpmyadmin|phpinfo|xmlrpc\.php|config\.json|credentials|secrets\.json|backup\.zip|admin\.php|\.well-known\/security\.txt)/i;
 
 // SEO and social bot user-agent fragments (lowercase)
 const BOT_SIGNATURES = [

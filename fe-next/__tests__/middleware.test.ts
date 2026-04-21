@@ -25,23 +25,27 @@ vi.mock('@supabase/ssr', () => ({
 // Mock next/server
 const mockSet = vi.fn();
 vi.mock('next/server', () => {
-  const NextResponse = {
-    next: vi.fn(() => ({
-      cookies: { set: mockSet },
-      headers: new Map(),
-    })),
-    redirect: vi.fn((url: URL, status: number) => ({
-      url: url.toString(),
-      status,
-      cookies: { set: mockSet },
-      headers: new Map(),
-    })),
-    rewrite: vi.fn((url: URL) => ({
-      url: url.toString(),
-      cookies: { set: mockSet },
-      headers: new Map(),
-    })),
-  };
+  function NextResponse(this: Record<string, unknown>, _body: unknown, init?: { status?: number }) {
+    this.status = init?.status ?? 200;
+    this.cookies = { set: mockSet };
+    this.headers = new Map();
+    return this;
+  }
+  (NextResponse as unknown as { next: Mock }).next = vi.fn(() => ({
+    cookies: { set: mockSet },
+    headers: new Map(),
+  }));
+  (NextResponse as unknown as { redirect: Mock }).redirect = vi.fn((url: URL, status: number) => ({
+    url: url.toString(),
+    status,
+    cookies: { set: mockSet },
+    headers: new Map(),
+  }));
+  (NextResponse as unknown as { rewrite: Mock }).rewrite = vi.fn((url: URL) => ({
+    url: url.toString(),
+    cookies: { set: mockSet },
+    headers: new Map(),
+  }));
   return { NextResponse };
 });
 
@@ -127,5 +131,41 @@ describe('Proxy — Supabase Auth Refresh', () => {
   it('should have a config matcher that covers all request paths', () => {
     expect(config.matcher).toBeDefined();
     expect(config.matcher.length).toBeGreaterThan(0);
+  });
+});
+
+describe('Proxy — Probe short-circuit (Sentry JAVASCRIPT-NEXTJS-NE)', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockGetSession.mockResolvedValue({ data: { session: null }, error: null });
+    process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://test.supabase.co';
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = 'test-anon-key';
+  });
+
+  // Scanners spray env/git variants; App Router rendering these crashes
+  // Node webstreams with "controller[kState].transformAlgorithm is not a function".
+  // Every variant below MUST 404 via short-circuit before App Router.
+  const probePaths = [
+    '/.env',
+    '/.env.local',
+    '/.env.production',
+    '/.env.prod.local',
+    '/.env.bak',
+    '/.git',
+    '/.git/config',
+    '/.aws/credentials',
+    '/.ssh/id_rsa',
+    '/.DS_Store',
+    '/wp-admin/install.php',
+    '/phpmyadmin/index.php',
+    '/xmlrpc.php',
+  ];
+
+  probePaths.forEach((p) => {
+    it(`short-circuits probe path ${p} with 404`, async () => {
+      const res = await proxy(makeRequest(p));
+      expect((res as unknown as { status: number }).status).toBe(404);
+      expect(mockGetSession).not.toHaveBeenCalled();
+    });
   });
 });
