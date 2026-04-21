@@ -143,15 +143,20 @@ export function useAdventureWordSubmit(props: UseAdventureWordSubmitProps): UseA
   const wordSubmittedTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastSubmittedWordRef = useRef<{ word: string; path: Array<{ row: number; col: number }> } | null>(null);
   const prevComboCountRef = useRef(0);
-  // Synchronous guard to prevent double-submission from React state batching
-  const isSubmittingRef = useRef(false);
+  // Track same-word submissions currently in-flight. Different words are
+  // allowed to validate concurrently; only identical duplicates are dropped.
+  const inFlightWordsRef = useRef<Set<string>>(new Set());
+  // Holds a submission received during cascade so we can replay it once the
+  // cascade finishes — otherwise fast consecutive words get silently dropped.
+  const pendingCascadeSubmissionRef = useRef<{ word: string; indices: number[] } | null>(null);
 
   // Cleanup timeouts and guards on unmount
   useEffect(() => {
     return () => {
       if (validationErrorTimeoutRef.current) clearTimeout(validationErrorTimeoutRef.current);
       if (wordSubmittedTimeoutRef.current) clearTimeout(wordSubmittedTimeoutRef.current);
-      isSubmittingRef.current = false;
+      inFlightWordsRef.current.clear();
+      pendingCascadeSubmissionRef.current = null;
     };
   }, []);
 
@@ -160,7 +165,7 @@ export function useAdventureWordSubmit(props: UseAdventureWordSubmitProps): UseA
       const word = submittedWord || currentWord;
       const indices = submittedIndices.length > 0 ? submittedIndices : selectedIndices;
 
-      if (!isPlaying || isPaused || isCascading || isSubmittingRef.current) {
+      if (!isPlaying || isPaused) {
         clearSelection();
         return;
       }
@@ -168,7 +173,24 @@ export function useAdventureWordSubmit(props: UseAdventureWordSubmitProps): UseA
         clearSelection();
         return;
       }
-      isSubmittingRef.current = true;
+
+      const normalizedWord = word.toLowerCase();
+
+      // Queue the submission during cascade so rapid swipes aren't lost.
+      // Replay after cascade ends (useEffect below).
+      if (isCascading) {
+        pendingCascadeSubmissionRef.current = { word, indices };
+        clearSelection();
+        return;
+      }
+
+      // Drop only duplicates of a word already being validated — different
+      // words must be allowed through concurrently.
+      if (inFlightWordsRef.current.has(normalizedWord)) {
+        clearSelection();
+        return;
+      }
+      inFlightWordsRef.current.add(normalizedWord);
 
       tap();
 
@@ -193,11 +215,11 @@ export function useAdventureWordSubmit(props: UseAdventureWordSubmitProps): UseA
         result = await validateWord(word, path);
       } catch {
         // Network error or unexpected failure — unblock future submissions
-        isSubmittingRef.current = false;
+        inFlightWordsRef.current.delete(normalizedWord);
         setValidationFeedback(prev => ({ ...prev, error: 'validationError' }));
         return;
       }
-      isSubmittingRef.current = false;
+      inFlightWordsRef.current.delete(normalizedWord);
 
       // Silently ignore cancelled validations (aborted by a newer submission)
       // Still clear selection so tiles don't stay highlighted ("stuck word" bug)
@@ -355,6 +377,19 @@ export function useAdventureWordSubmit(props: UseAdventureWordSubmitProps): UseA
     [isPlaying, isPaused, isCascading, currentWord, selectedIndices, tiles, gridSize, validateWord, submitWordWithPath, clearSelection, t, getPopupStartPosition, comboCount, wordsFound, clearCurrentHint, recordActivity, resetOnGameAction, isBossActive, bossConfig, checkBossWord, triggerBossTaunt, dealBossDamage, minWordLength, upgradeBonuses.scoreBonus, skillEffects, handleEarnAchievement, recordAIWord, handleAITransition, addScorePopup, getScoreMultiplier, worldMechanic, bossCurrentPhase, tap, hapticSuccess, bossHealPerWord, healPlayerHealth, detonateActive]
   );
 
+  // Flush a submission queued during cascade once cascade ends. Tile letters
+  // may have shifted — validateWord re-checks path-word match and will reject
+  // with proper feedback instead of silently dropping the word.
+  const handleWordSubmitRef = useRef(handleWordSubmit);
+  useEffect(() => { handleWordSubmitRef.current = handleWordSubmit; }, [handleWordSubmit]);
+  useEffect(() => {
+    if (isCascading) return;
+    const pending = pendingCascadeSubmissionRef.current;
+    if (!pending) return;
+    pendingCascadeSubmissionRef.current = null;
+    void handleWordSubmitRef.current(pending.word, pending.indices);
+  }, [isCascading]);
+
   const resetWordSubmitState = useCallback(() => {
     setValidationFeedback({ error: null, wasSubmitted: false, isValid: false });
     setLastAccepted(null);
@@ -363,7 +398,8 @@ export function useAdventureWordSubmit(props: UseAdventureWordSubmitProps): UseA
     setMechanicHitCount(0);
     lastSubmittedWordRef.current = null;
     prevComboCountRef.current = 0;
-    isSubmittingRef.current = false;
+    inFlightWordsRef.current.clear();
+    pendingCascadeSubmissionRef.current = null;
     if (validationErrorTimeoutRef.current) {
       clearTimeout(validationErrorTimeoutRef.current);
       validationErrorTimeoutRef.current = null;

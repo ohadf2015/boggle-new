@@ -90,4 +90,54 @@ describe('AdventureToast', () => {
     const toast = screen.getByRole('status');
     expect(toast).toHaveAttribute('aria-live', 'polite');
   });
+
+  it('deduplicates repeated triggers of the same upgrade into a single toast', () => {
+    const { rerender } = render(
+      <AdventureToast
+        upgradeTriggered={{ upgradeId: 'luckyPickaxe', effectValue: 1 }}
+        lastWordWasThemed={false}
+      />
+    );
+    // Fire the same upgrade trigger multiple times in quick succession
+    rerender(
+      <AdventureToast
+        upgradeTriggered={{ upgradeId: 'luckyPickaxe', effectValue: 2 }}
+        lastWordWasThemed={false}
+      />
+    );
+    rerender(
+      <AdventureToast
+        upgradeTriggered={{ upgradeId: 'luckyPickaxe', effectValue: 3 }}
+        lastWordWasThemed={false}
+      />
+    );
+    rerender(
+      <AdventureToast
+        upgradeTriggered={{ upgradeId: 'luckyPickaxe', effectValue: 4 }}
+        lastWordWasThemed={false}
+      />
+    );
+
+    // Only a single toast for that upgrade should be visible — not 4
+    const toasts = screen.getAllByRole('status');
+    expect(toasts).toHaveLength(1);
+  });
+
+  it('keeps separate toasts for different upgrade ids', () => {
+    const { rerender } = render(
+      <AdventureToast
+        upgradeTriggered={{ upgradeId: 'deepDrill', effectValue: 1 }}
+        lastWordWasThemed={false}
+      />
+    );
+    rerender(
+      <AdventureToast
+        upgradeTriggered={{ upgradeId: 'luckyPickaxe', effectValue: 1 }}
+        lastWordWasThemed={false}
+      />
+    );
+
+    const toasts = screen.getAllByRole('status');
+    expect(toasts).toHaveLength(2);
+  });
 });
