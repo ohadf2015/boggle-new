@@ -68,6 +68,7 @@ export interface WordHuntFact {
 const TOP_PERFORMER_THRESHOLD = 1;       // top 1% only — true brag territory
 const STREAK_LEGEND_DAYS = 30;           // 30+ days — rare
 const ELITE_SOLVE_RATE_THRESHOLD = 20;   // <20% solve rate
+const RARE_FIRST_TRY_THRESHOLD = 50;     // <50% first-try solve rate — "Only X%" wording only makes sense when X is low
 const LOW_LIFE_THRESHOLD = 50;           // speed pillar weak
 const LOW_EXPLORATION_THRESHOLD = 5;     // < 5 survival words
 const MANY_GUESSES_THRESHOLD = 5;        // 5+ guesses — accuracy pillar weak
@@ -100,7 +101,10 @@ function getFirstTryFact(result: WordHuntResult, stats: WordHuntStats): WordHunt
   ];
   const fallback = pickVariant(variants, result);
 
-  if (stats.totalPlayers < MIN_PLAYERS_FOR_STATS) {
+  if (
+    stats.totalPlayers < MIN_PLAYERS_FOR_STATS ||
+    stats.solveRate >= RARE_FIRST_TRY_THRESHOLD
+  ) {
     return {
       type: 'firstTry',
       translationKey: 'wordHunt.facts.firstTryPersonal',

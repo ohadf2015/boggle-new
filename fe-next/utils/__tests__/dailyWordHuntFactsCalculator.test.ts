@@ -54,6 +54,20 @@ describe('getWordHuntFacts', () => {
     expect(facts[0].type).toBe('firstTry');
   });
 
+  it('uses rare variant only when solve rate is actually rare', () => {
+    const result = makeResult({ attemptsUsed: 1, wordsDiscovered: [] });
+    const facts = getWordHuntFacts(result, makeStats({ solveRate: 15 }));
+    expect(facts[0].translationKey).toBe('wordHunt.facts.firstTryRare');
+  });
+
+  it('uses personal variant (no "Only X%" phrasing) when solve rate is high', () => {
+    const result = makeResult({ attemptsUsed: 1, wordsDiscovered: [] });
+    const facts = getWordHuntFacts(result, makeStats({ solveRate: 100 }));
+    expect(facts[0].type).toBe('firstTry');
+    expect(facts[0].translationKey).toBe('wordHunt.facts.firstTryPersonal');
+    expect(facts[0].translationParams.solveRate).toBeUndefined();
+  });
+
   it('prioritizes perfect score brag', () => {
     const result = makeResult({ efficiencyScore: 1000, attemptsUsed: 2 });
     const facts = getWordHuntFacts(result, makeStats());
