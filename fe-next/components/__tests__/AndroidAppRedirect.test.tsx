@@ -1,4 +1,4 @@
-import { render } from '@testing-library/react';
+import { render, waitFor } from '@testing-library/react';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import AndroidAppRedirect from '../AndroidAppRedirect';
 
@@ -28,6 +28,13 @@ function setLocation(href: string) {
   });
 }
 
+function mockInstalledRelatedApps(apps: Array<{ platform: string; id?: string; url?: string }>) {
+  Object.defineProperty(navigator, 'getInstalledRelatedApps', {
+    value: vi.fn().mockResolvedValue(apps),
+    configurable: true,
+  });
+}
+
 describe('AndroidAppRedirect', () => {
   beforeEach(() => {
     sessionStorage.clear();
@@ -38,56 +45,87 @@ describe('AndroidAppRedirect', () => {
 
   afterEach(() => {
     vi.restoreAllMocks();
+    delete (navigator as unknown as { getInstalledRelatedApps?: unknown }).getInstalledRelatedApps;
   });
 
-  it('redirects Android Chrome to intent:// URI preserving path', () => {
+  it('redirects to intent:// only when installed app detected', async () => {
     setUA(ANDROID_UA);
+    mockInstalledRelatedApps([{ platform: 'play', id: 'live.lexiclash.app' }]);
     render(<AndroidAppRedirect />);
-    expect(window.location.href).toMatch(/^intent:\/\/www\.lexiclash\.live\/play\?x=1#Intent;/);
+    await waitFor(() => {
+      expect(window.location.href).toMatch(/^intent:\/\/www\.lexiclash\.live\/play\?x=1#Intent;/);
+    });
     expect(window.location.href).toContain('package=live.lexiclash.app');
     expect(window.location.href).toContain(
       `S.browser_fallback_url=${encodeURIComponent('https://www.lexiclash.live/play?x=1')}`,
     );
   });
 
-  it('skips iOS', () => {
-    setUA(IOS_UA);
-    render(<AndroidAppRedirect />);
-    expect(window.location.href).toBe('https://www.lexiclash.live/play?x=1');
-  });
-
-  it('skips Android WebView (Capacitor host)', () => {
-    setUA(ANDROID_WEBVIEW_UA);
-    render(<AndroidAppRedirect />);
-    expect(window.location.href).toBe('https://www.lexiclash.live/play?x=1');
-  });
-
-  it('skips when Capacitor.isNativePlatform() true', () => {
+  it('does nothing when app not installed', async () => {
     setUA(ANDROID_UA);
+    mockInstalledRelatedApps([]);
+    render(<AndroidAppRedirect />);
+    await new Promise((r) => setTimeout(r, 10));
+    expect(window.location.href).toBe('https://www.lexiclash.live/play?x=1');
+  });
+
+  it('does nothing when getInstalledRelatedApps unavailable', async () => {
+    setUA(ANDROID_UA);
+    render(<AndroidAppRedirect />);
+    await new Promise((r) => setTimeout(r, 10));
+    expect(window.location.href).toBe('https://www.lexiclash.live/play?x=1');
+  });
+
+  it('skips iOS', async () => {
+    setUA(IOS_UA);
+    mockInstalledRelatedApps([{ platform: 'play', id: 'live.lexiclash.app' }]);
+    render(<AndroidAppRedirect />);
+    await new Promise((r) => setTimeout(r, 10));
+    expect(window.location.href).toBe('https://www.lexiclash.live/play?x=1');
+  });
+
+  it('skips Android WebView (Capacitor host)', async () => {
+    setUA(ANDROID_WEBVIEW_UA);
+    mockInstalledRelatedApps([{ platform: 'play', id: 'live.lexiclash.app' }]);
+    render(<AndroidAppRedirect />);
+    await new Promise((r) => setTimeout(r, 10));
+    expect(window.location.href).toBe('https://www.lexiclash.live/play?x=1');
+  });
+
+  it('skips when Capacitor.isNativePlatform() true', async () => {
+    setUA(ANDROID_UA);
+    mockInstalledRelatedApps([{ platform: 'play', id: 'live.lexiclash.app' }]);
     (window as unknown as { Capacitor: unknown }).Capacitor = { isNativePlatform: () => true };
     render(<AndroidAppRedirect />);
+    await new Promise((r) => setTimeout(r, 10));
     expect(window.location.href).toBe('https://www.lexiclash.live/play?x=1');
     delete (window as unknown as { Capacitor?: unknown }).Capacitor;
   });
 
-  it('skips when dismissed within 7d window', () => {
+  it('skips when dismissed within 7d window', async () => {
     setUA(ANDROID_UA);
+    mockInstalledRelatedApps([{ platform: 'play', id: 'live.lexiclash.app' }]);
     localStorage.setItem('android_app_redirect_dismissed_until', String(Date.now() + 86_400_000));
     render(<AndroidAppRedirect />);
+    await new Promise((r) => setTimeout(r, 10));
     expect(window.location.href).toBe('https://www.lexiclash.live/play?x=1');
   });
 
-  it('skips when session flag set (prevents loop)', () => {
+  it('skips when session flag set (prevents loop)', async () => {
     setUA(ANDROID_UA);
+    mockInstalledRelatedApps([{ platform: 'play', id: 'live.lexiclash.app' }]);
     sessionStorage.setItem('android_app_redirect_tried', '1');
     render(<AndroidAppRedirect />);
+    await new Promise((r) => setTimeout(r, 10));
     expect(window.location.href).toBe('https://www.lexiclash.live/play?x=1');
   });
 
-  it('skips when running as installed PWA (standalone)', () => {
+  it('skips when running as installed PWA (standalone)', async () => {
     setUA(ANDROID_UA);
+    mockInstalledRelatedApps([{ platform: 'play', id: 'live.lexiclash.app' }]);
     window.matchMedia = vi.fn().mockReturnValue({ matches: true }) as unknown as typeof window.matchMedia;
     render(<AndroidAppRedirect />);
+    await new Promise((r) => setTimeout(r, 10));
     expect(window.location.href).toBe('https://www.lexiclash.live/play?x=1');
   });
 });

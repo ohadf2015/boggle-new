@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback } from 'react';
 import Image from 'next/image';
-import { Send, ArrowLeft, ArrowRight, Gift, Sparkles, Coins, Award } from 'lucide-react';
+import { Send, Gift, Sparkles, Coins, Award, ChevronDown, ChevronUp } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -21,7 +21,6 @@ import { GiftTemplateSelector } from './GiftTemplateSelector';
 import { RewardAmountInput } from './RewardAmountInput';
 import { BadgeSelector } from './BadgeSelector';
 import {
-  GIFT_TEMPLATES,
   MAX_MESSAGE_LENGTH,
   MAX_TITLE_LENGTH,
   type GiftRecipient,
@@ -35,25 +34,31 @@ interface PlayerGiftDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   authToken: string;
-  initialPlayerId?: string;
+  initialRecipient?: GiftRecipient;
   onSuccess?: () => void;
 }
 
-type Step = 'players' | 'template' | 'message' | 'rewards' | 'badge' | 'preview';
-
-const STEPS: Step[] = ['players', 'template', 'message', 'rewards', 'badge', 'preview'];
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <section className="space-y-2">
+      <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+        {title}
+      </h3>
+      {children}
+    </section>
+  );
+}
 
 export function PlayerGiftDialog({
   open,
   onOpenChange,
   authToken,
-  initialPlayerId,
+  initialRecipient,
   onSuccess,
 }: PlayerGiftDialogProps) {
-  const [currentStep, setCurrentStep] = useState<Step>('players');
   const [sending, setSending] = useState(false);
+  const [badgeOpen, setBadgeOpen] = useState(false);
 
-  // Form state
   const [selectedPlayers, setSelectedPlayers] = useState<GiftRecipient[]>([]);
   const [templateType, setTemplateType] = useState<GiftTemplateType>('top_player');
   const [title, setTitle] = useState('');
@@ -62,8 +67,6 @@ export function PlayerGiftDialog({
   const [coinAmount, setCoinAmount] = useState(0);
   const [selectedBadgeId, setSelectedBadgeId] = useState<string | null>(null);
   const [selectedBadge, setSelectedBadge] = useState<BadgeOption | null>(null);
-
-  const currentStepIndex = STEPS.indexOf(currentStep);
 
   const handleTemplateSelect = useCallback((template: GiftTemplate) => {
     setTemplateType(template.id);
@@ -75,45 +78,28 @@ export function PlayerGiftDialog({
     }
   }, []);
 
-  const handleNext = () => {
-    const nextIndex = currentStepIndex + 1;
-    if (nextIndex < STEPS.length) {
-      setCurrentStep(STEPS[nextIndex]);
-    }
+  const reset = () => {
+    setSelectedPlayers([]);
+    setTemplateType('top_player');
+    setTitle('');
+    setMessage('');
+    setXpAmount(0);
+    setCoinAmount(0);
+    setSelectedBadgeId(null);
+    setSelectedBadge(null);
+    setBadgeOpen(false);
   };
 
-  const handleBack = () => {
-    const prevIndex = currentStepIndex - 1;
-    if (prevIndex >= 0) {
-      setCurrentStep(STEPS[prevIndex]);
-    }
-  };
-
-  const canProceed = (): boolean => {
-    switch (currentStep) {
-      case 'players':
-        return selectedPlayers.length > 0;
-      case 'template':
-        return true;
-      case 'message':
-        return title.trim().length > 0 && message.trim().length > 0;
-      case 'rewards':
-        return xpAmount >= 0 && coinAmount >= 0;
-      case 'badge':
-        return true; // Badge is optional
-      case 'preview':
-        return true;
-      default:
-        return false;
-    }
-  };
+  const canSend =
+    selectedPlayers.length > 0 &&
+    title.trim().length > 0 &&
+    message.trim().length > 0 &&
+    !sending;
 
   const handleSend = async () => {
-    if (!canProceed()) return;
-
+    if (!canSend) return;
     try {
       setSending(true);
-
       const formData: GiftFormData = {
         recipientIds: selectedPlayers.map(p => p.id),
         title: title.trim(),
@@ -140,18 +126,7 @@ export function PlayerGiftDialog({
 
       const result = await response.json();
       toast.success(`Gift sent to ${result.sentCount} player(s)!`);
-
-      // Reset form
-      setSelectedPlayers([]);
-      setTemplateType('top_player');
-      setTitle('');
-      setMessage('');
-      setXpAmount(0);
-      setCoinAmount(0);
-      setSelectedBadgeId(null);
-      setSelectedBadge(null);
-      setCurrentStep('players');
-
+      reset();
       onOpenChange(false);
       onSuccess?.();
     } catch (error) {
@@ -162,236 +137,131 @@ export function PlayerGiftDialog({
     }
   };
 
-  const renderStepContent = () => {
-    switch (currentStep) {
-      case 'players':
-        return (
-          <div className="space-y-4">
-            <p className="text-sm text-slate-600 dark:text-slate-400">
-              Search and select players to send a gift message to.
-            </p>
-            <PlayerSelector
-              authToken={authToken}
-              selectedPlayers={selectedPlayers}
-              onSelectionChange={setSelectedPlayers}
-              initialPlayerId={initialPlayerId}
-            />
-          </div>
-        );
-
-      case 'template':
-        return (
-          <div className="space-y-4">
-            <p className="text-sm text-slate-600 dark:text-slate-400">
-              Choose a message template or create a custom one.
-            </p>
-            <GiftTemplateSelector
-              selectedTemplate={templateType}
-              onSelect={handleTemplateSelect}
-            />
-          </div>
-        );
-
-      case 'message':
-        return (
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Title</label>
-              <Input
-                value={title}
-                onChange={(e) => setTitle(e.target.value.slice(0, MAX_TITLE_LENGTH))}
-                placeholder="Enter gift message title..."
-                className="bg-white dark:bg-slate-800"
-              />
-              <p className="text-xs text-slate-500">{title.length}/{MAX_TITLE_LENGTH}</p>
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Message</label>
-              <Textarea
-                value={message}
-                onChange={(e) => setMessage(e.target.value.slice(0, MAX_MESSAGE_LENGTH))}
-                placeholder="Write your message to the player(s)..."
-                rows={5}
-                className="bg-white dark:bg-slate-800 resize-none"
-              />
-              <p className="text-xs text-slate-500">{message.length}/{MAX_MESSAGE_LENGTH}</p>
-            </div>
-          </div>
-        );
-
-      case 'rewards':
-        return (
-          <div className="space-y-4">
-            <p className="text-sm text-slate-600 dark:text-slate-400">
-              Set the XP and coin rewards for this gift.
-            </p>
-            <RewardAmountInput
-              xpAmount={xpAmount}
-              coinAmount={coinAmount}
-              onXpChange={setXpAmount}
-              onCoinChange={setCoinAmount}
-            />
-          </div>
-        );
-
-      case 'badge':
-        return (
-          <div className="space-y-4">
-            <p className="text-sm text-slate-600 dark:text-slate-400">
-              Optionally attach a unique badge to this gift. The badge will be added to the player&apos;s collection when they claim the gift.
-            </p>
-            <BadgeSelector
-              authToken={authToken}
-              selectedBadgeId={selectedBadgeId}
-              onSelect={(badgeId, badge) => {
-                setSelectedBadgeId(badgeId);
-                setSelectedBadge(badge || null);
-              }}
-            />
-          </div>
-        );
-
-      case 'preview':
-        return (
-          <div className="space-y-4">
-            <div className="p-4 bg-linear-to-br from-amber-50 to-purple-50 dark:from-amber-900/20 dark:to-purple-900/20 rounded-lg border-2 border-amber-200 dark:border-amber-800">
-              {/* Preview Header */}
-              <div className="text-center mb-4">
-                <Gift className="w-12 h-12 text-amber-500 mx-auto mb-2" />
-                <div className="text-sm text-amber-700 dark:text-amber-300 font-medium">
-                  {GIFT_TEMPLATES.find(t => t.id === templateType)?.headerLine}
-                </div>
-              </div>
-
-              {/* Preview Content */}
-              <div className="bg-white dark:bg-slate-800 rounded-lg p-4 shadow-xs">
-                <h3 className="font-bold text-lg mb-2">{title}</h3>
-                <p className="text-sm text-slate-600 dark:text-slate-400 whitespace-pre-wrap">
-                  {message}
-                </p>
-
-                {/* Rewards */}
-                {(xpAmount > 0 || coinAmount > 0 || selectedBadge) && (
-                  <div className="mt-4 pt-4 border-t border-slate-200 dark:border-slate-700">
-                    <p className="text-xs text-slate-500 mb-2">Rewards:</p>
-                    <div className="flex flex-wrap gap-4">
-                      {xpAmount > 0 && (
-                        <div className="flex items-center gap-1.5 text-purple-600 dark:text-purple-400">
-                          <Sparkles className="w-4 h-4" />
-                          <span className="font-bold">{xpAmount.toLocaleString()}</span>
-                          <span className="text-xs">XP</span>
-                        </div>
-                      )}
-                      {coinAmount > 0 && (
-                        <div className="flex items-center gap-1.5 text-amber-600 dark:text-amber-400">
-                          <Coins className="w-4 h-4" />
-                          <span className="font-bold">{coinAmount.toLocaleString()}</span>
-                          <span className="text-xs">Coins</span>
-                        </div>
-                      )}
-                      {selectedBadge && (
-                        <div className="flex items-center gap-1.5 text-cyan-600 dark:text-cyan-400">
-                          {selectedBadge.image_url ? (
-                            <Image
-                              src={selectedBadge.image_url}
-                              alt={selectedBadge.name_key.split('.').pop()?.replace(/_/g, ' ') || 'Badge'}
-                              width={20}
-                              height={20}
-                              className="object-contain"
-                            />
-                          ) : (
-                            <Award className="w-4 h-4" />
-                          )}
-                          <span className="font-bold capitalize">
-                            {selectedBadge.name_key.split('.').pop()?.replace(/_/g, ' ')}
-                          </span>
-                          <span className="text-xs capitalize">({selectedBadge.rarity})</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Recipients Summary */}
-              <div className="mt-4 text-center text-sm text-slate-600 dark:text-slate-400">
-                Sending to <strong>{selectedPlayers.length}</strong> player(s)
-              </div>
-            </div>
-          </div>
-        );
-
-      default:
-        return null;
-    }
-  };
-
-  const getStepTitle = (): string => {
-    switch (currentStep) {
-      case 'players':
-        return 'Select Players';
-      case 'template':
-        return 'Choose Template';
-      case 'message':
-        return 'Write Message';
-      case 'rewards':
-        return 'Set Rewards';
-      case 'badge':
-        return 'Attach Badge';
-      case 'preview':
-        return 'Preview & Send';
-      default:
-        return '';
-    }
-  };
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-2xl max-h-[92vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Gift className="w-5 h-5 text-amber-500" />
             Send Gift Message
           </DialogTitle>
           <DialogDescription>
-            Step {currentStepIndex + 1} of {STEPS.length}: {getStepTitle()}
+            Fill out any sections — a template fills most of it for you.
           </DialogDescription>
         </DialogHeader>
 
-        {/* Progress Indicator */}
-        <div className="flex gap-1 mb-4">
-          {STEPS.map((step, index) => (
-            <div
-              key={step}
-              className={`flex-1 h-1.5 rounded-full transition-colors ${
-                index <= currentStepIndex
-                  ? 'bg-neo-lime'
-                  : 'bg-slate-200 dark:bg-slate-700'
-              }`}
+        <div className="space-y-5 py-2">
+          <Section title="Recipients">
+            <PlayerSelector
+              authToken={authToken}
+              selectedPlayers={selectedPlayers}
+              onSelectionChange={setSelectedPlayers}
+              initialRecipient={initialRecipient}
             />
-          ))}
+          </Section>
+
+          <Section title="Template (fills title, message, rewards)">
+            <GiftTemplateSelector
+              selectedTemplate={templateType}
+              onSelect={handleTemplateSelect}
+            />
+          </Section>
+
+          <Section title="Message">
+            <Input
+              value={title}
+              onChange={(e) => setTitle(e.target.value.slice(0, MAX_TITLE_LENGTH))}
+              placeholder="Title..."
+              className="bg-white dark:bg-slate-800"
+            />
+            <div className="flex justify-end">
+              <span className="text-xs text-slate-500">{title.length}/{MAX_TITLE_LENGTH}</span>
+            </div>
+            <Textarea
+              value={message}
+              onChange={(e) => setMessage(e.target.value.slice(0, MAX_MESSAGE_LENGTH))}
+              placeholder="Message to player(s)..."
+              rows={4}
+              className="bg-white dark:bg-slate-800 resize-none"
+            />
+            <div className="flex justify-end">
+              <span className="text-xs text-slate-500">{message.length}/{MAX_MESSAGE_LENGTH}</span>
+            </div>
+          </Section>
+
+          <Section title="Rewards">
+            <RewardAmountInput
+              xpAmount={xpAmount}
+              coinAmount={coinAmount}
+              onXpChange={setXpAmount}
+              onCoinChange={setCoinAmount}
+            />
+          </Section>
+
+          <section className="space-y-2">
+            <button
+              type="button"
+              onClick={() => setBadgeOpen(v => !v)}
+              className="flex w-full items-center justify-between text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
+            >
+              <span className="flex items-center gap-2">
+                <Award className="w-3.5 h-3.5" />
+                Badge (optional)
+                {selectedBadge && (
+                  <span className="ms-2 normal-case text-cyan-600 dark:text-cyan-400">
+                    · {selectedBadge.name_key.split('.').pop()?.replace(/_/g, ' ')}
+                  </span>
+                )}
+              </span>
+              {badgeOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            </button>
+            {badgeOpen && (
+              <BadgeSelector
+                authToken={authToken}
+                selectedBadgeId={selectedBadgeId}
+                onSelect={(badgeId, badge) => {
+                  setSelectedBadgeId(badgeId);
+                  setSelectedBadge(badge || null);
+                }}
+              />
+            )}
+          </section>
         </div>
 
-        {/* Step Content */}
-        <div className="min-h-[200px]">
-          {renderStepContent()}
-        </div>
-
-        {/* Navigation Buttons */}
-        <div className="flex justify-between mt-4 pt-4 border-t border-slate-200 dark:border-slate-700">
-          <Button
-            variant="outline"
-            onClick={handleBack}
-            disabled={currentStepIndex === 0 || sending}
-          >
-            <ArrowLeft className="w-4 h-4 me-1" />
-            Back
-          </Button>
-
-          {currentStep === 'preview' ? (
+        <div className="sticky bottom-0 -mx-6 px-6 pt-3 pb-1 border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900">
+          <div className="flex items-center justify-between gap-3">
+            <div className="text-xs text-slate-600 dark:text-slate-400 flex flex-wrap items-center gap-x-3 gap-y-1">
+              <span><strong>{selectedPlayers.length}</strong> recipient(s)</span>
+              {xpAmount > 0 && (
+                <span className="inline-flex items-center gap-1 text-purple-600 dark:text-purple-400">
+                  <Sparkles className="w-3.5 h-3.5" />{xpAmount.toLocaleString()} XP
+                </span>
+              )}
+              {coinAmount > 0 && (
+                <span className="inline-flex items-center gap-1 text-amber-600 dark:text-amber-400">
+                  <Coins className="w-3.5 h-3.5" />{coinAmount.toLocaleString()}
+                </span>
+              )}
+              {selectedBadge && (
+                <span className="inline-flex items-center gap-1 text-cyan-600 dark:text-cyan-400">
+                  {selectedBadge.image_url ? (
+                    <Image
+                      src={selectedBadge.image_url}
+                      alt=""
+                      width={14}
+                      height={14}
+                      className="object-contain"
+                    />
+                  ) : (
+                    <Award className="w-3.5 h-3.5" />
+                  )}
+                  {selectedBadge.name_key.split('.').pop()?.replace(/_/g, ' ')}
+                </span>
+              )}
+            </div>
             <Button
               onClick={handleSend}
-              disabled={!canProceed() || sending}
+              disabled={!canSend}
               className="bg-neo-lime text-black hover:bg-neo-lime/90 shadow-hard-sm"
             >
               {sending ? (
@@ -403,16 +273,7 @@ export function PlayerGiftDialog({
                 </>
               )}
             </Button>
-          ) : (
-            <Button
-              onClick={handleNext}
-              disabled={!canProceed()}
-              className="bg-neo-lime text-black hover:bg-neo-lime/90"
-            >
-              Next
-              <ArrowRight className="w-4 h-4 ms-1" />
-            </Button>
-          )}
+          </div>
         </div>
       </DialogContent>
     </Dialog>

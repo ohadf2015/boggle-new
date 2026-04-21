@@ -237,7 +237,7 @@ router.get('/players/top', async (req: AdminRequest, res: Response): Promise<voi
     const { data, error } = await supabase
       .from('profiles')
       .select(`
-        id, username, display_name, avatar_emoji, avatar_color, avatar_image,
+        id, username, display_name, avatar_emoji, avatar_color, avatar_image, avatar_config,
         total_score, total_games, total_words, total_time_played, total_xp, current_level,
         casual_games, ranked_games, casual_wins, ranked_wins,
         ranked_mmr, peak_mmr, longest_word, longest_word_length,
@@ -272,7 +272,7 @@ router.get('/players/recent', async (req: AdminRequest, res: Response): Promise<
     const { data, error } = await supabase
       .from('profiles')
       .select(`
-        id, username, display_name, avatar_emoji, avatar_color, avatar_image,
+        id, username, display_name, avatar_emoji, avatar_color, avatar_image, avatar_config,
         total_score, total_games, total_words, total_time_played, total_xp, current_level,
         casual_games, ranked_games, casual_wins, ranked_wins,
         ranked_mmr, peak_mmr, longest_word, longest_word_length,
@@ -311,7 +311,7 @@ router.get('/players', async (req: AdminRequest, res: Response): Promise<void> =
     let query = supabase
       .from('profiles')
       .select(`
-        id, username, display_name, avatar_emoji, avatar_color, avatar_image,
+        id, username, display_name, avatar_emoji, avatar_color, avatar_image, avatar_config,
         total_score, total_games, total_words, total_time_played, total_xp, current_level,
         casual_games, ranked_games, casual_wins, ranked_wins,
         ranked_mmr, peak_mmr, longest_word, longest_word_length,

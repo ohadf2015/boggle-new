@@ -55,10 +55,10 @@ export function PlayerManager({ authToken }: { authToken: string }) {
 
   // Gift dialog state
   const [giftDialogOpen, setGiftDialogOpen] = useState(false);
-  const [selectedPlayerForGift, setSelectedPlayerForGift] = useState<string | undefined>(undefined);
+  const [selectedPlayerForGift, setSelectedPlayerForGift] = useState<Player | undefined>(undefined);
 
-  const handleOpenGiftDialog = (playerId?: string) => {
-    setSelectedPlayerForGift(playerId);
+  const handleOpenGiftDialog = (player?: Player) => {
+    setSelectedPlayerForGift(player);
     setGiftDialogOpen(true);
   };
 
@@ -227,7 +227,7 @@ export function PlayerManager({ authToken }: { authToken: string }) {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => handleOpenGiftDialog(player.id)}
+                        onClick={() => handleOpenGiftDialog(player)}
                         className="text-amber-600 border-amber-300 hover:bg-amber-50 dark:hover:bg-amber-900/20"
                       >
                         <Gift className="w-4 h-4 me-1" />
@@ -288,7 +288,7 @@ export function PlayerManager({ authToken }: { authToken: string }) {
         open={giftDialogOpen}
         onOpenChange={setGiftDialogOpen}
         authToken={authToken}
-        initialPlayerId={selectedPlayerForGift}
+        initialRecipient={selectedPlayerForGift}
         onSuccess={() => setSelectedPlayerForGift(undefined)}
       />
     </div>

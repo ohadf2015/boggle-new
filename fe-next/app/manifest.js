@@ -84,5 +84,13 @@ export default function manifest() {
     theme_color: '#667eea',
     background_color: '#4a4a7a',
     categories: ['games', 'entertainment'],
+    related_applications: [
+      {
+        platform: 'play',
+        id: 'live.lexiclash.app',
+        url: 'https://play.google.com/store/apps/details?id=live.lexiclash.app',
+      },
+    ],
+    prefer_related_applications: false,
   };
 }

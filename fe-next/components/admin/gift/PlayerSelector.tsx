@@ -14,7 +14,7 @@ interface PlayerSelectorProps {
   selectedPlayers: GiftRecipient[];
   onSelectionChange: (players: GiftRecipient[]) => void;
   maxSelection?: number;
-  initialPlayerId?: string;
+  initialRecipient?: GiftRecipient;
 }
 
 export function PlayerSelector({
@@ -22,7 +22,7 @@ export function PlayerSelector({
   selectedPlayers,
   onSelectionChange,
   maxSelection = 50,
-  initialPlayerId,
+  initialRecipient,
 }: PlayerSelectorProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<GiftRecipient[]>([]);
@@ -60,34 +60,12 @@ export function PlayerSelector({
     }
   }, [authToken]);
 
-  // Load initial player if provided
   useEffect(() => {
-    if (initialPlayerId && selectedPlayers.length === 0) {
-      const loadInitialPlayer = async () => {
-        try {
-          const params = new URLSearchParams({
-            search: '',
-            limit: '1',
-            offset: '0',
-          });
-          // We need to fetch by ID - let's use a workaround by fetching all and filtering
-          const response = await fetch(`/api/admin/players?${params.toString()}`, {
-            headers: { Authorization: `Bearer ${authToken}` },
-          });
-          if (response.ok) {
-            const data = await response.json();
-            const player = data.players?.find((p: GiftRecipient) => p.id === initialPlayerId);
-            if (player) {
-              onSelectionChange([player]);
-            }
-          }
-        } catch (error) {
-          console.error('Error loading initial player:', error);
-        }
-      };
-      loadInitialPlayer();
+    if (initialRecipient && selectedPlayers.length === 0) {
+      onSelectionChange([initialRecipient]);
     }
-  }, [initialPlayerId, authToken, selectedPlayers.length, onSelectionChange]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialRecipient?.id]);
 
   // Debounced search
   useEffect(() => {

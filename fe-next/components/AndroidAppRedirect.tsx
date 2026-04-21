@@ -7,6 +7,8 @@ const SESSION_FLAG = 'android_app_redirect_tried';
 const DISMISS_KEY = 'android_app_redirect_dismissed_until';
 const DISMISS_DAYS = 7;
 
+type RelatedApp = { platform: string; id?: string; url?: string };
+
 function isCapacitorNative(): boolean {
   if (typeof window === 'undefined') return false;
   const cap = (window as unknown as { Capacitor?: { isNativePlatform?: () => boolean } }).Capacitor;
@@ -20,6 +22,19 @@ function isAndroidChrome(ua: string): boolean {
   return true;
 }
 
+async function hasLexiClashInstalled(): Promise<boolean> {
+  const nav = navigator as unknown as {
+    getInstalledRelatedApps?: () => Promise<RelatedApp[]>;
+  };
+  if (typeof nav.getInstalledRelatedApps !== 'function') return false;
+  try {
+    const apps = await nav.getInstalledRelatedApps();
+    return apps.some((a) => a.platform === 'play' && a.id === ANDROID_PACKAGE);
+  } catch {
+    return false;
+  }
+}
+
 export default function AndroidAppRedirect() {
   useEffect(() => {
     if (isCapacitorNative()) return;
@@ -31,17 +46,26 @@ export default function AndroidAppRedirect() {
 
     if (window.matchMedia('(display-mode: standalone)').matches) return;
 
-    const { host, pathname, search, hash } = window.location;
-    const fallback = `https://${host}${pathname}${search}${hash}`;
-    const intentUrl =
-      `intent://${host}${pathname}${search}${hash}` +
-      `#Intent;scheme=https;package=${ANDROID_PACKAGE};` +
-      `S.browser_fallback_url=${encodeURIComponent(fallback)};end`;
+    let cancelled = false;
+    void hasLexiClashInstalled().then((installed) => {
+      if (cancelled || !installed) return;
 
-    sessionStorage.setItem(SESSION_FLAG, '1');
-    localStorage.setItem(DISMISS_KEY, String(Date.now() + DISMISS_DAYS * 86_400_000));
+      const { host, pathname, search, hash } = window.location;
+      const fallback = `https://${host}${pathname}${search}${hash}`;
+      const intentUrl =
+        `intent://${host}${pathname}${search}${hash}` +
+        `#Intent;scheme=https;package=${ANDROID_PACKAGE};` +
+        `S.browser_fallback_url=${encodeURIComponent(fallback)};end`;
 
-    window.location.href = intentUrl;
+      sessionStorage.setItem(SESSION_FLAG, '1');
+      localStorage.setItem(DISMISS_KEY, String(Date.now() + DISMISS_DAYS * 86_400_000));
+
+      window.location.href = intentUrl;
+    });
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   return null;
