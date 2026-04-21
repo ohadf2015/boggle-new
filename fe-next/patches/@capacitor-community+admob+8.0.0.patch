@@ -1,0 +1,58 @@
+diff --git a/node_modules/@capacitor-community/admob/android/src/main/java/com/getcapacitor/community/admob/banner/BannerExecutor.java b/node_modules/@capacitor-community/admob/android/src/main/java/com/getcapacitor/community/admob/banner/BannerExecutor.java
+index c629139..775b2f7 100644
+--- a/node_modules/@capacitor-community/admob/android/src/main/java/com/getcapacitor/community/admob/banner/BannerExecutor.java
++++ b/node_modules/@capacitor-community/admob/android/src/main/java/com/getcapacitor/community/admob/banner/BannerExecutor.java
+@@ -44,7 +44,20 @@ public class BannerExecutor extends Executor {
+     }
+ 
+     public void initialize() {
+-        mViewGroup = (ViewGroup) ((ViewGroup) activitySupplier.get().findViewById(android.R.id.content)).getChildAt(0);
++        ensureViewGroup();
++    }
++
++    private void ensureViewGroup() {
++        if (mViewGroup != null) return;
++        try {
++            Activity activity = activitySupplier.get();
++            if (activity == null) return;
++            ViewGroup content = (ViewGroup) activity.findViewById(android.R.id.content);
++            if (content == null) return;
++            ViewGroup child = content.getChildCount() > 0 ? (ViewGroup) content.getChildAt(0) : null;
++            mViewGroup = child != null ? child : content;
++        } catch (Exception ignored) {
++        }
+     }
+ 
+     public void showBanner(final PluginCall call) {
+@@ -205,7 +218,7 @@ public class BannerExecutor extends Executor {
+                     .get()
+                     .runOnUiThread(() -> {
+                         if (mAdView != null) {
+-                            mViewGroup.removeView(mAdViewLayout);
++                            if (mViewGroup != null) mViewGroup.removeView(mAdViewLayout);
+                             mAdViewLayout.removeView(mAdView);
+                             mAdView.destroy();
+                             mAdView = null;
+@@ -261,7 +274,7 @@ public class BannerExecutor extends Executor {
+                         @Override
+                         public void onAdFailedToLoad(@NonNull LoadAdError adError) {
+                             if (mAdView != null) {
+-                                mViewGroup.removeView(mAdViewLayout);
++                                if (mViewGroup != null) mViewGroup.removeView(mAdViewLayout);
+                                 mAdViewLayout.removeView(mAdView);
+                                 mAdView.destroy();
+                                 mAdView = null;
+@@ -297,7 +310,12 @@ public class BannerExecutor extends Executor {
+                 );
+ 
+                 // Add AdViewLayout top of the WebView
+-                mViewGroup.addView(mAdViewLayout);
++                ensureViewGroup();
++                if (mViewGroup != null) {
++                    mViewGroup.addView(mAdViewLayout);
++                } else {
++                    Log.e(logTag, "Banner: mViewGroup null after ensureViewGroup, skip addView");
++                }
+             });
+     }
+ }
