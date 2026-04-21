@@ -6,9 +6,9 @@
 **Production access gate** (Play policy, not technical): need ≥12 closed-test opt-ins × 14 days before "Apply for production access" unlocks. Dashboard: "2 testers currently opted in". No API bypass.
 
 ## Last Release
-versionCode **3761** uploaded 2026-04-21 to **closed-testing ("alpha")** track, release_status=completed. Ships native crash logger (`MainActivity.installCrashLogger` → `filesDir/last_crash.txt`) + default notification channel. Prior: 3734 (2026-04-20). 3733 burned (duplicate-code error before bump).
+versionCode **3765** uploaded 2026-04-21 to **internal** track, release_status=completed. Ships Sentry Capacitor-WebView filter removal (`addListener(...).then is not a function` class now reaches Sentry) + i18n'd `capacitor-assets/error.html` (5 locales, RTL shadow flip). Prior: 3761 (native crash logger `MainActivity.installCrashLogger` → `filesDir/last_crash.txt` + default notification channel), 3734 (2026-04-20), 3733 burned (duplicate-code error before bump).
 
-Fastfile `track: "alpha"` for both `internal` and `promote_to_production` lanes — the script echo "Track=internal" is misleading. Promote lane fails with `Precondition check failed` until production access granted.
+Fastfile retargeted 2026-04-21: both `internal` and `promote_to_production` lanes now use `track: "internal"` (was `"alpha"`). Internal track exempts the 12-tester × 14-day production gate and propagates in minutes. Prereq: Play Console → Testing → Internal testing must have an active release created manually once, otherwise `supply` returns `Precondition check failed`.
 
 ## Keystore (v2 — new upload key)
 - Path: `android/lexiclash-upload-v2.keystore` (also referenced as `lexiclash-release.keystore` via env)

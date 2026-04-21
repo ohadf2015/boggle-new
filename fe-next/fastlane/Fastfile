@@ -1,12 +1,12 @@
 default_platform(:android)
 
 platform :android do
-  desc "Build AAB and upload to Play alpha (closed testing) track"
+  desc "Build AAB and upload to Play internal testing track (fast propagation, ≤100 testers)"
   lane :internal do
     aab = ENV["AAB_PATH"] || "android/app/build/outputs/bundle/release/app-release.aab"
     changelog = ENV["RELEASE_NOTES"] || `git log -1 --pretty=%B`.strip
     supply(
-      track: "alpha",
+      track: "internal",
       aab: aab,
       skip_upload_apk: true,
       release_status: "completed",
@@ -18,10 +18,10 @@ platform :android do
     UI.success("Uploaded #{aab} to alpha. Changelog: #{changelog}")
   end
 
-  desc "Promote latest alpha build to production"
+  desc "Promote latest internal build to production"
   lane :promote_to_production do
     supply(
-      track: "alpha",
+      track: "internal",
       track_promote_to: "production",
       skip_upload_apk: true,
       skip_upload_aab: true,
