@@ -5,7 +5,16 @@
 // These effects operate on temporary PixiJS Sprites created at tile positions.
 // The sprites are auto-cleaned up when the effect finishes.
 
-import { Container, Graphics, RenderTexture, Sprite, Texture, Ticker, type Application } from 'pixi.js';
+import { Container, Graphics, RenderTexture, Sprite, Texture, Ticker, type Application, type TickerCallback } from 'pixi.js';
+
+type TickerUpdatable = Container & { update?: TickerCallback<unknown> };
+
+function removeFromTicker(effect: Container): void {
+  const u = (effect as TickerUpdatable).update;
+  if (typeof u === 'function') {
+    Ticker.shared.remove(u, effect);
+  }
+}
 import {
   ShatterEffect,
   DissolveEffect,
@@ -401,11 +410,7 @@ export function createEnhancedEffects(
       if (destroyed) return;
       // Remove effect container from scene graph, then destroy
       try { if (effect.parent) effect.parent.removeChild(effect); } catch { /* */ }
-      try {
-        if (typeof (effect as any).update === 'function') {
-          Ticker.shared.remove((effect as any).update, effect);
-        }
-      } catch { /* already removed */ }
+      try { removeFromTicker(effect); } catch { /* already removed */ }
       try { effect.destroy({ children: true }); } catch { /* already cleaned */ }
       // Remove proxy sprite from scene graph, destroy texture, then sprite
       try { if (sprite.parent) sprite.parent.removeChild(sprite); } catch { /* */ }
@@ -485,11 +490,7 @@ export function createEnhancedEffects(
     destroyed = true;
     for (const effect of activeEffects) {
       try { if (effect.parent) effect.parent.removeChild(effect); } catch { /* */ }
-      try {
-        if (typeof (effect as any).update === 'function') {
-          Ticker.shared.remove((effect as any).update, effect);
-        }
-      } catch { /* already removed */ }
+      try { removeFromTicker(effect); } catch { /* already removed */ }
       try { effect.destroy({ children: true }); } catch { /* */ }
     }
     activeEffects.clear();
