@@ -4,6 +4,7 @@
  */
 import { useCallback, useEffect, useRef } from 'react';
 import type { GridTileState } from '@/types/adventure';
+import type { ChainBurstConfig, PendingExplosion, ScorePopupData } from '@/components/adventure/effects/AdventureEffectsLayer';
 
 interface UseAdventureGridInteractionParams {
   isPlaying: boolean;
@@ -26,9 +27,9 @@ interface UseAdventureGridInteractionParams {
   gridRef: React.RefObject<HTMLDivElement | null>;
   gridSize: number;
   effects: {
-    setChainBurstConfig: (v: any) => void;
-    addExplosion: (v: any) => void;
-    currentPopup: any;
+    setChainBurstConfig: (v: ChainBurstConfig | null) => void;
+    addExplosion: (v: PendingExplosion) => void;
+    currentPopup: ScorePopupData | null;
     handlePopupComplete: () => void;
   };
 }

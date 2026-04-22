@@ -14,7 +14,7 @@ interface UseAdventureQuestTrackingParams {
   bossMaxHP: number;
   playerCurrentHP: number;
   playerMaxHP: number;
-  gridEffectTrigger: any;
+  gridEffectTrigger: { name: string; id: number } | null;
   // Flash challenge
   isChallengeComplete: boolean;
   // Quest recorders
