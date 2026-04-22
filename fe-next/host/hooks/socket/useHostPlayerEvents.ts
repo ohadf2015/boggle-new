@@ -11,8 +11,14 @@ import { createConnectionHandlers } from '@/shared/utils/connectionUtils';
 import { createPlayerPresenceHandler } from '@/shared/utils/presenceUtils';
 import logger from '@/utils/logger';
 import type { XpGainedPayload, LevelUpPayload, AchievementPayload } from '@/shared/types/socket';
-import type { LeaderboardEntry } from '@/shared/types/game';
+import type { GameUser } from '@/shared/types/game';
 import type { Player } from '@/hooks/useGameState';
+
+interface LeaderboardWirePlayer {
+  username: string;
+  score: number;
+  wordCount?: number;
+}
 
 interface UseHostPlayerEventsProps {
   socket: Socket | null;
@@ -25,8 +31,8 @@ interface UseHostPlayerEventsProps {
   setPlayersReady: React.Dispatch<React.SetStateAction<Player[]>>;
   setPlayerWordCounts: React.Dispatch<React.SetStateAction<Record<string, number>>>;
   setPlayerScores: React.Dispatch<React.SetStateAction<Record<string, number>>>;
-  setPlayerAchievements: React.Dispatch<React.SetStateAction<Record<string, any[]>>>;
-  setHostAchievements: React.Dispatch<React.SetStateAction<any[]>>;
+  setPlayerAchievements: React.Dispatch<React.SetStateAction<Record<string, unknown[]>>>;
+  setHostAchievements: React.Dispatch<React.SetStateAction<unknown[]>>;
 
   // XP state setters
   setXpGainedData: React.Dispatch<React.SetStateAction<XpGainedPayload | null>>;
@@ -79,11 +85,11 @@ export function useHostPlayerEvents({
   useEffect(() => {
     if (!socket) return;
 
-    const handleUpdateUsers = (data: any) => {
-      const newUsers = data.users || [];
+    const handleUpdateUsers = (data: { users: Array<GameUser | string> }) => {
+      const newUsers = (data.users || []) as Player[];
       setPlayersReady(newUsers);
 
-      const currentUsernames = new Set(newUsers.map((u: string | Player) =>
+      const currentUsernames = new Set((data.users || []).map((u) =>
         typeof u === 'string' ? u : u.username
       ));
 
@@ -109,7 +115,7 @@ export function useHostPlayerEvents({
       });
 
       setPlayerAchievements(prev => {
-        const filtered: Record<string, any[]> = {};
+        const filtered: Record<string, unknown[]> = {};
         Object.keys(prev).forEach(uname => {
           if (currentUsernames.has(uname)) {
             filtered[uname] = prev[uname] ?? [];
@@ -119,14 +125,14 @@ export function useHostPlayerEvents({
       });
     };
 
-    const handlePlayerJoinedLate = (data: any) => {
+    const handlePlayerJoinedLate = (data: { username: string }) => {
       neoInfoToast(`${data.username} ${t('hostView.playerJoinedLate')}`, {
         icon: TOAST_ICONS.rocket,
         duration: 4000,
       });
     };
 
-    const handlePlayerFoundWord = (data: any) => {
+    const handlePlayerFoundWord = (data: { username: string; word: string; wordCount: number; score: number; comboLevel: number }) => {
       setPlayerWordCounts(prev => ({
         ...prev,
         [data.username]: data.wordCount
@@ -139,16 +145,16 @@ export function useHostPlayerEvents({
       }
     };
 
-    const handleUpdateLeaderboard = (data: { leaderboard: LeaderboardEntry[] }) => {
+    const handleUpdateLeaderboard = (data: { leaderboard: LeaderboardWirePlayer[] }) => {
       if (!data.leaderboard || !Array.isArray(data.leaderboard)) return;
 
       const newScores: Record<string, number> = {};
       const newWordCounts: Record<string, number> = {};
 
-      data.leaderboard.forEach((entry: LeaderboardEntry) => {
+      data.leaderboard.forEach((entry) => {
         newScores[entry.username] = entry.score;
-        if ((entry as any).wordCount !== undefined) {
-          newWordCounts[entry.username] = (entry as any).wordCount;
+        if (entry.wordCount !== undefined) {
+          newWordCounts[entry.username] = entry.wordCount;
         }
       });
 
@@ -156,16 +162,18 @@ export function useHostPlayerEvents({
       setPlayerWordCounts(prev => ({ ...prev, ...newWordCounts }));
     };
 
-    const handleAchievementUnlocked = (data: any) => {
+    const handleAchievementUnlocked = (data: { username?: string; achievement?: AchievementPayload }) => {
       if (!hostPlaying && data.username && data.achievement) {
+        const username = data.username;
+        const achievement = data.achievement;
         setPlayerAchievements(prev => ({
           ...prev,
-          [data.username]: [...(prev[data.username] || []), data.achievement]
+          [username]: [...(prev[username] || []), achievement]
         }));
       }
     };
 
-    const handleLiveAchievementUnlocked = (data: any) => {
+    const handleLiveAchievementUnlocked = (data: { achievements: AchievementPayload[] }) => {
       const validAchievements = processAchievements(data, queueAchievement, 'HOST');
       if (hostPlaying && validAchievements.length > 0) {
         setHostAchievements(prev => [...prev, ...validAchievements]);
