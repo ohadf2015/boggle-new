@@ -86,39 +86,42 @@ export const MessageComposer: React.FC<MessageComposerProps> = ({
   }, [onTyping]);
 
   /**
-   * Handle text change
+   * Sync state from a raw value (shared by change/input/compositionEnd handlers).
+   * Android GBoard in Hebrew buffers composition; onChange alone can leave React
+   * state empty while the DOM value already has text.
    */
-  const handleChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const newText = e.target.value;
-
-    // Don't exceed max length
-    if (newText.length <= maxLength) {
-      setText(newText);
-
-      // Emit typing indicator if text is being added
-      if (newText.length > 0) {
-        emitTyping(true);
-      } else {
-        emitTyping(false);
-      }
+  const syncText = useCallback((raw: string) => {
+    if (raw.length <= maxLength) {
+      setText(raw);
+      emitTyping(raw.length > 0);
     }
   }, [maxLength, emitTyping]);
 
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    syncText(e.target.value);
+  }, [syncText]);
+
+  const handleCompositionEnd = useCallback((e: React.CompositionEvent<HTMLTextAreaElement>) => {
+    syncText(e.currentTarget.value);
+  }, [syncText]);
+
   /**
-   * Handle send
+   * Handle send — reads the DOM value directly because React state can be stale
+   * mid-IME composition (Android GBoard with Hebrew doesn't always fire input
+   * events until the word commits).
    */
   const handleSend = useCallback(() => {
-    const trimmed = text.trim();
+    const raw = textareaRef.current?.value ?? text;
+    const trimmed = raw.trim();
 
     if (trimmed && !disabled && trimmed.length <= maxLength) {
       onSend(trimmed);
       setText('');
-      emitTyping(false);
-
-      // Reset textarea height
       if (textareaRef.current) {
+        textareaRef.current.value = '';
         textareaRef.current.style.height = 'auto';
       }
+      emitTyping(false);
     }
   }, [text, disabled, maxLength, onSend, emitTyping]);
 
@@ -163,6 +166,8 @@ export const MessageComposer: React.FC<MessageComposerProps> = ({
           ref={textareaRef}
           value={text}
           onChange={handleChange}
+          onInput={handleChange}
+          onCompositionEnd={handleCompositionEnd}
           onKeyDown={handleKeyDown}
           placeholder={placeholder || t('friends.typeMessage')}
           disabled={disabled}
@@ -179,16 +184,17 @@ export const MessageComposer: React.FC<MessageComposerProps> = ({
           }}
         />
 
-        {/* Send button */}
+        {/* Send button — aria-disabled (not `disabled`) so clicks still commit
+            IME composition on Android GBoard; handleSend reads the DOM value. */}
         <button
           onClick={handleSend}
-          disabled={!isValid || disabled}
+          aria-disabled={!isValid || disabled}
           className={cn(
             'shrink-0 p-2 rounded-neo border-2 border-neo-black',
             'transition-all',
             isValid && !disabled
               ? 'bg-neo-cyan shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5'
-              : 'bg-gray-600 opacity-50 cursor-not-allowed'
+              : 'bg-gray-600 opacity-50'
           )}
           aria-label={t('friends.sendMessage')}
         >
