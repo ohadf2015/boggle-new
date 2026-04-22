@@ -6,11 +6,17 @@ import { useEffect, MutableRefObject } from 'react';
 import { Socket } from 'socket.io-client';
 import { neoSuccessToast, neoErrorToast, neoInfoToast, TOAST_ICONS } from '../../../components/NeoToast';
 import { triggerTournamentCompleteCelebration } from '@/shared/utils/gameEventUtils';
+import type {
+  TournamentCreatedPayload,
+  TournamentRoundPayload,
+  TournamentCompletePayload,
+} from '@/shared/types/socket';
+import type { TournamentStanding } from '@/shared/types/game';
 
 interface TournamentData {
   currentRound?: number;
   totalRounds?: number;
-  standings?: any[];
+  standings?: TournamentStanding[];
   isComplete?: boolean;
 }
 
@@ -39,13 +45,17 @@ export function useHostTournamentEvents({
   useEffect(() => {
     if (!socket) return;
 
-    const handleTournamentCreated = (data: any) => {
+    const handleTournamentCreated = (data: TournamentCreatedPayload) => {
       if (tournamentTimeoutRef.current) {
         clearTimeout(tournamentTimeoutRef.current);
         tournamentTimeoutRef.current = null;
       }
       setTournamentCreating(false);
-      setTournamentData(data.tournament);
+      setTournamentData({
+        currentRound: data.tournament.currentRound,
+        totalRounds: data.tournament.totalRounds,
+        standings: data.standings,
+      });
       neoSuccessToast(`${t('hostView.tournamentMode')}: ${data.tournament.totalRounds} ${t('hostView.rounds')}`, {
         icon: TOAST_ICONS.trophy,
         duration: 4000,
@@ -55,41 +65,41 @@ export function useHostTournamentEvents({
       }, 1500);
     };
 
-    const handleTournamentRoundStarting = (data: any) => {
+    const handleTournamentRoundStarting = (data: TournamentRoundPayload) => {
       setTournamentData(prev => ({
         ...prev,
-        currentRound: data.roundNumber,
+        currentRound: data.tournament.currentRound,
+        totalRounds: data.tournament.totalRounds,
         standings: data.standings,
       }));
-      neoInfoToast(`${t('hostView.tournamentRound')} ${data.roundNumber}/${data.totalRounds}`, {
+      neoInfoToast(`${t('hostView.tournamentRound')} ${data.tournament.currentRound}/${data.tournament.totalRounds}`, {
         icon: TOAST_ICONS.flag,
         duration: 3000,
       });
     };
 
-    const handleTournamentRoundCompleted = (data: any) => {
+    const handleTournamentRoundCompleted = (data: TournamentRoundPayload) => {
       setTournamentData(prev => ({
         ...prev,
+        currentRound: data.tournament.currentRound,
+        totalRounds: data.tournament.totalRounds,
         standings: data.standings,
-        isComplete: data.isComplete,
       }));
-
-      if (data.isComplete) {
-        triggerTournamentCompleteCelebration();
-        neoSuccessToast(t('hostView.tournamentComplete'), {
-          icon: TOAST_ICONS.trophy,
-          duration: 5000,
-        });
-      }
     };
 
-    const handleTournamentComplete = (data: any) => {
+    const handleTournamentComplete = (data: TournamentCompletePayload) => {
       setTournamentData(prev => ({
         ...prev,
+        currentRound: data.tournament.currentRound,
+        totalRounds: data.tournament.totalRounds,
         standings: data.standings,
         isComplete: true,
       }));
       triggerTournamentCompleteCelebration();
+      neoSuccessToast(t('hostView.tournamentComplete'), {
+        icon: TOAST_ICONS.trophy,
+        duration: 5000,
+      });
     };
 
     const handleTournamentCancelled = () => {
