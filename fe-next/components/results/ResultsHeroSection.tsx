@@ -7,6 +7,7 @@ import useReducedMotion from '@/hooks/useReducedMotion';
 import Avatar from '../Avatar';
 import { formatRankOrdinal } from '@/utils/formatRankOrdinal';
 import { AnimatedCounter } from '@/components/ui/AnimatedCounter';
+import type { Avatar as AvatarData } from '@/shared/types/game';
 
 // ============================================================
 // TYPES
@@ -16,7 +17,7 @@ interface ResultsHeroSectionProps {
   rank: number;
   score: number;
   username: string;
-  avatar?: { emoji?: string; color?: string } | null;
+  avatar?: AvatarData | null;
   winnerScore?: number;
   totalPlayers: number;
   isWordHunt?: boolean;
@@ -224,7 +225,7 @@ const ResultsHeroSection = memo<ResultsHeroSectionProps>(
             >
               <Avatar
                 userId={username}
-                customAvatar={(avatar as any)?.customAvatar}
+                customAvatar={avatar?.customAvatar}
                 size="2xl"
                 className="w-full h-full rounded-full"
               />

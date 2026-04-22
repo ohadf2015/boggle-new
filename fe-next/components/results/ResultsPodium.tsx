@@ -296,7 +296,7 @@ export default function ResultsPodium({
                 >
                   <Avatar
                     userId={player.username}
-                    customAvatar={(player.avatar as any)?.customAvatar}
+                    customAvatar={player.avatar?.customAvatar}
                     size={isFirst ? 'lg' : 'md'}
                     className={cn('w-full h-full rounded-full')}
                   />

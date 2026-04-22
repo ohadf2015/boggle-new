@@ -100,7 +100,7 @@ export default function ConsolationRows({
               <div className="w-10 h-10 shrink-0">
                 <Avatar
                   userId={player.username}
-                  customAvatar={(player.avatar as any)?.customAvatar}
+                  customAvatar={player.avatar?.customAvatar}
                   size="md"
                   className="w-full h-full rounded-full"
                 />
