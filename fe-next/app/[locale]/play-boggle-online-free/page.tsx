@@ -70,7 +70,7 @@ const faqs = [
   },
   {
     q: 'Is LexiClash better than Words With Friends?',
-    a: "LexiClash offers a different experience. Unlike Words With Friends (turn-based), LexiClash is real-time — everyone plays simultaneously, making it faster and more exciting. It combines Boggle-style grid word finding with competitive multiplayer. Both are great, but LexiClash is completely free with no ads interrupting gameplay.",
+    a: "LexiClash offers a different experience. Unlike Words With Friends (turn-based), LexiClash is real-time — everyone plays simultaneously, making it faster and more exciting. It combines Boggle-style grid word finding with competitive multiplayer. Both are great, but LexiClash is completely free with no pay-to-win mechanics.",
   },
   {
     q: 'What are the best Boggle alternatives online?',
@@ -335,7 +335,7 @@ export default async function PlayBoggleOnlineFreePage({ params }: PageProps) {
             </Link>
             <Link href={`/${locale}/lexiclash-vs-scrabble`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-lime/40">
               <h3 className="font-bold text-neo-cyan">LexiClash vs Scrabble GO</h3>
-              <p className="mt-1 text-xs text-neo-gray-200">No ads, no bots, real players</p>
+              <p className="mt-1 text-xs text-neo-gray-200">No pay-to-win, no bots, real players</p>
             </Link>
             <Link href={`/${locale}/best-online-word-games`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-lime/40">
               <h3 className="font-bold text-neo-cyan">Best Word Games 2026</h3>

@@ -87,7 +87,7 @@ export interface OnShowResultsData {
   wheelRushSummary?: WheelRushSummary;
 }
 
-interface FinalScoresState {
+export interface FinalScoresState {
   players: PlayerResultPayload[];
   gameCode: string;
   wordHuntSummary?: WordHuntSummary;

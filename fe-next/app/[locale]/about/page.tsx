@@ -137,7 +137,7 @@ export default async function AboutPage({ params }: PageProps) {
             title: 'About LexiClash — Our Story, Mission & Team',
             description: 'LexiClash is a free, real-time multiplayer word game built for players who love language. Founded in 2024, our mission is to make word games accessible, competitive, and fun for everyone — in any language.',
             features: [
-              'Free multiplayer word game with no ads blocking gameplay',
+              'Free multiplayer word game with no pay-to-win mechanics',
               'Available in 5 languages — English, Hebrew, Swedish, Japanese, and Spanish',
               'Multiple game modes — Classic, Blast, Word Hunt, Adventure, and Daily Challenges',
               'Built for phones, tablets, and Party TV screens',

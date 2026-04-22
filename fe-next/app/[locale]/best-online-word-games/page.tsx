@@ -50,15 +50,15 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 const faqs = [
   {
     q: 'What is the best free word game online in 2026?',
-    a: 'It depends on what you want. If you love competing against real people in real time, LexiClash is hard to beat — unlimited games, no ads shoved in your face, and genuinely fun modes. If you prefer a quick daily ritual, Wordle nails that perfectly. For async games with a friend across the country, Words With Friends still does the job.',
+    a: 'It depends on what you want. If you love competing against real people in real time, LexiClash is hard to beat — unlimited games, no pay-to-win, and genuinely fun modes. If you prefer a quick daily ritual, Wordle nails that perfectly. For async games with a friend across the country, Words With Friends still does the job.',
   },
   {
     q: 'What word games can I play with friends online?',
     a: 'LexiClash lets you play with 2-20+ people simultaneously in real time, right in your browser. Words With Friends and Scrabble GO are both solid for turn-based play with one friend, but they need an app download. LexiClash is the only option where you can just send a link and start playing together instantly.',
   },
   {
-    q: 'Are there word games without ads?',
-    a: 'Wordle has zero ads (it lives behind the NYT paywall). LexiClash only shows ads if you opt in for rewards — nothing ever interrupts your game. Most other popular word games like Scrabble GO and Wordscapes hit you with ads constantly, sometimes every 30 seconds.',
+    q: 'Which word games respect your time?',
+    a: 'Wordle has zero ads (it lives behind the NYT paywall). LexiClash keeps ads minimal — a small banner and optional rewarded videos for bonuses, never interstitial pop-ups mid-game. Scrabble GO and Wordscapes hit you with full-screen ads constantly, sometimes every 30 seconds.',
   },
   {
     q: 'What word games work in the browser without downloading?',
@@ -364,7 +364,7 @@ export default async function BestOnlineWordGamesPage({ params }: PageProps) {
             </Link>
             <Link href={`/${locale}/lexiclash-vs-scrabble`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-lime/40">
               <h3 className="font-bold text-neo-cyan">LexiClash vs Scrabble GO</h3>
-              <p className="mt-1 text-xs text-neo-gray-200">No ads, no bots, real players</p>
+              <p className="mt-1 text-xs text-neo-gray-200">No pay-to-win, no bots, real players</p>
             </Link>
             <Link href={`/${locale}/play-boggle-online-free`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-lime/40">
               <h3 className="font-bold text-neo-cyan">Play Boggle Online Free</h3>

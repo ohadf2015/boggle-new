@@ -173,10 +173,13 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
                 "sm:hidden",
             )}
             style={{
-                // Float above AdSense's sticky bottom anchor ad when present (0 otherwise).
-                // Native AdMob banner stacks via its own plugin margin — see AnchoredNativeBanner.
-                bottom: 'var(--adsense-anchor-height, 0px)',
-                paddingBottom: safeArea.bottom > 0 ? `${safeArea.bottom}px` : 'env(safe-area-inset-bottom, 0px)',
+                // Float above whichever sticky bottom ad is present:
+                // --adsense-anchor-height (web) or --admob-banner-height (native Capacitor).
+                // Both fall back to 0px when inactive, so the sum is safe cross-platform.
+                bottom: 'calc(var(--adsense-anchor-height, 0px) + var(--admob-banner-height, 0px))',
+                // AdMob banner anchors at true bottom and absorbs safe-area itself —
+                // subtract it from padding to avoid double gap. AdSense doesn't, so padding persists.
+                paddingBottom: `max(0px, ${safeArea.bottom > 0 ? `${safeArea.bottom}px` : 'env(safe-area-inset-bottom, 0px)'} - var(--admob-banner-height, 0px))`,
             }}
             aria-label={t('nav.bottomNavigation')}
         >

@@ -58,7 +58,7 @@ const faqs = [
   },
   {
     q: 'How is this different from the original Boggle Word Shake app?',
-    a: 'LexiClash offers the same word-shake gameplay plus real-time multiplayer (2-20+ players), multiple grid sizes (4x4, 5x5, 6x6), daily challenges, combo scoring, and 5-language support — all free with no ads during gameplay.',
+    a: 'LexiClash offers the same word-shake gameplay plus real-time multiplayer (2-20+ players), multiple grid sizes (4x4, 5x5, 6x6), daily challenges, combo scoring, and 5-language support — all free with no pay-to-win boosts.',
   },
   {
     q: 'Can I play Boggle Word Shake with friends online?',

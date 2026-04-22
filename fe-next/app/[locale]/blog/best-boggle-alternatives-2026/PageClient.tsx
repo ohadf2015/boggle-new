@@ -65,11 +65,11 @@ export default function BoggleAlternativesPageClient(): React.ReactElement {
   ];
 
   const tryCtaByLocale: Record<string, string> = {
-    en: 'Try LexiClash free — no download, no ads',
-    he: 'נסו LexiClash בחינם — ללא הורדה, ללא פרסומות',
-    sv: 'Prova LexiClash gratis — ingen nedladdning, inga annonser',
-    ja: 'LexiClashを無料で試す — ダウンロード不要、広告なし',
-    es: 'Prueba LexiClash gratis — sin descarga, sin anuncios',
+    en: 'Try LexiClash free — no download, no pay-to-win',
+    he: 'נסו LexiClash בחינם — ללא הורדה, ללא תשלום לניצחון',
+    sv: 'Prova LexiClash gratis — ingen nedladdning, inget pay-to-win',
+    ja: 'LexiClashを無料で試す — ダウンロード不要、ペイ・トゥ・ウィンなし',
+    es: 'Prueba LexiClash gratis — sin descarga, sin pagar para ganar',
   };
 
   const relatedHeadingByLocale: Record<string, string> = {

@@ -7,9 +7,6 @@ import { AdMob, BannerAdPluginEvents, BannerAdPosition } from '@capacitor-commun
 import { useAdMob } from '@/hooks/useAdMob';
 import { useSafeArea } from '@/hooks/useSafeArea';
 
-// GlobalBottomNav height (h-16 = 64px). Keep in sync if nav height changes.
-const NAV_HEIGHT_PX = 64;
-
 const GAME_ROUTES = [
   '/multiplayer',
   '/singleplayer',
@@ -46,7 +43,10 @@ export default function AnchoredNativeBanner() {
 
     AdMob.addListener(BannerAdPluginEvents.SizeChanged, (info: { height: number }) => {
       const h = info?.height ?? 0;
-      document.documentElement.style.setProperty('--admob-banner-height', `${h}px`);
+      // Absorb safe-area into var: on iOS, plugin anchors banner above home indicator,
+      // so nav must offset by bannerH + safeArea to sit flush above banner top edge.
+      const total = h > 0 ? h + (safeArea.bottom || 0) : 0;
+      document.documentElement.style.setProperty('--admob-banner-height', `${total}px`);
     })
       .then((handle) => {
         removeListener = () => handle.remove();
@@ -57,7 +57,7 @@ export default function AnchoredNativeBanner() {
       removeListener?.();
       document.documentElement.style.setProperty('--admob-banner-height', '0px');
     };
-  }, []);
+  }, [safeArea.bottom]);
 
   useEffect(() => {
     if (!Capacitor.isNativePlatform()) return;
@@ -65,13 +65,13 @@ export default function AnchoredNativeBanner() {
     let cancelled = false;
 
     if (isAllowedRoute(pathname)) {
-      // Stack banner above GlobalBottomNav: margin = nav height + safe-area bottom.
-      // Plugin ignores margin on re-show of existing banner, so hide first.
-      const margin = NAV_HEIGHT_PX + (safeArea.bottom || 0);
+      // Anchor banner at true screen bottom (margin=0; plugin auto-excludes iOS notch).
+      // GlobalBottomNav reads --admob-banner-height CSS var (set via SizeChanged)
+      // and offsets itself up, so nav stacks flush above banner without magic constants.
       (async () => {
         await hideBanner();
         if (cancelled) return;
-        await showBanner(BannerAdPosition.BOTTOM_CENTER, margin);
+        await showBanner(BannerAdPosition.BOTTOM_CENTER, 0);
       })();
     } else {
       hideBanner();
@@ -81,7 +81,7 @@ export default function AnchoredNativeBanner() {
     return () => {
       cancelled = true;
     };
-  }, [pathname, showBanner, hideBanner, safeArea.bottom]);
+  }, [pathname, showBanner, hideBanner]);
 
   return null;
 }

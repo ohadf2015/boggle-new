@@ -11,9 +11,10 @@
 import { useState, useCallback, useMemo, useRef, useEffect, MutableRefObject } from 'react';
 import { generateRandomTable } from '@/utils/utils';
 import { DIFFICULTIES, DEFAULT_DIFFICULTY, DEFAULT_MIN_WORD_LENGTH } from '@/utils/consts';
-import type { Language, LetterGrid, DifficultyLevel, Avatar } from '@/types';
+import type { Language, LetterGrid, DifficultyLevel } from '@/types';
 import type { Player } from '@/hooks/useGameState';
 import type { BoardTheme } from '@/shared/types/socket';
+import type { FinalScoresState } from './socket/useHostGameEvents';
 import { useLocalStorageState } from '@/hooks/useLocalStorageState';
 
 // ==========================================
@@ -25,17 +26,6 @@ export interface TournamentData {
   totalRounds?: number;
   standings?: unknown[];
   isComplete?: boolean;
-}
-
-export interface FinalScoresData {
-  players: Array<{
-    username: string;
-    score: number;
-    wordsFound: number;
-    avatar?: Avatar;
-  }>;
-  gameCode: string;
-  wordHuntSummary?: { targetWord: string; playerLives: Record<string, number>; eliminatedPlayers: string[]; targetFoundBy: string | null };
 }
 
 export interface XpGainedData {
@@ -82,20 +72,20 @@ export interface PlayerTrackingState {
   playersReady: Player[];
   playerWordCounts: Record<string, number>;
   playerScores: Record<string, number>;
-  playerAchievements: Record<string, string[]>;
+  playerAchievements: Record<string, unknown[]>;
 }
 
 // Host-specific playing state
 export interface HostPlayingState {
   hostFoundWords: string[];
-  hostAchievements: string[];
+  hostAchievements: unknown[];
 }
 
 // Tournament state
 export interface TournamentState {
   tournamentData: TournamentData | null;
   tournamentCreating: boolean;
-  finalScores: FinalScoresData | null;
+  finalScores: FinalScoresState | null;
 }
 
 // Animation state
@@ -170,7 +160,7 @@ export interface UseHostViewStateReturn {
   tournament: TournamentState;
   setTournamentData: React.Dispatch<React.SetStateAction<TournamentData | null>>;
   setTournamentCreating: React.Dispatch<React.SetStateAction<boolean>>;
-  setFinalScores: React.Dispatch<React.SetStateAction<FinalScoresData | null>>;
+  setFinalScores: React.Dispatch<React.SetStateAction<FinalScoresState | null>>;
 
   // Animation
   animation: AnimationState;
@@ -283,7 +273,7 @@ export function useHostViewState(options: UseHostViewStateOptions = {}): UseHost
   // ==========================================
   const [tournamentData, setTournamentData] = useState<TournamentData | null>(null);
   const [tournamentCreating, setTournamentCreating] = useState<boolean>(false);
-  const [finalScores, setFinalScores] = useState<FinalScoresData | null>(null);
+  const [finalScores, setFinalScores] = useState<FinalScoresState | null>(null);
 
   // ==========================================
   // Animation State

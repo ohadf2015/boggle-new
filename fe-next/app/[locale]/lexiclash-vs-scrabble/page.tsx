@@ -15,12 +15,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const pageUrl = `${BASE_URL}/${locale}/lexiclash-vs-scrabble`;
 
   return {
-    title: 'LexiClash vs Scrabble GO — No Ads, No Bots, Real Competition | LexiClash',
-    description: 'Tired of Scrabble GO ads and fake bot opponents? LexiClash is a real-time word game with real players, no ad interruptions, and no pay-to-win. Free comparison.',
-    keywords: 'lexiclash vs scrabble, scrabble go alternative, scrabble go too many ads, scrabble go bots, scrabble go pay to win, best scrabble alternative 2026, word games without ads, real multiplayer word game',
+    title: 'LexiClash vs Scrabble GO — No Interruptions, No Bots, Real Competition | LexiClash',
+    description: 'Tired of Scrabble GO interstitials and fake bot opponents? LexiClash is a real-time word game with real players, no mid-game ad interruptions, and no pay-to-win. Free comparison.',
+    keywords: 'lexiclash vs scrabble, scrabble go alternative, scrabble go too many ads, scrabble go bots, scrabble go pay to win, best scrabble alternative 2026, no interstitial word games, real multiplayer word game',
     openGraph: {
       title: 'LexiClash vs Scrabble GO — Honest Comparison 2026',
-      description: 'No ads, no bots, no pay-to-win. See why players are switching from Scrabble GO.',
+      description: 'No interruptions, no bots, no pay-to-win. See why players are switching from Scrabble GO.',
       locale: 'en_US',
       type: 'website',
       url: pageUrl,
@@ -28,8 +28,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     },
     twitter: {
       card: 'summary_large_image',
-      title: 'LexiClash vs Scrabble GO — No Ads, Real Players',
-      description: 'Tired of Scrabble GO ads? LexiClash is the clean alternative.',
+      title: 'LexiClash vs Scrabble GO — No Interruptions, Real Players',
+      description: 'Tired of Scrabble GO interstitials? LexiClash is the clean alternative.',
       images: [`${BASE_URL}/og-image-en.webp`],
     },
     alternates: {
@@ -95,7 +95,7 @@ export default async function LexiClashVsScrabblePage({ params }: PageProps) {
 
       <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
         <h1 className="mb-6 font-neo-display text-4xl font-bold leading-tight sm:text-5xl">
-          LexiClash vs Scrabble GO — No Ads, No Bots, Real Competition
+          LexiClash vs Scrabble GO — No Interruptions, No Bots, Real Competition
         </h1>
 
         <p className="mb-4 text-lg leading-relaxed text-neo-gray-200">
@@ -221,14 +221,14 @@ export default async function LexiClashVsScrabblePage({ params }: PageProps) {
           <h2 className="font-neo-display text-2xl font-bold sm:text-3xl">Look, Just Try It</h2>
           <p className="mt-4 text-neo-gray-200">
             I&apos;m not going to pretend LexiClash is perfect. But it does the one thing Scrabble GO forgot how
-            to do: it lets you play a word game without constantly trying to sell you something. No ads ambushing
+            to do: it lets you play a word game without constantly trying to sell you something. No interstitials ambushing
             you between rounds. No bots wearing human masks. No $9.99 booster that plays the game for you.
             Just your brain, a grid of letters, and someone real on the other side. It&apos;s free, it runs in
             your browser, and you&apos;ll know within one round whether it&apos;s for you.
           </p>
           <div className="mt-6">
             <Link href={`/${locale}/multiplayer`} className="inline-block rounded-neo border-4 border-neo-lime bg-neo-lime px-8 py-4 font-bold text-neo-navy shadow-hard transition-all hover:shadow-hard-lg">
-              Play LexiClash — No Ads, No Bots
+              Play LexiClash — No Interruptions, No Bots
             </Link>
           </div>
         </section>

@@ -624,7 +624,7 @@ const StatsScene: React.FC = () => {
             letterSpacing: '0.04em',
           }}
         >
-          Free to play · No ads · Pure skill
+          Free to play · No pay-to-win · Pure skill
         </div>
 
         <div style={{ marginTop: 45, transform: `scale(${mIn})`, opacity: mIn > 0.01 ? mIn : 0 }}>

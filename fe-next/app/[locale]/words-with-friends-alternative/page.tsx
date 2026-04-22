@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   return {
     title: 'Words With Friends Alternative — Real-Time Free | LexiClash',
-    description: 'Skip the waiting. LexiClash is a free word game where 2-20 players compete on the same grid at the same time. No turns, no download, no ads. Play in 30 seconds.',
+    description: 'Skip the waiting. LexiClash is a free word game where 2-20 players compete on the same grid at the same time. No turns, no download, no pay-to-win. Play in 30 seconds.',
     keywords: 'words with friends multiplayer free online, words with friends alternative, word games multiplayer, multiplayer word games online, free word game with friends online, word game like words with friends, online multiplayer word games like hanging with friends, word battle online free, online word games with friends free, web word games with friends, spell game with friends online',
     openGraph: {
       title: 'Words With Friends Alternative — Real-Time Multiplayer | LexiClash',
@@ -54,7 +54,7 @@ const faqs = [
   },
   {
     q: 'Can I play word games with friends free online?',
-    a: 'Yes! LexiClash is completely free to play online with friends. No download, no signup, no ads interrupting gameplay. Create a room, share the link, and start playing in seconds. Works on any device with a browser.',
+    a: 'Yes! LexiClash is completely free to play online with friends. No download, no signup, no pay-to-win. Create a room, share the link, and start playing in seconds. Works on any device with a browser.',
   },
   {
     q: 'What makes LexiClash better than Words With Friends?',
@@ -101,7 +101,7 @@ export default async function WordsWithFriendsAlternativePage({ params }: PagePr
         <p className="mb-8 text-lg leading-relaxed text-neo-gray-200">
           Love Words With Friends but want something faster? LexiClash is a free multiplayer word game
           where everyone plays at the same time — no waiting for turns. Create a room, share the link,
-          and battle friends in real-time word finding. No download, no signup, no ads.
+          and battle friends in real-time word finding. No download, no signup, no pay-to-win.
         </p>
 
         <section className="mb-12 flex flex-col gap-3 sm:flex-row sm:gap-4">
@@ -142,7 +142,7 @@ export default async function WordsWithFriendsAlternativePage({ params }: PagePr
                 {[
                   ['Gameplay', 'Real-time (simultaneous)', 'Turn-based (waiting)'],
                   ['Players per game', '2-20+', '2'],
-                  ['Price', 'Free, no ads', 'Free with ads'],
+                  ['Price', 'Free, no pay-to-win', 'Free with ads'],
                   ['Download required', 'No (browser)', 'Yes (app store)'],
                   ['Languages', '5 (EN, HE, SV, JA, ES)', '1 (English)'],
                   ['Daily challenges', 'Yes (Wordle-style)', 'No'],
@@ -170,7 +170,7 @@ export default async function WordsWithFriendsAlternativePage({ params }: PagePr
               { title: 'Play With Groups', desc: 'Up to 20+ players in one room. Perfect for parties, family nights, and team building.' },
               { title: 'Zero Downloads', desc: 'Open a browser and play. Send a link to friends — they join instantly. No app store.' },
               { title: 'Multiple Languages', desc: 'Play in English, Hebrew, Swedish, Japanese, or Spanish with full dictionaries.' },
-              { title: 'No Ads In Gameplay', desc: 'No interstitial ads interrupting your game. Just pure word-finding competition.' },
+              { title: 'No Pay-To-Win', desc: 'Skill wins, not wallet. No paid boosts that break competitive fairness.' },
               { title: 'Unique Game Modes', desc: 'Adventure with boss battles, daily challenges, brain training, and blast mode — not just grid matches.' },
             ].map((item, idx) => (
               <div key={idx} className="rounded-neo border-3 border-neo-pink bg-neo-navy/50 p-5 shadow-hard">

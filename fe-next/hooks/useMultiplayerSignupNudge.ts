@@ -106,7 +106,7 @@ export function useMultiplayerSignupNudge({
         gameCode: undefined,
         isGuest: true,
         mpSessionGame: newCount,
-      } as any);
+      });
       return newCount;
     });
   }, []);
@@ -117,7 +117,7 @@ export function useMultiplayerSignupNudge({
       trackGrowthEvent('signup_prompt_shown', {
         trigger: 'mp_sheet_dismissed',
         mpSessionGame: mpGames,
-      } as any);
+      });
     }
     setActiveNudge(null);
   }, [activeNudge, mpGames]);
@@ -137,7 +137,7 @@ export function useMultiplayerSignupNudge({
         trackGrowthEvent('signup_prompt_shown', {
           trigger: 'mp_sheet',
           mpSessionGame: mpGames,
-        } as any);
+        });
       }, 2000); // 2s delay — let them see their results first
       return () => clearTimeout(timer);
     }
@@ -149,7 +149,7 @@ export function useMultiplayerSignupNudge({
         trackGrowthEvent('signup_prompt_shown', {
           trigger: 'mp_toast',
           mpSessionGame: mpGames,
-        } as any);
+        });
       }, 1500);
       return () => clearTimeout(timer);
     }
