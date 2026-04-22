@@ -35,7 +35,7 @@ function getDeviceType(): 'mobile' | 'tablet' | 'desktop' {
 function getConnectionType(): string | null {
   if (typeof window === 'undefined') return null;
   if ('connection' in navigator) {
-    const conn = (navigator as any).connection;
+    const conn = (navigator as Navigator & { connection?: { effectiveType?: string } }).connection;
     return conn?.effectiveType || null;
   }
   return null;

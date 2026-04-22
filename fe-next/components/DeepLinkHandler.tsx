@@ -26,18 +26,23 @@ export default function DeepLinkHandler() {
     let pushCleanup: (() => void) | null = null;
     let mounted = true;
 
-    function getSyncAppPlugin() {
-      return (globalThis as any).Capacitor?.Plugins?.App ?? null;
+    type CapListener = { remove: () => void };
+    type CapAppPlugin = { addListener: (event: string, handler: (e: { url: string }) => void) => CapListener | Promise<CapListener> };
+    type CapBrowserPlugin = { close: () => Promise<void> };
+    type CapGlobal = { Capacitor?: { Plugins?: { App?: CapAppPlugin; Browser?: CapBrowserPlugin } } };
+
+    function getSyncAppPlugin(): CapAppPlugin | null {
+      return (globalThis as unknown as CapGlobal).Capacitor?.Plugins?.App ?? null;
     }
 
-    function getSyncBrowserPlugin() {
-      return (globalThis as any).Capacitor?.Plugins?.Browser ?? null;
+    function getSyncBrowserPlugin(): CapBrowserPlugin | null {
+      return (globalThis as unknown as CapGlobal).Capacitor?.Plugins?.Browser ?? null;
     }
 
-    async function getAppPlugin() {
+    async function getAppPlugin(): Promise<CapAppPlugin | null> {
       const legacy = getSyncAppPlugin();
       if (legacy) return legacy;
-      try { return (await import('@capacitor/app')).App; } catch { return null; }
+      try { return (await import('@capacitor/app')).App as unknown as CapAppPlugin; } catch { return null; }
     }
 
     async function getBrowserPlugin() {
@@ -94,15 +99,13 @@ export default function DeepLinkHandler() {
     if (syncApp) {
       try {
         const listenerResult = syncApp.addListener('appUrlOpen', handleAppUrlOpen);
-        if (listenerResult && typeof listenerResult.then === 'function') {
-          listenerResult.then((listener: { remove: () => void }) => {
+        Promise.resolve(listenerResult)
+          .then((listener) => {
             if (mounted) cleanup = () => listener.remove();
-          }).catch((error: unknown) => {
+          })
+          .catch((error: unknown) => {
             logger.debug('Deep link listener unavailable:', error);
           });
-        } else if (listenerResult?.remove) {
-          cleanup = () => listenerResult.remove();
-        }
       } catch (error) {
         logger.debug('Deep link listener unavailable:', error);
       }

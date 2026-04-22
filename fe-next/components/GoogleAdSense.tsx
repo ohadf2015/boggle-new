@@ -26,8 +26,7 @@ export function GoogleAdSense() {
     const hostname = window.location.hostname;
     if (hostname === 'localhost' || hostname === '127.0.0.1') return;
 
-     
-    if ((window as any).Capacitor?.isNativePlatform?.()) return;
+    if ((window as Window & { Capacitor?: { isNativePlatform?: () => boolean } }).Capacitor?.isNativePlatform?.()) return;
 
     setShouldRender(true);
   }, []);

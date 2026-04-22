@@ -37,8 +37,7 @@ function isDevHost(): boolean {
 function isNativeApp(): boolean {
   if (typeof window === 'undefined') return false;
   try {
-     
-    return (window as any).Capacitor?.isNativePlatform?.() ?? false;
+    return (window as Window & { Capacitor?: { isNativePlatform?: () => boolean } }).Capacitor?.isNativePlatform?.() ?? false;
   } catch {
     return false;
   }
