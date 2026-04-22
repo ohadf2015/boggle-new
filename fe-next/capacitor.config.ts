@@ -54,10 +54,16 @@ const config: CapacitorConfig = {
     },
     AdMob: {
       appId: {
-        ios: process.env.ADMOB_APP_ID_IOS ?? 'ca-app-pub-3940256099942544~1458002511',
-        android: process.env.ADMOB_APP_ID_ANDROID ?? 'ca-app-pub-3940256099942544~3347511713',
+        // Real publisher app IDs (ca-pub-1896836706464880). Previously these
+        // defaulted to Google's sample app IDs (ca-app-pub-3940256099942544),
+        // which forced test ads regardless of NODE_ENV.
+        ios: process.env.ADMOB_APP_ID_IOS ?? 'ca-app-pub-1896836706464880~1458002511',
+        android: process.env.ADMOB_APP_ID_ANDROID ?? 'ca-app-pub-1896836706464880~3347511713',
       },
-      initializeForTesting: process.env.NODE_ENV !== 'production',
+      // Only enable AdMob test mode when explicitly opted-in via env var.
+      // Auto-enabling from NODE_ENV caused every non-production build (including
+      // any build where NODE_ENV is unset) to serve Google test ads.
+      initializeForTesting: process.env.ADMOB_TEST_MODE === 'true',
     },
   },
 

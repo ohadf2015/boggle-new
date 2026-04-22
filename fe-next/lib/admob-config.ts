@@ -6,6 +6,12 @@ export interface AdmobConfig {
   bannerAdId: string;
 }
 
+// Production AdMob unit IDs for publisher ca-pub-1896836706464880.
+// iOS falls back to the Android production unit IDs when iOS-specific env
+// vars are not provided — this keeps real ads serving on both platforms.
+// Previously iOS defaulted to Google's sample/test unit IDs
+// (ca-app-pub-3940256099942544/…), which caused "Test Ad" banners to show in
+// production. Override per-platform via NEXT_PUBLIC_ADMOB_*_IOS env vars.
 export const DEFAULTS: Record<AdPlatform, AdmobConfig> = {
   android: {
     rewardedAdId: 'ca-app-pub-1896836706464880/3688045325',
@@ -13,9 +19,9 @@ export const DEFAULTS: Record<AdPlatform, AdmobConfig> = {
     bannerAdId: 'ca-app-pub-1896836706464880/7714920248',
   },
   ios: {
-    rewardedAdId: 'ca-app-pub-3940256099942544/1712485313',
-    interstitialAdId: 'ca-app-pub-3940256099942544/4411468910',
-    bannerAdId: 'ca-app-pub-3940256099942544/2934735716',
+    rewardedAdId: 'ca-app-pub-1896836706464880/3688045325',
+    interstitialAdId: 'ca-app-pub-1896836706464880/2374963657',
+    bannerAdId: 'ca-app-pub-1896836706464880/7714920248',
   },
 };
 
