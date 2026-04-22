@@ -88,14 +88,23 @@ export function useAdMob() {
         isTesting: isDev,
         ...(typeof margin === 'number' ? { margin } : {}),
       });
-    } catch {}
+    } catch (err) {
+      console.error('[AdMob] showBanner failed', err);
+    }
   }, [hasNoAds, getConfig, isDev, whenReady]);
 
   const hideBanner = useCallback(async () => {
     try {
       await whenReady();
       await AdMob.hideBanner();
-    } catch {}
+    } catch (err) {
+      // hideBanner throws when no banner is mounted yet (expected on first call); only log
+      // when we actually have a meaningful error.
+      if (err && typeof err === 'object' && 'message' in err) {
+        const msg = String((err as { message: unknown }).message);
+        if (!msg.toLowerCase().includes('no banner')) console.warn('[AdMob] hideBanner failed', err);
+      }
+    }
   }, [whenReady]);
 
   return { showRewarded, showInterstitial, showBanner, hideBanner };

@@ -53,12 +53,16 @@ const config: CapacitorConfig = {
       presentationOptions: ['badge', 'sound', 'alert'],
     },
     AdMob: {
+      // NOTE: this `appId` block is documentation only — the @capacitor-community/admob
+      // plugin reads the runtime App ID from AndroidManifest.xml (`com.google.android.gms.ads.APPLICATION_ID`)
+      // and from iOS Info.plist (`GADApplicationIdentifier`), NOT from this config.
+      // Keep these values in sync with android/app/build.gradle (`ADMOB_APP_ID`)
+      // and the iOS Info.plist so future devs know which IDs are actually live.
+      // Previously the Android value here was `~3347511713`, which is a Google sample-publisher
+      // suffix — an obvious copy/paste error that caused confusion when ads stopped serving.
       appId: {
-        // Real publisher app IDs (ca-pub-1896836706464880). Previously these
-        // defaulted to Google's sample app IDs (ca-app-pub-3940256099942544),
-        // which forced test ads regardless of NODE_ENV.
         ios: process.env.ADMOB_APP_ID_IOS ?? 'ca-app-pub-1896836706464880~1458002511',
-        android: process.env.ADMOB_APP_ID_ANDROID ?? 'ca-app-pub-1896836706464880~3347511713',
+        android: process.env.ADMOB_APP_ID_ANDROID ?? 'ca-app-pub-1896836706464880~7614847892',
       },
       // Only enable AdMob test mode when explicitly opted-in via env var.
       // Auto-enabling from NODE_ENV caused every non-production build (including
