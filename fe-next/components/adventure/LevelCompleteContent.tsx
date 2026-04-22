@@ -10,7 +10,8 @@ import { Check, X, Trophy, RotateCcw, DoorOpen, Coins, Zap, Share2, Crosshair, H
 import { cn } from '@/lib/utils';
 import { OBJECTIVE_TRANSLATION_KEYS } from '@/lib/adventure/constants';
 import { RollingNumber } from './ui/RollingNumber';
-import { RewardedAdButton } from '@/components/ads/RewardedAdButton';
+import { RewardedAdGoldButton } from '@/components/ads/RewardedAdGoldButton';
+import { COIN_REWARDS } from '@/utils/coinManager';
 import { getNearMissMessages } from '@/lib/adventure/nearMiss';
 import { MissedWordsPanel } from './MissedWordsPanel';
 import { LootRevealAnimation } from './LootRevealAnimation';
@@ -369,7 +370,6 @@ export interface LevelCompleteActionsProps {
 export const LevelCompleteActions = memo<LevelCompleteActionsProps>(({
   isFailed, isLastLevelOfWorld, onNextWorld, onContinue, onRetry, onExit, canRetryFree, stars, goldEarned: _goldEarned, saveFailed, onRetrySave, score = 0, worldNumber = 1, levelNumber = 1, worldName = '', bestWord = '', wordsFound = 0, streakMilestone, t,
 }) => {
-  const [goldDoubled, setGoldDoubled] = useState(false);
   const [showShareCard, setShowShareCard] = useState(false);
 
   return (
@@ -396,11 +396,13 @@ export const LevelCompleteActions = memo<LevelCompleteActionsProps>(({
         <StreakMilestoneCelebration milestone={streakMilestone} t={t} />
       )}
 
-      {/* Double Coins Rewarded Ad */}
-      {stars > 0 && !goldDoubled && (
-        <RewardedAdButton name="adventure-double-coins" onReward={() => setGoldDoubled(true)} className="w-full">
-          {t('adventure.watchAdDoubleCoins')}
-        </RewardedAdButton>
+      {stars > 0 && (
+        <RewardedAdGoldButton
+          goldAmount={COIN_REWARDS.WATCH_AD}
+          surface="adventure_level_complete"
+          size="md"
+          className="w-full justify-center"
+        />
       )}
 
       {!isFailed && (
