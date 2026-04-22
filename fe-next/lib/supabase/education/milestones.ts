@@ -58,7 +58,7 @@ export function getMilestones(): MilestoneLevel[] {
   return ALL_MILESTONES.map(level => ({
     level,
     title: LEVEL_TITLES[level] || null,
-    isMajor: MAJOR_MILESTONES.includes(level as any),
+    isMajor: (MAJOR_MILESTONES as readonly number[]).includes(level),
   }));
 }
 
@@ -91,7 +91,7 @@ export function checkMilestoneCrossed(
   return {
     level: highestMilestone,
     title: LEVEL_TITLES[highestMilestone] || null,
-    isMajor: MAJOR_MILESTONES.includes(highestMilestone as any),
+    isMajor: (MAJOR_MILESTONES as readonly number[]).includes(highestMilestone),
   };
 }
 
@@ -104,7 +104,7 @@ export function getMilestoneRewards(milestoneLevel: number): {
   title: string | null;
 } {
   // Check if major milestone
-  if (MAJOR_MILESTONES.includes(milestoneLevel as any)) {
+  if ((MAJOR_MILESTONES as readonly number[]).includes(milestoneLevel)) {
     const rewards = MILESTONE_REWARDS[milestoneLevel as keyof typeof MILESTONE_REWARDS];
     return {
       xpBonus: rewards?.xp || 0,
@@ -114,7 +114,7 @@ export function getMilestoneRewards(milestoneLevel: number): {
   }
 
   // Check if minor milestone
-  if (MINOR_MILESTONES.includes(milestoneLevel as any)) {
+  if ((MINOR_MILESTONES as readonly number[]).includes(milestoneLevel)) {
     return {
       xpBonus: MINOR_REWARDS.xp,
       coinBonus: MINOR_REWARDS.coins,
