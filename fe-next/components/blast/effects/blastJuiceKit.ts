@@ -14,13 +14,17 @@
  * return to baseline quickly, never let residual state linger.
  */
 
-import type { Application } from 'pixi.js';
+import type { Application, Filter } from 'pixi.js';
 import {
   createRGBSplitFilter,
   createZoomBlurFilter,
   createAdvancedBloomFilter,
   createAdjustmentFilter,
 } from './pixiFilterPresets';
+
+type RGBSplit = ReturnType<typeof createRGBSplitFilter>;
+type ZoomBlur = ReturnType<typeof createZoomBlurFilter>;
+type AdvancedBloom = ReturnType<typeof createAdvancedBloomFilter>;
 
 interface ShakeLike {
   shake: (opts: { intensity: number; duration: number; decay?: 'linear' | 'exponential' }) => void;
@@ -36,7 +40,7 @@ interface JuiceEngine {
   // Loosened from Pick<Container,'filters'> — PixiJS v8 types forbid null, but
   // we intentionally null the ref on destroy as a "fully reset" sentinel the
   // caller can assert on.
-  camera: { filters: any };
+  camera: { filters: readonly Filter[] | Filter[] | null };
   shake: ShakeLike;
   timeDilation: TimeDilationLike;
   /**
@@ -98,12 +102,12 @@ export function createBlastJuiceKit(eng: JuiceEngine): BlastJuiceKit {
   };
 
   const runFilterBurst = (
-    filters: any[],
+    filters: Filter[],
     strengths: { rgb?: number; zoom?: number; bloomScale?: number },
     duration: number,
-    rgb?: any,
-    zoom?: any,
-    bloom?: any,
+    rgb?: RGBSplit,
+    zoom?: ZoomBlur,
+    bloom?: AdvancedBloom,
   ) => {
     if (destroyed) return;
     eng.camera.filters = filters;
@@ -142,9 +146,9 @@ export function createBlastJuiceKit(eng: JuiceEngine): BlastJuiceKit {
 
   const megaPunch = (origin: { cx: number; cy: number }) => {
     if (destroyed || !motionOk()) return;
-    const rgb = createRGBSplitFilter(8) as any;
-    const zoom = createZoomBlurFilter({ strength: 0.35, center: [origin.cx, origin.cy] }) as any;
-    const bloom = createAdvancedBloomFilter(3) as any;
+    const rgb = createRGBSplitFilter(8);
+    const zoom = createZoomBlurFilter({ strength: 0.35, center: [origin.cx, origin.cy] });
+    const bloom = createAdvancedBloomFilter(3);
 
     runFilterBurst([rgb, zoom, bloom], { rgb: 10, zoom: 0.35, bloomScale: 2.2 }, 280, rgb, zoom, bloom);
 
@@ -155,8 +159,8 @@ export function createBlastJuiceKit(eng: JuiceEngine): BlastJuiceKit {
   const comboPulse = (tier: number) => {
     if (destroyed || !motionOk()) return;
     const t = Math.max(1, tier);
-    const rgb = createRGBSplitFilter(2 + t) as any;
-    const adj = createAdjustmentFilter({ saturation: 1 + t * 0.1, brightness: 1.05 }) as any;
+    const rgb = createRGBSplitFilter(2 + t);
+    const adj = createAdjustmentFilter({ saturation: 1 + t * 0.1, brightness: 1.05 });
 
     runFilterBurst([rgb, adj], { rgb: 2 + t * 1.5 }, 180, rgb, undefined, undefined);
 
@@ -165,9 +169,9 @@ export function createBlastJuiceKit(eng: JuiceEngine): BlastJuiceKit {
 
   const waveClearBurst = (origin: { cx: number; cy: number }) => {
     if (destroyed || !motionOk()) return;
-    const rgb = createRGBSplitFilter(12) as any;
-    const zoom = createZoomBlurFilter({ strength: 0.5, center: [origin.cx, origin.cy] }) as any;
-    const bloom = createAdvancedBloomFilter(4) as any;
+    const rgb = createRGBSplitFilter(12);
+    const zoom = createZoomBlurFilter({ strength: 0.5, center: [origin.cx, origin.cy] });
+    const bloom = createAdvancedBloomFilter(4);
 
     runFilterBurst([rgb, zoom, bloom], { rgb: 14, zoom: 0.5, bloomScale: 2.8 }, 420, rgb, zoom, bloom);
 
