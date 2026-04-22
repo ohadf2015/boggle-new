@@ -166,14 +166,16 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
     return (
         <nav
             className={cn(
-                "fixed bottom-0 left-0 right-0 z-[80]",
+                "fixed left-0 right-0 z-[80]",
                 "bg-neo-navy",
                 "border-t-3 border-neo-black",
                 "shadow-[0_-4px_0_0_rgba(0,0,0,1)]",
                 "sm:hidden",
             )}
             style={{
-                // Nav sits at screen bottom. Banner (when shown) floats above nav via AdMob margin, so nav keeps the full safe-area as its own padding.
+                // Float above AdSense's sticky bottom anchor ad when present (0 otherwise).
+                // Native AdMob banner stacks via its own plugin margin — see AnchoredNativeBanner.
+                bottom: 'var(--adsense-anchor-height, 0px)',
                 paddingBottom: safeArea.bottom > 0 ? `${safeArea.bottom}px` : 'env(safe-area-inset-bottom, 0px)',
             }}
             aria-label={t('nav.bottomNavigation')}

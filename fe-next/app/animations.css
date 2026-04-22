@@ -820,6 +820,9 @@
   /* AdMob anchored banner height — set by AnchoredNativeBanner on SizeChanged */
   --admob-banner-height: 0px;
 
+  /* Google AdSense anchor (sticky bottom) ad height — set by useAdSenseAnchorHeight */
+  --adsense-anchor-height: 0px;
+
   /* Combined safe area - use Capacitor values if set, fall back to env() */
   --combined-safe-area-top: max(var(--safe-area-top), var(--cap-safe-area-top));
   --combined-safe-area-bottom: calc(max(var(--safe-area-bottom), var(--cap-safe-area-bottom)) + var(--admob-banner-height));
