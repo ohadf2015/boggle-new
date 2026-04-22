@@ -32,10 +32,9 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
   const { locale } = await params;
   const supportedLocales = ['en', 'he', 'sv', 'ja', 'es'];
   const validLocale = (supportedLocales.includes(locale) ? locale : 'en') as Locale;
-  const t = await loadTranslation(validLocale) as Record<string, any>;
-  const enT = await loadTranslation('en') as Record<string, any>;
+  const t = await loadTranslation(validLocale) as Record<string, unknown>;
 
-  const customPuzzle = (t as any).customPuzzle || {};
+  const customPuzzle = (t.customPuzzle ?? {}) as { title?: string; description?: string };
   const title = customPuzzle.title || 'Custom Puzzle';
   const description = customPuzzle.description || 'Can you solve this custom word puzzle?';
 

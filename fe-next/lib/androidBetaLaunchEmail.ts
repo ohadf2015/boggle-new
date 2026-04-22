@@ -128,6 +128,7 @@ export async function sendTestAndroidBetaLaunch(
 export async function sendAndroidBetaLaunchToPlayer(
   playerIdentifier: string
 ): Promise<{ success: boolean; error?: string; sentTo?: string }> {
+  const t0 = Date.now();
   if (!isEmailServiceConfigured()) {
     return { success: false, error: 'Email service not configured' };
   }
@@ -145,11 +146,10 @@ export async function sendAndroidBetaLaunchToPlayer(
 
   const isEmail = playerIdentifier.includes('@');
   let profileId: string | null = null;
-  let displayName: string | null = null;
-  let username: string | null = null;
-  let preferredLanguage: string | null = null;
-  let unsubscribeToken: string | null = null;
   let resolvedEmail: string | null = null;
+
+  logger.info('EMAIL', `[android-beta-player] lookup-start identifier=${playerIdentifier} +${Date.now() - t0}ms`);
+  const lookupStart = Date.now();
 
   if (isEmail) {
     const target = playerIdentifier.toLowerCase();
@@ -172,7 +172,7 @@ export async function sendAndroidBetaLaunchToPlayer(
       .from('profiles')
       .select('id')
       .eq('username', playerIdentifier)
-      .single();
+      .maybeSingle();
     if (!profileByName) {
       return {
         success: false,
@@ -186,38 +186,58 @@ export async function sendAndroidBetaLaunchToPlayer(
     return { success: false, error: 'Could not resolve profile' };
   }
 
-  const { data: profile } = await supabase
+  // Parallelize: profile details + email (if not already resolved via view)
+  const profilePromise = supabase
     .from('profiles')
     .select('display_name, username, language, email_unsubscribe_token')
     .eq('id', profileId)
-    .single();
+    .maybeSingle();
 
-  if (profile) {
-    displayName = profile.display_name ?? null;
-    username = profile.username ?? null;
-    preferredLanguage = profile.language ?? null;
-    unsubscribeToken = profile.email_unsubscribe_token ?? null;
-  }
+  const emailPromise = resolvedEmail
+    ? Promise.resolve({ data: { email: resolvedEmail }, error: null })
+    : supabase
+        .from('auth_users_view')
+        .select('email')
+        .eq('id', profileId)
+        .maybeSingle();
 
-  if (!resolvedEmail) {
-    const { data: authResp, error: authErr } =
-      await supabase.auth.admin.getUserById(profileId);
-    if (authErr) {
-      return { success: false, error: `Auth lookup failed: ${authErr.message}` };
-    }
-    resolvedEmail = authResp?.user?.email ?? null;
+  const [{ data: profile }, { data: emailRow, error: emailErr }] =
+    await Promise.all([profilePromise, emailPromise]);
+
+  logger.info(
+    'EMAIL',
+    `[android-beta-player] lookup-done in ${Date.now() - lookupStart}ms`
+  );
+
+  if (emailErr) {
+    return { success: false, error: `Email lookup failed: ${emailErr.message}` };
   }
+  resolvedEmail = emailRow?.email ?? resolvedEmail;
 
   if (!resolvedEmail) {
     return { success: false, error: 'Player has no email address' };
   }
 
+  const displayName = profile?.display_name ?? null;
+  const username = profile?.username ?? null;
+  const preferredLanguage = profile?.language ?? null;
+  let unsubscribeToken = profile?.email_unsubscribe_token ?? null;
+
   if (!unsubscribeToken) {
     unsubscribeToken = generateUnsubscribeToken();
-    await supabase
+    // Fire-and-forget: don't block send on token persistence
+    void supabase
       .from('profiles')
       .update({ email_unsubscribe_token: unsubscribeToken })
-      .eq('id', profileId);
+      .eq('id', profileId)
+      .then(({ error }) => {
+        if (error) {
+          logger.warn(
+            'EMAIL',
+            `[android-beta-player] unsubscribe-token persist failed: ${error.message}`
+          );
+        }
+      });
   }
 
   const language = preferredLanguage || 'en';
@@ -225,6 +245,8 @@ export async function sendAndroidBetaLaunchToPlayer(
   const unsubscribeUrl = `${baseUrl}/api/email/unsubscribe?token=${unsubscribeToken}`;
   const recipientName = displayName || username || 'Word Hunter';
 
+  logger.info('EMAIL', `[android-beta-player] render-start lang=${language} +${Date.now() - t0}ms`);
+  const renderStart = Date.now();
   const { subject, html } = await withTimeout(
     generateAndroidBetaLaunchHtml({
       recipientName,
@@ -235,8 +257,14 @@ export async function sendAndroidBetaLaunchToPlayer(
     30000,
     'Email render timed out after 30 seconds'
   );
+  logger.info(
+    'EMAIL',
+    `[android-beta-player] render-done html=${html.length}B in ${Date.now() - renderStart}ms`
+  );
 
   try {
+    logger.info('EMAIL', `[android-beta-player] resend-send-start to=${resolvedEmail} +${Date.now() - t0}ms`);
+    const sendStart = Date.now();
     const result = await withTimeout(
       resend.emails.send({
         from: fromEmail,
@@ -250,6 +278,10 @@ export async function sendAndroidBetaLaunchToPlayer(
       }),
       20000,
       'Resend API timed out after 20 seconds'
+    );
+    logger.info(
+      'EMAIL',
+      `[android-beta-player] resend-send-done in ${Date.now() - sendStart}ms total=${Date.now() - t0}ms`
     );
 
     if (result.error) {
@@ -267,8 +299,7 @@ export async function sendAndroidBetaLaunchToPlayer(
     const error = err as Error;
     logger.error(
       'EMAIL',
-      `Android beta launch error to ${resolvedEmail}:`,
-      error
+      `[android-beta-player] failed after ${Date.now() - t0}ms to ${resolvedEmail}: ${error.message}`
     );
     return { success: false, error: error.message };
   }
