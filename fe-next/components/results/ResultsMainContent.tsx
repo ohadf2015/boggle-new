@@ -22,6 +22,7 @@ import RewardsSummary from '@/components/results/RewardsSummary';
 import type { CoinReward } from '@/components/results/CoinRewardDisplay';
 
 import { ResultsWordsSection } from '@/components/results/ResultsWordsSection';
+import type { NearMiss } from '@/components/results/NearMissCard';
 import { WinStreakBadge } from '@/components/multiplayer/WinStreakBadge';
 import { NearRankTeaser } from '@/components/multiplayer/NearRankTeaser';
 import type { RankTier } from '@/shared/utils/eloRating';
@@ -43,7 +44,7 @@ type TFunction = (key: string, params?: Record<string, string | number>) => stri
 
 export interface ResultsMainContentProps {
   sortedScores: Player[];
-  nearMisses: any[];
+  nearMisses: NearMiss[];
   isHost: boolean;
   onStartGame: () => void;
   onMarkReady: () => void;
@@ -149,9 +150,9 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
   const consolationCrowns = useMemo(() => {
     const topThree = podiumPlayers.map(p => p.username);
     const playersWithStats = sortedScores.map(p => {
-      const words = allPlayerWords?.[p.username]?.map(w => ({
-        word: typeof w === 'string' ? w : (w as any).word || '',
-        score: typeof w === 'string' ? 0 : (w as any).score || 0,
+      const words = allPlayerWords?.[p.username]?.map((w: WordObject | string) => ({
+        word: typeof w === 'string' ? w : w.word || '',
+        score: typeof w === 'string' ? 0 : w.score || 0,
       }));
       return {
         username: p.username,
