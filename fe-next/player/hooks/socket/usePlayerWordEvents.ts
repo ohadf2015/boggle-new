@@ -29,6 +29,19 @@ import type {
   WordBlockedByCooldownPayload
 } from '@/shared/types/spam';
 
+import type { WordToVote } from '@/player/types';
+
+interface WordLifecyclePayload { word: string }
+interface WordFeedbackRequestPayload {
+  word: string;
+  submittedBy: string;
+  submitterAvatar?: { emoji?: string; color?: string };
+  timeoutSeconds?: number;
+  gameCode: string;
+  language: string;
+}
+interface VoteRecordedPayload { success?: boolean }
+
 interface UsePlayerWordEventsProps {
   socket: Socket | null;
   t: (key: string) => string;
@@ -38,7 +51,7 @@ interface UsePlayerWordEventsProps {
 
   // Word feedback state (local to PlayerView, not in GameState)
   setShowWordFeedback: React.Dispatch<React.SetStateAction<boolean>>;
-  setWordToVote: React.Dispatch<React.SetStateAction<any>>;
+  setWordToVote: React.Dispatch<React.SetStateAction<WordToVote | null>>;
 
   // Combo refs and setters
   comboLevelRef: MutableRefObject<number>;
@@ -192,7 +205,7 @@ export function usePlayerWordEvents({
       // Toast removed to avoid duplicate notifications
     }, [inputRef, setFoundWords, comboLevelRef, lastWordTimeRef, setComboLevel, setLastWordTime, comboTimeoutRef, playComboSound, resetCombo, customHaptic]);
 
-  const handleWordAlreadyFound = useCallback((data: any) => {
+  const handleWordAlreadyFound = useCallback((data: WordLifecyclePayload) => {
     // Haptic feedback for duplicate word (warning pattern)
     customHaptic(GAME_HAPTICS.invalidWord);
 
@@ -231,7 +244,7 @@ export function usePlayerWordEvents({
     logger.log('[PLAYER] Word already found by another player:', data.foundBy);
   }, [setFoundWords, customHaptic]);
 
-  const handleWordNotOnBoard = useCallback((data: any) => {
+  const handleWordNotOnBoard = useCallback((data: WordLifecyclePayload) => {
     // Haptic feedback for invalid word
     customHaptic(GAME_HAPTICS.invalidWord);
 
@@ -244,7 +257,7 @@ export function usePlayerWordEvents({
     resetCombo();
   }, [setFoundWords, resetCombo, customHaptic]);
 
-  const handleWordTooShort = useCallback((data: any) => {
+  const handleWordTooShort = useCallback((data: WordLifecyclePayload) => {
     // Haptic feedback for too short word
     customHaptic(GAME_HAPTICS.invalidWord);
 
@@ -255,7 +268,7 @@ export function usePlayerWordEvents({
     resetCombo();
   }, [setFoundWords, resetCombo, customHaptic]);
 
-  const handleWordRejected = useCallback((data: any) => {
+  const handleWordRejected = useCallback((data: WordLifecyclePayload) => {
     // Haptic feedback for rejected word
     customHaptic(GAME_HAPTICS.invalidWord);
 
@@ -268,7 +281,7 @@ export function usePlayerWordEvents({
   }, [setFoundWords, resetCombo, customHaptic]);
 
   // Word feedback handlers
-  const handleShowWordFeedback = useCallback((data: any) => {
+  const handleShowWordFeedback = useCallback((data: WordFeedbackRequestPayload) => {
     logger.log('[PLAYER] Received word feedback request:', data);
     setWordToVote({
       word: data.word,
@@ -287,14 +300,14 @@ export function usePlayerWordEvents({
     setWordToVote(null);
   }, [setShowWordFeedback, setWordToVote]);
 
-  const handleVoteRecorded = useCallback((data: any) => {
+  const handleVoteRecorded = useCallback((data: VoteRecordedPayload) => {
     logger.log('[PLAYER] Vote recorded:', data);
     if (data.success) {
       neoSuccessToast(t('wordFeedback.thankYou') || 'Thanks for voting!', { icon: TOAST_ICONS.check, duration: 2000 });
     }
   }, [t]);
 
-  const handleWordBecameValid = useCallback((data: any) => {
+  const handleWordBecameValid = useCallback((data: WordLifecyclePayload) => {
     logger.log('[PLAYER] Word became valid:', data);
     neoInfoToast(`"${data.word}" ${t('wordFeedback.nowValid') || 'is now a valid word!'}`, { icon: TOAST_ICONS.bookOpen, duration: 3000 });
   }, [t]);
