@@ -64,9 +64,12 @@ describe('LanguageContext — explicit preference persistence (Android WebView f
     });
 
     it('marks explicit + persists to localStorage when user changes language mid-session', async () => {
-        let captured: ReturnType<typeof useLanguage> | null = null;
+        const capturedRef: { current: ReturnType<typeof useLanguage> | null } = { current: null };
         function Capture() {
-            captured = useLanguage();
+            const value = useLanguage();
+            React.useEffect(() => {
+                capturedRef.current = value;
+            });
             return null;
         }
         mockPathname = '/en';
@@ -77,10 +80,10 @@ describe('LanguageContext — explicit preference persistence (Android WebView f
             </LanguageProvider>
         );
 
-        await waitFor(() => expect(captured).not.toBeNull());
+        await waitFor(() => expect(capturedRef.current).not.toBeNull());
 
         await act(async () => {
-            captured!.setLanguage('he');
+            capturedRef.current!.setLanguage('he');
         });
 
         expect(localStorage.getItem('boggle_language')).toBe('he');

@@ -192,7 +192,7 @@ export default function DuelLobby({ classroomId, studentId, lessons, onTabChange
               >
                 <div className="flex-1">
                   <p className="text-black font-neo-body font-black">
-                    {t('challengeFrom', { name: (challenge as any).challenger?.display_name || challenge.challenger_id })}
+                    {t('challengeFrom', { name: challenge.challenger_id })}
                   </p>
                   <p className="text-black/60 text-sm font-bold">
                     {lessons.find((l) => l.id === challenge.lesson_id)?.name || t('education.duels.unknownLesson')}

@@ -210,7 +210,19 @@ function StatCard({ label, value, trend }: { label: string; value: number; trend
   );
 }
 
-function TableCard({ tableName, data }: { tableName: string; data: any }) {
+interface TableCardData {
+  error?: string;
+  todayCount?: number;
+  allTimeCount?: number;
+  recentGames?: Array<{
+    id?: string;
+    created_at?: string;
+    started_at?: string;
+    completed_at?: string;
+  }>;
+}
+
+function TableCard({ tableName, data }: { tableName: string; data: TableCardData }) {
   if (data.error) {
     return (
       <div className="border-neo border-red-500/30 rounded p-3 bg-red-900/10">
@@ -234,11 +246,14 @@ function TableCard({ tableName, data }: { tableName: string; data: any }) {
         <div className="mt-2 border-t border-slate-700 pt-2">
           <div className="text-xs text-slate-500 mb-1">Recent games (latest 5):</div>
           <div className="space-y-1">
-            {data.recentGames.slice(0, 3).map((game: any, idx: number) => (
+            {data.recentGames.slice(0, 3).map((game, idx) => (
               <div key={idx} className="text-xs text-slate-400 font-mono flex items-center justify-between">
                 <span>{game.id?.substring(0, 8)}...</span>
                 <span className="text-slate-500">
-                  {new Date(game.created_at || game.started_at || game.completed_at).toLocaleTimeString()}
+                  {(() => {
+                    const ts = game.created_at || game.started_at || game.completed_at;
+                    return ts ? new Date(ts).toLocaleTimeString() : '—';
+                  })()}
                 </span>
               </div>
             ))}

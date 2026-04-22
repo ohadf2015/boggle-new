@@ -18,7 +18,7 @@
  */
 
 import React, { memo, useMemo, createContext, useContext, ReactNode } from 'react';
-import { motion, AnimatePresence, HTMLMotionProps, MotionProps } from 'framer-motion';
+import { motion, AnimatePresence, MotionProps } from 'framer-motion';
 import { getPerformanceConfig } from '@/components/grid/performanceUtils';
 import { useShouldReduceMotion } from '@/contexts/AccessibilityContext';
 
@@ -52,7 +52,7 @@ interface AdaptiveMotionProps extends MotionProps {
   children?: ReactNode;
   onClick?: React.MouseEventHandler;
 
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 // Type for creating adaptive motion components
@@ -63,8 +63,7 @@ type AdaptiveMotionComponent = React.FC<AdaptiveMotionProps>;
  */
 function createAdaptiveComponent(
   element: string,
-   
-  MotionComponent: any
+  MotionComponent: React.ComponentType<MotionProps>
 ): AdaptiveMotionComponent {
   const AdaptiveComponent: AdaptiveMotionComponent = memo((props: AdaptiveMotionProps) => {
     const {

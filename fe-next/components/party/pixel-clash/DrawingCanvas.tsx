@@ -117,7 +117,7 @@ const DrawingCanvasInner = forwardRef<DrawingCanvasHandle, DrawingCanvasProps>((
           eraserWidth={brushSize * 3}
           strokeColor={activeColor}
           canvasColor="#0d0d1a"
-          allowOnlyPointerType={readOnly ? 'none' as any : 'all'}
+          allowOnlyPointerType={readOnly ? 'none' : 'all'}
           style={{ border: 'none' }}
           onStroke={readOnly ? undefined : handleStrokeEnd}
           onChange={!readOnly && onStrokeUpdate ? handleOnChange : undefined}
@@ -241,7 +241,7 @@ export const DrawingDisplay = memo(function DrawingDisplay({ paths, size = 300 }
         width={`${size}px`}
         height={`${size}px`}
         canvasColor="#0d0d1a"
-        allowOnlyPointerType={'none' as any}
+        allowOnlyPointerType="none"
         style={{ border: 'none', pointerEvents: 'none' }}
       />
     </div>

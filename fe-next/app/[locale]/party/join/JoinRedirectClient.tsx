@@ -11,7 +11,7 @@ import { useSearchParams, useParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { usePartySocket } from '@/hooks/usePartySocket';
-import { PARTY_GAMES, type PartyGameId } from '@/shared/types/partyGame';
+import { PARTY_GAMES, type PartyGameId, type PartyInput } from '@/shared/types/partyGame';
 import dynamic from 'next/dynamic';
 import { GameLoadingFallback } from '@/components/ui/GameLoadingFallback';
 
@@ -170,7 +170,7 @@ export default function JoinRedirectClient() {
         socket={socket}
         playerId={playerId}
         isSpectator={isSpectator}
-        onSendInput={(input) => sendInput(input as any)}
+        onSendInput={(input) => sendInput(input as PartyInput)}
       />
     );
   }
@@ -181,7 +181,7 @@ export default function JoinRedirectClient() {
         socket={socket}
         playerId={playerId}
         isSpectator={isSpectator}
-        onSendInput={(input) => sendInput(input as any)}
+        onSendInput={(input) => sendInput(input as PartyInput)}
       />
     );
   }
@@ -190,7 +190,7 @@ export default function JoinRedirectClient() {
     return (
       <ShadowClashPhone
         socket={socket}
-        onSendInput={(input) => sendInput(input as any)}
+        onSendInput={(input) => sendInput(input as PartyInput)}
       />
     );
   }
