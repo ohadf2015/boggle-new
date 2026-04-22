@@ -4358,7 +4358,7 @@ const he = {
     },
     "playingNow": "משחקים עכשיו",
     "welcomeTitle": "מילים. יריבים. תהילה.",
-    "welcomeSubtitle": "חינם. בלי הרשמה. בלי פרסומות.",
+    "welcomeSubtitle": "חינם. בלי הרשמה. בלי תשלום לניצחון.",
     "playTodayChallenge": "שחקו באתגר היומי",
     "singlePlayer": "משחק מהיר",
     "singlePlayerDesc": "קפצו פנימה ושחקו מיד",
@@ -7931,7 +7931,6 @@ const he = {
       "blitz": { "name": "בליץ" },
       "zenMode": { "name": "מצב זן" }
     },
-    "watchAdDoubleCoins": "צפו בפרסומת כדי להכפיל מטבעות",
     "saveFailedWarning": "ההתקדמות לא נשמרה — בדקו את החיבור",
     "retrySave": "נסו שוב",
     "confirmSpendGold": "להשתמש ב-{amount} זהב עבור רמז?",

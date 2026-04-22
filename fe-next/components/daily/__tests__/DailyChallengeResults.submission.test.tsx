@@ -71,11 +71,6 @@ vi.mock('@/utils/confettiUtils', () => ({
 }));
 
 
-// Mock RewardedAdButton (uses ThemeProvider internally)
-vi.mock('@/components/ads/RewardedAdButton', () => ({
-  RewardedAdButton: ({ children }: any) => children || null,
-}));
-
 vi.mock('@/components/ads/RewardedAdGoldButton', () => ({
   __esModule: true,
   default: () => null,

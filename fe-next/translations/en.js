@@ -4466,7 +4466,7 @@ const en = {
     },
     "playingNow": "Playing Now",
     "welcomeTitle": "Words. Rivals. Glory.",
-    "welcomeSubtitle": "Free. No sign-up. No ads.",
+    "welcomeSubtitle": "Free. No sign-up. No pay-to-win.",
     "playTodayChallenge": "Play Today's Challenge",
     "singlePlayer": "Quick Play",
     "singlePlayerDesc": "Jump in and play instantly",
@@ -5117,7 +5117,7 @@ const en = {
       "items": [
         { "q": "What is the Daily Word Wheel?", "a": "The Daily Word Wheel is a free daily word puzzle on LexiClash. Every day at midnight UTC, a new wheel of letters appears. Your goal is to find as many words as possible using those letters. Everyone worldwide plays the same puzzle." },
         { "q": "How do I play?", "a": "You get a set of letters arranged in a wheel with one center letter. Form words using the letters — every word must include the center letter and be at least 3 letters long. Find as many words as possible before time runs out. Longer words score more points." },
-        { "q": "Is it free?", "a": "Yes, completely free. No download, no signup, no ads interrupting gameplay. Play in your browser on any device." },
+        { "q": "Is it free?", "a": "Yes, completely free. No download, no signup, no pay-to-win. Play in your browser on any device." },
         { "q": "Can I see the world record?", "a": "Yes! After completing the puzzle, you can see the global leaderboard showing top scores for that day. The world record updates in real-time." },
         { "q": "Do all words need the center letter?", "a": "Yes! Every word you submit must include the center letter of the wheel. This is the core constraint that makes the puzzle challenging." },
         { "q": "What languages are available?", "a": "The Daily Word Wheel is available in English, Hebrew, Swedish, Japanese, and Spanish. Each language has its own dictionary and leaderboard." }
@@ -8146,7 +8146,6 @@ const en = {
       "blitz": { "name": "Blitz" },
       "zenMode": { "name": "Zen Mode" }
     },
-    "watchAdDoubleCoins": "Watch Ad to Double Coins",
     "saveFailedWarning": "Progress not saved — check your connection",
     "retrySave": "Retry",
     "confirmSpendGold": "Spend {amount} gold for a hint?",

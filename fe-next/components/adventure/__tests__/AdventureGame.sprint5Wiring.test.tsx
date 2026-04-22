@@ -28,10 +28,6 @@ vi.mock('@/contexts/CoinContext', () => ({
   }),
 }));
 
-vi.mock('@/components/ads/RewardedAdButton', () => ({
-  RewardedAdButton: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-}));
-
 vi.mock('@/components/ads/RewardedAdGoldButton', () => ({
   __esModule: true,
   default: () => <div data-testid="rewarded-ad-gold-button">Ad</div>,

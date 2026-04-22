@@ -4361,7 +4361,7 @@ const sv = {
     },
     "playingNow": "Spelar Nu",
     "welcomeTitle": "Ord. Rivaler. Ära.",
-    "welcomeSubtitle": "Gratis. Ingen registrering. Inga annonser.",
+    "welcomeSubtitle": "Gratis. Ingen registrering. Inget pay-to-win.",
     "playTodayChallenge": "Spela dagens utmaning",
     "singlePlayer": "Snabbspel",
     "singlePlayerDesc": "Hoppa in och spela direkt",
@@ -7972,7 +7972,6 @@ const sv = {
       "blitz": { "name": "Blixt" },
       "zenMode": { "name": "Zenläge" }
     },
-    "watchAdDoubleCoins": "Se reklam för att dubbla mynt",
     "saveFailedWarning": "Framsteg ej sparat — kontrollera anslutningen",
     "retrySave": "Försök igen",
     "confirmSpendGold": "Använda {amount} guld för en ledtråd?",

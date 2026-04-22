@@ -4339,7 +4339,7 @@ const ja = {
     },
     "playingNow": "プレイ中",
     "welcomeTitle": "言葉。ライバル。栄光。",
-    "welcomeSubtitle": "無料。登録不要。広告なし。",
+    "welcomeSubtitle": "無料。登録不要。ペイ・トゥ・ウィンなし。",
     "playTodayChallenge": "今日のチャレンジをプレイ",
     "singlePlayer": "クイックプレイ",
     "singlePlayerDesc": "すぐにプレイ開始",
@@ -7947,7 +7947,6 @@ const ja = {
       "blitz": { "name": "ブリッツ" },
       "zenMode": { "name": "禅モード" }
     },
-    "watchAdDoubleCoins": "広告を見てコイン2倍",
     "saveFailedWarning": "進行状況が保存されませんでした — 接続を確認してください",
     "retrySave": "再試行",
     "confirmSpendGold": "{amount}ゴールドでヒントを使いますか？",

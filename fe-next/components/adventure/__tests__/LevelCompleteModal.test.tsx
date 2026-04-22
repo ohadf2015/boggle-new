@@ -49,10 +49,6 @@ vi.mock('@/contexts/CoinContext', () => ({
   }),
 }));
 
-vi.mock('@/components/ads/RewardedAdButton', () => ({
-  RewardedAdButton: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-}));
-
 vi.mock('@/components/ads/RewardedAdGoldButton', () => {
   const Stub = () => <div data-testid="rewarded-ad-gold-button">Ad</div>;
   return { __esModule: true, default: Stub, RewardedAdGoldButton: Stub };
@@ -142,11 +138,6 @@ vi.mock('@/hooks/useParticleBudget', () => ({
 // Mock confettiUtils
 vi.mock('@/utils/confettiUtils', () => ({
   fireVictoryConfetti: vi.fn(),
-}));
-
-// Mock RewardedAdButton (uses ThemeProvider internally)
-vi.mock('@/components/ads/RewardedAdButton', () => ({
-  RewardedAdButton: ({ children }: any) => children || null,
 }));
 
 // ==============================================

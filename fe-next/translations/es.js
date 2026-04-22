@@ -4385,7 +4385,7 @@ const es = {
     },
     "playingNow": "jugando",
     "welcomeTitle": "Palabras. Rivales. Gloria.",
-    "welcomeSubtitle": "Gratis. Sin registro. Sin anuncios.",
+    "welcomeSubtitle": "Gratis. Sin registro. Sin pagar para ganar.",
     "playTodayChallenge": "Jugar el desafío de hoy",
     "singlePlayer": "Juego Rápido",
     "singlePlayerDesc": "¡Salta y juega al instante!",
@@ -7967,7 +7967,6 @@ const es = {
       "blitz": { "name": "Blitz" },
       "zenMode": { "name": "Modo Zen" }
     },
-    "watchAdDoubleCoins": "Ver anuncio para duplicar monedas",
     "saveFailedWarning": "Progreso no guardado — verifica tu conexión",
     "retrySave": "Reintentar",
     "confirmSpendGold": "¿Gastar {amount} oro por una pista?",
