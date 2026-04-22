@@ -13,7 +13,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { subscribeToClassroomProgress } from '@/lib/supabaseRealtime';
+import { subscribeToClassroomProgress, type ClassroomProgressUpdate } from '@/lib/supabaseRealtime';
 
 // ============================================
 // TYPE DEFINITIONS
@@ -79,14 +79,17 @@ export function useRealtimeClassroomProgress({
 
   // ==================== ACTIVITY HANDLER ====================
 
-  const handleUpdate = useCallback((payload: { studentId: string; eventType: string; data: any }) => {
+  const handleUpdate = useCallback((payload: ClassroomProgressUpdate) => {
+    if (!payload.studentId) return;
+    const studentId = payload.studentId;
+    const data = payload.data as { xp_gained?: unknown; student_name?: string };
     const now = new Date();
     setLastUpdate(now);
 
     // Update active students map
     setActiveStudents(prev => {
       const next = new Map(prev);
-      next.set(payload.studentId, now);
+      next.set(studentId, now);
       return next;
     });
 
@@ -94,7 +97,7 @@ export function useRealtimeClassroomProgress({
     let activity: 'word_attempted' | 'lesson_completed' | 'xp_gained';
     if (payload.eventType === 'INSERT') {
       activity = 'lesson_completed';
-    } else if (payload.data?.xp_gained) {
+    } else if (data?.xp_gained) {
       activity = 'xp_gained';
     } else {
       activity = 'word_attempted';
@@ -103,8 +106,8 @@ export function useRealtimeClassroomProgress({
     // Add to recent activity
     setRecentActivity(prev => {
       const newActivity: RecentActivityItem = {
-        studentId: payload.studentId,
-        studentName: payload.data?.student_name || payload.studentId,
+        studentId,
+        studentName: data?.student_name || studentId,
         activity,
         timestamp: now,
       };
@@ -116,7 +119,7 @@ export function useRealtimeClassroomProgress({
 
     // Call external callback
     if (onStudentActivityRef.current) {
-      onStudentActivityRef.current(payload.studentId, activity);
+      onStudentActivityRef.current(studentId, activity);
     }
   }, []);
 

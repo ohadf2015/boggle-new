@@ -9,19 +9,68 @@
  * - Proper cleanup and deduplication
  */
 
-import { RealtimeChannel, REALTIME_SUBSCRIBE_STATES } from '@supabase/supabase-js';
+import {
+  RealtimeChannel,
+  REALTIME_SUBSCRIBE_STATES,
+  type RealtimePostgresChangesPayload,
+  type RealtimePresenceState,
+} from '@supabase/supabase-js';
 import { supabase } from './supabase';
 import logger from '@/utils/logger';
+
+// Minimal row shapes — only fields this module reads. Full DB types live server-side.
+interface LeaderboardRow {
+  username?: string;
+  player_id?: string;
+  score?: number;
+  [key: string]: unknown;
+}
+interface ProfileRow {
+  id?: string;
+  [key: string]: unknown;
+}
+interface GameResultRow {
+  player_id?: string;
+  [key: string]: unknown;
+}
+interface StudentProgressRow {
+  student_id?: string;
+  [key: string]: unknown;
+}
+
+type LeaderboardPayload = RealtimePostgresChangesPayload<LeaderboardRow>;
+type ProfilePayload = RealtimePostgresChangesPayload<ProfileRow>;
+type GameResultPayload = RealtimePostgresChangesPayload<GameResultRow>;
+type StudentProgressPayload = RealtimePostgresChangesPayload<StudentProgressRow>;
+
+export interface ClassroomProgressUpdate {
+  studentId: string | undefined;
+  eventType: string;
+  data: StudentProgressRow | Record<string, never>;
+}
+
+export interface GameRoomBroadcastPayload {
+  event: string;
+  type?: string;
+  payload?: Record<string, unknown>;
+  [key: string]: unknown;
+}
+
+export interface GameRoomPresenceEvent {
+  type: 'join' | 'leave';
+  key: string;
+  presences: Array<Record<string, unknown>>;
+}
 
 // Active subscriptions tracking
 const activeSubscriptions = new Map<string, RealtimeChannel>();
 
 // Subscriber callbacks for shared subscriptions
-const leaderboardCallbacks = new Set<(payload: any) => void>();
+const leaderboardCallbacks = new Set<(payload: LeaderboardPayload) => void>();
 const leaderboardStatusCallbacks = new Set<(status: string) => void>();
 
 // Subscriber callbacks for classroom progress
-const classroomProgressCallbacks = new Map<string, Set<(payload: any) => void>>();
+const classroomProgressCallbacks = new Map<string, Set<(payload: ClassroomProgressUpdate) => void>>();
 const classroomProgressStatusCallbacks = new Map<string, Set<(status: string) => void>>();
 
 // Debounce timers
@@ -61,14 +110,17 @@ function debounce(key: string, callback: () => void, delay: number): void {
 }
 
 interface GameRoomHandlers {
-  onPresence?: (state: any, event?: any) => void;
-  onBroadcast?: (payload: any) => void;
+  onPresence?: (
+    state: RealtimePresenceState | null,
+    event?: GameRoomPresenceEvent,
+  ) => void;
+  onBroadcast?: (payload: GameRoomBroadcastPayload) => void;
 }
 
 interface GameRoomChannel {
-  broadcast: (event: string, payload: any) => any;
-  track: (userData: any) => any;
-  untrack: () => any;
+  broadcast: (event: string, payload: Record<string, unknown>) => Promise<'ok' | 'timed out' | 'error'> | void;
+  track: (userData: Record<string, unknown>) => Promise<'ok' | 'timed out' | 'error'> | void;
+  untrack: () => Promise<'ok' | 'timed out' | 'error'> | void;
   unsubscribe: () => void;
 }
 
@@ -100,7 +152,7 @@ function getOrCreateClassroomProgressChannel(classroomId: string): RealtimeChann
         schema: 'public',
         table: 'student_lesson_progress'
       },
-      (payload) => {
+      (payload: StudentProgressPayload) => {
         if (!payload) return;
         logger.log('[Realtime] Classroom progress change:', payload.eventType, payload.new);
 
@@ -108,8 +160,12 @@ function getOrCreateClassroomProgressChannel(classroomId: string): RealtimeChann
         const callbacks = classroomProgressCallbacks.get(classroomId);
         if (!callbacks) return;
 
-        // Extract student ID from payload
-        const studentId = (payload.new as any)?.student_id || (payload.old as any)?.student_id;
+        // Extract student ID from payload — `new`/`old` are empty objects for the opposite event
+        const newRow = payload.new as StudentProgressRow | Record<string, never>;
+        const oldRow = payload.old as StudentProgressRow | Record<string, never>;
+        const studentId =
+          ('student_id' in newRow ? newRow.student_id : undefined) ??
+          ('student_id' in oldRow ? oldRow.student_id : undefined);
 
         // Notify all subscribers with debouncing per callback
         callbacks.forEach(callback => {
@@ -118,7 +174,7 @@ function getOrCreateClassroomProgressChannel(classroomId: string): RealtimeChann
             callback({
               studentId,
               eventType: payload.eventType,
-              data: payload.new || payload.old,
+              data: 'student_id' in newRow ? newRow : oldRow,
             });
           }, 500);
         });
@@ -183,9 +239,14 @@ function getOrCreateLeaderboardChannel(): RealtimeChannel | null {
         schema: 'public',
         table: 'leaderboard'
       },
-      (payload) => {
+      (payload: LeaderboardPayload) => {
         if (!payload) return;
-        logger.log('[Realtime] Leaderboard change:', payload.eventType, payload.new ? `player: ${(payload.new as { username?: string }).username}` : '');
+        const newRow = payload.new as LeaderboardRow | Record<string, never>;
+        logger.log(
+          '[Realtime] Leaderboard change:',
+          payload.eventType,
+          'username' in newRow ? `player: ${newRow.username}` : '',
+        );
         // Notify all subscribers with debouncing per callback
         leaderboardCallbacks.forEach(callback => {
           debounce(`leaderboard-callback-${callback.toString().slice(0, 50)}`, () => callback(payload), 500);
@@ -233,7 +294,7 @@ function getOrCreateLeaderboardChannel(): RealtimeChannel | null {
  */
 export function subscribeToClassroomProgress(
   classroomId: string,
-  onUpdate: (payload: { studentId: string; eventType: string; data: any }) => void,
+  onUpdate: (payload: ClassroomProgressUpdate) => void,
   options: SubscriptionOptions = {}
 ): () => void {
   const channel = getOrCreateClassroomProgressChannel(classroomId);
@@ -291,7 +352,7 @@ export function subscribeToClassroomProgress(
  * @returns Unsubscribe function
  */
 export function subscribeToLeaderboard(
-  onUpdate: (payload: any) => void,
+  onUpdate: (payload: LeaderboardPayload) => void,
   options: SubscriptionOptions = {}
 ): () => void {
   const channel = getOrCreateLeaderboardChannel();
@@ -336,7 +397,7 @@ export function subscribeToLeaderboard(
  */
 export function subscribeToProfile(
   userId: string,
-  onUpdate: (profile: any) => void
+  onUpdate: (profile: ProfileRow) => void
 ): () => void {
   if (!supabase || !userId) {
     return () => {};
@@ -366,10 +427,10 @@ export function subscribeToProfile(
         table: 'profiles',
         filter: `id=eq.${userId}`
       },
-      (payload) => {
+      (payload: ProfilePayload) => {
         if (!payload) return;
         logger.log('[Realtime] Profile updated:', payload.new);
-        onUpdate(payload.new);
+        onUpdate(payload.new as ProfileRow);
       }
     )
     .subscribe((status) => {
@@ -393,7 +454,7 @@ export function subscribeToProfile(
  */
 export function subscribeToGameResults(
   userId: string,
-  onNewResult: (result: any) => void
+  onNewResult: (result: GameResultRow) => void
 ): () => void {
   if (!supabase || !userId) {
     return () => {};
@@ -411,10 +472,10 @@ export function subscribeToGameResults(
         table: 'game_results',
         filter: `player_id=eq.${userId}`
       },
-      (payload) => {
+      (payload: GameResultPayload) => {
         if (!payload) return;
         logger.log('[Realtime] New game result:', payload.new);
-        onNewResult(payload.new);
+        onNewResult(payload.new as GameResultRow);
       }
     )
     .subscribe();
@@ -463,17 +524,25 @@ export function createGameRoomChannel(
         handlers.onPresence!(state);
       })
       .on('presence', { event: 'join' }, ({ key, newPresences }) => {
-        handlers.onPresence!(null, { type: 'join', key, presences: newPresences });
+        handlers.onPresence!(null, {
+          type: 'join',
+          key,
+          presences: newPresences as Array<Record<string, unknown>>,
+        });
       })
       .on('presence', { event: 'leave' }, ({ key, leftPresences }) => {
-        handlers.onPresence!(null, { type: 'leave', key, presences: leftPresences });
+        handlers.onPresence!(null, {
+          type: 'leave',
+          key,
+          presences: leftPresences as Array<Record<string, unknown>>,
+        });
       });
   }
 
   // Broadcast messages
   if (handlers.onBroadcast) {
     channel.on('broadcast', { event: 'game_event' }, (payload) => {
-      handlers.onBroadcast!(payload);
+      handlers.onBroadcast!(payload as GameRoomBroadcastPayload);
     });
   }
 
@@ -484,14 +553,14 @@ export function createGameRoomChannel(
   activeSubscriptions.set(channelName, channel);
 
   return {
-    broadcast: (event: string, payload: any) => {
+    broadcast: (event: string, payload: Record<string, unknown>) => {
       return channel.send({
         type: 'broadcast',
         event: 'game_event',
         payload: { event, ...payload }
       });
     },
-    track: (userData: any) => {
+    track: (userData: Record<string, unknown>) => {
       return channel.track(userData);
     },
     untrack: () => {
