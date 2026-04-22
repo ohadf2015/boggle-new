@@ -97,8 +97,13 @@ export default function FlashcardReview({
     });
 
     // Listen for enriched response
-    const handleEnriched = (data: { enrichedWords: any[] }) => {
-      const enriched: EnrichedVocabularyWord[] = data.enrichedWords.map((word: any) => ({
+    type EnrichedPayload = Partial<EnrichedVocabularyWord> & {
+      word: string;
+      definition: string;
+      contextualExamples?: string[];
+    };
+    const handleEnriched = (data: { enrichedWords: EnrichedPayload[] }) => {
+      const enriched: EnrichedVocabularyWord[] = data.enrichedWords.map((word) => ({
         word: word.word,
         definition: word.definition,
         pronunciation: word.pronunciation,
