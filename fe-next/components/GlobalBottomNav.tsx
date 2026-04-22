@@ -1,6 +1,6 @@
 'use client';
 
-import { memo, useCallback, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { Home, Swords, ScrollText, Users } from 'lucide-react';
@@ -161,25 +161,34 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
     }, [pathname, language]);
 
     // Hide entire bottom nav on CrazyGames — external links and social features prohibited
-    if (isInGame || shouldHideOnCurrentPath || isOnCrazyGamesPlatform) return null;
+    const isHidden = isInGame || shouldHideOnCurrentPath || isOnCrazyGamesPlatform;
+
+    // Signal nav visibility to CSS so sticky ads (AdSense anchor) can offset above it.
+    useEffect(() => {
+        if (typeof document === 'undefined') return;
+        document.documentElement.classList.toggle('has-global-bottom-nav', !isHidden);
+        return () => {
+            document.documentElement.classList.remove('has-global-bottom-nav');
+        };
+    }, [isHidden]);
+
+    if (isHidden) return null;
 
     return (
         <nav
             className={cn(
-                "fixed left-0 right-0 z-[80]",
+                "fixed left-0 right-0 bottom-0 z-[80]",
                 "bg-neo-navy",
                 "border-t-3 border-neo-black",
                 "shadow-[0_-4px_0_0_rgba(0,0,0,1)]",
                 "sm:hidden",
             )}
             style={{
-                // Float above whichever sticky bottom ad is present:
-                // --adsense-anchor-height (web) or --admob-banner-height (native Capacitor).
-                // Both fall back to 0px when inactive, so the sum is safe cross-platform.
-                bottom: 'calc(var(--adsense-anchor-height, 0px) + var(--admob-banner-height, 0px))',
-                // AdMob banner anchors at true bottom and absorbs safe-area itself —
-                // subtract it from padding to avoid double gap. AdSense doesn't, so padding persists.
-                paddingBottom: `max(0px, ${safeArea.bottom > 0 ? `${safeArea.bottom}px` : 'env(safe-area-inset-bottom, 0px)'} - var(--admob-banner-height, 0px))`,
+                // Nav sits flush at the viewport bottom. Sticky ads (AdSense anchor / AdMob
+                // banner) are positioned ABOVE this nav via CSS override / plugin margin,
+                // so no bottom offset is needed here.
+                bottom: 0,
+                paddingBottom: safeArea.bottom > 0 ? `${safeArea.bottom}px` : 'env(safe-area-inset-bottom, 0px)',
             }}
             aria-label={t('nav.bottomNavigation')}
         >

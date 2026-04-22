@@ -48,6 +48,27 @@ describe('AnchoredNativeBanner', () => {
     expect(showBanner).toHaveBeenCalledTimes(1);
   });
 
+  it('shows banner above GlobalBottomNav on home route (margin=64)', async () => {
+    mockPathname.current = '/';
+    render(<AnchoredNativeBanner />);
+    await Promise.resolve();
+    expect(showBanner).toHaveBeenCalledWith('BOTTOM_CENTER', 64);
+  });
+
+  it('shows banner above GlobalBottomNav on /settings (margin=64)', async () => {
+    mockPathname.current = '/settings';
+    render(<AnchoredNativeBanner />);
+    await Promise.resolve();
+    expect(showBanner).toHaveBeenCalledWith('BOTTOM_CENTER', 64);
+  });
+
+  it('shows banner flush at bottom on /education (nav hidden, margin=0)', async () => {
+    mockPathname.current = '/education';
+    render(<AnchoredNativeBanner />);
+    await Promise.resolve();
+    expect(showBanner).toHaveBeenCalledWith('BOTTOM_CENTER', 0);
+  });
+
   it('shows banner on locale-prefixed home', async () => {
     mockPathname.current = '/he';
     render(<AnchoredNativeBanner />);
