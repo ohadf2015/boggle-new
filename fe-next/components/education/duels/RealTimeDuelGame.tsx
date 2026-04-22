@@ -31,6 +31,7 @@ import type {
   DuelCompletedData,
 } from '@/hooks/useDuelSocket.types';
 import { cn } from '@/lib/utils';
+import { awardGameCoins } from '@/utils/coinManager';
 import { Loader } from '@/components/ui/Loader';
 import { OpponentProgressBar } from './OpponentProgressBar';
 import { DuelDisconnectOverlay } from './DuelDisconnectOverlay';
@@ -181,6 +182,11 @@ export function RealTimeDuelGame({
     const cleanupCompleted = onDuelCompleted((data: DuelCompletedData) => {
       setResult(data);
       setPhase('completed');
+      const isWinner = data.winnerId === studentId;
+      const finalScore = isWinner
+        ? Math.max(data.challengerScore, data.opponentScore)
+        : Math.min(data.challengerScore, data.opponentScore);
+      awardGameCoins(duelId, 'multiplayer', finalScore, isWinner ? 1 : 2, 2);
     });
 
     return () => {
@@ -202,6 +208,8 @@ export function RealTimeDuelGame({
     onDuelCompleted,
     playWordAcceptedSound,
     playWordRejectedSound,
+    duelId,
+    studentId,
   ]);
 
   // ============================================

@@ -8,6 +8,14 @@ import type {
   DuelCompletedData,
 } from '@/hooks/useDuelSocket.types';
 
+const { mockAwardGameCoins } = vi.hoisted(() => ({
+  mockAwardGameCoins: vi.fn(),
+}));
+
+vi.mock('@/utils/coinManager', () => ({
+  awardGameCoins: mockAwardGameCoins,
+}));
+
 // Mock useDuelSocket hook
 const mockSubmitWord = vi.fn();
 const mockForfeitDuel = vi.fn();
@@ -347,6 +355,70 @@ describe('RealTimeDuelGame', () => {
 
     await waitFor(() => {
       expect(screen.getByText('duels.youWin')).toBeInTheDocument();
+    });
+  });
+
+  it('should award coins when duel completes with rank based on winnerId', async () => {
+    render(
+      <RealTimeDuelGame
+        duelId="duel-123"
+        studentId="student-123"
+        opponentName="Bob"
+      />
+    );
+
+    const startData: DuelStartedData = {
+      duelId: 'duel-123',
+      boardState: [['A', 'B'], ['C', 'D']],
+      startTime: new Date().toISOString(),
+      timeLimit: 180,
+      players: ['student-123', 'opponent-456'],
+    };
+    mockListeners['duel:started']?.(startData);
+    await waitFor(() => screen.getByTestId('word-input'));
+
+    const completedData: DuelCompletedData = {
+      winnerId: 'student-123',
+      challengerScore: 100,
+      opponentScore: 75,
+      xpAwarded: { winner: 50, loser: 30 },
+    };
+    mockListeners['duel:completed']?.(completedData);
+
+    await waitFor(() => {
+      expect(mockAwardGameCoins).toHaveBeenCalledWith('duel-123', 'multiplayer', 100, 1, 2);
+    });
+  });
+
+  it('should award coins with rank 2 when opponent wins', async () => {
+    render(
+      <RealTimeDuelGame
+        duelId="duel-456"
+        studentId="student-123"
+        opponentName="Bob"
+      />
+    );
+
+    const startData: DuelStartedData = {
+      duelId: 'duel-456',
+      boardState: [['A', 'B'], ['C', 'D']],
+      startTime: new Date().toISOString(),
+      timeLimit: 180,
+      players: ['student-123', 'opponent-456'],
+    };
+    mockListeners['duel:started']?.(startData);
+    await waitFor(() => screen.getByTestId('word-input'));
+
+    const completedData: DuelCompletedData = {
+      winnerId: 'opponent-456',
+      challengerScore: 50,
+      opponentScore: 90,
+      xpAwarded: { winner: 50, loser: 30 },
+    };
+    mockListeners['duel:completed']?.(completedData);
+
+    await waitFor(() => {
+      expect(mockAwardGameCoins).toHaveBeenCalledWith('duel-456', 'multiplayer', 50, 2, 2);
     });
   });
 });

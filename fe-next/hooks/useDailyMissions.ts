@@ -17,6 +17,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { supabase } from '@/lib/supabase';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
+import { addCoins, GRAND_SLAM_BONUS } from '@/utils/coinManager';
 
 export type MissionType = 'wordHunt' | 'adventure' | 'community';
 
@@ -246,6 +247,7 @@ export function useDailyMissions(): UseDailyMissionsReturn {
       return;
     }
     void tryCelebrate('grand_slam', () => {
+      addCoins(GRAND_SLAM_BONUS, 'Grand Slam');
       import('@/components/quests/QuestCompletionToast').then(({ showQuestCompletionToast }) => {
         showQuestCompletionToast({
           questName: '',

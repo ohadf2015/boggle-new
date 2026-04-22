@@ -40,7 +40,23 @@ vi.mock('@/hooks/useWordOfTheDay', () => ({
   useWordOfTheDay: (...args: unknown[]) => mockUseWordOfTheDay(...args),
 }));
 
+// Mock coinManager
+const { mockAddCoins } = vi.hoisted(() => ({ mockAddCoins: vi.fn() }));
+vi.mock('@/utils/coinManager', async () => {
+  const actual = await vi.importActual<typeof import('@/utils/coinManager')>('@/utils/coinManager');
+  return { ...actual, addCoins: mockAddCoins };
+});
+
+// Real-ish localStorage for idempotency keys
+const localStore: Record<string, string> = {};
+beforeEach(() => {
+  for (const k of Object.keys(localStore)) delete localStore[k];
+  (localStorage.getItem as any).mockImplementation((key: string) => localStore[key] ?? null);
+  (localStorage.setItem as any).mockImplementation((key: string, val: string) => { localStore[key] = val; });
+});
+
 import { WotdReveal } from '../WotdReveal';
+import { WOTD_BONUS } from '@/utils/coinManager';
 
 describe('WotdReveal', () => {
   beforeEach(() => {
@@ -114,5 +130,38 @@ describe('WotdReveal', () => {
 
     render(<WotdReveal playerWords={['dragon']} />);
     expect(screen.getByText('Only 3% of players found this!')).toBeInTheDocument();
+  });
+
+  it('awards WOTD_BONUS coins once when player found the word', () => {
+    mockUseWordOfTheDay.mockReturnValue({
+      word: 'crystal', stats: { foundCount: 10, totalPlayers: 50, foundPercent: 20 },
+      playerFound: true, loading: false, error: null,
+    });
+
+    render(<WotdReveal playerWords={['crystal']} />);
+    expect(mockAddCoins).toHaveBeenCalledTimes(1);
+    expect(mockAddCoins).toHaveBeenCalledWith(WOTD_BONUS, expect.any(String));
+  });
+
+  it('does not re-award if idempotency key already stored', () => {
+    const today = new Date().toISOString().split('T')[0];
+    localStore[`lexiclash_wotd_coin_${today}_en`] = 'true';
+    mockUseWordOfTheDay.mockReturnValue({
+      word: 'crystal', stats: { foundCount: 10, totalPlayers: 50, foundPercent: 20 },
+      playerFound: true, loading: false, error: null,
+    });
+
+    render(<WotdReveal playerWords={['crystal']} />);
+    expect(mockAddCoins).not.toHaveBeenCalled();
+  });
+
+  it('does not award when player did not find the word', () => {
+    mockUseWordOfTheDay.mockReturnValue({
+      word: 'crystal', stats: { foundCount: 10, totalPlayers: 50, foundPercent: 20 },
+      playerFound: false, loading: false, error: null,
+    });
+
+    render(<WotdReveal playerWords={['garden']} />);
+    expect(mockAddCoins).not.toHaveBeenCalled();
   });
 });

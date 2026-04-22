@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useWordOfTheDay } from '@/hooks/useWordOfTheDay';
+import { addCoins, WOTD_BONUS } from '@/utils/coinManager';
 
 interface WotdRevealProps {
   /** Words the player found during the game */
@@ -39,6 +40,17 @@ export function WotdReveal({ playerWords, className }: WotdRevealProps) {
 
   const normalizedPlayerWords = playerWords.map(w => w.toLowerCase().trim());
   const found = word ? normalizedPlayerWords.includes(word.toLowerCase()) : false;
+
+  // Award WOTD_BONUS once per day per language when player found the word
+  useEffect(() => {
+    if (!found || !word || loading) return;
+    const today = new Date().toISOString().split('T')[0];
+    const key = `lexiclash_wotd_coin_${today}_${language}`;
+    if (typeof localStorage === 'undefined') return;
+    if (localStorage.getItem(key) === 'true') return;
+    localStorage.setItem(key, 'true');
+    addCoins(WOTD_BONUS, 'WOTD Found');
+  }, [found, word, loading, language]);
   const percent = stats.foundPercent;
 
   const [copied, setCopied] = useState(false);

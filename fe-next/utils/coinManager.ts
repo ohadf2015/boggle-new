@@ -46,6 +46,11 @@ export const COIN_EARNING_OTHER = {
   MAX_GAME_REWARD: 500,     // Cap per game — prevents high Word Hunt scores from exceeding API limit
 } as const;
 
+// Bonus constants for dedicated achievement pipelines
+export const FIRST_WIN_BONUS = 100;
+export const WOTD_BONUS = 50;
+export const GRAND_SLAM_BONUS = 200;
+
 // Free reveals per game
 export const FREE_REVEALS_PER_GAME = 2;
 

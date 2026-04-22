@@ -50,8 +50,15 @@ vi.mock('@/hooks/useInterstitialAd', () => ({
   }),
 }));
 
+const { mockAddCoins } = vi.hoisted(() => ({ mockAddCoins: vi.fn() }));
+vi.mock('@/utils/coinManager', async () => {
+  const actual = await vi.importActual<typeof import('@/utils/coinManager')>('@/utils/coinManager');
+  return { ...actual, addCoins: mockAddCoins };
+});
+
 import { useDailyMissions } from '../useDailyMissions';
 import { showQuestCompletionToast } from '@/components/quests/QuestCompletionToast';
+import { GRAND_SLAM_BONUS } from '@/utils/coinManager';
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -170,6 +177,24 @@ describe('useDailyMissions', () => {
           xpReward: 500,
         }),
       );
+    });
+  });
+
+  it('awards GRAND_SLAM_BONUS coins when Grand Slam fires', async () => {
+    mockSingle.mockResolvedValueOnce({
+      data: {
+        ...FULL_DATA,
+        word_hunt_celebrated: true,
+        adventure_celebrated: true,
+        community_celebrated: true,
+      },
+      error: null,
+    });
+
+    renderHook(() => useDailyMissions());
+
+    await waitFor(() => {
+      expect(mockAddCoins).toHaveBeenCalledWith(GRAND_SLAM_BONUS, expect.any(String));
     });
   });
 

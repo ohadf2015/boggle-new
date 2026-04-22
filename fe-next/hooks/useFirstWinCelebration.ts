@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { fireFirstWinConfetti } from '@/utils/confettiUtils';
 import { hapticGameWin } from '@/utils/haptics';
+import { addCoins, FIRST_WIN_BONUS } from '@/utils/coinManager';
 
 const FIRST_WIN_KEY = 'lexiclash_first_win_celebrated';
 
@@ -43,6 +44,8 @@ export function useFirstWinCelebration({
     // Mark as celebrated
     localStorage.setItem(FIRST_WIN_KEY, 'true');
     setShowCelebration(true);
+
+    addCoins(FIRST_WIN_BONUS, 'First Win Bonus');
 
     // Epic confetti burst using centralized utility
     fireFirstWinConfetti(4000);
