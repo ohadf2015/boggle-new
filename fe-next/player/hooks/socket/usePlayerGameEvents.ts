@@ -17,7 +17,7 @@ import {
 import { useLetterGrid, useGameLanguage, useShowStartAnimation, useGameActions, useGameStore } from '@/hooks/gameState';
 import type { BlastComboSyncPayload, StartGameBroadcast, PlayerResultPayload } from '@/shared/types/socket';
 import type { BlastTileState } from '@/shared/types/blast';
-import type { BlastTileOverlay, LetterFeedback } from '@/shared/types/game';
+import type { BlastTileOverlay, LetterFeedback, BlastPlayerStats, WheelRushPlayerStats } from '@/shared/types/game';
 import type { LetterGrid, Language } from '@/types';
 import type { WordToVote } from '@/player/types';
 import { createEarthquakeSocketHandlers } from '@/shared/utils/earthquakeSocketHandlers';
@@ -63,11 +63,11 @@ interface WordHuntSummary {
 
 interface BlastSummary {
   playerMoves: Record<string, number>;
-  playerStats: Record<string, { tilesCleared?: number; totalTileBonus?: number; [k: string]: unknown }>;
+  playerStats: Record<string, BlastPlayerStats>;
 }
 
 interface WheelRushSummary {
-  playerStats: Record<string, unknown>;
+  playerStats: Record<string, WheelRushPlayerStats>;
 }
 
 interface TimeUpdatePayload {
@@ -394,7 +394,7 @@ export function usePlayerGameEvents({
       startResultsTimeout();
     };
 
-    const handleTimeUpdate = (data: any) => {
+    const handleTimeUpdate = (data: TimeUpdatePayload) => {
       if (data.gameSessionId !== undefined && data.gameSessionId !== gameSessionIdRef.current) {
         logger.log('[PLAYER] Ignoring stale timeUpdate from old session:', data.gameSessionId);
         return;
@@ -443,10 +443,10 @@ export function usePlayerGameEvents({
 
     // --- TV mode sync: defer results until host reveals on TV ---
     let tvRevealTimeoutId: ReturnType<typeof setTimeout> | null = null;
-    const pendingTvResultsRef = { current: null as any };
+    const pendingTvResultsRef: { current: ValidatedScoresPayload | null } = { current: null };
     let tvRevealedBeforeData = false;
 
-    const showResultsFromData = (data: any) => {
+    const showResultsFromData = (data: ValidatedScoresPayload) => {
       // Sync blast stats from server
       if (data.blastSummary) {
         const store = useGameStore.getState();
@@ -506,7 +506,7 @@ export function usePlayerGameEvents({
       showResultsFromData(pending);
     };
 
-    const handleValidatedScores = (data: any) => {
+    const handleValidatedScores = (data: ValidatedScoresPayload) => {
       // Deduplicate by game session — prevents processing results twice for the same game
       if (hasProcessedResultsRef.current === gameSessionIdRef.current) {
         logger.log('[PLAYER] Ignoring duplicate validatedScores - already processed for session', gameSessionIdRef.current);
@@ -540,7 +540,7 @@ export function usePlayerGameEvents({
       showResultsFromData(data);
     };
 
-    const handleFinalScores = (data: any) => {
+    const handleFinalScores = (data: FinalScoresPayload) => {
       logger.log('[PLAYER] Received legacy finalScores event:', data);
 
       // Transition directly to results — no validation modal delay
@@ -558,7 +558,7 @@ export function usePlayerGameEvents({
       }
     };
 
-    const handleResetGame = (data: any) => {
+    const handleResetGame = (data: ResetGamePayload) => {
       // Guard against stale reset from old session
       if (data.gameSessionId !== undefined && gameSessionIdRef.current !== null &&
           data.gameSessionId < gameSessionIdRef.current) {
@@ -730,7 +730,7 @@ export function usePlayerGameEvents({
       }
     };
 
-    const handleWordHuntTargetResult = (data: { guess: string; feedback: any[]; correct: boolean; isFirstFinder: boolean; bonus: number; livesRemaining: number; isDiscovery?: boolean }) => {
+    const handleWordHuntTargetResult = (data: { guess: string; feedback: LetterFeedback[]; correct: boolean; isFirstFinder: boolean; bonus: number; livesRemaining: number; isDiscovery?: boolean }) => {
       logger.log('[PLAYER] Word hunt target result:', data);
       setWordHuntTargetAttempts((prev) => [...prev, { guess: data.guess, feedback: data.feedback, isDiscovery: data.isDiscovery || false }]);
       setWordHuntMyLife(data.livesRemaining);
