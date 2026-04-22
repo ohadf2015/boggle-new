@@ -19,6 +19,12 @@ interface Toast {
   };
 }
 
+declare global {
+  interface WindowEventMap {
+    'show-toast': CustomEvent<Toast>;
+  }
+}
+
 interface ToastItemProps {
   toast: Toast;
   onRemove: (id: string) => void;
@@ -212,8 +218,8 @@ export const ToastContainer: React.FC<ToastContainerProps> = ({
       setToasts((prev) => [...prev, newToast]);
     };
 
-    window.addEventListener('show-toast' as any, handleToast);
-    return () => window.removeEventListener('show-toast' as any, handleToast);
+    window.addEventListener('show-toast', handleToast);
+    return () => window.removeEventListener('show-toast', handleToast);
   }, []);
 
   return (

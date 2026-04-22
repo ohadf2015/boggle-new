@@ -107,7 +107,7 @@ export function LandingLeaderboardPreview({ players, loading, compact }: Landing
               <Avatar
                 avatarImage={player.avatarImage ?? undefined}
 
-                customAvatar={player.avatarConfig as any}
+                customAvatar={player.avatarConfig}
                 size="sm"
               />
               <PlayerProfileTooltip
@@ -177,7 +177,7 @@ export function LandingLeaderboardPreview({ players, loading, compact }: Landing
             <Avatar
               avatarImage={player.avatarImage ?? undefined}
 
-              customAvatar={player.avatarConfig as any}
+              customAvatar={player.avatarConfig}
               size="sm"
             />
             <PlayerProfileTooltip

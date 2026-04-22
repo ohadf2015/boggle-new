@@ -18,7 +18,12 @@ export function LandingYourRank() {
     let cancelled = false;
 
     getUserRank(profile.id).then(({ data }) => {
-      if (!cancelled && data) setRank(data as any);
+      if (!cancelled && data) {
+        setRank({
+          rank_position: data.rank_position,
+          total_score: data.total_score,
+        });
+      }
     });
 
     return () => { cancelled = true; };

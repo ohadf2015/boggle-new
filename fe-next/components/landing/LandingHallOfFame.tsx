@@ -141,7 +141,7 @@ export function LandingHallOfFame({ champions, loading }: LandingHallOfFameProps
                 <Avatar
                   avatarImage={champ.avatarImage ?? undefined}
 
-                  customAvatar={champ.avatarConfig as any}
+                  customAvatar={champ.avatarConfig}
                   size={originalIndex === 0 ? 'xl' : 'lg'}
                 />
               </div>

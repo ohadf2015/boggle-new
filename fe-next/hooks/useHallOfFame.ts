@@ -1,13 +1,14 @@
 'use client';
 
 import { useTopPlayers, type TopPlayer } from './useTopPlayers';
+import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 
 export interface HallOfFameEntry {
   username: string;
   displayName: string | null;
   totalScore: number;
   avatarImage: string | null;
-  avatarConfig: Record<string, string> | null;
+  avatarConfig: CustomAvatarConfig | null;
 }
 
 interface UseHallOfFameOptions {
@@ -29,7 +30,7 @@ export function useHallOfFame(limit = 5, options: UseHallOfFameOptions = {}) {
     displayName: p.displayName,
     totalScore: p.totalScore,
     avatarImage: p.avatarImage,
-    avatarConfig: p.avatarConfig as Record<string, string> | null,
+    avatarConfig: p.avatarConfig,
   }));
 
   return { champions, loading };
