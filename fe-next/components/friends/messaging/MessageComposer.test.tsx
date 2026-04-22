@@ -38,7 +38,7 @@ describe('MessageComposer — Hebrew/IME composition', () => {
     const sendButton = screen.getByLabelText('Send') as HTMLButtonElement;
 
     // Initial state: send disabled, counter shows 0
-    expect(sendButton).toBeDisabled();
+    expect(sendButton).toHaveAttribute('aria-disabled', 'true');
     expect(screen.getByText('0/1000 chars')).toBeInTheDocument();
 
     // When: Simulate Android IME composing Hebrew without firing onChange

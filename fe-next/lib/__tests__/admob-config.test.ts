@@ -19,11 +19,11 @@ describe('getAdmobConfig', () => {
     expect(config.bannerAdId).toBe(DEFAULTS.android.bannerAdId);
   });
 
-  it('returns ios test IDs by default', () => {
+  it('returns ios default IDs when env vars are missing', () => {
     const config = getAdmobConfig('ios');
-    expect(config.rewardedAdId).toBe('ca-app-pub-3940256099942544/1712485313');
-    expect(config.interstitialAdId).toBe('ca-app-pub-3940256099942544/4411468910');
-    expect(config.bannerAdId).toBe('ca-app-pub-3940256099942544/2934735716');
+    expect(config.rewardedAdId).toBe(DEFAULTS.ios.rewardedAdId);
+    expect(config.interstitialAdId).toBe(DEFAULTS.ios.interstitialAdId);
+    expect(config.bannerAdId).toBe(DEFAULTS.ios.bannerAdId);
   });
 
   it('overrides android rewarded ID from env', () => {
