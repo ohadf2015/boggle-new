@@ -6,7 +6,12 @@ import { useEffect, useCallback, MutableRefObject } from 'react';
 import { Socket } from 'socket.io-client';
 // Note: Word feedback toasts removed - WordFormingArea now handles visual feedback
 import { calculateComboChainWindow, calculateComboTimeout, resetComboState } from '@/shared/utils/comboUtils';
-import type { WordAcceptedPayload, BoardTheme } from '@/shared/types/socket';
+import type { WordAcceptedPayload, WordsForBoardPayload, BoardTheme } from '@/shared/types/socket';
+
+type WordRejectedPayload = { word: string; reason: string };
+type WordTooShortPayload = { word: string; minLength: number };
+type WordAlreadyFoundPayload = { word: string };
+type WordNotOnBoardPayload = { word: string };
 import { useGameStore } from '@/hooks/gameState/store';
 
 interface UseHostWordEventsProps {
@@ -114,7 +119,7 @@ export function useHostWordEvents({
     // Note: WordFormingArea now handles all word feedback visually
     // These handlers only update state, no toasts
 
-    const handleWordAlreadyFound = (data: any) => {
+    const handleWordAlreadyFound = (data: WordAlreadyFoundPayload) => {
       if (hostPlaying) {
         if (data?.word) {
           const wordLower = data.word.toLowerCase();
@@ -136,7 +141,7 @@ export function useHostWordEvents({
       }
     };
 
-    const handleWordNotOnBoard = (data: any) => {
+    const handleWordNotOnBoard = (data: WordNotOnBoardPayload) => {
       if (hostPlaying) {
         if (data?.word) {
           const wordLower = data.word.toLowerCase();
@@ -146,7 +151,7 @@ export function useHostWordEvents({
       }
     };
 
-    const handleWordRejected = (data: any) => {
+    const handleWordRejected = (data: WordRejectedPayload) => {
       if (hostPlaying) {
         if (data?.word) {
           const wordLower = data.word.toLowerCase();
@@ -156,7 +161,7 @@ export function useHostWordEvents({
       }
     };
 
-    const handleWordTooShort = (data: any) => {
+    const handleWordTooShort = (data: WordTooShortPayload) => {
       if (hostPlaying) {
         if (data?.word) {
           const wordLower = data.word.toLowerCase();
@@ -167,7 +172,7 @@ export function useHostWordEvents({
     };
 
     // Handle blast word accepted (update moves counter and accumulated stats for host)
-    const handleWordsForBoard = (data: any) => {
+    const handleWordsForBoard = (data: WordsForBoardPayload) => {
       if (data?.words) {
         setWordsForBoard(data.words);
       }
