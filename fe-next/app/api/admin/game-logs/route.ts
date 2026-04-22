@@ -9,6 +9,85 @@ import { NextRequest, NextResponse } from 'next/server';
 import { verifyAdminAuth } from '@/lib/auth/adminAuth';
 import { getSupabaseAdmin } from '@/lib/admin/server';
 
+type ProfileEmbed = unknown;
+
+interface GameResultRow {
+  id: string;
+  player_id: string | null;
+  game_code: string | null;
+  score: number | null;
+  word_count: number | null;
+  longest_word: string | null;
+  placement: number | null;
+  is_ranked: boolean | null;
+  language: string | null;
+  time_played: number | null;
+  created_at: string;
+  profiles: ProfileEmbed;
+}
+
+interface WordFoundEntry {
+  word?: string;
+  timestamp?: number;
+}
+
+interface GameSessionRow {
+  id: string;
+  guest_session_id: string | null;
+  mode: string | null;
+  language: string | null;
+  score: number | null;
+  words_found: WordFoundEntry[] | null;
+  room_code: string | null;
+  final_rank: number | null;
+  duration_seconds: number | null;
+  started_at: string;
+  completed: boolean | null;
+}
+
+interface WordHuntAttemptRow {
+  id: string;
+  player_id: string | null;
+  guest_fingerprint: string | null;
+  language: string | null;
+  puzzle_number: number | null;
+  solved: boolean | null;
+  attempts_used: number | null;
+  target_word: string | null;
+  words_discovered: WordFoundEntry[] | null;
+  efficiency_score: number | null;
+  completed_at: string | null;
+  created_at: string;
+  profiles: ProfileEmbed;
+}
+
+interface DailyPuzzleAttemptRow {
+  id: string;
+  player_id: string | null;
+  guest_fingerprint: string | null;
+  puzzle_number: number | null;
+  language: string | null;
+  score: number | null;
+  word_count: number | null;
+  time_seconds: number | null;
+  longest_word: string | null;
+  completed_at: string;
+  profiles: ProfileEmbed;
+}
+
+interface DrillSessionRow {
+  id: string;
+  user_id: string | null;
+  drill_type: string | null;
+  level: number | null;
+  score: number | null;
+  duration_seconds: number | null;
+  words_found: number | null;
+  domain_score_earned: number | null;
+  created_at: string;
+  profiles: ProfileEmbed;
+}
+
 /**
  * GET - Fetch game logs with filters and pagination
  * Includes both authenticated player games (from game_results) and guest games (from game_sessions)
@@ -95,14 +174,14 @@ export async function GET(request: NextRequest) {
     }
 
     // Transform authenticated games
-    const authGames = (authData || []).map((game: any) => ({
+    const authGames = ((authData as unknown as GameResultRow[]) || []).map((game) => ({
       ...game,
       is_guest: false,
       mode: game.is_ranked ? 'ranked' : 'casual',
     }));
 
     // Fetch guest games from game_sessions if includeGuests is true
-    let guestGames: any[] = [];
+    let guestGames: Array<Record<string, unknown>> = [];
     let guestCount = 0;
 
     if (includeGuests) {
@@ -154,7 +233,7 @@ export async function GET(request: NextRequest) {
         } else {
           guestCount = gCount || 0;
           // Transform guest games to match the expected format
-          guestGames = (guestData || []).map((session: any) => ({
+          guestGames = ((guestData as unknown as GameSessionRow[]) || []).map((session) => ({
             id: session.id,
             player_id: null,
             guest_session_id: session.guest_session_id,
@@ -162,8 +241,8 @@ export async function GET(request: NextRequest) {
             score: session.score || 0,
             word_count: Array.isArray(session.words_found) ? session.words_found.length : 0,
             longest_word: Array.isArray(session.words_found) && session.words_found.length > 0
-              ? session.words_found.reduce((longest: any, w: any) =>
-                  (w.word?.length || 0) > (longest?.length || 0) ? w.word : longest, ''
+              ? session.words_found.reduce<string>((longest, w) =>
+                  (w.word?.length || 0) > (longest.length || 0) ? (w.word ?? longest) : longest, ''
                 )
               : null,
             placement: session.final_rank,
@@ -180,7 +259,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Fetch Daily Word games from daily_word_hunt_attempts (Wordle-like game)
-    let wordHuntGames: any[] = [];
+    let wordHuntGames: Array<Record<string, unknown>> = [];
     let wordHuntCount = 0;
 
     try {
@@ -233,13 +312,13 @@ export async function GET(request: NextRequest) {
           console.error('[admin/game-logs] Word Hunt query error:', wordHuntError);
         } else {
           wordHuntCount = whCount || 0;
-          wordHuntGames = (wordHuntData || []).map((attempt: any) => {
+          wordHuntGames = ((wordHuntData as unknown as WordHuntAttemptRow[]) || []).map((attempt) => {
             // Derive duration from word discovery timestamps
             let timePlayed = 0;
             if (Array.isArray(attempt.words_discovered) && attempt.words_discovered.length > 1) {
               const timestamps = attempt.words_discovered
-                .map((w: any) => w.timestamp)
-                .filter((t: any) => typeof t === 'number');
+                .map((w) => w.timestamp)
+                .filter((t): t is number => typeof t === 'number');
               if (timestamps.length > 1) {
                 timePlayed = Math.round((Math.max(...timestamps) - Math.min(...timestamps)) / 1000);
               }
@@ -272,7 +351,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Fetch Daily Challenge games from daily_puzzle_attempts (Word Hunt daily puzzles)
-    let dailyChallengeGames: any[] = [];
+    let dailyChallengeGames: Array<Record<string, unknown>> = [];
     let dailyChallengeCount = 0;
 
     try {
@@ -318,7 +397,7 @@ export async function GET(request: NextRequest) {
           console.error('[admin/game-logs] Daily Challenge query error:', dailyError);
         } else {
           dailyChallengeCount = dcCount || 0;
-          dailyChallengeGames = (dailyData || []).map((attempt: any) => ({
+          dailyChallengeGames = ((dailyData as unknown as DailyPuzzleAttemptRow[]) || []).map((attempt) => ({
             id: attempt.id,
             player_id: attempt.player_id,
             guest_session_id: attempt.guest_fingerprint,
@@ -342,7 +421,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Fetch Brain Training Drill sessions from drill_sessions
-    let drillGames: any[] = [];
+    let drillGames: Array<Record<string, unknown>> = [];
     let drillCount = 0;
 
     try {
@@ -387,7 +466,7 @@ export async function GET(request: NextRequest) {
           console.error('[admin/game-logs] Drill sessions query error:', drillError);
         } else {
           drillCount = dCount || 0;
-          drillGames = (drillData || []).map((session: any) => ({
+          drillGames = ((drillData as unknown as DrillSessionRow[]) || []).map((session) => ({
             id: session.id,
             player_id: session.user_id,
             guest_session_id: null,
@@ -414,8 +493,8 @@ export async function GET(request: NextRequest) {
 
     // Combine and sort all games
     const allGames = [...authGames, ...guestGames, ...wordHuntGames, ...dailyChallengeGames, ...drillGames].sort((a, b) => {
-      const dateA = new Date(a.created_at).getTime();
-      const dateB = new Date(b.created_at).getTime();
+      const dateA = new Date(String((a as { created_at?: unknown }).created_at ?? '')).getTime();
+      const dateB = new Date(String((b as { created_at?: unknown }).created_at ?? '')).getTime();
       return ascending ? dateA - dateB : dateB - dateA;
     });
 

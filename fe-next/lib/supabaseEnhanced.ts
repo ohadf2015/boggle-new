@@ -6,8 +6,19 @@
  * - Error handling with detailed logging
  */
 
+import type { PostgrestError } from '@supabase/supabase-js';
 import { supabase, isSupabaseConfigured } from './supabase';
 import logger from '@/utils/logger';
+
+type RetryableError = PostgrestError | (Error & { code?: string; status?: number }) | { message?: string; code?: string; status?: number } | null | undefined;
+
+function errorMessage(err: unknown): string {
+  if (err instanceof Error) return err.message;
+  if (typeof err === 'object' && err && 'message' in err && typeof (err as { message: unknown }).message === 'string') {
+    return (err as { message: string }).message;
+  }
+  return String(err);
+}
 
 // Configuration
 const RETRY_CONFIG = {
