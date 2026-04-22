@@ -28,7 +28,7 @@ import type { BlastMicroState } from './utils/blastMicroAchievements';
 import type { ScoreFlyEvent } from './BlastScoreFly';
 import { BlastBackground } from './BlastBackground';
 import { cn } from '@/lib/utils';
-import type { LetterGrid, Language } from '@/shared/types/game';
+import type { LetterGrid, Language, Avatar } from '@/shared/types/game';
 import type { BlastTileState, BlastGameState } from './types';
 import type { SequencerState } from './hooks/useBlastSequencer';
 import type { ClearedTileEvent } from './BlastEffectsCanvas';
@@ -76,7 +76,7 @@ interface BlastStageProps {
   clearedTilesForEffects?: ClearedTileEvent[];
   waveCleared?: boolean;
   // Multiplayer leaderboard
-  leaderboard?: Array<{ username: string; score: number; wordCount?: number; avatar?: any }>;
+  leaderboard?: Array<{ username: string; score: number; wordCount?: number; avatar?: Avatar }>;
   username?: string;
   // Combo streak
   comboStreak?: ComboStreakState;

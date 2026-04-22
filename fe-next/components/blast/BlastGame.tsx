@@ -31,7 +31,7 @@ import type { ClearedTileEvent } from './BlastEffectsCanvas';
 import { useGameStore } from '@/hooks/gameState';
 import { useIdleDetection } from '@/hooks/useIdleDetection';
 import { trackDeadTime } from '@/utils/growthTracking';
-import type { LetterGrid } from '@/shared/types';
+import type { LetterGrid, Avatar } from '@/shared/types';
 
 const BLAST_DEAD_TIME_THRESHOLD_MS = 15000;
 
@@ -53,7 +53,7 @@ interface BlastGameProps {
   blastSeed?: number | null;
   remainingTime?: number | null;
   totalTime?: number;
-  leaderboard?: Array<{ username: string; score: number; wordCount?: number; avatar?: any }>;
+  leaderboard?: Array<{ username: string; score: number; wordCount?: number; avatar?: Avatar }>;
   username?: string;
 }
 

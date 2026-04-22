@@ -6,6 +6,7 @@ import { getLetterFeedback, isTargetWordFound, type LetterFeedback } from '@/uti
 import { calculateLifeReward, calculateTokenReward } from '@/utils/aiHintGenerator';
 import type { FeedbackType } from '../WordFeedbackToast';
 import type { WordDiscovery, TargetAttempt } from './types';
+import type { SurvivalAction } from './survivalGameReducer';
 import {
   MAX_ATTEMPTS,
   INITIAL_LIFE,
@@ -33,7 +34,7 @@ export interface UseSurvivalWordSubmissionProps {
   discoveredWords: WordDiscovery[];
   lifePoints: number;
   // Dispatch
-  dispatch: React.Dispatch<any>;
+  dispatch: React.Dispatch<SurvivalAction>;
   // Callbacks
   showToast: (type: FeedbackType, message: string, word?: string) => void;
   playWordAcceptedSound: (() => void) | undefined;
