@@ -108,7 +108,7 @@ export function useBlastGameEnd(deps: GameEndDeps) {
             engine.setTileStates(prev => prev.map((row, ri) =>
               row.map((tile, ci) => {
                 if (ri === step.row && ci === step.col) {
-                  return { ...tile, type: step.convertTo, hitsRemaining: 1, activationEffect: 'sugar-crush' as any };
+                  return { ...tile, type: step.convertTo, hitsRemaining: 1, activationEffect: 'sugar-crush' };
                 }
                 return tile;
               }),

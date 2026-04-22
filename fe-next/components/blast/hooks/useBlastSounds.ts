@@ -51,7 +51,8 @@ export function useBlastSounds() {
     if (typeof window === 'undefined') return null;
     try {
       if (!audioCtxRef.current) {
-        audioCtxRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+        const WebkitAudioCtx = (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+        audioCtxRef.current = new (window.AudioContext || WebkitAudioCtx!)();
       }
       const ctx = audioCtxRef.current;
       if (ctx.state === 'suspended') ctx.resume();
@@ -187,7 +188,8 @@ export function useBlastSounds() {
     if (typeof window === 'undefined') return;
     try {
       if (!audioCtxRef.current) {
-        audioCtxRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+        const WebkitAudioCtx = (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+        audioCtxRef.current = new (window.AudioContext || WebkitAudioCtx!)();
       }
       const ctx = audioCtxRef.current;
       if (ctx.state === 'suspended') ctx.resume();
