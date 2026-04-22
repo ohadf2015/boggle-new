@@ -10,6 +10,7 @@ import DesktopGameNav from '@/components/DesktopGameNav';
 import GoogleConsentMode from '@/components/GoogleConsentMode';
 import GoogleAnalytics from '@/components/GoogleAnalytics';
 import GoogleAdSense from '@/components/GoogleAdSense';
+import AdSenseAnchorTracker from '@/components/ads/AdSenseAnchorTracker';
 import CrazyGamesScriptServer from '@/components/CrazyGamesScriptServer';
 import WebVitalsReporter from '@/components/WebVitalsReporter';
 import PWAInstallPrompt from '@/components/PWAInstallPrompt';
@@ -519,6 +520,8 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 {/* Load external scripts with optimized strategies to prevent blocking */}
                 <GoogleAnalytics />
                 <GoogleAdSense />
+                {/* Tracks Google's sticky bottom anchor ad so GlobalBottomNav can offset above it */}
+                <AdSenseAnchorTracker />
                 <SocialMediaPixels />
                 <WebVitalsReporter />
                 <ServiceWorkerRegistration />
