@@ -41,6 +41,11 @@ interface UseEarthquakeAnimationProps {
 
 const PARTICLE_COLORS = ['#FFE135', '#FF6B35', '#FF3366', '#00FFFF', '#BFFF00'];
 
+// Stable zero-offset reference. Returning a fresh `{x:0,y:0,...}` literal from
+// getShakeOffset each render would defeat GridCell.memo (new ref per cell every
+// render). Sharing one frozen object keeps prop identity stable across renders.
+const ZERO_SHAKE_OFFSET: ShakeOffset = Object.freeze({ x: 0, y: 0, rotate: 0, scale: 1, delay: 0 });
+
 /**
  * OPTIMIZED Earthquake Animation Hook
  *
@@ -213,8 +218,8 @@ export function useEarthquakeAnimation({
   // Get shake offset for a specific cell
   const getShakeOffset = useCallback((cellKey: string): ShakeOffset => {
     return earthquakeShaking
-      ? shakeOffsetsRef.current.get(cellKey) || { x: 0, y: 0, rotate: 0, scale: 1, delay: 0 }
-      : { x: 0, y: 0, rotate: 0, scale: 1, delay: 0 };
+      ? shakeOffsetsRef.current.get(cellKey) || ZERO_SHAKE_OFFSET
+      : ZERO_SHAKE_OFFSET;
   }, [earthquakeShaking]);
 
   // Memoized animation config for each phase
