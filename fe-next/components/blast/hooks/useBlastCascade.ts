@@ -5,6 +5,7 @@
 
 import { useCallback, useRef } from 'react';
 import type { UseBlastSequencerReturn } from './useBlastSequencer';
+import type { CascadeResult, WordSubmitResult } from './useBlastEngine';
 import {
   type BlastTileState,
   MAX_CASCADE_CHAIN,
@@ -28,9 +29,9 @@ import { vibrateBlastCascade } from '@/components/grid/hapticFeedback';
 
 interface CascadeDeps {
   engine: {
-    startCascade: () => { gravity: any; commit?: () => void };
+    startCascade: () => CascadeResult;
     stopCascade: () => void;
-    submitWord: (cells: Array<{ row: number; col: number }>, word: string, score: number) => { clearedTiles: any[]; score: number };
+    submitWord: (cells: Array<{ row: number; col: number }>, word: string, score: number) => WordSubmitResult;
     getLatestState: () => { grid: string[][] | null; tileStates: BlastTileState[][] };
     gameState: { wordsFound: string[] };
   };
@@ -85,8 +86,8 @@ export function useBlastCascade(deps: CascadeDeps) {
       const effectiveMaxChain = Math.min(MAX_CASCADE_CHAIN, maxChainForMomentum);
 
       while (chainLevel < effectiveMaxChain) {
-        const affectedCols = new Set<number>(cascadeResult.gravity.newTiles.map((t: any) => t.col));
-        const affectedRows = new Set<number>(cascadeResult.gravity.newTiles.map((t: any) => t.row));
+        const affectedCols = new Set<number>(cascadeResult.gravity.newTiles.map((t) => t.col));
+        const affectedRows = new Set<number>(cascadeResult.gravity.newTiles.map((t) => t.row));
         for (const ft of cascadeResult.gravity.fallingTiles) {
           affectedRows.add(ft.row);
           affectedCols.add(ft.col);
