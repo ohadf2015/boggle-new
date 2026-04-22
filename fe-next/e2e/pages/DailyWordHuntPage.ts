@@ -2,7 +2,8 @@ import { type Page, type Locator, expect } from '@playwright/test';
 
 /**
  * Page Object for the Daily Word Hunt flow.
- * Covers landing, game play, results, and streak tracking.
+ * Covers landing, game play, and streak tracking. Results-phase assertions
+ * live in component tests (see components/daily/__tests__/DailyWordHuntResults.*).
  */
 export class DailyWordHuntPage {
   readonly page: Page;
@@ -30,12 +31,6 @@ export class DailyWordHuntPage {
   readonly mobileInfoToggle: Locator;
   readonly mobileInfoExpanded: Locator;
 
-  // Results
-  readonly winCinematic: Locator;
-  readonly resultsContainer: Locator;
-  readonly shareButton: Locator;
-  readonly scoreGauntletBanner: Locator;
-
   constructor(page: Page) {
     this.page = page;
 
@@ -62,11 +57,6 @@ export class DailyWordHuntPage {
     this.mobileInfoToggle = page.locator('[data-testid="mobile-info-toggle"]');
     this.mobileInfoExpanded = page.locator('[data-testid="mobile-info-expanded"]');
 
-    // Results
-    this.winCinematic = page.locator('[data-testid="win-cinematic"]');
-    this.resultsContainer = page.locator('[class*="results"], [data-testid*="results"]');
-    this.shareButton = page.getByRole('button', { name: /share|שתף/i });
-    this.scoreGauntletBanner = page.locator('[data-testid="score-gauntlet-banner"]');
   }
 
   /** Navigate to the daily challenge landing */
@@ -107,11 +97,6 @@ export class DailyWordHuntPage {
   async toggleMobileInfo() {
     await this.mobileInfoToggle.click();
     await expect(this.mobileInfoExpanded).toBeVisible();
-  }
-
-  /** Wait for results screen */
-  async waitForResults() {
-    await expect(this.resultsContainer).toBeVisible({ timeout: 60_000 });
   }
 
   /** Get a specific clue box by index */

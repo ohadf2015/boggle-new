@@ -327,51 +327,14 @@ test.describe('Scoring & Life', () => {
   });
 });
 
-// ---------------------------------------------------------------------------
-// 9. Results -- Win State
-// ---------------------------------------------------------------------------
-test.describe('Results -- Win State', () => {
-  test.skip(true, 'Requires full gameplay simulation -- run in dedicated integration suite');
-
-  test('win cinematic visible after solving', async ({ page }) => {
-    const dwh = new DailyWordHuntPage(page);
-    await dwh.waitForResults();
-    await expect(dwh.winCinematic).toBeVisible();
-  });
-
-  test('results container visible after game ends', async ({ page }) => {
-    const dwh = new DailyWordHuntPage(page);
-    await dwh.waitForResults();
-    await expect(dwh.resultsContainer).toBeVisible();
-  });
-
-  test('share button visible in results', async ({ page }) => {
-    const dwh = new DailyWordHuntPage(page);
-    await dwh.waitForResults();
-    await expect(dwh.shareButton).toBeVisible();
-  });
-});
-
-// ---------------------------------------------------------------------------
-// 10. Results -- After Completion
-// ---------------------------------------------------------------------------
-test.describe('Results -- After Completion', () => {
-  test.skip(true, 'Requires full gameplay simulation -- run in dedicated integration suite');
-
-  test('score gauntlet banner may be visible', async ({ page }) => {
-    const dwh = new DailyWordHuntPage(page);
-    await dwh.waitForResults();
-    // Banner is conditional, just check it doesn't crash
-    const bannerVisible = await dwh.scoreGauntletBanner.isVisible().catch(() => false);
-    expect(typeof bannerVisible).toBe('boolean');
-  });
-
-  test('results show score information', async ({ page }) => {
-    const dwh = new DailyWordHuntPage(page);
-    await dwh.waitForResults();
-    await expect(dwh.resultsContainer).toContainText(/\d/);
-  });
-});
+// Results-phase coverage (win cinematic, results container, share button,
+// score-gauntlet banner) lives in component tests that mount
+// <DailyWordHuntResults> directly with seed props:
+//   - components/daily/__tests__/DailyWordHuntResults.winCinematic.test.tsx
+//   - components/daily/__tests__/DailyWordHuntResults.emojiCard.test.tsx
+//   - components/daily/__tests__/WordHuntResultsContent.test.tsx
+// E2E can't reach the results phase without a test-only state seed, so we
+// assert those behaviors at the unit layer instead.
 
 // ---------------------------------------------------------------------------
 // 11. Streak Updates
