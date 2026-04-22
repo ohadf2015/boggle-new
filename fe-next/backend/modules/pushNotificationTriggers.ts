@@ -44,7 +44,7 @@ const NOTIFICATION_TYPE_MAP: Record<PushNotificationType, string> = {
  * Look up recipient's preferred locale from profiles.language.
  * Fail-open to 'en' — missing locale must not block delivery.
  */
-async function getUserLocale(userId: string): Promise<PushLocale> {
+export async function getUserLocale(userId: string): Promise<PushLocale> {
   try {
     if (!isSupabaseConfigured()) return 'en';
     const supabase = getSupabase();
@@ -397,7 +397,7 @@ export async function notifyDailyChallengeReminder(
   const locale = await getUserLocale(toUserId);
   const title = override?.title ?? translatePush(locale, 'dailyChallenge.title');
   const body = override?.body ?? translatePush(locale, 'dailyChallenge.body');
-  const deepLink = override?.deepLink ?? '/daily-challenge';
+  const deepLink = override?.deepLink ?? '/daily';
   return triggerPush(toUserId, 'daily_challenge', {
     title,
     body,

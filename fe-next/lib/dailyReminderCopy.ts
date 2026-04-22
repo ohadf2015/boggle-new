@@ -1,11 +1,18 @@
 /**
  * Witty/dynamic copy for the daily-challenge push reminder.
+ *
  * Deterministic per user+date so the same user doesn't see the same template
- * twice in one day (or a different one on retry) and so variant can be
- * tracked in analytics via the deep-link `v` param.
+ * twice in one day and so variant can be tracked in analytics via the
+ * deep-link `v` param.
+ *
+ * Localization: English has 15 witty variants. Non-English locales use the
+ * shared `translatePush('dailyChallenge.*')` strings — variant is still hashed
+ * for analytics bucketing (open-rate by hash bucket), even though copy is
+ * locale-constant. Maintaining 15 witty templates × 5 locales is out of scope.
  *
  * Placeholders: {hoursLeft} — integer hours until local midnight.
  */
+import { translatePush, type PushLocale } from '@/backend/utils/pushTranslations';
 
 export interface DailyReminderTemplate {
   title: string;
@@ -34,6 +41,7 @@ export interface DailyReminderInput {
   userId: string;
   date: string; // YYYY-MM-DD
   hoursLeft: number;
+  locale?: PushLocale;
 }
 
 export interface DailyReminderCopy {
@@ -56,15 +64,21 @@ function fill(template: string, hoursLeft: number): string {
 }
 
 export function pickDailyReminderCopy(input: DailyReminderInput): DailyReminderCopy {
-  const { userId, date, hoursLeft } = input;
+  const { userId, date, hoursLeft, locale } = input;
   const variant = hashString(`${userId}|${date}`) % DAILY_REMINDER_TEMPLATES.length;
-  const t = DAILY_REMINDER_TEMPLATES[variant];
   const hours = Math.max(1, Math.round(hoursLeft));
-  const deepLink = `/daily-challenge?src=push&v=${variant}&h=${hours}`;
-  return {
-    title: fill(t.title, hours),
-    body: fill(t.body, hours),
-    deepLink,
-    variant,
-  };
+  const deepLink = `/daily?src=push&v=${variant}&h=${hours}`;
+
+  let title: string;
+  let body: string;
+  if (!locale || locale === 'en') {
+    const t = DAILY_REMINDER_TEMPLATES[variant];
+    title = fill(t.title, hours);
+    body = fill(t.body, hours);
+  } else {
+    title = translatePush(locale, 'dailyChallenge.title');
+    body = translatePush(locale, 'dailyChallenge.body');
+  }
+
+  return { title, body, deepLink, variant };
 }

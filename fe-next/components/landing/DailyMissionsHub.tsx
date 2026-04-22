@@ -12,6 +12,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useDailyMissions, type MissionType } from '@/hooks/useDailyMissions';
 import { cn } from '@/lib/utils';
+import { DailyAvatarPartCard } from '@/components/avatar/DailyAvatarPartCard';
 
 interface MissionConfig {
   type: MissionType;
@@ -232,6 +233,8 @@ export function DailyMissionsHub() {
           );
         })}
       </div>
+
+      <DailyAvatarPartCard />
 
       {/* Grand Slam badge */}
       {isGrandSlam && !grandSlamClaimed && <GrandSlamBadge t={t} />}

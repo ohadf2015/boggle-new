@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import logger from '@/utils/logger';
 import { getDailyChallengePushRecipients, markDailyPushSent } from '@/lib/pushReminders';
-import { notifyDailyChallengeReminder } from '@/backend/modules/pushNotificationTriggers';
+import { notifyDailyChallengeReminder, getUserLocale } from '@/backend/modules/pushNotificationTriggers';
 import { pickDailyReminderCopy } from '@/lib/dailyReminderCopy';
 import { getLocalHour, getTodayDate } from '@/lib/email';
 import { captureApiError } from '@/utils/sentry';
@@ -43,7 +43,8 @@ export async function POST(request: NextRequest) {
       recipients.map(async (userId) => {
         const localHour = getLocalHour('UTC');
         const hoursLeft = Math.max(1, 24 - localHour);
-        const copy = pickDailyReminderCopy({ userId, date, hoursLeft });
+        const locale = await getUserLocale(userId);
+        const copy = pickDailyReminderCopy({ userId, date, hoursLeft, locale });
         await notifyDailyChallengeReminder(userId, {
           title: copy.title,
           body: copy.body,

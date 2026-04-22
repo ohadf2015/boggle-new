@@ -258,32 +258,32 @@ describe('GlobalBottomNav', () => {
             expect(container.firstChild).toBeNull();
         });
 
-        it('should hide on multiplayer path (has own nav)', () => {
+        it('should remain visible on multiplayer lobby (in-game state hides it, not the route)', () => {
             (usePathname as Mock).mockReturnValue('/en/multiplayer');
 
-            const { container } = render(<GlobalBottomNav />);
-            expect(container.firstChild).toBeNull();
+            render(<GlobalBottomNav />);
+            expect(screen.getByRole('navigation')).toBeInTheDocument();
         });
 
-        it('should hide on singleplayer path (has own nav)', () => {
+        it('should remain visible on singleplayer lobby', () => {
             (usePathname as Mock).mockReturnValue('/en/singleplayer');
 
-            const { container } = render(<GlobalBottomNav />);
-            expect(container.firstChild).toBeNull();
+            render(<GlobalBottomNav />);
+            expect(screen.getByRole('navigation')).toBeInTheDocument();
         });
 
-        it('should hide on daily path (has own nav)', () => {
+        it('should remain visible on daily lobby', () => {
             (usePathname as Mock).mockReturnValue('/en/daily');
 
-            const { container } = render(<GlobalBottomNav />);
-            expect(container.firstChild).toBeNull();
+            render(<GlobalBottomNav />);
+            expect(screen.getByRole('navigation')).toBeInTheDocument();
         });
 
-        it('should hide on adventure path (has own nav)', () => {
+        it('should remain visible on adventure lobby', () => {
             (usePathname as Mock).mockReturnValue('/en/adventure');
 
-            const { container } = render(<GlobalBottomNav />);
-            expect(container.firstChild).toBeNull();
+            render(<GlobalBottomNav />);
+            expect(screen.getByRole('navigation')).toBeInTheDocument();
         });
 
         it('should remain visible on friends path (consistent navigation)', () => {
@@ -301,11 +301,11 @@ describe('GlobalBottomNav', () => {
             expect(screen.getByRole('navigation')).toBeInTheDocument();
         });
 
-        it('should hide on education path (education section has own nav)', () => {
+        it('should remain visible on education path (general learning hub, not a dedicated app)', () => {
             (usePathname as Mock).mockReturnValue('/en/education');
 
-            const { container } = render(<GlobalBottomNav />);
-            expect(container.firstChild).toBeNull();
+            render(<GlobalBottomNav />);
+            expect(screen.getByRole('navigation')).toBeInTheDocument();
         });
 
         it('should hide on student path (education section has own nav)', () => {
@@ -334,6 +334,23 @@ describe('GlobalBottomNav', () => {
 
             const { container } = render(<GlobalBottomNav />);
             expect(container.firstChild).toBeNull();
+        });
+    });
+
+    describe('Tab Order', () => {
+        it('should render home as the last (rightmost) tab so users always reach home on the right', () => {
+            render(<GlobalBottomNav />);
+            const buttons = screen.getAllByRole('button');
+            const tabButtons = buttons.filter(b => b.getAttribute('aria-label'));
+            const lastTab = tabButtons[tabButtons.length - 1];
+            expect(lastTab).toHaveAttribute('aria-label', expect.stringMatching(/home/i));
+        });
+
+        it('should force dir="ltr" on the tab row so Home stays rightmost in RTL locales', () => {
+            render(<GlobalBottomNav />);
+            const nav = screen.getByRole('navigation');
+            const row = nav.querySelector('[dir="ltr"]');
+            expect(row).not.toBeNull();
         });
     });
 

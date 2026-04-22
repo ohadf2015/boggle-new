@@ -34,11 +34,13 @@ interface TabConfig {
     glowColor: string;     // Subtle glow under active icon
 }
 
+// Order: home is LAST so it renders rightmost (with dir="ltr" on the nav row,
+// this holds in both LTR and RTL locales so users always reach home on the right).
 const TABS: TabConfig[] = [
-    { id: 'home',    labelKey: 'nav.home',    icon: Home,       color: 'text-neo-cyan', glowColor: 'bg-neo-cyan/15' },
     { id: 'play',    labelKey: 'nav.play',    icon: Swords,     color: 'text-neo-pink', glowColor: 'bg-neo-pink/15' },
-    { id: 'quests',  labelKey: 'nav.quests',  icon: ScrollText, color: 'text-neo-lime',   glowColor: 'bg-neo-lime/15' },
-    { id: 'friends', labelKey: 'nav.friends', icon: Users,      color: 'text-neo-pink',   glowColor: 'bg-neo-pink/15' },
+    { id: 'quests',  labelKey: 'nav.quests',  icon: ScrollText, color: 'text-neo-lime', glowColor: 'bg-neo-lime/15' },
+    { id: 'friends', labelKey: 'nav.friends', icon: Users,      color: 'text-neo-pink', glowColor: 'bg-neo-pink/15' },
+    { id: 'home',    labelKey: 'nav.home',    icon: Home,       color: 'text-neo-cyan', glowColor: 'bg-neo-cyan/15' },
 ];
 
 // Color map for the sliding indicator pill
@@ -153,9 +155,11 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
         router.push(routes[tab]);
     }, [router, language, isAuthenticated]);
 
-    // pathsWithOwnNav — these routes render their own nav, so we hide the global one
+    // pathsWithOwnNav — dedicated surfaces (admin/educator) that ship their own nav.
+    // Game entrypoints (multiplayer, adventure, daily, brain, …) show the global nav on
+    // their lobby screens; actual gameplay hides it via `isInGame` (NavigationContext).
     const shouldHideOnCurrentPath = useMemo(() => {
-        const pathsWithOwnNav = ['/multiplayer', '/singleplayer', '/daily', '/adventure', '/education', '/student', '/teacher', '/admin', '/brain', '/challenge', '/custom', '/join'];
+        const pathsWithOwnNav = ['/admin', '/student', '/teacher'];
         const cleanPath = pathname.replace(`/${language}`, '');
         return pathsWithOwnNav.some(p => cleanPath.startsWith(p));
     }, [pathname, language]);
@@ -192,7 +196,8 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
             }}
             aria-label={t('nav.bottomNavigation')}
         >
-            <div className="flex items-center justify-around h-16 relative">
+            {/* dir="ltr" locks source-order → visual-order so Home stays rightmost in RTL too */}
+            <div dir="ltr" className="flex items-center justify-around h-16 relative">
                 {TABS.map((tab) => {
                     const isActive = activeTab === tab.id;
                     const Icon = tab.icon;

@@ -1,5 +1,5 @@
 import { isSupabaseConfigured } from '../modules/supabase';
-import { notifyDailyChallengeReminder } from '../modules/pushNotificationTriggers';
+import { notifyDailyChallengeReminder, getUserLocale } from '../modules/pushNotificationTriggers';
 import {
   getDailyChallengePushRecipients,
   markDailyPushSent,
@@ -32,7 +32,8 @@ export async function sendDailyChallengeReminders(): Promise<void> {
     recipients.map(async (userId) => {
       const localHour = getLocalHour('UTC');
       const hoursLeft = Math.max(1, 24 - localHour);
-      const copy = pickDailyReminderCopy({ userId, date, hoursLeft });
+      const locale = await getUserLocale(userId);
+      const copy = pickDailyReminderCopy({ userId, date, hoursLeft, locale });
       await notifyDailyChallengeReminder(userId, {
         title: copy.title,
         body: copy.body,

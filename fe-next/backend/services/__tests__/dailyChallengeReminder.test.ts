@@ -18,6 +18,7 @@ vi.mock('@/lib/pushReminders', () => ({
 
 vi.mock('../../modules/pushNotificationTriggers', () => ({
   notifyDailyChallengeReminder: mockNotify,
+  getUserLocale: vi.fn().mockResolvedValue('en'),
 }));
 
 vi.mock('../../modules/supabase', () => ({
@@ -57,7 +58,8 @@ describe('sendDailyChallengeReminders', () => {
     expect(override).toBeDefined();
     expect(override.title).toBeTruthy();
     expect(override.body).toBeTruthy();
-    expect(override.deepLink).toContain('/daily-challenge');
+    expect(override.deepLink).toContain('/daily');
+    expect(override.deepLink).not.toContain('/daily-challenge');
     expect(override.deepLink).toContain('src=push');
     expect(typeof override.variant).toBe('number');
   });

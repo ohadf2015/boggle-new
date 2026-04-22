@@ -171,7 +171,7 @@ export const PlayerRoster = memo(function PlayerRoster({ players, username, game
                     {(() => {
                       const tileInner = (
                         <div className={cn(
-                          'rounded-full border-neo-black flex items-center justify-center overflow-hidden shadow-hard',
+                          'box-content rounded-full border-neo-black flex items-center justify-center overflow-hidden shadow-hard',
                           compact ? 'w-16 h-16 border-4' : 'w-20 h-20 border-3',
                           AVATAR_COLORS[index % AVATAR_COLORS.length],
                           compact
@@ -185,7 +185,7 @@ export const PlayerRoster = memo(function PlayerRoster({ players, username, game
                             <Avatar
                               customAvatar={avatar?.customAvatar ?? undefined}
                               avatarImage={avatar?.avatarImage}
-                              size={compact ? 'xl' : '2xl'}
+                              size={compact ? 'lg' : 'xl'}
                             />
                           ) : (
                             <span className={cn('font-black text-neo-black', compact ? 'text-3xl' : 'text-4xl')}>

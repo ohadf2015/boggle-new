@@ -123,7 +123,7 @@ describe('pushNotificationTriggers', () => {
         body: 'Keep your streak alive — 60 seconds to play!',
         data: {
           type: 'daily_challenge',
-          deepLink: '/daily-challenge',
+          deepLink: '/daily',
         },
       }));
     });
