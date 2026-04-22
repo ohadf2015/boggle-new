@@ -1,24 +1,10 @@
 /**
- * Game State Module
+ * Game State Module — Zustand store + selector hooks.
  *
- * Centralized game state management powered by Zustand.
- * Split into focused files for maintainability:
- * - types.ts: Type definitions
- * - store.ts: Zustand store with selectors (RECOMMENDED)
- * - reducer.ts: Legacy reducer (kept for reference/testing)
- * - useGameState.ts: Legacy hook (kept for backward compatibility)
- *
- * RECOMMENDED USAGE (Zustand - best performance):
  * ```tsx
  * import { useGameActive, useGameActions } from '@/hooks/gameState';
  * const gameActive = useGameActive();
  * const { setGameActive } = useGameActions();
- * ```
- *
- * LEGACY USAGE (Context - still works):
- * ```tsx
- * import { useGameStateContext } from '@/contexts/GameStateContext';
- * const { gameActive, setGameActive } = useGameStateContext();
  * ```
  */
 
