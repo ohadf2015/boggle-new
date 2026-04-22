@@ -82,7 +82,38 @@ export async function GET(request: Request, { params }: RouteParams) {
       attemptDistribution[i.toString()] = stats[`solved_in_${i}`] || 0;
     }
 
-    const response: any = {
+    interface PersonalStats {
+      solved: boolean;
+      attemptsUsed: number;
+      efficiencyScore: number;
+      percentile: number;
+      rank?: number | null;
+      beatCreator: boolean;
+      completedAt: string | null;
+    }
+    interface StatsResponse {
+      success: true;
+      stats: {
+        puzzleCode: string;
+        creatorDisplayName: string;
+        targetWord: string;
+        language: string;
+        createdAt: string;
+        creatorEfficiencyScore: number;
+        totalAttempts: number;
+        totalSolved: number;
+        solveRate: number;
+        avgAttemptsSolved: number | null;
+        avgEfficiencyScore: number | null;
+        maxEfficiencyScore: number | null;
+        avgLifeRemaining: number | null;
+        avgWordsDiscovered: number | null;
+        attemptDistribution: Record<string, number>;
+        beatCreatorCount: number;
+        yourStats?: PersonalStats;
+      };
+    }
+    const response: StatsResponse = {
       success: true,
       stats: {
         puzzleCode: stats.puzzle_code,

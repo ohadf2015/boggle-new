@@ -26,6 +26,12 @@ export interface ActivityEvent {
   timestamp: string;
 }
 
+type ProfileRef = { display_name?: string | null; username?: string | null } | null | undefined;
+function pickProfile(p: unknown): ProfileRef {
+  if (Array.isArray(p)) return p[0] as ProfileRef;
+  return p as ProfileRef;
+}
+
 // ── In-memory cache (30s TTL) ──
 let cachedEvents: ActivityEvent[] | null = null;
 let cacheTimestamp = 0;
@@ -104,7 +110,7 @@ export async function GET(request: NextRequest) {
     const events: ActivityEvent[] = [];
 
     for (const g of mpWinsResult.data || []) {
-      const profile = g.profiles as any;
+      const profile = pickProfile(g.profiles);
       const name = profile?.display_name || profile?.username || 'Someone';
       events.push({
         type: 'multiplayer_win',
@@ -116,7 +122,7 @@ export async function GET(request: NextRequest) {
     }
 
     for (const d of dailySolvesResult.data || []) {
-      const profile = d.profiles as any;
+      const profile = pickProfile(d.profiles);
       const name = profile?.display_name || profile?.username || 'A player';
       events.push({
         type: 'daily_solved',
@@ -132,7 +138,7 @@ export async function GET(request: NextRequest) {
     }
 
     for (const w of whSolvesResult.data || []) {
-      const profile = w.profiles as any;
+      const profile = pickProfile(w.profiles);
       const name = profile?.display_name || profile?.username || 'A detective';
       events.push({
         type: 'word_hunt_solved',
@@ -144,7 +150,7 @@ export async function GET(request: NextRequest) {
     }
 
     for (const b of blastScoresResult.data || []) {
-      const profile = b.profiles as any;
+      const profile = pickProfile(b.profiles);
       const name = profile?.display_name || profile?.username || 'A blaster';
       events.push({
         type: 'blast_highscore',
@@ -157,7 +163,7 @@ export async function GET(request: NextRequest) {
 
     for (const lw of longWordsResult.data || []) {
       if (lw.longest_word && lw.longest_word.length >= 7) {
-        const profile = lw.profiles as any;
+        const profile = pickProfile(lw.profiles);
         const name = profile?.display_name || profile?.username || 'A wordsmith';
         events.push({
           type: 'long_word',

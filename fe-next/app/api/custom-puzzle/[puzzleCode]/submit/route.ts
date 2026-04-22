@@ -149,7 +149,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     );
 
     // Insert attempt (uses unique constraint to prevent duplicates)
-    const insertData: any = {
+    const insertData: Record<string, unknown> = {
       puzzle_id: puzzle.id,
       player_id: user?.id || null,
       guest_fingerprint: user ? null : (guestFingerprint || null),
