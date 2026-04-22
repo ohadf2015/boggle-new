@@ -16,6 +16,8 @@ import { createPlayerPresenceHandler } from '@/shared/utils/presenceUtils';
 import { useGameActions } from '@/hooks/gameState';
 import logger from '@/utils/logger';
 import type { AchievementPayload } from '@/shared/types/socket';
+import type { LeaderboardEntry, LetterGrid } from '@/shared/types/game';
+import type { Player } from '@/hooks/gameState/types';
 
 interface UsePlayerSessionEventsProps {
   socket: Socket | null;
@@ -24,6 +26,17 @@ interface UsePlayerSessionEventsProps {
   queueAchievement: (achievement: AchievementPayload) => void;
   intentionalExitRef: MutableRefObject<boolean>;
 }
+
+interface UpdateUsersPayload { users?: Player[] }
+interface ShufflingGridPayload {
+  grid?: LetterGrid;
+  highlightedCells?: Array<{ row: number; col: number }>;
+}
+interface LeaderboardUpdatePayload { leaderboard: LeaderboardEntry[] }
+interface LiveAchievementPayload { achievements?: unknown[] }
+interface HostMessagePayload { message?: string }
+interface HostTransferredPayload { message?: string; newHost?: string }
+interface SocketErrorEventPayload { code?: string; message?: string }
 
 /**
  * Hook for managing player session-related socket events
@@ -74,11 +87,11 @@ export function usePlayerSessionEvents({
   useEffect(() => {
     if (!socket) return;
 
-    const handleUpdateUsers = (data: any) => {
+    const handleUpdateUsers = (data: UpdateUsersPayload) => {
       setPlayersReady(data.users || []);
     };
 
-    const handleShufflingGridUpdate = (data: any) => {
+    const handleShufflingGridUpdate = (data: ShufflingGridPayload) => {
       if (data.grid) {
         setShufflingGrid(data.grid);
       }
@@ -87,18 +100,18 @@ export function usePlayerSessionEvents({
       }
     };
 
-    const handleUpdateLeaderboard = (data: any) => {
+    const handleUpdateLeaderboard = (data: LeaderboardUpdatePayload) => {
       setLeaderboard(data.leaderboard);
     };
 
-    const handleLiveAchievementUnlocked = (data: any) => {
+    const handleLiveAchievementUnlocked = (data: LiveAchievementPayload) => {
       const validAchievements = processAchievements(data, queueAchievement, 'PLAYER');
       if (validAchievements.length > 0) {
         setAchievements(prev => [...prev, ...validAchievements]);
       }
     };
 
-    const handleHostDisconnected = (data: any) => {
+    const handleHostDisconnected = (data: HostMessagePayload) => {
       logger.log('[PLAYER] Host disconnected, waiting for reconnection');
       neoInfoToast(data.message || t('playerView.hostDisconnected') || 'Host disconnected. Waiting for reconnection...', {
         icon: TOAST_ICONS.hourglass,
@@ -106,7 +119,7 @@ export function usePlayerSessionEvents({
       });
     };
 
-    const handleHostTransferred = (data: any) => {
+    const handleHostTransferred = (data: HostTransferredPayload) => {
       logger.log('[PLAYER] Host transferred to:', data.newHost);
       neoSuccessToast(data.message || `${data.newHost} ${t('playerView.isNowHost') || 'is now the host'}`, {
         icon: TOAST_ICONS.crown,
@@ -114,7 +127,7 @@ export function usePlayerSessionEvents({
       });
     };
 
-    const handleSessionTakenOver = (data: any) => {
+    const handleSessionTakenOver = (data: HostMessagePayload) => {
       logger.log('[PLAYER] Session taken over by another tab');
       intentionalExitRef.current = true;
       clearSessionPreservingUsername(username);
@@ -124,7 +137,7 @@ export function usePlayerSessionEvents({
       });
     };
 
-    const handleSessionMigrated = (data: any) => {
+    const handleSessionMigrated = (data: HostMessagePayload) => {
       logger.log('[PLAYER] Session migrated to different room');
       intentionalExitRef.current = true;
       clearSessionPreservingUsername(username);
@@ -133,7 +146,7 @@ export function usePlayerSessionEvents({
       });
     };
 
-    const handleError = (data: any) => {
+    const handleError = (data: SocketErrorEventPayload) => {
       const message = socketErrorMessage(data, t);
       wordErrorToast(message, { duration: 3000 });
     };
