@@ -25,7 +25,11 @@ export function AdMobProvider({ children }: { children: ReactNode }) {
     initPromise.current = isNative
       ? AdMob.initialize({ initializeForTesting: process.env.NODE_ENV !== 'production' })
           .then(() => undefined)
-          .catch(() => undefined)
+          .catch((err) => {
+            // Surface init failures so Crashlytics/Sentry can capture them — silent swallow
+            // here was masking the root cause of "no ads showing" reports.
+            console.error('[AdMob] initialize failed', err);
+          })
       : Promise.resolve();
   }
 
