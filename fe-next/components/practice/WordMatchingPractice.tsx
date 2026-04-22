@@ -21,6 +21,7 @@ import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import PracticeResultsCard from './PracticeResultsCard';
 import { useMatchingGame, type MatchingItem } from './hooks/useMatchingGame';
 import type { VocabularyWord } from '@/lib/supabase/education/types';
+import type { EnrichedVocabularyWord } from '@/types/vocabulary';
 import { WordContextRow } from './WordContextRow';
 import { PronunciationButton } from '@/components/practice/PronunciationButton';
 
@@ -309,8 +310,8 @@ export const WordMatchingPractice = memo<WordMatchingPracticeProps>(
                         />
                       </div>
                       <WordContextRow
-                        partOfSpeech={(wordData as any)?.partOfSpeech}
-                        example={(wordData as any)?.examples?.[0]?.text}
+                        partOfSpeech={(wordData as Partial<EnrichedVocabularyWord> | undefined)?.partOfSpeech}
+                        example={(wordData as Partial<EnrichedVocabularyWord> | undefined)?.examples?.[0]?.text}
                       />
                     </div>
                   );

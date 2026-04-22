@@ -9,6 +9,7 @@ import { ArrowLeft, Lightbulb, Check, X } from 'lucide-react';
 import { useSpellingGame } from './hooks/useSpellingGame';
 import PracticeResultsCard from './PracticeResultsCard';
 import type { VocabularyWord } from '@/lib/supabase/education/types';
+import type { EnrichedVocabularyWord } from '@/types/vocabulary';
 import { WordContextRow } from './WordContextRow';
 import { PronunciationButton } from './PronunciationButton';
 
@@ -225,8 +226,8 @@ export function SpellingChallengePractice({
               {currentWord?.definition || t('education.practice.noWords')}
             </p>
             <WordContextRow
-              partOfSpeech={(sortedWords[wordIndex] as any)?.partOfSpeech}
-              example={(sortedWords[wordIndex] as any)?.examples?.[0]?.text}
+              partOfSpeech={(sortedWords[wordIndex] as Partial<EnrichedVocabularyWord>)?.partOfSpeech}
+              example={(sortedWords[wordIndex] as Partial<EnrichedVocabularyWord>)?.examples?.[0]?.text}
             />
           </AdaptiveMotion.div>
         </AdaptiveAnimatePresence>
