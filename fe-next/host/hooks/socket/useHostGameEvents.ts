@@ -15,8 +15,83 @@ import {
 } from '@/shared/utils/gameEventUtils';
 import { createEarthquakeSocketHandlers } from '@/shared/utils/earthquakeSocketHandlers';
 import logger from '@/utils/logger';
-import type { StartGameBroadcast, XpGainedPayload, LevelUpPayload } from '@/shared/types/socket';
+import type { StartGameBroadcast, XpGainedPayload, LevelUpPayload, PlayerResultPayload } from '@/shared/types/socket';
+import type { BlastTileOverlay, LetterFeedback, BlastPlayerStats, WheelRushPlayerStats } from '@/shared/types/game';
+import type { Player } from '@/hooks/useGameState';
+import type { LetterGrid, Language } from '@/types';
+import type { TournamentData } from '@/shared/types/view';
 import { useGameStore } from '@/hooks/gameState/store';
+
+interface StartGameBroadcastExt extends StartGameBroadcast {
+  gameSessionId?: number;
+  reconnect?: boolean;
+  blastTileOverlay?: BlastTileOverlay[];
+  blastSeed?: number | null;
+  blastWave?: number;
+  wordHuntTargetLength?: number;
+  wordHuntTargetCategory?: string | null;
+  wordHuntPlayerLives?: Record<string, number>;
+  wordHuntEliminatedPlayers?: string[];
+}
+
+interface WordHuntSummary {
+  targetWord: string;
+  playerLives: Record<string, number>;
+  eliminatedPlayers: string[];
+  targetFoundBy: string | null;
+  foundTarget: boolean;
+  survivalTime: number;
+  discoveryWords: number;
+}
+
+interface BlastSummary {
+  playerMoves: Record<string, number>;
+  playerStats: Record<string, BlastPlayerStats>;
+}
+
+interface WheelRushSummary {
+  playerStats: Record<string, WheelRushPlayerStats>;
+}
+
+interface ValidatedScoresPayload {
+  scores: PlayerResultPayload[];
+  letterGrid: LetterGrid | null;
+  duplicateRuleDisabled?: boolean;
+  playerCount?: number;
+  gameMode?: string;
+  wordHuntSummary?: WordHuntSummary;
+  blastSummary?: BlastSummary;
+  wheelRushSummary?: WheelRushSummary;
+}
+
+interface TimeUpdatePayload {
+  remainingTime: number;
+  letterGrid?: LetterGrid;
+  language?: Language;
+  gameSessionId?: number;
+}
+
+interface ResetGamePayload {
+  gameSessionId?: number;
+  message?: string;
+  users?: Player[];
+}
+
+export interface OnShowResultsData {
+  scores: PlayerResultPayload[];
+  letterGrid: LetterGrid | null;
+  duplicateRuleDisabled?: boolean;
+  playerCount?: number;
+  wordHuntSummary?: WordHuntSummary;
+  blastSummary?: BlastSummary;
+  wheelRushSummary?: WheelRushSummary;
+}
+
+interface FinalScoresState {
+  players: PlayerResultPayload[];
+  gameCode: string;
+  wordHuntSummary?: WordHuntSummary;
+}
 
 interface UseHostGameEventsProps {
   socket: Socket | null;
@@ -28,19 +103,19 @@ interface UseHostGameEventsProps {
   // State setters
   setGameStarted: React.Dispatch<React.SetStateAction<boolean>>;
   setShowStartAnimation: React.Dispatch<React.SetStateAction<boolean>>;
-  setTableData: React.Dispatch<React.SetStateAction<any>>;
+  setTableData: React.Dispatch<React.SetStateAction<LetterGrid | null>>;
   setRemainingTime: React.Dispatch<React.SetStateAction<number | null>>;
   setWaitingForResults: React.Dispatch<React.SetStateAction<boolean>>;
-  setFinalScores: React.Dispatch<React.SetStateAction<any>>;
-  setPlayersReady?: React.Dispatch<React.SetStateAction<any[]>>;
+  setFinalScores: React.Dispatch<React.SetStateAction<FinalScoresState | null>>;
+  setPlayersReady?: React.Dispatch<React.SetStateAction<Player[]>>;
   setPlayerWordCounts: React.Dispatch<React.SetStateAction<Record<string, number>>>;
   setPlayerScores: React.Dispatch<React.SetStateAction<Record<string, number>>>;
-  setPlayerAchievements: React.Dispatch<React.SetStateAction<Record<string, any[]>>>;
+  setPlayerAchievements: React.Dispatch<React.SetStateAction<Record<string, unknown[]>>>;
   setHostFoundWords: React.Dispatch<React.SetStateAction<string[]>>;
-  setHostAchievements: React.Dispatch<React.SetStateAction<any[]>>;
-  setTournamentData: React.Dispatch<React.SetStateAction<any>>;
+  setHostAchievements: React.Dispatch<React.SetStateAction<unknown[]>>;
+  setTournamentData: React.Dispatch<React.SetStateAction<TournamentData | null>>;
   setTournamentCreating: React.Dispatch<React.SetStateAction<boolean>>;
-  setShufflingGrid: React.Dispatch<React.SetStateAction<any>>;
+  setShufflingGrid: React.Dispatch<React.SetStateAction<LetterGrid | null>>;
 
   // XP state setters
   setXpGainedData: React.Dispatch<React.SetStateAction<XpGainedPayload | null>>;
@@ -62,7 +137,7 @@ interface UseHostGameEventsProps {
   intentionalExitRef: RefObject<boolean>;
 
   // Callbacks
-  onShowResults?: (data: { scores: any; letterGrid: any; duplicateRuleDisabled?: boolean; playerCount?: number; wordHuntSummary?: any; blastSummary?: any; wheelRushSummary?: any }) => void;
+  onShowResults?: (data: OnShowResultsData) => void;
   onGameStart?: () => void;
 }
 
@@ -114,7 +189,7 @@ export function useHostGameEvents({
   const onGameStartRef = useRef(onGameStart);
   const gameStartedRef = useRef(gameStarted);
   const hostPlayingRef = useRef(hostPlaying);
-  const tableDataRef = useRef<any>(null);
+  const tableDataRef = useRef<LetterGrid | null>(null);
 
   useEffect(() => {
     onShowResultsRef.current = onShowResults;
@@ -177,7 +252,7 @@ export function useHostGameEvents({
     if (!socket) return;
 
     const handleStartGame = (data: StartGameBroadcast) => {
-      const extData = data as StartGameBroadcast & { gameSessionId?: number; reconnect?: boolean; gameMode?: string; blastTileOverlay?: any; blastSeed?: number | null; blastWave?: number; wordHuntTargetLength?: number; wordHuntPlayerLives?: Record<string, number>; wordHuntEliminatedPlayers?: string[] };
+      const extData = data as StartGameBroadcastExt;
 
       // Validate session ID - ignore stale startGame from previous sessions
       if (gameSessionIdRef.current !== null && extData.gameSessionId !== undefined &&
@@ -231,7 +306,7 @@ export function useHostGameEvents({
       if (extData.wordHuntTargetLength != null && extData.wordHuntTargetLength > 0) {
         const store = useGameStore.getState();
         store.setWordHuntTargetLength(extData.wordHuntTargetLength);
-        store.setWordHuntTargetCategory((extData as any).wordHuntTargetCategory ?? null);
+        store.setWordHuntTargetCategory(extData.wordHuntTargetCategory ?? null);
         store.setWordHuntMyLife(100);
         store.setWordHuntPlayerLives(extData.wordHuntPlayerLives || {});
         store.setWordHuntTargetAttempts([]);
@@ -300,7 +375,7 @@ export function useHostGameEvents({
       }, 15000);
     };
 
-    const handleTimeUpdate = (data: any) => {
+    const handleTimeUpdate = (data: TimeUpdatePayload) => {
       // Ignore stale events from previous sessions
       if (data.gameSessionId !== undefined && data.gameSessionId !== gameSessionIdRef.current) {
         logger.log('[HOST] Ignoring stale timeUpdate from old session:', data.gameSessionId);
@@ -340,7 +415,7 @@ export function useHostGameEvents({
       }
     };
 
-    const handleValidationComplete = (data: any) => {
+    const handleValidationComplete = (data: ValidatedScoresPayload) => {
       // Guard against duplicate validationComplete events using session ID
       if (hasProcessedResultsRef.current === gameSessionIdRef.current) {
         logger.log('[HOST] Ignoring duplicate validationComplete - already processed for session:', gameSessionIdRef.current);
@@ -410,7 +485,7 @@ export function useHostGameEvents({
       }
     };
 
-    const handleResetGame = (data: any) => {
+    const handleResetGame = (data: ResetGamePayload) => {
       // Validate session - only process reset for current or newer session
       if (data.gameSessionId !== undefined && gameSessionIdRef.current !== null &&
           data.gameSessionId < gameSessionIdRef.current) {
@@ -480,10 +555,10 @@ export function useHostGameEvents({
       }
     };
 
-    const handleWordHuntTargetResult = (data: { guess: string; feedback: any[]; correct: boolean; isFirstFinder: boolean; bonus: number; livesRemaining: number; isDiscovery?: boolean }) => {
+    const handleWordHuntTargetResult = (data: { guess: string; feedback: LetterFeedback[]; correct: boolean; isFirstFinder: boolean; bonus: number; livesRemaining: number; isDiscovery?: boolean }) => {
       logger.log('[HOST] Word hunt target result:', data);
       const store = useGameStore.getState();
-      store.setWordHuntTargetAttempts((prev: Array<{ guess: string; feedback: any[]; isDiscovery?: boolean }>) => [...prev, { guess: data.guess, feedback: data.feedback, isDiscovery: data.isDiscovery || false }]);
+      store.setWordHuntTargetAttempts((prev: Array<{ guess: string; feedback: LetterFeedback[]; isDiscovery?: boolean }>) => [...prev, { guess: data.guess, feedback: data.feedback, isDiscovery: data.isDiscovery || false }]);
       store.setWordHuntMyLife(data.livesRemaining);
       if (data.correct) {
         store.setWordHuntTargetFound(true);
