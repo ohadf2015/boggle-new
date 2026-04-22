@@ -2193,7 +2193,8 @@ const he = {
       "shared": "כולם"
     },
     "uniqueWords": {
-      "title": "המילים הייחודיות שלך"
+      "title": "המילים הייחודיות שלך",
+      "label": "רק את/ה"
     },
     "sessionStats": {
       "title": "נקודות עיקריות מהסשן",

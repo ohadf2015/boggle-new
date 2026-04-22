@@ -2175,7 +2175,8 @@ const ja = {
       "shared": "全員"
     },
     "uniqueWords": {
-      "title": "あなただけの単語"
+      "title": "あなただけの単語",
+      "label": "あなただけ"
     },
     "sessionStats": {
       "title": "セッションハイライト",
