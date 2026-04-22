@@ -20,6 +20,7 @@ import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useModalQueue } from '@/hooks/useModalQueue';
 import { trackModalDismissed } from '@/utils/posthogEngagement';
 import type { WordToVote } from '@/types/components';
+import type { ReferralMilestone, LevelUpPayload } from '@/shared/types/socket';
 
 // Dynamic imports for modals (loaded after initial render)
 const WordFeedbackModal = dynamic(() => import('@/components/voting/WordFeedbackModal'), { ssr: false });
@@ -49,7 +50,7 @@ interface WordFeedbackState {
 /** Referral milestone modal state */
 interface ReferralMilestoneState {
   /** Milestone data */
-  milestone: any;
+  milestone: ReferralMilestone | null;
   /** Whether milestone modal is visible */
   showReferralMilestone: boolean;
   /** Close handler callback */
@@ -59,13 +60,13 @@ interface ReferralMilestoneState {
 /** Level up celebration state */
 interface LevelUpState {
   /** Level up data (new level, XP gained, etc.) */
-  levelUpData: any;
+  levelUpData: LevelUpPayload | null;
   /** Whether celebration is visible */
   showLevelUpCelebration: boolean;
   /** Close handler callback */
   setShowLevelUpCelebration: (show: boolean) => void;
   /** Clear level up data after display */
-  setLevelUpData?: (data: any) => void;
+  setLevelUpData?: (data: LevelUpPayload | null) => void;
 }
 
 /** Auth modal state */
