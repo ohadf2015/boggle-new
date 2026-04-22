@@ -5,6 +5,7 @@ import { Calendar, Clock, X, Zap } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { cn } from '@/lib/utils';
+import { formatCountdownFromMs } from '@/shared/utils';
 
 interface EventConfig {
   theme?: string;
@@ -30,14 +31,6 @@ interface EventBannerProps {
   onDismiss: () => void;
   hasJoined?: boolean;
   className?: string;
-}
-
-function formatCountdown(ms: number): string {
-  if (ms <= 0) return '0:00:00';
-  const hours = Math.floor(ms / (1000 * 60 * 60));
-  const minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
-  const seconds = Math.floor((ms % (1000 * 60)) / 1000);
-  return `${hours}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 }
 
 const EventBanner: React.FC<EventBannerProps> = ({
@@ -111,7 +104,7 @@ const EventBanner: React.FC<EventBannerProps> = ({
               <div className="flex items-center gap-2 mt-2" data-testid="event-countdown">
                 <Clock size={14} className="text-white/60" />
                 <span className="text-sm font-mono text-white/80">
-                  {t('events.endsIn')} {formatCountdown(timeRemaining)}
+                  {t('events.endsIn')} {formatCountdownFromMs(timeRemaining)}
                 </span>
               </div>
 

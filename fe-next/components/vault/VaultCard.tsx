@@ -11,6 +11,7 @@ import { LockOpen, Lock, Clock, Trophy } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { cn } from '@/lib/utils';
+import { formatCountdownFromMs } from '@/shared/utils';
 
 interface VaultBoard {
   id: string;
@@ -42,14 +43,6 @@ interface VaultCardProps {
   className?: string;
 }
 
-function formatCountdown(ms: number): string {
-  if (ms <= 0) return '0:00:00';
-  const hours = Math.floor(ms / (1000 * 60 * 60));
-  const minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
-  const seconds = Math.floor((ms % (1000 * 60)) / 1000);
-  return `${hours}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-}
-
 const MEDAL_COLORS = ['#FFD700', '#C0C0C0', '#CD7F32'] as const;
 
 const VaultCard: React.FC<VaultCardProps> = ({
@@ -77,7 +70,7 @@ const VaultCard: React.FC<VaultCardProps> = ({
   }, [isActive, nextOpensIn]);
 
   const top3 = leaderboard.slice(0, 3);
-  const countdownStr = formatCountdown(isActive ? localTime : (nextOpensIn ?? 0));
+  const countdownStr = formatCountdownFromMs(isActive ? localTime : (nextOpensIn ?? 0));
 
   if (!isActive && !nextOpensIn) return null;
 

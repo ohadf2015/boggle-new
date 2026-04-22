@@ -33,6 +33,18 @@ export function formatTimeHHMMSS(seconds: number): string {
 }
 
 /**
+ * Format milliseconds as H:MM:SS, clamped to 0 when non-positive.
+ * Used for countdowns that carry millisecond precision (vault, events).
+ */
+export function formatCountdownFromMs(ms: number): string {
+  if (ms <= 0) return '0:00:00';
+  const hours = Math.floor(ms / 3_600_000);
+  const minutes = Math.floor((ms % 3_600_000) / 60_000);
+  const seconds = Math.floor((ms % 60_000) / 1000);
+  return `${hours}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+}
+
+/**
  * Format seconds intelligently - shows HH:MM:SS if hours > 0, else MM:SS
  * Adapts based on duration length
  */
