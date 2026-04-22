@@ -42,8 +42,10 @@ const PATHS_WITH_OWN_NAV = [
   '/join',
 ];
 
-// Matches h-16 on GlobalBottomNav (64px). Safe-area padding is absorbed by the
-// AdMob plugin at BOTTOM_CENTER, so the margin only needs to clear the nav's content.
+// Matches h-16 on GlobalBottomNav (64px). On iOS the plugin anchors above the
+// home indicator via safeAreaLayoutGuide, so margin only needs the nav's content
+// height. On Android the plugin measures margin from the absolute bottom of the
+// webview, so safe-area-bottom (gesture bar) must be added manually.
 const GLOBAL_BOTTOM_NAV_HEIGHT = 64;
 
 function isAllowedRoute(pathname: string | null): boolean {
@@ -93,9 +95,14 @@ export default function AnchoredNativeBanner() {
 
     if (isAllowedRoute(pathname)) {
       // Banner sits ABOVE the GlobalBottomNav (when present) so the nav stays flush
-      // at the viewport bottom. Plugin auto-excludes iOS safe-area, so margin only
-      // needs to clear the nav's visible height; on pages without the nav, margin=0.
-      const margin = hasGlobalBottomNav(pathname) ? GLOBAL_BOTTOM_NAV_HEIGHT : 0;
+      // at the viewport bottom. iOS plugin uses safeAreaLayoutGuide (auto-excludes
+      // home indicator); Android plugin measures from absolute webview bottom, so we
+      // add safe-area-bottom to clear the nav's gesture-bar padding.
+      const navHeight = hasGlobalBottomNav(pathname) ? GLOBAL_BOTTOM_NAV_HEIGHT : 0;
+      const isAndroid = Capacitor.getPlatform() === 'android';
+      const margin = navHeight > 0 && isAndroid
+        ? navHeight + (safeArea.bottom || 0)
+        : navHeight;
       (async () => {
         await hideBanner();
         if (cancelled) return;
@@ -109,7 +116,7 @@ export default function AnchoredNativeBanner() {
     return () => {
       cancelled = true;
     };
-  }, [pathname, showBanner, hideBanner]);
+  }, [pathname, showBanner, hideBanner, safeArea.bottom]);
 
   return null;
 }
