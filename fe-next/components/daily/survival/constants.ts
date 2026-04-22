@@ -32,10 +32,10 @@ export const NEW_PLAYER_THRESHOLD = 3;
 /**
  * Minimum life floor for new players (percentage).
  * New players' life will never drain below this value,
- * keeping them in the "yellow" zone instead of dying.
- * This lets first-timers learn without the stress of game-over.
+ * so first-timers can't lose via the timer alone.
+ * Kept low (critical zone) so the bar doesn't look frozen.
  */
-export const NEW_PLAYER_LIFE_FLOOR = 34;
+export const NEW_PLAYER_LIFE_FLOOR = 5;
 
 /**
  * Life bonus awarded for discovering long words

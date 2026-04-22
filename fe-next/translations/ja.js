@@ -5232,6 +5232,12 @@ const ja = {
       "blurbSolveRate": "今日解いたのはわずか{solveRate}%のプレイヤーです。"
     },
     "survival": {
+      "extraLifeModal": {
+        "title": "続ける？",
+        "body": "ライフがなくなりました。短い広告を見てHPを回復し、ランを続けましょう。",
+        "cta": "広告を見て +{amount} HP",
+        "decline": "ランを終了"
+      },
       "keyboardTip": "グリッドをスワイプするかキーボードで入力",
       "shop": "ヒントショップ",
       "revealLetter": "文字を表示",

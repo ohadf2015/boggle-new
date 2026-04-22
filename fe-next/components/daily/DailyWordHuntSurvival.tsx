@@ -27,6 +27,9 @@ import {
   AutoClueNotification,
 } from './survival';
 import { SurvivalDesktopLayout } from './survival/SurvivalDesktopLayout';
+import { SurvivalExtraLifeModal } from './survival/SurvivalExtraLifeModal';
+
+const EXTRA_LIFE_RESTORE_AMOUNT = 50;
 
 // Re-export types for backwards compatibility
 export type { WordDiscovery, TargetAttempt, SurvivalGameResult } from './survival/types';
@@ -74,6 +77,10 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     [isLowEnd, enableComplexAnimations]
   );
 
+  // Extra-life offer state (rewarded ad on life=0, single-use per run)
+  const hasUsedExtraLifeRef = useRef(false);
+  const [extraLifeDeclined, setExtraLifeDeclined] = useState(false);
+
   // Game logic hook
   const [state, actions] = useSurvivalGameLogic({
     grid,
@@ -82,7 +89,24 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     targetWord,
     onComplete,
     t,
+    deferGameOver:
+      !hasUsedExtraLifeRef.current && !extraLifeDeclined,
   });
+
+  const extraLifeModalOpen =
+    !hasUsedExtraLifeRef.current
+    && !extraLifeDeclined
+    && state.lifePoints === 0
+    && !state.isGameOver;
+
+  const handleExtraLifeAccept = () => {
+    hasUsedExtraLifeRef.current = true;
+    actions.restoreLife(EXTRA_LIFE_RESTORE_AMOUNT);
+  };
+
+  const handleExtraLifeDecline = () => {
+    setExtraLifeDeclined(true);
+  };
 
   // Navigation guard
   useNavigationGuard({
@@ -232,6 +256,16 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
           analyticsId="daily_survival_quit_confirm"
           analyticsExtras={{ orientation: 'landscape' }}
         />
+
+        {extraLifeModalOpen && (
+          <SurvivalExtraLifeModal
+            isOpen
+            restoreAmount={EXTRA_LIFE_RESTORE_AMOUNT}
+            onRestore={handleExtraLifeAccept}
+            onDecline={handleExtraLifeDecline}
+            t={t}
+          />
+        )}
       </>
     );
   }
@@ -396,6 +430,16 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         analyticsId="daily_survival_quit_confirm"
         analyticsExtras={{ orientation: 'portrait' }}
       />
+
+      {extraLifeModalOpen && (
+        <SurvivalExtraLifeModal
+          isOpen
+          restoreAmount={EXTRA_LIFE_RESTORE_AMOUNT}
+          onRestore={handleExtraLifeAccept}
+          onDecline={handleExtraLifeDecline}
+          t={t}
+        />
+      )}
     </motion.div>
   );
 };

@@ -35,6 +35,7 @@ export interface UseSurvivalGameLogicProps {
   targetWord: string;
   onComplete: (result: SurvivalGameResult) => void;
   t: (key: string) => string;
+  deferGameOver?: boolean;
 }
 
 export interface SurvivalGameState {
@@ -107,6 +108,7 @@ export interface SurvivalGameActions {
   setLifeGainAmount: (amount: number | null) => void;
   showAutoClueNotification: (clueType: string) => void;
   dismissNotification: (id: string) => void;
+  restoreLife: (amount: number) => void;
   gameDir: 'ltr' | 'rtl';
   clueContainerRef: React.RefObject<HTMLDivElement | null>;
 }
@@ -118,6 +120,7 @@ export function useSurvivalGameLogic({
   targetWord,
   onComplete,
   t,
+  deferGameOver = false,
 }: UseSurvivalGameLogicProps): [SurvivalGameState, SurvivalGameActions] {
   const { user } = useAuth();
   const { playWordAcceptedSound, playWordRejectedSound, setGameActive } = useSoundEffects();
@@ -267,12 +270,15 @@ export function useSurvivalGameLogic({
     };
   }, [state.isGameOver, drainRate, lifeDrainInterval]);
 
-  // Check for life-based game over
+  // Check for life-based game over. While `deferGameOver` is true (e.g. a
+  // rewarded-ad extra-life modal is open), suppress the finale so the reducer
+  // can be restored via `restoreLife` without the one-shot `gameOverRef`
+  // latching on a transient zero.
   useEffect(() => {
-    if (state.lifePoints === 0 && !gameOverRef.current) {
+    if (state.lifePoints === 0 && !gameOverRef.current && !deferGameOver) {
       handleGameOverRef.current?.(false);
     }
-  }, [state.lifePoints]);
+  }, [state.lifePoints, deferGameOver]);
 
   // Auto-win when player discovers all green clues
   // This triggers when the player knows the full word through gameplay
@@ -475,6 +481,10 @@ export function useSurvivalGameLogic({
     dispatch({ type: 'SET_LIFE_GAIN_ANIMATION', payload: { amount, isGaining: amount !== null } });
   }, []);
 
+  const restoreLife = useCallback((amount: number) => {
+    dispatch({ type: 'RESTORE_LIFE', payload: { amount } });
+  }, []);
+
   const returnState: SurvivalGameState = {
     lifePoints: state.lifePoints,
     isGameOver: state.isGameOver,
@@ -528,6 +538,7 @@ export function useSurvivalGameLogic({
     setLifeGainAmount,
     showAutoClueNotification,
     dismissNotification,
+    restoreLife,
     gameDir,
     clueContainerRef,
   };

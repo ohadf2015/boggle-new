@@ -5161,6 +5161,12 @@ const es = {
       "blurbSolveRate": "Solo el {solveRate}% de los jugadores resolvió hoy."
     },
     "survival": {
+      "extraLifeModal": {
+        "title": "¿Continuar?",
+        "body": "Te quedaste sin vida. Mira un anuncio corto para recuperar HP y continuar la partida.",
+        "cta": "Ver anuncio por +{amount} HP",
+        "decline": "Terminar partida"
+      },
       "keyboardTip": "Desliza en la cuadrícula o escribe con el teclado",
       "shop": "Tienda de Pistas",
       "revealLetter": "Revelar Letra",

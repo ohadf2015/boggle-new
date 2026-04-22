@@ -5211,6 +5211,12 @@ const sv = {
       "blurbSolveRate": "Bara {solveRate}% av spelarna löste idag."
     },
     "survival": {
+      "extraLifeModal": {
+        "title": "Fortsätta?",
+        "body": "Du har slut på liv. Titta på en snabb annons för att återställa HP och fortsätta rundan.",
+        "cta": "Se annons för +{amount} HP",
+        "decline": "Avsluta rundan"
+      },
       "keyboardTip": "Svep på rutnätet eller skriv med tangentbordet",
       "shop": "Ledtrådsbutik",
       "revealLetter": "Avslöja bokstav",

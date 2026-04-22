@@ -5191,6 +5191,12 @@ const he = {
       "blurbSolveRate": "רק {solveRate}% מהשחקנים פתרו היום."
     },
     "survival": {
+      "extraLifeModal": {
+        "title": "להמשיך?",
+        "body": "נגמרו לך החיים. צפה בפרסומת קצרה כדי לשחזר HP ולהמשיך את הריצה.",
+        "cta": "צפה בפרסומת ל־+{amount} HP",
+        "decline": "סיים ריצה"
+      },
       "keyboardTip": "החלק על הלוח או הקלד עם המקלדת",
       "shop": "חנות רמזים",
       "revealLetter": "חשוף אות",

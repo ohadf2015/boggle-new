@@ -5309,6 +5309,12 @@ const en = {
       "blurbSolveRate": "Only {solveRate}% of players solved today."
     },
     "survival": {
+      "extraLifeModal": {
+        "title": "Keep going?",
+        "body": "You're out of life. Watch a quick ad to restore HP and continue this run.",
+        "cta": "Watch Ad for +{amount} HP",
+        "decline": "End run"
+      },
       "keyboardTip": "Swipe on grid or type with keyboard",
       "shop": "Clue Shop",
       "revealLetter": "Reveal Letter",
