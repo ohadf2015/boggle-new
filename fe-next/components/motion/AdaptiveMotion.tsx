@@ -86,15 +86,11 @@ function createAdaptiveComponent(
 
     // If animations should be skipped, render static element
     if (shouldSkip || skipAnimation) {
-      // Extract only valid HTML attributes for static element
-       
-      const Element = element as any;
+      const Element = element as React.ElementType;
       return <Element {...restProps} />;
     }
 
-    // Render full motion component
-     
-    const Component = MotionComponent as any;
+    const Component = MotionComponent;
     return (
       <Component
         initial={initial}
