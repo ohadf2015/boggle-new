@@ -9,11 +9,27 @@ import { Socket } from 'socket.io-client';
 import { neoSuccessToast, neoErrorToast, neoInfoToast, TOAST_ICONS } from '../../../components/NeoToast';
 import { triggerTournamentCompleteCelebration } from '@/shared/utils/gameEventUtils';
 import { useGameActions } from '@/hooks/gameState';
+import type { TournamentData, TournamentStanding } from '@/hooks/gameState/types';
 
 interface UsePlayerTournamentEventsProps {
   socket: Socket | null;
   t: (key: string) => string;
 }
+
+interface TournamentCreatedPayload { tournament: TournamentData }
+interface TournamentRoundStartingPayload {
+  tournament?: TournamentData;
+  standings?: TournamentStanding[];
+}
+interface TournamentRoundCompletedPayload {
+  tournament?: TournamentData;
+  standings?: TournamentStanding[];
+}
+interface TournamentCompletePayload {
+  tournament?: TournamentData;
+  standings?: TournamentStanding[];
+}
+interface TournamentCancelledPayload { message?: string }
 
 /**
  * Hook for managing player tournament socket events
@@ -27,12 +43,12 @@ export function usePlayerTournamentEvents({
   useEffect(() => {
     if (!socket) return;
 
-    const handleTournamentCreated = (data: any) => {
+    const handleTournamentCreated = (data: TournamentCreatedPayload) => {
       setTournamentData(data.tournament);
       neoSuccessToast(t('hostView.tournamentCreated') || 'Tournament created!', { icon: TOAST_ICONS.trophy, duration: 3000 });
     };
 
-    const handleTournamentRoundStarting = (data: any) => {
+    const handleTournamentRoundStarting = (data: TournamentRoundStartingPayload) => {
       if (data.tournament) {
         setTournamentData(data.tournament);
       }
@@ -44,7 +60,7 @@ export function usePlayerTournamentEvents({
       neoInfoToast(`${t('hostView.tournamentRound')} ${roundNum}/${totalRounds}`, { icon: TOAST_ICONS.target, duration: 3000 });
     };
 
-    const handleTournamentRoundCompleted = (data: any) => {
+    const handleTournamentRoundCompleted = (data: TournamentRoundCompletedPayload) => {
       if (data.standings) {
         setTournamentStandings(data.standings);
         setShowTournamentStandings(true);
@@ -54,7 +70,7 @@ export function usePlayerTournamentEvents({
       }
     };
 
-    const handleTournamentComplete = (data: any) => {
+    const handleTournamentComplete = (data: TournamentCompletePayload) => {
       if (data.standings) {
         setTournamentStandings(data.standings);
         setShowTournamentStandings(true);
@@ -69,7 +85,7 @@ export function usePlayerTournamentEvents({
       }
     };
 
-    const handleTournamentCancelled = (data: any) => {
+    const handleTournamentCancelled = (data: TournamentCancelledPayload) => {
       setTournamentData(null);
       setTournamentStandings([]);
       setShowTournamentStandings(false);
