@@ -53,7 +53,15 @@ export interface UseAdventureLevelCompletionProps {
     objectiveProgress: Record<string, number>,
     isCompletion: boolean
   ) => void;
-  recordCompletion: (data: any) => void;
+  recordCompletion: (data: {
+    isCompletion: boolean;
+    timeRemaining: number;
+    timerSeconds: number;
+    score: number;
+    words: number;
+    wordPath?: Array<{ row: number; col: number }>;
+    targetWord?: string;
+  }) => Promise<void>;
   /** Eagerly save completion to DB (ProgressionContext.completeLevel) — called as soon as level ends */
   saveCompletion: (
     world: number,
@@ -328,8 +336,6 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
         timerSeconds,
         score: gameState.score,
         words: gameState.wordsFound.length,
-        lootDrops,
-        retainedScore: props.retainedScore ?? 0,
       });
 
       // Eagerly save completion to DB — don't wait for Continue button click.
@@ -376,7 +382,7 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
       );
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps -- wordsFound via ref (.length sufficient); earnedGoldRef instead of earnedGold state (stale closure)
-  }, [gameState.isComplete, gameState.stars, gameState.wordsFound.length, gameState.score, timeRemaining, objectives, levelConfig.world, levelConfig.level, timerSeconds, lootDrops, props.retainedScore]);
+  }, [gameState.isComplete, gameState.stars, gameState.wordsFound.length, gameState.score, timeRemaining, objectives, levelConfig.world, levelConfig.level, timerSeconds]);
 
   const handleLevelUpClose = useCallback(() => {
     setLevelUpData(null);

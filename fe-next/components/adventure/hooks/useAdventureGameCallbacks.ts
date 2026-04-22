@@ -6,6 +6,8 @@ import { useCallback } from 'react';
 import toast from 'react-hot-toast';
 import { getWorldConfig } from '@/lib/adventure/levelConfig';
 import type { AdventureAchievementId } from '@/utils/adventureAchievementUtils';
+import type { WorldUnlockCinematicState } from '@/components/adventure/hooks/useAdventureCinematics';
+import type { StoryBeat } from '@/lib/adventure/storyConfig';
 
 interface UseAdventureGameCallbacksParams {
   // Game state
@@ -27,7 +29,7 @@ interface UseAdventureGameCallbacksParams {
   showVictoryCinematic: boolean;
   showWorldUnlockCinematic: boolean;
   handleCinematicCompleteBase: () => void;
-  showWorldUnlock: (props: any) => void;
+  showWorldUnlock: (props: WorldUnlockCinematicState) => void;
   resetCinematics: () => void;
   // Completion
   earnedGold: number;
@@ -52,7 +54,7 @@ interface UseAdventureGameCallbacksParams {
   resetGame: (opts?: { retainedScore?: number }) => void;
   startGame: () => void;
   // Story beat
-  storyBeat: any;
+  storyBeat: StoryBeat | null;
   showLootOrComplete: () => void;
   // Setters
   setShowLevelComplete: (v: boolean) => void;
