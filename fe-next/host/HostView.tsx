@@ -477,7 +477,7 @@ const HostView: React.FC<HostViewProps> = memo(({
           gameCode={gameCode}
           language={state.roomLanguage}
           isTeacher={!!lessonData}
-          allWords={(tournament.finalScores?.players ?? []).flatMap((p: PlayerResult) =>
+          allWords={((tournament.finalScores?.players ?? []) as unknown as PlayerResult[]).flatMap((p) =>
             (p.allWords ?? []).map(w => ({ word: w.word, score: w.score ?? 0, foundBy: [p.username] }))
           )}
         />

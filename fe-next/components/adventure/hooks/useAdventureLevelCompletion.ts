@@ -61,6 +61,8 @@ export interface UseAdventureLevelCompletionProps {
     words: number;
     wordPath?: Array<{ row: number; col: number }>;
     targetWord?: string;
+    lootDrops?: LootDrop[];
+    retainedScore?: number;
   }) => Promise<void>;
   /** Eagerly save completion to DB (ProgressionContext.completeLevel) — called as soon as level ends */
   saveCompletion: (
@@ -129,6 +131,7 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
   // are batched to the next render, so the save effect's closure sees stale 0.
   // The ref is written synchronously and always has the correct value.
   const earnedGoldRef = useRef<number>(0);
+  const lootDropsRef = useRef<LootDrop[]>([]);
   const [nonBossCompleted, setNonBossCompleted] = useState(false);
   const completionProcessedRef = useRef(false);
   /** Tracks whether recordAttempt has been fired to prevent duplicate API calls */
@@ -225,6 +228,7 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
         isFirstCompletion: props.isFirstCompletion ?? true,
         isBossLevel,
       });
+      lootDropsRef.current = drops;
       setLootDrops(drops);
 
       // Accumulate rune fragments from loot drops
@@ -336,6 +340,8 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
         timerSeconds,
         score: gameState.score,
         words: gameState.wordsFound.length,
+        lootDrops: lootDropsRef.current,
+        retainedScore: props.retainedScore,
       });
 
       // Eagerly save completion to DB — don't wait for Continue button click.
