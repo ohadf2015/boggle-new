@@ -8,7 +8,6 @@
  */
 
 import { useRef, useState } from 'react';
-import Image from 'next/image';
 import { X, Zap, Sparkles, Shield, Crown, Check, AlertCircle } from 'lucide-react';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -27,7 +26,8 @@ export interface ComebackBonusModalProps {
 
 type ClaimState = 'idle' | 'claiming' | 'success' | 'error';
 
-const GIF_SRC = '/gifs/of130_httpss.mj.runc6Zotmwau94_--ar_256143_--motion_high_--vi_5c24086f-2c48-40a5-887b-7d91bc779a29_2.gif';
+const VIDEO_WEBM = '/gifs/comeback-bonus.webm';
+const VIDEO_MP4 = '/gifs/comeback-bonus.mp4';
 
 export function ComebackBonusModal({ isOpen, daysAway, tier, playerName, onClose, onClaimed }: ComebackBonusModalProps) {
   const { t } = useLanguage();
@@ -114,15 +114,17 @@ export function ComebackBonusModal({ isOpen, daysAway, tier, playerName, onClose
                   className="relative z-10"
                 >
                   <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-full overflow-hidden border-3 border-neo-pink shadow-hard bg-neo-navy">
-                    <Image
-                      src={GIF_SRC}
-                      alt=""
-                      width={200}
-                      height={200}
+                    <video
+                      autoPlay
+                      loop
+                      muted
+                      playsInline
+                      aria-hidden="true"
                       className="w-full h-full object-cover"
-                      unoptimized
-                      priority
-                    />
+                    >
+                      <source src={VIDEO_WEBM} type="video/webm" />
+                      <source src={VIDEO_MP4} type="video/mp4" />
+                    </video>
                   </div>
                 </AdaptiveMotion.div>
 

@@ -37,6 +37,8 @@ coverage/
 **/*.webm
 **/*.mp4
 **/*.mov
+!fe-next/public/**/*.webm
+!fe-next/public/**/*.mp4
 /test-screenshots
 /screenshots
 fe-next/app-debug.apk
