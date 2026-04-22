@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useHasRealAdProvider } from '@/hooks/useHasRealAdProvider';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useMusic } from '@/contexts/MusicContext';
 import { useBlastSounds } from './hooks/useBlastSounds';
@@ -96,6 +97,7 @@ export function BlastGame({
 }: BlastGameProps) {
   const isMultiplayer = mode === 'multiplayer';
   const { t } = useLanguage();
+  const hasRealAdProvider = useHasRealAdProvider();
   const { playComboSound, playBoardShuffleSound, setGameActive } = useSoundEffects();
   const { fadeToTrack, stopMusic, TRACKS } = useMusic();
   const sounds = useBlastSounds();
@@ -393,7 +395,8 @@ export function BlastGame({
   const hasUsedContinueRef = useRef(false);
   const [continueDeclined, setContinueDeclined] = useState(false);
   const continueModalOpen =
-    !isMultiplayer
+    hasRealAdProvider
+    && !isMultiplayer
     && engine.gameState.isDeadEnd
     && !hasUsedContinueRef.current
     && !continueDeclined;

@@ -1053,6 +1053,16 @@ const es = {
     "saveError": "No se pudo guardar. Inténtalo de nuevo."
   },
   "avatar": {
+    "dailyPart": {
+      "title": "Caída Diaria de Avatar",
+      "description": "Mira un anuncio corto para desbloquear una pieza premium aleatoria. Una entrega gratis cada 24 horas.",
+      "claim": "Ver anuncio y reclamar",
+      "close": "Quizás luego",
+      "ready": "Listo para reclamar — una pieza gratis te espera",
+      "cooldown": "Próxima caída en {time}",
+      "exhausted": "Tienes todas las piezas premium — ¡genial!",
+      "justClaimed": "¡Pieza desbloqueada! Revisa el creador de avatar"
+    },
     "builder": {
       "title": "Crea tu look",
       "base": "Cara",

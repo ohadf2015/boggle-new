@@ -6,6 +6,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useDesktopLayout } from '@/hooks/useDesktopLayout';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { useNavigationGuard } from '@/hooks/useNavigationGuard';
+import { useHasRealAdProvider } from '@/hooks/useHasRealAdProvider';
 import { useKeyboardWordInput } from '@/hooks/useKeyboardWordInput';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
@@ -80,6 +81,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
   // Extra-life offer state (rewarded ad on life=0, single-use per run)
   const hasUsedExtraLifeRef = useRef(false);
   const [extraLifeDeclined, setExtraLifeDeclined] = useState(false);
+  const hasRealAdProvider = useHasRealAdProvider();
 
   // Game logic hook
   const [state, actions] = useSurvivalGameLogic({
@@ -90,11 +92,12 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     onComplete,
     t,
     deferGameOver:
-      !hasUsedExtraLifeRef.current && !extraLifeDeclined,
+      hasRealAdProvider && !hasUsedExtraLifeRef.current && !extraLifeDeclined,
   });
 
   const extraLifeModalOpen =
-    !hasUsedExtraLifeRef.current
+    hasRealAdProvider
+    && !hasUsedExtraLifeRef.current
     && !extraLifeDeclined
     && state.lifePoints === 0
     && !state.isGameOver;

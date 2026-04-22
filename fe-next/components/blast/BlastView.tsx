@@ -4,6 +4,7 @@ import { useState, useCallback, useRef, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { Star } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useHasRealAdProvider } from '@/hooks/useHasRealAdProvider';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { BlastGame } from './BlastGame';
 import { BlastResultsSummary } from './BlastResultsSummary';
@@ -23,6 +24,7 @@ import { saveBlastResult } from './utils/saveBlastResult';
 export function BlastView() {
   const router = useRouter();
   const { language, t } = useLanguage();
+  const hasRealAdProvider = useHasRealAdProvider();
 
   const [phase, setPhase] = useState<BlastPhase>('ready');
   const [results, setResults] = useState<BlastResultsData | null>(null);
@@ -187,7 +189,7 @@ export function BlastView() {
             >
               {t(`blast.pregameBuff.${pregameBuff}`)}
             </div>
-          ) : (
+          ) : hasRealAdProvider ? (
             <button
               data-testid="blast-claim-boost-button"
               onClick={() => setBuffModalOpen(true)}
@@ -195,7 +197,7 @@ export function BlastView() {
             >
               {t('blast.pregameBuff.claim')}
             </button>
-          )}
+          ) : null}
         </div>
       )}
 

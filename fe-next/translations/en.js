@@ -995,6 +995,16 @@ const en = {
     "saveError": "Failed to save. Please try again."
   },
   "avatar": {
+    "dailyPart": {
+      "title": "Daily Avatar Drop",
+      "description": "Watch a quick ad to unlock a random premium avatar part. One free drop every 24 hours.",
+      "claim": "Watch Ad & Claim",
+      "close": "Maybe Later",
+      "ready": "Ready to claim — one free part on the house",
+      "cooldown": "Next drop in {time}",
+      "exhausted": "You own every premium part — nice!",
+      "justClaimed": "Part unlocked! Check your avatar builder"
+    },
     "builder": {
       "title": "Make Your Look",
       "base": "Face",

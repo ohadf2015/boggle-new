@@ -369,6 +369,9 @@ export function getPremiumParts(category: string): string[] {
   return [...(PREMIUM_MAP[category] ?? [])];
 }
 
+/** All categories that have premium parts (for iteration) */
+export const PREMIUM_CATEGORIES = Object.keys(PREMIUM_MAP) as readonly string[];
+
 // Free-only arrays (all premium+epic parts filtered out) for random generation
 // Also exclude 'none' from face parts so random avatars always have a complete face
 const FREE_BASES = AVATAR_BASES.filter(v => !PREMIUM_MAP.base.includes(v));

@@ -1010,6 +1010,16 @@ const sv = {
     "saveError": "Det gick inte att spara. Försök igen."
   },
   "avatar": {
+    "dailyPart": {
+      "title": "Dagligt Avatardrop",
+      "description": "Titta på en kort annons för att låsa upp en slumpmässig premium-avatardel. Ett gratisdrop var 24:e timme.",
+      "claim": "Titta & Hämta",
+      "close": "Kanske senare",
+      "ready": "Redo att hämta — en gratis del väntar",
+      "cooldown": "Nästa drop om {time}",
+      "exhausted": "Du äger alla premiumdelar — snyggt!",
+      "justClaimed": "Del upplåst! Kolla avatarbyggaren"
+    },
     "builder": {
       "title": "Skapa din look",
       "base": "Ansikte",
