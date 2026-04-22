@@ -38,6 +38,8 @@ interface GameEndDeps {
   onWaveComplete?: (score: number, words: string[], clearPct: number) => void;
   /** Fires after Sugar Crush with every non-cleared tile, so the view can trigger a finale debris burst. */
   onDeadEndFinale?: (tiles: DeadEndFinaleTile[]) => void;
+  /** When true, a dead-end state will NOT kick off the Sugar Crush finale — caller is showing a continue offer. */
+  deferDeadEndFinale?: boolean;
   maxCombo: number;
   sounds: {
     playSpecialTileSound: (type: string) => void;
@@ -85,8 +87,9 @@ export function useBlastGameEnd(deps: GameEndDeps) {
       return () => clearTimeout(timer);
     }
 
-    // Dead end — run Sugar Crush finale, then end game
-    if (engine.gameState.isDeadEnd) {
+    // Dead end — run Sugar Crush finale, then end game.
+    // If caller is offering a continue, defer the finale until they decline or the revive clears isDeadEnd.
+    if (engine.gameState.isDeadEnd && !depsRef.current.deferDeadEndFinale) {
       if (sugarCrushRunningRef.current) return undefined;
       sugarCrushRunningRef.current = true;
       setSugarCrushActive(true);
@@ -179,6 +182,7 @@ export function useBlastGameEnd(deps: GameEndDeps) {
   }, [
     engine.gameState.isComplete,
     engine.gameState.isDeadEnd,
+    deps.deferDeadEndFinale,
     objectives.allObjectivesComplete,
     isMultiplayer,
     gridSize,

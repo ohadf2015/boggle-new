@@ -8031,6 +8031,12 @@ const sv = {
     }
   },
   "blast": {
+    "continueModal": {
+      "title": "Sluta inte nu!",
+      "body": "Du har slut på drag. Titta på en snabb annons för att fortsätta.",
+      "cta": "Se annons för +{moves} drag",
+      "decline": "Avsluta rundan"
+    },
     "chain": {
       "badge": "Kedja x{level}",
       "cascade": "Kaskad!",

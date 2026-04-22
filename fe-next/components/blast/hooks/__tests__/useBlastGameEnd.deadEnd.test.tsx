@@ -125,6 +125,25 @@ describe('useBlastGameEnd — dead-end finale callback', () => {
     expect(result.current.sugarCrushActive).toBe(false);
   });
 
+  it('defers dead-end finale while deferDeadEndFinale=true, runs it when flag flips', async () => {
+    const deps = makeDeps({ isDeadEnd: true });
+    const { result, rerender } = renderHook(
+      ({ defer }: { defer: boolean }) =>
+        useBlastGameEnd({ ...deps, deferDeadEndFinale: defer } as any),
+      { initialProps: { defer: true } },
+    );
+
+    await act(async () => { await vi.runAllTimersAsync(); });
+    expect(deps.onDeadEndFinale).not.toHaveBeenCalled();
+    expect(deps.onGameEnd).not.toHaveBeenCalled();
+    expect(result.current.sugarCrushActive).toBe(false);
+
+    rerender({ defer: false });
+    await act(async () => { await vi.runAllTimersAsync(); });
+    expect(deps.onDeadEndFinale).toHaveBeenCalledTimes(1);
+    expect(deps.onGameEnd).toHaveBeenCalledTimes(1);
+  });
+
   it('skips onDeadEndFinale cleanly when every tile is already cleared', async () => {
     const deps = makeDeps({ isDeadEnd: true });
     // Override getLatestState to return a fully-cleared board.

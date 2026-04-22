@@ -3,6 +3,8 @@
  * No React dependencies — trivially testable.
  */
 
+import type { BlastGameState } from '../types';
+
 /** Word length threshold for +1 bonus move */
 export const BONUS_MOVE_THRESHOLD_SMALL = 6;
 
@@ -49,4 +51,19 @@ export function calculateBonusMoves(wordLength: number): number {
 export function calculateLeftoverMoveBonus(movesRemaining: number): number {
   if (movesRemaining <= 0) return 0;
   return movesRemaining * LEFTOVER_MOVE_BONUS_POINTS;
+}
+
+/**
+ * Revive a dead-end run by clearing isDeadEnd and appending bonus moves.
+ * No-op for infinite-move modes (MP) since `Infinity + N = Infinity`.
+ */
+export function applyRevive(prev: BlastGameState, bonusMoves: number): BlastGameState {
+  if (!isFinite(prev.totalMoves)) return prev;
+  const bonus = Math.max(0, bonusMoves);
+  return {
+    ...prev,
+    isDeadEnd: false,
+    movesRemaining: prev.movesRemaining + bonus,
+    totalMoves: prev.totalMoves + bonus,
+  };
 }

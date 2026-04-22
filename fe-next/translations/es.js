@@ -8026,6 +8026,12 @@ const es = {
     }
   },
   "blast": {
+    "continueModal": {
+      "title": "¡No pares ahora!",
+      "body": "Te quedaste sin movimientos. Mira un anuncio rápido para seguir jugando.",
+      "cta": "Ver anuncio por +{moves} movimientos",
+      "decline": "Terminar partida"
+    },
     "chain": {
       "badge": "Cadena x{level}",
       "cascade": "¡Cascada!",

@@ -25,6 +25,7 @@ import { useDictionaryCache } from '@/hooks/useDictionaryCache';
 import { useBlastCascade } from './hooks/useBlastCascade';
 import { useBlastWordHandler } from './hooks/useBlastWordHandler';
 import { useBlastGameEnd, type DeadEndFinaleTile } from './hooks/useBlastGameEnd';
+import { BlastContinueModal } from './BlastContinueModal';
 import { useBlastObjectiveEffects } from './hooks/useBlastObjectiveEffects';
 import type { ScoreFlyEvent } from './BlastScoreFly';
 import type { ClearedTileEvent } from './BlastEffectsCanvas';
@@ -34,6 +35,7 @@ import { trackDeadTime } from '@/utils/growthTracking';
 import type { LetterGrid, Avatar } from '@/shared/types';
 
 const BLAST_DEAD_TIME_THRESHOLD_MS = 15000;
+const BLAST_CONTINUE_BONUS_MOVES = 5;
 
 interface BlastGameProps {
   config: BlastGameConfig;
@@ -369,6 +371,26 @@ export function BlastGame({
     explosionShakeTimerRef.current = setTimeout(() => setExplosionShake(0), 800);
   }, [sounds, engine]);
 
+  // Rewarded-ad "continue" offer — SP only, single-use per game.
+  // While the modal is open we defer Sugar Crush so the player can revive cleanly.
+  const hasUsedContinueRef = useRef(false);
+  const [continueDeclined, setContinueDeclined] = useState(false);
+  const continueModalOpen =
+    !isMultiplayer
+    && engine.gameState.isDeadEnd
+    && !hasUsedContinueRef.current
+    && !continueDeclined;
+
+  const handleContinueAccept = useCallback(() => {
+    hasUsedContinueRef.current = true;
+    engine.revive(BLAST_CONTINUE_BONUS_MOVES);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- engine.revive method ref
+  }, [engine.revive]);
+  const handleContinueDecline = useCallback(() => {
+    hasUsedContinueRef.current = true;
+    setContinueDeclined(true);
+  }, []);
+
   // Game end detection + Sugar Crush (extracted to useBlastGameEnd)
   const { sugarCrushActive } = useBlastGameEnd({
     engine, isMultiplayer, gridSize: config.gridSize,
@@ -376,6 +398,7 @@ export function BlastGame({
     maxCombo: combo.maxCombo, sounds,
     setExplosionShake, explosionShakeTimerRef,
     onDeadEndFinale: handleDeadEndFinale,
+    deferDeadEndFinale: continueModalOpen,
   });
 
   // Loading state — wait for both grid generation AND dictionary cache
@@ -404,6 +427,14 @@ export function BlastGame({
       )}
 
       <BlastSugarCrushFinale active={sugarCrushActive} t={tAdapter} />
+
+      <BlastContinueModal
+        isOpen={continueModalOpen}
+        bonusMoves={BLAST_CONTINUE_BONUS_MOVES}
+        onContinue={handleContinueAccept}
+        onDecline={handleContinueDecline}
+        t={t}
+      />
 
       <BlastMoveWarningMascot movesRemaining={engine.gameState.movesRemaining} t={tAdapter} />
 

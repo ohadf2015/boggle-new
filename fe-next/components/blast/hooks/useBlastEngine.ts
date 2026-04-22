@@ -12,7 +12,7 @@ import { computeGravityResult, type GravityResult } from '../utils/blastGravity'
 import type { SpecialCombo } from '../utils/blastCombos';
 import { hasValidWords } from '../utils/blastDeadEndDetector';
 import { calculateEarnedStars } from '../utils/blastStarCalculator';
-import { calculateLeftoverMoveBonus } from '../utils/blastMoveUtils';
+import { calculateLeftoverMoveBonus, applyRevive } from '../utils/blastMoveUtils';
 import { createDDAState, updateDDA, getDDASpawnModifier } from '../utils/blastDDA';
 import { createSeededRandom, generateBlastLetter } from '../utils/blastLetterGenerator';
 import type { LetterGrid } from '@/shared/types/game';
@@ -66,6 +66,8 @@ export interface UseBlastEngineReturn {
   shuffleGrid: () => void;
   endGame: () => void;
   unlockMoves: () => void;
+  /** Rewarded-ad continue: clear dead-end and add bonus moves without resetting progress */
+  revive: (bonusMoves: number) => void;
   getResults: (maxCombo: number, wavesCompleted?: number, waveResults?: WaveResult[]) => BlastResultsData;
   isCascading: boolean;
   startCascade: () => CascadeResult;
@@ -461,6 +463,12 @@ export function useBlastEngine(
     setGameState(prev => ({ ...prev, movesRemaining: Infinity, totalMoves: Infinity }));
   }, []);
 
+  // ── revive — rewarded-ad "continue" flow: clear dead-end, add bonus moves
+  const revive = useCallback((bonusMoves: number) => {
+    setGameState(prev => applyRevive(prev, bonusMoves));
+    setNoWordsRemaining(false);
+  }, []);
+
   // ── getResults ──
   const getResults = useCallback((maxCombo: number, wavesCompleted = 0, waveResults: WaveResult[] = []): BlastResultsData => {
     const gs = gameStateRef.current;
@@ -520,6 +528,7 @@ export function useBlastEngine(
     shuffleGrid,
     endGame,
     unlockMoves,
+    revive,
     getResults,
     startCascade,
     stopCascade,

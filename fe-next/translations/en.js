@@ -8205,6 +8205,12 @@ const en = {
     }
   },
   "blast": {
+    "continueModal": {
+      "title": "Don't stop now!",
+      "body": "You're out of moves. Watch a quick ad to keep your run alive.",
+      "cta": "Watch Ad for +{moves} moves",
+      "decline": "End run"
+    },
     "chain": {
       "badge": "Chain x{level}",
       "cascade": "CASCADE!",

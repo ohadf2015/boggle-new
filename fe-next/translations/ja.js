@@ -8007,6 +8007,12 @@ const ja = {
     }
   },
   "blast": {
+    "continueModal": {
+      "title": "まだ終わらせない！",
+      "body": "手数がなくなりました。短い広告を見てプレイを続けよう。",
+      "cta": "広告を見て+{moves}手獲得",
+      "decline": "終了する"
+    },
     "chain": {
       "badge": "チェイン x{level}",
       "cascade": "カスケード！",
