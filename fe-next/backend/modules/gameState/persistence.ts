@@ -3,10 +3,23 @@
  * Redis persistence operations for game state
  */
 
-import type { GameState, RedisClient } from './types';
+import type { GameState, GameUser, RedisClient, Spectator } from './types';
 
 import logger from '../../utils/logger';
 import * as redisClientModule from '../../redisClient';
+
+/**
+ * Shape of a game state as read from Redis.
+ * Extends GameState but overrides Map/Set fields (serialized as arrays)
+ * and adds legacy `usersV2` envelope.
+ */
+type PersistedGameState = Omit<GameState, 'letterPositions' | 'selectedVocabulary' | 'lessonVocabulary' | 'kickedPlayers'> & {
+  letterPositions?: [string, [number, number][]][];
+  selectedVocabulary?: string[];
+  lessonVocabulary?: string[];
+  kickedPlayers?: string[];
+  usersV2?: Record<string, GameUser>;
+};
 
 function getRedisClient(): RedisClient {
   return redisClientModule as unknown as RedisClient;
@@ -66,88 +79,88 @@ export async function restoreGameFromRedis(
   games: Record<string, GameState>
 ): Promise<GameState | null> {
   try {
-    const redisState = await getRedisClient().getGameState(gameCode);
-    if (!redisState) return null;
+    const rawState = await getRedisClient().getGameState(gameCode);
+    if (!rawState) return null;
+    const persisted = rawState as unknown as PersistedGameState;
 
     logger.info('PERSIST', `Restoring game ${gameCode} from Redis`);
 
     // Prefer v2 full user objects; fall back to empty if only v1 username list
-    const usersV2 = (redisState as any).usersV2;
-    const restoredUsers = (usersV2 && typeof usersV2 === 'object' && !Array.isArray(usersV2))
-      ? usersV2 as Record<string, any>
+    const usersV2 = persisted.usersV2;
+    const restoredUsers: Record<string, GameUser> = (usersV2 && typeof usersV2 === 'object' && !Array.isArray(usersV2))
+      ? usersV2
       : {};
 
     // Null out socket IDs — they're stale after crash
     for (const user of Object.values(restoredUsers)) {
       if (user && typeof user === 'object') {
-        (user as any).socketId = null;
+        user.socketId = null as unknown as string;
       }
     }
 
-    const spectators = (redisState as any).spectators;
-    const restoredSpectators = (spectators && typeof spectators === 'object' && !Array.isArray(spectators))
-      ? spectators as Record<string, any>
+    const rawSpectators = persisted.spectators;
+    const restoredSpectators: Record<string, Spectator> = (rawSpectators && typeof rawSpectators === 'object' && !Array.isArray(rawSpectators))
+      ? rawSpectators
       : {};
 
-    games[gameCode] = {
+    const restored: GameState = {
       gameCode,
       hostSocketId: null,
-      hostUsername: (redisState as any).hostUsername || null,
-      hostPlayerId: (redisState as any).hostPlayerId || undefined,
-      roomName: redisState.roomName,
-      language: redisState.language || 'en',
+      hostUsername: persisted.hostUsername || null,
+      hostPlayerId: persisted.hostPlayerId || undefined,
+      roomName: persisted.roomName,
+      language: persisted.language || 'en',
       users: restoredUsers,
       spectators: restoredSpectators,
-      playerScores: redisState.playerScores || {},
-      playerWords: redisState.playerWords || {},
-      playerAchievements: redisState.playerAchievements || {},
-      playerCombos: (redisState as any).playerCombos || {},
-      gameState: redisState.gameState || 'waiting',
-      letterGrid: redisState.letterGrid,
-      timerSeconds: redisState.timerSeconds || 180,
-      remainingTime: redisState.remainingTime ?? undefined,
-      gameDuration: (redisState as any).gameDuration ?? undefined,
-      minWordLength: (redisState as any).minWordLength ?? undefined,
-      difficulty: (redisState as any).difficulty || undefined,
-      gameStartedAt: (redisState as any).gameStartedAt ?? undefined,
-      tournamentId: redisState.tournamentId,
+      playerScores: persisted.playerScores || {},
+      playerWords: persisted.playerWords || {},
+      playerAchievements: persisted.playerAchievements || {},
+      playerCombos: persisted.playerCombos || {},
+      gameState: persisted.gameState || 'waiting',
+      letterGrid: persisted.letterGrid,
+      timerSeconds: persisted.timerSeconds || 180,
+      remainingTime: persisted.remainingTime ?? undefined,
+      gameDuration: persisted.gameDuration ?? undefined,
+      minWordLength: persisted.minWordLength ?? undefined,
+      difficulty: persisted.difficulty || undefined,
+      gameStartedAt: persisted.gameStartedAt ?? undefined,
+      tournamentId: persisted.tournamentId,
       reconnectionTimeout: null,
-      isRanked: (redisState as any).isRanked ?? false,
-      isPrivate: (redisState as any).isPrivate ?? false,
-      allowLateJoin: (redisState as any).allowLateJoin ?? true,
-      aiApprovedWords: (redisState as any).aiApprovedWords || [],
+      isRanked: persisted.isRanked ?? false,
+      isPrivate: persisted.isPrivate ?? false,
+      allowLateJoin: persisted.allowLateJoin ?? true,
+      aiApprovedWords: persisted.aiApprovedWords || [],
       peerValidationWord: null,
-      peerValidationVotes: (redisState as any).peerValidationVotes || {},
-      createdAt: (redisState as any).createdAt || Date.now(),
-      lastActivity: (redisState as any).lastActivity || Date.now(),
+      peerValidationVotes: persisted.peerValidationVotes || {},
+      createdAt: persisted.createdAt || Date.now(),
+      lastActivity: persisted.lastActivity || Date.now(),
       restoredFromRedis: true,
       gameSessionId: 0,
       playersReadyForNextGame: {},
-      gameMode: (redisState.gameMode as any) || 'classic',
-      blastModeState: redisState.blastModeState as any || null,
-      wordHuntState: redisState.wordHuntState as any || null,
-      chatHistory: (redisState as any).chatHistory || undefined,
-      cachedResultsPayload: (redisState as any).cachedResultsPayload || undefined,
+      gameMode: persisted.gameMode || 'classic',
+      blastModeState: persisted.blastModeState || null,
+      wordHuntState: persisted.wordHuntState || null,
+      chatHistory: persisted.chatHistory || undefined,
+      cachedResultsPayload: persisted.cachedResultsPayload || undefined,
     };
-
-    const restored = games[gameCode] as any;
+    games[gameCode] = restored;
 
     // Reconstruct Map from serialized entries
-    const lpEntries = (redisState as any).letterPositions;
+    const lpEntries = persisted.letterPositions;
     if (Array.isArray(lpEntries) && lpEntries.length > 0) {
       restored.letterPositions = new Map(lpEntries);
     }
 
     // Reconstruct Sets from serialized arrays
-    const selVocab = (redisState as any).selectedVocabulary;
+    const selVocab = persisted.selectedVocabulary;
     if (Array.isArray(selVocab) && selVocab.length > 0) {
       restored.selectedVocabulary = new Set(selVocab);
     }
-    const lesVocab = (redisState as any).lessonVocabulary;
+    const lesVocab = persisted.lessonVocabulary;
     if (Array.isArray(lesVocab) && lesVocab.length > 0) {
       restored.lessonVocabulary = new Set(lesVocab);
     }
-    const kicked = (redisState as any).kickedPlayers;
+    const kicked = persisted.kickedPlayers;
     if (Array.isArray(kicked) && kicked.length > 0) {
       restored.kickedPlayers = new Set(kicked);
     }
