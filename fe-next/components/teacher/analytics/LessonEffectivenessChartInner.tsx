@@ -2,6 +2,7 @@
 
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useLessonEffectiveness } from '@/hooks/useLessonEffectiveness';
+import type { LessonEffectivenessData } from '@/lib/supabase/analytics';
 import { cn } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { PageLoader } from '@/components/ui/PageLoader';
@@ -19,7 +20,13 @@ const CHART_COLORS = {
 };
 
 // Custom tooltip component (must be outside render)
-const CustomTooltip = ({ active, payload, t }: any) => {
+interface CustomTooltipProps {
+  active?: boolean;
+  payload?: Array<{ payload: LessonEffectivenessData }>;
+  t: (key: string) => string;
+}
+
+const CustomTooltip = ({ active, payload, t }: CustomTooltipProps) => {
   if (!active || !payload || !payload.length) return null;
 
   const data = payload[0].payload;

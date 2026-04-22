@@ -29,7 +29,7 @@ interface CognitiveRadarChartProps {
 
 interface CustomTooltipProps {
   active?: boolean;
-  payload?: any[];
+  payload?: Array<{ value: number; payload: { domain: string } }>;
   t: (key: string) => string;
 }
 
