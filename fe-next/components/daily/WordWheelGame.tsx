@@ -424,13 +424,13 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
   useEffect(() => { handleSubmitRef.current = handleSubmit; }, [handleSubmit]);
 
   // Responsive wheel radius based on the wheel div width (not the game container)
-  const [wheelRadius, setWheelRadius] = useState(72);
+  const [wheelRadius, setWheelRadius] = useState(96);
   useEffect(() => {
     const update = () => {
       if (wheelContainerRef.current) {
         const w = wheelContainerRef.current.getBoundingClientRect().width;
-        // Radius should keep outer letters inside the wheel div (account for letter size ~52px)
-        setWheelRadius(Math.max(56, Math.min(96, (w - 56) / 2)));
+        // Radius should keep outer letters inside the wheel div (account for letter size ~60px)
+        setWheelRadius(Math.max(72, Math.min(136, (w - 64) / 2)));
       }
     };
     update();
@@ -611,7 +611,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
       </AnimatePresence>
 
       {/* ── Centered wheel region (absorbs leftover vertical space) ── */}
-      <div className="flex-1 flex flex-col items-center justify-center w-full min-h-0 gap-1.5 py-2">
+      <div className="flex-1 flex flex-col items-center justify-center w-full min-h-0 gap-2 py-1">
       {/* Tap-to-remove + double-tap-to-submit hint */}
       {builtLetters.length > 0 && (
         <p className="text-neo-cream/40 text-[10px] sm:text-xs text-center">
@@ -622,7 +622,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
       {/* ── The Wheel ── */}
       <div
         ref={wheelContainerRef}
-        className="relative w-52 h-52 sm:w-64 sm:h-64 md:w-72 md:h-72 shrink-0 flex items-center justify-center touch-none"
+        className="relative w-64 h-64 sm:w-80 sm:h-80 md:w-96 md:h-96 shrink-0 flex items-center justify-center touch-none"
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
@@ -676,7 +676,12 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
       </div>
 
       {/* ── Action Buttons (sticky so Submit stays in view as found-words list grows) ── */}
-      <div className="sticky bottom-0 z-30 w-full flex items-center justify-center gap-3 py-2 bg-linear-to-t from-neo-navy via-neo-navy/95 to-transparent">
+      {/* `bottom` offsets by AdSense anchor ad + AdMob banner heights so the
+          button bar is NEVER covered by a bottom-docked ad. */}
+      <div
+        className="sticky z-30 w-full flex items-center justify-center gap-3 py-2 bg-linear-to-t from-neo-navy via-neo-navy/95 to-transparent"
+        style={{ bottom: 'calc(var(--adsense-anchor-height, 0px) + var(--admob-banner-height, 0px))' }}
+      >
         {/* Clear */}
         <motion.button
           type="button"

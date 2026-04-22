@@ -7,10 +7,13 @@ import { AdMob, BannerAdPluginEvents, BannerAdPosition } from '@capacitor-commun
 import { useAdMob } from '@/hooks/useAdMob';
 import { useSafeArea } from '@/hooks/useSafeArea';
 
+// Routes where the AdMob anchored banner is NOT shown.
+// `/adventure` is intentionally allowed to show the banner — adventure mode
+// runs real banner ads during gameplay (layout reserves space via the
+// --admob-banner-height CSS var so buttons are never covered).
 const GAME_ROUTES = [
   '/multiplayer',
   '/singleplayer',
-  '/adventure',
   '/daily',
   '/challenge',
   '/join',

@@ -106,12 +106,12 @@ describe('AnchoredNativeBanner', () => {
     expect(hideBanner).toHaveBeenCalled();
   });
 
-  it('hides banner on /adventure', async () => {
+  it('shows banner on /adventure (real ads during adventure gameplay)', async () => {
     mockPathname.current = '/adventure/boss-rush';
     render(<AnchoredNativeBanner />);
     await Promise.resolve();
-    expect(showBanner).not.toHaveBeenCalled();
-    expect(hideBanner).toHaveBeenCalled();
+    expect(showBanner).toHaveBeenCalledTimes(1);
+    expect(showBanner).toHaveBeenCalledWith('BOTTOM_CENTER', 0);
   });
 
   it('hides banner on /daily', async () => {
