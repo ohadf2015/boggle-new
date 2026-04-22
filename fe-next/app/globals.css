@@ -3114,6 +3114,19 @@ html {
   }
 }
 
+/* Offset Google AdSense anchor (sticky-bottom) ads above GlobalBottomNav so the
+   nav stays flush at the viewport bottom. Scoped to mobile viewports where the
+   nav renders, and only when GlobalBottomNav has mounted (sets the html class).
+   AdSense injects these as inline style="bottom:0", so !important is required. */
+@media (max-width: 639px) {
+  html.has-global-bottom-nav ins.adsbygoogle[data-anchor-status="displayed"],
+  html.has-global-bottom-nav ins.adsbygoogle[data-anchor-shown="true"],
+  html.has-global-bottom-nav ins.adsbygoogle.google-anchor,
+  html.has-global-bottom-nav .google-auto-placed[data-anchor-status="displayed"] {
+    bottom: calc(var(--bottom-nav-height, 64px) + env(safe-area-inset-bottom, 0px)) !important;
+  }
+}
+
 /* Fixed positioning utilities with safe areas */
 .fixed-safe-top {
   top: max(env(safe-area-inset-top, 0px), 0px);

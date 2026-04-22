@@ -25,10 +25,37 @@ const GAME_ROUTES = [
   '/profile',
 ];
 
+// Paths where GlobalBottomNav is hidden — on these, the banner can sit flush at the bottom.
+// Kept in sync with pathsWithOwnNav in GlobalBottomNav.
+const PATHS_WITH_OWN_NAV = [
+  '/multiplayer',
+  '/singleplayer',
+  '/daily',
+  '/adventure',
+  '/education',
+  '/student',
+  '/teacher',
+  '/admin',
+  '/brain',
+  '/challenge',
+  '/custom',
+  '/join',
+];
+
+// Matches h-16 on GlobalBottomNav (64px). Safe-area padding is absorbed by the
+// AdMob plugin at BOTTOM_CENTER, so the margin only needs to clear the nav's content.
+const GLOBAL_BOTTOM_NAV_HEIGHT = 64;
+
 function isAllowedRoute(pathname: string | null): boolean {
   if (!pathname) return false;
   const path = pathname.replace(/^\/(en|he|sv|ja|es)/, '') || '/';
   return !GAME_ROUTES.some((r) => path.startsWith(r));
+}
+
+function hasGlobalBottomNav(pathname: string | null): boolean {
+  if (!pathname) return false;
+  const path = pathname.replace(/^\/(en|he|sv|ja|es)/, '') || '/';
+  return !PATHS_WITH_OWN_NAV.some((r) => path.startsWith(r));
 }
 
 export default function AnchoredNativeBanner() {
@@ -65,13 +92,14 @@ export default function AnchoredNativeBanner() {
     let cancelled = false;
 
     if (isAllowedRoute(pathname)) {
-      // Anchor banner at true screen bottom (margin=0; plugin auto-excludes iOS notch).
-      // GlobalBottomNav reads --admob-banner-height CSS var (set via SizeChanged)
-      // and offsets itself up, so nav stacks flush above banner without magic constants.
+      // Banner sits ABOVE the GlobalBottomNav (when present) so the nav stays flush
+      // at the viewport bottom. Plugin auto-excludes iOS safe-area, so margin only
+      // needs to clear the nav's visible height; on pages without the nav, margin=0.
+      const margin = hasGlobalBottomNav(pathname) ? GLOBAL_BOTTOM_NAV_HEIGHT : 0;
       (async () => {
         await hideBanner();
         if (cancelled) return;
-        await showBanner(BannerAdPosition.BOTTOM_CENTER, 0);
+        await showBanner(BannerAdPosition.BOTTOM_CENTER, margin);
       })();
     } else {
       hideBanner();

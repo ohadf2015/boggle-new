@@ -164,7 +164,28 @@ describe('GlobalBottomNav', () => {
 
             const { container } = render(<GlobalBottomNav />);
             const nav = container.querySelector('nav');
-            expect(nav).toHaveStyle({ paddingBottom: 'max(0px, 34px - var(--admob-banner-height, 0px))' });
+            // Nav sits flush at viewport bottom; safe-area padding is applied directly
+            // (ads are positioned above the nav, not beneath it).
+            expect(nav).toHaveStyle({ paddingBottom: '34px', bottom: '0px' });
+        });
+
+        it('should sit flush at viewport bottom with no safe-area inset', () => {
+            const { container } = render(<GlobalBottomNav />);
+            const nav = container.querySelector('nav');
+            expect(nav).toHaveStyle({ bottom: '0px' });
+        });
+
+        it('should set has-global-bottom-nav class on html while visible', () => {
+            const { unmount } = render(<GlobalBottomNav />);
+            expect(document.documentElement.classList.contains('has-global-bottom-nav')).toBe(true);
+            unmount();
+            expect(document.documentElement.classList.contains('has-global-bottom-nav')).toBe(false);
+        });
+
+        it('should not set has-global-bottom-nav class when hidden (in game)', () => {
+            (useNavigation as Mock).mockReturnValue({ isInGame: true });
+            render(<GlobalBottomNav />);
+            expect(document.documentElement.classList.contains('has-global-bottom-nav')).toBe(false);
         });
     });
 
