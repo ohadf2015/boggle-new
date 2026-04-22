@@ -5,11 +5,13 @@
 import React from 'react';
 import { render, cleanup } from '@testing-library/react';
 
-const { showBanner, hideBanner, mockPathname, addListener } = vi.hoisted(() => ({
+const { showBanner, hideBanner, mockPathname, addListener, mockPlatform, mockSafeArea } = vi.hoisted(() => ({
   showBanner: vi.fn(),
   hideBanner: vi.fn(),
   mockPathname: { current: '/' },
   addListener: vi.fn(() => Promise.resolve({ remove: vi.fn() })),
+  mockPlatform: { current: 'ios' as 'ios' | 'android' | 'web' },
+  mockSafeArea: { current: { top: 0, bottom: 0, left: 0, right: 0 } },
 }));
 
 vi.mock('next/navigation', () => ({
@@ -21,8 +23,16 @@ vi.mock('@/hooks/useAdMob', () => ({
   default: () => ({ showBanner, hideBanner, showInterstitial: vi.fn(), showRewarded: vi.fn() }),
 }));
 
+vi.mock('@/hooks/useSafeArea', () => ({
+  useSafeArea: () => mockSafeArea.current,
+  default: () => mockSafeArea.current,
+}));
+
 vi.mock('@capacitor/core', () => ({
-  Capacitor: { isNativePlatform: () => true },
+  Capacitor: {
+    isNativePlatform: () => true,
+    getPlatform: () => mockPlatform.current,
+  },
 }));
 
 vi.mock('@capacitor-community/admob', () => ({
@@ -39,6 +49,8 @@ describe('AnchoredNativeBanner', () => {
     hideBanner.mockClear();
     addListener.mockClear();
     mockPathname.current = '/';
+    mockPlatform.current = 'ios';
+    mockSafeArea.current = { top: 0, bottom: 0, left: 0, right: 0 };
   });
   afterEach(cleanup);
 
@@ -48,15 +60,17 @@ describe('AnchoredNativeBanner', () => {
     expect(showBanner).toHaveBeenCalledTimes(1);
   });
 
-  it('shows banner above GlobalBottomNav on home route (margin=64)', async () => {
+  it('shows banner above GlobalBottomNav on home route (iOS, margin=64)', async () => {
     mockPathname.current = '/';
+    mockPlatform.current = 'ios';
     render(<AnchoredNativeBanner />);
     await Promise.resolve();
     expect(showBanner).toHaveBeenCalledWith('BOTTOM_CENTER', 64);
   });
 
-  it('shows banner above GlobalBottomNav on /settings (margin=64)', async () => {
+  it('shows banner above GlobalBottomNav on /settings (iOS, margin=64)', async () => {
     mockPathname.current = '/settings';
+    mockPlatform.current = 'ios';
     render(<AnchoredNativeBanner />);
     await Promise.resolve();
     expect(showBanner).toHaveBeenCalledWith('BOTTOM_CENTER', 64);
@@ -64,6 +78,44 @@ describe('AnchoredNativeBanner', () => {
 
   it('shows banner flush at bottom on /education (nav hidden, margin=0)', async () => {
     mockPathname.current = '/education';
+    render(<AnchoredNativeBanner />);
+    await Promise.resolve();
+    expect(showBanner).toHaveBeenCalledWith('BOTTOM_CENTER', 0);
+  });
+
+  it('adds safe-area-bottom to margin on Android gesture-nav devices (margin=64+safeArea)', async () => {
+    // Android plugin measures margin from the absolute bottom of the webview,
+    // so nav's paddingBottom (safe-area) must be included or the banner overlaps.
+    mockPathname.current = '/';
+    mockPlatform.current = 'android';
+    mockSafeArea.current = { top: 24, bottom: 24, left: 0, right: 0 };
+    render(<AnchoredNativeBanner />);
+    await Promise.resolve();
+    expect(showBanner).toHaveBeenCalledWith('BOTTOM_CENTER', 64 + 24);
+  });
+
+  it('uses only nav height on Android when safe-area is zero (margin=64)', async () => {
+    mockPathname.current = '/';
+    mockPlatform.current = 'android';
+    mockSafeArea.current = { top: 0, bottom: 0, left: 0, right: 0 };
+    render(<AnchoredNativeBanner />);
+    await Promise.resolve();
+    expect(showBanner).toHaveBeenCalledWith('BOTTOM_CENTER', 64);
+  });
+
+  it('does not add safe-area on iOS (plugin uses safeAreaLayoutGuide)', async () => {
+    mockPathname.current = '/';
+    mockPlatform.current = 'ios';
+    mockSafeArea.current = { top: 47, bottom: 34, left: 0, right: 0 };
+    render(<AnchoredNativeBanner />);
+    await Promise.resolve();
+    expect(showBanner).toHaveBeenCalledWith('BOTTOM_CENTER', 64);
+  });
+
+  it('keeps margin=0 on pages without global nav even with safe-area', async () => {
+    mockPathname.current = '/education';
+    mockPlatform.current = 'android';
+    mockSafeArea.current = { top: 24, bottom: 24, left: 0, right: 0 };
     render(<AnchoredNativeBanner />);
     await Promise.resolve();
     expect(showBanner).toHaveBeenCalledWith('BOTTOM_CENTER', 0);
