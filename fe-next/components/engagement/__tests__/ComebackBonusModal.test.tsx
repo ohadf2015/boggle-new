@@ -115,4 +115,20 @@ describe('ComebackBonusModal', () => {
     );
     expect(screen.getByText('comebackBonus.streakFreezes')).toBeInTheDocument();
   });
+
+  it('disables retries after max attempts to stop rageclicks', async () => {
+    mockPostWithAuth.mockResolvedValue({ ok: false, json: async () => ({}) } as Response);
+
+    render(
+      <ComebackBonusModal isOpen={true} daysAway={7} tier={tier} onClose={vi.fn()} onClaimed={vi.fn()} />
+    );
+    const btn = screen.getByText('comebackBonus.claimButton').closest('button')!;
+    fireEvent.click(btn);
+    await waitFor(() => expect(btn).toBeDisabled());
+    fireEvent.click(btn);
+    fireEvent.click(btn);
+    await waitFor(() => {
+      expect(mockPostWithAuth).toHaveBeenCalledTimes(1);
+    });
+  });
 });

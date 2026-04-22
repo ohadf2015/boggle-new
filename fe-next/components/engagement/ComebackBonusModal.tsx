@@ -13,7 +13,11 @@ import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/Ada
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
 import { postWithAuth } from '@/utils/authFetch';
+import { captureApiError } from '@/utils/sentry';
 import type { ComebackTier } from '@/shared/types/engagement';
+
+const MAX_CLAIM_ATTEMPTS = 3;
+const COOLDOWN_MS = 1500;
 
 export interface ComebackBonusModalProps {
   isOpen: boolean;
@@ -33,11 +37,17 @@ export function ComebackBonusModal({ isOpen, daysAway, tier, playerName, onClose
   const { t } = useLanguage();
   const dialogRef = useRef<HTMLDivElement>(null);
   const [claimState, setClaimState] = useState<ClaimState>('idle');
+  const [attempts, setAttempts] = useState(0);
+  const cooldownRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [cooling, setCooling] = useState(false);
 
   useFocusTrap(dialogRef, isOpen, onClose);
 
+  const exhausted = attempts >= MAX_CLAIM_ATTEMPTS;
+
   const handleClaim = async () => {
-    if (claimState === 'claiming' || claimState === 'success') return;
+    if (claimState === 'claiming' || claimState === 'success' || cooling || exhausted) return;
+    setAttempts(n => n + 1);
     setClaimState('claiming');
     try {
       const response = await postWithAuth('/api/engagement/comeback');
@@ -45,10 +55,24 @@ export function ComebackBonusModal({ isOpen, daysAway, tier, playerName, onClose
         setClaimState('success');
         setTimeout(() => onClaimed(), 1800);
       } else {
+        captureApiError(
+          new Error(`comeback claim failed: ${response.status}`),
+          '/api/engagement/comeback',
+          { method: 'POST', statusCode: response.status },
+        );
         setClaimState('error');
+        setCooling(true);
+        cooldownRef.current = setTimeout(() => setCooling(false), COOLDOWN_MS);
       }
-    } catch {
+    } catch (err) {
+      captureApiError(
+        err instanceof Error ? err : new Error(String(err)),
+        '/api/engagement/comeback',
+        { method: 'POST' },
+      );
       setClaimState('error');
+      setCooling(true);
+      cooldownRef.current = setTimeout(() => setCooling(false), COOLDOWN_MS);
     }
   };
 
@@ -194,8 +218,8 @@ export function ComebackBonusModal({ isOpen, daysAway, tier, playerName, onClose
                   transition={{ delay: 0.5 }}
                 >
                   <button
-                    onClick={handleClaim}
-                    disabled={claimState === 'claiming' || claimState === 'success'}
+                    onClick={exhausted ? onClose : handleClaim}
+                    disabled={claimState === 'claiming' || claimState === 'success' || cooling}
                     className={`w-full py-3.5 px-4 font-black uppercase text-base border-neo-thick border-neo-white rounded-neo transition-all flex items-center justify-center gap-2 ${
                       claimState === 'success'
                         ? 'bg-neo-lime text-neo-navy shadow-hard'

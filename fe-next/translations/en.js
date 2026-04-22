@@ -6711,7 +6711,8 @@ const en = {
       }
     },
     "hunt": {
-      "preparingPuzzle": "Preparing puzzle..."
+      "preparingPuzzle": "Preparing puzzle...",
+      "noTargetAvailable": "Couldn't prepare this hunt. Try another level."
     },
     "loading": "Loading adventure...",
     "currency": {

@@ -42,7 +42,32 @@ vi.stubGlobal('cancelAnimationFrame', () => { rafCb = null; });
 
 import { Container } from 'pixi.js';
 import { PhysicsWorld } from '@/lib/gameEngine/PhysicsWorld';
-import { useBlastDebris } from '../useBlastDebris';
+import { useBlastDebris, safeHexToNum } from '../useBlastDebris';
+
+describe('safeHexToNum', () => {
+  it('parses valid #RRGGBB to number', () => {
+    expect(safeHexToNum('#FF1493')).toBe(0xff1493);
+    expect(safeHexToNum('#000000')).toBe(0x000000);
+    expect(safeHexToNum('#ffffff')).toBe(0xffffff);
+  });
+  it('parses without leading hash', () => {
+    expect(safeHexToNum('bfff00')).toBe(0xbfff00);
+  });
+  it('returns fallback for undefined/null/empty', () => {
+    expect(safeHexToNum(undefined)).toBe(0xffffff);
+    expect(safeHexToNum('')).toBe(0xffffff);
+  });
+  it('returns fallback for invalid hex (avoids NaN -> PIXI throw)', () => {
+    expect(safeHexToNum('#zzzzzz')).toBe(0xffffff);
+    expect(safeHexToNum('not-a-color')).toBe(0xffffff);
+  });
+  it('clamps negative values to fallback', () => {
+    expect(safeHexToNum('#-1')).toBe(0xffffff);
+  });
+  it('respects custom fallback', () => {
+    expect(safeHexToNum(undefined, 0x123456)).toBe(0x123456);
+  });
+});
 
 describe('useBlastDebris — static walls', () => {
   it('creates floor + left/right wall static bodies on mount', () => {

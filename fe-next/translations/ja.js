@@ -6826,7 +6826,8 @@ const ja = {
     "restart": "リスタート",
     "gold": "ゴールド",
     "hunt": {
-      "preparingPuzzle": "パズルを準備中..."
+      "preparingPuzzle": "パズルを準備中...",
+      "noTargetAvailable": "このハントを準備できませんでした。別のレベルを試してください。"
     },
     "loading": "アドベンチャーを読み込み中...",
     "currency": {

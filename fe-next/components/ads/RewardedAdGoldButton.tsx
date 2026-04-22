@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { Play, Coins, Loader2 } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Play, Coins, Loader2, CheckCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -14,6 +15,8 @@ interface RewardedAdGoldButtonProps {
   className?: string;
   /** Placement tag for PostHog funnel (e.g. 'gold_top_up', 'player_waiting'). */
   surface: string;
+  /** Larger, more prominent variant for primary CTAs. */
+  size?: 'sm' | 'md';
 }
 
 export const RewardedAdGoldButton: React.FC<RewardedAdGoldButtonProps> = ({
@@ -21,6 +24,7 @@ export const RewardedAdGoldButton: React.FC<RewardedAdGoldButtonProps> = ({
   onRewardEarned,
   className,
   surface,
+  size = 'sm',
 }) => {
   useEffect(() => {
     trackRewardedAdOffered(surface);
@@ -38,40 +42,63 @@ export const RewardedAdGoldButton: React.FC<RewardedAdGoldButtonProps> = ({
   });
 
   const capped = isPlaceholderCooldown;
-  const isDisabled = status === 'loading' || status === 'showing' || capped;
+  const isLoading = status === 'loading' || status === 'showing';
+  const isDone = status === 'completed';
+  const isDisabled = isLoading || capped;
+  const isIdle = status === 'idle' && !capped;
 
   const label = status === 'showing'
     ? t('ads.rewarded.earning')
-    : status === 'completed'
+    : isDone
       ? t('ads.rewarded.earned').replace('{amount}', String(goldAmount))
       : capped
         ? t('ads.rewarded.cooldown')
         : t('ads.rewarded.watchForGold').replace('{amount}', String(goldAmount));
 
-  const Icon = status === 'loading' || status === 'showing' ? Loader2 : Play;
+  const Icon = isDone ? CheckCircle : isLoading ? Loader2 : Play;
+  const isMd = size === 'md';
 
   return (
-    <button
+    <motion.button
       type="button"
       onClick={showAd}
       disabled={isDisabled}
       aria-label={t('ads.rewarded.watchForGold').replace('{amount}', String(goldAmount))}
+      whileHover={!isDisabled ? { scale: 1.04, y: -1 } : undefined}
+      whileTap={!isDisabled ? { scale: 0.96 } : undefined}
+      animate={isIdle ? { scale: [1, 1.03, 1] } : { scale: 1 }}
+      transition={isIdle ? { duration: 1.8, repeat: Infinity, ease: 'easeInOut' } : { duration: 0.15 }}
       className={cn(
-        'inline-flex items-center gap-2 px-3 py-1.5 text-sm font-bold',
-        'border-2 border-black rounded-neo',
-        'transition-all active:translate-y-0.5',
-        isDark
-          ? 'bg-neo-navy-light text-neo-lime border-neo-lime/40 hover:bg-neo-navy-light/80'
-          : 'bg-yellow-50 text-amber-800 border-amber-400 hover:bg-yellow-100',
-        'active:shadow-none',
-        'disabled:opacity-40 disabled:cursor-not-allowed disabled:active:translate-y-0',
+        'relative inline-flex items-center gap-2 font-bold',
+        isMd ? 'px-4 py-2.5 text-base' : 'px-3 py-1.5 text-sm',
+        'border-2 border-black rounded-neo shadow-hard',
+        'transition-colors active:shadow-hard-pressed',
+        isDone
+          ? 'bg-neo-lime text-black border-black'
+          : isDark
+            ? 'bg-neo-navy-light text-neo-lime border-neo-lime/60 hover:bg-neo-navy-light/80'
+            : 'bg-neo-yellow text-black border-black hover:brightness-95',
+        'disabled:opacity-50 disabled:cursor-not-allowed',
         className,
       )}
     >
-      <Icon className={cn('h-3.5 w-3.5', (status === 'loading' || status === 'showing') && 'animate-spin')} />
-      <Coins className="h-3.5 w-3.5 text-neo-lime" />
-      <span>{label}</span>
-    </button>
+      {isIdle && (
+        <span
+          aria-hidden
+          className="absolute inset-0 rounded-neo pointer-events-none animate-pulse opacity-40 ring-2 ring-neo-lime"
+        />
+      )}
+      <Icon className={cn(isMd ? 'h-4 w-4' : 'h-3.5 w-3.5', isLoading && 'animate-spin')} />
+      <span className="relative flex items-center gap-1">
+        <span>{label}</span>
+        {isIdle && (
+          <span className="inline-flex items-center gap-0.5 font-black text-neo-lime">
+            <Coins className={isMd ? 'h-4 w-4' : 'h-3.5 w-3.5'} />
+            +{goldAmount}
+          </span>
+        )}
+      </span>
+    </motion.button>
   );
 };
 

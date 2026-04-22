@@ -36,7 +36,9 @@ export const WheelLetter: React.FC<WheelLetterProps> = ({
       ref={btnRef}
       type="button"
       className={cn(
-        'absolute inset-0 m-auto flex items-center justify-center font-neo-display font-black uppercase select-none',
+        'absolute inset-0 m-auto flex items-center justify-center font-neo-display font-black uppercase select-none touch-manipulation',
+        // Invisible hit-area expander (≥48px WCAG AAA). Fixes rageclicks on Hebrew RTL wheel.
+        'before:absolute before:-inset-2 before:content-[""]',
         'border-3 border-neo-black rounded-full transition-colors duration-150',
         isCenter
           ? 'w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 text-2xl sm:text-3xl md:text-4xl z-10'
@@ -94,7 +96,8 @@ export const WordTile: React.FC<WordTileProps> = ({ letter, index, onRemove, isC
   <motion.button
     type="button"
     className={cn(
-      'group relative w-8 h-10 sm:w-10 sm:h-12 md:w-12 md:h-14 rounded-neo border-3 border-neo-black flex items-center justify-center',
+      'group relative w-8 h-10 sm:w-10 sm:h-12 md:w-12 md:h-14 rounded-neo border-3 border-neo-black flex items-center justify-center touch-manipulation',
+      'before:absolute before:-inset-2 before:content-[""]',
       'font-neo-display font-black text-base sm:text-lg md:text-xl cursor-pointer',
       'active:shadow-hard-pressed active:translate-x-px active:translate-y-px',
       isCenter

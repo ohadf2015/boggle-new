@@ -17,6 +17,11 @@ export function registerRune(runeId: string, evaluator: RuneEvaluator): void {
   evaluators[runeId] = evaluator;
 }
 
+/** Test helper — reports whether an evaluator is registered for this rune id. */
+export function hasEvaluator(runeId: string): boolean {
+  return runeId in evaluators;
+}
+
 /** Evaluate a rune against a scoring context. Returns effect or null if not triggered. */
 export function evaluateRune(
   def: RuneCardDef,
@@ -219,16 +224,6 @@ registerRune('palindromePrize', (ctx) => {
   };
 });
 
-registerRune('edgeWalker', (_ctx) => {
-  // TODO: Needs grid tile position info to determine which tiles are on edges
-  return null;
-});
-
-registerRune('centerStage', (_ctx) => {
-  // TODO: Needs grid tile position info to determine if word path passes through center
-  return null;
-});
-
 registerRune('streakBonus', (ctx) => {
   // comboCount is used as the consecutive-word streak
   if (ctx.comboCount <= 0) return null;
@@ -255,11 +250,6 @@ registerRune('wordHoarder', (ctx) => {
   };
 });
 
-registerRune('precisionShot', (_ctx) => {
-  // TODO: Needs remaining target and remaining seconds from run state
-  return null;
-});
-
 registerRune('sharpEdge', (ctx) => {
   const pts = getBaseLetterPoints(ctx.word);
   const avg = pts / ctx.word.length;
@@ -276,21 +266,6 @@ registerRune('sharpEdge', (ctx) => {
     type: 'addPoints',
     value: bonus,
   };
-});
-
-registerRune('goldRush', (_ctx) => {
-  // TODO: Needs gold tile state from grid-level integration
-  return null;
-});
-
-registerRune('letterFeast', (_ctx) => {
-  // TODO: Needs chosen letter from run-start selection
-  return null;
-});
-
-registerRune('avalanche', (_ctx) => {
-  // TODO: Needs lastWordTotalScore from run state
-  return null;
 });
 
 // === MULT RUNES ===
@@ -411,11 +386,6 @@ registerRune('vowelPower', (ctx) => {
   };
 });
 
-registerRune('loneSurvivor', (_ctx) => {
-  // TODO: Needs runesEquipped count from run state
-  return null;
-});
-
 registerRune('weightedWords', (ctx) => {
   const basePts = getBaseLetterPoints(ctx.word);
   if (basePts <= 15) return null;
@@ -428,11 +398,6 @@ registerRune('weightedWords', (ctx) => {
   };
 });
 
-registerRune('lastWord', (_ctx) => {
-  // TODO: Needs isLastWord flag from timer/run state
-  return null;
-});
-
 registerRune('grandMaster', (_ctx) => {
   return {
     runeId: 'grandMaster',
@@ -441,11 +406,6 @@ registerRune('grandMaster', (_ctx) => {
     type: 'multiply',
     value: 2.5,
   };
-});
-
-registerRune('neverDie', (_ctx) => {
-  // TODO: Needs bossesDefeatedThisRun from run state; formula: 1.5 ^ bossesDefeated
-  return null;
 });
 
 // === SPECIAL RUNES ===
@@ -473,63 +433,8 @@ registerRune('hintWhisper', (_ctx) => {
   return null;
 });
 
-registerRune('wordMirror', (_ctx) => {
-  // TODO: Handled by run manager — replays first word score at round end
-  return null;
-});
-
-registerRune('letterLock', (_ctx) => {
-  // TODO: Handled by run manager — prevents streak reset on best word
-  return null;
-});
-
 registerRune('bigGrid', (_ctx) => {
   // Handled by grid manager (6x6 grid), no score effect
-  return null;
-});
-
-registerRune('doubleOrNothing', (_ctx) => {
-  // TODO: Handled by UI — player holds submit button for 2s to wager
-  return null;
-});
-
-registerRune('richochet', (_ctx) => {
-  // TODO: Needs grid-level integration for tile adjacency highlighting
-  return null;
-});
-
-registerRune('catalystTile', (_ctx) => {
-  // TODO: Needs catalyst tile state from grid-level integration
-  return null;
-});
-
-registerRune('forgeFrenzy', (_ctx) => {
-  // TODO: Handled by timer manager — slow-motion last 10 seconds
-  return null;
-});
-
-registerRune('wordDynamite', (_ctx) => {
-  // TODO: Handled by grid manager — shuffle adjacent tiles after word
-  return null;
-});
-
-registerRune('wordAlchemy', (_ctx) => {
-  // TODO: Handled by run manager — one-time rune transform UI
-  return null;
-});
-
-registerRune('infiniteGrid', (_ctx) => {
-  // TODO: Handled by grid manager — tile recharge after 3s cooldown
-  return null;
-});
-
-registerRune('timeFreezeSpecial', (_ctx) => {
-  // TODO: Handled by timer manager — freeze 8s on 30+ pt word
-  return null;
-});
-
-registerRune('runeResonance', (_ctx) => {
-  // TODO: Needs mult-rune-trigger count per word from scoring pipeline
   return null;
 });
 

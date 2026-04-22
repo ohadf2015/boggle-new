@@ -266,6 +266,9 @@ Sentry.init({
     /no txrsid/i,
     // console.warn(stack) from React internals — no message, just stack frames (JAVASCRIPT-NEXTJS-11C)
     /^\s*at https?:\/\/[^\s]+\/_next\/static\/chunks\//,
+    // LogRocket internal quota/memory warnings — third-party, non-actionable (JAVASCRIPT-NEXTJS-11T, 11Y)
+    /LogRocket.*filter manager.*too much memory/i,
+    /LogRocket.*Session quota exceeded/i,
   ],
 
   denyUrls: [

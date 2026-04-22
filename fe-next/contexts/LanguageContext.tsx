@@ -142,26 +142,36 @@ export const LanguageProvider = ({ children, initialLanguage, initialTranslation
         languageRef.current = language;
     }, [language]);
 
-    // After mount, sync localStorage with URL locale
-    // URL is the source of truth - don't override explicit URL locale with stored preferences
+    // After mount, reconcile URL locale with user's explicit saved preference.
+    // Android WebView cold-starts at `/` → server falls back to Accept-Language
+    // (device locale) when cookie is absent/pruned, overwriting user's choice.
+    // Fix: if user explicitly selected a language (flag set), that wins over URL.
     useEffect(() => {
         mountedRef.current = true;
 
-        // Get the locale from the URL path
         const urlLocale = pathname ? parseLocaleFromPath(pathname) : null;
+        const savedLanguage = localStorage.getItem('boggle_language');
+        const explicit = localStorage.getItem('boggle_language_explicit') === '1';
+        const currentLang = languageRef.current;
 
-        // If URL has an explicit locale, that's the source of truth
-        // Don't change language state - the URL dictates the language
         if (urlLocale) {
+            // User's explicit pick overrides URL locale guessed by server.
+            if (
+                explicit &&
+                savedLanguage &&
+                locales.includes(savedLanguage as Language) &&
+                savedLanguage !== urlLocale
+            ) {
+                const segments = pathname.split('/');
+                segments[1] = savedLanguage;
+                const newPath = segments.join('/') || `/${savedLanguage}`;
+                setLanguageState(savedLanguage as Language);
+                router.replace(newPath);
+            }
             return;
         }
 
-        // Only if there's NO locale in URL (shouldn't happen with middleware, but fallback)
-        // do we check stored preferences
-        const currentLang = languageRef.current;
-
-        // Check localStorage for user's explicit preference
-        const savedLanguage = localStorage.getItem('boggle_language');
+        // No URL locale — use saved preference or browser fallback
         if (savedLanguage && locales.includes(savedLanguage as Language)) {
             if (savedLanguage !== currentLang) {
                 setLanguageState(savedLanguage as Language);
@@ -169,14 +179,12 @@ export const LanguageProvider = ({ children, initialLanguage, initialTranslation
             return;
         }
 
-        // Use browser language as fallback
-        // Location-based detection removed to respect user preferences
         const browserLang = getBrowserLanguage();
         if (browserLang && browserLang !== currentLang) {
             setLanguageState(browserLang);
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []); // Only run on mount - pathname is read once for initialization
+    }, []); // Only run on mount
 
     // Sync language when pathname or initialLanguage changes (after mount)
     useEffect(() => {
@@ -200,9 +208,16 @@ export const LanguageProvider = ({ children, initialLanguage, initialTranslation
         if (newLang !== languageRef.current) {
             setLanguageState(newLang);
 
+            // Mark as explicit user choice — mount effect uses this to override
+            // server-guessed URL locale (Accept-Language) on Android WebView cold start.
+            if (typeof window !== 'undefined') {
+                localStorage.setItem('boggle_language_explicit', '1');
+            }
+
             // Also update cookie immediately for server-side consistency
             if (typeof document !== 'undefined') {
                 document.cookie = `boggle_language=${newLang}; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax`;
+                document.cookie = `boggle_language_explicit=1; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax`;
             }
 
             // Fire-and-forget: persist to profiles.language so per-recipient push

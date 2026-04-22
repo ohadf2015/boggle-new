@@ -6797,7 +6797,8 @@ const sv = {
     "restart": "Börja om",
     "gold": "Guld",
     "hunt": {
-      "preparingPuzzle": "Förbereder pussel..."
+      "preparingPuzzle": "Förbereder pussel...",
+      "noTargetAvailable": "Det gick inte att förbereda jakten. Prova en annan nivå."
     },
     "loading": "Laddar äventyr...",
     "currency": {

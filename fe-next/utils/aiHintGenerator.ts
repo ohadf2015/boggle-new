@@ -219,11 +219,15 @@ export async function generateProgressiveHints(
         lastError = new Error(`API error ${response.status}: ${errorText}`);
 
         if (isRetryableError(null, response) && attempt < retryCount) {
-          logger.warn(`[HintGenerator] Retryable error: ${response.status}`);
+          logger.debug(`[HintGenerator] Retryable error: ${response.status}`);
           continue;
         }
 
-        logger.error('[HintGenerator] API error:', response.status, errorText);
+        if (response.status === 429) {
+          logger.debug('[HintGenerator] Rate limited, using fallback:', errorText);
+        } else {
+          logger.error('[HintGenerator] API error:', response.status, errorText);
+        }
         return generateFallbackHints(normalizedWord, language);
       }
 

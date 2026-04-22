@@ -18,6 +18,17 @@ interface DebrisFragment {
   createdAt: number;
 }
 
+// Guard against invalid hex -> NaN -> PIXI "Unable to convert color" throw.
+// Accepts '#RRGGBB' or 'RRGGBB'; returns fallback for undefined/malformed/negative.
+export function safeHexToNum(hex: string | undefined | null, fallback = 0xffffff): number {
+  if (!hex) return fallback;
+  const clean = hex.startsWith('#') ? hex.slice(1) : hex;
+  if (!/^[0-9a-fA-F]{1,8}$/.test(clean)) return fallback;
+  const n = parseInt(clean, 16);
+  if (!Number.isFinite(n) || n < 0 || n > 0xffffff) return fallback;
+  return n;
+}
+
 const DEBRIS_LIFETIME = 2; // seconds
 const DEBRIS_PER_TILE = 3;
 const MAX_DEBRIS = 60;
@@ -163,7 +174,7 @@ export function useBlastDebris(
     for (let i = 0; i < count; i++) {
       const dir = CROSS_DIRECTIONS[i % 4];
       const colorHex = RAINBOW_DEBRIS_COLORS[i % RAINBOW_DEBRIS_COLORS.length];
-      const colorNum = parseInt(colorHex.replace('#', ''), 16);
+      const colorNum = safeHexToNum(colorHex);
       const size = 4 + Math.random() * 4;
 
       const g = new Graphics();
@@ -333,7 +344,7 @@ export function useBlastDebris(
       for (let i = 0; i < perTile; i++) {
         const size = 3 + Math.random() * 5;
         const colorHex = colors[Math.floor(Math.random() * colors.length)];
-        const colorNum = parseInt(colorHex.replace('#', ''), 16);
+        const colorNum = safeHexToNum(colorHex);
 
         const g = new Graphics();
         g.rect(-size / 2, -size / 2, size, size).fill({ color: colorNum });
@@ -386,7 +397,7 @@ export function useBlastDebris(
         const y = cy + Math.sin(angle) * r;
         const size = 4 + Math.random() * 4;
         const colorHex = rainbow[i % rainbow.length];
-        const colorNum = parseInt(colorHex.replace('#', ''), 16);
+        const colorNum = safeHexToNum(colorHex);
 
         const g = new Graphics();
         g.rect(-size / 2, -size / 2, size, size).fill({ color: colorNum });

@@ -1,11 +1,16 @@
 /**
- * Rune Card Catalog — All 60 rune definitions for Word Forge mode.
+ * Rune Card Catalog — active rune definitions for Word Forge mode.
+ *
+ * Every id here must have a registered evaluator in runeEngine.ts (enforced
+ * by lib/wordForge/__tests__/runeParity.test.ts). A small number of runes
+ * (timeWarp, hintWhisper, bigGrid) are implemented by run/grid/timer managers
+ * outside the scoring evaluator; their evaluators return null by design.
  */
 
 import type { RuneCardDef } from '@/types/wordForge';
 
 export const RUNE_CATALOG: RuneCardDef[] = [
-  // ─── CHIP RUNES (20) ────────────────────────────────────────
+  // ─── CHIP RUNES (13) ────────────────────────────────────────
 
   // Common Chips (10)
   { id: 'vowelMiner', name: 'Vowel Miner', descriptionKey: 'wordForge.rune.vowelMiner', category: 'chip', rarity: 'common', icon: '🔷', unlockTier: 0 },
@@ -19,21 +24,13 @@ export const RUNE_CATALOG: RuneCardDef[] = [
   { id: 'cleanSlate', name: 'Clean Slate', descriptionKey: 'wordForge.rune.cleanSlate', category: 'chip', rarity: 'common', icon: '✨', unlockTier: 1 },
   { id: 'perfectFive', name: 'Perfect Five', descriptionKey: 'wordForge.rune.perfectFive', category: 'chip', rarity: 'common', icon: '⭐', unlockTier: 2 },
 
-  // Rare Chips (7)
+  // Rare Chips (3)
   { id: 'palindromePrize', name: 'Palindrome Prize', descriptionKey: 'wordForge.rune.palindromePrize', category: 'chip', rarity: 'rare', icon: '🔄', unlockTier: 2 },
-  { id: 'edgeWalker', name: 'Edge Walker', descriptionKey: 'wordForge.rune.edgeWalker', category: 'chip', rarity: 'rare', icon: '🗺️', unlockTier: 2 },
-  { id: 'centerStage', name: 'Center Stage', descriptionKey: 'wordForge.rune.centerStage', category: 'chip', rarity: 'rare', icon: '🎭', unlockTier: 2 },
   { id: 'streakBonus', name: 'Streak Bonus', descriptionKey: 'wordForge.rune.streakBonus', category: 'chip', rarity: 'rare', icon: '🔥', unlockTier: 3 },
   { id: 'wordHoarder', name: 'Word Hoarder', descriptionKey: 'wordForge.rune.wordHoarder', category: 'chip', rarity: 'rare', icon: '📚', unlockTier: 3 },
-  { id: 'precisionShot', name: 'Precision Shot', descriptionKey: 'wordForge.rune.precisionShot', category: 'chip', rarity: 'rare', icon: '🎖️', unlockTier: 3 },
   { id: 'sharpEdge', name: 'Sharp Edge', descriptionKey: 'wordForge.rune.sharpEdge', category: 'chip', rarity: 'rare', icon: '🔪', unlockTier: 2 },
 
-  // Legendary Chips (3)
-  { id: 'goldRush', name: 'Gold Rush', descriptionKey: 'wordForge.rune.goldRush', category: 'chip', rarity: 'legendary', icon: '💰', unlockTier: 2 },
-  { id: 'letterFeast', name: 'Letter Feast', descriptionKey: 'wordForge.rune.letterFeast', category: 'chip', rarity: 'legendary', icon: '🍽️', unlockTier: 4 },
-  { id: 'avalanche', name: 'Avalanche', descriptionKey: 'wordForge.rune.avalanche', category: 'chip', rarity: 'legendary', icon: '🌊', unlockTier: 5 },
-
-  // ─── MULT RUNES (15) ────────────────────────────────────────
+  // ─── MULT RUNES (13) ────────────────────────────────────────
 
   // Common Mults (5)
   { id: 'wordSmith', name: 'Word Smith', descriptionKey: 'wordForge.rune.wordSmith', category: 'mult', rarity: 'common', icon: '🔨', unlockTier: 0 },
@@ -42,42 +39,26 @@ export const RUNE_CATALOG: RuneCardDef[] = [
   { id: 'chainLink', name: 'Chain Link', descriptionKey: 'wordForge.rune.chainLink', category: 'mult', rarity: 'rare', icon: '🔗', unlockTier: 0 },
   { id: 'speedDemon', name: 'Speed Demon', descriptionKey: 'wordForge.rune.speedDemon', category: 'mult', rarity: 'common', icon: '⚡', unlockTier: 0 },
 
-  // Rare Mults (9)
+  // Rare Mults (7)
   { id: 'criticalHit', name: 'Critical Hit', descriptionKey: 'wordForge.rune.criticalHit', category: 'mult', rarity: 'rare', icon: '💥', unlockTier: 1 },
   { id: 'palindromePower', name: 'Palindrome Power', descriptionKey: 'wordForge.rune.palindromePower', category: 'mult', rarity: 'rare', icon: '🔁', unlockTier: 2 },
   { id: 'crescendo', name: 'Crescendo', descriptionKey: 'wordForge.rune.crescendo', category: 'mult', rarity: 'rare', icon: '📈', unlockTier: 2 },
   { id: 'frontLoad', name: 'Front Load', descriptionKey: 'wordForge.rune.frontLoad', category: 'mult', rarity: 'rare', icon: '🚀', unlockTier: 3 },
   { id: 'vowelPower', name: 'Vowel Power', descriptionKey: 'wordForge.rune.vowelPower', category: 'mult', rarity: 'rare', icon: '🅾️', unlockTier: 3 },
-  { id: 'loneSurvivor', name: 'Lone Survivor', descriptionKey: 'wordForge.rune.loneSurvivor', category: 'mult', rarity: 'rare', icon: '🛡️', unlockTier: 3 },
   { id: 'weightedWords', name: 'Weighted Words', descriptionKey: 'wordForge.rune.weightedWords', category: 'mult', rarity: 'rare', icon: '⚖️', unlockTier: 2 },
-  { id: 'lastWord', name: 'Last Word', descriptionKey: 'wordForge.rune.lastWord', category: 'mult', rarity: 'rare', icon: '🏁', unlockTier: 3 },
 
-  // Legendary Mults (2)
+  // Legendary Mults (1)
   { id: 'grandMaster', name: 'Grand Master', descriptionKey: 'wordForge.rune.grandMaster', category: 'mult', rarity: 'legendary', icon: '👑', unlockTier: 4 },
-  { id: 'neverDie', name: 'Immortal Flame', descriptionKey: 'wordForge.rune.neverDie', category: 'mult', rarity: 'legendary', icon: '🏆', unlockTier: 5 },
 
-  // ─── SPECIAL RUNES (15) ─────────────────────────────────────
+  // ─── SPECIAL RUNES (4) ──────────────────────────────────────
 
-  // Common Specials (5)
+  // Common Specials (3) — timeWarp/hintWhisper handled by managers, not evaluator
   { id: 'echo', name: 'Echo', descriptionKey: 'wordForge.rune.echo', category: 'special', rarity: 'common', icon: '🔊', unlockTier: 0 },
   { id: 'timeWarp', name: 'Time Warp', descriptionKey: 'wordForge.rune.timeWarp', category: 'special', rarity: 'common', icon: '⏱️', unlockTier: 0 },
   { id: 'hintWhisper', name: 'Hint Whisper', descriptionKey: 'wordForge.rune.hintWhisper', category: 'special', rarity: 'common', icon: '💡', unlockTier: 0 },
-  { id: 'wordMirror', name: 'Word Mirror', descriptionKey: 'wordForge.rune.wordMirror', category: 'special', rarity: 'common', icon: '🪞', unlockTier: 0 },
-  { id: 'letterLock', name: 'Letter Lock', descriptionKey: 'wordForge.rune.letterLock', category: 'special', rarity: 'common', icon: '🔒', unlockTier: 0 },
 
-  // Rare Specials (7)
+  // Rare Specials (1) — bigGrid handled by grid manager
   { id: 'bigGrid', name: 'Big Grid', descriptionKey: 'wordForge.rune.bigGrid', category: 'special', rarity: 'rare', icon: '📐', unlockTier: 1 },
-  { id: 'doubleOrNothing', name: 'Double Or Nothing', descriptionKey: 'wordForge.rune.doubleOrNothing', category: 'special', rarity: 'rare', icon: '🎰', unlockTier: 2 },
-  { id: 'richochet', name: 'Ricochet', descriptionKey: 'wordForge.rune.richochet', category: 'special', rarity: 'rare', icon: '🎾', unlockTier: 2 },
-  { id: 'catalystTile', name: 'Catalyst Tile', descriptionKey: 'wordForge.rune.catalystTile', category: 'special', rarity: 'rare', icon: '⚗️', unlockTier: 3 },
-  { id: 'forgeFrenzy', name: 'Forge Frenzy', descriptionKey: 'wordForge.rune.forgeFrenzy', category: 'special', rarity: 'rare', icon: '🕰️', unlockTier: 3 },
-  { id: 'wordDynamite', name: 'Word Dynamite', descriptionKey: 'wordForge.rune.wordDynamite', category: 'special', rarity: 'rare', icon: '💣', unlockTier: 3 },
-
-  // Legendary Specials (4)
-  { id: 'wordAlchemy', name: 'Word Alchemy', descriptionKey: 'wordForge.rune.wordAlchemy', category: 'special', rarity: 'legendary', icon: '🧪', unlockTier: 4 },
-  { id: 'infiniteGrid', name: 'Infinite Grid', descriptionKey: 'wordForge.rune.infiniteGrid', category: 'special', rarity: 'legendary', icon: '♾️', unlockTier: 4 },
-  { id: 'timeFreezeSpecial', name: 'Time Freeze', descriptionKey: 'wordForge.rune.timeFreezeSpecial', category: 'special', rarity: 'legendary', icon: '❄️', unlockTier: 5 },
-  { id: 'runeResonance', name: 'Rune Resonance', descriptionKey: 'wordForge.rune.runeResonance', category: 'special', rarity: 'legendary', icon: '🎶', unlockTier: 4 },
 
   // ─── CURSED RUNES (10) ──────────────────────────────────────
 
@@ -97,14 +78,6 @@ export const RUNE_CATALOG: RuneCardDef[] = [
   { id: 'overload', name: 'Overload', descriptionKey: 'wordForge.rune.overload', category: 'cursed', rarity: 'legendary', icon: '🔋', unlockTier: 5 },
   { id: 'lastStand', name: 'Last Stand', descriptionKey: 'wordForge.rune.lastStand', category: 'cursed', rarity: 'legendary', icon: '⚰️', unlockTier: 5 },
 ];
-
-/** Rune IDs with unimplemented evaluators (return null unconditionally). Excluded from offerings. */
-export const DEAD_RUNE_IDS = new Set([
-  'edgeWalker', 'centerStage', 'precisionShot', 'goldRush', 'letterFeast',
-  'avalanche', 'loneSurvivor', 'lastWord', 'neverDie', 'wordMirror',
-  'letterLock', 'doubleOrNothing', 'richochet', 'catalystTile', 'forgeFrenzy',
-  'wordDynamite', 'wordAlchemy', 'infiniteGrid', 'timeFreezeSpecial', 'runeResonance',
-]);
 
 /** Get runes available at a given unlock tier */
 export function getAvailableRunes(unlockTier: number): RuneCardDef[] {
@@ -135,7 +108,7 @@ export function generateRuneOffering(
   equippedRuneIds: string[],
 ): RuneCardDef[] {
   const available = getAvailableRunes(unlockTier).filter(
-    r => !equippedRuneIds.includes(r.id) && !DEAD_RUNE_IDS.has(r.id),
+    r => !equippedRuneIds.includes(r.id),
   );
 
   if (available.length <= 3) return available;

@@ -6611,7 +6611,8 @@ const he = {
       }
     },
     "hunt": {
-      "preparingPuzzle": "מכין פאזל..."
+      "preparingPuzzle": "מכין פאזל...",
+      "noTargetAvailable": "לא ניתן להכין ציד כאן. נסו שלב אחר."
     },
     "loading": "טוען הרפתקה...",
     "currency": {

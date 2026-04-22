@@ -6781,7 +6781,8 @@ const es = {
       "forge": "Forja de palabras"
     },
     "hunt": {
-      "preparingPuzzle": "Preparando el puzzle..."
+      "preparingPuzzle": "Preparando el puzzle...",
+      "noTargetAvailable": "No se pudo preparar esta cacería. Prueba otro nivel."
     },
     "loading": "Cargando aventura...",
     "currency": {

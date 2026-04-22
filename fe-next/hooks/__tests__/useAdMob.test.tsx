@@ -9,6 +9,15 @@ vi.mock('@capacitor/core', () => ({
   },
 }));
 
+type Listener = (payload?: unknown) => void;
+const { listeners, fireEvent } = vi.hoisted(() => {
+  const ls: Record<string, Listener[]> = {};
+  return {
+    listeners: ls,
+    fireEvent: (name: string, payload?: unknown) => (ls[name] || []).forEach((fn) => fn(payload)),
+  };
+});
+
 vi.mock('@capacitor-community/admob', () => ({
   AdMob: {
     initialize: vi.fn(() => Promise.resolve()),
@@ -18,9 +27,26 @@ vi.mock('@capacitor-community/admob', () => ({
     showInterstitial: vi.fn(() => Promise.resolve()),
     showBanner: vi.fn(() => Promise.resolve()),
     hideBanner: vi.fn(() => Promise.resolve()),
+    addListener: vi.fn((name: string, fn: Listener) => {
+      (listeners[name] ||= []).push(fn);
+      return Promise.resolve({
+        remove: () => {
+          listeners[name] = (listeners[name] || []).filter((f) => f !== fn);
+          return Promise.resolve();
+        },
+      });
+    }),
   },
   BannerAdSize: { ADAPTIVE_BANNER: 'ADAPTIVE_BANNER' },
   BannerAdPosition: { BOTTOM_CENTER: 'BOTTOM_CENTER' },
+  RewardAdPluginEvents: {
+    Loaded: 'onRewardedVideoAdLoaded',
+    FailedToLoad: 'onRewardedVideoAdFailedToLoad',
+    Showed: 'onRewardedVideoAdShowed',
+    FailedToShow: 'onRewardedVideoAdFailedToShow',
+    Dismissed: 'onRewardedVideoAdDismissed',
+    Rewarded: 'onRewardedVideoAdReward',
+  },
 }));
 
 import { Capacitor } from '@capacitor/core';
@@ -40,22 +66,60 @@ function makeWrapper(isNative: boolean, platform: string = 'android') {
 describe('useAdMob', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    Object.keys(listeners).forEach((k) => delete listeners[k]);
   });
 
-  it('showRewarded calls onReward on native', async () => {
+  it('showRewarded fires onReward only after Rewarded event (not on resolve)', async () => {
     const wrapper = makeWrapper(true);
     const { result } = renderHook(() => useAdMob(), { wrapper });
     const onReward = vi.fn();
     await act(async () => {
-      await result.current.showRewarded(onReward);
+      const p = result.current.showRewarded(onReward);
+      await Promise.resolve();
+      await Promise.resolve();
+      // Plugin resolves showRewardVideoAd, but no Rewarded event yet → must NOT call onReward
+      expect(onReward).not.toHaveBeenCalled();
+      fireEvent('onRewardedVideoAdReward', { type: 'coins', amount: 10 });
+      fireEvent('onRewardedVideoAdDismissed');
+      await p;
     });
-    expect(AdMob.prepareRewardVideoAd).toHaveBeenCalled();
-    expect(AdMob.showRewardVideoAd).toHaveBeenCalled();
     expect(onReward).toHaveBeenCalledTimes(1);
   });
 
-  it('showRewarded calls onError when AdMob throws', async () => {
-    vi.mocked(AdMob.showRewardVideoAd).mockRejectedValueOnce(new Error('dismissed'));
+  it('showRewarded calls onError when dismissed without reward', async () => {
+    const wrapper = makeWrapper(true);
+    const { result } = renderHook(() => useAdMob(), { wrapper });
+    const onReward = vi.fn();
+    const onError = vi.fn();
+    await act(async () => {
+      const p = result.current.showRewarded(onReward, onError);
+      await Promise.resolve();
+      await Promise.resolve();
+      fireEvent('onRewardedVideoAdDismissed');
+      await p;
+    });
+    expect(onReward).not.toHaveBeenCalled();
+    expect(onError).toHaveBeenCalled();
+  });
+
+  it('showRewarded calls onError on FailedToShow', async () => {
+    const wrapper = makeWrapper(true);
+    const { result } = renderHook(() => useAdMob(), { wrapper });
+    const onReward = vi.fn();
+    const onError = vi.fn();
+    await act(async () => {
+      const p = result.current.showRewarded(onReward, onError);
+      await Promise.resolve();
+      await Promise.resolve();
+      fireEvent('onRewardedVideoAdFailedToShow', { message: 'no fill' });
+      await p;
+    });
+    expect(onReward).not.toHaveBeenCalled();
+    expect(onError).toHaveBeenCalledWith(expect.stringContaining('no fill'));
+  });
+
+  it('showRewarded calls onError when AdMob.showRewardVideoAd throws', async () => {
+    vi.mocked(AdMob.showRewardVideoAd).mockRejectedValueOnce(new Error('boom'));
     const wrapper = makeWrapper(true);
     const { result } = renderHook(() => useAdMob(), { wrapper });
     const onReward = vi.fn();
@@ -64,7 +128,7 @@ describe('useAdMob', () => {
       await result.current.showRewarded(onReward, onError);
     });
     expect(onReward).not.toHaveBeenCalled();
-    expect(onError).toHaveBeenCalledWith('dismissed');
+    expect(onError).toHaveBeenCalledWith('boom');
   });
 
   it('showRewarded is no-op on web (getConfig returns null)', async () => {

@@ -122,23 +122,34 @@ const AdventureHuntGame: React.FC<Props> = ({ levelConfig, initialGrid, onLevelC
     isGameOver: false,
   });
 
-  const { solvedWords } = useAdventureWordValidation({
+  const { solvedWords, isSolveGridLoading } = useAdventureWordValidation({
     grid,
     language,
     minWordLength: levelConfig.minWordLength ?? 3,
     foundWords: state.foundWords,
   });
 
-  // Pick target from solved set when available (skip if hiddenWord already set)
+  // Pick target from solved set when available (skip if hiddenWord already set).
+  // If solve-grid finished but yielded no target, surface an error instead of
+  // spinning forever — empty Set is truthy, so `!solvedWords` is not enough.
   const targetPickedRef = React.useRef(false);
+  const [noTargetAvailable, setNoTargetAvailable] = React.useState(false);
   React.useEffect(() => {
-    if (state.targetWord || targetPickedRef.current || !solvedWords) return;
+    if (state.targetWord || targetPickedRef.current) return;
+    if (isSolveGridLoading) return;
+    if (!solvedWords) {
+      // Query errored out after retries — no data at all
+      setNoTargetAvailable(true);
+      return;
+    }
     const target = pickHuntTarget(solvedWords);
     if (target) {
       targetPickedRef.current = true;
       dispatch({ type: 'SET_TARGET', word: target });
+    } else {
+      setNoTargetAvailable(true);
     }
-  }, [solvedWords, state.targetWord]);
+  }, [solvedWords, isSolveGridLoading, state.targetWord]);
 
   const targetWord = state.targetWord;
   const targetLength = targetWord?.length ?? 0;
@@ -190,7 +201,7 @@ const AdventureHuntGame: React.FC<Props> = ({ levelConfig, initialGrid, onLevelC
   const emptySet = useMemo(() => new Set<string>(), []);
 
   // Show loading state while waiting for grid solve + target pick
-  const isLoading = !state.targetWord;
+  const isLoading = !state.targetWord && !noTargetAvailable;
 
   return (
     <div className="relative h-full w-full bg-neo-navy flex flex-col">
@@ -218,6 +229,18 @@ const AdventureHuntGame: React.FC<Props> = ({ levelConfig, initialGrid, onLevelC
         <div className="flex-1 flex items-center justify-center gap-3 text-neo-white/60">
           <Loader2 className="w-6 h-6 animate-spin" />
           <span className="font-neo-body text-sm">{t('adventure.hunt.preparingPuzzle')}</span>
+        </div>
+      ) : noTargetAvailable ? (
+        <div className="flex-1 flex flex-col items-center justify-center gap-4 px-6 text-center">
+          <span className="font-neo-display text-lg text-neo-white">
+            {t('adventure.hunt.noTargetAvailable')}
+          </span>
+          <button
+            onClick={onExit}
+            className="px-5 py-2 rounded-neo border-neo bg-neo-cyan text-neo-navy font-neo-display shadow-hard"
+          >
+            {t('common.exit')}
+          </button>
         </div>
       ) : (
         <div className="flex-1 min-h-0 relative overflow-hidden">
