@@ -18,7 +18,7 @@
  *
  * window.addEventListener('resize', handleResize);
  */
-export function throttle<T extends (...args: any[]) => void>(
+export function throttle<T extends (...args: unknown[]) => void>(
   fn: T,
   wait: number = 100
 ): T & { cancel: () => void } {
@@ -26,7 +26,7 @@ export function throttle<T extends (...args: any[]) => void>(
   let timeoutId: ReturnType<typeof setTimeout> | null = null;
   let rafId: number | null = null;
 
-  const throttled = function (this: any, ...args: Parameters<T>) {
+  const throttled = function (this: unknown, ...args: Parameters<T>) {
     const now = performance.now();
     const remaining = wait - (now - lastCall);
 
@@ -85,15 +85,15 @@ export function throttle<T extends (...args: any[]) => void>(
  *
  * input.addEventListener('input', (e) => handleSearch(e.target.value));
  */
-export function debounce<T extends (...args: any[]) => void>(
+export function debounce<T extends (...args: unknown[]) => void>(
   fn: T,
   wait: number = 100
 ): T & { cancel: () => void; flush: () => void } {
   let timeoutId: ReturnType<typeof setTimeout> | null = null;
   let lastArgs: Parameters<T> | null = null;
-  let lastThis: any = null;
+  let lastThis: unknown = null;
 
-  const debounced = function (this: any, ...args: Parameters<T>) {
+  const debounced = function (this: unknown, ...args: Parameters<T>) {
     lastArgs = args;
     lastThis = this;
 

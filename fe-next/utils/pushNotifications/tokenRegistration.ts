@@ -20,6 +20,36 @@ interface ActionPerformed {
   };
 }
 
+interface PushNotificationsPlugin {
+  checkPermissions: () => Promise<{ receive: string }>;
+  requestPermissions: () => Promise<{ receive: string }>;
+  register: () => Promise<void>;
+  addListener: <T = unknown>(event: string, handler: (data: T) => void) => Promise<{ remove: () => void }>;
+}
+
+interface LocalNotificationsPlugin {
+  schedule: (opts: {
+    notifications: Array<{
+      id: number;
+      title: string;
+      body: string;
+      extra?: Record<string, string>;
+    }>;
+  }) => Promise<void>;
+}
+
+interface CapacitorGlobal {
+  Capacitor?: {
+    getPlatform?: () => string;
+    Plugins?: {
+      PushNotifications?: PushNotificationsPlugin;
+      LocalNotifications?: LocalNotificationsPlugin;
+    };
+  };
+}
+
+const capGlobal = globalThis as unknown as CapacitorGlobal;
+
 // Storage key for device ID (persists across token refreshes)
 const DEVICE_ID_KEY = 'lexiclash_push_device_id';
 
@@ -44,9 +74,7 @@ async function getPlatform(): Promise<'ios' | 'android' | 'web'> {
   if (typeof window === 'undefined') return 'web';
 
   try {
-     
-    const cap = (globalThis as any).Capacitor;
-    const platform = cap?.getPlatform?.();
+    const platform = capGlobal.Capacitor?.getPlatform?.();
     if (platform === 'ios') return 'ios';
     if (platform === 'android') return 'android';
     return 'web';
@@ -96,8 +124,8 @@ export async function registerPushToken(): Promise<boolean> {
   }
 
   try {
-    // Dynamic import for Capacitor plugin
-    const { PushNotifications } = { PushNotifications: (globalThis as any).Capacitor?.Plugins?.PushNotifications } as any;
+    const PushNotifications = capGlobal.Capacitor?.Plugins?.PushNotifications;
+    if (!PushNotifications) return false;
 
     // Check current permission status
     const permStatus = await PushNotifications.checkPermissions();
@@ -193,13 +221,13 @@ export async function setupPushListeners(
   }
 
   try {
-    const { PushNotifications } = { PushNotifications: (globalThis as any).Capacitor?.Plugins?.PushNotifications } as any;
+    const PushNotifications = capGlobal.Capacitor?.Plugins?.PushNotifications;
 
     if (!PushNotifications) {
       return () => {}; // Plugin not available (e.g., Android WebView without Capacitor)
     }
 
-    const LocalNotifications = (globalThis as any).Capacitor?.Plugins?.LocalNotifications;
+    const LocalNotifications = capGlobal.Capacitor?.Plugins?.LocalNotifications;
 
     // Handle notification received while app is in foreground.
     // Capacitor's PushNotifications plugin does NOT display a system-tray
@@ -261,7 +289,8 @@ export async function isPushEnabled(): Promise<boolean> {
   }
 
   try {
-    const { PushNotifications } = { PushNotifications: (globalThis as any).Capacitor?.Plugins?.PushNotifications } as any;
+    const PushNotifications = capGlobal.Capacitor?.Plugins?.PushNotifications;
+    if (!PushNotifications) return false;
     const permStatus = await PushNotifications.checkPermissions();
     return permStatus.receive === 'granted';
   } catch {
