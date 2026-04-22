@@ -101,6 +101,10 @@ export const MessageComposer: React.FC<MessageComposerProps> = ({
     syncText(e.target.value);
   }, [syncText]);
 
+  const handleInput = useCallback((e: React.FormEvent<HTMLTextAreaElement>) => {
+    syncText(e.currentTarget.value);
+  }, [syncText]);
+
   const handleCompositionEnd = useCallback((e: React.CompositionEvent<HTMLTextAreaElement>) => {
     syncText(e.currentTarget.value);
   }, [syncText]);
@@ -166,7 +170,7 @@ export const MessageComposer: React.FC<MessageComposerProps> = ({
           ref={textareaRef}
           value={text}
           onChange={handleChange}
-          onInput={handleChange}
+          onInput={handleInput}
           onCompositionEnd={handleCompositionEnd}
           onKeyDown={handleKeyDown}
           placeholder={placeholder || t('friends.typeMessage')}
