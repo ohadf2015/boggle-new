@@ -22,7 +22,7 @@ import { useMounted } from '@/hooks/useMounted';
 /**
  * Hook to create a debounced callback
  */
-function useDebouncedCallback<T extends (...args: any[]) => any>(
+function useDebouncedCallback<T extends (...args: unknown[]) => unknown>(
   callback: T,
   delay: number
 ): T {
@@ -60,30 +60,33 @@ interface LeaderboardOptions {
   debounceMs?: number; // Debounce delay for realtime refetches (default: 500ms)
 }
 
-interface LeaderboardResult {
-  data: any[];
+type LeaderboardRow = Record<string, unknown>;
+type UserRank<T = Record<string, unknown>> = T | null;
+
+interface LeaderboardResult<T = LeaderboardRow> {
+  data: T[];
   loading: boolean;
-  error: any;
+  error: unknown;
   subscriptionStatus: string;
   refetch: () => Promise<void>;
 }
 
-interface UserRankResult {
-  rank: any;
+interface UserRankResult<T = Record<string, unknown>> {
+  rank: UserRank<T>;
   loading: boolean;
-  error: any;
+  error: unknown;
   refetch: () => Promise<void>;
 }
 
 // Module-level cache for leaderboard data (stale-while-revalidate pattern)
 // Persists across component mounts/unmounts for instant subsequent loads
 const leaderboardCache: {
-  data: any[] | null;
+  data: LeaderboardRow[] | null;
   timestamp: number;
   key: string;
 } = { data: null, timestamp: 0, key: '' };
 
-const userRankCache: Map<string, { data: any; timestamp: number }> = new Map();
+const userRankCache: Map<string, { data: UserRank; timestamp: number }> = new Map();
 
 const CACHE_TTL_MS = 60_000; // 1 minute - serve cached data immediately, revalidate in background
 
@@ -95,15 +98,15 @@ const CACHE_TTL_MS = 60_000; // 1 minute - serve cached data immediately, revali
  * @param options - { limit, orderBy, enabled, debounceMs }
  * @returns { data, loading, error, subscriptionStatus, refetch }
  */
-export function useLeaderboard(options: LeaderboardOptions = {}): LeaderboardResult {
+export function useLeaderboard<T = LeaderboardRow>(options: LeaderboardOptions = {}): LeaderboardResult<T> {
   const { limit = 100, orderBy = 'total_score', enabled = true, debounceMs = 500 } = options;
 
   const cacheKey = `${limit}:${orderBy}`;
   const cached = leaderboardCache.key === cacheKey ? leaderboardCache.data : null;
   // Initialize with cached data if available (instant render)
-  const [data, setData] = useState<any[]>(cached || []);
+  const [data, setData] = useState<T[]>((cached as T[] | null) || []);
   const [loading, setLoading] = useState(!cached);
-  const [error, setError] = useState<any>(null);
+  const [error, setError] = useState<unknown>(null);
   const [subscriptionStatus, setSubscriptionStatus] = useState('disconnected');
 
   // Track if component is mounted to prevent state updates after unmount
@@ -123,11 +126,11 @@ export function useLeaderboard(options: LeaderboardOptions = {}): LeaderboardRes
     if (result.error) {
       setError(result.error);
     } else {
-      const freshData = result.data || [];
+      const freshData = (result.data as T[] | null) || [];
       setData(freshData);
       setError(null);
       // Update module-level cache
-      leaderboardCache.data = freshData;
+      leaderboardCache.data = freshData as LeaderboardRow[];
       leaderboardCache.timestamp = Date.now();
       leaderboardCache.key = cacheKey;
     }
@@ -189,13 +192,13 @@ export function useLeaderboard(options: LeaderboardOptions = {}): LeaderboardRes
  * @param userId - User ID
  * @returns { rank, loading, error, refetch }
  */
-export function useUserRank(userId: string | null | undefined): UserRankResult {
+export function useUserRank<T = Record<string, unknown>>(userId: string | null | undefined): UserRankResult<T> {
   const cachedRank = userId ? userRankCache.get(userId) : null;
   const isCachedRankFresh = () => cachedRank && (Date.now() - cachedRank.timestamp) < CACHE_TTL_MS;
 
-  const [rank, setRank] = useState<any>(cachedRank?.data || null);
+  const [rank, setRank] = useState<UserRank<T>>((cachedRank?.data as T | null) || null);
   const [loading, setLoading] = useState(!cachedRank);
-  const [error, setError] = useState<any>(null);
+  const [error, setError] = useState<unknown>(null);
 
   // Track if component is mounted
   const isMountedRef = useMounted();
@@ -217,10 +220,10 @@ export function useUserRank(userId: string | null | undefined): UserRankResult {
     if (result.error) {
       setError(result.error);
     } else {
-      const freshRank = result.data?.[0] || null;
+      const freshRank = (result.data as T[] | null)?.[0] || null;
       setRank(freshRank);
       setError(null);
-      userRankCache.set(userId, { data: freshRank, timestamp: Date.now() });
+      userRankCache.set(userId, { data: freshRank as Record<string, unknown> | null, timestamp: Date.now() });
     }
     setLoading(false);
   }, [userId, isMountedRef]);

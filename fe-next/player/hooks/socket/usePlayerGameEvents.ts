@@ -15,22 +15,96 @@ import {
   createHostLeftRoomClosingHandler,
 } from '@/shared/utils/gameEventUtils';
 import { useLetterGrid, useGameLanguage, useShowStartAnimation, useGameActions, useGameStore } from '@/hooks/gameState';
-import type { BlastComboSyncPayload, StartGameBroadcast } from '@/shared/types/socket';
+import type { BlastComboSyncPayload, StartGameBroadcast, PlayerResultPayload } from '@/shared/types/socket';
 import type { BlastTileState } from '@/shared/types/blast';
-import type { BlastTileOverlay } from '@/shared/types/game';
+import type { BlastTileOverlay, LetterFeedback } from '@/shared/types/game';
+import type { LetterGrid, Language } from '@/types';
+import type { WordToVote } from '@/player/types';
 import { createEarthquakeSocketHandlers } from '@/shared/utils/earthquakeSocketHandlers';
 import logger from '@/utils/logger';
 import type { GameTimerReturn } from '@/hooks/useGameTimer';
+
+interface StartGameBroadcastExt extends StartGameBroadcast {
+  gameSessionId?: number;
+  boardTheme?: string;
+  blastTileOverlay?: BlastTileOverlay[];
+  blastPlayerMoves?: Record<string, number>;
+  blastSeed?: number | null;
+  blastWave?: number;
+  blastGrid?: string[][];
+  blastTileStates?: BlastTileState[][];
+  wordHuntTargetLength?: number;
+  wordHuntTargetCategory?: string | null;
+  wordHuntPlayerLives?: Record<string, number>;
+  wordHuntEliminatedPlayers?: string[];
+}
+
+interface ValidatedScoresPayload {
+  scores: PlayerResultPayload[];
+  letterGrid: LetterGrid | null;
+  duplicateRuleDisabled?: boolean;
+  playerCount?: number;
+  gameMode?: string;
+  wordHuntSummary?: WordHuntSummary;
+  blastSummary?: BlastSummary;
+  wheelRushSummary?: WheelRushSummary;
+  tvMode?: boolean;
+}
+
+interface WordHuntSummary {
+  targetWord: string;
+  playerLives: Record<string, number>;
+  eliminatedPlayers: string[];
+  targetFoundBy: string | null;
+  foundTarget: boolean;
+  survivalTime: number;
+  discoveryWords: number;
+}
+
+interface BlastSummary {
+  playerMoves: Record<string, number>;
+  playerStats: Record<string, { tilesCleared?: number; totalTileBonus?: number; [k: string]: unknown }>;
+}
+
+interface WheelRushSummary {
+  playerStats: Record<string, unknown>;
+}
+
+interface TimeUpdatePayload {
+  remainingTime: number;
+  letterGrid?: LetterGrid;
+  language?: Language;
+  gameSessionId?: number;
+}
+
+interface ResetGamePayload {
+  gameSessionId?: number;
+  message?: string;
+}
+
+interface FinalScoresPayload {
+  scores: PlayerResultPayload[];
+}
+
+export interface OnShowResultsData {
+  scores: PlayerResultPayload[];
+  letterGrid: LetterGrid | null;
+  duplicateRuleDisabled?: boolean;
+  playerCount?: number;
+  wordHuntSummary?: WordHuntSummary;
+  blastSummary?: BlastSummary;
+  wheelRushSummary?: WheelRushSummary;
+}
 
 interface UsePlayerGameEventsProps {
   socket: Socket | null;
   t: (key: string) => string;
   username: string;
-  onShowResults?: (data: { scores: any; letterGrid: any; duplicateRuleDisabled?: boolean; playerCount?: number; wordHuntSummary?: any; blastSummary?: any; wheelRushSummary?: any }) => void;
+  onShowResults?: (data: OnShowResultsData) => void;
 
   // Local state (not in GameState context)
   setShowWordFeedback: React.Dispatch<React.SetStateAction<boolean>>;
-  setWordToVote: React.Dispatch<React.SetStateAction<any>>;
+  setWordToVote: React.Dispatch<React.SetStateAction<WordToVote | null>>;
   setEarthquakeState: React.Dispatch<React.SetStateAction<'idle' | 'warning' | 'shaking' | 'fire-round'>>;
   setFireRoundActive: React.Dispatch<React.SetStateAction<boolean>>;
   setFireRoundRemaining: React.Dispatch<React.SetStateAction<number>>;
@@ -192,9 +266,10 @@ export function usePlayerGameEvents({
     if (!socket) return;
 
     const handleStartGame = (data: StartGameBroadcast) => {
+      const ext = data as StartGameBroadcastExt;
       // Validate session - ignore stale events
-      if (gameSessionIdRef.current !== null && (data as any).gameSessionId !== undefined &&
-          (data as any).gameSessionId < gameSessionIdRef.current) {
+      if (gameSessionIdRef.current !== null && ext.gameSessionId !== undefined &&
+          ext.gameSessionId < gameSessionIdRef.current) {
         logger.log('[PLAYER] Ignoring stale startGame from old session');
         return;
       }
@@ -202,13 +277,13 @@ export function usePlayerGameEvents({
       wasInActiveGameRef.current = true;
       comboShieldsUsedRef.current = 0;
 
-      if ((data as any).gameSessionId !== undefined) {
-        gameSessionIdRef.current = (data as any).gameSessionId;
+      if (ext.gameSessionId !== undefined) {
+        gameSessionIdRef.current = ext.gameSessionId;
       }
 
       // Batch all Zustand store updates into a single setState call
       // This prevents cascading re-renders (was 15+ individual updates)
-      const storeUpdates: Record<string, any> = {
+      const storeUpdates: Record<string, unknown> = {
         foundWords: [],
         achievements: [],
       };
@@ -219,39 +294,40 @@ export function usePlayerGameEvents({
       }
       if (data.language) storeUpdates.gameLanguage = data.language;
       storeUpdates.minWordLength = data.minWordLength ?? 2;
-      if ((data as any).boardTheme) storeUpdates.boardTheme = (data as any).boardTheme;
+      if (ext.boardTheme) storeUpdates.boardTheme = ext.boardTheme;
       if (data.gameMode) storeUpdates.gameMode = data.gameMode;
-      if ((data as any).blastTileOverlay) {
-        storeUpdates.blastTileOverlay = (data as any).blastTileOverlay;
-        const reconnectMoves = (data as any).blastPlayerMoves as Record<string, number> | undefined;
-        storeUpdates.blastMovesUsed = reconnectMoves?.[username] ?? 0;
-        if ((data as any).blastSeed != null) storeUpdates.blastSeed = (data as any).blastSeed;
-        if ((data as any).blastWave != null) storeUpdates.blastWave = (data as any).blastWave;
+      if (ext.blastTileOverlay) {
+        storeUpdates.blastTileOverlay = ext.blastTileOverlay;
+        const reconnectMoves = ext.blastPlayerMoves;
+        const myMoves = reconnectMoves?.[username] ?? 0;
+        storeUpdates.blastMovesUsed = myMoves;
+        if (ext.blastSeed != null) storeUpdates.blastSeed = ext.blastSeed;
+        if (ext.blastWave != null) storeUpdates.blastWave = ext.blastWave;
         // Reconnect/late-join: apply current server board state if available
-        if ((data as any).blastGrid && (data as any).blastTileStates) {
+        if (ext.blastGrid && ext.blastTileStates) {
           storeUpdates.blastBoardUpdate = {
-            grid: (data as any).blastGrid,
-            tileStates: (data as any).blastTileStates,
+            grid: ext.blastGrid,
+            tileStates: ext.blastTileStates,
             clearedBy: '__server_reconnect__',
             word: '',
             clearedCount: 0,
-            totalMoves: storeUpdates.blastMovesUsed,
+            totalMoves: myMoves,
           };
         }
       }
-      if ((data as any).wordHuntTargetLength != null && (data as any).wordHuntTargetLength > 0) {
-        storeUpdates.wordHuntTargetLength = (data as any).wordHuntTargetLength;
-        storeUpdates.wordHuntTargetCategory = (data as any).wordHuntTargetCategory ?? null;
+      if (ext.wordHuntTargetLength != null && ext.wordHuntTargetLength > 0) {
+        storeUpdates.wordHuntTargetLength = ext.wordHuntTargetLength;
+        storeUpdates.wordHuntTargetCategory = ext.wordHuntTargetCategory ?? null;
         storeUpdates.wordHuntMyLife = 100;
-        storeUpdates.wordHuntPlayerLives = (data as any).wordHuntPlayerLives || {};
+        storeUpdates.wordHuntPlayerLives = ext.wordHuntPlayerLives || {};
         storeUpdates.wordHuntTargetAttempts = [];
         storeUpdates.wordHuntTargetFound = false;
         storeUpdates.wordHuntTargetFoundBy = null;
-        storeUpdates.wordHuntEliminatedPlayers = (data as any).wordHuntEliminatedPlayers || [];
+        storeUpdates.wordHuntEliminatedPlayers = ext.wordHuntEliminatedPlayers || [];
         storeUpdates.wordHuntDiscoveryClues = [];
         storeUpdates.wordHuntKnownLetters = [];
       }
-      if ((data as any).lateJoin) {
+      if (data.lateJoin) {
         storeUpdates.gameActive = true;
         gameActiveRef.current = true;
       } else {
@@ -274,10 +350,10 @@ export function usePlayerGameEvents({
       sendStartGameAck(socket, data, 'PLAYER');
       onGameStart?.();
 
-      const toastMessage = (data as any).lateJoin
+      const toastMessage = data.lateJoin
         ? (t('common.joinedGame') || 'Joined game!')
         : t('common.gameStarted');
-      neoSuccessToast(toastMessage, { id: 'game-started', icon: (data as any).lateJoin ? TOAST_ICONS.gamepad : TOAST_ICONS.rocket, duration: 3000 });
+      neoSuccessToast(toastMessage, { id: 'game-started', icon: data.lateJoin ? TOAST_ICONS.gamepad : TOAST_ICONS.rocket, duration: 3000 });
     };
 
     // Fallback timeout: if we enter waitingForResults but never get validatedScores,

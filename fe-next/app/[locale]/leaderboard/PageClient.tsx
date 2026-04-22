@@ -71,9 +71,9 @@ export default function LeaderboardPageClient(): React.JSX.Element {
     error,
     subscriptionStatus,
     refetch,
-  } = useLeaderboard({ limit: 100, enabled: isSupabaseEnabled });
+  } = useLeaderboard<LeaderboardEntry>({ limit: 100, enabled: isSupabaseEnabled });
 
-  const { rank: userRank } = useUserRank(user?.id);
+  const { rank: userRank } = useUserRank<{ total_score?: number; rank_position?: number }>(user?.id);
 
   // Compute current user's tier for promotion detection
   const currentUserTier = userRank?.total_score != null

@@ -38,10 +38,30 @@ import { syncGhostRivalScore } from '@/utils/ghostRivalSync';
 // TYPES
 // ==============================================
 
+interface AllWordEntry {
+  word: string;
+  score: number;
+  validated: boolean;
+  comboBonus?: number;
+  timestamp?: number;
+}
+
+type AchievementLike = string | { key?: string; name?: string };
+
+interface PlayerData {
+  score?: number;
+  allWords?: AllWordEntry[];
+  achievements?: AchievementLike[];
+}
+
+interface ScoreEntry {
+  score?: number;
+}
+
 /** Configuration for useResultsSideEffects hook */
 export interface UseResultsSideEffectsConfig {
   /** Current player's data */
-  currentPlayerData: any | null;
+  currentPlayerData: PlayerData | null;
   /** Current player's valid words */
   currentPlayerValidWords: WordObject[];
   /** Whether current user won */
@@ -51,7 +71,7 @@ export interface UseResultsSideEffectsConfig {
   /** Total number of players */
   totalPlayers: number;
   /** Sorted scores (all players) */
-  sortedScores: any[];
+  sortedScores: ScoreEntry[];
   /** Current user's username */
   username: string | undefined;
   /** Game code (for multiplayer games) */
@@ -61,7 +81,7 @@ export interface UseResultsSideEffectsConfig {
   /** Grid size */
   gridSize?: number;
   /** Achievements earned */
-  achievements?: any[];
+  achievements?: AchievementLike[];
   /** Whether word feedback modal is showing */
   showWordFeedback: boolean;
   /** Game mode for daily quest tracking ('classic' | 'wordHunt') */
@@ -206,7 +226,7 @@ export function useResultsSideEffects({
         wordCount: currentPlayerValidWords.length,
         longestWord: longestValidWord ?? undefined,
         isWinner: isCurrentUserWinner,
-        achievements: (currentPlayerData.achievements || achievements || []).map((a: any) =>
+        achievements: (currentPlayerData.achievements || achievements || []).map((a) =>
           typeof a === 'string' ? a : a.key || a.name || ''
         ),
       });
@@ -275,7 +295,7 @@ export function useResultsSideEffects({
     if (!user?.id || !currentPlayerData || !gameCode) return;
 
     // Calculate max combo streak
-    const validWords = currentPlayerData.allWords?.filter((w: any) => w.validated && w.score > 0) || [];
+    const validWords = currentPlayerData.allWords?.filter((w) => w.validated && w.score > 0) || [];
     let maxCombo = 0;
     let currentCombo = 0;
 
@@ -289,7 +309,7 @@ export function useResultsSideEffects({
     }
 
     // Map words to expected format
-    const playerWordData = (currentPlayerData.allWords || []).map((w: any) => ({
+    const playerWordData = (currentPlayerData.allWords || []).map((w) => ({
       word: w.word,
       score: w.score,
       isValid: w.validated,
@@ -330,7 +350,7 @@ export function useResultsSideEffects({
   useEffect(() => {
     if (hasTrackedGameRef.current || !currentPlayerData) return;
 
-    const validWords = currentPlayerData.allWords?.filter((w: any) => w.validated && w.score > 0) || [];
+    const validWords = currentPlayerData.allWords?.filter((w) => w.validated && w.score > 0) || [];
     const guestStats = getGuestStatsSummary();
     const isFirstGame = guestStats.gamesPlayed <= 1;
 
@@ -396,10 +416,10 @@ export function useResultsSideEffects({
   useEffect(() => {
     if (hasAddedToHistoryRef.current || !currentPlayerData) return;
 
-    const validWords = currentPlayerData.allWords?.filter((w: any) => w.validated && w.score > 0) || [];
+    const validWords = currentPlayerData.allWords?.filter((w) => w.validated && w.score > 0) || [];
     const totalAttempts = currentPlayerData.allWords?.length || 0;
     const accuracy = totalAttempts > 0 ? Math.round((validWords.length / totalAttempts) * 100) : 0;
-    const longestWordLength = validWords.reduce((max: number, w: any) => Math.max(max, w.word.length), 0);
+    const longestWordLength = validWords.reduce((max: number, w) => Math.max(max, w.word.length), 0);
 
     addGameToHistory({
       score: currentPlayerData.score || 0,

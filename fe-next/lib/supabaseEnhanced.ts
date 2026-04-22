@@ -6,11 +6,8 @@
  * - Error handling with detailed logging
  */
 
-import type { PostgrestError } from '@supabase/supabase-js';
-import { supabase, isSupabaseConfigured } from './supabase';
+import { supabase } from './supabase';
 import logger from '@/utils/logger';
-
-type RetryableError = PostgrestError | (Error & { code?: string; status?: number }) | { message?: string; code?: string; status?: number } | null | undefined;
 
 function errorMessage(err: unknown): string {
   if (err instanceof Error) return err.message;
@@ -41,7 +38,7 @@ interface ConnectionHealth {
   isHealthy: boolean;
   lastCheck: string | null;
   failureCount: number;
-  lastError: any;
+  lastError: unknown;
 }
 
 // Connection health state
@@ -55,29 +52,28 @@ let connectionHealth: ConnectionHealth = {
 /**
  * Check if error is retryable
  */
-function isRetryableError(error: any): boolean {
-  if (!error) return false;
+function isRetryableError(error: unknown): boolean {
+  if (!error || typeof error !== 'object') return false;
 
-  // Network errors
-  if (error.message?.includes('fetch failed') ||
-      error.message?.includes('network') ||
-      error.message?.includes('timeout') ||
-      error.message?.includes('ECONNREFUSED')) {
+  const msg = errorMessage(error);
+  if (msg.includes('fetch failed') ||
+      msg.includes('network') ||
+      msg.includes('timeout') ||
+      msg.includes('ECONNREFUSED')) {
     return true;
   }
 
-  // Postgres errors
-  if (error.code && RETRY_CONFIG.retryableErrors.includes(error.code)) {
+  const code = 'code' in error ? (error as { code?: unknown }).code : undefined;
+  if (typeof code === 'string' && RETRY_CONFIG.retryableErrors.includes(code)) {
     return true;
   }
 
-  // HTTP 5xx errors (server errors)
-  if (error.status && error.status >= 500) {
+  const status = 'status' in error ? (error as { status?: unknown }).status : undefined;
+  if (typeof status === 'number' && status >= 500) {
     return true;
   }
 
-  // Rate limiting
-  if (error.status === 429) {
+  if (status === 429) {
     return true;
   }
 
@@ -111,16 +107,16 @@ interface RetryOptions {
  * @param options - Retry options
  * @returns Promise with { data, error }
  */
-export async function withRetry<T = any>(
-  operation: () => Promise<{ data: T | null; error: any }>,
+export async function withRetry<T = unknown>(
+  operation: () => Promise<{ data: T | null; error: unknown }>,
   options: RetryOptions = {}
-): Promise<{ data: T | null; error: any }> {
+): Promise<{ data: T | null; error: unknown }> {
   const {
     maxRetries = RETRY_CONFIG.maxRetries,
     context = 'operation'
   } = options;
 
-  let lastError: any = null;
+  let lastError: unknown = null;
 
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
@@ -131,7 +127,7 @@ export async function withRetry<T = any>(
 
         if (attempt < maxRetries) {
           const delay = calculateDelay(attempt);
-          logger.warn(`[Supabase] ${context} failed (attempt ${attempt + 1}/${maxRetries + 1}), retrying in ${delay}ms:`, result.error.message);
+          logger.warn(`[Supabase] ${context} failed (attempt ${attempt + 1}/${maxRetries + 1}), retrying in ${delay}ms:`, errorMessage(result.error));
           await sleep(delay);
           continue;
         }
@@ -144,12 +140,12 @@ export async function withRetry<T = any>(
       }
 
       return result;
-    } catch (err: any) {
+    } catch (err: unknown) {
       lastError = err;
 
       if (attempt < maxRetries && isRetryableError(err)) {
         const delay = calculateDelay(attempt);
-        logger.warn(`[Supabase] ${context} exception (attempt ${attempt + 1}/${maxRetries + 1}), retrying in ${delay}ms:`, err.message);
+        logger.warn(`[Supabase] ${context} exception (attempt ${attempt + 1}/${maxRetries + 1}), retrying in ${delay}ms:`, errorMessage(err));
         await sleep(delay);
         continue;
       }
@@ -195,13 +191,13 @@ export const profileOperations = {
   /**
    * Update profile with validation
    */
-  async update(userId: string, updates: Record<string, any>) {
+  async update(userId: string, updates: Record<string, unknown>) {
     // Validate updates
     const allowedFields = [
       'username', 'display_name', 'avatar_image', 'avatar_emoji', 'avatar_color',
     ];
 
-    const sanitizedUpdates: Record<string, any> = {};
+    const sanitizedUpdates: Record<string, unknown> = {};
     for (const [key, value] of Object.entries(updates)) {
       if (allowedFields.includes(key)) {
         sanitizedUpdates[key] = value;
@@ -366,13 +362,13 @@ export const connectionMonitor = {
       connectionHealth.lastError = null;
 
       return { healthy: true, latency };
-    } catch (err: any) {
+    } catch (err: unknown) {
       connectionHealth.isHealthy = false;
       connectionHealth.failureCount++;
       connectionHealth.lastError = err;
       connectionHealth.lastCheck = new Date().toISOString();
 
-      return { healthy: false, error: err.message };
+      return { healthy: false, error: errorMessage(err) };
     }
   },
 
@@ -389,10 +385,10 @@ export const connectionMonitor = {
   }
 };
 
-interface QueueItem {
-  operation: () => Promise<any>;
-  resolve: (value: any) => void;
-  reject: (reason: any) => void;
+interface QueueItem<T = unknown> {
+  operation: () => Promise<T>;
+  resolve: (value: T) => void;
+  reject: (reason: unknown) => void;
 }
 
 /**
@@ -414,8 +410,12 @@ class RequestQueue {
   }
 
   async add<T>(operation: () => Promise<T>): Promise<T> {
-    return new Promise((resolve, reject) => {
-      this.queue.push({ operation, resolve, reject });
+    return new Promise<T>((resolve, reject) => {
+      this.queue.push({
+        operation: operation as () => Promise<unknown>,
+        resolve: resolve as (value: unknown) => void,
+        reject,
+      });
       this.process();
     });
   }
