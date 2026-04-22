@@ -2291,7 +2291,8 @@ const en = {
       "shared": "Everyone"
     },
     "uniqueWords": {
-      "title": "Your Unique Words"
+      "title": "Your Unique Words",
+      "label": "Only You"
     },
     "sessionStats": {
       "title": "Session Highlights",

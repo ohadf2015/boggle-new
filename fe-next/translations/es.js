@@ -2179,7 +2179,8 @@ const es = {
       "shared": "Todos"
     },
     "uniqueWords": {
-      "title": "Tus palabras únicas"
+      "title": "Tus palabras únicas",
+      "label": "Solo tú"
     },
     "sessionStats": {
       "title": "Momentos de la Sesión",

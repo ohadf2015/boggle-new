@@ -2188,7 +2188,8 @@ const sv = {
       "shared": "Alla"
     },
     "uniqueWords": {
-      "title": "Dina unika ord"
+      "title": "Dina unika ord",
+      "label": "Bara du"
     },
     "sessionStats": {
       "title": "Sessionhöjdpunkter",

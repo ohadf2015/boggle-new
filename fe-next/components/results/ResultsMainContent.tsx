@@ -199,7 +199,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
         color: 'text-neo-lime',
       },
       {
-        label: t('results.uniqueWords') || 'Only You',
+        label: t('results.uniqueWords.label') || 'Only You',
         value: uniqueWordsCount,
         icon: <Star className="w-3 h-3" />,
         color: 'text-neo-cyan',
