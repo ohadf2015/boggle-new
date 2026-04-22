@@ -30,8 +30,10 @@ const SignupToast = dynamic(() => import('@/components/auth/SignupToast'), { ssr
 
 // Shared result components
 import { ResultsModals } from '@/components/results/ResultsModals';
-import { ResultsMainContent } from '@/components/results/ResultsMainContent';
-import { ResultsDetailsContent } from '@/components/results/ResultsDetailsContent';
+import { ResultsMainContent, type ResultsMainContentProps } from '@/components/results/ResultsMainContent';
+import { ResultsDetailsContent, type ResultsDetailsContentProps } from '@/components/results/ResultsDetailsContent';
+import type { WordHuntResultsSummaryProps } from '@/components/results/WordHuntResultsSummary';
+import type { PlayerScore } from '@/hooks/useResultsData';
 const StickyReadyBar = dynamic(() => import('@/components/results/StickyReadyBar'), { ssr: false });
 const PostGameSocialActions = dynamic(() => import('@/components/results/PostGameSocialActions'), { ssr: false });
 import { generateRandomTable } from '@/utils/utils';
@@ -61,10 +63,10 @@ import { SERIES_TOTAL_GAMES } from '@/hooks/useSeriesTracker';
 interface DesktopResultsLayoutProps {
   handleExitRoom: () => void;
   exitLabel?: string;
-  mainContentProps: any;
-  detailsContentProps: any;
+  mainContentProps: ResultsMainContentProps;
+  detailsContentProps: ResultsDetailsContentProps;
   resolvedGameMode: string | undefined;
-  wordHuntResultsData: any;
+  wordHuntResultsData: WordHuntResultsSummaryProps | undefined;
   blastMovesUsed: number;
   blastTotalTilesCleared: number;
   blastTotalTileBonus: number;
@@ -72,8 +74,8 @@ interface DesktopResultsLayoutProps {
   wheelRushPlayerStats: Record<string, WheelRushPlayerStats>;
   currentUsername?: string;
   gameCode?: string;
-  sortedScores: any[];
-  otherPlayers: any[];
+  sortedScores: PlayerScore[];
+  otherPlayers: PlayerScore[];
   isBotsOnlyGame: boolean;
   postGameWordReview?: React.ReactNode;
 }
@@ -184,10 +186,7 @@ function DesktopResultsLayout({
             transition={{ delay: 0.2, type: 'spring', stiffness: 120, damping: 20 }}
             className="space-y-4"
           >
-            <ResultsDetailsContent
-              {...detailsContentProps}
-              hideRankAndScore={true}
-            />
+            <ResultsDetailsContent {...detailsContentProps} />
           </motion.div>
         </div>
 

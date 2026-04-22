@@ -21,7 +21,7 @@ export interface WordHuntPlayerResult {
   avatar?: { customAvatar?: CustomAvatarConfig | null };
 }
 
-interface WordHuntResultsSummaryProps {
+export interface WordHuntResultsSummaryProps {
   targetWord: string;
   foundTarget: boolean;
   isFirstFinder: boolean;
