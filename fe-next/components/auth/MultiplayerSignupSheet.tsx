@@ -43,7 +43,7 @@ export const MultiplayerSignupSheet: React.FC<MultiplayerSignupSheetProps> = ({
         mpSessionGame: stats.mpGamesThisSession,
         totalWords: stats.totalWords,
         totalScore: stats.totalScore,
-      } as any);
+      });
     },
   });
 

@@ -5,10 +5,8 @@
 import React from 'react';
 import { Mail, Eye, EyeOff, Wand2, AlertCircle } from 'lucide-react';
 import { Loader } from '@/components/ui/Loader';
-import { Button as ButtonComponent } from '@/components/ui/button';
+import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-
-const Button = ButtonComponent as any;
 
 type AuthMode = 'signin' | 'signup';
 

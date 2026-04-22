@@ -6,10 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Mail, Eye, EyeOff, Wand2, Shield, AlertCircle } from 'lucide-react';
 import { Loader } from '@/components/ui/Loader';
 import Link from 'next/link';
-import { Button as ButtonComponent } from '../ui/button';
-
-// Type assertion for JSX Button component
-const Button = ButtonComponent as any;
+import { Button } from '../ui/button';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { signUpWithEmail, signInWithEmail, signInWithMagicLink, sendOtpCode, verifyOtpCode } from '../../lib/supabase';
 import { useOAuthSignIn } from './hooks/useOAuthSignIn';

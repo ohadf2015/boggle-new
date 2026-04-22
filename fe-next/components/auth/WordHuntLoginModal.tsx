@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Mail, Wand2, AlertCircle } from 'lucide-react';
 import { Loader } from '@/components/ui/Loader';
-import { Button as ButtonComponent } from '../ui/button';
+import { Button } from '../ui/button';
 import {
   Dialog,
   DialogContent,
@@ -13,7 +13,6 @@ import {
   DialogBody,
 } from '@/components/ui/dialog';
 
-const Button = ButtonComponent as any;
 import { useLanguage } from '../../contexts/LanguageContext';
 import { signInWithMagicLink, sendOtpCode, verifyOtpCode } from '../../lib/supabase';
 import { useOAuthSignIn } from './hooks/useOAuthSignIn';

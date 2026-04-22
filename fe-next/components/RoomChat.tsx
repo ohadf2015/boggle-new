@@ -2,16 +2,10 @@
 'use no memo'; // Disable React Compiler memoization due to TanStack Virtual incompatibility
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { CardContent as CardContentComponent } from './ui/card';
-import { Input as InputComponent } from './ui/input';
-import { Button as ButtonComponent } from './ui/button';
-import { Badge as BadgeComponent } from './ui/badge';
-
-// Type casting for JSX components not yet migrated to TS
-const CardContent = CardContentComponent as any;
-const Input = InputComponent as any;
-const Button = ButtonComponent as any;
-const Badge = BadgeComponent as any;
+import { CardContent } from './ui/card';
+import { Input } from './ui/input';
+import { Button } from './ui/button';
+import { Badge } from './ui/badge';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { useSocket } from '../utils/SocketContext';
