@@ -8043,6 +8043,16 @@ const sv = {
       "cta": "Se annons för +{moves} drag",
       "decline": "Avsluta rundan"
     },
+    "pregameBuff": {
+      "title": "Boosta?",
+      "body": "Välj en boost, titta på en snabb annons och starta rundan med övertag.",
+      "shield": "Sköld",
+      "bomb": "Bomb",
+      "combo2x": "2x Combo",
+      "cta": "Se annons för boost",
+      "skip": "Hoppa över",
+      "claim": "Hämta boost"
+    },
     "chain": {
       "badge": "Kedja x{level}",
       "cascade": "Kaskad!",

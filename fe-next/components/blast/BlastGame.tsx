@@ -26,6 +26,7 @@ import { useBlastCascade } from './hooks/useBlastCascade';
 import { useBlastWordHandler } from './hooks/useBlastWordHandler';
 import { useBlastGameEnd, type DeadEndFinaleTile } from './hooks/useBlastGameEnd';
 import { BlastContinueModal } from './BlastContinueModal';
+import type { BlastPregameBuff } from './BlastPregameBuffModal';
 import { useBlastObjectiveEffects } from './hooks/useBlastObjectiveEffects';
 import type { ScoreFlyEvent } from './BlastScoreFly';
 import type { ClearedTileEvent } from './BlastEffectsCanvas';
@@ -57,7 +58,15 @@ interface BlastGameProps {
   totalTime?: number;
   leaderboard?: Array<{ username: string; score: number; wordCount?: number; avatar?: Avatar }>;
   username?: string;
+  initialBuff?: BlastPregameBuff | null;
 }
+
+// Pre-game buff bonus moves (applied to wave 1 only, SP only)
+const BUFF_MOVE_BONUS: Record<BlastPregameBuff, number> = {
+  shield: 2,
+  bomb: 3,
+  combo2x: 1,
+};
 
 /**
  * BlastGame — main orchestrator for Blast Mode.
@@ -83,6 +92,7 @@ export function BlastGame({
   totalTime: _totalTime,
   leaderboard,
   username,
+  initialBuff,
 }: BlastGameProps) {
   const isMultiplayer = mode === 'multiplayer';
   const { t } = useLanguage();
@@ -98,9 +108,16 @@ export function BlastGame({
     [waveNumber, isMultiplayer],
   );
 
+  // Pre-game buff: wave-1 only, SP only — bonus moves on top of wave budget.
+  const buffMoveBonus = !isMultiplayer && waveNumber === 1 && initialBuff
+    ? BUFF_MOVE_BONUS[initialBuff]
+    : 0;
+
   // Core engine
   const engine = useBlastEngine(config, {
-    movesAllowed: waveConfig?.movesAllowed,
+    movesAllowed: waveConfig?.movesAllowed != null
+      ? waveConfig.movesAllowed + buffMoveBonus
+      : waveConfig?.movesAllowed,
     waveObjectives,
     currentWave: waveNumber,
     isMultiplayer,

@@ -8019,6 +8019,16 @@ const ja = {
       "cta": "広告を見て+{moves}手獲得",
       "decline": "終了する"
     },
+    "pregameBuff": {
+      "title": "パワーアップ？",
+      "body": "ブーストを選び、短い広告を見て、有利にランを始めよう。",
+      "shield": "シールド",
+      "bomb": "ボム",
+      "combo2x": "コンボ2倍",
+      "cta": "広告を見てブースト",
+      "skip": "スキップ",
+      "claim": "ブーストを獲得"
+    },
     "chain": {
       "badge": "チェイン x{level}",
       "cascade": "カスケード！",

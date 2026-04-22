@@ -7,6 +7,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { BlastGame } from './BlastGame';
 import { BlastResultsSummary } from './BlastResultsSummary';
+import { BlastPregameBuffModal, type BlastPregameBuff } from './BlastPregameBuffModal';
 import { useBlastCheckpoint } from './hooks/useBlastCheckpoint';
 import { getWaveConfig, getWaveDistribution } from './utils/blastWaveConfig';
 import { calculateEarnedStars } from './utils/blastStarCalculator';
@@ -34,6 +35,10 @@ export function BlastView() {
   const [allWordsFound, setAllWordsFound] = useState<string[]>([]);
   const [waveHistory, setWaveHistory] = useState<WaveResult[]>([]);
   const [lastWaveStats, setLastWaveStats] = useState({ score: 0, words: 0, clearPct: 0 });
+
+  // Pre-game buff (rewarded-ad picker, single-use per run)
+  const [pregameBuff, setPregameBuff] = useState<BlastPregameBuff | null>(null);
+  const [buffModalOpen, setBuffModalOpen] = useState(false);
 
   // Apply wave-specific overrides.
   // `config` is memoized so BlastGame doesn't see a new object reference on
@@ -126,6 +131,7 @@ export function BlastView() {
     setTotalScore(0);
     setAllWordsFound([]);
     setWaveHistory([]);
+    setPregameBuff(null);
     gameKeyRef.current += 1;
     setPhase('ready');
   }, []);
@@ -174,8 +180,31 @@ export function BlastView() {
               {t('blast.ready.play')}
             </Button>
           )}
+          {pregameBuff ? (
+            <div
+              data-testid="blast-claimed-buff-chip"
+              className="rounded-neo border-neo-thick border-black bg-neo-cyan px-4 py-2 font-neo-display text-xs font-black uppercase text-neo-navy shadow-hard"
+            >
+              {t(`blast.pregameBuff.${pregameBuff}`)}
+            </div>
+          ) : (
+            <button
+              data-testid="blast-claim-boost-button"
+              onClick={() => setBuffModalOpen(true)}
+              className="rounded-neo border-neo-thick border-black bg-neo-pink px-4 py-2 font-neo-display text-xs font-black uppercase text-neo-navy shadow-hard hover:bg-neo-pink/90"
+            >
+              {t('blast.pregameBuff.claim')}
+            </button>
+          )}
         </div>
       )}
+
+      <BlastPregameBuffModal
+        isOpen={buffModalOpen}
+        onPick={(b) => { setPregameBuff(b); setBuffModalOpen(false); }}
+        onSkip={() => setBuffModalOpen(false)}
+        t={t}
+      />
 
       {phase === 'playing' && (
         <BlastGame
@@ -184,6 +213,7 @@ export function BlastView() {
           waveNumber={currentWave}
           waveConfig={waveConfig}
           cumulativeScore={totalScore}
+          initialBuff={pregameBuff}
           onWaveComplete={handleWaveComplete}
           onGameEnd={handleGameEnd}
           onQuit={handleQuit}

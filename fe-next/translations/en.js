@@ -8217,6 +8217,16 @@ const en = {
       "cta": "Watch Ad for +{moves} moves",
       "decline": "End run"
     },
+    "pregameBuff": {
+      "title": "Power up?",
+      "body": "Pick a boost, watch a quick ad, and start this run with an edge.",
+      "shield": "Shield",
+      "bomb": "Bomb",
+      "combo2x": "2x Combo",
+      "cta": "Watch Ad for Boost",
+      "skip": "Skip",
+      "claim": "Claim Boost"
+    },
     "chain": {
       "badge": "Chain x{level}",
       "cascade": "CASCADE!",

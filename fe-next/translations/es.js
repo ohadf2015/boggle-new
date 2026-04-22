@@ -8038,6 +8038,16 @@ const es = {
       "cta": "Ver anuncio por +{moves} movimientos",
       "decline": "Terminar partida"
     },
+    "pregameBuff": {
+      "title": "¿Potenciar?",
+      "body": "Elige un boost, mira un anuncio corto y empieza la partida con ventaja.",
+      "shield": "Escudo",
+      "bomb": "Bomba",
+      "combo2x": "Combo x2",
+      "cta": "Ver anuncio por boost",
+      "skip": "Saltar",
+      "claim": "Obtener boost"
+    },
     "chain": {
       "badge": "Cadena x{level}",
       "cascade": "¡Cascada!",
