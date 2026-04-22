@@ -34,7 +34,25 @@ export async function GET(request: NextRequest) {
     const localTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     const localTime = now.toLocaleString('en-US', { timeZone: localTimeZone });
 
-    const diagnostic: any = {
+    interface TableDiagnostic {
+      todayCount?: number;
+      allTimeCount?: number;
+      recentGames?: unknown[];
+      error?: string;
+    }
+    interface Diagnostic {
+      timestamp: string;
+      localTime: string;
+      localTimeZone: string;
+      serverTimeZone: string;
+      todayRange: { start: string; end: string };
+      tables: Record<string, TableDiagnostic>;
+      totals: { todayGames: number; allTimeGames: number };
+      databaseTimeZone?: string | unknown;
+      serverInfo?: { note?: string; processUptime?: number; processUptimeFormatted?: string; error?: string };
+    }
+
+    const diagnostic: Diagnostic = {
       timestamp: now.toISOString(),
       localTime,
       localTimeZone,

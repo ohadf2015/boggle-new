@@ -91,8 +91,12 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: errorMessage }, { status: 500 });
     }
 
-    // Transform data to include status
-    const words = (data || []).map((word: any) => ({
+    interface WordScoreRow {
+      net_score?: number | null;
+      is_potentially_valid?: boolean | null;
+      [key: string]: unknown;
+    }
+    const words = ((data || []) as WordScoreRow[]).map((word) => ({
       ...word,
       status: getWordStatus(word.net_score || 0, word.is_potentially_valid || false)
     }));

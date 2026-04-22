@@ -7,11 +7,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkApiRateLimit, rateLimitResponse } from '@/lib/apiRateLimit';
 import { captureApiError } from '@/utils/sentry';
+import type { GameSessionUpdateData } from '@/backend/modules/gameSessionLogger';
 
-// Import backend services (dynamic to avoid server/client issues)
-let logGameSession: any;
-let updateGameSession: any;
-let getOrCreateGuestSession: any;
+type GameSessionLoggerModule = typeof import('@/backend/modules/gameSessionLogger');
+type GuestTrackerModule = typeof import('@/backend/modules/guestTracker');
+
+let logGameSession: GameSessionLoggerModule['logGameSession'] | undefined;
+let updateGameSession: GameSessionLoggerModule['updateGameSession'] | undefined;
+let getOrCreateGuestSession: GuestTrackerModule['getOrCreateGuestSession'] | undefined;
 
 async function getLoggers() {
   if (!logGameSession || !updateGameSession) {
@@ -19,7 +22,7 @@ async function getLoggers() {
     logGameSession = loggerModule.logGameSession;
     updateGameSession = loggerModule.updateGameSession;
   }
-  return { logGameSession, updateGameSession };
+  return { logGameSession: logGameSession!, updateGameSession: updateGameSession! };
 }
 
 async function getGuestTracker() {
@@ -27,7 +30,7 @@ async function getGuestTracker() {
     const guestModule = await import('@/backend/modules/guestTracker');
     getOrCreateGuestSession = guestModule.getOrCreateGuestSession;
   }
-  return { getOrCreateGuestSession };
+  return { getOrCreateGuestSession: getOrCreateGuestSession! };
 }
 
 // Rate limit: 60 requests per minute per IP (generous for gameplay)
@@ -77,16 +80,6 @@ export async function POST(request: NextRequest) {
       isFirstGame,
       startedAt,
       completedAt,
-      // DDA (Dynamic Difficulty Adjustment) fields
-      ddaFlowState,
-      ddaWordsPerMinute,
-      ddaSuccessRate,
-      ddaComboMaintenance,
-      ddaTimeInFlow,
-      ddaIntensityAdjustments,
-      ddaTier,
-      ddaIsBossBattle,
-      ddaAdjustmentTrigger,
     } = body;
 
     // Validate required fields for start action
@@ -188,7 +181,7 @@ export async function POST(request: NextRequest) {
 
       const { updateGameSession: updateFn } = await getLoggers();
 
-      const updates: any = {};
+      const updates: GameSessionUpdateData = {};
       if (score !== undefined) updates.score = score;
       if (wordsFound !== undefined) updates.wordsFound = wordsFound;
       if (durationSeconds !== undefined) updates.durationSeconds = durationSeconds;
@@ -202,17 +195,6 @@ export async function POST(request: NextRequest) {
       if (cluesUsed !== undefined) updates.cluesUsed = cluesUsed;
       if (finalRank !== undefined) updates.finalRank = finalRank;
       if (completedAt !== undefined) updates.completedAt = new Date(completedAt);
-
-      // DDA (Dynamic Difficulty Adjustment) fields
-      if (ddaFlowState !== undefined) updates.ddaFlowState = ddaFlowState;
-      if (ddaWordsPerMinute !== undefined) updates.ddaWordsPerMinute = ddaWordsPerMinute;
-      if (ddaSuccessRate !== undefined) updates.ddaSuccessRate = ddaSuccessRate;
-      if (ddaComboMaintenance !== undefined) updates.ddaComboMaintenance = ddaComboMaintenance;
-      if (ddaTimeInFlow !== undefined) updates.ddaTimeInFlow = ddaTimeInFlow;
-      if (ddaIntensityAdjustments !== undefined) updates.ddaIntensityAdjustments = ddaIntensityAdjustments;
-      if (ddaTier !== undefined) updates.ddaTier = ddaTier;
-      if (ddaIsBossBattle !== undefined) updates.ddaIsBossBattle = ddaIsBossBattle;
-      if (ddaAdjustmentTrigger !== undefined) updates.ddaAdjustmentTrigger = ddaAdjustmentTrigger;
 
       const success = await updateFn(sessionId, updates);
 

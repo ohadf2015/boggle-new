@@ -8,14 +8,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyAdminAuth } from '@/lib/auth/adminAuth';
 import { captureApiError } from '@/utils/sentry';
+import type { GameSessionFilters } from '@/backend/modules/gameSessionLogger';
 
-// Import backend services
-let getGameSessions: any;
-let getGameSessionStats: any;
-let getGuestSessionAnalytics: any;
+type GameSessionLoggerModule = typeof import('@/backend/modules/gameSessionLogger');
+type GuestTrackerModule = typeof import('@/backend/modules/guestTracker');
+
+let getGameSessions: GameSessionLoggerModule['getGameSessions'] | undefined;
+let getGameSessionStats: GameSessionLoggerModule['getGameSessionStats'] | undefined;
+let getGuestSessionAnalytics: GuestTrackerModule['getGuestSessionAnalytics'] | undefined;
 
 async function getServices() {
-  if (!getGameSessions || !getGameSessionStats) {
+  if (!getGameSessions || !getGameSessionStats || !getGuestSessionAnalytics) {
     const gameModule = await import('@/backend/modules/gameSessionLogger');
     const guestModule = await import('@/backend/modules/guestTracker');
     getGameSessions = gameModule.getGameSessions;
@@ -54,7 +57,7 @@ export async function GET(request: NextRequest) {
     // Handle different actions
     if (action === 'stats') {
       // Get game session statistics
-      const filters: any = {};
+      const filters: GameSessionFilters = {};
       if (mode) filters.mode = mode;
       if (language) filters.language = language;
       if (startDate) filters.startDate = new Date(startDate);
@@ -82,7 +85,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Default: Fetch sessions
-    const filters: any = {
+    const filters: GameSessionFilters = {
       limit,
       offset,
     };

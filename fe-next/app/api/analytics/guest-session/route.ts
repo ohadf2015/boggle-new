@@ -8,15 +8,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkApiRateLimit, rateLimitResponse } from '@/lib/apiRateLimit';
 import { createClient } from '@/utils/supabase/server';
+import type { GuestSessionUpdateData } from '@/backend/modules/guestTracker';
 
 // Cap at 5s — prevents orphaned requests when Supabase is slow
 export const maxDuration = 5;
 
-// Import backend services (dynamic to avoid server/client issues)
-let getOrCreateGuestSession: any;
-let updateGuestSession: any;
-let getGuestSession: any;
-let linkGuestSessionToUser: any;
+type GuestTrackerModule = typeof import('@/backend/modules/guestTracker');
+
+let getOrCreateGuestSession: GuestTrackerModule['getOrCreateGuestSession'] | undefined;
+let updateGuestSession: GuestTrackerModule['updateGuestSession'] | undefined;
+let getGuestSession: GuestTrackerModule['getGuestSession'] | undefined;
+let linkGuestSessionToUser: GuestTrackerModule['linkGuestSessionToUser'] | undefined;
 
 async function getTrackers() {
   if (!getOrCreateGuestSession || !updateGuestSession || !getGuestSession || !linkGuestSessionToUser) {
@@ -26,7 +28,12 @@ async function getTrackers() {
     getGuestSession = guestModule.getGuestSession;
     linkGuestSessionToUser = guestModule.linkGuestSessionToUser;
   }
-  return { getOrCreateGuestSession, updateGuestSession, getGuestSession, linkGuestSessionToUser };
+  return {
+    getOrCreateGuestSession: getOrCreateGuestSession!,
+    updateGuestSession: updateGuestSession!,
+    getGuestSession: getGuestSession!,
+    linkGuestSessionToUser: linkGuestSessionToUser!,
+  };
 }
 
 // Rate limit: 30 requests per minute per IP
@@ -174,7 +181,7 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      const updates: any = {};
+      const updates: GuestSessionUpdateData = {};
       if (deviceType !== undefined) updates.deviceType = deviceType;
       if (browser !== undefined) updates.browser = browser;
       if (language !== undefined) updates.language = language;
