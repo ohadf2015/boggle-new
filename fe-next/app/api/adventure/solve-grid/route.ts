@@ -139,7 +139,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'Invalid grid row' }, { status: 400 });
       }
       for (const cell of row) {
-        if (typeof cell !== 'string' || cell.length !== 1 || !/^[a-zA-Z]$/.test(cell)) {
+        if (typeof cell !== 'string' || Array.from(cell).length !== 1 || !/^\p{L}$/u.test(cell)) {
           return NextResponse.json({ error: 'Invalid grid cell — must be a single letter' }, { status: 400 });
         }
       }

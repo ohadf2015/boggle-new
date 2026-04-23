@@ -106,6 +106,18 @@ describe('POST /api/adventure/solve-grid', () => {
       expect(res.status).toBe(400);
       expect(res.data.error).toContain('single letter');
     });
+
+    it('accepts Hebrew letters (non-Latin) without 400', async () => {
+      mockLoadDictionaryWords.mockResolvedValue([]);
+      const res = await POST(makeRequest({ grid: [['ש', 'ל'], ['ו', 'ם']] }));
+      expect(res.status).toBe(200);
+    });
+
+    it('accepts Swedish diacritics (å ä ö) without 400', async () => {
+      mockLoadDictionaryWords.mockResolvedValue([]);
+      const res = await POST(makeRequest({ grid: [['å', 'ä'], ['ö', 'a']] }));
+      expect(res.status).toBe(200);
+    });
   });
 
   // ===== RATE LIMITING =====

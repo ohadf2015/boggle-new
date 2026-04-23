@@ -164,15 +164,15 @@ describe('GlobalBottomNav', () => {
 
             const { container } = render(<GlobalBottomNav />);
             const nav = container.querySelector('nav');
-            // Nav sits flush at viewport bottom; safe-area padding is applied directly
-            // (ads are positioned above the nav, not beneath it).
-            expect(nav).toHaveStyle({ paddingBottom: '34px', bottom: '0px' });
+            // Nav floats above AdMob banner via --admob-banner-height var (0px fallback);
+            // safe-area padding is applied directly.
+            expect(nav).toHaveStyle({ paddingBottom: '34px', bottom: 'var(--admob-banner-height, 0px)' });
         });
 
-        it('should sit flush at viewport bottom with no safe-area inset', () => {
+        it('should anchor to admob-banner-height var with no safe-area inset', () => {
             const { container } = render(<GlobalBottomNav />);
             const nav = container.querySelector('nav');
-            expect(nav).toHaveStyle({ bottom: '0px' });
+            expect(nav).toHaveStyle({ bottom: 'var(--admob-banner-height, 0px)' });
         });
 
         it('should set has-global-bottom-nav class on html while visible', () => {
@@ -239,12 +239,85 @@ describe('GlobalBottomNav', () => {
             expect(friendsButton).toHaveAttribute('aria-current', 'page');
         });
 
-        it('should default to home when path does not match any tab', () => {
+        it('should NOT mark home as active on unmapped, non-root paths', () => {
+            // Regression: previously the fallback was 'home', which misled users on e.g. /settings
             (usePathname as Mock).mockReturnValue('/en/some-other-page');
             render(<GlobalBottomNav />);
 
             const homeButton = screen.getByRole('button', { name: /home/i });
-            expect(homeButton).toHaveAttribute('aria-current', 'page');
+            expect(homeButton).not.toHaveAttribute('aria-current', 'page');
+
+            // No other tab should be active either
+            const activeButtons = screen.queryAllByRole('button', { current: 'page' });
+            expect(activeButtons).toHaveLength(0);
+        });
+
+        it('should NOT mark home as active on /adventure (dynamic route)', () => {
+            (usePathname as Mock).mockReturnValue('/en/adventure');
+            render(<GlobalBottomNav />);
+
+            const homeButton = screen.getByRole('button', { name: /home/i });
+            expect(homeButton).not.toHaveAttribute('aria-current', 'page');
+        });
+    });
+
+    describe('Dynamic Contextual Tab', () => {
+        const dynamicRoutes: Array<[string, RegExp]> = [
+            ['/en/adventure', /adventure/i],
+            ['/en/brain', /brain/i],
+            ['/en/daily', /daily/i],
+            ['/en/word-of-the-day', /daily/i],
+            ['/en/blast', /blast/i],
+            ['/en/word-forge', /forge/i],
+            ['/en/leaderboard', /ranks|leaderboard/i],
+            ['/en/profile', /profile/i],
+            ['/en/settings', /settings/i],
+            ['/en/community', /community/i],
+            ['/en/referrals', /invite|referral/i],
+            ['/en/singleplayer', /quick play|singleplayer/i],
+        ];
+
+        it.each(dynamicRoutes)('renders and activates a contextual tab on %s', (path, labelRe) => {
+            (usePathname as Mock).mockReturnValue(path);
+            render(<GlobalBottomNav />);
+
+            const tab = screen.getByRole('button', { name: labelRe });
+            expect(tab).toHaveAttribute('aria-current', 'page');
+        });
+
+        it('does not render a dynamic tab on unmapped routes (base 4 tabs only)', () => {
+            (usePathname as Mock).mockReturnValue('/en/some-other-page');
+            render(<GlobalBottomNav />);
+
+            // Only the 4 base tabs: home, play (multiplayer), quests, friends
+            const buttons = screen.getAllByRole('button');
+            expect(buttons).toHaveLength(4);
+        });
+
+        it('does not render a dynamic tab when already on a base tab route', () => {
+            (usePathname as Mock).mockReturnValue('/en/quests');
+            render(<GlobalBottomNav />);
+
+            const buttons = screen.getAllByRole('button');
+            expect(buttons).toHaveLength(4);
+        });
+
+        it('shows 5 tabs total when a dynamic route is active', () => {
+            (usePathname as Mock).mockReturnValue('/en/adventure');
+            render(<GlobalBottomNav />);
+
+            const buttons = screen.getAllByRole('button');
+            expect(buttons).toHaveLength(5);
+        });
+
+        it('clicking the dynamic tab does not push a new route (already on page)', () => {
+            (usePathname as Mock).mockReturnValue('/en/adventure');
+            render(<GlobalBottomNav />);
+
+            const dynamicBtn = screen.getByRole('button', { name: /adventure/i });
+            fireEvent.click(dynamicBtn);
+
+            expect(mockPush).not.toHaveBeenCalled();
         });
     });
 

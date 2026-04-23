@@ -13,7 +13,7 @@ import dynamic from 'next/dynamic';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import Image from 'next/image';
 const CrazyGamesBanner = dynamic(() => import('@/components/CrazyGamesBanner'), { ssr: false });
-import { Flame, ChevronRight, Map, Swords, Target, Check, Coins, Star, BookOpen, ShoppingBag, Home, Crown, Zap, Infinity as InfinityIcon, Gem, Trophy, Award } from 'lucide-react';
+import { Flame, ChevronRight, Map, Swords, Target, Check, Coins, Star, ShoppingBag, Crown, Zap, Infinity as InfinityIcon, Trophy, Award } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { GhostRivalWidget } from '@/components/engagement/GhostRivalWidget';
@@ -48,13 +48,9 @@ interface AdventureHubProps {
   onOpenWorldMap: () => void;
   onPlayLevel: (worldId: number, levelId: number) => void;
   onOpenShop: () => void;
-  wordAlbumCount?: number;
 
   onBossRush?: () => void;
   canBossRush?: boolean;
-  onOpenRunes?: () => void;
-  runeCount?: number;
-  onOpenWordAlbum?: () => void;
   onOpenCollection?: () => void;
   collectionCount?: number;
   onOpenAchievements?: () => void;
@@ -101,11 +97,6 @@ const AdventureHub = memo<AdventureHubProps>(({
   onOpenShop,
   onBossRush,
   canBossRush = false,
-
-  onOpenRunes,
-  runeCount = 0,
-  wordAlbumCount = 0,
-  onOpenWordAlbum,
   onOpenCollection,
   collectionCount = 0,
   onOpenAchievements,
@@ -146,16 +137,6 @@ const AdventureHub = memo<AdventureHubProps>(({
         />
         {/* Gradient overlay */}
         <div className="absolute inset-0 bg-linear-to-t from-neo-navy via-neo-navy/60 to-transparent" />
-
-        {/* Home link — top-left */}
-        <Link
-          href="/"
-          className="absolute top-3 inset-s-3 flex items-center gap-1 text-neo-white font-bold text-xs hover:text-neo-lime transition-colors z-10 bg-neo-black/60 backdrop-blur-xs px-2.5 py-1.5 rounded-neo border border-neo-white/20"
-          aria-label={t('common.home')}
-        >
-          <Home className="w-3.5 h-3.5" />
-          {t('common.home')}
-        </Link>
 
         {/* Player stats — overlaid bottom */}
         <div className="absolute bottom-3 inset-x-3 flex items-end justify-between z-10">
@@ -468,54 +449,6 @@ const AdventureHub = memo<AdventureHubProps>(({
             <ShoppingBag className="w-4 h-4" />
             {t('adventure.shop.title')}
           </AdaptiveMotion.button>
-
-          {onOpenRunes && (
-            <AdaptiveMotion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={onOpenRunes}
-              className={cn(
-                'flex-1 py-2.5 px-3',
-                'flex items-center justify-center gap-1.5',
-                'bg-neo-purple/10 text-neo-purple',
-                'font-bold text-xs',
-                'border border-neo-purple/30 rounded-neo',
-                'hover:bg-neo-purple/20 transition-colors'
-              )}
-            >
-              <Gem className="w-4 h-4" />
-              {t('adventure.runes.title')}
-              {runeCount > 0 && (
-                <span className="text-[10px] font-mono text-neo-purple tabular-nums">
-                  {runeCount}
-                </span>
-              )}
-            </AdaptiveMotion.button>
-          )}
-
-          {onOpenWordAlbum && (
-            <AdaptiveMotion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={onOpenWordAlbum}
-              className={cn(
-                'flex-1 py-2.5 px-3',
-                'flex items-center justify-center gap-1.5',
-                'bg-neo-white/5 text-neo-white/70',
-                'font-bold text-xs',
-                'border border-neo-white/15 rounded-neo',
-                'hover:bg-neo-white/10 transition-colors'
-              )}
-            >
-              <BookOpen className="w-4 h-4" />
-              {t('adventure.hub.wordAlbum')}
-              {wordAlbumCount > 0 && (
-                <span className="text-[10px] font-mono text-neo-cyan tabular-nums">
-                  {wordAlbumCount}
-                </span>
-              )}
-            </AdaptiveMotion.button>
-          )}
 
           {onOpenCollection && (
             <AdaptiveMotion.button

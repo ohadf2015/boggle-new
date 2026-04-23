@@ -77,7 +77,6 @@ function AdventureView(): React.JSX.Element {
   const closeShop = useCallback(() => setShowShop(false), []);
   const closeWeeklyChallenge = useCallback(() => setShowWeeklyChallenge(false), []);
   const closeWordAlbum = useCallback(() => setShowWordAlbum(false), []);
-  const openRunes = useCallback(() => setShowRunes(true), []);
   const closeRunes = useCallback(() => setShowRunes(false), []);
   const openCollection = useCallback(() => setShowCollection(true), []);
   const closeCollection = useCallback(() => setShowCollection(false), []);
@@ -481,12 +480,8 @@ function AdventureView(): React.JSX.Element {
                 onOpenWorldMap={openWorldMapFromHub}
                 onPlayLevel={handleHubPlayLevel}
                 onOpenShop={openShop}
-                wordAlbumCount={progression?.wordAlbum?.length}
                 onBossRush={() => { bossRush.startRush(); setViewState('bossRush'); }}
                 canBossRush={bossRush.canStartBossRush}
-                onOpenRunes={(progression?.currentWorld ?? 0) >= 3 ? openRunes : undefined}
-                runeCount={progression?.runes?.length}
-                onOpenWordAlbum={(progression?.currentWorld ?? 0) >= 3 ? () => setShowWordAlbum(true) : undefined}
                 onOpenCollection={openCollection}
                 collectionCount={inventory.length}
                 onOpenAchievements={openAchievements}
@@ -562,7 +557,7 @@ function AdventureView(): React.JSX.Element {
         </AdaptiveAnimatePresence>
       </div>
 
-      {(viewState === 'worldMap' || viewState === 'levelGrid') && (
+      {viewState === 'levelGrid' && (
         <AdventureShopFAB isRTL={isRTL} gold={gold} onOpenShop={openShop} t={t} />
       )}
 

@@ -3,7 +3,11 @@
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
-import { Home, Swords, ScrollText, Users } from 'lucide-react';
+import {
+    Home, Swords, ScrollText, Users,
+    Map, Brain, CalendarDays, Zap, Hammer, PartyPopper,
+    Trophy, User as UserIcon, Settings as SettingsIcon, Users2, Gift, Target,
+} from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../lib/utils';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -24,7 +28,7 @@ const QUEST_TOTAL = QUEST_MISSION_TYPES.length;
 // Lazy load AuthModal - only shown when unauthenticated users tap Profile
 const AuthModal = dynamic(() => import('./auth/AuthModal'), { ssr: false });
 
-type TabId = 'home' | 'play' | 'quests' | 'friends';
+type TabId = 'home' | 'play' | 'quests' | 'friends' | 'dynamic';
 
 interface TabConfig {
     id: TabId;
@@ -36,7 +40,8 @@ interface TabConfig {
 
 // Order: home is LAST so it renders rightmost (with dir="ltr" on the nav row,
 // this holds in both LTR and RTL locales so users always reach home on the right).
-const TABS: TabConfig[] = [
+// The dynamic slot (when present) is inserted just before home — see computed `tabs` below.
+const TABS_BASE: TabConfig[] = [
     { id: 'play',    labelKey: 'nav.play',    icon: Swords,     color: 'text-neo-pink', glowColor: 'bg-neo-pink/15' },
     { id: 'quests',  labelKey: 'nav.quests',  icon: ScrollText, color: 'text-neo-lime', glowColor: 'bg-neo-lime/15' },
     { id: 'friends', labelKey: 'nav.friends', icon: Users,      color: 'text-neo-pink', glowColor: 'bg-neo-pink/15' },
@@ -49,7 +54,36 @@ const INDICATOR_COLORS: Record<TabId, string> = {
     play: 'bg-neo-pink',
     quests: 'bg-neo-lime',
     friends: 'bg-neo-pink',
+    dynamic: 'bg-neo-cyan',
 };
+
+// Route → contextual tab mapping. First matching prefix wins.
+// Routes already covered by the base tabs (home/play/quests/friends) return null → no extra slot.
+type DynamicSpec = Omit<TabConfig, 'id'>;
+const DYNAMIC_ROUTES: ReadonlyArray<readonly [string, DynamicSpec]> = [
+    ['/adventure',          { labelKey: 'nav.adventure',    icon: Map,            color: 'text-neo-lime',   glowColor: 'bg-neo-lime/15' }],
+    ['/brain',              { labelKey: 'nav.brain',        icon: Brain,          color: 'text-neo-purple', glowColor: 'bg-neo-purple/15' }],
+    ['/daily-word-wheel',   { labelKey: 'nav.daily',        icon: CalendarDays,   color: 'text-neo-cyan',   glowColor: 'bg-neo-cyan/15' }],
+    ['/word-of-the-day',    { labelKey: 'nav.daily',        icon: CalendarDays,   color: 'text-neo-cyan',   glowColor: 'bg-neo-cyan/15' }],
+    ['/daily',              { labelKey: 'nav.daily',        icon: CalendarDays,   color: 'text-neo-cyan',   glowColor: 'bg-neo-cyan/15' }],
+    ['/blast',              { labelKey: 'nav.blast',        icon: Zap,            color: 'text-neo-pink',   glowColor: 'bg-neo-pink/15' }],
+    ['/word-forge',         { labelKey: 'nav.forge',        icon: Hammer,         color: 'text-neo-lime',   glowColor: 'bg-neo-lime/15' }],
+    ['/party',              { labelKey: 'nav.party',        icon: PartyPopper,    color: 'text-neo-pink',   glowColor: 'bg-neo-pink/15' }],
+    ['/leaderboard',        { labelKey: 'nav.leaderboard',  icon: Trophy,         color: 'text-neo-lime',   glowColor: 'bg-neo-lime/15' }],
+    ['/profile',            { labelKey: 'nav.profile',      icon: UserIcon,       color: 'text-neo-cyan',   glowColor: 'bg-neo-cyan/15' }],
+    ['/account',            { labelKey: 'nav.profile',      icon: UserIcon,       color: 'text-neo-cyan',   glowColor: 'bg-neo-cyan/15' }],
+    ['/settings',           { labelKey: 'nav.settings',     icon: SettingsIcon,   color: 'text-neo-cyan',   glowColor: 'bg-neo-cyan/15' }],
+    ['/community',          { labelKey: 'nav.community',    icon: Users2,         color: 'text-neo-lime',   glowColor: 'bg-neo-lime/15' }],
+    ['/referrals',          { labelKey: 'nav.referrals',    icon: Gift,           color: 'text-neo-pink',   glowColor: 'bg-neo-pink/15' }],
+    ['/singleplayer',       { labelKey: 'nav.singleplayer', icon: Target,         color: 'text-neo-cyan',   glowColor: 'bg-neo-cyan/15' }],
+];
+
+function resolveDynamic(cleanPath: string): DynamicSpec | null {
+    for (const [prefix, spec] of DYNAMIC_ROUTES) {
+        if (cleanPath.startsWith(prefix)) return spec;
+    }
+    return null;
+}
 
 /**
  * GlobalBottomNav - Mobile-only bottom navigation bar
@@ -132,27 +166,50 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
         missions.filter(m => QUEST_MISSION_TYPES.includes(m.type as typeof QUEST_MISSION_TYPES[number]) && m.completed).length,
     [missions]);
 
-    const activeTab = useMemo((): TabId => {
-        const cleanPath = pathname.replace(`/${language}`, '');
+    const cleanPath = useMemo(
+        () => pathname.replace(`/${language}`, ''),
+        [pathname, language]
+    );
+
+    const dynamicSpec = useMemo<DynamicSpec | null>(
+        () => resolveDynamic(cleanPath),
+        [cleanPath]
+    );
+
+    const activeTab = useMemo((): TabId | null => {
         if (cleanPath === '' || cleanPath === '/') return 'home';
         if (cleanPath.startsWith('/multiplayer')) return 'play';
         if (cleanPath.startsWith('/quests')) return 'quests';
         if (cleanPath.startsWith('/friends')) return 'friends';
-        return 'home';
-    }, [pathname, language]);
+        if (dynamicSpec) return 'dynamic';
+        return null; // Unmapped route → no tab highlighted (avoids misleading home selection)
+    }, [cleanPath, dynamicSpec]);
+
+    // Compose visible tabs: insert dynamic slot just before Home when applicable.
+    const tabs = useMemo<TabConfig[]>(() => {
+        if (!dynamicSpec) return TABS_BASE;
+        const homeIdx = TABS_BASE.findIndex(t => t.id === 'home');
+        const dynamicTab: TabConfig = { id: 'dynamic', ...dynamicSpec };
+        return [
+            ...TABS_BASE.slice(0, homeIdx),
+            dynamicTab,
+            ...TABS_BASE.slice(homeIdx),
+        ];
+    }, [dynamicSpec]);
 
     const navigate = useCallback((tab: TabId) => {
+        if (tab === 'dynamic') return; // Already on this page — indicator only
         if (tab === 'friends' && !isAuthenticated) {
             setShowAuthModal(true);
             return;
         }
-        const routes: Record<TabId, string> = {
+        const routes: Record<Exclude<TabId, 'dynamic'>, string> = {
             home: `/${language}`,
             play: `/${language}/multiplayer`,
             quests: `/${language}/quests`,
             friends: `/${language}/friends`,
         };
-        router.push(routes[tab]);
+        router.push(routes[tab as Exclude<TabId, 'dynamic'>]);
     }, [router, language, isAuthenticated]);
 
     // pathsWithOwnNav — dedicated surfaces (admin/educator) that ship their own nav.
@@ -160,9 +217,8 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
     // their lobby screens; actual gameplay hides it via `isInGame` (NavigationContext).
     const shouldHideOnCurrentPath = useMemo(() => {
         const pathsWithOwnNav = ['/admin', '/student', '/teacher'];
-        const cleanPath = pathname.replace(`/${language}`, '');
         return pathsWithOwnNav.some(p => cleanPath.startsWith(p));
-    }, [pathname, language]);
+    }, [cleanPath]);
 
     // Hide entire bottom nav on CrazyGames — external links and social features prohibited
     const isHidden = isInGame || shouldHideOnCurrentPath || isOnCrazyGamesPlatform;
@@ -188,17 +244,17 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
                 "sm:hidden",
             )}
             style={{
-                // Nav sits flush at the viewport bottom. Sticky ads (AdSense anchor / AdMob
-                // banner) are positioned ABOVE this nav via CSS override / plugin margin,
-                // so no bottom offset is needed here.
-                bottom: 0,
+                // Float above the AdMob native banner on Android/iOS. The var is set by
+                // AnchoredNativeBanner's SizeChanged listener and already includes the
+                // banner's safe-area offset; falls back to 0 when no banner is mounted.
+                bottom: 'var(--admob-banner-height, 0px)',
                 paddingBottom: safeArea.bottom > 0 ? `${safeArea.bottom}px` : 'env(safe-area-inset-bottom, 0px)',
             }}
             aria-label={t('nav.bottomNavigation')}
         >
             {/* dir="ltr" locks source-order → visual-order so Home stays rightmost in RTL too */}
             <div dir="ltr" className="flex items-center justify-around h-16 relative">
-                {TABS.map((tab) => {
+                {tabs.map((tab) => {
                     const isActive = activeTab === tab.id;
                     const Icon = tab.icon;
 

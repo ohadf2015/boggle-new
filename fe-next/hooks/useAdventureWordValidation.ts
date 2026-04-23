@@ -215,7 +215,11 @@ export function useAdventureWordValidation({
         body: JSON.stringify({ grid, language, minLength: minWordLength }),
         signal,
       });
-      if (!res.ok) throw new Error(`solve-grid ${res.status}`);
+      if (!res.ok) {
+        const err = new Error(`solve-grid ${res.status}`) as Error & { status?: number };
+        err.status = res.status;
+        throw err;
+      }
       const data = await res.json();
       if (data.words && Array.isArray(data.words)) {
         const wordSet = new Set<string>(data.words);
@@ -225,7 +229,11 @@ export function useAdventureWordValidation({
       return new Set<string>();
     },
     staleTime: Infinity,
-    retry: 3,
+    retry: (failureCount, error) => {
+      const status = (error as Error & { status?: number })?.status;
+      if (status !== undefined && status >= 400 && status < 500) return false;
+      return failureCount < 3;
+    },
     retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 8000),
   });
 
