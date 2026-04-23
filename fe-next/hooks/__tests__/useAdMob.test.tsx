@@ -233,4 +233,30 @@ describe('useAdMob', () => {
     });
     expect(AdMob.hideBanner).toHaveBeenCalled();
   });
+
+  it('hideBanner suppresses "banner that was never shown" plugin error', async () => {
+    vi.mocked(AdMob.hideBanner).mockRejectedValueOnce({
+      message: 'You tried to hide a banner that was never shown',
+    });
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const wrapper = makeWrapper(true);
+    const { result } = renderHook(() => useAdMob(), { wrapper });
+    await act(async () => {
+      await result.current.hideBanner();
+    });
+    expect(warnSpy).not.toHaveBeenCalled();
+    warnSpy.mockRestore();
+  });
+
+  it('hideBanner still logs genuine errors', async () => {
+    vi.mocked(AdMob.hideBanner).mockRejectedValueOnce({ message: 'internal SDK failure' });
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const wrapper = makeWrapper(true);
+    const { result } = renderHook(() => useAdMob(), { wrapper });
+    await act(async () => {
+      await result.current.hideBanner();
+    });
+    expect(warnSpy).toHaveBeenCalled();
+    warnSpy.mockRestore();
+  });
 });

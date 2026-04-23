@@ -371,7 +371,7 @@ export function startBotsForGame(
         });
 
         // Record bot as first finder so humans get "found by other" feedback
-        recordFirstFinder(gameCode, word, username, bot.avatar);
+        const isFirstFinder = recordFirstFinder(gameCode, word, username, bot.avatar);
 
         // Restore bot life in Word Hunt mode (same as humans)
         if (currentGame?.gameMode === 'word-hunt' && currentGame.wordHuntState) {
@@ -394,6 +394,7 @@ export function startBotsForGame(
           username,
           word,
           score: totalScore,
+          isFirstFinder,
         });
 
         // Also emit playerFoundWord so the frontend treats bot words like human words
@@ -405,6 +406,7 @@ export function startBotsForGame(
           wordCount: playerWordCount,
           score: (currentGame?.playerScores?.[username] || 0),
           comboLevel: comboLevel || 0,
+          isFirstFinder,
         });
 
         const leaderboard = getLeaderboard(gameCode);

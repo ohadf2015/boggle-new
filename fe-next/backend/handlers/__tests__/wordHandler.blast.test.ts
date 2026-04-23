@@ -179,7 +179,7 @@ vi.mock('@/components/blast/utils/blastLetterGenerator', () => ({
 }));
 
 // Import mocks
-import { getGame, getGameBySocketId, getUsernameBySocketId, getFirstFinder } from '../../../backend/modules/gameStateManager';
+import { getGame, getGameBySocketId, getUsernameBySocketId, getFirstFinder, recordFirstFinder } from '../../../backend/modules/gameStateManager';
 import { isWordOnBoardAsync } from '../../../backend/modules/wordValidatorPool';
 import { isDictionaryWord, isValidWordCached } from '../../../backend/dictionary';
 import { isWordCommunityValid, isWordValidForScoring } from '../../../backend/modules/communityWordManager';
@@ -462,6 +462,42 @@ describe('wordHandler - blastComboSync broadcast (52-02)', () => {
       await handlers['submitWord']({ word: 'test' });
 
       expect(botManager.stopAllBots as Mock).toHaveBeenCalledWith('BLAST1');
+    });
+  });
+
+  describe('first-finder flag on broadcasts (L2)', () => {
+    it('sets isFirstFinder: true on wordAccepted + playerFoundWord when recordFirstFinder returns true', async () => {
+      (recordFirstFinder as Mock).mockReturnValue(true);
+
+      await handlers['submitWord']({ word: 'test' });
+
+      const wordAcceptedCall = (mockSocket.emit as Mock).mock.calls.find(
+        (c: any[]) => c[0] === 'wordAccepted'
+      );
+      expect(wordAcceptedCall).toBeDefined();
+      expect(wordAcceptedCall[1].isFirstFinder).toBe(true);
+
+      const foundWordCall = (broadcastToRoom as Mock).mock.calls.find(
+        (c: any[]) => c[2] === 'playerFoundWord'
+      );
+      expect(foundWordCall).toBeDefined();
+      expect(foundWordCall[3].isFirstFinder).toBe(true);
+    });
+
+    it('sets isFirstFinder: false on both broadcasts when recordFirstFinder returns false', async () => {
+      (recordFirstFinder as Mock).mockReturnValue(false);
+
+      await handlers['submitWord']({ word: 'test' });
+
+      const wordAcceptedCall = (mockSocket.emit as Mock).mock.calls.find(
+        (c: any[]) => c[0] === 'wordAccepted'
+      );
+      expect(wordAcceptedCall[1].isFirstFinder).toBe(false);
+
+      const foundWordCall = (broadcastToRoom as Mock).mock.calls.find(
+        (c: any[]) => c[2] === 'playerFoundWord'
+      );
+      expect(foundWordCall[3].isFirstFinder).toBe(false);
     });
   });
 

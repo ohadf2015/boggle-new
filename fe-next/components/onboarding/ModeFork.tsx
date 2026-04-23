@@ -61,7 +61,8 @@ const ModeOption: React.FC<ModeOptionProps> = ({
         'w-full relative overflow-hidden rounded-neo-lg border-3',
         'shadow-hard-lg active:shadow-hard-pressed active:translate-y-[2px]',
         'transition-shadow duration-200',
-        'flex items-center text-start gap-4 py-5 ps-5 pe-28 min-h-[104px]',
+        'flex items-center text-start gap-4 p-5 min-h-[104px]',
+        mascot && 'pe-24',
         dark
           ? 'border-neo-white/20 bg-neo-navy-light'
           : 'border-neo-black',
@@ -121,6 +122,15 @@ const ModeOption: React.FC<ModeOptionProps> = ({
         </motion.div>
       </div>
 
+      {/* Transparent mascot peeks from trailing edge — nobg variants get no
+          clip/border, so they float cleanly over the card's colored gradient
+          without framing it in a dark box. */}
+      {mascot && (
+        <div className="absolute inset-e-1 bottom-0 pointer-events-none z-0 opacity-95">
+          <Mascot variant={mascot} size="xs" animated />
+        </div>
+      )}
+
       {/* Text block */}
       <div className="flex flex-col gap-1 relative z-10 min-w-0 flex-1">
         <span
@@ -143,22 +153,6 @@ const ModeOption: React.FC<ModeOptionProps> = ({
         )}
       </div>
 
-      {/* Mascot peeking from trailing edge */}
-      {mascot && (
-        <motion.div
-          className="absolute inset-e-2 bottom-0 pointer-events-none z-10"
-          initial={{ y: 10, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: delay + 0.25, type: 'spring', stiffness: 200, damping: 18 }}
-        >
-          <motion.div
-            animate={hovered ? { y: -4, rotate: [-3, 3, -3] } : { y: 0 }}
-            transition={{ duration: 0.6, repeat: hovered ? Infinity : 0, ease: 'easeInOut' }}
-          >
-            <Mascot variant={mascot} size="md" clipShape="none" />
-          </motion.div>
-        </motion.div>
-      )}
     </motion.button>
   );
 };
@@ -237,8 +231,8 @@ const ModeFork: React.FC<ModeForkProps> = ({ onSelectMode, hasPendingInvite }) =
           description={t('onboarding.ftue.joinFriendsGameDesc')}
           delay={0.05}
           onClick={() => handleSelect('joinRoom')}
+          mascot="mindblown"
           featured
-          mascot="celebration"
         />
       )}
 
@@ -253,8 +247,8 @@ const ModeFork: React.FC<ModeForkProps> = ({ onSelectMode, hasPendingInvite }) =
         description={t('onboarding.ftue.dailyChallengeDesc')}
         delay={baseDelay}
         onClick={() => handleSelect('daily')}
+        mascot="trophyNobg"
         featured={!hasPendingInvite}
-        mascot="trophy"
       />
 
       {/* Practice Mode card */}
@@ -268,7 +262,7 @@ const ModeFork: React.FC<ModeForkProps> = ({ onSelectMode, hasPendingInvite }) =
         description={t('onboarding.ftue.practiceModeDesc')}
         delay={baseDelay + 0.1}
         onClick={() => handleSelect('practice')}
-        mascot="gaming"
+        mascot="powerup"
       />
       </div>
 

@@ -102,7 +102,7 @@ export function useAdMob() {
       // when we actually have a meaningful error.
       if (err && typeof err === 'object' && 'message' in err) {
         const msg = String((err as { message: unknown }).message);
-        if (!msg.toLowerCase().includes('no banner')) console.warn('[AdMob] hideBanner failed', err);
+        if (!/no banner|never shown|not shown|not.*display/i.test(msg)) console.warn('[AdMob] hideBanner failed', err);
       }
     }
   }, [whenReady]);

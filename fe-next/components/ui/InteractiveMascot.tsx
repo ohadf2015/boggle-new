@@ -391,6 +391,24 @@ function getIdleAnimation(variant: ExtendedMascotVariant): TargetAndTransition {
       rotate: [0, 3, -3, 0],
       transition: { duration: 2.5, repeat: Infinity, ease: 'easeInOut' },
     },
+    // TrophyNobg: Proud sway (same as trophy)
+    trophyNobg: {
+      y: [0, -4, 0],
+      rotate: [0, 2, -2, 0],
+      scale: [1, 1.03, 1],
+      transition: { duration: 2, repeat: Infinity, ease: 'easeInOut' },
+    },
+    // ExplorerNobg: Walking sway
+    explorerNobg: {
+      x: [0, -3, 3, 0],
+      transition: { duration: 2, repeat: Infinity, ease: 'easeInOut' },
+    },
+    // CryingNobg: Heaving bob
+    cryingNobg: {
+      y: [0, -3, 0],
+      rotate: [0, -1, 1, 0],
+      transition: { duration: 1.5, repeat: Infinity, ease: 'easeInOut' },
+    },
   };
 
   const baseVariant = getBaseVariant(variant);

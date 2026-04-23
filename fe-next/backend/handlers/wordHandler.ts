@@ -273,7 +273,7 @@ function registerWordHandlers(io: Server, socket: Socket): void {
 
       // Check if already found
       if (playerHasWord(gameCode, username, normalizedWord)) {
-        logger.warn('WORD', `Word already found`, {
+        logger.debug('WORD', `Word already found`, {
           gameCode, username, word: normalizedWord,
           gameState: game.gameState,
           playerWordsCount: game.playerWords?.[username]?.length ?? -1,

@@ -304,6 +304,38 @@ describe('Bot blast mode — wave advance + endGame parity with human path', () 
     expect(result).toBe(12);
   });
 
+  it('sets isFirstFinder: true on botWordFound + playerFoundWord when recordFirstFinder returns true (L2)', async () => {
+    mocks.recordFirstFinder.mockReturnValue(true);
+    await invokeBotCallback(makeBot(), makeBlastGame(1));
+
+    const botWordFoundCall = mocks.volatileBroadcastToRoom.mock.calls.find(
+      ([, , evt]) => evt === 'botWordFound',
+    );
+    expect(botWordFoundCall).toBeDefined();
+    expect(botWordFoundCall![3].isFirstFinder).toBe(true);
+
+    const playerFoundCall = mocks.volatileBroadcastToRoom.mock.calls.find(
+      ([, , evt]) => evt === 'playerFoundWord',
+    );
+    expect(playerFoundCall).toBeDefined();
+    expect(playerFoundCall![3].isFirstFinder).toBe(true);
+  });
+
+  it('sets isFirstFinder: false on both bot broadcasts when recordFirstFinder returns false (L2)', async () => {
+    mocks.recordFirstFinder.mockReturnValue(false);
+    await invokeBotCallback(makeBot(), makeBlastGame(1));
+
+    const botWordFoundCall = mocks.volatileBroadcastToRoom.mock.calls.find(
+      ([, , evt]) => evt === 'botWordFound',
+    );
+    expect(botWordFoundCall![3].isFirstFinder).toBe(false);
+
+    const playerFoundCall = mocks.volatileBroadcastToRoom.mock.calls.find(
+      ([, , evt]) => evt === 'playerFoundWord',
+    );
+    expect(playerFoundCall![3].isFirstFinder).toBe(false);
+  });
+
   it('non-cleared board does not advance wave or schedule endGame', async () => {
     mocks.isBlastBoardCleared.mockReturnValue(false);
     const game = makeBlastGame(3);

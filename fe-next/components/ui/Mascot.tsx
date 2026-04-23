@@ -44,7 +44,10 @@ export type MascotVariant =
   | 'sad'         // crying.gif (dark) - Loss/disappointment
   | 'ghostly'     // ghostly.gif (dark) - Spooky/halloween/sleepy
   | 'dance'       // dance.gif (dark) - Dancing/celebration
-  | 'question';   // question.gif (dark) - Confused/help needed
+  | 'question'    // question.gif (dark) - Confused/help needed
+  | 'trophyNobg'  // trophy-nobg.gif (nobg) - Transparent trophy
+  | 'explorerNobg'// explorer-nobg.gif (nobg) - Transparent explorer
+  | 'cryingNobg'; // crying-nobg.gif (nobg) - Transparent crying
 
 /**
  * Background type for each mascot GIF.
@@ -88,6 +91,9 @@ export const MASCOT_IMAGES: Record<MascotVariant, string> = {
   ghostly: '/mascot/ghostly.gif',
   dance: '/mascot/dance.gif',
   question: '/mascot/question.gif',
+  trophyNobg: '/mascot/trophy-nobg.gif',
+  explorerNobg: '/mascot/explorer-nobg.gif',
+  cryingNobg: '/mascot/crying-nobg.gif',
 };
 
 /**
@@ -129,6 +135,9 @@ export const MASCOT_BG_TYPE: Record<MascotVariant, MascotBgType> = {
   ghostly: 'dark',
   dance: 'dark',
   question: 'dark',
+  trophyNobg: 'nobg',
+  explorerNobg: 'nobg',
+  cryingNobg: 'nobg',
 };
 
 /**
@@ -564,6 +573,30 @@ function getAnimationVariants(variant: MascotVariant): Variants {
         y: [0, -4, 0],
         rotate: [0, 3, -3, 0],
         transition: { duration: 2.5, repeat: Infinity, ease: 'easeInOut' },
+      },
+    },
+    // TrophyNobg: Proud sway (same as trophy)
+    trophyNobg: {
+      animate: {
+        y: [0, -4, 0],
+        rotate: [0, 2, -2, 0],
+        scale: [1, 1.03, 1],
+        transition: { duration: 2, repeat: Infinity, ease: 'easeInOut' },
+      },
+    },
+    // ExplorerNobg: Walking sway (same as explorer)
+    explorerNobg: {
+      animate: {
+        x: [0, -3, 3, 0],
+        transition: { duration: 2, repeat: Infinity, ease: 'easeInOut' },
+      },
+    },
+    // CryingNobg: Heaving bob (same as crying)
+    cryingNobg: {
+      animate: {
+        y: [0, -3, 0],
+        rotate: [0, -1, 1, 0],
+        transition: { duration: 1.5, repeat: Infinity, ease: 'easeInOut' },
       },
     },
   };
