@@ -5,7 +5,7 @@ import { useInterval } from '@/hooks/useSafeTimeout';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { Flame, Check, Clock, Sparkles, X, Star, Zap } from 'lucide-react';
+import { Flame, Check, Clock, Sparkles, X, Star, Zap, ArrowRight, ArrowLeft } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { trackLandingCtaClick } from '@/utils/growthTracking';
 import { cn } from '@/lib/utils';
@@ -40,8 +40,10 @@ interface DailyChallengeBannerProps {
 }
 
 /**
- * DailyChallengeBanner - Subtle card promoting the Daily Challenge
- * Clean design with puzzle number, streak badge, and completion indicator
+ * DailyChallengeBanner - Hero mode card for the Daily Challenge.
+ * Shares the ModeCard visual language (navy→accent gradient, arrow affordance,
+ * badge row, bottom-end mascot) but uses the reserved `neo-yellow` celebration
+ * accent plus puzzle#/streak/countdown/win-loss chrome for daily identity.
  */
 const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
   className = '',
@@ -50,10 +52,7 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
   preloadedStats,
 }) => {
   const { t, language, dir } = useLanguage();
-  // Initialize with a placeholder that won't cause hydration mismatch
-  // The actual value is set in useEffect once isClient is true
   const [countdown, setCountdown] = useState<string>('--:--:--');
-  // Use preloaded stats if available, otherwise default to false/0
   const [hasPlayed, setHasPlayed] = useState<boolean>(preloadedStats?.hasPlayed ?? false);
   const [hasSolved, setHasSolved] = useState<boolean>(preloadedStats?.hasSolved ?? false);
   const [streak, setStreak] = useState<number>(preloadedStats?.currentStreak ?? 0);
@@ -62,14 +61,13 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
   const [isHovered, setIsHovered] = useState(false);
   const { enableComplexAnimations, prefersReducedMotion } = useDevicePerformance();
 
-  // 3D tilt effect - slightly reduced values for smaller banner
+  // Match ModeCard tilt params for consistent feel
   const { ref: tiltRef, style: tiltStyle, handlers: tiltHandlers } = useTiltEffect<HTMLDivElement>({
-    maxTilt: 12,
-    hoverScale: 1.04,
-    perspective: 800,
+    maxTilt: 18,
+    hoverScale: 1.06,
+    perspective: 700,
   });
 
-  // Combined handlers for hover state tracking
   const combinedHandlers = {
     ...tiltHandlers,
     onMouseEnter: () => {
@@ -82,12 +80,10 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
     },
   };
 
-  // Initialize state on client - use preloaded stats if available
   useEffect(() => {
     setIsClient(true);
     const date = getDailyChallengeDate();
 
-    // If we have preloaded stats and they're not loading, use them
     if (preloadedStats && !preloadedStats.loading) {
       setHasPlayed(preloadedStats.hasPlayed);
       setHasSolved(preloadedStats.hasSolved ?? false);
@@ -100,10 +96,8 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
       return;
     }
 
-    // Fallback to localStorage if no preloaded stats
     setPuzzleNumber(getPuzzleNumber(date));
 
-    // Get full status including win/loss
     const status = getWordHuntStatusToday(language as Language);
     setHasPlayed(!!status);
     setHasSolved(status?.solved ?? false);
@@ -111,16 +105,12 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
     setStreak(getDailyStreak().currentStreak);
   }, [language, preloadedStats]);
 
-  // Update countdown timer
-  // Performance: Skip updates when tab is hidden to reduce CPU usage
   useInterval(() => {
-    // Skip update if tab is not visible (saves CPU cycles)
     if (document.visibilityState === 'hidden') return;
     const seconds = getSecondsUntilNextDaily();
     setCountdown(formatCountdown(seconds));
   }, isClient ? 1000 : null);
 
-  // Set initial countdown and handle visibility changes
   useEffect(() => {
     if (!isClient) return;
 
@@ -132,7 +122,6 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
 
     updateCountdown();
 
-    // Update immediately when tab becomes visible again
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
         updateCountdown();
@@ -145,7 +134,6 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
     };
   }, [isClient]);
 
-  // Refresh status when language changes
   useEffect(() => {
     if (!isClient) return;
     const status = getWordHuntStatusToday(language as Language);
@@ -154,7 +142,6 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
     setStreak(getDailyStreak().currentStreak);
   }, [language, isClient]);
 
-  // Refresh status when page becomes visible (handles navigation back)
   useEffect(() => {
     if (!isClient) return;
 
@@ -163,16 +150,14 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
       setHasPlayed(!!status);
       setHasSolved(status?.solved ?? false);
       setStreak(getDailyStreak().currentStreak);
-      };
+    };
 
-    // Refresh on page visibility change
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
         refreshStatus();
       }
     };
 
-    // Refresh on window focus (handles tab switches and navigation)
     const handleFocus = () => {
       refreshStatus();
     };
@@ -187,125 +172,88 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
   }, [isClient, language]);
 
   const isRTL = dir === 'rtl';
+  const ArrowIcon = isRTL ? ArrowLeft : ArrowRight;
+
+  // Navy → neo-yellow (celebration/gold) gradient, matching ModeCard pattern
+  const gradientClass = 'bg-linear-to-br from-neo-navy via-neo-navy-light/80 to-neo-yellow/70';
+  const hoverGradientClass = 'hover:to-neo-yellow/90';
+  const glowColor = 'rgba(255, 225, 53, 0.65)';
 
   if (!isClient) {
-    // SSR placeholder — invisible to match motion wrapper's initial opacity:0
     return (
       <div className={cn(
-        "w-full h-full rounded-neo border-3 border-neo-black shadow-hard-lg bg-linear-to-br from-amber-500 via-yellow-400 to-orange-400 opacity-0",
-        compact ? "p-2 sm:p-3" : "p-3 sm:p-4",
+        'w-full h-full rounded-neo-lg border-3 border-neo-black shadow-hard-lg opacity-0',
+        gradientClass,
         className
-      )}>
+      )}
+      style={{ padding: compact ? 'clamp(0.5rem, 3cqw, 1rem)' : 'clamp(0.75rem, 4cqw, 1.5rem)' }}
+      >
         <div className="flex items-center gap-3 sm:gap-4">
-          <div className={cn(
-            "rounded-neo border-2 border-neo-black bg-neo-navy shrink-0",
-            compact ? "w-10 h-10" : "w-12 h-12 sm:w-14 sm:h-14"
-          )} />
+          <div className="rounded-neo border-2 border-neo-black bg-neo-yellow shrink-0 w-10 h-10 sm:w-14 sm:h-14" />
           <div className="flex-1 min-w-0 space-y-2">
-            <div className="h-6 w-40 bg-neo-black/15 rounded" />
-            <div className="h-4 w-24 bg-neo-black/10 rounded" />
+            <div className="h-6 w-40 bg-neo-white/15 rounded" />
+            <div className="h-4 w-24 bg-neo-white/10 rounded" />
           </div>
         </div>
       </div>
     );
   }
 
-  // Warm gold-to-amber gradient — premium daily challenge feel
-  // Played state stays vibrant but slightly muted to signal completion
-  const gradientClass = hasPlayed
-    ? "bg-linear-to-br from-amber-600 via-yellow-500 to-orange-500"
-    : "bg-linear-to-br from-amber-500 via-yellow-400 to-orange-400";
-
-  const glowColor = 'rgba(255, 215, 0, 0.5)';
-
   return (
     <Link
       href={`/${language}/daily`}
-      className="block w-full h-full group"
+      className="block w-full h-full group focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy rounded-neo-lg"
       onClick={() => trackLandingCtaClick('daily_banner', { mode: 'daily', hasPlayed })}
     >
       <div
         ref={tiltRef}
         className={cn(
-          // Base card styles matching ModeCard
-          "relative w-full h-full rounded-neo border-3 border-neo-black shadow-hard-lg transition-shadow cursor-pointer overflow-hidden [container-type:inline-size]",
-          // Ensure the row is tall enough for the absolutely-positioned mascot,
-          // otherwise it clips on narrow phones where the text content alone is shorter than the mascot.
-          compact ? "min-h-[80px] sm:min-h-[92px]" : "min-h-[96px] sm:min-h-[112px]",
-          // Active effects matching ModeCard
+          'relative w-full h-full rounded-neo-lg border-3 border-neo-black shadow-hard-lg cursor-pointer overflow-hidden cq-container',
+          'transition-shadow duration-200 ease-out',
+          compact ? 'min-h-[80px] sm:min-h-[92px]' : 'min-h-[128px] sm:min-h-[148px]',
           isRTL
             ? 'active:-translate-x-px active:translate-y-px'
             : 'active:translate-x-px active:translate-y-px',
           'active:shadow-hard-pressed',
-          // Premium gold gradient
           gradientClass,
-          compact ? "p-2 sm:p-3" : "p-3 sm:p-4",
+          hoverGradientClass,
           className
         )}
         style={{
-          // Hover glow effect - gold/orange color for premium feel
-          boxShadow: isHovered
-            ? `0 0 30px ${glowColor}, 0 0 60px ${glowColor}, 6px 6px 0px rgb(var(--neo-black))`
-            : undefined,
+          padding: compact ? 'clamp(0.5rem, 3cqw, 1rem)' : 'clamp(0.75rem, 4cqw, 1.5rem)',
+          filter: isHovered ? `drop-shadow(0 0 20px ${glowColor})` : undefined,
           ...tiltStyle,
         }}
         {...combinedHandlers}
       >
-        {/* Animated sparkles for unplayed state - multiple sparkles */}
+        {/* Sparkles for unplayed state - celebration accent */}
         {!hasPlayed && enableComplexAnimations && !prefersReducedMotion && (
           <>
             <motion.div
-              className="absolute top-2 right-16 rtl:right-auto rtl:left-16"
-              animate={{
-                rotate: [0, 15, -15, 0],
-                scale: [1, 1.3, 1],
-                opacity: [0.6, 1, 0.6],
-              }}
-              transition={{
-                duration: 2,
-                repeat: Infinity,
-                ease: "easeInOut"
-              }}
+              className="absolute top-2 right-20 rtl:right-auto rtl:left-20 pointer-events-none"
+              animate={{ rotate: [0, 15, -15, 0], scale: [1, 1.3, 1], opacity: [0.6, 1, 0.6] }}
+              transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
             >
-              <Sparkles className="w-4 h-4 text-white" />
+              <Sparkles className="w-4 h-4 text-neo-yellow" />
             </motion.div>
             <motion.div
-              className="absolute top-1 right-8 rtl:right-auto rtl:left-8"
-              animate={{
-                rotate: [0, -10, 10, 0],
-                scale: [1, 1.2, 1],
-                opacity: [0.5, 0.9, 0.5],
-              }}
-              transition={{
-                type: 'tween',
-                duration: 1.8,
-                repeat: Infinity,
-                ease: "easeInOut",
-                delay: 0.5
-              }}
+              className="absolute top-1 right-12 rtl:right-auto rtl:left-12 pointer-events-none"
+              animate={{ rotate: [0, -10, 10, 0], scale: [1, 1.2, 1], opacity: [0.5, 0.9, 0.5] }}
+              transition={{ type: 'tween', duration: 1.8, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
             >
-              <Star className="w-3 h-3 text-white fill-white" />
+              <Star className="w-3 h-3 text-neo-yellow fill-neo-yellow" />
             </motion.div>
             <motion.div
-              className="absolute bottom-2 right-4 rtl:right-auto rtl:left-4"
-              animate={{
-                rotate: [0, 20, -20, 0],
-                scale: [0.8, 1.1, 0.8],
-                opacity: [0.4, 0.8, 0.4],
-              }}
-              transition={{
-                duration: 2.2,
-                repeat: Infinity,
-                ease: "easeInOut",
-                delay: 1
-              }}
+              className="absolute bottom-12 right-4 rtl:right-auto rtl:left-4 pointer-events-none"
+              animate={{ rotate: [0, 20, -20, 0], scale: [0.8, 1.1, 0.8], opacity: [0.4, 0.8, 0.4] }}
+              transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
             >
-              <Zap className="w-3 h-3 text-white fill-white" />
+              <Zap className="w-3 h-3 text-neo-yellow fill-neo-yellow" />
             </motion.div>
           </>
         )}
 
-        {/* Large blended character — matching ModeCard style */}
+        {/* Mode character — matches ModeCard sizing */}
         {!mascot && (
           <motion.div
             className={cn(
@@ -313,11 +261,8 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
               isRTL ? 'bottom-0 left-0' : 'bottom-0 right-0'
             )}
             style={{
-              // Floor reduced from 3.75rem → 3.25rem so the mascot fits inside
-              // the card's min-height (80px / 5rem) on the narrowest phones,
-              // leaving a small gutter and preventing the bottom-edge clipping.
-              width: 'clamp(3.25rem, 24cqw, 5.5rem)',
-              height: 'clamp(3.25rem, 24cqw, 5.5rem)',
+              width: 'clamp(5.5rem, 28cqw, 8rem)',
+              height: 'clamp(5.5rem, 28cqw, 8rem)',
             }}
             initial={{ scale: 0.6, opacity: 0, y: 20 }}
             whileInView={{ scale: 1, opacity: 1, y: 0 }}
@@ -333,8 +278,7 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
               alt=""
               fill
               className={cn(
-                'object-contain',
-                'drop-shadow-[0_4px_12px_rgba(0,0,0,0.4)]',
+                'object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.4)]',
                 isHovered ? 'brightness-110' : 'brightness-100'
               )}
               style={{
@@ -346,106 +290,136 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
           </motion.div>
         )}
 
-        <div className="flex items-center gap-3 sm:gap-4 relative z-10">
-          {/* Mascot slot (for mobile portrait override) */}
-          {mascot && (
-            <div className="shrink-0">{mascot}</div>
-          )}
+        {/* Header: title + puzzle# chip + arrow/win-loss indicator */}
+        <div
+          className="flex items-center gap-2 sm:gap-3 lg:gap-4 relative z-10"
+          style={{ marginBottom: 'clamp(0.25rem, 1.5cqw, 0.75rem)' }}
+        >
+          {mascot && <div className="shrink-0">{mascot}</div>}
 
-          {/* Content */}
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
-              <h2 className={cn(
-                "font-black uppercase text-neo-black leading-tight drop-shadow-xs",
-                compact ? "text-base" : "text-lg sm:text-xl"
-              )}>
+              <h2
+                className="font-black uppercase tracking-tight text-neo-white leading-tight"
+                style={{ fontSize: 'clamp(1rem, 5cqw, 1.75rem)' }}
+              >
                 {t('daily.badge')}
               </h2>
-              <span className={cn(
-                "font-black text-neo-white bg-neo-navy/90 px-2 py-0.5 rounded-neo border-2 border-neo-black shadow-hard-xs",
-                compact ? "text-xs" : "text-sm"
-              )}>
+              <span
+                className="font-black text-neo-navy bg-neo-yellow border-2 border-neo-black shadow-hard-xs rounded-neo"
+                style={{
+                  padding: 'clamp(0.125rem, 0.5cqw, 0.25rem) clamp(0.375rem, 1.5cqw, 0.5rem)',
+                  fontSize: 'clamp(0.625rem, 2.5cqw, 0.875rem)',
+                }}
+              >
                 #{puzzleNumber}
               </span>
             </div>
-            <div className="flex items-center gap-2 mt-1">
-              {/* Streak badge - more prominent */}
-              {streak > 0 && (
-                <motion.span
-                  className="flex items-center gap-1 px-2 py-0.5 rounded-neo bg-neo-navy text-neo-pink border border-neo-black"
-                  animate={{ scale: [1, 1.05, 1] }}
-                  transition={{ duration: 0.6, repeat: Infinity, repeatDelay: 2 }}
-                >
-                  <Flame className="w-3.5 h-3.5" />
-                  <span className="text-xs font-black">{streak} {t('daily.dayStreak')}</span>
-                </motion.span>
-              )}
-              {/* Countdown */}
-              <div className={cn(
-                "flex items-center gap-1.5 text-neo-black/80 font-semibold",
-                compact ? "text-xs" : "text-xs sm:text-sm"
-              )}>
-                <Clock className="w-3.5 h-3.5" />
-                <span className="tabular-nums">
-                  {hasPlayed
-                    ? <><span>{t('daily.nextPuzzleIn')}: </span><span className="font-bold">{countdown}</span></>
-                    : <span className="font-bold">{countdown}</span>
-                  }
-                </span>
-              </div>
-            </div>
           </div>
 
-          {/* Win/Loss indicator - only show when played */}
-          {hasPlayed && (
+          {/* Arrow (unplayed) or Win/Loss circular badge (played) — same slot */}
+          {hasPlayed ? (
             <motion.div
               className={cn(
-                "flex items-center justify-center rounded-full border-2 border-neo-black",
-                compact ? "w-10 h-10" : "w-12 h-12",
-                hasSolved
-                  ? "bg-neo-lime text-neo-black"
-                  : "bg-neo-pink text-neo-black"
+                'flex items-center justify-center rounded-full border-2 border-neo-black shrink-0 shadow-hard-sm',
+                hasSolved ? 'bg-neo-lime text-neo-black' : 'bg-neo-pink text-neo-black'
               )}
+              style={{
+                width: 'clamp(2.75rem, 8cqw, 3.25rem)',
+                height: 'clamp(2.75rem, 8cqw, 3.25rem)',
+              }}
               initial={{ scale: 0, rotate: -180 }}
               animate={{ scale: 1, rotate: 0 }}
-              transition={{ type: "spring", stiffness: 500, damping: 20 }}
-              data-testid={hasSolved ? "won-badge" : "lost-badge"}
+              transition={{ type: 'spring', stiffness: 500, damping: 20 }}
+              data-testid={hasSolved ? 'won-badge' : 'lost-badge'}
             >
               {hasSolved ? (
-                <Check className={cn(compact ? "w-5 h-5" : "w-6 h-6")} strokeWidth={3} />
+                <Check style={{ width: 'clamp(1rem, 4cqw, 1.5rem)', height: 'clamp(1rem, 4cqw, 1.5rem)' }} strokeWidth={3} />
               ) : (
-                <X className={cn(compact ? "w-5 h-5" : "w-6 h-6")} strokeWidth={3} />
+                <X style={{ width: 'clamp(1rem, 4cqw, 1.5rem)', height: 'clamp(1rem, 4cqw, 1.5rem)' }} strokeWidth={3} />
               )}
             </motion.div>
+          ) : (
+            <div
+              className={cn(
+                'min-w-[44px] min-h-[44px] rounded-full border-2 border-neo-black bg-neo-yellow text-neo-navy',
+                'flex items-center justify-center shrink-0 transition-all duration-200 ease-out',
+                'opacity-100 lg:opacity-0 lg:group-hover:opacity-100',
+                isRTL ? 'lg:group-hover:-translate-x-1' : 'lg:group-hover:translate-x-1'
+              )}
+              style={{
+                width: 'clamp(2.75rem, 8cqw, 3.25rem)',
+                height: 'clamp(2.75rem, 8cqw, 3.25rem)',
+              }}
+            >
+              <ArrowIcon style={{ fontSize: 'clamp(0.75rem, 3.5cqw, 1rem)' }} />
+            </div>
           )}
         </div>
 
-        {/* Premium animated effects - matching ModeCard */}
+        {/* Badges row: streak + countdown (replaces duration/difficulty) */}
+        <div
+          className="flex flex-wrap items-center relative z-10"
+          style={{ gap: 'clamp(0.375rem, 1.5cqw, 0.5rem)' }}
+        >
+          {streak > 0 && (
+            <motion.span
+              className="inline-flex items-center bg-neo-white/10 text-neo-white font-bold rounded-neo border-2 border-neo-white/20"
+              style={{
+                gap: 'clamp(0.25rem, 1cqw, 0.375rem)',
+                padding: 'clamp(0.125rem, 0.5cqw, 0.25rem) clamp(0.375rem, 1.5cqw, 0.5rem)',
+                fontSize: 'clamp(0.625rem, 2.5cqw, 0.75rem)',
+              }}
+              animate={{ scale: [1, 1.05, 1] }}
+              transition={{ duration: 0.6, repeat: Infinity, repeatDelay: 2 }}
+            >
+              <Flame
+                className="text-neo-orange"
+                style={{ width: 'clamp(0.625rem, 2.5cqw, 0.875rem)', height: 'clamp(0.625rem, 2.5cqw, 0.875rem)' }}
+              />
+              {streak} {t('daily.dayStreak')}
+            </motion.span>
+          )}
+          <span
+            className="inline-flex items-center bg-neo-white/10 text-neo-white font-bold rounded-neo border-2 border-neo-white/20 tabular-nums"
+            style={{
+              gap: 'clamp(0.25rem, 1cqw, 0.375rem)',
+              padding: 'clamp(0.125rem, 0.5cqw, 0.25rem) clamp(0.375rem, 1.5cqw, 0.5rem)',
+              fontSize: 'clamp(0.625rem, 2.5cqw, 0.75rem)',
+            }}
+          >
+            <Clock style={{ width: 'clamp(0.625rem, 2.5cqw, 0.875rem)', height: 'clamp(0.625rem, 2.5cqw, 0.875rem)' }} />
+            {hasPlayed
+              ? <><span className="opacity-80">{t('daily.nextPuzzleIn')}:</span>&nbsp;<span className="font-black">{countdown}</span></>
+              : <span className="font-black">{countdown}</span>
+            }
+          </span>
+        </div>
+
+        {/* Shine + corner accent — matches ModeCard */}
         {enableComplexAnimations && !prefersReducedMotion && (
           <>
-            {/* Shine effect on hover */}
             <motion.div
-              className="absolute inset-0 pointer-events-none overflow-hidden rounded-neo"
+              className="absolute inset-0 pointer-events-none overflow-hidden rounded-neo-lg"
               initial={false}
               animate={isHovered ? { opacity: 1 } : { opacity: 0 }}
               transition={{ duration: 0.3 }}
             >
               <motion.div
-                className="absolute inset-0 bg-linear-to-r from-transparent via-white/50 to-transparent"
+                className="absolute inset-0 bg-linear-to-r from-transparent via-white/40 to-transparent"
                 initial={{ x: '-100%' }}
                 animate={isHovered ? { x: '200%' } : { x: '-100%' }}
-                transition={{ duration: 0.6, ease: 'easeOut' }}
+                transition={{ duration: 0.5, ease: 'easeOut' }}
               />
             </motion.div>
 
-            {/* Decorative corner accent */}
             <motion.div
-              className="absolute top-0 left-0 w-16 h-16 pointer-events-none overflow-hidden rounded-neo"
+              className="absolute top-0 inset-e-0 w-16 h-16 pointer-events-none overflow-hidden rounded-neo-lg"
               initial={false}
             >
               <motion.div
-                className="absolute -top-8 -left-8 w-16 h-16 bg-white/15 rotate-45"
-                animate={isHovered ? { scale: 1.3, opacity: 0.25 } : { scale: 1, opacity: 0.1 }}
+                className="absolute -top-8 -inset-e-8 w-16 h-16 bg-white/10 rotate-45"
+                animate={isHovered ? { scale: 1.2, opacity: 0.15 } : { scale: 1, opacity: 0.08 }}
                 transition={{ duration: 0.3 }}
               />
             </motion.div>
