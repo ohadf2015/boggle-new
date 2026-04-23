@@ -60,6 +60,10 @@ export async function endGame(io: Server, gameCode: string): Promise<void> {
   // Stop timer (must use clearGameTimer which prefixes 'game:' to match setGameTimer key)
   clearGameTimer(gameCode);
 
+  // Clear any pending blast final-wave timer so it can't re-invoke endGame
+  // if another path (human word / bot word) triggered endGame first.
+  timerManager.clearTimer(`blastEnd:${gameCode}`);
+
   // Stop all bots
   botManager.stopAllBots(gameCode);
   clearBotScoringStart(gameCode);
