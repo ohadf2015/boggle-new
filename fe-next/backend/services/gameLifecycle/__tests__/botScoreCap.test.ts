@@ -11,6 +11,7 @@ import {
   shouldBotScore,
   markBotScoringStart,
   clearBotScoringStart,
+  clearBotVariance,
 } from '../botGame';
 
 // Mock gameStateManager
@@ -213,13 +214,59 @@ describe('Bot Score Cap', () => {
         { username: 'Alice', score: 200, isBot: false },
       ]);
 
+      // Variance is memoized per (gameCode, botUsername) so use distinct keys
+      // across the two Math.random values to observe the variance effect.
+      clearBotVariance('GAME_LO');
+      clearBotVariance('GAME_HI');
+
       // Low variance (Math.random = 0 → variance = 0.9): target = 200 * 0.95 * 0.9 = 171
       mathRandomSpy.mockReturnValue(0);
-      expect(shouldBotScore('GAME1', 'TestBot', 170, 5, 'medium')).toBe(false);
+      expect(shouldBotScore('GAME_LO', 'TestBot', 170, 5, 'medium')).toBe(false);
 
       // High variance (Math.random = 1 → variance = 1.1): target = 200 * 0.95 * 1.1 = 209
       mathRandomSpy.mockReturnValue(1);
-      expect(shouldBotScore('GAME1', 'TestBot', 205, 3, 'medium')).toBe(true);
+      expect(shouldBotScore('GAME_HI', 'TestBot', 205, 3, 'medium')).toBe(true);
+    });
+
+    it('memoizes variance per (gameCode, bot) — same key returns stable decision across Math.random swaps', () => {
+      // Human at 200, medium base = 200 * 0.95 = 190.
+      // First call seeds variance from Math.random=1 → 1.1 → target 209 → accept 205+3.
+      // Second call on SAME (game,bot) with Math.random=0 MUST reuse cached 1.1,
+      // not recompute 0.9 (which would reject).
+      getLeaderboard.mockReturnValue([
+        { username: 'Alice', score: 200, isBot: false },
+      ]);
+      clearBotVariance('GAME_MEMO');
+
+      mathRandomSpy.mockReturnValue(1);
+      expect(shouldBotScore('GAME_MEMO', 'BotA', 205, 3, 'medium')).toBe(true);
+
+      // Swap Math.random — cached variance must make this still accept
+      mathRandomSpy.mockReturnValue(0);
+      expect(shouldBotScore('GAME_MEMO', 'BotA', 205, 3, 'medium')).toBe(true);
+    });
+
+    it('clearBotVariance(gameCode) drops only matching entries', () => {
+      getLeaderboard.mockReturnValue([
+        { username: 'Alice', score: 200, isBot: false },
+      ]);
+      clearBotVariance('GAME_A');
+      clearBotVariance('GAME_B');
+
+      // Seed GAME_A with high variance (1.1 → target 209, accepts 205+3)
+      mathRandomSpy.mockReturnValue(1);
+      expect(shouldBotScore('GAME_A', 'BotA', 205, 3, 'medium')).toBe(true);
+      // Seed GAME_B with high variance too
+      expect(shouldBotScore('GAME_B', 'BotB', 205, 3, 'medium')).toBe(true);
+
+      // Clear only GAME_A; GAME_B entry survives
+      clearBotVariance('GAME_A');
+
+      // GAME_A reseeds with low variance (0 → 0.9 → target 171 → rejects 205+3)
+      mathRandomSpy.mockReturnValue(0);
+      expect(shouldBotScore('GAME_A', 'BotA', 205, 3, 'medium')).toBe(false);
+      // GAME_B still uses cached high variance → accepts
+      expect(shouldBotScore('GAME_B', 'BotB', 205, 3, 'medium')).toBe(true);
     });
 
     it('scales with human score — bots can reach high scores when human does', () => {

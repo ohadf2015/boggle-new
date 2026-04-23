@@ -82,6 +82,34 @@ export function clearBotScoringStart(gameCode: string): void {
 }
 
 /**
+ * Per-(gameCode, bot) variance cache. Without this, shouldBotScore recomputes
+ * Math.random on every call — a bot near the target line flickers between
+ * accept/reject across submissions inside the same game. Memoize once per bot
+ * per game so the target is a stable line.
+ */
+const gameBotVariance = new Map<string, number>();
+
+function varianceKey(gameCode: string, botUsername: string): string {
+  return `${gameCode}:${botUsername}`;
+}
+
+function getOrSeedVariance(gameCode: string, botUsername: string): number {
+  const key = varianceKey(gameCode, botUsername);
+  const cached = gameBotVariance.get(key);
+  if (cached !== undefined) return cached;
+  const v = 0.9 + Math.random() * 0.2; // 0.9 to 1.1
+  gameBotVariance.set(key, v);
+  return v;
+}
+
+export function clearBotVariance(gameCode: string): void {
+  const prefix = `${gameCode}:`;
+  for (const key of gameBotVariance.keys()) {
+    if (key.startsWith(prefix)) gameBotVariance.delete(key);
+  }
+}
+
+/**
  * Get the best human (non-bot) player's score in a game.
  */
 export function getBestHumanScore(gameCode: string): number {
@@ -103,7 +131,7 @@ export function getBestHumanScore(gameCode: string): number {
  */
 export function shouldBotScore(
   gameCode: string,
-  _botUsername: string,
+  botUsername: string,
   currentBotScore: number,
   pendingScore: number,
   botDifficulty: string = 'medium'
@@ -126,8 +154,9 @@ export function shouldBotScore(
   }
 
   const baseTarget = BOT_SCORE_TARGET[botDifficulty] ?? BOT_SCORE_TARGET.medium;
-  // Add slight per-game variance (±10%) so bots don't always land at exact same ratio
-  const variance = 0.9 + Math.random() * 0.2; // 0.9 to 1.1
+  // Per-(game,bot) variance (±10%), memoized so the target line doesn't
+  // flicker as Math.random drifts across consecutive submissions.
+  const variance = getOrSeedVariance(gameCode, botUsername);
   const scoreTarget = bestHuman * baseTarget * variance;
 
   // Minimum floor: bots always get at least this many points before capping kicks in
