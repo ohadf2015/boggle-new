@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { LandingHero } from '../LandingHero';
 
@@ -35,7 +35,7 @@ vi.mock('../LandingLeaderboardPreview', () => {
 const player = { id: '1', username: 'alice', displayName: 'Alice', totalScore: 100, avatarImage: null, avatarConfig: null };
 
 describe('LandingHero', () => {
-  const baseProps = { players: [player], playersLoading: false, isMobilePortrait: false, onPlayClick: vi.fn() };
+  const baseProps = { players: [player], playersLoading: false, isMobilePortrait: false };
 
   beforeEach(() => vi.clearAllMocks());
 
@@ -60,12 +60,5 @@ describe('LandingHero', () => {
     render(<LandingHero {...baseProps} isMobilePortrait={true} />);
     // On mobile the leaderboard sidebar is not rendered
     expect(screen.queryByTestId('leaderboard-preview')).not.toBeInTheDocument();
-  });
-
-  it('renders Daily Challenge CTA linking to localized daily route', () => {
-    render(<LandingHero {...baseProps} />);
-    const cta = screen.getByRole('link', { name: 'landing.playTodayChallenge' });
-    expect(cta).toBeInTheDocument();
-    expect(cta).toHaveAttribute('href', '/en/daily');
   });
 });

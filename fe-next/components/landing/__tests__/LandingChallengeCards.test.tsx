@@ -55,22 +55,14 @@ describe('LandingChallengeCards', () => {
     expect(screen.getByText('landing.practice')).toBeInTheDocument();
   });
 
-  it('renders adventure mode card', () => {
-    render(<LandingChallengeCards {...baseProps} />);
-    expect(screen.getByText('landing.adventureMode')).toBeInTheDocument();
-  });
-
   it('shows blast mode for all players', () => {
     render(<LandingChallengeCards {...baseProps} />);
     expect(screen.getByText('landing.blastMode')).toBeInTheDocument();
   });
 
-  it('shows blast mode before adventure mode', () => {
+  it('omits adventure mode from featured landing (reduced choice paralysis)', () => {
     render(<LandingChallengeCards {...baseProps} />);
-    const cards = screen.getAllByTestId('mode-card');
-    const blastIndex = cards.findIndex(c => c.textContent?.includes('landing.blastMode'));
-    const adventureIndex = cards.findIndex(c => c.textContent?.includes('landing.adventureMode'));
-    expect(blastIndex).toBeLessThan(adventureIndex);
+    expect(screen.queryByText('landing.adventureMode')).not.toBeInTheDocument();
   });
 
   it('renders daily challenge banner', () => {

@@ -72,7 +72,6 @@ describe('LandingChallengeCards — mode_selected tracking', () => {
     ['landing.quickPlay', 'quickPlay'],
     ['landing.arena', 'arena'],
     ['landing.blastMode', 'blast'],
-    ['landing.adventureMode', 'adventure'],
   ])('clicking %s card fires trackModeSelected(%s, "home")', (title, mode) => {
     mockIsVeteran.mockReturnValue(true); // skip practice, show quickPlay
     render(<LandingChallengeCards {...baseProps} />);

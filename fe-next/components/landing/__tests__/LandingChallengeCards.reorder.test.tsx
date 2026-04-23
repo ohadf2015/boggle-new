@@ -45,7 +45,7 @@ const baseProps = {
 };
 
 describe('LandingChallengeCards reordering (MP/SP split)', () => {
-  it('renders daily banner as hero, arena in MP section, practice/blast/adventure in SP section', () => {
+  it('renders daily banner as hero, arena in MP section, practice/blast in SP section', () => {
     render(<LandingChallengeCards {...baseProps} />);
     expect(screen.getByTestId('daily-banner')).toBeInTheDocument();
     const mpSection = screen.getByTestId('landing-section-mp');
@@ -54,7 +54,7 @@ describe('LandingChallengeCards reordering (MP/SP split)', () => {
     expect(mpSection).not.toHaveTextContent('landing.practice');
     expect(spSection).toHaveTextContent('landing.practice');
     expect(spSection).toHaveTextContent('landing.blastMode');
-    expect(spSection).toHaveTextContent('landing.adventureMode');
+    expect(spSection).not.toHaveTextContent('landing.adventureMode');
   });
 
   it('renders MP section before SP section in DOM (discovery hierarchy)', () => {
@@ -65,25 +65,8 @@ describe('LandingChallengeCards reordering (MP/SP split)', () => {
     // Remaining are SP
     const spTexts = cards.slice(1).map((c) => c.textContent);
     expect(spTexts).toEqual(
-      expect.arrayContaining(['landing.practice', 'landing.blastMode', 'landing.adventureMode'])
+      expect.arrayContaining(['landing.practice', 'landing.blastMode'])
     );
-  });
-
-  it('keeps blast above adventure inside SP section regardless of popularity', () => {
-    const stats: GameModeStats[] = [
-      { mode: 'adventure', playCount: 500 },
-      { mode: 'daily', playCount: 300 },
-      { mode: 'practice', playCount: 200 },
-      { mode: 'arena', playCount: 100 },
-      { mode: 'blast', playCount: 50 },
-    ];
-    const cardOrder = getCardOrder(stats);
-    render(<LandingChallengeCards {...baseProps} cardOrder={cardOrder} />);
-    const cards = screen.getAllByTestId('mode-card');
-    const blastIdx = cards.findIndex((c) => c.textContent?.includes('landing.blastMode'));
-    const adventureIdx = cards.findIndex((c) => c.textContent?.includes('landing.adventureMode'));
-    expect(blastIdx).toBeGreaterThanOrEqual(0);
-    expect(adventureIdx).toBeGreaterThan(blastIdx);
   });
 
   it('renders blast when most popular (still inside SP section)', () => {
