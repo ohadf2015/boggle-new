@@ -17,6 +17,7 @@ import NextStepPrompt from '@/components/results/NextStepPrompt';
 import DailyChallengeInlineSignup from '@/components/auth/DailyChallengeInlineSignup';
 import TabbedDailyLeaderboard from './TabbedDailyLeaderboard';
 import WatchAdButton from './WatchAdButton';
+import WatchAdForRevealButton from '@/components/ads/WatchAdForRevealButton';
 import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
 import { hasPlayedWordWheelToday } from '@/utils/dailyChallenge/storage';
 import { MascotWithEntrance } from '@/components/ui/Mascot';
@@ -71,11 +72,13 @@ export interface WordHuntResultsContentProps {
     coinReward: CoinReward | null;
     handleRetryChallenge: () => void;
     canAffordRetry: boolean;
+    canAffordReveal: boolean;
     retryCost: number;
     currentCoins: number;
     targetWordRevealed: boolean;
     revealCost: number;
     handleRevealTargetWord: () => void;
+    handleRevealTargetWordViaAd: () => void;
   };
   isAuthenticated: boolean;
   inlineSignupDismissed: boolean;
@@ -231,7 +234,7 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
             </div>
           </div>
         ) : (
-          <div className="max-w-btn">
+          <div className="max-w-btn space-y-2">
             <CoinUnlockCard
               icon={<Eye className="w-5 h-5 text-white" />}
               title={t('wordHunt.results.revealTargetWord')}
@@ -244,6 +247,14 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
               onSpendStart={(pos) => onSpendStart(pos, coinActions.revealCost)}
               t={t}
             />
+            {/* Paywall-softener: free reveal via rewarded ad when coin-poor */}
+            {!coinActions.canAffordReveal && (
+              <WatchAdForRevealButton
+                onReveal={coinActions.handleRevealTargetWordViaAd}
+                revealed={coinActions.targetWordRevealed}
+                placement="reveal_target_word"
+              />
+            )}
           </div>
         )}
 

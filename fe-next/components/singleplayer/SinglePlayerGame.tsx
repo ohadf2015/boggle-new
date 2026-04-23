@@ -184,6 +184,8 @@ function SinglePlayerGame({
       onConfirmQuit: core.onQuit,
       showQuitConfirm: core.showQuitConfirm,
       setShowQuitConfirm: core.setShowQuitConfirm,
+      onExtendTime: (seconds: number) =>
+        core.timer.setTime(core.timer.remainingTime + seconds),
       t: core.t,
     };
   }, [
@@ -193,7 +195,6 @@ function SinglePlayerGame({
     core.isGameOver,
     core.score,
     core.foundWords,
-    core.timer.remainingTime,
     settings.timerSeconds,
     settings.mode,
     core.combo.comboLevel,
@@ -229,6 +230,7 @@ function SinglePlayerGame({
     core.onQuit,
     core.showQuitConfirm,
     core.setShowQuitConfirm,
+    core.timer,
     core.t,
   ]);
 
