@@ -16,11 +16,24 @@ import {
   recordFirstFinder,
 } from '../../modules/gameStateManager';
 import { broadcastToRoom, volatileBroadcastToRoom, getGameRoom } from '../../utils/socketHelpers';
-import { calculateBlastTileBonus, getTilesOnPath, recordBlastMove, getWordPath } from '../../modules/blastModeManager';
+import {
+  calculateBlastTileBonus,
+  getTilesOnPath,
+  recordBlastMove,
+  getWordPath,
+  isBlastBoardCleared,
+  advanceBlastWave,
+} from '../../modules/blastModeManager';
 import { processTilesForWord } from '@/components/blast/utils/clearTilesProcessor';
 import { computeGravityResult } from '@/components/blast/utils/blastGravity';
 import { createSeededRandom } from '@/components/blast/utils/blastLetterGenerator';
-import { BLAST_SPECIAL_TILE_CHANCE } from '@/shared/constants/blastMultiplayerConstants';
+import { getWaveConfig } from '@/components/blast/utils/blastWaveConfig';
+import {
+  BLAST_SPECIAL_TILE_CHANCE,
+  BLAST_MP_DEFAULT_MAX_WAVES,
+} from '@/shared/constants/blastMultiplayerConstants';
+import timerManager from '../../utils/timerManager';
+import { endGame } from './gameEnd';
 import { BOARD_WORD_SCORE_PER_LETTER } from '@/shared/constants/wordHuntMultiplayerConstants';
 import * as botManager from '../../modules/botManager';
 import logger from '../../utils/logger';
@@ -207,7 +220,7 @@ export function startBotsForGame(
                 word,
                 baseScore: word.length - 1,
                 gridSize,
-                currentWave: 1,
+                currentWave: blastState.wave ?? 1,
                 rng,
               });
 
@@ -229,6 +242,46 @@ export function startBotsForGame(
                 clearedCount: processResult.newlyClearedCount,
                 totalMoves,
               });
+
+              // MP board-clear parity with human path (wordValidationHandler):
+              // advance wave OR schedule endGame on final-wave clear.
+              if (isBlastBoardCleared(gravityResult.newTileStates)) {
+                const currentWave = blastState.wave ?? 1;
+                const maxWaves = BLAST_MP_DEFAULT_MAX_WAVES;
+                if (currentWave < maxWaves) {
+                  const next = advanceBlastWave(blastState, gameCode, gravityResult.newGrid);
+                  Object.assign(blastState, {
+                    wave: next.wave,
+                    overlay: next.overlay,
+                    overlayMap: next.overlayMap,
+                    tileStates: next.tileStates,
+                    seed: next.seed,
+                    grid: next.grid,
+                    playerMoves: next.playerMoves,
+                    playerBonusMoves: next.playerBonusMoves,
+                    totalMoves: next.totalMoves,
+                  });
+                  const nextWaveNum = next.wave ?? currentWave + 1;
+                  const archetype = getWaveConfig(nextWaveNum).archetype;
+                  logger.info('BLAST', `Board cleared in ${gameCode} by bot ${username} — advancing to wave ${next.wave} (${archetype})`);
+                  broadcastToRoom(io, getGameRoom(gameCode), 'blastWaveAdvance', {
+                    wave: next.wave,
+                    archetype,
+                    grid: next.grid,
+                    tileStates: next.tileStates,
+                    overlay: next.overlay,
+                    seed: next.seed,
+                  });
+                } else {
+                  logger.info('BLAST', `Final wave ${currentWave} cleared in ${gameCode} by bot ${username} — scheduling endGame`);
+                  timerManager.setTimeout(`blastEnd:${gameCode}`, () => {
+                    const g = getGame(gameCode);
+                    if (g && g.gameState === 'in-progress') {
+                      endGame(io, gameCode);
+                    }
+                  }, 1500);
+                }
+              }
             }
           } catch (err) {
             logger.error('BOT', `Blast bonus error for "${username}": ${(err as Error).message}`);
