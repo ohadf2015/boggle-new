@@ -172,6 +172,9 @@ export async function resyncBotsForNewGrid(
   await Promise.all(bots.map(async (bot) => {
     if (!bot.isActive) return;
     try {
+      // Stall scheduled submissions against the old grid: a tick firing
+      // during the await window below would otherwise pull a stale word.
+      bot.currentWordIndex = bot.wordsToFind.length;
       await prepareBotWords(bot, grid, language);
       bot.currentWordIndex = 0;
       logger.debug('BOT', `Bot "${bot.username}" resynced for new grid (${bot.wordsToFind.length} words)`);
