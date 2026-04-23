@@ -3114,12 +3114,11 @@ html {
   }
 }
 
-/* When GlobalBottomNav is visible on mobile, reserve space at the bottom of the
-   page so fixed nav (h-16 + safe-area) never covers content. Scoped to the outer
-   <main> and skipped when an inner PageLayout already pads (.main-content-safe
-   nested), to avoid double-padding. */
+/* When GlobalBottomNav is visible on mobile, reserve space so fixed nav
+   (h-16 + safe-area) never covers content. Applied to .main-content-safe,
+   which lives only on the outer <main> (PageLayout no longer duplicates it). */
 @media (max-width: 639px) {
-  html.has-global-bottom-nav main#main-content:not(:has(.main-content-safe)) {
+  html.has-global-bottom-nav .main-content-safe {
     padding-bottom: calc(var(--bottom-nav-height, 64px) + env(safe-area-inset-bottom, 0px));
   }
   html.has-global-bottom-nav {
