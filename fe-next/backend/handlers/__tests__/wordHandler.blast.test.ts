@@ -427,6 +427,16 @@ describe('wordHandler - blastComboSync broadcast (52-02)', () => {
       const scheduled = setTimeoutMock.mock.calls.find((c: any[]) => c[0] === 'blastEnd:BLAST1');
       expect(scheduled).toBeDefined();
     });
+
+    it('final wave clear stops all bots immediately (H3)', async () => {
+      const botManager = await import('../../../backend/modules/botManager');
+      (isBlastBoardCleared as Mock).mockReturnValue(true);
+      (getGame as Mock).mockReturnValue(makeBlastGame({ blastModeState: makeCleared(3) }));
+
+      await handlers['submitWord']({ word: 'test' });
+
+      expect(botManager.stopAllBots as Mock).toHaveBeenCalledWith('BLAST1');
+    });
   });
 
   describe('wordAccepted blast field includes comboType (merged Fix 2)', () => {

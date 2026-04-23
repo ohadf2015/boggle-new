@@ -34,6 +34,7 @@ const mocks = vi.hoisted(() => ({
   getGameBots: vi.fn(() => []),
   startBot: vi.fn(),
   resyncBotsForNewGrid: vi.fn(),
+  stopAllBots: vi.fn(),
   processTilesForWord: vi.fn(() => ({ next: [], newlyClearedCount: 0 })),
   computeGravityResult: vi.fn(() => ({ newGrid: [['A']], newTileStates: [[{ isCleared: true }]] })),
 }));
@@ -85,6 +86,7 @@ vi.mock('../../../modules/botManager', () => ({
   getGameBots: mocks.getGameBots,
   startBot: mocks.startBot,
   resyncBotsForNewGrid: mocks.resyncBotsForNewGrid,
+  stopAllBots: mocks.stopAllBots,
   isBot: vi.fn(),
 }));
 
@@ -229,6 +231,12 @@ describe('Bot blast mode — wave advance + endGame parity with human path', () 
       'blastEnd:GAME1', expect.any(Function), 1500,
     );
     expect(mocks.advanceBlastWave).not.toHaveBeenCalled();
+  });
+
+  it('final-wave clear stops all bots immediately to silence scheduled ticks (H3)', async () => {
+    mocks.isBlastBoardCleared.mockReturnValue(true);
+    await invokeBotCallback(makeBot(), makeBlastGame(3));
+    expect(mocks.stopAllBots).toHaveBeenCalledWith('GAME1');
   });
 
   it('bot word passes correct currentWave to processTilesForWord (not hardcoded 1)', async () => {

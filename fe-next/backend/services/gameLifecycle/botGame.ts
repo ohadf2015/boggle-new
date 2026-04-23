@@ -282,6 +282,7 @@ export function startBotsForGame(
                   );
                 } else {
                   logger.info('BLAST', `Final wave ${currentWave} cleared in ${gameCode} by bot ${username} — scheduling endGame`);
+                  botManager.stopAllBots(gameCode);
                   timerManager.setTimeout(`blastEnd:${gameCode}`, () => {
                     const g = getGame(gameCode);
                     if (g && g.gameState === 'in-progress') {
