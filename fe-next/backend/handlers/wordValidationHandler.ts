@@ -186,7 +186,7 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
             });
             void resyncBotsForNewGrid(
               getGameBots(gameCode),
-              next.grid,
+              next.grid ?? gravityResult.newGrid,
               (game.language || 'en') as import('@/shared/types').Language,
             );
           } else {
