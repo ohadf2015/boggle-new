@@ -163,6 +163,16 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
               totalMoves: next.totalMoves,
             });
             game.letterPositions = makePositionsMap(next.grid, (game.language || 'en'));
+            if (game.playerWords) {
+              for (const u of Object.keys(game.playerWords)) {
+                game.playerWords[u] = [];
+              }
+            }
+            if (game.playerWordsSet) {
+              for (const u of Object.keys(game.playerWordsSet)) {
+                game.playerWordsSet[u] = new Set();
+              }
+            }
             const nextWaveNum = next.wave ?? currentWave + 1;
             const archetype = getWaveConfig(nextWaveNum).archetype;
             logger.info('BLAST', `Board cleared in ${gameCode} by ${username} — advancing to wave ${next.wave} (${archetype})`);

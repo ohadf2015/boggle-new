@@ -267,6 +267,16 @@ export function startBotsForGame(
                   });
                   if (currentGame) {
                     currentGame.letterPositions = makePositionsMap(next.grid, (currentGame.language || 'en'));
+                    if (currentGame.playerWords) {
+                      for (const u of Object.keys(currentGame.playerWords)) {
+                        currentGame.playerWords[u] = [];
+                      }
+                    }
+                    if (currentGame.playerWordsSet) {
+                      for (const u of Object.keys(currentGame.playerWordsSet)) {
+                        currentGame.playerWordsSet[u] = new Set();
+                      }
+                    }
                   }
                   const nextWaveNum = next.wave ?? currentWave + 1;
                   const archetype = getWaveConfig(nextWaveNum).archetype;
