@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { captureApiError } from '@/utils/sentry';
+import {
+  COINS_PER_REFERRAL,
+  milestonesCrossed,
+} from '@/lib/referral/rewards';
 
 /**
  * GET /api/referral
@@ -149,10 +153,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Referral code required' }, { status: 400 });
     }
 
-    // Find referrer by referral code
+    // Find referrer by referral code (also grab current count for milestone detection)
     const { data: referrer, error: referrerError } = await supabase
       .from('profiles')
-      .select('id')
+      .select('id, referral_count')
       .eq('referral_code', referralCode.toUpperCase())
       .single();
 
@@ -216,10 +220,27 @@ export async function POST(request: NextRequest) {
       // Don't fail the request if tracking fails
     }
 
-    // Grant initial referral reward to referrer (100 XP)
+    // Grant initial referral reward to referrer: coins (the promised gift) + XP
     const REFERRAL_REWARD_XP = 100;
 
-    // Update referrer's XP via atomic RPC
+    // 1) Coins via atomic sync_coins RPC — this is the UI-promised gift
+    const { error: coinError } = await supabase.rpc('sync_coins', {
+      p_user_id: referrer.id,
+      p_amount: COINS_PER_REFERRAL,
+      p_reason: 'referral_signup',
+      p_metadata: { referred_user_id: user.id, referral_id: referralRecord?.id },
+    });
+
+    if (coinError) {
+      console.error('Error granting referral coins:', coinError);
+      captureApiError(new Error(coinError.message), '/api/referral', {
+        method: 'POST',
+        userId: user.id,
+        statusCode: 500,
+      });
+    }
+
+    // 2) XP via atomic RPC (preserved for existing players)
     const { error: xpError } = await supabase.rpc('increment_profile_xp', {
       p_player_id: referrer.id,
       p_xp_amount: REFERRAL_REWARD_XP,
@@ -234,10 +255,10 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Track referral-specific XP separately
+    // Track referral-specific XP separately (used for display)
     const { data: referrerProfile } = await supabase
       .from('profiles')
-      .select('referral_reward_xp')
+      .select('referral_reward_xp, referral_count')
       .eq('id', referrer.id)
       .single();
 
@@ -252,14 +273,65 @@ export async function POST(request: NextRequest) {
       console.error('Error tracking referral XP:', trackError);
     }
 
-    // Record the reward
+    // 3) Milestone bonus coins — trigger has already bumped referral_count
+    const prevCount = referrer.referral_count ?? 0;
+    const newCount = referrerProfile?.referral_count ?? prevCount + 1;
+    const crossed = milestonesCrossed(prevCount, newCount);
+    const milestoneBonusCoins = crossed.reduce((sum, m) => sum + m.coins, 0);
+
+    if (milestoneBonusCoins > 0) {
+      const { error: bonusError } = await supabase.rpc('sync_coins', {
+        p_user_id: referrer.id,
+        p_amount: milestoneBonusCoins,
+        p_reason: 'referral_milestone_bonus',
+        p_metadata: {
+          milestones: crossed.map(m => m.id),
+          prev_count: prevCount,
+          new_count: newCount,
+        },
+      });
+
+      if (bonusError) {
+        console.error('Error granting milestone bonus coins:', bonusError);
+        captureApiError(new Error(bonusError.message), '/api/referral', {
+          method: 'POST',
+          userId: user.id,
+          statusCode: 500,
+        });
+      }
+
+      // Record one reward row per milestone for audit/history
+      for (const m of crossed) {
+        const { error: milestoneRewardError } = await supabase
+          .from('referral_rewards')
+          .insert({
+            player_id: referrer.id,
+            referral_id: referralRecord?.id ?? null,
+            reward_type: `referrer_milestone_${m.id}`,
+            reward_description: `Reached ${m.label} (${m.threshold} friends)`,
+            xp_amount: 0,
+            coin_amount: m.coins,
+            metadata: {
+              milestone_id: m.id,
+              threshold: m.threshold,
+              trigger_referred_user_id: user.id,
+            },
+          });
+        if (milestoneRewardError) {
+          console.error('Error recording milestone reward:', milestoneRewardError);
+        }
+      }
+    }
+
+    // 4) Record the base signup reward (coins + XP combined)
     if (referralRecord) {
       const { error: rewardInsertError } = await supabase.from('referral_rewards').insert({
         player_id: referrer.id,
         referral_id: referralRecord.id,
-        reward_type: 'new_referral_xp',
+        reward_type: 'new_referral',
         reward_description: 'New friend joined via your referral link',
         xp_amount: REFERRAL_REWARD_XP,
+        coin_amount: COINS_PER_REFERRAL,
         metadata: { referred_user_id: user.id },
       });
 
@@ -272,8 +344,8 @@ export async function POST(request: NextRequest) {
         .from('referrals')
         .update({
           reward_granted: true,
-          reward_type: 'xp',
-          reward_amount: REFERRAL_REWARD_XP,
+          reward_type: 'coins_xp',
+          reward_amount: COINS_PER_REFERRAL,
           reward_granted_at: new Date().toISOString(),
         })
         .eq('id', referralRecord.id);
@@ -289,7 +361,10 @@ export async function POST(request: NextRequest) {
       data: {
         referrerId: referrer.id,
         rewardGranted: true,
+        rewardCoins: COINS_PER_REFERRAL,
         rewardXp: REFERRAL_REWARD_XP,
+        milestoneBonusCoins,
+        milestonesCrossed: crossed.map(m => m.id),
       },
     });
   } catch (error) {

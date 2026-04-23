@@ -1,20 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { captureApiError } from '@/utils/sentry';
-
-/**
- * Referral milestone definitions with coin rewards.
- * Each milestone tracks a number-of-referrals threshold.
- */
-const REFERRAL_MILESTONES = [
-  { id: 'bronze', threshold: 3, coins: 50, label: 'Bronze Referrer' },
-  { id: 'silver', threshold: 10, coins: 200, label: 'Silver Referrer' },
-  { id: 'gold', threshold: 25, coins: 500, label: 'Gold Referrer' },
-  { id: 'diamond', threshold: 50, coins: 1000, label: 'Diamond Referrer' },
-] as const;
-
-/** Coins earned per successful referral signup */
-const COINS_PER_REFERRAL = 10;
+import {
+  COINS_PER_REFERRAL,
+  REFERRAL_MILESTONES,
+} from '@/lib/referral/rewards';
 
 /**
  * GET /api/referral/stats
@@ -119,7 +109,18 @@ export async function GET(request: NextRequest) {
     const totalInvited = referralDetails.length;
     const totalJoined = referralDetails.filter(r => r.rewardGranted).length;
     const totalActive = referralDetails.filter(r => r.status === 'active').length;
-    const coinsEarned = totalJoined * COINS_PER_REFERRAL;
+
+    // Real coin total from ledger (signup + milestones + activity bonuses)
+    const { data: rewardRows } = await supabase
+      .from('referral_rewards')
+      .select('coin_amount')
+      .eq('player_id', user.id);
+    const ledgerCoins = (rewardRows || []).reduce(
+      (sum, r) => sum + (r.coin_amount || 0),
+      0
+    );
+    // Fallback for legacy rows with no coin_amount recorded
+    const coinsEarned = ledgerCoins > 0 ? ledgerCoins : totalJoined * COINS_PER_REFERRAL;
 
     // Compute milestone progress
     const milestones = REFERRAL_MILESTONES.map(m => ({
