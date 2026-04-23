@@ -363,7 +363,7 @@ export function calculateNextDelay(bot: Bot): number {
  */
 export async function submitBotWord(
   bot: Bot,
-  onWordSubmit: ((data: WordSubmissionData) => boolean | void | Promise<boolean | void>) | null
+  onWordSubmit: ((data: WordSubmissionData) => number | boolean | void | Promise<number | boolean | void>) | null
 ): Promise<void> {
   if (!bot.isActive || bot.currentWordIndex >= bot.wordsToFind.length) {
     return;
@@ -379,6 +379,7 @@ export async function submitBotWord(
   const score = calculateWordScore(word, bot.comboLevel);
 
   let accepted = true;
+  let credited = score;
   if (onWordSubmit && typeof onWordSubmit === 'function') {
     const result = await onWordSubmit({
       botId: bot.id,
@@ -388,18 +389,19 @@ export async function submitBotWord(
       comboLevel: bot.comboLevel,
     });
     if (result === false) accepted = false;
+    // Numeric return = the actual credited total (base + blast/wordHunt bonus).
+    // Must use typeof === 'number' rather than truthy check so a legitimate 0
+    // doesn't collapse to the reject path.
+    else if (typeof result === 'number') credited = result;
   }
 
-  // Only mutate score/combo/wordsFound when the callback accepted the word.
-  // Previously these ran unconditionally, so cap-rejected words still inflated
-  // bot.score and starved shouldBotScore for every future submission.
   if (!accepted) {
     bot.comboLevel = 0;
     return;
   }
 
   bot.wordsFound.push(word);
-  bot.score += score;
+  bot.score += credited;
   bot.comboLevel++;
 
   logger.debug('BOT', `Bot "${bot.username}" submitted "${word}" (score: ${score}, combo: ${bot.comboLevel})`);

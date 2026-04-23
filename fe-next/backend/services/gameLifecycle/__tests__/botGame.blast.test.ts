@@ -237,6 +237,25 @@ describe('Bot blast mode — wave advance + endGame parity with human path', () 
     expect(call[0].currentWave).toBe(4);
   });
 
+  it('bot callback returns total credited score so bot.score mirrors cap (H1)', async () => {
+    mocks.calculateBlastTileBonus.mockReturnValue(10);
+    const bot = makeBot();
+    mocks.getGameBots.mockReturnValue([bot]);
+    mocks.getGame.mockReturnValue(makeBlastGame(1));
+    let cb: ((s: unknown) => unknown) | null = null;
+    mocks.startBot.mockImplementation((_b, _g, _l, callback) => { cb = callback; });
+
+    startBotsForGame({} as never, 'GAME1', [['A']], 'en', 60);
+    if (!cb) throw new Error('callback not captured');
+    const result = await (cb as (s: unknown) => Promise<unknown>)({
+      username: bot.username, word: 'AB', score: 2, comboLevel: 0,
+    });
+
+    // base (2) + blast tile bonus (10) = 12, credited to player and must be
+    // signalled back to submitBotWord so bot.score tracks shouldBotScore cap.
+    expect(result).toBe(12);
+  });
+
   it('non-cleared board does not advance wave or schedule endGame', async () => {
     mocks.isBlastBoardCleared.mockReturnValue(false);
     const game = makeBlastGame(3);

@@ -579,6 +579,19 @@ describe('Bot Behavior', () => {
       expect(bot.comboLevel).toBe(0);
       expect(bot.wordsFound).not.toContain('hello');
     });
+
+    test('submitBotWord credits numeric callback return as bot score (H1)', async () => {
+      const bot = createMockBot();
+      // botGame callback returns totalScore = base + blast/wordHunt bonuses.
+      // bot.score must accumulate that total so shouldBotScore cap is honoured.
+      const numericCallback = vi.fn().mockResolvedValue(42);
+
+      await submitBotWord(bot, numericCallback);
+
+      expect(bot.score).toBe(42);
+      expect(bot.comboLevel).toBe(1);
+      expect(bot.wordsFound).toContain('hello');
+    });
   });
 
   describe('Wrong Word Generation', () => {

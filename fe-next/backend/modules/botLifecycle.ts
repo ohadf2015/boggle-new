@@ -49,7 +49,7 @@ export function clearBotTimeout(bot: Bot, timerId: ReturnType<typeof setTimeout>
  */
 export function scheduleNextWord(
   bot: Bot,
-  onWordSubmit: ((data: WordSubmissionData) => boolean | void | Promise<boolean | void>) | null,
+  onWordSubmit: ((data: WordSubmissionData) => number | boolean | void | Promise<number | boolean | void>) | null,
   remainingTime: number,
   gameEndTime?: number
 ): void {
@@ -90,7 +90,7 @@ export async function startBot(
   bot: Bot,
   grid: LetterGrid,
   language: Language,
-  onWordSubmit: ((data: WordSubmissionData) => boolean | void | Promise<boolean | void>) | null,
+  onWordSubmit: ((data: WordSubmissionData) => number | boolean | void | Promise<number | boolean | void>) | null,
   gameDuration: number,
   gameStartTime?: number
 ): Promise<void> {

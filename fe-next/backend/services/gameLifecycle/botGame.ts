@@ -361,7 +361,7 @@ export function startBotsForGame(
         volatileBroadcastToRoom(io, getGameRoom(gameCode), 'updateLeaderboard', {
           leaderboard,
         });
-        return true;
+        return totalScore;
       },
       timerSeconds,
       gameStartTime
