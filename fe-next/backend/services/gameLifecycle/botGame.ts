@@ -23,6 +23,8 @@ import {
   getWordPath,
   isBlastBoardCleared,
   advanceBlastWave,
+  tryBeginWaveAdvance,
+  endWaveAdvance,
 } from '../../modules/blastModeManager';
 import { processTilesForWord } from '@/components/blast/utils/clearTilesProcessor';
 import { computeGravityResult } from '@/components/blast/utils/blastGravity';
@@ -245,7 +247,8 @@ export function startBotsForGame(
 
               // MP board-clear parity with human path (wordValidationHandler):
               // advance wave OR schedule endGame on final-wave clear.
-              if (isBlastBoardCleared(gravityResult.newTileStates)) {
+              if (isBlastBoardCleared(gravityResult.newTileStates) && tryBeginWaveAdvance(gameCode)) {
+                try {
                 const currentWave = blastState.wave ?? 1;
                 const maxWaves = BLAST_MP_DEFAULT_MAX_WAVES;
                 if (currentWave < maxWaves) {
@@ -285,6 +288,9 @@ export function startBotsForGame(
                       endGame(io, gameCode);
                     }
                   }, 1500);
+                }
+                } finally {
+                  endWaveAdvance(gameCode);
                 }
               }
             }

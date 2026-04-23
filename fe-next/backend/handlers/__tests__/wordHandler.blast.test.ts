@@ -152,6 +152,8 @@ vi.mock('../../../backend/modules/blastModeManager', () => ({
     grid,
     tileStates: grid.map((row) => row.map((letter) => ({ letter, type: 'standard', isCleared: false }))),
   })),
+  tryBeginWaveAdvance: vi.fn(() => true),
+  endWaveAdvance: vi.fn(),
 }));
 
 vi.mock('../../../backend/services/gameLifecycle/gameEnd', () => ({

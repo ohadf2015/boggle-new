@@ -12,6 +12,8 @@ import {
   hashStringToSeed,
   isBlastBoardCleared,
   advanceBlastWave,
+  tryBeginWaveAdvance,
+  endWaveAdvance,
 } from '../blastModeManager';
 import type { BlastTileState } from '@/shared/types/blast';
 
@@ -624,6 +626,50 @@ describe('blastModeManager', () => {
       const next = advanceBlastWave(state, gameCode, newGrid);
       expect(next.grid).toEqual(newGrid);
       expect(next.tileStates.length).toBe(newGrid.length);
+    });
+  });
+
+  // ==========================================
+  // tryBeginWaveAdvance / endWaveAdvance (H2)
+  // Concurrency guard: only one wave-advance sequence per game may be
+  // in flight at a time. Second entrant early-returns until first ends.
+  // ==========================================
+  describe('tryBeginWaveAdvance / endWaveAdvance', () => {
+    it('first caller claims the lock and returns true', () => {
+      const code = 'H2GAME1';
+      expect(tryBeginWaveAdvance(code)).toBe(true);
+      endWaveAdvance(code);
+    });
+
+    it('second caller is rejected while first holds the lock', () => {
+      const code = 'H2GAME2';
+      expect(tryBeginWaveAdvance(code)).toBe(true);
+      expect(tryBeginWaveAdvance(code)).toBe(false);
+      endWaveAdvance(code);
+    });
+
+    it('lock is reusable after endWaveAdvance', () => {
+      const code = 'H2GAME3';
+      expect(tryBeginWaveAdvance(code)).toBe(true);
+      endWaveAdvance(code);
+      expect(tryBeginWaveAdvance(code)).toBe(true);
+      endWaveAdvance(code);
+    });
+
+    it('locks are independent per gameCode', () => {
+      expect(tryBeginWaveAdvance('H2A')).toBe(true);
+      expect(tryBeginWaveAdvance('H2B')).toBe(true);
+      expect(tryBeginWaveAdvance('H2A')).toBe(false);
+      expect(tryBeginWaveAdvance('H2B')).toBe(false);
+      endWaveAdvance('H2A');
+      endWaveAdvance('H2B');
+    });
+
+    it('endWaveAdvance is idempotent (safe in finally blocks)', () => {
+      const code = 'H2GAME4';
+      tryBeginWaveAdvance(code);
+      endWaveAdvance(code);
+      expect(() => endWaveAdvance(code)).not.toThrow();
     });
   });
 });

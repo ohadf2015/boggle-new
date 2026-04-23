@@ -19,6 +19,25 @@ import { getWaveConfig, getWaveDistribution } from '@/components/blast/utils/bla
 import { rollSpecialType, createSeededRandom } from '@/components/blast/utils/blastLetterGenerator';
 import { overlayToTileStates } from '@/components/blast/utils/blastOverlayToTileStates';
 
+// H2: per-game mutex set guarding the check→advance→broadcast sequence so a
+// second concurrent caller cannot double-advance on the same cleared snapshot.
+const waveAdvancing = new Set<string>();
+
+/**
+ * Attempt to claim the wave-advance lock for `gameCode`. Returns true on success
+ * (caller must later call `endWaveAdvance`), false if another caller already holds it.
+ */
+export function tryBeginWaveAdvance(gameCode: string): boolean {
+  if (waveAdvancing.has(gameCode)) return false;
+  waveAdvancing.add(gameCode);
+  return true;
+}
+
+/** Release the wave-advance lock. Safe to call when no lock is held. */
+export function endWaveAdvance(gameCode: string): void {
+  waveAdvancing.delete(gameCode);
+}
+
 /**
  * Derive a deterministic unsigned 32-bit seed from an arbitrary string (e.g. gameCode).
  * Uses a simple djb2-style hash so the same code always produces the same seed.

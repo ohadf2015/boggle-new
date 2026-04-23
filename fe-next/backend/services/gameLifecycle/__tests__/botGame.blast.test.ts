@@ -65,6 +65,8 @@ vi.mock('../../../modules/blastModeManager', () => ({
   isBlastBoardCleared: mocks.isBlastBoardCleared,
   advanceBlastWave: mocks.advanceBlastWave,
   getWaveConfig: mocks.getWaveConfig,
+  tryBeginWaveAdvance: () => true,
+  endWaveAdvance: () => {},
 }));
 
 vi.mock('@/components/blast/utils/clearTilesProcessor', () => ({

@@ -25,7 +25,7 @@ import { addWordToBlacklist, getGameBots, resyncBotsForNewGrid } from '../module
 import { inc, incPerGame } from '../utils/metrics.js';
 import logger from '../utils/logger.js';
 import { processLongWordEngagement } from './engagementHandler';
-import { calculateBlastTileBonus, getTilesOnPath, recordBlastMove, getWordPath, isBlastBoardCleared, advanceBlastWave } from '../modules/blastModeManager.js';
+import { calculateBlastTileBonus, getTilesOnPath, recordBlastMove, getWordPath, isBlastBoardCleared, advanceBlastWave, tryBeginWaveAdvance, endWaveAdvance } from '../modules/blastModeManager.js';
 import { endGame } from '../services/gameLifecycle/gameEnd.js';
 import timerManager from '../utils/timerManager.js';
 import { processTilesForWord } from '@/components/blast/utils/clearTilesProcessor';
@@ -141,7 +141,10 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
         });
 
         // 5. MP board-clear: advance wave or schedule endGame on final wave.
-        if (isBlastBoardCleared(gravityResult.newTileStates)) {
+        // H2: tryBeginWaveAdvance guards against a concurrent caller (human+bot
+        // or two bots) double-advancing on the same cleared snapshot.
+        if (isBlastBoardCleared(gravityResult.newTileStates) && tryBeginWaveAdvance(gameCode)) {
+          try {
           const currentWave = blastState.wave ?? 1;
           const maxWaves = BLAST_MP_DEFAULT_MAX_WAVES;
           if (currentWave < maxWaves) {
@@ -184,6 +187,9 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
                 endGame(io, gameCode);
               }
             }, 1500);
+          }
+          } finally {
+            endWaveAdvance(gameCode);
           }
         }
       }
