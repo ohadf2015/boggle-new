@@ -19,6 +19,13 @@ Sentry.init({
   replaysOnErrorSampleRate: 0,
 
   beforeSend(event, hint) {
+    // Drop HeadlessChrome events — crawlers/CI bots, not real users.
+    // Catches rAF push-on-undefined errors (JAVASCRIPT-NEXTJS-121) triggered
+    // during physics/overlay teardown that only fires under automation.
+    if (event.contexts?.browser?.name === "HeadlessChrome") {
+      return null;
+    }
+
     if (typeof window !== "undefined") {
       const LogRocket = (window as unknown as { LogRocket?: { sessionURL?: string } }).LogRocket;
       if (LogRocket?.sessionURL) {
@@ -269,6 +276,8 @@ Sentry.init({
     // LogRocket internal quota/memory warnings — third-party, non-actionable (JAVASCRIPT-NEXTJS-11T, 11Y)
     /LogRocket.*filter manager.*too much memory/i,
     /LogRocket.*Session quota exceeded/i,
+    /LogRocket.*Navigation rate limit/i,
+    /Navigation rate limit exceeded/i,
   ],
 
   denyUrls: [

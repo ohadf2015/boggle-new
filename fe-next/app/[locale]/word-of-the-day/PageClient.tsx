@@ -7,7 +7,7 @@ import { motion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import AutoHideHeader from '@/components/AutoHideHeader';
-import { AdPlaceholder } from '@/components/ads';
+import { InlineBannerAd } from "@/components/ads";
 import type { WordEntry } from './content';
 
 const difficultyColors: Record<string, string> = {
@@ -171,7 +171,7 @@ export default function WordOfTheDayClient({ allWords }: Props) {
           </motion.article>
 
           {/* Ad between sections */}
-          <AdPlaceholder zone="content-page" className="mb-6" />
+          <InlineBannerAd webZone="content-page" className="mb-6" />
 
           {/* Previous Words */}
           <section>
@@ -203,7 +203,7 @@ export default function WordOfTheDayClient({ allWords }: Props) {
           </section>
 
           {/* Ad after previous words */}
-          <AdPlaceholder zone="content-page" className="my-6" />
+          <InlineBannerAd webZone="content-page" className="my-6" />
 
           {/* CTA */}
           <motion.div

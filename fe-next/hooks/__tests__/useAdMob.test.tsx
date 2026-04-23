@@ -6,6 +6,7 @@ vi.mock('@capacitor/core', () => ({
   Capacitor: {
     isNativePlatform: vi.fn(() => false),
     getPlatform: vi.fn(() => 'web'),
+    isPluginAvailable: vi.fn(() => true),
   },
 }));
 
@@ -229,6 +230,9 @@ describe('useAdMob', () => {
     const wrapper = makeWrapper(true);
     const { result } = renderHook(() => useAdMob(), { wrapper });
     await act(async () => {
+      await result.current.showBanner();
+    });
+    await act(async () => {
       await result.current.hideBanner();
     });
     expect(AdMob.hideBanner).toHaveBeenCalled();
@@ -242,6 +246,9 @@ describe('useAdMob', () => {
     const wrapper = makeWrapper(true);
     const { result } = renderHook(() => useAdMob(), { wrapper });
     await act(async () => {
+      await result.current.showBanner();
+    });
+    await act(async () => {
       await result.current.hideBanner();
     });
     expect(warnSpy).not.toHaveBeenCalled();
@@ -253,6 +260,9 @@ describe('useAdMob', () => {
     const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const wrapper = makeWrapper(true);
     const { result } = renderHook(() => useAdMob(), { wrapper });
+    await act(async () => {
+      await result.current.showBanner();
+    });
     await act(async () => {
       await result.current.hideBanner();
     });

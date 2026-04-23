@@ -82,7 +82,7 @@ describe('LanguageSelect', () => {
 
     fireEvent.click(screen.getByTestId('language-continue'));
 
-    expect(mockSetLanguage).toHaveBeenCalledWith('he');
+    expect(mockSetLanguage).toHaveBeenCalledWith('he', { skipNavigation: true });
     expect(mockOnSelect).toHaveBeenCalled();
   });
 

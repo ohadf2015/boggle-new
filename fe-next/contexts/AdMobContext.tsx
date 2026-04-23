@@ -16,19 +16,25 @@ interface AdMobContextValue {
 const AdMobContext = createContext<AdMobContextValue | null>(null);
 
 export function AdMobProvider({ children }: { children: ReactNode }) {
-  const isNative = useMemo(() => Capacitor.isNativePlatform(), []);
+  // `isPluginAvailable` is stricter than `isNativePlatform` — in some Android WebView
+  // contexts the bridge reports native but the AdMob plugin isn't registered,
+  // which throws UNIMPLEMENTED on any AdMob call.
+  const isAvailable = useMemo(
+    () => Capacitor.isNativePlatform() && Capacitor.isPluginAvailable('AdMob'),
+    []
+  );
   const platform = useMemo(() => Capacitor.getPlatform() as AdPlatform, []);
   const totalGameEnds = useRef(0);
   const initPromise = useRef<Promise<void> | null>(null);
 
   if (initPromise.current === null) {
-    initPromise.current = isNative
+    initPromise.current = isAvailable
       ? AdMob.initialize({ initializeForTesting: process.env.NODE_ENV !== 'production' })
           .then(() => undefined)
           .catch((err) => {
-            // Surface init failures so Crashlytics/Sentry can capture them — silent swallow
-            // here was masking the root cause of "no ads showing" reports.
-            console.error('[AdMob] initialize failed', err);
+            // warn (not error) so Sentry's captureConsole doesn't treat expected
+            // plugin-missing failures as errors.
+            console.warn('[AdMob] initialize failed', err);
           })
       : Promise.resolve();
   }
@@ -57,7 +63,7 @@ export function AdMobProvider({ children }: { children: ReactNode }) {
   }
 
   function getConfig(): AdmobConfig | null {
-    if (!isNative) return null;
+    if (!isAvailable) return null;
     return getAdmobConfig(platform);
   }
 

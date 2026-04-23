@@ -74,7 +74,7 @@ vi.mock('../LandingHero', () => ({ LandingHero: () => <div /> }));
 vi.mock('../LandingChallengeCards', () => ({ LandingChallengeCards: () => <div /> }));
 vi.mock('../LandingLeaderboardPreview', () => ({ LandingLeaderboardPreview: () => <div /> }));
 vi.mock('../LandingSEOSection', () => ({ LandingSEOSection: () => <div />, ScrollIndicator: () => <div /> }));
-vi.mock('@/components/ads', () => ({ AdPlaceholder: () => <div /> }));
+vi.mock('@/components/ads', () => ({ AdPlaceholder: () => <div />, InlineBannerAd: () => <div /> }));
 
 const wrapper = ({ children }: { children: React.ReactNode }) => (
   <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>

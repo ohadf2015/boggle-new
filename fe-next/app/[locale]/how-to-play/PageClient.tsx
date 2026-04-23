@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import AutoHideHeader from '@/components/AutoHideHeader';
-import { AdPlaceholder } from '@/components/ads';
+import { InlineBannerAd } from "@/components/ads";
 import { GameModeJsonLd } from '@/components/seo/GameModeJsonLd';
 import { BreadcrumbJsonLd } from '@/components/seo/BreadcrumbJsonLd';
 import { getHowToPlayContent, type GameModeContent, type FAQItem, type ScoringRow } from './content';
@@ -162,13 +162,13 @@ export default function HowToPlayPageClient({ locale }: HowToPlayPageClientProps
 
                 <GameModeSection data={c.gameModes.classic} modeKey="classic" />
 
-                <AdPlaceholder zone="content-page" className="my-8" />
+                <InlineBannerAd webZone="content-page" className="my-8" />
 
                 <GameModeSection data={c.gameModes.blast} modeKey="blast" />
 
                 <GameModeSection data={c.gameModes.wordHunt} modeKey="wordHunt" />
 
-                <AdPlaceholder zone="content-page" className="my-8" />
+                <InlineBannerAd webZone="content-page" className="my-8" />
 
                 <ScoringTable
                     title={c.scoring.title}

@@ -122,6 +122,10 @@ vi.mock('@/components/ui/IdleMascot', () => ({
 vi.mock('@/components/ui/PullToRefreshIndicator', () => ({
   PullToRefreshIndicator: () => null,
 }));
+vi.mock('@/components/ads', () => ({
+  AdPlaceholder: () => null,
+  InlineBannerAd: () => null,
+}));
 
 import { render, screen } from '@testing-library/react';
 import LandingView from '../landing/LandingView';

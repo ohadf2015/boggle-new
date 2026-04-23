@@ -9,7 +9,7 @@ import type { Language } from '@/types';
 
 interface LanguageContextValue {
   language: Language;
-  setLanguage: (newLang: Language) => void;
+  setLanguage: (newLang: Language, options?: { skipNavigation?: boolean }) => void;
   /**
    * Translate a key with optional fallback and interpolation params.
    * @param path - The translation key path (e.g., 'errors.networkError')
@@ -204,7 +204,7 @@ export const LanguageProvider = ({ children, initialLanguage, initialTranslation
         }
     }, [language]);
 
-    const setLanguage = useCallback((newLang: Language) => {
+    const setLanguage = useCallback((newLang: Language, options?: { skipNavigation?: boolean }) => {
         if (newLang !== languageRef.current) {
             setLanguageState(newLang);
 
@@ -228,6 +228,14 @@ export const LanguageProvider = ({ children, initialLanguage, initialTranslation
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ language: newLang }),
                 }).catch(() => { /* non-blocking */ });
+            }
+
+            // Caller can opt out of the immediate router.push — used by the FTUE
+            // language step, where router.push remounts [locale]/PageClient and
+            // resets the FTUE back to 'language' (infinite loop). Cookie + state
+            // are already updated above so subsequent navigations use new locale.
+            if (options?.skipNavigation) {
+                return;
             }
 
             // Navigate to new locale preserving FULL path (everything after locale)

@@ -2,6 +2,10 @@ import { useCallback } from 'react';
 import { AdMob, BannerAdSize, BannerAdPosition, RewardAdPluginEvents } from '@capacitor-community/admob';
 import { useAdMobContext } from '@/contexts/AdMobContext';
 
+// Module-level so every useAdMob() consumer observes the same banner state.
+// Prevents hideBanner calls when no banner was ever shown (Sentry #120).
+const bannerShownRef = { current: false };
+
 export function useAdMob() {
   const { recordGameEnd, shouldShowInterstitial, hasNoAds, getConfig, whenReady } = useAdMobContext();
   const isDev = process.env.NODE_ENV !== 'production';
@@ -88,24 +92,29 @@ export function useAdMob() {
         isTesting: isDev,
         ...(typeof margin === 'number' ? { margin } : {}),
       });
+      bannerShownRef.current = true;
     } catch (err) {
-      console.error('[AdMob] showBanner failed', err);
+      // warn (not error) — Sentry captureConsole treats error-level as errors.
+      console.warn('[AdMob] showBanner failed', err);
     }
   }, [hasNoAds, getConfig, isDev, whenReady]);
 
   const hideBanner = useCallback(async () => {
+    // getConfig returns null when AdMob isn't available — skip entirely.
+    if (!getConfig()) return;
+    // Don't call hideBanner if we never successfully showed one (Sentry #120).
+    if (!bannerShownRef.current) return;
     try {
       await whenReady();
       await AdMob.hideBanner();
+      bannerShownRef.current = false;
     } catch (err) {
-      // hideBanner throws when no banner is mounted yet (expected on first call); only log
-      // when we actually have a meaningful error.
       if (err && typeof err === 'object' && 'message' in err) {
         const msg = String((err as { message: unknown }).message);
         if (!/no banner|never shown|not shown|not.*display/i.test(msg)) console.warn('[AdMob] hideBanner failed', err);
       }
     }
-  }, [whenReady]);
+  }, [getConfig, whenReady]);
 
   return { showRewarded, showInterstitial, showBanner, hideBanner };
 }

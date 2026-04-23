@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils';
 import { ArrowLeft, ChevronDown, ChevronUp, HelpCircle, BookOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import AutoHideHeader from '@/components/AutoHideHeader';
-import { AdPlaceholder } from '@/components/ads';
+import { InlineBannerAd } from "@/components/ads";
 import { contentByLocale, type FAQContent } from './content';
 
 export default function FAQPageClient(): React.ReactElement {
@@ -68,7 +68,7 @@ export default function FAQPageClient(): React.ReactElement {
 
           return (
             <div key={catKey} className="mb-8">
-              {catIdx === 2 && <AdPlaceholder zone="content-page" className="mb-8" />}
+              {catIdx === 2 && <InlineBannerAd webZone="content-page" className="mb-8" />}
               <h2 className={cn(
                 'text-2xl font-bold mb-4',
                 isDarkMode ? 'text-white' : 'text-neo-black'

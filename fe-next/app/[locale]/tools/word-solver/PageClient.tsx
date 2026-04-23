@@ -4,7 +4,7 @@ import { useState, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { AdPlaceholder } from '@/components/ads';
+import { InlineBannerAd } from "@/components/ads";
 import { AutoHideHeader } from '@/components/AutoHideHeader';
 import { getContent } from './content';
 import { findWordsApi, groupByLength } from './wordList';
@@ -168,7 +168,7 @@ export default function WordSolverPageClient() {
           </div>
         </section>
 
-        <AdPlaceholder zone="content-page" />
+        <InlineBannerAd webZone="content-page" />
 
         {error && (
           <div className="bg-red-900/50 border-3 border-red-500 rounded-neo p-4 mb-6 text-red-200">

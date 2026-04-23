@@ -23,18 +23,15 @@ const LanguageSelect: React.FC<LanguageSelectProps> = ({ onSelect }) => {
 
   const handleSelect = useCallback((lang: Language) => {
     if (lang === selected) {
-      // Tap-again confirms selection. Apply language only if it differs from
-      // the context (no-op when the user sticks with the default) so we don't
-      // trigger a router.push during the FTUE.
+      // Tap-again confirms selection. Skip navigation so the router.push
+      // to `/{locale}` doesn't remount [locale]/PageClient and bounce the
+      // user back to this step.
       if (lang !== language) {
-        setLanguage(lang);
+        setLanguage(lang, { skipNavigation: true });
       }
       onSelect();
       return;
     }
-    // Defer setLanguage until the user confirms. Calling it here triggers
-    // router.push() to `/{locale}`, which remounts the OnboardingFlow and
-    // loops the user back to this step.
     setSelected(lang);
     fireOnboardingBurst({ y: 0.45 });
   }, [selected, onSelect, setLanguage, language]);
@@ -42,7 +39,7 @@ const LanguageSelect: React.FC<LanguageSelectProps> = ({ onSelect }) => {
   const handleConfirm = useCallback(() => {
     fireOnboardingBurst({ y: 0.7 }, ['#BFFF00', '#FFE135', '#00FFFF']);
     if (selected !== language) {
-      setLanguage(selected);
+      setLanguage(selected, { skipNavigation: true });
     }
     onSelect();
   }, [selected, language, setLanguage, onSelect]);

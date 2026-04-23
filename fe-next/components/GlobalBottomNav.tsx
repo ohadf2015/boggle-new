@@ -244,10 +244,6 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
                 "sm:hidden",
             )}
             style={{
-                // Float above the AdMob native banner on Android/iOS. The var is set by
-                // AnchoredNativeBanner's SizeChanged listener and already includes the
-                // banner's safe-area offset; falls back to 0 when no banner is mounted.
-                bottom: 'var(--admob-banner-height, 0px)',
                 paddingBottom: safeArea.bottom > 0 ? `${safeArea.bottom}px` : 'env(safe-area-inset-bottom, 0px)',
             }}
             aria-label={t('nav.bottomNavigation')}
