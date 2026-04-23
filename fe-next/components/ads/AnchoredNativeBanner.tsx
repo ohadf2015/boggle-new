@@ -42,9 +42,13 @@ export default function AnchoredNativeBanner() {
   useEffect(() => {
     if (!Capacitor.isNativePlatform()) return;
 
-    let removeListener: (() => void) | undefined;
+    const removers: Array<() => void> = [];
 
     const isAndroid = Capacitor.getPlatform() === 'android';
+    const resetVar = () => {
+      document.documentElement.style.setProperty('--admob-banner-height', '0px');
+    };
+
     AdMob.addListener(BannerAdPluginEvents.SizeChanged, (info: { height: number }) => {
       const h = info?.height ?? 0;
       // Var = total vertical space banner occupies from viewport bottom.
@@ -53,14 +57,22 @@ export default function AnchoredNativeBanner() {
       const total = h > 0 ? h + (isAndroid ? (safeArea.bottom || 0) : 0) : 0;
       document.documentElement.style.setProperty('--admob-banner-height', `${total}px`);
     })
-      .then((handle) => {
-        removeListener = () => handle.remove();
-      })
+      .then((handle) => { removers.push(() => handle.remove()); })
+      .catch(() => {});
+
+    // Without these, a failed/closed banner leaves the var inflated from a prior
+    // SizeChanged event → GlobalBottomNav floats mid-screen above empty space.
+    AdMob.addListener(BannerAdPluginEvents.FailedToLoad, resetVar)
+      .then((handle) => { removers.push(() => handle.remove()); })
+      .catch(() => {});
+
+    AdMob.addListener(BannerAdPluginEvents.Closed, resetVar)
+      .then((handle) => { removers.push(() => handle.remove()); })
       .catch(() => {});
 
     return () => {
-      removeListener?.();
-      document.documentElement.style.setProperty('--admob-banner-height', '0px');
+      removers.forEach((r) => r());
+      resetVar();
     };
   }, [safeArea.bottom]);
 
