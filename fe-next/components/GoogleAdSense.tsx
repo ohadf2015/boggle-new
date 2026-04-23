@@ -18,16 +18,17 @@ import { ADSENSE_PUBLISHER_ID } from '@/lib/adsense';
  */
 export function GoogleAdSense() {
   const [shouldRender, setShouldRender] = useState(false);
+  const [isTestMode, setIsTestMode] = useState(false);
 
   useEffect(() => {
-    // Skip AdSense in development
     if (process.env.NODE_ENV === 'development') return;
-    // Only check in browser — avoids SSR rendering the script for native WebViews
     const hostname = window.location.hostname;
     if (hostname === 'localhost' || hostname === '127.0.0.1') return;
 
     if ((window as Window & { Capacitor?: { isNativePlatform?: () => boolean } }).Capacitor?.isNativePlatform?.()) return;
 
+    const isProdHost = hostname === 'lexiclash.live' || hostname === 'www.lexiclash.live';
+    setIsTestMode(!isProdHost);
     setShouldRender(true);
   }, []);
 
@@ -35,17 +36,20 @@ export function GoogleAdSense() {
 
   return (
     <>
+      <Script id="ad-placement-shim" strategy="afterInteractive">
+        {`window.adsbygoogle = window.adsbygoogle || [];
+          window.adBreak = window.adConfig = function(o) { window.adsbygoogle.push(o); };`}
+      </Script>
       <Script
         id="google-adsense"
         async
         src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_PUBLISHER_ID}`}
         crossOrigin="anonymous"
         strategy="afterInteractive"
+        data-ad-client={ADSENSE_PUBLISHER_ID}
+        data-ad-frequency-hint="30s"
+        {...(isTestMode ? { 'data-adbreak-test': 'on' } : {})}
       />
-      <Script id="ad-placement-init" strategy="afterInteractive">
-        {`window.adsbygoogle = window.adsbygoogle || [];
-          window.adBreak = window.adConfig = function(o) { adsbygoogle.push(o); };`}
-      </Script>
     </>
   );
 }

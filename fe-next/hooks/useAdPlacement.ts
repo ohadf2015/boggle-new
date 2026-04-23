@@ -69,20 +69,39 @@ export function useAdPlacement() {
   const showRewarded = useCallback(
     (
       name: string,
-      callbacks: { onReward: () => void; onDismiss?: () => void },
+      callbacks: {
+        onReward: () => void;
+        onDismiss?: () => void;
+        onUnavailable?: (reason: PlacementInfo['breakStatus']) => void;
+      },
     ) => {
       if (isDev() || !window.adBreak) {
         // In dev, grant reward immediately for testing
         callbacks.onReward();
         return;
       }
+      let rewarded = false;
+      let dismissed = false;
       window.adBreak({
         type: 'reward',
         name,
         beforeReward: (showAdFn: () => void) => showAdFn(),
-        adDismissed: () => callbacks.onDismiss?.(),
-        adViewed: () => callbacks.onReward(),
-        adBreakDone: (_info: PlacementInfo) => { /* no-op */ },
+        adDismissed: () => {
+          dismissed = true;
+          callbacks.onDismiss?.();
+        },
+        adViewed: () => {
+          rewarded = true;
+          callbacks.onReward();
+        },
+        adBreakDone: (info: PlacementInfo) => {
+          // Fallback: if neither adViewed nor adDismissed fired, the ad was
+          // never shown (notReady / frequencyCapped / other). Surface to caller
+          // so UI can recover instead of hanging.
+          if (!rewarded && !dismissed) {
+            callbacks.onUnavailable?.(info.breakStatus);
+          }
+        },
       });
     },
     [],

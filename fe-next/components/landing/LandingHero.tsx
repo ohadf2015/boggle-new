@@ -2,7 +2,6 @@
 
 import { memo } from 'react';
 import dynamic from 'next/dynamic';
-import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { IdleMascotWithEntrance } from '@/components/ui/IdleMascot';
@@ -42,7 +41,7 @@ const HeroMascot = memo(function HeroMascot({ isMobilePortrait }: { isMobilePort
 });
 
 export function LandingHero({ players, playersLoading, isMobilePortrait }: LandingHeroProps) {
-  const { t, language } = useLanguage();
+  const { t } = useLanguage();
 
   return (
     <div className={cn(
@@ -89,19 +88,6 @@ export function LandingHero({ players, playersLoading, isMobilePortrait }: Landi
           >
             {t('landing.welcomeSubtitle')}
           </p>
-
-          <Link
-            href={`/${language}/daily`}
-            className={cn(
-              'inline-flex items-center justify-center font-bold uppercase tracking-wide',
-              'bg-neo-lime text-neo-navy border-neo rounded-neo shadow-hard',
-              'hover:shadow-hard-lg active:shadow-hard-pressed active:translate-x-[1px] active:translate-y-[1px]',
-              'transition-all animate-[fadeInUp_0.4s_ease-out_0.35s_both]',
-              isMobilePortrait ? 'px-5 py-2.5 text-sm mb-3' : 'px-7 py-3 text-base md:text-lg'
-            )}
-          >
-            {t('landing.playTodayChallenge')}
-          </Link>
 
         </div>
 

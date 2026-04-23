@@ -233,6 +233,25 @@ describe('Bot blast mode — wave advance + endGame parity with human path', () 
     expect(mocks.advanceBlastWave).not.toHaveBeenCalled();
   });
 
+  it('wave advance rebuilds letterPositions from new grid (M3)', async () => {
+    mocks.isBlastBoardCleared.mockReturnValue(true);
+    const newGrid = [['X', 'Y'], ['Z', 'W']];
+    mocks.advanceBlastWave.mockImplementation((state) => ({
+      wave: (state.wave ?? 1) + 1,
+      overlay: [], overlayMap: new Map(),
+      tileStates: [[{ isCleared: false }]],
+      seed: 999, grid: newGrid,
+      playerMoves: {}, playerBonusMoves: {}, totalMoves: 0,
+      playerStats: state.playerStats,
+    }));
+    const game = makeBlastGame(1);
+    await invokeBotCallback(makeBot(), game);
+    expect(game.letterPositions.get('x')).toEqual([[0, 0]]);
+    expect(game.letterPositions.get('y')).toEqual([[0, 1]]);
+    expect(game.letterPositions.get('z')).toEqual([[1, 0]]);
+    expect(game.letterPositions.get('w')).toEqual([[1, 1]]);
+  });
+
   it('final-wave clear stops all bots immediately to silence scheduled ticks (H3)', async () => {
     mocks.isBlastBoardCleared.mockReturnValue(true);
     await invokeBotCallback(makeBot(), makeBlastGame(3));

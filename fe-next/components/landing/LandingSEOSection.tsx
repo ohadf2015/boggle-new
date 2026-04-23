@@ -7,9 +7,8 @@ import { useParams } from 'next/navigation';
 import { type Variants } from 'framer-motion';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import {
-  Swords, CalendarDays, Map, Sparkles, ChevronDown, Plus, Minus, PencilRuler,
-  Smartphone, BookOpen, Users, Zap, MousePointerClick, Layers, Trophy, Target,
-  GraduationCap, Globe,
+  ChevronDown, Plus, Minus, MousePointerClick, Layers, Trophy, Target,
+  GraduationCap,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { contentByLocale, type LandingSEOContent } from './landingSEOContent';
@@ -53,17 +52,6 @@ export function ScrollIndicator() {
   );
 }
 
-/* ── Game mode card config ─────────────────────────────── */
-
-const MODE_ICONS = [Swords, CalendarDays, Map, Sparkles, PencilRuler] as const;
-const MODE_STYLES = [
-  { gradient: 'from-neo-pink/20 to-neo-pink/5', borderHover: 'hover:border-neo-pink/40', iconBg: 'bg-neo-pink/15 border-neo-pink/25', iconColor: 'text-neo-pink', glowBg: 'bg-neo-pink' },
-  { gradient: 'from-neo-lime/20 to-neo-lime/5', borderHover: 'hover:border-neo-lime/40', iconBg: 'bg-neo-lime/15 border-neo-lime/25', iconColor: 'text-neo-lime', glowBg: 'bg-neo-lime' },
-  { gradient: 'from-neo-cyan/20 to-neo-cyan/5', borderHover: 'hover:border-neo-cyan/40', iconBg: 'bg-neo-cyan/15 border-neo-cyan/25', iconColor: 'text-neo-cyan', glowBg: 'bg-neo-cyan' },
-  { gradient: 'from-neo-purple/20 to-neo-purple/5', borderHover: 'hover:border-neo-purple/40', iconBg: 'bg-neo-purple/15 border-neo-purple/25', iconColor: 'text-neo-purple', glowBg: 'bg-neo-purple' },
-  { gradient: 'from-neo-lime/15 to-neo-lime/5', borderHover: 'hover:border-neo-lime/30', iconBg: 'bg-neo-lime/10 border-neo-lime/20', iconColor: 'text-neo-lime', glowBg: 'bg-neo-lime' },
-] as const;
-
 /* ── How to Play steps ──────────────────────────────────── */
 
 const STEP_ICONS = [MousePointerClick, Layers, Target, Trophy];
@@ -75,10 +63,6 @@ const STEP_GLOW = [
   'shadow-[0_0_20px_rgba(191,255,0,0.3)]',
   'shadow-[0_0_20px_rgba(139,92,246,0.3)]',
 ] as const;
-
-/* ── Highlight pill icons ──────────────────────────────── */
-
-const HIGHLIGHT_ICONS = [Smartphone, Users, BookOpen, Zap];
 
 /* ── Blog images ───────────────────────────────────────── */
 
@@ -169,61 +153,6 @@ export function LandingSEOSection({ className }: LandingSEOSectionProps) {
         </p>
       </AdaptiveMotion.div>
 
-      {/* ── Game Modes — colored showcase cards ── */}
-      <AdaptiveMotion.div
-        className="mb-14 sm:mb-16"
-        variants={sectionReveal}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, margin: '-40px' }}
-      >
-        <h2 className="text-xl sm:text-2xl font-black uppercase text-neo-white text-center mb-8 neo-title">
-          {c.featuresTitle}
-        </h2>
-        <AdaptiveMotion.div
-          className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4"
-          variants={staggerContainer}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-30px' }}
-        >
-          {c.gameModes.map((mode, i) => {
-            const Icon = MODE_ICONS[i];
-            const s = MODE_STYLES[i];
-            return (
-              <AdaptiveMotion.div
-                key={mode.title}
-                variants={staggerItem}
-                whileHover={{ y: -6, scale: 1.03, transition: { type: 'spring', stiffness: 400, damping: 15 } }}
-                className={cn(
-                  'relative p-4 sm:p-5 rounded-neo border-2 border-neo-white/10',
-                  'bg-linear-to-b', s.gradient, s.borderHover,
-                  'flex flex-col items-center text-center gap-3',
-                  'transition-all duration-300 cursor-default select-none',
-                  'overflow-hidden group'
-                )}
-              >
-                <div className={cn(
-                  'absolute top-0 left-1/2 -translate-x-1/2 w-24 h-24 rounded-full blur-2xl opacity-0 group-hover:opacity-40 transition-opacity duration-500',
-                  s.glowBg
-                )} />
-                <div className={cn('relative p-3 rounded-neo border', s.iconBg)}>
-                  <Icon className={cn('w-6 h-6 sm:w-7 sm:h-7', s.iconColor)} aria-hidden="true" />
-                </div>
-                <div className="relative flex flex-col gap-1">
-                  <p className="font-black text-neo-white text-xs sm:text-sm uppercase leading-tight">
-                    {mode.title}
-                  </p>
-                  <span className="text-[10px] sm:text-xs font-semibold text-neo-white/50 uppercase tracking-widest">
-                    {mode.tag}
-                  </span>
-                </div>
-              </AdaptiveMotion.div>
-            );
-          })}
-        </AdaptiveMotion.div>
-      </AdaptiveMotion.div>
-
       {/* ── How to Play — connected timeline flow ── */}
       <AdaptiveMotion.div
         className="mb-14 sm:mb-16"
@@ -266,142 +195,6 @@ export function LandingSEOSection({ className }: LandingSEOSectionProps) {
                 <span className="text-xs sm:text-sm font-bold text-neo-white/80 leading-tight max-w-[140px]">
                   {step}
                 </span>
-              </AdaptiveMotion.div>
-            );
-          })}
-        </AdaptiveMotion.div>
-      </AdaptiveMotion.div>
-
-      {/* ── Highlight pills ── */}
-      <AdaptiveMotion.div
-        className="mb-12 sm:mb-14"
-        variants={sectionReveal}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, margin: '-40px' }}
-      >
-        <AdaptiveMotion.div
-          className="flex flex-wrap justify-center gap-3"
-          variants={staggerContainer}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-30px' }}
-        >
-          {c.highlights.map((text, i) => {
-            const Icon = HIGHLIGHT_ICONS[i];
-            return (
-              <AdaptiveMotion.div
-                key={text}
-                variants={staggerItem}
-                className={cn(
-                  'inline-flex items-center gap-2 px-4 py-2.5',
-                  'rounded-neo border-2 border-neo-white/10',
-                  'bg-neo-white/3',
-                  'text-neo-white/70 font-bold text-xs sm:text-sm'
-                )}
-              >
-                <Icon className="w-4 h-4 shrink-0 text-neo-white/60" aria-hidden="true" />
-                {text}
-              </AdaptiveMotion.div>
-            );
-          })}
-        </AdaptiveMotion.div>
-      </AdaptiveMotion.div>
-
-      {/* ── Who Can Play — icon grid ── */}
-      <AdaptiveMotion.div
-        className="mb-14 sm:mb-16"
-        variants={sectionReveal}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, margin: '-40px' }}
-      >
-        <h2 className="text-xl sm:text-2xl font-black uppercase text-neo-white text-center mb-8 neo-title">
-          {c.whoCanPlayTitle}
-        </h2>
-        <AdaptiveMotion.div
-          className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4"
-          variants={staggerContainer}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-30px' }}
-        >
-          {c.whoCanPlayCards.map((card, i) => {
-            const icons = [Smartphone, Users, BookOpen, Swords];
-            const CardIcon = icons[i];
-            const accentBg = ['bg-neo-cyan', 'bg-neo-lime', 'bg-neo-purple', 'bg-neo-pink'] as const;
-            const iconBg = ['bg-neo-cyan/15 border-neo-cyan/25', 'bg-neo-lime/15 border-neo-lime/25', 'bg-neo-purple/15 border-neo-purple/25', 'bg-neo-pink/15 border-neo-pink/25'] as const;
-            const iconText = ['text-neo-cyan', 'text-neo-lime', 'text-neo-purple', 'text-neo-pink'] as const;
-            return (
-              <AdaptiveMotion.div
-                key={card.label}
-                variants={staggerItem}
-                className={cn(
-                  'relative rounded-neo border-2 border-neo-white/10 p-5',
-                  'bg-neo-white/3 overflow-hidden',
-                  'group hover:border-neo-white/20 transition-colors duration-200'
-                )}
-              >
-                <div className={cn('absolute top-0 inset-x-0 h-0.5', accentBg[i])} />
-                <div className="flex gap-4">
-                  <div className={cn('shrink-0 w-10 h-10 rounded-neo border flex items-center justify-center', iconBg[i])}>
-                    <CardIcon className={cn('w-5 h-5', iconText[i])} aria-hidden="true" />
-                  </div>
-                  <div>
-                    <h3 className="font-black text-neo-white text-sm sm:text-base mb-1">{card.label}</h3>
-                    <p className="text-xs sm:text-sm text-neo-white/55 leading-relaxed">{card.detail}</p>
-                  </div>
-                </div>
-              </AdaptiveMotion.div>
-            );
-          })}
-        </AdaptiveMotion.div>
-      </AdaptiveMotion.div>
-
-      {/* ── Game Modes Explained — accent-bordered cards ── */}
-      <AdaptiveMotion.div
-        className="mb-14 sm:mb-16"
-        variants={sectionReveal}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, margin: '-40px' }}
-      >
-        <h2 className="text-xl sm:text-2xl font-black uppercase text-neo-white text-center mb-8 neo-title">
-          {c.gameModesTitle}
-        </h2>
-        <AdaptiveMotion.div
-          className="space-y-3"
-          variants={staggerContainer}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-30px' }}
-        >
-          {c.gameModesDetails.map((mode, i) => {
-            const modeIcons = [Swords, Target, CalendarDays, Map];
-            const ModeIcon = modeIcons[i];
-            const barBg = ['bg-neo-pink', 'bg-neo-cyan', 'bg-neo-lime', 'bg-neo-purple'] as const;
-            const circleBg = ['bg-neo-pink/15', 'bg-neo-cyan/15', 'bg-neo-lime/15', 'bg-neo-purple/15'] as const;
-            const circleText = ['text-neo-pink', 'text-neo-cyan', 'text-neo-lime', 'text-neo-purple'] as const;
-            return (
-              <AdaptiveMotion.div
-                key={mode.title}
-                variants={staggerItem}
-                className={cn(
-                  'relative rounded-neo border-2 border-neo-white/10 p-4 sm:p-5',
-                  'bg-neo-white/2',
-                  'overflow-hidden'
-                )}
-              >
-                <div className={cn('absolute top-0 bottom-0 inset-s-0 w-1 rounded-s-neo', barBg[i])} />
-                <div className="flex gap-4 ps-3">
-                  <div className={cn('shrink-0 w-9 h-9 rounded-full flex items-center justify-center mt-0.5', circleBg[i])}>
-                    <ModeIcon className={cn('w-4 h-4', circleText[i])} aria-hidden="true" />
-                  </div>
-                  <div>
-                    <h3 className="font-black text-neo-white text-sm sm:text-base mb-1.5">{mode.title}</h3>
-                    <p className="text-xs sm:text-sm text-neo-white/55 leading-relaxed">{mode.content}</p>
-                  </div>
-                </div>
               </AdaptiveMotion.div>
             );
           })}
@@ -470,41 +263,6 @@ export function LandingSEOSection({ className }: LandingSEOSectionProps) {
             <FAQItem key={item.question} question={item.question} answer={item.answer} />
           ))}
         </AdaptiveMotion.div>
-      </AdaptiveMotion.div>
-
-      {/* ── Community — CTA banner with stats ── */}
-      <AdaptiveMotion.div
-        className="mb-12 sm:mb-14"
-        variants={sectionReveal}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, margin: '-40px' }}
-      >
-        <div className={cn(
-          'relative rounded-neo border-2 border-neo-cyan/20 overflow-hidden',
-          'bg-linear-to-br from-neo-cyan/8 via-neo-pink/5 to-transparent',
-          'p-6 sm:p-8 text-center'
-        )}>
-          {/* Decorative glow */}
-          <div className="absolute -top-12 left-1/2 -translate-x-1/2 w-64 h-32 rounded-full bg-neo-cyan/8 blur-3xl pointer-events-none" aria-hidden="true" />
-          <div className="relative">
-            <h2 className="text-lg sm:text-xl font-black uppercase text-neo-white mb-3 neo-title-sm">
-              {c.communityTitle}
-            </h2>
-            <p className="text-sm sm:text-base text-neo-white/55 leading-relaxed max-w-xl mx-auto mb-6">
-              {c.communityContent}
-            </p>
-            {/* Stats pills */}
-            <div className="flex justify-center gap-4 sm:gap-8">
-              {c.communityStats.map((stat) => (
-                <div key={stat.label} className="text-center">
-                  <div className="text-2xl sm:text-3xl font-black text-neo-cyan">{stat.value}</div>
-                  <div className="text-[10px] sm:text-xs font-bold text-neo-white/40 uppercase tracking-wider">{stat.label}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
       </AdaptiveMotion.div>
 
       {/* ── Blog Links ── */}

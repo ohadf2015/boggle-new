@@ -428,6 +428,16 @@ describe('wordHandler - blastComboSync broadcast (52-02)', () => {
       expect(scheduled).toBeDefined();
     });
 
+    it('rebuilds letterPositions from new grid on wave advance (M3)', async () => {
+      (isBlastBoardCleared as Mock).mockReturnValue(true);
+      const game = makeBlastGame({ blastModeState: makeCleared(1) });
+      (getGame as Mock).mockReturnValue(game);
+
+      await handlers['submitWord']({ word: 'test' });
+
+      expect(game.letterPositions.get('a')).toEqual([[0, 0]]);
+    });
+
     it('final wave clear stops all bots immediately (H3)', async () => {
       const botManager = await import('../../../backend/modules/botManager');
       (isBlastBoardCleared as Mock).mockReturnValue(true);

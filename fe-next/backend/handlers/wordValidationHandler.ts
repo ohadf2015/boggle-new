@@ -26,6 +26,7 @@ import { inc, incPerGame } from '../utils/metrics.js';
 import logger from '../utils/logger.js';
 import { processLongWordEngagement } from './engagementHandler';
 import { calculateBlastTileBonus, getTilesOnPath, recordBlastMove, getWordPath, isBlastBoardCleared, advanceBlastWave, tryBeginWaveAdvance, endWaveAdvance } from '../modules/blastModeManager.js';
+import { makePositionsMap } from '../modules/wordValidator.js';
 import { endGame } from '../services/gameLifecycle/gameEnd.js';
 import timerManager from '../utils/timerManager.js';
 import { processTilesForWord } from '@/components/blast/utils/clearTilesProcessor';
@@ -161,6 +162,7 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
               playerBonusMoves: next.playerBonusMoves,
               totalMoves: next.totalMoves,
             });
+            game.letterPositions = makePositionsMap(next.grid, (game.language || 'en'));
             const nextWaveNum = next.wave ?? currentWave + 1;
             const archetype = getWaveConfig(nextWaveNum).archetype;
             logger.info('BLAST', `Board cleared in ${gameCode} by ${username} — advancing to wave ${next.wave} (${archetype})`);

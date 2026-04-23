@@ -266,6 +266,15 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
         onDismiss: () => {
           if (!adsenseRewarded) handleAdError('Ad dismissed without reward');
         },
+        onUnavailable: (reason) => {
+          if (adsenseRewarded) return;
+          const msg = reason === 'frequencyCapped'
+            ? 'Ad not available — try again shortly'
+            : reason === 'notReady'
+              ? 'Ad not ready — try again shortly'
+              : 'No ad available right now';
+          handleAdError(msg);
+        },
       });
     } else if (shouldUseSimulation) {
       // Priority 2: Simulation fallback for development/testing

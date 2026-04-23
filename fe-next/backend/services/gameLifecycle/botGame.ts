@@ -44,6 +44,7 @@ import type { Bot } from '../../modules/botBehavior';
 import { startBotsForWordHunt } from './botWordHunt';
 import { startBotsForWheelRush } from './botWheelRush';
 import { restoreLife, getLifeBonus } from '../../modules/wordHuntManager';
+import { makePositionsMap } from '../../modules/wordValidator';
 
 /** Score target ratios per difficulty — bots aim for this % of best human score */
 const BOT_SCORE_TARGET: Record<string, number> = {
@@ -264,6 +265,9 @@ export function startBotsForGame(
                     playerBonusMoves: next.playerBonusMoves,
                     totalMoves: next.totalMoves,
                   });
+                  if (currentGame) {
+                    currentGame.letterPositions = makePositionsMap(next.grid, (currentGame.language || 'en'));
+                  }
                   const nextWaveNum = next.wave ?? currentWave + 1;
                   const archetype = getWaveConfig(nextWaveNum).archetype;
                   logger.info('BLAST', `Board cleared in ${gameCode} by bot ${username} — advancing to wave ${next.wave} (${archetype})`);

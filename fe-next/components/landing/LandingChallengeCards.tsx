@@ -47,6 +47,14 @@ type LandingCardKey = LandingGameMode | 'quickPlay' | 'connections';
 /** Default card order when no server data available */
 const DEFAULT_ORDER: LandingCardKey[] = ['daily', 'quickPlay', 'arena', 'practice', 'blast', 'adventure'];
 
+/**
+ * Featured landing modes — keep the set small to reduce choice paralysis.
+ * Daily is the anchor, Arena is the primary MP, Blast is the marquee solo.
+ * Newcomer/veteran branches below still surface Practice/QuickPlay when
+ * appropriate via the same allowlist.
+ */
+const FEATURED_MODES = new Set<LandingCardKey>(['daily', 'arena', 'blast', 'practice', 'quickPlay']);
+
 /** CSS stagger delay for each card index */
 const cardDelay = (index: number) => `${index * 0.07}s`;
 
@@ -109,11 +117,14 @@ export function LandingChallengeCards({
   const progressFiltered: LandingCardKey[] = isVeteran
     ? withQuickPlay.filter((m) => m !== 'practice')
     : withQuickPlay.filter((m) => m !== 'quickPlay');
-  const cardOrder: LandingCardKey[] = isNewbie && !isVeteran
+  const orderedBeforeFeatured: LandingCardKey[] = isNewbie && !isVeteran
     ? (['practice', 'daily', ...progressFiltered.filter((m) => m !== 'practice' && m !== 'daily')] as LandingCardKey[])
     : progressFiltered[0] === 'daily'
     ? progressFiltered
     : (['daily', ...progressFiltered.filter((m) => m !== 'daily')] as LandingCardKey[]);
+  // Final step: cull to the featured allowlist so landing shows a small,
+  // high-intent set instead of every available mode.
+  const cardOrder: LandingCardKey[] = orderedBeforeFeatured.filter((m) => FEATURED_MODES.has(m));
 
   /** Renders a card by mode key with staggered CSS animation */
   const renderCard = (mode: LandingCardKey, index: number) => {
