@@ -16,7 +16,7 @@ const DATE_PUBLISHED = '2025-12-01';
 const DATE_MODIFIED = '2026-03-15';
 
 const metaTitles: Record<string, string> = {
-  en: 'I Tried Every Boggle Alternative (2026) — Here\'s What\'s Actually Worth Playing',
+  en: '6 Best Boggle Alternatives in 2026 (Free + Multiplayer)',
   he: 'ניסיתי כל חלופת בוגל ב-2026 — הנה מה שבאמת שווה לשחק',
   sv: 'Jag testade alla Boggle-alternativ 2026 — Här är vad som faktiskt är värt att spela',
   ja: 'Boggle代替ゲームを全部試した（2026年）— 本当に遊ぶ価値があるのはこれだ',

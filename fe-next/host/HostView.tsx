@@ -15,6 +15,7 @@ import type { Language, PlayerResult } from '@/types';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 import { setStoredUsername, setStoredCustomAvatar } from '@/utils/profileStorage';
 import { useGameMode } from '@/hooks/gameState/store';
+import logger from '@/utils/logger';
 import { useWordHuntPlayerLives, useWordHuntEliminatedPlayers, useWordHuntTargetLength, useBlastWave } from '@/hooks/gameState/selectors';
 
 // Extracted components
@@ -269,15 +270,26 @@ const HostView: React.FC<HostViewProps> = memo(({
   });
 
   // Quick Play: auto-start solo game once room is joined and socket ready.
-  // Ref-guarded so StrictMode double-mount or rerun only fires once.
+  // Ref-guarded so StrictMode double-mount or rerun only fires once per attempt.
+  // If emit silently fails (e.g. transient socket glitch), ref clears after 3.5s
+  // so a rerender retries. Success clears retry via gameStarted early-return.
   const autoStartFiredRef = useRef(false);
   useEffect(() => {
     if (!autoStart) return;
+    if (state.runtime.gameStarted) return;
     if (autoStartFiredRef.current) return;
     if (!socket?.connected || !gameCode) return;
-    if (state.runtime.gameStarted) return;
+    logger.warn('[QUICK_PLAY autostart] firing', {
+      gameCode,
+      connected: socket?.connected,
+      gameStarted: state.runtime.gameStarted,
+    });
     autoStartFiredRef.current = true;
     actions.confirmSoloStart();
+    const retryTimer = setTimeout(() => {
+      autoStartFiredRef.current = false;
+    }, 3500);
+    return () => clearTimeout(retryTimer);
   }, [autoStart, socket, gameCode, state.runtime.gameStarted, actions]);
 
   // Destructure stable setters for useEffect dependencies

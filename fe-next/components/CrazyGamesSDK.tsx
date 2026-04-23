@@ -26,6 +26,24 @@ const CRAZYGAMES_FORCE_DISABLED = process.env.NEXT_PUBLIC_CRAZYGAMES_ENABLED ===
 // (hidden external auth, scroll prevention) is correct on first paint.
 export function detectCrazyGamesSync(): boolean {
   if (typeof window === 'undefined') return false;
+
+  // Force-ON via env flag
+  if (process.env.NEXT_PUBLIC_CRAZYGAMES_ENABLED === 'true') return true;
+
+  // Dev/QA override: ?crazygames=1 persists to sessionStorage + window flag
+  try {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('crazygames') === '1' || params.get('cg') === '1') {
+      window.__crazyGamesEnvironment = 'crazygames';
+      try { sessionStorage.setItem('__cg_override', '1'); } catch { /* noop */ }
+      return true;
+    }
+    if (sessionStorage.getItem('__cg_override') === '1') {
+      window.__crazyGamesEnvironment = 'crazygames';
+      return true;
+    }
+  } catch { /* noop */ }
+
   try {
     if (window.location.ancestorOrigins?.length) {
       for (let i = 0; i < window.location.ancestorOrigins.length; i++) {
@@ -43,6 +61,19 @@ export function detectCrazyGamesSync(): boolean {
     const host = window.location?.hostname;
     if (host === 'icecream.me' || host?.endsWith('.icecream.me')) return true;
   } catch { /* noop */ }
+
+  // Iframe fallback: CG embeds us cross-origin, so ancestorOrigins often empty
+  // and referrer may be stripped by referrer-policy. If we're in an iframe AND
+  // the URL hints CG context, treat as CG. Guarded by URL heuristic to avoid
+  // false-positive in Vercel previews / Storybook / generic embeds.
+  try {
+    const inIframe = window.self !== window.top;
+    if (inIframe) {
+      const href = window.location.href;
+      if (/crazygames|cg[_-]?embed|icecream/i.test(href)) return true;
+    }
+  } catch { /* cross-origin top access denied — still an iframe, but no URL hint */ }
+
   return false;
 }
 

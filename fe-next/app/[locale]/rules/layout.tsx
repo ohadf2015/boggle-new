@@ -8,7 +8,7 @@ interface LayoutParams {
 // Localized metadata for rules page
 const rulesMetadata: Record<string, { title: string; description: string; ogDescription: string }> = {
     en: {
-        title: 'How to Play LexiClash (2026): Rules, Scoring & 7 Winning Tips',
+        title: 'How to Play LexiClash: Rules, Scoring & 7 Winning Tips',
         description: 'The complete 2026 LexiClash guide: game rules, scoring system, 7 proven beginner tips, and pro strategies to climb the leaderboard. Free, real-time multiplayer word game — no download.',
         ogDescription: 'Rules + scoring + 7 winning tips. The up-to-date LexiClash playbook.',
     },
