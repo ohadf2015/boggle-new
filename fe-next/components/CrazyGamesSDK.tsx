@@ -22,6 +22,30 @@ const CrazyGamesContext = createContext<CrazyGamesContextType | null>(null);
 // Force-disable via env var; otherwise auto-detect CrazyGames iframe at runtime
 const CRAZYGAMES_FORCE_DISABLED = process.env.NEXT_PUBLIC_CRAZYGAMES_ENABLED === 'false';
 
+// Synchronous iframe detection used for SSR-safe initial state so CG-specific UI
+// (hidden external auth, scroll prevention) is correct on first paint.
+export function detectCrazyGamesSync(): boolean {
+  if (typeof window === 'undefined') return false;
+  try {
+    if (window.location.ancestorOrigins?.length) {
+      for (let i = 0; i < window.location.ancestorOrigins.length; i++) {
+        if (window.location.ancestorOrigins[i]?.includes('crazygames.com')) return true;
+      }
+    }
+  } catch { /* cross-origin access denied */ }
+  try {
+    if (document.referrer?.includes('crazygames.com')) return true;
+  } catch { /* noop */ }
+  try {
+    if (window.__crazyGamesEnvironment === 'crazygames') return true;
+  } catch { /* noop */ }
+  try {
+    const host = window.location?.hostname;
+    if (host === 'icecream.me' || host?.endsWith('.icecream.me')) return true;
+  } catch { /* noop */ }
+  return false;
+}
+
 /**
  * CrazyGames SDK Provider
  *
@@ -30,7 +54,9 @@ const CRAZYGAMES_FORCE_DISABLED = process.env.NEXT_PUBLIC_CRAZYGAMES_ENABLED ===
  */
 export function CrazyGamesProvider({ children }: { children: ReactNode }) {
   const [isAvailable, setIsAvailable] = useState(false);
-  const [environment, setEnvironment] = useState<CrazyGamesEnvironment | null>(null);
+  const [environment, setEnvironment] = useState<CrazyGamesEnvironment | null>(
+    () => (!CRAZYGAMES_FORCE_DISABLED && detectCrazyGamesSync() ? 'crazygames' : null)
+  );
   const [isLoading, setIsLoading] = useState(true);
   const [isInstantMultiplayer, setIsInstantMultiplayer] = useState(false);
 
@@ -44,24 +70,7 @@ export function CrazyGamesProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    // Fallback: detect CrazyGames iframe via referrer/ancestor origins when SDK fails
-    const isCrazyGamesIframe = (): boolean => {
-      try {
-        // Check ancestor origins (Chrome/Edge)
-        if (window.location.ancestorOrigins?.length) {
-          for (let i = 0; i < window.location.ancestorOrigins.length; i++) {
-            if (window.location.ancestorOrigins[i]?.includes('crazygames.com')) return true;
-          }
-        }
-      } catch { /* cross-origin access denied — expected */ }
-      try {
-        if (document.referrer?.includes('crazygames.com')) return true;
-      } catch { /* noop */ }
-      try {
-        if (window.self !== window.top && window.__crazyGamesEnvironment === 'crazygames') return true;
-      } catch { /* cross-origin — likely an iframe */ }
-      return false;
-    };
+    const isCrazyGamesIframe = detectCrazyGamesSync;
 
     const checkSDK = async () => {
       let attempts = 0;
