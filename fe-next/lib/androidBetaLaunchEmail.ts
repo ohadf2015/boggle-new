@@ -82,8 +82,8 @@ export async function sendTestAndroidBetaLaunch(
       unsubscribeUrl,
       playUrl: PLAY_STORE_URL,
     }),
-    30000,
-    'Email render timed out after 30 seconds'
+    8000,
+    'Email render timed out after 8 seconds'
   );
   logger.info(
     'EMAIL',
@@ -100,8 +100,8 @@ export async function sendTestAndroidBetaLaunch(
         subject: `[TEST] ${subject}`,
         html,
       }),
-      20000,
-      'Resend API timed out after 20 seconds'
+      15000,
+      'Resend API timed out after 15 seconds'
     );
     logger.info(
       'EMAIL',
@@ -153,11 +153,17 @@ export async function sendAndroidBetaLaunchToPlayer(
 
   if (isEmail) {
     const target = playerIdentifier.toLowerCase();
-    const { data: viewRow, error: viewError } = await supabase
-      .from('auth_users_view')
-      .select('id, email')
-      .eq('email', target)
-      .maybeSingle();
+    const { data: viewRow, error: viewError } = await withTimeout(
+      Promise.resolve(
+        supabase
+          .from('auth_users_view')
+          .select('id, email')
+          .eq('email', target)
+          .maybeSingle()
+      ),
+      5000,
+      'Supabase email lookup timed out after 5 seconds'
+    );
 
     if (viewError || !viewRow) {
       return {
@@ -168,11 +174,17 @@ export async function sendAndroidBetaLaunchToPlayer(
     profileId = viewRow.id;
     resolvedEmail = viewRow.email ?? null;
   } else {
-    const { data: profileByName } = await supabase
-      .from('profiles')
-      .select('id')
-      .eq('username', playerIdentifier)
-      .maybeSingle();
+    const { data: profileByName } = await withTimeout(
+      Promise.resolve(
+        supabase
+          .from('profiles')
+          .select('id')
+          .eq('username', playerIdentifier)
+          .maybeSingle()
+      ),
+      5000,
+      'Supabase username lookup timed out after 5 seconds'
+    );
     if (!profileByName) {
       return {
         success: false,
@@ -201,8 +213,11 @@ export async function sendAndroidBetaLaunchToPlayer(
         .eq('id', profileId)
         .maybeSingle();
 
-  const [{ data: profile }, { data: emailRow, error: emailErr }] =
-    await Promise.all([profilePromise, emailPromise]);
+  const [{ data: profile }, { data: emailRow, error: emailErr }] = await withTimeout(
+    Promise.all([profilePromise, emailPromise]),
+    5000,
+    'Supabase profile+email lookup timed out after 5 seconds'
+  );
 
   logger.info(
     'EMAIL',
@@ -254,8 +269,8 @@ export async function sendAndroidBetaLaunchToPlayer(
       unsubscribeUrl,
       playUrl: PLAY_STORE_URL,
     }),
-    30000,
-    'Email render timed out after 30 seconds'
+    8000,
+    'Email render timed out after 8 seconds'
   );
   logger.info(
     'EMAIL',
@@ -276,8 +291,8 @@ export async function sendAndroidBetaLaunchToPlayer(
           'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
         },
       }),
-      20000,
-      'Resend API timed out after 20 seconds'
+      15000,
+      'Resend API timed out after 15 seconds'
     );
     logger.info(
       'EMAIL',
