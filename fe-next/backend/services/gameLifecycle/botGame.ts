@@ -283,19 +283,20 @@ export function startBotsForGame(
                 const maxWaves = BLAST_MP_DEFAULT_MAX_WAVES;
                 if (currentWave < maxWaves) {
                   const next = advanceBlastWave(blastState, gameCode, gravityResult.newGrid);
+                  const nextGrid = next.grid ?? gravityResult.newGrid;
                   Object.assign(blastState, {
                     wave: next.wave,
                     overlay: next.overlay,
                     overlayMap: next.overlayMap,
                     tileStates: next.tileStates,
                     seed: next.seed,
-                    grid: next.grid,
+                    grid: nextGrid,
                     playerMoves: next.playerMoves,
                     playerBonusMoves: next.playerBonusMoves,
                     totalMoves: next.totalMoves,
                   });
                   if (currentGame) {
-                    currentGame.letterPositions = makePositionsMap(next.grid, (currentGame.language || 'en'));
+                    currentGame.letterPositions = makePositionsMap(nextGrid, (currentGame.language || 'en'));
                     if (currentGame.playerWords) {
                       for (const u of Object.keys(currentGame.playerWords)) {
                         currentGame.playerWords[u] = [];
@@ -313,14 +314,14 @@ export function startBotsForGame(
                   broadcastToRoom(io, getGameRoom(gameCode), 'blastWaveAdvance', {
                     wave: next.wave,
                     archetype,
-                    grid: next.grid,
+                    grid: nextGrid,
                     tileStates: next.tileStates,
                     overlay: next.overlay,
                     seed: next.seed,
                   });
                   void botManager.resyncBotsForNewGrid(
                     botManager.getGameBots(gameCode),
-                    next.grid,
+                    nextGrid,
                     language,
                   );
                 } else {
