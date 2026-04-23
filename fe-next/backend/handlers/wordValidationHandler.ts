@@ -73,7 +73,7 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
 
   // Record this player as the first finder of this word
   const userData = game.users?.[username];
-  recordFirstFinder(gameCode, normalizedWord, username, userData?.avatar ?? undefined);
+  const isFirstFinder = recordFirstFinder(gameCode, normalizedWord, username, userData?.avatar ?? undefined);
 
   // Check if word is from lesson vocabulary (classroom games)
   const fromLesson = game.lessonVocabulary?.has(normalizedWord.toUpperCase()) || false;
@@ -162,7 +162,7 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
               playerBonusMoves: next.playerBonusMoves,
               totalMoves: next.totalMoves,
             });
-            game.letterPositions = makePositionsMap(next.grid, (game.language || 'en'));
+            game.letterPositions = makePositionsMap(next.grid ?? gravityResult.newGrid, (game.language || 'en'));
             if (game.playerWords) {
               for (const u of Object.keys(game.playerWords)) {
                 game.playerWords[u] = [];
@@ -290,6 +290,7 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
     fireRoundMultiplier: fireRoundMultiplier,
     fireRoundBonus: fireRoundBonus,
     autoValidated: true,
+    isFirstFinder,
     fromLesson: fromLesson,
     ...(goldenBonus > 0 ? { goldenBonus } : {}),
     ...(isSpecialWord ? { isSpecialWord: true } : {}),
@@ -360,6 +361,7 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
     wordCount: playerWordCount,
     score: totalScore,
     comboLevel: safeComboLevel,
+    isFirstFinder,
     // Merged combo sync (Fix 2): combo type embedded in playerFoundWord instead of separate event
     ...(comboType ? { comboSync: { comboType, username } } : {}),
   });
