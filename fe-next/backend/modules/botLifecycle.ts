@@ -151,6 +151,37 @@ export async function startBot(
 }
 
 /**
+ * Regenerate each bot's word pool against a new grid — used when the MP
+ * blast board advances to a new wave. Bots retain active scheduling and
+ * their combo/score; only the candidate list is rebuilt so subsequent
+ * submissions target words that actually exist on the new grid.
+ *
+ * No-op on inactive bots. Errors per-bot are logged but do not abort the
+ * batch (one bot's solver failure shouldn't silence the rest).
+ */
+export async function resyncBotsForNewGrid(
+  bots: Bot[],
+  grid: LetterGrid,
+  language: Language,
+): Promise<void> {
+  if (!bots || bots.length === 0) return;
+  if (!grid || !Array.isArray(grid) || grid.length === 0) {
+    logger.warn('BOT', 'resyncBotsForNewGrid called with invalid grid');
+    return;
+  }
+  await Promise.all(bots.map(async (bot) => {
+    if (!bot.isActive) return;
+    try {
+      await prepareBotWords(bot, grid, language);
+      bot.currentWordIndex = 0;
+      logger.debug('BOT', `Bot "${bot.username}" resynced for new grid (${bot.wordsToFind.length} words)`);
+    } catch (err) {
+      logger.warn('BOT', `Bot "${bot.username}" resync failed: ${(err as Error).message}`);
+    }
+  }));
+}
+
+/**
  * Stop a bot from playing
  */
 export function stopBot(bot: Bot): void {

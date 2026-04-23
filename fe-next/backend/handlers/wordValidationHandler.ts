@@ -21,7 +21,7 @@ import { broadcastToRoom, broadcastToRoomExceptSender, volatileBroadcastToRoom, 
 import { calculateWordScore } from '../modules/scoringEngine.js';
 import { checkAndAwardAchievements } from '../modules/achievementManager.js';
 import { isSupabaseConfigured, savePlayerWord, recordPlayerWrongWord } from '../modules/supabaseServer.js';
-import { addWordToBlacklist } from '../modules/botManager.js';
+import { addWordToBlacklist, getGameBots, resyncBotsForNewGrid } from '../modules/botManager.js';
 import { inc, incPerGame } from '../utils/metrics.js';
 import logger from '../utils/logger.js';
 import { processLongWordEngagement } from './engagementHandler';
@@ -169,6 +169,11 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
               overlay: next.overlay,
               seed: next.seed,
             });
+            void resyncBotsForNewGrid(
+              getGameBots(gameCode),
+              next.grid,
+              (game.language || 'en') as import('@/shared/types').Language,
+            );
           } else {
             // Final wave cleared — schedule delayed endGame.
             logger.info('BLAST', `Final wave ${currentWave} cleared in ${gameCode} by ${username} — scheduling endGame`);

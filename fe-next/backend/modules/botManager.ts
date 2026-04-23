@@ -49,7 +49,7 @@ export {
 } from './botCreation';
 
 // Re-export lifecycle
-export { startBot, stopBot } from './botLifecycle';
+export { startBot, stopBot, resyncBotsForNewGrid } from './botLifecycle';
 
 // Re-export blacklist management
 export { addWordToBlacklist };

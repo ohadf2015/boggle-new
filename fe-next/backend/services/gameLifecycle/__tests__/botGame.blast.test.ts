@@ -33,6 +33,7 @@ const mocks = vi.hoisted(() => ({
   endGame: vi.fn(),
   getGameBots: vi.fn(() => []),
   startBot: vi.fn(),
+  resyncBotsForNewGrid: vi.fn(),
   processTilesForWord: vi.fn(() => ({ next: [], newlyClearedCount: 0 })),
   computeGravityResult: vi.fn(() => ({ newGrid: [['A']], newTileStates: [[{ isCleared: true }]] })),
 }));
@@ -81,6 +82,7 @@ vi.mock('@/components/blast/utils/blastLetterGenerator', () => ({
 vi.mock('../../../modules/botManager', () => ({
   getGameBots: mocks.getGameBots,
   startBot: mocks.startBot,
+  resyncBotsForNewGrid: mocks.resyncBotsForNewGrid,
   isBot: vi.fn(),
 }));
 
@@ -194,6 +196,25 @@ describe('Bot blast mode — wave advance + endGame parity with human path', () 
     expect(waveAdvanceCall).toBeDefined();
     expect(mocks.timerSetTimeout).not.toHaveBeenCalled();
     expect(mocks.endGame).not.toHaveBeenCalled();
+  });
+
+  it('wave advance regenerates bot word pool against the new grid (C3)', async () => {
+    mocks.isBlastBoardCleared.mockReturnValue(true);
+    const newGrid = [['X', 'Y'], ['Z', 'W']];
+    mocks.advanceBlastWave.mockImplementation((state) => ({
+      wave: (state.wave ?? 1) + 1,
+      overlay: [], overlayMap: new Map(),
+      tileStates: [[{ isCleared: false }]],
+      seed: 999, grid: newGrid,
+      playerMoves: {}, playerBonusMoves: {}, totalMoves: 0,
+      playerStats: state.playerStats,
+    }));
+    const bot = makeBot();
+    mocks.getGameBots.mockReturnValue([bot]);
+    await invokeBotCallback(bot, makeBlastGame(1));
+    expect(mocks.resyncBotsForNewGrid).toHaveBeenCalledWith(
+      expect.arrayContaining([bot]), newGrid, 'en',
+    );
   });
 
   it('bot word that clears the FINAL wave schedules delayed endGame', async () => {

@@ -272,6 +272,11 @@ export function startBotsForGame(
                     overlay: next.overlay,
                     seed: next.seed,
                   });
+                  void botManager.resyncBotsForNewGrid(
+                    botManager.getGameBots(gameCode),
+                    next.grid,
+                    language,
+                  );
                 } else {
                   logger.info('BLAST', `Final wave ${currentWave} cleared in ${gameCode} by bot ${username} — scheduling endGame`);
                   timerManager.setTimeout(`blastEnd:${gameCode}`, () => {
