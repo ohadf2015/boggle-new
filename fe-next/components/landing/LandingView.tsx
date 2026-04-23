@@ -6,13 +6,13 @@ import dynamic from 'next/dynamic';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useMusic } from '@/contexts/MusicContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useMobilePortrait } from '@/hooks/useMobilePortrait';
 import { cn } from '@/lib/utils';
 import { useLiveRoomStats } from '@/hooks/useLiveRoomStats';
 import { usePlayerStats } from '@/hooks/usePlayerStats';
 import { useDailyChallengeStatus } from '@/hooks/useDailyChallengeStatus';
 import { useTopPlayers } from '@/hooks/useTopPlayers';
-import { trackModeSelected } from '@/utils/growthTracking';
 import { useLandingStats } from '@/hooks/useLandingStats';
 import { AdPlaceholder } from '@/components/ads';
 const CrazyGamesBanner = dynamic(() => import('@/components/CrazyGamesBanner'), { ssr: false });
@@ -37,27 +37,11 @@ const UrgencyCard = dynamic(() => import('./UrgencyCard').then(m => m.UrgencyCar
   loading: () => <div className="h-20 w-full rounded-neo bg-neo-navy-light/50 animate-pulse" />,
 });
 // Engagement widgets — only high-value conditional ones on landing
-const VaultCardConnected = dynamic(() => import('@/components/vault/VaultCardConnected').then(m => m.VaultCardConnected), {
-  ssr: false,
-  loading: () => <div className="h-24 w-full rounded-neo bg-neo-navy-light/50 animate-pulse" />,
-});
-const GhostRivalWidget = dynamic(() => import('@/components/engagement/GhostRivalWidget').then(m => m.GhostRivalWidget), {
-  ssr: false,
-  loading: () => <div className="h-24 w-full rounded-neo bg-neo-navy-light/50 animate-pulse" />,
-});
 const AnonymousTeaserWidgets = dynamic(() => import('./AnonymousTeaserWidgets').then(m => m.AnonymousTeaserWidgets), {
   ssr: false,
   loading: () => <div className="h-32 w-full rounded-neo bg-neo-navy-light/50 animate-pulse" />,
 });
 const LandingYourRank = dynamic(() => import('./LandingYourRank').then(m => m.LandingYourRank), {
-  ssr: false,
-  loading: () => <div className="h-48 w-full rounded-neo bg-neo-navy-light/50 animate-pulse" />,
-});
-const LandingShareBanner = dynamic(() => import('./LandingShareBanner').then(m => m.LandingShareBanner), {
-  ssr: false,
-  loading: () => <div className="h-20 w-full rounded-neo bg-neo-navy-light/50 animate-pulse" />,
-});
-const LandingCommunityShowcase = dynamic(() => import('./LandingCommunityShowcase').then(m => m.LandingCommunityShowcase), {
   ssr: false,
   loading: () => <div className="h-48 w-full rounded-neo bg-neo-navy-light/50 animate-pulse" />,
 });
@@ -112,6 +96,7 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
 
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const { isOnCrazyGamesPlatform } = useCrazyGames();
   const [showShareModal, setShowShareModal] = useState(false);
   const [, setIsAvatarBuilderOpen] = useState(false);
 
@@ -137,11 +122,6 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
       router.replace(`/${language}/multiplayer${window.location.search}`);
     }
   }, [language, router]);
-
-  const handlePlayClick = () => {
-    trackModeSelected('arena', 'home_mobile_cta');
-    router.push(`/${language}/multiplayer?autoCreate=true`);
-  };
 
   const [enableHeavyBackground, setEnableHeavyBackground] = useState(false);
   useEffect(() => { setEnableHeavyBackground(getPerfVariant() === 'control'); }, []);
@@ -174,7 +154,7 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
       {enableHeavyBackground && !isMobilePortrait && <PlayfulBackground intensity="high" colorScheme="default" />}
 
       <OnboardingModal isOpen={showOnboarding} onClose={() => setShowOnboarding(false)} />
-      <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />
+      {!isOnCrazyGamesPlatform && <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />}
       <ShareReferralModal isOpen={showShareModal} onClose={() => setShowShareModal(false)} />
       <Header />
 
@@ -228,18 +208,16 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
           </div>
         )}
 
-        {/* Engagement widgets — compact, below game modes. Max 3 to avoid overload */}
+        {/* Engagement widgets — single high-value widget to avoid stacking noise */}
         {isAuthenticated ? (
           <div className="flex flex-col gap-4 max-w-4xl mx-auto w-full">
             <UrgencyCard />
-            <GhostRivalWidget />
-            <VaultCardConnected />
           </div>
-        ) : (
+        ) : isOnCrazyGamesPlatform ? null : (
           <AnonymousTeaserWidgets onSignUpClick={() => setShowAuthModal(true)} />
         )}
 
-        {/* Below-fold sections */}
+        {/* Below-fold sections — rank + avatar only. Community/Share moved off landing. */}
         <div className="flex flex-col gap-6 sm:gap-8">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-stretch lg:gap-6 w-full max-w-4xl mx-auto xl:max-w-5xl">
             <div className="lg:flex-1">
@@ -248,12 +226,6 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
             <div className="lg:flex-1">
               <LandingAvatarTeaser onBuilderOpenChange={setIsAvatarBuilderOpen} />
             </div>
-          </div>
-
-          <LandingCommunityShowcase />
-
-          <div className="w-full max-w-4xl mx-auto">
-            <LandingShareBanner onShareClick={() => setShowShareModal(true)} />
           </div>
         </div>
       </section>

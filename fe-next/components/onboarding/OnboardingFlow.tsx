@@ -22,6 +22,7 @@ import ModeFork from './ModeFork';
 import OnboardingProgress from './OnboardingProgress';
 import ReturningUserStep from './ReturningUserStep';
 import AuthModal from '@/components/auth/AuthModal';
+import { useCrazyGames } from '@/components/CrazyGamesSDK';
 
 type FlowStep = 'returningUser' | 'language' | 'tutorial' | 'profile' | 'scoreReveal' | 'fork';
 
@@ -56,6 +57,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
 
   const [step, setStep] = useState<FlowStep>('language');
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const { isOnCrazyGamesPlatform } = useCrazyGames();
   const [tutorialScore, setTutorialScore] = useState(0);
   const [, setTutorialWords] = useState<string[]>([]);
   const [tutorialAttempt, setTutorialAttempt] = useState(1);
@@ -79,8 +81,9 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
   }, [isAuthenticated, step, onComplete]);
 
   const handleHaveAccount = useCallback(() => {
+    if (isOnCrazyGamesPlatform) return;
     setShowAuthModal(true);
-  }, []);
+  }, [isOnCrazyGamesPlatform]);
 
   const handleNewUser = useCallback(() => {
     trackOnboardingStep('tutorial');
@@ -193,10 +196,17 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
   );
 
   // Step 0: Language selected — proceed to returningUser prompt
+  // On CrazyGames the "have an account" branch is dead (no external auth),
+  // so skip straight to tutorial.
   const handleLanguageSelect = useCallback(() => {
     trackOnboardingStep('language');
+    if (isOnCrazyGamesPlatform) {
+      trackOnboardingStep('tutorial');
+      setStep('tutorial');
+      return;
+    }
     setStep('returningUser');
-  }, []);
+  }, [isOnCrazyGamesPlatform]);
 
   const renderStep = () => {
     switch (step) {
@@ -324,11 +334,13 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
         )}
       </AnimatePresence>
 
-      <AuthModal
-        isOpen={showAuthModal}
-        onClose={() => setShowAuthModal(false)}
-        initialMode="signin"
-      />
+      {!isOnCrazyGamesPlatform && (
+        <AuthModal
+          isOpen={showAuthModal}
+          onClose={() => setShowAuthModal(false)}
+          initialMode="signin"
+        />
+      )}
     </div>
   );
 };

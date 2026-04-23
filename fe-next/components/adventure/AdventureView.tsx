@@ -26,6 +26,7 @@ import {
 } from '@/lib/adventure';
 import dynamic from 'next/dynamic';
 import { AdventureThemeProvider } from '@/contexts/AdventureThemeContext';
+import { useCrazyGames } from '@/components/CrazyGamesSDK';
 
 import { calculateWorldMastery, convertQuestProgressWithTargets, deriveBossHighHealth } from '@/lib/adventure/mastery';
 import type { MasteryTier } from '@/types/adventure';
@@ -56,6 +57,7 @@ function AdventureView(): React.JSX.Element {
   const { progression, isLoading, error, isAuthError, completeLevel, updateCurrency, updateRunes, refreshProgression } = useProgression();
   const { user, profile } = useAuth();
   const isGuest = !user?.id;
+  const { isOnCrazyGamesPlatform } = useCrazyGames();
 
   const gold = progression?.gold ?? 0;
   const upgrades = (progression?.upgrades ?? {}) as Record<string, number>;
@@ -257,9 +259,9 @@ function AdventureView(): React.JSX.Element {
         // so this is safe to call even if the eager save already succeeded.
         const saved = await completeLevel(selectedWorld, selectedLevel, stars as 0 | 1 | 2 | 3, score, wordsFound, goldEarned, longWords, undefined, undefined, timePlayed) as boolean | void;
         if (saved === false) {
-          if (isGuest) {
+          if (isGuest && !isOnCrazyGamesPlatform) {
             setShowSignupPrompt(true);
-          } else {
+          } else if (!isGuest) {
             toast.error(t('adventure.progressNotSaved'));
           }
         }
@@ -271,7 +273,7 @@ function AdventureView(): React.JSX.Element {
         setSelectedLevel(null);
       }
     },
-    [selectedWorld, selectedLevel, completeLevel, setViewState, setSelectedLevel, t, isGuest]
+    [selectedWorld, selectedLevel, completeLevel, setViewState, setSelectedLevel, t, isGuest, isOnCrazyGamesPlatform]
   );
 
   const handleGameExit = useCallback(() => {
@@ -329,16 +331,18 @@ function AdventureView(): React.JSX.Element {
           <p className="text-neo-white/60 text-sm">
             {t('adventure.guestHint')}
           </p>
-          <button
-            onClick={() => setShowSignupPrompt(true)}
-            className={cn(
-              'px-6 py-3 bg-neo-lime text-neo-black font-bold',
-              'border-3 border-neo-black rounded-neo shadow-hard',
-              'hover:shadow-hard-pressed active:translate-y-0.5 transition-all'
-            )}
-          >
-            {t('adventure.guestSignup')}
-          </button>
+          {!isOnCrazyGamesPlatform && (
+            <button
+              onClick={() => setShowSignupPrompt(true)}
+              className={cn(
+                'px-6 py-3 bg-neo-lime text-neo-black font-bold',
+                'border-3 border-neo-black rounded-neo shadow-hard',
+                'hover:shadow-hard-pressed active:translate-y-0.5 transition-all'
+              )}
+            >
+              {t('adventure.guestSignup')}
+            </button>
+          )}
           <Link
             href="/"
             className="text-neo-white/40 text-sm underline hover:text-neo-white/60 transition-colors"
@@ -346,12 +350,14 @@ function AdventureView(): React.JSX.Element {
             {t('common.back')}
           </Link>
         </div>
-        <AuthModal
-          isOpen={showSignupPrompt}
-          onClose={() => setShowSignupPrompt(false)}
-          initialMode="signup"
-          showGuestStats
-        />
+        {!isOnCrazyGamesPlatform && (
+          <AuthModal
+            isOpen={showSignupPrompt}
+            onClose={() => setShowSignupPrompt(false)}
+            initialMode="signup"
+            showGuestStats
+          />
+        )}
       </div>
     );
   }
@@ -561,12 +567,14 @@ function AdventureView(): React.JSX.Element {
         <AdventureShopFAB isRTL={isRTL} gold={gold} onOpenShop={openShop} t={t} />
       )}
 
-      <AuthModal
-        isOpen={showSignupPrompt}
-        onClose={() => setShowSignupPrompt(false)}
-        initialMode="signup"
-        showGuestStats
-      />
+      {!isOnCrazyGamesPlatform && (
+        <AuthModal
+          isOpen={showSignupPrompt}
+          onClose={() => setShowSignupPrompt(false)}
+          initialMode="signup"
+          showGuestStats
+        />
+      )}
 
       <RunePanel
         isOpen={showRunes}

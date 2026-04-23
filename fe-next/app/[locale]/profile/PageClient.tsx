@@ -17,6 +17,7 @@ import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 
 import { usePlayerCollectibles } from '@/hooks/usePlayerCollectibles';
 import AuthModal from '@/components/auth/AuthModal';
+import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { ReferralCard } from '@/components/profile/ReferralCard';
 import CreatorProfileStats from '@/components/ugc/CreatorProfileStats';
 import { getCreatorStats } from '@/utils/creatorRewards';
@@ -58,6 +59,7 @@ export default function ProfilePageClient(): React.JSX.Element {
 
   // State
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const { isOnCrazyGamesPlatform } = useCrazyGames();
   const [activeGameSession, setActiveGameSession] = useState<GameSession | null>(null);
 
   // Hooks
@@ -142,14 +144,16 @@ export default function ProfilePageClient(): React.JSX.Element {
               {t('auth.upgradePrompt')}
             </p>
             <div className="flex gap-4 justify-center">
-              <EnhancedButton
-                onClick={() => setShowAuthModal(true)}
-                variant="cyan"
-                haptic
-                animation="pop"
-              >
-                {t('auth.signIn')}
-              </EnhancedButton>
+              {!isOnCrazyGamesPlatform && (
+                <EnhancedButton
+                  onClick={() => setShowAuthModal(true)}
+                  variant="cyan"
+                  haptic
+                  animation="pop"
+                >
+                  {t('auth.signIn')}
+                </EnhancedButton>
+              )}
               <EnhancedButton
                 variant="outline"
                 onClick={() => router.push(`/${language}`)}
@@ -161,7 +165,9 @@ export default function ProfilePageClient(): React.JSX.Element {
             </div>
           </div>
         </div>
-        <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} showGuestStats={true} />
+        {!isOnCrazyGamesPlatform && (
+          <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} showGuestStats={true} />
+        )}
       </div>
     );
   }

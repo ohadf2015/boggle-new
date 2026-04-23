@@ -10,6 +10,7 @@ import DailyIntroCarousel from './DailyIntroCarousel';
 import { CreateChallengeModal } from './CreateChallengeModal';
 import { UnauthenticatedCreateChallengeSection } from './UnauthenticatedCreateChallengeSection';
 import AuthModal from '../auth/AuthModal';
+import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { hasPlayedWordHuntToday } from '@/utils/dailyChallenge';
 import { safeToLocaleDateString } from '@/utils/bcp47Locale';
 import { useMusic } from '@/contexts/MusicContext';
@@ -86,6 +87,7 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
   const [showCreateChallenge, setShowCreateChallenge] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [pendingCreateChallenge, setPendingCreateChallenge] = useState(false);
+  const { isOnCrazyGamesPlatform } = useCrazyGames();
 
   // Auto-open leaderboard if showLeaderboard query param is present
   useEffect(() => {
@@ -230,7 +232,7 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
         </div>
 
         {/* Guest Mode Notice - Show only for anonymous users */}
-        {!isAuthenticated && (
+        {!isAuthenticated && !isOnCrazyGamesPlatform && (
           <motion.div
             initial={{ y: -10, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
@@ -359,7 +361,9 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
             </Button>
           </motion.div>
         ) : (
-          <UnauthenticatedCreateChallengeSection language={language} t={t} onAuthRequired={handleAuthRequired} />
+          !isOnCrazyGamesPlatform && (
+            <UnauthenticatedCreateChallengeSection language={language} t={t} onAuthRequired={handleAuthRequired} />
+          )
         )}
 
         {/* Secondary Actions - Collapsed */}
@@ -469,11 +473,13 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
         language={language}
       />
 
-      <AuthModal
-        isOpen={showAuthModal}
-        onClose={() => setShowAuthModal(false)}
-        initialMode="signup"
-      />
+      {!isOnCrazyGamesPlatform && (
+        <AuthModal
+          isOpen={showAuthModal}
+          onClose={() => setShowAuthModal(false)}
+          initialMode="signup"
+        />
+      )}
     </motion.div>
   );
 };
