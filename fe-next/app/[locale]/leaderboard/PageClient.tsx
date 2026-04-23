@@ -22,6 +22,7 @@ import { useLeaderboard, useUserRank } from '@/hooks/useSupabaseRealtime';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import Avatar from '@/components/Avatar';
+import { InlineBannerAd } from '@/components/ads';
 import NearRankIndicator from '@/components/leaderboard/NearRankIndicator';
 import { TierBadge, TierProgressBar } from '@/components/ui/TierBadge';
 import { useTierPromotion } from '@/hooks/useTierPromotion';
@@ -423,6 +424,9 @@ export default function LeaderboardPageClient(): React.JSX.Element {
 
         </>
         )}
+
+        {/* Non-sticky inline ad — passive page, appears after content before back button */}
+        <InlineBannerAd webZone="content-page" className="my-8" />
 
         {/* Back Button */}
         <div className="mt-8 text-center">

@@ -370,7 +370,7 @@ const en = {
       "analytics": "Analytics",
       "analyticsDesc": "Help us understand how you use the site to improve your experience",
       "advertising": "Advertising",
-      "advertisingDesc": "Show relevant ads via Google AdSense"
+      "advertisingDesc": "Show relevant ads via Google AdMob"
     }
   },
   "common": {
@@ -3398,8 +3398,8 @@ const en = {
       },
       "advertising": {
         "title": "4. Third-Party Advertising",
-        "intro": "We display non-personalized advertisements via Google AdSense. Because LexiClash is designed for players of all ages, including children, our ad serving operates under Google's Child-Directed Treatment (TFCD) mode.",
-        "googleAdsense": "Google AdSense: All ads served on LexiClash are non-personalized. We have enabled Tag For Child-Directed Treatment (TFCD), which prevents ad personalization, interest-based advertising, and remarketing.",
+        "intro": "We display non-personalized advertisements via Google AdMob. Because LexiClash is designed for players of all ages, including children, our ad serving operates under Google's Child-Directed Treatment (TFCD) mode.",
+        "googleAdmob": "Google AdMob: All ads served on LexiClash are non-personalized. We have enabled Tag For Child-Directed Treatment (TFCD), which prevents ad personalization, interest-based advertising, and remarketing.",
         "cookies": "Advertising Cookies: Under TFCD mode, Google does not set personalized advertising cookies. Limited cookies may be used for ad frequency capping and aggregated ad reporting only.",
         "personalization": "No Ad Personalization: Ads are not personalized based on browsing history, interests, or demographic profiles. All users see the same contextual, non-targeted advertisements.",
         "thirdPartyAccess": "Limited Data Access: Under child-directed treatment, advertising partners receive only aggregated, non-identifiable data for ad performance reporting.",
@@ -3408,7 +3408,7 @@ const en = {
       },
       "advertisingPartners": {
         "title": "Advertising Partners",
-        "intro": "We partner with Google AdSense to display ads on our website. Third-party vendors, including Google, use cookies to serve ads. Google's use of advertising cookies enables it and its partners to serve ads based on users' visits to LexiClash and other sites on the Internet. Ad revenue helps keep LexiClash free for all players. All ads operate under child-directed treatment (TFCD) mode.",
+        "intro": "We partner with Google AdMob to display ads on our website. Third-party vendors, including Google, use cookies to serve ads. Google's use of advertising cookies enables it and its partners to serve ads based on users' visits to LexiClash and other sites on the Internet. Ad revenue helps keep LexiClash free for all players. All ads operate under child-directed treatment (TFCD) mode.",
         "howItWorks": {
           "title": "How Advertising Works",
           "cookies": "Third-party vendors, including Google, use cookies to serve ads based on your prior visits to this and other websites",
@@ -3422,7 +3422,7 @@ const en = {
           "intro": "You have several options to control advertising on LexiClash:",
           "optOut": "You may opt out of personalized advertising by visiting Google Ads Settings",
           "googlePrivacy": "Review Google's privacy practices",
-          "partnerPolicy": "Learn about AdSense partner policies",
+          "partnerPolicy": "Learn about AdMob partner policies",
           "browserCookies": "You can manage or delete cookies through your browser settings. Note that disabling cookies may affect site functionality.",
           "aboutAds": "You may also opt out of third-party vendor ad cookies by visiting"
         },
@@ -3494,14 +3494,14 @@ const en = {
         },
         "advertising": {
           "title": "Advertising Cookies",
-          "adsense": "Google AdSense — serves ads to help support the game. Under child-directed treatment (TFCD) mode, no personalized advertising cookies are set",
+          "admob": "Google AdMob — serves ads to help support the game. Under child-directed treatment (TFCD) mode, no personalized advertising cookies are set",
           "tfcd": "Limited cookies may be used for ad frequency capping and aggregated ad reporting only — no cross-site tracking"
         }
       },
       "thirdPartyCookies": {
         "title": "3. Third-Party Cookies",
         "intro": "Some cookies are placed by third-party services we use:",
-        "google": "Google AdSense — for serving non-personalized ads. Google may use cookies for frequency capping and reporting. See Google's Privacy Policy for details.",
+        "google": "Google AdMob — for serving non-personalized ads. Google may use cookies for frequency capping and reporting. See Google's Privacy Policy for details.",
         "logrocket": "LogRocket — for session replay and analytics to help us improve the game experience."
       },
       "managingCookies": {
@@ -3645,7 +3645,7 @@ const en = {
       },
       "advertising": {
         "title": "Advertising Content",
-        "content": "LexiClash displays advertisements provided by third-party ad networks including Google AdSense. These ads are not endorsements by LexiClash. Ad content is determined by the ad networks based on various factors and may not reflect the views or values of LexiClash. We are not responsible for the accuracy or content of advertisements displayed on the site."
+        "content": "LexiClash displays advertisements provided by third-party ad networks including Google AdMob. These ads are not endorsements by LexiClash. Ad content is determined by the ad networks based on various factors and may not reflect the views or values of LexiClash. We are not responsible for the accuracy or content of advertisements displayed on the site."
       },
       "liability": {
         "title": "Limitation of Liability",
@@ -10109,7 +10109,7 @@ const en = {
       "multipleDevices": "Yes! If you create an account using Google Sign-In, your progress, statistics, and settings sync automatically across all your devices.",
       "deleteAccount": "To delete your account, go to Settings > Account > Delete Account. This action is permanent and will erase all your data including statistics, achievements, and game history.",
       "dataSafe": "Yes. We take privacy seriously and only collect necessary data to operate the game. We use industry-standard encryption and never sell your personal information. See our Privacy Policy for full details.",
-      "ads": "We partner with Google AdSense to display relevant advertisements. Ads help us keep the game free for everyone. You can learn more about ad personalization and opt-out options in our Privacy Policy.",
+      "ads": "We partner with Google AdMob to display relevant advertisements. Ads help us keep the game free for everyone. You can learn more about ad personalization and opt-out options in our Privacy Policy.",
       "optOut": "While some data collection is necessary for the game to function (like your username and scores), you can opt out of analytics and personalized ads in Settings > Privacy."
     }
   },

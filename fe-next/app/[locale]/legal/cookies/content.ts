@@ -47,7 +47,7 @@ export const contentByLocale: Record<string, CookiesContent> = {
       advertising: {
         title: 'Advertising Cookies',
         items: [
-          'Google AdSense — serves ads to help support the game. Under child-directed treatment (TFCD) mode, no personalized advertising cookies are set',
+          'Google AdMob — serves ads to help support the game. Under child-directed treatment (TFCD) mode, no personalized advertising cookies are set',
           'Limited cookies may be used for ad frequency capping and aggregated ad reporting only — no cross-site tracking',
         ],
       },
@@ -56,7 +56,7 @@ export const contentByLocale: Record<string, CookiesContent> = {
       title: '3. Third-Party Cookies',
       intro: 'Some cookies are placed by third-party services we use:',
       items: [
-        "Google AdSense — for serving non-personalized ads. Google may use cookies for frequency capping and reporting. See Google's Privacy Policy for details.",
+        "Google AdMob — for serving non-personalized ads. Google may use cookies for frequency capping and reporting. See Google's Privacy Policy for details.",
         'LogRocket — for session replay and analytics to help us improve the game experience.',
       ],
     },

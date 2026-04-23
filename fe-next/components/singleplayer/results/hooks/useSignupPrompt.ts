@@ -8,6 +8,7 @@
 import { useEffect, useState } from 'react';
 import { getGuestStats } from '@/utils/guestManager';
 import { usePostHogFlag } from '@/hooks/usePostHogFlag';
+import { trackSignupFunnel } from '@/utils/growthTracking';
 
 // Session storage key for tracking if signup prompt was shown
 const SIGNUP_PROMPT_SHOWN_KEY = 'boggle_sp_signup_shown';
@@ -59,9 +60,12 @@ export function useSignupPrompt({
 
     if (!qualifies) return;
 
+    const isFirstWin = signupVariant !== 'after-third-game' && wins >= 1;
+
     const timer = setTimeout(() => {
       setShowSignupModal(true);
       sessionStorage.setItem(SIGNUP_PROMPT_SHOWN_KEY, 'true');
+      trackSignupFunnel('prompt_shown', isFirstWin);
     }, 3500);
 
     return () => clearTimeout(timer);

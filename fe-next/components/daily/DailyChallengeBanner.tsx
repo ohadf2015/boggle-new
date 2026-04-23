@@ -7,6 +7,7 @@ import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { Flame, Check, Clock, Sparkles, X, Star, Zap } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { trackLandingCtaClick } from '@/utils/growthTracking';
 import { cn } from '@/lib/utils';
 import { useTiltEffect } from '@/hooks/useTiltEffect';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
@@ -218,7 +219,11 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
   const glowColor = 'rgba(255, 215, 0, 0.5)';
 
   return (
-    <Link href={`/${language}/daily`} className="block w-full h-full group">
+    <Link
+      href={`/${language}/daily`}
+      className="block w-full h-full group"
+      onClick={() => trackLandingCtaClick('daily_banner', { mode: 'daily', hasPlayed })}
+    >
       <div
         ref={tiltRef}
         className={cn(

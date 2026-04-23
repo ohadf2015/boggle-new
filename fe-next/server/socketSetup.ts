@@ -47,12 +47,10 @@ export function createSocketServer(httpServer: HttpServer, corsOrigin: string): 
       methods: ['GET', 'POST'],
       credentials: true
     },
-    // Performance optimizations
-    perMessageDeflate: {
-      threshold: 1024,
-      zlibDeflateOptions: { chunkSize: 1024, memLevel: 7, level: 3 },
-      zlibInflateOptions: { chunkSize: 10 * 1024 }
-    },
+    // perMessageDeflate disabled — zlib compression per frame burns CPU on
+    // small JSON payloads and hurts multi-game fan-out. Bandwidth savings
+    // are not worth the latency under concurrent load.
+    perMessageDeflate: false,
     pingTimeout: 60000,
     pingInterval: 25000,
     upgradeTimeout: 30000,

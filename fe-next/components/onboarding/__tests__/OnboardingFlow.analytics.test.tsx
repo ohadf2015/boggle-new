@@ -222,4 +222,29 @@ describe('OnboardingFlow analytics', () => {
       mode: 'daily',
     });
   });
+
+  // Regression: PostHog funnel showed tutorial step fires ~2x start count
+  // because handleNewUser emitted 'tutorial' on entry AND handleTutorialComplete
+  // emitted 'tutorial' on exit. Step events must fire once per step, on completion only.
+  it('fires step=tutorial exactly once (on completion, not on entry)', () => {
+    render(<OnboardingFlow onComplete={vi.fn()} />);
+    fireEvent.click(screen.getByTestId('lang-btn'));
+    goNew();
+    fireEvent.click(screen.getByTestId('tut-btn'));
+
+    const tutorialCalls = (trackOnboardingStep as unknown as ReturnType<typeof vi.fn>).mock.calls
+      .filter((c) => c[0] === 'tutorial');
+    expect(tutorialCalls).toHaveLength(1);
+    expect(tutorialCalls[0]).toEqual(['tutorial', { score: 47, wordCount: 3 }]);
+  });
+
+  it('never emits bare tutorial step without score payload', () => {
+    render(<OnboardingFlow onComplete={vi.fn()} />);
+    fireEvent.click(screen.getByTestId('lang-btn'));
+    goNew();
+    fireEvent.click(screen.getByTestId('tut-btn'));
+
+    expect(trackOnboardingStep).not.toHaveBeenCalledWith('tutorial');
+    expect(trackOnboardingStep).not.toHaveBeenCalledWith('tutorial', undefined);
+  });
 });

@@ -2,23 +2,18 @@
  * useHasRealAdProvider — read-only hook used to gate rewarded-ad entry points.
  *
  * Placement CTAs should only render when a real ad provider (CrazyGames,
- * AdMob native, AdSense) is wired AND working. In production without a
- * provider we fall into placeholder mode — the entry point must disappear.
+ * AdMob native) is wired AND working. In production without a provider we
+ * fall into placeholder mode — the entry point must disappear.
  *
  * Dev (`NODE_ENV !== 'production'`) returns true so local testing works.
  */
 import { renderHook } from '@testing-library/react';
 
 const crazyGamesState = { isAvailable: false, isOnCrazyGamesPlatform: false };
-const adPlacementState = { isReady: false };
 const capacitorState = { isNative: false };
 
 vi.mock('@/components/CrazyGamesSDK', () => ({
   useCrazyGames: () => ({ ...crazyGamesState, showRewardedAd: vi.fn() }),
-}));
-
-vi.mock('@/hooks/useAdPlacement', () => ({
-  useAdPlacement: () => ({ ...adPlacementState, showRewarded: vi.fn() }),
 }));
 
 vi.mock('@capacitor/core', () => ({
@@ -31,7 +26,6 @@ describe('useHasRealAdProvider', () => {
   beforeEach(() => {
     crazyGamesState.isAvailable = false;
     crazyGamesState.isOnCrazyGamesPlatform = false;
-    adPlacementState.isReady = false;
     capacitorState.isNative = false;
   });
 
@@ -62,13 +56,6 @@ describe('useHasRealAdProvider', () => {
   it('returns true in production on native (AdMob)', () => {
     vi.stubEnv('NODE_ENV', 'production');
     capacitorState.isNative = true;
-    const { result } = renderHook(() => useHasRealAdProvider());
-    expect(result.current).toBe(true);
-  });
-
-  it('returns true in production when AdSense placement ready', () => {
-    vi.stubEnv('NODE_ENV', 'production');
-    adPlacementState.isReady = true;
     const { result } = renderHook(() => useHasRealAdProvider());
     expect(result.current).toBe(true);
   });

@@ -365,9 +365,9 @@ function registerWordHandlers(io: Server, socket: Socket): void {
         handleSpamDetection(socket, gameCode, username, normalizedWord, InvalidReason.REJECTED, game);
       }
 
-      // Update leaderboard - reduced throttle for more responsive score updates
-      // Using 200ms as a balance between responsiveness and network efficiency
-      const lbThrottleMs = parseInt(process.env.LEADERBOARD_THROTTLE_MS || '200');
+      // Leading-edge broadcast fires instantly after a quiet window; 500ms cap
+      // only damps sustained bursts (3 concurrent games could fire 15 sorts/sec at 200ms).
+      const lbThrottleMs = parseInt(process.env.LEADERBOARD_THROTTLE_MS || '500');
       getLeaderboardThrottled(gameCode, (leaderboard: LeaderboardPlayer[]) => {
         volatileBroadcastToRoom(io, getGameRoom(gameCode), 'updateLeaderboard', { leaderboard });
       }, lbThrottleMs);

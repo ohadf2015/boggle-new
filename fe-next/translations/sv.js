@@ -370,7 +370,7 @@ const sv = {
       "analytics": "Analys",
       "analyticsDesc": "Hjälper oss förstå hur du använder webbplatsen för att förbättra din upplevelse",
       "advertising": "Reklam",
-      "advertisingDesc": "Visa relevanta annonser via Google AdSense"
+      "advertisingDesc": "Visa relevanta annonser via Google AdMob"
     }
   },
   "common": {
@@ -3985,8 +3985,8 @@ const sv = {
       },
       "advertising": {
         "title": "4. Tredjepartsannonsering",
-        "intro": "Vi visar icke-personaliserade annonser via Google AdSense. Eftersom LexiClash är utformat för spelare i alla åldrar, inklusive barn, fungerar vår annonsvisning under Googles barnriktat innehåll-läge (TFCD).",
-        "googleAdsense": "Google AdSense: Alla annonser som visas på LexiClash är icke-personaliserade. Vi har aktiverat Tag For Child-Directed Treatment (TFCD), som förhindrar annonspersonalisering, intressebaserad annonsering och remarketing.",
+        "intro": "Vi visar icke-personaliserade annonser via Google AdMob. Eftersom LexiClash är utformat för spelare i alla åldrar, inklusive barn, fungerar vår annonsvisning under Googles barnriktat innehåll-läge (TFCD).",
+        "googleAdmob": "Google AdMob: Alla annonser som visas på LexiClash är icke-personaliserade. Vi har aktiverat Tag For Child-Directed Treatment (TFCD), som förhindrar annonspersonalisering, intressebaserad annonsering och remarketing.",
         "cookies": "Annonskookies: Under TFCD-läget sätter Google inte personaliserade annonskookies. Begränsade cookies kan användas för annonsfrekvenstak och aggregerad annonsrapportering.",
         "personalization": "Ingen annonspersonalisering: Annonser personaliseras inte baserat på surfhistorik, intressen eller demografiska profiler. Alla användare ser samma kontextuella, icke-riktade annonser.",
         "thirdPartyAccess": "Begränsad dataåtkomst: Under barnriktat behandling får annonspartners endast aggregerad, icke-identifierbar data för annonsprestandarapportering.",
@@ -3995,7 +3995,7 @@ const sv = {
       },
       "advertisingPartners": {
         "title": "Annonspartners",
-        "intro": "Vi samarbetar med Google AdSense för att visa annonser på vår webbplats. Tredjepartsleverantörer, inklusive Google, använder cookies för att visa annonser. Googles användning av annonscookies gör det möjligt för Google och dess partners att visa annonser baserat på användares besök på LexiClash och andra webbplatser på internet. Annonsintäkter hjälper till att hålla LexiClash gratis för alla spelare. Alla annonser fungerar under barnriktat innehåll-läge (TFCD).",
+        "intro": "Vi samarbetar med Google AdMob för att visa annonser på vår webbplats. Tredjepartsleverantörer, inklusive Google, använder cookies för att visa annonser. Googles användning av annonscookies gör det möjligt för Google och dess partners att visa annonser baserat på användares besök på LexiClash och andra webbplatser på internet. Annonsintäkter hjälper till att hålla LexiClash gratis för alla spelare. Alla annonser fungerar under barnriktat innehåll-läge (TFCD).",
         "howItWorks": {
           "title": "Hur annonsering fungerar",
           "cookies": "Tredjepartsleverantörer, inklusive Google, använder cookies för att visa annonser baserat på dina tidigare besök på denna och andra webbplatser",
@@ -4009,7 +4009,7 @@ const sv = {
           "intro": "Du har flera alternativ för att kontrollera annonsering på LexiClash:",
           "optOut": "Du kan välja bort personaliserad annonsering genom att besöka Googles annonsinställningar",
           "googlePrivacy": "Granska Googles integritetspraxis",
-          "partnerPolicy": "Läs om AdSense partnerregler",
+          "partnerPolicy": "Läs om AdMob partnerregler",
           "browserCookies": "Du kan hantera eller ta bort cookies via dina webbläsarinställningar. Observera att inaktivering av cookies kan påverka webbplatsens funktionalitet.",
           "aboutAds": "Du kan också välja bort tredjepartsleverantörers annonscookies genom att besöka"
         },
@@ -4081,14 +4081,14 @@ const sv = {
         },
         "advertising": {
           "title": "Annonscookies",
-          "adsense": "Google AdSense — visar annonser för att stödja spelet. Under barnriktat behandlingsläge (TFCD) sätts inga personaliserade annonscookies",
+          "admob": "Google AdMob — visar annonser för att stödja spelet. Under barnriktat behandlingsläge (TFCD) sätts inga personaliserade annonscookies",
           "tfcd": "Begränsade cookies kan användas för annonsfrekvenstak och aggregerad annonsrapportering — ingen spårning över webbplatser"
         }
       },
       "thirdPartyCookies": {
         "title": "3. Tredjepartscookies",
         "intro": "Vissa cookies placeras av tredjepartstjänster vi använder:",
-        "google": "Google AdSense — för att visa icke-personaliserade annonser. Google kan använda cookies för frekvenstak och rapportering. Se Googles integritetspolicy för detaljer.",
+        "google": "Google AdMob — för att visa icke-personaliserade annonser. Google kan använda cookies för frekvenstak och rapportering. Se Googles integritetspolicy för detaljer.",
         "logrocket": "LogRocket — för sessionsinspelning och analys för att hjälpa oss förbättra spelupplevelsen."
       },
       "managingCookies": {
@@ -4232,7 +4232,7 @@ const sv = {
       },
       "advertising": {
         "title": "Reklaminnehåll",
-        "content": "LexiClash visar annonser som tillhandahålls av tredjepartsnätverk inklusive Google AdSense. Dessa annonser är inte rekommendationer från LexiClash. Annonsinnehåll bestäms av annonsnätverken baserat på olika faktorer och återspeglar kanske inte LexiClashs åsikter eller värderingar. Vi ansvarar inte för noggrannhet eller innehåll i annonser som visas på webbplatsen."
+        "content": "LexiClash visar annonser som tillhandahålls av tredjepartsnätverk inklusive Google AdMob. Dessa annonser är inte rekommendationer från LexiClash. Annonsinnehåll bestäms av annonsnätverken baserat på olika faktorer och återspeglar kanske inte LexiClashs åsikter eller värderingar. Vi ansvarar inte för noggrannhet eller innehåll i annonser som visas på webbplatsen."
       },
       "liability": {
         "title": "Ansvarsbegränsning",
@@ -9922,7 +9922,7 @@ const sv = {
       "multipleDevices": "Ja! Om du skapar ett konto med Google-inloggning synkroniseras dina framsteg, statistik och inställningar automatiskt mellan alla dina enheter.",
       "deleteAccount": "För att radera ditt konto, gå till Inställningar > Konto > Radera konto. Denna åtgärd är permanent och raderar all din data inklusive statistik, prestationer och spelhistorik.",
       "dataSafe": "Ja. Vi tar integritet på allvar och samlar bara in nödvändig data för att driva spelet. Vi använder branschstandard kryptering och säljer aldrig din personliga information. Se vår integritetspolicy för fullständiga detaljer.",
-      "ads": "Vi samarbetar med Google AdSense för att visa relevanta annonser. Annonser hjälper oss att hålla spelet gratis för alla. Du kan läsa mer om annonspersonalisering och avanmälningsalternativ i vår integritetspolicy.",
+      "ads": "Vi samarbetar med Google AdMob för att visa relevanta annonser. Annonser hjälper oss att hålla spelet gratis för alla. Du kan läsa mer om annonspersonalisering och avanmälningsalternativ i vår integritetspolicy.",
       "optOut": "Viss datainsamling är nödvändig för att spelet ska fungera (som ditt användarnamn och poäng), men du kan välja bort analys och personaliserade annonser i Inställningar > Integritet."
     }
   },

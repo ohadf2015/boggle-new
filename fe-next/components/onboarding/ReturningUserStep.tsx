@@ -41,14 +41,7 @@ const ReturningUserStep: React.FC<ReturningUserStepProps> = ({
   };
 
   return (
-    <div className="relative flex flex-col items-center justify-center gap-10 text-center px-5 py-10 overflow-hidden">
-      {/* Decorative backdrop */}
-      <div className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute -top-20 -right-16 w-64 h-64 rounded-full bg-neo-lime/20 blur-3xl" />
-        <div className="absolute -bottom-24 -left-20 w-72 h-72 rounded-full bg-neo-pink/15 blur-3xl" />
-        <div className="absolute inset-0 texture-halftone opacity-30" />
-      </div>
-
+    <div className="relative flex flex-col items-center justify-center gap-10 text-center px-5 py-10">
       {/* Hero */}
       <motion.div
         variants={containerVariants}
@@ -70,13 +63,13 @@ const ReturningUserStep: React.FC<ReturningUserStepProps> = ({
           <motion.div
             animate={{ rotate: [0, -3, 3, 0] }}
             transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-            className="relative w-36 h-36 shrink-0 rounded-full bg-neo-lime border-neo-thick border-black shadow-hard-lg flex items-center justify-center overflow-hidden p-2"
+            className="relative w-36 h-36 shrink-0 rounded-full bg-neo-navy border-neo-thick border-black shadow-hard-lg flex items-center justify-center overflow-hidden"
           >
             {/* eslint-disable-next-line @next/next/no-img-element -- animated GIF, next/image doesn't animate */}
             <img
               src="/mascot/spectating.gif"
               alt={t('onboarding.returningUser.title')}
-              className="w-full h-full object-contain"
+              className="w-full h-full object-cover"
               draggable={false}
             />
           </motion.div>
@@ -126,7 +119,7 @@ const ReturningUserStep: React.FC<ReturningUserStepProps> = ({
           whileHover={{ y: -2 }}
           whileTap={{ y: 1 }}
           onClick={onHaveAccount}
-          className="group relative w-full py-4 px-6 bg-neo-lime text-neo-navy font-neo-display text-xl uppercase tracking-wide border-neo-thick border-black rounded-neo shadow-hard-lg hover:shadow-hard-pressed active:shadow-hard-pressed transition-all"
+          className="group relative w-full py-4 px-6 bg-neo-lime text-neo-navy font-neo-display font-black text-xl uppercase tracking-wide border-neo-thick border-black rounded-neo shadow-hard-lg hover:shadow-hard-pressed active:shadow-hard-pressed transition-all"
         >
           <span className="flex items-center justify-center gap-2">
             <span aria-hidden="true" className="text-2xl">🎮</span>
@@ -139,7 +132,7 @@ const ReturningUserStep: React.FC<ReturningUserStepProps> = ({
           whileHover={{ y: -2 }}
           whileTap={{ y: 1 }}
           onClick={onNew}
-          className="group relative w-full py-4 px-6 bg-neo-cyan text-neo-navy font-neo-display text-xl uppercase tracking-wide border-neo-thick border-black rounded-neo shadow-hard-lg hover:shadow-hard-pressed active:shadow-hard-pressed transition-all"
+          className="group relative w-full py-4 px-6 bg-neo-cyan text-neo-navy font-neo-display font-black text-xl uppercase tracking-wide border-neo-thick border-black rounded-neo shadow-hard-lg hover:shadow-hard-pressed active:shadow-hard-pressed transition-all"
         >
           <span className="flex items-center justify-center gap-2">
             <span aria-hidden="true" className="text-2xl">✨</span>

@@ -1,10 +1,6 @@
 /**
- * RED test: WordWheelResults must render a back button that links home.
- *
- * Matches the pattern established in DailyReadyScreen:
- *   <ArrowLeft className="me-2 rtl:rotate-180" /> {t('daily.home')}
- *
- * Navigation target: `/${language}` (localized root).
+ * WordWheelResults must render a back button that links to the daily landing.
+ * Navigation target: `/${language}/daily`.
  */
 
 import React from 'react';
@@ -41,7 +37,7 @@ describe('WordWheelResults — back button', () => {
     timeSeconds: 60,
   } as WordWheelGameResult;
 
-  it('renders a back link to the localized home', () => {
+  it('renders a back link to the localized daily landing', () => {
     render(
       <WordWheelResults
         result={baseResult}
@@ -52,8 +48,8 @@ describe('WordWheelResults — back button', () => {
       />
     );
 
-    const backLink = screen.getByRole('link', { name: /daily\.home/i });
+    const backLink = screen.getByRole('link', { name: /common\.back/i });
     expect(backLink).toBeInTheDocument();
-    expect(backLink).toHaveAttribute('href', '/en');
+    expect(backLink).toHaveAttribute('href', '/en/daily');
   });
 });

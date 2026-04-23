@@ -3,7 +3,7 @@
  *
  * Funnel: offered (caller-side) → watched (reward granted) | declined (dismiss/error).
  * The hook fires watched/declined because it's the single chokepoint for all
- * platforms (CrazyGames, AdMob, AdSense, simulation, no-ad-placeholder).
+ * platforms (CrazyGames, AdMob, simulation, no-ad-placeholder).
  */
 import { renderHook, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
@@ -27,9 +27,6 @@ vi.mock('@/hooks/useAdMob', () => ({
   useAdMob: () => ({ isAvailable: false, showRewarded: vi.fn() }),
 }));
 
-vi.mock('@/hooks/useAdPlacement', () => ({
-  useAdPlacement: () => ({ isReady: false, showRewarded: vi.fn() }),
-}));
 
 vi.mock('@/contexts/CoinContext', () => ({
   useCoinContext: () => ({

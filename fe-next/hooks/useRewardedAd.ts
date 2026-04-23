@@ -4,7 +4,6 @@ import { useState, useCallback } from 'react';
 import { Capacitor } from '@capacitor/core';
 import { Howler } from 'howler';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
-import { useAdPlacement } from '@/hooks/useAdPlacement';
 import { useAdMob } from '@/hooks/useAdMob';
 import { useCoinContext } from '@/contexts/CoinContext';
 import { trackRewardedAdWatched, trackRewardedAdDeclined } from '@/utils/growthTracking';
@@ -117,7 +116,7 @@ interface UseRewardedAdReturn {
  *
  * Priority order:
  * 1. CrazyGames SDK - when running on CrazyGames platform
- * 1.5. AdSense for Games - when running on web with ad placement API
+ * 1.5. AdMob - native Capacitor apps
  * 2. Simulation fallback - for development/testing
  * 3. Placeholder - no ads available, grant coins with cooldown
  *
@@ -145,17 +144,15 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
   // Ad platform hooks
   const crazyGames = useCrazyGames();
   const adMob = useAdMob();
-  const adPlacement = useAdPlacement();
 
   // Determine which ad platform to use (priority order)
   const shouldUseCrazyGames = crazyGames.isAvailable && crazyGames.isOnCrazyGamesPlatform;
   const shouldUseAdMob = !shouldUseCrazyGames && Capacitor.isNativePlatform();
-  const shouldUseAdSense = !shouldUseCrazyGames && !shouldUseAdMob && adPlacement.isReady;
   // Simulation only in development — never award free gold in production
   const isDev = process.env.NODE_ENV === 'development';
-  const shouldUseSimulation = isDev && !shouldUseCrazyGames && !shouldUseAdMob && !shouldUseAdSense;
+  const shouldUseSimulation = isDev && !shouldUseCrazyGames && !shouldUseAdMob;
   // Placeholder: no ad platform available — still grant coins, log for admin
-  const isPlaceholder = !shouldUseCrazyGames && !shouldUseAdMob && !shouldUseAdSense && !shouldUseSimulation;
+  const isPlaceholder = !shouldUseCrazyGames && !shouldUseAdMob && !shouldUseSimulation;
 
   // Always available — placeholder grants coins when no real ads exist
   const isAdAvailable = true;
@@ -169,7 +166,7 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
     }
 
     // Determine platform early for declined-event tagging
-    const platformForDecline = shouldUseCrazyGames ? 'crazygames' : shouldUseAdMob ? 'admob' : shouldUseAdSense ? 'adsense' : shouldUseSimulation ? 'simulation' : 'no-ad-placeholder';
+    const platformForDecline = shouldUseCrazyGames ? 'crazygames' : shouldUseAdMob ? 'admob' : shouldUseSimulation ? 'simulation' : 'no-ad-placeholder';
 
     // Enforce daily limit across all platforms
     if (isDailyLimitReached()) {
@@ -190,7 +187,7 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
     setError(null);
 
     // Determine platform for logging
-    const platform = shouldUseCrazyGames ? 'crazygames' : shouldUseAdMob ? 'admob' : shouldUseAdSense ? 'adsense' : shouldUseSimulation ? 'simulation' : 'no-ad-placeholder';
+    const platform = shouldUseCrazyGames ? 'crazygames' : shouldUseAdMob ? 'admob' : shouldUseSimulation ? 'simulation' : 'no-ad-placeholder';
 
     // Award coins helper - uses unified CoinContext for auth/guest sync
     const awardCoinsAndNotify = async () => {
@@ -253,29 +250,6 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
         () => { awardCoinsAndNotify(); },
         (errMsg) => { handleAdError(errMsg || 'Ad dismissed without reward'); },
       );
-    } else if (shouldUseAdSense) {
-      // Priority 1.5: AdSense for Games rewarded ads
-      setStatus('showing');
-      onAdStarted?.();
-      let adsenseRewarded = false;
-      adPlacement.showRewarded('rewarded-gold', {
-        onReward: () => {
-          adsenseRewarded = true;
-          awardCoinsAndNotify();
-        },
-        onDismiss: () => {
-          if (!adsenseRewarded) handleAdError('Ad dismissed without reward');
-        },
-        onUnavailable: (reason) => {
-          if (adsenseRewarded) return;
-          const msg = reason === 'frequencyCapped'
-            ? 'Ad not available — try again shortly'
-            : reason === 'notReady'
-              ? 'Ad not ready — try again shortly'
-              : 'No ad available right now';
-          handleAdError(msg);
-        },
-      });
     } else if (shouldUseSimulation) {
       // Priority 2: Simulation fallback for development/testing
       setStatus('showing');
@@ -291,7 +265,7 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
       onAdStarted?.();
       awardCoinsAndNotify();
     }
-  }, [status, isPlaceholder, shouldUseCrazyGames, shouldUseAdMob, shouldUseAdSense, shouldUseSimulation, crazyGames, adMob, adPlacement, rewardAmount, onRewardEarned, onAdError, onAdStarted, awardWatchedAd]);
+  }, [status, isPlaceholder, shouldUseCrazyGames, shouldUseAdMob, shouldUseSimulation, crazyGames, adMob, rewardAmount, onRewardEarned, onAdError, onAdStarted, awardWatchedAd]);
 
   return {
     status,

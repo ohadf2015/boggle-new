@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
+import { vi } from 'vitest';
 import { GameEmojiShareCard } from '../GameEmojiShareCard';
 
 const t = (key: string) => {
@@ -110,5 +111,35 @@ describe('GameEmojiShareCard — blast mode', () => {
     const data = { ...blastData, maxCombo: 2 };
     render(<GameEmojiShareCard data={data} t={t} />);
     expect(screen.getByTestId('game-emoji-share-card')).not.toHaveTextContent('combo');
+  });
+});
+
+describe('GameEmojiShareCard — onShareClick telemetry hook', () => {
+  const data = {
+    mode: 'classic' as const,
+    puzzleNumber: 1,
+    score: 100,
+    words: ['CAT'],
+  };
+
+  it('invokes onShareClick with "copy" when Copy pressed', () => {
+    const onShareClick = vi.fn();
+    Object.assign(navigator, {
+      clipboard: { writeText: vi.fn().mockResolvedValue(undefined) },
+    });
+    render(<GameEmojiShareCard data={data} t={t} onShareClick={onShareClick} />);
+    fireEvent.click(screen.getByText('Copy'));
+    expect(onShareClick).toHaveBeenCalledWith('copy');
+  });
+
+  it('invokes onShareClick with "native" when Share pressed and navigator.share exists', () => {
+    const onShareClick = vi.fn();
+    Object.assign(navigator, {
+      share: vi.fn().mockResolvedValue(undefined),
+      clipboard: { writeText: vi.fn().mockResolvedValue(undefined) },
+    });
+    render(<GameEmojiShareCard data={data} t={t} onShareClick={onShareClick} />);
+    fireEvent.click(screen.getByText('Share'));
+    expect(onShareClick).toHaveBeenCalledWith('native');
   });
 });

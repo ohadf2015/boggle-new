@@ -26,7 +26,7 @@ import { useSurvivalHints } from './useSurvivalHints';
 import { survivalGameReducer, createInitialState } from './survivalGameReducer';
 import { useSafeTimeout, useSafeInterval } from '@/hooks/useSafeTimeout';
 import { useSurvivalWordSubmission } from './useSurvivalWordSubmission';
-import { trackGameEnd } from '@/utils/growthTracking';
+import { trackGameEnd, trackGameStart } from '@/utils/growthTracking';
 
 export interface UseSurvivalGameLogicProps {
   grid: LetterGrid;
@@ -219,6 +219,12 @@ export function useSurvivalGameLogic({
   // Initialize game start time
   useEffect(() => {
     gameStartTimeRef.current = Date.now();
+  }, []);
+
+  // Funnel parity: emit game_started once on mount to pair with trackGameEnd('survival', ...)
+  useEffect(() => {
+    trackGameStart('survival', { puzzleNumber, language });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Log game session start

@@ -3114,16 +3114,16 @@ html {
   }
 }
 
-/* Offset Google AdSense anchor (sticky-bottom) ads above GlobalBottomNav so the
-   nav stays flush at the viewport bottom. Scoped to mobile viewports where the
-   nav renders, and only when GlobalBottomNav has mounted (sets the html class).
-   AdSense injects these as inline style="bottom:0", so !important is required. */
+/* When GlobalBottomNav is visible on mobile, reserve space at the bottom of the
+   page so fixed nav (h-16 + safe-area) never covers content. Scoped to the outer
+   <main> and skipped when an inner PageLayout already pads (.main-content-safe
+   nested), to avoid double-padding. */
 @media (max-width: 639px) {
-  html.has-global-bottom-nav ins.adsbygoogle[data-anchor-status="displayed"],
-  html.has-global-bottom-nav ins.adsbygoogle[data-anchor-shown="true"],
-  html.has-global-bottom-nav ins.adsbygoogle.google-anchor,
-  html.has-global-bottom-nav .google-auto-placed[data-anchor-status="displayed"] {
-    bottom: calc(var(--bottom-nav-height, 64px) + env(safe-area-inset-bottom, 0px)) !important;
+  html.has-global-bottom-nav main#main-content:not(:has(.main-content-safe)) {
+    padding-bottom: calc(var(--bottom-nav-height, 64px) + env(safe-area-inset-bottom, 0px));
+  }
+  html.has-global-bottom-nav {
+    scroll-padding-bottom: calc(var(--bottom-nav-height, 64px) + env(safe-area-inset-bottom, 0px));
   }
 }
 

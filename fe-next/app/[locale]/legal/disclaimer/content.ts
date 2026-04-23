@@ -32,7 +32,7 @@ export const contentByLocale: Record<string, DisclaimerContent> = {
       },
       {
         title: 'Advertising Content',
-        content: 'LexiClash displays advertisements provided by third-party ad networks including Google AdSense. These ads are not endorsements by LexiClash. Ad content is determined by the ad networks based on various factors and may not reflect the views or values of LexiClash. We are not responsible for the accuracy or content of advertisements displayed on the site.',
+        content: 'LexiClash displays advertisements provided by third-party ad networks including Google AdMob. These ads are not endorsements by LexiClash. Ad content is determined by the ad networks based on various factors and may not reflect the views or values of LexiClash. We are not responsible for the accuracy or content of advertisements displayed on the site.',
       },
       {
         title: 'Limitation of Liability',

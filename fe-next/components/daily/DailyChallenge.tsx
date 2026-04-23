@@ -347,7 +347,7 @@ const DailyChallenge: React.FC = () => {
 
   const handleTutorialSkip = useCallback(() => setShowTutorial(false), []);
   const handleShowTutorial = useCallback(() => setShowTutorial(true), []);
-  const handleBack = useCallback(() => { window.location.href = `/${language}`; }, [language]);
+  const handleBack = useCallback(() => { window.location.href = `/${language}/daily`; }, [language]);
 
   return (
     <div

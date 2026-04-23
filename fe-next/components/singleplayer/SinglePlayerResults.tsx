@@ -45,6 +45,7 @@ import {
   useAchievementsSave,
   useWordValidation,
   useBannerConfig,
+  useSharePromptImpression,
   GlobalRankBadge,
   PerformanceSection,
   YourWordsSection,
@@ -56,6 +57,7 @@ import {
 import { StatsCardGrid } from '@/components/results/shared';
 import ResultsWinnerBanner from '@/components/results/ResultsWinnerBanner';
 import { GameEmojiShareCard, type SingleplayerShareData } from '@/components/shared/GameEmojiShareCard';
+import { trackGrowthEvent } from '@/utils/growthTracking';
 
 const PerformanceChart = dynamic(() => import('@/components/results/PerformanceChart'), { ssr: false });
 const InlineSignupCard = dynamic(() => import('@/components/auth/InlineSignupCard'), { ssr: false });
@@ -184,6 +186,9 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   });
 
   const hasMinimumScore = results.playerScore > 0;
+
+  useSharePromptImpression({ variant: sharePromptTiming, enabled: hasMinimumScore });
+
   const shouldShowConfetti = hasMinimumScore && (
     (mode === 'solo-bots' && playerRank >= 1 && playerRank <= 3) || isWinner || results.isNewHighScore
   );
@@ -258,7 +263,13 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   ) : null;
 
   const shareBlock = results.playerScore > 0 ? (
-    <GameEmojiShareCard data={shareData} t={t} />
+    <GameEmojiShareCard
+      data={shareData}
+      t={t}
+      onShareClick={(method) =>
+        trackGrowthEvent('share_win_prompt_clicked', { variant: sharePromptTiming, method })
+      }
+    />
   ) : null;
 
   const achievementsBlock = (

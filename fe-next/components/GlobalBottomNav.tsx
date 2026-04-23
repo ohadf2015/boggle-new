@@ -223,7 +223,7 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
     // Hide entire bottom nav on CrazyGames — external links and social features prohibited
     const isHidden = isInGame || shouldHideOnCurrentPath || isOnCrazyGamesPlatform;
 
-    // Signal nav visibility to CSS so sticky ads (AdSense anchor) can offset above it.
+    // Signal nav visibility to CSS so sticky overlays can offset above it.
     useEffect(() => {
         if (typeof document === 'undefined') return;
         document.documentElement.classList.toggle('has-global-bottom-nav', !isHidden);

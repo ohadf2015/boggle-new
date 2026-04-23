@@ -1,0 +1,45 @@
+'use client';
+
+import { memo, useCallback } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
+import { ArrowLeft } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { cn } from '@/lib/utils';
+
+const HOME_PATH_RE = /^\/?(?:en|he|sv|ja|es)?\/?$/;
+
+export const HeaderBackButton = memo(function HeaderBackButton() {
+  const router = useRouter();
+  const pathname = usePathname() || '/';
+  const { t, language } = useLanguage();
+
+  const onClick = useCallback(() => {
+    if (typeof window !== 'undefined' && window.history.length > 1) {
+      router.back();
+      return;
+    }
+    router.push(`/${language}`);
+  }, [router, language]);
+
+  if (HOME_PATH_RE.test(pathname)) return null;
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={t('common.back')}
+      className={cn(
+        'hidden lg:inline-flex items-center gap-1.5',
+        'px-2.5 py-1.5 rounded-neo border-neo border-black',
+        'bg-neo-white dark:bg-neo-navy-light text-neo-navy dark:text-neo-white',
+        'shadow-hard-sm hover:shadow-hard active:shadow-hard-pressed active:translate-y-[1px]',
+        'font-neo-body font-bold text-sm transition-all duration-100'
+      )}
+    >
+      <ArrowLeft className="w-4 h-4 rtl:rotate-180" aria-hidden="true" />
+      <span>{t('common.back')}</span>
+    </button>
+  );
+});
+
+export default HeaderBackButton;

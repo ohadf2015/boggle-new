@@ -26,7 +26,7 @@ vi.mock('@/utils/gameLogger', () => ({
   logGameEnd: vi.fn(async () => undefined),
   formatWordsForLogging: vi.fn(() => []),
 }));
-vi.mock('@/utils/growthTracking', () => ({ trackGameEnd: vi.fn() }));
+vi.mock('@/utils/growthTracking', () => ({ trackGameEnd: vi.fn(), trackGameStart: vi.fn() }));
 vi.mock('@/utils/trainingProgressStorage', () => ({
   isNewDailyPlayer: () => false,
   incrementDailyChallengesCompleted: vi.fn(),

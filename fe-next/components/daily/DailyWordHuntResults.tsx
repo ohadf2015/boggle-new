@@ -372,7 +372,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
           <div className="flex items-center justify-between gap-2">
             <Button variant="ghost" size="sm" onClick={onBack} className="text-slate-400 hover:text-white -ms-2 py-1">
               <ArrowLeft className="w-4 h-4 me-1 rtl:rotate-180" />
-              {t('daily.home')}
+              {t('common.back')}
             </Button>
             <ScoreBadge
               solved={result.solved}

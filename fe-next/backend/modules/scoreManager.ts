@@ -34,6 +34,14 @@ const leaderboardPendingUpdate: Record<string, boolean> = {};
 // Leaderboard sort cache with dirty flag
 const leaderboardCache: Record<string, LeaderboardPlayer[]> = {};
 const leaderboardDirty: Record<string, boolean> = {};
+// Signature of last broadcast — gate trailing emits when neither order nor scores changed
+const leaderboardLastSignature: Record<string, string> = {};
+
+function leaderboardSignature(lb: LeaderboardPlayer[]): string {
+  let sig = '';
+  for (const p of lb) sig += `${p.username}:${p.score}:${p.wordCount}|`;
+  return sig;
+}
 
 /**
  * Periodic cleanup of stale leaderboard throttle state.
@@ -53,6 +61,7 @@ export function registerActiveGamesProvider(provider: () => Set<string>): void {
           clearLeaderboardThrottle(key);
           delete leaderboardCache[key];
           delete leaderboardDirty[key];
+          delete leaderboardLastSignature[key];
         }
       }
       for (const key of Object.keys(leaderboardLastBroadcast)) {
@@ -61,6 +70,7 @@ export function registerActiveGamesProvider(provider: () => Set<string>): void {
           delete leaderboardPendingUpdate[key];
           delete leaderboardCache[key];
           delete leaderboardDirty[key];
+          delete leaderboardLastSignature[key];
         }
       }
     }, 5 * 60 * 1000); // Every 5 minutes
@@ -277,6 +287,7 @@ export function getLeaderboardThrottled(
     if (broadcastFn && typeof broadcastFn === 'function') {
       broadcastFn(leaderboard);
     }
+    leaderboardLastSignature[gameCode] = leaderboardSignature(leaderboard);
     leaderboardLastBroadcast[gameCode] = now;
 
     // Clear any pending trailing update since we just broadcasted
@@ -294,13 +305,17 @@ export function getLeaderboardThrottled(
     if (!leaderboardThrottleTimers[gameCode]) {
       const remainingTime = throttleMs - timeSinceLastBroadcast;
       leaderboardThrottleTimers[gameCode] = setTimeout(() => {
-        // Only broadcast if there's actually a pending update
         if (leaderboardPendingUpdate[gameCode]) {
           const leaderboard = getLeaderboard(game);
-          if (broadcastFn && typeof broadcastFn === 'function') {
-            broadcastFn(leaderboard);
+          const sig = leaderboardSignature(leaderboard);
+          // Skip trailing emit if nothing actually changed since last broadcast
+          if (sig !== leaderboardLastSignature[gameCode]) {
+            if (broadcastFn && typeof broadcastFn === 'function') {
+              broadcastFn(leaderboard);
+            }
+            leaderboardLastSignature[gameCode] = sig;
+            leaderboardLastBroadcast[gameCode] = Date.now();
           }
-          leaderboardLastBroadcast[gameCode] = Date.now();
           leaderboardPendingUpdate[gameCode] = false;
         }
         delete leaderboardThrottleTimers[gameCode];
@@ -321,6 +336,7 @@ export function clearLeaderboardThrottle(gameCode: string): void {
   delete leaderboardPendingUpdate[gameCode];
   delete leaderboardCache[gameCode];
   delete leaderboardDirty[gameCode];
+  delete leaderboardLastSignature[gameCode];
 }
 
 /**

@@ -37,7 +37,7 @@ import { getComboBonus as calculateComboBonus, calculateWordScore as canonicalWo
 import { useBotSimulation } from './useBotSimulation';
 import { useSpamDetection } from './useSpamDetection';
 import { useSinglePlayerEffects } from './useSinglePlayerEffects';
-import { buildGameResults, buildFallbackResults } from './buildGameResults';
+import { buildGameResults, buildFallbackResults, emitSinglePlayerGameEnd } from './buildGameResults';
 import type { SinglePlayerGameState, SinglePlayerResultsData } from '../../SinglePlayerView';
 import type { LetterGrid } from '@/shared/types/game';
 import type { WordFeedback } from '@/components/game/WordFormingArea';
@@ -425,12 +425,14 @@ export function useSinglePlayerCore({
     };
     try {
       const results = buildGameResults(resultParams);
+      emitSinglePlayerGameEnd(results, settings.mode);
       if (settings.mode === 'practice') trainingAnalysisFinishTraining();
       onGameEndRef.current(results);
     } catch (error) {
       console.error('Game end processing failed:', error);
       setIsValidatingWords(false);
       const fallback = buildFallbackResults(resultParams);
+      emitSinglePlayerGameEnd(fallback, settings.mode);
       if (settings.mode === 'practice') trainingAnalysisFinishTraining();
       onGameEndRef.current(fallback);
     }

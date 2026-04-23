@@ -9,8 +9,14 @@ export function useCrazyGamesScrollPrevention(enabled: boolean) {
   useEffect(() => {
     if (!enabled) return;
 
-    // Prevent page scrolling (CrazyGames requirement)
-    // But allow scrolling within scrollable containers
+    // Allow scroll inside containers with `overflow: auto/scroll` AND allow
+    // native document scroll when the page genuinely overflows the viewport.
+    // Only block scroll when nothing on-page can actually scroll — prevents
+    // rubber-band / parent-frame leakage without breaking legit page scroll
+    // (settings, landing) inside the CG iframe.
+    const documentOverflows = () =>
+      document.documentElement.scrollHeight > window.innerHeight + 1;
+
     const preventScroll = (event: WheelEvent) => {
       let target = event.target as HTMLElement | null;
 
@@ -45,6 +51,7 @@ export function useCrazyGamesScrollPrevention(enabled: boolean) {
         target = target.parentElement;
       }
 
+      if (documentOverflows()) return;
       event.preventDefault();
     };
 
@@ -78,6 +85,7 @@ export function useCrazyGamesScrollPrevention(enabled: boolean) {
       }
 
       if (['ArrowUp', 'ArrowDown', ' ', 'PageUp', 'PageDown'].includes(event.key)) {
+        if (documentOverflows()) return;
         event.preventDefault();
       }
     };
@@ -132,6 +140,7 @@ export function useCrazyGamesScrollPrevention(enabled: boolean) {
         }
       }
 
+      if (documentOverflows()) return;
       event.preventDefault();
     };
 

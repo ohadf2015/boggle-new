@@ -2,7 +2,7 @@
  * Cookie consent management with Google Consent Mode v2
  *
  * Manages granular consent categories (essential, analytics, advertising)
- * and syncs state with Google's Consent Mode API for AdSense/GA4 compliance.
+ * and syncs state with Google's Consent Mode API for GA4/ads compliance.
  *
  * @see https://developers.google.com/tag-platform/security/guides/consent
  */

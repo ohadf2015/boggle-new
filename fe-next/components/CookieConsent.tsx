@@ -15,7 +15,7 @@ import {
 } from '@/utils/cookieConsent';
 
 /**
- * Granular cookie consent banner for GDPR/AdSense compliance.
+ * Granular cookie consent banner for GDPR compliance.
  * Shows at bottom until user makes a choice.
  * Supports "Accept All", "Decline All", and granular category toggles.
  * Can be re-opened via the ManageCookiesButton component.

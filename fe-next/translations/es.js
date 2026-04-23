@@ -370,7 +370,7 @@ const es = {
       "analytics": "Análisis",
       "analyticsDesc": "Nos ayudan a entender cómo usas el sitio para mejorar tu experiencia",
       "advertising": "Publicidad",
-      "advertisingDesc": "Mostrar anuncios relevantes a través de Google AdSense"
+      "advertisingDesc": "Mostrar anuncios relevantes a través de Google AdMob"
     }
   },
   "common": {
@@ -3120,8 +3120,8 @@ const es = {
       },
       "advertising": {
         "title": "Publicidad de Terceros",
-        "intro": "Mostramos anuncios no personalizados a través de Google AdSense. Dado que LexiClash está diseñado para jugadores de todas las edades, incluidos niños, nuestra publicidad opera bajo el modo de tratamiento de contenido dirigido a niños (TFCD) de Google.",
-        "googleAdsense": "Google AdSense: Todos los anuncios mostrados en LexiClash son no personalizados. Hemos habilitado la etiqueta de tratamiento dirigido a niños (TFCD), que previene la personalización de anuncios, la publicidad basada en intereses y el remarketing.",
+        "intro": "Mostramos anuncios no personalizados a través de Google AdMob. Dado que LexiClash está diseñado para jugadores de todas las edades, incluidos niños, nuestra publicidad opera bajo el modo de tratamiento de contenido dirigido a niños (TFCD) de Google.",
+        "googleAdmob": "Google AdMob: Todos los anuncios mostrados en LexiClash son no personalizados. Hemos habilitado la etiqueta de tratamiento dirigido a niños (TFCD), que previene la personalización de anuncios, la publicidad basada en intereses y el remarketing.",
         "cookies": "Cookies publicitarias: En el modo TFCD, Google no establece cookies de publicidad personalizada. Se pueden utilizar cookies limitadas solo para limitar la frecuencia de anuncios e informes agregados.",
         "personalization": "Sin personalización de anuncios: Los anuncios no se personalizan según el historial de navegación, intereses o perfiles demográficos. Todos los usuarios ven los mismos anuncios contextuales no dirigidos.",
         "thirdPartyAccess": "Acceso limitado a datos: Bajo el tratamiento dirigido a niños, los socios publicitarios solo reciben datos agregados y no identificables para informes de rendimiento publicitario.",
@@ -3130,7 +3130,7 @@ const es = {
       },
       "advertisingPartners": {
         "title": "Socios Publicitarios",
-        "intro": "Nos asociamos con Google AdSense para mostrar anuncios en nuestro sitio web. Los proveedores externos, incluido Google, utilizan cookies para publicar anuncios. El uso de cookies publicitarias por parte de Google permite a Google y a sus socios publicar anuncios basados en las visitas de los usuarios a LexiClash y otros sitios en Internet. Los ingresos publicitarios ayudan a mantener LexiClash gratuito para todos los jugadores. Todos los anuncios operan bajo el modo de tratamiento dirigido a niños (TFCD).",
+        "intro": "Nos asociamos con Google AdMob para mostrar anuncios en nuestro sitio web. Los proveedores externos, incluido Google, utilizan cookies para publicar anuncios. El uso de cookies publicitarias por parte de Google permite a Google y a sus socios publicar anuncios basados en las visitas de los usuarios a LexiClash y otros sitios en Internet. Los ingresos publicitarios ayudan a mantener LexiClash gratuito para todos los jugadores. Todos los anuncios operan bajo el modo de tratamiento dirigido a niños (TFCD).",
         "howItWorks": {
           "title": "Cómo funciona la publicidad",
           "cookies": "Los proveedores externos, incluido Google, utilizan cookies para publicar anuncios basados en tus visitas anteriores a este y otros sitios web",
@@ -3144,7 +3144,7 @@ const es = {
           "intro": "Tienes varias opciones para controlar la publicidad en LexiClash:",
           "optOut": "Puedes optar por no recibir publicidad personalizada visitando la Configuración de anuncios de Google",
           "googlePrivacy": "Revisar las prácticas de privacidad de Google",
-          "partnerPolicy": "Conocer las políticas de socios de AdSense",
+          "partnerPolicy": "Conocer las políticas de socios de AdMob",
           "browserCookies": "Puedes gestionar o eliminar cookies a través de la configuración de tu navegador. Ten en cuenta que desactivar las cookies puede afectar la funcionalidad del sitio.",
           "aboutAds": "También puedes optar por no recibir cookies publicitarias de proveedores externos visitando"
         },
@@ -3216,14 +3216,14 @@ const es = {
         },
         "advertising": {
           "title": "Cookies publicitarias",
-          "adsense": "Google AdSense — muestra anuncios para apoyar el juego. En modo de contenido dirigido a niños (TFCD), no se establecen cookies publicitarias personalizadas",
+          "admob": "Google AdMob — muestra anuncios para apoyar el juego. En modo de contenido dirigido a niños (TFCD), no se establecen cookies publicitarias personalizadas",
           "tfcd": "Se pueden usar cookies limitadas para limitar la frecuencia de anuncios e informes agregados — sin seguimiento entre sitios"
         }
       },
       "thirdPartyCookies": {
         "title": "3. Cookies de terceros",
         "intro": "Algunas cookies son colocadas por servicios de terceros que usamos:",
-        "google": "Google AdSense — para mostrar anuncios no personalizados. Google puede usar cookies para limitar frecuencia e informes. Consulta la Política de Privacidad de Google para más detalles.",
+        "google": "Google AdMob — para mostrar anuncios no personalizados. Google puede usar cookies para limitar frecuencia e informes. Consulta la Política de Privacidad de Google para más detalles.",
         "logrocket": "LogRocket — para reproducción de sesiones y análisis para ayudarnos a mejorar la experiencia del juego."
       },
       "managingCookies": {
@@ -3367,7 +3367,7 @@ const es = {
       },
       "advertising": {
         "title": "Contenido Publicitario",
-        "content": "LexiClash muestra anuncios proporcionados por redes publicitarias de terceros, incluyendo Google AdSense. Estos anuncios no son respaldados por LexiClash. El contenido de los anuncios es determinado por las redes publicitarias basándose en diversos factores y puede no reflejar las opiniones o valores de LexiClash. No somos responsables de la exactitud o el contenido de los anuncios mostrados en el sitio."
+        "content": "LexiClash muestra anuncios proporcionados por redes publicitarias de terceros, incluyendo Google AdMob. Estos anuncios no son respaldados por LexiClash. El contenido de los anuncios es determinado por las redes publicitarias basándose en diversos factores y puede no reflejar las opiniones o valores de LexiClash. No somos responsables de la exactitud o el contenido de los anuncios mostrados en el sitio."
       },
       "liability": {
         "title": "Limitación de Responsabilidad",
@@ -9859,7 +9859,7 @@ const es = {
       "multipleDevices": "¡Sí! Si creas una cuenta con Google, tu progreso, estadísticas y configuración se sincronizan automáticamente en todos tus dispositivos.",
       "deleteAccount": "Para eliminar tu cuenta, ve a Configuración > Cuenta > Eliminar cuenta. Esta acción es permanente y borrará todos tus datos, incluyendo estadísticas, logros e historial de juegos.",
       "dataSafe": "Sí. Nos tomamos la privacidad en serio y solo recopilamos los datos necesarios para operar el juego. Usamos cifrado estándar de la industria y nunca vendemos tu información personal. Consulta nuestra Política de Privacidad para más detalles.",
-      "ads": "Nos asociamos con Google AdSense para mostrar anuncios relevantes. Los anuncios nos ayudan a mantener el juego gratuito para todos. Puedes obtener más información sobre la personalización de anuncios y las opciones de exclusión en nuestra Política de Privacidad.",
+      "ads": "Nos asociamos con Google AdMob para mostrar anuncios relevantes. Los anuncios nos ayudan a mantener el juego gratuito para todos. Puedes obtener más información sobre la personalización de anuncios y las opciones de exclusión en nuestra Política de Privacidad.",
       "optOut": "Si bien cierta recopilación de datos es necesaria para el funcionamiento del juego (como tu nombre de usuario y puntuaciones), puedes optar por no participar en análisis y anuncios personalizados en Configuración > Privacidad."
     }
   },

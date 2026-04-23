@@ -1,7 +1,9 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { calculateEfficiencyScore } from '@/utils/aiHintGenerator';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+
+const SCORE_HISTORY_CAP = 20;
+import { calculateWordScore } from '@/shared/utils/scoring';
 import type { WordDiscovery, TargetAttempt } from './types';
 
 export interface ScoreEvent {
@@ -36,10 +38,10 @@ export interface UseLiveScoreTrackerProps {
  * Calculates incremental score deltas and triggers animations
  */
 export function useLiveScoreTracker({
-  lifePoints,
-  clueTokens,
+  lifePoints: _lifePoints,
+  clueTokens: _clueTokens,
   discoveredWords,
-  attempts,
+  attempts: _attempts,
   isGameOver = false,
 }: UseLiveScoreTrackerProps): [LiveScoreState, LiveScoreActions] {
   const [currentScore, setCurrentScore] = useState(0);
@@ -50,15 +52,13 @@ export function useLiveScoreTracker({
   const animationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const previousScoreRef = useRef(0);
 
-  // Calculate current score based on game state
-  // During gameplay, show potential score (what you'd get if you solved now)
-  // Pass `true` for solved to show live potential score, not 0
-  const calculatedScore = calculateEfficiencyScore(
-    lifePoints,
-    clueTokens,
-    attempts.length,
-    discoveredWords.length,
-    true // Always calculate as if solved to show potential score
+  // Canonical word-hunt scoring: sum per-word scores (length-based, exponential)
+  // from `@/shared/utils/scoring.calculateWordScore`. Matches Boggle-style
+  // scoring (CAT=10, HOUSE=50, TESTING=200, 8+=500). Life/tokens are game-state
+  // only — they no longer feed the displayed score.
+  const calculatedScore = useMemo(
+    () => discoveredWords.reduce((sum, w) => sum + calculateWordScore(w.word), 0),
+    [discoveredWords],
   );
 
   // Update score when calculated score changes
@@ -84,7 +84,12 @@ export function useLiveScoreTracker({
         delta,
         reason: delta > 0 ? 'word_discovered' : 'target_attempt',
       };
-      setScoreHistory(prev => [...prev, event]);
+      setScoreHistory(prev => {
+        const next = prev.length >= SCORE_HISTORY_CAP
+          ? [...prev.slice(prev.length - SCORE_HISTORY_CAP + 1), event]
+          : [...prev, event];
+        return next;
+      });
 
       // Clear animation state after animation completes
       if (animationTimeoutRef.current) {
@@ -119,7 +124,12 @@ export function useLiveScoreTracker({
       delta,
       reason,
     };
-    setScoreHistory(prev => [...prev, event]);
+    setScoreHistory(prev => {
+      const next = prev.length >= SCORE_HISTORY_CAP
+        ? [...prev.slice(prev.length - SCORE_HISTORY_CAP + 1), event]
+        : [...prev, event];
+      return next;
+    });
 
     if (animationTimeoutRef.current) {
       clearTimeout(animationTimeoutRef.current);
