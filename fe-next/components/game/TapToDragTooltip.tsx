@@ -297,7 +297,7 @@ const TapToDragTooltip = memo<TapToDragTooltipProps>(
 
                           return (
                             <motion.line
-                              key={i}
+                              key={`line-${i}-${cell[0]}-${cell[1]}`}
                               x1={x1}
                               y1={y1}
                               x2={x2}

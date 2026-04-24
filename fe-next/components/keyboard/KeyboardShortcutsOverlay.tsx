@@ -245,7 +245,7 @@ function ShortcutRow({ keys, description }: ShortcutRowProps) {
       <div className="flex items-center gap-1 shrink-0">
         {keys.map((key, index) => (
           <kbd
-            key={index}
+            key={`key-${index}-${key}`}
             className={cn(
               'px-2 py-1',
               'bg-neo-cyan text-neo-black',

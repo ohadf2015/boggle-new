@@ -77,7 +77,7 @@ export const FireRoundIndicator: React.FC<FireRoundIndicatorProps> = ({
             <div className="absolute inset-0 overflow-hidden rounded-neo opacity-20 pointer-events-none">
               {[...Array(3)].map((_, i) => (
                 <motion.div
-                  key={i}
+                  key={`flame-${i}`}
                   className="absolute bottom-0 w-8 h-12 bg-neo-lime"
                   style={{
                     left: `${20 + i * 30}%`,
@@ -149,7 +149,7 @@ export const FireRoundIndicator: React.FC<FireRoundIndicatorProps> = ({
                   const distance = 40;
                   return (
                     <motion.div
-                      key={i}
+                      key={`sparkle-${i}`}
                       className="absolute w-2 h-2 rounded-full bg-neo-lime border border-neo-black"
                       style={{
                         left: '50%',

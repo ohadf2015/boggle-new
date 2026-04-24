@@ -90,7 +90,7 @@ const WordHuntQuickRules = memo<WordHuntQuickRulesProps>(({ onDismiss, t }) => {
         <ul className="flex flex-col gap-1.5">
           {TIPS.map((tip, i) => (
             <li
-              key={i}
+              key={`tip-${i}-${tip.textKey}`}
               className="flex items-center gap-2"
               data-testid={`tip-${i}`}
             >

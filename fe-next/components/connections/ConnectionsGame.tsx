@@ -196,7 +196,7 @@ export default function ConnectionsGame() {
             const alive = i < state.lives;
             return (
               <m.span
-                key={i}
+                key={`life-${i}`}
                 animate={alive ? { scale: 1, opacity: 1, filter: 'grayscale(0)' } : { scale: 0.7, opacity: 0.25, filter: 'grayscale(1)' }}
                 transition={{ type: 'spring' as const, stiffness: 400, damping: 18 }}
                 className="text-2xl select-none"

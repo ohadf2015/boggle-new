@@ -158,7 +158,7 @@ export const EarthquakeWarning: React.FC<EarthquakeWarningProps> = ({ isVisible 
             const angle = (i * 45) * (Math.PI / 180);
             return (
               <motion.div
-                key={i}
+                key={`particle-${i}-${distance}`}
                 className="absolute w-3 h-3 rounded-full bg-neo-red border-2 border-neo-black"
                 style={{
                   left: '50%',

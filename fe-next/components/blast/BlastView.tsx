@@ -242,7 +242,7 @@ export function BlastView() {
             <div className="flex gap-3">
               {[0, 1, 2].map(i => (
                 <AdaptiveMotion.div
-                  key={i}
+                  key={`star-${i}`}
                   initial={{ scale: 0, rotate: -180 }}
                   animate={{ scale: 1, rotate: 0 }}
                   transition={{ type: 'spring', stiffness: 300, damping: 12, delay: 0.3 + i * 0.2 }}

@@ -303,7 +303,7 @@ export const BlastTile = memo(function BlastTile({
             const filled = i < (3 - hitsRemaining);
             return (
               <span
-                key={i}
+                key={`shard-${i}`}
                 className={`w-1.5 h-1.5 rounded-full border border-white/40 ${filled ? 'bg-white/80' : 'bg-white/20'}`}
               />
             );

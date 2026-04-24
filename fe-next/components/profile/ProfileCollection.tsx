@@ -47,7 +47,7 @@ export function ProfileCollection({
       {isLoading ? (
         <div className="grid grid-cols-4 gap-3 py-4">
           {Array.from({ length: 8 }).map((_, i) => (
-            <Skeleton key={i} variant="circular" width={64} height={64} />
+            <Skeleton key={`skeleton-${i}`} variant="circular" width={64} height={64} />
           ))}
         </div>
       ) : collectibles.length === 0 ? (

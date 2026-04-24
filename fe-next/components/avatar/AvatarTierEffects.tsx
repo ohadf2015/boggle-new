@@ -98,7 +98,7 @@ const AvatarTierEffects = memo<AvatarTierEffectsProps>(({
       {/* Sparkle particles */}
       {sparkleCount > 0 && (
         Array.from({ length: sparkleCount }, (_, i) => (
-          <div key={i} className="avatar-sparkle" />
+          <div key={`sparkle-${i}`} className="avatar-sparkle" />
         ))
       )}
     </div>
