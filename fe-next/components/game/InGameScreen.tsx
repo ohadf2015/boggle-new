@@ -431,7 +431,6 @@ const InGameScreen = memo<InGameScreenProps>(function InGameScreen({
     socket,
     comboLevelRef: effectiveComboLevelRef,
     t,
-    playWordAcceptedSound,
     playWordRejectedSound,
     announceWordResult,
     onWordSubmit,
@@ -446,13 +445,16 @@ const InGameScreen = memo<InGameScreenProps>(function InGameScreen({
     fireRoundActiveRef.current = fireRoundActive;
   }, [fireRoundActive, fireRoundActiveRef]);
 
-  // Socket feedback hook
+  // Socket feedback hook — owns server-truth audio (accept on server's wordAccepted,
+  // reject + haptic error on rejection events). Prevents MP audio-lie.
   useSocketFeedback({
     socket,
     isPlaying,
     t,
     setCurrentFeedback,
     setLastWordFoundTime,
+    playWordAcceptedSound,
+    playWordRejectedSound,
   });
 
   // Keyboard word input

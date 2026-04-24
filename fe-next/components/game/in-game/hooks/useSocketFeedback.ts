@@ -5,6 +5,7 @@ import type { Socket } from 'socket.io-client';
 import type { WordFeedback } from '../../WordFormingArea';
 import type { TranslationFn } from '../types';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
+import { hapticError } from '@/utils/haptics';
 
 interface UseSocketFeedbackOptions {
   socket: Socket | null;
@@ -12,13 +13,25 @@ interface UseSocketFeedbackOptions {
   t: TranslationFn;
   setCurrentFeedback: (feedback: WordFeedback | null) => void;
   setLastWordFoundTime: (time: number) => void;
+  /** Plays on server's wordAccepted event (server-truth audio, prevents audio-lie). */
+  playWordAcceptedSound: () => void;
+  /** Plays on server rejection events (wordRejected/wordNotOnBoard/wordTooShort). */
+  playWordRejectedSound: () => void;
 }
 
 /**
  * Hook for handling socket word feedback events
  */
 export function useSocketFeedback(options: UseSocketFeedbackOptions): void {
-  const { socket, isPlaying, t, setCurrentFeedback, setLastWordFoundTime } = options;
+  const {
+    socket,
+    isPlaying,
+    t,
+    setCurrentFeedback,
+    setLastWordFoundTime,
+    playWordAcceptedSound,
+    playWordRejectedSound,
+  } = options;
 
   useEffect(() => {
     if (!socket || !isPlaying) return;
@@ -48,7 +61,8 @@ export function useSocketFeedback(options: UseSocketFeedbackOptions): void {
         longWordLabel,
         timestamp: Date.now(),
       });
-
+      // Server-truth accept sound: only plays after server confirms.
+      playWordAcceptedSound();
     };
 
     const handleWordAlreadyFound = (data: { word: string }): void => {
@@ -78,6 +92,8 @@ export function useSocketFeedback(options: UseSocketFeedbackOptions): void {
         message: t(messageKey) || 'Invalid word',
         timestamp: Date.now(),
       });
+      playWordRejectedSound();
+      hapticError();
     };
 
     const handleWordNotOnBoard = (data: { word: string }): void => {
@@ -88,6 +104,8 @@ export function useSocketFeedback(options: UseSocketFeedbackOptions): void {
         message: t('playerView.wordNotOnBoard') || 'Not on board',
         timestamp: Date.now(),
       });
+      playWordRejectedSound();
+      hapticError();
     };
 
     const handleWordTooShort = (data: { word: string; minLength?: number }): void => {
@@ -98,6 +116,8 @@ export function useSocketFeedback(options: UseSocketFeedbackOptions): void {
         message: t('playerView.wordTooShort') || 'Too short',
         timestamp: Date.now(),
       });
+      playWordRejectedSound();
+      hapticError();
     };
 
     const handleWordAlreadyFoundByOther = (data: {
@@ -138,5 +158,5 @@ export function useSocketFeedback(options: UseSocketFeedbackOptions): void {
       socket.off('wordNotOnBoard', handleWordNotOnBoard);
       socket.off('wordTooShort', handleWordTooShort);
     };
-  }, [socket, isPlaying, t, setCurrentFeedback, setLastWordFoundTime]);
+  }, [socket, isPlaying, t, setCurrentFeedback, setLastWordFoundTime, playWordAcceptedSound, playWordRejectedSound]);
 }

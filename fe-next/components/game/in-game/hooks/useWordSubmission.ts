@@ -19,7 +19,7 @@ interface UseWordSubmissionOptions {
   socket: Socket | null;
   comboLevelRef: MutableRefObject<number>;
   t: TranslationFn;
-  playWordAcceptedSound: () => void;
+  /** Plays on client-side rejection (too short, duplicate, not on board). Server-truth accept sound lives in useSocketFeedback. */
   playWordRejectedSound: () => void;
   announceWordResult: (word: string, isAccepted: boolean, score?: number, message?: string) => void;
   onWordSubmit?: (word: string) => void;
@@ -51,7 +51,6 @@ export function useWordSubmission(
     socket,
     comboLevelRef,
     t,
-    playWordAcceptedSound,
     playWordRejectedSound,
     announceWordResult,
     onWordSubmit,
@@ -134,8 +133,9 @@ export function useWordSubmission(
       return;
     }
 
-    // Play sound and haptic feedback immediately (optimistic)
-    playWordAcceptedSound();
+    // Haptic feedback fires optimistically (client-authoritative feel).
+    // Accept SOUND is gated on the server's wordAccepted event — see
+    // useSocketFeedback — to avoid audio-lie when server rejects.
     hapticForWordScore(formedWord.length);
 
     // Submit to server
@@ -160,7 +160,6 @@ export function useWordSubmission(
     onWordSubmit,
     onResetCombo,
     t,
-    playWordAcceptedSound,
     playWordRejectedSound,
     announceWordResult,
     comboLevelRef,

@@ -53,6 +53,7 @@ function buildOptions(overrides: Partial<Parameters<typeof useWordSubmission>[0]
     comboLevelRef,
     t: (k: string) => k,
     playWordAcceptedSound: vi.fn(),
+    playWordRejectedSound: vi.fn(),
     announceWordResult: vi.fn(),
     onWordSubmit: vi.fn(),
     onResetCombo: vi.fn(),
@@ -114,5 +115,46 @@ describe('useWordSubmission — comboType in submitWord emit', () => {
     expect(options.socket.emit).toHaveBeenCalledWith('submitWord', expect.objectContaining({
       comboType: null,
     }));
+  });
+});
+
+describe('useWordSubmission — audio feedback is server-truth (no optimistic accept sound)', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockValidateWordLocally.mockReturnValue({ isValid: true });
+    mockCouldBeOnBoard.mockReturnValue(true);
+  });
+
+  it('does NOT play accepted sound optimistically when client validation passes', () => {
+    const options = buildOptions();
+    const { result } = renderHook(() => useWordSubmission(options));
+
+    act(() => {
+      result.current.handleGridWordSubmit('TEST');
+    });
+
+    expect(options.playWordAcceptedSound).not.toHaveBeenCalled();
+  });
+
+  it('still fires haptic feedback optimistically (keeps responsiveness)', () => {
+    const options = buildOptions();
+    const { result } = renderHook(() => useWordSubmission(options));
+
+    act(() => {
+      result.current.handleGridWordSubmit('TEST');
+    });
+
+    expect(mockHapticForWordScore).toHaveBeenCalledWith(4);
+  });
+
+  it('still emits submitWord to server (sound will come from server event)', () => {
+    const options = buildOptions();
+    const { result } = renderHook(() => useWordSubmission(options));
+
+    act(() => {
+      result.current.handleGridWordSubmit('TEST');
+    });
+
+    expect(options.socket.emit).toHaveBeenCalledWith('submitWord', expect.any(Object));
   });
 });
