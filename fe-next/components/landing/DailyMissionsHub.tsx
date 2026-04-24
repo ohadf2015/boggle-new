@@ -182,7 +182,7 @@ export function DailyMissionsHub() {
         <div className="h-6 w-40 bg-neo-white/10 rounded mb-4" />
         <div className="space-y-2">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-14 bg-neo-white/5 rounded-neo" />
+            <div key={`skel-${i}`} className="h-14 bg-neo-white/5 rounded-neo" />
           ))}
         </div>
       </div>

@@ -192,7 +192,7 @@ export default function CreatorLeaderboard() {
       {loading && (
         <div className="space-y-3">
           {Array.from({ length: 5 }).map((_, i) => (
-            <div key={i} className="h-14 rounded-neo bg-neo-white/3 animate-pulse" />
+            <div key={`skel-${i}`} className="h-14 rounded-neo bg-neo-white/3 animate-pulse" />
           ))}
         </div>
       )}

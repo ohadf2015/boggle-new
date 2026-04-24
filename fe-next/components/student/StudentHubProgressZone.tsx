@@ -115,7 +115,7 @@ export function StudentHubProgressZone({ classroomId, userId }: StudentHubProgre
         </div>
         <div className="border-t-2 border-black/10 pt-4 grid grid-cols-3 gap-4">
           {[0, 1, 2].map((i) => (
-            <div key={i} className="flex items-center gap-2">
+            <div key={`stat-${i}`} className="flex items-center gap-2">
               <div className="w-9 h-9 rounded-neo bg-black/10" />
               <div>
                 <div className="h-3 w-10 bg-black/10 rounded mb-1" />

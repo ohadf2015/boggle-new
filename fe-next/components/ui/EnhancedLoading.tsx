@@ -87,7 +87,7 @@ export const LoadingDots: React.FC<LoadingDotsProps> = ({
     <div className={cn('flex items-center gap-1.5', className)} role="status">
       {[0, 1, 2].map((i) => (
         <AdaptiveMotion.div
-          key={i}
+          key={`dot-${i}`}
           className={cn('rounded-full', sizeClasses[size], variantClasses[variant])}
           animate={{
             scale: [1, 1.2, 1],
@@ -274,7 +274,7 @@ export const SkeletonCard: React.FC<SkeletonCardProps> = ({
     <div className="space-y-2">
       {Array.from({ length: lines }).map((_, i) => (
         <Skeleton
-          key={i}
+          key={`line-${i}`}
           variant="text"
           width={i === lines - 1 ? '80%' : '100%'}
         />

@@ -41,7 +41,7 @@ export default function ActivityFeed({ classroomId, userId }: ActivityFeedProps)
         <div className="space-y-3">
           {[0, 1, 2].map(i => (
             <div
-              key={i}
+              key={`skel-${i}`}
               data-testid="activity-skeleton-row"
               className="flex items-center gap-3 p-3 rounded-neo border-2 border-black/20 bg-gray-100 animate-pulse"
             >

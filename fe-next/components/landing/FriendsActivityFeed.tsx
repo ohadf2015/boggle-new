@@ -24,7 +24,7 @@ export function FriendsActivityFeed() {
         </div>
         <div className="space-y-1">
           {[0, 1, 2].map((i) => (
-            <div key={i} className="flex items-center gap-2 h-12 px-2">
+            <div key={`skel-${i}`} className="flex items-center gap-2 h-12 px-2">
               <div className="w-6 h-6 rounded-full bg-neo-white/10 animate-pulse shrink-0" />
               <div className="flex-1 space-y-1">
                 <div className="h-3 w-20 bg-neo-white/10 rounded animate-pulse" />

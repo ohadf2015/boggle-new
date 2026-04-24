@@ -44,7 +44,7 @@ export function ChartSkeleton({
             <div className="absolute inset-0 flex items-end justify-around px-4 pb-4">
               {[40, 60, 45, 70, 55, 80, 65].map((h, i) => (
                 <div
-                  key={i}
+                  key={`line-${h}`}
                   className="w-2 bg-linear-to-t from-neo-cyan/30 to-neo-pink/30 rounded-t animate-pulse"
                   style={{ height: `${h}%`, animationDelay: `${i * 100}ms` }}
                 />
@@ -56,7 +56,7 @@ export function ChartSkeleton({
             <div className="absolute inset-0 flex items-end justify-around px-4 pb-4 gap-2">
               {[50, 70, 40, 80, 60].map((h, i) => (
                 <div
-                  key={i}
+                  key={`bar-${h}`}
                   className="flex-1 bg-neo-cyan/20 rounded-t animate-pulse"
                   style={{ height: `${h}%`, animationDelay: `${i * 150}ms` }}
                 />
@@ -68,7 +68,7 @@ export function ChartSkeleton({
         {/* Stats row skeleton */}
         <div className="grid grid-cols-3 gap-2 mt-3">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="bg-white/10 rounded-neo border border-white/20 p-2">
+            <div key={`stat-${i}`} className="bg-white/10 rounded-neo border border-white/20 p-2">
               <div className="h-6 w-12 mx-auto rounded bg-white/20 mb-1" />
               <div className="h-3 w-16 mx-auto rounded bg-white/10" />
             </div>

@@ -190,7 +190,7 @@ export function SkeletonGrid({
   return (
     <div className={cn('grid grid-cols-1 lg:grid-cols-3 gap-6', className)}>
       {Array.from({ length: count }).map((_, i) => (
-        <Skeleton key={i} />
+        <Skeleton key={`skel-${i}`} />
       ))}
     </div>
   );

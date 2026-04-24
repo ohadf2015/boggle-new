@@ -33,7 +33,7 @@ export function LandingLeaderboardPreview({ players, loading, compact }: Landing
         </div>
         <div className="flex justify-center gap-3">
           {[0, 1, 2].map((i) => (
-            <div key={i} className="flex flex-col items-center gap-1">
+            <div key={`podium-${i}`} className="flex flex-col items-center gap-1">
               <div className={cn(
                 'w-6 h-6 rounded-full border-2 border-neo-black/20 animate-pulse',
                 i === 0 ? 'bg-yellow-400/30' : i === 1 ? 'bg-gray-300/30' : 'bg-amber-600/30'
@@ -53,7 +53,7 @@ export function LandingLeaderboardPreview({ players, loading, compact }: Landing
         </div>
         <div className="space-y-1">
           {Array.from({ length: 5 }).map((_, i) => (
-            <div key={i} className={cn(
+            <div key={`row-${i}`} className={cn(
               'flex items-center gap-3 py-1.5 px-2 rounded-neo',
               i < 3 && 'bg-neo-white/5'
             )}>

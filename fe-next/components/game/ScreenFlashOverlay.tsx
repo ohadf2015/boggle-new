@@ -1,6 +1,5 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface ScreenFlashOverlayProps {
@@ -10,29 +9,18 @@ interface ScreenFlashOverlayProps {
 }
 
 /**
- * Full-screen flash overlay that fires when trigger increments.
- * Self-managing: tracks previous trigger value internally.
+ * Full-screen flash overlay. Each new `trigger` value remounts the motion div
+ * (via `key={trigger}`) and re-runs the initial→animate flash. Stateless —
+ * purely derived from props so React Compiler / set-state-in-effect is clean.
  */
 export function ScreenFlashOverlay({ trigger, colorClass = 'bg-white' }: ScreenFlashOverlayProps) {
-  const [flash, setFlash] = useState(false);
-  const prevTriggerRef = useRef(trigger);
-
-  useEffect(() => {
-    if (trigger > prevTriggerRef.current) {
-      setFlash(true);
-      const timer = setTimeout(() => setFlash(false), 200);
-      prevTriggerRef.current = trigger;
-      return () => clearTimeout(timer);
-    }
-    prevTriggerRef.current = trigger;
-    return undefined;
-  }, [trigger]);
-
   return (
     <AnimatePresence>
-      {flash && (
+      {trigger > 0 && (
         <motion.div
+          key={trigger}
           data-testid="screen-flash"
+          data-trigger={trigger}
           initial={{ opacity: 0.1 }}
           animate={{ opacity: 0 }}
           exit={{ opacity: 0 }}

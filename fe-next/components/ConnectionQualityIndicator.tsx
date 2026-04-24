@@ -67,7 +67,7 @@ export const ConnectionQualityIndicator: React.FC<ConnectionQualityIndicatorProp
         const isFilled = i < filledCount;
         return (
           <div
-            key={i}
+            key={`bar-${i}`}
             data-testid={`signal-bar-${i}`}
             data-filled={isFilled ? 'true' : 'false'}
             className={cn(
