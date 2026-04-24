@@ -317,7 +317,7 @@ function ShadowClashTvInner({ socket }: { socket: Socket | null }) {
             <p className="text-neo-cream/30 font-neo-body text-xs uppercase mb-2">Eliminated</p>
             <div className="flex gap-2 justify-center">
               {eliminatedHistory.map((e, i) => (
-                <span key={i} className="text-neo-red/50 font-neo-body text-sm line-through">
+                <span key={`${e.username}-${i}`} className="text-neo-red/50 font-neo-body text-sm line-through">
                   {e.username} ({e.role === 'shadow' ? '🐺' : e.role === 'seer' ? '👁️' : e.role === 'medic' ? '🛡️' : '👤'})
                 </span>
               ))}

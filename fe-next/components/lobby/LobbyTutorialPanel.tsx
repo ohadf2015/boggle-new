@@ -81,7 +81,7 @@ export const LobbyTutorialPanel: React.FC<LobbyTutorialPanelProps> = ({ t }) => 
           <div className="flex gap-1.5">
             {TUTORIAL_STEPS.map((_, i) => (
               <div
-                key={i}
+                key={`step-${i}`}
                 className={`w-2 h-2 rounded-full transition-colors ${i === step ? 'bg-neo-cyan' : 'bg-neo-white/20'}`}
               />
             ))}

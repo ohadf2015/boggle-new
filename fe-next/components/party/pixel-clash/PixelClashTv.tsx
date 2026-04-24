@@ -231,7 +231,7 @@ function PixelClashTvInner({ socket }: { socket: Socket | null }) {
           ) : (
             <div className="flex gap-6">
               {[1, 2, 3].map(i => (
-                <div key={i} className="w-[250px] h-[250px] border-3 border-neo-cyan/20 border-dashed rounded-neo animate-pulse" />
+                <div key={`skel-${i}`} className="w-[250px] h-[250px] border-3 border-neo-cyan/20 border-dashed rounded-neo animate-pulse" />
               ))}
             </div>
           )}
@@ -322,7 +322,7 @@ function PixelClashTvInner({ socket }: { socket: Socket | null }) {
         <div className="flex flex-wrap gap-4 justify-center max-w-5xl">
           {chainData.chain.steps.map((step, i) => (
             <AdaptiveMotion.div
-              key={i}
+              key={`${step.username}-${i}`}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 1.5 }}

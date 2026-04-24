@@ -252,12 +252,12 @@ export const AchievementCinematic: React.FC<AchievementCinematicProps> = ({
         </div>
 
         {/* Platinum: reverse shatter converge */}
-        {tier === 'PLATINUM' && fragments.map((f, i) => {
+        {tier === 'PLATINUM' && fragments.map((f) => {
           // Reverse progress: fragments start scattered, converge to center
           const reverseFrame = Math.max(0, 60 - (frame - PHASE_FRAMES.COLOR_START));
           return (
             <ShatterFragment
-              key={i}
+              key={`${f.x}-${f.y}-${f.rotation}`}
               x={f.x}
               y={f.y}
               size={f.size}

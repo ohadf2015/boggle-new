@@ -191,7 +191,7 @@ function PixelCanvasInner({
           <div className="flex gap-1.5 flex-wrap justify-center">
             {COLORS.map((hex, i) => (
               <button
-                key={i}
+                key={hex}
                 onClick={() => setActiveColor(i)}
                 title={COLOR_NAMES[i]}
                 className={`

@@ -270,7 +270,7 @@ function ShadowClashPhoneInner({ socket, onSendInput }: ShadowClashPhoneProps) {
           <div className="mt-6 flex gap-1 justify-center">
             {[0, 1, 2].map(i => (
               <div
-                key={i}
+                key={`dot-${i}`}
                 className="w-2 h-2 bg-neo-purple/30 rounded-full animate-pulse"
                 style={{ animationDelay: `${i * 0.3}s` }}
               />

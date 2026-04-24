@@ -173,7 +173,7 @@ const PuzzleWordEditor: React.FC<PuzzleWordEditorProps> = ({
           <div className="flex justify-center gap-1">
             {Array.from({ length: MAX_WORD_LENGTH }).map((_, i) => (
               <AdaptiveMotion.div
-                key={i}
+                key={`char-${i}`}
                 initial={{ scale: 0 }}
                 animate={{
                   scale: 1,
