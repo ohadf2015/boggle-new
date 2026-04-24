@@ -385,7 +385,7 @@ export default function RareGems({
               )}>
                 {wordsFound.slice(-15).map((w, i) => (
                   <span
-                    key={i}
+                    key={`${w.word}-${i}`}
                     className={cn(
                       'px-3 py-1 rounded-neo border border-neo-black/30 text-sm font-bold text-neo-black',
                       RARITY_COLORS[w.rarity as keyof typeof RARITY_COLORS]

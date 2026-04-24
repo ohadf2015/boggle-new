@@ -283,7 +283,7 @@ export default function PatternSwitcher({
           <div className="flex items-center gap-1">
             {Array.from({ length: levelConfig.lives }).map((_, i) => (
               <div
-                key={i}
+                key={`life-${i}`}
                 className={cn(
                   'w-3 h-3 rounded-full border border-neo-black',
                   i < lives ? 'bg-neo-red' : 'bg-gray-300'
@@ -309,7 +309,7 @@ export default function PatternSwitcher({
         )}>
           {pattern.map((len, i) => (
             <div
-              key={i}
+              key={`step-${i}-${len}`}
               className={cn(
                 'w-8 h-8 rounded-lg border-2 border-neo-black flex items-center justify-center font-bold text-sm',
                 i < patternIndex ? 'bg-neo-green text-neo-black' :

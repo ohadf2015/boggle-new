@@ -349,7 +349,7 @@ export default function LightningRound({
               )}>
                 {wordsFound.slice(-10).map((word, i) => (
                   <span
-                    key={i}
+                    key={`${word}-${i}`}
                     className={cn(
                       'px-3 py-1 rounded-neo text-sm font-bold',
                       'bg-neo-green/20 text-neo-green border border-neo-green/30'

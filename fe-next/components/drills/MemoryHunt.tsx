@@ -84,7 +84,7 @@ export default function MemoryHunt({
           <div className="flex items-center gap-1">
             {Array.from({ length: game.levelConfig.lives }).map((_, i) => (
               <Heart
-                key={i}
+                key={`life-${i}`}
                 className={cn(
                   'w-5 h-5',
                   i < game.lives ? 'text-neo-red fill-neo-red' : 'text-gray-300'
@@ -338,7 +338,7 @@ export default function MemoryHunt({
               <div className="flex flex-wrap gap-2 justify-center min-h-[40px]">
                 {game.targetWords.map((tw, i) => (
                   <span
-                    key={i}
+                    key={`${tw.word}-${i}`}
                     className={cn(
                       'px-3 py-1.5 rounded-neo border-2 border-neo-black text-base font-bold min-w-[5ch] text-center',
                       tw.found

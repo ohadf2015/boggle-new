@@ -248,7 +248,7 @@ export default function ComboMaster({
           <div className="flex items-center gap-1">
             {Array.from({ length: MAX_COMBO_BREAKS }).map((_, i) => (
               <div
-                key={i}
+                key={`life-${i}`}
                 className={cn(
                   'w-3 h-3 rounded-full border border-neo-black',
                   i < (MAX_COMBO_BREAKS - comboBreaks)
