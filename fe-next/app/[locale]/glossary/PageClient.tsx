@@ -10,7 +10,7 @@ import { safeLocaleCompare } from '@/utils/bcp47Locale';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import AutoHideHeader from '@/components/AutoHideHeader';
-import { AdPlaceholder } from '@/components/ads';
+import { InlineBannerAd } from '@/components/ads';
 import { contentByLocale } from './content';
 
 export default function GlossaryPageClient(): React.ReactElement {
@@ -90,7 +90,7 @@ export default function GlossaryPageClient(): React.ReactElement {
           ))}
         </nav>
 
-        <AdPlaceholder zone="content-page" className="my-6" />
+        <InlineBannerAd webZone="content-page" className="my-6" />
 
         {/* Glossary Terms as Definition List */}
         <div data-speakable="true">
@@ -138,13 +138,13 @@ export default function GlossaryPageClient(): React.ReactElement {
                     </div>
                   ))}
                 </dl>
-                {li === 2 && <AdPlaceholder zone="content-page" className="mt-6" />}
+                {li === 2 && <InlineBannerAd webZone="content-page" className="mt-6" />}
               </section>
             );
           })}
         </div>
 
-        <AdPlaceholder zone="content-page" className="my-6" />
+        <InlineBannerAd webZone="content-page" className="my-6" />
       </main>
     </div>
   );

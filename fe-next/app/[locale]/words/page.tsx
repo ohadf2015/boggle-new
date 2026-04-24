@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { InlineBannerAd } from '@/components/ads';
 
 export const dynamic = 'force-dynamic';
 
@@ -127,6 +128,8 @@ export default async function WordsHubPage({ params }: PageParams) {
             ))}
           </div>
         </section>
+
+        <InlineBannerAd webZone="content-page" className="my-6" />
 
         {/* Words by Starting Letter */}
         <section className="mb-10">

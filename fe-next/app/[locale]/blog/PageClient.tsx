@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils';
 import { ArrowLeft, BookOpen, Clock, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import AutoHideHeader from '@/components/AutoHideHeader';
-import { AdPlaceholder } from '@/components/ads';
+import { InlineBannerAd } from '@/components/ads';
 
 interface BlogPost {
   slug: string;
@@ -755,7 +755,7 @@ export default function BlogIndexPageClient(): React.ReactElement {
         </div>
 
         {/* Ad: Between header and post grid */}
-        <AdPlaceholder zone="content-page" className="mb-6" />
+        <InlineBannerAd webZone="content-page" className="mb-6" />
 
         {/* Blog Posts Grid */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
