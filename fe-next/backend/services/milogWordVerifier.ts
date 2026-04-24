@@ -478,8 +478,9 @@ export async function markWordPromoted(wordId: string): Promise<boolean> {
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
 
-    const { error } = await supabase.rpc('mark_word_promoted_to_dictionary', {
+    const { error } = await supabase.rpc('mark_word_auto_promoted', {
       p_word_id: wordId,
+      p_source: 'milog_cron',
     });
 
     if (error) {

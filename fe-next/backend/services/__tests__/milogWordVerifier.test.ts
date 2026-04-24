@@ -3,12 +3,13 @@
  * Verifies Hebrew words against milog.co.il dictionary
  */
 
-import { vi, type Mock, type MockInstance } from 'vitest';
+import { vi } from 'vitest';
 import {
   verifyWordOnMilog,
   parseVerificationResult,
   processMilogVerificationQueue,
   invalidateMilogCache,
+  markWordPromoted,
 } from '../milogWordVerifier';
 
 // Mock ky — vi.hoisted() ensures mockGet is available when the hoisted vi.mock() runs
@@ -555,6 +556,37 @@ describe('MilogWordVerifier', () => {
 
       // Should not throw
       await expect(invalidateMilogCache('מילה')).resolves.toBeUndefined();
+    });
+  });
+
+  describe('markWordPromoted', () => {
+    beforeEach(() => {
+      process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://test.supabase.co';
+      process.env.SUPABASE_SERVICE_ROLE_KEY = 'test-service-key';
+    });
+
+    it('calls mark_word_auto_promoted RPC with milog_cron source (NOT ghost RPC)', async () => {
+      mockRpc.mockResolvedValueOnce({ error: null });
+
+      const result = await markWordPromoted('abc-123');
+
+      expect(mockRpc).toHaveBeenCalledWith('mark_word_auto_promoted', {
+        p_word_id: 'abc-123',
+        p_source: 'milog_cron',
+      });
+      expect(mockRpc).not.toHaveBeenCalledWith(
+        'mark_word_promoted_to_dictionary',
+        expect.anything(),
+      );
+      expect(result).toBe(true);
+    });
+
+    it('returns false when RPC returns an error', async () => {
+      mockRpc.mockResolvedValueOnce({ error: { message: 'boom' } });
+
+      const result = await markWordPromoted('abc-123');
+
+      expect(result).toBe(false);
     });
   });
 });
