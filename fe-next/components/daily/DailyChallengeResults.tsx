@@ -4,6 +4,7 @@ import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { markModePlayedLogic } from '@/hooks/useDailyModeQuest';
 import { motion, AnimatePresence } from 'framer-motion';
 import WatchAdButton from './WatchAdButton';
+import DoubleGoldAdButton from '@/components/ads/DoubleGoldAdButton';
 import CrazyGamesBanner from '@/components/CrazyGamesBanner';
 import { Share2, Flame, BookOpen, ArrowLeft, Copy, Check, Image as ImageIcon, ChevronDown, ChevronUp } from 'lucide-react';
 import { useDailyConfetti } from './results/useDailyConfetti';
@@ -250,6 +251,11 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
               coinsEarned={getRewardCoins(streak.currentStreak)}
               currentStreakDay={streak.currentStreak}
               t={t}
+            />
+            {/* Endowment anchoring: double the daily reward they just saw */}
+            <DoubleGoldAdButton
+              earnedAmount={getRewardCoins(streak.currentStreak)}
+              surface="daily_results_double"
             />
             <WatchAdButton onCoinsEarned={() => {}} t={t} surface="daily_challenge_results" />
           </>

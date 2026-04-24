@@ -83,6 +83,8 @@ export interface DesktopGameLayoutProps {
   // Quit dialog
   showQuitConfirm: boolean;
   setShowQuitConfirm: (show: boolean) => void;
+  /** Extend the game timer (rewarded-ad integration — desktop accepts but does not render). */
+  onExtendTime?: (seconds: number) => void;
   // Translation
   t: (key: string) => string | undefined;
 }
@@ -137,6 +139,7 @@ export function DesktopGameLayout({
   onConfirmQuit,
   showQuitConfirm,
   setShowQuitConfirm,
+  onExtendTime: _onExtendTime,
   t,
 }: DesktopGameLayoutProps): React.ReactElement {
   const validWords = React.useMemo(() => foundWords.filter(fw => fw.isValid === true), [foundWords]);

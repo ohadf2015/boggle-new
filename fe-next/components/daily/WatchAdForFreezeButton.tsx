@@ -19,6 +19,7 @@ interface WatchAdForFreezeButtonProps {
 const WatchAdForFreezeButton: React.FC<WatchAdForFreezeButtonProps> = ({ t, className = '', surface }) => {
   const { freezeCount, earnFreeze } = useStreakFreeze();
   const { showAd, status, isDailyLimitReached } = useRewardedAd({
+    rewardKind: 'feature',
     onRewardEarned: () => earnFreeze(),
   });
 

@@ -60,8 +60,11 @@ const BossRushResults = memo<BossRushResultsProps>(({ state, onRetry, onExit }) 
 
   const { showInterstitial } = useInterstitialAd();
   const { submitLeaderboardScore } = useCrazyGames();
-  // R5 — rewarded continue on failure
-  const rewarded = useRewardedAd({ onRewardEarned: () => onRetry() });
+  // R5 — rewarded continue on failure (feature reward, no coin payout)
+  const rewarded = useRewardedAd({
+    rewardKind: 'feature',
+    onRewardEarned: () => onRetry(),
+  });
 
   // Ads + leaderboard on mount
   useEffect(() => {

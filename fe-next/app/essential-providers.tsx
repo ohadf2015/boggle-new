@@ -31,6 +31,7 @@ import { linkLogRocketSession } from '@/utils/sentry';
 import { hasConsent } from '@/utils/cookieConsent';
 import { LogRocketIdentify } from '@/components/providers/LogRocketIdentify';
 import { PostHogProvider } from '@/components/providers/PostHogProvider';
+import GlobalCoinEarnFx from '@/components/animations/GlobalCoinEarnFx';
 
 
 import type { TranslationData } from '@/translations/loadTranslation';
@@ -186,6 +187,8 @@ export function EssentialProviders({ children, lang, initialTranslations }: Esse
                                             <AdMobProvider>
                                             <NavigationProvider>
                                                 {memoizedChildren}
+                                                {/* Global coin-earn VFX: sound + flying coins on every addCoins */}
+                                                <GlobalCoinEarnFx />
                                             </NavigationProvider>
                                             </AdMobProvider>
                                         </HapticsProvider>

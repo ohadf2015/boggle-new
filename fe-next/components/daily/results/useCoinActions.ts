@@ -79,6 +79,11 @@ export function useCoinActions({
     }
   }, [puzzleDate, language, spendCoins, costs]);
 
+  // Reveal without spending — used by the rewarded-ad paywall-softener flow
+  const handleRevealTargetWordViaAd = useCallback(() => {
+    setTargetWordRevealed(true);
+  }, []);
+
   // Handle retry challenge (costs coins)
   const handleRetryChallenge = useCallback(async () => {
     const cost = costs.DAILY_RETRY;
@@ -103,6 +108,7 @@ export function useCoinActions({
     revealCost: costs.REVEAL_TARGET_WORD,
     retryCost: costs.DAILY_RETRY,
     handleRevealTargetWord,
+    handleRevealTargetWordViaAd,
     handleRetryChallenge,
   };
 }

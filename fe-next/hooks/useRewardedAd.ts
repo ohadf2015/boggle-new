@@ -84,6 +84,14 @@ interface UseRewardedAdOptions {
   onAdError?: (error: string) => void;
   /** Callback when ad starts playing */
   onAdStarted?: () => void;
+  /**
+   * What the ad is rewarding.
+   * - 'coins' (default): hook auto-grants WATCH_AD coins via awardWatchedAd.
+   * - 'feature': hook does NOT grant coins — the caller's onRewardEarned is
+   *   the sole reward (e.g. retry, extra life, streak freeze, avatar part).
+   *   Prevents the double-reward bug where feature unlocks also paid coins.
+   */
+  rewardKind?: 'coins' | 'feature';
 }
 
 interface UseRewardedAdReturn {
@@ -132,7 +140,7 @@ interface UseRewardedAdReturn {
  * ```
  */
 export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAdReturn {
-  const { onRewardEarned, onAdError, onAdStarted } = options;
+  const { onRewardEarned, onAdError, onAdStarted, rewardKind = 'coins' } = options;
   const [status, setStatus] = useState<AdStatus>('idle');
   const [error, setError] = useState<string | null>(null);
   const [placeholderCooldownFlag, setPlaceholderCooldownFlag] = useState(() => isPlaceholderCapped());
@@ -189,7 +197,9 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
     // Determine platform for logging
     const platform = shouldUseCrazyGames ? 'crazygames' : shouldUseAdMob ? 'admob' : shouldUseSimulation ? 'simulation' : 'no-ad-placeholder';
 
-    // Award coins helper - uses unified CoinContext for auth/guest sync
+    // Award coins helper - uses unified CoinContext for auth/guest sync.
+    // For rewardKind='feature' we skip awardWatchedAd so feature unlocks
+    // (retry, extra life, streak freeze, etc.) don't silently also pay coins.
     const awardCoinsAndNotify = async () => {
       if (isPlaceholder) {
         recordPlaceholderView();
@@ -197,8 +207,11 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
       }
       recordDailyView();
       setDailyViewCount(getDailyViewCount());
-      const result = await awardWatchedAd(platform);
-      const awarded = result?.awarded ?? rewardAmount;
+      let awarded = 0;
+      if (rewardKind === 'coins') {
+        const result = await awardWatchedAd(platform);
+        awarded = result?.awarded ?? rewardAmount;
+      }
       trackRewardedAdWatched(platform, awarded);
       setStatus('completed');
       await onRewardEarned?.(awarded);
@@ -265,7 +278,7 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
       onAdStarted?.();
       awardCoinsAndNotify();
     }
-  }, [status, isPlaceholder, shouldUseCrazyGames, shouldUseAdMob, shouldUseSimulation, crazyGames, adMob, rewardAmount, onRewardEarned, onAdError, onAdStarted, awardWatchedAd]);
+  }, [status, isPlaceholder, shouldUseCrazyGames, shouldUseAdMob, shouldUseSimulation, crazyGames, adMob, rewardAmount, onRewardEarned, onAdError, onAdStarted, awardWatchedAd, rewardKind]);
 
   return {
     status,

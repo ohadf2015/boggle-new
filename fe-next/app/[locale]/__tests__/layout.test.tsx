@@ -124,7 +124,9 @@ describe('LocaleLayout Hydration', () => {
         // Check for skip link text which should always be present
         expect(container.textContent).toContain('Skip to main content');
 
-        // Verify no AdSense script is present (was removed for policy compliance)
+        // AdSense script must NOT load on localhost/dev/native WebView.
+        // GoogleAdSense.tsx gates itself on hostname + NODE_ENV + Capacitor, so
+        // under vitest (jsdom, localhost, NODE_ENV=test) no <script> should emit.
         const scripts = document.querySelectorAll('script');
         const adsenseScript = Array.from(scripts).find(s =>
             s.getAttribute('src')?.includes('adsbygoogle.js')

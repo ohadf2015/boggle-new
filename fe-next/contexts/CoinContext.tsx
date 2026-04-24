@@ -245,6 +245,15 @@ export function CoinProvider({ children }: { children: ReactNode }) {
   ): Promise<number> => {
     if (amount <= 0) return coins;
 
+    // Fire global coin-earned event so GlobalCoinEarnFx can play sound + fly coins
+    const fireCoinEarnedFx = () => {
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(
+          new CustomEvent('lexiclash:coin-earned', { detail: { amount } }),
+        );
+      }
+    };
+
     if (isAuthenticated && user) {
       const result = await syncCoinsToDatabase(user.id, amount, reason, metadata);
 
@@ -252,6 +261,7 @@ export function CoinProvider({ children }: { children: ReactNode }) {
         await refreshProfile();
         const { data: freshProfile } = await getProfile(user.id);
         coinEarnToast(amount, reason);
+        fireCoinEarnedFx();
         return freshProfile?.total_coins ?? result.newBalance ?? (coins + amount);
       } else {
         console.error('[CoinContext] Failed to add coins:', result.error);
@@ -262,6 +272,7 @@ export function CoinProvider({ children }: { children: ReactNode }) {
       const newTotal = addLocalCoins(amount, reason, metadata);
       setLocalCoins(newTotal);
       coinEarnToast(amount, reason);
+      fireCoinEarnedFx();
       return newTotal;
     }
   }, [isAuthenticated, user, coins, refreshProfile]);

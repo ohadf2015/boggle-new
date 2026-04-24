@@ -62,6 +62,7 @@ export function CoinBalance({
     <div
       role="status"
       aria-label={`Coin balance: ${coins.toLocaleString()}`}
+      data-coin-counter="true"
       className={cn(
         // Base layout
         'relative inline-flex items-center font-bold rounded-neo-lg overflow-hidden',
