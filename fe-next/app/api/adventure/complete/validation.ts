@@ -3,8 +3,8 @@
  * Split from route.ts so the handler stays under 500 lines.
  */
 
-export const MAX_SCORE = 50000;
-export const MAX_WORDS = 500;
+const MAX_SCORE = 50000;
+const MAX_WORDS = 500;
 export const MIN_TIME_PLAYED_SECONDS = 10;
 
 export interface ValidatedCompletionData {

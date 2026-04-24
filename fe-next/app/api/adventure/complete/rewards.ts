@@ -5,11 +5,11 @@
 
 import { getUpgradeEffect, getUpgradeTier, type UpgradeState } from '@/lib/adventure/upgradeConfig';
 
-export const XP_PER_STAR = 25;
-export const BASE_COMPLETION_XP = 50;
-export const MAX_GOLD_PER_LEVEL = 500;
+const XP_PER_STAR = 25;
+const BASE_COMPLETION_XP = 50;
+const MAX_GOLD_PER_LEVEL = 500;
 export const DAILY_GOLD_CAP = 5000;
-export const FLASH_CHALLENGE_GOLD = 25;
+const FLASH_CHALLENGE_GOLD = 25;
 const LONG_WORD_MIN_LENGTH = 6;
 const LONG_WORD_CLAMP = 20;
 
