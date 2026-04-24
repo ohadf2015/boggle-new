@@ -204,7 +204,7 @@ WORD3
                   </summary>
                   <div className="mt-2 max-h-32 overflow-y-auto text-xs text-gray-500 font-mono">
                     {result.errorDetails.slice(0, 20).map((err, i) => (
-                      <div key={i}>
+                      <div key={`err-${i}-${err.word}`}>
                         {err.word}: {err.error}
                       </div>
                     ))}

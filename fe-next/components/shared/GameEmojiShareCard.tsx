@@ -254,7 +254,7 @@ export const GameEmojiShareCard: React.FC<GameEmojiShareCardProps> = ({ data, t,
       {/* Emoji rows */}
       <div className="space-y-1 mb-3 text-base leading-relaxed">
         {emojiRows.map((row, idx) => (
-          <div key={idx}>{row}</div>
+          <div key={`row-${idx}-${row}`}>{row}</div>
         ))}
       </div>
 

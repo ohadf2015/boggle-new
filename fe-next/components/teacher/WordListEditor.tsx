@@ -103,7 +103,7 @@ export default function WordListEditor({
           <div className="space-y-2">
             {words.map((word, idx) => (
               <div
-                key={idx}
+                key={`word-${idx}-${word.word}`}
                 className="bg-neo-navy/50 p-2 rounded border border-neo-black"
               >
                 <div className="flex items-center justify-between">

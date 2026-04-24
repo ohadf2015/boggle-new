@@ -29,7 +29,7 @@ export function DuelMonitoringPanel({ classroomId }: DuelMonitoringPanelProps) {
       <div className="space-y-3">
         {[1, 2, 3].map(i => (
           <div
-            key={i}
+            key={`skeleton-${i}`}
             className="h-16 bg-neo-white/5 rounded-neo animate-pulse"
             data-testid="duel-skeleton"
           />

@@ -222,7 +222,7 @@ export default function FlashcardReview({
             <div className="bg-neo-black/30 rounded-neo p-4 mb-6 max-h-40 overflow-y-auto">
               {words.map((word, idx) => (
                 <div
-                  key={idx}
+                  key={`word-${idx}-${word.word}`}
                   className="flex items-center justify-between py-1 text-sm"
                 >
                   <span className="text-neo-white font-neo-body">{word.word}</span>

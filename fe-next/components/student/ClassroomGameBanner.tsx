@@ -231,7 +231,7 @@ export function ClassroomGameBanner({
           <div className="flex flex-wrap gap-2 mb-4">
             {activeGame.lessonNames.map((name, idx) => (
               <span
-                key={idx}
+                key={`lesson-${idx}-${name}`}
                 className="px-3 py-1 text-sm font-black bg-neo-pink border-2 border-black text-black rounded-neo shadow-hard-sm"
               >
                 {name}

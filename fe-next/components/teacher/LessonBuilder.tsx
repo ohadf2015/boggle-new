@@ -255,7 +255,7 @@ export default function LessonBuilder() {
                 <CardContent className="flex-1 flex flex-col">
                   <div className="space-y-2 flex-1">
                     {lesson.words.slice(0, 5).map((word, idx) => (
-                      <div key={idx} className="flex items-center gap-2 text-sm">
+                      <div key={`word-${idx}-${word.word}`} className="flex items-center gap-2 text-sm">
                         {word.canIntegrate ? (
                           <CheckCircle className="w-4 h-4 text-neo-cyan shrink-0" />
                         ) : (

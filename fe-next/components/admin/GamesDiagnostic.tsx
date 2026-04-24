@@ -108,7 +108,7 @@ export function GamesDiagnostic({ authToken }: GamesDiagnosticProps) {
                 {data.interpretation.recommendations.length > 0 && (
                   <ul className="space-y-1 text-sm">
                     {data.interpretation.recommendations.map((rec: string, idx: number) => (
-                      <li key={idx} className="flex items-start gap-2">
+                      <li key={`rec-${idx}-${rec}`} className="flex items-start gap-2">
                         <span className="text-yellow-400">→</span>
                         <span>{rec}</span>
                       </li>
@@ -247,7 +247,7 @@ function TableCard({ tableName, data }: { tableName: string; data: TableCardData
           <div className="text-xs text-slate-500 mb-1">Recent games (latest 5):</div>
           <div className="space-y-1">
             {data.recentGames.slice(0, 3).map((game, idx) => (
-              <div key={idx} className="text-xs text-slate-400 font-mono flex items-center justify-between">
+              <div key={`game-${game.id ?? idx}`} className="text-xs text-slate-400 font-mono flex items-center justify-between">
                 <span>{game.id?.substring(0, 8)}...</span>
                 <span className="text-slate-500">
                   {(() => {

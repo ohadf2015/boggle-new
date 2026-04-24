@@ -82,7 +82,7 @@ export function VocabularyCardEnriched({
           </h4>
           <ul className="space-y-2">
             {word.examples.map((example, index) => (
-              <li key={index} className="flex gap-2">
+              <li key={`ex-${index}-${example.text}`} className="flex gap-2">
                 <span className="text-neo-pink font-bold select-none" aria-hidden="true">
                   &bull;
                 </span>
@@ -118,7 +118,7 @@ export function VocabularyCardEnriched({
           >
             <ul className="space-y-2">
               {word.contextualExamples.map((example, index) => (
-                <li key={index} className="flex gap-2">
+                <li key={`ctx-ex-${index}-${example.text}`} className="flex gap-2">
                   <span className="text-neo-orange font-bold select-none" aria-hidden="true">
                     &bull;
                   </span>

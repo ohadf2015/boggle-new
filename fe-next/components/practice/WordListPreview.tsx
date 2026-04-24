@@ -122,7 +122,7 @@ export default function WordListPreview({
           ) : (
             filteredWords.map((word, idx) => (
               <Card
-                key={idx}
+                key={`word-${idx}-${word.word}`}
                 onClick={() => handleToggleExpand(word.word)}
                 className={cn(
                   'border-neo border-neo-black shadow-hard cursor-pointer',
