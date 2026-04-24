@@ -43,7 +43,7 @@ export function AdventureUpgradeHUD({ upgradeState, upgradeTriggered }: Adventur
             <div className="flex gap-0.5 mt-0.5">
               {Array.from({ length: maxTier }, (_, i) => (
                 <div
-                  key={i}
+                  key={`tier-pip-${i}`}
                   className={`w-1 h-1 rounded-full ${
                     i < tier ? 'bg-neo-lime' : 'bg-neo-navy-light'
                   }`}

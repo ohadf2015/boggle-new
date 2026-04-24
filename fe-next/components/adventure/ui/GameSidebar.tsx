@@ -201,7 +201,7 @@ export const GameSidebar = memo(function GameSidebar({
             'bg-neo-black/30 border-neo-white/8'
           )}>
             {[0, 1, 2].map(i => (
-              <Star key={i} className={cn('w-3.5 h-3.5 transition-all duration-300', i < currentStars ? 'text-neo-yellow fill-neo-yellow' : 'text-neo-white/20')} />
+              <Star key={`star-mobile-${i}`} className={cn('w-3.5 h-3.5 transition-all duration-300', i < currentStars ? 'text-neo-yellow fill-neo-yellow' : 'text-neo-white/20')} />
             ))}
           </div>
 
@@ -371,7 +371,7 @@ export const GameSidebar = memo(function GameSidebar({
         {/* Star Projection — centered with subtle glow */}
         <div className="flex items-center justify-center gap-2.5 py-2">
           {[0, 1, 2].map(i => (
-            <Star key={i} className={cn(
+            <Star key={`star-desktop-${i}`} className={cn(
               'transition-all duration-300',
               i < currentStars
                 ? 'w-6 h-6 text-neo-yellow fill-neo-yellow'

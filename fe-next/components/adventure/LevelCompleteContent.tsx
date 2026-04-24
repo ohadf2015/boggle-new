@@ -277,7 +277,7 @@ const LevelCompleteContent = memo<LevelCompleteContentProps>(({
             </p>
             <div className="space-y-1.5">
               {nearMisses.map((msg, i) => (
-                <div key={i} className="text-sm text-neo-white/80 font-bold">
+                <div key={`miss-${i}-${msg.translationKey}`} className="text-sm text-neo-white/80 font-bold">
                   {t(msg.translationKey, msg.params)}
                 </div>
               ))}

@@ -39,7 +39,7 @@ export default function AdventureHuntClueBoxes({
           const cls = fb ? feedbackClass[fb] : 'bg-neo-navy text-neo-white';
           return (
             <div
-              key={i}
+              key={`clue-${i}`}
               data-testid={`hunt-clue-box-${i}`}
               data-feedback={fb ?? 'empty'}
               className={`w-8 h-10 border-neo rounded-neo shadow-hard-sm flex items-center justify-center font-neo-display text-lg uppercase ${cls}`}

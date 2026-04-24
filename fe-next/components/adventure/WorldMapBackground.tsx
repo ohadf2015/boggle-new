@@ -114,7 +114,7 @@ export function WorldMapBackground({
       {!skipBlur && <div className="fixed inset-0 pointer-events-none overflow-hidden">
         {nebulaClouds.map((nebula, i) => (
           <div
-            key={i}
+            key={`nebula-${i}-${nebula.left}`}
             className="world-map-nebula"
             style={{
               left: nebula.left,
@@ -133,7 +133,7 @@ export function WorldMapBackground({
       {!isLowEnd && <div className="fixed inset-0 pointer-events-none overflow-hidden">
         {shootingStars.map((star, i) => (
           <div
-            key={i}
+            key={`shooting-${i}-${star.startX}-${star.startY}`}
             className="world-map-shooting-star"
             style={{
               left: `${star.startX}%`,

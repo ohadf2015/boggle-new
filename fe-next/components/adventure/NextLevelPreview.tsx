@@ -56,7 +56,7 @@ export function NextLevelPreview({
             {objectives.length > 0 && (
               <ul className="text-sm text-neo-white/70 space-y-1 mb-3">
                 {objectives.map((key, i) => (
-                  <li key={i} className="flex items-center gap-1.5">
+                  <li key={`obj-${i}-${key}`} className="flex items-center gap-1.5">
                     <ChevronRight className="w-3 h-3 text-neo-cyan rtl:scale-x-[-1]" />
                     <span>{t(key)}</span>
                   </li>

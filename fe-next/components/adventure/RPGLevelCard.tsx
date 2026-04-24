@@ -152,7 +152,7 @@ const RPGLevelCard = memo(function RPGLevelCard({
               const isFilled = i < stars;
               return (
                 <Star
-                  key={i}
+                  key={`star-${i}`}
                   data-testid={isFilled ? 'star-filled' : 'star-empty'}
                   className={cn(
                     'transition-all duration-300',
@@ -183,7 +183,7 @@ const RPGLevelCard = memo(function RPGLevelCard({
           {isBoss && (
             <div data-testid="difficulty-skulls" className="flex items-center gap-1 mt-1">
               {[1, 2, 3].map((i) => (
-                <Skull key={i} className="w-3 h-3 text-neo-red/60" />
+                <Skull key={`skull-${i}`} className="w-3 h-3 text-neo-red/60" />
               ))}
             </div>
           )}

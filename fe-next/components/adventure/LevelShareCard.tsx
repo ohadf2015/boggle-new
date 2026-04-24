@@ -91,7 +91,7 @@ export function LevelShareCard(props: LevelShareCardProps) {
         <div className="text-xl tracking-wider" aria-label={`${stars} of 3 stars`}>
           {Array.from({ length: 3 }, (_, i) => (
             <AdaptiveMotion.span
-              key={i}
+              key={`star-${i}`}
               initial={{ scale: 0, rotate: -30 }}
               animate={{ scale: 1, rotate: 0 }}
               transition={{ delay: 0.2 + i * 0.1, type: 'spring', stiffness: 300 }}

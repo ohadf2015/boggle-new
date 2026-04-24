@@ -250,9 +250,9 @@ function ScatterEffect({ config }: { config: AttackEffectConfig }) {
   ];
   return (
     <>
-      {particles.map((p, i) => (
+      {particles.map((p) => (
         <AdaptiveMotion.div
-          key={i}
+          key={`particle-${p.x}-${p.y}-${p.delay}`}
           className="absolute top-1/2 left-1/2 w-3 h-3 rounded-sm"
           initial={{ x: 0, y: 0, opacity: 1, scale: 0.5, rotate: 0 }}
           animate={{ x: p.x, y: p.y, opacity: 0, scale: [0.5, 1.2, 0], rotate: p.r * 10 }}

@@ -10,7 +10,6 @@
 
 import { memo, useMemo, useRef } from 'react';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
-import Image from 'next/image';
 import { Star, RotateCcw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -246,7 +245,7 @@ const BossVictory = memo<BossVictoryProps>(
             {/* Stars */}
             <div className="flex justify-center gap-2 mb-4">
               {STAR_SLOTS.map((i) => (
-                <BossStarDisplay key={i} filled={i < stars} index={i} />
+                <BossStarDisplay key={`star-${i}`} filled={i < stars} index={i} />
               ))}
             </div>
 
@@ -301,13 +300,16 @@ const BossVictory = memo<BossVictoryProps>(
               animate={{ scale: 1, rotate: 0 }}
               transition={{ delay: 0.7, type: 'spring', stiffness: 200, damping: 14 }}
             >
-              <Image
-                src={isVictory ? '/mascot/flexing.gif' : '/mascot/encouraging.gif'}
-                alt=""
+              <video
+                src={isVictory ? '/mascot/flexing.mp4' : '/mascot/encouraging.mp4'}
                 width={80}
                 height={80}
                 className="drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]"
-                unoptimized
+                autoPlay
+                loop
+                muted
+                playsInline
+                preload="metadata"
                 aria-hidden="true"
               />
             </AdaptiveMotion.div>

@@ -176,7 +176,7 @@ function UpgradeCard({ upgrade, tier, nextCost, canAfford, isFlashing, onPurchas
       <div className="flex items-center gap-1">
         {upgrade.tiers.map((_, i) => (
           <div
-            key={i}
+            key={`tier-pip-${i}`}
             className={cn(
               'h-2 flex-1 rounded-full border border-neo-black/40',
               i < tier ? 'bg-neo-lime' : 'bg-neo-white/10'

@@ -85,7 +85,7 @@ export function AdventureTutorial({ onComplete }: AdventureTutorialProps) {
           <div className="flex justify-center gap-1.5 mb-4">
             {Array.from({ length: totalSteps }, (_, i) => (
               <div
-                key={i}
+                key={`step-${i}`}
                 className={`w-2 h-2 rounded-full transition-colors ${
                   i === step ? 'bg-neo-lime' : i < step ? 'bg-neo-lime/40' : 'bg-neo-white/20'
                 }`}

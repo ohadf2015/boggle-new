@@ -196,7 +196,7 @@ export const BossDefeatCinematic: React.FC<BossDefeatCinematicProps> = ({
       >
         {fragments.map((f, i) => (
           <ShatterFragment
-            key={i}
+            key={`fragment-${i}-${f.x}-${f.y}`}
             x={f.x}
             y={f.y}
             size={f.size}

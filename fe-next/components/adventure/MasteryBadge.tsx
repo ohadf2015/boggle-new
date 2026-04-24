@@ -51,7 +51,7 @@ export function MasteryBadge({ tier }: MasteryBadgeProps): React.JSX.Element | n
       <span className="flex gap-0.5">
         {Array.from({ length: 5 }, (_, i) => (
           <span
-            key={i}
+            key={`pip-${i}`}
             data-pip={i < tier ? 'filled' : 'empty'}
             className={cn(
               'w-1.5 h-1.5 rotate-45',
