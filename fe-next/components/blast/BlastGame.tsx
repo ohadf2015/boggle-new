@@ -17,7 +17,7 @@ import { BlastStage } from './BlastStage';
 import { BlastWaveIntro } from './BlastWaveIntro';
 import { BlastSugarCrushFinale } from './BlastSugarCrushFinale';
 import { BlastMoveWarningMascot } from './BlastMoveWarningMascot';
-import { GameParticles } from '@/components/effects/GameParticles';
+import { BlastFxBridge } from './BlastFxBridge';
 import { type BlastComboType, type SpecialCombo } from './utils/blastCombos';
 import { getWaveObjectives, type WaveConfig } from './utils/blastWaveConfig';
 import { getComboMultiplier } from '@/shared/utils/scoring';
@@ -437,10 +437,11 @@ export function BlastGame({
 
   return (
     <div className="blast-game relative flex-1 flex flex-col h-full" data-testid="blast-game-root">
-      {/* Particle effects — self-gate on device performance */}
-      <GameParticles preset="wordFound" trigger={wordFoundParticle} />
-      <GameParticles preset="comboBreak" trigger={comboParticle} />
-      <GameParticles preset="victory" trigger={waveClearParticle} />
+      <BlastFxBridge
+        wordFoundCounter={wordFoundParticle}
+        comboBreakCounter={comboParticle}
+        waveClearCounter={waveClearParticle}
+      />
 
       {waveConfig?.archetype && (
         <BlastWaveIntro waveNumber={waveNumber} archetype={waveConfig.archetype} t={tAdapter} />

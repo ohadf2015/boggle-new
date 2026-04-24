@@ -15,7 +15,10 @@ type PresetName =
   | 'chain-burst'
   | 'word-trail'
   | 'celebration'
-  | 'level-up-burst';
+  | 'level-up-burst'
+  | 'word-found'
+  | 'combo-break'
+  | 'victory-burst';
 
 // Palette drawn from neo-brutalist design system (no #).
 const LIME = 'BFFF00';
@@ -161,6 +164,59 @@ export const PRESETS: Record<PresetName, ParticleConfig> = {
     spawnShape: 'burst',
     blendMode: 'normal',
     shape: 'diamond',
+  },
+
+  // Blast: word-found — gentle lime/yellow shower with gravity.
+  'word-found': {
+    maxParticles: 24,
+    frequency: 0,
+    emitterLifetime: 0.01,
+    particlesPerWave: 16,
+    lifetime: { min: 0.6, max: 0.8 },
+    speed: { min: 240, max: 480 },
+    gravity: { x: 0, y: 360 },
+    scale: { start: 1, end: 0 },
+    alpha: { start: 1, end: 0 },
+    rotationSpeed: { min: 3, max: 6 },
+    colors: [LIME, YELLOW, 'FFFFFF'],
+    spawnShape: 'burst',
+    blendMode: 'add',
+    shape: 'diamond',
+  },
+
+  // Blast: combo-break — sharp radial, no gravity, short lifetime.
+  'combo-break': {
+    maxParticles: 24,
+    frequency: 0,
+    emitterLifetime: 0.01,
+    particlesPerWave: 16,
+    lifetime: { min: 0.4, max: 0.6 },
+    speed: { min: 480, max: 900 },
+    scale: { start: 1.1, end: 0 },
+    alpha: { start: 1, end: 0 },
+    rotationSpeed: { min: 4, max: 8 },
+    colors: [PINK, LIME],
+    spawnShape: 'burst',
+    blendMode: 'add',
+    shape: 'diamond',
+  },
+
+  // Blast: victory-burst — staggered celebration, 5-color stars.
+  'victory-burst': {
+    maxParticles: 40,
+    frequency: 0,
+    emitterLifetime: 0.01,
+    particlesPerWave: 32,
+    lifetime: { min: 1.2, max: 1.5 },
+    speed: { min: 300, max: 900 },
+    gravity: { x: 0, y: 180 },
+    scale: { start: 1, end: 0 },
+    alpha: { start: 1, end: 0 },
+    rotationSpeed: { min: 3, max: 8 },
+    colors: [YELLOW, GOLD, PINK, CYAN, LIME],
+    spawnShape: 'burst',
+    blendMode: 'add',
+    shape: 'star',
   },
 };
 
