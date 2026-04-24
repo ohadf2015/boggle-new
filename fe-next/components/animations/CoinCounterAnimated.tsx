@@ -37,26 +37,7 @@ interface CoinCounterAnimatedProps {
  * - Shimmer shine effect
  * - Performance-optimized for all devices
  *
- * Use as the target for CoinTrajectory component.
- *
- * @example
- * ```tsx
- * const coinCounterRef = useRef<HTMLDivElement>(null);
- *
- * <CoinCounterAnimated
- *   ref={coinCounterRef}
- *   value={coins}
- *   previousValue={prevCoins}
- *   showImpact
- *   showAddedIndicator
- * />
- *
- * <CoinTrajectory
- *   coinCount={5}
- *   startPosition={sourcePos}
- *   targetRef={coinCounterRef}
- * />
- * ```
+ * Add `data-coin-counter="true"` attribute so GlobalCoinEarnFx can target it.
  */
 export const CoinCounterAnimated = forwardRef<HTMLDivElement, CoinCounterAnimatedProps>(
   function CoinCounterAnimated(

@@ -4,7 +4,7 @@
  * CoinSpendAnimation - Visual feedback when spending coins
  *
  * Shows a "drain" effect with coins flying outward and fading away.
- * Opposite visual to CoinBurstSource (earning animation).
+ * Opposite visual to the earning burst (GlobalCoinEarnFx).
  *
  * @example
  * ```tsx

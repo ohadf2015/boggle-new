@@ -7,14 +7,7 @@
  */
 
 // Coin Animations
-export { CoinTrajectory } from './CoinTrajectory';
-export { CoinBurstSource } from './CoinBurstSource';
 export { CoinCounterAnimated } from './CoinCounterAnimated';
-export {
-  CoinAnimationProvider,
-  useCoinAnimation,
-  CoinCounterWithAnimation,
-} from './CoinAnimationSystem';
 
 // Gameplay Animations
 export { WordPathTrail } from './WordPathTrail';

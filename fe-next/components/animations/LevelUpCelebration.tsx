@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils';
 import { fireConfetti } from '@/utils/confettiUtils';
 import { Star, Trophy, Crown, Sparkles } from 'lucide-react';
 import { CelebrationMascotWithEntrance } from '@/components/ui/CelebrationMascot';
+import { SharedFxApp } from '@/lib/pixiFx/SharedFxApp';
 
 interface LevelUpCelebrationProps {
   /** New level reached */
@@ -68,6 +69,7 @@ export function LevelUpCelebration({
   const { isLowEnd, prefersReducedMotion, enableGlowEffects, enableComplexAnimations } =
     useDevicePerformance();
   const containerRef = useRef<HTMLDivElement>(null);
+  const badgeRef = useRef<HTMLDivElement>(null);
   const timelineRef = useRef<{ kill: () => void } | null>(null);
   const [phase, setPhase] = useState<'flash' | 'badge' | 'reveal' | 'rewards' | 'done'>('flash');
 
@@ -190,6 +192,18 @@ export function LevelUpCelebration({
     return () => clearTimeout(timer);
   }, [show, autoDismissAfter, onDismiss]);
 
+  // Pixi particle burst bridge (replaces 8 framer-motion divs)
+  useEffect(() => {
+    if (!show) return;
+    if (prefersReducedMotion || isLowEnd || !enableComplexAnimations) return;
+    const el = badgeRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const x = rect.left + rect.width / 2;
+    const y = rect.top + rect.height / 2;
+    SharedFxApp.spawnBurst('level-up-burst', x, y);
+  }, [show, prefersReducedMotion, isLowEnd, enableComplexAnimations]);
+
   // Reduced motion variant
   if (prefersReducedMotion && show) {
     return (
@@ -256,7 +270,7 @@ export function LevelUpCelebration({
           {/* Main content */}
           <div className="relative z-10 text-center px-4">
             {/* Badge container */}
-            <div className="level-badge relative inline-block mb-6">
+            <div ref={badgeRef} className="level-badge relative inline-block mb-6">
               {/* Rotating ring */}
               {!isLowEnd && (
                 <motion.div
@@ -287,40 +301,7 @@ export function LevelUpCelebration({
                 </span>
               </div>
 
-              {/* Particle burst */}
-              {enableComplexAnimations && !isLowEnd && phase !== 'flash' && (
-                <>
-                  {[...Array(8)].map((_, i) => {
-                    const angle = (360 / 8) * i;
-                    const radians = (angle * Math.PI) / 180;
-                    return (
-                      <motion.div
-                        key={i}
-                        className="absolute w-3 h-3 bg-neo-lime border-2 border-neo-black"
-                        style={{
-                          left: '50%',
-                          top: '50%',
-                          marginLeft: -6,
-                          marginTop: -6,
-                        }}
-                        initial={{ x: 0, y: 0, scale: 0, opacity: 1 }}
-                        animate={{
-                          x: Math.cos(radians) * 80,
-                          y: Math.sin(radians) * 80,
-                          scale: [0, 1.5, 0],
-                          opacity: [1, 1, 0],
-                          rotate: 180,
-                        }}
-                        transition={{
-                          duration: 0.8,
-                          delay: 0.3 + i * 0.05,
-                          ease: 'easeOut',
-                        }}
-                      />
-                    );
-                  })}
-                </>
-              )}
+              {/* Particle burst — dispatched via SharedFxApp.spawnBurst('level-up-burst') */}
             </div>
 
             {/* Title */}
