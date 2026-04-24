@@ -4,6 +4,7 @@ import { loadTranslation } from '@/translations/loadTranslation';
 import { generatePageMetadata } from '@/lib/seo/generatePageMetadata';
 import { DAILY_CHALLENGE_EPOCH } from '@/utils/dailyChallenge/constants';
 import { safeToLocaleDateString } from '@/utils/bcp47Locale';
+import { InlineBannerAd } from '@/components/ads';
 
 export const dynamic = 'force-dynamic';
 
@@ -124,8 +125,10 @@ export default async function DailyArchivePage({ params }: PageParams) {
             </p>
           </div>
 
+          <InlineBannerAd webZone="content-page" className="mb-6" />
+
           {/* Grouped by month */}
-          {Object.entries(groupedByMonth).map(([monthKey, entries]) => (
+          {Object.entries(groupedByMonth).map(([monthKey, entries], monthIdx) => (
             <section key={monthKey} className="mb-8">
               <h2 className="text-lg font-neo-display font-bold text-neo-cyan mb-3 border-b border-slate-700/50 pb-1">
                 {formatMonth(monthKey)}
@@ -151,6 +154,7 @@ export default async function DailyArchivePage({ params }: PageParams) {
                   </Link>
                 ))}
               </div>
+              {monthIdx === 2 && <InlineBannerAd webZone="content-page" className="mt-6" />}
             </section>
           ))}
         </div>

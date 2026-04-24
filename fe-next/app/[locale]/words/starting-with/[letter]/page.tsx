@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { InlineBannerAd } from '@/components/ads';
 import {
   getWordsByLetter,
   groupByLength,
@@ -354,6 +355,8 @@ export default async function StartingWithLetterPage({ params }: PageParams) {
               </div>
             ))}
           </div>
+
+          <InlineBannerAd webZone="content-page" className="mt-10" />
 
           {/* FAQ section — renders as FAQ rich snippet in Google */}
           <ScrollReveal className="mt-12 pt-8 border-t-2 border-slate-700">

@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { calculateWordScore, getComboBonus } from '@/shared/utils/scoring';
+import { InlineBannerAd } from '@/components/ads';
 
 export const dynamic = 'force-dynamic';
 
@@ -230,6 +231,8 @@ export default async function WordExplorerPage({ params }: PageParams) {
               </div>
             )}
           </div>
+
+          <InlineBannerAd webZone="content-page" className="mb-6" />
 
           {/* Word facts */}
           <div className="bg-slate-900 border-2 border-neo-black rounded-neo p-4 mb-6 shadow-hard-sm">

@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils';
 import { ArrowLeft, Calendar, Clock, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import AutoHideHeader from '@/components/AutoHideHeader';
-import { AdPlaceholder } from '@/components/ads';
+import { InlineBannerAd } from '@/components/ads';
 import { RelatedArticles } from '@/components/blog/RelatedArticles';
 import { contentByLocale } from './content';
 import { faqByLocale, faqHeadingByLocale } from './faq';
@@ -162,7 +162,7 @@ export default function BoggleAlternativesPageClient(): React.ReactElement {
           </div>
         </header>
 
-        <AdPlaceholder zone="content-page" className="my-6" />
+        <InlineBannerAd webZone="content-page" className="my-6" />
 
         {/* Table of Contents */}
         <nav
@@ -282,7 +282,7 @@ export default function BoggleAlternativesPageClient(): React.ReactElement {
             </div>
           ))}
 
-          <AdPlaceholder zone="content-page" className="my-6" />
+          <InlineBannerAd webZone="content-page" className="my-6" />
 
           {/* FAQ Section */}
           <section className="mt-12" id="faq">
