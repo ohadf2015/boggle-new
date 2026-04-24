@@ -9,6 +9,7 @@ import type { BlastTileState, BlastTileType } from '@/shared/types/blast';
 import type { BlastGameConfig } from '@/components/blast/types';
 import { generateTileStates, nextTileUid } from '@/components/blast/utils/blastTileGeneration';
 import { generateSeededLetterGrid } from '@/components/blastEngine/utils/blastWordSeeder';
+import { hasWordInMemoryCache } from '@/hooks/useDictionaryCache';
 import type { Language } from '@/shared/types/game';
 
 // ─── Types ────────────────────────────────────────────────────────────
@@ -69,6 +70,17 @@ async function isValidWord(word: string, lang: Language): Promise<boolean> {
   const key = `${lang}:${word.toLowerCase()}`;
   const cached = dictionaryCache.get(key);
   if (cached !== undefined) return cached;
+
+  // Fast path: shared prewarmed dict Set covers the base-dictionary branch of
+  // server validation. A positive hit is safe to early-accept because it's a
+  // subset of the server's `dict || community || positiveScore` rule. A miss
+  // (or null when prewarm hasn't finished) falls through to the API so
+  // community-validated words still resolve correctly.
+  const memoryHit = hasWordInMemoryCache(word, lang);
+  if (memoryHit === true) {
+    dictionaryCache.set(key, true);
+    return true;
+  }
 
   // Deduplicate in-flight requests for the same word
   const pending = pendingRequests.get(key);

@@ -235,6 +235,44 @@ export async function prewarmDictionary(language: Language): Promise<void> {
 }
 
 /**
+ * Synchronous memory-only lookup for hot-path validators (e.g. blast mode).
+ *
+ *  - `true`  → dict is loaded and word is in it (safe to accept instantly)
+ *  - `false` → dict is loaded and word is definitively missing
+ *  - `null`  → dict not warmed yet; caller MUST fall back to server API so
+ *              community-validated words still get accepted
+ *
+ * Callers must NOT treat `false` as a hard reject — community-validated words
+ * bypass the base dict and only resolve via the server. `false` is useful for
+ * short-circuiting UI hints, not for rejecting submits.
+ */
+export function hasWordInMemoryCache(word: string, language: Language): boolean | null {
+  const dict = memoryCache.get(language);
+  if (!dict) return null;
+  const normalized = word.toLowerCase().trim();
+  if (dict.has(normalized)) return true;
+  if (language === 'he') {
+    const base = normalizeHebrewWord(normalized);
+    if (dict.has(base)) return true;
+    const withSofit = applyHebrewFinalLetters(base);
+    if (dict.has(withSofit)) return true;
+  }
+  return false;
+}
+
+/**
+ * Test-only: reset module-level caches and optionally seed the memory cache.
+ * Do not call from production code.
+ */
+export function __resetDictionaryCacheForTests(seed?: Map<Language, Set<string>>): void {
+  memoryCache.clear();
+  loadingPromises.clear();
+  if (seed) {
+    for (const [lang, set] of seed) memoryCache.set(lang, set);
+  }
+}
+
+/**
  * Hook for client-side dictionary caching
  */
 export function useDictionaryCache(language: Language): UseDictionaryCacheReturn {
