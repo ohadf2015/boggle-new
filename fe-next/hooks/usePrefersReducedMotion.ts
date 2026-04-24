@@ -19,7 +19,7 @@ import { useState, useEffect } from 'react';
  * ```tsx
  * const prefersReducedMotion = usePrefersReducedMotion();
  *
- * <motion.div
+ * <m.div
  *   animate={prefersReducedMotion ? {} : { scale: 1.1 }}
  * />
  * ```
