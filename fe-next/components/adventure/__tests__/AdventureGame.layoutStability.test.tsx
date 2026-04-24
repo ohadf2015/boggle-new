@@ -68,15 +68,21 @@ vi.mock('framer-motion', () => {
     return result;
   };
 
+  const motionProxy = {
+    div: createMockMotion('div'),
+    button: createMockMotion('button'),
+    ul: createMockMotion('ul'),
+    li: createMockMotion('li'),
+    span: createMockMotion('span'),
+  };
+
   return {
-    motion: {
-      div: createMockMotion('div'),
-      button: createMockMotion('button'),
-      ul: createMockMotion('ul'),
-      li: createMockMotion('li'),
-      span: createMockMotion('span'),
-    },
+    motion: motionProxy,
+    m: motionProxy,
     AnimatePresence: ({ children }: any) => children,
+    LazyMotion: ({ children }: any) => children,
+    domAnimation: {},
+    domMax: {},
     useSpring,
     useTransform,
   };
