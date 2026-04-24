@@ -24,7 +24,6 @@ import { volatileBroadcastToRoom, getGameRoom } from '../utils/socketHelpers.js'
 import { isWordOnBoardAsync } from '../modules/wordValidatorPool.js';
 import { isProfane } from '../utils/profanityFilter.js';
 import { isDictionaryWord, isValidWordCached } from '../dictionary.js';
-import { isSupabaseConfigured, recordPlayerWrongWord } from '../modules/supabaseServer.js';
 import { recordVote, updatePendingCache, isWordCommunityValid, isWordValidForScoring } from '../modules/communityWordManager.js';
 import { emitError, ErrorCodes } from '../utils/errorHandler.js';
 import { checkRateLimit } from '../utils/rateLimiter.js';
@@ -297,12 +296,6 @@ function registerWordHandlers(io: Server, socket: Socket): void {
         incPerGame(gameCode, 'wordNotOnBoard');
         socket.emit('wordNotOnBoard', { word: normalizedWord });
         handleSpamDetection(socket, gameCode, username, normalizedWord, InvalidReason.NOT_ON_BOARD, game);
-        // Record invalid word submission for admin review (non-blocking)
-        if (isSupabaseConfigured()) {
-          recordPlayerWrongWord(normalizedWord, game.language || 'en', 'not_on_board').catch((err: Error) => {
-            logger.error('WORD', `Failed to record wrong word "${normalizedWord}": ${err.message}`);
-          });
-        }
         await releaseGraceLockIfNeeded();
         return;
       }

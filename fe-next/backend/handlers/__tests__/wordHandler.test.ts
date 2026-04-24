@@ -156,6 +156,7 @@ import { isWordOnBoardAsync } from '../../../backend/modules/wordValidatorPool';
 import { isDictionaryWord } from '../../../backend/dictionary';
 import { isWordCommunityValid, isWordValidForScoring } from '../../../backend/modules/communityWordManager';
 import { emitError } from '../../../backend/utils/errorHandler';
+import { isSupabaseConfigured, recordPlayerWrongWord } from '../../../backend/modules/supabaseServer';
 import { registerWordHandlers } from '../wordHandler';
 
 function createMockSocket() {
@@ -242,6 +243,33 @@ describe('wordHandler submitWord error handling', () => {
 
       // WHEN: User submits a word — should NOT throw
       await expect(handlers['submitWord']({ word: 'test' })).resolves.not.toThrow();
+    });
+
+    it('should NOT record not_on_board rows in invalid_word_submissions (noise, not moderation signal)', async () => {
+      // GIVEN: Supabase is configured AND the submitted word is not on the board
+      (isSupabaseConfigured as Mock).mockReturnValue(true);
+      (getGame as Mock).mockReturnValue({
+        gameCode: 'TEST123',
+        gameState: 'in-progress',
+        language: 'en',
+        minWordLength: 2,
+        letterGrid: [['A', 'B'], ['C', 'D']],
+        letterPositions: new Map(),
+        playerWords: {},
+        playerWordDetails: {},
+        playerScores: {},
+        playerCombos: {},
+        users: { testUser: { isHost: false } },
+      });
+      (isWordOnBoardAsync as Mock).mockResolvedValue(false);
+
+      // WHEN: User submits a word that is not on the board
+      await handlers['submitWord']({ word: 'zzzz' });
+
+      // THEN: Client is notified but no DB row is written — these events are 96% single-submit
+      // with 0 appeals; admins cannot action them since the word simply wasn't on the grid.
+      expect(mockSocket.emit).toHaveBeenCalledWith('wordNotOnBoard', expect.objectContaining({ word: 'zzzz' }));
+      expect(recordPlayerWrongWord).not.toHaveBeenCalled();
     });
 
     it('should handle game deleted during word processing gracefully', async () => {
