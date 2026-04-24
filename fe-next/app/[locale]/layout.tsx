@@ -18,11 +18,13 @@ import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration';
 import VersionChecker from '@/components/VersionChecker';
 import NewYearCountdown from '@/components/celebration/NewYearCountdown';
 import AnimationsLoader from '@/components/AnimationsLoader';
+import DictionaryPrewarmer from '@/components/DictionaryPrewarmer';
 import NativeOAuthInitializer from '@/components/NativeOAuthInitializer';
 import { ToastContainer } from '@/components/ui/EnhancedToast';
 import { ChurnSignalTracker } from '@/components/engagement/ChurnSignalTracker';
 import SocialMediaPixels from '@/components/SocialMediaPixels';
 import { getLocalizedSchemaStrings } from '@/utils/seoLocalizedSchema';
+import type { Language } from '@/shared/types/game';
 
 import { fredokaLatin, fredokaHebrew, rubikLatin, rubikHebrew, heeboHebrew } from '../fonts';
 
@@ -524,6 +526,8 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 <ServiceWorkerRegistration />
                 {/* Defer loading animations.css (60KB) after page mount */}
                 <AnimationsLoader />
+                {/* Warm client dict Set on idle so first word submit skips ~100-300ms fetch */}
+                <DictionaryPrewarmer lang={validLocale as Language} />
                 {/* DeepLinkHandler moved to NativeAppProvider (client component) to avoid Capacitor/Turbopack issues */}
                 {/* Initialize native OAuth (Google/Apple Sign-In) on mobile */}
                 <NativeOAuthInitializer />

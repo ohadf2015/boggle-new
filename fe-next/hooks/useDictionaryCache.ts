@@ -221,6 +221,20 @@ async function fetchDictionary(language: Language): Promise<Set<string>> {
 }
 
 /**
+ * Eagerly warm the shared in-memory dictionary cache for a language.
+ * Fire-and-forget: reuses fetchDictionary's loading-promise de-dupe so a
+ * concurrent useDictionaryCache() mount shares the same fetch.
+ */
+export async function prewarmDictionary(language: Language): Promise<void> {
+  if (memoryCache.has(language)) return;
+  try {
+    await fetchDictionary(language);
+  } catch {
+    // Silent — real submits fall back to server-side dict check.
+  }
+}
+
+/**
  * Hook for client-side dictionary caching
  */
 export function useDictionaryCache(language: Language): UseDictionaryCacheReturn {
