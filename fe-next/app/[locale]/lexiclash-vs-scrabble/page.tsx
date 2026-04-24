@@ -135,8 +135,8 @@ export default async function LexiClashVsScrabblePage({ params }: PageProps) {
               { pain: 'A UI buried under gems, energy bars, and event popups', fix: 'Clean interface. You open the app, you play the game. That&apos;s it.' },
               { pain: 'Games that drag on for hours or even days', fix: 'Fast 60-180 second rounds. Quick, intense, done.' },
               { pain: 'Have to download a 300MB+ app', fix: 'Runs in your browser. Click and play, nothing to install.' },
-            ].map((item, idx) => (
-              <div key={idx} className="rounded-neo border-3 border-neo-red/30 bg-neo-navy/50 p-4 shadow-hard">
+            ].map((item) => (
+              <div key={item.pain} className="rounded-neo border-3 border-neo-red/30 bg-neo-navy/50 p-4 shadow-hard">
                 <p className="text-sm text-neo-red line-through opacity-70">{item.pain}</p>
                 <p className="mt-1 text-sm font-bold text-neo-lime">{item.fix}</p>
               </div>
@@ -172,8 +172,8 @@ export default async function LexiClashVsScrabblePage({ params }: PageProps) {
                   ['Adventure mode', 'Yes, 100+ levels', 'No'],
                   ['Daily challenges', 'Yes + global leaderboard', 'Yes (limited)'],
                   ['UI complexity', 'Clean, game-focused', 'Gems, energy, events, popups'],
-                ].map(([feature, lexi, scrabble], idx) => (
-                  <tr key={idx} className="border-b border-neo-gray-400/50">
+                ].map(([feature, lexi, scrabble]) => (
+                  <tr key={feature} className="border-b border-neo-gray-400/50">
                     <td className="px-4 py-3 font-medium">{feature}</td>
                     <td className="px-4 py-3 text-center text-neo-cyan">{lexi}</td>
                     <td className="px-4 py-3 text-center text-neo-gray-300">{scrabble}</td>
@@ -188,7 +188,7 @@ export default async function LexiClashVsScrabblePage({ params }: PageProps) {
           <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">Frequently Asked Questions</h2>
           <div className="space-y-4">
             {faqs.map((faq, idx) => (
-              <details key={idx} className="group rounded-neo border-3 border-neo-gray-400 bg-neo-navy/50 shadow-hard">
+              <details key={`faq-${idx}-${faq.q}`} className="group rounded-neo border-3 border-neo-gray-400 bg-neo-navy/50 shadow-hard">
                 <summary className="flex cursor-pointer items-center justify-between px-6 py-4 font-bold">
                   <span>{faq.q}</span>
                   <span className="text-neo-lime transition-transform group-open:rotate-180">▼</span>

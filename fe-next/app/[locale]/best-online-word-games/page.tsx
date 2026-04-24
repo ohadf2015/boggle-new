@@ -285,8 +285,8 @@ export default async function BestOnlineWordGamesPage({ params }: PageProps) {
         <section className="mb-12">
           <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">The Honest Breakdown</h2>
           <div className="space-y-6">
-            {games.map((game, idx) => (
-              <div key={idx} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-5 shadow-hard">
+            {games.map((game) => (
+              <div key={game.name} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-5 shadow-hard">
                 <div className="mb-2 flex items-center justify-between">
                   <h3 className="font-neo-display text-xl font-bold text-neo-white">{game.name}</h3>
                   {game.verdict && (
@@ -302,8 +302,8 @@ export default async function BestOnlineWordGamesPage({ params }: PageProps) {
                   <div>
                     <h4 className="mb-1 text-xs font-bold uppercase tracking-wide text-neo-lime/80">What it does well</h4>
                     <ul className="space-y-1 text-sm text-neo-gray-200">
-                      {game.pros.map((pro, i) => (
-                        <li key={i} className="flex items-start gap-2">
+                      {game.pros.map((pro) => (
+                        <li key={pro} className="flex items-start gap-2">
                           <span className="mt-1 text-neo-lime">+</span>
                           <span>{pro}</span>
                         </li>
@@ -313,8 +313,8 @@ export default async function BestOnlineWordGamesPage({ params }: PageProps) {
                   <div>
                     <h4 className="mb-1 text-xs font-bold uppercase tracking-wide text-neo-pink/80">Where it falls short</h4>
                     <ul className="space-y-1 text-sm text-neo-gray-200">
-                      {game.cons.map((con, i) => (
-                        <li key={i} className="flex items-start gap-2">
+                      {game.cons.map((con) => (
+                        <li key={con} className="flex items-start gap-2">
                           <span className="mt-1 text-neo-pink">-</span>
                           <span>{con}</span>
                         </li>
@@ -342,7 +342,7 @@ export default async function BestOnlineWordGamesPage({ params }: PageProps) {
           <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">Frequently Asked Questions</h2>
           <div className="space-y-4">
             {faqs.map((faq, idx) => (
-              <details key={idx} className="group rounded-neo border-3 border-neo-gray-400 bg-neo-navy/50 shadow-hard">
+              <details key={`faq-${idx}-${faq.q}`} className="group rounded-neo border-3 border-neo-gray-400 bg-neo-navy/50 shadow-hard">
                 <summary className="flex cursor-pointer items-center justify-between px-6 py-4 font-bold">
                   <span>{faq.q}</span>
                   <span className="text-neo-lime transition-transform group-open:rotate-180">▼</span>

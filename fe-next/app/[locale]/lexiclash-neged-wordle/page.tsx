@@ -159,7 +159,7 @@ export default async function LexiClashVsWordlePage({ params }: PageProps) {
               <tbody>
                 {comparisonRows.map((row, idx) => (
                   <tr
-                    key={idx}
+                    key={row.feature}
                     className={`border-b border-neo-gray-400/30 ${idx % 2 === 0 ? 'bg-neo-navy/50' : ''}`}
                   >
                     <td className="px-4 py-3 font-bold">{row.feature}</td>
@@ -266,7 +266,7 @@ export default async function LexiClashVsWordlePage({ params }: PageProps) {
           <div className="space-y-4">
             {faqs.map((faq, idx) => (
               <details
-                key={idx}
+                key={`faq-${idx}-${faq.q}`}
                 className="group rounded-neo border-3 border-neo-gray-400 bg-neo-navy/50 shadow-hard"
               >
                 <summary className="flex cursor-pointer items-center justify-between px-6 py-4 font-bold">

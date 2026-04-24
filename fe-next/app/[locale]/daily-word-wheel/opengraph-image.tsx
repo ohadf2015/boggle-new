@@ -183,7 +183,7 @@ export default async function OGImage({ params }: { params: Promise<{ locale: st
             const y = -Math.cos(rad) * r;
             return (
               <div
-                key={i}
+                key={`${letter}-${i}`}
                 style={{
                   position: 'absolute',
                   left: `${160 + x - 28}px`,

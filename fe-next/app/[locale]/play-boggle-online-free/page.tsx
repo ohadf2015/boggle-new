@@ -255,9 +255,9 @@ export default async function PlayBoggleOnlineFreePage({ params }: PageProps) {
               'Available in 5 languages (EN, HE, SV, JA, ES)',
               'Adventure mode with boss battles and upgrades',
               'Brain training drills to sharpen word skills',
-            ].map((feature, idx) => (
+            ].map((feature) => (
               <div
-                key={idx}
+                key={feature}
                 className="flex gap-3 rounded-neo border-3 border-neo-yellow bg-neo-navy/50 p-4 shadow-hard"
               >
                 <span className="shrink-0 text-neo-yellow">✓</span>
@@ -291,8 +291,8 @@ export default async function PlayBoggleOnlineFreePage({ params }: PageProps) {
                   ['Multiple languages', '5 languages', '✗', '✗'],
                   ['Boss battles', '✓', '✗', '✗'],
                   ['Multiple grid sizes', '4×4, 5×5, 6×6', '4×4 only', 'N/A'],
-                ].map(([feature, lexi, boggle, wwf], idx) => (
-                  <tr key={idx} className="border-b border-neo-gray-400/50">
+                ].map(([feature, lexi, boggle, wwf]) => (
+                  <tr key={feature} className="border-b border-neo-gray-400/50">
                     <td className="px-4 py-3 font-medium">{feature}</td>
                     <td className="px-4 py-3 text-center text-neo-cyan">{lexi}</td>
                     <td className="px-4 py-3 text-center text-neo-gray-300">{boggle}</td>
@@ -309,7 +309,7 @@ export default async function PlayBoggleOnlineFreePage({ params }: PageProps) {
           <div className="space-y-4">
             {faqs.map((faq, idx) => (
               <details
-                key={idx}
+                key={`faq-${idx}-${faq.q}`}
                 className="group rounded-neo border-3 border-neo-gray-400 bg-neo-navy/50 shadow-hard"
               >
                 <summary className="flex cursor-pointer items-center justify-between px-6 py-4 font-bold">

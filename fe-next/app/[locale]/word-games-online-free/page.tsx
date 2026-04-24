@@ -130,8 +130,8 @@ export default async function WordGamesOnlineFreePage({ params }: PageProps) {
               { title: 'Blast Mode', desc: 'Chain combos for explosive scores. Rapid-fire word finding at its best.' },
               { title: 'Adventure Mode', desc: 'Boss battles, upgrades, and quests. An RPG word game experience.' },
               { title: 'Brain Training', desc: '5 drill types to sharpen pattern recognition, memory, and speed.' },
-            ].map((game, idx) => (
-              <div key={idx} className="rounded-neo border-3 border-neo-cyan bg-neo-navy/50 p-5 shadow-hard">
+            ].map((game) => (
+              <div key={game.title} className="rounded-neo border-3 border-neo-cyan bg-neo-navy/50 p-5 shadow-hard">
                 <h3 className="mb-2 font-neo-display text-lg font-bold text-neo-cyan">{game.title}</h3>
                 <p className="text-sm text-neo-gray-200">{game.desc}</p>
               </div>
@@ -143,7 +143,7 @@ export default async function WordGamesOnlineFreePage({ params }: PageProps) {
           <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">Frequently Asked Questions</h2>
           <div className="space-y-4">
             {faqs.map((faq, idx) => (
-              <details key={idx} className="group rounded-neo border-3 border-neo-gray-400 bg-neo-navy/50 shadow-hard">
+              <details key={`faq-${idx}-${faq.q}`} className="group rounded-neo border-3 border-neo-gray-400 bg-neo-navy/50 shadow-hard">
                 <summary className="flex cursor-pointer items-center justify-between px-6 py-4 font-bold">
                   <span>{faq.q}</span>
                   <span className="text-neo-lime transition-transform group-open:rotate-180">&#9660;</span>

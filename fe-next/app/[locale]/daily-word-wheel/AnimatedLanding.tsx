@@ -179,7 +179,7 @@ export function AnimatedLanding({ locale, hero, steps, stepsHeading, faqHeading,
           <div className="space-y-4">
             {faqItems.map((faq, idx) => (
               <motion.details
-                key={idx}
+                key={`faq-${idx}-${faq.q}`}
                 className="group rounded-neo border-[3px] border-neo-cream/20 bg-neo-navy-light shadow-hard"
                 variants={fadeUp}
               >

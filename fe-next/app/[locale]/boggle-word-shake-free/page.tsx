@@ -170,8 +170,8 @@ export default async function BoggleWordShakeFreePage({ params }: PageProps) {
               'Daily challenges with global leaderboard',
               'Available in 5 languages',
               'Adventure mode with boss battles',
-            ].map((feature, idx) => (
-              <div key={idx} className="flex gap-3 rounded-neo border-3 border-neo-yellow bg-neo-navy/50 p-4 shadow-hard">
+            ].map((feature) => (
+              <div key={feature} className="flex gap-3 rounded-neo border-3 border-neo-yellow bg-neo-navy/50 p-4 shadow-hard">
                 <span className="shrink-0 text-neo-yellow">&#10003;</span>
                 <p className="text-sm sm:text-base">{feature}</p>
               </div>
@@ -183,7 +183,7 @@ export default async function BoggleWordShakeFreePage({ params }: PageProps) {
           <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">Frequently Asked Questions</h2>
           <div className="space-y-4">
             {faqs.map((faq, idx) => (
-              <details key={idx} className="group rounded-neo border-3 border-neo-gray-400 bg-neo-navy/50 shadow-hard">
+              <details key={`faq-${idx}-${faq.q}`} className="group rounded-neo border-3 border-neo-gray-400 bg-neo-navy/50 shadow-hard">
                 <summary className="flex cursor-pointer items-center justify-between px-6 py-4 font-bold">
                   <span>{faq.q}</span>
                   <span className="text-neo-yellow transition-transform group-open:rotate-180">&#9660;</span>

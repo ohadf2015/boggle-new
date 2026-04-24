@@ -146,8 +146,8 @@ export default async function LexiClashVsWordlePage({ params }: PageProps) {
                   ['Streak system', 'Yes + streak freeze', 'Yes'],
                   ['Shareable results', 'Emoji grid + challenge link', 'Emoji grid only'],
                   ['Account required', 'No', 'No (optional NYT)'],
-                ].map(([feature, lexi, wordle], idx) => (
-                  <tr key={idx} className="border-b border-neo-gray-400/50">
+                ].map(([feature, lexi, wordle]) => (
+                  <tr key={feature} className="border-b border-neo-gray-400/50">
                     <td className="px-4 py-3 font-medium">{feature}</td>
                     <td className="px-4 py-3 text-center text-neo-cyan">{lexi}</td>
                     <td className="px-4 py-3 text-center text-neo-gray-300">{wordle}</td>
@@ -168,8 +168,8 @@ export default async function LexiClashVsWordlePage({ params }: PageProps) {
               { title: 'A Whole Adventure Mode', desc: '100+ levels across 10 worlds, each with a boss that has unique mechanics. Upgrades, loot, progression. It\u0027s a word game with an actual campaign, which sounds absurd until you\u0027re hooked.' },
               { title: 'Play in Your Language', desc: 'English, Hebrew, Swedish, Japanese, and Spanish. Each language has its own dictionary and grid generation. Wordle is English-only (though fan-made clones exist for other languages).' },
               { title: 'No Subscription Creep', desc: 'Wordle got absorbed into the NYT Games bundle — still playable free, but the upsell is always there. LexiClash is free, no account needed, no "unlock premium" popups. Ever.' },
-            ].map((item, idx) => (
-              <div key={idx} className="rounded-neo border-3 border-neo-lime/40 bg-neo-navy/50 p-4 shadow-hard">
+            ].map((item) => (
+              <div key={item.title} className="rounded-neo border-3 border-neo-lime/40 bg-neo-navy/50 p-4 shadow-hard">
                 <h3 className="mb-1 font-bold text-neo-lime">{item.title}</h3>
                 <p className="text-sm text-neo-gray-200">{item.desc}</p>
               </div>
@@ -181,7 +181,7 @@ export default async function LexiClashVsWordlePage({ params }: PageProps) {
           <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">Frequently Asked Questions</h2>
           <div className="space-y-4">
             {faqs.map((faq, idx) => (
-              <details key={idx} className="group rounded-neo border-3 border-neo-gray-400 bg-neo-navy/50 shadow-hard">
+              <details key={`faq-${idx}-${faq.q}`} className="group rounded-neo border-3 border-neo-gray-400 bg-neo-navy/50 shadow-hard">
                 <summary className="flex cursor-pointer items-center justify-between px-6 py-4 font-bold">
                   <span>{faq.q}</span>
                   <span className="text-neo-lime transition-transform group-open:rotate-180">▼</span>

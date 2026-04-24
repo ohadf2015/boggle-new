@@ -148,8 +148,8 @@ export default async function WordsWithFriendsAlternativePage({ params }: PagePr
                   ['Daily challenges', 'Yes (Wordle-style)', 'No'],
                   ['Adventure mode', 'Yes (boss battles)', 'No'],
                   ['Party mode', 'Yes (20+ players)', 'No'],
-                ].map(([feature, lexi, wwf], idx) => (
-                  <tr key={idx} className="border-b border-neo-gray-400/50">
+                ].map(([feature, lexi, wwf]) => (
+                  <tr key={feature} className="border-b border-neo-gray-400/50">
                     <td className="px-4 py-3 font-medium">{feature}</td>
                     <td className="px-4 py-3 text-center text-neo-cyan">{lexi}</td>
                     <td className="px-4 py-3 text-center text-neo-gray-300">{wwf}</td>
@@ -172,8 +172,8 @@ export default async function WordsWithFriendsAlternativePage({ params }: PagePr
               { title: 'Multiple Languages', desc: 'Play in English, Hebrew, Swedish, Japanese, or Spanish with full dictionaries.' },
               { title: 'No Pay-To-Win', desc: 'Skill wins, not wallet. No paid boosts that break competitive fairness.' },
               { title: 'Unique Game Modes', desc: 'Adventure with boss battles, daily challenges, brain training, and blast mode — not just grid matches.' },
-            ].map((item, idx) => (
-              <div key={idx} className="rounded-neo border-3 border-neo-pink bg-neo-navy/50 p-5 shadow-hard">
+            ].map((item) => (
+              <div key={item.title} className="rounded-neo border-3 border-neo-pink bg-neo-navy/50 p-5 shadow-hard">
                 <h3 className="mb-2 font-neo-display font-bold text-neo-pink">{item.title}</h3>
                 <p className="text-sm text-neo-gray-200">{item.desc}</p>
               </div>
@@ -185,7 +185,7 @@ export default async function WordsWithFriendsAlternativePage({ params }: PagePr
           <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">Frequently Asked Questions</h2>
           <div className="space-y-4">
             {faqs.map((faq, idx) => (
-              <details key={idx} className="group rounded-neo border-3 border-neo-gray-400 bg-neo-navy/50 shadow-hard">
+              <details key={`faq-${idx}-${faq.q}`} className="group rounded-neo border-3 border-neo-gray-400 bg-neo-navy/50 shadow-hard">
                 <summary className="flex cursor-pointer items-center justify-between px-6 py-4 font-bold">
                   <span>{faq.q}</span>
                   <span className="text-neo-pink transition-transform group-open:rotate-180">&#9660;</span>
