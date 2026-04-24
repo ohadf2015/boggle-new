@@ -78,7 +78,7 @@ export function DailyMissionsHeader({ completedCount }: DailyMissionsHeaderProps
         <div className="flex gap-1.5" role="progressbar" aria-valuenow={Math.round((completedCount / 2) * 100)} aria-valuemin={0} aria-valuemax={2} data-testid="xp-progress-bar">
           {[0, 1].map((i) => (
             <motion.div
-              key={i}
+              key={`segment-${i}`}
               className={cn(
                 'flex-1 h-3.5 rounded-md border-2 border-black overflow-hidden',
                 i < completedCount ? '' : 'bg-black/40'

@@ -149,7 +149,7 @@ export function LeaderboardTeaser({ currentLanguage, onViewFull }: LeaderboardTe
       <div className="flex flex-col">
         {loading ? (
           Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="flex items-center gap-3 px-3 py-3 border-b border-black/10 last:border-b-0">
+            <div key={`skel-${i}`} className="flex items-center gap-3 px-3 py-3 border-b border-black/10 last:border-b-0">
               <div className="w-6 h-6 rounded-full skeleton" />
               <div className="w-24 h-3.5 skeleton rounded flex-1" />
               <div className="w-12 h-3.5 skeleton rounded" />

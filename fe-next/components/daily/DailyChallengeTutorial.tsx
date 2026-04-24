@@ -88,7 +88,7 @@ export const DailyChallengeTutorial: React.FC<DailyChallengeTutorialProps> = ({
         <div className="flex items-center justify-center gap-2 mb-6">
           {Array.from({ length: TOTAL_STEPS }).map((_, i) => (
             <div
-              key={i}
+              key={`tutorial-dot-${i}`}
               className={cn(
                 'h-2 rounded-full transition-all',
                 i + 1 === currentStep

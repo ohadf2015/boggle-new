@@ -142,7 +142,7 @@ export const ScoreGaugeRing: React.FC<ScoreGaugeRingProps> = ({
         {/* Tick marks (large rings only) */}
         {ticks.map((tick, i) => (
           <motion.line
-            key={i}
+            key={`${tick.x1}-${tick.y1}-${tick.x2}-${tick.y2}`}
             x1={tick.x1}
             y1={tick.y1}
             x2={tick.x2}

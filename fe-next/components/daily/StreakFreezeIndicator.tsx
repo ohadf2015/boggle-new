@@ -28,7 +28,7 @@ export function StreakFreezeIndicator({ freezeCount, t, className = '' }: Streak
         const isFilled = i < freezeCount;
         return (
           <span
-            key={i}
+            key={`slot-${i}`}
             data-testid={isFilled ? 'freeze-slot-filled' : 'freeze-slot-empty'}
             className={`text-lg transition-opacity ${isFilled ? 'opacity-100' : 'opacity-30'}`}
           >

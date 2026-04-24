@@ -37,9 +37,9 @@ export function ConfettiBackground() {
       aria-hidden="true"
       data-testid="confetti-background"
     >
-      {CONFETTI_ITEMS.map((item, i) => (
+      {CONFETTI_ITEMS.map((item) => (
         <div
-          key={i}
+          key={`${item.left}-${item.delay}-${item.color}`}
           className={`absolute ${item.size} ${item.color} ${item.rotate} opacity-20 rounded-sm`}
           style={{
             left: item.left,

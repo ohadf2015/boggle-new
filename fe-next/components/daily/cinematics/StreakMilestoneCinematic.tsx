@@ -203,7 +203,7 @@ export const StreakMilestoneCinematic: React.FC<StreakMilestoneCinematicProps> =
         <Sequence from={PHASE_FRAMES.BADGE_START - 10} durationInFrames={40} premountFor={15}>
           {tier.colors.map((color, i) => (
             <ExplosionRing
-              key={i}
+              key={`ring-${color}-${i}`}
               frame={frame - PHASE_FRAMES.BADGE_START + 10}
               color={color}
               delay={i * 8}

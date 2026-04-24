@@ -168,7 +168,7 @@ export const SurvivalLifeBar: React.FC<SurvivalLifeBarProps> = ({
           <div className="absolute inset-0 pointer-events-none overflow-hidden">
             {[0, 1, 2, 3].map((i) => (
               <AdaptiveMotion.div
-                key={i}
+                key={`particle-${i}`}
                 className="absolute w-1.5 h-1.5 bg-red-400 rounded-full opacity-80"
                 style={{ left: `${pct}%`, top: '50%' }}
                 animate={{

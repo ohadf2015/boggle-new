@@ -239,7 +239,7 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
                       /* Hidden: dot placeholders */
                       displayedTargetWord.split('').map((_, i) => (
                         <motion.span
-                          key={i}
+                          key={`blank-${i}`}
                           initial={{ scale: 0 }}
                           animate={{ scale: 1 }}
                           transition={{ delay: 0.5 + i * 0.04 }}
@@ -252,7 +252,7 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
                       /* Revealed: letter tiles with 3D flip effect */
                       displayedTargetWord.split('').map((letter, i) => (
                         <motion.span
-                          key={i}
+                          key={`letter-${i}-${letter}`}
                           data-testid={`letter-${letter}`}
                           initial={{ scale: 0, rotateY: -90, opacity: 0 }}
                           animate={{ scale: 1, rotateY: 0, opacity: 1 }}

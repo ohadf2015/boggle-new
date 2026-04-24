@@ -27,9 +27,9 @@ export function FloatingDecorations() {
       aria-hidden="true"
       data-testid="floating-decorations"
     >
-      {FLOATING_LETTERS.map(({ char, position, color, delay, size, duration }, i) => (
+      {FLOATING_LETTERS.map(({ char, position, color, delay, size, duration }) => (
         <span
-          key={i}
+          key={`${char}-${position}`}
           className={`absolute ${position} ${color} ${size} font-neo-display font-black opacity-[0.08] animate-particle-float select-none`}
           style={{ animationDelay: delay, animationDuration: duration }}
         >

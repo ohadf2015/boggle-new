@@ -142,7 +142,7 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
         <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
           {CONFETTI_CONFIGS.slice(0, confettiCount).map((config, i) => (
             <ConfettiParticle
-              key={i}
+              key={`confetti-${i}`}
               delay={i * 0.08}
               color={CONFETTI_COLORS[i % CONFETTI_COLORS.length]}
               config={config}

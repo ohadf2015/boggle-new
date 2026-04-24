@@ -407,7 +407,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
                   <div className="flex flex-wrap gap-1 justify-center pt-2">
                     {words.map((word, i) => (
                       <span
-                        key={i}
+                        key={`word-${i}-${word}`}
                         className={`px-2 py-1 text-xs font-medium rounded-md ${
                           word === longestWord
                             ? 'bg-neo-yellow text-neo-black border-2 border-neo-black shadow-hard-sm font-black'
