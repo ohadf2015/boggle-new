@@ -16,7 +16,6 @@ import PWAInstallPrompt from '@/components/PWAInstallPrompt';
 import AndroidAppRedirect from '@/components/AndroidAppRedirect';
 import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration';
 import VersionChecker from '@/components/VersionChecker';
-import { CrazyGamesRouteGuard } from '@/components/CrazyGamesRouteGuard';
 import NewYearCountdown from '@/components/celebration/NewYearCountdown';
 import AnimationsLoader from '@/components/AnimationsLoader';
 import NativeOAuthInitializer from '@/components/NativeOAuthInitializer';
@@ -545,7 +544,6 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 <ConditionalProviders lang={validLocale} initialTranslations={initialTranslations}>
                     {/* VersionChecker needs to be inside providers to access LanguageContext */}
                     <VersionChecker />
-                    <CrazyGamesRouteGuard />
                     <div className="flex-1 flex flex-col min-h-0 relative overflow-x-clip">
                         <DesktopGameNav />
                         <main

@@ -33,6 +33,7 @@ import type { WordObject } from '@/components/results/types';
 import { markModePlayedLogic } from '@/hooks/useDailyModeQuest';
 import { useMpWinStreak, type MpMode } from '@/hooks/useMpWinStreak';
 import { syncGhostRivalScore } from '@/utils/ghostRivalSync';
+import { useCrazyGames } from '@/components/CrazyGamesSDK';
 
 // ==============================================
 // TYPES
@@ -173,6 +174,7 @@ export function useResultsSideEffects({
   // ==============================================
 
   const { user, isAuthenticated, loading: authLoading } = useAuth();
+  const { isOnCrazyGamesPlatform } = useCrazyGames();
   const { refreshCoins } = useCoinContext();
   const { currentStreak, bestStreak, lastWinDate, recordWin } = useWinStreak();
   const { saveCognitiveScore } = useSaveCognitiveScore();
@@ -465,7 +467,8 @@ export function useResultsSideEffects({
       hasShownUpgradePrompt ||
       !hasUpdatedStatsRef.current ||
       showWordFeedback ||
-      gameCode
+      gameCode ||
+      isOnCrazyGamesPlatform
     ) {
       return;
     }
@@ -506,7 +509,7 @@ export function useResultsSideEffects({
       window.removeEventListener('scroll', handleScroll);
       clearTimeout(initialCheckTimeout);
     };
-  }, [isAuthenticated, user, authLoading, hasShownUpgradePrompt, isCurrentUserWinner, showWordFeedback, gameCode]);
+  }, [isAuthenticated, user, authLoading, hasShownUpgradePrompt, isCurrentUserWinner, showWordFeedback, gameCode, isOnCrazyGamesPlatform]);
 
   // ==============================================
   // RETURN ALL DATA
