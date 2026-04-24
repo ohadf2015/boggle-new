@@ -11,6 +11,7 @@ import logger from '../utils/logger';
 import { addToCommunityCache } from './communityWordManager';
 import { getVerifiedWordsForPromotion } from '../services/milogWordVerifier';
 import { getSupabase } from './supabaseServer';
+import { promoteWordToScores } from './wordPromotion';
 
 export const AUTO_PROMOTION_CONFIG = {
   MIN_SUBMISSIONS: 10,
@@ -99,17 +100,10 @@ async function promoteBySubmissionCount(
     try {
       await addToCommunityCache(candidate.word, candidate.language);
 
-      await supabase.from('word_scores').upsert(
-        {
-          word: candidate.word,
-          language: candidate.language,
-          likes_count: AUTO_PROMOTION_CONFIG.VOTES_TO_ADD,
-          dislikes_count: 0,
-          first_submitter: 'auto_promoted',
-          last_voted_at: new Date().toISOString(),
-        },
-        { onConflict: 'word,language' }
-      );
+      await promoteWordToScores(supabase, candidate.word, candidate.language, {
+        votes: AUTO_PROMOTION_CONFIG.VOTES_TO_ADD,
+        submitter: 'auto_promoted',
+      });
 
       await supabase.rpc('mark_word_auto_promoted', {
         p_word_id: candidate.id,
@@ -144,17 +138,10 @@ async function promoteByMilogVerification(
     try {
       await addToCommunityCache(wordRecord.word, 'he');
 
-      await supabase.from('word_scores').upsert(
-        {
-          word: wordRecord.word,
-          language: 'he',
-          likes_count: AUTO_PROMOTION_CONFIG.VOTES_TO_ADD,
-          dislikes_count: 0,
-          first_submitter: 'auto_promoted',
-          last_voted_at: new Date().toISOString(),
-        },
-        { onConflict: 'word,language' }
-      );
+      await promoteWordToScores(supabase, wordRecord.word, 'he', {
+        votes: AUTO_PROMOTION_CONFIG.VOTES_TO_ADD,
+        submitter: 'auto_promoted',
+      });
 
       await supabase.rpc('mark_word_auto_promoted', {
         p_word_id: wordRecord.id,

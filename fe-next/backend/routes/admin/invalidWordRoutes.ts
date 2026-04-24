@@ -9,6 +9,7 @@ import { auditLog } from './middleware';
 import logger from '../../utils/logger';
 
 import { getSupabase } from '../../modules/supabaseServer';
+import { promoteWordToScores } from '../../modules/wordPromotion';
 
 const router: Router = express.Router();
 
@@ -95,17 +96,14 @@ router.post('/approve', async (req: AdminRequest, res: Response): Promise<void> 
 
     const votesNeeded = Math.max(10, Math.min(invalidWord.submission_count * 2, 20));
 
-    const { error: scoreError } = await supabase
-      .from('word_scores')
-      .upsert({
-        word: normalizedWord, language,
-        likes_count: votesNeeded, dislikes_count: 0,
-        first_submitter: 'admin_approved',
-        last_voted_at: new Date().toISOString(),
-      }, { onConflict: 'word,language' });
-
-    if (scoreError) {
-      logger.error('ADMIN_API', `Word score update failed: ${scoreError.message}`);
+    try {
+      await promoteWordToScores(supabase, normalizedWord, language, {
+        votes: votesNeeded,
+        submitter: 'admin_approved',
+      });
+    } catch (scoreError) {
+      const msg = (scoreError as Error).message;
+      logger.error('ADMIN_API', `Word score update failed: ${msg}`);
       res.status(500).json({ error: 'Failed to update word score' });
       return;
     }
