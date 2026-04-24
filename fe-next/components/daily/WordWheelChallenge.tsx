@@ -24,6 +24,7 @@ import {
 import type { Language } from '@/types';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { useHideNavigation } from '@/contexts/NavigationContext';
 import { getGuestFingerprint } from '@/utils/guestManager';
 import type { WordWheelEffect } from './WordWheelEffectsCanvas';
 
@@ -49,6 +50,7 @@ const WordWheelChallenge: React.FC = () => {
   const { t, language } = useLanguage();
   const { setGameActive } = useSoundEffects();
   const { profile, isAuthenticated } = useAuth();
+  const setIsInGame = useHideNavigation();
 
   const [phase, setPhase] = useState<WordWheelPhase>('loading');
   const [puzzle, setPuzzle] = useState<WordWheelPuzzle | null>(null);
@@ -62,6 +64,11 @@ const WordWheelChallenge: React.FC = () => {
   useEffect(() => {
     setGuestFingerprint(getGuestFingerprint());
   }, []);
+
+  useEffect(() => {
+    setIsInGame(phase === 'playing');
+    return () => setIsInGame(false);
+  }, [phase, setIsInGame]);
 
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -217,7 +224,7 @@ const WordWheelChallenge: React.FC = () => {
         {phase === 'ready' && puzzle && (
           <motion.div
             key="ready"
-            className="flex-1 flex flex-col items-center justify-center gap-6 px-4"
+            className="flex-1 flex flex-col items-center gap-6 px-4 pt-4 pb-(--mobile-bottom-safe) sm:pb-6 overflow-y-auto"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -271,10 +278,9 @@ const WordWheelChallenge: React.FC = () => {
                 return (
                   <motion.div
                     key={`${letter}-${i}`}
-                    className="absolute w-10 h-10 rounded-full border-2 border-neo-black bg-neo-white flex items-center justify-center font-neo-display font-bold text-sm text-neo-navy shadow-[2px_2px_0px_black,0_0_6px_rgba(191,255,0,0.12)]"
-                    style={{ transform: `translate(${x}px, ${y}px)` }}
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
+                    className="absolute inset-0 m-auto w-10 h-10 rounded-full border-2 border-neo-black bg-neo-white flex items-center justify-center font-neo-display font-bold text-sm text-neo-navy shadow-[2px_2px_0px_black,0_0_6px_rgba(191,255,0,0.12)]"
+                    initial={{ scale: 0, x, y }}
+                    animate={{ scale: 1, x, y }}
                     transition={{ delay: i * 0.06, type: 'spring', stiffness: 400 }}
                   >
                     {letter}
