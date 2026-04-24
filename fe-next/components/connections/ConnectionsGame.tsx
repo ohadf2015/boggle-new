@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence, m } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getShuffledPuzzles } from '@/lib/connections/puzzles';
 import { initGameState, applyGuess, advancePuzzle, giveUp as giveUpLogic, markRated, xpForPuzzle } from '@/lib/connections/gameLogic';
@@ -135,22 +135,22 @@ export default function ConnectionsGame() {
 
   if (state.status === 'finished') {
     return (
-      <motion.div
+      <m.div
         initial={{ opacity: 0, scale: 0.92 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ type: 'spring' as const, stiffness: 260, damping: 22 }}
         className="flex flex-col items-center justify-center gap-8 py-12"
         dir={isRTL ? 'rtl' : 'ltr'}
       >
-        <motion.h2
+        <m.h2
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.1, type: 'spring' as const, stiffness: 300, damping: 20 }}
           className="font-neo-display text-4xl text-neo-lime"
         >
           {t('connections.finished')}
-        </motion.h2>
-        <motion.div
+        </m.h2>
+        <m.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.2, type: 'spring' as const, stiffness: 280, damping: 22 }}
@@ -163,8 +163,8 @@ export default function ConnectionsGame() {
               +{xpEarned} {t('connections.xpEarned')}
             </p>
           )}
-        </motion.div>
-        <motion.button
+        </m.div>
+        <m.button
           onClick={handleReset}
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -174,8 +174,8 @@ export default function ConnectionsGame() {
           className="rounded-neo border-neo-thick border-neo-lime bg-neo-lime text-neo-navy font-neo-display font-bold px-8 py-4 text-xl shadow-hard"
         >
           {t('connections.playAgain')}
-        </motion.button>
-      </motion.div>
+        </m.button>
+      </m.div>
     );
   }
 
@@ -184,7 +184,7 @@ export default function ConnectionsGame() {
       <ConnectionsEffectsCanvas width={canvasSize.width} height={canvasSize.height} />
 
       {/* Header stats */}
-      <motion.div
+      <m.div
         initial={{ opacity: 0, y: -12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ type: 'spring' as const, stiffness: 280, damping: 24, delay: 0.1 }}
@@ -195,14 +195,14 @@ export default function ConnectionsGame() {
           {Array.from({ length: 3 }).map((_, i) => {
             const alive = i < state.lives;
             return (
-              <motion.span
+              <m.span
                 key={i}
                 animate={alive ? { scale: 1, opacity: 1, filter: 'grayscale(0)' } : { scale: 0.7, opacity: 0.25, filter: 'grayscale(1)' }}
                 transition={{ type: 'spring' as const, stiffness: 400, damping: 18 }}
                 className="text-2xl select-none"
               >
                 ❤️
-              </motion.span>
+              </m.span>
             );
           })}
         </div>
@@ -210,7 +210,7 @@ export default function ConnectionsGame() {
         <div className="flex items-center gap-4 text-sm font-neo-body">
           <AnimatePresence>
             {state.streak >= 2 && (
-              <motion.span
+              <m.span
                 key={`streak-${state.streak}`}
                 initial={{ scale: 0.5, opacity: 0, y: -8 }}
                 animate={{ scale: 1, opacity: 1, y: 0 }}
@@ -219,13 +219,13 @@ export default function ConnectionsGame() {
                 className="text-neo-orange font-bold"
               >
                 🔥 ×{state.streak}
-              </motion.span>
+              </m.span>
             )}
           </AnimatePresence>
           <span className="text-neo-white/60">
             {t('connections.score')}:{' '}
             <AnimatePresence mode="popLayout">
-              <motion.span
+              <m.span
                 key={state.score}
                 initial={{ y: -14, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
@@ -234,15 +234,15 @@ export default function ConnectionsGame() {
                 className="text-neo-cyan font-bold inline-block"
               >
                 {state.score.toLocaleString()}
-              </motion.span>
+              </m.span>
             </AnimatePresence>
           </span>
         </div>
-      </motion.div>
+      </m.div>
 
       {/* Progress bar */}
       <div className="w-full h-1.5 bg-neo-navy-light rounded-full overflow-hidden">
-        <motion.div
+        <m.div
           className="h-full bg-neo-lime"
           initial={{ width: 0 }}
           animate={{ width: `${progress}%` }}
