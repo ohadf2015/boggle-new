@@ -1,9 +1,9 @@
 # Technical Debt Register
 
-Last updated: 2026-04-22
-Total items: 14 (rolled up from 100+ raw findings) | Estimated total effort: 3×XL + 5×L + 4×M + 2×S
+Last updated: 2026-04-24
+Total items: 18 (rolled up from 100+ raw findings + react-doctor residuals) | Estimated total effort: 3×XL + 6×L + 6×M + 3×S
 
-Source: CCGS `ccgs-tech-debt scan` run on `fe-next/` 2026-04-22.
+Source: CCGS `ccgs-tech-debt scan` run on `fe-next/` 2026-04-22. React-doctor residuals (TD-015..TD-018) from batches 1–19 sweep on 2026-04-24.
 
 ## Priority score: (impact × frequency) / effort. Critical=4, High=3, Med=2, Low=1. Effort XL=4, L=3, M=2, S=1.
 
@@ -23,6 +23,10 @@ Source: CCGS `ccgs-tech-debt scan` run on `fe-next/` 2026-04-22.
 | TD-012 | Code Quality | `ProgressionContext.tsx` 1,002 lines — monolithic context, 2 bare `exhaustive-deps` suppressions | `contexts/ProgressionContext.tsx` | L | High | 3.0 | 2026-04-22 | Backlog | Central state grew organically |
 | TD-013 | Code Quality | `HeaderMobileMenu.tsx` 1,032 lines — owns nav + notifications + coins + lang + auth | `components/header/HeaderMobileMenu.tsx` | L | Med | 2.0 | 2026-04-22 | Backlog | Single-file convenience |
 | TD-014 | Code Quality | `useWinStreak.ts` 621 lines — hook far exceeds reasonable hook size | `hooks/useWinStreak.ts` | M | Med | 2.0 | 2026-04-22 | Backlog | Streak logic accreted |
+| TD-015 | Performance | `no-layout-property-animation` — 71 errors. Framer-motion animating `width`/`height` (layout props) instead of `scaleX`/`scaleY` + `transformOrigin`. | adventure/boss/* (9), practice/* (4), party/* (2), singleplayer (1), ui/Collapsible+CollapsibleSection+PullToRefreshIndicator, daily/survival/*, 29 files total | L | Med | 2.0 | 2026-04-24 | Backlog | RTL origin-flip blocks blanket scaleX fix — `start-0` logical anchoring means `originX:0` breaks Hebrew visual direction. Needs per-component RTL-aware refactor. |
+| TD-016 | Performance | `todo` rule (React Compiler bailouts) — 169 errors. "React Compiler can't optimize this code" diagnostics, NOT literal TODO comments. Blocks memoization. | repo-wide, clustered in CrazyGamesSDK + similar SDK wrappers using try/catch + empty catch blocks | L | Med | 2.0 | 2026-04-24 | Backlog | React Compiler bailouts, case-by-case. Common causes: empty `catch {}`, sessionStorage access in try/catch, non-idempotent side effects. Not mechanical. |
+| TD-017 | Code Quality | `set-state-in-effect` — 219 errors. useEffect calling setState after mount. | repo-wide | L | Low | 1.33 | 2026-04-24 | Backlog | Sampled — predominantly legitimate transition refs / matchMedia subscriptions / animation flashes. False-positive heavy for this codebase's motion patterns. |
+| TD-018 | Code Quality | `no-array-index-as-key` — 260 residuals after 19-batch sweep. Remaining sites are truly index-stable OR the array itself is stable-identity. | repo-wide | M | Low | 1.0 | 2026-04-24 | Backlog | Stable-identity sites exhausted in batches 1–19. Residuals need data-shape refactor (introduce stable IDs at source) rather than key-swap. |
 
 ## Clean signals (no debt found)
 
