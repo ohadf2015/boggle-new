@@ -67,7 +67,7 @@ export function WordHuntTargetArea({
       <div className="flex gap-1">
         {Array.from({ length: targetLength }).map((_, i) => (
           <div
-            key={i}
+            key={`target-blank-${i}`}
             data-testid={`target-blank-${i}`}
             className="w-7 h-7 sm:w-8 sm:h-8 border-neo border-black rounded bg-gray-700 flex items-center justify-center text-neo-white font-neo-display text-base sm:text-lg"
           >

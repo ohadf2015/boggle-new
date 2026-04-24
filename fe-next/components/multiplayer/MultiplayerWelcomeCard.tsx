@@ -64,7 +64,7 @@ const MultiplayerWelcomeCard: React.FC<MultiplayerWelcomeCardProps> = ({ onDismi
       {/* Steps — all visible at once */}
       <div className="space-y-2.5">
         {steps.map((step, i) => (
-          <div key={i} className="flex items-start gap-3">
+          <div key={step.title} className="flex items-start gap-3">
             {/* Step number + icon */}
             <div className="shrink-0 flex items-center gap-2">
               <span className="w-5 h-5 bg-neo-black text-white text-xs font-black flex items-center justify-center rounded">

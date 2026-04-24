@@ -145,7 +145,7 @@ const TournamentStandings: React.FC<TournamentStandingsProps> = ({
                             <div className="flex gap-1 mt-0.5">
                               {player.roundScores.map((score, i) => (
                                 <span
-                                  key={i}
+                                  key={`round-${i + 1}`}
                                   className="text-xs bg-slate-200 dark:bg-slate-700 px-1.5 py-0.5 rounded"
                                   title={`Round ${i + 1}: ${score}`}
                                 >

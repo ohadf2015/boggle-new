@@ -306,7 +306,7 @@ const PreGameTutorial: React.FC<PreGameTutorialProps> = ({ onComplete }) => {
         <div className="flex items-center gap-3">
           {Array.from({ length: TOTAL_STEPS }).map((_, i) => (
             <motion.div
-              key={i}
+              key={`progress-dot-${i}`}
               data-testid={`progress-dot-${i}`}
               className="border-2 border-neo-black cursor-pointer"
               onClick={() => {

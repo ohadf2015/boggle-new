@@ -38,16 +38,16 @@ export function GamePageSeoContent({
 
       {features && features.length > 0 && (
         <ul>
-          {features.map((feature, i) => (
-            <li key={i}>{feature}</li>
+          {features.map((feature) => (
+            <li key={feature}>{feature}</li>
           ))}
         </ul>
       )}
 
       {faq && faq.length > 0 && (
         <div>
-          {faq.map((item, i) => (
-            <div key={i}>
+          {faq.map((item) => (
+            <div key={item.question}>
               <h3>{item.question}</h3>
               <p>{item.answer}</p>
             </div>

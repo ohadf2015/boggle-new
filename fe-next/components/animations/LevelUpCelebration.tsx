@@ -341,7 +341,7 @@ export function LevelUpCelebration({
 
                 {rewards.unlocks?.map((unlock, i) => (
                   <motion.div
-                    key={i}
+                    key={unlock}
                     className="block text-neo-lime font-bold"
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}

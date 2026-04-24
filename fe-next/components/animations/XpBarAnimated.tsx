@@ -231,7 +231,7 @@ export function XpBarAnimated({
                 <div className="absolute inset-0 overflow-hidden">
                   {[...Array(3)].map((_, i) => (
                     <motion.div
-                      key={i}
+                      key={`bubble-${i}`}
                       className="absolute w-1 h-1 rounded-full bg-white/40"
                       style={{
                         left: `${20 + i * 30}%`,

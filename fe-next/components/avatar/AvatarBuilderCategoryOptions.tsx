@@ -285,8 +285,12 @@ export default function CategoryOptions({ category, config, updateConfig, t, pre
                 >
                   {/* Mini color swatch preview */}
                   <span className="flex -space-x-1">
-                    {[theme.colors.bgColor, theme.colors.shirtColor, theme.colors.hairColor].map((c, i) => (
-                      <span key={i} className="w-3 h-3 rounded-full border border-black/40" style={{ backgroundColor: c }} />
+                    {([
+                      ['bg', theme.colors.bgColor],
+                      ['shirt', theme.colors.shirtColor],
+                      ['hair', theme.colors.hairColor],
+                    ] as const).map(([role, c]) => (
+                      <span key={role} className="w-3 h-3 rounded-full border border-black/40" style={{ backgroundColor: c }} />
                     ))}
                   </span>
                   <span className="text-neo-white/70 text-xs font-bold capitalize">

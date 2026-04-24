@@ -128,7 +128,7 @@ const DirectionHintOverlay = memo<DirectionHintOverlayProps>(function DirectionH
                     const to = getCenter(cell[0], cell[1]);
                     return (
                       <motion.line
-                        key={i}
+                        key={`${cell[0]}-${cell[1]}`}
                         x1={from.x}
                         y1={from.y}
                         x2={to.x}

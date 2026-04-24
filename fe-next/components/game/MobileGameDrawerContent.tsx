@@ -194,7 +194,7 @@ export function MobileGameDrawerContent({
       <div className="grid grid-cols-2 gap-1.5">
         {statItems.map((item, i) => (
           <motion.div
-            key={i}
+            key={item.label}
             initial={{ opacity: 0, y: 4 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.03 }}
