@@ -48,7 +48,7 @@ export function LandingHallOfFame({ champions, loading }: LandingHallOfFameProps
         <div className="flex gap-3 justify-center items-end flex-wrap">
           {Array.from({ length: 3 }).map((_, i) => (
             <div
-              key={i}
+              key={`hof-skel-${i}`}
               className={cn(
                 'w-32 sm:w-36 md:w-40 bg-neo-cream/20 border-3 border-neo-black/20 rounded-neo-lg shadow-hard p-3 flex flex-col items-center',
                 i === 0 && 'sm:-mt-4',

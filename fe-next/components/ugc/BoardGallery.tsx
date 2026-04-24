@@ -195,7 +195,7 @@ const BoardGallery = memo<BoardGalleryProps>(({ onPlay }) => {
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4">
               {Array.from({ length: 3 }).map((_, i) => (
                 <div
-                  key={i}
+                  key={`skel-${i}`}
                   className="h-52 rounded-neo border-3 border-black bg-neo-white/3 animate-pulse"
                 />
               ))}

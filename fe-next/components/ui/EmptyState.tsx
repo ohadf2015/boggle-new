@@ -178,7 +178,7 @@ export const WaitingDots = memo(function WaitingDots({ color = 'neo-cyan' }: { c
     return (
       <span className="inline-flex gap-1">
         {[0, 1, 2].map((i) => (
-          <span key={i} className={`w-2 h-2 bg-${color} rounded-full opacity-70`} />
+          <span key={`dot-${i}`} className={`w-2 h-2 bg-${color} rounded-full opacity-70`} />
         ))}
       </span>
     );
@@ -188,7 +188,7 @@ export const WaitingDots = memo(function WaitingDots({ color = 'neo-cyan' }: { c
     <span className="inline-flex gap-1">
       {[0, 1, 2].map((i) => (
         <AdaptiveMotion.span
-          key={i}
+          key={`dot-${i}`}
           className={`w-2 h-2 bg-${color} rounded-full`}
           animate={{ y: [0, -6, 0] }}
           transition={{

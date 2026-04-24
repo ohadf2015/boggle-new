@@ -68,7 +68,7 @@ export const AutoJoiningState: React.FC<AutoJoiningStateProps> = ({
               <div className="flex space-x-3">
                 {[0, 1, 2].map((i) => (
                   <motion.div
-                    key={i}
+                    key={`dot-${i}`}
                     className="w-4 h-4 bg-neo-cyan border-2 border-neo-black rounded-neo"
                     animate={{
                       scale: [1, 1.3, 1],

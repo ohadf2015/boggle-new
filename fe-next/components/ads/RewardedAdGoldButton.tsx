@@ -155,7 +155,7 @@ export const RewardedAdGoldButton: React.FC<RewardedAdGoldButtonProps> = ({
               const dy = Math.sin(angle) * 28 - 8;
               return (
                 <motion.span
-                  key={i}
+                  key={`burst-${i}`}
                   className="absolute left-1/2 top-1/2 text-neo-yellow"
                   initial={{ x: 0, y: 0, scale: 0.4, opacity: 0 }}
                   animate={{ x: dx, y: dy, scale: 1, opacity: [0, 1, 0] }}

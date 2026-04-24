@@ -79,9 +79,13 @@ export function DailyModeQuestCard() {
             {t('dailyQuest.modesPlayed', { count: modesPlayed })}
           </span>
           <div className="flex gap-1">
-            {[progress.daily, progress.classicMp, progress.wordHuntMp].map((done, i) => (
+            {[
+              { id: 'daily', done: progress.daily },
+              { id: 'classicMp', done: progress.classicMp },
+              { id: 'wordHuntMp', done: progress.wordHuntMp },
+            ].map(({ id, done }) => (
               <span
-                key={i}
+                key={id}
                 className={`w-2.5 h-2.5 rounded-full border border-neo-cream/30 ${
                   done ? 'bg-neo-lime' : 'bg-neo-navy animate-pulse'
                 }`}

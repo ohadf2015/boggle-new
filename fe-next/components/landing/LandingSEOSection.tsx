@@ -176,7 +176,7 @@ export function LandingSEOSection({ className }: LandingSEOSectionProps) {
             const StepIcon = STEP_ICONS[i];
             return (
               <AdaptiveMotion.div
-                key={i}
+                key={step}
                 variants={staggerItem}
                 className="flex flex-col items-center text-center gap-3 relative"
               >

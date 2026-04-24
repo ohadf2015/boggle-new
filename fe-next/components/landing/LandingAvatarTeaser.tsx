@@ -65,7 +65,7 @@ export function LandingAvatarTeaser({ onBuilderOpenChange }: LandingAvatarTeaser
       <div className="flex -space-x-3 rtl:space-x-reverse shrink-0">
         {SAMPLE_AVATARS.map((config, i) => (
           <AdaptiveMotion.div
-            key={i}
+            key={`${config.bgColor}-${config.hair}`}
             className={cn(
               'border-3 border-neo-black rounded-full overflow-hidden shadow-hard-sm',
               'group-hover:border-neo-purple transition-colors',
