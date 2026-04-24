@@ -7,6 +7,11 @@ import { buildTriplesFromCompounds } from '../../lib/connections/generator/tripl
 import { renderPuzzleFile } from '../../lib/connections/generator/puzzleWriter';
 import { fetchPhraseTotalHits, makeCachedFreqLookup } from '../../lib/connections/generator/frequencyApi';
 import { validateTripleAsync } from '../../lib/connections/generator/validator';
+import {
+  fetchPageCategories,
+  hasRejectedCategory,
+  HE_REJECT_CATEGORY_PATTERNS,
+} from '../../lib/connections/generator/wikiCategoryFilter';
 import type { Difficulty } from '../../lib/connections/types';
 
 interface LocaleConfig {
@@ -193,6 +198,9 @@ async function main(): Promise<void> {
     'אדידס', 'נייקי', 'ריבוק', 'פומה', 'אנדר', 'אסיקס',
     // Tech/consumer brands
     'אפל', 'גוגל', 'מיקרוסופט', 'סמסונג', 'סוני', 'אינטל',
+    // Prepositions & function words (can't anchor a compound term)
+    'ליד', 'על', 'תחת', 'מתחת', 'בתוך', 'אצל', 'לפני', 'אחרי', 'בין', 'מול',
+    'סביב', 'נגד', 'בעד', 'בלי', 'של',
   ]);
   const isWeakHeToken = (token: string, knownTokens: Set<string>): boolean => {
     if (HE_PROPER_BLOCKLIST.has(token)) return true;
@@ -214,6 +222,24 @@ async function main(): Promise<void> {
     console.error(`[generate-puzzles] ${rawCompounds.length - compounds.length} compounds dropped by HE weak-token gate`);
   }
   console.error(`[generate-puzzles] ${compounds.length} two-word compound titles`);
+
+  // HE-only: drop compounds whose article sits in a biographical / place /
+  // award / work-of-art category on Wikipedia. Frequency filter is necessary
+  // but insufficient — famous proper nouns (singers, cities, films) have
+  // high WP hits but never form real lexicalized Hebrew smichut. Categories
+  // are the authoritative taxonomic signal.
+  if (locale === 'he' && compounds.length > 0) {
+    const before = compounds.length;
+    const catMap = await fetchPageCategories(cfg.host, compounds);
+    compounds = compounds.filter((c) => {
+      const cats = catMap.get(c);
+      if (!cats || cats.length === 0) return true;
+      return !hasRejectedCategory(cats, HE_REJECT_CATEGORY_PATTERNS);
+    });
+    console.error(
+      `[generate-puzzles] ${before - compounds.length} compounds dropped by HE category filter (${compounds.length} remain)`,
+    );
+  }
 
   const allTriples = buildTriplesFromCompounds(compounds);
   console.error(`[generate-puzzles] ${allTriples.length} candidate triples built`);
