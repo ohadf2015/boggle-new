@@ -110,8 +110,3 @@ export function getTodayWord(locale: Locale): WordEntry {
   return words.find((w) => w.dateKey === today) || words[0];
 }
 
-export function getPreviousWords(locale: Locale, count = 7): WordEntry[] {
-  const today = new Date().toISOString().slice(0, 10);
-  const words = wordsByLocale[locale] || wordsByLocale.en;
-  return words.filter((w) => w.dateKey !== today).slice(0, count);
-}

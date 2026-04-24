@@ -44,7 +44,7 @@ export interface HowToPlayContent {
     };
 }
 
-export const content: Record<string, HowToPlayContent> = {
+const content: Record<string, HowToPlayContent> = {
     en: {
         pageTitle: 'How to Play LexiClash - Complete Guide to All Game Modes',
         pageDescription: 'Learn how to play LexiClash with step-by-step instructions for Classic, Blast, and Word Hunt modes. Scoring guide, tips, and FAQ included.',
