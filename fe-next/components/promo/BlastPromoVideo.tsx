@@ -276,7 +276,7 @@ const HookScene: React.FC = () => {
         <div style={{ display: 'flex', gap: 10 }}>
           {boringLetters.map((letter, i) => (
             <div
-              key={i}
+              key={`boring-${i}-${letter}`}
               style={{
                 width: 80,
                 height: 80,

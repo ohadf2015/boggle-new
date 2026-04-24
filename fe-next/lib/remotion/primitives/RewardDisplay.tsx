@@ -57,7 +57,7 @@ export const RewardDisplay: React.FC<RewardDisplayProps> = ({
       }}
     >
       {rewards.map((reward, i) => (
-        <div key={i} style={{ textAlign: 'center' }}>
+        <div key={`reward-${i}-${reward.label}`} style={{ textAlign: 'center' }}>
           <div
             style={{
               fontFamily: fredokaFamily,

@@ -296,7 +296,7 @@ const WordleBoringScene: React.FC = () => {
 
             return (
               <div
-                key={i}
+                key={`tile-${i}`}
                 style={{
                   transform: `scaleY(${Math.abs(flipY) < 0.01 ? 0.01 : flipY})`,
                 }}
@@ -482,7 +482,7 @@ const TransformScene: React.FC = () => {
           <div style={{ display: 'flex', gap: 10 }}>
             {['S', 'H', '?', '?', '?'].map((letter, i) => (
               <ClueTile
-                key={i}
+                key={`tile-${i}-${letter}`}
                 letter={letter}
                 state={i < 2 ? 'correct' : 'empty'}
                 size={90}
@@ -664,7 +664,7 @@ const GameplayScene: React.FC = () => {
                 : 0;
 
               return (
-                <div key={i} style={{ position: 'relative' }}>
+                <div key={`clue-${i}-${cl.letter}`} style={{ position: 'relative' }}>
                   <ClueTile
                     letter={cl.letter}
                     state={cl.state}
@@ -1001,7 +1001,7 @@ const DangerScene: React.FC = () => {
           <div style={{ display: 'flex', gap: 8 }}>
             {clues.map((cl, i) => (
               <ClueTile
-                key={i}
+                key={`clue-${i}-${cl.letter}`}
                 letter={cl.letter}
                 state={cl.state}
                 size={86}
@@ -1045,7 +1045,7 @@ const DangerScene: React.FC = () => {
 
               return (
                 <div
-                  key={i}
+                  key={`tile-${i}`}
                   style={{ transform: `scale(${typeScale > 0 ? typeScale : 1})` }}
                 >
                   <ClueTile
@@ -1188,7 +1188,7 @@ const VictoryScene: React.FC = () => {
         const sparkColor = idx % 2 === 0 ? C.lime : C.wordleGreen;
         return (
           <div
-            key={idx}
+            key={`sparkle-${idx}`}
             style={{
               position: 'absolute',
               left: sp.x,
@@ -1221,7 +1221,7 @@ const VictoryScene: React.FC = () => {
 
             return (
               <div
-                key={i}
+                key={`tile-${i}-${letter}`}
                 style={{
                   transform: `scaleY(${Math.abs(scaleY) < 0.01 ? 0.01 : scaleY})`,
                 }}

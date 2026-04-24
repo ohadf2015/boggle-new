@@ -37,7 +37,7 @@ export const Confetti: React.FC<ConfettiProps> = ({ particles, frame }) => (
 
       return (
         <div
-          key={i}
+          key={`confetti-${i}`}
           data-testid="confetti-piece"
           style={{
             position: 'absolute',
