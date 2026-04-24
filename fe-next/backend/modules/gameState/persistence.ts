@@ -29,7 +29,11 @@ function getRedisClient(): RedisClient {
 const persistTimers: Record<string, ReturnType<typeof setTimeout>> = {};
 // Cleanup timers for restored games (cancellable on shutdown)
 const restoreCleanupTimers: ReturnType<typeof setTimeout>[] = [];
-const PERSIST_DEBOUNCE_MS = parseInt(process.env.PERSIST_DEBOUNCE_MS || '200', 10);
+// Debounce bumped 200→1000ms: coalesces more writes under concurrent-game load.
+// Each word submission + score/leaderboard update triggers a persist call; at 200ms
+// bursts of 5-10 events barely coalesced. Durability window grows to 1s on crash,
+// but Redis-primary mode makes in-memory state the source of truth intra-session.
+const PERSIST_DEBOUNCE_MS = parseInt(process.env.PERSIST_DEBOUNCE_MS || '1000', 10);
 
 export function persistGameState(
   gameCode: string,

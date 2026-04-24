@@ -11,11 +11,10 @@ const BASE_URL = 'https://www.lexiclash.live';
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale } = await params;
-  const isTargetLocale = locale === 'en';
   const pageUrl = `${BASE_URL}/${locale}/best-online-word-games`;
 
   return {
-    title: 'Best Online Word Games 2026 — Wordle, Connections, Scrabble GO & More | LexiClash',
+    title: '17 Best Online Word Games in 2026 (Tested & Ranked)',
     description: 'Honest comparison of every major word game in 2026: Wordle, NYT Connections, Strands, Spelling Bee, Scrabble GO, Semantle, LexiClash, and more. Find the one that fits how you play.',
     keywords: 'best online word games 2026, free word games online, nyt connections, nyt strands, spelling bee game, semantle, wordle alternatives, multiplayer word games, word games with friends, word puzzle games online, word games no download, connections game',
     openGraph: {

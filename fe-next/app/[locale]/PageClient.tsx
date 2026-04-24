@@ -1,12 +1,9 @@
 'use client';
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import dynamic from 'next/dynamic';
-import { useRouter } from 'next/navigation';
 import { hasCompletedOnboarding, hasSupabaseSession, savePendingRoomInvite } from '@/utils/onboardingStorage';
 import { LandingView } from '@/components/landing';
-import { useCrazyGames } from '@/components/CrazyGamesSDK';
-import { useLanguage } from '@/contexts/LanguageContext';
 import type { LandingInitialData } from '@/lib/landing/fetchLandingData';
 
 const OnboardingFlow = dynamic(
@@ -31,10 +28,6 @@ interface HomePageClientProps {
  * edge case of cleared localStorage.
  */
 export default function HomePageClient({ initialData }: HomePageClientProps): React.JSX.Element {
-  const { isOnCrazyGamesPlatform, isLoading: isCrazyGamesLoading } = useCrazyGames();
-  const router = useRouter();
-  const { language } = useLanguage();
-
   // Synchronous check — runs during first render, not in an effect.
   // hasSupabaseSession() is Layer 1: skip FTUE for auth users whose localStorage was cleared.
   const [showFTUE, setShowFTUE] = useState(() => {
@@ -49,22 +42,6 @@ export default function HomePageClient({ initialData }: HomePageClientProps): Re
   const handleFTUEComplete = useCallback(() => {
     setShowFTUE(false);
   }, []);
-
-  // On CrazyGames, skip the landing page and go straight to multiplayer
-  useEffect(() => {
-    if (!isCrazyGamesLoading && isOnCrazyGamesPlatform) {
-      router.replace(`/${language}/multiplayer`);
-    }
-  }, [isCrazyGamesLoading, isOnCrazyGamesPlatform, router, language]);
-
-  // While CrazyGames SDK is loading in an iframe, show loading instead of landing/onboarding
-  if (isCrazyGamesLoading && typeof window !== 'undefined' && window.self !== window.top) {
-    return <div className="fixed inset-0 bg-neo-navy" />;
-  }
-  // Already confirmed on CrazyGames — show loading until redirect completes
-  if (isOnCrazyGamesPlatform) {
-    return <div className="fixed inset-0 bg-neo-navy" />;
-  }
 
   // New users go straight to onboarding — LandingView never mounts
   if (showFTUE) {

@@ -45,7 +45,7 @@ export const contentByLocale: Record<string, PrivacyContent> = {
       },
       {
         title: '4. Third-Party Advertising',
-        content: 'We display non-personalized advertisements via Google AdSense. Because LexiClash is designed for players of all ages, including children, our ad serving operates under Google\'s Child-Directed Treatment (TFCD) mode.',
+        content: 'We display non-personalized advertisements via Google AdMob. Because LexiClash is designed for players of all ages, including children, our ad serving operates under Google\'s Child-Directed Treatment (TFCD) mode.',
         subsections: [
           {
             title: 'How Advertising Works',
@@ -63,7 +63,7 @@ export const contentByLocale: Record<string, PrivacyContent> = {
             items: [
               'You may opt out of personalized advertising by visiting Google Ads Settings',
               'Review Google\'s privacy practices',
-              'Learn about AdSense partner policies',
+              'Learn about AdMob partner policies',
               'You can manage or delete cookies through your browser settings. Note that disabling cookies may affect site functionality.',
               'You may also opt out of third-party vendor ad cookies by visiting aboutads.info',
             ],

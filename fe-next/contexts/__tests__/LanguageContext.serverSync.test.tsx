@@ -1,0 +1,112 @@
+import { vi, describe, it, expect, beforeEach } from 'vitest';
+import React from 'react';
+import { render, waitFor } from '@testing-library/react';
+import { LanguageProvider } from '../LanguageContext';
+
+const pushMock = vi.fn();
+const replaceMock = vi.fn();
+let mockPathname = '/en';
+
+vi.mock('next/navigation', () => ({
+    useRouter: () => ({ push: pushMock, replace: replaceMock }),
+    usePathname: () => mockPathname,
+}));
+
+vi.mock('../../translations/loadTranslation', () => ({
+    loadTranslation: vi.fn(async () => ({ direction: 'ltr', flag: '🇺🇸' })),
+    getCachedTranslation: vi.fn(() => undefined),
+    seedTranslationCache: vi.fn(),
+}));
+
+describe('LanguageContext — server-side language sync', () => {
+    let fetchMock: ReturnType<typeof vi.fn>;
+
+    beforeEach(() => {
+        pushMock.mockClear();
+        replaceMock.mockClear();
+        localStorage.clear();
+        sessionStorage.clear();
+        document.cookie = 'boggle_language=; path=/; max-age=0';
+        document.cookie = 'boggle_language_explicit=; path=/; max-age=0';
+        mockPathname = '/en';
+
+        fetchMock = vi.fn(async () => new Response(JSON.stringify({ success: true }), { status: 200 }));
+        vi.stubGlobal('fetch', fetchMock);
+    });
+
+    it('POSTs current language to /api/user/language on mount', async () => {
+        mockPathname = '/en';
+
+        render(
+            <LanguageProvider initialLanguage="en">
+                <span />
+            </LanguageProvider>
+        );
+
+        await waitFor(() => {
+            const call = fetchMock.mock.calls.find((c) => c[0] === '/api/user/language');
+            expect(call).toBeDefined();
+            expect(call![1]).toMatchObject({ method: 'POST' });
+            expect(JSON.parse(call![1].body)).toEqual({ language: 'en' });
+        });
+    });
+
+    it('does not POST twice in the same session (dedup via sessionStorage)', async () => {
+        mockPathname = '/en';
+
+        const { unmount } = render(
+            <LanguageProvider initialLanguage="en">
+                <span />
+            </LanguageProvider>
+        );
+
+        await waitFor(() => {
+            expect(fetchMock.mock.calls.some((c) => c[0] === '/api/user/language')).toBe(true);
+        });
+
+        const firstCallCount = fetchMock.mock.calls.filter((c) => c[0] === '/api/user/language').length;
+        unmount();
+        fetchMock.mockClear();
+
+        render(
+            <LanguageProvider initialLanguage="en">
+                <span />
+            </LanguageProvider>
+        );
+
+        await new Promise((r) => setTimeout(r, 30));
+
+        const secondCallCount = fetchMock.mock.calls.filter((c) => c[0] === '/api/user/language').length;
+        expect(firstCallCount).toBe(1);
+        expect(secondCallCount).toBe(0);
+    });
+
+    it('re-POSTs when language changes (different lang invalidates dedup)', async () => {
+        mockPathname = '/en';
+
+        render(
+            <LanguageProvider initialLanguage="en">
+                <span />
+            </LanguageProvider>
+        );
+
+        await waitFor(() => {
+            expect(fetchMock.mock.calls.some((c) => c[0] === '/api/user/language')).toBe(true);
+        });
+        fetchMock.mockClear();
+
+        // Simulate a later provider mount under a different locale (navigation)
+        mockPathname = '/he';
+        render(
+            <LanguageProvider initialLanguage="he">
+                <span />
+            </LanguageProvider>
+        );
+
+        await waitFor(() => {
+            const call = fetchMock.mock.calls.find((c) => c[0] === '/api/user/language');
+            expect(call).toBeDefined();
+            expect(JSON.parse(call![1].body)).toEqual({ language: 'he' });
+        });
+    });
+});

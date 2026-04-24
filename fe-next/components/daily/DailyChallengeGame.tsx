@@ -27,7 +27,7 @@ import { useKeyboardWordInput } from '@/hooks/useKeyboardWordInput';
 import DirectionGuidanceTooltip from '@/components/game/DirectionGuidanceTooltip';
 import KeyboardHintTooltip from '@/components/game/KeyboardHintTooltip';
 import { cn } from '@/lib/utils';
-import { trackGameEnd } from '@/utils/growthTracking';
+import { trackGameEnd, trackGameStart } from '@/utils/growthTracking';
 import { useCoinContext } from '@/contexts/CoinContext';
 import { Mascot } from '@/components/ui/Mascot';
 import { PANIC_TIMER_THRESHOLD, ONFIRE_COMBO_THRESHOLD } from '@/utils/mascotConfig';
@@ -106,6 +106,12 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
     return () => {
       isMountedRef.current = false;
     };
+  }, []);
+
+  // Funnel parity: emit game_started once on mount to pair with trackGameEnd('daily-challenge', ...)
+  useEffect(() => {
+    trackGameStart('daily-challenge', { puzzleNumber, language });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Enable sound effects when game is active, disable when leaving

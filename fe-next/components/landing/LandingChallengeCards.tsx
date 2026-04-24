@@ -7,7 +7,7 @@ import DailyChallengeBanner from '@/components/daily/DailyChallengeBanner';
 import { shouldShowGuidance } from '@/utils/contextualGuidanceStorage';
 import { hasCompletedOnboarding } from '@/utils/onboardingStorage';
 import { isNewPlayer } from '@/utils/multiplayerProgressStorage';
-import { trackModeSelected } from '@/utils/growthTracking';
+import { trackModeSelected, trackLandingCtaClick } from '@/utils/growthTracking';
 import { useIsPracticeVeteran } from '@/hooks/useIsPracticeVeteran';
 import { usePostHogFlag } from '@/hooks/usePostHogFlag';
 import type { LandingGameMode } from '@/lib/landing/fetchGameModeStats';
@@ -146,7 +146,7 @@ export function LandingChallengeCards({
               duration={t('landing.duration').replace('{time}', '1-3')}
               difficulty={2}
               difficultyLabel={t('landing.difficultyMedium')}
-              onClick={() => trackModeSelected('quickPlay', 'home')}
+              onClick={() => { trackModeSelected('quickPlay', 'home'); trackLandingCtaClick('mode_card', { mode: 'quickPlay', variant: 'cyan' }); }}
             />
           </div>
         );
@@ -168,7 +168,7 @@ export function LandingChallengeCards({
               duration={t('landing.duration').replace('{time}', '1-3')}
               difficulty={2}
               difficultyLabel={t('landing.difficultyMedium')}
-              onClick={() => trackModeSelected('arena', 'home')}
+              onClick={() => { trackModeSelected('arena', 'home'); trackLandingCtaClick('mode_card', { mode: 'arena', variant: 'pink' }); }}
             />
           </div>
         );
@@ -189,7 +189,7 @@ export function LandingChallengeCards({
               duration={t('landing.duration').replace('{time}', '1-3')}
               difficulty={1}
               difficultyLabel={t('landing.difficultyEasy')}
-              onClick={() => trackModeSelected('practice', 'home')}
+              onClick={() => { trackModeSelected('practice', 'home'); trackLandingCtaClick('mode_card', { mode: 'practice', variant: 'cyan' }); }}
             />
           </div>
         );
@@ -215,7 +215,7 @@ export function LandingChallengeCards({
               duration={t('landing.duration').replace('{time}', '2-5')}
               difficulty={3}
               difficultyLabel={t('landing.difficultyHard')}
-              onClick={() => trackModeSelected('blast', 'home')}
+              onClick={() => { trackModeSelected('blast', 'home'); trackLandingCtaClick('mode_card', { mode: 'blast', variant: 'orange' }); }}
             />
           </div>
         );
@@ -233,7 +233,7 @@ export function LandingChallengeCards({
               duration={t('landing.duration').replace('{time}', '2-5')}
               difficulty={2}
               difficultyLabel={t('landing.difficultyMedium')}
-              onClick={() => trackModeSelected('adventure', 'home')}
+              onClick={() => { trackModeSelected('adventure', 'home'); trackLandingCtaClick('mode_card', { mode: 'adventure', variant: 'lime' }); }}
             />
           </div>
         );
@@ -252,7 +252,7 @@ export function LandingChallengeCards({
               duration={t('landing.duration').replace('{time}', '2-5')}
               difficulty={2}
               difficultyLabel={t('landing.difficultyMedium')}
-              onClick={() => trackModeSelected('connections', 'home')}
+              onClick={() => { trackModeSelected('connections', 'home'); trackLandingCtaClick('mode_card', { mode: 'connections', variant: 'purple' }); }}
             />
           </div>
         );
@@ -293,7 +293,7 @@ export function LandingChallengeCards({
               {t('landing.sectionMultiplayerSubtitle')}
             </span>
           </header>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 md:gap-5 items-stretch">
+          <div className={`grid grid-cols-1 gap-3 sm:gap-4 md:gap-5 items-stretch ${mpCards.length >= 2 ? 'sm:grid-cols-2' : 'max-w-md mx-auto'}`}>
             {mpCards.map((mode) => renderCard(mode, nextIndex()))}
           </div>
         </section>
@@ -312,7 +312,12 @@ export function LandingChallengeCards({
               {t('landing.sectionSoloSubtitle')}
             </span>
           </header>
-          <div className={`grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 md:gap-5 items-stretch ${spCards.length >= 4 ? 'xl:grid-cols-4' : 'md:grid-cols-3'}`}>
+          <div className={`grid grid-cols-1 gap-3 sm:gap-4 md:gap-5 items-stretch ${
+            spCards.length === 1 ? 'max-w-md mx-auto' :
+            spCards.length === 2 ? 'sm:grid-cols-2 max-w-3xl mx-auto' :
+            spCards.length >= 4 ? 'sm:grid-cols-2 xl:grid-cols-4' :
+            'sm:grid-cols-2 md:grid-cols-3'
+          }`}>
             {spCards.map((mode) => renderCard(mode, nextIndex()))}
           </div>
         </section>

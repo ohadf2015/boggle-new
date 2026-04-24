@@ -82,8 +82,8 @@ export async function sendTestAndroidBetaLaunch(
       unsubscribeUrl,
       playUrl: PLAY_STORE_URL,
     }),
-    30000,
-    'Email render timed out after 30 seconds'
+    8000,
+    'Email render timed out after 8 seconds'
   );
   logger.info(
     'EMAIL',
@@ -100,8 +100,8 @@ export async function sendTestAndroidBetaLaunch(
         subject: `[TEST] ${subject}`,
         html,
       }),
-      20000,
-      'Resend API timed out after 20 seconds'
+      15000,
+      'Resend API timed out after 15 seconds'
     );
     logger.info(
       'EMAIL',
@@ -129,6 +129,21 @@ export async function sendAndroidBetaLaunchToPlayer(
   playerIdentifier: string
 ): Promise<{ success: boolean; error?: string; sentTo?: string }> {
   const t0 = Date.now();
+  let currentStep = 'init';
+  const stepFail = (err: unknown) => {
+    const msg = err instanceof Error ? err.message : String(err);
+    const elapsed = Date.now() - t0;
+    logger.error(
+      'EMAIL',
+      `[android-beta-player] step=${currentStep} failed after ${elapsed}ms: ${msg}`
+    );
+    return {
+      success: false as const,
+      error: `step=${currentStep} elapsed=${elapsed}ms: ${msg}`,
+    };
+  };
+
+  try {
   if (!isEmailServiceConfigured()) {
     return { success: false, error: 'Email service not configured' };
   }
@@ -152,12 +167,19 @@ export async function sendAndroidBetaLaunchToPlayer(
   const lookupStart = Date.now();
 
   if (isEmail) {
+    currentStep = 'supabase-email-lookup';
     const target = playerIdentifier.toLowerCase();
-    const { data: viewRow, error: viewError } = await supabase
-      .from('auth_users_view')
-      .select('id, email')
-      .eq('email', target)
-      .maybeSingle();
+    const { data: viewRow, error: viewError } = await withTimeout(
+      Promise.resolve(
+        supabase
+          .from('auth_users_view')
+          .select('id, email')
+          .eq('email', target)
+          .maybeSingle()
+      ),
+      5000,
+      'Supabase email lookup timed out after 5 seconds'
+    );
 
     if (viewError || !viewRow) {
       return {
@@ -168,11 +190,18 @@ export async function sendAndroidBetaLaunchToPlayer(
     profileId = viewRow.id;
     resolvedEmail = viewRow.email ?? null;
   } else {
-    const { data: profileByName } = await supabase
-      .from('profiles')
-      .select('id')
-      .eq('username', playerIdentifier)
-      .maybeSingle();
+    currentStep = 'supabase-username-lookup';
+    const { data: profileByName } = await withTimeout(
+      Promise.resolve(
+        supabase
+          .from('profiles')
+          .select('id')
+          .eq('username', playerIdentifier)
+          .maybeSingle()
+      ),
+      5000,
+      'Supabase username lookup timed out after 5 seconds'
+    );
     if (!profileByName) {
       return {
         success: false,
@@ -186,6 +215,7 @@ export async function sendAndroidBetaLaunchToPlayer(
     return { success: false, error: 'Could not resolve profile' };
   }
 
+  currentStep = 'supabase-profile-email';
   // Parallelize: profile details + email (if not already resolved via view)
   const profilePromise = supabase
     .from('profiles')
@@ -201,8 +231,11 @@ export async function sendAndroidBetaLaunchToPlayer(
         .eq('id', profileId)
         .maybeSingle();
 
-  const [{ data: profile }, { data: emailRow, error: emailErr }] =
-    await Promise.all([profilePromise, emailPromise]);
+  const [{ data: profile }, { data: emailRow, error: emailErr }] = await withTimeout(
+    Promise.all([profilePromise, emailPromise]),
+    5000,
+    'Supabase profile+email lookup timed out after 5 seconds'
+  );
 
   logger.info(
     'EMAIL',
@@ -245,6 +278,7 @@ export async function sendAndroidBetaLaunchToPlayer(
   const unsubscribeUrl = `${baseUrl}/api/email/unsubscribe?token=${unsubscribeToken}`;
   const recipientName = displayName || username || 'Word Hunter';
 
+  currentStep = 'render';
   logger.info('EMAIL', `[android-beta-player] render-start lang=${language} +${Date.now() - t0}ms`);
   const renderStart = Date.now();
   const { subject, html } = await withTimeout(
@@ -254,53 +288,48 @@ export async function sendAndroidBetaLaunchToPlayer(
       unsubscribeUrl,
       playUrl: PLAY_STORE_URL,
     }),
-    30000,
-    'Email render timed out after 30 seconds'
+    8000,
+    'Email render timed out after 8 seconds'
   );
   logger.info(
     'EMAIL',
     `[android-beta-player] render-done html=${html.length}B in ${Date.now() - renderStart}ms`
   );
 
-  try {
-    logger.info('EMAIL', `[android-beta-player] resend-send-start to=${resolvedEmail} +${Date.now() - t0}ms`);
-    const sendStart = Date.now();
-    const result = await withTimeout(
-      resend.emails.send({
-        from: fromEmail,
-        to: resolvedEmail,
-        subject,
-        html,
-        headers: {
-          'List-Unsubscribe': `<${unsubscribeUrl}>`,
-          'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
-        },
-      }),
-      20000,
-      'Resend API timed out after 20 seconds'
-    );
-    logger.info(
-      'EMAIL',
-      `[android-beta-player] resend-send-done in ${Date.now() - sendStart}ms total=${Date.now() - t0}ms`
-    );
+  currentStep = 'resend-send';
+  logger.info('EMAIL', `[android-beta-player] resend-send-start to=${resolvedEmail} +${Date.now() - t0}ms`);
+  const sendStart = Date.now();
+  const result = await withTimeout(
+    resend.emails.send({
+      from: fromEmail,
+      to: resolvedEmail,
+      subject,
+      html,
+      headers: {
+        'List-Unsubscribe': `<${unsubscribeUrl}>`,
+        'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+      },
+    }),
+    15000,
+    'Resend API timed out after 15 seconds'
+  );
+  logger.info(
+    'EMAIL',
+    `[android-beta-player] resend-send-done in ${Date.now() - sendStart}ms total=${Date.now() - t0}ms`
+  );
 
-    if (result.error) {
-      logger.error(
-        'EMAIL',
-        `Failed to send android beta launch to ${resolvedEmail}:`,
-        result.error
-      );
-      return { success: false, error: result.error.message };
-    }
-
-    logger.info('EMAIL', `Android beta launch sent to ${resolvedEmail}`);
-    return { success: true, sentTo: resolvedEmail };
-  } catch (err) {
-    const error = err as Error;
+  if (result.error) {
     logger.error(
       'EMAIL',
-      `[android-beta-player] failed after ${Date.now() - t0}ms to ${resolvedEmail}: ${error.message}`
+      `Failed to send android beta launch to ${resolvedEmail}:`,
+      result.error
     );
-    return { success: false, error: error.message };
+    return { success: false, error: `step=resend-send resend-error: ${result.error.message}` };
+  }
+
+  logger.info('EMAIL', `Android beta launch sent to ${resolvedEmail}`);
+  return { success: true, sentTo: resolvedEmail };
+  } catch (err) {
+    return stepFail(err);
   }
 }

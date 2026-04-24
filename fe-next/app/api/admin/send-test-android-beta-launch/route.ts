@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { sendTestAndroidBetaLaunch } from '@/lib/androidBetaLaunchEmail';
-import { isEmailServiceConfigured } from '@/lib/email';
+import { isEmailServiceConfigured, withTimeout } from '@/lib/email';
 import { captureApiError } from '@/utils/sentry';
 import logger from '@/backend/utils/logger';
 
@@ -32,7 +32,11 @@ export async function POST(request: NextRequest) {
     const {
       data: { user },
       error: authError,
-    } = await supabase.auth.getUser();
+    } = await withTimeout(
+      supabase.auth.getUser(),
+      5000,
+      'Auth lookup timed out after 5s'
+    );
     logger.info('EMAIL', `[android-beta-route] auth-done +${Date.now() - t0}ms`);
 
     if (authError || !user) {
@@ -40,11 +44,17 @@ export async function POST(request: NextRequest) {
     }
 
     logger.info('EMAIL', `[android-beta-route] profile-start +${Date.now() - t0}ms`);
-    const { data: profile, error: profileError } = await supabase
-      .from('profiles')
-      .select('is_admin, display_name, username')
-      .eq('id', user.id)
-      .single();
+    const { data: profile, error: profileError } = await withTimeout(
+      Promise.resolve(
+        supabase
+          .from('profiles')
+          .select('is_admin, display_name, username')
+          .eq('id', user.id)
+          .single()
+      ),
+      5000,
+      'Profile lookup timed out after 5s'
+    );
     logger.info('EMAIL', `[android-beta-route] profile-done +${Date.now() - t0}ms`);
 
     if (profileError || !profile?.is_admin) {

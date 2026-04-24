@@ -83,7 +83,7 @@ describe('CookiePolicyPageClient', () => {
     render(<CookiePolicyPageClient />);
     expect(screen.getByText(/Authentication tokens/i)).toBeInTheDocument();
     expect(screen.getAllByText(/LogRocket/i).length).toBeGreaterThan(0);
-    expect(screen.getAllByText(/Google AdSense/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Google AdMob/i).length).toBeGreaterThan(0);
   });
 
   it('renders managing cookies content with opt-out mention', () => {

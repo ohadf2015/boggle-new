@@ -16,11 +16,20 @@ function makeBuilder(result: { data: unknown; error: unknown }) {
   return b;
 }
 
-const { mockFrom, profilesResult, tokensResult, challengesResult } = vi.hoisted(() => ({
+const {
+  mockFrom,
+  profilesResult,
+  tokensResult,
+  puzzleAttemptsResult,
+  wordHuntAttemptsResult,
+  prefsResult,
+} = vi.hoisted(() => ({
   mockFrom: vi.fn(),
   profilesResult: { data: [] as unknown[], error: null },
   tokensResult: { data: [] as unknown[], error: null },
-  challengesResult: { data: [] as unknown[], error: null },
+  puzzleAttemptsResult: { data: [] as unknown[], error: null },
+  wordHuntAttemptsResult: { data: [] as unknown[], error: null },
+  prefsResult: { data: [] as unknown[], error: null },
 }));
 
 vi.mock('../email', async () => {
@@ -36,7 +45,9 @@ function setup() {
   mockFrom.mockImplementation((table: string) => {
     if (table === 'user_push_tokens') return makeBuilder(tokensResult);
     if (table === 'profiles') return makeBuilder(profilesResult);
-    if (table === 'daily_challenges') return makeBuilder(challengesResult);
+    if (table === 'daily_puzzle_attempts') return makeBuilder(puzzleAttemptsResult);
+    if (table === 'daily_word_hunt_attempts') return makeBuilder(wordHuntAttemptsResult);
+    if (table === 'user_notification_preferences') return makeBuilder(prefsResult);
     return makeBuilder({ data: [], error: null });
   });
 }
@@ -46,21 +57,52 @@ describe('getDailyChallengePushRecipients', () => {
     vi.clearAllMocks();
     profilesResult.data = [];
     tokensResult.data = [];
-    challengesResult.data = [];
+    puzzleAttemptsResult.data = [];
+    wordHuntAttemptsResult.data = [];
+    prefsResult.data = [];
     setup();
   });
 
   it('returns users with active push token who have not played today', async () => {
-    tokensResult.data = [{ user_id: 'u1' }, { user_id: 'u2' }];
+    tokensResult.data = [{ user_id: 'u1' }, { user_id: 'u2' }, { user_id: 'u3' }];
     profilesResult.data = [
       { id: 'u1', timezone: 'America/New_York', last_daily_push_sent_at: null },
       { id: 'u2', timezone: 'America/New_York', last_daily_push_sent_at: null },
+      { id: 'u3', timezone: 'America/New_York', last_daily_push_sent_at: null },
     ];
-    challengesResult.data = [{ player_id: 'u2' }]; // u2 played
+    puzzleAttemptsResult.data = [{ player_id: 'u2' }]; // u2 played daily puzzle
+    wordHuntAttemptsResult.data = [{ player_id: 'u3' }]; // u3 played word hunt
 
     const recipients = await getDailyChallengePushRecipients();
 
     expect(recipients).toEqual(['u1']);
+  });
+
+  it('excludes users who started but did not complete today (any row = played)', async () => {
+    tokensResult.data = [{ user_id: 'u1' }];
+    profilesResult.data = [
+      { id: 'u1', timezone: 'America/New_York', last_daily_push_sent_at: null },
+    ];
+    // User started word hunt but did not solve — still counts as played
+    wordHuntAttemptsResult.data = [{ player_id: 'u1' }];
+
+    const recipients = await getDailyChallengePushRecipients();
+
+    expect(recipients).toEqual([]);
+  });
+
+  it('does not query the legacy daily_challenges table', async () => {
+    tokensResult.data = [{ user_id: 'u1' }];
+    profilesResult.data = [
+      { id: 'u1', timezone: 'America/New_York', last_daily_push_sent_at: null },
+    ];
+
+    await getDailyChallengePushRecipients();
+
+    const tablesQueried = mockFrom.mock.calls.map((c) => c[0]);
+    expect(tablesQueried).not.toContain('daily_challenges');
+    expect(tablesQueried).toContain('daily_puzzle_attempts');
+    expect(tablesQueried).toContain('daily_word_hunt_attempts');
   });
 
   it('excludes users who already got a push today', async () => {

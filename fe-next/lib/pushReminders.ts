@@ -44,21 +44,38 @@ export async function getDailyChallengePushRecipients(): Promise<string[]> {
   }
   if (!profiles || profiles.length === 0) return [];
 
-  const { data: playedRows, error: challengesErr } = await supabase
-    .from('daily_challenges')
-    .select('player_id')
-    .eq('challenge_date', today)
-    .eq('completed', true)
-    .in('player_id', userIds);
+  // "Played" = has any attempt row (started or completed) in either daily mode today.
+  // Row existence alone counts — started-but-abandoned still means the user saw today's
+  // puzzle, so a reminder would be noise. Both tables have UNIQUE(puzzle_date, player_id).
+  const [puzzleRes, wordHuntRes] = await Promise.all([
+    supabase
+      .from('daily_puzzle_attempts')
+      .select('player_id')
+      .eq('puzzle_date', today)
+      .in('player_id', userIds),
+    supabase
+      .from('daily_word_hunt_attempts')
+      .select('player_id')
+      .eq('puzzle_date', today)
+      .in('player_id', userIds),
+  ]);
 
-  if (challengesErr) {
-    logger.error?.('PUSH_REMINDER', `challenges query failed: ${challengesErr.message}`);
+  if (puzzleRes.error) {
+    logger.error?.('PUSH_REMINDER', `puzzle attempts query failed: ${puzzleRes.error.message}`);
+    return [];
+  }
+  if (wordHuntRes.error) {
+    logger.error?.('PUSH_REMINDER', `word hunt attempts query failed: ${wordHuntRes.error.message}`);
     return [];
   }
 
-  const playedIds = new Set(
-    (playedRows ?? []).map((r: { player_id: string }) => r.player_id)
-  );
+  const playedIds = new Set<string>();
+  for (const r of (puzzleRes.data ?? []) as Array<{ player_id: string | null }>) {
+    if (r.player_id) playedIds.add(r.player_id);
+  }
+  for (const r of (wordHuntRes.data ?? []) as Array<{ player_id: string | null }>) {
+    if (r.player_id) playedIds.add(r.player_id);
+  }
 
   // Batch-fetch notification preferences. Users with push_enabled=false or
   // daily_challenge=false are excluded. Missing row = defaults (both on).

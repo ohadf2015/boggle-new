@@ -30,7 +30,7 @@ const STEPS: FlowStep[] = ['language', 'returningUser', 'tutorial', 'profile', '
 
 /** Step-specific accent colors for the floating background shapes */
 const STEP_ACCENTS: Record<FlowStep, { color1: string; color2: string }> = {
-  returningUser: { color1: 'rgba(191,255,0,0.07)', color2: 'rgba(139,92,246,0.06)' },
+  returningUser: { color1: 'rgba(191,255,0,0.18)', color2: 'rgba(255,20,147,0.14)' },
   language: { color1: 'rgba(191,255,0,0.07)', color2: 'rgba(0,255,255,0.05)' },
   tutorial: { color1: 'rgba(0,255,255,0.06)', color2: 'rgba(191,255,0,0.04)' },
   profile: { color1: 'rgba(255,20,147,0.06)', color2: 'rgba(191,255,0,0.04)' },
@@ -86,7 +86,6 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
   }, [isOnCrazyGamesPlatform]);
 
   const handleNewUser = useCallback(() => {
-    trackOnboardingStep('tutorial');
     setStep('tutorial');
   }, []);
 
@@ -201,7 +200,6 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
   const handleLanguageSelect = useCallback(() => {
     trackOnboardingStep('language');
     if (isOnCrazyGamesPlatform) {
-      trackOnboardingStep('tutorial');
       setStep('tutorial');
       return;
     }

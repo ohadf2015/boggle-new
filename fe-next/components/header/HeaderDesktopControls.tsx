@@ -8,6 +8,7 @@ import AuthButton from '../auth/AuthButton';
 import { QuickLanguageSwitcher } from '../QuickLanguageSwitcher';
 import MusicControls from '../MusicControls';
 import { useEngagementStatus } from '@/hooks/useEngagementStatus';
+import { useCrazyGames } from '@/components/CrazyGamesSDK';
 
 interface HeaderDesktopControlsProps {
     unclaimedCount: number;
@@ -19,6 +20,7 @@ interface HeaderDesktopControlsProps {
 const HeaderDesktopControls = memo<HeaderDesktopControlsProps>(({ unclaimedCount, onOpenGiftModal, onSignIn, onSignUp }) => {
     const { t, language } = useLanguage();
     const { isAuthenticated, loading } = useAuth();
+    const { isOnCrazyGamesPlatform } = useCrazyGames();
     const engagementStatus = useEngagementStatus();
 
     return (
@@ -42,7 +44,7 @@ const HeaderDesktopControls = memo<HeaderDesktopControlsProps>(({ unclaimedCount
             <QuickLanguageSwitcher compact />
 
             {/* Unified auth button for guests */}
-            {!isAuthenticated && !loading && (
+            {!isAuthenticated && !loading && !isOnCrazyGamesPlatform && (
                 <AuthButton
                     onSignInClick={onSignIn}
                     onSignUpClick={onSignUp}

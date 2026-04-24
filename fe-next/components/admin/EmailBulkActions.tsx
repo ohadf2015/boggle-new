@@ -42,6 +42,9 @@ export function EmailBulkActions({
     setPlayerStatus('sending');
     setPlayerMessage('');
 
+    const controller = new AbortController();
+    const clientTimeout = setTimeout(() => controller.abort(), 55_000);
+
     try {
       const playerEndpoint =
         emailType === 'android-beta-launch'
@@ -49,6 +52,7 @@ export function EmailBulkActions({
           : '/api/admin/send-reengagement-to-player';
       const response = await fetch(playerEndpoint, {
         method: 'POST',
+        signal: controller.signal,
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${authToken}`,
@@ -66,7 +70,13 @@ export function EmailBulkActions({
       setPlayerMessage(data.message || `Email sent to ${data.sentTo}`);
     } catch (err) {
       setPlayerStatus('error');
-      setPlayerMessage(err instanceof Error ? err.message : 'Failed to send email');
+      if (err instanceof DOMException && err.name === 'AbortError') {
+        setPlayerMessage('Client timeout after 55s — check server logs for step=… label');
+      } else {
+        setPlayerMessage(err instanceof Error ? err.message : 'Failed to send email');
+      }
+    } finally {
+      clearTimeout(clientTimeout);
     }
   };
 

@@ -11,7 +11,7 @@ import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import type { WordWheelEffect } from './WordWheelEffectsCanvas';
 import { WheelLetter, WordTile } from './WordWheelParts';
 import { useWordWheelKeyboard } from '@/hooks/useWordWheelKeyboard';
-import { trackGameEnd } from '@/utils/growthTracking';
+import { trackGameEnd, trackGameStart } from '@/utils/growthTracking';
 import dynamic from 'next/dynamic';
 
 const WordWheelPixiRing = dynamic(() => import('./WordWheelPixiRing'), { ssr: false });
@@ -105,6 +105,12 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
 
   useEffect(() => { wordsFoundRef.current = wordsFound; }, [wordsFound]);
   useEffect(() => { scoreRef.current = score; }, [score]);
+
+  // Funnel parity: emit game_started once on mount to pair with trackGameEnd('word-wheel', ...)
+  useEffect(() => {
+    trackGameStart('word-wheel', { language });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Detect newly-passed rivals when score changes
   useEffect(() => {
@@ -676,11 +682,11 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
       </div>
 
       {/* ── Action Buttons (sticky so Submit stays in view as found-words list grows) ── */}
-      {/* `bottom` offsets by AdSense anchor ad + AdMob banner heights so the
-          button bar is NEVER covered by a bottom-docked ad. */}
+      {/* `bottom` offsets by AdMob banner height so the button bar is never
+          covered by a bottom-docked ad. */}
       <div
         className="sticky z-30 w-full flex items-center justify-center gap-3 py-2 bg-linear-to-t from-neo-navy via-neo-navy/95 to-transparent"
-        style={{ bottom: 'calc(var(--adsense-anchor-height, 0px) + var(--admob-banner-height, 0px))' }}
+        style={{ bottom: 'var(--admob-banner-height, 0px)' }}
       >
         {/* Clear */}
         <motion.button

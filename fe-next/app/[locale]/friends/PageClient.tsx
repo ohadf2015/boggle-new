@@ -9,6 +9,7 @@ import { PullToRefreshIndicator } from '@/components/ui/PullToRefreshIndicator';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/utils/ThemeContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { useCrazyGamesAuth } from '@/hooks/useCrazyGamesAuth';
 import { useFriends } from '@/hooks/useFriends';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import { cn } from '@/lib/utils';
@@ -20,6 +21,7 @@ export default function FriendsPageClient(): React.JSX.Element {
   const { language, t } = useLanguage();
   const { theme } = useTheme();
   const { isAuthenticated } = useAuth();
+  const { isCrazyGames, isLoggedIn: isCrazyGamesLoggedIn, login: loginCrazyGames, isLoggingIn: isCrazyGamesLoggingIn } = useCrazyGamesAuth();
   const { refresh: refreshFriends } = useFriends();
   const router = useRouter();
   const isDark = theme === 'dark';
@@ -87,23 +89,35 @@ export default function FriendsPageClient(): React.JSX.Element {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
         >
-          {!isAuthenticated ? (
+          {!isAuthenticated && !(isCrazyGames && isCrazyGamesLoggedIn) ? (
             <div className={cn(
               'text-center py-12 px-4 rounded-neo border-3 border-neo-black',
               isDark ? 'bg-slate-800' : 'bg-white'
             )}>
-              <p className={cn(
-                'text-lg font-bold mb-2',
-                isDark ? 'text-white' : 'text-gray-900'
-              )}>
-                {t('friends.signInTitle')}
-              </p>
-              <p className={cn(
-                'text-sm',
-                isDark ? 'text-gray-400' : 'text-gray-500'
-              )}>
-                {t('friends.signInDescription')}
-              </p>
+              {isCrazyGames ? (
+                <>
+                  <p className={cn('text-lg font-bold mb-4', isDark ? 'text-white' : 'text-gray-900')}>
+                    {t('auth.loginCrazyGames')}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => { void loginCrazyGames(); }}
+                    disabled={isCrazyGamesLoggingIn}
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-neo border-2 border-neo-black shadow-hard bg-neo-lime text-neo-black font-bold hover:shadow-hard-pressed hover:translate-y-px transition-all disabled:opacity-60"
+                  >
+                    {isCrazyGamesLoggingIn ? '…' : t('auth.loginCrazyGames')}
+                  </button>
+                </>
+              ) : (
+                <>
+                  <p className={cn('text-lg font-bold mb-2', isDark ? 'text-white' : 'text-gray-900')}>
+                    {t('friends.signInTitle')}
+                  </p>
+                  <p className={cn('text-sm', isDark ? 'text-gray-400' : 'text-gray-500')}>
+                    {t('friends.signInDescription')}
+                  </p>
+                </>
+              )}
             </div>
           ) : (
             <FriendsList />

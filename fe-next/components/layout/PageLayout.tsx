@@ -87,7 +87,7 @@ export function PageLayout({
   return (
     <div
       className={cn(
-        'flex flex-col relative main-content-safe',
+        'flex flex-col relative',
         fullHeight ? 'h-full overflow-hidden' : 'min-h-full',
         isDarkMode
           ? 'bg-neo-navy'

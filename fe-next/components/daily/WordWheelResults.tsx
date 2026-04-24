@@ -151,14 +151,14 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
         </div>
       )}
 
-      {/* Back to home */}
+      {/* Back to daily landing */}
       <div className="w-full flex justify-start z-10">
         <Link
-          href={`/${language}`}
+          href={`/${language}/daily`}
           className="inline-flex items-center text-sm text-neo-cream/70 hover:text-neo-white transition-colors"
         >
           <ArrowLeft className="me-2 rtl:rotate-180 w-4 h-4" />
-          {t('daily.home')}
+          {t('common.back')}
         </Link>
       </div>
 

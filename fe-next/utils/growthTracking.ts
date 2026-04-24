@@ -89,7 +89,9 @@ export type GrowthEvent =
   // Modals / confirmation dialogs
   | 'modal_interaction'
   // Friction / engagement
-  | 'dead_time_detected';
+  | 'dead_time_detected'
+  // Landing-page CTA instrumentation (visitor → onboarding funnel leak)
+  | 'landing_cta_clicked';
 
 /** Onboarding funnel step identifiers (FTUE state machine). */
 export type OnboardingStep =
@@ -803,6 +805,19 @@ export const trackDeadTime = (
   trackGrowthEvent('dead_time_detected', { gameMode, thresholdMs, ...extras });
 };
 
+/**
+ * Landing-page CTA click. Used to diagnose the visitor → onboarding_started
+ * gap (88 of 95 visitors drop pre-onboarding). `cta` is a stable id for the
+ * surface (e.g. 'mode_card', 'hero_play'); extras carry disambiguators
+ * (mode, variant) for breakdowns.
+ */
+export const trackLandingCtaClick = (
+  cta: string,
+  extras: Record<string, unknown> = {},
+): void => {
+  trackGrowthEvent('landing_cta_clicked', { ...extras, cta });
+};
+
 export const trackLanguageChanged = (from: string, to: string): void => {
   if (from === to) return;
   trackGrowthEvent('language_changed', { from, to });
@@ -833,6 +848,7 @@ const growthTracking = {
   trackFeatureFirstUse,
   trackDailyPuzzle,
   trackHintUsed,
+  trackLandingCtaClick,
   trackLanguageChanged,
   trackOnboardingStart,
   trackOnboardingStep,

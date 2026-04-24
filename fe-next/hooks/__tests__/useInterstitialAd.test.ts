@@ -4,17 +4,13 @@
  */
 import { renderHook, act } from '@testing-library/react';
 
-const { midgame, adsense, admobShow } = vi.hoisted(() => ({
+const { midgame, admobShow } = vi.hoisted(() => ({
   midgame: vi.fn(),
-  adsense: vi.fn(),
   admobShow: vi.fn(),
 }));
 
 vi.mock('@/hooks/useCrazyGamesAds', () => ({
   useCrazyGamesAds: () => ({ requestMidgameAd: midgame }),
-}));
-vi.mock('@/hooks/useAdPlacement', () => ({
-  useAdPlacement: () => ({ showInterstitial: adsense }),
 }));
 vi.mock('@/hooks/useAdMob', () => ({
   useAdMob: () => ({ isAvailable: false, showInterstitial: admobShow }),
@@ -25,7 +21,7 @@ import { useInterstitialAd } from '../useInterstitialAd';
 describe('useInterstitialAd', () => {
   beforeEach(() => {
     midgame.mockClear();
-    adsense.mockClear();
+    admobShow.mockClear();
   });
 
   it('dedupes same placement name', () => {
@@ -41,6 +37,6 @@ describe('useInterstitialAd', () => {
     act(() => { result.current.showInterstitial('adventure-level-complete-1-2'); });
     act(() => { result.current.showInterstitial('adventure-level-complete-1-3'); });
     expect(midgame).toHaveBeenCalledTimes(3);
-    expect(adsense).toHaveBeenCalledTimes(3);
+    expect(admobShow).toHaveBeenCalledTimes(3);
   });
 });

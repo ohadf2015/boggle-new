@@ -52,7 +52,7 @@ export function AutoHideFooter({ className }: AutoHideFooterProps) {
     return null;
   }
 
-  // Desktop game routes (lobby/landing): compact legal-only footer (AdSense requirement)
+  // Desktop game routes (lobby/landing): compact legal-only footer
   if (isInGame || isGameRoute) {
     return (
       <footer

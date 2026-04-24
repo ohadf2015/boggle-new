@@ -10,10 +10,32 @@ interface PostHogEventLike {
   properties?: Record<string, unknown>;
 }
 
+interface StacktraceFrame {
+  filename?: string | null;
+}
+
+interface Stacktrace {
+  frames?: StacktraceFrame[];
+}
+
 interface ExceptionListEntry {
   type?: string | null;
   value?: string | null;
-  stacktrace?: unknown;
+  stacktrace?: Stacktrace | unknown;
+}
+
+const NOISE_VALUE_PATTERNS: RegExp[] = [
+  /Unable to convert color/i,
+];
+
+function isSupabaseLockAbort(entry: ExceptionListEntry): boolean {
+  if (entry?.type !== 'AbortError') return false;
+  const frames = (entry.stacktrace as Stacktrace | undefined)?.frames;
+  if (!Array.isArray(frames)) return false;
+  return frames.some((f) =>
+    typeof f?.filename === 'string' &&
+    /supabase|GoTrueClient|auth-js/i.test(f.filename),
+  );
 }
 
 export function filterEmptyException<T extends PostHogEventLike | null>(
@@ -30,6 +52,12 @@ export function filterEmptyException<T extends PostHogEventLike | null>(
 
   if (!type && !value) return null;
   if (value === 'Script error.' && !first?.stacktrace) return null;
+
+  if (typeof value === 'string' && NOISE_VALUE_PATTERNS.some((re) => re.test(value))) {
+    return null;
+  }
+
+  if (isSupabaseLockAbort(first)) return null;
 
   return event;
 }

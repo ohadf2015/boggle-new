@@ -204,6 +204,27 @@ export const LanguageProvider = ({ children, initialLanguage, initialTranslation
         }
     }, [language]);
 
+    // Sync current language to profiles.language so server-side push notifications
+    // can localize per recipient. Fires once per (session, language) pair: users
+    // who arrive via cookie/URL never clicked the switcher, so profiles.language
+    // would otherwise stay NULL and all pushes default to English.
+    // 401 for anonymous users is expected and ignored.
+    useEffect(() => {
+        if (typeof window === 'undefined' || typeof fetch === 'undefined') return;
+        const key = `boggle_language_synced:${language}`;
+        try {
+            if (sessionStorage.getItem(key) === '1') return;
+            sessionStorage.setItem(key, '1');
+        } catch {
+            // sessionStorage unavailable (private mode etc.) — fall through and POST
+        }
+        fetch('/api/user/language', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ language }),
+        }).catch(() => { /* non-blocking */ });
+    }, [language]);
+
     const setLanguage = useCallback((newLang: Language, options?: { skipNavigation?: boolean }) => {
         if (newLang !== languageRef.current) {
             setLanguageState(newLang);

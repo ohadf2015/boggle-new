@@ -127,15 +127,17 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
       logger.warn('[HOST] Start game already in progress, ignoring duplicate');
       return;
     }
-    startGameLockRef.current = true;
-    setTimeout(() => { startGameLockRef.current = false; }, 3000);
 
-    // Validate socket connection
+    // Validate socket connection BEFORE taking the lock so a transient
+    // disconnect doesn't jam retries for the 3s debounce window.
     if (!socket || !socket.connected) {
       logger.warn('[HOST] Cannot start game: socket not connected');
       neoErrorToast(t('hostView.connectionLost') || 'Connection lost. Please refresh.', { icon: TOAST_ICONS.plug, duration: 4000 });
       return;
     }
+
+    startGameLockRef.current = true;
+    setTimeout(() => { startGameLockRef.current = false; }, 3000);
 
     // Tournament creation
     if (gameType === 'tournament' && !tournamentData) {

@@ -163,7 +163,7 @@ function getAllRoutes(): MetadataRoute.Sitemap {
   addForAllLocales(routes, '/legal/cookies', { lastModified: LEGAL_UPDATED, changeFrequency: 'monthly', priority: 0.3 });
 
   // ─── SEO landing pages (market-specific, single locale) ───
-  // Doorway SEO pages flipped to noindex for AdSense thin-content remediation — excluded from sitemap.
+  // Doorway SEO pages flipped to noindex for thin-content remediation — excluded from sitemap.
   // Only real game pages remain (e.g., /daily-word-wheel).
   const seoLandings = [
     { locale: 'en', path: '/daily-word-wheel', img: 'en' },
@@ -203,7 +203,7 @@ function getAllRoutes(): MetadataRoute.Sitemap {
   // ─── Author page ───
   addForAllLocales(routes, '/about/ohad-fisher', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.7 });
 
-  // ─── Editorial policy (E-E-A-T / AdSense trust) ───
+  // ─── Editorial policy (E-E-A-T trust) ───
   addForAllLocales(routes, '/editorial-policy', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.6 });
 
   // ─── Words hub ───

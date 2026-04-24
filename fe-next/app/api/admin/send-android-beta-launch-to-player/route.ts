@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { sendAndroidBetaLaunchToPlayer } from '@/lib/androidBetaLaunchEmail';
-import { isEmailServiceConfigured } from '@/lib/email';
+import { isEmailServiceConfigured, withTimeout } from '@/lib/email';
 import { captureApiError } from '@/utils/sentry';
 
 export const maxDuration = 60;
@@ -24,17 +24,27 @@ export async function POST(request: NextRequest) {
     const {
       data: { user },
       error: authError,
-    } = await supabase.auth.getUser();
+    } = await withTimeout(
+      supabase.auth.getUser(),
+      5000,
+      'Auth lookup timed out after 5s'
+    );
 
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('is_admin')
-      .eq('id', user.id)
-      .single();
+    const { data: profile } = await withTimeout(
+      Promise.resolve(
+        supabase
+          .from('profiles')
+          .select('is_admin')
+          .eq('id', user.id)
+          .single()
+      ),
+      5000,
+      'Profile lookup timed out after 5s'
+    );
 
     if (!profile?.is_admin) {
       return NextResponse.json(

@@ -5,6 +5,7 @@ import { cn } from '../lib/utils';
 import { useSafeArea } from '@/hooks/useSafeArea';
 import { useGiftNotifications } from './header/useGiftNotifications';
 import HeaderLogo from './header/HeaderLogo';
+import HeaderBackButton from './header/HeaderBackButton';
 import HeaderDesktopControls from './header/HeaderDesktopControls';
 import HeaderMobileMenu from './header/HeaderMobileMenu';
 
@@ -87,6 +88,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                 )}
             >
                 <div className="flex items-center gap-2 min-w-0">
+                    <HeaderBackButton />
                     <HeaderLogo />
                     {/* Compact league badge — constant awareness without clutter */}
                     <div className="hidden sm:block"><LeaguePositionBadge /></div>

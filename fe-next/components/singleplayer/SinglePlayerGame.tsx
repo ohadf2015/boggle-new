@@ -6,7 +6,7 @@ import { useAchievementQueue } from '@/components/achievements';
 import FirstTimeEncouragement from '@/components/game/FirstTimeEncouragement';
 import { useFirstTimeEncouragement } from '@/hooks/useFirstTimeEncouragement';
 import { useIdleDetection } from '@/hooks/useIdleDetection';
-import { trackDeadTime } from '@/utils/growthTracking';
+import { trackDeadTime, trackGameStart } from '@/utils/growthTracking';
 
 const DEAD_TIME_THRESHOLD_MS = 15000;
 import {
@@ -42,6 +42,16 @@ function SinglePlayerGame({
     onGameEnd,
     onQuit,
   });
+
+  // Funnel parity: emit game_started once on mount to pair with emitSinglePlayerGameEnd('singleplayer', settings.mode, ...)
+  useEffect(() => {
+    trackGameStart('singleplayer', {
+      subMode: settings.mode,
+      difficulty: settings.difficulty,
+      language: settings.language,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // First-time player encouragement system
   const encouragement = useFirstTimeEncouragement();

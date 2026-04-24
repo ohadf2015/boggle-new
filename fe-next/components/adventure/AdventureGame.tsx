@@ -424,6 +424,7 @@ const AdventureGame = memo<AdventureGameProps>(
       showVictoryCinematic: cinematics.showVictoryCinematic,
       showDefeatCinematic: cinematics.showDefeatCinematic,
       consecutiveFailures: (bestAttempt?.consecutiveFailures ?? 0) + 1,
+      isBossLevel,
     });
 
     const hintsUsedRef = useRef(0);

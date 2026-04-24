@@ -61,4 +61,65 @@ describe('filterEmptyException', () => {
   it('returns null for null event', () => {
     expect(filterEmptyException(null)).toBeNull();
   });
+
+  // Regression: PostHog recorded 113× "Unable to convert color -1" from
+  // custom-pixi-particles internals on /he/blast over 30d. Sentry already
+  // suppresses this via ignoreErrors; parity in PostHog keeps noise out.
+  it('drops Pixi "Unable to convert color" exceptions', () => {
+    const event = {
+      event: '$exception',
+      properties: {
+        $exception_list: [
+          { type: 'Error', value: 'Unable to convert color -1' },
+        ],
+      },
+    };
+    expect(filterEmptyException(event as never)).toBeNull();
+  });
+
+  it('drops variant "Unable to convert color" messages regardless of suffix', () => {
+    const event = {
+      event: '$exception',
+      properties: {
+        $exception_list: [
+          { type: 'Error', value: 'Unable to convert color NaN' },
+        ],
+      },
+    };
+    expect(filterEmptyException(event as never)).toBeNull();
+  });
+
+  // Regression: 48× benign Supabase `navigator.locks` AbortError on /he/daily.
+  // Lock steal on tab visibility change is expected; not a real error.
+  it('drops Supabase navigator.locks AbortError noise', () => {
+    const event = {
+      event: '$exception',
+      properties: {
+        $exception_list: [
+          {
+            type: 'AbortError',
+            value: 'The operation was aborted.',
+            stacktrace: { frames: [{ filename: 'supabase/auth-js/GoTrueClient' }] },
+          },
+        ],
+      },
+    };
+    expect(filterEmptyException(event as never)).toBeNull();
+  });
+
+  it('keeps unrelated AbortError (not from Supabase lock)', () => {
+    const event = {
+      event: '$exception',
+      properties: {
+        $exception_list: [
+          {
+            type: 'AbortError',
+            value: 'fetch aborted',
+            stacktrace: { frames: [{ filename: 'api/route.ts' }] },
+          },
+        ],
+      },
+    };
+    expect(filterEmptyException(event as never)).toBe(event);
+  });
 });

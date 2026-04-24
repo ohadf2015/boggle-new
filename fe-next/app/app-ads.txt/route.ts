@@ -22,7 +22,7 @@ export async function GET() {
 # This file declares authorized advertising partners for LexiClash.
 # Format: <domain>, <publisher-id>, <relationship>, <certification-authority-id>
 #
-# Google AdSense - Primary Ad Network
+# Google AdMob - Primary Ad Network
 google.com, pub-1896836706464880, DIRECT, f08c47fec0942fa0
 `;
 

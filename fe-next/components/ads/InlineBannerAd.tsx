@@ -8,7 +8,7 @@ import { useSafeArea } from '@/hooks/useSafeArea';
 import { AdPlaceholder } from './AdPlaceholder';
 
 interface InlineBannerAdProps {
-  /** AdSense zone used when the ad falls back to the web AdPlaceholder. */
+  /** Zone label used for the dev-only web placeholder. */
   webZone?: 'lobby' | 'between-rounds' | 'content-page' | 'post-game' | 'menu';
   /** Reserved height (px) for the native overlay slot. Matches adaptive banner height. */
   reservedHeight?: number;
@@ -16,11 +16,10 @@ interface InlineBannerAdProps {
 }
 
 /**
- * InlineBannerAd — page-level banner slot that replaces the old globally-anchored
- * AdMob banner. On native platforms it reserves a fixed-height placeholder and
- * positions the AdMob banner so it visually sits on top of the slot (plugin
- * banners are native overlays and cannot be placed in-flow). On web it delegates
- * to the AdSense-backed AdPlaceholder.
+ * InlineBannerAd — page-level banner slot. On native platforms it reserves a
+ * fixed-height placeholder and positions the AdMob banner so it visually sits
+ * on top of the slot (plugin banners are native overlays and cannot be placed
+ * in-flow). On web it renders the dev-only AdPlaceholder (null in production).
  */
 export default function InlineBannerAd({
   webZone = 'content-page',
@@ -86,6 +85,6 @@ export default function InlineBannerAd({
     );
   }
 
-  // Web: AdSense-backed inline placeholder.
+  // Web: dev-only placeholder (null in production).
   return <AdPlaceholder zone={webZone} className={className} />;
 }

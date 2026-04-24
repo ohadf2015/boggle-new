@@ -64,6 +64,8 @@ export interface GameEmojiShareCardProps {
   t: (key: string) => string;
   /** Language for RTL support */
   language?: string;
+  /** Telemetry hook fired when user presses Share or Copy */
+  onShareClick?: (method: 'native' | 'copy') => void;
 }
 
 // ==================== Emoji generators ====================
@@ -200,12 +202,13 @@ function buildShareText(data: GameShareData, t: (key: string) => string): string
 
 // ==================== Component ====================
 
-export const GameEmojiShareCard: React.FC<GameEmojiShareCardProps> = ({ data, t }) => {
+export const GameEmojiShareCard: React.FC<GameEmojiShareCardProps> = ({ data, t, onShareClick }) => {
   const [copied, setCopied] = useState(false);
 
   const shareText = buildShareText(data, t);
 
   const handleCopy = useCallback(async () => {
+    onShareClick?.('copy');
     try {
       await navigator.clipboard.writeText(shareText);
       setCopied(true);
@@ -213,20 +216,25 @@ export const GameEmojiShareCard: React.FC<GameEmojiShareCardProps> = ({ data, t 
     } catch {
       // fallback: select the card text
     }
-  }, [shareText]);
+  }, [shareText, onShareClick]);
 
   const handleNativeShare = useCallback(async () => {
     if (typeof navigator !== 'undefined' && navigator.share) {
+      onShareClick?.('native');
       try {
         await navigator.share({ text: shareText, url: 'https://lexiclash.live' });
       } catch {
-        // cancelled
-        await handleCopy();
+        // cancelled — fall back to copy without re-firing telemetry
+        try {
+          await navigator.clipboard.writeText(shareText);
+          setCopied(true);
+          setTimeout(() => setCopied(false), 2000);
+        } catch {}
       }
     } else {
       await handleCopy();
     }
-  }, [shareText, handleCopy]);
+  }, [shareText, handleCopy, onShareClick]);
 
   const { header, rows: emojiRows, scoreLine } = getShareParts(data, t);
 

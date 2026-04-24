@@ -15,7 +15,7 @@ const DATE_PUBLISHED = '2026-03-28';
 const DATE_MODIFIED = '2026-03-28';
 
 const metaTitles: Record<string, string> = {
-  en: 'Boggle vs Scrabble: Which Word Game Is Actually Better? (2026 Comparison)',
+  en: 'Boggle vs Scrabble: 7 Key Differences (2026 Guide)',
   he: 'בוגל מול סקראבל: איזה משחק מילים באמת יותר טוב? (השוואה 2026)',
   sv: 'Boggle vs Scrabble: Vilket Ordspel Ar Egentligen Battre? (2026 Jamforelse)',
   ja: 'ボグル vs スクラブル：どちらの言葉ゲームが本当に優れている？（2026年比較）',

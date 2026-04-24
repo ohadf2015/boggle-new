@@ -3,7 +3,7 @@
  *
  * Funnel: offered → watched (success) or declined (dismiss/error).
  * Each event carries `surface` (which UI exposed the CTA) + `platform`
- * (crazygames | admob | adsense | simulation | no-ad-placeholder) so the
+ * (crazygames | admob | simulation | no-ad-placeholder) so the
  * PostHog funnel can filter by surface and slice fill/reward by network.
  */
 

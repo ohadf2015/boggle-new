@@ -123,7 +123,7 @@ export const contentByLocale: Record<string, FAQContent> = {
       {
         category: 'privacy',
         question: 'Does LexiClash show ads?',
-        answer: 'We partner with Google AdSense to display relevant advertisements. Ads help us keep the game free for everyone. You can learn more about ad personalization and opt-out options in our Privacy Policy.',
+        answer: 'We partner with Google AdMob to display relevant advertisements. Ads help us keep the game free for everyone. You can learn more about ad personalization and opt-out options in our Privacy Policy.',
       },
       {
         category: 'privacy',
@@ -225,7 +225,7 @@ export const contentByLocale: Record<string, FAQContent> = {
       {
         category: 'privacy',
         question: 'האם LexiClash מציג פרסומות?',
-        answer: 'אנחנו משתפים פעולה עם Google AdSense להצגת פרסומות רלוונטיות. פרסומות עוזרות לנו לשמור על המשחק חינמי לכולם. תוכלו ללמוד עוד על התאמת פרסומות ואפשרויות ביטול במדיניות הפרטיות.',
+        answer: 'אנחנו משתפים פעולה עם Google AdMob להצגת פרסומות רלוונטיות. פרסומות עוזרות לנו לשמור על המשחק חינמי לכולם. תוכלו ללמוד עוד על התאמת פרסומות ואפשרויות ביטול במדיניות הפרטיות.',
       },
       {
         category: 'privacy',
@@ -327,7 +327,7 @@ export const contentByLocale: Record<string, FAQContent> = {
       {
         category: 'privacy',
         question: 'Visar LexiClash annonser?',
-        answer: 'Vi samarbetar med Google AdSense för att visa relevanta annonser. Annonser hjälper oss att hålla spelet gratis för alla. Du kan läsa mer om annonsanpassning och alternativ i vår integritetspolicy.',
+        answer: 'Vi samarbetar med Google AdMob för att visa relevanta annonser. Annonser hjälper oss att hålla spelet gratis för alla. Du kan läsa mer om annonsanpassning och alternativ i vår integritetspolicy.',
       },
       {
         category: 'privacy',
@@ -429,7 +429,7 @@ export const contentByLocale: Record<string, FAQContent> = {
       {
         category: 'privacy',
         question: 'LexiClashに広告はありますか？',
-        answer: 'Google AdSenseと提携して関連広告を表示しています。広告はゲームを無料に保つために役立っています。広告のパーソナライズとオプトアウトオプションについてはプライバシーポリシーをご覧ください。',
+        answer: 'Google AdMobと提携して関連広告を表示しています。広告はゲームを無料に保つために役立っています。広告のパーソナライズとオプトアウトオプションについてはプライバシーポリシーをご覧ください。',
       },
       {
         category: 'privacy',
@@ -531,7 +531,7 @@ export const contentByLocale: Record<string, FAQContent> = {
       {
         category: 'privacy',
         question: '¿LexiClash muestra anuncios?',
-        answer: 'Nos asociamos con Google AdSense para mostrar anuncios relevantes. Los anuncios nos ayudan a mantener el juego gratuito para todos. Puedes aprender más sobre la personalización de anuncios y opciones de exclusión en nuestra Política de privacidad.',
+        answer: 'Nos asociamos con Google AdMob para mostrar anuncios relevantes. Los anuncios nos ayudan a mantener el juego gratuito para todos. Puedes aprender más sobre la personalización de anuncios y opciones de exclusión en nuestra Política de privacidad.',
       },
       {
         category: 'privacy',

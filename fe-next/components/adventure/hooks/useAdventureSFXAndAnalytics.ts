@@ -6,7 +6,7 @@
  */
 
 import { useEffect, useRef } from 'react';
-import { trackAdventureLevel, trackFeatureFirstUse } from '@/utils/growthTracking';
+import { trackAdventureLevel, trackFeatureFirstUse, trackGameStart } from '@/utils/growthTracking';
 
 interface SFXHandlers {
   setGameActive: (active: boolean) => void;
@@ -136,12 +136,13 @@ interface UseAdventureAnalyticsOptions {
   showVictoryCinematic: boolean;
   showDefeatCinematic: boolean;
   consecutiveFailures: number;
+  isBossLevel?: boolean;
 }
 
 export function useAdventureAnalytics({
   isPlaying, entryPhase, worldNumber, levelNumber,
   gameStars, gameScore, nonBossCompleted, showVictoryCinematic, showDefeatCinematic,
-  consecutiveFailures,
+  consecutiveFailures, isBossLevel,
 }: UseAdventureAnalyticsOptions): { resetTracking: () => void } {
   // Track first adventure use (deduplicated in localStorage)
   useEffect(() => { trackFeatureFirstUse('adventure'); }, []);
@@ -152,8 +153,9 @@ export function useAdventureAnalytics({
     if (isPlaying && entryPhase === 'playing' && !hasTrackedStartRef.current) {
       hasTrackedStartRef.current = true;
       trackAdventureLevel('start', worldNumber, levelNumber);
+      trackGameStart(isBossLevel ? 'adventure-boss' : 'adventure', { world: worldNumber, level: levelNumber });
     }
-  }, [isPlaying, entryPhase, worldNumber, levelNumber]);
+  }, [isPlaying, entryPhase, worldNumber, levelNumber, isBossLevel]);
 
   // Track level pass/fail when completion is determined
   const hasTrackedResultRef = useRef(false);

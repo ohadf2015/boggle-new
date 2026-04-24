@@ -33,9 +33,6 @@ vi.mock('@/hooks/useAdMob', () => ({
   useAdMob: () => ({ isAvailable: false, showRewarded: vi.fn() }),
 }));
 
-vi.mock('@/hooks/useAdPlacement', () => ({
-  useAdPlacement: () => ({ isReady: false, showRewarded: vi.fn() }),
-}));
 
 vi.mock('@/contexts/CoinContext', () => ({
   useCoinContext: () => ({

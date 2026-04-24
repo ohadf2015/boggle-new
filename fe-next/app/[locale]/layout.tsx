@@ -9,15 +9,13 @@ import GlobalBottomNav from '@/components/GlobalBottomNav';
 import DesktopGameNav from '@/components/DesktopGameNav';
 import GoogleConsentMode from '@/components/GoogleConsentMode';
 import GoogleAnalytics from '@/components/GoogleAnalytics';
-import GoogleAdSense from '@/components/GoogleAdSense';
-import AdSenseAnchorTracker from '@/components/ads/AdSenseAnchorTracker';
+import PurpleAds from '@/components/PurpleAds';
 import CrazyGamesScriptServer from '@/components/CrazyGamesScriptServer';
 import WebVitalsReporter from '@/components/WebVitalsReporter';
 import PWAInstallPrompt from '@/components/PWAInstallPrompt';
 import AndroidAppRedirect from '@/components/AndroidAppRedirect';
 import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration';
 import VersionChecker from '@/components/VersionChecker';
-import { CrazyGamesRouteGuard } from '@/components/CrazyGamesRouteGuard';
 import NewYearCountdown from '@/components/celebration/NewYearCountdown';
 import AnimationsLoader from '@/components/AnimationsLoader';
 import NativeOAuthInitializer from '@/components/NativeOAuthInitializer';
@@ -159,6 +157,7 @@ export async function generateMetadata({ params }: LocaleLayoutProps): Promise<M
         },
         other: {
             'google-site-verification': '4Blim0yOh_Hl4uX9TFnRX71lagbldOOxg7PwrcEbhrc',
+            'purpleads-verification': '858431921a32e3ac048cd681',
             // Geo-targeting: signal to search engines this site is based in Israel
             'geo.region': 'IL',
             'geo.placename': 'Israel',
@@ -515,13 +514,11 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 >
                     {translations[validLocale]?.accessibility?.skipToMain || 'Skip to main content'}
                 </a>
-                {/* Google Consent Mode v2 — MUST load before GA/AdSense */}
+                {/* Google Consent Mode v2 — MUST load before GA */}
                 <GoogleConsentMode />
                 {/* Load external scripts with optimized strategies to prevent blocking */}
                 <GoogleAnalytics />
-                <GoogleAdSense />
-                {/* Tracks Google's sticky bottom anchor ad so GlobalBottomNav can offset above it */}
-                <AdSenseAnchorTracker />
+                <PurpleAds />
                 <SocialMediaPixels />
                 <WebVitalsReporter />
                 <ServiceWorkerRegistration />
@@ -531,7 +528,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 {/* Initialize native OAuth (Google/Apple Sign-In) on mobile */}
                 <NativeOAuthInitializer />
                 {/* Server-rendered legal navigation — guarantees crawlers find
-                    privacy/terms/about links even without JS execution (AdSense requirement) */}
+                    privacy/terms/about links even without JS execution */}
                 <nav aria-label="Site Navigation" className="sr-only">
                     <ul>
                         <li><a href={`/${validLocale}/how-to-play`}>{translations[validLocale]?.nav?.howToPlay || 'How to Play'}</a></li>
@@ -547,7 +544,6 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 <ConditionalProviders lang={validLocale} initialTranslations={initialTranslations}>
                     {/* VersionChecker needs to be inside providers to access LanguageContext */}
                     <VersionChecker />
-                    <CrazyGamesRouteGuard />
                     <div className="flex-1 flex flex-col min-h-0 relative overflow-x-clip">
                         <DesktopGameNav />
                         <main

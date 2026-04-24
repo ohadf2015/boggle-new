@@ -30,7 +30,7 @@ export const SurvivalHeader: React.FC<SurvivalHeaderProps> = ({
   t,
 }) => {
   return (
-    <div className="flex items-center justify-between mb-1 px-2 max-w-3xl mx-auto w-full">
+    <div className="sticky top-0 z-20 flex items-center justify-between mb-1 px-2 py-1 max-w-3xl mx-auto w-full bg-neo-navy/90 backdrop-blur-sm rounded-b-neo overflow-visible">
       <button
         onClick={onQuitClick}
         className="flex items-center gap-1.5 bg-neo-black/50 text-neo-cream/60 px-2.5 py-1.5 text-xs font-bold uppercase tracking-wide border-2 border-neo-cream/10 rounded-full hover:bg-neo-black/70 hover:text-neo-cream/80 active:scale-95 transition-all duration-150"

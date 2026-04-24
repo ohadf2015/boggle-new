@@ -255,6 +255,7 @@ vi.mock('../results', () => ({
   useWinStreakTracking: () => ({ winStreakData: null }),
   useCognitiveScoring: () => ({ brainPointsReward: null }),
   useSignupPrompt: () => ({ showSignupModal: false, setShowSignupModal: vi.fn() }),
+  useSharePromptImpression: () => {},
   useAchievementsSave: () => {},
   useWordValidation: () => ({
     wordValidationQueue: [],

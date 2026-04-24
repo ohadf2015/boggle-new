@@ -3,13 +3,13 @@ import Script from 'next/script';
 /**
  * Initializes Google Consent Mode v2 defaults via an inline script.
  *
- * MUST render BEFORE GoogleAnalytics and GoogleAdSense in the component tree.
+ * MUST render BEFORE GoogleAnalytics in the component tree.
  * Uses strategy="afterInteractive" in root layout — loads early enough
  * to set consent defaults before any Google tags fire.
  *
  * The inline script is a static string constant (no user input / no XSS risk).
  *
- * Required for AdSense approval in EU/EEA regions.
+ * Required for GDPR compliance in EU/EEA regions.
  * @see https://developers.google.com/tag-platform/security/guides/consent
  */
 

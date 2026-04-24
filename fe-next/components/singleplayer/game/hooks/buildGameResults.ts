@@ -9,6 +9,7 @@ import {
   calculateFinalAchievements,
   type WordData as AchievementWordData,
 } from '@/utils/singlePlayerAchievements';
+import { trackGameEnd } from '@/utils/growthTracking';
 import type { SinglePlayerResultsData, BotOpponent } from '../../SinglePlayerView';
 import type { LetterGrid } from '@/shared/types/game';
 import type { FoundWord } from '../types';
@@ -157,4 +158,31 @@ export function buildFallbackResults(params: BuildResultsParams): SinglePlayerRe
     gameSessionId: fallbackSessionId,
     language: language as Language,
   };
+}
+
+/**
+ * Emit PostHog `game_completed` event for a finished singleplayer game.
+ * Centralized so happy-path + fallback branches both record the completion
+ * (keeps the singleplayer funnel symmetric with other modes).
+ */
+export function emitSinglePlayerGameEnd(
+  results: SinglePlayerResultsData,
+  subMode: string,
+): void {
+  const maxBotScore = results.botScores.reduce(
+    (max, bot) => Math.max(max, bot.score),
+    0,
+  );
+  const isWinner = results.botScores.length === 0
+    ? true
+    : results.playerScore > maxBotScore;
+
+  trackGameEnd(
+    'singleplayer',
+    results.playerScore,
+    results.playerWords.length,
+    true,
+    results.gameDuration,
+    { isWinner, subMode },
+  );
 }

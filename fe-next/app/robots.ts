@@ -64,7 +64,7 @@ export default function robots(): MetadataRoute.Robots {
 
   return {
     rules: [
-      // AdSense crawler — must be explicitly allowed for ad serving
+      // AdMob / Google ads crawler — must be explicitly allowed for ad serving
       {
         userAgent: 'Mediapartners-Google',
         allow: '/',
