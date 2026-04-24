@@ -12,6 +12,7 @@ import { ThemeProvider } from '@/utils/ThemeContext';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { MotionConfigProvider } from '@/components/motion/MotionConfigProvider';
+import { LazyMotion, domAnimation } from 'framer-motion';
 import { AccessibilityProvider } from '@/contexts/AccessibilityContext';
 import { NavigationProvider } from '@/contexts/NavigationContext';
 import { MusicProvider } from '@/contexts/MusicContext';
@@ -32,6 +33,7 @@ import { hasConsent } from '@/utils/cookieConsent';
 import { LogRocketIdentify } from '@/components/providers/LogRocketIdentify';
 import { PostHogProvider } from '@/components/providers/PostHogProvider';
 import GlobalCoinEarnFx from '@/components/animations/GlobalCoinEarnFx';
+import { PixiFxProvider } from '@/components/providers/PixiFxProvider';
 
 
 import type { TranslationData } from '@/translations/loadTranslation';
@@ -180,15 +182,18 @@ export function EssentialProviders({ children, lang, initialTranslations }: Esse
                         <CoinProvider>
                             <AccessibilityProvider>
                             <MotionConfigProvider>
+                                <LazyMotion features={domAnimation} strict={false}>
                                 {/* Active tier: changes during gameplay */}
                                 <MusicProvider>
                                     <SoundEffectsProvider>
                                         <HapticsProvider>
                                             <AdMobProvider>
                                             <NavigationProvider>
-                                                {memoizedChildren}
-                                                {/* Global coin-earn VFX: sound + flying coins on every addCoins */}
-                                                <GlobalCoinEarnFx />
+                                                <PixiFxProvider>
+                                                    {memoizedChildren}
+                                                    {/* Global coin-earn VFX: sound + flying coins on every addCoins */}
+                                                    <GlobalCoinEarnFx />
+                                                </PixiFxProvider>
                                             </NavigationProvider>
                                             </AdMobProvider>
                                         </HapticsProvider>
@@ -210,6 +215,7 @@ export function EssentialProviders({ children, lang, initialTranslations }: Esse
                                         />
                                     </SoundEffectsProvider>
                                 </MusicProvider>
+                                </LazyMotion>
                             </MotionConfigProvider>
                         </AccessibilityProvider>
                     </CoinProvider>

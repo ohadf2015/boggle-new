@@ -2,18 +2,19 @@
 
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { getShuffledPuzzles } from '@/lib/connections/puzzles';
-import { initGameState, applyGuess, advancePuzzle, giveUp as giveUpLogic, markRated, xpForPuzzle } from '@/lib/connections/gameLogic';
+import { getLeveledPuzzles } from '@/lib/connections/puzzles';
+import { initGameState, applyGuess, advancePuzzle, giveUp as giveUpLogic, markRated, xpForPuzzle, checkGuess } from '@/lib/connections/gameLogic';
 import type { GameState, PuzzleRating } from '@/lib/connections/types';
 import { submitConnectionsFeedback } from '@/lib/connections/feedback';
+import { trackConnectionsPuzzleStarted, trackConnectionsPuzzleResolved } from '@/lib/connections/telemetry';
 import PuzzleCard from './PuzzleCard';
+import LevelBanner from './LevelBanner';
 
 const ConnectionsEffectsCanvas = dynamic(() => import('./ConnectionsEffectsCanvas'), { ssr: false });
 
 const PUZZLE_COUNT = 20;
-const ADVANCE_DELAY_MS = 1200;
 
 type Action =
   | { type: 'SET_INPUT'; input: string }
@@ -49,10 +50,10 @@ export default function ConnectionsGame() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [canvasSize, setCanvasSize] = useState({ width: 0, height: 0 });
 
-  const puzzles = getShuffledPuzzles(language, PUZZLE_COUNT);
+  const puzzles = getLeveledPuzzles(language, PUZZLE_COUNT);
   const [state, dispatch] = useReducer(reducer, puzzles, initGameState);
-  const [xpEarned, setXpEarned] = useState(0);
-  const xpAwardedIdsRef = useRef<Set<string>>(new Set());
+  const startedIdsRef = useRef<Set<string>>(new Set());
+  const resolvedIdsRef = useRef<Set<string>>(new Set());
 
   // Track container dimensions for the PixiJS canvas overlay
   useEffect(() => {
@@ -66,24 +67,54 @@ export default function ConnectionsGame() {
     return () => ro.disconnect();
   }, []);
 
-  // Auto-advance after correct answer + award XP
+  // Fire puzzle-started telemetry once per puzzle when it becomes active
+  useEffect(() => {
+    const puzzle = state.puzzles[state.currentIndex];
+    if (!puzzle || state.status === 'finished') return;
+    if (startedIdsRef.current.has(puzzle.id)) return;
+    startedIdsRef.current.add(puzzle.id);
+    trackConnectionsPuzzleStarted({
+      puzzleId: puzzle.id,
+      difficulty: puzzle.difficulty,
+      locale: language,
+      levelIndex: state.currentIndex,
+    });
+  }, [state.currentIndex, state.puzzles, state.status, language]);
+
+  // Fire resolved telemetry + correct-event on transition to 'correct'. XP is accounted in the reducer;
+  // the side-effect fetch is performed in handleSubmit after dispatch (see below).
   useEffect(() => {
     if (state.status !== 'correct') return;
     window.dispatchEvent(new CustomEvent('connections:correct'));
     const puzzle = state.puzzles[state.currentIndex];
-    if (puzzle && !xpAwardedIdsRef.current.has(puzzle.id)) {
-      xpAwardedIdsRef.current.add(puzzle.id);
-      const xp = xpForPuzzle(puzzle.difficulty, state.streak);
-      setXpEarned((prev) => prev + xp);
-      void fetch('/api/education/record-xp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ xpAmount: xp, lessonId: 'connections-game', activityType: 'connections' }),
-      }).catch(() => {});
+    if (puzzle && !resolvedIdsRef.current.has(puzzle.id)) {
+      resolvedIdsRef.current.add(puzzle.id);
+      trackConnectionsPuzzleResolved({
+        puzzleId: puzzle.id,
+        difficulty: puzzle.difficulty,
+        locale: language,
+        outcome: 'correct',
+        wrongAttempts: state.wrongAttempts,
+        streak: state.streak,
+      });
     }
-    const timer = setTimeout(() => dispatch({ type: 'ADVANCE' }), ADVANCE_DELAY_MS);
-    return () => clearTimeout(timer);
-  }, [state.status, state.currentIndex, state.puzzles, state.streak]);
+  }, [state.status, state.currentIndex, state.puzzles, state.streak, state.wrongAttempts, language]);
+
+  // Fire resolved telemetry on gaveUp
+  useEffect(() => {
+    if (state.status !== 'gaveUp') return;
+    const puzzle = state.puzzles[state.currentIndex];
+    if (!puzzle || resolvedIdsRef.current.has(puzzle.id)) return;
+    resolvedIdsRef.current.add(puzzle.id);
+    trackConnectionsPuzzleResolved({
+      puzzleId: puzzle.id,
+      difficulty: puzzle.difficulty,
+      locale: language,
+      outcome: 'gaveUp',
+      wrongAttempts: state.wrongAttempts,
+      streak: state.streak,
+    });
+  }, [state.status, state.currentIndex, state.puzzles, state.wrongAttempts, state.streak, language]);
 
   // Dispatch wrong event
   useEffect(() => {
@@ -97,14 +128,34 @@ export default function ConnectionsGame() {
   }, []);
 
   const handleSubmit = useCallback(() => {
+    const puzzle = state.puzzles[state.currentIndex];
+    const guardPassed =
+      puzzle != null &&
+      !!state.input.trim() &&
+      state.status !== 'correct' &&
+      state.status !== 'gaveUp' &&
+      state.status !== 'finished';
+    const willAwardXp =
+      guardPassed &&
+      puzzle != null &&
+      !state.xpAwardedIds.has(puzzle.id) &&
+      checkGuess(state.input, puzzle).correct;
     dispatch({ type: 'SUBMIT' });
-  }, []);
+    if (willAwardXp && puzzle) {
+      const xp = xpForPuzzle(puzzle.difficulty, state.streak + 1);
+      void fetch('/api/education/record-xp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ xpAmount: xp, lessonId: 'connections-game', activityType: 'connections' }),
+      }).catch(() => {});
+    }
+  }, [state.puzzles, state.currentIndex, state.status, state.streak, state.xpAwardedIds, state.input]);
 
   const handleReset = useCallback(() => {
-    const fresh = getShuffledPuzzles(language, PUZZLE_COUNT);
+    const fresh = getLeveledPuzzles(language, PUZZLE_COUNT);
     dispatch({ type: 'RESET', puzzles: fresh });
-    setXpEarned(0);
-    xpAwardedIdsRef.current = new Set();
+    startedIdsRef.current = new Set();
+    resolvedIdsRef.current = new Set();
   }, [language]);
 
   const handleGiveUp = useCallback(() => {
@@ -135,22 +186,22 @@ export default function ConnectionsGame() {
 
   if (state.status === 'finished') {
     return (
-      <motion.div
+      <m.div
         initial={{ opacity: 0, scale: 0.92 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ type: 'spring' as const, stiffness: 260, damping: 22 }}
         className="flex flex-col items-center justify-center gap-8 py-12"
         dir={isRTL ? 'rtl' : 'ltr'}
       >
-        <motion.h2
+        <m.h2
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.1, type: 'spring' as const, stiffness: 300, damping: 20 }}
           className="font-neo-display text-4xl text-neo-lime"
         >
           {t('connections.finished')}
-        </motion.h2>
-        <motion.div
+        </m.h2>
+        <m.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.2, type: 'spring' as const, stiffness: 280, damping: 22 }}
@@ -158,13 +209,13 @@ export default function ConnectionsGame() {
         >
           <p className="text-neo-white/60 text-sm uppercase tracking-widest mb-2">{t('connections.finalScore')}</p>
           <p className="font-neo-display text-6xl text-neo-yellow">{state.score.toLocaleString()}</p>
-          {xpEarned > 0 && (
+          {state.xpEarned > 0 && (
             <p className="mt-4 font-neo-body text-neo-lime text-lg">
-              +{xpEarned} {t('connections.xpEarned')}
+              +{state.xpEarned} {t('connections.xpEarned')}
             </p>
           )}
-        </motion.div>
-        <motion.button
+        </m.div>
+        <m.button
           onClick={handleReset}
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -174,8 +225,8 @@ export default function ConnectionsGame() {
           className="rounded-neo border-neo-thick border-neo-lime bg-neo-lime text-neo-navy font-neo-display font-bold px-8 py-4 text-xl shadow-hard"
         >
           {t('connections.playAgain')}
-        </motion.button>
-      </motion.div>
+        </m.button>
+      </m.div>
     );
   }
 
@@ -183,8 +234,16 @@ export default function ConnectionsGame() {
     <div ref={containerRef} className="relative flex flex-col gap-6 w-full max-w-xl mx-auto py-6 px-4">
       <ConnectionsEffectsCanvas width={canvasSize.width} height={canvasSize.height} />
 
+      {currentPuzzle && (
+        <LevelBanner
+          level={state.currentIndex + 1}
+          totalLevels={state.puzzles.length}
+          difficulty={currentPuzzle.difficulty}
+        />
+      )}
+
       {/* Header stats */}
-      <motion.div
+      <m.div
         initial={{ opacity: 0, y: -12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ type: 'spring' as const, stiffness: 280, damping: 24, delay: 0.1 }}
@@ -195,14 +254,14 @@ export default function ConnectionsGame() {
           {Array.from({ length: 3 }).map((_, i) => {
             const alive = i < state.lives;
             return (
-              <motion.span
+              <m.span
                 key={i}
                 animate={alive ? { scale: 1, opacity: 1, filter: 'grayscale(0)' } : { scale: 0.7, opacity: 0.25, filter: 'grayscale(1)' }}
                 transition={{ type: 'spring' as const, stiffness: 400, damping: 18 }}
                 className="text-2xl select-none"
               >
                 ❤️
-              </motion.span>
+              </m.span>
             );
           })}
         </div>
@@ -210,7 +269,7 @@ export default function ConnectionsGame() {
         <div className="flex items-center gap-4 text-sm font-neo-body">
           <AnimatePresence>
             {state.streak >= 2 && (
-              <motion.span
+              <m.span
                 key={`streak-${state.streak}`}
                 initial={{ scale: 0.5, opacity: 0, y: -8 }}
                 animate={{ scale: 1, opacity: 1, y: 0 }}
@@ -219,13 +278,13 @@ export default function ConnectionsGame() {
                 className="text-neo-orange font-bold"
               >
                 🔥 ×{state.streak}
-              </motion.span>
+              </m.span>
             )}
           </AnimatePresence>
           <span className="text-neo-white/60">
             {t('connections.score')}:{' '}
             <AnimatePresence mode="popLayout">
-              <motion.span
+              <m.span
                 key={state.score}
                 initial={{ y: -14, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
@@ -234,15 +293,15 @@ export default function ConnectionsGame() {
                 className="text-neo-cyan font-bold inline-block"
               >
                 {state.score.toLocaleString()}
-              </motion.span>
+              </m.span>
             </AnimatePresence>
           </span>
         </div>
-      </motion.div>
+      </m.div>
 
       {/* Progress bar */}
       <div className="w-full h-1.5 bg-neo-navy-light rounded-full overflow-hidden">
-        <motion.div
+        <m.div
           className="h-full bg-neo-lime"
           initial={{ width: 0 }}
           animate={{ width: `${progress}%` }}
