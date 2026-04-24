@@ -14,6 +14,7 @@ import { shouldShowKeyboardTrails } from '@/components/game/keyboardTrailsUtils'
 import { cn } from '@/lib/utils';
 import { GameOverlays } from './GameOverlays';
 import { HintPromptButton } from './HintPromptButton';
+import TimeLowAdPrompt from '@/components/ads/TimeLowAdPrompt';
 import type { LetterGrid, Language } from '@/shared/types/game';
 import type { EarthquakeState } from '@/shared/types/earthquake';
 import type { FoundWord, KeyboardInputState, TrainingState } from '../types';
@@ -81,6 +82,8 @@ export interface LandscapeGameLayoutProps {
   // Tutorial
   showLandscapeTutorial: boolean;
   onDismissLandscapeTutorial: () => void;
+  /** Extend the game timer (rewarded-ad integration). */
+  onExtendTime?: (seconds: number) => void;
   // Translation
   t: (key: string) => string | undefined;
 }
@@ -135,6 +138,7 @@ export function LandscapeGameLayout({
   setShowQuitConfirm,
   showLandscapeTutorial: _showLandscapeTutorial,
   onDismissLandscapeTutorial: _onDismissLandscapeTutorial,
+  onExtendTime,
   t,
 }: LandscapeGameLayoutProps): React.ReactElement {
   const validWords = React.useMemo(() => foundWords.filter(fw => fw.isValid === true), [foundWords]);
@@ -371,6 +375,13 @@ export function LandscapeGameLayout({
           />
         )}
       </AdaptiveAnimatePresence>
+
+      {/* Time-low rewarded-ad prompt — loss aversion at the most urgent moment */}
+      {onExtendTime && !isPaused && !isGameOver && (
+        <div className="absolute top-2 left-1/2 -translate-x-1/2 z-40 pointer-events-auto">
+          <TimeLowAdPrompt timeRemaining={remainingTime} onExtend={onExtendTime} />
+        </div>
+      )}
 
       {/* Quit Confirmation Dialog */}
       <ConfirmationDialog

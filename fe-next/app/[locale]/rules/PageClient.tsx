@@ -9,6 +9,7 @@ import { Gamepad2, Trophy, Lightbulb, Users, ArrowLeft, Play, Bot, CheckCircle }
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Header from '@/components/Header';
+import { InlineBannerAd } from '@/components/ads';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 // Generate localized JSON-LD Schema for How to Play page
@@ -228,6 +229,8 @@ export default function RulesPageClient(): React.JSX.Element {
                     </Card>
                 </motion.section>
 
+                <InlineBannerAd webZone="content-page" className="my-4 sm:my-6" />
+
                 {/* Compact Scoring System - 3 Rows */}
                 <motion.section
                     className="mb-4 sm:mb-8"
@@ -314,6 +317,8 @@ export default function RulesPageClient(): React.JSX.Element {
                         </CardContent>
                     </Card>
                 </motion.section>
+
+                <InlineBannerAd webZone="content-page" className="my-4 sm:my-6" />
 
                 {/* Call to Action */}
                 <motion.div

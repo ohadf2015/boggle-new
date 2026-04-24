@@ -6,6 +6,7 @@ import { useTheme } from '@/utils/ThemeContext';
 import { cn } from '@/lib/utils';
 import { Mail, Gamepad2, Globe, BookOpen, Users, Shield, Zap } from 'lucide-react';
 import { InstagramIcon } from '@/components/icons/SocialIcons';
+import { InlineBannerAd } from '@/components/ads';
 import { contentByLocale, type AboutContent } from './content';
 
 function FeatureCard({
@@ -125,6 +126,8 @@ export default function AboutPageClient(): React.ReactElement {
         </div>
       </section>
 
+      <InlineBannerAd webZone="content-page" className="my-6" />
+
       {/* Section 5: What We Do */}
       <section className="mb-8">
         <h2 className={sectionHeadingClass}>{c.whatWeDo.title}</h2>
@@ -152,6 +155,8 @@ export default function AboutPageClient(): React.ReactElement {
         <p className={cn(paragraphClass, 'mb-4')}>{c.community.content}</p>
         <p className={paragraphClass}>{c.community.content2}</p>
       </section>
+
+      <InlineBannerAd webZone="content-page" className="my-6" />
 
       {/* Section 9: Values */}
       <section className="mb-8">

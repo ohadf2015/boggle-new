@@ -7,7 +7,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { BookOpen, Zap, Target } from 'lucide-react';
 import AutoHideHeader from '@/components/AutoHideHeader';
-import { AdPlaceholder } from '@/components/ads';
+import { InlineBannerAd } from '@/components/ads';
 
 const guidesContent: Record<string, {
   title: string;
@@ -135,7 +135,7 @@ export default function GuidesIndexPageClient(): React.ReactElement {
           })}
         </div>
 
-        <AdPlaceholder zone="content-page" className="mt-8" />
+        <InlineBannerAd webZone="content-page" className="mt-8" />
       </main>
     </div>
   );

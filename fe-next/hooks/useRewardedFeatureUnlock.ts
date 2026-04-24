@@ -32,6 +32,7 @@ export function useRewardedFeatureUnlock(
   onUnlockRef.current = onUnlock;
 
   const { status, canShowAd, rewardAmount, isPlaceholder, showAd } = useRewardedAd({
+    rewardKind: 'feature',
     onRewardEarned: async () => {
       await onUnlockRef.current();
     },

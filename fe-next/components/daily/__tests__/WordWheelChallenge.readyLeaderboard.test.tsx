@@ -44,6 +44,9 @@ vi.mock('@/contexts/SoundEffectsContext', () => ({
 vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({ profile: null, isAuthenticated: false }),
 }));
+vi.mock('@/contexts/NavigationContext', () => ({
+  useHideNavigation: () => vi.fn(),
+}));
 
 // --- Utils ---
 vi.mock('@/utils/dailyChallenge', () => ({

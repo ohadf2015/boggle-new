@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils';
 import { ArrowLeft, Clock, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import AutoHideHeader from '@/components/AutoHideHeader';
-import { AdPlaceholder } from '@/components/ads';
+import { InlineBannerAd } from '@/components/ads';
 import { AuthorBioCard } from '@/components/blog/AuthorBioCard';
 import { contentByLocale } from './content';
 
@@ -98,7 +98,7 @@ export default function ClassicStrategyPageClient(): React.ReactElement {
           </ol>
         </section>
 
-        <AdPlaceholder zone="content-page" className="my-6" />
+        <InlineBannerAd webZone="content-page" className="my-6" />
 
         {/* Scoring Table */}
         <section className="mb-8">
@@ -156,7 +156,7 @@ export default function ClassicStrategyPageClient(): React.ReactElement {
                   {paragraph}
                 </p>
               ))}
-              {index === 2 && <AdPlaceholder zone="content-page" className="my-6" />}
+              {index === 2 && <InlineBannerAd webZone="content-page" className="my-6" />}
             </div>
           ))}
 
@@ -190,7 +190,7 @@ export default function ClassicStrategyPageClient(): React.ReactElement {
 
           <AuthorBioCard />
 
-          <AdPlaceholder zone="content-page" className="my-6" />
+          <InlineBannerAd webZone="content-page" className="my-6" />
 
           {/* CTA */}
           <div className={cn('mt-12 pt-6 border-t', isDarkMode ? 'border-slate-700' : 'border-gray-200')}>

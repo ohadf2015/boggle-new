@@ -1,0 +1,82 @@
+/**
+ * useRewardedAd — rewardKind option (coins vs feature).
+ *
+ * Bug: the hook unconditionally called awardWatchedAd() (+250g) on ad-complete,
+ * even when the caller was using the ad to unlock a non-coin feature (retry,
+ * continue, avatar part, streak-freeze). Result: feature unlocks silently also
+ * granted 250g on top of the advertised reward, inflating the economy.
+ *
+ * Fix: rewardKind option (default 'coins' for back-compat). When 'feature',
+ * the hook invokes onRewardEarned without calling awardWatchedAd.
+ */
+import { renderHook, act } from '@testing-library/react';
+
+const awardWatchedAdMock = vi.fn().mockResolvedValue({ awarded: 250 });
+
+vi.mock('@/components/CrazyGamesSDK', () => ({
+  useCrazyGames: () => ({
+    isAvailable: false,
+    isOnCrazyGamesPlatform: false,
+    showRewardedAd: vi.fn(),
+  }),
+}));
+
+vi.mock('@/hooks/useAdMob', () => ({
+  useAdMob: () => ({ isAvailable: false, showRewarded: vi.fn() }),
+}));
+
+vi.mock('@/hooks/useAdPlacement', () => ({
+  useAdPlacement: () => ({ isReady: false, showRewarded: vi.fn() }),
+}));
+
+vi.mock('@/contexts/CoinContext', () => ({
+  useCoinContext: () => ({
+    awardWatchedAd: awardWatchedAdMock,
+    rewards: { WATCH_AD: 250 },
+  }),
+}));
+
+vi.mock('@/utils/growthTracking', () => ({
+  trackRewardedAdWatched: vi.fn(),
+  trackRewardedAdDeclined: vi.fn(),
+  trackRewardedAdOffered: vi.fn(),
+}));
+
+import { useRewardedAd } from '../useRewardedAd';
+
+describe('useRewardedAd — rewardKind', () => {
+  beforeEach(() => {
+    awardWatchedAdMock.mockClear();
+    // NODE_ENV='test' (vitest default) → isPlaceholder path grants reward synchronously
+    if (typeof localStorage !== 'undefined') localStorage.clear();
+  });
+
+  it("defaults rewardKind to 'coins' and calls awardWatchedAd on reward", async () => {
+    const onRewardEarned = vi.fn();
+    const { result } = renderHook(() => useRewardedAd({ onRewardEarned }));
+
+    await act(async () => {
+      result.current.showAd();
+      // flush placeholder-path microtasks
+      await new Promise((r) => setTimeout(r, 0));
+    });
+
+    expect(awardWatchedAdMock).toHaveBeenCalledTimes(1);
+    expect(onRewardEarned).toHaveBeenCalledTimes(1);
+  });
+
+  it("with rewardKind='feature', does NOT call awardWatchedAd but still fires onRewardEarned", async () => {
+    const onRewardEarned = vi.fn();
+    const { result } = renderHook(() =>
+      useRewardedAd({ onRewardEarned, rewardKind: 'feature' }),
+    );
+
+    await act(async () => {
+      result.current.showAd();
+      await new Promise((r) => setTimeout(r, 0));
+    });
+
+    expect(awardWatchedAdMock).not.toHaveBeenCalled();
+    expect(onRewardEarned).toHaveBeenCalledTimes(1);
+  });
+});

@@ -151,7 +151,7 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
-      className="flex-1 flex flex-col items-center justify-start pt-2 sm:pt-4 page-content-safe px-4 pb-10 min-h-0 overflow-y-auto"
+      className="flex-1 flex flex-col items-center justify-start pt-2 sm:pt-4 px-4 pb-[calc(var(--mobile-bottom-safe)+5rem)] sm:pb-10 min-h-0 overflow-y-auto"
     >
       {/* Top bar with back and language */}
       <div className="w-full max-w-md lg:max-w-5xl xl:max-w-6xl flex items-center justify-between mb-2">

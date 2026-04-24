@@ -99,8 +99,12 @@ const RetryAssistModal = memo<RetryAssistModalProps>(
     const dialogRef = useRef<HTMLDivElement>(null);
     useFocusTrap(dialogRef, isOpen, onExit);
 
-    // R4 — rewarded ad grants bonus-time retry without failure threshold
-    const rewarded = useRewardedAd({ onRewardEarned: () => onRetryWithBonus() });
+    // R4 — rewarded ad grants bonus-time retry without failure threshold.
+    // rewardKind='feature' so the bonus-retry is the SOLE reward (no extra coin payout).
+    const rewarded = useRewardedAd({
+      rewardKind: 'feature',
+      onRewardEarned: () => onRetryWithBonus(),
+    });
 
     // Fire offered-event each time the modal opens with CTA visible.
     useEffect(() => {

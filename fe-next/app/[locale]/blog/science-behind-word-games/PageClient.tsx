@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils';
 import { ArrowLeft, Calendar, Clock, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import AutoHideHeader from '@/components/AutoHideHeader';
-import { AdPlaceholder } from '@/components/ads';
+import { InlineBannerAd } from '@/components/ads';
 import { RelatedArticles } from '@/components/blog/RelatedArticles';
 import { contentByLocale } from './content';
 import { AuthorBioCard } from '@/components/blog/AuthorBioCard';
@@ -128,7 +128,7 @@ export default function SciencePageClient(): React.ReactElement {
         </header>
 
         {/* Ad: After hero */}
-        <AdPlaceholder zone="content-page" className="my-6" />
+        <InlineBannerAd webZone="content-page" className="my-6" />
 
         <div className={cn(
           'prose prose-lg max-w-none',
@@ -160,7 +160,7 @@ export default function SciencePageClient(): React.ReactElement {
 
 
           {/* Ad: Before CTAs */}
-          <AdPlaceholder zone="content-page" className="my-6" />
+          <InlineBannerAd webZone="content-page" className="my-6" />
 
           <div className={cn('mt-12 pt-6 border-t', isDarkMode ? 'border-slate-700' : 'border-gray-200')}>
             <div className="flex gap-4">

@@ -18,6 +18,7 @@ import { formatScore } from '@/utils/scoreDisplay';
 import { GameOverlays } from './GameOverlays';
 import { HintPromptButton } from './HintPromptButton';
 import { DynamicEnergyBackground } from './DynamicEnergyBackground';
+import TimeLowAdPrompt from '@/components/ads/TimeLowAdPrompt';
 import type { LetterGrid, Language } from '@/shared/types/game';
 import type { EarthquakeState } from '@/shared/types/earthquake';
 import type { FoundWord, KeyboardInputState, TrainingState } from '../types';
@@ -90,6 +91,8 @@ export interface PortraitGameLayoutProps {
   // Quit dialog
   showQuitConfirm: boolean;
   setShowQuitConfirm: (show: boolean) => void;
+  /** Extend the game timer (rewarded-ad integration). */
+  onExtendTime?: (seconds: number) => void;
   // Words
   totalBoardWords: number | null;
   // Ref for auto-scroll
@@ -150,6 +153,7 @@ export function PortraitGameLayout({
   totalBoardWords,
   showQuitConfirm,
   setShowQuitConfirm,
+  onExtendTime,
   gameStatsRef,
   t,
 }: PortraitGameLayoutProps): React.ReactElement {
@@ -442,6 +446,13 @@ export function PortraitGameLayout({
           />
         )}
       </AdaptiveAnimatePresence>
+
+      {/* Time-low rewarded-ad prompt — loss aversion at the most urgent moment */}
+      {onExtendTime && !isPaused && !isGameOver && (
+        <div className="fixed top-16 left-1/2 -translate-x-1/2 z-40 pointer-events-auto">
+          <TimeLowAdPrompt timeRemaining={remainingTime} onExtend={onExtendTime} />
+        </div>
+      )}
 
       {/* Practice Completion Popup */}
       {isPracticeMode && (

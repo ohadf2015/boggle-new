@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { InlineBannerAd } from '@/components/ads';
 import {
   getWordsByLength,
   groupByFirstLetter,
@@ -235,9 +236,11 @@ export default async function NLetterWordsPage({ params }: PageParams) {
             </section>
           )}
 
+          <InlineBannerAd webZone="content-page" className="mb-8" />
+
           {/* Word list by letter group */}
           <div className="space-y-8">
-            {sortedLetters.map(letter => (
+            {sortedLetters.map((letter, letterIdx) => (
               <section key={letter}>
                 <h2 className="text-2xl font-neo-display font-black text-neo-cyan mb-3 border-b-2 border-slate-700 pb-2">
                   {letter}
@@ -258,6 +261,7 @@ export default async function NLetterWordsPage({ params }: PageParams) {
                     </Link>
                   ))}
                 </div>
+                {letterIdx === 3 && <InlineBannerAd webZone="content-page" className="mt-6" />}
               </section>
             ))}
           </div>

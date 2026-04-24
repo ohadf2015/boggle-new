@@ -69,6 +69,7 @@ export const CoinBalanceBadge = memo<CoinBalanceBadgeProps>(function CoinBalance
       )}
       role="status"
       aria-label={`Coin balance: ${balance.toLocaleString()}`}
+      data-coin-counter="true"
     >
       <Coins className={cn(config.icon, canAfford ? 'text-neo-black' : 'text-white')} />
       <span>{balance.toLocaleString()}</span>
