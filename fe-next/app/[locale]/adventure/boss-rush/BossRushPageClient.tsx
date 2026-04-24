@@ -251,7 +251,7 @@ export function BossRushPageClient() {
           <div className="flex gap-2 mb-6">
             {state.bossSequence.map((_, i) => (
               <div
-                key={i}
+                key={`boss-progress-${i}`}
                 className={cn(
                   'flex-1 h-2 rounded-full transition-colors',
                   i < state.defeatedCount

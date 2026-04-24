@@ -288,8 +288,8 @@ export default function StudentProfilePageClient() {
           {isLoadingProgress ? (
             // Skeleton loaders for stats
             <>
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="p-6 bg-neo-navy/50 border-neo border-neo-black rounded-neo shadow-hard animate-pulse">
+              {['a', 'b', 'c'].map((id) => (
+                <div key={`stats-${id}`} className="p-6 bg-neo-navy/50 border-neo border-neo-black rounded-neo shadow-hard animate-pulse">
                   <div className="h-4 w-24 bg-neo-white/10 rounded mb-2" />
                   <div className="h-9 w-16 bg-neo-white/20 rounded" />
                 </div>
@@ -336,8 +336,8 @@ export default function StudentProfilePageClient() {
           {isLoadingDuels ? (
             // Skeleton loader
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="p-4 bg-neo-navy/50 border-neo border-neo-black rounded-neo shadow-hard animate-pulse">
+              {['a', 'b', 'c', 'd'].map((id) => (
+                <div key={`duel-${id}`} className="p-4 bg-neo-navy/50 border-neo border-neo-black rounded-neo shadow-hard animate-pulse">
                   <div className="h-4 w-16 bg-neo-white/10 rounded mb-2" />
                   <div className="h-8 w-12 bg-neo-white/20 rounded" />
                 </div>

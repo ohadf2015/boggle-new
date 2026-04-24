@@ -80,7 +80,7 @@ const ExplosiveBurstLayout = memo<ExplosiveBurstLayoutProps>(({
       {/* Burst particles */}
       {particles.map((particle, i) => (
         <motion.div
-          key={i}
+          key={`p-${i}-${particle.x}-${particle.y}`}
           className={cn(
             'absolute rounded-full',
             particle.size,

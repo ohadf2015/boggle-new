@@ -166,7 +166,7 @@ export async function GET(request: NextRequest) {
           <div style={{ display: 'flex', gap: '8px', marginBottom: '20px' }}>
             {[0, 1, 2].map((i) => (
               <span
-                key={i}
+                key={`star-${i}`}
                 style={{
                   fontSize: '36px',
                   filter: i < stars ? 'none' : 'grayscale(1) opacity(0.3)',

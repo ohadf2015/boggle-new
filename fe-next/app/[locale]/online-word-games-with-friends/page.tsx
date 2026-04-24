@@ -148,8 +148,8 @@ export default async function OnlineWordGamesWithFriendsPage({ params }: PagePro
               { title: 'Word Hunt', desc: 'Find specific target words before your opponents. Strategy meets speed.' },
               { title: 'Blast Mode', desc: 'Chain words into combos for massive scores. Fast and furious word finding.' },
               { title: 'Daily Challenge', desc: 'Everyone plays the same puzzle. Compare scores with friends and the world.' },
-            ].map((mode, idx) => (
-              <div key={idx} className="rounded-neo border-3 border-neo-pink bg-neo-navy/50 p-5 shadow-hard">
+            ].map((mode) => (
+              <div key={mode.title} className="rounded-neo border-3 border-neo-pink bg-neo-navy/50 p-5 shadow-hard">
                 <h3 className="mb-2 font-neo-display text-lg font-bold text-neo-pink">{mode.title}</h3>
                 <p className="text-sm text-neo-gray-200">{mode.desc}</p>
               </div>
@@ -160,8 +160,8 @@ export default async function OnlineWordGamesWithFriendsPage({ params }: PagePro
         <section className="mb-12">
           <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">Frequently Asked Questions</h2>
           <div className="space-y-4">
-            {faqs.map((faq, idx) => (
-              <details key={idx} className="group rounded-neo border-3 border-neo-gray-400 bg-neo-navy/50 shadow-hard">
+            {faqs.map((faq) => (
+              <details key={faq.q} className="group rounded-neo border-3 border-neo-gray-400 bg-neo-navy/50 shadow-hard">
                 <summary className="flex cursor-pointer items-center justify-between px-6 py-4 font-bold">
                   <span>{faq.q}</span>
                   <span className="text-neo-pink transition-transform group-open:rotate-180">&#9660;</span>

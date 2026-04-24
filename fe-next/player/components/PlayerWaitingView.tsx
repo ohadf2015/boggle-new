@@ -382,9 +382,9 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
               <ChevronLeft className="w-4 h-4 text-neo-cream" />
             </button>
             <div className="flex gap-1.5">
-              {steps.map((_, i) => (
+              {steps.map((step, i) => (
                 <button
-                  key={i}
+                  key={step.titleKey}
                   onClick={() => setInstructionStep(i)}
                   className={cn(
                     'w-2 h-2 rounded-full transition-colors',

@@ -297,8 +297,8 @@ export default function LeaderboardPageClient(): React.JSX.Element {
               {profile && <SkeletonCard hasImage={false} lines={2} className="bg-neo-cream dark:bg-neo-navy" />}
               {/* Skeleton for leaderboard table */}
               <div className="space-y-2">
-                {Array.from({ length: 8 }).map((_, i) => (
-                  <SkeletonCard key={i} hasImage={false} lines={1} className="py-3 bg-neo-cream dark:bg-neo-navy" />
+                {['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'].map((id) => (
+                  <SkeletonCard key={`lb-skel-${id}`} hasImage={false} lines={1} className="py-3 bg-neo-cream dark:bg-neo-navy" />
                 ))}
               </div>
             </div>

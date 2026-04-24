@@ -114,8 +114,8 @@ export function GameInstructions({ selectedGameMode, t }: GameInstructionsProps)
                   <ChevronLeft className="w-4 h-4 text-neo-cream rtl:rotate-180" />
                 </button>
                 <div className="flex gap-1.5">
-                  {steps.map((_, i) => (
-                    <button key={i} onClick={(e) => { e.stopPropagation(); setInstructionStep(i); }} className={cn('w-2 h-2 rounded-full transition-colors', i === instructionStep ? dotClass : 'bg-neo-white/20')} />
+                  {steps.map((step, i) => (
+                    <button key={step.titleKey} onClick={(e) => { e.stopPropagation(); setInstructionStep(i); }} className={cn('w-2 h-2 rounded-full transition-colors', i === instructionStep ? dotClass : 'bg-neo-white/20')} />
                   ))}
                 </div>
                 <button onClick={(e) => { e.stopPropagation(); setInstructionStep(s => Math.min(steps.length - 1, s + 1)); }} disabled={instructionStep === steps.length - 1} className="w-6 h-6 flex items-center justify-center rounded bg-neo-white/10 disabled:opacity-30 transition-opacity" aria-label={t('common.next')}>

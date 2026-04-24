@@ -479,7 +479,7 @@ export async function GET(request: NextRequest) {
                 >
                   {['🎮 Multiplayer', '⚡ Real-time', '🌍 5 Languages'].map((feature, i) => (
                     <div
-                      key={i}
+                      key={feature}
                       style={{
                         display: 'flex',
                         backgroundColor: [COLORS.yellow, COLORS.cyan, COLORS.pink][i],

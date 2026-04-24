@@ -2,7 +2,6 @@
 
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import Image from 'next/image';
 import type { Socket } from 'socket.io-client';
 import { useGameMode } from '@/hooks/gameState/store';
 import { cn } from '@/lib/utils';
@@ -61,7 +60,7 @@ const TvClassicActivityPanel = memo<{
       <div className="flex-1 grid grid-cols-4 grid-rows-4 gap-2 p-4">
         {Array.from({ length: 16 }, (_, i) => (
           <div
-            key={i}
+            key={`tile-${i}`}
             data-testid="abstract-tile"
             data-pulsing={pulsingTiles.has(i) ? 'true' : undefined}
             className={cn(
@@ -165,7 +164,7 @@ const TvWordHuntActivityPanel = memo<{
           <p className="text-xs font-bold text-neo-cream/60 uppercase me-2">{t('tvBroadcast.targetLength')}:</p>
           {Array.from({ length: targetLength }, (_, i) => (
             <div
-              key={i}
+              key={`slot-${i}`}
               className="w-6 h-8 rounded border-2 border-neo-pink/60 bg-neo-pink/10 flex items-center justify-center"
             >
               <span className="text-neo-pink font-black text-lg">_</span>
@@ -367,13 +366,17 @@ const TvActivityPanel = memo<TvActivityPanelProps>(({
             className="absolute bottom-12 right-4 z-20 pointer-events-none"
             aria-hidden="true"
           >
-            <Image
-              src="/mascot/celebration.gif"
-              alt=""
+            <video
+              src="/mascot/celebration.mp4"
               width={100}
               height={100}
               className="drop-shadow-[3px_3px_0px_rgba(0,0,0,1)]"
-              unoptimized
+              autoPlay
+              loop
+              muted
+              playsInline
+              preload="metadata"
+              aria-hidden="true"
             />
           </motion.div>
         )}

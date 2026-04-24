@@ -92,8 +92,8 @@ export default function TeacherProfilePageClient() {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
           {classroomsLoading ? (
             <>
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="p-5 bg-neo-cream border-3 border-neo-black rounded-neo shadow-hard animate-pulse">
+              {['a', 'b', 'c'].map((id) => (
+                <div key={`skeleton-${id}`} className="p-5 bg-neo-cream border-3 border-neo-black rounded-neo shadow-hard animate-pulse">
                   <div className="h-4 w-24 bg-neo-black/10 rounded mb-3" />
                   <div className="h-9 w-16 bg-neo-black/20 rounded" />
                 </div>

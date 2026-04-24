@@ -36,7 +36,7 @@ function GameModeSection({
             <ol className="space-y-4">
                 {data.steps.map((step, i) => (
                     <li
-                        key={i}
+                        key={`${modeKey}-step-${i}-${step.title}`}
                         id={`${modeKey}-step-${i + 1}`}
                         className="flex gap-4 items-start bg-slate-800/50 border-3 border-neo-black rounded-neo p-4 shadow-hard-sm"
                     >
@@ -85,8 +85,8 @@ function ScoringTable({
                 <table className="w-full border-3 border-neo-black rounded-neo overflow-hidden text-sm">
                     <thead>
                         <tr className="bg-neo-navy border-b-3 border-neo-black">
-                            {headers.map((h, i) => (
-                                <th key={i} className="px-4 py-3 text-start font-bold text-neo-yellow uppercase tracking-wide">
+                            {headers.map((h) => (
+                                <th key={h} className="px-4 py-3 text-start font-bold text-neo-yellow uppercase tracking-wide">
                                     {h}
                                 </th>
                             ))}
@@ -94,7 +94,7 @@ function ScoringTable({
                     </thead>
                     <tbody>
                         {rows.map((row, i) => (
-                            <tr key={i} className={cn('border-b border-neo-black/30', i % 2 === 0 ? 'bg-slate-800/40' : 'bg-slate-800/20')}>
+                            <tr key={`row-${row.length}`} className={cn('border-b border-neo-black/30', i % 2 === 0 ? 'bg-slate-800/40' : 'bg-slate-800/20')}>
                                 <td className="px-4 py-2.5 font-medium text-white">{row.length}</td>
                                 <td className="px-4 py-2.5 text-neo-cyan font-bold">{row.points}</td>
                                 <td className="px-4 py-2.5 text-neo-cream/60">{row.example}</td>
@@ -120,7 +120,7 @@ function FAQSection({ title, items }: { title: string; items: FAQItem[] }) {
             </h2>
             <dl className="space-y-3">
                 {items.map((item, i) => (
-                    <div key={i} className="bg-slate-800/50 border-3 border-neo-black rounded-neo p-4 shadow-hard-sm">
+                    <div key={`faq-${i}-${item.question}`} className="bg-slate-800/50 border-3 border-neo-black rounded-neo p-4 shadow-hard-sm">
                         <dt className="font-bold text-white mb-1" data-speakable="true">{item.question}</dt>
                         <dd className="text-neo-cream/70 text-sm leading-relaxed" data-speakable="true">{item.answer}</dd>
                     </div>
