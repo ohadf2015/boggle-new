@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { m } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Shuffle, FileText, Bomb, Crosshair, Disc3 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { GameMode } from '@/shared/types/game';
@@ -93,7 +93,7 @@ export function GameModeSelector({
       {modes.map((mode) => {
         const isActive = selectedMode === mode;
         return (
-          <m.button
+          <motion.button
             key={mode}
             onClick={() => {
               setTooltipMode(mode);
@@ -117,15 +117,15 @@ export function GameModeSelector({
             )}
           >
             {/* Icon with bounce on active */}
-            <m.span
+            <motion.span
               className={cn('flex items-center justify-center', compact ? 'text-xs' : 'text-sm')}
               animate={isActive ? { y: [0, -2, 0] } : { y: 0 }}
               transition={isActive ? { duration: 0.3, ease: 'easeOut' as const } : {}}
             >
               {MODE_ICONS[mode]}
-            </m.span>
+            </motion.span>
             <span className="leading-none">{getModeLabel(mode, t)}</span>
-          </m.button>
+          </motion.button>
         );
       })}
     </div>
