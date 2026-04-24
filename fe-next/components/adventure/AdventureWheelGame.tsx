@@ -9,6 +9,7 @@ import { useAdventureMusic } from '@/hooks/useAdventureMusic';
 import { useChapterQuests } from '@/hooks/useChapterQuests';
 import { getChapterNumber } from '@/lib/adventure/questConfig';
 import { useAdventureAchievements } from '@/hooks/useAdventureAchievements';
+import { fastValidateWord } from '@/hooks/fastValidateWord';
 import { showAchievementToast } from '@/components/achievements/AchievementToast';
 import { ADVENTURE_ACHIEVEMENTS } from '@/utils/adventureAchievementUtils';
 import type { LevelConfig } from '@/types/adventure';
@@ -97,20 +98,10 @@ const AdventureWheelGame: React.FC<Props> = ({ levelConfig, onLevelComplete, onE
     return obj?.target ?? 200;
   }, [levelConfig.objectives]);
 
-  const handleValidateWord = useCallback(async (word: string): Promise<boolean> => {
-    try {
-      const res = await fetch('/api/validate-word', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ word, language }),
-      });
-      if (!res.ok) return false;
-      const data = await res.json();
-      return data.isValid === true;
-    } catch {
-      return word.length >= 3;
-    }
-  }, [language]);
+  const handleValidateWord = useCallback(
+    (word: string) => fastValidateWord(word, language as Language),
+    [language]
+  );
 
   const handleEffect = useCallback((effect: WordWheelEffect) => {
     setEffects(prev => [...prev, effect]);

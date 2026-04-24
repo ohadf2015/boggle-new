@@ -23,6 +23,7 @@ import {
 } from '@/utils/dailyChallenge';
 import type { Language } from '@/types';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
+import { fastValidateWord } from '@/hooks/fastValidateWord';
 import { useAuth } from '@/contexts/AuthContext';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 import { getGuestFingerprint } from '@/utils/guestManager';
@@ -116,20 +117,10 @@ const WordWheelChallenge: React.FC = () => {
     setHasPlayedWH(hasPlayedWordHuntToday(gameLang));
   }, [language]);
 
-  const handleValidateWord = useCallback(async (word: string): Promise<boolean> => {
-    try {
-      const res = await fetch('/api/validate-word', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ word, language }),
-      });
-      if (!res.ok) return false;
-      const data = await res.json();
-      return data.isValid === true;
-    } catch {
-      return word.length >= 3;
-    }
-  }, [language]);
+  const handleValidateWord = useCallback(
+    (word: string) => fastValidateWord(word, language as Language),
+    [language]
+  );
 
   const handleStart = useCallback(() => {
     setGameActive(true);
