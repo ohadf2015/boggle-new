@@ -205,7 +205,7 @@ const FeedbackOverlay: React.FC<FeedbackOverlayProps> = ({ feedback, targetWordL
         const showGrayLetter = isGray && !grayFaded;
         return (
           <AdaptiveMotion.div
-            key={idx}
+            key={`fb-${idx}-${letterFb.letter}`}
             initial={skipAnimations ? { opacity: 0 } : { rotateX: 90, opacity: 0 }}
             animate={skipAnimations ? { opacity: 1 } : { rotateX: 0, opacity: 1 }}
             transition={skipAnimations ? {
@@ -320,7 +320,7 @@ const HintBoxes: React.FC<HintBoxesProps> = ({
 
         return (
           <AdaptiveMotion.div
-            key={idx}
+            key={`hint-${idx}`}
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: idx * 0.03, type: "spring", stiffness: 300 }}

@@ -124,7 +124,7 @@ export const DailyIntroCarousel: React.FC<DailyIntroCarouselProps> = ({
       <div className="flex justify-center gap-2 mt-3">
         {Array.from({ length: TOTAL_STEPS }).map((_, idx) => (
           <button
-            key={idx}
+            key={`step-${idx}`}
             aria-label={t('daily.carousel.goToStep').replace('{step}', String(idx + 1))}
             onClick={() => goToStep(idx)}
             className={cn(
@@ -157,7 +157,7 @@ const Step1SwipeAndColors: React.FC<{ isRTL: boolean; t: (key: string) => string
         <div className="grid grid-cols-3 gap-1">
           {letters.map((letter, idx) => (
             <motion.div
-              key={idx}
+              key={`letter-${idx}-${letter}`}
               className={cn(
                 'w-9 h-9 sm:w-10 sm:h-10 rounded-lg border-2 border-neo-black flex items-center justify-center font-bold text-base sm:text-lg',
                 highlightedIndices.includes(idx)
@@ -237,7 +237,7 @@ const Step2FindWordAndClues: React.FC<{ targetWordLength: number; t: (key: strin
         <div className="flex justify-center gap-1.5 sm:gap-2">
           {Array.from({ length: displayLength }).map((_, idx) => (
             <motion.div
-              key={idx}
+              key={`target-box-${idx}`}
               className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-neo-black border-2 border-neo-black flex items-center justify-center text-white font-bold text-sm sm:text-base shadow-[2px_2px_0px_rgb(0,0,0)]"
               initial={{ scale: 0, rotateY: 90 }}
               animate={{ scale: 1, rotateY: 0 }}
@@ -268,7 +268,7 @@ const Step2FindWordAndClues: React.FC<{ targetWordLength: number; t: (key: strin
           <div className="flex gap-1">
             {['C', 'A', 'T'].map((letter, idx) => (
               <div
-                key={idx}
+                key={`cat-${idx}-${letter}`}
                 className="w-6 h-6 rounded-lg border-2 border-neo-black bg-neo-lime flex items-center justify-center font-bold text-xs text-neo-black shadow-[2px_2px_0px_rgb(0,0,0)]"
               >
                 {letter}

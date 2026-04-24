@@ -237,7 +237,7 @@ export const CustomChallengeStats: React.FC<CustomChallengeStatsProps> = ({ puzz
           <div className="space-y-2">
             {leaderboard.map((entry, idx) => (
               <motion.div
-                key={idx}
+                key={`lb-${entry.user_id ?? idx}`}
                 initial={{ x: -20, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
                 transition={{ delay: 0.05 * idx, type: 'spring', stiffness: 380, damping: 26 }}

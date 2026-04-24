@@ -271,7 +271,7 @@ const Step4MinimumLength: React.FC<{ onNext: () => void; onPrev: () => void }> =
           </div>
           <div className="flex justify-center gap-1">
             {['?', '?', '?', '?', '?'].map((char, idx) => (
-              <div key={idx} className="w-8 h-8 bg-neo-black rounded border-2 border-neo-black flex items-center justify-center text-white font-bold text-sm">
+              <div key={`placeholder-${idx}`} className="w-8 h-8 bg-neo-black rounded border-2 border-neo-black flex items-center justify-center text-white font-bold text-sm">
                 {char}
               </div>
             ))}

@@ -412,7 +412,7 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
           >
             {duelData.boardState.flat().map((letter, idx) => (
               <div
-                key={idx}
+                key={`cell-${idx}-${letter}`}
                 className="aspect-square flex items-center justify-center bg-neo-lime text-neo-black font-neo-display font-bold text-2xl rounded-neo border-neo shadow-hard-sm"
                 data-testid={`board-letter-${idx}`}
               >
@@ -458,7 +458,7 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
                 <div className="flex flex-wrap gap-2">
                   {wordsFound.map((word, idx) => (
                     <AdaptiveMotion.div
-                      key={idx}
+                      key={`word-${idx}-${word}`}
                       initial={{ opacity: 0, scale: 0.8 }}
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0, scale: 0.8 }}

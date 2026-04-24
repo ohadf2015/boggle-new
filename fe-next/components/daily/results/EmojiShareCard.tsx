@@ -120,7 +120,7 @@ export const EmojiShareCard: React.FC<EmojiShareCardProps> = ({
       {/* Emoji rows */}
       <div className="space-y-1 mb-3">
         {words.map((entry, idx) => (
-          <div key={idx} className="flex items-center gap-2">
+          <div key={`word-${idx}-${entry.word}`} className="flex items-center gap-2">
             <span className="text-base leading-none">{wordToEmoji(entry)}</span>
             <span className={`text-xs uppercase tracking-wide ${entry.found ? 'text-slate-400' : 'text-slate-600'}`}>
               {revealed ? entry.word : maskWord(entry.word)}
