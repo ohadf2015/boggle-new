@@ -81,8 +81,8 @@ function Cornrows({ fill }: HairPartProps) {
         'M50 8 Q52 10 54 12 Q60 18 64 28',
         'M50 8 Q54 10 60 14 Q68 20 72 30',
         'M50 8 Q58 8 66 14 Q74 20 78 30',
-      ].map((d, i) => (
-        <path key={i} d={d} fill="none" stroke="#000" strokeWidth={2.5} opacity={0.3} strokeLinecap="round" />
+      ].map((d) => (
+        <path key={d} d={d} fill="none" stroke="#000" strokeWidth={2.5} opacity={0.3} strokeLinecap="round" />
       ))}
       {/* Raised ridge fill — visible bumps along each row */}
       {[

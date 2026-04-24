@@ -49,7 +49,7 @@ function FlatTop({ fill }: HairPartProps) {
       <line x1="80" y1="12" x2="78" y2="28" stroke="#000" strokeWidth={1.5} opacity="0.2" />
       {/* Vertical texture lines — tight, uniform hair standing up */}
       {[28,33,38,43,48,53,58,63,68,73].map((x, i) => (
-        <line key={i} x1={x} y1="6" x2={x} y2="26" stroke="#000" strokeWidth={0.6} opacity={0.08+i*0.004} />
+        <line key={`line-${x}`} x1={x} y1="6" x2={x} y2="26" stroke="#000" strokeWidth={0.6} opacity={0.08+i*0.004} />
       ))}
       {/* Highlights */}
       <path d="M32 6 Q50 4 68 6" fill="none" stroke="#fff" strokeWidth={1.5} opacity="0.15" />
@@ -140,8 +140,8 @@ function Quiff({ fill }: HairPartProps) {
       {/* Shorter sides — tapered */}
       <path d="M22 36 Q22 28 30 24" fill="none" stroke={fill} strokeWidth={1} opacity="0.3" />
       <path d="M78 36 Q78 28 70 24" fill="none" stroke={fill} strokeWidth={1} opacity="0.3" />
-      {[{x:24,y:32},{x:27,y:28},{x:30,y:26},{x:74,y:26},{x:73,y:28},{x:76,y:32}].map((p,i) => (
-        <circle key={i} cx={p.x} cy={p.y} r={1.2} fill={fill} opacity={0.25} />
+      {[{x:24,y:32},{x:27,y:28},{x:30,y:26},{x:74,y:26},{x:73,y:28},{x:76,y:32}].map((p) => (
+        <circle key={`${p.x}-${p.y}`} cx={p.x} cy={p.y} r={1.2} fill={fill} opacity={0.25} />
       ))}
       {/* Big volume at front — the signature quiff */}
       <path d={quiffCap}

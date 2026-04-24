@@ -27,7 +27,7 @@ function FlameHair({ fill }: HairPartProps) {
       <path d="M38 34 C40 24 46 18 50 10 M62 34 C60 24 54 18 50 10" fill="none" stroke="#FFEB3B" strokeWidth={0.8} opacity="0.25" />
       {/* Ember particles — slow gentle float */}
       {[{cx:32,cy:6,r:1.5,c:'#FFD600',d:4},{cx:66,cy:8,r:1.2,c:'#FF9100',d:5},{cx:50,cy:-2,r:1.5,c:'#FFEB3B',d:4.5}].map((e,i) => (
-        <circle key={i} cx={e.cx} cy={e.cy} r={e.r} fill={e.c}>
+        <circle key={`${e.cx}-${e.cy}`} cx={e.cx} cy={e.cy} r={e.r} fill={e.c}>
           <animate attributeName="cy" values={`${e.cy};${e.cy-6};${e.cy-12};${e.cy}`} dur={`${e.d}s`} begin={`${i*0.8}s`} repeatCount="indefinite" />
           <animate attributeName="opacity" values="0.6;0.25;0;0.6" dur={`${e.d}s`} begin={`${i*0.8}s`} repeatCount="indefinite" />
         </circle>
@@ -63,7 +63,7 @@ function GalaxyHair(_props: HairPartProps) {
       <path d="M20 48 Q30 42 42 46 Q54 42 64 46" fill="none" stroke="#E040FB" strokeWidth={0.8} opacity="0.15" />
       {/* Stars — slow gentle twinkle */}
       {[{cx:32,cy:20,r:1.5,d:4},{cx:50,cy:14,r:1,d:3.5},{cx:68,cy:20,r:1.5,d:5},{cx:26,cy:32,r:0.8,d:6},{cx:74,cy:32,r:0.8,d:5.5}].map((s,i) => (
-        <circle key={i} cx={s.cx} cy={s.cy} r={s.r} fill="#fff">
+        <circle key={`${s.cx}-${s.cy}`} cx={s.cx} cy={s.cy} r={s.r} fill="#fff">
           <animate attributeName="opacity" values={`${0.8-i*0.1};0.15;${0.8-i*0.1}`} dur={`${s.d}s`} begin={`${i*0.7}s`} repeatCount="indefinite" />
         </circle>
       ))}
@@ -93,15 +93,15 @@ function NeonHair(_props: HairPartProps) {
       <path d="M22 32 Q24 18 28 10 Q30 22 36 6 Q40 20 44 2 Q48 18 50 8 Q54 20 58 4 Q62 16 66 12 Q70 22 74 8 Q76 18 78 32"
         fill={`url(#${u}neonHairGrad)`} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
       {/* Glow streaks — slow soft pulse */}
-      {[{x1:28,y1:24,x2:28,y2:10,b:0},{x1:50,y1:20,x2:50,y2:6,b:1.5},{x1:70,y1:24,x2:68,y2:8,b:3}].map((l,i) => (
-        <path key={i} d={`M${l.x1} ${l.y1} L${l.x2} ${l.y2}`} stroke="#fff" strokeWidth={1.5}>
+      {[{x1:28,y1:24,x2:28,y2:10,b:0},{x1:50,y1:20,x2:50,y2:6,b:1.5},{x1:70,y1:24,x2:68,y2:8,b:3}].map((l) => (
+        <path key={`${l.x1}-${l.y1}-${l.x2}-${l.y2}`} d={`M${l.x1} ${l.y1} L${l.x2} ${l.y2}`} stroke="#fff" strokeWidth={1.5}>
           <animate attributeName="opacity" values="0.3;0.7;0.3" dur="3s" begin={`${l.b}s`} repeatCount="indefinite" />
         </path>
       ))}
       <path d="M40 22 L42 8 M60 20 L58 8" stroke="#fff" strokeWidth={0.8} opacity="0.25" />
       {/* Electric sparks — slower, less frantic */}
       {[{d:'M36 8 L38 4 L34 6',c:'#00FFFF',b:0},{d:'M62 6 L60 2 L64 4',c:'#FF00FF',b:1.5},{d:'M46 2 L48 -2 L44 0',c:'#00FFFF',b:3},{d:'M56 8 L54 4 L58 6',c:'#FF00FF',b:4.5}].map((s,i) => (
-        <g key={i}><animate attributeName="opacity" values="0;0.7;0.7;0" dur="4s" begin={`${s.b}s`} repeatCount="indefinite" /><path d={s.d} stroke={s.c} strokeWidth={i<2?1:0.8} fill="none" /></g>
+        <g key={s.d}><animate attributeName="opacity" values="0;0.7;0.7;0" dur="4s" begin={`${s.b}s`} repeatCount="indefinite" /><path d={s.d} stroke={s.c} strokeWidth={i<2?1:0.8} fill="none" /></g>
       ))}
     </g>
   );
@@ -151,7 +151,7 @@ function Undercut({ fill }: HairPartProps) {
       {/* Shaved sides — dot pattern showing skin */}
       {[{x:24,y:34},{x:27,y:31},{x:30,y:28},{x:26,y:36},{x:33,y:30},
         {x:70,y:28},{x:73,y:31},{x:76,y:34},{x:74,y:36},{x:67,y:30}].map((p,i) => (
-        <circle key={i} cx={p.x} cy={p.y} r={1.3} fill={fill} opacity={0.22-(i%3)*0.03} />
+        <circle key={`${p.x}-${p.y}`} cx={p.x} cy={p.y} r={1.3} fill={fill} opacity={0.22-(i%3)*0.03} />
       ))}
       {/* Dramatic slicked-back top — base + shade + rim light + gloss */}
       <path d={top} fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />

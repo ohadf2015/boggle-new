@@ -791,8 +791,8 @@ function Pearls({ fill }: AccessoryPartProps) {
         { x: 42, y: 70 }, { x: 46, y: 69.5 }, { x: 50, y: 69.5 },
         { x: 54, y: 69.5 }, { x: 58, y: 70 }, { x: 62, y: 70.5 },
         { x: 66, y: 71.5 }, { x: 70, y: 73 },
-      ].map((p, i) => (
-        <g key={i}>
+      ].map((p) => (
+        <g key={`${p.x}-${p.y}`}>
           <circle cx={p.x} cy={p.y} r="2.2" fill={pearlColor} stroke="#C0B8A8" strokeWidth={0.6} />
           {/* Pearl luster — shifted highlight */}
           <circle cx={p.x - 0.5} cy={p.y - 0.6} r="0.8" fill="#fff" opacity="0.6" />

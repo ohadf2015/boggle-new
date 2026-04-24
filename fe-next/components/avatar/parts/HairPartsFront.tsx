@@ -218,8 +218,8 @@ function CornrowsFront({ fill }: HairPartProps) {
       <path d="M24 34 Q30 26 42 26 Q50 22 58 26 Q70 26 76 34"
         fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
       {/* Row start lines visible on forehead */}
-      {[32, 38, 44, 50, 56, 62, 68].map((x, i) => (
-        <line key={i} x1={x} y1={32} x2={x} y2={28} stroke="#000" strokeWidth={0.8} opacity="0.15" />
+      {[32, 38, 44, 50, 56, 62, 68].map((x) => (
+        <line key={x} x1={x} y1={32} x2={x} y2={28} stroke="#000" strokeWidth={0.8} opacity="0.15" />
       ))}
       <path d="M40 26 Q46 22 50 22 Q54 22 60 26" fill="none" stroke="#fff" strokeWidth={0.6} opacity="0.12" />
     </g>

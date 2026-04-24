@@ -67,8 +67,8 @@ function Buzz({ fill }: HairPartProps) {
         {x:30,y:20},{x:38,y:16},{x:46,y:14},{x:54,y:14},{x:62,y:16},{x:70,y:20},
         {x:26,y:26},{x:34,y:22},{x:42,y:18},{x:50,y:16},{x:58,y:18},{x:66,y:22},{x:74,y:26},
         {x:30,y:30},{x:40,y:24},{x:50,y:20},{x:60,y:24},{x:70,y:30},
-      ].map((p,i) => (
-        <circle key={i} cx={p.x} cy={p.y} r={1.2} fill="#000" opacity={0.1} />
+      ].map((p) => (
+        <circle key={`${p.x}-${p.y}`} cx={p.x} cy={p.y} r={1.2} fill="#000" opacity={0.1} />
       ))}
       <path d="M34 16 Q50 10 66 16" fill="none" stroke="#fff" strokeWidth={1.2} opacity="0.14" />
     </g>
@@ -84,8 +84,8 @@ function Mohawk({ fill }: HairPartProps) {
       {/* Shaved side hints */}
       <path d="M22 36 Q22 26 34 24" fill="none" stroke={fill} strokeWidth={1} opacity="0.3" />
       <path d="M78 36 Q78 26 66 24" fill="none" stroke={fill} strokeWidth={1} opacity="0.3" />
-      {[{x:24,y:32},{x:28,y:28},{x:32,y:26},{x:72,y:28},{x:76,y:32},{x:68,y:26}].map((p,i) => (
-        <circle key={i} cx={p.x} cy={p.y} r={1.2} fill={fill} opacity={0.25} />
+      {[{x:24,y:32},{x:28,y:28},{x:32,y:26},{x:72,y:28},{x:76,y:32},{x:68,y:26}].map((p) => (
+        <circle key={`${p.x}-${p.y}`} cx={p.x} cy={p.y} r={1.2} fill={fill} opacity={0.25} />
       ))}
       {/* Mohawk strip — clamped within viewBox */}
       <path d={strip} fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />

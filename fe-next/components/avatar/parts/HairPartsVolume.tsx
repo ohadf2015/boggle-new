@@ -95,7 +95,7 @@ function Sideshave({ fill }: HairPartProps) {
       {/* Shaved left side — visible buzzed stubble pattern */}
       <path d="M20 36 Q20 24 32 22" fill="none" stroke={fill} strokeWidth={1.5} opacity="0.3" />
       {[{x:22,y:34},{x:25,y:30},{x:28,y:27},{x:24,y:37},{x:27,y:33},{x:30,y:29},{x:22,y:28},{x:26,y:24}].map((p,i) => (
-        <circle key={i} cx={p.x} cy={p.y} r={1.3} fill={fill} opacity={0.25-(i%3)*0.04} />
+        <circle key={`${p.x}-${p.y}`} cx={p.x} cy={p.y} r={1.3} fill={fill} opacity={0.25-(i%3)*0.04} />
       ))}
       {/* Shave demarcation line */}
       <path d="M34 22 Q36 28 34 34" fill="none" stroke="#000" strokeWidth={1} opacity="0.15" />
@@ -136,7 +136,7 @@ function Dreads({ fill }: HairPartProps) {
         const hw = w/2;
         const tw = hw * 0.6; /* tip half-width */
         return (
-          <g key={i}>
+          <g key={`${sx}-${sy}`}>
             <path d={`M${sx-hw} ${sy} C${mx-hw-1} ${my-4} ${ex-tw-1} ${ey-8} ${ex-tw} ${ey} Q${ex} ${ey+3} ${ex+tw} ${ey} C${ex+tw+1} ${ey-8} ${mx+hw+1} ${my-4} ${sx+hw} ${sy}Z`}
               fill={fill} stroke="#000" strokeWidth={1.5} strokeLinejoin="round" />
             {/* Segment wraps — the horizontal bands that define dread texture */}
@@ -144,7 +144,7 @@ function Dreads({ fill }: HairPartProps) {
               const px = sx + (ex-sx)*t + bulge*(t < 0.5 ? t*2 : 1);
               const py = sy + (ey-sy)*t;
               const rw = hw - (hw-tw)*t;
-              return <path key={j} d={`M${px-rw+0.5} ${py} L${px+rw-0.5} ${py}`} stroke="#000" strokeWidth={0.7} opacity={0.12+j*0.02} />;
+              return <path key={t} d={`M${px-rw+0.5} ${py} L${px+rw-0.5} ${py}`} stroke="#000" strokeWidth={0.7} opacity={0.12+j*0.02} />;
             })}
             {/* Bead on select dreads */}
             {(i===2||i===5||i===7) && (
@@ -168,7 +168,7 @@ function Braids({ fill }: HairPartProps) {
       const y = startY + i * 7;
       const xOff = (i % 2 === 0 ? -1 : 1) * dir * 2.5;
       segs.push(
-        <ellipse key={i} cx={cx + xOff} cy={y} rx={5} ry={4} fill={fill} stroke="#000" strokeWidth={1.2}
+        <ellipse key={y} cx={cx + xOff} cy={y} rx={5} ry={4} fill={fill} stroke="#000" strokeWidth={1.2}
           strokeLinejoin="round" />
       );
     }
@@ -378,20 +378,20 @@ function LocsShort({ fill }: HairPartProps) {
       <defs><HairPolishDefs uid={u} keyName="locsShort" /></defs>
       <path d={cap} fill={fill} stroke="#000" strokeWidth={S} />
       <HairPolish uid={u} keyName="locsShort" d={cap} />
-      {locs.map(([sx,sy,ex,ey,bulge,w],i) => {
+      {locs.map(([sx,sy,ex,ey,bulge,w]) => {
         const mx = (sx+ex)/2 + bulge;
         const my = (sy+ey)/2;
         const hw = w/2;
         const tw = hw * 0.55;
         return (
-          <g key={i}>
+          <g key={`${sx}-${sy}`}>
             <path d={`M${sx-hw} ${sy} C${mx-hw-1} ${my-3} ${ex-tw-1} ${ey-6} ${ex-tw} ${ey} Q${ex} ${ey+3} ${ex+tw} ${ey} C${ex+tw+1} ${ey-6} ${mx+hw+1} ${my-3} ${sx+hw} ${sy}Z`}
               fill={fill} stroke="#000" strokeWidth={1.5} strokeLinejoin="round" />
             {[0.3, 0.55, 0.75].map((t, j) => {
               const px = sx + (ex-sx)*t + bulge*(t < 0.5 ? t*2 : 1);
               const py = sy + (ey-sy)*t;
               const rw = hw - (hw-tw)*t;
-              return <path key={j} d={`M${px-rw+0.5} ${py} L${px+rw-0.5} ${py}`} stroke="#000" strokeWidth={0.7} opacity={0.12+j*0.02} />;
+              return <path key={t} d={`M${px-rw+0.5} ${py} L${px+rw-0.5} ${py}`} stroke="#000" strokeWidth={0.7} opacity={0.12+j*0.02} />;
             })}
           </g>
         );
