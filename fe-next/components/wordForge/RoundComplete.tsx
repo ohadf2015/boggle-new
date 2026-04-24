@@ -63,7 +63,7 @@ export function RoundComplete({
       {/* Floating particles */}
       {!prefersReducedMotion && particles.map((p, i) => (
         <motion.div
-          key={i}
+          key={`${p.x}-${i}`}
           className="absolute w-2 h-2 rounded-full bg-neo-lime/60"
           initial={{ y: 0, x: p.x, opacity: 1 }}
           animate={{ y: -120, opacity: 0 }}

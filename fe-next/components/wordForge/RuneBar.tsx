@@ -83,7 +83,7 @@ export function RuneBar({ runes, maxSlots, triggeredRuneIds = [] }: RuneBarProps
           const isTriggered = rune ? triggeredRuneIds.includes(rune.instanceId) : false;
           return (
             <motion.button
-              key={i}
+              key={rune?.instanceId ?? `slot-${i}`}
               onClick={() => rune && setInspecting(i)}
               disabled={!rune}
               animate={

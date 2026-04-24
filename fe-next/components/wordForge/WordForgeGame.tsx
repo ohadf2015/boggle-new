@@ -71,7 +71,7 @@ export default function WordForgeGame(): React.JSX.Element {
         <div className="flex flex-col gap-1.5 text-sm text-neo-cream/50 font-neo-body text-center max-w-xs">
           {['🔤 Spell words on a Boggle grid', '🃏 Collect rune modifiers between rounds', '💥 Stack multipliers to break the score'].map((line, i) => (
             <motion.span
-              key={i}
+              key={line}
               initial={prefersReducedMotion ? false : { opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: prefersReducedMotion ? 0 : 0.2 + i * 0.2, duration: 0.4 }}

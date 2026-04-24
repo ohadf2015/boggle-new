@@ -164,7 +164,7 @@ export function RunePicker({
           const rune = equippedRunes[i];
           return (
             <div
-              key={i}
+              key={`slot-${i}`}
               className={cn(
                 'w-8 h-8 rounded-neo border-2 flex items-center justify-center text-sm',
                 rune

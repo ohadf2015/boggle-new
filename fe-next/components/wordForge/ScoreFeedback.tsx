@@ -67,7 +67,7 @@ export function ScoreFeedback({ lastScore }: ScoreFeedbackProps): React.JSX.Elem
 
           {/* Chip bonuses */}
           {chipEffects.map((e, i) => (
-            <span key={i} className="text-xs text-neo-cyan/70">
+            <span key={`chip-${i}-${e.value}`} className="text-xs text-neo-cyan/70">
               +{e.value}
             </span>
           ))}
@@ -82,7 +82,7 @@ export function ScoreFeedback({ lastScore }: ScoreFeedbackProps): React.JSX.Elem
           {/* Mult bonuses (RED — the Balatro color) */}
           {multEffects.map((e, i) => (
             <span
-              key={i}
+              key={`mult-${i}-${e.value}`}
               className={cn(
                 'text-sm font-black',
                 e.value >= 3 ? 'text-neo-red motion-safe:animate-score-pop' : 'text-[#FF3366]',
