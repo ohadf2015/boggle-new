@@ -91,7 +91,7 @@ export default function WordHuntStrategyPageClient(): React.ReactElement {
           </h2>
           <ol className="list-decimal list-inside space-y-2">
             {content.quickTips.map((tip, i) => (
-              <li key={i} className={cn('leading-relaxed', isDarkMode ? 'text-gray-300' : 'text-gray-700')}>
+              <li key={`tip-${i}-${tip}`} className={cn('leading-relaxed', isDarkMode ? 'text-gray-300' : 'text-gray-700')}>
                 {tip}
               </li>
             ))}
@@ -103,7 +103,7 @@ export default function WordHuntStrategyPageClient(): React.ReactElement {
         {/* Article Content */}
         <div className={cn('prose prose-lg max-w-none', isDarkMode ? 'prose-invert' : '')}>
           {content.sections.map((section, index) => (
-            <div key={index} className="mb-6">
+            <div key={`section-${index}`} className="mb-6">
               {section.title && (
                 <h2 className={cn(
                   'text-xl font-bold mb-3 mt-8',
@@ -114,7 +114,7 @@ export default function WordHuntStrategyPageClient(): React.ReactElement {
               )}
               {section.content.split('\n\n').map((paragraph, pIndex) => (
                 <p
-                  key={pIndex}
+                  key={`section-${index}-p-${pIndex}`}
                   className={cn('mb-4 leading-relaxed', isDarkMode ? 'text-gray-300' : 'text-gray-700')}
                 >
                   {paragraph}
@@ -132,7 +132,7 @@ export default function WordHuntStrategyPageClient(): React.ReactElement {
             <div className="space-y-4">
               {content.faq.map((item, i) => (
                 <details
-                  key={i}
+                  key={`faq-${i}-${item.question}`}
                   className={cn(
                     'rounded-neo border-3 border-neo-black shadow-hard overflow-hidden',
                     isDarkMode ? 'bg-slate-800' : 'bg-white'
