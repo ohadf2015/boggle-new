@@ -74,7 +74,7 @@ export default function AvatarTestPageClient() {
         </h2>
         <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-6 lg:grid-cols-12 gap-3 mb-10">
           {randomAvatars.map((config, i) => (
-            <div key={i} className="border-3 border-black shadow-hard rounded-neo-lg overflow-hidden min-w-0 aspect-square">
+            <div key={`avatar-${i}`} className="border-3 border-black shadow-hard rounded-neo-lg overflow-hidden min-w-0 aspect-square">
               <AvatarRenderer config={config} size={64} className="block w-full h-full" disableEffects />
             </div>
           ))}

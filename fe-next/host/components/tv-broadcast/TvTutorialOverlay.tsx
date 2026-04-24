@@ -173,9 +173,9 @@ const TvTutorialOverlay: React.FC<TvTutorialOverlayProps> = ({
 
           {/* Progress indicator */}
           <div className="flex gap-1 px-6 pt-4">
-            {TUTORIAL_STEPS.map((_, index) => (
+            {TUTORIAL_STEPS.map((s, index) => (
               <div
-                key={index}
+                key={s.id}
                 className={`h-1 flex-1 rounded-full transition-colors ${
                   index <= currentStep ? 'bg-neo-purple' : 'bg-neo-black/20'
                 }`}

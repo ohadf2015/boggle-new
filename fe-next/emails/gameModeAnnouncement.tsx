@@ -624,7 +624,7 @@ export default function GameModeAnnouncementEmail({
                               style={{ marginBottom: '20px' }}>
                               <tr>
                                 {([0, 1, 2] as const).map((i) => (
-                                  <td key={i} width="33%" align="center" valign="top"
+                                  <td key={`feature-${i}`} width="33%" align="center" valign="top"
                                     className="feature-td"
                                     style={{ padding: '0 4px' }}>
                                     <table role="presentation" cellPadding={0} cellSpacing={0} width="100%"

@@ -403,7 +403,7 @@ export default function ReengagementEmail({
                                             {Array.from({ length: TILES }, (_, i) => {
                                               const isFilled = i === firstIdx;
                                               return (
-                                                <td key={i} width={52} height={52} align="center" valign="middle"
+                                                <td key={`tile-${i}`} width={52} height={52} align="center" valign="middle"
                                                   style={{
                                                     width: '52px', height: '52px',
                                                     backgroundColor: isFilled ? C.filledTile : C.tileEmpty,

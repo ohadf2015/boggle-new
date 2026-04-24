@@ -50,8 +50,8 @@ vi.mock('@/utils/singlePlayerAchievements', () => ({
 // Mock AchievementDock component
 const MockAchievementDock = vi.fn(({ achievements, className }) => (
   <div data-testid="achievement-dock" className={className}>
-    {achievements.map((ach: { key: string; icon: string }, idx: number) => (
-      <div key={idx} data-testid={`achievement-${ach.key}`}>
+    {achievements.map((ach: { key: string; icon: string }) => (
+      <div key={ach.key} data-testid={`achievement-${ach.key}`}>
         {ach.icon} {ach.key}
       </div>
     ))}
