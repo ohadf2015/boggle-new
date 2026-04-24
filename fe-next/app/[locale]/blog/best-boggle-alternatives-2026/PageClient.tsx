@@ -211,7 +211,7 @@ export default function BoggleAlternativesPageClient(): React.ReactElement {
               )}
               {section.content.split('\n\n').map((paragraph, pIndex) => (
                 <p
-                  key={pIndex}
+                  key={`${section.slug || index}-p-${pIndex}`}
                   className={cn(
                     'mb-4 leading-relaxed',
                     isDarkMode ? 'text-gray-300' : 'text-gray-700'
@@ -295,7 +295,7 @@ export default function BoggleAlternativesPageClient(): React.ReactElement {
             <div className="space-y-4">
               {faqs.map((faq, i) => (
                 <details
-                  key={i}
+                  key={`faq-${i}-${faq.question}`}
                   className={cn(
                     'group rounded-neo border-3 border-neo-black overflow-hidden',
                     isDarkMode ? 'bg-slate-800' : 'bg-white'

@@ -119,7 +119,7 @@ export default function BoggleVsWwfPageClient(): React.ReactElement {
           isDarkMode ? 'prose-invert' : ''
         )}>
           {content.sections.map((section, index) => (
-            <div key={index} className="mb-6">
+            <div key={`section-${index}`} className="mb-6">
               {section.title && (
                 <h2 className={cn(
                   'text-xl font-bold mb-3 mt-8',
@@ -130,7 +130,7 @@ export default function BoggleVsWwfPageClient(): React.ReactElement {
               )}
               {section.content.split('\n\n').map((paragraph, pIndex) => (
                 <p
-                  key={pIndex}
+                  key={`section-${index}-p-${pIndex}`}
                   className={cn(
                     'mb-4 leading-relaxed',
                     isDarkMode ? 'text-gray-300' : 'text-gray-700'
