@@ -109,7 +109,7 @@ export default async function GlobalNotFound() {
             <div className="relative h-32 sm:h-40 mb-4 flex items-center justify-center" aria-hidden="true">
               {TILES.map((tile, i) => (
                 <div
-                  key={i}
+                  key={`tile-${i}-${tile.letter}`}
                   className={`absolute font-neo-display text-4xl sm:text-5xl font-bold
                     ${tile.bg} text-neo-navy
                     w-14 h-14 sm:w-16 sm:h-16 flex items-center justify-center

@@ -27,7 +27,7 @@ const OnboardingProgress: React.FC<OnboardingProgressProps> = ({
 
         return (
           <motion.button
-            key={i}
+            key={`step-${i}`}
             className="p-2 touch-target"
             aria-label={`Step ${i + 1} of ${totalSteps}`}
             aria-current={isActive ? 'step' : undefined}

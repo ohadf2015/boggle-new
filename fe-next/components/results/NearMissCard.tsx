@@ -125,7 +125,7 @@ const NearMissCard: React.FC<NearMissCardProps> = ({
 
           return (
             <motion.div
-              key={index}
+              key={`${nearMiss.type}-${nearMiss.achievement ?? index}`}
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.6 + index * 0.1, type: 'spring', stiffness: 380, damping: 26 }}

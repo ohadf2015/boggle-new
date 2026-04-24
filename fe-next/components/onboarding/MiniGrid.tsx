@@ -402,7 +402,7 @@ const MiniGrid: React.FC<MiniGridProps> = ({
             const filled = i < selected.length;
             return (
               <motion.span
-                key={i}
+                key={`mini-letter-${i}-${targetLetter}`}
                 className={cn(
                   'relative z-10 w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-md font-black text-xl sm:text-2xl',
                   filled
@@ -430,7 +430,7 @@ const MiniGrid: React.FC<MiniGridProps> = ({
                 {/* Mini celebration particles */}
                 {[...Array(6)].map((_, i) => (
                   <motion.div
-                    key={i}
+                    key={`burst-${i}`}
                     className="absolute w-1.5 h-1.5 rounded-full bg-neo-yellow"
                     initial={{ x: 0, y: 0, opacity: 1 }}
                     animate={{

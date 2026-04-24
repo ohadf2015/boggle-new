@@ -2,7 +2,6 @@
 
 import { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import Image from 'next/image';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { RankTier } from '@/shared/utils/eloRating';
 
@@ -54,7 +53,7 @@ export function RankUpCinematic({ from, to, onDismiss }: RankUpCinematicProps) {
             const del = (seed % 6) * 0.25;
             return (
               <motion.div
-                key={i}
+                key={`confetti-${i}`}
                 className="absolute w-3 h-3 rounded-full"
                 style={{
                   backgroundColor: i % 2 === 0 ? to.color : from.color,
@@ -117,13 +116,16 @@ export function RankUpCinematic({ from, to, onDismiss }: RankUpCinematicProps) {
           animate={{ scale: 1, rotate: 0 }}
           transition={{ delay: 0.7, type: 'spring', stiffness: 200, damping: 12 }}
         >
-          <Image
-            src="/mascot/celebration.gif"
-            alt=""
+          <video
+            src="/mascot/celebration.mp4"
             width={120}
             height={120}
             className="drop-shadow-[3px_3px_0px_rgba(0,0,0,1)]"
-            unoptimized
+            autoPlay
+            loop
+            muted
+            playsInline
+            preload="metadata"
             aria-hidden="true"
           />
         </motion.div>

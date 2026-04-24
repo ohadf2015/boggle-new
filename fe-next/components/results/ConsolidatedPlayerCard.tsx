@@ -260,7 +260,7 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
                 {bestWord ? (
                   applyHebrewFinalLetters(bestWord.word).split('').map((char, i) => (
                     <motion.span
-                      key={i}
+                      key={`char-${i}-${char}`}
                       initial={{ opacity: 0, y: 4 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.8 + i * 0.05, duration: 0.15 }}

@@ -372,11 +372,11 @@ const FriendsList: React.FC<FriendsListProps> = ({
       )}>
         <div className="flex gap-2 mb-4">
           {Array.from({ length: 3 }).map((_, i) => (
-            <SkeletonCard key={i} hasImage={false} lines={0} className="py-2 px-4 w-24" />
+            <SkeletonCard key={`skel-tab-${i}`} hasImage={false} lines={0} className="py-2 px-4 w-24" />
           ))}
         </div>
         {Array.from({ length: 4 }).map((_, i) => (
-          <SkeletonCard key={i} hasImage lines={1} className="py-3" />
+          <SkeletonCard key={`skel-row-${i}`} hasImage lines={1} className="py-3" />
         ))}
       </div>
     );

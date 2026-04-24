@@ -102,9 +102,9 @@ const ScoreReveal: React.FC<ScoreRevealProps> = ({
       dir={dir}
     >
       {/* Floating sparkle decorations — positions randomized per render */}
-      {sparkles.map((spark, i) => (
+      {sparkles.map((spark) => (
         <motion.div
-          key={i}
+          key={`spark-${spark.x}-${spark.y}-${spark.delay}`}
           initial={{ scale: 0, rotate: spark.startRotate }}
           animate={{ scale: [0, 1.2, 1], rotate: [spark.startRotate, 15, 0] }}
           transition={{ delay: spark.delay, duration: 0.5, ease: 'easeOut' }}

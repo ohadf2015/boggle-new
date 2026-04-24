@@ -133,7 +133,7 @@ const SeriesStandingsBanner: React.FC<SeriesStandingsBannerProps> = ({
                   <div className="flex gap-0.5 mt-0.5">
                     {player.roundScores.map((score, i) => (
                       <span
-                        key={i}
+                        key={`round-${i}`}
                         className={cn(
                           'text-[10px] px-1 py-0 rounded bg-neo-white/10 text-neo-cream/60',
                           i === player.roundScores.length - 1 && 'bg-neo-white/20 text-neo-cream/90 font-bold'

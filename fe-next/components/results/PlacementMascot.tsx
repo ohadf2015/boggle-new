@@ -164,9 +164,9 @@ const CelebratingArms: React.FC = () => (
       { x: 66, y: 22, delay: 1.2, char: '✦' },
       { x: 2, y: 32, delay: 1.6, char: '✧' },
       { x: 72, y: 30, delay: 1.8, char: '✧' },
-    ].map((s, i) => (
+    ].map((s) => (
       <motion.text
-        key={i}
+        key={`${s.char}-${s.x}-${s.y}`}
         x={s.x} y={s.y} fontSize="7" fill="#FFE135"
         animate={{
           opacity: [0, 1, 1, 0],

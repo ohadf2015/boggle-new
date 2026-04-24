@@ -36,7 +36,7 @@ export function KPICards({ stats }: KPICardsProps) {
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
         {Array.from({ length: 6 }).map((_, i) => (
           <div
-            key={i}
+            key={`kpi-skel-${i}`}
             data-testid="kpi-skeleton"
             className="bg-slate-800/50 rounded-neo border-neo border-black p-4 animate-pulse h-24"
           />

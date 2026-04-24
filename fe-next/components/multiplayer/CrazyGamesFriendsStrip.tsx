@@ -71,7 +71,7 @@ const CrazyGamesFriendsStrip = memo(function CrazyGamesFriendsStrip({ roomId }: 
         {isLoading && friends.length === 0 ? (
           <div className="flex gap-3">
             {[0, 1, 2].map(i => (
-              <div key={i} className="flex flex-col items-center gap-1.5 w-16 animate-pulse">
+              <div key={`friend-skel-${i}`} className="flex flex-col items-center gap-1.5 w-16 animate-pulse">
                 <div className="w-10 h-10 rounded-full bg-slate-700" />
                 <div className="w-12 h-2.5 rounded bg-slate-700" />
               </div>
