@@ -266,8 +266,19 @@ export function CrazyGamesProvider({ children }: { children: ReactNode }) {
   }, [isAvailable]);
 
   const showAuthPrompt = useCallback(async () => {
-    if (isAvailable && window.CrazyGames?.SDK) return window.CrazyGames.SDK.user.showAuthPrompt();
-    return null;
+    if (!isAvailable || !window.CrazyGames?.SDK) return null;
+    const sdkUser = window.CrazyGames.SDK.user;
+    try {
+      const existing = await sdkUser.getUser();
+      if (existing) return existing;
+      return await sdkUser.showAuthPrompt();
+    } catch (err) {
+      const code = (err as { code?: string } | null)?.code;
+      if (code === 'userAlreadySignedIn') {
+        try { return await sdkUser.getUser(); } catch { return null; }
+      }
+      return null;
+    }
   }, [isAvailable]);
 
   const isUserAccountAvailable = useCallback(async (): Promise<boolean> => {
