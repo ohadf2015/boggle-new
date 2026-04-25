@@ -62,17 +62,26 @@ export function detectCrazyGamesSync(): boolean {
     if (host === 'icecream.me' || host?.endsWith('.icecream.me')) return true;
   } catch { /* noop */ }
 
-  // Iframe fallback: CG embeds us cross-origin, so ancestorOrigins often empty
-  // and referrer may be stripped by referrer-policy. If we're in an iframe AND
-  // the URL hints CG context, treat as CG. Guarded by URL heuristic to avoid
-  // false-positive in Vercel previews / Storybook / generic embeds.
+  // Iframe fallback: CG embeds us cross-origin. Firefox lacks ancestorOrigins,
+  // and strict referrer-policy strips Referer — so the only first-paint signal
+  // left is "are we in a cross-origin iframe?". Same-origin iframes (Storybook,
+  // Vercel preview) can read parent.location.href; cross-origin throws. Treat
+  // any cross-origin iframe as a portal embed (CG, itch, gamejolt, etc.) so
+  // external sign-in/sign-up stay hidden until the SDK confirms otherwise.
   try {
     const inIframe = window.self !== window.top;
     if (inIframe) {
       const href = window.location.href;
       if (/crazygames|cg[_-]?embed|icecream/i.test(href)) return true;
+      try {
+        // Cross-origin parent access throws SecurityError. If readable, parent
+        // is same-origin → not a portal embed.
+        void window.parent.location.href;
+      } catch {
+        return true;
+      }
     }
-  } catch { /* cross-origin top access denied — still an iframe, but no URL hint */ }
+  } catch { /* cross-origin top access denied — still an iframe; fall through */ }
 
   return false;
 }

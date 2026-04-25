@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/utils/supabase/server';
 import { sendTestAndroidBetaLaunch } from '@/lib/androidBetaLaunchEmail';
-import { isEmailServiceConfigured, withTimeout } from '@/lib/email';
+import { isEmailServiceConfigured } from '@/lib/email';
 import { captureApiError } from '@/utils/sentry';
 import logger from '@/backend/utils/logger';
 
@@ -27,42 +26,18 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    logger.info('EMAIL', `[android-beta-route] auth-start +${Date.now() - t0}ms`);
-    const supabase = await createClient();
-    const {
-      data: { user },
-      error: authError,
-    } = await withTimeout(
-      supabase.auth.getUser(),
-      5000,
-      'Auth lookup timed out after 5s'
-    );
-    logger.info('EMAIL', `[android-beta-route] auth-done +${Date.now() - t0}ms`);
-
-    if (authError || !user) {
+    // Auth already done by Express adminAuth middleware (server/index.ts mounts
+    // adminRoutes at /api/admin which applies adminAuth before falling through to
+    // this Next route). It forwards admin context via x-admin-* headers, saving
+    // a duplicate getUser+profile roundtrip (~1-2s).
+    const adminUserId = request.headers.get('x-admin-user-id');
+    if (!adminUserId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-
-    logger.info('EMAIL', `[android-beta-route] profile-start +${Date.now() - t0}ms`);
-    const { data: profile, error: profileError } = await withTimeout(
-      Promise.resolve(
-        supabase
-          .from('profiles')
-          .select('is_admin, display_name, username')
-          .eq('id', user.id)
-          .single()
-      ),
-      5000,
-      'Profile lookup timed out after 5s'
-    );
-    logger.info('EMAIL', `[android-beta-route] profile-done +${Date.now() - t0}ms`);
-
-    if (profileError || !profile?.is_admin) {
-      return NextResponse.json(
-        { error: 'Admin access required' },
-        { status: 403 }
-      );
-    }
+    const adminEmail = request.headers.get('x-admin-email') || '';
+    const adminUsername = request.headers.get('x-admin-username') || '';
+    const adminDisplayName = request.headers.get('x-admin-display-name') || '';
+    logger.info('EMAIL', `[android-beta-route] auth-via-headers +${Date.now() - t0}ms`);
 
     let body: {
       email?: string;
@@ -75,7 +50,7 @@ export async function POST(request: NextRequest) {
       // empty body allowed
     }
 
-    const targetEmail = body.email || user.email;
+    const targetEmail = body.email || adminEmail;
     if (!targetEmail) {
       return NextResponse.json(
         { error: 'No email address provided' },
@@ -85,8 +60,8 @@ export async function POST(request: NextRequest) {
 
     const recipientName =
       body.recipientName ||
-      profile.display_name ||
-      profile.username ||
+      adminDisplayName ||
+      adminUsername ||
       'Test User';
 
     const language = ALLOWED_LANGUAGES.includes(body.language ?? '')

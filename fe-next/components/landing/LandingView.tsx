@@ -100,7 +100,10 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
 
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
-  const { isOnCrazyGamesPlatform } = useCrazyGames();
+  const { isOnCrazyGamesPlatform, isLoading: cgLoading } = useCrazyGames();
+  // Treat "still resolving" as embedded — prevents AnonymousTeaserWidgets
+  // signup CTA from flashing on first paint while the CG SDK confirms env.
+  const hideExternalAuth = cgLoading || isOnCrazyGamesPlatform;
   const [showShareModal, setShowShareModal] = useState(false);
   const [, setIsAvatarBuilderOpen] = useState(false);
 
@@ -158,7 +161,7 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
       {enableHeavyBackground && !isMobilePortrait && <PlayfulBackground intensity="high" colorScheme="default" />}
 
       <OnboardingModal isOpen={showOnboarding} onClose={() => setShowOnboarding(false)} />
-      {!isOnCrazyGamesPlatform && <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />}
+      {!hideExternalAuth && <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />}
       <ShareReferralModal isOpen={showShareModal} onClose={() => setShowShareModal(false)} />
       <Header />
 
@@ -217,7 +220,7 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
           <div className="flex flex-col gap-4 max-w-4xl mx-auto w-full">
             <UrgencyCard />
           </div>
-        ) : isOnCrazyGamesPlatform ? null : (
+        ) : hideExternalAuth ? null : (
           <AnonymousTeaserWidgets onSignUpClick={() => setShowAuthModal(true)} />
         )}
 

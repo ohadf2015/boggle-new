@@ -152,6 +152,13 @@ function requestTimeout(): RequestHandler {
   // guest-session is non-critical analytics — let the client's 5s AbortController handle it
   const ROUTES_WITH_CUSTOM_TIMEOUT = [
     '/api/cron/',
+    // Next.js admin email routes — own per-step timeouts + maxDuration=60.
+    // Express adminAuth runs first (~1-2s), then Next route does auth+profile+render+resend
+    // (5+5+8+15=33s worst case). The 30s global Express cap fires before Next finishes,
+    // returning 408 even though the email send is still in flight.
+    '/api/admin/send-test-android-beta-launch',
+    '/api/admin/send-android-beta-launch-to-player',
+    '/api/admin/android-beta-launch-preview',
   ];
 
   const isDev = process.env.NODE_ENV !== 'production';

@@ -30,7 +30,7 @@ export const SignupToast: React.FC<SignupToastProps> = ({
 }) => {
   const { t } = useLanguage();
   const { theme } = useTheme();
-  const { isOnCrazyGamesPlatform } = useCrazyGames();
+  const { isOnCrazyGamesPlatform, isLoading: cgLoading } = useCrazyGames();
   const isDarkMode = theme === 'dark';
 
   useEffect(() => {
@@ -39,7 +39,9 @@ export const SignupToast: React.FC<SignupToastProps> = ({
     return () => clearTimeout(timer);
   }, [isVisible, onDismiss]);
 
-  if (isOnCrazyGamesPlatform) return null;
+  // Suppress while CG SDK environment is still resolving — keeps the signup
+  // CTA hidden during the 0–500ms SDK init window even if sync detection misses.
+  if (cgLoading || isOnCrazyGamesPlatform) return null;
 
   return (
     <AnimatePresence>

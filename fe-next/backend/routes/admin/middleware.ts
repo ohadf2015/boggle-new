@@ -149,7 +149,7 @@ export async function adminAuth(req: AdminRequest, res: Response, next: NextFunc
     // Check if user is admin - server-side verification
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
-      .select('is_admin, username, admin_role')
+      .select('is_admin, username, display_name, admin_role')
       .eq('id', user.id)
       .single();
 
@@ -164,6 +164,14 @@ export async function adminAuth(req: AdminRequest, res: Response, next: NextFunc
       username: profile.username,
       admin_role: profile.admin_role ?? 'viewer',
     };
+
+    // Forward admin context to downstream Next.js handlers via mutated request
+    // headers — saves a duplicate getUser+profile roundtrip in App Router routes
+    // mounted under /api/admin (e.g. android-beta send routes).
+    req.headers['x-admin-user-id'] = user.id;
+    req.headers['x-admin-email'] = user.email ?? '';
+    req.headers['x-admin-username'] = profile.username ?? '';
+    req.headers['x-admin-display-name'] = profile.display_name ?? '';
 
     // Log successful admin access (no PII — use admin ID only)
     logger.debug('ADMIN_API', `Admin access: ${user.id} -> ${req.method} ${req.path} [${requestId}]`);

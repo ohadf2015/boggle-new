@@ -55,4 +55,50 @@ describe('detectCrazyGamesSync', () => {
     stubReferrer('');
     expect(detectCrazyGamesSync()).toBe(false);
   });
+
+  it('returns true in cross-origin iframe even without ancestorOrigins/referrer (Firefox/Brave)', () => {
+    // Firefox: no ancestorOrigins. Strict referrer-policy: empty referrer.
+    // Game URL has no "crazygames"/"icecream" hint. Distinguishing signal is that
+    // `window.parent` is cross-origin → reading `parent.location.href` throws.
+    stubLocation('lexiclash.app', []);
+    stubReferrer('');
+    const fakeParent = {
+      get location(): never {
+        throw new DOMException('cross-origin', 'SecurityError');
+      },
+    };
+    const originalSelf = window.self;
+    const originalTop = window.top;
+    const originalParent = window.parent;
+    Object.defineProperty(window, 'self', { value: {}, configurable: true });
+    Object.defineProperty(window, 'top', { value: {}, configurable: true });
+    Object.defineProperty(window, 'parent', { value: fakeParent, configurable: true });
+    try {
+      expect(detectCrazyGamesSync()).toBe(true);
+    } finally {
+      Object.defineProperty(window, 'self', { value: originalSelf, configurable: true });
+      Object.defineProperty(window, 'top', { value: originalTop, configurable: true });
+      Object.defineProperty(window, 'parent', { value: originalParent, configurable: true });
+    }
+  });
+
+  it('returns false in same-origin iframe (Storybook, dev preview)', () => {
+    // Same-origin iframe: parent.location.href is readable → not a portal embed.
+    stubLocation('lexiclash.app', []);
+    stubReferrer('');
+    const fakeParent = { location: { href: 'https://lexiclash.app/preview' } };
+    const originalSelf = window.self;
+    const originalTop = window.top;
+    const originalParent = window.parent;
+    Object.defineProperty(window, 'self', { value: {}, configurable: true });
+    Object.defineProperty(window, 'top', { value: {}, configurable: true });
+    Object.defineProperty(window, 'parent', { value: fakeParent, configurable: true });
+    try {
+      expect(detectCrazyGamesSync()).toBe(false);
+    } finally {
+      Object.defineProperty(window, 'self', { value: originalSelf, configurable: true });
+      Object.defineProperty(window, 'top', { value: originalTop, configurable: true });
+      Object.defineProperty(window, 'parent', { value: originalParent, configurable: true });
+    }
+  });
 });
