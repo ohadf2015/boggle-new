@@ -21,6 +21,7 @@ import { io, Socket } from 'socket.io-client';
 import { getSocketURL } from '@/utils/SocketContext';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { ClassroomSetupStep } from './ClassroomSetupStep';
+import type { GameMode } from '@/shared/types/game';
 
 export interface ClassroomGameLobbyProps {
   initialLessonId?: string;
@@ -42,7 +43,7 @@ export function ClassroomGameLobby({ initialLessonId, onBack }: ClassroomGameLob
   const [isStarting, setIsStarting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [socket, setSocket] = useState<Socket | null>(null);
-  const [gameMode, setGameMode] = useState<'classic' | 'wordHunt' | 'blast'>('classic');
+  const [gameMode, setGameMode] = useState<GameMode>('classic');
 
   const settings = useMemo(
     () => ({
@@ -113,7 +114,7 @@ export function ClassroomGameLobby({ initialLessonId, onBack }: ClassroomGameLob
       socketInstance.on('classroomGameCreated', (data: { success: boolean; gameCode: string }) => {
         if (data.success) {
           toast.success(t('education.classroomGame.gameCreated'));
-          router.push(`/${language}/multiplayer?room=${data.gameCode}&classroom=true`);
+          router.push(`/${language}/multiplayer?room=${data.gameCode}&classroom=true&host=true`);
         }
       });
       socketInstance.on('classroomGameError', (data: { error: string }) => {

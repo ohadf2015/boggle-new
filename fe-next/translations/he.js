@@ -8584,7 +8584,8 @@ const he = {
         "title": "מצב משחק",
         "classic": "קלאסי",
         "wordHunt": "ציד מילים",
-        "blast": "בלאסט"
+        "blast": "בלאסט",
+        "wheelRush": "מרוץ הגלגל"
       },
       "create": "צור כיתה",
       "edit": "ערוך כיתה",
@@ -9122,7 +9123,8 @@ const he = {
       "teacherFeature1": "אנליטיקה בזמן אמת",
       "teacherFeature2": "רשימות מילים מותאמות",
       "teacherFeature3": "משחקי כיתה",
-      "title": "LexiClash חינוך"
+      "title": "LexiClash חינוך",
+      "startGame": "התחל משחק"
     },
     "leaderboard": {
       "allTime": "כל הזמנים",

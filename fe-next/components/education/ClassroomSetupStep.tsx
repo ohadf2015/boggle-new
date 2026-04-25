@@ -1,16 +1,24 @@
-import { School, BookOpen, LayoutGrid, Search, Zap } from 'lucide-react';
+import { School, BookOpen, LayoutGrid, Search, Zap, RotateCw } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { WizardStep } from '@/components/ui/WizardStep';
 import { MultiLessonSelector } from './MultiLessonSelector';
 import type { VocabularyLesson, Classroom } from '@/lib/supabase/education';
+import type { GameMode } from '@/shared/types/game';
 
-type GameMode = 'classic' | 'wordHunt' | 'blast';
+// Translation keys are camelCase but canonical GameMode wire values are kebab.
+const MODE_KEY_MAP: Record<GameMode, string> = {
+  classic: 'classic',
+  blast: 'blast',
+  'word-hunt': 'wordHunt',
+  'wheel-rush': 'wheelRush',
+};
 
 const GAME_MODES: { key: GameMode; icon: typeof LayoutGrid; color: string }[] = [
   { key: 'classic', icon: LayoutGrid, color: 'neo-cyan' },
-  { key: 'wordHunt', icon: Search, color: 'neo-lime' },
+  { key: 'word-hunt', icon: Search, color: 'neo-lime' },
   { key: 'blast', icon: Zap, color: 'neo-pink' },
+  { key: 'wheel-rush', icon: RotateCw, color: 'neo-purple' },
 ];
 
 interface ClassroomSetupStepProps {
@@ -121,7 +129,7 @@ export function ClassroomSetupStep({
           <label className="block text-neo-white font-bold mb-3">
             {t('teacher.classroom.gameModes.title')}
           </label>
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {GAME_MODES.map(({ key, icon: Icon, color }) => (
               <button
                 key={key}
@@ -135,7 +143,7 @@ export function ClassroomSetupStep({
                 )}
               >
                 <Icon className="w-6 h-6" />
-                <span className="text-sm">{t(`teacher.classroom.gameModes.${key}`)}</span>
+                <span className="text-sm">{t(`teacher.classroom.gameModes.${MODE_KEY_MAP[key]}`)}</span>
               </button>
             ))}
           </div>

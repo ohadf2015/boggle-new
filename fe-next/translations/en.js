@@ -8799,7 +8799,8 @@ const en = {
         "title": "Game Mode",
         "classic": "Classic",
         "wordHunt": "Word Hunt",
-        "blast": "Blast"
+        "blast": "Blast",
+        "wheelRush": "Wheel Rush"
       },
       "create": "Create Classroom",
       "edit": "Edit Classroom",

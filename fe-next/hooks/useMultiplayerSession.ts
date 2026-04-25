@@ -10,14 +10,14 @@ import { getSession, clearSession, saveSession } from '@/utils/session';
 import { getStoredUsername } from '@/utils/profileStorage';
 import { getAvatarForName, getRandomDefaultNameWithAvatar } from '@/utils/defaultNames';
 import logger from '@/utils/logger';
-import type { Language } from '@/shared/types/game';
+import type { Language, GameMode } from '@/shared/types/game';
 
 interface LessonData {
   lessonId: string;
   lessonName: string;
   vocabularyWords: string[];
   language: Language;
-  gameMode?: 'classic' | 'wordHunt' | 'blast';
+  gameMode?: GameMode;
   templateSettings?: {
     timerSeconds: number;
     difficulty: string;

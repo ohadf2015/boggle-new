@@ -8625,7 +8625,8 @@ const sv = {
         "title": "Spelläge",
         "classic": "Klassiskt",
         "wordHunt": "Ordjakt",
-        "blast": "Blast"
+        "blast": "Blast",
+        "wheelRush": "Hjulrush"
       },
       "create": "Skapa klassrum",
       "edit": "Redigera klassrum",

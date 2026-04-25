@@ -71,6 +71,7 @@ function ViewLoadingSkeleton(): React.JSX.Element {
 export default function MultiplayerPageClient(): React.JSX.Element {
   const searchParams = useSearchParams();
   const isClassroomMode = searchParams?.get('classroom') === 'true';
+  const isClassroomHost = searchParams?.get('host') === 'true';
   const preselectedMode = searchParams?.get('mode') as GameMode | null;
   const autoCreate = searchParams?.get('autoCreate') === 'true';
   const quickPlay = searchParams?.get('quickPlay') === 'true';
@@ -112,7 +113,7 @@ export default function MultiplayerPageClient(): React.JSX.Element {
 
   const [lessonDataState, setLessonDataState] = useState<{
     lessonId: string; lessonName: string; vocabularyWords: string[];
-    language: Language; gameMode?: 'classic' | 'wordHunt' | 'blast';
+    language: Language; gameMode?: GameMode;
     templateSettings?: { timerSeconds: number; difficulty: string; minWordLength: number; allowLateJoin: boolean } | null;
   } | null>(null);
 
@@ -367,6 +368,7 @@ export default function MultiplayerPageClient(): React.JSX.Element {
             displayName={(isCrazyGames && cgUser?.username) || profile?.display_name || ''} profileAvatar={profile?.avatar_config}
             onCrazyGamesLogin={isCrazyGames && !cgUser ? loginCrazyGames : undefined}
             prefilledRoom={prefilledRoomCode} defaultLanguage={language as Language}
+            host={isClassroomHost}
             setGameCode={setGameCode} setUsername={setUsername}
             setRoomName={setRoomName} setHostUsername={setHostUsername}
           />

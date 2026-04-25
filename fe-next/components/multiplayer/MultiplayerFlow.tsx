@@ -51,6 +51,12 @@ interface MultiplayerFlowProps {
   prefilledRoom?: string;
   defaultLanguage: Language;
 
+  // When true and prefilledRoom is set, auto-CREATE a private room with that
+  // gameCode rather than auto-joining. Used by the classroom flow where the
+  // teacher generates the gameCode upstream (see ClassroomGameLobby) and
+  // expects to host the room with that exact code.
+  host?: boolean;
+
   // Auto-create room on mount (e.g., from Word Hunt banner)
   autoCreate?: boolean;
 
@@ -87,6 +93,7 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
   autoCreate,
   quickPlay,
   defaultLanguage,
+  host,
   profileAvatar,
   setGameCode,
   setUsername,
@@ -173,6 +180,14 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
         const profile = getProfileData();
         setGameCode(roomCode);
         setUsername(profile.username);
+        // Classroom host flow: teacher pre-generated gameCode upstream, so we
+        // must CREATE a private room with that exact code rather than join.
+        if (host) {
+          setRoomName(`${profile.username} Room`);
+          setHostUsername(profile.username);
+          handleJoin(true, defaultLanguage, roomCode, `${profile.username} Room`, profile.username, { isPrivate: true });
+          return;
+        }
         // Pass username as override to avoid stale closure in handleJoin
         handleJoin(false, null, roomCode, undefined, profile.username);
       } else {
@@ -190,7 +205,7 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
         setFlowState('join-modal');
       }
     },
-    [hasProfile, getProfileData, handleJoin, setGameCode, setUsername, defaultLanguage]
+    [hasProfile, getProfileData, handleJoin, setGameCode, setUsername, setRoomName, setHostUsername, defaultLanguage, host]
   );
 
   // NOTE: CrazyGames invite is handled via the onInviteJoin callback above.

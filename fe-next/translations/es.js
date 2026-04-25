@@ -8607,7 +8607,8 @@ const es = {
         "title": "Modo de juego",
         "classic": "Clásico",
         "wordHunt": "Caza de palabras",
-        "blast": "Blast"
+        "blast": "Blast",
+        "wheelRush": "Carrera de Ruleta"
       },
       "create": "Crear Aula",
       "edit": "Editar Aula",
@@ -9158,7 +9159,8 @@ const es = {
       "teacherFeature1": "Estadísticas en tiempo real",
       "teacherFeature2": "Listas de palabras personalizadas",
       "teacherFeature3": "Juegos en el aula",
-      "title": "LexiClash Educación"
+      "title": "LexiClash Educación",
+      "startGame": "Iniciar juego"
     },
     "leaderboard": {
       "allTime": "Histórico",

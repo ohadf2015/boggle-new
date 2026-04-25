@@ -44,7 +44,7 @@ const createClassroomGameSchema = z.object({
     timerMinutes: z.number().int().min(1).max(30).optional(),
     boardSize: z.enum(['small', 'medium', 'large']).optional(),
     allowLateJoin: z.boolean().optional(),
-    gameMode: z.enum(['classic', 'wordHunt', 'blast']).optional(),
+    gameMode: z.enum(['classic', 'blast', 'word-hunt', 'wheel-rush']).optional(),
   }).optional(),
 });
 
@@ -116,7 +116,7 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
     const payload = validation.data as {
       classroomId: string; teacherId: string; teacherName: string; gameCode: string;
       lessonIds?: string[]; lessonNames?: string[]; vocabularyWords?: string[];
-      settings?: { timerMinutes?: number; boardSize?: 'small' | 'medium' | 'large'; allowLateJoin?: boolean; gameMode?: 'classic' | 'wordHunt' | 'blast' };
+      settings?: { timerMinutes?: number; boardSize?: 'small' | 'medium' | 'large'; allowLateJoin?: boolean; gameMode?: 'classic' | 'blast' | 'word-hunt' | 'wheel-rush' };
     };
 
     // Auth check: teacherId MUST match authenticated user (mandatory, not optional)

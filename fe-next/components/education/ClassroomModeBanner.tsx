@@ -1,21 +1,19 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { GraduationCap, BookOpen, Copy, Check, LayoutGrid, Search, Zap, Clock, Grid3x3, UserPlus, X } from 'lucide-react';
+import { GraduationCap, BookOpen, Copy, Check, LayoutGrid, Search, Zap, RotateCw, Clock, Grid3x3, UserPlus, X } from 'lucide-react';
 import { QRCodeCanvas } from 'qrcode.react';
 import toast from 'react-hot-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
-import type { Language } from '@/shared/types/game';
-
-type ClassroomGameMode = 'classic' | 'wordHunt' | 'blast';
+import type { Language, GameMode } from '@/shared/types/game';
 
 interface LessonData {
   lessonId: string;
   lessonName: string;
   vocabularyWords: string[];
   language: Language;
-  gameMode?: ClassroomGameMode;
+  gameMode?: GameMode;
   templateSettings?: {
     timerSeconds: number;
     difficulty: string;
@@ -30,10 +28,18 @@ interface ClassroomModeBannerProps {
   expanded?: boolean;
 }
 
-const MODE_ICON: Record<ClassroomGameMode, typeof LayoutGrid> = {
+const MODE_ICON: Record<GameMode, typeof LayoutGrid> = {
   classic: LayoutGrid,
-  wordHunt: Search,
+  'word-hunt': Search,
   blast: Zap,
+  'wheel-rush': RotateCw,
+};
+
+const MODE_TRANSLATION_KEY: Record<GameMode, string> = {
+  classic: 'classic',
+  blast: 'blast',
+  'word-hunt': 'wordHunt',
+  'wheel-rush': 'wheelRush',
 };
 
 function boardSizeLabel(size?: string): string {
@@ -172,7 +178,7 @@ export function ClassroomModeBanner({ lessonData, gameCode, expanded = false }: 
                 <SummaryTile
                   icon={<ModeIcon className="w-4 h-4" />}
                   label={t('teacher.classroom.gameModes.title')}
-                  value={t(`teacher.classroom.gameModes.${gameMode}`)}
+                  value={t(`teacher.classroom.gameModes.${MODE_TRANSLATION_KEY[gameMode]}`)}
                 />
                 {timerMinutes !== null && (
                   <SummaryTile

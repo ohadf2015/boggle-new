@@ -8601,7 +8601,8 @@ const ja = {
         "title": "ゲームモード",
         "classic": "クラシック",
         "wordHunt": "ワードハント",
-        "blast": "ブラスト"
+        "blast": "ブラスト",
+        "wheelRush": "ホイールラッシュ"
       },
       "create": "クラス作成",
       "edit": "クラス編集",
@@ -9139,7 +9140,8 @@ const ja = {
       "teacherFeature1": "リアルタイム分析",
       "teacherFeature2": "カスタム単語リスト",
       "teacherFeature3": "クラスゲーム",
-      "title": "LexiClash 教育"
+      "title": "LexiClash 教育",
+      "startGame": "ゲーム開始"
     },
     "leaderboard": {
       "allTime": "全期間",

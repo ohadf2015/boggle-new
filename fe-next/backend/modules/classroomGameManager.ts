@@ -29,7 +29,7 @@ export interface ClassroomGameSettings {
   timerMinutes?: number;
   boardSize?: 'small' | 'medium' | 'large';
   allowLateJoin?: boolean;
-  gameMode?: 'classic' | 'wordHunt' | 'blast';
+  gameMode?: 'classic' | 'blast' | 'word-hunt' | 'wheel-rush';
 }
 
 export interface ClassroomGame {
