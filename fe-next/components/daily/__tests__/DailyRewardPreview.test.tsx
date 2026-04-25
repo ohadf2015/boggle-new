@@ -19,7 +19,9 @@ const mockT = (key: string, params?: Record<string, string | number>) => {
   const translations: Record<string, string> = {
     'daily.todayReward': "Today's reward: {{coins}} coins",
     'daily.tomorrowReward': 'Tomorrow: {{coins}} coins',
-    'daily.nearMilestone': '{{days}} more days to {{badge}}!',
+    'daily.nearMilestone': '{{days}} days to {{badge}} badge!',
+    'daily.nearMilestoneOne': '1 day to {{badge}} badge!',
+    'daily.milestoneEarned': '🎉 {{badge}} unlocked!',
     'daily.rewardDay': 'Day {{day}}',
     'daily.badges.weekWarrior': 'Week Warrior',
     'daily.badges.fortnightFighter': 'Fortnight Fighter',
@@ -50,7 +52,31 @@ describe('DailyRewardPreview', () => {
   it('shows milestone proximity when near a badge milestone', () => {
     // Day 5, next badge milestone is day 7 (weekly_warrior) = 2 days away
     render(<DailyRewardPreview currentStreakDay={5} t={mockT} />);
-    expect(screen.getByText(/2 more days/)).toBeInTheDocument();
+    expect(screen.getByText(/2 days to Week Warrior/)).toBeInTheDocument();
+  });
+
+  it('uses singular "1 day" copy when daysAway is 1 (streak 6 → week warrior)', () => {
+    render(<DailyRewardPreview currentStreakDay={6} t={mockT} />);
+    expect(screen.getByText(/1 day to Week Warrior badge!/)).toBeInTheDocument();
+    expect(screen.queryByText(/1 days/)).not.toBeInTheDocument();
+  });
+
+  it('shows celebration banner instead of "X days to next" when streak day equals a badge milestone', () => {
+    // Streak 7 = Week Warrior just earned
+    render(<DailyRewardPreview currentStreakDay={7} t={mockT} />);
+    expect(screen.getByText(/Week Warrior unlocked/)).toBeInTheDocument();
+    expect(screen.queryByText(/days to Fortnight Fighter/)).not.toBeInTheDocument();
+  });
+
+  it('shows celebration for centurion milestone (day 100)', () => {
+    render(<DailyRewardPreview currentStreakDay={100} t={mockT} />);
+    expect(screen.getByText(/Centurion unlocked/)).toBeInTheDocument();
+  });
+
+  it('skips veteran (day 50, no badge) and points to Centurion', () => {
+    render(<DailyRewardPreview currentStreakDay={50} t={mockT} />);
+    // 100 - 50 = 50 days to centurion
+    expect(screen.getByText(/50 days to Centurion/)).toBeInTheDocument();
   });
 
   it('translates the badge label (not raw key) in milestone proximity', () => {

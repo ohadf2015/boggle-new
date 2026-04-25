@@ -46,15 +46,24 @@ export function checkGuess(input: string, puzzle: ConnectionPuzzle): GuessResult
   return { correct, normalizedGuess, normalizedAnswer };
 }
 
-export function initGameState(puzzles: ConnectionPuzzle[]): GameState {
+export interface InitGameStateOptions {
+  /** Lives to start with — clamped to [0..INITIAL_LIVES]. Defaults to INITIAL_LIVES. */
+  initialLives?: number;
+}
+
+export function initGameState(puzzles: ConnectionPuzzle[], opts?: InitGameStateOptions): GameState {
+  const requested = opts?.initialLives ?? INITIAL_LIVES;
+  const lives = Number.isFinite(requested)
+    ? Math.max(0, Math.min(INITIAL_LIVES, Math.floor(requested)))
+    : INITIAL_LIVES;
   return {
     puzzles,
     currentIndex: 0,
     score: 0,
     streak: 0,
-    lives: INITIAL_LIVES,
+    lives,
     wrongAttempts: 0,
-    status: 'playing',
+    status: lives === 0 ? 'outOfLives' : 'playing',
     input: '',
     completedIds: new Set(),
     ratedIds: new Set(),

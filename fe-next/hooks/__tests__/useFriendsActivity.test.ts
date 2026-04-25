@@ -64,8 +64,7 @@ const mockSessionRows = [
     score: 420,
     words_found: 12,
     created_at: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
-    daily_number: 42,
-    adventure_world: null,
+    daily_puzzle_number: 42,
     profiles: { username: 'WordWiz', display_name: 'Word Wiz', avatar_image: null, avatar_config: null },
   },
   {
@@ -74,8 +73,7 @@ const mockSessionRows = [
     score: 300,
     words_found: 25,
     created_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-    daily_number: null,
-    adventure_world: null,
+    daily_puzzle_number: null,
     profiles: { username: 'BlastKing', display_name: null, avatar_image: 'food_pizza', avatar_config: null },
   },
 ];

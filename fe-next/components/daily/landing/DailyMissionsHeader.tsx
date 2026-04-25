@@ -18,8 +18,18 @@ interface DailyMissionsHeaderProps {
 export function DailyMissionsHeader({ completedCount }: DailyMissionsHeaderProps) {
   const { t } = useLanguage();
   const [countdown, setCountdown] = useState(getSecondsUntilNextDaily());
+  // Defer date to client to avoid SSR/CSR hydration mismatch (React #418)
+  const [dateLabel, setDateLabel] = useState<{ monthAbbr: string; dayNum: number | null }>({
+    monthAbbr: '',
+    dayNum: null,
+  });
 
   useEffect(() => {
+    const now = new Date();
+    setDateLabel({
+      monthAbbr: now.toLocaleString('en', { month: 'short' }).toUpperCase(),
+      dayNum: now.getDate(),
+    });
     const interval = setInterval(() => {
       setCountdown(getSecondsUntilNextDaily());
     }, 1000);
@@ -27,9 +37,7 @@ export function DailyMissionsHeader({ completedCount }: DailyMissionsHeaderProps
   }, []);
 
   const allDone = completedCount >= 2;
-  const now = new Date();
-  const monthAbbr = now.toLocaleString('en', { month: 'short' }).toUpperCase();
-  const dayNum = now.getDate();
+  const { monthAbbr, dayNum } = dateLabel;
 
   return (
     <motion.div

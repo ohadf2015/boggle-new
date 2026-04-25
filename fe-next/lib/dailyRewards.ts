@@ -90,20 +90,26 @@ export function getRewardForDay(streakDay: number): DailyReward {
 /**
  * Get the next milestone after the given streak day.
  * Returns null if already at or past the last milestone.
+ *
+ * @param options.badgeOnly  when true, skip non-badge milestones (day 1,2,3,5,50)
  */
-export function getNextMilestone(streakDay: number): NextMilestone | null {
+export function getNextMilestone(
+  streakDay: number,
+  options: { badgeOnly?: boolean } = {}
+): NextMilestone | null {
   const day = Math.max(0, streakDay);
 
   for (const milestone of DAILY_REWARD_SCHEDULE) {
-    if (milestone.day > day) {
-      return {
-        day: milestone.day,
-        coins: milestone.coins,
-        badge: 'badge' in milestone ? (milestone as { badge: string }).badge : undefined,
-        label: milestone.label,
-        daysAway: milestone.day - day,
-      };
-    }
+    if (milestone.day <= day) continue;
+    const badge = 'badge' in milestone ? (milestone as { badge: string }).badge : undefined;
+    if (options.badgeOnly && !badge) continue;
+    return {
+      day: milestone.day,
+      coins: milestone.coins,
+      badge,
+      label: milestone.label,
+      daysAway: milestone.day - day,
+    };
   }
 
   return null;

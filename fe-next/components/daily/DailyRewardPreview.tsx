@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { getRewardForDay, getRewardCoins, DAILY_REWARD_SCHEDULE } from '@/lib/dailyRewards';
+import { getRewardForDay, getRewardCoins, getNextMilestone } from '@/lib/dailyRewards';
 
 interface DailyRewardPreviewProps {
   currentStreakDay: number;
@@ -16,8 +16,11 @@ export function DailyRewardPreview({ currentStreakDay, t }: DailyRewardPreviewPr
   const todayReward = getRewardForDay(currentStreakDay);
   const tomorrowCoins = getRewardCoins(currentStreakDay + 1);
 
-  // Find next badge milestone
-  const nextMilestone = getNextMilestoneWithBadge(currentStreakDay);
+  const justEarnedBadge =
+    todayReward.isMilestone && todayReward.badge && todayReward.label
+      ? { label: todayReward.label }
+      : null;
+  const nextMilestone = justEarnedBadge ? null : getNextMilestone(currentStreakDay, { badgeOnly: true });
 
   // Build timeline: show 5 days starting from today
   const timelineDays = [];
@@ -48,11 +51,22 @@ export function DailyRewardPreview({ currentStreakDay, t }: DailyRewardPreviewPr
         </p>
       </div>
 
+      {/* Just-earned badge celebration (takes precedence over next-milestone teaser) */}
+      {justEarnedBadge && (
+        <div className="px-3 py-1.5 rounded-lg bg-neo-yellow/15 border border-neo-yellow/40 text-center">
+          <p className="text-neo-yellow text-xs font-bold">
+            {t('daily.milestoneEarned', {
+              badge: t(`daily.badges.${justEarnedBadge.label}`),
+            })}
+          </p>
+        </div>
+      )}
+
       {/* Milestone proximity */}
       {nextMilestone && (
         <div className="px-3 py-1.5 rounded-lg bg-neo-purple/10 border border-neo-purple/30 text-center">
           <p className="text-neo-purple text-xs font-bold">
-            {t('daily.nearMilestone', {
+            {t(nextMilestone.daysAway === 1 ? 'daily.nearMilestoneOne' : 'daily.nearMilestone', {
               days: nextMilestone.daysAway,
               badge: t(`daily.badges.${nextMilestone.label}`),
             })}
@@ -93,20 +107,3 @@ export function DailyRewardPreview({ currentStreakDay, t }: DailyRewardPreviewPr
   );
 }
 
-/**
- * Find the next milestone that has a badge (not just any milestone).
- */
-function getNextMilestoneWithBadge(currentDay: number) {
-  for (const milestone of DAILY_REWARD_SCHEDULE) {
-    if (milestone.day > currentDay && 'badge' in milestone) {
-      return {
-        day: milestone.day,
-        coins: milestone.coins,
-        badge: (milestone as { badge: string }).badge,
-        label: milestone.label,
-        daysAway: milestone.day - currentDay,
-      };
-    }
-  }
-  return null;
-}

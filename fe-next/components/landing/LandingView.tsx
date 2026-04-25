@@ -27,10 +27,6 @@ const LandingAvatarTeaser = dynamic(() => import('./LandingAvatarTeaser').then(m
   ssr: false,
   loading: () => <div className="h-48 w-full rounded-neo bg-neo-navy-light/50 animate-pulse" />,
 });
-const LandingAdventureStrip = dynamic(() => import('./LandingAdventureStrip').then(m => m.LandingAdventureStrip), {
-  ssr: false,
-  loading: () => <div className="h-28 w-full max-w-4xl mx-auto rounded-neo bg-neo-navy-light/50 animate-pulse" />,
-});
 import { LandingChallengeCards } from './LandingChallengeCards';
 import { LandingLeaderboardPreview } from './LandingLeaderboardPreview';
 
@@ -234,9 +230,6 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
               <LandingAvatarTeaser onBuilderOpenChange={setIsAvatarBuilderOpen} />
             </div>
           </div>
-
-          {/* Adventure mode — distinct bottom strip, not part of featured mode grid */}
-          <LandingAdventureStrip />
         </div>
       </section>
 

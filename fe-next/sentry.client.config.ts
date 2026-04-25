@@ -293,6 +293,9 @@ Sentry.init({
     /LogRocket.*Session quota exceeded/i,
     /LogRocket.*Navigation rate limit/i,
     /Navigation rate limit exceeded/i,
+    // Third-party SDK chunk (`core.js:297`, fn `Tx`) — Supabase realtime broadcast
+    // events with no payload. Not first-party; no .payload access in app code.
+    /Cannot read properties of undefined \(reading 'payload'\)/i,
   ],
 
   denyUrls: [

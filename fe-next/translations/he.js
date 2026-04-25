@@ -4994,6 +4994,8 @@ const he = {
     "todayReward": "היום: {{coins}} מטבעות",
     "tomorrowReward": "מחר: {{coins}} מטבעות",
     "nearMilestone": "{{days}} ימים לתג {{badge}}!",
+    "nearMilestoneOne": "יום אחד לתג {{badge}}!",
+    "milestoneEarned": "🎉 פתחת את התג {{badge}}!",
     "rewardDay": "יום {day}",
     "badges": {
       "weekWarrior": "לוחם שבועי",

@@ -58,12 +58,13 @@ export function DailyChallengeLanding({
   const [wordWheelStatus, setWordWheelStatus] = useState<'new' | 'played'>('new');
   const [freezeCount, setFreezeCount] = useState(0);
   const [guestFingerprint, setGuestFingerprint] = useState<string | null>(null);
+  // Defer Date.now()-derived value to client to avoid hydration mismatch (React #418)
+  const [todayIso, setTodayIso] = useState<string>('');
 
   useEffect(() => {
     setGuestFingerprint(getGuestFingerprint());
+    setTodayIso(new Date().toISOString().split('T')[0]);
   }, []);
-
-  const todayIso = new Date().toISOString().split('T')[0];
 
   // Derive Word Hunt status from hook (server-aware for cross-device play)
   const wordHuntStatus: 'new' | 'won' | 'lost' = dailyStatus.loading
@@ -82,22 +83,17 @@ export function DailyChallengeLanding({
     setWordWheelStatus(wwPlayed ? 'played' : 'new');
   };
 
-  // Fetch streak freeze count
+  // Fetch streak freeze count (authed users only — guests have no server streak)
   const fetchFreezeCount = async () => {
+    if (!user?.id) {
+      setFreezeCount(0);
+      return;
+    }
     try {
-      const params = new URLSearchParams();
-      if (user?.id) {
-        params.set('player_id', user.id);
-      } else {
-        const fingerprint = getGuestFingerprint();
-        if (fingerprint) params.set('guest_fingerprint', fingerprint);
-      }
-      if (params.toString()) {
-        const res = await fetch(`/api/daily-streak?${params.toString()}`);
-        if (res.ok) {
-          const data = await res.json();
-          setFreezeCount(data.freezeCount || 0);
-        }
+      const res = await fetch('/api/streak');
+      if (res.ok) {
+        const data = await res.json();
+        setFreezeCount(data.freezesAvailable ?? 0);
       }
     } catch {
       // Freeze count is optional — fail silently
@@ -372,27 +368,30 @@ export function DailyChallengeLanding({
           <WatchAdForFreezeButton t={t} surface="daily_freeze" />
         </div>
       )}
-      <DailyRewardPreview currentStreakDay={streak} t={t} />
+      {/* Streak preview is auth-only — guests don't get streak tracking (storage.ts:205) */}
+      {user && <DailyRewardPreview currentStreakDay={streak} t={t} />}
 
-      {/* Leaderboard Teaser */}
-      <motion.div
-        className="w-full"
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4, type: 'spring', stiffness: 300, damping: 25 }}
-      >
-        <TabbedDailyLeaderboard
-          puzzleDate={todayIso}
-          language={currentLanguage}
-          currentPlayerId={user?.id ?? null}
-          currentGuestFingerprint={guestFingerprint}
-          scope="combined"
-          defaultTab="today"
-          t={t}
-          maxVisible={5}
-          compact
-        />
-      </motion.div>
+      {/* Leaderboard Teaser — only render after client-side date hydration */}
+      {todayIso && (
+        <motion.div
+          className="w-full"
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4, type: 'spring', stiffness: 300, damping: 25 }}
+        >
+          <TabbedDailyLeaderboard
+            puzzleDate={todayIso}
+            language={currentLanguage}
+            currentPlayerId={user?.id ?? null}
+            currentGuestFingerprint={guestFingerprint}
+            scope="combined"
+            defaultTab="today"
+            t={t}
+            maxVisible={5}
+            compact
+          />
+        </motion.div>
+      )}
     </motion.div>
   );
 }

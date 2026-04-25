@@ -5005,6 +5005,8 @@ const sv = {
     "todayReward": "Idag: {{coins}} mynt",
     "tomorrowReward": "Imorgon: {{coins}} mynt",
     "nearMilestone": "{{days}} dagar till {{badge}}-märke!",
+    "nearMilestoneOne": "1 dag till {{badge}}-märke!",
+    "milestoneEarned": "🎉 {{badge}} upplåst!",
     "rewardDay": "Dag {day}",
     "badges": {
       "weekWarrior": "Veckokrigare",

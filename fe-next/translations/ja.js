@@ -5035,6 +5035,8 @@ const ja = {
     "todayReward": "今日: {{coins}}コイン",
     "tomorrowReward": "明日: {{coins}}コイン",
     "nearMilestone": "{{badge}}バッジまであと{{days}}日！",
+    "nearMilestoneOne": "{{badge}}バッジまであと1日！",
+    "milestoneEarned": "🎉 {{badge}}を獲得！",
     "rewardDay": "{day}日目",
     "badges": {
       "weekWarrior": "ウィークウォリアー",

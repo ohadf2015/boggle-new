@@ -16,6 +16,24 @@ import { httpLogger } from './logger';
 const dev: boolean = process.env.NODE_ENV !== 'production';
 const EXPRESS_API_ROUTES: string[] = ['/api/leaderboard', '/api/geolocation', '/api/analytics', '/api/admin', '/api/dictionary', '/api/solve-grid', '/api/single-player', '/api/daily-challenge', '/api/generate-word-hints', '/api/ugc'];
 
+// Next.js App Router admin POST routes that have NO Express counterpart — they
+// fall through `/api/admin` to the Next catch-all and parse JSON themselves via
+// `await request.json()`. Express must NOT pre-parse: doing so drains the
+// IncomingMessage stream, after which Next's `request.json()` waits forever for
+// Content-Length bytes that already left the wire (the await never resolves nor
+// rejects, so try/catch + withTimeout cannot rescue it). Add new entries when
+// adding Next-only admin POST/PUT/PATCH routes.
+const NEXT_ADMIN_BODY_ROUTES: string[] = [
+  '/api/admin/send-test-android-beta-launch',
+  '/api/admin/send-android-beta-launch-to-player',
+];
+
+export function shouldExpressParseJsonBody(path: string): boolean {
+  const isExpressRoute = EXPRESS_API_ROUTES.some((route) => path.startsWith(route));
+  const isNextAdminRoute = NEXT_ADMIN_BODY_ROUTES.some((route) => path.startsWith(route));
+  return isExpressRoute && !isNextAdminRoute;
+}
+
 // Pre-compiled regexes — avoids recompilation on every HTTP request
 const STATIC_ASSET_RE = /\.(js|css|woff2?|ttf|otf|png|jpg|jpeg|svg|ico|webp|avif|mp3|mp4|ogg|wav|gif|webm)$/;
 const NON_HTML_ASSET_RE = /\.(js|css|woff2?|ttf|otf|png|jpg|jpeg|svg|ico|webp|avif)$/;
@@ -67,7 +85,8 @@ export function createHelmetMiddleware(isDev: boolean): RequestHandler {
           'https://sdk.crazygames.com', 'https://*.crazygames.com',
           'https://pagead2.googlesyndication.com', 'https://imasdk.googleapis.com',
           'https://*.googleadservices.com', 'https://*.adtrafficquality.google',
-          'https://*.doubleclick.net', 'https://*.posthog.com', 'https://eu.i.posthog.com'],
+          'https://*.doubleclick.net', 'https://*.posthog.com', 'https://eu.i.posthog.com',
+          'https://app.purpleads.io', 'https://*.purpleads.io'],
         styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
         imgSrc: ["'self'", 'data:', 'https:', 'blob:'],
         fontSrc: ["'self'", 'data:', 'https://fonts.gstatic.com'],
@@ -77,7 +96,8 @@ export function createHelmetMiddleware(isDev: boolean): RequestHandler {
           'https://*.googletagmanager.com', 'https://*.crazygames.com',
           'https://*.googlesyndication.com', 'https://*.doubleclick.net',
           'https://*.googleadservices.com', 'https://*.adtrafficquality.google',
-          'https://*.posthog.com', 'https://eu.i.posthog.com', 'ws:', 'wss:'],
+          'https://*.posthog.com', 'https://eu.i.posthog.com',
+          'https://app.purpleads.io', 'https://*.purpleads.io', 'ws:', 'wss:'],
         workerSrc: ["'self'", 'blob:'],
         frameSrc: ["'self'", 'https://*.googlesyndication.com', 'https://*.doubleclick.net',
           'https://googleads.g.doubleclick.net'],
@@ -313,8 +333,7 @@ export function configureMiddleware(app: Application, { corsOrigin, isDev }: Mid
   // JSON body parsing - only for Express-handled API routes
   // Next.js App Router API routes handle their own body parsing
   app.use((req: Request, res: Response, next: NextFunction): void => {
-    const isExpressRoute = EXPRESS_API_ROUTES.some(route => req.path.startsWith(route));
-    if (isExpressRoute) {
+    if (shouldExpressParseJsonBody(req.path)) {
       express.json({ limit: '1mb', strict: true })(req, res, next);
       return;
     }

@@ -64,21 +64,21 @@ describe('dailyRewards', () => {
   describe('getNextMilestone', () => {
     it('returns day 2 milestone when on day 1', () => {
       const next = getNextMilestone(1);
-      expect(next.day).toBe(2);
-      expect(next.coins).toBe(15);
+      expect(next!.day).toBe(2);
+      expect(next!.coins).toBe(15);
     });
 
     it('returns day 7 milestone when on day 5', () => {
       const next = getNextMilestone(5);
-      expect(next.day).toBe(7);
-      expect(next.coins).toBe(100);
+      expect(next!.day).toBe(7);
+      expect(next!.coins).toBe(100);
     });
 
     it('returns day 7 milestone when on day 6', () => {
       const next = getNextMilestone(6);
-      expect(next.day).toBe(7);
-      expect(next.coins).toBe(100);
-      expect(next.badge).toBe('weekly_warrior');
+      expect(next!.day).toBe(7);
+      expect(next!.coins).toBe(100);
+      expect(next!.badge).toBe('weekly_warrior');
     });
 
     it('returns null when on day 100 (last milestone)', () => {
@@ -89,6 +89,31 @@ describe('dailyRewards', () => {
     it('returns day 1 milestone for day 0', () => {
       const next = getNextMilestone(0);
       expect(next!.day).toBe(1);
+    });
+
+    describe('with { badgeOnly: true }', () => {
+      it('skips non-badge milestones (day 1,2,3,5)', () => {
+        const next = getNextMilestone(0, { badgeOnly: true });
+        expect(next!.day).toBe(7);
+        expect(next!.badge).toBe('weekly_warrior');
+      });
+
+      it('returns day 14 fortnight when on day 7 (just earned week badge)', () => {
+        const next = getNextMilestone(7, { badgeOnly: true });
+        expect(next!.day).toBe(14);
+        expect(next!.badge).toBe('fortnight_fighter');
+      });
+
+      it('skips veteran (day 50, no badge) for centurion (day 100)', () => {
+        const next = getNextMilestone(50, { badgeOnly: true });
+        expect(next!.day).toBe(100);
+        expect(next!.badge).toBe('centurion');
+      });
+
+      it('returns null past last badge milestone', () => {
+        expect(getNextMilestone(100, { badgeOnly: true })).toBeNull();
+        expect(getNextMilestone(150, { badgeOnly: true })).toBeNull();
+      });
     });
   });
 

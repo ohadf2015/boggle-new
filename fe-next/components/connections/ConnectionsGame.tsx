@@ -19,6 +19,7 @@ import {
   xpForPuzzle,
 } from '@/lib/connections/gameLogic';
 import { getCurrentLevel, setCurrentLevel } from '@/lib/connections/levelStore';
+import { getCurrentLives, setCurrentLives, MAX_LIVES } from '@/lib/connections/livesStore';
 import type { ConnectionPuzzle, GameState, PuzzleRating } from '@/lib/connections/types';
 import { submitConnectionsFeedback } from '@/lib/connections/feedback';
 import PuzzleCard from './PuzzleCard';
@@ -36,7 +37,7 @@ type Action =
   | { type: 'REVIVE' }
   | { type: 'REVEAL_HINT' }
   | { type: 'MARK_RATED'; puzzleId: string }
-  | { type: 'RESET'; puzzles: ConnectionPuzzle[] };
+  | { type: 'RESET'; puzzles: ConnectionPuzzle[]; initialLives?: number };
 
 function reducer(state: GameState, action: Action): GameState {
   switch (action.type) {
@@ -58,7 +59,7 @@ function reducer(state: GameState, action: Action): GameState {
     case 'ADVANCE':
       return advancePuzzle(state);
     case 'RESET':
-      return initGameState(action.puzzles);
+      return initGameState(action.puzzles, { initialLives: action.initialLives });
     default:
       return state;
   }
@@ -72,13 +73,20 @@ export default function ConnectionsGame() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [canvasSize, setCanvasSize] = useState({ width: 0, height: 0 });
 
-  // Each level renders one puzzle. Level number persists in localStorage per locale.
+  // Each level renders one puzzle. Level number + lives persist in localStorage per locale.
   const [level, setLevel] = useState<number>(() => getCurrentLevel(language));
   const totalLevels = getTotalLevels(language);
   const initialPuzzle = getPuzzleForLevel(language, level);
   const initialPuzzles: ConnectionPuzzle[] = initialPuzzle ? [initialPuzzle] : [];
 
-  const [state, dispatch] = useReducer(reducer, initialPuzzles, initGameState);
+  const [state, dispatch] = useReducer(
+    reducer,
+    initialPuzzles,
+    (puzzles): GameState => initGameState(puzzles, { initialLives: getCurrentLives(language) })
+  );
+  const heartsRef = useRef<HTMLDivElement>(null);
+  const levelBadgeRef = useRef<HTMLDivElement>(null);
+  const prevLivesRef = useRef<number>(state.lives);
   const [sessionScore, setSessionScore] = useState(0);
   const [xpEarned, setXpEarned] = useState(0);
   const xpAwardedIdsRef = useRef<Set<string>>(new Set());
@@ -89,14 +97,37 @@ export default function ConnectionsGame() {
     return () => setIsInGame(false);
   }, [setIsInGame]);
 
-  // If locale changes mid-session, reload from that locale's saved level.
+  // If locale changes mid-session, reload from that locale's saved level + lives.
   useEffect(() => {
     const newLevel = getCurrentLevel(language);
     setLevel(newLevel);
     const puzzle = getPuzzleForLevel(language, newLevel);
-    dispatch({ type: 'RESET', puzzles: puzzle ? [puzzle] : [] });
+    dispatch({
+      type: 'RESET',
+      puzzles: puzzle ? [puzzle] : [],
+      initialLives: getCurrentLives(language),
+    });
     xpAwardedIdsRef.current = new Set();
   }, [language]);
+
+  // Persist lives + emit lifeLost / gameOver events on changes.
+  useEffect(() => {
+    const prev = prevLivesRef.current;
+    if (state.lives !== prev) {
+      setCurrentLives(language, state.lives);
+      if (state.lives < prev) {
+        const rect = heartsRef.current?.getBoundingClientRect();
+        const containerRect = containerRef.current?.getBoundingClientRect();
+        const x = rect && containerRect ? rect.left + rect.width / 2 - containerRect.left : 0;
+        const y = rect && containerRect ? rect.top + rect.height / 2 - containerRect.top : 0;
+        window.dispatchEvent(new CustomEvent('connections:lifeLost', { detail: { x, y } }));
+      }
+      if (state.lives === 0 && prev > 0) {
+        window.dispatchEvent(new CustomEvent('connections:gameOver'));
+      }
+      prevLivesRef.current = state.lives;
+    }
+  }, [state.lives, language]);
 
   useEffect(() => {
     const el = containerRef.current;
@@ -143,9 +174,15 @@ export default function ConnectionsGame() {
     setLevel(nextLevel);
     const puzzle = getPuzzleForLevel(language, nextLevel);
     if (puzzle) {
-      dispatch({ type: 'RESET', puzzles: [puzzle] });
+      // Carry surviving lives across levels so they actually gate progress.
+      dispatch({ type: 'RESET', puzzles: [puzzle], initialLives: state.lives });
     }
-  }, [language, level]);
+    const rect = levelBadgeRef.current?.getBoundingClientRect();
+    const containerRect = containerRef.current?.getBoundingClientRect();
+    const x = rect && containerRect ? rect.left + rect.width / 2 - containerRect.left : 0;
+    const y = rect && containerRect ? rect.top + rect.height / 2 - containerRect.top : 0;
+    window.dispatchEvent(new CustomEvent('connections:levelUp', { detail: { x, y, level: nextLevel } }));
+  }, [language, level, state.lives]);
 
   const handleInput = useCallback((value: string) => {
     dispatch({ type: 'SET_INPUT', input: value });
@@ -209,36 +246,64 @@ export default function ConnectionsGame() {
         initial={{ opacity: 0, y: -12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ type: 'spring' as const, stiffness: 280, damping: 24, delay: 0.1 }}
-        className="flex items-center justify-between"
+        className="flex items-center justify-between gap-3"
         dir={isRTL ? 'rtl' : 'ltr'}
       >
-        <div className="flex items-center gap-2" aria-label={t('connections.lives')}>
-          {Array.from({ length: 3 }).map((_, i) => {
-            const alive = i < state.lives;
-            return (
-              <m.span
-                key={`life-${i}`}
-                animate={alive ? { scale: 1, opacity: 1, filter: 'grayscale(0)' } : { scale: 0.7, opacity: 0.25, filter: 'grayscale(1)' }}
-                transition={{ type: 'spring' as const, stiffness: 400, damping: 18 }}
-                className="text-2xl select-none"
-              >
-                ❤️
-              </m.span>
-            );
-          })}
+        {/* LIVES — neo-brutalist hearts pill */}
+        <div
+          ref={heartsRef}
+          className="flex flex-col items-start gap-1"
+          aria-label={`${t('connections.lives')}: ${state.lives} / ${MAX_LIVES}`}
+        >
+          <p className="text-neo-pink text-[10px] uppercase tracking-widest font-neo-display font-bold leading-none">
+            {t('connections.lives')}
+          </p>
+          <div className="flex items-center gap-1.5 px-2 py-1 bg-neo-navy-light border-neo border-black rounded-neo shadow-hard">
+            {Array.from({ length: MAX_LIVES }).map((_, i) => {
+              const alive = i < state.lives;
+              return (
+                <m.span
+                  key={`life-${i}`}
+                  animate={
+                    alive
+                      ? { scale: 1, opacity: 1, filter: 'grayscale(0) drop-shadow(0 0 4px rgba(255,20,147,0.6))' }
+                      : { scale: 0.55, opacity: 0.18, filter: 'grayscale(1)' }
+                  }
+                  transition={{ type: 'spring' as const, stiffness: 420, damping: 16 }}
+                  className="text-xl select-none leading-none"
+                >
+                  {alive ? '❤️' : '🖤'}
+                </m.span>
+              );
+            })}
+          </div>
         </div>
 
-        <div className="text-center">
-          <p className="text-neo-white/40 text-[10px] uppercase tracking-widest font-mono">
+        {/* LEVEL — neo-brutalist cyan badge */}
+        <m.div
+          ref={levelBadgeRef}
+          key={`level-${level}`}
+          initial={{ scale: 0.8, rotate: -3 }}
+          animate={{ scale: 1, rotate: 0 }}
+          transition={{ type: 'spring' as const, stiffness: 400, damping: 14 }}
+          className="flex flex-col items-center gap-1"
+        >
+          <p className="text-neo-cyan text-[10px] uppercase tracking-widest font-neo-display font-bold leading-none">
             {t('connections.level')}
           </p>
-          <p className="font-neo-display text-xl text-neo-cyan font-bold leading-none">
-            {level}
-            <span className="text-neo-white/30 text-sm font-mono"> / {totalLevels}</span>
-          </p>
-        </div>
+          <div className="px-3 py-1 bg-neo-cyan border-neo border-black rounded-neo shadow-hard">
+            <p className="font-neo-display text-2xl text-neo-navy font-black leading-none tabular-nums">
+              {level}
+              <span className="text-neo-navy/50 text-xs font-mono font-bold"> / {totalLevels}</span>
+            </p>
+          </div>
+        </m.div>
 
-        <div className="flex items-center gap-3 text-sm font-neo-body">
+        <div className="flex flex-col items-end gap-1 text-sm font-neo-body min-w-0">
+          <p className="text-neo-lime text-[10px] uppercase tracking-widest font-neo-display font-bold leading-none">
+            {t('connections.score')}
+          </p>
+          <div className="flex items-center gap-2">
           <AnimatePresence>
             {state.streak >= 2 && (
               <m.span
@@ -267,6 +332,7 @@ export default function ConnectionsGame() {
               </m.span>
             </AnimatePresence>
           </span>
+          </div>
         </div>
       </m.div>
 

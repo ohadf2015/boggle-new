@@ -30,8 +30,7 @@ interface RawSession {
   score: number;
   words_found: number;
   created_at: string;
-  daily_number: number | null;
-  adventure_world: number | null;
+  daily_puzzle_number: number | null;
   profiles: {
     username: string;
     display_name: string | null;
@@ -58,14 +57,11 @@ function mapSessionToEvent(row: RawSession): FriendActivityEvent {
   const friendName = profile.display_name || profile.username;
 
   let actionKey = 'friendsActivity.scored';
-  let actionParams: Record<string, unknown> = { score: row.score, number: row.daily_number ?? 0 };
+  let actionParams: Record<string, unknown> = { score: row.score, number: row.daily_puzzle_number ?? 0 };
 
   if (row.mode === 'blast') {
     actionKey = 'friendsActivity.blastWords';
     actionParams = { count: row.words_found };
-  } else if (row.mode === 'adventure' && row.adventure_world) {
-    actionKey = 'friendsActivity.reachedWorld';
-    actionParams = { world: row.adventure_world };
   }
 
   return {
@@ -126,7 +122,7 @@ export function useFriendsActivity() {
         // Step 2: Get recent game sessions from friends
         const { data: sessions, error: sessionsError } = await supabase!
           .from('game_sessions')
-          .select('user_id, mode, score, words_found, created_at, daily_number, adventure_world, profiles!inner(username, display_name, avatar_image, avatar_config)')
+          .select('user_id, mode, score, words_found, created_at, daily_puzzle_number, profiles!inner(username, display_name, avatar_image, avatar_config)')
           .in('user_id', friendIds)
           .order('created_at', { ascending: false })
           .limit(MAX_EVENTS);

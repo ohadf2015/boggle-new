@@ -5103,6 +5103,8 @@ const en = {
     "todayReward": "Today: {{coins}} coins",
     "tomorrowReward": "Tomorrow: {{coins}} coins",
     "nearMilestone": "{{days}} days to {{badge}} badge!",
+    "nearMilestoneOne": "1 day to {{badge}} badge!",
+    "milestoneEarned": "🎉 {{badge}} unlocked!",
     "rewardDay": "Day {day}",
     "badges": {
       "weekWarrior": "Week Warrior",

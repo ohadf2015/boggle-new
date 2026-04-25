@@ -5,7 +5,39 @@
 // list, or static asset URLs. The `activate` handler below deletes any
 // cache whose name !== CACHE_NAME, so bumping the version reliably evicts
 // stale assets for returning users. Format: lexiclash-v{MAJOR}-{YYYYMMDD}.
-const CACHE_NAME = 'lexiclash-v2-20260409';
+const CACHE_NAME = 'lexiclash-v3-20260425';
+
+// Cacheable: status 200 only, basic/default response type, GET requests.
+// Rejects 206 (Range), 0 (opaque), redirects, and CORS-restricted responses
+// that throw on Cache.put().
+function isCacheable(response) {
+  return (
+    response &&
+    response.status === 200 &&
+    (response.type === 'basic' || response.type === 'default' || response.type === 'cors')
+  );
+}
+
+// Wrap cache.put to swallow expected errors (Range, opaque, quota exceeded).
+// SW has no Sentry SDK — forward unexpected failures to clients via postMessage
+// so the page-side Sentry init can capture them.
+function safeCachePut(cache, request, response) {
+  return cache.put(request, response).catch((err) => {
+    const msg = err && err.message ? err.message : String(err);
+    // Known noise: partial responses, opaque, quota — swallow.
+    if (
+      msg.includes('Partial response') ||
+      msg.includes('status code 206') ||
+      msg.includes('convert value to') ||
+      msg.includes('QuotaExceeded')
+    ) {
+      return;
+    }
+    self.clients.matchAll().then((clients) => {
+      clients.forEach((c) => c.postMessage({ type: 'sw:cache-error', message: msg, url: request.url }));
+    });
+  });
+}
 
 // Static assets to precache on install
 const PRECACHE_ASSETS = [
@@ -75,9 +107,9 @@ self.addEventListener('fetch', (event) => {
       caches.match(request).then((cached) => {
         if (cached) return cached;
         return fetch(request).then((response) => {
-          if (response.ok) {
+          if (isCacheable(response)) {
             const clone = response.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
+            caches.open(CACHE_NAME).then((cache) => safeCachePut(cache, request, clone));
           }
           return response;
         });
@@ -91,9 +123,9 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(
       fetch(request)
         .then((response) => {
-          if (response.ok) {
+          if (isCacheable(response)) {
             const clone = response.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
+            caches.open(CACHE_NAME).then((cache) => safeCachePut(cache, request, clone));
           }
           return response;
         })
@@ -107,9 +139,9 @@ self.addEventListener('fetch', (event) => {
     caches.match(request).then((cached) => {
       const fetchPromise = fetch(request)
         .then((response) => {
-          if (response.ok) {
+          if (isCacheable(response)) {
             const clone = response.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
+            caches.open(CACHE_NAME).then((cache) => safeCachePut(cache, request, clone));
           }
           return response;
         })

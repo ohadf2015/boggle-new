@@ -88,6 +88,22 @@ describe('initGameState', () => {
     expect(state.completedIds.size).toBe(0);
     expect(state.hintRevealed).toBe(false);
   });
+
+  it('accepts initialLives option to carry lives across levels', () => {
+    const state = initGameState(MOCK_PUZZLES, { initialLives: 1 });
+    expect(state.lives).toBe(1);
+  });
+
+  it('clamps initialLives to [0..INITIAL_LIVES]', () => {
+    expect(initGameState(MOCK_PUZZLES, { initialLives: -3 }).lives).toBe(0);
+    expect(initGameState(MOCK_PUZZLES, { initialLives: 99 }).lives).toBe(INITIAL_LIVES);
+  });
+
+  it('initialLives=0 sets status outOfLives so dead-on-resume is honored', () => {
+    const state = initGameState(MOCK_PUZZLES, { initialLives: 0 });
+    expect(state.lives).toBe(0);
+    expect(state.status).toBe('outOfLives');
+  });
 });
 
 describe('applyGuess', () => {

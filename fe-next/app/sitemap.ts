@@ -232,18 +232,10 @@ function getAllRoutes(): MetadataRoute.Sitemap {
   return routes;
 }
 
-// Split into chunks of 50 URLs per sitemap file to stay well under XML size limits.
-// Each URL with ~20 hreflang alternates generates ~2KB of XML.
-const URLS_PER_SITEMAP = 50;
-
-export async function generateSitemaps() {
-  const allRoutes = getAllRoutes();
-  const count = Math.ceil(allRoutes.length / URLS_PER_SITEMAP);
-  return Array.from({ length: count }, (_, i) => ({ id: i }));
-}
-
-export default function sitemap({ id }: { id: number }): MetadataRoute.Sitemap {
-  const allRoutes = getAllRoutes();
-  const start = id * URLS_PER_SITEMAP;
-  return allRoutes.slice(start, start + URLS_PER_SITEMAP);
+// Single sitemap at /sitemap.xml. ~410 URLs × ~2KB hreflangs ≈ 820KB —
+// well under Google's 50MB / 50k URL limit. generateSitemaps() chunks to
+// /sitemap/[id].xml but does NOT auto-create an index at /sitemap.xml,
+// which then collides with the [locale] catch-all and serves HTML.
+export default function sitemap(): MetadataRoute.Sitemap {
+  return getAllRoutes();
 }

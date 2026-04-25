@@ -5019,6 +5019,8 @@ const es = {
     "todayReward": "Hoy: {{coins}} monedas",
     "tomorrowReward": "Mañana: {{coins}} monedas",
     "nearMilestone": "¡{{days}} días para la insignia {{badge}}!",
+    "nearMilestoneOne": "¡1 día para la insignia {{badge}}!",
+    "milestoneEarned": "🎉 ¡Insignia {{badge}} desbloqueada!",
     "rewardDay": "Día {day}",
     "badges": {
       "weekWarrior": "Guerrero Semanal",
