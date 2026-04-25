@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Swords, BookOpen, Map, Bomb, Zap, Link2 } from 'lucide-react';
+import { Swords, BookOpen, Map, Bomb, Zap, Link2, Brain } from 'lucide-react';
 import ModeCard from './ModeCard';
 import DailyChallengeBanner from '@/components/daily/DailyChallengeBanner';
 import { shouldShowGuidance } from '@/utils/contextualGuidanceStorage';
@@ -9,7 +9,6 @@ import { hasCompletedOnboarding } from '@/utils/onboardingStorage';
 import { isNewPlayer } from '@/utils/multiplayerProgressStorage';
 import { trackModeSelected, trackLandingCtaClick } from '@/utils/growthTracking';
 import { useIsPracticeVeteran } from '@/hooks/useIsPracticeVeteran';
-import { usePostHogFlag } from '@/hooks/usePostHogFlag';
 import type { LandingGameMode } from '@/lib/landing/fetchGameModeStats';
 
 interface DailyChallengePreloadedStats {
@@ -40,20 +39,23 @@ interface LandingChallengeCardsProps {
  * Landing card identifiers — `'quickPlay'` is a landing-only synthetic mode
  * that routes into `/multiplayer?quickPlay=true` (auto-creates a bot room and
  * starts a random game). It is not part of `LandingGameMode` (server stats).
- * `'connections'` is feature-flagged via PostHog `connections_game`.
+ * `'connections'` and `'brainGym'` are landing-only synthetic modes routing
+ * to `/connections` and `/brain` respectively.
  */
-type LandingCardKey = LandingGameMode | 'quickPlay' | 'connections';
+type LandingCardKey = LandingGameMode | 'quickPlay' | 'connections' | 'brainGym';
 
 /** Default card order when no server data available */
-const DEFAULT_ORDER: LandingCardKey[] = ['daily', 'quickPlay', 'arena', 'practice', 'blast', 'adventure'];
+const DEFAULT_ORDER: LandingCardKey[] = ['daily', 'quickPlay', 'arena', 'practice', 'blast', 'adventure', 'connections', 'brainGym'];
 
 /**
- * Featured landing modes — keep the set small to reduce choice paralysis.
- * Daily is the anchor, Arena is the primary MP, Blast is the marquee solo.
- * Newcomer/veteran branches below still surface Practice/QuickPlay when
- * appropriate via the same allowlist.
+ * Featured landing modes — surfaces every shippable mode so players can
+ * discover Connections, Adventure, and Brain Gym without hunting through
+ * sidebar nav. Newcomer/veteran branches still bias which solo card leads.
  */
-const FEATURED_MODES = new Set<LandingCardKey>(['daily', 'arena', 'blast', 'practice', 'quickPlay']);
+const FEATURED_MODES = new Set<LandingCardKey>([
+  'daily', 'arena', 'blast', 'practice', 'quickPlay',
+  'adventure', 'connections', 'brainGym',
+]);
 
 /** CSS stagger delay for each card index */
 const cardDelay = (index: number) => `${index * 0.07}s`;
@@ -68,8 +70,6 @@ export function LandingChallengeCards({
   dailyChallengeStats,
   cardOrder: cardOrderProp,
 }: LandingChallengeCardsProps) {
-  const connectionsEnabled = usePostHogFlag<boolean>('connections_game', false);
-
   // Synchronous init from localStorage — avoids post-mount card reorder CLS
   const [isFirstTimer] = useState(() => {
     if (typeof window === 'undefined') return false;
@@ -91,9 +91,15 @@ export function LandingChallengeCards({
   //   4. Surface `'practice'` first for brand-new players (< 3 games).
   //   5. Guarantee `'daily'` lands in the top 2 — it must never be buried.
   const baseOrder: LandingCardKey[] = cardOrderProp ?? DEFAULT_ORDER;
-  const rawOrder: LandingCardKey[] = connectionsEnabled
-    ? [...baseOrder, 'connections']
-    : baseOrder;
+  // Server stats only ship LandingGameMode keys; ensure the synthetic discovery
+  // cards (`connections`, `brainGym`) are appended when missing so they land
+  // in the SP section even on the popularity-ranked path.
+  const rawOrder: LandingCardKey[] = (() => {
+    const next = [...baseOrder];
+    if (!next.includes('connections')) next.push('connections');
+    if (!next.includes('brainGym')) next.push('brainGym');
+    return next;
+  })();
   // Guarantee blast always appears before adventure (regardless of popularity ranking)
   const serverOrder: LandingCardKey[] = (() => {
     const order = [...rawOrder];
@@ -257,13 +263,31 @@ export function LandingChallengeCards({
           </div>
         );
 
+      case 'brainGym':
+        return (
+          <div key="brainGym" className="w-full h-full animate-[fadeInUp_0.4s_ease-out_both]" style={style}>
+            <ModeCard
+              title={t('landing.brainTraining')}
+              description={t('landing.brainTrainingDesc')}
+              href={`/${language}/brain`}
+              icon={<Brain className="w-6 h-6" />}
+              modeImage="/modes/practice.png"
+              variant="purple"
+              duration={t('landing.duration').replace('{time}', '1-3')}
+              difficulty={2}
+              difficultyLabel={t('landing.difficultyMedium')}
+              onClick={() => { trackModeSelected('brainGym', 'home'); trackLandingCtaClick('mode_card', { mode: 'brainGym', variant: 'purple' }); }}
+            />
+          </div>
+        );
+
       default:
         return null;
     }
   };
 
   const MP_MODES = new Set<LandingCardKey>(['arena', 'quickPlay']);
-  const SP_MODES = new Set<LandingCardKey>(['practice', 'blast', 'adventure', 'connections']);
+  const SP_MODES = new Set<LandingCardKey>(['practice', 'blast', 'adventure', 'connections', 'brainGym']);
 
   const heroCards = cardOrder.filter((m) => m === 'daily');
   const mpCards = cardOrder.filter((m) => MP_MODES.has(m));

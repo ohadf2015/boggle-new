@@ -45,7 +45,7 @@ const baseProps = {
 };
 
 describe('LandingChallengeCards reordering (MP/SP split)', () => {
-  it('renders daily banner as hero, arena in MP section, practice/blast in SP section', () => {
+  it('renders daily banner as hero, arena in MP section, all solo modes in SP section', () => {
     render(<LandingChallengeCards {...baseProps} />);
     expect(screen.getByTestId('daily-banner')).toBeInTheDocument();
     const mpSection = screen.getByTestId('landing-section-mp');
@@ -54,7 +54,9 @@ describe('LandingChallengeCards reordering (MP/SP split)', () => {
     expect(mpSection).not.toHaveTextContent('landing.practice');
     expect(spSection).toHaveTextContent('landing.practice');
     expect(spSection).toHaveTextContent('landing.blastMode');
-    expect(spSection).not.toHaveTextContent('landing.adventureMode');
+    expect(spSection).toHaveTextContent('landing.adventureMode');
+    expect(spSection).toHaveTextContent('landing.wordChainMode');
+    expect(spSection).toHaveTextContent('landing.brainTraining');
   });
 
   it('renders MP section before SP section in DOM (discovery hierarchy)', () => {

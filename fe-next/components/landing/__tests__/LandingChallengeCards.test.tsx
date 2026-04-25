@@ -60,9 +60,11 @@ describe('LandingChallengeCards', () => {
     expect(screen.getByText('landing.blastMode')).toBeInTheDocument();
   });
 
-  it('omits adventure mode from featured landing (reduced choice paralysis)', () => {
+  it('surfaces every shippable mode (adventure, connections, brain gym) so players can discover them', () => {
     render(<LandingChallengeCards {...baseProps} />);
-    expect(screen.queryByText('landing.adventureMode')).not.toBeInTheDocument();
+    expect(screen.getByText('landing.adventureMode')).toBeInTheDocument();
+    expect(screen.getByText('landing.wordChainMode')).toBeInTheDocument();
+    expect(screen.getByText('landing.brainTraining')).toBeInTheDocument();
   });
 
   it('renders daily challenge banner', () => {
