@@ -48,6 +48,7 @@ tmp/
 fe-next/tmp/
 .vercel
 .claude/worktrees/
+.claude/scheduled_tasks.lock
 fe-next/dist/
 .env.local
 dump.rdb
