@@ -101,6 +101,46 @@ describe('AdMobProvider', () => {
     expect(captured!.shouldShowInterstitial()).toBe(true);
   });
 
+  it('caps interstitials at MAX_INTERSTITIALS_PER_SESSION (4) regardless of game-end count', async () => {
+    let captured: ReturnType<typeof useAdMobContext> | null = null;
+    await act(async () => {
+      render(
+        <AdMobProvider>
+          <TestConsumer onMount={(ctx) => { captured = ctx; }} />
+        </AdMobProvider>
+      );
+    });
+    // Warmup (3 game-ends, no ads)
+    for (let i = 0; i < 3; i++) captured!.recordGameEnd();
+    // Four eligible cycles: each = 3 more game-ends, gate true, record show
+    for (let i = 0; i < 4; i++) {
+      for (let j = 0; j < 3; j++) captured!.recordGameEnd();
+      expect(captured!.shouldShowInterstitial()).toBe(true);
+      captured!.recordInterstitialShown();
+    }
+    // 5th eligible cycle: gate must now block on session cap
+    for (let j = 0; j < 3; j++) captured!.recordGameEnd();
+    expect(captured!.shouldShowInterstitial()).toBe(false);
+  });
+
+  it('recordInterstitialShown only blocks after cap reached, not before', async () => {
+    let captured: ReturnType<typeof useAdMobContext> | null = null;
+    await act(async () => {
+      render(
+        <AdMobProvider>
+          <TestConsumer onMount={(ctx) => { captured = ctx; }} />
+        </AdMobProvider>
+      );
+    });
+    // Warmup + 1 cycle, record only 1 show
+    for (let i = 0; i < 6; i++) captured!.recordGameEnd();
+    expect(captured!.shouldShowInterstitial()).toBe(true);
+    captured!.recordInterstitialShown();
+    // Cap not reached — gate should still pass on next eligible cycle
+    for (let j = 0; j < 3; j++) captured!.recordGameEnd();
+    expect(captured!.shouldShowInterstitial()).toBe(true);
+  });
+
   it('getConfig returns null on web', async () => {
     vi.mocked(Capacitor.isNativePlatform).mockReturnValue(false);
     let captured: ReturnType<typeof useAdMobContext> | null = null;

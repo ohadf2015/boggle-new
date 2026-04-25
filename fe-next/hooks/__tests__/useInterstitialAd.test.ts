@@ -39,4 +39,17 @@ describe('useInterstitialAd', () => {
     expect(midgame).toHaveBeenCalledTimes(3);
     expect(admobShow).toHaveBeenCalledTimes(3);
   });
+
+  // MP loop: ResultsPage unmounts (showResults=false) when match restarts and
+  // remounts on next match end → fresh hook instance → fresh firedRef. Same
+  // placement name 'multiplayer-round-complete' must re-fire across remounts.
+  it('refires same placement name across hook remounts (MP rematch loop)', () => {
+    for (let match = 0; match < 5; match++) {
+      const { unmount, result } = renderHook(() => useInterstitialAd());
+      act(() => { result.current.showInterstitial('multiplayer-round-complete'); });
+      unmount();
+    }
+    expect(midgame).toHaveBeenCalledTimes(5);
+    expect(admobShow).toHaveBeenCalledTimes(5);
+  });
 });

@@ -6,33 +6,7 @@ import { Capacitor } from '@capacitor/core';
 import { AdMob, BannerAdPluginEvents, BannerAdPosition } from '@capacitor-community/admob';
 import { useAdMob } from '@/hooks/useAdMob';
 import { useSafeArea } from '@/hooks/useSafeArea';
-
-// Routes where the AdMob anchored banner is NOT shown.
-// `/adventure` is intentionally allowed to show the banner — adventure mode
-// runs real banner ads during gameplay (layout reserves space via the
-// --admob-banner-height CSS var so buttons are never covered).
-const GAME_ROUTES = [
-  '/multiplayer',
-  '/singleplayer',
-  '/daily',
-  '/challenge',
-  '/join',
-  '/brain',
-  '/custom',
-  '/party-screen',
-  '/teacher',
-  '/student',
-  '/auth/callback',
-  '/hebrew-multiplayer-word-game',
-  '/friends',
-  '/profile',
-];
-
-function isAllowedRoute(pathname: string | null): boolean {
-  if (!pathname) return false;
-  const path = pathname.replace(/^\/(en|he|sv|ja|es)/, '') || '/';
-  return !GAME_ROUTES.some((r) => path.startsWith(r));
-}
+import { isAllowedAdBannerRoute } from '@/lib/admob-routes';
 
 export default function AnchoredNativeBanner() {
   const pathname = usePathname();
@@ -81,7 +55,7 @@ export default function AnchoredNativeBanner() {
 
     let cancelled = false;
 
-    if (isAllowedRoute(pathname)) {
+    if (isAllowedAdBannerRoute(pathname)) {
       // Banner pins flush at webview bottom. GlobalBottomNav floats above it via
       // the --admob-banner-height CSS var (set by SizeChanged above). On Android,
       // margin lifts the banner above the gesture bar; iOS uses safeAreaLayoutGuide.

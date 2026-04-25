@@ -158,6 +158,25 @@ describe('useAdMob', () => {
     expect(AdMob.showInterstitial).toHaveBeenCalled();
   });
 
+  it('showInterstitial stops calling prepare/show after session cap (4) reached', async () => {
+    const wrapper = makeWrapper(true);
+    const { result } = renderHook(() => useAdMob(), { wrapper });
+    // Drive 4 successful interstitial cycles: warmup (3) + 4*(3 cycles) = 15 game-ends.
+    await act(async () => {
+      for (let i = 0; i < 15; i++) await result.current.showInterstitial();
+    });
+    expect(AdMob.prepareInterstitial).toHaveBeenCalledTimes(4);
+    expect(AdMob.showInterstitial).toHaveBeenCalledTimes(4);
+
+    // 5th eligible cycle (game-ends 16-18) — must be blocked by cap.
+    vi.clearAllMocks();
+    await act(async () => {
+      for (let i = 0; i < 3; i++) await result.current.showInterstitial();
+    });
+    expect(AdMob.prepareInterstitial).not.toHaveBeenCalled();
+    expect(AdMob.showInterstitial).not.toHaveBeenCalled();
+  });
+
   it('showInterstitial skips ad during warmup', async () => {
     const wrapper = makeWrapper(true);
     const { result } = renderHook(() => useAdMob(), { wrapper });

@@ -7,7 +7,7 @@ import { useAdMobContext } from '@/contexts/AdMobContext';
 const bannerShownRef = { current: false };
 
 export function useAdMob() {
-  const { recordGameEnd, shouldShowInterstitial, hasNoAds, getConfig, whenReady } = useAdMobContext();
+  const { recordGameEnd, shouldShowInterstitial, recordInterstitialShown, hasNoAds, getConfig, whenReady } = useAdMobContext();
   const isDev = process.env.NODE_ENV !== 'production';
 
   const showRewarded = useCallback(async (onReward: () => void, onError?: (err: string) => void) => {
@@ -72,12 +72,15 @@ export function useAdMob() {
     if (!shouldShowInterstitial()) return;
     const config = getConfig();
     if (!config) return;
+    // Record before show — gate uses this counter, recording after a thrown
+    // showInterstitial would let a broken plugin re-fire indefinitely.
+    recordInterstitialShown();
     try {
       await whenReady();
       await AdMob.prepareInterstitial({ adId: config.interstitialAdId });
       await AdMob.showInterstitial();
     } catch {}
-  }, [recordGameEnd, shouldShowInterstitial, getConfig, whenReady]);
+  }, [recordGameEnd, shouldShowInterstitial, recordInterstitialShown, getConfig, whenReady]);
 
   const showBanner = useCallback(async (position = BannerAdPosition.BOTTOM_CENTER, margin?: number) => {
     if (hasNoAds()) return;

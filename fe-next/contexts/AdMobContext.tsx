@@ -8,10 +8,15 @@ import { getAdmobConfig, type AdmobConfig, type AdPlatform } from '@/lib/admob-c
 interface AdMobContextValue {
   recordGameEnd: () => void;
   shouldShowInterstitial: () => boolean;
+  recordInterstitialShown: () => void;
   hasNoAds: () => boolean;
   getConfig: () => AdmobConfig | null;
   whenReady: () => Promise<void>;
 }
+
+// Defensive cap. Prevents new interstitial trigger sites (mission-claim, streak-save, etc.)
+// from compounding into ad fatigue within a single session.
+const MAX_INTERSTITIALS_PER_SESSION = 4;
 
 const AdMobContext = createContext<AdMobContextValue | null>(null);
 
@@ -25,6 +30,7 @@ export function AdMobProvider({ children }: { children: ReactNode }) {
   );
   const platform = useMemo(() => Capacitor.getPlatform() as AdPlatform, []);
   const totalGameEnds = useRef(0);
+  const interstitialsShown = useRef(0);
   const initPromise = useRef<Promise<void> | null>(null);
 
   if (initPromise.current === null) {
@@ -55,8 +61,13 @@ export function AdMobProvider({ children }: { children: ReactNode }) {
     totalGameEnds.current += 1;
   }
 
+  function recordInterstitialShown() {
+    interstitialsShown.current += 1;
+  }
+
   function shouldShowInterstitial(): boolean {
     if (hasNoAds()) return false;
+    if (interstitialsShown.current >= MAX_INTERSTITIALS_PER_SESSION) return false;
     if (totalGameEnds.current <= 3) return false;
     const postWarmupCount = totalGameEnds.current - 3;
     return postWarmupCount % 3 === 0;
@@ -68,7 +79,7 @@ export function AdMobProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AdMobContext.Provider value={{ recordGameEnd, shouldShowInterstitial, hasNoAds, getConfig, whenReady }}>
+    <AdMobContext.Provider value={{ recordGameEnd, shouldShowInterstitial, recordInterstitialShown, hasNoAds, getConfig, whenReady }}>
       {children}
     </AdMobContext.Provider>
   );
