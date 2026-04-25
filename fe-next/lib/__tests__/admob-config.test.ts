@@ -46,24 +46,26 @@ describe('getAdmobConfig', () => {
 
   // --- Segmented rewarded units ---
 
-  it('exposes rewardedUnits map with all surfaces falling back to generic', () => {
+  it('exposes rewardedUnits map with surface-specific defaults baked in', () => {
     const config = getAdmobConfig('android');
     expect(config.rewardedUnits).toBeDefined();
     expect(config.rewardedUnits.generic).toBe(DEFAULTS.android.rewardedAdId);
-    expect(config.rewardedUnits.hint).toBe(DEFAULTS.android.rewardedAdId);
-    expect(config.rewardedUnits.doubleGold).toBe(DEFAULTS.android.rewardedAdId);
-    expect(config.rewardedUnits.freeze).toBe(DEFAULTS.android.rewardedAdId);
-    expect(config.rewardedUnits.retry).toBe(DEFAULTS.android.rewardedAdId);
-    expect(config.rewardedUnits.timeLow).toBe(DEFAULTS.android.rewardedAdId);
+    // Per-surface units have their own DEFAULTS entries, distinct from generic.
+    expect(config.rewardedUnits.hint).toBe(DEFAULTS.android.rewardedSurfaceIds.hint);
+    expect(config.rewardedUnits.doubleGold).toBe(DEFAULTS.android.rewardedSurfaceIds.doubleGold);
+    expect(config.rewardedUnits.freeze).toBe(DEFAULTS.android.rewardedSurfaceIds.freeze);
+    expect(config.rewardedUnits.retry).toBe(DEFAULTS.android.rewardedSurfaceIds.retry);
+    expect(config.rewardedUnits.timeLow).toBe(DEFAULTS.android.rewardedSurfaceIds.timeLow);
   });
 
-  it('per-surface env override for hint takes precedence over generic env', () => {
+  it('per-surface env override for hint takes precedence over generic env and surface default', () => {
     process.env.NEXT_PUBLIC_ADMOB_REWARDED_ANDROID = 'ca-app-pub-x/generic';
     process.env.NEXT_PUBLIC_ADMOB_REWARDED_HINT_ANDROID = 'ca-app-pub-x/hint';
     const config = getAdmobConfig('android');
     expect(config.rewardedUnits.hint).toBe('ca-app-pub-x/hint');
     expect(config.rewardedUnits.generic).toBe('ca-app-pub-x/generic');
-    expect(config.rewardedUnits.doubleGold).toBe('ca-app-pub-x/generic');
+    // doubleGold has no env set → falls to its hard-coded surface default
+    expect(config.rewardedUnits.doubleGold).toBe(DEFAULTS.android.rewardedSurfaceIds.doubleGold);
   });
 
   it('cross-platform per-surface env applies to both platforms', () => {
@@ -87,14 +89,14 @@ describe('getAdmobConfig', () => {
 
   // --- Segmented banner variants ---
 
-  it('exposes bannerUnits map with content falling back to game banner', () => {
+  it('exposes bannerUnits map with distinct content default', () => {
     const config = getAdmobConfig('android');
     expect(config.bannerUnits).toBeDefined();
     expect(config.bannerUnits.game).toBe(DEFAULTS.android.bannerAdId);
-    expect(config.bannerUnits.content).toBe(DEFAULTS.android.bannerAdId);
+    expect(config.bannerUnits.content).toBe(DEFAULTS.android.contentBannerAdId);
   });
 
-  it('content banner env override is independent from game banner', () => {
+  it('content banner env override beats default content banner', () => {
     process.env.NEXT_PUBLIC_ADMOB_BANNER_CONTENT_ANDROID = 'ca-app-pub-x/banner-content';
     const config = getAdmobConfig('android');
     expect(config.bannerUnits.content).toBe('ca-app-pub-x/banner-content');

@@ -292,7 +292,7 @@ describe('useAdMob', () => {
     delete process.env.NEXT_PUBLIC_ADMOB_REWARDED_HINT_ANDROID;
   });
 
-  it('showRewarded falls back to generic unit when surface env not set', async () => {
+  it('showRewarded uses surface-specific default when env not set', async () => {
     const wrapper = makeWrapper(true);
     const { result } = renderHook(() => useAdMob(), { wrapper });
     await act(async () => {
@@ -303,9 +303,9 @@ describe('useAdMob', () => {
       fireEvent('onRewardedVideoAdDismissed');
       await p;
     });
-    // Falls back to default android rewarded ID.
+    // Falls back to the freeze surface default (NOT the generic rewarded unit).
     expect(AdMob.prepareRewardVideoAd).toHaveBeenCalledWith(
-      expect.objectContaining({ adId: expect.stringContaining('ca-app-pub-1896836706464880/3688045325') })
+      expect.objectContaining({ adId: 'ca-app-pub-1896836706464880/5950581279' })
     );
   });
 
