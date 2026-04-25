@@ -10560,7 +10560,18 @@ const he = {
     "next": "הבא",
     "rateThis": "דרג את החידה",
     "thanks": "תודה על המשוב",
-    "xpEarned": "נק׳ ניסיון"
+    "xpEarned": "נק׳ ניסיון",
+    "level": "שלב",
+    "outOfLives": "נגמרו החיים!",
+    "reviveDescription": "צפה בפרסומת קצרה כדי למלא חיים ולהמשיך בשלב.",
+    "reviveAd": "צפה בפרסומת ל-3 חיים",
+    "adminRefill": "מילוי חיים (אדמין)",
+    "quitToMenu": "חזרה לתפריט",
+    "noAdAvailable": "אין פרסומת זמינה כרגע. נסה שוב.",
+    "revealHint": "הצג רמז",
+    "revealHintAd": "צפה בפרסומת לרמז",
+    "revealAnswerAd": "צפה בפרסומת לחשיפת התשובה",
+    "adminGiveUp": "דלג על חידה (אדמין)"
   },
   "wheel": {
     "rush": {

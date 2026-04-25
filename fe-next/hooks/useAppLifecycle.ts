@@ -28,9 +28,13 @@ export function useAppLifecycle({
     if (!isNative()) return;
 
     // Access Capacitor plugins via globalThis to avoid static imports
-     
-    const plugins = (globalThis as any).Capacitor?.Plugins;
-    const AppPlugin = plugins?.App;
+
+    const cap = (globalThis as any).Capacitor;
+    // Guard against the Android WebView race: isNativePlatform() can flip true
+    // before the native bridge has registered @capacitor/app, surfacing as
+    // "App plugin is not implemented on android" (Sentry JAVASCRIPT-NEXTJS-12A).
+    if (typeof cap?.isPluginAvailable === 'function' && !cap.isPluginAvailable('App')) return;
+    const AppPlugin = cap?.Plugins?.App;
     if (!AppPlugin) return;
 
     let listenerHandle: { remove: () => void } | null = null;

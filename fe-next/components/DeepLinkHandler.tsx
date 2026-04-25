@@ -29,7 +29,7 @@ export default function DeepLinkHandler() {
     type CapListener = { remove: () => void };
     type CapAppPlugin = { addListener: (event: string, handler: (e: { url: string }) => void) => CapListener | Promise<CapListener> };
     type CapBrowserPlugin = { close: () => Promise<void> };
-    type CapGlobal = { Capacitor?: { Plugins?: { App?: CapAppPlugin; Browser?: CapBrowserPlugin } } };
+    type CapGlobal = { Capacitor?: { Plugins?: { App?: CapAppPlugin; Browser?: CapBrowserPlugin }; isPluginAvailable?: (name: string) => boolean } };
 
     function getSyncAppPlugin(): CapAppPlugin | null {
       return (globalThis as unknown as CapGlobal).Capacitor?.Plugins?.App ?? null;
@@ -94,28 +94,19 @@ export default function DeepLinkHandler() {
       }
     };
 
-    // Register synchronously if plugin is available (covers test env & native Capacitor bridge)
-    const syncApp = getSyncAppPlugin();
-    if (syncApp) {
-      try {
-        const listenerResult = syncApp.addListener('appUrlOpen', handleAppUrlOpen);
-        Promise.resolve(listenerResult)
-          .then((listener) => {
-            if (mounted) cleanup = () => listener.remove();
-          })
-          .catch((error: unknown) => {
-            logger.debug('Deep link listener unavailable:', error);
-          });
-      } catch (error) {
-        logger.debug('Deep link listener unavailable:', error);
-      }
-    } else {
-      // Async fallback for dynamic import path
-      getAppPlugin().then((AppPlugin) => {
-        if (!AppPlugin || !mounted) return;
+    // Guard against the Android WebView race: isNative() can be true before the
+    // native bridge has registered @capacitor/app (Sentry JAVASCRIPT-NEXTJS-12A).
+    const cap = (globalThis as unknown as CapGlobal).Capacitor;
+    const appPluginAvailable = typeof cap?.isPluginAvailable !== 'function' || cap.isPluginAvailable('App');
+
+    if (appPluginAvailable) {
+      // Register synchronously if plugin is available (covers test env & native Capacitor bridge)
+      const syncApp = getSyncAppPlugin();
+      if (syncApp) {
         try {
-          Promise.resolve(AppPlugin.addListener('appUrlOpen', handleAppUrlOpen))
-            .then((listener: { remove: () => void }) => {
+          const listenerResult = syncApp.addListener('appUrlOpen', handleAppUrlOpen);
+          Promise.resolve(listenerResult)
+            .then((listener) => {
               if (mounted) cleanup = () => listener.remove();
             })
             .catch((error: unknown) => {
@@ -124,7 +115,23 @@ export default function DeepLinkHandler() {
         } catch (error) {
           logger.debug('Deep link listener unavailable:', error);
         }
-      });
+      } else {
+        // Async fallback for dynamic import path
+        getAppPlugin().then((AppPlugin) => {
+          if (!AppPlugin || !mounted) return;
+          try {
+            Promise.resolve(AppPlugin.addListener('appUrlOpen', handleAppUrlOpen))
+              .then((listener: { remove: () => void }) => {
+                if (mounted) cleanup = () => listener.remove();
+              })
+              .catch((error: unknown) => {
+                logger.debug('Deep link listener unavailable:', error);
+              });
+          } catch (error) {
+            logger.debug('Deep link listener unavailable:', error);
+          }
+        });
+      }
     }
 
     async function initPush() {

@@ -132,7 +132,14 @@ export async function listenForOAuthCallback(
     return () => {};
   }
 
-  let AppPlugin = getCapacitor()?.Plugins?.App;
+  // Guard against the Android WebView race: isNative() can be true before the
+  // native bridge has registered @capacitor/app (Sentry JAVASCRIPT-NEXTJS-12A).
+  const cap = getCapacitor();
+  if (typeof cap?.isPluginAvailable === 'function' && !cap.isPluginAvailable('App')) {
+    return () => {};
+  }
+
+  let AppPlugin = cap?.Plugins?.App;
   if (!AppPlugin) {
     try { AppPlugin = (await import('@capacitor/app')).App; } catch { /* noop */ }
   }

@@ -5,6 +5,9 @@ import {
   initGameState,
   applyGuess,
   advancePuzzle,
+  giveUp,
+  revive,
+  revealHint,
   xpForPuzzle,
   INITIAL_LIVES,
   POINTS_EASY,
@@ -83,6 +86,7 @@ describe('initGameState', () => {
     expect(state.streak).toBe(0);
     expect(state.status).toBe('playing');
     expect(state.completedIds.size).toBe(0);
+    expect(state.hintRevealed).toBe(false);
   });
 });
 
@@ -106,20 +110,36 @@ describe('applyGuess', () => {
     expect(next.score).toBe(0);
   });
 
-  it('second wrong guess shows hint', () => {
+  it('does NOT auto-show hint on second wrong guess (manual reveal only)', () => {
     const state = initGameState([MOCK_PUZZLES[2]]); // has hint
     const after1 = applyGuess(state, 'bad');
     const after2 = applyGuess(after1, 'bad');
-    expect(after2.status).toBe('hint');
+    expect(after2.status).toBe('wrong');
+    expect(after2.hintRevealed).toBe(false);
+  });
+
+  it('sets status outOfLives when lives drops to 0 from a wrong guess', () => {
+    let state = initGameState(MOCK_PUZZLES);
+    state = applyGuess(state, 'cat'); // lives 2
+    state = applyGuess(state, 'cat'); // lives 1
+    state = applyGuess(state, 'cat'); // lives 0
+    expect(state.lives).toBe(0);
+    expect(state.status).toBe('outOfLives');
+  });
+
+  it('blocks further guesses when status is outOfLives', () => {
+    let state = initGameState(MOCK_PUZZLES);
+    for (let i = 0; i < INITIAL_LIVES; i++) state = applyGuess(state, 'cat');
+    const next = applyGuess(state, 'worm');
+    // out-of-lives is terminal until revive
+    expect(next).toBe(state);
   });
 
   it('streak bonus at threshold', () => {
     let state = initGameState(MOCK_PUZZLES);
-    // fill streak to threshold
     for (let i = 0; i < STREAK_BONUS_THRESHOLD - 1; i++) {
       state = { ...state, streak: i };
-      state = applyGuess(state, 'worm'); // correct guess on puzzle 0
-      // reset to same puzzle to keep testing
+      state = applyGuess(state, 'worm');
       state = { ...state, currentIndex: 0 };
     }
     const baseline = state.score;
@@ -141,14 +161,72 @@ describe('applyGuess', () => {
   });
 });
 
-describe('advancePuzzle', () => {
-  it('increments index and resets per-puzzle state', () => {
+describe('giveUp', () => {
+  it('reveals answer (status gaveUp) without decrementing lives', () => {
     const state = initGameState(MOCK_PUZZLES);
+    const next = giveUp(state);
+    expect(next.status).toBe('gaveUp');
+    expect(next.lives).toBe(INITIAL_LIVES);
+    expect(next.streak).toBe(0);
+  });
+
+  it('works from outOfLives state too (admin skip after death)', () => {
+    let state = initGameState(MOCK_PUZZLES);
+    for (let i = 0; i < INITIAL_LIVES; i++) state = applyGuess(state, 'cat');
+    expect(state.status).toBe('outOfLives');
+    const next = giveUp(state);
+    expect(next.status).toBe('gaveUp');
+  });
+});
+
+describe('revive', () => {
+  it('refills lives, clears wrongAttempts, status playing', () => {
+    let state = initGameState(MOCK_PUZZLES);
+    for (let i = 0; i < INITIAL_LIVES; i++) state = applyGuess(state, 'cat');
+    expect(state.status).toBe('outOfLives');
+    const revived = revive(state);
+    expect(revived.lives).toBe(INITIAL_LIVES);
+    expect(revived.wrongAttempts).toBe(0);
+    expect(revived.status).toBe('playing');
+  });
+
+  it('preserves score and current puzzle index', () => {
+    let state = initGameState(MOCK_PUZZLES);
+    state = { ...state, score: 1234, currentIndex: 0 };
+    for (let i = 0; i < INITIAL_LIVES; i++) state = applyGuess(state, 'cat');
+    const revived = revive(state);
+    expect(revived.score).toBe(1234);
+    expect(revived.currentIndex).toBe(0);
+  });
+});
+
+describe('revealHint', () => {
+  it('sets hintRevealed true; does not affect lives or status', () => {
+    const state = initGameState([MOCK_PUZZLES[2]]);
+    const after = revealHint(state);
+    expect(after.hintRevealed).toBe(true);
+    expect(after.lives).toBe(INITIAL_LIVES);
+    expect(after.status).toBe('playing');
+  });
+
+  it('is idempotent', () => {
+    const state = initGameState([MOCK_PUZZLES[2]]);
+    const once = revealHint(state);
+    const twice = revealHint(once);
+    expect(twice.hintRevealed).toBe(true);
+  });
+});
+
+describe('advancePuzzle', () => {
+  it('increments index and resets per-puzzle state including hintRevealed', () => {
+    let state = initGameState(MOCK_PUZZLES);
+    state = revealHint(state);
     const next = advancePuzzle(state);
     expect(next.currentIndex).toBe(1);
     expect(next.wrongAttempts).toBe(0);
     expect(next.status).toBe('playing');
     expect(next.input).toBe('');
+    expect(next.hintRevealed).toBe(false);
   });
 
   it('sets finished when no more puzzles', () => {

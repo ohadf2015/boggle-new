@@ -18,6 +18,7 @@ import { MusicProvider } from '@/contexts/MusicContext';
 import { SoundEffectsProvider } from '@/contexts/SoundEffectsContext';
 import { HapticsProvider } from '@/contexts/HapticsContext';
 import { CoinProvider } from '@/contexts/CoinContext';
+import { CrazyGamesProvider } from '@/components/CrazyGamesSDK';
 import { Toaster } from 'react-hot-toast';
 import ErrorBoundary from './components/ErrorBoundary';
 import { QueryProvider } from '@/components/providers/QueryProvider';
@@ -178,6 +179,11 @@ export function EssentialProviders({ children, lang, initialTranslations }: Esse
                     <AuthProvider>
                         <LogRocketIdentify />
                         <PostHogProvider>
+                        {/* Mounted globally so chrome (header auth buttons, landing
+                            CTAs) can react to CrazyGames embed status on every
+                            route — not only game pages. Detection is sticky and
+                            cheap (≤500ms quick-bail off-platform). */}
+                        <CrazyGamesProvider>
                         <CoinProvider>
                             <AccessibilityProvider>
                             <MotionConfigProvider>
@@ -216,6 +222,7 @@ export function EssentialProviders({ children, lang, initialTranslations }: Esse
                             </MotionConfigProvider>
                         </AccessibilityProvider>
                     </CoinProvider>
+                    </CrazyGamesProvider>
                     </PostHogProvider>
                     </AuthProvider>                </LanguageProvider>
             </ThemeProvider>

@@ -16,24 +16,37 @@ vi.mock('@/contexts/NavigationContext', () => ({
 }));
 
 vi.mock('@/lib/connections/puzzles', () => ({
-  getShuffledPuzzles: () => [
-    {
-      id: 'p1',
-      difficulty: 'easy' as const,
-      left: 'red',
-      right: 'wood',
-      answer: 'redwood',
-      hint: 'tree',
-    },
-  ],
+  getPuzzleForLevel: () => ({
+    id: 'p1',
+    word1: 'BOOK',
+    word2: 'HOLE',
+    bridge: 'WORM',
+    difficulty: 'easy' as const,
+    hint: 'crawls in soil',
+  }),
+  getTotalLevels: () => 100,
+}));
+
+vi.mock('@/lib/connections/levelStore', () => ({
+  getCurrentLevel: () => 1,
+  setCurrentLevel: vi.fn(),
 }));
 
 vi.mock('@/lib/connections/feedback', () => ({
   submitConnectionsFeedback: vi.fn(),
 }));
 
+vi.mock('@/contexts/AuthContext', () => ({
+  useAuth: () => ({ isAdmin: false }),
+}));
+
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({ push: vi.fn() }),
+}));
+
 vi.mock('../ConnectionsEffectsCanvas', () => ({ default: () => null }));
 vi.mock('../PuzzleCard', () => ({ default: () => <div data-testid="puzzle-card" /> }));
+vi.mock('../OutOfLivesModal', () => ({ default: () => null }));
 
 vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true }));
 

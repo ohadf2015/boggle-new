@@ -2,16 +2,19 @@
 
 import { useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useAnimationControls } from 'framer-motion';
-import { ThumbsUp, ThumbsDown, ArrowRight, Flag, Check, Lightbulb } from 'lucide-react';
+import { ThumbsUp, ThumbsDown, ArrowRight, Flag, Check, Lightbulb, Eye } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useRewardedFeatureUnlock } from '@/hooks/useRewardedFeatureUnlock';
 import type { ConnectionPuzzle, GameState, PuzzleRating } from '@/lib/connections/types';
 
 interface PuzzleCardProps {
   puzzle: ConnectionPuzzle;
   state: GameState;
+  isAdmin: boolean;
   onInputChange: (value: string) => void;
   onSubmit: () => void;
   onGiveUp: () => void;
+  onRevealHint: () => void;
   onRate: (rating: PuzzleRating) => void;
   onNext: () => void;
 }
@@ -32,19 +35,19 @@ const WORD_CHIP_VARIANTS = {
 const STATUS_BORDER: Record<string, string> = {
   correct: 'border-neo-lime',
   wrong: 'border-neo-red',
-  hint: 'border-neo-yellow',
   playing: 'border-neo-purple',
   finished: 'border-neo-navy-light',
   gaveUp: 'border-neo-red',
+  outOfLives: 'border-neo-red',
 };
 
 const STATUS_BG: Record<string, string> = {
   correct: 'bg-neo-lime/10',
   wrong: 'bg-neo-red/10',
-  hint: 'bg-neo-yellow/10',
   playing: 'bg-neo-navy-light/80',
   finished: 'bg-neo-navy-light',
   gaveUp: 'bg-neo-red/10',
+  outOfLives: 'bg-neo-red/10',
 };
 
 const DIFFICULTY_STYLE: Record<string, string> = {
@@ -53,7 +56,17 @@ const DIFFICULTY_STYLE: Record<string, string> = {
   hard: 'border-neo-pink/50 text-neo-pink',
 };
 
-export default function PuzzleCard({ puzzle, state, onInputChange, onSubmit, onGiveUp, onRate, onNext }: PuzzleCardProps) {
+export default function PuzzleCard({
+  puzzle,
+  state,
+  isAdmin,
+  onInputChange,
+  onSubmit,
+  onGiveUp,
+  onRevealHint,
+  onRate,
+  onNext,
+}: PuzzleCardProps) {
   const { t, language } = useLanguage();
   const isRTL = language === 'he';
   const shakeControls = useAnimationControls();
@@ -65,11 +78,27 @@ export default function PuzzleCard({ puzzle, state, onInputChange, onSubmit, onG
   const isCorrect = state.status === 'correct';
   const isGaveUp = state.status === 'gaveUp';
   const isResolved = isCorrect || isGaveUp;
-  const isDisabled = isResolved || state.status === 'finished';
+  const isDisabled = isResolved || state.status === 'finished' || state.status === 'outOfLives';
   const bridgeRevealed = isCorrect || isGaveUp;
   const hasRated = state.ratedIds.has(puzzle.id);
+  const showHint = state.hintRevealed && !!puzzle.hint;
 
-  // Shake on wrong — fires only on transition to 'wrong', not re-render
+  // Rewarded-ad gate for non-admin reveal-answer
+  const revealAnswerAd = useRewardedFeatureUnlock({
+    placement: 'connections_reveal_answer',
+    onUnlock: onGiveUp,
+    disabled: isAdmin || isDisabled,
+    context: { puzzleId: puzzle.id, difficulty: puzzle.difficulty },
+  });
+
+  // Rewarded-ad gate for non-admin reveal-hint
+  const revealHintAd = useRewardedFeatureUnlock({
+    placement: 'connections_reveal_hint',
+    onUnlock: onRevealHint,
+    disabled: isAdmin || state.hintRevealed || isDisabled || !puzzle.hint,
+    context: { puzzleId: puzzle.id },
+  });
+
   useEffect(() => {
     if (state.status === 'wrong' && prevStatus.current !== 'wrong') {
       shakeControls.start({
@@ -115,7 +144,6 @@ export default function PuzzleCard({ puzzle, state, onInputChange, onSubmit, onG
         ].join(' ')}
         dir={isRTL ? 'rtl' : 'ltr'}
       >
-        {/* Difficulty badge */}
         {puzzle.difficulty && (
           <span
             className={[
@@ -129,7 +157,6 @@ export default function PuzzleCard({ puzzle, state, onInputChange, onSubmit, onG
           </span>
         )}
 
-        {/* Word chain: WORD1 + [?] + WORD2 */}
         <AnimatePresence mode="wait">
           <div key={`chain-${puzzle.id}`} className="flex items-center justify-center gap-3 mb-6 flex-wrap">
             <motion.span
@@ -154,7 +181,6 @@ export default function PuzzleCard({ puzzle, state, onInputChange, onSubmit, onG
               +
             </motion.span>
 
-            {/* Bridge slot */}
             <motion.div
               custom={0.12}
               variants={WORD_CHIP_VARIANTS}
@@ -213,9 +239,8 @@ export default function PuzzleCard({ puzzle, state, onInputChange, onSubmit, onG
           </div>
         </AnimatePresence>
 
-        {/* Status feedback messages */}
         <AnimatePresence mode="wait">
-          {state.status === 'hint' && puzzle.hint && (
+          {showHint && (
             <motion.p
               key="hint"
               initial={{ opacity: 0, y: -6 }}
@@ -267,7 +292,6 @@ export default function PuzzleCard({ puzzle, state, onInputChange, onSubmit, onG
           )}
         </AnimatePresence>
 
-        {/* Input + submit */}
         <div className="flex gap-3" dir={isRTL ? 'rtl' : 'ltr'}>
           <input
             ref={inputRef}
@@ -283,9 +307,7 @@ export default function PuzzleCard({ puzzle, state, onInputChange, onSubmit, onG
               'px-4 py-3 text-lg outline-none transition-colors duration-200',
               'placeholder:text-neo-white/30 shadow-hard',
               isRTL ? 'text-right' : 'text-left',
-              isCorrect
-                ? 'border-neo-lime'
-                : 'border-neo-white/20 focus:border-neo-cyan',
+              isCorrect ? 'border-neo-lime' : 'border-neo-white/20 focus:border-neo-cyan',
             ].join(' ')}
             autoComplete="off"
             autoCapitalize="none"
@@ -306,27 +328,65 @@ export default function PuzzleCard({ puzzle, state, onInputChange, onSubmit, onG
           </motion.button>
         </div>
 
-        {/* Give Up — active play only */}
-        {(state.status === 'playing' || state.status === 'wrong' || state.status === 'hint') && (
-          <div className="mt-4 flex justify-center">
-            <motion.button
-              onClick={onGiveUp}
-              whileHover={{ scale: 1.04 }}
-              whileTap={{ scale: 0.96 }}
-              className={[
-                'rounded-neo border-neo border-neo-red/70 bg-transparent text-neo-red',
-                'font-neo-body text-sm px-4 py-2 transition-colors',
-                'hover:bg-neo-red/10',
-                'inline-flex items-center gap-2',
-              ].join(' ')}
-            >
-              <Flag className="w-4 h-4" aria-hidden="true" />
-              {t('connections.giveUp')}
-            </motion.button>
+        {/* Reveal-hint + reveal-answer / give-up row — active play only */}
+        {(state.status === 'playing' || state.status === 'wrong') && (
+          <div className="mt-4 flex flex-wrap justify-center gap-3">
+            {/* Reveal hint button — only when puzzle has a hint and not yet revealed */}
+            {puzzle.hint && !state.hintRevealed && (
+              isAdmin ? (
+                <motion.button
+                  type="button"
+                  onClick={onRevealHint}
+                  whileHover={{ scale: 1.04 }}
+                  whileTap={{ scale: 0.96 }}
+                  className="inline-flex items-center gap-2 rounded-neo border-neo border-neo-yellow/70 bg-transparent text-neo-yellow font-neo-body text-sm px-4 py-2 hover:bg-neo-yellow/10 transition-colors"
+                >
+                  <Lightbulb className="w-4 h-4" aria-hidden="true" />
+                  {t('connections.revealHint')}
+                </motion.button>
+              ) : revealHintAd.canShowAd ? (
+                <motion.button
+                  type="button"
+                  onClick={revealHintAd.offer}
+                  whileHover={{ scale: 1.04 }}
+                  whileTap={{ scale: 0.96 }}
+                  disabled={revealHintAd.status === 'loading' || revealHintAd.status === 'showing'}
+                  className="inline-flex items-center gap-2 rounded-neo border-neo border-neo-yellow/70 bg-transparent text-neo-yellow font-neo-body text-sm px-4 py-2 hover:bg-neo-yellow/10 transition-colors disabled:opacity-60"
+                >
+                  <Lightbulb className="w-4 h-4" aria-hidden="true" />
+                  {t('connections.revealHintAd')}
+                </motion.button>
+              ) : null
+            )}
+
+            {/* Reveal answer / give-up — admin gets free skip; non-admin gets ad-gated reveal */}
+            {isAdmin ? (
+              <motion.button
+                type="button"
+                onClick={onGiveUp}
+                whileHover={{ scale: 1.04 }}
+                whileTap={{ scale: 0.96 }}
+                className="inline-flex items-center gap-2 rounded-neo border-neo border-neo-red/70 bg-transparent text-neo-red font-neo-body text-sm px-4 py-2 hover:bg-neo-red/10 transition-colors"
+              >
+                <Flag className="w-4 h-4" aria-hidden="true" />
+                {t('connections.adminGiveUp')}
+              </motion.button>
+            ) : revealAnswerAd.canShowAd ? (
+              <motion.button
+                type="button"
+                onClick={revealAnswerAd.offer}
+                whileHover={{ scale: 1.04 }}
+                whileTap={{ scale: 0.96 }}
+                disabled={revealAnswerAd.status === 'loading' || revealAnswerAd.status === 'showing'}
+                className="inline-flex items-center gap-2 rounded-neo border-neo border-neo-purple/70 bg-transparent text-neo-purple font-neo-body text-sm px-4 py-2 hover:bg-neo-purple/10 transition-colors disabled:opacity-60"
+              >
+                <Eye className="w-4 h-4" aria-hidden="true" />
+                {t('connections.revealAnswerAd')}
+              </motion.button>
+            ) : null}
           </div>
         )}
 
-        {/* Like / Dislike + Next — after puzzle resolved */}
         {isResolved && (
           <motion.div
             initial={{ opacity: 0, y: 8 }}

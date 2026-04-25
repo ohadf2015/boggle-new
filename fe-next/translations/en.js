@@ -10674,7 +10674,18 @@ const en = {
     "next": "Next",
     "rateThis": "Rate this puzzle",
     "thanks": "Thanks for your feedback",
-    "xpEarned": "XP Earned"
+    "xpEarned": "XP Earned",
+    "level": "Level",
+    "outOfLives": "Out of lives!",
+    "reviveDescription": "Watch a quick ad to refill your lives and continue this level.",
+    "reviveAd": "Watch ad for 3 lives",
+    "adminRefill": "Refill lives (admin)",
+    "quitToMenu": "Back to menu",
+    "noAdAvailable": "No ad available right now. Try again later.",
+    "revealHint": "Reveal hint",
+    "revealHintAd": "Watch ad for hint",
+    "revealAnswerAd": "Watch ad to reveal answer",
+    "adminGiveUp": "Skip puzzle (admin)"
   },
   "socketErrors": {
     "AUTH_REQUIRED": "Sign in required for this action",

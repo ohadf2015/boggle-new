@@ -20,7 +20,6 @@
 import React, { useEffect, ReactNode } from 'react';
 import { AchievementQueueProvider } from '@/components/achievements';
 import { GameAnnouncerProvider } from '@/components/GameAnnouncer';
-import { CrazyGamesProvider } from '@/components/CrazyGamesSDK';
 import { NativeAppProvider } from '@/components/native/NativeAppProvider';
 import { NetworkStatusHandler } from '@/components/native/NetworkStatusHandler';
 import { SocketProvider } from '@/utils/SocketContext';
@@ -101,11 +100,13 @@ interface GameSpecificProvidersProps {
  * rendered INSIDE EssentialProviders by ConditionalProviders.
  */
 export function GameSpecificProviders({ children }: GameSpecificProvidersProps) {
+    // CrazyGamesProvider is mounted globally in EssentialProviders so chrome on
+    // every route reacts to embed status. SettingsBridge stays game-only — it
+    // only matters once gameplay/audio are active.
     return (
         <NetworkStatusHandler>
             <NativeAppProvider>
-                <CrazyGamesProvider>
-                    <CrazyGamesSettingsBridge>
+                <CrazyGamesSettingsBridge>
                     <SocketProvider>
                         <SocketEventBusProvider>
                             <CoreGameProviders>
@@ -117,7 +118,6 @@ export function GameSpecificProviders({ children }: GameSpecificProvidersProps) 
                         </SocketEventBusProvider>
                     </SocketProvider>
                 </CrazyGamesSettingsBridge>
-                </CrazyGamesProvider>
             </NativeAppProvider>
         </NetworkStatusHandler>
     );

@@ -6,7 +6,6 @@ export const POINTS_MEDIUM = 200;
 export const POINTS_HARD = 350;
 export const STREAK_BONUS_THRESHOLD = 3;
 export const STREAK_BONUS_MULTIPLIER = 1.5;
-const HINT_WRONG_THRESHOLD = 2;
 
 const POINTS_BY_DIFFICULTY: Record<ConnectionPuzzle['difficulty'], number> = {
   easy: POINTS_EASY,
@@ -25,7 +24,6 @@ export function normalizeGuess(input: string): string {
 }
 
 function stripPunctuation(s: string): string {
-  // keep Unicode letters + digits; drop everything else (quotes, punctuation, whitespace edges)
   return s.replace(/[^\p{L}\p{N}]/gu, '');
 }
 
@@ -60,12 +58,24 @@ export function initGameState(puzzles: ConnectionPuzzle[]): GameState {
     input: '',
     completedIds: new Set(),
     ratedIds: new Set(),
+    hintRevealed: false,
   };
 }
 
 export function giveUp(state: GameState): GameState {
   if (state.status === 'finished' || state.status === 'correct' || state.status === 'gaveUp') return state;
-  return { ...state, status: 'gaveUp', lives: Math.max(0, state.lives - 1), streak: 0, wrongAttempts: 0 };
+  // Reveal answer + skip puzzle. No life penalty — lives are spent on wrong guesses,
+  // and ad-revive (or admin) is what restores them.
+  return { ...state, status: 'gaveUp', streak: 0, wrongAttempts: 0 };
+}
+
+export function revive(state: GameState): GameState {
+  return { ...state, lives: INITIAL_LIVES, wrongAttempts: 0, status: 'playing' };
+}
+
+export function revealHint(state: GameState): GameState {
+  if (state.hintRevealed) return state;
+  return { ...state, hintRevealed: true };
 }
 
 export function markRated(state: GameState, puzzleId: string): GameState {
@@ -76,6 +86,9 @@ export function markRated(state: GameState, puzzleId: string): GameState {
 }
 
 export function applyGuess(state: GameState, input: string): GameState {
+  if (state.status === 'outOfLives' || state.status === 'finished' || state.status === 'gaveUp') {
+    return state;
+  }
   const puzzle = state.puzzles[state.currentIndex];
   const { correct } = checkGuess(input, puzzle);
 
@@ -86,12 +99,12 @@ export function applyGuess(state: GameState, input: string): GameState {
     return { ...state, status: 'correct', score: state.score + base + bonus, streak: newStreak, wrongAttempts: 0 };
   }
 
+  const newLives = Math.max(0, state.lives - 1);
   const newWrongAttempts = state.wrongAttempts + 1;
-  const showHint = newWrongAttempts >= HINT_WRONG_THRESHOLD && !!puzzle.hint;
   return {
     ...state,
-    status: showHint ? 'hint' : 'wrong',
-    lives: Math.max(0, state.lives - 1),
+    status: newLives === 0 ? 'outOfLives' : 'wrong',
+    lives: newLives,
     wrongAttempts: newWrongAttempts,
     streak: 0,
   };
@@ -100,7 +113,7 @@ export function applyGuess(state: GameState, input: string): GameState {
 export function advancePuzzle(state: GameState): GameState {
   const puzzle = state.puzzles[state.currentIndex];
   const completedIds = new Set(state.completedIds);
-  completedIds.add(puzzle.id);
+  if (puzzle) completedIds.add(puzzle.id);
   const nextIndex = state.currentIndex + 1;
   const finished = nextIndex >= state.puzzles.length;
   return {
@@ -110,5 +123,6 @@ export function advancePuzzle(state: GameState): GameState {
     input: '',
     status: finished ? 'finished' : 'playing',
     completedIds,
+    hintRevealed: false,
   };
 }
