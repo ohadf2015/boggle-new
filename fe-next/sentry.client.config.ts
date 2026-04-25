@@ -187,6 +187,11 @@ Sentry.init({
     /\[SOCKET\.IO\] Socket error event.*Target word already found/i,
     // NativeOAuth UNIMPLEMENTED — CrazyGames SDK outside platform
     /\[NativeOAuth\].*UNIMPLEMENTED/i,
+    // Capacitor App plugin race during native bridge init or stale APK install
+    // (versionCode 3766 lacks plugin guards; 3959 fixed). All call sites guarded
+    // with isPluginAvailable('App') (Sentry JAVASCRIPT-NEXTJS-12A).
+    /"App" plugin is not implemented/i,
+    /plugin is not implemented on (android|ios)/i,
     // CrazyGames SDK ad/banner/gameplay warnings — expected outside platform
     /adsDisabledBasicLaunch/i,
     /bannersDisabledBasicLaunch/i,

@@ -56,6 +56,18 @@ describe('detectCrazyGamesSync', () => {
     expect(detectCrazyGamesSync()).toBe(false);
   });
 
+  it('does NOT force-on when NEXT_PUBLIC_CRAZYGAMES_ENABLED=true (env governs SDK script load only)', () => {
+    // Regression: a previous version returned true unconditionally when this
+    // env var was 'true'. Because Next inlines NEXT_PUBLIC_* at build time,
+    // every prod client then mis-detected as a CrazyGames embed → hid the
+    // global bottom nav, mobile menu, and external auth on the public site.
+    vi.stubEnv('NEXT_PUBLIC_CRAZYGAMES_ENABLED', 'true');
+    stubLocation('example.com', []);
+    stubReferrer('');
+    expect(detectCrazyGamesSync()).toBe(false);
+    vi.unstubAllEnvs();
+  });
+
   it('returns true in cross-origin iframe even without ancestorOrigins/referrer (Firefox/Brave)', () => {
     // Firefox: no ancestorOrigins. Strict referrer-policy: empty referrer.
     // Game URL has no "crazygames"/"icecream" hint. Distinguishing signal is that

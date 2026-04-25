@@ -27,8 +27,11 @@ const CRAZYGAMES_FORCE_DISABLED = process.env.NEXT_PUBLIC_CRAZYGAMES_ENABLED ===
 export function detectCrazyGamesSync(): boolean {
   if (typeof window === 'undefined') return false;
 
-  // Force-ON via env flag
-  if (process.env.NEXT_PUBLIC_CRAZYGAMES_ENABLED === 'true') return true;
+  // NB: do NOT honor `NEXT_PUBLIC_CRAZYGAMES_ENABLED === 'true'` here.
+  // That env var only controls SDK script loading (see next.config.mjs); using
+  // it as a force-on for embed detection inlines `true` into every prod client
+  // and mis-declares all devices as CrazyGames embeds → hides global nav,
+  // mobile menu, and external auth on the public site. Use `?cg=1` for QA.
 
   // Dev/QA override: ?crazygames=1 persists to sessionStorage + window flag
   try {
