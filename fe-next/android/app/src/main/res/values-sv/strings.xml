@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="shortcut_daily_short">Daglig</string>
+    <string name="shortcut_daily_long">Daglig utmaning</string>
+    <string name="shortcut_mp_short">Flerspelar</string>
+    <string name="shortcut_mp_long">Spela flerspelarläge</string>
+    <string name="shortcut_solo_short">Solo</string>
+    <string name="shortcut_solo_long">Enspelarläge</string>
+    <string name="shortcut_connections_short">Kopplingar</string>
+    <string name="shortcut_connections_long">Spela Kopplingar</string>
+</resources>

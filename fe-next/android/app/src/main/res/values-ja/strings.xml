@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="shortcut_daily_short">デイリー</string>
+    <string name="shortcut_daily_long">デイリーチャレンジ</string>
+    <string name="shortcut_mp_short">対戦</string>
+    <string name="shortcut_mp_long">マルチプレイヤー</string>
+    <string name="shortcut_solo_short">ソロ</string>
+    <string name="shortcut_solo_long">シングルプレイヤー</string>
+    <string name="shortcut_connections_short">コネクション</string>
+    <string name="shortcut_connections_long">コネクションをプレイ</string>
+</resources>

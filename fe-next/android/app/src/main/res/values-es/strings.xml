@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="shortcut_daily_short">Diario</string>
+    <string name="shortcut_daily_long">Reto diario</string>
+    <string name="shortcut_mp_short">Multijugador</string>
+    <string name="shortcut_mp_long">Jugar multijugador</string>
+    <string name="shortcut_solo_short">Solo</string>
+    <string name="shortcut_solo_long">Un jugador</string>
+    <string name="shortcut_connections_short">Conexiones</string>
+    <string name="shortcut_connections_long">Jugar Conexiones</string>
+</resources>

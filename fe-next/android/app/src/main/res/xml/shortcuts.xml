@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <shortcut
+        android:shortcutId="daily_challenge"
+        android:enabled="true"
+        android:icon="@drawable/shortcut_daily"
+        android:shortcutShortLabel="@string/shortcut_daily_short"
+        android:shortcutLongLabel="@string/shortcut_daily_long">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="live.lexiclash.app"
+            android:targetClass="live.lexiclash.app.MainActivity"
+            android:data="https://www.lexiclash.live/daily" />
+        <categories android:name="android.shortcut.conversation" />
+        <capability-binding android:key="actions.intent.OPEN_APP_FEATURE" />
+    </shortcut>
+
+    <shortcut
+        android:shortcutId="multiplayer"
+        android:enabled="true"
+        android:icon="@drawable/shortcut_multiplayer"
+        android:shortcutShortLabel="@string/shortcut_mp_short"
+        android:shortcutLongLabel="@string/shortcut_mp_long">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="live.lexiclash.app"
+            android:targetClass="live.lexiclash.app.MainActivity"
+            android:data="https://www.lexiclash.live/multiplayer" />
+    </shortcut>
+
+    <shortcut
+        android:shortcutId="solo"
+        android:enabled="true"
+        android:icon="@drawable/shortcut_solo"
+        android:shortcutShortLabel="@string/shortcut_solo_short"
+        android:shortcutLongLabel="@string/shortcut_solo_long">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="live.lexiclash.app"
+            android:targetClass="live.lexiclash.app.MainActivity"
+            android:data="https://www.lexiclash.live/singleplayer" />
+    </shortcut>
+
+    <shortcut
+        android:shortcutId="connections"
+        android:enabled="true"
+        android:icon="@drawable/shortcut_connections"
+        android:shortcutShortLabel="@string/shortcut_connections_short"
+        android:shortcutLongLabel="@string/shortcut_connections_long">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="live.lexiclash.app"
+            android:targetClass="live.lexiclash.app.MainActivity"
+            android:data="https://www.lexiclash.live/connections" />
+    </shortcut>
+
+</shortcuts>

@@ -13,6 +13,8 @@ import React, { useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { useSafeArea } from '@/hooks/useSafeArea';
 import { useAppLifecycle } from '@/hooks/useAppLifecycle';
+import { useAndroidBackButton } from '@/hooks/useAndroidBackButton';
+import { useStatusBarTint } from '@/hooks/useStatusBarTint';
 import { getSharedSocketIfExists } from '@/utils/SocketContext';
 import { isNative } from '@/utils/platform';
 import logger from '@/utils/logger';
@@ -29,18 +31,23 @@ export function NativeAppProvider({ children }: NativeAppProviderProps): React.R
   // Hook sets --cap-safe-area-top/bottom/left/right on document root
   useSafeArea();
 
-  // Configure status bar on native: don't overlay WebView content
+  // Hardware back gesture/button -> Next.js router back, with double-tap-to-exit
+  // on root routes. Replaces Capacitor's default exitApp-on-back behavior.
+  useAndroidBackButton();
+
+  // Per-route status bar color so the system bar matches the active mode's
+  // brand family (multiplayer=pink, daily=yellow, etc). Applies on every nav.
+  useStatusBarTint();
+
+  // One-time status bar wiring: WebView extends behind the bar, safe-area CSS
+  // vars handle the inset. Color/style set per-route by useStatusBarTint.
   useEffect(() => {
     if (!isNative()) return;
-
-    import('@capacitor/status-bar').then(({ StatusBar, Style }) => {
-      // Let WebView render behind the status bar — CSS safe area vars handle the inset
+    import('@capacitor/status-bar').then(({ StatusBar }) => {
       StatusBar.setOverlaysWebView({ overlay: true }).catch(() => {});
-      StatusBar.setBackgroundColor({ color: '#1a1a2e' }).catch(() => {});
-      StatusBar.setStyle({ style: Style.Dark }).catch(() => {});
-      logger.log('[NativeAppProvider] Status bar configured');
+      logger.log('[NativeAppProvider] Status bar overlay enabled');
     }).catch((err) => {
-      logger.warn('[NativeAppProvider] Failed to configure status bar:', err);
+      logger.warn('[NativeAppProvider] Failed to configure status bar overlay:', err);
     });
   }, []);
 
