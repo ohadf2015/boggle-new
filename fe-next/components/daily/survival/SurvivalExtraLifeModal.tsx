@@ -21,6 +21,7 @@ export function SurvivalExtraLifeModal({
 }: SurvivalExtraLifeModalProps) {
   const { offer, canShowAd } = useRewardedFeatureUnlock({
     placement: 'daily_survival_extra_life',
+    surface: 'retry',
     onUnlock: onRestore,
     disabled: !isOpen,
     context: { restoreAmount },

@@ -42,6 +42,7 @@ export const TimeLowAdPrompt: React.FC<TimeLowAdPromptProps> = ({
 
   const { showAd, status, canShowAd } = useRewardedAd({
     rewardKind: 'feature',
+    surface: 'timeLow',
     onRewardEarned: () => {
       setUsed(true);
       onExtend(bonusSeconds);

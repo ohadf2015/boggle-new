@@ -32,6 +32,7 @@ export const WatchAdForRevealButton: React.FC<WatchAdForRevealButtonProps> = ({
   const { t } = useLanguage();
   const { offer, status, canShowAd } = useRewardedFeatureUnlock({
     placement,
+    surface: 'hint',
     onUnlock: onReveal,
   });
 

@@ -48,20 +48,23 @@ describe('useRewardedAd analytics', () => {
     }
   });
 
-  it('fires trackRewardedAdWatched when reward is granted (placeholder path)', async () => {
+  it('fires trackRewardedAdDeclined with no_ad_provider when no real provider on web', async () => {
+    // NODE_ENV='test' in vitest → isDev=false → placeholder is blocked, not granted.
+    // The hook must decline with reason='no_ad_provider' so analytics see the
+    // shadow demand (button taps that find no provider).
     const { result } = renderHook(() => useRewardedAd());
 
     await act(async () => {
       result.current.showAd();
-      // Placeholder path awards synchronously via awardCoinsAndNotify promise chain.
       await Promise.resolve();
       await Promise.resolve();
     });
 
-    expect(trackRewardedAdWatched).toHaveBeenCalledTimes(1);
-    const args = (trackRewardedAdWatched as unknown as ReturnType<typeof vi.fn>).mock.calls[0];
-    expect(args[0]).toBe('no-ad-placeholder');
-    expect(args[1]).toBe(30);
+    expect(trackRewardedAdWatched).not.toHaveBeenCalled();
+    expect(trackRewardedAdDeclined).toHaveBeenCalled();
+    const args = (trackRewardedAdDeclined as unknown as ReturnType<typeof vi.fn>).mock.calls[0];
+    expect(args[0]).toBe('no_ad_provider');
+    expect(args[1]).toBe('no-ad-placeholder');
   });
 
   it('fires trackRewardedAdDeclined with reason=daily_limit when cap reached', () => {

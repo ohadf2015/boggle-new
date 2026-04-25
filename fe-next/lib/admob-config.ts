@@ -1,18 +1,23 @@
 export type AdPlatform = 'android' | 'ios';
+export type RewardedSurface = 'generic' | 'hint' | 'doubleGold' | 'freeze' | 'retry' | 'timeLow';
+export type BannerVariant = 'game' | 'content';
 
 export interface AdmobConfig {
+  /** Generic rewarded unit (legacy field). Mirrors rewardedUnits.generic. */
   rewardedAdId: string;
   interstitialAdId: string;
+  /** Game banner unit (legacy field). Mirrors bannerUnits.game. */
   bannerAdId: string;
+  /** Per-surface rewarded unit IDs for AdMob waterfall segmentation. */
+  rewardedUnits: Record<RewardedSurface, string>;
+  /** Per-surface banner unit IDs (game vs content browsing). */
+  bannerUnits: Record<BannerVariant, string>;
 }
 
 // Production AdMob unit IDs for publisher ca-pub-1896836706464880.
 // iOS falls back to the Android production unit IDs when iOS-specific env
-// vars are not provided — this keeps real ads serving on both platforms.
-// Previously iOS defaulted to Google's sample/test unit IDs
-// (ca-app-pub-3940256099942544/…), which caused "Test Ad" banners to show in
-// production. Override per-platform via NEXT_PUBLIC_ADMOB_*_IOS env vars.
-export const DEFAULTS: Record<AdPlatform, AdmobConfig> = {
+// vars are not provided — keeps real ads serving on both platforms.
+export const DEFAULTS: Record<AdPlatform, Pick<AdmobConfig, 'rewardedAdId' | 'interstitialAdId' | 'bannerAdId'>> = {
   android: {
     rewardedAdId: 'ca-app-pub-1896836706464880/3688045325',
     interstitialAdId: 'ca-app-pub-1896836706464880/2374963657',
@@ -25,20 +30,72 @@ export const DEFAULTS: Record<AdPlatform, AdmobConfig> = {
   },
 };
 
+const REWARDED_SURFACE_ENV_KEY: Record<Exclude<RewardedSurface, 'generic'>, string> = {
+  hint: 'HINT',
+  doubleGold: 'DOUBLE_GOLD',
+  freeze: 'FREEZE',
+  retry: 'RETRY',
+  timeLow: 'TIME_LOW',
+};
+
+function pickEnv(...keys: string[]): string | undefined {
+  for (const k of keys) {
+    const v = process.env[k];
+    if (typeof v === 'string' && v.length > 0) return v;
+  }
+  return undefined;
+}
+
+function resolveRewardedSurface(
+  surface: RewardedSurface,
+  platformSuffix: 'ANDROID' | 'IOS',
+  fallbackGeneric: string,
+): string {
+  if (surface === 'generic') return fallbackGeneric;
+  const segment = REWARDED_SURFACE_ENV_KEY[surface];
+  return (
+    pickEnv(
+      `NEXT_PUBLIC_ADMOB_REWARDED_${segment}_${platformSuffix}`,
+      `NEXT_PUBLIC_ADMOB_REWARDED_${segment}`,
+    ) ?? fallbackGeneric
+  );
+}
+
 export function getAdmobConfig(platform: AdPlatform): AdmobConfig {
   const suffix = platform === 'android' ? 'ANDROID' : 'IOS';
+
+  const genericRewarded =
+    pickEnv(`NEXT_PUBLIC_ADMOB_REWARDED_${suffix}`, 'NEXT_PUBLIC_ADMOB_REWARDED_ID') ??
+    DEFAULTS[platform].rewardedAdId;
+
+  const interstitial =
+    pickEnv(`NEXT_PUBLIC_ADMOB_INTERSTITIAL_${suffix}`, 'NEXT_PUBLIC_ADMOB_INTERSTITIAL_ID') ??
+    DEFAULTS[platform].interstitialAdId;
+
+  const gameBanner =
+    pickEnv(`NEXT_PUBLIC_ADMOB_BANNER_${suffix}`, 'NEXT_PUBLIC_ADMOB_BANNER_ID') ??
+    DEFAULTS[platform].bannerAdId;
+
+  const contentBanner =
+    pickEnv(
+      `NEXT_PUBLIC_ADMOB_BANNER_CONTENT_${suffix}`,
+      'NEXT_PUBLIC_ADMOB_BANNER_CONTENT',
+    ) ?? gameBanner;
+
+  const rewardedUnits: Record<RewardedSurface, string> = {
+    generic: genericRewarded,
+    hint: resolveRewardedSurface('hint', suffix, genericRewarded),
+    doubleGold: resolveRewardedSurface('doubleGold', suffix, genericRewarded),
+    freeze: resolveRewardedSurface('freeze', suffix, genericRewarded),
+    retry: resolveRewardedSurface('retry', suffix, genericRewarded),
+    timeLow: resolveRewardedSurface('timeLow', suffix, genericRewarded),
+  };
+
   return {
-    rewardedAdId:
-      process.env[`NEXT_PUBLIC_ADMOB_REWARDED_${suffix}`] ||
-      process.env['NEXT_PUBLIC_ADMOB_REWARDED_ID'] ||
-      DEFAULTS[platform].rewardedAdId,
-    interstitialAdId:
-      process.env[`NEXT_PUBLIC_ADMOB_INTERSTITIAL_${suffix}`] ||
-      process.env['NEXT_PUBLIC_ADMOB_INTERSTITIAL_ID'] ||
-      DEFAULTS[platform].interstitialAdId,
-    bannerAdId:
-      process.env[`NEXT_PUBLIC_ADMOB_BANNER_${suffix}`] ||
-      process.env['NEXT_PUBLIC_ADMOB_BANNER_ID'] ||
-      DEFAULTS[platform].bannerAdId,
+    rewardedAdId: rewardedUnits.generic,
+    interstitialAdId: interstitial,
+    bannerAdId: gameBanner,
+    rewardedUnits,
+    bannerUnits: { game: gameBanner, content: contentBanner },
   };
 }

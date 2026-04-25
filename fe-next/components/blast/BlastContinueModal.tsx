@@ -17,6 +17,7 @@ export function BlastContinueModal({
 }: BlastContinueModalProps) {
   const { offer, canShowAd } = useRewardedFeatureUnlock({
     placement: 'blast_wave_continue',
+    surface: 'retry',
     onUnlock: onContinue,
     disabled: !isOpen,
     context: { bonusMoves },

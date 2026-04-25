@@ -52,6 +52,7 @@ const WatchAdButton: React.FC<WatchAdButtonProps> = ({
 
   // Update effect to refresh coins when ad succeeds
   const { showAd, isAdAvailable, isPlaceholderCooldown, status, error, rewardAmount } = useRewardedAd({
+    surface: 'doubleGold',
     onRewardEarned: async (earned) => {
       setEarnedAmount(earned);
       setShowSuccess(true);

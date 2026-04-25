@@ -70,7 +70,7 @@ describe('AnchoredNativeBanner', () => {
     mockPlatform.current = 'ios';
     render(<AnchoredNativeBanner />);
     await Promise.resolve();
-    expect(showBanner).toHaveBeenCalledWith('BOTTOM_CENTER', 0);
+    expect(showBanner).toHaveBeenCalledWith('BOTTOM_CENTER', 0, { variant: 'content' });
   });
 
   it('ignores iOS safe-area in margin (plugin handles home indicator)', async () => {
@@ -79,7 +79,7 @@ describe('AnchoredNativeBanner', () => {
     mockSafeArea.current = { top: 47, bottom: 34, left: 0, right: 0 };
     render(<AnchoredNativeBanner />);
     await Promise.resolve();
-    expect(showBanner).toHaveBeenCalledWith('BOTTOM_CENTER', 0);
+    expect(showBanner).toHaveBeenCalledWith('BOTTOM_CENTER', 0, { variant: 'content' });
   });
 
   it('lifts banner above gesture bar on Android (margin=safeArea.bottom)', async () => {
@@ -88,7 +88,7 @@ describe('AnchoredNativeBanner', () => {
     mockSafeArea.current = { top: 24, bottom: 24, left: 0, right: 0 };
     render(<AnchoredNativeBanner />);
     await Promise.resolve();
-    expect(showBanner).toHaveBeenCalledWith('BOTTOM_CENTER', 24);
+    expect(showBanner).toHaveBeenCalledWith('BOTTOM_CENTER', 24, { variant: 'content' });
   });
 
   it('uses margin=0 on Android when safe-area is zero', async () => {
@@ -97,7 +97,7 @@ describe('AnchoredNativeBanner', () => {
     mockSafeArea.current = { top: 0, bottom: 0, left: 0, right: 0 };
     render(<AnchoredNativeBanner />);
     await Promise.resolve();
-    expect(showBanner).toHaveBeenCalledWith('BOTTOM_CENTER', 0);
+    expect(showBanner).toHaveBeenCalledWith('BOTTOM_CENTER', 0, { variant: 'content' });
   });
 
   it('margin is route-independent — nav floats via CSS var, not plugin margin', async () => {
@@ -106,7 +106,7 @@ describe('AnchoredNativeBanner', () => {
     mockSafeArea.current = { top: 24, bottom: 24, left: 0, right: 0 };
     render(<AnchoredNativeBanner />);
     await Promise.resolve();
-    expect(showBanner).toHaveBeenCalledWith('BOTTOM_CENTER', 24);
+    expect(showBanner).toHaveBeenCalledWith('BOTTOM_CENTER', 24, { variant: 'content' });
   });
 
   it('shows banner on locale-prefixed home', async () => {
@@ -151,7 +151,7 @@ describe('AnchoredNativeBanner', () => {
     render(<AnchoredNativeBanner />);
     await Promise.resolve();
     expect(showBanner).toHaveBeenCalledTimes(1);
-    expect(showBanner).toHaveBeenCalledWith('BOTTOM_CENTER', 0);
+    expect(showBanner).toHaveBeenCalledWith('BOTTOM_CENTER', 0, { variant: 'content' });
   });
 
   it('hides banner on /daily', async () => {
@@ -166,6 +166,38 @@ describe('AnchoredNativeBanner', () => {
     render(<AnchoredNativeBanner />);
     await Promise.resolve();
     expect(addListener).toHaveBeenCalledWith('bannerAdSizeChanged', expect.any(Function));
+  });
+
+  it('lifts banner above GlobalBottomNav on Android (margin = navHeight)', async () => {
+    mockPathname.current = '/';
+    mockPlatform.current = 'android';
+    mockSafeArea.current = { top: 0, bottom: 24, left: 0, right: 0 };
+    const nav = document.createElement('div');
+    nav.setAttribute('data-global-bottom-nav', '');
+    Object.defineProperty(nav, 'getBoundingClientRect', {
+      value: () => ({ height: 88, width: 0, top: 0, left: 0, right: 0, bottom: 0, x: 0, y: 0, toJSON() {} }),
+    });
+    document.body.appendChild(nav);
+    render(<AnchoredNativeBanner />);
+    await Promise.resolve();
+    expect(showBanner).toHaveBeenCalledWith('BOTTOM_CENTER', 88, { variant: 'content' });
+    document.body.removeChild(nav);
+  });
+
+  it('lifts banner above GlobalBottomNav on iOS (margin = navHeight − safeArea, plugin re-adds inset)', async () => {
+    mockPathname.current = '/';
+    mockPlatform.current = 'ios';
+    mockSafeArea.current = { top: 0, bottom: 34, left: 0, right: 0 };
+    const nav = document.createElement('div');
+    nav.setAttribute('data-global-bottom-nav', '');
+    Object.defineProperty(nav, 'getBoundingClientRect', {
+      value: () => ({ height: 98, width: 0, top: 0, left: 0, right: 0, bottom: 0, x: 0, y: 0, toJSON() {} }),
+    });
+    document.body.appendChild(nav);
+    render(<AnchoredNativeBanner />);
+    await Promise.resolve();
+    expect(showBanner).toHaveBeenCalledWith('BOTTOM_CENTER', 64, { variant: 'content' });
+    document.body.removeChild(nav);
   });
 
   it('registers FailedToLoad and Closed listeners that reset --admob-banner-height', async () => {

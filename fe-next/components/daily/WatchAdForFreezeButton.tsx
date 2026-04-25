@@ -20,6 +20,7 @@ const WatchAdForFreezeButton: React.FC<WatchAdForFreezeButtonProps> = ({ t, clas
   const { freezeCount, earnFreeze } = useStreakFreeze();
   const { showAd, status, isDailyLimitReached } = useRewardedAd({
     rewardKind: 'feature',
+    surface: 'freeze',
     onRewardEarned: () => earnFreeze(),
   });
 

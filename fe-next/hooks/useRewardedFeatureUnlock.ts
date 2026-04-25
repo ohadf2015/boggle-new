@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef } from 'react';
 import { useRewardedAd } from '@/hooks/useRewardedAd';
+import type { RewardedSurface } from '@/lib/admob-config';
 import { trackRewardedAdOffered } from '@/utils/growthTracking';
 
 interface UseRewardedFeatureUnlockOptions {
@@ -13,6 +14,8 @@ interface UseRewardedFeatureUnlockOptions {
   disabled?: boolean;
   /** Extra context for the offered event (e.g. { wave: 3 }) */
   context?: Record<string, unknown>;
+  /** AdMob unit segment — routes to per-surface ad unit ID. */
+  surface?: RewardedSurface;
 }
 
 export interface UseRewardedFeatureUnlockReturn {
@@ -26,13 +29,14 @@ export interface UseRewardedFeatureUnlockReturn {
 export function useRewardedFeatureUnlock(
   opts: UseRewardedFeatureUnlockOptions,
 ): UseRewardedFeatureUnlockReturn {
-  const { placement, onUnlock, disabled = false, context } = opts;
+  const { placement, onUnlock, disabled = false, context, surface } = opts;
 
   const onUnlockRef = useRef(onUnlock);
   onUnlockRef.current = onUnlock;
 
   const { status, canShowAd, rewardAmount, isPlaceholder, showAd } = useRewardedAd({
     rewardKind: 'feature',
+    surface,
     onRewardEarned: async () => {
       await onUnlockRef.current();
     },

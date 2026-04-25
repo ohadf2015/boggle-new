@@ -103,6 +103,7 @@ const RetryAssistModal = memo<RetryAssistModalProps>(
     // rewardKind='feature' so the bonus-retry is the SOLE reward (no extra coin payout).
     const rewarded = useRewardedAd({
       rewardKind: 'feature',
+      surface: 'retry',
       onRewardEarned: () => onRetryWithBonus(),
     });
 

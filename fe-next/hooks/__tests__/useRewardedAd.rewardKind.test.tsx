@@ -21,8 +21,18 @@ vi.mock('@/components/CrazyGamesSDK', () => ({
   }),
 }));
 
+// Mock AdMob as a working real provider so the hook routes through the
+// AdMob branch (not the now-blocked placeholder branch). These tests verify
+// the rewardKind logic, which is independent of the web-no-provider block.
+vi.mock('@capacitor/core', () => ({
+  Capacitor: { isNativePlatform: () => true, getPlatform: () => 'android' },
+}));
+
 vi.mock('@/hooks/useAdMob', () => ({
-  useAdMob: () => ({ isAvailable: false, showRewarded: vi.fn() }),
+  useAdMob: () => ({
+    isAvailable: true,
+    showRewarded: vi.fn((onReward: () => void) => onReward()),
+  }),
 }));
 
 vi.mock('@/hooks/useAdPlacement', () => ({

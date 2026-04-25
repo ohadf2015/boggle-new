@@ -19,6 +19,7 @@ export default function OutOfLivesModal({ open, isAdmin, level, onRevive, onQuit
 
   const { offer, status, canShowAd } = useRewardedFeatureUnlock({
     placement: 'connections_revive',
+    surface: 'retry',
     onUnlock: onRevive,
     disabled: !open || isAdmin,
     context: { level },

@@ -25,6 +25,7 @@ export function BlastPregameBuffModal({ isOpen, onPick, onSkip, t }: BlastPregam
 
   const { offer, canShowAd } = useRewardedFeatureUnlock({
     placement: 'blast_pregame_buff',
+    surface: 'doubleGold',
     onUnlock: () => {
       if (selected) onPick(selected);
     },

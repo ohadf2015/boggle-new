@@ -63,6 +63,7 @@ const BossRushResults = memo<BossRushResultsProps>(({ state, onRetry, onExit }) 
   // R5 — rewarded continue on failure (feature reward, no coin payout)
   const rewarded = useRewardedAd({
     rewardKind: 'feature',
+    surface: 'retry',
     onRewardEarned: () => onRetry(),
   });
 

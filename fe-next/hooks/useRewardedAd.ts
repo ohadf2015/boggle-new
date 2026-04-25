@@ -7,6 +7,7 @@ import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useAdMob } from '@/hooks/useAdMob';
 import { useCoinContext } from '@/contexts/CoinContext';
 import { trackRewardedAdWatched, trackRewardedAdDeclined } from '@/utils/growthTracking';
+import type { RewardedSurface } from '@/lib/admob-config';
 
 export type AdStatus = 'idle' | 'loading' | 'showing' | 'completed' | 'error';
 
@@ -92,6 +93,11 @@ interface UseRewardedAdOptions {
    *   Prevents the double-reward bug where feature unlocks also paid coins.
    */
   rewardKind?: 'coins' | 'feature';
+  /**
+   * Which gameplay surface this ad serves. Routes to a per-surface AdMob unit
+   * so the waterfall can be optimized per placement. Defaults to 'generic'.
+   */
+  surface?: RewardedSurface;
 }
 
 interface UseRewardedAdReturn {
@@ -140,7 +146,7 @@ interface UseRewardedAdReturn {
  * ```
  */
 export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAdReturn {
-  const { onRewardEarned, onAdError, onAdStarted, rewardKind = 'coins' } = options;
+  const { onRewardEarned, onAdError, onAdStarted, rewardKind = 'coins', surface = 'generic' } = options;
   const [status, setStatus] = useState<AdStatus>('idle');
   const [error, setError] = useState<string | null>(null);
   const [placeholderCooldownFlag, setPlaceholderCooldownFlag] = useState(() => isPlaceholderCapped());
@@ -183,7 +189,18 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
       return;
     }
 
-    // Enforce placeholder cooldown
+    // No-ads web build (no CrazyGames, no AdMob, not dev): refuse to grant
+    // ANY reward — feature unlocks (hint/freeze/retry/extra-life) and coin
+    // grants alike. Until real ads ship on a platform, boosts must stay
+    // locked. canShowAd already returns false here so well-behaved callsites
+    // hide the button; this block stops rogue callers from bypassing it.
+    if (isPlaceholder && !isDev) {
+      trackRewardedAdDeclined('no_ad_provider', platformForDecline, undefined);
+      onAdError?.('No ad provider available');
+      return;
+    }
+
+    // Enforce placeholder cooldown (development only — production blocked above)
     if (isPlaceholder && isPlaceholderCapped()) {
       setPlaceholderCooldownFlag(true);
       trackRewardedAdDeclined('placeholder_cooldown', platformForDecline, undefined);
@@ -262,6 +279,7 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
       adMob.showRewarded(
         () => { awardCoinsAndNotify(); },
         (errMsg) => { handleAdError(errMsg || 'Ad dismissed without reward'); },
+        { surface },
       );
     } else if (shouldUseSimulation) {
       // Priority 2: Simulation fallback for development/testing
@@ -278,7 +296,7 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
       onAdStarted?.();
       awardCoinsAndNotify();
     }
-  }, [status, isPlaceholder, shouldUseCrazyGames, shouldUseAdMob, shouldUseSimulation, crazyGames, adMob, rewardAmount, onRewardEarned, onAdError, onAdStarted, awardWatchedAd, rewardKind]);
+  }, [status, isDev, isPlaceholder, shouldUseCrazyGames, shouldUseAdMob, shouldUseSimulation, crazyGames, adMob, rewardAmount, onRewardEarned, onAdError, onAdStarted, awardWatchedAd, rewardKind, surface]);
 
   return {
     status,

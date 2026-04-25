@@ -274,6 +274,65 @@ describe('useAdMob', () => {
     warnSpy.mockRestore();
   });
 
+  it('showRewarded uses surface-specific unit ID when surface=hint env override is set', async () => {
+    process.env.NEXT_PUBLIC_ADMOB_REWARDED_HINT_ANDROID = 'ca-app-pub-x/hint';
+    const wrapper = makeWrapper(true);
+    const { result } = renderHook(() => useAdMob(), { wrapper });
+    await act(async () => {
+      const p = result.current.showRewarded(vi.fn(), undefined, { surface: 'hint' });
+      await Promise.resolve();
+      await Promise.resolve();
+      fireEvent('onRewardedVideoAdReward', { type: 'coins', amount: 10 });
+      fireEvent('onRewardedVideoAdDismissed');
+      await p;
+    });
+    expect(AdMob.prepareRewardVideoAd).toHaveBeenCalledWith(
+      expect.objectContaining({ adId: 'ca-app-pub-x/hint' })
+    );
+    delete process.env.NEXT_PUBLIC_ADMOB_REWARDED_HINT_ANDROID;
+  });
+
+  it('showRewarded falls back to generic unit when surface env not set', async () => {
+    const wrapper = makeWrapper(true);
+    const { result } = renderHook(() => useAdMob(), { wrapper });
+    await act(async () => {
+      const p = result.current.showRewarded(vi.fn(), undefined, { surface: 'freeze' });
+      await Promise.resolve();
+      await Promise.resolve();
+      fireEvent('onRewardedVideoAdReward', { type: 'coins', amount: 10 });
+      fireEvent('onRewardedVideoAdDismissed');
+      await p;
+    });
+    // Falls back to default android rewarded ID.
+    expect(AdMob.prepareRewardVideoAd).toHaveBeenCalledWith(
+      expect.objectContaining({ adId: expect.stringContaining('ca-app-pub-1896836706464880/3688045325') })
+    );
+  });
+
+  it('showBanner uses content variant unit when env override is set', async () => {
+    process.env.NEXT_PUBLIC_ADMOB_BANNER_CONTENT_ANDROID = 'ca-app-pub-x/banner-content';
+    const wrapper = makeWrapper(true);
+    const { result } = renderHook(() => useAdMob(), { wrapper });
+    await act(async () => {
+      await result.current.showBanner(BannerAdPosition.BOTTOM_CENTER, undefined, { variant: 'content' });
+    });
+    expect(AdMob.showBanner).toHaveBeenCalledWith(
+      expect.objectContaining({ adId: 'ca-app-pub-x/banner-content' })
+    );
+    delete process.env.NEXT_PUBLIC_ADMOB_BANNER_CONTENT_ANDROID;
+  });
+
+  it('showBanner with default variant uses game banner unit', async () => {
+    const wrapper = makeWrapper(true);
+    const { result } = renderHook(() => useAdMob(), { wrapper });
+    await act(async () => {
+      await result.current.showBanner();
+    });
+    expect(AdMob.showBanner).toHaveBeenCalledWith(
+      expect.objectContaining({ adId: 'ca-app-pub-1896836706464880/7714920248' })
+    );
+  });
+
   it('hideBanner still logs genuine errors', async () => {
     vi.mocked(AdMob.hideBanner).mockRejectedValueOnce({ message: 'internal SDK failure' });
     const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});

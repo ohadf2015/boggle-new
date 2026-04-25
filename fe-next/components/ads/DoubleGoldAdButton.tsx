@@ -39,6 +39,7 @@ export const DoubleGoldAdButton: React.FC<DoubleGoldAdButtonProps> = ({
 
   const { showAd, status, canShowAd, isPlaceholderCooldown } = useRewardedAd({
     rewardKind: 'feature',
+    surface: 'doubleGold',
     onRewardEarned: async () => {
       await addCoins(earnedAmount, 'Double Gold Ad', { surface, bonus: earnedAmount });
       setDoubled(true);

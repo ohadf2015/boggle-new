@@ -1,19 +1,31 @@
 import { useCallback } from 'react';
 import { AdMob, BannerAdSize, BannerAdPosition, RewardAdPluginEvents } from '@capacitor-community/admob';
 import { useAdMobContext } from '@/contexts/AdMobContext';
+import type { RewardedSurface, BannerVariant } from '@/lib/admob-config';
 
 // Module-level so every useAdMob() consumer observes the same banner state.
 // Prevents hideBanner calls when no banner was ever shown (Sentry #120).
 const bannerShownRef = { current: false };
 
+export interface ShowRewardedOptions {
+  surface?: RewardedSurface;
+}
+
+export interface ShowBannerOptions {
+  variant?: BannerVariant;
+}
+
 export function useAdMob() {
   const { recordGameEnd, shouldShowInterstitial, recordInterstitialShown, hasNoAds, getConfig, whenReady } = useAdMobContext();
   const isDev = process.env.NODE_ENV !== 'production';
 
-  const showRewarded = useCallback(async (onReward: () => void, onError?: (err: string) => void) => {
+  const showRewarded = useCallback(async (onReward: () => void, onError?: (err: string) => void, opts?: ShowRewardedOptions) => {
     if (hasNoAds()) return;
     const config = getConfig();
     if (!config) return;
+    const surface: RewardedSurface = opts?.surface ?? 'generic';
+    // Per-surface unit ID lets AdMob waterfall optimize each placement separately.
+    const adId = config.rewardedUnits?.[surface] ?? config.rewardedAdId;
 
     // Reward must come from the SDK's Rewarded event — Dismissed alone is ambiguous
     // (fires on both early-close and post-reward per plugin docs).
@@ -52,7 +64,7 @@ export function useAdMob() {
         (async () => {
           try {
             await whenReady();
-            await AdMob.prepareRewardVideoAd({ adId: config.rewardedAdId });
+            await AdMob.prepareRewardVideoAd({ adId });
             await AdMob.showRewardVideoAd();
           } catch (err) {
             const msg = err instanceof Error ? err.message : 'Ad failed';
@@ -82,14 +94,16 @@ export function useAdMob() {
     } catch {}
   }, [recordGameEnd, shouldShowInterstitial, recordInterstitialShown, getConfig, whenReady]);
 
-  const showBanner = useCallback(async (position = BannerAdPosition.BOTTOM_CENTER, margin?: number) => {
+  const showBanner = useCallback(async (position = BannerAdPosition.BOTTOM_CENTER, margin?: number, opts?: ShowBannerOptions) => {
     if (hasNoAds()) return;
     const config = getConfig();
     if (!config) return;
+    const variant: BannerVariant = opts?.variant ?? 'game';
+    const adId = config.bannerUnits?.[variant] ?? config.bannerAdId;
     try {
       await whenReady();
       await AdMob.showBanner({
-        adId: config.bannerAdId,
+        adId,
         adSize: BannerAdSize.ADAPTIVE_BANNER,
         position,
         isTesting: isDev,

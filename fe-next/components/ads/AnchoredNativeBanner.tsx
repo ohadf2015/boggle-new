@@ -25,9 +25,10 @@ export default function AnchoredNativeBanner() {
 
     AdMob.addListener(BannerAdPluginEvents.SizeChanged, (info: { height: number }) => {
       const h = info?.height ?? 0;
-      // Var = total vertical space banner occupies from viewport bottom.
-      // Android: plugin margin adds safe-area, so total = h + safeArea.
-      // iOS: plugin uses safeAreaLayoutGuide (home indicator excluded automatically), total = h.
+      // Var = banner clearance from viewport bottom (used by in-game content that
+      // hides the bottom nav). Android plugin margin adds safe-area; iOS plugin
+      // adds safeAreaLayoutGuide internally. Nav-related lift is NOT in this var —
+      // pages with the nav use `has-global-bottom-nav` for their own clearance.
       const total = h > 0 ? h + (isAndroid ? (safeArea.bottom || 0) : 0) : 0;
       document.documentElement.style.setProperty('--admob-banner-height', `${total}px`);
     })
@@ -35,7 +36,7 @@ export default function AnchoredNativeBanner() {
       .catch(() => {});
 
     // Without these, a failed/closed banner leaves the var inflated from a prior
-    // SizeChanged event → GlobalBottomNav floats mid-screen above empty space.
+    // SizeChanged event → in-game content floats mid-screen above empty space.
     AdMob.addListener(BannerAdPluginEvents.FailedToLoad, resetVar)
       .then((handle) => { removers.push(() => handle.remove()); })
       .catch(() => {});
@@ -56,15 +57,26 @@ export default function AnchoredNativeBanner() {
     let cancelled = false;
 
     if (isAllowedAdBannerRoute(pathname)) {
-      // Banner pins flush at webview bottom. GlobalBottomNav floats above it via
-      // the --admob-banner-height CSS var (set by SizeChanged above). On Android,
-      // margin lifts the banner above the gesture bar; iOS uses safeAreaLayoutGuide.
+      // Banner is lifted above GlobalBottomNav (when present) via plugin `margin`,
+      // so the nav stays flush at viewport bottom and the banner sits directly above.
+      // Game pages hide the nav (NavigationContext.isInGame); banner then falls back
+      // to safe-area-only margin (Android) or 0 (iOS, plugin handles safeAreaLayoutGuide).
       const isAndroid = Capacitor.getPlatform() === 'android';
-      const margin = isAndroid ? (safeArea.bottom || 0) : 0;
+      const safeBottom = safeArea.bottom || 0;
+      const navEl = document.querySelector<HTMLElement>('[data-global-bottom-nav]');
+      const navHeight = navEl ? Math.round(navEl.getBoundingClientRect().height) : 0;
+      // Android: nav.offsetHeight already includes safe-area via paddingBottom, so margin = navHeight ≥ safeBottom.
+      // iOS: plugin re-adds safe-area, subtract to avoid double-count; floor at 0.
+      const margin = isAndroid
+        ? Math.max(navHeight, safeBottom)
+        : Math.max(0, navHeight - safeBottom);
       (async () => {
         await hideBanner();
         if (cancelled) return;
-        await showBanner(BannerAdPosition.BOTTOM_CENTER, margin);
+        // AnchoredNativeBanner renders only on non-game surfaces (profile,
+        // leaderboard, blog, glossary, etc.) per isAllowedAdBannerRoute, so
+        // we tag this as the 'content' variant for separate eCPM optimization.
+        await showBanner(BannerAdPosition.BOTTOM_CENTER, margin, { variant: 'content' });
       })();
     } else {
       hideBanner();

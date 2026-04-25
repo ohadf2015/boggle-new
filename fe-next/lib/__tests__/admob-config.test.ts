@@ -43,4 +43,67 @@ describe('getAdmobConfig', () => {
     const config = getAdmobConfig('android');
     expect(config.rewardedAdId).toBe(DEFAULTS.android.rewardedAdId);
   });
+
+  // --- Segmented rewarded units ---
+
+  it('exposes rewardedUnits map with all surfaces falling back to generic', () => {
+    const config = getAdmobConfig('android');
+    expect(config.rewardedUnits).toBeDefined();
+    expect(config.rewardedUnits.generic).toBe(DEFAULTS.android.rewardedAdId);
+    expect(config.rewardedUnits.hint).toBe(DEFAULTS.android.rewardedAdId);
+    expect(config.rewardedUnits.doubleGold).toBe(DEFAULTS.android.rewardedAdId);
+    expect(config.rewardedUnits.freeze).toBe(DEFAULTS.android.rewardedAdId);
+    expect(config.rewardedUnits.retry).toBe(DEFAULTS.android.rewardedAdId);
+    expect(config.rewardedUnits.timeLow).toBe(DEFAULTS.android.rewardedAdId);
+  });
+
+  it('per-surface env override for hint takes precedence over generic env', () => {
+    process.env.NEXT_PUBLIC_ADMOB_REWARDED_ANDROID = 'ca-app-pub-x/generic';
+    process.env.NEXT_PUBLIC_ADMOB_REWARDED_HINT_ANDROID = 'ca-app-pub-x/hint';
+    const config = getAdmobConfig('android');
+    expect(config.rewardedUnits.hint).toBe('ca-app-pub-x/hint');
+    expect(config.rewardedUnits.generic).toBe('ca-app-pub-x/generic');
+    expect(config.rewardedUnits.doubleGold).toBe('ca-app-pub-x/generic');
+  });
+
+  it('cross-platform per-surface env applies to both platforms', () => {
+    process.env.NEXT_PUBLIC_ADMOB_REWARDED_FREEZE = 'ca-app-pub-x/freeze';
+    expect(getAdmobConfig('android').rewardedUnits.freeze).toBe('ca-app-pub-x/freeze');
+    expect(getAdmobConfig('ios').rewardedUnits.freeze).toBe('ca-app-pub-x/freeze');
+  });
+
+  it('platform-specific per-surface env beats cross-platform per-surface', () => {
+    process.env.NEXT_PUBLIC_ADMOB_REWARDED_RETRY = 'ca-app-pub-x/retry-any';
+    process.env.NEXT_PUBLIC_ADMOB_REWARDED_RETRY_ANDROID = 'ca-app-pub-x/retry-android';
+    expect(getAdmobConfig('android').rewardedUnits.retry).toBe('ca-app-pub-x/retry-android');
+    expect(getAdmobConfig('ios').rewardedUnits.retry).toBe('ca-app-pub-x/retry-any');
+  });
+
+  it('legacy rewardedAdId mirrors rewardedUnits.generic', () => {
+    process.env.NEXT_PUBLIC_ADMOB_REWARDED_ANDROID = 'ca-app-pub-x/legacy-generic';
+    const config = getAdmobConfig('android');
+    expect(config.rewardedAdId).toBe(config.rewardedUnits.generic);
+  });
+
+  // --- Segmented banner variants ---
+
+  it('exposes bannerUnits map with content falling back to game banner', () => {
+    const config = getAdmobConfig('android');
+    expect(config.bannerUnits).toBeDefined();
+    expect(config.bannerUnits.game).toBe(DEFAULTS.android.bannerAdId);
+    expect(config.bannerUnits.content).toBe(DEFAULTS.android.bannerAdId);
+  });
+
+  it('content banner env override is independent from game banner', () => {
+    process.env.NEXT_PUBLIC_ADMOB_BANNER_CONTENT_ANDROID = 'ca-app-pub-x/banner-content';
+    const config = getAdmobConfig('android');
+    expect(config.bannerUnits.content).toBe('ca-app-pub-x/banner-content');
+    expect(config.bannerUnits.game).toBe(DEFAULTS.android.bannerAdId);
+  });
+
+  it('legacy bannerAdId mirrors bannerUnits.game', () => {
+    process.env.NEXT_PUBLIC_ADMOB_BANNER_ANDROID = 'ca-app-pub-x/legacy-banner';
+    const config = getAdmobConfig('android');
+    expect(config.bannerAdId).toBe(config.bannerUnits.game);
+  });
 });

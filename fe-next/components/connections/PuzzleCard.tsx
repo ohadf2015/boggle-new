@@ -86,6 +86,7 @@ export default function PuzzleCard({
   // Rewarded-ad gate for non-admin reveal-answer
   const revealAnswerAd = useRewardedFeatureUnlock({
     placement: 'connections_reveal_answer',
+    surface: 'hint',
     onUnlock: onGiveUp,
     disabled: isAdmin || isDisabled,
     context: { puzzleId: puzzle.id, difficulty: puzzle.difficulty },
@@ -94,6 +95,7 @@ export default function PuzzleCard({
   // Rewarded-ad gate for non-admin reveal-hint
   const revealHintAd = useRewardedFeatureUnlock({
     placement: 'connections_reveal_hint',
+    surface: 'hint',
     onUnlock: onRevealHint,
     disabled: isAdmin || state.hintRevealed || isDisabled || !puzzle.hint,
     context: { puzzleId: puzzle.id },

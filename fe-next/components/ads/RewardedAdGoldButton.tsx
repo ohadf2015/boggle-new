@@ -41,6 +41,7 @@ export const RewardedAdGoldButton: React.FC<RewardedAdGoldButtonProps> = ({
   const [burstKey, setBurstKey] = useState(0);
 
   const { showAd, status, isPlaceholderCooldown } = useRewardedAd({
+    surface: 'doubleGold',
     onRewardEarned: (amount) => {
       onRewardEarned?.(amount);
     },
