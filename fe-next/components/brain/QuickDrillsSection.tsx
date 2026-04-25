@@ -147,7 +147,7 @@ export default function QuickDrillsSection({ drillProgress: _drillProgress = EMP
 
                   <div className="flex flex-col items-start min-w-0 flex-1">
                     <p className={cn(
-                      'text-sm md:text-base font-bold text-left line-clamp-1',
+                      'text-sm md:text-base font-bold text-start line-clamp-1',
                       isDarkMode ? 'text-neo-white' : 'text-neo-black'
                     )}>
                       {t(`brain.drills.${drill.id}.name`)}

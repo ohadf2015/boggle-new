@@ -301,9 +301,18 @@ router.get('/leaderboard/:date/:language', async (req: Request<LeaderboardParams
       .is('player_id', null)
       .not('guest_fingerprint', 'is', null);
 
+    // Wheel has no `solved` boolean — anyone who submitted ≥1 word counts as solved.
+    const { count: totalSolvedCount } = await supabase
+      .from('daily_word_wheel_attempts')
+      .select('*', { count: 'exact', head: true })
+      .eq('puzzle_date', date)
+      .eq('language', language)
+      .gt('word_count', 0);
+
     res.json({
       data: rerankedData,
       totalParticipants: rerankedData.length,
+      totalSolved: totalSolvedCount ?? 0,
       totalAttempts: totalCount ?? 0,
       guestPlayerCount: guestCount ?? 0,
       date,

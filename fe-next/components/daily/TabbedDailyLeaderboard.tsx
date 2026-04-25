@@ -238,7 +238,14 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
         huntJson.totalPlayers || 0,
         wheelJson.totalParticipants || 0,
       );
-      const totalSolved = huntJson.totalSolved || 0;
+      // Solved per scope. Combined sums both modes — slight overcount for players
+      // who played both, but server-side counts include off-leaderboard solvers
+      // (guests, anyone past top 100), which the merged client map can't see.
+      const totalSolved = scope === 'word-hunt'
+        ? (huntJson.totalSolved || 0)
+        : scope === 'word-wheel'
+          ? (wheelJson.totalSolved || 0)
+          : (huntJson.totalSolved || 0) + (wheelJson.totalSolved || 0);
       const guestCount = (huntJson.guestPlayerCount || 0) + (wheelJson.guestPlayerCount || 0);
 
       setTodayParticipants(data);

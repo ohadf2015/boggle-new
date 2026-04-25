@@ -3128,6 +3128,12 @@ html {
   html.has-global-bottom-nav .main-content-safe {
     padding-bottom: calc(var(--bottom-nav-height, 64px) + env(safe-area-inset-bottom, 0px));
   }
+  /* Belt-and-suspenders: pages whose own scroll container (overflow-y-auto on a
+     descendant of <main>) bypass body/main padding. Pad the immediate child of
+     main so the inner scroller's last content sits above the fixed nav. */
+  html.has-global-bottom-nav main.main-content-safe > div {
+    padding-bottom: calc(var(--bottom-nav-height, 64px) + env(safe-area-inset-bottom, 0px));
+  }
   html.has-global-bottom-nav {
     scroll-padding-bottom: calc(var(--bottom-nav-height, 64px) + env(safe-area-inset-bottom, 0px));
   }

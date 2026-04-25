@@ -56,7 +56,7 @@ export default function ComboMaster({
   onPlayAgain,
 }: ComboMasterProps) {
   const { t, dir } = useLanguage();
-  const { playErrorSound, playDrillStartSound, playSound } = useSoundEffects();
+  const { playErrorSound, playDrillStartSound, playDrillCompleteSound } = useSoundEffects();
 
   const levelConfig = LEVEL_CONFIGS[Math.min(level - 1, LEVEL_CONFIGS.length - 1)];
 
@@ -200,10 +200,10 @@ export default function ComboMaster({
   // Handle completion
   useEffect(() => {
     if (phase === 'complete') {
-      playSound('drillComplete');
+      playDrillCompleteSound();
       onComplete(getResults());
     }
-  }, [phase, getResults, onComplete, playSound]);
+  }, [phase, getResults, onComplete, playDrillCompleteSound]);
 
   // Cleanup
   useEffect(() => {

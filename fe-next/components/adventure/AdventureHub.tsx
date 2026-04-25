@@ -13,7 +13,7 @@ import dynamic from 'next/dynamic';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import Image from 'next/image';
 const CrazyGamesBanner = dynamic(() => import('@/components/CrazyGamesBanner'), { ssr: false });
-import { Flame, ChevronRight, Map, Swords, Target, Check, Coins, Star, ShoppingBag, Crown, Zap, Infinity as InfinityIcon, Trophy, Award } from 'lucide-react';
+import { ArrowLeft, Flame, ChevronRight, Map, Swords, Target, Check, Coins, Star, ShoppingBag, Crown, Zap, Infinity as InfinityIcon, Trophy, Award } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { GhostRivalWidget } from '@/components/engagement/GhostRivalWidget';
@@ -137,6 +137,16 @@ const AdventureHub = memo<AdventureHubProps>(({
         />
         {/* Gradient overlay */}
         <div className="absolute inset-0 bg-linear-to-t from-neo-navy via-neo-navy/60 to-transparent" />
+
+        {/* Back to home — overlaid top-start */}
+        <Link
+          href="/"
+          aria-label={t('common.back')}
+          className="absolute top-2 start-2 z-20 flex items-center justify-center w-10 h-10 rounded-neo bg-neo-navy/60 text-neo-white/80 hover:text-neo-white hover:bg-neo-navy/80 transition-colors"
+          style={{ marginTop: 'env(safe-area-inset-top, 0px)' }}
+        >
+          <ArrowLeft className="w-5 h-5 rtl:rotate-180" />
+        </Link>
 
         {/* Player stats — overlaid bottom */}
         <div className="absolute bottom-3 inset-x-3 flex items-end justify-between z-10">

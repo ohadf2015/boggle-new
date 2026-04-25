@@ -1,9 +1,8 @@
 'use client';
 
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
-import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -13,6 +12,8 @@ import DrillProgressionOverlay from '@/components/brain/DrillProgressionOverlay'
 import { useDrillGrid } from '@/hooks/useDrillGrid';
 import { useSaveDrillResult, DrillBrainScoreUpdate } from '@/hooks/useSaveDrillResult';
 import { useDrillRewards } from '@/hooks/useDrillRewards';
+import { useDrillLevel } from '@/hooks/useDrillLevel';
+import { trackDrillStart } from '@/lib/drills/telemetry';
 import { FeatureErrorBoundary } from '@/components/ErrorBoundaries';
 
 /**
@@ -29,6 +30,7 @@ export default function RareGemsPageClient() {
   const isDarkMode = theme === 'dark';
   const { saveDrillResult } = useSaveDrillResult();
   const { awardDrillRewards } = useDrillRewards();
+  const drillLevel = useDrillLevel('rare-gems');
 
   // State for progression overlay
   const [showProgressionOverlay, setShowProgressionOverlay] = useState(false);
@@ -43,6 +45,13 @@ export default function RareGemsPageClient() {
     setIsInGame(true);
     return () => setIsInGame(false);
   }, [setIsInGame]);
+
+  const startFiredRef = useRef(false);
+  React.useEffect(() => {
+    if (isLoading || startFiredRef.current) return;
+    startFiredRef.current = true;
+    trackDrillStart({ drillType: 'rare-gems', level: drillLevel });
+  }, [isLoading, drillLevel]);
 
   const handleComplete = useCallback(async (result: {
     score: number;
@@ -85,13 +94,10 @@ export default function RareGemsPageClient() {
         'flex-1 flex items-center justify-center',
         isDarkMode ? 'bg-neo-navy' : 'bg-neo-cream'
       )}>
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-          className={cn(
-            'w-12 h-12 border-4 border-t-transparent rounded-full',
-            isDarkMode ? 'border-neo-green' : 'border-neo-green'
-          )}
+        <div
+          role="status"
+          aria-label={t('common.loading')}
+          className="w-12 h-12 border-4 border-t-transparent rounded-full border-neo-green motion-safe:animate-spin"
         />
       </div>
     );
@@ -137,7 +143,7 @@ export default function RareGemsPageClient() {
           <RareGems
             grid={grid}
             availableWords={availableWords}
-            level={1}
+            level={drillLevel}
             language={language}
             onComplete={handleComplete}
             onExit={handleExit}

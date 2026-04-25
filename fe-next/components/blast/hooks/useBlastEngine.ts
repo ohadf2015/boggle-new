@@ -73,6 +73,12 @@ export interface UseBlastEngineReturn {
   startCascade: () => CascadeResult;
   stopCascade: () => void;
   setTileStates: (updater: (prev: BlastTileState[][]) => BlastTileState[][]) => void;
+  /** Seed tile states from outside the engine (e.g. rewarded-ad bomb buff). Updates
+   *  both React state AND the internal tileStatesRef so subsequent cascade/gravity
+   *  reads (which canonicalize on the ref) see the seeded tiles. Plain setTileStates
+   *  only writes React state, so the next move's gravity result, derived from the
+   *  stale ref, would silently wipe the seed. */
+  seedTileStates: (updater: (prev: BlastTileState[][]) => BlastTileState[][]) => void;
   trackWordFail: () => void;
   /** Consume a move without clearing tiles (e.g. invalid word submission) */
   consumeMove: () => void;
@@ -514,6 +520,14 @@ export function useBlastEngine(
     tileStates: tileStatesRef.current,
   }), []);
 
+  /** Seed tile states from outside the engine while keeping the canonical ref
+   *  in sync — see UseBlastEngineReturn.seedTileStates docstring. */
+  const seedTileStates = useCallback((updater: (prev: BlastTileState[][]) => BlastTileState[][]) => {
+    const next = updater(tileStatesRef.current);
+    tileStatesRef.current = next;
+    setTileStates(next);
+  }, []);
+
   /** Apply server-authoritative board state (MP sync) */
   const applyServerBoard = useCallback((newGrid: LetterGrid, newTileStates: BlastTileState[][]) => {
     effectiveGridRef.current = newGrid;
@@ -533,6 +547,7 @@ export function useBlastEngine(
     startCascade,
     stopCascade,
     setTileStates,
+    seedTileStates,
     trackWordFail,
     consumeMove,
     addBonusScore,

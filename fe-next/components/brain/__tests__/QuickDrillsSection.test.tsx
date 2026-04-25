@@ -91,7 +91,7 @@ describe('QuickDrillsSection', () => {
       const { container } = render(<QuickDrillsSection />);
 
       // Title text should scale up on desktop
-      const titleElements = container.querySelectorAll('.font-bold.text-left');
+      const titleElements = container.querySelectorAll('.font-bold.text-start');
       expect(titleElements.length).toBeGreaterThan(0);
 
       const firstTitle = titleElements[0];

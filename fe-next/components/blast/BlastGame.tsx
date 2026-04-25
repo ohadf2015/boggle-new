@@ -27,6 +27,7 @@ import { useBlastCascade } from './hooks/useBlastCascade';
 import { useBlastWordHandler } from './hooks/useBlastWordHandler';
 import { useBlastGameEnd, type DeadEndFinaleTile } from './hooks/useBlastGameEnd';
 import { BlastContinueModal } from './BlastContinueModal';
+import { shouldOfferBlastContinue } from './utils/blastContinueOffer';
 import type { BlastPregameBuff } from './BlastPregameBuffModal';
 import { useBlastBuffEffects } from './hooks/useBlastBuffEffects';
 import { useBlastObjectiveEffects } from './hooks/useBlastObjectiveEffects';
@@ -116,7 +117,7 @@ export function BlastGame({
   });
 
   // Pre-game buff effects (wave-1, SP only): bomb seed, shield revive, combo2x score multiplier.
-  const { scoreMultiplier: buffScoreMultiplier, shieldConsumed, shieldToastVisible } =
+  const { scoreMultiplier: buffScoreMultiplier, shieldConsumed, shieldToastVisible, buffIntroVisible } =
     useBlastBuffEffects({ buff: initialBuff, waveNumber, isMultiplayer, engine });
 
   const combo = useComboSystem({ trackMaxCombo: true, onComboSound: playComboSound, timerIntervalMs: 250 });
@@ -386,12 +387,14 @@ export function BlastGame({
   // While the modal is open we defer Sugar Crush so the player can revive cleanly.
   const hasUsedContinueRef = useRef(false);
   const [continueDeclined, setContinueDeclined] = useState(false);
-  const continueModalOpen =
-    hasRealAdProvider
-    && !isMultiplayer
-    && engine.gameState.isDeadEnd
-    && !hasUsedContinueRef.current
-    && !continueDeclined;
+  const continueModalOpen = shouldOfferBlastContinue({
+    hasRealAdProvider,
+    isMultiplayer,
+    isDeadEnd: engine.gameState.isDeadEnd,
+    noWordsRemaining: engine.noWordsRemaining,
+    hasUsedContinue: hasUsedContinueRef.current,
+    continueDeclined,
+  });
 
   const handleContinueAccept = useCallback(() => {
     hasUsedContinueRef.current = true;
@@ -456,6 +459,30 @@ export function BlastGame({
           <span className="text-xl">🛡️</span>{t('blast.pregameBuff.shieldTriggered') || 'Shield saved you!'}
         </div>
       )}
+
+      {buffIntroVisible && initialBuff && (() => {
+        const buffMeta = {
+          shield: { emoji: '🛡️', bg: 'bg-neo-cyan' },
+          bomb: { emoji: '💣', bg: 'bg-neo-pink' },
+          combo2x: { emoji: '⚡', bg: 'bg-neo-lime' },
+        }[initialBuff];
+        const label = t(`blast.pregameBuff.${initialBuff}`) || initialBuff;
+        const desc = t(`blast.pregameBuff.${initialBuff}Desc`) || '';
+        return (
+          <div
+            data-testid="blast-buff-intro-toast"
+            role="status"
+            aria-live="polite"
+            className={`fixed top-20 left-1/2 -translate-x-1/2 z-[80] flex items-center gap-3 rounded-neo border-neo-thick border-black ${buffMeta.bg} px-5 py-3 font-neo-display text-base font-black uppercase tracking-wide text-neo-navy shadow-hard-lg animate-neo-pop`}
+          >
+            <span className="text-2xl">{buffMeta.emoji}</span>
+            <div className="flex flex-col leading-tight">
+              <span>{t('blast.pregameBuff.activeLabel', { buff: label }) || `${label} active`}</span>
+              {desc && <span className="text-[10px] font-bold normal-case opacity-80">{desc}</span>}
+            </div>
+          </div>
+        );
+      })()}
 
       <BlastStage
         grid={engine.grid}

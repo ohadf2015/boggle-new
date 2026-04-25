@@ -115,11 +115,13 @@ const AdventureWheelGame: React.FC<Props> = ({ levelConfig, onLevelComplete, onE
     const gold = Math.floor(baseGold * upgradeEffects.goldMultiplier) + longWordBonus;
     // Persist to DB via ProgressionContext — server is source of truth for
     // gold/XP/unlocks. Fire-and-forget; UI advances via onLevelComplete.
+    const timePlayed = Math.max(0, Math.floor(result.timeSeconds));
     if (stars > 0) {
       void completeLevel(
         levelConfig.world, levelConfig.level,
         stars, result.score, result.wordsFound.length,
-        gold, longWords, result.wordsFound
+        gold, longWords, result.wordsFound,
+        undefined, timePlayed
       );
       chapterQuests.recordWordsFound(result.wordsFound.length);
       chapterQuests.recordScoreChallenge(result.score);

@@ -375,6 +375,7 @@ const en = {
   },
   "common": {
     "email": "Email",
+    "free": "Free",
     "loading": "Shuffling letters...",
     "error": "Whoops!",
     "errorOccurred": "Something broke!",
@@ -5360,7 +5361,21 @@ const en = {
       "allLettersRevealed": "All letters revealed!",
       "clueUnlocked": "{name} Unlocked! (-{cost} Coins)",
       "longWordBonus": "🔥 +{bonus} long word bonus!",
-      "scoreBreakdownTooltip": "Tap for details"
+      "scoreBreakdownTooltip": "Tap for details",
+      "score": {
+        "tier": {
+          "bronze": "Bronze",
+          "silver": "Silver",
+          "gold": "Gold",
+          "platinum": "Platinum",
+          "bronzeFlavor": "Warming up",
+          "silverFlavor": "Solid run",
+          "goldFlavor": "On fire",
+          "platinumFlavor": "Legendary",
+          "maxed": "Maxed out",
+          "toNext": "{points} to {next}"
+        }
+      }
     },
     "desktop": {
       "liveRanks": "Live Ranks",
@@ -8265,7 +8280,8 @@ const en = {
       "ctaDefault": "Pick a boost above",
       "skip": "No thanks",
       "claim": "FREE BOOST",
-      "shieldTriggered": "Shield saved you! +2 moves"
+      "shieldTriggered": "Shield saved you! +2 moves",
+      "activeLabel": "{buff} active!"
     },
     "chain": {
       "badge": "Chain x{level}",

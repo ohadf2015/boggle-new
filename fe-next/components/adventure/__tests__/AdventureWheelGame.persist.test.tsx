@@ -84,10 +84,10 @@ describe('AdventureWheelGame — P0-1 persistence', () => {
     );
 
     expect(capturedOnComplete).toBeTruthy();
-    capturedOnComplete!({ score: 250, wordsFound: ['HELLO', 'WORLDS'] });
+    capturedOnComplete!({ score: 250, wordsFound: ['HELLO', 'WORLDS'], timeSeconds: 47 });
 
     expect(completeLevelMock).toHaveBeenCalledTimes(1);
-    const [world, level, stars, score, words, gold, longWords, wordsFound] =
+    const [world, level, stars, score, words, gold, longWords, wordsFound, flashChallengeGold, timePlayed] =
       completeLevelMock.mock.calls[0];
     expect(world).toBe(2);
     expect(level).toBe(5);
@@ -97,6 +97,8 @@ describe('AdventureWheelGame — P0-1 persistence', () => {
     expect(gold).toBeGreaterThan(0);
     expect(longWords).toBe(1);
     expect(wordsFound).toEqual(['HELLO', 'WORLDS']);
+    expect(flashChallengeGold).toBeUndefined();
+    expect(timePlayed).toBe(47);
     expect(onLevelComplete).toHaveBeenCalled();
   });
 });

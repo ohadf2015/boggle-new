@@ -375,6 +375,7 @@ const he = {
   },
   "common": {
     "email": "אימייל",
+    "free": "חינם",
     "loading": "מערבב אותיות...",
     "error": "אופס!",
     "errorOccurred": "אירעה שגיאה",
@@ -5242,7 +5243,21 @@ const he = {
       "allLettersRevealed": "כל האותיות נחשפו!",
       "clueUnlocked": "{name} נפתח! (-{cost} מטבעות)",
       "longWordBonus": "🔥 +{bonus} בונוס מילה ארוכה!",
-      "scoreBreakdownTooltip": "לחץ לפרטים"
+      "scoreBreakdownTooltip": "לחץ לפרטים",
+      "score": {
+        "tier": {
+          "bronze": "ארד",
+          "silver": "כסף",
+          "gold": "זהב",
+          "platinum": "פלטינום",
+          "bronzeFlavor": "מתחממים",
+          "silverFlavor": "ריצה איתנה",
+          "goldFlavor": "בוערים",
+          "platinumFlavor": "אגדי",
+          "maxed": "במקסימום",
+          "toNext": "{points} עד {next}"
+        }
+      }
     },
     "desktop": {
       "liveRanks": "דירוג חי",
@@ -8050,7 +8065,8 @@ const he = {
       "ctaDefault": "בחר בוסט למעלה",
       "skip": "לא, תודה",
       "claim": "בוסט חינם",
-      "shieldTriggered": "המגן הציל אותך! +2 מהלכים"
+      "shieldTriggered": "המגן הציל אותך! +2 מהלכים",
+      "activeLabel": "{buff} פעיל!"
     },
     "chain": {
       "badge": "שרשרת x{level}",

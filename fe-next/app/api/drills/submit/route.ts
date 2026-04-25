@@ -9,6 +9,8 @@ import {
   getTierFromScore,
   calculateTierProgress,
 } from '@/utils/cognitiveScoring';
+import { computeDrillProgressUpdate } from '@/shared/utils/drillLeveling';
+import { validateDrillSubmission } from '@/shared/utils/drillSubmissionValidation';
 
 interface DrillSubmitRequest {
   drillType: DrillType;
@@ -67,27 +69,22 @@ export async function POST(request: NextRequest) {
 
     const { drillType, level, score, durationSeconds, wordsFound, domainScoreEarned, extraData } = body;
 
-    if (!drillType || !level || score === undefined || durationSeconds === undefined || wordsFound === undefined) {
+    if (
+      drillType === undefined ||
+      level === undefined ||
+      score === undefined ||
+      durationSeconds === undefined ||
+      wordsFound === undefined
+    ) {
       return NextResponse.json(
         { error: 'Missing required fields: drillType, level, score, durationSeconds, wordsFound' },
         { status: 400 }
       );
     }
 
-    const validDrillTypes: DrillType[] = [
-      'lightning-round',
-      'memory-hunt',
-      'combo-master',
-      'pattern-switcher',
-      'rare-gems',
-    ];
-
-    if (!validDrillTypes.includes(drillType)) {
-      return NextResponse.json({ error: 'Invalid drill type' }, { status: 400 });
-    }
-
-    if (level < 1 || level > 5) {
-      return NextResponse.json({ error: 'Level must be between 1 and 5' }, { status: 400 });
+    const validation = validateDrillSubmission({ drillType, level, score, wordsFound, durationSeconds });
+    if (!validation.ok) {
+      return NextResponse.json({ error: validation.error }, { status: 400 });
     }
 
     const { data: sessionData, error: sessionError } = await supabase
@@ -126,21 +123,28 @@ export async function POST(request: NextRequest) {
       console.error('Error fetching drill progress:', progressError);
     }
 
-    if (progressData) {
-      const newHighScore = Math.max(progressData.high_score || 0, score);
-      const newTotalPlays = (progressData.total_plays || 0) + 1;
-      const newTotalScore = (progressData.total_score || 0) + score;
-      const newAvgScore = Math.round(newTotalScore / newTotalPlays);
+    const priorSnapshot = progressData
+      ? {
+          level: progressData.level ?? 1,
+          highScore: progressData.high_score ?? 0,
+          totalPlays: progressData.total_plays ?? 0,
+          totalScore: progressData.total_score ?? 0,
+        }
+      : null;
+    const nextProgress = computeDrillProgressUpdate(priorSnapshot, score);
+    const nowIso = new Date().toISOString();
 
+    if (progressData) {
       const { error: updateError } = await supabase
         .from('drill_progress')
         .update({
-          high_score: newHighScore,
-          total_plays: newTotalPlays,
-          total_score: newTotalScore,
-          avg_score: newAvgScore,
-          last_played_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
+          level: nextProgress.level,
+          high_score: nextProgress.highScore,
+          total_plays: nextProgress.totalPlays,
+          total_score: nextProgress.totalScore,
+          avg_score: nextProgress.avgScore,
+          last_played_at: nowIso,
+          updated_at: nowIso,
         })
         .eq('id', progressData.id);
 
@@ -153,12 +157,12 @@ export async function POST(request: NextRequest) {
         .insert({
           user_id: user.id,
           drill_type: drillType,
-          level,
-          high_score: score,
-          total_plays: 1,
-          total_score: score,
-          avg_score: score,
-          last_played_at: new Date().toISOString(),
+          level: nextProgress.level,
+          high_score: nextProgress.highScore,
+          total_plays: nextProgress.totalPlays,
+          total_score: nextProgress.totalScore,
+          avg_score: nextProgress.avgScore,
+          last_played_at: nowIso,
         });
 
       if (insertError) {

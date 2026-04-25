@@ -375,6 +375,7 @@ const ja = {
   },
   "common": {
     "email": "メール",
+    "free": "無料",
     "loading": "文字をシャッフル中...",
     "error": "おっと！",
     "errorOccurred": "エラーが発生しました",
@@ -5283,7 +5284,21 @@ const ja = {
       "allLettersRevealed": "すべての文字が公開されました！",
       "clueUnlocked": "{name}解放！（-{cost}コイン）",
       "longWordBonus": "🔥 +{bonus} 長い単語ボーナス！",
-      "scoreBreakdownTooltip": "詳細はタップ"
+      "scoreBreakdownTooltip": "詳細はタップ",
+      "score": {
+        "tier": {
+          "bronze": "ブロンズ",
+          "silver": "シルバー",
+          "gold": "ゴールド",
+          "platinum": "プラチナ",
+          "bronzeFlavor": "ウォームアップ",
+          "silverFlavor": "好調",
+          "goldFlavor": "絶好調",
+          "platinumFlavor": "伝説級",
+          "maxed": "最大到達",
+          "toNext": "次のランクまで{points}"
+        }
+      }
     },
     "desktop": {
       "liveRanks": "ライブランキング",
@@ -8067,7 +8082,8 @@ const ja = {
       "ctaDefault": "上のブーストを選択",
       "skip": "やめる",
       "claim": "無料ブースト",
-      "shieldTriggered": "シールドが救った！＋2手"
+      "shieldTriggered": "シールドが救った！＋2手",
+      "activeLabel": "{buff} 発動中！"
     },
     "chain": {
       "badge": "チェイン x{level}",

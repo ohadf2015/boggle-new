@@ -223,6 +223,44 @@ describe('RoomChat', () => {
       fireEvent.change(input, { target: { value: 'Hello' } });
       expect(sendButton).not.toBeDisabled();
     });
+
+    it('enables send button for whitespace-only input (trims on send)', () => {
+      // Regression: prior `!inputMessage.trim()` disable hid button while user
+      // had visible (whitespace) content. Disable now keys on raw length.
+      render(<RoomChat {...defaultProps} />);
+      const input = screen.getByPlaceholderText('Type a message...');
+      const sendButton = screen.getByRole('button', { name: 'Send message' });
+
+      fireEvent.change(input, { target: { value: '   ' } });
+      expect(sendButton).not.toBeDisabled();
+    });
+  });
+
+  describe('IME composition', () => {
+    it('does not send on Enter while composing (e.g. Japanese kana)', () => {
+      render(<RoomChat {...defaultProps} />);
+      const input = screen.getByPlaceholderText('Type a message...');
+
+      fireEvent.change(input, { target: { value: 'こ' } });
+      fireEvent.compositionStart(input);
+      fireEvent.keyDown(input, { key: 'Enter', isComposing: true });
+
+      expect(mockSocket.emit).not.toHaveBeenCalledWith('chatMessage', expect.any(Object));
+    });
+
+    it('sends on Enter after compositionEnd', () => {
+      render(<RoomChat {...defaultProps} />);
+      const input = screen.getByPlaceholderText('Type a message...');
+
+      fireEvent.compositionStart(input);
+      fireEvent.change(input, { target: { value: 'こんにちは' } });
+      fireEvent.compositionEnd(input, { data: 'こんにちは' });
+      fireEvent.keyDown(input, { key: 'Enter' });
+
+      expect(mockSocket.emit).toHaveBeenCalledWith('chatMessage', expect.objectContaining({
+        message: 'こんにちは'
+      }));
+    });
   });
 
   describe('chat history', () => {

@@ -131,13 +131,13 @@ export function BlastHUD({
                 data-testid="blast-active-buff-chip"
                 data-consumed={buffConsumed ? 'true' : 'false'}
                 className={cn(
-                  'shrink-0 inline-flex items-center gap-1 rounded-lg border-2 border-black px-1.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-neo-navy shadow-hard transition-all',
+                  'shrink-0 inline-flex items-center gap-1.5 rounded-lg border-2 border-black px-2.5 py-1 text-xs font-black uppercase tracking-wider text-neo-navy shadow-hard transition-all animate-neo-pop',
                   buffConsumed ? 'bg-white/20 text-white/40 line-through opacity-60 shadow-none' : `${meta.bg} blast-heartbeat`,
                 )}
                 style={NO_TEXT_SHADOW_STYLE}
                 aria-label={(t(meta.label) || activeBuff) + (buffConsumed ? ` (${t('common.used') || 'used'})` : '')}
               >
-                <Icon className="h-3 w-3" strokeWidth={3} />
+                <Icon className="h-4 w-4" strokeWidth={3} />
                 {t(meta.label) || activeBuff}
               </span>
             );

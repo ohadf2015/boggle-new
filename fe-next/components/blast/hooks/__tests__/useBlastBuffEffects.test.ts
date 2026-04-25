@@ -39,13 +39,13 @@ function makeBoard(size = 4): BlastTileState[][] {
 
 function makeEngine(overrides: Partial<{ tileStates: BlastTileState[][]; isDeadEnd: boolean; isComplete: boolean }> = {}) {
   let tileStates = overrides.tileStates ?? makeBoard();
-  const setTileStates = vi.fn((updater: (prev: BlastTileState[][]) => BlastTileState[][]) => {
+  const seedTileStates = vi.fn((updater: (prev: BlastTileState[][]) => BlastTileState[][]) => {
     tileStates = updater(tileStates);
   });
   return {
     grid: [['a','b','c','d'],['e','f','g','h'],['i','j','k','l'],['m','n','o','p']],
     get tileStates() { return tileStates; },
-    setTileStates,
+    seedTileStates,
     revive: vi.fn(),
     gameState: { isDeadEnd: overrides.isDeadEnd ?? false, isComplete: overrides.isComplete ?? false },
   };
@@ -80,7 +80,7 @@ describe('useBlastBuffEffects — bomb', () => {
   it('seeds BOMB_BUFF_SEED_COUNT bomb tiles on wave 1 SP', () => {
     const engine = makeEngine();
     renderHook(() => useBlastBuffEffects({ buff: 'bomb', waveNumber: 1, isMultiplayer: false, engine }));
-    expect(engine.setTileStates).toHaveBeenCalledTimes(1);
+    expect(engine.seedTileStates).toHaveBeenCalledTimes(1);
     const bombs = engine.tileStates.flat().filter(t => t.type === 'bomb');
     expect(bombs).toHaveLength(BOMB_BUFF_SEED_COUNT);
   });
@@ -88,13 +88,13 @@ describe('useBlastBuffEffects — bomb', () => {
   it('does not seed bombs on wave 2+', () => {
     const engine = makeEngine();
     renderHook(() => useBlastBuffEffects({ buff: 'bomb', waveNumber: 2, isMultiplayer: false, engine }));
-    expect(engine.setTileStates).not.toHaveBeenCalled();
+    expect(engine.seedTileStates).not.toHaveBeenCalled();
   });
 
   it('does not seed bombs in multiplayer', () => {
     const engine = makeEngine();
     renderHook(() => useBlastBuffEffects({ buff: 'bomb', waveNumber: 1, isMultiplayer: true, engine }));
-    expect(engine.setTileStates).not.toHaveBeenCalled();
+    expect(engine.seedTileStates).not.toHaveBeenCalled();
   });
 
   it('does not double-seed on rerender', () => {
@@ -102,7 +102,7 @@ describe('useBlastBuffEffects — bomb', () => {
     const { rerender } = renderHook(() => useBlastBuffEffects({ buff: 'bomb', waveNumber: 1, isMultiplayer: false, engine }));
     rerender();
     rerender();
-    expect(engine.setTileStates).toHaveBeenCalledTimes(1);
+    expect(engine.seedTileStates).toHaveBeenCalledTimes(1);
   });
 });
 
@@ -170,5 +170,31 @@ describe('useBlastBuffEffects — combo2x', () => {
     const engine = makeEngine();
     const { result } = renderHook(() => useBlastBuffEffects({ buff: null, waveNumber: 1, isMultiplayer: false, engine }));
     expect(result.current.scoreMultiplier).toBe(1);
+  });
+});
+
+describe('useBlastBuffEffects — buffIntroVisible', () => {
+  it('is true on wave-1 SP entry with any buff', () => {
+    const engine = makeEngine();
+    const { result } = renderHook(() => useBlastBuffEffects({ buff: 'shield', waveNumber: 1, isMultiplayer: false, engine }));
+    expect(result.current.buffIntroVisible).toBe(true);
+  });
+
+  it('is false when no buff is selected', () => {
+    const engine = makeEngine();
+    const { result } = renderHook(() => useBlastBuffEffects({ buff: null, waveNumber: 1, isMultiplayer: false, engine }));
+    expect(result.current.buffIntroVisible).toBe(false);
+  });
+
+  it('is false on wave 2+ even with a buff', () => {
+    const engine = makeEngine();
+    const { result } = renderHook(() => useBlastBuffEffects({ buff: 'bomb', waveNumber: 2, isMultiplayer: false, engine }));
+    expect(result.current.buffIntroVisible).toBe(false);
+  });
+
+  it('is false in multiplayer', () => {
+    const engine = makeEngine();
+    const { result } = renderHook(() => useBlastBuffEffects({ buff: 'combo2x', waveNumber: 1, isMultiplayer: true, engine }));
+    expect(result.current.buffIntroVisible).toBe(false);
   });
 });

@@ -67,6 +67,7 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
   const { isOnCrazyGamesPlatform } = useCrazyGames();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputMessage, setInputMessage] = useState('');
+  const [isComposing, setIsComposing] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const [latestAnnouncement, setLatestAnnouncement] = useState('');
   const parentRef = useRef<HTMLDivElement>(null);
@@ -237,7 +238,7 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
+    if (e.key === 'Enter' && !isComposing && !e.nativeEvent.isComposing) {
       e.preventDefault();
       sendMessage();
     }
@@ -390,6 +391,11 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInputMessage(e.target.value)}
             onKeyDown={handleKeyDown}
             onFocus={handleInputFocus}
+            onCompositionStart={() => setIsComposing(true)}
+            onCompositionEnd={(e: React.CompositionEvent<HTMLInputElement>) => {
+              setIsComposing(false);
+              setInputMessage(e.currentTarget.value);
+            }}
             placeholder={t('chat.placeholder')}
             aria-label={t('chat.placeholder')}
             maxLength={200}
@@ -398,7 +404,7 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
           />
           <Button
             onClick={sendMessage}
-            disabled={!inputMessage.trim()}
+            disabled={inputMessage.length === 0 || !socket}
             size="icon"
             variant="cyan"
             className="shrink-0"

@@ -374,6 +374,7 @@ const es = {
     }
   },
   "common": {
+    "free": "Gratis",
     "loading": "Mezclando letras...",
     "error": "¡Ups!",
     "errorOccurred": "Ocurrió un error",
@@ -5212,7 +5213,21 @@ const es = {
       "allLettersRevealed": "¡Todas las letras reveladas!",
       "clueUnlocked": "¡{name} desbloqueada! (-{cost} monedas)",
       "longWordBonus": "🔥 +{bonus} bonus por palabra larga!",
-      "scoreBreakdownTooltip": "Toca para detalles"
+      "scoreBreakdownTooltip": "Toca para detalles",
+      "score": {
+        "tier": {
+          "bronze": "Bronce",
+          "silver": "Plata",
+          "gold": "Oro",
+          "platinum": "Platino",
+          "bronzeFlavor": "Calentando",
+          "silverFlavor": "Buena racha",
+          "goldFlavor": "En llamas",
+          "platinumFlavor": "Legendario",
+          "maxed": "Al máximo",
+          "toNext": "{points} para {next}"
+        }
+      }
     },
     "desktop": {
       "liveRanks": "Clasificación en Vivo",
@@ -8086,7 +8101,8 @@ const es = {
       "ctaDefault": "Elige un boost arriba",
       "skip": "No, gracias",
       "claim": "BOOST GRATIS",
-      "shieldTriggered": "¡El escudo te salvó! +2 movimientos"
+      "shieldTriggered": "¡El escudo te salvó! +2 movimientos",
+      "activeLabel": "¡{buff} activo!"
     },
     "chain": {
       "badge": "Cadena x{level}",

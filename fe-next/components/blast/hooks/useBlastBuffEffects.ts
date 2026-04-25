@@ -12,7 +12,10 @@ interface BuffEffectsParams {
   engine: {
     grid: unknown;
     tileStates: BlastTileState[][];
-    setTileStates: (updater: (prev: BlastTileState[][]) => BlastTileState[][]) => void;
+    /** Synced seeder — updates React state AND tileStatesRef so the bombs survive
+     *  the first cascade. Plain setTileStates would let gravity, which reads the
+     *  stale ref, wipe them on the next move. */
+    seedTileStates: (updater: (prev: BlastTileState[][]) => BlastTileState[][]) => void;
     revive: (bonusMoves: number) => void;
     gameState: { isDeadEnd: boolean; isComplete: boolean };
   };
@@ -25,10 +28,15 @@ interface BuffEffectsReturn {
   shieldConsumed: boolean;
   /** Transient flag — true for SHIELD_TOAST_DURATION_MS right after the shield fires. */
   shieldToastVisible: boolean;
+  /** Transient flag — true for BUFF_INTRO_DURATION_MS at the start of wave-1 SP
+   *  to confirm to the player that their rewarded-ad buff is active. */
+  buffIntroVisible: boolean;
 }
 
 /** Duration the "shield triggered" toast stays on screen, in ms. */
 export const SHIELD_TOAST_DURATION_MS = 2800;
+/** Duration the "buff active" intro banner stays on screen, in ms. */
+export const BUFF_INTRO_DURATION_MS = 3000;
 
 /** Number of bomb tiles seeded into the wave-1 board for the bomb buff. */
 export const BOMB_BUFF_SEED_COUNT = 3;
@@ -56,6 +64,7 @@ export function useBlastBuffEffects({
   const shieldArmedRef = useRef(false);
   const [shieldConsumed, setShieldConsumed] = useState(false);
   const [shieldToastVisible, setShieldToastVisible] = useState(false);
+  const [buffIntroVisible, setBuffIntroVisible] = useState(false);
 
   // Arm shield once per buff selection.
   useEffect(() => {
@@ -70,7 +79,7 @@ export function useBlastBuffEffects({
     if (!engine.grid || engine.tileStates.length === 0) return;
 
     bombSeededRef.current = true;
-    engine.setTileStates(prev => seedBombTiles(prev, BOMB_BUFF_SEED_COUNT));
+    engine.seedTileStates(prev => seedBombTiles(prev, BOMB_BUFF_SEED_COUNT));
     // eslint-disable-next-line react-hooks/exhaustive-deps -- one-shot seed; engine ref methods are stable
   }, [buff, isWave1Singleplayer, engine.grid, engine.tileStates.length]);
 
@@ -95,9 +104,18 @@ export function useBlastBuffEffects({
     return () => clearTimeout(timer);
   }, [shieldToastVisible]);
 
+  // Show the "buff active" intro banner once on wave-1 SP entry so the player
+  // sees what the rewarded ad bought them. Auto-dismiss after BUFF_INTRO_DURATION_MS.
+  useEffect(() => {
+    if (!isWave1Singleplayer || !buff) return;
+    setBuffIntroVisible(true);
+    const timer = setTimeout(() => setBuffIntroVisible(false), BUFF_INTRO_DURATION_MS);
+    return () => clearTimeout(timer);
+  }, [isWave1Singleplayer, buff]);
+
   const scoreMultiplier = isWave1Singleplayer && buff === 'combo2x' ? COMBO_2X_BUFF_MULTIPLIER : 1;
 
-  return { scoreMultiplier, shieldConsumed, shieldToastVisible };
+  return { scoreMultiplier, shieldConsumed, shieldToastVisible, buffIntroVisible };
 }
 
 /**

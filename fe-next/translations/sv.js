@@ -375,6 +375,7 @@ const sv = {
   },
   "common": {
     "email": "E-post",
+    "free": "Gratis",
     "loading": "Blandar bokstäver...",
     "error": "Hoppsan!",
     "errorOccurred": "Ett fel uppstod",
@@ -5262,7 +5263,21 @@ const sv = {
       "allLettersRevealed": "Alla bokstäver avslöjade!",
       "clueUnlocked": "{name} upplåst! (-{cost} mynt)",
       "longWordBonus": "🔥 +{bonus} bonus för långt ord!",
-      "scoreBreakdownTooltip": "Tryck för detaljer"
+      "scoreBreakdownTooltip": "Tryck för detaljer",
+      "score": {
+        "tier": {
+          "bronze": "Brons",
+          "silver": "Silver",
+          "gold": "Guld",
+          "platinum": "Platina",
+          "bronzeFlavor": "Värmer upp",
+          "silverFlavor": "Stadig runda",
+          "goldFlavor": "På elden",
+          "platinumFlavor": "Legendarisk",
+          "maxed": "Max nått",
+          "toNext": "{points} till {next}"
+        }
+      }
     },
     "desktop": {
       "liveRanks": "Live Ranking",
@@ -8091,7 +8106,8 @@ const sv = {
       "ctaDefault": "Välj en boost ovan",
       "skip": "Nej tack",
       "claim": "GRATIS BOOST",
-      "shieldTriggered": "Skölden räddade dig! +2 drag"
+      "shieldTriggered": "Skölden räddade dig! +2 drag",
+      "activeLabel": "{buff} aktiv!"
     },
     "chain": {
       "badge": "Kedja x{level}",
