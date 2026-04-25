@@ -168,10 +168,12 @@ export async function adminAuth(req: AdminRequest, res: Response, next: NextFunc
     // Forward admin context to downstream Next.js handlers via mutated request
     // headers — saves a duplicate getUser+profile roundtrip in App Router routes
     // mounted under /api/admin (e.g. android-beta send routes).
+    // Header values must be ASCII (RFC 7230); non-ASCII names crash undici's
+    // ByteString conversion — percent-encode and decodeURIComponent on read.
     req.headers['x-admin-user-id'] = user.id;
-    req.headers['x-admin-email'] = user.email ?? '';
-    req.headers['x-admin-username'] = profile.username ?? '';
-    req.headers['x-admin-display-name'] = profile.display_name ?? '';
+    req.headers['x-admin-email'] = encodeURIComponent(user.email ?? '');
+    req.headers['x-admin-username'] = encodeURIComponent(profile.username ?? '');
+    req.headers['x-admin-display-name'] = encodeURIComponent(profile.display_name ?? '');
 
     // Log successful admin access (no PII — use admin ID only)
     logger.debug('ADMIN_API', `Admin access: ${user.id} -> ${req.method} ${req.path} [${requestId}]`);
