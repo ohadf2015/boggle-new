@@ -325,35 +325,42 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
   return (
     <div className="relative flex-1 flex flex-col min-h-0 bg-neo-navy p-3 md:p-4 gap-2 overflow-hidden">
       {/* Top bar: leaderboard (fog-of-war) + quit */}
-      <div className="flex items-center justify-between gap-3">
-        <div className="flex flex-wrap gap-2">
+      <div className="flex items-center justify-between gap-2 shrink-0 pt-[env(safe-area-inset-top)]">
+        <div className="flex items-center gap-1.5 overflow-x-auto flex-1 min-w-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {leaderboard.map(p => {
             const isSelf = p.username === username;
             const fogged = !isSelf && fogActive;
+            const wc = p.wordCount ?? 0;
             return (
               <div
                 key={p.username}
                 className={cn(
-                  'px-3 py-1.5 rounded-neo border-2 border-neo-black font-neo-display font-bold text-sm shadow-hard',
+                  'shrink-0 px-2.5 py-1 rounded-neo border-2 border-neo-black font-neo-display font-bold text-xs sm:text-sm shadow-hard whitespace-nowrap',
                   isSelf ? 'bg-neo-lime text-neo-black' : 'bg-neo-navy-light text-neo-cream',
                 )}
               >
-                {p.username}: {fogged ? '???' : p.score}
-                {fogged && p.wordCount != null && (
-                  <span className="ms-1 text-xs opacity-60">({p.wordCount}w)</span>
+                <span className="opacity-80">{p.username}</span>
+                <span className="mx-1 opacity-40">·</span>
+                {fogged ? (
+                  <span className="tracking-wider">???</span>
+                ) : (
+                  <span className="tabular-nums">{p.score}</span>
+                )}
+                {wc > 0 && (
+                  <span className="ms-1 text-[10px] sm:text-xs opacity-60 tabular-nums">{wc}w</span>
                 )}
               </div>
             );
           })}
         </div>
-        <div className="flex items-center gap-2">
-          <Button size="sm" variant="destructive" onClick={onQuit}>{t('common.quit') || 'Quit'}</Button>
-        </div>
+        <Button size="sm" variant="destructive" onClick={onQuit} className="shrink-0">{t('common.quit') || 'Quit'}</Button>
       </div>
 
       {fogActive && (
-        <div className="text-center text-xs text-neo-cyan font-neo-body">
-          {t('wheel.rush.fogActive') || `Fog of war: ${Math.ceil((fogEndsAt - now) / 1000)}s`}
+        <div className="text-center text-xs sm:text-sm text-neo-cyan font-neo-display font-bold tracking-wide flex items-center justify-center gap-2 shrink-0">
+          <span className="inline-block w-1.5 h-1.5 rounded-full bg-neo-cyan animate-pulse" />
+          {t('wheel.rush.fogActive') || 'Fog of War active!'}
+          <span className="opacity-60 tabular-nums">{Math.ceil((fogEndsAt - now) / 1000)}s</span>
         </div>
       )}
 
@@ -412,10 +419,8 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
         </AnimatePresence>
       </motion.div>
 
-      <div className="flex-1 min-h-2" />
-
-      {/* Wheel */}
-      <div className="flex items-center justify-center">
+      {/* Wheel cluster — fills remaining vertical space, centered */}
+      <div className="flex-1 flex flex-col items-center justify-center min-h-0 gap-2">
         <div
           ref={wheelContainerRef}
           className="relative w-52 h-52 sm:w-64 sm:h-64 md:w-72 md:h-72 flex items-center justify-center touch-none"
@@ -459,14 +464,13 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
             />
           ))}
         </div>
+        <p className="text-neo-cream/40 text-xs text-center px-2">
+          {t('wordWheel.centerLetterRule') || 'Must include center letter'} &middot; {(t('wordWheel.minLetters') || 'Min {min} letters').replace('{min}', String(MIN_LEN))}
+        </p>
       </div>
 
-      <p className="text-neo-cream/40 text-xs text-center mt-1">
-        {t('wordWheel.centerLetterRule') || 'Must include center letter'} &middot; {(t('wordWheel.minLetters') || 'Min {min} letters').replace('{min}', String(MIN_LEN))}
-      </p>
-
       {/* Actions (Clear / Submit / Shuffle) */}
-      <div className="flex items-center justify-center gap-3 mt-1">
+      <div className="flex items-center justify-center gap-3 shrink-0">
         <motion.button
           type="button"
           onClick={handleClear}
@@ -517,7 +521,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
         </motion.button>
       </div>
 
-      <StealableLocks locks={stealableLocks} now={now} username={username} />
+      {!fogActive && <StealableLocks locks={stealableLocks} now={now} username={username} t={t} />}
       <MyWordsChips words={myWords} />
 
       <div className="pointer-events-none absolute inset-0 z-40">

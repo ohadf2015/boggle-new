@@ -269,7 +269,7 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
                 : showFeedback && visibleFeedback?.type === 'duplicate'
                   ? (visibleFeedback.message || t('wordFeedback.duplicate'))
                   : showFeedback && visibleFeedback?.type === 'foundByOther'
-                    ? (visibleFeedback.message || t('game.foundByOther').replace('${player}', visibleFeedback.foundBy || ''))
+                    ? (visibleFeedback.message || t('game.foundByOther', { player: visibleFeedback.foundBy || '' }))
                     : displayWord}
             </span>
 

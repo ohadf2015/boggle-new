@@ -72,7 +72,7 @@ export interface UseWordSubmissionOptions {
   /** Current combo level for scoring */
   comboLevel?: number;
   /** Translation function */
-  t?: (key: string) => string;
+  t?: (key: string, params?: Record<string, string | number>) => string;
   /** Called when word is accepted */
   onWordAccepted?: (word: string, score: number, comboBonus: number, fireRoundBonus: number) => void;
   /** Called when word is rejected */
@@ -332,10 +332,11 @@ export function useWordSubmission(options: UseWordSubmissionOptions): WordSubmis
     );
 
     if (!localValidation.isValid) {
-      let msg = t(localValidation.errorKey ?? 'Invalid word');
-      if (localValidation.errorParams?.min) {
-        msg = msg.replace('${min}', String(localValidation.errorParams.min));
-      }
+      const errorKey = localValidation.errorKey ?? 'Invalid word';
+      const params = localValidation.errorParams?.min
+        ? { min: String(localValidation.errorParams.min) }
+        : undefined;
+      const msg = params ? t(errorKey, params) : t(errorKey);
       setCurrentFeedback({
         id: `reject-${now}`,
         type: 'rejected',

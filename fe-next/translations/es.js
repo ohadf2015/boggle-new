@@ -10576,6 +10576,12 @@ const es = {
       "inverter": "Runas de chip desactivadas, solo funcionan los multiplicadores"
     }
   },
+  "wheel": {
+    "rush": {
+      "loading": "Cargando...",
+      "fogActive": "¡Niebla de guerra activa!"
+    }
+  },
   "socketErrors": {
     "AUTH_REQUIRED": "Se requiere iniciar sesión para esta acción",
     "GAME_NOT_FOUND": "Partida no encontrada. ¡Revisa el código!",

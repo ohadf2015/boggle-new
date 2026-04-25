@@ -34,6 +34,46 @@ interface RenderedEmail {
   html: string;
 }
 
+// Sentinels survive React render unchanged (plain ASCII, no special chars).
+// Replaced post-render so we render the heavy 700+ line template ONCE per language
+// instead of per request. Avoids 30-60s sync render hangs in admin send path.
+const NAME_SENTINEL = '__LEXI_RECIPIENT_NAME__';
+const UNSUB_SENTINEL = 'https://__lexi_unsubscribe_sentinel__/';
+
+const htmlEntities: Record<string, string> = {
+  '&': '&amp;',
+  '<': '&lt;',
+  '>': '&gt;',
+  '"': '&quot;',
+  "'": '&#39;',
+};
+
+function htmlEscape(s: string): string {
+  return s.replace(/[&<>"']/g, (c) => htmlEntities[c]);
+}
+
+const renderCacheByLanguage = new Map<string, Promise<string>>();
+
+function getCachedTemplate(language: string, playUrl: string): Promise<string> {
+  const existing = renderCacheByLanguage.get(language);
+  if (existing) return existing;
+
+  const p = render(
+    AndroidBetaLaunchEmail({
+      recipientName: NAME_SENTINEL,
+      language,
+      unsubscribeUrl: UNSUB_SENTINEL,
+      playUrl,
+    })
+  ).catch((err) => {
+    renderCacheByLanguage.delete(language);
+    throw err;
+  });
+
+  renderCacheByLanguage.set(language, p);
+  return p;
+}
+
 export async function generateAndroidBetaLaunchHtml(
   params: RenderParams
 ): Promise<RenderedEmail> {
@@ -42,7 +82,12 @@ export async function generateAndroidBetaLaunchHtml(
     params.recipientName
   );
 
-  const html = await render(AndroidBetaLaunchEmail(params));
+  const template = await getCachedTemplate(params.language, params.playUrl);
+  const html = template
+    .split(NAME_SENTINEL)
+    .join(htmlEscape(params.recipientName))
+    .split(UNSUB_SENTINEL)
+    .join(params.unsubscribeUrl);
 
   return { subject, html };
 }

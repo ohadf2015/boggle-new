@@ -40,7 +40,7 @@ interface UseWordSubmissionOptions {
   /** Spam detection hook return */
   spamDetection: UseSpamDetectionReturn;
   /** Translation function */
-  t: (key: string) => string | undefined;
+  t: (key: string, params?: Record<string, string | number>) => string | undefined;
   /** Sound effects */
   playWordAcceptedSound: () => void;
   playComboSound: (level: number) => void;
@@ -185,10 +185,10 @@ export function useWordSubmission({
 
     if (!localValidation.isValid) {
       const errorKey = localValidation.errorKey ?? 'Invalid word';
-      let msg = t(errorKey) || errorKey;
-      if (localValidation.errorParams?.min) {
-        msg = msg.replace('${min}', String(localValidation.errorParams.min));
-      }
+      const params = localValidation.errorParams?.min
+        ? { min: String(localValidation.errorParams.min) }
+        : undefined;
+      const msg = (params ? t(errorKey, params) : t(errorKey)) || errorKey;
       setCurrentFeedback({
         id: `reject-${now}`,
         type: 'rejected',

@@ -10492,6 +10492,12 @@ const ja = {
       "inverter": "チップルーン無効、倍率のみ有効"
     }
   },
+  "wheel": {
+    "rush": {
+      "loading": "読み込み中...",
+      "fogActive": "戦場の霧 発動中！"
+    }
+  },
   "socketErrors": {
     "AUTH_REQUIRED": "この操作にはサインインが必要です",
     "GAME_NOT_FOUND": "ゲームが見つかりません。コードを確認してください！",

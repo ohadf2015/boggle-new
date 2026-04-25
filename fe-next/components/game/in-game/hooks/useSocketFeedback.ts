@@ -101,7 +101,7 @@ export function useSocketFeedback(options: UseSocketFeedbackOptions): void {
         id: `rejected-${Date.now()}`,
         type: 'rejected',
         word: data.word,
-        message: t('playerView.wordNotOnBoard') || 'Not on board',
+        message: t('playerView.invalidWord') || 'Invalid word',
         timestamp: Date.now(),
       });
       playWordRejectedSound();
@@ -132,7 +132,7 @@ export function useSocketFeedback(options: UseSocketFeedbackOptions): void {
         type: 'foundByOther',
         word: data.word,
         score: hasPartialCredit ? data.confirmationScore : undefined,
-        message: t('playerView.foundByOther')?.replace('${player}', data.foundBy) || `Found by ${data.foundBy}`,
+        message: t('playerView.foundByOther', { player: data.foundBy }) || `Found by ${data.foundBy}`,
         foundBy: data.foundBy,
         foundByAvatar: data.foundByAvatar as WordFeedback['foundByAvatar'],
         timestamp: Date.now(),

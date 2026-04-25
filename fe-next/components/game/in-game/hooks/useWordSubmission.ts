@@ -85,9 +85,9 @@ export function useWordSubmission(
       const isDuplicate = validation.errorKey === 'playerView.wordAlreadyFound';
 
       if (validation.errorKey === 'playerView.wordTooShortMin') {
-        msg = t('playerView.wordTooShortMin')
-          ? t('playerView.wordTooShortMin').replace('${min}', String(validation.errorParams?.min || minWordLength))
-          : `Word too short! (min ${validation.errorParams?.min || minWordLength} letters)`;
+        const minVal = String(validation.errorParams?.min || minWordLength);
+        msg = t('playerView.wordTooShortMin', { min: minVal })
+          || `Word too short! (min ${minVal} letters)`;
       } else if (validation.errorKey === 'playerView.wordTooShort') {
         msg = t('playerView.wordTooShort') || 'Word too short';
       } else if (isDuplicate) {

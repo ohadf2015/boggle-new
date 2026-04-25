@@ -10554,6 +10554,12 @@ const he = {
     "thanks": "תודה על המשוב",
     "xpEarned": "נק׳ ניסיון"
   },
+  "wheel": {
+    "rush": {
+      "loading": "טוען...",
+      "fogActive": "ערפל הקרב פעיל!"
+    }
+  },
   "socketErrors": {
     "AUTH_REQUIRED": "נדרשת התחברות לפעולה זו",
     "GAME_NOT_FOUND": "משחק לא נמצא. בדוק את הקוד!",

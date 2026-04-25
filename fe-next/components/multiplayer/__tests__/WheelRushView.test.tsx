@@ -122,8 +122,10 @@ describe('WheelRushView', () => {
     act(() => {
       socket.fire('wheelRushInit', { puzzle, startedAt: Date.now() });
     });
-    expect(screen.getByText(/bob:\s*\?\?\?/)).toBeTruthy();
-    expect(screen.getByText(/alice:\s*10/)).toBeTruthy();
+    expect(screen.getByText('bob')).toBeTruthy();
+    expect(screen.getByText('???')).toBeTruthy();
+    expect(screen.getByText('alice')).toBeTruthy();
+    expect(screen.getByText('10')).toBeTruthy();
   });
 
   it('calls onQuit when quit button clicked', () => {

@@ -254,8 +254,10 @@ export function useSinglePlayerCore({
     const localValidation = validateWordLocally(normalizedWord, settings.language, minWordLength, foundWords.map(fw => ({ word: fw.word, isValid: fw.isValid })));
     if (!localValidation.isValid) {
       const errorKey = localValidation.errorKey ?? 'Invalid word';
-      let msg = t(errorKey) || errorKey;
-      if (localValidation.errorParams?.min) msg = msg.replace('${min}', String(localValidation.errorParams.min));
+      const params = localValidation.errorParams?.min
+        ? { min: String(localValidation.errorParams.min) }
+        : undefined;
+      const msg = (params ? t(errorKey, params) : t(errorKey)) || errorKey;
       setCurrentFeedback({ id: `reject-${now}`, type: 'rejected', word: normalizedWord, message: msg, timestamp: now });
       playWordRejectedSound(); hapticError(); announceWordResult(normalizedWord, false, undefined, msg); combo.resetCombo();
       return;
