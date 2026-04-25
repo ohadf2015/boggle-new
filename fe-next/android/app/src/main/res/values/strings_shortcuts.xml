@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!--
+  App shortcut labels (default locale = English).
+  Kept in a separate file from strings.xml so `cap sync android` doesn't wipe
+  these on regen. Localized variants live under values-{he,sv,ja,es}/strings.xml
+  (cap sync doesn't touch those).
+-->
+<resources>
+    <string name="shortcut_daily_short">Daily</string>
+    <string name="shortcut_daily_long">Daily Challenge</string>
+    <string name="shortcut_mp_short">Multiplayer</string>
+    <string name="shortcut_mp_long">Play Multiplayer</string>
+    <string name="shortcut_solo_short">Solo</string>
+    <string name="shortcut_solo_long">Single Player</string>
+    <string name="shortcut_connections_short">Connections</string>
+    <string name="shortcut_connections_long">Play Connections</string>
+</resources>
