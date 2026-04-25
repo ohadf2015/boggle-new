@@ -21,6 +21,7 @@ import {
   installTabVisibilityTracker,
 } from '@/utils/posthogEngagement';
 import { filterEmptyException } from '@/utils/posthogExceptionFilter';
+import { installAbandonOnPagehide } from '@/utils/abandonOnPagehide';
 
 let posthogInitialized = false;
 
@@ -97,6 +98,10 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
     // Tab-visibility tracker — attention time is a core engagement metric.
     const uninstallVisibility = installTabVisibilityTracker();
 
+    // Pagehide-driven game abandon — without this the "Game Abandoned" goal
+    // sees zero conversions because players close the tab rather than tap quit.
+    const uninstallAbandon = installAbandonOnPagehide();
+
     // React to consent changes — opt out only if user explicitly declines
     const unsubscribe = onConsentChange((state) => {
       if (!state.analytics) {
@@ -108,6 +113,7 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
 
     return () => {
       uninstallVisibility();
+      uninstallAbandon();
       unsubscribe();
     };
   }, []);

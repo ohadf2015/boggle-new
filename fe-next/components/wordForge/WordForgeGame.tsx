@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useHideNavigation } from '@/contexts/NavigationContext';
 import { useWordForgeRun } from '@/hooks/useWordForgeRun';
 import { useDictionaryCache } from '@/hooks/useDictionaryCache';
 import type { Language } from '@/shared/types/game';
@@ -36,6 +37,12 @@ export default function WordForgeGame(): React.JSX.Element {
   // Track triggered rune IDs for glow effect
   const [triggeredRuneIds, setTriggeredRuneIds] = useState<string[]>([]);
   const triggeredTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const setIsInGame = useHideNavigation();
+  useEffect(() => {
+    setIsInGame(run.state.phase === 'playing');
+    return () => setIsInGame(false);
+  }, [run.state.phase, setIsInGame]);
 
   useEffect(() => {
     if (run.lastWordScore?.runeEffects?.length) {

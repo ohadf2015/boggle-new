@@ -8058,9 +8058,14 @@ const ja = {
       "shield": "シールド",
       "bomb": "ボム",
       "combo2x": "コンボ2倍",
-      "cta": "広告を見てブースト",
-      "skip": "スキップ",
-      "claim": "ブーストを獲得"
+      "shieldDesc": "行き止まりを1回耐える — 自動復活＋2手",
+      "bombDesc": "ボード上にボムタイル3個が最初から配置",
+      "combo2xDesc": "最初のウェーブ中、全ての単語が2倍スコア",
+      "cta": "広告を見て {buff} を獲得",
+      "ctaDefault": "上のブーストを選択",
+      "skip": "やめる",
+      "claim": "無料ブースト",
+      "shieldTriggered": "シールドが救った！＋2手"
     },
     "chain": {
       "badge": "チェイン x{level}",

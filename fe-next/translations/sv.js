@@ -8082,9 +8082,14 @@ const sv = {
       "shield": "Sköld",
       "bomb": "Bomb",
       "combo2x": "2x Combo",
-      "cta": "Se annons för boost",
-      "skip": "Hoppa över",
-      "claim": "Hämta boost"
+      "shieldDesc": "Överlev en återvändsgränd — auto-återupplivning med +2 drag",
+      "bombDesc": "Börja med 3 bombrutor redan på brädet",
+      "combo2xDesc": "Varje ord ger dubbelt under hela första vågen",
+      "cta": "Se annons — Få {buff}",
+      "ctaDefault": "Välj en boost ovan",
+      "skip": "Nej tack",
+      "claim": "GRATIS BOOST",
+      "shieldTriggered": "Skölden räddade dig! +2 drag"
     },
     "chain": {
       "badge": "Kedja x{level}",

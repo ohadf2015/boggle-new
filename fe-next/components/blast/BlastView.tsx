@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useCallback, useRef, useMemo } from 'react';
+import { useState, useCallback, useRef, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Star } from 'lucide-react';
+import { Star, Gift, Shield, Bomb, Zap } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useHideNavigation } from '@/contexts/NavigationContext';
 import { useHasRealAdProvider } from '@/hooks/useHasRealAdProvider';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { BlastGame } from './BlastGame';
@@ -29,6 +30,12 @@ export function BlastView() {
   const [phase, setPhase] = useState<BlastPhase>('ready');
   const [results, setResults] = useState<BlastResultsData | null>(null);
   const gameKeyRef = useRef(0);
+
+  const setIsInGame = useHideNavigation();
+  useEffect(() => {
+    setIsInGame(phase === 'playing');
+    return () => setIsInGame(false);
+  }, [phase, setIsInGame]);
 
   // Wave tracking
   const checkpoint = useBlastCheckpoint();
@@ -182,20 +189,30 @@ export function BlastView() {
               {t('blast.ready.play')}
             </Button>
           )}
-          {pregameBuff ? (
-            <div
-              data-testid="blast-claimed-buff-chip"
-              className="rounded-neo border-neo-thick border-black bg-neo-cyan px-4 py-2 font-neo-display text-xs font-black uppercase text-neo-navy shadow-hard"
-            >
-              {t(`blast.pregameBuff.${pregameBuff}`)}
-            </div>
-          ) : hasRealAdProvider ? (
+          {pregameBuff ? (() => {
+            const BuffIcon = pregameBuff === 'shield' ? Shield : pregameBuff === 'bomb' ? Bomb : Zap;
+            const tone = pregameBuff === 'shield' ? 'bg-neo-cyan' : pregameBuff === 'bomb' ? 'bg-neo-pink' : 'bg-neo-lime';
+            return (
+              <div
+                data-testid="blast-claimed-buff-chip"
+                className={`flex items-center gap-2 rounded-neo border-neo-thick border-black ${tone} px-4 py-2 font-neo-display text-sm font-black uppercase text-neo-navy shadow-hard`}
+              >
+                <BuffIcon className="h-4 w-4" strokeWidth={3} />
+                <span>{t(`blast.pregameBuff.${pregameBuff}`)}</span>
+                <span className="text-[10px] opacity-70">· {t(`blast.pregameBuff.${pregameBuff}Desc`)}</span>
+              </div>
+            );
+          })() : hasRealAdProvider ? (
             <button
               data-testid="blast-claim-boost-button"
               onClick={() => setBuffModalOpen(true)}
-              className="rounded-neo border-neo-thick border-black bg-neo-pink px-4 py-2 font-neo-display text-xs font-black uppercase text-neo-navy shadow-hard hover:bg-neo-pink/90"
+              className="group relative flex items-center justify-center gap-2 rounded-neo border-neo-thick border-black bg-neo-pink px-6 py-3 font-neo-display text-sm font-black uppercase tracking-wide text-neo-navy shadow-hard-lg transition-all hover:scale-105 hover:bg-neo-pink-light active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-pressed"
             >
+              <Gift className="h-5 w-5 animate-neo-wobble" strokeWidth={3} />
               {t('blast.pregameBuff.claim')}
+              <span className="absolute -top-2 -right-2 rounded-full border-2 border-black bg-neo-lime px-1.5 py-0.5 text-[9px] font-black uppercase text-neo-navy shadow-hard">
+                {t('common.free') || 'Free'}
+              </span>
             </button>
           ) : null}
         </div>

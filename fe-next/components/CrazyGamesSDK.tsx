@@ -85,6 +85,14 @@ export function detectCrazyGamesSync(): boolean {
  */
 export function CrazyGamesProvider({ children }: { children: ReactNode }) {
   const [isAvailable, setIsAvailable] = useState(false);
+  // Sticky iframe detection — if we ever detect we're embedded in CrazyGames,
+  // we keep this true regardless of what SDK.getEnvironment() reports later.
+  // CG QA preview / `?disable*` flags can flip the SDK env to 'disabled' even
+  // though we're still rendered inside crazygames.com — UI policy (hiding
+  // external Sign In/Sign Up) must follow embed status, not ad-runtime status.
+  const [isInCrazyGamesIframe, setIsInCrazyGamesIframe] = useState<boolean>(
+    () => !CRAZYGAMES_FORCE_DISABLED && detectCrazyGamesSync()
+  );
   const [environment, setEnvironment] = useState<CrazyGamesEnvironment | null>(
     () => (!CRAZYGAMES_FORCE_DISABLED && detectCrazyGamesSync() ? 'crazygames' : null)
   );
@@ -131,6 +139,9 @@ export function CrazyGamesProvider({ children }: { children: ReactNode }) {
           const env = window.__crazyGamesEnvironment!;
           setEnvironment(env);
           setIsAvailable(env !== 'disabled');
+          if (env === 'crazygames' || isCrazyGamesIframe()) {
+            setIsInCrazyGamesIframe(true);
+          }
           try {
             setIsInstantMultiplayer(!!window.CrazyGames.SDK.game.isInstantMultiplayer);
           } catch {
@@ -151,6 +162,7 @@ export function CrazyGamesProvider({ children }: { children: ReactNode }) {
         // SDK failed to load but we're definitely on CrazyGames — hide external auth
         setEnvironment('crazygames');
         setIsAvailable(false);
+        setIsInCrazyGamesIframe(true);
       }
       setIsLoading(false);
 
@@ -385,7 +397,9 @@ export function CrazyGamesProvider({ children }: { children: ReactNode }) {
 
   const value: CrazyGamesContextType = {
     isAvailable,
-    isOnCrazyGamesPlatform: environment === 'crazygames',
+    // Embed-aware: stays true when SDK env is 'disabled' but the app is still
+    // rendered inside a CrazyGames iframe (e.g. CG QA preview, ?disableAds=true).
+    isOnCrazyGamesPlatform: environment === 'crazygames' || isInCrazyGamesIframe,
     environment,
     isLoading,
     deviceType,

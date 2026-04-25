@@ -8256,9 +8256,14 @@ const en = {
       "shield": "Shield",
       "bomb": "Bomb",
       "combo2x": "2x Combo",
-      "cta": "Watch Ad for Boost",
-      "skip": "Skip",
-      "claim": "Claim Boost"
+      "shieldDesc": "Survive one dead-end — auto-revive with +2 moves",
+      "bombDesc": "Start with 3 bomb tiles already on the board",
+      "combo2xDesc": "Every word scores double for the whole first wave",
+      "cta": "Watch Ad — Get {buff}",
+      "ctaDefault": "Pick a boost above",
+      "skip": "No thanks",
+      "claim": "FREE BOOST",
+      "shieldTriggered": "Shield saved you! +2 moves"
     },
     "chain": {
       "badge": "Chain x{level}",

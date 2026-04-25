@@ -14,6 +14,10 @@ vi.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
+vi.mock('@/contexts/NavigationContext', () => ({
+  useHideNavigation: () => vi.fn(),
+}));
+
 vi.mock('@/components/motion/AdaptiveMotion', () => {
   const passthrough = () => {
     const Comp = ({ children, ...props }: any) => {

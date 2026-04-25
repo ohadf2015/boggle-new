@@ -28,6 +28,7 @@ import { useBlastWordHandler } from './hooks/useBlastWordHandler';
 import { useBlastGameEnd, type DeadEndFinaleTile } from './hooks/useBlastGameEnd';
 import { BlastContinueModal } from './BlastContinueModal';
 import type { BlastPregameBuff } from './BlastPregameBuffModal';
+import { useBlastBuffEffects } from './hooks/useBlastBuffEffects';
 import { useBlastObjectiveEffects } from './hooks/useBlastObjectiveEffects';
 import type { ScoreFlyEvent } from './BlastScoreFly';
 import type { ClearedTileEvent } from './BlastEffectsCanvas';
@@ -61,13 +62,6 @@ interface BlastGameProps {
   username?: string;
   initialBuff?: BlastPregameBuff | null;
 }
-
-// Pre-game buff bonus moves (applied to wave 1 only, SP only)
-const BUFF_MOVE_BONUS: Record<BlastPregameBuff, number> = {
-  shield: 2,
-  bomb: 3,
-  combo2x: 1,
-};
 
 /**
  * BlastGame — main orchestrator for Blast Mode.
@@ -110,16 +104,9 @@ export function BlastGame({
     [waveNumber, isMultiplayer],
   );
 
-  // Pre-game buff: wave-1 only, SP only — bonus moves on top of wave budget.
-  const buffMoveBonus = !isMultiplayer && waveNumber === 1 && initialBuff
-    ? BUFF_MOVE_BONUS[initialBuff]
-    : 0;
-
   // Core engine
   const engine = useBlastEngine(config, {
-    movesAllowed: waveConfig?.movesAllowed != null
-      ? waveConfig.movesAllowed + buffMoveBonus
-      : waveConfig?.movesAllowed,
+    movesAllowed: waveConfig?.movesAllowed,
     waveObjectives,
     currentWave: waveNumber,
     isMultiplayer,
@@ -127,6 +114,10 @@ export function BlastGame({
     initialTileStates: isMultiplayer ? initialTileStates : undefined,
     minWordLength,
   });
+
+  // Pre-game buff effects (wave-1, SP only): bomb seed, shield revive, combo2x score multiplier.
+  const { scoreMultiplier: buffScoreMultiplier, shieldConsumed, shieldToastVisible } =
+    useBlastBuffEffects({ buff: initialBuff, waveNumber, isMultiplayer, engine });
 
   const combo = useComboSystem({ trackMaxCombo: true, onComboSound: playComboSound, timerIntervalMs: 250 });
   const sequencer = useBlastSequencer();
@@ -223,6 +214,7 @@ export function BlastGame({
     lastPathRef, flyIdRef, explosionShakeTimerRef, nearMissTimerRef,
     onWordWithComboTypeRef, onComboDetected,
     config, t,
+    scoreMultiplier: buffScoreMultiplier,
     effects: {
       setLastWordLength, setWordSubmitCount, setWordFoundParticle,
       setClearedTilesForEffects, setScoreFlyEvents,
@@ -459,6 +451,12 @@ export function BlastGame({
 
       <BlastMoveWarningMascot movesRemaining={engine.gameState.movesRemaining} t={tAdapter} />
 
+      {shieldToastVisible && (
+        <div data-testid="blast-shield-triggered-toast" role="status" aria-live="polite" className="fixed top-20 left-1/2 -translate-x-1/2 z-[80] flex items-center gap-2 rounded-neo border-neo-thick border-black bg-neo-cyan px-5 py-3 font-neo-display text-base font-black uppercase tracking-wide text-neo-navy shadow-hard-lg animate-neo-pop">
+          <span className="text-xl">🛡️</span>{t('blast.pregameBuff.shieldTriggered') || 'Shield saved you!'}
+        </div>
+      )}
+
       <BlastStage
         grid={engine.grid}
         tileStates={engine.tileStates}
@@ -494,6 +492,8 @@ export function BlastGame({
         explosionShake={explosionShake}
         lastWordLength={lastWordLength}
         wordSubmitCount={wordSubmitCount}
+        activeBuff={!isMultiplayer && waveNumber === 1 ? (initialBuff ?? null) : null}
+        buffConsumed={initialBuff === 'shield' ? shieldConsumed : false}
         t={tAdapter}
       />
     </div>

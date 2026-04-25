@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { X, Sparkles, Tag, FileText } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -23,14 +23,18 @@ export const AutoClueNotification: React.FC<AutoClueNotificationProps> = ({
   direction,
   t,
 }) => {
-  // Auto-dismiss after 3 seconds
+  // Auto-dismiss after 1.5 seconds. Use ref so the timer is set ONCE on mount
+  // and isn't reset by parent re-renders that produce a new onDismiss identity.
+  const onDismissRef = useRef(onDismiss);
+  onDismissRef.current = onDismiss;
+
   useEffect(() => {
     const timer = setTimeout(() => {
-      onDismiss();
-    }, 3000);
+      onDismissRef.current();
+    }, 1500);
 
     return () => clearTimeout(timer);
-  }, [onDismiss]);
+  }, []);
 
   // Get clue-specific content
   const getClueContent = () => {

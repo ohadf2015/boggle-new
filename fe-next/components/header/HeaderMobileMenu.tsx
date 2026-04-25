@@ -25,6 +25,7 @@ import { useEngagementStatus } from '@/hooks/useEngagementStatus';
 import { useDailyMissions } from '@/hooks/useDailyMissions';
 import { useRealtimeNotifications } from '@/hooks/useRealtimeNotifications';
 import { useCrazyGamesAuth } from '@/hooks/useCrazyGamesAuth';
+import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useFriends } from '@/hooks/useFriends';
 import { useFriendMessages } from '@/hooks/useFriendMessages';
 import { queryKeys } from '@/lib/queryKeys';
@@ -99,6 +100,7 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
         ? ((notifications ?? []) as NotificationData[]).filter(n => n.notification_type !== 'gift')
         : (notifications ?? []) as NotificationData[]);
     const { isCrazyGames } = useCrazyGamesAuth();
+    const { isLoading: cgLoading } = useCrazyGames();
     const queryClient = useQueryClient();
     const [showMobileMenu, setShowMobileMenu] = useState(false);
     const [lastSeenBadgeCount, setLastSeenBadgeCount] = useState<number>(() => {
@@ -257,8 +259,10 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
             <div className="sm:hidden flex items-center gap-2 min-w-0 shrink-0">
                 <MusicControls />
 
-                {/* Unified auth button for guests (hidden on CrazyGames) */}
-                {!isAuthenticated && !loading && !isCrazyGames && (
+                {/* Unified auth button for guests (hidden on CrazyGames).
+                    Also gated on `cgLoading` so the button does not flash
+                    before the SDK resolves the embed environment. */}
+                {!isAuthenticated && !loading && !cgLoading && !isCrazyGames && (
                     <button
                         onClick={onSignIn}
                         className={cn(

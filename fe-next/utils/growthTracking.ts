@@ -20,6 +20,7 @@ import {
   trackRageQuit,
   trackSessionDepth,
 } from '@/utils/posthogEngagement';
+import { markGameActive, markGameInactive } from '@/utils/abandonOnPagehide';
 
 // Growth event types for tracking viral loops and engagement
 export type GrowthEvent =
@@ -603,6 +604,7 @@ export const trackGameStart = (
   sessionGameCount += 1;
   trackGrowthEvent('game_started', { ...extras, mode, gameMode: mode });
   trackSessionDepth(sessionGameCount);
+  markGameActive(mode);
 };
 
 /**
@@ -616,6 +618,10 @@ export const trackGameEnd = (
   durationSec?: number,
   extras: Record<string, unknown> = {}
 ): void => {
+  // Game lifecycle ended (either path) — clear active flag so a later pagehide
+  // does not double-emit `game_abandoned`.
+  markGameInactive();
+
   trackGrowthEvent(completed ? 'game_completed' : 'game_abandoned', {
     ...extras,
     mode,

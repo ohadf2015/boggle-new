@@ -2,7 +2,7 @@
 // Gameplay routes hide the banner so it doesn't cover the play surface.
 // `/adventure` is intentionally allowed — adventure layout reserves space
 // via the --admob-banner-height CSS var so buttons are never covered.
-// `/profile` allows banner (passive menu, safe to monetize).
+// `/profile` and `/friends` allow banner (passive menu/social, safe to monetize).
 const GAME_ROUTES = [
   '/multiplayer',
   '/singleplayer',
@@ -16,7 +16,6 @@ const GAME_ROUTES = [
   '/student',
   '/auth/callback',
   '/hebrew-multiplayer-word-game',
-  '/friends',
 ];
 
 const LOCALE_PREFIX = /^\/(en|he|sv|ja|es)/;

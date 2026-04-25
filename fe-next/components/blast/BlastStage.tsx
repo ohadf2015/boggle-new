@@ -86,6 +86,9 @@ interface BlastStageProps {
   // Word praise feedback
   lastWordLength?: number;
   wordSubmitCount?: number;
+  // Pre-game buff visibility (HUD chip)
+  activeBuff?: 'shield' | 'bomb' | 'combo2x' | null;
+  buffConsumed?: boolean;
   // Translation
   t: (key: string) => string | undefined;
 }
@@ -130,6 +133,8 @@ export const BlastStage = memo(function BlastStage({
   explosionShake,
   lastWordLength = 0,
   wordSubmitCount = 0,
+  activeBuff = null,
+  buffConsumed = false,
   t,
 }: BlastStageProps) {
   const { score, wordsFound, movesRemaining, totalMoves, tilesCleared, totalTiles, isComplete, isDeadEnd } = gameState;
@@ -221,6 +226,8 @@ export const BlastStage = memo(function BlastStage({
         onShowHelp={onShowHelp ?? (() => setShowTileGuide(true))}
         comboStreak={comboStreak}
         comboStreakArcRef={comboStreakArcRef}
+        activeBuff={activeBuff}
+        buffConsumed={buffConsumed}
         t={t}
       />
       </div>

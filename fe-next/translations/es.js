@@ -8077,9 +8077,14 @@ const es = {
       "shield": "Escudo",
       "bomb": "Bomba",
       "combo2x": "Combo x2",
-      "cta": "Ver anuncio por boost",
-      "skip": "Saltar",
-      "claim": "Obtener boost"
+      "shieldDesc": "Sobrevive un punto muerto — revive automático con +2 movimientos",
+      "bombDesc": "Empieza con 3 fichas bomba ya en el tablero",
+      "combo2xDesc": "Cada palabra puntúa el doble durante toda la primera ola",
+      "cta": "Ver anuncio — Conseguir {buff}",
+      "ctaDefault": "Elige un boost arriba",
+      "skip": "No, gracias",
+      "claim": "BOOST GRATIS",
+      "shieldTriggered": "¡El escudo te salvó! +2 movimientos"
     },
     "chain": {
       "badge": "Cadena x{level}",

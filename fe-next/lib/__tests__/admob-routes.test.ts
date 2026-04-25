@@ -30,6 +30,11 @@ describe('isAllowedAdBannerRoute', () => {
     expect(isAllowedAdBannerRoute('/he/profile')).toBe(true);
   });
 
+  it('allows /friends (passive social list — safe for banner)', () => {
+    expect(isAllowedAdBannerRoute('/friends')).toBe(true);
+    expect(isAllowedAdBannerRoute('/he/friends')).toBe(true);
+  });
+
   it('returns false for null pathname', () => {
     expect(isAllowedAdBannerRoute(null)).toBe(false);
   });

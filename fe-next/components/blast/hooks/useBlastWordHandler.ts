@@ -50,6 +50,8 @@ interface UseBlastWordHandlerParams {
   config: BlastGameConfig;
   t: (key: string) => string;
   effects: WordHandlerEffects;
+  /** Multiplies baseScore before submission (e.g. combo2x pre-game buff). Defaults to 1. */
+  scoreMultiplier?: number;
 }
 
 export function useBlastWordHandler({
@@ -66,6 +68,7 @@ export function useBlastWordHandler({
   config,
   t,
   effects,
+  scoreMultiplier = 1,
 }: UseBlastWordHandlerParams) {
   const handleWordAccepted = useCallback(async (data: { word: string; score: number }) => {
     if (lastPathRef.current.length === 0) return;
@@ -102,8 +105,9 @@ export function useBlastWordHandler({
       row: c.row, col: c.col, type: c.type as BlastTileType,
     })));
 
-    // 2. Submit to engine
-    const result = engine.submitWord(path, data.word, data.score);
+    // 2. Submit to engine — apply pregame-buff score multiplier (combo2x) before scoring
+    const multipliedScore = scoreMultiplier !== 1 ? Math.round(data.score * scoreMultiplier) : data.score;
+    const result = engine.submitWord(path, data.word, multipliedScore);
 
     // 3. Score fly effect
     const avgRow = path.reduce((s, p) => s + p.row, 0) / path.length;
@@ -176,7 +180,7 @@ export function useBlastWordHandler({
     sounds.playTileClear(clearedInfo.length);
     sounds.playLongWordBonus(path.length);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [engine, runCascade, onComboDetected, sounds, sequencer, config.gridSize, t]);
+  }, [engine, runCascade, onComboDetected, sounds, sequencer, config.gridSize, t, scoreMultiplier]);
 
   return { handleWordAccepted };
 }

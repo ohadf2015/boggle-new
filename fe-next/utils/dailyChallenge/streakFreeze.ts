@@ -7,6 +7,8 @@ import type { DailyStreak } from './types';
 import { DAILY_STREAK_KEY } from './constants';
 import { getDailyChallengeDate, getPreviousDate } from './dateUtils';
 import { getJsonFromLocalStorage, saveJsonToLocalStorage } from '@/utils/storageHelpers';
+import { emitStreakLifecycle, type StreakOutcome } from './streakTelemetry';
+import { getStreakMilestone } from './streaks';
 
 export const STREAK_FREEZE_KEY = 'lexiclash_streak_freezes';
 const MAX_FREEZES = 3;
@@ -66,17 +68,21 @@ export function updateDailyStreakWithFreeze(completionDate?: string): StreakWith
 
   let newStreak: number;
   let freezeUsed = false;
+  let outcome: StreakOutcome;
 
   if (current.lastPlayedDate === previousDay) {
-    // Played yesterday - continue streak normally
     newStreak = current.currentStreak + 1;
+    outcome = 'continued';
   } else if (current.lastPlayedDate === twoDaysAgo && consumeFreezeFromStorage()) {
-    // Missed exactly one day but freeze available - continue streak
     newStreak = current.currentStreak + 1;
     freezeUsed = true;
-  } else {
-    // Streak broken
+    outcome = 'continued';
+  } else if (current.currentStreak > 0) {
     newStreak = 1;
+    outcome = 'broken';
+  } else {
+    newStreak = 1;
+    outcome = 'started';
   }
 
   const updated: DailyStreak = {
@@ -87,6 +93,12 @@ export function updateDailyStreakWithFreeze(completionDate?: string): StreakWith
   };
 
   saveJsonToLocalStorage(DAILY_STREAK_KEY, updated);
+  emitStreakLifecycle({
+    outcome,
+    newStreak,
+    milestone: getStreakMilestone(newStreak),
+    freezeUsed,
+  });
 
   return { streak: updated, freezeUsed };
 }

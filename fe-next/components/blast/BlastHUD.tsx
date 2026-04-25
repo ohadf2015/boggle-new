@@ -1,10 +1,18 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { X, HelpCircle } from 'lucide-react';
+import { X, HelpCircle, Shield, Bomb, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { BlastComboStreakBadge } from './BlastComboStreakBadge';
 import type { ComboStreakState } from './hooks/useBlastComboStreak';
+
+/** Pre-game buff chip — shown in HUD top row when player claimed a rewarded-ad boost. */
+type ActiveBuff = 'shield' | 'bomb' | 'combo2x';
+const BUFF_META: Record<ActiveBuff, { Icon: typeof Shield; bg: string; label: string }> = {
+  shield:  { Icon: Shield, bg: 'bg-neo-cyan',  label: 'blast.pregameBuff.shield' },
+  bomb:    { Icon: Bomb,   bg: 'bg-neo-pink',  label: 'blast.pregameBuff.bomb' },
+  combo2x: { Icon: Zap,    bg: 'bg-neo-lime',  label: 'blast.pregameBuff.combo2x' },
+};
 
 const NO_TEXT_SHADOW_STYLE = { textShadow: 'none' } as const;
 
@@ -58,6 +66,10 @@ interface BlastHUDProps {
   comboStreak?: ComboStreakState;
   /** Ref for the SVG arc — driven at 60fps by useBlastComboStreak */
   comboStreakArcRef?: React.RefObject<SVGCircleElement | null>;
+  /** Active rewarded-ad pre-game buff (null if none claimed). */
+  activeBuff?: ActiveBuff | null;
+  /** Whether the buff effect has been spent (e.g. shield revive used). Greys the chip. */
+  buffConsumed?: boolean;
   t: (key: string) => string | undefined;
 }
 
@@ -77,6 +89,8 @@ export function BlastHUD({
   onShowHelp,
   comboStreak,
   comboStreakArcRef,
+  activeBuff = null,
+  buffConsumed = false,
   t,
 }: BlastHUDProps) {
   const clearPct = totalTiles > 0 ? Math.round((tilesCleared / totalTiles) * 100) : 0;
@@ -101,13 +115,34 @@ export function BlastHUD({
     >
       {/* Top row: wave + controls */}
       <div className="flex items-center justify-between px-3 py-1.5 pt-safe">
-        <span
-          className="shrink-0 text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-lg border-2 border-neo-cyan/40 text-neo-cyan"
-          style={NO_TEXT_SHADOW_STYLE}
-          aria-label={`${t('blast.wave')} ${waveNumber}`}
-        >
-          W{waveNumber}
-        </span>
+        <div className="flex items-center gap-2 min-w-0">
+          <span
+            className="shrink-0 text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-lg border-2 border-neo-cyan/40 text-neo-cyan"
+            style={NO_TEXT_SHADOW_STYLE}
+            aria-label={`${t('blast.wave')} ${waveNumber}`}
+          >
+            W{waveNumber}
+          </span>
+          {activeBuff && (() => {
+            const meta = BUFF_META[activeBuff];
+            const Icon = meta.Icon;
+            return (
+              <span
+                data-testid="blast-active-buff-chip"
+                data-consumed={buffConsumed ? 'true' : 'false'}
+                className={cn(
+                  'shrink-0 inline-flex items-center gap-1 rounded-lg border-2 border-black px-1.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-neo-navy shadow-hard transition-all',
+                  buffConsumed ? 'bg-white/20 text-white/40 line-through opacity-60 shadow-none' : `${meta.bg} blast-heartbeat`,
+                )}
+                style={NO_TEXT_SHADOW_STYLE}
+                aria-label={(t(meta.label) || activeBuff) + (buffConsumed ? ` (${t('common.used') || 'used'})` : '')}
+              >
+                <Icon className="h-3 w-3" strokeWidth={3} />
+                {t(meta.label) || activeBuff}
+              </span>
+            );
+          })()}
+        </div>
 
         <div className="flex items-center gap-1.5">
           {onShowHelp && (

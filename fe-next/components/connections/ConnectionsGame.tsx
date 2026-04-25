@@ -4,6 +4,7 @@ import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { AnimatePresence, m } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useHideNavigation } from '@/contexts/NavigationContext';
 import { getShuffledPuzzles } from '@/lib/connections/puzzles';
 import { initGameState, applyGuess, advancePuzzle, giveUp as giveUpLogic, markRated, xpForPuzzle } from '@/lib/connections/gameLogic';
 import type { GameState, PuzzleRating } from '@/lib/connections/types';
@@ -53,6 +54,12 @@ export default function ConnectionsGame() {
   const [state, dispatch] = useReducer(reducer, puzzles, initGameState);
   const [xpEarned, setXpEarned] = useState(0);
   const xpAwardedIdsRef = useRef<Set<string>>(new Set());
+
+  const setIsInGame = useHideNavigation();
+  useEffect(() => {
+    setIsInGame(state.status !== 'finished');
+    return () => setIsInGame(false);
+  }, [state.status, setIsInGame]);
 
   // Track container dimensions for the PixiJS canvas overlay
   useEffect(() => {

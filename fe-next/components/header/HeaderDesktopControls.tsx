@@ -20,7 +20,7 @@ interface HeaderDesktopControlsProps {
 const HeaderDesktopControls = memo<HeaderDesktopControlsProps>(({ unclaimedCount, onOpenGiftModal, onSignIn, onSignUp }) => {
     const { t, language } = useLanguage();
     const { isAuthenticated, loading } = useAuth();
-    const { isOnCrazyGamesPlatform } = useCrazyGames();
+    const { isOnCrazyGamesPlatform, isLoading: cgLoading } = useCrazyGames();
     const engagementStatus = useEngagementStatus();
 
     return (
@@ -43,8 +43,11 @@ const HeaderDesktopControls = memo<HeaderDesktopControlsProps>(({ unclaimedCount
             {/* Language switcher — always visible */}
             <QuickLanguageSwitcher compact />
 
-            {/* Unified auth button for guests */}
-            {!isAuthenticated && !loading && !isOnCrazyGamesPlatform && (
+            {/* Unified auth button for guests.
+                Also gated on `cgLoading`: while the CrazyGames SDK is still
+                resolving its environment, hold the slot to avoid a flash of
+                external Sign In/Sign Up before we know we're embedded. */}
+            {!isAuthenticated && !loading && !cgLoading && !isOnCrazyGamesPlatform && (
                 <AuthButton
                     onSignInClick={onSignIn}
                     onSignUpClick={onSignUp}

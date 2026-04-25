@@ -10,6 +10,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useHideNavigation } from '@/contexts/NavigationContext';
 import { useFeatureFlag } from '@/hooks/useFeatureFlag';
 import { usePartySocket } from '@/hooks/usePartySocket';
 import { PARTY_GAMES, type PartyGameId } from '@/shared/types/partyGame';
@@ -59,6 +60,13 @@ export default function PartyPlayClient() {
       setJoined(true);
     }
   }, [joined, connected, hasAccess, roomCode, playerName, joinRoom, profile?.avatar_image]);
+
+  const setIsInGame = useHideNavigation();
+  useEffect(() => {
+    const phase = room?.phase;
+    setIsInGame(Boolean(phase) && phase !== 'lobby');
+    return () => setIsInGame(false);
+  }, [room?.phase, setIsInGame]);
 
   if (flagLoading) {
     return (
