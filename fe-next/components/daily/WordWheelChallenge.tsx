@@ -88,34 +88,105 @@ const WordWheelChallenge: React.FC = () => {
 
   // Initialize puzzle
   useEffect(() => {
+    let isMounted = true;
     const date = getDailyChallengeDate();
     const number = getPuzzleNumber(date);
     setPuzzleNumber(number);
+    setHasPlayedWH(hasPlayedWordHuntToday(language as Language));
 
     const gameLang = language as Language;
 
-    if (hasPlayedWordWheelToday(gameLang)) {
-      const stored = getTodaysWordWheelResult(gameLang);
-      if (stored) {
-        setGameResult({
-          wordsFound: stored.result.wordsFound,
-          score: stored.result.score,
-          timeSeconds: stored.result.timeSeconds,
-        });
+    const init = async () => {
+      // Fast-path: localStorage already has today's result.
+      if (hasPlayedWordWheelToday(gameLang)) {
+        const stored = getTodaysWordWheelResult(gameLang);
+        if (!isMounted) return;
+        if (stored) {
+          setGameResult({
+            wordsFound: stored.result.wordsFound,
+            score: stored.result.score,
+            timeSeconds: stored.result.timeSeconds,
+          });
+        } else {
+          setGameResult({ wordsFound: [], score: 0, timeSeconds: 0 });
+        }
         setPhase('already-played');
-      } else {
-        // Played but result corrupted/missing — show fallback result
-        setGameResult({ wordsFound: [], score: 0, timeSeconds: 0 });
-        setPhase('already-played');
+        return;
       }
-    } else {
+
+      // Cross-device sync: ask the server whether this player already
+      // submitted today's result on another device. localStorage on this
+      // device is empty but the canonical record lives in Supabase.
+      try {
+        const params = new URLSearchParams();
+        if (isAuthenticated && profile) params.set('playerId', profile.id);
+        else {
+          const fp = guestFingerprint ?? getGuestFingerprint();
+          if (fp) params.set('guestFingerprint', fp);
+        }
+
+        if (params.toString()) {
+          const resp = await fetch(
+            `/api/daily-challenge/word-wheel/check-played/${date}/${gameLang}?${params.toString()}`,
+            { signal: AbortSignal.timeout(5000) },
+          );
+          if (!isMounted) return;
+          if (resp.ok) {
+            const data = (await resp.json()) as {
+              hasPlayed: boolean;
+              result?: {
+                score: number;
+                wordsFound: string[];
+                longestWord: string | null;
+                timeSeconds: number;
+                centerLetter: string | null;
+                completedAt: string | null;
+              };
+            };
+            if (data.hasPlayed && data.result) {
+              const r = data.result;
+              // Hydrate localStorage so subsequent loads on this device are
+              // instant and offline-safe. saveWordWheelResult also marks this
+              // as the user's record for streak/share UI.
+              saveWordWheelResult({
+                puzzleNumber: number,
+                puzzleDate: date,
+                language: gameLang,
+                centerLetter: r.centerLetter || '',
+                wordsFound: r.wordsFound,
+                totalPossible: 0,
+                score: r.score,
+                timeSeconds: r.timeSeconds,
+                streakDays: getDailyStreak().currentStreak,
+                completedAt: r.completedAt || new Date().toISOString(),
+              });
+              if (!isMounted) return;
+              setGameResult({
+                wordsFound: r.wordsFound,
+                score: r.score,
+                timeSeconds: r.timeSeconds,
+              });
+              setPhase('already-played');
+              return;
+            }
+          }
+        }
+      } catch {
+        // Network error / timeout — fall through to ready phase. Worst case
+        // is the user can replay; submit will be deduped server-side via the
+        // unique (player_id, puzzle_date, language) constraint (error 23505).
+      }
+
+      if (!isMounted) return;
       const generatedPuzzle = generateWordWheelPuzzle(date, gameLang);
       setPuzzle(generatedPuzzle);
       setPhase('ready');
-    }
+    };
 
-    setHasPlayedWH(hasPlayedWordHuntToday(gameLang));
-  }, [language]);
+    init();
+    return () => { isMounted = false; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [language, isAuthenticated, profile?.id, guestFingerprint]);
 
   const handleValidateWord = useCallback(
     (word: string) => fastValidateWord(word, language as Language),

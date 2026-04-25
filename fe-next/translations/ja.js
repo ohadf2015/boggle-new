@@ -5278,6 +5278,9 @@ const ja = {
       "clueRevealCategory": "カテゴリー解放！",
       "clueExampleSentence": "例文解放！",
       "clueAutoMessage": "{cost}トークンで自動解放",
+      "allLettersRevealed": "すべての文字が公開されました！",
+      "clueUnlocked": "{name}解放！（-{cost}コイン）",
+      "longWordBonus": "🔥 +{bonus} 長い単語ボーナス！",
       "scoreBreakdownTooltip": "詳細はタップ"
     },
     "desktop": {

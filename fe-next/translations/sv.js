@@ -5257,6 +5257,9 @@ const sv = {
       "clueRevealCategory": "Kategori upplåst!",
       "clueExampleSentence": "Exempelmening upplåst!",
       "clueAutoMessage": "Auto-upplåst vid {cost} poletter",
+      "allLettersRevealed": "Alla bokstäver avslöjade!",
+      "clueUnlocked": "{name} upplåst! (-{cost} mynt)",
+      "longWordBonus": "🔥 +{bonus} bonus för långt ord!",
       "scoreBreakdownTooltip": "Tryck för detaljer"
     },
     "desktop": {

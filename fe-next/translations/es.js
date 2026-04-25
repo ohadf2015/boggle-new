@@ -5207,6 +5207,9 @@ const es = {
       "clueRevealCategory": "¡Categoría desbloqueada!",
       "clueExampleSentence": "¡Ejemplo desbloqueado!",
       "clueAutoMessage": "Auto-desbloqueado a {cost} fichas",
+      "allLettersRevealed": "¡Todas las letras reveladas!",
+      "clueUnlocked": "¡{name} desbloqueada! (-{cost} monedas)",
+      "longWordBonus": "🔥 +{bonus} bonus por palabra larga!",
       "scoreBreakdownTooltip": "Toca para detalles"
     },
     "desktop": {

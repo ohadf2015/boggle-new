@@ -5237,6 +5237,9 @@ const he = {
       "clueRevealCategory": "קטגוריה נפתחה!",
       "clueExampleSentence": "משפט לדוגמה נפתח!",
       "clueAutoMessage": "נפתח אוטומטית ב-{cost} אסימונים",
+      "allLettersRevealed": "כל האותיות נחשפו!",
+      "clueUnlocked": "{name} נפתח! (-{cost} מטבעות)",
+      "longWordBonus": "🔥 +{bonus} בונוס מילה ארוכה!",
       "scoreBreakdownTooltip": "לחץ לפרטים"
     },
     "desktop": {

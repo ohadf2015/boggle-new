@@ -11,7 +11,7 @@ export interface UseSurvivalHintsProps {
   language: Language;
   playWordAcceptedSound?: () => void;
   showToast: (type: FeedbackType, message: string) => void;
-  t: (key: string) => string;
+  t: (key: string, params?: Record<string, string | number>) => string;
   accumulatedClues?: Map<number, { letter: string; type: string }>;
 }
 
@@ -169,7 +169,7 @@ export function useSurvivalHints({
              setRevealedLetters(prev => new Set([...prev, nextIdx]));
              success = true;
         } else {
-             showToast('invalid-word', 'All letters revealed!');
+             showToast('invalid-word', t('wordHunt.survival.allLettersRevealed'));
         }
     } else if (nextHintItem.id === 'reveal_category') {
         setShowCategory(true);
@@ -178,14 +178,22 @@ export function useSurvivalHints({
         setShowExample(true);
         success = true;
     }
-    
+
     if (success) {
         setClueTokens(prev => prev - nextHintItem.cost);
         setTokensSpent(prev => prev + nextHintItem.cost);
         playWordAcceptedSound?.();
-        
-        // Show clearer feedback that coins were spent
-        showToast('valid-word', `${nextHintItem.name} Unlocked! (-${nextHintItem.cost} Coins)`);
+
+        const clueNameKey =
+          nextHintItem.id === 'reveal_letter'
+            ? 'wordHunt.survival.revealLetter'
+            : nextHintItem.id === 'reveal_category'
+              ? 'wordHunt.survival.revealCategory'
+              : 'wordHunt.survival.exampleSentence';
+        showToast(
+          'valid-word',
+          t('wordHunt.survival.clueUnlocked', { name: t(clueNameKey), cost: nextHintItem.cost }),
+        );
     }
     
   }, [nextHintItem, unrevealedPositions, playWordAcceptedSound, showToast, t]);

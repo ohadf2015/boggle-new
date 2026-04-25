@@ -27,7 +27,7 @@ export interface UseSurvivalWordSubmissionProps {
   grid: LetterGrid;
   language: Language;
   targetWord: string;
-  t: (key: string) => string;
+  t: (key: string, params?: Record<string, string | number>) => string;
   // State reads
   isGameOver: boolean;
   attempts: TargetAttempt[];
@@ -242,7 +242,7 @@ export function useSurvivalWordSubmission({
 
     const rewardMessage = formatRewardMessage({ lifeGained, tokensGained });
     const bonusMessage = longWordBonus > 0
-      ? `${rewardMessage} 🔥 +${longWordBonus} long word bonus!`
+      ? `${rewardMessage} ${t('wordHunt.survival.longWordBonus', { bonus: longWordBonus })}`
       : rewardMessage;
     showToast('valid-word', bonusMessage, word);
   }, [discoveredWords, lifePoints, grid, language, playWordAcceptedSound, playWordRejectedSound, showToast, t, validateWordInDictionary, clueActions, lifeAnimationTimeout, dispatch]);

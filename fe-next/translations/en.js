@@ -5355,6 +5355,9 @@ const en = {
       "clueRevealCategory": "Category unlocked!",
       "clueExampleSentence": "Example sentence unlocked!",
       "clueAutoMessage": "Auto-unlocked at {cost} tokens",
+      "allLettersRevealed": "All letters revealed!",
+      "clueUnlocked": "{name} Unlocked! (-{cost} Coins)",
+      "longWordBonus": "🔥 +{bonus} long word bonus!",
       "scoreBreakdownTooltip": "Tap for details"
     },
     "desktop": {

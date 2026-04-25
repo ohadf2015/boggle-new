@@ -149,6 +149,94 @@ router.post('/submit', async (req: Request<unknown, unknown, WordWheelSubmitBody
 });
 
 // ==========================================
+// GET /api/daily-challenge/word-wheel/check-played/:date/:language
+// Returns the canonical server-side completion record so the client can sync
+// across devices instead of relying solely on per-device localStorage.
+// ==========================================
+
+router.get('/check-played/:date/:language', async (
+  req: Request<{ date: string; language: string }, unknown, unknown, { playerId?: string; guestFingerprint?: string }>,
+  res: Response,
+): Promise<void> => {
+  try {
+    if (!isSupabaseConfigured()) {
+      // Match Word Hunt: signal "unknown" rather than `false` so a DB outage
+      // does not let users replay completed puzzles.
+      res.status(503).json({ error: 'Service temporarily unavailable', hasPlayed: null });
+      return;
+    }
+
+    const { date, language } = req.params;
+    const playerId = req.query.playerId as string | undefined;
+    const guestFingerprint = req.query.guestFingerprint as string | undefined;
+
+    if (!isValidDateFormat(date)) {
+      res.status(400).json({ error: 'Invalid date format. Use YYYY-MM-DD' });
+      return;
+    }
+    if (!isValidLanguage(language)) {
+      res.status(400).json({ error: 'Invalid language code' });
+      return;
+    }
+    if (!playerId && !guestFingerprint) {
+      res.status(400).json({ error: 'Either playerId or guestFingerprint is required' });
+      return;
+    }
+
+    const supabase = getSupabase();
+    if (!supabase) {
+      res.json({ hasPlayed: false });
+      return;
+    }
+
+    let query = supabase
+      .from('daily_word_wheel_attempts')
+      .select('score, word_count, words_found, longest_word, time_seconds, center_letter, completed_at')
+      .eq('puzzle_date', date)
+      .eq('language', language);
+
+    if (playerId) {
+      query = query.eq('player_id', playerId);
+    } else {
+      query = query.eq('guest_fingerprint', guestFingerprint);
+    }
+
+    const { data: existing, error } = await query.maybeSingle();
+
+    if (error) {
+      logger.error('API', `Word Wheel check-played error: ${error.message}`);
+      res.status(500).json({ error: 'Failed to check attempt status' });
+      return;
+    }
+
+    if (!existing) {
+      res.json({ hasPlayed: false });
+      return;
+    }
+
+    const rawWords = Array.isArray(existing.words_found) ? (existing.words_found as unknown[]) : [];
+    const wordsFound = rawWords.filter((w): w is string => typeof w === 'string');
+
+    res.json({
+      hasPlayed: true,
+      result: {
+        score: existing.score ?? 0,
+        wordCount: existing.word_count ?? wordsFound.length,
+        wordsFound,
+        longestWord: existing.longest_word ?? null,
+        timeSeconds: existing.time_seconds ?? 0,
+        centerLetter: existing.center_letter ?? null,
+        completedAt: existing.completed_at ?? null,
+      },
+    });
+  } catch (error) {
+    const err = error as Error;
+    logger.error('API', `Word Wheel check-played error: ${err.message}`);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// ==========================================
 // GET /api/daily-challenge/word-wheel/leaderboard/:date/:language
 // ==========================================
 
