@@ -18,6 +18,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useTeacherOnboardingState } from '@/hooks/useOnboardingState';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { trackEduTeacherOnboardingStep } from '@/lib/education/telemetry';
 
 interface OnboardingStep {
   id: string;
@@ -106,7 +107,13 @@ export const TeacherOnboarding = memo<TeacherOnboardingProps>(({
 
   // Handle next/finish
   const handleNext = useCallback(() => {
-    if (currentStep < ONBOARDING_STEPS.length - 1) {
+    const isLast = currentStep >= ONBOARDING_STEPS.length - 1;
+    trackEduTeacherOnboardingStep({
+      step: currentStep,
+      totalSteps: ONBOARDING_STEPS.length,
+      action: isLast ? 'complete' : 'next',
+    });
+    if (!isLast) {
       nextStep();
     } else {
       complete();
@@ -116,14 +123,24 @@ export const TeacherOnboarding = memo<TeacherOnboardingProps>(({
 
   // Handle previous
   const handlePrev = useCallback(() => {
+    trackEduTeacherOnboardingStep({
+      step: currentStep,
+      totalSteps: ONBOARDING_STEPS.length,
+      action: 'back',
+    });
     prevStep();
-  }, [prevStep]);
+  }, [currentStep, prevStep]);
 
   // Handle skip
   const handleSkip = useCallback(() => {
+    trackEduTeacherOnboardingStep({
+      step: currentStep,
+      totalSteps: ONBOARDING_STEPS.length,
+      action: 'skip',
+    });
     skip();
     onSkip?.();
-  }, [skip, onSkip]);
+  }, [currentStep, skip, onSkip]);
 
   // Don't render if onboarding shouldn't show
   if (!shouldShowOnboarding) {

@@ -14,6 +14,7 @@ import { useJoinClassroom } from '@/hooks/useClassroom';
 import { cn } from '@/lib/utils';
 import toast from 'react-hot-toast';
 import { EducationHeader } from '@/components/education/EducationHeader';
+import { trackEduClassroomJoin } from '@/lib/education/telemetry';
 
 /**
  * JoinClassroomForm - Student classroom join form
@@ -68,6 +69,7 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
     // Validate code format (6 alphanumeric characters)
     if (!trimmedCode || trimmedCode.length !== 6) {
       setCodeError(true);
+      trackEduClassroomJoin({ result: 'invalid_code' });
       toast.error(t('education.student.join.invalidCode'));
       return;
     }
@@ -78,21 +80,29 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
       const result = await joinClassroom(trimmedCode.toUpperCase());
 
       if (result.success) {
+        trackEduClassroomJoin({
+          result: 'success',
+          classroomId: result.classroomId,
+        });
         toast.success(t('education.student.join.success'));
         // Redirect to student dashboard
         router.push(`/${language}/student`);
       } else {
         // Handle specific error cases
         if (result.error?.includes('already')) {
+          trackEduClassroomJoin({ result: 'success' });
           toast.error(t('education.student.join.alreadyMember'));
         } else if (result.error?.includes('not found')) {
+          trackEduClassroomJoin({ result: 'not_found' });
           toast.error(t('education.student.join.invalidCode'));
         } else {
+          trackEduClassroomJoin({ result: 'error' });
           toast.error(result.error || t('education.student.join.invalidCode'));
         }
         setCodeError(true);
       }
     } catch (error) {
+      trackEduClassroomJoin({ result: 'error' });
       toast.error(t('common.error'));
       setCodeError(true);
     } finally {

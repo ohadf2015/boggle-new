@@ -35,6 +35,13 @@ vi.mock('@/lib/supabase', () => ({
   },
 }));
 
+// Mock education telemetry — F1 wiring
+const mockTrackEduPracticeComplete = vi.fn();
+vi.mock('@/lib/education/telemetry', () => ({
+  trackEduPracticeComplete: (...args: unknown[]) => mockTrackEduPracticeComplete(...args),
+  trackEduError: vi.fn(),
+}));
+
 // Mock useEducationXp hook
 vi.mock('@/hooks/useEducationXp', () => ({
   __esModule: true,
@@ -711,6 +718,53 @@ describe('PracticeSessionProvider', () => {
       // Should not call checkForUnlocks when award fails
       expect(mockCheckForUnlocks).not.toHaveBeenCalled();
 
+      consoleSpy.mockRestore();
+    });
+  });
+
+  describe('telemetry (F1 wiring)', () => {
+    beforeEach(() => {
+      mockTrackEduPracticeComplete.mockClear();
+    });
+
+    it('emits edu_practice_complete with outcome metrics on session completion', async () => {
+      const user = userEvent.setup();
+
+      render(
+        <PracticeSessionProvider studentId="student-1" lessonId="lesson-1">
+          <TestConsumer />
+        </PracticeSessionProvider>
+      );
+
+      await user.click(screen.getByTestId('complete-btn'));
+
+      await waitFor(() => {
+        expect(mockTrackEduPracticeComplete).toHaveBeenCalledWith(
+          expect.objectContaining({
+            lessonId: 'lesson-1',
+            practiceType: 'flashcard',
+            cardsReviewed: 10,
+            cardsCorrect: 9,
+          }),
+        );
+      });
+    });
+
+    it('does not emit telemetry when XP award fails', async () => {
+      const user = userEvent.setup();
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      mockAwardPracticeXp.mockRejectedValueOnce(new Error('boom'));
+
+      render(
+        <PracticeSessionProvider studentId="student-1" lessonId="lesson-1">
+          <TestConsumer />
+        </PracticeSessionProvider>
+      );
+
+      await user.click(screen.getByTestId('complete-btn'));
+      await waitFor(() => expect(consoleSpy).toHaveBeenCalled());
+
+      expect(mockTrackEduPracticeComplete).not.toHaveBeenCalled();
       consoleSpy.mockRestore();
     });
   });

@@ -1,6 +1,12 @@
 import type { Metadata } from 'next';
 import { generatePageMetadata } from '@/lib/seo/generatePageMetadata';
 import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
+import {
+  buildEducationFaqJsonLd,
+  buildEducationOrgJsonLd,
+  buildEducationBreadcrumbJsonLd,
+  buildEducationCourseJsonLd,
+} from '@/lib/seo/educationJsonLd';
 import EducationPageClient from './PageClient';
 
 export const dynamic = 'force-dynamic';
@@ -47,22 +53,39 @@ const seoContent: Record<string, { title: string; description: string; features:
   },
   ja: {
     title: '教育ハブ - 教室と語彙学習のためのワードゲーム',
-    description: '教室と生徒向けに設計された魅力的なワードゲームで語彙学習を変えましょう。教師はボキャブラリーデュエルを作成し、授業進捗を追跡できます。',
+    description: '教室と生徒向けに設計された魅力的なワードゲームで語彙学習を変えましょう。教師はボキャブラリーデュエルを作成し、カリキュラムに沿った課題を割り当て、教師ダッシュボードを通じて生徒の進捗を追跡できます。',
     features: [
       '生徒の参加と学習成果のために設計されたクラスルームワードゲーム',
       '競争的で楽しい復習のための生徒間語彙デュエル',
       '課題作成と生徒の進捗監視のための教師ダッシュボード',
+      'あらゆる科目や学年向けのカリキュラム準拠ワード演習',
+      'リアルタイムリーダーボードで生徒のモチベーションを高める',
     ],
-    faq: [],
+    faq: [
+      { question: '教室で利用できるワードゲームは？', answer: 'LexiClash Educationはマルチプレイヤー語彙デュエル、時間制限付きワードハント、共同ワードビルディングチャレンジを提供します。すべてブラウザで直接プレイ可能、ダウンロード不要です。' },
+      { question: '教師はどのようにクラスルームワードゲームを設定しますか？', answer: '教師は教師ダッシュボードでクラスを作成し、参加コードで生徒を招待し、数秒でゲームや課題を開始できます。進捗とスコアは自動的に追跡されます。' },
+      { question: 'LexiClashはあらゆる年齢の生徒に適していますか？', answer: 'はい。難易度とワードリストは課題ごとにカスタマイズ可能で、小学生、中学生、高校生、成人学習者に適しています。' },
+      { question: '教師向けの語彙ゲームとして使えますか？', answer: 'もちろんです。教師ハブではカリキュラムからカスタムワードリストを作成し、ゲームセッションをスケジュールし、クラス全体の分析を表示し、採点用に結果をエクスポートできます。' },
+      { question: '語彙デュエルの形式はどのように機能しますか？', answer: '2人以上の生徒が共有ボードからできるだけ早く単語を見つけて対戦します。目標スコアに最初に達した方が勝ちます。教師は現在のレッスンの語彙にワードリストを制限できます。' },
+    ],
   },
   sv: {
     title: 'Utbildningshub - Ordspel för Klassrum och Ordförrådsinlärning',
-    description: 'Förvandla inlärning av ordförråd med engagerande ordspel designade för klassrum och elever. Lärare kan skapa ordförrådsdueller, tilldela lektionsanpassade övningar och följa elevernas framsteg.',
+    description: 'Förvandla inlärning av ordförråd med engagerande ordspel designade för klassrum och elever. Lärare kan skapa ordförrådsdueller, tilldela läroplansanpassade övningar och följa elevernas framsteg via en dedikerad panel.',
     features: [
-      'Klassrumsordspel designade för elevengagemang',
-      'Ordförrådsdueller mellan elever för roliga repetitionssessioner',
+      'Klassrumsordspel designade för elevengagemang och inlärningsresultat',
+      'Ordförrådsdueller mellan elever för roliga och tävlingsinriktade repetitionssessioner',
+      'Lärarpanel för att skapa uppgifter och övervaka elevernas framsteg',
+      'Läroplansanpassade ordövningar för alla ämnen och årskurser',
+      'Topplistor i realtid för att motivera och belöna elevernas prestationer',
     ],
-    faq: [],
+    faq: [
+      { question: 'Vilka ordspel finns tillgängliga för klassrummet?', answer: 'LexiClash Education erbjuder ordförrådsdueller för flera spelare, tidsbegränsade ordjakter och samarbetsutmaningar — alla spelbara direkt i webbläsaren utan nedladdningar.' },
+      { question: 'Hur ställer lärare in ett ordspel i klassrummet?', answer: 'Lärare skapar ett klassrum i lärarpanelen, bjuder in elever med en kod och startar valfritt spel eller uppgift på sekunder. Framsteg och poäng spåras automatiskt.' },
+      { question: 'Är LexiClash lämpligt för elever i alla åldrar?', answer: 'Ja. Svårighetsgrad och ordlistor kan anpassas per uppgift, vilket gör det lämpligt för elever i grundskolan, mellanstadiet och gymnasiet samt vuxna inlärare.' },
+      { question: 'Kan jag använda LexiClash som ett ordförrådsspel för lärare?', answer: 'Absolut. Lärarhubben låter dig bygga anpassade ordlistor från din läroplan, schemalägga spelpass, visa klassanalys och exportera resultat för betygsättning.' },
+      { question: 'Hur fungerar ordförrådsduellerna?', answer: 'Två eller fler elever tävlar mot varandra för att hitta ord från en gemensam bräda så snabbt som möjligt. Den första som når målpoängen vinner. Lärare kan begränsa ordlistor till aktuell lektionsvokabulär.' },
+    ],
   },
   es: {
     title: 'Hub Educativo - Juegos de Palabras para Aulas y Aprendizaje de Vocabulario',
@@ -85,8 +108,21 @@ const seoContent: Record<string, { title: string; description: string; features:
 export default async function EducationPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   const content = seoContent[locale as keyof typeof seoContent] ?? seoContent.en;
+  const faqSchema = buildEducationFaqJsonLd(locale, content.faq);
+  const orgSchema = buildEducationOrgJsonLd(locale);
+  const breadcrumbSchema = buildEducationBreadcrumbJsonLd(locale);
+  const courseSchema = buildEducationCourseJsonLd(locale);
+  // Safe: schemas built from static seoContent + locale enum, not user input.
+  // JSON.stringify escapes content for <script> context; same pattern as
+  // app/[locale]/guides/page.tsx:73 and lib/seo/homepageFaqJsonLd.ts.
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(courseSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
+      {faqSchema && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
+      )}
       <EducationPageClient />
       <GamePageSeoContent
         title={content.title}

@@ -81,9 +81,11 @@ export function MultiLessonSelector({
         </h3>
         <div className="flex items-center gap-3">
           <button
+            type="button"
             onClick={handleSelectAll}
             className={cn(
-              'text-sm font-bold px-3 py-1 rounded-neo border-neo border-neo-black transition-all',
+              'text-sm font-bold px-4 py-2.5 rounded-neo border-neo border-neo-black transition-all',
+              'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2',
               allSelected
                 ? 'bg-neo-white/20 text-neo-white hover:bg-neo-white/30'
                 : 'bg-neo-cyan/20 text-neo-cyan hover:bg-neo-cyan/30'
@@ -107,11 +109,15 @@ export function MultiLessonSelector({
           return (
             <button
               key={lesson.id}
+              type="button"
+              role="checkbox"
+              aria-checked={isSelected}
               onClick={() => handleToggleLesson(lesson.id)}
               className={cn(
                 'relative p-4 rounded-neo border-neo border-neo-black',
                 'transition-all duration-150',
                 'text-start',
+                'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2',
                 isSelected
                   ? 'bg-neo-cyan text-neo-black shadow-hard'
                   : 'bg-neo-navy/50 text-neo-white hover:bg-neo-navy shadow-hard-sm',

@@ -215,4 +215,19 @@ describe('XpProgressBar', () => {
       expect(progressFill).toHaveClass('bg-neo-lime');
     });
   });
+
+  describe('accessibility', () => {
+    it('announces recent XP gain via a polite live region', () => {
+      render(<XpProgressBar totalXp={150} recentXpGain={25} />);
+      const announcer = screen.getByTestId('xp-recent-gain');
+      expect(announcer).toHaveAttribute('role', 'status');
+      expect(announcer).toHaveAttribute('aria-live', 'polite');
+      expect(announcer).toHaveTextContent('+25');
+    });
+
+    it('does not render the live region when no XP was gained', () => {
+      render(<XpProgressBar totalXp={150} />);
+      expect(screen.queryByTestId('xp-recent-gain')).not.toBeInTheDocument();
+    });
+  });
 });

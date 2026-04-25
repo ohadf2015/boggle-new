@@ -15,6 +15,7 @@ export type LocaleContent = {
   backToBlog: string;
   playDaily: string;
   startPracticing: string;
+  tryAlternative: string;
 };
 
 export const contentByLocale: Record<string, LocaleContent> = {
@@ -134,6 +135,7 @@ Obviously. But if you have to pick one, pick the one that doesn't charge you to 
     backToBlog: 'Back to Blog',
     playDaily: 'Try the Daily Challenge',
     startPracticing: 'Play Free Now',
+    tryAlternative: 'Words With Friends Alternative',
   },
 
   he: {
@@ -248,6 +250,7 @@ LexiClash משלב את העוצמה של בוגל בזמן אמת עם פיצ'�
     backToBlog: 'חזרה לבלוג',
     playDaily: 'נסו את האתגר היומי',
     startPracticing: 'שחקו בחינם',
+    tryAlternative: 'חלופה ל-Words With Friends',
   },
 
   sv: {
@@ -359,6 +362,7 @@ Tidsbegransad ordletning (Boggle) aktiverar fler neurala vagar an otidsbegransad
     backToBlog: 'Tillbaka till bloggen',
     playDaily: 'Prova daglig utmaning',
     startPracticing: 'Spela gratis nu',
+    tryAlternative: 'Alternativ till Words With Friends',
   },
 
   ja: {
@@ -470,6 +474,7 @@ Words With FriendsはPay-to-Win？
     backToBlog: 'ブログに戻る',
     playDaily: 'デイリーチャレンジを試す',
     startPracticing: '無料でプレイ',
+    tryAlternative: 'Words With Friendsの代替',
   },
 
   es: {
@@ -584,5 +589,6 @@ Claro. Pero si tienes que elegir uno, elige el que no te cobra para competir jus
     backToBlog: 'Volver al blog',
     playDaily: 'Prueba el desafio diario',
     startPracticing: 'Juega gratis ahora',
+    tryAlternative: 'Alternativa a Words With Friends',
   },
 };

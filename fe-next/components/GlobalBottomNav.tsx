@@ -236,6 +236,7 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
 
     return (
         <nav
+            data-global-bottom-nav=""
             className={cn(
                 "fixed left-0 right-0 bottom-0 z-[80]",
                 "bg-neo-navy",

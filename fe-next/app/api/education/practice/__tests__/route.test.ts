@@ -50,8 +50,15 @@ vi.mock('@/backend/modules/educationXpManager', () => ({
   calculatePracticeXp: vi.fn(() => ({ totalXp: 120, breakdown: { dailyPractice: 20, flashcardCorrect: 100 }, masteryMessage: 'Great!' })),
 }));
 
+// E3 audit fix: practice route must enforce a per-user rate limit so a
+// hostile client can't spam session writes (DB bloat + XP grind risk).
+const mockCheckApiRateLimit = vi.fn().mockReturnValue({ success: true });
+vi.mock('@/lib/apiRateLimit', () => ({
+  checkApiRateLimit: (...args: unknown[]) => mockCheckApiRateLimit(...args),
+}));
+
 import { NextRequest } from 'next/server';
-import { PATCH } from '../route';
+import { PATCH, POST } from '../route';
 import { createClient } from '@/utils/supabase/server';
 import * as logger from '@/utils/logger';
 
@@ -340,6 +347,59 @@ describe('PATCH /api/education/practice', () => {
         'Failed to award education XP:',
         expect.objectContaining({ message: 'RPC function not found' })
       );
+    });
+  });
+
+  describe('rate limiting (E3)', () => {
+    beforeEach(() => {
+      mockCheckApiRateLimit.mockClear();
+      mockCheckApiRateLimit.mockReturnValue({ success: true });
+    });
+
+    it('PATCH consults checkApiRateLimit before doing work', async () => {
+      const request = new NextRequest('http://localhost/api/education/practice', {
+        method: 'PATCH',
+        body: JSON.stringify({
+          sessionId: '550e8400-e29b-41d4-a716-446655440099',
+          completed: true,
+        }),
+      });
+
+      await PATCH(request);
+
+      expect(mockCheckApiRateLimit).toHaveBeenCalled();
+      const [, bucket] = mockCheckApiRateLimit.mock.calls[0];
+      expect(bucket).toBe('education-practice');
+    });
+
+    it('PATCH returns 429 when limiter rejects', async () => {
+      mockCheckApiRateLimit.mockReturnValueOnce({ success: false, retryAfter: 30 });
+
+      const request = new NextRequest('http://localhost/api/education/practice', {
+        method: 'PATCH',
+        body: JSON.stringify({
+          sessionId: '550e8400-e29b-41d4-a716-446655440099',
+          completed: true,
+        }),
+      });
+
+      const response = await PATCH(request);
+      expect(response.status).toBe(429);
+    });
+
+    it('POST returns 429 when limiter rejects', async () => {
+      mockCheckApiRateLimit.mockReturnValueOnce({ success: false, retryAfter: 30 });
+
+      const request = new NextRequest('http://localhost/api/education/practice', {
+        method: 'POST',
+        body: JSON.stringify({
+          lessonId: '550e8400-e29b-41d4-a716-446655440003',
+          practiceType: 'flashcard',
+        }),
+      });
+
+      const response = await POST(request);
+      expect(response.status).toBe(429);
     });
   });
 });

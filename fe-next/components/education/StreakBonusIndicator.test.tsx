@@ -171,4 +171,29 @@ describe('StreakBonusIndicator', () => {
       expect(indicator).toHaveClass('shadow-hard');
     });
   });
+
+  describe('accessibility', () => {
+    it('exposes a screen-reader label that does not depend on color', () => {
+      render(<StreakBonusIndicator currentStreak={14} variant="badge" />);
+      const indicator = screen.getByTestId('streak-indicator');
+      // 14d = +75% multiplier; label must spell that out for color-blind users
+      expect(indicator).toHaveAttribute(
+        'aria-label',
+        expect.stringContaining('14'),
+      );
+      expect(indicator).toHaveAttribute(
+        'aria-label',
+        expect.stringContaining('75'),
+      );
+    });
+
+    it('still labels the streak when below the bonus threshold', () => {
+      render(<StreakBonusIndicator currentStreak={3} variant="badge" />);
+      const indicator = screen.getByTestId('streak-indicator');
+      expect(indicator).toHaveAttribute(
+        'aria-label',
+        expect.stringContaining('3'),
+      );
+    });
+  });
 });

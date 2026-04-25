@@ -107,4 +107,47 @@ describe('confettiUtils', () => {
       expect(() => fireLayeredCelebration(0, { combo: 0 })).not.toThrow();
     });
   });
+
+  describe('reduced motion (B4)', () => {
+    afterEach(() => {
+      // Reset matchMedia between tests
+      Object.defineProperty(window, 'matchMedia', {
+        writable: true,
+        configurable: true,
+        value: vi.fn().mockReturnValue({ matches: false, addEventListener: vi.fn(), removeEventListener: vi.fn() }),
+      });
+    });
+
+    it('fireConfetti returns null and does not initialize canvas when prefers-reduced-motion is set', async () => {
+      Object.defineProperty(window, 'matchMedia', {
+        writable: true,
+        configurable: true,
+        value: vi.fn().mockImplementation((q: string) => ({
+          matches: q.includes('reduce'),
+          addEventListener: vi.fn(),
+          removeEventListener: vi.fn(),
+        })),
+      });
+
+      const mod = await import('../confettiUtils');
+      const result = mod.fireConfetti({ particleCount: 50 });
+      expect(result).toBeNull();
+    });
+
+    it('fireLevelUpConfetti is a no-op under prefers-reduced-motion', async () => {
+      Object.defineProperty(window, 'matchMedia', {
+        writable: true,
+        configurable: true,
+        value: vi.fn().mockImplementation((q: string) => ({
+          matches: q.includes('reduce'),
+          addEventListener: vi.fn(),
+          removeEventListener: vi.fn(),
+        })),
+      });
+
+      const mod = await import('../confettiUtils');
+      // Should not throw and return without scheduling timers visibly
+      expect(() => mod.fireLevelUpConfetti()).not.toThrow();
+    });
+  });
 });

@@ -303,4 +303,49 @@ describe('MultiLessonSelector', () => {
       ).not.toBeInTheDocument();
     });
   });
+
+  describe('accessibility', () => {
+    it('renders a list with each lesson as a checkbox-role button', () => {
+      render(
+        <MultiLessonSelector
+          lessons={mockLessons}
+          selectedLessonIds={['lesson-1']}
+          onSelectChange={vi.fn()}
+        />
+      );
+
+      const checkboxes = screen.getAllByRole('checkbox');
+      expect(checkboxes).toHaveLength(2);
+      expect(checkboxes[0]).toHaveAttribute('aria-checked', 'true');
+      expect(checkboxes[1]).toHaveAttribute('aria-checked', 'false');
+    });
+
+    it('Select All control meets the 40px+ TV/kid touch target', () => {
+      render(
+        <MultiLessonSelector
+          lessons={mockLessons}
+          selectedLessonIds={[]}
+          onSelectChange={vi.fn()}
+        />
+      );
+
+      const btn = screen.getByText('education.classroomGame.selectAllLessons');
+      // Tailwind py-2.5 = 10px top+bottom + ~20px line-height ≈ 40px
+      expect(btn.className).toMatch(/py-2\.5/);
+      expect(btn.className).toMatch(/px-4/);
+    });
+
+    it('lesson buttons expose a focus-visible ring for keyboard / TV users', () => {
+      render(
+        <MultiLessonSelector
+          lessons={mockLessons}
+          selectedLessonIds={[]}
+          onSelectChange={vi.fn()}
+        />
+      );
+
+      const lessonButton = screen.getAllByRole('checkbox')[0];
+      expect(lessonButton.className).toMatch(/focus-visible:ring/);
+    });
+  });
 });

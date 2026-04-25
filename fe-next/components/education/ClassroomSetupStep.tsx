@@ -126,26 +126,38 @@ export function ClassroomSetupStep({
 
         {/* Game Mode */}
         <div>
-          <label className="block text-neo-white font-bold mb-3">
+          <div id="classroom-gamemode-label" className="block text-neo-white font-bold mb-3">
             {t('teacher.classroom.gameModes.title')}
-          </label>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            {GAME_MODES.map(({ key, icon: Icon, color }) => (
-              <button
-                key={key}
-                type="button"
-                onClick={() => onGameModeChange(key)}
-                className={cn(
-                  'flex flex-col items-center gap-2 px-4 py-3 font-bold rounded-neo border-neo border-neo-black transition-all',
-                  gameMode === key
-                    ? `bg-${color} text-neo-black shadow-hard`
-                    : 'bg-neo-navy/50 text-neo-white hover:bg-neo-navy shadow-hard-sm'
-                )}
-              >
-                <Icon className="w-6 h-6" />
-                <span className="text-sm">{t(`teacher.classroom.gameModes.${MODE_KEY_MAP[key]}`)}</span>
-              </button>
-            ))}
+          </div>
+          <div
+            role="radiogroup"
+            aria-labelledby="classroom-gamemode-label"
+            className="grid grid-cols-2 sm:grid-cols-4 gap-3"
+          >
+            {GAME_MODES.map(({ key, icon: Icon, color }) => {
+              const isSelected = gameMode === key;
+              const label = t(`teacher.classroom.gameModes.${MODE_KEY_MAP[key]}`);
+              return (
+                <button
+                  key={key}
+                  type="button"
+                  role="radio"
+                  aria-checked={isSelected}
+                  aria-label={label}
+                  onClick={() => onGameModeChange(key)}
+                  className={cn(
+                    'flex flex-col items-center gap-2 px-4 py-3 font-bold rounded-neo border-neo border-neo-black transition-all',
+                    'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2',
+                    isSelected
+                      ? `bg-${color} text-neo-black shadow-hard`
+                      : 'bg-neo-navy/50 text-neo-white hover:bg-neo-navy shadow-hard-sm'
+                  )}
+                >
+                  <Icon className="w-6 h-6" />
+                  <span className="text-sm">{label}</span>
+                </button>
+              );
+            })}
           </div>
         </div>
       </div>

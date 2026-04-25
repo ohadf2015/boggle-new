@@ -13,19 +13,61 @@ const PUZZLES_BY_LOCALE: Record<PuzzleLocale, ConnectionPuzzle[]> = {
 };
 
 /**
- * Stable, difficulty-ramped order: all easy → all medium → all hard.
- * Within each difficulty, sort by id so order is deterministic across sessions.
- * Built once per locale; safe because puzzle pools are import-time constants.
+ * Greedy round-robin: bucket puzzles by bridge, always pull from the largest
+ * non-empty bucket whose bridge differs from the previous pick. This spreads
+ * each "category" (bridge word) across the run instead of letting same-bridge
+ * puzzles cluster (e.g., five בית puzzles in a row from id-sorted ordering).
+ *
+ * Only forced to repeat a bridge when one bucket has more items than every
+ * other bucket combined — at that point alternation is mathematically impossible.
+ */
+function interleaveByBridge(items: ConnectionPuzzle[]): ConnectionPuzzle[] {
+  const buckets = new Map<string, ConnectionPuzzle[]>();
+  for (const p of items) {
+    const arr = buckets.get(p.bridge);
+    if (arr) arr.push(p);
+    else buckets.set(p.bridge, [p]);
+  }
+  for (const arr of buckets.values()) arr.sort((a, b) => a.id.localeCompare(b.id));
+
+  const out: ConnectionPuzzle[] = [];
+  let lastBridge: string | null = null;
+  while (out.length < items.length) {
+    let pickKey: string | null = null;
+    let pickSize = -1;
+    for (const [key, arr] of buckets) {
+      if (arr.length === 0) continue;
+      if (key === lastBridge) continue;
+      if (arr.length > pickSize) {
+        pickSize = arr.length;
+        pickKey = key;
+      }
+    }
+    if (!pickKey) {
+      for (const [key, arr] of buckets) {
+        if (arr.length > 0) { pickKey = key; break; }
+      }
+    }
+    const arr = buckets.get(pickKey!)!;
+    out.push(arr.shift()!);
+    lastBridge = pickKey;
+  }
+  return out;
+}
+
+/**
+ * Difficulty-ramped order: easy → medium → hard. Within each difficulty, bridges
+ * are interleaved so the same category does not appear back-to-back. Built once
+ * at module load — pools are import-time constants.
  */
 const ORDERED_BY_LOCALE: Record<PuzzleLocale, ConnectionPuzzle[]> = (() => {
   const out = {} as Record<PuzzleLocale, ConnectionPuzzle[]>;
   for (const locale of Object.keys(PUZZLES_BY_LOCALE) as PuzzleLocale[]) {
     const all = PUZZLES_BY_LOCALE[locale];
-    const sortById = (a: ConnectionPuzzle, b: ConnectionPuzzle) => a.id.localeCompare(b.id);
     out[locale] = [
-      ...all.filter((p) => p.difficulty === 'easy').sort(sortById),
-      ...all.filter((p) => p.difficulty === 'medium').sort(sortById),
-      ...all.filter((p) => p.difficulty === 'hard').sort(sortById),
+      ...interleaveByBridge(all.filter((p) => p.difficulty === 'easy')),
+      ...interleaveByBridge(all.filter((p) => p.difficulty === 'medium')),
+      ...interleaveByBridge(all.filter((p) => p.difficulty === 'hard')),
     ];
   }
   return out;

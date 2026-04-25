@@ -145,7 +145,12 @@ export default function BoggleVsWwfPageClient(): React.ReactElement {
           <InlineBannerAd webZone="content-page" className="my-6" />
 
           <div className={cn('mt-12 pt-6 border-t', isDarkMode ? 'border-slate-700' : 'border-gray-200')}>
-            <div className="flex gap-4">
+            <div className="flex flex-wrap gap-4">
+              <Link href={`/${locale}/words-with-friends-alternative`}>
+                <Button className="rounded-neo border-3 border-neo-black bg-neo-pink text-neo-navy font-bold shadow-hard hover:shadow-hard-lg">
+                  {content.tryAlternative}
+                </Button>
+              </Link>
               <Link href={`/${locale}/daily`}>
                 <Button className="rounded-neo border-3 border-neo-black bg-neo-orange text-white font-bold shadow-hard hover:shadow-hard-lg">
                   {content.playDaily}

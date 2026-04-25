@@ -135,6 +135,19 @@ export function fireConfetti(options: Options = {}): Promise<null> | null {
     return null;
   }
 
+  // B4 (WCAG 2.3.3): respect the OS-level reduced-motion preference at the
+  // single chokepoint so every caller (level-up, victory, daily challenge,
+  // duel, etc.) is covered without each having to remember the gate.
+  if (typeof window !== 'undefined' && typeof window.matchMedia === 'function') {
+    try {
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        return null;
+      }
+    } catch {
+      // matchMedia stubs in test environments may throw — treat as "not set"
+    }
+  }
+
   // Ensure canvas exists
   getConfettiCanvas();
 

@@ -81,7 +81,8 @@ function getAllRoutes(): MetadataRoute.Sitemap {
   });
 
   // ─── Core game mode pages ───
-  addForAllLocales(routes, '/singleplayer', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.9 });
+  // /singleplayer omitted: bare hits 308 → /multiplayer?quickPlay=true (see app/[locale]/singleplayer/page.tsx).
+  // Route still serves variants (?autoStart, ?preset, ?boardCode, ?returnTo) but those are not sitemap-worthy.
   addForAllLocales(routes, '/multiplayer', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.9 });
   addForAllLocales(routes, '/daily', { lastModified: LAST_DEPLOYED, changeFrequency: 'daily', priority: 0.9 });
   addForAllLocales(routes, '/blast', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.9 });
@@ -106,6 +107,8 @@ function getAllRoutes(): MetadataRoute.Sitemap {
 
   // ─── Education ───
   addForAllLocales(routes, '/education', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.7 });
+  addForAllLocales(routes, '/education/duels', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.65 });
+  addForAllLocales(routes, '/education/classroom-game', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.65 });
 
   // ─── Content pages ───
   addForAllLocales(routes, '/how-to-play', { lastModified: GUIDES_UPDATED, changeFrequency: 'weekly', priority: 0.9 });
@@ -163,10 +166,18 @@ function getAllRoutes(): MetadataRoute.Sitemap {
   addForAllLocales(routes, '/legal/cookies', { lastModified: LEGAL_UPDATED, changeFrequency: 'monthly', priority: 0.3 });
 
   // ─── SEO landing pages (market-specific, single locale) ───
-  // Doorway SEO pages flipped to noindex for thin-content remediation — excluded from sitemap.
-  // Only real game pages remain (e.g., /daily-word-wheel).
+  // English commercial-intent doorways targeting AI grounding queries like
+  // "words with friends multiplayer free online". Each page has unique
+  // 200+ line content (FAQs, comparison tables, FAQPage JSON-LD) and is
+  // marked index:true in its generateMetadata. Hreflang points non-en
+  // locales to their localized equivalent.
   const seoLandings = [
     { locale: 'en', path: '/daily-word-wheel', img: 'en' },
+    { locale: 'en', path: '/words-with-friends-alternative', img: 'en' },
+    { locale: 'en', path: '/online-word-games-with-friends', img: 'en' },
+    { locale: 'en', path: '/multiplayer-word-game-online', img: 'en' },
+    { locale: 'en', path: '/play-boggle-online-free', img: 'en' },
+    { locale: 'en', path: '/word-games-online-free', img: 'en' },
   ] as const;
   seoLandings.forEach(({ locale, path, img }) => {
     routes.push({

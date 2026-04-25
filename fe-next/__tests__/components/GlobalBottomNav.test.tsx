@@ -164,15 +164,15 @@ describe('GlobalBottomNav', () => {
 
             const { container } = render(<GlobalBottomNav />);
             const nav = container.querySelector('nav');
-            // Nav floats above AdMob banner via --admob-banner-height var (0px fallback);
-            // safe-area padding is applied directly.
-            expect(nav).toHaveStyle({ paddingBottom: '34px', bottom: 'var(--admob-banner-height, 0px)' });
+            // Nav stays flush at viewport bottom; AdMob banner lifts above it via
+            // plugin margin (see AnchoredNativeBanner). Safe-area padding is internal.
+            expect(nav).toHaveStyle({ paddingBottom: '34px' });
+            expect(nav?.className).toContain('bottom-0');
         });
 
-        it('should anchor to admob-banner-height var with no safe-area inset', () => {
+        it('should expose data-global-bottom-nav for the AdMob banner to measure', () => {
             const { container } = render(<GlobalBottomNav />);
-            const nav = container.querySelector('nav');
-            expect(nav).toHaveStyle({ bottom: 'var(--admob-banner-height, 0px)' });
+            expect(container.querySelector('[data-global-bottom-nav]')).not.toBeNull();
         });
 
         it('should set has-global-bottom-nav class on html while visible', () => {

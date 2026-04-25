@@ -97,11 +97,19 @@ const StreakBonusIndicator = memo<StreakBonusIndicatorProps>(({
     return null;
   }
 
+  // Spelled-out screen-reader label so streak bonus isn't conveyed
+  // by color alone (WCAG 1.4.1).
+  const ariaLabel = bonus !== null
+    ? `${currentStreak} day streak, +${bonus}% XP bonus`
+    : `${currentStreak} day streak`;
+
   // Badge variant: Full styled badge
   if (variant === 'badge') {
     return (
       <motion.div
         data-testid="streak-indicator"
+        role="img"
+        aria-label={ariaLabel}
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 0.3, ease: 'easeOut' as const }}
@@ -160,6 +168,8 @@ const StreakBonusIndicator = memo<StreakBonusIndicatorProps>(({
   return (
     <motion.div
       data-testid="streak-indicator"
+      role="img"
+      aria-label={ariaLabel}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.2 }}

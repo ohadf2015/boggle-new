@@ -18,6 +18,7 @@ import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { fireLevelUpConfetti } from '@/utils/confettiUtils';
 import type { UnlockPayload } from '@/hooks/useAchievementUnlock';
+import { trackEduAchievementUnlock } from '@/lib/education/telemetry';
 
 // ==============================================
 // TYPES
@@ -59,6 +60,17 @@ const AchievementUnlockModal = memo<AchievementUnlockModalProps>(({ unlock, onCl
   const isFullModal = unlock?.tier === 'gold' || unlock?.tier === 'platinum';
 
   useFocusTrap(modalRef, !!isFullModal && !!unlock, onClose);
+
+  // F1: announce achievement unlock once per appearance so we can attribute
+  // unlocks to the upstream feature that triggered them (practice / classroom
+  // game / duel) via PostHog session funneling.
+  useEffect(() => {
+    if (!unlock) return;
+    trackEduAchievementUnlock({
+      achievementId: unlock.achievementKey,
+      tier: unlock.tier,
+    });
+  }, [unlock]);
 
   // Fire confetti for Gold/Platinum only
   useEffect(() => {

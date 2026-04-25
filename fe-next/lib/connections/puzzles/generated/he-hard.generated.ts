@@ -1080,13 +1080,6 @@ export const HE_GENERATED: ConnectionPuzzle[] = [
     difficulty: 'hard',
   },
   {
-    id: 'he-g-173',
-    word1: 'הורדת',
-    bridge: 'מוזיקה',
-    word2: 'אפריקאית',
-    difficulty: 'hard',
-  },
-  {
     id: 'he-g-174',
     word1: 'שיחור',
     bridge: 'מזון',

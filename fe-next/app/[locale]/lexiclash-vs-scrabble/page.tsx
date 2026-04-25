@@ -11,8 +11,9 @@ const BASE_URL = 'https://www.lexiclash.live';
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale } = await params;
-  const isTargetLocale = locale === 'en';
+  const isEnglish = locale === 'en';
   const pageUrl = `${BASE_URL}/${locale}/lexiclash-vs-scrabble`;
+  const canonicalUrl = `${BASE_URL}/en/lexiclash-vs-scrabble`;
 
   return {
     title: 'LexiClash vs Scrabble GO — No Interruptions, No Bots, Real Competition | LexiClash',
@@ -33,7 +34,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       images: [`${BASE_URL}/og-image-en.webp`],
     },
     alternates: {
-      canonical: pageUrl,
+      canonical: canonicalUrl,
       languages: {
         'x-default': `${BASE_URL}/en/lexiclash-vs-scrabble`,
         en: `${BASE_URL}/en/lexiclash-vs-scrabble`,
@@ -43,7 +44,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         es: `${BASE_URL}/es/juego-de-palabras-multijugador`,
       },
     },
-    robots: { index: true, follow: true },
+    robots: { index: isEnglish, follow: true },
   };
 }
 

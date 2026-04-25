@@ -4,8 +4,8 @@ import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { AnimatePresence, m } from 'framer-motion';
+import { ArrowLeft } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useHideNavigation } from '@/contexts/NavigationContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { getPuzzleForLevel, getTotalLevels } from '@/lib/connections/puzzles';
 import {
@@ -90,12 +90,6 @@ export default function ConnectionsGame() {
   const [sessionScore, setSessionScore] = useState(0);
   const [xpEarned, setXpEarned] = useState(0);
   const xpAwardedIdsRef = useRef<Set<string>>(new Set());
-
-  const setIsInGame = useHideNavigation();
-  useEffect(() => {
-    setIsInGame(true);
-    return () => setIsInGame(false);
-  }, [setIsInGame]);
 
   // If locale changes mid-session, reload from that locale's saved level + lives.
   useEffect(() => {
@@ -240,6 +234,19 @@ export default function ConnectionsGame() {
   return (
     <div ref={containerRef} className="relative flex flex-col gap-6 w-full max-w-xl mx-auto py-6 px-4">
       <ConnectionsEffectsCanvas width={canvasSize.width} height={canvasSize.height} />
+
+      {/* Back to home */}
+      <div className="flex" dir={isRTL ? 'rtl' : 'ltr'}>
+        <button
+          type="button"
+          onClick={handleQuit}
+          aria-label={t('common.back')}
+          className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-neo border-neo border-black bg-neo-navy-light text-neo-white shadow-hard-sm hover:shadow-hard active:shadow-hard-pressed active:translate-y-[1px] font-neo-body font-bold text-sm transition-all duration-100"
+        >
+          <ArrowLeft className="w-4 h-4 rtl:rotate-180" aria-hidden="true" />
+          <span>{t('common.back')}</span>
+        </button>
+      </div>
 
       {/* Header: lives + level + score */}
       <m.div

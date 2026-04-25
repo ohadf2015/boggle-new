@@ -10,8 +10,7 @@ interface PageProps {
 const BASE_URL = 'https://www.lexiclash.live';
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { locale } = await params;
-  const isTargetLocale = locale === 'en';
+  await params;
   const pageUrl = `${BASE_URL}/en/words-with-friends-alternative`;
 
   return {
@@ -81,17 +80,87 @@ const faqJsonLd = JSON.stringify({
   })),
 });
 
+// VideoGame entity — anchors AI grounding queries ("words with friends multiplayer free online")
+// to a structured Game/VideoGame node so AI Overviews + Perplexity can cite it as a Game entity.
+const videoGameJsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'VideoGame',
+  name: 'LexiClash',
+  alternateName: ['LexiClash Word Battle', 'LexiClash Multiplayer Word Game'],
+  url: 'https://www.lexiclash.live/en/words-with-friends-alternative',
+  description: 'Free real-time multiplayer word game. A browser-based alternative to Words With Friends — 2 to 20+ players play the same letter grid simultaneously. No download, no signup, no pay-to-win.',
+  image: 'https://www.lexiclash.live/og-image-en.webp',
+  genre: ['Word Game', 'Puzzle', 'Multiplayer', 'Casual'],
+  gamePlatform: ['Web Browser', 'iOS', 'Android', 'PWA'],
+  playMode: ['MultiPlayer', 'SinglePlayer', 'CoOp'],
+  numberOfPlayers: { '@type': 'QuantitativeValue', minValue: 1, maxValue: 20 },
+  applicationCategory: 'GameApplication',
+  operatingSystem: 'Any (Web Browser)',
+  inLanguage: ['en', 'he', 'sv', 'ja', 'es'],
+  offers: {
+    '@type': 'Offer',
+    price: '0',
+    priceCurrency: 'USD',
+    availability: 'https://schema.org/InStock',
+    url: 'https://www.lexiclash.live/en/multiplayer',
+  },
+  publisher: {
+    '@type': 'Organization',
+    name: 'LexiClash',
+    url: 'https://www.lexiclash.live',
+  },
+});
+
+// SoftwareApplication — second valid entity type stacked for AI engines that prefer SaaS/app schema.
+const softwareAppJsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: 'LexiClash — Words With Friends Alternative',
+  applicationCategory: 'GameApplication',
+  applicationSubCategory: 'Word Game',
+  operatingSystem: 'Web, iOS, Android',
+  url: 'https://www.lexiclash.live/en/words-with-friends-alternative',
+  offers: {
+    '@type': 'Offer',
+    price: '0',
+    priceCurrency: 'USD',
+  },
+  featureList: [
+    'Real-time multiplayer (2-20+ players)',
+    'No download or app install required',
+    'Free to play with no pay-to-win',
+    '5 languages (English, Hebrew, Swedish, Japanese, Spanish)',
+    'Daily Wordle-style challenges',
+    'Adventure mode with boss battles',
+    'Browser-based and PWA installable',
+  ],
+});
+
+// Breadcrumb — helps AI search engines understand information architecture and surface
+// the right anchor URL when summarizing the entity.
+const breadcrumbJsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://www.lexiclash.live/en' },
+    { '@type': 'ListItem', position: 2, name: 'Compare', item: 'https://www.lexiclash.live/en/best-online-word-games' },
+    { '@type': 'ListItem', position: 3, name: 'Words With Friends Alternative', item: 'https://www.lexiclash.live/en/words-with-friends-alternative' },
+  ],
+});
+
 export default async function WordsWithFriendsAlternativePage({ params }: PageProps) {
   const { locale } = await params;
-  const isTargetLocale = locale === 'en';
 
   return (
     <main className="min-h-screen bg-neo-navy text-neo-white">
-      {/* Static JSON-LD structured data for FAQ rich results — hardcoded content only, no user input */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: faqJsonLd }}
-      />
+      {/* Static JSON-LD structured data — hardcoded content only, no user input.
+          Stacked entities (FAQPage + VideoGame + SoftwareApplication + BreadcrumbList)
+          give AI Overviews / Perplexity / ChatGPT-Search multiple grounding hooks for
+          queries like "words with friends multiplayer free online". */}
+      <script type="application/ld+json" id="ld-faq">{faqJsonLd}</script>
+      <script type="application/ld+json" id="ld-videogame">{videoGameJsonLd}</script>
+      <script type="application/ld+json" id="ld-software">{softwareAppJsonLd}</script>
+      <script type="application/ld+json" id="ld-breadcrumb">{breadcrumbJsonLd}</script>
 
       <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
         <h1 className="mb-6 font-neo-display text-4xl font-bold leading-tight sm:text-5xl">

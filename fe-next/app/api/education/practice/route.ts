@@ -4,6 +4,14 @@ import { z } from 'zod';
 import logger from '@/utils/logger';
 import { calculatePracticeXp, type PracticeSessionXp } from '@/backend/modules/educationXpManager';
 import { updateEducationChallengeProgress } from '@/lib/supabase/education/challengeProgress';
+import { checkApiRateLimit } from '@/lib/apiRateLimit';
+
+function tooManyRequests(retryAfter: number | undefined) {
+  return NextResponse.json(
+    { error: 'Too many requests' },
+    { status: 429, headers: { 'Retry-After': String(retryAfter ?? 60) } }
+  );
+}
 
 // Validation schemas
 const practiceTypeSchema = z.enum(['flashcard', 'solo_board', 'warmup', 'word_list', 'matching', 'spelling', 'blitz']);
@@ -180,6 +188,12 @@ export async function GET(request: NextRequest) {
  * Start a new practice session
  */
 export async function POST(request: NextRequest) {
+  const limit = checkApiRateLimit(request, 'education-practice', {
+    maxRequests: 60,
+    windowMs: 60_000,
+  });
+  if (!limit.success) return tooManyRequests(limit.retryAfter);
+
   try {
     const supabase = await createClient();
 
@@ -258,6 +272,12 @@ export async function POST(request: NextRequest) {
  * Update a practice session (progress, completion)
  */
 export async function PATCH(request: NextRequest) {
+  const limit = checkApiRateLimit(request, 'education-practice', {
+    maxRequests: 60,
+    windowMs: 60_000,
+  });
+  if (!limit.success) return tooManyRequests(limit.retryAfter);
+
   try {
     const supabase = await createClient();
 

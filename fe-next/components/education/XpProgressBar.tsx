@@ -153,6 +153,10 @@ const XpProgressBar = memo<XpProgressBarProps>(({
           {/* Recent XP gain indicator */}
           {recentXpGain && recentXpGain > 0 && (
             <motion.span
+              data-testid="xp-recent-gain"
+              role="status"
+              aria-live="polite"
+              aria-atomic="true"
               initial={{ opacity: 1, scale: 1.2 }}
               animate={{ opacity: 0, scale: 1 }}
               transition={{ duration: 1.2 }}

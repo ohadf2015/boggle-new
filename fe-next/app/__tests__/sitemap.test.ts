@@ -36,4 +36,26 @@ describe('sitemap', () => {
     // Rough size estimate: each entry ~2KB with hreflangs. 410 × 2KB ≈ 820KB.
     expect(entries.length * 2048).toBeLessThan(50 * 1024 * 1024);
   });
+
+  it('includes education sub-routes (duels + classroom-game) for all locales', () => {
+    const urls = new Set(sitemap().map((e) => e.url));
+    for (const locale of ['en', 'he', 'sv', 'ja', 'es']) {
+      expect(urls.has(`https://www.lexiclash.live/${locale}/education/duels`), `sitemap missing /${locale}/education/duels`).toBe(true);
+      expect(urls.has(`https://www.lexiclash.live/${locale}/education/classroom-game`), `sitemap missing /${locale}/education/classroom-game`).toBe(true);
+    }
+  });
+
+  it('includes English commercial-intent doorway pages (WWF / multiplayer / free-online targets)', () => {
+    const urls = new Set(sitemap().map((e) => e.url));
+    const required = [
+      'https://www.lexiclash.live/en/words-with-friends-alternative',
+      'https://www.lexiclash.live/en/online-word-games-with-friends',
+      'https://www.lexiclash.live/en/multiplayer-word-game-online',
+      'https://www.lexiclash.live/en/play-boggle-online-free',
+      'https://www.lexiclash.live/en/word-games-online-free',
+    ];
+    for (const url of required) {
+      expect(urls.has(url), `sitemap missing: ${url}`).toBe(true);
+    }
+  });
 });

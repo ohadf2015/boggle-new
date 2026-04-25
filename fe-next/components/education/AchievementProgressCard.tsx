@@ -40,26 +40,33 @@ export interface AchievementProgressCardProps {
 // TIER COLORS
 // ============================================
 
+// B3 contrast: tier "text" tone is shown over neo-navy and must stay
+// >= 4.5:1. Silver in particular previously used `bg-neo-white/60` as a
+// text color, which renders ~2.5:1 on navy.
 const TIER_COLORS = {
   bronze: {
     bg: 'bg-amber-700',
     border: 'border-amber-800',
-    fill: 'bg-amber-600',
+    fill: 'bg-amber-500',
+    text: 'text-amber-300',
   },
   silver: {
-    bg: 'bg-neo-white/60',
-    border: 'border-neo-white/40',
-    fill: 'bg-neo-white/80',
+    bg: 'bg-slate-300',
+    border: 'border-slate-400',
+    fill: 'bg-slate-300',
+    text: 'text-slate-200',
   },
   gold: {
     bg: 'bg-yellow-500',
     border: 'border-yellow-600',
     fill: 'bg-yellow-400',
+    text: 'text-yellow-300',
   },
   platinum: {
     bg: 'bg-cyan-400',
     border: 'border-cyan-500',
     fill: 'bg-cyan-300',
+    text: 'text-cyan-200',
   },
 };
 
@@ -121,7 +128,16 @@ export default function AchievementProgressCard({
             ${isLocked ? 'opacity-40' : ''}
           `}
         >
-          <span className="text-3xl">
+          <span
+            data-testid="achievement-icon"
+            role="img"
+            aria-label={
+              achievement.isSecret && isLocked
+                ? t('education.achievements.secret')
+                : `${t(`education.achievements.${achievement.key}.name`)} icon`
+            }
+            className="text-3xl"
+          >
             {achievement.isSecret && isLocked ? '???' : achievement.icon}
           </span>
         </div>
@@ -137,7 +153,7 @@ export default function AchievementProgressCard({
                   : t(`education.achievements.${achievement.key}.name`)}
               </h3>
               {isEarned && achievement.currentTier && (
-                <p className={`text-sm font-neo-body ${tierColors?.fill || ''}`}>
+                <p className={`text-sm font-neo-body font-bold ${tierColors?.text || 'text-neo-white'}`}>
                   {t(`education.achievements.tiers.${achievement.currentTier}`)}
                 </p>
               )}

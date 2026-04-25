@@ -46,7 +46,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       },
     },
     // Only English body exists; noindex non-en routes so crawler treats /en/ as the single indexable version.
-    robots: { index: true, follow: true },
+    robots: { index: isEnglish, follow: true },
   };
 }
 

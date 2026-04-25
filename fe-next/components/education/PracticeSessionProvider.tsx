@@ -32,6 +32,7 @@ import useAchievementUnlock from '@/hooks/useAchievementUnlock';
 import { UnifiedAchievementModal } from '@/components/achievements/UnifiedAchievementModal';
 // supabase import removed — XP persistence handled server-side only
 import logger from '@/utils/logger';
+import { trackEduPracticeComplete, trackEduError } from '@/lib/education/telemetry';
 
 // ============================================
 // TYPE DEFINITIONS
@@ -310,6 +311,16 @@ export function PracticeSessionProvider({
           setPracticeDaysThisMonth(newDaysThisMonth);
         } catch { /* noop */ }
 
+        // F1: announce session completion to PostHog so we can build
+        // funnels (D1/D7 return, mode mix, drop-off step) without inventing
+        // events at every call site.
+        trackEduPracticeComplete({
+          lessonId,
+          practiceType: sessionData.type,
+          cardsReviewed: sessionData.cardsReviewed,
+          cardsCorrect: sessionData.cardsCorrect,
+        });
+
         // Check for achievement unlocks after XP is awarded.
         // Fields not tracked in education context use 0 (won't falsely unlock)
         // rather than hardcoded 1 which could falsely unlock achievements.
@@ -335,6 +346,7 @@ export function PracticeSessionProvider({
         });
       } catch (error) {
         logger.error('Error completing practice session:', error);
+        trackEduError({ surface: 'practice_session', code: 'complete_failed' });
       } finally {
         setIsPersisting(false);
       }

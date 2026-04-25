@@ -479,5 +479,33 @@ describe('AchievementProgressCard', () => {
       expect(progressBar).toHaveAttribute('aria-valuenow', '75');
       expect(progressBar).toHaveAttribute('aria-valuemax', '150');
     });
+
+    it('emoji icon carries an aria-label so screen readers do not just say "graphic"', () => {
+      const achievement = {
+        key: 'word_master',
+        category: 'progress' as const,
+        icon: '🎓',
+        isSecret: false,
+        currentTier: 'bronze' as const,
+        progressValue: 75,
+        nextThreshold: 150,
+        isMaxTier: false,
+        percentComplete: 50,
+      };
+
+      render(
+        <AchievementProgressCard
+          achievement={achievement}
+          isPinned={false}
+          onTogglePin={vi.fn()}
+          canPin={true}
+        />
+      );
+
+      const iconWrapper = screen.getByTestId('achievement-icon');
+      expect(iconWrapper).toHaveAttribute('role', 'img');
+      expect(iconWrapper).toHaveAttribute('aria-label');
+      expect(iconWrapper.getAttribute('aria-label')).toMatch(/Word Master/i);
+    });
   });
 });

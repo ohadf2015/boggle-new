@@ -33,7 +33,7 @@ export const EDUCATION_XP_CONFIG = {
   // Solo Board XP (vocabulary-focused)
   VOCABULARY_WORD_FOUND: 15, // XP per vocabulary word found
   BOARD_COMPLETION: 50, // Base XP for completing session
-  NEW_WORD_BONUS: 25, // First time finding a vocabulary word
+  NEW_WORD_BONUS: 40, // First time finding a vocabulary word — discovery > re-find
 
   // Lesson Completion XP
   LESSON_COMPLETED: 200, // Completing entire lesson

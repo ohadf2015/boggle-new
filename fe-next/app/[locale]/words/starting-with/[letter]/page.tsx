@@ -43,7 +43,9 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
     description,
     openGraph: { type: 'website', url, title, description, siteName: 'LexiClash' },
     alternates: {
-      canonical: url,
+      // Body content is English-only across all locale prefixes — point canonical at /en/
+      // so Google does not flag /he, /sv, /es variants as duplicates with conflicting self-canonicals.
+      canonical: `${BASE_URL}/en/words/starting-with/${letter}`,
       languages: Object.fromEntries([
         ['x-default', `${BASE_URL}/en/words/starting-with/${letter}`],
         ...LOCALES.map(l => [l, `${BASE_URL}/${l}/words/starting-with/${letter}`]),

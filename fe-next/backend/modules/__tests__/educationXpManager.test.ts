@@ -33,7 +33,9 @@ describe('educationXpManager', () => {
     it('should have correct board XP values', () => {
       expect(EDUCATION_XP_CONFIG.VOCABULARY_WORD_FOUND).toBe(15);
       expect(EDUCATION_XP_CONFIG.BOARD_COMPLETION).toBe(50);
-      expect(EDUCATION_XP_CONFIG.NEW_WORD_BONUS).toBe(25);
+      // Bumped 25 → 40 (audit D5): discovery is the highest-value learning
+      // signal so the new-word bonus should clearly out-pay re-finding.
+      expect(EDUCATION_XP_CONFIG.NEW_WORD_BONUS).toBe(40);
     });
 
     it('should have correct lesson XP values', () => {
@@ -190,10 +192,10 @@ describe('educationXpManager', () => {
 
       const result = calculatePracticeXp(session);
 
-      // 3 vocab * 15 = 45 + 25 new word + 50 completion + 20 daily = 140 XP
-      expect(result.totalXp).toBe(140);
+      // 3 vocab * 15 = 45 + 40 new word + 50 completion + 20 daily = 155 XP
+      expect(result.totalXp).toBe(155);
       expect(result.breakdown.vocabularyWords).toBe(45);
-      expect(result.breakdown.newWords).toBe(25);
+      expect(result.breakdown.newWords).toBe(40);
       expect(result.breakdown.boardCompletion).toBe(50);
       expect(result.breakdown.dailyPractice).toBe(20);
     });
@@ -226,9 +228,9 @@ describe('educationXpManager', () => {
 
       const result = calculatePracticeXp(session);
 
-      // 4 vocab * 15 = 60 + 50 new words (2*25) + 50 completion + 20 daily = 180 XP
-      expect(result.totalXp).toBe(180);
-      expect(result.breakdown.newWords).toBe(50);
+      // 4 vocab * 15 = 60 + 80 new words (2*40) + 50 completion + 20 daily = 210 XP
+      expect(result.totalXp).toBe(210);
+      expect(result.breakdown.newWords).toBe(80);
     });
   });
 

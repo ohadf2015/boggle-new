@@ -42,6 +42,11 @@ vi.mock('@/utils/confettiUtils', () => ({
   fireLevelUpConfetti: vi.fn(),
 }));
 
+const mockTrackUnlock = vi.fn();
+vi.mock('@/lib/education/telemetry', () => ({
+  trackEduAchievementUnlock: (...args: unknown[]) => mockTrackUnlock(...args),
+}));
+
 // Mock framer-motion to avoid animation issues in tests
 vi.mock('framer-motion', () => ({
   motion: {
@@ -364,6 +369,28 @@ describe('AchievementUnlockModal', () => {
 
         unmount();
       });
+    });
+  });
+
+  describe('telemetry (F1 wiring)', () => {
+    beforeEach(() => mockTrackUnlock.mockClear());
+
+    it('emits edu_achievement_unlock when an unlock appears', () => {
+      const unlock: UnlockPayload = {
+        achievementKey: 'first_lesson',
+        tier: 'bronze',
+        isUpgrade: false,
+      };
+      render(<AchievementUnlockModal unlock={unlock} onClose={vi.fn()} />);
+      expect(mockTrackUnlock).toHaveBeenCalledWith({
+        achievementId: 'first_lesson',
+        tier: 'bronze',
+      });
+    });
+
+    it('does not emit when unlock is null', () => {
+      render(<AchievementUnlockModal unlock={null} onClose={vi.fn()} />);
+      expect(mockTrackUnlock).not.toHaveBeenCalled();
     });
   });
 });

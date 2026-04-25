@@ -11,7 +11,9 @@ const BASE_URL = 'https://www.lexiclash.live';
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale } = await params;
+  const isEnglish = locale === 'en';
   const pageUrl = `${BASE_URL}/${locale}/best-online-word-games`;
+  const canonicalUrl = `${BASE_URL}/en/best-online-word-games`;
 
   return {
     title: '9 Best Online Word Games of 2026 (Free, No Download)',
@@ -32,7 +34,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       images: [`${BASE_URL}/og-image-en.webp`],
     },
     alternates: {
-      canonical: pageUrl,
+      canonical: canonicalUrl,
       languages: {
         'x-default': `${BASE_URL}/en/best-online-word-games`,
         en: `${BASE_URL}/en/best-online-word-games`,
@@ -42,6 +44,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         es: `${BASE_URL}/es/juego-de-palabras-multijugador`,
       },
     },
+    robots: { index: isEnglish, follow: true },
   };
 }
 
@@ -353,10 +356,14 @@ export default async function BestOnlineWordGamesPage({ params }: PageProps) {
           </div>
         </section>
 
-        {/* Detailed Comparisons — keep exactly as-is */}
+        {/* Detailed Comparisons */}
         <section className="mb-12">
           <h2 className="mb-4 font-neo-display text-2xl font-bold sm:text-3xl">Detailed Comparisons</h2>
-          <div className="grid gap-3 sm:grid-cols-3">
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <Link href={`/${locale}/words-with-friends-alternative`} className="rounded-neo border-3 border-neo-pink/60 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-pink">
+              <h3 className="font-bold text-neo-pink">Words With Friends Alternative</h3>
+              <p className="mt-1 text-xs text-neo-gray-200">Real-time multiplayer, free, no download</p>
+            </Link>
             <Link href={`/${locale}/lexiclash-vs-wordle`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-lime/40">
               <h3 className="font-bold text-neo-cyan">LexiClash vs Wordle</h3>
               <p className="mt-1 text-xs text-neo-gray-200">Unlimited play vs 1 puzzle/day</p>
