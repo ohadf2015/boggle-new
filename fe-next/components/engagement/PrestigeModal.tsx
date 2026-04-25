@@ -125,7 +125,7 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
                 className="flex flex-col items-center gap-4 py-6"
               >
                 <Image
-                  src="/mascot/powerup.gif"
+                  src="/mascot/powerup-nobg.webp"
                   alt=""
                   width={80}
                   height={80}

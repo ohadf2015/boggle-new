@@ -132,8 +132,11 @@ export class PixiSoundManager {
   /** Mute/unmute all sounds */
   setMuted(muted: boolean): void {
     if (!this.pixiSound) return;
-    this.pixiSound.sound.muteAll();
-    if (!muted) this.pixiSound.sound.unmuteAll();
+    if (muted) {
+      this.pixiSound.sound.muteAll();
+    } else {
+      this.pixiSound.sound.unmuteAll();
+    }
   }
 
   /** Stop all sounds and clean up */

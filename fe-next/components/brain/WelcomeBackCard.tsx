@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import Image from 'next/image';
 import { Trophy, Flame, X, TrendingUp, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/utils/ThemeContext';
@@ -142,13 +141,16 @@ export default function WelcomeBackCard({
             {/* Header with dismiss button */}
             <div className="flex items-start justify-between mb-3">
               <div className="flex items-center gap-2">
-                <Image
-                  src="/mascot/encouraging.gif"
-                  alt=""
+                <video
+                  src="/mascot/encouraging.mp4"
                   width={40}
                   height={40}
                   className="drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]"
-                  unoptimized
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  preload="metadata"
                   aria-hidden="true"
                 />
                 <h3 className={cn(

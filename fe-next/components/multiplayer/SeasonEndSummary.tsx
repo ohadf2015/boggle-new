@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import Image from 'next/image';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { calculateSoftReset } from '@/lib/seasons';
 
@@ -54,13 +53,16 @@ export const SeasonEndSummary: React.FC<SeasonEndSummaryProps> = ({
               animate={{ scale: 1 }}
               transition={{ delay: 0.3, type: 'spring', stiffness: 200, damping: 14 }}
             >
-              <Image
-                src="/mascot/trophy.gif"
-                alt=""
+              <video
+                src="/mascot/trophy.mp4"
                 width={80}
                 height={80}
                 className="mx-auto mb-2 drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]"
-                unoptimized
+                autoPlay
+                loop
+                muted
+                playsInline
+                preload="metadata"
                 aria-hidden="true"
               />
             </motion.div>

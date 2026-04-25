@@ -4,6 +4,7 @@
 
 import type { LetterGrid, Language } from '@/types';
 import type { LetterFeedback } from '@/utils/wordHuntFeedback';
+import type { WordHuntRescueMethod } from '../analytics/wordHuntCompletePayload';
 
 /**
  * Props for the main DailyWordHuntSurvival component
@@ -13,7 +14,7 @@ export interface DailyWordHuntSurvivalProps {
   puzzleNumber: number;
   language: Language;
   targetWord: string;
-  onComplete: (result: SurvivalGameResult) => void;
+  onComplete: (result: SurvivalGameResult, rescueMethod?: WordHuntRescueMethod) => void;
   onQuit: () => void;
   /** Puzzle date string for desktop leaderboard sidebar (e.g. '2026-02-07') */
   puzzleDate?: string;

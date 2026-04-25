@@ -279,7 +279,7 @@ const HostView: React.FC<HostViewProps> = memo(({
     if (state.runtime.gameStarted) return;
     if (autoStartFiredRef.current) return;
     if (!socket?.connected || !gameCode) return;
-    logger.warn('[QUICK_PLAY autostart] firing', {
+    logger.debug('[QUICK_PLAY autostart] firing', {
       gameCode,
       connected: socket?.connected,
       gameStarted: state.runtime.gameStarted,

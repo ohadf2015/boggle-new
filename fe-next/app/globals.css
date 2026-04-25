@@ -3115,9 +3115,16 @@ html {
 }
 
 /* When GlobalBottomNav is visible on mobile, reserve space so fixed nav
-   (h-16 + safe-area) never covers content. Applied to .main-content-safe,
-   which lives only on the outer <main> (PageLayout no longer duplicates it). */
+   (h-16 + safe-area) never covers content. Applied to body.screen-fit
+   (the actual scroll container) because inner flex items with min-h-0
+   let content overflow past main's padding box. Padding on the scroll
+   container is counted in scrollable height, so the bottom 64px is
+   always reachable above the fixed nav. Keeps the .main-content-safe
+   rule as a belt-and-suspenders for any ad-hoc scrollable containers. */
 @media (max-width: 639px) {
+  html.has-global-bottom-nav body.screen-fit {
+    padding-bottom: calc(var(--bottom-nav-height, 64px) + env(safe-area-inset-bottom, 0px));
+  }
   html.has-global-bottom-nav .main-content-safe {
     padding-bottom: calc(var(--bottom-nav-height, 64px) + env(safe-area-inset-bottom, 0px));
   }

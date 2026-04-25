@@ -15,7 +15,7 @@ const DATE_PUBLISHED = '2026-03-28';
 const DATE_MODIFIED = '2026-03-28';
 
 const metaTitles: Record<string, string> = {
-  en: 'Boggle vs Wordle 2026 - Honest Comparison: Which Word Game Is Better?',
+  en: 'Boggle vs Wordle: Which Is Better in 2026? (Honest Take)',
   he: 'באגל מול וורדל 2026 - השוואה כנה: איזה משחק מילים יותר טוב?',
   sv: 'Boggle vs Wordle 2026 - Ärlig Jämförelse: Vilket Ordspel Är Bäst?',
   ja: 'Boggle vs Wordle 2026 - 正直比較：どちらのワードゲームが優れている？',
@@ -23,7 +23,7 @@ const metaTitles: Record<string, string> = {
 };
 
 const metaDescriptions: Record<string, string> = {
-  en: 'Boggle vs Wordle — which word game is better? An honest comparison of gameplay, difficulty, addictiveness, and value. Find out which one deserves your daily time in 2026.',
+  en: 'Boggle vs Wordle in 2026 — gameplay, difficulty, addictiveness, daily-ritual value compared. Find out which word game actually deserves 5 minutes of your day. Honest verdict inside.',
   he: 'באגל מול וורדל — איזה משחק מילים יותר טוב? השוואה כנה של גיימפליי, קושי, ממכרות וערך. גלו מי באמת שווה את הזמן שלכם ב-2026.',
   sv: 'Boggle vs Wordle — vilket ordspel är bäst? En ärlig jämförelse av gameplay, svårighetsgrad, beroendeframkallande och värde. Ta reda på vilket som förtjänar din dagliga tid 2026.',
   ja: 'Boggle vs Wordle — どちらのワードゲームが優れている？ゲームプレイ、難易度、中毒性、価値を正直に比較。2026年にどちらが毎日の時間に値するか。',

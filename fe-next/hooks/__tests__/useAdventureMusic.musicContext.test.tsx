@@ -165,7 +165,7 @@ describe('useAdventureMusic MusicContext Integration', () => {
   });
 
   describe('mute control integration', () => {
-    it('should mute adventure music when MusicContext is muted', () => {
+    it('should pause Howl when MusicContext is muted', () => {
       // GIVEN - adventure music is playing
       mockPlaying.mockReturnValue(true);
 
@@ -180,21 +180,22 @@ describe('useAdventureMusic MusicContext Integration', () => {
 
       vi.clearAllMocks();
 
-      // WHEN - user mutes via MusicControls (which toggles MusicContext mute)
+      // WHEN - user mutes via MusicControls
       act(() => {
         result.current.music.toggleMute();
       });
 
-      // THEN - adventure music should be muted (volume 0)
-      // Currently this will FAIL because useAdventureMusic ignores MusicContext isMuted
-      expect(mockVolumeSet).toHaveBeenCalledWith(0);
+      // THEN - Howl should be paused (not just volume-0'd) so decoding stops
+      expect(mockPause).toHaveBeenCalled();
     });
 
-    it('should unmute adventure music when MusicContext is unmuted', () => {
+    it('should resume Howl at saved volume when MusicContext is unmuted', () => {
       // GIVEN - MusicContext is initially muted
       localStorageMock.setItem('boggle_music_settings', JSON.stringify({ volume: 0.7, isMuted: true }));
 
-      mockPlaying.mockReturnValue(true);
+      // Initially Howl is paused (not playing) because we muted it.
+      // After unmute, resumeAudio calls play() which restarts decoding.
+      mockPlaying.mockReturnValue(false);
 
       const { result } = renderHook(
         () => {
@@ -212,8 +213,8 @@ describe('useAdventureMusic MusicContext Integration', () => {
         result.current.music.toggleMute();
       });
 
-      // THEN - adventure music should resume at saved volume (0.7)
-      // Currently this will FAIL because useAdventureMusic ignores MusicContext
+      // THEN - Howl should be resumed (play called) and volume restored to 0.7
+      expect(mockPlay).toHaveBeenCalled();
       expect(mockVolumeSet).toHaveBeenCalledWith(0.7);
     });
   });

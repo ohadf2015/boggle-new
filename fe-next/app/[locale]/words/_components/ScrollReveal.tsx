@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useEffect, useState, type ReactNode } from 'react';
+import { useRef, useEffect, useState, isValidElement, type ReactNode } from 'react';
 
 interface ScrollRevealProps {
   children: ReactNode;
@@ -121,7 +121,7 @@ export function StaggerReveal({
     <div ref={ref} className={className}>
       {children.map((child, i) => (
         <div
-          key={i}
+          key={(isValidElement(child) && child.key) || `stagger-${i}`}
           style={{
             transitionProperty: 'opacity, transform',
             transitionDuration: '0.4s',

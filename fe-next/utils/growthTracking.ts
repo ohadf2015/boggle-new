@@ -47,6 +47,7 @@ export type GrowthEvent =
   | 'daily_challenge_completed'
   | 'daily_puzzle_opened'
   | 'daily_puzzle_completed'
+  | 'daily_word_hunt_complete'
   // Adventure
   | 'adventure_level_start'
   | 'adventure_level_pass'

@@ -130,6 +130,8 @@ vi.mock('../results', () => ({
     handleRevealTargetWord: vi.fn(),
   }),
   useConfettiEffects: () => ({ handleBadgeClickConfetti: vi.fn() }),
+  useSpendAnimation: () => ({ isVisible: false, position: { x: 0, y: 0 }, amount: 0, start: vi.fn(), hide: vi.fn() }),
+  useStreakFreezeStatus: () => ({ freezesAvailable: 0, isStreakProtected: false }),
   ScoreBadge: () => <div data-testid="score-badge" />,
   ResultDisplay: () => <div data-testid="result-display" />,
   PerformanceSection: () => <div data-testid="performance-section" />,

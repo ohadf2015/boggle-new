@@ -4,7 +4,6 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Dialog, DialogContent, DialogTitle } from '../ui/dialog';
 import { cn } from '@/lib/utils';
-import Image from 'next/image';
 import { Sparkles, Gift, Zap, Star, Crown } from 'lucide-react';
 import { fireConfetti } from '@/utils/confettiUtils';
 
@@ -349,13 +348,16 @@ const MysteryRewardPopup: React.FC<MysteryRewardPopupProps> = ({
                   animate={{ scale: 1, y: 0 }}
                   transition={{ delay: 0.4, type: 'spring', stiffness: 250, damping: 15 }}
                 >
-                  <Image
-                    src={rarity === 'legendary' || rarity === 'epic' ? '/mascot/celebration.gif' : '/mascot/flexing.gif'}
-                    alt=""
+                  <video
+                    src={rarity === 'legendary' || rarity === 'epic' ? '/mascot/celebration.mp4' : '/mascot/flexing.mp4'}
                     width={80}
                     height={80}
                     className="drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]"
-                    unoptimized
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    preload="metadata"
                     aria-hidden="true"
                   />
                 </motion.div>

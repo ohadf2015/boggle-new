@@ -1,12 +1,21 @@
 'use client';
 
-import React, { useMemo, useEffect, useRef, useState } from 'react';
+import React, { useMemo, useEffect, useRef, useState, useCallback } from 'react';
+import dynamic from 'next/dynamic';
+import { DiscoveredWordsList } from './DiscoveredWordsList';
 import { motion, AnimatePresence } from 'framer-motion';
+import type { WordHuntEffect } from './WordHuntEffectsCanvas';
+
+const WordHuntEffectsCanvas = dynamic(
+  () => import('./WordHuntEffectsCanvas'),
+  { ssr: false }
+);
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useDesktopLayout } from '@/hooks/useDesktopLayout';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { useNavigationGuard } from '@/hooks/useNavigationGuard';
 import { useHasRealAdProvider } from '@/hooks/useHasRealAdProvider';
+import { useCoinsFromContext } from '@/contexts/CoinContext';
 import { useKeyboardWordInput } from '@/hooks/useKeyboardWordInput';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
@@ -16,7 +25,8 @@ import { InlineConfetti } from '@/components/effects/InlineConfetti';
 import { ScreenFlashOverlay } from '@/components/game/ScreenFlashOverlay';
 
 import type { LetterGrid, Language } from '@/types';
-import type { SurvivalGameResult, WordDiscovery } from './survival/types';
+import type { SurvivalGameResult } from './survival/types';
+import type { WordHuntRescueMethod } from './analytics/wordHuntCompletePayload';
 import { MIN_DISCOVERY_WORD_LENGTH } from '@/shared/constants/gameConstants';
 
 import {
@@ -31,6 +41,7 @@ import { SurvivalDesktopLayout } from './survival/SurvivalDesktopLayout';
 import { SurvivalExtraLifeModal } from './survival/SurvivalExtraLifeModal';
 
 const EXTRA_LIFE_RESTORE_AMOUNT = 50;
+const EXTRA_LIFE_COIN_COST = 50;
 
 // Re-export types for backwards compatibility
 export type { WordDiscovery, TargetAttempt, SurvivalGameResult } from './survival/types';
@@ -40,7 +51,7 @@ interface DailyWordHuntSurvivalProps {
   puzzleNumber: number;
   language: Language;
   targetWord: string;
-  onComplete: (result: SurvivalGameResult) => void;
+  onComplete: (result: SurvivalGameResult, rescueMethod?: WordHuntRescueMethod) => void;
   onQuit: () => void;
   /** Puzzle date string for desktop leaderboard sidebar */
   puzzleDate?: string;
@@ -78,10 +89,19 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     [isLowEnd, enableComplexAnimations]
   );
 
-  // Extra-life offer state (rewarded ad on life=0, single-use per run)
+  // Extra-life offer state (rewarded ad OR coin-spend on life=0, single-use per run)
   const hasUsedExtraLifeRef = useRef(false);
+  const rescueMethodRef = useRef<WordHuntRescueMethod>(null);
   const [extraLifeDeclined, setExtraLifeDeclined] = useState(false);
   const hasRealAdProvider = useHasRealAdProvider();
+  const { canAfford, spendCoins } = useCoinsFromContext();
+  const canAffordCoinRestore = canAfford(EXTRA_LIFE_COIN_COST);
+  const hasRescueAvailable = hasRealAdProvider || canAffordCoinRestore;
+
+  const handleInnerComplete = React.useCallback(
+    (result: SurvivalGameResult) => onComplete(result, rescueMethodRef.current),
+    [onComplete],
+  );
 
   // Game logic hook
   const [state, actions] = useSurvivalGameLogic({
@@ -89,14 +109,14 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     puzzleNumber,
     language,
     targetWord,
-    onComplete,
+    onComplete: handleInnerComplete,
     t,
     deferGameOver:
-      hasRealAdProvider && !hasUsedExtraLifeRef.current && !extraLifeDeclined,
+      hasRescueAvailable && !hasUsedExtraLifeRef.current && !extraLifeDeclined,
   });
 
   const extraLifeModalOpen =
-    hasRealAdProvider
+    hasRescueAvailable
     && !hasUsedExtraLifeRef.current
     && !extraLifeDeclined
     && state.lifePoints === 0
@@ -104,11 +124,25 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
 
   const handleExtraLifeAccept = () => {
     hasUsedExtraLifeRef.current = true;
+    rescueMethodRef.current = 'ad';
     actions.restoreLife(EXTRA_LIFE_RESTORE_AMOUNT);
   };
 
   const handleExtraLifeDecline = () => {
     setExtraLifeDeclined(true);
+  };
+
+  const handleExtraLifeCoinAccept = async () => {
+    const ok = await spendCoins(
+      EXTRA_LIFE_COIN_COST,
+      'Daily Survival Extra Life',
+      { placement: 'daily_survival_extra_life_coin' },
+    );
+    if (ok) {
+      hasUsedExtraLifeRef.current = true;
+      rescueMethodRef.current = 'coin';
+      actions.restoreLife(EXTRA_LIFE_RESTORE_AMOUNT);
+    }
   };
 
   // Navigation guard
@@ -147,15 +181,50 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
   const [flashTrigger, setFlashTrigger] = useState(0);
   const [flashColor, setFlashColor] = useState('bg-green-400/15');
 
+  // PixiJS effects layer — queue-drain pattern
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [canvasSize, setCanvasSize] = useState({ width: 0, height: 0 });
+  const [pixiEffects, setPixiEffects] = useState<WordHuntEffect[]>([]);
+
+  const pushEffect = useCallback((effect: WordHuntEffect) => {
+    setPixiEffects((prev) => [...prev, effect]);
+  }, []);
+  const handleEffectsConsumed = useCallback(() => {
+    setPixiEffects([]);
+  }, []);
+
+  useEffect(() => {
+    if (skipAnimations) return;
+    const node = containerRef.current;
+    if (!node) return;
+    const measure = () => {
+      const rect = node.getBoundingClientRect();
+      setCanvasSize({ width: rect.width, height: rect.height });
+    };
+    measure();
+    if (typeof ResizeObserver === 'undefined') return;
+    const ro = new ResizeObserver(measure);
+    ro.observe(node);
+    return () => ro.disconnect();
+  }, [skipAnimations]);
+
   // Trigger effects on feedback type changes
   const prevFeedbackForEffects = useRef(state.feedbackType);
   useEffect(() => {
     if (state.feedbackType && state.feedbackType !== prevFeedbackForEffects.current) {
+      const cx = canvasSize.width / 2;
+      const cy = canvasSize.height / 2;
       if (state.feedbackType === 'valid-word') {
         triggerReward('wordFound');
         if (!skipAnimations) {
           setFlashColor('bg-green-400/15');
           setFlashTrigger((n) => n + 1);
+          pushEffect({
+            type: 'wordValid',
+            x: cx,
+            y: cy,
+            points: state.lastScoreIncrement ?? 1,
+          });
         }
       } else if (state.feedbackType === 'target-found') {
         triggerReward('levelUp');
@@ -163,11 +232,102 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         if (!skipAnimations) {
           setFlashColor('bg-neo-lime/20');
           setFlashTrigger((n) => n + 1);
+          pushEffect({ type: 'targetFound', x: cx, y: cy });
         }
+      } else if (
+        !skipAnimations &&
+        (state.feedbackType === 'invalid-word' ||
+          state.feedbackType === 'not-in-dictionary' ||
+          state.feedbackType === 'not-on-board')
+      ) {
+        pushEffect({ type: 'invalid', x: canvasSize.width / 2, y: canvasSize.height / 2 });
       }
     }
     prevFeedbackForEffects.current = state.feedbackType;
-  }, [state.feedbackType, triggerReward, skipAnimations]);
+  }, [
+    state.feedbackType,
+    state.lastScoreIncrement,
+    triggerReward,
+    skipAnimations,
+    pushEffect,
+    canvasSize.width,
+    canvasSize.height,
+  ]);
+
+  // Life delta watcher — gain / drop / lowLife
+  const prevLifePointsRef = useRef(state.lifePoints);
+  const lowLifeFiredRef = useRef(false);
+  useEffect(() => {
+    if (skipAnimations) {
+      prevLifePointsRef.current = state.lifePoints;
+      return;
+    }
+    const prev = prevLifePointsRef.current;
+    const curr = state.lifePoints;
+    if (curr > prev) {
+      pushEffect({ type: 'lifeGain', amount: curr - prev });
+    } else if (curr < prev) {
+      pushEffect({ type: 'lifeDrop', amount: prev - curr });
+    }
+    if (curr > 0 && curr <= 25 && !lowLifeFiredRef.current) {
+      pushEffect({ type: 'lowLife' });
+      lowLifeFiredRef.current = true;
+    } else if (curr > 25 && lowLifeFiredRef.current) {
+      lowLifeFiredRef.current = false;
+    }
+    prevLifePointsRef.current = curr;
+  }, [state.lifePoints, skipAnimations, pushEffect]);
+
+  // Letter elimination watcher — push effect on each new eliminated letter
+  const prevEliminatedCountRef = useRef(state.eliminatedLetters.size);
+  useEffect(() => {
+    if (skipAnimations) {
+      prevEliminatedCountRef.current = state.eliminatedLetters.size;
+      return;
+    }
+    const prev = prevEliminatedCountRef.current;
+    const curr = state.eliminatedLetters.size;
+    if (curr > prev) {
+      pushEffect({
+        type: 'letterEliminated',
+        x: canvasSize.width / 2,
+        y: canvasSize.height * 0.6,
+      });
+    }
+    prevEliminatedCountRef.current = curr;
+  }, [state.eliminatedLetters.size, skipAnimations, pushEffect, canvasSize.width, canvasSize.height]);
+
+  // Clue-gain watcher — fire on rising edge
+  const prevClueGainingRef = useRef(state.isClueGaining);
+  useEffect(() => {
+    if (!skipAnimations && state.isClueGaining && !prevClueGainingRef.current) {
+      pushEffect({ type: 'clueGain' });
+    }
+    prevClueGainingRef.current = state.isClueGaining;
+  }, [state.isClueGaining, skipAnimations, pushEffect]);
+
+  // Game end watcher — gameWon / gameLost
+  const gameEndFiredRef = useRef<'won' | 'lost' | null>(null);
+  useEffect(() => {
+    if (skipAnimations) return;
+    if (state.hasWon && gameEndFiredRef.current !== 'won') {
+      pushEffect({ type: 'gameWon', score: state.liveScore });
+      gameEndFiredRef.current = 'won';
+    } else if (state.isGameOver && !state.hasWon && gameEndFiredRef.current !== 'lost') {
+      pushEffect({ type: 'gameLost' });
+      gameEndFiredRef.current = 'lost';
+    }
+  }, [state.hasWon, state.isGameOver, state.liveScore, skipAnimations, pushEffect]);
+
+  const pixiOverlay =
+    !skipAnimations && canvasSize.width > 0 && canvasSize.height > 0 ? (
+      <WordHuntEffectsCanvas
+        width={canvasSize.width}
+        height={canvasSize.height}
+        effects={pixiEffects}
+        onEffectsConsumed={handleEffectsConsumed}
+      />
+    ) : null;
 
   // Hide bottom navigation during active gameplay
   useEffect(() => {
@@ -181,10 +341,24 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     onQuit();
   };
 
+  const extraLifeModal = extraLifeModalOpen ? (
+    <SurvivalExtraLifeModal
+      isOpen
+      restoreAmount={EXTRA_LIFE_RESTORE_AMOUNT}
+      onRestore={handleExtraLifeAccept}
+      onDecline={handleExtraLifeDecline}
+      coinCost={EXTRA_LIFE_COIN_COST}
+      canAffordCoinRestore={canAffordCoinRestore}
+      onCoinRestore={handleExtraLifeCoinAccept}
+      t={t}
+    />
+  ) : null;
+
   // Desktop/TV layout (3-column with sidebars)
   if ((isDesktop || isTv) && puzzleDate) {
     return (
-      <>
+      <div ref={containerRef} className="relative w-full h-full">
+        {pixiOverlay}
         <ScreenFlashOverlay trigger={flashTrigger} colorClass={flashColor} />
         {/* react-rewards anchor — must exist in DOM for reward confetti to target */}
         <span id={rewardId} className="fixed top-1/2 left-1/2 pointer-events-none" />
@@ -260,16 +434,8 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
           analyticsExtras={{ orientation: 'landscape' }}
         />
 
-        {extraLifeModalOpen && (
-          <SurvivalExtraLifeModal
-            isOpen
-            restoreAmount={EXTRA_LIFE_RESTORE_AMOUNT}
-            onRestore={handleExtraLifeAccept}
-            onDecline={handleExtraLifeDecline}
-            t={t}
-          />
-        )}
-      </>
+        {extraLifeModal}
+      </div>
     );
   }
 
@@ -277,14 +443,16 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
   // pt-3 ensures game header doesn't overlap with the sticky app header on mobile
   return (
     <motion.div
+      ref={containerRef}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="flex-1 flex flex-col p-2 sm:p-4 overflow-x-clip overflow-y-auto pb-safe pt-3 sm:pt-2"
+      className="relative flex-1 flex flex-col p-2 sm:p-4 overflow-x-clip overflow-y-auto pb-safe pt-3 sm:pt-2"
       style={{
         paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom, 0px))',
       } as React.CSSProperties}
     >
+      {pixiOverlay}
       {/* Subtle screen flash on word discovery */}
       <ScreenFlashOverlay trigger={flashTrigger} colorClass={flashColor} />
 
@@ -434,70 +602,8 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         analyticsExtras={{ orientation: 'portrait' }}
       />
 
-      {extraLifeModalOpen && (
-        <SurvivalExtraLifeModal
-          isOpen
-          restoreAmount={EXTRA_LIFE_RESTORE_AMOUNT}
-          onRestore={handleExtraLifeAccept}
-          onDecline={handleExtraLifeDecline}
-          t={t}
-        />
-      )}
+      {extraLifeModal}
     </motion.div>
-  );
-};
-
-/**
- * Inline discovered words list for mobile — words visible by default with obfuscate toggle
- */
-const DiscoveredWordsList: React.FC<{
-  words: WordDiscovery[];
-  t: (key: string) => string;
-}> = ({ words, t }) => {
-  const [obfuscated, setObfuscated] = useState(false);
-
-  const sortedWords = useMemo(
-    () => [...words].sort((a, b) => b.timestamp - a.timestamp),
-    [words]
-  );
-
-  return (
-    <div className="shrink-0 px-1 pb-1">
-      {/* Header with count + toggle */}
-      <div className="flex items-center justify-between px-2 py-1">
-        <span className="text-[11px] text-neo-cream/60 font-bold tabular-nums">
-          {words.length} {t('wordHunt.mobile.words')}
-        </span>
-        <button
-          onClick={() => setObfuscated(!obfuscated)}
-          className="text-[10px] text-neo-cream/40 hover:text-neo-cream/70 font-medium transition-colors px-1.5 py-0.5 rounded"
-        >
-          {obfuscated ? t('common.show') : t('common.hide')}
-        </button>
-      </div>
-      {/* Word chips */}
-      <div className="flex flex-wrap gap-1 px-1 max-h-[72px] overflow-y-auto scrollbar-thin scrollbar-thumb-neo-cream/10">
-        <AnimatePresence mode="popLayout">
-          {sortedWords.map((w) => (
-            <motion.span
-              key={`${w.word}-${w.timestamp}`}
-              initial={{ opacity: 0, scale: 0.7 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.7 }}
-              className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider ${
-                w.word.length >= 7
-                  ? 'bg-neo-pink/15 text-neo-pink'
-                  : w.word.length >= 5
-                    ? 'bg-neo-cyan/15 text-neo-cyan'
-                    : 'bg-neo-cream/10 text-neo-cream/70'
-              }`}
-            >
-              {obfuscated ? '•'.repeat(w.word.length) : w.word}
-            </motion.span>
-          ))}
-        </AnimatePresence>
-      </div>
-    </div>
   );
 };
 

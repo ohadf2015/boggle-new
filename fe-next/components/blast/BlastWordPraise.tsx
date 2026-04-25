@@ -60,20 +60,37 @@ export default function BlastWordPraise({ wordLength, submitCount, t }: BlastWor
         {visible && tier && (
           <AdaptiveMotion.div
             key={animKey}
-            initial={{ scale: 0.3, opacity: 0, y: 20 }}
-            animate={{ scale: 1, opacity: 1, y: 0 }}
-            exit={{ scale: 1.2, opacity: 0, y: -10 }}
-            transition={{ type: 'spring', stiffness: 500, damping: 25 }}
+            initial={{ scale: 0.2, opacity: 0, y: 24, rotate: -6 }}
+            animate={{
+              scale: [0.2, 1.25, 0.95, 1.05, 1],
+              opacity: [0, 1, 1, 1, 1],
+              y: [24, -6, 0, -2, 0],
+              rotate: [-6, 3, -1, 1, 0],
+            }}
+            exit={{
+              scale: 1.4,
+              opacity: 0,
+              y: -18,
+              rotate: 4,
+              transition: { duration: 0.25, ease: 'easeIn' },
+            }}
+            transition={{
+              duration: 0.55,
+              times: [0, 0.35, 0.6, 0.8, 1],
+              ease: 'easeOut',
+            }}
           >
-            <span
-              className={`${tier.color} font-neo-display font-black uppercase tracking-wider px-4 py-1 rounded-neo`}
+            <AdaptiveMotion.span
+              className={`${tier.color} font-neo-display font-black uppercase tracking-wider px-4 py-1 rounded-neo inline-block`}
               style={{
                 fontSize: `${tier.scale * 2}rem`,
                 textShadow: `0 2px 8px rgba(0,0,0,0.6), 0 0 16px ${tier.glow}`,
               }}
+              animate={{ y: [0, -3, 0] }}
+              transition={{ duration: 0.9, ease: 'easeInOut', repeat: 0 }}
             >
               {t(tier.key)}
-            </span>
+            </AdaptiveMotion.span>
           </AdaptiveMotion.div>
         )}
       </AdaptiveAnimatePresence>

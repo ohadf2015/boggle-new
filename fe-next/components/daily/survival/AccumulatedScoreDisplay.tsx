@@ -10,66 +10,67 @@ export interface AccumulatedScoreDisplayProps {
   currentScore: number;
   lastIncrement: number | null;
   isAnimating: boolean;
-  t: (key: string) => string;
+  t: (key: string, params?: Record<string, string | number>) => string;
 }
 
-/**
- * Score tier thresholds for subtle color coding
- * Thresholds based on typical word hunt scoring patterns
- * Colors are muted to avoid distraction during gameplay
- */
+// Season-2 efficiency bands (0–1000). Mirror the results-page tier color thresholds.
 const SCORE_TIERS = {
-  LOW: 75,       // 0-74: Needs improvement
-  MEDIUM: 175,   // 75-174: Average
-  GOOD: 300,     // 175-299: Good
-  // 300+: Excellent
+  SILVER: 400,
+  GOLD: 600,
+  PLATINUM: 800,
 } as const;
 
-/**
- * Get subtle color classes based on score
- * Uses muted tones to provide feedback without distraction
- */
-function getScoreColorClasses(score: number): {
+type TierKey = 'bronze' | 'silver' | 'gold' | 'platinum';
+
+interface TierInfo {
+  tier: TierKey;
+  nextTier: TierKey | null;
+  nextThreshold: number | null;
   gradient: string;
-  iconColor: string;
-  textColor: string;
-} {
-  if (score < SCORE_TIERS.LOW) {
-    // Low score - muted warm tone (not alarming red)
+  labelColor: string;
+}
+
+function getTierInfo(score: number): TierInfo {
+  if (score < SCORE_TIERS.SILVER) {
     return {
+      tier: 'bronze',
+      nextTier: 'silver',
+      nextThreshold: SCORE_TIERS.SILVER,
       gradient: 'from-neo-pink-muted to-neo-pink',
-      iconColor: 'text-neo-black/80',
-      textColor: 'text-neo-black',
+      labelColor: 'text-neo-pink',
     };
   }
-  if (score < SCORE_TIERS.MEDIUM) {
-    // Medium score - warm lime
+  if (score < SCORE_TIERS.GOLD) {
     return {
-      gradient: 'from-neo-lime-muted to-neo-lime',
-      iconColor: 'text-neo-black/80',
-      textColor: 'text-neo-black',
+      tier: 'silver',
+      nextTier: 'gold',
+      nextThreshold: SCORE_TIERS.GOLD,
+      gradient: 'from-neo-orange to-neo-yellow',
+      labelColor: 'text-neo-orange',
     };
   }
-  if (score < SCORE_TIERS.GOOD) {
-    // Good score - bright lime
+  if (score < SCORE_TIERS.PLATINUM) {
     return {
-      gradient: 'from-neo-lime-light to-neo-lime',
-      iconColor: 'text-neo-black/80',
-      textColor: 'text-neo-black',
+      tier: 'gold',
+      nextTier: 'platinum',
+      nextThreshold: SCORE_TIERS.PLATINUM,
+      gradient: 'from-neo-yellow to-neo-lime-light',
+      labelColor: 'text-neo-yellow',
     };
   }
-  // Excellent score - cyan/lime
   return {
-    gradient: 'from-neo-lime to-neo-cyan-light',
-    iconColor: 'text-neo-black/80',
-    textColor: 'text-neo-black',
+    tier: 'platinum',
+    nextTier: null,
+    nextThreshold: null,
+    gradient: 'from-neo-lime-light to-neo-lime',
+    labelColor: 'text-neo-lime',
   };
 }
 
 /**
- * Accumulated Score Display Component
- * Shows live-updating score with neo-brutalist styling and pop animations
- * Colors dynamically change based on score performance
+ * Accumulated Score Display — shows live projected Season-2 score (0–1000)
+ * that matches what the results page will eventually render, plus a witty
+ * tier-progress note ("150 to Gold" / "Legendary · maxed out").
  */
 export const AccumulatedScoreDisplay: React.FC<AccumulatedScoreDisplayProps> = ({
   currentScore,
@@ -77,10 +78,22 @@ export const AccumulatedScoreDisplay: React.FC<AccumulatedScoreDisplayProps> = (
   isAnimating,
   t,
 }) => {
-  // Memoize color classes to prevent recalculation on every render
-  const scoreColors = useMemo(() => getScoreColorClasses(currentScore), [currentScore]);
+  const tierInfo = useMemo(() => getTierInfo(currentScore), [currentScore]);
 
-  // Smooth counting animation — interpolates score on every frame
+  const tierLabel = t(`wordHunt.survival.score.tier.${tierInfo.tier}`);
+  const flavor = t(`wordHunt.survival.score.tier.${tierInfo.tier}Flavor`);
+  const progressNote = useMemo(() => {
+    if (tierInfo.nextTier === null || tierInfo.nextThreshold === null) {
+      return t('wordHunt.survival.score.tier.maxed');
+    }
+    const pointsToNext = Math.max(0, tierInfo.nextThreshold - currentScore);
+    const nextLabel = t(`wordHunt.survival.score.tier.${tierInfo.nextTier}`);
+    return t('wordHunt.survival.score.tier.toNext', {
+      points: pointsToNext,
+      next: nextLabel,
+    });
+  }, [tierInfo, currentScore, t]);
+
   const springProps = useSpring({
     val: Math.max(0, currentScore),
     from: { val: 0 },
@@ -88,8 +101,7 @@ export const AccumulatedScoreDisplay: React.FC<AccumulatedScoreDisplayProps> = (
   });
 
   return (
-    <div className="relative @container">
-      {/* Score Container — lightweight HUD style */}
+    <div className="relative @container flex flex-col items-end gap-0.5">
       <AdaptiveMotion.div
         className={cn(
           'relative flex items-center gap-2',
@@ -108,16 +120,16 @@ export const AccumulatedScoreDisplay: React.FC<AccumulatedScoreDisplayProps> = (
           stiffness: 350,
         }}
       >
-        {/* Icon with tier color glow */}
-        <div className={cn(
-          'w-5 h-5 shrink-0 rounded-full flex items-center justify-center',
-          'bg-linear-to-br',
-          scoreColors.gradient,
-        )}>
+        <div
+          className={cn(
+            'w-5 h-5 shrink-0 rounded-full flex items-center justify-center',
+            'bg-linear-to-br',
+            tierInfo.gradient,
+          )}
+        >
           <TrendingUp className="w-3 h-3 text-neo-black" />
         </div>
 
-        {/* Score Value */}
         <div className="relative overflow-visible">
           <animated.span
             className="text-xl @[100px]:text-2xl font-black font-neo-display text-neo-cream tabular-nums block whitespace-nowrap"
@@ -125,7 +137,6 @@ export const AccumulatedScoreDisplay: React.FC<AccumulatedScoreDisplayProps> = (
             {springProps.val.to((v) => Math.round(v).toLocaleString())}
           </animated.span>
 
-          {/* Floating increment */}
           <AdaptiveAnimatePresence>
             {lastIncrement !== null && lastIncrement !== 0 && (
               <AdaptiveMotion.div
@@ -144,7 +155,7 @@ export const AccumulatedScoreDisplay: React.FC<AccumulatedScoreDisplayProps> = (
                   'rounded-full',
                   lastIncrement > 0
                     ? 'text-neo-lime drop-shadow-[0_0_6px_rgba(191,255,0,0.6)]'
-                    : 'text-neo-pink drop-shadow-[0_0_6px_rgba(255,20,147,0.6)]'
+                    : 'text-neo-pink drop-shadow-[0_0_6px_rgba(255,20,147,0.6)]',
                 )}
               >
                 {lastIncrement > 0 ? '+' : ''}
@@ -154,6 +165,19 @@ export const AccumulatedScoreDisplay: React.FC<AccumulatedScoreDisplayProps> = (
           </AdaptiveAnimatePresence>
         </div>
       </AdaptiveMotion.div>
+
+      <div
+        className="flex items-center gap-1.5 text-[10px] leading-tight font-neo-body whitespace-nowrap"
+        data-testid="tier-progress-note"
+      >
+        <span className={cn('font-black uppercase tracking-wide', tierInfo.labelColor)}>
+          {tierLabel}
+        </span>
+        <span className="text-neo-cream/50">·</span>
+        <span className="text-neo-cream/70 italic">{flavor}</span>
+        <span className="text-neo-cream/50">·</span>
+        <span className="text-neo-cream/80 font-bold">{progressNote}</span>
+      </div>
     </div>
   );
 };

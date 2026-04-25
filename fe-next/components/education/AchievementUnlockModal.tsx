@@ -14,7 +14,6 @@
 import { memo, useEffect, useId, useRef } from 'react';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
 import { motion, AnimatePresence } from 'framer-motion';
-import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { fireLevelUpConfetti } from '@/utils/confettiUtils';
@@ -197,13 +196,16 @@ const AchievementUnlockModal = memo<AchievementUnlockModalProps>(({ unlock, onCl
               animate={{ scale: [0, 1.3, 1], rotate: [30, -15, 0] }}
               transition={{ delay: 0.2, duration: 0.5, ease: 'easeOut' }}
             >
-              <Image
-                src="/mascot/celebration.gif"
-                alt=""
+              <video
+                src="/mascot/celebration.mp4"
                 width={80}
                 height={80}
                 className="mx-auto drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]"
-                unoptimized
+                autoPlay
+                loop
+                muted
+                playsInline
+                preload="metadata"
                 aria-hidden="true"
               />
             </motion.div>

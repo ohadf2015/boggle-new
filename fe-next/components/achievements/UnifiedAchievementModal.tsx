@@ -16,7 +16,6 @@
 
 import React, { useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import { SPRING_PRESETS } from '@/lib/animation/presets';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -219,13 +218,16 @@ export function UnifiedAchievementModal(props: UnifiedAchievementModalProps) {
             animate={{ scale: 1, rotate: 0 }}
             transition={{ delay: 0.1, type: 'spring', stiffness: 200, damping: 12 }}
           >
-            <Image
-              src="/mascot/celebration.gif"
-              alt=""
+            <video
+              src="/mascot/celebration.mp4"
               width={64}
               height={64}
               className="drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]"
-              unoptimized
+              autoPlay
+              loop
+              muted
+              playsInline
+              preload="metadata"
               aria-hidden="true"
             />
           </motion.div>

@@ -6,48 +6,48 @@ import Image from 'next/image';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 
 /**
- * Mascot variants - GIF-ONLY
- * All mascot images are animated GIFs in 3 background categories:
- * - dark: Dark bg matching app's neo-navy — renders directly, blends seamlessly
- * - white: White bg — auto-clipped to circle with neo border
- * - nobg: Transparent bg — works on any surface
+ * Mascot variants - split-format (MP4 for opaque, animated WebP for transparent)
+ * Three background categories, each with an optimized format:
+ * - dark: MP4 H.264 opaque, renders via <video>, blends with app's neo-navy
+ * - white: MP4 H.264 opaque, auto-clipped to circle with neo border
+ * - nobg: animated WebP transparent, renders via <Image unoptimized>
  */
 export type MascotVariant =
-  | 'happy'       // winner.gif (dark) - Happy/idle states
-  | 'gaming'      // play.gif (dark) - Gaming/active/energetic states
-  | 'thinking'    // question.gif (dark) - Thinking/focused/waiting states
-  | 'oops'        // oops.gif (dark) - Error/mistake/surprised states
-  | 'celebration' // celebration.gif (dark) - Victory/cheering states
-  | 'dj'          // dj.gif (dark) - Party/music/dancing states
-  | 'trophy'      // trophy.gif (dark) - Winner/achievement states
-  | 'panic'       // panic.gif (dark) - Panicking/time pressure
-  | 'crying'      // crying.gif (dark) - Sad/losing/defeated
-  | 'onfire'      // onfire-nobg.gif (nobg) - On fire/hot streak
-  | 'bored'       // bored-nobg.gif (nobg) - Bored/waiting/idle
-  | 'mindblown'   // mindblown-nobg.gif (nobg) - Amazed/shocked
-  | 'encouraging' // encouraging.gif (white) - Supportive/cheering on
-  | 'explorer'    // explorer.gif (dark) - Adventuring/discovering
-  | 'flexing'     // flexing.gif (dark) - Proud/strong/earned it
-  | 'scared'      // scared.gif (white) - Frightened/nervous
-  | 'shopkeeper'  // shopkeeper.gif (dark) - Shop/store context
-  | 'spectating'  // spectating.gif (dark) - Watching/observing
-  | 'waving'      // waving.gif (white) - Greeting/welcoming
-  | 'powerup'     // powerup-nobg.gif (nobg) - Power-up activation
-  | 'sleepy'      // ghostly.gif (dark) - Sleeping/idle timeout
-  | 'waiting'     // waiting.gif (dark) - Loading/queue/patience
-  | 'gg'          // gg.gif (dark) - Game over/good game
-  | 'scholar'     // scholar.gif (dark) - Education/learning
-  | 'rage'        // rage.gif (dark) - Competitive anger/losing badly
-  | 'bomber'      // bomber.gif (dark) - Blast mode
-  | 'winner'      // winner.gif (dark) - Victory/winning
-  | 'knight'      // knight.gif (dark) - Battle/ranked/combat
-  | 'sad'         // crying.gif (dark) - Loss/disappointment
-  | 'ghostly'     // ghostly.gif (dark) - Spooky/halloween/sleepy
-  | 'dance'       // dance.gif (dark) - Dancing/celebration
-  | 'question'    // question.gif (dark) - Confused/help needed
-  | 'trophyNobg'  // trophy-nobg.gif (nobg) - Transparent trophy
-  | 'explorerNobg'// explorer-nobg.gif (nobg) - Transparent explorer
-  | 'cryingNobg'; // crying-nobg.gif (nobg) - Transparent crying
+  | 'happy'       // winner.mp4 (dark)
+  | 'gaming'      // play.mp4 (dark)
+  | 'thinking'    // question.mp4 (dark)
+  | 'oops'        // oops.mp4 (dark)
+  | 'celebration' // celebration.mp4 (dark)
+  | 'dj'          // dj.mp4 (dark)
+  | 'trophy'      // trophy.mp4 (dark)
+  | 'panic'       // panic.mp4 (dark)
+  | 'crying'      // crying.mp4 (dark)
+  | 'onfire'      // onfire-nobg.webp (nobg)
+  | 'bored'       // bored-nobg.webp (nobg)
+  | 'mindblown'   // mindblown-nobg.webp (nobg)
+  | 'encouraging' // encouraging.mp4 (white)
+  | 'explorer'    // explorer.mp4 (dark)
+  | 'flexing'     // flexing.mp4 (dark)
+  | 'scared'      // scared.mp4 (white)
+  | 'shopkeeper'  // shopkeeper.mp4 (dark)
+  | 'spectating'  // spectating.mp4 (dark)
+  | 'waving'      // waving.mp4 (white)
+  | 'powerup'     // powerup-nobg.webp (nobg)
+  | 'sleepy'      // ghostly.mp4 (dark)
+  | 'waiting'     // waiting.mp4 (dark)
+  | 'gg'          // gg.mp4 (dark)
+  | 'scholar'     // scholar.mp4 (dark)
+  | 'rage'        // rage.mp4 (dark)
+  | 'bomber'      // bomber.mp4 (dark)
+  | 'winner'      // winner.mp4 (dark)
+  | 'knight'      // knight.mp4 (dark)
+  | 'sad'         // crying.mp4 (dark)
+  | 'ghostly'     // ghostly.mp4 (dark)
+  | 'dance'       // dance.mp4 (dark)
+  | 'question'    // question.mp4 (dark)
+  | 'trophyNobg'  // trophy-nobg.webp (nobg)
+  | 'explorerNobg'// explorer-nobg.webp (nobg)
+  | 'cryingNobg'; // crying-nobg.webp (nobg)
 
 /**
  * Background type for each mascot GIF.
@@ -56,44 +56,45 @@ export type MascotVariant =
 export type MascotBgType = 'dark' | 'white' | 'nobg';
 
 /**
- * Mascot GIF paths (ALL mascots use animated GIFs)
+ * Mascot paths — MP4 for opaque (dark/white), animated WebP for transparent (nobg).
+ * 88% size reduction vs legacy GIFs (42MB → 5MB). Render path branches on extension.
  */
 export const MASCOT_IMAGES: Record<MascotVariant, string> = {
-  happy: '/mascot/winner.gif',
-  gaming: '/mascot/play.gif',
-  thinking: '/mascot/question.gif',
-  oops: '/mascot/oops.gif',
-  celebration: '/mascot/celebration.gif',
-  dj: '/mascot/dj.gif',
-  trophy: '/mascot/trophy.gif',
-  panic: '/mascot/panic.gif',
-  crying: '/mascot/crying.gif',
-  onfire: '/mascot/onfire-nobg.gif',
-  bored: '/mascot/bored-nobg.gif',
-  mindblown: '/mascot/mindblown-nobg.gif',
-  encouraging: '/mascot/encouraging.gif',
-  explorer: '/mascot/explorer.gif',
-  flexing: '/mascot/flexing.gif',
-  scared: '/mascot/scared.gif',
-  shopkeeper: '/mascot/shopkeeper.gif',
-  spectating: '/mascot/spectating.gif',
-  waving: '/mascot/waving.gif',
-  powerup: '/mascot/powerup-nobg.gif',
-  sleepy: '/mascot/ghostly.gif',
-  waiting: '/mascot/waiting.gif',
-  gg: '/mascot/gg.gif',
-  scholar: '/mascot/scholar.gif',
-  rage: '/mascot/rage.gif',
-  bomber: '/mascot/bomber.gif',
-  winner: '/mascot/winner.gif',
-  knight: '/mascot/knight.gif',
-  sad: '/mascot/crying.gif',
-  ghostly: '/mascot/ghostly.gif',
-  dance: '/mascot/dance.gif',
-  question: '/mascot/question.gif',
-  trophyNobg: '/mascot/trophy-nobg.gif',
-  explorerNobg: '/mascot/explorer-nobg.gif',
-  cryingNobg: '/mascot/crying-nobg.gif',
+  happy: '/mascot/winner.mp4',
+  gaming: '/mascot/play.mp4',
+  thinking: '/mascot/question.mp4',
+  oops: '/mascot/oops.mp4',
+  celebration: '/mascot/celebration.mp4',
+  dj: '/mascot/dj.mp4',
+  trophy: '/mascot/trophy.mp4',
+  panic: '/mascot/panic.mp4',
+  crying: '/mascot/crying.mp4',
+  onfire: '/mascot/onfire-nobg.webp',
+  bored: '/mascot/bored-nobg.webp',
+  mindblown: '/mascot/mindblown-nobg.webp',
+  encouraging: '/mascot/encouraging.mp4',
+  explorer: '/mascot/explorer.mp4',
+  flexing: '/mascot/flexing.mp4',
+  scared: '/mascot/scared.mp4',
+  shopkeeper: '/mascot/shopkeeper.mp4',
+  spectating: '/mascot/spectating.mp4',
+  waving: '/mascot/waving.mp4',
+  powerup: '/mascot/powerup-nobg.webp',
+  sleepy: '/mascot/ghostly.mp4',
+  waiting: '/mascot/waiting.mp4',
+  gg: '/mascot/gg.mp4',
+  scholar: '/mascot/scholar.mp4',
+  rage: '/mascot/rage.mp4',
+  bomber: '/mascot/bomber.mp4',
+  winner: '/mascot/winner.mp4',
+  knight: '/mascot/knight.mp4',
+  sad: '/mascot/crying.mp4',
+  ghostly: '/mascot/ghostly.mp4',
+  dance: '/mascot/dance.mp4',
+  question: '/mascot/question.mp4',
+  trophyNobg: '/mascot/trophy-nobg.webp',
+  explorerNobg: '/mascot/explorer-nobg.webp',
+  cryingNobg: '/mascot/crying-nobg.webp',
 };
 
 /**
@@ -155,9 +156,14 @@ export function getMascotBgType(variant: MascotVariant): MascotBgType {
 }
 
 /**
- * Check if a variant uses an animated GIF
- * All mascot variants use GIFs.
+ * Check if a variant is rendered as <video> (opaque MP4).
+ * Transparent variants use animated WebP via <Image unoptimized>.
  */
+export function isVideoVariant(variant: MascotVariant): boolean {
+  return MASCOT_IMAGES[variant].endsWith('.mp4');
+}
+
+/** @deprecated kept for backward-compat with tests; always true since animated assets bypass Next/Image optimization. */
 export function isGifVariant(_variant: MascotVariant): boolean {
   return true;
 }
@@ -663,7 +669,7 @@ export const Mascot = memo(function Mascot({
   const animationVariants = useMemo(() => getAnimationVariants(variant), [variant]);
 
   const imageSrc = getMascotImagePath(variant);
-  const isGif = isGifVariant(variant);
+  const isVideo = isVideoVariant(variant);
   const altText = alt || `Lexi mascot - ${variant}`;
 
   const shouldPrioritize = priority ?? (variant === 'happy');
@@ -671,6 +677,7 @@ export const Mascot = memo(function Mascot({
 
   const { shape, border, bg } = getAutoStyle(variant, clipShape, clipBorder, clipBg);
   const hasClip = shape !== 'none';
+  const mediaClass = `object-contain w-full h-full ${hasClip ? 'scale-110' : ''} drop-shadow-lg`;
 
   return (
     <motion.div
@@ -681,16 +688,31 @@ export const Mascot = memo(function Mascot({
       <div
         className={`w-full h-full ${CLIP_CLASSES[shape]} ${BORDER_CLASSES[border]} ${hasClip ? bg : ''}`}
       >
-        <Image
-          src={imageSrc}
-          alt={altText}
-          width={SIZE_PIXELS[size]}
-          height={SIZE_PIXELS[size]}
-          className={`object-contain ${hasClip ? 'scale-110' : ''} drop-shadow-lg`}
-          priority={shouldPrioritize}
-          loading={loadingStrategy as 'lazy' | undefined}
-          unoptimized={isGif}
-        />
+        {isVideo ? (
+          <video
+            src={imageSrc}
+            aria-label={altText}
+            width={SIZE_PIXELS[size]}
+            height={SIZE_PIXELS[size]}
+            className={mediaClass}
+            autoPlay
+            loop
+            muted
+            playsInline
+            preload={shouldPrioritize ? 'auto' : 'metadata'}
+          />
+        ) : (
+          <Image
+            src={imageSrc}
+            alt={altText}
+            width={SIZE_PIXELS[size]}
+            height={SIZE_PIXELS[size]}
+            className={`object-contain ${hasClip ? 'scale-110' : ''} drop-shadow-lg`}
+            priority={shouldPrioritize}
+            loading={loadingStrategy as 'lazy' | undefined}
+            unoptimized
+          />
+        )}
       </div>
     </motion.div>
   );
@@ -717,7 +739,7 @@ export const MascotWithEntrance = memo(function MascotWithEntrance({
   const loopVariants = useMemo(() => getAnimationVariants(variant), [variant]);
 
   const imageSrc = getMascotImagePath(variant);
-  const isGif = isGifVariant(variant);
+  const isVideo = isVideoVariant(variant);
   const altText = alt || `Lexi mascot - ${variant}`;
 
   const shouldPrioritize = priority ?? (variant === 'happy');
@@ -725,6 +747,7 @@ export const MascotWithEntrance = memo(function MascotWithEntrance({
 
   const { shape, border, bg } = getAutoStyle(variant, clipShape, clipBorder, clipBg);
   const hasClip = shape !== 'none';
+  const mediaClass = `object-contain w-full h-full ${hasClip ? 'scale-110' : ''} drop-shadow-lg`;
 
   return (
     <motion.div
@@ -746,16 +769,31 @@ export const MascotWithEntrance = memo(function MascotWithEntrance({
         <div
           className={`w-full h-full ${CLIP_CLASSES[shape]} ${BORDER_CLASSES[border]} ${hasClip ? bg : ''}`}
         >
-          <Image
-            src={imageSrc}
-            alt={altText}
-            width={SIZE_PIXELS[size]}
-            height={SIZE_PIXELS[size]}
-            className={`object-contain ${hasClip ? 'scale-110' : ''} drop-shadow-lg`}
-            priority={shouldPrioritize}
-            loading={loadingStrategy as 'lazy' | undefined}
-            unoptimized={isGif}
-          />
+          {isVideo ? (
+            <video
+              src={imageSrc}
+              aria-label={altText}
+              width={SIZE_PIXELS[size]}
+              height={SIZE_PIXELS[size]}
+              className={mediaClass}
+              autoPlay
+              loop
+              muted
+              playsInline
+              preload={shouldPrioritize ? 'auto' : 'metadata'}
+            />
+          ) : (
+            <Image
+              src={imageSrc}
+              alt={altText}
+              width={SIZE_PIXELS[size]}
+              height={SIZE_PIXELS[size]}
+              className={`object-contain ${hasClip ? 'scale-110' : ''} drop-shadow-lg`}
+              priority={shouldPrioritize}
+              loading={loadingStrategy as 'lazy' | undefined}
+              unoptimized
+            />
+          )}
         </div>
       </motion.div>
     </motion.div>

@@ -68,15 +68,17 @@ export function BlastWaveClearText({ waveCleared, movesRemaining, t }: BlastWave
           exit={variationRef.current.exit}
           transition={variationRef.current.transition}
         >
-          <span
-            className={`${tier.color} font-neo-display font-black uppercase tracking-wider px-6 py-2 rounded-neo bg-black/60`}
+          <AdaptiveMotion.span
+            className={`${tier.color} font-neo-display font-black uppercase tracking-wider px-6 py-2 rounded-neo bg-black/60 inline-block`}
             style={{
               fontSize: `${tier.scale * 2.5}rem`,
-              textShadow: `0 2px 8px rgba(0,0,0,0.5), 0 0 20px ${tier.glow}`,
+              textShadow: `0 2px 8px rgba(0,0,0,0.5), 0 0 28px ${tier.glow}, 0 0 44px ${tier.glow}`,
             }}
+            animate={{ scale: [1, 1.08, 0.98, 1.03, 1], y: [0, -4, 0, -2, 0] }}
+            transition={{ duration: 1.1, times: [0, 0.25, 0.5, 0.75, 1], ease: 'easeInOut' }}
           >
             {tier.text}
-          </span>
+          </AdaptiveMotion.span>
         </AdaptiveMotion.div>
       </AdaptiveAnimatePresence>
       {bonusPoints > 0 && (

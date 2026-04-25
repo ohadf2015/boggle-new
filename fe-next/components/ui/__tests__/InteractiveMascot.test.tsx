@@ -1,7 +1,8 @@
 /**
  * InteractiveMascot Component Tests
  *
- * Tests for the interactive mascot component with hover/click state changes
+ * Tests for the interactive mascot component with hover/click state changes.
+ * Split-format aware: opaque variants render <video> (MP4), transparent variants render <img> (animated WebP).
  */
 
 import React from 'react';
@@ -40,24 +41,39 @@ vi.mock('next/image', () => {
   } };
 });
 
+/** Returns the active mascot element (video for MP4, img for WebP). */
+function getMascotEl(container: HTMLElement): HTMLVideoElement | HTMLImageElement {
+  const el = container.querySelector('video, img') as HTMLVideoElement | HTMLImageElement | null;
+  if (!el) throw new Error('No mascot element rendered');
+  return el;
+}
+
 describe('InteractiveMascot', () => {
   describe('rendering', () => {
-    it('renders with default variant', () => {
-      render(<InteractiveMascot variant="happy" />);
-      const img = screen.getByRole('img');
-      expect(img).toHaveAttribute('alt', 'Lexi mascot - happy');
+    it('renders with default variant (happy → MP4 video)', () => {
+      const { container } = render(<InteractiveMascot variant="happy" />);
+      const video = container.querySelector('video');
+      expect(video).toBeInTheDocument();
+      expect(video).toHaveAttribute('aria-label', 'Lexi mascot - happy');
     });
 
-    it('renders with custom alt text', () => {
-      render(<InteractiveMascot variant="happy" alt="Custom alt" />);
-      const img = screen.getByRole('img');
-      expect(img).toHaveAttribute('alt', 'Custom alt');
+    it('renders with custom alt text on video', () => {
+      const { container } = render(<InteractiveMascot variant="happy" alt="Custom alt" />);
+      const video = container.querySelector('video');
+      expect(video).toHaveAttribute('aria-label', 'Custom alt');
     });
 
-    it('renders the correct image source for variant', () => {
-      render(<InteractiveMascot variant="thinking" />);
-      const img = screen.getByRole('img');
-      expect(img).toHaveAttribute('src', '/mascot/question.gif');
+    it('renders the correct MP4 source for opaque variant', () => {
+      const { container } = render(<InteractiveMascot variant="thinking" />);
+      const video = container.querySelector('video');
+      expect(video).toHaveAttribute('src', '/mascot/question.mp4');
+    });
+
+    it('renders <img> for transparent WebP variant', () => {
+      const { container } = render(<InteractiveMascot variant="onfire" />);
+      const img = container.querySelector('img');
+      expect(img).toBeInTheDocument();
+      expect(img).toHaveAttribute('src', '/mascot/onfire-nobg.webp');
     });
   });
 
@@ -82,45 +98,40 @@ describe('InteractiveMascot', () => {
   });
 
   describe('extended variants (mood & activity)', () => {
-    it('renders mood variant with fallback image', () => {
-      render(<InteractiveMascot variant="confused" />);
-      const img = screen.getByRole('img');
-      // 'confused' falls back to 'thinking' (which is now a GIF variant)
-      expect(img).toHaveAttribute('src', '/mascot/question.gif');
+    it('renders mood variant with fallback asset (confused → thinking → MP4)', () => {
+      const { container } = render(<InteractiveMascot variant="confused" />);
+      const video = container.querySelector('video');
+      expect(video).toHaveAttribute('src', '/mascot/question.mp4');
     });
 
-    it('renders activity variant mapped to GIF (eating_pizza → happy)', () => {
-      render(<InteractiveMascot variant="eating_pizza" />);
-      const img = screen.getByRole('img');
-      // eating_pizza maps to happy → winner.gif
-      expect(img).toHaveAttribute('src', '/mascot/winner.gif');
+    it('renders activity variant mapped to MP4 (eating_pizza → happy → winner.mp4)', () => {
+      const { container } = render(<InteractiveMascot variant="eating_pizza" />);
+      const video = container.querySelector('video');
+      expect(video).toHaveAttribute('src', '/mascot/winner.mp4');
     });
 
-    it('renders gaming variant with GIF', () => {
-      render(<InteractiveMascot variant="gaming" />);
-      const img = screen.getByRole('img');
-      // gaming is a base GIF variant
-      expect(img).toHaveAttribute('src', '/mascot/play.gif');
+    it('renders gaming variant with MP4', () => {
+      const { container } = render(<InteractiveMascot variant="gaming" />);
+      const video = container.querySelector('video');
+      expect(video).toHaveAttribute('src', '/mascot/play.mp4');
     });
 
-    it('renders activity variant mapped to GIF (skateboarding → gaming)', () => {
-      render(<InteractiveMascot variant="skateboarding" />);
-      const img = screen.getByRole('img');
-      // skateboarding maps to gaming GIF
-      expect(img).toHaveAttribute('src', '/mascot/play.gif');
+    it('renders activity variant mapped to MP4 (skateboarding → gaming → play.mp4)', () => {
+      const { container } = render(<InteractiveMascot variant="skateboarding" />);
+      const video = container.querySelector('video');
+      expect(video).toHaveAttribute('src', '/mascot/play.mp4');
     });
 
-    it('renders activity variant mapped to GIF (dancing → dj)', () => {
-      render(<InteractiveMascot variant="dancing" />);
-      const img = screen.getByRole('img');
-      // dancing maps to dj GIF
-      expect(img).toHaveAttribute('src', '/mascot/dj.gif');
+    it('renders activity variant mapped to MP4 (dancing → dj → dj.mp4)', () => {
+      const { container } = render(<InteractiveMascot variant="dancing" />);
+      const video = container.querySelector('video');
+      expect(video).toHaveAttribute('src', '/mascot/dj.mp4');
     });
   });
 
   describe('hover interactions', () => {
     it('changes variant on hover when enableHover is true', () => {
-      render(
+      const { container } = render(
         <InteractiveMascot
           variant="happy"
           enableHover
@@ -131,13 +142,13 @@ describe('InteractiveMascot', () => {
       const button = screen.getByRole('button');
       fireEvent.mouseEnter(button);
 
-      // The component should now show the hover variant (gaming GIF)
-      const img = screen.getByRole('img');
-      expect(img).toHaveAttribute('src', '/mascot/play.gif');
+      // After hover, should display the gaming MP4
+      const video = container.querySelector('video');
+      expect(video).toHaveAttribute('src', '/mascot/play.mp4');
     });
 
-    it('reverts to base variant on mouse leave', () => {
-      render(
+    it('reverts to base variant on mouse leave (excited → onfire WebP on hover, back to happy MP4)', () => {
+      const { container } = render(
         <InteractiveMascot
           variant="happy"
           enableHover
@@ -147,10 +158,13 @@ describe('InteractiveMascot', () => {
 
       const button = screen.getByRole('button');
       fireEvent.mouseEnter(button);
-      fireEvent.mouseLeave(button);
+      // During hover: excited → onfire → transparent WebP → <img>
+      expect(container.querySelector('img')).toHaveAttribute('src', '/mascot/onfire-nobg.webp');
 
-      const img = screen.getByRole('img');
-      expect(img).toHaveAttribute('src', '/mascot/winner.gif');
+      fireEvent.mouseLeave(button);
+      // After leave: back to happy → MP4 → <video>
+      const video = container.querySelector('video');
+      expect(video).toHaveAttribute('src', '/mascot/winner.mp4');
     });
 
     it('calls onHover callback', () => {
@@ -175,7 +189,7 @@ describe('InteractiveMascot', () => {
 
   describe('click interactions', () => {
     it('changes variant on click when enableClick is true', () => {
-      render(
+      const { container } = render(
         <InteractiveMascot
           variant="happy"
           enableClick
@@ -186,9 +200,8 @@ describe('InteractiveMascot', () => {
       const button = screen.getByRole('button');
       fireEvent.click(button);
 
-      const img = screen.getByRole('img');
-      // celebrating maps to happy, but we're using gaming directly for testing
-      expect(img).toHaveAttribute('src', '/mascot/play.gif');
+      const video = container.querySelector('video');
+      expect(video).toHaveAttribute('src', '/mascot/play.mp4');
     });
 
     it('calls onClick callback', () => {
@@ -210,7 +223,7 @@ describe('InteractiveMascot', () => {
     it('reverts to base variant after clickDuration', async () => {
       vi.useFakeTimers();
 
-      render(
+      const { container } = render(
         <InteractiveMascot
           variant="happy"
           enableClick
@@ -222,15 +235,15 @@ describe('InteractiveMascot', () => {
       const button = screen.getByRole('button');
       fireEvent.click(button);
 
-      // Immediately after click, should show click variant (gaming GIF)
-      expect(screen.getByRole('img')).toHaveAttribute('src', '/mascot/play.gif');
+      // Immediately after click, should show click variant (gaming MP4)
+      expect(container.querySelector('video')).toHaveAttribute('src', '/mascot/play.mp4');
 
-      // After duration, should revert to base
+      // After duration, should revert to base (happy → winner.mp4)
       await act(async () => {
         vi.advanceTimersByTime(500);
       });
 
-      expect(screen.getByRole('img')).toHaveAttribute('src', '/mascot/winner.gif');
+      expect(container.querySelector('video')).toHaveAttribute('src', '/mascot/winner.mp4');
 
       vi.useRealTimers();
     });
@@ -323,7 +336,7 @@ describe('InteractiveMascot', () => {
 
   describe('default state transitions', () => {
     it('uses default hover transition when hoverVariant not specified', () => {
-      render(
+      const { container } = render(
         <InteractiveMascot
           variant="happy"
           enableHover
@@ -333,13 +346,13 @@ describe('InteractiveMascot', () => {
       const button = screen.getByRole('button');
       fireEvent.mouseEnter(button);
 
-      // 'happy' defaults to 'gaming' on hover (updated for GIF variants)
-      const img = screen.getByRole('img');
-      expect(img).toHaveAttribute('src', '/mascot/play.gif');
+      // 'happy' defaults to 'gaming' on hover
+      const video = container.querySelector('video');
+      expect(video).toHaveAttribute('src', '/mascot/play.mp4');
     });
 
     it('uses default click transition when clickVariant not specified', () => {
-      render(
+      const { container } = render(
         <InteractiveMascot
           variant="happy"
           enableClick
@@ -350,21 +363,20 @@ describe('InteractiveMascot', () => {
       fireEvent.click(button);
 
       // 'happy' defaults to 'celebration' on click
-      const img = screen.getByRole('img');
-      expect(img).toHaveAttribute('src', '/mascot/celebration.gif');
+      const video = container.querySelector('video');
+      expect(video).toHaveAttribute('src', '/mascot/celebration.mp4');
     });
   });
 });
 
 describe('InteractiveMascotWithEntrance', () => {
   it('renders correctly', () => {
-    render(<InteractiveMascotWithEntrance variant="happy" />);
-    const img = screen.getByRole('img');
-    expect(img).toBeInTheDocument();
+    const { container } = render(<InteractiveMascotWithEntrance variant="happy" />);
+    expect(getMascotEl(container)).toBeInTheDocument();
   });
 
   it('passes props to InteractiveMascot', () => {
-    render(
+    const { container } = render(
       <InteractiveMascotWithEntrance
         variant="thinking"
         size="lg"
@@ -372,13 +384,12 @@ describe('InteractiveMascotWithEntrance', () => {
         enableClick
       />
     );
-    const img = screen.getByRole('img');
-    expect(img).toHaveAttribute('src', '/mascot/question.gif');
+    const video = container.querySelector('video');
+    expect(video).toHaveAttribute('src', '/mascot/question.mp4');
   });
 
   it('accepts delay prop', () => {
-    // Just verify it renders without error
-    render(<InteractiveMascotWithEntrance variant="happy" delay={0.5} />);
-    expect(screen.getByRole('img')).toBeInTheDocument();
+    const { container } = render(<InteractiveMascotWithEntrance variant="happy" delay={0.5} />);
+    expect(getMascotEl(container)).toBeInTheDocument();
   });
 });

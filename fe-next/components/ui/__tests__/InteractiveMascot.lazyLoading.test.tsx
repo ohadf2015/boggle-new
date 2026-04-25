@@ -90,7 +90,7 @@ describe('InteractiveMascot - Lazy Loading', () => {
 
     // WHEN: Component is mounted
     await waitFor(() => {
-      expect(screen.getByAltText(/Lexi mascot - happy/i)).toBeInTheDocument();
+      expect(screen.getByTestId('interactive-mascot')).toBeInTheDocument();
     });
 
     // Wait for any async preloading to occur
@@ -103,13 +103,13 @@ describe('InteractiveMascot - Lazy Loading', () => {
     // THEN: preloadAllMascotImages() should NOT have been called
     // So we should NOT see all 7 mascot GIFs being preloaded via Image constructor
     const allMascotPaths = [
-      '/mascot/main.gif',
-      '/mascot/play.gif',
-      '/mascot/study.gif',
-      '/mascot/oops.gif',
-      '/mascot/celebration.gif',
-      '/mascot/dj.gif',
-      '/mascot/trophy.gif',
+      '/mascot/winner.mp4',
+      '/mascot/play.mp4',
+      '/mascot/question.mp4',
+      '/mascot/oops.mp4',
+      '/mascot/celebration.mp4',
+      '/mascot/dj.mp4',
+      '/mascot/trophy.mp4',
     ];
 
     // VERIFY: preloadAllMascotImages was NOT called (no Image constructor calls)
@@ -130,7 +130,8 @@ describe('InteractiveMascot - Lazy Loading', () => {
 
     // WHEN: Components are mounted
     await waitFor(() => {
-      expect(screen.getAllByTestId('mascot-image')).toHaveLength(3);
+      const nodes = screen.queryAllByTestId('interactive-mascot');
+      expect(nodes).toHaveLength(3);
     });
 
     // Wait for any async preloading to occur
@@ -157,7 +158,7 @@ describe('InteractiveMascot - Lazy Loading', () => {
 
     // WHEN: Component is mounted
     await waitFor(() => {
-      expect(screen.getByAltText(/Lexi mascot - happy/i)).toBeInTheDocument();
+      expect(screen.getByTestId('interactive-mascot')).toBeInTheDocument();
     });
 
     // Preloading is deferred via requestIdleCallback/setTimeout — advance timers
@@ -170,14 +171,14 @@ describe('InteractiveMascot - Lazy Loading', () => {
     // THEN: Only the hover and click target variants should be preloaded
     // happy → hover: gaming, click: celebration
     expect(mockImageConstructorCalls.length).toBe(2);
-    expect(mockImageConstructorCalls.includes('/mascot/play.gif')).toBe(true); // gaming (hover)
-    expect(mockImageConstructorCalls.includes('/mascot/celebration.gif')).toBe(true); // celebration (click)
+    expect(mockImageConstructorCalls.includes('/mascot/play.mp4')).toBe(true); // gaming (hover)
+    expect(mockImageConstructorCalls.includes('/mascot/celebration.mp4')).toBe(true); // celebration (click)
 
     // AND: Other unused variants should NOT be preloaded
-    expect(mockImageConstructorCalls.includes('/mascot/main.gif')).toBe(false); // happy (already shown via Next Image)
-    expect(mockImageConstructorCalls.includes('/mascot/study.gif')).toBe(false); // thinking
-    expect(mockImageConstructorCalls.includes('/mascot/oops.gif')).toBe(false); // oops
-    expect(mockImageConstructorCalls.includes('/mascot/dj.gif')).toBe(false); // dj
-    expect(mockImageConstructorCalls.includes('/mascot/trophy.gif')).toBe(false); // trophy
+    expect(mockImageConstructorCalls.includes('/mascot/winner.mp4')).toBe(false); // happy (already shown)
+    expect(mockImageConstructorCalls.includes('/mascot/question.mp4')).toBe(false); // thinking
+    expect(mockImageConstructorCalls.includes('/mascot/oops.mp4')).toBe(false); // oops
+    expect(mockImageConstructorCalls.includes('/mascot/dj.mp4')).toBe(false); // dj
+    expect(mockImageConstructorCalls.includes('/mascot/trophy.mp4')).toBe(false); // trophy
   });
 });

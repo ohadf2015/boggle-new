@@ -146,7 +146,9 @@ export function useBlastDebris(
           d.graphic.x = state.position.x;
           d.graphic.y = state.position.y;
           d.graphic.rotation = state.angle;
-          const fadeStart = DEBRIS_LIFETIME * 0.7;
+          // Fade across most of the lifetime so fragments visibly dissolve
+          // rather than sitting at alpha=1 and snap-fading at the end.
+          const fadeStart = DEBRIS_LIFETIME * 0.3;
           d.graphic.alpha = age > fadeStart
             ? 1 - (age - fadeStart) / (DEBRIS_LIFETIME - fadeStart)
             : 1;

@@ -218,7 +218,7 @@ export default async function WordExplorerPage({ params }: PageParams) {
             <div className="flex flex-wrap gap-2">
               {word.toUpperCase().split('').map((letter, i) => (
                 <div
-                  key={i}
+                  key={`${letter}-${i}`}
                   className="w-10 h-10 bg-slate-800 border-2 border-neo-black rounded-neo flex items-center justify-center font-neo-display font-black text-lg text-neo-yellow shadow-hard-sm"
                 >
                   {letter}

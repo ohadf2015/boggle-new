@@ -1,7 +1,6 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import { ScoreCountUp } from './ScoreCountUp';
 import { StatsCardGrid, type StatCardItem } from './StatsCardGrid';
@@ -113,13 +112,16 @@ export function ResultsHero({
         transition={{ delay: 0.15, type: 'spring', stiffness: 200, damping: 12 }}
         className="flex justify-center"
       >
-        <Image
-          src={variant === 'win' ? '/mascot/celebration.gif' : variant === 'loss' ? '/mascot/encouraging.gif' : '/mascot/flexing.gif'}
-          alt=""
+        <video
+          src={variant === 'win' ? '/mascot/celebration.mp4' : variant === 'loss' ? '/mascot/encouraging.mp4' : '/mascot/flexing.mp4'}
           width={72}
           height={72}
           className="drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]"
-          unoptimized
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="metadata"
           aria-hidden="true"
         />
       </motion.div>

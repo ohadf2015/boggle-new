@@ -4,7 +4,10 @@ import BlastWordPraise from '../BlastWordPraise';
 
 // Mock AdaptiveMotion to render children synchronously
 vi.mock('@/components/motion/AdaptiveMotion', () => ({
-  AdaptiveMotion: { div: ({ children, ...props }: any) => <div {...props}>{children}</div> },
+  AdaptiveMotion: {
+    div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
+    span: ({ children, ...props }: any) => <span {...props}>{children}</span>,
+  },
   AdaptiveAnimatePresence: ({ children }: any) => <>{children}</>,
 }));
 

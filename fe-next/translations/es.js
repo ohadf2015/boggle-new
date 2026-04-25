@@ -4817,6 +4817,8 @@ const es = {
     "badge": "DESAFÍO DIARIO",
     "puzzleNumber": "Diario #{number}",
     "playButton": "Jugar el Puzzle de Hoy",
+    "loadingWordHunt": "Cargando Búsqueda de Palabras...",
+    "loadingWordWheel": "Cargando Rueda de Palabras...",
     "nextPuzzleIn": "Próximo puzzle en:",
     "samePuzzle": "Mismo puzzle para todos en el mundo. ¡Comparte tus resultados para desafiar a amigos!",
     "alreadyPlayed": "Ya Jugaste Hoy",
@@ -5180,6 +5182,7 @@ const es = {
         "title": "¿Continuar?",
         "body": "Te quedaste sin vida. Mira un anuncio corto para recuperar HP y continuar la partida.",
         "cta": "Ver anuncio por +{amount} HP",
+        "coinCta": "Gasta {cost} monedas para restaurar",
         "decline": "Terminar partida"
       },
       "keyboardTip": "Desliza en la cuadrícula o escribe con el teclado",
@@ -5288,6 +5291,18 @@ const es = {
         "speed": "Termina más rápido para mejorar",
         "accuracy": "Usa menos intentos",
         "exploration": "Encuentra más palabras"
+      },
+      "tier": {
+        "bronze": "Bronce",
+        "silver": "Plata",
+        "gold": "Oro",
+        "platinum": "Platino",
+        "bronzeFlavor": "Calentando",
+        "silverFlavor": "Subiendo",
+        "goldFlavor": "En llamas",
+        "platinumFlavor": "Intocable",
+        "toNext": "{points} para {next}",
+        "maxed": "Legendario · al máximo"
       }
     },
     "ad": {

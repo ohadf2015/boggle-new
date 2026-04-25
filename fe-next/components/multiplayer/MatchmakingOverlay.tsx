@@ -1,7 +1,6 @@
 'use client';
 
 import { useRef } from 'react';
-import Image from 'next/image';
 import type { MatchmakingOpponent, MatchmakingStatus } from '@/hooks/useMatchmaking';
 import { getRankTier } from '@/shared/utils/eloRating';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
@@ -49,13 +48,16 @@ export function MatchmakingOverlay({
         {status === 'searching' && (
           <div className="flex flex-col items-center gap-4">
             {/* Searching mascot */}
-            <Image
-              src="/mascot/spectating.gif"
-              alt=""
+            <video
+              src="/mascot/spectating.mp4"
               width={80}
               height={80}
               className="drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]"
-              unoptimized
+              autoPlay
+              loop
+              muted
+              playsInline
+              preload="metadata"
               aria-hidden="true"
             />
 

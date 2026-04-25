@@ -4,7 +4,7 @@ import { motion, AnimatePresence, type TargetAndTransition } from 'framer-motion
 import { memo, useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
-import { MascotVariant, getMascotImagePath, getMascotBgType, isGifVariant, type MascotClipShape, type MascotBorderColor } from './Mascot';
+import { MascotVariant, getMascotImagePath, getMascotBgType, isVideoVariant, type MascotClipShape, type MascotBorderColor } from './Mascot';
 import {
   getBaseVariant,
   type ExtendedMascotVariant,
@@ -551,7 +551,7 @@ export const InteractiveMascot = memo(function InteractiveMascot({
 
   const imageSrc = getImageSource(currentVariant);
   const baseVariant = useMemo(() => getBaseVariant(currentVariant), [currentVariant]);
-  const isGif = isGifVariant(baseVariant);
+  const isVideo = isVideoVariant(baseVariant);
   const altText = alt || ariaLabel || `Lexi mascot - ${currentVariant}`;
   const idleAnimation = useMemo(() => getIdleAnimation(currentVariant), [currentVariant]);
 
@@ -641,16 +641,32 @@ export const InteractiveMascot = memo(function InteractiveMascot({
               className="w-full h-full"
             >
               <div className={`w-full h-full ${CLIP_CLASSES[autoStyle.shape]} ${BORDER_CLASSES[autoStyle.border]} ${autoStyle.shape !== 'none' ? autoStyle.bg : ''}`}>
-                <Image
-                  src={imageSrc}
-                  alt={altText}
-                  width={SIZE_PIXELS[size]}
-                  height={SIZE_PIXELS[size]}
-                  className={`object-contain ${autoStyle.shape !== 'none' ? 'scale-110' : ''} drop-shadow-lg`}
-                  priority={priority}
-                  fetchPriority={fetchPriority}
-                  unoptimized={isGif}
-                />
+                {isVideo ? (
+                  <video
+                    key={imageSrc}
+                    src={imageSrc}
+                    aria-label={altText}
+                    width={SIZE_PIXELS[size]}
+                    height={SIZE_PIXELS[size]}
+                    className={`object-contain w-full h-full ${autoStyle.shape !== 'none' ? 'scale-110' : ''} drop-shadow-lg`}
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    preload={priority ? 'auto' : 'metadata'}
+                  />
+                ) : (
+                  <Image
+                    src={imageSrc}
+                    alt={altText}
+                    width={SIZE_PIXELS[size]}
+                    height={SIZE_PIXELS[size]}
+                    className={`object-contain ${autoStyle.shape !== 'none' ? 'scale-110' : ''} drop-shadow-lg`}
+                    priority={priority}
+                    fetchPriority={fetchPriority}
+                    unoptimized
+                  />
+                )}
               </div>
             </motion.div>
           </AnimatePresence>
@@ -674,7 +690,7 @@ export const InteractiveMascot = memo(function InteractiveMascot({
           <>
             {[...Array(6)].map((_, i) => (
               <motion.div
-                key={i}
+                key={`sparkle-${i}`}
                 className="absolute w-2 h-2 bg-neo-lime rounded-full"
                 style={{
                   top: '50%',

@@ -23,8 +23,8 @@ export default function QuestsPage() {
           <div className="animate-pulse bg-neo-navy/50 rounded-neo p-8 w-full max-w-md">
             <div className="h-6 bg-neo-white/10 rounded mb-4 w-1/3" />
             <div className="space-y-3">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="h-20 bg-neo-white/5 rounded-neo-lg" />
+              {['a', 'b', 'c'].map((id) => (
+                <div key={`skeleton-${id}`} className="h-20 bg-neo-white/5 rounded-neo-lg" />
               ))}
             </div>
           </div>

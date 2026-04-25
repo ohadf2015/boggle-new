@@ -25,7 +25,7 @@
  * }
  * ```
  */
-export async function speakWord(word: string, lang: string): Promise<boolean> {
+export async function speakWord(word: string, lang: string, volume: number = 1.0): Promise<boolean> {
   // Check if Web Speech API is available
   if (!window.speechSynthesis || !window.SpeechSynthesisUtterance) {
     return false;
@@ -51,7 +51,7 @@ export async function speakWord(word: string, lang: string): Promise<boolean> {
   utterance.lang = lang;
   utterance.rate = 0.9; // Slightly slower for clarity
   utterance.pitch = 1.0;
-  utterance.volume = 1.0;
+  utterance.volume = Math.max(0, Math.min(1, volume));
 
   // Return promise that resolves when speech completes
   return new Promise((resolve, reject) => {

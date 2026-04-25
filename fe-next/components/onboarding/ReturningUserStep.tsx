@@ -65,12 +65,15 @@ const ReturningUserStep: React.FC<ReturningUserStepProps> = ({
             transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
             className="relative w-36 h-36 shrink-0 rounded-full bg-neo-navy border-neo-thick border-black shadow-hard-lg flex items-center justify-center overflow-hidden"
           >
-            {/* eslint-disable-next-line @next/next/no-img-element -- animated GIF, next/image doesn't animate */}
-            <img
-              src="/mascot/spectating.gif"
-              alt={t('onboarding.returningUser.title')}
+            <video
+              src="/mascot/spectating.mp4"
               className="w-full h-full object-cover"
-              draggable={false}
+              autoPlay
+              loop
+              muted
+              playsInline
+              preload="metadata"
+              aria-label={t('onboarding.returningUser.title')}
             />
           </motion.div>
           {/* Sparkles */}

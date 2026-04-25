@@ -4794,6 +4794,8 @@ const sv = {
     "badge": "DAGLIG UTMANING",
     "puzzleNumber": "Daglig #{number}",
     "playButton": "Spela dagens pussel",
+    "loadingWordHunt": "Laddar Ordjakt...",
+    "loadingWordWheel": "Laddar Ordhjul...",
     "nextPuzzleIn": "Nästa pussel om:",
     "samePuzzle": "Samma pussel för alla världen över. Dela dina resultat för att utmana vänner!",
     "alreadyPlayed": "Redan spelat idag",
@@ -5230,6 +5232,7 @@ const sv = {
         "title": "Fortsätta?",
         "body": "Du har slut på liv. Titta på en snabb annons för att återställa HP och fortsätta rundan.",
         "cta": "Se annons för +{amount} HP",
+        "coinCta": "Spendera {cost} mynt för att återställa",
         "decline": "Avsluta rundan"
       },
       "keyboardTip": "Svep på rutnätet eller skriv med tangentbordet",
@@ -5338,6 +5341,18 @@ const sv = {
         "speed": "Bli snabbare",
         "accuracy": "Använd färre gissningar",
         "exploration": "Hitta fler ord"
+      },
+      "tier": {
+        "bronze": "Brons",
+        "silver": "Silver",
+        "gold": "Guld",
+        "platinum": "Platina",
+        "bronzeFlavor": "Värmer upp",
+        "silverFlavor": "På väg upp",
+        "goldFlavor": "Het",
+        "platinumFlavor": "Oslagbar",
+        "toNext": "{points} till {next}",
+        "maxed": "Legendarisk · max"
       }
     },
     "ad": {

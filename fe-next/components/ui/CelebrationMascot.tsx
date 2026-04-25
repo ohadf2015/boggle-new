@@ -2,7 +2,6 @@
 
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { memo } from 'react';
-import Image from 'next/image';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import type { MascotClipShape, MascotBorderColor } from './Mascot';
 
@@ -50,8 +49,8 @@ const SIZE_PIXELS: Record<MascotSize, number> = {
 };
 
 const VARIANT_PATHS: Record<CelebrationVariant, string> = {
-  trophy: '/mascot/trophy.gif',
-  celebration: '/mascot/celebration.gif',
+  trophy: '/mascot/trophy.mp4',
+  celebration: '/mascot/celebration.mp4',
 };
 
 interface CelebrationMascotProps {
@@ -127,14 +126,17 @@ export const CelebrationMascot = memo(function CelebrationMascot({
       }}
     >
       <div className={`w-full h-full ${CLIP_CLASSES[resolvedShape]} ${BORDER_CLASSES[resolvedBorder]} ${hasClip ? resolvedBg : ''}`}>
-        <Image
+        <video
           src={imageSrc}
-          alt={altText}
           width={SIZE_PIXELS[size]}
           height={SIZE_PIXELS[size]}
-          className={`object-contain ${hasClip ? 'scale-110' : ''} drop-shadow-lg`}
-          priority={priority}
-          unoptimized
+          className={`w-full h-full object-contain ${hasClip ? 'scale-110' : ''} drop-shadow-lg`}
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload={priority ? 'auto' : 'metadata'}
+          aria-label={altText}
         />
       </div>
     </AdaptiveMotion.div>

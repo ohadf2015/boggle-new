@@ -7,7 +7,10 @@ import { BlastWaveClearText, getWaveClearTier } from '../BlastWaveClearText';
 
 // Mock AdaptiveMotion to render children directly
 jest.mock('@/components/motion/AdaptiveMotion', () => ({
-  AdaptiveMotion: { div: (props: React.PropsWithChildren<{ className?: string; style?: React.CSSProperties }>) => <div {...props} /> },
+  AdaptiveMotion: {
+    div: (props: React.PropsWithChildren<{ className?: string; style?: React.CSSProperties }>) => <div {...props} />,
+    span: (props: React.PropsWithChildren<{ className?: string; style?: React.CSSProperties }>) => <span {...props} />,
+  },
   AdaptiveAnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
 }));
 

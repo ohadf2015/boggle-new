@@ -3,31 +3,21 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSearchParams } from 'next/navigation';
-import { ArrowLeft, Globe, ChevronDown, Trophy, Target, Check, UserCircle2, Sparkles } from 'lucide-react';
+import { ArrowLeft, Trophy, Target, UserCircle2, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import TabbedDailyLeaderboard from './TabbedDailyLeaderboard';
 import DailyIntroCarousel from './DailyIntroCarousel';
 import { CreateChallengeModal } from './CreateChallengeModal';
 import { UnauthenticatedCreateChallengeSection } from './UnauthenticatedCreateChallengeSection';
+import { LanguageDropdown } from './LanguageDropdown';
 import AuthModal from '../auth/AuthModal';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
-import { hasPlayedWordHuntToday } from '@/utils/dailyChallenge';
 import { safeToLocaleDateString } from '@/utils/bcp47Locale';
 import { useMusic } from '@/contexts/MusicContext';
 import { MascotWithEntrance } from '@/components/ui/Mascot';
 import type { Language } from '@/types';
 
-// ==========================================
-// Constants
-// ==========================================
-
-export const LANGUAGE_OPTIONS: { code: Language; flag: string; name: string }[] = [
-  { code: 'en', flag: '🇺🇸', name: 'English' },
-  { code: 'he', flag: '🇮🇱', name: 'עברית' },
-  { code: 'sv', flag: '🇸🇪', name: 'Svenska' },
-  { code: 'ja', flag: '🇯🇵', name: '日本語' },
-  { code: 'es', flag: '🇪🇸', name: 'Español' },
-];
+export { LANGUAGE_OPTIONS } from './LanguageDropdown';
 
 // ==========================================
 // Types
@@ -82,7 +72,6 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
   t,
 }) => {
   const searchParams = useSearchParams();
-  const [showLangDropdown, setShowLangDropdown] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [showCreateChallenge, setShowCreateChallenge] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -130,9 +119,6 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
   // Check if this is a valid challenge (same puzzle number)
   const isValidChallenge = challengeData && challengeData.puzzleNumber === puzzleNumber;
 
-  // Calculate how many languages have been completed today
-  const completedLanguagesCount = LANGUAGE_OPTIONS.filter(option => hasPlayedWordHuntToday(option.code)).length;
-
   const formattedDate = useMemo(() => {
     try {
       return safeToLocaleDateString(new Date(puzzleDate + 'T00:00:00Z'), language, {
@@ -166,60 +152,11 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
           {t('daily.home')}
         </Button>
 
-        {/* Language Selector */}
-        <div className="relative">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setShowLangDropdown(!showLangDropdown)}
-            onBlur={() => setTimeout(() => setShowLangDropdown(false), 200)}
-            className="relative flex items-center gap-2 bg-neo-cream border-3 border-neo-black rounded-neo shadow-hard-sm hover:shadow-hard transition-all min-w-[44px] min-h-[44px]"
-          >
-            <span className="text-lg">{currentFlag}</span>
-            <Globe className="w-4 h-4 text-neo-black" />
-            <ChevronDown className={`w-3 h-3 text-neo-black transition-transform ${showLangDropdown ? 'rotate-180' : ''}`} />
-            {completedLanguagesCount > 0 && (
-              <span className="absolute -top-2 -right-2 w-5 h-5 bg-neo-lime text-neo-black rounded-full border-2 border-neo-black flex items-center justify-center text-xs font-black">
-                {completedLanguagesCount}
-              </span>
-            )}
-          </Button>
-
-          <AnimatePresence>
-            {showLangDropdown && (
-              <motion.div
-                initial={{ opacity: 0, y: -5, scale: 0.95 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: -5, scale: 0.95 }}
-                transition={{ duration: 0.15 }}
-                className="absolute top-full right-0 mt-2 z-[100] bg-neo-cream border-3 border-neo-black rounded-neo shadow-hard-lg overflow-hidden min-w-[140px]"
-                onMouseDown={(e) => e.preventDefault()}
-              >
-                {LANGUAGE_OPTIONS.map((option) => {
-                  const hasPlayed = hasPlayedWordHuntToday(option.code);
-                  return (
-                    <button
-                      key={option.code}
-                      onClick={() => {
-                        onLanguageChange(option.code);
-                        setShowLangDropdown(false);
-                      }}
-                      className={`w-full flex items-center gap-2 px-3 py-2 text-left hover:bg-neo-cyan/30 transition-colors ${
-                        language === option.code ? 'bg-neo-cyan/50 font-bold' : ''
-                      }`}
-                    >
-                      <span className="text-lg">{option.flag}</span>
-                      <span className="text-sm text-neo-black">{option.name}</span>
-                      {hasPlayed && (
-                        <Check className="w-4 h-4 ms-auto text-neo-lime" strokeWidth={3} />
-                      )}
-                    </button>
-                  );
-                })}
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
+        <LanguageDropdown
+          language={language}
+          currentFlag={currentFlag}
+          onLanguageChange={onLanguageChange}
+        />
       </div>
 
       {/* Main content - COMPACT on mobile, two-column on desktop */}
@@ -450,7 +387,7 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
       </div>
 
       {/* Mobile sticky play button — sits above bottom nav, below cookie consent */}
-      <div className="sm:hidden fixed bottom-16 inset-x-0 z-[100] px-4 pb-2 pointer-events-none">
+      <div className="sm:hidden fixed bottom-[var(--mobile-bottom-safe)] inset-x-0 z-[100] px-4 pb-2 pointer-events-none">
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}

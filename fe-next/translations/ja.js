@@ -4860,6 +4860,8 @@ const ja = {
     "badge": "デイリーチャレンジ",
     "puzzleNumber": "デイリー #{number}",
     "playButton": "今日のパズルをプレイ",
+    "loadingWordHunt": "ワードハント読込中...",
+    "loadingWordWheel": "ワードホイール読込中...",
     "nextPuzzleIn": "次のパズルまで:",
     "samePuzzle": "世界中で同じパズル。結果をシェアして友達に挑戦！",
     "alreadyPlayed": "今日はプレイ済み",
@@ -5251,6 +5253,7 @@ const ja = {
         "title": "続ける？",
         "body": "ライフがなくなりました。短い広告を見てHPを回復し、ランを続けましょう。",
         "cta": "広告を見て +{amount} HP",
+        "coinCta": "{cost}コインで回復",
         "decline": "ランを終了"
       },
       "keyboardTip": "グリッドをスワイプするかキーボードで入力",
@@ -5359,6 +5362,18 @@ const ja = {
         "speed": "もっと速くクリアしよう",
         "accuracy": "推測回数を減らそう",
         "exploration": "もっと単語を見つけよう"
+      },
+      "tier": {
+        "bronze": "ブロンズ",
+        "silver": "シルバー",
+        "gold": "ゴールド",
+        "platinum": "プラチナ",
+        "bronzeFlavor": "ウォームアップ",
+        "silverFlavor": "調子上昇中",
+        "goldFlavor": "絶好調",
+        "platinumFlavor": "無敵",
+        "toNext": "{next}まで{points}",
+        "maxed": "伝説級・MAX"
       }
     },
     "ad": {

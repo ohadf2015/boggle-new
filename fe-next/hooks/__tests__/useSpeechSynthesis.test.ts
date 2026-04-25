@@ -14,12 +14,23 @@ vi.mock('../../lib/speech/textToSpeech', () => ({
   getAvailableVoices: vi.fn(),
 }));
 
+// Mock SoundEffectsContext — TTS now respects sfxMuted / sfxVolume.
+// Default unmuted so existing tests still exercise the speak path.
+const mockSfxState = { sfxMuted: false, sfxVolume: 1.0 };
+vi.mock('../../contexts/SoundEffectsContext', () => ({
+  useSoundEffects: () => mockSfxState,
+}));
+
 const mockSpeakWord = textToSpeech.speakWord as any;
 const mockCancelSpeech = textToSpeech.cancelSpeech as any;
 const mockGetAvailableVoices = textToSpeech.getAvailableVoices as any;
 
 beforeEach(() => {
   vi.clearAllMocks();
+
+  // Reset SFX mock state for each test
+  mockSfxState.sfxMuted = false;
+  mockSfxState.sfxVolume = 1.0;
 
   // Default: Web Speech API supported
   mockGetAvailableVoices.mockReturnValue([
@@ -69,7 +80,7 @@ describe('useSpeechSynthesis', () => {
 
       // THEN
       expect(mockSpeakWord).toHaveBeenCalledTimes(1);
-      expect(mockSpeakWord).toHaveBeenCalledWith(word, lang);
+      expect(mockSpeakWord).toHaveBeenCalledWith(word, lang, 1.0);
     });
 
     it('should set isSpeaking to true during speech', async () => {
@@ -158,7 +169,7 @@ describe('useSpeechSynthesis', () => {
 
       // THEN
       expect(mockCancelSpeech).toHaveBeenCalled();
-      expect(mockSpeakWord).toHaveBeenCalledWith('second', 'en-US');
+      expect(mockSpeakWord).toHaveBeenCalledWith('second', 'en-US', 1.0);
 
       // Cleanup: resolve first speech
       await act(async () => {
@@ -177,7 +188,7 @@ describe('useSpeechSynthesis', () => {
       });
 
       // THEN
-      expect(mockSpeakWord).toHaveBeenCalledWith(word, 'es-ES');
+      expect(mockSpeakWord).toHaveBeenCalledWith(word, 'es-ES', 1.0);
     });
 
     it('should override default language when provided', async () => {
@@ -191,7 +202,38 @@ describe('useSpeechSynthesis', () => {
       });
 
       // THEN
-      expect(mockSpeakWord).toHaveBeenCalledWith(word, 'en-US');
+      expect(mockSpeakWord).toHaveBeenCalledWith(word, 'en-US', 1.0);
+    });
+
+    it('should not call speakWord when SFX is muted', async () => {
+      // GIVEN
+      mockSfxState.sfxMuted = true;
+      const { result } = renderHook(() => useSpeechSynthesis());
+
+      // WHEN
+      let success = true;
+      await act(async () => {
+        success = await result.current.speak('hello', 'en-US');
+      });
+
+      // THEN
+      expect(success).toBe(false);
+      expect(mockSpeakWord).not.toHaveBeenCalled();
+      expect(result.current.isSpeaking).toBe(false);
+    });
+
+    it('should pass current sfxVolume to speakWord', async () => {
+      // GIVEN
+      mockSfxState.sfxVolume = 0.4;
+      const { result } = renderHook(() => useSpeechSynthesis());
+
+      // WHEN
+      await act(async () => {
+        await result.current.speak('hello', 'en-US');
+      });
+
+      // THEN
+      expect(mockSpeakWord).toHaveBeenCalledWith('hello', 'en-US', 0.4);
     });
   });
 

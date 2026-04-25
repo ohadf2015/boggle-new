@@ -32,7 +32,12 @@ import {
   type StoredWordHuntResult,
 } from '@/utils/dailyChallenge';
 import { neoErrorToast } from '@/components/NeoToast';
-import { trackDailyPuzzle, trackFeatureFirstUse } from '@/utils/growthTracking';
+import { trackDailyPuzzle, trackFeatureFirstUse, trackGrowthEvent } from '@/utils/growthTracking';
+import {
+  buildDailyWordHuntCompletePayload,
+  type WordHuntRescueMethod,
+} from './analytics/wordHuntCompletePayload';
+import { shouldAutoShowTutorial } from './tutorial/shouldAutoShowTutorial';
 import { useDailyChallengeUrlParams } from './useDailyChallengeUrlParams';
 import { useRetryChallenge } from './useRetryChallenge';
 import type { LetterGrid, Language } from '@/types';
@@ -62,6 +67,12 @@ const DailyChallenge: React.FC = () => {
   const [phase, setPhase] = useState<DailyChallengePhase>('loading');
   const [showTutorial, setShowTutorial] = useState(false);
   const [tutorialCompleted, setTutorialCompleted] = useState(false);
+
+  useEffect(() => {
+    if (shouldAutoShowTutorial({ phase, tutorialCompleted, showTutorial })) {
+      setShowTutorial(true);
+    }
+  }, [phase, tutorialCompleted, showTutorial]);
   const [puzzleDate, setPuzzleDate] = useState<string>('');
   const [puzzleNumber, setPuzzleNumber] = useState<number>(0);
   const [grid, setGrid] = useState<LetterGrid | null>(null);
@@ -110,6 +121,7 @@ const DailyChallenge: React.FC = () => {
   // Track previous values for smarter re-initialization
   const prevGameLanguageRef = useRef<Language | null>(null);
   const prevWasResetRef = useRef<boolean>(false);
+  const gameStartedAtRef = useRef<number>(0);
 
   // Initialize Word Hunt daily challenge
   useEffect(() => {
@@ -218,6 +230,7 @@ const DailyChallenge: React.FC = () => {
 
     if (justResetRef.current) {
       justResetRef.current = false;
+      gameStartedAtRef.current = Date.now();
       setPhase('playing');
       return;
     }
@@ -264,11 +277,12 @@ const DailyChallenge: React.FC = () => {
 
     trackDailyPuzzle('opened', 'word_hunt');
     trackFeatureFirstUse('daily_word_hunt');
+    gameStartedAtRef.current = Date.now();
     setPhase('playing');
   }, [gameLanguage, isAuthenticated, profile, t, unlockAudio, justResetRef]);
 
   // Handle game completion
-  const handleGameComplete = useCallback((result: SurvivalGameResult) => {
+  const handleGameComplete = useCallback((result: SurvivalGameResult, rescueMethod?: WordHuntRescueMethod) => {
     const wordHuntResult: WordHuntResult = {
       puzzleNumber,
       puzzleDate,
@@ -297,6 +311,17 @@ const DailyChallenge: React.FC = () => {
     trackDailyPuzzle('completed', 'word_hunt', {
       solved: result.solved,
       attempts: result.attemptsUsed,
+    });
+
+    trackGrowthEvent('daily_word_hunt_complete', {
+      ...buildDailyWordHuntCompletePayload({
+        result,
+        puzzleNumber,
+        language: gameLanguage,
+        startedAt: gameStartedAtRef.current,
+        completedAt: Date.now(),
+        rescueMethod: rescueMethod ?? null,
+      }),
     });
 
     setGameResult(result);

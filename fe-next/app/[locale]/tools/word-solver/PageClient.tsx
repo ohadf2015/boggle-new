@@ -260,7 +260,7 @@ export default function WordSolverPageClient() {
           </h2>
           <ol className="list-decimal list-inside space-y-3 text-neo-cream/90">
             {content.howToSteps.map((step, i) => (
-              <li key={i} className="leading-relaxed">{step}</li>
+              <li key={`step-${i}-${step.slice(0, 24)}`} className="leading-relaxed">{step}</li>
             ))}
           </ol>
         </section>
@@ -270,9 +270,9 @@ export default function WordSolverPageClient() {
             {content.tipsTitle}
           </h2>
           <div className="grid gap-4 sm:grid-cols-2">
-            {content.tips.map((tip, i) => (
+            {content.tips.map((tip) => (
               <article
-                key={i}
+                key={tip.title}
                 className="bg-slate-800 border-3 border-neo-black rounded-neo p-4"
               >
                 <h3 className="font-neo-display font-bold text-neo-cyan mb-2">
@@ -293,7 +293,7 @@ export default function WordSolverPageClient() {
           <div className="space-y-4">
             {content.faqs.map((faq, i) => (
               <details
-                key={i}
+                key={`faq-${i}-${faq.question}`}
                 className="bg-slate-800 border-3 border-neo-black rounded-neo p-4 group"
               >
                 <summary className="font-neo-display font-bold text-neo-orange cursor-pointer list-none flex items-center justify-between">

@@ -2,7 +2,6 @@
 
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { memo } from 'react';
-import Image from 'next/image';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 
 /**
@@ -81,14 +80,17 @@ export const DJMascot = memo(function DJMascot({
       }}
     >
       <div className="w-full h-full">
-        <Image
-          src="/mascot/dj.gif"
-          alt={altText}
+        <video
+          src="/mascot/dj.mp4"
           width={SIZE_PIXELS[size]}
           height={SIZE_PIXELS[size]}
-          className="object-contain drop-shadow-lg"
-          priority={priority}
-          unoptimized
+          className="w-full h-full object-contain drop-shadow-lg"
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload={priority ? 'auto' : 'metadata'}
+          aria-label={altText}
         />
       </div>
     </AdaptiveMotion.div>

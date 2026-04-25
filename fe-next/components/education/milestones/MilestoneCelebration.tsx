@@ -106,15 +106,30 @@ export const MilestoneCelebration = memo<MilestoneCelebrationProps>(
               animate={{ scale: [0, 1.3, 1], rotate: [30, -15, 0] }}
               transition={{ delay: 0.2, duration: 0.5, ease: 'easeOut' }}
             >
-              <Image
-                src={isMajor ? '/mascot/trophy-nobg.gif' : '/mascot/celebration.gif'}
-                alt=""
-                width={80}
-                height={80}
-                className="mx-auto drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]"
-                unoptimized
-                aria-hidden="true"
-              />
+              {isMajor ? (
+                <Image
+                  src="/mascot/trophy-nobg.webp"
+                  alt=""
+                  width={80}
+                  height={80}
+                  className="mx-auto drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]"
+                  unoptimized
+                  aria-hidden="true"
+                />
+              ) : (
+                <video
+                  src="/mascot/celebration.mp4"
+                  width={80}
+                  height={80}
+                  className="mx-auto drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]"
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  preload="metadata"
+                  aria-hidden="true"
+                />
+              )}
             </motion.div>
 
             {/* Title */}

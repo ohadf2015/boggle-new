@@ -45,6 +45,10 @@ export { useShareHandlers } from './useShareHandlers';
 export { useResultSubmission } from './useResultSubmission';
 export { useCoinActions } from './useCoinActions';
 export { useConfettiEffects } from './useConfettiEffects';
+export { useSpendAnimation } from './useSpendAnimation';
+export type { SpendAnimationPosition, UseSpendAnimationReturn } from './useSpendAnimation';
+export { useStreakFreezeStatus } from './useStreakFreezeStatus';
+export type { UseStreakFreezeStatusReturn } from './useStreakFreezeStatus';
 
 // Components
 export { ScoreBadge } from './ScoreBadge';

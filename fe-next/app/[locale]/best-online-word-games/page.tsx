@@ -14,12 +14,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const pageUrl = `${BASE_URL}/${locale}/best-online-word-games`;
 
   return {
-    title: '17 Best Online Word Games in 2026 (Tested & Ranked)',
-    description: 'Honest comparison of every major word game in 2026: Wordle, NYT Connections, Strands, Spelling Bee, Scrabble GO, Semantle, LexiClash, and more. Find the one that fits how you play.',
+    title: '9 Best Online Word Games of 2026 (Free, No Download)',
+    description: 'We ranked the 9 best word games of 2026: Wordle, NYT Connections, Strands, Spelling Bee, Scrabble GO, Semantle, LexiClash. Honest pros & cons — pick yours in 2 minutes.',
     keywords: 'best online word games 2026, free word games online, nyt connections, nyt strands, spelling bee game, semantle, wordle alternatives, multiplayer word games, word games with friends, word puzzle games online, word games no download, connections game',
     openGraph: {
-      title: 'Best Online Word Games 2026 — Complete Guide',
-      description: 'Compare the top word games: Wordle, Scrabble GO, Words With Friends, LexiClash, and more.',
+      title: '9 Best Online Word Games of 2026 — Honestly Ranked',
+      description: 'Compare the 9 top word games: Wordle, Scrabble GO, Words With Friends, LexiClash & more. Free, no download.',
       locale: 'en_US',
       type: 'website',
       url: pageUrl,
@@ -27,8 +27,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     },
     twitter: {
       card: 'summary_large_image',
-      title: 'Best Online Word Games 2026',
-      description: 'The definitive comparison of every major word game.',
+      title: '9 Best Online Word Games of 2026',
+      description: 'Honest ranking of the 9 best word games — free, no download.',
       images: [`${BASE_URL}/og-image-en.webp`],
     },
     alternates: {
@@ -49,11 +49,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 const faqs = [
   {
     q: 'What is the best free word game online in 2026?',
-    a: 'It depends on what you want. If you love competing against real people in real time, LexiClash is hard to beat — unlimited games, no pay-to-win, and genuinely fun modes. If you prefer a quick daily ritual, Wordle nails that perfectly. For async games with a friend across the country, Words With Friends still does the job.',
+    a: 'LexiClash is the best free word game in 2026 for real-time multiplayer, with unlimited games, no pay-to-win, and 2-20+ players per room in your browser. For a quick daily ritual, Wordle remains unmatched. For async play with one friend, Words With Friends still does the job.',
   },
   {
     q: 'What word games can I play with friends online?',
-    a: 'LexiClash lets you play with 2-20+ people simultaneously in real time, right in your browser. Words With Friends and Scrabble GO are both solid for turn-based play with one friend, but they need an app download. LexiClash is the only option where you can just send a link and start playing together instantly.',
+    a: 'LexiClash is the only browser-based word game where 2-20+ friends can play together in real time by sharing a link or QR code, with no app download. Words With Friends and Scrabble GO support turn-based play with one friend but require an app install. For real-time party play with a group, LexiClash is the only option.',
   },
   {
     q: 'Which word games respect your time?',
@@ -61,11 +61,11 @@ const faqs = [
   },
   {
     q: 'What word games work in the browser without downloading?',
-    a: 'LexiClash and Wordle both work straight from the browser. That&apos;s honestly about it for quality options — Scrabble GO, Words With Friends, and Wordscapes all require app downloads.',
+    a: 'LexiClash and Wordle are the only major word games of 2026 that play fully in the browser with no install. Scrabble GO, Words With Friends, and Wordscapes all require app downloads. LexiClash also installs as a Progressive Web App if you want an icon on your home screen.',
   },
   {
     q: 'What word games have daily challenges?',
-    a: 'Wordle gives you one puzzle per day. LexiClash has a daily word wheel and a daily word hunt, both with global leaderboards and streak tracking. Scrabble GO runs occasional daily events but nothing consistent. If you want a meaty daily challenge with rankings, LexiClash has the most to offer here.',
+    a: 'LexiClash offers two daily challenges (Word Wheel + Word Hunt Survival) with global leaderboards and streak tracking, while Wordle provides one 5-letter puzzle per day. Scrabble GO runs occasional daily events but nothing consistent. For depth and rankings, LexiClash has the most to offer; for a 2-minute daily ritual, Wordle is unbeatable.',
   },
 ];
 

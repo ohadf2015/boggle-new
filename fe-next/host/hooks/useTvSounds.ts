@@ -41,7 +41,7 @@ export function useTvSounds({
 
   // Get global mute settings
   const { sfxMuted, sfxVolume } = useSoundEffects();
-  const { isMuted: musicMuted, audioUnlocked } = useMusic();
+  const { audioUnlocked } = useMusic();
 
   // Pre-load audio files
   useEffect(() => {
@@ -74,7 +74,7 @@ export function useTvSounds({
 
   // Play sound by tier - respects global mute settings and minimum gap
   const playSound = useCallback((tier: NotificationTier) => {
-    if (!enabled || mutedRef.current || !audioUnlocked || sfxMuted || musicMuted) return;
+    if (!enabled || mutedRef.current || !audioUnlocked || sfxMuted) return;
 
     const now = Date.now();
     if (now - lastSoundTimeRef.current < MIN_SOUND_GAP_MS) return;
@@ -88,11 +88,11 @@ export function useTvSounds({
         console.debug('TV sound play failed:', error);
       });
     }
-  }, [enabled, audioUnlocked, sfxMuted, musicMuted, sfxVolume]);
+  }, [enabled, audioUnlocked, sfxMuted, sfxVolume]);
 
   // Play combo break sound - respects global mute settings and minimum gap
   const playComboBreak = useCallback(() => {
-    if (!enabled || mutedRef.current || !audioUnlocked || sfxMuted || musicMuted) return;
+    if (!enabled || mutedRef.current || !audioUnlocked || sfxMuted) return;
 
     const now = Date.now();
     if (now - lastSoundTimeRef.current < MIN_SOUND_GAP_MS) return;
@@ -106,7 +106,7 @@ export function useTvSounds({
         console.debug('Combo break sound play failed:', error);
       });
     }
-  }, [enabled, audioUnlocked, sfxMuted, musicMuted, sfxVolume]);
+  }, [enabled, audioUnlocked, sfxMuted, sfxVolume]);
 
   // Set muted state
   const setMuted = useCallback((muted: boolean) => {

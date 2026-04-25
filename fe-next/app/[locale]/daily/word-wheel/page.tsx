@@ -1,7 +1,7 @@
 import React, { Suspense } from 'react';
 import dynamicImport from 'next/dynamic';
 import type { Metadata } from 'next';
-import { PageLoader } from '@/components/ui/PageLoader';
+import { DailyLoadingFallback } from '@/components/daily/DailyLoadingFallback';
 import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
 
 type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es';
@@ -12,11 +12,7 @@ interface PageParams {
   params: Promise<{ locale: string }>;
 }
 
-const LoadingFallback = () => (
-  <div className="flex-1 flex items-center justify-center bg-neo-navy">
-    <PageLoader size="lg" text="Loading Word Wheel..." />
-  </div>
-);
+const LoadingFallback = () => <DailyLoadingFallback mode="wordWheel" />;
 
 const WordWheelChallenge = dynamicImport(
   () => import('@/components/daily/WordWheelChallenge'),

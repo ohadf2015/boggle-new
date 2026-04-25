@@ -12,7 +12,6 @@
 import { memo, useEffect, useId, useRef } from 'react';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
-import Image from 'next/image';
 
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -109,13 +108,16 @@ const LevelUpCelebration = memo<LevelUpCelebrationProps>(
               animate={{ scale: 1, rotate: 0 }}
               transition={{ delay: 0.2, type: 'spring', stiffness: 200, damping: 12 }}
             >
-              <Image
-                src="/mascot/celebration.gif"
-                alt=""
+              <video
+                src="/mascot/celebration.mp4"
                 width={96}
                 height={96}
                 className="mx-auto drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]"
-                unoptimized
+                autoPlay
+                loop
+                muted
+                playsInline
+                preload="metadata"
                 aria-hidden="true"
               />
             </AdaptiveMotion.div>

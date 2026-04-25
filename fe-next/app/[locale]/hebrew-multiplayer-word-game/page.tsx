@@ -144,9 +144,9 @@ export default async function HebrewMultiplayerWordGamePage({ params }: PageProp
               'קרבות בוסים עם הפתעות ייחודיות',
               'לגמרי חינם, ללא הורדה',
               'שחקו בעברית, אנגלית, שוודית, יפנית וספרדית',
-            ].map((feature, idx) => (
+            ].map((feature) => (
               <div
-                key={idx}
+                key={feature}
                 className="flex gap-3 rounded-neo border-3 border-neo-yellow bg-neo-navy/50 p-4 shadow-hard"
               >
                 <span className="text-neo-yellow">✓</span>
@@ -182,7 +182,7 @@ export default async function HebrewMultiplayerWordGamePage({ params }: PageProp
           <div className="space-y-4">
             {faqs.map((faq, idx) => (
               <details
-                key={idx}
+                key={`faq-${idx}-${faq.q}`}
                 className="group rounded-neo border-3 border-neo-gray-400 bg-neo-navy/50 shadow-hard"
               >
                 <summary className="flex cursor-pointer items-center justify-between px-6 py-4 font-bold">

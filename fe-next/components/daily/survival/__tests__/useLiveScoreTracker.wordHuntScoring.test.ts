@@ -1,14 +1,34 @@
 import { describe, it, expect } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useLiveScoreTracker } from '../useLiveScoreTracker';
-import type { WordDiscovery } from '../types';
+import type { WordDiscovery, TargetAttempt } from '../types';
 
 function makeWord(word: string): WordDiscovery {
   return { word, timestamp: Date.now(), lifeGained: 0, tokensGained: 0 };
 }
 
-describe('useLiveScoreTracker — word-hunt scoring', () => {
-  it('sums per-word scores using canonical calculateWordScore lengths', () => {
+function makeAttempt(word: string, isDiscovery = false): TargetAttempt {
+  return { word, feedback: [], timestamp: Date.now(), isDiscovery };
+}
+
+describe('useLiveScoreTracker — Season-2 projected score', () => {
+  it('projects breakdown total during gameplay (fresh game = 800)', () => {
+    const { result } = renderHook(() =>
+      useLiveScoreTracker({
+        lifePoints: 100,
+        clueTokens: 0,
+        discoveredWords: [],
+        attempts: [],
+        hasWon: false,
+        isGameOver: false,
+      }),
+    );
+
+    // speed 400 + accuracy 400 + exploration 0 = 800
+    expect(result.current[0].currentScore).toBe(800);
+  });
+
+  it('adds 10 per discovered word (exploration bonus)', () => {
     const { result, rerender } = renderHook(
       ({ words }: { words: WordDiscovery[] }) =>
         useLiveScoreTracker({
@@ -16,68 +36,119 @@ describe('useLiveScoreTracker — word-hunt scoring', () => {
           clueTokens: 0,
           discoveredWords: words,
           attempts: [],
+          hasWon: false,
+          isGameOver: false,
         }),
       { initialProps: { words: [] as WordDiscovery[] } },
     );
 
-    expect(result.current[0].currentScore).toBe(0);
+    expect(result.current[0].currentScore).toBe(800);
 
     rerender({ words: [makeWord('CAT')] });
-    expect(result.current[0].currentScore).toBe(10);
+    expect(result.current[0].currentScore).toBe(810);
 
     rerender({ words: [makeWord('CAT'), makeWord('HOUSE')] });
-    expect(result.current[0].currentScore).toBe(60);
-
-    rerender({
-      words: [makeWord('CAT'), makeWord('HOUSE'), makeWord('TESTING')],
-    });
-    expect(result.current[0].currentScore).toBe(260);
+    expect(result.current[0].currentScore).toBe(820);
   });
 
-  it('ignores lifePoints/clueTokens/attempts when computing score', () => {
+  it('subtracts 40 per extra target attempt (accuracy penalty)', () => {
     const { result, rerender } = renderHook(
-      ({
-        life,
-        tokens,
-        attempts,
-      }: {
-        life: number;
-        tokens: number;
-        attempts: number;
-      }) =>
+      ({ attempts }: { attempts: TargetAttempt[] }) =>
         useLiveScoreTracker({
-          lifePoints: life,
-          clueTokens: tokens,
-          discoveredWords: [makeWord('HOUSE')],
-          attempts: Array.from({ length: attempts }, (_, i) => ({
-            word: `W${i}`,
-            timestamp: 0,
-            isCorrect: false,
-          })) as never,
+          lifePoints: 100,
+          clueTokens: 0,
+          discoveredWords: [],
+          attempts,
+          hasWon: false,
+          isGameOver: false,
         }),
-      { initialProps: { life: 100, tokens: 0, attempts: 0 } },
+      { initialProps: { attempts: [] as TargetAttempt[] } },
     );
 
-    const base = result.current[0].currentScore;
-    expect(base).toBe(50);
+    expect(result.current[0].currentScore).toBe(800);
 
-    rerender({ life: 10, tokens: 5, attempts: 9 });
-    expect(result.current[0].currentScore).toBe(base);
+    // 1 target attempt → accuracy still 400 (first guess is free)
+    rerender({ attempts: [makeAttempt('WRONG')] });
+    expect(result.current[0].currentScore).toBe(800);
+
+    // 2 attempts → accuracy 360
+    rerender({ attempts: [makeAttempt('WRONG'), makeAttempt('WRONG2')] });
+    expect(result.current[0].currentScore).toBe(760);
   });
 
-  it('sets final score without animation on game over', () => {
+  it('ignores discovery attempts for accuracy calc', () => {
+    const { result } = renderHook(() =>
+      useLiveScoreTracker({
+        lifePoints: 100,
+        clueTokens: 0,
+        discoveredWords: [],
+        attempts: [
+          makeAttempt('CAT', true),
+          makeAttempt('DOG', true),
+          makeAttempt('WRONG', false),
+        ],
+        hasWon: false,
+        isGameOver: false,
+      }),
+    );
+
+    // Only the 1 non-discovery counts; accuracy stays 400
+    expect(result.current[0].currentScore).toBe(800);
+  });
+
+  it('life loss reduces speed (4 pts per life)', () => {
+    const { result, rerender } = renderHook(
+      ({ life }: { life: number }) =>
+        useLiveScoreTracker({
+          lifePoints: life,
+          clueTokens: 0,
+          discoveredWords: [],
+          attempts: [],
+          hasWon: false,
+          isGameOver: false,
+        }),
+      { initialProps: { life: 100 } },
+    );
+
+    expect(result.current[0].currentScore).toBe(800);
+
+    rerender({ life: 90 });
+    expect(result.current[0].currentScore).toBe(760);
+
+    rerender({ life: 0 });
+    expect(result.current[0].currentScore).toBe(400);
+  });
+
+  it('drops to 0 on game over if player lost (isGameOver && !hasWon)', () => {
     const { result } = renderHook(() =>
       useLiveScoreTracker({
         lifePoints: 0,
         clueTokens: 0,
         discoveredWords: [makeWord('HOUSE'), makeWord('CAT')],
-        attempts: [],
+        attempts: [makeAttempt('X'), makeAttempt('Y')],
+        hasWon: false,
         isGameOver: true,
       }),
     );
 
-    expect(result.current[0].currentScore).toBe(60);
+    expect(result.current[0].currentScore).toBe(0);
     expect(result.current[0].isScoreAnimating).toBe(false);
+  });
+
+  it('uses real breakdown on game over if player won', () => {
+    const { result } = renderHook(() =>
+      useLiveScoreTracker({
+        lifePoints: 80,
+        clueTokens: 0,
+        discoveredWords: [makeWord('HOUSE'), makeWord('CAT')],
+        attempts: [makeAttempt('ANSWER')],
+        hasWon: true,
+        isGameOver: true,
+      }),
+    );
+
+    // speed 320 + accuracy 400 + exploration 20 = 740
+    expect(result.current[0].currentScore).toBe(740);
   });
 
   it('resetScore clears accumulated state', () => {
@@ -88,12 +159,14 @@ describe('useLiveScoreTracker — word-hunt scoring', () => {
           clueTokens: 0,
           discoveredWords: words,
           attempts: [],
+          hasWon: false,
+          isGameOver: false,
         }),
       { initialProps: { words: [makeWord('HOUSE')] } },
     );
 
     rerender({ words: [makeWord('HOUSE'), makeWord('CAT')] });
-    expect(result.current[0].currentScore).toBe(60);
+    expect(result.current[0].currentScore).toBe(820);
 
     act(() => {
       result.current[1].resetScore();

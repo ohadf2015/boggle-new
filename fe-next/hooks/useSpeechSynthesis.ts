@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { speakWord, cancelSpeech, getAvailableVoices } from '../lib/speech/textToSpeech';
+import { useSoundEffects } from '../contexts/SoundEffectsContext';
 
 /**
  * Hook for Text-to-Speech integration
@@ -31,6 +32,14 @@ export function useSpeechSynthesis(defaultLang: string = 'en-US') {
   const [isSupported, setIsSupported] = useState(false);
   const isMountedRef = useRef(true);
 
+  // Mirror SFX mute/volume into refs so speak() always reads the latest values
+  // without forcing the callback to re-create on every settings change.
+  const { sfxMuted, sfxVolume } = useSoundEffects();
+  const sfxMutedRef = useRef(sfxMuted);
+  const sfxVolumeRef = useRef(sfxVolume);
+  useEffect(() => { sfxMutedRef.current = sfxMuted; }, [sfxMuted]);
+  useEffect(() => { sfxVolumeRef.current = sfxVolume; }, [sfxVolume]);
+
   // Check if Web Speech API is supported
   useEffect(() => {
     const voices = getAvailableVoices();
@@ -55,6 +64,11 @@ export function useSpeechSynthesis(defaultLang: string = 'en-US') {
     async (word: string, lang?: string): Promise<boolean> => {
       const targetLang = lang || defaultLang;
 
+      // Respect global SFX mute — TTS is part of the SFX channel
+      if (sfxMutedRef.current) {
+        return false;
+      }
+
       // Cancel any ongoing speech
       cancelSpeech();
 
@@ -62,7 +76,7 @@ export function useSpeechSynthesis(defaultLang: string = 'en-US') {
       setIsSpeaking(true);
 
       try {
-        await speakWord(word, targetLang);
+        await speakWord(word, targetLang, sfxVolumeRef.current);
         return true;
       } catch (error) {
         console.error('Speech synthesis error:', error);

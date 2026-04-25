@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 
 const SCORE_HISTORY_CAP = 20;
-import { calculateWordScore } from '@/shared/utils/scoring';
+import { getScoreBreakdown } from '@/utils/aiHintScoring';
 import type { WordDiscovery, TargetAttempt } from './types';
 
 export interface ScoreEvent {
@@ -31,19 +31,51 @@ export interface UseLiveScoreTrackerProps {
   discoveredWords: WordDiscovery[];
   attempts: TargetAttempt[];
   isGameOver?: boolean;
+  /**
+   * When isGameOver=true, this gates whether score reflects the real final total
+   * (hasWon=true) or collapses to 0 (hasWon=false) — mirrors the results-page rule
+   * that losses score 0.
+   */
+  hasWon?: boolean;
 }
 
 /**
- * Hook to track real-time score changes during survival gameplay
- * Calculates incremental score deltas and triggers animations
+ * Live Season-2 score projection during survival gameplay.
+ * Mirrors `getScoreBreakdown` from the results page so the HUD always shows
+ * "what would appear on results if you solved right now". Score starts at 800
+ * on a fresh game (perfect speed + accuracy, 0 exploration) and erodes as life
+ * drops / target attempts miss, while exploration adds +10 per discovered word.
+ * On game over, a loss drops the score to 0 to match the real final payload.
  */
 export function useLiveScoreTracker({
-  lifePoints: _lifePoints,
+  lifePoints,
   clueTokens: _clueTokens,
   discoveredWords,
-  attempts: _attempts,
+  attempts,
   isGameOver = false,
+  hasWon = false,
 }: UseLiveScoreTrackerProps): [LiveScoreState, LiveScoreActions] {
+  const targetAttemptsCount = useMemo(
+    () => attempts.filter(a => !a.isDiscovery).length,
+    [attempts],
+  );
+
+  // During live play, project solved=true (show the score the player would
+  // receive if they solved right now). On game over, honor the real outcome:
+  // losses yield 0 to match the results page.
+  const projectedSolved = isGameOver ? hasWon : true;
+
+  const calculatedScore = useMemo(
+    () =>
+      getScoreBreakdown(
+        lifePoints,
+        targetAttemptsCount,
+        discoveredWords.length,
+        projectedSolved,
+      ).total,
+    [lifePoints, targetAttemptsCount, discoveredWords.length, projectedSolved],
+  );
+
   const [currentScore, setCurrentScore] = useState(0);
   const [lastIncrement, setLastIncrement] = useState<number | null>(null);
   const [isScoreAnimating, setIsScoreAnimating] = useState(false);
@@ -51,23 +83,21 @@ export function useLiveScoreTracker({
 
   const animationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const previousScoreRef = useRef(0);
+  const didInitRef = useRef(false);
 
-  // Canonical word-hunt scoring: sum per-word scores (length-based, exponential)
-  // from `@/shared/utils/scoring.calculateWordScore`. Matches Boggle-style
-  // scoring (CAT=10, HOUSE=50, TESTING=200, 8+=500). Life/tokens are game-state
-  // only — they no longer feed the displayed score.
-  const calculatedScore = useMemo(
-    () => discoveredWords.reduce((sum, w) => sum + calculateWordScore(w.word), 0),
-    [discoveredWords],
-  );
-
-  // Update score when calculated score changes
   useEffect(() => {
+    if (!didInitRef.current) {
+      didInitRef.current = true;
+      setCurrentScore(Math.max(0, calculatedScore));
+      previousScoreRef.current = calculatedScore;
+      return;
+    }
+
     if (isGameOver) {
-      // On game over, set final score without animation
       setCurrentScore(Math.max(0, calculatedScore));
       setLastIncrement(null);
       setIsScoreAnimating(false);
+      previousScoreRef.current = calculatedScore;
       return;
     }
 
@@ -78,7 +108,6 @@ export function useLiveScoreTracker({
       setLastIncrement(delta);
       setIsScoreAnimating(true);
 
-      // Add to history
       const event: ScoreEvent = {
         timestamp: Date.now(),
         delta,
@@ -91,20 +120,18 @@ export function useLiveScoreTracker({
         return next;
       });
 
-      // Clear animation state after animation completes
       if (animationTimeoutRef.current) {
         clearTimeout(animationTimeoutRef.current);
       }
       animationTimeoutRef.current = setTimeout(() => {
         setIsScoreAnimating(false);
         setLastIncrement(null);
-      }, 600); // Match animation duration
+      }, 600);
 
       previousScoreRef.current = calculatedScore;
     }
   }, [calculatedScore, isGameOver]);
 
-  // Cleanup timeout on unmount
   useEffect(() => {
     return () => {
       if (animationTimeoutRef.current) {
@@ -146,6 +173,7 @@ export function useLiveScoreTracker({
     setIsScoreAnimating(false);
     setScoreHistory([]);
     previousScoreRef.current = 0;
+    didInitRef.current = false;
   }, []);
 
   const state: LiveScoreState = {

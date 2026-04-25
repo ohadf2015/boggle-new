@@ -4928,6 +4928,8 @@ const en = {
     "failed": "Failed",
     "puzzleNumber": "Daily #{number}",
     "playButton": "Play",
+    "loadingWordHunt": "Loading Word Hunt...",
+    "loadingWordWheel": "Loading Word Wheel...",
     "nextPuzzleIn": "Next in",
     "samePuzzle": "Same puzzle for everyone. How do you rank?",
     "alreadyPlayed": "Done Today!",
@@ -5328,6 +5330,7 @@ const en = {
         "title": "Keep going?",
         "body": "You're out of life. Watch a quick ad to restore HP and continue this run.",
         "cta": "Watch Ad for +{amount} HP",
+        "coinCta": "Spend {cost} coins to restore",
         "decline": "End run"
       },
       "keyboardTip": "Swipe on grid or type with keyboard",
@@ -5436,6 +5439,18 @@ const en = {
         "speed": "Finish faster to improve",
         "accuracy": "Use fewer guesses",
         "exploration": "Find more words"
+      },
+      "tier": {
+        "bronze": "Bronze",
+        "silver": "Silver",
+        "gold": "Gold",
+        "platinum": "Platinum",
+        "bronzeFlavor": "Warming up",
+        "silverFlavor": "Climbing",
+        "goldFlavor": "On fire",
+        "platinumFlavor": "Untouchable",
+        "toNext": "{points} to {next}",
+        "maxed": "Legendary · maxed out"
       }
     },
     "ad": {

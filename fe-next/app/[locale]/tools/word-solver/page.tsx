@@ -137,9 +137,9 @@ export default async function WordSolverPage({ params }: PageParams) {
 
   return (
     <>
-      {jsonLd.map((schema, i) => (
+      {jsonLd.map((schema) => (
         <script
-          key={i}
+          key={schema['@type']}
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
         />

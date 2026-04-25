@@ -530,19 +530,26 @@ export function useAdventureMusic({
     }
   }, [totalTime, enabled, isPlaying, isPaused, startTrack1]);
 
-  // Handle MusicContext volume and mute changes in real-time
-  // This ensures MusicControls works correctly during adventure mode playback
+  // Live-update Howl volume when MusicContext volume changes (slider drag).
+  // Decoupled from mute so dragging the slider doesn't pause/resume the loop.
   useEffect(() => {
+    if (contextMuted) return;
     const currentTrack = currentTrackRef.current;
     if (!currentTrack) return;
-
     const howl = currentTrack === 1 ? track1Ref.current : track2Ref.current;
     if (!howl) return;
-
-    const effectiveVolume = contextMuted ? 0 : contextVolume;
-    logger.log(`[AdventureMusic] MusicContext changed - setting volume to ${effectiveVolume}`);
-    howl.volume(effectiveVolume);
+    howl.volume(contextVolume);
   }, [contextVolume, contextMuted]);
+
+  // Pause/resume Howl on MusicContext mute toggle.
+  // pause() halts decoding entirely; volume(0) would leave the audio loop running.
+  useEffect(() => {
+    if (contextMuted) {
+      suspendAudio('Music muted');
+    } else {
+      resumeAudio('Music unmuted');
+    }
+  }, [contextMuted, suspendAudio, resumeAudio]);
 
   // ==============================================
   // RETURN

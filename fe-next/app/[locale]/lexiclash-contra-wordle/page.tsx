@@ -161,8 +161,8 @@ export default async function LexiClashContraWordlePage({ params }: PageProps) {
                   ['Tamaños de grilla', '4×4, 5×5, 6×6', 'N/A (5 letras fijas)'],
                   ['Sistema de combos', '✓ Puntos extra por velocidad', '✗'],
                   ['Sin descarga', '✓ Directo en el navegador', '✓ Directo en el navegador'],
-                ].map(([feature, lexi, wordle], idx) => (
-                  <tr key={idx} className="border-b border-neo-gray-400/50">
+                ].map(([feature, lexi, wordle]) => (
+                  <tr key={feature} className="border-b border-neo-gray-400/50">
                     <td className="px-4 py-3 font-medium">{feature}</td>
                     <td className="px-4 py-3 text-center text-neo-cyan">{lexi}</td>
                     <td className="px-4 py-3 text-center text-neo-gray-300">{wordle}</td>
@@ -187,9 +187,9 @@ export default async function LexiClashContraWordlePage({ params }: PageProps) {
               'Grillas de 4×4, 5×5 y 6×6 para todos los niveles',
               'Funciona en celular, tablet y computadora sin descargar nada',
               'Disponible en español latino con diccionario completo',
-            ].map((feature, idx) => (
+            ].map((feature) => (
               <div
-                key={idx}
+                key={feature}
                 className="flex gap-3 rounded-neo border-3 border-neo-lime bg-neo-navy/50 p-4 shadow-hard"
               >
                 <span className="shrink-0 text-neo-lime">✓</span>
@@ -204,7 +204,7 @@ export default async function LexiClashContraWordlePage({ params }: PageProps) {
           <div className="space-y-4">
             {faqs.map((faq, idx) => (
               <details
-                key={idx}
+                key={`faq-${idx}-${faq.q}`}
                 className="group rounded-neo border-3 border-neo-gray-400 bg-neo-navy/50 shadow-hard"
               >
                 <summary className="flex cursor-pointer items-center justify-between px-6 py-4 font-bold">

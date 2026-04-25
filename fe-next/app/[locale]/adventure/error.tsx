@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { captureError } from '@/utils/sentry';
+import { Mascot } from '@/components/ui/Mascot';
 import { translations } from '../../../translations';
 
 export default function AdventureError({
@@ -42,8 +43,7 @@ export default function AdventureError({
   return (
     <div className="flex-1 flex items-center justify-center bg-neo-navy px-4 py-8">
       <div className="max-w-lg w-full text-center">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/mascot/scared.gif" alt="" width={96} height={96} className="mx-auto mb-4 drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]" aria-hidden="true" />
+        <Mascot variant="scared" size="xs" animated={false} className="mx-auto mb-4" />
         <h2 className="text-2xl font-bold text-white mb-2">
           {t('errors.errorHeading')}
         </h2>

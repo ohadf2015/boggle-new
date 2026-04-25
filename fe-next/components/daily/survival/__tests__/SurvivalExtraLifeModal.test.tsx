@@ -156,4 +156,77 @@ describe('SurvivalExtraLifeModal', () => {
     expect(screen.queryByTestId('survival-extralife-cta')).toBeNull();
     expect(screen.getByTestId('survival-extralife-decline')).toBeDefined();
   });
+
+  it('shows coin-spend CTA when ad unavailable and player can afford', () => {
+    hookReturn.canShowAd = false;
+    render(
+      <SurvivalExtraLifeModal
+        isOpen
+        restoreAmount={50}
+        onRestore={vi.fn()}
+        onDecline={vi.fn()}
+        coinCost={50}
+        canAffordCoinRestore
+        onCoinRestore={vi.fn()}
+        t={t}
+      />,
+    );
+    const coinCta = screen.getByTestId('survival-extralife-coin-cta');
+    expect(coinCta).toBeDefined();
+    expect(coinCta.textContent).toContain('50');
+  });
+
+  it('calls onCoinRestore when coin CTA clicked', () => {
+    hookReturn.canShowAd = false;
+    const onCoinRestore = vi.fn();
+    render(
+      <SurvivalExtraLifeModal
+        isOpen
+        restoreAmount={50}
+        onRestore={vi.fn()}
+        onDecline={vi.fn()}
+        coinCost={50}
+        canAffordCoinRestore
+        onCoinRestore={onCoinRestore}
+        t={t}
+      />,
+    );
+    fireEvent.click(screen.getByTestId('survival-extralife-coin-cta'));
+    expect(onCoinRestore).toHaveBeenCalledTimes(1);
+  });
+
+  it('hides coin CTA when player cannot afford', () => {
+    hookReturn.canShowAd = false;
+    render(
+      <SurvivalExtraLifeModal
+        isOpen
+        restoreAmount={50}
+        onRestore={vi.fn()}
+        onDecline={vi.fn()}
+        coinCost={50}
+        canAffordCoinRestore={false}
+        onCoinRestore={vi.fn()}
+        t={t}
+      />,
+    );
+    expect(screen.queryByTestId('survival-extralife-coin-cta')).toBeNull();
+  });
+
+  it('hides coin CTA when ad is available (prefers ad path)', () => {
+    hookReturn.canShowAd = true;
+    render(
+      <SurvivalExtraLifeModal
+        isOpen
+        restoreAmount={50}
+        onRestore={vi.fn()}
+        onDecline={vi.fn()}
+        coinCost={50}
+        canAffordCoinRestore
+        onCoinRestore={vi.fn()}
+        t={t}
+      />,
+    );
+    expect(screen.getByTestId('survival-extralife-cta')).toBeDefined();
+    expect(screen.queryByTestId('survival-extralife-coin-cta')).toBeNull();
+  });
 });

@@ -79,6 +79,34 @@ describe('useSurvivalGameLogic - extra life', () => {
     expect(onComplete.mock.calls[0][0]).toMatchObject({ solved: false });
   });
 
+  it('keeps isGameOver=false while deferGameOver=true despite lifePoints hitting zero', () => {
+    const onComplete = vi.fn();
+    const { result } = renderHook(() =>
+      useSurvivalGameLogic({ ...baseProps, onComplete, deferGameOver: true } as any)
+    );
+
+    act(() => { vi.advanceTimersByTime(100_000); });
+
+    expect(result.current[0].lifePoints).toBe(0);
+    expect(result.current[0].isGameOver).toBe(false);
+    expect(result.current[0].hasWon).toBe(false);
+    expect(onComplete).not.toHaveBeenCalled();
+  });
+
+  it('fires game-over when deferGameOver is false (default) and lifePoints hit zero', () => {
+    const onComplete = vi.fn();
+    const { result } = renderHook(() =>
+      useSurvivalGameLogic({ ...baseProps, onComplete } as any)
+    );
+
+    act(() => { vi.advanceTimersByTime(100_000); });
+
+    expect(result.current[0].isGameOver).toBe(true);
+    expect(result.current[0].hasWon).toBe(false);
+    expect(onComplete).toHaveBeenCalledTimes(1);
+    expect(onComplete.mock.calls[0][0]).toMatchObject({ solved: false });
+  });
+
   it('restoreLife action resets lifePoints and keeps the game alive', () => {
     const onComplete = vi.fn();
     const { result } = renderHook(() =>

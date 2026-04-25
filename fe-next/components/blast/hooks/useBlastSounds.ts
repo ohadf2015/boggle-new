@@ -31,7 +31,11 @@ export function useBlastSounds() {
     playLongWordBonusSound,
     playLegendaryWordSound,
     playMegaCascadeSound,
+    sfxMuted,
   } = useSoundEffects();
+
+  const sfxMutedRef = useRef(sfxMuted);
+  useEffect(() => { sfxMutedRef.current = sfxMuted; }, [sfxMuted]);
 
   const audioCtxRef = useRef<AudioContext | null>(null);
 
@@ -62,6 +66,7 @@ export function useBlastSounds() {
 
   /** Synthesize a short tone with configurable waveform, frequency, and duration */
   const synthTone = useCallback((freq: number, wave: OscillatorType, dur: number, vol = 0.1, detune = 0) => {
+    if (sfxMutedRef.current) return;
     const ctx = getAudioCtx();
     if (!ctx) return;
     const osc = ctx.createOscillator();
@@ -186,6 +191,7 @@ export function useBlastSounds() {
    *  Uses Web Audio oscillator — zero-latency, no asset needed. */
   const playPathTone = useCallback((pathLength: number) => {
     if (typeof window === 'undefined') return;
+    if (sfxMutedRef.current) return;
     try {
       if (!audioCtxRef.current) {
         const WebkitAudioCtx = (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;

@@ -175,6 +175,7 @@ export function useSurvivalGameLogic({
     discoveredWords: state.discoveredWords,
     attempts: state.attempts,
     isGameOver: state.isGameOver,
+    hasWon: state.hasWon,
   });
 
   // Notification actions
