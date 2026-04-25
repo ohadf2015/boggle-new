@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
-import { AnimatePresence, m } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowLeft } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -249,7 +249,7 @@ export default function ConnectionsGame() {
       </div>
 
       {/* Header: lives + level + score */}
-      <m.div
+      <motion.div
         initial={{ opacity: 0, y: -12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ type: 'spring' as const, stiffness: 280, damping: 24, delay: 0.1 }}
@@ -269,7 +269,7 @@ export default function ConnectionsGame() {
             {Array.from({ length: MAX_LIVES }).map((_, i) => {
               const alive = i < state.lives;
               return (
-                <m.span
+                <motion.span
                   key={`life-${i}`}
                   animate={
                     alive
@@ -280,14 +280,14 @@ export default function ConnectionsGame() {
                   className="text-xl select-none leading-none"
                 >
                   {alive ? '❤️' : '🖤'}
-                </m.span>
+                </motion.span>
               );
             })}
           </div>
         </div>
 
         {/* LEVEL — neo-brutalist cyan badge */}
-        <m.div
+        <motion.div
           ref={levelBadgeRef}
           key={`level-${level}`}
           initial={{ scale: 0.8, rotate: -3 }}
@@ -304,7 +304,7 @@ export default function ConnectionsGame() {
               <span className="text-neo-navy/50 text-xs font-mono font-bold"> / {totalLevels}</span>
             </p>
           </div>
-        </m.div>
+        </motion.div>
 
         <div className="flex flex-col items-end gap-1 text-sm font-neo-body min-w-0">
           <p className="text-neo-lime text-[10px] uppercase tracking-widest font-neo-display font-bold leading-none">
@@ -313,7 +313,7 @@ export default function ConnectionsGame() {
           <div className="flex items-center gap-2">
           <AnimatePresence>
             {state.streak >= 2 && (
-              <m.span
+              <motion.span
                 key={`streak-${state.streak}`}
                 initial={{ scale: 0.5, opacity: 0, y: -8 }}
                 animate={{ scale: 1, opacity: 1, y: 0 }}
@@ -322,12 +322,12 @@ export default function ConnectionsGame() {
                 className="text-neo-orange font-bold"
               >
                 🔥 ×{state.streak}
-              </m.span>
+              </motion.span>
             )}
           </AnimatePresence>
           <span className="text-neo-white/60">
             <AnimatePresence mode="popLayout">
-              <m.span
+              <motion.span
                 key={sessionScore + state.score}
                 initial={{ y: -14, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
@@ -336,12 +336,12 @@ export default function ConnectionsGame() {
                 className="text-neo-cyan font-bold inline-block"
               >
                 {(sessionScore + state.score).toLocaleString()}
-              </m.span>
+              </motion.span>
             </AnimatePresence>
           </span>
           </div>
         </div>
-      </m.div>
+      </motion.div>
 
       {/* XP earned this session */}
       {xpEarned > 0 && (
