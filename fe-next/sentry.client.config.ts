@@ -55,6 +55,15 @@ Sentry.init({
       }
     }
 
+    // Non-Error promise rejections (CrazyGames SDK throws plain objects).
+    // Handled by CrazyGamesSDK.showAuthPrompt try/catch — drop residual noise (JAVASCRIPT-NEXTJS-129).
+    if (error && typeof error === "object" && !(error instanceof Error)) {
+      const code = (error as { code?: string }).code;
+      if (code === "userAlreadySignedIn" || code === "userNotAuthenticated") {
+        return null;
+      }
+    }
+
     return event;
   },
 
@@ -223,6 +232,12 @@ Sentry.init({
     /\[useOAuthSignIn\].*Native OAuth failed/i,
     // CrazyGames userNotAuthenticated — expected when user not logged in
     /userNotAuthenticated/i,
+    // CrazyGames userAlreadySignedIn — handled by showAuthPrompt try/catch (JAVASCRIPT-NEXTJS-128)
+    /userAlreadySignedIn/i,
+    /\[UserError\] Code: userAlreadySignedIn/i,
+    // Push token registration network failures — transient, downgraded to debug (JAVASCRIPT-NEXTJS-12C)
+    /Error registering push token/i,
+    /Push token (network|server) (error|rejected)/i,
     // CrazyGames friends refresh — downstream of auth issues
     /Failed to refresh CrazyGames friends/i,
     // PWA service worker registration — transient, non-critical

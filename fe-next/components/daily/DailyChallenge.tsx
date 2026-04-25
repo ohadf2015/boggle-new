@@ -38,6 +38,7 @@ import {
   type WordHuntRescueMethod,
 } from './analytics/wordHuntCompletePayload';
 import { shouldAutoShowTutorial } from './tutorial/shouldAutoShowTutorial';
+import { markWordHuntTutorialSeen } from './tutorial/markWordHuntTutorialSeen';
 import { useDailyChallengeUrlParams } from './useDailyChallengeUrlParams';
 import { useRetryChallenge } from './useRetryChallenge';
 import type { LetterGrid, Language } from '@/types';
@@ -364,13 +365,18 @@ const DailyChallenge: React.FC = () => {
 }, [puzzleNumber, puzzleDate, gameLanguage, isAuthenticated, recordStreak]);
 
   const handleTutorialComplete = useCallback(() => {
-    const tutorialKey = getWordHuntTutorialKey(gameLanguage);
-    if (typeof window !== 'undefined') localStorage.setItem(tutorialKey, 'true');
+    markWordHuntTutorialSeen(gameLanguage);
     setTutorialCompleted(true);
     setShowTutorial(false);
   }, [gameLanguage]);
 
-  const handleTutorialSkip = useCallback(() => setShowTutorial(false), []);
+  // Skip persists the seen flag too — otherwise the auto-show effect re-fires
+  // immediately (X button bug) and the tutorial re-appears next session.
+  const handleTutorialSkip = useCallback(() => {
+    markWordHuntTutorialSeen(gameLanguage);
+    setTutorialCompleted(true);
+    setShowTutorial(false);
+  }, [gameLanguage]);
   const handleShowTutorial = useCallback(() => setShowTutorial(true), []);
   const handleBack = useCallback(() => { window.location.href = `/${language}/daily`; }, [language]);
 

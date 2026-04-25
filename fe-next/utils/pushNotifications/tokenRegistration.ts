@@ -101,14 +101,16 @@ async function registerTokenWithServer(
     });
 
     if (!response.ok) {
-      console.error('Failed to register push token:', await response.text());
+      console.debug('Push token server rejected:', response.status, await response.text());
       return false;
     }
 
     await response.json();
     return true;
   } catch (error) {
-    console.error('Error registering push token:', error);
+    // Transient network failure (offline, WebView lifecycle race) — non-actionable.
+    // Downgraded to debug so Sentry stops capturing as error (JAVASCRIPT-NEXTJS-12C).
+    console.debug('Push token network error:', error instanceof Error ? error.message : String(error));
     return false;
   }
 }
