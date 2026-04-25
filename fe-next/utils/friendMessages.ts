@@ -275,7 +275,7 @@ export async function getThreads(userId?: string): Promise<MessageThread[]> {
         // Get friend profile
         const { data: profile } = await supabase
           .from('profiles')
-          .select('username, display_name, avatar_emoji, avatar_color, avatar_image, custom_avatar, last_seen_at')
+          .select('username, display_name, avatar_emoji, avatar_color, avatar_image, avatar_config, last_seen_at')
           .eq('id', friendId)
           .single();
 
@@ -297,7 +297,7 @@ export async function getThreads(userId?: string): Promise<MessageThread[]> {
             emoji: profile.avatar_emoji || '👤',
             color: profile.avatar_color || '#808080',
             image: profile.avatar_image || undefined,
-            customAvatar: profile.custom_avatar || undefined,
+            customAvatar: profile.avatar_config || undefined,
           },
           lastMessage: lastMsg.message,
           lastMessageAt: new Date(lastMsg.created_at).getTime(),
