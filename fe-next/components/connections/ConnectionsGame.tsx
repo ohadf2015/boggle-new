@@ -223,7 +223,71 @@ export default function ConnectionsGame() {
 
   const currentPuzzle = state.puzzles[state.currentIndex];
 
+  // Distinguish "cleared whole pack" from "no puzzles for this locale".
+  // getPuzzleForLevel returns null past the end → if the player has cleared
+  // ≥1 level we treat this as terminal-success, otherwise as no-content.
+  const handlePlayAgain = useCallback(() => {
+    setCurrentLevel(language, 1);
+    setLevel(1);
+    const puzzle = getPuzzleForLevel(language, 1);
+    dispatch({ type: 'RESET', puzzles: puzzle ? [puzzle] : [], initialLives: MAX_LIVES });
+    setSessionScore(0);
+    setXpEarned(0);
+    xpAwardedIdsRef.current = new Set();
+  }, [language]);
+
   if (!currentPuzzle) {
+    const cleared = level > 1 && totalLevels > 0;
+    if (cleared) {
+      return (
+        <div className="flex-1 flex items-center justify-center px-4 py-6">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.92, y: 16 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ type: 'spring', stiffness: 320, damping: 22 }}
+            className="w-full max-w-sm rounded-neo border-neo-thick border-neo-lime bg-neo-navy-light shadow-hard-lg p-6 text-center"
+          >
+            <p className="text-5xl mb-3" aria-hidden="true">🏆</p>
+            <h2 className="font-neo-display text-2xl text-neo-cream font-bold mb-2">
+              {t('connections.finished')}
+            </h2>
+            <p className="text-neo-white/60 text-sm mb-4">
+              {t('connections.subtitle')}
+            </p>
+            <div className="flex justify-around gap-3 mb-5 text-sm font-neo-body">
+              <div className="flex flex-col">
+                <span className="text-neo-cyan text-[10px] uppercase tracking-widest font-bold">{t('connections.finalScore')}</span>
+                <span className="text-neo-cyan font-bold tabular-nums">{(sessionScore + state.score).toLocaleString()}</span>
+              </div>
+              {xpEarned > 0 && (
+                <div className="flex flex-col">
+                  <span className="text-neo-lime text-[10px] uppercase tracking-widest font-bold">{t('connections.xpEarned')}</span>
+                  <span className="text-neo-lime font-bold tabular-nums">+{xpEarned}</span>
+                </div>
+              )}
+            </div>
+            <div className="flex flex-col gap-2">
+              <motion.button
+                type="button"
+                onClick={handlePlayAgain}
+                whileHover={{ scale: 1.03, y: -1 }}
+                whileTap={{ scale: 0.97 }}
+                className="w-full rounded-neo border-neo-thick border-neo-lime bg-neo-lime text-neo-navy font-neo-display font-bold px-5 py-3 shadow-hard"
+              >
+                {t('connections.playAgain')}
+              </motion.button>
+              <button
+                type="button"
+                onClick={handleQuit}
+                className="w-full rounded-neo border-neo border-neo-white/30 bg-transparent text-neo-white/70 font-neo-body text-sm px-5 py-2.5 hover:bg-neo-white/5 transition-colors"
+              >
+                {t('connections.quitToMenu')}
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      );
+    }
     return (
       <div className="flex-1 flex items-center justify-center">
         <p className="text-neo-white/50 font-neo-body text-center px-4">{t('connections.noAccess')}</p>
@@ -248,12 +312,12 @@ export default function ConnectionsGame() {
         </button>
       </div>
 
-      {/* Header: lives + level + score */}
+      {/* Header: lives + level + score — sticky so HUD stays visible while scrolling / mobile keyboard up */}
       <motion.div
         initial={{ opacity: 0, y: -12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ type: 'spring' as const, stiffness: 280, damping: 24, delay: 0.1 }}
-        className="flex items-center justify-between gap-3"
+        className="sticky top-0 z-30 -mx-4 px-4 py-2 bg-neo-navy/90 backdrop-blur-sm border-b-2 border-neo-purple/40 flex items-center justify-between gap-3"
         dir={isRTL ? 'rtl' : 'ltr'}
       >
         {/* LIVES — neo-brutalist hearts pill */}
