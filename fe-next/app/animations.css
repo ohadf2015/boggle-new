@@ -1050,34 +1050,15 @@ textarea {
    CRAZYGAMES IFRAME EMBEDDING STYLES
    ==================================== */
 
-/* CSS isolation for CrazyGames iframe embedding */
-/* Prevents parent frame styles from bleeding in and ensures visual consistency */
+/* Marker class only — applied to <body> by CrazyGamesScriptServer bootstrap.
+   Cross-origin iframes already isolate styles, so no layout reset is needed.
+   Earlier `all: initial` here wiped body's `display: flex` (from .screen-fit)
+   and reset `display` to `inline`, which detached the fixed header from its
+   spacer and broke the flex-1 chain that fills the viewport. Keep this rule
+   empty; layout-affecting overrides go on `body.crazygames-embed` selectors
+   below so they don't fight `.screen-fit`. */
 .crazygames-embed {
-  /* Prevent any parent frame styles from bleeding in */
-  all: initial;
-
-  /* Re-apply our base styles */
-  font-family: var(--font-rubik), var(--font-fredoka), system-ui, sans-serif;
-  color: rgb(var(--neo-white));
-  background: var(--neo-navy);
-
-  /* Force our viewport to fill iframe exactly */
-  width: 100%;
-  height: 100%;
-  min-height: 100vh;
-  min-height: 100dvh; /* Dynamic viewport height for mobile */
-
-  /* Prevent scrollbars at page level */
-  overflow: hidden;
-
-  /* Ensure box-sizing is correct */
-  box-sizing: border-box;
-}
-
-.crazygames-embed *,
-.crazygames-embed *::before,
-.crazygames-embed *::after {
-  box-sizing: inherit;
+  /* intentionally empty — see comment above */
 }
 
 /* CrazyGames iframe requirements - prevent mobile selection issues */
