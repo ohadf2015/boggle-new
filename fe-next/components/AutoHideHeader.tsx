@@ -3,6 +3,7 @@
 import Header from './Header';
 import { useTvFullscreenListener } from '@/hooks/useTvFullscreenListener';
 import { useNavigation } from '@/contexts/NavigationContext';
+import { useCrazyGames } from '@/components/CrazyGamesSDK';
 
 interface AutoHideHeaderProps {
   className?: string;
@@ -16,14 +17,19 @@ interface AutoHideHeaderProps {
  * Hides the header during:
  * - TV fullscreen mode (broadcast)
  * - Active gameplay (game pages have their own in-game controls)
+ * - CrazyGames embed: portal provides its own chrome and the in-app header has
+ *   no menu/auth/dropdown to render anyway (e4a3ef8a, 65e790e7). Removing the
+ *   header also drops its sibling spacer, fixing the visible empty band that
+ *   the fixed-header + spacer pattern produced on CG.
  * In landscape mode it uses static positioning (handled by the Header component's landscape:static class).
  */
 export function AutoHideHeader({ className, onVisibilityChange }: AutoHideHeaderProps) {
   const isTvFullscreen = useTvFullscreenListener();
   const { isInGame } = useNavigation();
+  const { isOnCrazyGamesPlatform } = useCrazyGames();
 
-  // Hide header in fullscreen mode or during active gameplay
-  if (isTvFullscreen || isInGame) {
+  // Hide header in fullscreen mode, during active gameplay, or on CrazyGames
+  if (isTvFullscreen || isInGame || isOnCrazyGamesPlatform) {
     if (onVisibilityChange) {
       onVisibilityChange(false);
     }
