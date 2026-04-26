@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import { generatePageMetadata } from '@/lib/seo/generatePageMetadata';
 import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
+import { VideoGameJsonLd } from '@/components/seo/VideoGameJsonLd';
+import { BreadcrumbJsonLd } from '@/components/seo/BreadcrumbJsonLd';
 import MultiplayerPageClient from './PageClient';
 
 export const dynamic = 'force-dynamic';
@@ -153,8 +155,23 @@ const seoContent: Record<string, {
 export default async function MultiplayerPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   const content = seoContent[locale] ?? seoContent.en;
+  const origin = 'https://www.lexiclash.live';
   return (
     <>
+      <VideoGameJsonLd
+        mode="multiplayer"
+        locale={locale}
+        name={content.title}
+        description={content.description}
+        playMode="MultiPlayer"
+        numberOfPlayers={{ minValue: 2, maxValue: 8 }}
+      />
+      <BreadcrumbJsonLd
+        items={[
+          { name: 'LexiClash', url: `${origin}/${locale}` },
+          { name: content.title, url: `${origin}/${locale}/multiplayer` },
+        ]}
+      />
       <MultiplayerPageClient />
       <GamePageSeoContent
         asH1

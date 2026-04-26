@@ -1,29 +1,56 @@
 import type { ReactNode } from 'react';
 
+const SUPPORTED_LOCALES = new Set(['en', 'he', 'sv', 'ja', 'es']);
+const SITE_ORIGIN = 'https://www.lexiclash.live';
+
+interface VideoGameJsonLdProps {
+    /** Game-mode slug (e.g. 'multiplayer', 'blast'). Omit for site-wide schema. */
+    mode?: string;
+    /** Locale path segment (en, he, sv, ja, es). Required when `mode` is set. */
+    locale?: string;
+    /** Override game name. Defaults to 'LexiClash'. */
+    name?: string;
+    /** Override game description. */
+    description?: string;
+    /** Single playMode string (mode-specific) or array (site-wide default). */
+    playMode?: 'SinglePlayer' | 'MultiPlayer' | 'CoOp' | Array<'SinglePlayer' | 'MultiPlayer' | 'CoOp'>;
+    /** Number of players range. */
+    numberOfPlayers?: { minValue: number; maxValue: number };
+}
+
 /**
  * VideoGame JSON-LD schema for LexiClash.
- * Enables Rich Results in Google Search with game metadata.
- * All content is static constants — safe for dangerouslySetInnerHTML.
+ * Site-wide when called bare; per-mode when `mode` + `locale` provided.
+ * All content is static constants or server-rendered string literals.
  */
-export function VideoGameJsonLd(): ReactNode {
+export function VideoGameJsonLd(props: VideoGameJsonLdProps = {}): ReactNode {
+    const { mode, locale, name, description, playMode, numberOfPlayers } = props;
+    const lang = locale && SUPPORTED_LOCALES.has(locale) ? locale : 'en';
+    const isModeScoped = Boolean(mode);
+    const url = isModeScoped ? `${SITE_ORIGIN}/${lang}/${mode}` : SITE_ORIGIN;
+    const id = isModeScoped ? `${url}#videogame` : `${SITE_ORIGIN}/#videogame`;
+
     const schema = {
         '@context': 'https://schema.org',
-        '@type': 'VideoGame',
-        '@id': 'https://www.lexiclash.live/#videogame',
-        name: 'LexiClash',
-        url: 'https://www.lexiclash.live',
-        description: 'Free online multiplayer word game. Battle friends in real-time boggle-style word hunts across 10+ game modes.',
+        '@type': isModeScoped ? ['VideoGame', 'SoftwareApplication'] : 'VideoGame',
+        '@id': id,
+        name: name ?? 'LexiClash',
+        url,
+        description:
+            description ??
+            'Free online multiplayer word game. Battle friends in real-time boggle-style word hunts across 10+ game modes.',
         genre: ['Word Game', 'Puzzle', 'Multiplayer'],
-        gamePlatform: ['Web Browser'],
-        applicationCategory: 'Game',
-        operatingSystem: 'Any',
+        gamePlatform: ['Web', 'Android', 'iOS'],
+        applicationCategory: isModeScoped ? 'GameApplication' : 'Game',
+        operatingSystem: isModeScoped ? 'Web, Android' : 'Any',
         numberOfPlayers: {
             '@type': 'QuantitativeValue',
-            minValue: 1,
-            maxValue: 20,
+            minValue: numberOfPlayers?.minValue ?? 1,
+            maxValue: numberOfPlayers?.maxValue ?? 20,
         },
-        playMode: ['SinglePlayer', 'MultiPlayer', 'CoOp'],
-        inLanguage: ['en', 'he', 'sv', 'ja', 'es'],
+        playMode: playMode ?? ['SinglePlayer', 'MultiPlayer', 'CoOp'],
+        inLanguage: isModeScoped ? lang : ['en', 'he', 'sv', 'ja', 'es'],
+        isFamilyFriendly: true,
         offers: {
             '@type': 'Offer',
             price: '0',
@@ -32,10 +59,10 @@ export function VideoGameJsonLd(): ReactNode {
         },
         publisher: {
             '@type': 'Organization',
-            '@id': 'https://www.lexiclash.live/#organization',
+            '@id': `${SITE_ORIGIN}/#organization`,
             name: 'LexiClash',
         },
-        image: 'https://www.lexiclash.live/og-image-en.webp',
+        image: `${SITE_ORIGIN}/og-image-${lang}.webp`,
     };
 
     return (
