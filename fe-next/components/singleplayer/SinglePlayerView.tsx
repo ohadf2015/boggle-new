@@ -99,6 +99,7 @@ const SinglePlayerView: React.FC = () => {
   const setIsInGame = useHideNavigation();
   const { user, isAuthenticated } = useAuth();
   const [resultsData, setResultsData] = useState<SinglePlayerResultsData | null>(null);
+  const [sessionId] = useState(() => `sp_${crypto.randomUUID()}`);
 
   // Show feature unlock notifications when user reaches milestones
   useFeatureUnlockNotifications();
@@ -260,7 +261,7 @@ const SinglePlayerView: React.FC = () => {
       <AutoHideHeader />
 
       {phase === 'pre-game' && (
-        <PreGameTutorial onComplete={handleTutorialComplete} />
+        <PreGameTutorial onComplete={handleTutorialComplete} sessionId={sessionId} />
       )}
 
       <div className={`w-full px-2 sm:px-3 lg:px-4 landscape-content overflow-x-hidden ${phase === 'playing' ? 'flex-1 min-h-0 flex flex-col' : ''}`}>

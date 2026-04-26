@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useNavigation } from '@/contexts/NavigationContext';
+import { BoostButton } from '@/components/boosts/BoostButton';
 import RareGems from '@/components/drills/RareGems';
 import DrillProgressionOverlay from '@/components/brain/DrillProgressionOverlay';
 import { useDrillGrid } from '@/hooks/useDrillGrid';
@@ -36,6 +37,7 @@ export default function RareGemsPageClient() {
   const [showProgressionOverlay, setShowProgressionOverlay] = useState(false);
   const [brainScoreUpdate, setBrainScoreUpdate] = useState<DrillBrainScoreUpdate | null>(null);
   const [drillRewards, setDrillRewards] = useState<{ xpAwarded: number; goldAwarded: number } | null>(null);
+  const [sessionId] = useState(() => `drill_rare-gems_${crypto.randomUUID()}`);
 
   // Generate drill grid
   const { grid, availableWords, isLoading, regenerate } = useDrillGrid(5, language);
@@ -134,7 +136,9 @@ export default function RareGemsPageClient() {
           {t('brain.drills.rare-gems.name')}
         </h1>
 
-        <div className="w-10" /> {/* Spacer */}
+        {/* v1: Drill boosts apply client-side via useBoostClaim's cached token. */}
+        {/* Server-side score multiplier deferred to v2 (per spec). */}
+        <BoostButton mode="drill" sessionId={sessionId} />
       </header>
 
       {/* Drill Content */}

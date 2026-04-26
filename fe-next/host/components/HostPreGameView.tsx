@@ -8,6 +8,7 @@ import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useSocket } from '../../utils/SocketContext';
 import { useGameActions, useGameMode } from '@/hooks/gameState';
 import { useAuth } from '@/contexts/AuthContext';
+import { BoostButton } from '@/components/boosts/BoostButton';
 
 import { GAME_PRESETS } from './pre-game/PresetSelector';
 import { StartButton } from './pre-game/StartButton';
@@ -435,14 +436,19 @@ function HostPreGameView({
           />
           {/* Sticky bottom start button — desktop */}
           <div className="shrink-0 px-6 py-3 border-t-3 border-neo-black bg-neo-navy/95">
-            <StartButton
-              onStartGame={onStartGame}
-              disabled={isStartDisabled}
-              tournamentCreating={tournamentCreating}
-              playerCount={filteredPlayersForDisplay.length}
-              maxPlayers={maxPlayers}
-              t={t}
-            />
+            <div className="flex items-center gap-3">
+              <BoostButton mode="mp" sessionId={gameCode} />
+              <div className="flex-1">
+                <StartButton
+                  onStartGame={onStartGame}
+                  disabled={isStartDisabled}
+                  tournamentCreating={tournamentCreating}
+                  playerCount={filteredPlayersForDisplay.length}
+                  maxPlayers={maxPlayers}
+                  t={t}
+                />
+              </div>
+            </div>
           </div>
         </div>
 
@@ -476,7 +482,8 @@ function HostPreGameView({
           </div>
           {/* Sticky bottom start button — mobile */}
           <div className="shrink-0 px-5 py-3 border-t-3 border-neo-black bg-neo-navy/95" style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom, 0px))' }}>
-            <div className="max-w-[600px] mx-auto">
+            <div className="max-w-[600px] mx-auto flex flex-col gap-2">
+              <BoostButton mode="mp" sessionId={gameCode} />
               <StartButton
                 onStartGame={onStartGame}
                 disabled={isStartDisabled}

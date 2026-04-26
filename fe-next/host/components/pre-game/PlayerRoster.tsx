@@ -178,7 +178,7 @@ export const PlayerRoster = memo(function PlayerRoster({ players, username, game
                       const tileInner = (
                         <div className={cn(
                           'box-content rounded-full border-neo-black flex items-center justify-center overflow-hidden shadow-hard',
-                          compact ? 'w-16 h-16 border-4' : 'w-20 h-20 border-3',
+                          compact ? 'w-16 h-16 border-4' : 'w-20 h-20 border-4',
                           AVATAR_COLORS[index % AVATAR_COLORS.length],
                           compact
                             ? cn('ring-4 ring-offset-2 ring-offset-neo-navy', AVATAR_RING_COLORS[index % AVATAR_RING_COLORS.length])
@@ -303,7 +303,7 @@ export const PlayerRoster = memo(function PlayerRoster({ players, username, game
               whileTap={{ scale: 0.9 }}
               onClick={() => handleAddBot('medium')}
               className={cn(
-                'rounded-full border-4 border-dashed border-white/20 bg-white/5 flex items-center justify-center',
+                'box-content rounded-full border-4 border-dashed border-white/30 bg-white/5 flex items-center justify-center shadow-hard',
                 'hover:bg-white/10 hover:border-neo-cyan/60 transition-all group',
                 compact ? 'w-16 h-16' : 'w-20 h-20'
               )}

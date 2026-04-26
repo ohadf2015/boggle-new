@@ -9,10 +9,12 @@ import { Mascot, MascotWithEntrance } from '@/components/ui/Mascot';
 import MiniGrid from '@/components/onboarding/MiniGrid';
 import AvatarBuilderModal from '@/components/avatar/AvatarBuilderModal';
 import { useAuth } from '@/contexts/AuthContext';
+import { BoostButton } from '@/components/boosts/BoostButton';
 import { demoConfigs } from '@/components/onboarding/demoConfigs';
 
 interface PreGameTutorialProps {
   onComplete: () => void;
+  sessionId: string;
 }
 
 const TOTAL_STEPS = 3;
@@ -31,7 +33,7 @@ const getStepTransition = (dir: number, rtl: boolean) => {
   };
 };
 
-const PreGameTutorial: React.FC<PreGameTutorialProps> = ({ onComplete }) => {
+const PreGameTutorial: React.FC<PreGameTutorialProps> = ({ onComplete, sessionId }) => {
   const { t, language, dir } = useLanguage();
   const isRTL = dir === 'rtl';
   const isDesktop = useIsDesktop();
@@ -267,24 +269,30 @@ const PreGameTutorial: React.FC<PreGameTutorialProps> = ({ onComplete }) => {
                 premium={null}
               />
 
-              {/* Let's Play CTA — breathing pulse */}
-              <motion.button
-                onClick={onComplete}
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5, ...SPRING_POP }}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95, y: 2 }}
-                className="bg-neo-lime border-3 border-neo-black rounded-neo px-8 py-3.5 font-black text-lg text-neo-black shadow-hard transition-shadow flex items-center gap-2"
-              >
-                <motion.div
-                  animate={{ scale: [1, 1.15, 1] }}
-                  transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+              {/* Boost button and Let's Play CTA */}
+              <div className="flex flex-col gap-2 items-center">
+                <BoostButton mode="sp" sessionId={sessionId} />
+                {/* v1: SP boosts apply client-side via useBoostClaim's cached token. */}
+                {/* Server-side score multiplier deferred to v2 (per spec). */}
+                {/* Let's Play CTA — breathing pulse */}
+                <motion.button
+                  onClick={onComplete}
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5, ...SPRING_POP }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95, y: 2 }}
+                  className="bg-neo-lime border-3 border-neo-black rounded-neo px-8 py-3.5 font-black text-lg text-neo-black shadow-hard transition-shadow flex items-center gap-2"
                 >
-                  <Play className="w-5 h-5" fill="currentColor" />
-                </motion.div>
-                {t('preGameTutorial.letsPlay')}
-              </motion.button>
+                  <motion.div
+                    animate={{ scale: [1, 1.15, 1] }}
+                    transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+                  >
+                    <Play className="w-5 h-5" fill="currentColor" />
+                  </motion.div>
+                  {t('preGameTutorial.letsPlay')}
+                </motion.button>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>

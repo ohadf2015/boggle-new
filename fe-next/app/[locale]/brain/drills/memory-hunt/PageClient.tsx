@@ -14,6 +14,7 @@ import { useSaveDrillResult, DrillBrainScoreUpdate } from '@/hooks/useSaveDrillR
 import { useDrillRewards } from '@/hooks/useDrillRewards';
 import { useDrillLevel } from '@/hooks/useDrillLevel';
 import { trackDrillStart } from '@/lib/drills/telemetry';
+import { BoostButton } from '@/components/boosts/BoostButton';
 import { FeatureErrorBoundary } from '@/components/ErrorBoundaries';
 
 /**
@@ -36,6 +37,7 @@ export default function MemoryHuntPageClient() {
   const [showProgressionOverlay, setShowProgressionOverlay] = useState(false);
   const [brainScoreUpdate, setBrainScoreUpdate] = useState<DrillBrainScoreUpdate | null>(null);
   const [drillRewards, setDrillRewards] = useState<{ xpAwarded: number; goldAwarded: number } | null>(null);
+  const [sessionId] = useState(() => `drill_memory-hunt_${crypto.randomUUID()}`);
 
   // Generate drill grid
   const { grid, availableWords, isLoading, regenerate } = useDrillGrid(5, language);
@@ -134,7 +136,9 @@ export default function MemoryHuntPageClient() {
           {t('brain.drills.memory-hunt.name')}
         </h1>
 
-        <div className="w-10" /> {/* Spacer */}
+        {/* v1: Drill boosts apply client-side via useBoostClaim's cached token. */}
+        {/* Server-side score multiplier deferred to v2 (per spec). */}
+        <BoostButton mode="drill" sessionId={sessionId} />
       </header>
 
       {/* Drill Content */}

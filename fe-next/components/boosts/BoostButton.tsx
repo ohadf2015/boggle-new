@@ -29,7 +29,7 @@ export function BoostButton({ mode, sessionId, disabled }: Props) {
       >
         {t('boosts.cta')} <span className="text-xs opacity-80">({remaining})</span>
       </button>
-      <BoostPicker open={open} mode={mode} sessionId={sessionId} onClose={() => setOpen(false)} />
+      {open && <BoostPicker open={open} mode={mode} sessionId={sessionId} onClose={() => setOpen(false)} />}
     </>
   );
 }

@@ -16,6 +16,7 @@ import { clearSessionPreservingUsername } from '@/utils/session';
 import { generateRandomTable } from '@/utils/utils';
 import { DIFFICULTIES } from '@/utils/consts';
 import logger from '@/utils/logger';
+import { BOOST_TOKEN_STORAGE_KEY } from '@/hooks/useBoostClaim';
 import type { Language, LetterGrid, DifficultyLevel } from '@/types';
 import type { TournamentData } from './useHostViewState';
 import type { BoardTheme } from '@/shared/types/socket';
@@ -202,6 +203,19 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
       tvMode: !hostPlaying,
     });
 
+    // Apply cached boost token if present
+    const raw = typeof sessionStorage !== 'undefined'
+      ? sessionStorage.getItem(BOOST_TOKEN_STORAGE_KEY(gameCode))
+      : null;
+    if (raw) {
+      try {
+        const { token } = JSON.parse(raw);
+        socket.emit('boost:apply', { sessionId: gameCode, token });
+      } catch {
+        // Ignore parsing errors
+      }
+    }
+
     neoSuccessToast(t('common.gameStarted'), {
       icon: TOAST_ICONS.gamepad,
       duration: 3000,
@@ -230,6 +244,7 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
     setTournamentCreating,
     tournamentTimeoutRef,
     gameMode,
+    gameCode,
   ]);
 
   /** Public startGame — shows solo confirmation if host is alone */
