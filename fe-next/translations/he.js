@@ -4402,7 +4402,7 @@ const he = {
     "adventureModeDesc": "100 שלבים ב-10 עולמות",
     "blastMode": "מצב פיצוץ",
     "blastModeDesc": "נקו את הלוח!",
-    "wordChainMode": "שרשרת מילים",
+    "wordChainMode": "ראש זנב",
     "wordChainModeDesc": "חברו שתי מילים באמצעות מילה אחת",
     "wordForgeMode": "מסדת המילים",
     "wordForgeModeDesc": "משחק מילים רוגלייק",
@@ -10554,7 +10554,7 @@ const he = {
     }
   },
   "connections": {
-    "title": "שרשרת מילים",
+    "title": "ראש זנב",
     "subtitle": "מצא את המילה המקשרת!",
     "placeholder": "הקלד את מילת הגשר...",
     "submit": "שלח",
