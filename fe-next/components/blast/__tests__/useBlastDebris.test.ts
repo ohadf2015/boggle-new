@@ -147,6 +147,37 @@ describe('useBlastDebris — static walls', () => {
     unmount();
   });
 
+  it('RAF tick keeps ageing out debris after a deps-change re-mount (regression: mountedRef latch)', () => {
+    // Given — first useEffect deps include cellSize. Without re-arming
+    // `mountedRef.current = true` in the effect body, prior cleanup left
+    // it false, so the RAF tick short-circuits forever and debris freezes
+    // on the overlay. Symptom: shards stuck on board hiding tiles.
+    const physics = new PhysicsWorld({ gravity: { x: 0, y: 0 } });
+    const camera = new Container();
+    let nowMs = 1000;
+    const perfSpy = vi.spyOn(performance, 'now').mockImplementation(() => nowMs);
+
+    const { result, rerender, unmount } = renderHook(
+      ({ cs }: { cs: number }) => useBlastDebris(cs, 8, camera, physics),
+      { initialProps: { cs: 40 } },
+    );
+
+    rerender({ cs: 50 }); // forces first effect cleanup + re-run
+
+    result.current.spawnDebris([{ row: 0, col: 0, type: 'standard' }]);
+
+    const wallCount = physics.getAllBodyStates().filter(b => b.label === 'wall').length;
+    expect(physics.getAllBodyStates().length - wallCount).toBeGreaterThan(0);
+
+    nowMs += 3000; // past DEBRIS_LIFETIME (2s)
+    if (rafCb) rafCb(nowMs);
+
+    expect(physics.getAllBodyStates().length - wallCount).toBe(0);
+
+    perfSpy.mockRestore();
+    unmount();
+  });
+
   it('removes wall bodies on unmount', () => {
     const physics = new PhysicsWorld({ gravity: { x: 0, y: 1 } });
     const camera = new Container();

@@ -59,6 +59,10 @@ export function useBlastDebris(
 
   // Create debris container + static walls on mount
   useEffect(() => {
+    // Re-arm on every effect run — deps (cellSize/gridSize) can change on resize,
+    // and prior cleanup flipped this to false. Without re-arming, the RAF tick
+    // below short-circuits forever, leaving spawned debris frozen on the overlay.
+    mountedRef.current = true;
     const container = new Container();
     camera.addChild(container);
     debrisContainerRef.current = container;

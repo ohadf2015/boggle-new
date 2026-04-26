@@ -55,36 +55,65 @@ export default function AnchoredNativeBanner() {
     if (!Capacitor.isNativePlatform()) return;
 
     let cancelled = false;
+    let lastMargin = -1;
+    const isAndroid = Capacitor.getPlatform() === 'android';
+    const safeBottom = safeArea.bottom || 0;
 
-    if (isAllowedAdBannerRoute(pathname)) {
-      // Banner is lifted above GlobalBottomNav (when present) via plugin `margin`,
-      // so the nav stays flush at viewport bottom and the banner sits directly above.
-      // Game pages hide the nav (NavigationContext.isInGame); banner then falls back
-      // to safe-area-only margin (Android) or 0 (iOS, plugin handles safeAreaLayoutGuide).
-      const isAndroid = Capacitor.getPlatform() === 'android';
-      const safeBottom = safeArea.bottom || 0;
+    if (!isAllowedAdBannerRoute(pathname)) {
+      hideBanner();
+      document.documentElement.style.setProperty('--admob-banner-height', '0px');
+      return () => { cancelled = true; };
+    }
+
+    const computeMargin = (): number => {
       const navEl = document.querySelector<HTMLElement>('[data-global-bottom-nav]');
       const navHeight = navEl ? Math.round(navEl.getBoundingClientRect().height) : 0;
       // Android: nav.offsetHeight already includes safe-area via paddingBottom, so margin = navHeight ≥ safeBottom.
       // iOS: plugin re-adds safe-area, subtract to avoid double-count; floor at 0.
-      const margin = isAndroid
+      return isAndroid
         ? Math.max(navHeight, safeBottom)
         : Math.max(0, navHeight - safeBottom);
-      (async () => {
-        await hideBanner();
-        if (cancelled) return;
-        // AnchoredNativeBanner renders only on non-game surfaces (profile,
-        // leaderboard, blog, glossary, etc.) per isAllowedAdBannerRoute, so
-        // we tag this as the 'content' variant for separate eCPM optimization.
-        await showBanner(BannerAdPosition.BOTTOM_CENTER, margin, { variant: 'content' });
-      })();
-    } else {
-      hideBanner();
-      document.documentElement.style.setProperty('--admob-banner-height', '0px');
+    };
+
+    const applyBanner = async (margin: number) => {
+      if (cancelled || margin === lastMargin) return;
+      lastMargin = margin;
+      await hideBanner();
+      if (cancelled) return;
+      // AnchoredNativeBanner renders only on non-game surfaces (profile,
+      // leaderboard, blog, glossary, etc.) per isAllowedAdBannerRoute, so
+      // we tag this as the 'content' variant for separate eCPM optimization.
+      await showBanner(BannerAdPosition.BOTTOM_CENTER, margin, { variant: 'content' });
+    };
+
+    // Initial sync call preserves test contract (margin reflects nav present at mount).
+    applyBanner(computeMargin());
+
+    // Re-measure after paint — nav DOM may not be laid out on first effect tick
+    // (sibling render/effect race between essential-providers and layout).
+    const rafId = requestAnimationFrame(() => {
+      if (!cancelled) applyBanner(computeMargin());
+    });
+
+    // Re-measure when nav resizes (orientation, font load, safe-area shift).
+    const navEl = document.querySelector<HTMLElement>('[data-global-bottom-nav]');
+    let resizeObserver: ResizeObserver | null = null;
+    if (navEl && typeof ResizeObserver !== 'undefined') {
+      resizeObserver = new ResizeObserver(() => applyBanner(computeMargin()));
+      resizeObserver.observe(navEl);
     }
+
+    // Re-measure when nav appears/disappears (NavigationContext.isInGame toggles
+    // `has-global-bottom-nav` on <html>). Without this, leaving a game leaves the
+    // banner with stale 0-margin, sitting on top of the just-shown nav.
+    const classObserver = new MutationObserver(() => applyBanner(computeMargin()));
+    classObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
 
     return () => {
       cancelled = true;
+      cancelAnimationFrame(rafId);
+      resizeObserver?.disconnect();
+      classObserver.disconnect();
     };
   }, [pathname, showBanner, hideBanner, safeArea.bottom]);
 

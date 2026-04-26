@@ -128,7 +128,14 @@ export function useSurvivalClues({
 
     if (normalizedWord.length < 2) return 0;
 
-    const checkLength = Math.min(normalizedWord.length, targetLength);
+    // Position-aligned green clues are only meaningful when the discovered word does
+    // not exceed the target's length. A longer board word that happens to share its
+    // prefix with the target (e.g. "CATS" vs target "CAT") would otherwise mark every
+    // target position green and trigger the auto-win, exposing the answer before the
+    // player ever submits the full target word. Letters still flow into knownLetters
+    // below so the player keeps the "letter exists" hint without the positional reveal.
+    const canAlignPositions = normalizedWord.length <= targetLength;
+    const checkLength = canAlignPositions ? normalizedWord.length : 0;
     let cluesRevealed = 0;
 
     // Compute new greens for this word (position matches)
