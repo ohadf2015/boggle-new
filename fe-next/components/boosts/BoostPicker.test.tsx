@@ -1,0 +1,45 @@
+import { describe, it, expect, vi } from 'vitest';
+import { render, screen, fireEvent } from '@testing-library/react';
+import { BoostPicker } from './BoostPicker';
+
+const t = (k: string) => {
+  // Mock with basic placeholder substitution for testing
+  if (k === 'boosts.remaining') return '3 / 5';
+  return k;
+};
+vi.mock('@/contexts/LanguageContext', () => ({ useLanguage: () => ({ t, language: 'en' }) }));
+vi.mock('@/hooks/useBoostStatus', () => ({ useBoostStatus: () => ({ status: { remaining: 3, capPerDay: 5, resetAt: '' }, isLoading: false }) }));
+vi.mock('@/hooks/useBoostClaim', () => ({ useBoostClaim: () => ({ claim: vi.fn(), claimed: null, isLoading: false, error: null }) }));
+
+describe('BoostPicker', () => {
+  it('shows only mp-eligible boosts in mp mode', () => {
+    render(<BoostPicker open mode="mp" sessionId="s1" onClose={() => {}} />);
+    expect(screen.getByText('boosts.hint.title')).toBeInTheDocument();
+    expect(screen.getByText('boosts.scoreMultiplier.title')).toBeInTheDocument();
+    expect(screen.getByText('boosts.firstWordBonus.title')).toBeInTheDocument();
+    expect(screen.queryByText('boosts.freezeTime.title')).not.toBeInTheDocument();
+  });
+
+  it('shows freezeTime in classic mode but not firstWordBonus', () => {
+    render(<BoostPicker open mode="classic" sessionId="s1" onClose={() => {}} />);
+    expect(screen.getByText('boosts.freezeTime.title')).toBeInTheDocument();
+    expect(screen.queryByText('boosts.firstWordBonus.title')).not.toBeInTheDocument();
+  });
+
+  it('renders remaining count from status', () => {
+    render(<BoostPicker open mode="mp" sessionId="s1" onClose={() => {}} />);
+    expect(screen.getByText(/3.*5/)).toBeInTheDocument();
+  });
+
+  it('returns null when not open', () => {
+    const { container } = render(<BoostPicker open={false} mode="mp" sessionId="s1" onClose={() => {}} />);
+    expect(container.firstChild).toBeNull();
+  });
+
+  it('Escape closes the picker', () => {
+    const onClose = vi.fn();
+    render(<BoostPicker open mode="mp" sessionId="s1" onClose={onClose} />);
+    fireEvent.keyDown(document, { key: 'Escape' });
+    expect(onClose).toHaveBeenCalled();
+  });
+});
