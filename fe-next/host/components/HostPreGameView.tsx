@@ -344,7 +344,7 @@ function HostPreGameView({
       )}
 
       {/* Header */}
-      <header className="shrink-0 px-3 py-2 bg-neo-navy/95 border-b-3 border-neo-black sticky top-0 z-20">
+      <header className="shrink-0 px-3 py-1.5 bg-neo-navy/95 border-b-3 border-neo-black sticky top-0 z-20">
         <div className="flex items-center justify-between gap-2">
           {/* Game language chip — prominent so hosts see the board language before starting */}
           <div
@@ -397,8 +397,7 @@ function HostPreGameView({
             leftContent={
               <>
                 <AnimatePresence>{renderBotCountdown()}</AnimatePresence>
-                <div className="animate-fade-in-up flex-1 min-h-0 flex flex-col rounded-neo-lg border-3 border-neo-black bg-slate-800/80 shadow-hard p-4">
-                  <div className="flex justify-end mb-2">{tvModeToggle}</div>
+                <div className="animate-fade-in-up flex-1 [min-height:fit-content] flex flex-col rounded-neo-lg border-3 border-neo-black bg-slate-800/80 shadow-hard px-4 pt-3 pb-4 overflow-visible">
                   <PlayerRoster
                     players={filteredPlayersForDisplay}
                     username={username}
@@ -409,6 +408,7 @@ function HostPreGameView({
                     onSelfAvatarClick={handleOpenAvatarBuilder}
                     onSelfNameChange={handleSelfNameChange}
                     canEditSelfName={!isAuthenticated}
+                    headerExtra={tvModeToggle}
                   />
                 </div>
                 <div className="animate-fade-in-up" style={{ animationDelay: '80ms' }}>

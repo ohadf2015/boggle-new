@@ -35,6 +35,8 @@ interface PlayerRosterProps {
   onSelfNameChange?: (newName: string) => void;
   /** Gate name editing (e.g., disallow for authenticated users with server-side names) */
   canEditSelfName?: boolean;
+  /** Optional element rendered on the right side of the header row (e.g., TV/projector toggle) */
+  headerExtra?: React.ReactNode;
 }
 
 const AVATAR_COLORS = ['bg-neo-cyan', 'bg-neo-pink', 'bg-purple-400', 'bg-neo-lime', 'bg-neo-yellow', 'bg-orange-400', 'bg-teal-400', 'bg-rose-400'];
@@ -76,7 +78,7 @@ const playerEntranceVariants = {
   },
 };
 
-export const PlayerRoster = memo(function PlayerRoster({ players, username, gameCode, maxPlayers, t, compact = false, onSelfAvatarClick, onSelfNameChange, canEditSelfName = false }: PlayerRosterProps): React.ReactElement {
+export const PlayerRoster = memo(function PlayerRoster({ players, username, gameCode, maxPlayers, t, compact = false, onSelfAvatarClick, onSelfNameChange, canEditSelfName = false, headerExtra }: PlayerRosterProps): React.ReactElement {
   const { socket } = useSocket();
 
   const [isEditingSelfName, setIsEditingSelfName] = useState(false);
@@ -115,12 +117,13 @@ export const PlayerRoster = memo(function PlayerRoster({ players, username, game
   }, [socket, gameCode]);
 
   return (
-    <section className={compact ? 'space-y-1' : 'space-y-3'}>
-      {/* Header row */}
-      <div className="flex items-center justify-between px-1">
+    <section className={cn(compact ? 'space-y-1' : 'space-y-3', 'overflow-visible')}>
+      {/* Header row — title left, optional extra (e.g. TV toggle) right */}
+      <div className="flex items-center justify-between gap-2 px-1">
         <h2 className={cn('font-bold uppercase tracking-widest text-slate-500', compact ? 'text-[10px]' : 'text-xs')}>
           {t('hostView.playersInRoom')}
         </h2>
+        {headerExtra ? <div className="shrink-0">{headerExtra}</div> : null}
       </div>
 
       {/* Player avatars grid — centered.
