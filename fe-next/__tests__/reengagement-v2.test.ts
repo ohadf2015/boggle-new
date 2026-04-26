@@ -132,3 +132,44 @@ describe('getReengagementSubjectV2 — subject rotation', () => {
     }
   });
 });
+
+describe('ReengagementEmailV2 — stress copy guardrails', () => {
+  // Stop death/crisis metaphors creeping back into re-engagement.
+  // These targets disengaged users — guilt + medical imagery = churn driver.
+  const STRESS_PHRASES_BY_LANG: Record<string, string[]> = {
+    en: ['life support', 'streak is dying', 'last chance', "don't lose"],
+    he: ['תלוי בחוט', 'בטיפול נמרץ', 'גוסס'],
+    sv: ['intensiven', 'akuten', 'döende'],
+    ja: ['瀕死', '危篤'],
+    es: ['terapia intensiva', 'cuelga de un hilo', 'agonizando'],
+  };
+
+  it('rendered HTML contains no death/crisis metaphors per language', async () => {
+    for (const [lang, phrases] of Object.entries(STRESS_PHRASES_BY_LANG)) {
+      const html = await renderHtml({ language: lang });
+      for (const phrase of phrases) {
+        expect(html).not.toContain(phrase);
+      }
+    }
+  });
+
+  it('subject lines contain no death/crisis metaphors per language', () => {
+    for (const [lang, phrases] of Object.entries(STRESS_PHRASES_BY_LANG)) {
+      const subjects = SUBJECT_LINES[lang].map((fn) => fn('S', 'Ohad'));
+      for (const phrase of phrases) {
+        expect(subjects.some((s) => s.includes(phrase))).toBe(false);
+      }
+    }
+  });
+
+  it('Hebrew uses correct mascot spelling "לקסי" (not "וקסי" or bare "קסי")', async () => {
+    const html = await renderHtml({ language: 'he' });
+    const heSubjects = SUBJECT_LINES.he.map((fn) => fn('ש', 'אוהד'));
+    expect(html).not.toContain('וקסי');
+    for (const s of heSubjects) {
+      expect(s).not.toContain('וקסי');
+      // Bare "קסי" alone (not preceded by ל) is wrong — match word boundary
+      expect(s).not.toMatch(/(^|[^ל])קסי/);
+    }
+  });
+});

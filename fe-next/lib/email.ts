@@ -318,7 +318,7 @@ function generateDailyChallengeEmail(
 <body>
   <!-- Preheader text (hidden) -->
   <div style="display: none; max-height: 0; overflow: hidden; mso-hide: all; font-size: 1px; line-height: 1px; color: ${colors.navy};">
-    Daily #${puzzleNumber} is here — same grid, one shot, beat everyone! Play now and protect your streak 🔥 &nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;
+    Daily #${puzzleNumber} is here — same grid, one shot. Quick game when you've got 30 seconds 🔥 &nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;
   </div>
 
   <!-- Email Container -->
@@ -443,7 +443,7 @@ function generateDailyChallengeEmail(
                                 </td>
                                 <td valign="middle">
                                   <span style="color: ${colors.orange}; font-size: 14px; font-weight: 600; line-height: 1.4;">
-                                    Don't break your streak! Play today to keep it alive.
+                                    Fresh puzzle's up. 30 seconds, one word.
                                   </span>
                                 </td>
                               </tr>
@@ -534,7 +534,7 @@ Same grid for everyone. Can you top the board?
 
 ▶▶▶ PLAY NOW: ${playUrl}
 
-🔥 Don't break your streak! Play today to keep it alive.
+🔥 Fresh puzzle's up. 30 seconds, one word.
 
 ---
 

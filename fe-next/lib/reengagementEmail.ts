@@ -30,8 +30,9 @@ export {
 // Constants
 // ==========================================
 
-const INACTIVITY_DAYS = 11;
-const MIN_INTERVAL_DAYS = 14;
+const INACTIVITY_DAYS = 14;
+const MIN_INTERVAL_DAYS = 30;
+const MAX_INACTIVITY_DAYS = 90;
 
 /** Country code -> supported language mapping */
 export const COUNTRY_TO_LANGUAGE: Record<string, string> = {
@@ -132,11 +133,14 @@ export async function getFirstLetterForLanguage(
 // ==========================================
 
 /**
- * Get users eligible for re-engagement emails:
- * - daily_email_subscribed = true
- * - No daily_puzzle_attempts in last 11 days (~1.5 weeks)
- * - last_reengagement_email_sent_at is null or > 14 days ago
- * - Local time is 7-9 AM
+ * Get users eligible for re-engagement emails. Conservative gating to avoid
+ * nagging users who don't want it:
+ *   - daily_email_subscribed = true
+ *   - No daily_puzzle_attempts in last INACTIVITY_DAYS
+ *   - HAS played daily at least once ever (skip never-played sign-ups)
+ *   - Most recent play within MAX_INACTIVITY_DAYS (give up on long-gone users)
+ *   - last_reengagement_email_sent_at null or > MIN_INTERVAL_DAYS ago
+ *   - Local time 7-9 AM
  */
 export async function getReengagementRecipients(): Promise<ReengagementRecipient[]> {
   const supabase = getSupabaseAdmin();
@@ -173,6 +177,10 @@ export async function getReengagementRecipients(): Promise<ReengagementRecipient
   inactivityDate.setDate(inactivityDate.getDate() - INACTIVITY_DAYS);
   const inactivityCutoff = inactivityDate.toISOString().split('T')[0];
 
+  const giveUpDate = new Date();
+  giveUpDate.setDate(giveUpDate.getDate() - MAX_INACTIVITY_DAYS);
+  const giveUpCutoff = giveUpDate.toISOString().split('T')[0];
+
   const recipients: ReengagementRecipient[] = [];
 
   for (const profile of profiles) {
@@ -188,6 +196,7 @@ export async function getReengagementRecipients(): Promise<ReengagementRecipient
     const localHour = getLocalHour(userTimezone);
     if (localHour < 7 || localHour > 9) continue;
 
+    // Recent activity check — skip users who already played within window
     const { data: recentAttempt } = await supabase
       .from('daily_puzzle_attempts')
       .select('id')
@@ -197,6 +206,18 @@ export async function getReengagementRecipients(): Promise<ReengagementRecipient
       .single();
 
     if (recentAttempt) continue;
+
+    // Engagement window — must have played at least once within last MAX_INACTIVITY_DAYS.
+    // Skips two cohorts we shouldn't nag: never-played sign-ups + long-gone users.
+    const { data: lastPlay } = await supabase
+      .from('daily_puzzle_attempts')
+      .select('id')
+      .eq('player_id', profile.id)
+      .gte('puzzle_date', giveUpCutoff)
+      .limit(1)
+      .maybeSingle();
+
+    if (!lastPlay) continue;
 
     recipients.push({
       id: profile.id,
