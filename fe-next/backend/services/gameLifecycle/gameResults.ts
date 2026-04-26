@@ -20,6 +20,43 @@ import { updateRankedMmr, fetchRankedBaselines, type RankedParticipant } from '.
 import { DEFAULT_RATING, DEFAULT_RD } from '@/shared/utils/eloRating';
 import logger from '../../utils/logger';
 import type { PlayerResult, UserData } from './types';
+import { verifyBoostToken } from '../../utils/boostToken';
+import { applyFirstWordBonus, applyScoreMultiplier } from '@/shared/utils/boostEffects';
+
+export interface PlayerBoostClaim { sessionId: string; token: string }
+
+/**
+ * Apply boost tokens (firstWordBonus, scoreMultiplier) to player scores.
+ *
+ * NOTE: WordDetail is expected to have a 'ts' (timestamp) field when using scoreMultiplier.
+ * If 'ts' is missing, scoreMultiplier will treat undefined as 0 (all words within window).
+ * If WordDetail lacks 'ts', the boost gracefully degrades.
+ */
+export function applyBoostsToScores(
+  scores: PlayerResult[],
+  claimsByUsername: Record<string, PlayerBoostClaim>,
+  gameStartTs: number,
+): PlayerResult[] {
+  return scores.map((player) => {
+    const claim = claimsByUsername[player.username];
+    if (!claim) return player;
+    const v = verifyBoostToken(claim.token, claim.sessionId);
+    if (!v.valid || !v.boostType) return player;
+
+    // Ensure WordDetail has ts field (add default if missing)
+    const wordDetails = (player.wordDetails ?? []).map((w: any) => ({
+      ...w,
+      ts: w.ts ?? 0,
+    }));
+    let nextWords = wordDetails;
+    if (v.boostType === 'firstWordBonus') nextWords = applyFirstWordBonus(wordDetails);
+    else if (v.boostType === 'scoreMultiplier') nextWords = applyScoreMultiplier(wordDetails, gameStartTs);
+    else return player;
+
+    const totalScore = nextWords.reduce((s, w) => s + (w.score ?? 0), 0);
+    return { ...player, wordDetails: nextWords as typeof player.wordDetails, totalScore };
+  });
+}
 
 // Track pending engagement timeouts per game so they can be cleared on game cleanup
 const pendingEngagementTimeouts = new Map<string, ReturnType<typeof setTimeout>[]>();
@@ -84,14 +121,19 @@ export async function recordGameResultsToSupabase(
       gameMode: game.gameMode || 'classic',
     };
 
+    // Apply boost tokens (firstWordBonus, scoreMultiplier) to player scores if present
+    const boostedScores = game.playerBoosts
+      ? applyBoostsToScores(humanScores, game.playerBoosts, game.gameStartedAt ?? game.startTime ?? game.createdAt ?? 0)
+      : humanScores;
+
     // Sort scores to calculate placements for stats recording
-    const sortedForStats = [...humanScores].sort(
+    const sortedForStats = [...boostedScores].sort(
       (a, b) => b.totalScore - a.totalScore
     );
     const totalPlayersInGame = humanScores.length;
 
     // Map PlayerResult[] to PlayerScore[] format expected by processGameResults
-    const mappedScores = humanScores.map((playerResult) => {
+    const mappedScores = boostedScores.map((playerResult) => {
       const placement =
         sortedForStats.findIndex((p) => p.username === playerResult.username) + 1;
       const longestWord =

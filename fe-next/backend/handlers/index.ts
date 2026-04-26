@@ -30,6 +30,7 @@ import { registerKickHandler } from './kickHandler.js';
 import { registerReactionHandlers } from './reactionHandler.js';
 import { registerGiftHandlers } from './giftHandler.js';
 import { registerPartyHandlers } from './partyHandler.js';
+import { registerBoostHandlers } from './boostHandler.js';
 import { getGame } from '../modules/gameStateManager.js';
 
 /**
@@ -65,6 +66,7 @@ function registerAllHandlers(io: Server, socket: Socket): void {
   registerReactionHandlers(io, socket);
   registerGiftHandlers(io, socket);
   registerPartyHandlers(io, socket);
+  registerBoostHandlers(io, socket);
 }
 
 export {

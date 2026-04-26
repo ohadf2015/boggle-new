@@ -139,6 +139,8 @@ export interface GameState {
   roundEventSchedule?: { eventType: string; triggerAtPercent: number } | null;
   /** Currently active round event */
   activeRoundEvent?: string | null;
+  /** Player boost claims: sessionId + signed token for firstWordBonus / scoreMultiplier */
+  playerBoosts?: Record<string, { sessionId: string; token: string }>;
 }
 
 // Game creation data interface
