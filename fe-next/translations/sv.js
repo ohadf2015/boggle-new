@@ -10602,6 +10602,31 @@ const sv = {
       "fogActive": "Dimmans krig aktivt!"
     }
   },
+  "boosts": {
+    "title": "[REVIEW] Pick a boost",
+    "cta": "[REVIEW] BOOST",
+    "close": "[REVIEW] Close",
+    "remaining": "[REVIEW] Boosts left today: {{n}}/{{cap}}",
+    "watchAd": "[REVIEW] Watch ad to unlock",
+    "activeThisGame": "[REVIEW] Active this game",
+    "openPickerAria": "[REVIEW] Open boost picker, {{n}} boosts left today",
+    "freezeTime": {
+      "title": "[REVIEW] Freeze Time",
+      "description": "[REVIEW] Pause the timer once during your game."
+    },
+    "hint": {
+      "title": "[REVIEW] Hint",
+      "description": "[REVIEW] Reveal one bonus word."
+    },
+    "scoreMultiplier": {
+      "title": "[REVIEW] Score Multiplier",
+      "description": "[REVIEW] 1.5x score for the first 30 seconds."
+    },
+    "firstWordBonus": {
+      "title": "[REVIEW] First Word Bonus",
+      "description": "[REVIEW] 2x score on your first word."
+    }
+  },
   "socketErrors": {
     "AUTH_REQUIRED": "Inloggning krävs för denna åtgärd",
     "GAME_NOT_FOUND": "Spelet hittades inte. Kontrollera koden!",

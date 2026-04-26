@@ -10597,6 +10597,31 @@ const he = {
       "fogActive": "ערפל הקרב פעיל!"
     }
   },
+  "boosts": {
+    "title": "[HE-PENDING] Pick a boost",
+    "cta": "[HE-PENDING] BOOST",
+    "close": "[HE-PENDING] Close",
+    "remaining": "[HE-PENDING] Boosts left today: {{n}}/{{cap}}",
+    "watchAd": "[HE-PENDING] Watch ad to unlock",
+    "activeThisGame": "[HE-PENDING] Active this game",
+    "openPickerAria": "[HE-PENDING] Open boost picker, {{n}} boosts left today",
+    "freezeTime": {
+      "title": "[HE-PENDING] Freeze Time",
+      "description": "[HE-PENDING] Pause the timer once during your game."
+    },
+    "hint": {
+      "title": "[HE-PENDING] Hint",
+      "description": "[HE-PENDING] Reveal one bonus word."
+    },
+    "scoreMultiplier": {
+      "title": "[HE-PENDING] Score Multiplier",
+      "description": "[HE-PENDING] 1.5x score for the first 30 seconds."
+    },
+    "firstWordBonus": {
+      "title": "[HE-PENDING] First Word Bonus",
+      "description": "[HE-PENDING] 2x score on your first word."
+    }
+  },
   "socketErrors": {
     "AUTH_REQUIRED": "נדרשת התחברות לפעולה זו",
     "GAME_NOT_FOUND": "משחק לא נמצא. בדוק את הקוד!",

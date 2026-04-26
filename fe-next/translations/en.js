@@ -10705,6 +10705,31 @@ const en = {
     "revealAnswerAd": "Watch ad to reveal answer",
     "adminGiveUp": "Skip puzzle (admin)"
   },
+  "boosts": {
+    "title": "Pick a boost",
+    "cta": "BOOST",
+    "close": "Close",
+    "remaining": "Boosts left today: {{n}}/{{cap}}",
+    "watchAd": "Watch ad to unlock",
+    "activeThisGame": "Active this game",
+    "openPickerAria": "Open boost picker, {{n}} boosts left today",
+    "freezeTime": {
+      "title": "Freeze Time",
+      "description": "Pause the timer once during your game."
+    },
+    "hint": {
+      "title": "Hint",
+      "description": "Reveal one bonus word."
+    },
+    "scoreMultiplier": {
+      "title": "Score Multiplier",
+      "description": "1.5x score for the first 30 seconds."
+    },
+    "firstWordBonus": {
+      "title": "First Word Bonus",
+      "description": "2x score on your first word."
+    }
+  },
   "socketErrors": {
     "AUTH_REQUIRED": "Sign in required for this action",
     "GAME_NOT_FOUND": "Game not found. Check the code!",

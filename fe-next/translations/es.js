@@ -10608,6 +10608,31 @@ const es = {
       "fogActive": "¡Niebla de guerra activa!"
     }
   },
+  "boosts": {
+    "title": "[REVIEW] Pick a boost",
+    "cta": "[REVIEW] BOOST",
+    "close": "[REVIEW] Close",
+    "remaining": "[REVIEW] Boosts left today: {{n}}/{{cap}}",
+    "watchAd": "[REVIEW] Watch ad to unlock",
+    "activeThisGame": "[REVIEW] Active this game",
+    "openPickerAria": "[REVIEW] Open boost picker, {{n}} boosts left today",
+    "freezeTime": {
+      "title": "[REVIEW] Freeze Time",
+      "description": "[REVIEW] Pause the timer once during your game."
+    },
+    "hint": {
+      "title": "[REVIEW] Hint",
+      "description": "[REVIEW] Reveal one bonus word."
+    },
+    "scoreMultiplier": {
+      "title": "[REVIEW] Score Multiplier",
+      "description": "[REVIEW] 1.5x score for the first 30 seconds."
+    },
+    "firstWordBonus": {
+      "title": "[REVIEW] First Word Bonus",
+      "description": "[REVIEW] 2x score on your first word."
+    }
+  },
   "socketErrors": {
     "AUTH_REQUIRED": "Se requiere iniciar sesión para esta acción",
     "GAME_NOT_FOUND": "Partida no encontrada. ¡Revisa el código!",
