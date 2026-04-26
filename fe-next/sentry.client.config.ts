@@ -243,6 +243,11 @@ Sentry.init({
     // Push token registration network failures — transient, downgraded to debug (JAVASCRIPT-NEXTJS-12C)
     /Error registering push token/i,
     /Push token (network|server) (error|rejected)/i,
+    // Supabase refresh-token-not-found — expected on session expiry; handled by
+    // isRefreshTokenError() → clearAuthState() at all call sites (JAVASCRIPT-NEXTJS-12D)
+    /Invalid Refresh Token.*Refresh Token Not Found/i,
+    /AuthApiError.*refresh token not found/i,
+    /refresh_token_not_found/i,
     // CrazyGames friends refresh — downstream of auth issues
     /Failed to refresh CrazyGames friends/i,
     // PWA service worker registration — transient, non-critical

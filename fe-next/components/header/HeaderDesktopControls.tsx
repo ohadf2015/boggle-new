@@ -54,11 +54,16 @@ const HeaderDesktopControls = memo<HeaderDesktopControlsProps>(({ unclaimedCount
                 />
             )}
 
-            {/* Unified menu — all actions live here */}
-            <HeaderMenuDropdown
-                unclaimedCount={unclaimedCount}
-                onOpenGiftModal={onOpenGiftModal}
-            />
+            {/* Unified menu — all actions live here.
+                Hidden on CrazyGames (mirrors HeaderMobileMenu): menu items lead
+                to profile/settings/leaderboard/cookie banner/Ko-fi/Instagram —
+                all of which navigate the player off-mode (CG is multiplayer-only). */}
+            {!isOnCrazyGamesPlatform && (
+                <HeaderMenuDropdown
+                    unclaimedCount={unclaimedCount}
+                    onOpenGiftModal={onOpenGiftModal}
+                />
+            )}
         </div>
     );
 });

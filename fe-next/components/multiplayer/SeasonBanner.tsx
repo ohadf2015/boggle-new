@@ -17,7 +17,7 @@ export const SeasonBanner: React.FC = () => {
   return (
     <motion.div
       className={`
-        w-full px-4 py-3 rounded-neo border-neo border-black
+        mx-4 mt-3 px-4 py-3 rounded-neo border-neo border-black
         bg-neo-navy-light shadow-hard-sm
         flex items-center justify-between gap-3
         ${isEndingSoon ? 'ring-2 ring-neo-pink animate-pulse' : ''}

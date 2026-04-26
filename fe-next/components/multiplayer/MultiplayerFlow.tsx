@@ -380,18 +380,21 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
   // Always show RoomListView as base, with modals as overlays
   return (
     <>
-      <div className="px-4 pt-3">
-        <SeasonBanner />
-        {isAdmin && (
+      {/* SeasonBanner returns null for unranked users — render its wrapper
+          padding only when something will actually appear, so non-admin
+          unranked players don't get a 12px ghost gap above ARENA HUB. */}
+      <SeasonBanner />
+      {isAdmin && (
+        <div className="px-4 pt-3">
           <button
             onClick={() => matchmaking.joinQueue('classic', defaultLanguage)}
             disabled={matchmaking.status !== 'idle'}
-            className="mt-2 w-full rounded-neo border-neo bg-neo-pink px-4 py-3 font-neo-display text-neo-white shadow-hard-sm transition-transform active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed disabled:opacity-50"
+            className="w-full rounded-neo border-neo bg-neo-pink px-4 py-3 font-neo-display text-neo-white shadow-hard-sm transition-transform active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed disabled:opacity-50"
           >
             ⚔️ {t('matchmaking.rankedMatch')}
           </button>
-        )}
-      </div>
+        </div>
+      )}
 
       <MatchmakingOverlay
         status={matchmaking.status}

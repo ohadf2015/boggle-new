@@ -123,8 +123,11 @@ export const PlayerRoster = memo(function PlayerRoster({ players, username, game
         </h2>
       </div>
 
-      {/* Player avatars grid — centered */}
-      <div className={cn('flex flex-wrap items-end justify-center', compact ? 'gap-5 pb-1' : 'gap-4 pb-2')}>
+      {/* Player avatars grid — centered.
+          pt-* reserves space for the host crown that's absolute-positioned at
+          -top-4 above the avatar; without it the crown clips into whatever
+          renders above (e.g. bot countdown banner) on short viewports. */}
+      <div className={cn('flex flex-wrap items-end justify-center', compact ? 'gap-5 pt-5 pb-1' : 'gap-4 pt-6 pb-2')}>
         <AnimatePresence mode="popLayout">
           {players.map((player, index) => {
             const name = typeof player === 'string' ? player : player.username;
