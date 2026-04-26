@@ -130,7 +130,7 @@ export const PlayerRoster = memo(function PlayerRoster({ players, username, game
           pt-* reserves space for the host crown that's absolute-positioned at
           -top-4 above the avatar; without it the crown clips into whatever
           renders above (e.g. bot countdown banner) on short viewports. */}
-      <div className={cn('flex flex-wrap items-end justify-center', compact ? 'gap-5 pt-5 pb-1' : 'gap-4 pt-6 pb-2')}>
+      <div className={cn('flex flex-wrap items-end justify-center', compact ? 'gap-4 pt-4 pb-1' : 'gap-4 pt-5 pb-1')}>
         <AnimatePresence mode="popLayout">
           {players.map((player, index) => {
             const name = typeof player === 'string' ? player : player.username;
@@ -151,13 +151,13 @@ export const PlayerRoster = memo(function PlayerRoster({ players, username, game
                 initial="initial"
                 animate="animate"
                 exit="exit"
-                className="shrink-0 flex flex-col items-center gap-2 group/player"
+                className="shrink-0 flex flex-col items-center gap-1.5 group/player"
               >
                 <div className="relative">
-                  {/* Host crown — larger, more prominent */}
+                  {/* Host crown — sized close to avatar so it doesn't dominate vertical headroom */}
                   {isHostPlayer && (
-                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-10 animate-crown-bounce">
-                      <Crown className={cn(compact ? 'w-5 h-5' : 'w-6 h-6', 'text-neo-yellow drop-shadow-[0_0_6px_rgba(255,225,53,0.6)]')} />
+                    <div className={cn('absolute left-1/2 -translate-x-1/2 z-10 animate-crown-bounce', compact ? '-top-3' : '-top-3')}>
+                      <Crown className={cn(compact ? 'w-4 h-4' : 'w-5 h-5', 'text-neo-yellow drop-shadow-[0_0_5px_rgba(255,225,53,0.6)]')} />
                     </div>
                   )}
 
@@ -177,24 +177,24 @@ export const PlayerRoster = memo(function PlayerRoster({ players, username, game
                     {(() => {
                       const tileInner = (
                         <div className={cn(
-                          'box-content rounded-full border-neo-black flex items-center justify-center overflow-hidden shadow-hard',
-                          compact ? 'w-16 h-16 border-4' : 'w-20 h-20 border-4',
+                          'rounded-full border-neo-black flex items-center justify-center overflow-hidden shadow-hard aspect-square',
+                          compact ? 'w-14 h-14 border-[3px]' : 'w-16 h-16 border-[3px]',
                           AVATAR_COLORS[index % AVATAR_COLORS.length],
                           compact
-                            ? cn('ring-4 ring-offset-2 ring-offset-neo-navy', AVATAR_RING_COLORS[index % AVATAR_RING_COLORS.length])
+                            ? cn('ring-2 ring-offset-1 ring-offset-neo-navy', AVATAR_RING_COLORS[index % AVATAR_RING_COLORS.length])
                             : cn(
-                                isMe && 'ring-3 ring-neo-lime ring-offset-2 ring-offset-neo-navy',
-                                isHostPlayer && 'ring-3 ring-neo-yellow ring-offset-2 ring-offset-neo-navy',
+                                isMe && 'ring-2 ring-neo-lime ring-offset-1 ring-offset-neo-navy',
+                                isHostPlayer && 'ring-2 ring-neo-yellow ring-offset-1 ring-offset-neo-navy',
                               ),
                         )}>
                           {avatar?.customAvatar || avatar?.avatarImage ? (
                             <Avatar
                               customAvatar={avatar?.customAvatar ?? undefined}
                               avatarImage={avatar?.avatarImage}
-                              size={compact ? 'lg' : 'xl'}
+                              size="lg"
                             />
                           ) : (
-                            <span className={cn('font-black text-neo-black', compact ? 'text-3xl' : 'text-4xl')}>
+                            <span className={cn('font-black text-neo-black', compact ? 'text-2xl' : 'text-2xl')}>
                               {name.charAt(0).toUpperCase()}
                             </span>
                           )}
@@ -210,8 +210,8 @@ export const PlayerRoster = memo(function PlayerRoster({ players, username, game
                             aria-label={t('playerView.editAvatar')}
                           >
                             {tileInner}
-                            <span className="absolute -bottom-0.5 -inset-e-0.5 w-6 h-6 rounded-full bg-neo-cyan border-2 border-neo-black shadow-hard-sm flex items-center justify-center">
-                              <Pencil className="w-3 h-3 text-neo-black" />
+                            <span className="absolute -bottom-0.5 -inset-e-0.5 w-5 h-5 rounded-full bg-neo-cyan border-2 border-neo-black shadow-hard-sm flex items-center justify-center">
+                              <Pencil className="w-2.5 h-2.5 text-neo-black" />
                             </span>
                           </button>
                         );
@@ -262,7 +262,7 @@ export const PlayerRoster = memo(function PlayerRoster({ players, username, game
                       }}
                       className={cn(
                         'bg-white/10 text-neo-cream border-2 border-neo-black rounded-neo px-1.5 py-0.5 text-center font-bold focus:outline-hidden focus:ring-2 focus:ring-neo-cyan',
-                        compact ? 'text-[11px] w-16' : 'text-xs w-20',
+                        compact ? 'text-[11px] w-[68px]' : 'text-[11px] w-[72px]',
                       )}
                     />
                     <button
@@ -281,13 +281,13 @@ export const PlayerRoster = memo(function PlayerRoster({ players, username, game
                     onClick={isMe && canEditSelfName ? startSelfNameEdit : undefined}
                     data-testid={isMe ? 'self-edit-name-button' : undefined}
                     className={cn(
-                      'font-bold truncate text-center text-neo-cream flex items-center gap-1 justify-center',
-                      compact ? 'text-[11px] w-16' : 'text-xs w-20',
+                      'font-bold text-center text-neo-cream flex items-center gap-1 justify-center leading-tight',
+                      compact ? 'text-[11px] w-[68px]' : 'text-[11px] w-[72px]',
                       isMe && canEditSelfName ? 'hover:text-neo-cyan transition-colors cursor-text' : 'cursor-default',
                     )}
                     disabled={!(isMe && canEditSelfName)}
                   >
-                    <span className="truncate">{name}</span>
+                    <span className="truncate min-w-0">{name}</span>
                     {isMe && canEditSelfName && <Pencil className="w-2.5 h-2.5 shrink-0 opacity-60" />}
                   </button>
                 )}
@@ -296,25 +296,25 @@ export const PlayerRoster = memo(function PlayerRoster({ players, username, game
           })}
         </AnimatePresence>
 
-        {/* Add bot button */}
+        {/* Add bot button — sized to match avatar tile so the row stays compact and aligned */}
         {!isFull && (
-          <div className="shrink-0 flex flex-col items-center gap-2">
+          <div className="shrink-0 flex flex-col items-center gap-1.5">
             <motion.button
-              whileTap={{ scale: 0.9 }}
+              whileHover={{ scale: 1.04 }}
+              whileTap={{ scale: 0.92 }}
               onClick={() => handleAddBot('medium')}
+              aria-label={t('hostView.addBot')}
               className={cn(
-                'box-content rounded-full border-4 border-dashed border-white/30 bg-white/5 flex items-center justify-center shadow-hard',
+                'rounded-full border-[3px] border-dashed border-white/30 bg-white/5 flex items-center justify-center shadow-hard aspect-square',
                 'hover:bg-white/10 hover:border-neo-cyan/60 transition-all group',
-                compact ? 'w-16 h-16' : 'w-20 h-20'
+                compact ? 'w-14 h-14' : 'w-16 h-16'
               )}
             >
-              <div className="flex flex-col items-center">
-                <span className="text-2xl text-white/60 group-hover:text-neo-cyan transition-colors">+</span>
-                <span className="text-[8px] font-black uppercase tracking-tighter text-white/40 group-hover:text-neo-cyan/80 mt-0.5">
-                  + BOT
-                </span>
-              </div>
+              <span className="text-2xl font-black text-white/60 group-hover:text-neo-cyan transition-colors leading-none">+</span>
             </motion.button>
+            <span className={cn('font-black uppercase tracking-tight text-white/50 leading-tight text-center', compact ? 'text-[10px] w-[68px]' : 'text-[11px] w-[72px]')}>
+              {t('hostView.bot')}
+            </span>
           </div>
         )}
       </div>

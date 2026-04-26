@@ -1535,8 +1535,10 @@ body.crazygames-embed [aria-hidden="true"].h-header {
    MOBILE LANDSCAPE OPTIMIZATION
    ==================================== */
 
-/* Landscape orientation on mobile devices — DEPRECATED: landscape layouts removed, CSS kept for reference */
-@media (orientation: landscape) and (max-height: 600px) {
+/* Landscape orientation on mobile devices — DEPRECATED: landscape layouts removed, CSS kept for reference.
+   Scoped to max-width: 1199px so it only targets small phones/tablets in landscape;
+   short desktop windows (e.g. CrazyGames 1280×600 iframe) are unaffected. */
+@media (orientation: landscape) and (max-height: 600px) and (max-width: 1199px) {
 
   /* Prevent horizontal scrolling */
   html,

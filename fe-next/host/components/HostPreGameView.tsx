@@ -398,7 +398,7 @@ function HostPreGameView({
             leftContent={
               <>
                 <AnimatePresence>{renderBotCountdown()}</AnimatePresence>
-                <div className="animate-fade-in-up flex-1 [min-height:fit-content] flex flex-col rounded-neo-lg border-3 border-neo-black bg-slate-800/80 shadow-hard px-4 pt-3 pb-4 overflow-visible">
+                <div className="animate-fade-in-up shrink-0 rounded-neo-lg border-3 border-neo-black bg-slate-800/80 shadow-hard px-4 pt-2.5 pb-3 overflow-visible">
                   <PlayerRoster
                     players={filteredPlayersForDisplay}
                     username={username}
