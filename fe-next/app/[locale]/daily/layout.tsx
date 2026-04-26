@@ -243,21 +243,40 @@ export default async function DailyLayout({ children, params }: DailyLayoutProps
   tomorrow.setDate(tomorrow.getDate() + 1);
   tomorrow.setHours(0, 0, 0, 0);
 
-  // SoftwareApplication schema for rich snippets (star ratings in SERPs)
+  // VideoGame + WebApplication multi-typed entity for the daily challenge.
+  // Multi-typing lets Google index the same node under both spaces (game discovery + app discovery).
   const softwareAppSchema = {
     '@context': 'https://schema.org',
-    '@type': 'WebApplication',
-    '@id': 'https://www.lexiclash.live/#webapp-daily',
+    '@type': ['VideoGame', 'WebApplication', 'SoftwareApplication'],
+    '@id': `https://www.lexiclash.live${localePath}/daily#videogame`,
     name: `LexiClash - ${localeSeo.title}`,
+    description: localeSeo.description,
     url: `https://www.lexiclash.live${localePath}/daily`,
     applicationCategory: 'GameApplication',
-    operatingSystem: 'Any',
+    operatingSystem: 'Web, Android',
+    genre: ['Word', 'Puzzle', 'Daily Challenge'],
+    gamePlatform: ['Web', 'Android', 'iOS'],
+    playMode: 'SinglePlayer',
+    numberOfPlayers: {
+      '@type': 'QuantitativeValue',
+      minValue: 1,
+      maxValue: 1,
+    },
+    isFamilyFriendly: true,
     offers: {
       '@type': 'Offer',
       price: '0',
       priceCurrency: 'USD',
+      availability: 'https://schema.org/InStock',
     },
-    // aggregateRating removed — hardcoded ratings risk a Google manual action. TODO: Wire to real user ratings from Supabase when available.
+    publisher: {
+      '@type': 'Organization',
+      '@id': 'https://www.lexiclash.live/#organization',
+      name: 'LexiClash',
+    },
+    // aggregateRating intentionally omitted — hardcoded ratings risk a Google
+    // manual action. Do not reintroduce without verified UGC ratings AND a
+    // visible rating badge on the page (Google policy requires both).
     browserRequirements: 'Requires a modern web browser',
     inLanguage: ['en', 'he', 'sv', 'ja', 'es'],
   };
