@@ -119,7 +119,9 @@ function getAllRoutes(): MetadataRoute.Sitemap {
   // ─── Comparison pages ───
   addForAllLocales(routes, '/lexiclash-vs-wordle', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.85 });
   addForAllLocales(routes, '/lexiclash-vs-scrabble', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.85 });
+  addForAllLocales(routes, '/lexiclash-vs-cabanagrams', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.85 });
   addForAllLocales(routes, '/lexiclash-vs-puzzly-words', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.85 });
+  addForAllLocales(routes, '/lexiclash-vs-popple', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.85 });
 
   // ─── Guides & Glossary ───
   addForAllLocales(routes, '/guides', { lastModified: GUIDES_UPDATED, changeFrequency: 'monthly', priority: 0.7 });
