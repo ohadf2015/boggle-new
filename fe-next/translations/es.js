@@ -10609,28 +10609,28 @@ const es = {
     }
   },
   "boosts": {
-    "title": "[REVIEW] Pick a boost",
-    "cta": "[REVIEW] BOOST",
-    "close": "[REVIEW] Close",
-    "remaining": "[REVIEW] Boosts left today: {{n}}/{{cap}}",
-    "watchAd": "[REVIEW] Watch ad to unlock",
-    "activeThisGame": "[REVIEW] Active this game",
-    "openPickerAria": "[REVIEW] Open boost picker, {{n}} boosts left today",
+    "title": "Elige un boost",
+    "cta": "BOOST",
+    "close": "Cerrar",
+    "remaining": "Boosts restantes hoy: {{n}}/{{cap}}",
+    "watchAd": "Mira un anuncio para desbloquear",
+    "activeThisGame": "Activo en esta partida",
+    "openPickerAria": "Abrir selector de boost, {{n}} boosts restantes hoy",
     "freezeTime": {
-      "title": "[REVIEW] Freeze Time",
-      "description": "[REVIEW] Pause the timer once during your game."
+      "title": "Congelar tiempo",
+      "description": "Pausa el temporizador una vez durante tu partida."
     },
     "hint": {
-      "title": "[REVIEW] Hint",
-      "description": "[REVIEW] Reveal one bonus word."
+      "title": "Pista",
+      "description": "Revela una palabra extra."
     },
     "scoreMultiplier": {
-      "title": "[REVIEW] Score Multiplier",
-      "description": "[REVIEW] 1.5x score for the first 30 seconds."
+      "title": "Multiplicador de puntos",
+      "description": "1,5x puntos durante los primeros 30 segundos."
     },
     "firstWordBonus": {
-      "title": "[REVIEW] First Word Bonus",
-      "description": "[REVIEW] 2x score on your first word."
+      "title": "Bono primera palabra",
+      "description": "2x puntos en tu primera palabra."
     }
   },
   "socketErrors": {

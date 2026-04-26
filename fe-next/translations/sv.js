@@ -10603,28 +10603,28 @@ const sv = {
     }
   },
   "boosts": {
-    "title": "[REVIEW] Pick a boost",
-    "cta": "[REVIEW] BOOST",
-    "close": "[REVIEW] Close",
-    "remaining": "[REVIEW] Boosts left today: {{n}}/{{cap}}",
-    "watchAd": "[REVIEW] Watch ad to unlock",
-    "activeThisGame": "[REVIEW] Active this game",
-    "openPickerAria": "[REVIEW] Open boost picker, {{n}} boosts left today",
+    "title": "Välj en boost",
+    "cta": "BOOST",
+    "close": "Stäng",
+    "remaining": "Boostar kvar idag: {{n}}/{{cap}}",
+    "watchAd": "Titta på annons för att låsa upp",
+    "activeThisGame": "Aktiv detta spel",
+    "openPickerAria": "Öppna boost-väljare, {{n}} boostar kvar idag",
     "freezeTime": {
-      "title": "[REVIEW] Freeze Time",
-      "description": "[REVIEW] Pause the timer once during your game."
+      "title": "Frys tiden",
+      "description": "Pausa nedräkningen en gång under ditt spel."
     },
     "hint": {
-      "title": "[REVIEW] Hint",
-      "description": "[REVIEW] Reveal one bonus word."
+      "title": "Tips",
+      "description": "Avslöja ett bonusord."
     },
     "scoreMultiplier": {
-      "title": "[REVIEW] Score Multiplier",
-      "description": "[REVIEW] 1.5x score for the first 30 seconds."
+      "title": "Poängmultiplikator",
+      "description": "1,5x poäng under de första 30 sekunderna."
     },
     "firstWordBonus": {
-      "title": "[REVIEW] First Word Bonus",
-      "description": "[REVIEW] 2x score on your first word."
+      "title": "Första ord-bonus",
+      "description": "2x poäng på ditt första ord."
     }
   },
   "socketErrors": {

@@ -10525,28 +10525,28 @@ const ja = {
     }
   },
   "boosts": {
-    "title": "[REVIEW] Pick a boost",
-    "cta": "[REVIEW] BOOST",
-    "close": "[REVIEW] Close",
-    "remaining": "[REVIEW] Boosts left today: {{n}}/{{cap}}",
-    "watchAd": "[REVIEW] Watch ad to unlock",
-    "activeThisGame": "[REVIEW] Active this game",
-    "openPickerAria": "[REVIEW] Open boost picker, {{n}} boosts left today",
+    "title": "ブーストを選択",
+    "cta": "ブースト",
+    "close": "閉じる",
+    "remaining": "本日の残り: {{n}}/{{cap}}",
+    "watchAd": "広告を見てアンロック",
+    "activeThisGame": "このゲームで有効",
+    "openPickerAria": "ブースト選択を開く、本日残り{{n}}個",
     "freezeTime": {
-      "title": "[REVIEW] Freeze Time",
-      "description": "[REVIEW] Pause the timer once during your game."
+      "title": "タイム停止",
+      "description": "ゲーム中に1回タイマーを停止します。"
     },
     "hint": {
-      "title": "[REVIEW] Hint",
-      "description": "[REVIEW] Reveal one bonus word."
+      "title": "ヒント",
+      "description": "ボーナス単語を1つ表示します。"
     },
     "scoreMultiplier": {
-      "title": "[REVIEW] Score Multiplier",
-      "description": "[REVIEW] 1.5x score for the first 30 seconds."
+      "title": "スコア倍率",
+      "description": "最初の30秒間スコアが1.5倍。"
     },
     "firstWordBonus": {
-      "title": "[REVIEW] First Word Bonus",
-      "description": "[REVIEW] 2x score on your first word."
+      "title": "初手ボーナス",
+      "description": "最初の単語のスコアが2倍。"
     }
   },
   "socketErrors": {
