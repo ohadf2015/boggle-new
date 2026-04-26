@@ -43,4 +43,11 @@ describe('applyBoostsToScores', () => {
     expect(out[0].totalScore).toBe(20);
     expect(out[1].totalScore).toBe(10);
   });
+
+  it('does not apply scoreMultiplier server-side in v1 (deferred pending ts plumbing)', () => {
+    const token = signBoostToken('s1', 'scoreMultiplier');
+    const scores = [{ username: 'a', totalScore: 10, wordDetails: [{ word: 'cat', score: 10, ts: 1000 }] }] as never;
+    const out = applyBoostsToScores(scores, { a: { sessionId: 's1', token } }, 0);
+    expect(out[0].totalScore).toBe(10);
+  });
 });

@@ -50,7 +50,11 @@ export function applyBoostsToScores(
     }));
     let nextWords = wordDetails;
     if (v.boostType === 'firstWordBonus') nextWords = applyFirstWordBonus(wordDetails);
-    else if (v.boostType === 'scoreMultiplier') nextWords = applyScoreMultiplier(wordDetails, gameStartTs);
+    else if (v.boostType === 'scoreMultiplier') {
+      // v2: server-side scoreMultiplier requires WordDetail.ts plumbing.
+      // For v1, scoreMultiplier is client-display only — server doesn't multiply.
+      return player;
+    }
     else return player;
 
     const totalScore = nextWords.reduce((s, w) => s + (w.score ?? 0), 0);
@@ -181,7 +185,7 @@ export async function recordGameResultsToSupabase(
     }
     if (gameInfo.isRanked && scoresArray.length >= 2 && durationOk && scoreOk) {
       try {
-        const sortedForRanked = [...scoresArray].sort((a, b) => b.totalScore - a.totalScore);
+        const sortedForRanked = [...boostedScores].sort((a, b) => b.totalScore - a.totalScore);
         const playerIds = sortedForRanked
           .map(p => (game.users?.[p.username] as UserData | undefined)?.authUserId)
           .filter((id): id is string => !!id);

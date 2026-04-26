@@ -66,10 +66,10 @@ Behavior (atomic, FOR UPDATE on profiles row):
 |------|---------------|--------------|
 | `freezeTime` | Client (already wired in adventure; reuse hook in other modes) | Token presence checked in MP server score-calc |
 | `hint` | Client (existing free-reveals logic; +1 reveal if token valid) | Token presence checked in MP server score-calc |
-| `scoreMultiplier` | Client computes display, server `gameResults.ts` re-applies on token verify | Server-validated token |
+| `scoreMultiplier` | Client display only (v1); server v2 pending WordDetail.ts plumbing | Server-validated token (v2) |
 | `firstWordBonus` (MP only) | Server `gameResults.ts` only — first valid word in `wordDetails` × 2 | Server-validated token |
 
-Server validates token signature + `sessionId` match before honoring multiplier. Client never trusted for score math.
+**Note on scoreMultiplier (v1 limitation):** WordDetail lacks a `ts` (timestamp) field in current schema, so server-side multiplier application is deferred to v2. For v1, scoreMultiplier is applied client-side for display only; server validates token presence but does not re-apply the multiplier to final scores. Server validates token signature + `sessionId` match. Client never trusted for score math (firstWordBonus).
 
 ## Files
 
@@ -131,7 +131,7 @@ Per `.claude/rules/22-tdd-strict.md` — write tests first, RED → GREEN → RE
 5. **`/api/boosts/status` route:** returns `{remaining, capPerDay, resetAt}`. Updates after claim.
 6. **`<BoostPicker>` UI:** renders 4 cards, keyboard-navigable, disabled state when lobby is `starting`, RTL flip in Hebrew, reduced-motion gates animation.
 7. **`useBoostClaim` hook:** ad-then-claim flow, token persisted in session storage by sessionId, status reflects API.
-8. **Server effect application:** `gameResults.ts` verifies token + applies `firstWordBonus` 2x to first valid word and `scoreMultiplier` 1.5x to first 30s of words. Untrusted/missing/expired token = no multiplier.
+8. **Server effect application:** `gameResults.ts` verifies token + applies `firstWordBonus` 2x to first valid word. `scoreMultiplier` is client-display only in v1 (deferred server-apply to v2). Untrusted/missing/expired token = no multiplier for firstWordBonus.
 9. **E2E:** lobby → boost picker → mock ad → game start → MP final score reflects 2x first word; counter decremented; cap visible.
 
 ## Open questions resolved
