@@ -116,6 +116,11 @@ function getAllRoutes(): MetadataRoute.Sitemap {
   addForAllLocales(routes, '/word-of-the-day', { lastModified: LAST_DEPLOYED, changeFrequency: 'daily', priority: 0.9 });
   addForAllLocales(routes, '/leaderboard', { lastModified: LAST_DEPLOYED, changeFrequency: 'daily', priority: 0.8 });
 
+  // ─── Comparison pages ───
+  addForAllLocales(routes, '/lexiclash-vs-wordle', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.85 });
+  addForAllLocales(routes, '/lexiclash-vs-scrabble', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.85 });
+  addForAllLocales(routes, '/lexiclash-vs-puzzly-words', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.85 });
+
   // ─── Guides & Glossary ───
   addForAllLocales(routes, '/guides', { lastModified: GUIDES_UPDATED, changeFrequency: 'monthly', priority: 0.7 });
   const guideSlugs = ['classic-strategy', 'blast-strategy', 'word-hunt-strategy'];
