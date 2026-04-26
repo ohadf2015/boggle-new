@@ -4,16 +4,22 @@
  */
 
 // Mock supabase before imports
-const { mockFrom, mockRpc } = vi.hoisted(() => {
+const { mockFrom, mockRpc, mockAwardCoins } = vi.hoisted(() => {
   const mockFrom = vi.fn();
   const mockRpc = vi.fn();
-  return { mockFrom, mockRpc };
+  const mockAwardCoins = vi.fn();
+  return { mockFrom, mockRpc, mockAwardCoins };
 });
 vi.mock('../supabaseServer', () => ({
   getSupabase: () => ({
     from: (...args: unknown[]) => mockFrom(...args),
     rpc: (...args: unknown[]) => mockRpc(...args),
   }),
+}));
+
+vi.mock('../../services/economy/awardCoins', () => ({
+  awardCoinsServer: (...args: unknown[]) => mockAwardCoins(...args),
+  MAX_SERVER_COIN_AWARD: 2000,
 }));
 
 vi.mock('../../utils/logger', () => ({
@@ -27,6 +33,7 @@ import {
   recordWotdAttempt,
   getWotdStats,
   WORD_POOL,
+  WOTD_COIN_REWARD,
   seededRandom,
 } from '../wordOfTheDayManager';
 
@@ -223,6 +230,104 @@ describe('wordOfTheDayManager', () => {
 
       const result = await recordWotdAttempt('player1', 'crystal', true, 'en');
       expect(result.success).toBe(false);
+    });
+  });
+
+  // ==========================================
+  // recordWotdAttempt — coin reward
+  // ==========================================
+  describe('recordWotdAttempt coin reward', () => {
+    /** Helper: wire mockFrom for the new-attempt path so insert/upsert/count/update succeed. */
+    function wireSuccessfulNewAttempt() {
+      const selectChain = {
+        eq: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            eq: vi.fn().mockReturnValue({
+              single: vi.fn().mockResolvedValue({ data: null, error: null }),
+            }),
+          }),
+        }),
+      };
+      const insertMock = vi.fn().mockResolvedValue({ error: null });
+      const upsertMock = vi.fn().mockResolvedValue({ error: null });
+      const countSelectChain = (count: number) => ({
+        eq: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({ count }),
+          count,
+        }),
+        count,
+      });
+      const updateChain = {
+        eq: vi.fn().mockReturnValue({
+          eq: vi.fn().mockResolvedValue({ error: null }),
+        }),
+      };
+
+      let callCount = 0;
+      mockFrom.mockImplementation(() => {
+        callCount++;
+        if (callCount === 1) return { select: vi.fn().mockReturnValue(selectChain) };
+        if (callCount === 2) return { insert: insertMock };
+        if (callCount === 3) return { upsert: upsertMock };
+        if (callCount === 4) return { select: vi.fn().mockReturnValue(countSelectChain(1)) };
+        if (callCount === 5) return { select: vi.fn().mockReturnValue(countSelectChain(1)) };
+        return { update: vi.fn().mockReturnValue(updateChain) };
+      });
+    }
+
+    beforeEach(() => {
+      mockAwardCoins.mockResolvedValue({ success: true, newBalance: 100 });
+    });
+
+    it('awards WOTD_COIN_REWARD to player when found=true', async () => {
+      wireSuccessfulNewAttempt();
+
+      await recordWotdAttempt('player1', 'crystal', true, 'en', '2026-04-26');
+
+      expect(mockAwardCoins).toHaveBeenCalledTimes(1);
+      expect(mockAwardCoins).toHaveBeenCalledWith(
+        'player1',
+        WOTD_COIN_REWARD,
+        'wotd_complete',
+        expect.objectContaining({ word: 'crystal' })
+      );
+    });
+
+    it('does NOT award coins when found=false (failed attempt)', async () => {
+      wireSuccessfulNewAttempt();
+
+      await recordWotdAttempt('player1', 'crystal', false, 'en', '2026-04-26');
+
+      expect(mockAwardCoins).not.toHaveBeenCalled();
+    });
+
+    it('does NOT award coins when alreadyRecorded (idempotent on duplicate attempt)', async () => {
+      mockFrom.mockReturnValue({
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            eq: vi.fn().mockReturnValue({
+              eq: vi.fn().mockReturnValue({
+                single: vi.fn().mockResolvedValue({ data: { id: 'x' }, error: null }),
+              }),
+            }),
+          }),
+        }),
+      });
+
+      const result = await recordWotdAttempt('player1', 'crystal', true, 'en', '2026-04-26');
+
+      expect(result.alreadyRecorded).toBe(true);
+      expect(mockAwardCoins).not.toHaveBeenCalled();
+    });
+
+    it('still returns success=true even when coin grant fails (best-effort)', async () => {
+      wireSuccessfulNewAttempt();
+      mockAwardCoins.mockResolvedValueOnce({ success: false, error: 'rpc failed' });
+
+      const result = await recordWotdAttempt('player1', 'crystal', true, 'en', '2026-04-26');
+
+      expect(result.success).toBe(true);
+      expect(mockAwardCoins).toHaveBeenCalledTimes(1);
     });
   });
 

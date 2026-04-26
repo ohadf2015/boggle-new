@@ -5,6 +5,7 @@
  */
 
 import { getSupabase } from './supabase/client';
+import { awardCoinsServer } from '../services/economy/awardCoins';
 // Dynamic import may produce nested { default: { default: ... } } due to CJS/ESM interop.
 // Unwrap until we find the actual Logger instance with .info().
 import _loggerImport from '../utils/logger';
@@ -45,6 +46,8 @@ export interface GrandSlamResult {
 }
 
 const GRAND_SLAM_XP = 500;
+/** Coins granted alongside XP when player completes all 3 daily missions. */
+export const GRAND_SLAM_COIN_REWARD = 200;
 
 function getTodayDate(date?: string): string {
   return date || new Date().toISOString().split('T')[0];
@@ -214,7 +217,14 @@ export async function checkAndClaimGrandSlam(
     logger.error('DAILY_MISSIONS', `Grand slam XP grant failed for ${playerId}: ${xpError.message}`);
   }
 
-  logger.info('DAILY_MISSIONS', `Grand Slam claimed by ${playerId}: ${GRAND_SLAM_XP} XP`);
+  // Coin grant is best-effort; failure logged inside helper. We do not undo
+  // the XP grant or the claim flag if coins fail — manual reconcile beats
+  // a 2-phase commit. `grand_slam_claimed=true` above provides idempotency.
+  await awardCoinsServer(playerId, GRAND_SLAM_COIN_REWARD, 'grand_slam', {
+    date: today,
+  });
+
+  logger.info('DAILY_MISSIONS', `Grand Slam claimed by ${playerId}: ${GRAND_SLAM_XP} XP + ${GRAND_SLAM_COIN_REWARD} coins`);
   return { claimed: true, reward: GRAND_SLAM_XP };
 }
 

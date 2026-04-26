@@ -3,7 +3,16 @@
  */
 
 import { vi } from 'vitest';
-import { getDailyMissions, completeMission, checkAndClaimGrandSlam, markCelebrated } from '../dailyMissionsManager';
+import { getDailyMissions, completeMission, checkAndClaimGrandSlam, markCelebrated, GRAND_SLAM_COIN_REWARD } from '../dailyMissionsManager';
+
+const { mockAwardCoins } = vi.hoisted(() => {
+  const mockAwardCoins = vi.fn();
+  return { mockAwardCoins };
+});
+vi.mock('../../services/economy/awardCoins', () => ({
+  awardCoinsServer: (...args: unknown[]) => mockAwardCoins(...args),
+  MAX_SERVER_COIN_AWARD: 2000,
+}));
 
 // Mock supabaseServer
 const { mockSelect, mockEq, mockMaybeSingle, mockSingle, mockUpdate, mockUpsert, mockRpc, mockFrom, mockSupabase, chainable } = vi.hoisted(() => {
@@ -78,6 +87,7 @@ beforeEach(() => {
   mockUpdate.mockReturnValue(chainable);
   mockUpsert.mockReturnValue(chainable);
   mockFrom.mockReturnValue(chainable);
+  mockAwardCoins.mockResolvedValue({ success: true, newBalance: 100 });
 });
 
 describe('getDailyMissions', () => {
@@ -198,6 +208,51 @@ describe('checkAndClaimGrandSlam', () => {
 
     expect(result.claimed).toBe(false);
     expect(mockRpc).not.toHaveBeenCalled();
+  });
+
+  it('grants GRAND_SLAM_COIN_REWARD coins on claim (alongside XP)', async () => {
+    mockMaybeSingle.mockResolvedValueOnce({ data: FULL_ROW, error: null });
+    mockUpdate.mockReturnValue({ eq: vi.fn().mockReturnValue({ eq: vi.fn().mockResolvedValue({ error: null }) }) });
+
+    await checkAndClaimGrandSlam(PLAYER_ID);
+
+    expect(mockAwardCoins).toHaveBeenCalledTimes(1);
+    expect(mockAwardCoins).toHaveBeenCalledWith(
+      PLAYER_ID,
+      GRAND_SLAM_COIN_REWARD,
+      'grand_slam',
+      expect.any(Object),
+    );
+  });
+
+  it('does NOT grant coins when already claimed (idempotent via grand_slam_claimed flag)', async () => {
+    mockMaybeSingle.mockResolvedValueOnce({
+      data: { ...FULL_ROW, grand_slam_claimed: true },
+      error: null,
+    });
+
+    await checkAndClaimGrandSlam(PLAYER_ID);
+
+    expect(mockAwardCoins).not.toHaveBeenCalled();
+  });
+
+  it('does NOT grant coins when missions incomplete', async () => {
+    mockMaybeSingle.mockResolvedValueOnce({ data: EMPTY_ROW, error: null });
+
+    await checkAndClaimGrandSlam(PLAYER_ID);
+
+    expect(mockAwardCoins).not.toHaveBeenCalled();
+  });
+
+  it('still claims (returns claimed=true) when coin grant fails (best-effort)', async () => {
+    mockMaybeSingle.mockResolvedValueOnce({ data: FULL_ROW, error: null });
+    mockUpdate.mockReturnValue({ eq: vi.fn().mockReturnValue({ eq: vi.fn().mockResolvedValue({ error: null }) }) });
+    mockAwardCoins.mockResolvedValueOnce({ success: false, error: 'rpc fail' });
+
+    const result = await checkAndClaimGrandSlam(PLAYER_ID);
+
+    expect(result.claimed).toBe(true);
+    expect(result.reward).toBe(500);
   });
 });
 

@@ -5,7 +5,11 @@
  */
 
 import { getSupabase } from './supabaseServer';
+import { awardCoinsServer } from '../services/economy/awardCoins';
 import logger from '../utils/logger';
+
+/** Coins granted for solving the daily word. Mirrors WOTD_BONUS in client coinManager. */
+export const WOTD_COIN_REWARD = 50;
 
 /** Curated word list — interesting, medium-length words suitable for all languages */
 const WORD_POOL: string[] = [
@@ -158,6 +162,17 @@ export async function recordWotdAttempt(
       .eq('language', language);
 
     logger.info('WOTD', `Recorded attempt for ${playerId}: found=${found}`);
+
+    // Coin reward only on success — losing attempt earns nothing. Idempotent
+    // because the existing-row guard above blocks repeat attempts.
+    if (found) {
+      await awardCoinsServer(playerId, WOTD_COIN_REWARD, 'wotd_complete', {
+        word,
+        date: targetDate,
+        language,
+      });
+    }
+
     return { success: true };
   } catch (error: unknown) {
     const err = error as Error;
