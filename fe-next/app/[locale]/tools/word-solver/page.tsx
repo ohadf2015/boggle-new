@@ -1,8 +1,11 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { loadTranslation, type TranslationData } from '@/translations/loadTranslation';
 import WordSolverPageClient from './PageClient';
 import { getContent, type Locale } from './content';
 import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
+
+const POPULAR_ANAGRAM_SEEDS = ['listen', 'stared', 'heart', 'stone', 'rates', 'learn', 'smart', 'great', 'earth', 'words'];
 
 export const dynamic = 'force-dynamic';
 
@@ -151,6 +154,27 @@ export default async function WordSolverPage({ params }: PageParams) {
         features={content.howToSteps}
         faq={content.faqs}
       />
+      <section className="mx-auto max-w-4xl px-4 pb-12">
+        <h2 className="text-xl font-neo-display font-bold text-neo-pink uppercase tracking-wider mb-3">
+          Popular Anagram Lookups
+        </h2>
+        <p className="text-slate-400 text-sm mb-4">
+          Shareable URLs for every anagram search — perfect for sending to friends or bookmarking.
+        </p>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
+          {POPULAR_ANAGRAM_SEEDS.map((letters) => (
+            <Link
+              key={letters}
+              href={`/${locale}/anagram/${letters}`}
+              className="bg-slate-900 border-2 border-neo-black rounded-neo px-3 py-2 shadow-hard-sm hover:shadow-hard hover:border-neo-pink transition-all text-center"
+            >
+              <span className="text-sm font-neo-display font-bold text-neo-white uppercase">
+                {letters}
+              </span>
+            </Link>
+          ))}
+        </div>
+      </section>
     </>
   );
 }

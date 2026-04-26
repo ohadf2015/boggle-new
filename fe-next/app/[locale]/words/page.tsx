@@ -151,6 +151,29 @@ export default async function WordsHubPage({ params }: PageParams) {
           </div>
         </section>
 
+        {/* Popular Anagram Lookups */}
+        <section className="mb-10">
+          <h2 className="text-xl font-neo-display font-bold text-neo-pink uppercase tracking-wider mb-4">
+            Popular Anagram Lookups
+          </h2>
+          <p className="text-slate-400 text-sm mb-4">
+            Find every word you can form from these letters — instant results, no signup.
+          </p>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
+            {['listen', 'stared', 'heart', 'stone', 'rates', 'learn', 'smart', 'great', 'earth', 'words'].map((letters) => (
+              <Link
+                key={letters}
+                href={`/${locale}/anagram/${letters}`}
+                className="bg-slate-900 border-2 border-neo-black rounded-neo px-3 py-2 shadow-hard-sm hover:shadow-hard hover:border-neo-pink transition-all text-center"
+              >
+                <span className="text-sm font-neo-display font-bold text-neo-white uppercase">
+                  {letters}
+                </span>
+              </Link>
+            ))}
+          </div>
+        </section>
+
         {/* CTA */}
         <div className="text-center mt-8">
           <Link
