@@ -28,13 +28,13 @@
 *Symptom:* When `level > totalLevels`, `getPuzzleForLevel` returns null → component renders generic `connections.noAccess` ("This game mode is not available."). Same fallback as feature-flag-off / locale-without-puzzles. Player who cleared the whole pack sees a dead-end error message instead of a victory screen.
 *Fix:* Distinguish terminal-success state from no-content state. Render celebration card with final session score + XP + "Play again" CTA that resets `setCurrentLevel(language, 1)`.
 
-### P1 — Note, don't fix this pass
+### P1 — Shipped this pass
 
-**C-003 — Reduced-motion ignored**
-Particle bursts (`flash.white`, `flash.danger`, `shake.heavy`) and full-screen flashes fire unconditionally. No `useReducedMotion()` guard. WCAG 2.3.3 (Animation from Interactions) concern. Fix requires plumbing through `GameCanvas` API — defer to a11y sweep.
+**C-003 — Reduced-motion guard (FIXED)**
+`ConnectionsGame.tsx` now reads `useReducedMotion()` and skips dispatching all five `connections:*` window events when the user prefers reduced motion. Suppresses particle bursts, full-screen flash, and screen shake at the source — no GameCanvas API change needed. WCAG 2.3.3 satisfied for this surface. Test: `ConnectionsGame.hud.test.tsx` "skips life-loss particle bursts when prefers-reduced-motion is set".
 
-**C-004 — UI test coverage gap**
-Only `ConnectionsGame.hideNav.test.tsx` exists. No render tests for HUD, level-advance, OutOfLivesModal flow, give-up path. Logic layer well-tested via `gameLogic.test.ts`.
+**C-004 — UI test coverage gap (PARTIAL)**
+Added `ConnectionsGame.hud.test.tsx` (6 tests): sticky HUD class, label rendering, victory-card render, Play Again resets storage, no-puzzles fallback, reduced-motion suppression. Outstanding: OutOfLivesModal flow + give-up path tests.
 
 **C-005 — `xpAwardedIdsRef` cleared only on language change**
 After 1000 levels the Set holds 1000 strings. Negligible memory; correctness is fine because puzzle ids are unique. Drop unless we ship infinite-mode.

@@ -7,6 +7,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowLeft } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { getPuzzleForLevel, getTotalLevels } from '@/lib/connections/puzzles';
 import {
   initGameState,
@@ -70,6 +71,7 @@ export default function ConnectionsGame() {
   const { isAdmin } = useAuth();
   const router = useRouter();
   const isRTL = language === 'he';
+  const prefersReducedMotion = useReducedMotion();
   const containerRef = useRef<HTMLDivElement>(null);
   const [canvasSize, setCanvasSize] = useState({ width: 0, height: 0 });
 
@@ -105,23 +107,27 @@ export default function ConnectionsGame() {
   }, [language]);
 
   // Persist lives + emit lifeLost / gameOver events on changes.
+  // Reduced-motion users still get state persistence but skip the
+  // particle/flash/shake bursts (WCAG 2.3.3).
   useEffect(() => {
     const prev = prevLivesRef.current;
     if (state.lives !== prev) {
       setCurrentLives(language, state.lives);
-      if (state.lives < prev) {
-        const rect = heartsRef.current?.getBoundingClientRect();
-        const containerRect = containerRef.current?.getBoundingClientRect();
-        const x = rect && containerRect ? rect.left + rect.width / 2 - containerRect.left : 0;
-        const y = rect && containerRect ? rect.top + rect.height / 2 - containerRect.top : 0;
-        window.dispatchEvent(new CustomEvent('connections:lifeLost', { detail: { x, y } }));
-      }
-      if (state.lives === 0 && prev > 0) {
-        window.dispatchEvent(new CustomEvent('connections:gameOver'));
+      if (!prefersReducedMotion) {
+        if (state.lives < prev) {
+          const rect = heartsRef.current?.getBoundingClientRect();
+          const containerRect = containerRef.current?.getBoundingClientRect();
+          const x = rect && containerRect ? rect.left + rect.width / 2 - containerRect.left : 0;
+          const y = rect && containerRect ? rect.top + rect.height / 2 - containerRect.top : 0;
+          window.dispatchEvent(new CustomEvent('connections:lifeLost', { detail: { x, y } }));
+        }
+        if (state.lives === 0 && prev > 0) {
+          window.dispatchEvent(new CustomEvent('connections:gameOver'));
+        }
       }
       prevLivesRef.current = state.lives;
     }
-  }, [state.lives, language]);
+  }, [state.lives, language, prefersReducedMotion]);
 
   useEffect(() => {
     const el = containerRef.current;
@@ -137,7 +143,9 @@ export default function ConnectionsGame() {
   // After correct → award XP + accumulate score, then auto-advance to next level
   useEffect(() => {
     if (state.status !== 'correct') return;
-    window.dispatchEvent(new CustomEvent('connections:correct'));
+    if (!prefersReducedMotion) {
+      window.dispatchEvent(new CustomEvent('connections:correct'));
+    }
     const puzzle = state.puzzles[state.currentIndex];
     if (puzzle && !xpAwardedIdsRef.current.has(puzzle.id)) {
       xpAwardedIdsRef.current.add(puzzle.id);
@@ -157,10 +165,10 @@ export default function ConnectionsGame() {
   }, [state.status, state.currentIndex, state.puzzles, state.streak, state.score]);
 
   useEffect(() => {
-    if (state.status === 'wrong') {
+    if (state.status === 'wrong' && !prefersReducedMotion) {
       window.dispatchEvent(new CustomEvent('connections:wrong'));
     }
-  }, [state.status, state.wrongAttempts]);
+  }, [state.status, state.wrongAttempts, prefersReducedMotion]);
 
   const advanceToNextLevel = useCallback(() => {
     const nextLevel = level + 1;
@@ -171,12 +179,14 @@ export default function ConnectionsGame() {
       // Carry surviving lives across levels so they actually gate progress.
       dispatch({ type: 'RESET', puzzles: [puzzle], initialLives: state.lives });
     }
-    const rect = levelBadgeRef.current?.getBoundingClientRect();
-    const containerRect = containerRef.current?.getBoundingClientRect();
-    const x = rect && containerRect ? rect.left + rect.width / 2 - containerRect.left : 0;
-    const y = rect && containerRect ? rect.top + rect.height / 2 - containerRect.top : 0;
-    window.dispatchEvent(new CustomEvent('connections:levelUp', { detail: { x, y, level: nextLevel } }));
-  }, [language, level, state.lives]);
+    if (!prefersReducedMotion) {
+      const rect = levelBadgeRef.current?.getBoundingClientRect();
+      const containerRect = containerRef.current?.getBoundingClientRect();
+      const x = rect && containerRect ? rect.left + rect.width / 2 - containerRect.left : 0;
+      const y = rect && containerRect ? rect.top + rect.height / 2 - containerRect.top : 0;
+      window.dispatchEvent(new CustomEvent('connections:levelUp', { detail: { x, y, level: nextLevel } }));
+    }
+  }, [language, level, state.lives, prefersReducedMotion]);
 
   const handleInput = useCallback((value: string) => {
     dispatch({ type: 'SET_INPUT', input: value });

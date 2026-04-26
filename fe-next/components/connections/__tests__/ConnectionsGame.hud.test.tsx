@@ -48,6 +48,11 @@ vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: vi.fn() }),
 }));
 
+const reducedMotionMock = vi.fn(() => false);
+vi.mock('@/hooks/useReducedMotion', () => ({
+  useReducedMotion: () => reducedMotionMock(),
+}));
+
 vi.mock('../ConnectionsEffectsCanvas', () => ({ default: () => null }));
 vi.mock('../PuzzleCard', () => ({ default: () => <div data-testid="puzzle-card" /> }));
 vi.mock('../OutOfLivesModal', () => ({ default: () => null }));
@@ -113,6 +118,24 @@ describe('ConnectionsGame — terminal states', () => {
     fireEvent.click(screen.getByRole('button', { name: 'connections.playAgain' }));
 
     expect(setCurrentLevelMock).toHaveBeenCalledWith('en', 1);
+  });
+
+  it('skips life-loss particle bursts when prefers-reduced-motion is set', () => {
+    reducedMotionMock.mockReturnValue(true);
+    getCurrentLevelMock.mockReturnValue(1);
+    getTotalLevelsMock.mockReturnValue(100);
+    getPuzzleForLevelMock.mockReturnValue({
+      id: 'p1', word1: 'A', word2: 'B', bridge: 'C', difficulty: 'easy' as const,
+    });
+    const dispatchSpy = vi.spyOn(window, 'dispatchEvent');
+    render(<ConnectionsGame />);
+    // No connections:* events should be dispatched on mount.
+    const connectionsEvents = dispatchSpy.mock.calls
+      .map((call) => (call[0] as Event).type)
+      .filter((type) => type.startsWith('connections:'));
+    expect(connectionsEvents).toEqual([]);
+    dispatchSpy.mockRestore();
+    reducedMotionMock.mockReturnValue(false);
   });
 
   it('still falls back to noAccess when the locale has no puzzles at all', () => {
