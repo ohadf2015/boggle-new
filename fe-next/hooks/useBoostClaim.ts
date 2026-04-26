@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import posthog from 'posthog-js';
 import { useRewardedAd } from '@/hooks/useRewardedAd';
 import type { BoostType } from '@/shared/types/boosts';
 
@@ -57,6 +58,9 @@ export function useBoostClaim(sessionId: string) {
 
   const makeClaimRequest = useCallback(
     async (boostType: BoostType, resolve: (success: boolean) => void) => {
+      // Emit started event
+      posthog?.capture('boost_claim_started', { boost_type: boostType });
+
       try {
         const res = await fetch('/api/boosts/claim', {
           method: 'POST',
@@ -65,8 +69,11 @@ export function useBoostClaim(sessionId: string) {
         });
         const body = await res.json();
         if (!res.ok || !body.success) {
-          setError(body.error ?? 'claim_failed');
+          const reason = body.error ?? 'network';
+          setError(reason);
           setIsLoading(false);
+          // Emit failed event
+          posthog?.capture('boost_claim_failed', { reason, boost_type: boostType });
           resolve(false);
           return;
         }
@@ -75,10 +82,15 @@ export function useBoostClaim(sessionId: string) {
         sessionStorage.setItem(BOOST_TOKEN_STORAGE_KEY(sessionId), JSON.stringify(next));
         setClaimed(next);
         setIsLoading(false);
+        // Emit completed event
+        posthog?.capture('boost_claim_completed', { boost_type: boostType, remaining_today: body.remaining });
         resolve(true);
       } catch (e) {
-        setError((e as Error).message);
+        const msg = (e as Error).message;
+        setError(msg);
         setIsLoading(false);
+        // Emit failed event on network error
+        posthog?.capture('boost_claim_failed', { reason: 'network', boost_type: boostType });
         resolve(false);
       }
     },

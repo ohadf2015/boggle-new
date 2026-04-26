@@ -22,6 +22,7 @@ import logger from '../../utils/logger';
 import type { PlayerResult, UserData } from './types';
 import { verifyBoostToken } from '../../utils/boostToken';
 import { applyFirstWordBonus, applyScoreMultiplier } from '@/shared/utils/boostEffects';
+import { getPostHogServer } from '@/lib/posthog';
 
 export interface PlayerBoostClaim { sessionId: string; token: string }
 
@@ -49,7 +50,12 @@ export function applyBoostsToScores(
       ts: w.ts ?? 0,
     }));
     let nextWords = wordDetails;
-    if (v.boostType === 'firstWordBonus') nextWords = applyFirstWordBonus(wordDetails);
+    let boostApplied = false;
+
+    if (v.boostType === 'firstWordBonus') {
+      nextWords = applyFirstWordBonus(wordDetails);
+      boostApplied = true;
+    }
     else if (v.boostType === 'scoreMultiplier') {
       // v2: server-side scoreMultiplier requires WordDetail.ts plumbing.
       // For v1, scoreMultiplier is client-display only — server doesn't multiply.
@@ -58,6 +64,19 @@ export function applyBoostsToScores(
     else return player;
 
     const totalScore = nextWords.reduce((s, w) => s + (w.score ?? 0), 0);
+
+    // Emit PostHog event for applied boost
+    if (boostApplied) {
+      getPostHogServer()?.capture({
+        distinctId: player.username,
+        event: 'boost_applied',
+        properties: {
+          boost_type: v.boostType,
+          mode: 'mp',
+        },
+      });
+    }
+
     return { ...player, wordDetails: nextWords as typeof player.wordDetails, totalScore };
   });
 }

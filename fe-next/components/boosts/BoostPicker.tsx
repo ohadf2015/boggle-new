@@ -1,5 +1,6 @@
 'use client';
 import { useEffect } from 'react';
+import posthog from 'posthog-js';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useBoostStatus } from '@/hooks/useBoostStatus';
 import { useBoostClaim } from '@/hooks/useBoostClaim';
@@ -16,6 +17,12 @@ export function BoostPicker({ open, mode, sessionId, onClose }: Props) {
   const { t } = useLanguage();
   const { status } = useBoostStatus();
   const { claim, claimed, isLoading } = useBoostClaim(sessionId);
+
+  useEffect(() => {
+    if (open) {
+      posthog?.capture('boost_picker_opened', { mode });
+    }
+  }, [open, mode]);
 
   useEffect(() => {
     if (!open) return;
