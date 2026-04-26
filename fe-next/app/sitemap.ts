@@ -247,6 +247,13 @@ function getAllRoutes(): MetadataRoute.Sitemap {
     });
   });
 
+  // Anagram hub page (parent of programmatic /anagram/[letters] routes).
+  addForAllLocales(routes, '/anagram', {
+    lastModified: LAST_DEPLOYED,
+    changeFrequency: 'monthly',
+    priority: 0.7,
+  });
+
   // ─── Programmatic SEO: Anagram solver (150 seed letter combos) ───
   // Top-N common letter racks from competitive word games.
   // Long tail discovered via internal links + dynamic crawling.
