@@ -8,6 +8,7 @@ import { type CustomAvatarConfig, getRandomAvatarConfig } from '@/shared/types/c
 import Avatar from '@/components/Avatar';
 import AvatarBuilderModal from '@/components/avatar/AvatarBuilderModal';
 import { fireOnboardingBurst } from '@/utils/confettiUtils';
+import { suggestPlayerName } from '@/utils/onboardingNameSuggestions';
 import { cn } from '@/lib/utils';
 
 interface QuickProfileSetupProps {
@@ -26,7 +27,7 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
   hasPendingInvite,
 }) => {
   const { t, dir } = useLanguage();
-  const [name, setName] = useState('');
+  const [name, setName] = useState(suggestPlayerName);
   const [avatar, setAvatar] = useState<CustomAvatarConfig>(getRandomAvatarConfig);
   const [isBuilderOpen, setIsBuilderOpen] = useState(false);
   const [avatarKey, setAvatarKey] = useState(0);
@@ -58,6 +59,8 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
   const handleRandomize = useCallback(() => {
     setAvatar(getRandomAvatarConfig());
     setAvatarKey((k) => k + 1);
+    setName(suggestPlayerName());
+    previouslyValidRef.current = false;
     // Small burst centred near the avatar (roughly upper-middle of viewport)
     fireOnboardingBurst({ y: 0.4 }, ['#FFE135', '#FF1493', '#BFFF00']);
   }, []);

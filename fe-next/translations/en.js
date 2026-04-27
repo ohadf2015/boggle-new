@@ -1960,7 +1960,31 @@ const en = {
       "letsGo": "Let's Start!",
       "chooseLanguage": "Choose your language",
       "letsPlay": "Let's Play",
-      "whereToStart": "Where to start?"
+      "whereToStart": "Where to start?",
+      "v2": {
+        "rewardsEarned": "REWARDS EARNED",
+        "goldReward": "+{{gold}} GOLD",
+        "streakStarted": "DAY 1 STREAK",
+        "achievementUnlocked": "FIRST WORDS",
+        "tomorrowBonus": "Come back tomorrow for +50 bonus",
+        "scoreFooter": "{{score}} pts",
+        "claimAndPlay": "CLAIM & PLAY",
+        "skipForNow": "Skip for now",
+        "titles": {
+          "wordling": "WORDLING",
+          "wordHunter": "WORD HUNTER!",
+          "wordsmith": "WORDSMITH!",
+          "wordSlayer": "WORD SLAYER!",
+          "wordLegend": "WORD LEGEND!"
+        },
+        "mascotReactions": {
+          "wordling": "Nice start!",
+          "wordHunter": "Look at you go!",
+          "wordsmith": "You're a natural!",
+          "wordSlayer": "You're on fire!",
+          "wordLegend": "Legendary debut!"
+        }
+      }
     }
   },
   "preGameTutorial": {

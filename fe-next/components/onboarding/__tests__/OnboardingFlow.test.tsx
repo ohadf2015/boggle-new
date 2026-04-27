@@ -109,13 +109,13 @@ vi.mock('../QuickProfileSetup', () => {
   };
 });
 
-vi.mock('../ScoreReveal', () => {
+vi.mock('../ScoreRevealV2', () => {
   return {
     __esModule: true,
-    default: ({ onTryAgain, onContinue }: any) => (
+    default: ({ onContinue, onSkip }: any) => (
       <div data-testid="score-reveal">
-        <button onClick={onTryAgain}>Try Again</button>
         <button onClick={onContinue}>Continue</button>
+        {onSkip && <button onClick={onSkip}>Skip</button>}
       </div>
     ),
   };

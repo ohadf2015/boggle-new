@@ -102,11 +102,10 @@ vi.mock('../QuickProfileSetup', () => ({
   ),
 }));
 
-vi.mock('../ScoreReveal', () => ({
+vi.mock('../ScoreRevealV2', () => ({
   __esModule: true,
-  default: ({ onTryAgain, onContinue }: any) => (
+  default: ({ onContinue }: any) => (
     <>
-      <button data-testid="retry-btn" onClick={onTryAgain}>retry</button>
       <button data-testid="continue-btn" onClick={onContinue}>continue</button>
     </>
   ),
@@ -195,18 +194,6 @@ describe('OnboardingFlow analytics', () => {
     fireEvent.click(screen.getByTestId('continue-btn'));
     expect(trackOnboardingStep).toHaveBeenCalledWith('score_reveal', {
       action: 'continue',
-    });
-  });
-
-  it('fires step=score_reveal action=retry on Try Again (friction signal)', () => {
-    render(<OnboardingFlow onComplete={vi.fn()} />);
-    fireEvent.click(screen.getByTestId('lang-btn'));
-    goNew();
-    fireEvent.click(screen.getByTestId('tut-btn'));
-    fireEvent.click(screen.getByTestId('profile-btn'));
-    fireEvent.click(screen.getByTestId('retry-btn'));
-    expect(trackOnboardingStep).toHaveBeenCalledWith('score_reveal', {
-      action: 'retry',
     });
   });
 

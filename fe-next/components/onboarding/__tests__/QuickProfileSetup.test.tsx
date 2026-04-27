@@ -137,9 +137,16 @@ describe('QuickProfileSetup', () => {
     expect(screen.getByTestId('avatar-preview')).toBeInTheDocument();
   });
 
-  it('requires a name of at least 2 characters', () => {
+  it('pre-fills the name with a suggested player name', () => {
     render(<QuickProfileSetup {...defaultProps} />);
-    // Clicking submit with empty name should not call onComplete
+    const input = screen.getByRole('textbox') as HTMLInputElement;
+    expect(input.value.length).toBeGreaterThan(0);
+  });
+
+  it('does not submit when name is cleared to empty', () => {
+    render(<QuickProfileSetup {...defaultProps} />);
+    const input = screen.getByRole('textbox');
+    fireEvent.change(input, { target: { value: '' } });
     fireEvent.click(screen.getByText("Let's go!"));
     expect(defaultProps.onComplete).not.toHaveBeenCalled();
   });

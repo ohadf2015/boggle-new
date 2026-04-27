@@ -17,7 +17,7 @@ import { type CustomAvatarConfig } from '@/shared/types/customAvatar';
 import LanguageSelect from './LanguageSelect';
 import TutorialGame from './TutorialGame';
 import QuickProfileSetup from './QuickProfileSetup';
-import ScoreReveal from './ScoreReveal';
+import ScoreRevealV2 from './ScoreRevealV2';
 import ModeFork from './ModeFork';
 import OnboardingProgress from './OnboardingProgress';
 import ReturningUserStep from './ReturningUserStep';
@@ -42,9 +42,6 @@ interface OnboardingFlowProps {
   onComplete: () => void;
 }
 
-/** Default average score shown to new players */
-const DEFAULT_AVERAGE_SCORE = 62;
-
 /**
  * OnboardingFlow - Orchestrates the full FTUE.
  * State machine: language -> tutorial -> profile -> scoreReveal -> fork.
@@ -60,7 +57,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
   const { isOnCrazyGamesPlatform } = useCrazyGames();
   const [tutorialScore, setTutorialScore] = useState(0);
   const [, setTutorialWords] = useState<string[]>([]);
-  const [tutorialAttempt, setTutorialAttempt] = useState(1);
+  const [tutorialAttempt] = useState(1);
   const [playerName, setPlayerName] = useState('');
   const [, setPlayerAvatar] = useState<CustomAvatarConfig | null>(null);
   // Gate re-entry + show overlay once we've committed to a route navigation.
@@ -145,13 +142,6 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
   );
 
 
-  // Step 3: Try again (restart tutorial) — retries are a friction signal for PostHog
-  const handleTryAgain = useCallback(() => {
-    trackOnboardingStep('score_reveal', { action: 'retry' });
-    setTutorialAttempt((n) => n + 1);
-    setStep('tutorial');
-  }, []);
-
   // Step 3: Continue to fork
   const handleContinue = useCallback(() => {
     trackOnboardingStep('score_reveal', { action: 'continue' });
@@ -229,11 +219,10 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
         );
       case 'scoreReveal':
         return (
-          <ScoreReveal
+          <ScoreRevealV2
             score={tutorialScore}
-            averageScore={DEFAULT_AVERAGE_SCORE}
-            onTryAgain={handleTryAgain}
             onContinue={handleContinue}
+            onSkip={handleSkipOnboarding}
           />
         );
       case 'fork':
