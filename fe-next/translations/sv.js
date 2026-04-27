@@ -66,10 +66,10 @@ const sv = {
       "ogDescription": "Samma pussel, hela världen. Hitta ord, dela resultat, tävla globalt. Gratis — ingen nedladdning!"
     },
     "multiplayer": {
-      "title": "Multiplayer Ordstrid - Realtidstävling",
-      "description": "Gå med i ordstrider i realtid med vänner! Var värd för eller gå med i multiplayer-rum, tävla live mot motståndare och klättra på topplistan. Perfekt för fester och spelkvällar.",
-      "ogTitle": "Multiplayer Ordstrid - Tävla Live",
-      "ogDescription": "Realtids multiplayer ordspel - var värd för rum, bjud in vänner och tävla i live ordstrider!"
+      "title": "Multiplayer Ordspel Online — Spela Gratis Med Vänner | LexiClash",
+      "description": "Realtids ordstrider med vänner — ingen nedladdning, ingen registrering. Skapa rum, dela länk, tävla live. 6 spellägen, 5 språk, daglig topplista. Spela gratis nu →",
+      "ogTitle": "Ordstrider i realtid med vänner — gratis",
+      "ogDescription": "Skapa rum, dela länk, tävla om ord live. 6 lägen, 5 språk. Gratis i din webbläsare."
     },
     "about": {
       "title": "Om LexiClash - Vårt Uppdrag, Berättelse & Team",
@@ -282,10 +282,10 @@ const sv = {
       "ogDescription": "Gratis ordverktyg — lösare, anagramsökare och ordförrådsbyggare."
     },
     "dailyWordWheel": {
-      "title": "Dagliga Ordhjulet - Gratis Dagligt Pussel | LexiClash",
-      "description": "Snurra det dagliga ordhjulet! Hitta alla möjliga ord från en uppsättning bokstäver. Nytt pussel varje dag!",
-      "ogTitle": "Dagliga Ordhjulet - Gratis Pussel",
-      "ogDescription": "Snurra ordhjulet och hitta alla möjliga ord. Nytt pussel dagligen!"
+      "title": "Dagligt Ordhjul · Gratis Pussel Som Wordle Men Bättre | LexiClash",
+      "description": "Nytt ordhjul varje dag — hitta alla ord, slå klockan. Dela resultat, bygg streak, klättra på den globala topplistan. Gratis, ingen registrering. Spela idag →",
+      "ogTitle": "Dagens Ordhjul — Hitta Alla Ord",
+      "ogDescription": "Snurra dagens hjul, kapplöp mot klockan, dela din streak. Gratis pussel, nytt varje dag."
     },
     "playerProfile": {
       "title": "Spelarprofil & Spelstatistik | LexiClash",

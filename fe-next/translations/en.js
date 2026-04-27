@@ -66,10 +66,10 @@ const en = {
       "ogDescription": "Same puzzle, everyone worldwide. Find words, share emoji results, climb the leaderboard. Play free — no download needed!"
     },
     "multiplayer": {
-      "title": "Word Game With Friends - Free Online Multiplayer",
-      "description": "Join real-time word battles with friends! Host or join multiplayer rooms, compete live against opponents, and climb the leaderboard. Perfect for parties and game nights.",
-      "ogTitle": "Multiplayer Word Battle - Compete Live",
-      "ogDescription": "Real-time multiplayer word game - host rooms, invite friends, and compete in live word battles!"
+      "title": "Multiplayer Word Game Online — Free Battles With Friends | LexiClash",
+      "description": "Real-time multiplayer word battles with friends — no signup. Host a room, share the link, compete live. 6 modes, 5 languages, daily leaderboard. Play free now →",
+      "ogTitle": "Real-Time Word Battles With Friends — Play Free",
+      "ogDescription": "Host a room, share the link, race for words live. 6 modes, 5 languages. Free in your browser."
     },
     "about": {
       "title": "About LexiClash - Our Story, Mission & Team",
@@ -282,10 +282,10 @@ const en = {
       "ogDescription": "Free word tools — solver, anagram finder, and vocabulary builder."
     },
     "dailyWordWheel": {
-      "title": "Daily Word Wheel - Free Daily Puzzle | LexiClash",
-      "description": "Spin the daily word wheel! Find all possible words from a set of letters. New puzzle every day — share your results with friends.",
-      "ogTitle": "Daily Word Wheel - Free Puzzle",
-      "ogDescription": "Spin the word wheel and find all possible words. New puzzle daily!"
+      "title": "Daily Word Wheel — Free Puzzle Like Wordle, But Better | LexiClash",
+      "description": "New letter wheel every day — find every word, beat the timer. Share results, climb the global leaderboard, build your streak. Free, no signup. Play today →",
+      "ogTitle": "Today's Word Wheel — Find Every Word",
+      "ogDescription": "Spin the daily wheel, race the clock, share your streak. Free puzzle, new every day."
     },
     "playerProfile": {
       "title": "Player Profile & Game Stats | LexiClash",

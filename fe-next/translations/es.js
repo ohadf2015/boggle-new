@@ -66,10 +66,10 @@ const es = {
       "ogDescription": "Mismo puzzle, todo el mundo. Encuentra palabras, comparte resultados, compite globalmente. ¡Gratis y sin descarga!"
     },
     "multiplayer": {
-      "title": "Batalla de Palabras Multijugador - Tiempo Real",
-      "description": "¡Únete a batallas de palabras en tiempo real con amigos! Crea o únete a salas multijugador, compite en vivo contra oponentes y sube en la clasificación.",
-      "ogTitle": "Batalla de Palabras Multijugador - Compite en Vivo",
-      "ogDescription": "Juego de palabras multijugador en tiempo real - crea salas, invita amigos y compite en batallas de palabras en vivo."
+      "title": "Juego de Palabras Multijugador Online · Gratis con Amigos | LexiClash",
+      "description": "Batallas de palabras en tiempo real con amigos — sin registro, sin descarga. Crea sala, comparte enlace, compite en vivo. 6 modos, 5 idiomas, ranking diario. ¡Juega gratis ya! →",
+      "ogTitle": "Batallas de palabras en vivo con amigos — gratis",
+      "ogDescription": "Crea sala, comparte enlace, compite por palabras en vivo. 6 modos, 5 idiomas. Gratis en tu navegador."
     },
     "about": {
       "title": "Sobre LexiClash - Nuestra Historia, Mision y Equipo",
@@ -282,10 +282,10 @@ const es = {
       "ogDescription": "Herramientas gratuitas — solucionador, buscador de anagramas y vocabulario."
     },
     "dailyWordWheel": {
-      "title": "Rueda de Palabras Diaria - Puzzle Diario Gratis | LexiClash",
-      "description": "Gira la rueda de palabras diaria! Encuentra todas las palabras posibles. Nuevo puzzle cada dia!",
-      "ogTitle": "Rueda de Palabras Diaria - Puzzle Gratis",
-      "ogDescription": "Gira la rueda de palabras y encuentra todas las palabras. Nuevo puzzle diario!"
+      "title": "Rueda de Palabras Diaria · Puzzle Gratis Como Wordle | LexiClash",
+      "description": "Nueva rueda de letras cada día — encuentra todas las palabras y vence al reloj. Comparte resultados, construye tu racha, sube al ranking global. Gratis. ¡Juega hoy! →",
+      "ogTitle": "La Rueda de Hoy — Encuentra Todas las Palabras",
+      "ogDescription": "Gira la rueda diaria, corre contra el reloj, comparte tu racha. Puzzle gratis, nuevo cada día."
     },
     "playerProfile": {
       "title": "Perfil de Jugador y Estadisticas | LexiClash",

@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   return {
     title: 'LexiClash vs Wordle — La Mejor Alternativa a Wordle en Español | LexiClash',
-    description: 'LexiClash es la mejor alternativa a Wordle en español. Juega sin límite de intentos, modo multijugador en tiempo real, desafíos diarios y batallas contra jefes. Gratis, sin descargas, directo en tu navegador. ¿Wordle se te queda corto? Prueba LexiClash.',
+    description: 'Alternativa a Wordle en español — partidas ilimitadas, multijugador en tiempo real, desafíos diarios. Gratis, sin descargas. ¿Wordle se queda corto? ¡Pruébalo ya! →',
     keywords: 'lexiclash vs wordle, alternativa a wordle, juego de palabras online, wordle en español alternativa, juego de palabras gratis, wordle alternativa multijugador, juego tipo wordle, juegos de palabras en español',
     openGraph: {
       title: 'LexiClash vs Wordle — Alternativa Gratis y Sin Límites',
