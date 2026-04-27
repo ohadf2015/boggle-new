@@ -98,7 +98,7 @@ export const MobileChatFab = memo<MobileChatFabProps>(({ username, isHost, gameC
             onClick={handleOpen}
             className={cn(
               'fixed right-3 z-30',
-              'bottom-[calc(5rem+env(safe-area-inset-bottom))]',
+              'bottom-[calc(5rem+env(safe-area-inset-bottom)+var(--admob-banner-height,0px))]',
               'w-10 h-10 min-w-[44px] min-h-[44px]',
               'flex items-center justify-center',
               'bg-neo-navy/90 border-2 border-neo-lime/60 rounded-full',

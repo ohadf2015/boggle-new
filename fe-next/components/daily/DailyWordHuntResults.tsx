@@ -365,7 +365,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
 
       {/* Main Content - flex-1 min-h-0 fills remaining space after compact header */}
       {/* Bottom padding accounts for fixed MobileTabBar (--mobile-bottom-safe = 80px + safe-area) */}
-      <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain scrollable-area px-3 pb-(--mobile-bottom-safe) md:pb-6">
+      <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain scrollable-area px-3 pb-bottom-stack md:pb-6">
         {/* Mobile: Tab-based content */}
         <div className="max-w-md mx-auto pt-4 md:hidden">
           {activeTab === 'results' && <WordHuntResultsContent {...resultsContentProps} />}

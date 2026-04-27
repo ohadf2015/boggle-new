@@ -294,7 +294,7 @@ export default function EducationBadgeGrid({
 
       {/* Pin Error Toast */}
       {pinError && (
-        <div className="fixed bottom-4 right-4 z-50">
+        <div className="fixed bottom-[calc(1rem+var(--admob-banner-height,0px))] right-4 z-50">
           <div className="bg-neo-pink text-neo-black px-4 py-3 rounded-neo border-3 border-neo-black shadow-hard-lg flex items-center gap-3">
             <span className="font-neo-body">{pinError}</span>
             <button

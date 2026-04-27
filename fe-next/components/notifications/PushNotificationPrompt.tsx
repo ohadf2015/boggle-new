@@ -55,7 +55,7 @@ export function PushNotificationPrompt() {
           exit={{ opacity: 0, y: 40 }}
           transition={{ type: 'spring', damping: 20, stiffness: 300 }}
           ref={dialogRef}
-          className="fixed bottom-20 inset-x-4 z-50 mx-auto max-w-md"
+          className="fixed bottom-[calc(5rem+var(--admob-banner-height,0px))] inset-x-4 z-50 mx-auto max-w-md"
           role="dialog"
           aria-label={t('notifications.prompt.title')}
           data-testid="push-notification-prompt"

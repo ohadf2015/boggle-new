@@ -137,7 +137,7 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
-      className="flex-1 flex flex-col items-center justify-start pt-2 sm:pt-4 px-4 pb-[calc(var(--mobile-bottom-safe)+5rem)] sm:pb-10 min-h-0 overflow-y-auto"
+      className="flex-1 flex flex-col items-center justify-start pt-2 sm:pt-4 px-4 pb-bottom-stack sm:pb-10 min-h-0 overflow-y-auto"
     >
       {/* Top bar with back and language */}
       <div className="w-full max-w-md lg:max-w-5xl xl:max-w-6xl flex items-center justify-between mb-2">
@@ -278,45 +278,55 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
           </motion.div>
         )}
 
-        {/* Spacer for sticky button */}
-        <div className="h-2" />
-
-        {/* Create Challenge Section - Different UI for authenticated vs unauthenticated */}
+        {/* Secondary actions row — demoted from primary CTA, sits below carousel */}
         {isAuthenticated ? (
           <motion.div
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.35, type: 'spring', stiffness: 300, damping: 26 }}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.35, type: 'spring', stiffness: 280, damping: 26 }}
+            className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 pt-1"
           >
-            <Button
+            <button
               onClick={() => setShowCreateChallenge(true)}
-              variant="outline"
-              className="w-full max-w-btn py-3.5 text-xs sm:text-sm font-black bg-linear-to-r from-neo-purple to-neo-pink text-neo-white border-neo-thick border-neo-white rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 active:translate-y-0 active:shadow-hard-pressed transition-all flex items-center justify-center gap-2 uppercase text-center leading-tight"
+              className="inline-flex items-center gap-1.5 text-sm font-bold text-neo-pink hover:text-neo-pink-light transition-colors"
             >
-              <Sparkles className="w-5 h-5" />
+              <Sparkles className="w-4 h-4" />
               {t('daily.createCustomChallenge')}
-            </Button>
+            </button>
+            <button
+              onClick={() => setShowLeaderboard(!showLeaderboard)}
+              className="inline-flex items-center gap-1.5 text-sm font-bold text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
+            >
+              <Trophy className="w-4 h-4" />
+              {t('daily.todaysPlayers')}
+            </button>
           </motion.div>
         ) : (
-          !isOnCrazyGamesPlatform && (
-            <UnauthenticatedCreateChallengeSection language={language} t={t} onAuthRequired={handleAuthRequired} />
-          )
+          <>
+            {!isOnCrazyGamesPlatform && (
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.35, type: 'spring', stiffness: 300, damping: 26 }}
+              >
+                <UnauthenticatedCreateChallengeSection language={language} t={t} onAuthRequired={handleAuthRequired} />
+              </motion.div>
+            )}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.4, type: 'spring', stiffness: 280, damping: 26 }}
+              className="flex items-center justify-center gap-4 pt-2"
+            >
+              <button
+                onClick={() => setShowLeaderboard(!showLeaderboard)}
+                className="text-sm font-bold text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors flex items-center gap-1"
+              >
+                <Trophy className="w-3 h-3" /> {t('daily.todaysPlayers')}
+              </button>
+            </motion.div>
+          </>
         )}
-
-        {/* Secondary Actions - Collapsed */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.4, type: 'spring', stiffness: 280, damping: 26 }}
-          className="flex items-center justify-center gap-4 pt-2"
-        >
-          <button
-            onClick={() => setShowLeaderboard(!showLeaderboard)}
-            className="text-sm font-bold text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors flex items-center gap-1"
-          >
-            <Trophy className="w-3 h-3" /> {t('daily.todaysPlayers')}
-          </button>
-        </motion.div>
 
         {/* Collapsible Leaderboard */}
         <AnimatePresence>
@@ -387,7 +397,7 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
       </div>
 
       {/* Mobile sticky play button — sits above bottom nav, below cookie consent */}
-      <div className="sm:hidden fixed bottom-[var(--mobile-bottom-safe)] inset-x-0 z-[100] px-4 pb-2 pointer-events-none">
+      <div className="sm:hidden fixed bottom-[var(--bottom-stack-height,0px)] inset-x-0 z-[100] px-4 pb-2 pointer-events-none">
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}

@@ -113,7 +113,7 @@ export function PageLayout({
         className={cn(
           'flex-1 mx-auto w-full',
           fullHeight && 'min-h-0',
-          bottomNavAware && 'pb-(--mobile-bottom-safe) sm:pb-0',
+          bottomNavAware && 'pb-bottom-stack sm:pb-0',
           maxWidthClasses[maxWidth],
           paddingClasses[padding]
         )}

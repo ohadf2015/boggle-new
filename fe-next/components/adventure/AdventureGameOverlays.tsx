@@ -155,7 +155,7 @@ const AdventureGameOverlays = memo<AdventureGameOverlaysProps>(({
       effectCallbacks={bossEffectCallbacks} />
 
     {isBossLevel && isBossActive && !showBossIntro && !showLevelComplete && !playerHealthState.isDead && (
-      <div className="fixed bottom-[4.5rem] sm:bottom-24 lg:bottom-4 left-1/2 -translate-x-1/2 z-30 px-4 w-full max-w-md">
+      <div className="fixed bottom-[calc(4.5rem+var(--admob-banner-height,0px))] sm:bottom-[calc(6rem+var(--admob-banner-height,0px))] lg:bottom-[calc(1rem+var(--admob-banner-height,0px))] left-1/2 -translate-x-1/2 z-30 px-4 w-full max-w-md">
         <PlayerHealthBar healthState={playerHealthState} />
       </div>
     )}

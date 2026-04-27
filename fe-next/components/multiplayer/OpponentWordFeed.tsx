@@ -22,7 +22,7 @@ export function OpponentWordFeed({ feedItems, t }: OpponentWordFeedProps) {
   return (
     <div
       data-testid="opponent-word-feed"
-      className="pointer-events-none fixed bottom-20 left-3 z-40 flex flex-col gap-1.5 max-w-[260px]"
+      className="pointer-events-none fixed bottom-[calc(5rem+var(--admob-banner-height,0px))] left-3 z-40 flex flex-col gap-1.5 max-w-[260px]"
     >
       <AdaptiveAnimatePresence>
         {visibleItems.map((item) => {

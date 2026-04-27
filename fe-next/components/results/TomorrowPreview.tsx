@@ -62,7 +62,7 @@ const TomorrowPreview: React.FC<TomorrowPreviewProps> = memo(({ mode, onDismiss 
 
   return (
     <motion.div
-      className="fixed bottom-0 inset-x-0 z-[60] bg-neo-navy/95 backdrop-blur-xs border-t border-neo-yellow px-4 py-3 safe-area-bottom"
+      className="fixed bottom-[var(--admob-banner-height,0px)] inset-x-0 z-[60] bg-neo-navy/95 backdrop-blur-xs border-t border-neo-yellow px-4 py-3 safe-area-bottom"
       initial={slideVariants.initial}
       animate={slideVariants.animate}
       exit={slideVariants.exit}

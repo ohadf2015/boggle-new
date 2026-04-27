@@ -23,7 +23,7 @@ export default function AdventureShopFAB({
   return (
     <div
       className={cn(
-        'fixed bottom-6 z-20 lg:hidden',
+        'fixed bottom-[calc(1.5rem+var(--admob-banner-height,0px))] z-20 lg:hidden',
         isRTL ? 'left-5' : 'right-5'
       )}
     >

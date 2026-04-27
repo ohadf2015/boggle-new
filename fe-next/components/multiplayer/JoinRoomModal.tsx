@@ -181,7 +181,7 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
           </div>
         </DialogBody>
 
-        <DialogFooter className="sticky bottom-0 bg-inherit z-10 flex flex-col gap-2" style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom, 0.75rem))' }}>
+        <DialogFooter className="sticky bottom-0 bg-inherit z-10 flex flex-col gap-2" style={{ paddingBottom: 'calc(max(0.75rem, env(safe-area-inset-bottom, 0.75rem)) + var(--admob-banner-height, 0px))' }}>
           {room.maxPlayers && room.playerCount >= room.maxPlayers ? (
             <>
               <p className="text-xs text-center text-neo-white/50 font-bold">

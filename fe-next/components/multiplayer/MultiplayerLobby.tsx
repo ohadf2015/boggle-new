@@ -211,7 +211,7 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
   return (
     <>
       <div dir={dir} className="min-h-dvh bg-neo-navy flex flex-col overflow-y-auto scrollable-area">
-      <div className="w-[94%] max-w-7xl mx-auto py-2 flex-1 flex flex-col min-h-0 pb-(--mobile-bottom-safe)">
+      <div className="w-[94%] max-w-7xl mx-auto py-2 flex-1 flex flex-col min-h-0 pb-bottom-stack">
         {/* Compact Header: back button + title inline */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}

@@ -412,7 +412,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         />
 
         {/* Word Feedback — inline WordFormingArea */}
-        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40">
+        <div className="fixed bottom-[calc(1rem+var(--admob-banner-height,0px))] left-1/2 -translate-x-1/2 z-40">
           <WordFormingArea word={state.formedWord} letterCount={state.letterCount} feedback={state.wordFeedback} compact />
         </div>
 

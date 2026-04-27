@@ -123,7 +123,7 @@ export default function DailyHub() {
   }, []);
 
   return (
-    <div className="flex-1 flex flex-col items-center bg-neo-navy min-h-screen px-4 py-8">
+    <div className="flex-1 flex flex-col items-center bg-neo-navy min-h-screen px-4 pt-8 pb-bottom-stack sm:pb-8">
       <motion.div
         className="w-full max-w-md flex flex-col gap-6"
         initial={{ opacity: 0, y: 20 }}

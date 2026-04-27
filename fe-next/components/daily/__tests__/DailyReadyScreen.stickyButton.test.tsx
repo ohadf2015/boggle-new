@@ -2,8 +2,9 @@
  * Tests for DailyReadyScreen mobile sticky play button safe-area handling.
  *
  * Regression: sticky CTA used `fixed bottom-16` (64px) which clipped on iOS
- * notch and Android nav bars. Must use `--mobile-bottom-safe` CSS var
- * (tab-bar height + env(safe-area-inset-bottom)) to clear device chrome.
+ * notch and Android nav bars. Must use `--bottom-stack-height` CSS var
+ * (nav height + admob banner height + safe-area) to clear device chrome
+ * AND the AdMob banner when it's shown above the bottom nav.
  */
 
 import React from 'react';
@@ -56,7 +57,7 @@ describe('DailyReadyScreen - Mobile sticky button safe area', () => {
     t: (key: string) => key,
   };
 
-  it('mobile sticky play button uses --mobile-bottom-safe CSS var (not fixed 64px)', () => {
+  it('mobile sticky play button uses --bottom-stack-height CSS var (clears nav + banner)', () => {
     render(<DailyReadyScreen {...defaultProps} />);
 
     const playButtons = screen.getAllByRole('button', { name: /daily\.playButton/i });
@@ -70,6 +71,6 @@ describe('DailyReadyScreen - Mobile sticky button safe area', () => {
     const cls = stickyContainer!.className;
 
     expect(cls).not.toMatch(/\bbottom-16\b/);
-    expect(cls).toMatch(/bottom-\[var\(--mobile-bottom-safe\)\]/);
+    expect(cls).toMatch(/bottom-\[var\(--bottom-stack-height,0px\)\]/);
   });
 });

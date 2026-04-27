@@ -46,7 +46,7 @@ export function GestureTutorialTooltip() {
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -8, scale: 0.95 }}
           transition={{ duration: 0.3, ease: 'easeOut' }}
-          className="fixed bottom-24 inset-x-0 z-50 flex justify-center pointer-events-none px-4"
+          className="fixed bottom-[calc(6rem+var(--admob-banner-height,0px))] inset-x-0 z-50 flex justify-center pointer-events-none px-4"
         >
           <button
             type="button"

@@ -28,17 +28,17 @@ index c629139..462a14a 100644
                  rootView.setOnApplyWindowInsetsListener((v, insets) -> {
                      int bottomInset = insets.getSystemWindowInsetBottom();
                      int topInset = insets.getSystemWindowInsetTop();
-+                    // Honor caller-supplied margin so banner can clear bottom nav etc.
-+                    // Without this addition the listener overwrites the user margin
-+                    // with safe-area only and the banner overlaps fixed UI elements.
++                    // Honor caller-supplied margin via max(): summing with bottomInset
++                    // double-counts safe-area on Android 15+ (caller's margin already
++                    // includes it via --bottom-nav-height) and produces a visible gap.
 +                    int userMarginPx = (int) (adOptions.margin * v.getResources().getDisplayMetrics().density);
  
                      if ("TOP_CENTER".equals(adOptions.position)) {
 -                        mAdViewLayoutParams.setMargins(0, topInset, 0, 0);
-+                        mAdViewLayoutParams.setMargins(0, topInset + userMarginPx, 0, 0);
++                        mAdViewLayoutParams.setMargins(0, Math.max(topInset, userMarginPx), 0, 0);
                      } else {
 -                        mAdViewLayoutParams.setMargins(0, 0, 0, bottomInset);
-+                        mAdViewLayoutParams.setMargins(0, 0, 0, bottomInset + userMarginPx);
++                        mAdViewLayoutParams.setMargins(0, 0, 0, Math.max(bottomInset, userMarginPx));
                      }
  
                      mAdViewLayout.setLayoutParams(mAdViewLayoutParams);

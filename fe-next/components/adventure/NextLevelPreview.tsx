@@ -40,7 +40,7 @@ export function NextLevelPreview({
           exit={{ y: 200, opacity: 0 }}
           transition={{ type: 'spring', stiffness: 300, damping: 25, delay: 1.5 }}
           data-testid="next-level-preview"
-          className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 w-[90%] max-w-sm"
+          className="fixed bottom-[calc(1.5rem+var(--admob-banner-height,0px))] left-1/2 -translate-x-1/2 z-40 w-[90%] max-w-sm"
         >
           <div className="bg-neo-navy border-3 border-neo-black rounded-neo shadow-hard p-4">
             <div className="flex items-center justify-between mb-2">

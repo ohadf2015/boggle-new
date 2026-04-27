@@ -170,7 +170,7 @@ const TrainingHints: React.FC<TrainingHintsProps> = ({
               exit={{ opacity: 0, y: 20, scale: 0.98 }}
               transition={{ type: 'spring', damping: 25, stiffness: 200, delay: HINT_DELAY_MS / 1000 }}
               className={cn(
-                'fixed inset-x-4 bottom-20 z-50',
+                'fixed inset-x-4 bottom-[calc(5rem+var(--admob-banner-height,0px))] z-50',
                 'max-w-sm mx-auto'
               )}
             >

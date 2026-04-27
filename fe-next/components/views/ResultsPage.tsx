@@ -823,7 +823,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
 
         {/* Floating bottom bar — always-visible sticky CTA */}
         {gameCode && onReturnToRoom && (
-          <div className="shrink-0 fixed bottom-0 inset-x-0 z-50 text-neo-cream">
+          <div className="shrink-0 fixed bottom-[var(--admob-banner-height,0px)] inset-x-0 z-50 text-neo-cream">
             <motion.div
               initial={{ y: 60, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
@@ -878,7 +878,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
 
       {/* DESKTOP Sticky Ready Bar — pinned to bottom on md+ screens */}
       {gameCode && onReturnToRoom && (
-        <div className="hidden md:block fixed bottom-0 inset-x-0 z-50 bg-neo-navy text-neo-cream border-t-4 border-neo-black safe-area-pb">
+        <div className="hidden md:block fixed bottom-[var(--admob-banner-height,0px)] inset-x-0 z-50 bg-neo-navy text-neo-cream border-t-4 border-neo-black safe-area-pb">
           <div className="max-w-6xl mx-auto px-4 py-2.5">
             <StickyReadyBar
               isHost={isHost}

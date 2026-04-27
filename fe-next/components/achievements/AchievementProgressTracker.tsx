@@ -232,7 +232,7 @@ export const AchievementProgressTracker: React.FC<AchievementProgressTrackerProp
   }
 
   return (
-    <div className={cn("fixed bottom-20 ltr:right-4 rtl:left-4 z-40 space-y-2", className)}>
+    <div className={cn("fixed bottom-[calc(5rem+var(--admob-banner-height,0px))] ltr:right-4 rtl:left-4 z-40 space-y-2", className)}>
       {hasNearMilestone && (
         <div className="flex justify-center my-1">
           <Mascot variant={hasNearMilestone ? 'mindblown' : 'encouraging'} size="xs" animated clipBorder="none" />
