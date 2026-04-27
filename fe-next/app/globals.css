@@ -3124,25 +3124,16 @@ html {
 }
 
 /* When GlobalBottomNav is visible on mobile, reserve space so fixed nav
-   (h-16 + safe-area) never covers content. Applied to body.screen-fit
-   (the actual scroll container) because inner flex items with min-h-0
-   let content overflow past main's padding box. Padding on the scroll
-   container is counted in scrollable height, so the bottom 64px is
-   always reachable above the fixed nav. Keeps the .main-content-safe
-   rule as a belt-and-suspenders for any ad-hoc scrollable containers. */
+   (h-16 + safe-area) never covers content. Padding lives on body.screen-fit
+   alone — that's the actual scroll container (overflow-y:auto), so its
+   padding-bottom is counted in scrollable height. Layering the same rule on
+   <main> and main>div compounds visually (each rule shortens the next flex
+   child's box), creating ~2-3x of empty space below content.
+
+   Pages whose own scroll container is a descendant of <main> (rare) opt in
+   with the .pb-bottom-stack utility on that scroller. */
 @media (max-width: 639px) {
-  /* --bottom-stack-height already includes safe-area (each layer publishes its
-     own incl. inset). Don't add env(safe-area-inset-bottom) here — that triple-counts. */
   html.has-global-bottom-nav body.screen-fit {
-    padding-bottom: var(--bottom-stack-height);
-  }
-  html.has-global-bottom-nav .main-content-safe {
-    padding-bottom: var(--bottom-stack-height);
-  }
-  /* Belt-and-suspenders: pages whose own scroll container (overflow-y-auto on a
-     descendant of <main>) bypass body/main padding. Pad the immediate child of
-     main so the inner scroller's last content sits above the fixed nav. */
-  html.has-global-bottom-nav main.main-content-safe > div {
     padding-bottom: var(--bottom-stack-height);
   }
   html.has-global-bottom-nav {
