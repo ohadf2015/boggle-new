@@ -123,6 +123,38 @@ function getAllRoutes(): MetadataRoute.Sitemap {
   addForAllLocales(routes, '/lexiclash-vs-puzzly-words', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.85 });
   addForAllLocales(routes, '/lexiclash-vs-popple', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.85 });
 
+  // Per-locale competitor landings — locale-specific indexing for native switcher intent
+  routes.push({
+    url: `${BASE_URL}/sv/lexiclash-vs-wordfeud`,
+    lastModified: LAST_DEPLOYED,
+    changeFrequency: 'monthly',
+    priority: 0.85,
+    alternates: {
+      languages: {
+        'x-default': `${BASE_URL}/sv/lexiclash-vs-wordfeud`,
+        sv: `${BASE_URL}/sv/lexiclash-vs-wordfeud`,
+        'sv-SE': `${BASE_URL}/sv/lexiclash-vs-wordfeud`,
+      },
+    },
+  });
+  routes.push({
+    url: `${BASE_URL}/es/lexiclash-vs-apalabrados`,
+    lastModified: LAST_DEPLOYED,
+    changeFrequency: 'monthly',
+    priority: 0.85,
+    alternates: {
+      languages: {
+        'x-default': `${BASE_URL}/es/lexiclash-vs-apalabrados`,
+        es: `${BASE_URL}/es/lexiclash-vs-apalabrados`,
+        'es-ES': `${BASE_URL}/es/lexiclash-vs-apalabrados`,
+        'es-MX': `${BASE_URL}/es/lexiclash-vs-apalabrados`,
+        'es-AR': `${BASE_URL}/es/lexiclash-vs-apalabrados`,
+        'es-CO': `${BASE_URL}/es/lexiclash-vs-apalabrados`,
+        'es-US': `${BASE_URL}/es/lexiclash-vs-apalabrados`,
+      },
+    },
+  });
+
   // ─── Guides & Glossary ───
   addForAllLocales(routes, '/guides', { lastModified: GUIDES_UPDATED, changeFrequency: 'monthly', priority: 0.7 });
   const guideSlugs = ['classic-strategy', 'blast-strategy', 'word-hunt-strategy'];

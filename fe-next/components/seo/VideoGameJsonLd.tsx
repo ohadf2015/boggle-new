@@ -63,6 +63,12 @@ export function VideoGameJsonLd(props: VideoGameJsonLdProps = {}): ReactNode {
             name: 'LexiClash',
         },
         image: `${SITE_ORIGIN}/og-image-${lang}.webp`,
+        downloadUrl: 'https://play.google.com/store/apps/details?id=live.lexiclash.app',
+        installUrl: 'https://play.google.com/store/apps/details?id=live.lexiclash.app',
+        speakable: {
+            '@type': 'SpeakableSpecification',
+            cssSelector: ['h1', 'h2', '[data-speakable="true"]', 'main p:first-of-type'],
+        },
     };
 
     return (

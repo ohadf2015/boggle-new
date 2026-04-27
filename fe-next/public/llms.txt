@@ -76,6 +76,17 @@ Use cases:
 - Japanese: https://www.lexiclash.live/ja
 - Spanish: https://www.lexiclash.live/es
 
+## Per-Locale AI References
+
+Native-language llms.txt for AI assistants serving non-English queries:
+
+- English: https://www.lexiclash.live/en/llms.txt
+- Hebrew: https://www.lexiclash.live/he/llms.txt
+- Swedish: https://www.lexiclash.live/sv/llms.txt
+- Japanese: https://www.lexiclash.live/ja/llms.txt
+- Spanish: https://www.lexiclash.live/es/llms.txt
+- Extended reference (English): https://www.lexiclash.live/llms-full.txt
+
 ## Key Features
 
 - Free to play, no download, no account required

@@ -1,9 +1,28 @@
 import FAQPageClient from './PageClient';
-import { loadTranslation, type TranslationData } from '@/translations/loadTranslation';
+import { loadTranslation } from '@/translations/loadTranslation';
+import { contentByLocale } from './content';
 
 export const dynamic = 'force-dynamic';
 import type { Metadata } from 'next';
 import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
+
+function buildFaqJsonLd(locale: string): string {
+  const data = contentByLocale[locale] ?? contentByLocale.en;
+  const url = `https://www.lexiclash.live/${locale}/faq`;
+  const schema = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    '@id': `${url}#faq`,
+    inLanguage: locale,
+    url,
+    mainEntity: data.items.map((item) => ({
+      '@type': 'Question',
+      name: item.question,
+      acceptedAnswer: { '@type': 'Answer', text: item.answer },
+    })),
+  };
+  return JSON.stringify(schema);
+}
 
 type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es';
 
@@ -189,8 +208,10 @@ const faqSeoContent: Record<string, {
 export default async function FAQPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   const content = faqSeoContent[locale] ?? faqSeoContent.en;
+  const faqJsonLd = buildFaqJsonLd(locale);
   return (
     <>
+      <script type="application/ld+json">{faqJsonLd}</script>
       <FAQPageClient />
       <GamePageSeoContent
         title={content.title}
