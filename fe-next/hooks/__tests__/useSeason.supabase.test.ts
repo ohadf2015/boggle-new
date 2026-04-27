@@ -15,6 +15,7 @@ vi.mock('@/lib/supabase', () => ({
 
 vi.mock('@/lib/seasons', () => ({
   getCurrentSeason: () => ({ id: 1, name: 'Season 1', startDate: '2026-01-01', endDate: '2026-06-01' }),
+  getCurrentSeasonDynamic: () => ({ id: 1, name: 'Season 1', startDate: '2026-01-01', endDate: '2026-06-01' }),
   getSeasonTimeRemaining: () => ({ days: 30, hours: 5, minutes: 10 }),
   getSeasonRewards: () => ({ tier: 'Gold', rewards: [] }),
 }));
@@ -84,9 +85,13 @@ describe('useSeason - Supabase sync', () => {
     expect(mockSupabaseFrom).not.toHaveBeenCalled();
   });
 
-  it('syncs to Supabase on updatePeakTier for authenticated users', async () => {
+  it('updatePeakTier updates localStorage but does NOT write to Supabase', async () => {
+    // Post-20260426 seasons migration the JSONB column is array-shaped and
+    // populated server-side only by process_season_reset. The client used
+    // to write back here, which corrupted the array. The hook must now stay
+    // local-only on tier rises.
     mockAuth();
-    mockSupabaseSelect({ season_peak_tier: {} });
+    mockSupabaseSelect({ season_peak_tier: [] });
 
     const { result } = renderHook(() => useSeason());
     await waitFor(() => {
@@ -94,15 +99,15 @@ describe('useSeason - Supabase sync', () => {
     });
 
     vi.clearAllMocks();
-    mockSupabaseSelect({ season_peak_tier: {} }); // re-mock for update call
 
     act(() => {
       result.current.updatePeakTier(1800); // Diamond
     });
 
-    await waitFor(() => {
-      expect(mockSupabaseFrom).toHaveBeenCalledWith('profiles');
-    });
+    // Allow microtasks to flush; client must not have called Supabase.
+    await new Promise((r) => setTimeout(r, 30));
+    expect(mockSupabaseFrom).not.toHaveBeenCalled();
+    expect(result.current.peakTier).toBe('Diamond');
   });
 
   it('gracefully handles Supabase failure', async () => {

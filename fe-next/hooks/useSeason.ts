@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import {
-  getCurrentSeason,
+  getCurrentSeasonDynamic,
   getSeasonTimeRemaining,
   getSeasonRewards,
   type Season,
@@ -31,7 +31,7 @@ export interface UseSeasonReturn {
 }
 
 export function useSeason(): UseSeasonReturn {
-  const currentSeason = useMemo(() => getCurrentSeason(), []);
+  const currentSeason = useMemo(() => getCurrentSeasonDynamic(), []);
   const [timeRemaining, setTimeRemaining] = useState<TimeRemaining>(() => getSeasonTimeRemaining());
   const { user, isAuthenticated } = useAuth();
   const hasSyncedRef = useRef(false);
@@ -61,9 +61,19 @@ export function useSeason(): UseSeasonReturn {
       .single()
       .then(({ data, error }) => {
         if (error || !data) return;
-        const peakTiers = data.season_peak_tier as Record<string, string> | null;
-        if (peakTiers && peakTiers[String(currentSeason.id)]) {
-          const serverTier = peakTiers[String(currentSeason.id)];
+        // Schema is Array<{seasonId, tier, claimedAt?}> after the
+        // 20260426_seasons_infrastructure migration. Tolerate the legacy
+        // Record<string, string> shape too in case of rollback.
+        const peakTiers = data.season_peak_tier;
+        let serverTier: string | undefined;
+        if (Array.isArray(peakTiers)) {
+          const entry = (peakTiers as Array<{ seasonId: number; tier: string }>)
+            .find((e) => e?.seasonId === currentSeason.id);
+          serverTier = entry?.tier;
+        } else if (peakTiers && typeof peakTiers === 'object') {
+          serverTier = (peakTiers as Record<string, string>)[String(currentSeason.id)];
+        }
+        if (serverTier) {
           localStorage.setItem(peakKey, serverTier);
           setPeakTier(serverTier);
         }
@@ -78,24 +88,15 @@ export function useSeason(): UseSeasonReturn {
     return () => clearInterval(interval);
   }, []);
 
-  const syncPeakTierToSupabase = useCallback((newTier: string) => {
-    if (!isAuthenticated || !user?.id || !supabase) return;
-    // Read current, merge, write back
-    supabase
-      .from('profiles')
-      .select('season_peak_tier')
-      .eq('id', user.id)
-      .single()
-      .then(({ data }) => {
-        const current = (data?.season_peak_tier as Record<string, string>) ?? {};
-        const updated = { ...current, [String(currentSeason.id)]: newTier };
-        supabase!
-          .from('profiles')
-          .update({ season_peak_tier: updated })
-          .eq('id', user!.id)
-          .then(() => {}, () => {});
-      }, () => {});
-  }, [isAuthenticated, user, currentSeason.id]);
+  const syncPeakTierToSupabase = useCallback((_newTier: string) => {
+    // No-op: post-20260426 seasons migration, profiles.season_peak_tier is
+    // an Array<{seasonId, tier, claimedAt}> populated solely by the
+    // process_season_reset RPC at season end. Writing from the client here
+    // would corrupt the array shape with the legacy object form. Live tier
+    // tracking lives in localStorage (set by the caller) and on
+    // leaderboard.ranked_mmr; the JSONB array is archive-only.
+    void _newTier;
+  }, []);
 
   const updatePeakTier = useCallback((elo: number) => {
     const tier = getRankTier(elo);

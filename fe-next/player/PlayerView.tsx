@@ -198,16 +198,18 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
   // Combo timer visual feedback (RAF-based, threshold updates)
   const { comboTimeRemaining, comboDanger } = useComboTimer(comboLevel, lastWordTime);
 
+  // Tournament state
+  const [tournamentData, _setTournamentData] = useState<TournamentData | null>(null);
+
   // CrazyGames SDK lifecycle (gameplayStart/Stop, happyTime) — required for full launch
+  // roundKey resets the lifecycle between tournament rounds so each round emits SDK calls.
   useCrazyGamesLifecycle({
     isGameActive: gameActive,
     isGameOver: waitingForResults,
     score: leaderboard.find(p => p.username === username)?.score ?? 0,
     maxCombo: comboLevel,
+    roundKey: tournamentData?.currentRound ?? 0,
   });
-
-  // Tournament state
-  const [tournamentData, _setTournamentData] = useState<TournamentData | null>(null);
   const [tournamentStandings, _setTournamentStandings] = useState<TournamentStanding[]>([]);
   const [showTournamentStandings, setShowTournamentStandings] = useState<boolean>(false);
 

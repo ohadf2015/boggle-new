@@ -14,8 +14,8 @@ import HostPreGameView from '../host/components/HostPreGameView';
 import type { DifficultyLevel } from '@/shared/types/game';
 
 // Mock framer-motion
-vi.mock('framer-motion', () => ({
-  motion: {
+vi.mock('framer-motion', () => {
+  const motion = {
     div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => {
       const { initial, animate, exit, transition, whileTap, whileHover, ...validProps } = props;
       return <div {...validProps}>{children}</div>;
@@ -28,9 +28,19 @@ vi.mock('framer-motion', () => ({
       const { initial, animate, exit, transition, whileTap, whileHover, ...validProps } = props;
       return <span {...validProps}>{children}</span>;
     },
-  },
-  AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
-}));
+  };
+  return {
+    motion,
+    m: motion,
+    LazyMotion: ({ children }: React.PropsWithChildren) => <>{children}</>,
+    domAnimation: {},
+    AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
+    useReducedMotion: () => false,
+  };
+});
+
+vi.mock('@/components/boosts/BoostButton', () => ({ BoostButton: () => null }));
+vi.mock('@/components/boosts/BoostPicker', () => ({ BoostPicker: () => null }));
 
 vi.mock('../utils/SocketContext', () => ({
   useSocket: () => ({ socket: null }),

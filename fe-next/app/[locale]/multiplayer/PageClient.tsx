@@ -413,6 +413,10 @@ export default function MultiplayerPageClient(): React.JSX.Element {
             signalIntentionalLeave();
             socket?.emit('leaveRoom', { gameCode });
             setIsActive(false); setIsHost(false); setGameCode('');
+            // Clear results so a subsequent rejoin doesn't render the prior
+            // game's results page for a frame before the socket reconnects
+            // (audit UX-MED-17).
+            setShowResults(false); setResultsData(null);
             clearSession();
             toast(t('multiplayerFlow.roomList.leftGame'), { icon: '👋' });
           }} /> : <ConnectionDot />}

@@ -26,6 +26,8 @@ import { InlineBannerAd } from '@/components/ads';
 import NearRankIndicator from '@/components/leaderboard/NearRankIndicator';
 import { TierBadge, TierProgressBar } from '@/components/ui/TierBadge';
 import { useTierPromotion } from '@/hooks/useTierPromotion';
+import { SeasonLeaderboardTabs, type SeasonTabKey } from '@/components/seasons/SeasonLeaderboardTabs';
+import { SeasonBanner } from '@/components/multiplayer/SeasonBanner';
 import {
   getGlobalLeaderboardTier,
   getLeaderboardTierProgress,
@@ -64,6 +66,7 @@ export default function LeaderboardPageClient(): React.JSX.Element {
   const router = useRouter();
   const isDarkMode = theme === 'dark';
   const [activeTab, setActiveTab] = useState<'players' | 'creators'>('players');
+  const [seasonScope, setSeasonScope] = useState<SeasonTabKey>('season');
 
   // Use real-time hooks for live leaderboard updates
   const {
@@ -216,6 +219,22 @@ export default function LeaderboardPageClient(): React.JSX.Element {
 
         {activeTab === 'creators' ? (
           <CreatorLeaderboard />
+        ) : (
+        <>
+        <div className="mb-4">
+          <SeasonBanner />
+        </div>
+
+        <div className="mb-4 flex justify-center">
+          <SeasonLeaderboardTabs active={seasonScope} onChange={setSeasonScope} />
+        </div>
+
+        {seasonScope !== 'season' ? (
+          <EnhancedEmptyState
+            icon="sparkles"
+            title={t(seasonScope === 'allTime' ? 'season.allTime' : 'season.pastSeasons')}
+            description={t('season.noPastSeasons')}
+          />
         ) : (
         <>
         {/* User's Rank Card (if authenticated) */}
@@ -421,6 +440,9 @@ export default function LeaderboardPageClient(): React.JSX.Element {
             </div>
           </motion.div>
         </PageStateHandler>
+
+        </>
+        )}
 
         </>
         )}

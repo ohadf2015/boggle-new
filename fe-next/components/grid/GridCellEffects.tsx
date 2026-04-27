@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import type { ComboColors, PerformanceMode } from './types';
 import { getSelectionEscalation } from './selectionEscalation';
 import VFXTileEffect from './VFXTileEffect';
@@ -82,7 +82,7 @@ const GridCellEffects = memo<GridCellEffectsProps>(function GridCellEffects({
   return (
     <>
       {/* Primary ripple — color compounds from both systems */}
-      <motion.div
+      <m.div
         className="absolute inset-0"
         style={{ borderRadius: '6px', background: rippleGradient }}
         initial={{ scale: 0.3, opacity: 1 }}
@@ -92,7 +92,7 @@ const GridCellEffects = memo<GridCellEffectsProps>(function GridCellEffects({
 
       {/* Secondary glow pulse — full mode, compounds */}
       {effectiveRenderMode === 'full' && (
-        <motion.div
+        <m.div
           className="absolute inset-[-4px] pointer-events-none"
           style={{
             background: glowGradient,
@@ -110,7 +110,7 @@ const GridCellEffects = memo<GridCellEffectsProps>(function GridCellEffects({
 
       {/* Glow ring — appears when EITHER system triggers (tier 1+ or combo 3+) */}
       {compoundTier >= 1 && !reduceMotion && (
-        <motion.div
+        <m.div
           className="absolute inset-[-6px] pointer-events-none"
           style={{
             borderRadius: '12px',
@@ -135,7 +135,7 @@ const GridCellEffects = memo<GridCellEffectsProps>(function GridCellEffects({
             const colors = escalation.particleColors;
             const color = colors[idx % colors.length];
             return (
-              <motion.div
+              <m.div
                 key={`first-burst-${idx}`}
                 className="absolute pointer-events-none rounded-full"
                 style={{
@@ -167,7 +167,7 @@ const GridCellEffects = memo<GridCellEffectsProps>(function GridCellEffects({
             const angle = (idx * (360 / escalation.particleCount) + 30) * (Math.PI / 180);
             const color = escalation.particleColors[idx % escalation.particleColors.length];
             return (
-              <motion.div
+              <m.div
                 key={`esc-burst-${idx}`}
                 className="absolute rounded-full pointer-events-none"
                 style={{
@@ -209,7 +209,7 @@ const GridCellEffects = memo<GridCellEffectsProps>(function GridCellEffects({
                 : ['#FF6B35', '#FFE135', '#FF3366', '#FFA500', '#FFD700', '#FF9500'];
             const pColor = pColors[idx % pColors.length];
             return (
-              <motion.div
+              <m.div
                 key={`combo-burst-${idx}`}
                 className="absolute rounded-full pointer-events-none"
                 style={{

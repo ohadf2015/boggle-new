@@ -252,8 +252,11 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
       ? selectNextGameMode(game.modeHistory || [], ALL_GAME_MODES)
       : gameMode as GameMode;
 
-    // Default blast MP to 90s when host didn't set an explicit timer
-    if (resolvedMode === 'blast' && !timerSeconds) {
+    // Blast mode is balanced around BLAST_MP_DEFAULT_TIMER (90s) — word density
+    // and combo math assume the canonical window. Force-override any client-
+    // supplied timer so a host can't request 30s Blast and skew balance
+    // (audit SRV-M4).
+    if (resolvedMode === 'blast') {
       validTimer = BLAST_MP_DEFAULT_TIMER;
     }
 
@@ -293,8 +296,14 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
       return;
     }
 
-    // State machine now guards against concurrent starts — release the mutex
-    gamesStarting.delete(gameCode);
+    // Hold the mutex through the entire game-setup async chain. If we released
+    // here (right after the state transition) and a duplicate `startGame`
+    // arrived during the awaits below (dict load, classroom lookup, board solve),
+    // the duplicate would pass the mutex check, hit the state-machine guard
+    // (state is now 'in-progress', not 'waiting'), and fall into the self-heal
+    // branch which force-resets the in-flight game. Holding the mutex until the
+    // setup chain finishes prevents that race (audit SRV-H4).
+    try {
 
     broadcastToRoom(io, getGameRoom(gameCode), 'gameStarting', {
       gameMode: resolvedMode,
@@ -388,13 +397,26 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
     // Auto-add bots if solo player started the game
     const autoAddResult = await autoAddBotsForSoloPlayer(gameCode, game);
     if (autoAddResult.botsAdded > 0) {
+      // SECURITY: solo→multiplayer grid regen (audit SRV-CRIT-4).
+      // The earlier line-334 regen check let solo (1 player) games keep the
+      // client-supplied grid. Auto-adding bots converts that into a competitive
+      // multiplayer game — without this regen, the host's rigged board would
+      // ride into the bot match. Drop the rigged grid here.
+      letterGrid = vocabToEmbed.length > 0
+        ? generateRandomTable(6, 6, gameLang, vocabToEmbed)
+        : generateRandomTable(6, 6, gameLang);
+      const newPositions = makePositionsMap(letterGrid);
+      updateGame(gameCode, { letterGrid });
+      const regenGame = getGame(gameCode);
+      if (regenGame) regenGame.letterPositions = newPositions;
+
       // Re-initialize player data to include bots
       initializePlayerData(gameCode);
       // Broadcast updated user list so clients see the bots
       broadcastToRoom(io, getGameRoom(gameCode), 'updateUsers', {
         users: getGameUsers(gameCode),
       });
-      logger.info('BOT', `Auto-added ${autoAddResult.botsAdded} bots for solo player in ${gameCode}`);
+      logger.info('BOT', `Auto-added ${autoAddResult.botsAdded} bots for solo player in ${gameCode} (grid regenerated)`);
     }
 
     const users = getGameUsers(gameCode);
@@ -541,5 +563,9 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
     }).catch((err: Error) => {
       logger.error('SOCKET', `Failed to notify game started for ${gameCode}: ${err.message}`);
     });
+    } finally {
+      // Mutex released only after all setup completes (or throws). See SRV-H4 above.
+      gamesStarting.delete(gameCode);
+    }
   });
 }

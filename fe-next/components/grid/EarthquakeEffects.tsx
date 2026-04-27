@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 
 export interface EarthquakeParticle {
   id: number;
@@ -37,7 +37,7 @@ const EarthquakeEffects = memo<EarthquakeEffectsProps>(function EarthquakeEffect
       {/* Earthquake Particle Debris */}
       <AnimatePresence>
         {particles.map((particle) => (
-          <motion.div
+          <m.div
             key={particle.id}
             className="absolute pointer-events-none rounded-full"
             style={{
@@ -78,7 +78,7 @@ const EarthquakeEffects = memo<EarthquakeEffectsProps>(function EarthquakeEffect
       {/* Earthquake Dust Clouds */}
       <AnimatePresence>
         {dust.map((d) => (
-          <motion.div
+          <m.div
             key={d.id}
             className="absolute pointer-events-none"
             style={{

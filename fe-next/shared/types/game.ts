@@ -150,6 +150,12 @@ export interface WordDetail {
   isFirstFinder?: boolean;
   /** Whether this word is from lesson vocabulary (classroom games only) */
   fromLesson?: boolean;
+  /**
+   * Server-clock submit time (Date.now()). Required for the scoreMultiplier
+   * boost to verify a word landed inside the boost window (audit SRV-CRIT-1).
+   * Optional so existing surfaces that don't need it stay backwards-compatible.
+   */
+  timestamp?: number;
 }
 
 /** Entry tracking who found a word first */

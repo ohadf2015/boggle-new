@@ -4364,7 +4364,17 @@ const en = {
     "gamesPlayed": "Games Played",
     "newSeason": "New Season",
     "rewardCoins": "Coins Earned",
-    "softReset": "Rank Reset"
+    "softReset": "Rank Reset",
+    "claimRewards": "Claim Rewards",
+    "claim": "Claim",
+    "alreadyClaimed": "Already claimed",
+    "rewardEarned": "You earned {{coins}} coins!",
+    "thisSeason": "This Season",
+    "allTime": "All Time",
+    "pastSeasons": "Past Seasons",
+    "noPastSeasons": "No past seasons yet",
+    "rankedAt": "Rank #{{position}}",
+    "tierLabel": "Tier"
   },
   "growth": {
     "dayStreak": "day streak",

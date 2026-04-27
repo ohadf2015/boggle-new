@@ -7,6 +7,7 @@ import {
   pgTable,
   text,
   integer,
+  bigserial,
   timestamp,
   boolean,
   jsonb,
@@ -59,23 +60,75 @@ export const profiles = pgTable('profiles', {
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
 });
 
-// ── leaderboard (001 + 005) ────────────────────────────────────────
-export const leaderboard = pgTable('leaderboard', {
-  playerId: uuid('player_id')
-    .primaryKey()
-    .references(() => profiles.id, { onDelete: 'cascade' }),
-  username: text('username').notNull(),
-  avatarEmoji: text('avatar_emoji'),
-  avatarColor: text('avatar_color'),
-  totalScore: integer('total_score').default(0),
-  gamesPlayed: integer('games_played').default(0),
-  gamesWon: integer('games_won').default(0),
-  rankedMmr: integer('ranked_mmr').default(1000),
-  rankPosition: integer('rank_position'),
-  totalXp: integer('total_xp').default(0),
-  currentLevel: integer('current_level').default(1),
-  lastUpdated: timestamp('last_updated', { withTimezone: true }).defaultNow(),
+// ── seasons (20260426160000) ───────────────────────────────────────
+export const seasons = pgTable('seasons', {
+  id: integer('id').primaryKey(),
+  name: text('name').notNull(),
+  theme: text('theme').notNull(),
+  startDate: timestamp('start_date', { withTimezone: true }).notNull(),
+  endDate: timestamp('end_date', { withTimezone: true }).notNull(),
+  status: text('status').notNull().default('active'),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
 });
+
+// ── leaderboard (001 + 005 + 20260426160000 composite UNIQUE) ──────
+// Real PK is on `id` (uuid auto-gen). Player×season uniqueness is
+// enforced by the composite UNIQUE constraint added in the seasons
+// infrastructure migration.
+export const leaderboard = pgTable(
+  'leaderboard',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    playerId: uuid('player_id')
+      .notNull()
+      .references(() => profiles.id, { onDelete: 'cascade' }),
+    seasonId: integer('season_id')
+      .notNull()
+      .default(1)
+      .references(() => seasons.id),
+    username: text('username').notNull(),
+    avatarEmoji: text('avatar_emoji'),
+    avatarColor: text('avatar_color'),
+    totalScore: integer('total_score').default(0),
+    gamesPlayed: integer('games_played').default(0),
+    gamesWon: integer('games_won').default(0),
+    rankedMmr: integer('ranked_mmr').default(1000),
+    rankPosition: integer('rank_position'),
+    totalXp: integer('total_xp').default(0),
+    currentLevel: integer('current_level').default(1),
+    lastUpdated: timestamp('last_updated', { withTimezone: true }).defaultNow(),
+  },
+  (table) => [
+    uniqueIndex('leaderboard_player_id_season_id_key').on(table.playerId, table.seasonId),
+    index('idx_lb_season_score').on(table.seasonId, table.totalScore),
+  ]
+);
+
+// ── season_leaderboards archive (20260426160000) ───────────────────
+export const seasonLeaderboards = pgTable(
+  'season_leaderboards',
+  {
+    id: bigserial('id', { mode: 'number' }).primaryKey(),
+    seasonId: integer('season_id')
+      .notNull()
+      .references(() => seasons.id),
+    playerId: uuid('player_id')
+      .notNull()
+      .references(() => profiles.id, { onDelete: 'set null' }),
+    username: text('username').notNull(),
+    totalScore: integer('total_score').notNull().default(0),
+    gamesPlayed: integer('games_played').notNull().default(0),
+    gamesWon: integer('games_won').notNull().default(0),
+    rankedMmr: integer('ranked_mmr'),
+    rankPosition: integer('rank_position').notNull(),
+    peakTier: text('peak_tier'),
+    archivedAt: timestamp('archived_at', { withTimezone: true }).defaultNow(),
+  },
+  (table) => [
+    uniqueIndex('uq_season_lb_player').on(table.seasonId, table.playerId),
+    index('idx_season_lb_rank').on(table.seasonId, table.rankPosition),
+  ]
+);
 
 // ── game_results (001) ─────────────────────────────────────────────
 export const gameResults = pgTable('game_results', {

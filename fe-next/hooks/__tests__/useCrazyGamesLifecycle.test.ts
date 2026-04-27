@@ -97,6 +97,44 @@ describe('useCrazyGamesLifecycle', () => {
       // THEN gameplayStart should NOT be called again
       expect(mockGameplayStart).toHaveBeenCalledTimes(1);
     });
+
+    it('should call gameplayStart again on tournament round transition (roundKey change)', () => {
+      // GIVEN round 1 is active and ended
+      const { rerender } = renderHook(
+        ({ isGameActive, isGameOver, roundKey }) =>
+          useCrazyGamesLifecycle({ isGameActive, isGameOver, roundKey }),
+        { initialProps: { isGameActive: true, isGameOver: false, roundKey: 1 } }
+      );
+      expect(mockGameplayStart).toHaveBeenCalledTimes(1);
+
+      // WHEN round 1 ends
+      rerender({ isGameActive: false, isGameOver: true, roundKey: 1 });
+      expect(mockGameplayStop).toHaveBeenCalledTimes(1);
+
+      // AND round 2 starts (roundKey changes, isGameActive flips back true)
+      rerender({ isGameActive: false, isGameOver: false, roundKey: 2 });
+      rerender({ isGameActive: true, isGameOver: false, roundKey: 2 });
+
+      // THEN gameplayStart should fire again for round 2
+      expect(mockGameplayStart).toHaveBeenCalledTimes(2);
+    });
+
+    it('should not reset on roundKey change while game is mid-round', () => {
+      // GIVEN game active in round 1
+      const { rerender } = renderHook(
+        ({ roundKey }) =>
+          useCrazyGamesLifecycle({ isGameActive: true, isGameOver: false, roundKey }),
+        { initialProps: { roundKey: 1 } }
+      );
+      expect(mockGameplayStart).toHaveBeenCalledTimes(1);
+
+      // WHEN roundKey changes mid-round (shouldn't happen in practice but defensive)
+      rerender({ roundKey: 2 });
+
+      // THEN reset should still allow next gameplayStart cycle without double-fire
+      // (no extra calls until isGameActive flips false→true)
+      expect(mockGameplayStart).toHaveBeenCalledTimes(1);
+    });
   });
 
   describe('happyTime triggers', () => {

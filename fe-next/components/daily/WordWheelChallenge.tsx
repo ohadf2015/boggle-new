@@ -219,7 +219,10 @@ const WordWheelChallenge: React.FC = () => {
       completedAt: new Date().toISOString(),
     });
 
-    // Submit to server for leaderboard
+    // Submit to server for leaderboard. If the server reports the player
+    // already submitted today (cross-device replay or post-timeout retry),
+    // reconcile localStorage + UI to the canonical row instead of leaving the
+    // wasted-replay score in place.
     const longestWord = result.wordsFound.reduce((a, b) => b.length > a.length ? b : a, '');
     const submitBody = {
       puzzleDate: date,
@@ -240,11 +243,50 @@ const WordWheelChallenge: React.FC = () => {
       centerLetter: puzzle?.centerLetter || undefined,
     };
 
-    fetch('/api/daily-challenge/word-wheel/submit', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(submitBody),
-    }).catch(() => { /* leaderboard submission is best-effort */ });
+    void (async () => {
+      try {
+        const resp = await fetch('/api/daily-challenge/word-wheel/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(submitBody),
+        });
+        if (!resp.ok) return;
+        const json = (await resp.json()) as {
+          alreadySubmitted?: boolean;
+          result?: {
+            score: number;
+            wordCount: number;
+            wordsFound: string[];
+            longestWord: string | null;
+            timeSeconds: number;
+            centerLetter: string | null;
+            completedAt: string | null;
+          } | null;
+        };
+        if (json?.alreadySubmitted && json.result) {
+          const c = json.result;
+          saveWordWheelResult({
+            puzzleNumber,
+            puzzleDate: date,
+            language: gameLang,
+            centerLetter: c.centerLetter || '',
+            wordsFound: c.wordsFound,
+            totalPossible: 0,
+            score: c.score,
+            timeSeconds: c.timeSeconds,
+            streakDays: streak.currentStreak,
+            completedAt: c.completedAt || new Date().toISOString(),
+          });
+          setGameResult({
+            wordsFound: c.wordsFound,
+            score: c.score,
+            timeSeconds: c.timeSeconds,
+          });
+        }
+      } catch {
+        /* leaderboard submission is best-effort */
+      }
+    })();
 
     setPhase('completed');
   }, [language, puzzle, puzzleNumber, setGameActive, isAuthenticated, profile]);

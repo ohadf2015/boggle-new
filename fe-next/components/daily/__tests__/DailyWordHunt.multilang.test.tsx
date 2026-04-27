@@ -16,15 +16,21 @@ import { LanguageProvider } from '@/contexts/LanguageContext';
 import type { LetterGrid, Language } from '@/types';
 
 // Mock framer-motion to avoid matchMedia issues
-vi.mock('framer-motion', () => ({
-  motion: {
+vi.mock('framer-motion', () => {
+  const motion = {
     div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => {
       const { initial, animate, exit, whileHover, whileTap, transition, variants, ...domProps } = props as Record<string, unknown>;
       return <div {...domProps}>{children}</div>;
     },
-  },
-  AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
-}));
+  };
+  return {
+    motion,
+    m: motion,
+    LazyMotion: ({ children }: React.PropsWithChildren) => <>{children}</>,
+    domAnimation: {},
+    AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
+  };
+});
 
 // Mock contexts and hooks
 vi.mock('@/contexts/NavigationContext', () => ({

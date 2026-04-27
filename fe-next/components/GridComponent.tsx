@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, memo, useMemo, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence, LazyMotion, domAnimation } from 'framer-motion';
 import { cn } from '../lib/utils';
 import type { LetterGrid, Language } from '@/types';
 
@@ -329,6 +329,9 @@ const GridComponent = memo<GridComponentProps>(({
     () => getSelectionEscalation(0, selectedCells.length, effectiveCombo).tier,
     [selectedCells.length, effectiveCombo],
   );
+  // Boolean view of currentTier for non-selected cells: only flips at the tier-3
+  // boundary, so cells skip re-render waves when escalation crosses tier 1→2.
+  const isHighTier = currentTier >= 3;
 
   // Tier transition flash — fires once when crossing a tier boundary
   const prevTierRef = useRef(0);
@@ -357,6 +360,7 @@ const GridComponent = memo<GridComponentProps>(({
   }), [grid]);
 
   return (
+    <LazyMotion features={domAnimation} strict>
     <div className="relative w-full h-full flex items-center justify-center">
       <div
         className="sr-only"
@@ -370,7 +374,7 @@ const GridComponent = memo<GridComponentProps>(({
       {!hideWordPreview && (
         <AnimatePresence>
           {interactive && selectedCells.length > 0 && (
-            <motion.div
+            <m.div
               initial={{ opacity: 0, y: -20, scale: 0.9 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -10, scale: 0.95 }}
@@ -386,7 +390,7 @@ const GridComponent = memo<GridComponentProps>(({
                   {selectedCells.length}
                 </span>
               </div>
-            </motion.div>
+            </m.div>
           )}
         </AnimatePresence>
       )}
@@ -395,7 +399,7 @@ const GridComponent = memo<GridComponentProps>(({
         <ComboIndicator comboLevel={comboLevel} reduceMotion={reduceMotion} />
       )}
 
-      <motion.div
+      <m.div
         className={cn("game-board-frame relative", equippedBoardTheme && `cosmetic-board-${equippedBoardTheme.replace('board-', '')}`)}
         animate={earthquakePhase === 'quake' && useEnhancedMode ? {
           x: [0, -8, 8, -6, 6, -4, 4, -2, 2, 0],
@@ -511,7 +515,7 @@ const GridComponent = memo<GridComponentProps>(({
                   isDragging={isDragging}
                   isTypingMode={isTypingMode}
                   hintAnimationPhase={hintAnimationPhase}
-                  currentTier={currentTier}
+                  isHighTier={isHighTier}
                   selectedCellsLength={isSelected || isLastSelected ? selectedCells.length : hasAnySelection}
                   onTouchStart={handleCellTouchStart}
                   onMouseDown={handleCellMouseDown}
@@ -526,7 +530,7 @@ const GridComponent = memo<GridComponentProps>(({
         {/* Tier transition flash overlay */}
         <AnimatePresence>
           {tierFlash !== null && (
-            <motion.div
+            <m.div
               key={`tier-flash-${tierFlash}`}
               className="absolute inset-0 pointer-events-none z-30 rounded-neo"
               style={{
@@ -557,8 +561,9 @@ const GridComponent = memo<GridComponentProps>(({
             {/* InputModeIndicator removed — overlaps grid tiles and confuses players */}
           </>
         )}
-      </motion.div>
+      </m.div>
     </div>
+    </LazyMotion>
   );
 });
 

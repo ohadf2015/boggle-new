@@ -1,0 +1,25 @@
+diff --git a/node_modules/custom-pixi-particles/dist/lib/util/Color.js b/node_modules/custom-pixi-particles/dist/lib/util/Color.js
+index 7f7aeec..b98ddd8 100644
+--- a/node_modules/custom-pixi-particles/dist/lib/util/Color.js
++++ b/node_modules/custom-pixi-particles/dist/lib/util/Color.js
+@@ -153,10 +153,16 @@ export default class Color {
+      * @returns {number} The hex value of the Color object
+      */
+     get hex() {
+-        let hex = this.r << 16;
+-        hex = hex | (this.g << 8);
+-        hex = hex | this.b;
+-        return hex;
++        // PATCH: clamp channels to [0,255] before bitwise-OR.
++        // Upstream bug: when r/g/b drift below 0 (e.g. behaviour overshoot, fade
++        // interpolation), `r << 16` sign-extends to negative int32, producing
++        // values like -1 / -2. PixiJS v8 then throws "Unable to convert color -1"
++        // from sprite.tint = ..., crashing the Ticker on every frame.
++        // Repro: 113 of 176 $exception events on /he/blast (PostHog 2026-04-27).
++        const r = Math.max(0, Math.min(255, this.r | 0));
++        const g = Math.max(0, Math.min(255, this.g | 0));
++        const b = Math.max(0, Math.min(255, this.b | 0));
++        return (r << 16) | (g << 8) | b;
+     }
+     /**
+      * @function hex

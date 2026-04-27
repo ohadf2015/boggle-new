@@ -127,6 +127,18 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
 
       const { gameCode, roomName, language, hostUsername, playerId, avatar, authUserId, guestTokenHash, guestSessionId, isRanked, isPrivate } = validation.data as CreateGamePayload;
 
+      // Ranked rooms must be hosted by an authenticated user — guests can't
+      // submit results that update the ranked MMR leaderboard, so allowing
+      // them to flag their room as ranked would silently waste matchmaking
+      // intent and pollute lobby filters (audit SRV-CRIT-2).
+      if (isRanked && !authUserId) {
+        logger.warn('SOCKET', `Rejected ranked room ${gameCode}: host not authenticated`);
+        emitError(socket, ErrorCodes.AUTH_FORBIDDEN, {
+          message: 'Ranked rooms require a signed-in host',
+        });
+        return;
+      }
+
       logger.info('SOCKET', `Create game request: ${gameCode} by ${hostUsername}${isRanked ? ' (RANKED)' : ''}`, {
         socketId: socket.id,
         hasAvatar: !!avatar,

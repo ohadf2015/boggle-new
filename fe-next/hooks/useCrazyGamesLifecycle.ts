@@ -55,6 +55,12 @@ interface CrazyGamesLifecycleOptions {
   maxCombo?: number;
   /** Number of words found (triggers happyTime at threshold) */
   wordsFound?: number;
+  /**
+   * Unique identifier per gameplay session — change between tournament rounds /
+   * rematches to reset internal start/end refs so `gameplayStart()` fires again.
+   * If omitted, only the first session lifecycle is reported (legacy behaviour).
+   */
+  roundKey?: string | number;
   /** Configuration options */
   config?: CrazyGamesLifecycleConfig;
 }
@@ -114,6 +120,7 @@ export function useCrazyGamesLifecycle({
   score = 0,
   maxCombo = 0,
   wordsFound = 0,
+  roundKey,
   config = {},
 }: CrazyGamesLifecycleOptions): CrazyGamesLifecycleReturn {
   const {
@@ -201,6 +208,23 @@ export function useCrazyGamesLifecycle({
       },
     });
   }, [isAvailable, sdkShowMidgameAd, pauseOnAd, onAdStart, onAdEnd]);
+
+  // Reset start/end refs when roundKey changes AFTER a round ended.
+  // This lets tournament round 2+ fire gameplayStart again. Skipped when game
+  // is mid-round so a stray prop change doesn't double-fire start.
+  const lastRoundKeyRef = useRef(roundKey);
+  useEffect(() => {
+    if (lastRoundKeyRef.current === roundKey) return;
+    lastRoundKeyRef.current = roundKey;
+    if (hasStartedRef.current && hasEndedRef.current) {
+      hasStartedRef.current = false;
+      hasEndedRef.current = false;
+      hasTriggeredHappyTimeRef.current = false;
+      scoreTriggeredRef.current = false;
+      setHasStarted(false);
+      setHasEnded(false);
+    }
+  }, [roundKey]);
 
   // Signal loading between game sessions (CrazyGames uses this for load time metrics)
   const hasSignaledLoadingRef = useRef(false);

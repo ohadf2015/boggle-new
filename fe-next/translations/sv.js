@@ -4259,7 +4259,17 @@ const sv = {
     "gamesPlayed": "Spelade spel",
     "newSeason": "Ny säsong",
     "rewardCoins": "Mynt intjänade",
-    "softReset": "Rankåterställning"
+    "softReset": "Rankåterställning",
+    "claimRewards": "Hämta belöningar",
+    "claim": "Hämta",
+    "alreadyClaimed": "Redan hämtad",
+    "rewardEarned": "Du tjänade {{coins}} mynt!",
+    "thisSeason": "Denna säsong",
+    "allTime": "Genom tiderna",
+    "pastSeasons": "Tidigare säsonger",
+    "noPastSeasons": "Inga tidigare säsonger ännu",
+    "rankedAt": "Plats #{{position}}",
+    "tierLabel": "Nivå"
   },
   "growth": {
     "dayStreak": "dagars svit",

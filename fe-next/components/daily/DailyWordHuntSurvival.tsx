@@ -341,6 +341,18 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     onQuit();
   };
 
+  // Stable callbacks for SurvivalDesktopLayout — inline arrows broke the memo()
+  // wrap on the layout, so every life-drain tick re-rendered the whole 3-column
+  // tree (and through it, the grid). The setters are individually useCallback'd
+  // in useSurvivalGameLogic; destructure to give exhaustive-deps a clean signal.
+  const { setLifeGainAmount, setShowQuitConfirm } = actions;
+  const handleLifeGainComplete = useCallback(() => {
+    setLifeGainAmount(null);
+  }, [setLifeGainAmount]);
+  const handleQuitClick = useCallback(() => {
+    setShowQuitConfirm(true);
+  }, [setShowQuitConfirm]);
+
   const extraLifeModal = extraLifeModalOpen ? (
     <SurvivalExtraLifeModal
       isOpen
@@ -374,7 +386,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
           isLifeGaining={state.isLifeGaining}
           lifeGainAmount={state.lifeGainAmount}
           skipAnimations={skipAnimations}
-          onLifeGainComplete={() => actions.setLifeGainAmount(null)}
+          onLifeGainComplete={handleLifeGainComplete}
           liveScore={state.liveScore}
           lastScoreIncrement={state.lastScoreIncrement}
           isScoreAnimating={state.isScoreAnimating}
@@ -395,7 +407,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
           language={language}
           currentPlayerId={currentPlayerId ?? null}
           currentGuestFingerprint={currentGuestFingerprint ?? null}
-          onQuitClick={() => actions.setShowQuitConfirm(true)}
+          onQuitClick={handleQuitClick}
           t={t}
         />
 
@@ -461,7 +473,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         liveScore={state.liveScore}
         lastScoreIncrement={state.lastScoreIncrement}
         isScoreAnimating={state.isScoreAnimating}
-        onQuitClick={() => actions.setShowQuitConfirm(true)}
+        onQuitClick={handleQuitClick}
         t={t}
       />
 
@@ -547,7 +559,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
           isLifeGaining={state.isLifeGaining}
           lifeGainAmount={state.lifeGainAmount}
           skipAnimations={skipAnimations}
-          onLifeGainComplete={() => actions.setLifeGainAmount(null)}
+          onLifeGainComplete={handleLifeGainComplete}
         />
       </div>
 

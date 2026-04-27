@@ -16,6 +16,9 @@ import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 // Mock Socket context
+vi.mock('@/components/boosts/BoostButton', () => ({ BoostButton: () => null }));
+vi.mock('@/components/boosts/BoostPicker', () => ({ BoostPicker: () => null }));
+
 vi.mock('../../utils/SocketContext', () => ({
   useSocket: () => ({
     socket: null,
@@ -49,7 +52,10 @@ vi.mock('framer-motion', () => {
   return {
     motion: motionObj,
     m: motionObj,
+    LazyMotion: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+    domAnimation: {},
     AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+    useReducedMotion: () => false,
   };
 });
 

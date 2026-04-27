@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, memo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import { useIsDesktop } from '@/hooks/useMediaQuery';
 
@@ -58,7 +58,7 @@ const DragReleaseHint = memo<DragReleaseHintProps>(({
   return (
     <AnimatePresence>
       {shouldShow && (
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 4 }}
@@ -68,7 +68,7 @@ const DragReleaseHint = memo<DragReleaseHintProps>(({
           <span className="bg-neo-black/80 text-neo-lime text-[11px] font-black px-3 py-1 rounded-full border border-neo-lime/40 shadow-[0_0_8px_rgba(191,255,0,0.3)] uppercase tracking-wider whitespace-nowrap">
             {t('desktopInput.releaseToSubmit') || 'Release to submit'}
           </span>
-        </motion.div>
+        </m.div>
       )}
     </AnimatePresence>
   );

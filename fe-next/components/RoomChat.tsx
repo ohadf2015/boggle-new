@@ -392,6 +392,11 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
             onKeyDown={handleKeyDown}
             onFocus={handleInputFocus}
             onCompositionStart={() => setIsComposing(true)}
+            onCompositionUpdate={(e: React.CompositionEvent<HTMLInputElement>) => {
+              // Sync state during IME composition — some browsers (Safari/iOS)
+              // suppress `onChange` while composing, leaving disable check stale.
+              setInputMessage(e.currentTarget.value);
+            }}
             onCompositionEnd={(e: React.CompositionEvent<HTMLInputElement>) => {
               setIsComposing(false);
               setInputMessage(e.currentTarget.value);
@@ -407,7 +412,7 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
             disabled={inputMessage.length === 0 || !socket}
             size="icon"
             variant="cyan"
-            className="shrink-0"
+            className="shrink-0 disabled:bg-neo-navy-light disabled:text-neo-cream/40 disabled:grayscale disabled:opacity-50"
             aria-label={t('chat.send')}
           >
             <Send aria-hidden="true" />

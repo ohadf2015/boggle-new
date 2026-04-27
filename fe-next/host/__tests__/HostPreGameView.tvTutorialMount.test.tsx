@@ -138,6 +138,16 @@ vi.mock('../components/pre-game/desktop', () => ({
   EnhancedPlayerList: () => null,
 }));
 
+// BoostButton transitively pulls AdMobProvider via useRewardedAd; the tutorial
+// test doesn't wrap in providers, so stub it to keep this suite focused on TV
+// tutorial state. (Boost picker behavior is covered by components/boosts tests.)
+vi.mock('@/components/boosts/BoostButton', () => ({
+  BoostButton: () => null,
+}));
+vi.mock('@/components/boosts/BoostPicker', () => ({
+  BoostPicker: () => null,
+}));
+
 // Mock localStorage
 const mockLocalStorage = (() => {
   let store: Record<string, string> = {};

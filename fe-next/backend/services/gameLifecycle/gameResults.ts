@@ -29,9 +29,12 @@ export interface PlayerBoostClaim { sessionId: string; token: string }
 /**
  * Apply boost tokens (firstWordBonus, scoreMultiplier) to player scores.
  *
- * NOTE: WordDetail is expected to have a 'ts' (timestamp) field when using scoreMultiplier.
- * If 'ts' is missing, scoreMultiplier will treat undefined as 0 (all words within window).
- * If WordDetail lacks 'ts', the boost gracefully degrades.
+ * scoreMultiplier requires real word timestamps. The bridge prefers `ts` (already
+ * supplied by some callers/tests), falls back to `timestamp` (the field declared
+ * on WordDetail and populated by `scoreManager.recordWordForPlayer`). When no
+ * source has a real timestamp the boost FAILS CLOSED — applying with ts=0 would
+ * place every word "before" the cutoff and grant the multiplier unconditionally,
+ * which the v1 audit (SRV-CRIT-1) flagged as exploitable.
  */
 export function applyBoostsToScores(
   scores: PlayerResult[],
@@ -44,11 +47,16 @@ export function applyBoostsToScores(
     const v = verifyBoostToken(claim.token, claim.sessionId);
     if (!v.valid || !v.boostType) return player;
 
-    // Ensure WordDetail has ts field (add default if missing)
-    const wordDetails = (player.wordDetails ?? []).map((w: any) => ({
-      ...w,
-      ts: w.ts ?? 0,
-    }));
+    // Bridge timestamp from `ts` (caller-provided) or WordDetail.timestamp.
+    // Records without either get ts=0 and we use the resolved-flag below to
+    // decide whether scoreMultiplier can safely run.
+    let anyResolvedTs = false;
+    const wordDetails = (player.wordDetails ?? []).map((w: any) => {
+      const resolved = (typeof w.ts === 'number' ? w.ts : undefined)
+        ?? (typeof w.timestamp === 'number' ? w.timestamp : undefined);
+      if (resolved !== undefined) anyResolvedTs = true;
+      return { ...w, ts: resolved ?? 0 };
+    });
     let nextWords = wordDetails;
     let boostApplied = false;
 
@@ -57,9 +65,13 @@ export function applyBoostsToScores(
       boostApplied = true;
     }
     else if (v.boostType === 'scoreMultiplier') {
-      // v2: server-side scoreMultiplier requires WordDetail.ts plumbing.
-      // For v1, scoreMultiplier is client-display only — server doesn't multiply.
-      return player;
+      // Fail closed if no timestamps OR no game start reference — without a
+      // verifiable submit-time we can't prove a word landed inside the window.
+      if (!anyResolvedTs || !gameStartTs || gameStartTs <= 0) {
+        return player;
+      }
+      nextWords = applyScoreMultiplier(wordDetails, gameStartTs);
+      boostApplied = true;
     }
     else return player;
 
@@ -144,10 +156,10 @@ export async function recordGameResultsToSupabase(
       gameMode: game.gameMode || 'classic',
     };
 
-    // Apply boost tokens (firstWordBonus, scoreMultiplier) to player scores if present
-    const boostedScores = game.playerBoosts
-      ? applyBoostsToScores(humanScores, game.playerBoosts, game.gameStartedAt ?? game.startTime ?? game.createdAt ?? 0)
-      : humanScores;
+    // Boosts are applied upstream in `processFinalScores` (gameScores.ts) so
+    // broadcast and persist see identical totals. The scores arriving here are
+    // already boosted; do NOT re-apply (would double the multiplier).
+    const boostedScores = humanScores;
 
     // Sort scores to calculate placements for stats recording
     const sortedForStats = [...boostedScores].sort(

@@ -19,8 +19,8 @@ import {
 export { calculateWordScore, getComboBonus, getComboMultiplier };
 
 export interface WordDetailResult extends WordDetail {
-  // Additional fields not in base WordDetail
-  timestamp?: number | null;
+  // `timestamp` is inherited from base WordDetail (added for scoreMultiplier
+  // boost — see SRV-CRIT-1). Pace analytics keep the per-game-clock companion.
   timeSinceStart?: number | null;
 }
 

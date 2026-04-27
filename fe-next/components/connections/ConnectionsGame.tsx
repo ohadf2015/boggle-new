@@ -23,6 +23,7 @@ import { getCurrentLevel, setCurrentLevel } from '@/lib/connections/levelStore';
 import { getCurrentLives, setCurrentLives, MAX_LIVES } from '@/lib/connections/livesStore';
 import type { ConnectionPuzzle, GameState, PuzzleRating } from '@/lib/connections/types';
 import { submitConnectionsFeedback } from '@/lib/connections/feedback';
+import { trackGameStart } from '@/utils/growthTracking';
 import PuzzleCard from './PuzzleCard';
 import OutOfLivesModal from './OutOfLivesModal';
 
@@ -92,6 +93,15 @@ export default function ConnectionsGame() {
   const [sessionScore, setSessionScore] = useState(0);
   const [xpEarned, setXpEarned] = useState(0);
   const xpAwardedIdsRef = useRef<Set<string>>(new Set());
+
+  // Funnel parity: emit growth:game_started once on mount. Was missing →
+  // PostHog showed 18 connections mode_selected with 0 game_starts
+  // (2026-04-27 sweep). One emit per session is enough; subsequent puzzles
+  // within the same session are tracked via puzzle-level events.
+  useEffect(() => {
+    trackGameStart('connections', { language });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // If locale changes mid-session, reload from that locale's saved level + lives.
   useEffect(() => {

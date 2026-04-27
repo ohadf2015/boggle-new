@@ -8,6 +8,9 @@ import HostPreGameView from '../../host/components/HostPreGameView';
 import { SocketContext } from '../../utils/SocketContext';
 
 // Mock next/navigation
+vi.mock('@/components/boosts/BoostButton', () => ({ BoostButton: () => null }));
+vi.mock('@/components/boosts/BoostPicker', () => ({ BoostPicker: () => null }));
+
 vi.mock('next/navigation', () => ({
   useRouter: vi.fn(() => ({
     push: vi.fn(),
@@ -27,14 +30,21 @@ vi.mock('../../hooks/useCrazyGamesInvite', () => ({
 }));
 
 // Mock framer-motion
-vi.mock('framer-motion', () => ({
-  motion: {
+vi.mock('framer-motion', () => {
+  const motion = {
     div: ({ children, ...props }: { children?: React.ReactNode; [key: string]: unknown }) => <div {...props}>{children}</div>,
     button: ({ children, ...props }: { children?: React.ReactNode; [key: string]: unknown }) => <button {...props}>{children}</button>,
     span: ({ children, ...props }: { children?: React.ReactNode; [key: string]: unknown }) => <span {...props}>{children}</span>,
-  },
-  AnimatePresence: ({ children }: { children?: React.ReactNode }) => <>{children}</>,
-}));
+  };
+  return {
+    motion,
+    m: motion,
+    LazyMotion: ({ children }: { children?: React.ReactNode }) => <>{children}</>,
+    domAnimation: {},
+    AnimatePresence: ({ children }: { children?: React.ReactNode }) => <>{children}</>,
+    useReducedMotion: () => false,
+  };
+});
 
 // Mock RoomChat component since it requires LanguageProvider
 vi.mock('../../components/RoomChat', () => ({

@@ -191,7 +191,7 @@ export function useSurvivalHints({
               ? 'wordHunt.survival.revealCategory'
               : 'wordHunt.survival.exampleSentence';
         showToast(
-          'valid-word',
+          'clue-unlocked',
           t('wordHunt.survival.clueUnlocked', { name: t(clueNameKey), cost: nextHintItem.cost }),
         );
     }

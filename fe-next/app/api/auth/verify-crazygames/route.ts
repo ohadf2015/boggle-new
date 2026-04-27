@@ -24,8 +24,18 @@ const jwks = createRemoteJWKSet(CRAZYGAMES_JWKS_URL);
 // Expected issuer for CrazyGames tokens
 const EXPECTED_ISSUER = 'crazygames.com';
 // Audience claim — prevents tokens issued for other CrazyGames titles from being accepted.
-// Set CRAZYGAMES_GAME_DOMAIN env var to your game's domain on CrazyGames (e.g. "lexiclash").
-const EXPECTED_AUDIENCE = process.env.CRAZYGAMES_GAME_DOMAIN || undefined;
+// Default to the LexiClash CG game domain; override with CRAZYGAMES_GAME_DOMAIN env var
+// for staging or alternate slugs. Never undefined: jose's jwtVerify silently skips the
+// audience check when audience is undefined, which would accept any signed CG token from
+// any other game on the platform.
+const DEFAULT_AUDIENCE = 'lexiclash';
+const EXPECTED_AUDIENCE = process.env.CRAZYGAMES_GAME_DOMAIN || DEFAULT_AUDIENCE;
+if (!process.env.CRAZYGAMES_GAME_DOMAIN && process.env.NODE_ENV === 'production') {
+  console.warn(
+    '[verify-crazygames] CRAZYGAMES_GAME_DOMAIN not set — falling back to default audience "%s"',
+    DEFAULT_AUDIENCE,
+  );
+}
 
 export async function POST(request: NextRequest) {
   // Rate limit: 10 requests per 60 seconds per IP
@@ -51,8 +61,8 @@ export async function POST(request: NextRequest) {
     // Verify the JWT against CrazyGames public keys
     const { payload } = await jwtVerify(token, jwks, {
       issuer: EXPECTED_ISSUER,
-      // Validate audience when configured — prevents cross-game token reuse
-      ...(EXPECTED_AUDIENCE ? { audience: EXPECTED_AUDIENCE } : {}),
+      // Always validate audience to prevent cross-game token reuse
+      audience: EXPECTED_AUDIENCE,
       // CrazyGames tokens use RS256
       algorithms: ['RS256'],
     });

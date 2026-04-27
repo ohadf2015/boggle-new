@@ -33,7 +33,11 @@ vi.mock('@/utils/utmCapture', () => ({
   getStoredUtmData: () => mockUtm(),
 }));
 
-import { identifyUserForAnalytics, resetUserAnalytics } from '../authAnalytics';
+import {
+  identifyUserForAnalytics,
+  resetUserAnalytics,
+  syncAuthAnalyticsTransition,
+} from '../authAnalytics';
 
 describe('identifyUserForAnalytics', () => {
   beforeEach(() => {
@@ -168,5 +172,68 @@ describe('identifyUserForAnalytics', () => {
 
     expect(reset).toHaveBeenCalled();
     expect(capture).toHaveBeenCalledWith('user_logged_out');
+  });
+});
+
+describe('syncAuthAnalyticsTransition (gates user_logged_out / user_identified)', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockUtm.mockReturnValue(null);
+  });
+
+  const identifyArgs = {
+    userId: 'user-1',
+    displayName: 'Alice',
+    isAdmin: false,
+    isTeacher: false,
+    locale: 'en',
+  };
+
+  it('guest mount (false → false) does NOT capture user_logged_out', () => {
+    const reset = vi.fn();
+    const next = syncAuthAnalyticsTransition({
+      wasAuthenticated: false,
+      identify: null,
+      reset,
+    });
+    expect(reset).not.toHaveBeenCalled();
+    expect(capture).not.toHaveBeenCalled();
+    expect(next).toBe(false);
+  });
+
+  it('login (false → true) captures user_identified once', () => {
+    const reset = vi.fn();
+    const next = syncAuthAnalyticsTransition({
+      wasAuthenticated: false,
+      identify: identifyArgs,
+      reset,
+    });
+    expect(reset).not.toHaveBeenCalled();
+    expect(capture).toHaveBeenCalledWith('user_identified', expect.any(Object));
+    expect(next).toBe(true);
+  });
+
+  it('logout (true → false) captures user_logged_out exactly once', () => {
+    const reset = vi.fn();
+    const next = syncAuthAnalyticsTransition({
+      wasAuthenticated: true,
+      identify: null,
+      reset,
+    });
+    expect(reset).toHaveBeenCalledTimes(1);
+    expect(capture).toHaveBeenCalledWith('user_logged_out');
+    expect(next).toBe(false);
+  });
+
+  it('re-identify while authenticated does not double-capture user_logged_out', () => {
+    const reset = vi.fn();
+    const next = syncAuthAnalyticsTransition({
+      wasAuthenticated: true,
+      identify: identifyArgs,
+      reset,
+    });
+    expect(reset).not.toHaveBeenCalled();
+    expect(capture).not.toHaveBeenCalledWith('user_logged_out');
+    expect(next).toBe(true);
   });
 });

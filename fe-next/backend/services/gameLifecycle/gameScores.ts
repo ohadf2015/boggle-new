@@ -21,7 +21,7 @@ import {
 import { calculatePlayerTitles } from '../../modules/playerTitlesManager';
 import { broadcastToRoom, getGameRoom } from '../../utils/socketHelpers';
 import { isSupabaseConfigured } from '../../modules/supabaseServer';
-import { recordGameResultsToSupabase } from './gameResults';
+import { recordGameResultsToSupabase, applyBoostsToScores } from './gameResults';
 import logger from '../../utils/logger';
 
 /**
@@ -117,6 +117,22 @@ export async function calculateAndBroadcastFinalScores(
     aiValidatedWords,
     { playerCount, gameMode: game.gameMode }
   );
+
+  // Apply MP boost tokens (firstWordBonus, scoreMultiplier) BEFORE sorting and
+  // before broadcast so client and Supabase see the same totals — previously
+  // boosts were only applied inside recordGameResultsToSupabase, which left the
+  // 'validatedScores' broadcast unboosted (audit SRV-M1). PlayerResult shape is
+  // a superset of the boost helper's input so the cast is safe.
+  if (game.playerBoosts && Object.keys(game.playerBoosts).length > 0) {
+    const gameStartTs = game.gameStartedAt ?? game.startTime ?? game.createdAt ?? 0;
+    const boosted = applyBoostsToScores(
+      finalScores as unknown as Parameters<typeof applyBoostsToScores>[0],
+      game.playerBoosts,
+      gameStartTs,
+    );
+    finalScores.length = 0;
+    finalScores.push(...(boosted as unknown as PlayerScoreResult[]));
+  }
 
   // In Word Hunt, the player who found the target word is the winner
   // Re-sort so target finder ranks first, others by score

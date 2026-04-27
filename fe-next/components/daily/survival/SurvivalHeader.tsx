@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { memo } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { AccumulatedScoreDisplay } from './AccumulatedScoreDisplay';
 
@@ -22,7 +22,7 @@ export interface SurvivalHeaderProps {
  * Header bar for survival mode - quit button and score display
  * Clues now auto-unlock in background, score is the primary metric
  */
-export const SurvivalHeader: React.FC<SurvivalHeaderProps> = ({
+export const SurvivalHeader = memo<SurvivalHeaderProps>(({
   liveScore,
   lastScoreIncrement,
   isScoreAnimating,
@@ -47,4 +47,5 @@ export const SurvivalHeader: React.FC<SurvivalHeaderProps> = ({
       />
     </div>
   );
-};
+});
+SurvivalHeader.displayName = 'SurvivalHeader';

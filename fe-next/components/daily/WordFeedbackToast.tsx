@@ -2,7 +2,7 @@
 
 import React, { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Check, X, AlertTriangle, RefreshCw } from 'lucide-react';
+import { Check, X, AlertTriangle, RefreshCw, Lightbulb } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export type FeedbackType =
@@ -14,7 +14,8 @@ export type FeedbackType =
   | 'too-long'          // Orange - above maximum length
   | 'duplicate'         // Yellow - already found
   | 'target-attempt'    // Blue - attempted target word
-  | 'target-found';     // Rainbow - found the target!
+  | 'target-found'      // Rainbow - found the target!
+  | 'clue-unlocked';    // Lime - subtle non-blocking hint purchase confirmation
 
 export interface WordFeedbackToastProps {
   type: FeedbackType | null;
@@ -93,27 +94,62 @@ const FEEDBACK_STYLES: Record<FeedbackType, {
     icon: <div className="text-base">🎉</div>,
     animation: 'animate-neo-explosion',
   },
+  'clue-unlocked': {
+    bg: 'bg-neo-lime',
+    text: 'text-neo-black',
+    border: 'border-neo-black',
+    icon: <Lightbulb className="w-3.5 h-3.5" />,
+    animation: '',
+  },
 };
 
 export const WordFeedbackToast: React.FC<WordFeedbackToastProps> = ({
   type,
   message,
-  duration = 3000, // Increased from 2000ms for better readability
+  duration,
   onClose,
 }) => {
+  const isSubtle = type === 'clue-unlocked';
+  const effectiveDuration = duration ?? (isSubtle ? 1400 : 3000);
+
   useEffect(() => {
     if (!type) return;
 
     const timer = setTimeout(() => {
       onClose?.();
-    }, duration);
+    }, effectiveDuration);
 
     return () => clearTimeout(timer);
-  }, [type, duration, onClose]);
+  }, [type, effectiveDuration, onClose]);
 
   if (!type) return null;
 
   const style = FEEDBACK_STYLES[type];
+
+  if (isSubtle) {
+    return (
+      <AnimatePresence>
+        <motion.div
+          key="clue-unlocked"
+          initial={{ opacity: 0, y: 8, scale: 0.85 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: -16, scale: 0.9 }}
+          transition={{ duration: 0.25, ease: 'easeOut' }}
+          className={cn(
+            'fixed top-3 left-1/2 -translate-x-1/2 z-40 pointer-events-none',
+            'flex items-center gap-1.5 px-2.5 py-1 rounded-neo',
+            'border-2 shadow-hard text-xs font-bold',
+            style.bg,
+            style.text,
+            style.border,
+          )}
+        >
+          <div className="shrink-0">{style.icon}</div>
+          <div>{message}</div>
+        </motion.div>
+      </AnimatePresence>
+    );
+  }
 
   return (
     <AnimatePresence>

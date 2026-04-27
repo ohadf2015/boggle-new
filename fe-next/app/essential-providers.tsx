@@ -25,6 +25,7 @@ import { QueryProvider } from '@/components/providers/QueryProvider';
 import { QueryErrorResetBoundary } from '@tanstack/react-query';
 import { AdMobProvider } from '@/contexts/AdMobContext';
 import AnchoredNativeBanner from '@/components/ads/AnchoredNativeBanner';
+import { SeasonClaimContainer } from '@/components/seasons/SeasonClaimContainer';
 import { initUtmCapture } from '@/utils/utmCapture';
 import { initConsoleOverride, initCapacitorLogFilter } from '@/utils/consoleOverride';
 import { initSessionTracking } from '@/utils/sessionTracking';
@@ -196,6 +197,8 @@ export function EssentialProviders({ children, lang, initialTranslations }: Esse
                                                 {memoizedChildren}
                                                 {/* Global coin-earn VFX: sound + flying coins on every addCoins */}
                                                 <GlobalCoinEarnFx />
+                                                {/* Season claim modal — auto-shows when player has unclaimed past seasons */}
+                                                <SeasonClaimContainer />
                                                 {/* Native AdMob banner — single global mount, route-aware. */}
                                                 <AnchoredNativeBanner />
                                             </NavigationProvider>

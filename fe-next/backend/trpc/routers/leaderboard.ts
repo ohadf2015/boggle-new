@@ -3,6 +3,7 @@ import { router, loggedProcedure } from '../trpc';
 import { TRPCError } from '@trpc/server';
 import logger from '../../utils/logger';
 import { getTopPlayersByScore } from '../../db/queries/leaderboardQueries';
+import { getCurrentSeasonDynamic, getSeasonRewards } from '@/lib/seasons';
 
 import { getSupabase, isSupabaseConfigured } from '../../modules/supabaseServer';
 import { getCachedLeaderboardTop100, cacheLeaderboardTop100, getCachedUserRank, cacheUserRank } from '../../redisClient';
@@ -11,31 +12,41 @@ import { coalesce } from '../../utils/requestCoalescing';
 export const leaderboardRouter = router({
   getTop: loggedProcedure
     .input(z.object({
-      period: z.enum(['daily', 'weekly', 'allTime']).default('weekly'),
+      period: z.enum(['daily', 'weekly', 'season', 'allTime']).default('season'),
       limit: z.number().min(1).max(100).default(20),
+      seasonId: z.number().int().positive().optional(),
     }))
     .query(async ({ input }) => {
       if (!isSupabaseConfigured()) {
         throw new TRPCError({ code: 'PRECONDITION_FAILED', message: 'Leaderboard service not available' });
       }
 
-      // Try cache first
-      const cached = await getCachedLeaderboardTop100();
+      const targetSeasonId = input.period === 'season'
+        ? (input.seasonId ?? getCurrentSeasonDynamic().id)
+        : undefined;
+
+      // Try cache first (season-namespaced when applicable)
+      const cached = await getCachedLeaderboardTop100(targetSeasonId);
       if (cached) {
         return { data: cached, cached: true };
       }
 
-      // Use request coalescing to prevent thundering herd
-      const result = await coalesce('leaderboard:top100', async () => {
-        // Double-check cache
-        const recheck = await getCachedLeaderboardTop100();
+      const coalesceKey = targetSeasonId
+        ? `leaderboard:top100:season:${targetSeasonId}`
+        : 'leaderboard:top100';
+
+      const result = await coalesce(coalesceKey, async () => {
+        const recheck = await getCachedLeaderboardTop100(targetSeasonId);
         if (recheck) {
           return { data: recheck, cached: true, coalesced: true };
         }
 
         let entries;
         try {
-          const drizzleData = await getTopPlayersByScore(input.limit);
+          const drizzleData = await getTopPlayersByScore(
+            input.limit,
+            targetSeasonId !== undefined ? { seasonId: targetSeasonId } : {}
+          );
           entries = drizzleData.map(row => ({
             player_id: row.playerId,
             username: row.username,
@@ -45,6 +56,7 @@ export const leaderboardRouter = router({
             games_played: row.gamesPlayed,
             games_won: row.gamesWon,
             ranked_mmr: 0,
+            season_id: row.seasonId,
           }));
         } catch (drizzleErr) {
           logger.warn('TRPC', `Drizzle leaderboard query failed, falling back to Supabase: ${drizzleErr}`);
@@ -52,9 +64,16 @@ export const leaderboardRouter = router({
           if (!supabase) {
             throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Database not available' });
           }
-          const { data, error } = await supabase
+          // Post-seasons migration the leaderboard has multiple rows per
+          // player (one per season). Filter when querying a specific season
+          // so the fallback doesn't merge seasons and double-rank a player.
+          let query = supabase
             .from('leaderboard')
-            .select('player_id, username, display_name, avatar_emoji, avatar_color, avatar_image, total_score, games_played, games_won, ranked_mmr')
+            .select('player_id, username, display_name, avatar_emoji, avatar_color, avatar_image, total_score, games_played, games_won, ranked_mmr, season_id');
+          if (targetSeasonId !== undefined) {
+            query = query.eq('season_id', targetSeasonId);
+          }
+          const { data, error } = await query
             .order('total_score', { ascending: false })
             .limit(input.limit);
 
@@ -66,13 +85,97 @@ export const leaderboardRouter = router({
         }
 
         if (entries.length > 0) {
-          await cacheLeaderboardTop100(entries);
+          await cacheLeaderboardTop100(entries, targetSeasonId);
         }
 
         return { data: entries, cached: false };
       });
 
       return result;
+    }),
+
+  claimSeasonRewards: loggedProcedure
+    .input(z.object({
+      seasonId: z.number().int().positive(),
+      playerId: z.string().uuid(),
+    }))
+    .mutation(async ({ input }) => {
+      const supabase = getSupabase();
+      if (!supabase) {
+        throw new TRPCError({ code: 'PRECONDITION_FAILED', message: 'Database unavailable' });
+      }
+
+      // Look up player's archived peak tier for that season
+      const { data: archived, error: archiveError } = await supabase
+        .from('season_leaderboards')
+        .select('peak_tier')
+        .eq('season_id', input.seasonId)
+        .eq('player_id', input.playerId)
+        .maybeSingle();
+
+      const tier = archived?.peak_tier ?? 'Bronze';
+      const rewards = getSeasonRewards(tier, input.seasonId);
+      const badgeIds = rewards.badges.map((b: { id: string }) => b.id);
+
+      const { data, error } = await supabase.rpc('claim_season_rewards', {
+        p_player_id: input.playerId,
+        p_season_id: input.seasonId,
+        p_coins: rewards.coins,
+        p_badges: badgeIds,
+      });
+
+      if (error) {
+        if (archiveError) {
+          logger.warn('TRPC', 'Season archive lookup failed; proceeding with default tier', {
+            error: archiveError.message,
+          });
+        }
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: `Reward claim failed: ${error.message}`,
+        });
+      }
+
+      const claimedNow = data === true;
+      return {
+        success: claimedNow,
+        alreadyClaimed: !claimedNow,
+        rewards,
+        tier,
+      };
+    }),
+
+  getSeasonHistory: loggedProcedure
+    .input(z.object({ playerId: z.string().uuid() }))
+    .query(async ({ input }) => {
+      const supabase = getSupabase();
+      if (!supabase) {
+        throw new TRPCError({ code: 'PRECONDITION_FAILED', message: 'Database unavailable' });
+      }
+
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('season_peak_tier')
+        .eq('id', input.playerId)
+        .single();
+
+      if (error) {
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: `Season history fetch failed: ${error.message}`,
+        });
+      }
+
+      const peakTiers = Array.isArray(data?.season_peak_tier)
+        ? (data.season_peak_tier as Array<{
+            seasonId: number;
+            tier: string;
+            rankPosition?: number;
+            claimedAt: string | null;
+          }>)
+        : [];
+
+      return { data: peakTiers };
     }),
 
   getPlayerRank: loggedProcedure

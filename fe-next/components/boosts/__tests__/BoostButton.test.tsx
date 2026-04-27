@@ -25,8 +25,13 @@ vi.mock('../BoostPicker', () => ({
     ) : null,
 }));
 
+vi.mock('@/hooks/useRewardedAd', () => ({
+  useRewardedAd: vi.fn(() => ({ canShowAd: true })),
+}));
+
 import { BoostButton } from '../BoostButton';
 import * as boostStatusModule from '@/hooks/useBoostStatus';
+import * as rewardedAdModule from '@/hooks/useRewardedAd';
 
 describe('BoostButton', () => {
   beforeEach(() => {
@@ -36,6 +41,10 @@ describe('BoostButton', () => {
       error: null,
       refresh: vi.fn(),
     });
+    // Default: ad provider available
+    vi.mocked(rewardedAdModule.useRewardedAd).mockReturnValue({
+      canShowAd: true,
+    } as ReturnType<typeof rewardedAdModule.useRewardedAd>);
   });
 
   it('renders with remaining count', () => {
@@ -66,5 +75,22 @@ describe('BoostButton', () => {
     render(<BoostButton mode="mp" sessionId="s1" disabled={true} />);
     const button = screen.getByRole('button');
     expect(button).toBeDisabled();
+  });
+
+  it('hides button when no ad provider available (web placeholder, daily ad limit)', () => {
+    vi.mocked(rewardedAdModule.useRewardedAd).mockReturnValueOnce({
+      canShowAd: false,
+    } as ReturnType<typeof rewardedAdModule.useRewardedAd>);
+    const { container } = render(<BoostButton mode="mp" sessionId="s1" />);
+    expect(container.firstChild).toBeNull();
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
+  });
+
+  it('shows button when ads available and boosts remaining (mp mode)', () => {
+    vi.mocked(rewardedAdModule.useRewardedAd).mockReturnValueOnce({
+      canShowAd: true,
+    } as ReturnType<typeof rewardedAdModule.useRewardedAd>);
+    render(<BoostButton mode="mp" sessionId="s1" />);
+    expect(screen.getByRole('button')).toBeInTheDocument();
   });
 });

@@ -98,7 +98,13 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
   }, [isOpen, isAuthenticated, displayName, profileAvatar, defaultLanguage]);
 
   const generateRoomName = useCallback((hostName: string): string => {
-    const sanitized = hostName.replace(/[']/g, '').trim();
+    // Strip apostrophes + bidirectional/format control characters so a Hebrew or
+    // mixed-direction username can't inject RTL/LTR marks that misalign the
+    // room-list chip layout (audit UX-H6). Covers LRM/RLM/ALM/LRE/RLE/PDF/LRO/
+    // RLO/LRI/RLI/FSI/PDI plus zero-width joiners.
+    const sanitized = hostName
+      .replace(/[‎‏؜‪-‮⁦-⁩​-‍﻿']/g, '')
+      .trim();
     return `${sanitized} Room`;
   }, []);
 

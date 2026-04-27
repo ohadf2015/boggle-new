@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useReducer } from 'react';
-import { motion, AnimatePresence, useAnimation } from 'framer-motion';
+import { m, AnimatePresence, useAnimation } from 'framer-motion';
 import { cn } from '../../lib/utils';
 import { getComboColors } from './comboColors';
 import { useReducedMotion } from '../../utils/accessibility';
@@ -23,7 +23,7 @@ const Sparkle: React.FC<{
   color: string;
   size?: number;
 }> = ({ delay, angle, distance, color, size = 8 }) => (
-  <motion.div
+  <m.div
     className="absolute pointer-events-none combo-sparkle"
     style={{
       width: size,
@@ -50,7 +50,7 @@ const Sparkle: React.FC<{
     <svg viewBox="0 0 24 24" fill={color} className="w-full h-full drop-shadow-lg">
       <path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" />
     </svg>
-  </motion.div>
+  </m.div>
 );
 
 // Confetti particle for high combos
@@ -59,7 +59,7 @@ const Confetti: React.FC<{
   startX: number;
   color: string;
 }> = ({ delay, startX, color }) => (
-  <motion.div
+  <m.div
     className="absolute w-2 h-3 pointer-events-none combo-confetti"
     style={{
       left: '50%',
@@ -89,7 +89,7 @@ const GlowRing: React.FC<{
   color: string;
   scale?: number;
 }> = ({ delay, color, scale = 2 }) => (
-  <motion.div
+  <m.div
     className="absolute rounded-full pointer-events-none combo-glow-ring"
     style={{
       width: 120,
@@ -213,7 +213,7 @@ const ComboIndicator: React.FC<ComboIndicatorProps> = ({
 
   return (
     <AnimatePresence mode="wait">
-      <motion.div
+      <m.div
         key={`combo-${animationKey}`}
         className="fixed top-28 inset-s-4 sm:inset-s-1/2 sm:-translate-x-1/2 sm:rtl:translate-x-1/2 z-[80] pointer-events-none combo-indicator-container flex items-center justify-center"
         data-tutorial="combo"
@@ -262,7 +262,7 @@ const ComboIndicator: React.FC<ComboIndicatorProps> = ({
         )}
 
         {/* Main combo badge */}
-        <motion.div
+        <m.div
           initial={{
             scale: 0,
             opacity: 0,
@@ -284,7 +284,7 @@ const ComboIndicator: React.FC<ComboIndicatorProps> = ({
           className="relative"
         >
           {/* Badge content */}
-          <motion.div
+          <m.div
             className={cn(
               'px-5 py-2.5 rounded-full font-extrabold text-2xl md:text-3xl text-white relative overflow-hidden',
               !isRainbow && 'bg-linear-to-r from-orange-500 via-red-500 to-pink-500',
@@ -306,11 +306,11 @@ const ComboIndicator: React.FC<ComboIndicatorProps> = ({
           >
             {/* Shimmer overlay - skip on low-end devices for performance */}
             {!skipParticles && !isExtremeCombo && (
-              <motion.div
+              <m.div
                 className="absolute inset-0 rounded-full pointer-events-none overflow-hidden"
                 style={{ zIndex: 5 }}
               >
-                <motion.div
+                <m.div
                   className="absolute inset-0"
                   style={{
                     background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent)',
@@ -324,11 +324,11 @@ const ComboIndicator: React.FC<ComboIndicatorProps> = ({
                     ease: 'easeInOut',
                   }}
                 />
-              </motion.div>
+              </m.div>
             )}
 
             {/* Emoji */}
-            <motion.span
+            <m.span
               className="relative z-10"
               initial={{ scale: 0.5, rotate: -20 }}
               animate={{ scale: 1, rotate: 0 }}
@@ -339,22 +339,22 @@ const ComboIndicator: React.FC<ComboIndicatorProps> = ({
               }}
             >
               {isRainbow ? '🌈' : '🔥'}
-            </motion.span>
+            </m.span>
 
             {/* Combo text - shows actual count */}
-            <motion.span
+            <m.span
               className="relative z-10 ms-1.5"
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.1, duration: 0.2 }}
             >
               {displayText}
-            </motion.span>
-          </motion.div>
+            </m.span>
+          </m.div>
 
           {/* Streak text for high combos */}
           {isHighCombo && (
-            <motion.div
+            <m.div
               className="absolute -bottom-7 left-1/2 whitespace-nowrap"
               initial={{ opacity: 0, scale: 0.8, y: 5 }}
               animate={{ opacity: [0, 1, 1, 0], scale: [0.8, 1.1, 1, 0.9], y: [5, 0, 0, -5] }}
@@ -380,10 +380,10 @@ const ComboIndicator: React.FC<ComboIndicatorProps> = ({
               >
                 {isInsaneCombo ? `🏆 LEGENDARY x${visibleCombo}!` : isVeryHighCombo ? '🔥 ON FIRE!' : 'COMBO'}
               </span>
-            </motion.div>
+            </m.div>
           )}
-        </motion.div>
-      </motion.div>
+        </m.div>
+      </m.div>
     </AnimatePresence>
   );
 };

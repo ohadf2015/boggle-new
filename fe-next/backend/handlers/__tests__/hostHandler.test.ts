@@ -32,7 +32,7 @@ function createMockSocket(id = 'socket-host') {
   };
 }
 
-function makeGame(overrides: Record<string, any> = {}) {
+function makeGame(overrides: Record<string, any> = {}): any {
   return {
     gameCode: 'GAME1',
     hostSocketId: 'socket-host',
@@ -46,6 +46,12 @@ function makeGame(overrides: Record<string, any> = {}) {
   };
 }
 
+function createMockIo() {
+  const emit = vi.fn();
+  const to = vi.fn(() => ({ emit }));
+  return { io: { to } as any, to, emit };
+}
+
 describe('hostHandler', () => {
   const mockIo = {} as any;
 
@@ -53,11 +59,12 @@ describe('hostHandler', () => {
     vi.clearAllMocks();
   });
 
-  it('registers hostKeepAlive and hostReactivate handlers', () => {
+  it('registers hostKeepAlive, hostReactivate, and changeRoomLanguage handlers', () => {
     const { socket } = createMockSocket();
     registerHostHandlers(mockIo, socket);
     expect(socket.on).toHaveBeenCalledWith('hostKeepAlive', expect.any(Function));
     expect(socket.on).toHaveBeenCalledWith('hostReactivate', expect.any(Function));
+    expect(socket.on).toHaveBeenCalledWith('changeRoomLanguage', expect.any(Function));
   });
 
   // ─── hostKeepAlive ───
@@ -179,6 +186,109 @@ describe('hostHandler', () => {
       expect(mockReactivateHost).toHaveBeenCalledWith('GAME1');
       // The handler always emits success:true regardless of reactivateHost return
       expect(socket.emit).toHaveBeenCalledWith('hostReactivated', { success: true });
+    });
+  });
+
+  // ─── changeRoomLanguage ───
+  describe('changeRoomLanguage', () => {
+    it('updates game.language and broadcasts roomLanguageChanged when host with valid language', () => {
+      const { socket, handlers } = createMockSocket();
+      const { io, to, emit } = createMockIo();
+      registerHostHandlers(io, socket);
+
+      const game = makeGame({ language: 'en' });
+      mockGetGame.mockReturnValue(game);
+
+      handlers['changeRoomLanguage']({ gameCode: 'GAME1', language: 'he' });
+
+      expect(game.language).toBe('he');
+      expect(to).toHaveBeenCalledWith('GAME1');
+      expect(emit).toHaveBeenCalledWith('roomLanguageChanged', {
+        language: 'he',
+        changedBy: 'Host',
+      });
+    });
+
+    it('rejects when game does not exist', () => {
+      const { socket, handlers } = createMockSocket();
+      const { io, emit } = createMockIo();
+      registerHostHandlers(io, socket);
+
+      mockGetGame.mockReturnValue(null);
+
+      handlers['changeRoomLanguage']({ gameCode: 'GAME1', language: 'he' });
+
+      expect(emit).not.toHaveBeenCalled();
+    });
+
+    it('rejects when sender is not host', () => {
+      const { socket, handlers } = createMockSocket('socket-p1');
+      const { io, emit } = createMockIo();
+      registerHostHandlers(io, socket);
+
+      const game = makeGame({ language: 'en' });
+      mockGetGame.mockReturnValue(game);
+
+      handlers['changeRoomLanguage']({ gameCode: 'GAME1', language: 'he' });
+
+      expect(game.language).toBe('en');
+      expect(emit).not.toHaveBeenCalled();
+    });
+
+    it('rejects unknown language values', () => {
+      const { socket, handlers } = createMockSocket();
+      const { io, emit } = createMockIo();
+      registerHostHandlers(io, socket);
+
+      const game = makeGame({ language: 'en' });
+      mockGetGame.mockReturnValue(game);
+
+      handlers['changeRoomLanguage']({ gameCode: 'GAME1', language: 'xx' });
+
+      expect(game.language).toBe('en');
+      expect(emit).not.toHaveBeenCalled();
+    });
+
+    it('rejects when payload missing gameCode or language', () => {
+      const { socket, handlers } = createMockSocket();
+      const { io, emit } = createMockIo();
+      registerHostHandlers(io, socket);
+
+      handlers['changeRoomLanguage']({});
+      handlers['changeRoomLanguage']({ gameCode: 'GAME1' });
+      handlers['changeRoomLanguage']({ language: 'he' });
+
+      expect(emit).not.toHaveBeenCalled();
+    });
+
+    it('rejects when game is in-progress (no mid-game language change)', () => {
+      const { socket, handlers } = createMockSocket();
+      const { io, emit } = createMockIo();
+      registerHostHandlers(io, socket);
+
+      const game = makeGame({ language: 'en', gameState: 'in-progress' });
+      mockGetGame.mockReturnValue(game);
+
+      handlers['changeRoomLanguage']({ gameCode: 'GAME1', language: 'he' });
+
+      expect(game.language).toBe('en');
+      expect(emit).not.toHaveBeenCalled();
+      expect(socket.emit).not.toHaveBeenCalled();
+    });
+
+    it('rejects when game is finished', () => {
+      const { socket, handlers } = createMockSocket();
+      const { io, emit } = createMockIo();
+      registerHostHandlers(io, socket);
+
+      const game = makeGame({ language: 'en', gameState: 'finished' });
+      mockGetGame.mockReturnValue(game);
+
+      handlers['changeRoomLanguage']({ gameCode: 'GAME1', language: 'he' });
+
+      expect(game.language).toBe('en');
+      expect(emit).not.toHaveBeenCalled();
+      expect(socket.emit).not.toHaveBeenCalled();
     });
   });
 });

@@ -10,22 +10,23 @@ import GridComponent from '../GridComponent';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 
 // Mock framer-motion to avoid animation issues in tests
-vi.mock('framer-motion', () => ({
-  motion: {
-    div: ({ children, initial, animate, exit, whileTap, transition, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (
-      <div {...props}>{children}</div>
-    ),
-    span: ({ children, initial, animate, exit, whileTap, transition, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (
-      <span {...props}>{children}</span>
-    ),
-  },
-  AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
-  useAnimation: () => ({
-    start: vi.fn(),
-    stop: vi.fn(),
-    set: vi.fn(),
-  }),
-}));
+vi.mock('framer-motion', () => {
+  const passthrough = ({ children, initial, animate, exit, whileTap, transition, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (
+    <div {...props}>{children}</div>
+  );
+  const passthroughSpan = ({ children, initial, animate, exit, whileTap, transition, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (
+    <span {...props}>{children}</span>
+  );
+  return {
+    motion: { div: passthrough, span: passthroughSpan },
+    m: { div: passthrough, span: passthroughSpan },
+    AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
+    LazyMotion: ({ children }: React.PropsWithChildren) => <>{children}</>,
+    domAnimation: {},
+    domMax: {},
+    useAnimation: () => ({ start: vi.fn(), stop: vi.fn(), set: vi.fn() }),
+  };
+});
 
 // Mock accessibility context
 vi.mock('@/contexts/AccessibilityContext', () => ({

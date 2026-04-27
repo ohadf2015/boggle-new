@@ -169,7 +169,10 @@ export function addPlayerWord(
       validatedStatus = undefined;
     }
 
-    // Add to playerWordDetails for achievement tracking
+    // Add to playerWordDetails for achievement tracking.
+    // `timestamp` is required for the scoreMultiplier boost to verify a word
+    // was submitted inside the boost window (audit SRV-CRIT-1). It's also used
+    // by pace/achievement analytics already declared on the WordDetail type.
     const wordDetail: WordDetail = {
       word: normalizedWord,
       score: options.score || 0,
@@ -182,6 +185,7 @@ export function addPlayerWord(
       fireRoundMultiplier: options.fireRoundMultiplier || 1,
       fireRoundBonus: options.fireRoundBonus || 0,
       fromLesson: options.fromLesson || false,
+      timestamp: Date.now(),
     };
 
     game.playerWordDetails[username].push(wordDetail);

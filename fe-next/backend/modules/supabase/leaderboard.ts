@@ -4,6 +4,7 @@
  */
 
 import { getSupabase } from './client';
+import { getCurrentSeasonDynamic } from '@/lib/seasons';
 
 /**
  * Update leaderboard entry for a player
@@ -21,11 +22,15 @@ export async function updateLeaderboardEntry(playerId: string, retries = 1): Pro
 
   if (fetchError) return { data: null, error: fetchError };
 
-  // Upsert leaderboard entry
+  const seasonId = getCurrentSeasonDynamic().id;
+
+  // Upsert leaderboard entry — composite PK (player_id, season_id) since
+  // 20260426160000_seasons_infrastructure.
   const { data, error } = await client
     .from('leaderboard')
     .upsert({
       player_id: playerId,
+      season_id: seasonId,
       username: profile.username,
       display_name: profile.display_name,
       avatar_emoji: profile.avatar_emoji,
@@ -36,7 +41,7 @@ export async function updateLeaderboardEntry(playerId: string, retries = 1): Pro
       ranked_mmr: profile.ranked_mmr || 1000,
       last_updated: new Date().toISOString()
     }, {
-      onConflict: 'player_id'
+      onConflict: 'player_id,season_id'
     })
     .select()
     .single();

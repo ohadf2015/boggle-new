@@ -194,7 +194,7 @@ export function useMultiplayerJoin({
 
       const safetyTimeout = setTimeout(() => {
         setIsJoining(false);
-        logger.warn('[JOIN] Safety timeout triggered');
+        logger.debug('[JOIN] Safety timeout triggered');
         toast.error(t('errors.connectionTimeout'), { duration: 4000, icon: '⚠️' });
       }, 10000);
 

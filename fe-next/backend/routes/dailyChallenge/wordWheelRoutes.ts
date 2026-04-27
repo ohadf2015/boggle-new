@@ -108,7 +108,35 @@ router.post('/submit', async (req: Request<unknown, unknown, WordWheelSubmitBody
 
     if (error) {
       if (error.code === '23505') {
-        res.json({ success: true, alreadySubmitted: true });
+        // Canonical row exists from a prior submit. Return it so the client
+        // can sync UI/localStorage to the truth instead of overwriting with
+        // the wasted replay.
+        let canonicalQuery = supabase
+          .from('daily_word_wheel_attempts')
+          .select('score, word_count, words_found, longest_word, time_seconds, center_letter, completed_at')
+          .eq('puzzle_date', puzzleDate)
+          .eq('language', language);
+        canonicalQuery = playerId
+          ? canonicalQuery.eq('player_id', playerId)
+          : canonicalQuery.eq('guest_fingerprint', guestFingerprint);
+
+        const { data: existing } = await canonicalQuery.maybeSingle();
+
+        const result = existing
+          ? {
+              score: existing.score ?? 0,
+              wordCount: existing.word_count ?? 0,
+              wordsFound: Array.isArray(existing.words_found)
+                ? (existing.words_found as unknown[]).filter((w): w is string => typeof w === 'string')
+                : [],
+              longestWord: existing.longest_word ?? null,
+              timeSeconds: existing.time_seconds ?? 0,
+              centerLetter: existing.center_letter ?? null,
+              completedAt: existing.completed_at ?? null,
+            }
+          : null;
+
+        res.json({ success: true, alreadySubmitted: true, result });
         return;
       }
       logger.error('API', `Word Wheel submit error: ${error.message}`);

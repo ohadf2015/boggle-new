@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Star, Gift, Shield, Bomb, Zap } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useHideNavigation } from '@/contexts/NavigationContext';
+import { trackGameStart } from '@/utils/growthTracking';
 import { useHasRealAdProvider } from '@/hooks/useHasRealAdProvider';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { BlastGame } from './BlastGame';
@@ -36,6 +37,17 @@ export function BlastView() {
     setIsInGame(phase === 'playing');
     return () => setIsInGame(false);
   }, [phase, setIsInGame]);
+
+  // Funnel parity: emit growth:game_started once per blast run when the player
+  // first transitions out of `ready`. Was missing entirely → PostHog showed
+  // 27 blast mode_selected events with 0 game_starts (2026-04-27 sweep).
+  const gameStartedRef = useRef(false);
+  useEffect(() => {
+    if (phase === 'playing' && !gameStartedRef.current) {
+      gameStartedRef.current = true;
+      trackGameStart('blast', { language });
+    }
+  }, [phase, language]);
 
   // Wave tracking
   const checkpoint = useBlastCheckpoint();

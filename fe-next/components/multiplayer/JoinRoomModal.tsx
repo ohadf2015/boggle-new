@@ -190,7 +190,18 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
               <Button
                 variant="default"
                 size="lg"
-                onClick={() => onSpectate?.(username.trim()) || handleJoin()}
+                // Re-check capacity at click time — if a player left while the
+                // modal was open the room may no longer be full, in which case
+                // we should join as a player instead of silently spectating
+                // (audit UX-H1).
+                onClick={() => {
+                  const stillFull = room.maxPlayers && room.playerCount >= room.maxPlayers;
+                  if (stillFull) {
+                    onSpectate?.(username.trim()) || handleJoin();
+                  } else {
+                    handleJoin();
+                  }
+                }}
                 disabled={isJoining}
                 className="w-full bg-neo-purple hover:bg-neo-purple/90 text-neo-white font-black uppercase tracking-wide border-3 border-neo-black shadow-hard hover:-translate-x-px hover:-translate-y-px hover:shadow-hard-lg active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all duration-100 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:translate-x-0 disabled:translate-y-0 gap-2"
               >

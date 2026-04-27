@@ -85,6 +85,18 @@ export function registerBoostHandlers(io: Server, socket: Socket): void {
       if (!game.playerBoosts) {
         game.playerBoosts = {};
       }
+      // Idempotency guard — reject re-claim within the same session so a duplicate
+      // socket emit (race or replay) cannot grant a second boost benefit. A new
+      // sessionId (next game) is allowed to overwrite (audit SRV-MED).
+      const existing = game.playerBoosts[username];
+      if (existing && existing.sessionId === sessionId) {
+        socket.emit('error', {
+          error: 'BOOST_ALREADY_CLAIMED',
+          message: 'A boost was already claimed for this session',
+        });
+        logger.warn('BOOST', `Duplicate boost claim for ${username} in game ${gameCode} (session ${sessionId})`);
+        return;
+      }
       game.playerBoosts[username] = { sessionId, token };
 
       // Persist the updated game state

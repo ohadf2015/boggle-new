@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, memo } from 'react';
 import { useSpring, animated } from '@react-spring/web';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { TrendingUp } from 'lucide-react';
@@ -72,7 +72,7 @@ function getTierInfo(score: number): TierInfo {
  * that matches what the results page will eventually render, plus a witty
  * tier-progress note ("150 to Gold" / "Legendary · maxed out").
  */
-export const AccumulatedScoreDisplay: React.FC<AccumulatedScoreDisplayProps> = ({
+export const AccumulatedScoreDisplay = memo<AccumulatedScoreDisplayProps>(({
   currentScore,
   lastIncrement,
   isAnimating,
@@ -180,6 +180,7 @@ export const AccumulatedScoreDisplay: React.FC<AccumulatedScoreDisplayProps> = (
       </div>
     </div>
   );
-};
+});
+AccumulatedScoreDisplay.displayName = 'AccumulatedScoreDisplay';
 
 export default AccumulatedScoreDisplay;

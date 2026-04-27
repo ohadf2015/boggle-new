@@ -55,7 +55,11 @@ export const WheelLetter: React.FC<WheelLetterProps> = ({
       onClick={() => {
         if (btnRef.current) onPress(letter, index, btnRef.current);
       }}
-      whileTap={{ scaleX: 1.12, scaleY: 0.82 }}
+      // Symmetric press: previous { scaleX: 1.12, scaleY: 0.82 } stretched the
+      // button non-uniformly, which on slow Android frames reads as "danced
+      // but didn't commit" → users re-tap. PostHog 2026-04-27 rage-clicks on
+      // /he/daily/word-wheel were exclusively Mobile (he, ר, ש).
+      whileTap={{ scale: 0.94 }}
       whileHover={!isCenter && !isUsed ? { scale: 1.1, boxShadow: '2px 2px 0px black, 0 0 18px rgba(191,255,0,0.5)' } : undefined}
       animate={{
         x: offsetX,

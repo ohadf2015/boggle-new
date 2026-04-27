@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { memo } from 'react';
 import { Keyboard } from 'lucide-react';
 import { SurvivalHeader } from './SurvivalHeader';
 import { SurvivalClueBoxes } from './SurvivalClueBoxes';
@@ -62,7 +62,7 @@ export interface SurvivalDesktopLayoutProps {
  * Rounded zone panels with thin neon glow borders (pink/cyan/lime).
  * Left: Live leaderboard, Center: Game area, Right: Loot/Score panel
  */
-export function SurvivalDesktopLayout({
+function SurvivalDesktopLayoutImpl({
   isTv,
   grid,
   isGameOver,
@@ -203,4 +203,12 @@ export function SurvivalDesktopLayout({
   );
 }
 
+// Memoized: parent re-renders ~1× per second from life-drain timer.
+// Without memo, every tick cascades through this 3-column layout and into
+// GridComponent, defeating the cell-tree memo work. Stable-ref props are
+// expected from the parent (callbacks via useCallback, derived data via useMemo).
+// Both named + default exports resolve to the memoized version so consumers
+// importing either path get the same memo guarantee.
+export const SurvivalDesktopLayout = memo(SurvivalDesktopLayoutImpl);
+SurvivalDesktopLayout.displayName = 'SurvivalDesktopLayout';
 export default SurvivalDesktopLayout;

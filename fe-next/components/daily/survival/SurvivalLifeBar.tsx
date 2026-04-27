@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useEffect, useState, useCallback } from 'react';
+import React, { useRef, useEffect, useState, useCallback, memo } from 'react';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { Heart } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -25,7 +25,7 @@ function getLifeTier(pct: number) {
 /**
  * Neo-brutalist life bar with animated heart, segmented pips, shimmer, and damage feedback
  */
-export const SurvivalLifeBar: React.FC<SurvivalLifeBarProps> = ({
+export const SurvivalLifeBar = memo<SurvivalLifeBarProps>(({
   lifePoints,
   isGameOver,
   isLifeGaining,
@@ -223,4 +223,5 @@ export const SurvivalLifeBar: React.FC<SurvivalLifeBarProps> = ({
       </div>
     </div>
   );
-};
+});
+SurvivalLifeBar.displayName = 'SurvivalLifeBar';

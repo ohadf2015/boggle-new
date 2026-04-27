@@ -258,6 +258,11 @@ Sentry.init({
     /\[SOCKET\.IO\].*Error received.*eliminated/i,
     /\[SOCKET\.IO\].*Error received.*kicked/i,
     /\[SOCKET\.IO\].*Error received.*Target word already found/i,
+    // Socket.IO AUTH_REQUIRED — unauth users hitting friends sockets; server rejects correctly (JAVASCRIPT-NEXTJS-12G)
+    /\[SOCKET\.IO\].*AUTH_REQUIRED/i,
+    /\[SOCKET\.IO\].*Authentication required/i,
+    // Multiplayer join 10s safety timeout — transient connectivity, user is shown toast (JAVASCRIPT-NEXTJS-12E)
+    /\[JOIN\] Safety timeout triggered/i,
     // Results/resetGame timeout — race condition during fast rematch
     /\[RESULTS\].*resetGame callback timed out/i,
     // Adventure state 404 — new user without saved progress

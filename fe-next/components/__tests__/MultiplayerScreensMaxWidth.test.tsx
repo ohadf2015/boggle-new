@@ -17,6 +17,8 @@ vi.mock('@/lib/animation/presets', () => ({ SPRING_PRESETS: { balanced: { type: 
 vi.mock('@/utils/profileStorage', () => ({ getOrCreateStoredCustomAvatar: () => null, setStoredCustomAvatar: vi.fn() }));
 vi.mock('@/hooks/useAvatarPremium', () => ({ useAvatarPremium: () => ({ isPremium: false }) }));
 vi.mock('@/components/avatar/AvatarBuilderModal', () => ({ __esModule: true, default: () => null }));
+vi.mock('@/components/boosts/BoostButton', () => ({ BoostButton: () => null }));
+vi.mock('@/components/boosts/BoostPicker', () => ({ BoostPicker: () => null }));
 
 vi.mock('../../contexts/LanguageContext', () => ({
   useLanguage: () => ({

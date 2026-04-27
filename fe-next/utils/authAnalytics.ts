@@ -78,3 +78,36 @@ export function resetUserAnalytics(opts?: { reset?: () => void }): void {
   safe(() => reset());
   safe(() => (posthog.capture as PHFn)('user_logged_out'));
 }
+
+/**
+ * State-machine guard for auth-analytics side effects.
+ *
+ * Why: AuthContext used to fire `resetUserAnalytics()` on every render where
+ * user/profile were falsy — including the initial guest mount on every page
+ * load. PostHog showed `user_logged_out` 1:1 with `$pageview` on /he (252 vs
+ * 250 over 14d). Only fire on real transitions:
+ *   - `false → true`: capture `user_identified`
+ *   - `true → false`: capture `user_logged_out`
+ *   - no change: no-op
+ *
+ * Returns the next `wasAuthenticated` value so callers can persist it in a ref.
+ */
+export function syncAuthAnalyticsTransition(args: {
+  wasAuthenticated: boolean;
+  identify: IdentifyArgs | null;
+  reset?: () => void;
+}): boolean {
+  const isAuthenticated = args.identify !== null;
+
+  if (isAuthenticated && args.identify) {
+    // Always re-identify when authed: profile fields may have changed.
+    identifyUserForAnalytics(args.identify);
+    return true;
+  }
+
+  // identify === null (guest)
+  if (args.wasAuthenticated) {
+    resetUserAnalytics({ reset: args.reset });
+  }
+  return false;
+}

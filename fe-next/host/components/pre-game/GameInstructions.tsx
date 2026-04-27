@@ -9,6 +9,7 @@ import type { GameModeOption } from '@/components/GameModeSelector';
 interface GameInstructionsProps {
   selectedGameMode: GameModeOption;
   t: (path: string, params?: Record<string, string | number>) => string;
+  defaultOpen?: boolean;
 }
 
 const GAME_INSTRUCTIONS: Record<string, { icon: React.ReactNode; barClass: string; iconBgClass: string; dotClass: string; steps: { titleKey: string; descKey: string }[] }> = {
@@ -50,9 +51,9 @@ const GAME_INSTRUCTIONS: Record<string, { icon: React.ReactNode; barClass: strin
   },
 };
 
-export function GameInstructions({ selectedGameMode, t }: GameInstructionsProps): React.ReactElement | null {
+export function GameInstructions({ selectedGameMode, t, defaultOpen = true }: GameInstructionsProps): React.ReactElement | null {
   const [instructionStep, setInstructionStep] = useState(0);
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(defaultOpen);
 
   useEffect(() => { setInstructionStep(0); }, [selectedGameMode]);
 
@@ -66,7 +67,7 @@ export function GameInstructions({ selectedGameMode, t }: GameInstructionsProps)
       initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.2, type: 'spring', stiffness: 300, damping: 24 }}
-      className="rounded-neo-lg border-3 border-neo-black bg-slate-800/80 shadow-hard overflow-hidden"
+      className="rounded-neo-lg border-3 border-neo-black bg-neo-navy-light shadow-hard overflow-hidden"
     >
       <div className={cn('h-1', barClass)} />
       <button

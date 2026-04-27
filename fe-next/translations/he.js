@@ -4256,7 +4256,23 @@ const he = {
     "name": "עונה {{number}}: {{theme}}",
     "endingSoon": "העונה מסתיימת בקרוב!",
     "endsIn": "מסתיימת בעוד {{days}} ימים",
-    "peakTier": "שיא: {{tier}}"
+    "peakTier": "שיא: {{tier}}",
+    "complete": "העונה הסתיימה!",
+    "continue": "המשך",
+    "gamesPlayed": "משחקים",
+    "newSeason": "עונה חדשה",
+    "rewardCoins": "מטבעות שהורווחו",
+    "softReset": "איפוס דירוג",
+    "claimRewards": "קבלו את הפרסים",
+    "claim": "קבלו",
+    "alreadyClaimed": "כבר נאסף",
+    "rewardEarned": "הרווחתם {{coins}} מטבעות!",
+    "thisSeason": "העונה הנוכחית",
+    "allTime": "כל הזמנים",
+    "pastSeasons": "עונות קודמות",
+    "noPastSeasons": "אין עדיין עונות קודמות",
+    "rankedAt": "מקום #{{position}}",
+    "tierLabel": "דרגה"
   },
   "growth": {
     "dayStreak": "ימי רצף",
@@ -10598,28 +10614,28 @@ const he = {
     }
   },
   "boosts": {
-    "title": "[HE-PENDING] Pick a boost",
-    "cta": "[HE-PENDING] BOOST",
-    "close": "[HE-PENDING] Close",
-    "remaining": "[HE-PENDING] Boosts left today: {{n}}/{{cap}}",
-    "watchAd": "[HE-PENDING] Watch ad to unlock",
-    "activeThisGame": "[HE-PENDING] Active this game",
-    "openPickerAria": "[HE-PENDING] Open boost picker, {{n}} boosts left today",
+    "title": "בחרו בוסט",
+    "cta": "בוסט",
+    "close": "סגור",
+    "remaining": "בוסטים שנותרו היום: {{n}}/{{cap}}",
+    "watchAd": "צפו בפרסומת כדי לפתוח",
+    "activeThisGame": "פעיל במשחק זה",
+    "openPickerAria": "פתח בוחר בוסט, נשארו {{n}} בוסטים היום",
     "freezeTime": {
-      "title": "[HE-PENDING] Freeze Time",
-      "description": "[HE-PENDING] Pause the timer once during your game."
+      "title": "הקפאת זמן",
+      "description": "השהו את הטיימר פעם אחת במהלך המשחק."
     },
     "hint": {
-      "title": "[HE-PENDING] Hint",
-      "description": "[HE-PENDING] Reveal one bonus word."
+      "title": "רמז",
+      "description": "חשפו מילת בונוס אחת."
     },
     "scoreMultiplier": {
-      "title": "[HE-PENDING] Score Multiplier",
-      "description": "[HE-PENDING] 1.5x score for the first 30 seconds."
+      "title": "מכפיל ניקוד",
+      "description": "ניקוד פי 1.5 ב-30 השניות הראשונות."
     },
     "firstWordBonus": {
-      "title": "[HE-PENDING] First Word Bonus",
-      "description": "[HE-PENDING] 2x score on your first word."
+      "title": "בונוס מילה ראשונה",
+      "description": "ניקוד כפול על המילה הראשונה שלכם."
     }
   },
   "socketErrors": {

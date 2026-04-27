@@ -221,7 +221,7 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
           <Link
             href={`/${language}`}
             className="flex items-center justify-center w-10 h-10 rounded-neo border-3 border-neo-black bg-neo-cream shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-px active:translate-y-px active:shadow-hard-pressed focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-lime transition-all text-neo-black"
-            aria-label={t('common.back')}
+            aria-label={t('common.backToHome')}
           >
             <ArrowLeft className="w-5 h-5 rtl:rotate-180" />
           </Link>
@@ -302,13 +302,20 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
                   )}
                 </div>
 
-                {/* Primary submit — single focused action */}
+                {/* Primary submit — single focused action.
+                    Disabled while profile is loading or username is empty so a
+                    fast-clicker can't create a room with a blank username (audit UX-H4). */}
                 <Button
                   type="submit"
                   variant={mode === 'host' ? 'success' : 'default'}
                   className="w-full"
                   size="lg"
-                  disabled={isJoining || (mode === 'join' && (isAutoJoining || !gameCode))}
+                  disabled={
+                    isJoining
+                    || isProfileLoading
+                    || !username.trim()
+                    || (mode === 'join' && (isAutoJoining || !gameCode))
+                  }
                 >
                   {mode === 'host' ? <Crown className="me-2" /> : <User className="me-2" />}
                   {mode === 'host'

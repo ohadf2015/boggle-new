@@ -11,23 +11,31 @@ import { render, screen, fireEvent } from '@testing-library/react';
 // Mock framer-motion to avoid animation issues in tests
 vi.mock('framer-motion', () => {
   const React = require('react');
+  const motion = new Proxy({}, {
+    get: (_target: unknown, prop: string) => {
+      const MotionComponent = React.forwardRef((props: Record<string, unknown>, ref: React.Ref<HTMLElement>) => {
+        const { children, initial, animate, exit, transition, variants, whileHover, whileTap, ...rest } = props;
+        return React.createElement(prop, { ...rest, ref }, children);
+      });
+      MotionComponent.displayName = `motion.${prop}`;
+      return MotionComponent;
+    },
+  });
   return {
-    motion: new Proxy({}, {
-      get: (_target: unknown, prop: string) => {
-        const MotionComponent = React.forwardRef((props: Record<string, unknown>, ref: React.Ref<HTMLElement>) => {
-          const { children, initial, animate, exit, transition, variants, whileHover, whileTap, ...rest } = props;
-          return React.createElement(prop, { ...rest, ref }, children);
-        });
-        MotionComponent.displayName = `motion.${prop}`;
-        return MotionComponent;
-      },
-    }),
+    motion,
+    m: motion,
+    LazyMotion: ({ children }: { children: React.ReactNode }) =>
+      React.createElement(React.Fragment, null, children),
+    domAnimation: {},
     AnimatePresence: ({ children }: { children: React.ReactNode }) =>
       React.createElement(React.Fragment, null, children),
   };
 });
 
 // Mock LanguageContext
+vi.mock('@/components/boosts/BoostButton', () => ({ BoostButton: () => null }));
+vi.mock('@/components/boosts/BoostPicker', () => ({ BoostPicker: () => null }));
+
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,

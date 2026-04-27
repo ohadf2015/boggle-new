@@ -1,13 +1,21 @@
 /**
  * Type-safe leaderboard queries using Drizzle ORM.
  */
-import { desc, eq, sql } from 'drizzle-orm';
+import { desc, eq } from 'drizzle-orm';
 import { getDrizzleClient } from '../drizzle';
 import { profiles, leaderboard, gameResults } from '../schema';
 
-export async function getTopPlayersByScore(limit = 20) {
+export interface TopPlayersOptions {
+  /** Restrict results to a specific season. Omit to query all rows. */
+  seasonId?: number;
+}
+
+export async function getTopPlayersByScore(
+  limit = 20,
+  opts: TopPlayersOptions = {}
+) {
   const db = getDrizzleClient();
-  return db
+  const baseSelect = db
     .select({
       playerId: leaderboard.playerId,
       username: leaderboard.username,
@@ -19,10 +27,15 @@ export async function getTopPlayersByScore(limit = 20) {
       rankPosition: leaderboard.rankPosition,
       totalXp: leaderboard.totalXp,
       currentLevel: leaderboard.currentLevel,
+      seasonId: leaderboard.seasonId,
     })
-    .from(leaderboard)
-    .orderBy(desc(leaderboard.totalScore))
-    .limit(limit);
+    .from(leaderboard);
+
+  const filtered = opts.seasonId !== undefined
+    ? baseSelect.where(eq(leaderboard.seasonId, opts.seasonId))
+    : baseSelect;
+
+  return filtered.orderBy(desc(leaderboard.totalScore)).limit(limit);
 }
 
 export async function getTopPlayersByMmr(limit = 20) {

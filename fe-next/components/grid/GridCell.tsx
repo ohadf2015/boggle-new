@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { cn } from '../../lib/utils';
 import { getComboColors, type PerformanceMode } from './index';
 import GridCellEffects from './GridCellEffects';
@@ -49,7 +49,9 @@ export interface GridCellProps {
   isDragging: boolean;
   isTypingMode: boolean;
   hintAnimationPhase: 'blink' | 'fadeout' | null;
-  currentTier: number;
+  /** True when escalation has crossed tier 3+ — used to apply background-shrink scale.
+   * Boolean (not number) so non-selected cells skip re-renders on tier 1→2 transitions. */
+  isHighTier: boolean;
   selectedCellsLength: number;
   onTouchStart: (e: React.TouchEvent) => void;
   onMouseDown: (e: React.MouseEvent) => void;
@@ -69,7 +71,7 @@ const GridCell = memo<GridCellProps>(({
   effectiveRenderMode, earthquakePhase, getPhaseAnimation,
   comboLevel, escalationCombo, comboColors, reduceMotion, animateOnMount, interactive,
   isSelecting, isDragging, isTypingMode, hintAnimationPhase,
-  currentTier, selectedCellsLength,
+  isHighTier, selectedCellsLength,
   onTouchStart, onMouseDown, onDoubleClick, ghost = false, ariaLabel,
 }) => {
   // Empty cell — render invisible placeholder to maintain grid layout
@@ -106,7 +108,7 @@ const GridCell = memo<GridCellProps>(({
   }
 
   return (
-  <motion.div
+  <m.div
     key={`${row}-${col}`}
     data-row={row}
     data-col={col}
@@ -143,7 +145,7 @@ const GridCell = memo<GridCellProps>(({
         }
       ) : {
         scale: isSelected ? (escalation?.scale ?? 1.05)
-          : currentTier >= 3 && !isEliminated ? 0.96
+          : isHighTier && !isEliminated ? 0.96
           : (isFading ? 1.02 : 1),
         rotate: isSelected ? ((row + col) % 2 === 0 ? -1.5 : 1.5) : 0,
         y: isSelected ? (escalation?.liftY ?? -2) : 0,
@@ -215,7 +217,15 @@ const GridCell = memo<GridCellProps>(({
       // Opacity dimming for non-selected cells during selection — driven by CSS transition
       // instead of framer-motion to avoid animation restarts on every re-render
       opacity: isSelecting && selectedCellsLength > 0 && !isSelected && !isAdjacentHint && !isHighlighted ? 0.4 : 1,
-      transition: 'box-shadow 300ms ease-out, background 250ms ease, border-color 200ms ease, opacity 150ms ease',
+      // Short transitions during active drag prevent chained 300ms shadows from
+      // stacking into compositor stutter as letters fire 4-6/sec. Restore smooth
+      // transitions when idle so selection entrance still feels polished.
+      transition: isDragging
+        ? 'box-shadow 90ms ease-out, background 80ms linear, border-color 80ms linear, opacity 80ms ease'
+        : 'box-shadow 300ms ease-out, background 250ms ease, border-color 200ms ease, opacity 150ms ease',
+      // Promote selected/dragging cells to compositor layer — avoids paint reflow
+      // when transform scales during drag. Drop the hint when idle to free GPU memory.
+      willChange: isSelected || isDragging ? 'transform' : 'auto',
       ...(isSelected && {
         '--esc-scale': String(escalation?.scale ?? 1.05),
         boxShadow: escalation?.glow ?? '0 0 0 2px rgba(255, 225, 53, 0.7), 0 0 8px rgba(255, 200, 100, 0.3)',
@@ -320,7 +330,7 @@ const GridCell = memo<GridCellProps>(({
     <DoubleClickIndicator
       visible={isLastSelected && isSelecting && !isDragging && selectedCellsLength >= 2}
     />
-  </motion.div>
+  </m.div>
   );
 });
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { memo } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 
 interface RoundEventTileEffectsProps {
   isFrozen: boolean;
@@ -30,7 +30,7 @@ const RoundEventTileEffects = memo<RoundEventTileEffectsProps>(function RoundEve
     return (
       <>
         {/* Ice crystal base — frost crawl from edges */}
-        <motion.div
+        <m.div
           className="absolute inset-0 rounded-[6px] pointer-events-none overflow-hidden"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -46,7 +46,7 @@ const RoundEventTileEffects = memo<RoundEventTileEffectsProps>(function RoundEve
           />
 
           {/* Animated frost veins crawling from corners */}
-          <motion.div
+          <m.div
             className="absolute inset-0"
             initial={{ opacity: 0, scale: 0.3 }}
             animate={{ opacity: [0, 0.6, 0.4], scale: [0.3, 1.1, 1] }}
@@ -69,11 +69,11 @@ const RoundEventTileEffects = memo<RoundEventTileEffectsProps>(function RoundEve
               backgroundSize: '200% 200%',
             }}
           />
-        </motion.div>
+        </m.div>
 
         {/* Floating ice crystal particles */}
         {[0, 1, 2].map(i => (
-          <motion.div
+          <m.div
             key={`ice-${i}`}
             className="absolute pointer-events-none z-20"
             style={{
@@ -100,11 +100,11 @@ const RoundEventTileEffects = memo<RoundEventTileEffectsProps>(function RoundEve
               <path d="M12 2v20M2 12h20M5.6 5.6l12.8 12.8M18.4 5.6L5.6 18.4"
                 stroke="rgba(186,230,253,0.9)" strokeWidth="1.5" strokeLinecap="round" />
             </svg>
-          </motion.div>
+          </m.div>
         ))}
 
         {/* Frost edge glow */}
-        <motion.div
+        <m.div
           className="absolute inset-[-2px] rounded-neo pointer-events-none"
           initial={{ opacity: 0 }}
           animate={{ opacity: [0.3, 0.7, 0.3] }}
@@ -115,7 +115,7 @@ const RoundEventTileEffects = memo<RoundEventTileEffectsProps>(function RoundEve
         />
 
         {/* Ice badge */}
-        <motion.span
+        <m.span
           className="absolute -top-1 -left-1 text-[10px] pointer-events-none select-none z-20 drop-shadow-[0_0_4px_rgba(96,165,250,0.8)]"
           initial={{ scale: 0, rotate: -180 }}
           animate={{ scale: 1, rotate: 0 }}
@@ -123,7 +123,7 @@ const RoundEventTileEffects = memo<RoundEventTileEffectsProps>(function RoundEve
           aria-hidden="true"
         >
           ❄️
-        </motion.span>
+        </m.span>
       </>
     );
   }
@@ -133,7 +133,7 @@ const RoundEventTileEffects = memo<RoundEventTileEffectsProps>(function RoundEve
     return (
       <>
         {/* Energy field base */}
-        <motion.div
+        <m.div
           className="absolute inset-0 rounded-[6px] pointer-events-none overflow-hidden"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -155,10 +155,10 @@ const RoundEventTileEffects = memo<RoundEventTileEffectsProps>(function RoundEve
               background: 'radial-gradient(ellipse at 50% 50%, rgba(250,204,21,0.4) 0%, transparent 70%)',
             }}
           />
-        </motion.div>
+        </m.div>
 
         {/* Electric arc lines — randomized SVG paths */}
-        <motion.svg
+        <m.svg
           className="absolute inset-0 w-full h-full pointer-events-none z-10"
           viewBox="0 0 100 100"
           initial={{ opacity: 0 }}
@@ -190,11 +190,11 @@ const RoundEventTileEffects = memo<RoundEventTileEffectsProps>(function RoundEve
               </feMerge>
             </filter>
           </defs>
-        </motion.svg>
+        </m.svg>
 
         {/* Spark particles */}
         {[0, 1, 2, 3].map(i => (
-          <motion.div
+          <m.div
             key={`spark-${i}`}
             className="absolute rounded-full pointer-events-none z-20"
             style={{
@@ -221,7 +221,7 @@ const RoundEventTileEffects = memo<RoundEventTileEffectsProps>(function RoundEve
         ))}
 
         {/* Electric border glow — rapid pulsing */}
-        <motion.div
+        <m.div
           className="absolute inset-[-2px] rounded-neo pointer-events-none"
           animate={{
             boxShadow: [
@@ -234,7 +234,7 @@ const RoundEventTileEffects = memo<RoundEventTileEffectsProps>(function RoundEve
         />
 
         {/* Lightning badge with bounce */}
-        <motion.span
+        <m.span
           className="absolute -top-1.5 -left-1.5 text-[12px] pointer-events-none select-none z-20 drop-shadow-[0_0_6px_rgba(250,204,21,0.9)]"
           initial={{ scale: 0, y: -10 }}
           animate={{ scale: [1, 1.2, 1], y: 0 }}
@@ -245,10 +245,10 @@ const RoundEventTileEffects = memo<RoundEventTileEffectsProps>(function RoundEve
           aria-hidden="true"
         >
           ⚡
-        </motion.span>
+        </m.span>
 
         {/* 1.5x multiplier badge */}
-        <motion.span
+        <m.span
           className="absolute -bottom-1 -right-1 text-[7px] font-black leading-none pointer-events-none select-none z-20 bg-yellow-400 text-yellow-900 px-1 py-0.5 rounded-full border border-yellow-600/50 shadow-[0_0_8px_rgba(250,204,21,0.6)]"
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
@@ -256,7 +256,7 @@ const RoundEventTileEffects = memo<RoundEventTileEffectsProps>(function RoundEve
           aria-hidden="true"
         >
           1.5×
-        </motion.span>
+        </m.span>
       </>
     );
   }
@@ -266,7 +266,7 @@ const RoundEventTileEffects = memo<RoundEventTileEffectsProps>(function RoundEve
     return (
       <>
         {/* Impact crater base */}
-        <motion.div
+        <m.div
           className="absolute inset-0 rounded-[6px] pointer-events-none overflow-hidden"
           initial={{ opacity: 0, scale: 0.5 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -291,10 +291,10 @@ const RoundEventTileEffects = memo<RoundEventTileEffectsProps>(function RoundEve
               backgroundSize: '100% 200%',
             }}
           />
-        </motion.div>
+        </m.div>
 
         {/* Impact shockwave ring — expands outward on arrival */}
-        <motion.div
+        <m.div
           className="absolute inset-[-4px] rounded-[10px] pointer-events-none"
           initial={{ scale: 0.5, opacity: 1 }}
           animate={{ scale: [0.5, 1.3, 1.5], opacity: [1, 0.5, 0] }}
@@ -307,7 +307,7 @@ const RoundEventTileEffects = memo<RoundEventTileEffectsProps>(function RoundEve
 
         {/* Ember particles rising */}
         {[0, 1, 2, 3, 4].map(i => (
-          <motion.div
+          <m.div
             key={`ember-${i}`}
             className="absolute rounded-full pointer-events-none z-20"
             style={{
@@ -334,7 +334,7 @@ const RoundEventTileEffects = memo<RoundEventTileEffectsProps>(function RoundEve
         ))}
 
         {/* Crater glow — pulsing orange aura */}
-        <motion.div
+        <m.div
           className="absolute inset-[-2px] rounded-neo pointer-events-none"
           animate={{
             boxShadow: [
@@ -347,7 +347,7 @@ const RoundEventTileEffects = memo<RoundEventTileEffectsProps>(function RoundEve
         />
 
         {/* Meteor badge with impact animation */}
-        <motion.span
+        <m.span
           className="absolute -top-1.5 -left-1.5 text-[11px] pointer-events-none select-none z-20 drop-shadow-[0_0_6px_rgba(251,146,60,0.9)]"
           initial={{ scale: 0, y: -20, rotate: -45 }}
           animate={{ scale: 1, y: 0, rotate: 0 }}
@@ -355,10 +355,10 @@ const RoundEventTileEffects = memo<RoundEventTileEffectsProps>(function RoundEve
           aria-hidden="true"
         >
           ☄️
-        </motion.span>
+        </m.span>
 
         {/* "NEW" badge for replaced letter */}
-        <motion.span
+        <m.span
           className="absolute -bottom-1 -right-1 text-[6px] font-black leading-none pointer-events-none select-none z-20 bg-orange-500 text-white px-1 py-0.5 rounded-full border border-orange-700/50 shadow-[0_0_8px_rgba(251,146,60,0.6)]"
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
@@ -366,7 +366,7 @@ const RoundEventTileEffects = memo<RoundEventTileEffectsProps>(function RoundEve
           aria-hidden="true"
         >
           NEW
-        </motion.span>
+        </m.span>
       </>
     );
   }

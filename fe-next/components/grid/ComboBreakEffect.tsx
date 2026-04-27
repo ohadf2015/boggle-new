@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { useReducedMotion } from '../../utils/accessibility';
 
 interface ComboBreakEffectProps {
@@ -52,7 +52,7 @@ const ComboBreakEffect: React.FC<ComboBreakEffectProps> = ({
 
   return (
     <AnimatePresence mode="wait">
-      <motion.div
+      <m.div
         key={`combo-break-${displayLevel}`}
         className="fixed top-28 left-1/2 -translate-x-1/2 z-79 pointer-events-none flex flex-col items-center"
         initial={{ opacity: 1 }}
@@ -61,7 +61,7 @@ const ComboBreakEffect: React.FC<ComboBreakEffectProps> = ({
       >
         {/* Brief screen flash overlay - very subtle desaturation effect */}
         {!prefersReducedMotion && (
-          <motion.div
+          <m.div
             className="fixed inset-0 pointer-events-none"
             style={{
               backgroundColor: 'rgba(0, 0, 0, 0.1)',
@@ -74,7 +74,7 @@ const ComboBreakEffect: React.FC<ComboBreakEffectProps> = ({
         )}
 
         {/* Deflating badge animation */}
-        <motion.div
+        <m.div
           initial={{ scale: 1, opacity: 0.8, y: 0 }}
           animate={{
             scale: [1, 0.9, 0.7, 0.4, 0],
@@ -93,11 +93,11 @@ const ComboBreakEffect: React.FC<ComboBreakEffectProps> = ({
           <span className="relative z-10">
             💨 x{displayLevel}
           </span>
-        </motion.div>
+        </m.div>
 
         {/* Ghost text showing what was lost - only for meaningful combos */}
         {showLostText && (
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 10, scale: 0.9 }}
             animate={{
               opacity: [0, 0.7, 0.7, 0],
@@ -121,14 +121,14 @@ const ComboBreakEffect: React.FC<ComboBreakEffectProps> = ({
             >
               {isHighCombo ? `Lost x${displayLevel} combo...` : 'Combo lost'}
             </span>
-          </motion.div>
+          </m.div>
         )}
 
         {/* Particle scatter effect for high combos */}
         {!prefersReducedMotion && isHighCombo && (
           <>
             {[...Array(6)].map((_, i) => (
-              <motion.div
+              <m.div
                 key={`particle-${i}`}
                 className="absolute w-1.5 h-1.5 rounded-full bg-orange-400/60"
                 style={{
@@ -151,7 +151,7 @@ const ComboBreakEffect: React.FC<ComboBreakEffectProps> = ({
             ))}
           </>
         )}
-      </motion.div>
+      </m.div>
     </AnimatePresence>
   );
 };

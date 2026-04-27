@@ -1,5 +1,5 @@
 'use client';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import posthog from 'posthog-js';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useBoostStatus } from '@/hooks/useBoostStatus';
@@ -17,6 +17,8 @@ export function BoostPicker({ open, mode, sessionId, onClose }: Props) {
   const { t } = useLanguage();
   const { status } = useBoostStatus();
   const { claim, claimed, isLoading } = useBoostClaim(sessionId);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const closeBtnRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (open) {
@@ -26,8 +28,32 @@ export function BoostPicker({ open, mode, sessionId, onClose }: Props) {
 
   useEffect(() => {
     if (!open) return;
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+        return;
+      }
+      // Focus trap: keep Tab cycling within the dialog so Shift+Tab from the
+      // close button doesn't escape behind the modal to the Start Game button.
+      if (e.key === 'Tab' && dialogRef.current) {
+        const focusables = dialogRef.current.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), [href], input:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusables.length === 0) return;
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    };
     document.addEventListener('keydown', onKey);
+    // Move initial focus into the dialog
+    closeBtnRef.current?.focus();
     return () => document.removeEventListener('keydown', onKey);
   }, [open, onClose]);
 
@@ -40,7 +66,10 @@ export function BoostPicker({ open, mode, sessionId, onClose }: Props) {
   return (
     <div role="dialog" aria-modal="true" aria-labelledby="boost-picker-title"
          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 motion-reduce:transition-none">
-      <div className="m-4 w-full max-w-md rounded-neo border-neo-thick bg-neo-navy p-6 shadow-hard-lg motion-safe:animate-neo-pop">
+      <div
+        ref={dialogRef}
+        className="mx-2 my-4 w-full max-w-[calc(100vw-1rem)] sm:max-w-md rounded-neo border-neo-thick bg-neo-navy p-4 sm:p-6 shadow-hard-lg motion-safe:animate-neo-pop"
+      >
         <h2 id="boost-picker-title" className="font-neo-display text-2xl text-neo-cream">
           {t('boosts.title')}
         </h2>
@@ -57,8 +86,9 @@ export function BoostPicker({ open, mode, sessionId, onClose }: Props) {
           ))}
         </div>
         <button
+          ref={closeBtnRef}
           onClick={onClose}
-          className="mt-4 w-full rounded-neo border-neo bg-neo-cream py-2 font-neo-body text-neo-navy shadow-hard hover:active:shadow-hard-pressed">
+          className="mt-4 w-full min-h-[44px] rounded-neo border-neo bg-neo-cream py-2 font-neo-body text-neo-navy shadow-hard hover:active:shadow-hard-pressed">
           {t('boosts.close')}
         </button>
       </div>

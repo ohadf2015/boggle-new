@@ -8,11 +8,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 /**
  * Graduated reconnection UX delay.
- * Brief disconnections (< 5s) are silent — most mobile cellular handoffs
- * resolve within 1-3 seconds. Showing a banner immediately creates
- * unnecessary anxiety. Only show after this threshold.
+ * Brief disconnections (< 1.5s) are silent — most mobile cellular handoffs
+ * resolve within 1-3 seconds. Lower than the prior 5s threshold so users on
+ * a real handoff see feedback well before the device feels frozen, while
+ * sub-second blips (typical socket retransmits) still don't flash a banner.
+ * See audit UX-CRIT-4 (multiplayer-comprehensive-audit-2026-04-27).
  */
-const BANNER_DELAY_MS = 5000;
+const BANNER_DELAY_MS = 1500;
 
 /**
  * Connection status type for better semantics

@@ -90,13 +90,14 @@ export function getCurrentSeason(now?: Date): Season {
 }
 
 /**
- * Get time remaining in the current season.
+ * Get time remaining in the current season (monthly cadence after the
+ * grandfathered Q1+April 2026 window).
  * @param now - optional date override
  */
 export function getSeasonTimeRemaining(now?: Date): TimeRemaining {
   const date = now ?? new Date();
-  const season = getCurrentSeason(date);
-  const totalMs = Math.max(0, season.endDate.getTime() - date.getTime());
+  const { end } = getMonthlySeasonBounds(date);
+  const totalMs = Math.max(0, end.getTime() - date.getTime());
   const totalHours = totalMs / (1000 * 60 * 60);
 
   return {
@@ -167,6 +168,64 @@ export function getSeasonRewards(tierName: string, seasonId: number): SeasonRewa
   }
 
   return empty;
+}
+
+/**
+ * Grandfathered Season 1 window: 2026-01-01 → 2026-05-01.
+ * After this point seasons become monthly. Exported so tests + migration share truth.
+ */
+export const GRANDFATHERED_SEASON_1_END = '2026-05-01T00:00:00.000Z';
+
+const MONTHLY_EPOCH = new Date(GRANDFATHERED_SEASON_1_END);
+
+/**
+ * Monthly season bounds.
+ * Season 1 covers Jan-Apr 2026 (grandfathered quarterly window).
+ * Season 2+ are monthly: May 2026 = S2, Jun 2026 = S3, etc.
+ */
+export function getMonthlySeasonBounds(date: Date): { id: number; start: Date; end: Date } {
+  if (date.getTime() < MONTHLY_EPOCH.getTime()) {
+    return {
+      id: 1,
+      start: new Date('2026-01-01T00:00:00.000Z'),
+      end: new Date(GRANDFATHERED_SEASON_1_END),
+    };
+  }
+
+  const year = date.getUTCFullYear();
+  const month = date.getUTCMonth();
+  const monthsSinceEpoch =
+    (year - MONTHLY_EPOCH.getUTCFullYear()) * 12 +
+    (month - MONTHLY_EPOCH.getUTCMonth());
+
+  const id = 2 + monthsSinceEpoch;
+
+  const start = new Date(Date.UTC(year, month, 1));
+  const end = month === 11
+    ? new Date(Date.UTC(year + 1, 0, 1))
+    : new Date(Date.UTC(year, month + 1, 1));
+
+  return { id, start, end };
+}
+
+/**
+ * Get the currently active season using the monthly-after-grandfathered cadence.
+ * Prefer this over the legacy quarterly getCurrentSeason for any new code.
+ */
+export function getCurrentSeasonDynamic(now?: Date): Season {
+  const date = now ?? new Date();
+  const { id, start, end } = getMonthlySeasonBounds(date);
+  const themeIndex = (id - 1) % SEASON_THEMES.length;
+  const theme = SEASON_THEMES[themeIndex];
+
+  return {
+    id,
+    name: `Season ${id}: ${theme}`,
+    theme,
+    startDate: start,
+    endDate: end,
+    rewards: buildSeasonRewards(id),
+  };
 }
 
 function buildSeasonRewards(seasonId: number): SeasonReward[] {

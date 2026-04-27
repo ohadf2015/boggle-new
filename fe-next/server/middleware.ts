@@ -26,6 +26,7 @@ const EXPRESS_API_ROUTES: string[] = ['/api/leaderboard', '/api/geolocation', '/
 const NEXT_ADMIN_BODY_ROUTES: string[] = [
   '/api/admin/send-test-android-beta-launch',
   '/api/admin/send-android-beta-launch-to-player',
+  '/api/admin/season-reset',
 ];
 
 export function shouldExpressParseJsonBody(path: string): boolean {

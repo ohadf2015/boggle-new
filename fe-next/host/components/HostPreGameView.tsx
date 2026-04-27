@@ -9,6 +9,7 @@ import { useSocket } from '../../utils/SocketContext';
 import { useGameActions, useGameMode } from '@/hooks/gameState';
 import { useAuth } from '@/contexts/AuthContext';
 import { BoostButton } from '@/components/boosts/BoostButton';
+import { BoostPicker } from '@/components/boosts/BoostPicker';
 
 import { GAME_PRESETS } from './pre-game/PresetSelector';
 import { StartButton } from './pre-game/StartButton';
@@ -128,6 +129,9 @@ function HostPreGameView({
 
   // Avatar & name editing state (UI lives in PlayerRoster, modal lives here)
   const [isAvatarBuilderOpen, setIsAvatarBuilderOpen] = useState(false);
+  // Lifted boost-picker state — single picker mounts at view root so picker UI
+  // survives mobile↔desktop layout swaps on device rotation (see audit UX-CRIT-5).
+  const [isBoostPickerOpen, setIsBoostPickerOpen] = useState(false);
   const avatarPremium = useAvatarPremium();
   const currentAvatar = getOrCreateStoredCustomAvatar();
 
@@ -437,7 +441,7 @@ function HostPreGameView({
           {/* Sticky bottom start button — desktop */}
           <div className="shrink-0 px-6 py-3 border-t-3 border-neo-black bg-neo-navy/95">
             <div className="flex items-center gap-3">
-              <BoostButton mode="mp" sessionId={gameCode} />
+              <BoostButton mode="mp" sessionId={gameCode} open={isBoostPickerOpen} onOpenChange={setIsBoostPickerOpen} />
               <div className="flex-1">
                 <StartButton
                   onStartGame={onStartGame}
@@ -476,14 +480,14 @@ function HostPreGameView({
                 isAdmin={isAdmin}
                 hasBlastAccess={hasBlastAccess}
               />
-              <GameInstructions selectedGameMode={selectedGameMode} t={t} />
+              <GameInstructions selectedGameMode={selectedGameMode} t={t} defaultOpen={false} />
               <InviteCard gameCode={gameCode} t={t} />
             </div>
           </div>
           {/* Sticky bottom start button — mobile */}
           <div className="shrink-0 px-5 py-3 border-t-3 border-neo-black bg-neo-navy/95" style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom, 0px))' }}>
             <div className="max-w-[600px] mx-auto flex flex-col gap-2">
-              <BoostButton mode="mp" sessionId={gameCode} />
+              <BoostButton mode="mp" sessionId={gameCode} open={isBoostPickerOpen} onOpenChange={setIsBoostPickerOpen} />
               <StartButton
                 onStartGame={onStartGame}
                 disabled={isStartDisabled}
@@ -506,6 +510,18 @@ function HostPreGameView({
         premium={avatarPremium}
       />
       <ChatBubble gameCode={gameCode} username={username} isHost t={t} />
+      {/* Single boost picker mount — survives layout tree swaps. Lazy-mounted
+          so the picker's hooks (useBoostStatus, useBoostClaim → AdMobProvider)
+          don't run until needed; HostPreGameView root keeps the open flag so
+          the picker reopens at the same state on viewport changes. */}
+      {isBoostPickerOpen && (
+        <BoostPicker
+          open={isBoostPickerOpen}
+          mode="mp"
+          sessionId={gameCode}
+          onClose={() => setIsBoostPickerOpen(false)}
+        />
+      )}
     </div>
   );
 }

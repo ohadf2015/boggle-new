@@ -595,6 +595,34 @@ export const markFirstGameActivation = (args: {
 };
 
 /**
+ * Marketing-name → engine-name vocab map for the home screen mode cards.
+ *
+ * `trackModeSelected` receives the marketing name (what the card says, e.g.
+ * "quickPlay", "arena"). `trackGameStart` receives the engine name (e.g.
+ * "singleplayer", "multiplayer"). Without a translation, PostHog funnels
+ * broken-down by either prop never link the two events, hiding the real
+ * conversion (PostHog 2026-04-27 sweep: blast 27→0, connections 18→0).
+ *
+ * Add new mode cards here whenever a marketing label diverges from its engine
+ * label. If marketing == engine, you can omit the entry — `engineModeFor`
+ * falls back to the input.
+ */
+const MODE_SELECTED_TO_ENGINE: Record<string, string> = {
+  quickPlay: 'singleplayer',
+  practice: 'singleplayer',
+  arena: 'multiplayer',
+  // identity-mapped (kept explicit for self-documentation):
+  blast: 'blast',
+  adventure: 'adventure',
+  connections: 'connections',
+  brainGym: 'brainGym',
+};
+
+export function engineModeFor(uiMode: string): string {
+  return MODE_SELECTED_TO_ENGINE[uiMode] ?? uiMode;
+}
+
+/**
  * Track game start across any mode (SP, MP, daily, adventure, drill, blast)
  */
 export const trackGameStart = (
@@ -602,7 +630,12 @@ export const trackGameStart = (
   extras: Record<string, unknown> = {}
 ): void => {
   sessionGameCount += 1;
-  trackGrowthEvent('game_started', { ...extras, mode, gameMode: mode });
+  trackGrowthEvent('game_started', {
+    ...extras,
+    mode,
+    gameMode: mode,
+    engineMode: mode,
+  });
   trackSessionDepth(sessionGameCount);
   markGameActive(mode);
 };
@@ -680,7 +713,11 @@ export const trackAdventureLevel = (
  * Track mode selection from home screen
  */
 export const trackModeSelected = (mode: string, fromScreen: string = 'home'): void => {
-  trackGrowthEvent('mode_selected', { gameMode: mode, fromScreen });
+  trackGrowthEvent('mode_selected', {
+    gameMode: mode,
+    fromScreen,
+    engineMode: engineModeFor(mode),
+  });
 };
 
 /**

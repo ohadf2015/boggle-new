@@ -10,17 +10,18 @@ import GridComponent, { HighlightedCell } from '../GridComponent';
 import type { LetterGrid } from '@/types';
 
 // Mock framer-motion to avoid animation complexity in tests
-vi.mock('framer-motion', () => ({
-  motion: {
-    div: ({ children, animate, initial, ...props }: any) => <div {...props}>{children}</div>,
-  },
-  AnimatePresence: ({ children }: any) => <>{children}</>,
-  useAnimation: () => ({
-    start: vi.fn(),
-    set: vi.fn(),
-    stop: vi.fn(),
-  }),
-}));
+vi.mock('framer-motion', () => {
+  const passthrough = ({ children, animate, initial, ...props }: any) => <div {...props}>{children}</div>;
+  return {
+    motion: { div: passthrough },
+    m: { div: passthrough },
+    AnimatePresence: ({ children }: any) => <>{children}</>,
+    LazyMotion: ({ children }: any) => <>{children}</>,
+    domAnimation: {},
+    domMax: {},
+    useAnimation: () => ({ start: vi.fn(), set: vi.fn(), stop: vi.fn() }),
+  };
+});
 
 // Mock hooks
 vi.mock('@/contexts/SoundEffectsContext', () => ({

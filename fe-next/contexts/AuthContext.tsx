@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useMemo, useRef, ReactNode } from 'react';
 import { setSentryUser, clearSentryUser } from '@/utils/sentry';
-import { identifyUserForAnalytics, resetUserAnalytics } from '@/utils/authAnalytics';
+import { syncAuthAnalyticsTransition } from '@/utils/authAnalytics';
 
 // Import types and hooks from auth module
 import {
@@ -93,7 +93,10 @@ export function AuthProvider({ children }: AuthProviderProps): React.ReactElemen
     needsProfileCustomization,
   } = useComputedAuthValues(user, profile, rankedProgress);
 
-  // Sync user context with Sentry and PostHog
+  // Sync user context with Sentry and PostHog.
+  // Gated through syncAuthAnalyticsTransition so guest pageviews don't emit
+  // spurious user_logged_out events (was firing 1:1 with $pageview on /he).
+  const wasAuthenticatedRef = useRef(false);
   useEffect(() => {
     if (user && profile) {
       setSentryUser(user, profile);
@@ -101,17 +104,25 @@ export function AuthProvider({ children }: AuthProviderProps): React.ReactElemen
       const navLang =
         typeof navigator !== 'undefined' ? navigator.language?.split('-')[0] ?? '' : '';
       const locale = docLang || navLang || 'en';
-      identifyUserForAnalytics({
-        userId: user.id,
-        displayName: profile.display_name ?? profile.username,
-        isAdmin,
-        isTeacher,
-        locale,
-        email: user.email ?? null,
+      wasAuthenticatedRef.current = syncAuthAnalyticsTransition({
+        wasAuthenticated: wasAuthenticatedRef.current,
+        identify: {
+          userId: user.id,
+          displayName: profile.display_name ?? profile.username,
+          isAdmin,
+          isTeacher,
+          locale,
+          email: user.email ?? null,
+        },
       });
     } else {
-      clearSentryUser();
-      resetUserAnalytics();
+      if (wasAuthenticatedRef.current) {
+        clearSentryUser();
+      }
+      wasAuthenticatedRef.current = syncAuthAnalyticsTransition({
+        wasAuthenticated: wasAuthenticatedRef.current,
+        identify: null,
+      });
     }
   }, [user, profile, isAdmin, isTeacher]);
 

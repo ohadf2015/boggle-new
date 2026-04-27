@@ -7,14 +7,14 @@ import { KEY_PATTERNS, KEYS } from './keys';
 
 import logger from '../utils/logger';
 
-export async function getCachedLeaderboardTop100(): Promise<unknown[] | null> {
+export async function getCachedLeaderboardTop100(seasonId?: number): Promise<unknown[] | null> {
   if (!isRedisAvailable() || !getRedisClient()) {
     return null;
   }
 
   try {
     const client = getRedisClient()!;
-    const data = await circuitBreaker.execute(() => client.get(KEYS.leaderboardTop()));
+    const data = await circuitBreaker.execute(() => client.get(KEYS.leaderboardTop(seasonId)));
     return data ? JSON.parse(data) : null;
   } catch (error: unknown) {
     const err = error as Error;
@@ -23,7 +23,7 @@ export async function getCachedLeaderboardTop100(): Promise<unknown[] | null> {
   }
 }
 
-export async function cacheLeaderboardTop100(leaderboard: unknown[]): Promise<void> {
+export async function cacheLeaderboardTop100(leaderboard: unknown[], seasonId?: number): Promise<void> {
   if (!isRedisAvailable() || !getRedisClient()) {
     return;
   }
@@ -32,7 +32,7 @@ export async function cacheLeaderboardTop100(leaderboard: unknown[]): Promise<vo
     const client = getRedisClient()!;
     await circuitBreaker.execute(() =>
       client.setex(
-        KEYS.leaderboardTop(),
+        KEYS.leaderboardTop(seasonId),
         getTTLWithJitter(TTL_CONFIG.LEADERBOARD_TOP),
         JSON.stringify(leaderboard)
       )

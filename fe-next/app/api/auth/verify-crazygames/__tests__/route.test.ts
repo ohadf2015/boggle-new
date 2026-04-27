@@ -82,6 +82,7 @@ describe('POST /api/auth/verify-crazygames', () => {
 
     expect(mockJwtVerify).toHaveBeenCalledWith('some-token', 'mock-jwks', {
       issuer: 'crazygames.com',
+      audience: 'lexiclash',
       algorithms: ['RS256'],
     });
   });

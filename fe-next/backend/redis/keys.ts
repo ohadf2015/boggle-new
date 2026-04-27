@@ -15,8 +15,10 @@ export const KEYS = {
   wordApproval: (lang: string, word: string): string =>
     `${REDIS_PREFIX}:${REDIS_VERSION}:word:${lang}:${word}`,
 
-  leaderboardTop: (): string =>
-    `${REDIS_PREFIX}:${REDIS_VERSION}:lb:top100`,
+  leaderboardTop: (seasonId?: number): string =>
+    seasonId !== undefined
+      ? `${REDIS_PREFIX}:${REDIS_VERSION}:lb:top100:s${seasonId}`
+      : `${REDIS_PREFIX}:${REDIS_VERSION}:lb:top100`,
 
   leaderboardUser: (userId: string): string =>
     `${REDIS_PREFIX}:${REDIS_VERSION}:lb:user:${userId}`,

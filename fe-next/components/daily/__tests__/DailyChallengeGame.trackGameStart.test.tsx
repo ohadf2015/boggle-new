@@ -15,15 +15,21 @@ vi.mock('@/utils/growthTracking', () => ({
   trackGameEnd: (...args: unknown[]) => trackGameEnd(...args),
 }));
 
-vi.mock('framer-motion', () => ({
-  motion: new Proxy({}, {
+vi.mock('framer-motion', () => {
+  const motion = new Proxy({}, {
     get: () => ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => {
       const { initial, animate, exit, whileHover, whileTap, transition, variants, ...rest } = props as Record<string, unknown>;
       return <div {...rest}>{children}</div>;
     },
-  }),
-  AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
-}));
+  });
+  return {
+    motion,
+    m: motion,
+    LazyMotion: ({ children }: React.PropsWithChildren) => <>{children}</>,
+    domAnimation: {},
+    AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
+  };
+});
 
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, language: 'en', setLanguage: vi.fn() }),

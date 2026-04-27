@@ -41,6 +41,7 @@ import {
   type Player,
 } from './hooks';
 import { useNavigationGuard } from '../hooks/useNavigationGuard';
+import { useCrazyGamesLifecycle } from '@/hooks/useCrazyGamesLifecycle';
 
 // ==========================================
 // Props
@@ -377,6 +378,17 @@ const HostView: React.FC<HostViewProps> = memo(({
 
   // Destructure for cleaner JSX
   const { runtime, settings, players, tournament, animation, ui, hostPlaying: hostPlayingState, combo } = state;
+
+  // CrazyGames SDK lifecycle (gameplayStart/Stop, happyTime) — required for full launch.
+  // Hosts in MP rooms (whether playing or broadcasting) must emit lifecycle events for
+  // CrazyGames QA detection. roundKey resets between tournament rounds.
+  useCrazyGamesLifecycle({
+    isGameActive: runtime.gameStarted && !runtime.waitingForResults,
+    isGameOver: runtime.waitingForResults,
+    score: players.playerScores[username] ?? 0,
+    maxCombo: combo.level ?? 0,
+    roundKey: tournament.tournamentData?.currentRound ?? 0,
+  });
 
   // Navigation guard - prevent accidental navigation during active game
   // Enable for ALL hosts when game is running, whether playing or spectating

@@ -1,11 +1,12 @@
 'use client';
 
 import React, { memo, useCallback, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { Crown, X, Pencil, Check } from 'lucide-react';
 import Avatar from '../../../components/Avatar';
 import { useSocket } from '../../../utils/SocketContext';
 import { cn } from '../../../lib/utils';
+import { ConfirmationDialog } from '../../../components/ui/ConfirmationDialog';
 import type { Avatar as AvatarType, PresenceStatus } from '@/shared/types/game';
 
 interface PlayerData {
@@ -78,11 +79,23 @@ const playerEntranceVariants = {
   },
 };
 
+/** No-motion variants for prefers-reduced-motion users — instant fade only,
+ *  no scale/rotate/spring overshoot (audit UX-LOW). */
+const reducedMotionVariants = {
+  initial: { opacity: 0 },
+  animate: { opacity: 1, transition: { duration: 0 } },
+  exit: { opacity: 0, transition: { duration: 0 } },
+};
+
 export const PlayerRoster = memo(function PlayerRoster({ players, username, gameCode, maxPlayers, t, compact = false, onSelfAvatarClick, onSelfNameChange, canEditSelfName = false, headerExtra }: PlayerRosterProps): React.ReactElement {
   const { socket } = useSocket();
 
   const [isEditingSelfName, setIsEditingSelfName] = useState(false);
   const [selfNameDraft, setSelfNameDraft] = useState(username);
+  // { name, description } so the dialog text stays stable during exit animation
+  // even after we clear the pending kick on cancel/confirm.
+  const [pendingKick, setPendingKick] = useState<{ name: string; description: string } | null>(null);
+  const prefersReducedMotion = useReducedMotion() ?? false;
 
   const startSelfNameEdit = useCallback(() => {
     setSelfNameDraft(username);
@@ -107,10 +120,18 @@ export const PlayerRoster = memo(function PlayerRoster({ players, username, game
   }, [socket, gameCode]);
 
   const handleKick = useCallback((targetUsername: string) => {
-    if (confirm(t('hostView.kickConfirm').replace('{{name}}', targetUsername))) {
-      socket?.emit('kickPlayer', { targetUsername });
+    setPendingKick({
+      name: targetUsername,
+      description: t('hostView.kickConfirm').replace('{{name}}', targetUsername),
+    });
+  }, [t]);
+
+  const confirmKick = useCallback(() => {
+    if (pendingKick) {
+      socket?.emit('kickPlayer', { targetUsername: pendingKick.name });
     }
-  }, [socket, t]);
+    setPendingKick(null);
+  }, [pendingKick, socket]);
 
   const handleRemoveBot = useCallback((botUsername: string) => {
     socket?.emit('removeBot', { username: botUsername, gameCode });
@@ -141,7 +162,9 @@ export const PlayerRoster = memo(function PlayerRoster({ players, username, game
             const isMe = name === username;
             const diffConfig = botDifficulty ? DIFFICULTY_CONFIG[botDifficulty] : null;
 
-            const variants = isBot ? botEntranceVariants : playerEntranceVariants;
+            const variants = prefersReducedMotion
+              ? reducedMotionVariants
+              : (isBot ? botEntranceVariants : playerEntranceVariants);
 
             return (
               <motion.div
@@ -319,6 +342,16 @@ export const PlayerRoster = memo(function PlayerRoster({ players, username, game
         )}
       </div>
 
+      <ConfirmationDialog
+        open={pendingKick !== null}
+        onOpenChange={(open) => { if (!open) setPendingKick(null); }}
+        title={t('hostView.kickPlayer')}
+        description={pendingKick?.description}
+        confirmText={t('hostView.kickPlayer')}
+        cancelText={t('common.cancel')}
+        onConfirm={confirmKick}
+        variant="danger"
+      />
     </section>
   );
 });

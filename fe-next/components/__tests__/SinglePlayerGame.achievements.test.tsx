@@ -123,8 +123,8 @@ vi.mock('@/hooks/useEarthquakeFireRound', () => ({
   }),
 }));
 
-vi.mock('framer-motion', () => ({
-  motion: {
+vi.mock('framer-motion', () => {
+  const motion = {
     div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (
       <div {...props}>{children}</div>
     ),
@@ -138,14 +138,20 @@ vi.mock('framer-motion', () => ({
     button: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (
       <button {...props}>{children}</button>
     ),
-  },
-  AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
-  useAnimation: () => ({
-    start: vi.fn(),
-    stop: vi.fn(),
-    set: vi.fn(),
-  }),
-}));
+  };
+  return {
+    motion,
+    m: motion,
+    LazyMotion: ({ children }: React.PropsWithChildren) => <>{children}</>,
+    domAnimation: {},
+    AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
+    useAnimation: () => ({
+      start: vi.fn(),
+      stop: vi.fn(),
+      set: vi.fn(),
+    }),
+  };
+});
 
 vi.mock('@/utils/accessibility', () => ({
   useReducedMotion: () => false,
