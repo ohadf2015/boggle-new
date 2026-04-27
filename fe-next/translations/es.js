@@ -3979,7 +3979,10 @@ const es = {
       "title": "¡Bien hecho!",
       "message": "¡Ya tienes las jugadas! ¿Listo para la competencia real?",
       "finish": "¡A Batallar!",
-      "continuePractice": "Continuar Practicando"
+      "continuePractice": "Continuar Practicando",
+      "nextChallenge": "¿Qué sigue?",
+      "tryDaily": "Reto diario de hoy",
+      "tryQuickMatch": "Reta a un bot"
     },
     "analysis": {
       "titleComplete": "¡Entrenamiento Completo!",
@@ -4439,6 +4442,7 @@ const es = {
     "quickPlayDesc": "Entra ya — modo aleatorio vs bots",
     "practice": "Práctica",
     "practiceDesc": "Sin presión, solo palabras",
+    "practiceFirstToUnlock": "Termina la práctica para desbloquear",
     "brainTraining": "Entrenamiento Cerebral",
     "brainTrainingDesc": "Sigue tu crecimiento cognitivo",
     "adventureMode": "Aventura",
@@ -5109,6 +5113,7 @@ const es = {
     "timeLimit": "Límite de tiempo: 2 minutos",
     "clear": "Borrar",
     "shuffle": "Mezclar",
+    "stealLabel": "ROBAR",
     "foundWords": "Palabras encontradas",
     "possibleWords": "Posibles",
     "excellent": "¡Excelente!",
@@ -5236,12 +5241,9 @@ const es = {
           "silver": "Plata",
           "gold": "Oro",
           "platinum": "Platino",
-          "bronzeFlavor": "Calentando",
-          "silverFlavor": "Buena racha",
-          "goldFlavor": "En llamas",
-          "platinumFlavor": "Legendario",
           "maxed": "Al máximo",
-          "toNext": "{points} para {next}"
+          "toNext": "{points} para {next}",
+          "progressLabel": "Progreso de rango"
         }
       }
     },

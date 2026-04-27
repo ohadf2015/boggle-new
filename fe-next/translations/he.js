@@ -2611,7 +2611,10 @@ const he = {
       "title": "כל הכבוד!",
       "message": "תפסת את הטריק! מוכנים למשחק האמיתי?",
       "finish": "יאללה לקרב!",
-      "continuePractice": "המשך תרגול"
+      "continuePractice": "המשך תרגול",
+      "nextChallenge": "מה הלאה?",
+      "tryDaily": "אתגר יומי",
+      "tryQuickMatch": "שחק נגד בוט"
     },
     "analysis": {
       "titleComplete": "האימון הושלם!",
@@ -4412,6 +4415,7 @@ const he = {
     "quickPlayDesc": "קפצו פנימה — מצב אקראי נגד בוטים",
     "practice": "תרגול",
     "practiceDesc": "בלי לחץ, רק מילים",
+    "practiceFirstToUnlock": "סיים תרגול כדי לפתוח",
     "brainTraining": "אימון קוגניטיבי",
     "brainTrainingDesc": "עקוב אחר התפתחות קוגניטיבית",
     "adventureMode": "הרפתקה",
@@ -5084,6 +5088,7 @@ const he = {
     "timeLimit": "מגבלת זמן: 2 דקות",
     "clear": "נקה",
     "shuffle": "ערבב",
+    "stealLabel": "גנוב!",
     "foundWords": "מילים שנמצאו",
     "possibleWords": "אפשרי",
     "excellent": "מצוין!",
@@ -5266,12 +5271,9 @@ const he = {
           "silver": "כסף",
           "gold": "זהב",
           "platinum": "פלטינום",
-          "bronzeFlavor": "מתחממים",
-          "silverFlavor": "ריצה איתנה",
-          "goldFlavor": "בוערים",
-          "platinumFlavor": "אגדי",
-          "maxed": "במקסימום",
-          "toNext": "{points} עד {next}"
+          "maxed": "אגדי",
+          "toNext": "עוד {points} ל{next}",
+          "progressLabel": "התקדמות בדרגה"
         }
       }
     },

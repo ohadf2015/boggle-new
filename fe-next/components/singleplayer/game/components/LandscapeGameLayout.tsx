@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import GridComponent from '@/components/GridComponent';
 import CircularTimer from '@/components/CircularTimer';
 import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
-import { TrainingProgressBar } from '@/components/training';
+import { TrainingProgressBar, PracticeCompletionPopup } from '@/components/training';
 import { shouldShowKeyboardTrails } from '@/components/game/keyboardTrailsUtils';
 import { cn } from '@/lib/utils';
 import { GameOverlays } from './GameOverlays';
@@ -79,6 +79,9 @@ export interface LandscapeGameLayoutProps {
   // Quit dialog
   showQuitConfirm: boolean;
   setShowQuitConfirm: (show: boolean) => void;
+  // Practice completion popup
+  showCompletionPopup: boolean;
+  setShowCompletionPopup: (show: boolean) => void;
   // Tutorial
   showLandscapeTutorial: boolean;
   onDismissLandscapeTutorial: () => void;
@@ -136,6 +139,8 @@ export function LandscapeGameLayout({
   onConfirmQuit,
   showQuitConfirm,
   setShowQuitConfirm,
+  showCompletionPopup,
+  setShowCompletionPopup,
   showLandscapeTutorial: _showLandscapeTutorial,
   onDismissLandscapeTutorial: _onDismissLandscapeTutorial,
   onExtendTime,
@@ -396,6 +401,16 @@ export function LandscapeGameLayout({
         analyticsId="sp_quit_confirm"
         analyticsExtras={{ layout: 'landscape' }}
       />
+
+      {/* Practice Completion Popup */}
+      {isPracticeMode && (
+        <PracticeCompletionPopup
+          open={showCompletionPopup}
+          onOpenChange={setShowCompletionPopup}
+          language={language}
+          t={t}
+        />
+      )}
 
       {/* Screen reader status announcements */}
       <div className="sr-only" role="status" aria-live="polite">

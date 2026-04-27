@@ -409,7 +409,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
 
               {/* Stats row - Timer centered on mobile, Timer + controls on desktop */}
               <div
-                className="flex w-full items-center justify-center lg:justify-start relative min-h-[56px] md:min-h-[70px] lg:min-h-[clamp(40px,7dvh,64px)] desktop-short:lg:min-h-[40px] gap-2"
+                className="flex w-full items-center justify-center lg:justify-start relative min-h-[56px] md:min-h-[70px] lg:min-h-[clamp(40px,7dvh,64px)] desktop-short:lg:min-h-[40px] short:min-h-[40px] short:md:min-h-[44px] gap-2"
                 data-testid="stats-row"
               >
                 {/* Desktop header */}
@@ -436,10 +436,10 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
                   <div className="hidden desktop-tall:lg:block">
                     <CircularTimer remainingTime={remainingTime} totalTime={timerValue * 60} size="md" onTimerState={onTimerState} />
                   </div>
-                  <div className="hidden md:block lg:hidden">
+                  <div className="hidden md:block lg:hidden short:md:hidden">
                     <CircularTimer remainingTime={remainingTime} totalTime={timerValue * 60} size="md" />
                   </div>
-                  <div className="md:hidden">
+                  <div className="md:hidden short:md:block short:lg:hidden">
                     <CircularTimer remainingTime={remainingTime} totalTime={timerValue * 60} size="sm" />
                   </div>
                 </AdaptiveMotion.div>
@@ -447,7 +447,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
                 {/* Right Side: Score (mobile) - positioned absolutely to not affect timer centering */}
                 {isPlaying && (
                   <div
-                    className="absolute inset-e-1 md:inset-e-2 top-1/2 -translate-y-1/2 lg:hidden"
+                    className="absolute inset-e-1 md:inset-e-2 short:inset-e-0 short:scale-90 top-1/2 -translate-y-1/2 lg:hidden"
                     data-testid="score-mobile"
                   >
                     <ScoreDisplay
@@ -570,12 +570,12 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
           <div
             data-testid="grid-container"
             className={cn(
-              'flex-1 flex flex-col items-center justify-center min-h-0 overflow-visible pt-1 md:pt-0 gap-2 desktop-short:lg:gap-0 desktop-short:lg:pt-0',
+              'flex-1 flex flex-col items-center justify-center min-h-0 overflow-visible pt-1 md:pt-0 gap-2 desktop-short:lg:gap-0 desktop-short:lg:pt-0 short:gap-0 short:pt-0',
               'transition-shadow duration-500',
               comboGlow
             )}
           >
-            <div className="relative w-full max-w-[min(600px,92vw)] lg:max-w-none lg:w-auto lg:h-full mx-auto aspect-square">
+            <div className="relative w-full max-w-[min(600px,92vw,80dvh)] short:max-w-[min(600px,92vw,95dvh)] lg:max-w-none lg:w-auto lg:h-full mx-auto aspect-square">
               <GridComponent
                 key={isPlaying ? 'playing-grid' : 'spectating-grid'}
                 grid={letterGrid}

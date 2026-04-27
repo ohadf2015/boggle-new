@@ -4,6 +4,7 @@ import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { calculateSoftReset } from '@/lib/seasons';
+import { SilentVideo } from '@/components/ui/SilentVideo';
 
 export interface SeasonEndSummaryProps {
   seasonName: string;
@@ -53,15 +54,11 @@ export const SeasonEndSummary: React.FC<SeasonEndSummaryProps> = ({
               animate={{ scale: 1 }}
               transition={{ delay: 0.3, type: 'spring', stiffness: 200, damping: 14 }}
             >
-              <video
+              <SilentVideo
                 src="/mascot/trophy.mp4"
                 width={80}
                 height={80}
                 className="mx-auto mb-2 drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]"
-                autoPlay
-                loop
-                muted
-                playsInline
                 preload="metadata"
                 aria-hidden="true"
               />

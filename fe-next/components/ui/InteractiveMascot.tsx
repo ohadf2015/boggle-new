@@ -5,6 +5,7 @@ import { memo, useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { MascotVariant, getMascotImagePath, getMascotBgType, isVideoVariant, type MascotClipShape, type MascotBorderColor } from './Mascot';
+import { SilentVideo } from './SilentVideo';
 import {
   getBaseVariant,
   type ExtendedMascotVariant,
@@ -642,17 +643,13 @@ export const InteractiveMascot = memo(function InteractiveMascot({
             >
               <div className={`w-full h-full ${CLIP_CLASSES[autoStyle.shape]} ${BORDER_CLASSES[autoStyle.border]} ${autoStyle.shape !== 'none' ? autoStyle.bg : ''}`}>
                 {isVideo ? (
-                  <video
+                  <SilentVideo
                     key={imageSrc}
                     src={imageSrc}
                     aria-label={altText}
                     width={SIZE_PIXELS[size]}
                     height={SIZE_PIXELS[size]}
                     className={`object-contain w-full h-full ${autoStyle.shape !== 'none' ? 'scale-110' : ''} drop-shadow-lg`}
-                    autoPlay
-                    loop
-                    muted
-                    playsInline
                     preload={priority ? 'auto' : 'metadata'}
                   />
                 ) : (

@@ -85,6 +85,7 @@ export function KeyboardModeIndicator({
           transition={{ type: 'spring', stiffness: 300, damping: 25 }}
           className={cn(
             'fixed z-50 pointer-events-none',
+            'short:hidden',
             positionClasses[position]
           )}
           role="status"

@@ -15,6 +15,7 @@ import { useFocusTrap } from '@/hooks/useFocusTrap';
 import { postWithAuth } from '@/utils/authFetch';
 import { captureApiError } from '@/utils/sentry';
 import type { ComebackTier } from '@/shared/types/engagement';
+import { SilentVideo } from '@/components/ui/SilentVideo';
 
 const MAX_CLAIM_ATTEMPTS = 3;
 const COOLDOWN_MS = 1500;
@@ -138,17 +139,13 @@ export function ComebackBonusModal({ isOpen, daysAway, tier, playerName, onClose
                   className="relative z-10"
                 >
                   <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-full overflow-hidden border-3 border-neo-pink shadow-hard bg-neo-navy">
-                    <video
-                      autoPlay
-                      loop
-                      muted
-                      playsInline
+                    <SilentVideo
                       aria-hidden="true"
                       className="w-full h-full object-cover"
                     >
                       <source src={VIDEO_WEBM} type="video/webm" />
                       <source src={VIDEO_MP4} type="video/mp4" />
-                    </video>
+                    </SilentVideo>
                   </div>
                 </AdaptiveMotion.div>
 

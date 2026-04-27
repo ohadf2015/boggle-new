@@ -3,6 +3,7 @@
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { memo } from 'react';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
+import { SilentVideo } from './SilentVideo';
 
 /**
  * Size presets for the DJ mascot
@@ -80,15 +81,11 @@ export const DJMascot = memo(function DJMascot({
       }}
     >
       <div className="w-full h-full">
-        <video
+        <SilentVideo
           src="/mascot/dj.mp4"
           width={SIZE_PIXELS[size]}
           height={SIZE_PIXELS[size]}
           className="w-full h-full object-contain drop-shadow-lg"
-          autoPlay
-          loop
-          muted
-          playsInline
           preload={priority ? 'auto' : 'metadata'}
           aria-label={altText}
         />

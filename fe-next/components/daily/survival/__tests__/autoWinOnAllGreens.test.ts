@@ -1,11 +1,11 @@
 /**
- * Tests for auto-win behavior when player discovers all green clues
+ * Tests for `allPositionsRevealed` detection in useSurvivalClues.
  *
- * Bug fix: When the player discovers all letters of the target word through
- * gameplay (guessing and word discovery), the game should automatically
- * transition to the win state since the player already knows the word.
- *
- * This is separate from the hint system which never reveals the final letter.
+ * The flag is true when every target position has a green clue from gameplay
+ * (target-feedback or word discovery). It used to trigger an auto-win, but
+ * that progression was removed — the player must now submit the target word
+ * on the board themselves. The detection itself is still useful for UI cues,
+ * so these tests stay.
  */
 
 import { renderHook, act, waitFor } from '@testing-library/react';

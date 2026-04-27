@@ -9,6 +9,7 @@ import Avatar from '../../components/Avatar';
 import AvatarBuilderModal from '../../components/avatar/AvatarBuilderModal';
 import { useAvatarPremium } from '@/hooks/useAvatarPremium';
 import RewardedAdGoldButton from '@/components/ads/RewardedAdGoldButton';
+import { QuickLanguageSwitcher } from '@/components/QuickLanguageSwitcher';
 import RoomChat from '../../components/RoomChat';
 import { LobbyTutorialPanel } from '../../components/lobby/LobbyTutorialPanel';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
@@ -450,6 +451,8 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
                 </span>
               </div>
             )}
+            {/* UI-language pill — distinct from the board-language chip above; one tap. */}
+            <QuickLanguageSwitcher compact />
             <div className="bg-black/40 border-2 border-neo-black px-2 py-1 rounded-md flex items-center gap-1.5">
               <Users className="w-4 h-4 text-neo-cyan" />
               <span className="text-xs font-black text-neo-cream">

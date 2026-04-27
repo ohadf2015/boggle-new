@@ -4,6 +4,7 @@ import { useRef } from 'react';
 import type { MatchmakingOpponent, MatchmakingStatus } from '@/hooks/useMatchmaking';
 import { getRankTier } from '@/shared/utils/eloRating';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
+import { SilentVideo } from '@/components/ui/SilentVideo';
 
 interface MatchmakingOverlayProps {
   status: MatchmakingStatus;
@@ -48,15 +49,11 @@ export function MatchmakingOverlay({
         {status === 'searching' && (
           <div className="flex flex-col items-center gap-4">
             {/* Searching mascot */}
-            <video
+            <SilentVideo
               src="/mascot/spectating.mp4"
               width={80}
               height={80}
               className="drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]"
-              autoPlay
-              loop
-              muted
-              playsInline
               preload="metadata"
               aria-hidden="true"
             />

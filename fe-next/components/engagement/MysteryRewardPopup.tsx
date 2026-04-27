@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogTitle } from '../ui/dialog';
 import { cn } from '@/lib/utils';
 import { Sparkles, Gift, Zap, Star, Crown } from 'lucide-react';
 import { fireConfetti } from '@/utils/confettiUtils';
+import { SilentVideo } from '@/components/ui/SilentVideo';
 
 /**
  * Mystery reward data from engagement system
@@ -348,15 +349,11 @@ const MysteryRewardPopup: React.FC<MysteryRewardPopupProps> = ({
                   animate={{ scale: 1, y: 0 }}
                   transition={{ delay: 0.4, type: 'spring', stiffness: 250, damping: 15 }}
                 >
-                  <video
+                  <SilentVideo
                     src={rarity === 'legendary' || rarity === 'epic' ? '/mascot/celebration.mp4' : '/mascot/flexing.mp4'}
                     width={80}
                     height={80}
                     className="drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]"
-                    autoPlay
-                    loop
-                    muted
-                    playsInline
                     preload="metadata"
                     aria-hidden="true"
                   />

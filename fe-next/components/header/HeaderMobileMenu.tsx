@@ -255,9 +255,13 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
 
     return (
         <>
-            {/* Mobile: Volume + Auth + Hamburger */}
+            {/* Mobile: Volume + Lang + Auth + Hamburger */}
             <div className="sm:hidden flex items-center gap-2 min-w-0 shrink-0">
                 <MusicControls />
+
+                {/* Quick UI-language pill — always visible on mobile (incl. CrazyGames),
+                    so embed players can switch language without the hamburger menu. */}
+                <QuickLanguageSwitcher compact />
 
                 {/* Unified auth button for guests (hidden on CrazyGames).
                     Also gated on `cgLoading` so the button does not flash

@@ -7,7 +7,7 @@ import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/Ada
 import GridComponent from '@/components/GridComponent';
 import DesktopInputHint from '@/components/grid/DesktopInputHint';
 import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
-import { TrainingProgressBar } from '@/components/training';
+import { TrainingProgressBar, PracticeCompletionPopup } from '@/components/training';
 import { shouldShowKeyboardTrails } from '@/components/game/keyboardTrailsUtils';
 import { COIN_EARNING_OTHER } from '@/utils/coinManager';
 import { GameOverlays } from './GameOverlays';
@@ -83,6 +83,9 @@ export interface DesktopGameLayoutProps {
   // Quit dialog
   showQuitConfirm: boolean;
   setShowQuitConfirm: (show: boolean) => void;
+  // Practice completion popup
+  showCompletionPopup: boolean;
+  setShowCompletionPopup: (show: boolean) => void;
   /** Extend the game timer (rewarded-ad integration — desktop accepts but does not render). */
   onExtendTime?: (seconds: number) => void;
   // Translation
@@ -139,6 +142,8 @@ export function DesktopGameLayout({
   onConfirmQuit,
   showQuitConfirm,
   setShowQuitConfirm,
+  showCompletionPopup,
+  setShowCompletionPopup,
   onExtendTime: _onExtendTime,
   t,
 }: DesktopGameLayoutProps): React.ReactElement {
@@ -195,8 +200,11 @@ export function DesktopGameLayout({
           gridTemplateRows: '1fr',
         }}
       >
-        {/* Left Sidebar - Stats Panel (+ Training details in practice mode) */}
-        <div className="desktop-stats-panel h-full overflow-y-auto flex flex-col gap-3">
+        {/* Left Sidebar - Stats Panel (+ Training details in practice mode)
+            min-h-0 + [&>*]:shrink-0 ensures children render at intrinsic size and the
+            container scrolls when content exceeds height (training panel was getting
+            cropped by flex-shrink + the card's overflow-hidden). */}
+        <div className="desktop-stats-panel h-full min-h-0 overflow-y-auto flex flex-col gap-3 [&>*]:shrink-0">
           <DesktopStatsPanel
             score={score}
             remainingTime={remainingTime}
@@ -365,6 +373,16 @@ export function DesktopGameLayout({
         analyticsId="sp_quit_confirm"
         analyticsExtras={{ layout: 'desktop' }}
       />
+
+      {/* Practice Completion Popup */}
+      {isPracticeMode && (
+        <PracticeCompletionPopup
+          open={showCompletionPopup}
+          onOpenChange={setShowCompletionPopup}
+          language={language}
+          t={t}
+        />
+      )}
 
       {/* Screen reader status */}
       <div className="sr-only" role="status" aria-live="polite">

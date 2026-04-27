@@ -29,6 +29,34 @@ import { fetchGeolocation, fetchRandomPlayerName, extractOAuthDisplayName } from
 import { getOnboardingData } from '@/utils/onboardingStorage';
 import type { ProfileData, AuthStateSetters } from '../authTypes';
 
+const SUPPORTED_LANGUAGES = ['he', 'en', 'sv', 'ja', 'es'] as const;
+type SupportedLanguage = (typeof SUPPORTED_LANGUAGES)[number];
+
+// Read stored locale from cookie/localStorage at signup so profiles.language
+// is populated on row creation. Without this, fallback is 'en' for ~80% of
+// users → all push notifications go out in English. See LanguageContext.tsx.
+function getStoredLanguage(): SupportedLanguage | null {
+  if (typeof document !== 'undefined') {
+    const match = document.cookie
+      .split(';')
+      .map((c) => c.trim().split('='))
+      .find(([name]) => name === 'boggle_language');
+    const cookieVal = match?.[1];
+    if (cookieVal && (SUPPORTED_LANGUAGES as readonly string[]).includes(cookieVal)) {
+      return cookieVal as SupportedLanguage;
+    }
+  }
+  if (typeof localStorage !== 'undefined') {
+    try {
+      const stored = localStorage.getItem('boggle_language');
+      if (stored && (SUPPORTED_LANGUAGES as readonly string[]).includes(stored)) {
+        return stored as SupportedLanguage;
+      }
+    } catch { /* ignore */ }
+  }
+  return null;
+}
+
 interface UseProfileManagementParams {
   user: User | null;
   setters: AuthStateSetters;
@@ -147,6 +175,9 @@ async function createNewProfile(
 
   const randomCustomAvatar = getRandomAvatarConfig();
 
+  // Persist current locale so push notifications localize from row creation.
+  const storedLanguage = getStoredLanguage();
+
   const { data: newProfile, error: createError } = await createProfile({
     id: userId,
     username,
@@ -156,6 +187,7 @@ async function createNewProfile(
     avatar_image: finalAvatarImage,
     avatar_config: randomCustomAvatar,
     has_customized_profile: Boolean(ftueName), // FTUE pick counts as customized; else prompt after sign-in
+    ...(storedLanguage ? { language: storedLanguage } : {}),
   });
 
   if (createError) {

@@ -5,6 +5,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useBoostStatus } from '@/hooks/useBoostStatus';
 import { useBoostClaim } from '@/hooks/useBoostClaim';
 import { BOOST_TYPES, BOOST_CONFIGS, type BoostType } from '@/shared/types/boosts';
+import { BOOST_ICONS } from './boostIcons';
 
 interface Props {
   open: boolean;
@@ -100,21 +101,32 @@ function BoostCard({ boostType, disabled, isClaimed, onClaim }: {
   boostType: BoostType; disabled: boolean; isClaimed: boolean; onClaim: () => void;
 }) {
   const { t } = useLanguage();
+  const { Icon, bg, fg } = BOOST_ICONS[boostType];
   return (
     <button
       onClick={onClaim}
       disabled={disabled}
+      data-boost-card
       aria-label={t(`${BOOST_CONFIGS[boostType].i18nKey}.title`)}
-      className="rounded-neo border-neo bg-neo-cream p-4 text-start shadow-hard transition disabled:opacity-50 hover:active:shadow-hard-pressed">
-      <div className="font-neo-display text-lg text-neo-navy">
-        {t(`${BOOST_CONFIGS[boostType].i18nKey}.title`)}
-      </div>
-      <div className="mt-1 text-sm text-neo-navy/70">
-        {t(`${BOOST_CONFIGS[boostType].i18nKey}.description`)}
-      </div>
-      <div className="mt-2 text-xs font-bold text-neo-pink">
-        {isClaimed ? t('boosts.activeThisGame') : t('boosts.watchAd')}
-      </div>
+      className="flex items-start gap-3 rounded-neo border-neo bg-neo-cream p-4 text-start shadow-hard transition disabled:opacity-50 hover:active:shadow-hard-pressed">
+      <span
+        data-boost-icon
+        aria-hidden="true"
+        className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-neo border-neo ${bg} ${fg} shadow-hard-sm`}
+      >
+        <Icon className="h-6 w-6" strokeWidth={2.5} />
+      </span>
+      <span className="flex-1">
+        <span className="block font-neo-display text-lg text-neo-navy">
+          {t(`${BOOST_CONFIGS[boostType].i18nKey}.title`)}
+        </span>
+        <span className="mt-1 block text-sm text-neo-navy/70">
+          {t(`${BOOST_CONFIGS[boostType].i18nKey}.description`)}
+        </span>
+        <span className="mt-2 block text-xs font-bold text-neo-pink">
+          {isClaimed ? t('boosts.activeThisGame') : t('boosts.watchAd')}
+        </span>
+      </span>
     </button>
   );
 }

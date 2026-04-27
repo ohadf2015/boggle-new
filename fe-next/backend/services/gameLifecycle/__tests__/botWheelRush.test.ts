@@ -29,6 +29,7 @@ vi.mock('../../../modules/gameStateManager', () => ({
 }));
 vi.mock('../../../utils/socketHelpers', () => ({
   broadcastToRoom: mocks.broadcastToRoom,
+  volatileBroadcastToRoom: vi.fn(),
   getGameRoom: (code: string) => `room:${code}`,
 }));
 vi.mock('../../../utils/timerManager', () => ({
@@ -152,7 +153,12 @@ describe('startBotsForWheelRush', () => {
       gameState: 'in-progress',
       language: 'en',
       wheelRushState: state,
+      users: {
+        alice: { avatar: 'default', isHost: true },
+        BotBob: { avatar: 'default', isHost: false },
+      },
       playerScores: { alice: 100, BotBob: 0 },
+      playerWords: { alice: [], BotBob: [] },
     });
 
     const bot = makeBot();

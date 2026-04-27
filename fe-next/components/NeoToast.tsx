@@ -138,7 +138,7 @@ export const wordAcceptedToast = (word: string, options: WordAcceptedOptions = {
               initial={{ opacity: 0, scale: 0.95, rotate: -180 }}
               animate={{ opacity: 1, scale: 1, rotate: 0 }}
               transition={{ delay: 0.1, type: 'spring', stiffness: 300 }}
-              className="text-2xl"
+              className="text-2xl text-neo-black"
               aria-hidden="true"
             >
               ✓
@@ -174,7 +174,7 @@ export const wordAcceptedToast = (word: string, options: WordAcceptedOptions = {
                 initial={{ opacity: 0, scale: 0.95, rotate: -10 }}
                 animate={{ opacity: 1, scale: 1, rotate: 0 }}
                 transition={{ delay: 0.25, type: 'spring', stiffness: 400, damping: 15 }}
-                className="px-2 py-1 bg-neo-pink border-2 border-neo-black rounded font-black text-sm text-neo-white"
+                className="px-2 py-1 bg-neo-pink border-2 border-neo-black rounded font-black text-sm text-neo-black"
               >
                 +{comboBonus} {options.comboBonusLabel || 'combo!'}
               </motion.span>
@@ -207,7 +207,7 @@ export const wordNeedsValidationToast = (word: string, options: WordNeedsValidat
             <motion.span
               animate={{ rotate: [0, 10, -10, 0] }}
               transition={{ duration: 0.5, repeat: 2 }}
-              className="text-2xl"
+              className="text-2xl text-neo-black"
             >
               ⏳
             </motion.span>
@@ -310,7 +310,7 @@ export const wordRejectedToast = (word: string, options: WordRejectedOptions & {
               initial={{ opacity: 0, scale: 0.95, rotate: -90 }}
               animate={{ opacity: 1, scale: 1, rotate: 0 }}
               transition={{ delay: 0.1, type: 'spring', stiffness: 400, damping: 15 }}
-              className="text-2xl"
+              className="text-2xl text-neo-white"
               aria-hidden="true"
             >
               {rejectionInfo.icon}
@@ -327,7 +327,7 @@ export const wordRejectedToast = (word: string, options: WordRejectedOptions & {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.15, type: 'spring', stiffness: 400, damping: 15 }}
-              className="text-xl ms-auto"
+              className="text-xl ms-auto text-neo-white"
             >
               ✗
             </motion.span>
@@ -372,7 +372,7 @@ export const wordErrorToast = (message: string, options: WordErrorOptions = {}):
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.1, type: 'spring', stiffness: 400, damping: 15 }}
-              className="text-2xl"
+              className="text-2xl text-neo-white"
               aria-hidden="true"
             >
               ✗
@@ -412,7 +412,7 @@ export const neoSuccessToast = (message: string, options: NeoToastOptions = {}):
               initial={{ opacity: 0, scale: 0.95, rotate: -180 }}
               animate={{ opacity: 1, scale: 1, rotate: 0 }}
               transition={{ delay: 0.1, type: 'spring' }}
-              className="text-2xl"
+              className="text-2xl text-neo-black"
               aria-hidden="true"
             >
               {icon}
@@ -463,7 +463,7 @@ export const neoErrorToast = (message: string, options: NeoToastOptions = {}): s
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.1, type: 'spring', stiffness: 400, damping: 15 }}
-              className="text-2xl"
+              className="text-2xl text-neo-white"
               aria-hidden="true"
             >
               {icon}
@@ -503,7 +503,7 @@ export const neoInfoToast = (message: string, options: NeoToastOptions = {}): st
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.1, type: 'spring' }}
-              className="text-2xl"
+              className="text-2xl text-neo-black"
               aria-hidden="true"
             >
               {icon}
@@ -553,7 +553,7 @@ export const neoWarningToast = (message: string, options: NeoToastOptions = {}):
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: [1, 1.2, 1] }}
               transition={{ delay: 0.1, type: 'spring', repeat: 1 }}
-              className="text-2xl"
+              className="text-2xl text-neo-black"
               aria-hidden="true"
             >
               {icon}

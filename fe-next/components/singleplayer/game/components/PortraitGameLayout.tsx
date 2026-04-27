@@ -3,14 +3,13 @@
 import React from 'react';
 import { ArrowLeft, Pause, Play, Crown, TrendingUp, Target, Zap, Coins } from 'lucide-react';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import WordFormingArea, { type WordFeedback } from '@/components/game/WordFormingArea';
 import ComboDisplay from '@/components/game/ComboDisplay';
 import { Button } from '@/components/ui/button';
 import GridComponent from '@/components/GridComponent';
 import CircularTimer from '@/components/CircularTimer';
 import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
-import { TrainingProgressBar } from '@/components/training';
+import { TrainingProgressBar, PracticeCompletionPopup } from '@/components/training';
 import { shouldShowKeyboardTrails } from '@/components/game/keyboardTrailsUtils';
 import { cn } from '@/lib/utils';
 import { COIN_EARNING_OTHER } from '@/utils/coinManager';
@@ -283,23 +282,9 @@ export function PortraitGameLayout({
           </AdaptiveMotion.div>
         </div>
 
-        {/* Center: Timer */}
-        <div className="relative flex items-center justify-center mx-2">
-          {!isPracticeMode ? (
-            <AdaptiveMotion.div
-              initial={{ scale: 0, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              className="relative z-20"
-              style={TIMER_DROP_SHADOW_STYLE}
-            >
-              <CircularTimer
-                remainingTime={remainingTime}
-                totalTime={totalTime}
-                size="sm"
-              />
-            </AdaptiveMotion.div>
-          ) : (
-            /* Score - Centered in practice mode */
+        {/* Center: Score (practice only) — in non-practice the timer moves down to the word-forming row */}
+        {isPracticeMode && (
+          <div className="relative flex items-center justify-center mx-2">
             <AdaptiveMotion.div
               initial={{ scale: 0, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
@@ -320,8 +305,8 @@ export function PortraitGameLayout({
                 </div>
               </div>
             </AdaptiveMotion.div>
-          )}
-        </div>
+          </div>
+        )}
 
         {/* Right: Score badge */}
         <div className="flex-1 flex justify-end">
@@ -361,9 +346,25 @@ export function PortraitGameLayout({
         </div>
       </div>
 
-      {/* Word Forming Area */}
-      <div className="h-10 flex items-center justify-center shrink-0 relative z-30 px-4 mb-1 max-w-[360px] mx-auto w-full overflow-visible">
-        <WordFormingArea word={keyboardInput.isTypingMode ? keyboardInput.typedWord : formedWord} letterCount={(keyboardInput.isTypingMode ? keyboardInput.typedWord : formedWord).length} feedback={currentFeedback} compact />
+      {/* Timer + Word Forming Area — same row so they're vertically aligned and share spacing */}
+      <div className="flex items-center justify-center gap-3 shrink-0 relative z-30 px-4 mb-1 mx-auto w-full overflow-visible max-w-[440px]">
+        {!isPracticeMode && (
+          <AdaptiveMotion.div
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="relative z-20 shrink-0"
+            style={TIMER_DROP_SHADOW_STYLE}
+          >
+            <CircularTimer
+              remainingTime={remainingTime}
+              totalTime={totalTime}
+              size="sm"
+            />
+          </AdaptiveMotion.div>
+        )}
+        <div className="h-10 flex items-center justify-center min-w-0 overflow-visible">
+          <WordFormingArea word={keyboardInput.isTypingMode ? keyboardInput.typedWord : formedWord} letterCount={(keyboardInput.isTypingMode ? keyboardInput.typedWord : formedWord).length} feedback={currentFeedback} compact />
+        </div>
       </div>
 
       {/* Words Progress - subtle indicator (hidden on very short screens) */}
@@ -456,39 +457,12 @@ export function PortraitGameLayout({
 
       {/* Practice Completion Popup */}
       {isPracticeMode && (
-        <Dialog open={showCompletionPopup} onOpenChange={setShowCompletionPopup}>
-          <DialogContent noDescription className="max-w-sm sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle className="text-xl font-black uppercase text-center">
-                {t('training.completion.title')}
-              </DialogTitle>
-            </DialogHeader>
-            <div className="p-4 space-y-4">
-              <p className="text-center text-neo-black dark:text-neo-white font-medium">
-                {t('training.completion.message')}
-              </p>
-            </div>
-            <DialogFooter className="flex-col sm:flex-row gap-2">
-              <Button
-                variant="outline"
-                onClick={() => setShowCompletionPopup(false)}
-                className="flex-1 min-h-[48px] font-bold"
-              >
-                {t('training.completion.continuePractice')}
-              </Button>
-              <Button
-                variant="success"
-                onClick={() => {
-                  setShowCompletionPopup(false);
-                  onFinishPractice();
-                }}
-                className="flex-1 min-h-[48px] font-bold"
-              >
-                {t('training.completion.finish')}
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+        <PracticeCompletionPopup
+          open={showCompletionPopup}
+          onOpenChange={setShowCompletionPopup}
+          language={language}
+          t={t}
+        />
       )}
 
       {/* Quit Confirmation Dialog */}

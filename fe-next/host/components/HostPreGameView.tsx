@@ -10,6 +10,7 @@ import { useGameActions, useGameMode } from '@/hooks/gameState';
 import { useAuth } from '@/contexts/AuthContext';
 import { BoostButton } from '@/components/boosts/BoostButton';
 import { BoostPicker } from '@/components/boosts/BoostPicker';
+import { QuickLanguageSwitcher } from '@/components/QuickLanguageSwitcher';
 
 import { GAME_PRESETS } from './pre-game/PresetSelector';
 import { StartButton } from './pre-game/StartButton';
@@ -349,18 +350,18 @@ function HostPreGameView({
       )}
 
       {/* Header */}
-      <header className="shrink-0 px-3 py-1.5 bg-neo-navy/95 border-b-3 border-neo-black sticky top-0 z-20">
+      <header className="shrink-0 px-2 sm:px-3 py-1 sm:py-1.5 bg-neo-navy/95 border-b-3 border-neo-black sticky top-0 z-20">
         <div className="flex items-center justify-between gap-2">
           {/* Game language chip — prominent so hosts see the board language before starting */}
           <div
             data-testid="lobby-language-chip"
-            className="flex items-center gap-2 px-3 py-1.5 rounded-neo border-2 border-neo-lime/70 bg-neo-navy-light shadow-hard-sm"
+            className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-neo border-2 border-neo-lime/70 bg-neo-navy-light shadow-hard-sm"
             aria-label={t('joinView.selectLanguage')}
           >
             <span className="text-base leading-none" aria-hidden>
               {({ en: '🇺🇸', he: '🇮🇱', sv: '🇸🇪', ja: '🇯🇵', es: '🇪🇸' } as Record<Language, string>)[roomLanguage]}
             </span>
-            <span className="text-[10px] font-bold uppercase tracking-widest text-neo-lime">
+            <span className="text-[10px] font-bold uppercase tracking-widest text-neo-lime short:max-sm:hidden">
               {t(`joinView.${
                 ({ en: 'english', he: 'hebrew', sv: 'swedish', ja: 'japanese', es: 'spanish' } as Record<Language, string>)[roomLanguage]
               }`)}
@@ -370,6 +371,9 @@ function HostPreGameView({
             <div className="lg:hidden">
               <MobileShareSection gameCode={gameCode} t={t} showHint={actualPlayerCount === 0} compact />
             </div>
+            {/* UI-language switcher — distinct from board-language chip on the left;
+                lets every lobby player change app language without leaving the room. */}
+            <QuickLanguageSwitcher compact />
             <AdvancedSettingsModal
               timerValue={timerValue}
               setTimerValue={setTimerValue}
@@ -485,17 +489,21 @@ function HostPreGameView({
             </div>
           </div>
           {/* Sticky bottom start button — mobile */}
-          <div className="shrink-0 px-5 py-3 border-t-3 border-neo-black bg-neo-navy/95" style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom, 0px))' }}>
-            <div className="max-w-[600px] mx-auto flex flex-col gap-2">
-              <BoostButton mode="mp" sessionId={gameCode} open={isBoostPickerOpen} onOpenChange={setIsBoostPickerOpen} />
-              <StartButton
-                onStartGame={onStartGame}
-                disabled={isStartDisabled}
-                tournamentCreating={tournamentCreating}
-                playerCount={filteredPlayersForDisplay.length}
-                maxPlayers={maxPlayers}
-                t={t}
-              />
+          <div className="shrink-0 px-5 short:px-3 py-3 short:py-1.5 border-t-3 border-neo-black bg-neo-navy/95" style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom, 0px))' }}>
+            <div className="max-w-[600px] mx-auto flex flex-col short:flex-row short:items-stretch gap-2">
+              <div className="short:shrink-0 short:w-auto">
+                <BoostButton mode="mp" sessionId={gameCode} open={isBoostPickerOpen} onOpenChange={setIsBoostPickerOpen} />
+              </div>
+              <div className="short:flex-1 short:min-w-0">
+                <StartButton
+                  onStartGame={onStartGame}
+                  disabled={isStartDisabled}
+                  tournamentCreating={tournamentCreating}
+                  playerCount={filteredPlayersForDisplay.length}
+                  maxPlayers={maxPlayers}
+                  t={t}
+                />
+              </div>
             </div>
           </div>
         </div>

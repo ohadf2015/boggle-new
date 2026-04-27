@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { Search, Inbox, FolderOpen, Frown, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { EnhancedButton } from './EnhancedButton';
+import { SilentVideo } from './SilentVideo';
 
 /**
  * Enhanced Empty State Component
@@ -104,15 +105,11 @@ export const EnhancedEmptyState: React.FC<EnhancedEmptyStateProps> = ({
           className={cn('mb-6', compact ? 'w-16 h-16' : 'w-24 h-24')}
           variants={reduceMotion ? {} : itemVariants}
         >
-          <video
+          <SilentVideo
             src={mascotSrc}
             width={compact ? 64 : 96}
             height={compact ? 64 : 96}
             className="object-contain drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]"
-            autoPlay
-            loop
-            muted
-            playsInline
             preload="metadata"
             aria-hidden="true"
           />

@@ -19,6 +19,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { fireLevelUpConfetti } from '@/utils/confettiUtils';
 import type { UnlockPayload } from '@/hooks/useAchievementUnlock';
 import { trackEduAchievementUnlock } from '@/lib/education/telemetry';
+import { SilentVideo } from '@/components/ui/SilentVideo';
 
 // ==============================================
 // TYPES
@@ -208,15 +209,11 @@ const AchievementUnlockModal = memo<AchievementUnlockModalProps>(({ unlock, onCl
               animate={{ scale: [0, 1.3, 1], rotate: [30, -15, 0] }}
               transition={{ delay: 0.2, duration: 0.5, ease: 'easeOut' }}
             >
-              <video
+              <SilentVideo
                 src="/mascot/celebration.mp4"
                 width={80}
                 height={80}
                 className="mx-auto drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]"
-                autoPlay
-                loop
-                muted
-                playsInline
                 preload="metadata"
                 aria-hidden="true"
               />

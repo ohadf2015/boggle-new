@@ -12,11 +12,16 @@ import {
   updatePlayerScore,
 } from '../modules/gameStateManager.js';
 import {
+  getLeaderboardThrottled,
+  type LeaderboardPlayer,
+  type ScoreGameBase,
+} from '../modules/scoreManager.js';
+import {
   validateWheelSubmission,
   applyWheelWord,
   reapExpiredLocks,
 } from '../modules/wheelRushManager.js';
-import { broadcastToRoom, getGameRoom } from '../utils/socketHelpers.js';
+import { broadcastToRoom, volatileBroadcastToRoom, getGameRoom } from '../utils/socketHelpers.js';
 import { checkRateLimit } from '../utils/rateLimiter.js';
 import { validatePayload } from '../utils/socketValidation.js';
 import logger from '../utils/logger.js';
@@ -36,6 +41,15 @@ const submitWheelWordSchema = z.object({
 });
 
 interface SubmitWheelWordPayload { word: string; }
+
+function broadcastWheelLeaderboard(io: Server, gameCode: string): void {
+  const game = getGame(gameCode);
+  if (!game) return;
+  const lbThrottleMs = parseInt(process.env.LEADERBOARD_THROTTLE_MS || '500');
+  getLeaderboardThrottled(game as unknown as ScoreGameBase, gameCode, (leaderboard: LeaderboardPlayer[]) => {
+    volatileBroadcastToRoom(io, getGameRoom(gameCode), 'updateLeaderboard', { leaderboard });
+  }, lbThrottleMs);
+}
 
 export function handleSubmitWheelWord(io: Server, socket: Socket, data: SubmitWheelWordPayload): void {
   const gameCode = getGameBySocketId(socket.id);
@@ -72,6 +86,7 @@ export function handleSubmitWheelWord(io: Server, socket: Socket, data: SubmitWh
     broadcastToRoom(io, getGameRoom(gameCode), 'wheelWordLocked', {
       word, by: username, lockUntil: outcome.lockUntil,
     });
+    broadcastWheelLeaderboard(io, gameCode);
     // Schedule reap sweep for this specific lock expiry
     timerManager.setTimeout(`wheelRushReap:${gameCode}:${word}`, () => {
       const g = getGame(gameCode);
@@ -95,6 +110,7 @@ export function handleSubmitWheelWord(io: Server, socket: Socket, data: SubmitWh
     broadcastToRoom(io, getGameRoom(gameCode), 'wheelWordStolen', {
       word, by: username, from: outcome.from,
     });
+    broadcastWheelLeaderboard(io, gameCode);
     logger.info('WHEEL_RUSH', `${username} stole "${word}" from ${outcome.from} in ${gameCode} (+${total})`);
     return;
   }

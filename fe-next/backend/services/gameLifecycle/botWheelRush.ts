@@ -12,13 +12,18 @@ import type { Server } from 'socket.io';
 import type { Language, WheelPuzzle, WheelRushModeState } from '@/shared/types/game';
 import type { Bot } from '../../modules/botBehavior';
 import { getGame, updatePlayerScore } from '../../modules/gameStateManager';
+import {
+  getLeaderboardThrottled,
+  type LeaderboardPlayer,
+  type ScoreGameBase,
+} from '../../modules/scoreManager';
 import { getCachedTrie, type TrieNode } from '../../modules/boggleSolver';
 import {
   applyWheelWord,
   reapExpiredLocks,
   validateWheelSubmission,
 } from '../../modules/wheelRushManager';
-import { broadcastToRoom, getGameRoom } from '../../utils/socketHelpers';
+import { broadcastToRoom, volatileBroadcastToRoom, getGameRoom } from '../../utils/socketHelpers';
 import timerManager from '../../utils/timerManager';
 import { setBotTimeout } from '../../modules/botLifecycle';
 import { shouldBotScore } from './botGame';
@@ -75,6 +80,15 @@ function shuffle<T>(arr: T[]): T[] {
   return out;
 }
 
+function broadcastWheelLeaderboard(io: Server, gameCode: string): void {
+  const game = getGame(gameCode);
+  if (!game) return;
+  const lbThrottleMs = parseInt(process.env.LEADERBOARD_THROTTLE_MS || '500');
+  getLeaderboardThrottled(game as unknown as ScoreGameBase, gameCode, (leaderboard: LeaderboardPlayer[]) => {
+    volatileBroadcastToRoom(io, getGameRoom(gameCode), 'updateLeaderboard', { leaderboard });
+  }, lbThrottleMs);
+}
+
 function scheduleReap(
   io: Server,
   gameCode: string,
@@ -118,6 +132,7 @@ function submitOneWord(
     broadcastToRoom(io, getGameRoom(gameCode), 'wheelWordLocked', {
       word, by: bot.username, lockUntil: outcome.lockUntil,
     });
+    broadcastWheelLeaderboard(io, gameCode);
     scheduleReap(io, gameCode, word, outcome.lockUntil);
     logger.info('BOT_WHEEL', `${bot.username} locked "${word}" (+${total})`);
     return;
@@ -131,6 +146,7 @@ function submitOneWord(
     broadcastToRoom(io, getGameRoom(gameCode), 'wheelWordStolen', {
       word, by: bot.username, from: outcome.from,
     });
+    broadcastWheelLeaderboard(io, gameCode);
     logger.info('BOT_WHEEL', `${bot.username} stole "${word}" from ${outcome.from} (+${total})`);
   }
 }

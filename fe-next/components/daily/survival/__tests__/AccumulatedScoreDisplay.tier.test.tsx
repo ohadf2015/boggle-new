@@ -28,12 +28,8 @@ const t = (key: string, params?: Record<string, string | number>): string => {
     'wordHunt.survival.score.tier.silver': 'Silver',
     'wordHunt.survival.score.tier.gold': 'Gold',
     'wordHunt.survival.score.tier.platinum': 'Platinum',
-    'wordHunt.survival.score.tier.bronzeFlavor': 'Warming up',
-    'wordHunt.survival.score.tier.silverFlavor': 'Climbing',
-    'wordHunt.survival.score.tier.goldFlavor': 'On fire',
-    'wordHunt.survival.score.tier.platinumFlavor': 'Untouchable',
     'wordHunt.survival.score.tier.toNext': '{points} to {next}',
-    'wordHunt.survival.score.tier.maxed': 'Legendary · maxed out',
+    'wordHunt.survival.score.tier.maxed': 'Legendary',
   };
   let out = dict[key] ?? key;
   if (params) {
@@ -52,7 +48,6 @@ describe('AccumulatedScoreDisplay — tier progress note', () => {
     expect(screen.getByText(/Bronze/)).toBeInTheDocument();
     // 400 - 250 = 150
     expect(screen.getByText(/150 to Silver/)).toBeInTheDocument();
-    expect(screen.getByText(/Warming up/)).toBeInTheDocument();
   });
 
   it('shows Silver tier + points to Gold when score in [400,600)', () => {
@@ -62,7 +57,6 @@ describe('AccumulatedScoreDisplay — tier progress note', () => {
     expect(screen.getByText(/Silver/)).toBeInTheDocument();
     // 600 - 450 = 150
     expect(screen.getByText(/150 to Gold/)).toBeInTheDocument();
-    expect(screen.getByText(/Climbing/)).toBeInTheDocument();
   });
 
   it('shows Gold tier + points to Platinum when score in [600,800)', () => {
@@ -72,7 +66,6 @@ describe('AccumulatedScoreDisplay — tier progress note', () => {
     expect(screen.getByText(/Gold/)).toBeInTheDocument();
     // 800 - 750 = 50
     expect(screen.getByText(/50 to Platinum/)).toBeInTheDocument();
-    expect(screen.getByText(/On fire/)).toBeInTheDocument();
   });
 
   it('shows Platinum tier + maxed message when score >= 800', () => {
@@ -80,10 +73,29 @@ describe('AccumulatedScoreDisplay — tier progress note', () => {
       <AccumulatedScoreDisplay currentScore={900} lastIncrement={null} isAnimating={false} t={t} />
     );
     expect(screen.getByText(/Platinum/)).toBeInTheDocument();
-    expect(screen.getByText(/Legendary · maxed out/)).toBeInTheDocument();
-    expect(screen.getByText(/Untouchable/)).toBeInTheDocument();
+    expect(screen.getByText(/Legendary/)).toBeInTheDocument();
     // Must NOT show a "to X" message once maxed
     expect(screen.queryByText(/to Platinum/)).not.toBeInTheDocument();
+  });
+
+  it('does not render decorative flavor text', () => {
+    render(
+      <AccumulatedScoreDisplay currentScore={750} lastIncrement={null} isAnimating={false} t={t} />
+    );
+    // Flavor strings are noise; should not even attempt translation lookup
+    expect(screen.queryByText(/Flavor/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/wordHunt\.survival\.score\.tier\.\w+Flavor/)).not.toBeInTheDocument();
+  });
+
+  it('renders an accessible progress bar reflecting tier progress', () => {
+    render(
+      <AccumulatedScoreDisplay currentScore={500} lastIncrement={null} isAnimating={false} t={t} />
+    );
+    // Silver band: 400→600. Score 500 → 50% across the band.
+    const bar = screen.getByRole('progressbar', { name: /tier/i });
+    expect(bar).toHaveAttribute('aria-valuenow', '50');
+    expect(bar).toHaveAttribute('aria-valuemin', '0');
+    expect(bar).toHaveAttribute('aria-valuemax', '100');
   });
 
   it('snaps to Bronze tier at score 0', () => {

@@ -255,8 +255,35 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
 
     let validTimer = Math.max(30, Math.min(600, parseInt(String(timerSeconds), 10) || 120));
 
-    let resolvedMode: GameMode = (!gameMode || gameMode === 'random')
-      ? selectNextGameMode(game.modeHistory || [], ALL_GAME_MODES)
+    // Resolve host blast access up-front so we can both filter the random pool
+    // (avoids rolling a mode the host can't start) AND gate explicit blast picks.
+    // Only hit Supabase when blast is actually a candidate.
+    const isRandomRoll = !gameMode || gameMode === 'random';
+    const isExplicitBlast = gameMode === 'blast';
+    let blastAllowed = false;
+    if (isRandomRoll || isExplicitBlast) {
+      const hostUser = Object.values(game.users).find((u) => u.isHost);
+      const hostAuthId = hostUser?.authUserId || (socket.data?.verifiedUserId as string | undefined);
+      const supabase = getSupabase();
+      // Dev/test (no Supabase) → allow. Prod → require is_admin or blast_access.
+      if (!supabase) {
+        blastAllowed = true;
+      } else if (hostAuthId) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('is_admin, blast_access')
+          .eq('id', hostAuthId)
+          .single();
+        blastAllowed = !!(profile?.is_admin || profile?.blast_access);
+      }
+    }
+
+    const enabledModes = blastAllowed
+      ? ALL_GAME_MODES
+      : ALL_GAME_MODES.filter((m) => m !== 'blast');
+
+    let resolvedMode: GameMode = isRandomRoll
+      ? selectNextGameMode(game.modeHistory || [], enabledModes)
       : gameMode as GameMode;
 
     // Blast mode is balanced around BLAST_MP_DEFAULT_TIMER (90s) — word density
@@ -267,30 +294,13 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
       validTimer = BLAST_MP_DEFAULT_TIMER;
     }
 
-    // Server-side blast access enforcement — only admin or blast_access users can start blast games
-    if (resolvedMode === 'blast') {
-      const hostUser = Object.values(game.users).find((u) => u.isHost);
-      const hostAuthId = hostUser?.authUserId || (socket.data?.verifiedUserId as string | undefined);
-      const supabase = getSupabase();
-      // If Supabase is not configured (dev/test), allow blast access by default.
-      // In production with Supabase available, require admin or blast_access on the profile.
-      let blastAllowed = !supabase;
-
-      if (hostAuthId && supabase) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('is_admin, blast_access')
-          .eq('id', hostAuthId)
-          .single();
-        blastAllowed = !!(profile?.is_admin || profile?.blast_access);
-      }
-
-      if (!blastAllowed) {
-        gamesStarting.delete(gameCode);
-        logger.debug('SOCKET', `Rejected blast mode for ${gameCode}: host lacks blast_access`);
-        emitError(socket, ErrorCodes.AUTH_FORBIDDEN, { message: 'Blast mode requires special access' });
-        return;
-      }
+    // Defense-in-depth: explicit blast pick (or any path that bypassed the pool
+    // filter) must still pass the access gate. blastAllowed was resolved above.
+    if (resolvedMode === 'blast' && !blastAllowed) {
+      gamesStarting.delete(gameCode);
+      logger.debug('SOCKET', `Rejected blast mode for ${gameCode}: host lacks blast_access`);
+      emitError(socket, ErrorCodes.AUTH_FORBIDDEN, { message: 'Blast mode requires special access' });
+      return;
     }
 
     // CRITICAL: Transition state FIRST to guard against concurrent startGame calls.

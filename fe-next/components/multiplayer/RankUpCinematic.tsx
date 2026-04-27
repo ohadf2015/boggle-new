@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { RankTier } from '@/shared/utils/eloRating';
+import { SilentVideo } from '@/components/ui/SilentVideo';
 
 interface RankUpCinematicProps {
   from: RankTier;
@@ -116,15 +117,11 @@ export function RankUpCinematic({ from, to, onDismiss }: RankUpCinematicProps) {
           animate={{ scale: 1, rotate: 0 }}
           transition={{ delay: 0.7, type: 'spring', stiffness: 200, damping: 12 }}
         >
-          <video
+          <SilentVideo
             src="/mascot/celebration.mp4"
             width={120}
             height={120}
             className="drop-shadow-[3px_3px_0px_rgba(0,0,0,1)]"
-            autoPlay
-            loop
-            muted
-            playsInline
             preload="metadata"
             aria-hidden="true"
           />

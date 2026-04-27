@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { BrainTier } from '@/shared/types/cognitive';
+import { SilentVideo } from '@/components/ui/SilentVideo';
 
 interface WelcomeBackCardProps {
   /** Days since last activity */
@@ -141,15 +142,11 @@ export default function WelcomeBackCard({
             {/* Header with dismiss button */}
             <div className="flex items-start justify-between mb-3">
               <div className="flex items-center gap-2">
-                <video
+                <SilentVideo
                   src="/mascot/encouraging.mp4"
                   width={40}
                   height={40}
                   className="drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]"
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
                   preload="metadata"
                   aria-hidden="true"
                 />

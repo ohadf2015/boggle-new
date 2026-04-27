@@ -13,6 +13,7 @@ vi.mock('../../utils/logger', () => {
 
 vi.mock('../../utils/socketHelpers', () => ({
   broadcastToRoom: vi.fn(),
+  volatileBroadcastToRoom: vi.fn(),
   getGameRoom: vi.fn((code: string) => `room:${code}`),
 }));
 
@@ -57,6 +58,12 @@ const gameBase = {
   gameState: 'in-progress',
   gameMode: 'wheel-rush',
   language: 'en',
+  users: {
+    p1: { avatar: 'default', isHost: true },
+    p2: { avatar: 'default', isHost: false },
+  },
+  playerScores: { p1: 0, p2: 0 },
+  playerWords: { p1: [], p2: [] },
   wheelRushState: {
     puzzle: { centerLetter: 'C', outerLetters: ['A','N','E','S','T','X'], allLetters: ['C','A','N','E','S','T','X'] },
     foundWords: { p1: [], p2: [] },

@@ -214,9 +214,19 @@ describe('Header Settings Access', () => {
     it('should render QuickLanguageSwitcher on desktop for guest users', () => {
       render(<Header />);
 
-      // QuickLanguageSwitcher renders a combobox
-      const languageSwitcher = screen.getByRole('combobox', { name: 'Change Language' });
-      expect(languageSwitcher).toBeInTheDocument();
+      // Get desktop control elements
+      const desktopControls = document.querySelector('.sm\\:flex');
+      expect(desktopControls).toBeInTheDocument();
+
+      // QuickLanguageSwitcher renders a combobox - should be in desktop controls
+      const languageSwitchers = screen.getAllByRole('combobox', { name: 'Change Language' });
+      expect(languageSwitchers.length).toBeGreaterThanOrEqual(1);
+
+      // At least one should be in desktop controls
+      const desktopLanguageSwitcher = languageSwitchers.find(
+        switcher => desktopControls?.contains(switcher)
+      );
+      expect(desktopLanguageSwitcher).toBeInTheDocument();
     });
 
     it('should NOT render profile link for guest users', () => {
@@ -270,9 +280,19 @@ describe('Header Settings Access', () => {
     it('should render QuickLanguageSwitcher on desktop for authenticated users', () => {
       render(<Header />);
 
-      // QuickLanguageSwitcher renders a combobox
-      const languageSwitcher = screen.getByRole('combobox', { name: 'Change Language' });
-      expect(languageSwitcher).toBeInTheDocument();
+      // Get desktop control elements
+      const desktopControls = document.querySelector('.sm\\:flex');
+      expect(desktopControls).toBeInTheDocument();
+
+      // QuickLanguageSwitcher renders a combobox - should be in desktop controls
+      const languageSwitchers = screen.getAllByRole('combobox', { name: 'Change Language' });
+      expect(languageSwitchers.length).toBeGreaterThanOrEqual(1);
+
+      // At least one should be in desktop controls
+      const desktopLanguageSwitcher = languageSwitchers.find(
+        switcher => desktopControls?.contains(switcher)
+      );
+      expect(desktopLanguageSwitcher).toBeInTheDocument();
     });
 
     it('should ALSO render profile link for authenticated users', async () => {
@@ -353,17 +373,22 @@ describe('Header Settings Access', () => {
       render(<Header />);
 
       // Get desktop control elements
-      const languageSwitcher = screen.getByRole('combobox', { name: 'Change Language' });
+      const languageSwitchers = screen.getAllByRole('combobox', { name: 'Change Language' });
       const menuButtons = screen.getAllByRole('button', { name: 'Open menu' });
 
       // Both should exist
-      expect(languageSwitcher).toBeInTheDocument();
+      expect(languageSwitchers.length).toBeGreaterThanOrEqual(1);
       expect(menuButtons.length).toBeGreaterThanOrEqual(1);
 
       // Verify they're in the desktop controls section (hidden on mobile)
       const desktopControls = document.querySelector('.sm\\:flex');
       expect(desktopControls).toBeInTheDocument();
-      expect(desktopControls).toContainElement(languageSwitcher);
+
+      // Find desktop language switcher
+      const desktopLanguageSwitcher = languageSwitchers.find(
+        switcher => desktopControls?.contains(switcher)
+      );
+      expect(desktopLanguageSwitcher).toBeInTheDocument();
 
       // At least one menu button should be in desktop controls
       const desktopMenuButton = menuButtons.find(button => desktopControls?.contains(button));

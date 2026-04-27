@@ -287,16 +287,6 @@ export function useSurvivalGameLogic({
     }
   }, [state.lifePoints, deferGameOver]);
 
-  // Auto-win when player discovers all green clues
-  // This triggers when the player knows the full word through gameplay
-  // (NOT from auto-hints, which never reveal the final letter)
-  useEffect(() => {
-    if (clueState.allPositionsRevealed && !gameOverRef.current) {
-      // Player figured out the word - auto-win!
-      handleGameOverRef.current?.(true);
-    }
-  }, [clueState.allPositionsRevealed]);
-
   // Word submission logic (extracted hook)
   const wordSubmission = useSurvivalWordSubmission({
     grid,

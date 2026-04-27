@@ -4,6 +4,7 @@ import { motion, Variants } from 'framer-motion';
 import { memo, useMemo } from 'react';
 import Image from 'next/image';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
+import { SilentVideo } from './SilentVideo';
 
 /**
  * Mascot variants - split-format (MP4 for opaque, animated WebP for transparent)
@@ -689,16 +690,12 @@ export const Mascot = memo(function Mascot({
         className={`w-full h-full ${CLIP_CLASSES[shape]} ${BORDER_CLASSES[border]} ${hasClip ? bg : ''}`}
       >
         {isVideo ? (
-          <video
+          <SilentVideo
             src={imageSrc}
             aria-label={altText}
             width={SIZE_PIXELS[size]}
             height={SIZE_PIXELS[size]}
             className={mediaClass}
-            autoPlay
-            loop
-            muted
-            playsInline
             preload={shouldPrioritize ? 'auto' : 'metadata'}
           />
         ) : (
@@ -770,16 +767,12 @@ export const MascotWithEntrance = memo(function MascotWithEntrance({
           className={`w-full h-full ${CLIP_CLASSES[shape]} ${BORDER_CLASSES[border]} ${hasClip ? bg : ''}`}
         >
           {isVideo ? (
-            <video
+            <SilentVideo
               src={imageSrc}
               aria-label={altText}
               width={SIZE_PIXELS[size]}
               height={SIZE_PIXELS[size]}
               className={mediaClass}
-              autoPlay
-              loop
-              muted
-              playsInline
               preload={shouldPrioritize ? 'auto' : 'metadata'}
             />
           ) : (

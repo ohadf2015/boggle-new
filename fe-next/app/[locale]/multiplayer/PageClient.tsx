@@ -90,10 +90,13 @@ export default function MultiplayerPageClient(): React.JSX.Element {
 
   const setIsInGame = useHideNavigation();
 
-  // Pre-select game mode from URL param (e.g., ?mode=word-hunt)
+  // Pre-select game mode from URL param (e.g., ?mode=word-hunt).
+  // Default MP mode is 'random' when no URL override.
   useEffect(() => {
     if (preselectedMode && VALID_MODES.includes(preselectedMode)) {
       setStoreGameMode(preselectedMode);
+    } else {
+      setStoreGameMode('random');
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

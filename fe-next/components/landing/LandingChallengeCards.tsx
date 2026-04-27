@@ -132,9 +132,18 @@ export function LandingChallengeCards({
   // high-intent set instead of every available mode.
   const cardOrder: LandingCardKey[] = orderedBeforeFeatured.filter((m) => FEATURED_MODES.has(m));
 
+  // Non-veterans (still in practice state) see non-essential modes as LOCKED — softer
+  // than hiding, preserves discoverability while keeping landing calm + focused on
+  // practice + daily. Practice & daily always stay unlocked.
+  const lockNonEssential = !isVeteran;
+  const lockedMessage = t('landing.practiceFirstToUnlock');
+  const isModeLocked = (mode: LandingCardKey): boolean =>
+    lockNonEssential && mode !== 'practice' && mode !== 'daily';
+
   /** Renders a card by mode key with staggered CSS animation */
   const renderCard = (mode: LandingCardKey, index: number) => {
     const style = { animationDelay: cardDelay(index) } as React.CSSProperties;
+    const locked = isModeLocked(mode);
 
     switch (mode) {
       case 'quickPlay':
@@ -152,6 +161,8 @@ export function LandingChallengeCards({
               duration={t('landing.duration').replace('{time}', '1-3')}
               difficulty={2}
               difficultyLabel={t('landing.difficultyMedium')}
+              locked={locked}
+              lockedMessage={locked ? lockedMessage : undefined}
               onClick={() => { trackModeSelected('quickPlay', 'home'); trackLandingCtaClick('mode_card', { mode: 'quickPlay', variant: 'cyan' }); }}
             />
           </div>
@@ -174,6 +185,8 @@ export function LandingChallengeCards({
               duration={t('landing.duration').replace('{time}', '1-3')}
               difficulty={2}
               difficultyLabel={t('landing.difficultyMedium')}
+              locked={locked}
+              lockedMessage={locked ? lockedMessage : undefined}
               onClick={() => { trackModeSelected('arena', 'home'); trackLandingCtaClick('mode_card', { mode: 'arena', variant: 'pink' }); }}
             />
           </div>
@@ -221,6 +234,8 @@ export function LandingChallengeCards({
               duration={t('landing.duration').replace('{time}', '2-5')}
               difficulty={3}
               difficultyLabel={t('landing.difficultyHard')}
+              locked={locked}
+              lockedMessage={locked ? lockedMessage : undefined}
               onClick={() => { trackModeSelected('blast', 'home'); trackLandingCtaClick('mode_card', { mode: 'blast', variant: 'orange' }); }}
             />
           </div>
@@ -239,6 +254,8 @@ export function LandingChallengeCards({
               duration={t('landing.duration').replace('{time}', '2-5')}
               difficulty={2}
               difficultyLabel={t('landing.difficultyMedium')}
+              locked={locked}
+              lockedMessage={locked ? lockedMessage : undefined}
               onClick={() => { trackModeSelected('adventure', 'home'); trackLandingCtaClick('mode_card', { mode: 'adventure', variant: 'lime' }); }}
             />
           </div>
@@ -258,6 +275,8 @@ export function LandingChallengeCards({
               duration={t('landing.duration').replace('{time}', '2-5')}
               difficulty={2}
               difficultyLabel={t('landing.difficultyMedium')}
+              locked={locked}
+              lockedMessage={locked ? lockedMessage : undefined}
               onClick={() => { trackModeSelected('connections', 'home'); trackLandingCtaClick('mode_card', { mode: 'connections', variant: 'purple' }); }}
             />
           </div>
@@ -276,6 +295,8 @@ export function LandingChallengeCards({
               duration={t('landing.duration').replace('{time}', '1-3')}
               difficulty={2}
               difficultyLabel={t('landing.difficultyMedium')}
+              locked={locked}
+              lockedMessage={locked ? lockedMessage : undefined}
               onClick={() => { trackModeSelected('brainGym', 'home'); trackLandingCtaClick('mode_card', { mode: 'brainGym', variant: 'purple' }); }}
             />
           </div>

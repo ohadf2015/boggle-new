@@ -208,21 +208,29 @@ export const LanguageProvider = ({ children, initialLanguage, initialTranslation
     // can localize per recipient. Fires once per (session, language) pair: users
     // who arrive via cookie/URL never clicked the switcher, so profiles.language
     // would otherwise stay NULL and all pushes default to English.
-    // 401 for anonymous users is expected and ignored.
+    // 401 for anonymous users leaves the dedup gate UNSET so a later mount
+    // (e.g. after the user logs in and refreshes / navigates) retries the POST.
     useEffect(() => {
         if (typeof window === 'undefined' || typeof fetch === 'undefined') return;
         const key = `boggle_language_synced:${language}`;
+        let alreadySynced = false;
         try {
-            if (sessionStorage.getItem(key) === '1') return;
-            sessionStorage.setItem(key, '1');
+            alreadySynced = sessionStorage.getItem(key) === '1';
         } catch {
             // sessionStorage unavailable (private mode etc.) — fall through and POST
         }
+        if (alreadySynced) return;
         fetch('/api/user/language', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ language }),
-        }).catch(() => { /* non-blocking */ });
+        })
+            .then((res) => {
+                if (res.ok) {
+                    try { sessionStorage.setItem(key, '1'); } catch { /* ignore */ }
+                }
+            })
+            .catch(() => { /* non-blocking */ });
     }, [language]);
 
     const setLanguage = useCallback((newLang: Language, options?: { skipNavigation?: boolean }) => {

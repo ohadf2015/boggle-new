@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { MessageSquare, X } from 'lucide-react';
 import RoomChat from '../../../components/RoomChat';
 import { cn } from '../../../lib/utils';
+import { useCrazyGames } from '@/components/CrazyGamesSDK';
 
 interface ChatBubbleProps {
   gameCode: string;
@@ -13,9 +14,10 @@ interface ChatBubbleProps {
   t: (path: string, params?: Record<string, string | number>) => string;
 }
 
-export function ChatBubble({ gameCode, username, isHost, t }: ChatBubbleProps): React.ReactElement {
+export function ChatBubble({ gameCode, username, isHost, t }: ChatBubbleProps): React.ReactElement | null {
   const [isOpen, setIsOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
+  const { isOnCrazyGamesPlatform } = useCrazyGames();
 
   const handleNewMessage = useCallback(() => {
     if (!isOpen) {
@@ -27,6 +29,8 @@ export function ChatBubble({ gameCode, username, isHost, t }: ChatBubbleProps): 
     setIsOpen(true);
     setUnreadCount(0);
   }, []);
+
+  if (isOnCrazyGamesPlatform) return null;
 
   return (
     <>

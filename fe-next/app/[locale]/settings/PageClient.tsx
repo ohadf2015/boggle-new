@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useMusic } from '@/contexts/MusicContext';
+import { SilentVideo } from '@/components/ui/SilentVideo';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useAccessibility } from '@/contexts/AccessibilityContext';
 import { cn } from '@/lib/utils';
@@ -202,15 +203,11 @@ export default function SettingsPageClient(): React.JSX.Element {
           )}>
             {t('settings.title')}
           </h1>
-          <video
+          <SilentVideo
             src="/mascot/shopkeeper.mp4"
             width={48}
             height={48}
             className="ms-auto drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]"
-            autoPlay
-            loop
-            muted
-            playsInline
             preload="metadata"
             aria-hidden="true"
           />

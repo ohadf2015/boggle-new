@@ -21,14 +21,7 @@ interface BattleModeCardProps {
 interface ModeVisualConfig {
   mode: GameModeOption;
   icon: React.ReactNode;
-  largeIcon: React.ReactNode;
   nameKey: string;
-  descKey: string;
-  featureKeys: [string, string, string];
-  accentColor: string;
-  accentBorder: string;
-  accentBg: string;
-  activeText: string;
   activeBg: string;
 }
 
@@ -36,53 +29,25 @@ const MODES: ModeVisualConfig[] = [
   {
     mode: 'random',
     icon: <Shuffle className="w-4 h-4" />,
-    largeIcon: <Shuffle className="w-7 h-7" />,
     nameKey: 'gameModes.random',
-    descKey: 'gameModes.randomDescription',
-    featureKeys: ['gameModes.randomFeature1', 'gameModes.randomFeature2', 'gameModes.randomFeature3'],
-    accentColor: 'bg-neo-purple',
-    accentBorder: 'border-l-neo-purple',
-    accentBg: 'bg-neo-purple',
-    activeText: 'text-neo-purple',
     activeBg: 'bg-neo-purple',
   },
   {
     mode: 'classic',
     icon: <FileText className="w-4 h-4" />,
-    largeIcon: <FileText className="w-7 h-7" />,
     nameKey: 'gameModes.classic.name',
-    descKey: 'gameModes.classic.description',
-    featureKeys: ['gameModes.classic.feature1', 'gameModes.classic.feature2', 'gameModes.classic.feature3'],
-    accentColor: 'bg-neo-cyan',
-    accentBorder: 'border-l-neo-cyan',
-    accentBg: 'bg-neo-cyan',
-    activeText: 'text-neo-cyan',
     activeBg: 'bg-neo-cyan',
   },
   {
     mode: 'word-hunt',
     icon: <Target className="w-4 h-4" />,
-    largeIcon: <Target className="w-7 h-7" />,
     nameKey: 'gameModes.wordHunt.name',
-    descKey: 'gameModes.wordHunt.description',
-    featureKeys: ['gameModes.wordHunt.feature1', 'gameModes.wordHunt.feature2', 'gameModes.wordHunt.feature3'],
-    accentColor: 'bg-neo-pink',
-    accentBorder: 'border-l-neo-pink',
-    accentBg: 'bg-neo-pink',
-    activeText: 'text-neo-pink',
     activeBg: 'bg-neo-pink',
   },
   {
     mode: 'wheel-rush',
     icon: <Target className="w-4 h-4" />,
-    largeIcon: <Target className="w-7 h-7" />,
     nameKey: 'gameModes.wheelRush.name',
-    descKey: 'gameModes.wheelRush.description',
-    featureKeys: ['gameModes.wheelRush.feature1', 'gameModes.wheelRush.feature2', 'gameModes.wheelRush.feature3'],
-    accentColor: 'bg-neo-lime',
-    accentBorder: 'border-l-neo-lime',
-    accentBg: 'bg-neo-lime',
-    activeText: 'text-neo-lime',
     activeBg: 'bg-neo-lime',
   },
 ];
@@ -99,7 +64,6 @@ export function BattleModeCard({
   }, [setSelectedGameMode]);
 
   const visibleModes = MODES;
-  const activeMode = visibleModes.find(m => m.mode === selectedGameMode) ?? visibleModes[0];
 
   return (
     <section className="rounded-neo-lg border-3 border-neo-black bg-slate-800/80 shadow-hard overflow-hidden">
@@ -109,9 +73,8 @@ export function BattleModeCard({
         {t('hostView.battleMode')}
       </h3>
       {/* Horizontal chips row — equal-width */}
-      <div className="space-y-2">
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
-          {visibleModes.map(({ mode, icon, nameKey, activeBg }) => {
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
+        {visibleModes.map(({ mode, icon, nameKey, activeBg }) => {
             const isActive = selectedGameMode === mode;
 
             return (
@@ -148,38 +111,7 @@ export function BattleModeCard({
               </motion.button>
             );
           })}
-        </div>
       </div>
-
-      {/* Mode Explainer Card */}
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={activeMode.mode}
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -8 }}
-          transition={{ duration: 0.2 }}
-          className={cn(
-            'flex gap-3 p-3 rounded-neo border-2 border-neo-black border-l-4 bg-neo-navy-light/80 shadow-hard-sm',
-            activeMode.accentBorder
-          )}
-        >
-          <div className={cn(
-            'w-14 h-14 rounded-neo border-2 border-neo-black flex items-center justify-center shrink-0 shadow-hard-sm text-neo-black',
-            activeMode.accentBg
-          )}>
-            {activeMode.largeIcon}
-          </div>
-          <div className="flex-1 min-w-0 space-y-1">
-            <h4 className={cn('font-neo-display text-lg leading-none tracking-tight uppercase', activeMode.activeText)}>
-              {t(activeMode.nameKey)}
-            </h4>
-            <p className="text-[11px] text-neo-cream/60 leading-tight">
-              {t(activeMode.descKey)}
-            </p>
-          </div>
-        </motion.div>
-      </AnimatePresence>
       </div>
     </section>
   );

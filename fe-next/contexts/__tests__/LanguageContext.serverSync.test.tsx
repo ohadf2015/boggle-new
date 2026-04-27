@@ -81,6 +81,44 @@ describe('LanguageContext — server-side language sync', () => {
         expect(secondCallCount).toBe(0);
     });
 
+    it('does NOT lock dedup gate when POST fails (e.g. 401 anon) — next mount retries', async () => {
+        mockPathname = '/en';
+        // First mount: simulate anonymous user — endpoint returns 401
+        fetchMock.mockImplementationOnce(
+            async () => new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 })
+        );
+
+        const { unmount } = render(
+            <LanguageProvider initialLanguage="en">
+                <span />
+            </LanguageProvider>
+        );
+
+        await waitFor(() => {
+            expect(fetchMock.mock.calls.some((c) => c[0] === '/api/user/language')).toBe(true);
+        });
+
+        unmount();
+        fetchMock.mockClear();
+        // Second mount: simulate post-login (200 OK) — must POST again because
+        // 401 should not have set the sessionStorage dedup gate.
+        fetchMock.mockImplementation(
+            async () => new Response(JSON.stringify({ success: true }), { status: 200 })
+        );
+
+        render(
+            <LanguageProvider initialLanguage="en">
+                <span />
+            </LanguageProvider>
+        );
+
+        await waitFor(() => {
+            const call = fetchMock.mock.calls.find((c) => c[0] === '/api/user/language');
+            expect(call).toBeDefined();
+            expect(JSON.parse(call![1].body)).toEqual({ language: 'en' });
+        });
+    });
+
     it('re-POSTs when language changes (different lang invalidates dedup)', async () => {
         mockPathname = '/en';
 

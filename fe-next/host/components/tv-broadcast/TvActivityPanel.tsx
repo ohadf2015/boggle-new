@@ -5,6 +5,7 @@ import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import type { Socket } from 'socket.io-client';
 import { useGameMode } from '@/hooks/gameState/store';
 import { cn } from '@/lib/utils';
+import { SilentVideo } from '@/components/ui/SilentVideo';
 
 // ==================== Types ====================
 
@@ -366,15 +367,11 @@ const TvActivityPanel = memo<TvActivityPanelProps>(({
             className="absolute bottom-12 right-4 z-20 pointer-events-none"
             aria-hidden="true"
           >
-            <video
+            <SilentVideo
               src="/mascot/celebration.mp4"
               width={100}
               height={100}
               className="drop-shadow-[3px_3px_0px_rgba(0,0,0,1)]"
-              autoPlay
-              loop
-              muted
-              playsInline
               preload="metadata"
               aria-hidden="true"
             />

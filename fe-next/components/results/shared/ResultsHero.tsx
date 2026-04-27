@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { ScoreCountUp } from './ScoreCountUp';
 import { StatsCardGrid, type StatCardItem } from './StatsCardGrid';
+import { SilentVideo } from '@/components/ui/SilentVideo';
 
 type HeroVariant = 'win' | 'loss' | 'neutral';
 
@@ -112,15 +113,11 @@ export function ResultsHero({
         transition={{ delay: 0.15, type: 'spring', stiffness: 200, damping: 12 }}
         className="flex justify-center"
       >
-        <video
+        <SilentVideo
           src={variant === 'win' ? '/mascot/celebration.mp4' : variant === 'loss' ? '/mascot/encouraging.mp4' : '/mascot/flexing.mp4'}
           width={72}
           height={72}
           className="drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]"
-          autoPlay
-          loop
-          muted
-          playsInline
           preload="metadata"
           aria-hidden="true"
         />

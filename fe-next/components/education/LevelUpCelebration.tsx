@@ -16,6 +16,7 @@ import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/Ada
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { fireLevelUpConfetti } from '@/utils/confettiUtils';
+import { SilentVideo } from '@/components/ui/SilentVideo';
 
 // ==============================================
 // TYPES
@@ -108,15 +109,11 @@ const LevelUpCelebration = memo<LevelUpCelebrationProps>(
               animate={{ scale: 1, rotate: 0 }}
               transition={{ delay: 0.2, type: 'spring', stiffness: 200, damping: 12 }}
             >
-              <video
+              <SilentVideo
                 src="/mascot/celebration.mp4"
                 width={96}
                 height={96}
                 className="mx-auto drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]"
-                autoPlay
-                loop
-                muted
-                playsInline
                 preload="metadata"
                 aria-hidden="true"
               />

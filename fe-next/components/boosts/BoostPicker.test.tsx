@@ -42,4 +42,16 @@ describe('BoostPicker', () => {
     fireEvent.keyDown(document, { key: 'Escape' });
     expect(onClose).toHaveBeenCalled();
   });
+
+  it('renders an icon for each eligible boost card (decorative, aria-hidden)', () => {
+    const { container } = render(<BoostPicker open mode="mp" sessionId="s1" onClose={() => {}} />);
+    // 3 mp-eligible boosts: hint, scoreMultiplier, firstWordBonus
+    const cards = container.querySelectorAll('[data-boost-card]');
+    expect(cards.length).toBe(3);
+    cards.forEach((card) => {
+      const icon = card.querySelector('[data-boost-icon]');
+      expect(icon).not.toBeNull();
+      expect(icon?.getAttribute('aria-hidden')).toBe('true');
+    });
+  });
 });

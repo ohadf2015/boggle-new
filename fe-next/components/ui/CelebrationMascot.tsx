@@ -4,6 +4,7 @@ import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { memo } from 'react';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import type { MascotClipShape, MascotBorderColor } from './Mascot';
+import { SilentVideo } from './SilentVideo';
 
 const CLIP_CLASSES: Record<MascotClipShape, string> = {
   none: '',
@@ -126,15 +127,11 @@ export const CelebrationMascot = memo(function CelebrationMascot({
       }}
     >
       <div className={`w-full h-full ${CLIP_CLASSES[resolvedShape]} ${BORDER_CLASSES[resolvedBorder]} ${hasClip ? resolvedBg : ''}`}>
-        <video
+        <SilentVideo
           src={imageSrc}
           width={SIZE_PIXELS[size]}
           height={SIZE_PIXELS[size]}
           className={`w-full h-full object-contain ${hasClip ? 'scale-110' : ''} drop-shadow-lg`}
-          autoPlay
-          loop
-          muted
-          playsInline
           preload={priority ? 'auto' : 'metadata'}
           aria-label={altText}
         />

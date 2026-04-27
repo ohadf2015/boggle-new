@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, memo } from 'react';
+import { useMemo, memo } from 'react';
 import { useSpring, animated } from '@react-spring/web';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { TrendingUp } from 'lucide-react';
@@ -25,8 +25,10 @@ type TierKey = 'bronze' | 'silver' | 'gold' | 'platinum';
 interface TierInfo {
   tier: TierKey;
   nextTier: TierKey | null;
+  lowerThreshold: number;
   nextThreshold: number | null;
   gradient: string;
+  fillColor: string;
   labelColor: string;
 }
 
@@ -35,8 +37,10 @@ function getTierInfo(score: number): TierInfo {
     return {
       tier: 'bronze',
       nextTier: 'silver',
+      lowerThreshold: 0,
       nextThreshold: SCORE_TIERS.SILVER,
       gradient: 'from-neo-pink-muted to-neo-pink',
+      fillColor: 'bg-neo-pink',
       labelColor: 'text-neo-pink',
     };
   }
@@ -44,8 +48,10 @@ function getTierInfo(score: number): TierInfo {
     return {
       tier: 'silver',
       nextTier: 'gold',
+      lowerThreshold: SCORE_TIERS.SILVER,
       nextThreshold: SCORE_TIERS.GOLD,
       gradient: 'from-neo-orange to-neo-yellow',
+      fillColor: 'bg-neo-orange',
       labelColor: 'text-neo-orange',
     };
   }
@@ -53,16 +59,20 @@ function getTierInfo(score: number): TierInfo {
     return {
       tier: 'gold',
       nextTier: 'platinum',
+      lowerThreshold: SCORE_TIERS.GOLD,
       nextThreshold: SCORE_TIERS.PLATINUM,
       gradient: 'from-neo-yellow to-neo-lime-light',
+      fillColor: 'bg-neo-yellow',
       labelColor: 'text-neo-yellow',
     };
   }
   return {
     tier: 'platinum',
     nextTier: null,
+    lowerThreshold: SCORE_TIERS.PLATINUM,
     nextThreshold: null,
     gradient: 'from-neo-lime-light to-neo-lime',
+    fillColor: 'bg-neo-lime',
     labelColor: 'text-neo-lime',
   };
 }
@@ -81,9 +91,9 @@ export const AccumulatedScoreDisplay = memo<AccumulatedScoreDisplayProps>(({
   const tierInfo = useMemo(() => getTierInfo(currentScore), [currentScore]);
 
   const tierLabel = t(`wordHunt.survival.score.tier.${tierInfo.tier}`);
-  const flavor = t(`wordHunt.survival.score.tier.${tierInfo.tier}Flavor`);
+  const isMaxed = tierInfo.nextTier === null || tierInfo.nextThreshold === null;
   const progressNote = useMemo(() => {
-    if (tierInfo.nextTier === null || tierInfo.nextThreshold === null) {
+    if (isMaxed || tierInfo.nextTier === null || tierInfo.nextThreshold === null) {
       return t('wordHunt.survival.score.tier.maxed');
     }
     const pointsToNext = Math.max(0, tierInfo.nextThreshold - currentScore);
@@ -92,7 +102,15 @@ export const AccumulatedScoreDisplay = memo<AccumulatedScoreDisplayProps>(({
       points: pointsToNext,
       next: nextLabel,
     });
-  }, [tierInfo, currentScore, t]);
+  }, [isMaxed, tierInfo, currentScore, t]);
+
+  const tierProgressPct = useMemo(() => {
+    if (isMaxed || tierInfo.nextThreshold === null) return 100;
+    const span = tierInfo.nextThreshold - tierInfo.lowerThreshold;
+    if (span <= 0) return 0;
+    const within = Math.max(0, Math.min(span, currentScore - tierInfo.lowerThreshold));
+    return Math.round((within / span) * 100);
+  }, [currentScore, tierInfo, isMaxed]);
 
   const springProps = useSpring({
     val: Math.max(0, currentScore),
@@ -173,10 +191,28 @@ export const AccumulatedScoreDisplay = memo<AccumulatedScoreDisplayProps>(({
         <span className={cn('font-black uppercase tracking-wide', tierInfo.labelColor)}>
           {tierLabel}
         </span>
-        <span className="text-neo-cream/50">·</span>
-        <span className="text-neo-cream/70 italic">{flavor}</span>
-        <span className="text-neo-cream/50">·</span>
-        <span className="text-neo-cream/80 font-bold">{progressNote}</span>
+        {isMaxed ? (
+          <span className="text-neo-lime font-black uppercase tracking-wide">{progressNote}</span>
+        ) : (
+          <>
+            <div
+              role="progressbar"
+              aria-label={t('wordHunt.survival.score.tier.progressLabel')}
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuenow={tierProgressPct}
+              className="relative h-1.5 w-12 rounded-full bg-neo-cream/15 border border-neo-cream/25 overflow-hidden"
+            >
+              <AdaptiveMotion.div
+                className={cn('absolute inset-y-0 start-0 rounded-full', tierInfo.fillColor)}
+                initial={{ width: 0 }}
+                animate={{ width: `${tierProgressPct}%` }}
+                transition={{ type: 'spring', stiffness: 90, damping: 20 }}
+              />
+            </div>
+            <span className="text-neo-cream/85 font-bold tabular-nums">{progressNote}</span>
+          </>
+        )}
       </div>
     </div>
   );

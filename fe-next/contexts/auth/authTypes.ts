@@ -64,6 +64,8 @@ export interface ProfileData {
   practice_graduated_at?: string | null;
   // Role-based access control
   user_role?: 'student' | 'teacher' | 'admin';
+  // UI/push notification language preference (5 supported locales)
+  language?: 'he' | 'en' | 'sv' | 'ja' | 'es' | null;
 }
 
 // Collectible item from the catalog

@@ -15,6 +15,7 @@ import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
 import type { BossVictoryProps } from '@/types/boss';
+import { SilentVideo } from '@/components/ui/SilentVideo';
 
 // ==============================================
 // CONSTANTS
@@ -300,15 +301,11 @@ const BossVictory = memo<BossVictoryProps>(
               animate={{ scale: 1, rotate: 0 }}
               transition={{ delay: 0.7, type: 'spring', stiffness: 200, damping: 14 }}
             >
-              <video
+              <SilentVideo
                 src={isVictory ? '/mascot/flexing.mp4' : '/mascot/encouraging.mp4'}
                 width={80}
                 height={80}
                 className="drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]"
-                autoPlay
-                loop
-                muted
-                playsInline
                 preload="metadata"
                 aria-hidden="true"
               />

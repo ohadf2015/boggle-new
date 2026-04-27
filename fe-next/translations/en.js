@@ -2733,7 +2733,10 @@ const en = {
       "title": "Nailed it!",
       "message": "You've got the moves! Ready for real competition?",
       "finish": "Let's Battle!",
-      "continuePractice": "Keep Practicing"
+      "continuePractice": "Keep Practicing",
+      "nextChallenge": "What's next?",
+      "tryDaily": "Try today's daily",
+      "tryQuickMatch": "Battle a bot"
     },
     "analysis": {
       "titleComplete": "Training Done!",
@@ -4538,6 +4541,7 @@ const en = {
     "quickPlayDesc": "Jump in — random mode vs bots",
     "practice": "Practice",
     "practiceDesc": "No pressure, just words",
+    "practiceFirstToUnlock": "Finish practice to unlock",
     "brainTraining": "Brain Training",
     "brainTrainingDesc": "Track cognitive growth",
     "adventureMode": "Adventure",
@@ -5215,6 +5219,7 @@ const en = {
     "timeLimit": "2 minute time limit",
     "clear": "Clear",
     "shuffle": "Shuffle",
+    "stealLabel": "STEAL",
     "foundWords": "Found Words",
     "possibleWords": "Possible",
     "excellent": "Excellent!",
@@ -5402,12 +5407,9 @@ const en = {
           "silver": "Silver",
           "gold": "Gold",
           "platinum": "Platinum",
-          "bronzeFlavor": "Warming up",
-          "silverFlavor": "Solid run",
-          "goldFlavor": "On fire",
-          "platinumFlavor": "Legendary",
           "maxed": "Maxed out",
-          "toNext": "{points} to {next}"
+          "toNext": "{points} to {next}",
+          "progressLabel": "Tier progress"
         }
       }
     },

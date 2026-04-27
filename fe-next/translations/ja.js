@@ -2593,7 +2593,10 @@ const ja = {
       "title": "完璧！",
       "message": "操作マスターした！本番に挑戦する？",
       "finish": "バトルへ！",
-      "continuePractice": "練習を続ける"
+      "continuePractice": "練習を続ける",
+      "nextChallenge": "次は？",
+      "tryDaily": "今日のデイリーに挑戦",
+      "tryQuickMatch": "ボットと対戦"
     },
     "analysis": {
       "titleComplete": "トレーニング完了！",
@@ -4393,6 +4396,7 @@ const ja = {
     "quickPlayDesc": "すぐ開始 — ボットとランダムモード",
     "practice": "練習",
     "practiceDesc": "プレッシャーなし、言葉だけ",
+    "practiceFirstToUnlock": "練習を完了して解除",
     "brainTraining": "脳トレーニング",
     "brainTrainingDesc": "認知成長を追跡",
     "adventureMode": "アドベンチャー",
@@ -5125,6 +5129,7 @@ const ja = {
     "timeLimit": "2分の制限時間",
     "clear": "クリア",
     "shuffle": "シャッフル",
+    "stealLabel": "スチール",
     "foundWords": "見つかった単語",
     "possibleWords": "可能",
     "excellent": "素晴らしい！",
@@ -5307,12 +5312,9 @@ const ja = {
           "silver": "シルバー",
           "gold": "ゴールド",
           "platinum": "プラチナ",
-          "bronzeFlavor": "ウォームアップ",
-          "silverFlavor": "好調",
-          "goldFlavor": "絶好調",
-          "platinumFlavor": "伝説級",
           "maxed": "最大到達",
-          "toNext": "次のランクまで{points}"
+          "toNext": "次のランクまで{points}",
+          "progressLabel": "ランク進捗"
         }
       }
     },

@@ -25,6 +25,7 @@ import { TIER_COLORS, TIER_ICONS, type TierName, calculateTier } from '@/utils/a
 import type { AchievementPayload } from '@/shared/types/socket';
 import type { UnlockPayload } from '@/hooks/useAchievementUnlock';
 import type { AdventureAchievementDef } from '@/utils/adventureAchievementUtils';
+import { SilentVideo } from '@/components/ui/SilentVideo';
 
 // ==============================================
 // TYPES
@@ -218,15 +219,11 @@ export function UnifiedAchievementModal(props: UnifiedAchievementModalProps) {
             animate={{ scale: 1, rotate: 0 }}
             transition={{ delay: 0.1, type: 'spring', stiffness: 200, damping: 12 }}
           >
-            <video
+            <SilentVideo
               src="/mascot/celebration.mp4"
               width={64}
               height={64}
               className="drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]"
-              autoPlay
-              loop
-              muted
-              playsInline
               preload="metadata"
               aria-hidden="true"
             />

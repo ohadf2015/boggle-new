@@ -4,6 +4,7 @@ import React from 'react';
 import { motion, type Variants } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { markOnboardingSkipped } from '@/utils/onboardingStorage';
+import { SilentVideo } from '@/components/ui/SilentVideo';
 
 interface ReturningUserStepProps {
   onHaveAccount: () => void;
@@ -65,13 +66,9 @@ const ReturningUserStep: React.FC<ReturningUserStepProps> = ({
             transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
             className="relative w-36 h-36 shrink-0 rounded-full bg-neo-navy border-neo-thick border-black shadow-hard-lg flex items-center justify-center overflow-hidden"
           >
-            <video
+            <SilentVideo
               src="/mascot/spectating.mp4"
               className="w-full h-full object-cover"
-              autoPlay
-              loop
-              muted
-              playsInline
               preload="metadata"
               aria-label={t('onboarding.returningUser.title')}
             />

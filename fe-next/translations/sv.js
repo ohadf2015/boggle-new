@@ -2606,7 +2606,10 @@ const sv = {
       "title": "Bra gjort!",
       "message": "Du har koll! Redo för riktig tävling?",
       "finish": "Nu kör vi!",
-      "continuePractice": "Fortsätt Öva"
+      "continuePractice": "Fortsätt Öva",
+      "nextChallenge": "Vad händer nu?",
+      "tryDaily": "Prova dagens utmaning",
+      "tryQuickMatch": "Möt en bot"
     },
     "analysis": {
       "titleComplete": "Träning Klar!",
@@ -4409,6 +4412,7 @@ const sv = {
     "quickPlayDesc": "Hoppa in — slumpläge mot bottar",
     "practice": "Träning",
     "practiceDesc": "Ingen press, bara ord",
+    "practiceFirstToUnlock": "Avsluta övningen för att låsa upp",
     "brainTraining": "Hjärnträning",
     "brainTrainingDesc": "Spåra kognitiv tillväxt",
     "adventureMode": "Äventyr",
@@ -5093,6 +5097,7 @@ const sv = {
     "timeLimit": "2 minuters tidsgräns",
     "clear": "Rensa",
     "shuffle": "Blanda",
+    "stealLabel": "STJÄL",
     "foundWords": "Hittade ord",
     "possibleWords": "Möjliga",
     "excellent": "Utmärkt!",
@@ -5280,12 +5285,9 @@ const sv = {
           "silver": "Silver",
           "gold": "Guld",
           "platinum": "Platina",
-          "bronzeFlavor": "Värmer upp",
-          "silverFlavor": "Stadig runda",
-          "goldFlavor": "På elden",
-          "platinumFlavor": "Legendarisk",
           "maxed": "Max nått",
-          "toNext": "{points} till {next}"
+          "toNext": "{points} till {next}",
+          "progressLabel": "Nivåframsteg"
         }
       }
     },

@@ -93,4 +93,11 @@ describe('BoostButton', () => {
     render(<BoostButton mode="mp" sessionId="s1" />);
     expect(screen.getByRole('button')).toBeInTheDocument();
   });
+
+  it('renders a decorative icon inside the button', () => {
+    const { container } = render(<BoostButton mode="mp" sessionId="s1" />);
+    const icon = container.querySelector('[data-boost-button-icon]');
+    expect(icon).not.toBeNull();
+    expect(icon?.getAttribute('aria-hidden')).toBe('true');
+  });
 });
