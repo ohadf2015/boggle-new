@@ -32,7 +32,8 @@ describe('ReengagementEmailV2 — component render', () => {
     expect(html).toMatch(/you\s*good/);
     // Apostrophes get HTML-encoded → match "Let" + "s go" loosely
     expect(html).toMatch(/Let.{1,10}s go/);
-    expect(html).toContain('LEXICLASH');
+    // Branding now lives in the OG image alt text (text wordmark removed)
+    expect(html).toContain('alt="LexiClash"');
   });
 
   it('includes the circular marshmallow mascot with alt text', async () => {
@@ -41,6 +42,25 @@ describe('ReengagementEmailV2 — component render', () => {
     expect(html).toContain('Lexi waving hello');
     // Circular clipping — border-radius 9999px applied to the ring cell
     expect(html).toContain('border-radius:9999px');
+  });
+
+  it('uses the localized OG image as branded header (proves it is LexiClash)', async () => {
+    for (const lang of ['en', 'he', 'sv', 'ja', 'es']) {
+      const html = await renderHtml({ language: lang });
+      expect(html).toContain(`https://www.lexiclash.live/og-image-${lang}.jpg`);
+      expect(html).toContain('alt="LexiClash"');
+    }
+  });
+
+  it('renders tightened copy — drops the kettle/PS/urgency cruft', async () => {
+    const html = await renderHtml();
+    // Old wordy lines that were cut
+    expect(html).not.toContain('kettle');
+    expect(html).not.toContain('few friends asked about you');
+    expect(html).not.toMatch(/Today.{1,10}s hint is ready when you are/);
+    // New punchier replacements (apostrophes get HTML-encoded → tolerate)
+    expect(html).toMatch(/Today.{1,10}s word is waiting/);
+    expect(html).toMatch(/That.{1,10}s it/);
   });
 
   it('renders the giant letter tile with firstLetter', async () => {

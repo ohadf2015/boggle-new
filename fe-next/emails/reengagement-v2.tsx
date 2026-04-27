@@ -46,8 +46,6 @@ interface Copy {
   hint: string;          // small label above the letter reveal
   pitch: string;         // line between letter reveal and CTA
   cta: string;
-  urgency: string;
-  social: string;
   footerReason: string;
   unsubscribe: string;
   privacy: string;
@@ -56,60 +54,50 @@ interface Copy {
 const COPY: Record<string, Copy> = {
   en: {
     greeting: (n) => `${n}, you good?`,
-    missed: "It's been a minute. Lexi put the kettle on, just in case.",
+    missed: "Been a minute. Today's word is waiting.",
     hint: 'Your hint for today',
-    pitch: "30 seconds. One word. Whenever you've got a moment.",
+    pitch: "30 seconds. One word. That's it.",
     cta: "Let's go",
-    urgency: "Today's hint is ready when you are. No rush.",
-    social: 'PS — a few friends asked about you. Said you’d be back.',
     footerReason: 'You signed up for daily word reminders.',
     unsubscribe: 'Unsubscribe',
     privacy: 'Privacy',
   },
   he: {
     greeting: (n) => `${n}, הכל טוב?`,
-    missed: 'עבר קצת זמן. לקסי הכינה תה, ליתר ביטחון.',
+    missed: 'עבר קצת זמן. המילה של היום מחכה.',
     hint: 'הרמז שלך להיום',
-    pitch: 'שלושים שניות, מילה אחת. כשיהיה לך רגע.',
+    pitch: '30 שניות. מילה אחת. זהו.',
     cta: 'יאללה',
-    urgency: 'הרמז של היום מחכה לך. בלי לחץ.',
-    social: 'אגב — חברים שאלו עליך. אמרנו שתחזור/י.',
     footerReason: 'נרשמת לתזכורות מילה יומית.',
     unsubscribe: 'ביטול הרשמה',
     privacy: 'פרטיות',
   },
   sv: {
     greeting: (n) => `${n}, allt bra?`,
-    missed: 'Det var ett tag sen. Lexi satte på tevattnet, ifall.',
+    missed: 'Det var ett tag sen. Dagens ord väntar.',
     hint: 'Din ledtråd för idag',
-    pitch: 'Trettio sekunder. Ett ord. När du har en lugn stund.',
+    pitch: '30 sekunder. Ett ord. Klart.',
     cta: 'Nu kör vi',
-    urgency: 'Dagens ledtråd finns där när du vill. Ingen brådska.',
-    social: 'PS — några vänner frågade efter dig. Vi sa att du kommer tillbaka.',
     footerReason: 'Du anmälde dig till dagliga ordpåminnelser.',
     unsubscribe: 'Avprenumerera',
     privacy: 'Integritet',
   },
   ja: {
     greeting: (n) => `${n}さん、元気？`,
-    missed: 'ちょっとお久しぶり。レキシ、お茶入れて待ってるよ。',
+    missed: 'お久しぶり。今日の単語、待ってるよ。',
     hint: '今日のヒント',
-    pitch: '30秒、一単語。手があいたときにどうぞ。',
+    pitch: '30秒、一単語、それだけ。',
     cta: 'いこう',
-    urgency: '今日のヒント、いつでも準備できてるよ。焦らなくていい。',
-    social: 'PS — フレンドが心配してたよ。「戻ってくるよ」って答えといた。',
     footerReason: '毎日の単語リマインダーに登録してくれたよね。',
     unsubscribe: '配信停止',
     privacy: 'プライバシー',
   },
   es: {
     greeting: (n) => `${n}, ¿todo bien?`,
-    missed: 'Ha pasado un rato. Lexi te preparó té, por si acaso.',
+    missed: 'Ha pasado un rato. La palabra de hoy te espera.',
     hint: 'Tu pista de hoy',
-    pitch: 'Treinta segundos. Una palabra. Cuando tengas un momento.',
+    pitch: '30 segundos. Una palabra. Listo.',
     cta: 'Vamos',
-    urgency: 'La pista de hoy está lista cuando quieras. Sin prisa.',
-    social: 'PD — unos amigos preguntaron por ti. Dijimos que volverías.',
     footerReason: 'Te suscribiste a recordatorios diarios.',
     unsubscribe: 'Cancelar suscripción',
     privacy: 'Privacidad',
@@ -192,6 +180,15 @@ interface ReengagementEmailV2Props {
 // Use www. domain — lexiclash.live 301s to www, and email clients don't follow redirects
 const MASCOT_SRC = 'https://www.lexiclash.live/mascot/waving.gif';
 
+/** Localized OG card — branded LexiClash header (replaces text wordmark) */
+const OG_IMAGE_BY_LANG: Record<string, string> = {
+  en: 'https://www.lexiclash.live/og-image-en.jpg',
+  he: 'https://www.lexiclash.live/og-image-he.jpg',
+  sv: 'https://www.lexiclash.live/og-image-sv.jpg',
+  ja: 'https://www.lexiclash.live/og-image-ja.jpg',
+  es: 'https://www.lexiclash.live/og-image-es.jpg',
+};
+
 /* ─── Palette (solid hex only — dark-mode safe) ─── */
 
 const C = {
@@ -225,6 +222,7 @@ export default function ReengagementEmailV2({
   const sh = rtl ? '-' : '';
   const locale = ['he', 'sv', 'ja', 'es'].includes(language) ? language : 'en';
   const privacyUrl = `https://lexiclash.live/${locale}/privacy`;
+  const ogImageSrc = OG_IMAGE_BY_LANG[locale] || OG_IMAGE_BY_LANG.en;
   const year = new Date().getFullYear();
 
   return (
@@ -292,19 +290,25 @@ export default function ReengagementEmailV2({
                 <table role="presentation" cellPadding={0} cellSpacing={0} width="100%"
                   style={{ maxWidth: '560px' }} dir={dir}>
 
-                  {/* ── 1. Text wordmark ── */}
+                  {/* ── 1. Branded OG header (localized — visual proof this is LexiClash) ── */}
                   <tr>
-                    <td align="center" style={{ paddingBottom: '28px' }}>
-                      <Link href={playUrl} target="_blank"
-                        style={{
-                          color: C.lime,
-                          fontSize: '20px',
-                          fontWeight: 700,
-                          letterSpacing: '5px',
-                          textDecoration: 'none',
-                          fontFamily: "'Fredoka', Arial, sans-serif",
-                        }}>
-                        LEXICLASH
+                    <td align="center" style={{ paddingBottom: '24px' }}>
+                      <Link href={playUrl} target="_blank" style={{ textDecoration: 'none', display: 'inline-block', lineHeight: 0 }}>
+                        <Img
+                          src={ogImageSrc}
+                          alt="LexiClash"
+                          width="280"
+                          height="147"
+                          style={{
+                            display: 'block',
+                            width: '280px',
+                            height: '147px',
+                            border: `3px solid ${C.black}`,
+                            borderRadius: '12px',
+                            boxShadow: `${sh}4px 4px 0px ${C.black}`,
+                            outline: 'none',
+                          }}
+                        />
                       </Link>
                     </td>
                   </tr>
@@ -513,40 +517,10 @@ export default function ReengagementEmailV2({
                     </td>
                   </tr>
 
-                  {/* ── 7. Urgency — inline, not a boxed panel (v1 had a box) ── */}
-                  <tr>
-                    <td align="center" style={{ paddingBottom: '18px' }}>
-                      <Text style={{
-                        color: C.pink,
-                        fontSize: '13px',
-                        fontWeight: 600,
-                        textAlign: 'center',
-                        margin: 0,
-                        direction: dir,
-                      }}>
-                        ⏳ {t.urgency}
-                      </Text>
-                    </td>
-                  </tr>
+                  {/* spacer above footer */}
+                  <tr><td style={{ height: '12px', lineHeight: 0, fontSize: 0 }}>&nbsp;</td></tr>
 
-                  {/* ── 8. Social proof, casual P.S. ── */}
-                  <tr>
-                    <td align="center" style={{ paddingBottom: '28px' }}>
-                      <Text style={{
-                        color: C.muted,
-                        fontSize: '13px',
-                        fontStyle: 'italic',
-                        textAlign: 'center',
-                        margin: 0,
-                        lineHeight: '1.5',
-                        direction: dir,
-                      }}>
-                        {t.social}
-                      </Text>
-                    </td>
-                  </tr>
-
-                  {/* ── 9. Footer ── */}
+                  {/* ── 7. Footer ── */}
                   <tr>
                     <td style={{ borderTop: `1px solid ${C.divider}`, paddingTop: '24px' }}>
                       <table role="presentation" cellPadding={0} cellSpacing={0} width="100%">

@@ -196,7 +196,7 @@ export async function getReengagementRecipients(): Promise<ReengagementRecipient
     const localHour = getLocalHour(userTimezone);
     if (localHour < 7 || localHour > 9) continue;
 
-    // Recent activity check — skip users who already played within window
+    // Recent activity check — skip users who played the daily within window.
     const { data: recentAttempt } = await supabase
       .from('daily_puzzle_attempts')
       .select('id')
@@ -206,6 +206,20 @@ export async function getReengagementRecipients(): Promise<ReengagementRecipient
       .single();
 
     if (recentAttempt) continue;
+
+    // Cross-mode activity check — engagementManager writes last_played_at on
+    // every game (MP, SP, brain drills, party). If the user played anything
+    // recently, don't nag them to come back.
+    const inactivityCutoffIso = inactivityDate.toISOString();
+    const { data: recentAnyGame } = await supabase
+      .from('player_engagement')
+      .select('last_played_at')
+      .eq('player_id', profile.id)
+      .gte('last_played_at', inactivityCutoffIso)
+      .limit(1)
+      .maybeSingle();
+
+    if (recentAnyGame) continue;
 
     // Engagement window — must have played at least once within last MAX_INACTIVITY_DAYS.
     // Skips two cohorts we shouldn't nag: never-played sign-ups + long-gone users.

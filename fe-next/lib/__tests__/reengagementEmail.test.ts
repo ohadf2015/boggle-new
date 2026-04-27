@@ -273,8 +273,8 @@ describe('generateReengagementEmailHtml', () => {
       baseUrl: 'https://example.com',
     });
 
-    // Text logo instead of WEBP image
-    expect(html).toContain('LEXICLASH');
+    // Branding now lives in the OG image alt text (text wordmark removed)
+    expect(html).toContain('alt="LexiClash"');
   });
 
   test('should include greeting, tiles, mascot, and CTA', async () => {
@@ -307,8 +307,9 @@ describe('generateReengagementEmailHtml', () => {
       baseUrl: 'https://example.com',
     });
 
-    // Text logo, no WEBP — same for all languages
-    expect(html).toContain('LEXICLASH');
+    // Per-locale OG image is the brand surface now
+    expect(html).toContain('og-image-he.jpg');
+    expect(html).toContain('alt="LexiClash"');
   });
 
   test('should generate Hebrew template with RTL direction and flipped shadows', async () => {
