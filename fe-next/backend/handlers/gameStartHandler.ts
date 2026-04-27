@@ -52,6 +52,7 @@ import { initWheelRushState, generateWheelPuzzle } from '../modules/wheelRushMan
 import { getSupabase } from '../modules/supabase/client.js';
 import { autoAddBotsForSoloPlayer } from '../services/gameLifecycle/autoAddBots.js';
 import { scheduleRoundEvent } from '../modules/roundEventsManager.js';
+import { verifyBoostToken } from '../utils/boostToken.js';
 
 // In-memory mutex to prevent concurrent startGame flows for the same game.
 // The state machine transition is synchronous, but async work before it
@@ -67,6 +68,12 @@ interface StartGamePayload {
   boardTheme?: { nameKey: string; emoji: string; isHoliday: boolean } | null;
   gameMode?: GameMode | 'random';
   tvMode?: boolean;
+  /**
+   * Optional boost token bundled with startGame so the boost is registered
+   * atomically with state transition — eliminates the race where a separate
+   * `boost:apply` emit could arrive after the first submitWord.
+   */
+  boostToken?: string;
 }
 
 /**
@@ -294,6 +301,32 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
       logger.warn('SOCKET', `Rejected concurrent startGame for ${gameCode}: ${transitionResult.error}`);
       emitError(socket, ErrorCodes.INTERNAL_ERROR, { message: 'Failed to start game' });
       return;
+    }
+
+    // Apply boost token bundled with startGame (atomic with state transition).
+    // Replaces the prior separate `boost:apply` emit that raced submitWord —
+    // boost now lands in game.playerBoosts before any gameplay broadcast.
+    const boostToken = (validatedData as StartGamePayload).boostToken;
+    if (boostToken && game.hostUsername) {
+      try {
+        const verification = verifyBoostToken(boostToken, gameCode);
+        if (verification.valid) {
+          if (!game.playerBoosts) game.playerBoosts = {};
+          const existing = game.playerBoosts[game.hostUsername];
+          if (!existing || existing.sessionId !== gameCode) {
+            game.playerBoosts[game.hostUsername] = { sessionId: gameCode, token: boostToken };
+            socket.emit('boost:applied', {
+              success: true,
+              boostType: verification.boostType,
+            });
+            logger.info('BOOST', `Applied ${verification.boostType} for ${game.hostUsername} via startGame`);
+          }
+        } else {
+          logger.warn('BOOST', `Invalid boost token in startGame for ${gameCode}: ${verification.reason}`);
+        }
+      } catch (err) {
+        logger.warn('BOOST', `Boost apply error in startGame: ${(err as Error).message}`);
+      }
     }
 
     // Hold the mutex through the entire game-setup async chain. If we released

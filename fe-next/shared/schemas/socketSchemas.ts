@@ -179,6 +179,12 @@ export const StartGameSchema = z.object({
   }).nullable().optional(),
   gameMode: z.enum(['classic', 'blast', 'word-hunt', 'wheel-rush', 'random']).optional(),
   tvMode: z.boolean().optional(),
+  /**
+   * Optional boost token bundled with startGame so the server can register
+   * the boost atomically with state transition (eliminates the prior race
+   * with a separate `boost:apply` emit).
+   */
+  boostToken: z.string().min(1).max(512).optional(),
 });
 
 /**

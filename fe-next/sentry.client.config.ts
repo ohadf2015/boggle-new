@@ -57,9 +57,17 @@ Sentry.init({
 
     // Non-Error promise rejections (CrazyGames SDK throws plain objects).
     // Handled by CrazyGamesSDK.showAuthPrompt try/catch — drop residual noise (JAVASCRIPT-NEXTJS-129).
+    // Also covers AdMob/CrazyGames basic-launch ad-gating codes which surface as
+    // <unknown> events because ignoreErrors regex can't see nested object props
+    // (JAVASCRIPT-NEXTJS-12J).
     if (error && typeof error === "object" && !(error instanceof Error)) {
       const code = (error as { code?: string }).code;
-      if (code === "userAlreadySignedIn" || code === "userNotAuthenticated") {
+      if (
+        code === "userAlreadySignedIn" ||
+        code === "userNotAuthenticated" ||
+        code === "bannersDisabledBasicLaunch" ||
+        code === "adsDisabledBasicLaunch"
+      ) {
         return null;
       }
     }

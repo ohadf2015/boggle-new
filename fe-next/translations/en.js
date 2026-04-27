@@ -10746,6 +10746,7 @@ const en = {
     "remaining": "Boosts left today: {{n}}/{{cap}}",
     "watchAd": "Watch ad to unlock",
     "activeThisGame": "Active this game",
+    "activated": "{{boost}} active!",
     "openPickerAria": "Open boost picker, {{n}} boosts left today",
     "freezeTime": {
       "title": "Freeze Time",

@@ -10620,6 +10620,7 @@ const he = {
     "remaining": "בוסטים שנותרו היום: {{n}}/{{cap}}",
     "watchAd": "צפו בפרסומת כדי לפתוח",
     "activeThisGame": "פעיל במשחק זה",
+    "activated": "{{boost}} פעיל!",
     "openPickerAria": "פתח בוחר בוסט, נשארו {{n}} בוסטים היום",
     "freezeTime": {
       "title": "הקפאת זמן",

@@ -10631,6 +10631,7 @@ const es = {
     "remaining": "Boosts restantes hoy: {{n}}/{{cap}}",
     "watchAd": "Mira un anuncio para desbloquear",
     "activeThisGame": "Activo en esta partida",
+    "activated": "¡{{boost}} activo!",
     "openPickerAria": "Abrir selector de boost, {{n}} boosts restantes hoy",
     "freezeTime": {
       "title": "Congelar tiempo",

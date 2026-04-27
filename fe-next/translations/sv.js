@@ -10619,6 +10619,7 @@ const sv = {
     "remaining": "Boostar kvar idag: {{n}}/{{cap}}",
     "watchAd": "Titta på annons för att låsa upp",
     "activeThisGame": "Aktiv detta spel",
+    "activated": "{{boost}} aktiv!",
     "openPickerAria": "Öppna boost-väljare, {{n}} boostar kvar idag",
     "freezeTime": {
       "title": "Frys tiden",

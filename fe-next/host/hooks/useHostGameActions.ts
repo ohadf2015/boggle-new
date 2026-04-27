@@ -190,6 +190,22 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
     setHostFoundWords([]);
     setHostAchievements([]);
 
+    // Read cached boost token BEFORE emit so the server registers the boost
+    // atomically with state transition. The prior separate `boost:apply` emit
+    // raced submitWord — first words could land before the boost was stashed.
+    let boostToken: string | undefined;
+    const rawBoost = typeof sessionStorage !== 'undefined'
+      ? sessionStorage.getItem(BOOST_TOKEN_STORAGE_KEY(gameCode))
+      : null;
+    if (rawBoost) {
+      try {
+        const parsed = JSON.parse(rawBoost) as { token?: string };
+        if (parsed?.token) boostToken = parsed.token;
+      } catch {
+        // Ignore parsing errors — startGame proceeds without a boost.
+      }
+    }
+
     logger.info('[HOST] Starting game with', playersCount, 'players');
     socket.emit('startGame', {
       letterGrid: newTable,
@@ -201,20 +217,8 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
       boardTheme: boardTheme,
       gameMode: gameMode || 'random',
       tvMode: !hostPlaying,
+      ...(boostToken ? { boostToken } : {}),
     });
-
-    // Apply cached boost token if present
-    const raw = typeof sessionStorage !== 'undefined'
-      ? sessionStorage.getItem(BOOST_TOKEN_STORAGE_KEY(gameCode))
-      : null;
-    if (raw) {
-      try {
-        const { token } = JSON.parse(raw);
-        socket.emit('boost:apply', { sessionId: gameCode, token });
-      } catch {
-        // Ignore parsing errors
-      }
-    }
 
     neoSuccessToast(t('common.gameStarted'), {
       icon: TOAST_ICONS.gamepad,

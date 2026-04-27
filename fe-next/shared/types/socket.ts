@@ -101,6 +101,11 @@ export interface ClientToServerEvents {
 
   // TV mode events
   resultsRevealed: () => void;
+
+  // Boost events
+  // Legacy separate-emit path. Prefer bundling `boostToken` into startGame
+  // (atomic registration); this event is kept for back-compat with older clients.
+  'boost:apply': (data: { gameCode?: string; sessionId: string; token: string }) => void;
 }
 
 // ==================== Hint Types ====================
@@ -307,6 +312,9 @@ export interface ServerToClientEvents {
   'party:phaseChange': (data: { phase: string; gameState?: unknown }) => void;
   'party:playerJoined': (data: { player: unknown }) => void;
   'party:playerLeft': (data: { socketId: string; username?: string }) => void;
+
+  // Boost ack — server confirms a boost token was registered against the player's game.
+  'boost:applied': (data: { success: boolean; boostType?: string }) => void;
 }
 
 // ==================== Payload Types ====================
@@ -350,6 +358,8 @@ export interface StartGamePayload {
   language?: Language;
   minWordLength?: number;
   gameMode?: GameMode;
+  /** Optional boost token bundled with startGame (atomic boost registration). */
+  boostToken?: string;
 }
 
 export interface JoinedPayload {

@@ -10547,6 +10547,7 @@ const ja = {
     "remaining": "本日の残り: {{n}}/{{cap}}",
     "watchAd": "広告を見てアンロック",
     "activeThisGame": "このゲームで有効",
+    "activated": "{{boost}} 発動！",
     "openPickerAria": "ブースト選択を開く、本日残り{{n}}個",
     "freezeTime": {
       "title": "タイム停止",

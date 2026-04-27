@@ -133,6 +133,11 @@ vi.mock('@/shared/constants/wordHuntMultiplayerConstants', () => ({
 }));
 vi.mock('@/shared/constants/gameConstants', () => ({ BLAST_MP_DEFAULT_TIMER: 90 }));
 
+const mockVerifyBoostToken = vi.hoisted(() => vi.fn());
+vi.mock('../../../backend/utils/boostToken', () => ({
+  verifyBoostToken: mockVerifyBoostToken,
+}));
+
 // ─── Import after mocks ────────────────────────────────────────────────────
 
 import { vi, type Mock, type MockInstance } from 'vitest';
@@ -681,6 +686,108 @@ describe('registerStartGameHandler', () => {
         'room:GAME1',
         'startGame',
         expect.objectContaining({ timerSeconds: 90 }) // BLAST_MP_DEFAULT_TIMER
+      );
+    });
+  });
+
+  // ─── Boost token bundling (race-fix) ─────────────────────────────────
+  // Bundling the boost token into startGame eliminates the prior race where
+  // a separate `boost:apply` emit could arrive after the first submitWord,
+  // causing scoreMultiplier/firstWordBonus to be missed at result aggregation.
+
+  describe('boost token bundling', () => {
+    beforeEach(() => {
+      mockVerifyBoostToken.mockReset();
+    });
+
+    it('applies a valid boost token bundled in startGame payload to game.playerBoosts', async () => {
+      mockVerifyBoostToken.mockReturnValue({ valid: true, boostType: 'scoreMultiplier' });
+      const game = makeGame();
+      mockGetGame.mockReturnValue(game);
+      const { socket, handlers } = createMockSocket('socket-host');
+      registerStartGameHandler(mockIo, socket);
+
+      await triggerStartGame(handlers, makePayload({ boostToken: 'v1.GAME1.scoreMultiplier.999.SIG' }));
+
+      expect(mockVerifyBoostToken).toHaveBeenCalledWith('v1.GAME1.scoreMultiplier.999.SIG', 'GAME1');
+      expect(game.playerBoosts).toEqual({
+        Host: { sessionId: 'GAME1', token: 'v1.GAME1.scoreMultiplier.999.SIG' },
+      });
+    });
+
+    it('emits boost:applied to the host socket on successful apply', async () => {
+      mockVerifyBoostToken.mockReturnValue({ valid: true, boostType: 'firstWordBonus' });
+      const { socket, handlers } = createMockSocket('socket-host');
+      registerStartGameHandler(mockIo, socket);
+
+      await triggerStartGame(handlers, makePayload({ boostToken: 'tok' }));
+
+      expect(socket.emit).toHaveBeenCalledWith('boost:applied', {
+        success: true,
+        boostType: 'firstWordBonus',
+      });
+    });
+
+    it('does not call verifyBoostToken when no boostToken in payload', async () => {
+      const { socket, handlers } = createMockSocket('socket-host');
+      registerStartGameHandler(mockIo, socket);
+
+      await triggerStartGame(handlers, makePayload());
+
+      expect(mockVerifyBoostToken).not.toHaveBeenCalled();
+      expect(socket.emit).not.toHaveBeenCalledWith('boost:applied', expect.anything());
+    });
+
+    it('still starts the game when boost token is invalid (does not abort startGame)', async () => {
+      mockVerifyBoostToken.mockReturnValue({ valid: false, reason: 'expired' });
+      const { socket, handlers } = createMockSocket('socket-host');
+      registerStartGameHandler(mockIo, socket);
+
+      await triggerStartGame(handlers, makePayload({ boostToken: 'expired-tok' }));
+
+      // Game must still broadcast startGame
+      expect(mockBroadcastToRoom).toHaveBeenCalledWith(
+        mockIo,
+        'room:GAME1',
+        'startGame',
+        expect.anything(),
+      );
+      // No ack emitted for invalid token
+      expect(socket.emit).not.toHaveBeenCalledWith('boost:applied', expect.anything());
+    });
+
+    it('is idempotent within the same session (does not re-apply)', async () => {
+      mockVerifyBoostToken.mockReturnValue({ valid: true, boostType: 'scoreMultiplier' });
+      const game = makeGame({
+        playerBoosts: { Host: { sessionId: 'GAME1', token: 'old-tok' } },
+      });
+      mockGetGame.mockReturnValue(game);
+      const { socket, handlers } = createMockSocket('socket-host');
+      registerStartGameHandler(mockIo, socket);
+
+      await triggerStartGame(handlers, makePayload({ boostToken: 'new-tok' }));
+
+      // Existing claim preserved
+      expect(game.playerBoosts.Host.token).toBe('old-tok');
+      // No duplicate ack
+      expect(socket.emit).not.toHaveBeenCalledWith('boost:applied', expect.anything());
+    });
+
+    it('does not abort startGame when verifyBoostToken throws', async () => {
+      mockVerifyBoostToken.mockImplementation(() => {
+        throw new Error('crypto failure');
+      });
+      const { socket, handlers } = createMockSocket('socket-host');
+      registerStartGameHandler(mockIo, socket);
+
+      await triggerStartGame(handlers, makePayload({ boostToken: 'crashy' }));
+
+      // Game must still broadcast startGame
+      expect(mockBroadcastToRoom).toHaveBeenCalledWith(
+        mockIo,
+        'room:GAME1',
+        'startGame',
+        expect.anything(),
       );
     });
   });
