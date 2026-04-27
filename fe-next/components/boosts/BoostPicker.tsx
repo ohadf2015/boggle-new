@@ -74,7 +74,7 @@ export function BoostPicker({ open, mode, sessionId, onClose }: Props) {
           {t('boosts.title')}
         </h2>
         <p className="mt-1 text-sm text-neo-cream/70">
-          {t('boosts.remaining').replace('{{n}}', String(remaining)).replace('{{cap}}', String(cap))}
+          {t('boosts.remaining', { n: String(remaining), cap: String(cap) })}
         </p>
         <div className="mt-4 grid gap-3">
           {eligible.map((bt) => (

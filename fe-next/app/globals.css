@@ -2038,7 +2038,16 @@
     --header-height-tablet: 70px;
     --header-height-desktop: 80px;
     --footer-height: 60px;
-    --bottom-nav-height: 64px;
+    /* Bottom-nav real height (h-16 + safe-area) — published by GlobalBottomNav via
+       ResizeObserver. The calc() is the SSR/pre-hydration fallback that matches
+       the rendered offsetHeight (h-16 + paddingBottom = env(safe-area-inset-bottom)),
+       avoiding a layout shift on iOS notched devices. JS overwrites once the nav mounts. */
+    --bottom-nav-height: calc(64px + env(safe-area-inset-bottom, 0px));
+    /* AdMob banner height (incl. its own safe-area) — published by AnchoredNativeBanner. */
+    --admob-banner-height: 0px;
+    /* Single composed offset every fixed-bottom-aware page consumes. Avoids
+       triple-counting safe-area: each layer's var already includes its own. */
+    --bottom-stack-height: calc(var(--bottom-nav-height, 0px) + var(--admob-banner-height, 0px));
 
     /* Snappy Timing Functions */
     --ease-snap: cubic-bezier(0.68, -0.55, 0.265, 1.55);
@@ -3122,21 +3131,29 @@ html {
    always reachable above the fixed nav. Keeps the .main-content-safe
    rule as a belt-and-suspenders for any ad-hoc scrollable containers. */
 @media (max-width: 639px) {
+  /* --bottom-stack-height already includes safe-area (each layer publishes its
+     own incl. inset). Don't add env(safe-area-inset-bottom) here — that triple-counts. */
   html.has-global-bottom-nav body.screen-fit {
-    padding-bottom: calc(var(--bottom-nav-height, 64px) + var(--admob-banner-height, 0px) + env(safe-area-inset-bottom, 0px));
+    padding-bottom: var(--bottom-stack-height);
   }
   html.has-global-bottom-nav .main-content-safe {
-    padding-bottom: calc(var(--bottom-nav-height, 64px) + var(--admob-banner-height, 0px) + env(safe-area-inset-bottom, 0px));
+    padding-bottom: var(--bottom-stack-height);
   }
   /* Belt-and-suspenders: pages whose own scroll container (overflow-y-auto on a
      descendant of <main>) bypass body/main padding. Pad the immediate child of
      main so the inner scroller's last content sits above the fixed nav. */
   html.has-global-bottom-nav main.main-content-safe > div {
-    padding-bottom: calc(var(--bottom-nav-height, 64px) + var(--admob-banner-height, 0px) + env(safe-area-inset-bottom, 0px));
+    padding-bottom: var(--bottom-stack-height);
   }
   html.has-global-bottom-nav {
-    scroll-padding-bottom: calc(var(--bottom-nav-height, 64px) + var(--admob-banner-height, 0px) + env(safe-area-inset-bottom, 0px));
+    scroll-padding-bottom: var(--bottom-stack-height);
   }
+}
+
+/* Utility for any page that needs to clear the bottom-fixed stack
+   (nav + banner). Reactive: updates automatically as either layer resizes. */
+.pb-bottom-stack {
+  padding-bottom: var(--bottom-stack-height);
 }
 
 /* Fixed positioning utilities with safe areas */

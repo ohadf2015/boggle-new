@@ -66,10 +66,12 @@ export default function AnchoredNativeBanner() {
     }
 
     const computeMargin = (): number => {
-      const navEl = document.querySelector<HTMLElement>('[data-global-bottom-nav]');
-      const navHeight = navEl ? Math.round(navEl.getBoundingClientRect().height) : 0;
-      // Android: nav.offsetHeight already includes safe-area via paddingBottom, so margin = navHeight ≥ safeBottom.
-      // iOS: plugin re-adds safe-area, subtract to avoid double-count; floor at 0.
+      // Read --bottom-nav-height published by GlobalBottomNav (single source of truth).
+      // The var holds the nav's real offsetHeight (h-16 + safe-area paddingBottom), so:
+      //   Android: plugin adds safe-area on top → margin = max(navHeight, safeBottom).
+      //   iOS: plugin re-adds safeAreaLayoutGuide → subtract to avoid double-count.
+      const raw = document.documentElement.style.getPropertyValue('--bottom-nav-height').trim();
+      const navHeight = Math.round(parseFloat(raw) || 0);
       return isAndroid
         ? Math.max(navHeight, safeBottom)
         : Math.max(0, navHeight - safeBottom);
@@ -95,25 +97,17 @@ export default function AnchoredNativeBanner() {
       if (!cancelled) applyBanner(computeMargin());
     });
 
-    // Re-measure when nav resizes (orientation, font load, safe-area shift).
-    const navEl = document.querySelector<HTMLElement>('[data-global-bottom-nav]');
-    let resizeObserver: ResizeObserver | null = null;
-    if (navEl && typeof ResizeObserver !== 'undefined') {
-      resizeObserver = new ResizeObserver(() => applyBanner(computeMargin()));
-      resizeObserver.observe(navEl);
-    }
-
-    // Re-measure when nav appears/disappears (NavigationContext.isInGame toggles
-    // `has-global-bottom-nav` on <html>). Without this, leaving a game leaves the
-    // banner with stale 0-margin, sitting on top of the just-shown nav.
-    const classObserver = new MutationObserver(() => applyBanner(computeMargin()));
-    classObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    // Single observer on <html>: GlobalBottomNav writes --bottom-nav-height to
+    // the inline style attribute, and NavigationContext toggles `has-global-bottom-nav`
+    // on the class attribute. Both paths covered here — re-applies banner margin
+    // on orientation, font load, safe-area shift, and game-enter/exit transitions.
+    const htmlObserver = new MutationObserver(() => applyBanner(computeMargin()));
+    htmlObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['class', 'style'] });
 
     return () => {
       cancelled = true;
       cancelAnimationFrame(rafId);
-      resizeObserver?.disconnect();
-      classObserver.disconnect();
+      htmlObserver.disconnect();
     };
   }, [pathname, showBanner, hideBanner, safeArea.bottom]);
 

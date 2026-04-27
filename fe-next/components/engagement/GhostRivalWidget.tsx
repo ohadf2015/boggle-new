@@ -26,7 +26,8 @@ function useCountdown(weekEnd: string | null): string {
 
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
     const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    return t('ghostRival.endsIn', { days: String(days), hours: String(hours) });
+    const time = days > 0 ? `${days}d ${hours}h` : `${hours}h`;
+    return t('ghostRival.endsIn', { time });
   }, [weekEnd, t]);
 }
 
@@ -38,8 +39,8 @@ export const GhostRivalWidget: React.FC = memo(() => {
   if (loading || !rival) return null;
 
   const gapText = isAhead
-    ? t('ghostRival.ahead', { points: String(gap) })
-    : t('ghostRival.behind', { points: String(gap) });
+    ? t('ghostRival.ahead', { pts: String(gap) })
+    : t('ghostRival.behind', { pts: String(gap) });
 
   return (
     <div

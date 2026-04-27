@@ -223,6 +223,8 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
     // Hide entire bottom nav on CrazyGames — external links and social features prohibited
     const isHidden = isInGame || shouldHideOnCurrentPath || isOnCrazyGamesPlatform;
 
+    const navRef = useRef<HTMLElement>(null);
+
     // Signal nav visibility to CSS so sticky overlays can offset above it.
     useEffect(() => {
         if (typeof document === 'undefined') return;
@@ -232,10 +234,36 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
         };
     }, [isHidden]);
 
+    // Publish real nav height (h-16 + safe-area) into --bottom-nav-height. This is the
+    // single source of truth consumed by content padding (globals.css) and by the
+    // AdMob banner's margin calc — replaces brittle DOM measurement from sibling components.
+    useEffect(() => {
+        if (typeof document === 'undefined') return;
+        const root = document.documentElement;
+        if (isHidden) {
+            root.style.setProperty('--bottom-nav-height', '0px');
+            return;
+        }
+        const el = navRef.current;
+        if (!el) return;
+        const update = () => {
+            root.style.setProperty('--bottom-nav-height', `${el.offsetHeight}px`);
+        };
+        update();
+        if (typeof ResizeObserver === 'undefined') return;
+        const ro = new ResizeObserver(update);
+        ro.observe(el);
+        return () => {
+            ro.disconnect();
+            root.style.setProperty('--bottom-nav-height', '0px');
+        };
+    }, [isHidden]);
+
     if (isHidden) return null;
 
     return (
         <nav
+            ref={navRef}
             data-global-bottom-nav=""
             className={cn(
                 "fixed left-0 right-0 bottom-0 z-[80]",

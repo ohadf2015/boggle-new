@@ -168,36 +168,26 @@ describe('AnchoredNativeBanner', () => {
     expect(addListener).toHaveBeenCalledWith('bannerAdSizeChanged', expect.any(Function));
   });
 
-  it('lifts banner above GlobalBottomNav on Android (margin = navHeight)', async () => {
+  it('lifts banner above GlobalBottomNav on Android (margin = navHeight from --bottom-nav-height var)', async () => {
     mockPathname.current = '/';
     mockPlatform.current = 'android';
     mockSafeArea.current = { top: 0, bottom: 24, left: 0, right: 0 };
-    const nav = document.createElement('div');
-    nav.setAttribute('data-global-bottom-nav', '');
-    Object.defineProperty(nav, 'getBoundingClientRect', {
-      value: () => ({ height: 88, width: 0, top: 0, left: 0, right: 0, bottom: 0, x: 0, y: 0, toJSON() {} }),
-    });
-    document.body.appendChild(nav);
+    document.documentElement.style.setProperty('--bottom-nav-height', '88px');
     render(<AnchoredNativeBanner />);
     await Promise.resolve();
     expect(showBanner).toHaveBeenCalledWith('BOTTOM_CENTER', 88, { variant: 'content' });
-    document.body.removeChild(nav);
+    document.documentElement.style.removeProperty('--bottom-nav-height');
   });
 
   it('lifts banner above GlobalBottomNav on iOS (margin = navHeight − safeArea, plugin re-adds inset)', async () => {
     mockPathname.current = '/';
     mockPlatform.current = 'ios';
     mockSafeArea.current = { top: 0, bottom: 34, left: 0, right: 0 };
-    const nav = document.createElement('div');
-    nav.setAttribute('data-global-bottom-nav', '');
-    Object.defineProperty(nav, 'getBoundingClientRect', {
-      value: () => ({ height: 98, width: 0, top: 0, left: 0, right: 0, bottom: 0, x: 0, y: 0, toJSON() {} }),
-    });
-    document.body.appendChild(nav);
+    document.documentElement.style.setProperty('--bottom-nav-height', '98px');
     render(<AnchoredNativeBanner />);
     await Promise.resolve();
     expect(showBanner).toHaveBeenCalledWith('BOTTOM_CENTER', 64, { variant: 'content' });
-    document.body.removeChild(nav);
+    document.documentElement.style.removeProperty('--bottom-nav-height');
   });
 
   it('registers FailedToLoad and Closed listeners that reset --admob-banner-height', async () => {

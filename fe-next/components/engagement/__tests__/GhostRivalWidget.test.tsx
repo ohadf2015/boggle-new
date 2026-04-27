@@ -20,10 +20,10 @@ const mockT = (key: string, params?: Record<string, string>) => {
   const translations: Record<string, string> = {
     'ghostRival.title': 'Ghost Rival',
     'ghostRival.you': 'You',
-    'ghostRival.ahead': `${params?.points ?? ''} pts ahead`,
-    'ghostRival.behind': `${params?.points ?? ''} pts behind`,
+    'ghostRival.ahead': `${params?.pts ?? ''} pts ahead`,
+    'ghostRival.behind': `${params?.pts ?? ''} pts behind`,
     'ghostRival.cta': 'Play to close the gap!',
-    'ghostRival.endsIn': `Ends in ${params?.days ?? ''}d ${params?.hours ?? ''}h`,
+    'ghostRival.endsIn': `Ends in ${params?.time ?? ''}`,
     'ghostRival.ended': 'Week ended',
   };
   return translations[key] ?? key;
