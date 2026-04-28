@@ -32,7 +32,7 @@ export function CreatorAttribution({
   const { t } = useLanguage();
   const { avatar: avatarSize, text } = SIZE_MAP[size];
 
-  const label = t('ugc.board.createdBy').replace('{{name}}', displayName);
+  const label = t('ugc.board.createdBy', { name: displayName });
 
   return (
     <div

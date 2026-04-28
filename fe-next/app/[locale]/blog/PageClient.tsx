@@ -124,6 +124,11 @@ const blogPosts: BlogPost[] = [
     image: '/images/blog/boggle-vs-wwf.jpg',
     date: '2026-03-28',
   },
+  {
+    slug: 'netflix-word-game-2026-rise',
+    image: '/images/blog/netflix-word-games.jpg',
+    date: '2026-04-29',
+  },
 ];
 
 // Localized content for all languages
@@ -241,6 +246,12 @@ const contentByLocale: Record<string, PageContent> = {
         readTime: '9 min read',
         category: 'Comparison',
       },
+      'netflix-word-game-2026-rise': {
+        title: "Netflix Just Dropped a Word Game — 2026 Is the Year Word Games Took Over",
+        excerpt: 'Streaming giants, daily-puzzle obsession, brain-training boom and a TikTok-shaped social loop. Why every screen you own suddenly wants you spelling things.',
+        readTime: '9 min read',
+        category: 'Trends',
+      },
     },
   },
   he: {
@@ -355,6 +366,12 @@ const contentByLocale: Record<string, PageContent> = {
         excerpt: 'סריקת לוח ב-100 קמ״ש מול הנחת אריחים לאורך שלושה ימים. ואחד מהם גובה כסף על פאוור-אפס.',
         readTime: '9 דקות קריאה',
         category: 'השוואה',
+      },
+      'netflix-word-game-2026-rise': {
+        title: 'נטפליקס שחררה משחק מילים — 2026 היא השנה של משחקי המילים',
+        excerpt: 'סטרימינג ענק, התמכרות לפאזל היומי, גל אימון מוחי וטיק־טוק שהפך פתרון לספורט צפייה. למה כל מסך פתאום רוצה שתאייתו.',
+        readTime: '9 דקות קריאה',
+        category: 'טרנדים',
       },
     },
   },
@@ -471,6 +488,12 @@ const contentByLocale: Record<string, PageContent> = {
         readTime: '9 min läsning',
         category: 'Jämförelse',
       },
+      'netflix-word-game-2026-rise': {
+        title: 'Netflix släppte ett ordspel — 2026 är ordspelens år',
+        excerpt: 'Streamingjättar, daglig pusselbesatthet, hjärnträningsboom och en TikTok-driven social loop. Varför varenda skärm plötsligt vill att du stavar.',
+        readTime: '9 min läsning',
+        category: 'Trender',
+      },
     },
   },
   ja: {
@@ -586,6 +609,12 @@ const contentByLocale: Record<string, PageContent> = {
         readTime: '11分で読める',
         category: '学習',
       },
+      'netflix-word-game-2026-rise': {
+        title: 'Netflixがワードゲームを投入 — 2026年はワードゲームの年',
+        excerpt: 'ストリーミング大手、デイリーパズル中毒、脳トレブーム、TikTok型ソーシャルループ。なぜあなたの全画面が突然「綴れ」と言ってくるのか。',
+        readTime: '9分で読める',
+        category: 'トレンド',
+      },
     },
   },
   es: {
@@ -700,6 +729,12 @@ const contentByLocale: Record<string, PageContent> = {
         excerpt: 'Escanear grillas a toda velocidad vs colocar fichas durante tres días. Y uno de ellos cobra por power-ups.',
         readTime: '9 min de lectura',
         category: 'Comparación',
+      },
+      'netflix-word-game-2026-rise': {
+        title: 'Netflix lanza un juego de palabras — 2026, el año de los juegos de palabras',
+        excerpt: 'Gigantes del streaming, obsesión por el puzzle diario, boom del entrenamiento cerebral y un bucle social al estilo TikTok. Por qué cada pantalla quiere que deletrees.',
+        readTime: '9 min de lectura',
+        category: 'Tendencias',
       },
     },
   },

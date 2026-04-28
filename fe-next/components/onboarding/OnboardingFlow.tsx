@@ -21,6 +21,7 @@ import ScoreRevealV2 from './ScoreRevealV2';
 import ModeFork from './ModeFork';
 import OnboardingProgress from './OnboardingProgress';
 import ReturningUserStep from './ReturningUserStep';
+import CrazyGamesWelcome, { type CrazyGamesMode } from './CrazyGamesWelcome';
 import AuthModal from '@/components/auth/AuthModal';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 
@@ -196,6 +197,25 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
     setStep('returningUser');
   }, [isOnCrazyGamesPlatform]);
 
+  // CrazyGames portal: replace 5-step FTUE with one welcome screen.
+  // Players land via thumbnail click; expectation is play in seconds.
+  const handleCrazyGamesPlay = useCallback(
+    (mode: CrazyGamesMode) => {
+      if (isNavigating) return;
+      setIsNavigating(true);
+      markOnboardingComplete({ avatarId: 'custom', displayName: 'Player', selectedMode: mode === 'multiplayer' ? 'multi' : mode === 'daily' ? 'daily' : 'single' });
+      const route =
+        mode === 'daily'
+          ? `/${language}/daily`
+          : mode === 'multiplayer'
+            ? `/${language}/multiplayer`
+            : `/${language}/singleplayer?autoStart=practice`;
+      router.push(route);
+      onComplete();
+    },
+    [isNavigating, language, router, onComplete],
+  );
+
   const renderStep = () => {
     switch (step) {
       case 'returningUser':
@@ -233,6 +253,42 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
   };
 
   const showProgress = step !== 'tutorial';
+
+  // CrazyGames short-flow: one visual welcome screen → game.
+  if (isOnCrazyGamesPlatform) {
+    return (
+      <div
+        data-testid="onboarding-flow"
+        className="fixed inset-0 z-[100] bg-neo-navy flex flex-col items-center justify-center overflow-y-auto"
+        dir={dir}
+      >
+        <CrazyGamesWelcome onPlay={handleCrazyGamesPlay} />
+        <AnimatePresence>
+          {isNavigating && (
+            <motion.div
+              key="cg-welcome-loading"
+              data-testid="onboarding-loading"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-neo-navy/90 backdrop-blur-sm"
+              role="status"
+              aria-live="polite"
+            >
+              <div
+                className="w-12 h-12 border-neo-thick border-neo-lime border-t-transparent rounded-full animate-spin"
+                aria-hidden
+              />
+              <p className="mt-4 font-neo-display text-neo-white text-lg uppercase tracking-wide">
+                {t('onboarding.loading')}
+              </p>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    );
+  }
 
   return (
     <div

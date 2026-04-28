@@ -1,7 +1,7 @@
 'use client';
 
 import React, { memo } from 'react';
-import { Settings, Timer, Grid3X3, Type } from 'lucide-react';
+import { Settings, Timer, Grid3X3, Type, Globe } from 'lucide-react';
 import { motion } from 'framer-motion';
 import {
   Dialog,
@@ -9,7 +9,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '../../../components/ui/dialog';
-import { LanguageSelector } from '../../../components/join/LanguageSelector';
 import { cn } from '../../../lib/utils';
 import type { Language, DifficultyLevel } from '@/shared/types/game';
 
@@ -28,10 +27,17 @@ interface AdvancedSettingsModalProps {
 const TIMER_OPTIONS = [1, 2, 3];
 const DIFFICULTY_OPTIONS: { key: DifficultyLevel; labelKey: string; board: string }[] = [
   { key: 'EASY', labelKey: 'hostView.presetEasy', board: '5×5' },
-  { key: 'MEDIUM', labelKey: 'hostView.presetParty', board: '7×7' },
-  { key: 'HARD', labelKey: 'hostView.presetChallenge', board: '9×9' },
+  { key: 'MEDIUM', labelKey: 'hostView.presetParty', board: '6×6' },
+  { key: 'HARD', labelKey: 'hostView.presetChallenge', board: '7×7' },
 ];
 const MIN_WORD_OPTIONS = [2, 3, 4];
+const LANGUAGE_OPTIONS: { code: Language; flag: string; labelKey: string }[] = [
+  { code: 'en', flag: '🇺🇸', labelKey: 'joinView.english' },
+  { code: 'he', flag: '🇮🇱', labelKey: 'joinView.hebrew' },
+  { code: 'sv', flag: '🇸🇪', labelKey: 'joinView.swedish' },
+  { code: 'ja', flag: '🇯🇵', labelKey: 'joinView.japanese' },
+  { code: 'es', flag: '🇪🇸', labelKey: 'joinView.spanish' },
+];
 
 export const AdvancedSettingsModal = memo<AdvancedSettingsModalProps>(function AdvancedSettingsModal({
   timerValue,
@@ -119,14 +125,36 @@ export const AdvancedSettingsModal = memo<AdvancedSettingsModalProps>(function A
             </div>
           </SettingRow>
 
-          {/* Language */}
-          <div className="pt-2 border-t border-neo-white/10">
-            <LanguageSelector
-              selectedLanguage={roomLanguage}
-              onLanguageChange={onRoomLanguageChange}
-              hideLabel
-            />
-          </div>
+          {/* Language — chips (one-tap) avoid Radix Select-in-Dialog click bug
+              that intermittently swallowed the change inside the CrazyGames iframe. */}
+          <SettingRow
+            icon={<Globe className="w-4 h-4" />}
+            label={t('joinView.selectLanguage')}
+          >
+            <div className="grid grid-cols-3 gap-1.5">
+              {LANGUAGE_OPTIONS.map(({ code, flag, labelKey }) => {
+                const active = roomLanguage === code;
+                return (
+                  <button
+                    key={code}
+                    type="button"
+                    onClick={() => onRoomLanguageChange(code)}
+                    aria-pressed={active}
+                    aria-label={t(labelKey)}
+                    className={cn(
+                      'flex items-center justify-center gap-1.5 px-2 py-2 rounded-neo border-2 text-xs font-bold uppercase transition-all',
+                      active
+                        ? 'bg-neo-lime text-neo-black border-neo-black shadow-hard-sm'
+                        : 'bg-white/5 text-neo-cream/70 border-neo-white/15 hover:border-neo-white/30 hover:bg-white/10'
+                    )}
+                  >
+                    <span className="text-base leading-none" aria-hidden>{flag}</span>
+                    <span>{t(labelKey)}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </SettingRow>
         </div>
       </DialogContent>
     </Dialog>

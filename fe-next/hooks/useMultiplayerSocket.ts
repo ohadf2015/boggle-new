@@ -64,7 +64,7 @@ interface UseMultiplayerSocketOptions {
   onWarning: (data: { type?: string; message?: string }) => void;
   onRateLimited: () => void;
   onHostTransferred: (data: { newHost: string }) => void;
-  t: (key: string) => string;
+  t: (key: string, fallbackOrParams?: string | Record<string, string | number>, paramsWhenFallback?: Record<string, string | number>) => string;
 }
 
 interface UseMultiplayerSocketReturn {
@@ -405,7 +405,7 @@ export function useMultiplayerSocket(
 
     socketInstance.on('afkWarning', (data: { secondsRemaining: number }) => {
       const opts = optionsRef.current;
-      toast(opts.t('hostView.afkWarning').replace('{{seconds}}', String(data.secondsRemaining)), {
+      toast(opts.t('hostView.afkWarning', { seconds: data.secondsRemaining }), {
         icon: '⚠️',
         duration: Math.min(data.secondsRemaining * 1000, 10000),
         id: 'afk-warning',
@@ -414,7 +414,7 @@ export function useMultiplayerSocket(
 
     socketInstance.on('playerKicked', (data: { username: string; reason: string }) => {
       const opts = optionsRef.current;
-      toast(opts.t('hostView.playerKicked').replace('{{name}}', data.username), {
+      toast(opts.t('hostView.playerKicked', { name: data.username }), {
         icon: '👋',
         duration: 3000,
       });

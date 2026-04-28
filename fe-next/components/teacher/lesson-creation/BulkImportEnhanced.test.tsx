@@ -17,7 +17,7 @@ vi.mock('@/hooks/useWordIntegration');
 vi.mock('@/contexts/LanguageContext', () => ({
   ...vi.importActual('@/contexts/LanguageContext'),
   useLanguage: () => ({
-    t: (key: string) => {
+    t: (key: string, vars?: Record<string, unknown>) => {
       const translations: Record<string, string> = {
         'teacher.lesson.bulkImportTitle': 'Import Multiple Words',
         'teacher.lesson.bulkImportDescription': 'Paste words or upload CSV',
@@ -29,7 +29,13 @@ vi.mock('@/contexts/LanguageContext', () => ({
         'common.more': 'more',
         'teacher.lesson.canIntegrate': 'ready',
       };
-      return translations[key] || key;
+      let str = translations[key] || key;
+      if (vars) {
+        for (const [k, v] of Object.entries(vars)) {
+          str = str.replace(new RegExp(`\\{\\{?${k}\\}?\\}`, 'g'), String(v));
+        }
+      }
+      return str;
     },
     language: 'en' as Language,
     setLanguage: vi.fn(),

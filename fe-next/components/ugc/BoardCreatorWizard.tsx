@@ -214,7 +214,7 @@ function PreviewStep({ creator }: { creator: UseBoardCreatorReturn }) {
       <div className="border-neo border-black bg-neo-navy/80 rounded-neo p-4 flex gap-6 flex-wrap shadow-hard">
         <div data-testid="word-count-stat" className="flex flex-col">
           <span className="font-neo-body text-xs text-neo-white/60">
-            {t('ugc.board.wordsFound').replace('{{count}}', String(generatedBoard.totalFindableWords))}
+            {t('ugc.board.wordsFound', { count: generatedBoard.totalFindableWords })}
           </span>
           <span className={cn(
             'font-neo-display text-xl font-bold',

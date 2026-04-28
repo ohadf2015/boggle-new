@@ -3,7 +3,6 @@
  * Handles wheel-word submissions for Wheel Rush multiplayer mode.
  */
 
-import { z } from 'zod';
 import type { Server, Socket } from 'socket.io';
 import {
   getGame,
@@ -24,6 +23,7 @@ import {
 import { broadcastToRoom, volatileBroadcastToRoom, getGameRoom } from '../utils/socketHelpers.js';
 import { checkRateLimit } from '../utils/rateLimiter.js';
 import { validatePayload } from '../utils/socketValidation.js';
+import { SubmitWheelWordSchema, type SubmitWheelWordData } from '../../shared/schemas/socketSchemas.js';
 import logger from '../utils/logger.js';
 import timerManager from '../utils/timerManager.js';
 import { gameCleanupEmitter } from '../events/gameCleanup.js';
@@ -36,12 +36,6 @@ gameCleanupEmitter.onGameReset(({ gameCode }) => {
   timerManager.clearTimersWithPrefix(`wheelRushReap:${gameCode}:`);
 });
 
-const submitWheelWordSchema = z.object({
-  word: z.string().min(1).max(20).transform(s => s.toUpperCase().trim()),
-});
-
-interface SubmitWheelWordPayload { word: string; }
-
 function broadcastWheelLeaderboard(io: Server, gameCode: string): void {
   const game = getGame(gameCode);
   if (!game) return;
@@ -51,7 +45,7 @@ function broadcastWheelLeaderboard(io: Server, gameCode: string): void {
   }, lbThrottleMs);
 }
 
-export function handleSubmitWheelWord(io: Server, socket: Socket, data: SubmitWheelWordPayload): void {
+export function handleSubmitWheelWord(io: Server, socket: Socket, data: SubmitWheelWordData): void {
   const gameCode = getGameBySocketId(socket.id);
   const username = getUsernameBySocketId(socket.id);
   if (!gameCode || !username) { socket.emit('error', { message: 'Not in a game' }); return; }
@@ -121,30 +115,44 @@ export function handleSubmitWheelWord(io: Server, socket: Socket, data: SubmitWh
   }
 }
 
-export function registerWheelRushHandlers(io: Server, socket: Socket): void {
-  socket.on('requestWheelRushState', () => {
-    const gameCode = getGameBySocketId(socket.id);
-    if (!gameCode) return;
-    const game = getGame(gameCode);
-    if (!game || game.gameMode !== 'wheel-rush' || !game.wheelRushState) return;
-    socket.emit('wheelRushInit', {
-      puzzle: game.wheelRushState.puzzle,
-      startedAt: game.wheelRushState.startedAt,
-    });
+/**
+ * Resume snapshot for clients that joined late or reconnected mid-game.
+ * Includes locks/foundWords/closed so UI can re-hydrate without waiting
+ * for the next event tick.
+ */
+export function handleRequestWheelRushState(socket: Socket): void {
+  const gameCode = getGameBySocketId(socket.id);
+  if (!gameCode) return;
+  const game = getGame(gameCode);
+  if (!game || game.gameMode !== 'wheel-rush' || !game.wheelRushState) return;
+  const username = getUsernameBySocketId(socket.id);
+  const state = game.wheelRushState;
+  socket.emit('wheelRushInit', {
+    puzzle: state.puzzle,
+    startedAt: state.startedAt,
+    foundWords: state.foundWords ?? {},
+    locks: state.locks ?? {},
+    closed: state.closed ?? [],
+    myWords: username ? (state.foundWords?.[username] ?? []) : [],
   });
+}
+
+export function registerWheelRushHandlers(io: Server, socket: Socket): void {
+  socket.on('requestWheelRushState', () => handleRequestWheelRushState(socket));
 
   socket.on('submitWheelWord', (data: unknown) => {
-    if (!checkRateLimit(socket.id, 20)) {
+    // Weight 5: ~10 submits per 10s window (endgame sprints can spike to 3-4/sec)
+    if (!checkRateLimit(socket.id, 5)) {
       socket.emit('rateLimited', { message: 'Too many submissions, slow down' });
       return;
     }
-    const validation = validatePayload(submitWheelWordSchema, data);
-    if (!validation.success) {
-      socket.emit('error', { message: `Invalid word: ${validation.error}` });
+    const validation = validatePayload(SubmitWheelWordSchema, data);
+    if (!validation.success || !validation.data) {
+      socket.emit('error', { message: `Invalid word: ${validation.success ? 'missing data' : validation.error}` });
       return;
     }
     try {
-      handleSubmitWheelWord(io, socket, validation.data as SubmitWheelWordPayload);
+      handleSubmitWheelWord(io, socket, validation.data);
     } catch (err) {
       logger.error('WHEEL_RUSH', `Error submitWheelWord: ${(err as Error).message}`);
       socket.emit('error', { message: 'Error processing wheel word' });

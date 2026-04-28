@@ -42,7 +42,7 @@ export default function ClassroomManager() {
     setIsSaving(false);
 
     if (result.success) {
-      toast.success(t('teacher.classroom.created').replace('{{date}}', 'just now'));
+      toast.success(t('teacher.classroom.created', { date: 'just now' }));
       setIsCreateDialogOpen(false);
       setFormData({ name: '', language: language as Language });
     } else {
@@ -173,7 +173,7 @@ export default function ClassroomManager() {
                     <span className="text-sm text-black/70 font-bold">
                       {classroom.member_count === 1
                         ? t('teacher.classroom.member')
-                        : t('teacher.classroom.members').replace('{{count}}', String(classroom.member_count || 0))}
+                        : t('teacher.classroom.members', { count: classroom.member_count || 0 })}
                     </span>
                   </div>
                 </div>
@@ -222,7 +222,7 @@ export default function ClassroomManager() {
                   >
                     <span className="flex items-center gap-2">
                       <Users className="w-4 h-4" />
-                      {t('teacher.classrooms.students.count').replace('{{count}}', String(classroom.member_count || 0))}
+                      {t('teacher.classrooms.students.count', { count: classroom.member_count || 0 })}
                     </span>
                     {expandedClassroomId === classroom.id ? (
                       <ChevronUp className="w-4 h-4" />

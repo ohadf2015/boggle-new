@@ -41,10 +41,11 @@ export const StealableLocks: React.FC<StealableLocksProps> = ({ locks, now, user
         return (
           <div
             key={lock.word}
+            dir="auto"
             className="relative px-2 py-0.5 rounded border-2 border-neo-black bg-neo-pink text-neo-white text-xs font-bold font-neo-body overflow-hidden tabular-nums"
             title={`Locked by ${lock.by} — ${(msLeft / 1000).toFixed(1)}s to steal`}
           >
-            <span className="relative z-10">
+            <span className="relative z-10" dir="auto">
               {isMine ? lock.word : `??? · ${secs}s`}
             </span>
             <span
@@ -71,6 +72,7 @@ export const MyWordsChips: React.FC<MyWordsChipsProps> = ({ words }) => {
         <span
           key={`${w.word}-${i}`}
           data-kind={w.kind}
+          dir="auto"
           className={cn(
             'px-2 py-0.5 rounded border-2 border-neo-black text-xs font-neo-body font-bold',
             w.kind === 'stolen-from-me' ? 'bg-neo-red text-neo-white line-through' :

@@ -58,7 +58,7 @@ function PackCard({
               {t(pack.nameKey)}
             </h4>
             <span className="text-xs text-neo-white/50 font-neo-body font-bold uppercase">
-              {pack.words.length} {t('teacher.lesson.words').replace('{{count}}', '')}
+              {t('teacher.lesson.words', { count: pack.words.length })}
             </span>
           </div>
         </div>

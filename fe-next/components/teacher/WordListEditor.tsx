@@ -57,7 +57,7 @@ export default function WordListEditor({
     <div>
       <div className="flex items-center justify-between mb-2">
         <label className="text-sm font-neo-body text-neo-white">
-          {t('teacher.lesson.words').replace('{{count}}', String(words.length))} ({words.length})
+          {t('teacher.lesson.words', { count: words.length })} ({words.length})
         </label>
         {showBulkImport && (
           <Button

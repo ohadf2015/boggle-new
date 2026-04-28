@@ -124,10 +124,33 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
   useEffect(() => {
     if (!socket) return;
 
-    const onInit = (data: { puzzle: WheelPuzzle; startedAt?: number }) => {
+    const onInit = (data: {
+      puzzle: WheelPuzzle;
+      startedAt?: number;
+      foundWords?: Record<string, string[]>;
+      locks?: Record<string, { by: string; until: number }>;
+      closed?: string[];
+      myWords?: string[];
+    }) => {
       setPuzzle(data.puzzle);
       setOuterLetters(data.puzzle.outerLetters);
       setStartedAt(data.startedAt ?? Date.now());
+      // Reconnect-snapshot hydration: rebuild client state from server payload.
+      if (data.locks) {
+        setActiveLocks(Object.entries(data.locks).map(([word, lk]) => ({ word, by: lk.by, lockUntil: lk.until })));
+      }
+      const mine = data.myWords ?? data.foundWords?.[username] ?? [];
+      if (mine.length) {
+        const closedSet = new Set(data.closed ?? []);
+        const myLocks = data.locks ?? {};
+        const ts = Date.now();
+        setMyWords(mine.map(word => {
+          const lk = myLocks[word];
+          if (lk && lk.by === username) return { word, kind: 'locked', lockUntil: lk.until, ts };
+          if (closedSet.has(word)) return { word, kind: 'closed', ts };
+          return { word, kind: 'locked', ts };
+        }));
+      }
     };
     const onResult = (data: { word: string; accepted: boolean; kind?: string; score?: number; lockUntil?: number; stolenFrom?: string; error?: string }) => {
       if (!data.accepted) {
@@ -143,7 +166,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
         flash('ok', `+${data.score}`);
       } else if (data.kind === 'stolen') {
         setMyWords(prev => [{ word: data.word, kind: 'stolen', score: data.score, stolenFrom: data.stolenFrom, ts: Date.now() }, ...prev]);
-        flash('ok', `STEAL +${data.score}`);
+        flash('ok', t('wordWheel.stealGain', { score: data.score ?? 0 }) || `+${data.score}`);
       }
       playWordAcceptedSound();
       haptic(20);
@@ -266,12 +289,12 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
     const word = builtWord.toUpperCase();
 
     if (word.length < MIN_LEN) {
-      flash('err', (t('wordWheel.tooShort') || 'Too short').replace('{min}', String(MIN_LEN)));
+      flash('err', t('wordWheel.tooShort', { min: MIN_LEN }) || `Too short (min ${MIN_LEN} letters)`);
       playWordRejectedSound();
       return;
     }
     if (!word.includes(puzzle.centerLetter.toUpperCase())) {
-      flash('err', (t('wordWheel.missingCenter') || 'Missing center letter').replace('{letter}', puzzle.centerLetter));
+      flash('err', t('wordWheel.missingCenter', { letter: puzzle.centerLetter }) || `Missing center letter (${puzzle.centerLetter})`);
       playWordRejectedSound();
       return;
     }

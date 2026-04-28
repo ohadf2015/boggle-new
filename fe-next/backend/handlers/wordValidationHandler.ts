@@ -208,7 +208,13 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
       }
     } catch (err: unknown) {
       const error = err as Error;
-      logger.error('BLAST', `Blast bonus calculation error: ${error.message}`);
+      logger.error('BLAST', `Blast bonus calculation error: ${error.message}`, {
+        gameCode,
+        username,
+        word: normalizedWord,
+        wave: game.blastModeState?.wave ?? null,
+        stack: error.stack,
+      });
       blastTileBonus = 0;
     }
   }

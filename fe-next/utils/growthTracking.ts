@@ -93,7 +93,10 @@ export type GrowthEvent =
   // Friction / engagement
   | 'dead_time_detected'
   // Landing-page CTA instrumentation (visitor → onboarding funnel leak)
-  | 'landing_cta_clicked';
+  | 'landing_cta_clicked'
+  // CrazyGames portal short-flow funnel
+  | 'cg_welcome_view'
+  | 'cg_welcome_play';
 
 /** Onboarding funnel step identifiers (FTUE state machine). */
 export type OnboardingStep =

@@ -45,7 +45,7 @@ vi.mock('../../modules/wheelRushManager', () => ({
   reapExpiredLocks: vi.fn(() => []),
 }));
 
-import { handleSubmitWheelWord } from '../wheelRushHandler';
+import { handleSubmitWheelWord, handleRequestWheelRushState } from '../wheelRushHandler';
 import { broadcastToRoom } from '../../utils/socketHelpers';
 import { getGame, updatePlayerScore } from '../../modules/gameStateManager';
 import { validateWheelSubmission, applyWheelWord } from '../../modules/wheelRushManager';
@@ -124,6 +124,38 @@ describe('wheelRushHandler', () => {
     handleSubmitWheelWord(mkIo(), sock, { word: 'CANE' });
     expect(sock.emit).toHaveBeenCalledWith('error', { message: 'Not a wheel-rush game' });
     expect(validateWheelSubmission).not.toHaveBeenCalled();
+  });
+
+  describe('requestWheelRushState — reconnect snapshot', () => {
+    it('emits wheelRushInit with full state snapshot (puzzle + foundWords + locks + closed)', () => {
+      const richState = {
+        ...gameBase,
+        wheelRushState: {
+          puzzle: { centerLetter: 'C', outerLetters: ['A','N','E'], allLetters: ['C','A','N','E'] },
+          foundWords: { p1: ['CANE'], p2: ['ACE'] },
+          locks: { CANE: { by: 'p1', until: 9999 } },
+          closed: ['ACE'],
+          startedAt: 1234,
+        },
+      };
+      (getGame as unknown as Mock).mockReturnValue(richState);
+      const sock = mkSocket();
+      handleRequestWheelRushState(sock);
+      expect(sock.emit).toHaveBeenCalledWith('wheelRushInit', expect.objectContaining({
+        puzzle: richState.wheelRushState.puzzle,
+        startedAt: 1234,
+        foundWords: { p1: ['CANE'], p2: ['ACE'] },
+        locks: { CANE: { by: 'p1', until: 9999 } },
+        closed: ['ACE'],
+      }));
+    });
+
+    it('returns silently if not a wheel-rush game', () => {
+      (getGame as unknown as Mock).mockReturnValue({ ...gameBase, gameMode: 'classic' });
+      const sock = mkSocket();
+      handleRequestWheelRushState(sock);
+      expect(sock.emit).not.toHaveBeenCalled();
+    });
   });
 
   describe('cleanup on game end/reset', () => {

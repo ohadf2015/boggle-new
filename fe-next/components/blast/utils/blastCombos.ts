@@ -1,35 +1,12 @@
 import type { BlastTileState, BlastTileType } from '../types';
+import type { BlastComboType } from '@/shared/types/blast';
 
 // ==================== Types ====================
 
-export type BlastComboType =
-  | 'bomb_bomb'
-  | 'bomb_lightning'
-  | 'bomb_prism'
-  | 'bomb_rainbow'
-  | 'bomb_magnet'
-  | 'bomb_gem'
-  | 'bomb_frozen'
-  | 'lightning_lightning'
-  | 'lightning_prism'
-  | 'lightning_rainbow'
-  | 'lightning_magnet'
-  | 'lightning_gem'
-  | 'lightning_frozen'
-  | 'prism_prism'
-  | 'prism_rainbow'
-  | 'prism_magnet'
-  | 'prism_gem'
-  | 'prism_frozen'
-  | 'rainbow_magnet'
-  | 'rainbow_gem'
-  | 'rainbow_frozen'
-  | 'magnet_gem'
-  | 'magnet_frozen'
-  | 'gem_frozen'
-  | 'gold_special'
-  | 'rainbow_special'
-  | 'triple_special';
+// BlastComboType is now canonical in @/shared/types/blast (single source of truth
+// for both UI components and the SubmitWordSchema enum validator). Re-exported
+// here so existing imports from this file keep working.
+export type { BlastComboType };
 
 export interface SpecialCombo {
   type: BlastComboType;

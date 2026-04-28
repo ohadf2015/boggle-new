@@ -15,9 +15,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const pageUrl = `${BASE_URL}/en/boggle-word-shake-free`;
 
   return {
-    title: 'Boggle Word Shake Free — No Download, Play Online | LexiClash',
-    description: 'Play Boggle Word Shake free online — shake the grid, find words, score points. No download, no signup. Solo or multiplayer with 2-20 friends in your browser.',
-    keywords: 'play boggle word shake free no download, boggle word shake free, boggle word shake online, word shake game free, boggle shake free online, word scramble game free no download, boggle word game free, word shake multiplayer',
+    title: 'Boggle Shake Free Online — No Download, Play in Browser | LexiClash',
+    description: 'Play Boggle Shake free online — shake the grid, find words, score combos. Free boggle online no download, no signup. Solo or multiplayer with 2-20 friends in any browser.',
+    keywords: 'boggle shake, boggle shake free, play boggle shake online, free boggle online no download, boggle word shake free no download, boggle word shake online, word shake game free, boggle shake free online, word scramble game free no download, boggle word game free, word shake multiplayer',
+    robots: isTargetLocale ? { index: true, follow: true } : { index: false, follow: true },
     openGraph: {
       title: 'Boggle Word Shake Free — Play Online | LexiClash',
       description: 'Shake the grid, find words, compete with friends. Free, no download!',
@@ -43,7 +44,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         es: `${BASE_URL}/es/juego-de-palabras-multijugador`,
       },
     },
-    robots: { index: true, follow: true },
   };
 }
 
@@ -105,13 +105,14 @@ export default async function BoggleWordShakeFreePage({ params }: PageProps) {
 
       <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
         <h1 className="mb-6 font-neo-display text-4xl font-bold leading-tight sm:text-5xl">
-          Boggle Word Shake Free — Play Online, No Download
+          Boggle Shake Free Online — Play in Browser, No Download
         </h1>
 
         <p className="mb-8 text-lg leading-relaxed text-neo-gray-200">
-          Miss Boggle Word Shake? LexiClash brings the same scramble-and-find gameplay to your browser — completely
-          free, no download required. Shake up a grid of letters, find as many words as you can, and compete against
-          friends or AI bots in real-time. Choose from 4x4, 5x5, or 6x6 grids with combo scoring for extra challenge.
+          Miss the classic Boggle Shake game? LexiClash brings the same scramble-and-find gameplay to your browser —
+          completely free, no download required. Shake up a grid of letters, find as many words as you can, and compete
+          against friends or AI bots in real-time. Looking for free boggle online no download? You found it. Choose from
+          4x4, 5x5, or 6x6 grids with combo scoring for extra challenge.
         </p>
 
         <section className="mb-12 flex flex-col gap-3 sm:flex-row sm:gap-4">

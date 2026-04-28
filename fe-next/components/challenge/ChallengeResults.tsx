@@ -144,7 +144,7 @@ const ChallengeResults: React.FC<ChallengeResultsProps> = ({
             totalPlayers={2}
             customMessage={beatCreator ? t('challengeResults.youWon') : t('challengeResults.soClose')}
             customAnnouncement={beatCreator
-              ? t('challengeResults.youBeat').replace('{{name}}', challenge.creatorUsername)
+              ? t('challengeResults.youBeat', { name: challenge.creatorUsername })
               : t('challengeResults.tryAgainMsg')}
           />
 

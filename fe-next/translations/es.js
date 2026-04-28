@@ -3750,6 +3750,18 @@ const es = {
     "step1Text": "Arrastra sobre letras conectadas para formar palabras.",
     "step2Title": "Gana Puntos",
     "step2Text": "Palabras más largas = más puntos. ¡Encuentra palabras únicas!",
+    "crazygames": {
+      "tagline": "En Vivo",
+      "title": "Juega.",
+      "titleAccent": "Gana.",
+      "howTo": "Toca letras conectadas para formar palabras. Palabras más largas = más puntos. Reto diario y multijugador en vivo en cinco idiomas.",
+      "playDaily": "Reto Diario",
+      "playPractice": "Práctica",
+      "playMultiplayer": "Multijugador",
+      "demoCaption": "Cómo jugar",
+      "freeBadge": "Gratis Siempre",
+      "demoAlt": "Cuadrícula de letras mostrando cómo trazar una palabra"
+    },
     "welcome": {
       "title": "¡Bienvenido a LexiClash!",
       "subtitle": "Desliza letras. Forma palabras. Domina.",
@@ -5104,6 +5116,7 @@ const es = {
     "alreadyClosed": "Palabra ya cerrada",
     "lockedByOther": "Bloqueada por otro jugador",
     "yourWordStolen": "¡{by} te robó la palabra {word}!",
+    "stealGain": "ROBO +{score}",
     "inputPlaceholder": "Escribe una palabra...",
     "tapLetters": "Toca o arrastra letras para formar una palabra",
     "tapToRemove": "Toca otra vez una letra añadida para quitarla",

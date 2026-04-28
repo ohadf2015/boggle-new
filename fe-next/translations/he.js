@@ -1760,6 +1760,18 @@ const he = {
     "step1Text": "גררו על אותיות מחוברות ליצירת מילים.",
     "step2Title": "צברו נקודות",
     "step2Text": "מילים ארוכות = הרבה יותר נקודות. מצאו מילים ייחודיות!",
+    "crazygames": {
+      "tagline": "משחקים עכשיו",
+      "title": "אייתו.",
+      "titleAccent": "נצחו.",
+      "howTo": "הקישו על אותיות צמודות וצרו מילים. מילים ארוכות = יותר נקודות. אתגר יומי ומולטיפלייר חי בחמש שפות.",
+      "playDaily": "אתגר יומי",
+      "playPractice": "אימון",
+      "playMultiplayer": "מולטיפלייר",
+      "demoCaption": "איך משחקים",
+      "freeBadge": "חינם תמיד",
+      "demoAlt": "לוח אותיות שמראה איך לחבר מילה"
+    },
     "welcome": {
       "title": "ברוכים הבאים ל-LexiClash!",
       "subtitle": "החליקו. אייתו. שלטו.",
@@ -5079,6 +5091,7 @@ const he = {
     "alreadyClosed": "המילה כבר נסגרה",
     "lockedByOther": "נעול על ידי שחקן אחר",
     "yourWordStolen": "{by} גנב לך את המילה {word}!",
+    "stealGain": "גניבה +{score}",
     "inputPlaceholder": "הקלד מילה...",
     "tapLetters": "הקש או גרור אותיות כדי לבנות מילה",
     "tapToRemove": "הקש שוב על אות שהוספת כדי להסיר",

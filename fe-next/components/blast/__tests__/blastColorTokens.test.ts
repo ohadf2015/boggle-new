@@ -5,6 +5,7 @@ import {
   NEBULA_COLORS,
   BACKGROUND_PARTICLE_COLORS,
   CHAIN_GLOW_COLORS,
+  getScoreColor,
 } from '../blastColorTokens';
 
 describe('blastColorTokens', () => {
@@ -50,5 +51,48 @@ describe('blastColorTokens', () => {
     expect(CHAIN_GLOW_COLORS[1]).toBe('#FFD700');
     expect(CHAIN_GLOW_COLORS[2]).toBe('#FF6B35');
     expect(CHAIN_GLOW_COLORS[3]).toBe('#FF1493');
+  });
+
+  // BLT-TEST-2 (blast MP audit 2026-04-28): lock getScoreColor against
+  // edge inputs (NaN/Infinity/negative) — fallback path must never throw.
+  describe('getScoreColor — edge cases', () => {
+    test('returns top-tier pink for scores at and above 30', () => {
+      expect(getScoreColor(30)).toBe('#FF1493');
+      expect(getScoreColor(100)).toBe('#FF1493');
+      expect(getScoreColor(9999)).toBe('#FF1493');
+    });
+
+    test('respects each threshold boundary exactly', () => {
+      expect(getScoreColor(29)).toBe('#FF6B35');
+      expect(getScoreColor(20)).toBe('#FF6B35');
+      expect(getScoreColor(19)).toBe('#FFD700');
+      expect(getScoreColor(10)).toBe('#FFD700');
+      expect(getScoreColor(9)).toBe('#00FFFF');
+      expect(getScoreColor(5)).toBe('#00FFFF');
+      expect(getScoreColor(4)).toBe('#FFFFFF');
+      expect(getScoreColor(0)).toBe('#FFFFFF');
+    });
+
+    test('fractional scores fall to the lower tier', () => {
+      expect(getScoreColor(4.99)).toBe('#FFFFFF');
+      expect(getScoreColor(5.0)).toBe('#00FFFF');
+      expect(getScoreColor(29.999)).toBe('#FF6B35');
+    });
+
+    test('returns white fallback for negative scores without throwing', () => {
+      expect(() => getScoreColor(-1)).not.toThrow();
+      expect(getScoreColor(-1)).toBe('#FFFFFF');
+      expect(getScoreColor(-999)).toBe('#FFFFFF');
+    });
+
+    test('returns white fallback for NaN without throwing', () => {
+      expect(() => getScoreColor(NaN)).not.toThrow();
+      expect(getScoreColor(NaN)).toBe('#FFFFFF');
+    });
+
+    test('handles Infinity and -Infinity safely', () => {
+      expect(getScoreColor(Infinity)).toBe('#FF1493');
+      expect(getScoreColor(-Infinity)).toBe('#FFFFFF');
+    });
   });
 });

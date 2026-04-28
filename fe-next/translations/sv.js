@@ -1757,6 +1757,18 @@ const sv = {
     "step1Text": "Dra över sammankopplade bokstäver för att bilda ord.",
     "step2Title": "Få Poäng",
     "step2Text": "Längre ord = fler poäng. Hitta unika ord!",
+    "crazygames": {
+      "tagline": "Spela Nu",
+      "title": "Stava.",
+      "titleAccent": "Vinn.",
+      "howTo": "Tryck på sammankopplade bokstäver för att bilda ord. Längre ord = mer poäng. Daglig utmaning och live-flerspelarläge på fem språk.",
+      "playDaily": "Daglig Utmaning",
+      "playPractice": "Träning",
+      "playMultiplayer": "Flerspelare",
+      "demoCaption": "Så spelar du",
+      "freeBadge": "Alltid Gratis",
+      "demoAlt": "Bokstavsruta som visar hur man kopplar ihop ett ord"
+    },
     "welcome": {
       "title": "Välkommen till LexiClash!",
       "subtitle": "Svep bokstäver. Bilda ord. Dominera.",
@@ -5088,6 +5100,7 @@ const sv = {
     "alreadyClosed": "Ordet är redan stängt",
     "lockedByOther": "Låst av en annan spelare",
     "yourWordStolen": "{by} stal ditt ord {word}!",
+    "stealGain": "STÖLD +{score}",
     "inputPlaceholder": "Skriv ett ord...",
     "tapLetters": "Tryck eller dra bokstäver för att bygga ett ord",
     "tapToRemove": "Tryck igen på en tillagd bokstav för att ta bort",

@@ -18,7 +18,7 @@ interface PrestigeModalProps {
   nextRewards: PrestigeReward[];
   canPrestige: boolean;
   maxPrestige: number;
-  t: (key: string) => string;
+  t: (key: string, fallbackOrParams?: string | Record<string, string | number>, paramsWhenFallback?: Record<string, string | number>) => string;
   language?: string;
   onPrestigeSuccess?: () => void;
 }
@@ -143,7 +143,7 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
 
                 <div className="text-center">
                   <p className={cn('text-2xl font-black', colors.text.replace('text-', 'text-'))}>
-                    {pm('prestigeAchievedLevel').replace('{{level}}', toRoman(nextPrestigeLevel))}
+                    {t('xp.prestigeModal.prestigeAchievedLevel', { level: toRoman(nextPrestigeLevel) })}
                   </p>
                   <p className="text-neo-cream/70 text-sm mt-1">
                     {pm('rewardsUnlocked')}
@@ -287,7 +287,7 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
                     <div className="space-y-2">
                       <p className="text-xs text-neo-cream/70 uppercase tracking-wide flex items-center gap-1">
                         <Star className="w-3 h-3" />
-                        {pm('rewardsFor').replace('{{level}}', toRoman(nextPrestigeLevel))}
+                        {t('xp.prestigeModal.rewardsFor', { level: toRoman(nextPrestigeLevel) })}
                       </p>
 
                       <div className="grid gap-2">
@@ -337,7 +337,7 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
                         )}
                       >
                         <Sparkles className="w-5 h-5 inline me-2" />
-                        {pm('prestigeTo').replace('{{level}}', toRoman(nextPrestigeLevel))}
+                        {t('xp.prestigeModal.prestigeTo', { level: toRoman(nextPrestigeLevel) })}
                       </motion.button>
                     ) : (
                       <div className="p-4 rounded-neo bg-neo-cream/5 border-2 border-white/10 text-center">
@@ -345,7 +345,7 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
                           {pm('reachLevel')}
                         </p>
                         <p className="text-neo-cream/60 text-xs mt-1">
-                          {pm('levelsRemaining').replace('{{count}}', String(100 - currentLevel))}
+                          {t('xp.prestigeModal.levelsRemaining', { count: 100 - currentLevel })}
                         </p>
                       </div>
                     )}

@@ -116,7 +116,7 @@ export default function LessonAssignmentDialog({
                             {classroom.language.toUpperCase()} •{' '}
                             {classroom.member_count === 1
                               ? t('teacher.classroom.member')
-                              : t('teacher.classroom.members').replace('{{count}}', String(classroom.member_count))}
+                              : t('teacher.classroom.members', { count: classroom.member_count })}
                           </div>
                         </div>
                         {selectedClassroomId === classroom.id && (

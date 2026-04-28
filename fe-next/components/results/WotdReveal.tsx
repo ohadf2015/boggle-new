@@ -62,7 +62,7 @@ export function WotdReveal({ playerWords, className }: WotdRevealProps) {
     const shareText = [
       `${emoji} ${t('wotd.title')} — ${status}`,
       `"${word.toUpperCase()}"`,
-      found ? t('wotd.foundPercent').replace('{{percent}}', String(percent)) : '',
+      found ? t('wotd.foundPercent', { percent }) : '',
       '',
       'lexiclash.live/word-of-the-day',
     ].filter(Boolean).join('\n');
@@ -126,7 +126,7 @@ export function WotdReveal({ playerWords, className }: WotdRevealProps) {
             {word}
           </p>
           <p className="text-sm text-neo-white/70 mb-3">
-            {t('wotd.foundPercent').replace('{{percent}}', String(percent))}
+            {t('wotd.foundPercent', { percent })}
           </p>
         </>
       ) : (

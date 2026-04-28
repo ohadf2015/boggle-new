@@ -19,7 +19,7 @@ vi.mock('framer-motion', () => ({
 }));
 
 // Mock useLanguage
-const mockT = vi.fn((key: string) => {
+const mockT = vi.fn((key: string, vars?: Record<string, unknown>) => {
   const translations: Record<string, string> = {
     'wotd.found': 'You found it!',
     'wotd.foundPercent': 'Only {{percent}}% of players found this!',
@@ -27,7 +27,13 @@ const mockT = vi.fn((key: string) => {
     'wotd.missedHint': 'Try again tomorrow!',
     'wotd.loading': 'Loading...',
   };
-  return translations[key] || key;
+  let str = translations[key] || key;
+  if (vars) {
+    for (const [k, v] of Object.entries(vars)) {
+      str = str.replace(new RegExp(`\\{\\{?${k}\\}?\\}`, 'g'), String(v));
+    }
+  }
+  return str;
 });
 
 vi.mock('@/contexts/LanguageContext', () => ({

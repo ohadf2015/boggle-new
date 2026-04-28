@@ -9,6 +9,7 @@ import WinStreakDisplay from './WinStreakDisplay';
 import { fireConfetti } from '@/utils/confettiUtils';
 import useReducedMotion from '@/hooks/useReducedMotion';
 import { ScoreCountUp } from '@/components/results/shared';
+import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import type { CoinReward } from './CoinRewardDisplay';
 
 export interface RewardsSummaryProps {

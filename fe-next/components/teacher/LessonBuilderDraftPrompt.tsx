@@ -10,7 +10,7 @@ interface LessonBuilderDraftPromptProps {
   onRestore: () => void;
   onDiscard: () => void;
   formattedAge: string;
-  t: (key: string) => string;
+  t: (key: string, fallbackOrParams?: string | Record<string, string | number>, paramsWhenFallback?: Record<string, string | number>) => string;
 }
 
 export default function LessonBuilderDraftPrompt({
@@ -36,7 +36,7 @@ export default function LessonBuilderDraftPrompt({
             {t('teacher.lesson.resumeDraft')}
           </AlertDialog.Title>
           <AlertDialog.Description className="text-neo-white/60 mb-6 text-pretty">
-            {t('teacher.lesson.draftFound').replace('{{time}}', formattedAge)}
+            {t('teacher.lesson.draftFound', { time: formattedAge })}
           </AlertDialog.Description>
 
           <div className="flex gap-3">

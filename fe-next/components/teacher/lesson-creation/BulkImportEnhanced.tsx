@@ -231,7 +231,7 @@ export default function BulkImportEnhanced({
                 {/* Stats bar */}
                 <div className="flex items-center gap-4 text-sm font-neo-body">
                   <span className="text-neo-cyan tabular-nums">
-                    {t('teacher.lesson.bulkImportDetected').replace('{{count}}', String(validationResults.length))}
+                    {t('teacher.lesson.bulkImportDetected', { count: validationResults.length })}
                   </span>
                   <div className="flex items-center gap-4 ms-auto">
                     {stats.ready > 0 && (

@@ -1,6 +1,6 @@
 /**
  * Canonical Blast Tile Type Definitions
- * Single source of truth for BlastTileType used by both SP and MP blast modes.
+ * Single source of truth for BlastTileType + BlastComboType used by both SP and MP blast modes.
  * All consumers import from here (directly or via @/components/blast/types re-export).
  */
 
@@ -54,6 +54,41 @@ export const BLAST_TILE_TYPE_LIST: readonly BlastTileType[] = [
   'key',
   'anchor',
 ] as const;
+
+// ==================== Combo Type ====================
+
+/** Runtime-iterable list of all blast combo types. Used by socket schema enum + type union. */
+export const BLAST_COMBO_TYPES = [
+  'bomb_bomb',
+  'bomb_lightning',
+  'bomb_prism',
+  'bomb_rainbow',
+  'bomb_magnet',
+  'bomb_gem',
+  'bomb_frozen',
+  'lightning_lightning',
+  'lightning_prism',
+  'lightning_rainbow',
+  'lightning_magnet',
+  'lightning_gem',
+  'lightning_frozen',
+  'prism_prism',
+  'prism_rainbow',
+  'prism_magnet',
+  'prism_gem',
+  'prism_frozen',
+  'rainbow_magnet',
+  'rainbow_gem',
+  'rainbow_frozen',
+  'magnet_gem',
+  'magnet_frozen',
+  'gem_frozen',
+  'gold_special',
+  'rainbow_special',
+  'triple_special',
+] as const;
+
+export type BlastComboType = (typeof BLAST_COMBO_TYPES)[number];
 
 // ==================== Tile State ====================
 

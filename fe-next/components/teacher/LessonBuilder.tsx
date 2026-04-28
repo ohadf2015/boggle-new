@@ -70,7 +70,7 @@ export default function LessonBuilder() {
 
   const handleBulkImport = useCallback((importedWords: VocabularyWord[]) => {
     setWords((prev) => [...prev, ...importedWords]);
-    toast.success(t('teacher.lesson.bulkImportDetected').replace('{{count}}', String(importedWords.length)));
+    toast.success(t('teacher.lesson.bulkImportDetected', { count: importedWords.length }));
   }, [t]);
 
   const handleTemplateSelect = useCallback((template: {
@@ -79,7 +79,7 @@ export default function LessonBuilder() {
     setFormData(prev => ({ ...prev, name: template.name, description: template.description, language: template.language }));
     setWords(template.words);
     setShowTemplateSelector(false);
-    toast.success(t('teacher.lesson.templateLoaded').replace('{{count}}', String(template.words.length)));
+    toast.success(t('teacher.lesson.templateLoaded', { count: template.words.length }));
   }, [t]);
 
   const handleRestoreDraft = useCallback(() => {
@@ -218,28 +218,26 @@ export default function LessonBuilder() {
                     {lesson.name}
                   </CardTitle>
                   {lesson.description && (
-                    <p className="text-sm text-neo-white/60 mt-1">{lesson.description}</p>
+                    <p className="text-sm text-neo-white/75 mt-1">{lesson.description}</p>
                   )}
-                  <div className="flex items-center gap-2 mt-1 text-sm text-neo-white/60">
-                    <span>
+                  <div className="flex flex-wrap items-center gap-2 mt-1 text-sm text-neo-white/75">
+                    <span className="font-bold">
                       {lesson.language.toUpperCase()} •{' '}
                       {lesson.words.length === 1
                         ? t('teacher.lesson.word')
-                        : t('teacher.lesson.words').replace('{{count}}', String(lesson.words.length))}
+                        : t('teacher.lesson.words', { count: lesson.words.length })}
                     </span>
                     <span
                       className={cn(
-                        'text-xs px-1.5 py-0.5 rounded',
+                        'text-xs font-bold px-1.5 py-0.5 rounded shrink-0',
                         defCount === totalWords && totalWords > 0
-                          ? 'text-neo-cyan bg-neo-cyan/10'
+                          ? 'text-neo-cyan bg-neo-cyan/15'
                           : defCount > 0
-                            ? 'text-neo-lime bg-neo-lime/10'
-                            : 'text-neo-white/40 bg-neo-navy/10'
+                            ? 'text-neo-lime bg-neo-lime/15'
+                            : 'text-neo-white/70 bg-neo-white/10'
                       )}
                     >
-                      {t('teacher.lesson.definitionCoverage')
-                        .replace('{{count}}', String(defCount))
-                        .replace('{{total}}', String(totalWords))}
+                      {t('teacher.lesson.definitionCoverage', { count: defCount, total: totalWords })}
                     </span>
                   </div>
                   {defaultTemplate && (
@@ -263,15 +261,15 @@ export default function LessonBuilder() {
                         )}
                         <span className="text-neo-white font-neo-body">{word.word}</span>
                         {word.definition && (
-                          <span className="text-xs text-neo-white/40 truncate max-w-[120px]">
+                          <span className="text-xs text-neo-white/70 truncate max-w-[120px]">
                             — {word.definition}
                           </span>
                         )}
                       </div>
                     ))}
                     {lesson.words.length > 5 && (
-                      <p className="text-xs text-neo-white/40 mt-2">
-                        {t('teacher.lesson.moreWords').replace('{{count}}', String(lesson.words.length - 5))}
+                      <p className="text-xs text-neo-white/70 mt-2 font-bold">
+                        {t('teacher.lesson.moreWords', { count: lesson.words.length - 5 })}
                       </p>
                     )}
                   </div>

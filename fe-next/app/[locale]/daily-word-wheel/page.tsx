@@ -15,11 +15,45 @@ const LOCALES: Locale[] = ['en', 'he', 'sv', 'ja', 'es'];
 
 // SEO keywords per locale
 const KEYWORDS: Record<Locale, string> = {
-  en: 'daily word wheel, daily word wheel game, daily word puzzle, word wheel game, free daily word game, word wheel online, daily word challenge, wordle alternative daily, daily word game free, word wheel puzzle',
+  en: 'daily word wheel, word wheel puzzles free online, word wheel puzzle, express word wheel today, daily express word wheel alternative, word wheel game, free daily word game, word wheel online, daily word challenge, wordle alternative daily, daily word game free, word wheel puzzle game',
   he: 'גלגל מילים יומי, פאזל מילים, משחק מילים חינם, משחק מילים יומי, אתגר מילים',
   sv: 'dagligt ordhjul, ordpussel, gratis ordspel, dagligt ordspel, ordhjul online',
   ja: 'デイリーワードホイール, ワードパズル, 無料ワードゲーム, 毎日のワードゲーム',
   es: 'rueda de palabras diaria, puzzle de palabras, juego de palabras gratis, juego de palabras diario',
+};
+
+// Per-locale metadata fallbacks — kills cross-locale dup-title flagging when translation keys missing
+const META_FALLBACK: Record<Locale, { title: string; description: string; ogTitle: string; ogDescription: string }> = {
+  en: {
+    title: 'Daily Word Wheel — Free Online Puzzle Game | LexiClash',
+    description: 'Spin the daily word wheel and find every hidden word. Free word wheel puzzle online — no signup, no download. New letters every day. Looking for an express word wheel alternative? Play here.',
+    ogTitle: 'Daily Word Wheel — Free Puzzle',
+    ogDescription: 'Spin the word wheel and find all possible words. New word wheel puzzle every day!',
+  },
+  he: {
+    title: 'גלגל מילים יומי — פאזל מילים חינם אונליין | LexiClash',
+    description: 'סובבו את גלגל המילים היומי ומצאו כל מילה חבויה. פאזל מילים חינם — בלי הרשמה, בלי הורדה. אותיות חדשות בכל יום.',
+    ogTitle: 'גלגל מילים יומי — פאזל חינם',
+    ogDescription: 'סובבו את הגלגל ומצאו את כל המילים. פאזל חדש כל יום!',
+  },
+  sv: {
+    title: 'Dagligt Ordhjul — Gratis Pussel Online | LexiClash',
+    description: 'Snurra det dagliga ordhjulet och hitta alla dolda ord. Gratis ordpussel online — ingen registrering, ingen nedladdning. Nya bokstäver varje dag.',
+    ogTitle: 'Dagligt Ordhjul — Gratis Pussel',
+    ogDescription: 'Snurra ordhjulet och hitta alla ord. Nytt pussel varje dag!',
+  },
+  ja: {
+    title: 'デイリーワードホイール — 無料パズルゲーム | LexiClash',
+    description: '毎日のワードホイールを回して隠れた単語を全部見つけよう。無料、登録不要、ダウンロード不要。毎日新しい文字。',
+    ogTitle: 'デイリーワードホイール — 無料パズル',
+    ogDescription: 'ホイールを回して全ての単語を見つけよう。毎日新しいパズル！',
+  },
+  es: {
+    title: 'Rueda de Palabras Diaria — Puzzle Gratis Online | LexiClash',
+    description: 'Gira la rueda de palabras diaria y encuentra cada palabra escondida. Puzzle gratis online — sin registro, sin descarga. Letras nuevas cada día.',
+    ogTitle: 'Rueda de Palabras Diaria — Puzzle Gratis',
+    ogDescription: 'Gira la rueda y encuentra todas las palabras. ¡Nuevo puzzle cada día!',
+  },
 };
 
 function getNestedValue(obj: Record<string, unknown>, path: string): string | undefined {
@@ -63,23 +97,24 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   const ogLocaleMap: Record<string, string> = { en: 'en_US', he: 'he_IL', sv: 'sv_SE', ja: 'ja_JP', es: 'es_ES' };
 
+  const fallback = META_FALLBACK[validLocale];
   return {
-    title: resolve('meta.dailyWordWheel.title', 'Daily Word Wheel — Play Today\'s Free Puzzle | LexiClash'),
-    description: resolve('meta.dailyWordWheel.description', 'A new letter wheel drops every day. Find every word before time runs out — no signup, no download. See how you rank worldwide on the daily leaderboard.'),
+    title: resolve('meta.dailyWordWheel.title', fallback.title),
+    description: resolve('meta.dailyWordWheel.description', fallback.description),
     keywords: KEYWORDS[validLocale],
     openGraph: {
-      title: resolve('meta.dailyWordWheel.ogTitle', 'Daily Word Wheel - Free Puzzle'),
-      description: resolve('meta.dailyWordWheel.ogDescription', 'Spin the word wheel and find all possible words. New puzzle daily!'),
+      title: resolve('meta.dailyWordWheel.ogTitle', fallback.ogTitle),
+      description: resolve('meta.dailyWordWheel.ogDescription', fallback.ogDescription),
       locale: ogLocaleMap[validLocale] || 'en_US',
       type: 'website',
       url: pageUrl,
       siteName: 'LexiClash',
-      images: [{ url: `${BASE_URL}/${validLocale}/daily-word-wheel/opengraph-image`, width: 1200, height: 630, alt: resolve('meta.dailyWordWheel.ogTitle', 'Daily Word Wheel') }],
+      images: [{ url: `${BASE_URL}/${validLocale}/daily-word-wheel/opengraph-image`, width: 1200, height: 630, alt: resolve('meta.dailyWordWheel.ogTitle', fallback.ogTitle) }],
     },
     twitter: {
       card: 'summary_large_image',
-      title: resolve('meta.dailyWordWheel.ogTitle', 'Daily Word Wheel - Free Puzzle'),
-      description: resolve('meta.dailyWordWheel.ogDescription', 'Spin the word wheel and find all possible words. New puzzle daily!'),
+      title: resolve('meta.dailyWordWheel.ogTitle', fallback.ogTitle),
+      description: resolve('meta.dailyWordWheel.ogDescription', fallback.ogDescription),
       images: [`${BASE_URL}/${validLocale}/daily-word-wheel/opengraph-image`],
     },
     alternates: {

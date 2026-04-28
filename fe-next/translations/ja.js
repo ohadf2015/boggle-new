@@ -1742,6 +1742,18 @@ const ja = {
     "step1Text": "つながった文字をドラッグして単語を作ろう。",
     "step2Title": "ポイントを獲得",
     "step2Text": "長い単語 = もっとポイント。ユニークな単語を見つけよう！",
+    "crazygames": {
+      "tagline": "プレイ中",
+      "title": "つづれ。",
+      "titleAccent": "勝て。",
+      "howTo": "つながった文字をタップして単語を作ろう。長い単語ほど高得点。デイリーパズル＆オンライン対戦、5言語対応。",
+      "playDaily": "デイリー",
+      "playPractice": "練習",
+      "playMultiplayer": "対戦",
+      "demoCaption": "遊び方",
+      "freeBadge": "ずっと無料",
+      "demoAlt": "単語の作り方を示す文字盤"
+    },
     "welcome": {
       "title": "LexiClashへようこそ！",
       "subtitle": "なぞって。つなげて。勝ち取れ。",
@@ -5120,6 +5132,7 @@ const ja = {
     "alreadyClosed": "単語はすでに確定済みです",
     "lockedByOther": "他のプレイヤーがロック中",
     "yourWordStolen": "{by}に単語{word}を奪われました！",
+    "stealGain": "スチール +{score}",
     "inputPlaceholder": "単語を入力...",
     "tapLetters": "文字をタップまたはドラッグして単語を作ろう",
     "tapToRemove": "追加した文字をもう一度タップで削除",

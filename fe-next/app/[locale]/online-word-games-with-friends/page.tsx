@@ -43,7 +43,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         es: `${BASE_URL}/es/juego-de-palabras-multijugador`,
       },
     },
-    robots: { index: true, follow: true },
+    robots: isTargetLocale ? { index: true, follow: true } : { index: false, follow: true },
   };
 }
 

@@ -66,7 +66,7 @@ export default function ClassroomStudentList({ classroomId, joinCode }: Classroo
           {t('teacher.classrooms.students.empty')}
         </p>
         <p className="text-black/60 text-sm font-bold">
-          {t('teacher.classrooms.students.emptyHint').replace('{{code}}', joinCode)}
+          {t('teacher.classrooms.students.emptyHint', { code: joinCode })}
         </p>
       </div>
     );

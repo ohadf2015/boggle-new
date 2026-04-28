@@ -122,7 +122,7 @@ export const PlayerRoster = memo(function PlayerRoster({ players, username, game
   const handleKick = useCallback((targetUsername: string) => {
     setPendingKick({
       name: targetUsername,
-      description: t('hostView.kickConfirm').replace('{{name}}', targetUsername),
+      description: t('hostView.kickConfirm', { name: targetUsername }),
     });
   }, [t]);
 

@@ -1860,6 +1860,18 @@ const en = {
     "step1Text": "Drag across letters to build words.",
     "step2Title": "Score Big",
     "step2Text": "Longer words = WAY more points!",
+    "crazygames": {
+      "tagline": "Live Now",
+      "title": "Spell.",
+      "titleAccent": "Win.",
+      "howTo": "Tap connected letters to make words. Longer words = bigger scores. Daily puzzles + live multiplayer in 5 languages.",
+      "playDaily": "Play Daily",
+      "playPractice": "Practice",
+      "playMultiplayer": "Multiplayer",
+      "demoCaption": "How to play",
+      "freeBadge": "Free Forever",
+      "demoAlt": "Letter grid showing how to trace a word path"
+    },
     "welcome": {
       "title": "Welcome to LexiClash!",
       "subtitle": "Swipe. Spell. Dominate.",
@@ -5180,7 +5192,9 @@ const en = {
         { "q": "Is it free?", "a": "Yes, completely free. No download, no signup, no pay-to-win. Play in your browser on any device." },
         { "q": "Can I see the world record?", "a": "Yes! After completing the puzzle, you can see the global leaderboard showing top scores for that day. The world record updates in real-time." },
         { "q": "Do all words need the center letter?", "a": "Yes! Every word you submit must include the center letter of the wheel. This is the core constraint that makes the puzzle challenging." },
-        { "q": "What languages are available?", "a": "The Daily Word Wheel is available in English, Hebrew, Swedish, Japanese, and Spanish. Each language has its own dictionary and leaderboard." }
+        { "q": "What languages are available?", "a": "The Daily Word Wheel is available in English, Hebrew, Swedish, Japanese, and Spanish. Each language has its own dictionary and leaderboard." },
+        { "q": "Is this an alternative to the Daily Express word wheel?", "a": "LexiClash is an independent free word wheel puzzle game — not affiliated with the Daily Express newspaper. If you're looking for free word wheel puzzles online with a daily reset, leaderboards, and 5-language support, LexiClash is a great alternative. Play in your browser, no download or signup required." },
+        { "q": "Are word wheel puzzles free online here?", "a": "Yes — every word wheel puzzle is 100% free. No paywall, no premium tier, no signup. Just open the page and play." }
       ]
     },
     "finalCta": {
@@ -5210,6 +5224,7 @@ const en = {
     "alreadyClosed": "Word already closed",
     "lockedByOther": "Locked by another player",
     "yourWordStolen": "{by} stole your word {word}!",
+    "stealGain": "STEAL +{score}",
     "inputPlaceholder": "Type a word...",
     "tapLetters": "Tap or drag letters to build a word",
     "tapToRemove": "Tap an added letter again to remove it",

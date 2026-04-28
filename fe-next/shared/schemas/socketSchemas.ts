@@ -8,6 +8,7 @@
 
 import { z } from 'zod';
 import { customAvatarSchema } from '../types/customAvatar';
+import { BLAST_COMBO_TYPES } from '../types/blast';
 
 // ==================== Security Configuration ====================
 
@@ -204,8 +205,17 @@ export const SubmitWordSchema = z.object({
   path: z.array(GridPositionSchema).optional(),
   // comboLevel and fireRoundActive deliberately omitted — derived server-side
   // to prevent clients from spoofing score multipliers.
-  // comboType is trusted from client (server has no tile state to detect combos).
-  comboType: z.string().optional().nullable(),
+  // comboType: server has no tile state to detect combos, so the value itself
+  // is client-supplied — but the surface is enum-restricted to canonical types
+  // to prevent arbitrary string injection (BLT-VAL-1, blast MP audit 2026-04-28).
+  comboType: z.enum(BLAST_COMBO_TYPES).optional().nullable(),
+});
+
+/**
+ * submitWheelWord event payload - Wheel Rush MP word submission
+ */
+export const SubmitWheelWordSchema = z.object({
+  word: z.string().min(1).max(20).transform(s => s.toUpperCase().trim()),
 });
 
 /**
@@ -392,6 +402,7 @@ export const ClientEventSchemas = {
   resetGame: ResetGameSchema,
   closeRoom: CloseRoomSchema,
   submitWord: SubmitWordSchema,
+  submitWheelWord: SubmitWheelWordSchema,
   submitWordVote: SubmitWordVoteSchema,
   submitPeerValidationVote: SubmitPeerValidationVoteSchema,
   sendChatMessage: ChatMessageSchema,
@@ -500,6 +511,7 @@ export type JoinGameData = z.infer<typeof JoinGameSchema>;
 export type LeaveRoomData = z.infer<typeof LeaveRoomSchema>;
 export type StartGameData = z.infer<typeof StartGameSchema>;
 export type SubmitWordData = z.infer<typeof SubmitWordSchema>;
+export type SubmitWheelWordData = z.infer<typeof SubmitWheelWordSchema>;
 export type ChatMessageData = z.infer<typeof ChatMessageSchema>;
 export type AddBotData = z.infer<typeof AddBotSchema>;
 export type RemoveBotData = z.infer<typeof RemoveBotSchema>;

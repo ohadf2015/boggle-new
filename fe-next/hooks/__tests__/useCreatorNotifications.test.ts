@@ -20,7 +20,11 @@ vi.mock('react-hot-toast', () => ({
 
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
-    t: (key: string) => key,
+    t: (key: string, vars?: Record<string, unknown>) => {
+      if (!vars) return key;
+      const parts = Object.entries(vars).map(([k, v]) => `${k}=${String(v)}`);
+      return `${key} ${parts.join(' ')}`;
+    },
   }),
 }));
 

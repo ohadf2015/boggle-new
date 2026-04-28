@@ -28,8 +28,16 @@ const titleMap: Record<string, string> = {
   es: 'Juegos de Palabras Online Gratis · Multijugador en Español | LexiClash',
 };
 
+const keywordsMap: Record<string, string> = {
+  en: 'free multiplayer word game, boggle online free, boggle shake, daily word wheel, word wheel puzzles free online, free boggle online no download, word games online free, words with friends alternative, multiplayer word games online',
+  he: 'משחק מילים מרובה משתתפים, גלגל מילים יומי, בוגל אונליין, משחקי מילים חינם',
+  sv: 'gratis ordspel online, dagligt ordhjul, ordspel multiplayer, alfapet alternativ',
+  ja: '無料ワードゲーム, デイリーワードホイール, 多人数ワードゲーム, ワードパズル',
+  es: 'juegos de palabras gratis, rueda de palabras diaria, juego multijugador de palabras',
+};
+
 const descriptionMap: Record<string, string> = {
-  en: 'Free multiplayer word game — no signup, no download. Real-time Boggle-style battles, daily word wheel, 6 modes, 5 languages. Play in any browser. Start now →',
+  en: 'Free multiplayer word game — no signup, no download. Real-time Boggle Shake-style battles, daily word wheel puzzles, 6 modes, 5 languages. Play in any browser. Start now →',
   he: 'משחק מילים מרובה משתתפים חינם בעברית — ללא הורדה. בוגל בזמן אמת עם חברים, גלגל מילים יומי, 6 מצבי משחק, 10,000+ מילים. שחק עכשיו בדפדפן ←',
   sv: 'Spela gratis ordspel online med vänner — ingen nedladdning. Realtids ordstrider, dagligt ordhjul, 6 spellägen, 5 språk. Som Alfapet möter Boggle. Spela nu →',
   ja: '友達と無料マルチプレイヤーワードゲーム — 登録不要・ダウンロード不要。リアルタイム単語バトル、毎日のワードホイール、6モード、5言語対応。今すぐブラウザで開始 →',
@@ -41,6 +49,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title: { absolute: titleMap[locale] || titleMap.en },
     description: descriptionMap[locale] || descriptionMap.en,
+    keywords: keywordsMap[locale] || keywordsMap.en,
   };
 }
 
