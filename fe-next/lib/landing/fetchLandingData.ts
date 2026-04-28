@@ -47,6 +47,11 @@ export async function fetchLandingData(language: string): Promise<LandingInitial
 
   const today = new Date().toISOString().slice(0, 10);
 
+  // Resolve current season first so the leaderboard query returns the active window only.
+  // Falls back to season 1 if get_current_season_id() returns NULL (no date-window match).
+  const seasonResp = await supabase.rpc('get_current_season_id');
+  const currentSeasonId = (seasonResp?.data as number | null) ?? 1;
+
   const [supabaseResults, gameModeStats] = await Promise.all([
     Promise.all([
       supabase
@@ -54,6 +59,7 @@ export async function fetchLandingData(language: string): Promise<LandingInitial
         .select(
           'player_id, username, display_name, total_score, avatar_image, avatar_config, profiles!leaderboard_player_id_fkey(prestige_level)'
         )
+        .eq('season_id', currentSeasonId)
         .order('total_score', { ascending: false })
         .limit(TOP_PLAYERS_LIMIT),
 

@@ -63,9 +63,12 @@ export function useTopPlayers(limit = 5, options: UseTopPlayersOptions = {}) {
     let cancelled = false;
 
     async function fetchData() {
+      const seasonResp = await supabase!.rpc('get_current_season_id');
+      const seasonId = (seasonResp?.data as number | null) ?? 1;
       const { data, error } = await supabase!
         .from('leaderboard')
         .select('player_id, username, display_name, total_score, avatar_image, avatar_config, profiles!leaderboard_player_id_fkey(prestige_level)')
+        .eq('season_id', seasonId)
         .order('total_score', { ascending: false })
         .limit(limit);
 
