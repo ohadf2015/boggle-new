@@ -42,22 +42,23 @@ function label(key: string, locale: string): string {
 
 interface Props {
   allWords: WordEntry[];
+  featuredWord?: WordEntry;
 }
 
-export default function WordOfTheDayClient({ allWords }: Props) {
+export default function WordOfTheDayClient({ allWords, featuredWord }: Props) {
   const { locale } = useParams<{ locale: string }>();
   const { language } = useLanguage();
   const lang = locale || language || 'en';
   const [copied, setCopied] = useState(false);
 
-  const today = useMemo(() => new Date().toISOString().slice(0, 10), []);
-  const todayWord = useMemo(
-    () => allWords.find((w) => w.dateKey === today) || allWords[0],
-    [allWords, today],
-  );
+  const todayWord = useMemo(() => {
+    if (featuredWord) return featuredWord;
+    const today = new Date().toISOString().slice(0, 10);
+    return allWords.find((w) => w.dateKey === today) || allWords[0];
+  }, [allWords, featuredWord]);
   const previousWords = useMemo(
-    () => allWords.filter((w) => w.dateKey !== today).slice(0, 7),
-    [allWords, today],
+    () => allWords.filter((w) => w.dateKey !== todayWord.dateKey).slice(0, 7),
+    [allWords, todayWord.dateKey],
   );
 
   const handleShare = useCallback(async () => {

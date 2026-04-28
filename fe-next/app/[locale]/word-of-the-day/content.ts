@@ -104,9 +104,34 @@ export const wordsByLocale: Record<Locale, WordEntry[]> = {
   es: esWords,
 };
 
+const ISO_DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+const ROTATION_EPOCH_MS = Date.UTC(2026, 0, 1);
+const MS_PER_DAY = 86_400_000;
+
+function localeWords(locale: Locale): WordEntry[] {
+  return wordsByLocale[locale] && wordsByLocale[locale].length > 0
+    ? wordsByLocale[locale]
+    : wordsByLocale.en;
+}
+
+export function getWordByDate(locale: Locale, dateKey: string): WordEntry | null {
+  if (!dateKey || !ISO_DATE_RE.test(dateKey)) return null;
+  const words = localeWords(locale);
+  return words.find((w) => w.dateKey === dateKey) ?? null;
+}
+
+export function getRotatedTodayWord(locale: Locale, dateKey: string): WordEntry {
+  const words = localeWords(locale);
+  const exact = words.find((w) => w.dateKey === dateKey);
+  if (exact) return exact;
+  if (!ISO_DATE_RE.test(dateKey)) return words[0];
+  const dayIndex = Math.floor((Date.parse(dateKey + 'T00:00:00Z') - ROTATION_EPOCH_MS) / MS_PER_DAY);
+  const idx = ((dayIndex % words.length) + words.length) % words.length;
+  return words[idx];
+}
+
 export function getTodayWord(locale: Locale): WordEntry {
   const today = new Date().toISOString().slice(0, 10);
-  const words = wordsByLocale[locale] || wordsByLocale.en;
-  return words.find((w) => w.dateKey === today) || words[0];
+  return getRotatedTodayWord(locale, today);
 }
 

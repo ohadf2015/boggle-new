@@ -1,4 +1,5 @@
 import type { MetadataRoute } from 'next';
+import { wordsByLocale as wotdWords } from './[locale]/word-of-the-day/content';
 
 const BASE_URL = 'https://www.lexiclash.live';
 const LOCALES = ['he', 'en', 'sv', 'ja', 'es'] as const;
@@ -132,6 +133,20 @@ function getAllRoutes(): MetadataRoute.Sitemap {
   addForAllLocales(routes, '/how-to-play', { lastModified: GUIDES_UPDATED, changeFrequency: 'weekly', priority: 0.9 });
   addForAllLocales(routes, '/rules', { lastModified: GUIDES_UPDATED, changeFrequency: 'monthly', priority: 0.7 });
   addForAllLocales(routes, '/word-of-the-day', { lastModified: LAST_DEPLOYED, changeFrequency: 'daily', priority: 0.9 });
+
+  // Per-date Word of the Day pages — each curated word becomes a distinct indexable URL.
+  // Only emit per-locale URLs where that locale actually has the word, so we don't serve
+  // identical EN content under /he/.../<date> and dilute the HE corpus.
+  LOCALES.forEach((locale) => {
+    wotdWords[locale]?.forEach((entry) => {
+      routes.push({
+        url: `${BASE_URL}/${locale}/word-of-the-day/${entry.dateKey}`,
+        lastModified: `${entry.dateKey}T00:00:00.000Z`,
+        changeFrequency: 'monthly',
+        priority: 0.7,
+      });
+    });
+  });
   addForAllLocales(routes, '/leaderboard', { lastModified: LAST_DEPLOYED, changeFrequency: 'daily', priority: 0.8 });
 
   // ─── Comparison pages ───

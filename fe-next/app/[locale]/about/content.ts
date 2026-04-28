@@ -42,7 +42,7 @@ export type AboutContent = {
 export const contentByLocale: Record<string, AboutContent> = {
   en: {
     title: 'About LexiClash',
-    lastUpdated: 'January 2025',
+    lastUpdated: 'April 2026',
     whoWeAre: {
       title: 'Who We Are',
       content: 'LexiClash is a real-time multiplayer word strategy game developed by LexiClash Ltd, based in Israel. We create engaging, educational, and competitive word games for players of all ages — from young learners to seasoned word enthusiasts — across multiple languages and cultures.',

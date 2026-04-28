@@ -759,7 +759,7 @@ export default function BlogIndexPageClient(): React.ReactElement {
 
         {/* Blog Posts Grid */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {blogPosts.map((post) => {
+          {blogPosts.map((post, index) => {
             const postContent = content.posts[post.slug];
             if (!postContent) return null;
 
@@ -781,6 +781,7 @@ export default function BlogIndexPageClient(): React.ReactElement {
                     alt={postContent.title}
                     fill
                     sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    priority={index < 3}
                     className="object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                   {/* Category Badge overlaid on image */}

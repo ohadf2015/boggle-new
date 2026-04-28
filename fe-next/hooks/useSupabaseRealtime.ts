@@ -58,6 +58,7 @@ interface LeaderboardOptions {
   orderBy?: string;
   enabled?: boolean;
   debounceMs?: number; // Debounce delay for realtime refetches (default: 500ms)
+  seasonId?: number; // omit = current season; 0 = all-time
 }
 
 type LeaderboardRow = Record<string, unknown>;
@@ -99,9 +100,9 @@ const CACHE_TTL_MS = 60_000; // 1 minute - serve cached data immediately, revali
  * @returns { data, loading, error, subscriptionStatus, refetch }
  */
 export function useLeaderboard<T = LeaderboardRow>(options: LeaderboardOptions = {}): LeaderboardResult<T> {
-  const { limit = 100, orderBy = 'total_score', enabled = true, debounceMs = 500 } = options;
+  const { limit = 100, orderBy = 'total_score', enabled = true, debounceMs = 500, seasonId } = options;
 
-  const cacheKey = `${limit}:${orderBy}`;
+  const cacheKey = `${limit}:${orderBy}:${seasonId ?? 'current'}`;
   const cached = leaderboardCache.key === cacheKey ? leaderboardCache.data : null;
   // Initialize with cached data if available (instant render)
   const [data, setData] = useState<T[]>((cached as T[] | null) || []);
@@ -119,7 +120,7 @@ export function useLeaderboard<T = LeaderboardRow>(options: LeaderboardOptions =
     if (!leaderboardCache.data || leaderboardCache.key !== cacheKey) {
       setLoading(true);
     }
-    const result = await leaderboardOperations.getTop(limit, orderBy);
+    const result = await leaderboardOperations.getTop(limit, orderBy, seasonId);
 
     if (!isMountedRef.current) return;
 
@@ -135,7 +136,7 @@ export function useLeaderboard<T = LeaderboardRow>(options: LeaderboardOptions =
       leaderboardCache.key = cacheKey;
     }
     setLoading(false);
-  }, [limit, orderBy, enabled, isMountedRef, cacheKey]);
+  }, [limit, orderBy, enabled, isMountedRef, cacheKey, seasonId]);
 
   // Debounced refetch for realtime updates
   const debouncedRefetch = useDebouncedCallback(fetchLeaderboard, debounceMs);

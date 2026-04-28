@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { Shuffle, Trophy, RotateCcw, Target } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -9,6 +9,7 @@ import GridComponent from '@/components/GridComponent';
 import WordFormingArea, { type WordFeedback } from '@/components/game/WordFormingArea';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useDrillKeyboardSupport } from '@/hooks/useDrillKeyboardSupport';
+import { useDrillCompleteOnce } from './hooks/useDrillCompleteOnce';
 import { KeyboardDesktopBadge, EnterKeyHint, KeyboardQuickTip } from '@/components/keyboard';
 import type { LetterGrid, Language } from '@/types';
 import { calculateWordScore } from '@/shared/utils/scoring';
@@ -252,12 +253,8 @@ export default function PatternSwitcher({
     };
   }, [score, patternsCompleted, wordsFound.length, level]);
 
-  useEffect(() => {
-    if (phase === 'complete') {
-      playDrillCompleteSound();
-      onComplete(getResults());
-    }
-  }, [phase, getResults, onComplete, playDrillCompleteSound]);
+  // Handle completion (idempotent — see useDrillCompleteOnce)
+  useDrillCompleteOnce(phase, getResults, onComplete, playDrillCompleteSound);
 
   return (
     <div dir={dir} className={cn(

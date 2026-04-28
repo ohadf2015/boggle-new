@@ -66,12 +66,9 @@ export default function AboutPageClient(): React.ReactElement {
   return (
     <LegalPageLayout
       title={c.title}
+      lastUpdated={c.lastUpdated}
       breadcrumbs={[{ label: c.title }]}
     >
-      {/* Last Updated */}
-      <p className="text-sm mb-6 text-gray-500">
-        Last updated: {c.lastUpdated}
-      </p>
 
       {/* Section 1: Who We Are */}
       <section className="mb-8">

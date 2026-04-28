@@ -242,12 +242,14 @@ export default function ProfilePageClient(): React.JSX.Element {
                     'flex-1 flex flex-col items-center gap-1 py-2.5 rounded-neo font-neo-display text-xs font-bold uppercase tracking-wide transition-all duration-150',
                     isActive
                       ? 'bg-neo-yellow text-neo-black border-3 border-neo-black shadow-hard-sm scale-[1.02]'
-                      : 'bg-neo-white/8 text-neo-white/60 border-2 border-neo-white/15 active:scale-95'
+                      : isDarkMode
+                        ? 'bg-neo-white/8 text-neo-white/80 border-2 border-neo-white/20 active:scale-95'
+                        : 'bg-neo-black/5 text-neo-black/80 border-2 border-neo-black/20 active:scale-95'
                   )}
                   aria-selected={isActive}
                   role="tab"
                 >
-                  <Icon className={cn('w-5 h-5', isActive ? 'text-neo-black' : 'text-neo-white/50')} />
+                  <Icon className={cn('w-5 h-5', isActive ? 'text-neo-black' : isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70')} />
                   <span>{t(`profile.sections.${section}`)}</span>
                 </button>
               );

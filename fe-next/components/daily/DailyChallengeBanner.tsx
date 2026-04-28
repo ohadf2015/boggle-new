@@ -52,7 +52,10 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
   preloadedStats,
 }) => {
   const { t, language, dir } = useLanguage();
-  const [countdown, setCountdown] = useState<string>('--:--:--');
+  const [countdown, setCountdown] = useState<string>(() => {
+    if (typeof window === 'undefined') return '--:--:--';
+    return formatCountdown(getSecondsUntilNextDaily());
+  });
   const [hasPlayed, setHasPlayed] = useState<boolean>(preloadedStats?.hasPlayed ?? false);
   const [hasSolved, setHasSolved] = useState<boolean>(preloadedStats?.hasSolved ?? false);
   const [streak, setStreak] = useState<number>(preloadedStats?.currentStreak ?? 0);
@@ -390,8 +393,8 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
           >
             <Clock style={{ width: 'clamp(0.625rem, 2.5cqw, 0.875rem)', height: 'clamp(0.625rem, 2.5cqw, 0.875rem)' }} />
             {hasPlayed
-              ? <><span className="opacity-80">{t('daily.nextPuzzleIn')}:</span>&nbsp;<span className="font-black">{countdown}</span></>
-              : <span className="font-black">{countdown}</span>
+              ? <><span className="opacity-80">{t('daily.nextPuzzleIn')}:</span>&nbsp;<span className="font-black tabular-nums" suppressHydrationWarning>{countdown}</span></>
+              : <span className="font-black tabular-nums" suppressHydrationWarning>{countdown}</span>
             }
           </span>
         </div>

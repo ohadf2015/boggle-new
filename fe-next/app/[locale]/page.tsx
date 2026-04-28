@@ -53,12 +53,12 @@ const seoContent: Record<string, {
   en: {
     title: 'LexiClash — Free Multiplayer Word Game Online',
     description:
-      'LexiClash is a free online multiplayer word game that combines the grid-based word hunting of Boggle with real-time competitive gameplay. Find words on a shared letter grid, race against friends or strangers, and climb the leaderboard — all in your browser with no download or signup required. Play in English, Hebrew, Swedish, Japanese, or Spanish across multiple game modes including Classic, Word Hunt, Blast, and the daily Word Wheel challenge. LexiClash also features Adventure Mode with 50+ progressive levels, Brain Training drills for cognitive improvement, and a Party Mode designed for group play on a shared TV screen.',
+      'LexiClash is a free online multiplayer word game that combines the grid-based word hunting of Boggle with real-time competitive gameplay. Find words on a shared letter grid, race against friends or strangers, and climb the leaderboard — all in your browser with no download or signup required. Play in English, Hebrew, Swedish, Japanese, or Spanish across multiple game modes including Classic, Word Hunt, Blast, and the daily Word Wheel challenge. LexiClash also features Adventure Mode with 100 progressive levels across 10 themed worlds, Brain Training drills for cognitive improvement, and a Party Mode designed for group play on a shared TV screen.',
     features: [
       'Real-time multiplayer word battles — 2 to 20+ players on the same grid simultaneously',
       'Six distinct game modes: Classic, Word Hunt, Blast, Wheel Rush, Adventure, and Brain Training',
       'Daily Word Wheel challenge with global leaderboards and streak tracking',
-      'Adventure Mode with 50+ levels, boss fights, and progressive difficulty',
+      'Adventure Mode with 100 levels across 10 themed worlds, boss fights, and progressive difficulty',
       'Brain Training drills: Lightning Round, Rare Gems, Combo Master, Pattern Switcher, Memory Hunt',
       'Party Mode for game nights — play on a shared TV with phones as controllers',
       'Five language support: English, Hebrew (RTL), Swedish, Japanese, and Spanish',
@@ -235,7 +235,6 @@ export default async function HomePage({ params }: PageProps) {
       />
       <HomePageClient initialData={initialData} />
       <GamePageSeoContent
-        asH1
         title={content.title}
         description={content.description}
         features={content.features}

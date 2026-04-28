@@ -39,11 +39,26 @@ export const SeasonBanner: React.FC = () => {
           <span className="font-neo-display text-sm text-neo-cream truncate">
             {t('season.name', { number: currentSeason.id, theme: currentSeason.theme })}
           </span>
-          <span className="text-xs text-neo-cream/70">
+          <span className={`text-xs ${isEndingSoon ? 'text-neo-pink font-neo-display' : 'text-neo-cream/70'}`}>
             {isEndingSoon
               ? t('season.endingSoon')
               : t('season.endsIn', { days: timeRemaining.days })}
           </span>
+        </div>
+      </div>
+
+      <div
+        className="hidden sm:flex items-center gap-1 shrink-0"
+        aria-label={t('season.endsIn', { days: timeRemaining.days })}
+        data-testid="season-banner-countdown"
+      >
+        <div className={`px-2 py-1 rounded-neo border-neo border-black shadow-hard-sm font-neo-display text-base leading-none ${isEndingSoon ? 'bg-neo-pink text-black animate-neo-pop' : 'bg-neo-lime text-black'}`}>
+          {timeRemaining.days}
+          <span className="text-[10px] ms-1 uppercase tracking-wider opacity-80">d</span>
+        </div>
+        <div className="px-2 py-1 rounded-neo border-neo border-black shadow-hard-sm font-neo-display text-base leading-none bg-neo-cyan text-black">
+          {timeRemaining.hours}
+          <span className="text-[10px] ms-1 uppercase tracking-wider opacity-80">h</span>
         </div>
       </div>
 

@@ -28,6 +28,7 @@ import { TierBadge, TierProgressBar } from '@/components/ui/TierBadge';
 import { useTierPromotion } from '@/hooks/useTierPromotion';
 import { SeasonLeaderboardTabs, type SeasonTabKey } from '@/components/seasons/SeasonLeaderboardTabs';
 import { SeasonBanner } from '@/components/multiplayer/SeasonBanner';
+import { PastSeasonsLeaderboard } from '@/components/seasons/PastSeasonsLeaderboard';
 import {
   getGlobalLeaderboardTier,
   getLeaderboardTierProgress,
@@ -68,6 +69,9 @@ export default function LeaderboardPageClient(): React.JSX.Element {
   const [activeTab, setActiveTab] = useState<'players' | 'creators'>('players');
   const [seasonScope, setSeasonScope] = useState<SeasonTabKey>('season');
 
+  // 'season' = current (date-windowed), 'allTime' = id=0 (no filter), 'pastSeasons' = handled separately
+  const querySeasonId = seasonScope === 'allTime' ? 0 : undefined;
+
   // Use real-time hooks for live leaderboard updates
   const {
     data: leaderboard,
@@ -75,7 +79,11 @@ export default function LeaderboardPageClient(): React.JSX.Element {
     error,
     subscriptionStatus,
     refetch,
-  } = useLeaderboard<LeaderboardEntry>({ limit: 100, enabled: isSupabaseEnabled });
+  } = useLeaderboard<LeaderboardEntry>({
+    limit: 100,
+    enabled: isSupabaseEnabled && seasonScope !== 'pastSeasons',
+    seasonId: querySeasonId,
+  });
 
   const { rank: userRank } = useUserRank<{ total_score?: number; rank_position?: number }>(user?.id);
 
@@ -229,12 +237,8 @@ export default function LeaderboardPageClient(): React.JSX.Element {
           <SeasonLeaderboardTabs active={seasonScope} onChange={setSeasonScope} />
         </div>
 
-        {seasonScope !== 'season' ? (
-          <EnhancedEmptyState
-            icon="sparkles"
-            title={t(seasonScope === 'allTime' ? 'season.allTime' : 'season.pastSeasons')}
-            description={t('season.noPastSeasons')}
-          />
+        {seasonScope === 'pastSeasons' ? (
+          <PastSeasonsLeaderboard />
         ) : (
         <>
         {/* User's Rank Card (if authenticated) */}

@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { Trophy, RotateCcw, Clock, Target } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { GameEmojiShareCard } from '@/components/shared/GameEmojiShareCard';
@@ -16,12 +16,12 @@ export function MemoryHuntCompletePhase({
   isDarkMode, results, lives, t, onPlayAgain, onExit,
 }: MemoryHuntCompletePhaseProps) {
   return (
-    <motion.div
+    <AdaptiveMotion.div
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
       className="text-center space-y-6"
     >
-      <motion.div
+      <AdaptiveMotion.div
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
         transition={{ type: 'spring', damping: 12, delay: 0.2 }}
@@ -30,33 +30,33 @@ export function MemoryHuntCompletePhase({
           'w-14 h-14 sm:w-20 sm:h-20 mx-auto',
           results.wordsFound > 0 ? 'text-neo-lime' : 'text-gray-400'
         )} />
-      </motion.div>
-      <motion.h2
+      </AdaptiveMotion.div>
+      <AdaptiveMotion.h2
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
         className={cn('text-2xl font-black', isDarkMode ? 'text-neo-white' : 'text-neo-black')}
       >
         {lives > 0 ? t('brain.drills.complete') : t('brain.drills.gameOver')}
-      </motion.h2>
-      <motion.div
+      </AdaptiveMotion.h2>
+      <AdaptiveMotion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5 }}
         className={cn('p-4 rounded-neo border-3 border-neo-black space-y-3', isDarkMode ? 'bg-slate-800' : 'bg-white')}
       >
-        <motion.div
+        <AdaptiveMotion.div
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ delay: 0.7, type: 'spring' }}
           className="text-3xl font-black text-neo-purple"
         >
-          <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }}>
+          <AdaptiveMotion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }}>
             {results.score}
-          </motion.span> {t('brain.drills.points')}
-        </motion.div>
+          </AdaptiveMotion.span> {t('brain.drills.points')}
+        </AdaptiveMotion.div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
-          <motion.div
+          <AdaptiveMotion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.9 }}
@@ -69,8 +69,8 @@ export function MemoryHuntCompletePhase({
             <p className={cn('text-xs', isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70')}>
               {t('brain.drills.wordsFound')}
             </p>
-          </motion.div>
-          <motion.div
+          </AdaptiveMotion.div>
+          <AdaptiveMotion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 1 }}
@@ -83,11 +83,11 @@ export function MemoryHuntCompletePhase({
             <p className={cn('text-xs', isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70')}>
               {t('brain.drills.timeSpent')}
             </p>
-          </motion.div>
+          </AdaptiveMotion.div>
         </div>
-      </motion.div>
+      </AdaptiveMotion.div>
       {results.score > 0 && (
-        <motion.div
+        <AdaptiveMotion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1.1 }}
@@ -95,7 +95,7 @@ export function MemoryHuntCompletePhase({
           <GameEmojiShareCard
             data={{
               mode: 'drill',
-              drillType: 'Memory Hunt',
+              drillType: t('brain.drills.memory-hunt.name'),
               score: results.score,
               wordsFound: results.wordsFound,
               totalWords: results.totalWords,
@@ -103,15 +103,15 @@ export function MemoryHuntCompletePhase({
             }}
             t={t}
           />
-        </motion.div>
+        </AdaptiveMotion.div>
       )}
-      <motion.div
+      <AdaptiveMotion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 1.2 }}
         className="flex gap-3 justify-center"
       >
-        <motion.button
+        <AdaptiveMotion.button
           whileTap={{ scale: 0.95 }}
           onClick={onPlayAgain}
           className={cn(
@@ -122,9 +122,9 @@ export function MemoryHuntCompletePhase({
         >
           <RotateCcw className="w-5 h-5" />
           {t('brain.drills.playAgain')}
-        </motion.button>
+        </AdaptiveMotion.button>
         {onExit && (
-          <motion.button
+          <AdaptiveMotion.button
             whileTap={{ scale: 0.95 }}
             onClick={onExit}
             className={cn(
@@ -134,9 +134,9 @@ export function MemoryHuntCompletePhase({
             )}
           >
             {t('brain.drills.exit')}
-          </motion.button>
+          </AdaptiveMotion.button>
         )}
-      </motion.div>
-    </motion.div>
+      </AdaptiveMotion.div>
+    </AdaptiveMotion.div>
   );
 }

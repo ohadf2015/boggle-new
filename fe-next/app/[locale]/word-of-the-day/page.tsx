@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
-import { wordsByLocale, getTodayWord, type Locale } from './content';
+import { wordsByLocale, getRotatedTodayWord, type Locale } from './content';
 import WordOfTheDayClient from './PageClient';
 import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
+import { buildDynamicTitle, buildDynamicDescription, buildSchemas } from './seo';
 
 export const dynamic = 'force-dynamic';
 
@@ -29,10 +30,13 @@ const descriptionMap: Record<string, string> = {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale } = await params;
-  const todayWord = getTodayWord(locale as Locale);
-  const title = titleMap[locale] || titleMap.en;
-  const description = descriptionMap[locale] || descriptionMap.en;
+  const today = new Date().toISOString().slice(0, 10);
+  const todayWord = getRotatedTodayWord(locale as Locale, today);
+  const title = buildDynamicTitle(locale, todayWord);
+  const description = buildDynamicDescription(locale, todayWord);
   const url = `${SITE_URL}/${locale}/word-of-the-day`;
+  // Keep static fallbacks for any consumer that imports them.
+  void titleMap; void descriptionMap;
 
   return {
     title,
@@ -84,53 +88,19 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function WordOfTheDayPage({ params }: PageProps) {
   const { locale } = await params;
   const loc = (locale as Locale) || 'en';
-  const todayWord = getTodayWord(loc);
+  const today = new Date().toISOString().slice(0, 10);
+  const todayWord = getRotatedTodayWord(loc, today);
   const allWords = wordsByLocale[loc] || wordsByLocale.en;
+  const schemas = buildSchemas(loc, todayWord, `/${loc}/word-of-the-day`);
 
-  const schemas = [
-    {
-      '@context': 'https://schema.org',
-      '@type': 'BreadcrumbList',
-      itemListElement: [
-        { '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE_URL}/${locale}` },
-        { '@type': 'ListItem', position: 2, name: 'Word of the Day', item: `${SITE_URL}/${locale}/word-of-the-day` },
-      ],
-    },
-    {
-      '@context': 'https://schema.org',
-      '@type': 'DefinedTerm',
-      name: todayWord.word,
-      description: todayWord.definition,
-      inDefinedTermSet: {
-        '@type': 'DefinedTermSet',
-        name: 'LexiClash Word of the Day',
-        url: `${SITE_URL}/${locale}/word-of-the-day`,
-      },
-      termCode: todayWord.dateKey,
-    },
-    {
-      '@context': 'https://schema.org',
-      '@type': 'WebPage',
-      '@id': `${SITE_URL}/${locale}/word-of-the-day#webpage`,
-      url: `${SITE_URL}/${locale}/word-of-the-day`,
-      name: titleMap[locale] || titleMap.en,
-      description: descriptionMap[locale] || descriptionMap.en,
-      isPartOf: { '@id': `${SITE_URL}/#website` },
-      speakable: {
-        '@type': 'SpeakableSpecification',
-        cssSelector: ['[data-speakable="true"]'],
-      },
-    },
-  ];
-
-  // Safe: schemas built entirely from static constants defined in this file, no user input
+  // Safe: schemas built entirely from typed helpers + curated word data, no user input
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(schemas) }}
       />
-      <WordOfTheDayClient allWords={allWords} />
+      <WordOfTheDayClient allWords={allWords} featuredWord={todayWord} />
       {(() => {
         const wotdSeoContent: Record<string, {
           title: string; description: string; features: string[];

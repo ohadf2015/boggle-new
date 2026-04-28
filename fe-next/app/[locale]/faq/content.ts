@@ -53,7 +53,7 @@ export const contentByLocale: Record<string, FAQContent> = {
       {
         category: 'gettingStarted',
         question: 'What is LexiClash?',
-        answer: 'LexiClash is a multiplayer word game where you compete against friends or AI opponents to find words on a shared board. Play solo, challenge daily puzzles, or compete in real-time multiplayer matches across Hebrew, English, Swedish, and Japanese.',
+        answer: 'LexiClash is a multiplayer word game where you compete against friends or AI opponents to find words on a shared board. Play solo, challenge daily puzzles, or compete in real-time multiplayer matches across Hebrew, English, Swedish, Japanese, and Spanish.',
       },
       {
         category: 'gettingStarted',
@@ -83,7 +83,7 @@ export const contentByLocale: Record<string, FAQContent> = {
       {
         category: 'gameplay',
         question: 'Can I play in multiple languages?',
-        answer: 'Yes! LexiClash supports Hebrew, English, Swedish, and Japanese. You can switch languages in Settings. Each language has its own word dictionary and leaderboards.',
+        answer: 'Yes! LexiClash supports Hebrew, English, Swedish, Japanese, and Spanish. You can switch languages in Settings. Each language has its own word dictionary and leaderboards.',
       },
       {
         category: 'technical',

@@ -292,11 +292,13 @@ export function useMemoryHuntGame({
     };
   }, [targetWords, score, startTime, endTime, level]);
 
-  // Handle completion
+  // Handle completion (idempotent: ref guard prevents reward loop when parent
+  // recreates `onComplete` after coin-state updates).
+  const completionFiredRef = useRef(false);
   useEffect(() => {
-    if (phase === 'complete') {
-      onComplete(results);
-    }
+    if (phase !== 'complete' || completionFiredRef.current) return;
+    completionFiredRef.current = true;
+    onComplete(results);
   }, [phase, results, onComplete]);
 
   // Remaining unfound words for UI

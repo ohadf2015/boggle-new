@@ -250,19 +250,17 @@ export const profileOperations = {
  */
 export const leaderboardOperations = {
   /**
-   * Get top players with optional MMR ordering
+   * Get top players for a season. seasonId omitted = current season (date-windowed).
+   * seasonId = 0 = all-time across every season row.
    */
-  async getTop(limit = 100, orderBy = 'total_score') {
-    const order = orderBy === 'ranked_mmr'
-      ? { column: 'ranked_mmr', ascending: false }
-      : { column: 'total_score', ascending: false };
-
+  async getTop(limit = 100, orderBy = 'total_score', seasonId?: number) {
     return withRetry(
-      async () => supabase!
-        .from('leaderboard')
-        .select('*')
-        .order(order.column, { ascending: order.ascending })
-        .limit(limit),
+      async () => supabase!.rpc('get_leaderboard', {
+        p_limit: limit,
+        p_offset: 0,
+        p_order_by: orderBy,
+        p_season_id: seasonId ?? null,
+      }),
       { context: 'getLeaderboard' }
     );
   },

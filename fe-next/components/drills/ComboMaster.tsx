@@ -8,6 +8,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import GridComponent from '@/components/GridComponent';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useDrillWordSubmit } from './hooks/useDrillWordSubmit';
+import { useDrillCompleteOnce } from './hooks/useDrillCompleteOnce';
 import { useDrillKeyboardSupport } from '@/hooks/useDrillKeyboardSupport';
 import { KeyboardDesktopBadge, EnterKeyHint, KeyboardQuickTip } from '@/components/keyboard';
 import type { LetterGrid, Language } from '@/types';
@@ -197,13 +198,8 @@ export default function ComboMaster({
     };
   }, [score, maxCombo, wordsFound.length, level]);
 
-  // Handle completion
-  useEffect(() => {
-    if (phase === 'complete') {
-      playDrillCompleteSound();
-      onComplete(getResults());
-    }
-  }, [phase, getResults, onComplete, playDrillCompleteSound]);
+  // Handle completion (idempotent — see useDrillCompleteOnce)
+  useDrillCompleteOnce(phase, getResults, onComplete, playDrillCompleteSound);
 
   // Cleanup
   useEffect(() => {
@@ -383,6 +379,9 @@ export default function ComboMaster({
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
+                  role="status"
+                  aria-live={feedback.type === 'error' ? 'assertive' : 'polite'}
+                  aria-atomic="true"
                   className={cn(
                     'text-center px-4 py-2 rounded-neo border-2 border-neo-black font-bold text-sm',
                     feedback.type === 'error'
