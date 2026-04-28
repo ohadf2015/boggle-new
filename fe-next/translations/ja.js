@@ -5056,8 +5056,6 @@ const ja = {
     "streakFreezeTooltip": "ストリークフリーズ — 1日休んでもストリークを守ります",
     "streakFreezesAvailable": "ストリークフリーズ{count}個利用可能",
     "watchAdForFreeze": "広告を見てストリークフリーズを獲得",
-    "todayReward": "今日: {{coins}}コイン",
-    "tomorrowReward": "明日: {{coins}}コイン",
     "nearMilestone": "{{badge}}バッジまであと{{days}}日！",
     "nearMilestoneOne": "{{badge}}バッジまであと1日！",
     "milestoneEarned": "🎉 {{badge}}を獲得！",

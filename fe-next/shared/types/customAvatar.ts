@@ -372,15 +372,38 @@ export function getPremiumParts(category: string): string[] {
 /** All categories that have premium parts (for iteration) */
 export const PREMIUM_CATEGORIES = Object.keys(PREMIUM_MAP) as readonly string[];
 
-// Free-only arrays (all premium+epic parts filtered out) for random generation
+// ==================== Hidden Parts ====================
+// Parts that don't look good and aren't funny — hidden from picker + random
+// generation, but kept in the schema enum so existing saved configs still
+// validate and render. Tighten or extend this list as taste dictates.
+export const HIDDEN_PARTS = {
+  base: ['shield', 'triangle', 'hexagon'],
+  eyes: ['hypno', 'cyclops', 'robot', 'infinity'],
+  mouth: ['pipe', 'glitch', 'drool', 'mustache'],
+  hair: ['frizzle', 'ramen'],
+  accessory: ['plunger', 'cucumberFace'],
+} as const;
+
+type HiddenCategory = keyof typeof HIDDEN_PARTS;
+
+/** Return only the parts that should be shown in the picker UI. */
+export function visibleParts<T extends string>(category: HiddenCategory, all: readonly T[]): T[] {
+  const hidden = HIDDEN_PARTS[category] as readonly string[];
+  return all.filter(p => !hidden.includes(p));
+}
+
+const isHidden = (cat: HiddenCategory, v: string) =>
+  (HIDDEN_PARTS[cat] as readonly string[]).includes(v);
+
+// Free-only arrays (all premium+epic+hidden parts filtered out) for random generation
 // Also exclude 'none' from face parts so random avatars always have a complete face
-const FREE_BASES = AVATAR_BASES.filter(v => !PREMIUM_MAP.base.includes(v));
-const FREE_EYE_STYLES = AVATAR_EYE_STYLES.filter(v => v !== 'none' && !PREMIUM_MAP.eyes.includes(v));
-const FREE_MOUTH_STYLES = AVATAR_MOUTH_STYLES.filter(v => v !== 'none' && !PREMIUM_MAP.mouth.includes(v));
-const FREE_ACCESSORIES = AVATAR_ACCESSORIES.filter(v => !PREMIUM_MAP.accessory.includes(v));
+const FREE_BASES = AVATAR_BASES.filter(v => !PREMIUM_MAP.base.includes(v) && !isHidden('base', v));
+const FREE_EYE_STYLES = AVATAR_EYE_STYLES.filter(v => v !== 'none' && !PREMIUM_MAP.eyes.includes(v) && !isHidden('eyes', v));
+const FREE_MOUTH_STYLES = AVATAR_MOUTH_STYLES.filter(v => v !== 'none' && !PREMIUM_MAP.mouth.includes(v) && !isHidden('mouth', v));
+const FREE_ACCESSORIES = AVATAR_ACCESSORIES.filter(v => !PREMIUM_MAP.accessory.includes(v) && !isHidden('accessory', v));
 const FREE_FACIAL_HAIR_STYLES = AVATAR_FACIAL_HAIR_STYLES.filter(v => !PREMIUM_MAP.facialHair.includes(v));
 const FREE_EYEBROW_STYLES = AVATAR_EYEBROW_STYLES.filter(v => !PREMIUM_MAP.eyebrows.includes(v));
-const FREE_HAIR_STYLES = AVATAR_HAIR_STYLES.filter(v => v !== 'none' && !PREMIUM_MAP.hair.includes(v));
+const FREE_HAIR_STYLES = AVATAR_HAIR_STYLES.filter(v => v !== 'none' && !PREMIUM_MAP.hair.includes(v) && !isHidden('hair', v));
 
 export function getRandomAvatarConfig(): CustomAvatarConfig {
   const pick = <T>(arr: readonly T[]): T => arr[Math.floor(Math.random() * arr.length)];

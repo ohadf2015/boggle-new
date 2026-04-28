@@ -168,7 +168,7 @@ function Combover({ fill }: HairPartProps) {
 
 function Elvis({ fill }: HairPartProps) {
   const u = useAvatarUid();
-  const pompadour = "M28 32 Q26 10 40 0 Q52 -4 60 6 Q64 16 56 26 Q48 34 38 36";
+  const pompadour = "M28 32 Q26 10 40 2 Q52 0 60 8 Q64 16 56 26 Q48 34 38 36";
   const cap = "M20 36 Q20 18 50 14 Q80 18 80 36";
   return (
     <g>
@@ -189,8 +189,8 @@ function Elvis({ fill }: HairPartProps) {
       <path d={pompadour} fill={`url(#${u}hair-elvis-shade)`} stroke="none" />
       <path d={pompadour} fill={`url(#${u}hair-elvis-light)`} stroke="none" />
       {/* Pomade sheen — VIP specialty gradient accent */}
-      <path d="M30 8 Q42 -2 56 4 Q60 10 54 14 Q44 10 34 16 Z" fill={`url(#${u}hair-elvis-pomade)`} stroke="none" />
-      <path d="M36 10 Q44 0 52 6" fill="none" stroke="#fff" strokeWidth={1.4} opacity="0.35" strokeLinecap="round" />
+      <path d="M30 8 Q42 2 56 4 Q60 10 54 14 Q44 10 34 16 Z" fill={`url(#${u}hair-elvis-pomade)`} stroke="none" />
+      <path d="M36 10 Q44 4 52 6" fill="none" stroke="#fff" strokeWidth={1.4} opacity="0.35" strokeLinecap="round" />
       <path d="M34 18 Q42 10 50 14" fill="none" stroke="#fff" strokeWidth={0.8} opacity="0.18" />
       <path d="M38 14 Q44 6 50 10 M36 20 Q42 14 48 18" fill="none" stroke="#000" strokeWidth={1} opacity="0.15" />
       {/* Sideburns — connected to cap, tapered downward */}

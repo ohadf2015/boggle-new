@@ -17,8 +17,7 @@ jest.mock('framer-motion', () => ({
 
 const mockT = (key: string, params?: Record<string, string | number>) => {
   const translations: Record<string, string> = {
-    'daily.todayReward': "Today's reward: {{coins}} coins",
-    'daily.tomorrowReward': 'Tomorrow: {{coins}} coins',
+    'daily.today': 'TODAY',
     'daily.nearMilestone': '{{days}} days to {{badge}} badge!',
     'daily.nearMilestoneOne': '1 day to {{badge}} badge!',
     'daily.milestoneEarned': '🎉 {{badge}} unlocked!',
@@ -39,14 +38,17 @@ const mockT = (key: string, params?: Record<string, string | number>) => {
 };
 
 describe('DailyRewardPreview', () => {
-  it('renders today reward for streak day 1', () => {
+  it("renders today's reward dot for streak day 1", () => {
     render(<DailyRewardPreview currentStreakDay={1} t={mockT} />);
-    expect(screen.getByText(/10 coins/)).toBeInTheDocument();
+    const timeline = screen.getByTestId('reward-timeline');
+    expect(timeline).toHaveTextContent('10');
+    expect(timeline).toHaveTextContent('TODAY');
   });
 
-  it('renders tomorrow reward', () => {
+  it("renders tomorrow's reward dot", () => {
     render(<DailyRewardPreview currentStreakDay={1} t={mockT} />);
-    expect(screen.getByText(/15 coins/)).toBeInTheDocument();
+    const timeline = screen.getByTestId('reward-timeline');
+    expect(timeline).toHaveTextContent('15');
   });
 
   it('shows milestone proximity when near a badge milestone', () => {

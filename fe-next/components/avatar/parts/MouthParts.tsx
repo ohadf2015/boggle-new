@@ -72,7 +72,7 @@ function Oh() {
 function Smirk() {
   return (
     <g>
-      <path d="M38 62 Q50 68 62 56" fill="none" stroke="#000" strokeWidth={2.5} strokeLinecap="round" />
+      <path d="M38 62 Q50 68 62 56" fill="none" stroke="#000" strokeWidth={S} strokeLinecap="round" />
       <path d="M39 63 Q50 67 60 58" fill="#E85D75" opacity="0.35" />
       <circle cx="63" cy="57" r="1.2" fill="#000" opacity="0.3" />
       <path d="M64 55 Q66.5 57.5 64 60" fill="none" stroke="#000" strokeWidth={0.8} opacity="0.25" />

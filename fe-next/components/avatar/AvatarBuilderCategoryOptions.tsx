@@ -21,6 +21,7 @@ import {
   isPremiumPart,
   getPartPrice,
   PREMIUM_BG_COLORS,
+  visibleParts,
 } from '@/shared/types/customAvatar';
 import type { AvatarPremium } from './AvatarBuilderModal';
 import PartPreviewGrid from './AvatarBuilderPartGrid';
@@ -89,7 +90,7 @@ export default function CategoryOptions({ category, config, updateConfig, t, pre
             label={t('avatar.builder.shape')}
             partType="base"
             premiumCategory="base"
-            options={AVATAR_BASES}
+            options={visibleParts('base', AVATAR_BASES)}
             selected={config.base}
             onSelect={v => updateConfig('base', v)}
             config={config}
@@ -106,7 +107,7 @@ export default function CategoryOptions({ category, config, updateConfig, t, pre
         </div>
       );
     case 'hair': {
-      const hairOptions = config.gender === 'female' ? FEMALE_HAIR_STYLES : MALE_HAIR_STYLES;
+      const hairOptions = visibleParts('hair', config.gender === 'female' ? FEMALE_HAIR_STYLES : MALE_HAIR_STYLES);
       return (
         <div className="space-y-3">
           <PartPreviewGrid
@@ -163,7 +164,7 @@ export default function CategoryOptions({ category, config, updateConfig, t, pre
             label={t('avatar.builder.style')}
             partType="eyes"
             premiumCategory="eyes"
-            options={AVATAR_EYE_STYLES}
+            options={visibleParts('eyes', AVATAR_EYE_STYLES)}
             selected={config.eyes}
             onSelect={v => updateConfig('eyes', v)}
             config={config}
@@ -211,7 +212,7 @@ export default function CategoryOptions({ category, config, updateConfig, t, pre
           label={t('avatar.builder.style')}
           partType="mouth"
           premiumCategory="mouth"
-          options={AVATAR_MOUTH_STYLES}
+          options={visibleParts('mouth', AVATAR_MOUTH_STYLES)}
           selected={config.mouth}
           onSelect={v => updateConfig('mouth', v)}
           config={config}
@@ -243,7 +244,7 @@ export default function CategoryOptions({ category, config, updateConfig, t, pre
             label={t('avatar.builder.type')}
             partType="accessory"
             premiumCategory="accessory"
-            options={AVATAR_ACCESSORIES}
+            options={visibleParts('accessory', AVATAR_ACCESSORIES)}
             selected={config.accessory}
             onSelect={v => updateConfig('accessory', v)}
             config={config}

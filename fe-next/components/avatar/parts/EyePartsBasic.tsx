@@ -70,8 +70,8 @@ export function Wink() {
 export function Happy() {
   return (
     <g>
-      <path d="M33 44 Q38 38 43 44" fill="none" stroke="#000" strokeWidth={3} strokeLinecap="round" />
-      <path d="M57 44 Q62 38 67 44" fill="none" stroke="#000" strokeWidth={3} strokeLinecap="round" />
+      <path d="M33 44 Q38 38 43 44" fill="none" stroke="#000" strokeWidth={S} strokeLinecap="round" />
+      <path d="M57 44 Q62 38 67 44" fill="none" stroke="#000" strokeWidth={S} strokeLinecap="round" />
       <line x1="32" y1="43" x2="30" y2="42" stroke="#000" strokeWidth={1.2} strokeLinecap="round" opacity="0.5" />
       <line x1="32" y1="44.5" x2="30" y2="45" stroke="#000" strokeWidth={1.2} strokeLinecap="round" opacity="0.5" />
       <line x1="68" y1="43" x2="70" y2="42" stroke="#000" strokeWidth={1.2} strokeLinecap="round" opacity="0.5" />

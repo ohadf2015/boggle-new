@@ -19,8 +19,8 @@ export function Star() {
           <stop offset="100%" stopColor="#FFB300" />
         </linearGradient>
       </defs>
-      <polygon points="38,37 39.5,40.5 43,41 40.5,43.5 41,47 38,45 35,47 35.5,43.5 33,41 36.5,40.5" fill={`url(#${u}starEyeGrad)`} stroke="#000" strokeWidth={1.5} />
-      <polygon points="62,37 63.5,40.5 67,41 64.5,43.5 65,47 62,45 59,47 59.5,43.5 57,41 60.5,40.5" fill={`url(#${u}starEyeGrad)`} stroke="#000" strokeWidth={1.5} />
+      <polygon points="38,37 39.5,40.5 43,41 40.5,43.5 41,47 38,45 35,47 35.5,43.5 33,41 36.5,40.5" fill={`url(#${u}starEyeGrad)`} stroke="#000" strokeWidth={S} />
+      <polygon points="62,37 63.5,40.5 67,41 64.5,43.5 65,47 62,45 59,47 59.5,43.5 57,41 60.5,40.5" fill={`url(#${u}starEyeGrad)`} stroke="#000" strokeWidth={S} />
       <polygon points="38,39.5 38.8,41 40,41.3 39,42.3 39.2,43.5 38,42.8 36.8,43.5 37,42.3 36,41.3 37.2,41" fill="#fff" opacity="0.45" />
       <polygon points="62,39.5 62.8,41 64,41.3 63,42.3 63.2,43.5 62,42.8 60.8,43.5 61,42.3 60,41.3 61.2,41" fill="#fff" opacity="0.45" />
     </g>
@@ -60,8 +60,8 @@ export function Hearts() {
     <g>
       <circle cx="38" cy="42" r="8" fill="#FF1493" opacity="0.1" />
       <circle cx="62" cy="42" r="8" fill="#FF1493" opacity="0.1" />
-      <path d="M38 38 C36 35 32 35 32 39 C32 43 38 46 38 46 C38 46 44 43 44 39 C44 35 40 35 38 38Z" fill="#FF1493" stroke="#000" strokeWidth={1.5} />
-      <path d="M62 38 C60 35 56 35 56 39 C56 43 62 46 62 46 C62 46 68 43 68 39 C68 35 64 35 62 38Z" fill="#FF1493" stroke="#000" strokeWidth={1.5} />
+      <path d="M38 38 C36 35 32 35 32 39 C32 43 38 46 38 46 C38 46 44 43 44 39 C44 35 40 35 38 38Z" fill="#FF1493" stroke="#000" strokeWidth={S} />
+      <path d="M62 38 C60 35 56 35 56 39 C56 43 62 46 62 46 C62 46 68 43 68 39 C68 35 64 35 62 38Z" fill="#FF1493" stroke="#000" strokeWidth={S} />
       <path d="M36 37.5 C35 36.5 33.5 37 34 38.5" fill="none" stroke="#fff" strokeWidth={1.2} strokeLinecap="round" opacity="0.6" />
       <path d="M60 37.5 C59 36.5 57.5 37 58 38.5" fill="none" stroke="#fff" strokeWidth={1.2} strokeLinecap="round" opacity="0.6" />
     </g>
@@ -214,21 +214,21 @@ export function Alien() {
           <stop offset="100%" stopColor="#008800" />
         </linearGradient>
       </defs>
-      <ellipse cx="36" cy="42" rx="11" ry="8" fill="none" stroke={`url(#${u}alienRim)`} strokeWidth={0.8} opacity="0.5" transform="rotate(-10 36 42)" />
-      <ellipse cx="64" cy="42" rx="11" ry="8" fill="none" stroke={`url(#${u}alienRim)`} strokeWidth={0.8} opacity="0.5" transform="rotate(10 64 42)" />
-      <ellipse cx="36" cy="42" rx="10" ry="7" fill={`url(#${u}alienLens)`} stroke="#00FF00" strokeWidth={S} transform="rotate(-10 36 42)" />
-      <ellipse cx="64" cy="42" rx="10" ry="7" fill={`url(#${u}alienLens)`} stroke="#00FF00" strokeWidth={S} transform="rotate(10 64 42)" />
-      <ellipse cx="36" cy="42" rx="9" ry="6" fill="none" stroke="#00FF00" strokeWidth={0.5} opacity="0.25" transform="rotate(-10 36 42)" />
-      <path d="M30 40 Q33 42 30 44" fill="none" stroke="#00AA00" strokeWidth={0.4} opacity="0.3" />
-      <path d="M42 40 Q39 42 42 44" fill="none" stroke="#00AA00" strokeWidth={0.4} opacity="0.3" />
-      <path d="M58 40 Q61 42 58 44" fill="none" stroke="#00AA00" strokeWidth={0.4} opacity="0.3" />
-      <path d="M70 40 Q67 42 70 44" fill="none" stroke="#00AA00" strokeWidth={0.4} opacity="0.3" />
+      <ellipse cx="38" cy="42" rx="10" ry="7.5" fill="none" stroke={`url(#${u}alienRim)`} strokeWidth={0.8} opacity="0.5" transform="rotate(-6 38 42)" />
+      <ellipse cx="62" cy="42" rx="10" ry="7.5" fill="none" stroke={`url(#${u}alienRim)`} strokeWidth={0.8} opacity="0.5" transform="rotate(6 62 42)" />
+      <ellipse cx="38" cy="42" rx="9" ry="6.5" fill={`url(#${u}alienLens)`} stroke="#00FF00" strokeWidth={S} transform="rotate(-6 38 42)" />
+      <ellipse cx="62" cy="42" rx="9" ry="6.5" fill={`url(#${u}alienLens)`} stroke="#00FF00" strokeWidth={S} transform="rotate(6 62 42)" />
+      <ellipse cx="38" cy="42" rx="8" ry="5.5" fill="none" stroke="#00FF00" strokeWidth={0.5} opacity="0.25" transform="rotate(-6 38 42)" />
+      <path d="M32 40 Q35 42 32 44" fill="none" stroke="#00AA00" strokeWidth={0.4} opacity="0.3" />
+      <path d="M44 40 Q41 42 44 44" fill="none" stroke="#00AA00" strokeWidth={0.4} opacity="0.3" />
+      <path d="M56 40 Q59 42 56 44" fill="none" stroke="#00AA00" strokeWidth={0.4} opacity="0.3" />
+      <path d="M68 40 Q65 42 68 44" fill="none" stroke="#00AA00" strokeWidth={0.4} opacity="0.3" />
       <ellipse cx="38" cy="42" rx="3" ry="4" fill="#00FF00" opacity="0.8" />
       <ellipse cx="62" cy="42" rx="3" ry="4" fill="#00FF00" opacity="0.8" />
       <ellipse cx="38" cy="42" rx="1.5" ry="3" fill="#88FF88" opacity="0.4" />
       <ellipse cx="62" cy="42" rx="1.5" ry="3" fill="#88FF88" opacity="0.4" />
-      <circle cx="35" cy="39.5" r="1.5" fill="#fff" opacity="0.4" />
-      <circle cx="61" cy="39.5" r="1.5" fill="#fff" opacity="0.4" />
+      <circle cx="36" cy="39.5" r="1.5" fill="#fff" opacity="0.4" />
+      <circle cx="60" cy="39.5" r="1.5" fill="#fff" opacity="0.4" />
     </g>
   );
 }
@@ -275,14 +275,14 @@ export function FlameEyes() {
       </defs>
       <circle cx="38" cy="42" r="9" fill="#FF6D00" opacity="0.08" />
       <circle cx="62" cy="42" r="9" fill="#FF6D00" opacity="0.08" />
-      <path d="M38 48 C32 44 32 38 38 34 C44 38 44 44 38 48Z" fill={`url(#${u}flameEyeGrad)`} stroke="#000" strokeWidth={1.5}>
+      <path d="M38 47 C33 43.5 33 38.5 38 36 C43 38.5 43 43.5 38 47Z" fill={`url(#${u}flameEyeGrad)`} stroke="#000" strokeWidth={S}>
         <animateTransform attributeName="transform" type="scale" values="1 1;1.01 1.04;1 1" dur="3s" repeatCount="indefinite" additive="sum" />
       </path>
-      <path d="M62 48 C56 44 56 38 62 34 C68 38 68 44 62 48Z" fill={`url(#${u}flameEyeGrad)`} stroke="#000" strokeWidth={1.5}>
+      <path d="M62 47 C57 43.5 57 38.5 62 36 C67 38.5 67 43.5 62 47Z" fill={`url(#${u}flameEyeGrad)`} stroke="#000" strokeWidth={S}>
         <animateTransform attributeName="transform" type="scale" values="1 1;1.01 1.04;1 1" dur="3.5s" repeatCount="indefinite" additive="sum" />
       </path>
-      <path d="M38 46 C35 43 35 39 38 37 C41 39 41 43 38 46Z" fill="#FFD600" opacity="0.6" />
-      <path d="M62 46 C59 43 59 39 62 37 C65 39 65 43 62 46Z" fill="#FFD600" opacity="0.6" />
+      <path d="M38 45 C35.5 42.5 35.5 39.5 38 38 C40.5 39.5 40.5 42.5 38 45Z" fill="#FFD600" opacity="0.6" />
+      <path d="M62 45 C59.5 42.5 59.5 39.5 62 38 C64.5 39.5 64.5 42.5 62 45Z" fill="#FFD600" opacity="0.6" />
       <path d="M38 44 C37 42 37 41 38 40 C39 41 39 42 38 44Z" fill="#fff" opacity="0.7" />
       <path d="M62 44 C61 42 61 41 62 40 C63 41 63 42 62 44Z" fill="#fff" opacity="0.7" />
       <circle cx="36" cy="36" r="0.5" fill="#FFD600"><animate attributeName="cy" values="36;30;24" dur="4s" repeatCount="indefinite" /><animate attributeName="opacity" values="0.6;0.25;0" dur="4s" repeatCount="indefinite" /></circle>

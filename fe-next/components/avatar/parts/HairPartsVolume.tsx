@@ -314,7 +314,7 @@ function Mullet({ fill }: HairPartProps) {
 function Frizzle({ fill }: HairPartProps) {
   const u = useAvatarUid();
   /* Spiky polygon silhouette — clearly distinct from Afro's smooth bumps */
-  const spiky = "M18 52 L8 44 L14 36 L6 28 L14 20 L8 12 L18 8 L16 0 L26 4 L30 -6 L38 0 L42 -8 L50 -2 L56 -8 L62 0 L70 -6 L74 4 L82 0 L84 8 L92 12 L82 20 L94 28 L86 36 L92 44 L82 52Z";
+  const spiky = "M18 52 L8 44 L14 36 L6 28 L14 20 L8 12 L18 8 L16 2 L26 5 L30 0 L38 3 L42 1 L50 4 L56 1 L62 3 L70 0 L74 5 L82 2 L84 8 L92 12 L82 20 L94 28 L86 36 L92 44 L82 52Z";
   return (
     <g>
       <defs><HairPolishDefs uid={u} keyName="frizzle" /></defs>
@@ -324,11 +324,11 @@ function Frizzle({ fill }: HairPartProps) {
       {/* Face reveal */}
       <path d="M20 44 Q50 18 80 44 Q82 36 82 26 Q82 18 50 18 Q18 18 18 26 Q18 36 20 44Z" fill={fill} stroke="none" />
       {/* Wild frizz texture strokes */}
-      <path d="M22 30 L18 24 M30 16 L26 10 M40 8 L38 2 M50 5 L50 -2 M60 8 L62 2 M70 16 L74 10 M78 30 L82 24"
+      <path d="M22 30 L18 24 M30 16 L26 10 M40 8 L38 3 M50 6 L50 1 M60 8 L62 3 M70 16 L74 10 M78 30 L82 24"
         stroke="#000" strokeWidth={0.8} opacity="0.15" />
-      <path d="M25 26 L20 20 M36 12 L34 6 M46 6 L44 0 M54 6 L56 0 M64 12 L66 6 M75 26 L80 20"
+      <path d="M25 26 L20 20 M36 12 L34 6 M46 6 L44 1 M54 6 L56 1 M64 12 L66 6 M75 26 L80 20"
         stroke="#000" strokeWidth={0.6} opacity="0.1" />
-      <path d="M28 8 Q42 0 50 -2 Q58 0 72 8" fill="none" stroke="#fff" strokeWidth={1.5} opacity="0.18" />
+      <path d="M28 8 Q42 2 50 1 Q58 2 72 8" fill="none" stroke="#fff" strokeWidth={1.5} opacity="0.18" />
     </g>
   );
 }

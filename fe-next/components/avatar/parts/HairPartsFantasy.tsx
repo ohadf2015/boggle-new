@@ -26,9 +26,9 @@ function FlameHair({ fill }: HairPartProps) {
       </path>
       <path d="M38 34 C40 24 46 18 50 10 M62 34 C60 24 54 18 50 10" fill="none" stroke="#FFEB3B" strokeWidth={0.8} opacity="0.25" />
       {/* Ember particles — slow gentle float */}
-      {[{cx:32,cy:6,r:1.5,c:'#FFD600',d:4},{cx:66,cy:8,r:1.2,c:'#FF9100',d:5},{cx:50,cy:-2,r:1.5,c:'#FFEB3B',d:4.5}].map((e,i) => (
+      {[{cx:32,cy:8,r:1.5,c:'#FFD600',d:4},{cx:66,cy:10,r:1.2,c:'#FF9100',d:5},{cx:50,cy:4,r:1.5,c:'#FFEB3B',d:4.5}].map((e,i) => (
         <circle key={`${e.cx}-${e.cy}`} cx={e.cx} cy={e.cy} r={e.r} fill={e.c}>
-          <animate attributeName="cy" values={`${e.cy};${e.cy-6};${e.cy-12};${e.cy}`} dur={`${e.d}s`} begin={`${i*0.8}s`} repeatCount="indefinite" />
+          <animate attributeName="cy" values={`${e.cy};${Math.max(0, e.cy-3)};${Math.max(0, e.cy-6)};${e.cy}`} dur={`${e.d}s`} begin={`${i*0.8}s`} repeatCount="indefinite" />
           <animate attributeName="opacity" values="0.6;0.25;0;0.6" dur={`${e.d}s`} begin={`${i*0.8}s`} repeatCount="indefinite" />
         </circle>
       ))}
@@ -100,7 +100,7 @@ function NeonHair(_props: HairPartProps) {
       ))}
       <path d="M40 22 L42 8 M60 20 L58 8" stroke="#fff" strokeWidth={0.8} opacity="0.25" />
       {/* Electric sparks — slower, less frantic */}
-      {[{d:'M36 8 L38 4 L34 6',c:'#00FFFF',b:0},{d:'M62 6 L60 2 L64 4',c:'#FF00FF',b:1.5},{d:'M46 2 L48 -2 L44 0',c:'#00FFFF',b:3},{d:'M56 8 L54 4 L58 6',c:'#FF00FF',b:4.5}].map((s,i) => (
+      {[{d:'M36 8 L38 4 L34 6',c:'#00FFFF',b:0},{d:'M62 8 L60 4 L64 6',c:'#FF00FF',b:1.5},{d:'M46 6 L48 2 L44 4',c:'#00FFFF',b:3},{d:'M56 8 L54 4 L58 6',c:'#FF00FF',b:4.5}].map((s,i) => (
         <g key={s.d}><animate attributeName="opacity" values="0;0.7;0.7;0" dur="4s" begin={`${s.b}s`} repeatCount="indefinite" /><path d={s.d} stroke={s.c} strokeWidth={i<2?1:0.8} fill="none" /></g>
       ))}
     </g>

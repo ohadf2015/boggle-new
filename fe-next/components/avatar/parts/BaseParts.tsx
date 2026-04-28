@@ -151,8 +151,8 @@ function Skull({ fill }: BasePartProps) {
       {/* Cranium top highlight */}
       <path d="M30 20 Q50 12 70 20" fill="none" stroke="#fff" strokeWidth={1.5} opacity="0.2" />
       {/* Deep eye sockets — sized to frame composable eyes at cx=38/62 y=42 */}
-      <ellipse cx="38" cy="42" rx="10" ry="10" fill="#000" opacity="0.3" />
-      <ellipse cx="62" cy="42" rx="10" ry="10" fill="#000" opacity="0.3" />
+      <ellipse cx="38" cy="42" rx="8" ry="8" fill="#000" opacity="0.22" />
+      <ellipse cx="62" cy="42" rx="8" ry="8" fill="#000" opacity="0.22" />
       {/* Cheekbone ridges */}
       <path d="M24 50 Q30 46 36 50" fill="none" stroke="#000" strokeWidth={1.5} opacity="0.35" />
       <path d="M64 50 Q70 46 76 50" fill="none" stroke="#000" strokeWidth={1.5} opacity="0.35" />
@@ -239,20 +239,9 @@ function DragonHead({ fill }: BasePartProps) {
       {/* Nostrils (below nose zone, above mouth zone) */}
       <ellipse cx="44" cy="54" rx="2.5" ry="2" fill="#000" opacity="0.4" />
       <ellipse cx="56" cy="54" rx="2.5" ry="2" fill="#000" opacity="0.4" />
-      {/* Nostril glow */}
-      <ellipse cx="44" cy="54" rx="1.5" ry="1" fill="#FF4500">
-        <animate attributeName="opacity" values="0.3;0.6;0.3" dur="2s" repeatCount="indefinite" />
-      </ellipse>
-      <ellipse cx="56" cy="54" rx="1.5" ry="1" fill="#FF4500">
-        <animate attributeName="opacity" values="0.3;0.6;0.3" dur="2s" begin="0.5s" repeatCount="indefinite" />
-      </ellipse>
-
-      {/* Smoke wisps */}
-      <circle cx="43" cy="52" r="1" fill="#888">
-        <animate attributeName="cy" values="52;44;36" dur="3s" repeatCount="indefinite" />
-        <animate attributeName="opacity" values="0.25;0.1;0" dur="3s" repeatCount="indefinite" />
-        <animate attributeName="r" values="1;2;3" dur="3s" repeatCount="indefinite" />
-      </circle>
+      {/* Nostril glow — static */}
+      <ellipse cx="44" cy="54" rx="1.5" ry="1" fill="#FF4500" opacity="0.45" />
+      <ellipse cx="56" cy="54" rx="1.5" ry="1" fill="#FF4500" opacity="0.45" />
 
       {/* Jaw spikes */}
       <polygon points="22,60 16,66 24,64" fill={fill} stroke="#000" strokeWidth={1.2} />

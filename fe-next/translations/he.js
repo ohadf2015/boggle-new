@@ -5015,8 +5015,6 @@ const he = {
     "streakFreezeTooltip": "הקפאת רצף — מגנה על הרצף שלך אם תפספס יום",
     "streakFreezesAvailable": "{count} הקפאות רצף זמינות",
     "watchAdForFreeze": "צפו בפרסומת ← קבלו הקפאת רצף",
-    "todayReward": "היום: {{coins}} מטבעות",
-    "tomorrowReward": "מחר: {{coins}} מטבעות",
     "nearMilestone": "{{days}} ימים לתג {{badge}}!",
     "nearMilestoneOne": "יום אחד לתג {{badge}}!",
     "milestoneEarned": "🎉 פתחת את התג {{badge}}!",

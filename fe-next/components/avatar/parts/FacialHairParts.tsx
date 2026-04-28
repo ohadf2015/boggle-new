@@ -172,7 +172,7 @@ function WizardBeard({ fill }: FacialHairProps) {
         </linearGradient>
       </defs>
       {/* Main flowing beard shape */}
-      <path d="M34 58 Q36 56 40 57 Q44 58 47 58 Q50 58 53 58 Q56 58 60 57 Q64 56 66 58 Q70 64 68 74 Q66 82 62 88 Q58 94 54 97 Q52 98 50 99 Q48 98 46 97 Q42 94 38 88 Q34 82 32 74 Q30 64 34 58Z" fill={`url(#${u}wizardBeardGrad)`} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      <path d="M34 58 Q36 56 40 57 Q44 58 47 58 Q50 58 53 58 Q56 58 60 57 Q64 56 66 58 Q70 64 68 74 Q66 82 62 86 Q58 91 54 93 Q52 94 50 94 Q48 94 46 93 Q42 91 38 86 Q34 82 32 74 Q30 64 34 58Z" fill={`url(#${u}wizardBeardGrad)`} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
       {/* Mustache portion */}
       <path d="M40 57 Q44 55 47 56 Q50 57.5 50 57.5 Q50 57.5 53 56 Q56 55 60 57" fill="none" stroke="#000" strokeWidth={1} opacity="0.3" />
       {/* Wispy flow lines */}
@@ -180,9 +180,9 @@ function WizardBeard({ fill }: FacialHairProps) {
       <path d="M50 60 Q50 72 50 82 Q50 90 50 97" fill="none" stroke="#000" strokeWidth={0.5} opacity="0.08" />
       <path d="M62 64 Q60 72 58 80 Q56 88 54 94" fill="none" stroke="#000" strokeWidth={0.4} opacity="0.1" />
       {/* Wispy tendrils at the tip */}
-      <path d="M46 94 Q44 98 42 100" fill="none" stroke={fill} strokeWidth={1.5} strokeLinecap="round" opacity="0.5" />
-      <path d="M50 97 Q50 100 50 102" fill="none" stroke={fill} strokeWidth={1.5} strokeLinecap="round" opacity="0.4" />
-      <path d="M54 94 Q56 98 58 100" fill="none" stroke={fill} strokeWidth={1.5} strokeLinecap="round" opacity="0.5" />
+      <path d="M46 92 Q44 95 42 96" fill="none" stroke={fill} strokeWidth={1.5} strokeLinecap="round" opacity="0.5" />
+      <path d="M50 94 Q50 96 50 96" fill="none" stroke={fill} strokeWidth={1.5} strokeLinecap="round" opacity="0.4" />
+      <path d="M54 92 Q56 95 58 96" fill="none" stroke={fill} strokeWidth={1.5} strokeLinecap="round" opacity="0.5" />
       {/* Subtle highlight streaks */}
       <path d="M44 62 Q46 68 46 74" fill="none" stroke="#fff" strokeWidth={0.6} opacity="0.1" />
       <path d="M56 62 Q54 68 54 74" fill="none" stroke="#fff" strokeWidth={0.6} opacity="0.1" />

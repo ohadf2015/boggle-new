@@ -5040,8 +5040,6 @@ const es = {
     "streakFreezeTooltip": "Congelación de racha — protege tu racha si te saltas un día",
     "streakFreezesAvailable": "{count} congelaciones de racha disponibles",
     "watchAdForFreeze": "Ver anuncio → gana una congelación",
-    "todayReward": "Hoy: {{coins}} monedas",
-    "tomorrowReward": "Mañana: {{coins}} monedas",
     "nearMilestone": "¡{{days}} días para la insignia {{badge}}!",
     "nearMilestoneOne": "¡1 día para la insignia {{badge}}!",
     "milestoneEarned": "🎉 ¡Insignia {{badge}} desbloqueada!",

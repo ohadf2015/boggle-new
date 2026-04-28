@@ -5142,8 +5142,6 @@ const en = {
     "streakFreezeTooltip": "Streak Freeze — protects your streak if you miss a day",
     "streakFreezesAvailable": "{count} streak freezes available",
     "watchAdForFreeze": "Watch ad → earn a streak freeze",
-    "todayReward": "Today: {{coins}} coins",
-    "tomorrowReward": "Tomorrow: {{coins}} coins",
     "nearMilestone": "{{days}} days to {{badge}} badge!",
     "nearMilestoneOne": "1 day to {{badge}} badge!",
     "milestoneEarned": "🎉 {{badge}} unlocked!",

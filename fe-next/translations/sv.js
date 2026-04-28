@@ -5020,8 +5020,6 @@ const sv = {
     "streakFreezeTooltip": "Svitfrys — skyddar din svit om du missar en dag",
     "streakFreezesAvailable": "{count} svitfrysar tillgängliga",
     "watchAdForFreeze": "Se reklam → få en svitfrys",
-    "todayReward": "Idag: {{coins}} mynt",
-    "tomorrowReward": "Imorgon: {{coins}} mynt",
     "nearMilestone": "{{days}} dagar till {{badge}}-märke!",
     "nearMilestoneOne": "1 dag till {{badge}}-märke!",
     "milestoneEarned": "🎉 {{badge}} upplåst!",

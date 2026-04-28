@@ -210,12 +210,12 @@ function Tiara({ fill }: AccessoryPartProps) {
 function Antenna({ fill }: AccessoryPartProps) {
   return (
     <g>
-      <line x1="50" y1="20" x2="50" y2="6" stroke="#000" strokeWidth={S} strokeLinecap="round" />
-      <line x1="50" y1="16" x2="50" y2="14" stroke="#555" strokeWidth={3.5} />
-      <line x1="50" y1="12" x2="50" y2="10" stroke="#555" strokeWidth={3.5} />
-      <circle cx="50" cy="0" r="4" fill={fill} stroke="#000" strokeWidth={S} />
-      <circle cx="50" cy="0" r="6" fill={fill} opacity="0.15" />
-      <circle cx="49" cy="-1" r="1.2" fill="#fff" opacity="0.4" />
+      <line x1="50" y1="22" x2="50" y2="10" stroke="#000" strokeWidth={S} strokeLinecap="round" />
+      <line x1="50" y1="18" x2="50" y2="16" stroke="#555" strokeWidth={3.5} />
+      <line x1="50" y1="14" x2="50" y2="12" stroke="#555" strokeWidth={3.5} />
+      <circle cx="50" cy="6" r="4" fill={fill} stroke="#000" strokeWidth={S} />
+      <circle cx="50" cy="6" r="6" fill={fill} opacity="0.15" />
+      <circle cx="49" cy="5" r="1.2" fill="#fff" opacity="0.4" />
     </g>
   );
 }
@@ -369,10 +369,10 @@ function ClownNose({ fill }: AccessoryPartProps) {
 function PartyHat({ fill }: AccessoryPartProps) {
   return (
     <g>
-      <path d="M30 28 L50 -2 L70 28Z" fill={fill} stroke="#000" strokeWidth={SO} strokeLinejoin="round" />
-      <path d="M36 20 L50 2 L64 20" fill="none" stroke="#FF1493" strokeWidth={2} opacity="0.5" />
-      <path d="M40 14 L50 2 L60 14" fill="none" stroke="#00FFFF" strokeWidth={2} opacity="0.5" />
-      <circle cx="50" cy="-2" r="5" fill="#BFFF00" stroke="#000" strokeWidth={S} />
+      <path d="M30 28 L50 2 L70 28Z" fill={fill} stroke="#000" strokeWidth={SO} strokeLinejoin="round" />
+      <path d="M36 20 L50 6 L64 20" fill="none" stroke="#FF1493" strokeWidth={2} opacity="0.5" />
+      <path d="M40 14 L50 6 L60 14" fill="none" stroke="#00FFFF" strokeWidth={2} opacity="0.5" />
+      <circle cx="50" cy="2" r="4" fill="#BFFF00" stroke="#000" strokeWidth={S} />
       <path d="M30 28 Q25 50 22 58" stroke="#000" strokeWidth={1} fill="none" opacity="0.4" />
       <path d="M70 28 Q75 50 78 58" stroke="#000" strokeWidth={1} fill="none" opacity="0.4" />
     </g>
@@ -470,7 +470,7 @@ function CucumberFace({ fill }: AccessoryPartProps) {
 function Plunger({ fill }: AccessoryPartProps) {
   return (
     <g>
-      <line x1="50" y1="18" x2="50" y2="-4" stroke="#8B6E4E" strokeWidth={3} strokeLinecap="round" />
+      <line x1="50" y1="18" x2="50" y2="2" stroke="#8B6E4E" strokeWidth={3} strokeLinecap="round" />
       <path d="M38 18 Q38 10 50 8 Q62 10 62 18 Q62 24 50 26 Q38 24 38 18Z" fill={fill} stroke="#000" strokeWidth={S} />
       <circle cx="50" cy="22" r="3" fill="none" stroke="#000" strokeWidth={1} opacity="0.2" />
     </g>
@@ -532,14 +532,14 @@ function WizardHat({ fill }: AccessoryPartProps) {
           <stop offset="100%" stopColor="#1A0033" />
         </linearGradient>
       </defs>
-      <path d="M25 32 L50 -5 L75 32 Q62 28 50 30 Q38 28 25 32Z" fill={`url(#${u}wizardGrad)`} stroke="#000" strokeWidth={SO} />
+      <path d="M25 32 L50 0 L75 32 Q62 28 50 30 Q38 28 25 32Z" fill={`url(#${u}wizardGrad)`} stroke="#000" strokeWidth={SO} />
       <ellipse cx="50" cy="32" rx="30" ry="5" fill={fill} stroke="#000" strokeWidth={SO} />
-      <polygon points="40,10 41,13 44,13 41.5,15 42.5,18 40,16 37.5,18 38.5,15 36,13 39,13" fill="#FFD700" />
-      <polygon points="58,16 59,18 61,18 59.5,19.5 60,21.5 58,20 56,21.5 56.5,19.5 55,18 57,18" fill="#FFD700" />
+      <polygon points="40,12 41,15 44,15 41.5,17 42.5,20 40,18 37.5,20 38.5,17 36,15 39,15" fill="#FFD700" />
+      <polygon points="58,18 59,20 61,20 59.5,21.5 60,23.5 58,22 56,23.5 56.5,21.5 55,20 57,20" fill="#FFD700" />
       <circle cx="48" cy="22" r="1.5" fill="#E040FB" opacity="0.8" />
       <circle cx="34" cy="24" r="1" fill="#FFD700" opacity="0.5" />
-      <circle cx="64" cy="20" r="0.8" fill="#E040FB" opacity="0.4" />
-      <path d="M50 -5 Q56 -2 52 4" fill="none" stroke="#FFD700" strokeWidth={1.5} strokeLinecap="round" />
+      <circle cx="64" cy="22" r="0.8" fill="#E040FB" opacity="0.4" />
+      <path d="M50 2 Q56 4 52 8" fill="none" stroke="#FFD700" strokeWidth={1.5} strokeLinecap="round" />
     </g>
   );
 }
@@ -592,12 +592,12 @@ function PhoenixCrown({ fill }: AccessoryPartProps) {
       <circle cx="35" cy="22" r="2.5" fill={`url(#${u}phoenixGemGrad)`} stroke="#000" strokeWidth={1} />
       <circle cx="65" cy="22" r="2.5" fill={`url(#${u}phoenixGemGrad)`} stroke="#000" strokeWidth={1} />
       <circle cx="20" cy="8" r="1" fill="#FFD600" opacity="0.7" />
-      <circle cx="42" cy="2" r="0.8" fill="#FF6D00" opacity="0.6" />
-      <circle cx="58" cy="4" r="1" fill="#FFD600" opacity="0.7" />
+      <circle cx="42" cy="4" r="0.8" fill="#FF6D00" opacity="0.6" />
+      <circle cx="58" cy="6" r="1" fill="#FFD600" opacity="0.7" />
       <circle cx="80" cy="8" r="0.8" fill="#FF6D00" opacity="0.6" />
-      <circle cx="50" cy="0" r="1.2" fill="#fff" opacity="0.5" />
-      <circle cx="30" cy="4" r="0.6" fill="#FFD600" opacity="0.5" />
-      <circle cx="70" cy="2" r="0.7" fill="#FFAB00" opacity="0.5" />
+      <circle cx="50" cy="3" r="1.2" fill="#fff" opacity="0.5" />
+      <circle cx="30" cy="6" r="0.6" fill="#FFD600" opacity="0.5" />
+      <circle cx="70" cy="4" r="0.7" fill="#FFAB00" opacity="0.5" />
       <line x1="30" y1="28" x2="70" y2="28" stroke="#FFD600" strokeWidth={1} opacity="0.6" />
     </g>
   );
@@ -700,16 +700,16 @@ function BunnyEars({ fill }: AccessoryPartProps) {
   return (
     <g>
       {/* Left ear — upright */}
-      <path d="M34 26 Q32 -4 30 -10 Q28 -14 34 -12 Q40 -10 38 20" fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
-      <path d="M35 22 Q34 0 33 -6 Q32 -8 35 -7 Q37 -6 37 18" fill="#FFB6C1" stroke="none" />
+      <path d="M34 26 Q32 6 30 2 Q28 0 34 1 Q40 2 38 20" fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      <path d="M35 22 Q34 10 33 6 Q32 4 35 5 Q37 6 37 18" fill="#FFB6C1" stroke="none" />
       {/* Right ear — slightly drooping */}
-      <path d="M66 26 Q70 -2 74 -6 Q78 -8 80 -4 Q82 2 72 20" fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
-      <path d="M68 22 Q71 2 74 -2 Q76 -4 77 -1 Q78 4 71 18" fill="#FFB6C1" stroke="none" />
+      <path d="M66 26 Q70 8 74 4 Q78 2 80 6 Q82 12 72 20" fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      <path d="M68 22 Q71 12 74 8 Q76 6 77 9 Q78 14 71 18" fill="#FFB6C1" stroke="none" />
       {/* Right ear droop curve */}
-      <path d="M74 -6 Q78 -2 80 4" fill="none" stroke="#000" strokeWidth={0.6} opacity="0.15" />
+      <path d="M74 4 Q78 8 80 14" fill="none" stroke="#000" strokeWidth={0.6} opacity="0.15" />
       {/* Ear highlights */}
-      <path d="M33 4 L34 10" stroke="#fff" strokeWidth={0.6} opacity="0.2" />
-      <path d="M73 2 L72 8" stroke="#fff" strokeWidth={0.6} opacity="0.2" />
+      <path d="M33 8 L34 14" stroke="#fff" strokeWidth={0.6} opacity="0.2" />
+      <path d="M73 8 L72 14" stroke="#fff" strokeWidth={0.6} opacity="0.2" />
     </g>
   );
 }

@@ -114,11 +114,12 @@
 
 /* ── Legendary Tier ── */
 
+/* Halo glow cycles through warm gold/amber/rose without recoloring the avatar itself.
+   Uses drop-shadow color shift only — no hue-rotate, so skin/hair/eyes stay true. */
 @keyframes avatar-holo {
-  0% { filter: drop-shadow(0 0 6px var(--tier-color)) hue-rotate(0deg) brightness(1); }
-  33% { filter: drop-shadow(0 0 14px var(--tier-color)) hue-rotate(120deg) brightness(1.08); }
-  66% { filter: drop-shadow(0 0 10px var(--tier-color)) hue-rotate(240deg) brightness(1.04); }
-  100% { filter: drop-shadow(0 0 6px var(--tier-color)) hue-rotate(360deg) brightness(1); }
+  0%, 100% { filter: drop-shadow(0 0 6px rgba(255, 215, 0, 0.7)) brightness(1); }
+  33% { filter: drop-shadow(0 0 14px rgba(255, 140, 0, 0.7)) brightness(1.03); }
+  66% { filter: drop-shadow(0 0 10px rgba(255, 105, 180, 0.6)) brightness(1.02); }
 }
 
 @keyframes avatar-breathe {
@@ -140,7 +141,7 @@
 
 .avatar-tier-legendary {
   --tier-color: rgba(255, 170, 0, 0.7);
-  animation: avatar-breathe 3s ease-in-out infinite, avatar-holo 5s linear infinite;
+  animation: avatar-breathe 3s ease-in-out infinite, avatar-holo 6s ease-in-out infinite;
 }
 
 .avatar-tier-legendary .avatar-shimmer-overlay::after {

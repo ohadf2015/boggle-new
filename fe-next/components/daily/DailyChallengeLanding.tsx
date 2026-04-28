@@ -369,7 +369,8 @@ export function DailyChallengeLanding({
         </div>
       )}
       {/* Streak preview is auth-only — guests don't get streak tracking (storage.ts:205) */}
-      {user && <DailyRewardPreview currentStreakDay={streak} t={t} />}
+      {/* Pass streak + 1: today's claim becomes day N+1, where streak = days already completed */}
+      {user && <DailyRewardPreview currentStreakDay={streak + 1} t={t} />}
 
       {/* Leaderboard Teaser — only render after client-side date hydration */}
       {todayIso && (
