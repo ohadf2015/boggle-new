@@ -1,20 +1,25 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { Trophy } from 'lucide-react';
 import { useSeason } from '@/hooks/useSeason';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { tierColor } from '@/lib/tierColors';
 
 export const SeasonBanner: React.FC = () => {
   const { currentSeason, timeRemaining, peakTier } = useSeason();
   const { t } = useLanguage();
+  const { isOnCrazyGamesPlatform } = useCrazyGames();
+  if (isOnCrazyGamesPlatform) return null;
 
   const isEndingSoon = timeRemaining.days < 7;
   const isCritical = timeRemaining.days <= 1;
   const isUnranked = peakTier === 'Unranked';
   const color = tierColor(peakTier);
+  const hasArt = Boolean(currentSeason.imageUrl);
 
   return (
     <motion.div
@@ -31,10 +36,27 @@ export const SeasonBanner: React.FC = () => {
       data-testid="season-banner"
     >
       <div className="flex items-center gap-3 min-w-0">
-        <Trophy
-          className={`w-6 h-6 shrink-0 ${isEndingSoon ? 'text-neo-pink' : 'text-neo-yellow'}`}
-          aria-hidden="true"
-        />
+        {hasArt ? (
+          <div
+            className="relative w-12 h-12 shrink-0 rounded-neo border-neo border-black overflow-hidden shadow-hard-sm"
+            style={{ backgroundColor: currentSeason.accentColor }}
+            data-testid="season-banner-image"
+          >
+            <Image
+              src={currentSeason.imageUrl}
+              alt={currentSeason.theme}
+              fill
+              sizes="48px"
+              className="object-cover"
+              unoptimized
+            />
+          </div>
+        ) : (
+          <Trophy
+            className={`w-6 h-6 shrink-0 ${isEndingSoon ? 'text-neo-pink' : 'text-neo-yellow'}`}
+            aria-hidden="true"
+          />
+        )}
         <div className="flex flex-col min-w-0">
           <span className="font-neo-display text-sm text-neo-cream truncate">
             {t('season.name', { number: currentSeason.id, theme: currentSeason.theme })}

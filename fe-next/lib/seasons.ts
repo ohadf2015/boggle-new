@@ -12,6 +12,9 @@ export interface Season {
   startDate: Date;
   endDate: Date;
   rewards: SeasonReward[];
+  imageUrl: string;
+  accentColor: string;
+  tagline: string;
 }
 
 export interface SeasonReward {
@@ -38,11 +41,33 @@ const SEASON_THEMES = [
   'Letter Legends',
   'Vocab Victors',
   'Syllable Champions',
+  'Phonic Phenoms',
+  'Lexicon Lords',
 ];
+
+interface SeasonArt {
+  imageUrl: string;
+  accentColor: string;
+  tagline: string;
+}
+
+const SEASON_ART: Record<number, SeasonArt> = {
+  1: { imageUrl: '/seasons/season-1-word-warriors.jpg',     accentColor: '#BFFF00', tagline: 'Forge your legacy, one word at a time' },
+  2: { imageUrl: '/seasons/season-2-letter-legends.jpg',    accentColor: '#FF1493', tagline: 'Crowns earned, not inherited' },
+  3: { imageUrl: '/seasons/season-3-vocab-victors.jpg',     accentColor: '#00FFFF', tagline: 'Knowledge is your sharpest blade' },
+  4: { imageUrl: '/seasons/season-4-syllable-champions.jpg', accentColor: '#8B5CF6', tagline: 'Rhythm wins rounds' },
+  5: { imageUrl: '/seasons/season-5-phonic-phenoms.jpg',    accentColor: '#FFE135', tagline: 'Sound is the new strategy' },
+  6: { imageUrl: '/seasons/season-6-lexicon-lords.jpg',     accentColor: '#FF6B35', tagline: 'Rule the dictionary' },
+};
+
+const DEFAULT_ART: SeasonArt = SEASON_ART[1];
+
+function artForSeason(id: number): SeasonArt {
+  return SEASON_ART[id] ?? DEFAULT_ART;
+}
 
 /** Season 1 starts Q1 2026 */
 const SEASON_EPOCH = new Date('2026-01-01T00:00:00Z');
-const MS_PER_DAY = 86_400_000;
 
 /**
  * Get season ID and quarter boundaries for a given date.
@@ -78,6 +103,7 @@ export function getCurrentSeason(now?: Date): Season {
   const { id, start, end } = getSeasonBounds(date);
   const themeIndex = (id - 1) % SEASON_THEMES.length;
   const theme = SEASON_THEMES[themeIndex];
+  const art = artForSeason(id);
 
   return {
     id,
@@ -86,6 +112,9 @@ export function getCurrentSeason(now?: Date): Season {
     startDate: start,
     endDate: end,
     rewards: buildSeasonRewards(id),
+    imageUrl: art.imageUrl,
+    accentColor: art.accentColor,
+    tagline: art.tagline,
   };
 }
 
@@ -217,6 +246,7 @@ export function getCurrentSeasonDynamic(now?: Date): Season {
   const { id, start, end } = getMonthlySeasonBounds(date);
   const themeIndex = (id - 1) % SEASON_THEMES.length;
   const theme = SEASON_THEMES[themeIndex];
+  const art = artForSeason(id);
 
   return {
     id,
@@ -225,6 +255,9 @@ export function getCurrentSeasonDynamic(now?: Date): Season {
     startDate: start,
     endDate: end,
     rewards: buildSeasonRewards(id),
+    imageUrl: art.imageUrl,
+    accentColor: art.accentColor,
+    tagline: art.tagline,
   };
 }
 
