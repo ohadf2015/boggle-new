@@ -35,13 +35,13 @@ const PODIUM_CONFIG = [
     bgClass: 'bg-neo-cyan',
     borderClass: 'border-neo-cyan',
     textClass: 'text-neo-cyan',
-    ptOffset: 'pt-8',
-    avatarSize: 'w-12 h-12 sm:w-14 sm:h-14',
+    ptOffset: 'pt-8 medium-short:pt-4',
+    avatarSize: 'w-12 h-12 sm:w-14 sm:h-14 medium-short:w-10 medium-short:h-10',
     badgeSize: 'w-6 h-6 text-[10px]',
     nameSize: 'text-[10px]',
     scoreSize: 'text-[9px]',
-    barHeight: 'h-20',
-    barText: 'text-2xl sm:text-4xl',
+    barHeight: 'h-20 medium-short:h-14',
+    barText: 'text-2xl sm:text-4xl medium-short:text-xl',
     shadow: 'shadow-hard-sm',
     borderWidth: 'border-2',
   },
@@ -52,12 +52,12 @@ const PODIUM_CONFIG = [
     borderClass: 'border-neo-lime',
     textClass: 'text-neo-lime',
     ptOffset: '',
-    avatarSize: 'w-14 h-14 sm:w-16 sm:h-16',
+    avatarSize: 'w-14 h-14 sm:w-16 sm:h-16 medium-short:w-12 medium-short:h-12',
     badgeSize: '',
     nameSize: 'text-[11px]',
     scoreSize: 'text-[10px]',
-    barHeight: 'h-32',
-    barText: 'text-3xl sm:text-5xl',
+    barHeight: 'h-32 medium-short:h-20',
+    barText: 'text-3xl sm:text-5xl medium-short:text-2xl',
     shadow: 'shadow-hard',
     borderWidth: 'border-2',
   },
@@ -67,13 +67,13 @@ const PODIUM_CONFIG = [
     bgClass: 'bg-neo-purple',
     borderClass: 'border-neo-purple',
     textClass: 'text-neo-purple',
-    ptOffset: 'pt-14',
-    avatarSize: 'w-10 h-10 sm:w-12 sm:h-12',
+    ptOffset: 'pt-14 medium-short:pt-7',
+    avatarSize: 'w-10 h-10 sm:w-12 sm:h-12 medium-short:w-9 medium-short:h-9',
     badgeSize: 'w-5 h-5 text-[9px]',
     nameSize: 'text-[10px]',
     scoreSize: 'text-[9px]',
-    barHeight: 'h-12',
-    barText: 'text-xl sm:text-3xl',
+    barHeight: 'h-12 medium-short:h-9',
+    barText: 'text-xl sm:text-3xl medium-short:text-lg',
     shadow: 'shadow-hard-sm',
     borderWidth: 'border-2',
   },
@@ -207,7 +207,7 @@ export default function ResultsPodium({
     >
       {/* Section header */}
       <motion.div
-        className="flex items-center justify-center gap-1.5 mb-4"
+        className="flex items-center justify-center gap-1.5 mb-4 medium-short:mb-2"
         initial={reducedMotion ? undefined : { opacity: 0, y: -8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.05, duration: 0.3 }}
@@ -269,7 +269,7 @@ export default function ResultsPodium({
 
               {/* Avatar — bouncy drop-in */}
               <motion.div
-                className="relative mb-3"
+                className="relative mb-3 medium-short:mb-1.5"
                 initial={reducedMotion ? undefined : { opacity: 0, y: -25, scale: 0.6 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 transition={{

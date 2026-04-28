@@ -1,13 +1,13 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { Sparkles, Gamepad2, Users } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { detectCrazyGamesLanguage } from '@/utils/cgLocaleDetect';
+import WelcomeDemoGrid from './WelcomeDemoGrid';
 
 export type CrazyGamesMode = 'daily' | 'practice' | 'multiplayer';
 
@@ -130,7 +130,10 @@ const CrazyGamesWelcome: React.FC<CrazyGamesWelcomeProps> = ({ onPlay }) => {
             style={{ fontSize: 'clamp(2.75rem, 8cqw, 5rem)' }}
           >
             {t('onboarding.crazygames.title')}{' '}
-            <span className="inline-block bg-neo-lime text-black px-2 py-0.5 -rotate-2 border-2 border-black shadow-hard">
+            <span
+              className="inline-block bg-neo-lime text-black px-2 py-0.5 border-2 border-black shadow-hard"
+              style={{ transform: `rotate(${isRTL ? 2 : -2}deg)` }}
+            >
               {t('onboarding.crazygames.titleAccent')}
             </span>
           </motion.h1>
@@ -191,15 +194,8 @@ const CrazyGamesWelcome: React.FC<CrazyGamesWelcomeProps> = ({ onPlay }) => {
           className="relative w-full max-w-md mx-auto"
         >
           <div className="relative rounded-neo border-neo-thick border-black bg-neo-navy-light overflow-hidden shadow-hard-lg">
-            <div className="aspect-[4/3] relative">
-              <Image
-                src="/onboarding/cg/tutorial-demo.png"
-                alt={t('onboarding.crazygames.demoAlt')}
-                fill
-                sizes="(max-width: 1024px) 90vw, 480px"
-                className="object-contain"
-                priority
-              />
+            <div className="p-3 sm:p-4">
+              <WelcomeDemoGrid />
             </div>
             {/* Caption strip — gives the exhibit feel */}
             <div className="px-4 py-2.5 bg-black border-t-2 border-black flex items-center justify-between gap-3">

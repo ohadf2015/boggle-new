@@ -87,7 +87,15 @@ vi.mock('@/shared/constants/wordHuntMultiplayerConstants', () => ({
   HUNT_TARGET_MIN_LENGTH: 4,
   HUNT_TARGET_MAX_LENGTH: 8,
 }));
-vi.mock('@/shared/constants/gameConstants', () => ({ BLAST_MP_DEFAULT_TIMER: 90 }));
+vi.mock('@/shared/constants/gameConstants', () => ({
+  BLAST_MP_DEFAULT_TIMER: 90,
+  DEFAULT_DIFFICULTY: 'MEDIUM',
+  DIFFICULTIES: {
+    EASY: { nameKey: 'difficulty.easy', rows: 5, cols: 5 },
+    MEDIUM: { nameKey: 'difficulty.medium', rows: 6, cols: 6 },
+    HARD: { nameKey: 'difficulty.hard', rows: 7, cols: 7 },
+  },
+}));
 
 // Import the internal function under test via the module's exports.
 // We test the observable side-effect: broadcastToRoom called with totalBoardWords.

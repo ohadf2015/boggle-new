@@ -363,7 +363,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
         t={t}
       />
 
-      <div className="flex flex-col lg:flex-row lg:items-stretch lg:justify-center gap-0 md:gap-2 lg:gap-2 desktop-tall:lg:gap-3 desktop-short:lg:gap-0 flex-1 w-full max-w-[1920px] mx-auto overflow-x-clip overflow-hidden transition-all duration-500 ease-in-out pb-16 lg:pb-1 desktop-tall:lg:pb-2 desktop-short:lg:pb-0 px-2 lg:px-2 desktop-tall:lg:px-3 xl:px-4 min-h-0">
+      <div className="flex flex-col lg:flex-row lg:items-stretch lg:justify-center gap-0 md:gap-2 lg:gap-2 desktop-tall:lg:gap-3 desktop-short:lg:gap-0 desktop-medium-short:lg:gap-1 flex-1 w-full max-w-[1920px] mx-auto overflow-x-clip overflow-hidden transition-all duration-500 ease-in-out pb-16 medium-short:pb-12 lg:pb-1 desktop-tall:lg:pb-2 desktop-short:lg:pb-0 desktop-medium-short:lg:pb-1 px-2 lg:px-2 desktop-tall:lg:px-3 xl:px-4 min-h-0">
         {/* Mobile Header */}
         <GameHeader
           onExitRoom={onExitRoom}
@@ -381,8 +381,8 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
           </div>
         )}
 
-        {/* Center Column: Timer, Score, Grid */}
-        <div className="flex-1 flex flex-col min-w-0 min-h-0 overflow-x-clip overflow-y-hidden lg:overflow-y-hidden lg:overflow-x-visible">
+        {/* Center Column: Timer, Score, Grid — container-queryable so board auto-fits */}
+        <div className="@container/center [container-type:size] flex-1 flex flex-col min-w-0 min-h-0 overflow-x-clip overflow-y-hidden lg:overflow-y-hidden lg:overflow-x-visible">
           {/* Stats section with vertical stacking on mobile - reduced gap for tighter layout */}
           {remainingTime !== null && (
             <div
@@ -409,7 +409,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
 
               {/* Stats row - Timer centered on mobile, Timer + controls on desktop */}
               <div
-                className="flex w-full items-center justify-center lg:justify-start relative min-h-[56px] md:min-h-[70px] lg:min-h-[clamp(40px,7dvh,64px)] desktop-short:lg:min-h-[40px] short:min-h-[40px] short:md:min-h-[44px] gap-2"
+                className="flex w-full items-center justify-center lg:justify-start relative min-h-[56px] md:min-h-[70px] medium-short:min-h-[44px] medium-short:md:min-h-[48px] lg:min-h-[clamp(40px,7dvh,64px)] desktop-short:lg:min-h-[40px] desktop-medium-short:lg:min-h-[44px] short:min-h-[40px] short:md:min-h-[44px] gap-2"
                 data-testid="stats-row"
               >
                 {/* Desktop header */}
@@ -436,10 +436,10 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
                   <div className="hidden desktop-tall:lg:block">
                     <CircularTimer remainingTime={remainingTime} totalTime={timerValue * 60} size="md" onTimerState={onTimerState} />
                   </div>
-                  <div className="hidden md:block lg:hidden short:md:hidden">
+                  <div className="hidden md:block lg:hidden short:md:hidden medium-short:md:hidden">
                     <CircularTimer remainingTime={remainingTime} totalTime={timerValue * 60} size="md" />
                   </div>
-                  <div className="md:hidden short:md:block short:lg:hidden">
+                  <div className="md:hidden short:md:block short:lg:hidden medium-short:md:block medium-short:lg:hidden">
                     <CircularTimer remainingTime={remainingTime} totalTime={timerValue * 60} size="sm" />
                   </div>
                 </AdaptiveMotion.div>
@@ -447,7 +447,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
                 {/* Right Side: Score (mobile) - positioned absolutely to not affect timer centering */}
                 {isPlaying && (
                   <div
-                    className="absolute inset-e-1 md:inset-e-2 short:inset-e-0 short:scale-90 top-1/2 -translate-y-1/2 lg:hidden"
+                    className="absolute inset-e-1 md:inset-e-2 short:inset-e-0 short:scale-90 medium-short:inset-e-0 medium-short:scale-90 top-1/2 -translate-y-1/2 lg:hidden"
                     data-testid="score-mobile"
                   >
                     <ScoreDisplay
@@ -575,7 +575,9 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
               comboGlow
             )}
           >
-            <div className="relative w-full max-w-[min(600px,92vw,80dvh)] short:max-w-none short:w-auto short:h-full lg:max-w-none lg:w-auto lg:h-full mx-auto aspect-square">
+            <div
+              className="relative aspect-square mx-auto w-[min(600px,92cqi,calc(100cqb-240px))] medium-short:w-[min(560px,92cqi,calc(100cqb-200px))] lg:w-[min(680px,100cqi,calc(100cqb-120px))] desktop-short:lg:w-[min(560px,100cqi,calc(100cqb-90px))] desktop-medium-short:lg:w-[min(620px,100cqi,calc(100cqb-100px))] max-h-full"
+            >
               <GridComponent
                 key={isPlaying ? 'playing-grid' : 'spectating-grid'}
                 grid={letterGrid}
@@ -637,7 +639,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
               Leaderboard only when there are other players; word list always shows while playing
               so single-player users can see their progress. */}
           {isPlaying && !gameplayFocusMode && (
-            <div className="block lg:hidden mt-0.5 md:mt-1 space-y-0.5 max-w-md mx-auto md:space-y-1 shrink overflow-y-auto min-h-0 max-h-[120px] sm:max-h-[140px] short:max-h-[80px] scrollbar-thin">
+            <div className="block lg:hidden mt-0.5 md:mt-1 space-y-0.5 max-w-md mx-auto md:space-y-1 shrink overflow-y-auto min-h-0 max-h-[120px] sm:max-h-[140px] medium-short:max-h-[88px] short:max-h-[80px] scrollbar-thin">
               {leaderboard && leaderboard.length > 0 && (
                 <CompactLeaderboard
                   players={compactLeaderboardPlayers}

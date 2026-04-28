@@ -125,7 +125,7 @@ function DesktopResultsLayout({
     <div className="hidden md:flex md:flex-col md:flex-1 md:min-h-0 relative">
       <div
         ref={scrollRef}
-        className="flex-1 min-h-0 overflow-y-auto overscroll-contain scrollable-area p-4 xl:p-6 pb-32"
+        className="flex-1 min-h-0 overflow-y-auto overscroll-contain scrollable-area p-4 medium-short:p-2 desktop-medium-short:p-3 xl:p-6 pb-32 medium-short:pb-24"
         style={{ WebkitOverflowScrolling: 'touch' }}
       >
         {/* Top Bar with Exit Button */}
@@ -142,7 +142,7 @@ function DesktopResultsLayout({
         </div>
 
         {/* Two-column area below the cinematic hero */}
-        <div className="w-full max-w-5xl mx-auto mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="w-full max-w-5xl mx-auto mt-6 medium-short:mt-3 desktop-medium-short:mt-4 grid grid-cols-1 lg:grid-cols-2 gap-6 medium-short:gap-3 desktop-medium-short:gap-4">
           {/* LEFT: Game mode summary + social + engagement */}
           <div className="space-y-4">
             {resolvedGameMode === 'word-hunt' && wordHuntResultsData && (
@@ -808,10 +808,10 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
 
         {/* Scrollable content — everything in one flow */}
         <div
-          className="flex-1 min-h-0 overflow-y-auto overscroll-contain scrollable-area px-2 pb-36 bg-neo-navy"
+          className="flex-1 min-h-0 overflow-y-auto overscroll-contain scrollable-area px-2 pb-36 medium-short:pb-24 bg-neo-navy"
           style={{ overscrollBehavior: 'contain', WebkitOverflowScrolling: 'touch' }}
         >
-          <div className="max-w-lg mx-auto space-y-6">
+          <div className="max-w-lg mx-auto space-y-6 medium-short:space-y-3">
             {renderResultsTab()}
             {/* CrazyGames banner ad — mobile size between results and details */}
             <CrazyGamesBanner size="320x50" />

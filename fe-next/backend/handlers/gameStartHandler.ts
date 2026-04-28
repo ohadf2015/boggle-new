@@ -44,7 +44,7 @@ import { notifyGameStarted } from '../modules/notificationService.js';
 import { selectNextGameMode, ALL_GAME_MODES } from '../modules/gameModeSelector.js';
 import { initializePlayerData } from './playerDataInit.js';
 import { HUNT_TARGET_MIN_LENGTH, HUNT_TARGET_MAX_LENGTH } from '@/shared/constants/wordHuntMultiplayerConstants';
-import { BLAST_MP_DEFAULT_TIMER } from '@/shared/constants/gameConstants';
+import { BLAST_MP_DEFAULT_TIMER, DIFFICULTIES, DEFAULT_DIFFICULTY } from '@/shared/constants/gameConstants';
 import { getClassroomGame } from '../modules/classroomGameManager.js';
 import { initBlastModeState, hashStringToSeed } from '../modules/blastModeManager.js';
 import { initWordHuntState, selectTargetWordWithFallback } from '../modules/wordHuntManager.js';
@@ -381,12 +381,16 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
     // can actually find them during gameplay.
     const vocabToEmbed = classroomGame?.vocabularyWords?.map(w => w.toUpperCase()) ?? [];
     const playerCount = Object.keys(game.users).length;
-    // Multiplayer always uses 6x6 grid regardless of mode.
-    // Also regenerate when the client sent no grid (e.g. quick play).
+    // Grid size honors host difficulty (EASY=5x5, MEDIUM=6x6, HARD=7x7).
+    // Blast mode forces 6x6 regardless to keep its tile economy balanced.
+    // Regenerate server-side for MP (anti-cheat) or when client sent no grid.
+    const dim = DIFFICULTIES[difficulty || DEFAULT_DIFFICULTY];
+    const gridRows = resolvedMode === 'blast' ? 6 : dim.rows;
+    const gridCols = resolvedMode === 'blast' ? 6 : dim.cols;
     if (playerCount >= 2 || !letterGrid || letterGrid.length === 0) {
       letterGrid = vocabToEmbed.length > 0
-        ? generateRandomTable(6, 6, gameLang, vocabToEmbed)
-        : generateRandomTable(6, 6, gameLang);
+        ? generateRandomTable(gridRows, gridCols, gameLang, vocabToEmbed)
+        : generateRandomTable(gridRows, gridCols, gameLang);
     }
 
     updateGame(gameCode, {

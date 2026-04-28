@@ -79,6 +79,12 @@ vi.mock('@/shared/constants/wordHuntMultiplayerConstants', () => ({
 
 vi.mock('@/shared/constants/gameConstants', () => ({
   BLAST_MP_DEFAULT_TIMER: 90,
+  DEFAULT_DIFFICULTY: 'MEDIUM',
+  DIFFICULTIES: {
+    EASY: { nameKey: 'difficulty.easy', rows: 5, cols: 5 },
+    MEDIUM: { nameKey: 'difficulty.medium', rows: 6, cols: 6 },
+    HARD: { nameKey: 'difficulty.hard', rows: 7, cols: 7 },
+  },
 }));
 
 vi.mock('../../../backend/modules/gameStateManager', () => ({

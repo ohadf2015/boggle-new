@@ -55,6 +55,7 @@ const RewardsSummary: React.FC<RewardsSummaryProps> = memo(({
   className,
 }) => {
   const { t } = useLanguage();
+  const { isOnCrazyGamesPlatform } = useCrazyGames();
   const reducedMotion = useReducedMotion();
   const inf = reducedMotion ? 0 : Infinity;
   const [showRewards, setShowRewards] = useState(false);
@@ -88,7 +89,8 @@ const RewardsSummary: React.FC<RewardsSummaryProps> = memo(({
     }
   }, [isWinner, coinReward, winStreak, achievementsUnlocked, celebrationFired, reducedMotion]);
 
-  const hasCoins = coinReward && coinReward.awarded > 0;
+  const suppressGuestCoinTease = isOnCrazyGamesPlatform && !isAuthenticated;
+  const hasCoins = !suppressGuestCoinTease && coinReward && coinReward.awarded > 0;
   const hasStreak = winStreak && winStreak.currentStreak > 0;
   const hasAchievements = achievementsUnlocked > 0;
   const hasAnyReward = hasCoins || hasStreak || hasAchievements;
