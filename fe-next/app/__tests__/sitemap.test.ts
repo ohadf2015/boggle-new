@@ -58,4 +58,31 @@ describe('sitemap', () => {
       expect(urls.has(url), `sitemap missing: ${url}`).toBe(true);
     }
   });
+
+  // Per-date archive pages render unique server-rendered stats + leaderboards
+  // (see app/[locale]/daily/archive/[date]/page.tsx). Each becomes a long-tail
+  // landing page for queries like "lexiclash daily challenge april 27" once
+  // crawlers can discover them via sitemap.
+  it('includes per-date daily archive URLs for all locales (epoch → yesterday)', () => {
+    const urls = new Set(sitemap().map((e) => e.url));
+    // Spot-check the epoch first day (2025-12-30) across all 5 locales.
+    for (const locale of ['en', 'he', 'sv', 'ja', 'es']) {
+      expect(
+        urls.has(`https://www.lexiclash.live/${locale}/daily/archive/2025-12-30`),
+        `sitemap missing first archive day for /${locale}`,
+      ).toBe(true);
+    }
+  });
+
+  it('does NOT include today or future archive dates (only finalized past puzzles)', () => {
+    const urls = new Set(sitemap().map((e) => e.url));
+    const today = new Date().toISOString().split('T')[0];
+    const tomorrow = new Date();
+    tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
+    const tomorrowStr = tomorrow.toISOString().split('T')[0];
+    for (const locale of ['en', 'he', 'sv', 'ja', 'es']) {
+      expect(urls.has(`https://www.lexiclash.live/${locale}/daily/archive/${today}`)).toBe(false);
+      expect(urls.has(`https://www.lexiclash.live/${locale}/daily/archive/${tomorrowStr}`)).toBe(false);
+    }
+  });
 });

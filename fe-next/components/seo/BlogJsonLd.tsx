@@ -30,6 +30,11 @@ interface CitationRef {
     datePublished?: string;
 }
 
+interface FaqQa {
+    question: string;
+    answer: string;
+}
+
 interface BlogPostingJsonLdProps {
     title: string;
     description: string;
@@ -39,6 +44,8 @@ interface BlogPostingJsonLdProps {
     dateModified?: string;
     wordCount?: number;
     citations?: CitationRef[];
+    /** Optional FAQ Q/A — when present, an FAQPage schema is co-emitted alongside BlogPosting. */
+    faqItems?: FaqQa[];
 }
 
 export function BlogPostingJsonLd({
@@ -50,6 +57,7 @@ export function BlogPostingJsonLd({
     dateModified,
     wordCount,
     citations,
+    faqItems,
 }: BlogPostingJsonLdProps): ReactNode {
     const articleUrl = `${SITE_URL}/${locale}/blog/${slug}`;
     const imageUrl = getBlogImage(slug);
@@ -130,11 +138,24 @@ export function BlogPostingJsonLd({
         },
     };
 
+    const faqSchema = faqItems && faqItems.length > 0 ? {
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        '@id': `${articleUrl}#faq`,
+        mainEntity: faqItems.map((qa) => ({
+            '@type': 'Question',
+            name: qa.question,
+            acceptedAnswer: { '@type': 'Answer', text: qa.answer },
+        })),
+    } : null;
+
+    const payload = faqSchema ? [schema, faqSchema] : schema;
+
     // Safe: all content is from static blog data constants, not user input
     return (
         <script
             type="application/ld+json"
-            dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(payload) }}
         />
     );
 }

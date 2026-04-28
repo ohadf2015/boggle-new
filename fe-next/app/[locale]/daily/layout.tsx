@@ -281,6 +281,78 @@ export default async function DailyLayout({ children, params }: DailyLayoutProps
     inLanguage: ['en', 'he', 'sv', 'ja', 'es'],
   };
 
+  // FAQPage schema — uses the same locale FAQ already rendered (sr-only) by
+  // GamePageSeoContent, so AI search engines (ChatGPT, Perplexity) and Google
+  // rich-results can surface answers directly from /daily without rewrites.
+  const localeFaq = seoContent[locale as keyof typeof seoContent]?.faq || seoContent.en.faq;
+  const faqPageSchema = localeFaq.length > 0 ? {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    '@id': `https://www.lexiclash.live${localePath}/daily#faq`,
+    mainEntity: localeFaq.map((qa) => ({
+      '@type': 'Question',
+      name: qa.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: qa.answer,
+      },
+    })),
+  } : null;
+
+  // HowTo schema — structures the "play the daily challenge" flow as four
+  // discrete steps. Targets Google's HowTo rich result + AI quotability for
+  // queries like "how to play LexiClash daily challenge".
+  const howToStepsByLocale: Record<string, { name: string; text: string }[]> = {
+    en: [
+      { name: 'Open the daily page', text: 'Visit lexiclash.live/daily — no signup or download required.' },
+      { name: 'Pick a mode', text: 'Choose Word Hunt Survival (find a hidden word in 10 attempts) or Daily Word Wheel (form words from a letter wheel).' },
+      { name: 'Solve the puzzle', text: 'Same board for every player worldwide. Use clues from misses to narrow the answer.' },
+      { name: 'Share and climb the leaderboard', text: 'Copy your emoji result like Wordle, build a daily streak, and compete on the global leaderboard that resets at midnight UTC.' },
+    ],
+    he: [
+      { name: 'פתחו את הדף היומי', text: 'היכנסו ל-lexiclash.live/daily — ללא הרשמה או הורדה.' },
+      { name: 'בחרו מצב משחק', text: 'מצא מילה (10 ניסיונות) או גלגל מילים (יצירת מילים מאותיות).' },
+      { name: 'פתרו את הפאזל', text: 'אותו לוח לכל שחקן בעולם. השתמשו ברמזים מניסיונות שגויים.' },
+      { name: 'שתפו והתחרו', text: 'העתיקו את תוצאת האימוג\'י, בנו רצף יומי, והתחרו בטבלת מובילים גלובלית.' },
+    ],
+    sv: [
+      { name: 'Oeppna daglig sida', text: 'Besoek lexiclash.live/daily — ingen registrering eller nedladdning.' },
+      { name: 'Vaelj laege', text: 'Ordjakt (hitta dolt ord paa 10 foersoek) eller Ordhjul (bilda ord fraan bokstaever).' },
+      { name: 'Loes pusslet', text: 'Samma braede foer alla spelare. Anvaend ledtraadar fraan missade gissningar.' },
+      { name: 'Dela och taevla', text: 'Kopiera emoji-resultat, bygg daglig strak, taevla paa global topplista.' },
+    ],
+    ja: [
+      { name: 'デイリーページを開く', text: 'lexiclash.live/daily にアクセス — 登録・ダウンロード不要。' },
+      { name: 'モードを選ぶ', text: 'ワードハント（10回で隠された単語を見つける）またはワードホイール（文字から単語を作る）。' },
+      { name: 'パズルを解く', text: '世界中の全プレイヤーが同じボード。外れた手がかりを使って答えを絞り込む。' },
+      { name: 'シェアしてランキングへ', text: '絵文字結果をコピー、デイリーストリークを積み、UTC午前0時にリセットされるグローバルランキングで競争。' },
+    ],
+    es: [
+      { name: 'Abre la pagina diaria', text: 'Visita lexiclash.live/daily — sin registro ni descarga.' },
+      { name: 'Elige el modo', text: 'Caza de Palabras (encuentra la palabra oculta en 10 intentos) o Rueda de Palabras (forma palabras desde una rueda).' },
+      { name: 'Resuelve el puzzle', text: 'Mismo tablero para todos los jugadores del mundo. Usa pistas de intentos fallidos.' },
+      { name: 'Comparte y compite', text: 'Copia tu resultado emoji, construye una racha diaria y compite en el ranking global que se reinicia a medianoche UTC.' },
+    ],
+  };
+  const howToSteps = howToStepsByLocale[locale] || howToStepsByLocale.en;
+  const howToSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'HowTo',
+    '@id': `https://www.lexiclash.live${localePath}/daily#howto`,
+    name: localeSeo.title,
+    description: localeSeo.description,
+    totalTime: 'PT5M',
+    estimatedCost: { '@type': 'MonetaryAmount', currency: 'USD', value: '0' },
+    step: howToSteps.map((s, i) => ({
+      '@type': 'HowToStep',
+      position: i + 1,
+      name: s.name,
+      text: s.text,
+      url: `https://www.lexiclash.live${localePath}/daily#step-${i + 1}`,
+    })),
+    inLanguage: locale,
+  };
+
   // Event schema for Word Hunt Survival - daily recurring event
   const wordHuntEventSchema = {
     '@context': 'https://schema.org',
@@ -327,6 +399,8 @@ export default async function DailyLayout({ children, params }: DailyLayoutProps
             challengeListSchema,
             softwareAppSchema,
             wordHuntEventSchema,
+            howToSchema,
+            ...(faqPageSchema ? [faqPageSchema] : []),
           ]),
         }}
       />

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { BlogPostingJsonLd, generateBlogMetadata } from '@/components/seo/BlogJsonLd';
 import { BreadcrumbJsonLd } from '@/components/seo/BreadcrumbJsonLd';
+import { extractFaqFromSections } from '@/utils/seo/parseFaqProse';
 import BoggleVsWwfPageClient from './PageClient';
 import { contentByLocale } from './content';
 
@@ -43,6 +44,7 @@ export default async function BoggleVsWwfPage({ params }: PageProps) {
   const content = contentByLocale[locale] || contentByLocale.en;
 
   const siteUrl = 'https://www.lexiclash.live';
+  const faqItems = extractFaqFromSections(content.sections);
   return (
     <>
       <BreadcrumbJsonLd items={[
@@ -57,6 +59,7 @@ export default async function BoggleVsWwfPage({ params }: PageProps) {
         locale={locale}
         datePublished={DATE_PUBLISHED}
         dateModified={DATE_MODIFIED}
+        faqItems={faqItems}
       />
       <BoggleVsWwfPageClient />
     </>

@@ -25,10 +25,23 @@ Website: https://www.lexiclash.live
 - URL: https://www.lexiclash.live/en/singleplayer
 
 ### Daily Challenge
-- Word Hunt Survival: Wordle-style puzzle, 10 attempts, same board worldwide, shareable emoji results
-- Daily Buzz: AI-generated puzzles based on trending topics and current events
-- Daily leaderboards and streak tracking
-- URL: https://www.lexiclash.live/en/daily
+- New puzzle every day at midnight UTC; same board for every player worldwide (no per-user randomization)
+- Two modes share the daily flow:
+  - Word Hunt Survival: find a hidden 4-6 letter target word in 10 attempts. Wordle-style green/yellow/grey feedback overlaid on a Boggle-style adjacency grid.
+  - Daily Word Wheel: form as many words as possible from a wheel of letters. Every word must include the center letter. Longer words score more.
+- Daily Buzz: AI-generated puzzles seeded by trending topics and current events
+- Free, no signup, no download — playable in browser, on Android (Google Play), or as an iOS PWA
+- Available in English, Hebrew (RTL), Swedish, Japanese, Spanish — locale-prefixed routes (e.g. /he/daily)
+- Daily streaks reward consecutive solves; missing a day breaks the streak
+- Global leaderboard resets at 00:00 UTC alongside the new puzzle
+- Emoji result-card sharing (Wordle-style) reveals attempt count without spoiling the word
+- Public archive of finalized past puzzles with stats (solve rate %, attempt distribution, leaderboard) at /[locale]/daily/archive/YYYY-MM-DD; the current day is intentionally not in the archive
+- URLs:
+  - Today: https://www.lexiclash.live/en/daily
+  - Word Hunt: https://www.lexiclash.live/en/daily/word-hunt
+  - Word Wheel: https://www.lexiclash.live/en/daily/word-wheel
+  - Archive index: https://www.lexiclash.live/en/daily/archive
+  - Archive entry pattern: https://www.lexiclash.live/en/daily/archive/YYYY-MM-DD (since 2025-12-30, puzzle #1)
 
 ### Blast Mode
 - Fast-paced cascading word game
