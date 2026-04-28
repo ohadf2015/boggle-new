@@ -33,6 +33,7 @@ import gameStartCoordinator from '../utils/gameStartCoordinator.js';
 import { clearGameTimer } from '../utils/timerManager.js';
 import { ensureGame } from '../utils/metrics.js';
 import { generateRandomTable } from '../utils/gameUtils.js';
+import { generateRichBoard } from '../utils/boardSelection.js';
 import { ensureLanguageLoaded } from '../dictionary.js';
 import logger from '../utils/logger.js';
 import { validatePayload, startGameSchema } from '../utils/socketValidation.js';
@@ -388,9 +389,14 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
     const gridRows = resolvedMode === 'blast' ? 6 : dim.rows;
     const gridCols = resolvedMode === 'blast' ? 6 : dim.cols;
     if (playerCount >= 2 || !letterGrid || letterGrid.length === 0) {
-      letterGrid = vocabToEmbed.length > 0
-        ? generateRandomTable(gridRows, gridCols, gameLang, vocabToEmbed)
-        : generateRandomTable(gridRows, gridCols, gameLang);
+      letterGrid = generateRichBoard(
+        () => vocabToEmbed.length > 0
+          ? generateRandomTable(gridRows, gridCols, gameLang, vocabToEmbed)
+          : generateRandomTable(gridRows, gridCols, gameLang),
+        gameLang,
+        gridRows,
+        gridCols
+      ) as LetterGrid;
     }
 
     updateGame(gameCode, {
@@ -449,9 +455,14 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
       // client-supplied grid. Auto-adding bots converts that into a competitive
       // multiplayer game — without this regen, the host's rigged board would
       // ride into the bot match. Drop the rigged grid here.
-      letterGrid = vocabToEmbed.length > 0
-        ? generateRandomTable(6, 6, gameLang, vocabToEmbed)
-        : generateRandomTable(6, 6, gameLang);
+      letterGrid = generateRichBoard(
+        () => vocabToEmbed.length > 0
+          ? generateRandomTable(6, 6, gameLang, vocabToEmbed)
+          : generateRandomTable(6, 6, gameLang),
+        gameLang,
+        6,
+        6
+      ) as LetterGrid;
       const newPositions = makePositionsMap(letterGrid);
       updateGame(gameCode, { letterGrid });
       const regenGame = getGame(gameCode);

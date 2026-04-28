@@ -12,12 +12,10 @@ import { validateUsername, validateRoomName, validateGameCode, sanitizeInput } f
 import { useValidation } from '@/hooks/useValidation';
 import { generateRoomCode as generateCode } from '@/utils/utils';
 import type { Language, ActiveRoom } from '@/shared/types/game';
-import {
-  RoomList,
-  LanguageSelector,
-  HostModeFields,
-  JoinModeFields,
-} from '@/components/join';
+import { RoomList } from '@/components/join/RoomList';
+import { LanguageSelector } from '@/components/join/LanguageSelector';
+import HostModeFields from '@/components/join/HostModeFields';
+import JoinModeFields from '@/components/join/JoinModeFields';
 
 export type JoinMode = 'join' | 'host';
 

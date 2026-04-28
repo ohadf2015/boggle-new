@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { generateRandomTable } from '@/utils/utils';
+import { pickRichestBoardClient } from '@/lib/boardSelection';
 import { DIFFICULTIES } from '@/utils/consts';
 import type { LetterGrid, Language, DifficultyLevel } from '@/shared/types/game';
 
@@ -119,7 +120,10 @@ export function useGridInit({
         }
       }
 
-      const newGrid = generateRandomTable(rows, cols, language, wordsToEmbed);
+      const newGrid = pickRichestBoardClient(
+        () => generateRandomTable(rows, cols, language, wordsToEmbed),
+        language
+      );
       setGrid(newGrid);
     };
 

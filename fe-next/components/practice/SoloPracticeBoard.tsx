@@ -11,6 +11,7 @@ import GridComponent from '@/components/GridComponent';
 import WordFormingArea from '@/components/game/WordFormingArea';
 import { useWordSubmission } from '@/hooks/useWordSubmission';
 import { generateRandomTable } from '@/utils/utils';
+import { pickRichestBoardClient } from '@/lib/boardSelection';
 import { DIFFICULTIES } from '@/utils/consts';
 import { motion } from 'framer-motion';
 import {
@@ -68,11 +69,14 @@ export default function SoloPracticeBoard({
   // Generate initial board with vocabulary words embedded
   const generateBoard = useCallback(() => {
     const config = DIFFICULTIES[difficulty];
-    return generateRandomTable(
-      config.rows,
-      config.cols,
-      language,
-      language !== 'ja' ? vocabularyWords : []
+    return pickRichestBoardClient(
+      () => generateRandomTable(
+        config.rows,
+        config.cols,
+        language,
+        language !== 'ja' ? vocabularyWords : []
+      ),
+      language
     );
   }, [difficulty, language, vocabularyWords]);
 

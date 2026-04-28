@@ -21,6 +21,7 @@ import {
   VALID_TRANSITIONS,
 } from './types';
 import { generateRandomTable } from '@/backend/utils/gameUtils';
+import { generateRichBoard } from '@/backend/utils/boardSelection';
 import { getSupabase } from '@/backend/modules/supabase/client';
 import { startRealtimeDuel } from './realtime';
 import logger from '@/backend/utils/logger';
@@ -82,7 +83,12 @@ export function registerLifecycleHandlers(
       }
 
       // Generate frozen board for this duel
-      const boardState = generateRandomTable(4, 4, lesson.language);
+      const boardState = generateRichBoard(
+        () => generateRandomTable(4, 4, lesson.language),
+        lesson.language,
+        4,
+        4
+      );
 
       // Calculate expiration (24 hours from now)
       const expiresAt = new Date();
@@ -513,7 +519,12 @@ export function registerLifecycleHandlers(
       const duelType = priorDuel?.duel_type ?? 'realtime';
 
       // Fresh board for rematch
-      const boardState = generateRandomTable(4, 4, lesson.language);
+      const boardState = generateRichBoard(
+        () => generateRandomTable(4, 4, lesson.language),
+        lesson.language,
+        4,
+        4
+      );
 
       const expiresAt = new Date();
       expiresAt.setHours(expiresAt.getHours() + 24);

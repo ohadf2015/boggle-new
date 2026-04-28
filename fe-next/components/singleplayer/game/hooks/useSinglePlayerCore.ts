@@ -15,6 +15,7 @@ import { useDesktopLayout } from '@/hooks/useDesktopLayout';
 import { useNavigationGuard } from '@/hooks/useNavigationGuard';
 import { useGiftModalPause } from '@/hooks/useGiftModalPause';
 import { generateRandomTable } from '@/utils/utils';
+import { pickRichestBoardClient } from '@/lib/boardSelection';
 import { DIFFICULTIES } from '@/utils/consts';
 import { validateWordLocally, isWordOnBoard } from '@/utils/clientWordValidator';
 import { wordErrorToast } from '@/components/NeoToast';
@@ -389,7 +390,10 @@ export function useSinglePlayerCore({
           if (response.ok) { const data = await response.json(); wordsToEmbed = data.words || []; }
         } catch (error) { console.warn('Failed to fetch themed words:', error); }
       }
-      setGrid(generateRandomTable(rows, cols, settings.language, wordsToEmbed));
+      setGrid(pickRichestBoardClient(
+        () => generateRandomTable(rows, cols, settings.language, wordsToEmbed),
+        settings.language
+      ));
     };
     initGrid(); initializeBotUsedWords(settings.bots); resetBots(); resetSpamDetection();
   // eslint-disable-next-line react-hooks/exhaustive-deps

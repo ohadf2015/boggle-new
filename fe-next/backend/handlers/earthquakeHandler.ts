@@ -24,6 +24,7 @@ import {
 
 import { broadcastToRoom, getGameRoom } from '../utils/socketHelpers.js';
 import { generateRandomTable } from '../utils/gameUtils.js';
+import { generateRichBoard } from '../utils/boardSelection.js';
 import { DIFFICULTIES } from '../utils/consts.js';
 import { makePositionsMap } from '../modules/wordValidator.js';
 import logger from '../utils/logger.js';
@@ -184,13 +185,17 @@ function executeEarthquakeSequence(io: Server, gameCode: string, game: GameState
       const difficultyConfig: DifficultyConfig = DIFFICULTIES[difficulty] || DIFFICULTIES.MEDIUM;
       const language = currentGame.language || 'en';
 
-      // Generate new grid with embedded words
-      const newGrid: LetterGrid = generateRandomTable(
-        difficultyConfig.rows,
-        difficultyConfig.cols,
+      // Generate new grid via best-of-N solver scoring for richer boards
+      const newGrid: LetterGrid = generateRichBoard(
+        () => generateRandomTable(
+          difficultyConfig.rows,
+          difficultyConfig.cols,
+          language
+        ),
         language,
-        [] // Empty array - let it generate random words to embed
-      );
+        difficultyConfig.rows,
+        difficultyConfig.cols
+      ) as LetterGrid;
 
       // Generate new letter positions map for word validation
       const newPositions = makePositionsMap(newGrid, language);

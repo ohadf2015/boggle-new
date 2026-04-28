@@ -17,6 +17,7 @@ import type {
   AdventureGameState,
 } from '@/types/adventure';
 import { WORLDS_COUNT, LEVELS_PER_WORLD, generateAdventureGrid } from '@/lib/adventure';
+import { pickRichestBoardClient } from '@/lib/boardSelection';
 import type { Language } from '@/types';
 import { useCascadeLoop, type CascadePhase } from './useCascadeLoop';
 import { gameReducer, createInitialState, type ReducerUpgradeConfig } from './adventureGameReducer';
@@ -312,7 +313,10 @@ export function useAdventureGame({
     dispatch({ type: 'USE_SHUFFLE' });
     // Regenerate the grid with language-aware letter distribution
     const gridSize = levelConfig.gridSize as 4 | 5 | 6 | 7;
-    const freshGrid = generateAdventureGrid(gridSize, undefined, language);
+    const freshGrid = pickRichestBoardClient(
+      () => generateAdventureGrid(gridSize, undefined, language),
+      language
+    );
     dispatch({ type: 'REGENERATE_GRID', payload: { grid: freshGrid } });
     // Release guard after React processes the state update
     requestAnimationFrame(() => { isShufflingRef.current = false; });

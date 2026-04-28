@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { generateRandomTable } from '@/utils/utils';
+import { pickRichestBoardClient } from '@/lib/boardSelection';
 import { DIFFICULTIES } from '@/utils/consts';
 import {
   DEFAULT_EARTHQUAKE_CONFIG,
@@ -120,11 +121,14 @@ export function useEarthquakeFireRound(
   // Generate new grid for fire round
   const generateNewGrid = useCallback(() => {
     const difficultyConfig = DIFFICULTIES[difficulty] || DIFFICULTIES.MEDIUM;
-    const newGrid = generateRandomTable(
-      difficultyConfig.rows,
-      difficultyConfig.cols,
-      language,
-      [] // Empty array - let it generate random words to embed
+    const newGrid = pickRichestBoardClient(
+      () => generateRandomTable(
+        difficultyConfig.rows,
+        difficultyConfig.cols,
+        language,
+        []
+      ),
+      language
     );
 
     return { grid: newGrid, embeddedWords: [] };

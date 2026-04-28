@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import GridComponent from '@/components/GridComponent';
 import { generateRandomTable } from '@/utils/utils';
+import { pickRichestBoardClient } from '@/lib/boardSelection';
 import { DIFFICULTIES } from '@/utils/consts';
 import {
   ArrowLeft,
@@ -67,11 +68,14 @@ export default function WarmupRound({
   // Generate initial board with vocabulary words embedded
   const generateBoard = useCallback(() => {
     const config = DIFFICULTIES[difficulty];
-    return generateRandomTable(
-      config.rows,
-      config.cols,
-      language,
-      language !== 'ja' ? vocabularyWords : []
+    return pickRichestBoardClient(
+      () => generateRandomTable(
+        config.rows,
+        config.cols,
+        language,
+        language !== 'ja' ? vocabularyWords : []
+      ),
+      language
     );
   }, [difficulty, language, vocabularyWords]);
 

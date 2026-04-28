@@ -18,6 +18,7 @@ import type {
 import { scoreWord, getRoundTarget, isBossRound, getUnlockTier } from '@/lib/wordForge/scoring';
 import { generateRuneOffering } from '@/lib/wordForge/runeCatalog';
 import { generateWordForgeGrid } from '@/lib/wordForge/gridGenerator';
+import { pickRichestBoardClient } from '@/lib/boardSelection';
 import {
   pickBossConstraint,
   getConstraintTimerDuration,
@@ -203,7 +204,7 @@ export function useWordForgeRun(): UseWordForgeRunReturn {
     newState.round = 1;
     newState.phase = 'playing';
     newState.roundTarget = getRoundTarget(1);
-    newState.grid = generateWordForgeGrid(5);
+    newState.grid = pickRichestBoardClient(() => generateWordForgeGrid(5), 'en', 4);
     newState.timerDuration = 60;
     newState.timeRemaining = 60;
     newState.runSeed = Math.floor(Math.random() * 100000);
@@ -245,7 +246,7 @@ export function useWordForgeRun(): UseWordForgeRunReturn {
         skipBonus: 0,
         wordsThisRound: [],
         bannedLetters: new Set(),
-        grid: generateWordForgeGrid(finalGridSize),
+        grid: pickRichestBoardClient(() => generateWordForgeGrid(finalGridSize), 'en', 4),
         gridSize: finalGridSize,
         timerDuration: withTimeWarp,
         timeRemaining: withTimeWarp,
@@ -411,7 +412,7 @@ export function useWordForgeRun(): UseWordForgeRunReturn {
       bossConstraint: null,
       wordsThisRound: [],
       bannedLetters: new Set(),
-      grid: generateWordForgeGrid(5),
+      grid: pickRichestBoardClient(() => generateWordForgeGrid(5), 'en', 4),
       gridSize: 5,
       timerDuration: 60,
       timeRemaining: 60,

@@ -20,6 +20,8 @@ import { emitError, ErrorCodes } from '../utils/errorHandler.js';
 import { checkRateLimit } from '../utils/rateLimiter.js';
 import { makePositionsMap } from '../modules/wordValidator.js';
 import { generateRandomTable } from '../utils/gameUtils.js';
+import { generateRichBoard } from '../utils/boardSelection.js';
+import { DIFFICULTIES, DEFAULT_DIFFICULTY } from '../utils/consts.js';
 import gameStartCoordinator from '../utils/gameStartCoordinator.js';
 import {
   createTournament as createTournamentFn,
@@ -156,7 +158,14 @@ function registerTournamentHandlers(io: Server, socket: Socket): void {
     startTournamentRound(tournamentId, gameCode);
 
     // Generate new board for the round
-    const letterGrid: LetterGrid = generateRandomTable(null, null, game.language || 'en');
+    const tDim = DIFFICULTIES[DEFAULT_DIFFICULTY];
+    const tLang = game.language || 'en';
+    const letterGrid: LetterGrid = generateRichBoard(
+      () => generateRandomTable(tDim.rows, tDim.cols, tLang),
+      tLang,
+      tDim.rows,
+      tDim.cols
+    ) as LetterGrid;
     const timerSeconds = game.timerSeconds || 180;
 
     // Update game state

@@ -36,6 +36,7 @@ import type { WordHuntResultsSummaryProps } from '@/components/results/WordHuntR
 const StickyReadyBar = dynamic(() => import('@/components/results/StickyReadyBar'), { ssr: false });
 const PostGameSocialActions = dynamic(() => import('@/components/results/PostGameSocialActions'), { ssr: false });
 import { generateRandomTable } from '@/utils/utils';
+import { pickRichestBoardClient } from '@/lib/boardSelection';
 import { DIFFICULTIES } from '@/utils/consts';
 import { useCrazyGamesLifecycle } from '@/hooks/useCrazyGamesLifecycle';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
@@ -503,7 +504,10 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
   // Pre-generate next grid during results (Brawl Stars-style: zero delay on start)
   const preGeneratedGrid = useMemo(() => {
     const difficultyConfig = DIFFICULTIES.MEDIUM;
-    return generateRandomTable(difficultyConfig.rows, difficultyConfig.cols, roomLanguage, []);
+    return pickRichestBoardClient(
+      () => generateRandomTable(difficultyConfig.rows, difficultyConfig.cols, roomLanguage, []),
+      roomLanguage
+    );
   }, [roomLanguage]);
 
   const startGameTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
