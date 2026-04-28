@@ -373,15 +373,16 @@ export function getPremiumParts(category: string): string[] {
 export const PREMIUM_CATEGORIES = Object.keys(PREMIUM_MAP) as readonly string[];
 
 // ==================== Hidden Parts ====================
-// Parts that don't look good and aren't funny — hidden from picker + random
-// generation, but kept in the schema enum so existing saved configs still
-// validate and render. Tighten or extend this list as taste dictates.
+// Parts that look broken or read wrong — hidden from picker + random generation,
+// but kept in the schema enum so existing saved configs still validate and render.
+// Bar for hiding: clearly looks bad AND isn't stylized/funny enough to redeem.
+// Stylized-but-unusual parts (cyclops, hypno, geometric bases) stay visible.
 export const HIDDEN_PARTS = {
-  base: ['shield', 'triangle', 'hexagon'],
-  eyes: ['hypno', 'cyclops', 'robot', 'infinity'],
-  mouth: ['pipe', 'glitch', 'drool', 'mustache'],
-  hair: ['frizzle', 'ramen'],
-  accessory: ['plunger', 'cucumberFace'],
+  base: [],
+  eyes: [],
+  mouth: ['pipe', 'drool', 'mustache'],
+  hair: ['frizzle'],
+  accessory: ['plunger'],
 } as const;
 
 type HiddenCategory = keyof typeof HIDDEN_PARTS;
