@@ -48,7 +48,22 @@ vi.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
+const mockUseCrazyGames = vi.fn(() => ({ isOnCrazyGamesPlatform: false }));
+vi.mock('@/components/CrazyGamesSDK', () => ({
+  useCrazyGames: () => mockUseCrazyGames(),
+}));
+
 describe('SeasonBanner', () => {
+  beforeEach(() => {
+    mockUseCrazyGames.mockReturnValue({ isOnCrazyGamesPlatform: false });
+  });
+
+  it('renders nothing on CrazyGames embed', () => {
+    mockUseCrazyGames.mockReturnValue({ isOnCrazyGamesPlatform: true });
+    const { container } = render(<SeasonBanner />);
+    expect(container.querySelector('[data-testid="season-banner"]')).toBeNull();
+  });
+
   it('renders season name', () => {
     render(<SeasonBanner />);
     expect(screen.getByText(/Season 1/)).toBeInTheDocument();

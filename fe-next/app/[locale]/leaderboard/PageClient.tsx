@@ -29,6 +29,7 @@ import { useTierPromotion } from '@/hooks/useTierPromotion';
 import { SeasonLeaderboardTabs, type SeasonTabKey } from '@/components/seasons/SeasonLeaderboardTabs';
 import { SeasonBanner } from '@/components/multiplayer/SeasonBanner';
 import { PastSeasonsLeaderboard } from '@/components/seasons/PastSeasonsLeaderboard';
+import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import {
   getGlobalLeaderboardTier,
   getLeaderboardTierProgress,
@@ -67,7 +68,10 @@ export default function LeaderboardPageClient(): React.JSX.Element {
   const router = useRouter();
   const isDarkMode = theme === 'dark';
   const [activeTab, setActiveTab] = useState<'players' | 'creators'>('players');
-  const [seasonScope, setSeasonScope] = useState<SeasonTabKey>('season');
+  const { isOnCrazyGamesPlatform } = useCrazyGames();
+  const [seasonScope, setSeasonScope] = useState<SeasonTabKey>(
+    isOnCrazyGamesPlatform ? 'allTime' : 'season',
+  );
 
   // 'season' = current (date-windowed), 'allTime' = id=0 (no filter), 'pastSeasons' = handled separately
   const querySeasonId = seasonScope === 'allTime' ? 0 : undefined;
@@ -229,15 +233,19 @@ export default function LeaderboardPageClient(): React.JSX.Element {
           <CreatorLeaderboard />
         ) : (
         <>
-        <div className="mb-4">
-          <SeasonBanner />
-        </div>
+        {!isOnCrazyGamesPlatform && (
+          <>
+            <div className="mb-4">
+              <SeasonBanner />
+            </div>
 
-        <div className="mb-4 flex justify-center">
-          <SeasonLeaderboardTabs active={seasonScope} onChange={setSeasonScope} />
-        </div>
+            <div className="mb-4 flex justify-center">
+              <SeasonLeaderboardTabs active={seasonScope} onChange={setSeasonScope} />
+            </div>
+          </>
+        )}
 
-        {seasonScope === 'pastSeasons' ? (
+        {seasonScope === 'pastSeasons' && !isOnCrazyGamesPlatform ? (
           <PastSeasonsLeaderboard />
         ) : (
         <>

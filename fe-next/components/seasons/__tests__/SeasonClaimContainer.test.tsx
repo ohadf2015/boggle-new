@@ -42,6 +42,11 @@ vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => mockUseAuth(),
 }));
 
+const mockUseCrazyGames = vi.fn(() => ({ isOnCrazyGamesPlatform: false }));
+vi.mock('@/components/CrazyGamesSDK', () => ({
+  useCrazyGames: () => mockUseCrazyGames(),
+}));
+
 const mockClaim = vi.fn();
 const mockUseSeasonClaim = vi.fn();
 vi.mock('@/hooks/useSeasonClaim', () => ({
@@ -67,6 +72,23 @@ describe('SeasonClaimContainer', () => {
     mockClaim.mockReset();
     mockUseAuth.mockReset();
     mockUseSeasonClaim.mockReset();
+    mockUseCrazyGames.mockReturnValue({ isOnCrazyGamesPlatform: false });
+  });
+
+  it('renders nothing on CrazyGames embed even with unclaimed season', () => {
+    mockUseCrazyGames.mockReturnValue({ isOnCrazyGamesPlatform: true });
+    mockUseAuth.mockReturnValue({ user: { id: 'u1' }, isAuthenticated: true });
+    mockUseSeasonClaim.mockReturnValue({
+      next: {
+        seasonId: 1, tier: 'Gold', rankPosition: 4,
+        rewards: { coins: 500, badges: [], exclusives: [] },
+      },
+      unclaimedSeasons: [],
+      isLoading: false, isClaiming: false, claim: mockClaim,
+    });
+
+    const { container } = render(<SeasonClaimContainer />);
+    expect(container.querySelector('[data-testid="season-claim-modal"]')).toBeNull();
   });
 
   it('renders nothing when not authenticated', () => {

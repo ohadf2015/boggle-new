@@ -29,6 +29,11 @@ vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({ user: null }),
 }));
 
+const mockUseCrazyGames = vi.fn(() => ({ isOnCrazyGamesPlatform: false }));
+vi.mock('@/components/CrazyGamesSDK', () => ({
+  useCrazyGames: () => mockUseCrazyGames(),
+}));
+
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: vi.fn() }),
 }));
@@ -57,6 +62,13 @@ vi.mock('next/image', () => ({
 describe('SeasonAnnouncementModal', () => {
   beforeEach(() => {
     localStorage.clear();
+    mockUseCrazyGames.mockReturnValue({ isOnCrazyGamesPlatform: false });
+  });
+
+  it('does not show on CrazyGames embed (no season popups in CG)', () => {
+    mockUseCrazyGames.mockReturnValue({ isOnCrazyGamesPlatform: true });
+    render(<SeasonAnnouncementModal />);
+    expect(screen.queryByTestId('season-announcement-modal')).toBeNull();
   });
 
   it('shows when localStorage has no last-seen season id', () => {

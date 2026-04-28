@@ -14,6 +14,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useSeasonClaim } from '@/hooks/useSeasonClaim';
 import { SeasonClaimModal } from './SeasonClaimModal';
 
@@ -22,7 +23,8 @@ const CLAIMED_KEY = (seasonId: number) => `season-claim-success:${seasonId}`;
 
 export const SeasonClaimContainer: React.FC = () => {
   const { user, isAuthenticated } = useAuth();
-  const playerId = isAuthenticated ? user?.id ?? null : null;
+  const { isOnCrazyGamesPlatform } = useCrazyGames();
+  const playerId = isAuthenticated && !isOnCrazyGamesPlatform ? user?.id ?? null : null;
   const { next, isClaiming, claim } = useSeasonClaim(playerId);
 
   const [dismissed, setDismissed] = useState<Set<number>>(() => new Set());
