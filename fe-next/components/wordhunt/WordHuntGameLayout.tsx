@@ -135,8 +135,8 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
           t={t}
         />
 
-        {/* Clue Boxes — tight vertical padding */}
-        <div className={`px-2 py-0 flex-shrink-0${wrongGuessShake ? ' animate-neo-shake' : ''}`}>
+        {/* Clue Boxes — tight vertical padding; on short landscape collapse outer padding too */}
+        <div className={`px-2 py-0 [@media(max-height:560px)]:px-1 flex-shrink-0${wrongGuessShake ? ' animate-neo-shake' : ''}`}>
           <SurvivalClueBoxes
             currentHint={currentHint}
             targetWord={'?'.repeat(targetLength)}
@@ -166,8 +166,8 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
           />
         </div>
 
-        {/* Grid — fills remaining space, auto-scales to fit */}
-        <div className="flex-1 min-h-[40dvh] px-1 relative overflow-y-auto overflow-x-hidden">
+        {/* Grid — fills remaining space, auto-scales to fit. No dvh floor: on short landscape the floor would push the bottom row off-screen. */}
+        <div className="flex-1 min-h-0 px-1 relative overflow-hidden [@media(min-height:560px)]:min-h-[40dvh] [@media(min-height:560px)]:overflow-y-auto">
           <SurvivalGridSection
             grid={grid}
             isGameOver={isGameOver}
@@ -188,8 +188,8 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
           )}
         </div>
 
-        {/* MP Leaderboard — mobile: compact horizontal strip */}
-        <div className="shrink-0 max-h-[10vh] overflow-y-auto lg:hidden">
+        {/* MP Leaderboard — mobile strip. Cap by absolute px on short landscape so the grid keeps room. */}
+        <div className="shrink-0 max-h-[80px] [@media(min-height:560px)]:max-h-[10vh] overflow-y-auto lg:hidden">
           <WordHuntMPLeaderboard
             playerLives={playerLives}
             eliminatedPlayers={eliminatedPlayers}

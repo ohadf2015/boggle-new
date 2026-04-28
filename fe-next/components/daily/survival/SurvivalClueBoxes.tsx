@@ -55,6 +55,7 @@ export const SurvivalClueBoxes = forwardRef<HTMLDivElement, SurvivalClueBoxesPro
       animate={{ opacity: 1, y: 0 }}
       className={cn(
         "mx-auto max-w-3xl w-full px-3 py-2 mb-0.5 rounded-neo-lg transition-all duration-300",
+        "[@media(max-height:560px)]:py-px [@media(max-height:560px)]:px-1.5 [@media(max-height:560px)]:mb-0 [@media(max-height:560px)]:border [@media(max-height:560px)]:rounded-md",
         "bg-neo-navy/30 dark:bg-neo-navy/50 border-2 border-neo-black/20",
         showFeedbackOverlay
           ? "clue-feedback-active clue-container-attention animate-pulse ring-2 ring-neo-lime/60"
@@ -68,7 +69,7 @@ export const SurvivalClueBoxes = forwardRef<HTMLDivElement, SurvivalClueBoxesPro
       {showMatchWarning && (
         <div
           data-testid="match-target-warning"
-          className="text-center mb-1 text-sm sm:text-base font-black text-neo-pink animate-neo-pop"
+          className="text-center mb-1 text-sm sm:text-base font-black text-neo-pink animate-neo-pop [@media(max-height:560px)]:hidden"
           role="status"
           aria-live="polite"
         >
@@ -80,9 +81,9 @@ export const SurvivalClueBoxes = forwardRef<HTMLDivElement, SurvivalClueBoxesPro
         const targetAttempts = attempts.filter(a => !a.isDiscovery).length;
         const triesRemaining = MAX_ATTEMPTS - targetAttempts;
         return (
-          <div className="text-center mb-2">
+          <div className="text-center mb-2 [@media(max-height:560px)]:mb-0.5">
             <span className={cn(
-              "text-xl sm:text-2xl font-black",
+              "text-xl sm:text-2xl font-black [@media(max-height:560px)]:text-sm",
               triesRemaining <= 2
                 ? "text-red-600 dark:text-red-400"
                 : triesRemaining <= 4
@@ -96,7 +97,7 @@ export const SurvivalClueBoxes = forwardRef<HTMLDivElement, SurvivalClueBoxesPro
       })()}
 
       {/* Black boxes for target word OR Letter Feedback Overlay */}
-      <div dir={gameDir} className="flex justify-center flex-wrap gap-2 sm:gap-2.5 px-2">
+      <div dir={gameDir} className="flex justify-center flex-wrap gap-2 sm:gap-2.5 [@media(max-height:560px)]:gap-0.5 [@media(max-height:560px)]:px-0 px-2">
         <AdaptiveAnimatePresence mode="sync">
           {showFeedbackOverlay && latestAttemptFeedback ? (
             <FeedbackOverlay
@@ -116,8 +117,8 @@ export const SurvivalClueBoxes = forwardRef<HTMLDivElement, SurvivalClueBoxesPro
         </AdaptiveAnimatePresence>
       </div>
 
-      {/* Legend / Known letters indicator */}
-      <div className="min-h-[40px] sm:min-h-[44px] flex flex-col justify-center">
+      {/* Legend / Known letters indicator. Floor collapses on short landscape so the grid keeps room. */}
+      <div className="min-h-[40px] sm:min-h-[44px] [@media(max-height:560px)]:min-h-0 flex flex-col justify-center">
         <AdaptiveAnimatePresence mode="sync">
           {showFeedbackOverlay && latestAttemptFeedback ? (
             <FeedbackLegend t={t} />
@@ -183,12 +184,12 @@ const FeedbackOverlay: React.FC<FeedbackOverlayProps> = ({ feedback, targetWordL
   const normalizedFeedback = normalizeToTargetLength(feedback, targetWordLength);
   const wordLength = normalizedFeedback.length;
   const sizeClass = wordLength <= 4
-    ? "w-11 h-11 sm:w-12 sm:h-12 text-lg sm:text-xl"
+    ? "w-11 h-11 sm:w-12 sm:h-12 text-lg sm:text-xl [@media(max-height:560px)]:w-7 [@media(max-height:560px)]:h-7 [@media(max-height:560px)]:text-xs [@media(max-height:560px)]:rounded [@media(max-height:560px)]:border [@media(max-height:560px)]:shadow-none"
     : wordLength <= 6
-      ? "w-10 h-10 sm:w-11 sm:h-11 text-base sm:text-lg"
+      ? "w-10 h-10 sm:w-11 sm:h-11 text-base sm:text-lg [@media(max-height:560px)]:w-6 [@media(max-height:560px)]:h-6 [@media(max-height:560px)]:text-[10px] [@media(max-height:560px)]:rounded [@media(max-height:560px)]:border [@media(max-height:560px)]:shadow-none"
       : wordLength <= 8
-        ? "w-9 h-9 sm:w-10 sm:h-10 text-sm sm:text-base"
-        : "w-8 h-8 sm:w-9 sm:h-9 text-xs sm:text-sm";
+        ? "w-9 h-9 sm:w-10 sm:h-10 text-sm sm:text-base [@media(max-height:560px)]:w-6 [@media(max-height:560px)]:h-6 [@media(max-height:560px)]:text-[10px] [@media(max-height:560px)]:rounded [@media(max-height:560px)]:border [@media(max-height:560px)]:shadow-none"
+        : "w-8 h-8 sm:w-9 sm:h-9 text-xs sm:text-sm [@media(max-height:560px)]:w-5 [@media(max-height:560px)]:h-5 [@media(max-height:560px)]:text-[9px] [@media(max-height:560px)]:rounded [@media(max-height:560px)]:border [@media(max-height:560px)]:shadow-none";
 
   return (
     <AdaptiveMotion.div
@@ -263,12 +264,12 @@ const HintBoxes: React.FC<HintBoxesProps> = ({
     [attempts, letterCounts, accumulatedClues]
   );
   const sizeClass = wordLength <= 4
-    ? "w-11 h-11 sm:w-12 sm:h-12 text-lg sm:text-xl"
+    ? "w-11 h-11 sm:w-12 sm:h-12 text-lg sm:text-xl [@media(max-height:560px)]:w-7 [@media(max-height:560px)]:h-7 [@media(max-height:560px)]:text-xs [@media(max-height:560px)]:rounded [@media(max-height:560px)]:border [@media(max-height:560px)]:shadow-none"
     : wordLength <= 6
-      ? "w-10 h-10 sm:w-11 sm:h-11 text-base sm:text-lg"
+      ? "w-10 h-10 sm:w-11 sm:h-11 text-base sm:text-lg [@media(max-height:560px)]:w-6 [@media(max-height:560px)]:h-6 [@media(max-height:560px)]:text-[10px] [@media(max-height:560px)]:rounded [@media(max-height:560px)]:border [@media(max-height:560px)]:shadow-none"
       : wordLength <= 8
-        ? "w-9 h-9 sm:w-10 sm:h-10 text-sm sm:text-base"
-        : "w-8 h-8 sm:w-9 sm:h-9 text-xs sm:text-sm";
+        ? "w-9 h-9 sm:w-10 sm:h-10 text-sm sm:text-base [@media(max-height:560px)]:w-6 [@media(max-height:560px)]:h-6 [@media(max-height:560px)]:text-[10px] [@media(max-height:560px)]:rounded [@media(max-height:560px)]:border [@media(max-height:560px)]:shadow-none"
+        : "w-8 h-8 sm:w-9 sm:h-9 text-xs sm:text-sm [@media(max-height:560px)]:w-5 [@media(max-height:560px)]:h-5 [@media(max-height:560px)]:text-[9px] [@media(max-height:560px)]:rounded [@media(max-height:560px)]:border [@media(max-height:560px)]:shadow-none";
 
   return (
     <AdaptiveMotion.div

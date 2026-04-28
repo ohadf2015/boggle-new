@@ -575,7 +575,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
               comboGlow
             )}
           >
-            <div className="relative w-full max-w-[min(600px,92vw,80dvh)] short:max-w-[min(600px,92vw,95dvh)] lg:max-w-none lg:w-auto lg:h-full mx-auto aspect-square">
+            <div className="relative w-full max-w-[min(600px,92vw,80dvh)] short:max-w-none short:w-auto short:h-full lg:max-w-none lg:w-auto lg:h-full mx-auto aspect-square">
               <GridComponent
                 key={isPlaying ? 'playing-grid' : 'spectating-grid'}
                 grid={letterGrid}

@@ -82,7 +82,7 @@ export const WordHuntMPLeaderboard = memo<WordHuntMPLeaderboardProps>(({
   }, [leaderboard, currentUsername, playerLives, eliminatedPlayers]);
 
   return (
-    <div className="px-2 py-1.5">
+    <div className="px-2 py-1.5 [@media(max-height:560px)]:py-0.5">
       {/* Mobile: horizontal compact strip — top 2 opponents only, no self */}
       <div className="flex gap-1.5 lg:hidden overflow-x-auto scrollbar-hide">
         {mobileOpponents.map((player) => {

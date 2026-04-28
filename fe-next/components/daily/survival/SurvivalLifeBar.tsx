@@ -74,7 +74,7 @@ export const SurvivalLifeBar = memo<SurvivalLifeBarProps>(({
   return (
     <div
       className={cn(
-        "flex items-center gap-2 max-w-3xl mx-auto w-full relative py-1 overflow-x-clip",
+        "flex items-center gap-2 max-w-3xl mx-auto w-full relative py-1 [@media(max-height:560px)]:py-0 overflow-x-clip",
         tier.glow
       )}
       role="progressbar"
@@ -92,7 +92,7 @@ export const SurvivalLifeBar = memo<SurvivalLifeBarProps>(({
       <AdaptiveMotion.div
         key={`heart-${isLifeGaining ? 'beating' : 'idle'}`}
         className={cn(
-          "shrink-0 flex items-center justify-center w-9 h-9 sm:w-11 sm:h-11 rounded-full",
+          "shrink-0 flex items-center justify-center w-9 h-9 sm:w-11 sm:h-11 [@media(max-height:560px)]:w-7 [@media(max-height:560px)]:h-7 rounded-full",
           "border-2 border-neo-cream/15",
           tier.heart,
           isLifeGaining && "heart-beating"
@@ -118,7 +118,7 @@ export const SurvivalLifeBar = memo<SurvivalLifeBarProps>(({
       <div className="flex-1 relative">
       <AdaptiveMotion.div
         className={cn(
-          "h-7 sm:h-8 rounded-neo overflow-hidden border-2 relative transition-colors duration-300",
+          "h-7 sm:h-8 [@media(max-height:560px)]:h-5 rounded-neo overflow-hidden border-2 relative transition-colors duration-300",
           "bg-neo-navy/80",
           isDamaged ? "border-neo-cream/30 bg-red-900/20" : "border-neo-cream/10",
           isLifeGaining && "life-gain-flash life-meter-pulse"

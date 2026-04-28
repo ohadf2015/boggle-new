@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Download, X } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { gameEvents } from '@/components/GoogleAnalytics';
 
 interface BeforeInstallPromptEvent extends Event {
@@ -22,6 +23,7 @@ interface BeforeInstallPromptEvent extends Event {
  */
 export function PWAInstallPrompt() {
   const { t } = useLanguage();
+  const { isOnCrazyGamesPlatform } = useCrazyGames();
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [showPrompt, setShowPrompt] = useState(false);
 
@@ -95,6 +97,7 @@ export function PWAInstallPrompt() {
     localStorage.setItem('pwa_install_dismissed_until', dismissedUntil.toString());
   };
 
+  if (isOnCrazyGamesPlatform) return null;
   if (!showPrompt || !deferredPrompt) return null;
 
   return (
