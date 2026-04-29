@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Calendar, Clock, ArrowRight } from 'lucide-react';
+import { Calendar, Clock, ArrowRight, BookOpen } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { safeToLocaleDateString } from '@/utils/bcp47Locale';
@@ -16,41 +16,42 @@ interface BlogPostData {
   content: Record<string, { title: string; excerpt: string; readTime: string; category: string }>;
 }
 
+// Sorted by date descending — newest first. Keep in sync with `app/[locale]/blog/PageClient.tsx`.
 const recentPosts: BlogPostData[] = [
   {
-    slug: 'vocabulary-building-strategies',
-    image: '/images/blog/vocabulary-building.jpg',
-    date: '2026-03-05',
+    slug: 'netflix-word-game-2026-rise',
+    image: '/images/blog/netflix-word-games.jpg',
+    date: '2026-04-29',
     content: {
-      en: { title: 'I Learned 500 New Words in 30 Days (Here\'s Exactly How)', excerpt: 'Spaced repetition, active recall, morphology hacks, and the daily routines that actually stick.', readTime: '11 min read', category: 'Learning' },
-      he: { title: 'למדתי 500 מילים חדשות ב-30 יום (ככה בדיוק)', excerpt: 'חזרה מרווחת, זכירה אקטיבית, טריקים מורפולוגיים, ושגרות יומיות שבאמת נתקעות.', readTime: '11 דקות קריאה', category: 'למידה' },
-      sv: { title: 'Jag lärde mig 500 nya ord på 30 dagar (så här gjorde jag)', excerpt: 'Repetition med intervall, aktiv återkallning, morfologiknep och dagliga rutiner som faktiskt fastnar.', readTime: '11 min läsning', category: 'Lärande' },
-      ja: { title: '30日で500の新しい単語を覚えた方法（具体的に教えます）', excerpt: '間隔反復、能動的想起、形態学ハック、実際に定着する日課。', readTime: '11分で読める', category: '学習' },
-      es: { title: 'Aprendí 500 Palabras Nuevas en 30 Días (Así Es Exactamente Cómo)', excerpt: 'Repetición espaciada, recuerdo activo, trucos morfológicos y rutinas diarias que realmente se quedan.', readTime: '11 min de lectura', category: 'Aprendizaje' },
+      en: { title: "Netflix Just Dropped a Word Game — 2026 Is the Year Word Games Took Over", excerpt: 'Streaming giants, daily-puzzle obsession, brain-training boom and a TikTok-shaped social loop. Why every screen you own suddenly wants you spelling things.', readTime: '9 min read', category: 'Trends' },
+      he: { title: 'נטפליקס שחררה משחק מילים — 2026 היא השנה של משחקי המילים', excerpt: 'סטרימינג ענק, התמכרות לפאזל היומי, גל אימון מוחי וטיק־טוק שהפך פתרון לספורט צפייה. למה כל מסך פתאום רוצה שתאייתו.', readTime: '9 דקות קריאה', category: 'טרנדים' },
+      sv: { title: 'Netflix släppte ett ordspel — 2026 är ordspelens år', excerpt: 'Streamingjättar, daglig pusselbesatthet, hjärnträningsboom och en TikTok-driven social loop. Varför varenda skärm plötsligt vill att du stavar.', readTime: '9 min läsning', category: 'Trender' },
+      ja: { title: 'Netflixがワードゲームを投入 — 2026年はワードゲームの年', excerpt: 'ストリーミング大手、デイリーパズル中毒、脳トレブーム、TikTok型ソーシャルループ。なぜあなたの全画面が突然「綴れ」と言ってくるのか。', readTime: '9分で読める', category: 'トレンド' },
+      es: { title: 'Netflix lanza un juego de palabras — 2026, el año de los juegos de palabras', excerpt: 'Gigantes del streaming, obsesión por el puzzle diario, boom del entrenamiento cerebral y un bucle social al estilo TikTok. Por qué cada pantalla quiere que deletrees.', readTime: '9 min de lectura', category: 'Tendencias' },
     },
   },
   {
-    slug: 'multiplayer-word-games-social',
-    image: '/images/blog/multiplayer-social.jpg',
-    date: '2026-02-15',
+    slug: 'boggle-vs-wordle',
+    image: '/images/blog/boggle-vs-wordle.jpg',
+    date: '2026-03-28',
     content: {
-      en: { title: 'Why Playing Word Games With Friends Hits Different', excerpt: 'Cooperative cognition, competitive trash talk, and why your brain literally lights up more when other humans are involved.', readTime: '10 min read', category: 'Social Science' },
-      he: { title: 'למה לשחק משחקי מילים עם חברים זה משהו אחר לגמרי', excerpt: 'קוגניציה שיתופית, טראש טוק תחרותי, ולמה המוח שלכם ממש נדלק יותר כשיש אנשים אחרים.', readTime: '10 דקות קריאה', category: 'מדע חברתי' },
-      sv: { title: 'Varför ordspel med vänner känns annorlunda', excerpt: 'Kooperativ kognition, tävlingsinriktat trash talk och varför din hjärna bokstavligen lyser mer med andra.', readTime: '10 min läsning', category: 'Samhällsvetenskap' },
-      ja: { title: '友達とのワードゲームが特別な理由', excerpt: '協調的認知、競争的トラッシュトーク、他の人間がいると脳が文字通りもっと輝く理由。', readTime: '10分で読める', category: '社会科学' },
-      es: { title: 'Por Qué Jugar Juegos de Palabras con Amigos Es Diferente', excerpt: 'Cognición cooperativa, trash talk competitivo y por qué tu cerebro literalmente se ilumina más con otros humanos.', readTime: '10 min de lectura', category: 'Ciencia Social' },
+      en: { title: 'Boggle vs Wordle: One Grid, Two Completely Different Brain Workouts', excerpt: 'Pattern recognition versus deductive logic. Unlimited rounds versus one a day. Which word game actually fits your brain?', readTime: '9 min read', category: 'Comparison' },
+      he: { title: 'בוגל מול וורדל: שני משחקי מילים, שני מוחות שונים לגמרי', excerpt: 'זיהוי דפוסים מול היגיון דדוקטיבי. סיבובים אינסופיים מול פעם ביום. איזה משחק מילים באמת מתאים לכם?', readTime: '9 דקות קריאה', category: 'השוואה' },
+      sv: { title: 'Boggle vs Wordle: Två ordspel, två helt olika hjärnträningar', excerpt: 'Mönsterigenkänning mot deduktiv logik. Obegränsade rundor mot en om dagen. Vilket ordspel passar din hjärna?', readTime: '9 min läsning', category: 'Jämförelse' },
+      ja: { title: 'Boggle vs Wordle：同じ「言葉」でも全く違う脳トレ', excerpt: 'パターン認識 vs 演繹的推理。無制限ラウンド vs 1日1回。あなたの脳に合うワードゲームはどっち？', readTime: '9分で読める', category: '比較' },
+      es: { title: 'Boggle vs Wordle: Dos Juegos de Palabras, Dos Cerebros Distintos', excerpt: 'Reconocimiento de patrones vs lógica deductiva. Rondas ilimitadas vs una al día. ¿Cuál le va mejor a tu cerebro?', readTime: '9 min de lectura', category: 'Comparación' },
     },
   },
   {
-    slug: 'word-games-for-kids-education',
-    image: '/images/blog/kids-education.jpg',
-    date: '2026-01-27',
+    slug: 'boggle-vs-scrabble',
+    image: '/images/blog/boggle-vs-scrabble.jpg',
+    date: '2026-03-28',
     content: {
-      en: { title: 'Why Every Teacher Should Have a Word Game in Their Toolkit', excerpt: 'The vocabulary gap is real, the research is compelling, and your students are already gamers — meet them where they are.', readTime: '11 min read', category: 'Education' },
-      he: { title: 'למה כל מורה צריך משחק מילים בארגז הכלים', excerpt: 'הפער באוצר המילים אמיתי, המחקר משכנע, והתלמידים שלכם כבר גיימרים — תפגשו אותם איפה שהם.', readTime: '11 דקות קריאה', category: 'חינוך' },
-      sv: { title: 'Varför varje lärare bör ha ett ordspel i verktygslådan', excerpt: 'Ordförrådsgapet är verkligt, forskningen är övertygande, och dina elever är redan gamers.', readTime: '11 min läsning', category: 'Utbildning' },
-      ja: { title: 'すべての教師がワードゲームを持つべき理由', excerpt: '語彙格差は現実、研究は説得力あり、生徒たちはすでにゲーマー — 彼らのいる場所で会いましょう。', readTime: '11分で読める', category: '教育' },
-      es: { title: 'Por Qué Todo Profesor Debería Tener un Juego de Palabras', excerpt: 'La brecha de vocabulario es real, la investigación es convincente, y tus alumnos ya son gamers.', readTime: '11 min de lectura', category: 'Educación' },
+      en: { title: 'Boggle vs Scrabble: Speed Demon or Strategic Mastermind?', excerpt: 'One gives you 3 minutes and chaos. The other lets you stare at tiles for 20. Which classic word game is actually better?', readTime: '10 min read', category: 'Comparison' },
+      he: { title: 'בוגל מול סקרבל: מהירות או אסטרטגיה?', excerpt: 'אחד נותן לכם 3 דקות וכאוס. השני נותן לכם לבהות באריחים 20 דקות. איזה קלאסיקה באמת יותר טובה?', readTime: '10 דקות קריאה', category: 'השוואה' },
+      sv: { title: 'Boggle vs Scrabble: Fartdemon eller strategiskt geni?', excerpt: 'Det ena ger dig 3 minuter och kaos. Det andra låter dig stirra på brickor i 20. Vilken klassiker är bäst?', readTime: '10 min läsning', category: 'Jämförelse' },
+      ja: { title: 'Boggle vs Scrabble：スピード狂か戦略の達人か？', excerpt: '一方は3分間のカオス。もう一方は20分間タイルを見つめる。どっちのクラシックが本当に優れてる？', readTime: '10分で読める', category: '比較' },
+      es: { title: 'Boggle vs Scrabble: ¿Velocidad o Estrategia?', excerpt: 'Uno te da 3 minutos de caos. El otro te deja mirar fichas 20 minutos. ¿Cuál clásico es realmente mejor?', readTime: '10 min de lectura', category: 'Comparación' },
     },
   },
 ];
@@ -79,20 +80,10 @@ export function LandingBlogSection() {
 
   return (
     <section className="w-full max-w-4xl mx-auto xl:max-w-5xl">
-      <div className="flex items-center justify-between mb-6">
+      <div className="mb-6">
         <h2 className="text-2xl sm:text-3xl font-black uppercase text-white">
           {sectionHeading[lang]}
         </h2>
-        <Link
-          href={`/${locale}/blog`}
-          className={cn(
-            'hidden sm:flex items-center gap-1 text-sm font-bold text-neo-yellow',
-            'hover:underline underline-offset-4'
-          )}
-        >
-          {viewAllLabel[lang]}
-          <ArrowRight className="w-4 h-4 rtl:rotate-180" />
-        </Link>
       </div>
 
       <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
@@ -153,14 +144,21 @@ export function LandingBlogSection() {
         })}
       </div>
 
-      {/* Mobile "View All" link */}
-      <div className="sm:hidden mt-4 text-center">
+      {/* Prominent "View All" CTA — pulls eyes after the 3-card grid */}
+      <div className="mt-8 flex justify-center">
         <Link
           href={`/${locale}/blog`}
-          className="inline-flex items-center gap-1 text-sm font-bold text-neo-yellow hover:underline underline-offset-4"
+          className={cn(
+            'group inline-flex items-center gap-2 px-6 py-3 sm:px-8 sm:py-4',
+            'rounded-neo border-3 border-neo-black bg-neo-yellow text-neo-black',
+            'font-black uppercase text-base sm:text-lg shadow-hard-lg',
+            'transition-all hover:-translate-y-0.5 hover:shadow-hard-xl',
+            'active:translate-y-0 active:shadow-hard-pressed'
+          )}
         >
+          <BookOpen className="w-5 h-5" />
           {viewAllLabel[lang]}
-          <ArrowRight className="w-4 h-4 rtl:rotate-180" />
+          <ArrowRight className="w-5 h-5 rtl:rotate-180 transition-transform group-hover:translate-x-1 rtl:group-hover:-translate-x-1" />
         </Link>
       </div>
     </section>
