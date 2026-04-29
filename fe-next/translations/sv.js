@@ -1751,6 +1751,7 @@ const sv = {
     "header": "Snabbguide",
     "loading": "Laddar...",
     "skip": "Hoppa över",
+    "skipTutorial": "Hoppa över guiden",
     "letsPlay": "Nu kör vi!",
     "timingHint": "De första 10 sekunderna är avgörande!",
     "step1Title": "Svep Bokstäver",
@@ -1779,6 +1780,7 @@ const sv = {
       "demoComplete": "Du förstår! Nu vet du hur man spelar.",
       "startHere": "Börja här",
       "watchMe": "Titta!",
+      "demoAriaLabel": "Demo: spårar ordet {{word}}",
       "yourTurn": "Din tur! Stava:",
       "letterCount": "{current}/{total}"
     },
@@ -2580,7 +2582,7 @@ const sv = {
       },
       "letterFeedback": {
         "title": "Läsa Ledtrådarna",
-        "example": "Exempel: Målet är \"BEACH\"",
+        "example": "Exempel",
         "gotIt": "Fattar!",
         "legendGreen": "Rätt plats",
         "legendYellow": "Fel plats",
@@ -2856,6 +2858,22 @@ const sv = {
     "LOYAL_PLAYER": {
       "name": "Lojal spelare",
       "description": "Spelade på 30 olika dagar"
+    },
+    "EARLY_BIRD": {
+      "name": "Tidig fågel",
+      "description": "Första ord på under 2 sekunder"
+    },
+    "PALINDROME_HUNTER": {
+      "name": "Palindromjägare",
+      "description": "Hittade ett ord som läses likadant åt båda hållen"
+    },
+    "COMEBACK_CHAMPION": {
+      "name": "Comeback-mästare",
+      "description": "Vann med en rasande slutspurt"
+    },
+    "FIRST_GAME_WIN": {
+      "name": "Första segern",
+      "description": "Vann din allra första match"
     },
     "DAILY_DOUBLE": {
       "name": "Dubbel Daglig",
@@ -3517,7 +3535,9 @@ const sv = {
     "recentWords": "Senaste Ord",
     "leaderboard": "Topplista",
     "words": "ord",
-    "noPlayersYet": "Inga spelare ännu"
+    "noPlayersYet": "Inga spelare ännu",
+    "live": "Live",
+    "connecting": "Ansluter..."
   },
   "collectibles": {
     "title": "Min samling",
@@ -3617,6 +3637,7 @@ const sv = {
     "unequip": "Ta av",
     "purchase": "Köp ({{cost}} guld)",
     "close": "Stäng",
+    "unlockedToast": "✨ Ny kosmetik upplåst: {{name}}",
     "rarity": {
       "common": "Vanlig",
       "rare": "Sällsynt",
@@ -10675,6 +10696,7 @@ const sv = {
     "title": "Välj en boost",
     "cta": "BOOST",
     "close": "Stäng",
+    "skipAndPlay": "Spela utan boost",
     "remaining": "Boostar kvar idag: {{n}}/{{cap}}",
     "watchAd": "Titta på annons för att låsa upp",
     "activeThisGame": "Aktiv detta spel",

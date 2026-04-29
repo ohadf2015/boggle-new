@@ -55,6 +55,12 @@ export const ACHIEVEMENT_ICONS: Record<string, string> = {
   POINT_KING: '💎',           // Accumulate 50000 total points
   DEDICATION: '🔥',           // Play games on 7 different days
   LOYAL_PLAYER: '⭐',         // Play games on 30 different days
+
+  // NEW
+  EARLY_BIRD: '🐦',           // First valid word within 2 seconds of game start
+  PALINDROME_HUNTER: '🪞',    // Submitted a palindrome word of 4+ letters
+  COMEBACK_CHAMPION: '🦾',    // Won MP after late-game push from behind
+  FIRST_GAME_WIN: '🌱',       // Win first ever game
 };
 
 export interface Achievement {
@@ -307,6 +313,19 @@ export function checkLiveAchievements(
     const lastFour = validatedWordDetails.slice(-4);
     if (lastFour.every(w => w.word.length >= 6)) {
       newAchievements.push(addAchievementAndReturn('LONG_WORD_CHAIN'));
+    }
+  }
+
+  // Early Bird - first valid word within 2 seconds of game start
+  if (timeSinceStart <= 2 && isCurrentWordValid && !achievements.includes('EARLY_BIRD')) {
+    newAchievements.push(addAchievementAndReturn('EARLY_BIRD'));
+  }
+
+  // Palindrome Hunter - palindrome word of 4+ letters
+  if (word.length >= 4 && isCurrentWordValid && !achievements.includes('PALINDROME_HUNTER')) {
+    const lower = word.toLowerCase();
+    if (lower === lower.split('').reverse().join('')) {
+      newAchievements.push(addAchievementAndReturn('PALINDROME_HUNTER'));
     }
   }
 
@@ -586,6 +605,27 @@ export function awardFinalAchievements(game: Game, users: string[]): void {
       if (myScore > maxOtherScore && myScore - maxOtherScore < 5 && !currentAchievements.includes('PHOTO_FINISH')) {
         currentAchievements.push('PHOTO_FINISH');
       }
+
+      // Comeback Champion - winner whose total points scored in last 25% of game
+      // exceeded their total from the first 75%, AND they won.
+      const myWords = (game.playerWordDetails[username] || [])
+        .filter(w => w.validated === true) as WordDetailWithTimestamp[];
+      const gameDuration = (gameWithAchievements.gameDuration || 180);
+      const lateThreshold = gameDuration * 0.75;
+      const lateScore = myWords
+        .filter(w => (w.timeSinceStart || 0) >= lateThreshold)
+        .reduce((sum, w) => sum + Math.max(w.word.length - 1, 0), 0);
+      const earlyScore = myWords
+        .filter(w => (w.timeSinceStart || 0) < lateThreshold)
+        .reduce((sum, w) => sum + Math.max(w.word.length - 1, 0), 0);
+
+      if (
+        myScore > maxOtherScore &&
+        lateScore > earlyScore &&
+        !currentAchievements.includes('COMEBACK_CHAMPION')
+      ) {
+        currentAchievements.push('COMEBACK_CHAMPION');
+      }
     });
   }
 }
@@ -624,6 +664,9 @@ export function checkLifetimeAchievements(
   }
 
   // Games won achievements
+  if ((userStats.gamesWon || 0) >= 1) {
+    addIfNew('FIRST_GAME_WIN');
+  }
   if ((userStats.gamesWon || 0) >= 25) {
     addIfNew('CHAMPION');
   }
@@ -658,6 +701,7 @@ export function checkLifetimeAchievements(
 
 // Export lifetime achievement thresholds for UI display
 export const LIFETIME_ACHIEVEMENT_THRESHOLDS: Record<string, LifetimeThreshold> = {
+  FIRST_GAME_WIN: { stat: 'gamesWon', threshold: 1 },
   VETERAN: { stat: 'gamesPlayed', threshold: 50 },
   CENTURION: { stat: 'gamesPlayed', threshold: 100 },
   WORD_COLLECTOR: { stat: 'totalWordsFound', threshold: 1000 },

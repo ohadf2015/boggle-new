@@ -1854,6 +1854,7 @@ const en = {
     "header": "Quick Start",
     "loading": "Loading...",
     "skip": "Skip",
+    "skipTutorial": "Skip Tutorial",
     "letsPlay": "Let's Clash!",
     "timingHint": "First 10 secs are key!",
     "step1Title": "Swipe It",
@@ -1882,6 +1883,7 @@ const en = {
       "demoComplete": "You got it! Let's clash!",
       "startHere": "Start Here",
       "watchMe": "Watch this!",
+      "demoAriaLabel": "Animated demo: tracing the word {{word}} across letter tiles",
       "yourTurn": "Your turn! Spell:",
       "letterCount": "{current}/{total}"
     },
@@ -2707,7 +2709,7 @@ const en = {
       },
       "letterFeedback": {
         "title": "Reading the Clues",
-        "example": "Example: Target is \"BEACH\"",
+        "example": "Example",
         "gotIt": "Got it!",
         "legendGreen": "Right spot",
         "legendYellow": "Wrong spot",
@@ -2983,6 +2985,22 @@ const en = {
     "LOYAL_PLAYER": {
       "name": "Loyalist",
       "description": "30-day warrior"
+    },
+    "EARLY_BIRD": {
+      "name": "Early Bird",
+      "description": "First word in 2 seconds flat"
+    },
+    "PALINDROME_HUNTER": {
+      "name": "Palindrome Hunter",
+      "description": "Found a word that reads the same both ways"
+    },
+    "COMEBACK_CHAMPION": {
+      "name": "Comeback Champion",
+      "description": "Won with a furious late-game push"
+    },
+    "FIRST_GAME_WIN": {
+      "name": "First Victory",
+      "description": "Won your very first game"
     },
     "DAILY_DOUBLE": {
       "name": "Daily Double",
@@ -4013,7 +4031,9 @@ const en = {
     "recentWords": "Recent Words",
     "leaderboard": "Leaderboard",
     "words": "words",
-    "noPlayersYet": "No players yet"
+    "noPlayersYet": "No players yet",
+    "live": "Live",
+    "connecting": "Connecting..."
   },
   "collectibles": {
     "title": "My Collection",
@@ -4113,6 +4133,7 @@ const en = {
     "unequip": "Unequip",
     "purchase": "Buy ({{cost}} gold)",
     "close": "Close",
+    "unlockedToast": "✨ New cosmetic unlocked: {{name}}",
     "rarity": {
       "common": "Common",
       "rare": "Rare",
@@ -10804,6 +10825,7 @@ const en = {
     "title": "Pick a boost",
     "cta": "BOOST",
     "close": "Close",
+    "skipAndPlay": "Play Without Boost",
     "remaining": "Boosts left today: {{n}}/{{cap}}",
     "watchAd": "Watch ad to unlock",
     "activeThisGame": "Active this game",

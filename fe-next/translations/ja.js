@@ -1737,6 +1737,7 @@ const ja = {
     "header": "クイックスタートガイド",
     "loading": "読み込み中...",
     "skip": "スキップ",
+    "skipTutorial": "チュートリアルをスキップ",
     "letsPlay": "レッツクラッシュ！",
     "step1Title": "文字をスワイプ",
     "step1Text": "つながった文字をドラッグして単語を作ろう。",
@@ -1764,6 +1765,7 @@ const ja = {
       "demoComplete": "できた！遊び方がわかったね。",
       "startHere": "ここから",
       "watchMe": "見て！",
+      "demoAriaLabel": "デモ：{{word}}",
       "yourTurn": "あなたの番！スペル：",
       "letterCount": "{current}/{total}"
     },
@@ -2568,7 +2570,7 @@ const ja = {
       },
       "letterFeedback": {
         "title": "ヒントを読む",
-        "example": "例：目標は「BEACH」",
+        "example": "例",
         "gotIt": "わかった！",
         "legendGreen": "正解位置",
         "legendYellow": "位置違い",
@@ -2843,6 +2845,22 @@ const ja = {
     "LOYAL_PLAYER": {
       "name": "古参プレイヤー",
       "description": "30日間にわたってプレイ"
+    },
+    "EARLY_BIRD": {
+      "name": "アーリーバード",
+      "description": "ゲーム開始2秒以内の単語"
+    },
+    "PALINDROME_HUNTER": {
+      "name": "回文ハンター",
+      "description": "前後どちらから読んでも同じ単語を発見"
+    },
+    "COMEBACK_CHAMPION": {
+      "name": "逆転王者",
+      "description": "終盤の猛追で勝利"
+    },
+    "FIRST_GAME_WIN": {
+      "name": "初勝利",
+      "description": "最初の試合に勝利"
     },
     "DAILY_DOUBLE": {
       "name": "デイリー・ダブル",
@@ -3501,7 +3519,9 @@ const ja = {
     "recentWords": "最近の単語",
     "leaderboard": "ランキング",
     "words": "単語",
-    "noPlayersYet": "まだプレイヤーがいません"
+    "noPlayersYet": "まだプレイヤーがいません",
+    "live": "ライブ",
+    "connecting": "接続中..."
   },
   "collectibles": {
     "title": "マイコレクション",
@@ -3601,6 +3621,7 @@ const ja = {
     "unequip": "外す",
     "purchase": "購入（{{cost}}ゴールド）",
     "close": "閉じる",
+    "unlockedToast": "✨ 新しいコスメティック解放: {{name}}",
     "rarity": {
       "common": "コモン",
       "rare": "レア",
@@ -10603,6 +10624,7 @@ const ja = {
     "title": "ブーストを選択",
     "cta": "ブースト",
     "close": "閉じる",
+    "skipAndPlay": "ブーストなしでプレイ",
     "remaining": "本日の残り: {{n}}/{{cap}}",
     "watchAd": "広告を見てアンロック",
     "activeThisGame": "このゲームで有効",

@@ -2678,6 +2678,22 @@ const es = {
       "name": "Jugador Leal",
       "description": "Jugó en 30 días diferentes"
     },
+    "EARLY_BIRD": {
+      "name": "Madrugador",
+      "description": "Primera palabra en menos de 2 segundos"
+    },
+    "PALINDROME_HUNTER": {
+      "name": "Cazador de palíndromos",
+      "description": "Encontraste una palabra que se lee igual al revés"
+    },
+    "COMEBACK_CHAMPION": {
+      "name": "Campeón de la remontada",
+      "description": "Ganaste con una remontada feroz al final"
+    },
+    "FIRST_GAME_WIN": {
+      "name": "Primera victoria",
+      "description": "Ganaste tu primera partida"
+    },
     "DAILY_DOUBLE": {
       "name": "Doble Diario",
       "description": "Aplastaste ambos retos de hoy"
@@ -3616,7 +3632,9 @@ const es = {
     "recentWords": "Palabras Recientes",
     "leaderboard": "Tabla de Clasificación",
     "words": "palabras",
-    "noPlayersYet": "Aún no hay jugadores"
+    "noPlayersYet": "Aún no hay jugadores",
+    "live": "En vivo",
+    "connecting": "Conectando..."
   },
   "collectibles": {
     "title": "Mi Colección",
@@ -3716,6 +3734,7 @@ const es = {
     "unequip": "Desequipar",
     "purchase": "Comprar ({{cost}} oro)",
     "close": "Cerrar",
+    "unlockedToast": "✨ Nuevo cosmético desbloqueado: {{name}}",
     "rarity": {
       "common": "Común",
       "rare": "Raro",
@@ -3769,6 +3788,7 @@ const es = {
     "header": "Guía Rápida",
     "loading": "Cargando...",
     "skip": "Omitir",
+    "skipTutorial": "Saltar tutorial",
     "letsPlay": "¡A Jugar!",
     "timingHint": "¡La velocidad da combos!",
     "step1Title": "Desliza Letras",
@@ -3797,6 +3817,7 @@ const es = {
       "demoComplete": "¡Lo tienes! Ahora sabes cómo jugar.",
       "startHere": "Empieza aquí",
       "watchMe": "¡Mira esto!",
+      "demoAriaLabel": "Demostración: trazando la palabra {{word}}",
       "yourTurn": "¡Tu turno! Deletrea:",
       "letterCount": "{current}/{total}"
     },
@@ -3957,7 +3978,7 @@ const es = {
       },
       "letterFeedback": {
         "title": "Leyendo las Pistas",
-        "example": "Ejemplo: Objetivo es \"BEACH\"",
+        "example": "Ejemplo",
         "gotIt": "¡Entendido!",
         "legendGreen": "Lugar correcto",
         "legendYellow": "Lugar incorrecto",
@@ -10687,6 +10708,7 @@ const es = {
     "title": "Elige un boost",
     "cta": "BOOST",
     "close": "Cerrar",
+    "skipAndPlay": "Jugar sin boost",
     "remaining": "Boosts restantes hoy: {{n}}/{{cap}}",
     "watchAd": "Mira un anuncio para desbloquear",
     "activeThisGame": "Activo en esta partida",
