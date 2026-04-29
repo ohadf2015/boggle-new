@@ -29,9 +29,13 @@ export function safeHexToNum(hex: string | undefined | null, fallback = 0xffffff
   return n;
 }
 
-const DEBRIS_LIFETIME = 2; // seconds
-const DEBRIS_PER_TILE = 3;
-const MAX_DEBRIS = 60;
+// Tightened 2026-04-29: was 2s/3-per-tile/60 — fragments lingered for too long on
+// the board, hiding tile letters and making it hard for the player to see what's
+// next. 1.0s lifetime + 2 fragments per tile keeps the visual punch while clearing
+// the board ~50% sooner. MAX_DEBRIS reduced in proportion.
+const DEBRIS_LIFETIME = 1.0; // seconds
+const DEBRIS_PER_TILE = 2;
+const MAX_DEBRIS = 40;
 const LIGHTNING_DEBRIS_PER_CELL = 2;
 const LIGHTNING_FLASH_DURATION = 200; // ms
 
@@ -150,12 +154,13 @@ export function useBlastDebris(
           d.graphic.x = state.position.x;
           d.graphic.y = state.position.y;
           d.graphic.rotation = state.angle;
-          // Fade across most of the lifetime so fragments visibly dissolve
-          // rather than sitting at alpha=1 and snap-fading at the end.
-          const fadeStart = DEBRIS_LIFETIME * 0.3;
+          // Aggressive fade: start at 10% of lifetime so fragments dissolve
+          // almost the entire flight, never sitting opaque on a tile.
+          const fadeStart = DEBRIS_LIFETIME * 0.1;
+          const peakAlpha = 0.85;
           d.graphic.alpha = age > fadeStart
-            ? 1 - (age - fadeStart) / (DEBRIS_LIFETIME - fadeStart)
-            : 1;
+            ? peakAlpha * (1 - (age - fadeStart) / (DEBRIS_LIFETIME - fadeStart))
+            : peakAlpha;
         } else if (!state) {
           // Physics body vanished — destroy orphan graphic
           if (!d.graphic.destroyed) d.graphic.destroy();

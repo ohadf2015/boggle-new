@@ -57,7 +57,7 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
   onQuit,
 }) => {
   const { t, dir, language: uiLanguage } = useLanguage();
-  const { playWordAcceptedSound, playWordRejectedSound, playComboSound, playCountdownBeep, setGameActive } = useSoundEffects();
+  const { playWordAcceptedSound, playWordRejectedSound, playComboSound, playCountdownBeep, playWordLengthSound, setGameActive } = useSoundEffects();
   const { stopMusic } = useMusic();
   const { awardComboMilestone } = useCoinContext();
   const { isLowEnd } = useDevicePerformance();
@@ -194,6 +194,9 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
       // Combo already incremented optimistically in onComboIncrement
       setScore(prev => prev + wordScore);
       playWordAcceptedSound?.();
+      if (word.length >= 5) {
+        playWordLengthSound?.(word.length);
+      }
       triggerPopup(wordScore, word);
     },
     onWordRejected: () => {

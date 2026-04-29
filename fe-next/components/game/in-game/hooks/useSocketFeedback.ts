@@ -17,6 +17,8 @@ interface UseSocketFeedbackOptions {
   playWordAcceptedSound: () => void;
   /** Plays on server rejection events (wordRejected/wordNotOnBoard/wordTooShort). */
   playWordRejectedSound: () => void;
+  /** Optional bespoke per-length flavor sound, fired in addition to the accept chime. */
+  playWordLengthSound?: (length: number) => void;
 }
 
 /**
@@ -31,6 +33,7 @@ export function useSocketFeedback(options: UseSocketFeedbackOptions): void {
     setLastWordFoundTime,
     playWordAcceptedSound,
     playWordRejectedSound,
+    playWordLengthSound,
   } = options;
 
   useEffect(() => {
@@ -63,6 +66,11 @@ export function useSocketFeedback(options: UseSocketFeedbackOptions): void {
       });
       // Server-truth accept sound: only plays after server confirms.
       playWordAcceptedSound();
+      // Layered per-length flavor — short words still get just the accept chime,
+      // longer words get a richer reward via wordLengthSrc tiers (3..7, 8+).
+      if (wordLen >= 5) {
+        playWordLengthSound?.(wordLen);
+      }
     };
 
     const handleWordAlreadyFound = (data: { word: string }): void => {
@@ -158,5 +166,5 @@ export function useSocketFeedback(options: UseSocketFeedbackOptions): void {
       socket.off('wordNotOnBoard', handleWordNotOnBoard);
       socket.off('wordTooShort', handleWordTooShort);
     };
-  }, [socket, isPlaying, t, setCurrentFeedback, setLastWordFoundTime, playWordAcceptedSound, playWordRejectedSound]);
+  }, [socket, isPlaying, t, setCurrentFeedback, setLastWordFoundTime, playWordAcceptedSound, playWordRejectedSound, playWordLengthSound]);
 }

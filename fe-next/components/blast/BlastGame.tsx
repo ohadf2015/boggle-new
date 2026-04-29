@@ -387,6 +387,11 @@ export function BlastGame({
   // While the modal is open we defer Sugar Crush so the player can revive cleanly.
   const hasUsedContinueRef = useRef(false);
   const [continueDeclined, setContinueDeclined] = useState(false);
+  // Suppress the offer once the wave goal is already met — the player has
+  // effectively won the wave, so prompting for extra moves is noise. The
+  // dead-end branch in useBlastGameEnd will simply call onWaveComplete.
+  const objectiveAlreadyMet = engine.gameState.totalTiles > 0
+    && (engine.gameState.tilesCleared / engine.gameState.totalTiles) * 100 >= 90;
   const continueModalOpen = shouldOfferBlastContinue({
     hasRealAdProvider,
     isMultiplayer,
@@ -394,6 +399,7 @@ export function BlastGame({
     noWordsRemaining: engine.noWordsRemaining,
     hasUsedContinue: hasUsedContinueRef.current,
     continueDeclined,
+    objectiveAlreadyMet,
   });
 
   const handleContinueAccept = useCallback(() => {

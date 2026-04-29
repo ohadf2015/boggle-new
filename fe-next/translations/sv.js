@@ -8235,6 +8235,12 @@ const sv = {
       "cta": "Se annons för +{moves} drag",
       "decline": "Avsluta rundan"
     },
+    "retryWaveModal": {
+      "title": "Våg {wave} — så nära!",
+      "body": "Du rensade {percent}%. Se en annons för att göra om våg {wave} — tidigare vågor sparas.",
+      "cta": "Gör om våg {wave}",
+      "decline": "Starta om från våg 1"
+    },
     "pregameBuff": {
       "title": "Boosta?",
       "body": "Välj en boost, titta på en snabb annons och starta rundan med övertag.",

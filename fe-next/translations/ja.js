@@ -8217,6 +8217,12 @@ const ja = {
       "cta": "広告を見て+{moves}手獲得",
       "decline": "終了する"
     },
+    "retryWaveModal": {
+      "title": "ウェーブ{wave} — あと少し！",
+      "body": "{percent}%クリア。広告を見てウェーブ{wave}に再挑戦 — 前のウェーブは保持されます。",
+      "cta": "ウェーブ{wave}に再挑戦",
+      "decline": "ウェーブ1から再開"
+    },
     "pregameBuff": {
       "title": "パワーアップ？",
       "body": "ブーストを選び、短い広告を見て、有利にランを始めよう。",

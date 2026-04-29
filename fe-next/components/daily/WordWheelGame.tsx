@@ -47,6 +47,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
     playTileSelectSound, playWordAcceptedSound, playWordRejectedSound,
     playComboSound, playLegendaryWordSound, playEpicVictorySound,
     playCountdownBeep, playBoardShuffleSound, playButtonClickSound,
+    playWordLengthSound,
   } = useSoundEffects();
 
   // Built word: array of { letter, wheelIndex } — wheelIndex: -1 = center
@@ -402,6 +403,9 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
           haptic([50, 30, 50, 30, 80]);
         } else {
           playWordAcceptedSound();
+          if (word.length >= 5) {
+            playWordLengthSound(word.length);
+          }
           haptic(newCombo >= 2 ? [15, 30, 15, 30, 15] : 20);
         }
         if (newCombo >= 2) {
@@ -425,7 +429,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
     } finally {
       setIsValidating(false);
     }
-  }, [builtWord, isValidating, puzzle, wordsFound, onValidateWord, showFeedback, t, onEffect, combo, playWordRejectedSound, playWordAcceptedSound, playLegendaryWordSound, playComboSound]);
+  }, [builtWord, isValidating, puzzle, wordsFound, onValidateWord, showFeedback, t, onEffect, combo, playWordRejectedSound, playWordAcceptedSound, playLegendaryWordSound, playComboSound, playWordLengthSound]);
 
   // Keep submit ref fresh so double-tap handler (created earlier) can reach the latest closure.
   useEffect(() => { handleSubmitRef.current = handleSubmit; }, [handleSubmit]);

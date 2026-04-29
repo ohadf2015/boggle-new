@@ -8,7 +8,7 @@ import { haptics } from '@/utils/haptics/HapticsManager';
 import { useLocalStorageObject } from '@/hooks/useLocalStorageState';
 import { createLazyHowl, preloadAudioOnDemand, preloadByPriority, AUDIO_LOAD_PRIORITY, ensureHowl } from '@/lib/audio/audioLoader';
 import { getCountdownBeepParams } from '@/utils/countdownBeepParams';
-import { pickVariant, SOUND_VARIATIONS } from '@/lib/audio/soundVariations';
+import { pickVariant, SOUND_VARIATIONS, comboLevelSrc, wordLengthSrc } from '@/lib/audio/soundVariations';
 import { SOUND_EFFECTS, SOUND_PRIORITIES, type SoundEffectOptions, type SoundEffectsContextType } from '@/lib/audio/soundEffectsConfig';
 import { useSoundPlayFunctions } from '@/hooks/useSoundPlayFunctions';
 
@@ -291,22 +291,44 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
     }
   }, [audioUnlocked, sfxMuted, sfxVolume]);
 
-  // Play combo sound with dynamic pitch based on combo level
-  // Pitch increases with each combo level (infinite scaling)
-  const playComboSound = useCallback((comboLevel: number) => {
+  // Play combo sound — bespoke audio per combo level (1..25), clamps above 25.
+  // Falls back to the legacy single-file pitch-shift if the level file fails to load.
+  const playComboSound = useCallback(async (comboLevel: number) => {
     if (!audioUnlocked || sfxMuted || !isTabVisibleRef.current || !isGameActiveRef.current || comboLevel < 1) return;
 
-    // Pitch scales gently with combo level — capped at 1.8x to stay musical
-    const baseRate = 1.0;
-    const pitchIncrease = Math.log2(comboLevel + 1) * 0.2;
-    const rate = Math.min(baseRate + pitchIncrease, 1.8);
+    const src = comboLevelSrc(comboLevel);
+    const cacheKey = `_combo_${src}`;
+    let howl = soundsRef.current[cacheKey];
+    if (!howl) {
+      howl = createLazyHowl(src, { volume: 0.7 });
+      soundsRef.current[cacheKey] = howl;
+    }
 
-    // Also increase volume slightly with combo level (max 1.0)
-    const volumeBoost = Math.min(0.6 + (comboLevel * 0.03), 1.0);
+    if (howl.state() === 'unloaded') {
+      try {
+        await preloadAudioOnDemand(howl);
+      } catch (err) {
+        // Bespoke level file failed — fall back to pitch-shifted base combo
+        logger.log(`[SFX] combo-level ${comboLevel} failed, using pitch fallback:`, err);
+        const rate = Math.min(1.0 + Math.log2(comboLevel + 1) * 0.2, 1.8);
+        const volumeBoost = Math.min(0.6 + (comboLevel * 0.03), 1.0);
+        playSound('combo', { rate, volume: volumeBoost });
+        haptics.tap();
+        return;
+      }
+    }
 
-    playSound('combo', { rate, volume: volumeBoost });
+    // Slight volume swell with combo level (max 1.0) so escalation reads even with bespoke audio
+    const volumeBoost = Math.min(0.6 + (comboLevel * 0.02), 1.0);
+    howl.volume(volumeBoost * sfxVolume);
+    howl.rate(1.0);
+    try {
+      howl.play();
+    } catch (err) {
+      logger.log(`[SFX] combo-level ${comboLevel} play error:`, err);
+    }
     haptics.tap();
-  }, [audioUnlocked, sfxMuted, playSound]);
+  }, [audioUnlocked, sfxMuted, sfxVolume, playSound]);
 
   // Play countdown beep with increasing pitch (10→1 seconds remaining)
   const playCountdownBeep = useCallback((secondsRemaining: number) => {
@@ -315,6 +337,37 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
     if (!params) return;
     playSound('countdownBeep', { rate: params.rate, volume: params.volume });
   }, [audioUnlocked, sfxMuted, playSound]);
+
+  // Play word-length feedback (3..7 use bespoke files, 8+ uses celebration file).
+  // Falls back silently if the bespoke file fails — caller already plays wordAccepted.
+  const playWordLengthSound = useCallback(async (length: number) => {
+    if (!audioUnlocked || sfxMuted || !isTabVisibleRef.current || !isGameActiveRef.current || length < 3) return;
+
+    const src = wordLengthSrc(length);
+    const cacheKey = `_wlen_${src}`;
+    let howl = soundsRef.current[cacheKey];
+    if (!howl) {
+      howl = createLazyHowl(src, { volume: 0.65 });
+      soundsRef.current[cacheKey] = howl;
+    }
+
+    if (howl.state() === 'unloaded') {
+      try {
+        await preloadAudioOnDemand(howl);
+      } catch (err) {
+        logger.log(`[SFX] word-length ${length} failed to load:`, err);
+        return;
+      }
+    }
+
+    howl.volume(0.65 * sfxVolume);
+    howl.rate(1.0);
+    try {
+      howl.play();
+    } catch (err) {
+      logger.log(`[SFX] word-length ${length} play error:`, err);
+    }
+  }, [audioUnlocked, sfxMuted, sfxVolume]);
 
   // All individual play functions extracted to useSoundPlayFunctions hook
   const soundFns = useSoundPlayFunctions(playSound, {
@@ -407,6 +460,7 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
     playSound,
     playComboSound,
     playCountdownBeep,
+    playWordLengthSound,
     startFireCrackleLoop,
     stopFireCrackleLoop,
     // All individual play functions from extracted hook
@@ -421,6 +475,7 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
     playSound,
     playComboSound,
     playCountdownBeep,
+    playWordLengthSound,
     startFireCrackleLoop,
     stopFireCrackleLoop,
     soundFns,
@@ -439,6 +494,7 @@ const SOUND_EFFECTS_FALLBACK = {
   sfxVolume: 0.7, sfxMuted: true, isGameActive: false,
   setSfxVolume: NOOP, toggleSfxMute: NOOP, setGameActive: NOOP,
   playSound: NOOP, playComboSound: NOOP, playCountdownBeep: NOOP,
+  playWordLengthSound: NOOP,
   startFireCrackleLoop: NOOP, stopFireCrackleLoop: NOOP,
   // All individual play functions
   playWordAcceptedSound: NOOP, playWordRejectedSound: NOOP,

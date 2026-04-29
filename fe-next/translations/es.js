@@ -8236,6 +8236,12 @@ const es = {
       "cta": "Ver anuncio por +{moves} movimientos",
       "decline": "Terminar partida"
     },
+    "retryWaveModal": {
+      "title": "Oleada {wave} — ¡muy cerca!",
+      "body": "Limpiaste {percent}%. Mira un anuncio para reintentar la oleada {wave} — tus oleadas previas se conservan.",
+      "cta": "Reintentar oleada {wave}",
+      "decline": "Reiniciar desde la oleada 1"
+    },
     "pregameBuff": {
       "title": "¿Potenciar?",
       "body": "Elige un boost, mira un anuncio corto y empieza la partida con ventaja.",

@@ -8411,6 +8411,12 @@ const en = {
       "cta": "Watch Ad for +{moves} moves",
       "decline": "End run"
     },
+    "retryWaveModal": {
+      "title": "Wave {wave} — so close!",
+      "body": "You cleared {percent}%. Watch an ad to retry wave {wave} — your earlier waves are safe.",
+      "cta": "Retry Wave {wave}",
+      "decline": "Restart from wave 1"
+    },
     "pregameBuff": {
       "title": "Power up?",
       "body": "Pick a boost, watch a quick ad, and start this run with an edge.",

@@ -123,6 +123,7 @@ const InGameScreen = memo<InGameScreenProps>(function InGameScreen({
   const {
     playWordAcceptedSound,
     playWordRejectedSound,
+    playWordLengthSound,
     playEarthquakeRumble,
     playEarthquakeShake,
     playFireRoundStart,
@@ -468,6 +469,7 @@ const InGameScreen = memo<InGameScreenProps>(function InGameScreen({
     setLastWordFoundTime,
     playWordAcceptedSound,
     playWordRejectedSound,
+    playWordLengthSound,
   });
 
   // Keyboard word input

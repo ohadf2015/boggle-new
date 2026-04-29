@@ -6,6 +6,9 @@ export interface BlastContinueOfferInput {
   noWordsRemaining: boolean;
   hasUsedContinue: boolean;
   continueDeclined: boolean;
+  /** Player has already cleared ≥ wave goal (default 90%) — wave will advance,
+   *  so prompting for extra moves is noise. Suppress the offer. */
+  objectiveAlreadyMet: boolean;
 }
 
 export function shouldOfferBlastContinue({
@@ -15,6 +18,7 @@ export function shouldOfferBlastContinue({
   noWordsRemaining,
   hasUsedContinue,
   continueDeclined,
+  objectiveAlreadyMet,
 }: BlastContinueOfferInput): boolean {
   return (
     hasRealAdProvider
@@ -23,5 +27,6 @@ export function shouldOfferBlastContinue({
     && !noWordsRemaining
     && !hasUsedContinue
     && !continueDeclined
+    && !objectiveAlreadyMet
   );
 }

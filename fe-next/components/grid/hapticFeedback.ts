@@ -1,14 +1,20 @@
 /**
  * Haptic Feedback Utilities
- * Centralized haptic vibration patterns for grid interactions.
- * Extracted from useGridInteraction to eliminate duplication.
+ * Centralized haptic patterns for grid interactions.
+ *
+ * Dual-dispatch:
+ * - Native (iOS/Android via Capacitor): routes through HapticsManager →
+ *   Taptic Engine (iOS) / VibrationEffect (Android). The Web Vibration API
+ *   is ignored by WKWebView, so without this path iOS feels nothing.
+ * - Web: keeps original navigator.vibrate(arrayPattern) for full pattern
+ *   fidelity on Android Chrome and other browsers that honor the API.
  */
 
-/**
- * Vibration patterns for different game scenarios
- */
+import { isNative } from '@/utils/platform';
+import { haptics } from '@/utils/haptics/HapticsManager';
+import { HapticPattern, HapticIntensity } from '@/utils/haptics/types';
+
 const PATTERNS: Record<string, number | number[]> = {
-  // Fire round patterns (full intensity)
   fireCombo7Plus: [100, 50, 100, 50, 100, 50, 150],
   fireCombo5Plus: [80, 40, 80, 40, 120],
   fireCombo3Plus: [60, 40, 60, 40, 100],
@@ -16,7 +22,6 @@ const PATTERNS: Record<string, number | number[]> = {
   fireLongWord: [40, 30, 60],
   fireShortWord: 50,
 
-  // Normal patterns (reduced intensity)
   normalCombo7Plus: [30, 20, 30],
   normalCombo5Plus: [25, 15, 25],
   normalCombo3Plus: [20, 10, 20],
@@ -24,13 +29,11 @@ const PATTERNS: Record<string, number | number[]> = {
   normalLongWord: 20,
   normalShortWord: 15,
 
-  // Blast mode patterns
   blastBomb: [80, 30, 80, 30, 120],
   blastLightning: [40, 20, 60, 20, 40],
   blastPrism: [100, 40, 100, 40, 150],
   blastCascade: [30, 20, 30, 20, 50],
 
-  // Interaction feedback — stronger tap matches the "rubber stamp pop" visual
   cellTapFire: 30,
   cellTapNormal: 22,
   cellDragFire: 18,
@@ -42,23 +45,46 @@ const PATTERNS: Record<string, number | number[]> = {
   navigation: 10,
   clickSelect: 12,
 
-  // Word validation feedback
   wordAccepted: [20, 10, 30],
   wordRejected: [40, 20, 40],
 };
 
-/**
- * Safely trigger vibration if available
- */
-function vibrate(pattern: number | number[]): void {
-  if (window.navigator?.vibrate) {
-    window.navigator.vibrate(pattern);
+type NativeFeel =
+  | { kind: 'impact'; intensity: HapticIntensity }
+  | { kind: 'notify'; pattern: HapticPattern }
+  | { kind: 'selection' };
+
+const I_LIGHT: NativeFeel = { kind: 'impact', intensity: HapticIntensity.LIGHT };
+const I_MEDIUM: NativeFeel = { kind: 'impact', intensity: HapticIntensity.MEDIUM };
+const I_HEAVY: NativeFeel = { kind: 'impact', intensity: HapticIntensity.HEAVY };
+const N_SUCCESS: NativeFeel = { kind: 'notify', pattern: HapticPattern.SUCCESS };
+const N_ERROR: NativeFeel = { kind: 'notify', pattern: HapticPattern.ERROR };
+const SEL: NativeFeel = { kind: 'selection' };
+
+function dispatchNative(feel: NativeFeel): void {
+  switch (feel.kind) {
+    case 'impact':
+      void haptics.triggerCustom({ duration: 0, intensity: feel.intensity });
+      return;
+    case 'notify':
+      void haptics.trigger(feel.pattern);
+      return;
+    case 'selection':
+      void haptics.trigger(HapticPattern.SELECTION);
+      return;
   }
 }
 
-/**
- * Haptic feedback for word submission based on combo level and fire round status
- */
+function vibrate(webPattern: number | number[], native: NativeFeel): void {
+  if (isNative()) {
+    dispatchNative(native);
+    return;
+  }
+  if (typeof window !== 'undefined' && window.navigator?.vibrate) {
+    window.navigator.vibrate(webPattern);
+  }
+}
+
 export function vibrateWordSubmit(
   wordLength: number,
   comboLevel: number,
@@ -66,152 +92,114 @@ export function vibrateWordSubmit(
 ): void {
   if (fireRoundActive) {
     if (comboLevel >= 7) {
-      vibrate(PATTERNS.fireCombo7Plus);
+      vibrate(PATTERNS.fireCombo7Plus, N_SUCCESS);
     } else if (comboLevel >= 5) {
-      vibrate(PATTERNS.fireCombo5Plus);
+      vibrate(PATTERNS.fireCombo5Plus, N_SUCCESS);
     } else if (comboLevel >= 3) {
-      vibrate(PATTERNS.fireCombo3Plus);
+      vibrate(PATTERNS.fireCombo3Plus, I_HEAVY);
     } else if (comboLevel >= 1) {
-      vibrate(PATTERNS.fireCombo1Plus);
+      vibrate(PATTERNS.fireCombo1Plus, I_MEDIUM);
     } else if (wordLength >= 6) {
-      vibrate(PATTERNS.fireLongWord);
+      vibrate(PATTERNS.fireLongWord, I_HEAVY);
     } else {
-      vibrate(PATTERNS.fireShortWord);
+      vibrate(PATTERNS.fireShortWord, I_MEDIUM);
     }
   } else {
     if (comboLevel >= 7) {
-      vibrate(PATTERNS.normalCombo7Plus);
+      vibrate(PATTERNS.normalCombo7Plus, I_HEAVY);
     } else if (comboLevel >= 5) {
-      vibrate(PATTERNS.normalCombo5Plus);
+      vibrate(PATTERNS.normalCombo5Plus, I_MEDIUM);
     } else if (comboLevel >= 3) {
-      vibrate(PATTERNS.normalCombo3Plus);
+      vibrate(PATTERNS.normalCombo3Plus, I_MEDIUM);
     } else if (comboLevel >= 1) {
-      vibrate(PATTERNS.normalCombo1Plus);
+      vibrate(PATTERNS.normalCombo1Plus, I_LIGHT);
     } else if (wordLength >= 6) {
-      vibrate(PATTERNS.normalLongWord);
+      vibrate(PATTERNS.normalLongWord, I_MEDIUM);
     } else {
-      vibrate(PATTERNS.normalShortWord);
+      vibrate(PATTERNS.normalShortWord, I_LIGHT);
     }
   }
 }
 
-/**
- * Haptic feedback for initial cell selection (touch start)
- */
 export function vibrateCellTap(fireRoundActive: boolean): void {
-  vibrate(fireRoundActive ? PATTERNS.cellTapFire : PATTERNS.cellTapNormal);
+  vibrate(
+    fireRoundActive ? PATTERNS.cellTapFire : PATTERNS.cellTapNormal,
+    fireRoundActive ? I_MEDIUM : I_LIGHT
+  );
 }
 
-/**
- * Haptic feedback during cell drag selection.
- * Escalates with selection tier for a "building power" sensation.
- */
 export function vibrateCellDrag(fireRoundActive: boolean, tier = 0): void {
   if (tier >= 3) {
-    // Firm double-tap — matches urgent breathing glow
-    vibrate(fireRoundActive ? [25, 10, 30] : [18, 10, 22]);
+    vibrate(fireRoundActive ? [25, 10, 30] : [18, 10, 22], fireRoundActive ? I_HEAVY : I_MEDIUM);
   } else if (tier >= 2) {
-    // Medium double-tap — matches faster pink breathing
-    vibrate(fireRoundActive ? [18, 10, 18] : [14, 8, 14]);
+    vibrate(fireRoundActive ? [18, 10, 18] : [14, 8, 14], fireRoundActive ? I_MEDIUM : I_LIGHT);
   } else if (tier >= 1) {
-    // Slightly stronger single tap — matches orange breathing onset
-    vibrate(fireRoundActive ? PATTERNS.cellDragFire : 12);
+    vibrate(fireRoundActive ? PATTERNS.cellDragFire : 12, fireRoundActive ? I_LIGHT : SEL);
   } else {
-    vibrate(fireRoundActive ? PATTERNS.cellDragFire : PATTERNS.cellDragNormal);
+    vibrate(
+      fireRoundActive ? PATTERNS.cellDragFire : PATTERNS.cellDragNormal,
+      fireRoundActive ? I_LIGHT : SEL
+    );
   }
 }
 
-/**
- * Haptic feedback for tier transition — a distinct "power surge" pulse
- * fired once when crossing a tier boundary during selection.
- */
 export function vibrateTierTransition(newTier: number): void {
   if (newTier >= 3) {
-    // Triple pulse — "power surge" matching cyan/pink shimmer onset
-    vibrate([40, 15, 35, 15, 50]);
+    vibrate([40, 15, 35, 15, 50], N_SUCCESS);
   } else if (newTier >= 2) {
-    // Double pulse — "charge up" matching pink bloom onset
-    vibrate([30, 15, 35]);
+    vibrate([30, 15, 35], I_HEAVY);
   } else if (newTier >= 1) {
-    // Single firm pulse — "momentum" matching orange glow onset
-    vibrate(22);
+    vibrate(22, I_MEDIUM);
   }
+  // tier 0 — no feedback (avoids double-firing on initial selection)
 }
 
-/**
- * Haptic feedback for backtracking (deselecting cells)
- */
 export function vibrateBacktrack(fireRoundActive: boolean): void {
-  vibrate(fireRoundActive ? PATTERNS.backtrackFire : PATTERNS.backtrackNormal);
+  vibrate(
+    fireRoundActive ? PATTERNS.backtrackFire : PATTERNS.backtrackNormal,
+    fireRoundActive ? I_LIGHT : SEL
+  );
 }
 
-/**
- * Haptic feedback for undo action
- */
 export function vibrateUndo(fireRoundActive: boolean): void {
-  vibrate(fireRoundActive ? PATTERNS.undoFire : PATTERNS.undoNormal);
+  vibrate(
+    fireRoundActive ? PATTERNS.undoFire : PATTERNS.undoNormal,
+    fireRoundActive ? I_MEDIUM : I_LIGHT
+  );
 }
 
-/**
- * Haptic feedback for keyboard navigation
- */
 export function vibrateNavigation(): void {
-  vibrate(PATTERNS.navigation);
+  vibrate(PATTERNS.navigation, SEL);
 }
 
-/**
- * Haptic feedback for click-to-select mode
- */
 export function vibrateClickSelect(): void {
-  vibrate(PATTERNS.clickSelect);
+  vibrate(PATTERNS.clickSelect, I_LIGHT);
 }
 
-/**
- * Haptic feedback for keyboard word building
- */
 export function vibrateKeyboardSelect(fireRoundActive: boolean): void {
-  vibrate(fireRoundActive ? 20 : 8);
+  vibrate(fireRoundActive ? 20 : 8, fireRoundActive ? I_MEDIUM : I_LIGHT);
 }
 
-/**
- * Haptic feedback for blast bomb explosion
- */
 export function vibrateBlastBomb(): void {
-  vibrate(PATTERNS.blastBomb);
+  vibrate(PATTERNS.blastBomb, I_HEAVY);
 }
 
-/**
- * Haptic feedback for blast lightning strike
- */
 export function vibrateBlastLightning(): void {
-  vibrate(PATTERNS.blastLightning);
+  vibrate(PATTERNS.blastLightning, I_MEDIUM);
 }
 
-/**
- * Haptic feedback for blast prism detonation
- */
 export function vibrateBlastPrism(): void {
-  vibrate(PATTERNS.blastPrism);
+  vibrate(PATTERNS.blastPrism, N_SUCCESS);
 }
 
-/**
- * Haptic feedback for blast cascade chain
- */
 export function vibrateBlastCascade(): void {
-  vibrate(PATTERNS.blastCascade);
+  vibrate(PATTERNS.blastCascade, SEL);
 }
 
-/**
- * Haptic feedback when a word is accepted after validation.
- * Distinct from vibrateWordSubmit (which fires on touch-end before validation).
- */
 export function vibrateWordAccepted(): void {
-  vibrate(PATTERNS.wordAccepted);
+  vibrate(PATTERNS.wordAccepted, N_SUCCESS);
 }
 
-/**
- * Haptic feedback when a word is rejected after validation.
- */
 export function vibrateWordRejected(): void {
-  vibrate(PATTERNS.wordRejected);
+  vibrate(PATTERNS.wordRejected, N_ERROR);
 }
