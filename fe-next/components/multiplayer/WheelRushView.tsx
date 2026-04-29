@@ -63,6 +63,17 @@ const ERROR_KEY: Record<WheelErrorCode, string> = {
   'duplicate': 'wordWheel.alreadyFound',
 };
 
+const FogCountdown: React.FC<{ endsAt: number }> = ({ endsAt }) => {
+  const [secs, setSecs] = useState(() => Math.max(0, Math.ceil((endsAt - Date.now()) / 1000)));
+  useEffect(() => {
+    const tick = () => setSecs(Math.max(0, Math.ceil((endsAt - Date.now()) / 1000)));
+    tick();
+    const id = setInterval(tick, 250);
+    return () => clearInterval(id);
+  }, [endsAt]);
+  return <span className="opacity-60 tabular-nums">{secs}s</span>;
+};
+
 export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, onQuit, t }) => {
   const {
     playTileSelectSound, playWordAcceptedSound, playWordRejectedSound,
@@ -76,7 +87,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
   const [myWords, setMyWords] = useState<WordEntry[]>([]);
   const [feedback, setFeedback] = useState<{ type: 'ok' | 'err'; msg: string } | null>(null);
   const [wordBuilderShake, setWordBuilderShake] = useState(false);
-  const [now, setNow] = useState<number>(() => Date.now());
+  const [fogActive, setFogActive] = useState(false);
   const [wheelRadius, setWheelRadius] = useState(72);
 
   const { floatingReactions, dismissReaction } = useQuickReactions({ socket, username });
@@ -89,11 +100,16 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
   const dragEngagedRef = useRef(false);
   const usedIndicesRef = useRef<Set<number>>(new Set());
 
-  // 100ms tick for countdowns + fog window
+  // Fog flips off once at expiry — no per-frame ticker on the parent.
+  // FogCountdown leaf owns its own 100ms tick for the seconds display.
   useEffect(() => {
-    const id = setInterval(() => setNow(Date.now()), 100);
-    return () => clearInterval(id);
-  }, []);
+    if (startedAt == null) { setFogActive(false); return; }
+    const remaining = startedAt + WHEEL_RUSH_FOG_MS - Date.now();
+    if (remaining <= 0) { setFogActive(false); return; }
+    setFogActive(true);
+    const id = setTimeout(() => setFogActive(false), remaining);
+    return () => clearTimeout(id);
+  }, [startedAt]);
 
   // Track which wheel indices are used (-1 for center)
   const usedIndices = useMemo(() => {
@@ -323,7 +339,6 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
   });
 
   const fogEndsAt = (startedAt ?? 0) + WHEEL_RUSH_FOG_MS;
-  const fogActive = startedAt != null && now < fogEndsAt;
   if (!puzzle) {
     return (
       <div className="flex-1 flex items-center justify-center bg-neo-navy text-neo-cream">
@@ -370,7 +385,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
         <div className="text-center text-xs sm:text-sm text-neo-cyan font-neo-display font-bold tracking-wide flex items-center justify-center gap-2 shrink-0">
           <span className="inline-block w-1.5 h-1.5 rounded-full bg-neo-cyan animate-pulse" />
           {t('wheel.rush.fogActive') || 'Fog of War active!'}
-          <span className="opacity-60 tabular-nums">{Math.ceil((fogEndsAt - now) / 1000)}s</span>
+          <FogCountdown endsAt={fogEndsAt} />
         </div>
       )}
 

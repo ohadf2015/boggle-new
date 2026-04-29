@@ -2,6 +2,7 @@ import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, act, fireEvent } from '@testing-library/react';
 import type { Socket } from 'socket.io-client';
+import { WHEEL_RUSH_FOG_MS } from '@/shared/constants/wheelRushConstants';
 
 vi.mock('@/contexts/SoundEffectsContext', () => ({
   useSoundEffects: () => ({
@@ -126,6 +127,44 @@ describe('WheelRushView', () => {
     expect(screen.getByText('???')).toBeTruthy();
     expect(screen.getByText('alice')).toBeTruthy();
     expect(screen.getByText('10')).toBeTruthy();
+  });
+
+  it('unmasks opponent scores after fog window expires', () => {
+    vi.useFakeTimers();
+    try {
+      const start = 1_700_000_000_000;
+      vi.setSystemTime(start);
+      const socket = makeMockSocket();
+      render(
+        <WheelRushView
+          socket={socket}
+          username="alice"
+          leaderboard={[
+            { username: 'alice', score: 10 },
+            { username: 'bob', score: 42 },
+          ]}
+          onQuit={vi.fn()}
+          t={tStub}
+        />,
+      );
+      act(() => {
+        socket.fire('wheelRushInit', { puzzle, startedAt: start });
+      });
+      // During fog: bob's score is masked
+      expect(screen.getByText('???')).toBeTruthy();
+
+      // Advance past fog window
+      act(() => {
+        vi.setSystemTime(start + WHEEL_RUSH_FOG_MS + 500);
+        vi.advanceTimersByTime(WHEEL_RUSH_FOG_MS + 500);
+      });
+
+      // After fog: bob's real score is visible, no more ???
+      expect(screen.queryByText('???')).toBeNull();
+      expect(screen.getByText('42')).toBeTruthy();
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it('calls onQuit when quit button clicked', () => {
