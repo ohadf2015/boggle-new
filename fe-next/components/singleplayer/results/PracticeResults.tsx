@@ -23,7 +23,6 @@ import {
   useCoinRewards,
   useCognitiveScoring,
   useSignupPrompt,
-  useAchievementsSave,
 } from '../results';
 import { CatalystTeaser } from './CatalystTeaser';
 import type { SinglePlayerResultsData } from '../SinglePlayerView';
@@ -89,7 +88,7 @@ function FloatingSparkles({ tier }: { tier: Tier }) {
           transition={{
             duration: s.duration,
             delay: 0.5 + s.delay,
-            repeat: Infinity,
+            repeat: 2,
             ease: 'easeOut',
           }}
         />
@@ -174,7 +173,7 @@ const PracticeResults = memo(function PracticeResults({
   onBackToLobby,
 }: PracticeResultsProps) {
   const { t, language } = useLanguage();
-  const { user, isAuthenticated, profile, updateProfile, loading: authLoading } = useAuth();
+  const { user, isAuthenticated, loading: authLoading } = useAuth();
   const reducedMotion = useReducedMotion();
   const router = useRouter();
 
@@ -207,8 +206,6 @@ const PracticeResults = memo(function PracticeResults({
   useCognitiveScoring({ userId: user?.id, mode: 'practice', results });
 
   const { showSignupModal, setShowSignupModal } = useSignupPrompt({ isAuthenticated, hasUser: !!user, authLoading });
-
-  useAchievementsSave({ isAuthenticated, profile, results, updateProfile });
 
   // ─── Encouragement content ───
   const tier = getEncouragementTier(results.playerScore);
@@ -245,7 +242,7 @@ const PracticeResults = memo(function PracticeResults({
     router.push(`/${language}/daily/word-hunt`);
   }, [router, language]);
 
-  const inf = reducedMotion ? 0 : Infinity;
+  const ctaPulseRepeat = reducedMotion ? 0 : 3;
 
   // ─── Tier colors for text ───
   const tierTextColor = tier === 'legendary'
@@ -380,7 +377,7 @@ const PracticeResults = memo(function PracticeResults({
                 animate={reducedMotion ? {} : { scale: [1, 1.03, 1] }}
                 transition={{
                   duration: 2.5,
-                  repeat: inf,
+                  repeat: ctaPulseRepeat,
                   ease: 'easeInOut',
                   repeatDelay: 0.5,
                 }}
@@ -441,13 +438,13 @@ const PracticeResults = memo(function PracticeResults({
       </div>
 
       {/* ── Mobile sticky bottom — daily challenge primary + replay secondary ── */}
-      <div className="md:hidden fixed bottom-0 inset-x-0 z-50 bg-neo-navy/95 backdrop-blur-xs border-t-3 border-neo-black safe-area-bottom px-3 py-2.5">
+      <div className="md:hidden fixed bottom-0 inset-x-0 z-50 bg-neo-navy border-t-3 border-neo-black safe-area-bottom px-3 py-2.5">
         <div className="flex flex-col gap-2">
           {!dailyAlreadyPlayed && (
             <motion.button
               onClick={handleWordHuntDaily}
               animate={reducedMotion ? {} : { scale: [1, 1.03, 1] }}
-              transition={{ duration: 2, repeat: inf, ease: 'easeInOut', repeatDelay: 1 }}
+              transition={{ duration: 2, repeat: ctaPulseRepeat, ease: 'easeInOut', repeatDelay: 1 }}
               className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-amber-400 text-neo-black font-black text-sm uppercase border-3 border-neo-black rounded-neo shadow-hard"
             >
               <Trophy className="w-4 h-4" />
@@ -456,18 +453,18 @@ const PracticeResults = memo(function PracticeResults({
           )}
           <div className="flex gap-2">
             <button
-              onClick={onBackToLobby}
-              className="flex items-center justify-center gap-1 px-3 py-2.5 bg-white/10 text-white/80 font-bold text-xs uppercase border-2 border-white/20 rounded-neo transition-colors hover:bg-white/20"
-            >
-              <ArrowLeft className="w-3.5 h-3.5 rtl:rotate-180" />
-              {t('nextStep.backToLobby')}
-            </button>
-            <button
               onClick={onPlayAgain}
-              className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-white/10 text-white/80 font-bold text-sm uppercase border-2 border-white/20 rounded-neo transition-colors hover:bg-white/20"
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-neo-cream text-neo-navy font-black text-sm uppercase border-2 border-neo-black rounded-neo shadow-hard transition-colors"
             >
               <RotateCcw className="w-4 h-4" />
               {t('practiceResults.playAgain')}
+            </button>
+            <button
+              onClick={onBackToLobby}
+              aria-label={t('nextStep.backToLobby')}
+              className="flex items-center justify-center min-w-[44px] min-h-[44px] px-3 py-2.5 bg-white/10 text-white/80 font-bold text-xs uppercase border-2 border-white/20 rounded-neo transition-colors hover:bg-white/20"
+            >
+              <ArrowLeft className="w-4 h-4 rtl:rotate-180" />
             </button>
           </div>
         </div>

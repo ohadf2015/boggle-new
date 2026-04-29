@@ -4,6 +4,7 @@ import { useState, useEffect, memo } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import { useIsDesktop } from '@/hooks/useMediaQuery';
+import { useIsExperiencedPlayer } from '@/hooks/useIsExperiencedPlayer';
 
 const STORAGE_KEY = 'lexiclash_drag_hint_dismissed';
 
@@ -28,6 +29,7 @@ const DragReleaseHint = memo<DragReleaseHintProps>(({
 }) => {
   const [dismissed, setDismissed] = useState(true); // default hidden until checked
   const isDesktop = useIsDesktop();
+  const isExperienced = useIsExperiencedPlayer();
   const { t } = useLanguageSafe();
 
   // Check localStorage once on mount
@@ -53,7 +55,7 @@ const DragReleaseHint = memo<DragReleaseHintProps>(({
     }
   }, [wordSubmitted, dismissed]);
 
-  const shouldShow = isDesktop && !dismissed && isDragging && selectedCellCount >= 2;
+  const shouldShow = isDesktop && !dismissed && !isExperienced && isDragging && selectedCellCount >= 2;
 
   return (
     <AnimatePresence>

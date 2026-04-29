@@ -388,7 +388,9 @@ export function useMultiplayerSocket(
       clearSessionPreservingUsername(opts.username);
       opts.onHostLeftRoomClosing(data);
       // Store timeout so it can be cancelled on unmount
-      hostLeftReloadTimerRef.current = setTimeout(() => window.location.reload(), 2000);
+      // Hard-navigate to bare pathname (drop ?room=&classroom=&host= so we don't
+      // re-enter the classroom lobby from stale query params).
+      hostLeftReloadTimerRef.current = setTimeout(() => { window.location.href = window.location.pathname; }, 2000);
     });
 
     socketInstance.on('kicked', (data: { reason: 'host' | 'inactive' }) => {
@@ -400,7 +402,8 @@ export function useMultiplayerSocket(
       toast.error(message, { icon: '🚫', duration: 5000 });
       clearSessionPreservingUsername(opts.username);
       opts.onHostLeftRoomClosing({ message });
-      kickedReloadTimerRef.current = setTimeout(() => window.location.reload(), 2000);
+      // Same as host-left: drop query (?classroom=true) so the lobby renders cleanly.
+      kickedReloadTimerRef.current = setTimeout(() => { window.location.href = window.location.pathname; }, 2000);
     });
 
     socketInstance.on('afkWarning', (data: { secondsRemaining: number }) => {

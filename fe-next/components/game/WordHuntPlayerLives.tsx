@@ -105,7 +105,7 @@ const PlayerLifeRow = memo<{
 
       {/* Percentage label */}
       <span
-        className={`text-[10px] font-bold tabular-nums w-7 text-right transition-colors duration-300 ${
+        className={`text-[10px] font-bold tabular-nums w-7 text-end transition-colors duration-300 ${
           isEliminated ? 'text-gray-500' : percentage <= 30 ? 'text-red-400' : 'text-neo-cream/70'
         }`}
       >

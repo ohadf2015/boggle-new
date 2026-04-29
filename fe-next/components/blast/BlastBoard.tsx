@@ -9,6 +9,7 @@ import type { BlastTileState, BlastTileType } from './types';
 import type { SequencerState, TileAnimState } from './hooks/useBlastSequencer';
 import { GRID_PADDING, GRID_GAP_CLASS } from '@/components/grid/gridLayoutConstants';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useEquippedCosmetic } from '@/hooks/useEquippedCosmetic';
 import { COMBO_ELIGIBLE_TILES } from './utils/blastCombos';
 import { computeCellFilter, createPortalAdjacency } from './hooks/blastCellFilterLogic';
 import { scanOffensiveSpecial, OFFENSIVE_RANK } from './utils/blastTileEffects';
@@ -91,6 +92,8 @@ export const BlastBoard = memo(function BlastBoard({
   diamondRevealTurns = 0,
 }: BlastBoardProps) {
   const { t } = useLanguage();
+  const equippedBoardTheme = useEquippedCosmetic('boardTheme');
+  const equippedTileSkin = useEquippedCosmetic('tileSkin');
   const gridStyle = useMemo(() => ({
     padding: GRID_PADDING,
     gridTemplateColumns: `repeat(${gridSize}, minmax(0, 1fr))`,
@@ -220,7 +223,8 @@ export const BlastBoard = memo(function BlastBoard({
   return (
     <div
       ref={containerRef}
-      className="blast-board relative w-full aspect-square overflow-hidden"
+      className={`blast-board relative w-full aspect-square overflow-hidden${equippedBoardTheme ? ` cosmetic-board-${equippedBoardTheme.replace('board-', '')}` : ''}`}
+      {...(equippedTileSkin && { 'data-tile-skin': equippedTileSkin.replace('tile-', '') })}
       style={{ contain: 'layout paint' }}
     >
       {/* Layer 1: GridComponent — word selection via touch/drag */}

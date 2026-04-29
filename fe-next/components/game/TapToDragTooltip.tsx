@@ -21,15 +21,15 @@ interface TapToDragTooltipProps {
   language?: string;
 }
 
-// Language-specific demo grids
+// Language-specific demo grids — only the 5 supported locales.
+// Hebrew uses vetted vocabulary from tutorialBoardConfig (כלב = "dog").
+// Japanese uses romaji because the live Word Hunt board is romaji on `ja`.
 const LANGUAGE_GRIDS: Record<string, string[][]> = {
-  en: [['C', 'A'], ['T', 'S']],
-  he: [['ב', 'ת'], ['כ', 'ל']], // בתכל
-  sv: [['K', 'A'], ['T', 'S']], // KATS
-  ja: [['猫', '犬'], ['魚', '鳥']], // cat, dog, fish, bird
-  es: [['G', 'A'], ['T', 'O']], // GATO
-  fr: [['C', 'H'], ['A', 'T']], // CHAT
-  de: [['K', 'A'], ['T', 'Z']], // KATZ
+  en: [['C', 'A'], ['T', 'S']], // CATS
+  he: [['כ', 'ל'], ['ב', 'י']], // כלב (dog)
+  sv: [['K', 'A'], ['T', 'T']], // KATT (cat)
+  ja: [['C', 'A'], ['T', 'S']], // CATS (romaji per project convention)
+  es: [['G', 'A'], ['T', 'O']], // GATO (cat)
 };
 
 /**

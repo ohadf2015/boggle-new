@@ -5,9 +5,9 @@ function BangsFront({ fill }: HairPartProps) {
   return (
     <g>
       {/* Chunky bangs with soft wavy bottom */}
-      <path d="M18 34 Q18 14 50 8 Q82 14 82 34 Q74 40 66 36 Q58 42 50 36 Q42 42 34 36 Q26 40 18 34Z"
+      <path d="M18 34 Q18 14 50 8 Q82 14 82 34 Q74 36 66 33 Q58 36 50 33 Q42 36 34 33 Q26 36 18 34Z"
         fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
-      <path d="M32 22 L32 34 M44 18 L42 36 M56 18 L58 36 M68 22 L68 34" stroke="#000" strokeWidth={0.6} opacity="0.1" />
+      <path d="M32 22 L32 33 M44 18 L42 33 M56 18 L58 33 M68 22 L68 33" stroke="#000" strokeWidth={0.6} opacity="0.1" />
       <path d="M38 16 Q46 10 56 10 Q66 10 72 16" fill="none" stroke="#fff" strokeWidth={0.8} opacity="0.15" />
     </g>
   );
@@ -76,15 +76,15 @@ function AfroFront({ fill }: HairPartProps) {
 function DreadsFront({ fill }: HairPartProps) {
   return (
     <g>
-      {/* Front-hanging dreads — tapered, organic shapes */}
-      <path d="M34 26 C33 30 32 38 34 44 Q37.5 46 41 44 C43 38 42 30 41 26 Q37.5 24 34 26Z"
+      {/* Forehead-only dreads — short tapered tufts above the eye line (y<34) */}
+      <path d="M30 22 C29 26 28 30 30 33 Q33.5 35 37 33 C39 30 38 26 37 22 Q33.5 20 30 22Z"
         fill={fill} stroke="#000" strokeWidth={1.5} strokeLinejoin="round" />
-      <path d="M46 24 C45 28 44 34 46 40 Q49.5 42 53 40 C55 34 54 28 53 24 Q49.5 22 46 24Z"
+      <path d="M46 20 C45 24 44 28 46 31 Q49.5 33 53 31 C55 28 54 24 53 20 Q49.5 18 46 20Z"
         fill={fill} stroke="#000" strokeWidth={1.5} strokeLinejoin="round" />
-      <path d="M58 26 C57 30 56 37 58 43 Q61.5 45 65 43 C67 37 66 30 65 26 Q61.5 24 58 26Z"
+      <path d="M62 22 C61 26 60 30 62 33 Q65.5 35 69 33 C71 30 70 26 69 22 Q65.5 20 62 22Z"
         fill={fill} stroke="#000" strokeWidth={1.5} strokeLinejoin="round" />
       {/* Segment wraps */}
-      <path d="M35 32 L40 32 M36 36 L39 36 M47 30 L52 30 M48 34 L51 34 M59 32 L64 32 M60 36 L63 36" stroke="#000" strokeWidth={0.6} opacity="0.12" />
+      <path d="M31 27 L36 27 M32 30 L35 30 M47 25 L52 25 M48 28 L51 28 M63 27 L68 27 M64 30 L67 30" stroke="#000" strokeWidth={0.6} opacity="0.12" />
     </g>
   );
 }
@@ -121,9 +121,9 @@ function BunFront({ fill }: HairPartProps) {
 function TwintailsFront({ fill }: HairPartProps) {
   return (
     <g>
-      <path d="M20 34 Q26 22 40 24 Q50 18 60 24 Q74 22 80 34 Q72 38 64 34 Q56 40 50 34 Q44 40 36 34 Q28 38 20 34Z"
+      <path d="M20 32 Q26 20 40 22 Q50 16 60 22 Q74 20 80 32 Q72 34 64 32 Q56 34 50 30 Q44 34 36 32 Q28 34 20 32Z"
         fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
-      <path d="M36 24 L36 32 M64 24 L64 32" stroke="#000" strokeWidth={0.5} opacity="0.1" />
+      <path d="M36 22 L36 30 M64 22 L64 30" stroke="#000" strokeWidth={0.5} opacity="0.1" />
       <path d="M44 22 Q50 18 56 22" fill="none" stroke="#fff" strokeWidth={0.6} opacity="0.12" />
     </g>
   );
@@ -257,11 +257,11 @@ function HalfUpFront({ fill }: HairPartProps) {
 function HimecutFront({ fill }: HairPartProps) {
   return (
     <g>
-      {/* Sharp straight bangs overlay — the iconic blunt fringe */}
-      <path d="M20 34 Q20 16 50 12 Q80 16 80 34 L80 38 L20 38Z"
+      {/* Sharp straight bangs overlay — the iconic blunt fringe (above eye line) */}
+      <path d="M20 32 Q20 14 50 10 Q80 14 80 32 L80 34 L20 34Z"
         fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
       {/* Sharp cut line at bottom */}
-      <line x1="20" y1="38" x2="80" y2="38" stroke="#000" strokeWidth={1.5} opacity="0.35" />
+      <line x1="20" y1="34" x2="80" y2="34" stroke="#000" strokeWidth={1.5} opacity="0.35" />
       {/* Strand lines for sleek look */}
       <path d="M32 18 L32 36 M42 14 L42 36 M50 12 L50 36 M58 14 L58 36 M68 18 L68 36" stroke="#000" strokeWidth={0.4} opacity="0.06" />
       <path d="M36 16 Q44 12 50 12 Q56 12 64 16" fill="none" stroke="#fff" strokeWidth={0.8} opacity="0.12" />
@@ -341,12 +341,12 @@ function FrizzleFront({ fill }: HairPartProps) {
 function DuragFront({ fill }: HairPartProps) {
   return (
     <g>
-      {/* Forehead fabric band — the front edge of the durag */}
-      <path d="M18 38 Q18 28 50 24 Q82 28 82 38 L80 42 Q66 36 50 34 Q34 36 20 42Z"
+      {/* Forehead fabric band — front edge sits above eye line */}
+      <path d="M18 34 Q18 24 50 20 Q82 24 82 34 L80 36 Q66 32 50 30 Q34 32 20 36Z"
         fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
       {/* Fabric sheen on band */}
-      <path d="M30 30 Q42 26 50 26 Q58 26 70 30" fill="none" stroke="#fff" strokeWidth={1} opacity="0.18" />
-      <path d="M26 34 Q38 30 50 30 Q62 30 74 34" fill="none" stroke="#fff" strokeWidth={0.6} opacity="0.1" />
+      <path d="M30 26 Q42 22 50 22 Q58 22 70 26" fill="none" stroke="#fff" strokeWidth={1} opacity="0.18" />
+      <path d="M26 30 Q38 26 50 26 Q62 26 74 30" fill="none" stroke="#fff" strokeWidth={0.6} opacity="0.1" />
     </g>
   );
 }
@@ -354,14 +354,14 @@ function DuragFront({ fill }: HairPartProps) {
 function LocsShortFront({ fill }: HairPartProps) {
   return (
     <g>
-      {/* 3 short front-hanging locs — neat, shoulder-length-ish */}
-      <path d="M34 26 C33 30 32 36 34 42 Q37.5 44 41 42 C43 36 42 30 41 26 Q37.5 24 34 26Z"
+      {/* Forehead-only neat locs — short tufts above eye line (y<34) */}
+      <path d="M30 22 C29 26 28 30 30 33 Q33.5 35 37 33 C39 30 38 26 37 22 Q33.5 20 30 22Z"
         fill={fill} stroke="#000" strokeWidth={1.5} strokeLinejoin="round" />
-      <path d="M46 24 C45 28 44 34 46 38 Q49.5 40 53 38 C55 34 54 28 53 24 Q49.5 22 46 24Z"
+      <path d="M46 20 C45 24 44 28 46 31 Q49.5 33 53 31 C55 28 54 24 53 20 Q49.5 18 46 20Z"
         fill={fill} stroke="#000" strokeWidth={1.5} strokeLinejoin="round" />
-      <path d="M58 26 C57 30 56 36 58 42 Q61.5 44 65 42 C67 36 66 30 65 26 Q61.5 24 58 26Z"
+      <path d="M62 22 C61 26 60 30 62 33 Q65.5 35 69 33 C71 30 70 26 69 22 Q65.5 20 62 22Z"
         fill={fill} stroke="#000" strokeWidth={1.5} strokeLinejoin="round" />
-      <path d="M35 32 L40 32 M36 36 L39 36 M47 30 L52 30 M48 34 L51 34 M59 32 L64 32 M60 36 L63 36"
+      <path d="M31 27 L36 27 M32 30 L35 30 M47 25 L52 25 M48 28 L51 28 M63 27 L68 27 M64 30 L67 30"
         stroke="#000" strokeWidth={0.6} opacity="0.12" />
     </g>
   );

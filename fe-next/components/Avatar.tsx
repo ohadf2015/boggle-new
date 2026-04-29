@@ -30,6 +30,14 @@ interface AvatarProps {
   isLoading?: boolean;
   /** Game-mode color frame: pink/cyan/purple/lime ring around avatar */
   mode?: AvatarMode;
+  /** Equipped profile-frame cosmetic id (e.g. 'frame-gold'). 'frame-none'/null = no frame. */
+  frame?: string | null;
+}
+
+/** Map a profile-frame cosmetic id to its avatar wrapper class. Returns null for no frame. */
+function frameWrapperClass(frame: string | null | undefined): string | null {
+  if (!frame || frame === 'frame-none') return null;
+  return `avatar-${frame}`;
 }
 
 const SIZE_CONFIG: Record<AvatarSize, SizeConfig> = {
@@ -52,7 +60,10 @@ const Avatar = memo<AvatarProps>(({
   className = '',
   isLoading,
   mode,
+  frame,
 }) => {
+  const frameClass = frameWrapperClass(frame);
+  const frameAttr = frameClass ? { 'data-frame': frame as string } : {};
   const config = SIZE_CONFIG[size] || SIZE_CONFIG.md;
 
   // Hydration guard: always render skeleton on first paint to match SSR,
@@ -83,9 +94,10 @@ const Avatar = memo<AvatarProps>(({
   if (customAvatar) {
     return (
       <div
-        className={cn('relative rounded-full overflow-hidden shrink-0', config.container, className)}
+        className={cn('relative rounded-full overflow-hidden shrink-0', config.container, className, frameClass)}
         data-testid="header-avatar"
         data-avatar-type="custom"
+        {...frameAttr}
       >
         <AvatarRenderer config={customAvatar} size={config.px} circular className="w-full h-full" mode={mode} />
       </div>
@@ -95,9 +107,10 @@ const Avatar = memo<AvatarProps>(({
   // 2. Fallback: deterministic random custom avatar
   return (
     <div
-      className={cn('relative rounded-full overflow-hidden shrink-0', config.container, className)}
+      className={cn('relative rounded-full overflow-hidden shrink-0', config.container, className, frameClass)}
       data-testid="header-avatar"
       data-avatar-type="generated"
+      {...frameAttr}
     >
       <AvatarRenderer config={fallbackConfig} size={config.px} circular mode={mode} />
     </div>

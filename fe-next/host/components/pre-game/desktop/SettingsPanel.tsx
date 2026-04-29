@@ -95,7 +95,7 @@ export function SettingsPanel({
                   onClick={() => onGameModeClick(mode)}
                   whileTap={{ scale: 0.98 }}
                   className={cn(
-                    'flex items-center gap-3 xl:gap-4 p-3 xl:p-4 rounded-neo border-2 xl:border-3 transition-all text-left',
+                    'flex items-center gap-3 xl:gap-4 p-3 xl:p-4 rounded-neo border-2 xl:border-3 transition-all text-start',
                     isSelected
                       ? `${colors.bg} ${colors.border} shadow-none`
                       : 'bg-neo-navy/40 border-neo-black/50 hover:border-neo-black shadow-hard-sm'
@@ -143,7 +143,7 @@ export function SettingsPanel({
         )}
       >
         <Monitor className={cn('w-5 h-5 xl:w-6 xl:h-6', tvMode ? 'text-neo-purple' : 'text-neo-cream/70')} />
-        <div className="flex-1 text-left">
+        <div className="flex-1 text-start">
           <p className={cn('font-bold text-sm xl:text-base', tvMode ? 'text-neo-purple' : 'text-neo-cream')}>
             {t('hostView.broadcastModeTitle')}
           </p>

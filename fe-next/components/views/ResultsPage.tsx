@@ -465,6 +465,15 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
 
     clearSessionPreservingUsername(username);
 
+    // Classroom flow: lessonGameData (sessionStorage) signals this was a teacher-launched
+    // classroom game — route back to /education so we don't bounce back into the
+    // classroom lobby (which would happen on a same-URL reload that keeps ?classroom=true).
+    const isClassroomFlow = !!lessonGameData;
+    try {
+      sessionStorage.removeItem('lessonGameData');
+    } catch {}
+    const exitHref = isClassroomFlow ? `/${language}/education` : `/${language}/multiplayer`;
+
     setTimeout(() => {
       try {
         if (socket) {
@@ -473,7 +482,9 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
       } catch (error) {
         logger.error('[RESULTS] Error disconnecting socket:', error);
       }
-      window.location.reload();
+      // Hard navigation (not reload) → drops ?classroom=true&host=true query params
+      // and gives us the same fresh-state reset that reload provided.
+      window.location.href = exitHref;
     }, 200);
   };
 

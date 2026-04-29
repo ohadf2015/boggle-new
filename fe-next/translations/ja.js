@@ -1857,7 +1857,33 @@ const ja = {
       "letsGo": "はじめよう！",
       "chooseLanguage": "言語を選択",
       "letsPlay": "プレイ開始",
-      "whereToStart": "どこから始める？"
+      "whereToStart": "どこから始める？",
+      "v2": {
+        "rewardsEarned": "獲得した報酬",
+        "goldReward": "+{{gold}} ゴールド",
+        "goldEarned": "獲得ゴールド",
+        "streak": "連続",
+        "streakStarted": "連続1日目",
+        "achievementUnlocked": "初めての言葉",
+        "tomorrowBonus": "明日も来て+50ボーナスをゲット",
+        "scoreFooter": "{{score}}点",
+        "claimAndPlay": "受け取ってプレイ",
+        "skipForNow": "あとで",
+        "titles": {
+          "wordling": "ワードリング",
+          "wordHunter": "ワードハンター！",
+          "wordsmith": "ワードスミス！",
+          "wordSlayer": "ワードスレイヤー！",
+          "wordLegend": "ワードレジェンド！"
+        },
+        "mascotReactions": {
+          "wordling": "いい出だし！",
+          "wordHunter": "やるね！",
+          "wordsmith": "天性の才能！",
+          "wordSlayer": "絶好調！",
+          "wordLegend": "伝説のデビュー！"
+        }
+      }
     }
   },
   "preGameTutorial": {

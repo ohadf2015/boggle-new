@@ -38,6 +38,7 @@ import {
 } from '@/components/profile';
 import { CosmeticCollection } from '@/components/cosmetics/CosmeticCollection';
 import { useCoinContext } from '@/contexts/CoinContext';
+import { useUnlockNotifier } from '@/hooks/useUnlockNotifier';
 
 interface GameSession {
   gameCode?: string;
@@ -65,6 +66,13 @@ export default function ProfilePageClient(): React.JSX.Element {
   // Hooks
   const { spendCoins } = useCoinContext();
   const { collectibles: playerCollectibles, isLoading: isLoadingCollectibles } = usePlayerCollectibles(user?.id);
+
+  // Surface a toast whenever a new cosmetic becomes available (rank-up / streak milestone).
+  // Mounted on profile because that is where rank/streak are already loaded.
+  useUnlockNotifier({
+    rankTier: profile?.rank_tier || 'Bronze',
+    streakDays: profile?.streak_days || 0,
+  });
 
   // Pull-to-refresh
   const { pullToRefreshHandlers, pullState } = usePullToRefresh({

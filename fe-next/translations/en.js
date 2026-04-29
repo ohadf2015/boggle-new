@@ -1978,6 +1978,8 @@ const en = {
       "v2": {
         "rewardsEarned": "REWARDS EARNED",
         "goldReward": "+{{gold}} GOLD",
+        "goldEarned": "gold earned",
+        "streak": "streak",
         "streakStarted": "DAY 1 STREAK",
         "achievementUnlocked": "FIRST WORDS",
         "tomorrowBonus": "Come back tomorrow for +50 bonus",

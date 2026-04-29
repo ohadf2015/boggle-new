@@ -169,7 +169,7 @@ export default function AvatarBuilderModal({
   if (!isOpen) return null;
 
   return createPortal(
-    <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/60 p-4 overflow-hidden" role="presentation" onClick={onClose} onKeyDown={(e) => { if (e.key === 'Escape') onClose(); }}>
+    <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/60 p-4 overflow-hidden" role="presentation" onClick={onClose} onKeyDown={(e) => { if (e.key === 'Escape') onClose(); }}>
       <AdaptiveMotion.div
         ref={dialogRef}
         role="dialog"

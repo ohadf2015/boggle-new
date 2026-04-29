@@ -1871,7 +1871,33 @@ const sv = {
       "letsGo": "Nu kör vi!",
       "chooseLanguage": "Välj språk",
       "letsPlay": "Kör igång",
-      "whereToStart": "Var vill du börja?"
+      "whereToStart": "Var vill du börja?",
+      "v2": {
+        "rewardsEarned": "BELÖNINGAR INTJÄNADE",
+        "goldReward": "+{{gold}} GULD",
+        "goldEarned": "guld intjänat",
+        "streak": "svit",
+        "streakStarted": "DAG 1 SVIT",
+        "achievementUnlocked": "FÖRSTA ORDEN",
+        "tomorrowBonus": "Kom tillbaka imorgon för +50 bonus",
+        "scoreFooter": "{{score}} p",
+        "claimAndPlay": "HÄMTA & SPELA",
+        "skipForNow": "Hoppa över nu",
+        "titles": {
+          "wordling": "ORDLING",
+          "wordHunter": "ORDJÄGARE!",
+          "wordsmith": "ORDSMED!",
+          "wordSlayer": "ORDDRÄPARE!",
+          "wordLegend": "ORDLEGEND!"
+        },
+        "mascotReactions": {
+          "wordling": "Bra start!",
+          "wordHunter": "Kolla in dig!",
+          "wordsmith": "Du är ett naturtalent!",
+          "wordSlayer": "Du brinner!",
+          "wordLegend": "Legendarisk debut!"
+        }
+      }
     }
   },
   "preGameTutorial": {

@@ -6,7 +6,10 @@ import { trackReferralInviteSent } from '@/utils/viralTracking';
 /**
  * Translation function type
  */
-type TranslationFunction = (key: string) => string;
+type TranslationFunction = (
+  key: string,
+  params?: Record<string, string | number>,
+) => string;
 
 /**
  * Get the join URL for a game room
@@ -634,7 +637,7 @@ export const shareBoard = (
   t: TranslationFunction
 ): void => {
   const url = getBoardUrl(boardCode, locale);
-  const message = `${t('ugc.board.shareMessage')}\n${t('ugc.board.createdBy').replace('{{name}}', creatorName)}\n\n${url}`;
+  const message = `${t('ugc.board.shareMessage')}\n${t('ugc.board.createdBy', { name: creatorName })}\n\n${url}`;
 
   if (navigator.share) {
     navigator.share({ title, text: message, url }).catch(() => {
@@ -668,7 +671,7 @@ export const shareWordPack = (
   t: TranslationFunction
 ): void => {
   const url = getWordPackUrl(packId, locale);
-  const message = `${t('ugc.pack.shareMessage')}\n"${name}" ${t('ugc.board.createdBy').replace('{{name}}', creatorName)}\n\n${url}`;
+  const message = `${t('ugc.pack.shareMessage')}\n"${name}" ${t('ugc.board.createdBy', { name: creatorName })}\n\n${url}`;
 
   if (navigator.share) {
     navigator.share({ title: name, text: message, url }).catch(() => {

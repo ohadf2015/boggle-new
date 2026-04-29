@@ -273,16 +273,18 @@ describe('AchievementQueueProvider', () => {
   });
 
   it('returns no-op queueAchievement when used outside provider (does not throw)', () => {
-    let captured: { queueAchievement: (a: { key: string; icon: string }) => void } | null = null;
+    const onCapture = vi.fn();
     const TestComponent = () => {
-      captured = useAchievementQueue();
+      const ctx = useAchievementQueue();
+      onCapture(ctx);
       return null;
     };
 
     expect(() => render(<TestComponent />)).not.toThrow();
-    expect(captured).not.toBeNull();
-    expect(captured!.queueAchievement).toBeInstanceOf(Function);
-    expect(() => captured!.queueAchievement({ key: 'TEST', icon: '🎯' })).not.toThrow();
+    expect(onCapture).toHaveBeenCalled();
+    const captured = onCapture.mock.calls[0][0] as { queueAchievement: (a: { key: string; icon: string }) => void };
+    expect(captured.queueAchievement).toBeInstanceOf(Function);
+    expect(() => captured.queueAchievement({ key: 'TEST', icon: '🎯' })).not.toThrow();
   });
 
   it('should auto-dismiss notification after timeout', () => {

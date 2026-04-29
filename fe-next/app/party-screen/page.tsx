@@ -1,10 +1,9 @@
-// This page is outside the [locale] route group and needs its own LanguageProvider.
-// It is a server component so metadata can be exported.
+// This page sits outside the [locale] route group. Locale is injected via the
+// PartyScreenLanguageProvider in layout.tsx (reads ?locale=xx).
 import type { Metadata } from 'next';
+import PartyScreenContent from './PartyScreenContent';
 
 export const dynamic = 'force-dynamic';
-import { LanguageProvider } from '@/contexts/LanguageContext';
-import PartyScreenContent from './PartyScreenContent';
 
 export const metadata: Metadata = {
   title: 'Party TV Screen — Display Game on the Big Screen | LexiClash',
@@ -12,9 +11,5 @@ export const metadata: Metadata = {
 };
 
 export default function PartyScreenLanding() {
-  return (
-    <LanguageProvider initialLanguage="en">
-      <PartyScreenContent />
-    </LanguageProvider>
-  );
+  return <PartyScreenContent />;
 }

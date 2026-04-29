@@ -4,6 +4,8 @@ import {
   getUnlockedCosmetics,
   isUnlocked,
   getEquippedCosmetics,
+  formatUnlockHint,
+  diffNewlyUnlocked,
   type CosmeticCategory,
   type PlayerCosmeticState,
 } from '../cosmetics';
@@ -97,6 +99,55 @@ describe('getUnlockedCosmetics', () => {
       (c) => c.unlockCondition.type === 'rank' && c.unlockCondition.tier === 'Gold'
     );
     expect(unlocked).toContainEqual(goldItem);
+  });
+});
+
+describe('formatUnlockHint', () => {
+  it('returns null for default cosmetics (no hint needed)', () => {
+    const def = COSMETICS.find((c) => c.unlockCondition.type === 'default')!;
+    expect(formatUnlockHint(def)).toBeNull();
+  });
+
+  it('returns rank hint with tier param', () => {
+    const rank = COSMETICS.find(
+      (c) => c.unlockCondition.type === 'rank' && c.unlockCondition.tier === 'Silver',
+    )!;
+    expect(formatUnlockHint(rank)).toEqual({
+      key: 'cosmetics.unlock.rank',
+      params: { tier: 'Silver' },
+    });
+  });
+
+  it('returns streak hint with days param', () => {
+    const streak = COSMETICS.find((c) => c.unlockCondition.type === 'streak')!;
+    expect(formatUnlockHint(streak)).toEqual({
+      key: 'cosmetics.unlock.streak',
+      params: { days: (streak.unlockCondition as { days: number }).days },
+    });
+  });
+
+  it('returns purchase hint with cost param', () => {
+    const buy = COSMETICS.find((c) => c.unlockCondition.type === 'purchase')!;
+    expect(formatUnlockHint(buy)).toEqual({
+      key: 'cosmetics.unlock.purchase',
+      params: { cost: (buy.unlockCondition as { cost: number }).cost },
+    });
+  });
+});
+
+describe('diffNewlyUnlocked', () => {
+  it('returns cosmetics newly unlocked between two states', () => {
+    const before = { rankTier: 'Bronze', streakDays: 0, coins: 0, seasonRewards: [], purchasedIds: [], equippedIds: {} };
+    const after = { ...before, rankTier: 'Silver' };
+    const newly = diffNewlyUnlocked(before, after);
+    expect(newly.some((c) => c.id === 'tile-neon')).toBe(true);
+    expect(newly.some((c) => c.id === 'frame-silver')).toBe(true);
+    expect(newly.some((c) => c.id === 'tile-default')).toBe(false);
+  });
+
+  it('returns empty when nothing changed', () => {
+    const state = makePlayerState({ rankTier: 'Gold' });
+    expect(diffNewlyUnlocked(state, state)).toEqual([]);
   });
 });
 

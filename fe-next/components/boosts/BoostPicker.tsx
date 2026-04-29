@@ -7,6 +7,7 @@ import { useBoostClaim } from '@/hooks/useBoostClaim';
 import { useExperiment } from '@/hooks/useExperiment';
 import { BOOST_TYPES, BOOST_CONFIGS, type BoostType } from '@/shared/types/boosts';
 import { BOOST_ICONS } from './boostIcons';
+import { SharedFxApp } from '@/lib/pixiFx/SharedFxApp';
 
 interface Props {
   open: boolean;
@@ -102,14 +103,24 @@ export function BoostPicker({ open, mode, sessionId, onClose }: Props) {
               boostType={bt}
               disabled={isLoading || remaining === 0 || claimed?.boostType === bt}
               isClaimed={claimed?.boostType === bt}
-              onClaim={() => claim(bt)} />
+              onClaim={(rect) => {
+                claim(bt);
+                if (rect && SharedFxApp.isInitialized()) {
+                  SharedFxApp.spawnBurst(
+                    `boost-${bt}`,
+                    rect.left + rect.width / 2,
+                    rect.top + rect.height / 2,
+                  );
+                }
+              }} />
           ))}
         </div>
         <button
           ref={closeBtnRef}
           onClick={onClose}
-          className="mt-4 w-full min-h-[44px] rounded-neo border-neo bg-neo-cream py-2 font-neo-body text-neo-navy shadow-hard hover:active:shadow-hard-pressed">
-          {t('boosts.close')}
+          data-testid="boost-skip"
+          className="mt-4 w-full min-h-[44px] rounded-neo border-neo bg-neo-cream py-2 font-neo-body font-bold text-neo-navy shadow-hard hover:active:shadow-hard-pressed">
+          {t('boosts.skipAndPlay')}
         </button>
       </div>
     </div>
@@ -117,13 +128,13 @@ export function BoostPicker({ open, mode, sessionId, onClose }: Props) {
 }
 
 function BoostCard({ boostType, disabled, isClaimed, onClaim }: {
-  boostType: BoostType; disabled: boolean; isClaimed: boolean; onClaim: () => void;
+  boostType: BoostType; disabled: boolean; isClaimed: boolean; onClaim: (rect: DOMRect | null) => void;
 }) {
   const { t } = useLanguage();
   const { Icon, bg, fg } = BOOST_ICONS[boostType];
   return (
     <button
-      onClick={onClaim}
+      onClick={(e) => onClaim((e.currentTarget as HTMLButtonElement).getBoundingClientRect())}
       disabled={disabled}
       data-boost-card
       aria-label={t(`${BOOST_CONFIGS[boostType].i18nKey}.title`)}

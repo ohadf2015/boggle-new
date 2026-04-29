@@ -57,6 +57,11 @@ interface MultiplayerFlowProps {
   // expects to host the room with that exact code.
   host?: boolean;
 
+  // When true, suppress the public lobby chrome (RoomListView, SeasonBanner,
+  // admin Ranked button) — classroom users have a code via ClassroomModeBanner
+  // and shouldn't see competing matchmaking CTAs while auto-join is in flight.
+  isClassroomMode?: boolean;
+
   // Auto-create room on mount (e.g., from Word Hunt banner)
   autoCreate?: boolean;
 
@@ -94,6 +99,7 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
   quickPlay,
   defaultLanguage,
   host,
+  isClassroomMode,
   profileAvatar,
   setGameCode,
   setUsername,
@@ -385,6 +391,21 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
   // CG SDK initializes async — but blocking the lobby on it kills first-paint
   // and tanks gameplay-conversion. Show the lobby immediately; auto-join waits
   // for SDK ready (effect above) so platform calls fire correctly when they fire.
+
+  // Classroom mode: suppress public-lobby chrome. Auto-join effects above still
+  // run (handleInvitationAutoJoin fires from prefilledRoom), so the host's room
+  // is created/joined the same way — only the UI is replaced with a waiting
+  // loader. The ClassroomModeBanner upstream already shows the share code + QR.
+  if (isClassroomMode) {
+    return (
+      <div className="flex-1 flex items-center justify-center px-4 py-8">
+        <div className="flex flex-col items-center gap-3 text-neo-white/85 font-neo-body">
+          <div className="w-10 h-10 rounded-full border-4 border-neo-cyan/30 border-t-neo-cyan animate-spin" aria-hidden="true" />
+          <p className="text-sm sm:text-base">{t('education.classroomGame.waitingForPlayers')}</p>
+        </div>
+      </div>
+    );
+  }
 
   // Always show RoomListView as base, with modals as overlays
   return (

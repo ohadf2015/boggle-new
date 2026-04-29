@@ -74,6 +74,27 @@ describe('Avatar', () => {
     });
   });
 
+  describe('profile frame cosmetic', () => {
+    it('applies frame class when frame prop set', () => {
+      render(<Avatar customAvatar={SAMPLE_CUSTOM_AVATAR} frame="frame-gold" />);
+      const wrapper = screen.getByTestId('header-avatar');
+      expect(wrapper.getAttribute('data-frame')).toBe('frame-gold');
+      expect(wrapper.className).toContain('avatar-frame-gold');
+    });
+
+    it('omits frame attr when frame is null', () => {
+      render(<Avatar customAvatar={SAMPLE_CUSTOM_AVATAR} frame={null} />);
+      const wrapper = screen.getByTestId('header-avatar');
+      expect(wrapper.getAttribute('data-frame')).toBeNull();
+    });
+
+    it('omits frame attr when frame is "frame-none"', () => {
+      render(<Avatar customAvatar={SAMPLE_CUSTOM_AVATAR} frame="frame-none" />);
+      const wrapper = screen.getByTestId('header-avatar');
+      expect(wrapper.getAttribute('data-frame')).toBeNull();
+    });
+  });
+
   describe('generated fallback avatar', () => {
     it('renders generated avatar when userId seed is provided but no customAvatar', () => {
       render(<Avatar userId="some-user" />);

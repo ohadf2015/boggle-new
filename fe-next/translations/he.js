@@ -1874,7 +1874,33 @@ const he = {
       "letsGo": "יאללה, מתחילים!",
       "chooseLanguage": "בחרו שפה",
       "letsPlay": "בואו נשחק",
-      "whereToStart": "מאיפה מתחילים?"
+      "whereToStart": "מאיפה מתחילים?",
+      "v2": {
+        "rewardsEarned": "פרסים שצברת",
+        "goldReward": "+{{gold}} זהב",
+        "goldEarned": "זהב שהרווחת",
+        "streak": "רצף",
+        "streakStarted": "יום 1 ברצף",
+        "achievementUnlocked": "מילים ראשונות",
+        "tomorrowBonus": "חזרו מחר לבונוס +50",
+        "scoreFooter": "{{score}} נק׳",
+        "claimAndPlay": "קחו ושחקו",
+        "skipForNow": "דלג בינתיים",
+        "titles": {
+          "wordling": "מילונאי",
+          "wordHunter": "צייד מילים!",
+          "wordsmith": "אומן מילים!",
+          "wordSlayer": "קוטל מילים!",
+          "wordLegend": "אגדת מילים!"
+        },
+        "mascotReactions": {
+          "wordling": "התחלה יפה!",
+          "wordHunter": "תראו אותך!",
+          "wordsmith": "אתם טבעיים!",
+          "wordSlayer": "אתם בוערים!",
+          "wordLegend": "הופעת בכורה אגדית!"
+        }
+      }
     }
   },
 

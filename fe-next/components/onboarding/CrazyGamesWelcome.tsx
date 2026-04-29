@@ -8,6 +8,7 @@ import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { detectCrazyGamesLanguage } from '@/utils/cgLocaleDetect';
 import WelcomeDemoGrid from './WelcomeDemoGrid';
+import { getWelcomeDemoConfig } from './demoConfigs';
 
 export type CrazyGamesMode = 'daily' | 'practice' | 'multiplayer';
 
@@ -208,7 +209,9 @@ const CrazyGamesWelcome: React.FC<CrazyGamesWelcomeProps> = ({ onPlay }) => {
                 className="font-neo-display text-[11px] uppercase tracking-[0.15em] text-neo-cream/70"
                 aria-hidden
               >
-                {isRTL ? '← P-L-A-Y' : 'P-L-A-Y →'}
+                {isRTL
+                  ? `← ${getWelcomeDemoConfig(language).word.split('').join('-')}`
+                  : `${getWelcomeDemoConfig(language).word.split('').join('-')} →`}
               </motion.span>
             </div>
           </div>

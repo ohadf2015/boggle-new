@@ -416,6 +416,68 @@ describe('MultiplayerFlow', () => {
     });
   });
 
+  describe('Classroom Mode', () => {
+    it('should NOT render RoomListView when isClassroomMode is true', () => {
+      render(
+        <MultiplayerFlow
+          {...defaultProps}
+          isClassroomMode={true}
+          host={true}
+          prefilledRoom="RRGWFX"
+          isAuthenticated={true}
+          displayName="Teacher"
+        />
+      );
+
+      // Arena Hub / Quick Start / Open Arenas must not appear in classroom mode —
+      // teacher already has the share code (rendered by ClassroomModeBanner upstream).
+      expect(screen.queryByTestId('room-list-view')).not.toBeInTheDocument();
+    });
+
+    it('should render waiting state when isClassroomMode is true', () => {
+      render(
+        <MultiplayerFlow
+          {...defaultProps}
+          isClassroomMode={true}
+          host={true}
+          prefilledRoom="RRGWFX"
+          isAuthenticated={true}
+          displayName="Teacher"
+        />
+      );
+
+      // useLanguage falls back through translation cache; assert the EN string
+      // for `education.classroomGame.waitingForPlayers`.
+      expect(screen.getByText(/waiting for players/i)).toBeInTheDocument();
+    });
+
+    it('should still auto-create classroom host room via prefilledRoom', async () => {
+      const handleJoin = vi.fn();
+      render(
+        <MultiplayerFlow
+          {...defaultProps}
+          handleJoin={handleJoin}
+          isClassroomMode={true}
+          host={true}
+          prefilledRoom="RRGWFX"
+          isAuthenticated={true}
+          displayName="Teacher"
+        />
+      );
+
+      await waitFor(() => {
+        expect(handleJoin).toHaveBeenCalledWith(
+          true,
+          'en',
+          'RRGWFX',
+          expect.any(String),
+          'Teacher',
+          expect.objectContaining({ isPrivate: true })
+        );
+      });
+    });
+  });
+
   describe('Quick Play', () => {
     it('should call handleJoin with quickPlay flag when Quick Play clicked', async () => {
       const handleJoin = vi.fn();

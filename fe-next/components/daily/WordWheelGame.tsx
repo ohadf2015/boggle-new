@@ -11,6 +11,7 @@ import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import type { WordWheelEffect } from './WordWheelEffectsCanvas';
 import { WheelLetter, WordTile } from './WordWheelParts';
 import { useWordWheelKeyboard } from '@/hooks/useWordWheelKeyboard';
+import { useEquippedCosmetic } from '@/hooks/useEquippedCosmetic';
 import { trackGameEnd, trackGameStart } from '@/utils/growthTracking';
 import dynamic from 'next/dynamic';
 
@@ -457,8 +458,16 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
   const minutes = Math.floor(timeLeft / 60);
   const seconds = timeLeft % 60;
 
+  const equippedBoardTheme = useEquippedCosmetic('boardTheme');
+
   return (
-    <div ref={gameContainerRef} className="relative flex flex-col items-center w-full flex-1 max-w-lg mx-auto px-3 sm:px-4 pb-3">
+    <div
+      ref={gameContainerRef}
+      className={cn(
+        'relative flex flex-col items-center w-full flex-1 max-w-lg mx-auto px-3 sm:px-4 pb-3 rounded-neo',
+        equippedBoardTheme && `cosmetic-board-${equippedBoardTheme.replace('board-', '')}`,
+      )}
+    >
       {/* ── Timer & Score Bar ── */}
       <div className="w-full space-y-1.5">
         <div className="flex items-center justify-between w-full gap-2">

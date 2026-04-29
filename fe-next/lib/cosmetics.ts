@@ -263,6 +263,40 @@ export function getCosmeticsByCategory(category: CosmeticCategory): Cosmetic[] {
 }
 
 /**
+ * Translation hint for an unlock condition.
+ * Returns null for `default` (no hint to show).
+ * Caller passes `key`+`params` straight to t().
+ */
+export function formatUnlockHint(
+  cosmetic: Cosmetic,
+): { key: string; params?: Record<string, string | number> } | null {
+  const cond = cosmetic.unlockCondition;
+  switch (cond.type) {
+    case 'default':
+      return null;
+    case 'rank':
+      return { key: 'cosmetics.unlock.rank', params: { tier: cond.tier } };
+    case 'streak':
+      return { key: 'cosmetics.unlock.streak', params: { days: cond.days } };
+    case 'purchase':
+      return { key: 'cosmetics.unlock.purchase', params: { cost: cond.cost } };
+    case 'season':
+      return { key: 'cosmetics.unlock.season' };
+  }
+}
+
+/**
+ * Cosmetics newly unlocked between two player states.
+ * Used for awarding/notifying after rank-ups, streak milestones, etc.
+ */
+export function diffNewlyUnlocked(
+  before: PlayerCosmeticState,
+  after: PlayerCosmeticState,
+): Cosmetic[] {
+  return COSMETICS.filter((c) => !isUnlocked(c.id, before) && isUnlocked(c.id, after));
+}
+
+/**
  * Rarity color mapping for UI.
  */
 export const RARITY_COLORS: Record<CosmeticRarity, string> = {

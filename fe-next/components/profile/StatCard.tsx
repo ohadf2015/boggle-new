@@ -6,31 +6,11 @@ import { cn } from '@/lib/utils';
 
 export type StatColor = 'cyan' | 'pink' | 'lime' | 'purple';
 
-const colorMap: Record<StatColor, { text: string; iconBg: string; iconText: string; bar: string }> = {
-  cyan: {
-    text: 'text-neo-cyan',
-    iconBg: 'bg-neo-cyan/10',
-    iconText: 'text-neo-cyan',
-    bar: 'bg-neo-cyan',
-  },
-  pink: {
-    text: 'text-neo-pink',
-    iconBg: 'bg-neo-pink/10',
-    iconText: 'text-neo-pink',
-    bar: 'bg-neo-pink',
-  },
-  lime: {
-    text: 'text-neo-lime',
-    iconBg: 'bg-neo-lime/10',
-    iconText: 'text-neo-lime',
-    bar: 'bg-neo-lime',
-  },
-  purple: {
-    text: 'text-neo-purple',
-    iconBg: 'bg-neo-purple/10',
-    iconText: 'text-neo-purple',
-    bar: 'bg-neo-purple',
-  },
+const colorMap: Record<StatColor, { value: string; ribbon: string; chipBg: string; chipText: string; shadow: string }> = {
+  cyan:   { value: 'text-neo-cyan',   ribbon: 'bg-neo-cyan',   chipBg: 'bg-neo-cyan',   chipText: 'text-neo-black', shadow: 'shadow-hard-cyan' },
+  pink:   { value: 'text-neo-pink',   ribbon: 'bg-neo-pink',   chipBg: 'bg-neo-pink',   chipText: 'text-neo-white', shadow: 'shadow-hard-pink' },
+  lime:   { value: 'text-neo-lime',   ribbon: 'bg-neo-lime',   chipBg: 'bg-neo-lime',   chipText: 'text-neo-black', shadow: 'shadow-hard-lime' },
+  purple: { value: 'text-neo-purple', ribbon: 'bg-neo-purple', chipBg: 'bg-neo-purple', chipText: 'text-neo-white', shadow: 'shadow-hard-lg' },
 };
 
 export interface StatCardProps {
@@ -40,35 +20,30 @@ export interface StatCardProps {
   isDarkMode: boolean;
   highlight?: boolean;
   color?: StatColor;
-  /** Decorative progress 0-100 */
+  /** @deprecated decorative progress bar removed in v2 — kept for back-compat */
   progress?: number;
-  /** Stagger delay for entrance animation */
   index?: number;
 }
 
-/** Animated counter that counts up numeric values */
 function AnimatedValue({ value }: { value: string | number }) {
   const [display, setDisplay] = useState<string | number>(typeof value === 'number' ? 0 : value);
-  const ref = useRef<HTMLParagraphElement>(null);
+  const ref = useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { once: true });
 
   useEffect(() => {
     if (!inView) return;
     if (typeof value !== 'number') { setDisplay(value); return; }
-
-    // Parse numeric strings with commas (e.g., "1,234")
     const target = value;
     if (target === 0) { setDisplay(0); return; }
 
-    const duration = 800;
+    const duration = 900;
     const startTime = performance.now();
     let frame: number;
 
     const tick = (now: number) => {
       const elapsed = now - startTime;
       const progress = Math.min(elapsed / duration, 1);
-      // Ease-out cubic
-      const eased = 1 - Math.pow(1 - progress, 3);
+      const eased = 1 - Math.pow(1 - progress, 4);
       setDisplay(Math.round(target * eased));
       if (progress < 1) frame = requestAnimationFrame(tick);
     };
@@ -79,57 +54,77 @@ function AnimatedValue({ value }: { value: string | number }) {
   return <span ref={ref}>{typeof display === 'number' ? display.toLocaleString() : display}</span>;
 }
 
-export function StatCard({ icon, label, value, isDarkMode, highlight = false, color, progress, index = 0 }: StatCardProps): React.ReactNode {
-  const c = color ? colorMap[color] : null;
+export function StatCard({ icon, label, value, color, index = 0 }: StatCardProps): React.ReactNode {
+  const c = color ? colorMap[color] : colorMap.cyan;
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: '-50px' });
+  const indexLabel = String(index + 1).padStart(2, '0');
 
   return (
     <motion.div
       ref={ref}
-      initial={{ opacity: 0, y: 20, scale: 0.95 }}
-      animate={inView ? { opacity: 1, y: 0, scale: 1 } : {}}
-      transition={{ type: 'spring', stiffness: 300, damping: 20, delay: index * 0.08 }}
-      whileHover={{ scale: 1.03, y: -2 }}
-      className="bg-neo-navy-light p-5 rounded-neo-xl border border-white/[0.08]"
-    >
-      {/* Icon box */}
-      <motion.div
-        className={cn(
-          'w-10 h-10 rounded-xl flex items-center justify-center text-lg mb-3',
-          c ? `${c.iconBg} ${c.iconText}` : 'bg-slate-700/50 text-gray-400'
-        )}
-        initial={{ scale: 0, rotate: -20 }}
-        animate={inView ? { scale: 1, rotate: 0 } : {}}
-        transition={{ type: 'spring', stiffness: 400, damping: 15, delay: index * 0.08 + 0.1 }}
-      >
-        {icon}
-      </motion.div>
-
-      {/* Label */}
-      <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-1">
-        {label}
-      </p>
-
-      {/* Value — animated count-up for numbers */}
-      <p className={cn(
-        'text-2xl font-black',
-        c ? c.text : 'text-white'
-      )}>
-        {inView ? <AnimatedValue value={value} /> : '0'}
-      </p>
-
-      {/* Decorative progress bar — animated fill */}
-      {progress !== undefined && (
-        <div className="mt-3 h-1 bg-white/[0.06] rounded-full overflow-hidden">
-          <motion.div
-            className={cn('h-full rounded-full', c ? c.bar : 'bg-neo-cyan')}
-            initial={{ width: 0 }}
-            animate={inView ? { width: `${Math.min(100, Math.max(0, progress))}%` } : {}}
-            transition={{ duration: 0.8, ease: 'easeOut', delay: index * 0.08 + 0.3 }}
-          />
-        </div>
+      initial={{ opacity: 0, y: 24 }}
+      animate={inView ? { opacity: 1, y: 0 } : {}}
+      transition={{ type: 'spring', stiffness: 260, damping: 22, delay: index * 0.07 }}
+      whileHover={{ y: -3 }}
+      whileTap={{ y: 1 }}
+      className={cn(
+        'group relative bg-neo-navy-light overflow-hidden',
+        'border-3 border-neo-black rounded-neo',
+        c.shadow,
+        'transition-transform duration-150',
       )}
+    >
+      {/* Halftone color ribbon — top edge */}
+      <div className={cn('relative h-2.5 w-full', c.ribbon)}>
+        <div className="absolute inset-0 texture-halftone-comic opacity-30 mix-blend-overlay" aria-hidden />
+      </div>
+
+      {/* Body */}
+      <div className="relative p-4 pt-5 pb-4">
+        {/* Floating icon chip — physical, with own shadow */}
+        <div
+          className={cn(
+            'absolute top-0 inset-e-3 -translate-y-1/2',
+            'w-10 h-10 flex items-center justify-center',
+            'rounded-neo border-2 border-neo-black shadow-hard-sm',
+            c.chipBg, c.chipText,
+          )}
+          aria-hidden
+        >
+          <span className="[&>svg]:w-5 [&>svg]:h-5 text-base">{icon}</span>
+        </div>
+
+        {/* Label — small, mono-track, separated from value */}
+        <p className="text-[10px] font-black uppercase tracking-[0.18em] text-neo-white/55 mb-1.5">
+          {label}
+        </p>
+
+        {/* Value — outsized Fredoka, single solid color (NO gradient text) */}
+        <p className={cn(
+          'font-neo-display font-black leading-none tracking-tight',
+          'text-[1.75rem] sm:text-[2rem] lg:text-[2.25rem]',
+          c.value,
+        )}>
+          {inView ? <AnimatedValue value={value} /> : <span aria-hidden>0</span>}
+        </p>
+
+        {/* Bottom-end index marker — tabular slop-killer detail */}
+        <div className="mt-3 flex items-end justify-between">
+          <span
+            className="font-mono text-[10px] tracking-tight text-neo-white/30 tabular-nums"
+            aria-hidden
+          >
+            {indexLabel} / 04
+          </span>
+          {/* Two short tick marks — replaces the meaningless progress bar */}
+          <div className="flex items-end gap-[3px]" aria-hidden>
+            <span className={cn('block w-[3px] h-2 rounded-sm opacity-40', c.ribbon)} />
+            <span className={cn('block w-[3px] h-3 rounded-sm opacity-70', c.ribbon)} />
+            <span className={cn('block w-[3px] h-4 rounded-sm', c.ribbon)} />
+          </div>
+        </div>
+      </div>
     </motion.div>
   );
 }

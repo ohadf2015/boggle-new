@@ -56,7 +56,7 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
   onComplete,
   onQuit,
 }) => {
-  const { t } = useLanguage();
+  const { t, dir, language: uiLanguage } = useLanguage();
   const { playWordAcceptedSound, playWordRejectedSound, playComboSound, playCountdownBeep, setGameActive } = useSoundEffects();
   const { stopMusic } = useMusic();
   const { awardComboMilestone } = useCoinContext();
@@ -516,6 +516,8 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
         isVisible={directionGuidance.showDirectionGuidance}
         onDismiss={directionGuidance.dismissDirectionGuidance}
         t={t}
+        dir={dir}
+        language={uiLanguage}
       />
 
       {/* Keyboard Input Hint - Desktop only */}
