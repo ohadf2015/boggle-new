@@ -422,10 +422,28 @@ export function BlastGame({
     setContinueDeclined(true);
   }, []);
 
+  // Sprint 3 polish: enrich results with target_word context so the wave-end
+  // card can acknowledge the goal either way (found vs missed). Reads the
+  // current objectiveProgress at fail/success time.
+  const handleGameEnd = useCallback((results: BlastResultsData) => {
+    const targetObj = objectives.objectiveProgress.find(
+      p => p.objective.type === 'target_word',
+    );
+    if (targetObj?.objective.targetWord) {
+      onGameEnd({
+        ...results,
+        targetWord: targetObj.objective.targetWord,
+        targetWordFound: targetObj.isComplete,
+      });
+    } else {
+      onGameEnd(results);
+    }
+  }, [objectives.objectiveProgress, onGameEnd]);
+
   // Game end detection + Sugar Crush (extracted to useBlastGameEnd)
   const { sugarCrushActive } = useBlastGameEnd({
     engine, isMultiplayer, gridSize: config.gridSize,
-    waveConfig, objectives, onGameEnd, onWaveComplete,
+    waveConfig, objectives, onGameEnd: handleGameEnd, onWaveComplete,
     maxCombo: combo.maxCombo, sounds,
     setExplosionShake, explosionShakeTimerRef,
     onDeadEndFinale: handleDeadEndFinale,

@@ -133,6 +133,32 @@ export function BlastResultsSummary({
           <p className="text-[11px] uppercase tracking-wider font-bold text-white/80">
             {t('blast.results.failHint')}
           </p>
+          {results.targetWord && !results.targetWordFound && (
+            <p
+              data-testid="blast-target-word-missed"
+              className="mt-1 text-[11px] uppercase tracking-wider font-bold text-white/85"
+            >
+              {t('blast.objective.targetWordMissed', { word: results.targetWord })}
+            </p>
+          )}
+        </AdaptiveMotion.div>
+      )}
+
+      {/* Target-word acknowledgement on success */}
+      {!didFail && results.targetWord && results.targetWordFound && (
+        <AdaptiveMotion.div
+          initial={{ scale: 0.85, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ type: 'spring', stiffness: 380, damping: 20, delay: 0.05 }}
+          className={cn(
+            'inline-flex items-center gap-2 px-3 py-1.5',
+            'rounded-neo border-3 border-neo-black shadow-hard',
+            'bg-neo-lime text-neo-black',
+            'font-neo-display font-black uppercase tracking-wider text-xs',
+          )}
+          data-testid="blast-target-word-found"
+        >
+          {t('blast.objective.targetWordFoundIt')} {results.targetWord}
         </AdaptiveMotion.div>
       )}
 

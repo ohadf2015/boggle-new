@@ -224,6 +224,60 @@ describe('BlastResultsSummary', () => {
     expect(screen.queryByText('blast.results.waveFailed')).toBeNull();
   });
 
+  // Sprint 3 polish: target_word goal acknowledgement closes the loop on
+  // semantic-goal feedback regardless of fail/success.
+  it('shows target-word missed line under fail banner when goal not found', () => {
+    render(
+      <BlastResultsSummary
+        results={makeResults({
+          clearPercentage: 75,
+          tilesCleared: 27,
+          totalTiles: 36,
+          targetWord: 'CRYSTAL',
+          targetWordFound: false,
+        })}
+        t={t}
+        onPlayAgain={noop}
+        onQuit={noop}
+      />,
+    );
+    const missed = screen.getByTestId('blast-target-word-missed');
+    expect(missed.textContent).toContain('blast.objective.targetWordMissed');
+    expect(missed.textContent).toContain('CRYSTAL');
+  });
+
+  it('shows target-word found celebration when goal hit on a winning wave', () => {
+    render(
+      <BlastResultsSummary
+        results={makeResults({
+          clearPercentage: 95,
+          stars: 3,
+          targetWord: 'CRYSTAL',
+          targetWordFound: true,
+        })}
+        t={t}
+        onPlayAgain={noop}
+        onQuit={noop}
+      />,
+    );
+    const celebration = screen.getByTestId('blast-target-word-found');
+    expect(celebration.textContent).toContain('blast.objective.targetWordFoundIt');
+    expect(celebration.textContent).toContain('CRYSTAL');
+  });
+
+  it('omits target-word UI entirely when no targetWord set', () => {
+    render(
+      <BlastResultsSummary
+        results={makeResults({ clearPercentage: 95, stars: 3 })}
+        t={t}
+        onPlayAgain={noop}
+        onQuit={noop}
+      />,
+    );
+    expect(screen.queryByTestId('blast-target-word-missed')).toBeNull();
+    expect(screen.queryByTestId('blast-target-word-found')).toBeNull();
+  });
+
   it('renders sticky CTA footer containing play-again + home', () => {
     render(
       <BlastResultsSummary

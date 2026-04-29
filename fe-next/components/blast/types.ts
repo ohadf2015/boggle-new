@@ -126,6 +126,12 @@ export interface BlastResultsData {
   bestWave?: { waveNumber: number; score: number };
   /** Badges unlocked this run (for achievement ribbon) */
   badges?: Array<{ id: string; icon: string; label: string; isNew?: boolean }>;
+  /** Sprint 3 polish: target_word goal context surfaced on the results card so
+   *  the player sees acknowledgement either way ("Target was: CRYSTAL" on miss,
+   *  "FOUND IT!" on hit). Optional — only set when the wave actually had a
+   *  target_word objective. */
+  targetWord?: string;
+  targetWordFound?: boolean;
 }
 
 // ==================== Special Tile Effects ====================
