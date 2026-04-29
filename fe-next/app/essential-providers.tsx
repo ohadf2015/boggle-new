@@ -27,6 +27,7 @@ import { AdMobProvider } from '@/contexts/AdMobContext';
 import AnchoredNativeBanner from '@/components/ads/AnchoredNativeBanner';
 import { SeasonClaimContainer } from '@/components/seasons/SeasonClaimContainer';
 import { SeasonAnnouncementModal } from '@/components/seasons/SeasonAnnouncementModal';
+import { SignupPromptHost } from '@/components/auth/SignupPromptHost';
 import { initUtmCapture } from '@/utils/utmCapture';
 import { initConsoleOverride, initCapacitorLogFilter } from '@/utils/consoleOverride';
 import { initSessionTracking } from '@/utils/sessionTracking';
@@ -202,6 +203,8 @@ export function EssentialProviders({ children, lang, initialTranslations }: Esse
                                                 <SeasonClaimContainer />
                                                 {/* Season-change announcement modal — fires once per season ID transition */}
                                                 <SeasonAnnouncementModal />
+                                                {/* Global guest signup prompt — fires on first win or 5+ games regardless of mode. MP routes delegate to useMultiplayerSignupNudge. */}
+                                                <SignupPromptHost />
                                                 {/* Native AdMob banner — single global mount, route-aware. */}
                                                 <AnchoredNativeBanner />
                                             </NavigationProvider>

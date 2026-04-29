@@ -42,6 +42,7 @@ import {
 } from './hooks';
 import { useNavigationGuard } from '../hooks/useNavigationGuard';
 import { useCrazyGamesLifecycle } from '@/hooks/useCrazyGamesLifecycle';
+import { useGameStartTelemetry } from '@/hooks/useGameStartTelemetry';
 
 // ==========================================
 // Props
@@ -388,6 +389,15 @@ const HostView: React.FC<HostViewProps> = memo(({
     score: players.playerScores[username] ?? 0,
     maxCombo: combo.level ?? 0,
     roundKey: tournament.tournamentData?.currentRound ?? 0,
+  });
+
+  // PostHog funnel parity: emit `growth:game_started` once when the host's
+  // game becomes active. Without this, MP `game_completed` events have no
+  // matching `game_started`, blinding started→finished funnels.
+  useGameStartTelemetry({
+    mode: currentGameMode ?? 'multiplayer',
+    isGameActive: runtime.gameStarted && !runtime.waitingForResults,
+    extras: { gameCode, role: 'host' },
   });
 
   // Navigation guard - prevent accidental navigation during active game

@@ -7,45 +7,45 @@ import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { SilentVideo } from './SilentVideo';
 
 /**
- * Mascot variants - split-format (MP4 for opaque, animated WebP for transparent)
- * Three background categories, each with an optimized format:
- * - dark: MP4 H.264 opaque, renders via <video>, blends with app's neo-navy
- * - white: MP4 H.264 opaque, auto-clipped to circle with neo border
- * - nobg: animated WebP transparent, renders via <Image unoptimized>
+ * Mascot variants - all animated WebP. Single render path via <Image unoptimized>.
+ * Background categories tracked for clip styling only:
+ * - dark: opaque dark bg, blends with app's neo-navy
+ * - white: opaque white bg, auto-clipped to circle with neo border
+ * - nobg: transparent, works on any surface
  */
 export type MascotVariant =
-  | 'happy'       // winner.mp4 (dark)
-  | 'gaming'      // play.mp4 (dark)
-  | 'thinking'    // question.mp4 (dark)
-  | 'oops'        // oops.mp4 (dark)
-  | 'celebration' // celebration.mp4 (dark)
-  | 'dj'          // dj.mp4 (dark)
-  | 'trophy'      // trophy.mp4 (dark)
-  | 'panic'       // panic.mp4 (dark)
-  | 'crying'      // crying.mp4 (dark)
+  | 'happy'       // winner.webp (dark)
+  | 'gaming'      // play.webp (dark)
+  | 'thinking'    // question.webp (dark)
+  | 'oops'        // oops.webp (dark)
+  | 'celebration' // celebration.webp (dark)
+  | 'dj'          // dj.webp (dark)
+  | 'trophy'      // trophy.webp (dark)
+  | 'panic'       // panic.webp (dark)
+  | 'crying'      // crying.webp (dark)
   | 'onfire'      // onfire-nobg.webp (nobg)
   | 'bored'       // bored-nobg.webp (nobg)
   | 'mindblown'   // mindblown-nobg.webp (nobg)
-  | 'encouraging' // encouraging.mp4 (white)
-  | 'explorer'    // explorer.mp4 (dark)
-  | 'flexing'     // flexing.mp4 (dark)
-  | 'scared'      // scared.mp4 (white)
-  | 'shopkeeper'  // shopkeeper.mp4 (dark)
-  | 'spectating'  // spectating.mp4 (dark)
-  | 'waving'      // waving.mp4 (white)
+  | 'encouraging' // encouraging.webp (white)
+  | 'explorer'    // explorer.webp (dark)
+  | 'flexing'     // flexing.webp (dark)
+  | 'scared'      // scared.webp (white)
+  | 'shopkeeper'  // shopkeeper.webp (dark)
+  | 'spectating'  // spectating.webp (dark)
+  | 'waving'      // waving.webp (white)
   | 'powerup'     // powerup-nobg.webp (nobg)
-  | 'sleepy'      // ghostly.mp4 (dark)
-  | 'waiting'     // waiting.mp4 (dark)
-  | 'gg'          // gg.mp4 (dark)
-  | 'scholar'     // scholar.mp4 (dark)
-  | 'rage'        // rage.mp4 (dark)
-  | 'bomber'      // bomber.mp4 (dark)
-  | 'winner'      // winner.mp4 (dark)
-  | 'knight'      // knight.mp4 (dark)
-  | 'sad'         // crying.mp4 (dark)
-  | 'ghostly'     // ghostly.mp4 (dark)
-  | 'dance'       // dance.mp4 (dark)
-  | 'question'    // question.mp4 (dark)
+  | 'sleepy'      // ghostly.webp (dark)
+  | 'waiting'     // waiting.webp (dark)
+  | 'gg'          // gg.webp (dark)
+  | 'scholar'     // scholar.webp (dark)
+  | 'rage'        // rage.webp (dark)
+  | 'bomber'      // bomber.webp (dark)
+  | 'winner'      // winner.webp (dark)
+  | 'knight'      // knight.webp (dark)
+  | 'sad'         // crying.webp (dark)
+  | 'ghostly'     // ghostly.webp (dark)
+  | 'dance'       // dance.webp (dark)
+  | 'question'    // question.webp (dark)
   | 'trophyNobg'  // trophy-nobg.webp (nobg)
   | 'explorerNobg'// explorer-nobg.webp (nobg)
   | 'cryingNobg'; // crying-nobg.webp (nobg)
@@ -57,42 +57,42 @@ export type MascotVariant =
 export type MascotBgType = 'dark' | 'white' | 'nobg';
 
 /**
- * Mascot paths — MP4 for opaque (dark/white), animated WebP for transparent (nobg).
- * 88% size reduction vs legacy GIFs (42MB → 5MB). Render path branches on extension.
+ * Mascot paths — all animated WebP. Replaced MP4s for cross-device compatibility
+ * (some Android/iOS/TV browsers fail to autoplay or render H.264 mascots).
  */
 export const MASCOT_IMAGES: Record<MascotVariant, string> = {
-  happy: '/mascot/winner.mp4',
-  gaming: '/mascot/play.mp4',
-  thinking: '/mascot/question.mp4',
-  oops: '/mascot/oops.mp4',
-  celebration: '/mascot/celebration.mp4',
-  dj: '/mascot/dj.mp4',
-  trophy: '/mascot/trophy.mp4',
-  panic: '/mascot/panic.mp4',
-  crying: '/mascot/crying.mp4',
+  happy: '/mascot/winner.webp',
+  gaming: '/mascot/play.webp',
+  thinking: '/mascot/question.webp',
+  oops: '/mascot/oops.webp',
+  celebration: '/mascot/celebration.webp',
+  dj: '/mascot/dj.webp',
+  trophy: '/mascot/trophy.webp',
+  panic: '/mascot/panic.webp',
+  crying: '/mascot/crying.webp',
   onfire: '/mascot/onfire-nobg.webp',
   bored: '/mascot/bored-nobg.webp',
   mindblown: '/mascot/mindblown-nobg.webp',
-  encouraging: '/mascot/encouraging.mp4',
-  explorer: '/mascot/explorer.mp4',
-  flexing: '/mascot/flexing.mp4',
-  scared: '/mascot/scared.mp4',
-  shopkeeper: '/mascot/shopkeeper.mp4',
-  spectating: '/mascot/spectating.mp4',
-  waving: '/mascot/waving.mp4',
+  encouraging: '/mascot/encouraging.webp',
+  explorer: '/mascot/explorer.webp',
+  flexing: '/mascot/flexing.webp',
+  scared: '/mascot/scared.webp',
+  shopkeeper: '/mascot/shopkeeper.webp',
+  spectating: '/mascot/spectating.webp',
+  waving: '/mascot/waving.webp',
   powerup: '/mascot/powerup-nobg.webp',
-  sleepy: '/mascot/ghostly.mp4',
-  waiting: '/mascot/waiting.mp4',
-  gg: '/mascot/gg.mp4',
-  scholar: '/mascot/scholar.mp4',
-  rage: '/mascot/rage.mp4',
-  bomber: '/mascot/bomber.mp4',
-  winner: '/mascot/winner.mp4',
-  knight: '/mascot/knight.mp4',
-  sad: '/mascot/crying.mp4',
-  ghostly: '/mascot/ghostly.mp4',
-  dance: '/mascot/dance.mp4',
-  question: '/mascot/question.mp4',
+  sleepy: '/mascot/ghostly.webp',
+  waiting: '/mascot/waiting.webp',
+  gg: '/mascot/gg.webp',
+  scholar: '/mascot/scholar.webp',
+  rage: '/mascot/rage.webp',
+  bomber: '/mascot/bomber.webp',
+  winner: '/mascot/winner.webp',
+  knight: '/mascot/knight.webp',
+  sad: '/mascot/crying.webp',
+  ghostly: '/mascot/ghostly.webp',
+  dance: '/mascot/dance.webp',
+  question: '/mascot/question.webp',
   trophyNobg: '/mascot/trophy-nobg.webp',
   explorerNobg: '/mascot/explorer-nobg.webp',
   cryingNobg: '/mascot/crying-nobg.webp',

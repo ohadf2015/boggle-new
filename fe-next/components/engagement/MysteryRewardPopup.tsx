@@ -350,7 +350,7 @@ const MysteryRewardPopup: React.FC<MysteryRewardPopupProps> = ({
                   transition={{ delay: 0.4, type: 'spring', stiffness: 250, damping: 15 }}
                 >
                   <SilentVideo
-                    src={rarity === 'legendary' || rarity === 'epic' ? '/mascot/celebration.mp4' : '/mascot/flexing.mp4'}
+                    src={rarity === 'legendary' || rarity === 'epic' ? '/mascot/celebration.webp' : '/mascot/flexing.webp'}
                     width={80}
                     height={80}
                     className="drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]"

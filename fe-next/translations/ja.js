@@ -2294,7 +2294,7 @@ const ja = {
     "tryDaily": "デイリーチャレンジ",
     "tryDailyDesc": "同じパズルでみんなと競争",
     "tryBots": "ボットと対戦",
-    "tryBotsDesc": "AIと腕試し",
+    "tryBotsDesc": "誰もいない？AIなら寝ない。",
     "tryMultiplayer": "フレンドと対戦",
     "tryMultiplayerDesc": "リアルタイムワードバトル",
     "wordHuntCta": "デイリーワードハントに挑戦",
@@ -3657,7 +3657,7 @@ const ja = {
     "globalRank": "グローバルランク",
     "loading": "リーダーボードを読み込み中...",
     "error": "リーダーボードの読み込みに失敗しました",
-    "empty": "まだスコアがありません。最初にプレイしよう！",
+    "empty": "まっさら。記録を作ろう。",
     "beFirstToPlay": "最初にプレイしよう！",
     "refresh": "更新",
     "best": "ベスト",
@@ -3751,7 +3751,7 @@ const ja = {
     "gallery": {
       "title": "コミュニティボード",
       "boardCount": "ボード",
-      "empty": "まだボードがありません。最初に作成しましょう！",
+      "empty": "ボードはまだ。最初の一枚を作ろう。",
       "emptyHint": "カスタムボードを作成してコミュニティと共有しよう",
       "emptyTitle": "まだボードがありません",
       "emptySubtitle": "最初に作成しましょう！",
@@ -4462,7 +4462,7 @@ const ja = {
     "shareSubtitleGuest": "友達と遊ぼう！",
     "shareButton": "シェア",
     "shareTextAuth": "LexiClashで一緒に遊ぼう！私の招待コードを使ってね: {code}",
-    "shareTextGuest": "LexiClashをプレイしよう - 最高のマルチプレイヤー単語ゲーム！",
+    "shareTextGuest": "LexiClashで対戦しよう。どっちが強いか勝負だ。",
     "shareNativeTitle": "LexiClashに参加",
     "playNowFree": "今すぐプレイ — 無料！",
     "letsPlay": "さあ、遊ぼう！",
@@ -4574,7 +4574,7 @@ const ja = {
       "faq5A": "はい。LexiClashは6歳以上のプレイヤー向けに設計されています。COPPA規制に準拠し、パーソナライズされていない広告のみを表示し、子供のブラウジング行動を追跡しません。",
       "faq6Q": "自分のボードを作れますか？",
       "faq6A": "はい！コミュニティボードビルダーを使って、オリジナルの文字グリッドをデザインできます。公開して他のプレイヤーにプレイ、評価、競争してもらいましょう。トップボードはホームページで紹介されます。",
-      "communityTitle": "数千人のワードゲーム愛好家に参加",
+      "communityTitle": "言葉好き、集まってます。",
       "communityContent": "LexiClashのプレイヤーは40カ国以上、5言語にわたります。グローバルリーダーボードで競い合い、デイリーチャレンジの結果を共有し、新しいワード戦略を発見するコミュニティに参加しましょう。ヒント、アップデート、コミュニティハイライトはInstagram @lexi.clashをフォロー。"
     },
     "firstTimer": {
@@ -4701,7 +4701,7 @@ const ja = {
         "practiceMode": "練習モード",
         "practiceModeDesc": "自分のペースで練習しよう",
         "challengeMode": "チャレンジモード",
-        "challengeModeDesc": "より難しいパズルでスキルを試そう",
+        "challengeModeDesc": "難しいボード。手加減なし。",
         "customBotCount": "カスタムボット",
         "customBotCountDesc": "対戦するボットの数を選択",
         "advancedSettings": "詳細設定",
@@ -4847,8 +4847,8 @@ const ja = {
   "rules": {
     "pageTitle": "LexiClash: リアルタイム単語バトル",
     "gameModes": "ゲームモード",
-    "readyToTest": "単語力を試す準備はできましたか？",
-    "readyToTestDesc": "究極の単語バトル体験に何千人ものプレイヤーと一緒に参加しましょう。ルームを作成し、友達を招待して、誰が最高のボキャブラリーを持っているか確かめよう！",
+    "readyToTest": "腕試ししてみる？",
+    "readyToTestDesc": "ルーム作って、友達呼んで、誰が一番か決めよう。",
     "startPlaying": "今すぐプレイを開始",
     "backToHome": "ホームに戻る",
     "joinOrCreateDesc": "自分のゲームルームを作成するか、ルームコードを使って既存のルームに参加します。コードを友達と共有して即座に招待できます。",
@@ -4867,7 +4867,7 @@ const ja = {
     "dontOverthinkDesc": "明らかな3-4文字の単語をためらわずに素早く提出しましょう。それらはすぐに積み重なり、より長く高得点の単語を探している間、堅実な基盤を与えてくれます。",
     "soloVsBotsDesc": "様々な難易度レベルのAI対戦相手と競争。本物のプレイヤーに挑戦する前の戦略練習に最適。",
     "practiceModeDesc": "タイマーなしでゆっくり。新しい単語を学んだり、プレッシャーなしでグリッドを探索するのに最適。",
-    "challengeModeDesc": "自分の最高記録を破り、時間とともに上達を追跡。自分自身と競争！"
+    "challengeModeDesc": "昨日の自分を超えていけ。スコアが伸びるのを楽しもう。"
   },
   "social": {
     "playersOnline": "オンラインプレイヤー",
@@ -4947,7 +4947,7 @@ const ja = {
         "trackResults": "誰があなたのチャレンジを突破したかを確認"
       },
       "ctaButton": "登録して作成を開始",
-      "socialProof": "何千人もの作成者に参加しよう"
+      "socialProof": "今もボードがどんどん作られてる。"
     },
     "copiedToClipboard": "コピーしました！",
     "home": "ホーム",
@@ -5074,7 +5074,7 @@ const ja = {
     },
     "nextChallenge": {
       "wordHuntTitle": "⚡ デイリーワードハントが待っています！",
-      "wordHuntDesc": "スピードをテスト！できるだけ早く目標の単語を見つけよう。",
+      "wordHuntDesc": "時間との勝負。単語をつかまえろ。",
       "wordHuntCTA": "ワードハントをプレイ",
       "buzzTitle": "🔥 デイリーバズチャレンジ！",
       "buzzDesc": "トレンドトピック！AI生成ワードパズルを解こう。",
@@ -9220,7 +9220,7 @@ const ja = {
       "roleGuest": "ゲスト",
       "roleStudent": "生徒",
       "roleTeacher": "先生",
-      "socialProof": "何千人もの仲間が学習中",
+      "socialProof": "勉強してるのは、あなただけじゃない。",
       "student": "生徒",
       "studentCta": "学習をはじめる",
       "studentDesc": "遊びながら語彙力UP",
@@ -9711,7 +9711,7 @@ const ja = {
       "practiceMode": "練習モード",
       "practiceModeDesc": "自分のペースで練習しよう",
       "challengeMode": "チャレンジモード",
-      "challengeModeDesc": "より難しいパズルでスキルを試そう",
+      "challengeModeDesc": "難しいボード。手加減なし。",
       "customBotCount": "カスタムボット",
       "customBotCountDesc": "対戦するボットの数を選択",
       "advancedSettings": "詳細設定",

@@ -69,10 +69,10 @@ describe('MilestoneCelebration', () => {
 
     const { container } = render(<MilestoneCelebration milestone={milestone} onClose={mockOnClose} />);
 
-    // Minor milestone shows celebration mascot WebM video (aria-hidden, so use querySelector)
-    const video = container.querySelector('video');
-    expect(video).toBeInTheDocument();
-    expect(video).toHaveAttribute('src', expect.stringContaining('celebration'));
+    // Minor milestone shows celebration mascot animated WebP via <img>
+    const img = container.querySelector('img');
+    expect(img).toBeInTheDocument();
+    expect(img).toHaveAttribute('src', expect.stringContaining('celebration'));
   });
 
   it('should display milestone level', () => {

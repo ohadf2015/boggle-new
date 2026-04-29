@@ -2286,7 +2286,7 @@ const es = {
     "tryDaily": "Desafío diario",
     "tryDailyDesc": "Mismo puzzle, todos compiten",
     "tryBots": "Contra bots",
-    "tryBotsDesc": "Pon a prueba tus habilidades contra IA",
+    "tryBotsDesc": "¿Sin amigos en línea? Los bots no duermen.",
     "tryMultiplayer": "Jugar con amigos",
     "tryMultiplayerDesc": "Batallas de palabras en tiempo real",
     "wordHuntCta": "Jugar Word Hunt diario",
@@ -4070,7 +4070,7 @@ const es = {
     "globalRank": "Posición Global",
     "loading": "Cargando clasificación...",
     "error": "Error al cargar la clasificación",
-    "empty": "¡Sin puntuaciones todavía. Sé el primero en jugar!",
+    "empty": "Tablero limpio. Pon la marca.",
     "beFirstToPlay": "¡Sé el primero en jugar!",
     "refresh": "Actualizar",
     "best": "Mejor",
@@ -4164,7 +4164,7 @@ const es = {
     "gallery": {
       "title": "Tableros de la comunidad",
       "boardCount": "tableros",
-      "empty": "Aún no hay tableros. ¡Sé el primero en crear uno!",
+      "empty": "Aún no hay tableros. Arma el primero y empieza la racha.",
       "emptyHint": "Crea un tablero personalizado y compártelo con la comunidad",
       "emptyTitle": "Aún no hay tableros",
       "emptySubtitle": "¡Sé el primero en crear uno!",
@@ -4507,7 +4507,7 @@ const es = {
     "shareSubtitleGuest": "¡Juega con amigos!",
     "shareButton": "Compartir",
     "shareTextAuth": "¡Únete a LexiClash! Usa mi código de referido: {code}",
-    "shareTextGuest": "¡Juega LexiClash - el mejor juego de palabras multijugador!",
+    "shareTextGuest": "Juguemos LexiClash juntos — a ver quién gana.",
     "shareNativeTitle": "Únete a LexiClash",
     "playNowFree": "¡Juega ahora — Gratis!",
     "letsPlay": "¡A jugar!",
@@ -4619,7 +4619,7 @@ const es = {
       "faq5A": "Sí. LexiClash está diseñado para jugadores a partir de 6 años. Cumplimos con las regulaciones COPPA, mostramos solo anuncios no personalizados y no rastreamos el comportamiento de navegación de los niños.",
       "faq6Q": "¿Puedo crear mi propio tablero?",
       "faq6A": "¡Sí! Usa el Constructor de Tableros Comunitarios para diseñar cuadrículas de letras personalizadas. Publícalos para que otros jugadores jueguen, califiquen y compitan. Los mejores tableros aparecen en la página principal.",
-      "communityTitle": "Únete a miles de entusiastas de juegos de palabras",
+      "communityTitle": "Aquí todos amamos las palabras.",
       "communityContent": "Los jugadores de LexiClash abarcan más de 40 países y cinco idiomas. Únete a la comunidad para competir en clasificaciones globales, compartir resultados del desafío diario y descubrir nuevas estrategias de palabras. Síguenos en Instagram @lexi.clash para consejos, actualizaciones y eventos de la comunidad."
     },
     "firstTimer": {
@@ -4746,7 +4746,7 @@ const es = {
         "practiceMode": "Modo Práctica",
         "practiceModeDesc": "Practica a tu propio ritmo",
         "challengeMode": "Modo Desafío",
-        "challengeModeDesc": "Pon a prueba tus habilidades con puzzles más difíciles",
+        "challengeModeDesc": "Tableros más difíciles. Sin piedad.",
         "customBotCount": "Bots Personalizados",
         "customBotCountDesc": "Elige cuántos bots enfrentar",
         "advancedSettings": "Configuración Avanzada",
@@ -4840,8 +4840,8 @@ const es = {
   "rules": {
     "pageTitle": "LexiClash: Batalla de Palabras en Tiempo Real",
     "gameModes": "Modos de Juego",
-    "readyToTest": "¿Listo para Probar Tus Habilidades con Palabras?",
-    "readyToTestDesc": "Únete a miles de jugadores en la experiencia definitiva de batalla de palabras.",
+    "readyToTest": "¿Te la juegas?",
+    "readyToTestDesc": "Arma una sala, llama a tus amigos y vean quién manda.",
     "startPlaying": "Empezar a Jugar Ahora",
     "backToHome": "Volver al Inicio",
     "joinOrCreateDesc": "Crea tu propia sala de juego o únete a una existente usando un código de sala.",
@@ -4860,7 +4860,7 @@ const es = {
     "dontOverthinkDesc": "Envía palabras obvias de 3-4 letras rápidamente sin dudar.",
     "soloVsBotsDesc": "Compite contra oponentes de IA de diferentes niveles de dificultad.",
     "practiceModeDesc": "Tómate tu tiempo sin temporizador. Perfecto para aprender nuevas palabras.",
-    "challengeModeDesc": "Supera tus récords personales y rastrea tu mejora con el tiempo."
+    "challengeModeDesc": "Vence al tú de antes. Mira cómo sube el puntaje."
   },
   "social": {
     "playersOnline": "jugadores en línea",
@@ -4930,7 +4930,7 @@ const es = {
         "trackResults": "Ve quién supera tu desafío"
       },
       "ctaButton": "Regístrate para empezar a crear",
-      "socialProof": "Únete a miles creando desafíos"
+      "socialProof": "Hay un montón de tableros en construcción ahora mismo."
     },
     "playingAs": "Jugando como",
     "keepPlaying": "¡Vuelve mañana para un nuevo rompecabezas!",
@@ -5053,7 +5053,7 @@ const es = {
     },
     "nextChallenge": {
       "wordHuntTitle": "⚡ ¡Te Espera Word Hunt Diario!",
-      "wordHuntDesc": "¡Prueba tu velocidad! Encuentra la palabra objetivo lo más rápido posible.",
+      "wordHuntDesc": "Carrera contra el reloj. Atrapa la palabra.",
       "wordHuntCTA": "Jugar Word Hunt",
       "buzzTitle": "🔥 ¡Desafío Buzz Diario!",
       "buzzDesc": "¡Temas de tendencia! Resuelve rompecabezas de palabras generados por IA.",
@@ -9239,7 +9239,7 @@ const es = {
       "roleGuest": "Invitado",
       "roleStudent": "Estudiante",
       "roleTeacher": "Profesor",
-      "socialProof": "Únete a miles de estudiantes",
+      "socialProof": "No eres el único que está aprendiendo.",
       "student": "Estudiante",
       "studentCta": "Empezar a aprender",
       "studentDesc": "Aprende vocabulario jugando",
@@ -10006,7 +10006,7 @@ const es = {
       "practiceMode": "Modo Práctica",
       "practiceModeDesc": "Practica a tu propio ritmo",
       "challengeMode": "Modo Desafío",
-      "challengeModeDesc": "Pon a prueba tus habilidades con puzzles más difíciles",
+      "challengeModeDesc": "Tableros más difíciles. Sin piedad.",
       "customBotCount": "Bots Personalizados",
       "customBotCountDesc": "Elige cuántos bots enfrentar",
       "advancedSettings": "Configuración Avanzada",

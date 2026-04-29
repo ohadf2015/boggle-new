@@ -115,9 +115,9 @@ No `await`. The `.catch()` attaches a rejection handler to an unawaited promise;
 | S-M1 | `scoringEngine.ts:118-145` | Rarity recomputed per word on game-end; O(words × players) | open |
 | S-M2 | `wordValidationHandler.ts:134-142` | Blast: full grid+tileStates per word; should send delta `{clearedPath, movedFrom, movedTo}` | open |
 | S-M3 | `middleware/rateLimiterRedis.ts:97-109` | Redis round-trip per action; consider local sliding window + write-behind | open |
-| S-M4 | `services/gameLifecycle/gameResults.ts` | `incrementWordApproval` N+1 INCR; collapse to one HMSET | open |
+| ~~S-M4~~ | ~~`services/gameLifecycle/gameResults.ts`~~ | ~~N+1 INCR; collapse to HMSET~~ | **dropped — wrong shape**: not INCR but Lua-scripted JSON-blob R-M-W with capped `gameIds[]` array. Cannot collapse to HMSET. Real opportunity: `enableAutoPipelining: true` in `backend/redis/config.ts` collapses `Promise.all([n calls])` from N round-trips to 1, benefiting every Redis batch in the codebase. Defer to dedicated infra session — broader scope (touches every Redis user), needs load-test regression + WATCH/MULTI compat verify, and game-end isn't a hot path (player on results screen, not user-perceptible). |
 | S-M5 | `gameStateManager.ts:84-87` | `gameCache` TTL 30 min × max 200 — verify memory ceiling | open |
-| S-M6 | `shared/schemas/socketSchemas.ts` | Verify wheel-rush `gameMode` registered (carries from 04-28 audit) | open |
+| ~~S-M6~~ | ~~`shared/schemas/socketSchemas.ts`~~ | ~~Verify wheel-rush registered~~ | **dropped — already shipped**: `gameMode` enum includes `wheel-rush` (line 181), `SubmitWheelWordSchema` exists (line 217), wired in `wheelRushHandler.ts:160` via `validatePayload` |
 | C-M1 | `MultiplayerInGameView.tsx:238-245` | 9 store hooks at root; push mode-specific subscriptions into their own components | open |
 | C-M2 | `WheelRushView.tsx:5` | Full `framer-motion` import; wrap in `LazyMotion(domAnimation)` | open — **app-wide sweep needed** (mixed `motion` imports in shared `WordWheelParts.tsx` + others negate single-file LazyMotion) |
 | ~~C-M3~~ | ~~`WheelRushView.tsx:368-420`~~ | ~~Pulse/shake without `useReducedMotion()` guard~~ | **shipped — see CLIENT-T3** |

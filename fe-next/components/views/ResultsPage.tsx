@@ -401,6 +401,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     achievements,
     showWordFeedback,
     normalizeUsername,
+    gameMode: resolvedGameMode,
   });
 
   // CrazyGames lifecycle - stop gameplay when results page loads

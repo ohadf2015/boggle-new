@@ -50,7 +50,7 @@ export function MatchmakingOverlay({
           <div className="flex flex-col items-center gap-4">
             {/* Searching mascot */}
             <SilentVideo
-              src="/mascot/spectating.mp4"
+              src="/mascot/spectating.webp"
               width={80}
               height={80}
               className="drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]"

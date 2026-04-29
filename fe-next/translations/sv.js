@@ -2307,7 +2307,7 @@ const sv = {
     "tryDaily": "Daglig utmaning",
     "tryDailyDesc": "Samma pussel, alla tävlar",
     "tryBots": "Mot bottar",
-    "tryBotsDesc": "Testa dina färdigheter mot AI",
+    "tryBotsDesc": "Inga kompisar online? Botarna sover aldrig.",
     "tryMultiplayer": "Spela med vänner",
     "tryMultiplayerDesc": "Ordstrider i realtid",
     "wordHuntCta": "Spela dagens ordjakt",
@@ -3673,7 +3673,7 @@ const sv = {
     "globalRank": "Global rank",
     "loading": "Laddar topplista...",
     "error": "Kunde inte ladda topplista",
-    "empty": "Inga poäng ännu. Var först att spela!",
+    "empty": "Helt tomt. Sätt ribban.",
     "beFirstToPlay": "Var först att spela!",
     "refresh": "Uppdatera",
     "best": "Bäst",
@@ -3767,7 +3767,7 @@ const sv = {
     "gallery": {
       "title": "Community-brädor",
       "boardCount": "brädor",
-      "empty": "Inga brädor ännu. Bli först att skapa en!",
+      "empty": "Inga brädor än. Bygg en och starta trenden.",
       "emptyHint": "Skapa ett eget bräde och dela det med gemenskapen",
       "emptyTitle": "Inga brädor ännu",
       "emptySubtitle": "Bli först att skapa en!",
@@ -4478,7 +4478,7 @@ const sv = {
     "shareSubtitleGuest": "Spela med vänner!",
     "shareButton": "Dela",
     "shareTextAuth": "Gå med mig i LexiClash! Använd min referenskod: {code}",
-    "shareTextGuest": "Spela LexiClash - det bästa multiplayer-ordspelet!",
+    "shareTextGuest": "Spela LexiClash med mig — vi får se vem som är bäst.",
     "shareNativeTitle": "Gå med i LexiClash",
     "playNowFree": "Spela nu — Gratis!",
     "letsPlay": "Nu kör vi!",
@@ -4590,7 +4590,7 @@ const sv = {
       "faq5A": "Ja. LexiClash är designat för spelare från 6 år och uppåt. Vi följer COPPA-regler, visar enbart icke-personaliserade annonser och spårar inte barns surfbeteende.",
       "faq6Q": "Kan jag skapa mitt eget bräde?",
       "faq6A": "Ja! Använd Communitybrädbyggaren för att designa egna bokstavsrutnät. Publicera dem så att andra kan spela, betygsätta och tävla. Topprankade brädor visas på startsidan.",
-      "communityTitle": "Gå med tusentals ordspelsentusiaster",
+      "communityTitle": "Här gillar alla ord.",
       "communityContent": "LexiClash-spelare finns i över 40 länder och fem språk. Gå med i communityt för att tävla på globala topplistor, dela dagliga utmaningsresultat och upptäcka nya ordstrategier. Följ oss på Instagram @lexi.clash för tips, uppdateringar och community-höjdpunkter."
     },
     "firstTimer": {
@@ -4717,7 +4717,7 @@ const sv = {
         "practiceMode": "Övningsläge",
         "practiceModeDesc": "Öva i din egen takt",
         "challengeMode": "Utmaningsläge",
-        "challengeModeDesc": "Testa dina färdigheter med svårare pussel",
+        "challengeModeDesc": "Svårare brickor. Inga ursäkter.",
         "customBotCount": "Anpassade Bottar",
         "customBotCountDesc": "Välj hur många bottar du spelar mot",
         "advancedSettings": "Avancerade Inställningar",
@@ -4811,8 +4811,8 @@ const sv = {
   "rules": {
     "pageTitle": "LexiClash: Ordstrid i Realtid",
     "gameModes": "Spellägen",
-    "readyToTest": "Redo att testa dina ordkunskaper?",
-    "readyToTestDesc": "Gå med tusentals spelare i den ultimata ordstridsupplevelsen. Skapa ett rum, bjud in dina vänner och se vem som har det bästa ordförrådet!",
+    "readyToTest": "Vågar du?",
+    "readyToTestDesc": "Skapa ett rum. Bjud in kompisarna. Se vem som faktiskt kan.",
     "startPlaying": "Börja spela nu",
     "backToHome": "Tillbaka till startsidan",
     "joinOrCreateDesc": "Skapa ditt eget spelrum eller gå med i ett befintligt med en rumskod. Dela koden med vänner för att bjuda in dem direkt.",
@@ -4831,7 +4831,7 @@ const sv = {
     "dontOverthinkDesc": "Skicka in uppenbara ord med 3-4 bokstäver snabbt utan att tveka. De läggs ihop snabbt och ger dig en solid grund medan du letar efter längre, högre poänggivande ord.",
     "soloVsBotsDesc": "Tävla mot AI-motståndare på olika svårighetsgrader. Perfekt för att öva strategier innan du utmanar riktiga spelare.",
     "practiceModeDesc": "Ta din tid utan timer. Perfekt för att lära dig nya ord och utforska rutnätet utan press.",
-    "challengeModeDesc": "Slå dina personliga rekord och följ din förbättring över tid. Tävla mot dig själv!"
+    "challengeModeDesc": "Slå ditt gamla jag. Se siffrorna stiga."
   },
   "social": {
     "playersOnline": "spelare online",
@@ -4935,7 +4935,7 @@ const sv = {
         "trackResults": "Se vem som klarar din utmaning"
       },
       "ctaButton": "Registrera dig och börja skapa",
-      "socialProof": "Gå med i tusentals som skapar utmaningar"
+      "socialProof": "Det byggs brickor överallt just nu."
     },
     "download": "Spara som bild",
     "downloadImage": "Spara delningsbild",
@@ -5038,7 +5038,7 @@ const sv = {
     },
     "nextChallenge": {
       "wordHuntTitle": "⚡ Daglig Word Hunt Väntar!",
-      "wordHuntDesc": "Testa din hastighet! Hitta målord så snabbt du kan.",
+      "wordHuntDesc": "Tävla mot klockan. Fånga ordet.",
       "wordHuntCTA": "Spela Word Hunt",
       "buzzTitle": "🔥 Daglig Buzz-utmaning!",
       "buzzDesc": "Trendiga ämnen! Lös AI-genererade ordpussel.",
@@ -9238,7 +9238,7 @@ const sv = {
       "roleGuest": "Gäst",
       "roleStudent": "Elev",
       "roleTeacher": "Lärare",
-      "socialProof": "Häng med tusentals som lär sig",
+      "socialProof": "Du är inte ensam om att plugga.",
       "student": "Elev",
       "studentCta": "Börja lära dig",
       "studentDesc": "Bygg ordförråd genom lek",
@@ -9781,7 +9781,7 @@ const sv = {
       "practiceMode": "Övningsläge",
       "practiceModeDesc": "Öva i din egen takt",
       "challengeMode": "Utmaningsläge",
-      "challengeModeDesc": "Testa dina färdigheter med svårare pussel",
+      "challengeModeDesc": "Svårare brickor. Inga ursäkter.",
       "customBotCount": "Anpassade Bottar",
       "customBotCountDesc": "Välj hur många bottar du spelar mot",
       "advancedSettings": "Avancerade Inställningar",

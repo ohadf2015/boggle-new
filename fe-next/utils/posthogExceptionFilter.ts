@@ -28,7 +28,20 @@ const NOISE_VALUE_PATTERNS: RegExp[] = [
   /Unable to convert color/i,
 ];
 
+// Multi-tab Supabase auth-token lock contention. Three observed shapes:
+//   1. type=AbortError, message=The operation was aborted (frames in supabase/auth-js)
+//   2. type=DOMException, message=AbortError: Lock broken by another request with the 'steal' option
+//   3. type=Error, message=Lock "lock:sb-<id>-auth-token" was released because another request stole it
+// All three are normal multi-tab token-refresh races, not real failures.
+const SUPABASE_LOCK_MESSAGE_PATTERNS: RegExp[] = [
+  /Lock broken by another request with the 'steal' option/i,
+  /Lock "lock:sb-[\w-]+-auth-token" was released because another request stole it/i,
+];
+
 function isSupabaseLockAbort(entry: ExceptionListEntry): boolean {
+  const value = typeof entry?.value === 'string' ? entry.value : '';
+  if (SUPABASE_LOCK_MESSAGE_PATTERNS.some((re) => re.test(value))) return true;
+
   if (entry?.type !== 'AbortError') return false;
   const frames = (entry.stacktrace as Stacktrace | undefined)?.frames;
   if (!Array.isArray(frames)) return false;

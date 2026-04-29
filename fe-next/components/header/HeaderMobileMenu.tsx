@@ -265,8 +265,12 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
 
                 {/* Unified auth button for guests (hidden on CrazyGames).
                     Also gated on `cgLoading` so the button does not flash
-                    before the SDK resolves the embed environment. */}
-                {!isAuthenticated && !loading && !cgLoading && !isCrazyGames && (
+                    before the SDK resolves the embed environment.
+                    `mounted` gate prevents hydration-shape drift: SSR
+                    renders before `loading`/`cgLoading` resolve to false,
+                    so the button SSR-state would not match its post-hydrate
+                    state and shifted sibling positions. */}
+                {mounted && !isAuthenticated && !loading && !cgLoading && !isCrazyGames && (
                     <button
                         onClick={onSignIn}
                         className={cn(
@@ -292,8 +296,12 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                   Hidden on CrazyGames: the menu exposes profile / settings /
                   leaderboard / cookie banner / Ko-fi / Instagram links that
                   would all navigate the player off-mode (CG is multiplayer-only).
+                  `mounted` gate: SSR cannot resolve `isCrazyGames` (SDK loads
+                  client-only); deferring keeps SSR ↔ first-client render
+                  identical, preventing Radix Select aria-controls drift on
+                  the sibling QuickLanguageSwitcher.
                 */}
-                {!isCrazyGames && (
+                {mounted && !isCrazyGames && (
                     <button
                         onClick={() => {
                             if (!showMobileMenu) {

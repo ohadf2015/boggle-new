@@ -143,7 +143,7 @@ export default function WelcomeBackCard({
             <div className="flex items-start justify-between mb-3">
               <div className="flex items-center gap-2">
                 <SilentVideo
-                  src="/mascot/encouraging.mp4"
+                  src="/mascot/encouraging.webp"
                   width={40}
                   height={40}
                   className="drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]"

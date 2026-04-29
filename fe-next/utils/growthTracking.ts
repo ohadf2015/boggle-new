@@ -377,9 +377,12 @@ export const trackGameCompletion = (
   }
 
   if (isWinner) {
+    const mode = gameMode || 'unknown';
     trackGrowthEvent(isFirstGame ? 'first_game_won' : 'streak_continued', {
       score,
       wordCount,
+      mode,
+      gameMode: mode,
     });
   }
 };

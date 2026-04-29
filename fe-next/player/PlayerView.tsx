@@ -45,6 +45,7 @@ import {
 } from '@/hooks/gameState';
 import { useNavigationGuard } from '@/hooks/useNavigationGuard';
 import { useCrazyGamesLifecycle } from '@/hooks/useCrazyGamesLifecycle';
+import { useGameStartTelemetry } from '@/hooks/useGameStartTelemetry';
 
 import type { Player, WordToVote, PlayerViewProps } from './types';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
@@ -209,6 +210,15 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
     score: leaderboard.find(p => p.username === username)?.score ?? 0,
     maxCombo: comboLevel,
     roundKey: tournamentData?.currentRound ?? 0,
+  });
+
+  // PostHog funnel parity: emit `growth:game_started` once when the player's
+  // game becomes active. Pairs with the trackGameEnd in the results flow so
+  // MP started→finished funnels become computable.
+  useGameStartTelemetry({
+    mode: gameMode ?? 'multiplayer',
+    isGameActive: gameActive,
+    extras: { gameCode, role: 'player' },
   });
   const [tournamentStandings, _setTournamentStandings] = useState<TournamentStanding[]>([]);
   const [showTournamentStandings, setShowTournamentStandings] = useState<boolean>(false);

@@ -82,7 +82,7 @@ export const DJMascot = memo(function DJMascot({
     >
       <div className="w-full h-full">
         <SilentVideo
-          src="/mascot/dj.mp4"
+          src="/mascot/dj.webp"
           width={SIZE_PIXELS[size]}
           height={SIZE_PIXELS[size]}
           className="w-full h-full object-contain drop-shadow-lg"

@@ -39,7 +39,7 @@ export default async function OGImage({ params }: { params: Promise<{ locale: st
 
   // Word wheel letters for decoration
   const outerLetters = ['W', 'O', 'R', 'D', 'S', '!'];
-  const centerLetter = '★';
+  const centerLetter = '⭐';
 
   return new ImageResponse(
     (
@@ -168,7 +168,6 @@ export default async function OGImage({ params }: { params: Promise<{ locale: st
               fontWeight: 900,
               color: '#1a1a2e',
               boxShadow: '4px 4px 0px #000, 0 0 30px rgba(191,255,0,0.5)',
-              zIndex: 2,
             }}
           >
             {centerLetter}

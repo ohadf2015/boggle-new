@@ -2434,7 +2434,7 @@ const en = {
     "tryDaily": "Daily Challenge",
     "tryDailyDesc": "Same puzzle, everyone competes",
     "tryBots": "Fight Bots",
-    "tryBotsDesc": "Test your skills against AI opponents",
+    "tryBotsDesc": "No friends around? Bots don't sleep.",
     "tryMultiplayer": "Play with Friends",
     "tryMultiplayerDesc": "Real-time word battles",
     "wordHuntCta": "Play Word Hunt Daily",
@@ -4169,7 +4169,7 @@ const en = {
     "globalRank": "Global Rank",
     "loading": "Loading leaderboard...",
     "error": "Failed to load leaderboard",
-    "empty": "No scores yet. Be the first to play!",
+    "empty": "Wide open. Go set the bar.",
     "beFirstToPlay": "Be the first to play!",
     "refresh": "Refresh",
     "best": "Best",
@@ -4263,7 +4263,7 @@ const en = {
     "gallery": {
       "title": "Community Boards",
       "boardCount": "boards",
-      "empty": "No boards yet. Be the first to create one!",
+      "empty": "No boards yet. Build one — start the trend.",
       "emptyHint": "Create a custom board and share it with the community",
       "emptyTitle": "No boards yet",
       "emptySubtitle": "Be the first to create one!",
@@ -4607,7 +4607,7 @@ const en = {
     "shareSubtitleGuest": "Play with friends!",
     "shareButton": "Share",
     "shareTextAuth": "Join me on LexiClash! Use my referral code: {code}",
-    "shareTextGuest": "Play LexiClash - the best multiplayer word game!",
+    "shareTextGuest": "Come play LexiClash with me — let's see who's better.",
     "shareNativeTitle": "Join LexiClash",
     "playNowFree": "Play Now — Free!",
     "letsPlay": "Let's Play!",
@@ -4720,7 +4720,7 @@ const en = {
       "faq5A": "Yes. LexiClash is designed for players ages 6 and up. We comply with COPPA regulations, serve only non-personalized ads, and do not track children's browsing behavior.",
       "faq6Q": "Can I create my own board?",
       "faq6A": "Yes! Use the Community Board Builder to design custom letter grids with your own seed words. Publish them for others to play, rate, and compete on. Top boards get featured on the home page.",
-      "communityTitle": "Join Thousands of Word Game Enthusiasts",
+      "communityTitle": "Word nerds welcome.",
       "communityContent": "LexiClash players span over 40 countries and five languages. Join the community to compete on global leaderboards, share daily challenge results, and discover new word strategies. Follow us on Instagram @lexi.clash for tips, updates, and community highlights."
     },
     "firstTimer": {
@@ -4847,7 +4847,7 @@ const en = {
         "practiceMode": "Practice Mode",
         "practiceModeDesc": "Practice at your own pace",
         "challengeMode": "Challenge Mode",
-        "challengeModeDesc": "Test your skills with harder puzzles",
+        "challengeModeDesc": "Tougher boards. No mercy.",
         "customBotCount": "Custom Bots",
         "customBotCountDesc": "Choose how many bots to play against",
         "advancedSettings": "Advanced Settings",
@@ -4941,8 +4941,8 @@ const en = {
   "rules": {
     "pageTitle": "LexiClash: Real-Time Word Battle",
     "gameModes": "Game Modes",
-    "readyToTest": "Ready to Test Your Word Skills?",
-    "readyToTestDesc": "Join thousands of players in the ultimate word battle experience. Create a room, invite your friends, and see who has the best vocabulary!",
+    "readyToTest": "Think you can hang?",
+    "readyToTestDesc": "Make a room. Drag your friends in. Find out who's actually good.",
     "startPlaying": "Start Playing Now",
     "backToHome": "Back to Home",
     "joinOrCreateDesc": "Create your own game room or join an existing one using a room code. Share the code with friends to invite them instantly.",
@@ -4961,7 +4961,7 @@ const en = {
     "dontOverthinkDesc": "Submit obvious 3-4 letter words quickly without hesitation. They add up fast and give you a solid foundation while you search for longer, higher-scoring words.",
     "soloVsBotsDesc": "Compete against AI opponents of varying difficulty levels. Perfect for practicing strategies before challenging real players.",
     "practiceModeDesc": "Take your time with no timer. Perfect for learning new words and exploring the grid without pressure.",
-    "challengeModeDesc": "Beat your personal high scores and track your improvement over time. Compete against yourself!"
+    "challengeModeDesc": "Beat your old self. Watch the score climb."
   },
   "social": {
     "playersOnline": "players online",
@@ -5077,7 +5077,7 @@ const en = {
         "trackResults": "See who beats your challenge"
       },
       "ctaButton": "Sign Up to Start Creating",
-      "socialProof": "Join thousands creating challenges"
+      "socialProof": "Plenty of boards being built right now."
     },
     "createChallengeTitle": "Create Challenge",
     "chooseBoardSize": "Choose Board Size",
@@ -5160,7 +5160,7 @@ const en = {
     },
     "nextChallenge": {
       "wordHuntTitle": "⚡ Daily Word Hunt Awaits!",
-      "wordHuntDesc": "Test your speed! Find the target word as fast as you can.",
+      "wordHuntDesc": "Race the clock. Catch the word.",
       "wordHuntCTA": "Play Word Hunt",
       "buzzTitle": "🔥 Daily Buzz Challenge!",
       "buzzDesc": "Trending topics! Solve AI-generated word puzzles.",
@@ -9445,7 +9445,7 @@ const en = {
       "roleGuest": "Guest",
       "roleStudent": "Student",
       "roleTeacher": "Teacher",
-      "socialProof": "Join thousands of learners",
+      "socialProof": "You're not the only one studying.",
       "student": "Student",
       "studentCta": "Start Learning",
       "studentDesc": "Build vocabulary through play",
@@ -9994,7 +9994,7 @@ const en = {
       "practiceMode": "Practice Mode",
       "practiceModeDesc": "Practice at your own pace",
       "challengeMode": "Challenge Mode",
-      "challengeModeDesc": "Test your skills with harder puzzles",
+      "challengeModeDesc": "Tougher boards. No mercy.",
       "customBotCount": "Custom Bots",
       "customBotCountDesc": "Choose how many bots to play against",
       "advancedSettings": "Advanced Settings",

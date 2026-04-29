@@ -118,7 +118,7 @@ export function RankUpCinematic({ from, to, onDismiss }: RankUpCinematicProps) {
           transition={{ delay: 0.7, type: 'spring', stiffness: 200, damping: 12 }}
         >
           <SilentVideo
-            src="/mascot/celebration.mp4"
+            src="/mascot/celebration.webp"
             width={120}
             height={120}
             className="drop-shadow-[3px_3px_0px_rgba(0,0,0,1)]"
