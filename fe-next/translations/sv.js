@@ -8536,6 +8536,10 @@ const sv = {
       "targetWord": "Hitta: {word}",
       "targetWordFoundIt": "HITTAD!",
       "targetWordMissed": "Målet var: {word} — Vattenfallet fick det!",
+      "colorPower": "Använd {count}+ {color} brickor i ett ord",
+      "colorPink": "Rosa",
+      "colorCyan": "Cyan",
+      "colorLime": "Limefärg",
       "bannerTitle": "Mål"
     },
     "combo": {

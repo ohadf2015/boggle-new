@@ -120,4 +120,6 @@ export interface BlastTileState {
   fuseTimer?: number;
   /** Locked tiles: unlocked by a cleared key tile in 8-directional adjacency. Undefined/false = gated. */
   isUnlocked?: boolean;
+  /** Color tag for color_power objectives (pink/cyan/lime). Applies pulsing glow on board. */
+  colorTag?: 'pink' | 'cyan' | 'lime';
 }

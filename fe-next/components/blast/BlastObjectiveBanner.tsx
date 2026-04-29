@@ -1,7 +1,7 @@
 'use client';
 
 import { memo } from 'react';
-import { Check, Target } from 'lucide-react';
+import { Check, Target, Heart } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatObjectiveLabel } from './utils/blastObjectiveUtils';
 import type { BlastObjectiveProgress } from './types';
@@ -37,9 +37,20 @@ export const BlastObjectiveBanner = memo(function BlastObjectiveBanner({
     >
       {visible.map((p, i) => {
         const isTargetWord = p.objective.type === 'target_word';
+        const isColorPower = p.objective.type === 'color_power';
+        const colorTag = p.objective.colorTag;
+
+        // Determine color CSS class for color_power objectives
+        let colorClass = '';
+        if (isColorPower && colorTag) {
+          if (colorTag === 'pink') colorClass = 'text-neo-pink';
+          else if (colorTag === 'cyan') colorClass = 'text-neo-cyan';
+          else if (colorTag === 'lime') colorClass = 'text-neo-lime';
+        }
+
         return (
           <div
-            key={`${p.objective.type}-${p.objective.tileType ?? p.objective.targetWord ?? ''}-${i}`}
+            key={`${p.objective.type}-${p.objective.tileType ?? p.objective.targetWord ?? p.objective.colorTag ?? ''}-${i}`}
             data-testid={`blast-objective-row-${i}`}
             data-complete={p.isComplete ? 'true' : 'false'}
             className={cn(
@@ -48,9 +59,10 @@ export const BlastObjectiveBanner = memo(function BlastObjectiveBanner({
             )}
           >
             {isTargetWord && <Target className="h-3.5 w-3.5 shrink-0" strokeWidth={2} />}
-            {p.isComplete && !isTargetWord && <Check className="h-3.5 w-3.5 shrink-0" strokeWidth={3} />}
+            {isColorPower && <Heart className={cn('h-3.5 w-3.5 shrink-0', colorClass)} fill={colorClass.replace('text-', '')} strokeWidth={2} />}
+            {p.isComplete && !isTargetWord && !isColorPower && <Check className="h-3.5 w-3.5 shrink-0" strokeWidth={3} />}
             <span className="flex-1 truncate">{formatObjectiveLabel(p.objective, t)}</span>
-            {!isTargetWord && (
+            {!isTargetWord && !isColorPower && (
               <span className="shrink-0 text-white/70">
                 {Math.min(p.current, p.objective.target)} / {p.objective.target}
               </span>
@@ -58,6 +70,11 @@ export const BlastObjectiveBanner = memo(function BlastObjectiveBanner({
             {isTargetWord && (
               <span className="shrink-0 text-white/70">
                 {p.isComplete ? '✓' : '○'}
+              </span>
+            )}
+            {isColorPower && (
+              <span className="shrink-0 text-white/70">
+                {p.current} / {p.objective.minColorCount}
               </span>
             )}
           </div>

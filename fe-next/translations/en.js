@@ -8713,6 +8713,10 @@ const en = {
       "targetWord": "Find: {word}",
       "targetWordFoundIt": "FOUND IT!",
       "targetWordMissed": "Target was: {word} — Cascade got it!",
+      "colorPower": "Use {count}+ {color} tiles in a word",
+      "colorPink": "Pink",
+      "colorCyan": "Cyan",
+      "colorLime": "Lime",
       "bannerTitle": "Goals"
     },
     "combo": {

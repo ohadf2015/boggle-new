@@ -370,6 +370,46 @@ export function seedTargetWordObjective(
   ];
 }
 
+/**
+ * Optionally seed a color_power objective into wave objectives.
+ * Adds color_power goal for waves 4+ at 25% probability per wave.
+ * Rotates color: wave 4=pink, 5=cyan, 8=lime, then repeats.
+ *
+ * @param wave wave number
+ * @param objectives current wave objectives to augment
+ * @returns objectives with optional color_power added
+ */
+export function seedColorPowerObjective(
+  wave: number,
+  objectives: BlastObjective[],
+): BlastObjective[] {
+  // Only add to wave 4+ at 25% rate
+  if (wave < 4) return objectives;
+
+  // Deterministic RNG: use wave as seed for pseudo-random chance
+  const shouldAdd = ((wave * 47) % 100) < 25;
+  if (!shouldAdd) return objectives;
+
+  // Rotate color: pink (4) → cyan (5) → lime (8) → pink (11) ...
+  const colorRotation: Array<'pink' | 'cyan' | 'lime'> = ['pink', 'cyan', 'lime'];
+  const colorIndex = (wave - 4) % 3;
+  const color = colorRotation[colorIndex];
+
+  // Ramp minColorCount: early waves 3, later waves 4+
+  const minColorCount = wave >= 8 ? 4 : 3;
+
+  // Add color_power objective (bonus, not required for advance)
+  return [
+    ...objectives,
+    {
+      type: 'color_power' as const,
+      target: 1,
+      colorTag: color,
+      minColorCount,
+    },
+  ];
+}
+
 /** Lightning share when enabled (taken from gold + rainbow) */
 const LIGHTNING_SHARE = 0.08;
 /** Vortex share when enabled (renamed from MAGNET_SHARE; taken from gold + rainbow) */

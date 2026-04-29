@@ -8536,6 +8536,10 @@ const es = {
       "targetWord": "Encuentra: {word}",
       "targetWordFoundIt": "¡LO ENCONTRASTE!",
       "targetWordMissed": "El objetivo era: {word} — ¡La cascada lo consiguió!",
+      "colorPower": "Usa {count}+ fichas {color} en una palabra",
+      "colorPink": "Rosa",
+      "colorCyan": "Cian",
+      "colorLime": "Lima",
       "bannerTitle": "Objetivos"
     },
     "combo": {

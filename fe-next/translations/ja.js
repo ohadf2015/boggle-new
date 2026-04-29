@@ -8518,6 +8518,10 @@ const ja = {
       "targetWord": "見つける: {word}",
       "targetWordFoundIt": "見つけた!",
       "targetWordMissed": "ターゲットは: {word} — カスケードが解決した!",
+      "colorPower": "1つの単語で{color}タイル{count}個以上を使用",
+      "colorPink": "ピンク",
+      "colorCyan": "シアン",
+      "colorLime": "ライム",
       "bannerTitle": "目標"
     },
     "combo": {

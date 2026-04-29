@@ -88,6 +88,8 @@ export interface BlastGameState {
   tileTypeClears: Record<BlastTileType, number>;
   /** Turns remaining where frozen tile inner types are revealed (diamond effect) */
   diamondRevealTurns: number;
+  /** Color counts in the last submitted word: { pink, cyan, lime } (for color_power tracking) */
+  lastWordColorCounts?: { pink: number; cyan: number; lime: number };
 }
 
 /** Per-wave summary for results breakdown */
@@ -340,7 +342,9 @@ export const SPECIAL_TILE_DISTRIBUTION: Record<Exclude<BlastTileType, 'standard'
 
 // ==================== Objectives ====================
 
-export type BlastObjectiveType = 'collect_type' | 'clear_all_type' | 'score_target' | 'word_length' | 'clear_percent' | 'target_word';
+export type BlastObjectiveType = 'collect_type' | 'clear_all_type' | 'score_target' | 'word_length' | 'clear_percent' | 'target_word' | 'color_power';
+
+export type ColorTag = 'pink' | 'cyan' | 'lime';
 
 export interface BlastObjective {
   type: BlastObjectiveType;
@@ -352,6 +356,10 @@ export interface BlastObjective {
   minWordLength?: number;
   /** Target word to find (for target_word type) */
   targetWord?: string;
+  /** Color tag for color_power objective */
+  colorTag?: ColorTag;
+  /** Minimum count of colored tiles required (for color_power type) */
+  minColorCount?: number;
 }
 
 /** 2D grid of letters for Blast board representation */

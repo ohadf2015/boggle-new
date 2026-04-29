@@ -21,7 +21,7 @@ export function getObjectiveTileTypes(objectives: BlastObjective[]): BlastTileTy
 
 /**
  * Format a human-readable label for an objective, using translation function.
- * Supports template variables: {target}, {tileType}, {minWordLength}, {word}.
+ * Supports template variables: {target}, {tileType}, {minWordLength}, {word}, {color}, {count}.
  */
 export function formatObjectiveLabel(
   objective: BlastObjective,
@@ -48,13 +48,22 @@ export function formatObjectiveLabel(
     case 'target_word':
       template = t('blast.objective.targetWord') || 'Find: {word}';
       break;
+    case 'color_power':
+      template = t('blast.objective.colorPower') || 'Use {count}+ {color} tiles in one word';
+      break;
     default:
       template = '';
   }
+
+  // Get color translation key
+  const colorKey = objective.colorTag ? `blast.objective.color${objective.colorTag.charAt(0).toUpperCase()}${objective.colorTag.slice(1)}` : '';
+  const colorLabel = colorKey ? (t(colorKey) || objective.colorTag) : '';
 
   return template
     .replace('{target}', String(objective.target))
     .replace('{tileType}', objective.tileType || '')
     .replace('{minWordLength}', String(objective.minWordLength || 0))
-    .replace('{word}', (objective.targetWord || '').toUpperCase());
+    .replace('{word}', (objective.targetWord || '').toUpperCase())
+    .replace('{count}', String(objective.minColorCount || 0))
+    .replace('{color}', colorLabel);
 }

@@ -54,6 +54,8 @@ export interface BlastTileProps {
   portalPairIndex?: number;
   /** Rainbow scan target — this tile will be copied by rainbow */
   isScanTarget?: 'rainbow';
+  /** Color tag for color_power objectives (pink/cyan/lime) — applies pulsing glow */
+  colorTag?: 'pink' | 'cyan' | 'lime';
   onClick?: () => void;
 }
 
@@ -173,6 +175,17 @@ function getPhaseClasses(phase: TilePhase, isSelected: boolean): string {
   return '';
 }
 
+/** Color tag glow class for color_power objectives */
+function getColorTagGlow(colorTag?: 'pink' | 'cyan' | 'lime'): string {
+  if (!colorTag) return '';
+  const colorMap: Record<string, string> = {
+    pink: 'ring-2 ring-neo-pink animate-pulse',
+    cyan: 'ring-2 ring-neo-cyan animate-pulse',
+    lime: 'ring-2 ring-neo-lime animate-pulse',
+  };
+  return colorMap[colorTag] || '';
+}
+
 /** Inline styles for selected tiles: progressive scale */
 function getSelectionStyles(isSelected: boolean, selectionIndex?: number, selectionTotal?: number): React.CSSProperties {
   if (!isSelected) return {};
@@ -185,7 +198,7 @@ export const BlastTile = memo(function BlastTile({
   letter, type, phase, isSelected, isCleared, hitsRemaining,
   fallOffset, clearRotate, spawnOffset, isNearMiss, activationEffect, isComboPreview,
   selectionIndex, selectionTotal, isLocked, countdown, fuseTimer, zonePreview,
-  isDiamondRevealed, innerType, isCascadeHighlight, portalPairIndex, isScanTarget, onClick,
+  isDiamondRevealed, innerType, isCascadeHighlight, portalPairIndex, isScanTarget, colorTag, onClick,
 }: BlastTileProps) {
   const reducedMotion = usePrefersReducedMotion();
   const { t } = useLanguage();
@@ -259,6 +272,7 @@ export const BlastTile = memo(function BlastTile({
         isLocked ? 'blast-tile-locked' : '',
         isCascadeHighlight ? 'blast-tile-cascade-highlight' : '',
         isNearMiss ? 'ring-2 ring-neo-lime/80 animate-pulse' : '',
+        getColorTagGlow(colorTag),
         getPhaseClasses(effectivePhase, isSelected),
       ].filter(Boolean).join(' ')}
       style={{

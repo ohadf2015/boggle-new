@@ -8501,6 +8501,10 @@ const he = {
       "targetWord": "מצא: {word}",
       "targetWordFoundIt": "מצאת!",
       "targetWordMissed": "המטרה הייתה: {word} — המפלים תפסו אותה!",
+      "colorPower": "השתמש ב-{count}+ אריחים {color} במילה אחת",
+      "colorPink": "ורוד",
+      "colorCyan": "טורקיז",
+      "colorLime": "ליים",
       "bannerTitle": "מטרות"
     },
     "combo": {

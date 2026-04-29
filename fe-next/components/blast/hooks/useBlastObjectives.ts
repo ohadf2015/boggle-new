@@ -57,6 +57,16 @@ function getProgress(
       current = wordsFound.some(w => w.toUpperCase() === targetWord) ? 1 : 0;
       break;
     }
+
+    case 'color_power': {
+      // Track the max color count across all words found
+      // If lastWordColorCounts is set, use the matching color's count
+      const colorTag = objective.colorTag as 'pink' | 'cyan' | 'lime' | undefined;
+      if (colorTag && gameState.lastWordColorCounts) {
+        current = gameState.lastWordColorCounts[colorTag] || 0;
+      }
+      break;
+    }
   }
 
   return {
