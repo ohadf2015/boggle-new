@@ -86,6 +86,61 @@ export const EXPERIMENTS = {
     description:
       'Multiplayer signup nudge — how many MP games before prompting guest to sign up.',
   }),
+
+  /**
+   * CrazyGames onboarding flow. Hypothesis: CG players bounce when
+   * forced to pick a mode before seeing gameplay (CG ranks games on
+   * 60s-survival rate). `autostart` deep-links straight into Word Hunt
+   * SP; `quick-play` shows a single big "Play Now" button above mode
+   * grid; `control` keeps the current landing.
+   * Conversion = first_minute_retained where platform = crazygames.
+   */
+  'cg-onboarding-flow': defineExperiment({
+    variants: ['control', 'quick-play', 'autostart'] as const,
+    default: 'control',
+    description:
+      'CrazyGames first-paint flow. control = current landing, quick-play = single Play Now CTA above mode grid, autostart = skip landing, deep-link to Word Hunt SP.',
+  }),
+
+  /**
+   * CrazyGames replay-CTA prominence. Drives plays-per-session — the
+   * second CG ranking lever after first-minute survival. Tests whether
+   * a pulsing/oversized "Play Again" lifts replay vs the default button.
+   * Conversion = next_game_started / game_completed within 30s.
+   */
+  'cg-replay-cta-style': defineExperiment({
+    variants: ['control', 'pulse', 'oversized'] as const,
+    default: 'control',
+    description:
+      'Replay CTA on results screen for CrazyGames. control = current button, pulse = animate-neo-wobble + glow, oversized = 1.5x scale w/ mascot. Drives plays/session.',
+  }),
+
+  /**
+   * Rewarded-ad revive offer. When player runs out of time / fails a
+   * level, offer "Watch ad → +30s / continue". Hypothesis: lifts both
+   * session length AND ad-completion-rate without harming retention.
+   * Conversion = ad_completed where placement = revive.
+   */
+  'cg-rewarded-revive': defineExperiment({
+    variants: ['off', 'on'] as const,
+    default: 'off',
+    description:
+      'Offer rewarded-ad revive (+30s or continue) on timeout/fail screens. on = show prompt, off = skip. Measures ad-completion lift vs retention impact.',
+  }),
+
+  /**
+   * Difficulty ramp for first-time CG players. CG players are mostly
+   * casual — too-hard first board → bounce. `easy-first-3` forces an
+   * easier letter set + longer timer for first 3 games of a CG session;
+   * `control` uses the standard board generator.
+   * Conversion = first_minute_retained AND session_depth_milestone(3).
+   */
+  'cg-difficulty-ramp': defineExperiment({
+    variants: ['control', 'easy-first-3'] as const,
+    default: 'control',
+    description:
+      'Ease-in difficulty for first 3 games on CrazyGames. control = standard board, easy-first-3 = vowel-rich letter pool + +30s timer. Anti-bounce.',
+  }),
 } as const;
 
 export type ExperimentKey = keyof typeof EXPERIMENTS;

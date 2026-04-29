@@ -10,6 +10,7 @@ import {
 import { hasCompletedOnboarding, markOnboardingComplete, hasPlayedBotsGame } from '@/utils/onboardingStorage';
 import { getStoredUsername } from '@/utils/profileStorage';
 import { useAuth } from '@/contexts/AuthContext';
+import { trackReplayClicked, trackNextGameStarted } from '@/utils/posthogEngagement';
 import type { DifficultyLevel, Language, LetterGrid } from '@/shared/types/game';
 import type {
   SinglePlayerMode,
@@ -120,6 +121,9 @@ export function useSinglePlayerConfig({ searchParams }: UseSinglePlayerConfigOpt
 
   const hasAutoStartedRef = useRef(false);
   const wasFirstTimerPracticeRef = useRef(false);
+  // CrazyGames "plays per session" counter — increments on every replay click.
+  // Drives the next_game_started event which feeds CG's engagement metric.
+  const sessionPlayCountRef = useRef(1);
   const hasRedirectedRef = useRef(false);
 
   // Returning-player gate: SP-vs-bots is FTUE-only. Once flag is set,
@@ -284,6 +288,9 @@ export function useSinglePlayerConfig({ searchParams }: UseSinglePlayerConfigOpt
   const handlePlayAgain = useCallback(() => {
     wasFirstTimerPracticeRef.current = false;
     unlockAudio();
+    sessionPlayCountRef.current += 1;
+    trackReplayClicked({ mode: 'sp', fromScreen: 'results' });
+    trackNextGameStarted({ mode: 'sp', gamesThisSession: sessionPlayCountRef.current });
     setGameState(prev => ({ ...prev, grid: null }));
     setPhase('playing');
   }, [unlockAudio]);
@@ -291,6 +298,9 @@ export function useSinglePlayerConfig({ searchParams }: UseSinglePlayerConfigOpt
   // Quick rematch
   const handleQuickRematch = useCallback(() => {
     unlockAudio();
+    sessionPlayCountRef.current += 1;
+    trackReplayClicked({ mode: 'sp', fromScreen: 'quick_rematch' });
+    trackNextGameStarted({ mode: 'sp', gamesThisSession: sessionPlayCountRef.current });
     setGameState(prev => ({ ...prev, grid: null }));
     setPhase('playing');
   }, [unlockAudio]);

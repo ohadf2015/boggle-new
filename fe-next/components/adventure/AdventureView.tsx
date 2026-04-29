@@ -28,6 +28,7 @@ import dynamic from 'next/dynamic';
 import { AdventureThemeProvider } from '@/contexts/AdventureThemeContext';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 
+import { peekQueue } from '@/lib/adventure/offlineCompletionQueue';
 import { calculateWorldMastery, convertQuestProgressWithTargets, deriveBossHighHealth } from '@/lib/adventure/mastery';
 import type { MasteryTier } from '@/types/adventure';
 import AdventureViewHeader from './AdventureViewHeader';
@@ -261,7 +262,9 @@ function AdventureView(): React.JSX.Element {
         if (saved === false) {
           if (isGuest && !isOnCrazyGamesPlatform) {
             setShowSignupPrompt(true);
-          } else if (!isGuest) {
+          } else if (!isGuest && peekQueue().length === 0) {
+            // Only toast as a hard failure — if the save was queued for offline
+            // replay, the system will retry it and the toast would be a false alarm.
             toast.error(t('adventure.progressNotSaved'));
           }
         }

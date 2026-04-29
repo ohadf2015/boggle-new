@@ -41,6 +41,12 @@ import {
   trackCtaClicked,
   trackSessionDepth,
   createDeadTimeDetector,
+  detectPlatform,
+  trackFirstMinuteRetained,
+  trackReplayClicked,
+  trackNextGameStarted,
+  trackAdLifecycle,
+  createFirstMinuteSurvivalTimer,
 } from '../posthogEngagement';
 
 describe('posthogEngagement — super & user properties', () => {
@@ -182,5 +188,112 @@ describe('posthogEngagement — dead-time detector', () => {
     detector.stop();
     vi.advanceTimersByTime(20_000);
     expect(capture).not.toHaveBeenCalled();
+  });
+});
+
+describe('posthogEngagement — platform detection (CrazyGames metric)', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    delete (window as unknown as { __crazyGamesEnvironment?: string }).__crazyGamesEnvironment;
+    delete (window as unknown as { Capacitor?: unknown }).Capacitor;
+  });
+
+  it('returns "crazygames" when window.__crazyGamesEnvironment === "crazygames"', () => {
+    (window as unknown as { __crazyGamesEnvironment: string }).__crazyGamesEnvironment = 'crazygames';
+    expect(detectPlatform()).toBe('crazygames');
+  });
+
+  it('returns "android" when Capacitor native bridge present', () => {
+    (window as unknown as { Capacitor: { isNativePlatform: () => boolean; getPlatform: () => string } }).Capacitor = {
+      isNativePlatform: () => true,
+      getPlatform: () => 'android',
+    };
+    expect(detectPlatform()).toBe('android');
+  });
+
+  it('returns "web" otherwise', () => {
+    expect(detectPlatform()).toBe('web');
+  });
+});
+
+describe('posthogEngagement — first-minute survival (CrazyGames ranking)', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.useFakeTimers();
+  });
+
+  it('trackFirstMinuteRetained captures first_minute_retained with mode + platform', () => {
+    trackFirstMinuteRetained({ mode: 'sp', platform: 'crazygames' });
+    expect(capture).toHaveBeenCalledWith(
+      'first_minute_retained',
+      expect.objectContaining({ mode: 'sp', platform: 'crazygames' })
+    );
+  });
+
+  it('createFirstMinuteSurvivalTimer fires after 60s if not cancelled', () => {
+    const timer = createFirstMinuteSurvivalTimer({ mode: 'sp', platform: 'crazygames' });
+    timer.start();
+    vi.advanceTimersByTime(60_001);
+    expect(capture).toHaveBeenCalledWith(
+      'first_minute_retained',
+      expect.objectContaining({ mode: 'sp' })
+    );
+  });
+
+  it('createFirstMinuteSurvivalTimer cancel() prevents firing', () => {
+    const timer = createFirstMinuteSurvivalTimer({ mode: 'sp', platform: 'web' });
+    timer.start();
+    vi.advanceTimersByTime(30_000);
+    timer.cancel();
+    vi.advanceTimersByTime(60_000);
+    expect(capture).not.toHaveBeenCalled();
+  });
+
+  it('does not fire twice if start() called repeatedly', () => {
+    const timer = createFirstMinuteSurvivalTimer({ mode: 'sp', platform: 'web' });
+    timer.start();
+    timer.start();
+    vi.advanceTimersByTime(60_001);
+    expect(capture).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('posthogEngagement — replay loop (plays per session)', () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it('trackReplayClicked fires replay_clicked with mode + source screen', () => {
+    trackReplayClicked({ mode: 'sp', fromScreen: 'results' });
+    expect(capture).toHaveBeenCalledWith(
+      'replay_clicked',
+      expect.objectContaining({ mode: 'sp', from_screen: 'results' })
+    );
+  });
+
+  it('trackNextGameStarted fires next_game_started with games_this_session', () => {
+    trackNextGameStarted({ mode: 'sp', gamesThisSession: 3 });
+    expect(capture).toHaveBeenCalledWith(
+      'next_game_started',
+      expect.objectContaining({ mode: 'sp', games_this_session: 3 })
+    );
+  });
+});
+
+describe('posthogEngagement — ad lifecycle', () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it('trackAdLifecycle fires ad_<event> with placement + adType', () => {
+    trackAdLifecycle({ event: 'requested', adType: 'rewarded', placement: 'revive' });
+    expect(capture).toHaveBeenCalledWith(
+      'ad_requested',
+      expect.objectContaining({ ad_type: 'rewarded', placement: 'revive' })
+    );
+  });
+
+  it('captures completed event for measuring ad fill / completion rate', () => {
+    trackAdLifecycle({ event: 'completed', adType: 'midgame', placement: 'between_games' });
+    expect(capture).toHaveBeenCalledWith(
+      'ad_completed',
+      expect.objectContaining({ ad_type: 'midgame', placement: 'between_games' })
+    );
   });
 });

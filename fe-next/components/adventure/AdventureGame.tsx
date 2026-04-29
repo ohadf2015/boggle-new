@@ -450,7 +450,7 @@ const AdventureGame = memo<AdventureGameProps>(
       upgradeRetryScoreRetention: init.upgradeEffects.retryScoreRetention,
       onLevelComplete, totalStars, clearSelection, resetGame, startGame,
       storyBeat, showLootOrComplete,
-      setShowLevelComplete, setRetriesUsed, setShowStoryBeat,
+      setShowLevelComplete, setRetriesUsed, setShowStoryBeat, setIsPaused,
       t, hintsUsed: hintsUsedRef.current,
       resetWordSubmitState: wordSubmit.resetWordSubmitState,
       resetFlashChallenge: flashChallenge.reset,

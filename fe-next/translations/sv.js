@@ -2330,6 +2330,7 @@ const sv = {
   },
   "practiceResults": {
     "playAgain": "Spela igen",
+    "goHome": "Tillbaka till start",
     "orTrySomethingNew": "eller prova något nytt",
     "wordsFound": "{count} ord hittade",
     "tryDaily": "Daglig utmaning",
@@ -4360,6 +4361,45 @@ const sv = {
     "noPastSeasons": "Inga tidigare säsonger ännu",
     "rankedAt": "Plats #{{position}}",
     "tierLabel": "Nivå"
+  },
+  "seasonBadges": {
+    "section": {
+      "title": "Säsongstroféer",
+      "empty": "Sluta topp 5 i en säsong för att få en samlartrofé",
+      "count": "{{count}} intjänade",
+      "viewAll": "Visa alla"
+    },
+    "title": {
+      "rank1": "Mästare",
+      "rank2": "Tvåa",
+      "rank3": "Bronsmedaljör",
+      "rank4": "Topp 5-finalist",
+      "rank5": "Topp 5-finalist"
+    },
+    "subtitle": "{{theme}} · Säsong {{seasonId}}",
+    "modal": {
+      "headline": "Du slutade #{{rank}}!",
+      "subhead": "{{theme}}-placering upplåst",
+      "collectible": "Permanent samlarobjekt",
+      "viewProfile": "Visa i profil"
+    },
+    "recap": {
+      "title": "Säsongssammanfattning",
+      "bestRank": "Bästa placering",
+      "totalGames": "Spelade matcher",
+      "finalScore": "Slutpoäng",
+      "peakTier": "Högsta nivå",
+      "stats": "Dina siffror"
+    },
+    "rarity": {
+      "legendary": "Legendarisk",
+      "epic": "Episk",
+      "rare": "Sällsynt",
+      "uncommon": "Ovanlig"
+    },
+    "publicProfile": {
+      "title": "{{username}}s säsongstroféer"
+    }
   },
   "growth": {
     "dayStreak": "dagars svit",

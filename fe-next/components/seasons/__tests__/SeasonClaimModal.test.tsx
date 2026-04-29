@@ -32,6 +32,19 @@ vi.mock('@/contexts/LanguageContext', () => ({
         'season.alreadyClaimed': 'Already claimed',
         'season.rewardEarned': `You earned ${params?.coins ?? 0} coins!`,
         'season.continue': 'Continue',
+        'seasonBadges.modal.headline': `You finished #${params?.rank ?? ''}!`,
+        'seasonBadges.modal.subhead': `${params?.theme ?? ''} placement unlocked`,
+        'seasonBadges.modal.collectible': 'Permanent collectible',
+        'seasonBadges.recap.title': 'Season Recap',
+        'seasonBadges.recap.peakTier': 'Peak Tier',
+        'seasonBadges.recap.bestRank': 'Best Rank',
+        'seasonBadges.recap.totalGames': 'Games Played',
+        'seasonBadges.recap.finalScore': 'Final Score',
+        'seasonBadges.title.rank1': 'Champion',
+        'seasonBadges.title.rank2': 'Runner-Up',
+        'seasonBadges.title.rank3': 'Bronze Medalist',
+        'seasonBadges.title.rank4': 'Top 5 Finisher',
+        'seasonBadges.title.rank5': 'Top 5 Finisher',
       };
       return map[key] ?? key;
     },
@@ -39,11 +52,12 @@ vi.mock('@/contexts/LanguageContext', () => ({
 }));
 
 describe('SeasonClaimModal', () => {
+  // Default: rank 12 → medal path (no top-5 badge override)
   const baseProps = {
     seasonId: 1,
     seasonName: 'Season 1: Word Warriors',
     tier: 'Gold',
-    rankPosition: 4,
+    rankPosition: 12,
     rewards: {
       coins: 500,
       badges: [{ id: 'gold-season-1', name: 'Gold Season 1' }],
@@ -62,7 +76,7 @@ describe('SeasonClaimModal', () => {
     expect(screen.getByRole('button', { name: /Claim Rewards/i })).toBeInTheDocument();
   });
 
-  it('renders the tier-specific medal image', () => {
+  it('renders the tier-specific medal image when rank > 5', () => {
     render(<SeasonClaimModal {...baseProps} />);
     const medal = screen.getByTestId('season-medal');
     expect(medal).toHaveAttribute('src', '/seasons/medals/medal-gold.png');
@@ -72,6 +86,32 @@ describe('SeasonClaimModal', () => {
   it('falls back to bronze medal when tier is unknown', () => {
     render(<SeasonClaimModal {...baseProps} tier="Mystery" />);
     expect(screen.getByTestId('season-medal')).toHaveAttribute('src', '/seasons/medals/medal-bronze.png');
+  });
+
+  it('renders placement-badge image (not medal) when rank is top-5', () => {
+    render(<SeasonClaimModal {...baseProps} rankPosition={1} />);
+    expect(screen.queryByTestId('season-medal')).not.toBeInTheDocument();
+    const badge = screen.getByTestId('season-placement-badge');
+    expect(badge).toHaveAttribute('src', '/badges/season-1-rank-1.png');
+    expect(badge).toHaveAttribute('data-rank', '1');
+  });
+
+  it('shows "Permanent collectible" pill for top-5 placement', () => {
+    render(<SeasonClaimModal {...baseProps} rankPosition={3} />);
+    expect(screen.getByText('Permanent collectible')).toBeInTheDocument();
+  });
+
+  it('renders recap stats grid when recap data present', () => {
+    render(
+      <SeasonClaimModal
+        {...baseProps}
+        recap={{ totalScore: 12345, gamesPlayed: 42, gamesWon: 18 }}
+      />,
+    );
+    expect(screen.getByText('Games Played')).toBeInTheDocument();
+    expect(screen.getByText('42')).toBeInTheDocument();
+    expect(screen.getByText('Final Score')).toBeInTheDocument();
+    expect(screen.getByText('12,345')).toBeInTheDocument();
   });
 
   it('invokes onClaim when claim button pressed', () => {

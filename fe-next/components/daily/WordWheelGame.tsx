@@ -736,12 +736,11 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
       </div>
 
       {/* ── Action Buttons (sticky so Submit stays in view as found-words list grows) ── */}
-      {/* `bottom` offsets by the full bottom stack (nav + banner) so the
-          button bar is never covered — survives nav-visible regressions even
-          though `isInGame` normally hides the nav during play. */}
+      {/* Parent scroll container (WordWheelChallenge playing wrapper) reserves
+          --bottom-stack-height via `pb-bottom-stack`, so sticky bottom: 0 pins
+          to the content-edge above the AdMob banner without double-counting. */}
       <div
-        className="sticky z-30 w-full flex items-center justify-center gap-3 py-2 bg-linear-to-t from-neo-navy via-neo-navy/95 to-transparent"
-        style={{ bottom: 'var(--bottom-stack-height, 0px)' }}
+        className="sticky bottom-0 z-30 w-full flex items-center justify-center gap-3 py-2 bg-linear-to-t from-neo-navy via-neo-navy/95 to-transparent"
       >
         {/* Clear */}
         <motion.button

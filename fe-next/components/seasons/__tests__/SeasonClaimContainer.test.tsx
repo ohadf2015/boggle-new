@@ -53,6 +53,16 @@ vi.mock('@/hooks/useSeasonClaim', () => ({
   useSeasonClaim: () => mockUseSeasonClaim(),
 }));
 
+vi.mock('@/lib/trpc', () => ({
+  trpc: {
+    leaderboard: {
+      getSeasonRecap: {
+        useQuery: () => ({ data: null, isLoading: false }),
+      },
+    },
+  },
+}));
+
 import { SeasonClaimContainer } from '../SeasonClaimContainer';
 
 const sessionStorageMock = (() => {

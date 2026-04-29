@@ -7,6 +7,7 @@ import FirstTimeEncouragement from '@/components/game/FirstTimeEncouragement';
 import { useFirstTimeEncouragement } from '@/hooks/useFirstTimeEncouragement';
 import { useIdleDetection } from '@/hooks/useIdleDetection';
 import { trackDeadTime, trackGameStart } from '@/utils/growthTracking';
+import { createFirstMinuteSurvivalTimer, detectPlatform } from '@/utils/posthogEngagement';
 
 const DEAD_TIME_THRESHOLD_MS = 15000;
 import {
@@ -50,6 +51,14 @@ function SinglePlayerGame({
       difficulty: settings.difficulty,
       language: settings.language,
     });
+    // CrazyGames ranking signal — fires `first_minute_retained` if player
+    // stays past 60s. Cancelled on unmount (early abandon).
+    const survival = createFirstMinuteSurvivalTimer({
+      mode: `sp:${settings.mode}`,
+      platform: detectPlatform(),
+    });
+    survival.start();
+    return () => survival.cancel();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

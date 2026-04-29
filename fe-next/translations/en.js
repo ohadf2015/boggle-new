@@ -2433,6 +2433,7 @@ const en = {
   },
   "practiceResults": {
     "playAgain": "Play Again",
+    "goHome": "Back to Home",
     "orTrySomethingNew": "or try something new",
     "wordsFound": "{count} words found",
     "tryDaily": "Daily Challenge",
@@ -4465,6 +4466,45 @@ const en = {
     "noPastSeasons": "No past seasons yet",
     "rankedAt": "Rank #{{position}}",
     "tierLabel": "Tier"
+  },
+  "seasonBadges": {
+    "section": {
+      "title": "Season Trophies",
+      "empty": "Finish top 5 in a season to earn a collectible trophy",
+      "count": "{{count}} earned",
+      "viewAll": "View all"
+    },
+    "title": {
+      "rank1": "Champion",
+      "rank2": "Runner-Up",
+      "rank3": "Bronze Medalist",
+      "rank4": "Top 5 Finisher",
+      "rank5": "Top 5 Finisher"
+    },
+    "subtitle": "{{theme}} · Season {{seasonId}}",
+    "modal": {
+      "headline": "You finished #{{rank}}!",
+      "subhead": "{{theme}} placement unlocked",
+      "collectible": "Permanent collectible",
+      "viewProfile": "View in profile"
+    },
+    "recap": {
+      "title": "Season Recap",
+      "bestRank": "Best Rank",
+      "totalGames": "Games Played",
+      "finalScore": "Final Score",
+      "peakTier": "Peak Tier",
+      "stats": "Your Numbers"
+    },
+    "rarity": {
+      "legendary": "Legendary",
+      "epic": "Epic",
+      "rare": "Rare",
+      "uncommon": "Uncommon"
+    },
+    "publicProfile": {
+      "title": "{{username}}'s Season Trophies"
+    }
   },
   "growth": {
     "dayStreak": "day streak",

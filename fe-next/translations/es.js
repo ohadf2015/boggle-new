@@ -2281,6 +2281,7 @@ const es = {
   },
   "practiceResults": {
     "playAgain": "Jugar de nuevo",
+    "goHome": "Volver al inicio",
     "orTrySomethingNew": "o prueba algo nuevo",
     "wordsFound": "{count} palabras encontradas",
     "tryDaily": "Desafío diario",
@@ -3908,7 +3909,33 @@ const es = {
       "letsGo": "¡Empecemos!",
       "chooseLanguage": "Elige tu idioma",
       "letsPlay": "¡A jugar!",
-      "whereToStart": "¿Por dónde empezar?"
+      "whereToStart": "¿Por dónde empezar?",
+      "v2": {
+        "rewardsEarned": "RECOMPENSAS GANADAS",
+        "goldReward": "+{{gold}} ORO",
+        "goldEarned": "oro ganado",
+        "streak": "racha",
+        "streakStarted": "DÍA 1 DE RACHA",
+        "achievementUnlocked": "PRIMERAS PALABRAS",
+        "tomorrowBonus": "Vuelve mañana para +50 extra",
+        "scoreFooter": "{{score}} pts",
+        "claimAndPlay": "RECLAMAR Y JUGAR",
+        "skipForNow": "Omitir por ahora",
+        "titles": {
+          "wordling": "PALABRINO",
+          "wordHunter": "¡CAZAPALABRAS!",
+          "wordsmith": "¡MAESTRO DE PALABRAS!",
+          "wordSlayer": "¡VERDUGO DE PALABRAS!",
+          "wordLegend": "¡LEYENDA DE PALABRAS!"
+        },
+        "mascotReactions": {
+          "wordling": "¡Buen comienzo!",
+          "wordHunter": "¡Mira cómo vas!",
+          "wordsmith": "¡Eres un natural!",
+          "wordSlayer": "¡Estás en llamas!",
+          "wordLegend": "¡Debut legendario!"
+        }
+      }
     }
   },
   "preGameTutorial": {
@@ -4364,6 +4391,45 @@ const es = {
     "noPastSeasons": "Aún no hay temporadas pasadas",
     "rankedAt": "Puesto #{{position}}",
     "tierLabel": "Nivel"
+  },
+  "seasonBadges": {
+    "section": {
+      "title": "Trofeos de temporada",
+      "empty": "Termina entre los 5 primeros para ganar un trofeo coleccionable",
+      "count": "{{count}} obtenidos",
+      "viewAll": "Ver todos"
+    },
+    "title": {
+      "rank1": "Campeón",
+      "rank2": "Subcampeón",
+      "rank3": "Medalla de bronce",
+      "rank4": "Finalista Top 5",
+      "rank5": "Finalista Top 5"
+    },
+    "subtitle": "{{theme}} · Temporada {{seasonId}}",
+    "modal": {
+      "headline": "¡Terminaste en el #{{rank}}!",
+      "subhead": "{{theme}} colocación desbloqueada",
+      "collectible": "Coleccionable permanente",
+      "viewProfile": "Ver en perfil"
+    },
+    "recap": {
+      "title": "Resumen de temporada",
+      "bestRank": "Mejor puesto",
+      "totalGames": "Partidas jugadas",
+      "finalScore": "Puntuación final",
+      "peakTier": "Nivel máximo",
+      "stats": "Tus números"
+    },
+    "rarity": {
+      "legendary": "Legendario",
+      "epic": "Épico",
+      "rare": "Raro",
+      "uncommon": "Poco común"
+    },
+    "publicProfile": {
+      "title": "Trofeos de temporada de {{username}}"
+    }
   },
   "growth": {
     "dayStreak": "racha de días",

@@ -2335,29 +2335,30 @@ const he = {
   },
   "practiceResults": {
     "playAgain": "שחקו שוב",
+    "goHome": "חזרה לדף הבית",
     "orTrySomethingNew": "או נסו משהו חדש",
-    "wordsFound": "{count} מילים נמצאו",
+    "wordsFound": "מצאתם {count} מילים",
     "tryDaily": "אתגר יומי",
     "tryDailyDesc": "אותו פאזל, כולם מתחרים",
     "tryBots": "נגד בוטים",
     "tryBotsDesc": "אין עם מי לשחק? בוטים לא ישנים.",
     "tryMultiplayer": "שחקו עם חברים",
     "tryMultiplayerDesc": "קרבות מילים בזמן אמת",
-    "wordHuntCta": "שחקו ציד מילים יומי",
-    "wordHuntCtaDesc": "האתגר היומי מחכה לכם!",
+    "wordHuntCta": "לאתגר היומי",
+    "wordHuntCtaDesc": "ציד מילים חדש כל יום",
     "wordHuntAlreadyPlayed": "כבר שיחקתם היום",
     "wordHuntAlreadyPlayedDesc": "חזרו מחר!",
     "encouragement": {
-      "legendary": "מדהים!",
+      "legendary": "אדירים!",
       "great": "עבודה יפה!",
       "nice": "כל הכבוד!",
       "warmup": "התחלה מעולה!"
     },
     "subtitle": {
-      "legendary": "אתם על אש — אל תעצרו!",
-      "great": "יש לכם כישורי מילים רציניים",
-      "nice": "כל משחק משפר אתכם",
-      "warmup": "כל משחק מחזק אתכם — אתם בדרך!"
+      "legendary": "אתם בכושר — תמשיכו ככה",
+      "great": "יש לכם ראש למילים",
+      "nice": "כל משחק עושה את שלו",
+      "warmup": "מתחממים — בדרך הנכונה"
     }
   },
   "almostFound": {
@@ -4363,6 +4364,45 @@ const he = {
     "noPastSeasons": "אין עדיין עונות קודמות",
     "rankedAt": "מקום #{{position}}",
     "tierLabel": "דרגה"
+  },
+  "seasonBadges": {
+    "section": {
+      "title": "גביעי עונה",
+      "empty": "סיימו ב-5 הראשונים בעונה כדי לזכות בגביע אספני",
+      "count": "{{count}} הושגו",
+      "viewAll": "הצג הכל"
+    },
+    "title": {
+      "rank1": "אלוף",
+      "rank2": "סגן אלוף",
+      "rank3": "מקום שלישי",
+      "rank4": "טופ 5",
+      "rank5": "טופ 5"
+    },
+    "subtitle": "{{theme}} · עונה {{seasonId}}",
+    "modal": {
+      "headline": "סיימת במקום ה-{{rank}}!",
+      "subhead": "{{theme}} - גביע נפתח",
+      "collectible": "אספן קבוע",
+      "viewProfile": "הצג בפרופיל"
+    },
+    "recap": {
+      "title": "סיכום עונה",
+      "bestRank": "הדירוג הטוב ביותר",
+      "totalGames": "משחקים",
+      "finalScore": "ניקוד סופי",
+      "peakTier": "שיא דרגה",
+      "stats": "המספרים שלך"
+    },
+    "rarity": {
+      "legendary": "אגדי",
+      "epic": "אפי",
+      "rare": "נדיר",
+      "uncommon": "לא רגיל"
+    },
+    "publicProfile": {
+      "title": "הגביעים העונתיים של {{username}}"
+    }
   },
   "growth": {
     "dayStreak": "ימי רצף",

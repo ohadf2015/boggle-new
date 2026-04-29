@@ -2317,6 +2317,7 @@ const ja = {
   },
   "practiceResults": {
     "playAgain": "もう一回",
+    "goHome": "ホームに戻る",
     "orTrySomethingNew": "他のモードも試してみよう",
     "wordsFound": "{count}個の単語を発見",
     "tryDaily": "デイリーチャレンジ",
@@ -4344,6 +4345,45 @@ const ja = {
     "noPastSeasons": "過去のシーズンはまだありません",
     "rankedAt": "{{position}}位",
     "tierLabel": "ティア"
+  },
+  "seasonBadges": {
+    "section": {
+      "title": "シーズントロフィー",
+      "empty": "シーズンのトップ5に入賞してコレクションを獲得しよう",
+      "count": "{{count}}個獲得",
+      "viewAll": "すべて表示"
+    },
+    "title": {
+      "rank1": "チャンピオン",
+      "rank2": "準優勝",
+      "rank3": "ブロンズメダリスト",
+      "rank4": "トップ5入賞",
+      "rank5": "トップ5入賞"
+    },
+    "subtitle": "{{theme}} · シーズン{{seasonId}}",
+    "modal": {
+      "headline": "{{rank}}位でフィニッシュ！",
+      "subhead": "{{theme}} 順位アンロック",
+      "collectible": "永久コレクション",
+      "viewProfile": "プロフィールで見る"
+    },
+    "recap": {
+      "title": "シーズンまとめ",
+      "bestRank": "最高順位",
+      "totalGames": "プレイ数",
+      "finalScore": "最終スコア",
+      "peakTier": "最高ティア",
+      "stats": "あなたの記録"
+    },
+    "rarity": {
+      "legendary": "レジェンド",
+      "epic": "エピック",
+      "rare": "レア",
+      "uncommon": "アンコモン"
+    },
+    "publicProfile": {
+      "title": "{{username}}のシーズントロフィー"
+    }
   },
   "growth": {
     "dayStreak": "日連続",

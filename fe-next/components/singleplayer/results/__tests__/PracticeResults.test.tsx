@@ -27,6 +27,7 @@ vi.mock('@/contexts/LanguageContext', () => ({
         'practiceResults.wordHuntCtaDesc': 'Today\'s daily challenge awaits!',
         'practiceResults.wordHuntAlreadyPlayed': 'Already Played Today',
         'practiceResults.wordHuntAlreadyPlayedDesc': 'Come back tomorrow!',
+        'practiceResults.goHome': 'Back to Home',
         'nextStep.backToLobby': 'Back to Lobby',
         'practiceResults.playAgain': 'Play Again',
       };
@@ -240,30 +241,22 @@ describe('PracticeResults — Celebratory Redesign', () => {
   // ── Secondary actions ──
 
   describe('secondary actions', () => {
-    it('renders "Back to Lobby" as secondary action', () => {
+    it('renders "Back to Home" as the only secondary action', () => {
       render(<PracticeResults {...defaultProps} />);
-      const lobbyButtons = screen.getAllByText('Back to Lobby');
-      expect(lobbyButtons.length).toBeGreaterThan(0);
+      const homeButtons = screen.getAllByText('Back to Home');
+      expect(homeButtons.length).toBeGreaterThan(0);
     });
 
-    it('calls onBackToLobby when lobby button is clicked', () => {
+    it('calls onBackToLobby when home button is clicked', () => {
       render(<PracticeResults {...defaultProps} />);
-      const lobbyButtons = screen.getAllByText('Back to Lobby');
-      fireEvent.click(lobbyButtons[0]);
+      const homeButtons = screen.getAllByText('Back to Home');
+      fireEvent.click(homeButtons[0]);
       expect(defaultProps.onBackToLobby).toHaveBeenCalled();
     });
 
-    it('renders "Play Again" as a secondary option', () => {
+    it('does not render a "Play Again" button (replaced by daily-challenge primary CTA)', () => {
       render(<PracticeResults {...defaultProps} />);
-      const playAgainButtons = screen.getAllByText('Play Again');
-      expect(playAgainButtons.length).toBeGreaterThan(0);
-    });
-
-    it('calls onPlayAgain when play again is clicked', () => {
-      render(<PracticeResults {...defaultProps} />);
-      const playAgainButtons = screen.getAllByText('Play Again');
-      fireEvent.click(playAgainButtons[0]);
-      expect(defaultProps.onPlayAgain).toHaveBeenCalled();
+      expect(screen.queryByText('Play Again')).not.toBeInTheDocument();
     });
   });
 

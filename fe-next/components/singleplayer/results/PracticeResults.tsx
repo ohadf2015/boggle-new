@@ -4,7 +4,7 @@ import { memo, useEffect, useCallback, useMemo, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { motion, useMotionValue, useTransform, animate } from 'framer-motion';
-import { ArrowLeft, Trophy, RotateCcw, Crosshair, Lock } from 'lucide-react';
+import { ArrowLeft, Trophy, Crosshair, Lock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -163,13 +163,13 @@ function StaggeredText({ text, className, delay = 0 }: {
 
 interface PracticeResultsProps {
   results: SinglePlayerResultsData;
-  onPlayAgain: () => void;
+  /** Reserved for future use; currently the screen exposes only daily-challenge + go-home actions. */
+  onPlayAgain?: () => void;
   onBackToLobby: () => void;
 }
 
 const PracticeResults = memo(function PracticeResults({
   results,
-  onPlayAgain,
   onBackToLobby,
 }: PracticeResultsProps) {
   const { t, language } = useLanguage();
@@ -343,82 +343,70 @@ const PracticeResults = memo(function PracticeResults({
           {/* ── Catalyst teaser — surfaces what's coming in arena/adventure ── */}
           <CatalystTeaser t={t} />
 
-          {/* ── Primary CTA: Word Hunt Daily ── */}
+          {/* ── Primary CTA: Word Hunt Daily — desktop big card; mobile uses sticky bottom only ── */}
           <motion.div
             initial={reducedMotion ? false : { opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6 }}
             className="space-y-3"
           >
-            {dailyAlreadyPlayed ? (
-              /* Already played — disabled state */
-              <div
-                className={cn(
-                  'w-full flex items-center justify-center gap-3',
-                  'px-6 py-4',
-                  'bg-white/5 text-white/40',
-                  'font-black text-base uppercase',
-                  'border-3 border-white/10 rounded-neo',
-                  'cursor-not-allowed',
-                )}
-              >
-                <Lock className="w-5 h-5" />
-                <div className="text-start">
-                  <span className="block">{t('practiceResults.wordHuntAlreadyPlayed')}</span>
-                  <span className="text-xs font-medium text-white/30 block">
-                    {t('practiceResults.wordHuntAlreadyPlayedDesc')}
-                  </span>
+            {/* Big card hidden on mobile to avoid duplicate with sticky bottom */}
+            <div className="hidden md:block">
+              {dailyAlreadyPlayed ? (
+                <div
+                  className={cn(
+                    'w-full flex items-center justify-center gap-3',
+                    'px-6 py-4',
+                    'bg-white/5 text-white/40',
+                    'font-black text-base uppercase',
+                    'border-3 border-white/10 rounded-neo',
+                    'cursor-not-allowed',
+                  )}
+                >
+                  <Lock className="w-5 h-5" />
+                  <div className="text-start">
+                    <span className="block">{t('practiceResults.wordHuntAlreadyPlayed')}</span>
+                    <span className="text-xs font-medium text-white/30 block">
+                      {t('practiceResults.wordHuntAlreadyPlayedDesc')}
+                    </span>
+                  </div>
                 </div>
-              </div>
-            ) : (
-              /* Daily available — big inviting CTA */
-              <motion.button
-                onClick={handleWordHuntDaily}
-                animate={reducedMotion ? {} : { scale: [1, 1.03, 1] }}
-                transition={{
-                  duration: 2.5,
-                  repeat: ctaPulseRepeat,
-                  ease: 'easeInOut',
-                  repeatDelay: 0.5,
-                }}
-                whileHover={reducedMotion ? { opacity: 0.9 } : { scale: 1.06 }}
-                whileTap={reducedMotion ? {} : { scale: 0.96 }}
-                className={cn(
-                  'w-full flex items-center justify-center gap-3',
-                  'px-6 py-4',
-                  'bg-amber-400 text-neo-black',
-                  'font-black text-base uppercase',
-                  'border-4 border-neo-black rounded-neo',
-                  'shadow-hard-lg',
-                  'transition-shadow duration-150',
-                )}
-              >
-                <Crosshair className="w-6 h-6" />
-                <div className="text-start">
-                  <span className="block">{t('practiceResults.wordHuntCta')}</span>
-                  <span className="text-xs font-medium text-neo-black/60 block">
-                    {t('practiceResults.wordHuntCtaDesc')}
-                  </span>
-                </div>
-                <Trophy className="w-5 h-5 text-amber-600" />
-              </motion.button>
-            )}
+              ) : (
+                <motion.button
+                  onClick={handleWordHuntDaily}
+                  animate={reducedMotion ? {} : { scale: [1, 1.03, 1] }}
+                  transition={{
+                    duration: 2.5,
+                    repeat: ctaPulseRepeat,
+                    ease: 'easeInOut',
+                    repeatDelay: 0.5,
+                  }}
+                  whileHover={reducedMotion ? { opacity: 0.9 } : { scale: 1.06 }}
+                  whileTap={reducedMotion ? {} : { scale: 0.96 }}
+                  className={cn(
+                    'w-full flex items-center justify-center gap-3',
+                    'px-6 py-4',
+                    'bg-amber-400 text-neo-black',
+                    'font-black text-base uppercase',
+                    'border-4 border-neo-black rounded-neo',
+                    'shadow-hard-lg',
+                    'transition-shadow duration-150',
+                  )}
+                >
+                  <Crosshair className="w-6 h-6" />
+                  <div className="text-start">
+                    <span className="block">{t('practiceResults.wordHuntCta')}</span>
+                    <span className="text-xs font-medium text-neo-black/60 block">
+                      {t('practiceResults.wordHuntCtaDesc')}
+                    </span>
+                  </div>
+                  <Trophy className="w-5 h-5 text-amber-600" />
+                </motion.button>
+              )}
+            </div>
 
-            {/* ── Secondary actions row ── */}
+            {/* ── Desktop secondary action: home only ── */}
             <div className="hidden md:flex gap-2.5 justify-center">
-              <button
-                onClick={onPlayAgain}
-                className={cn(
-                  'inline-flex items-center gap-2 px-5 py-2.5',
-                  'bg-white/10 text-white/80',
-                  'font-bold text-sm uppercase',
-                  'border-2 border-white/20 rounded-neo',
-                  'transition-colors hover:bg-white/20',
-                )}
-              >
-                <RotateCcw className="w-4 h-4" />
-                {t('practiceResults.playAgain')}
-              </button>
               <button
                 onClick={onBackToLobby}
                 className={cn(
@@ -430,14 +418,14 @@ const PracticeResults = memo(function PracticeResults({
                 )}
               >
                 <ArrowLeft className="w-4 h-4 rtl:rotate-180" />
-                {t('nextStep.backToLobby')}
+                {t('practiceResults.goHome')}
               </button>
             </div>
           </motion.div>
         </div>
       </div>
 
-      {/* ── Mobile sticky bottom — daily challenge primary + replay secondary ── */}
+      {/* ── Mobile sticky bottom — single daily CTA + go home ── */}
       <div className="md:hidden fixed bottom-0 inset-x-0 z-50 bg-neo-navy border-t-3 border-neo-black safe-area-bottom px-3 py-2.5">
         <div className="flex flex-col gap-2">
           {!dailyAlreadyPlayed && (
@@ -451,22 +439,13 @@ const PracticeResults = memo(function PracticeResults({
               {t('practiceResults.wordHuntCta')}
             </motion.button>
           )}
-          <div className="flex gap-2">
-            <button
-              onClick={onPlayAgain}
-              className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-neo-cream text-neo-navy font-black text-sm uppercase border-2 border-neo-black rounded-neo shadow-hard transition-colors"
-            >
-              <RotateCcw className="w-4 h-4" />
-              {t('practiceResults.playAgain')}
-            </button>
-            <button
-              onClick={onBackToLobby}
-              aria-label={t('nextStep.backToLobby')}
-              className="flex items-center justify-center min-w-[44px] min-h-[44px] px-3 py-2.5 bg-white/10 text-white/80 font-bold text-xs uppercase border-2 border-white/20 rounded-neo transition-colors hover:bg-white/20"
-            >
-              <ArrowLeft className="w-4 h-4 rtl:rotate-180" />
-            </button>
-          </div>
+          <button
+            onClick={onBackToLobby}
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-white/10 text-white/80 font-bold text-sm uppercase border-2 border-white/20 rounded-neo transition-colors hover:bg-white/20"
+          >
+            <ArrowLeft className="w-4 h-4 rtl:rotate-180" />
+            {t('practiceResults.goHome')}
+          </button>
         </div>
       </div>
 

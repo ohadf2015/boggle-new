@@ -37,6 +37,8 @@ import {
   ProfileBackButtons,
 } from '@/components/profile';
 import { CosmeticCollection } from '@/components/cosmetics/CosmeticCollection';
+import { SeasonTrophyCase } from '@/components/seasons/SeasonTrophyCase';
+import { useSeasonBadges } from '@/hooks/useSeasonBadges';
 import { useCoinContext } from '@/contexts/CoinContext';
 import { useUnlockNotifier } from '@/hooks/useUnlockNotifier';
 
@@ -66,6 +68,7 @@ export default function ProfilePageClient(): React.JSX.Element {
   // Hooks
   const { spendCoins } = useCoinContext();
   const { collectibles: playerCollectibles, isLoading: isLoadingCollectibles } = usePlayerCollectibles(user?.id);
+  const { badges: seasonBadges, isLoading: isLoadingSeasonBadges } = useSeasonBadges(user?.id);
 
   // Surface a toast whenever a new cosmetic becomes available (rank-up / streak milestone).
   // Mounted on profile because that is where rank/streak are already loaded.
@@ -348,6 +351,7 @@ export default function ProfilePageClient(): React.JSX.Element {
                 transition={{ duration: 0.2 }}
               >
                 {user && <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }} className="mb-4"><ReferralCard /></motion.div>}
+                <SeasonTrophyCase badges={seasonBadges} isLoading={isLoadingSeasonBadges} delay={0.32} />
                 <ProfileCollection collectibles={playerCollectibles} isLoading={isLoadingCollectibles} isDarkMode={isDarkMode} />
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.37 }} className="mt-4">
                   <CosmeticCollection
@@ -416,7 +420,10 @@ export default function ProfilePageClient(): React.JSX.Element {
           {/* 6. Achievements */}
           <ProfileAchievements profile={profile} isDarkMode={isDarkMode} delay={0.3} />
 
-          {/* 7. Collection */}
+          {/* 7. Season Trophies (Top-5 placements) */}
+          <SeasonTrophyCase badges={seasonBadges} isLoading={isLoadingSeasonBadges} delay={0.33} />
+
+          {/* 7b. Collection */}
           <ProfileCollection collectibles={playerCollectibles} isLoading={isLoadingCollectibles} isDarkMode={isDarkMode} delay={0.35} />
           <CosmeticCollection
             rankTier={profile?.rank_tier || 'Bronze'}

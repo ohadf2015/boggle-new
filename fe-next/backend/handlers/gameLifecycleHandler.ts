@@ -148,7 +148,9 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
       const sanitizedPlayerId = playerId || undefined;
 
       if (gameExists(gameCode) || gamesBeingCreated.has(gameCode)) {
-        logger.warn('SOCKET', `Game code already exists or in-flight: ${gameCode}`);
+        // Expected dedup: client double-tapped Create or stale request retry.
+        // Server rejects via emitError; no need to ship to Sentry.
+        logger.info('SOCKET', `Game code already exists or in-flight: ${gameCode}`);
         emitError(socket, ErrorCodes.GAME_ALREADY_EXISTS);
         return;
       }
@@ -163,7 +165,8 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
 
       // Re-check after async yield — another socket may have created it
       if (gameExists(gameCode)) {
-        logger.warn('SOCKET', `Game code created by another socket during async: ${gameCode}`);
+        // Expected TOCTOU race; rejecting cleanly. Info-only.
+        logger.info('SOCKET', `Game code created by another socket during async: ${gameCode}`);
         emitError(socket, ErrorCodes.GAME_ALREADY_EXISTS);
         return;
       }

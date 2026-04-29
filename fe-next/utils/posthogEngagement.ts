@@ -246,6 +246,131 @@ export function createDeadTimeDetector(opts: { thresholdMs: number; mode: string
   };
 }
 
+// ---------- Platform detection ----------
+
+export type EngagementPlatform = 'crazygames' | 'android' | 'ios' | 'web';
+
+/**
+ * Detects the runtime platform for slicing PostHog cohorts. CrazyGames uses
+ * `window.__crazyGamesEnvironment` set by the SDK provider on first paint.
+ * Capacitor sets `window.Capacitor` on native shells. Everything else = web.
+ */
+export function detectPlatform(): EngagementPlatform {
+  if (typeof window === 'undefined') return 'web';
+  try {
+    if ((window as { __crazyGamesEnvironment?: string }).__crazyGamesEnvironment === 'crazygames') {
+      return 'crazygames';
+    }
+  } catch { /* noop */ }
+  try {
+    const cap = (window as { Capacitor?: { isNativePlatform?: () => boolean; getPlatform?: () => string } }).Capacitor;
+    if (cap?.isNativePlatform?.()) {
+      const p = cap.getPlatform?.();
+      if (p === 'ios') return 'ios';
+      return 'android';
+    }
+  } catch { /* noop */ }
+  return 'web';
+}
+
+// ---------- First-minute survival (CrazyGames ranking signal) ----------
+
+/**
+ * Fires `first_minute_retained` — the single most important CrazyGames
+ * ranking signal. CG's algorithm penalizes games where players bounce in
+ * <60s. Tracking this lets us A/B onboarding flows against bounce rate.
+ */
+export function trackFirstMinuteRetained(args: { mode: string; platform: EngagementPlatform }): void {
+  safe(() =>
+    (posthog.capture as PHFn)('first_minute_retained', {
+      mode: args.mode,
+      platform: args.platform,
+    })
+  );
+}
+
+/**
+ * Idempotent 60s timer. Call `start()` on game start, `cancel()` on early
+ * abandon. Fires once per instance — repeat `start()` is a no-op.
+ */
+export function createFirstMinuteSurvivalTimer(args: {
+  mode: string;
+  platform: EngagementPlatform;
+}): { start: () => void; cancel: () => void } {
+  let timer: ReturnType<typeof setTimeout> | null = null;
+  let fired = false;
+
+  return {
+    start() {
+      if (fired || timer) return;
+      timer = setTimeout(() => {
+        fired = true;
+        timer = null;
+        trackFirstMinuteRetained({ mode: args.mode, platform: args.platform });
+      }, 60_000);
+    },
+    cancel() {
+      if (timer) clearTimeout(timer);
+      timer = null;
+    },
+  };
+}
+
+// ---------- Replay loop (plays per session — CG engagement metric) ----------
+
+/**
+ * Replay button clicked from a results / end screen. Pair with
+ * `next_game_started` to build a "results→replay→played" funnel.
+ */
+export function trackReplayClicked(args: { mode: string; fromScreen: string }): void {
+  safe(() =>
+    (posthog.capture as PHFn)('replay_clicked', {
+      mode: args.mode,
+      from_screen: args.fromScreen,
+    })
+  );
+}
+
+/**
+ * Subsequent game in a session (gamesThisSession >= 2). Drives the CG
+ * "plays per session" metric — CG ranking weights replays heavily.
+ */
+export function trackNextGameStarted(args: { mode: string; gamesThisSession: number }): void {
+  safe(() =>
+    (posthog.capture as PHFn)('next_game_started', {
+      mode: args.mode,
+      games_this_session: args.gamesThisSession,
+    })
+  );
+}
+
+// ---------- Ad lifecycle (CG ad fill + revenue funnel) ----------
+
+export type AdLifecycleEvent = 'requested' | 'shown' | 'completed' | 'skipped' | 'error';
+export type AdType = 'midgame' | 'rewarded' | 'banner' | 'preroll';
+
+/**
+ * Capture each step of an ad's lifecycle so we can compute fill rate
+ * (`shown / requested`) and completion rate (`completed / shown`). On
+ * CrazyGames revenue scales with completion — surfacing skips/errors
+ * lets us tune placement frequency to maximize completion without
+ * burning the player.
+ */
+export function trackAdLifecycle(args: {
+  event: AdLifecycleEvent;
+  adType: AdType;
+  placement: string;
+  errorMessage?: string;
+}): void {
+  safe(() =>
+    (posthog.capture as PHFn)(`ad_${args.event}`, {
+      ad_type: args.adType,
+      placement: args.placement,
+      ...(args.errorMessage ? { error_message: args.errorMessage } : {}),
+    })
+  );
+}
+
 // ---------- Tab visibility tracker ----------
 
 /**

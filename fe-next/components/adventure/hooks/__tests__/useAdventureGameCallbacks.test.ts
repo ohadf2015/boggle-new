@@ -33,6 +33,7 @@ describe('useAdventureGameCallbacks', () => {
   const mockResetWordSubmitState = vi.fn();
   const mockResetFlashChallenge = vi.fn();
   const mockRetrySaveCompletion = vi.fn().mockResolvedValue(true);
+  const mockSetIsPaused = vi.fn();
   const mockT = vi.fn((key: string) => key);
 
   const defaultParams = {
@@ -80,6 +81,7 @@ describe('useAdventureGameCallbacks', () => {
     retrySaveCompletion: mockRetrySaveCompletion,
     timeRemaining: 60,
     timerSeconds: 120,
+    setIsPaused: mockSetIsPaused,
   };
 
   beforeEach(() => {
@@ -193,6 +195,31 @@ describe('useAdventureGameCallbacks', () => {
       expect(mockOnLevelComplete).toHaveBeenCalledWith(
         1, 500, 3, 50, 0, ['cat', 'dog', 'bat'], 0
       );
+    });
+  });
+
+  describe('handleRetry - clears isPaused (Sentry: pause→restart no-op)', () => {
+    it('should call setIsPaused(false) so the PauseOverlay unmounts after retry', () => {
+      const { result } = renderHook(() => useAdventureGameCallbacks(defaultParams));
+
+      act(() => {
+        result.current.handleRetry();
+      });
+
+      expect(mockSetIsPaused).toHaveBeenCalledWith(false);
+    });
+
+    it('should call setIsPaused(false) on boss-level retry too (no startGame branch)', () => {
+      const { result } = renderHook(() =>
+        useAdventureGameCallbacks({ ...defaultParams, isBossLevel: true })
+      );
+
+      act(() => {
+        result.current.handleRetry();
+      });
+
+      expect(mockSetIsPaused).toHaveBeenCalledWith(false);
+      expect(mockStartGame).not.toHaveBeenCalled();
     });
   });
 

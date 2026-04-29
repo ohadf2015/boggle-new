@@ -19,6 +19,7 @@ import {
   setPostHogSuperProps,
   setPostHogSuperPropsOnce,
   installTabVisibilityTracker,
+  detectPlatform,
 } from '@/utils/posthogEngagement';
 import { filterEmptyException } from '@/utils/posthogExceptionFilter';
 import { installAbandonOnPagehide } from '@/utils/abandonOnPagehide';
@@ -78,21 +79,33 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     initPostHog();
 
+    let platformRecheckId: ReturnType<typeof setTimeout> | null = null;
+
     // Register super properties attached to every event — lets you slice
-    // any funnel / cohort by locale + RTL in PostHog without joining data.
+    // any funnel / cohort by locale + RTL + platform in PostHog without joins.
     if (typeof document !== 'undefined') {
       const htmlLang = document.documentElement.lang || 'en';
       const isRtl = document.documentElement.dir === 'rtl';
+      const platform = detectPlatform();
       setPostHogSuperProps({
         locale: htmlLang,
         is_rtl: isRtl,
         viewport: `${window.innerWidth}x${window.innerHeight}`,
         touch: 'ontouchstart' in window,
+        platform,
       });
       setPostHogSuperPropsOnce({
         first_locale: htmlLang,
         first_touch: 'ontouchstart' in window,
+        first_platform: platform,
       });
+
+      // CG SDK detection is async — re-register `platform` after a short delay
+      // so events fired pre-detection are properly tagged.
+      platformRecheckId = setTimeout(() => {
+        const updated = detectPlatform();
+        if (updated !== platform) setPostHogSuperProps({ platform: updated });
+      }, 2_000);
     }
 
     // Tab-visibility tracker — attention time is a core engagement metric.
@@ -112,6 +125,7 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
     });
 
     return () => {
+      if (platformRecheckId) clearTimeout(platformRecheckId);
       uninstallVisibility();
       uninstallAbandon();
       unsubscribe();
