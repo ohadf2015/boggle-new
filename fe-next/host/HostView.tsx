@@ -16,7 +16,7 @@ import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 import { setStoredUsername, setStoredCustomAvatar } from '@/utils/profileStorage';
 import { useGameMode } from '@/hooks/gameState/store';
 import logger from '@/utils/logger';
-import { useWordHuntPlayerLives, useWordHuntEliminatedPlayers, useWordHuntTargetLength, useBlastWave } from '@/hooks/gameState/selectors';
+import { useBlastWave } from '@/hooks/gameState/selectors';
 
 // Extracted components
 import HostPreGameView from './components/HostPreGameView';
@@ -141,10 +141,9 @@ const HostView: React.FC<HostViewProps> = memo(({
     defaultLanguage: language as Language,
   });
 
-  // Mode-specific state from Zustand store (for TV broadcast)
-  const wordHuntPlayerLives = useWordHuntPlayerLives();
-  const wordHuntEliminatedPlayers = useWordHuntEliminatedPlayers();
-  const wordHuntTargetLength = useWordHuntTargetLength();
+  // Mode-specific state from Zustand store (for TV broadcast).
+  // wordHunt overlay state subscribed inside TvBroadcastView so this view
+  // doesn't re-render on word-hunt ticks when host isn't broadcasting.
   const blastWave = useBlastWave();
 
   // Earthquake/Fire Round state (managed via socket events)
@@ -667,9 +666,6 @@ const HostView: React.FC<HostViewProps> = memo(({
           earthquakeState={earthquakeState}
           fireRoundActive={fireRoundActive}
           fireRoundRemaining={fireRoundRemaining}
-          wordHuntPlayerLives={wordHuntPlayerLives}
-          wordHuntEliminatedPlayers={wordHuntEliminatedPlayers}
-          wordHuntTargetLength={wordHuntTargetLength}
           blastWave={blastWave}
         />
       )}

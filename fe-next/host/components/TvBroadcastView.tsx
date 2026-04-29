@@ -20,7 +20,12 @@ import { useTvFullscreen } from '../hooks/useTvFullscreen';
 import { useTvFinalMinute } from '../hooks/useTvFinalMinute';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
-import { useGameMode } from '@/hooks/gameState/store';
+import {
+  useGameMode,
+  useWordHuntPlayerLives,
+  useWordHuntEliminatedPlayers,
+  useWordHuntTargetLength,
+} from '@/hooks/gameState/store';
 import Image from 'next/image';
 import type { Language, LetterGrid, Avatar as AvatarType } from '@/shared/types/game';
 import type { EarthquakeState } from '@/shared/types/earthquake';
@@ -66,11 +71,6 @@ interface TvBroadcastViewProps {
   fireRoundActive?: boolean;
   fireRoundRemaining?: number;
 
-  // Word Hunt mode
-  wordHuntPlayerLives?: Record<string, number>;
-  wordHuntEliminatedPlayers?: string[];
-  wordHuntTargetLength?: number;
-
   // Blast mode
   blastWave?: number;
 }
@@ -110,14 +110,15 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
   fireRoundActive = false,
   fireRoundRemaining = 0,
 
-  // Word Hunt mode
-  wordHuntPlayerLives = {},
-  wordHuntEliminatedPlayers = [],
-  wordHuntTargetLength = 0,
-
   // Blast mode
   blastWave = 1,
 }) => {
+  // Mode-overlay state read directly from store — keeps HostView from
+  // re-rendering on word-hunt updates when the host isn't using TV broadcast.
+  const wordHuntPlayerLives = useWordHuntPlayerLives();
+  const wordHuntEliminatedPlayers = useWordHuntEliminatedPlayers();
+  const wordHuntTargetLength = useWordHuntTargetLength();
+
   // CrazyGames platform detection - fullscreen is managed by CrazyGames, not us
   const { isOnCrazyGamesPlatform } = useCrazyGames();
 
