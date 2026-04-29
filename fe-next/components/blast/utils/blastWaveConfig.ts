@@ -368,7 +368,7 @@ export function seedTargetWordObjective(
   const shouldAdd = ((wave * 37) % 100) < 25;
   if (!shouldAdd) return objectives;
 
-  const pool = getTargetWordPool(language);
+  const pool = getTargetWordPool(language as import('@/shared/types/game').Language);
   if (pool.length === 0) return objectives; // No words available for language
 
   const targetWord = pickRandomTargetWord(pool);

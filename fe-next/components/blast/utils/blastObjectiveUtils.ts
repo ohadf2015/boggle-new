@@ -57,7 +57,7 @@ export function formatObjectiveLabel(
 
   // Get color translation key
   const colorKey = objective.colorTag ? `blast.objective.color${objective.colorTag.charAt(0).toUpperCase()}${objective.colorTag.slice(1)}` : '';
-  const colorLabel = colorKey ? (t(colorKey) || objective.colorTag) : '';
+  const colorLabel: string = colorKey ? (t(colorKey) || objective.colorTag || '') : '';
 
   return template
     .replace('{target}', String(objective.target))
