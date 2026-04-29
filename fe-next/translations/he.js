@@ -1754,6 +1754,7 @@ const he = {
     "header": "מדריך מהיר",
     "loading": "טוען...",
     "skip": "דלג",
+    "skipTutorial": "דלגו על המדריך",
     "letsPlay": "בואו נשחק!",
     "timingHint": "10 השניות הראשונות קריטיות! 🎯",
     "step1Title": "החליקו אותיות",
@@ -1782,6 +1783,7 @@ const he = {
       "demoComplete": "הבנת! עכשיו את/ה יודע/ת לשחק.",
       "startHere": "התחילו כאן",
       "watchMe": "תראו!",
+      "demoAriaLabel": "הדגמה: {{word}}",
       "yourTurn": "תורכם! כתבו:",
       "letterCount": "{current}/{total}"
     },
@@ -2576,17 +2578,17 @@ const he = {
       "triesRule": {
         "title": "מה נחשב כניסיון?",
         "description": "רק מילים באורך הנכון משתמשות ב-10 הניסיונות שלך!",
-        "exampleTarget": "דוגמה: מילת היעד בת 5 אותיות",
-        "usesAttempt": "5 אותיות = משתמש בניסיון",
-        "noAttempt": "3 אותיות = בלי ניסיון, רק חיים!",
+        "exampleTarget": "דוגמה: מילת היעד בת 4 אותיות",
+        "usesAttempt": "4 אותיות = משתמש בניסיון",
+        "noAttempt": "2 אותיות = בלי ניסיון, רק חיים!",
         "keyInsight": "💡 מצא מילים קצרות בחינם לחיים בלי לבזבז ניסיונות!",
         "gotIt": "הבנתי!",
         "bonusTitle": "בונוס!",
-        "revealsClue": "מילים של 3+ אותיות גם חושפות רמזים!"
+        "revealsClue": "מילים קצרות גם חושפות רמזים!"
       },
       "letterFeedback": {
         "title": "קריאת הרמזים",
-        "example": "דוגמה: היעד הוא \"BEACH\"",
+        "example": "דוגמה",
         "gotIt": "הבנתי!",
         "legendGreen": "מקום נכון",
         "legendYellow": "מקום לא נכון",
@@ -2861,6 +2863,22 @@ const he = {
     "LOYAL_PLAYER": {
       "name": "שחקן נאמן",
       "description": "שיחק ב-30 ימים שונים"
+    },
+    "EARLY_BIRD": {
+      "name": "מקדים ת'תור",
+      "description": "מילה ראשונה תוך 2 שניות"
+    },
+    "PALINDROME_HUNTER": {
+      "name": "צייד פלינדרומים",
+      "description": "מצאת מילה שנקראת אותו דבר משני הכיוונים"
+    },
+    "COMEBACK_CHAMPION": {
+      "name": "אלוף הקאמבק",
+      "description": "ניצחת אחרי זינוק עוצמתי בסיומת"
+    },
+    "FIRST_GAME_WIN": {
+      "name": "ניצחון ראשון",
+      "description": "ניצחת במשחק הראשון שלך"
     },
     "DAILY_DOUBLE": {
       "name": "דאבל יומי 🏆",
@@ -3887,7 +3905,9 @@ const he = {
     "recentWords": "מילים אחרונות",
     "leaderboard": "טבלת מובילים",
     "words": "מילים",
-    "noPlayersYet": "אין שחקנים עדיין"
+    "noPlayersYet": "אין שחקנים עדיין",
+    "live": "בשידור",
+    "connecting": "מתחבר..."
   },
   "collectibles": {
     "title": "האוסף שלי",
@@ -3987,6 +4007,7 @@ const he = {
     "unequip": "הסר",
     "purchase": "קנה ({{cost}} זהב)",
     "close": "סגור",
+    "unlockedToast": "✨ קוסמטיקה חדשה נפתחה: {{name}}",
     "rarity": {
       "common": "נפוץ",
       "rare": "נדיר",
@@ -10676,6 +10697,7 @@ const he = {
     "title": "בחרו בוסט",
     "cta": "בוסט",
     "close": "סגור",
+    "skipAndPlay": "שחקו בלי בוסט",
     "remaining": "בוסטים שנותרו היום: {{n}}/{{cap}}",
     "watchAd": "צפו בפרסומת כדי לפתוח",
     "activeThisGame": "פעיל במשחק זה",
