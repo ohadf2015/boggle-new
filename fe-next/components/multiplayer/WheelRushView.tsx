@@ -2,7 +2,7 @@
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { Socket } from 'socket.io-client';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import dynamic from 'next/dynamic';
 import { RotateCcw, Shuffle, Sparkles } from 'lucide-react';
 import { WheelLetter, WordTile } from '@/components/daily/WordWheelParts';
@@ -79,6 +79,8 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
     playTileSelectSound, playWordAcceptedSound, playWordRejectedSound,
     playButtonClickSound, playBoardShuffleSound,
   } = useSoundEffects();
+
+  const prefersReduced = useReducedMotion();
 
   const [puzzle, setPuzzle] = useState<WheelPuzzle | null>(null);
   const [outerLetters, setOuterLetters] = useState<string[]>([]);
@@ -391,7 +393,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
 
       {fogActive && (
         <div className="text-center text-xs sm:text-sm text-neo-cyan font-neo-display font-bold tracking-wide flex items-center justify-center gap-2 shrink-0">
-          <span className="inline-block w-1.5 h-1.5 rounded-full bg-neo-cyan animate-pulse" />
+          <span className={cn('inline-block w-1.5 h-1.5 rounded-full bg-neo-cyan', !prefersReduced && 'animate-pulse')} />
           {t('wheel.rush.fogActive') || 'Fog of War active!'}
           <FogCountdown endsAt={fogEndsAt} />
         </div>
@@ -401,13 +403,15 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
       <motion.div
         className="relative w-full min-h-[52px] sm:min-h-[72px] flex items-center justify-center"
         animate={
-          wordBuilderShake
+          wordBuilderShake && !prefersReduced
             ? { x: [-4, 4, -3, 3, -1, 0] }
-            : { scale: 1 + builtLetters.length * 0.008 }
+            : { scale: prefersReduced ? 1 : 1 + builtLetters.length * 0.008 }
         }
-        transition={wordBuilderShake
+        transition={wordBuilderShake && !prefersReduced
           ? { duration: 0.35 }
-          : { type: 'spring', stiffness: 300, damping: 20 }
+          : prefersReduced
+            ? { duration: 0 }
+            : { type: 'spring', stiffness: 300, damping: 20 }
         }
       >
         <div className="flex items-center justify-center gap-1 sm:gap-2 flex-wrap max-w-full">
@@ -513,7 +517,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
             'hover:bg-neo-navy active:shadow-hard-pressed active:translate-x-px active:translate-y-px',
             'disabled:opacity-30 disabled:cursor-not-allowed',
           )}
-          whileTap={{ scale: 0.9 }}
+          whileTap={prefersReduced ? {} : { scale: 0.9 }}
           aria-label={t('wordWheel.clear') || 'Clear'}
         >
           <RotateCcw className="w-5 h-5" />
@@ -531,7 +535,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
             'active:shadow-hard-pressed active:translate-x-px active:translate-y-px',
             'disabled:cursor-not-allowed',
           )}
-          whileTap={builtWord.length >= MIN_LEN ? { scale: 0.92 } : {}}
+          whileTap={prefersReduced || builtWord.length < MIN_LEN ? {} : { scale: 0.92 }}
         >
           <div className="flex items-center gap-2">
             <Sparkles className="w-5 h-5" />
@@ -546,7 +550,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
             'p-3 rounded-neo border-3 border-neo-black bg-neo-navy-light text-neo-cream shadow-hard',
             'hover:bg-neo-navy active:shadow-hard-pressed active:translate-x-px active:translate-y-px',
           )}
-          whileTap={{ scale: 0.9, rotate: 180 }}
+          whileTap={prefersReduced ? {} : { scale: 0.9, rotate: 180 }}
           transition={{ type: 'spring', stiffness: 300 }}
           aria-label={t('wordWheel.shuffle') || 'Shuffle'}
         >

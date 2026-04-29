@@ -4,6 +4,12 @@ import { render, screen, act, fireEvent } from '@testing-library/react';
 import type { Socket } from 'socket.io-client';
 import { WHEEL_RUSH_FOG_MS } from '@/shared/constants/wheelRushConstants';
 
+let mockReducedMotion = false;
+vi.mock('framer-motion', async () => {
+  const actual = await vi.importActual<typeof import('framer-motion')>('framer-motion');
+  return { ...actual, useReducedMotion: () => mockReducedMotion };
+});
+
 vi.mock('@/contexts/SoundEffectsContext', () => ({
   useSoundEffects: () => ({
     playTileSelectSound: vi.fn(),
@@ -279,6 +285,30 @@ describe('WheelRushView', () => {
 
     const afterInit = onMock.mock.calls.length;
     expect(afterInit - beforeInit).toBe(0);
+  });
+
+  it('drops the animate-pulse class on the fog dot when prefers-reduced-motion is set', () => {
+    mockReducedMotion = true;
+    try {
+      const socket = makeMockSocket();
+      const { container } = render(
+        <WheelRushView
+          socket={socket}
+          username="alice"
+          leaderboard={[{ username: 'alice', score: 0 }]}
+          onQuit={vi.fn()}
+          t={tStub}
+        />,
+      );
+      act(() => {
+        socket.fire('wheelRushInit', { puzzle, startedAt: Date.now() });
+      });
+      const dot = container.querySelector('.bg-neo-cyan');
+      expect(dot).toBeTruthy();
+      expect(dot?.className.includes('animate-pulse')).toBe(false);
+    } finally {
+      mockReducedMotion = false;
+    }
   });
 
   it('does not render QuickReactions picker in-game', () => {

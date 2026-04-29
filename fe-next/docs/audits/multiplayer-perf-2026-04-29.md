@@ -8,6 +8,17 @@
 
 ## Shipped this session
 
+### CLIENT-T3 — WheelRushView reduced-motion guards (a11y + perf)
+
+**File:** `components/multiplayer/WheelRushView.tsx`
+**Severity (before):** MED — `wordBuilderShake` keyframes, fog dot `animate-pulse`, and three `whileTap` scales fired unconditionally regardless of OS-level `prefers-reduced-motion`. WCAG 2.1 AA (project requirement) violation, plus unnecessary layout/composite work for users who explicitly opted out of motion.
+**Fix:** Added `useReducedMotion()` hook. Guards:
+- Word-builder shake `animate` collapses to a static scale (1) when reduced; transition becomes `{ duration: 0 }`.
+- Fog dot `animate-pulse` Tailwind class dropped via `cn(..., !prefersReduced && 'animate-pulse')`.
+- All three `whileTap` scales (clear/submit/shuffle buttons) become `{}` when reduced.
+
+**Test:** Added "drops the animate-pulse class on the fog dot when prefers-reduced-motion is set". Mocks `framer-motion`'s `useReducedMotion` via partial-actual mock pattern (`vi.importActual` + selective override) controlled by a module-scope flag. RED on previous code, GREEN after guards. Pattern reusable for future a11y motion tests.
+
 ### CLIENT-T2 — WheelRushView socket effect deps stabilized
 
 **File:** `components/multiplayer/WheelRushView.tsx`
@@ -76,8 +87,8 @@ No `await`. The `.catch()` attaches a rejection handler to an unawaited promise;
 | S-M5 | `gameStateManager.ts:84-87` | `gameCache` TTL 30 min × max 200 — verify memory ceiling | open |
 | S-M6 | `shared/schemas/socketSchemas.ts` | Verify wheel-rush `gameMode` registered (carries from 04-28 audit) | open |
 | C-M1 | `MultiplayerInGameView.tsx:238-245` | 9 store hooks at root; push mode-specific subscriptions into their own components | open |
-| C-M2 | `WheelRushView.tsx:5` | Full `framer-motion` import; wrap in `LazyMotion(domAnimation)` | open (perf-profile-2026-04-22) |
-| C-M3 | `WheelRushView.tsx:368-420` | Pulse/shake without `useReducedMotion()` guard | open |
+| C-M2 | `WheelRushView.tsx:5` | Full `framer-motion` import; wrap in `LazyMotion(domAnimation)` | open — **app-wide sweep needed** (mixed `motion` imports in shared `WordWheelParts.tsx` + others negate single-file LazyMotion) |
+| ~~C-M3~~ | ~~`WheelRushView.tsx:368-420`~~ | ~~Pulse/shake without `useReducedMotion()` guard~~ | **shipped — see CLIENT-T3** |
 | C-M4 | `WheelRushView.tsx:303` | `getBoundingClientRect()` in undebounced resize handler | open |
 | ~~C-M5~~ | ~~`WheelRushView.tsx:187-200`~~ | ~~`socket.on('connect')` not `off`'d~~ | **dropped — false claim, see CLIENT-T2** |
 | C-M6 | `MultiplayerInGameView.tsx:26` | `BlastGame` (528 lines) imported eagerly though branch-rendered | open |
