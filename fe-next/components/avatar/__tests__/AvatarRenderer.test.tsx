@@ -46,4 +46,36 @@ describe('AvatarRenderer', () => {
     const svg = screen.getByTestId('custom-avatar');
     expect(svg).toHaveClass('my-class');
   });
+
+  describe('neo-brutalist v2', () => {
+    it('uses hard offset shadow (no Gaussian blur)', () => {
+      render(<AvatarRenderer config={DEFAULT_AVATAR_CONFIG} />);
+      const svg = screen.getByTestId('custom-avatar');
+      // Brand: hard shadow only, no blur
+      expect(svg.querySelector('feDropShadow')).toBeNull();
+      expect(svg.querySelector('feGaussianBlur')).toBeNull();
+      // Hard-shadow filter must use offset
+      const feOffset = svg.querySelector('feOffset');
+      expect(feOffset).not.toBeNull();
+      expect(feOffset?.getAttribute('dx')).toBe('2');
+      expect(feOffset?.getAttribute('dy')).toBe('2');
+    });
+
+    it('renders halftone dot pattern overlay on background', () => {
+      render(<AvatarRenderer config={DEFAULT_AVATAR_CONFIG} />);
+      const svg = screen.getByTestId('custom-avatar');
+      const pattern = svg.querySelector('pattern[data-halftone]');
+      expect(pattern).not.toBeNull();
+      // Pattern must contain at least one circle (the dot)
+      expect(pattern?.querySelector('circle')).not.toBeNull();
+    });
+
+    it('hard-shadow filter floods solid black (no opacity blur)', () => {
+      render(<AvatarRenderer config={DEFAULT_AVATAR_CONFIG} />);
+      const svg = screen.getByTestId('custom-avatar');
+      const flood = svg.querySelector('feFlood');
+      expect(flood).not.toBeNull();
+      expect(flood?.getAttribute('flood-color')).toBe('#000');
+    });
+  });
 });

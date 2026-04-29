@@ -77,6 +77,7 @@ const SKIP_FEMALE_LASHES_EYES = new Set([
 const AvatarRenderer = memo<AvatarRendererProps>(({ config, size = 64, className = '', disableEffects, forceTier, circular }) => {
   const uid = useId();
   const faceShadowId = `fs${uid}`;
+  const halftoneId = `ht${uid}`;
   const BasePart = BASE_PARTS[config.base] ?? BASE_PARTS.round;
   const EyePart = EYE_PARTS[config.eyes] ?? EYE_PARTS.round;
   const MouthPart = MOUTH_PARTS[config.mouth] ?? MOUTH_PARTS.smile;
@@ -109,18 +110,39 @@ const AvatarRenderer = memo<AvatarRendererProps>(({ config, size = 64, className
       aria-label={`Avatar: ${config.base} face, ${config.eyes} eyes, ${config.hair} hair`}
       data-testid="custom-avatar"
     >
-      {/* Shared filter definitions */}
+      {/* Shared filter definitions — neo-brutalist hard offset shadow (NO blur) */}
       <defs>
         <filter id={faceShadowId} x="-10%" y="-10%" width="120%" height="130%">
-          <feDropShadow dx="0" dy="3" stdDeviation="2.5" floodColor="#000" floodOpacity="0.3" />
+          <feOffset dx="2" dy="2" in="SourceAlpha" result="offset" />
+          <feFlood floodColor="#000" floodOpacity="0.55" />
+          <feComposite in2="offset" operator="in" result="shadow" />
+          <feMerge>
+            <feMergeNode in="shadow" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
         </filter>
+        <pattern
+          id={halftoneId}
+          data-halftone=""
+          patternUnits="userSpaceOnUse"
+          width="6"
+          height="6"
+        >
+          <circle cx="1.5" cy="1.5" r="0.7" fill="#000" />
+        </pattern>
       </defs>
 
-      {/* Background */}
+      {/* Background — solid color + halftone dot overlay (brand texture) */}
       {circular ? (
-        <circle cx="50" cy="50" r="50" fill={config.bgColor} />
+        <>
+          <circle cx="50" cy="50" r="50" fill={config.bgColor} />
+          <circle cx="50" cy="50" r="50" fill={`url(#${halftoneId})`} opacity="0.08" />
+        </>
       ) : (
-        <rect x="0" y="0" width="100" height="100" rx="16" fill={config.bgColor} />
+        <>
+          <rect x="0" y="0" width="100" height="100" rx="16" fill={config.bgColor} />
+          <rect x="0" y="0" width="100" height="100" rx="16" fill={`url(#${halftoneId})`} opacity="0.08" />
+        </>
       )}
 
       {/* Body (shoulders/torso at bottom) */}
