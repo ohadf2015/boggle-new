@@ -8902,6 +8902,19 @@ const en = {
         "blast": "Blast",
         "wheelRush": "Wheel Rush"
       },
+      "timer": {
+        "title": "Timer",
+        "min1": "1 min",
+        "min2": "2 min",
+        "min3": "3 min",
+        "min5": "5 min"
+      },
+      "board": {
+        "title": "Board Size",
+        "small": "Small (4×4)",
+        "medium": "Medium (5×5)",
+        "large": "Large (6×6)"
+      },
       "create": "Create Classroom",
       "edit": "Edit Classroom",
       "delete": "Delete Classroom",
@@ -9389,6 +9402,7 @@ const en = {
       "shareCode": "Share Code",
       "shareCodeWithStudents": "Share code with students",
       "startGame": "Start Game",
+      "createRoom": "Create Room",
       "startGameDescription": "Launch the classroom game",
       "title": "Classroom Game",
       "waitingForPlayers": "Waiting for players...",

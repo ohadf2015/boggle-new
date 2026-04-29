@@ -1,6 +1,6 @@
 'use client';
 
-import React, { memo, useState, useEffect } from 'react';
+import React, { memo, useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Timer, Zap, Monitor } from 'lucide-react';
 import TvJoinBar from './TvJoinBar';
@@ -59,7 +59,17 @@ const TvLobbyView = memo<TvLobbyViewProps>(({
   tournamentCreating,
   setHostPlaying,
 }) => {
-  const playerCount = playersReady.length;
+  // TV mode = host is the screen, NOT a competitor. Strip the host record so
+  // counts/roster only reflect joining players. Mirror of HostPreGameView's
+  // host-not-playing filter (HostPreGameView.tsx:194-201).
+  const filteredPlayers = useMemo(() => {
+    return playersReady.filter((player) => {
+      const name = typeof player === 'string' ? player : player.username;
+      const isHostPlayer = typeof player === 'object' ? player.isHost : false;
+      return !isHostPlayer && name !== username;
+    });
+  }, [playersReady, username]);
+  const playerCount = filteredPlayers.length;
   const storeGameMode = useGameMode();
   const { setGameMode: setStoreGameMode } = useGameActions();
   const [localGameMode, setLocalGameMode] = useState<GameModeOption>(storeGameMode || 'random');
@@ -99,7 +109,7 @@ const TvLobbyView = memo<TvLobbyViewProps>(({
           {/* Player roster — TV-sized */}
           <div className="flex-1">
             <PlayerRoster
-              players={playersReady}
+              players={filteredPlayers}
               username={username}
               gameCode={gameCode}
               maxPlayers={8}

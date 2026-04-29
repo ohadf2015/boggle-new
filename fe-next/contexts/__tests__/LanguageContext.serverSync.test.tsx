@@ -1,7 +1,7 @@
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import React from 'react';
-import { render, waitFor } from '@testing-library/react';
-import { LanguageProvider } from '../LanguageContext';
+import { act, render, renderHook, waitFor } from '@testing-library/react';
+import { LanguageProvider, useLanguage } from '../LanguageContext';
 
 const pushMock = vi.fn();
 const replaceMock = vi.fn();
@@ -47,7 +47,33 @@ describe('LanguageContext — server-side language sync', () => {
             const call = fetchMock.mock.calls.find((c) => c[0] === '/api/user/language');
             expect(call).toBeDefined();
             expect(call![1]).toMatchObject({ method: 'POST' });
-            expect(JSON.parse(call![1].body)).toEqual({ language: 'en' });
+            // Auto-sync: explicit=false signals to API "do not clobber existing pref"
+            expect(JSON.parse(call![1].body)).toEqual({ language: 'en', explicit: false });
+        });
+    });
+
+    it('setLanguage() POSTs explicit:true so deliberate switcher click overwrites server', async () => {
+        mockPathname = '/en';
+
+        const wrapper = ({ children }: { children: React.ReactNode }) => (
+            <LanguageProvider initialLanguage="en">{children}</LanguageProvider>
+        );
+        const { result } = renderHook(() => useLanguage(), { wrapper });
+
+        // Wait for the mount auto-sync POST to fire.
+        await waitFor(() => {
+            expect(fetchMock.mock.calls.some((c) => c[0] === '/api/user/language')).toBe(true);
+        });
+        fetchMock.mockClear();
+
+        act(() => {
+            result.current.setLanguage('he', { skipNavigation: true });
+        });
+
+        await waitFor(() => {
+            const call = fetchMock.mock.calls.find((c) => c[0] === '/api/user/language');
+            expect(call).toBeDefined();
+            expect(JSON.parse(call![1].body)).toEqual({ language: 'he', explicit: true });
         });
     });
 
@@ -115,7 +141,7 @@ describe('LanguageContext — server-side language sync', () => {
         await waitFor(() => {
             const call = fetchMock.mock.calls.find((c) => c[0] === '/api/user/language');
             expect(call).toBeDefined();
-            expect(JSON.parse(call![1].body)).toEqual({ language: 'en' });
+            expect(JSON.parse(call![1].body)).toEqual({ language: 'en', explicit: false });
         });
     });
 
@@ -144,7 +170,7 @@ describe('LanguageContext — server-side language sync', () => {
         await waitFor(() => {
             const call = fetchMock.mock.calls.find((c) => c[0] === '/api/user/language');
             expect(call).toBeDefined();
-            expect(JSON.parse(call![1].body)).toEqual({ language: 'he' });
+            expect(JSON.parse(call![1].body)).toEqual({ language: 'he', explicit: false });
         });
     });
 });

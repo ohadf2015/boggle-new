@@ -3,8 +3,14 @@ import { z } from 'zod';
 import { createClient } from '@/utils/supabase/server';
 import { SUPPORTED_PUSH_LOCALES } from '@/backend/utils/pushTranslations';
 
+// `explicit` distinguishes deliberate user choice (switcher click) from
+// auto-sync on mount (URL/cookie/browser-derived). Without this flag the
+// auto-sync would clobber a user's real preference whenever they happened
+// to land on a non-default-locale URL — push notifications then go out in
+// the wrong language. Auto-sync only fills NULL rows; explicit always wins.
 const bodySchema = z.object({
   language: z.enum(SUPPORTED_PUSH_LOCALES as readonly [string, ...string[]]),
+  explicit: z.boolean().optional(),
 });
 
 export async function POST(request: Request) {
@@ -28,10 +34,14 @@ export async function POST(request: Request) {
       );
     }
 
-    const { error } = await supabase
+    const update = supabase
       .from('profiles')
       .update({ language: parsed.data.language, updated_at: new Date().toISOString() })
       .eq('id', user.id);
+
+    const { error } = parsed.data.explicit === true
+      ? await update
+      : await update.is('language', null);
 
     if (error) {
       console.error('Failed to update profiles.language:', error);

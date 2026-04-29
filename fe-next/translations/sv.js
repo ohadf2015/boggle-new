@@ -8702,6 +8702,19 @@ const sv = {
         "blast": "Blast",
         "wheelRush": "Hjulrush"
       },
+      "timer": {
+        "title": "Timer",
+        "min1": "1 min",
+        "min2": "2 min",
+        "min3": "3 min",
+        "min5": "5 min"
+      },
+      "board": {
+        "title": "Brädstorlek",
+        "small": "Liten (4×4)",
+        "medium": "Mellan (5×5)",
+        "large": "Stor (6×6)"
+      },
       "create": "Skapa klassrum",
       "edit": "Redigera klassrum",
       "delete": "Ta bort klassrum",
@@ -9182,6 +9195,7 @@ const sv = {
       "shareCode": "Dela kod",
       "shareCodeWithStudents": "Dela koden med eleverna",
       "startGame": "Starta spel",
+      "createRoom": "Skapa rum",
       "startGameDescription": "Starta klassrumsspelet",
       "title": "Klassrumsspel",
       "waitingForPlayers": "Väntar på spelare...",

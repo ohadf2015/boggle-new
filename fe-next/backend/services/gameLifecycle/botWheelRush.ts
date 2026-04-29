@@ -11,7 +11,7 @@
 import type { Server } from 'socket.io';
 import type { Language, WheelPuzzle, WheelRushModeState } from '@/shared/types/game';
 import type { Bot } from '../../modules/botBehavior';
-import { getGame, updatePlayerScore } from '../../modules/gameStateManager';
+import { getGame, updatePlayerScore, addPlayerWord } from '../../modules/gameStateManager';
 import {
   getLeaderboardThrottled,
   type LeaderboardPlayer,
@@ -129,6 +129,12 @@ function submitOneWord(
     if (!shouldBotScore(gameCode, bot.username, bot.score, total, bot.difficulty)) return;
     bot.score += total;
     updatePlayerScore(gameCode, bot.username, total, true);
+    addPlayerWord(gameCode, bot.username, word, {
+      score: total,
+      validated: true,
+      autoValidated: true,
+      isBot: true,
+    });
     broadcastToRoom(io, getGameRoom(gameCode), 'wheelWordLocked', {
       word, by: bot.username, lockUntil: outcome.lockUntil,
     });
@@ -143,6 +149,12 @@ function submitOneWord(
     if (!shouldBotScore(gameCode, bot.username, bot.score, total, bot.difficulty)) return;
     bot.score += total;
     updatePlayerScore(gameCode, bot.username, total, true);
+    addPlayerWord(gameCode, bot.username, word, {
+      score: total,
+      validated: true,
+      autoValidated: true,
+      isBot: true,
+    });
     broadcastToRoom(io, getGameRoom(gameCode), 'wheelWordStolen', {
       word, by: bot.username, from: outcome.from,
     });

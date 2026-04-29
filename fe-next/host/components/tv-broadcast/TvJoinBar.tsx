@@ -37,7 +37,7 @@ const TvJoinBar = memo<TvJoinBarProps>(({
       transition={{ type: 'spring', stiffness: 300, damping: 30 }}
       className="w-full bg-neo-purple border-b-4 border-neo-black relative z-40"
     >
-      <div className="max-w-7xl mx-auto px-4 py-3">
+      <div className="max-w-7xl mx-auto px-4 py-4 md:py-5">
         {/* Main row: Join info + Code + QR */}
         <div className="flex items-center justify-between gap-4">
           {/* Left: Join URL */}

@@ -2,6 +2,7 @@
 
 import React, { useCallback, useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { QRCodeSVG } from 'qrcode.react';
 import { Copy, Check, Share2, Maximize2, X } from 'lucide-react';
@@ -134,16 +135,35 @@ export function InviteCard({
     </AnimatePresence>
   );
 
-  // Invite card with "BRING YOUR SQUAD" header and prominent QR
+  // Invite card with hero illustration header + prominent CTAs
   return (
     <>
       <div
         data-testid="invite-card"
         className={cn(
-          'rounded-neo-lg border-3 border-neo-cyan/50 bg-slate-800/90 shadow-hard overflow-hidden ring-1 ring-neo-cyan/20',
+          'rounded-neo-lg border-3 border-neo-lime/60 bg-slate-800/90 shadow-hard-lg overflow-hidden ring-2 ring-neo-lime/20',
           className
         )}
       >
+        {/* Hero illustration header — kawaii squad illustration sets the
+            "play with friends" mood. Drives invite-action prominence by
+            making the card feel like a feature, not a settings strip. */}
+        <div className="relative w-full h-[120px] overflow-hidden border-b-3 border-neo-black">
+          <Image
+            src="/images/invite-hero.jpg"
+            alt=""
+            fill
+            sizes="(min-width: 1024px) 360px, 100vw"
+            className="object-cover"
+          />
+          <div className="absolute inset-0 bg-linear-to-t from-slate-900/90 via-slate-900/30 to-transparent" />
+          <div className="absolute inset-x-0 bottom-0 px-4 py-2.5">
+            <p className="text-base font-black uppercase tracking-widest text-neo-lime drop-shadow-[2px_2px_0_rgba(0,0,0,0.8)] font-neo-display">
+              {t('hostView.bringYourSquad')}
+            </p>
+          </div>
+        </div>
+
         {/* Compact horizontal row: QR thumbnail + code | COPY LINK | Share */}
         <div className="px-4 py-3 flex items-center gap-3">
           {/* QR thumbnail + room code */}
@@ -173,16 +193,17 @@ export function InviteCard({
             </div>
           </button>
 
-          {/* COPY LINK button */}
+          {/* COPY LINK button — primary CTA, lime to match hero accent and
+              read as the next action, not a tertiary control. */}
           <motion.button
             data-testid="copy-link-button"
             onClick={handleCopyLink}
             whileTap={{ scale: 0.95 }}
             className={cn(
-              'flex-1 h-11 flex items-center justify-center gap-2 rounded-lg border-2 border-neo-black text-[10px] font-bold uppercase tracking-widest transition-all',
+              'flex-1 h-11 flex items-center justify-center gap-2 rounded-lg border-2 border-neo-black text-xs font-black uppercase tracking-widest transition-all shadow-hard',
               linkCopied
                 ? 'bg-neo-lime text-neo-black'
-                : 'bg-neo-navy-light text-neo-cream hover:bg-white hover:text-neo-black shadow-hard'
+                : 'bg-neo-lime text-neo-black hover:-translate-y-0.5 active:shadow-hard-pressed active:translate-y-0.5'
             )}
             aria-label={t('roomCode.copyLink')}
           >

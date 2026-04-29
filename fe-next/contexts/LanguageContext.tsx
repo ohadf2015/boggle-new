@@ -204,12 +204,12 @@ export const LanguageProvider = ({ children, initialLanguage, initialTranslation
         }
     }, [language]);
 
-    // Sync current language to profiles.language so server-side push notifications
-    // can localize per recipient. Fires once per (session, language) pair: users
-    // who arrive via cookie/URL never clicked the switcher, so profiles.language
-    // would otherwise stay NULL and all pushes default to English.
-    // 401 for anonymous users leaves the dedup gate UNSET so a later mount
-    // (e.g. after the user logs in and refreshes / navigates) retries the POST.
+    // Auto-sync current language to profiles.language for server-side push
+    // localization. `explicit: false` tells the API "fill if NULL, don't
+    // clobber" — otherwise visiting /en/anything would silently overwrite
+    // a Hebrew speaker's stored preference and route every push in English.
+    // Deliberate switcher clicks go through setLanguage() with explicit:true.
+    // 401 (anonymous) leaves the dedup gate UNSET so a later post-login mount retries.
     useEffect(() => {
         if (typeof window === 'undefined' || typeof fetch === 'undefined') return;
         const key = `boggle_language_synced:${language}`;
@@ -223,7 +223,7 @@ export const LanguageProvider = ({ children, initialLanguage, initialTranslation
         fetch('/api/user/language', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ language }),
+            body: JSON.stringify({ language, explicit: false }),
         })
             .then((res) => {
                 if (res.ok) {
@@ -250,12 +250,17 @@ export const LanguageProvider = ({ children, initialLanguage, initialTranslation
             }
 
             // Fire-and-forget: persist to profiles.language so per-recipient push
-            // notifications can be localized server-side. Ignored if unauthenticated.
+            // notifications can be localized server-side. `explicit:true` lets the
+            // API overwrite any prior auto-synced value — switcher click is the
+            // user's deliberate intent and must win over URL/cookie heuristics.
             if (typeof fetch !== 'undefined') {
+                // Reset session dedup so the auto-sync effect won't bail on the next
+                // mount, and so subsequent re-mounts re-confirm the explicit choice.
+                try { sessionStorage.removeItem(`boggle_language_synced:${newLang}`); } catch { /* ignore */ }
                 fetch('/api/user/language', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ language: newLang }),
+                    body: JSON.stringify({ language: newLang, explicit: true }),
                 }).catch(() => { /* non-blocking */ });
             }
 

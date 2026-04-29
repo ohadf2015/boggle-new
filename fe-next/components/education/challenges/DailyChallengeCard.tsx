@@ -13,10 +13,10 @@ interface DailyChallengeCardProps {
 export function DailyChallengeCard({ challenge, onClaim }: DailyChallengeCardProps) {
   const { t } = useLanguage();
 
-  const tierColors = {
-    easy: 'bg-green-500',
-    medium: 'bg-neo-pink',
-    hard: 'bg-neo-pink',
+  const tierColors: Record<'easy' | 'medium' | 'hard', string> = {
+    easy: 'bg-neo-lime text-neo-black',
+    medium: 'bg-neo-cyan text-neo-black',
+    hard: 'bg-neo-pink text-white',
   };
 
   const progress = challenge.target_value > 0
@@ -35,7 +35,7 @@ export function DailyChallengeCard({ challenge, onClaim }: DailyChallengeCardPro
       {/* Tier Badge */}
       <div className="flex items-center justify-between mb-2">
         <span
-          className={`${tierColors[challenge.challenge_tier]} text-white text-xs font-bold px-2 py-1 rounded uppercase`}
+          className={`${tierColors[challenge.challenge_tier as 'easy' | 'medium' | 'hard']} text-xs font-black px-2 py-1 rounded uppercase border-neo border-neo-black`}
           data-testid="tier-badge"
         >
           {t(`challenges.${challenge.challenge_tier}`)}
@@ -46,12 +46,12 @@ export function DailyChallengeCard({ challenge, onClaim }: DailyChallengeCardPro
       <h3 className="font-neo-display text-lg text-white mb-1" data-testid="challenge-title">
         {t(challenge.title)}
       </h3>
-      <p className="text-sm text-neo-white/60 mb-3" data-testid="challenge-description">
+      <p className="text-sm text-neo-white/85 mb-3" data-testid="challenge-description">
         {t(challenge.description, { target: challenge.target_value })}
       </p>
 
       {/* Progress Bar */}
-      <div className="relative h-6 bg-neo-navy rounded-full overflow-hidden mb-3" data-testid="progress-bar">
+      <div className="relative h-6 bg-neo-navy-light border border-neo-black rounded-full overflow-hidden mb-3" data-testid="progress-bar">
         <motion.div
           className="absolute inset-y-0 left-0 bg-neo-cyan"
           initial={{ width: 0 }}
@@ -85,7 +85,7 @@ export function DailyChallengeCard({ challenge, onClaim }: DailyChallengeCardPro
 
       {/* Claimed State */}
       {isClaimed && (
-        <div className="text-center text-green-400 font-bold" data-testid="claimed-badge">
+        <div className="text-center text-neo-lime font-bold" data-testid="claimed-badge">
           <Check className="w-4 h-4 inline" /> {t('challenges.claimed')}
         </div>
       )}

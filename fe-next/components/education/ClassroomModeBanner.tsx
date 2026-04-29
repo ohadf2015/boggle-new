@@ -112,8 +112,8 @@ export function ClassroomModeBanner({ lessonData, gameCode, expanded = false }: 
 
         {lessonName && (
           <>
-            <span className="text-neo-white/30">|</span>
-            <div className="flex items-center gap-1.5 text-neo-white/70">
+            <span className="text-neo-white/50" aria-hidden="true">|</span>
+            <div className="flex items-center gap-1.5 text-neo-white/90">
               <BookOpen className="w-3.5 h-3.5" />
               <span className="truncate max-w-[200px] sm:max-w-[400px]">{lessonName}</span>
             </div>
@@ -122,8 +122,8 @@ export function ClassroomModeBanner({ lessonData, gameCode, expanded = false }: 
 
         {wordCount > 0 && (
           <>
-            <span className="text-neo-white/30">|</span>
-            <span className="text-neo-white/50">
+            <span className="text-neo-white/50" aria-hidden="true">|</span>
+            <span className="text-neo-white/85">
               {t('education.classroomGame.words', { count: wordCount })}
             </span>
           </>
@@ -135,7 +135,7 @@ export function ClassroomModeBanner({ lessonData, gameCode, expanded = false }: 
           <div className="max-w-5xl mx-auto grid gap-4 sm:gap-5 md:grid-cols-[1.1fr_1fr]">
             {/* Join info card */}
             <div className="p-4 sm:p-5 rounded-neo border-neo-thick border-neo-black bg-neo-cyan/15 shadow-hard-lg">
-              <p className="text-xs sm:text-sm text-neo-white/70 font-neo-body text-center mb-2">
+              <p className="text-xs sm:text-sm text-neo-white/90 font-neo-body text-center mb-2">
                 {t('education.classroomGame.shareCode')}
               </p>
               <div className="flex items-center justify-center gap-3">
@@ -158,7 +158,7 @@ export function ClassroomModeBanner({ lessonData, gameCode, expanded = false }: 
 
               {joinUrl && (
                 <div className="flex flex-col items-center gap-2 mt-4">
-                  <p className="text-xs text-neo-white/60 font-neo-body">
+                  <p className="text-xs text-neo-white/85 font-neo-body">
                     {t('education.classroomGame.scanToJoin')}
                   </p>
                   <div className="p-2 bg-neo-cream rounded-neo border-neo border-neo-black shadow-hard-sm">
@@ -204,7 +204,7 @@ export function ClassroomModeBanner({ lessonData, gameCode, expanded = false }: 
                   <div className="flex items-center gap-2 text-neo-pink font-bold text-sm mb-2">
                     <BookOpen className="w-4 h-4" />
                     <span className="truncate">{lessonName}</span>
-                    <span className="text-neo-white/50 ms-auto shrink-0 font-neo-body">
+                    <span className="text-neo-white/85 ms-auto shrink-0 font-neo-body">
                       {t('education.classroomGame.words', { count: wordCount })}
                     </span>
                   </div>
@@ -213,13 +213,13 @@ export function ClassroomModeBanner({ lessonData, gameCode, expanded = false }: 
                       {previewWords.map((w) => (
                         <span
                           key={w}
-                          className="px-2 py-0.5 text-xs rounded-full bg-neo-cyan/10 border border-neo-cyan/30 text-neo-white/80 font-neo-body"
+                          className="px-2 py-0.5 text-xs rounded-full bg-neo-cyan/15 border border-neo-cyan/60 text-neo-white font-neo-body"
                         >
                           {w}
                         </span>
                       ))}
                       {wordCount > previewWords.length && (
-                        <span className="px-2 py-0.5 text-xs text-neo-white/50 font-neo-body">
+                        <span className="px-2 py-0.5 text-xs text-neo-white/85 font-neo-body">
                           +{wordCount - previewWords.length}
                         </span>
                       )}
@@ -245,8 +245,8 @@ function SummaryTile({
   value: React.ReactNode;
 }) {
   return (
-    <div className="p-2.5 rounded-neo border border-neo-black/60 bg-neo-navy/50">
-      <div className="flex items-center gap-1.5 text-neo-white/50 text-[10px] uppercase tracking-wide mb-1">
+    <div className="p-3 rounded-neo border border-neo-black bg-neo-navy-light/80">
+      <div className="flex items-center gap-1.5 text-neo-white/85 text-[10px] uppercase tracking-wide mb-1">
         {icon}
         <span>{label}</span>
       </div>

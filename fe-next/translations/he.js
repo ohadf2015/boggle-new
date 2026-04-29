@@ -8667,6 +8667,19 @@ const he = {
         "blast": "בלאסט",
         "wheelRush": "מרוץ הגלגל"
       },
+      "timer": {
+        "title": "טיימר",
+        "min1": "דקה",
+        "min2": "2 דקות",
+        "min3": "3 דקות",
+        "min5": "5 דקות"
+      },
+      "board": {
+        "title": "גודל לוח",
+        "small": "קטן (4×4)",
+        "medium": "בינוני (5×5)",
+        "large": "גדול (6×6)"
+      },
       "create": "צור כיתה",
       "edit": "ערוך כיתה",
       "delete": "מחק כיתה",
@@ -9147,6 +9160,7 @@ const he = {
       "shareCode": "שתפו קוד",
       "shareCodeWithStudents": "שתפו את הקוד עם התלמידים",
       "startGame": "התחל משחק",
+      "createRoom": "צור חדר",
       "startGameDescription": "הפעלת משחק כיתתי",
       "title": "משחק כיתתי",
       "waitingForPlayers": "ממתין לשחקנים...",

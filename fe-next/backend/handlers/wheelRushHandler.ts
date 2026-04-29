@@ -9,6 +9,7 @@ import {
   getGameBySocketId,
   getUsernameBySocketId,
   updatePlayerScore,
+  addPlayerWord,
 } from '../modules/gameStateManager.js';
 import {
   getLeaderboardThrottled,
@@ -73,6 +74,11 @@ export function handleSubmitWheelWord(io: Server, socket: Socket, data: SubmitWh
 
   if (outcome.kind === 'locked') {
     updatePlayerScore(gameCode, username, outcome.score, true);
+    addPlayerWord(gameCode, username, word, {
+      score: outcome.score,
+      validated: true,
+      autoValidated: true,
+    });
     socket.emit('wheelWordResult', {
       word, accepted: true, kind: 'locked',
       score: outcome.score, lockUntil: outcome.lockUntil,
@@ -97,6 +103,11 @@ export function handleSubmitWheelWord(io: Server, socket: Socket, data: SubmitWh
   if (outcome.kind === 'stolen') {
     const total = outcome.score + outcome.stealBonus;
     updatePlayerScore(gameCode, username, total, true);
+    addPlayerWord(gameCode, username, word, {
+      score: total,
+      validated: true,
+      autoValidated: true,
+    });
     socket.emit('wheelWordResult', {
       word, accepted: true, kind: 'stolen',
       score: total, stolenFrom: outcome.from,

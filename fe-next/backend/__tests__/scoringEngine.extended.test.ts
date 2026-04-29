@@ -100,3 +100,38 @@ describe('Scoring Strategy Scenarios', () => {
     expect(perfFire).toBeGreaterThan(speedFire);
   });
 });
+
+describe('Scoring Engine - Wheel Rush mode', () => {
+  test('wheel-rush totalScore equals sum of pre-calculated word scores (no rarity inflation)', () => {
+    const game = createMockGame({
+      gameMode: 'wheel-rush',
+      users: { p1: createTestUser('p1'), p2: createTestUser('p2') },
+      playerWords: { p1: ['cane', 'tea'], p2: ['cane', 'east'] },
+      playerWordDetails: {
+        p1: [
+          { word: 'cane', score: 18, validated: true },
+          { word: 'tea', score: 6, validated: true },
+        ],
+        p2: [
+          { word: 'cane', score: 11, validated: true },
+          { word: 'east', score: 9, validated: true },
+        ],
+      },
+    });
+    const result = calculateGameScores(
+      game,
+      { cane: 2, tea: 1, east: 1 },
+      new Set(['cane', 'tea', 'east']),
+      new Set(),
+      new Map<string, AiValidationResult>(),
+      { playerCount: 2, gameMode: 'wheel-rush' }
+    );
+    const p1 = result.find(r => r.username === 'p1')!;
+    const p2 = result.find(r => r.username === 'p2')!;
+    expect(p1.totalScore).toBe(24);
+    expect(p2.totalScore).toBe(20);
+    for (const r of result) {
+      for (const w of r.allWords) expect(w.isDuplicate).toBe(false);
+    }
+  });
+});

@@ -37,6 +37,7 @@ vi.mock('../../modules/gameStateManager', () => ({
   getGameBySocketId: vi.fn(() => 'GAME1'),
   getUsernameBySocketId: vi.fn(() => 'p1'),
   updatePlayerScore: vi.fn(),
+  addPlayerWord: vi.fn(),
 }));
 
 vi.mock('../../modules/wheelRushManager', () => ({
@@ -47,7 +48,7 @@ vi.mock('../../modules/wheelRushManager', () => ({
 
 import { handleSubmitWheelWord, handleRequestWheelRushState } from '../wheelRushHandler';
 import { broadcastToRoom } from '../../utils/socketHelpers';
-import { getGame, updatePlayerScore } from '../../modules/gameStateManager';
+import { getGame, updatePlayerScore, addPlayerWord } from '../../modules/gameStateManager';
 import { validateWheelSubmission, applyWheelWord } from '../../modules/wheelRushManager';
 import timerManager from '../../utils/timerManager';
 
@@ -92,6 +93,8 @@ describe('wheelRushHandler', () => {
     const sock = mkSocket();
     handleSubmitWheelWord(mkIo(), sock, { word: 'CANE' });
     expect(updatePlayerScore).toHaveBeenCalledWith('GAME1', 'p1', 12, true);
+    expect(addPlayerWord).toHaveBeenCalledWith('GAME1', 'p1', 'CANE',
+      expect.objectContaining({ score: 12, validated: true, autoValidated: true }));
     expect(broadcastToRoom).toHaveBeenCalledWith(expect.anything(), 'room:GAME1', 'wheelWordLocked',
       { word: 'CANE', by: 'p1', lockUntil: 9999 });
   });
@@ -103,6 +106,8 @@ describe('wheelRushHandler', () => {
     const sock = mkSocket();
     handleSubmitWheelWord(mkIo(), sock, { word: 'CANE' });
     expect(updatePlayerScore).toHaveBeenCalledWith('GAME1', 'p1', 11, true);
+    expect(addPlayerWord).toHaveBeenCalledWith('GAME1', 'p1', 'CANE',
+      expect.objectContaining({ score: 11, validated: true, autoValidated: true }));
     expect(broadcastToRoom).toHaveBeenCalledWith(expect.anything(), 'room:GAME1', 'wheelWordStolen',
       { word: 'CANE', by: 'p1', from: 'p2' });
   });
@@ -116,6 +121,7 @@ describe('wheelRushHandler', () => {
     expect(sock.emit).toHaveBeenCalledWith('wheelWordResult', { word: 'CANE', accepted: false, error: 'duplicate' });
     expect(broadcastToRoom).not.toHaveBeenCalled();
     expect(updatePlayerScore).not.toHaveBeenCalled();
+    expect(addPlayerWord).not.toHaveBeenCalled();
   });
 
   it('rejects when game is not wheel-rush mode', () => {

@@ -5,6 +5,7 @@ import { motion, animate as fmAnimate } from 'framer-motion';
 import { Star, ArrowRight, ArrowLeft, Flame, Crown, Zap } from 'lucide-react';
 import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { cn } from '@/lib/utils';
 import { scoreWord } from '@/utils/dailyChallenge/wordWheelScoring';
 import TabbedDailyLeaderboard from './TabbedDailyLeaderboard';
@@ -103,6 +104,7 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
   currentPlayerId, currentGuestFingerprint,
 }) => {
   const { t, language, dir } = useLanguage();
+  const { submitLeaderboardScore } = useCrazyGames();
   const tier = getResultTier(result.score);
   const isRTL = dir === 'rtl';
   const [showConfetti, setShowConfetti] = useState(false);
@@ -118,6 +120,15 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
     });
     return () => controls.stop();
   }, [result.score]);
+
+  // Submit completion score to CrazyGames leaderboard (no-op off-platform).
+  // Drives CG retention metrics by tying daily-challenge engagement to the
+  // platform leaderboard the player can return to.
+  useEffect(() => {
+    if (result.score > 0) {
+      submitLeaderboardScore(result.score);
+    }
+  }, [result.score, submitLeaderboardScore]);
 
   // Trigger confetti for good scores
   useEffect(() => {

@@ -64,10 +64,13 @@ export function calculateGameScores(
 
   // Disable duplicate rule for large rooms (more than 7 players) or Word Hunt mode
   // In Word Hunt, finding the same board words as opponents is fine — the goal is the target word
-  const duplicateRuleDisabled = playerCount > 7 || gameMode === 'word-hunt';
+  // In Wheel Rush, lock+steal mechanic means stealer and original locker both have the word
+  // in their playerWords with their own outcome scores; duplicate halving would corrupt totals.
+  const duplicateRuleDisabled = playerCount > 7 || gameMode === 'word-hunt' || gameMode === 'wheel-rush';
 
   // Blast mode skips rarity multiplier — tile bonuses already reward unique paths
-  const rarityDisabled = gameMode === 'blast';
+  // Wheel Rush skips it too — first-finder multiplier + steal bonus already encode rarity
+  const rarityDisabled = gameMode === 'blast' || gameMode === 'wheel-rush';
   if (!game) return [];
 
   const results: PlayerScoreResult[] = [];

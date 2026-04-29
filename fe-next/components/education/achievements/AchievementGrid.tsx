@@ -72,7 +72,7 @@ export const AchievementGrid = memo<AchievementGridProps>(
                 'font-bold text-sm transition-all duration-200',
                 activeCategory === key
                   ? 'bg-neo-lime text-neo-black shadow-hard'
-                  : 'bg-neo-navy/50 text-neo-white/60 hover:bg-neo-navy/70'
+                  : 'bg-neo-navy text-neo-white hover:bg-neo-navy-light'
               )}
             >
               {t(labelKey)}
@@ -108,7 +108,7 @@ export const AchievementGrid = memo<AchievementGridProps>(
                   className={cn(
                     'bg-neo-navy border-neo rounded-neo p-3 shadow-hard',
                     'relative overflow-hidden',
-                    !isEarned && 'grayscale opacity-50'
+                    !isEarned && 'grayscale opacity-75'
                   )}
                   initial={{ opacity: 0, scale: 0.85 }}
                   animate={{ opacity: 1, scale: 1 }}
@@ -171,7 +171,7 @@ export const AchievementGrid = memo<AchievementGridProps>(
                         <span>{tierProgress.currentTier}</span>
                       </div>
                     ) : (
-                      <div className="px-3 py-1 rounded-full border-neo border-neo-black bg-neo-navy/50 text-neo-white/40 font-black text-xs">
+                      <div className="px-3 py-1 rounded-full border-neo border-neo-black bg-neo-navy-light text-neo-white/80 font-black text-xs">
                         {t('education.achievements.locked')}
                       </div>
                     )}

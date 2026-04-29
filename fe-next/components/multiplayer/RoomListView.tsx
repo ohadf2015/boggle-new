@@ -19,7 +19,6 @@ const TITLE_TEXT_SHADOW_STYLE = { textShadow: '3px 3px 0px rgba(0,0,0,0.8)' } as
 const HowToPlay = dynamic(() => import('@/components/HowToPlay'), { ssr: false });
 const MultiplayerWelcomeCard = dynamic(() => import('@/components/multiplayer/MultiplayerWelcomeCard'), { ssr: false });
 import { Loader } from '@/components/ui/Loader';
-import { PageLoader } from '@/components/ui/PageLoader';
 import AvatarStack from '@/components/multiplayer/AvatarStack';
 import CrazyGamesFriendsStrip from '@/components/multiplayer/CrazyGamesFriendsStrip';
 import { shouldShowGuidance, markGuidanceShown } from '@/utils/contextualGuidanceStorage';
@@ -340,8 +339,28 @@ const RoomListView: React.FC<RoomListViewProps> = ({
             </div>
 
             {roomsLoading && activeRooms.length === 0 ? (
-              <div className="h-24 flex items-center justify-center">
-                <PageLoader size="sm" />
+              // Skeleton room cards while activeRooms socket payload arrives.
+              // Showing card-shaped placeholders (instead of a centered spinner)
+              // tells the player "rooms are coming" and keeps Quick Play above
+              // visible — directly addresses CG mobile bounce on empty lobby.
+              <div
+                data-testid="room-list-skeleton"
+                className="flex flex-col gap-3"
+                aria-hidden="true"
+              >
+                {[0, 1, 2].map((i) => (
+                  <div
+                    key={i}
+                    className="flex items-center gap-3 p-3 rounded-xl border-2 border-neo-black border-s-4 border-s-neo-cyan/40 bg-neo-navy-light/30 animate-pulse"
+                  >
+                    <div className="w-10 h-10 bg-neo-navy-light border-2 border-neo-black rounded-lg shrink-0" />
+                    <div className="flex-1 min-w-0 flex flex-col gap-1.5">
+                      <div className="h-3 w-2/3 bg-neo-navy-light rounded" />
+                      <div className="h-2.5 w-1/3 bg-neo-navy-light/70 rounded" />
+                    </div>
+                    <div className="w-12 h-6 bg-neo-navy-light/70 rounded-md shrink-0" />
+                  </div>
+                ))}
               </div>
             ) : hasRooms ? (
               <motion.div

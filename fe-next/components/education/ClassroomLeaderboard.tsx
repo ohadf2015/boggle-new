@@ -101,7 +101,7 @@ const TimeScopeTabs = memo<TimeScopeTabsProps>(({ timeScope, onScopeChange }) =>
             'px-4 py-2 rounded-neo border-neo font-neo-body font-bold text-sm transition-all',
             timeScope === tab.key
               ? 'bg-neo-lime text-neo-black border-neo-black shadow-hard-sm'
-              : 'bg-neo-navy text-neo-white/60 border-neo-black/30 hover:text-neo-white/80'
+              : 'bg-neo-navy-light text-neo-white border-neo-black hover:bg-neo-navy'
           )}
         >
           {tab.label}
@@ -196,9 +196,9 @@ const TierBadge = memo<TierBadgeProps>(({ rank, totalStudents }) => {
   if (!tier) return null;
 
   const tierConfig = {
-    top10: { bg: 'bg-neo-lime', label: t('education.leaderboard.top10') },
-    top25: { bg: 'bg-neo-white/60', label: t('education.leaderboard.top25') },
-    top50: { bg: 'bg-neo-pink', label: t('education.leaderboard.top50') },
+    top10: { bg: 'bg-neo-lime', text: 'text-neo-black', label: t('education.leaderboard.top10') },
+    top25: { bg: 'bg-neo-cyan', text: 'text-neo-black', label: t('education.leaderboard.top25') },
+    top50: { bg: 'bg-neo-pink', text: 'text-white', label: t('education.leaderboard.top50') },
   };
 
   const config = tierConfig[tier];
@@ -207,8 +207,9 @@ const TierBadge = memo<TierBadgeProps>(({ rank, totalStudents }) => {
     <span
       data-testid={`tier-badge-${tier}`}
       className={cn(
-        'px-2 py-0.5 text-xs font-neo-body font-bold text-white rounded',
-        config.bg
+        'px-2 py-0.5 text-xs font-neo-body font-bold rounded',
+        config.bg,
+        config.text
       )}
     >
       {config.label}

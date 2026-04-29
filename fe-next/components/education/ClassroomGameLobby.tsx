@@ -45,13 +45,14 @@ export function ClassroomGameLobby({ initialLessonId, onBack }: ClassroomGameLob
   const [socket, setSocket] = useState<Socket | null>(null);
   const [gameMode, setGameMode] = useState<GameMode>('classic');
 
+  // Teacher-configurable lobby settings — were hardcoded, now part of the
+  // wizard so the room is created with the teacher's final choices instead of
+  // forcing them into the lobby with defaults they can't preview.
+  const [timerMinutes, setTimerMinutes] = useState<number>(3);
+  const [boardSize, setBoardSize] = useState<'small' | 'medium' | 'large'>('medium');
   const settings = useMemo(
-    () => ({
-      timerMinutes: 3,
-      boardSize: 'medium' as const,
-      allowLateJoin: true,
-    }),
-    []
+    () => ({ timerMinutes, boardSize, allowLateJoin: true }),
+    [timerMinutes, boardSize]
   );
 
   // Fetch teacher data
@@ -250,10 +251,14 @@ export function ClassroomGameLobby({ initialLessonId, onBack }: ClassroomGameLob
       selectedLessonIds={selectedLessonIds}
       allPlayableWords={allPlayableWords}
       gameMode={gameMode}
+      timerMinutes={timerMinutes}
+      boardSize={boardSize}
       isStarting={isStarting}
       onSelectClassroom={setSelectedClassroomId}
       onSelectLessons={setSelectedLessonIds}
       onGameModeChange={setGameMode}
+      onTimerChange={setTimerMinutes}
+      onBoardSizeChange={setBoardSize}
       onNext={handleStartGame}
       onBack={onBack}
     />

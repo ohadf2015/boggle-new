@@ -24,6 +24,8 @@ import { FloatingReaction } from '@/components/game/QuickReactions';
 import { useQuickReactions } from '@/hooks/useQuickReactions';
 
 const PostGameEngagement = dynamic(() => import('@/components/growth/PostGameEngagement'), { ssr: false });
+const DailyChallengeInvite = dynamic(() => import('@/components/growth/DailyChallengeInvite').then(m => m.DailyChallengeInvite), { ssr: false });
+const GlobalRankBadge = dynamic(() => import('@/components/multiplayer/GlobalRankBadge').then(m => m.GlobalRankBadge), { ssr: false });
 const MultiplayerSignupSheet = dynamic(() => import('@/components/auth/MultiplayerSignupSheet'), { ssr: false });
 const SignupToast = dynamic(() => import('@/components/auth/SignupToast'), { ssr: false });
 // MobileTabBar replaced by inline floating pill for results page
@@ -78,6 +80,9 @@ interface DesktopResultsLayoutProps {
   otherPlayers: PlayerScore[];
   isBotsOnlyGame: boolean;
   postGameWordReview?: React.ReactNode;
+  isCurrentUserWinner: boolean;
+  userId: string | null;
+  matchScore: number;
 }
 
 function DesktopResultsLayout({
@@ -98,6 +103,9 @@ function DesktopResultsLayout({
   otherPlayers,
   isBotsOnlyGame,
   postGameWordReview,
+  isCurrentUserWinner,
+  userId,
+  matchScore,
 }: DesktopResultsLayoutProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [showScrollIndicator, setShowScrollIndicator] = useState(false);
@@ -140,6 +148,13 @@ function DesktopResultsLayout({
             {...mainContentProps}
             hideInlineCta={!!gameCode && !isBotsOnlyGame}
           />
+          {/* Global percentile context — sits below podium so it lands as the player reads
+              their own row. Hides for guests (no userId). */}
+          {userId ? (
+            <div className="mt-2 flex justify-center">
+              <GlobalRankBadge userId={userId} matchScore={matchScore} />
+            </div>
+          ) : null}
         </div>
 
         {/* Two-column area below the cinematic hero */}
@@ -175,6 +190,9 @@ function DesktopResultsLayout({
                 reducedMotion={null}
               />
             )}
+            {/* D1 retention CTA — outcome-aware Daily Challenge invite. Renders on CG too
+                (PostGameEngagement self-hides on CG; this one stays). */}
+            <DailyChallengeInvite isWinner={isCurrentUserWinner} />
             <PostGameEngagement />
             {postGameWordReview}
           </div>
@@ -225,7 +243,7 @@ function DesktopResultsLayout({
 
 const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onReturnToRoom, username, socket, achievements, duplicateRuleDisabled, isHost = false, roomLanguage = 'en', gridSize = 4, gameDuration = 180, seriesStandings, seriesRoundNumber, seriesTotalGames, seriesLeader, onResetSeries, wordHuntSummary }) => {
   const { t, language } = useLanguage();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const setIsInGame = useHideNavigation();
 
   // Hide global bottom nav on mobile while viewing results
@@ -817,6 +835,14 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
         >
           <div className="max-w-lg mx-auto space-y-6 medium-short:space-y-3">
             {renderResultsTab()}
+            {/* Global rank badge — mobile, sub-podium */}
+            {user?.id ? (
+              <div className="flex justify-center">
+                <GlobalRankBadge userId={user.id} matchScore={currentPlayerData?.score ?? 0} />
+              </div>
+            ) : null}
+            {/* D1 retention CTA — Daily Challenge invite */}
+            <DailyChallengeInvite isWinner={isCurrentUserWinner} />
             {/* CrazyGames banner ad — mobile size between results and details */}
             <CrazyGamesBanner size="320x50" />
             {/* Other players' details (inline, no tab switch needed) */}
@@ -878,6 +904,9 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
         otherPlayers={otherPlayers}
         isBotsOnlyGame={isBotsOnlyGame}
         postGameWordReview={postGameWordReviewNode}
+        isCurrentUserWinner={isCurrentUserWinner}
+        userId={user?.id ?? null}
+        matchScore={currentPlayerData?.score ?? 0}
       />
 
       {/* DESKTOP Sticky Ready Bar — pinned to bottom on md+ screens */}

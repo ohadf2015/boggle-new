@@ -84,6 +84,7 @@ export const playerProfileRouter = router({
           achievementCounts: profile.achievement_counts || {},
           memberSince,
           percentile,
+          totalPlayersAbove: higherCount || 0,
         };
       }, 300);
     }),

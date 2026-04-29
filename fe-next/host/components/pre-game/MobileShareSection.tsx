@@ -74,19 +74,22 @@ export const MobileShareSection = memo<MobileShareSectionProps>(function MobileS
     }
   }, [gameCode, joinUrl, t]);
 
-  // Trigger button
+  // Trigger button — primary CTA in lobby, brand lime color so it reads as
+  // "do this next" not "optional extra". showHint adds wobble for empty rooms.
   const triggerButton = (
     <DialogTrigger asChild>
       <motion.button
         data-testid="mobile-share-trigger"
         whileTap={{ scale: 0.95 }}
         className={cn(
-          'flex items-center gap-1.5 rounded-full border-2 border-neo-black shadow-hard-sm transition-all font-bold text-neo-black bg-white',
-          compact ? 'h-8 px-3 text-xs' : 'h-9 px-3.5 text-xs',
+          'flex items-center gap-1.5 rounded-full border-2 border-neo-black shadow-hard transition-all font-bold uppercase tracking-wide',
+          compact
+            ? 'h-8 px-3 text-xs bg-white text-neo-black shadow-hard-sm'
+            : 'h-10 px-4 text-sm bg-neo-lime text-neo-black',
           showHint && 'animate-neo-wobble',
         )}
       >
-        <Share2 className="w-3.5 h-3.5" />
+        <Share2 className={cn(compact ? 'w-3.5 h-3.5' : 'w-4 h-4')} />
         <span>{t('share.invite')}</span>
       </motion.button>
     </DialogTrigger>

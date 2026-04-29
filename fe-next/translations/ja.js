@@ -8684,6 +8684,19 @@ const ja = {
         "blast": "ブラスト",
         "wheelRush": "ホイールラッシュ"
       },
+      "timer": {
+        "title": "タイマー",
+        "min1": "1分",
+        "min2": "2分",
+        "min3": "3分",
+        "min5": "5分"
+      },
+      "board": {
+        "title": "盤サイズ",
+        "small": "小 (4×4)",
+        "medium": "中 (5×5)",
+        "large": "大 (6×6)"
+      },
       "create": "クラス作成",
       "edit": "クラス編集",
       "delete": "クラス削除",
@@ -9164,6 +9177,7 @@ const ja = {
       "shareCode": "コードをシェア",
       "shareCodeWithStudents": "生徒にコードを共有",
       "startGame": "ゲーム開始",
+      "createRoom": "ルームを作成",
       "startGameDescription": "クラスゲームをスタート",
       "title": "クラスゲーム",
       "waitingForPlayers": "プレイヤーを待っています...",

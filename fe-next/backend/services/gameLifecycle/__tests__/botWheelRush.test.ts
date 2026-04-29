@@ -14,6 +14,7 @@ vi.mock('../../../utils/logger', () => ({ default: {
 
 const mocks = vi.hoisted(() => ({
   updatePlayerScore: vi.fn(),
+  addPlayerWord: vi.fn(),
   getGame: vi.fn(),
   getLeaderboard: vi.fn(() => []),
   broadcastToRoom: vi.fn(),
@@ -24,6 +25,7 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock('../../../modules/gameStateManager', () => ({
   updatePlayerScore: mocks.updatePlayerScore,
+  addPlayerWord: mocks.addPlayerWord,
   getGame: mocks.getGame,
   getLeaderboard: mocks.getLeaderboard,
 }));

@@ -110,7 +110,7 @@ export default function AchievementProgressCard({
     <article
       className={`
         relative rounded-neo border-neo border-neo-black
-        ${isEarned ? 'bg-neo-navy/50 shadow-hard' : 'bg-neo-navy/20 opacity-50'}
+        ${isEarned ? 'bg-neo-navy/50 shadow-hard' : 'bg-neo-navy-light/70 opacity-80'}
         p-4 transition-all
       `}
       aria-label={`${t(`education.achievements.${achievement.key}.name`)} achievement`}
@@ -158,7 +158,7 @@ export default function AchievementProgressCard({
                 </p>
               )}
               {isLocked && (
-                <p className="text-sm text-neo-white/60">
+                <p className="text-sm text-neo-white/85">
                   {t('education.achievements.locked')}
                 </p>
               )}
@@ -174,7 +174,7 @@ export default function AchievementProgressCard({
                 className={`
                   w-8 h-8 rounded flex items-center justify-center
                   border-neo border-neo-black transition-all
-                  ${isPinned ? 'bg-neo-lime shadow-hard-sm' : 'bg-neo-white/30'}
+                  ${isPinned ? 'bg-neo-lime text-neo-black shadow-hard-sm' : 'bg-neo-navy-light text-neo-white'}
                   ${!isPinned && !canPin ? 'opacity-40 cursor-not-allowed' : 'hover:scale-110 active:scale-95'}
                 `}
               >
@@ -225,7 +225,7 @@ export default function AchievementProgressCard({
           {/* Hint for Locked Badges */}
           {isLocked && (
             <div className="mt-3">
-              <p className="text-sm text-neo-white/60 italic">
+              <p className="text-sm text-neo-white/85 italic">
                 {achievement.isSecret
                   ? t(`education.achievements.${achievement.key}.hint`)
                   : t(`education.achievements.${achievement.key}.hint`)}

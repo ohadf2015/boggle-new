@@ -27,8 +27,14 @@ vi.mock('../../pre-game/PlayerRoster', () => ({
 }));
 
 vi.mock('../../pre-game/StartButton', () => ({
-  StartButton: ({ onStartGame }: { onStartGame: () => void }) => (
-    <button data-testid="start-button" onClick={onStartGame}>Start</button>
+  StartButton: ({ onStartGame, disabled }: { onStartGame: () => void; disabled?: boolean }) => (
+    <button
+      data-testid={disabled ? 'start-button-disabled' : 'start-button'}
+      onClick={onStartGame}
+      disabled={disabled}
+    >
+      Start
+    </button>
   ),
 }));
 
@@ -71,6 +77,42 @@ describe('TvLobbyView', () => {
   it('renders PlayerRoster with players', () => {
     render(<TvLobbyView {...defaultProps} />);
     expect(screen.getByTestId('player-roster')).toHaveTextContent('Players: 2');
+  });
+
+  it('excludes host from PlayerRoster count (TV mode = host not playing)', () => {
+    render(<TvLobbyView
+      {...defaultProps}
+      username="HostUser"
+      playersReady={[
+        { username: 'HostUser', avatar: null, isHost: true },
+        { username: 'Player1', avatar: null },
+        { username: 'Player2', avatar: null },
+      ]}
+    />);
+    expect(screen.getByTestId('player-roster')).toHaveTextContent('Players: 2');
+  });
+
+  it('excludes host even when isHost flag missing — falls back to username match', () => {
+    render(<TvLobbyView
+      {...defaultProps}
+      username="HostUser"
+      playersReady={[
+        { username: 'HostUser', avatar: null },
+        { username: 'Player1', avatar: null },
+      ]}
+    />);
+    expect(screen.getByTestId('player-roster')).toHaveTextContent('Players: 1');
+  });
+
+  it('disables StartButton when only host is in room', () => {
+    const onStart = vi.fn();
+    render(<TvLobbyView
+      {...defaultProps}
+      onStartGame={onStart}
+      username="HostUser"
+      playersReady={[{ username: 'HostUser', avatar: null, isHost: true }]}
+    />);
+    expect(screen.getByTestId('start-button-disabled')).toBeInTheDocument();
   });
 
   it('renders StartButton', () => {

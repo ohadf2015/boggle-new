@@ -6,6 +6,7 @@ import { Play, Crown, Check, X, Trophy } from 'lucide-react';
 import Avatar from '@/components/Avatar';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { MODE_ICONS, MODE_ACTIVE_COLORS, getModeLabel, getModeDescription, type GameModeOption } from '@/components/GameModeSelector';
+import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { cn } from '@/lib/utils';
 import type { Avatar as AvatarType } from '@/types';
 
@@ -40,7 +41,11 @@ interface StickyReadyBarProps {
 }
 
 const ALL_MODES: GameModeOption[] = ['word-hunt', 'classic', 'wheel-rush', 'random'];
-const AUTO_SECONDS = 35;
+const AUTO_SECONDS_DEFAULT = 35;
+// CG sessions are short and impulsive — trim result pause so more matches
+// fit per session, lifting CG's average-playtime metric. 20s leaves room
+// to read final scores without giving the user a bounce window.
+const AUTO_SECONDS_CG = 20;
 
 /**
  * Inline ready bar — renders as flex items inside a parent floating bar.
@@ -73,6 +78,8 @@ export default function StickyReadyBar({
   isClassroom = false,
 }: StickyReadyBarProps) {
   const { t } = useLanguage();
+  const { isOnCrazyGamesPlatform } = useCrazyGames();
+  const AUTO_SECONDS = isOnCrazyGamesPlatform ? AUTO_SECONDS_CG : AUTO_SECONDS_DEFAULT;
 
   const isRevenge = currentPlayerRank > 1 && !!winnerUsername;
 
@@ -94,8 +101,11 @@ export default function StickyReadyBar({
   const winnerAvatar = winnerUsername ? playerMap.get(winnerUsername)?.avatar : undefined;
 
   // ---------- Unified auto-countdown for ALL players ----------
-  // Persist cancellation across game rounds via sessionStorage
+  // Persist cancellation across game rounds via sessionStorage. On CrazyGames
+  // we DON'T persist — locking a CG player into manual ready ends sessions
+  // early, which directly tanks playtime and conversion metrics.
   const [cancelled, setCancelled] = useState(() => {
+    if (isOnCrazyGamesPlatform) return false;
     try { return sessionStorage.getItem('mp-auto-advance-cancelled') === '1'; }
     catch { return false; }
   });
@@ -146,7 +156,7 @@ export default function StickyReadyBar({
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [showCountdown, handleCountdownComplete]);
+  }, [showCountdown, handleCountdownComplete, AUTO_SECONDS]);
 
   // ---------- Render helpers ----------
 

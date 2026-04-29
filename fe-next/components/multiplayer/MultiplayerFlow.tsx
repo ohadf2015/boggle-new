@@ -13,7 +13,6 @@ import { useCrazyGamesInvite } from '@/hooks/useCrazyGamesInvite';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { PageLoader } from '@/components/ui/PageLoader';
 import { SeasonBanner } from '@/components/multiplayer/SeasonBanner';
 import { MatchmakingOverlay } from '@/components/multiplayer/MatchmakingOverlay';
 import { useMatchmaking } from '@/hooks/useMatchmaking';
@@ -342,6 +341,9 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
   // CrazyGames Smart Auto-Join: join an open room or quick-play on first load
   useEffect(() => {
     if (!isOnCrazyGamesPlatform) return;
+    // Wait for the CG SDK to finish handshaking so leaderboard/ad calls
+    // emitted as a side-effect of joining a room don't no-op silently.
+    if (!isCrazyGamesReady) return;
     if (cgAutoJoinHandledRef.current) return;
     if (cgInviteHandledRef.current) return;
     if (prefilledRoom) return;
@@ -368,17 +370,11 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
     } else {
       handleQuickPlay();
     }
-  }, [isOnCrazyGamesPlatform, roomsLoading, activeRooms, prefilledRoom, autoCreate, handleRoomClick, handleQuickPlay]);
+  }, [isOnCrazyGamesPlatform, isCrazyGamesReady, roomsLoading, activeRooms, prefilledRoom, autoCreate, handleRoomClick, handleQuickPlay]);
 
-  // CrazyGames SDK initializes async — only block render when actually on CG platform
-  // Non-CG users see the lobby immediately
-  if (!isCrazyGamesReady && isOnCrazyGamesPlatform) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-neo-navy">
-        <PageLoader size="md" />
-      </div>
-    );
-  }
+  // CG SDK initializes async — but blocking the lobby on it kills first-paint
+  // and tanks gameplay-conversion. Show the lobby immediately; auto-join waits
+  // for SDK ready (effect above) so platform calls fire correctly when they fire.
 
   // Always show RoomListView as base, with modals as overlays
   return (

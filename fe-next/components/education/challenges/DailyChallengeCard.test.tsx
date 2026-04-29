@@ -74,7 +74,7 @@ describe('DailyChallengeCard', () => {
 
     const badge = screen.getByTestId('tier-badge');
     expect(badge).toHaveTextContent('Easy');
-    expect(badge).toHaveClass('bg-green-500');
+    expect(badge).toHaveClass('bg-neo-lime');
   });
 
   it('renders tier badge with correct color for medium', () => {
@@ -82,7 +82,7 @@ describe('DailyChallengeCard', () => {
     render(<DailyChallengeCard challenge={mediumChallenge} onClaim={mockOnClaim} />);
 
     const badge = screen.getByTestId('tier-badge');
-    expect(badge).toHaveClass('bg-neo-pink');
+    expect(badge).toHaveClass('bg-neo-cyan');
   });
 
   it('renders tier badge with correct color for hard', () => {

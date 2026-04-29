@@ -8690,6 +8690,19 @@ const es = {
         "blast": "Blast",
         "wheelRush": "Carrera de Ruleta"
       },
+      "timer": {
+        "title": "Temporizador",
+        "min1": "1 min",
+        "min2": "2 min",
+        "min3": "3 min",
+        "min5": "5 min"
+      },
+      "board": {
+        "title": "Tamaño del Tablero",
+        "small": "Pequeño (4×4)",
+        "medium": "Mediano (5×5)",
+        "large": "Grande (6×6)"
+      },
       "create": "Crear Aula",
       "edit": "Editar Aula",
       "delete": "Eliminar Aula",
@@ -9183,6 +9196,7 @@ const es = {
       "shareCode": "Compartir código",
       "shareCodeWithStudents": "Comparte el código con los estudiantes",
       "startGame": "Iniciar juego",
+      "createRoom": "Crear sala",
       "startGameDescription": "Lanzar el juego del aula",
       "title": "Juego del aula",
       "waitingForPlayers": "Esperando jugadores...",

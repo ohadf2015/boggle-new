@@ -1,4 +1,4 @@
-import { School, BookOpen, LayoutGrid, Search, Zap, RotateCw } from 'lucide-react';
+import { School, BookOpen, LayoutGrid, Search, Zap, RotateCw, Timer, Grid3x3 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { WizardStep } from '@/components/ui/WizardStep';
@@ -28,13 +28,30 @@ interface ClassroomSetupStepProps {
   selectedLessonIds: string[];
   allPlayableWords: string[];
   gameMode: GameMode;
+  timerMinutes: number;
+  boardSize: 'small' | 'medium' | 'large';
   isStarting: boolean;
   onSelectClassroom: (id: string) => void;
   onSelectLessons: (ids: string[]) => void;
   onGameModeChange: (mode: GameMode) => void;
+  onTimerChange: (minutes: number) => void;
+  onBoardSizeChange: (size: 'small' | 'medium' | 'large') => void;
   onNext: () => void;
   onBack: () => void;
 }
+
+const TIMER_OPTIONS: { minutes: number; labelKey: string }[] = [
+  { minutes: 1, labelKey: 'teacher.classroom.timer.min1' },
+  { minutes: 2, labelKey: 'teacher.classroom.timer.min2' },
+  { minutes: 3, labelKey: 'teacher.classroom.timer.min3' },
+  { minutes: 5, labelKey: 'teacher.classroom.timer.min5' },
+];
+
+const BOARD_SIZES: { key: 'small' | 'medium' | 'large'; labelKey: string }[] = [
+  { key: 'small', labelKey: 'teacher.classroom.board.small' },
+  { key: 'medium', labelKey: 'teacher.classroom.board.medium' },
+  { key: 'large', labelKey: 'teacher.classroom.board.large' },
+];
 
 export function ClassroomSetupStep({
   classrooms,
@@ -43,10 +60,14 @@ export function ClassroomSetupStep({
   selectedLessonIds,
   allPlayableWords,
   gameMode,
+  timerMinutes,
+  boardSize,
   isStarting,
   onSelectClassroom,
   onSelectLessons,
   onGameModeChange,
+  onTimerChange,
+  onBoardSizeChange,
   onNext,
   onBack,
 }: ClassroomSetupStepProps) {
@@ -60,7 +81,7 @@ export function ClassroomSetupStep({
       description={t('education.classroomGame.selectClassroomAndLessonsDesc')}
       onNext={onNext}
       onBack={onBack}
-      nextLabel={t('education.classroomGame.startGame')}
+      nextLabel={t('education.classroomGame.createRoom')}
       nextDisabled={selectedLessonIds.length === 0 || !selectedClassroomId}
       isLoading={isStarting}
     >
@@ -122,6 +143,76 @@ export function ClassroomSetupStep({
               </p>
             </div>
           )}
+        </div>
+
+        {/* Timer */}
+        <div>
+          <div id="classroom-timer-label" className="block text-neo-white font-bold mb-3">
+            <Timer className="w-5 h-5 inline me-2 text-neo-cyan" />
+            {t('teacher.classroom.timer.title')}
+          </div>
+          <div
+            role="radiogroup"
+            aria-labelledby="classroom-timer-label"
+            className="grid grid-cols-2 sm:grid-cols-4 gap-3"
+          >
+            {TIMER_OPTIONS.map(({ minutes, labelKey }) => {
+              const isSelected = timerMinutes === minutes;
+              return (
+                <button
+                  key={minutes}
+                  type="button"
+                  role="radio"
+                  aria-checked={isSelected}
+                  onClick={() => onTimerChange(minutes)}
+                  className={cn(
+                    'px-4 py-3 font-bold rounded-neo border-neo border-neo-black transition-all',
+                    'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2',
+                    isSelected
+                      ? 'bg-neo-cyan text-neo-black shadow-hard'
+                      : 'bg-neo-navy/50 text-neo-white hover:bg-neo-navy shadow-hard-sm'
+                  )}
+                >
+                  {t(labelKey)}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Board Size */}
+        <div>
+          <div id="classroom-board-label" className="block text-neo-white font-bold mb-3">
+            <Grid3x3 className="w-5 h-5 inline me-2 text-neo-lime" />
+            {t('teacher.classroom.board.title')}
+          </div>
+          <div
+            role="radiogroup"
+            aria-labelledby="classroom-board-label"
+            className="grid grid-cols-3 gap-3"
+          >
+            {BOARD_SIZES.map(({ key, labelKey }) => {
+              const isSelected = boardSize === key;
+              return (
+                <button
+                  key={key}
+                  type="button"
+                  role="radio"
+                  aria-checked={isSelected}
+                  onClick={() => onBoardSizeChange(key)}
+                  className={cn(
+                    'px-4 py-3 font-bold rounded-neo border-neo border-neo-black transition-all',
+                    'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2',
+                    isSelected
+                      ? 'bg-neo-lime text-neo-black shadow-hard'
+                      : 'bg-neo-navy/50 text-neo-white hover:bg-neo-navy shadow-hard-sm'
+                  )}
+                >
+                  {t(labelKey)}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {/* Game Mode */}
