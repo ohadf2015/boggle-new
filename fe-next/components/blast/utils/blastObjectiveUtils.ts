@@ -21,7 +21,7 @@ export function getObjectiveTileTypes(objectives: BlastObjective[]): BlastTileTy
 
 /**
  * Format a human-readable label for an objective, using translation function.
- * Supports template variables: {target}, {tileType}, {minWordLength}.
+ * Supports template variables: {target}, {tileType}, {minWordLength}, {word}.
  */
 export function formatObjectiveLabel(
   objective: BlastObjective,
@@ -45,6 +45,9 @@ export function formatObjectiveLabel(
     case 'clear_percent':
       template = t('blast.objective.clearPercent') || 'Clear {target}% of the board';
       break;
+    case 'target_word':
+      template = t('blast.objective.targetWord') || 'Find: {word}';
+      break;
     default:
       template = '';
   }
@@ -52,5 +55,6 @@ export function formatObjectiveLabel(
   return template
     .replace('{target}', String(objective.target))
     .replace('{tileType}', objective.tileType || '')
-    .replace('{minWordLength}', String(objective.minWordLength || 0));
+    .replace('{minWordLength}', String(objective.minWordLength || 0))
+    .replace('{word}', (objective.targetWord || '').toUpperCase());
 }

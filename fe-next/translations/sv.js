@@ -8533,6 +8533,9 @@ const sv = {
       "clearAllType": "Rensa alla {tileType}",
       "wordLength": "{target} ord med {minWordLength}+ bokstäver",
       "clearPercent": "Rensa {target}% av brädet",
+      "targetWord": "Hitta: {word}",
+      "targetWordFoundIt": "HITTAD!",
+      "targetWordMissed": "Målet var: {word} — Vattenfallet fick det!",
       "bannerTitle": "Mål"
     },
     "combo": {

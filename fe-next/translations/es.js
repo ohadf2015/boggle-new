@@ -8533,6 +8533,9 @@ const es = {
       "clearAllType": "Limpia todos los {tileType}",
       "wordLength": "{target} palabras de {minWordLength}+ letras",
       "clearPercent": "Limpia {target}% del tablero",
+      "targetWord": "Encuentra: {word}",
+      "targetWordFoundIt": "¡LO ENCONTRASTE!",
+      "targetWordMissed": "El objetivo era: {word} — ¡La cascada lo consiguió!",
       "bannerTitle": "Objetivos"
     },
     "combo": {

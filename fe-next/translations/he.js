@@ -8498,6 +8498,9 @@ const he = {
       "clearAllType": "נקה את כל ה{tileType}",
       "wordLength": "{target} מילים של {minWordLength}+ אותיות",
       "clearPercent": "נקה {target}% מהלוח",
+      "targetWord": "מצא: {word}",
+      "targetWordFoundIt": "מצאת!",
+      "targetWordMissed": "המטרה הייתה: {word} — המפלים תפסו אותה!",
       "bannerTitle": "מטרות"
     },
     "combo": {

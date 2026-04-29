@@ -8710,6 +8710,9 @@ const en = {
       "clearAllType": "Clear all {tileType}",
       "wordLength": "{target} words of {minWordLength}+ letters",
       "clearPercent": "Clear {target}% of the board",
+      "targetWord": "Find: {word}",
+      "targetWordFoundIt": "FOUND IT!",
+      "targetWordMissed": "Target was: {word} — Cascade got it!",
       "bannerTitle": "Goals"
     },
     "combo": {

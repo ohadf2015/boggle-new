@@ -340,7 +340,7 @@ export const SPECIAL_TILE_DISTRIBUTION: Record<Exclude<BlastTileType, 'standard'
 
 // ==================== Objectives ====================
 
-export type BlastObjectiveType = 'collect_type' | 'clear_all_type' | 'score_target' | 'word_length' | 'clear_percent';
+export type BlastObjectiveType = 'collect_type' | 'clear_all_type' | 'score_target' | 'word_length' | 'clear_percent' | 'target_word';
 
 export interface BlastObjective {
   type: BlastObjectiveType;
@@ -350,7 +350,12 @@ export interface BlastObjective {
   target: number;
   /** Minimum word length required (for word_length type) */
   minWordLength?: number;
+  /** Target word to find (for target_word type) */
+  targetWord?: string;
 }
+
+/** 2D grid of letters for Blast board representation */
+export type LetterGrid = string[][];
 
 export interface BlastObjectiveProgress {
   objective: BlastObjective;

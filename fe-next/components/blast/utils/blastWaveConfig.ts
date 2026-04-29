@@ -333,6 +333,43 @@ export function getWaveObjectives(wave: number): BlastObjective[] {
   return [CLEAR_BOARD, ...WAVE8_TEMPLATES[templateIndex].map(obj => ({ ...obj }))];
 }
 
+/**
+ * Optionally seed a target_word objective into wave objectives.
+ * Adds target_word goal for waves 3+ at 25% probability per wave.
+ * Defers to server/RNG for actual board validation.
+ *
+ * @param wave wave number
+ * @param language game language (en/he/sv/ja/es)
+ * @param objectives current wave objectives to augment
+ * @returns objectives with optional target_word added
+ */
+export function seedTargetWordObjective(
+  wave: number,
+  language: string,
+  objectives: BlastObjective[],
+): BlastObjective[] {
+  // Only add to wave 3+ at 25% rate
+  if (wave < 3) return objectives;
+
+  // Deterministic RNG: use wave as seed for pseudo-random chance
+  const shouldAdd = ((wave * 37) % 100) < 25;
+  if (!shouldAdd) return objectives;
+
+  // Import here to avoid circular dependencies
+  const { getTargetWordPool, pickRandomTargetWord } = require('./blastTargetWordPool');
+  const pool = getTargetWordPool(language);
+  if (pool.length === 0) return objectives; // No words available for language
+
+  const targetWord = pickRandomTargetWord(pool);
+  if (!targetWord) return objectives;
+
+  // Add target_word objective (bonus, not required for advance)
+  return [
+    ...objectives,
+    { type: 'target_word' as const, target: 1, targetWord },
+  ];
+}
+
 /** Lightning share when enabled (taken from gold + rainbow) */
 const LIGHTNING_SHARE = 0.08;
 /** Vortex share when enabled (renamed from MAGNET_SHARE; taken from gold + rainbow) */

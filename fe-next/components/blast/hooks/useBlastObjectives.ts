@@ -51,6 +51,12 @@ function getProgress(
       current = totalTiles > 0 ? Math.floor((tilesCleared / totalTiles) * 100 + 0.5) : 0;
       break;
     }
+
+    case 'target_word': {
+      const targetWord = (objective.targetWord || '').toUpperCase();
+      current = wordsFound.some(w => w.toUpperCase() === targetWord) ? 1 : 0;
+      break;
+    }
   }
 
   return {

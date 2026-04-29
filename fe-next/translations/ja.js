@@ -8515,6 +8515,9 @@ const ja = {
       "clearAllType": "すべての{tileType}をクリア",
       "wordLength": "{minWordLength}文字以上の単語を{target}個",
       "clearPercent": "ボードの{target}%をクリア",
+      "targetWord": "見つける: {word}",
+      "targetWordFoundIt": "見つけた!",
+      "targetWordMissed": "ターゲットは: {word} — カスケードが解決した!",
       "bannerTitle": "目標"
     },
     "combo": {
