@@ -240,9 +240,9 @@ const PracticeResults = memo(function PracticeResults({
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ─── Navigation ───
-  const handleDailyChallenge = useCallback(() => {
+  const handleWordHuntDaily = useCallback(() => {
     clearSessionPreservingUsername();
-    router.push(`/${language}/daily`);
+    router.push(`/${language}/daily/word-hunt`);
   }, [router, language]);
 
   const inf = reducedMotion ? 0 : Infinity;
@@ -376,7 +376,7 @@ const PracticeResults = memo(function PracticeResults({
             ) : (
               /* Daily available — big inviting CTA */
               <motion.button
-                onClick={handleDailyChallenge}
+                onClick={handleWordHuntDaily}
                 animate={reducedMotion ? {} : { scale: [1, 1.03, 1] }}
                 transition={{
                   duration: 2.5,
@@ -445,7 +445,7 @@ const PracticeResults = memo(function PracticeResults({
         <div className="flex flex-col gap-2">
           {!dailyAlreadyPlayed && (
             <motion.button
-              onClick={handleDailyChallenge}
+              onClick={handleWordHuntDaily}
               animate={reducedMotion ? {} : { scale: [1, 1.03, 1] }}
               transition={{ duration: 2, repeat: inf, ease: 'easeInOut', repeatDelay: 1 }}
               className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-amber-400 text-neo-black font-black text-sm uppercase border-3 border-neo-black rounded-neo shadow-hard"

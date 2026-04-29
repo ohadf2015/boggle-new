@@ -3094,6 +3094,8 @@ const sv = {
     "firstWin": {
       "title": "Grattis till din första vinst!",
       "subtitle": "Du har talang! Skapa ett konto för att fortsätta din vinstsvit.",
+      "subtitleUrgency": "Förlora inte den här vinsten — skapa konto innan den försvinner.",
+      "subtitleValueProp": "Spåra din svit och lås upp dagliga utmaningar.",
       "benefitsTitle": "Registrera dig för att låsa upp:",
       "benefits": {
         "trackProgress": "Följ dina framsteg",
@@ -3106,7 +3108,9 @@ const sv = {
     "signInWith": "Logga in med {provider}",
     "multiGames": {
       "title": "Du blir bättre!",
-      "subtitle": "Registrera dig för att spara dina framsteg och följa dina prestationer!"
+      "subtitle": "Registrera dig för att spara dina framsteg och följa dina prestationer!",
+      "subtitleUrgency": "Din statistik försvinner om du inte sparar den.",
+      "subtitleValueProp": "Klättra på topplistan och spela med vänner."
     },
     "mpSignup": {
       "title": "Behåll dina framsteg",
@@ -4449,6 +4453,7 @@ const sv = {
     "practice": "Träning",
     "practiceDesc": "Ingen press, bara ord",
     "practiceFirstToUnlock": "Avsluta övningen för att låsa upp",
+    "playGamesToUnlock": "Spela {count} spel för att låsa upp",
     "brainTraining": "Hjärnträning",
     "brainTrainingDesc": "Spåra kognitiv tillväxt",
     "adventureMode": "Äventyr",
@@ -4714,6 +4719,8 @@ const sv = {
     },
     "features": {
       "unlocked": {
+        "modeRoster": "Spellägen",
+        "modeRosterDesc": "Alla lägen upplåsta. Prova dem!",
         "practiceMode": "Övningsläge",
         "practiceModeDesc": "Öva i din egen takt",
         "challengeMode": "Utmaningsläge",

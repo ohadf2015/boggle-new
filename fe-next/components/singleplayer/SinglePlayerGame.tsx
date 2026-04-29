@@ -194,8 +194,6 @@ function SinglePlayerGame({
       onConfirmQuit: core.onQuit,
       showQuitConfirm: core.showQuitConfirm,
       setShowQuitConfirm: core.setShowQuitConfirm,
-      showCompletionPopup: core.showCompletionPopup,
-      setShowCompletionPopup: core.setShowCompletionPopup,
       onExtendTime: (seconds: number) =>
         core.timer.setTime(core.timer.remainingTime + seconds),
       t: core.t,
@@ -242,8 +240,6 @@ function SinglePlayerGame({
     core.onQuit,
     core.showQuitConfirm,
     core.setShowQuitConfirm,
-    core.showCompletionPopup,
-    core.setShowCompletionPopup,
     core.timer,
     core.t,
   ]);

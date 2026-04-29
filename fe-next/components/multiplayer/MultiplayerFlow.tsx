@@ -11,6 +11,7 @@ import {
 } from '@/utils/profileStorage';
 import { useCrazyGamesInvite } from '@/hooks/useCrazyGamesInvite';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
+import { trackGrowthEvent } from '@/utils/growthTracking';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { SeasonBanner } from '@/components/multiplayer/SeasonBanner';
@@ -364,6 +365,15 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
     const joinableRoom = activeRooms.find(
       (r) => r.gameState === 'waiting' && r.playerCount < (r.maxPlayers || 8),
     );
+
+    const decision = joinableRoom ? 'auto_join_room' : 'quick_play';
+    trackGrowthEvent('cg_lobby_arrival', {
+      decision,
+      activeRoomCount: activeRooms.length,
+      joinableRoomCount: activeRooms.filter(
+        (r) => r.gameState === 'waiting' && r.playerCount < (r.maxPlayers || 8),
+      ).length,
+    });
 
     if (joinableRoom) {
       handleRoomClick(joinableRoom);

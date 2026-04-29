@@ -20,6 +20,8 @@ import WatchAdButton from './WatchAdButton';
 import WatchAdForRevealButton from '@/components/ads/WatchAdForRevealButton';
 import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
 import { hasPlayedWordWheelToday } from '@/utils/dailyChallenge/storage';
+import { trackGrowthEvent } from '@/utils/growthTracking';
+import { useExperiment } from '@/hooks/useExperiment';
 import { MascotWithEntrance } from '@/components/ui/Mascot';
 import type { WordHuntResult } from '@/utils/dailyChallenge/types';
 import type { Language } from '@/shared/types/game';
@@ -132,6 +134,60 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
     setWordWheelPlayed(hasPlayedWordWheelToday(language));
   }, [language]);
 
+  // A/B: cross-promo wheel-CTA placement vs leaderboard order.
+  const { variant: crossPromoOrder, trackExposure: trackCrossPromoExposure } =
+    useExperiment('wordhunt-crosspromo-position');
+  useEffect(() => {
+    trackCrossPromoExposure();
+  }, [trackCrossPromoExposure]);
+
+  const wheelCtaNode = !wordWheelPlayed && (
+    <motion.div
+      data-testid="wordhunt-wheel-cta"
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.22, type: 'spring', stiffness: 300, damping: 26 }}
+    >
+      <div className="relative">
+        <span className="absolute -top-2 left-4 z-10 inline-block px-2 py-0.5 rounded-full bg-neo-purple text-neo-white text-[10px] font-neo-display font-black tracking-wider border-2 border-neo-black shadow-hard-sm">
+          {t('wordWheel.results.stepBadge', 'STEP 2 OF 2')}
+        </span>
+        <Link
+          href={`/${language}/daily/word-wheel`}
+          onClick={() => trackGrowthEvent('cross_promo_click', {
+            target: 'word_wheel',
+            source: 'word_hunt_results',
+            placement: crossPromoOrder === 'wheel-first' ? 'primary' : 'secondary',
+            experiment_variant: crossPromoOrder,
+            solved: result.solved,
+            language,
+          })}
+          className="flex items-center justify-between gap-3 w-full p-5 rounded-neo border-3 border-neo-black bg-neo-purple shadow-hard-lg hover:scale-[1.02] active:translate-x-px active:translate-y-px active:shadow-hard-pressed transition-all"
+        >
+          <div className="flex items-center gap-3">
+            <div className="flex items-center justify-center w-12 h-12 rounded-neo border-2 border-neo-black bg-neo-navy shrink-0">
+              <CircleDot className="w-7 h-7 text-neo-purple-light" />
+            </div>
+            <div>
+              <span className="block font-neo-display font-black text-neo-white text-base leading-tight">
+                {t('wordWheel.results.completeDailyTitle', "Finish today's challenge")}
+              </span>
+              <p className="text-neo-cream/80 text-xs mt-0.5">
+                {t('wordWheel.results.completeDailyDesc', 'Play Word Wheel to complete your Daily Challenge')}
+              </p>
+            </div>
+          </div>
+          <motion.div
+            animate={{ x: [0, 4, 0] }}
+            transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
+          >
+            <ArrowRight className="w-6 h-6 text-neo-white shrink-0" />
+          </motion.div>
+        </Link>
+      </div>
+    </motion.div>
+  );
+
   return (
   <div className="space-y-4">
     {/* Performance mascot — reacts to how many words the player found */}
@@ -174,7 +230,7 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3, type: 'spring', stiffness: 300, damping: 26 }}
+        transition={{ delay: 0.1, type: 'spring', stiffness: 300, damping: 26 }}
       >
         <PerformanceSection
           coinReward={coinActions.coinReward}
@@ -197,7 +253,7 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5, type: 'spring', stiffness: 300, damping: 26 }}
+        transition={{ delay: 0.15, type: 'spring', stiffness: 300, damping: 26 }}
       >
         <RankBadge stats={stats} t={t} />
       </motion.div>
@@ -208,22 +264,14 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
       <motion.div
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.52, type: 'spring', stiffness: 300, damping: 26 }}
+        transition={{ delay: 0.18, type: 'spring', stiffness: 300, damping: 26 }}
       >
         <StatsBlurb stats={stats} solved={result.solved} t={t} />
       </motion.div>
     )}
 
-    {/* Witty facts — data-driven insights about the player's performance */}
-    {stats && (
-      <motion.div
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.55, type: 'spring', stiffness: 300, damping: 26 }}
-      >
-        <DailyWordHuntFacts result={result} stats={stats} t={t} />
-      </motion.div>
-    )}
+    {/* PRIMARY CROSS-PROMO (variant): Word Wheel CTA above leaderboard. */}
+    {crossPromoOrder === 'wheel-first' && wheelCtaNode}
 
     {/* FAIL state: Reveal target word + watch ad */}
     {!result.solved && (
@@ -289,11 +337,14 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
       scope="word-hunt"
     />
 
+    {/* SECONDARY CROSS-PROMO (variant): Word Wheel CTA below leaderboard. */}
+    {crossPromoOrder === 'leaderboard-first' && wheelCtaNode}
+
     {/* Share/Retry Section */}
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.7, type: 'spring', stiffness: 300, damping: 26 }}
+      transition={{ delay: 0.28, type: 'spring', stiffness: 300, damping: 26 }}
     >
       <ShareSection
         solved={result.solved}
@@ -324,51 +375,12 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
       />
     )}
 
-    {/* Daily Challenge next-step — PRIMARY CTA when Word Wheel not yet played */}
-    {!wordWheelPlayed && (
-      <motion.div
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.72, type: 'spring', stiffness: 300, damping: 26 }}
-      >
-        <div className="relative">
-          <span className="absolute -top-2 left-4 z-10 inline-block px-2 py-0.5 rounded-full bg-neo-purple text-neo-white text-[10px] font-neo-display font-black tracking-wider border-2 border-neo-black shadow-hard-sm">
-            {t('wordWheel.results.stepBadge', 'STEP 2 OF 2')}
-          </span>
-          <Link
-            href={`/${language}/daily/word-wheel`}
-            className="flex items-center justify-between gap-3 w-full p-5 rounded-neo border-3 border-neo-black bg-neo-purple shadow-hard-lg hover:scale-[1.02] active:translate-x-px active:translate-y-px active:shadow-hard-pressed transition-all"
-          >
-            <div className="flex items-center gap-3">
-              <div className="flex items-center justify-center w-12 h-12 rounded-neo border-2 border-neo-black bg-neo-navy shrink-0">
-                <CircleDot className="w-7 h-7 text-neo-purple-light" />
-              </div>
-              <div>
-                <span className="block font-neo-display font-black text-neo-white text-base leading-tight">
-                  {t('wordWheel.results.completeDailyTitle', "Finish today's challenge")}
-                </span>
-                <p className="text-neo-cream/80 text-xs mt-0.5">
-                  {t('wordWheel.results.completeDailyDesc', 'Play Word Wheel to complete your Daily Challenge')}
-                </p>
-              </div>
-            </div>
-            <motion.div
-              animate={{ x: [0, 4, 0] }}
-              transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
-            >
-              <ArrowRight className="w-6 h-6 text-neo-white shrink-0" />
-            </motion.div>
-          </Link>
-        </div>
-      </motion.div>
-    )}
-
     {/* Daily complete badge — shown once both games done */}
     {wordWheelPlayed && (
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.72, type: 'spring', stiffness: 300, damping: 26 }}
+        transition={{ delay: 0.32, type: 'spring', stiffness: 300, damping: 26 }}
       >
         <div className="flex items-center gap-3 w-full p-4 rounded-neo border-3 border-neo-black bg-neo-lime shadow-hard-lg">
           <CheckCircle2 className="w-6 h-6 text-neo-black shrink-0" />
@@ -389,7 +401,7 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.82, type: 'spring', stiffness: 300, damping: 26 }}
+        transition={{ delay: 0.36, type: 'spring', stiffness: 300, damping: 26 }}
       >
         <NextStepPrompt
           currentMode="word-hunt"
@@ -397,6 +409,18 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
           variant="mobile"
           hideBackButton
         />
+      </motion.div>
+    )}
+
+    {/* Witty facts — supplementary, demoted below the fold so the page is
+        more to the point. Stats blurb above already gives the headline number. */}
+    {stats && (
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.4, type: 'spring', stiffness: 300, damping: 26 }}
+      >
+        <DailyWordHuntFacts result={result} stats={stats} t={t} />
       </motion.div>
     )}
 

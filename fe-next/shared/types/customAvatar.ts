@@ -24,25 +24,34 @@ export const AVATAR_HAIR_STYLES = [
   'frenchBob', 'shag', 'flatTop', 'lob', 'fingerWaves', 'curlyBangs', 'quiff', 'sideSwept',
   'fadeCurly',
   'frizzle', 'durag', 'locsShort',
+  /* Feminine-only additions (girly differentiation) */
+  'heartBuns', 'sideBow', 'milkmaidBraids', 'butterflyClips', 'lowPigtailsBow',
+  'princessBraid', 'sideBraidBow',
 ] as const;
 
-/** Styles that look feminine — shown when gender is female */
+/** Styles that look feminine — shown when gender is female. No overlap with MALE except gender-neutral shared (curly, afro, dreads, cornrows, straight). */
 export const FEMALE_HAIR_STYLES = [
-  'none', 'long', 'bob', 'ponytail', 'wavy', 'pigtails', 'sideshave', 'braids',
-  'bun', 'bangs', 'twintails', 'curly', 'afro', 'topknot', 'dreads',
-  'pixie', 'spaceBuns', 'straight', 'wolfCut', 'cornrows',
-  'curtainBangs', 'halfUp', 'himecut',
-  'frenchBob', 'shag', 'lob', 'fingerWaves', 'curlyBangs', 'sideSwept',
-  'frizzle', 'locsShort',
+  'none',
+  /* Femme-coded back-layer styles */
+  'long', 'bob', 'wavy', 'pigtails', 'braids', 'bangs', 'twintails',
+  'pixie', 'spaceBuns', 'curtainBangs', 'halfUp', 'himecut',
+  'frenchBob', 'lob', 'fingerWaves', 'curlyBangs', 'sideshave',
+  /* New girly-only styles */
+  'heartBuns', 'sideBow', 'milkmaidBraids', 'butterflyClips', 'lowPigtailsBow',
+  'princessBraid', 'sideBraidBow',
+  /* Gender-neutral shared */
+  'curly', 'afro', 'dreads', 'cornrows', 'straight',
 ] as const;
 
-/** Styles that look masculine — shown when gender is male */
+/** Styles that look masculine — shown when gender is male. */
 export const MALE_HAIR_STYLES = [
-  'none', 'spiky', 'curly', 'buzz', 'mohawk', 'afro', 'topknot', 'dreads',
+  'none', 'spiky', 'buzz', 'mohawk', 'topknot',
   'mullet', 'combover', 'elvis', 'ramen',
-  'undercut', 'fade', 'cornrows', 'wolfCut', 'ponytail', 'bun', 'straight',
+  'undercut', 'fade', 'wolfCut', 'ponytail', 'bun',
   'flatTop', 'quiff', 'shag', 'sideSwept', 'fadeCurly',
   'frizzle', 'durag', 'locsShort',
+  /* Gender-neutral shared */
+  'curly', 'afro', 'dreads', 'cornrows', 'straight',
 ] as const;
 
 /** Default hair when switching to female */

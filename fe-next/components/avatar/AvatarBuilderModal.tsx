@@ -169,7 +169,7 @@ export default function AvatarBuilderModal({
   if (!isOpen) return null;
 
   return createPortal(
-    <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/60" role="presentation" onClick={onClose} onKeyDown={(e) => { if (e.key === 'Escape') onClose(); }}>
+    <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/60 p-4 overflow-hidden" role="presentation" onClick={onClose} onKeyDown={(e) => { if (e.key === 'Escape') onClose(); }}>
       <AdaptiveMotion.div
         ref={dialogRef}
         role="dialog"
@@ -178,7 +178,7 @@ export default function AvatarBuilderModal({
         initial={{ opacity: 0, scale: 0.9, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-        className="bg-neo-navy border-3 border-black shadow-hard-lg rounded-neo-lg w-full max-w-[95vw] sm:max-w-lg mx-4 max-h-[85dvh] sm:max-h-[90vh] flex flex-col"
+        className="bg-neo-navy border-3 border-black shadow-hard-lg rounded-neo-lg w-full max-w-[95vw] sm:max-w-lg max-h-full flex flex-col min-h-0"
         onClick={(e: React.MouseEvent) => e.stopPropagation()}
       >
         {/* Header */}
@@ -233,7 +233,7 @@ export default function AvatarBuilderModal({
         </div>
 
         {/* Options Grid — animated category transition */}
-        <div className="flex-1 overflow-y-auto p-3 sm:p-4 min-h-[80px]">
+        <div className="flex-1 overflow-y-auto p-3 sm:p-4 min-h-0">
           <AdaptiveAnimatePresence mode="wait">
             <AdaptiveMotion.div
               key={activeCategory}

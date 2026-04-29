@@ -52,6 +52,13 @@ vi.mock('@/components/CrazyGamesSDK', () => ({
   useCrazyGames: () => ({ isOnCrazyGamesPlatform: mockIsOnCG() }),
 }));
 
+// Default to "experienced" stats (≥ 3 games) so existing tests retain their
+// "all modes visible" assertions. New newcomer-collapse cases override this.
+const mockUserStats = vi.fn(() => ({ userStats: { totalGamesPlayed: 5 }, isLoading: false }));
+vi.mock('@/hooks/useUserStats', () => ({
+  useUserStats: () => mockUserStats(),
+}));
+
 const baseProps = {
   language: 'en',
   activePlayers: 10,
@@ -150,6 +157,50 @@ describe('LandingChallengeCards', () => {
       render(<LandingChallengeCards {...baseProps} />);
       expect(screen.getByText('landing.practice')).toBeInTheDocument();
       expect(screen.queryByText('landing.quickPlay')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('newcomer collapse — modes hidden until 3 games played', () => {
+    afterEach(() => {
+      mockUserStats.mockReturnValue({ userStats: { totalGamesPlayed: 5 }, isLoading: false });
+      mockIsVeteran.mockReturnValue(false);
+    });
+
+    it('player with 0 games sees the More-Game-Modes expander (extras hidden by default)', () => {
+      mockUserStats.mockReturnValue({ userStats: { totalGamesPlayed: 0 }, isLoading: false });
+      const { container } = render(<LandingChallengeCards {...baseProps} />);
+      // Expander is present
+      expect(container.querySelector('[data-testid="landing-section-more"]')).not.toBeNull();
+    });
+
+    it('player with 0 games does NOT see adventure/connections/brainGym above the fold', () => {
+      mockUserStats.mockReturnValue({ userStats: { totalGamesPlayed: 0 }, isLoading: false });
+      const { container } = render(<LandingChallengeCards {...baseProps} />);
+      const moreSection = container.querySelector('[data-testid="landing-section-more"]');
+      // The extras live INSIDE the expander, not above it
+      expect(moreSection?.textContent).toContain('landing.adventureMode');
+      expect(moreSection?.textContent).toContain('landing.wordChainMode');
+      expect(moreSection?.textContent).toContain('landing.brainTraining');
+    });
+
+    it('player with 3 games sees all modes above the fold (no expander needed)', () => {
+      mockUserStats.mockReturnValue({ userStats: { totalGamesPlayed: 3 }, isLoading: false });
+      const { container } = render(<LandingChallengeCards {...baseProps} />);
+      expect(container.querySelector('[data-testid="landing-section-more"]')).toBeNull();
+    });
+
+    it('CrazyGames bypass overrides newcomer collapse', () => {
+      mockUserStats.mockReturnValue({ userStats: { totalGamesPlayed: 0 }, isLoading: false });
+      mockIsOnCG.mockReturnValue(true);
+      const { container } = render(<LandingChallengeCards {...baseProps} />);
+      expect(container.querySelector('[data-testid="landing-section-more"]')).toBeNull();
+      mockIsOnCG.mockReturnValue(false);
+    });
+
+    it('null userStats (auth still loading) does not collapse — default to open landing', () => {
+      mockUserStats.mockReturnValue({ userStats: null, isLoading: true });
+      const { container } = render(<LandingChallengeCards {...baseProps} />);
+      expect(container.querySelector('[data-testid="landing-section-more"]')).toBeNull();
     });
   });
 });

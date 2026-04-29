@@ -3221,6 +3221,8 @@ const en = {
     "firstWin": {
       "title": "First Victory! 🎉",
       "subtitle": "You've got game! Sign up to keep winning.",
+      "subtitleUrgency": "Don't lose this win — sign up before it slips away.",
+      "subtitleValueProp": "Track your streak and unlock daily challenges.",
       "benefitsTitle": "Unlock:",
       "benefits": {
         "trackProgress": "Track your progress",
@@ -3233,7 +3235,9 @@ const en = {
     "signInWith": "Sign in with {provider}",
     "multiGames": {
       "title": "You're On a Roll!",
-      "subtitle": "Save your progress and track achievements!"
+      "subtitle": "Save your progress and track achievements!",
+      "subtitleUrgency": "Your stats vanish if you don't save them.",
+      "subtitleValueProp": "Climb the leaderboard and play with friends."
     },
     "mpSignup": {
       "title": "Keep Your Progress",
@@ -4578,6 +4582,7 @@ const en = {
     "practice": "Practice",
     "practiceDesc": "No pressure, just words",
     "practiceFirstToUnlock": "Finish practice to unlock",
+    "playGamesToUnlock": "Play {count} games to unlock",
     "brainTraining": "Brain Training",
     "brainTrainingDesc": "Track cognitive growth",
     "adventureMode": "Adventure",
@@ -4844,6 +4849,8 @@ const en = {
     },
     "features": {
       "unlocked": {
+        "modeRoster": "Game Modes",
+        "modeRosterDesc": "Full lineup unlocked. Try them all!",
         "practiceMode": "Practice Mode",
         "practiceModeDesc": "Practice at your own pace",
         "challengeMode": "Challenge Mode",

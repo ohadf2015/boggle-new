@@ -23,13 +23,13 @@ import { getCurrentLevel, setCurrentLevel } from '@/lib/connections/levelStore';
 import { getCurrentLives, setCurrentLives, MAX_LIVES } from '@/lib/connections/livesStore';
 import type { ConnectionPuzzle, GameState, PuzzleRating } from '@/lib/connections/types';
 import { submitConnectionsFeedback } from '@/lib/connections/feedback';
+import { fetchBannedPuzzleIds, getCachedBannedIds } from '@/lib/connections/bannedPuzzles';
 import { trackGameStart } from '@/utils/growthTracking';
 import PuzzleCard from './PuzzleCard';
 import OutOfLivesModal from './OutOfLivesModal';
 
 const ConnectionsEffectsCanvas = dynamic(() => import('./ConnectionsEffectsCanvas'), { ssr: false });
 
-const ADVANCE_DELAY_MS = 1200;
 
 type Action =
   | { type: 'SET_INPUT'; input: string }
@@ -76,10 +76,15 @@ export default function ConnectionsGame() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [canvasSize, setCanvasSize] = useState({ width: 0, height: 0 });
 
+  // Auto-banned puzzles (≥3 distinct authed users flagged dislike+gave_up).
+  // Hydrate from localStorage cache so first paint already filters; refresh
+  // from `v_connections_banned_puzzles` in the background.
+  const [bannedIds, setBannedIds] = useState<ReadonlySet<string>>(() => getCachedBannedIds());
+
   // Each level renders one puzzle. Level number + lives persist in localStorage per locale.
   const [level, setLevel] = useState<number>(() => getCurrentLevel(language));
-  const totalLevels = getTotalLevels(language);
-  const initialPuzzle = getPuzzleForLevel(language, level);
+  const totalLevels = getTotalLevels(language, bannedIds);
+  const initialPuzzle = getPuzzleForLevel(language, level, bannedIds);
   const initialPuzzles: ConnectionPuzzle[] = initialPuzzle ? [initialPuzzle] : [];
 
   const [state, dispatch] = useReducer(
@@ -103,18 +108,48 @@ export default function ConnectionsGame() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // If locale changes mid-session, reload from that locale's saved level + lives.
+  // Refresh ban list in background. If a puzzle just crossed the 3-distinct-
+  // disliker threshold while the player was on it, the next level resolution
+  // (RESET below) will already skip it.
+  useEffect(() => {
+    let cancelled = false;
+    void fetchBannedPuzzleIds().then((ids) => {
+      if (!cancelled) setBannedIds(ids);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // Locale change — full reset to that locale's saved level + lives.
+  // Intentionally only depends on `language`: the background ban-list fetch
+  // resolves with a new Set ref every time, so coupling it here would wipe a
+  // mid-typed input on every game start. Ban-list refresh handled separately.
   useEffect(() => {
     const newLevel = getCurrentLevel(language);
     setLevel(newLevel);
-    const puzzle = getPuzzleForLevel(language, newLevel);
+    const puzzle = getPuzzleForLevel(language, newLevel, bannedIds);
     dispatch({
       type: 'RESET',
       puzzles: puzzle ? [puzzle] : [],
       initialLives: getCurrentLives(language),
     });
     xpAwardedIdsRef.current = new Set();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [language]);
+
+  // Ban-list refresh — only swap puzzle if the *current* one just got banned.
+  // Preserves the player's typed input + accumulated state in the (overwhelmingly
+  // common) case where the fetched ban list matches what's already in cache.
+  useEffect(() => {
+    const cur = state.puzzles[state.currentIndex];
+    if (!cur || !bannedIds.has(cur.id)) return;
+    const replacement = getPuzzleForLevel(language, level, bannedIds);
+    if (replacement && replacement.id !== cur.id) {
+      dispatch({ type: 'RESET', puzzles: [replacement], initialLives: state.lives });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bannedIds]);
 
   // Persist lives + emit lifeLost / gameOver events on changes.
   // Reduced-motion users still get state persistence but skip the
@@ -150,7 +185,9 @@ export default function ConnectionsGame() {
     return () => ro.disconnect();
   }, []);
 
-  // After correct → award XP + accumulate score, then auto-advance to next level
+  // After correct → award XP + accumulate score. Advance is user-driven via
+  // the Next button in PuzzleCard so the like/dislike CTA stays on screen
+  // long enough to actually tap (auto-advance at 1.2s was burying it).
   useEffect(() => {
     if (state.status !== 'correct') return;
     if (!prefersReducedMotion) {
@@ -168,11 +205,7 @@ export default function ConnectionsGame() {
         body: JSON.stringify({ xpAmount: xp, lessonId: 'connections-game', activityType: 'connections' }),
       }).catch(() => {});
     }
-    const timer = setTimeout(() => advanceToNextLevel(), ADVANCE_DELAY_MS);
-    return () => clearTimeout(timer);
-    // advanceToNextLevel referenced via closure below
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state.status, state.currentIndex, state.puzzles, state.streak, state.score]);
+  }, [state.status, state.currentIndex, state.puzzles, state.streak, state.score, prefersReducedMotion]);
 
   useEffect(() => {
     if (state.status === 'wrong' && !prefersReducedMotion) {
@@ -184,7 +217,7 @@ export default function ConnectionsGame() {
     const nextLevel = level + 1;
     setCurrentLevel(language, nextLevel);
     setLevel(nextLevel);
-    const puzzle = getPuzzleForLevel(language, nextLevel);
+    const puzzle = getPuzzleForLevel(language, nextLevel, bannedIds);
     if (puzzle) {
       // Carry surviving lives across levels so they actually gate progress.
       dispatch({ type: 'RESET', puzzles: [puzzle], initialLives: state.lives });
@@ -196,7 +229,7 @@ export default function ConnectionsGame() {
       const y = rect && containerRect ? rect.top + rect.height / 2 - containerRect.top : 0;
       window.dispatchEvent(new CustomEvent('connections:levelUp', { detail: { x, y, level: nextLevel } }));
     }
-  }, [language, level, state.lives, prefersReducedMotion]);
+  }, [language, level, state.lives, prefersReducedMotion, bannedIds]);
 
   const handleInput = useCallback((value: string) => {
     dispatch({ type: 'SET_INPUT', input: value });
@@ -249,12 +282,12 @@ export default function ConnectionsGame() {
   const handlePlayAgain = useCallback(() => {
     setCurrentLevel(language, 1);
     setLevel(1);
-    const puzzle = getPuzzleForLevel(language, 1);
+    const puzzle = getPuzzleForLevel(language, 1, bannedIds);
     dispatch({ type: 'RESET', puzzles: puzzle ? [puzzle] : [], initialLives: MAX_LIVES });
     setSessionScore(0);
     setXpEarned(0);
     xpAwardedIdsRef.current = new Set();
-  }, [language]);
+  }, [language, bannedIds]);
 
   if (!currentPuzzle) {
     const cleared = level > 1 && totalLevels > 0;

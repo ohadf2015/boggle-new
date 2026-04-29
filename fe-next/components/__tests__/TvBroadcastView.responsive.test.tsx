@@ -54,6 +54,9 @@ vi.mock('@/host/hooks/useTvFinalMinute', () => ({
 // Mock game state store
 vi.mock('@/hooks/gameState/store', () => ({
   useGameMode: () => 'classic',
+  useWordHuntPlayerLives: () => ({}),
+  useWordHuntEliminatedPlayers: () => [],
+  useWordHuntTargetLength: () => 0,
 }));
 
 // Mock child components

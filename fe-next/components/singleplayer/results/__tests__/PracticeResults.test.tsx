@@ -218,11 +218,11 @@ describe('PracticeResults — Celebratory Redesign', () => {
       expect(buttons.length).toBeGreaterThanOrEqual(1);
     });
 
-    it('navigates to daily challenge when CTA is clicked', () => {
+    it('navigates to Word Hunt daily when CTA is clicked', () => {
       render(<PracticeResults {...defaultProps} />);
       const buttons = screen.getAllByText('Play Word Hunt Daily');
       fireEvent.click(buttons[0]);
-      expect(mockPush).toHaveBeenCalledWith('/en/daily');
+      expect(mockPush).toHaveBeenCalledWith('/en/daily/word-hunt');
     });
 
     it('shows already-played state when daily was completed today', () => {

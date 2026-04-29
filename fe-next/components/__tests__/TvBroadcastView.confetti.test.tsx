@@ -47,6 +47,9 @@ vi.mock('@/components/CrazyGamesSDK', () => ({
 
 vi.mock('@/hooks/gameState/store', () => ({
   useGameMode: () => 'classic',
+  useWordHuntPlayerLives: () => ({}),
+  useWordHuntEliminatedPlayers: () => [],
+  useWordHuntTargetLength: () => 0,
 }));
 
 // Mock heavy child components

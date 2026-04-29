@@ -117,30 +117,35 @@ function Topknot({ fill }: HairPartProps) {
 
 function Ponytail({ fill }: HairPartProps) {
   const u = useAvatarUid();
-  const cap = "M18 34 C18 22 28 12 50 10 C72 12 82 22 82 34";
+  /* Sleek pulled-back cap + clean back-center ponytail (gender-neutral, more masculine after femme split). */
+  const cap = "M16 32 C16 14 30 8 50 6 C70 8 84 14 84 32";
+  /* Single tail attached center-back upper-crown, swoops down behind ending below face */
+  const tail = "M50 8 C56 8 62 12 64 22 C66 32 64 44 60 56 C58 64 56 76 60 86 C58 90 52 92 50 88 C48 92 42 90 40 86 C44 76 42 64 40 56 C36 44 34 32 36 22 C38 12 44 8 50 8Z";
   return (
     <g>
       <defs><HairPolishDefs uid={u} keyName="ponytail" /></defs>
-      {/* Hair cap — sleek, pulled back with volume */}
       <path d={cap} fill={fill} stroke="#000" strokeWidth={S} />
       <HairPolish uid={u} keyName="ponytail" d={cap} />
-      {/* Pulled-back texture — radiating from crown */}
-      <path d="M30 26 C38 18 46 14 50 12 C54 14 62 18 70 26" fill="none" stroke="#000" strokeWidth={0.8} opacity="0.1" />
-      <path d="M34 24 C40 16 46 12 50 10 C54 12 60 16 66 24" fill="none" stroke="#fff" strokeWidth={1} opacity="0.12" />
-      {/* Ponytail swooping behind — fuller S-curve with tapered tip */}
-      <path d="M74 24 C84 16 92 22 90 34 C92 48 88 62 84 72 C82 78 78 80 76 74 C78 66 82 54 84 42 C86 32 82 24 76 22Z"
-        fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
-      {/* Double-strand ponytail highlights */}
-      <path d="M82 30 C84 42 84 54 82 66" stroke="#fff" strokeWidth={1.2} opacity="0.15" />
-      <path d="M80 32 C82 44 82 56 80 64" stroke="#fff" strokeWidth={0.7} opacity="0.1" />
-      {/* Hair tie — scrunchie style */}
-      <ellipse cx="75" cy="24" rx="5.5" ry="3.5" fill={fill} stroke="#000" strokeWidth={2} />
-      <path d="M72 23 C74 21 76 21 78 23" fill="none" stroke="#fff" strokeWidth={0.6} opacity="0.2" />
+      {/* Pulled-back texture lines radiating from crown */}
+      <path d="M28 24 C36 16 46 10 50 8 C54 10 64 16 72 24" fill="none" stroke="#000" strokeWidth={0.8} opacity="0.14" />
+      <path d="M32 22 C40 14 50 10 50 8 C50 10 60 14 68 22" fill="none" stroke="#fff" strokeWidth={1} opacity="0.18" />
+      <path d="M22 28 C30 20 42 14 50 12" fill="none" stroke="#fff" strokeWidth={0.7} opacity="0.12" strokeLinecap="round" />
+      <path d="M78 28 C70 20 58 14 50 12" fill="none" stroke="#fff" strokeWidth={0.7} opacity="0.12" strokeLinecap="round" />
+      {/* Tail (rendered mostly behind face — only top stub above y=22 + bottom flare below y=82 visible) */}
+      <path d={tail} fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      <HairPolish uid={u} keyName="ponytail" d={tail} />
+      {/* Tail strand highlights */}
+      <path d="M48 14 C46 30 42 50 42 84" stroke="#fff" strokeWidth={1} opacity="0.18" strokeLinecap="round" fill="none" />
+      <path d="M52 14 C54 30 58 50 58 84" stroke="#fff" strokeWidth={1} opacity="0.18" strokeLinecap="round" fill="none" />
+      <path d="M50 14 C50 40 50 70 50 86" stroke="#000" strokeWidth={0.7} opacity="0.18" strokeLinecap="round" fill="none" />
+      {/* Hair tie at base of tail */}
+      <ellipse cx="50" cy="12" rx="6" ry="3.5" fill={fill} stroke="#000" strokeWidth={2} />
+      <ellipse cx="48" cy="11" rx="2" ry="1" fill="#fff" opacity="0.3" />
       {/* Baby hairs at temples */}
-      <path d="M20 34 C18 38 19 42 22 44" fill="none" stroke={fill} strokeWidth={1.5} strokeLinecap="round" />
-      <path d="M80 34 C82 38 81 42 78 44" fill="none" stroke={fill} strokeWidth={1.5} strokeLinecap="round" />
+      <path d="M18 34 C16 38 17 42 20 44" fill="none" stroke={fill} strokeWidth={1.5} strokeLinecap="round" />
+      <path d="M82 34 C84 38 83 42 80 44" fill="none" stroke={fill} strokeWidth={1.5} strokeLinecap="round" />
       {/* Crown highlight */}
-      <path d="M34 14 C42 8 58 8 66 14" fill="none" stroke="#fff" strokeWidth={1.2} opacity="0.16" strokeLinecap="round" />
+      <path d="M34 12 C42 8 58 8 66 12" fill="none" stroke="#fff" strokeWidth={1.4} opacity="0.2" strokeLinecap="round" />
     </g>
   );
 }

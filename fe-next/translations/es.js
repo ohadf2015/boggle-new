@@ -2906,6 +2906,8 @@ const es = {
     "firstWin": {
       "title": "¡Felicitaciones por Tu Primera Victoria!",
       "subtitle": "¡Tienes habilidades! Crea una cuenta para mantener tu racha ganadora.",
+      "subtitleUrgency": "No pierdas esta victoria — regístrate antes de que se esfume.",
+      "subtitleValueProp": "Sigue tu racha y desbloquea los retos diarios.",
       "benefitsTitle": "Regístrate para desbloquear:",
       "benefits": {
         "trackProgress": "Seguir tu progreso",
@@ -2918,7 +2920,9 @@ const es = {
     "signInWith": "Iniciar con {provider}",
     "multiGames": {
       "title": "¡Estás mejorando!",
-      "subtitle": "¡Regístrate para guardar tu progreso y seguir tus logros!"
+      "subtitle": "¡Regístrate para guardar tu progreso y seguir tus logros!",
+      "subtitleUrgency": "Tus estadísticas desaparecerán si no las guardas.",
+      "subtitleValueProp": "Sube en la clasificación y juega con amigos."
     },
     "mpSignup": {
       "title": "Guarda tu progreso",
@@ -4479,6 +4483,7 @@ const es = {
     "practice": "Práctica",
     "practiceDesc": "Sin presión, solo palabras",
     "practiceFirstToUnlock": "Termina la práctica para desbloquear",
+    "playGamesToUnlock": "Juega {count} partidas para desbloquear",
     "brainTraining": "Entrenamiento Cerebral",
     "brainTrainingDesc": "Sigue tu crecimiento cognitivo",
     "adventureMode": "Aventura",
@@ -4743,6 +4748,8 @@ const es = {
     },
     "features": {
       "unlocked": {
+        "modeRoster": "Modos de Juego",
+        "modeRosterDesc": "¡Todos desbloqueados! Pruébalos.",
         "practiceMode": "Modo Práctica",
         "practiceModeDesc": "Practica a tu propio ritmo",
         "challengeMode": "Modo Desafío",

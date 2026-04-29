@@ -46,10 +46,10 @@ describe('useFeatureUnlockNotifications', () => {
     expect(toast.success).not.toHaveBeenCalled();
   });
 
-  it('should not show notification for users with 4 games (below threshold)', () => {
-    // GIVEN - User with 4 games (below first threshold)
+  it('should not show notification for users with 2 games (below modeRoster threshold)', () => {
+    // GIVEN - User with 2 games (below modeRoster=3 threshold)
     (useUserStats as any).mockReturnValue({
-      userStats: { totalGamesPlayed: 4 },
+      userStats: { totalGamesPlayed: 2 },
       isLoading: false,
     });
 
@@ -58,6 +58,24 @@ describe('useFeatureUnlockNotifications', () => {
 
     // THEN - No toast shown
     expect(toast.success).not.toHaveBeenCalled();
+  });
+
+  it('should celebrate the modeRoster unlock at 3 games (mode-reveal threshold)', () => {
+    // GIVEN - Player just crossed 3 games — all home-screen modes now visible
+    (useUserStats as any).mockReturnValue({
+      userStats: { totalGamesPlayed: 3 },
+      isLoading: false,
+    });
+
+    // WHEN
+    renderHook(() => useFeatureUnlockNotifications());
+
+    // THEN
+    expect(toast.success).toHaveBeenCalledWith(
+      expect.stringContaining('singlePlayer.features.unlocked.modeRoster'),
+      expect.any(Object)
+    );
+    expect(localStorage.getItem('feature_unlock_modeRoster')).toBe('true');
   });
 
   it('should show notification when user reaches 5 games (advanced settings unlock)', () => {
@@ -96,7 +114,9 @@ describe('useFeatureUnlockNotifications', () => {
   });
 
   it('should NOT show notification twice for same unlock', () => {
-    // GIVEN - User already saw advancedSettings unlock
+    // GIVEN - User already saw both unlocks they've crossed at 5 games
+    // (modeRoster at 3, advancedSettings at 5)
+    localStorage.setItem('feature_unlock_modeRoster', 'true');
     localStorage.setItem('feature_unlock_advancedSettings', 'true');
     (useUserStats as any).mockReturnValue({
       userStats: { totalGamesPlayed: 5 },

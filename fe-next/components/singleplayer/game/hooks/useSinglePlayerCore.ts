@@ -88,7 +88,6 @@ export function useSinglePlayerCore({
 
   // UI state
   const [showQuitConfirm, setShowQuitConfirm] = useState(false);
-  const [showCompletionPopup, setShowCompletionPopup] = useState(false);
   const [showHintPrompt, setShowHintPrompt] = useState(false);
   const [formedWord, setFormedWord] = useState('');
   const [letterCount, setLetterCount] = useState(0);
@@ -164,7 +163,10 @@ export function useSinglePlayerCore({
   });
 
   const handleTrainingSkillUnlock = useCallback((_skillId: string) => { /* noop */ }, []);
-  const handleTrainingComplete = useCallback(() => { setShowCompletionPopup(true); }, []);
+  // Training-mastered no longer interrupts the session with a popup.
+  // Player keeps practicing until they tap Finish (manual) or quit;
+  // PracticeResults is rendered by SinglePlayerView once phase flips to 'results'.
+  const handleTrainingComplete = useCallback(() => { /* noop — no mid-game upsell */ }, []);
   const {
     completedSkills: trainingCompletedSkills, completedSkillsRef: trainingCompletedSkillsRef,
     justUnlocked: trainingJustUnlocked, isComplete: trainingIsComplete,
@@ -514,7 +516,6 @@ export function useSinglePlayerCore({
     showQuitConfirm, setShowQuitConfirm,
     showLandscapeTutorial: effects.showLandscapeTutorial,
     dismissLandscapeTutorial: effects.dismissLandscapeTutorial,
-    showCompletionPopup, setShowCompletionPopup,
     totalBoardWords, targetHighScore, liveAchievements,
     lastWordFoundTimeRef: effects.lastWordFoundTimeRef, gameStatsRef,
     handleWordSubmit, handlePathSubmit, handleWordChange,

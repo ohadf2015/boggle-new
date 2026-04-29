@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { BreadcrumbJsonLd } from '@/components/seo/BreadcrumbJsonLd';
+import { VideoGameJsonLd } from '@/components/seo/VideoGameJsonLd';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,12 +17,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const pageUrl = `${BASE_URL}/es/juego-de-palabras-multijugador`;
 
   return {
-    title: 'Juego de Palabras Multijugador Online Gratis - Boggle y Scrabble en Tiempo Real | LexiClash',
-    description: 'Te gustan Boggle, Scrabble o Wordle? LexiClash es un juego de palabras multijugador online en tiempo real. Crea una sala, envia un enlace a tus amigos y compite en tiempo real. 10,000+ palabras, sin registro, completamente gratis.',
-    keywords: 'juego de palabras multijugador, juego de palabras online gratis, juego de palabras en tiempo real, boggle online multijugador, scrabble online gratis, juego de palabras con amigos, batalla de palabras',
+    title: 'Scrabble Online en Español Multijugador Gratis 2026 | LexiClash',
+    description: 'Juega Scrabble online en español multijugador GRATIS. Crea sala, comparte enlace, compite en tiempo real con amigos. 10,000+ palabras, sin registro, sin descargas. ¡Empieza ya!',
+    keywords: 'scrabble online español multijugador, scrabble online en español gratis, scrabble multijugador online, scrabble con amigos online, scrabble español tiempo real, apalabrados online gratis, juego de palabras multijugador, boggle online en español, juego de palabras online gratis, batalla de palabras tiempo real',
     openGraph: {
-      title: 'Juego de Palabras Multijugador Online - Boggle y Scrabble Gratis | LexiClash',
-      description: 'Como Boggle, Scrabble y Wordle combinados. Crea una sala, invita amigos, compite en tiempo real. Gratis y sin registro.',
+      title: 'Scrabble Online en Español Multijugador - Gratis y Sin Registro | LexiClash',
+      description: 'Juega Scrabble online en español con amigos. Crea sala, invita por enlace, compite en tiempo real. 100% gratis, sin descargas.',
       locale: 'es_ES',
       type: 'website',
       url: pageUrl,
@@ -29,14 +31,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
           url: `${BASE_URL}/og-image-es.webp`,
           width: 1200,
           height: 630,
-          alt: 'LexiClash - Juego de Palabras Multijugador Online',
+          alt: 'LexiClash - Scrabble Online en Español Multijugador',
         },
       ],
     },
     twitter: {
       card: 'summary_large_image',
-      title: 'Juego de Palabras Multijugador Online Gratis - LexiClash',
-      description: 'Como Boggle, Scrabble y Wordle combinados. Crea una sala, invita amigos y compite en tiempo real. Gratis y sin registro.',
+      title: 'Scrabble Online en Español Multijugador Gratis - LexiClash',
+      description: 'Juega Scrabble online en español con amigos. Sala con enlace, tiempo real, sin registro. ¡100% gratis!',
       images: [`${BASE_URL}/og-image-es.webp`],
     },
     alternates: {
@@ -66,7 +68,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         'es-CO': `${BASE_URL}/es/juego-de-palabras-multijugador`,
       },
     },
-    robots: { index: true, follow: true },
+    robots: isTargetLocale
+      ? { index: true, follow: true }
+      : { index: false, follow: true },
   };
 }
 
@@ -75,29 +79,44 @@ export default async function SpanishWordGamePage({ params }: PageProps) {
 
   const faqs = [
     {
-      q: '¿Cómo comienzo a jugar juegos de palabras multijugador?',
-      a: 'Simplemente haz clic en "Crear sala" o "Unirse a sala" en la página multijugador. Comparte el enlace de la sala con amigos y ¡todos pueden comenzar a competir en tiempo real! Sin necesidad de registrarse.',
+      q: '¿Cómo juego Scrabble online en español multijugador gratis?',
+      a: 'En LexiClash haces clic en "Crear sala" en la página multijugador, compartes el enlace con tus amigos y todos compiten en tiempo real al estilo Scrabble. Sin registro, sin descargas, 100% gratis. Funciona en móvil y ordenador.',
     },
     {
-      q: '¿Qué hace a LexiClash diferente de otros juegos de palabras?',
-      a: 'LexiClash combina lo mejor de Boggle, Scrabble y Wordle. Compite en tiempo real con retroalimentación de puntos inmediata, múltiples modos de juego, batallas de jefes y desafíos diarios.',
+      q: '¿LexiClash es como Scrabble o Apalabrados pero online?',
+      a: 'Sí. LexiClash combina la profundidad estratégica de Scrabble, la velocidad de Boggle y el formato social de Apalabrados, todo en tiempo real con más de 10,000 palabras en español.',
     },
     {
-      q: '¿Puedo jugar con amigos en línea gratis?',
-      a: '¡Sí! LexiClash es completamente gratis. Crea salas, invita amigos a través del enlace y compite sin descargas ni registro.',
+      q: '¿Puedo jugar Scrabble online con amigos sin registrarme?',
+      a: '¡Sí! Crea una sala, envía el enlace por WhatsApp, Discord o cualquier app, y tus amigos se unen al instante. Sin cuenta, sin email, sin descargas.',
     },
     {
-      q: '¿Cuántas palabras en español tiene LexiClash?',
-      a: 'LexiClash incluye más de 10,000 palabras en español. Nuestro diccionario se actualiza continuamente.',
+      q: '¿Cuántas palabras en español tiene el diccionario?',
+      a: 'Más de 10,000 palabras en español validadas, actualizadas continuamente. Reconoce variantes de España y Latinoamérica.',
     },
     {
-      q: '¿Qué modos de juego hay?',
-      a: 'Juega salas multijugador, desafíos diarios, cazadores de palabras, modo explosión y más. Cada modo tiene reglas y cálculo de puntos únicos.',
+      q: '¿Qué modos de juego multijugador hay?',
+      a: 'Salas multijugador en tiempo real, desafíos diarios, cazadores de palabras, modo explosión, batallas de jefes y más. Cada modo tiene reglas y puntuación únicas.',
     },
   ];
 
   return (
     <main className="min-h-screen bg-neo-navy text-neo-white">
+      <BreadcrumbJsonLd
+        items={[
+          { name: 'Inicio', url: `${BASE_URL}/${locale}` },
+          { name: 'Multijugador', url: `${BASE_URL}/${locale}/multiplayer` },
+          { name: 'Scrabble Online en Español Multijugador', url: `${BASE_URL}/es/juego-de-palabras-multijugador` },
+        ]}
+      />
+      <VideoGameJsonLd
+        mode="juego-de-palabras-multijugador"
+        locale="es"
+        name="LexiClash - Scrabble Online en Español Multijugador"
+        description="Scrabble online en español multijugador gratis. Crea sala, comparte enlace, compite en tiempo real con amigos. 10,000+ palabras, sin registro, sin descargas."
+        playMode="MultiPlayer"
+        numberOfPlayers={{ minValue: 2, maxValue: 8 }}
+      />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -118,11 +137,11 @@ export default async function SpanishWordGamePage({ params }: PageProps) {
 
       <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
         <h1 className="mb-6 font-neo-display text-4xl font-bold leading-tight sm:text-5xl">
-          Juego de Palabras Multijugador Online - Batallas de Palabras en Tiempo Real
+          Scrabble Online en Español Multijugador - Gratis y en Tiempo Real
         </h1>
 
         <p className="mb-8 text-lg leading-relaxed text-neo-gray-200">
-          Bienvenido a LexiClash, el juego de palabras multijugador online gratuito definitivo en español. Ya sea que ames Boggle, Scrabble o Wordle, nuestra plataforma de batalla de palabras en tiempo real combina lo mejor de cada uno. Crea una sala, envía un enlace a tus amigos y compite en emocionantes batallas de palabras al instante. Con más de 10,000 palabras en nuestro diccionario en español, sin descargas requeridas y acceso completamente gratuito, LexiClash es tu juego de palabras definitivo para diversión competitiva.
+          ¿Buscas Scrabble online en español multijugador? LexiClash es la mejor alternativa gratuita: un juego de palabras en tiempo real que combina lo mejor de Scrabble, Boggle y Apalabrados. Crea una sala, comparte el enlace con tus amigos y compite al instante en español. Más de 10,000 palabras en el diccionario, sin descargas, sin registro y 100% gratis. Juega Scrabble multijugador online desde tu móvil u ordenador, en cualquier momento.
         </p>
 
         <section className="mb-12">
@@ -191,12 +210,12 @@ export default async function SpanishWordGamePage({ params }: PageProps) {
         </section>
 
         <section className="mb-12 max-w-none">
-          <h2 className="font-neo-display text-2xl font-bold sm:text-3xl">Sobre LexiClash Multijugador</h2>
+          <h2 className="font-neo-display text-2xl font-bold sm:text-3xl">Sobre Scrabble Online en Español Multijugador</h2>
           <p className="mt-4 text-neo-gray-200">
-            LexiClash revoluciona los juegos de palabras en línea al combinar la profundidad estratégica de Scrabble, la velocidad en tiempo real de Boggle y la satisfacción del rompecabezas de Wordle. Nuestra plataforma está diseñada para amantes de palabras, jugadores casuales y jugadores competitivos por igual.
+            LexiClash revoluciona el Scrabble online en español al combinar la profundidad estratégica de Scrabble, la velocidad en tiempo real de Boggle y el formato social de Apalabrados. Nuestra plataforma está diseñada para amantes de las palabras, jugadores casuales y competitivos por igual.
           </p>
           <p className="mt-4 text-neo-gray-200">
-            Juega juegos de palabras multijugador en línea con amigos, familia o extraños en todo el mundo. Ya sea que quieras una partida rápida de 15 minutos o una sesión competitiva más larga, LexiClash se adapta a todos los estilos de juego. La interfaz intuitiva funciona en escritorio y móvil, permitiéndote jugar juegos de palabras en cualquier lugar, en cualquier momento.
+            Juega Scrabble multijugador online con amigos, familia o rivales de todo el mundo hispanohablante. Ya sea una partida rápida de 15 minutos o una sesión competitiva más larga, LexiClash se adapta a tu ritmo. La interfaz intuitiva funciona en escritorio y móvil, así que puedes jugar Scrabble en español en cualquier lugar y momento.
           </p>
           <p className="mt-4 text-neo-gray-200">
             Compite en clasificaciones globales, obtén logros y desbloquea modos de juego especiales. Nuestras batallas de jefes añaden un giro único de PvE donde los jugadores colaboran contra oponentes de IA. Los desafíos diarios ofrecen nuevos rompecabezas cada día con recompensas exclusivas.

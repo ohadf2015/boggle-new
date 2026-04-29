@@ -1,9 +1,10 @@
 'use client';
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import posthog from 'posthog-js';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useBoostStatus } from '@/hooks/useBoostStatus';
 import { useBoostClaim } from '@/hooks/useBoostClaim';
+import { useExperiment } from '@/hooks/useExperiment';
 import { BOOST_TYPES, BOOST_CONFIGS, type BoostType } from '@/shared/types/boosts';
 import { BOOST_ICONS } from './boostIcons';
 
@@ -21,11 +22,16 @@ export function BoostPicker({ open, mode, sessionId, onClose }: Props) {
   const dialogRef = useRef<HTMLDivElement>(null);
   const closeBtnRef = useRef<HTMLButtonElement>(null);
 
+  // A/B: which boost gets top-of-grid placement.
+  const { variant: orderVariant, trackExposure: trackOrderExposure } =
+    useExperiment('boost-picker-order');
+
   useEffect(() => {
     if (open) {
-      posthog?.capture('boost_picker_opened', { mode });
+      posthog?.capture('boost_picker_opened', { mode, order_variant: orderVariant });
+      trackOrderExposure();
     }
-  }, [open, mode]);
+  }, [open, mode, orderVariant, trackOrderExposure]);
 
   useEffect(() => {
     if (!open) return;
@@ -58,9 +64,22 @@ export function BoostPicker({ open, mode, sessionId, onClose }: Props) {
     return () => document.removeEventListener('keydown', onKey);
   }, [open, onClose]);
 
+  // Promote the variant's chosen boost to the front of the grid (no-op
+  // when control or when the chosen boost isn't eligible for this mode).
+  const eligible = useMemo(() => {
+    const base = BOOST_TYPES.filter((bt) =>
+      BOOST_CONFIGS[bt].availableIn.includes(mode),
+    );
+    const promote: BoostType | null =
+      orderVariant === 'score-first' ? 'scoreMultiplier'
+      : orderVariant === 'freeze-first' ? 'freezeTime'
+      : null;
+    if (!promote || !base.includes(promote)) return base;
+    return [promote, ...base.filter((bt) => bt !== promote)];
+  }, [mode, orderVariant]);
+
   if (!open) return null;
 
-  const eligible = BOOST_TYPES.filter((bt) => BOOST_CONFIGS[bt].availableIn.includes(mode));
   const remaining = status?.remaining ?? 0;
   const cap = status?.capPerDay ?? 5;
 

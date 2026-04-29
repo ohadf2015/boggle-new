@@ -3099,6 +3099,8 @@ const he = {
     "firstWin": {
       "title": "מזל טוב על הניצחון הראשון!",
       "subtitle": "יש לך את זה! צור חשבון כדי להמשיך את רצף הניצחונות.",
+      "subtitleUrgency": "יש לך את זה! צור חשבון כדי להמשיך את רצף הניצחונות.",
+      "subtitleValueProp": "יש לך את זה! צור חשבון כדי להמשיך את רצף הניצחונות.",
       "benefitsTitle": "הירשם כדי לקבל:",
       "benefits": {
         "trackProgress": "עקוב אחר ההתקדמות שלך",
@@ -3111,7 +3113,9 @@ const he = {
     "signInWith": "התחבר עם {provider}",
     "multiGames": {
       "title": "אתה משתפר!",
-      "subtitle": "הירשם כדי לשמור את ההתקדמות שלך ולעקוב אחר ההישגים!"
+      "subtitle": "הירשם כדי לשמור את ההתקדמות שלך ולעקוב אחר ההישגים!",
+      "subtitleUrgency": "הירשם כדי לשמור את ההתקדמות שלך ולעקוב אחר ההישגים!",
+      "subtitleValueProp": "הירשם כדי לשמור את ההתקדמות שלך ולעקוב אחר ההישגים!"
     },
     "mpSignup": {
       "title": "שמור על ההתקדמות שלך",
@@ -4452,6 +4456,7 @@ const he = {
     "practice": "תרגול",
     "practiceDesc": "בלי לחץ, רק מילים",
     "practiceFirstToUnlock": "סיים תרגול כדי לפתוח",
+    "playGamesToUnlock": "שחקו {count} משחקים לפתיחה",
     "brainTraining": "אימון קוגניטיבי",
     "brainTrainingDesc": "עקוב אחר התפתחות קוגניטיבית",
     "adventureMode": "הרפתקה",
@@ -4717,6 +4722,8 @@ const he = {
     },
     "features": {
       "unlocked": {
+        "modeRoster": "מצבי משחק",
+        "modeRosterDesc": "כל המצבים נפתחו!",
         "practiceMode": "מצב אימון",
         "practiceModeDesc": "התאמנו בקצב שלכם",
         "challengeMode": "מצב אתגר",

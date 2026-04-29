@@ -272,27 +272,13 @@ export function useSinglePlayerConfig({ searchParams }: UseSinglePlayerConfigOpt
     loadCommunityBoard();
   }, [boardCode, uiLanguage]);
 
-  // Handle pre-game tutorial completion
+  // Handle pre-game tutorial completion — route to homepage so the player
+  // chooses their own next step instead of being auto-funneled into practice.
   const handleTutorialComplete = useCallback(() => {
     markGuidanceShown('firstPlayTutorialCompleted');
     markOnboardingComplete({ avatarId: '', displayName: getStoredUsername() || '', selectedMode: 'single' });
-    wasFirstTimerPracticeRef.current = true;
-    const practicePreset = getDefaultPreset('practice');
-    if (practicePreset) {
-      const minWordLength = getMinWordLength(uiLanguage, practicePreset.settings.difficulty);
-      setGameState(prev => ({
-        ...prev,
-        mode: 'practice',
-        difficulty: practicePreset.settings.difficulty,
-        timerSeconds: practicePreset.settings.timerSeconds,
-        bots: [],
-        language: (uiLanguage as Language) || 'en',
-        grid: null,
-        minWordLength,
-      }));
-    }
-    setPhase('playing');
-  }, [uiLanguage]);
+    router.push(`/${uiLanguage}/`);
+  }, [router, uiLanguage]);
 
   // Handle play again — replays the current mode
   const handlePlayAgain = useCallback(() => {

@@ -6,6 +6,7 @@
  */
 
 export interface FeatureGates {
+  modeRoster: boolean; // Unlocked after 3 games — full home-screen mode list
   advancedSettings: boolean; // Unlocked after 5 games
   customBotCount: boolean; // Unlocked after 10 games
   challengeMode: boolean; // Unlocked after 15 games
@@ -20,6 +21,7 @@ export interface UserStats {
 
 // Feature unlock thresholds (games required)
 export const THRESHOLDS = {
+  modeRoster: 3,
   advancedSettings: 5,
   customBotCount: 10,
   challengeMode: 15,
@@ -41,6 +43,7 @@ export function getFeatureGates(userStats: UserStats | null | undefined): Featur
   const gamesPlayed = userStats?.totalGamesPlayed ?? 0;
 
   return {
+    modeRoster: gamesPlayed >= THRESHOLDS.modeRoster,
     advancedSettings: gamesPlayed >= THRESHOLDS.advancedSettings,
     customBotCount: gamesPlayed >= THRESHOLDS.customBotCount,
     challengeMode: gamesPlayed >= THRESHOLDS.challengeMode,

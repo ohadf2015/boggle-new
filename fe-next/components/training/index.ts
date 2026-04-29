@@ -12,5 +12,4 @@ export { default as TrainingHints } from './TrainingHints';
 export { default as TrainingAnalysisModal } from './TrainingAnalysisModal';
 export { default as TrainingProgressBar, TRAINING_SKILL_IDS } from './TrainingProgressBar';
 export { default as SkillUnlockToast } from './SkillUnlockToast';
-export { default as PracticeCompletionPopup } from './PracticeCompletionPopup';
 export type { TrainingSkillId } from './TrainingProgressBar';

@@ -3081,6 +3081,8 @@ const ja = {
     "firstWin": {
       "title": "初勝利！🎉",
       "subtitle": "才能あるじゃん！登録して勝ち続けよう！",
+      "subtitleUrgency": "この勝利を失わないで — 消える前に登録しよう。",
+      "subtitleValueProp": "連勝を記録して、デイリーチャレンジを開放しよう。",
       "benefitsTitle": "登録して以下をアンロック:",
       "benefits": {
         "trackProgress": "進捗を追跡",
@@ -3093,7 +3095,9 @@ const ja = {
     "signInWith": "{provider}でログイン",
     "multiGames": {
       "title": "上達しています！",
-      "subtitle": "登録して進捗を保存し、実績を追跡しましょう！"
+      "subtitle": "登録して進捗を保存し、実績を追跡しましょう！",
+      "subtitleUrgency": "保存しないと統計が消えてしまいます。",
+      "subtitleValueProp": "ランキングを駆け上がり、友達と遊ぼう。"
     },
     "mpSignup": {
       "title": "進捗を保存しよう",
@@ -4433,6 +4437,7 @@ const ja = {
     "practice": "練習",
     "practiceDesc": "プレッシャーなし、言葉だけ",
     "practiceFirstToUnlock": "練習を完了して解除",
+    "playGamesToUnlock": "{count}ゲームをプレイして解除",
     "brainTraining": "脳トレーニング",
     "brainTrainingDesc": "認知成長を追跡",
     "adventureMode": "アドベンチャー",
@@ -4698,6 +4703,8 @@ const ja = {
     },
     "features": {
       "unlocked": {
+        "modeRoster": "ゲームモード",
+        "modeRosterDesc": "全モード解放！試してみよう",
         "practiceMode": "練習モード",
         "practiceModeDesc": "自分のペースで練習しよう",
         "challengeMode": "チャレンジモード",

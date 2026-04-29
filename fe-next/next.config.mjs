@@ -151,6 +151,23 @@ const nextConfig = {
         destination: 'https://www.lexiclash.live/:path',
         permanent: true,
       },
+      // SEO: keyword-shaped URLs for "scrabble online español multijugador" GSC query
+      // → canonical /es/juego-de-palabras-multijugador (ranks the existing page).
+      {
+        source: '/es/scrabble-online-multijugador',
+        destination: '/es/juego-de-palabras-multijugador',
+        permanent: true,
+      },
+      {
+        source: '/es/scrabble-online-en-espanol',
+        destination: '/es/juego-de-palabras-multijugador',
+        permanent: true,
+      },
+      {
+        source: '/es/scrabble-multijugador-online',
+        destination: '/es/juego-de-palabras-multijugador',
+        permanent: true,
+      },
       // Catch-all: redirect any path without a locale prefix to /en/...
       // This prevents 308s from the app router and gives Google clean 301s.
       // Must be AFTER the non-www redirect and root redirect above.
