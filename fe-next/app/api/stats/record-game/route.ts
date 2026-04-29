@@ -10,6 +10,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { checkApiRateLimit } from '@/lib/apiRateLimit';
 import { createClient } from '@/utils/supabase/server';
 import { calculateGameXp, getLevelFromXp, checkLevelUp, getTitleForLevel } from '@/backend/modules/xpManager';
+import { checkLifetimeAchievements, type UserStats } from '@/backend/modules/achievementManager';
 import { captureApiError } from '@/utils/sentry';
 
 interface RecordGameRequest {
@@ -106,7 +107,7 @@ export async function POST(request: NextRequest) {
     // Fetch current profile
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
-      .select('total_games, total_score, total_words, total_time_played, total_xp, current_level, player_title, longest_word, longest_word_length, last_game_at, unique_days_played')
+      .select('total_games, total_score, total_words, total_time_played, total_xp, current_level, player_title, longest_word, longest_word_length, last_game_at, unique_days_played, achievement_counts')
       .eq('id', userId)
       .single();
 
@@ -189,6 +190,38 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Check lifetime achievements based on UPDATED stats. SP never had a
+    // grant path before, so VETERAN/CENTURION/WORD_COLLECTOR/etc. were
+    // silent for solo players. gamesWon-gated ones (FIRST_GAME_WIN /
+    // CHAMPION / LEGEND) won't fire here since SP is non-competitive.
+    let newLifetimeAchievements: { key: string; icon: string }[] = [];
+    try {
+      const profileAchievementCounts = (profile?.achievement_counts || {}) as Record<string, number>;
+      const userStats: UserStats = {
+        gamesPlayed: updates.total_games as number,
+        totalWordsFound: updates.total_words as number,
+        totalScore: updates.total_score as number,
+        uniqueDaysPlayed: (updates.unique_days_played as number | undefined) ?? profile?.unique_days_played ?? 0,
+      };
+      newLifetimeAchievements = checkLifetimeAchievements(
+        userStats,
+        Object.keys(profileAchievementCounts),
+      );
+
+      if (newLifetimeAchievements.length > 0) {
+        const updatedCounts = { ...profileAchievementCounts };
+        for (const achievement of newLifetimeAchievements) {
+          updatedCounts[achievement.key] = (updatedCounts[achievement.key] || 0) + 1;
+        }
+        await supabase
+          .from('profiles')
+          .update({ achievement_counts: updatedCounts })
+          .eq('id', userId);
+      }
+    } catch (err) {
+      console.error('[STATS RECORD-GAME] Lifetime achievement check failed:', err);
+    }
+
     // Update weekly quest progress for singleplayer games
     try {
       const { updateQuestProgress } = await import('@/backend/modules/weeklyQuestManager');
@@ -220,6 +253,7 @@ export async function POST(request: NextRequest) {
       newTotalXp,
       newLevel,
       leveledUp: levelUpInfo.leveledUp,
+      ...(newLifetimeAchievements.length > 0 ? { lifetimeAchievements: newLifetimeAchievements } : {}),
       ...(questUpdate ? { questUpdate } : {}),
     });
   } catch (error) {

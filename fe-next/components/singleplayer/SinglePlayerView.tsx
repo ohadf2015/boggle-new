@@ -22,6 +22,7 @@ import { awardCreatorCoins } from '@/utils/creatorRewards';
 import type { DifficultyLevel, Language, LetterGrid } from '@/shared/types/game';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { useAchievementQueue } from '@/components/achievements';
 import { useSinglePlayerConfig } from './useSinglePlayerConfig';
 
 export type SinglePlayerMode = 'solo-bots' | 'practice' | 'challenge';
@@ -98,6 +99,7 @@ const SinglePlayerView: React.FC = () => {
 
   const setIsInGame = useHideNavigation();
   const { user, isAuthenticated } = useAuth();
+  const { queueAchievement } = useAchievementQueue();
   const [resultsData, setResultsData] = useState<SinglePlayerResultsData | null>(null);
   const [sessionId] = useState(() => `sp_${crypto.randomUUID()}`);
 
@@ -218,6 +220,11 @@ const SinglePlayerView: React.FC = () => {
       })
         .then(r => r.json())
         .then(data => {
+          if (Array.isArray(data.lifetimeAchievements)) {
+            for (const achievement of data.lifetimeAchievements) {
+              if (achievement?.key) queueAchievement(achievement);
+            }
+          }
           if (data.questUpdate?.completed) {
             import('@/components/quests/QuestCompletionToast').then(({ showQuestCompletionToast }) => {
               showQuestCompletionToast({
@@ -243,7 +250,7 @@ const SinglePlayerView: React.FC = () => {
     setResultsData(results);
     setPhase('results');
   // eslint-disable-next-line react-hooks/exhaustive-deps -- t is stable from LanguageContext
-}, [gameState.mode, gameState.difficulty, gameState.timerSeconds, boardCode, setPhase, isAuthenticated, user?.id]);
+}, [gameState.mode, gameState.difficulty, gameState.timerSeconds, boardCode, setPhase, isAuthenticated, user?.id, queueAchievement]);
 
   return (
     <div

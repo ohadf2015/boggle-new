@@ -272,20 +272,17 @@ describe('AchievementQueueProvider', () => {
     expect(onContext.mock.calls[0][0].queueAchievement).toBeInstanceOf(Function);
   });
 
-  it('should throw error when useAchievementQueue is used outside provider', () => {
-    // Suppress console.error for this test
-    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-
+  it('returns no-op queueAchievement when used outside provider (does not throw)', () => {
+    let captured: { queueAchievement: (a: { key: string; icon: string }) => void } | null = null;
     const TestComponent = () => {
-      useAchievementQueue();
+      captured = useAchievementQueue();
       return null;
     };
 
-    expect(() => render(<TestComponent />)).toThrow(
-      'useAchievementQueue must be used within AchievementQueueProvider'
-    );
-
-    consoleSpy.mockRestore();
+    expect(() => render(<TestComponent />)).not.toThrow();
+    expect(captured).not.toBeNull();
+    expect(captured!.queueAchievement).toBeInstanceOf(Function);
+    expect(() => captured!.queueAchievement({ key: 'TEST', icon: '🎯' })).not.toThrow();
   });
 
   it('should auto-dismiss notification after timeout', () => {

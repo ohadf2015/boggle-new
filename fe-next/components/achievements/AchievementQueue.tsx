@@ -339,10 +339,9 @@ export const AchievementQueueProvider = ({ children }: AchievementQueueProviderP
   );
 };
 
+const NOOP_QUEUE: AchievementQueueContextValue = { queueAchievement: () => {} };
+
 export const useAchievementQueue = (): AchievementQueueContextValue => {
   const context = useContext(AchievementQueueContext);
-  if (!context) {
-    throw new Error('useAchievementQueue must be used within AchievementQueueProvider');
-  }
-  return context;
+  return context ?? NOOP_QUEUE;
 };
