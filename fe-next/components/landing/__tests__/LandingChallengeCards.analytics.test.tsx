@@ -15,6 +15,7 @@ import { LandingChallengeCards } from '../LandingChallengeCards';
 const trackModeSelected = vi.fn();
 vi.mock('@/utils/growthTracking', () => ({
   trackModeSelected: (...args: unknown[]) => trackModeSelected(...args),
+  trackLandingCtaClick: vi.fn(),
 }));
 
 vi.mock('framer-motion', () => {
