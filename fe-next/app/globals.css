@@ -3037,7 +3037,9 @@
    behind sticky headers or fixed footers
    ==================================== */
 
-/* Scroll padding for anchor links to account for sticky header */
+/* Scroll padding for anchor links to account for sticky header.
+   At md+ (>=768px) DesktopGameNav (~44px) joins the fixed header band, so
+   anchors must clear the larger combined chrome. */
 html {
   scroll-padding-top: calc(var(--header-height-mobile) + 16px);
 }
@@ -3048,9 +3050,15 @@ html {
   }
 }
 
+@media (min-width: 768px) {
+  html {
+    scroll-padding-top: calc(var(--header-height-tablet) + 44px + 16px);
+  }
+}
+
 @media (min-width: 1024px) {
   html {
-    scroll-padding-top: calc(var(--header-height-desktop) + 16px);
+    scroll-padding-top: calc(var(--header-height-desktop) + 44px + 16px);
   }
 }
 

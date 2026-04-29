@@ -29,15 +29,15 @@ export const HeaderBackButton = memo(function HeaderBackButton() {
       onClick={onClick}
       aria-label={t('common.back')}
       className={cn(
-        'hidden lg:inline-flex items-center gap-1.5',
-        'px-2.5 py-1.5 rounded-neo border-neo border-black',
+        'inline-flex items-center gap-1.5',
+        'px-2 py-1.5 lg:px-2.5 rounded-neo border-neo border-black',
         'bg-neo-white dark:bg-neo-navy-light text-neo-navy dark:text-neo-white',
         'shadow-hard-sm hover:shadow-hard active:shadow-hard-pressed active:translate-y-[1px]',
         'font-neo-body font-bold text-sm transition-all duration-100'
       )}
     >
       <ArrowLeft className="w-4 h-4 rtl:rotate-180" aria-hidden="true" />
-      <span>{t('common.back')}</span>
+      <span className="hidden lg:inline">{t('common.back')}</span>
     </button>
   );
 });

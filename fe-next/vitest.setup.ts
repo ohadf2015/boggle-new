@@ -306,6 +306,13 @@ vi.mock('@/hooks/useDevicePerformance', () => ({
   createAdaptiveThrottle: () => (fn: any) => fn,
 }));
 
+// DesktopGameNav requires Navigation/CrazyGames/Veteran providers. Most tests
+// that mount Header don't set those up; stub it out (the real component is
+// loaded via next/dynamic in Header.tsx and is irrelevant to unit tests).
+vi.mock('@/components/DesktopGameNav', () => ({
+  default: () => null,
+}));
+
 (global as any).mockUseDevicePerformance = mockUseDevicePerformance;
 (global as any).defaultDevicePerformanceValue = defaultDevicePerformanceValue;
 

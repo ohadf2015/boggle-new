@@ -12,6 +12,9 @@ import HeaderMobileMenu from './header/HeaderMobileMenu';
 const AuthModal = dynamic(() => import('./auth/AuthModal'), { ssr: false });
 const AdminGiftModal = dynamic(() => import('./gift/AdminGiftModal').then(m => m.AdminGiftModal), { ssr: false });
 const LeaguePositionBadge = dynamic(() => import('@/components/leagues/LeaguePositionBadge').then(m => m.LeaguePositionBadge), { ssr: false });
+// Dynamic — DesktopGameNav uses navigation/CrazyGames/veteran hooks; matches the
+// pattern of other sub-components above and keeps Header unit tests insulated.
+const DesktopGameNav = dynamic(() => import('./DesktopGameNav'), { ssr: false });
 
 interface HeaderProps {
     className?: string;
@@ -53,7 +56,9 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                 aria-hidden="true"
                 className={cn(
                     "h-header pb-1 lg:pb-2",
-                    "min-h-[60px] sm:min-h-[70px] lg:min-h-[80px]"
+                    // md+ adds DesktopGameNav (~44px) into the same fixed band, so
+                    // the spacer must clear bar + nav. min-height wins over h-header.
+                    "min-h-[60px] sm:min-h-[70px] md:min-h-[114px] lg:min-h-[124px]"
                 )}
                 style={{
                     paddingTop: safeArea.top > 0 ? `${safeArea.top}px` : undefined,
@@ -67,7 +72,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                     // Flow space is reserved by the sibling spacer div above.
                     "fixed top-0 left-0 right-0",
                     "z-[60] bg-slate-50 dark:bg-slate-900",
-                    "min-h-[60px] sm:min-h-[70px] lg:min-h-[80px]",
+                    "min-h-[60px] sm:min-h-[70px] md:min-h-[114px] lg:min-h-[124px]",
                     className
                 )}
                 style={{
@@ -108,6 +113,10 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                     onSignUp={openSignUp}
                 />
             </div>
+
+            {/* Desktop game-mode tabs share the fixed header band so they aren't
+                overlaid by Header (z-60) when mounted separately in the layout. */}
+            <DesktopGameNav />
 
             <AuthModal
                 isOpen={showAuthModal}
