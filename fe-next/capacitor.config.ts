@@ -69,6 +69,22 @@ const config: CapacitorConfig = {
       // any build where NODE_ENV is unset) to serve Google test ads.
       initializeForTesting: process.env.ADMOB_TEST_MODE === 'true',
     },
+    SocialLogin: {
+      // Disable Facebook & Twitter — we only use Google (+ Apple on iOS).
+      // Plugin's capacitor:sync:before hook reads this to write
+      // android/gradle.properties (`socialLogin.facebook.include=false`)
+      // and the iOS podspec (comments out FBSDK pods).
+      // Without this, the FB SDK is on classpath and its
+      // FacebookInitProvider ContentProvider auto-inits before
+      // Application.onCreate, crashing the app because no
+      // facebook_app_id meta-data exists in AndroidManifest.
+      providers: {
+        google: true,        // implementation
+        apple: true,         // implementation (iOS-only — plugin no-ops on Android)
+        facebook: false,     // compileOnly → stub source set, no SDK
+        twitter: false,      // compileOnly
+      },
+    },
   },
 
   ios: {
