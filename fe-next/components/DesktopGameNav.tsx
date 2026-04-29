@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useNavigation } from '@/contexts/NavigationContext';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
+import { useIsPracticeVeteran } from '@/hooks/useIsPracticeVeteran';
 
 interface NavItem {
   id: string;
@@ -35,6 +36,7 @@ export const DesktopGameNav = memo(function DesktopGameNav() {
   const { t, language } = useLanguage();
   const { isInGame } = useNavigation();
   const { isOnCrazyGamesPlatform } = useCrazyGames();
+  const isVeteran = useIsPracticeVeteran();
   const router = useRouter();
   const pathname = usePathname();
 
@@ -49,6 +51,15 @@ export const DesktopGameNav = memo(function DesktopGameNav() {
 
   // Hide desktop nav on CrazyGames — external links and social features prohibited
   if (isInGame || isOnCrazyGamesPlatform) return null;
+
+  // Practice gate: pre-graduation players (<20 words) shouldn't be tempted by other
+  // modes from the home/practice routes. Other routes (leaderboard/friends/etc.)
+  // stay reachable so navigation isn't a dead end.
+  if (!isVeteran) {
+    const cleanPath = pathname.replace(`/${language}`, '') || '/';
+    const onPracticeSurface = cleanPath === '/' || cleanPath.startsWith('/singleplayer');
+    if (onPracticeSurface) return null;
+  }
 
   return (
     <nav

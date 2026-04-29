@@ -9,6 +9,7 @@ import { hasCompletedOnboarding } from '@/utils/onboardingStorage';
 import { isNewPlayer } from '@/utils/multiplayerProgressStorage';
 import { trackModeSelected, trackLandingCtaClick } from '@/utils/growthTracking';
 import { useIsPracticeVeteran } from '@/hooks/useIsPracticeVeteran';
+import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import type { LandingGameMode } from '@/lib/landing/fetchGameModeStats';
 
 interface DailyChallengePreloadedStats {
@@ -81,7 +82,11 @@ export function LandingChallengeCards({
   });
   // Veterans skip the practice card entirely. Newcomers keep it as their
   // soft-onramp into the game (single-player word grids without pressure).
-  const isVeteran = useIsPracticeVeteran();
+  // CrazyGames bypass: portal players see every mode open — practice gate is
+  // hidden chrome that confuses portal traffic and CG forbids walled content.
+  const isVeteranRaw = useIsPracticeVeteran();
+  const { isOnCrazyGamesPlatform } = useCrazyGames();
+  const isVeteran = isVeteranRaw || isOnCrazyGamesPlatform;
 
   // Layered ordering, applied to a `LandingCardKey[]` working set:
   //   1. Start from the server-provided order (or `DEFAULT_ORDER`).
@@ -192,7 +197,11 @@ export function LandingChallengeCards({
           </div>
         );
 
-      case 'practice':
+      case 'practice': {
+        // Pre-graduation players (`!isVeteran`) get an always-on highlight regardless
+        // of `isNewbie`. The newbie heuristic (<3 games + onboarding flag) is too
+        // narrow — anyone still on practice deserves the spotlight on landing.
+        const showPracticeHighlight = isNewbie || !isVeteran;
         return (
           <div key="practice" className="w-full h-full animate-[fadeInUp_0.4s_ease-out_both]" style={style}>
             <ModeCard
@@ -203,8 +212,8 @@ export function LandingChallengeCards({
               modeImage="/modes/practice.png"
               variant="cyan"
               personalBest={playerAllTimeBest ? { score: playerAllTimeBest.score, label: t('landing.personalBest') } : undefined}
-              highlighted={isNewbie}
-              highlightLabel={isNewbie ? t('onboarding.welcome.startHere') : undefined}
+              highlighted={showPracticeHighlight}
+              highlightLabel={showPracticeHighlight ? t('onboarding.welcome.startHere') : undefined}
               duration={t('landing.duration').replace('{time}', '1-3')}
               difficulty={1}
               difficultyLabel={t('landing.difficultyEasy')}
@@ -212,6 +221,7 @@ export function LandingChallengeCards({
             />
           </div>
         );
+      }
 
       case 'daily':
         return (
@@ -312,7 +322,13 @@ export function LandingChallengeCards({
 
   const heroCards = cardOrder.filter((m) => m === 'daily');
   const mpCards = cardOrder.filter((m) => MP_MODES.has(m));
-  const spCards = cardOrder.filter((m) => SP_MODES.has(m));
+  // Non-veterans see practice promoted to a dedicated featured row above the SP grid
+  // so it stops looking like just another card. Locked siblings (blast/adventure/etc.)
+  // already de-emphasize the rest.
+  const featurePractice = !isVeteran && cardOrder.includes('practice');
+  const spCards = cardOrder
+    .filter((m) => SP_MODES.has(m))
+    .filter((m) => !(featurePractice && m === 'practice'));
 
   let runningIndex = 0;
   const nextIndex = () => runningIndex++;
@@ -340,6 +356,25 @@ export function LandingChallengeCards({
           </header>
           <div className={`grid grid-cols-1 gap-3 sm:gap-4 md:gap-5 items-stretch ${mpCards.length >= 2 ? 'sm:grid-cols-2' : 'max-w-md mx-auto'}`}>
             {mpCards.map((mode) => renderCard(mode, nextIndex()))}
+          </div>
+        </section>
+      )}
+
+      {featurePractice && (
+        <section
+          data-testid="landing-section-practice-featured"
+          aria-label={t('landing.practice')}
+        >
+          <header className="mb-3 md:mb-4 flex items-baseline gap-2 px-1">
+            <span className="font-neo-display font-bold text-sm sm:text-base uppercase tracking-wide text-neo-lime">
+              {t('onboarding.welcome.startHere')}
+            </span>
+            <span className="font-neo-body text-xs sm:text-sm text-neo-white/60">
+              {t('landing.practiceDesc')}
+            </span>
+          </header>
+          <div className="grid grid-cols-1 max-w-3xl mx-auto">
+            {renderCard('practice', nextIndex())}
           </div>
         </section>
       )}

@@ -2279,6 +2279,27 @@ const sv = {
     "resumeCta": "Fortsätt spela",
     "wordsWaiting": "ord väntar"
   },
+  "catalystTeaser": {
+    "title": "Kommer i riktiga spel",
+    "subtitle": "Katalysatorer mitt i spelet ändrar allt",
+    "onePerGame": "Endast en utlöses per spel",
+    "earthquake": {
+      "name": "Jordskalv",
+      "desc": "Brädet blandas om + 2× eldrunda"
+    },
+    "blizzard": {
+      "name": "Snöstorm",
+      "desc": "Frusna brickor du inte kan använda"
+    },
+    "lightning": {
+      "name": "Blixt",
+      "desc": "Laddade brickor — kombobonus"
+    },
+    "meteor": {
+      "name": "Meteor",
+      "desc": "Träff! Ord nära den ger 2×"
+    }
+  },
   "practiceResults": {
     "playAgain": "Spela igen",
     "orTrySomethingNew": "eller prova något nytt",
@@ -10666,6 +10687,23 @@ const sv = {
     "VALIDATION_MISSING_FIELD": "Obligatoriskt fält saknas",
     "WORD_PROCESSING_ERROR": "Kunde inte bearbeta ditt ord. Försök igen.",
     "INTERNAL_ERROR": "Något gick sönder. Försök igen."
+  },
+  "dailyInvite": {
+    "titleWon": "Skarp hjärna idag",
+    "titleLost": "Skaka av dig",
+    "bodyWon": "Dagens utmaning väntar — ett pussel, ett försök.",
+    "bodyLost": "Dagens utmaning — din chans till revansch.",
+    "bodyCgComeBack": "Nytt pussel varje dag. Bokmärk och kom tillbaka imorgon.",
+    "streak": "Dag {{count}} svit — håll den vid liv",
+    "playNow": "Spela",
+    "dismiss": "Kanske senare"
+  },
+  "globalRank": {
+    "top": "Topp {{percentile}}% globalt",
+    "behind": "{{count}} spelare bakom dig",
+    "socialProof": "Gick med {{count}} spelare idag",
+    "aboveYourNorm": "+{{delta}}% över ditt snitt",
+    "belowYourNorm": "{{delta}}% under ditt snitt"
   }
 };
 

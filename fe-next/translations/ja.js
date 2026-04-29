@@ -2266,6 +2266,27 @@ const ja = {
     "resumeCta": "ボードを再開",
     "wordsWaiting": "個の単語が待機中"
   },
+  "catalystTeaser": {
+    "title": "本番ゲームで起こること",
+    "subtitle": "ゲーム途中の触媒が状況を一変させる",
+    "onePerGame": "1ゲームにつき1つだけ発生",
+    "earthquake": {
+      "name": "地震",
+      "desc": "ボードがシャッフル＋ファイアラウンド2倍"
+    },
+    "blizzard": {
+      "name": "吹雪",
+      "desc": "凍ったタイルは使用不可"
+    },
+    "lightning": {
+      "name": "雷",
+      "desc": "帯電タイル — コンボボーナス"
+    },
+    "meteor": {
+      "name": "隕石",
+      "desc": "命中！近くの単語は2倍"
+    }
+  },
   "practiceResults": {
     "playAgain": "もう一回",
     "orTrySomethingNew": "他のモードも試してみよう",
@@ -10594,6 +10615,23 @@ const ja = {
     "VALIDATION_MISSING_FIELD": "必須フィールドがありません",
     "WORD_PROCESSING_ERROR": "単語を処理できませんでした。もう一度お試しください。",
     "INTERNAL_ERROR": "問題が発生しました。もう一度お試しください。"
+  },
+  "dailyInvite": {
+    "titleWon": "冴えてるね",
+    "titleLost": "次はいける",
+    "bodyWon": "デイリーチャレンジが待ってる — 一日一問。",
+    "bodyLost": "デイリーチャレンジ — 巻き返しのチャンス。",
+    "bodyCgComeBack": "毎日新しいパズル。ブックマークして明日また来てね。",
+    "streak": "{{count}}日連続 — 続けよう",
+    "playNow": "プレイ",
+    "dismiss": "あとで"
+  },
+  "globalRank": {
+    "top": "世界トップ{{percentile}}%",
+    "behind": "あなたの後ろに{{count}}人",
+    "socialProof": "今日{{count}}人が参加",
+    "aboveYourNorm": "平均より+{{delta}}%",
+    "belowYourNorm": "平均より{{delta}}%"
   }
 };
 

@@ -2284,6 +2284,27 @@ const he = {
     "resumeCta": "חזרו ללוח",
     "wordsWaiting": "מילים מחכות"
   },
+  "catalystTeaser": {
+    "title": "מה מחכה לכם במשחקים אמיתיים",
+    "subtitle": "אירועי אמצע משחק שמשנים הכול",
+    "onePerGame": "רק אחד יקרה בכל משחק",
+    "earthquake": {
+      "name": "רעידת אדמה",
+      "desc": "הלוח מתערבב + סבב אש כפול נקודות"
+    },
+    "blizzard": {
+      "name": "סופת שלגים",
+      "desc": "אריחים קפואים שאי אפשר להשתמש בהם"
+    },
+    "lightning": {
+      "name": "ברק",
+      "desc": "אריחים טעונים — בונוס קומבו"
+    },
+    "meteor": {
+      "name": "מטאור",
+      "desc": "פגיעה! מילים קרובות מקבלות פי 2"
+    }
+  },
   "practiceResults": {
     "playAgain": "שחקו שוב",
     "orTrySomethingNew": "או נסו משהו חדש",
@@ -10667,6 +10688,23 @@ const he = {
     "VALIDATION_MISSING_FIELD": "חסר שדה חובה",
     "WORD_PROCESSING_ERROR": "לא ניתן לעבד את המילה. נסה שוב.",
     "INTERNAL_ERROR": "משהו השתבש. נסה שוב."
+  },
+  "dailyInvite": {
+    "titleWon": "מצוין",
+    "titleLost": "פעם הבאה",
+    "bodyWon": "אתגר היומי מחכה — חידה אחת ביום.",
+    "bodyLost": "אתגר היומי מחכה — הזדמנות לחזור.",
+    "bodyCgComeBack": "חידה חדשה כל יום. שמרו וחזרו מחר.",
+    "streak": "רצף יום {{count}} — אל תפסיקו",
+    "playNow": "שחק",
+    "dismiss": "לא עכשיו"
+  },
+  "globalRank": {
+    "top": "{{percentile}}% המובילים",
+    "behind": "{{count}} שחקנים מאחורייך",
+    "socialProof": "{{count}} שחקנים שיחקו היום",
+    "aboveYourNorm": "+{{delta}}% מעל הממוצע שלך",
+    "belowYourNorm": "{{delta}}% מתחת לממוצע שלך"
   }
 };
 

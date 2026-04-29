@@ -123,6 +123,13 @@ vi.mock('@/components/results/MissedWords', () => {
   return { default: MockMissedWords };
 });
 
+// CatalystTeaser uses motion.section/motion.li — out of scope for this test, has its own suite
+vi.mock('../CatalystTeaser', () => ({
+  __esModule: true,
+  CatalystTeaser: () => <div data-testid="catalyst-teaser-stub" />,
+  default: () => <div data-testid="catalyst-teaser-stub" />,
+}));
+
 // Mock daily challenge storage
 const mockHasPlayedWordHuntToday = vi.fn();
 vi.mock('@/utils/dailyChallenge/storage', () => ({

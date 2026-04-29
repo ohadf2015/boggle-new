@@ -2406,6 +2406,27 @@ const en = {
     "resumeCta": "Resume Board",
     "wordsWaiting": "words waiting"
   },
+  "catalystTeaser": {
+    "title": "Coming up in real games",
+    "subtitle": "Mid-game catalysts shake things up",
+    "onePerGame": "Only one fires per game",
+    "earthquake": {
+      "name": "Earthquake",
+      "desc": "Board reshuffles + 2× fire round"
+    },
+    "blizzard": {
+      "name": "Blizzard",
+      "desc": "Frozen tiles you can't use"
+    },
+    "lightning": {
+      "name": "Lightning",
+      "desc": "Charged tiles — combo bonus"
+    },
+    "meteor": {
+      "name": "Meteor",
+      "desc": "Strike! Words near it score 2×"
+    }
+  },
   "practiceResults": {
     "playAgain": "Play Again",
     "orTrySomethingNew": "or try something new",
@@ -10795,6 +10816,23 @@ const en = {
     "VALIDATION_MISSING_FIELD": "Missing required field",
     "WORD_PROCESSING_ERROR": "Couldn't process your word. Try again.",
     "INTERNAL_ERROR": "Something broke. Please try again."
+  },
+  "dailyInvite": {
+    "titleWon": "Sharp brain today",
+    "titleLost": "Shake it off",
+    "bodyWon": "Daily Challenge waiting — one puzzle, one shot.",
+    "bodyLost": "Daily Challenge — your redemption shot.",
+    "bodyCgComeBack": "New puzzle every day. Bookmark and come back tomorrow.",
+    "streak": "Day {{count}} streak — keep it alive",
+    "playNow": "Play Daily",
+    "dismiss": "Maybe later"
+  },
+  "globalRank": {
+    "top": "Top {{percentile}}% globally",
+    "behind": "{{count}} players behind you",
+    "socialProof": "Joined {{count}} players today",
+    "aboveYourNorm": "+{{delta}}% above your average",
+    "belowYourNorm": "{{delta}}% below your average"
   }
 };
 

@@ -25,6 +25,7 @@ import {
   useSignupPrompt,
   useAchievementsSave,
 } from '../results';
+import { CatalystTeaser } from './CatalystTeaser';
 import type { SinglePlayerResultsData } from '../SinglePlayerView';
 
 const FirstWinSignupModal = dynamic(() => import('@/components/auth/FirstWinSignupModal'), { ssr: false });
@@ -341,6 +342,9 @@ const PracticeResults = memo(function PracticeResults({
             </motion.p>
           </motion.div>
 
+
+          {/* ── Catalyst teaser — surfaces what's coming in arena/adventure ── */}
+          <CatalystTeaser t={t} />
 
           {/* ── Primary CTA: Word Hunt Daily ── */}
           <motion.div

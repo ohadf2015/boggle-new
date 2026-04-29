@@ -2258,6 +2258,27 @@ const es = {
     "resumeCta": "Reanudar tablero",
     "wordsWaiting": "palabras esperando"
   },
+  "catalystTeaser": {
+    "title": "Te espera en partidas reales",
+    "subtitle": "Catalizadores que sacuden la partida",
+    "onePerGame": "Solo uno se activa por partida",
+    "earthquake": {
+      "name": "Terremoto",
+      "desc": "El tablero se reordena + ronda de fuego 2×"
+    },
+    "blizzard": {
+      "name": "Ventisca",
+      "desc": "Fichas congeladas que no se pueden usar"
+    },
+    "lightning": {
+      "name": "Rayo",
+      "desc": "Fichas cargadas — bonus de combo"
+    },
+    "meteor": {
+      "name": "Meteoro",
+      "desc": "¡Impacto! Palabras cercanas valen 2×"
+    }
+  },
   "practiceResults": {
     "playAgain": "Jugar de nuevo",
     "orTrySomethingNew": "o prueba algo nuevo",
@@ -10678,6 +10699,23 @@ const es = {
     "VALIDATION_MISSING_FIELD": "Falta un campo obligatorio",
     "WORD_PROCESSING_ERROR": "No se pudo procesar tu palabra. Inténtalo de nuevo.",
     "INTERNAL_ERROR": "Algo falló. Inténtalo de nuevo."
+  },
+  "dailyInvite": {
+    "titleWon": "Mente afilada hoy",
+    "titleLost": "Sacúdete el polvo",
+    "bodyWon": "El Reto Diario te espera — un puzle, un intento.",
+    "bodyLost": "El Reto Diario — tu oportunidad de revancha.",
+    "bodyCgComeBack": "Nuevo puzle cada día. Marca y vuelve mañana.",
+    "streak": "Día {{count}} de racha — no la rompas",
+    "playNow": "Jugar",
+    "dismiss": "Quizá luego"
+  },
+  "globalRank": {
+    "top": "Top {{percentile}}% global",
+    "behind": "{{count}} jugadores detrás de ti",
+    "socialProof": "Hoy se unieron {{count}} jugadores",
+    "aboveYourNorm": "+{{delta}}% sobre tu promedio",
+    "belowYourNorm": "{{delta}}% bajo tu promedio"
   }
 };
 

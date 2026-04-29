@@ -30,8 +30,12 @@ vi.mock('@/components/daily/DailyChallengeBanner', () => {
   DailyChallengeBanner.displayName = 'DailyChallengeBanner';
   return { __esModule: true, default: DailyChallengeBanner };
 });
+const mockIsVeteran = vi.fn(() => false);
 vi.mock('@/hooks/useIsPracticeVeteran', () => ({
-  useIsPracticeVeteran: () => false,
+  useIsPracticeVeteran: () => mockIsVeteran(),
+}));
+vi.mock('@/components/CrazyGamesSDK', () => ({
+  useCrazyGames: () => ({ isOnCrazyGamesPlatform: false }),
 }));
 
 const baseProps = {
@@ -45,14 +49,16 @@ const baseProps = {
 };
 
 describe('LandingChallengeCards reordering (MP/SP split)', () => {
-  it('renders daily banner as hero, arena in MP section, all solo modes in SP section', () => {
+  it('non-veteran: practice in featured row above SP grid; SP grid has every other solo mode', () => {
     render(<LandingChallengeCards {...baseProps} />);
     expect(screen.getByTestId('daily-banner')).toBeInTheDocument();
     const mpSection = screen.getByTestId('landing-section-mp');
     const spSection = screen.getByTestId('landing-section-sp');
+    const featuredRow = screen.getByTestId('landing-section-practice-featured');
     expect(mpSection).toHaveTextContent('landing.arena');
     expect(mpSection).not.toHaveTextContent('landing.practice');
-    expect(spSection).toHaveTextContent('landing.practice');
+    expect(featuredRow).toHaveTextContent('landing.practice');
+    expect(spSection).not.toHaveTextContent('landing.practice');
     expect(spSection).toHaveTextContent('landing.blastMode');
     expect(spSection).toHaveTextContent('landing.adventureMode');
     expect(spSection).toHaveTextContent('landing.wordChainMode');
@@ -64,11 +70,19 @@ describe('LandingChallengeCards reordering (MP/SP split)', () => {
     const cards = screen.getAllByTestId('mode-card');
     // Arena (MP) comes before any SP card
     expect(cards[0]).toHaveTextContent('landing.arena');
-    // Remaining are SP
-    const spTexts = cards.slice(1).map((c) => c.textContent);
-    expect(spTexts).toEqual(
+    // Remaining cards still include practice (in featured row) and blast (in SP)
+    const otherTexts = cards.slice(1).map((c) => c.textContent);
+    expect(otherTexts).toEqual(
       expect.arrayContaining(['landing.practice', 'landing.blastMode'])
     );
+  });
+
+  it('veteran: practice card omitted (quickPlay replaces it); no featured row', () => {
+    mockIsVeteran.mockReturnValueOnce(true);
+    render(<LandingChallengeCards {...baseProps} />);
+    expect(screen.queryByTestId('landing-section-practice-featured')).toBeNull();
+    expect(screen.queryByText('landing.practice')).toBeNull();
+    expect(screen.getByText('landing.quickPlay')).toBeInTheDocument();
   });
 
   it('renders blast when most popular (still inside SP section)', () => {

@@ -17,7 +17,16 @@ vi.mock('framer-motion', () => {
 });
 
 vi.mock('../ModeCard', () => {
-  const ModeCard = ({ title, badge }: any) => <div data-testid="mode-card">{title}{badge && <span data-testid="badge">{badge}</span>}</div>;
+  const ModeCard = ({ title, badge, highlighted, highlightLabel }: any) => (
+    <div
+      data-testid="mode-card"
+      data-title={title}
+      data-highlighted={highlighted ? 'true' : 'false'}
+      data-highlight-label={highlightLabel || ''}
+    >
+      {title}{badge && <span data-testid="badge">{badge}</span>}
+    </div>
+  );
   ModeCard.displayName = 'ModeCard';
   return { __esModule: true, default: ModeCard };
 });
@@ -36,6 +45,11 @@ vi.mock('@/components/daily/DailyChallengeBanner', () => {
 const mockIsVeteran = vi.fn(() => false);
 vi.mock('@/hooks/useIsPracticeVeteran', () => ({
   useIsPracticeVeteran: () => mockIsVeteran(),
+}));
+
+const mockIsOnCG = vi.fn(() => false);
+vi.mock('@/components/CrazyGamesSDK', () => ({
+  useCrazyGames: () => ({ isOnCrazyGamesPlatform: mockIsOnCG() }),
 }));
 
 const baseProps = {
@@ -70,6 +84,55 @@ describe('LandingChallengeCards', () => {
   it('renders daily challenge banner', () => {
     render(<LandingChallengeCards {...baseProps} />);
     expect(screen.getByTestId('daily-banner')).toBeInTheDocument();
+  });
+
+  describe('practice card emphasis for non-veterans', () => {
+    afterEach(() => mockIsVeteran.mockReturnValue(false));
+
+    it('practice card is highlighted whenever player is not a veteran', () => {
+      mockIsVeteran.mockReturnValue(false);
+      render(<LandingChallengeCards {...baseProps} />);
+      const practice = screen.getByText('landing.practice').closest('[data-testid="mode-card"]') as HTMLElement;
+      expect(practice).not.toBeNull();
+      expect(practice.getAttribute('data-highlighted')).toBe('true');
+    });
+
+    it('non-veteran practice card lives in its own featured row above the SP grid', () => {
+      mockIsVeteran.mockReturnValue(false);
+      const { container } = render(<LandingChallengeCards {...baseProps} />);
+      const featured = container.querySelector('[data-testid="landing-section-practice-featured"]');
+      expect(featured).not.toBeNull();
+      expect(featured?.textContent).toContain('landing.practice');
+    });
+
+    it('veteran landing has no featured practice row', () => {
+      mockIsVeteran.mockReturnValue(true);
+      const { container } = render(<LandingChallengeCards {...baseProps} />);
+      expect(container.querySelector('[data-testid="landing-section-practice-featured"]')).toBeNull();
+    });
+  });
+
+  describe('CrazyGames bypass — practice gate disabled, every mode open', () => {
+    afterEach(() => {
+      mockIsVeteran.mockReturnValue(false);
+      mockIsOnCG.mockReturnValue(false);
+    });
+
+    it('on CG: no featured-practice row even when player has not graduated', () => {
+      mockIsVeteran.mockReturnValue(false);
+      mockIsOnCG.mockReturnValue(true);
+      const { container } = render(<LandingChallengeCards {...baseProps} />);
+      expect(container.querySelector('[data-testid="landing-section-practice-featured"]')).toBeNull();
+    });
+
+    it('on CG: arena/blast/adventure are not locked even for non-veterans', () => {
+      mockIsVeteran.mockReturnValue(false);
+      mockIsOnCG.mockReturnValue(true);
+      render(<LandingChallengeCards {...baseProps} />);
+      // veteran-equivalent: quickPlay shows (not practice)
+      expect(screen.getByText('landing.quickPlay')).toBeInTheDocument();
+      expect(screen.queryByText('landing.practice')).not.toBeInTheDocument();
+    });
   });
 
   describe('quickPlay / practice mutual exclusivity', () => {
