@@ -10,6 +10,7 @@ import { coalesce } from '../utils/requestCoalescing';
 import logger from '../utils/logger';
 import { generateDailyPuzzle } from '../../utils/dailyChallenge';
 import { generateDailyPuzzleAsync } from '../../utils/dailyChallenge/gridGeneration.server';
+import { COIN_COSTS } from '../../utils/coinManager';
 import type { Language } from '../../types';
 import wordHuntRouter from './dailyChallenge/wordHuntRoutes';
 import wordWheelRouter from './dailyChallenge/wordWheelRoutes';
@@ -221,6 +222,17 @@ router.get('/leaderboard/:date/:language', async (req: Request<LeaderboardParams
 /**
  * POST /api/daily-challenge/submit
  */
+/**
+ * Compute the score that should be persisted on a daily-challenge submission.
+ * On retry (existing row found), apply a server-side penalty clamped to 0.
+ * Exported for unit testing — keep pure (no I/O).
+ */
+export function computeRetryScore(rawScore: number, isRetry: boolean): { finalScore: number; penaltyApplied: number } {
+  const penaltyApplied = isRetry ? COIN_COSTS.DAILY_RETRY_LEADERBOARD_PENALTY : 0;
+  const finalScore = Math.max(0, rawScore - penaltyApplied);
+  return { finalScore, penaltyApplied };
+}
+
 router.post('/submit', async (req: SubmitRequest, res: Response): Promise<void> => {
   try {
     if (!isSupabaseConfigured()) {
@@ -250,12 +262,34 @@ router.post('/submit', async (req: SubmitRequest, res: Response): Promise<void> 
       return;
     }
 
-    // NOTE: Atomic insert with unique constraint fallback prevents race conditions
-    const insertData: AttemptInsertData = {
+    // Detect retry via existing row (player_id OR guest_fingerprint + puzzle_date + language).
+    // The unique_player_daily constraint blocked re-INSERT before, so retry scores were
+    // silently dropped. Now: SELECT first → UPDATE on retry with server-applied penalty.
+    const idColumn: 'player_id' | 'guest_fingerprint' = playerId ? 'player_id' : 'guest_fingerprint';
+    const idValue = playerId || (guestFingerprint as string);
+
+    const { data: existing, error: existingError } = await supabase
+      .from('daily_puzzle_attempts')
+      .select('id, score')
+      .eq('puzzle_date', puzzleDate)
+      .eq('language', language)
+      .eq(idColumn, idValue)
+      .maybeSingle();
+
+    if (existingError) {
+      logger.error('API', `Daily challenge submit lookup error: ${existingError.message}`);
+      res.status(500).json({ error: 'Failed to submit result' });
+      return;
+    }
+
+    const isRetry = !!existing;
+    const { finalScore, penaltyApplied } = computeRetryScore(score, isRetry);
+
+    const writeData: AttemptInsertData = {
       puzzle_date: puzzleDate,
       puzzle_number: puzzleNumber,
       language,
-      score,
+      score: finalScore,
       word_count: wordCount || 0,
       words_by_length: wordsByLength || {},
       time_seconds: timeSeconds || 0,
@@ -270,25 +304,69 @@ router.post('/submit', async (req: SubmitRequest, res: Response): Promise<void> 
     };
 
     if (playerId) {
-      insertData.player_id = playerId;
+      writeData.player_id = playerId;
     } else {
-      insertData.guest_fingerprint = guestFingerprint;
+      writeData.guest_fingerprint = guestFingerprint;
     }
 
-    const { data, error } = await supabase
-      .from('daily_puzzle_attempts')
-      .insert(insertData)
-      .select()
-      .single();
-
-    if (error) {
-      if (error.code === '23505') {
-        res.json({ success: true, alreadySubmitted: true } as SubmitResponse);
+    let data: unknown = null;
+    if (isRetry && existing) {
+      const { data: updated, error: updateError } = await supabase
+        .from('daily_puzzle_attempts')
+        .update(writeData)
+        .eq('id', existing.id)
+        .select()
+        .single();
+      if (updateError) {
+        logger.error('API', `Daily challenge retry update error: ${updateError.message}`);
+        res.status(500).json({ error: 'Failed to submit result' });
         return;
       }
-      logger.error('API', `Daily challenge submit error: ${error.message}`);
-      res.status(500).json({ error: 'Failed to submit result' });
-      return;
+      data = updated;
+    } else {
+      const { data: inserted, error: insertError } = await supabase
+        .from('daily_puzzle_attempts')
+        .insert(writeData)
+        .select()
+        .single();
+      if (insertError) {
+        // Race: a concurrent submit landed first. Treat this attempt as a retry
+        // so the leaderboard still reflects the latest score (with penalty).
+        if ((insertError as { code?: string }).code === '23505') {
+          const { data: raced } = await supabase
+            .from('daily_puzzle_attempts')
+            .select('id')
+            .eq('puzzle_date', puzzleDate)
+            .eq('language', language)
+            .eq(idColumn, idValue)
+            .maybeSingle();
+          if (raced) {
+            const racePayload = { ...writeData, score: Math.max(0, score - COIN_COSTS.DAILY_RETRY_LEADERBOARD_PENALTY) };
+            const { data: updated, error: raceUpdateError } = await supabase
+              .from('daily_puzzle_attempts')
+              .update(racePayload)
+              .eq('id', raced.id)
+              .select()
+              .single();
+            if (raceUpdateError) {
+              logger.error('API', `Daily challenge race-update error: ${raceUpdateError.message}`);
+              res.status(500).json({ error: 'Failed to submit result' });
+              return;
+            }
+            data = updated;
+          } else {
+            logger.error('API', `Daily challenge submit error: ${insertError.message}`);
+            res.status(500).json({ error: 'Failed to submit result' });
+            return;
+          }
+        } else {
+          logger.error('API', `Daily challenge submit error: ${insertError.message}`);
+          res.status(500).json({ error: 'Failed to submit result' });
+          return;
+        }
+      } else {
+        data = inserted;
+      }
     }
 
     // Compute auth-only rank: count auth players ranked above this player + 1.
@@ -320,6 +398,9 @@ router.post('/submit', async (req: SubmitRequest, res: Response): Promise<void> 
     res.json({
       success: true,
       alreadySubmitted: false,
+      isRetry,
+      penaltyApplied,
+      finalScore,
       data,
       rank
     } as SubmitResponse);

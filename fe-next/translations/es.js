@@ -5310,6 +5310,7 @@ const es = {
       "coinsEarned": "Monedas Ganadas",
       "share": "Compartir",
       "retry": "Reintentar",
+      "watchAdRetry": "Ver anuncio para reintentar",
       "survivalBonus": "Bonus de Supervivencia",
       "generating": "Creando...",
       "previewImage": "Vista previa de imagen",

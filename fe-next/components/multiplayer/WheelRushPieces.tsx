@@ -3,12 +3,6 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 
-export interface WheelLockInfo {
-  word: string;
-  by: string;
-  lockUntil: number;
-}
-
 export interface WordEntry {
   word: string;
   kind: 'locked' | 'stolen' | 'closed' | 'stolen-from-me';
@@ -17,48 +11,6 @@ export interface WordEntry {
   stolenFrom?: string;
   ts: number;
 }
-
-interface StealableLocksProps {
-  locks: WheelLockInfo[];
-  now: number;
-  username: string;
-  t?: (path: string, params?: Record<string, string | number>) => string;
-}
-
-export const StealableLocks: React.FC<StealableLocksProps> = ({ locks, now, username, t }) => {
-  if (locks.length === 0) return null;
-  const label = t?.('wordWheel.stealLabel') || 'STEAL';
-  return (
-    <div className="flex flex-wrap gap-1.5 justify-center items-center mt-1 shrink-0 px-2">
-      <span className="text-[10px] sm:text-xs font-neo-display font-black text-neo-pink tracking-widest opacity-80">
-        {label}
-      </span>
-      {locks.map(lock => {
-        const msLeft = Math.max(0, lock.lockUntil - now);
-        const pct = Math.max(0, Math.min(100, (msLeft / 3000) * 100));
-        const isMine = lock.by === username;
-        const secs = (Math.ceil(msLeft / 100) / 10).toFixed(1);
-        return (
-          <div
-            key={lock.word}
-            dir="auto"
-            className="relative px-2 py-0.5 rounded border-2 border-neo-black bg-neo-pink text-neo-white text-xs font-bold font-neo-body overflow-hidden tabular-nums"
-            title={`Locked by ${lock.by} — ${(msLeft / 1000).toFixed(1)}s to steal`}
-          >
-            <span className="relative z-10" dir="auto">
-              {isMine ? lock.word : `??? · ${secs}s`}
-            </span>
-            <span
-              aria-hidden
-              className="absolute inset-y-0 start-0 bg-neo-pink-dark/60"
-              style={{ width: `${pct}%` }}
-            />
-          </div>
-        );
-      })}
-    </div>
-  );
-};
 
 interface MyWordsChipsProps {
   words: WordEntry[];

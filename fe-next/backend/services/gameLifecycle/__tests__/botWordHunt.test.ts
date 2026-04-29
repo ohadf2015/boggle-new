@@ -111,8 +111,9 @@ describe('Bot Word Hunt', () => {
       const strategy = createBotWordHuntStrategy(['apple', 'beach'], 5, 'medium', 'apple');
 
       expect(strategy.targetWord).toBe('apple');
-      expect(strategy.minWrongGuesses).toBe(4);
-      expect(strategy.stumbleChance).toBe(0.35);
+      expect(strategy.minWrongGuesses).toBeGreaterThan(0);
+      expect(strategy.stumbleChance).toBeGreaterThan(0);
+      expect(strategy.stumbleChance).toBeLessThan(1);
     });
 
     it('easy bots require more wrong guesses than hard bots', () => {

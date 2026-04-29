@@ -292,6 +292,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
     stats,
     shareHandlers,
     coinActions,
+    onRetryFree: onRetry,
     isAuthenticated,
     inlineSignupDismissed,
     onInlineSignupDismiss: () => setInlineSignupDismissed(true),

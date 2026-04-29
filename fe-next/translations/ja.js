@@ -5383,6 +5383,7 @@ const ja = {
       "coinsEarned": "獲得コイン",
       "share": "シェア",
       "retry": "リトライ",
+      "watchAdRetry": "広告を見てリトライ",
       "survivalBonus": "サバイバルボーナス",
       "generating": "作成中...",
       "previewImage": "プレビュー画像",

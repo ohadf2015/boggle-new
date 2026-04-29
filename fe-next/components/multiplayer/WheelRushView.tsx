@@ -13,7 +13,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { WHEEL_RUSH_FOG_MS, WHEEL_RUSH_MIN_WORD_LEN } from '@/shared/constants/wheelRushConstants';
 import type { Avatar as AvatarType, PresenceStatus } from '@/shared/types/game';
-import { StealableLocks, MyWordsChips, type WheelLockInfo, type WordEntry } from './WheelRushPieces';
+import { MyWordsChips, type WordEntry } from './WheelRushPieces';
 import { FloatingReaction } from '@/components/game/QuickReactions';
 import { useQuickReactions } from '@/hooks/useQuickReactions';
 
@@ -74,7 +74,6 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
   const [startedAt, setStartedAt] = useState<number | null>(null);
   const [builtLetters, setBuiltLetters] = useState<BuiltLetter[]>([]);
   const [myWords, setMyWords] = useState<WordEntry[]>([]);
-  const [activeLocks, setActiveLocks] = useState<WheelLockInfo[]>([]);
   const [feedback, setFeedback] = useState<{ type: 'ok' | 'err'; msg: string } | null>(null);
   const [wordBuilderShake, setWordBuilderShake] = useState(false);
   const [now, setNow] = useState<number>(() => Date.now());
@@ -136,9 +135,6 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
       setOuterLetters(data.puzzle.outerLetters);
       setStartedAt(data.startedAt ?? Date.now());
       // Reconnect-snapshot hydration: rebuild client state from server payload.
-      if (data.locks) {
-        setActiveLocks(Object.entries(data.locks).map(([word, lk]) => ({ word, by: lk.by, lockUntil: lk.until })));
-      }
       const mine = data.myWords ?? data.foundWords?.[username] ?? [];
       if (mine.length) {
         const closedSet = new Set(data.closed ?? []);
@@ -172,11 +168,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
       haptic(20);
       setBuiltLetters([]);
     };
-    const onLocked = (data: { word: string; by: string; lockUntil: number }) => {
-      setActiveLocks(prev => [...prev.filter(l => l.word !== data.word), data]);
-    };
     const onStolen = (data: { word: string; by?: string; from?: string }) => {
-      setActiveLocks(prev => prev.filter(l => l.word !== data.word));
       if (data.from === username) {
         setMyWords(prev => prev.map(w =>
           w.word === data.word && w.kind === 'locked'
@@ -189,13 +181,11 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
       }
     };
     const onClosed = (data: { word: string; finder: string }) => {
-      setActiveLocks(prev => prev.filter(l => l.word !== data.word));
       setMyWords(prev => prev.map(w => (w.word === data.word && w.kind === 'locked' ? { ...w, kind: 'closed' as const } : w)));
     };
 
     socket.on('wheelRushInit', onInit);
     socket.on('wheelWordResult', onResult);
-    socket.on('wheelWordLocked', onLocked);
     socket.on('wheelWordStolen', onStolen);
     socket.on('wheelWordClosed', onClosed);
 
@@ -205,7 +195,6 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
     return () => {
       socket.off('wheelRushInit', onInit);
       socket.off('wheelWordResult', onResult);
-      socket.off('wheelWordLocked', onLocked);
       socket.off('wheelWordStolen', onStolen);
       socket.off('wheelWordClosed', onClosed);
       socket.off('connect', onReconnect);
@@ -335,8 +324,6 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
 
   const fogEndsAt = (startedAt ?? 0) + WHEEL_RUSH_FOG_MS;
   const fogActive = startedAt != null && now < fogEndsAt;
-  const stealableLocks = activeLocks.filter(l => l.lockUntil > now);
-
   if (!puzzle) {
     return (
       <div className="flex-1 flex items-center justify-center bg-neo-navy text-neo-cream">
@@ -544,7 +531,6 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
         </motion.button>
       </div>
 
-      {!fogActive && <StealableLocks locks={stealableLocks} now={now} username={username} t={t} />}
       <MyWordsChips words={myWords} />
 
       <div className="pointer-events-none absolute inset-0 z-40">

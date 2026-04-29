@@ -5353,6 +5353,7 @@ const sv = {
       "find": "FYND",
       "share": "Dela",
       "retry": "Försök igen",
+      "watchAdRetry": "Se annons för att försöka igen",
       "title": "Resultat",
       "details": "Detaljer & Belöningar",
       "coinsEarned": "Intjänade mynt",

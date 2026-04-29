@@ -5,18 +5,24 @@
 
 'use client';
 
-import React, { useRef, useCallback, useState } from 'react';
+import React, { useRef, useCallback, useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Share2, RotateCcw, Loader2 } from 'lucide-react';
+import { Share2, RotateCcw, Loader2, Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { CoinBalanceBadge } from '@/components/ui/CoinBalanceBadge';
 import { cn } from '@/lib/utils';
+import { isNative } from '@/utils/platform';
+import { useRewardedAd } from '@/hooks/useRewardedAd';
+import { trackRewardedAdOffered } from '@/utils/growthTracking';
 
 export interface ShareSectionProps {
   solved: boolean;
   onShare: () => void;
   onChallengeShare?: () => void;
+  /** Web retry path — spends coins (wrapped by useCoinActions). */
   onRetry: () => void | Promise<void>;
+  /** Native retry path — runs after rewarded-ad reward; no coin spend. */
+  onRetryFree?: () => void | Promise<void>;
   canAffordRetry: boolean;
   retryCost: number;
   currentCoins: number;
@@ -32,17 +38,62 @@ export interface ShareSectionProps {
   t: (key: string) => string;
 }
 
+// Native-only retry button: rewarded ad gates a free retry. Web build never
+// reaches this — the placeholder ad refuses rewards (see feedback memory).
+function WatchAdRetryButton({
+  onRetryFree,
+  t,
+}: {
+  onRetryFree: () => void | Promise<void>;
+  t: (key: string) => string;
+}) {
+  const [busy, setBusy] = useState(false);
+  const { showAd, status, isAdAvailable, isPlaceholderCooldown } = useRewardedAd({
+    rewardKind: 'feature',
+    surface: 'retry',
+    onRewardEarned: async () => {
+      setBusy(true);
+      try {
+        await onRetryFree();
+      } finally {
+        setBusy(false);
+      }
+    },
+  });
+  useEffect(() => {
+    trackRewardedAdOffered('daily_retry');
+  }, []);
+  const disabled = busy || status === 'loading' || status === 'showing' || !isAdAvailable || isPlaceholderCooldown;
+
+  return (
+    <Button
+      onClick={() => void showAd()}
+      disabled={disabled}
+      className="w-full py-3.5 text-lg font-black uppercase border-3 rounded-neo transition-all bg-linear-to-r from-amber-400 to-orange-500 text-neo-black border-neo-black shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 disabled:opacity-50"
+    >
+      {busy ? (
+        <Loader2 className="me-2 w-5 h-5 animate-spin" />
+      ) : (
+        <Play className="me-2 w-5 h-5" />
+      )}
+      {t('wordHunt.results.watchAdRetry')}
+    </Button>
+  );
+}
+
 export const ShareSection: React.FC<ShareSectionProps> = ({
   solved,
   onShare,
   onChallengeShare,
   onRetry,
+  onRetryFree,
   canAffordRetry,
   retryCost,
   currentCoins,
   onSpendStart,
   t,
 }) => {
+  const useAdRetry = isNative() && !!onRetryFree;
   const retryRef = useRef<HTMLButtonElement>(null);
   const [isRetrying, setIsRetrying] = useState(false);
 
@@ -83,37 +134,44 @@ export const ShareSection: React.FC<ShareSectionProps> = ({
       {/* Failed players: Retry is primary, Share is secondary */}
       {!solved ? (
         <div className="max-w-btn mx-auto space-y-2">
-          {/* Inline coin balance row */}
-          <div className="flex justify-end">
-            <CoinBalanceBadge
-              balance={currentCoins}
-              size="sm"
-              canAfford={canAffordRetry}
-            />
-          </div>
-          <Button
-            ref={retryRef}
-            onClick={handleRetryClick}
-            disabled={!canAffordRetry || isRetrying}
-            className={cn(
-              "w-full py-3.5 text-lg font-black uppercase border-3 rounded-neo transition-all",
-              canAffordRetry && !isRetrying
-                ? "bg-linear-to-r from-amber-400 to-orange-500 text-neo-black border-neo-black shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5"
-                : "bg-gray-400 text-gray-600 border-neo-black cursor-not-allowed shadow-hard"
-            )}
-          >
-            {isRetrying ? (
-              <Loader2 className="me-2 w-5 h-5 animate-spin" />
-            ) : (
-              <RotateCcw className="me-2 w-5 h-5" />
-            )}
-            {isRetrying ? t('common.loading') : t('wordHunt.results.retry')}
-            <span className="ms-2 text-sm opacity-70">({retryCost}🪙)</span>
-          </Button>
-          {!canAffordRetry && (
-            <p className="text-xs text-center text-red-400 font-bold">
-              {t('wordHunt.results.earnMoreHint')}
-            </p>
+          {useAdRetry ? (
+            // Native (Android/iOS): rewarded-ad gated retry — no coin spend.
+            <WatchAdRetryButton onRetryFree={onRetryFree as () => void | Promise<void>} t={t} />
+          ) : (
+            <>
+              {/* Inline coin balance row */}
+              <div className="flex justify-end">
+                <CoinBalanceBadge
+                  balance={currentCoins}
+                  size="sm"
+                  canAfford={canAffordRetry}
+                />
+              </div>
+              <Button
+                ref={retryRef}
+                onClick={handleRetryClick}
+                disabled={!canAffordRetry || isRetrying}
+                className={cn(
+                  "w-full py-3.5 text-lg font-black uppercase border-3 rounded-neo transition-all",
+                  canAffordRetry && !isRetrying
+                    ? "bg-linear-to-r from-amber-400 to-orange-500 text-neo-black border-neo-black shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5"
+                    : "bg-gray-400 text-gray-600 border-neo-black cursor-not-allowed shadow-hard"
+                )}
+              >
+                {isRetrying ? (
+                  <Loader2 className="me-2 w-5 h-5 animate-spin" />
+                ) : (
+                  <RotateCcw className="me-2 w-5 h-5" />
+                )}
+                {isRetrying ? t('common.loading') : t('wordHunt.results.retry')}
+                <span className="ms-2 text-sm opacity-70">({retryCost}🪙)</span>
+              </Button>
+              {!canAffordRetry && (
+                <p className="text-xs text-center text-red-400 font-bold">
+                  {t('wordHunt.results.earnMoreHint')}
+                </p>
+              )}
+            </>
           )}
           <Button
             onClick={onShare}

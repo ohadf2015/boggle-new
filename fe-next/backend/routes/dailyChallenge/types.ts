@@ -65,6 +65,9 @@ export interface SubmitRequest extends Request {
 export interface SubmitResponse {
   success: boolean;
   alreadySubmitted?: boolean;
+  isRetry?: boolean;
+  penaltyApplied?: number;
+  finalScore?: number;
   data?: AttemptData;
   rank?: number | null;
   error?: string;

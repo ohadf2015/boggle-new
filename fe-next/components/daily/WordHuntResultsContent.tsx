@@ -80,6 +80,8 @@ export interface WordHuntResultsContentProps {
     handleRevealTargetWord: () => void;
     handleRevealTargetWordViaAd: () => void;
   };
+  /** Native ad-gated retry callback — runs the underlying retry without spending coins. */
+  onRetryFree?: () => void | Promise<void>;
   isAuthenticated: boolean;
   inlineSignupDismissed: boolean;
   onInlineSignupDismiss: () => void;
@@ -110,6 +112,7 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
   stats,
   shareHandlers,
   coinActions,
+  onRetryFree,
   isAuthenticated,
   inlineSignupDismissed,
   onInlineSignupDismiss,
@@ -297,6 +300,7 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
         onShare={shareHandlers.handleNativeShare}
         onChallengeShare={shareHandlers.handleChallengeShare}
         onRetry={coinActions.handleRetryChallenge}
+        onRetryFree={onRetryFree}
         canAffordRetry={coinActions.canAffordRetry}
         retryCost={coinActions.retryCost}
         currentCoins={coinActions.currentCoins}

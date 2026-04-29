@@ -29,6 +29,7 @@ export const COIN_COSTS = {
   REVEAL_5_PLUS: 60,        // Cost to reveal a 5+ letter word (balances with daily earnings)
   REVEAL_TARGET_WORD: 250,  // Cost to reveal the target word in daily challenge when failed
   DAILY_RETRY: 200,         // Cost to retry daily challenge (reduced from 500 — was 4+ sessions of earning)
+  DAILY_RETRY_LEADERBOARD_PENALTY: 100, // Server-applied score deduction when a retry attempt updates the leaderboard
 } as const;
 
 // Coin reward constants for ads and bonuses

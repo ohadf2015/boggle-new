@@ -9,6 +9,7 @@ import { getCachedDailyPuzzle } from '../../redisClient';
 import logger from '../../utils/logger';
 import { generateDailyPuzzleAsync } from '../../../utils/dailyChallenge/gridGeneration.server';
 import { getPuzzleNumber } from '../../../utils/dailyChallenge';
+import { COIN_COSTS } from '../../../utils/coinManager';
 import type { Language } from '../../../types';
 import { ensureLanguageLoaded } from '../../dictionary';
 
@@ -188,24 +189,99 @@ router.post('/submit', async (req: WordHuntSubmitRequest, res: Response): Promis
       insertData.guest_fingerprint = guestFingerprint;
     }
 
-    const { data, error } = await supabase
-      .from('daily_word_hunt_attempts')
-      .insert(insertData)
-      .select()
-      .single();
+    // Retry detection: existing row for (player|guest, date, language) means this is
+    // a second attempt. Apply server-side leaderboard penalty and UPDATE in place
+    // so the leaderboard reflects the latest run instead of silently dropping it.
+    const idColumn: 'player_id' | 'guest_fingerprint' = playerId ? 'player_id' : 'guest_fingerprint';
+    const idValue = playerId || (guestFingerprint as string);
 
-    if (error) {
-      if (error.code === '23505') {
-        logger.info('API', `[WordHunt Submit] Already submitted for ${puzzleDate}/${language}`);
-        res.json({ success: true, alreadySubmitted: true });
-        return;
-      }
-      logger.error('API', `Word Hunt submit error: ${error.message}`);
+    const { data: existing, error: existingError } = await supabase
+      .from('daily_word_hunt_attempts')
+      .select('id, extra_tries')
+      .eq('puzzle_date', puzzleDate)
+      .eq('language', language)
+      .eq(idColumn, idValue)
+      .maybeSingle();
+
+    if (existingError) {
+      logger.error('API', `Word Hunt submit lookup error: ${existingError.message}`);
       res.status(500).json({ error: 'Failed to submit result' });
       return;
     }
 
-    logger.info('API', `[WordHunt Submit] SUCCESS: id=${data.id}, playerType=${playerId ? 'authenticated' : 'guest'}, displayName=${displayName}, solved=${solved}`);
+    const isRetry = !!existing;
+    const penaltyApplied = isRetry ? COIN_COSTS.DAILY_RETRY_LEADERBOARD_PENALTY : 0;
+    if (isRetry && efficiencyScore !== undefined) {
+      insertData.efficiency_score = Math.max(0, Math.round(efficiencyScore) - penaltyApplied);
+    }
+    if (isRetry) {
+      insertData.extra_tries = (existing!.extra_tries || 0) + 1;
+    }
+
+    let data: Record<string, unknown> | null = null;
+    if (isRetry && existing) {
+      const { data: updated, error: updateError } = await supabase
+        .from('daily_word_hunt_attempts')
+        .update(insertData)
+        .eq('id', existing.id)
+        .select()
+        .single();
+      if (updateError) {
+        logger.error('API', `Word Hunt retry update error: ${updateError.message}`);
+        res.status(500).json({ error: 'Failed to submit result' });
+        return;
+      }
+      data = updated;
+    } else {
+      const { data: inserted, error: insertError } = await supabase
+        .from('daily_word_hunt_attempts')
+        .insert(insertData)
+        .select()
+        .single();
+      if (insertError) {
+        // Race: concurrent submit landed first → re-detect and update.
+        if ((insertError as { code?: string }).code === '23505') {
+          const { data: raced } = await supabase
+            .from('daily_word_hunt_attempts')
+            .select('id, extra_tries')
+            .eq('puzzle_date', puzzleDate)
+            .eq('language', language)
+            .eq(idColumn, idValue)
+            .maybeSingle();
+          if (raced) {
+            const racePayload: Record<string, unknown> = { ...insertData };
+            if (efficiencyScore !== undefined) {
+              racePayload.efficiency_score = Math.max(0, Math.round(efficiencyScore) - COIN_COSTS.DAILY_RETRY_LEADERBOARD_PENALTY);
+            }
+            racePayload.extra_tries = (raced.extra_tries || 0) + 1;
+            const { data: updated, error: raceUpdateError } = await supabase
+              .from('daily_word_hunt_attempts')
+              .update(racePayload)
+              .eq('id', raced.id)
+              .select()
+              .single();
+            if (raceUpdateError) {
+              logger.error('API', `Word Hunt race-update error: ${raceUpdateError.message}`);
+              res.status(500).json({ error: 'Failed to submit result' });
+              return;
+            }
+            data = updated;
+          } else {
+            logger.error('API', `Word Hunt submit error: ${insertError.message}`);
+            res.status(500).json({ error: 'Failed to submit result' });
+            return;
+          }
+        } else {
+          logger.error('API', `Word Hunt submit error: ${insertError.message}`);
+          res.status(500).json({ error: 'Failed to submit result' });
+          return;
+        }
+      } else {
+        data = inserted;
+      }
+    }
+
+    logger.info('API', `[WordHunt Submit] SUCCESS: id=${(data as { id?: string })?.id}, playerType=${playerId ? 'authenticated' : 'guest'}, displayName=${displayName}, solved=${solved}, isRetry=${isRetry}, penalty=${penaltyApplied}`);
 
     // Mark daily mission as complete for authenticated users (fire-and-forget)
     if (playerId) {
@@ -218,7 +294,8 @@ router.post('/submit', async (req: WordHuntSubmitRequest, res: Response): Promis
     // Helper also bumps `unique_days_played`, which backs the DEDICATION (7d) and
     // LOYAL_PLAYER (30d) achievements — bypassing /api/stats/record-game is why
     // daily-challenge-only players never unlocked the 7-day title.
-    if (playerId) {
+    // Skip on retry: first attempt already counted; second attempt would double-count.
+    if (playerId && !isRetry) {
       const scoreToAdd = solved && efficiencyScore !== undefined && efficiencyScore > 0
         ? Math.round(efficiencyScore)
         : 0;
@@ -229,7 +306,7 @@ router.post('/submit', async (req: WordHuntSubmitRequest, res: Response): Promis
       }
     }
 
-    res.json({ success: true, alreadySubmitted: false, data });
+    res.json({ success: true, alreadySubmitted: false, isRetry, penaltyApplied, data });
   } catch (error) {
     const err = error as Error;
     logger.error('API', `Word Hunt submit error: ${err.message}`);

@@ -5339,6 +5339,7 @@ const he = {
       "find": "מציאה",
       "share": "שתף",
       "retry": "נסה שוב",
+      "watchAdRetry": "צפו בפרסומת כדי לנסות שוב",
       "title": "תוצאות",
       "details": "פרטים ופרסים",
       "coinsEarned": "מטבעות שנצברו",

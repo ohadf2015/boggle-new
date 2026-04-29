@@ -30,14 +30,16 @@ const TARGET_FOUND_END_DELAY_MS = 3000;
 /** Score buffer when no human has scored yet (matches botGame.ts) */
 const BOT_SCORE_BUFFER = 20;
 
-/** Timing config per difficulty — startDelay is high so bots find regular words first */
+/** Timing config per difficulty — startDelay is high so bots find regular words first.
+ *  minWrongGuesses × HUNT_WRONG_GUESS_PENALTY (10) approaches HUNT_INITIAL_LIFE (100):
+ *  easy bots are designed to often bleed out before finding the target. */
 const HUNT_TIMING: Record<string, {
   minDelay: number; maxDelay: number; startDelay: number;
   minWrongGuesses: number; stumbleChance: number;
 }> = {
-  easy:   { minDelay: 10000, maxDelay: 20000, startDelay: 20000, minWrongGuesses: 5, stumbleChance: 0.50 },
-  medium: { minDelay: 7000,  maxDelay: 14000, startDelay: 14000, minWrongGuesses: 4, stumbleChance: 0.35 },
-  hard:   { minDelay: 4000,  maxDelay: 9000,  startDelay: 8000,  minWrongGuesses: 2, stumbleChance: 0.15 },
+  easy:   { minDelay: 14000, maxDelay: 26000, startDelay: 30000, minWrongGuesses: 9, stumbleChance: 0.65 },
+  medium: { minDelay: 10000, maxDelay: 20000, startDelay: 22000, minWrongGuesses: 6, stumbleChance: 0.45 },
+  hard:   { minDelay: 6000,  maxDelay: 13000, startDelay: 14000, minWrongGuesses: 4, stumbleChance: 0.25 },
 };
 
 export interface BotWordHuntStrategy {

@@ -5477,6 +5477,7 @@ const en = {
       "find": "FIND",
       "share": "Share",
       "retry": "Retry",
+      "watchAdRetry": "Watch Ad to Retry",
       "title": "Results",
       "details": "Details & Rewards",
       "coinsEarned": "Coins Earned",

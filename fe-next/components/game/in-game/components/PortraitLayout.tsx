@@ -374,10 +374,15 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
           variant="mobile"
         />
 
-        {/* Left Column: Found Words (Desktop only) */}
-        {isPlaying && !gameplayFocusMode && (
+        {/* Left Column: Found Words (Desktop only).
+            Render the container whenever the right panel renders so the
+            center column stays optically centered (countdown overlay is
+            fixed inset-0 → viewport center must equal game-area center). */}
+        {!gameplayFocusMode && (
           <div className="hidden lg:flex lg:flex-col lg:w-56 xl:w-64 2xl:w-72 gap-2 min-h-0 shrink-0 overflow-y-auto">
-            <GameWordList foundWords={foundWords} minWordLength={minWordLength} t={t} />
+            {isPlaying && (
+              <GameWordList foundWords={foundWords} minWordLength={minWordLength} t={t} />
+            )}
           </div>
         )}
 
