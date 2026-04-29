@@ -8,6 +8,18 @@
 
 ## Shipped this session
 
+### CLIENT-T6 — Lift mode-overlay store subscriptions into InGameScreen
+
+**Files:** `components/game/InGameScreen.tsx`, `components/game/in-game/types.ts`, `components/multiplayer/MultiplayerInGameView.tsx`, `player/components/PlayerInGameView.tsx`, `host/components/HostInGameView.tsx`
+**Severity (before):** MED — `MultiplayerInGameView`, `PlayerInGameView`, and `HostInGameView` each subscribed to 7 Zustand store hooks (`useBlastTileOverlay`, `useWordHuntTargetLength`, `useWordHuntMyLife`, `useWordHuntTargetAttempts`, `useWordHuntTargetFound`, `useWordHuntPlayerLives`, `useWordHuntEliminatedPlayers`) and prop-passed all 7 values into `InGameScreen`. The three parents only ever consumed `gameMode` directly; the 7 mode-overlay hooks were pure pass-throughs. Net effect: every word-hunt/blast tick re-rendered all three parents even when their `gameMode` wasn't `classic` (and the values would be ignored at the early-return for wheel-rush/blast/word-hunt branches). Audit C-M1 originally framed as "9 hooks at root" — verified count is 7 mode-overlay hooks (plus `gameMode` and `useGameStore` selectors that legitimately stay at root).
+**Fix:** Read the 7 values directly inside `InGameScreen` (only place they're consumed). Remove the 7 prop fields from `InGameScreenProps`. Remove the 7 hook subscriptions and the 7 prop pass-throughs from all three parents.
+
+**Why this works:** Zustand's `useStore`-style hooks subscribe selectively per-component. Moving subscriptions to the leaf where data is consumed means the leaf re-renders on those updates (correct), but the parents only re-render on what they actually read (`gameMode` and other genuinely shared state). For non-classic modes, `InGameScreen` doesn't render at all (parents take an earlier `return` branch), so even the leaf is paid only when the data matters.
+
+**Test surface:** No existing tests for `InGameScreen`, `MultiplayerInGameView`, `PlayerInGameView`, or `HostInGameView`. Regression net = `npm run build:fast` (clean type-check + bundle), full multiplayer test suite (138/138 green). Two unrelated `RoomListView.tutorial-persistence` test failures isolated to the user's parallel translation WIP — reproduce on clean HEAD with translation WIP applied alone, do not reproduce with this refactor's 5 files alone.
+
+**Note on audit-vs-reality:** Audit said "9 hooks", real count is 7 mode-overlay + 1 gameMode + 1 unrelated `useOpponentWordFeed` (separate concern). Audit also didn't flag `HostInGameView` or `PlayerInGameView` despite identical pattern — caught during build:fast type check (compile error pointed to HostInGameView still passing dropped props).
+
 ### CLIENT-T5 — Mode-specific game views code-split via next/dynamic
 
 **File:** `components/multiplayer/MultiplayerInGameView.tsx`
@@ -118,7 +130,7 @@ No `await`. The `.catch()` attaches a rejection handler to an unawaited promise;
 | ~~S-M4~~ | ~~`services/gameLifecycle/gameResults.ts`~~ | ~~N+1 INCR; collapse to HMSET~~ | **dropped — wrong shape**: not INCR but Lua-scripted JSON-blob R-M-W with capped `gameIds[]` array. Cannot collapse to HMSET. Real opportunity: `enableAutoPipelining: true` in `backend/redis/config.ts` collapses `Promise.all([n calls])` from N round-trips to 1, benefiting every Redis batch in the codebase. Defer to dedicated infra session — broader scope (touches every Redis user), needs load-test regression + WATCH/MULTI compat verify, and game-end isn't a hot path (player on results screen, not user-perceptible). |
 | S-M5 | `gameStateManager.ts:84-87` | `gameCache` TTL 30 min × max 200 — verify memory ceiling | open |
 | ~~S-M6~~ | ~~`shared/schemas/socketSchemas.ts`~~ | ~~Verify wheel-rush registered~~ | **dropped — already shipped**: `gameMode` enum includes `wheel-rush` (line 181), `SubmitWheelWordSchema` exists (line 217), wired in `wheelRushHandler.ts:160` via `validatePayload` |
-| C-M1 | `MultiplayerInGameView.tsx:238-245` | 9 store hooks at root; push mode-specific subscriptions into their own components | open |
+| ~~C-M1~~ | ~~`MultiplayerInGameView.tsx:238-245`~~ | ~~9 store hooks at root~~ | **shipped — see CLIENT-T6** (extended to PlayerInGameView + HostInGameView) |
 | C-M2 | `WheelRushView.tsx:5` | Full `framer-motion` import; wrap in `LazyMotion(domAnimation)` | open — **app-wide sweep needed** (mixed `motion` imports in shared `WordWheelParts.tsx` + others negate single-file LazyMotion) |
 | ~~C-M3~~ | ~~`WheelRushView.tsx:368-420`~~ | ~~Pulse/shake without `useReducedMotion()` guard~~ | **shipped — see CLIENT-T3** |
 | ~~C-M4~~ | ~~`WheelRushView.tsx:303`~~ | ~~`getBoundingClientRect()` in undebounced resize handler~~ | **shipped — see CLIENT-T4** |

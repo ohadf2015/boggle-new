@@ -4,7 +4,7 @@
 
 import type { ReactNode, MutableRefObject } from 'react';
 import type { Socket } from 'socket.io-client';
-import type { LetterGrid, Language, GameModeSelection, BlastTileOverlay, LetterFeedback } from '@/shared/types/game';
+import type { LetterGrid, Language, GameModeSelection } from '@/shared/types/game';
 import type {
   FoundWord,
   ExtendedLeaderboardPlayer as LeaderboardPlayer,
@@ -92,16 +92,7 @@ export interface InGameScreenProps {
   // Game mode (classic/blast/word-hunt) — controls mode-specific overlays
   gameMode?: GameModeSelection;
 
-  // Blast mode overlay data
-  blastTileOverlay?: BlastTileOverlay[];
-
-  // Word Hunt mode state
-  wordHuntTargetLength?: number;
-  wordHuntAttempts?: Array<{ guess: string; feedback: LetterFeedback[] }>;
-  wordHuntFound?: boolean;
-  wordHuntLife?: number;
-  wordHuntPlayerLives?: Record<string, number>;
-  wordHuntEliminatedPlayers?: string[];
+  // Word-hunt input handler (state is read internally from store).
   onWordHuntGuess?: (guess: string) => void;
 
   // Player experience - used to determine inactivity threshold for keyboard trails

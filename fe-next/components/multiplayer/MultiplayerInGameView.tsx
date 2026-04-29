@@ -55,16 +55,7 @@ import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { OpponentWordFeed } from '@/components/multiplayer/OpponentWordFeed';
 import { useOpponentWordFeed } from '@/hooks/useOpponentWordFeed';
-import {
-  useGameMode,
-  useBlastTileOverlay,
-  useWordHuntTargetLength,
-  useWordHuntMyLife,
-  useWordHuntTargetAttempts,
-  useWordHuntTargetFound,
-  useWordHuntPlayerLives,
-  useWordHuntEliminatedPlayers,
-} from '@/hooks/gameState/store';
+import { useGameMode } from '@/hooks/gameState/store';
 
 // ==================== Types ====================
 
@@ -249,15 +240,10 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
 }): React.ReactElement => {
   const { profile } = useAuth();
 
-  // Game mode state from Zustand
+  // Only gameMode at root — mode-specific overlay state subscribed by
+  // InGameScreen directly so this component doesn't re-render on irrelevant
+  // word-hunt/blast store updates.
   const gameMode = useGameMode();
-  const blastTileOverlay = useBlastTileOverlay();
-  const wordHuntTargetLength = useWordHuntTargetLength();
-  const wordHuntLife = useWordHuntMyLife();
-  const wordHuntAttempts = useWordHuntTargetAttempts();
-  const wordHuntFound = useWordHuntTargetFound();
-  const wordHuntPlayerLives = useWordHuntPlayerLives();
-  const wordHuntEliminatedPlayers = useWordHuntEliminatedPlayers();
 
   // Opponent word feed for classic mode
   const { feedItems: opponentFeedItems } = useOpponentWordFeed({ socket, currentPlayerName: username });
@@ -428,13 +414,6 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
           boardTheme={boardTheme}
           // Game mode overlays
           gameMode={gameMode ?? undefined}
-          blastTileOverlay={blastTileOverlay}
-          wordHuntTargetLength={wordHuntTargetLength}
-          wordHuntAttempts={wordHuntAttempts}
-          wordHuntFound={wordHuntFound}
-          wordHuntLife={wordHuntLife}
-          wordHuntPlayerLives={wordHuntPlayerLives}
-          wordHuntEliminatedPlayers={wordHuntEliminatedPlayers}
           onWordHuntGuess={handleWordHuntGuess}
           // Player experience
           totalGamesPlayed={profile?.total_games}

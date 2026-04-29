@@ -1,6 +1,15 @@
 'use client';
 
 import { useRef, useEffect, useCallback, useMemo, memo, useState, useDeferredValue } from 'react';
+import {
+  useBlastTileOverlay,
+  useWordHuntTargetLength,
+  useWordHuntMyLife,
+  useWordHuntTargetAttempts,
+  useWordHuntTargetFound,
+  useWordHuntPlayerLives,
+  useWordHuntEliminatedPlayers,
+} from '@/hooks/gameState/store';
 import { useSoundEffects } from '../../contexts/SoundEffectsContext';
 import { useAnnouncer } from '../GameAnnouncer';
 import { useAutoScrollOnGameStart } from '@/hooks/useAutoScrollOnGameStart';
@@ -97,15 +106,19 @@ const InGameScreen = memo<InGameScreenProps>(function InGameScreen({
 
   // Game mode overlays
   gameMode,
-  blastTileOverlay,
-  wordHuntTargetLength,
-  wordHuntAttempts,
-  wordHuntFound,
-  wordHuntLife,
-  wordHuntPlayerLives,
-  wordHuntEliminatedPlayers,
   onWordHuntGuess,
 }) {
+  // Mode-overlay state read directly from store — keeps parents from
+  // re-rendering on irrelevant store updates (was previously prop-passed
+  // by MultiplayerInGameView + PlayerInGameView, churning them on every
+  // word-hunt/blast tick even when their gameMode isn't classic).
+  const blastTileOverlay = useBlastTileOverlay();
+  const wordHuntTargetLength = useWordHuntTargetLength();
+  const wordHuntAttempts = useWordHuntTargetAttempts();
+  const wordHuntFound = useWordHuntTargetFound();
+  const wordHuntLife = useWordHuntMyLife();
+  const wordHuntPlayerLives = useWordHuntPlayerLives();
+  const wordHuntEliminatedPlayers = useWordHuntEliminatedPlayers();
   // Sound effects
   const {
     playWordAcceptedSound,
