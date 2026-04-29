@@ -78,4 +78,37 @@ describe('AvatarRenderer', () => {
       expect(flood?.getAttribute('flood-color')).toBe('#000');
     });
   });
+
+  describe('mode-color frame', () => {
+    it('renders no frame when mode prop omitted (backwards compat)', () => {
+      render(<AvatarRenderer config={DEFAULT_AVATAR_CONFIG} />);
+      const svg = screen.getByTestId('custom-avatar');
+      expect(svg.querySelector('[data-mode-frame]')).toBeNull();
+    });
+
+    it('renders pink frame for multiplayer mode', () => {
+      render(<AvatarRenderer config={DEFAULT_AVATAR_CONFIG} mode="multiplayer" />);
+      const frame = screen.getByTestId('custom-avatar').querySelector('[data-mode-frame]');
+      expect(frame).not.toBeNull();
+      expect(frame?.getAttribute('stroke')).toBe('#FF1493');
+    });
+
+    it('renders cyan frame for singleplayer mode', () => {
+      render(<AvatarRenderer config={DEFAULT_AVATAR_CONFIG} mode="singleplayer" />);
+      const frame = screen.getByTestId('custom-avatar').querySelector('[data-mode-frame]');
+      expect(frame?.getAttribute('stroke')).toBe('#00FFFF');
+    });
+
+    it('renders purple frame for brain mode', () => {
+      render(<AvatarRenderer config={DEFAULT_AVATAR_CONFIG} mode="brain" />);
+      const frame = screen.getByTestId('custom-avatar').querySelector('[data-mode-frame]');
+      expect(frame?.getAttribute('stroke')).toBe('#8B5CF6');
+    });
+
+    it('renders lime frame for default/practice mode', () => {
+      render(<AvatarRenderer config={DEFAULT_AVATAR_CONFIG} mode="practice" />);
+      const frame = screen.getByTestId('custom-avatar').querySelector('[data-mode-frame]');
+      expect(frame?.getAttribute('stroke')).toBe('#BFFF00');
+    });
+  });
 });
