@@ -359,8 +359,17 @@ export function useBlastEngine(
     const betweenTurn = applyBetweenTurnEffects(tilesAfterThaw, gridSize);
 
     setTileStates(tilesAfterThaw);
-     
+
     tileStatesRef.current = tilesAfterThaw;
+
+    // Count colored tiles in the path for color_power objective tracking
+    const colorCounts = { pink: 0, cyan: 0, lime: 0 };
+    for (const cell of path) {
+      const tile = currentTiles[cell.row]?.[cell.col];
+      if (tile?.colorTag === 'pink') colorCounts.pink++;
+      else if (tile?.colorTag === 'cyan') colorCounts.cyan++;
+      else if (tile?.colorTag === 'lime') colorCounts.lime++;
+    }
 
     setGameState(prev => {
       const newMovesRemaining = Math.max(0, prev.movesRemaining - 1) + bonusMoveCount;
@@ -380,6 +389,7 @@ export function useBlastEngine(
           newDiamondReveal,
           prev.diamondRevealTurns > 0 ? prev.diamondRevealTurns - 1 : 0,
         ),
+        lastWordColorCounts: colorCounts,
       };
     });
 

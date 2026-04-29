@@ -281,6 +281,7 @@ export function getWaveConfig(wave: number): WaveConfig {
 // ==================== Wave Objectives ====================
 
 import type { BlastObjective } from '../types';
+import { getTargetWordPool, pickRandomTargetWord } from './blastTargetWordPool';
 
 /**
  * Objectives per wave — designed with progressive disclosure:
@@ -305,32 +306,44 @@ const WAVE_OBJECTIVES: Record<number, BlastObjective[]> = {
  * Get objectives for a given wave number.
  * Waves 1-6 use the lookup table. Wave 7+ uses wave 6 pattern
  * with linearly increasing score target.
+ *
+ * @param wave wave number
+ * @param language optional game language (for target_word pool lookup)
+ * @returns base objectives for the wave
  */
-export function getWaveObjectives(wave: number): BlastObjective[] {
+export function getWaveObjectives(wave: number, language?: string): BlastObjective[] {
   const clamped = Math.max(wave, 1);
 
+  let baseObjectives: BlastObjective[];
   if (clamped <= 7) {
-    return WAVE_OBJECTIVES[clamped].map(obj => ({ ...obj }));
+    baseObjectives = WAVE_OBJECTIVES[clamped].map(obj => ({ ...obj }));
+  } else {
+    // Wave 8+: rotating objective templates for variety
+    const baseScore = 150 + (clamped - 7) * 40;
+    const templateIndex = (clamped - 8) % 5;
+
+    const WAVE8_TEMPLATES: BlastObjective[][] = [
+      // Template 0: score + collect bombs
+      [{ type: 'score_target', target: baseScore }, { type: 'collect_type', tileType: 'bomb', target: 4 }],
+      // Template 1: score + long words
+      [{ type: 'score_target', target: baseScore }, { type: 'word_length', target: 3, minWordLength: 5 }],
+      // Template 2: score + collect prisms
+      [{ type: 'score_target', target: baseScore }, { type: 'collect_type', tileType: 'prism', target: 3 }],
+      // Template 3: score + clear ice
+      [{ type: 'score_target', target: baseScore }, { type: 'clear_all_type', tileType: 'ice', target: 0 }],
+      // Template 4: score + collect gems
+      [{ type: 'score_target', target: baseScore }, { type: 'collect_type', tileType: 'gem', target: 4 }],
+    ];
+
+    baseObjectives = [CLEAR_BOARD, ...WAVE8_TEMPLATES[templateIndex].map(obj => ({ ...obj }))];
   }
 
-  // Wave 8+: rotating objective templates for variety
-  const baseScore = 150 + (clamped - 7) * 40;
-  const templateIndex = (clamped - 8) % 5;
+  // Seed optional target_word and color_power objectives
+  const lang = language ?? 'en';
+  let withTargetWord = seedTargetWordObjective(clamped, lang, baseObjectives);
+  let withAllSeeds = seedColorPowerObjective(clamped, withTargetWord);
 
-  const WAVE8_TEMPLATES: BlastObjective[][] = [
-    // Template 0: score + collect bombs
-    [{ type: 'score_target', target: baseScore }, { type: 'collect_type', tileType: 'bomb', target: 4 }],
-    // Template 1: score + long words
-    [{ type: 'score_target', target: baseScore }, { type: 'word_length', target: 3, minWordLength: 5 }],
-    // Template 2: score + collect prisms
-    [{ type: 'score_target', target: baseScore }, { type: 'collect_type', tileType: 'prism', target: 3 }],
-    // Template 3: score + clear ice
-    [{ type: 'score_target', target: baseScore }, { type: 'clear_all_type', tileType: 'ice', target: 0 }],
-    // Template 4: score + collect gems
-    [{ type: 'score_target', target: baseScore }, { type: 'collect_type', tileType: 'gem', target: 4 }],
-  ];
-
-  return [CLEAR_BOARD, ...WAVE8_TEMPLATES[templateIndex].map(obj => ({ ...obj }))];
+  return withAllSeeds;
 }
 
 /**
@@ -355,8 +368,6 @@ export function seedTargetWordObjective(
   const shouldAdd = ((wave * 37) % 100) < 25;
   if (!shouldAdd) return objectives;
 
-  // Import here to avoid circular dependencies
-  const { getTargetWordPool, pickRandomTargetWord } = require('./blastTargetWordPool');
   const pool = getTargetWordPool(language);
   if (pool.length === 0) return objectives; // No words available for language
 

@@ -13,6 +13,7 @@ import { useBlastEngine } from './hooks/useBlastEngine';
 import { useBlastObjectives } from './hooks/useBlastObjectives';
 import { useBlastComboStreak, getComboWindowMs } from './hooks/useBlastComboStreak';
 import { useBlastSequencer } from './hooks/useBlastSequencer';
+import { useBlastColorSeeding } from './hooks/useBlastColorSeeding';
 import { BlastStage } from './BlastStage';
 import { BlastWaveIntro } from './BlastWaveIntro';
 import { BlastSugarCrushFinale } from './BlastSugarCrushFinale';
@@ -101,8 +102,8 @@ export function BlastGame({
 
   // Wave objectives (SP only)
   const waveObjectives = useMemo(
-    () => (isMultiplayer ? [] : getWaveObjectives(waveNumber)),
-    [waveNumber, isMultiplayer],
+    () => (isMultiplayer ? [] : getWaveObjectives(waveNumber, config.language)),
+    [waveNumber, isMultiplayer, config.language],
   );
 
   // Core engine
@@ -119,6 +120,15 @@ export function BlastGame({
   // Pre-game buff effects (wave-1, SP only): bomb seed, shield revive, combo2x score multiplier.
   const { scoreMultiplier: buffScoreMultiplier, shieldConsumed, shieldToastVisible, buffIntroVisible } =
     useBlastBuffEffects({ buff: initialBuff, waveNumber, isMultiplayer, engine });
+
+  // Color tag seeding for color_power objectives (SP only)
+  useBlastColorSeeding({
+    objectives: waveObjectives,
+    waveNumber,
+    tileStates: engine.tileStates,
+    seedTileStates: engine.seedTileStates,
+    isMultiplayer,
+  });
 
   const combo = useComboSystem({ trackMaxCombo: true, onComboSound: playComboSound, timerIntervalMs: 250 });
   const sequencer = useBlastSequencer();
