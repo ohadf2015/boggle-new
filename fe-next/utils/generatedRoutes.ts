@@ -24,6 +24,7 @@ export const PUBLIC_ROUTES: string[] = [
   "/blog/improve-word-game-skills",
   "/blog/multilingual-word-learning",
   "/blog/multiplayer-word-games-social",
+  "/blog/netflix-word-game-2026-rise",
   "/blog/science-behind-word-games",
   "/blog/top-player-secrets",
   "/blog/vocabulary-building-strategies",
