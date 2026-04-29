@@ -2,7 +2,7 @@
 
 import { useMemo, memo, useState, useEffect } from 'react';
 import { getSeededAvatarConfig, hashString, type CustomAvatarConfig } from '@/shared/types/customAvatar';
-import AvatarRenderer from '@/components/avatar/AvatarRenderer';
+import AvatarRenderer, { type AvatarMode } from '@/components/avatar/AvatarRenderer';
 import { cn } from '@/lib/utils';
 import { NeoSkeletonAvatar } from '@/components/ui/skeleton';
 
@@ -28,6 +28,8 @@ interface AvatarProps {
   className?: string;
   /** Show loading skeleton instead of avatar */
   isLoading?: boolean;
+  /** Game-mode color frame: pink/cyan/purple/lime ring around avatar */
+  mode?: AvatarMode;
 }
 
 const SIZE_CONFIG: Record<AvatarSize, SizeConfig> = {
@@ -49,6 +51,7 @@ const Avatar = memo<AvatarProps>(({
   size = 'md',
   className = '',
   isLoading,
+  mode,
 }) => {
   const config = SIZE_CONFIG[size] || SIZE_CONFIG.md;
 
@@ -84,7 +87,7 @@ const Avatar = memo<AvatarProps>(({
         data-testid="header-avatar"
         data-avatar-type="custom"
       >
-        <AvatarRenderer config={customAvatar} size={config.px} circular className="w-full h-full" />
+        <AvatarRenderer config={customAvatar} size={config.px} circular className="w-full h-full" mode={mode} />
       </div>
     );
   }
@@ -96,7 +99,7 @@ const Avatar = memo<AvatarProps>(({
       data-testid="header-avatar"
       data-avatar-type="generated"
     >
-      <AvatarRenderer config={fallbackConfig} size={config.px} circular />
+      <AvatarRenderer config={fallbackConfig} size={config.px} circular mode={mode} />
     </div>
   );
 });

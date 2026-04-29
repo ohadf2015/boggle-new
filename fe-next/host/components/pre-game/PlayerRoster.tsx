@@ -215,6 +215,7 @@ export const PlayerRoster = memo(function PlayerRoster({ players, username, game
                               customAvatar={avatar?.customAvatar ?? undefined}
                               avatarImage={avatar?.avatarImage}
                               size="lg"
+                              mode="multiplayer"
                             />
                           ) : (
                             <span className={cn('font-black text-neo-black', compact ? 'text-2xl' : 'text-2xl')}>

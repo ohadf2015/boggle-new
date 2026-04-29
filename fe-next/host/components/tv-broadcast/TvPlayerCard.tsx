@@ -217,6 +217,7 @@ const TvPlayerCard = memo<TvPlayerCardProps>(({
             "border-2 border-neo-black",
             isAway && !isBot && "opacity-50"
           )}
+          mode="multiplayer"
         />
         {isHost && !isAway && (
           <div

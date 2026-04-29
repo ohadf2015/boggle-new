@@ -27,8 +27,8 @@ vi.mock('next/image', () => ({
 // Mock AvatarRenderer
 vi.mock('@/components/avatar/AvatarRenderer', () => ({
   __esModule: true,
-  default: ({ config, size }: { config: CustomAvatarConfig; size: number }) => (
-    <svg data-testid="custom-avatar" data-size={size} data-base={config.base} />
+  default: ({ config, size, mode }: { config: CustomAvatarConfig; size: number; mode?: string }) => (
+    <svg data-testid="custom-avatar" data-size={size} data-base={config.base} data-mode={mode ?? ''} />
   ),
 }));
 
@@ -283,6 +283,23 @@ describe('Avatar', () => {
   describe('memoization', () => {
     it('has displayName set for debugging', () => {
       expect(Avatar.displayName).toBe('Avatar');
+    });
+  });
+
+  describe('mode prop forwarding', () => {
+    it('omits mode (no frame) by default', () => {
+      render(<Avatar customAvatar={SAMPLE_CUSTOM_AVATAR} />);
+      expect(screen.getByTestId('custom-avatar').getAttribute('data-mode')).toBe('');
+    });
+
+    it('forwards mode to AvatarRenderer for custom avatar', () => {
+      render(<Avatar customAvatar={SAMPLE_CUSTOM_AVATAR} mode="multiplayer" />);
+      expect(screen.getByTestId('custom-avatar').getAttribute('data-mode')).toBe('multiplayer');
+    });
+
+    it('forwards mode to fallback generated avatar', () => {
+      render(<Avatar userId="abc123" mode="brain" />);
+      expect(screen.getByTestId('custom-avatar').getAttribute('data-mode')).toBe('brain');
     });
   });
 });
