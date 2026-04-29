@@ -58,6 +58,10 @@ export default function InlineBannerAd({
       await hideBanner();
       if (cancelled) return;
       await showBanner(BannerAdPosition.BOTTOM_CENTER, margin);
+      // Final reconcile: if cleanup ran during showBanner (route change mid-
+      // flight), explicitly hide. Otherwise the plugin paints the banner on
+      // the destination — visible on game routes that disallow banners.
+      if (cancelled) await hideBanner();
     };
 
     void show();

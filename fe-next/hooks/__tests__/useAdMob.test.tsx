@@ -333,6 +333,61 @@ describe('useAdMob', () => {
     );
   });
 
+  it('hideBanner calls plugin even when no prior showBanner (race-safe)', async () => {
+    // Regression: prior bannerShownRef early-return raced with in-flight
+    // showBanner — hide on route change was a no-op while plugin was still
+    // about to paint a banner, leaving banner visible on disallowed routes
+    // (e.g., /daily/word-wheel after navigating from /word-of-the-day).
+    const wrapper = makeWrapper(true);
+    const { result } = renderHook(() => useAdMob(), { wrapper });
+    await act(async () => {
+      await result.current.hideBanner();
+    });
+    expect(AdMob.hideBanner).toHaveBeenCalled();
+  });
+
+  it('hideBanner during in-flight showBanner reaches the plugin (race fix)', async () => {
+    // Simulates rapid pathname change: showBanner await is still pending when
+    // user navigates and hideBanner fires. Both must reach AdMob.* — without
+    // the optimistic ref flip + early-return removal, hide was skipped.
+    let resolveShow: (() => void) | null = null;
+    vi.mocked(AdMob.showBanner).mockImplementationOnce(
+      () => new Promise<void>((res) => { resolveShow = () => res(); })
+    );
+    const wrapper = makeWrapper(true);
+    const { result } = renderHook(() => useAdMob(), { wrapper });
+    let showP: Promise<void>;
+    await act(async () => {
+      showP = result.current.showBanner();
+      await Promise.resolve();
+    });
+    // Hide arrives mid-show — must NOT be a no-op.
+    await act(async () => {
+      await result.current.hideBanner();
+    });
+    expect(AdMob.hideBanner).toHaveBeenCalled();
+    await act(async () => {
+      resolveShow!();
+      await showP!;
+    });
+  });
+
+  it('showBanner failure resets bannerShownRef so subsequent hide is still callable', async () => {
+    vi.mocked(AdMob.showBanner).mockRejectedValueOnce(new Error('boom'));
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const wrapper = makeWrapper(true);
+    const { result } = renderHook(() => useAdMob(), { wrapper });
+    await act(async () => {
+      await result.current.showBanner();
+    });
+    // Even after failed show, hide must still attempt the plugin call.
+    await act(async () => {
+      await result.current.hideBanner();
+    });
+    expect(AdMob.hideBanner).toHaveBeenCalled();
+    warnSpy.mockRestore();
+  });
+
   it('hideBanner still logs genuine errors', async () => {
     vi.mocked(AdMob.hideBanner).mockRejectedValueOnce({ message: 'internal SDK failure' });
     const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});

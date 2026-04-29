@@ -464,7 +464,12 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
     <div
       ref={gameContainerRef}
       className={cn(
-        'relative flex flex-col items-center w-full flex-1 max-w-lg mx-auto px-3 sm:px-4 pb-3 rounded-neo',
+        // Defense in depth: parent (WordWheelChallenge playing wrapper) already
+        // reserves --bottom-stack-height, but if banner ever paints anyway
+        // (Android mid-nav race, future routes), the found-words list below
+        // the sticky action bar would bleed into reserved zone. pb-bottom-stack
+        // here keeps the list above any banner overlap.
+        'relative flex flex-col items-center w-full flex-1 max-w-lg mx-auto px-3 sm:px-4 pb-bottom-stack rounded-neo',
         equippedBoardTheme && `cosmetic-board-${equippedBoardTheme.replace('board-', '')}`,
       )}
     >

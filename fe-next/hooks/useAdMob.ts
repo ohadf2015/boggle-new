@@ -100,6 +100,10 @@ export function useAdMob() {
     if (!config) return;
     const variant: BannerVariant = opts?.variant ?? 'game';
     const adId = config.bannerUnits?.[variant] ?? config.bannerAdId;
+    // Optimistic flip BEFORE await — closes race where a hideBanner arriving
+    // mid-show was a no-op (ref still false), letting plugin paint the banner
+    // on the destination route after navigation. Revert on failure.
+    bannerShownRef.current = true;
     try {
       await whenReady();
       await AdMob.showBanner({
@@ -109,8 +113,8 @@ export function useAdMob() {
         isTesting: isDev,
         ...(typeof margin === 'number' ? { margin } : {}),
       });
-      bannerShownRef.current = true;
     } catch (err) {
+      bannerShownRef.current = false;
       // warn (not error) — Sentry captureConsole treats error-level as errors.
       console.warn('[AdMob] showBanner failed', err);
     }
@@ -119,8 +123,10 @@ export function useAdMob() {
   const hideBanner = useCallback(async () => {
     // getConfig returns null when AdMob isn't available — skip entirely.
     if (!getConfig()) return;
-    // Don't call hideBanner if we never successfully showed one (Sentry #120).
-    if (!bannerShownRef.current) return;
+    // Always attempt the plugin call. The prior `bannerShownRef` early-return
+    // raced with in-flight showBanner (ref flips after await), making hide a
+    // no-op while a banner was about to paint on the destination route.
+    // Plugin throws benign "no banner" when nothing is showing — caught below.
     try {
       await whenReady();
       await AdMob.hideBanner();
