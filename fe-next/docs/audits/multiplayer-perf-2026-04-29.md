@@ -8,6 +8,25 @@
 
 ## Shipped this session
 
+### CLIENT-T5 — Mode-specific game views code-split via next/dynamic
+
+**File:** `components/multiplayer/MultiplayerInGameView.tsx`
+**Severity (before):** MED — `BlastGame` (528 lines), `WordHuntGame` (308 lines), and `WheelRushView` (~575 lines) were all eagerly imported into the MP route bundle, even though only one of them ever renders at a time (mode-conditional render at lines 290/325/345). A standard MP room paid the bytes for every other mode's view + its dependencies (Pixi for wheel-rush, blast-specific tile state, word-hunt life system).
+**Fix:** Replaced all three eager imports with `next/dynamic` + `ssr: false`:
+```ts
+const BlastGame = dynamic(() => import('@/components/blast/BlastGame').then(m => m.BlastGame), { ssr: false });
+const WordHuntGame = dynamic(() => import('@/components/wordhunt/WordHuntGame').then(m => m.WordHuntGame), { ssr: false });
+const WheelRushView = dynamic(() => import('@/components/multiplayer/WheelRushView').then(m => m.WheelRushView), { ssr: false });
+```
+
+**Why ssr:false is safe here:** Each view uses client-only hooks (sockets, sound effects, `framer-motion`'s `useReducedMotion`, etc.), and `MultiplayerInGameView` itself runs only client-side via Zustand store hooks.
+
+**Why `useBlastMultiplayerBridge` stays eager:** The hook is called unconditionally at the top of the component (line 256). Conditional hooks violate rules-of-hooks. The bridge file is small (49 lines) and its imports are likely shared with BlastGame's chunk anyway; lazy-loading it would require structural rework outside this session's scope.
+
+**Verification:** No test file exists for `MultiplayerInGameView`, so behavioral regression is checked via the broader multiplayer suite (138/138 green) plus a clean `npm run build:fast` (47s, dynamic chunks compile correctly). Type errors in `host/HostView.tsx:396` (pre-existing user WIP, unrelated) noted but not fixed in this session.
+
+**Trade-off:** Each mode now shows a brief loading state (default ~50–200ms, network-dependent) on first render of that mode. Acceptable for game routes where the user has just transitioned from matchmaking. If this becomes a UX issue, replace `{ ssr: false }` with `{ ssr: false, loading: () => <ModeLoadingPlaceholder /> }`.
+
 ### CLIENT-T4 — WheelRushView responsive wheel: window-resize → ResizeObserver
 
 **File:** `components/multiplayer/WheelRushView.tsx`
@@ -104,7 +123,7 @@ No `await`. The `.catch()` attaches a rejection handler to an unawaited promise;
 | ~~C-M3~~ | ~~`WheelRushView.tsx:368-420`~~ | ~~Pulse/shake without `useReducedMotion()` guard~~ | **shipped — see CLIENT-T3** |
 | ~~C-M4~~ | ~~`WheelRushView.tsx:303`~~ | ~~`getBoundingClientRect()` in undebounced resize handler~~ | **shipped — see CLIENT-T4** |
 | ~~C-M5~~ | ~~`WheelRushView.tsx:187-200`~~ | ~~`socket.on('connect')` not `off`'d~~ | **dropped — false claim, see CLIENT-T2** |
-| C-M6 | `MultiplayerInGameView.tsx:26` | `BlastGame` (528 lines) imported eagerly though branch-rendered | open |
+| ~~C-M6~~ | ~~`MultiplayerInGameView.tsx:26`~~ | ~~`BlastGame` (528 lines) imported eagerly though branch-rendered~~ | **shipped — see CLIENT-T5** (extended to WordHuntGame + WheelRushView) |
 
 C-M5 is HIGH severity — will cause stale handler firing on rematch. Recommend addressing in next perf cycle or a small standalone fix.
 

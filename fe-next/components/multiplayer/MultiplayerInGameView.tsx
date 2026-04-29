@@ -1,6 +1,7 @@
 'use client';
 
 import React, { memo, useCallback } from 'react';
+import dynamic from 'next/dynamic';
 import type { Socket } from 'socket.io-client';
 import { Button } from '../ui/button';
 import { FeatureErrorBoundary } from '@/components/ErrorBoundaries';
@@ -23,10 +24,24 @@ import {
 } from '../ui/alert-dialog';
 import TournamentStandings from '../TournamentStandings';
 import InGameScreen from '../game/InGameScreen';
-import { BlastGame } from '@/components/blast/BlastGame';
 import { useBlastMultiplayerBridge } from '@/components/blast/hooks/useBlastMultiplayerBridge';
-import { WordHuntGame } from '@/components/wordhunt/WordHuntGame';
-import { WheelRushView } from '@/components/multiplayer/WheelRushView';
+
+// Mode-specific game views are split into per-route chunks. Only the active
+// mode's bundle is downloaded — non-blast rooms don't pay for BlastGame's
+// 528 lines + Pixi/blast-specific deps, etc. ssr:false because each view
+// uses client-only hooks (sockets, sound effects, framer-motion).
+const BlastGame = dynamic(
+  () => import('@/components/blast/BlastGame').then(m => m.BlastGame),
+  { ssr: false },
+);
+const WordHuntGame = dynamic(
+  () => import('@/components/wordhunt/WordHuntGame').then(m => m.WordHuntGame),
+  { ssr: false },
+);
+const WheelRushView = dynamic(
+  () => import('@/components/multiplayer/WheelRushView').then(m => m.WheelRushView),
+  { ssr: false },
+);
 import type {
   Language,
   LetterGrid,
