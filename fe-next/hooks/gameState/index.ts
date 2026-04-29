@@ -38,6 +38,7 @@ export {
   useLevelUpData,
   useBoardTheme,
   useGameMode,
+  useHostSelectedGameMode,
   useWordHuntTargetLength,
   useWordHuntTargetCategory,
   useWordHuntMyLife,

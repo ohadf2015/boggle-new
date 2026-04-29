@@ -49,6 +49,7 @@ export const useBoardTheme = () => useGameStore((state) => state.boardTheme);
 
 // Game mode selector
 export const useGameMode = () => useGameStore((state) => state.gameMode);
+export const useHostSelectedGameMode = () => useGameStore((state) => state.hostSelectedGameMode);
 
 // Blast multiplayer selectors
 export const useBlastTileOverlay = () => useGameStore((state) => state.blastTileOverlay);
@@ -112,6 +113,7 @@ const getActions = (state: GameStore) => ({
   setLevelUpData: state.setLevelUpData,
   setBoardTheme: state.setBoardTheme,
   setGameMode: state.setGameMode,
+  setHostSelectedGameMode: state.setHostSelectedGameMode,
   setBlastTileOverlay: state.setBlastTileOverlay,
   setBlastMovesUsed: state.setBlastMovesUsed,
   setBlastTotalTileBonus: state.setBlastTotalTileBonus,

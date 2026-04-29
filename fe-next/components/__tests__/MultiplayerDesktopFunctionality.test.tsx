@@ -26,7 +26,7 @@ vi.mock('../../utils/SocketContext', () => ({
   }),
 }));
 
-vi.mock('@/hooks/gameState', () => ({ useGameMode: () => 'classic', useGameActions: () => ({ setGameActive: vi.fn(), setGameMode: vi.fn() }) }));
+vi.mock('@/hooks/gameState', () => ({ useGameMode: () => 'classic', useHostSelectedGameMode: () => 'random', useGameActions: () => ({ setGameActive: vi.fn(), setGameMode: vi.fn(), setHostSelectedGameMode: vi.fn() }) }));
 vi.mock('@/components/ads/RewardedAdGoldButton', () => ({ __esModule: true, default: () => null }));
 vi.mock('@/lib/animation/presets', () => ({ SPRING_PRESETS: { balanced: { type: 'spring', stiffness: 300, damping: 26 } } }));
 vi.mock('@/utils/profileStorage', () => ({ getOrCreateStoredCustomAvatar: () => null, setStoredCustomAvatar: vi.fn() }));

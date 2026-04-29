@@ -54,6 +54,7 @@ vi.mock('@/host/hooks/useTvFinalMinute', () => ({
 // Mock game state store
 vi.mock('@/hooks/gameState/store', () => ({
   useGameMode: () => 'classic',
+  useHostSelectedGameMode: () => 'random',
 }));
 
 // Mock child components

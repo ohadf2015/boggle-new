@@ -52,6 +52,7 @@ const initialState: GameState = {
   levelUpData: null,
   boardTheme: null,
   gameMode: 'classic',
+  hostSelectedGameMode: 'random',
   blastTileOverlay: [],
   blastMovesUsed: 0,
   blastTotalTileBonus: 0,
@@ -305,6 +306,10 @@ export const useGameStore = create<GameStore>()(
       gameMode: applySetState(value, state.gameMode)
     })),
 
+    setHostSelectedGameMode: (value) => set((state) => ({
+      hostSelectedGameMode: applySetState(value, state.hostSelectedGameMode)
+    })),
+
     // ==========================================
     // Blast Multiplayer Actions
     // ==========================================
@@ -409,10 +414,15 @@ export const useGameStore = create<GameStore>()(
         clearTimeout(_comboTimeoutId);
         _comboTimeoutId = null;
       }
-      // Full reset first, then apply explicit overrides — prevents stale state bleed
+      // Full reset first, then apply explicit overrides — prevents stale state bleed.
+      // `hostSelectedGameMode` is the host's persistent intent (can be 'random') and
+      // must survive the reset so random mode re-rolls each round instead of locking
+      // to the previously resolved mode.
+      const preservedHostSelectedGameMode = get().hostSelectedGameMode;
       set(() => ({
         ...initialState,
         combo: DEFAULT_COMBO_STATE,
+        hostSelectedGameMode: preservedHostSelectedGameMode,
         ...(data.letterGrid !== undefined && { letterGrid: data.letterGrid }),
         ...(data.remainingTime !== undefined && { remainingTime: data.remainingTime, gameDuration: data.remainingTime }),
         ...(data.gameLanguage !== undefined && { gameLanguage: data.gameLanguage }),
@@ -517,6 +527,7 @@ export {
   useLevelUpData,
   useBoardTheme,
   useGameMode,
+  useHostSelectedGameMode,
   useBlastTileOverlay,
   useBlastMovesUsed,
   useBlastTotalTileBonus,

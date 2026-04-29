@@ -47,6 +47,7 @@ vi.mock('@/components/CrazyGamesSDK', () => ({
 
 vi.mock('@/hooks/gameState/store', () => ({
   useGameMode: () => 'classic',
+  useHostSelectedGameMode: () => 'random',
 }));
 
 // Mock heavy child components
