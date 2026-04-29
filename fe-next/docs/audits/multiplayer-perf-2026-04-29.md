@@ -8,6 +8,19 @@
 
 ## Shipped this session
 
+### CLIENT-T4 — WheelRushView responsive wheel: window-resize → ResizeObserver
+
+**File:** `components/multiplayer/WheelRushView.tsx`
+**Severity (before):** MED — `window.addEventListener('resize', ...)` fired on every browser resize event with no debounce, each call triggering `getBoundingClientRect()` (forced layout) + `setWheelRadius(...)` (re-render). Rapid resize (orientation change, devtools toggle, snap-resize on macOS) caused layout thrash.
+**Fix:** Replaced window resize listener with `ResizeObserver` observing the wheel container directly. Browser batches RO callbacks per-frame, so rapid resizes coalesce into at most one update per frame. Also more targeted — only fires when *this element* resizes, not on every window resize event regardless of impact.
+
+**Why this is better than debouncing window resize:**
+1. ResizeObserver is per-frame batched at the browser level (no JS-level throttle needed).
+2. Observes the actual element of interest — irrelevant resizes (e.g., a side panel resizing) don't fire the callback.
+3. Catches container resizes from CSS reflow even when the window itself doesn't change.
+
+**Test:** Added "observes the wheel container with ResizeObserver instead of window resize". Replaces `global.ResizeObserver` with a tracked stub for the test scope, asserts constructor and `observe()` were both called with an `Element`. RED on previous code (no RO instantiated), GREEN on this fix. The project's existing `vitest.setup.ts` already provides a default RO mock — the test layers a tracking version on top.
+
 ### CLIENT-T3 — WheelRushView reduced-motion guards (a11y + perf)
 
 **File:** `components/multiplayer/WheelRushView.tsx`
@@ -89,7 +102,7 @@ No `await`. The `.catch()` attaches a rejection handler to an unawaited promise;
 | C-M1 | `MultiplayerInGameView.tsx:238-245` | 9 store hooks at root; push mode-specific subscriptions into their own components | open |
 | C-M2 | `WheelRushView.tsx:5` | Full `framer-motion` import; wrap in `LazyMotion(domAnimation)` | open — **app-wide sweep needed** (mixed `motion` imports in shared `WordWheelParts.tsx` + others negate single-file LazyMotion) |
 | ~~C-M3~~ | ~~`WheelRushView.tsx:368-420`~~ | ~~Pulse/shake without `useReducedMotion()` guard~~ | **shipped — see CLIENT-T3** |
-| C-M4 | `WheelRushView.tsx:303` | `getBoundingClientRect()` in undebounced resize handler | open |
+| ~~C-M4~~ | ~~`WheelRushView.tsx:303`~~ | ~~`getBoundingClientRect()` in undebounced resize handler~~ | **shipped — see CLIENT-T4** |
 | ~~C-M5~~ | ~~`WheelRushView.tsx:187-200`~~ | ~~`socket.on('connect')` not `off`'d~~ | **dropped — false claim, see CLIENT-T2** |
 | C-M6 | `MultiplayerInGameView.tsx:26` | `BlastGame` (528 lines) imported eagerly though branch-rendered | open |
 

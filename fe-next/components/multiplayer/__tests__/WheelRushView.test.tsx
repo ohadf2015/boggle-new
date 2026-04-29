@@ -311,6 +311,41 @@ describe('WheelRushView', () => {
     }
   });
 
+  it('observes the wheel container with ResizeObserver instead of window resize', () => {
+    const ctorSpy = vi.fn();
+    const observeSpy = vi.fn();
+    class TrackedRO {
+      constructor(cb: ResizeObserverCallback) { ctorSpy(cb); }
+      observe = observeSpy;
+      unobserve = vi.fn();
+      disconnect = vi.fn();
+    }
+    const original = (global as unknown as { ResizeObserver: unknown }).ResizeObserver;
+    (global as unknown as { ResizeObserver: unknown }).ResizeObserver = TrackedRO;
+    try {
+      const socket = makeMockSocket();
+      render(
+        <WheelRushView
+          socket={socket}
+          username="alice"
+          leaderboard={[{ username: 'alice', score: 0 }]}
+          onQuit={vi.fn()}
+          t={tStub}
+        />,
+      );
+      act(() => {
+        socket.fire('wheelRushInit', { puzzle, startedAt: Date.now() });
+      });
+      expect(ctorSpy).toHaveBeenCalled();
+      // observe should be called with an Element (the wheel container)
+      expect(observeSpy).toHaveBeenCalled();
+      const observed = observeSpy.mock.calls[0]?.[0];
+      expect(observed).toBeInstanceOf(Element);
+    } finally {
+      (global as unknown as { ResizeObserver: unknown }).ResizeObserver = original;
+    }
+  });
+
   it('does not render QuickReactions picker in-game', () => {
     const socket = makeMockSocket();
     render(

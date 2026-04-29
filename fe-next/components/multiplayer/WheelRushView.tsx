@@ -322,17 +322,19 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
     socket.emit('submitWheelWord', { word });
   }, [socket, puzzle, builtLetters.length, builtWord, flash, t, playWordRejectedSound]);
 
-  // Responsive wheel radius
+  // Responsive wheel radius — observe the container directly. Browser batches
+  // ResizeObserver callbacks per-frame, so rapid window resizes won't thrash.
   useEffect(() => {
+    const el = wheelContainerRef.current;
+    if (!el) return;
     const update = () => {
-      if (wheelContainerRef.current) {
-        const w = wheelContainerRef.current.getBoundingClientRect().width;
-        setWheelRadius(Math.max(56, Math.min(96, (w - 56) / 2)));
-      }
+      const w = el.getBoundingClientRect().width;
+      setWheelRadius(Math.max(56, Math.min(96, (w - 56) / 2)));
     };
     update();
-    window.addEventListener('resize', update);
-    return () => window.removeEventListener('resize', update);
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
   }, [puzzle]);
 
   // Keyboard input (shared hook)
