@@ -333,9 +333,12 @@ describe('MultiplayerFlow', () => {
         'en',
         expect.any(String),
         'Test Room',
-        'HostPlayer',
-        expect.objectContaining({ isPrivate: true })
+        'HostPlayer'
       );
+      // Default visibility = public: no isPrivate option ever passed
+      const createCalls = (defaultProps.handleJoin as ReturnType<typeof vi.fn>).mock.calls;
+      const opts = createCalls[createCalls.length - 1]?.[5];
+      expect(opts?.isPrivate).toBeUndefined();
     });
 
     it('should generate valid 6-character game code', async () => {

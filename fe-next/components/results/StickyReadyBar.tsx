@@ -324,8 +324,8 @@ export default function StickyReadyBar({
     <div className="flex flex-col gap-2 flex-1 min-w-0 pb-[env(safe-area-inset-bottom)]">
         {/* Host mode selector — always-visible horizontal pills */}
         {isHost && selectedGameMode !== undefined && onSelectGameMode && (
-          <div className="flex flex-col gap-1">
-            <div className="flex items-center gap-1 px-0.5">
+          <div className="flex flex-col gap-1 min-w-0">
+            <div className="flex items-center gap-1 px-0.5 min-w-0">
               {ALL_MODES.map((mode) => {
                 const isActive = selectedGameMode === mode;
                 return (
@@ -344,14 +344,14 @@ export default function StickyReadyBar({
                     title={getModeDescription(mode, t)}
                     aria-label={`${getModeLabel(mode, t)} — ${getModeDescription(mode, t)}`}
                     className={cn(
-                      'flex-1 flex items-center justify-center gap-1.5 py-1.5 text-[9px] font-black uppercase rounded-lg border-2 transition-all',
+                      'flex-1 min-w-0 flex items-center justify-center gap-1.5 py-1.5 px-1 text-[9px] font-black uppercase rounded-lg border-2 transition-all',
                       isActive
                         ? cn(MODE_ACTIVE_COLORS[mode], 'border-current/30 shadow-xs')
                         : 'text-neo-cream/40 border-transparent hover:text-neo-cream/70 hover:bg-neo-white/5'
                     )}
                   >
-                    <span className="[&>svg]:w-3 [&>svg]:h-3">{MODE_ICONS[mode]}</span>
-                    <span className="hidden xs:inline">{getModeLabel(mode, t)}</span>
+                    <span className="shrink-0 [&>svg]:w-3 [&>svg]:h-3">{MODE_ICONS[mode]}</span>
+                    <span className="hidden xs:inline truncate">{getModeLabel(mode, t)}</span>
                   </button>
                 );
               })}

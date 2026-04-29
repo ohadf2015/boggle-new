@@ -166,26 +166,33 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
           />
         </div>
 
-        {/* Grid — fills remaining space, auto-scales to fit. No dvh floor: on short landscape the floor would push the bottom row off-screen. */}
-        <div className="flex-1 min-h-0 px-1 relative overflow-hidden [@media(min-height:560px)]:min-h-[40dvh] [@media(min-height:560px)]:overflow-y-auto">
-          <SurvivalGridSection
-            grid={grid}
-            isGameOver={isGameOver}
-            eliminatedLetters={new Set<string>()}
-            onWordSubmit={onWordSubmit}
-            onWordChange={onWordChange}
-            highlightedPath={highlightedPath}
-            t={t}
-          />
-
-          {/* Game over overlay — death or victory, then spectator mode */}
-          {!hideGameOverOverlay && (
-            <WordHuntGameOverOverlay
-              reason={isGameOver ? (targetFound ? (targetFoundBy != null && targetFoundBy !== currentUsername ? 'otherFound' : 'found') : 'eliminated') : null}
+        {/* Grid — caps to a square that fits BOTH width and remaining height,
+             so the bottom row never overflows when clue boxes + life bar + leaderboard
+             share the column. No dvh floor — that pushed the last row off-screen. */}
+        <div
+          className="flex-1 min-h-0 px-1 relative overflow-hidden flex items-center justify-center"
+          style={{ containerType: 'size' }}
+        >
+          <div className="relative aspect-square mx-auto" style={{ width: 'min(100cqw, 100cqh)', maxWidth: '440px' }}>
+            <SurvivalGridSection
+              grid={grid}
+              isGameOver={isGameOver}
+              eliminatedLetters={new Set<string>()}
+              onWordSubmit={onWordSubmit}
+              onWordChange={onWordChange}
+              highlightedPath={highlightedPath}
               t={t}
-              deathRecapStats={deathRecapStats}
             />
-          )}
+
+            {/* Game over overlay — death or victory, then spectator mode */}
+            {!hideGameOverOverlay && (
+              <WordHuntGameOverOverlay
+                reason={isGameOver ? (targetFound ? (targetFoundBy != null && targetFoundBy !== currentUsername ? 'otherFound' : 'found') : 'eliminated') : null}
+                t={t}
+                deathRecapStats={deathRecapStats}
+              />
+            )}
+          </div>
         </div>
 
         {/* MP Leaderboard — mobile strip. Cap by absolute px on short landscape so the grid keeps room. */}

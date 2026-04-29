@@ -290,8 +290,10 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
       setHostUsername(config.hostUsername);
       setUsername(config.hostUsername);
 
-      // Pass username as override to avoid stale closure in handleJoin
-      handleJoin(true, config.language, gameCode, config.roomName, config.hostUsername, { isPrivate: true });
+      // Pass username as override to avoid stale closure in handleJoin.
+      // Default room visibility = public (discoverable in lobby). Private opt-in
+      // is reserved for classroom host flow (see handleInvitationAutoJoin).
+      handleJoin(true, config.language, gameCode, config.roomName, config.hostUsername);
 
       // Show CrazyGames invite button so host can invite friends
       cgShowInvite(gameCode);
@@ -314,8 +316,9 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
     setHostUsername(quickPlayUsername);
     setUsername(quickPlayUsername);
 
-    // Create private room immediately with host playing and auto-start the game.
-    handleJoin(true, defaultLanguage, gameCode, roomName, quickPlayUsername, { quickPlay: true, isPrivate: true });
+    // Create public room immediately with host playing and auto-start the game.
+    // Public so other players (web + CrazyGames) can discover it in the lobby.
+    handleJoin(true, defaultLanguage, gameCode, roomName, quickPlayUsername, { quickPlay: true });
 
     // Show CrazyGames invite button so host can invite friends
     cgShowInvite(gameCode);

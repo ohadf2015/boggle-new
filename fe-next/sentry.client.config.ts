@@ -195,6 +195,12 @@ Sentry.init({
     /\[SOCKET\.IO\] Socket error event.*Target word already found/i,
     // NativeOAuth UNIMPLEMENTED — CrazyGames SDK outside platform
     /\[NativeOAuth\].*UNIMPLEMENTED/i,
+    // AdMob plugin not registered (web/blog/non-native WebView contexts).
+    // Initialize/showBanner/hideBanner all surface as UNIMPLEMENTED — guarded by
+    // Capacitor.isPluginAvailable('AdMob') in AdMobContext but plugin probe still
+    // emits warns under captureConsole. (JAVASCRIPT-NEXTJS-123, 125)
+    /\[AdMob\].*(initialize|showBanner|hideBanner) failed/i,
+    /AdMob.*UNIMPLEMENTED/i,
     // Capacitor App plugin race during native bridge init or stale APK install
     // (versionCode 3766 lacks plugin guards; 3959 fixed). All call sites guarded
     // with isPluginAvailable('App') (Sentry JAVASCRIPT-NEXTJS-12A).
