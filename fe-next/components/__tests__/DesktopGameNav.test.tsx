@@ -1,5 +1,9 @@
 import { render } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+
+// Override the global stub from vitest.setup.ts — this file tests the real component.
+vi.unmock('@/components/DesktopGameNav');
+
 import { DesktopGameNav } from '@/components/DesktopGameNav';
 
 let mockIsInGame = false;

@@ -311,6 +311,7 @@ vi.mock('@/hooks/useDevicePerformance', () => ({
 // loaded via next/dynamic in Header.tsx and is irrelevant to unit tests).
 vi.mock('@/components/DesktopGameNav', () => ({
   default: () => null,
+  DesktopGameNav: () => null,
 }));
 
 (global as any).mockUseDevicePerformance = mockUseDevicePerformance;
