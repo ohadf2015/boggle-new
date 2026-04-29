@@ -128,7 +128,7 @@ No `await`. The `.catch()` attaches a rejection handler to an unawaited promise;
 | S-M2 | `wordValidationHandler.ts:134-142` | Blast: full grid+tileStates per word; should send delta `{clearedPath, movedFrom, movedTo}` | open |
 | S-M3 | `middleware/rateLimiterRedis.ts:97-109` | Redis round-trip per action; consider local sliding window + write-behind | open |
 | ~~S-M4~~ | ~~`services/gameLifecycle/gameResults.ts`~~ | ~~N+1 INCR; collapse to HMSET~~ | **dropped — wrong shape**: not INCR but Lua-scripted JSON-blob R-M-W with capped `gameIds[]` array. Cannot collapse to HMSET. Real opportunity: `enableAutoPipelining: true` in `backend/redis/config.ts` collapses `Promise.all([n calls])` from N round-trips to 1, benefiting every Redis batch in the codebase. Defer to dedicated infra session — broader scope (touches every Redis user), needs load-test regression + WATCH/MULTI compat verify, and game-end isn't a hot path (player on results screen, not user-perceptible). |
-| S-M5 | `gameStateManager.ts:84-87` | `gameCache` TTL 30 min × max 200 — verify memory ceiling | open |
+| ~~S-M5~~ | ~~`gameStateManager.ts:84-87`~~ | ~~`gameCache` TTL 30 min × max 200~~ | **dropped — moot in current production**: `gameCache` is gated on `REDIS_PRIMARY === 'true'` (line 77). That env flag is unset in `.env*`/Dockerfile/scripts, so all `gameCache.set` calls (lines 184, 196) sit inside guards that never fire. The cache exists for an alternate deployment mode that isn't enabled. If `REDIS_PRIMARY` is later turned on, revisit: real fix is a deferred `gameCache.delete(gameCode)` in `gameEnd.ts` (~120s after game end, after results-screen reads complete) plus optional cap reduction. Current "6GB held" framing in audit was speculative. |
 | ~~S-M6~~ | ~~`shared/schemas/socketSchemas.ts`~~ | ~~Verify wheel-rush registered~~ | **dropped — already shipped**: `gameMode` enum includes `wheel-rush` (line 181), `SubmitWheelWordSchema` exists (line 217), wired in `wheelRushHandler.ts:160` via `validatePayload` |
 | ~~C-M1~~ | ~~`MultiplayerInGameView.tsx:238-245`~~ | ~~9 store hooks at root~~ | **shipped — see CLIENT-T6** (extended to PlayerInGameView + HostInGameView) |
 | C-M2 | `WheelRushView.tsx:5` | Full `framer-motion` import; wrap in `LazyMotion(domAnimation)` | open — **app-wide sweep needed** (mixed `motion` imports in shared `WordWheelParts.tsx` + others negate single-file LazyMotion) |
@@ -149,7 +149,31 @@ C-M5 is HIGH severity — will cause stale handler firing on rematch. Recommend 
 
 ---
 
-## What changed (one line)
+## Session shipped (6 commits on master)
 
-- `components/multiplayer/WheelRushView.tsx`: `now`-state polling replaced with `setTimeout` + `<FogCountdown>` leaf
-- `components/multiplayer/__tests__/WheelRushView.test.tsx`: added fog-expiry regression test
+| # | Commit | Fix | Net LOC |
+|---|---|---|---|
+| 1 | `25fb90fb7` | Fog ticker → leaf (CLIENT-T1) | +29 / -7 |
+| 2 | `ec202e628` | Socket deps → latestRef (CLIENT-T2) | +28 / -8 |
+| 3 | `e00ec8143` | Reduced-motion guards (CLIENT-T3) | +22 / -8 |
+| 4 | `bc893dc53` | ResizeObserver swap (CLIENT-T4) | +14 / -8 |
+| 5 | `695b5ebe6` | Mode views → dynamic chunks (CLIENT-T5) | +21 / -3 |
+| 6 | `8f9e94845` | Subscriptions → leaf (CLIENT-T6) | +42 / -87 |
+
+## Final audit-vs-reality scorecard
+
+| Category | Count | Items |
+|---|---|---|
+| Verified-real, shipped | 6 | CLIENT-T1, T2, T3, T4, T5, T6 |
+| Disconfirmed (audit was wrong) | 4 | H1, H4, C-M5, S-M4 (as stated) |
+| Already-shipped before audit | 1 | S-M6 |
+| Moot (config gate not active) | 1 | S-M5 |
+| Real, deferred (separate session) | 5 | C-M2 (LazyMotion app-wide), S-M2 (blast delta), S-M3 (rate-limit infra), S-M4 (autoPipelining infra), H3 (leaderboard wire-format) |
+
+## Lessons reinforced
+
+1. **Sub-agent findings are prompts, not specs.** Direction useful, specific shapes/severities require source verification. Half the audit's claims were wrong at the line.
+2. **Wire-format and infra changes don't fit perf-sprint commits.** Bundle them into their own sessions with appropriate regression tooling (load tests for infra, back-compat plans for wire formats).
+3. **TypeScript catches refactor blast radius.** Lifting subscriptions into InGameScreen surfaced two unflagged consumers (PlayerInGameView, HostInGameView) via build:fast type-check.
+4. **Net-negative LOC perf wins exist.** CLIENT-T6 deleted 45 more lines than it added. Zustand + leaf-subscription pattern means consumer-near subscriptions = less code AND fewer renders.
+5. **`prefer-no-build-after-every-change` is right except when refactoring shared interfaces.** Build:fast caught CLIENT-T6's missing consumer immediately; multiplayer test suite alone didn't.
