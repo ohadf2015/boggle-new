@@ -8393,6 +8393,7 @@ const ja = {
       "newBadge": "NEW",
       "waveFailed": "ウェーブ失敗",
       "needClearPct": "{required}%クリアが必要 — 結果は{got}%",
+      "tilesShort": "あと{count}タイルだった!",
       "failHint": "進むにはボードの90%以上をクリアしてください",
       "tryAgain": "もう一度",
       "share": "共有",
@@ -8511,7 +8512,8 @@ const ja = {
       "collectType": "{tileType}を{target}個集める",
       "clearAllType": "すべての{tileType}をクリア",
       "wordLength": "{minWordLength}文字以上の単語を{target}個",
-      "clearPercent": "ボードの{target}%をクリア"
+      "clearPercent": "ボードの{target}%をクリア",
+      "bannerTitle": "目標"
     },
     "combo": {
       "bomb_bomb": "メガブラスト！",

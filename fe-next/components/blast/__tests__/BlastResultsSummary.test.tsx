@@ -184,7 +184,13 @@ describe('BlastResultsSummary', () => {
   it('shows fail banner + hides stars when clearPercentage < 90', () => {
     render(
       <BlastResultsSummary
-        results={makeResults({ clearPercentage: 75, stars: 1 })}
+        // 27/36 = 75%; ceil(36*0.9)=33 → 6 tiles short
+        results={makeResults({
+          clearPercentage: 75,
+          stars: 1,
+          tilesCleared: 27,
+          totalTiles: 36,
+        })}
         t={t}
         onPlayAgain={noop}
         onQuit={noop}
@@ -192,9 +198,11 @@ describe('BlastResultsSummary', () => {
     );
     const banner = screen.getByTestId('blast-results-fail-banner');
     expect(banner).toBeDefined();
-    // Interpolated copy carries both required (90) and actual (75) percents.
-    expect(banner.textContent).toContain('90');
-    expect(banner.textContent).toContain('75');
+    // Sprint 1 clarity guard: copy now leads with concrete shortfall instead
+    // of percentages — "Just N tiles short!" reads sharper.
+    const reason = screen.getByTestId('blast-fail-reason');
+    expect(reason.textContent).toContain('blast.results.tilesShort');
+    expect(reason.textContent).toContain('6');
     expect(banner.textContent).toContain('blast.results.failHint');
     // Stars row suppressed on fail; star-label key should not render.
     expect(screen.queryByText('blast.stars1')).toBeNull();

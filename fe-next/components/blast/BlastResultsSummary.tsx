@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils';
 import { useBlastBadgeUnlocks } from './hooks/useBlastBadgeUnlocks';
 import { BlastBragCard } from './BlastBragCard';
 import { getMascotForResults, MASCOT_IMAGES } from './utils/blastMascot';
+import { computeFailReason } from './utils/computeFailReason';
 import type { BlastResultsData } from './types';
 
 type IconType = ComponentType<{ className?: string; strokeWidth?: number }>;
@@ -59,6 +60,12 @@ export function BlastResultsSummary({
 
   // Fail signal mirrors advance gate in useBlastGameEnd.ts (clearPct >= 90)
   const didFail = results.clearPercentage < 90;
+  // Sprint 1 clarity guard: concrete "N tiles short" reads sharper than a
+  // bare percent. Falls back to needClearPct copy when shortfall is unknown.
+  const failReason = computeFailReason({
+    tilesCleared: results.tilesCleared,
+    totalTiles: results.totalTiles,
+  });
 
   return (
     <div
@@ -115,8 +122,13 @@ export function BlastResultsSummary({
           )}
           data-testid="blast-results-fail-banner"
         >
-          <p className="font-neo-display font-black uppercase tracking-wider text-sm">
-            {t('blast.results.needClearPct', { required: 90, got: results.clearPercentage })}
+          <p
+            className="font-neo-display font-black uppercase tracking-wider text-sm"
+            data-testid="blast-fail-reason"
+          >
+            {failReason.kind === 'tiles_short'
+              ? t('blast.results.tilesShort', { count: failReason.tilesShort })
+              : t('blast.results.needClearPct', { required: 90, got: results.clearPercentage })}
           </p>
           <p className="text-[11px] uppercase tracking-wider font-bold text-white/80">
             {t('blast.results.failHint')}

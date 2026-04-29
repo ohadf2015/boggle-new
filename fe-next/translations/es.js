@@ -8402,6 +8402,7 @@ const es = {
       "newBadge": "NUEVO",
       "waveFailed": "Oleada Fallida",
       "needClearPct": "Necesitabas {required}% despejado — lograste {got}%",
+      "tilesShort": "¡Solo {count} fichas más!",
       "failHint": "Despeja al menos el 90% del tablero para avanzar",
       "tryAgain": "Intentar de Nuevo",
       "share": "Compartir",
@@ -8529,7 +8530,8 @@ const es = {
       "collectType": "Recolecta {target} {tileType}",
       "clearAllType": "Limpia todos los {tileType}",
       "wordLength": "{target} palabras de {minWordLength}+ letras",
-      "clearPercent": "Limpia {target}% del tablero"
+      "clearPercent": "Limpia {target}% del tablero",
+      "bannerTitle": "Objetivos"
     },
     "combo": {
       "bomb_bomb": "¡MEGA EXPLOSIÓN!",

@@ -23,6 +23,7 @@ import {
 
 export interface UseBlastMicroAchievementsOptions {
   displayMs?: number;
+  enabled?: boolean;
 }
 
 export interface UseBlastMicroAchievementsResult {
@@ -36,20 +37,25 @@ export function useBlastMicroAchievements(
   options: UseBlastMicroAchievementsOptions = {},
 ): UseBlastMicroAchievementsResult {
   const displayMs = options.displayMs ?? DEFAULT_DISPLAY_MS;
+  const enabled = options.enabled ?? true;
   const shownRef = useRef<Set<BlastMicroId>>(new Set());
   const queueRef = useRef<BlastMicroId[]>([]);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [currentId, setCurrentId] = useState<BlastMicroId | null>(null);
 
   // Detect newly earned achievements after each render. Idempotent under
-  // StrictMode because shownRef.add is a Set.
-  const earned = computeMicroAchievements(snapshot);
-  const newly = diffMicroAchievements(shownRef.current, earned);
-  if (newly.length > 0) {
-    for (const id of newly) {
-      if (!shownRef.current.has(id)) {
-        shownRef.current.add(id);
-        queueRef.current.push(id);
+  // StrictMode because shownRef.add is a Set. When disabled, skip queueing
+  // entirely so end-of-wave summary (separate path via useBlastBadgeUnlocks)
+  // is unaffected but no in-wave toast surfaces.
+  if (enabled) {
+    const earned = computeMicroAchievements(snapshot);
+    const newly = diffMicroAchievements(shownRef.current, earned);
+    if (newly.length > 0) {
+      for (const id of newly) {
+        if (!shownRef.current.has(id)) {
+          shownRef.current.add(id);
+          queueRef.current.push(id);
+        }
       }
     }
   }
@@ -64,6 +70,7 @@ export function useBlastMicroAchievements(
   // and currentId checks, so this never loops.
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
+    if (!enabled) return;
     if (currentId !== null) return;
     if (timerRef.current !== null) return;
     if (queueRef.current.length === 0) return;

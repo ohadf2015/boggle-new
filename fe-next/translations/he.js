@@ -8376,6 +8376,7 @@ const he = {
       "newBadge": "חדש",
       "waveFailed": "הגל נכשל",
       "needClearPct": "נדרש ניקוי של {required}% — ניקית {got}%",
+      "tilesShort": "חסרו רק {count} משבצות!",
       "failHint": "יש לנקות לפחות 90% מהלוח כדי להתקדם",
       "tryAgain": "נסה שוב",
       "share": "שתף",
@@ -8494,7 +8495,8 @@ const he = {
       "collectType": "אסוף {target} {tileType}",
       "clearAllType": "נקה את כל ה{tileType}",
       "wordLength": "{target} מילים של {minWordLength}+ אותיות",
-      "clearPercent": "נקה {target}% מהלוח"
+      "clearPercent": "נקה {target}% מהלוח",
+      "bannerTitle": "מטרות"
     },
     "combo": {
       "bomb_bomb": "מגה פיצוץ!",

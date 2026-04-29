@@ -8411,6 +8411,7 @@ const sv = {
       "newBadge": "NY",
       "waveFailed": "Våg misslyckades",
       "needClearPct": "Behövde {required}% rensat — du fick {got}%",
+      "tilesShort": "Bara {count} brickor kvar!",
       "failHint": "Rensa minst 90% av brädet för att gå vidare",
       "tryAgain": "Försök igen",
       "share": "Dela",
@@ -8529,7 +8530,8 @@ const sv = {
       "collectType": "Samla {target} {tileType}",
       "clearAllType": "Rensa alla {tileType}",
       "wordLength": "{target} ord med {minWordLength}+ bokstäver",
-      "clearPercent": "Rensa {target}% av brädet"
+      "clearPercent": "Rensa {target}% av brädet",
+      "bannerTitle": "Mål"
     },
     "combo": {
       "bomb_bomb": "MEGASMALL!",

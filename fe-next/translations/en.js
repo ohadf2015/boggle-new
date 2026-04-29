@@ -8587,6 +8587,7 @@ const en = {
       "newBadge": "NEW",
       "waveFailed": "Wave Failed",
       "needClearPct": "Needed {required}% cleared — you got {got}%",
+      "tilesShort": "Just {count} tiles short!",
       "failHint": "Clear at least 90% of the board to advance",
       "tryAgain": "Try Again",
       "share": "Share",
@@ -8706,7 +8707,8 @@ const en = {
       "collectType": "Collect {target} {tileType}",
       "clearAllType": "Clear all {tileType}",
       "wordLength": "{target} words of {minWordLength}+ letters",
-      "clearPercent": "Clear {target}% of the board"
+      "clearPercent": "Clear {target}% of the board",
+      "bannerTitle": "Goals"
     },
     "combo": {
       "bomb_bomb": "MEGA BLAST!",
