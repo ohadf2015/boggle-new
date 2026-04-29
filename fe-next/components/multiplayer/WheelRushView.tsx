@@ -100,6 +100,11 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
   const dragEngagedRef = useRef(false);
   const usedIndicesRef = useRef<Set<number>>(new Set());
 
+  // Latest-value ref for socket handlers — prevents listener re-registration
+  // when consumer-supplied values (t, sound funcs) change reference across renders.
+  const latestRef = useRef({ t, puzzle, username, playWordAcceptedSound, playWordRejectedSound });
+  latestRef.current = { t, puzzle, username, playWordAcceptedSound, playWordRejectedSound };
+
   // Fog flips off once at expiry — no per-frame ticker on the parent.
   // FogCountdown leaf owns its own 100ms tick for the seconds display.
   useEffect(() => {
@@ -147,30 +152,32 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
       closed?: string[];
       myWords?: string[];
     }) => {
+      const me = latestRef.current.username;
       setPuzzle(data.puzzle);
       setOuterLetters(data.puzzle.outerLetters);
       setStartedAt(data.startedAt ?? Date.now());
       // Reconnect-snapshot hydration: rebuild client state from server payload.
-      const mine = data.myWords ?? data.foundWords?.[username] ?? [];
+      const mine = data.myWords ?? data.foundWords?.[me] ?? [];
       if (mine.length) {
         const closedSet = new Set(data.closed ?? []);
         const myLocks = data.locks ?? {};
         const ts = Date.now();
         setMyWords(mine.map(word => {
           const lk = myLocks[word];
-          if (lk && lk.by === username) return { word, kind: 'locked', lockUntil: lk.until, ts };
+          if (lk && lk.by === me) return { word, kind: 'locked', lockUntil: lk.until, ts };
           if (closedSet.has(word)) return { word, kind: 'closed', ts };
           return { word, kind: 'locked', ts };
         }));
       }
     };
     const onResult = (data: { word: string; accepted: boolean; kind?: string; score?: number; lockUntil?: number; stolenFrom?: string; error?: string }) => {
+      const { t: tt, puzzle: pz, playWordAcceptedSound: accSfx, playWordRejectedSound: rejSfx } = latestRef.current;
       if (!data.accepted) {
         const code = data.error as WheelErrorCode | undefined;
         const key = code && ERROR_KEY[code] ? ERROR_KEY[code] : 'wordWheel.notInDictionary';
-        const msg = t(key, { min: MIN_LEN, letter: puzzle?.centerLetter ?? '' }) || key;
+        const msg = tt(key, { min: MIN_LEN, letter: pz?.centerLetter ?? '' }) || key;
         flash('err', msg);
-        playWordRejectedSound();
+        rejSfx();
         return;
       }
       if (data.kind === 'locked') {
@@ -178,21 +185,22 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
         flash('ok', `+${data.score}`);
       } else if (data.kind === 'stolen') {
         setMyWords(prev => [{ word: data.word, kind: 'stolen', score: data.score, stolenFrom: data.stolenFrom, ts: Date.now() }, ...prev]);
-        flash('ok', t('wordWheel.stealGain', { score: data.score ?? 0 }) || `+${data.score}`);
+        flash('ok', tt('wordWheel.stealGain', { score: data.score ?? 0 }) || `+${data.score}`);
       }
-      playWordAcceptedSound();
+      accSfx();
       haptic(20);
       setBuiltLetters([]);
     };
     const onStolen = (data: { word: string; by?: string; from?: string }) => {
-      if (data.from === username) {
+      const { t: tt, username: me, playWordRejectedSound: rejSfx } = latestRef.current;
+      if (data.from === me) {
         setMyWords(prev => prev.map(w =>
           w.word === data.word && w.kind === 'locked'
             ? { ...w, kind: 'stolen-from-me' as const, stolenFrom: data.by }
             : w,
         ));
-        flash('err', t('wordWheel.yourWordStolen', { word: data.word, by: data.by ?? '' }) || 'Stolen!');
-        playWordRejectedSound();
+        flash('err', tt('wordWheel.yourWordStolen', { word: data.word, by: data.by ?? '' }) || 'Stolen!');
+        rejSfx();
         haptic([40, 30, 40]);
       }
     };
@@ -215,7 +223,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
       socket.off('wheelWordClosed', onClosed);
       socket.off('connect', onReconnect);
     };
-  }, [socket, flash, t, puzzle, username, playWordAcceptedSound, playWordRejectedSound]);
+  }, [socket, flash]);
 
   // Letter tap handler (matches SP signature)
   const handleLetterPress = useCallback((letter: string, wheelIndex: number, _el: HTMLButtonElement) => {

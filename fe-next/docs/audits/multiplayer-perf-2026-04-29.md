@@ -8,6 +8,18 @@
 
 ## Shipped this session
 
+### CLIENT-T2 — WheelRushView socket effect deps stabilized
+
+**File:** `components/multiplayer/WheelRushView.tsx`
+**Severity (before):** MED — useEffect deps included `puzzle, t, username, playWordAcceptedSound, playWordRejectedSound`. Whenever `puzzle` flipped from `null` to set (after `wheelRushInit`), all 5 socket listeners were torn down and re-registered. With unstable consumer-side refs (e.g. memo-busted parent), churn could repeat across the match.
+**Fix:** Introduced a single `latestRef` that captures the latest `t`, `puzzle`, `username`, and sound functions on every render. Socket handlers read from `latestRef.current` instead of closure. Effect deps reduced to `[socket, flash]` (both stable).
+
+**Why this works:** Socket message handlers fire async and only need the *current* values when a message arrives — they don't need to "subscribe" to changes. The latest-ref pattern is a textbook React way to avoid effect re-runs when you want closure-captured behavior without dependency churn.
+
+**Test:** Added "does not re-register socket listeners when puzzle is set after wheelRushInit". Snapshots `socket.on.mock.calls.length` before/after `wheelRushInit`; must be equal. RED on previous code (10 extra registrations exposed by test mock returning fresh `vi.fn()` instances per call — same fragility that would bite production if a parent re-renders without memoizing the SoundEffectsContext value), GREEN on this fix.
+
+**Note on C-M5 audit claim:** Sub-agent flagged "`socket.on('connect', onReconnect)` registered but never unregistered in cleanup" — incorrect. Line 216 has `socket.off('connect', onReconnect)`. Cleanup is present. The real adjacent issue (deps churn) was discovered via TDD and fixed under CLIENT-T2.
+
 ### CLIENT-T1 — WheelRushView 100ms parent ticker → leaf-isolated countdown
 
 **File:** `components/multiplayer/WheelRushView.tsx`
@@ -67,7 +79,7 @@ No `await`. The `.catch()` attaches a rejection handler to an unawaited promise;
 | C-M2 | `WheelRushView.tsx:5` | Full `framer-motion` import; wrap in `LazyMotion(domAnimation)` | open (perf-profile-2026-04-22) |
 | C-M3 | `WheelRushView.tsx:368-420` | Pulse/shake without `useReducedMotion()` guard | open |
 | C-M4 | `WheelRushView.tsx:303` | `getBoundingClientRect()` in undebounced resize handler | open |
-| C-M5 | `WheelRushView.tsx:187-200` | `socket.on('connect', onReconnect)` not `off`'d in cleanup | open (HIGH) |
+| ~~C-M5~~ | ~~`WheelRushView.tsx:187-200`~~ | ~~`socket.on('connect')` not `off`'d~~ | **dropped — false claim, see CLIENT-T2** |
 | C-M6 | `MultiplayerInGameView.tsx:26` | `BlastGame` (528 lines) imported eagerly though branch-rendered | open |
 
 C-M5 is HIGH severity — will cause stale handler firing on rematch. Recommend addressing in next perf cycle or a small standalone fix.

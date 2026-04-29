@@ -258,6 +258,29 @@ describe('WheelRushView', () => {
     expect(screen.queryByText(/^not-a-word$/)).toBeNull();
   });
 
+  it('does not re-register socket listeners when puzzle is set after wheelRushInit', () => {
+    const socket = makeMockSocket();
+    render(
+      <WheelRushView
+        socket={socket}
+        username="alice"
+        leaderboard={[{ username: 'alice', score: 0 }]}
+        onQuit={vi.fn()}
+        t={tStub}
+      />,
+    );
+    const onMock = socket.on as ReturnType<typeof vi.fn>;
+    const beforeInit = onMock.mock.calls.length;
+
+    // wheelRushInit transitions puzzle null→object. Listener effect must NOT re-run.
+    act(() => {
+      socket.fire('wheelRushInit', { puzzle, startedAt: Date.now() });
+    });
+
+    const afterInit = onMock.mock.calls.length;
+    expect(afterInit - beforeInit).toBe(0);
+  });
+
   it('does not render QuickReactions picker in-game', () => {
     const socket = makeMockSocket();
     render(
