@@ -8690,6 +8690,8 @@ const en = {
     "celebrateAgain": "Celebrate again",
     "best": "Best",
     "movesLeft": "Moves",
+    "luckyBoost": "Lucky Boost",
+    "luckyBoostDesc": "Spawning more specials after a tough run",
     "bonusMove": "+1 Move!",
     "bonusMoves": "+{count} Moves!",
     "outOfMoves": "Out of Moves!",

@@ -8478,6 +8478,8 @@ const he = {
     "celebrateAgain": "חגוג שוב",
     "best": "שיא",
     "movesLeft": "מהלכים",
+    "luckyBoost": "בונוס מזל",
+    "luckyBoostDesc": "מטילים מיוחדים יותר אחרי רצף קשה",
     "bonusMove": "+1 מהלך!",
     "bonusMoves": "+{count} מהלכים!",
     "outOfMoves": "נגמרו המהלכים!",

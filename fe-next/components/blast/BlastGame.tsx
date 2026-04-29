@@ -528,6 +528,7 @@ export function BlastGame({
         activeBuff={!isMultiplayer && waveNumber === 1 ? (initialBuff ?? null) : null}
         buffConsumed={initialBuff === 'shield' ? shieldConsumed : false}
         objectiveProgress={objectives.objectiveProgress}
+        ddaBoostActive={!isMultiplayer && engine.ddaBoostActive}
         t={tAdapter}
       />
     </div>

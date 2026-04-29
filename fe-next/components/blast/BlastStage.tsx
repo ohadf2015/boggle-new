@@ -92,6 +92,8 @@ interface BlastStageProps {
   buffConsumed?: boolean;
   // Persistent goal banner — non-dismissable secondary objectives
   objectiveProgress?: BlastObjectiveProgress[];
+  // Visible "Lucky Boost" indicator — DDA assist surfacing
+  ddaBoostActive?: boolean;
   // Translation
   t: (key: string) => string | undefined;
 }
@@ -139,6 +141,7 @@ export const BlastStage = memo(function BlastStage({
   activeBuff = null,
   buffConsumed = false,
   objectiveProgress = [],
+  ddaBoostActive = false,
   t,
 }: BlastStageProps) {
   const { score, wordsFound, movesRemaining, totalMoves, tilesCleared, totalTiles, isComplete, isDeadEnd } = gameState;
@@ -236,6 +239,7 @@ export const BlastStage = memo(function BlastStage({
         comboStreakArcRef={comboStreakArcRef}
         activeBuff={activeBuff}
         buffConsumed={buffConsumed}
+        ddaBoostActive={ddaBoostActive}
         t={t}
       />
       <BlastObjectiveBanner objectives={objectiveProgress} t={t} />

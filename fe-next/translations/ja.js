@@ -8495,6 +8495,8 @@ const ja = {
     "celebrateAgain": "また祝おう",
     "best": "ベスト",
     "movesLeft": "残り手数",
+    "luckyBoost": "ラッキーブースト",
+    "luckyBoostDesc": "苦戦後に特殊タイル増加",
     "bonusMove": "+1 手!",
     "bonusMoves": "+{count} 手!",
     "outOfMoves": "手数切れ!",

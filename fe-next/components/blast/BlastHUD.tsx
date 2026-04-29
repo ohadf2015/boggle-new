@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { X, HelpCircle, Shield, Bomb, Zap } from 'lucide-react';
+import { X, HelpCircle, Shield, Bomb, Zap, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { BlastComboStreakBadge } from './BlastComboStreakBadge';
 import type { ComboStreakState } from './hooks/useBlastComboStreak';
@@ -74,6 +74,9 @@ interface BlastHUDProps {
   activeBuff?: ActiveBuff | null;
   /** Whether the buff effect has been spent (e.g. shield revive used). Greys the chip. */
   buffConsumed?: boolean;
+  /** DDA "Lucky Boost" — surfaces when 2+ consecutive failed words triggered
+   *  the invisible spawn-rate boost. Sprint 1 visibility guard. */
+  ddaBoostActive?: boolean;
   t: (key: string) => string | undefined;
 }
 
@@ -97,6 +100,7 @@ export function BlastHUD({
   comboStreakArcRef,
   activeBuff = null,
   buffConsumed = false,
+  ddaBoostActive = false,
   t,
 }: BlastHUDProps) {
   const clearPct = totalTiles > 0 ? Math.round((tilesCleared / totalTiles) * 100) : 0;
@@ -130,6 +134,19 @@ export function BlastHUD({
           >
             W{waveNumber}
           </span>
+          {/* Lucky Boost chip — visible only when DDA assist is active. */}
+          {ddaBoostActive && (
+            <span
+              data-testid="blast-lucky-boost-chip"
+              className="shrink-0 inline-flex items-center gap-1 rounded-lg border-2 border-black bg-neo-yellow px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-neo-navy shadow-hard animate-neo-pop"
+              style={NO_TEXT_SHADOW_STYLE}
+              aria-label={t('blast.luckyBoostDesc')}
+              title={t('blast.luckyBoostDesc')}
+            >
+              <Sparkles className="h-3 w-3" strokeWidth={3} />
+              {t('blast.luckyBoost') || 'Lucky'}
+            </span>
+          )}
           {/* Reserved buff slot — keeps chrome stable whether a buff is active or not. */}
           <div
             data-testid="blast-buff-slot"

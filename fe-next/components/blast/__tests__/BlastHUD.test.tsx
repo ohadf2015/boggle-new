@@ -87,3 +87,20 @@ describe('BlastHUD — score/moves/wave smoke', () => {
     expect(screen.getByText('4')).toBeDefined();
   });
 });
+
+describe('BlastHUD — Lucky Boost (DDA visibility)', () => {
+  it('hides the Lucky Boost chip when ddaBoostActive=false', () => {
+    render(<BlastHUD {...baseProps} ddaBoostActive={false} />);
+    expect(screen.queryByTestId('blast-lucky-boost-chip')).toBeNull();
+  });
+
+  it('shows the Lucky Boost chip when ddaBoostActive=true', () => {
+    render(<BlastHUD {...baseProps} ddaBoostActive={true} />);
+    expect(screen.getByTestId('blast-lucky-boost-chip')).toBeDefined();
+  });
+
+  it('hides by default when prop omitted (backward compat)', () => {
+    render(<BlastHUD {...baseProps} />);
+    expect(screen.queryByTestId('blast-lucky-boost-chip')).toBeNull();
+  });
+});

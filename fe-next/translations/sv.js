@@ -8513,6 +8513,8 @@ const sv = {
     "celebrateAgain": "Fira igen",
     "best": "Bäst",
     "movesLeft": "Drag",
+    "luckyBoost": "Tursam boost",
+    "luckyBoostDesc": "Fler specialbrickor efter en tuff omgång",
     "bonusMove": "+1 Drag!",
     "bonusMoves": "+{count} Drag!",
     "outOfMoves": "Inga drag kvar!",
