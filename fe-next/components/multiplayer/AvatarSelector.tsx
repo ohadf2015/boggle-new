@@ -52,7 +52,7 @@ export const AvatarSelector: React.FC<AvatarSelectorProps> = ({
           aria-label={t('profile.chooseAvatar')}
         >
           <div className="w-16 h-16 rounded-full border-3 border-neo-black shadow-hard-sm overflow-hidden group-hover:border-neo-cyan transition-colors">
-            <AvatarRenderer config={currentConfig} size={64} />
+            <AvatarRenderer config={currentConfig} size={64} mode="multiplayer" />
           </div>
           <div className="absolute -bottom-0.5 -inset-e-0.5 w-6 h-6 bg-neo-cyan rounded-full border-2 border-neo-black flex items-center justify-center shadow-hard-sm">
             <Pencil className="w-3 h-3 text-neo-black" />
@@ -87,7 +87,7 @@ export const AvatarSelector: React.FC<AvatarSelectorProps> = ({
       >
         <div className="flex items-center gap-3">
           <div className="relative w-14 h-14 rounded-full border-2 border-neo-cyan overflow-hidden shrink-0 shadow-hard-sm">
-            <AvatarRenderer config={currentConfig} size={56} />
+            <AvatarRenderer config={currentConfig} size={56} mode="multiplayer" />
           </div>
           <div className="text-left">
             <p className="text-xs font-bold uppercase text-neo-cyan">

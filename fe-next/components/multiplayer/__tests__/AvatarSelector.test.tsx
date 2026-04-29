@@ -38,8 +38,8 @@ vi.mock('@/components/avatar/AvatarBuilderModal', () => {
 });
 
 vi.mock('@/components/avatar/AvatarRenderer', () => {
-  const MockAvatarRenderer = ({ config, size }: { config: CustomAvatarConfig; size: number }) => {
-    return <div data-testid="avatar-renderer" data-size={size} data-base={config.base} />;
+  const MockAvatarRenderer = ({ config, size, mode }: { config: CustomAvatarConfig; size: number; mode?: string }) => {
+    return <div data-testid="avatar-renderer" data-size={size} data-base={config.base} data-mode={mode ?? ''} />;
   };
   return { default: MockAvatarRenderer };
 });
@@ -115,5 +115,13 @@ describe('AvatarSelector', () => {
     render(<AvatarSelector selectedAvatar={null} onAvatarChange={mockOnAvatarChange} />);
 
     expect(screen.getByTestId('avatar-renderer')).toBeInTheDocument();
+  });
+
+  it('passes multiplayer mode to AvatarRenderer (pink frame in MP context)', () => {
+    render(<AvatarSelector {...defaultProps} />);
+    const renderers = screen.getAllByTestId('avatar-renderer');
+    renderers.forEach((r) => {
+      expect(r.getAttribute('data-mode')).toBe('multiplayer');
+    });
   });
 });

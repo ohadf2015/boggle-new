@@ -90,7 +90,7 @@ export const PlayerProfileCard: React.FC<PlayerProfileCardProps> = ({
           )}
           aria-label={t('profile.chooseAvatar')}
         >
-          <AvatarRenderer config={currentConfig} size={64} />
+          <AvatarRenderer config={currentConfig} size={64} mode="multiplayer" />
           <div className="absolute inset-0 bg-neo-black/0 group-hover:bg-neo-black/30 transition-colors flex items-center justify-center">
             <Pencil className="w-5 h-5 text-neo-white opacity-0 group-hover:opacity-100 transition-opacity drop-shadow-[1px_1px_0px_black]" />
           </div>
