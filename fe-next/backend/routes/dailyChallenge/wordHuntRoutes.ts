@@ -9,7 +9,6 @@ import { getCachedDailyPuzzle } from '../../redisClient';
 import logger from '../../utils/logger';
 import { generateDailyPuzzleAsync } from '../../../utils/dailyChallenge/gridGeneration.server';
 import { getPuzzleNumber } from '../../../utils/dailyChallenge';
-import { COIN_COSTS } from '../../../utils/coinManager';
 import type { Language } from '../../../types';
 import { ensureLanguageLoaded } from '../../dictionary';
 
@@ -26,6 +25,7 @@ import {
   isWordValidForDailyChallenge,
   isValidDateFormat,
   isValidLanguage,
+  computeWordHuntRetryScore,
 } from './utils';
 import { completeMission } from '../../modules/dailyMissionsManager';
 import { updateDailyProfileStats } from './profileStats';
@@ -62,7 +62,8 @@ router.post('/submit', async (req: WordHuntSubmitRequest, res: Response): Promis
       clueTokensEarned,
       clueTokensSpent,
       hintsUnlocked,
-      efficiencyScore
+      efficiencyScore,
+      extraTries: clientExtraTries
     } = req.body;
 
     // Validate required fields
@@ -209,17 +210,23 @@ router.post('/submit', async (req: WordHuntSubmitRequest, res: Response): Promis
       return;
     }
 
-    const isRetry = !!existing;
-    const penaltyApplied = isRetry ? COIN_COSTS.DAILY_RETRY_LEADERBOARD_PENALTY : 0;
-    if (isRetry && efficiencyScore !== undefined) {
-      insertData.efficiency_score = Math.max(0, Math.round(efficiencyScore) - penaltyApplied);
+    const existingExtraTries = existing?.extra_tries || 0;
+    const reportedExtraTries = Math.max(0, Math.round(clientExtraTries ?? 0));
+    const { finalScore, penaltyApplied, isPaidRetry } = computeWordHuntRetryScore({
+      rawEfficiency: efficiencyScore ?? 0,
+      existingExtraTries,
+      reportedExtraTries,
+      hasExistingRow: !!existing,
+    });
+    if (isPaidRetry && efficiencyScore !== undefined) {
+      insertData.efficiency_score = finalScore;
     }
-    if (isRetry) {
-      insertData.extra_tries = (existing!.extra_tries || 0) + 1;
+    if (existing) {
+      insertData.extra_tries = Math.max(existingExtraTries, reportedExtraTries);
     }
 
     let data: Record<string, unknown> | null = null;
-    if (isRetry && existing) {
+    if (existing) {
       const { data: updated, error: updateError } = await supabase
         .from('daily_word_hunt_attempts')
         .update(insertData)
@@ -250,10 +257,17 @@ router.post('/submit', async (req: WordHuntSubmitRequest, res: Response): Promis
             .maybeSingle();
           if (raced) {
             const racePayload: Record<string, unknown> = { ...insertData };
+            const racedExtraTries = raced.extra_tries || 0;
+            const racedScore = computeWordHuntRetryScore({
+              rawEfficiency: efficiencyScore ?? 0,
+              existingExtraTries: racedExtraTries,
+              reportedExtraTries,
+              hasExistingRow: true,
+            });
             if (efficiencyScore !== undefined) {
-              racePayload.efficiency_score = Math.max(0, Math.round(efficiencyScore) - COIN_COSTS.DAILY_RETRY_LEADERBOARD_PENALTY);
+              racePayload.efficiency_score = racedScore.finalScore;
             }
-            racePayload.extra_tries = (raced.extra_tries || 0) + 1;
+            racePayload.extra_tries = Math.max(racedExtraTries, reportedExtraTries);
             const { data: updated, error: raceUpdateError } = await supabase
               .from('daily_word_hunt_attempts')
               .update(racePayload)
@@ -281,7 +295,8 @@ router.post('/submit', async (req: WordHuntSubmitRequest, res: Response): Promis
       }
     }
 
-    logger.info('API', `[WordHunt Submit] SUCCESS: id=${(data as { id?: string })?.id}, playerType=${playerId ? 'authenticated' : 'guest'}, displayName=${displayName}, solved=${solved}, isRetry=${isRetry}, penalty=${penaltyApplied}`);
+    const isRetry = !!existing;
+    logger.info('API', `[WordHunt Submit] SUCCESS: id=${(data as { id?: string })?.id}, playerType=${playerId ? 'authenticated' : 'guest'}, displayName=${displayName}, solved=${solved}, isRetry=${isRetry}, isPaidRetry=${isPaidRetry}, penalty=${penaltyApplied}`);
 
     // Mark daily mission as complete for authenticated users (fire-and-forget)
     if (playerId) {

@@ -170,6 +170,8 @@ export interface WordHuntSubmitRequest extends Request {
     clueTokensSpent?: number;
     hintsUnlocked?: number;
     efficiencyScore?: number;
+    /** Number of coin-paid retries the client has consumed for this puzzle. */
+    extraTries?: number;
   };
 }
 

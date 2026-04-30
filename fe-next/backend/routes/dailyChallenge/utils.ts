@@ -7,6 +7,7 @@ import type { Language } from '../../../types';
 import { normalizeHebrewWord } from '../../../shared/utils/wordNormalization';
 import { isDictionaryWord } from '../../dictionary';
 import { isWordCommunityValid } from '../../modules/communityWordManager';
+import { COIN_COSTS } from '../../../utils/coinManager';
 import { VALID_LANGUAGES, ValidLanguage } from './types';
 
 /**
@@ -61,4 +62,40 @@ export function isValidLanguage(language: string): language is ValidLanguage {
  */
 export function getTodayDateString(): string {
   return new Date().toISOString().split('T')[0];
+}
+
+/**
+ * Decide whether a Word Hunt submit should incur the retry leaderboard penalty
+ * and compute the resulting stored efficiency score.
+ *
+ * The gate is `reportedExtraTries > existingExtraTries` — i.e. the client's
+ * paid-retry counter must have *advanced* beyond what's stored. Bare row
+ * existence is NOT enough, otherwise an idempotent re-submit (network drop,
+ * page re-mount) of a single play would be falsely penalised.
+ */
+export interface WordHuntRetryScoreInput {
+  rawEfficiency: number;
+  /** `extra_tries` value from the existing row, or 0 when there is no row. */
+  existingExtraTries: number;
+  /** `extraTries` value the client included in this submit. */
+  reportedExtraTries: number;
+  /** Whether a row already exists for this (player, date, language). */
+  hasExistingRow: boolean;
+}
+
+export interface WordHuntRetryScoreResult {
+  finalScore: number;
+  penaltyApplied: number;
+  isPaidRetry: boolean;
+}
+
+export function computeWordHuntRetryScore(
+  input: WordHuntRetryScoreInput
+): WordHuntRetryScoreResult {
+  const existing = Math.max(0, Math.round(input.existingExtraTries || 0));
+  const reported = Math.max(0, Math.round(input.reportedExtraTries || 0));
+  const isPaidRetry = input.hasExistingRow && reported > existing;
+  const penaltyApplied = isPaidRetry ? COIN_COSTS.DAILY_RETRY_LEADERBOARD_PENALTY : 0;
+  const finalScore = Math.max(0, Math.round(input.rawEfficiency) - penaltyApplied);
+  return { finalScore, penaltyApplied, isPaidRetry };
 }
