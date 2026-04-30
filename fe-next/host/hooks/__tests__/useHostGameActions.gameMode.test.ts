@@ -31,11 +31,12 @@ vi.mock('@/utils/logger', () => ({
 }));
 vi.mock('@/hooks/gameState', () => ({
   useGameMode: vi.fn().mockReturnValue('blast'),
+  useHostSelectedGameMode: vi.fn().mockReturnValue('blast'),
 }));
 
 import { renderHook, act } from '@testing-library/react';
 import { useHostGameActions } from '../useHostGameActions';
-import { useGameMode } from '@/hooks/gameState';
+import { useGameMode, useHostSelectedGameMode } from '@/hooks/gameState';
 import { generateRandomTable } from '@/utils/utils';
 
 describe('useHostGameActions - gameMode in handleStartNewGame', () => {
@@ -95,8 +96,11 @@ describe('useHostGameActions - gameMode in handleStartNewGame', () => {
     });
   });
 
-  it('should include gameMode in handleStartNewGame emit', () => {
-    // GIVEN: hook is rendered with gameMode = 'blast' (from mock)
+  it('should include host-selected gameMode in handleStartNewGame emit', () => {
+    // GIVEN: hook is rendered with hostSelectedGameMode = 'blast' (from mock).
+    // The emit must use the host's *intent* (preserved across rounds), not
+    // the resolved gameMode — otherwise "random" intent locks to the rolled mode.
+    (useHostSelectedGameMode as any).mockReturnValue('blast');
     const { result } = renderHook(() => useHostGameActions(baseOptions));
 
     // WHEN: handleStartNewGame is called (Play Again)
@@ -104,7 +108,7 @@ describe('useHostGameActions - gameMode in handleStartNewGame', () => {
       result.current.handleStartNewGame();
     });
 
-    // THEN: the second emit (startGame) should include gameMode
+    // THEN: the second emit (startGame) should include the host's intent
     const startGameCall = mockEmit.mock.calls.find(
       (call: any[]) => call[0] === 'startGame'
     );
@@ -114,9 +118,34 @@ describe('useHostGameActions - gameMode in handleStartNewGame', () => {
     );
   });
 
-  it('should default gameMode to random when undefined', () => {
-    // GIVEN: useGameMode returns undefined (mocked)
-    (useGameMode as any).mockReturnValue(undefined);
+  it('preserves "random" intent across rounds (regression: random stayed locked)', () => {
+    // GIVEN: host originally picked "random". Server resolved it to 'blast' for
+    // round 1, so `useGameMode` (resolved) reports 'blast'. But the host's intent
+    // — `useHostSelectedGameMode` — is still 'random'.
+    (useGameMode as any).mockReturnValue('blast');
+    (useHostSelectedGameMode as any).mockReturnValue('random');
+
+    const { result } = renderHook(() => useHostGameActions(baseOptions));
+
+    // WHEN: host clicks "Play Again"
+    act(() => {
+      result.current.handleStartNewGame();
+    });
+
+    // THEN: emit must send 'random' (intent) so the server re-rolls,
+    // not 'blast' (the resolved mode from the previous round)
+    const startGameCall = mockEmit.mock.calls.find(
+      (call: any[]) => call[0] === 'startGame'
+    );
+    expect(startGameCall).toBeDefined();
+    expect(startGameCall![1]).toEqual(
+      expect.objectContaining({ gameMode: 'random' })
+    );
+  });
+
+  it('should default gameMode to random when host intent is undefined', () => {
+    // GIVEN: useHostSelectedGameMode returns undefined (mocked)
+    (useHostSelectedGameMode as any).mockReturnValue(undefined);
 
     const { result } = renderHook(() => useHostGameActions(baseOptions));
 

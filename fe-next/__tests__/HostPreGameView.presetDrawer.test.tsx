@@ -141,7 +141,8 @@ const defaultProps = {
 
 vi.mock('@/hooks/gameState', () => ({
   useGameMode: () => null,
-  useGameActions: () => ({ setGameMode: vi.fn() }),
+  useHostSelectedGameMode: () => 'random',
+  useGameActions: () => ({ setGameMode: vi.fn(), setHostSelectedGameMode: vi.fn() }),
 }));
 
 vi.mock('@/components/ui/DJMascot', () => ({

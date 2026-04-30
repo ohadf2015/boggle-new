@@ -6,7 +6,7 @@ import { BookOpen, LogOut, Monitor } from 'lucide-react';
 import { useCrazyGamesInvite } from '../../hooks/useCrazyGamesInvite';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useSocket } from '../../utils/SocketContext';
-import { useGameActions, useGameMode } from '@/hooks/gameState';
+import { useGameActions, useGameMode, useHostSelectedGameMode } from '@/hooks/gameState';
 import { useAuth } from '@/contexts/AuthContext';
 import { BoostButton } from '@/components/boosts/BoostButton';
 import { BoostPicker } from '@/components/boosts/BoostPicker';
@@ -152,14 +152,21 @@ function HostPreGameView({
 
   const [hasInitialized, setHasInitialized] = useState(false);
   const [showTvTutorial, setShowTvTutorial] = useState(false);
-  const storeGameMode = useGameMode();
-  const initialMode = (storeGameMode === 'blast' && !isAdmin && !hasBlastAccess) ? 'random' : (storeGameMode || 'random');
+  // Source of truth for the host's intent is `hostSelectedGameMode` (preserved across
+  // rounds). `gameMode` holds the resolved mode during gameplay and isn't a reliable
+  // signal of intent post-round (a "random" pick gets replaced with the rolled value).
+  const hostSelectedGameMode = useHostSelectedGameMode();
+  const initialMode = (hostSelectedGameMode === 'blast' && !isAdmin && !hasBlastAccess)
+    ? 'random'
+    : (hostSelectedGameMode || 'random');
   const [selectedGameMode, setSelectedGameMode] = useState<GameModeOption>(initialMode);
-  const { setGameMode: setStoreGameMode } = useGameActions();
+  const { setGameMode: setStoreGameMode, setHostSelectedGameMode } = useGameActions();
 
   useEffect(() => {
-    setStoreGameMode(selectedGameMode || 'random');
-  }, [selectedGameMode, setStoreGameMode]);
+    const mode = selectedGameMode || 'random';
+    setStoreGameMode(mode);
+    setHostSelectedGameMode(mode);
+  }, [selectedGameMode, setStoreGameMode, setHostSelectedGameMode]);
 
   // Apply default preset on mount
   useEffect(() => {

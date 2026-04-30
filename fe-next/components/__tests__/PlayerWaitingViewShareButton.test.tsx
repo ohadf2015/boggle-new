@@ -99,6 +99,7 @@ vi.mock('../../utils/SocketContext', () => ({
 // Mock gameState hooks
 vi.mock('@/hooks/gameState', () => ({
   useGameMode: () => 'classic',
+  useHostSelectedGameMode: () => 'random',
 }));
 
 // Mock RewardedAdGoldButton

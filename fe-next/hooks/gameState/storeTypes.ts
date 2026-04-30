@@ -53,6 +53,12 @@ export interface GameState {
 
   // Game mode
   gameMode: GameModeSelection;
+  /**
+   * Host's intended game mode for the next round (can be 'random').
+   * Persists across rounds — distinct from `gameMode` which holds the
+   * server-resolved concrete mode (e.g., 'blast') during gameplay.
+   */
+  hostSelectedGameMode: GameModeSelection;
 
   // Blast multiplayer state
   blastTileOverlay: BlastTileOverlay[];
@@ -137,6 +143,7 @@ export interface GameActions {
 
   // Game mode actions
   setGameMode: (value: GameModeSelection | ((prev: GameModeSelection) => GameModeSelection)) => void;
+  setHostSelectedGameMode: (value: GameModeSelection | ((prev: GameModeSelection) => GameModeSelection)) => void;
 
   // Blast multiplayer actions
   setBlastTileOverlay: (value: BlastTileOverlay[] | ((prev: BlastTileOverlay[]) => BlastTileOverlay[])) => void;

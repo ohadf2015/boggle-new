@@ -20,7 +20,7 @@ import { BOOST_TOKEN_STORAGE_KEY } from '@/hooks/useBoostClaim';
 import type { Language, LetterGrid, DifficultyLevel } from '@/types';
 import type { TournamentData } from './useHostViewState';
 import type { BoardTheme } from '@/shared/types/socket';
-import { useGameMode } from '@/hooks/gameState';
+import { useGameMode, useHostSelectedGameMode } from '@/hooks/gameState';
 
 interface UseHostGameActionsOptions {
   socket: Socket | null;
@@ -83,6 +83,9 @@ export interface UseHostGameActionsReturn {
 
 export function useHostGameActions(options: UseHostGameActionsOptions): UseHostGameActionsReturn {
   const gameMode = useGameMode();
+  // Send the host's persistent intent (can be 'random'), not the resolved gameMode
+  // — otherwise a "random" pick locks to the rolled result on subsequent rounds.
+  const hostSelectedGameMode = useHostSelectedGameMode();
   const {
     socket,
     gameCode,
@@ -215,7 +218,7 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
       minWordLength: minWordLength,
       difficulty: difficulty,
       boardTheme: boardTheme,
-      gameMode: gameMode || 'random',
+      gameMode: hostSelectedGameMode || 'random',
       tvMode: !hostPlaying,
       ...(boostToken ? { boostToken } : {}),
     });
@@ -248,6 +251,7 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
     setTournamentCreating,
     tournamentTimeoutRef,
     gameMode,
+    hostSelectedGameMode,
     gameCode,
   ]);
 
@@ -363,7 +367,7 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
           minWordLength: minWordLength,
           difficulty: difficulty,
           boardTheme: boardTheme,
-          gameMode: gameMode || 'random',
+          gameMode: hostSelectedGameMode || 'random',
           tvMode: !hostPlaying,
         });
 
@@ -381,7 +385,7 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
     });
   }, [
     socket, t, setFinalScores, setGameType, difficulty, timerValue, roomLanguage,
-    wordsForBoard, hostPlaying, minWordLength, boardTheme, gameMode, gameCode,
+    wordsForBoard, hostPlaying, minWordLength, boardTheme, gameMode, hostSelectedGameMode, gameCode,
     setTableData, setRemainingTime, setShowStartAnimation,
     setPlayerWordCounts, setPlayerScores, setHostFoundWords, setHostAchievements
   ]);
