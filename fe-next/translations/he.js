@@ -689,7 +689,7 @@ const he = {
     "point": "נקודה",
     "points": "נקודות",
     "combos": "קומבו",
-    "comboExplanation": "שרשר מילים תוך 5 שניות לבניית קומבו! כל רמה מוסיפה נקודות בונוס.",
+    "comboExplanation": "שרשר מילים תוך 5 שניות. כל רמה מוסיפה נקודות בונוס.",
     "keyboardShortcuts": "קיצורי מקלדת",
     "arrowKeys": "מקשי חצים",
     "navigate": "ניווט",
@@ -711,7 +711,7 @@ const he = {
   "combo": {
     "shieldUsed": "המגן הציל את הרצף!",
     "explanationTitle": "כוח הקומבו!",
-    "explanationText": "שרשרו מילים מהר לבניית קומבו. קומבו גבוה = מכפילים גדולים. אל תפילו!",
+    "explanationText": "שרשרו מילים מהר. קומבו גבוה = בונוס גדול.",
     "milestones": {
       "nice": "יפה!",
       "fire": "אש!",
@@ -738,7 +738,7 @@ const he = {
   "effects": {
     "preferenceTitle": "הגדרות אנימציה",
     "preferenceSubtitle": "פעם ראשונה שאתה רואה את זה?",
-    "preferenceDescription": "שימו לב! יש לנו רעידות מסך ואורות מהבהבים. רוצים לכבות?",
+    "preferenceDescription": "אנימציות כוללות רעידות מסך ואורות מהבהבים. כבות?",
     "earthquakeShake": "רעידת מסך",
     "fireRoundLights": "אורות מהבהבים",
     "keepAnimations": "השאר אפקטים",
@@ -820,7 +820,7 @@ const he = {
     "deleteAccount": "מחיקת חשבון",
     "deleteAccountDescription": "מחיקת החשבון וכל הנתונים לצמיתות",
     "deleteAccountButton": "מחיקה",
-    "deleteAccountConfirm": "פעולה זו בלתי הפיכה. כל ההתקדמות במשחק, הסטטיסטיקות והפרופיל שלך יימחקו לצמיתות.",
+    "deleteAccountConfirm": "זה בלתי הפיך. כל ההתקדמות, הסטטיסטיקות והפרופיל יימחקו.",
     "deleteAccountTypeConfirm": "הקלידו DELETE לאישור:",
     "deleteAccountConfirmButton": "מחיקת חשבון לצמיתות",
     "deleteAccountDeleting": "מוחק...",
@@ -841,8 +841,8 @@ const he = {
     "sending": "שולח...",
     "sendLinkError": "שליחת קישור האימות נכשלה. נסו שוב.",
     "checkEmail": "בדקו את האימייל",
-    "checkEmailDescription": "שלחנו קישור אימות לאימייל שלכם. לחצו עליו כדי לאמת את זהותכם, ואז חזרו לכאן למחיקת החשבון.",
-    "deleted": "החשבון שלכם נמחק בהצלחה. כל הנתונים הוסרו.",
+    "checkEmailDescription": "קישור אימות נשלח. לחצו עליו, ואז חזרו לכאן לאישור.",
+    "deleted": "החשבון נמחק. כל הנתונים שלך הוסרו.",
     "backToHome": "חזרה לדף הבית"
   },
   "share": {
@@ -938,7 +938,7 @@ const he = {
     "errorMessage": "תקלה זעירה, אל דאגה - כל המילים שלך שמורות!",
     "errorProgress": "הכל נשמר!",
     "updateHeading": "עדכון חדש מוכן!",
-    "updateMessage": "דברים חדשים הגיעו! רענון מהיר וחוזרים לפעולה!",
+    "updateMessage": "גרסה חדשה זמינה. רענן כדי לעדכן.",
     "updateProgress": "לוקח שתי שניות!",
     "globalErrorEncouragement": "אל דאגה - המשחק שלך מאובטח!",
     "goHome": "הביתה",
@@ -1051,6 +1051,7 @@ const he = {
       "facialHairStyle": "סגנון",
       "colorTheme": "ערכת צבעים",
       "bodyStyle": "לבוש",
+      "download": "הורדה",
       bodyStyles: {
         default: "רגיל",
         hoodie: "קפוצ׳ון",
@@ -1367,7 +1368,7 @@ const he = {
     "confirmExit": "לצאת? החדר נשאר פתוח, מישהו אחר יהיה מארח.",
     "exitWarning": "לצאת? החדר ייסגר לכולם.",
     "soloStartTitle": "אין עדיין שחקנים אחרים!",
-    "soloStartDescription": "רוצה להזמין חברים קודם? אם לא, בוטים יצטרפו כדי שיהיה מאתגר.",
+    "soloStartDescription": "הזמינו חברים או שחקו מול בוטים.",
     "soloStartCancel": "לחכות לשחקנים",
     "soloStartConfirm": "לשחק עם בוטים",
     "exitRoom": "יציאה",
@@ -1394,11 +1395,11 @@ const he = {
     "scanQr": "סרוק את הקוד כדי להצטרף למשחק או השתמש בקוד",
     "hostPlays": "אני רוצה לשדר",
     "broadcastModeTitle": "מצב טלוויזיה/מקרן",
-    "broadcastModeDescription": "שידרו על מסך גדול — אתם צופים, לא משחקים",
+    "broadcastModeDescription": "הצגת משחק על מסך גדול — אתם צופים, לא משחקים.",
     "broadcastModeDesc": "המארח צופה, לא משחק",
     "broadcastModeHint": "מושלם ל-4+ שחקנים! הפעל כדי להציג על טלוויזיה",
     "scanOrShare": "סרוק קוד QR או שתף קישור",
-    "broadcastSuggestion": "יש 4+ שחקנים? נסה מצב טלוויזיה להצגת המשחק על מסך גדול!",
+    "broadcastSuggestion": "4+ שחקנים? נסה מצב טלוויזיה.",
     "advancedSettings": "הגדרות מתקדמות",
     "roomClosedInactivity": "החדר נסגר עקב חוסר פעילות",
     "gameOverCheckScores": "המשחק נגמר! בדוק את התוצאות הסופיות",
@@ -1420,7 +1421,7 @@ const he = {
     "tournamentCreateFailed": "יצירת הטורניר נכשלה. אנא נסה שוב.",
     "cancelTournament": "בטל טורניר",
     "confirmCancelTournament": "לבטל את הטורניר?",
-    "cancelTournamentWarning": "לבטל את הטורניר? כל ההתקדמות תאבד ואין דרך חזרה.",
+    "cancelTournamentWarning": "לבטל הטורניר? ההתקדמות תאבד.",
     "minWordLength": "אורך מילה מינימלי",
     "wordsAutoValidated": "מילים אומתו אוטומטית",
     "gameTypeSelector": "בחר מצב משחק",
@@ -1454,9 +1455,9 @@ const he = {
     "presetPartyDesc": "2 דק' מצב מסיבה",
     "presetChallenge": "אתגר",
     "presetChallengeDesc": "3 דק' מצב קשה",
-    "presetFastDetails": "מושלם לסיבובים מהירים! התחרו נגד השעון במשחק מהיר. מעולה לחימום או כשאין הרבה זמן.",
-    "presetPartyDetails": "חוויית המסיבה הקלאסית! משחק מאוזן עם מספיק זמן למצוא מילים מעולות תוך שמירה על האנרגיה. אידיאלי לקבוצות.",
-    "presetChallengeDetails": "לציידי המילים הרציניים! לוח גדול יותר אומר יותר שילובי מילים ותחרות קשה יותר. הוכיחו שאתם אלופי המילים!",
+    "presetFastDetails": "מהיר ולוהט. מעולה לחימום או הפסקה קצרה.",
+    "presetPartyDetails": "קצב מאוזן. בנוי לקבוצות.",
+    "presetChallengeDetails": "לוח גדול, זמן ארוך, בלי רחמים.",
     "presetDrawerTimer": "טיימר",
     "presetDrawerBoard": "גודל לוח",
     "presetDrawerMinWord": "אורך מילה מינימלי",
@@ -1908,7 +1909,7 @@ const he = {
   "preGameTutorial": {
     "welcome": {
       "title": "היי!",
-      "subtitle": "אני לקסי! בואו אראה לכם איך לשחק!"
+      "subtitle": "אני לקסי — קדימה!"
     },
     "practice": {
       "instruction": ":החליקו על האותיות כדי לאיית",
@@ -1916,7 +1917,7 @@ const he = {
     },
     "tips": {
       "title": "אתם טבעיים!",
-      "subtitle": "כמה טיפים לפני שנתחיל"
+      "subtitle": "כמה טיפים זריזים"
     },
     "letsPlay": "בואו נשחק!",
     "buildAvatar": "ליצור אווטאר קודם?",
@@ -1944,7 +1945,7 @@ const he = {
     "upgraded": "נכנסת! יאללה לשחק!",
     "youAreSpectating": "צופה בבאלגן!",
     "status": "צופה 👀",
-    "explanation": "החדר פוצץ! צופים בינתיים - נודיע אם מישהו עוזב.",
+    "explanation": "החדר מלא. תכף נכנסים.",
     "requestToPlay": "תנו לי להיכנס!",
     "join": "כנס"
   },
@@ -3905,7 +3906,7 @@ const he = {
     "recoverDesc": "אפשר לשחזר את הרצף של {count} ימים שלך!",
     "recoverFor": "שחזר תמורת {cost} מטבעות",
     "freezes": "הקפאות רצף",
-    "freezeDesc": "השתמש בהקפאה כדי להגן על הרצף שלך ליום אחד בלי לנצח.",
+    "freezeDesc": "מגן על הרצף שלך ליום אחד.",
     "useFreeze": "השתמש בהקפאת רצף",
     "noFreezes": "אין הקפאות זמינות. קבל הקפאה חינם בכל שבוע!",
     "freezeShields": "מגן הקפאה {count}",
@@ -3922,7 +3923,7 @@ const he = {
     "liveLeaderboardDesc": "צפה בניקוד מתעדכן בזמן אמת כשמשתתפים מוצאים מילים",
     "enterRoomCode": "הזן קוד חדר",
     "startDisplay": "התחל תצוגת מסיבה",
-    "tip": "טיפ: שדר את הדף הזה לטלוויזיה דרך Chrome או AirPlay לחוויה הטובה ביותר!",
+    "tip": "טיפ: שדר ל־TV דרך Chrome או AirPlay.",
     "room": "חדר",
     "scanToJoin": "סרוק להצטרפות",
     "orEnterCode": "או הזן קוד",
@@ -3942,7 +3943,7 @@ const he = {
     "items": "פריטים",
     "emptyCollection": "עדיין אין פריטים באוסף!",
     "earnByPlaying": "צבור מטבעות במשחקים",
-    "shopComingSoon": "החנות בקרוב! אסוף אווטרים, תגים ותארים מיוחדים.",
+    "shopComingSoon": "החנות בקרוב. אווטרים, תגים ותארים.",
     "owned": "בבעלות",
     "locked": "נעול",
     "unlocked": "פתוח",
@@ -4141,7 +4142,18 @@ const he = {
       "platinum": "פלטינה",
       "diamond": "יהלום",
       "grandmaster": "גרנדמאסטר"
-    }
+    },
+    "tier": {
+      "rankInTier": "‫#{{rank}} מתוך {{total}} ב-{{tier}}‬",
+      "percentile": "‫{{pct}}% עליונים ב-{{tier}}‬",
+      "tierLeader": "מוביל הדרגה",
+      "topTierDefend": "‫הדרגה העליונה — הגן על הכתר‬",
+      "climbToNext": "‫שחק עוד כדי להעפיל ל-{{nextTier}}‬",
+      "peersInTier": "‫שחקנים ב-{{tier}}‬",
+      "nobodyAbove": "‫אין אף אחד מעליך ב-{{tier}}‬",
+      "distanceToFirst": "‫{{score}} עד #1‬"
+    },
+    "global": "גלובלי"
   },
   "ugc": {
     "createBoard": "צור לוח",
@@ -8128,16 +8140,16 @@ const he = {
       "prestigeCosmic": "יוקרה קוסמית"
     },
     "weekly": {
-      "speedDemon": { "name": "שד המהירות" },
-      "longWords": { "name": "מילים ארוכות" },
-      "goldRush": { "name": "בהלת זהב" },
-      "iceAge": { "name": "עידן הקרח" },
-      "marathon": { "name": "מרתון" },
-      "doubleOrNothing": { "name": "הכל או כלום" },
-      "wordSmith": { "name": "צורף מילים" },
-      "treasureHunter": { "name": "צייד אוצרות" },
-      "blitz": { "name": "בליץ" },
-      "zenMode": { "name": "מצב זן" }
+      "speedDemon": { "name": "שד המהירות", "desc": "טיימר מהיר · ניקוד ×1.5" },
+      "longWords": { "name": "מילים ארוכות", "desc": "מילים מ-4 אותיות · זהב ×1.5" },
+      "goldRush": { "name": "בהלת זהב", "desc": "זהב ×2 · טיימר מהיר" },
+      "iceAge": { "name": "עידן הקרח", "desc": "אריחים מיוחדים ×2 · ניקוד ×1.3" },
+      "marathon": { "name": "מרתון", "desc": "טיימר ארוך · ניקוד ×0.8" },
+      "doubleOrNothing": { "name": "הכל או כלום", "desc": "ניקוד ×2 · חצי טיימר" },
+      "wordSmith": { "name": "צורף מילים", "desc": "מילים מ-5 אותיות · ניקוד ×2" },
+      "treasureHunter": { "name": "צייד אוצרות", "desc": "זהב ×1.8 · אריחים מיוחדים ×1.5" },
+      "blitz": { "name": "בליץ", "desc": "טיימר מהיר · ניקוד ×3" },
+      "zenMode": { "name": "מצב זן", "desc": "טיימר רגוע · חצי זהב" }
     },
     "saveFailedWarning": "ההתקדמות לא נשמרה — בדקו את החיבור",
     "retrySave": "נסו שוב",
@@ -10831,6 +10843,19 @@ const he = {
     "VALIDATION_MISSING_FIELD": "חסר שדה חובה",
     "WORD_PROCESSING_ERROR": "לא ניתן לעבד את המילה. נסה שוב.",
     "INTERNAL_ERROR": "משהו השתבש. נסה שוב."
+  },
+  "cg": {
+    "hero": {
+      "firstGreeting": "ברוכים הבאים ל־LEXICLASH!",
+      "firstSub": "מצא מילים. נצח את השעון.",
+      "welcomeBack": "ברוך שובך, {name}!",
+      "welcomeBackAnon": "ברוך שובך!",
+      "returnSub": "סיבוב מילים מהיר?",
+      "playCta": "שחק עכשיו",
+      "playMicrocopy": "קדימה!",
+      "browseRooms": "או דפדף בחדרים ↓",
+      "aria": { "section": "ברוכים הבאים ל־CrazyGames" }
+    }
   },
   "dailyInvite": {
     "titleWon": "מצוין",

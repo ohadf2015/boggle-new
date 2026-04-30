@@ -695,7 +695,7 @@ const sv = {
     "point": "poäng",
     "points": "poäng",
     "combos": "Kombos",
-    "comboExplanation": "Kedja ord inom 5 sekunder för att bygga kombos! Varje nivå ger bonuspoäng.",
+    "comboExplanation": "Kedja ord inom 5 sekunder. Varje nivå ger bonus.",
     "keyboardShortcuts": "Tangentbordsgenvägar",
     "arrowKeys": "Piltangenter",
     "navigate": "Navigera",
@@ -717,7 +717,7 @@ const sv = {
   "combo": {
     "shieldUsed": "Skölden räddade din svit!",
     "explanationTitle": "Kombokraft!",
-    "explanationText": "Kedja ord snabbt för att bygga kombos. Högre kombo = större multiplikatorer. Tappa den inte!",
+    "explanationText": "Kedja snabbt. Högre kombo = större bonus.",
     "milestones": {
       "nice": "SNYGGT!",
       "fire": "ELD!",
@@ -744,7 +744,7 @@ const sv = {
   "effects": {
     "preferenceTitle": "Animationsinställningar",
     "preferenceSubtitle": "Första gången du ser detta?",
-    "preferenceDescription": "Obs! Vi använder skärmskakningar och blinkande ljus för att fira dina vinster. Vill du stänga av dem?",
+    "preferenceDescription": "Vissa animationer använder skärmskakningar och blinkande ljus. Stänga av?",
     "earthquakeShake": "Skärmskakning",
     "fireRoundLights": "Blinkande ljus",
     "keepAnimations": "Behåll effekter",
@@ -826,7 +826,7 @@ const sv = {
     "deleteAccount": "Radera konto",
     "deleteAccountDescription": "Radera ditt konto och all data permanent",
     "deleteAccountButton": "Radera",
-    "deleteAccountConfirm": "Denna åtgärd är permanent och kan inte ångras. Alla spelframsteg, statistik och profil kommer att raderas permanent.",
+    "deleteAccountConfirm": "Detta är permanent. Framsteg, statistik och profil raderas.",
     "deleteAccountTypeConfirm": "Skriv DELETE för att bekräfta:",
     "deleteAccountConfirmButton": "Radera konto permanent",
     "deleteAccountDeleting": "Raderar...",
@@ -847,8 +847,8 @@ const sv = {
     "sending": "Skickar...",
     "sendLinkError": "Kunde inte skicka verifieringslänk. Försök igen.",
     "checkEmail": "Kolla din e-post",
-    "checkEmailDescription": "Vi har skickat en verifieringslänk till din e-post. Klicka på den för att verifiera din identitet och kom sedan tillbaka hit för att radera kontot.",
-    "deleted": "Ditt konto har raderats. All din data har tagits bort.",
+    "checkEmailDescription": "Verifieringslänk skickad. Klicka på den, kom sedan tillbaka för bekräftelse.",
+    "deleted": "Konto raderat. All data är borta.",
     "backToHome": "Tillbaka till startsidan"
   },
   "share": {
@@ -945,7 +945,7 @@ const sv = {
     "errorMessage": "Litet fel, men oroa dig inte - alla ord är sparade!",
     "errorProgress": "Allt sparat!",
     "updateHeading": "Ny Uppdatering Redo!",
-    "updateMessage": "Coola grejer har kommit! Snabb uppdatering och du är tillbaka.",
+    "updateMessage": "Ny version tillgänglig. Uppdatera.",
     "updateProgress": "Tar 2 sekunder!",
     "globalErrorEncouragement": "Lugnt - ditt spel är säkert!",
     "goHome": "Hem",
@@ -1363,7 +1363,7 @@ const sv = {
     "confirmExit": "Lämna? Någon annan tar över som värd.",
     "exitWarning": "Lämna? Rummet stängs för alla.",
     "soloStartTitle": "Inga andra spelare ännu!",
-    "soloStartDescription": "Vill du bjuda in vänner först? Annars hoppar bottar in för att göra det spännande.",
+    "soloStartDescription": "Bjud in vänner, eller spela mot bottar.",
     "soloStartCancel": "Vänta på spelare",
     "soloStartConfirm": "Spela med bottar",
     "exitRoom": "Lämna rum",
@@ -1390,11 +1390,11 @@ const sv = {
     "scanQr": "Skanna QR-kod för att gå med eller använd kod",
     "hostPlays": "Jag vill spela",
     "broadcastModeTitle": "TV/Projektorläge",
-    "broadcastModeDescription": "Visa spelet på stor skärm medan du tittar på (du spelar inte)",
+    "broadcastModeDescription": "Visa spelet på stor skärm — du tittar, inte spelar.",
     "broadcastModeDesc": "Värd tittar, spelar inte",
     "broadcastModeHint": "Perfekt för 4+ spelare! Aktivera för att visa på TV",
     "scanOrShare": "Skanna QR-kod eller dela länk",
-    "broadcastSuggestion": "Har du 4+ spelare? Prova TV-läge för att visa spelet på stor skärm!",
+    "broadcastSuggestion": "4+ spelare? Prova TV-läge.",
     "advancedSettings": "Avancerade inställningar",
     "roomClosedInactivity": "Rummet stängt på grund av inaktivitet",
     "gameOverCheckScores": "Spelet slut! Kolla slutresultaten",
@@ -1416,7 +1416,7 @@ const sv = {
     "tournamentCreateFailed": "Misslyckades med att skapa turnering. Försök igen.",
     "cancelTournament": "Avbryt turnering",
     "confirmCancelTournament": "Avbryt turnering?",
-    "cancelTournamentWarning": "Är du säker på att du vill avbryta turneringen? Alla framsteg går förlorade och detta kan inte ångras.",
+    "cancelTournamentWarning": "Avbryta turnering? Framsteg går förlorade.",
     "minWordLength": "Minsta ordlängd",
     "wordsAutoValidated": "ord automatiskt validerade",
     "gameTypeSelector": "Välj spelläge",
@@ -1450,9 +1450,9 @@ const sv = {
     "presetPartyDesc": "2 min partyläge",
     "presetChallenge": "Utmaning",
     "presetChallengeDesc": "3 min svårt läge",
-    "presetFastDetails": "Perfekt för snabba rundor! Tävla mot klockan i ett snabbt spel. Bra för uppvärmning eller när du har ont om tid.",
-    "presetPartyDetails": "Den klassiska partyupplevelsen! Balanserat spel med tillräckligt med tid för att hitta bra ord samtidigt som energin hålls hög. Perfekt för grupper.",
-    "presetChallengeDetails": "För seriösa ordjägare! Större bräda betyder fler ordkombinationer och tuffare konkurrens. Bevisa att du är den ultimata ordmästaren!",
+    "presetFastDetails": "Snabbt och hektiskt. Bra för uppvärmning.",
+    "presetPartyDetails": "Balanserat tempo. Byggt för grupper.",
+    "presetChallengeDetails": "Större bräda, längre tid, ingen nåd.",
     "presetDrawerTimer": "Timer",
     "presetDrawerBoard": "Brädstorlek",
     "presetDrawerMinWord": "Min ordlängd",
@@ -1904,7 +1904,7 @@ const sv = {
   "preGameTutorial": {
     "welcome": {
       "title": "Hej!",
-      "subtitle": "Jag heter Lexi! Jag visar dig hur man spelar"
+      "subtitle": "Jag är Lexi — kör!"
     },
     "practice": {
       "instruction": "Svep över bokstäverna för att stava:",
@@ -1912,7 +1912,7 @@ const sv = {
     },
     "tips": {
       "title": "Du är en naturtalang!",
-      "subtitle": "Några tips innan vi börjar"
+      "subtitle": "Snabba tips"
     },
     "letsPlay": "Nu kör vi!",
     "buildAvatar": "Skapa din avatar först?",
@@ -1939,7 +1939,7 @@ const sv = {
     "upgraded": "Du är med! Kör hårt!",
     "youAreSpectating": "Kollar på matchen!",
     "status": "👀 ÅSKÅDAR",
-    "explanation": "Fullsatt! Häng kvar - vi säger till om någon hoppar av.",
+    "explanation": "Fullsatt. Vänta lite.",
     "requestToPlay": "Jag vill spela!",
     "join": "Gå med"
   },
@@ -3535,7 +3535,7 @@ const sv = {
     "recoverDesc": "Din {count}-dagars svit kan återställas!",
     "recoverFor": "Återställ för {cost} mynt",
     "freezes": "Svitfrysningar",
-    "freezeDesc": "Använd en frysning för att skydda din svit en dag utan att vinna.",
+    "freezeDesc": "Skyddar din svit en dag.",
     "useFreeze": "Använd svitfrysning",
     "noFreezes": "Inga frysningar tillgängliga. Tjäna 1 gratis frysning per vecka!",
     "freezeShields": "{count} Frysningssköld",
@@ -3552,7 +3552,7 @@ const sv = {
     "liveLeaderboardDesc": "Se poäng uppdateras i realtid när spelare hittar ord",
     "enterRoomCode": "Ange Rumskod",
     "startDisplay": "Starta Partyvisning",
-    "tip": "Tips: Casta den här sidan till din TV med Chrome eller AirPlay för bästa upplevelse!",
+    "tip": "Tips: Casta till TV via Chrome eller AirPlay.",
     "room": "Rum",
     "scanToJoin": "Skanna för att Gå med",
     "orEnterCode": "Eller ange kod",
@@ -3572,7 +3572,7 @@ const sv = {
     "items": "föremål",
     "emptyCollection": "Inga samlarföremål än!",
     "earnByPlaying": "Tjäna mynt genom att spela",
-    "shopComingSoon": "Butik kommer snart! Samla speciella avatarer, märken och titlar.",
+    "shopComingSoon": "Butik kommer snart. Avatarer, märken och titlar.",
     "owned": "Ägs",
     "locked": "Låst",
     "unlocked": "Upplåst",
@@ -3771,7 +3771,18 @@ const sv = {
       "platinum": "Platina",
       "diamond": "Diamant",
       "grandmaster": "Grandmästare"
-    }
+    },
+    "tier": {
+      "rankInTier": "#{{rank}} av {{total}} i {{tier}}",
+      "percentile": "Topp {{pct}}% i {{tier}}",
+      "tierLeader": "Divisionsledare",
+      "topTierDefend": "Högsta divisionen — försvara din tron",
+      "climbToNext": "Spela mer för att nå {{nextTier}}",
+      "peersInTier": "Spelare i {{tier}}",
+      "nobodyAbove": "Ingen ovanför dig i {{tier}}",
+      "distanceToFirst": "{{score}} till #1"
+    },
+    "global": "globalt"
   },
   "ugc": {
     "createBoard": "Skapa bräda",
@@ -8163,16 +8174,16 @@ const sv = {
       "prestigeCosmic": "Kosmisk Prestige"
     },
     "weekly": {
-      "speedDemon": { "name": "Fartdemon" },
-      "longWords": { "name": "Långa Ord" },
-      "goldRush": { "name": "Guldrush" },
-      "iceAge": { "name": "Istiden" },
-      "marathon": { "name": "Maraton" },
-      "doubleOrNothing": { "name": "Dubbelt eller Inget" },
-      "wordSmith": { "name": "Ordsmed" },
-      "treasureHunter": { "name": "Skattjägare" },
-      "blitz": { "name": "Blixt" },
-      "zenMode": { "name": "Zenläge" }
+      "speedDemon": { "name": "Fartdemon", "desc": "Snabbare timer · ×1.5 poäng" },
+      "longWords": { "name": "Långa Ord", "desc": "4+ bokstäver · ×1.5 guld" },
+      "goldRush": { "name": "Guldrush", "desc": "×2 guld · snabbare timer" },
+      "iceAge": { "name": "Istiden", "desc": "Specialrutor ×2 · ×1.3 poäng" },
+      "marathon": { "name": "Maraton", "desc": "Längre timer · ×0.8 poäng" },
+      "doubleOrNothing": { "name": "Dubbelt eller Inget", "desc": "×2 poäng · halv timer" },
+      "wordSmith": { "name": "Ordsmed", "desc": "5+ bokstäver · ×2 poäng" },
+      "treasureHunter": { "name": "Skattjägare", "desc": "×1.8 guld · ×1.5 specialrutor" },
+      "blitz": { "name": "Blixt", "desc": "Snabb timer · ×3 poäng" },
+      "zenMode": { "name": "Zenläge", "desc": "Lugn timer · halvt guld" }
     },
     "saveFailedWarning": "Framsteg ej sparat — kontrollera anslutningen",
     "retrySave": "Försök igen",
@@ -10830,6 +10841,19 @@ const sv = {
     "VALIDATION_MISSING_FIELD": "Obligatoriskt fält saknas",
     "WORD_PROCESSING_ERROR": "Kunde inte bearbeta ditt ord. Försök igen.",
     "INTERNAL_ERROR": "Något gick sönder. Försök igen."
+  },
+  "cg": {
+    "hero": {
+      "firstGreeting": "VÄLKOMMEN TILL LEXICLASH!",
+      "firstSub": "Hitta ord. Slå klockan.",
+      "welcomeBack": "VÄLKOMMEN TILLBAKA, {name}!",
+      "welcomeBackAnon": "VÄLKOMMEN TILLBAKA!",
+      "returnSub": "Snabb ordmatch?",
+      "playCta": "SPELA NU",
+      "playMicrocopy": "KÖR!",
+      "browseRooms": "Eller bläddra i rum ↓",
+      "aria": { "section": "CrazyGames-välkomst" }
+    }
   },
   "dailyInvite": {
     "titleWon": "Skarp hjärna idag",

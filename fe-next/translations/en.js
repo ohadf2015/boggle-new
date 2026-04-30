@@ -680,7 +680,7 @@ const en = {
     "point": "point",
     "points": "points",
     "combos": "Combos",
-    "comboExplanation": "Chain words within 5 seconds to build combos! Each level adds bonus points.",
+    "comboExplanation": "Chain words within 5s. Each level adds bonus points.",
     "keyboardShortcuts": "Keyboard Shortcuts",
     "arrowKeys": "Arrow Keys",
     "navigate": "Navigate",
@@ -702,7 +702,7 @@ const en = {
   "combo": {
     "shieldUsed": "Shield blocked the reset!",
     "explanationTitle": "Combo Power!",
-    "explanationText": "Chain words fast for multipliers! Higher streak = bigger bonus. Keep it going!",
+    "explanationText": "Chain words fast. Bigger streak, bigger bonus.",
     "milestones": {
       "nice": "NICE!",
       "fire": "FIRE!",
@@ -729,7 +729,7 @@ const en = {
   "effects": {
     "preferenceTitle": "Animation Settings",
     "preferenceSubtitle": "First time seeing this?",
-    "preferenceDescription": "Heads up! We use screen shake and flashing lights to celebrate your wins. Want to disable them?",
+    "preferenceDescription": "Some animations use screen shake and flashing lights. Disable?",
     "earthquakeShake": "Screen Shake",
     "fireRoundLights": "Flashing Lights",
     "keepAnimations": "Keep Effects",
@@ -811,7 +811,7 @@ const en = {
     "deleteAccount": "Delete Account",
     "deleteAccountDescription": "Permanently delete your account and all data",
     "deleteAccountButton": "Delete",
-    "deleteAccountConfirm": "This action is permanent and cannot be undone. All your game progress, stats, and profile will be permanently deleted.",
+    "deleteAccountConfirm": "This is permanent. All your progress, stats, and profile will be deleted.",
     "deleteAccountTypeConfirm": "Type DELETE to confirm:",
     "deleteAccountConfirmButton": "Permanently Delete Account",
     "deleteAccountDeleting": "Deleting...",
@@ -832,8 +832,8 @@ const en = {
     "sending": "Sending...",
     "sendLinkError": "Failed to send verification link. Please try again.",
     "checkEmail": "Check your email",
-    "checkEmailDescription": "We sent a verification link to your email. Click it to verify your identity, then return here to delete your account.",
-    "deleted": "Your account has been successfully deleted. All your data has been removed.",
+    "checkEmailDescription": "Verification link sent. Click it, then return here to confirm deletion.",
+    "deleted": "Account deleted. All your data is gone.",
     "backToHome": "Back to Home"
   },
   "share": {
@@ -929,7 +929,7 @@ const en = {
     "errorMessage": "Quick glitch, but don't worry - your words are safe!",
     "errorProgress": "Everything's saved!",
     "updateHeading": "Fresh Update Ready!",
-    "updateMessage": "Cool new stuff just dropped! Quick refresh and you're back in.",
+    "updateMessage": "New version available. Refresh to update.",
     "updateProgress": "Takes 2 seconds!",
     "globalErrorEncouragement": "Don't worry - your game's secure!",
     "goHome": "Go Home",
@@ -1344,7 +1344,7 @@ const en = {
     "confirmExit": "Exit? Someone else will become host.",
     "exitWarning": "Exit? Room closes for everyone.",
     "soloStartTitle": "No other players yet!",
-    "soloStartDescription": "Want to invite friends first? If not, bots will join to keep things competitive.",
+    "soloStartDescription": "Invite friends, or play with bots.",
     "soloStartCancel": "Wait for players",
     "soloStartConfirm": "Play with bots",
     "exitRoom": "Exit",
@@ -1374,14 +1374,14 @@ const en = {
     "scanQr": "Scan QR code to join or use code",
     "hostPlays": "I want to broadcast",
     "broadcastModeTitle": "TV/Projector Mode",
-    "broadcastModeDescription": "Display the game on a big screen while you spectate (you won't play)",
+    "broadcastModeDescription": "Show the game on a big screen — you'll spectate, not play.",
     "broadcastModeDesc": "Host watches, not plays",
     "broadcastModeHint": "Got 4+ players? Throw the game on a TV!",
     "scanOrShare": "Scan QR code or share link",
     "sendLinkToFriends": "Send this link to friends so they can join your game",
     "waitingForFriendsHint": "No one here yet — share the link below to invite players!",
     "inviteMoreFriends": "Invite more players to join",
-    "broadcastSuggestion": "Got 4+ players? Try TV Mode to display the game on a big screen!",
+    "broadcastSuggestion": "4+ players? Try TV Mode.",
     "advancedSettings": "Advanced Settings",
     "roomClosedInactivity": "Room timed out — everyone went quiet!",
     "gameOverCheckScores": "Game Over! Check final scores",
@@ -1402,7 +1402,7 @@ const en = {
     "tournamentCreateFailed": "Failed to create tournament. Please try again.",
     "cancelTournament": "Cancel Tournament",
     "confirmCancelTournament": "Cancel Tournament?",
-    "cancelTournamentWarning": "Cancel the tournament? All progress goes poof — no take-backs!",
+    "cancelTournamentWarning": "Cancel tournament? Progress is lost.",
     "minWordLength": "Minimum Word Length",
     "wordsAutoValidated": "words auto-validated",
     "gameTypeSelector": "Mode",
@@ -1435,9 +1435,9 @@ const en = {
     "presetPartyDesc": "2 min party mode",
     "presetChallenge": "Challenge",
     "presetChallengeDesc": "3 min hard mode",
-    "presetFastDetails": "Perfect for quick rounds! Race against the clock in a fast-paced game. Great for warming up or squeezing in a game when you're short on time.",
-    "presetPartyDetails": "The classic party experience! Balanced gameplay with enough time to find great words while keeping the energy high. Ideal for groups.",
-    "presetChallengeDetails": "For serious word hunters! Larger board means more word combinations and tougher competition. Prove you're the ultimate word master!",
+    "presetFastDetails": "Fast and frantic. Great for a warmup or quick break.",
+    "presetPartyDetails": "Balanced pace. Built for groups.",
+    "presetChallengeDetails": "Bigger board, longer time, no mercy.",
     "presetDrawerTimer": "Timer",
     "presetDrawerBoard": "Board Size",
     "presetDrawerMinWord": "Min Word Length",
@@ -2007,7 +2007,7 @@ const en = {
   "preGameTutorial": {
     "welcome": {
       "title": "Hey there!",
-      "subtitle": "I'm Lexi! Let me show you how to play"
+      "subtitle": "I'm Lexi — let's go"
     },
     "practice": {
       "instruction": "Swipe across the letters to spell:",
@@ -2015,7 +2015,7 @@ const en = {
     },
     "tips": {
       "title": "You're a natural!",
-      "subtitle": "A few tips before we start"
+      "subtitle": "Quick tips"
     },
     "letsPlay": "Let's Play!",
     "buildAvatar": "Create your avatar first?",
@@ -2042,7 +2042,7 @@ const en = {
     "upgraded": "You're in! Let's go!",
     "youAreSpectating": "Watching the action!",
     "status": "👀 SPECTATING",
-    "explanation": "Room's packed! Watch the chaos - we'll ping you if someone bails.",
+    "explanation": "Room's full. Hang tight.",
     "requestToPlay": "I Want In!",
     "join": "Jump In"
   },
@@ -4007,7 +4007,7 @@ const en = {
     "recoverDesc": "Your {count}-day streak can be restored!",
     "recoverFor": "Recover for {cost} coins",
     "freezes": "Streak Freezes",
-    "freezeDesc": "Use a freeze to protect your streak for one day without winning.",
+    "freezeDesc": "Protects your streak for one day.",
     "useFreeze": "Use Streak Freeze",
     "noFreezes": "No freezes available. Earn 1 free freeze per week!",
     "freezeShields": "{count} Freeze Shield",
@@ -4024,7 +4024,7 @@ const en = {
     "liveLeaderboardDesc": "Watch scores update in real-time as players find words",
     "enterRoomCode": "Enter Room Code",
     "startDisplay": "Start Party Display",
-    "tip": "Tip: Cast this page to your TV using Chrome or AirPlay for the best experience!",
+    "tip": "Tip: Cast to TV via Chrome or AirPlay.",
     "room": "Room",
     "scanToJoin": "Scan to Join",
     "orEnterCode": "Or enter code",
@@ -4044,7 +4044,7 @@ const en = {
     "items": "items",
     "emptyCollection": "No collectibles yet!",
     "earnByPlaying": "Earn coins by playing games",
-    "shopComingSoon": "Shop coming soon! Collect special avatars, badges, and titles.",
+    "shopComingSoon": "Shop coming soon. Avatars, badges, and titles.",
     "owned": "Owned",
     "locked": "Locked",
     "unlocked": "Unlocked",
@@ -4243,7 +4243,18 @@ const en = {
       "platinum": "Platinum",
       "diamond": "Diamond",
       "grandmaster": "Grandmaster"
-    }
+    },
+    "tier": {
+      "rankInTier": "#{{rank}} of {{total}} in {{tier}}",
+      "percentile": "Top {{pct}}% in {{tier}}",
+      "tierLeader": "Tier leader",
+      "topTierDefend": "Top tier — defend your throne",
+      "climbToNext": "Play more to climb to {{nextTier}}",
+      "peersInTier": "Peers in {{tier}}",
+      "nobodyAbove": "Nobody above you in {{tier}}",
+      "distanceToFirst": "{{score}} to #1"
+    },
+    "global": "global"
   },
   "ugc": {
     "createBoard": "Create Board",
@@ -8339,16 +8350,16 @@ const en = {
       "prestigeCosmic": "Cosmic Prestige"
     },
     "weekly": {
-      "speedDemon": { "name": "Speed Demon" },
-      "longWords": { "name": "Long Words" },
-      "goldRush": { "name": "Gold Rush" },
-      "iceAge": { "name": "Ice Age" },
-      "marathon": { "name": "Marathon" },
-      "doubleOrNothing": { "name": "Double or Nothing" },
-      "wordSmith": { "name": "Word Smith" },
-      "treasureHunter": { "name": "Treasure Hunter" },
-      "blitz": { "name": "Blitz" },
-      "zenMode": { "name": "Zen Mode" }
+      "speedDemon": { "name": "Speed Demon", "desc": "Faster timer · ×1.5 score" },
+      "longWords": { "name": "Long Words", "desc": "4+ letter words · ×1.5 gold" },
+      "goldRush": { "name": "Gold Rush", "desc": "×2 gold · faster timer" },
+      "iceAge": { "name": "Ice Age", "desc": "Special tiles ×2 · ×1.3 score" },
+      "marathon": { "name": "Marathon", "desc": "Longer timer · ×0.8 score" },
+      "doubleOrNothing": { "name": "Double or Nothing", "desc": "×2 score · half timer" },
+      "wordSmith": { "name": "Word Smith", "desc": "5+ letter words · ×2 score" },
+      "treasureHunter": { "name": "Treasure Hunter", "desc": "×1.8 gold · ×1.5 special tiles" },
+      "blitz": { "name": "Blitz", "desc": "Fast timer · ×3 score" },
+      "zenMode": { "name": "Zen Mode", "desc": "Relaxed timer · half gold" }
     },
     "saveFailedWarning": "Progress not saved — check your connection",
     "retrySave": "Retry",
@@ -10935,6 +10946,19 @@ const en = {
     "VALIDATION_MISSING_FIELD": "Missing required field",
     "WORD_PROCESSING_ERROR": "Couldn't process your word. Try again.",
     "INTERNAL_ERROR": "Something broke. Please try again."
+  },
+  "cg": {
+    "hero": {
+      "firstGreeting": "WELCOME TO LEXICLASH!",
+      "firstSub": "Find words. Beat the clock.",
+      "welcomeBack": "WELCOME BACK, {name}!",
+      "welcomeBackAnon": "WELCOME BACK!",
+      "returnSub": "Quick word battle?",
+      "playCta": "PLAY NOW",
+      "playMicrocopy": "GO!",
+      "browseRooms": "Or browse rooms ↓",
+      "aria": { "section": "CrazyGames welcome" }
+    }
   },
   "dailyInvite": {
     "titleWon": "Sharp brain today",

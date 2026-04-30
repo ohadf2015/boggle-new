@@ -689,7 +689,7 @@ const ja = {
     "point": "ポイント",
     "points": "ポイント",
     "combos": "コンボ",
-    "comboExplanation": "5秒以内に単語をつなげてコンボ！各レベルでボーナスポイントが追加されます。",
+    "comboExplanation": "5秒以内に単語をつなげてコンボ。各レベルでボーナスがもらえるよ。",
     "keyboardShortcuts": "キーボードショートカット",
     "arrowKeys": "矢印キー",
     "navigate": "ナビゲート",
@@ -711,7 +711,7 @@ const ja = {
   "combo": {
     "shieldUsed": "シールドがストリークを守った！",
     "explanationTitle": "コンボパワー！",
-    "explanationText": "素早く単語をつなげてコンボを作ろう。高コンボ = 高倍率。途切れさせるな！",
+    "explanationText": "素早くつなげよう。コンボ高い = ボーナス大きい。",
     "milestones": {
       "nice": "ナイス！",
       "fire": "ファイア！",
@@ -738,7 +738,7 @@ const ja = {
   "effects": {
     "preferenceTitle": "アニメーション設定",
     "preferenceSubtitle": "初めてですか？",
-    "preferenceDescription": "画面の揺れや点滅は勝利の演出だよ！苦手なら無効にできるよ",
+    "preferenceDescription": "一部のアニメは画面の揺れや点滅を使用します。無効にしますか？",
     "earthquakeShake": "画面の揺れ",
     "fireRoundLights": "点滅ライト",
     "keepAnimations": "効果を維持",
@@ -820,7 +820,7 @@ const ja = {
     "deleteAccount": "アカウント削除",
     "deleteAccountDescription": "アカウントとすべてのデータを完全に削除します",
     "deleteAccountButton": "削除",
-    "deleteAccountConfirm": "この操作は取り消せません。すべてのゲーム進行状況、統計、プロフィールが完全に削除されます。",
+    "deleteAccountConfirm": "これは取り消せません。すべての進行状況、統計、プロフィールが削除されます。",
     "deleteAccountTypeConfirm": "確認のためDELETEと入力してください：",
     "deleteAccountConfirmButton": "アカウントを完全に削除",
     "deleteAccountDeleting": "削除中...",
@@ -841,8 +841,8 @@ const ja = {
     "sending": "送信中...",
     "sendLinkError": "確認リンクの送信に失敗しました。もう一度お試しください。",
     "checkEmail": "メールを確認してください",
-    "checkEmailDescription": "確認リンクをメールに送信しました。クリックして本人確認を行い、こちらに戻ってアカウントを削除してください。",
-    "deleted": "アカウントが正常に削除されました。すべてのデータが削除されました。",
+    "checkEmailDescription": "確認リンクを送信しました。クリックしてから、ここに戻って確認してください。",
+    "deleted": "アカウント削除済み。すべてのデータが削除されました。",
     "backToHome": "ホームに戻る"
   },
   "share": {
@@ -938,7 +938,7 @@ const ja = {
     "errorMessage": "小さなバグだけど大丈夫 - 言葉は全部セーブされてる！",
     "errorProgress": "全部保存済み！",
     "updateHeading": "新しいアップデート！",
-    "updateMessage": "新機能が来たよ！更新してすぐ戻ろう。",
+    "updateMessage": "新バージョンがあるよ。更新してね。",
     "updateProgress": "2秒で終わるよ！",
     "globalErrorEncouragement": "安心して - ゲームは安全だよ！",
     "goHome": "ホームへ",
@@ -1051,6 +1051,7 @@ const ja = {
       "facialHairStyle": "スタイル",
       "colorTheme": "カラーテーマ",
       "bodyStyle": "服装",
+      "download": "ダウンロード",
       bodyStyles: {
         default: "デフォルト",
         hoodie: "パーカー",
@@ -1351,7 +1352,7 @@ const ja = {
     "confirmExit": "退出する？別のプレイヤーがホストになるよ。",
     "exitWarning": "退出するとルームが閉じるよ。本当にいい？",
     "soloStartTitle": "まだ他のプレイヤーがいないよ！",
-    "soloStartDescription": "友達を招待する？しなければボットが参加して対戦するよ。",
+    "soloStartDescription": "友達を招待する？それともボットと対戦？",
     "soloStartCancel": "プレイヤーを待つ",
     "soloStartConfirm": "ボットと対戦",
     "exitRoom": "ルームを退出",
@@ -1378,11 +1379,11 @@ const ja = {
     "scanQr": "QRコードをスキャンして参加するか、コードを使用してください",
     "hostPlays": "プレイしたい",
     "broadcastModeTitle": "テレビ/プロジェクターモード",
-    "broadcastModeDescription": "大画面でゲームを表示しながら観戦します（プレイしません）",
+    "broadcastModeDescription": "大画面にゲームを表示 — 観戦します、プレイしません。",
     "broadcastModeDesc": "ホストは観戦のみ",
     "broadcastModeHint": "4人以上のプレイヤーに最適！テレビに表示するには有効にしてください",
     "scanOrShare": "QRコードをスキャンまたはリンクを共有",
-    "broadcastSuggestion": "4人以上いる？テレビモードで大画面に映すと盛り上がるよ！",
+    "broadcastSuggestion": "4人以上？テレビモード試してみて。",
     "advancedSettings": "詳細設定",
     "roomClosedInactivity": "非アクティブのためルームが閉じられました",
     "gameOverCheckScores": "ゲームオーバー！最終スコアを確認してください",
@@ -1404,7 +1405,7 @@ const ja = {
     "tournamentCreateFailed": "トーナメントの作成に失敗しました。もう一度お試しください。",
     "cancelTournament": "トーナメントをキャンセル",
     "confirmCancelTournament": "トーナメントをキャンセルしますか？",
-    "cancelTournamentWarning": "トーナメントをキャンセルする？進行状況は全部消えて元に戻せないよ。",
+    "cancelTournamentWarning": "トーナメントをキャンセル？進行状況は全部消えるよ。",
     "minWordLength": "最小文字数",
     "wordsAutoValidated": "単語が自動検証されました",
     "gameTypeSelector": "ゲームモードを選択",
@@ -1438,9 +1439,9 @@ const ja = {
     "presetPartyDesc": "2分パーティーモード",
     "presetChallenge": "チャレンジ",
     "presetChallengeDesc": "3分ハードモード",
-    "presetFastDetails": "サクッと遊べる！時間との勝負でスピーディーに。ウォームアップや隙間時間にぴったり。",
-    "presetPartyDetails": "定番のパーティー体験！バランスの取れたゲームプレイで、盛り上がりながらしっかり言葉を探せる。グループに最適。",
-    "presetChallengeDetails": "本気の言葉ハンター向け！大きなボードでより多くの組み合わせと激しい競争。究極のワードマスターを証明しよう！",
+    "presetFastDetails": "サクッと一発勝負。ウォームアップに最適。",
+    "presetPartyDetails": "バランス重視。グループ向け。",
+    "presetChallengeDetails": "大きなボード、長い時間、容赦なし。",
     "presetDrawerTimer": "タイマー",
     "presetDrawerBoard": "ボードサイズ",
     "presetDrawerMinWord": "最小文字数",
@@ -1890,7 +1891,7 @@ const ja = {
   "preGameTutorial": {
     "welcome": {
       "title": "やあ！",
-      "subtitle": "僕はレクシー！遊び方を教えるよ"
+      "subtitle": "レクシーだよ — いくよ！"
     },
     "practice": {
       "instruction": "文字をなぞって単語を作ろう：",
@@ -1898,7 +1899,7 @@ const ja = {
     },
     "tips": {
       "title": "天性だね！",
-      "subtitle": "始める前にちょっとコツ"
+      "subtitle": "ちょっとしたコツ"
     },
     "letsPlay": "さあ遊ぼう！",
     "buildAvatar": "先にアバターを作る？",
@@ -1926,7 +1927,7 @@ const ja = {
     "upgraded": "入れた！いくよ！",
     "youAreSpectating": "バトル観戦中！",
     "status": "👀 観戦中",
-    "explanation": "満員！観戦しながら待っててね - 空いたら教えるよ。",
+    "explanation": "満員。少し待ってね。",
     "requestToPlay": "参加したい！",
     "join": "参加"
   },
@@ -3519,7 +3520,7 @@ const ja = {
     "recoverDesc": "{count}日間の連続記録を復活できます！",
     "recoverFor": "{cost}コインで復活",
     "freezes": "連続記録凍結",
-    "freezeDesc": "凍結を使って、勝たなくても1日連続記録を保護できます。",
+    "freezeDesc": "連続記録を1日保護するよ。",
     "useFreeze": "凍結を使用",
     "noFreezes": "凍結がありません。週に1回無料の凍結を獲得できます！",
     "freezeShields": "フリーズシールド {count}個",
@@ -3536,7 +3537,7 @@ const ja = {
     "liveLeaderboardDesc": "プレイヤーが単語を見つけるとスコアがリアルタイムで更新",
     "enterRoomCode": "ルームコードを入力",
     "startDisplay": "パーティー画面を開始",
-    "tip": "ヒント：ChromeまたはAirPlayでこのページをTVにキャストすると最高の体験ができます！",
+    "tip": "ヒント：ChromeまたはAirPlayでTVにキャストできます。",
     "room": "ルーム",
     "scanToJoin": "スキャンして参加",
     "orEnterCode": "またはコードを入力",
@@ -3556,7 +3557,7 @@ const ja = {
     "items": "アイテム",
     "emptyCollection": "まだコレクションがありません！",
     "earnByPlaying": "ゲームをプレイしてコインを獲得",
-    "shopComingSoon": "ショップ近日公開！特別なアバター、バッジ、称号を集めよう。",
+    "shopComingSoon": "ショップ近日公開。アバター、バッジ、称号。",
     "owned": "所持",
     "locked": "ロック中",
     "unlocked": "アンロック済",
@@ -3755,7 +3756,18 @@ const ja = {
       "platinum": "プラチナ",
       "diamond": "ダイヤモンド",
       "grandmaster": "グランドマスター"
-    }
+    },
+    "tier": {
+      "rankInTier": "{{tier}}で{{total}}人中#{{rank}}位",
+      "percentile": "{{tier}}の上位{{pct}}%",
+      "tierLeader": "ティアリーダー",
+      "topTierDefend": "最上位ティア — 王座を守れ",
+      "climbToNext": "プレイして{{nextTier}}に昇格しよう",
+      "peersInTier": "{{tier}}のプレイヤー",
+      "nobodyAbove": "{{tier}}にあなたより上はいません",
+      "distanceToFirst": "#1まであと{{score}}"
+    },
+    "global": "グローバル"
   },
   "ugc": {
     "createBoard": "ボードを作成",
@@ -8144,16 +8156,16 @@ const ja = {
       "prestigeCosmic": "コスミックプレステージ"
     },
     "weekly": {
-      "speedDemon": { "name": "スピードデーモン" },
-      "longWords": { "name": "ロングワード" },
-      "goldRush": { "name": "ゴールドラッシュ" },
-      "iceAge": { "name": "アイスエイジ" },
-      "marathon": { "name": "マラソン" },
-      "doubleOrNothing": { "name": "ダブルオアナッシング" },
-      "wordSmith": { "name": "ワードスミス" },
-      "treasureHunter": { "name": "トレジャーハンター" },
-      "blitz": { "name": "ブリッツ" },
-      "zenMode": { "name": "禅モード" }
+      "speedDemon": { "name": "スピードデーモン", "desc": "タイマー短縮・スコア×1.5" },
+      "longWords": { "name": "ロングワード", "desc": "4文字以上・ゴールド×1.5" },
+      "goldRush": { "name": "ゴールドラッシュ", "desc": "ゴールド×2・タイマー短縮" },
+      "iceAge": { "name": "アイスエイジ", "desc": "特殊タイル×2・スコア×1.3" },
+      "marathon": { "name": "マラソン", "desc": "タイマー延長・スコア×0.8" },
+      "doubleOrNothing": { "name": "ダブルオアナッシング", "desc": "スコア×2・タイマー半減" },
+      "wordSmith": { "name": "ワードスミス", "desc": "5文字以上・スコア×2" },
+      "treasureHunter": { "name": "トレジャーハンター", "desc": "ゴールド×1.8・特殊タイル×1.5" },
+      "blitz": { "name": "ブリッツ", "desc": "タイマー短縮・スコア×3" },
+      "zenMode": { "name": "禅モード", "desc": "ゆとりタイマー・ゴールド半減" }
     },
     "saveFailedWarning": "進行状況が保存されませんでした — 接続を確認してください",
     "retrySave": "再試行",
@@ -10758,6 +10770,19 @@ const ja = {
     "VALIDATION_MISSING_FIELD": "必須フィールドがありません",
     "WORD_PROCESSING_ERROR": "単語を処理できませんでした。もう一度お試しください。",
     "INTERNAL_ERROR": "問題が発生しました。もう一度お試しください。"
+  },
+  "cg": {
+    "hero": {
+      "firstGreeting": "LEXICLASHへようこそ！",
+      "firstSub": "単語を見つけて、時間との勝負。",
+      "welcomeBack": "おかえり、{name}さん！",
+      "welcomeBackAnon": "おかえりなさい！",
+      "returnSub": "1ラウンドどうぞ？",
+      "playCta": "プレイ",
+      "playMicrocopy": "GO!",
+      "browseRooms": "ルームを見る ↓",
+      "aria": { "section": "CrazyGamesウェルカム" }
+    }
   },
   "dailyInvite": {
     "titleWon": "冴えてるね",

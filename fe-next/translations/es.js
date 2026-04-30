@@ -670,7 +670,7 @@ const es = {
     "point": "punto",
     "points": "puntos",
     "combos": "Combos",
-    "comboExplanation": "¡Encadena palabras en 5 segundos para construir combos! Cada nivel añade puntos bonus.",
+    "comboExplanation": "Encadena palabras en 5s. Cada nivel suma puntos bonus.",
     "keyboardShortcuts": "Atajos de Teclado",
     "arrowKeys": "Teclas de Flecha",
     "navigate": "Navegar",
@@ -692,7 +692,7 @@ const es = {
   "combo": {
     "shieldUsed": "¡El escudo salvó tu racha!",
     "explanationTitle": "¡Poder Combo!",
-    "explanationText": "Encadena palabras rápido para crear combos. Mayor combo = mayores multiplicadores. ¡No lo dejes caer!",
+    "explanationText": "Encadena rápido. Más combo, más multiplicador.",
     "milestones": {
       "nice": "¡BIEN!",
       "fire": "¡FUEGO!",
@@ -719,7 +719,7 @@ const es = {
   "effects": {
     "preferenceTitle": "Ajustes de animación",
     "preferenceSubtitle": "¿Primera vez viendo esto?",
-    "preferenceDescription": "¡Aviso! Usamos vibración y luces parpadeantes para celebrar tus victorias. ¿Quieres desactivarlos?",
+    "preferenceDescription": "Algunas animaciones usan vibración y luces parpadeantes. ¿Desactivarlas?",
     "earthquakeShake": "Vibración de pantalla",
     "fireRoundLights": "Luces parpadeantes",
     "keepAnimations": "Mantener efectos",
@@ -801,7 +801,7 @@ const es = {
     "deleteAccount": "Eliminar cuenta",
     "deleteAccountDescription": "Eliminar permanentemente tu cuenta y todos los datos",
     "deleteAccountButton": "Eliminar",
-    "deleteAccountConfirm": "Esta acción es permanente y no se puede deshacer. Todo tu progreso, estadísticas y perfil se eliminarán permanentemente.",
+    "deleteAccountConfirm": "Es permanente. Tu progreso, estadísticas y perfil se eliminarán.",
     "deleteAccountTypeConfirm": "Escribe DELETE para confirmar:",
     "deleteAccountConfirmButton": "Eliminar cuenta permanentemente",
     "deleteAccountDeleting": "Eliminando...",
@@ -822,8 +822,8 @@ const es = {
     "sending": "Enviando...",
     "sendLinkError": "No se pudo enviar el enlace de verificación. Inténtalo de nuevo.",
     "checkEmail": "Revisa tu correo",
-    "checkEmailDescription": "Enviamos un enlace de verificación a tu correo. Haz clic para verificar tu identidad y luego regresa aquí para eliminar tu cuenta.",
-    "deleted": "Tu cuenta ha sido eliminada exitosamente. Todos tus datos han sido eliminados.",
+    "checkEmailDescription": "Enlace de verificación enviado. Haz clic, luego regresa para confirmar.",
+    "deleted": "Cuenta eliminada. Todos tus datos se han ido.",
     "backToHome": "Volver al inicio"
   },
   "share": {
@@ -987,7 +987,7 @@ const es = {
     "errorMessage": "Fallo chiquito, pero tranqui - ¡tus palabras están seguras!",
     "errorProgress": "¡Todo guardado!",
     "updateHeading": "¡Actualización Lista!",
-    "updateMessage": "¡Cosas nuevas recién salidas! Refresca y sigues jugando.",
+    "updateMessage": "Versión nueva disponible. Refresca para actualizar.",
     "updateProgress": "¡Son 2 segundos!",
     "globalErrorEncouragement": "Tranqui - ¡tu juego está seguro!",
     "goHome": "Ir al inicio",
@@ -1100,6 +1100,7 @@ const es = {
       "facialHairStyle": "Estilo",
       "colorTheme": "Tema de color",
       "bodyStyle": "Ropa",
+      "download": "Descargar",
       bodyStyles: {
         default: "Normal",
         hoodie: "Sudadera",
@@ -1369,7 +1370,7 @@ const es = {
     "confirmExit": "¿Salir? Otro jugador será anfitrión.",
     "exitWarning": "Esto cerrará la sala. ¿Continuar?",
     "soloStartTitle": "¡Aún no hay otros jugadores!",
-    "soloStartDescription": "¿Quieres invitar amigos primero? Si no, bots se unirán para competir.",
+    "soloStartDescription": "Invita amigos o juega contra bots.",
     "soloStartCancel": "Esperar jugadores",
     "soloStartConfirm": "Jugar con bots",
     "exitRoom": "Salir",
@@ -1396,11 +1397,11 @@ const es = {
     "scanQr": "Escanea para unirte",
     "hostPlays": "Jugar",
     "broadcastModeTitle": "Modo TV/Proyector",
-    "broadcastModeDescription": "Muestra el juego en pantalla grande mientras observas (no jugarás)",
+    "broadcastModeDescription": "Muestra el juego en pantalla grande — observarás, no jugarás.",
     "broadcastModeDesc": "El anfitrión observa, no juega",
     "broadcastModeHint": "¡Perfecto para 4+ jugadores! Activa para mostrar en TV",
     "scanOrShare": "Escanea el código QR o comparte el enlace",
-    "broadcastSuggestion": "¿4+ jugadores? ¡Prueba el Modo TV para mostrar el juego en pantalla grande!",
+    "broadcastSuggestion": "¿4+ jugadores? Prueba Modo TV.",
     "advancedSettings": "Avanzado",
     "roomClosedInactivity": "Cerrada por inactividad",
     "gameOverCheckScores": "¡Fin! Revisa puntuaciones",
@@ -1422,7 +1423,7 @@ const es = {
     "tournamentCreateFailed": "Error al crear torneo. Por favor intenta de nuevo.",
     "cancelTournament": "Cancelar Torneo",
     "confirmCancelTournament": "¿Cancelar Torneo?",
-    "cancelTournamentWarning": "¿Seguro que quieres cancelar el torneo? Todo el progreso se perderá.",
+    "cancelTournamentWarning": "¿Cancelar torneo? Todo el progreso se pierde.",
     "minWordLength": "Largo mínimo",
     "wordsAutoValidated": "palabras auto-validadas",
     "gameTypeSelector": "Elige Modo de Juego",
@@ -1456,9 +1457,9 @@ const es = {
     "presetPartyDesc": "2 min modo fiesta",
     "presetChallenge": "Desafío",
     "presetChallengeDesc": "3 min modo difícil",
-    "presetFastDetails": "¡Perfecto para rondas rápidas! Compite contra el reloj en un juego veloz. Ideal para calentar o cuando tienes poco tiempo.",
-    "presetPartyDetails": "¡La experiencia clásica de fiesta! Juego equilibrado con tiempo suficiente para encontrar buenas palabras manteniendo la energía alta. Ideal para grupos.",
-    "presetChallengeDetails": "¡Para cazadores de palabras serios! Un tablero más grande significa más combinaciones y competencia más dura. ¡Demuestra que eres el maestro de las palabras!",
+    "presetFastDetails": "Rápido e intenso. Ideal para calentar.",
+    "presetPartyDetails": "Ritmo equilibrado. Hecho para grupos.",
+    "presetChallengeDetails": "Tablero grande, más tiempo, sin piedad.",
     "presetDrawerTimer": "Tiempo",
     "presetDrawerBoard": "Tamaño del tablero",
     "presetDrawerMinWord": "Longitud mínima",
@@ -1909,7 +1910,7 @@ const es = {
     "upgraded": "¡Entraste! ¡Dale!",
     "youAreSpectating": "¡Viendo la acción!",
     "status": "👀 ESPECTANDO",
-    "explanation": "¡Sala llena! Mira el caos - te avisamos si alguien sale.",
+    "explanation": "Sala llena. Espera un momento.",
     "requestToPlay": "¡Quiero jugar!",
     "join": "Entrar"
   },
@@ -3606,7 +3607,7 @@ const es = {
     "recoverDesc": "¡Tu racha de {count} días puede ser restaurada!",
     "recoverFor": "Recuperar por {cost} monedas",
     "freezes": "Congelaciones de Racha",
-    "freezeDesc": "Usa una congelación para proteger tu racha por un día sin ganar.",
+    "freezeDesc": "Protege tu racha por un día.",
     "useFreeze": "Usar Congelación de Racha",
     "noFreezes": "No hay congelaciones disponibles. ¡Gana 1 congelación gratis por semana!",
     "freezeShields": "{count} Escudo de Congelación",
@@ -3623,7 +3624,7 @@ const es = {
     "liveLeaderboardDesc": "Mira las puntuaciones actualizarse en tiempo real mientras los jugadores encuentran palabras",
     "enterRoomCode": "Ingresa Código de Sala",
     "startDisplay": "Iniciar Pantalla de Fiesta",
-    "tip": "Consejo: ¡Transmite esta página a tu TV usando Chrome o AirPlay para la mejor experiencia!",
+    "tip": "Consejo: Transmite a TV vía Chrome o AirPlay.",
     "room": "Sala",
     "scanToJoin": "Escanea para Unirte",
     "orEnterCode": "O ingresa código",
@@ -3643,7 +3644,7 @@ const es = {
     "items": "artículos",
     "emptyCollection": "¡Aún no hay coleccionables!",
     "earnByPlaying": "Gana monedas jugando",
-    "shopComingSoon": "¡Tienda próximamente! Colecciona avatares, insignias y títulos especiales.",
+    "shopComingSoon": "Tienda próximamente. Avatares, insignias y títulos.",
     "owned": "Obtenido",
     "locked": "Bloqueado",
     "unlocked": "Desbloqueado",
@@ -3942,7 +3943,7 @@ const es = {
   "preGameTutorial": {
     "welcome": {
       "title": "¡Hola!",
-      "subtitle": "¡Soy Lexi! Te enseño cómo jugar"
+      "subtitle": "Soy Lexi — ¡vamos!"
     },
     "practice": {
       "instruction": "Desliza sobre las letras para deletrear:",
@@ -3950,7 +3951,7 @@ const es = {
     },
     "tips": {
       "title": "¡Eres un natural!",
-      "subtitle": "Unos tips antes de empezar"
+      "subtitle": "Tips rápidos"
     },
     "letsPlay": "¡A jugar!",
     "buildAvatar": "¿Crear tu avatar primero?",
@@ -4168,7 +4169,18 @@ const es = {
       "platinum": "Platino",
       "diamond": "Diamante",
       "grandmaster": "Gran Maestro"
-    }
+    },
+    "tier": {
+      "rankInTier": "#{{rank}} de {{total}} en {{tier}}",
+      "percentile": "Top {{pct}}% en {{tier}}",
+      "tierLeader": "Líder de división",
+      "topTierDefend": "División superior — defiende tu trono",
+      "climbToNext": "Juega más para subir a {{nextTier}}",
+      "peersInTier": "Jugadores en {{tier}}",
+      "nobodyAbove": "Nadie por encima de ti en {{tier}}",
+      "distanceToFirst": "{{score}} para llegar a #1"
+    },
+    "global": "global"
   },
   "ugc": {
     "createBoard": "Crear tablero",
@@ -8164,16 +8176,16 @@ const es = {
       "prestigeCosmic": "Prestigio Cósmico"
     },
     "weekly": {
-      "speedDemon": { "name": "Demonio Veloz" },
-      "longWords": { "name": "Palabras Largas" },
-      "goldRush": { "name": "Fiebre del Oro" },
-      "iceAge": { "name": "Era de Hielo" },
-      "marathon": { "name": "Maratón" },
-      "doubleOrNothing": { "name": "Doble o Nada" },
-      "wordSmith": { "name": "Forjador de Palabras" },
-      "treasureHunter": { "name": "Cazador de Tesoros" },
-      "blitz": { "name": "Blitz" },
-      "zenMode": { "name": "Modo Zen" }
+      "speedDemon": { "name": "Demonio Veloz", "desc": "Temporizador rápido · puntos ×1.5" },
+      "longWords": { "name": "Palabras Largas", "desc": "Palabras de 4+ letras · oro ×1.5" },
+      "goldRush": { "name": "Fiebre del Oro", "desc": "Oro ×2 · temporizador rápido" },
+      "iceAge": { "name": "Era de Hielo", "desc": "Fichas especiales ×2 · puntos ×1.3" },
+      "marathon": { "name": "Maratón", "desc": "Temporizador largo · puntos ×0.8" },
+      "doubleOrNothing": { "name": "Doble o Nada", "desc": "Puntos ×2 · medio temporizador" },
+      "wordSmith": { "name": "Forjador de Palabras", "desc": "Palabras de 5+ letras · puntos ×2" },
+      "treasureHunter": { "name": "Cazador de Tesoros", "desc": "Oro ×1.8 · fichas especiales ×1.5" },
+      "blitz": { "name": "Blitz", "desc": "Temporizador rápido · puntos ×3" },
+      "zenMode": { "name": "Modo Zen", "desc": "Temporizador relajado · medio oro" }
     },
     "saveFailedWarning": "Progreso no guardado — verifica tu conexión",
     "retrySave": "Reintentar",
@@ -10842,6 +10854,19 @@ const es = {
     "VALIDATION_MISSING_FIELD": "Falta un campo obligatorio",
     "WORD_PROCESSING_ERROR": "No se pudo procesar tu palabra. Inténtalo de nuevo.",
     "INTERNAL_ERROR": "Algo falló. Inténtalo de nuevo."
+  },
+  "cg": {
+    "hero": {
+      "firstGreeting": "¡BIENVENIDO A LEXICLASH!",
+      "firstSub": "Encuentra palabras. Vence al reloj.",
+      "welcomeBack": "¡BIENVENIDO DE VUELTA, {name}!",
+      "welcomeBackAnon": "¡BIENVENIDO DE VUELTA!",
+      "returnSub": "¿Una rápida?",
+      "playCta": "JUGAR YA",
+      "playMicrocopy": "¡VAMOS!",
+      "browseRooms": "O explora salas ↓",
+      "aria": { "section": "Bienvenida de CrazyGames" }
+    }
   },
   "dailyInvite": {
     "titleWon": "Mente afilada hoy",
