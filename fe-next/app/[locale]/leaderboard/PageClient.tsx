@@ -1,7 +1,7 @@
 'use client';
 
 // Note: Dynamic rendering is set in page.tsx (server component)
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 import dynamic from 'next/dynamic';
@@ -26,6 +26,9 @@ import { InlineBannerAd } from '@/components/ads';
 import NearRankIndicator from '@/components/leaderboard/NearRankIndicator';
 import { TierBadge, TierProgressBar } from '@/components/ui/TierBadge';
 import { useTierPromotion } from '@/hooks/useTierPromotion';
+import { useTierPosition } from '@/hooks/useTierPosition';
+import { useExperiment } from '@/hooks/useExperiment';
+import TierPositionPanel from '@/components/leaderboard/TierPositionPanel';
 import { SeasonLeaderboardTabs, type SeasonTabKey } from '@/components/seasons/SeasonLeaderboardTabs';
 import { SeasonBanner } from '@/components/multiplayer/SeasonBanner';
 import { PastSeasonsLeaderboard } from '@/components/seasons/PastSeasonsLeaderboard';
@@ -97,6 +100,19 @@ export default function LeaderboardPageClient(): React.JSX.Element {
     : null;
 
   useTierPromotion({ userId: user?.id, currentTier: currentUserTier, t });
+
+  const { variant: tierPanelVariant, trackExposure: trackTierPanelExposure } =
+    useExperiment('tier-position-panel');
+  const tierPanelEnabled = tierPanelVariant === 'enabled';
+
+  const { data: tierPosition } = useTierPosition(
+    tierPanelEnabled ? user?.id : undefined,
+    typeof querySeasonId === 'number' ? querySeasonId : undefined,
+  );
+
+  useEffect(() => {
+    if (tierPanelEnabled && tierPosition) trackTierPanelExposure();
+  }, [tierPanelEnabled, tierPosition, trackTierPanelExposure]);
 
   // Pre-compute tiers to avoid calling getGlobalLeaderboardTier per-row on every render
   const leaderboardTiers = useMemo(
@@ -262,47 +278,69 @@ export default function LeaderboardPageClient(): React.JSX.Element {
                   : 'bg-linear-to-r from-cyan-50 to-blue-50 border-cyan-200'
               )}
             >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <Avatar
-                    customAvatar={profile.avatar_config}
-                    avatarImage={profile.avatar_image ?? undefined}
-                    userId={user?.id}
-                    size="lg"
-                  />
-                  <div>
-                    <p className={cn('text-sm', 'text-gray-600')}>
-                      {t('leaderboard.yourRank')}
-                    </p>
-                    <p className={cn('text-2xl font-bold', isDarkMode ? 'text-cyan-400' : 'text-cyan-600')}>
-                      #{userRank.rank_position || '—'}
-                    </p>
+              {tierPanelEnabled && tierPosition && user?.id ? (
+                <div className="flex flex-col gap-3">
+                  <div className="flex items-center gap-4">
+                    <Avatar
+                      customAvatar={profile.avatar_config}
+                      avatarImage={profile.avatar_image ?? undefined}
+                      userId={user?.id}
+                      size="lg"
+                    />
+                    <div className="flex-1">
+                      <p className={cn('text-xs', 'text-gray-500')}>
+                        {t('leaderboard.yourRank')} · #{userRank.rank_position || '—'} {t('leaderboard.global')}
+                      </p>
+                      <p className={cn('text-sm font-semibold', isDarkMode ? 'text-white' : 'text-gray-900')}>
+                        {userRank.total_score?.toLocaleString() || 0} {t('leaderboard.score')}
+                      </p>
+                    </div>
+                  </div>
+                  <TierPositionPanel position={tierPosition} userId={user.id} />
+                </div>
+              ) : (
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <Avatar
+                      customAvatar={profile.avatar_config}
+                      avatarImage={profile.avatar_image ?? undefined}
+                      userId={user?.id}
+                      size="lg"
+                    />
+                    <div>
+                      <p className={cn('text-sm', 'text-gray-600')}>
+                        {t('leaderboard.yourRank')}
+                      </p>
+                      <p className={cn('text-2xl font-bold', isDarkMode ? 'text-cyan-400' : 'text-cyan-600')}>
+                        #{userRank.rank_position || '—'}
+                      </p>
+                      {currentUserTier && (
+                        <div className="flex items-center gap-1.5 mt-1">
+                          <TierBadge tier={currentUserTier} size="sm" showLabel />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <div className="text-right flex flex-col items-end gap-2">
+                    <div>
+                      <p className={cn('text-sm', 'text-gray-600')}>
+                        {t('leaderboard.score')}
+                      </p>
+                      <p className={cn('text-2xl font-bold', isDarkMode ? 'text-white' : 'text-gray-900')}>
+                        {userRank.total_score?.toLocaleString() || 0}
+                      </p>
+                    </div>
                     {currentUserTier && (
-                      <div className="flex items-center gap-1.5 mt-1">
-                        <TierBadge tier={currentUserTier} size="sm" showLabel />
-                      </div>
+                      <TierProgressBar
+                        tier={currentUserTier}
+                        progress={getLeaderboardTierProgress(userRank.total_score ?? 0, GLOBAL_LEADERBOARD_TIERS)}
+                        nextThreshold={getNextTierThreshold(userRank.total_score ?? 0, GLOBAL_LEADERBOARD_TIERS)}
+                        className="w-32"
+                      />
                     )}
                   </div>
                 </div>
-                <div className="text-right flex flex-col items-end gap-2">
-                  <div>
-                    <p className={cn('text-sm', 'text-gray-600')}>
-                      {t('leaderboard.score')}
-                    </p>
-                    <p className={cn('text-2xl font-bold', isDarkMode ? 'text-white' : 'text-gray-900')}>
-                      {userRank.total_score?.toLocaleString() || 0}
-                    </p>
-                  </div>
-                  {currentUserTier && (
-                    <TierProgressBar
-                      tier={currentUserTier}
-                      progress={getLeaderboardTierProgress(userRank.total_score ?? 0, GLOBAL_LEADERBOARD_TIERS)}
-                      nextThreshold={getNextTierThreshold(userRank.total_score ?? 0, GLOBAL_LEADERBOARD_TIERS)}
-                      className="w-32"
-                    />
-                  )}
-                </div>
-              </div>
+              )}
             </motion.div>
 
             {/* Near-Rank Progress Indicator */}
