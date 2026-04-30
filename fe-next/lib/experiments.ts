@@ -141,6 +141,20 @@ export const EXPERIMENTS = {
     description:
       'Ease-in difficulty for first 3 games on CrazyGames. control = standard board, easy-first-3 = vowel-rich letter pool + +30s timer. Anti-bounce.',
   }),
+
+  /**
+   * Leaderboard tier position panel. Replaces the right-column block
+   * of the user-rank card with a tier-rank + percentile + peer list.
+   * Hypothesis: surfacing within-tier rank lifts time-on-leaderboard
+   * and return rate vs the current global-rank-only treatment.
+   * Conversion: tier_position_viewed + leaderboard session length.
+   */
+  'tier-position-panel': defineExperiment({
+    variants: ['control', 'enabled'] as const,
+    default: 'control',
+    description:
+      "Leaderboard user-rank card. control = current (global rank primary), enabled = TierPositionPanel mounted (tier-rank primary, peer list, percentile).",
+  }),
 } as const;
 
 export type ExperimentKey = keyof typeof EXPERIMENTS;
