@@ -133,6 +133,7 @@ function makeBlastGame(wave: number) {
   return {
     gameMode: 'blast' as const,
     gameState: 'in-progress' as const,
+    letterGrid: [['A']],
     letterPositions: new Map(),
     blastModeState: {
       grid: [['A']],
@@ -250,6 +251,26 @@ describe('Bot blast mode — wave advance + endGame parity with human path', () 
     expect(game.letterPositions.get('y')).toEqual([[0, 1]]);
     expect(game.letterPositions.get('z')).toEqual([[1, 0]]);
     expect(game.letterPositions.get('w')).toEqual([[1, 1]]);
+  });
+
+  // Companion to letterPositions: wordHandler validates submissions with
+  // isWordOnBoardAsync(game.letterGrid, game.letterPositions). Mismatched
+  // grid/positions silently rejects every word in wave 2+, so leaderboard
+  // freezes at 0.
+  it('wave advance rewrites game.letterGrid to the new-wave grid', async () => {
+    mocks.isBlastBoardCleared.mockReturnValue(true);
+    const newGrid = [['X', 'Y'], ['Z', 'W']];
+    mocks.advanceBlastWave.mockImplementation((state) => ({
+      wave: (state.wave ?? 1) + 1,
+      overlay: [], overlayMap: new Map(),
+      tileStates: [[{ isCleared: false }]],
+      seed: 999, grid: newGrid,
+      playerMoves: {}, playerBonusMoves: {}, totalMoves: 0,
+      playerStats: state.playerStats,
+    }));
+    const game = makeBlastGame(1);
+    await invokeBotCallback(makeBot(), game);
+    expect(game.letterGrid).toEqual(newGrid);
   });
 
   it('wave advance resets playerWords/playerWordsSet so repeats unblock (M4)', async () => {
