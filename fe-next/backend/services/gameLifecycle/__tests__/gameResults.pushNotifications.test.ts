@@ -7,7 +7,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // Hoist mocks so vi.mock factory can reference them
 const mockNotifyLevelUp = vi.hoisted(() => vi.fn().mockResolvedValue(undefined));
-const mockNotifyAchievement = vi.hoisted(() => vi.fn().mockResolvedValue(undefined));
+const mockNotifyAchievementsBatch = vi.hoisted(() => vi.fn().mockResolvedValue(undefined));
 const mockProcessGameResults = vi.hoisted(() => vi.fn());
 const mockGetSocketById = vi.hoisted(() => vi.fn());
 const mockSafeEmit = vi.hoisted(() => vi.fn());
@@ -20,7 +20,7 @@ const mockUpdateRankedMmr = vi.hoisted(() => vi.fn().mockResolvedValue(undefined
 
 vi.mock('../../../modules/pushNotificationTriggers', () => ({
   notifyLevelUp: mockNotifyLevelUp,
-  notifyAchievement: mockNotifyAchievement,
+  notifyAchievementsBatch: mockNotifyAchievementsBatch,
 }));
 
 vi.mock('../../../modules/supabaseServer', () => ({
@@ -184,8 +184,8 @@ describe('gameResults push notifications', () => {
     });
   });
 
-  describe('notifyAchievement', () => {
-    it('calls notifyAchievement for each lifetime achievement unlocked', async () => {
+  describe('notifyAchievementsBatch', () => {
+    it('coalesces all lifetime achievement unlocks into a single batched call', async () => {
       setupSocket();
       mockProcessGameResults.mockResolvedValue({
         success: true,
@@ -200,12 +200,11 @@ describe('gameResults push notifications', () => {
 
       await recordGameResultsToSupabase(makeIo(), 'GAME1', [makePlayerResult()], makeGame());
 
-      expect(mockNotifyAchievement).toHaveBeenCalledTimes(2);
-      expect(mockNotifyAchievement).toHaveBeenCalledWith(AUTH_USER_ID, 'Veteran');
-      expect(mockNotifyAchievement).toHaveBeenCalledWith(AUTH_USER_ID, 'Word Collector');
+      expect(mockNotifyAchievementsBatch).toHaveBeenCalledTimes(1);
+      expect(mockNotifyAchievementsBatch).toHaveBeenCalledWith(AUTH_USER_ID, ['VETERAN', 'WORD_COLLECTOR']);
     });
 
-    it('does NOT call notifyAchievement when no achievements unlocked', async () => {
+    it('does NOT call notifyAchievementsBatch when no achievements unlocked', async () => {
       setupSocket();
       mockProcessGameResults.mockResolvedValue({
         success: true,
@@ -215,10 +214,10 @@ describe('gameResults push notifications', () => {
 
       await recordGameResultsToSupabase(makeIo(), 'GAME1', [makePlayerResult()], makeGame());
 
-      expect(mockNotifyAchievement).not.toHaveBeenCalled();
+      expect(mockNotifyAchievementsBatch).not.toHaveBeenCalled();
     });
 
-    it('does NOT call notifyAchievement when authUserId is missing', async () => {
+    it('does NOT call notifyAchievementsBatch when authUserId is missing', async () => {
       setupSocket();
       mockProcessGameResults.mockResolvedValue({
         success: true,
@@ -233,7 +232,7 @@ describe('gameResults push notifications', () => {
 
       await recordGameResultsToSupabase(makeIo(), 'GAME1', [makePlayerResult()], gameNoAuth);
 
-      expect(mockNotifyAchievement).not.toHaveBeenCalled();
+      expect(mockNotifyAchievementsBatch).not.toHaveBeenCalled();
     });
   });
 });
