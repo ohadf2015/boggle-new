@@ -3,6 +3,10 @@ import {
   pickDailyReminderCopy,
   DAILY_REMINDER_TEMPLATES,
 } from '../dailyReminderCopy';
+import {
+  DAILY_REMINDER_TEMPLATES_BY_LOCALE,
+  DAILY_REMINDER_TEMPLATE_COUNT,
+} from '../dailyReminderTemplates';
 
 describe('pickDailyReminderCopy', () => {
   it('returns a title, body, deepLink, and variant index (en)', () => {
@@ -89,8 +93,24 @@ describe('pickDailyReminderCopy', () => {
       hoursLeft: 5,
       locale: 'es',
     });
-    // Spanish dailyChallenge string contains "desafío"
-    expect(copy.title.toLowerCase()).toContain('desafío');
+    // Spanish copy must NOT match the English variant for the same hash slot —
+    // proves locale routing pulled from the ES table, not the EN fallback.
+    const enCopy = pickDailyReminderCopy({
+      userId: 'user-es',
+      date: '2026-04-21',
+      hoursLeft: 5,
+      locale: 'en',
+    });
+    expect(copy.title).not.toBe(enCopy.title);
+  });
+
+  it('every Spanish template contains a Spanish-specific marker', () => {
+    // Catches an EN copy-paste regression in the ES table — every ES variant
+    // should have at least one accented char OR inverted punctuation.
+    for (const t of DAILY_REMINDER_TEMPLATES_BY_LOCALE.es) {
+      const combined = `${t.title} ${t.body}`;
+      expect(combined).toMatch(/[áéíñóúüÁÉÍÑÓÚÜ¿¡]/);
+    }
   });
 
   it('returns Japanese copy for ja locale', () => {
@@ -111,7 +131,39 @@ describe('pickDailyReminderCopy', () => {
       hoursLeft: 5,
       locale: 'sv',
     });
-    expect(copy.title.toLowerCase()).toContain('utmaning');
+    const enCopy = pickDailyReminderCopy({
+      userId: 'user-sv',
+      date: '2026-04-21',
+      hoursLeft: 5,
+      locale: 'en',
+    });
+    expect(copy.title).not.toBe(enCopy.title);
+  });
+
+  it('every locale provides 15 templates so variant rotation matches', () => {
+    // Variant index = hash %% N. If a locale has fewer templates than EN,
+    // analytics buckets misalign across locales.
+    expect(DAILY_REMINDER_TEMPLATES_BY_LOCALE.he.length).toBe(DAILY_REMINDER_TEMPLATE_COUNT);
+    expect(DAILY_REMINDER_TEMPLATES_BY_LOCALE.sv.length).toBe(DAILY_REMINDER_TEMPLATE_COUNT);
+    expect(DAILY_REMINDER_TEMPLATES_BY_LOCALE.ja.length).toBe(DAILY_REMINDER_TEMPLATE_COUNT);
+    expect(DAILY_REMINDER_TEMPLATES_BY_LOCALE.es.length).toBe(DAILY_REMINDER_TEMPLATE_COUNT);
+  });
+
+  it('locale-specific templates render {hoursLeft} placeholders', () => {
+    // Sample many users in each locale to exercise placeholder substitution
+    // across templates that contain {hoursLeft}.
+    for (const locale of ['he', 'sv', 'ja', 'es'] as const) {
+      for (let i = 0; i < 30; i++) {
+        const c = pickDailyReminderCopy({
+          userId: `${locale}-${i}`,
+          date: '2026-04-21',
+          hoursLeft: 7,
+          locale,
+        });
+        expect(c.title).not.toContain('{hoursLeft}');
+        expect(c.body).not.toContain('{hoursLeft}');
+      }
+    }
   });
 
   it('defaults to English when locale is missing', () => {

@@ -5,37 +5,25 @@
  * twice in one day and so variant can be tracked in analytics via the
  * deep-link `v` param.
  *
- * Localization: English has 15 witty variants. Non-English locales use the
- * shared `translatePush('dailyChallenge.*')` strings — variant is still hashed
- * for analytics bucketing (open-rate by hash bucket), even though copy is
- * locale-constant. Maintaining 15 witty templates × 5 locales is out of scope.
+ * Localization: 15 witty templates per supported locale (he/en/sv/ja/es) live
+ * in `dailyReminderTemplates.ts`. Variant index is hash(userId|date) %% 15;
+ * deep-link param `v=<variant>` is shared across locales so analytics can
+ * pivot by template within a locale OR across all locales.
  *
- * Placeholders: {hoursLeft} — integer hours until local midnight.
+ * Placeholders: {hoursLeft} — integer hours until local midnight (min 1).
  */
-import { translatePush, type PushLocale } from '@/backend/utils/pushTranslations';
+import {
+  DAILY_REMINDER_TEMPLATES_BY_LOCALE,
+  DAILY_REMINDER_TEMPLATE_COUNT,
+  type DailyReminderTemplate,
+} from './dailyReminderTemplates';
+import type { PushLocale } from '@/backend/utils/pushTranslations';
 
-export interface DailyReminderTemplate {
-  title: string;
-  body: string;
-}
-
-export const DAILY_REMINDER_TEMPLATES: DailyReminderTemplate[] = [
-  { title: 'Your brain called 📞', body: "It says today's daily is still unsolved. {hoursLeft}h left." },
-  { title: 'Tick tock, word jock ⏰', body: "Daily challenge won't solve itself. {hoursLeft}h on the clock." },
-  { title: 'Plot twist 📖', body: "You haven't played today yet. Fix that in 60 seconds." },
-  { title: 'The board misses you 🧩', body: 'Letters are set. {hoursLeft}h until the door closes.' },
-  { title: 'One puzzle. Your name. ✍️', body: "Today's daily is waiting for a champion." },
-  { title: 'Streak check 🔥', body: "Don't let {hoursLeft}h slip — keep the chain alive." },
-  { title: 'Your daily called in sick 😷', body: 'Just kidding. It wants a fight. Tap in.' },
-  { title: '{hoursLeft}h left, word wizard 🧙', body: 'One quick round before the board resets.' },
-  { title: 'The letters are gossiping 🤫', body: 'They say you ghosted them. Prove them wrong.' },
-  { title: "Don't let today ghost you 👻", body: "60 seconds. That's all the daily needs." },
-  { title: 'Challenge: unsolved 🔍', body: 'Will today have your name on it? {hoursLeft}h left.' },
-  { title: 'Soft reminder 💌', body: "Daily's open. Brain's warm. Go." },
-  { title: 'Clock says {hoursLeft}h ⏳', body: 'Daily challenge says: come get it.' },
-  { title: 'Word nerd alert 🚨', body: "Today's puzzle hasn't met its match yet. You?" },
-  { title: 'Midnight speedrun? 🏁', body: '{hoursLeft}h to solve. Less if you hustle.' },
-];
+// Re-exported so existing test file `dailyReminderCopy.test.ts` keeps importing
+// from this module path without a churning rename.
+export type { DailyReminderTemplate };
+export const DAILY_REMINDER_TEMPLATES: DailyReminderTemplate[] =
+  DAILY_REMINDER_TEMPLATES_BY_LOCALE.en;
 
 export interface DailyReminderInput {
   userId: string;
@@ -65,20 +53,18 @@ function fill(template: string, hoursLeft: number): string {
 
 export function pickDailyReminderCopy(input: DailyReminderInput): DailyReminderCopy {
   const { userId, date, hoursLeft, locale } = input;
-  const variant = hashString(`${userId}|${date}`) % DAILY_REMINDER_TEMPLATES.length;
+  const variant = hashString(`${userId}|${date}`) % DAILY_REMINDER_TEMPLATE_COUNT;
   const hours = Math.max(1, Math.round(hoursLeft));
   const deepLink = `/daily?src=push&v=${variant}&h=${hours}`;
 
-  let title: string;
-  let body: string;
-  if (!locale || locale === 'en') {
-    const t = DAILY_REMINDER_TEMPLATES[variant];
-    title = fill(t.title, hours);
-    body = fill(t.body, hours);
-  } else {
-    title = translatePush(locale, 'dailyChallenge.title');
-    body = translatePush(locale, 'dailyChallenge.body');
-  }
+  const localeKey: PushLocale = locale ?? 'en';
+  const table = DAILY_REMINDER_TEMPLATES_BY_LOCALE[localeKey] ?? DAILY_REMINDER_TEMPLATES_BY_LOCALE.en;
+  const t = table[variant] ?? table[0];
 
-  return { title, body, deepLink, variant };
+  return {
+    title: fill(t.title, hours),
+    body: fill(t.body, hours),
+    deepLink,
+    variant,
+  };
 }
