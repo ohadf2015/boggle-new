@@ -119,11 +119,10 @@ export function BlastView() {
 
   /** Game ended */
   const handleGameEnd = useCallback((resultsData: BlastResultsData) => {
-    // Persist progress even on game-over so the player can resume from the
-    // highest wave reached (not just the last wave *completed*).
-    if (currentWave > 1) {
-      checkpoint.recordWaveReached(currentWave - 1);
-    }
+    // Save the wave the player reached even on a fail — declining the retry
+    // ad and quitting must still leave a Resume entry on the home screen,
+    // not silently drop them back to wave 1.
+    checkpoint.recordWaveReached(currentWave);
 
     const mergedResults: BlastResultsData = {
       ...resultsData,
