@@ -88,6 +88,15 @@ const TierPositionPanel: React.FC<Props> = memo(({ position, userId, className }
         </div>
       )}
 
+      {isFirstInTier && (
+        <div
+          data-testid="tier-nobody-above"
+          className="mt-2 text-xs italic text-gray-400"
+        >
+          {t('leaderboard.tier.nobodyAbove', { tier: position.tier_id })}
+        </div>
+      )}
+
       <ul role="list" className="mt-3 space-y-1">
         {position.neighbors.map((n) => (
           <li

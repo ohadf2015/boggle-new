@@ -105,3 +105,26 @@ describe('TierPositionPanel — Grandmaster tier', () => {
     expect(screen.getByTestId('tier-throne-label')).toBeInTheDocument();
   });
 });
+
+const firstInGold: TierPosition = {
+  tier_id: 'gold',
+  rank_in_tier: 1,
+  tier_population: 487,
+  neighbors: [
+    { player_id: 'me',  display_name: 'YOU',    total_score: 29900, avatar_image: null, avatar_config: null, rank_in_tier: 1 },
+    { player_id: 'p2',  display_name: 'rivalA', total_score: 28000, avatar_image: null, avatar_config: null, rank_in_tier: 2 },
+    { player_id: 'p3',  display_name: 'rivalB', total_score: 27500, avatar_image: null, avatar_config: null, rank_in_tier: 3 },
+  ],
+};
+
+describe('TierPositionPanel — first in tier', () => {
+  it('applies the wobble animation class', () => {
+    render(<TierPositionPanel position={firstInGold} userId="me" />);
+    expect(screen.getByTestId('tier-rank-primary')).toHaveClass('animate-neo-wobble');
+  });
+
+  it('renders the nobody-above placeholder', () => {
+    render(<TierPositionPanel position={firstInGold} userId="me" />);
+    expect(screen.getByTestId('tier-nobody-above')).toBeInTheDocument();
+  });
+});
