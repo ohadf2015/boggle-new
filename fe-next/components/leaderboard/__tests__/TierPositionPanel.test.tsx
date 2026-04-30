@@ -65,3 +65,22 @@ describe('TierPositionPanel — Gold happy path', () => {
     expect(screen.getByLabelText('Rank 12 of 487 in gold tier')).toBeInTheDocument();
   });
 });
+
+const stonePosition: TierPosition = {
+  tier_id: 'stone',
+  rank_in_tier: 1893,
+  tier_population: 8421,
+  neighbors: [],
+};
+
+describe('TierPositionPanel — Stone tier', () => {
+  it('hides the percentile pill', () => {
+    render(<TierPositionPanel position={stonePosition} userId="me" />);
+    expect(screen.queryByTestId('tier-percentile')).toBeNull();
+  });
+
+  it('shows the climb-to-next CTA chip', () => {
+    render(<TierPositionPanel position={stonePosition} userId="me" />);
+    expect(screen.getByTestId('tier-climb-cta')).toBeInTheDocument();
+  });
+});
