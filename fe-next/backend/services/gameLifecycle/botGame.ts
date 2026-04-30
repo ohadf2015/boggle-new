@@ -296,6 +296,10 @@ export function startBotsForGame(
                     totalMoves: next.totalMoves,
                   });
                   if (currentGame) {
+                    // Keep letterGrid + letterPositions in lock-step. The human
+                    // submitWord path walks letterGrid using letterPositions;
+                    // mismatches silently reject every wave 2+ word.
+                    currentGame.letterGrid = nextGrid;
                     currentGame.letterPositions = makePositionsMap(nextGrid, (currentGame.language || 'en'));
                     if (currentGame.playerWords) {
                       for (const u of Object.keys(currentGame.playerWords)) {
