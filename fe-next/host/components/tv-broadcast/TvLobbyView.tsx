@@ -7,7 +7,7 @@ import TvJoinBar from './TvJoinBar';
 import { PlayerRoster } from '../pre-game/PlayerRoster';
 import { StartButton } from '../pre-game/StartButton';
 import { BattleModeCard } from '../pre-game/BattleModeCard';
-import { useGameMode } from '@/hooks/gameState/store';
+import { useHostSelectedGameMode } from '@/hooks/gameState/store';
 import { useGameActions } from '@/hooks/gameState';
 import type { Language, DifficultyLevel, Avatar as AvatarType, PresenceStatus } from '@/shared/types/game';
 import type { GameModeOption } from '@/components/GameModeSelector';
@@ -70,19 +70,22 @@ const TvLobbyView = memo<TvLobbyViewProps>(({
     });
   }, [playersReady, username]);
   const playerCount = filteredPlayers.length;
-  const storeGameMode = useGameMode();
-  const { setGameMode: setStoreGameMode } = useGameActions();
-  const [localGameMode, setLocalGameMode] = useState<GameModeOption>(storeGameMode || 'random');
+  const hostSelectedGameMode = useHostSelectedGameMode();
+  const { setGameMode: setStoreGameMode, setHostSelectedGameMode } = useGameActions();
+  const [localGameMode, setLocalGameMode] = useState<GameModeOption>(hostSelectedGameMode || 'random');
 
   const selectedGameMode = selectedGameModeProp ?? localGameMode;
   const setSelectedGameMode = setSelectedGameModeProp ?? ((mode: GameModeOption) => {
     setLocalGameMode(mode);
     setStoreGameMode(mode);
+    setHostSelectedGameMode(mode);
   });
 
   useEffect(() => {
-    setStoreGameMode(selectedGameMode || 'random');
-  }, [selectedGameMode, setStoreGameMode]);
+    const mode = selectedGameMode || 'random';
+    setStoreGameMode(mode);
+    setHostSelectedGameMode(mode);
+  }, [selectedGameMode, setStoreGameMode, setHostSelectedGameMode]);
 
   return (
     <div data-testid="tv-lobby-view" className="flex flex-col h-full min-h-screen bg-neo-navy">

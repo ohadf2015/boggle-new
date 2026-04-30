@@ -438,6 +438,19 @@ describe('wordHandler - blastComboSync broadcast (52-02)', () => {
       expect(game.letterPositions.get('a')).toEqual([[0, 0]]);
     });
 
+    // Without this, isWordOnBoardAsync walks the wave-1 grid using new-wave
+    // positions; nearly every word in wave 2+ gets rejected as wordNotOnBoard
+    // and the leaderboard never updates (the visible MP-blast scoring bug).
+    it('rewrites game.letterGrid to the new-wave grid on wave advance', async () => {
+      (isBlastBoardCleared as Mock).mockReturnValue(true);
+      const game = makeBlastGame({ blastModeState: makeCleared(1) });
+      (getGame as Mock).mockReturnValue(game);
+
+      await handlers['submitWord']({ word: 'test' });
+
+      expect(game.letterGrid).toEqual([['A']]);
+    });
+
     it('resets playerWords/playerWordsSet on wave advance (M4)', async () => {
       (isBlastBoardCleared as Mock).mockReturnValue(true);
       const game = makeBlastGame({

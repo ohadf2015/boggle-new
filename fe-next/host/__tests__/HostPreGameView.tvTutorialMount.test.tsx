@@ -78,8 +78,10 @@ vi.mock('../../components/BotControls', () => ({
 
 vi.mock('@/hooks/gameState', () => ({
   useGameMode: () => 'classic',
+  useHostSelectedGameMode: () => 'random',
   useGameActions: () => ({
     setGameMode: vi.fn(),
+    setHostSelectedGameMode: vi.fn(),
   }),
 }));
 

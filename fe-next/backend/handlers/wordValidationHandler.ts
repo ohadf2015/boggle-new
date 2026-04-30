@@ -162,7 +162,12 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
               playerBonusMoves: next.playerBonusMoves,
               totalMoves: next.totalMoves,
             });
-            game.letterPositions = makePositionsMap(next.grid ?? gravityResult.newGrid, (game.language || 'en'));
+            const nextGrid = next.grid ?? gravityResult.newGrid;
+            // Keep letterGrid in lock-step with letterPositions; wordHandler's
+            // isWordOnBoardAsync walks letterGrid using letterPositions, and a
+            // mismatch silently rejects every wave 2+ word as wordNotOnBoard.
+            game.letterGrid = nextGrid;
+            game.letterPositions = makePositionsMap(nextGrid, (game.language || 'en'));
             if (game.playerWords) {
               for (const u of Object.keys(game.playerWords)) {
                 game.playerWords[u] = [];

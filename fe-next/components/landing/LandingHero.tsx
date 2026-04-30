@@ -80,15 +80,6 @@ export function LandingHero({ players, playersLoading, isMobilePortrait }: Landi
             </>
           )}
 
-          <p
-            className={cn(
-              'font-medium text-neo-black/80 dark:text-neo-white/90 max-w-md animate-[fadeInUp_0.4s_ease-out_0.25s_both]',
-              isMobilePortrait ? 'text-sm mb-3 px-2' : 'text-base md:text-lg mb-5',
-            )}
-          >
-            {t('landing.welcomeSubtitle')}
-          </p>
-
         </div>
 
         {/* Right: Leaderboard Preview (desktop only — mobile moves below game cards) */}

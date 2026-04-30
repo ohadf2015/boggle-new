@@ -73,6 +73,7 @@ vi.mock('../../../contexts/AuthContext', () => ({
 // Mock gameState hooks
 vi.mock('@/hooks/gameState', () => ({
   useGameMode: () => 'classic',
+  useHostSelectedGameMode: () => 'random',
 }));
 
 // Mock RewardedAdGoldButton

@@ -327,10 +327,10 @@ const ModeCard: React.FC<ModeCardProps> = ({
           className={cn(
             'font-black uppercase tracking-tight flex-1 min-w-0',
             'text-neo-white',
-            secondary && 'text-sm sm:text-base'
+            secondary && 'text-base sm:text-lg'
           )}
           style={secondary ? undefined : {
-            fontSize: 'clamp(1rem, 5cqw, 1.75rem)',
+            fontSize: 'clamp(1.25rem, 6cqw, 2rem)',
           }}
         >
           {title}
@@ -374,7 +374,7 @@ const ModeCard: React.FC<ModeCardProps> = ({
             'text-neo-white/80'
           )}
           style={{
-            fontSize: 'clamp(0.75rem, 3cqw, 1.125rem)',
+            fontSize: 'clamp(0.875rem, 3.75cqw, 1.25rem)',
             marginBottom: 'clamp(0.375rem, 2cqw, 1rem)',
           }}
         >

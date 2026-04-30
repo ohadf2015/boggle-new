@@ -45,9 +45,9 @@ describe('LandingHero', () => {
     expect(screen.getByText('landing.welcomeTitle')).toBeInTheDocument();
   });
 
-  it('renders welcome subtitle', () => {
+  it('does not render welcome subtitle', () => {
     render(<LandingHero {...baseProps} />);
-    expect(screen.getByText('landing.welcomeSubtitle')).toBeInTheDocument();
+    expect(screen.queryByText('landing.welcomeSubtitle')).not.toBeInTheDocument();
   });
 
   it('shows leaderboard preview on desktop', () => {

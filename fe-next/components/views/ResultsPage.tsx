@@ -45,7 +45,7 @@ import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useInterstitialAd } from '@/hooks/useInterstitialAd';
 import { useGameKeyboardShortcuts } from '@/hooks/useGameKeyboardShortcuts';
 import type { GameModeOption } from '@/components/GameModeSelector';
-import { useGameMode, useWordHuntPlayerLives, useWordHuntEliminatedPlayers, useBlastMovesUsed, useBlastTotalTileBonus, useBlastTotalTilesCleared, useBlastPlayerStats, useWheelRushPlayerStats } from '@/hooks/gameState/store';
+import { useGameMode, useHostSelectedGameMode, useWordHuntPlayerLives, useWordHuntEliminatedPlayers, useBlastMovesUsed, useBlastTotalTileBonus, useBlastTotalTilesCleared, useBlastPlayerStats, useWheelRushPlayerStats, useGameActions } from '@/hooks/gameState/store';
 import type { BlastPlayerStats, WheelRushPlayerStats } from '@/shared/types/game';
 const WordHuntResultsSummary = dynamic(() => import('@/components/results/WordHuntResultsSummary'), { ssr: false });
 const BlastResultsSummary = dynamic(() => import('@/components/results/BlastResultsSummary'), { ssr: false });
@@ -285,8 +285,18 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
   });
   // Game mode override for host (results page lets host change mode before next game)
   const resolvedGameMode = useGameMode();
-  // Persist the game mode that was just played (so "Play Again" keeps the same mode)
-  const [selectedGameMode, setSelectedGameMode] = useState<GameModeOption>(resolvedGameMode || 'random');
+  // Host's intended mode (preserved across rounds — "random" stays "random" so each round re-rolls)
+  const hostSelectedGameMode = useHostSelectedGameMode();
+  const { setHostSelectedGameMode } = useGameActions();
+  // Default to host's persistent intent; fall back to just-played mode for non-hosts.
+  const [selectedGameMode, setSelectedGameModeLocal] = useState<GameModeOption>(
+    hostSelectedGameMode || resolvedGameMode || 'random'
+  );
+  // Sync host's selection to the store so it survives round transitions.
+  const setSelectedGameMode = useCallback((mode: GameModeOption) => {
+    setSelectedGameModeLocal(mode);
+    setHostSelectedGameMode(mode);
+  }, [setHostSelectedGameMode]);
   const wordHuntPlayerLives = useWordHuntPlayerLives();
   const wordHuntEliminatedPlayers = useWordHuntEliminatedPlayers();
   const blastMovesUsed = useBlastMovesUsed();

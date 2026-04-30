@@ -1,8 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import { type Variants } from 'framer-motion';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
@@ -62,14 +60,6 @@ const STEP_GLOW = [
   'shadow-[0_0_20px_rgba(0,255,255,0.3)]',
   'shadow-[0_0_20px_rgba(191,255,0,0.3)]',
   'shadow-[0_0_20px_rgba(139,92,246,0.3)]',
-] as const;
-
-/* ── Blog images ───────────────────────────────────────── */
-
-const BLOG_IMAGES = [
-  '/images/blog/science-brain.jpg',
-  '/images/blog/why-addictive.jpg',
-  '/images/blog/daily-strategies.jpg',
 ] as const;
 
 /* ── FAQ Accordion item (SEO-safe: always in DOM) ──────── */
@@ -265,68 +255,6 @@ export function LandingSEOSection({ className }: LandingSEOSectionProps) {
         </AdaptiveMotion.div>
       </AdaptiveMotion.div>
 
-      {/* ── Blog Links ── */}
-      <AdaptiveMotion.div
-        variants={sectionReveal}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, margin: '-40px' }}
-      >
-        <div className="flex items-center justify-between mb-5">
-          <h2 className="text-lg sm:text-xl font-black uppercase text-neo-white">
-            {c.blogTitle}
-          </h2>
-          <Link
-            href={`/${locale}/blog`}
-            className={cn(
-              'text-xs sm:text-sm font-bold',
-              'text-neo-white/60 hover:text-neo-white transition-colors',
-              'underline underline-offset-2'
-            )}
-          >
-            {c.viewAllPosts}
-          </Link>
-        </div>
-        <AdaptiveMotion.div
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"
-          variants={staggerContainer}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-30px' }}
-        >
-          {c.blogLinks.map((blog, i) => (
-            <AdaptiveMotion.div key={blog.slug} variants={staggerItem}>
-              <Link
-                href={`/${locale}/blog/${blog.slug}`}
-                className={cn(
-                  'group block rounded-neo border-2 border-neo-white/10 overflow-hidden',
-                  'bg-neo-white/3',
-                  'hover:border-neo-white/20 hover:bg-neo-white/6 hover:-translate-y-0.5',
-                  'transition-all duration-200'
-                )}
-              >
-                <div className="relative aspect-video overflow-hidden">
-                  <Image
-                    src={BLOG_IMAGES[i]}
-                    alt={blog.title}
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-300"
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                  />
-                  <span className="absolute top-2 inset-s-2 inline-block px-2 py-0.5 text-[10px] font-bold uppercase text-neo-white bg-neo-black/60 rounded-neo tracking-wider">
-                    {blog.category}
-                  </span>
-                </div>
-                <div className="p-3">
-                  <p className="text-sm font-bold text-neo-white/80 group-hover:text-neo-white transition-colors line-clamp-2">
-                    {blog.title}
-                  </p>
-                </div>
-              </Link>
-            </AdaptiveMotion.div>
-          ))}
-        </AdaptiveMotion.div>
-      </AdaptiveMotion.div>
     </section>
   );
 }

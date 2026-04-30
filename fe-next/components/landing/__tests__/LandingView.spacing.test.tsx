@@ -72,6 +72,7 @@ vi.mock('next/navigation', () => ({
     push: vi.fn(),
     replace: vi.fn(),
   }),
+  useParams: () => ({ locale: 'en' }),
 }));
 
 vi.mock('@/utils/onboardingStorage', () => ({

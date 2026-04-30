@@ -47,6 +47,7 @@ vi.mock('@/components/CrazyGamesSDK', () => ({
 
 vi.mock('@/hooks/gameState/store', () => ({
   useGameMode: () => 'classic',
+  useHostSelectedGameMode: () => 'random',
   useWordHuntPlayerLives: () => ({}),
   useWordHuntEliminatedPlayers: () => [],
   useWordHuntTargetLength: () => 0,

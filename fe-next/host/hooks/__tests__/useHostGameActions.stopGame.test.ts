@@ -35,6 +35,7 @@ vi.mock('@/utils/logger', () => ({
 }));
 vi.mock('@/hooks/gameState', () => ({
   useGameMode: vi.fn().mockReturnValue('classic'),
+  useHostSelectedGameMode: vi.fn().mockReturnValue('random'),
 }));
 
 import { renderHook, act } from '@testing-library/react';

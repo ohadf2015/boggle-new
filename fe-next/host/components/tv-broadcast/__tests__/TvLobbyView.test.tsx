@@ -7,10 +7,11 @@ import TvLobbyView from '../TvLobbyView';
 // Mock Zustand game state hooks
 vi.mock('@/hooks/gameState/store', () => ({
   useGameMode: () => 'random',
+  useHostSelectedGameMode: () => 'random',
 }));
 
 vi.mock('@/hooks/gameState', () => ({
-  useGameActions: () => ({ setGameMode: vi.fn() }),
+  useGameActions: () => ({ setGameMode: vi.fn(), setHostSelectedGameMode: vi.fn() }),
 }));
 
 // Mock sub-components to isolate TvLobbyView layout logic

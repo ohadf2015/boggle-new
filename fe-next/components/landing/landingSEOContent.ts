@@ -31,9 +31,6 @@ export interface LandingSEOContent {
   faq: { question: string; answer: string }[];
   communityTitle: string;
   communityContent: string;
-  blogTitle: string;
-  viewAllPosts: string;
-  blogLinks: { slug: string; title: string; category: string }[];
 }
 
 const en: LandingSEOContent = {
@@ -167,25 +164,6 @@ const en: LandingSEOContent = {
   communityTitle: 'Join Thousands of Word Game Enthusiasts',
   communityContent:
     'LexiClash players span over 40 countries and five languages. Join the community to compete on global leaderboards, share daily challenge results, and discover new word strategies. Follow us on Instagram @lexi.clash for tips, updates, and community highlights.',
-  blogTitle: 'From Our Blog',
-  viewAllPosts: 'View all posts →',
-  blogLinks: [
-    {
-      slug: 'science-behind-word-games',
-      title: 'The Science Behind Word Games',
-      category: 'Science',
-    },
-    {
-      slug: 'why-word-games-are-addictive',
-      title: 'Why Word Games Are So Addictive',
-      category: 'Psychology',
-    },
-    {
-      slug: 'daily-challenge-strategies',
-      title: 'Daily Challenge Strategies',
-      category: 'Strategy',
-    },
-  ],
 };
 
 const he: LandingSEOContent = {
@@ -326,25 +304,6 @@ const he: LandingSEOContent = {
   communityTitle: 'הצטרפו לאלפי חובבי משחקי מילים',
   communityContent:
     'שחקני LexiClash פרוסים על פני יותר מ-40 מדינות וחמש שפות. הצטרפו לקהילה כדי להתחרות בלוחות דירוג גלובליים, לשתף תוצאות אתגרים יומיים ולגלות אסטרטגיות מילים חדשות. עקבו אחרינו באינסטגרם @lexi.clash לטיפים, עדכונים ואירועי קהילה.',
-  blogTitle: 'מהבלוג שלנו',
-  viewAllPosts: 'לכל הפוסטים ←',
-  blogLinks: [
-    {
-      slug: 'science-behind-word-games',
-      title: 'המדע מאחורי משחקי מילים',
-      category: 'מדע',
-    },
-    {
-      slug: 'why-word-games-are-addictive',
-      title: 'למה משחקי מילים כל כך ממכרים',
-      category: 'פסיכולוגיה',
-    },
-    {
-      slug: 'daily-challenge-strategies',
-      title: 'אסטרטגיות לאתגר היומי',
-      category: 'אסטרטגיה',
-    },
-  ],
 };
 
 const sv: LandingSEOContent = {
@@ -485,25 +444,6 @@ const sv: LandingSEOContent = {
   communityTitle: 'Gå med tusentals ordspelsentusiaster',
   communityContent:
     'LexiClash-spelare finns i över 40 länder och på fem språk. Gå med i gemenskapen för att tävla på globala topplistor, dela dagliga utmaningsresultat och upptäck nya ordstrategier. Följ oss på Instagram @lexi.clash för tips, uppdateringar och gemenskapshöjdpunkter.',
-  blogTitle: 'Från vår blogg',
-  viewAllPosts: 'Visa alla inlägg →',
-  blogLinks: [
-    {
-      slug: 'science-behind-word-games',
-      title: 'Vetenskapen bakom ordspel',
-      category: 'Vetenskap',
-    },
-    {
-      slug: 'why-word-games-are-addictive',
-      title: 'Varför ordspel är så beroendeframkallande',
-      category: 'Psykologi',
-    },
-    {
-      slug: 'daily-challenge-strategies',
-      title: 'Strategier för dagliga utmaningar',
-      category: 'Strategi',
-    },
-  ],
 };
 
 const ja: LandingSEOContent = {
@@ -644,25 +584,6 @@ const ja: LandingSEOContent = {
   communityTitle: '数千人のワードゲーム愛好家と一緒に',
   communityContent:
     'LexiClashのプレイヤーは40カ国以上、5言語にわたっています。コミュニティに参加して、グローバルランキングで競い、デイリーチャレンジの結果をシェアし、新しいワード戦略を発見しよう。Instagram @lexi.clash でヒント、アップデート、コミュニティハイライトをチェック。',
-  blogTitle: 'ブログから',
-  viewAllPosts: '全ての投稿を見る →',
-  blogLinks: [
-    {
-      slug: 'science-behind-word-games',
-      title: 'ワードゲームの科学',
-      category: 'サイエンス',
-    },
-    {
-      slug: 'why-word-games-are-addictive',
-      title: 'ワードゲームがやめられない理由',
-      category: '心理学',
-    },
-    {
-      slug: 'daily-challenge-strategies',
-      title: 'デイリーチャレンジ攻略法',
-      category: '戦略',
-    },
-  ],
 };
 
 const es: LandingSEOContent = {
@@ -803,25 +724,6 @@ const es: LandingSEOContent = {
   communityTitle: 'Únete a miles de entusiastas de los juegos de palabras',
   communityContent:
     'Los jugadores de LexiClash están repartidos en más de 40 países y cinco idiomas. Únete a la comunidad para competir en tablas de clasificación globales, compartir resultados de desafíos diarios y descubrir nuevas estrategias de vocabulario. Síguenos en Instagram @lexi.clash para consejos, actualizaciones y destacados de la comunidad.',
-  blogTitle: 'De nuestro blog',
-  viewAllPosts: 'Ver todas las entradas →',
-  blogLinks: [
-    {
-      slug: 'science-behind-word-games',
-      title: 'La ciencia detrás de los juegos de palabras',
-      category: 'Ciencia',
-    },
-    {
-      slug: 'why-word-games-are-addictive',
-      title: 'Por qué los juegos de palabras son tan adictivos',
-      category: 'Psicología',
-    },
-    {
-      slug: 'daily-challenge-strategies',
-      title: 'Estrategias para el desafío diario',
-      category: 'Estrategia',
-    },
-  ],
 };
 
 export const contentByLocale: Record<string, LandingSEOContent> = {

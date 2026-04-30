@@ -58,10 +58,6 @@ vi.mock('../ScoreRevealV2', () => ({
   __esModule: true,
   default: () => <div data-testid="score-reveal" />,
 }));
-vi.mock('../ModeFork', () => ({
-  __esModule: true,
-  default: () => <div data-testid="mode-fork" />,
-}));
 vi.mock('../ReturningUserStep', () => ({
   __esModule: true,
   default: () => <div data-testid="returning-user-step" />,
@@ -95,14 +91,13 @@ describe('OnboardingFlow on CrazyGames', () => {
     vi.clearAllMocks();
   });
 
-  it('renders only CrazyGamesWelcome — no language/tutorial/profile/scoreReveal/fork', () => {
+  it('renders only CrazyGamesWelcome — no language/tutorial/profile/scoreReveal', () => {
     render(<OnboardingFlow onComplete={vi.fn()} />);
     expect(screen.getByTestId('crazygames-welcome')).toBeInTheDocument();
     expect(screen.queryByTestId('language-select')).not.toBeInTheDocument();
     expect(screen.queryByTestId('tutorial-game')).not.toBeInTheDocument();
     expect(screen.queryByTestId('quick-profile-setup')).not.toBeInTheDocument();
     expect(screen.queryByTestId('score-reveal')).not.toBeInTheDocument();
-    expect(screen.queryByTestId('mode-fork')).not.toBeInTheDocument();
   });
 
   it('Play Daily routes to /<locale>/daily and marks complete', () => {
