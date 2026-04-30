@@ -15,6 +15,7 @@ export interface SoundEffectsContextType {
   playSound: (soundKey: keyof typeof SOUND_EFFECTS, options?: SoundEffectOptions) => void;
   playComboSound: (comboLevel: number) => void;
   playCountdownBeep: (secondsRemaining: number) => void;
+  playWordLengthSound: (length: number) => void;
   startFireCrackleLoop: () => void;
   stopFireCrackleLoop: () => void;
   // Individual play functions (from useSoundPlayFunctions hook)
@@ -176,6 +177,26 @@ export const SOUND_EFFECTS = {
   wheelSpin: '/sounds/wheel-spin.mp3',
   flashChallenge: '/sounds/flash-challenge.mp3',
   wordReveal: '/sounds/word-reveal.mp3',
+  // Mascot voice reactions (kawaii character lines)
+  mascotCheer: '/sounds/mascot-cheer.mp3',
+  mascotGiggle: '/sounds/mascot-giggle.mp3',
+  mascotGasp: '/sounds/mascot-gasp.mp3',
+  mascotWhoa: '/sounds/mascot-whoa.mp3',
+  mascotAww: '/sounds/mascot-aww.mp3',
+  mascotDrumroll: '/sounds/mascot-drumroll.mp3',
+  // Party signature sounds
+  confettiRain: '/sounds/confetti-rain.mp3',
+  balloonPop: '/sounds/balloon-pop.mp3',
+  partyTada: '/sounds/party-tada.mp3',
+  crownSparkle: '/sounds/crown-sparkle.mp3',
+  bubbleBurst: '/sounds/bubble-burst.mp3',
+  comebackSurge: '/sounds/comeback-surge.mp3',
+  vaultUnlock: '/sounds/vault-unlock.mp3',
+  xpSparkle: '/sounds/xp-sparkle.mp3',
+  streakBuild: '/sounds/streak-build.mp3',
+  perfectBoard: '/sounds/perfect-board.mp3',
+  rivalTaunt: '/sounds/rival-taunt.mp3',
+  brainPower: '/sounds/brain-power.mp3',
 } as const;
 
 export type SoundEffectKey = keyof typeof SOUND_EFFECTS;
@@ -256,4 +277,24 @@ export const SOUND_PRIORITIES: Record<SoundEffectKey, AUDIO_LOAD_PRIORITY> = {
   wheelSpin: AUDIO_LOAD_PRIORITY.LOW,
   flashChallenge: AUDIO_LOAD_PRIORITY.NORMAL,
   wordReveal: AUDIO_LOAD_PRIORITY.LOW,
+  // Mascot voice — lazy-load so first cheer fetches on demand
+  mascotCheer: AUDIO_LOAD_PRIORITY.LOW,
+  mascotGiggle: AUDIO_LOAD_PRIORITY.LOW,
+  mascotGasp: AUDIO_LOAD_PRIORITY.LOW,
+  mascotWhoa: AUDIO_LOAD_PRIORITY.LOW,
+  mascotAww: AUDIO_LOAD_PRIORITY.LOW,
+  mascotDrumroll: AUDIO_LOAD_PRIORITY.LOW,
+  // Party signature — celebratory, infrequent, fine to lazy-load
+  confettiRain: AUDIO_LOAD_PRIORITY.LOW,
+  balloonPop: AUDIO_LOAD_PRIORITY.LOW,
+  partyTada: AUDIO_LOAD_PRIORITY.LOW,
+  crownSparkle: AUDIO_LOAD_PRIORITY.LOW,
+  bubbleBurst: AUDIO_LOAD_PRIORITY.LOW,
+  comebackSurge: AUDIO_LOAD_PRIORITY.LOW,
+  vaultUnlock: AUDIO_LOAD_PRIORITY.LOW,
+  xpSparkle: AUDIO_LOAD_PRIORITY.LOW,
+  streakBuild: AUDIO_LOAD_PRIORITY.LOW,
+  perfectBoard: AUDIO_LOAD_PRIORITY.LOW,
+  rivalTaunt: AUDIO_LOAD_PRIORITY.LOW,
+  brainPower: AUDIO_LOAD_PRIORITY.LOW,
 };

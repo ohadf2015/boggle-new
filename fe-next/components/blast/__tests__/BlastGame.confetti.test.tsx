@@ -49,4 +49,30 @@ describe('calculateEarnedStars', () => {
   it('returns 1 star when totalTiles is 0 (edge case)', () => {
     expect(calculateEarnedStars(0, 0)).toBe(1);
   });
+
+  describe('with allObjectivesComplete flag', () => {
+    it('caps at 2 stars when 80%+ cleared but objectives incomplete', () => {
+      expect(calculateEarnedStars(80, 100, false)).toBe(2);
+      expect(calculateEarnedStars(95, 100, false)).toBe(2);
+    });
+
+    it('keeps 3 stars when 80%+ cleared AND all objectives complete', () => {
+      expect(calculateEarnedStars(80, 100, true)).toBe(3);
+      expect(calculateEarnedStars(100, 100, true)).toBe(3);
+    });
+
+    it('keeps 1 star at low clear regardless of flag', () => {
+      expect(calculateEarnedStars(40, 100, true)).toBe(1);
+      expect(calculateEarnedStars(40, 100, false)).toBe(1);
+    });
+
+    it('does not promote: completing all objectives at 50% clear stays 2 stars', () => {
+      expect(calculateEarnedStars(50, 100, true)).toBe(2);
+    });
+
+    it('flag undefined preserves legacy behavior', () => {
+      expect(calculateEarnedStars(85, 100)).toBe(3);
+      expect(calculateEarnedStars(85, 100, undefined)).toBe(3);
+    });
+  });
 });

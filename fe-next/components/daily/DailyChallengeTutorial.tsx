@@ -16,6 +16,94 @@ export interface DailyChallengeTutorialProps {
 
 const TOTAL_STEPS = 5;
 
+/**
+ * Locale-aware example data for tutorial steps 3 (letter feedback) and 4
+ * (tries rule). The colors in step 3 always teach the same lesson — the
+ * letters just change to match the player's language. Hebrew/Swedish use
+ * vetted vocabulary; Japanese keeps romaji because the live game does.
+ *
+ * `feedback`: per-tile { letter, state } where state ∈ {gray,green,yellow}.
+ * `usesAttemptWord` / `noAttemptWord`: shown in step 4 to contrast a guess
+ * that consumes a try vs. one that doesn't.
+ */
+type TileState = 'gray' | 'green' | 'yellow';
+interface TutorialExample {
+  feedback: ReadonlyArray<{ letter: string; state: TileState }>;
+  usesAttemptWord: string;
+  noAttemptWord: string;
+}
+
+const TUTORIAL_EXAMPLES: Record<string, TutorialExample> = {
+  en: {
+    feedback: [
+      { letter: 'S', state: 'gray' },
+      { letter: 'E', state: 'green' },
+      { letter: 'A', state: 'yellow' },
+      { letter: 'R', state: 'gray' },
+      { letter: 'S', state: 'gray' },
+    ],
+    usesAttemptWord: 'BEACH',
+    noAttemptWord: 'CAT',
+  },
+  es: {
+    feedback: [
+      { letter: 'P', state: 'gray' },
+      { letter: 'L', state: 'green' },
+      { letter: 'A', state: 'yellow' },
+      { letter: 'Y', state: 'gray' },
+      { letter: 'A', state: 'gray' },
+    ],
+    usesAttemptWord: 'PLAYA',
+    noAttemptWord: 'SOL',
+  },
+  sv: {
+    feedback: [
+      { letter: 'S', state: 'gray' },
+      { letter: 'O', state: 'green' },
+      { letter: 'L', state: 'yellow' },
+      { letter: 'E', state: 'gray' },
+      { letter: 'N', state: 'gray' },
+    ],
+    usesAttemptWord: 'SOLEN',
+    noAttemptWord: 'SOL',
+  },
+  // Hebrew uses 4-letter vetted vocabulary (no 5-letter words exist in the
+  // tutorial vocab set). The lesson holds: "matching length uses a try,
+  // shorter doesn't." Path/letter colors still teach the green/yellow rule.
+  he: {
+    feedback: [
+      { letter: 'ש', state: 'gray' },
+      { letter: 'מ', state: 'green' },
+      { letter: 'ח', state: 'yellow' },
+      { letter: 'ה', state: 'gray' },
+    ],
+    usesAttemptWord: 'דורש',
+    noAttemptWord: 'לב',
+  },
+  ja: {
+    // Romaji per project convention — live Word Hunt board on `ja` is romaji.
+    feedback: [
+      { letter: 'S', state: 'gray' },
+      { letter: 'E', state: 'green' },
+      { letter: 'A', state: 'yellow' },
+      { letter: 'R', state: 'gray' },
+      { letter: 'S', state: 'gray' },
+    ],
+    usesAttemptWord: 'BEACH',
+    noAttemptWord: 'CAT',
+  },
+};
+
+function getTutorialExample(language: string): TutorialExample {
+  return TUTORIAL_EXAMPLES[language] || TUTORIAL_EXAMPLES.en;
+}
+
+const TILE_COLORS: Record<TileState, string> = {
+  gray: 'bg-gray-400 border-gray-500 text-white',
+  green: 'bg-green-500 border-green-700 text-white',
+  yellow: 'bg-yellow-500 border-yellow-600 text-neo-black dark:text-neo-black',
+};
+
 export const DailyChallengeTutorial: React.FC<DailyChallengeTutorialProps> = ({
   onComplete,
   onSkip,
@@ -202,7 +290,8 @@ const Step3LetterFeedback: React.FC<{ onNext: () => void; onPrev: () => void }> 
   onNext,
   onPrev,
 }) => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const example = getTutorialExample(language);
 
   return (
     <div>
@@ -217,11 +306,17 @@ const Step3LetterFeedback: React.FC<{ onNext: () => void; onPrev: () => void }> 
           {t('tutorial.wordHunt.letterFeedback.example')}
         </div>
         <div className="flex justify-center gap-1.5 mb-3">
-          <div className="w-10 h-10 bg-gray-400 rounded-lg border-2 border-gray-500 flex items-center justify-center text-white font-black text-lg shadow-hard-sm">S</div>
-          <div className="w-10 h-10 bg-green-500 rounded-lg border-2 border-green-700 flex items-center justify-center text-white font-black text-lg shadow-hard-sm">E</div>
-          <div className="w-10 h-10 bg-yellow-500 rounded-lg border-2 border-yellow-600 flex items-center justify-center text-neo-black dark:text-neo-black font-black text-lg shadow-hard-sm">A</div>
-          <div className="w-10 h-10 bg-gray-400 rounded-lg border-2 border-gray-500 flex items-center justify-center text-white font-black text-lg shadow-hard-sm">R</div>
-          <div className="w-10 h-10 bg-gray-400 rounded-lg border-2 border-gray-500 flex items-center justify-center text-white font-black text-lg shadow-hard-sm">S</div>
+          {example.feedback.map((tile, idx) => (
+            <div
+              key={`${tile.letter}-${idx}`}
+              className={cn(
+                'w-10 h-10 rounded-lg border-2 flex items-center justify-center font-black text-lg shadow-hard-sm',
+                TILE_COLORS[tile.state],
+              )}
+            >
+              {tile.letter}
+            </div>
+          ))}
         </div>
         {/* Compact legend */}
         <div className="flex justify-center gap-4 text-xs font-bold">
@@ -248,7 +343,9 @@ const Step4MinimumLength: React.FC<{ onNext: () => void; onPrev: () => void }> =
   onNext,
   onPrev,
 }) => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const example = getTutorialExample(language);
+  const targetLength = example.usesAttemptWord.length;
 
   return (
     <div>
@@ -264,15 +361,15 @@ const Step4MinimumLength: React.FC<{ onNext: () => void; onPrev: () => void }> =
       </p>
 
       <div className="bg-gray-100 dark:bg-gray-800 rounded-neo border-2 border-neo-black p-4 mb-4 space-y-3">
-        {/* Example: 5-letter target word */}
+        {/* Example: target word (length matches the locale's example word) */}
         <div className="text-center mb-3">
           <div className="text-xs text-gray-600 dark:text-gray-400 mb-2">
             {t('tutorial.wordHunt.triesRule.exampleTarget')}
           </div>
           <div className="flex justify-center gap-1">
-            {['?', '?', '?', '?', '?'].map((char, idx) => (
+            {Array.from({ length: targetLength }).map((_, idx) => (
               <div key={`placeholder-${idx}`} className="w-8 h-8 bg-neo-black rounded border-2 border-neo-black flex items-center justify-center text-white font-bold text-sm">
-                {char}
+                ?
               </div>
             ))}
           </div>
@@ -284,7 +381,7 @@ const Step4MinimumLength: React.FC<{ onNext: () => void; onPrev: () => void }> =
             <span className="text-white font-bold text-xs">-1</span>
           </div>
           <div>
-            <div className="font-bold text-neo-pink">BEACH</div>
+            <div className="font-bold text-neo-pink">{example.usesAttemptWord}</div>
             <div className="text-xs text-gray-600 dark:text-gray-400">
               {t('tutorial.wordHunt.triesRule.usesAttempt')}
             </div>
@@ -297,7 +394,7 @@ const Step4MinimumLength: React.FC<{ onNext: () => void; onPrev: () => void }> =
             <Heart className="w-4 h-4 text-white fill-current" />
           </div>
           <div>
-            <div className="font-bold text-green-600">CAT</div>
+            <div className="font-bold text-green-600">{example.noAttemptWord}</div>
             <div className="text-xs text-gray-600 dark:text-gray-400">
               {t('tutorial.wordHunt.triesRule.noAttempt')}
             </div>

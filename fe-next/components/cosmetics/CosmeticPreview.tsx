@@ -3,7 +3,7 @@
 import { useRef } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
-import { type Cosmetic, RARITY_COLORS } from '@/lib/cosmetics';
+import { type Cosmetic, RARITY_COLORS, formatUnlockHint } from '@/lib/cosmetics';
 import { X, Lock } from 'lucide-react';
 
 interface CosmeticPreviewProps {
@@ -60,9 +60,14 @@ export function CosmeticPreview({ cosmetic, isUnlocked, onClose, onEquip, onPurc
           </button>
         )}
 
-        {!isUnlocked && (
+        {!isUnlocked && (() => {
+          const hint = formatUnlockHint(cosmetic);
+          return (
           <div>
-            <p className="text-sm text-gray-500 mb-2">{t('cosmetics.locked')}</p>
+            <p className="text-sm text-neo-cream/80 mb-2 font-neo-body">
+              <span className="text-gray-500 me-1">🔒</span>
+              {hint ? t(hint.key, hint.params) : t('cosmetics.locked')}
+            </p>
             {cosmetic.unlockCondition.type === 'purchase' && onPurchase && (
               <button
                 onClick={() => onPurchase(cosmetic.id)}
@@ -72,7 +77,8 @@ export function CosmeticPreview({ cosmetic, isUnlocked, onClose, onEquip, onPurc
               </button>
             )}
           </div>
-        )}
+          );
+        })()}
       </div>
     </div>
   );

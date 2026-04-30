@@ -387,6 +387,7 @@ const he = {
     "backToHome": "חזרה לדף הבית",
     "backToMenu": "חזרה לתפריט",
     "next": "הבא",
+    "stepOf": "שלב {current} מתוך {total}",
     "previous": "הקודם",
     "confirm": "אישור",
     "cancel": "ביטול",
@@ -1754,6 +1755,7 @@ const he = {
     "header": "מדריך מהיר",
     "loading": "טוען...",
     "skip": "דלג",
+    "skipTutorial": "דלגו על המדריך",
     "letsPlay": "בואו נשחק!",
     "timingHint": "10 השניות הראשונות קריטיות! 🎯",
     "step1Title": "החליקו אותיות",
@@ -1782,6 +1784,7 @@ const he = {
       "demoComplete": "הבנת! עכשיו את/ה יודע/ת לשחק.",
       "startHere": "התחילו כאן",
       "watchMe": "תראו!",
+      "demoAriaLabel": "הדגמה: {{word}}",
       "yourTurn": "תורכם! כתבו:",
       "letterCount": "{current}/{total}"
     },
@@ -1872,7 +1875,33 @@ const he = {
       "letsGo": "יאללה, מתחילים!",
       "chooseLanguage": "בחרו שפה",
       "letsPlay": "בואו נשחק",
-      "whereToStart": "מאיפה מתחילים?"
+      "whereToStart": "מאיפה מתחילים?",
+      "v2": {
+        "rewardsEarned": "פרסים שצברת",
+        "goldReward": "+{{gold}} זהב",
+        "goldEarned": "זהב שהרווחת",
+        "streak": "רצף",
+        "streakStarted": "יום 1 ברצף",
+        "achievementUnlocked": "מילים ראשונות",
+        "tomorrowBonus": "חזרו מחר לבונוס +50",
+        "scoreFooter": "{{score}} נק׳",
+        "claimAndPlay": "קחו ושחקו",
+        "skipForNow": "דלג בינתיים",
+        "titles": {
+          "wordling": "מילונאי",
+          "wordHunter": "צייד מילים!",
+          "wordsmith": "אומן מילים!",
+          "wordSlayer": "קוטל מילים!",
+          "wordLegend": "אגדת מילים!"
+        },
+        "mascotReactions": {
+          "wordling": "התחלה יפה!",
+          "wordHunter": "תראו אותך!",
+          "wordsmith": "אתם טבעיים!",
+          "wordSlayer": "אתם בוערים!",
+          "wordLegend": "הופעת בכורה אגדית!"
+        }
+      }
     }
   },
 
@@ -2307,29 +2336,30 @@ const he = {
   },
   "practiceResults": {
     "playAgain": "שחקו שוב",
+    "goHome": "חזרה לדף הבית",
     "orTrySomethingNew": "או נסו משהו חדש",
-    "wordsFound": "{count} מילים נמצאו",
+    "wordsFound": "מצאתם {count} מילים",
     "tryDaily": "אתגר יומי",
     "tryDailyDesc": "אותו פאזל, כולם מתחרים",
     "tryBots": "נגד בוטים",
-    "tryBotsDesc": "בדקו את הכישורים שלכם מול יריבי AI",
+    "tryBotsDesc": "אין עם מי לשחק? בוטים לא ישנים.",
     "tryMultiplayer": "שחקו עם חברים",
     "tryMultiplayerDesc": "קרבות מילים בזמן אמת",
-    "wordHuntCta": "שחקו ציד מילים יומי",
-    "wordHuntCtaDesc": "האתגר היומי מחכה לכם!",
+    "wordHuntCta": "לאתגר היומי",
+    "wordHuntCtaDesc": "ציד מילים חדש כל יום",
     "wordHuntAlreadyPlayed": "כבר שיחקתם היום",
     "wordHuntAlreadyPlayedDesc": "חזרו מחר!",
     "encouragement": {
-      "legendary": "מדהים!",
+      "legendary": "אדירים!",
       "great": "עבודה יפה!",
       "nice": "כל הכבוד!",
       "warmup": "התחלה מעולה!"
     },
     "subtitle": {
-      "legendary": "אתם על אש — אל תעצרו!",
-      "great": "יש לכם כישורי מילים רציניים",
-      "nice": "כל משחק משפר אתכם",
-      "warmup": "כל משחק מחזק אתכם — אתם בדרך!"
+      "legendary": "אתם בכושר — תמשיכו ככה",
+      "great": "יש לכם ראש למילים",
+      "nice": "כל משחק עושה את שלו",
+      "warmup": "מתחממים — בדרך הנכונה"
     }
   },
   "almostFound": {
@@ -2576,17 +2606,17 @@ const he = {
       "triesRule": {
         "title": "מה נחשב כניסיון?",
         "description": "רק מילים באורך הנכון משתמשות ב-10 הניסיונות שלך!",
-        "exampleTarget": "דוגמה: מילת היעד בת 5 אותיות",
-        "usesAttempt": "5 אותיות = משתמש בניסיון",
-        "noAttempt": "3 אותיות = בלי ניסיון, רק חיים!",
+        "exampleTarget": "דוגמה: מילת היעד בת 4 אותיות",
+        "usesAttempt": "4 אותיות = משתמש בניסיון",
+        "noAttempt": "2 אותיות = בלי ניסיון, רק חיים!",
         "keyInsight": "💡 מצא מילים קצרות בחינם לחיים בלי לבזבז ניסיונות!",
         "gotIt": "הבנתי!",
         "bonusTitle": "בונוס!",
-        "revealsClue": "מילים של 3+ אותיות גם חושפות רמזים!"
+        "revealsClue": "מילים קצרות גם חושפות רמזים!"
       },
       "letterFeedback": {
         "title": "קריאת הרמזים",
-        "example": "דוגמה: היעד הוא \"BEACH\"",
+        "example": "דוגמה",
         "gotIt": "הבנתי!",
         "legendGreen": "מקום נכון",
         "legendYellow": "מקום לא נכון",
@@ -2862,6 +2892,22 @@ const he = {
       "name": "שחקן נאמן",
       "description": "שיחק ב-30 ימים שונים"
     },
+    "EARLY_BIRD": {
+      "name": "מקדים ת'תור",
+      "description": "מילה ראשונה תוך 2 שניות"
+    },
+    "PALINDROME_HUNTER": {
+      "name": "צייד פלינדרומים",
+      "description": "מצאת מילה שנקראת אותו דבר משני הכיוונים"
+    },
+    "COMEBACK_CHAMPION": {
+      "name": "אלוף הקאמבק",
+      "description": "ניצחת אחרי זינוק עוצמתי בסיומת"
+    },
+    "FIRST_GAME_WIN": {
+      "name": "ניצחון ראשון",
+      "description": "ניצחת במשחק הראשון שלך"
+    },
     "DAILY_DOUBLE": {
       "name": "דאבל יומי 🏆",
       "description": "ריסקת את שני האתגרים היום!"
@@ -3099,6 +3145,8 @@ const he = {
     "firstWin": {
       "title": "מזל טוב על הניצחון הראשון!",
       "subtitle": "יש לך את זה! צור חשבון כדי להמשיך את רצף הניצחונות.",
+      "subtitleUrgency": "יש לך את זה! צור חשבון כדי להמשיך את רצף הניצחונות.",
+      "subtitleValueProp": "יש לך את זה! צור חשבון כדי להמשיך את רצף הניצחונות.",
       "benefitsTitle": "הירשם כדי לקבל:",
       "benefits": {
         "trackProgress": "עקוב אחר ההתקדמות שלך",
@@ -3111,7 +3159,9 @@ const he = {
     "signInWith": "התחבר עם {provider}",
     "multiGames": {
       "title": "אתה משתפר!",
-      "subtitle": "הירשם כדי לשמור את ההתקדמות שלך ולעקוב אחר ההישגים!"
+      "subtitle": "הירשם כדי לשמור את ההתקדמות שלך ולעקוב אחר ההישגים!",
+      "subtitleUrgency": "הירשם כדי לשמור את ההתקדמות שלך ולעקוב אחר ההישגים!",
+      "subtitleValueProp": "הירשם כדי לשמור את ההתקדמות שלך ולעקוב אחר ההישגים!"
     },
     "mpSignup": {
       "title": "שמור על ההתקדמות שלך",
@@ -3883,7 +3933,9 @@ const he = {
     "recentWords": "מילים אחרונות",
     "leaderboard": "טבלת מובילים",
     "words": "מילים",
-    "noPlayersYet": "אין שחקנים עדיין"
+    "noPlayersYet": "אין שחקנים עדיין",
+    "live": "בשידור",
+    "connecting": "מתחבר..."
   },
   "collectibles": {
     "title": "האוסף שלי",
@@ -3983,6 +4035,7 @@ const he = {
     "unequip": "הסר",
     "purchase": "קנה ({{cost}} זהב)",
     "close": "סגור",
+    "unlockedToast": "✨ קוסמטיקה חדשה נפתחה: {{name}}",
     "rarity": {
       "common": "נפוץ",
       "rare": "נדיר",
@@ -4043,7 +4096,7 @@ const he = {
     "globalRank": "דירוג גלובלי",
     "loading": "טוען טבלת מובילים...",
     "error": "שגיאה בטעינת טבלת המובילים",
-    "empty": "אין עדיין תוצאות. היה הראשון לשחק!",
+    "empty": "ריק לגמרי. בואו תקבעו את הרף.",
     "beFirstToPlay": "היה הראשון לשחק!",
     "refresh": "רענן",
     "best": "הכי טוב",
@@ -4137,7 +4190,7 @@ const he = {
     "gallery": {
       "title": "לוחות הקהילה",
       "boardCount": "לוחות",
-      "empty": "אין לוחות עדיין. היה הראשון ליצור!",
+      "empty": "אין לוחות עדיין. תהיו הראשונים — תפתחו את הטרנד.",
       "emptyHint": "צרו לוח מותאם ושתפו עם הקהילה",
       "emptyTitle": "אין לוחות עדיין",
       "emptySubtitle": "היה הראשון ליצור!",
@@ -4313,6 +4366,45 @@ const he = {
     "rankedAt": "מקום #{{position}}",
     "tierLabel": "דרגה"
   },
+  "seasonBadges": {
+    "section": {
+      "title": "גביעי עונה",
+      "empty": "סיימו ב-5 הראשונים בעונה כדי לזכות בגביע אספני",
+      "count": "{{count}} הושגו",
+      "viewAll": "הצג הכל"
+    },
+    "title": {
+      "rank1": "אלוף",
+      "rank2": "סגן אלוף",
+      "rank3": "מקום שלישי",
+      "rank4": "טופ 5",
+      "rank5": "טופ 5"
+    },
+    "subtitle": "{{theme}} · עונה {{seasonId}}",
+    "modal": {
+      "headline": "סיימת במקום ה-{{rank}}!",
+      "subhead": "{{theme}} - גביע נפתח",
+      "collectible": "אספן קבוע",
+      "viewProfile": "הצג בפרופיל"
+    },
+    "recap": {
+      "title": "סיכום עונה",
+      "bestRank": "הדירוג הטוב ביותר",
+      "totalGames": "משחקים",
+      "finalScore": "ניקוד סופי",
+      "peakTier": "שיא דרגה",
+      "stats": "המספרים שלך"
+    },
+    "rarity": {
+      "legendary": "אגדי",
+      "epic": "אפי",
+      "rare": "נדיר",
+      "uncommon": "לא רגיל"
+    },
+    "publicProfile": {
+      "title": "הגביעים העונתיים של {{username}}"
+    }
+  },
   "growth": {
     "dayStreak": "ימי רצף",
     "daysAway": "ימים נותרו",
@@ -4432,6 +4524,8 @@ const he = {
     "welcomeTitle": "מילים. יריבים. תהילה.",
     "welcomeSubtitle": "חינם. בלי הרשמה. בלי תשלום לניצחון.",
     "playTodayChallenge": "שחקו באתגר היומי",
+    "moreGameModes": "עוד מצבי משחק",
+    "moreGameModesHint": "הקישו לגילוי",
     "singlePlayer": "משחק מהיר",
     "singlePlayerDesc": "קפצו פנימה ושחקו מיד",
     "badgeBots": "בוטים",
@@ -4452,6 +4546,7 @@ const he = {
     "practice": "תרגול",
     "practiceDesc": "בלי לחץ, רק מילים",
     "practiceFirstToUnlock": "סיים תרגול כדי לפתוח",
+    "playGamesToUnlock": "שחקו {count} משחקים לפתיחה",
     "brainTraining": "אימון קוגניטיבי",
     "brainTrainingDesc": "עקוב אחר התפתחות קוגניטיבית",
     "adventureMode": "הרפתקה",
@@ -4481,7 +4576,7 @@ const he = {
     "shareSubtitleGuest": "שחק עם חברים!",
     "shareButton": "שתף",
     "shareTextAuth": "הצטרף אלי ב-LexiClash! השתמש בקוד ההפניה שלי: {code}",
-    "shareTextGuest": "שחק LexiClash - משחק המילים הרב-משתתפים הכי טוב!",
+    "shareTextGuest": "בוא תשחק איתי LexiClash — נראה מי יותר טוב.",
     "shareNativeTitle": "הצטרף ל-LexiClash",
     "playNowFree": "שחקו עכשיו — חינם!",
     "letsPlay": "בואו נשחק!",
@@ -4593,7 +4688,7 @@ const he = {
       "faq5A": "כן. לקסיקלאש מיועד לשחקנים מגיל 6 ומעלה. אנחנו עומדים בתקנות COPPA, מציגים רק פרסומות לא מותאמות אישית ולא עוקבים אחרי התנהגות הגלישה של ילדים.",
       "faq6Q": "אפשר ליצור לוח משלי?",
       "faq6A": "כן! השתמשו בבונה הלוחות הקהילתי כדי לעצב לוחות אותיות מותאמים אישית. פרסמו אותם כדי ששחקנים אחרים ישחקו, ידרגו ויתחרו. הלוחות הטובים ביותר מוצגים בעמוד הבית.",
-      "communityTitle": "הצטרפו לאלפי חובבי משחקי מילים",
+      "communityTitle": "כאן כולם משוגעים על מילים.",
       "communityContent": "שחקני לקסיקלאש מגיעים מיותר מ-40 מדינות וחמש שפות. הצטרפו לקהילה כדי להתחרות בטבלאות מובילים גלובליות, לשתף תוצאות אתגר יומי ולגלות אסטרטגיות מילים חדשות. עקבו אחרינו באינסטגרם @lexi.clash לטיפים, עדכונים ואירועי קהילה."
     },
     "firstTimer": {
@@ -4717,10 +4812,12 @@ const he = {
     },
     "features": {
       "unlocked": {
+        "modeRoster": "מצבי משחק",
+        "modeRosterDesc": "כל המצבים נפתחו!",
         "practiceMode": "מצב אימון",
         "practiceModeDesc": "התאמנו בקצב שלכם",
         "challengeMode": "מצב אתגר",
-        "challengeModeDesc": "בחנו את הכישורים שלכם עם חידות קשות יותר",
+        "challengeModeDesc": "לוחות יותר קשים. בלי רחמים.",
         "customBotCount": "בוטים מותאמים",
         "customBotCountDesc": "בחרו כמה בוטים לשחק נגדם",
         "advancedSettings": "הגדרות מתקדמות",
@@ -4814,8 +4911,8 @@ const he = {
   "rules": {
     "pageTitle": "לקסיקלאש: קרב מילים בזמן אמת",
     "gameModes": "מצבי משחק",
-    "readyToTest": "מוכנים לבחון את כישורי המילים שלכם?",
-    "readyToTestDesc": "הצטרפו לאלפי שחקנים בחוויית קרב המילים האולטימטיבית. צרו חדר, הזמינו חברים וגלו מי בעל אוצר המילים הטוב ביותר!",
+    "readyToTest": "מי מתמודד?",
+    "readyToTestDesc": "פתחו חדר, גררו את החברים פנימה, תגלו מי באמת חזק.",
     "startPlaying": "התחילו לשחק עכשיו",
     "backToHome": "חזרה לדף הבית",
     "joinOrCreateDesc": "צרו חדר משחק משלכם או הצטרפו לחדר קיים באמצעות קוד. שתפו את הקוד עם חברים כדי להזמין אותם מיד.",
@@ -4834,7 +4931,7 @@ const he = {
     "dontOverthinkDesc": "שלחו מילים ברורות של 3-4 אותיות במהירות ללא היסוס. הן מצטברות מהר ונותנות לכם בסיס מוצק בזמן שאתם מחפשים מילים ארוכות יותר.",
     "soloVsBotsDesc": "התחרו נגד יריבי בינה מלאכותית ברמות קושי שונות. מושלם לתרגול אסטרטגיות לפני אתגור שחקנים אמיתיים.",
     "practiceModeDesc": "קחו את הזמן שלכם ללא טיימר. מושלם ללמידת מילים חדשות וחקירת הלוח ללא לחץ.",
-    "challengeModeDesc": "שברו את השיאים האישיים שלכם ועקבו אחר ההתקדמות לאורך זמן. התחרו נגד עצמכם!"
+    "challengeModeDesc": "תנצחו את הגרסה הישנה של עצמכם. תראו את הניקוד עולה."
   },
   "social": {
     "playersOnline": "שחקנים מחוברים",
@@ -4902,7 +4999,7 @@ const he = {
         "trackResults": "ראו מי מנצח באתגר שלכם"
       },
       "ctaButton": "הירשמו והתחילו ליצור",
-      "socialProof": "הצטרפו לאלפים שיוצרים אתגרים"
+      "socialProof": "המון לוחות נבנים ממש עכשיו."
     },
     "download": "שמור כתמונה",
     "downloadImage": "שמור תמונה לשיתוף",
@@ -5033,7 +5130,7 @@ const he = {
     },
     "nextChallenge": {
       "wordHuntTitle": "⚡ ציד מילים יומי מחכה!",
-      "wordHuntDesc": "בדוק את המהירות שלך! מצא את המילה המבוקשת מהר ככל האפשר.",
+      "wordHuntDesc": "מירוץ נגד השעון. תפסו את המילה.",
       "wordHuntCTA": "שחק ציד מילים",
       "buzzTitle": "🔥 אתגר Buzz יומי!",
       "buzzDesc": "נושאים טרנדיים! פתור חידות מילים שנוצרו בAI.",
@@ -8106,6 +8203,12 @@ const he = {
       "cta": "צפה בפרסומת ל-+{moves} צעדים",
       "decline": "סיים משחק"
     },
+    "retryWaveModal": {
+      "title": "גל {wave} — כמעט הצלחת!",
+      "body": "ניקית {percent}%. צפה בפרסומת ונסה שוב את גל {wave} — הגלים הקודמים נשמרים.",
+      "cta": "נסה שוב את גל {wave}",
+      "decline": "התחל מחדש מגל 1"
+    },
     "pregameBuff": {
       "title": "לחזק?",
       "body": "בחר בוסט, צפה בפרסומת קצרה, והתחל את הריצה עם יתרון.",
@@ -8276,6 +8379,7 @@ const he = {
       "newBadge": "חדש",
       "waveFailed": "הגל נכשל",
       "needClearPct": "נדרש ניקוי של {required}% — ניקית {got}%",
+      "tilesShort": "חסרו רק {count} משבצות!",
       "failHint": "יש לנקות לפחות 90% מהלוח כדי להתקדם",
       "tryAgain": "נסה שוב",
       "share": "שתף",
@@ -8377,6 +8481,8 @@ const he = {
     "celebrateAgain": "חגוג שוב",
     "best": "שיא",
     "movesLeft": "מהלכים",
+    "luckyBoost": "בונוס מזל",
+    "luckyBoostDesc": "מטילים מיוחדים יותר אחרי רצף קשה",
     "bonusMove": "+1 מהלך!",
     "bonusMoves": "+{count} מהלכים!",
     "outOfMoves": "נגמרו המהלכים!",
@@ -8394,7 +8500,29 @@ const he = {
       "collectType": "אסוף {target} {tileType}",
       "clearAllType": "נקה את כל ה{tileType}",
       "wordLength": "{target} מילים של {minWordLength}+ אותיות",
-      "clearPercent": "נקה {target}% מהלוח"
+      "clearPercent": "נקה {target}% מהלוח",
+      "targetWord": "מצא: {word}",
+      "targetWordFoundIt": "מצאת!",
+      "targetWordMissed": "המטרה הייתה: {word} — המפלים תפסו אותה!",
+      "colorPower": "השתמש ב-{count}+ אריחים {color} במילה אחת",
+      "colorPink": "ורוד",
+      "colorCyan": "טורקיז",
+      "colorLime": "ליים",
+      "bannerTitle": "מטרות"
+    },
+    "hint": {
+      "free": "חינם",
+      "ad": "רמז",
+      "aria": {
+        "free": "רמז חינם — עולה 25 נק'",
+        "ad": "צפה בפרסומת לרמז — עולה 25 נק'"
+      },
+      "toast": {
+        "targetWord": "נסה ליצור: {word}",
+        "colorPower": "חפש אריחים בצבע {color}",
+        "collectType": "מצא עוד {tileType}",
+        "clearAllType": "נקה את ה{tileType} שנותרו"
+      }
     },
     "combo": {
       "bomb_bomb": "מגה פיצוץ!",
@@ -9203,7 +9331,7 @@ const he = {
       "roleGuest": "אורח",
       "roleStudent": "תלמיד",
       "roleTeacher": "מורה",
-      "socialProof": "הצטרפו לאלפי לומדים",
+      "socialProof": "לא רק אתם לומדים פה.",
       "student": "תלמיד",
       "studentCta": "התחל ללמוד",
       "studentDesc": "בנו אוצר מילים דרך משחק",
@@ -9746,7 +9874,7 @@ const he = {
       "practiceMode": "מצב אימון",
       "practiceModeDesc": "התאמנו בקצב שלכם",
       "challengeMode": "מצב אתגר",
-      "challengeModeDesc": "בחנו את הכישורים שלכם עם חידות קשות יותר",
+      "challengeModeDesc": "לוחות יותר קשים. בלי רחמים.",
       "customBotCount": "בוטים מותאמים",
       "customBotCountDesc": "בחרו כמה בוטים לשחק נגדם",
       "advancedSettings": "הגדרות מתקדמות",
@@ -10669,6 +10797,7 @@ const he = {
     "title": "בחרו בוסט",
     "cta": "בוסט",
     "close": "סגור",
+    "skipAndPlay": "שחקו בלי בוסט",
     "remaining": "בוסטים שנותרו היום: {{n}}/{{cap}}",
     "watchAd": "צפו בפרסומת כדי לפתוח",
     "activeThisGame": "פעיל במשחק זה",

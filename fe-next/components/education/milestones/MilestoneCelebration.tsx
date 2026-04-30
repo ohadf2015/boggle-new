@@ -119,7 +119,7 @@ export const MilestoneCelebration = memo<MilestoneCelebrationProps>(
                 />
               ) : (
                 <SilentVideo
-                  src="/mascot/celebration.mp4"
+                  src="/mascot/celebration.webp"
                   width={80}
                   height={80}
                   className="mx-auto drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]"

@@ -18,7 +18,11 @@ type PresetName =
   | 'level-up-burst'
   | 'word-found'
   | 'combo-break'
-  | 'victory-burst';
+  | 'victory-burst'
+  | 'boost-freezeTime'
+  | 'boost-hint'
+  | 'boost-scoreMultiplier'
+  | 'boost-firstWordBonus';
 
 // Palette drawn from neo-brutalist design system (no #).
 const LIME = 'BFFF00';
@@ -196,6 +200,76 @@ export const PRESETS: Record<PresetName, ParticleConfig> = {
     alpha: { start: 1, end: 0 },
     rotationSpeed: { min: 4, max: 8 },
     colors: [PINK, LIME],
+    spawnShape: 'burst',
+    blendMode: 'add',
+    shape: 'diamond',
+  },
+
+  // Boost: freezeTime — icy diamond shards, no gravity (frozen-in-air feel).
+  'boost-freezeTime': {
+    maxParticles: 20,
+    frequency: 0,
+    emitterLifetime: 0.01,
+    particlesPerWave: 14,
+    lifetime: { min: 0.6, max: 0.9 },
+    speed: { min: 80, max: 200 },
+    scale: { start: 1.1, end: 0 },
+    alpha: { start: 1, end: 0 },
+    rotationSpeed: { min: 1, max: 3 },
+    colors: [CYAN, 'FFFFFF', '7DD3FC'],
+    spawnShape: 'burst',
+    blendMode: 'add',
+    shape: 'diamond',
+  },
+
+  // Boost: hint — bright lightbulb stars, fast pop, slight gravity.
+  'boost-hint': {
+    maxParticles: 16,
+    frequency: 0,
+    emitterLifetime: 0.01,
+    particlesPerWave: 12,
+    lifetime: { min: 0.5, max: 0.8 },
+    speed: { min: 100, max: 220 },
+    gravity: { x: 0, y: 80 },
+    scale: { start: 1, end: 0 },
+    alpha: { start: 1, end: 0 },
+    rotationSpeed: { min: 4, max: 8 },
+    colors: [YELLOW, LIME, 'FFFFFF'],
+    spawnShape: 'burst',
+    blendMode: 'add',
+    shape: 'star',
+  },
+
+  // Boost: scoreMultiplier — high-stakes pink/gold shower with gravity.
+  'boost-scoreMultiplier': {
+    maxParticles: 24,
+    frequency: 0,
+    emitterLifetime: 0.01,
+    particlesPerWave: 18,
+    lifetime: { min: 0.7, max: 1.1 },
+    speed: { min: 200, max: 420 },
+    gravity: { x: 0, y: 280 },
+    scale: { start: 1.1, end: 0 },
+    alpha: { start: 1, end: 0 },
+    rotationSpeed: { min: 4, max: 8 },
+    colors: [PINK, GOLD, YELLOW],
+    spawnShape: 'burst',
+    blendMode: 'add',
+    shape: 'star',
+  },
+
+  // Boost: firstWordBonus — encouraging lime/cyan ring-out (MP only).
+  'boost-firstWordBonus': {
+    maxParticles: 18,
+    frequency: 0,
+    emitterLifetime: 0.01,
+    particlesPerWave: 12,
+    lifetime: { min: 0.5, max: 0.9 },
+    speed: { min: 120, max: 260 },
+    scale: { start: 1, end: 0 },
+    alpha: { start: 1, end: 0 },
+    rotationSpeed: { min: 3, max: 6 },
+    colors: [LIME, CYAN, 'FFFFFF'],
     spawnShape: 'burst',
     blendMode: 'add',
     shape: 'diamond',

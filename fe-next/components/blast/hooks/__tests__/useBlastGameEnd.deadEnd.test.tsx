@@ -104,7 +104,10 @@ describe('useBlastGameEnd — dead-end finale callback', () => {
     await act(async () => { await vi.runAllTimersAsync(); });
 
     expect(deps.onGameEnd).toHaveBeenCalledTimes(1);
-    expect(deps.engine.getResults).toHaveBeenCalledWith(3);
+    // getResults signature now (maxCombo, wavesCompleted?, waveResults?, allObjectivesComplete?)
+    // — the wave-end caller passes the objective-complete flag through so
+    // the results screen caps stars at 2 when objectives weren't met.
+    expect(deps.engine.getResults).toHaveBeenCalledWith(3, undefined, undefined, false);
   });
 
   it('flips sugarCrushActive true during cascade and false after finale', async () => {

@@ -3,6 +3,7 @@
 import { createContext, useContext, useCallback, useState, useEffect, ReactNode } from 'react';
 import { useCrazyGamesViewport } from '@/hooks/useCrazyGamesViewport';
 import { useCrazyGamesScrollPrevention } from '@/hooks/useCrazyGamesScrollPrevention';
+import { trackAdLifecycle, type AdType } from '@/utils/posthogEngagement';
 import {
   CRAZYGAMES_NOOP_CONTEXT,
   type CrazyGamesEnvironment,
@@ -212,22 +213,46 @@ export function CrazyGamesProvider({ children }: { children: ReactNode }) {
     if (isAvailable && typeof window.CrazyGames?.SDK?.game?.trackEvent === 'function') window.CrazyGames.SDK.game.trackEvent(eventName);
   }, [isAvailable]);
 
-  // Ad handlers
-  const showMidgameAd = useCallback((callbacks?: AdCallbacks) => {
+  // Ad handlers — wrap callbacks with lifecycle telemetry so PostHog can
+  // compute fill rate (shown/requested) and completion rate (completed/shown).
+  // CG revenue tracks completion; surfacing skip/error helps tune frequency.
+  const wrapAdCallbacks = useCallback((adType: AdType, placement: string, callbacks?: AdCallbacks): AdCallbacks => {
+    return {
+      adStarted: () => {
+        trackAdLifecycle({ event: 'shown', adType, placement });
+        callbacks?.adStarted?.();
+      },
+      adFinished: () => {
+        trackAdLifecycle({ event: 'completed', adType, placement });
+        callbacks?.adFinished?.();
+      },
+      adError: (err: string) => {
+        trackAdLifecycle({ event: 'error', adType, placement, errorMessage: err });
+        callbacks?.adError?.(err);
+      },
+    };
+  }, []);
+
+  const showMidgameAd = useCallback((callbacks?: AdCallbacks, placement: string = 'between_games') => {
+    trackAdLifecycle({ event: 'requested', adType: 'midgame', placement });
     if (isAvailable && window.CrazyGames?.SDK) {
-      window.CrazyGames.SDK.ad.requestAd('midgame', callbacks);
+      window.CrazyGames.SDK.ad.requestAd('midgame', wrapAdCallbacks('midgame', placement, callbacks));
     } else {
+      // No SDK → mark as skipped so the funnel reflects denominator correctly.
+      trackAdLifecycle({ event: 'skipped', adType: 'midgame', placement });
       callbacks?.adFinished?.();
     }
-  }, [isAvailable]);
+  }, [isAvailable, wrapAdCallbacks]);
 
-  const showRewardedAd = useCallback((callbacks?: AdCallbacks) => {
+  const showRewardedAd = useCallback((callbacks?: AdCallbacks, placement: string = 'reward') => {
+    trackAdLifecycle({ event: 'requested', adType: 'rewarded', placement });
     if (isAvailable && window.CrazyGames?.SDK) {
-      window.CrazyGames.SDK.ad.requestAd('rewarded', callbacks);
+      window.CrazyGames.SDK.ad.requestAd('rewarded', wrapAdCallbacks('rewarded', placement, callbacks));
     } else {
+      trackAdLifecycle({ event: 'error', adType: 'rewarded', placement, errorMessage: 'SDK not available' });
       callbacks?.adError?.('SDK not available');
     }
-  }, [isAvailable]);
+  }, [isAvailable, wrapAdCallbacks]);
 
   const hasAdblock = useCallback(async (): Promise<boolean> => {
     if (isAvailable && window.CrazyGames?.SDK) return window.CrazyGames.SDK.ad.hasAdblock();

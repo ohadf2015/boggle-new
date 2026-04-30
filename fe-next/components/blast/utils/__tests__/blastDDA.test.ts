@@ -2,10 +2,36 @@ import {
   createDDAState,
   updateDDA,
   getDDASpawnModifier,
+  isDDABoostActive,
   DDA_BOOST_PERCENT,
   DDA_REDUCE_PERCENT,
   type BlastDDAState,
 } from '../blastDDA';
+
+describe('isDDABoostActive', () => {
+  it('returns false at start', () => {
+    expect(isDDABoostActive(createDDAState())).toBe(false);
+  });
+
+  it('returns false after 1 fail', () => {
+    const s = updateDDA(createDDAState(), 'fail');
+    expect(isDDABoostActive(s)).toBe(false);
+  });
+
+  it('returns true after 2 consecutive fails', () => {
+    let s = updateDDA(createDDAState(), 'fail');
+    s = updateDDA(s, 'fail');
+    expect(isDDABoostActive(s)).toBe(true);
+  });
+
+  it('returns false after a success resets the streak', () => {
+    let s = updateDDA(createDDAState(), 'fail');
+    s = updateDDA(s, 'fail');
+    expect(isDDABoostActive(s)).toBe(true);
+    s = updateDDA(s, 'success');
+    expect(isDDABoostActive(s)).toBe(false);
+  });
+});
 
 describe('blastDDA — pure DDA state machine', () => {
   // ── createDDAState ─────────────────────────────────────────────────────────

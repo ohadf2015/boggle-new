@@ -35,9 +35,10 @@ describe('CosmeticPreview', () => {
     expect(onEquip).toHaveBeenCalledWith('tile-neon');
   });
 
-  it('shows unlock condition when locked', () => {
+  it('shows unlock condition when locked (rank cosmetic shows tier requirement)', () => {
     render(<CosmeticPreview cosmetic={mockCosmetic} isUnlocked={false} onClose={() => {}} />);
-    expect(screen.getByText('cosmetics.locked')).toBeDefined();
+    // mock cosmetic is rank-Silver → renders the rank-unlock translation key
+    expect(screen.getByText(/cosmetics\.unlock\.rank/)).toBeDefined();
   });
 
   it('shows purchase button for purchasable locked items', () => {

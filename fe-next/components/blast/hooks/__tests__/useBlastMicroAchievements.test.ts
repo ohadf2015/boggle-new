@@ -99,4 +99,19 @@ describe('useBlastMicroAchievements', () => {
     rerender({ snap: makeSnap({ maxCombo: 2 }) });
     expect(result.current.currentId).toBeNull();
   });
+
+  it('never surfaces a toast when enabled=false', () => {
+    const { result, rerender } = renderHook(
+      ({ snap }: { snap: BlastMicroState }) =>
+        useBlastMicroAchievements(snap, { enabled: false, displayMs: 500 }),
+      { initialProps: { snap: makeSnap() } },
+    );
+    expect(result.current.currentId).toBeNull();
+
+    rerender({ snap: makeSnap({ maxCombo: 3, longestWordLen: 6 }) });
+    expect(result.current.currentId).toBeNull();
+
+    act(() => { vi.advanceTimersByTime(2000); });
+    expect(result.current.currentId).toBeNull();
+  });
 });

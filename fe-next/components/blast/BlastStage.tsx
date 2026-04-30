@@ -29,7 +29,8 @@ import type { ScoreFlyEvent } from './BlastScoreFly';
 import { BlastBackground } from './BlastBackground';
 import { cn } from '@/lib/utils';
 import type { LetterGrid, Language, Avatar } from '@/shared/types/game';
-import type { BlastTileState, BlastGameState } from './types';
+import { BlastObjectiveBanner } from './BlastObjectiveBanner';
+import type { BlastTileState, BlastGameState, BlastObjectiveProgress } from './types';
 import type { SequencerState } from './hooks/useBlastSequencer';
 import type { ClearedTileEvent } from './BlastEffectsCanvas';
 import type { ComboStreakState } from './hooks/useBlastComboStreak';
@@ -89,6 +90,14 @@ interface BlastStageProps {
   // Pre-game buff visibility (HUD chip)
   activeBuff?: 'shield' | 'bomb' | 'combo2x' | null;
   buffConsumed?: boolean;
+  // Persistent goal banner — non-dismissable secondary objectives
+  objectiveProgress?: BlastObjectiveProgress[];
+  // Visible "Lucky Boost" indicator — DDA assist surfacing
+  ddaBoostActive?: boolean;
+  // Optional hint button (wave 6+) rendered in HUD controls
+  hintSlot?: React.ReactNode;
+  // Optional hint toast overlaid above the grid for HINT_HIGHLIGHT_MS
+  hintToast?: React.ReactNode;
   // Translation
   t: (key: string) => string | undefined;
 }
@@ -135,6 +144,10 @@ export const BlastStage = memo(function BlastStage({
   wordSubmitCount = 0,
   activeBuff = null,
   buffConsumed = false,
+  objectiveProgress = [],
+  ddaBoostActive = false,
+  hintSlot,
+  hintToast,
   t,
 }: BlastStageProps) {
   const { score, wordsFound, movesRemaining, totalMoves, tilesCleared, totalTiles, isComplete, isDeadEnd } = gameState;
@@ -181,7 +194,11 @@ export const BlastStage = memo(function BlastStage({
     longestWordLen: Math.max(microStateRef.current.longestWordLen, lastWordLength),
     wavesCompleted: Math.max(microStateRef.current.wavesCompleted, Math.max(0, waveNumber - 1)),
   };
-  const { currentId: microId } = useBlastMicroAchievements(microStateRef.current);
+  // Sprint 1 clarity guard: in-wave micro-achievement toasts disabled — they
+  // pile up over goal banner + combos and read as noise per LLM critique
+  // consensus. Achievements still surface in the end-of-wave summary via
+  // useBlastBadgeUnlocks (a separate path).
+  const { currentId: microId } = useBlastMicroAchievements(microStateRef.current, { enabled: false });
 
   return (
     <div className="flex-1 flex flex-col h-full overflow-hidden relative pb-safe" data-testid="blast-stage">
@@ -228,8 +245,12 @@ export const BlastStage = memo(function BlastStage({
         comboStreakArcRef={comboStreakArcRef}
         activeBuff={activeBuff}
         buffConsumed={buffConsumed}
+        ddaBoostActive={ddaBoostActive}
+        hintSlot={hintSlot}
         t={t}
       />
+      <BlastObjectiveBanner objectives={objectiveProgress} t={t} />
+      {hintToast}
       </div>
 
       {/* 1b. Live leaderboard strip (MP only) */}

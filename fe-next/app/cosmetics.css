@@ -194,3 +194,24 @@
   color: #ffe8cc !important;
   text-shadow: 0 0 4px rgba(255, 200, 0, 0.6);
 }
+
+/* ============================================================
+   Avatar Frames — applied via .avatar-{frameId} on rounded wrapper
+   Used by Avatar component when player equips a profileFrame.
+   ============================================================ */
+
+.avatar-frame-bronze {
+  box-shadow: 0 0 0 3px #cd7f32, 0 0 0 5px #5a3514, 2px 2px 0 5px #000;
+}
+
+.avatar-frame-silver {
+  box-shadow: 0 0 0 3px #d8d8d8, 0 0 0 5px #6e6e6e, 2px 2px 0 5px #000;
+}
+
+.avatar-frame-gold {
+  box-shadow: 0 0 0 3px #ffe135, 0 0 12px 4px rgba(255, 225, 53, 0.55), 2px 2px 0 5px #000;
+}
+
+.avatar-frame-diamond {
+  box-shadow: 0 0 0 3px #00ffff, 0 0 16px 4px rgba(0, 255, 255, 0.6), 2px 2px 0 5px #000;
+}

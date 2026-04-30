@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import Avatar from '@/components/Avatar';
 import AvatarBuilderModal from '@/components/avatar/AvatarBuilderModal';
 import { useAvatarPremium } from '@/hooks/useAvatarPremium';
+import { useEquippedCosmetic } from '@/hooks/useEquippedCosmetic';
 import { CountrySelector } from '@/components/settings/CountrySelector';
 import { getCountryFlag } from '@/shared/utils/countryUtils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -52,6 +53,7 @@ export function ProfileHeader({
   const [isSavingCountry, setIsSavingCountry] = useState(false);
   const [isAvatarBuilderOpen, setIsAvatarBuilderOpen] = useState(false);
   const avatarPremium = useAvatarPremium();
+  const equippedFrame = useEquippedCosmetic('profileFrame');
 
   const startEditingName = (): void => {
     setEditDisplayName(profile?.display_name || profile?.username || '');
@@ -132,7 +134,10 @@ export function ProfileHeader({
         <div className="relative shrink-0">
           <div
             className={cn(
-              'relative rounded-full overflow-hidden ring-2 ring-neo-cyan/30 ring-offset-2 ring-offset-slate-800/40',
+              'relative rounded-full overflow-hidden',
+              !equippedFrame || equippedFrame === 'frame-none'
+                ? 'ring-2 ring-neo-cyan/30 ring-offset-2 ring-offset-slate-800/40'
+                : '',
               compact ? 'w-20 h-20' : 'w-24 h-24'
             )}
           >
@@ -141,6 +146,7 @@ export function ProfileHeader({
               userId={profile?.id}
               size={compact ? 'lg' : '2xl'}
               className="w-full h-full"
+              frame={equippedFrame}
             />
           </div>
 

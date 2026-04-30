@@ -3,7 +3,8 @@
  * Tests focus on the assembly logic: onRetrySave wiring + modeStats derivation.
  */
 import { renderHook, act } from '@testing-library/react';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import * as offlineQueue from '@/lib/adventure/offlineCompletionQueue';
 import { useAdventureOverlayProps } from '../useAdventureOverlayProps';
 
 const makeParams = (overrides: Partial<Parameters<typeof useAdventureOverlayProps>[0]> = {}) => {
@@ -81,6 +82,13 @@ const makeParams = (overrides: Partial<Parameters<typeof useAdventureOverlayProp
 };
 
 describe('useAdventureOverlayProps', () => {
+  beforeEach(() => {
+    vi.spyOn(offlineQueue, 'peekQueue').mockReturnValue([]);
+  });
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   it('returns a spreadable object with core overlay props', () => {
     const params = makeParams();
     const { result } = renderHook(() => useAdventureOverlayProps(params));
@@ -144,6 +152,25 @@ describe('useAdventureOverlayProps', () => {
     const failRef = { current: true };
     const params = makeParams({
       isGuest: true,
+      levelCompletion: { ...makeParams().levelCompletion, completionSaveFailedRef: failRef },
+    });
+    const { result } = renderHook(() => useAdventureOverlayProps(params));
+    expect(result.current.saveFailed).toBe(false);
+  });
+
+  it('saveFailed is suppressed when the offline queue has pending items', () => {
+    // The save was queued for offline replay — the system will retry it.
+    // Showing "Progress not saved" here would be a false alarm.
+    vi.spyOn(offlineQueue, 'peekQueue').mockReturnValue([
+      {
+        world: 1, level: 3, stars: 2, score: 500, words: 8,
+        queuedAt: Date.now(),
+      },
+    ]);
+    const failRef = { current: true };
+    const params = makeParams({
+      isGuest: false,
+      showLevelComplete: true,
       levelCompletion: { ...makeParams().levelCompletion, completionSaveFailedRef: failRef },
     });
     const { result } = renderHook(() => useAdventureOverlayProps(params));

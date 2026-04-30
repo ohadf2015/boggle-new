@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Clock, Shuffle, RotateCcw, Sparkles, Flame, TrendingUp, ChevronUp } from 'lucide-react';
+import { Clock, Shuffle, RotateCcw, Sparkles, Flame, TrendingUp, ChevronUp, Check } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { isValidWordWheelWord, type WordWheelPuzzle } from '@/utils/dailyChallenge/wordWheelGeneration';
@@ -11,6 +11,7 @@ import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import type { WordWheelEffect } from './WordWheelEffectsCanvas';
 import { WheelLetter, WordTile } from './WordWheelParts';
 import { useWordWheelKeyboard } from '@/hooks/useWordWheelKeyboard';
+import { useEquippedCosmetic } from '@/hooks/useEquippedCosmetic';
 import { trackGameEnd, trackGameStart } from '@/utils/growthTracking';
 import dynamic from 'next/dynamic';
 
@@ -46,6 +47,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
     playTileSelectSound, playWordAcceptedSound, playWordRejectedSound,
     playComboSound, playLegendaryWordSound, playEpicVictorySound,
     playCountdownBeep, playBoardShuffleSound, playButtonClickSound,
+    playWordLengthSound,
   } = useSoundEffects();
 
   // Built word: array of { letter, wheelIndex } — wheelIndex: -1 = center
@@ -401,6 +403,9 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
           haptic([50, 30, 50, 30, 80]);
         } else {
           playWordAcceptedSound();
+          if (word.length >= 5) {
+            playWordLengthSound(word.length);
+          }
           haptic(newCombo >= 2 ? [15, 30, 15, 30, 15] : 20);
         }
         if (newCombo >= 2) {
@@ -424,7 +429,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
     } finally {
       setIsValidating(false);
     }
-  }, [builtWord, isValidating, puzzle, wordsFound, onValidateWord, showFeedback, t, onEffect, combo, playWordRejectedSound, playWordAcceptedSound, playLegendaryWordSound, playComboSound]);
+  }, [builtWord, isValidating, puzzle, wordsFound, onValidateWord, showFeedback, t, onEffect, combo, playWordRejectedSound, playWordAcceptedSound, playLegendaryWordSound, playComboSound, playWordLengthSound]);
 
   // Keep submit ref fresh so double-tap handler (created earlier) can reach the latest closure.
   useEffect(() => { handleSubmitRef.current = handleSubmit; }, [handleSubmit]);
@@ -457,8 +462,21 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
   const minutes = Math.floor(timeLeft / 60);
   const seconds = timeLeft % 60;
 
+  const equippedBoardTheme = useEquippedCosmetic('boardTheme');
+
   return (
-    <div ref={gameContainerRef} className="relative flex flex-col items-center w-full flex-1 max-w-lg mx-auto px-3 sm:px-4 pb-3">
+    <div
+      ref={gameContainerRef}
+      className={cn(
+        // Defense in depth: parent (WordWheelChallenge playing wrapper) already
+        // reserves --bottom-stack-height, but if banner ever paints anyway
+        // (Android mid-nav race, future routes), the found-words list below
+        // the sticky action bar would bleed into reserved zone. pb-bottom-stack
+        // here keeps the list above any banner overlap.
+        'relative flex flex-col items-center w-full flex-1 max-w-lg mx-auto px-3 sm:px-4 pb-bottom-stack rounded-neo',
+        equippedBoardTheme && `cosmetic-board-${equippedBoardTheme.replace('board-', '')}`,
+      )}
+    >
       {/* ── Timer & Score Bar ── */}
       <div className="w-full space-y-1.5">
         <div className="flex items-center justify-between w-full gap-2">
@@ -467,21 +485,23 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
             <span className="tabular-nums">{minutes}:{seconds.toString().padStart(2, '0')}</span>
           </div>
           <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-            {/* Combo counter */}
-            <AnimatePresence>
-              {combo >= 2 && (
-                <motion.div
-                  className="flex items-center gap-1 px-1.5 py-0.5 rounded-neo border-2 border-neo-black bg-linear-to-r from-neo-pink to-neo-red shadow-[0_0_10px_rgba(255,20,147,0.4)] shrink-0"
-                  initial={{ scale: 0, x: 20 }}
-                  animate={{ scale: 1, x: 0 }}
-                  exit={{ scale: 0, x: 20 }}
-                  transition={{ type: 'spring', stiffness: 500 }}
-                >
-                  <Flame className="w-3.5 h-3.5 text-neo-white" />
-                  <span className="font-neo-display font-black text-neo-white text-xs sm:text-sm">x{combo}</span>
-                </motion.div>
-              )}
-            </AnimatePresence>
+            {/* Combo counter — reserved slot avoids horizontal layout shift in top bar */}
+            <div data-testid="combo-slot" className="min-w-[56px] sm:min-w-[64px] flex justify-end shrink-0">
+              <AnimatePresence>
+                {combo >= 2 && (
+                  <motion.div
+                    className="flex items-center gap-1 px-1.5 py-0.5 rounded-neo border-2 border-neo-black bg-linear-to-r from-neo-pink to-neo-red shadow-[0_0_10px_rgba(255,20,147,0.4)] shrink-0"
+                    initial={{ scale: 0, x: 20 }}
+                    animate={{ scale: 1, x: 0 }}
+                    exit={{ scale: 0, x: 20 }}
+                    transition={{ type: 'spring', stiffness: 500 }}
+                  >
+                    <Flame className="w-3.5 h-3.5 text-neo-white" />
+                    <span className="font-neo-display font-black text-neo-white text-xs sm:text-sm">x{combo}</span>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
             <span className="text-neo-cream/60 text-xs sm:text-sm font-semibold truncate">
               {t('wordWheel.wordsFound').replace('{count}', String(wordsFound.length))}
             </span>
@@ -546,6 +566,37 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
               ))
             )}
           </AnimatePresence>
+          {/* Inline submit chip — primary tap-friendly affordance.
+              Sits next to the built word so the thumb never has to travel
+              down to the sticky bottom bar. Disabled-styled until min-len
+              reached, but still tappable so users get a "too short" toast. */}
+          <AnimatePresence>
+            {builtLetters.length > 0 && (
+              <motion.button
+                key="inline-submit-chip"
+                type="button"
+                data-testid="inline-submit-chip"
+                onClick={handleSubmit}
+                disabled={isValidating}
+                aria-label={t('wordWheel.submit')}
+                className={cn(
+                  'ms-1 sm:ms-2 w-9 h-10 sm:w-11 sm:h-12 md:w-12 md:h-14 rounded-neo border-3 border-neo-black flex items-center justify-center touch-manipulation cursor-pointer',
+                  'before:absolute before:-inset-2 before:content-[""] relative',
+                  'active:shadow-hard-pressed active:translate-x-px active:translate-y-px',
+                  builtWord.length >= 3
+                    ? 'bg-linear-to-r from-neo-lime to-neo-cyan text-neo-black shadow-[2px_2px_0px_black,0_0_14px_rgba(191,255,0,0.5)]'
+                    : 'bg-neo-navy-light text-neo-cream/40 shadow-hard-xs',
+                )}
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0, opacity: 0 }}
+                whileTap={builtWord.length >= 3 ? { scale: 0.9 } : { scale: 0.96 }}
+                transition={{ type: 'spring', stiffness: 600, damping: 22 }}
+              >
+                <Check className="w-5 h-5 sm:w-6 sm:h-6" strokeWidth={3} />
+              </motion.button>
+            )}
+          </AnimatePresence>
         </div>
         {/* Inline feedback toast */}
         <AnimatePresence>
@@ -582,24 +633,30 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         </AnimatePresence>
       </motion.div>
 
-      {/* Words-to-pass next-rival hint (under word builder, above wheel) */}
-      <AnimatePresence>
-        {nextRival && (
-          <motion.div
-            className="mt-2 mb-1 px-2.5 py-1 rounded-neo border-2 border-neo-cream/20 bg-neo-navy-light/60 text-[11px] sm:text-xs text-neo-cream/80 font-semibold flex items-center gap-1.5"
-            initial={{ opacity: 0, y: -4 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
-          >
-            <ChevronUp className="w-3 h-3 text-neo-lime" />
-            <span>
-              {t('wordWheel.wordsToPass')
-                .replace('{count}', String(wordsToPass))
-                .replace('{name}', nextRival.name)}
-            </span>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Words-to-pass next-rival hint — reserved slot prevents wheel from
+          shifting down when the rival pill mounts/unmounts. */}
+      <div
+        data-testid="next-rival-slot"
+        className="w-full mt-1.5 min-h-[26px] sm:min-h-[28px] flex items-center justify-center"
+      >
+        <AnimatePresence>
+          {nextRival && (
+            <motion.div
+              className="px-2.5 py-1 rounded-neo border-2 border-neo-cream/20 bg-neo-navy-light/60 text-[11px] sm:text-xs text-neo-cream/80 font-semibold flex items-center gap-1.5"
+              initial={{ opacity: 0, y: -4 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+            >
+              <ChevronUp className="w-3 h-3 text-neo-lime" />
+              <span>
+                {t('wordWheel.wordsToPass')
+                  .replace('{count}', String(wordsToPass))
+                  .replace('{name}', nextRival.name)}
+              </span>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
 
       {/* Pass notification toast */}
       <AnimatePresence>
@@ -618,12 +675,18 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
 
       {/* ── Centered wheel region (absorbs leftover vertical space) ── */}
       <div className="flex-1 flex flex-col items-center justify-center w-full min-h-0 gap-2 py-1">
-      {/* Tap-to-remove + double-tap-to-submit hint */}
-      {builtLetters.length > 0 && (
-        <p className="text-neo-cream/40 text-[10px] sm:text-xs text-center">
-          {t('wordWheel.tapToRemove')} &middot; {t('wordWheel.doubleTapToSubmit')}
-        </p>
-      )}
+      {/* Tap-to-remove + double-tap-to-submit hint — reserved slot so the
+          wheel does not shift down on first tap. */}
+      <div
+        data-testid="tap-hint-slot"
+        className="min-h-[14px] sm:min-h-[16px] flex items-center justify-center"
+      >
+        {builtLetters.length > 0 && (
+          <p className="text-neo-cream/40 text-[10px] sm:text-xs text-center">
+            {t('wordWheel.tapToRemove')} &middot; {t('wordWheel.doubleTapToSubmit')}
+          </p>
+        )}
+      </div>
 
       {/* ── The Wheel ── */}
       <div
@@ -682,12 +745,11 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
       </div>
 
       {/* ── Action Buttons (sticky so Submit stays in view as found-words list grows) ── */}
-      {/* `bottom` offsets by the full bottom stack (nav + banner) so the
-          button bar is never covered — survives nav-visible regressions even
-          though `isInGame` normally hides the nav during play. */}
+      {/* Parent scroll container (WordWheelChallenge playing wrapper) reserves
+          --bottom-stack-height via `pb-bottom-stack`, so sticky bottom: 0 pins
+          to the content-edge above the AdMob banner without double-counting. */}
       <div
-        className="sticky z-30 w-full flex items-center justify-center gap-3 py-2 bg-linear-to-t from-neo-navy via-neo-navy/95 to-transparent"
-        style={{ bottom: 'var(--bottom-stack-height, 0px)' }}
+        className="sticky bottom-0 z-30 w-full flex items-center justify-center gap-3 py-2 bg-linear-to-t from-neo-navy via-neo-navy/95 to-transparent"
       >
         {/* Clear */}
         <motion.button

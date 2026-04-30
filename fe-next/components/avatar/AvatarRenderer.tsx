@@ -16,6 +16,16 @@ import { NOSE_PARTS } from './parts/NoseParts';
 import { BODY_PARTS } from './parts/BodyParts';
 import AvatarTierEffects, { type Tier } from './AvatarTierEffects';
 
+/** Game-mode color frame around avatar — matches brand palette */
+export type AvatarMode = 'multiplayer' | 'singleplayer' | 'brain' | 'practice';
+
+const MODE_FRAME_COLOR: Record<AvatarMode, string> = {
+  multiplayer: '#FF1493', // neo-pink
+  singleplayer: '#00FFFF', // neo-cyan
+  brain: '#8B5CF6', // neo-purple
+  practice: '#BFFF00', // neo-lime
+};
+
 interface AvatarRendererProps {
   config: CustomAvatarConfig;
   size?: number;
@@ -26,6 +36,8 @@ interface AvatarRendererProps {
   forceTier?: Tier;
   /** Use circular background (for circular containers like profile avatars) */
   circular?: boolean;
+  /** Game-mode color frame: pink/cyan/purple/lime ring around avatar */
+  mode?: AvatarMode;
 }
 
 /**
@@ -35,7 +47,7 @@ interface AvatarRendererProps {
  *   facial hair -> hair(front) -> accessory
  */
 /** Styles that render their main body behind the head */
-const BACK_LAYER_STYLES = new Set(['long', 'afro', 'wavy', 'dreads', 'pigtails', 'sideshave', 'braids', 'bun', 'bangs', 'twintails', 'mullet', 'flame', 'galaxy', 'neon', 'curly', 'straight', 'spaceBuns', 'cornrows', 'wolfCut', 'curtainBangs', 'halfUp', 'himecut', 'lob', 'shag', 'curlyBangs', 'sideSwept']);
+const BACK_LAYER_STYLES = new Set(['long', 'afro', 'wavy', 'dreads', 'pigtails', 'sideshave', 'braids', 'bun', 'bangs', 'twintails', 'mullet', 'flame', 'galaxy', 'neon', 'curly', 'straight', 'spaceBuns', 'cornrows', 'wolfCut', 'curtainBangs', 'halfUp', 'himecut', 'lob', 'shag', 'curlyBangs', 'sideSwept', 'heartBuns', 'sideBow', 'milkmaidBraids', 'butterflyClips', 'lowPigtailsBow', 'princessBraid', 'sideBraidBow']);
 
 /** Accessories that render behind the face (ears, wings, etc.) */
 const BACK_ACCESSORY_STYLES = new Set(['monkeyEars']);
@@ -74,9 +86,10 @@ const SKIP_FEMALE_LASHES_EYES = new Set([
   'none', 'lashes', 'monocleEye', 'crossEyed', 'wingedLiner', 'smokyEye',
 ]);
 
-const AvatarRenderer = memo<AvatarRendererProps>(({ config, size = 64, className = '', disableEffects, forceTier, circular }) => {
+const AvatarRenderer = memo<AvatarRendererProps>(({ config, size = 64, className = '', disableEffects, forceTier, circular, mode }) => {
   const uid = useId();
   const faceShadowId = `fs${uid}`;
+  const halftoneId = `ht${uid}`;
   const BasePart = BASE_PARTS[config.base] ?? BASE_PARTS.round;
   const EyePart = EYE_PARTS[config.eyes] ?? EYE_PARTS.round;
   const MouthPart = MOUTH_PARTS[config.mouth] ?? MOUTH_PARTS.smile;
@@ -109,18 +122,39 @@ const AvatarRenderer = memo<AvatarRendererProps>(({ config, size = 64, className
       aria-label={`Avatar: ${config.base} face, ${config.eyes} eyes, ${config.hair} hair`}
       data-testid="custom-avatar"
     >
-      {/* Shared filter definitions */}
+      {/* Shared filter definitions — neo-brutalist hard offset shadow (NO blur) */}
       <defs>
         <filter id={faceShadowId} x="-10%" y="-10%" width="120%" height="130%">
-          <feDropShadow dx="0" dy="3" stdDeviation="2.5" floodColor="#000" floodOpacity="0.3" />
+          <feOffset dx="2" dy="2" in="SourceAlpha" result="offset" />
+          <feFlood floodColor="#000" floodOpacity="0.55" />
+          <feComposite in2="offset" operator="in" result="shadow" />
+          <feMerge>
+            <feMergeNode in="shadow" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
         </filter>
+        <pattern
+          id={halftoneId}
+          data-halftone=""
+          patternUnits="userSpaceOnUse"
+          width="6"
+          height="6"
+        >
+          <circle cx="1.5" cy="1.5" r="0.7" fill="#000" />
+        </pattern>
       </defs>
 
-      {/* Background */}
+      {/* Background — solid color + halftone dot overlay (brand texture) */}
       {circular ? (
-        <circle cx="50" cy="50" r="50" fill={config.bgColor} />
+        <>
+          <circle cx="50" cy="50" r="50" fill={config.bgColor} />
+          <circle cx="50" cy="50" r="50" fill={`url(#${halftoneId})`} opacity="0.08" />
+        </>
       ) : (
-        <rect x="0" y="0" width="100" height="100" rx="16" fill={config.bgColor} />
+        <>
+          <rect x="0" y="0" width="100" height="100" rx="16" fill={config.bgColor} />
+          <rect x="0" y="0" width="100" height="100" rx="16" fill={`url(#${halftoneId})`} opacity="0.08" />
+        </>
       )}
 
       {/* Body (shoulders/torso at bottom) */}
@@ -219,6 +253,21 @@ const AvatarRenderer = memo<AvatarRendererProps>(({ config, size = 64, className
 
       {/* Accessories (on top, unless it's a back-layer accessory already rendered) */}
       {!isBackAccessory && <AccessoryPart fill={config.accessoryColor} />}
+
+      {/* Mode-color frame — black underlay (brutalist border) + colored stripe on top */}
+      {mode && (
+        circular ? (
+          <g data-mode-frame="" stroke={MODE_FRAME_COLOR[mode]}>
+            <circle cx="50" cy="50" r="48" fill="none" stroke="#000" strokeWidth="5" />
+            <circle cx="50" cy="50" r="48" fill="none" stroke={MODE_FRAME_COLOR[mode]} strokeWidth="3" />
+          </g>
+        ) : (
+          <g data-mode-frame="" stroke={MODE_FRAME_COLOR[mode]}>
+            <rect x="2" y="2" width="96" height="96" rx="14" fill="none" stroke="#000" strokeWidth="5" />
+            <rect x="2" y="2" width="96" height="96" rx="14" fill="none" stroke={MODE_FRAME_COLOR[mode]} strokeWidth="3" />
+          </g>
+        )
+      )}
     </svg>
     </AvatarEyeColorContext.Provider>
     </AvatarUidContext.Provider>

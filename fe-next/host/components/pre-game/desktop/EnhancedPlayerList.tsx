@@ -122,6 +122,7 @@ export const EnhancedPlayerList = memo(function EnhancedPlayerList({
                     avatarImage={avatar?.avatarImage}
                     size="md"
                     className="w-12 h-12 xl:w-14 xl:h-14"
+                    mode="multiplayer"
                   />
                   {/* Online indicator dot - slightly larger on desktop */}
                   {!isBot && (

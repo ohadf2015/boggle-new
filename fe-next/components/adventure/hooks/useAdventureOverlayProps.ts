@@ -19,6 +19,7 @@ import type { ComboMilestoneConfig } from '@/hooks/useComboMilestone';
 import type { BossTier } from '@/components/celebration/BossDefeatFireworks';
 import type { HintLevel } from '@/lib/adaptiveDifficulty';
 import { LEVELS_PER_WORLD } from '@/lib/adventure';
+import { peekQueue } from '@/lib/adventure/offlineCompletionQueue';
 
 type ScorePopup = AdventureGameOverlaysProps['currentPopup'];
 type ChainBurstConfig = AdventureGameOverlaysProps['chainBurstConfig'];
@@ -173,7 +174,13 @@ export function useAdventureOverlayProps(p: UseAdventureOverlayPropsParams): Adv
     };
   }, [modeState, gameState]);
 
-  const saveFailed = !p.isGuest && !!levelCompletion.completionSaveFailedRef?.current && p.showLevelComplete;
+  // Suppress the "Progress not saved" banner if the save was queued for offline
+  // replay — the system will retry it when connectivity returns or on next mount.
+  // Showing the banner in that case is a false alarm that scares the player.
+  // Note: the gate is global (any pending queue item), not per-level, so a stale
+  // queued item from another level will also suppress the banner here.
+  const hasPendingQueuedSaves = p.showLevelComplete && peekQueue().length > 0;
+  const saveFailed = !p.isGuest && !!levelCompletion.completionSaveFailedRef?.current && p.showLevelComplete && !hasPendingQueuedSaves;
 
   return {
     bossConfig: bossOrch.bossConfig,

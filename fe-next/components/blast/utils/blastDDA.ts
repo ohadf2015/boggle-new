@@ -63,3 +63,12 @@ export function getDDASpawnModifier(state: BlastDDAState): number {
 
   return 0;
 }
+
+/**
+ * Whether the DDA spawn boost is active. Pure derivation of state — used by
+ * the engine to expose a visible "Lucky Boost" HUD chip so players can see
+ * when the game is helping them. Sprint 1 surfaces previously-hidden state.
+ */
+export function isDDABoostActive(state: BlastDDAState): boolean {
+  return state.consecutiveFails >= 2;
+}

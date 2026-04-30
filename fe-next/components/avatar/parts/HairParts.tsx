@@ -7,6 +7,7 @@ import { HAIR_PARTS_VOLUME } from './HairPartsVolume';
 import { HAIR_PARTS_FANTASY } from './HairPartsFantasy';
 import { HAIR_PARTS_MODERN } from './HairPartsModern';
 import { HAIR_PARTS_TRENDY } from './HairPartsTrendy';
+import { HAIR_PARTS_FEMININE } from './HairPartsFeminine';
 import { HAIR_FRONT_MAP } from './HairPartsFront';
 
 export const HAIR_PARTS = {
@@ -57,6 +58,14 @@ export const HAIR_PARTS = {
   frizzle: HAIR_PARTS_VOLUME.frizzle,
   durag: HAIR_PARTS_VOLUME.durag,
   locsShort: HAIR_PARTS_VOLUME.locsShort,
+  /* Femme-only girly styles */
+  heartBuns: HAIR_PARTS_FEMININE.heartBuns,
+  sideBow: HAIR_PARTS_FEMININE.sideBow,
+  milkmaidBraids: HAIR_PARTS_FEMININE.milkmaidBraids,
+  butterflyClips: HAIR_PARTS_FEMININE.butterflyClips,
+  lowPigtailsBow: HAIR_PARTS_FEMININE.lowPigtailsBow,
+  princessBraid: HAIR_PARTS_FEMININE.princessBraid,
+  sideBraidBow: HAIR_PARTS_FEMININE.sideBraidBow,
 } as const;
 
 export type HairPart = keyof typeof HAIR_PARTS;

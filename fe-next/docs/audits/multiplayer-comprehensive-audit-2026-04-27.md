@@ -6,6 +6,18 @@
 
 ---
 
+## Status update — 2026-04-29 spot check
+
+This doc snapshots state at 2026-04-27. Several items have shipped since but the doc was never refreshed. Verified-shipped during MP perf session (2026-04-29):
+
+- ✅ **CG-CRIT-4** (sec): `app/api/auth/verify-crazygames/route.ts:31-38` — `DEFAULT_AUDIENCE = 'lexiclash'` set; production warning when env unset. Audience check no longer skippable.
+- ✅ **SRV-CRIT-1**: `backend/services/gameLifecycle/gameResults.ts:67-75` — `scoreMultiplier` now server-applied with timestamp-based fail-closed validation. Memory `boost-picker-shipped.md` v2 work landed.
+- ✅ **UX-CRIT-1**: `host/components/pre-game/PlayerRoster.tsx` — kick uses `setPendingKick({...})` modal pattern; no native `confirm()` remains.
+
+**Recommendation:** Re-run a comprehensive audit pass to refresh status across all 67 findings. The doc as-written is unreliable for current backlog planning. See `multiplayer-perf-2026-04-29.md` for the perf-scoped audit run that closed those items in real time.
+
+---
+
 ## TL;DR
 
 **3 ship-blockers for CrazyGames submission/relaunch:**

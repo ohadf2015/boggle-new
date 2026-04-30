@@ -4,6 +4,7 @@ import { useState, useEffect, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import { useIsDesktop } from '@/hooks/useMediaQuery';
+import { useIsExperiencedPlayer } from '@/hooks/useIsExperiencedPlayer';
 
 const STORAGE_KEY = 'lexiclash_desktop_hint_shown';
 
@@ -15,10 +16,11 @@ const STORAGE_KEY = 'lexiclash_desktop_hint_shown';
 const DesktopInputHint = memo<{ wordSubmitted?: boolean }>(({ wordSubmitted }) => {
   const [visible, setVisible] = useState(false);
   const isDesktop = useIsDesktop();
+  const isExperienced = useIsExperiencedPlayer();
   const { t } = useLanguageSafe();
 
   useEffect(() => {
-    if (!isDesktop) return;
+    if (!isDesktop || isExperienced) return;
     try {
       const shown = localStorage.getItem(STORAGE_KEY);
       if (!shown) {
@@ -28,7 +30,7 @@ const DesktopInputHint = memo<{ wordSubmitted?: boolean }>(({ wordSubmitted }) =
     } catch {
       // localStorage unavailable
     }
-  }, [isDesktop]);
+  }, [isDesktop, isExperienced]);
 
   // Auto-dismiss after 6s
   useEffect(() => {

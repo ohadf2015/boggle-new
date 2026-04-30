@@ -34,95 +34,40 @@ export async function saveHostApprovedWord(params: WordApprovalInput): Promise<{
   if (!client) return { data: null, error: { message: 'Supabase not configured' }, isNewWord: false };
 
   try {
-    const now = new Date().toISOString();
+    // Atomic upsert via RPC. Replaces SELECT-then-UPDATE which lost
+    // increments under concurrent writers (last writer wins on COUNT).
+    const { data: rpcRows, error: rpcError } = await client
+      .rpc('upsert_community_word', {
+        p_word: word,
+        p_language: language,
+        p_user_id: hostUserId ?? null,
+        p_game_code: gameCode,
+        p_promoted: promoted,
+      });
 
-    // Try insert first. If the word already exists, the unique constraint
-    // returns error code 23505 instead of the old SELECT-then-INSERT race.
-    const { data: inserted, error: insertError } = await client
-      .from('community_words')
+    if (rpcError || !rpcRows || (Array.isArray(rpcRows) && rpcRows.length === 0)) {
+      logger.error('SUPABASE', `Error upserting community word "${word}"`, rpcError?.message);
+      return { data: null, error: rpcError ?? { message: 'upsert_community_word returned no row' }, isNewWord: false };
+    }
+
+    const row = (Array.isArray(rpcRows) ? rpcRows[0] : rpcRows) as { out_id: string; out_approval_count: number; out_is_new_word: boolean };
+    const wordRecord = { id: row.out_id, approval_count: row.out_approval_count };
+    const isNewWord = row.out_is_new_word;
+
+    // Record the individual approval event (best-effort — failures are warned, not propagated)
+    const { error: approvalError } = await client
+      .from('community_word_approvals')
       .insert({
-        word,
-        language,
-        approval_count: 1,
-        promoted_to_dictionary: promoted,
-        promoted_at: promoted ? now : null,
-        first_approved_by: hostUserId,
-        first_approved_in_game: gameCode,
-        last_approved_by: hostUserId,
-        last_approved_in_game: gameCode
-      })
-      .select()
-      .single();
+        word_id: row.out_id,
+        approved_by: hostUserId,
+        game_code: gameCode
+      });
 
-    let wordRecord: unknown;
-    let isNewWord = false;
-
-    if (!insertError && inserted) {
-      wordRecord = inserted;
-      isNewWord = true;
-    } else if (insertError && insertError.code === '23505') {
-      // Word already exists - fetch and update
-      const { data: existing, error: fetchError } = await client
-        .from('community_words')
-        .select('id, approval_count, promoted_to_dictionary')
-        .eq('word', word)
-        .eq('language', language)
-        .single();
-
-      if (fetchError || !existing) {
-        logger.error('SUPABASE', `Error fetching existing word "${word}"`, fetchError?.message);
-        return { data: null, error: fetchError || { message: 'Word not found after conflict' }, isNewWord: false };
-      }
-
-      const updates: Record<string, unknown> = {
-        approval_count: existing.approval_count + 1,
-        last_approved_by: hostUserId,
-        last_approved_in_game: gameCode,
-        last_approved_at: now
-      };
-
-      if (promoted && !existing.promoted_to_dictionary) {
-        updates.promoted_to_dictionary = true;
-        updates.promoted_at = now;
-      }
-
-      const { data: updated, error: updateError } = await client
-        .from('community_words')
-        .update(updates)
-        .eq('id', existing.id)
-        .select()
-        .single();
-
-      if (updateError) {
-        logger.error('SUPABASE', `Error updating word "${word}"`, updateError.message);
-        return { data: null, error: updateError, isNewWord: false };
-      }
-
-      wordRecord = updated;
-    } else {
-      // Real insert error (not a conflict)
-      logger.error('SUPABASE', `Error inserting word "${word}"`, insertError?.message);
-      return { data: null, error: insertError, isNewWord: false };
+    if (approvalError) {
+      logger.warn('SUPABASE', `Error recording approval for "${word}"`, approvalError.message);
     }
 
-    // Record the individual approval event
-    if (wordRecord) {
-      const wordData = wordRecord as { id: string };
-      const { error: approvalError } = await client
-        .from('community_word_approvals')
-        .insert({
-          word_id: wordData.id,
-          approved_by: hostUserId,
-          game_code: gameCode
-        });
-
-      if (approvalError) {
-        logger.warn('SUPABASE', `Error recording approval for "${word}"`, approvalError.message);
-      }
-    }
-
-    const wordData = wordRecord as { approval_count?: number } | null;
-    logger.debug('SUPABASE', `${isNewWord ? 'Saved new' : 'Updated'} community word "${word}" (${language}) - approval count: ${wordData?.approval_count || 1}${promoted ? ' - PROMOTED' : ''}`);
+    logger.debug('SUPABASE', `${isNewWord ? 'Saved new' : 'Updated'} community word "${word}" (${language}) - approval count: ${row.out_approval_count}${promoted ? ' - PROMOTED' : ''}`);
     return { data: wordRecord, error: null, isNewWord };
 
   } catch (err: unknown) {
@@ -144,70 +89,24 @@ export async function savePlayerWord(params: PlayerWordInput): Promise<{ data: u
   const normalizedWord = word.toLowerCase().trim();
 
   try {
-    const now = new Date().toISOString();
+    // Atomic upsert via RPC. Replaces SELECT-then-UPDATE which lost
+    // increments under concurrent writers (two T's both reading N → both writing N+1).
+    const { data: rpcRows, error: rpcError } = await client
+      .rpc('upsert_player_word', {
+        p_word: normalizedWord,
+        p_language: language,
+        p_player_id: playerId ?? null,
+        p_game_code: gameCode,
+      });
 
-    // Try insert first. If the word already exists, the unique constraint
-    // on (word, language) returns an error (code 23505) instead of the old
-    // SELECT-then-INSERT race that caused duplicate key violations.
-    const { data: inserted, error: insertError } = await client
-      .from('player_words')
-      .insert({
-        word: normalizedWord,
-        language,
-        times_submitted: 1,
-        first_submitted_by: playerId,
-        first_submitted_in_game: gameCode,
-        last_submitted_by: playerId,
-        last_submitted_in_game: gameCode,
-        last_submitted_at: now
-      })
-      .select()
-      .single();
-
-    if (!insertError && inserted) {
-      logger.debug('SUPABASE', `Saved new player word "${normalizedWord}" (${language}) - times submitted: 1`);
-      return { data: inserted, error: null, isNewWord: true };
+    if (rpcError || !rpcRows || (Array.isArray(rpcRows) && rpcRows.length === 0)) {
+      logger.error('SUPABASE', `Error upserting player word "${normalizedWord}"`, rpcError?.message);
+      return { data: null, error: rpcError ?? { message: 'upsert_player_word returned no row' }, isNewWord: false };
     }
 
-    // If error is NOT a unique constraint violation, it's a real error
-    if (insertError && insertError.code !== '23505') {
-      logger.error('SUPABASE', `Error inserting player word "${normalizedWord}"`, insertError.message);
-      return { data: null, error: insertError, isNewWord: false };
-    }
-
-    // Word already exists - fetch current row and increment times_submitted
-    const { data: existing, error: fetchError } = await client
-      .from('player_words')
-      .select('id, times_submitted')
-      .eq('word', normalizedWord)
-      .eq('language', language)
-      .single();
-
-    if (fetchError || !existing) {
-      logger.error('SUPABASE', `Error fetching existing player word "${normalizedWord}"`, fetchError?.message);
-      return { data: null, error: fetchError || { message: 'Word not found after conflict' }, isNewWord: false };
-    }
-
-    const { data: updated, error: updateError } = await client
-      .from('player_words')
-      .update({
-        times_submitted: existing.times_submitted + 1,
-        last_submitted_by: playerId,
-        last_submitted_in_game: gameCode,
-        last_submitted_at: now
-      })
-      .eq('id', existing.id)
-      .select()
-      .single();
-
-    if (updateError) {
-      logger.error('SUPABASE', `Error updating player word "${normalizedWord}"`, updateError.message);
-      return { data: null, error: updateError, isNewWord: false };
-    }
-
-    const wordData = updated as { times_submitted?: number } | null;
-    logger.debug('SUPABASE', `Updated player word "${normalizedWord}" (${language}) - times submitted: ${wordData?.times_submitted || 1}`);
-    return { data: updated, error: null, isNewWord: false };
+    const row = (Array.isArray(rpcRows) ? rpcRows[0] : rpcRows) as { out_id: string; out_times_submitted: number; out_is_new_word: boolean };
+    logger.debug('SUPABASE', `${row.out_is_new_word ? 'Saved new' : 'Updated'} player word "${normalizedWord}" (${language}) - times submitted: ${row.out_times_submitted}`);
+    return { data: { id: row.out_id, times_submitted: row.out_times_submitted }, error: null, isNewWord: row.out_is_new_word };
 
   } catch (err: unknown) {
     const errorMessage = err instanceof Error ? err.message : 'Unexpected error';

@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import GridComponent from '@/components/GridComponent';
 import CircularTimer from '@/components/CircularTimer';
 import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
-import { TrainingProgressBar, PracticeCompletionPopup } from '@/components/training';
+import { TrainingProgressBar } from '@/components/training';
 import { shouldShowKeyboardTrails } from '@/components/game/keyboardTrailsUtils';
 import { cn } from '@/lib/utils';
 import { COIN_EARNING_OTHER } from '@/utils/coinManager';
@@ -76,9 +76,6 @@ export interface PortraitGameLayoutProps {
   training: TrainingState | null;
   progressBarExpanded: boolean;
   onToggleProgressBar: () => void;
-  // Completion popup
-  showCompletionPopup: boolean;
-  setShowCompletionPopup: (show: boolean) => void;
   // Handlers
   onWordSubmit: (word: string) => void;
   onPathSubmit: (cells: Array<{ row: number; col: number }>) => void;
@@ -140,8 +137,6 @@ export function PortraitGameLayout({
   training,
   progressBarExpanded,
   onToggleProgressBar,
-  showCompletionPopup,
-  setShowCompletionPopup,
   onWordSubmit,
   onPathSubmit,
   onWordChange,
@@ -262,24 +257,26 @@ export function PortraitGameLayout({
 
       {/* Stats section - Gemini Pro: Coins (left), Timer (center), Score (right) */}
       <div ref={gameStatsRef} className="px-4 flex items-center justify-between shrink-0 relative z-30 mb-1 max-w-md mx-auto w-full" role="status" aria-label="Game status">
-        {/* Left: Coins badge */}
+        {/* Left: Coins badge — hidden in practice (training has no coin economy noise) */}
         <div className="flex-1 flex justify-start">
-          <AdaptiveMotion.div
-            data-coin-target
-            initial={{ scale: 0, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            className="flex items-center gap-1.5 bg-yellow-400 border-3 border-neo-black rounded-lg px-2 py-1 shadow-hard-sm transform -rotate-1"
-          >
-            <div className="bg-black/10 rounded-full p-0.5">
-              <Coins className="w-4 h-4 text-neo-black" />
-            </div>
-            <div className="flex flex-col leading-none">
-              <span className="font-black text-neo-black text-sm">
-                {score > 0 ? COIN_EARNING_OTHER.SINGLEPLAYER_BASE + Math.floor(score / COIN_EARNING_OTHER.SCORE_DIVISOR) : 0}
-              </span>
-              <span className="font-bold text-neo-black/60 text-[8px] uppercase">{t('common.coins')}</span>
-            </div>
-          </AdaptiveMotion.div>
+          {!isPracticeMode && (
+            <AdaptiveMotion.div
+              data-coin-target
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="flex items-center gap-1.5 bg-yellow-400 border-3 border-neo-black rounded-lg px-2 py-1 shadow-hard-sm transform -rotate-1"
+            >
+              <div className="bg-black/10 rounded-full p-0.5">
+                <Coins className="w-4 h-4 text-neo-black" />
+              </div>
+              <div className="flex flex-col leading-none">
+                <span className="font-black text-neo-black text-sm">
+                  {score > 0 ? COIN_EARNING_OTHER.SINGLEPLAYER_BASE + Math.floor(score / COIN_EARNING_OTHER.SCORE_DIVISOR) : 0}
+                </span>
+                <span className="font-bold text-neo-black/60 text-[8px] uppercase">{t('common.coins')}</span>
+              </div>
+            </AdaptiveMotion.div>
+          )}
         </div>
 
         {/* Center: Score (practice only) — in non-practice the timer moves down to the word-forming row */}
@@ -332,16 +329,8 @@ export function PortraitGameLayout({
               </div>
             </AdaptiveMotion.div>
           ) : (
-            <div className="min-w-[50px] flex justify-end">
-              <ComboDisplay
-                comboLevel={comboLevel}
-                compact
-                timeRemaining={comboTimeRemaining}
-                isDanger={comboDanger}
-                coinReward={comboCoinReward}
-                onCoinAnimationComplete={onCoinAnimationComplete}
-              />
-            </div>
+            // Practice mode: no combo chrome — score chip lives in the centre slot.
+            <div className="min-w-[50px]" />
           )}
         </div>
       </div>
@@ -453,16 +442,6 @@ export function PortraitGameLayout({
         <div className="fixed top-16 left-1/2 -translate-x-1/2 z-40 pointer-events-auto">
           <TimeLowAdPrompt timeRemaining={remainingTime} onExtend={onExtendTime} />
         </div>
-      )}
-
-      {/* Practice Completion Popup */}
-      {isPracticeMode && (
-        <PracticeCompletionPopup
-          open={showCompletionPopup}
-          onOpenChange={setShowCompletionPopup}
-          language={language}
-          t={t}
-        />
       )}
 
       {/* Quit Confirmation Dialog */}

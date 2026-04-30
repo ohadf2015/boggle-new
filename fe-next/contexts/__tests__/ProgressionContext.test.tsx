@@ -702,6 +702,55 @@ describe('ProgressionContext', () => {
       expect(stateCallCount).toBe(2);
     });
 
+    it('should return false (not throw) when 403 persists after refresh+retry', async () => {
+      // GIVEN — server keeps rejecting with 403 even after progression refresh.
+      // This means the local frontier is genuinely stale (cache from older
+      // session, URL-jump, dropped completion). Client must NOT throw — that
+      // ships a warning to Sentry. It should clear the bad cache and bail.
+      const mockProgression = createMockProgression({ currentWorld: 1, currentLevel: 1 });
+      let stateCallCount = 0;
+      let completeCallCount = 0;
+      mockFetch.mockImplementation((url: string) => {
+        if (url.includes('/api/adventure/state')) {
+          stateCallCount++;
+          return Promise.resolve({
+            ok: true,
+            json: async () => ({ progression: mockProgression, attempts: [] }),
+          });
+        }
+        if (url.includes('/api/adventure/complete')) {
+          completeCallCount++;
+          return Promise.resolve({
+            ok: false,
+            status: 403,
+            text: async () => JSON.stringify({ error: 'Level not unlocked — cannot skip ahead' }),
+          });
+        }
+        return Promise.resolve({ ok: true, json: async () => ({}) });
+      });
+
+      const { result } = renderHook(() => useProgression(), { wrapper });
+      await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+      // WHEN — try to complete a level the server says is locked
+      let saved: boolean = true;
+      let threw = false;
+      await act(async () => {
+        try {
+          saved = await result.current.completeLevel(5, 1, 3, 500, 15);
+        } catch {
+          threw = true;
+        }
+      });
+
+      // THEN — clean false, no throw. Two complete attempts (refresh+retry).
+      // Two extra state fetches (refresh-then-retry, then post-clear refresh).
+      expect(threw).toBe(false);
+      expect(saved).toBe(false);
+      expect(completeCallCount).toBe(2);
+      expect(stateCallCount).toBeGreaterThanOrEqual(2);
+    });
+
     it('should retry quest progress saves on transient errors', async () => {
       // GIVEN — quest progress endpoint fails with 500 first, then succeeds
       const mockProgression = createMockProgression();

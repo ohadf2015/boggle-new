@@ -1,32 +1,18 @@
 'use client';
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { getWelcomeDemoConfig } from './demoConfigs';
 
 /**
- * 4×4 animated demo grid that traces the word "PLAY" on a 4s loop.
+ * 4×4 animated demo grid that traces a locale-appropriate word on a 4s loop.
+ * Per language: PLAY (en, ja-romaji), GATO (es), KATT (sv), שמחה (he).
  *
  * Built with the game's actual tile colors (lime/cyan) so the welcome
  * teaches the real interaction, not a stylized tutorial image. Path stroke
  * animates via SVG `pathLength`; tiles light up in sequence.
  */
-
-type Coord = readonly [col: number, row: number];
-
-const GRID: ReadonlyArray<ReadonlyArray<string>> = [
-  ['P', 'L', 'C', 'V'],
-  ['B', 'A', 'Y', 'R'],
-  ['T', 'M', 'S', 'N'],
-  ['E', 'O', 'Y', 'D'],
-];
-
-// Path through the grid that spells P-L-A-Y
-const PATH: ReadonlyArray<Coord> = [
-  [0, 0], // P
-  [1, 0], // L
-  [1, 1], // A
-  [2, 1], // Y
-];
 
 const CELL = 64;
 const GAP = 6;
@@ -36,22 +22,29 @@ const SIZE = CELL * 4 + GAP * 3 + PAD * 2;
 const cx = (col: number) => PAD + col * (CELL + GAP) + CELL / 2;
 const cy = (row: number) => PAD + row * (CELL + GAP) + CELL / 2;
 
-const PATH_D = PATH.map(([c, r], i) => `${i === 0 ? 'M' : 'L'} ${cx(c)} ${cy(r)}`).join(' ');
-
-const isOnPath = (col: number, row: number): number => {
-  for (let i = 0; i < PATH.length; i++) {
-    if (PATH[i][0] === col && PATH[i][1] === row) return i;
-  }
-  return -1;
-};
-
 const WelcomeDemoGrid: React.FC = () => {
+  const { language, t } = useLanguage();
+  const config = useMemo(() => getWelcomeDemoConfig(language), [language]);
+  const { letters: GRID, path: PATH, word } = config;
+
+  const pathD = useMemo(
+    () => PATH.map(([c, r], i) => `${i === 0 ? 'M' : 'L'} ${cx(c)} ${cy(r)}`).join(' '),
+    [PATH],
+  );
+
+  const isOnPath = (col: number, row: number): number => {
+    for (let i = 0; i < PATH.length; i++) {
+      if (PATH[i][0] === col && PATH[i][1] === row) return i;
+    }
+    return -1;
+  };
+
   return (
     <svg
       viewBox={`0 0 ${SIZE} ${SIZE}`}
       className="w-full h-auto"
       role="img"
-      aria-label="Animated demo: tracing the word PLAY across letter tiles"
+      aria-label={t('onboarding.welcome.demoAriaLabel', { word })}
     >
       {/* Tiles */}
       {GRID.map((row, r) =>
@@ -125,7 +118,7 @@ const WelcomeDemoGrid: React.FC = () => {
 
       {/* Animated trace path */}
       <motion.path
-        d={PATH_D}
+        d={pathD}
         fill="none"
         stroke="#FF1493"
         strokeWidth={8}

@@ -170,6 +170,18 @@ vi.mock('@/hooks/usePlayerCollectibles', () => ({
   })
 }));
 
+vi.mock('@/hooks/useSeasonBadges', () => ({
+  useSeasonBadges: () => ({
+    badges: [],
+    isLoading: false
+  })
+}));
+
+vi.mock('@/components/seasons/SeasonTrophyCase', () => ({
+  SeasonTrophyCase: () => null,
+  default: () => null
+}));
+
 vi.mock('@/hooks/usePullToRefresh', () => ({
   usePullToRefresh: () => ({
     pullToRefreshHandlers: {},

@@ -217,6 +217,7 @@ const TvPlayerCard = memo<TvPlayerCardProps>(({
             "border-2 border-neo-black",
             isAway && !isBot && "opacity-50"
           )}
+          mode="multiplayer"
         />
         {isHost && !isAway && (
           <div
@@ -323,7 +324,7 @@ const TvPlayerCard = memo<TvPlayerCardProps>(({
       )}
 
       {/* Score Delta Badge + Score */}
-      <div className="text-right flex items-center gap-2">
+      <div className="text-end flex items-center gap-2">
         <AnimatePresence>
           {scoreDelta !== null && (
             <motion.div

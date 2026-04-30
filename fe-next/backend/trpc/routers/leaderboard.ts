@@ -178,6 +178,48 @@ export const leaderboardRouter = router({
       return { data: peakTiers };
     }),
 
+  getSeasonRecap: loggedProcedure
+    .input(z.object({
+      playerId: z.string().uuid(),
+      seasonId: z.number().int().positive(),
+    }))
+    .query(async ({ input }) => {
+      const supabase = getSupabase();
+      if (!supabase) {
+        throw new TRPCError({ code: 'PRECONDITION_FAILED', message: 'Database unavailable' });
+      }
+
+      const { data, error } = await supabase
+        .from('season_leaderboards')
+        .select('total_score, games_played, games_won, ranked_mmr, rank_position, peak_tier')
+        .eq('season_id', input.seasonId)
+        .eq('player_id', input.playerId)
+        .maybeSingle();
+
+      if (error) {
+        logger.warn('TRPC', 'getSeasonRecap fetch error', { error: error.message });
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: `Recap fetch failed: ${error.message}`,
+        });
+      }
+
+      if (!data) {
+        return { data: null };
+      }
+
+      return {
+        data: {
+          totalScore: data.total_score ?? 0,
+          gamesPlayed: data.games_played ?? 0,
+          gamesWon: data.games_won ?? 0,
+          rankedMmr: data.ranked_mmr ?? 0,
+          rankPosition: data.rank_position ?? null,
+          peakTier: data.peak_tier ?? 'Bronze',
+        },
+      };
+    }),
+
   getPlayerRank: loggedProcedure
     .input(z.object({ userId: z.string().min(1) }))
     .query(async ({ input }) => {

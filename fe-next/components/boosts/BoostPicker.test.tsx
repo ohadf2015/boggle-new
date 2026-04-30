@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { BoostPicker } from './BoostPicker';
+import { SharedFxApp } from '@/lib/pixiFx/SharedFxApp';
 
 const t = (k: string) => {
   // Mock with basic placeholder substitution for testing
@@ -9,7 +10,11 @@ const t = (k: string) => {
 };
 vi.mock('@/contexts/LanguageContext', () => ({ useLanguage: () => ({ t, language: 'en' }) }));
 vi.mock('@/hooks/useBoostStatus', () => ({ useBoostStatus: () => ({ status: { remaining: 3, capPerDay: 5, resetAt: '' }, isLoading: false }) }));
-vi.mock('@/hooks/useBoostClaim', () => ({ useBoostClaim: () => ({ claim: vi.fn(), claimed: null, isLoading: false, error: null }) }));
+const claimMock = vi.fn();
+vi.mock('@/hooks/useBoostClaim', () => ({ useBoostClaim: () => ({ claim: claimMock, claimed: null, isLoading: false, error: null }) }));
+vi.mock('@/lib/pixiFx/SharedFxApp', () => ({
+  SharedFxApp: { spawnBurst: vi.fn(), isInitialized: () => true },
+}));
 
 describe('BoostPicker', () => {
   it('shows only mp-eligible boosts in mp mode', () => {
@@ -41,6 +46,23 @@ describe('BoostPicker', () => {
     render(<BoostPicker open mode="mp" sessionId="s1" onClose={onClose} />);
     fireEvent.keyDown(document, { key: 'Escape' });
     expect(onClose).toHaveBeenCalled();
+  });
+
+  it('fires pixi flourish burst when boost card is claimed', () => {
+    const spawnSpy = vi.mocked(SharedFxApp.spawnBurst);
+    spawnSpy.mockClear();
+    claimMock.mockClear();
+
+    render(<BoostPicker open mode="mp" sessionId="s1" onClose={() => {}} />);
+    const hintCard = screen.getByText('boosts.hint.title').closest('button');
+    fireEvent.click(hintCard!);
+
+    expect(claimMock).toHaveBeenCalledWith('hint');
+    expect(spawnSpy).toHaveBeenCalledWith(
+      'boost-hint',
+      expect.any(Number),
+      expect.any(Number),
+    );
   });
 
   it('renders an icon for each eligible boost card (decorative, aria-hidden)', () => {

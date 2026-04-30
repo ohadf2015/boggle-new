@@ -1,11 +1,13 @@
 'use client';
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import posthog from 'posthog-js';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useBoostStatus } from '@/hooks/useBoostStatus';
 import { useBoostClaim } from '@/hooks/useBoostClaim';
+import { useExperiment } from '@/hooks/useExperiment';
 import { BOOST_TYPES, BOOST_CONFIGS, type BoostType } from '@/shared/types/boosts';
 import { BOOST_ICONS } from './boostIcons';
+import { SharedFxApp } from '@/lib/pixiFx/SharedFxApp';
 
 interface Props {
   open: boolean;
@@ -21,11 +23,16 @@ export function BoostPicker({ open, mode, sessionId, onClose }: Props) {
   const dialogRef = useRef<HTMLDivElement>(null);
   const closeBtnRef = useRef<HTMLButtonElement>(null);
 
+  // A/B: which boost gets top-of-grid placement.
+  const { variant: orderVariant, trackExposure: trackOrderExposure } =
+    useExperiment('boost-picker-order');
+
   useEffect(() => {
     if (open) {
-      posthog?.capture('boost_picker_opened', { mode });
+      posthog?.capture('boost_picker_opened', { mode, order_variant: orderVariant });
+      trackOrderExposure();
     }
-  }, [open, mode]);
+  }, [open, mode, orderVariant, trackOrderExposure]);
 
   useEffect(() => {
     if (!open) return;
@@ -58,9 +65,22 @@ export function BoostPicker({ open, mode, sessionId, onClose }: Props) {
     return () => document.removeEventListener('keydown', onKey);
   }, [open, onClose]);
 
+  // Promote the variant's chosen boost to the front of the grid (no-op
+  // when control or when the chosen boost isn't eligible for this mode).
+  const eligible = useMemo(() => {
+    const base = BOOST_TYPES.filter((bt) =>
+      BOOST_CONFIGS[bt].availableIn.includes(mode),
+    );
+    const promote: BoostType | null =
+      orderVariant === 'score-first' ? 'scoreMultiplier'
+      : orderVariant === 'freeze-first' ? 'freezeTime'
+      : null;
+    if (!promote || !base.includes(promote)) return base;
+    return [promote, ...base.filter((bt) => bt !== promote)];
+  }, [mode, orderVariant]);
+
   if (!open) return null;
 
-  const eligible = BOOST_TYPES.filter((bt) => BOOST_CONFIGS[bt].availableIn.includes(mode));
   const remaining = status?.remaining ?? 0;
   const cap = status?.capPerDay ?? 5;
 
@@ -83,14 +103,24 @@ export function BoostPicker({ open, mode, sessionId, onClose }: Props) {
               boostType={bt}
               disabled={isLoading || remaining === 0 || claimed?.boostType === bt}
               isClaimed={claimed?.boostType === bt}
-              onClaim={() => claim(bt)} />
+              onClaim={(rect) => {
+                claim(bt);
+                if (rect && SharedFxApp.isInitialized()) {
+                  SharedFxApp.spawnBurst(
+                    `boost-${bt}`,
+                    rect.left + rect.width / 2,
+                    rect.top + rect.height / 2,
+                  );
+                }
+              }} />
           ))}
         </div>
         <button
           ref={closeBtnRef}
           onClick={onClose}
-          className="mt-4 w-full min-h-[44px] rounded-neo border-neo bg-neo-cream py-2 font-neo-body text-neo-navy shadow-hard hover:active:shadow-hard-pressed">
-          {t('boosts.close')}
+          data-testid="boost-skip"
+          className="mt-4 w-full min-h-[44px] rounded-neo border-neo bg-neo-cream py-2 font-neo-body font-bold text-neo-navy shadow-hard hover:active:shadow-hard-pressed">
+          {t('boosts.skipAndPlay')}
         </button>
       </div>
     </div>
@@ -98,13 +128,13 @@ export function BoostPicker({ open, mode, sessionId, onClose }: Props) {
 }
 
 function BoostCard({ boostType, disabled, isClaimed, onClaim }: {
-  boostType: BoostType; disabled: boolean; isClaimed: boolean; onClaim: () => void;
+  boostType: BoostType; disabled: boolean; isClaimed: boolean; onClaim: (rect: DOMRect | null) => void;
 }) {
   const { t } = useLanguage();
   const { Icon, bg, fg } = BOOST_ICONS[boostType];
   return (
     <button
-      onClick={onClaim}
+      onClick={(e) => onClaim((e.currentTarget as HTMLButtonElement).getBoundingClientRect())}
       disabled={disabled}
       data-boost-card
       aria-label={t(`${BOOST_CONFIGS[boostType].i18nKey}.title`)}

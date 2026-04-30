@@ -1,11 +1,17 @@
 import { useMemo } from 'react';
-import { getWaveObjectives } from '../utils/blastWaveConfig';
 import type { BlastGameState, BlastTileType, BlastObjective, BlastObjectiveProgress } from '../types';
 
 export interface UseBlastObjectivesParams {
   gameState: BlastGameState;
   tileTypeClears: Record<BlastTileType, number>;
-  waveNumber: number;
+  /**
+   * Pre-computed objectives for the current wave.
+   * The hook consumes them rather than recomputing — this preserves any
+   * language-specific seeding (target_word pool by locale) and any
+   * board-validated repairs done by the parent. Recomputing here would
+   * silently default to English and re-seed a different target word.
+   */
+  objectives: BlastObjective[];
   wordsFound: string[];
   /** Initial count of each tile type on the board (needed for clear_all_type) */
   initialTileTypeCounts?: Record<BlastTileType, number>;
@@ -51,6 +57,22 @@ function getProgress(
       current = totalTiles > 0 ? Math.floor((tilesCleared / totalTiles) * 100 + 0.5) : 0;
       break;
     }
+
+    case 'target_word': {
+      const targetWord = (objective.targetWord || '').toUpperCase();
+      current = wordsFound.some(w => w.toUpperCase() === targetWord) ? 1 : 0;
+      break;
+    }
+
+    case 'color_power': {
+      // Track the max color count across all words found
+      // If lastWordColorCounts is set, use the matching color's count
+      const colorTag = objective.colorTag as 'pink' | 'cyan' | 'lime' | undefined;
+      if (colorTag && gameState.lastWordColorCounts) {
+        current = gameState.lastWordColorCounts[colorTag] || 0;
+      }
+      break;
+    }
   }
 
   return {
@@ -63,12 +85,10 @@ function getProgress(
 export function useBlastObjectives({
   gameState,
   tileTypeClears,
-  waveNumber,
+  objectives,
   wordsFound,
   initialTileTypeCounts,
 }: UseBlastObjectivesParams) {
-  const objectives = useMemo(() => getWaveObjectives(waveNumber), [waveNumber]);
-
   const objectiveProgress = useMemo(() =>
     objectives.map(obj =>
       getProgress(obj, gameState, tileTypeClears, wordsFound, initialTileTypeCounts),

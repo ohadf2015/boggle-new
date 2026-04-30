@@ -472,6 +472,12 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
           shouldQueueOnFailure = true;
         }
 
+        // 401 = expired session. Token refresh on the next page load can replay
+        // this completion successfully, so queue rather than drop the player's progress.
+        if (response.status === 401) {
+          shouldQueueOnFailure = true;
+        }
+
         // Retry on 403 "Level not unlocked" — stale DB state from a prior failed save.
         // Refresh progression (which updates the server's view) and retry once.
         if (response.status === 403) {
@@ -484,6 +490,19 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
             credentials: 'include',
             body: requestBody,
           });
+
+          // Server is source-of-truth: a persistent 403 means the local frontier
+          // was stale (cached localStorage from a prior session, URL-jump, or
+          // dropped completion). Drop the bad cache so the next render snaps to
+          // the server's view and the user is routed back to a valid level.
+          // Return cleanly — don't throw (avoids Sentry spam) and don't queue
+          // (4xx is deterministic; replay would 403 again).
+          if (response.status === 403) {
+            logger.info('[ProgressionContext] Level genuinely locked — clearing stale cache');
+            clearCachedProgression();
+            await fetchProgressionRef.current().catch(() => { /* best-effort */ });
+            return false;
+          }
         }
 
         if (!response.ok) {
@@ -566,7 +585,15 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
 
         return true;
       } catch (err) {
-        logger.warn('[ProgressionContext] Complete level error:', err instanceof Error ? err.message : err);
+        const errMsg = err instanceof Error ? err.message : String(err);
+        // Server-validated rejections (403/404) are deterministic; the retry path above
+        // already refreshed progression once. Demote to info so they don't ship to Sentry.
+        const isExpectedRejection = /:\s*40[34]\b/.test(errMsg);
+        if (isExpectedRejection) {
+          logger.info('[ProgressionContext] Complete level rejected:', errMsg);
+        } else {
+          logger.warn('[ProgressionContext] Complete level error:', errMsg);
+        }
 
         // Queue for offline replay on:
         //  - network errors (TypeError = fetch failed)
@@ -886,26 +913,42 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
     };
   }, [flushQuestProgress]);
 
-  // Flush offline completion queue when connectivity returns
+  // Drain queued completions to the server. Stable across renders so the
+  // mount-time and 'online'-event effects can share a single implementation.
+  // Bounds the loop to the initial queue size so a persistent failure that
+  // re-enqueues items doesn't tight-loop forever — re-queued items wait for
+  // the next drain trigger ('online' event or next mount).
+  const flushOfflineQueue = useCallback(async () => {
+    const initial = peekQueue();
+    if (initial.length === 0) return;
+    logger.info('[ProgressionContext] Flushing', initial.length, 'queued completions');
+
+    for (let i = 0; i < initial.length; i++) {
+      const item = dequeueCompletion();
+      if (!item) break;
+      await completeLevel(
+        item.world, item.level, item.stars, item.score, item.words,
+        item.goldEarned, item.longWords, item.wordsFound, item.flashChallengeGold,
+      );
+    }
+  }, [completeLevel]);
+
+  // Flush queued completions when connectivity returns.
   useEffect(() => {
-    const flushOfflineQueue = async () => {
-      const queued = peekQueue();
-      if (queued.length === 0) return;
-      logger.info('[ProgressionContext] Online — flushing', queued.length, 'queued completions');
-
-      let item = dequeueCompletion();
-      while (item) {
-        await completeLevel(
-          item.world, item.level, item.stars, item.score, item.words,
-          item.goldEarned, item.longWords, item.wordsFound, item.flashChallengeGold,
-        );
-        item = dequeueCompletion();
-      }
-    };
-
     window.addEventListener('online', flushOfflineQueue);
     return () => window.removeEventListener('online', flushOfflineQueue);
-  }, [completeLevel]);
+  }, [flushOfflineQueue]);
+
+  // Drain on mount/auth-ready: covers the case where the user was offline in
+  // a previous session, a save was queued to localStorage, and now the app
+  // loads while already online — the 'online' event never fires, so without
+  // this we'd hold the completion in localStorage indefinitely.
+  useEffect(() => {
+    if (!user?.id) return;
+    if (typeof navigator !== 'undefined' && navigator.onLine === false) return;
+    if (peekQueue().length === 0) return;
+    flushOfflineQueue();
+  }, [user?.id, flushOfflineQueue]);
 
   // Split context values for selective re-rendering
   const dataValue = useMemo<ProgressionDataContextType>(

@@ -16,6 +16,7 @@ const base = {
   noWordsRemaining: false,
   hasUsedContinue: false,
   continueDeclined: false,
+  objectiveAlreadyMet: false,
 };
 
 describe('shouldOfferBlastContinue', () => {
@@ -45,5 +46,9 @@ describe('shouldOfferBlastContinue', () => {
 
   it('does NOT offer after player declined', () => {
     expect(shouldOfferBlastContinue({ ...base, continueDeclined: true })).toBe(false);
+  });
+
+  it('does NOT offer when wave goal (≥90%) is already met — wave will advance, no extra moves needed', () => {
+    expect(shouldOfferBlastContinue({ ...base, objectiveAlreadyMet: true })).toBe(false);
   });
 });

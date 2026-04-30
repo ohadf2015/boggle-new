@@ -141,6 +141,8 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
   const [todayParticipants, setTodayParticipants] = useState<DailyParticipant[]>([]);
   const [todayTotalCount, setTodayTotalCount] = useState(0);
   const [todayTotalSolved, setTodayTotalSolved] = useState(0);
+  const [todayHuntSolved, setTodayHuntSolved] = useState(0);
+  const [todayWheelSolved, setTodayWheelSolved] = useState(0);
   const [todayGuestCount, setTodayGuestCount] = useState(0);
   const [todayLoading, setTodayLoading] = useState(true);
   const [todayError, setTodayError] = useState<string | null>(null);
@@ -238,19 +240,22 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
         huntJson.totalPlayers || 0,
         wheelJson.totalParticipants || 0,
       );
-      // Solved per scope. Combined sums both modes — slight overcount for players
-      // who played both, but server-side counts include off-leaderboard solvers
-      // (guests, anyone past top 100), which the merged client map can't see.
+      const huntSolved = huntJson.totalSolved || 0;
+      const wheelSolved = wheelJson.totalSolved || 0;
+      // Single-scope keeps a single solved count. Combined renders per-mode in the
+      // header to avoid the "solved > played" paradox when players solve both modes.
       const totalSolved = scope === 'word-hunt'
-        ? (huntJson.totalSolved || 0)
+        ? huntSolved
         : scope === 'word-wheel'
-          ? (wheelJson.totalSolved || 0)
-          : (huntJson.totalSolved || 0) + (wheelJson.totalSolved || 0);
+          ? wheelSolved
+          : huntSolved + wheelSolved;
       const guestCount = (huntJson.guestPlayerCount || 0) + (wheelJson.guestPlayerCount || 0);
 
       setTodayParticipants(data);
       setTodayTotalCount(totalPlayers);
       setTodayTotalSolved(totalSolved);
+      setTodayHuntSolved(huntSolved);
+      setTodayWheelSolved(wheelSolved);
       setTodayGuestCount(guestCount);
 
       if (onParticipantCountChange && activeTab === 'today') {
@@ -623,7 +628,15 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
                 <>
                   <span>{totalCount} {t('wordHunt.leaderboard.played')}</span>
                   <span className="mx-1.5">•</span>
-                  <span className="text-emerald-600 dark:text-emerald-400">{totalSolvedCount} {t('wordHunt.leaderboard.solved')}</span>
+                  {scope === 'combined' && todayHuntSolved > 0 && todayWheelSolved > 0 ? (
+                    <>
+                      <span className="text-emerald-600 dark:text-emerald-400">🎯 {todayHuntSolved} {t('wordHunt.leaderboard.solved')}</span>
+                      <span className="mx-1.5">•</span>
+                      <span className="text-emerald-600 dark:text-emerald-400">🎡 {todayWheelSolved} {t('wordHunt.leaderboard.solved')}</span>
+                    </>
+                  ) : (
+                    <span className="text-emerald-600 dark:text-emerald-400">{totalSolvedCount} {t('wordHunt.leaderboard.solved')}</span>
+                  )}
                   {todayGuestCount > 0 && (
                     <>
                       <span className="mx-1.5">•</span>

@@ -10,6 +10,7 @@ import {
 import { hasCompletedOnboarding, markOnboardingComplete, hasPlayedBotsGame } from '@/utils/onboardingStorage';
 import { getStoredUsername } from '@/utils/profileStorage';
 import { useAuth } from '@/contexts/AuthContext';
+import { trackReplayClicked, trackNextGameStarted } from '@/utils/posthogEngagement';
 import type { DifficultyLevel, Language, LetterGrid } from '@/shared/types/game';
 import type {
   SinglePlayerMode,
@@ -120,6 +121,9 @@ export function useSinglePlayerConfig({ searchParams }: UseSinglePlayerConfigOpt
 
   const hasAutoStartedRef = useRef(false);
   const wasFirstTimerPracticeRef = useRef(false);
+  // CrazyGames "plays per session" counter — increments on every replay click.
+  // Drives the next_game_started event which feeds CG's engagement metric.
+  const sessionPlayCountRef = useRef(1);
   const hasRedirectedRef = useRef(false);
 
   // Returning-player gate: SP-vs-bots is FTUE-only. Once flag is set,
@@ -272,32 +276,21 @@ export function useSinglePlayerConfig({ searchParams }: UseSinglePlayerConfigOpt
     loadCommunityBoard();
   }, [boardCode, uiLanguage]);
 
-  // Handle pre-game tutorial completion
+  // Handle pre-game tutorial completion — route to homepage so the player
+  // chooses their own next step instead of being auto-funneled into practice.
   const handleTutorialComplete = useCallback(() => {
     markGuidanceShown('firstPlayTutorialCompleted');
     markOnboardingComplete({ avatarId: '', displayName: getStoredUsername() || '', selectedMode: 'single' });
-    wasFirstTimerPracticeRef.current = true;
-    const practicePreset = getDefaultPreset('practice');
-    if (practicePreset) {
-      const minWordLength = getMinWordLength(uiLanguage, practicePreset.settings.difficulty);
-      setGameState(prev => ({
-        ...prev,
-        mode: 'practice',
-        difficulty: practicePreset.settings.difficulty,
-        timerSeconds: practicePreset.settings.timerSeconds,
-        bots: [],
-        language: (uiLanguage as Language) || 'en',
-        grid: null,
-        minWordLength,
-      }));
-    }
-    setPhase('playing');
-  }, [uiLanguage]);
+    router.push(`/${uiLanguage}/`);
+  }, [router, uiLanguage]);
 
   // Handle play again — replays the current mode
   const handlePlayAgain = useCallback(() => {
     wasFirstTimerPracticeRef.current = false;
     unlockAudio();
+    sessionPlayCountRef.current += 1;
+    trackReplayClicked({ mode: 'sp', fromScreen: 'results' });
+    trackNextGameStarted({ mode: 'sp', gamesThisSession: sessionPlayCountRef.current });
     setGameState(prev => ({ ...prev, grid: null }));
     setPhase('playing');
   }, [unlockAudio]);
@@ -305,6 +298,9 @@ export function useSinglePlayerConfig({ searchParams }: UseSinglePlayerConfigOpt
   // Quick rematch
   const handleQuickRematch = useCallback(() => {
     unlockAudio();
+    sessionPlayCountRef.current += 1;
+    trackReplayClicked({ mode: 'sp', fromScreen: 'quick_rematch' });
+    trackNextGameStarted({ mode: 'sp', gamesThisSession: sessionPlayCountRef.current });
     setGameState(prev => ({ ...prev, grid: null }));
     setPhase('playing');
   }, [unlockAudio]);

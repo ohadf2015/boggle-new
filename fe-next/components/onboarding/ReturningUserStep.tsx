@@ -67,7 +67,7 @@ const ReturningUserStep: React.FC<ReturningUserStepProps> = ({
             className="relative w-36 h-36 shrink-0 rounded-full bg-neo-navy border-neo-thick border-black shadow-hard-lg flex items-center justify-center overflow-hidden"
           >
             <SilentVideo
-              src="/mascot/spectating.mp4"
+              src="/mascot/spectating.webp"
               className="w-full h-full object-cover"
               preload="metadata"
               aria-label={t('onboarding.returningUser.title')}

@@ -169,12 +169,50 @@ describe('useBlastDebris — static walls', () => {
     const wallCount = physics.getAllBodyStates().filter(b => b.label === 'wall').length;
     expect(physics.getAllBodyStates().length - wallCount).toBeGreaterThan(0);
 
-    nowMs += 3000; // past DEBRIS_LIFETIME (2s)
+    nowMs += 2000; // past DEBRIS_LIFETIME (1.0s after tightening)
     if (rafCb) rafCb(nowMs);
 
     expect(physics.getAllBodyStates().length - wallCount).toBe(0);
 
     perfSpy.mockRestore();
+    unmount();
+  });
+
+  it('debris ages out within ≤1.1s of spawn (was 2s — letters were obscured for too long)', () => {
+    // Given — a freshly spawned debris fragment
+    const physics = new PhysicsWorld({ gravity: { x: 0, y: 0 } });
+    const camera = new Container();
+    let nowMs = 1000;
+    const perfSpy = vi.spyOn(performance, 'now').mockImplementation(() => nowMs);
+
+    const { result, unmount } = renderHook(() => useBlastDebris(40, 8, camera, physics));
+    result.current.spawnDebris([{ row: 0, col: 0, type: 'standard' }]);
+
+    const wallCount = physics.getAllBodyStates().filter(b => b.label === 'wall').length;
+    const beforeFrames = physics.getAllBodyStates().length - wallCount;
+    expect(beforeFrames).toBeGreaterThan(0);
+
+    // When — 1.1s elapses
+    nowMs += 1100;
+    if (rafCb) rafCb(nowMs);
+
+    // Then — debris cleared
+    expect(physics.getAllBodyStates().length - wallCount).toBe(0);
+
+    perfSpy.mockRestore();
+    unmount();
+  });
+
+  it('spawnDebris emits at most 2 fragments per cleared tile (density tightened from 3)', () => {
+    const physics = new PhysicsWorld({ gravity: { x: 0, y: 0 } });
+    const camera = new Container();
+    const { result, unmount } = renderHook(() => useBlastDebris(40, 8, camera, physics));
+
+    const wallCount = physics.getAllBodyStates().filter(b => b.label === 'wall').length;
+    result.current.spawnDebris([{ row: 0, col: 0, type: 'standard' }]);
+    const dynamic = physics.getAllBodyStates().length - wallCount;
+    expect(dynamic).toBeLessThanOrEqual(2);
+
     unmount();
   });
 

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Trophy, Star, Clock } from 'lucide-react';
+import { Trophy, Star, Clock, BookOpenText } from 'lucide-react';
 import { StatCard } from './StatCard';
 import { formatTimePlayed } from '@/constants/achievementIcons';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -24,45 +24,41 @@ export function ProfileStatsGrid({ profile, isDarkMode, delay = 0.1 }: ProfileSt
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay }}
-      className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-4"
+      className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-5 pt-2"
     >
       <StatCard
-        icon={<Star />}
+        icon={<Star strokeWidth={2.5} />}
         label={t('profile.totalScore')}
         value={totalScore.toLocaleString()}
         isDarkMode={isDarkMode}
         color="cyan"
-        progress={Math.min(100, (totalScore / 1000000) * 100)}
         index={0}
       />
       <StatCard
-        icon={<Trophy />}
+        icon={<Trophy strokeWidth={2.5} />}
         label={t('profile.wins')}
         value={totalWins}
         isDarkMode={isDarkMode}
         color="pink"
-        progress={Math.min(100, (totalWins / 500) * 100)}
         index={1}
       />
       <StatCard
-        icon={<span className="text-lg">📝</span>}
+        icon={<BookOpenText strokeWidth={2.5} />}
         label={t('profile.wordsFound')}
-        value={(totalWords).toLocaleString()}
+        value={totalWords.toLocaleString()}
         isDarkMode={isDarkMode}
         color="lime"
-        progress={Math.min(100, (totalWords / 50000) * 100)}
         index={2}
       />
       <StatCard
-        icon={<Clock />}
+        icon={<Clock strokeWidth={2.5} />}
         label={t('profile.timePlayed')}
         value={formatTimePlayed(totalTime)}
         isDarkMode={isDarkMode}
         color="purple"
-        progress={Math.min(100, (totalTime / 500) * 100)}
         index={3}
       />
     </motion.div>

@@ -9,6 +9,8 @@ import type { ScoreFlyEvent } from '../BlastScoreFly';
 import type { BlastObjectiveProgress } from '../types';
 
 const HIDDEN_OBJECTIVE_BONUS = 25;
+const TARGET_WORD_BONUS = 50;
+const COLOR_POWER_BONUS = 30;
 
 interface ObjectiveEffectsDeps {
   objectives: {
@@ -47,11 +49,19 @@ export function useBlastObjectiveEffects(deps: ObjectiveEffectsDeps) {
         completedObjRef.current.add(i);
         const isHidden = obj.objective.type !== 'clear_percent';
         if (isHidden) {
-          engine.addBonusScore(HIDDEN_OBJECTIVE_BONUS);
+          // Determine bonus amount based on objective type
+          let bonusAmount = HIDDEN_OBJECTIVE_BONUS;
+          if (obj.objective.type === 'target_word') {
+            bonusAmount = TARGET_WORD_BONUS;
+          } else if (obj.objective.type === 'color_power') {
+            bonusAmount = COLOR_POWER_BONUS;
+          }
+
+          engine.addBonusScore(bonusAmount);
           const flyId = `obj-bonus-${flyIdRef.current!++}`;
           setScoreFlyEvents(prev => [...prev.slice(-2), {
             id: flyId,
-            score: HIDDEN_OBJECTIVE_BONUS,
+            score: bonusAmount,
             startX: 50,
             startY: 30,
             tier: 2,

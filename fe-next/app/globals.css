@@ -775,6 +775,21 @@
   animation: blast-heartbeat 0.8s ease-in-out infinite;
 }
 
+@utility blast-progress-shimmer {
+  /* Blast HUD progress bar — celebratory sheen once the wave goal is met */
+  position: relative;
+  background-image:
+    linear-gradient(90deg, #BFFF00, #D9FF66),
+    linear-gradient(110deg, transparent 30%, rgba(255,255,255,0.55) 50%, transparent 70%);
+  background-size: 100% 100%, 200% 100%;
+  background-blend-mode: normal, screen;
+  animation: blast-progress-shimmer-anim 1.6s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .blast-progress-shimmer { animation: none; }
+}
+
 @utility blast-board {
   /* Blast board — hide base grid visuals so BlastTile overlay is the sole renderer */
   & .game-board-frame {
@@ -2376,6 +2391,11 @@
     100% { background-position: -200% 0; }
   }
 
+  @keyframes blast-progress-shimmer-anim {
+    0% { background-position: 0 0, -200% 0; }
+    100% { background-position: 0 0, 200% 0; }
+  }
+
   @keyframes blast-shimmer {
     0% { background-position: 0% 0%; opacity: 0.9; box-shadow: inset 0 0 18px rgba(255,215,0,0.4), 0 0 12px rgba(255,200,0,0.3); transform: scale(1); }
     30% { opacity: 1; box-shadow: inset 0 0 26px rgba(255,215,0,0.6), 0 0 20px rgba(255,200,0,0.45); transform: scale(1.03); }
@@ -3037,7 +3057,9 @@
    behind sticky headers or fixed footers
    ==================================== */
 
-/* Scroll padding for anchor links to account for sticky header */
+/* Scroll padding for anchor links to account for sticky header.
+   At md+ (>=768px) DesktopGameNav (~44px) joins the fixed header band, so
+   anchors must clear the larger combined chrome. */
 html {
   scroll-padding-top: calc(var(--header-height-mobile) + 16px);
 }
@@ -3048,9 +3070,15 @@ html {
   }
 }
 
+@media (min-width: 768px) {
+  html {
+    scroll-padding-top: calc(var(--header-height-tablet) + 44px + 16px);
+  }
+}
+
 @media (min-width: 1024px) {
   html {
-    scroll-padding-top: calc(var(--header-height-desktop) + 16px);
+    scroll-padding-top: calc(var(--header-height-desktop) + 44px + 16px);
   }
 }
 

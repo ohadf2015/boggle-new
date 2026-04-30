@@ -29,13 +29,6 @@ import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   useGameMode,
-  useBlastTileOverlay,
-  useWordHuntTargetLength,
-  useWordHuntMyLife,
-  useWordHuntTargetAttempts,
-  useWordHuntTargetFound,
-  useWordHuntPlayerLives,
-  useWordHuntEliminatedPlayers,
   useGameStore,
 } from '@/hooks/gameState/store';
 
@@ -214,14 +207,9 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
   // Game mode state from Zustand
   const gameMode = useGameMode();
   const gameDuration = useGameStore((s) => s.gameDuration);
-  const blastTileOverlay = useBlastTileOverlay();
 
-  const wordHuntTargetLength = useWordHuntTargetLength();
-  const wordHuntLife = useWordHuntMyLife();
-  const wordHuntAttempts = useWordHuntTargetAttempts();
-  const wordHuntFound = useWordHuntTargetFound();
-  const wordHuntPlayerLives = useWordHuntPlayerLives();
-  const wordHuntEliminatedPlayers = useWordHuntEliminatedPlayers();
+  // Mode-overlay state subscribed inside InGameScreen — keeps this view
+  // from re-rendering on irrelevant store updates when gameMode isn't classic.
 
   // Blast multiplayer bridge — converts Zustand state to BlastGame props
   const blastBridge = useBlastMultiplayerBridge({
@@ -368,13 +356,6 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
 
           // Game mode overlays
           gameMode={gameMode ?? undefined}
-          blastTileOverlay={blastTileOverlay}
-          wordHuntTargetLength={wordHuntTargetLength}
-          wordHuntAttempts={wordHuntAttempts}
-          wordHuntFound={wordHuntFound}
-          wordHuntLife={wordHuntLife}
-          wordHuntPlayerLives={wordHuntPlayerLives}
-          wordHuntEliminatedPlayers={wordHuntEliminatedPlayers}
           onWordHuntGuess={handleWordHuntGuess}
 
           // Player experience (for keyboard trail inactivity threshold)

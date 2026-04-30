@@ -387,6 +387,7 @@ const ja = {
     "backToHome": "ホームに戻る",
     "backToMenu": "メニューに戻る",
     "next": "次へ",
+    "stepOf": "ステップ {current} / {total}",
     "previous": "前へ",
     "confirm": "確認",
     "cancel": "キャンセル",
@@ -1737,6 +1738,7 @@ const ja = {
     "header": "クイックスタートガイド",
     "loading": "読み込み中...",
     "skip": "スキップ",
+    "skipTutorial": "チュートリアルをスキップ",
     "letsPlay": "レッツクラッシュ！",
     "step1Title": "文字をスワイプ",
     "step1Text": "つながった文字をドラッグして単語を作ろう。",
@@ -1764,6 +1766,7 @@ const ja = {
       "demoComplete": "できた！遊び方がわかったね。",
       "startHere": "ここから",
       "watchMe": "見て！",
+      "demoAriaLabel": "デモ：{{word}}",
       "yourTurn": "あなたの番！スペル：",
       "letterCount": "{current}/{total}"
     },
@@ -1855,7 +1858,33 @@ const ja = {
       "letsGo": "はじめよう！",
       "chooseLanguage": "言語を選択",
       "letsPlay": "プレイ開始",
-      "whereToStart": "どこから始める？"
+      "whereToStart": "どこから始める？",
+      "v2": {
+        "rewardsEarned": "獲得した報酬",
+        "goldReward": "+{{gold}} ゴールド",
+        "goldEarned": "獲得ゴールド",
+        "streak": "連続",
+        "streakStarted": "連続1日目",
+        "achievementUnlocked": "初めての言葉",
+        "tomorrowBonus": "明日も来て+50ボーナスをゲット",
+        "scoreFooter": "{{score}}点",
+        "claimAndPlay": "受け取ってプレイ",
+        "skipForNow": "あとで",
+        "titles": {
+          "wordling": "ワードリング",
+          "wordHunter": "ワードハンター！",
+          "wordsmith": "ワードスミス！",
+          "wordSlayer": "ワードスレイヤー！",
+          "wordLegend": "ワードレジェンド！"
+        },
+        "mascotReactions": {
+          "wordling": "いい出だし！",
+          "wordHunter": "やるね！",
+          "wordsmith": "天性の才能！",
+          "wordSlayer": "絶好調！",
+          "wordLegend": "伝説のデビュー！"
+        }
+      }
     }
   },
   "preGameTutorial": {
@@ -2289,12 +2318,13 @@ const ja = {
   },
   "practiceResults": {
     "playAgain": "もう一回",
+    "goHome": "ホームに戻る",
     "orTrySomethingNew": "他のモードも試してみよう",
     "wordsFound": "{count}個の単語を発見",
     "tryDaily": "デイリーチャレンジ",
     "tryDailyDesc": "同じパズルでみんなと競争",
     "tryBots": "ボットと対戦",
-    "tryBotsDesc": "AIと腕試し",
+    "tryBotsDesc": "誰もいない？AIなら寝ない。",
     "tryMultiplayer": "フレンドと対戦",
     "tryMultiplayerDesc": "リアルタイムワードバトル",
     "wordHuntCta": "デイリーワードハントに挑戦",
@@ -2568,7 +2598,7 @@ const ja = {
       },
       "letterFeedback": {
         "title": "ヒントを読む",
-        "example": "例：目標は「BEACH」",
+        "example": "例",
         "gotIt": "わかった！",
         "legendGreen": "正解位置",
         "legendYellow": "位置違い",
@@ -2844,6 +2874,22 @@ const ja = {
       "name": "古参プレイヤー",
       "description": "30日間にわたってプレイ"
     },
+    "EARLY_BIRD": {
+      "name": "アーリーバード",
+      "description": "ゲーム開始2秒以内の単語"
+    },
+    "PALINDROME_HUNTER": {
+      "name": "回文ハンター",
+      "description": "前後どちらから読んでも同じ単語を発見"
+    },
+    "COMEBACK_CHAMPION": {
+      "name": "逆転王者",
+      "description": "終盤の猛追で勝利"
+    },
+    "FIRST_GAME_WIN": {
+      "name": "初勝利",
+      "description": "最初の試合に勝利"
+    },
     "DAILY_DOUBLE": {
       "name": "デイリー・ダブル",
       "description": "今日の2つのチャレンジを完全制覇！"
@@ -3081,6 +3127,8 @@ const ja = {
     "firstWin": {
       "title": "初勝利！🎉",
       "subtitle": "才能あるじゃん！登録して勝ち続けよう！",
+      "subtitleUrgency": "この勝利を失わないで — 消える前に登録しよう。",
+      "subtitleValueProp": "連勝を記録して、デイリーチャレンジを開放しよう。",
       "benefitsTitle": "登録して以下をアンロック:",
       "benefits": {
         "trackProgress": "進捗を追跡",
@@ -3093,7 +3141,9 @@ const ja = {
     "signInWith": "{provider}でログイン",
     "multiGames": {
       "title": "上達しています！",
-      "subtitle": "登録して進捗を保存し、実績を追跡しましょう！"
+      "subtitle": "登録して進捗を保存し、実績を追跡しましょう！",
+      "subtitleUrgency": "保存しないと統計が消えてしまいます。",
+      "subtitleValueProp": "ランキングを駆け上がり、友達と遊ぼう。"
     },
     "mpSignup": {
       "title": "進捗を保存しよう",
@@ -3497,7 +3547,9 @@ const ja = {
     "recentWords": "最近の単語",
     "leaderboard": "ランキング",
     "words": "単語",
-    "noPlayersYet": "まだプレイヤーがいません"
+    "noPlayersYet": "まだプレイヤーがいません",
+    "live": "ライブ",
+    "connecting": "接続中..."
   },
   "collectibles": {
     "title": "マイコレクション",
@@ -3597,6 +3649,7 @@ const ja = {
     "unequip": "外す",
     "purchase": "購入（{{cost}}ゴールド）",
     "close": "閉じる",
+    "unlockedToast": "✨ 新しいコスメティック解放: {{name}}",
     "rarity": {
       "common": "コモン",
       "rare": "レア",
@@ -3657,7 +3710,7 @@ const ja = {
     "globalRank": "グローバルランク",
     "loading": "リーダーボードを読み込み中...",
     "error": "リーダーボードの読み込みに失敗しました",
-    "empty": "まだスコアがありません。最初にプレイしよう！",
+    "empty": "まっさら。記録を作ろう。",
     "beFirstToPlay": "最初にプレイしよう！",
     "refresh": "更新",
     "best": "ベスト",
@@ -3751,7 +3804,7 @@ const ja = {
     "gallery": {
       "title": "コミュニティボード",
       "boardCount": "ボード",
-      "empty": "まだボードがありません。最初に作成しましょう！",
+      "empty": "ボードはまだ。最初の一枚を作ろう。",
       "emptyHint": "カスタムボードを作成してコミュニティと共有しよう",
       "emptyTitle": "まだボードがありません",
       "emptySubtitle": "最初に作成しましょう！",
@@ -4294,6 +4347,45 @@ const ja = {
     "rankedAt": "{{position}}位",
     "tierLabel": "ティア"
   },
+  "seasonBadges": {
+    "section": {
+      "title": "シーズントロフィー",
+      "empty": "シーズンのトップ5に入賞してコレクションを獲得しよう",
+      "count": "{{count}}個獲得",
+      "viewAll": "すべて表示"
+    },
+    "title": {
+      "rank1": "チャンピオン",
+      "rank2": "準優勝",
+      "rank3": "ブロンズメダリスト",
+      "rank4": "トップ5入賞",
+      "rank5": "トップ5入賞"
+    },
+    "subtitle": "{{theme}} · シーズン{{seasonId}}",
+    "modal": {
+      "headline": "{{rank}}位でフィニッシュ！",
+      "subhead": "{{theme}} 順位アンロック",
+      "collectible": "永久コレクション",
+      "viewProfile": "プロフィールで見る"
+    },
+    "recap": {
+      "title": "シーズンまとめ",
+      "bestRank": "最高順位",
+      "totalGames": "プレイ数",
+      "finalScore": "最終スコア",
+      "peakTier": "最高ティア",
+      "stats": "あなたの記録"
+    },
+    "rarity": {
+      "legendary": "レジェンド",
+      "epic": "エピック",
+      "rare": "レア",
+      "uncommon": "アンコモン"
+    },
+    "publicProfile": {
+      "title": "{{username}}のシーズントロフィー"
+    }
+  },
   "growth": {
     "dayStreak": "日連続",
     "daysAway": "日後",
@@ -4413,6 +4505,8 @@ const ja = {
     "welcomeTitle": "言葉。ライバル。栄光。",
     "welcomeSubtitle": "無料。登録不要。ペイ・トゥ・ウィンなし。",
     "playTodayChallenge": "今日のチャレンジをプレイ",
+    "moreGameModes": "その他のゲームモード",
+    "moreGameModesHint": "タップして探索",
     "singlePlayer": "クイックプレイ",
     "singlePlayerDesc": "すぐにプレイ開始",
     "badgeBots": "ボット",
@@ -4433,6 +4527,7 @@ const ja = {
     "practice": "練習",
     "practiceDesc": "プレッシャーなし、言葉だけ",
     "practiceFirstToUnlock": "練習を完了して解除",
+    "playGamesToUnlock": "{count}ゲームをプレイして解除",
     "brainTraining": "脳トレーニング",
     "brainTrainingDesc": "認知成長を追跡",
     "adventureMode": "アドベンチャー",
@@ -4462,7 +4557,7 @@ const ja = {
     "shareSubtitleGuest": "友達と遊ぼう！",
     "shareButton": "シェア",
     "shareTextAuth": "LexiClashで一緒に遊ぼう！私の招待コードを使ってね: {code}",
-    "shareTextGuest": "LexiClashをプレイしよう - 最高のマルチプレイヤー単語ゲーム！",
+    "shareTextGuest": "LexiClashで対戦しよう。どっちが強いか勝負だ。",
     "shareNativeTitle": "LexiClashに参加",
     "playNowFree": "今すぐプレイ — 無料！",
     "letsPlay": "さあ、遊ぼう！",
@@ -4574,7 +4669,7 @@ const ja = {
       "faq5A": "はい。LexiClashは6歳以上のプレイヤー向けに設計されています。COPPA規制に準拠し、パーソナライズされていない広告のみを表示し、子供のブラウジング行動を追跡しません。",
       "faq6Q": "自分のボードを作れますか？",
       "faq6A": "はい！コミュニティボードビルダーを使って、オリジナルの文字グリッドをデザインできます。公開して他のプレイヤーにプレイ、評価、競争してもらいましょう。トップボードはホームページで紹介されます。",
-      "communityTitle": "数千人のワードゲーム愛好家に参加",
+      "communityTitle": "言葉好き、集まってます。",
       "communityContent": "LexiClashのプレイヤーは40カ国以上、5言語にわたります。グローバルリーダーボードで競い合い、デイリーチャレンジの結果を共有し、新しいワード戦略を発見するコミュニティに参加しましょう。ヒント、アップデート、コミュニティハイライトはInstagram @lexi.clashをフォロー。"
     },
     "firstTimer": {
@@ -4698,10 +4793,12 @@ const ja = {
     },
     "features": {
       "unlocked": {
+        "modeRoster": "ゲームモード",
+        "modeRosterDesc": "全モード解放！試してみよう",
         "practiceMode": "練習モード",
         "practiceModeDesc": "自分のペースで練習しよう",
         "challengeMode": "チャレンジモード",
-        "challengeModeDesc": "より難しいパズルでスキルを試そう",
+        "challengeModeDesc": "難しいボード。手加減なし。",
         "customBotCount": "カスタムボット",
         "customBotCountDesc": "対戦するボットの数を選択",
         "advancedSettings": "詳細設定",
@@ -4847,8 +4944,8 @@ const ja = {
   "rules": {
     "pageTitle": "LexiClash: リアルタイム単語バトル",
     "gameModes": "ゲームモード",
-    "readyToTest": "単語力を試す準備はできましたか？",
-    "readyToTestDesc": "究極の単語バトル体験に何千人ものプレイヤーと一緒に参加しましょう。ルームを作成し、友達を招待して、誰が最高のボキャブラリーを持っているか確かめよう！",
+    "readyToTest": "腕試ししてみる？",
+    "readyToTestDesc": "ルーム作って、友達呼んで、誰が一番か決めよう。",
     "startPlaying": "今すぐプレイを開始",
     "backToHome": "ホームに戻る",
     "joinOrCreateDesc": "自分のゲームルームを作成するか、ルームコードを使って既存のルームに参加します。コードを友達と共有して即座に招待できます。",
@@ -4867,7 +4964,7 @@ const ja = {
     "dontOverthinkDesc": "明らかな3-4文字の単語をためらわずに素早く提出しましょう。それらはすぐに積み重なり、より長く高得点の単語を探している間、堅実な基盤を与えてくれます。",
     "soloVsBotsDesc": "様々な難易度レベルのAI対戦相手と競争。本物のプレイヤーに挑戦する前の戦略練習に最適。",
     "practiceModeDesc": "タイマーなしでゆっくり。新しい単語を学んだり、プレッシャーなしでグリッドを探索するのに最適。",
-    "challengeModeDesc": "自分の最高記録を破り、時間とともに上達を追跡。自分自身と競争！"
+    "challengeModeDesc": "昨日の自分を超えていけ。スコアが伸びるのを楽しもう。"
   },
   "social": {
     "playersOnline": "オンラインプレイヤー",
@@ -4947,7 +5044,7 @@ const ja = {
         "trackResults": "誰があなたのチャレンジを突破したかを確認"
       },
       "ctaButton": "登録して作成を開始",
-      "socialProof": "何千人もの作成者に参加しよう"
+      "socialProof": "今もボードがどんどん作られてる。"
     },
     "copiedToClipboard": "コピーしました！",
     "home": "ホーム",
@@ -5074,7 +5171,7 @@ const ja = {
     },
     "nextChallenge": {
       "wordHuntTitle": "⚡ デイリーワードハントが待っています！",
-      "wordHuntDesc": "スピードをテスト！できるだけ早く目標の単語を見つけよう。",
+      "wordHuntDesc": "時間との勝負。単語をつかまえろ。",
       "wordHuntCTA": "ワードハントをプレイ",
       "buzzTitle": "🔥 デイリーバズチャレンジ！",
       "buzzDesc": "トレンドトピック！AI生成ワードパズルを解こう。",
@@ -8123,6 +8220,12 @@ const ja = {
       "cta": "広告を見て+{moves}手獲得",
       "decline": "終了する"
     },
+    "retryWaveModal": {
+      "title": "ウェーブ{wave} — あと少し！",
+      "body": "{percent}%クリア。広告を見てウェーブ{wave}に再挑戦 — 前のウェーブは保持されます。",
+      "cta": "ウェーブ{wave}に再挑戦",
+      "decline": "ウェーブ1から再開"
+    },
     "pregameBuff": {
       "title": "パワーアップ？",
       "body": "ブーストを選び、短い広告を見て、有利にランを始めよう。",
@@ -8293,6 +8396,7 @@ const ja = {
       "newBadge": "NEW",
       "waveFailed": "ウェーブ失敗",
       "needClearPct": "{required}%クリアが必要 — 結果は{got}%",
+      "tilesShort": "あと{count}タイルだった!",
       "failHint": "進むにはボードの90%以上をクリアしてください",
       "tryAgain": "もう一度",
       "share": "共有",
@@ -8394,6 +8498,8 @@ const ja = {
     "celebrateAgain": "また祝おう",
     "best": "ベスト",
     "movesLeft": "残り手数",
+    "luckyBoost": "ラッキーブースト",
+    "luckyBoostDesc": "苦戦後に特殊タイル増加",
     "bonusMove": "+1 手!",
     "bonusMoves": "+{count} 手!",
     "outOfMoves": "手数切れ!",
@@ -8411,7 +8517,29 @@ const ja = {
       "collectType": "{tileType}を{target}個集める",
       "clearAllType": "すべての{tileType}をクリア",
       "wordLength": "{minWordLength}文字以上の単語を{target}個",
-      "clearPercent": "ボードの{target}%をクリア"
+      "clearPercent": "ボードの{target}%をクリア",
+      "targetWord": "見つける: {word}",
+      "targetWordFoundIt": "見つけた!",
+      "targetWordMissed": "ターゲットは: {word} — カスケードが解決した!",
+      "colorPower": "1つの単語で{color}タイル{count}個以上を使用",
+      "colorPink": "ピンク",
+      "colorCyan": "シアン",
+      "colorLime": "ライム",
+      "bannerTitle": "目標"
+    },
+    "hint": {
+      "free": "無料",
+      "ad": "ヒント",
+      "aria": {
+        "free": "無料ヒント — 25点減点",
+        "ad": "広告を見てヒントを取得 — 25点減点"
+      },
+      "toast": {
+        "targetWord": "作ってみよう: {word}",
+        "colorPower": "{color}のタイルを探そう",
+        "collectType": "{tileType}をもっと見つけよう",
+        "clearAllType": "残りの{tileType}をクリア"
+      }
     },
     "combo": {
       "bomb_bomb": "メガブラスト！",
@@ -9220,7 +9348,7 @@ const ja = {
       "roleGuest": "ゲスト",
       "roleStudent": "生徒",
       "roleTeacher": "先生",
-      "socialProof": "何千人もの仲間が学習中",
+      "socialProof": "勉強してるのは、あなただけじゃない。",
       "student": "生徒",
       "studentCta": "学習をはじめる",
       "studentDesc": "遊びながら語彙力UP",
@@ -9711,7 +9839,7 @@ const ja = {
       "practiceMode": "練習モード",
       "practiceModeDesc": "自分のペースで練習しよう",
       "challengeMode": "チャレンジモード",
-      "challengeModeDesc": "より難しいパズルでスキルを試そう",
+      "challengeModeDesc": "難しいボード。手加減なし。",
       "customBotCount": "カスタムボット",
       "customBotCountDesc": "対戦するボットの数を選択",
       "advancedSettings": "詳細設定",
@@ -10596,6 +10724,7 @@ const ja = {
     "title": "ブーストを選択",
     "cta": "ブースト",
     "close": "閉じる",
+    "skipAndPlay": "ブーストなしでプレイ",
     "remaining": "本日の残り: {{n}}/{{cap}}",
     "watchAd": "広告を見てアンロック",
     "activeThisGame": "このゲームで有効",

@@ -57,7 +57,6 @@ const ShareReferralModal = dynamic(
   () => import('./ShareReferralModal').then((m) => m.ShareReferralModal),
   { ssr: false }
 );
-const OnboardingModal = dynamic(() => import('@/components/OnboardingModal'), { ssr: false });
 const PlayfulBackground = dynamic(
   () => import('@/components/ui/PlayfulBackground').then((m) => m.PlayfulBackground),
   { ssr: false }
@@ -94,7 +93,6 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
     if (visibleEvent) setDismissedEventIds((prev) => new Set([...prev, visibleEvent.id]));
   }, [visibleEvent]);
 
-  const [showOnboarding, setShowOnboarding] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const { isOnCrazyGamesPlatform, isLoading: cgLoading } = useCrazyGames();
   // Treat "still resolving" as embedded — prevents AnonymousTeaserWidgets
@@ -156,7 +154,6 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
     >
       {enableHeavyBackground && !isMobilePortrait && <PlayfulBackground intensity="high" colorScheme="default" />}
 
-      <OnboardingModal isOpen={showOnboarding} onClose={() => setShowOnboarding(false)} />
       {!hideExternalAuth && <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />}
       <ShareReferralModal isOpen={showShareModal} onClose={() => setShowShareModal(false)} />
       <Header />

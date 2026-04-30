@@ -204,7 +204,7 @@ export default function PartyScreen() {
           )}>
             {isConnected ? <Wifi className="w-4 h-4" /> : <WifiOff className="w-4 h-4" />}
             <span className="text-sm font-bold uppercase">
-              {isConnected ? 'Live' : 'Connecting...'}
+              {isConnected ? t('partyScreen.live') : t('partyScreen.connecting')}
             </span>
           </div>
 

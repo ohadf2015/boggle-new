@@ -110,17 +110,40 @@ export function GameInstructions({ selectedGameMode, t, defaultOpen = true }: Ga
                   </div>
                 </motion.div>
               </AnimatePresence>
-              <div className="flex items-center justify-center gap-3 mt-3">
-                <button onClick={(e) => { e.stopPropagation(); setInstructionStep(s => Math.max(0, s - 1)); }} disabled={instructionStep === 0} className="w-6 h-6 flex items-center justify-center rounded bg-neo-white/10 disabled:opacity-30 transition-opacity" aria-label={t('common.previous')}>
-                  <ChevronLeft className="w-4 h-4 text-neo-cream rtl:rotate-180" />
+              <div className="flex items-center justify-center gap-2 mt-3" role="group">
+                <button
+                  onClick={(e) => { e.stopPropagation(); setInstructionStep(s => Math.max(0, s - 1)); }}
+                  disabled={instructionStep === 0}
+                  className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-neo bg-neo-white/10 disabled:opacity-30 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan"
+                  aria-label={t('common.previous')}
+                >
+                  <ChevronLeft className="w-5 h-5 text-neo-cream rtl:rotate-180" />
                 </button>
-                <div className="flex gap-1.5">
-                  {steps.map((step, i) => (
-                    <button key={step.titleKey} onClick={(e) => { e.stopPropagation(); setInstructionStep(i); }} className={cn('w-2 h-2 rounded-full transition-colors', i === instructionStep ? dotClass : 'bg-neo-white/20')} />
-                  ))}
+                <div className="flex gap-0.5" role="tablist">
+                  {steps.map((step, i) => {
+                    const isActive = i === instructionStep;
+                    return (
+                      <button
+                        key={step.titleKey}
+                        onClick={(e) => { e.stopPropagation(); setInstructionStep(i); }}
+                        role="tab"
+                        aria-selected={isActive}
+                        aria-current={isActive ? 'step' : undefined}
+                        aria-label={t('common.stepOf', { current: i + 1, total: steps.length })}
+                        className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-neo focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan"
+                      >
+                        <span className={cn('w-2.5 h-2.5 rounded-full transition-colors', isActive ? dotClass : 'bg-neo-white/20')} aria-hidden="true" />
+                      </button>
+                    );
+                  })}
                 </div>
-                <button onClick={(e) => { e.stopPropagation(); setInstructionStep(s => Math.min(steps.length - 1, s + 1)); }} disabled={instructionStep === steps.length - 1} className="w-6 h-6 flex items-center justify-center rounded bg-neo-white/10 disabled:opacity-30 transition-opacity" aria-label={t('common.next')}>
-                  <ChevronRight className="w-4 h-4 text-neo-cream rtl:rotate-180" />
+                <button
+                  onClick={(e) => { e.stopPropagation(); setInstructionStep(s => Math.min(steps.length - 1, s + 1)); }}
+                  disabled={instructionStep === steps.length - 1}
+                  className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-neo bg-neo-white/10 disabled:opacity-30 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan"
+                  aria-label={t('common.next')}
+                >
+                  <ChevronRight className="w-5 h-5 text-neo-cream rtl:rotate-180" />
                 </button>
               </div>
             </div>

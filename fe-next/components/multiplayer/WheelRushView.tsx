@@ -2,7 +2,7 @@
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { Socket } from 'socket.io-client';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import dynamic from 'next/dynamic';
 import { RotateCcw, Shuffle, Sparkles } from 'lucide-react';
 import { WheelLetter, WordTile } from '@/components/daily/WordWheelParts';
@@ -63,11 +63,24 @@ const ERROR_KEY: Record<WheelErrorCode, string> = {
   'duplicate': 'wordWheel.alreadyFound',
 };
 
+const FogCountdown: React.FC<{ endsAt: number }> = ({ endsAt }) => {
+  const [secs, setSecs] = useState(() => Math.max(0, Math.ceil((endsAt - Date.now()) / 1000)));
+  useEffect(() => {
+    const tick = () => setSecs(Math.max(0, Math.ceil((endsAt - Date.now()) / 1000)));
+    tick();
+    const id = setInterval(tick, 250);
+    return () => clearInterval(id);
+  }, [endsAt]);
+  return <span className="opacity-60 tabular-nums">{secs}s</span>;
+};
+
 export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, onQuit, t }) => {
   const {
     playTileSelectSound, playWordAcceptedSound, playWordRejectedSound,
     playButtonClickSound, playBoardShuffleSound,
   } = useSoundEffects();
+
+  const prefersReduced = useReducedMotion();
 
   const [puzzle, setPuzzle] = useState<WheelPuzzle | null>(null);
   const [outerLetters, setOuterLetters] = useState<string[]>([]);
@@ -76,7 +89,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
   const [myWords, setMyWords] = useState<WordEntry[]>([]);
   const [feedback, setFeedback] = useState<{ type: 'ok' | 'err'; msg: string } | null>(null);
   const [wordBuilderShake, setWordBuilderShake] = useState(false);
-  const [now, setNow] = useState<number>(() => Date.now());
+  const [fogActive, setFogActive] = useState(false);
   const [wheelRadius, setWheelRadius] = useState(72);
 
   const { floatingReactions, dismissReaction } = useQuickReactions({ socket, username });
@@ -89,11 +102,21 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
   const dragEngagedRef = useRef(false);
   const usedIndicesRef = useRef<Set<number>>(new Set());
 
-  // 100ms tick for countdowns + fog window
+  // Latest-value ref for socket handlers — prevents listener re-registration
+  // when consumer-supplied values (t, sound funcs) change reference across renders.
+  const latestRef = useRef({ t, puzzle, username, playWordAcceptedSound, playWordRejectedSound });
+  latestRef.current = { t, puzzle, username, playWordAcceptedSound, playWordRejectedSound };
+
+  // Fog flips off once at expiry — no per-frame ticker on the parent.
+  // FogCountdown leaf owns its own 100ms tick for the seconds display.
   useEffect(() => {
-    const id = setInterval(() => setNow(Date.now()), 100);
-    return () => clearInterval(id);
-  }, []);
+    if (startedAt == null) { setFogActive(false); return; }
+    const remaining = startedAt + WHEEL_RUSH_FOG_MS - Date.now();
+    if (remaining <= 0) { setFogActive(false); return; }
+    setFogActive(true);
+    const id = setTimeout(() => setFogActive(false), remaining);
+    return () => clearTimeout(id);
+  }, [startedAt]);
 
   // Track which wheel indices are used (-1 for center)
   const usedIndices = useMemo(() => {
@@ -131,30 +154,32 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
       closed?: string[];
       myWords?: string[];
     }) => {
+      const me = latestRef.current.username;
       setPuzzle(data.puzzle);
       setOuterLetters(data.puzzle.outerLetters);
       setStartedAt(data.startedAt ?? Date.now());
       // Reconnect-snapshot hydration: rebuild client state from server payload.
-      const mine = data.myWords ?? data.foundWords?.[username] ?? [];
+      const mine = data.myWords ?? data.foundWords?.[me] ?? [];
       if (mine.length) {
         const closedSet = new Set(data.closed ?? []);
         const myLocks = data.locks ?? {};
         const ts = Date.now();
         setMyWords(mine.map(word => {
           const lk = myLocks[word];
-          if (lk && lk.by === username) return { word, kind: 'locked', lockUntil: lk.until, ts };
+          if (lk && lk.by === me) return { word, kind: 'locked', lockUntil: lk.until, ts };
           if (closedSet.has(word)) return { word, kind: 'closed', ts };
           return { word, kind: 'locked', ts };
         }));
       }
     };
     const onResult = (data: { word: string; accepted: boolean; kind?: string; score?: number; lockUntil?: number; stolenFrom?: string; error?: string }) => {
+      const { t: tt, puzzle: pz, playWordAcceptedSound: accSfx, playWordRejectedSound: rejSfx } = latestRef.current;
       if (!data.accepted) {
         const code = data.error as WheelErrorCode | undefined;
         const key = code && ERROR_KEY[code] ? ERROR_KEY[code] : 'wordWheel.notInDictionary';
-        const msg = t(key, { min: MIN_LEN, letter: puzzle?.centerLetter ?? '' }) || key;
+        const msg = tt(key, { min: MIN_LEN, letter: pz?.centerLetter ?? '' }) || key;
         flash('err', msg);
-        playWordRejectedSound();
+        rejSfx();
         return;
       }
       if (data.kind === 'locked') {
@@ -162,21 +187,22 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
         flash('ok', `+${data.score}`);
       } else if (data.kind === 'stolen') {
         setMyWords(prev => [{ word: data.word, kind: 'stolen', score: data.score, stolenFrom: data.stolenFrom, ts: Date.now() }, ...prev]);
-        flash('ok', t('wordWheel.stealGain', { score: data.score ?? 0 }) || `+${data.score}`);
+        flash('ok', tt('wordWheel.stealGain', { score: data.score ?? 0 }) || `+${data.score}`);
       }
-      playWordAcceptedSound();
+      accSfx();
       haptic(20);
       setBuiltLetters([]);
     };
     const onStolen = (data: { word: string; by?: string; from?: string }) => {
-      if (data.from === username) {
+      const { t: tt, username: me, playWordRejectedSound: rejSfx } = latestRef.current;
+      if (data.from === me) {
         setMyWords(prev => prev.map(w =>
           w.word === data.word && w.kind === 'locked'
             ? { ...w, kind: 'stolen-from-me' as const, stolenFrom: data.by }
             : w,
         ));
-        flash('err', t('wordWheel.yourWordStolen', { word: data.word, by: data.by ?? '' }) || 'Stolen!');
-        playWordRejectedSound();
+        flash('err', tt('wordWheel.yourWordStolen', { word: data.word, by: data.by ?? '' }) || 'Stolen!');
+        rejSfx();
         haptic([40, 30, 40]);
       }
     };
@@ -199,7 +225,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
       socket.off('wheelWordClosed', onClosed);
       socket.off('connect', onReconnect);
     };
-  }, [socket, flash, t, puzzle, username, playWordAcceptedSound, playWordRejectedSound]);
+  }, [socket, flash]);
 
   // Letter tap handler (matches SP signature)
   const handleLetterPress = useCallback((letter: string, wheelIndex: number, _el: HTMLButtonElement) => {
@@ -296,17 +322,19 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
     socket.emit('submitWheelWord', { word });
   }, [socket, puzzle, builtLetters.length, builtWord, flash, t, playWordRejectedSound]);
 
-  // Responsive wheel radius
+  // Responsive wheel radius — observe the container directly. Browser batches
+  // ResizeObserver callbacks per-frame, so rapid window resizes won't thrash.
   useEffect(() => {
+    const el = wheelContainerRef.current;
+    if (!el) return;
     const update = () => {
-      if (wheelContainerRef.current) {
-        const w = wheelContainerRef.current.getBoundingClientRect().width;
-        setWheelRadius(Math.max(56, Math.min(96, (w - 56) / 2)));
-      }
+      const w = el.getBoundingClientRect().width;
+      setWheelRadius(Math.max(56, Math.min(96, (w - 56) / 2)));
     };
     update();
-    window.addEventListener('resize', update);
-    return () => window.removeEventListener('resize', update);
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
   }, [puzzle]);
 
   // Keyboard input (shared hook)
@@ -323,7 +351,6 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
   });
 
   const fogEndsAt = (startedAt ?? 0) + WHEEL_RUSH_FOG_MS;
-  const fogActive = startedAt != null && now < fogEndsAt;
   if (!puzzle) {
     return (
       <div className="flex-1 flex items-center justify-center bg-neo-navy text-neo-cream">
@@ -368,9 +395,9 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
 
       {fogActive && (
         <div className="text-center text-xs sm:text-sm text-neo-cyan font-neo-display font-bold tracking-wide flex items-center justify-center gap-2 shrink-0">
-          <span className="inline-block w-1.5 h-1.5 rounded-full bg-neo-cyan animate-pulse" />
+          <span className={cn('inline-block w-1.5 h-1.5 rounded-full bg-neo-cyan', !prefersReduced && 'animate-pulse')} />
           {t('wheel.rush.fogActive') || 'Fog of War active!'}
-          <span className="opacity-60 tabular-nums">{Math.ceil((fogEndsAt - now) / 1000)}s</span>
+          <FogCountdown endsAt={fogEndsAt} />
         </div>
       )}
 
@@ -378,13 +405,15 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
       <motion.div
         className="relative w-full min-h-[52px] sm:min-h-[72px] flex items-center justify-center"
         animate={
-          wordBuilderShake
+          wordBuilderShake && !prefersReduced
             ? { x: [-4, 4, -3, 3, -1, 0] }
-            : { scale: 1 + builtLetters.length * 0.008 }
+            : { scale: prefersReduced ? 1 : 1 + builtLetters.length * 0.008 }
         }
-        transition={wordBuilderShake
+        transition={wordBuilderShake && !prefersReduced
           ? { duration: 0.35 }
-          : { type: 'spring', stiffness: 300, damping: 20 }
+          : prefersReduced
+            ? { duration: 0 }
+            : { type: 'spring', stiffness: 300, damping: 20 }
         }
       >
         <div className="flex items-center justify-center gap-1 sm:gap-2 flex-wrap max-w-full">
@@ -490,7 +519,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
             'hover:bg-neo-navy active:shadow-hard-pressed active:translate-x-px active:translate-y-px',
             'disabled:opacity-30 disabled:cursor-not-allowed',
           )}
-          whileTap={{ scale: 0.9 }}
+          whileTap={prefersReduced ? {} : { scale: 0.9 }}
           aria-label={t('wordWheel.clear') || 'Clear'}
         >
           <RotateCcw className="w-5 h-5" />
@@ -508,7 +537,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
             'active:shadow-hard-pressed active:translate-x-px active:translate-y-px',
             'disabled:cursor-not-allowed',
           )}
-          whileTap={builtWord.length >= MIN_LEN ? { scale: 0.92 } : {}}
+          whileTap={prefersReduced || builtWord.length < MIN_LEN ? {} : { scale: 0.92 }}
         >
           <div className="flex items-center gap-2">
             <Sparkles className="w-5 h-5" />
@@ -523,7 +552,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
             'p-3 rounded-neo border-3 border-neo-black bg-neo-navy-light text-neo-cream shadow-hard',
             'hover:bg-neo-navy active:shadow-hard-pressed active:translate-x-px active:translate-y-px',
           )}
-          whileTap={{ scale: 0.9, rotate: 180 }}
+          whileTap={prefersReduced ? {} : { scale: 0.9, rotate: 180 }}
           transition={{ type: 'spring', stiffness: 300 }}
           aria-label={t('wordWheel.shuffle') || 'Shuffle'}
         >

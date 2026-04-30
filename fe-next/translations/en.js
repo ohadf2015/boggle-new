@@ -388,6 +388,7 @@ const en = {
     "backToHome": "Back to Home",
     "backToMenu": "Back to Menu",
     "next": "Next",
+    "stepOf": "Step {current} of {total}",
     "previous": "Previous",
     "confirm": "Confirm",
     "cancel": "Cancel",
@@ -1854,6 +1855,7 @@ const en = {
     "header": "Quick Start",
     "loading": "Loading...",
     "skip": "Skip",
+    "skipTutorial": "Skip Tutorial",
     "letsPlay": "Let's Clash!",
     "timingHint": "First 10 secs are key!",
     "step1Title": "Swipe It",
@@ -1882,6 +1884,7 @@ const en = {
       "demoComplete": "You got it! Let's clash!",
       "startHere": "Start Here",
       "watchMe": "Watch this!",
+      "demoAriaLabel": "Animated demo: tracing the word {{word}} across letter tiles",
       "yourTurn": "Your turn! Spell:",
       "letterCount": "{current}/{total}"
     },
@@ -1976,6 +1979,8 @@ const en = {
       "v2": {
         "rewardsEarned": "REWARDS EARNED",
         "goldReward": "+{{gold}} GOLD",
+        "goldEarned": "gold earned",
+        "streak": "streak",
         "streakStarted": "DAY 1 STREAK",
         "achievementUnlocked": "FIRST WORDS",
         "tomorrowBonus": "Come back tomorrow for +50 bonus",
@@ -2429,12 +2434,13 @@ const en = {
   },
   "practiceResults": {
     "playAgain": "Play Again",
+    "goHome": "Back to Home",
     "orTrySomethingNew": "or try something new",
     "wordsFound": "{count} words found",
     "tryDaily": "Daily Challenge",
     "tryDailyDesc": "Same puzzle, everyone competes",
     "tryBots": "Fight Bots",
-    "tryBotsDesc": "Test your skills against AI opponents",
+    "tryBotsDesc": "No friends around? Bots don't sleep.",
     "tryMultiplayer": "Play with Friends",
     "tryMultiplayerDesc": "Real-time word battles",
     "wordHuntCta": "Play Word Hunt Daily",
@@ -2707,7 +2713,7 @@ const en = {
       },
       "letterFeedback": {
         "title": "Reading the Clues",
-        "example": "Example: Target is \"BEACH\"",
+        "example": "Example",
         "gotIt": "Got it!",
         "legendGreen": "Right spot",
         "legendYellow": "Wrong spot",
@@ -2984,6 +2990,22 @@ const en = {
       "name": "Loyalist",
       "description": "30-day warrior"
     },
+    "EARLY_BIRD": {
+      "name": "Early Bird",
+      "description": "First word in 2 seconds flat"
+    },
+    "PALINDROME_HUNTER": {
+      "name": "Palindrome Hunter",
+      "description": "Found a word that reads the same both ways"
+    },
+    "COMEBACK_CHAMPION": {
+      "name": "Comeback Champion",
+      "description": "Won with a furious late-game push"
+    },
+    "FIRST_GAME_WIN": {
+      "name": "First Victory",
+      "description": "Won your very first game"
+    },
     "DAILY_DOUBLE": {
       "name": "Daily Double",
       "description": "Crushed both challenges today"
@@ -3221,6 +3243,8 @@ const en = {
     "firstWin": {
       "title": "First Victory! 🎉",
       "subtitle": "You've got game! Sign up to keep winning.",
+      "subtitleUrgency": "Don't lose this win — sign up before it slips away.",
+      "subtitleValueProp": "Track your streak and unlock daily challenges.",
       "benefitsTitle": "Unlock:",
       "benefits": {
         "trackProgress": "Track your progress",
@@ -3233,7 +3257,9 @@ const en = {
     "signInWith": "Sign in with {provider}",
     "multiGames": {
       "title": "You're On a Roll!",
-      "subtitle": "Save your progress and track achievements!"
+      "subtitle": "Save your progress and track achievements!",
+      "subtitleUrgency": "Your stats vanish if you don't save them.",
+      "subtitleValueProp": "Climb the leaderboard and play with friends."
     },
     "mpSignup": {
       "title": "Keep Your Progress",
@@ -4009,7 +4035,9 @@ const en = {
     "recentWords": "Recent Words",
     "leaderboard": "Leaderboard",
     "words": "words",
-    "noPlayersYet": "No players yet"
+    "noPlayersYet": "No players yet",
+    "live": "Live",
+    "connecting": "Connecting..."
   },
   "collectibles": {
     "title": "My Collection",
@@ -4109,6 +4137,7 @@ const en = {
     "unequip": "Unequip",
     "purchase": "Buy ({{cost}} gold)",
     "close": "Close",
+    "unlockedToast": "✨ New cosmetic unlocked: {{name}}",
     "rarity": {
       "common": "Common",
       "rare": "Rare",
@@ -4169,7 +4198,7 @@ const en = {
     "globalRank": "Global Rank",
     "loading": "Loading leaderboard...",
     "error": "Failed to load leaderboard",
-    "empty": "No scores yet. Be the first to play!",
+    "empty": "Wide open. Go set the bar.",
     "beFirstToPlay": "Be the first to play!",
     "refresh": "Refresh",
     "best": "Best",
@@ -4263,7 +4292,7 @@ const en = {
     "gallery": {
       "title": "Community Boards",
       "boardCount": "boards",
-      "empty": "No boards yet. Be the first to create one!",
+      "empty": "No boards yet. Build one — start the trend.",
       "emptyHint": "Create a custom board and share it with the community",
       "emptyTitle": "No boards yet",
       "emptySubtitle": "Be the first to create one!",
@@ -4439,6 +4468,45 @@ const en = {
     "rankedAt": "Rank #{{position}}",
     "tierLabel": "Tier"
   },
+  "seasonBadges": {
+    "section": {
+      "title": "Season Trophies",
+      "empty": "Finish top 5 in a season to earn a collectible trophy",
+      "count": "{{count}} earned",
+      "viewAll": "View all"
+    },
+    "title": {
+      "rank1": "Champion",
+      "rank2": "Runner-Up",
+      "rank3": "Bronze Medalist",
+      "rank4": "Top 5 Finisher",
+      "rank5": "Top 5 Finisher"
+    },
+    "subtitle": "{{theme}} · Season {{seasonId}}",
+    "modal": {
+      "headline": "You finished #{{rank}}!",
+      "subhead": "{{theme}} placement unlocked",
+      "collectible": "Permanent collectible",
+      "viewProfile": "View in profile"
+    },
+    "recap": {
+      "title": "Season Recap",
+      "bestRank": "Best Rank",
+      "totalGames": "Games Played",
+      "finalScore": "Final Score",
+      "peakTier": "Peak Tier",
+      "stats": "Your Numbers"
+    },
+    "rarity": {
+      "legendary": "Legendary",
+      "epic": "Epic",
+      "rare": "Rare",
+      "uncommon": "Uncommon"
+    },
+    "publicProfile": {
+      "title": "{{username}}'s Season Trophies"
+    }
+  },
   "growth": {
     "dayStreak": "day streak",
     "daysAway": "days away",
@@ -4558,6 +4626,8 @@ const en = {
     "welcomeTitle": "Words. Rivals. Glory.",
     "welcomeSubtitle": "Free. No sign-up. No pay-to-win.",
     "playTodayChallenge": "Play Today's Challenge",
+    "moreGameModes": "More Game Modes",
+    "moreGameModesHint": "Tap to explore",
     "singlePlayer": "Quick Play",
     "singlePlayerDesc": "Jump in and play instantly",
     "badgeBots": "Bots",
@@ -4578,6 +4648,7 @@ const en = {
     "practice": "Practice",
     "practiceDesc": "No pressure, just words",
     "practiceFirstToUnlock": "Finish practice to unlock",
+    "playGamesToUnlock": "Play {count} games to unlock",
     "brainTraining": "Brain Training",
     "brainTrainingDesc": "Track cognitive growth",
     "adventureMode": "Adventure",
@@ -4607,7 +4678,7 @@ const en = {
     "shareSubtitleGuest": "Play with friends!",
     "shareButton": "Share",
     "shareTextAuth": "Join me on LexiClash! Use my referral code: {code}",
-    "shareTextGuest": "Play LexiClash - the best multiplayer word game!",
+    "shareTextGuest": "Come play LexiClash with me — let's see who's better.",
     "shareNativeTitle": "Join LexiClash",
     "playNowFree": "Play Now — Free!",
     "letsPlay": "Let's Play!",
@@ -4720,7 +4791,7 @@ const en = {
       "faq5A": "Yes. LexiClash is designed for players ages 6 and up. We comply with COPPA regulations, serve only non-personalized ads, and do not track children's browsing behavior.",
       "faq6Q": "Can I create my own board?",
       "faq6A": "Yes! Use the Community Board Builder to design custom letter grids with your own seed words. Publish them for others to play, rate, and compete on. Top boards get featured on the home page.",
-      "communityTitle": "Join Thousands of Word Game Enthusiasts",
+      "communityTitle": "Word nerds welcome.",
       "communityContent": "LexiClash players span over 40 countries and five languages. Join the community to compete on global leaderboards, share daily challenge results, and discover new word strategies. Follow us on Instagram @lexi.clash for tips, updates, and community highlights."
     },
     "firstTimer": {
@@ -4844,10 +4915,12 @@ const en = {
     },
     "features": {
       "unlocked": {
+        "modeRoster": "Game Modes",
+        "modeRosterDesc": "Full lineup unlocked. Try them all!",
         "practiceMode": "Practice Mode",
         "practiceModeDesc": "Practice at your own pace",
         "challengeMode": "Challenge Mode",
-        "challengeModeDesc": "Test your skills with harder puzzles",
+        "challengeModeDesc": "Tougher boards. No mercy.",
         "customBotCount": "Custom Bots",
         "customBotCountDesc": "Choose how many bots to play against",
         "advancedSettings": "Advanced Settings",
@@ -4941,8 +5014,8 @@ const en = {
   "rules": {
     "pageTitle": "LexiClash: Real-Time Word Battle",
     "gameModes": "Game Modes",
-    "readyToTest": "Ready to Test Your Word Skills?",
-    "readyToTestDesc": "Join thousands of players in the ultimate word battle experience. Create a room, invite your friends, and see who has the best vocabulary!",
+    "readyToTest": "Think you can hang?",
+    "readyToTestDesc": "Make a room. Drag your friends in. Find out who's actually good.",
     "startPlaying": "Start Playing Now",
     "backToHome": "Back to Home",
     "joinOrCreateDesc": "Create your own game room or join an existing one using a room code. Share the code with friends to invite them instantly.",
@@ -4961,7 +5034,7 @@ const en = {
     "dontOverthinkDesc": "Submit obvious 3-4 letter words quickly without hesitation. They add up fast and give you a solid foundation while you search for longer, higher-scoring words.",
     "soloVsBotsDesc": "Compete against AI opponents of varying difficulty levels. Perfect for practicing strategies before challenging real players.",
     "practiceModeDesc": "Take your time with no timer. Perfect for learning new words and exploring the grid without pressure.",
-    "challengeModeDesc": "Beat your personal high scores and track your improvement over time. Compete against yourself!"
+    "challengeModeDesc": "Beat your old self. Watch the score climb."
   },
   "social": {
     "playersOnline": "players online",
@@ -5077,7 +5150,7 @@ const en = {
         "trackResults": "See who beats your challenge"
       },
       "ctaButton": "Sign Up to Start Creating",
-      "socialProof": "Join thousands creating challenges"
+      "socialProof": "Plenty of boards being built right now."
     },
     "createChallengeTitle": "Create Challenge",
     "chooseBoardSize": "Choose Board Size",
@@ -5160,7 +5233,7 @@ const en = {
     },
     "nextChallenge": {
       "wordHuntTitle": "⚡ Daily Word Hunt Awaits!",
-      "wordHuntDesc": "Test your speed! Find the target word as fast as you can.",
+      "wordHuntDesc": "Race the clock. Catch the word.",
       "wordHuntCTA": "Play Word Hunt",
       "buzzTitle": "🔥 Daily Buzz Challenge!",
       "buzzDesc": "Trending topics! Solve AI-generated word puzzles.",
@@ -8341,6 +8414,12 @@ const en = {
       "cta": "Watch Ad for +{moves} moves",
       "decline": "End run"
     },
+    "retryWaveModal": {
+      "title": "Wave {wave} — so close!",
+      "body": "You cleared {percent}%. Watch an ad to retry wave {wave} — your earlier waves are safe.",
+      "cta": "Retry Wave {wave}",
+      "decline": "Restart from wave 1"
+    },
     "pregameBuff": {
       "title": "Power up?",
       "body": "Pick a boost, watch a quick ad, and start this run with an edge.",
@@ -8511,6 +8590,7 @@ const en = {
       "newBadge": "NEW",
       "waveFailed": "Wave Failed",
       "needClearPct": "Needed {required}% cleared — you got {got}%",
+      "tilesShort": "Just {count} tiles short!",
       "failHint": "Clear at least 90% of the board to advance",
       "tryAgain": "Try Again",
       "share": "Share",
@@ -8613,6 +8693,8 @@ const en = {
     "celebrateAgain": "Celebrate again",
     "best": "Best",
     "movesLeft": "Moves",
+    "luckyBoost": "Lucky Boost",
+    "luckyBoostDesc": "Spawning more specials after a tough run",
     "bonusMove": "+1 Move!",
     "bonusMoves": "+{count} Moves!",
     "outOfMoves": "Out of Moves!",
@@ -8630,7 +8712,29 @@ const en = {
       "collectType": "Collect {target} {tileType}",
       "clearAllType": "Clear all {tileType}",
       "wordLength": "{target} words of {minWordLength}+ letters",
-      "clearPercent": "Clear {target}% of the board"
+      "clearPercent": "Clear {target}% of the board",
+      "targetWord": "Find: {word}",
+      "targetWordFoundIt": "FOUND IT!",
+      "targetWordMissed": "Target was: {word} — Cascade got it!",
+      "colorPower": "Use {count}+ {color} tiles in a word",
+      "colorPink": "Pink",
+      "colorCyan": "Cyan",
+      "colorLime": "Lime",
+      "bannerTitle": "Goals"
+    },
+    "hint": {
+      "free": "FREE",
+      "ad": "HINT",
+      "aria": {
+        "free": "Free hint — costs 25 pts",
+        "ad": "Watch an ad for a hint — costs 25 pts"
+      },
+      "toast": {
+        "targetWord": "Try forming: {word}",
+        "colorPower": "Look for {color} tiles",
+        "collectType": "Find more {tileType}",
+        "clearAllType": "Clear remaining {tileType}"
+      }
     },
     "combo": {
       "bomb_bomb": "MEGA BLAST!",
@@ -9445,7 +9549,7 @@ const en = {
       "roleGuest": "Guest",
       "roleStudent": "Student",
       "roleTeacher": "Teacher",
-      "socialProof": "Join thousands of learners",
+      "socialProof": "You're not the only one studying.",
       "student": "Student",
       "studentCta": "Start Learning",
       "studentDesc": "Build vocabulary through play",
@@ -9994,7 +10098,7 @@ const en = {
       "practiceMode": "Practice Mode",
       "practiceModeDesc": "Practice at your own pace",
       "challengeMode": "Challenge Mode",
-      "challengeModeDesc": "Test your skills with harder puzzles",
+      "challengeModeDesc": "Tougher boards. No mercy.",
       "customBotCount": "Custom Bots",
       "customBotCountDesc": "Choose how many bots to play against",
       "advancedSettings": "Advanced Settings",
@@ -10797,6 +10901,7 @@ const en = {
     "title": "Pick a boost",
     "cta": "BOOST",
     "close": "Close",
+    "skipAndPlay": "Play Without Boost",
     "remaining": "Boosts left today: {{n}}/{{cap}}",
     "watchAd": "Watch ad to unlock",
     "activeThisGame": "Active this game",

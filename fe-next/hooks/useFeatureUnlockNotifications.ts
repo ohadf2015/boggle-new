@@ -35,6 +35,7 @@ export function useFeatureUnlockNotifications() {
 
     // Check each feature to see if it's newly unlocked
     const features: FeatureKey[] = [
+      'modeRoster',
       'advancedSettings',
       'customBotCount',
       'challengeMode',

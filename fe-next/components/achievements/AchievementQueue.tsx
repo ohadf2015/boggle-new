@@ -10,6 +10,8 @@ import type { CinematicPlayerProps } from '../adventure/boss/cinematics/Cinemati
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getAchievementIcon } from '@/constants/achievementIcons';
 import { calculateTier, TIER_COLORS } from '@/utils/achievementTiers';
+import { useSoundEffects } from '@/contexts/SoundEffectsContext';
+import { haptics } from '@/utils/haptics/HapticsManager';
 import type { AchievementPayload } from '@/shared/types/socket';
 
 const CinematicPlayer = dynamic(
@@ -178,17 +180,18 @@ function AchievementInlineToast({
   onDismiss: () => void;
 }) {
   const { t } = useLanguage();
-
+  const { playAchievementSound } = useSoundEffects();
 
   const icon = getAchievementIcon(achievement.key);
   const name = t(`achievements.${achievement.key}.name`) || achievement.key;
   const description = t(`achievements.${achievement.key}.description`);
 
-  // Auto-dismiss after timeout
   useEffect(() => {
+    playAchievementSound();
+    haptics.success().catch(() => {});
     const timer = setTimeout(onDismiss, INLINE_TOAST_DURATION);
     return () => clearTimeout(timer);
-  }, [onDismiss]);
+  }, [onDismiss, playAchievementSound]);
 
   // Uses inset-x-0 + flex centering instead of left-1/2 -translate-x-1/2
   // to avoid the element extending beyond viewport bounds, which gets
@@ -336,10 +339,9 @@ export const AchievementQueueProvider = ({ children }: AchievementQueueProviderP
   );
 };
 
+const NOOP_QUEUE: AchievementQueueContextValue = { queueAchievement: () => {} };
+
 export const useAchievementQueue = (): AchievementQueueContextValue => {
   const context = useContext(AchievementQueueContext);
-  if (!context) {
-    throw new Error('useAchievementQueue must be used within AchievementQueueProvider');
-  }
-  return context;
+  return context ?? NOOP_QUEUE;
 };

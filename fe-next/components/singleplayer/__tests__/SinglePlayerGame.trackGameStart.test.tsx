@@ -67,8 +67,6 @@ vi.mock('../game', () => ({
     handleToggleProgressBar: vi.fn(),
     showLandscapeTutorial: false,
     dismissLandscapeTutorial: vi.fn(),
-    showCompletionPopup: false,
-    setShowCompletionPopup: vi.fn(),
     gameStatsRef: { current: null },
   }),
   LandscapeGameLayout: () => null,

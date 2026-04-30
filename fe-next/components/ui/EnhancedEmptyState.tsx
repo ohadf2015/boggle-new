@@ -4,8 +4,8 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Search, Inbox, FolderOpen, Frown, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import Image from 'next/image';
 import { EnhancedButton } from './EnhancedButton';
-import { SilentVideo } from './SilentVideo';
 
 /**
  * Enhanced Empty State Component
@@ -44,7 +44,7 @@ export interface EnhancedEmptyStateProps {
   reduceMotion?: boolean;
   /** Custom className */
   className?: string;
-  /** Optional mascot video path (e.g. '/mascot/explorer.mp4') */
+  /** Optional mascot image path (e.g. '/mascot/explorer.webp') */
   mascotSrc?: string;
 }
 
@@ -105,12 +105,13 @@ export const EnhancedEmptyState: React.FC<EnhancedEmptyStateProps> = ({
           className={cn('mb-6', compact ? 'w-16 h-16' : 'w-24 h-24')}
           variants={reduceMotion ? {} : itemVariants}
         >
-          <SilentVideo
+          <Image
             src={mascotSrc}
+            alt=""
             width={compact ? 64 : 96}
             height={compact ? 64 : 96}
             className="object-contain drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]"
-            preload="metadata"
+            unoptimized
             aria-hidden="true"
           />
         </motion.div>
@@ -231,7 +232,7 @@ export const EmptySearchResults: React.FC<{
         : 'Try adjusting your search or filters to find what you\'re looking for.'
     }
     icon="search"
-    mascotSrc="/mascot/explorer.mp4"
+    mascotSrc="/mascot/explorer.webp"
     action={
       onClearSearch
         ? {
@@ -310,7 +311,7 @@ export const ErrorState: React.FC<{
     title={title}
     description={description}
     icon="sad"
-    mascotSrc="/mascot/oops.mp4"
+    mascotSrc="/mascot/oops.webp"
     action={
       onRetry
         ? {
@@ -341,7 +342,7 @@ export const SuccessState: React.FC<{
     title={title}
     description={description}
     icon="sparkles"
-    mascotSrc="/mascot/celebration.mp4"
+    mascotSrc="/mascot/celebration.webp"
     action={
       onContinue
         ? {

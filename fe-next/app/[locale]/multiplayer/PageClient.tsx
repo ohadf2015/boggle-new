@@ -21,6 +21,7 @@ import { PageLoader } from '@/components/ui/PageLoader';
 import { PlayfulBackground } from '@/components/ui/PlayfulBackground';
 import { useConnectionToasts } from '@/hooks/useConnectionToasts';
 import { useMultiplayerSocket } from '@/hooks/useMultiplayerSocket';
+import { useAchievementSocketBridge } from '@/hooks/useAchievementSocketBridge';
 import { useMultiplayerAuth } from '@/hooks/useMultiplayerAuth';
 import { useMultiplayerSession } from '@/hooks/useMultiplayerSession';
 import { useMultiplayerGameFlow } from '@/hooks/useMultiplayerGameFlow';
@@ -280,6 +281,8 @@ export default function MultiplayerPageClient(): React.JSX.Element {
   // Sync ref bridge so hooks called before useMultiplayerSocket get the latest socket
   socketRef.current = socket;
 
+  useAchievementSocketBridge(socket);
+
   // Listen for room language changes (host changed the game dictionary language)
   useEffect(() => {
     if (!socket) return;
@@ -372,6 +375,7 @@ export default function MultiplayerPageClient(): React.JSX.Element {
             onCrazyGamesLogin={isCrazyGames && !cgUser ? loginCrazyGames : undefined}
             prefilledRoom={prefilledRoomCode} defaultLanguage={language as Language}
             host={isClassroomHost}
+            isClassroomMode={isClassroomMode}
             setGameCode={setGameCode} setUsername={setUsername}
             setRoomName={setRoomName} setHostUsername={setHostUsername}
           />

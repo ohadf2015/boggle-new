@@ -107,6 +107,43 @@ describe('filterEmptyException', () => {
     expect(filterEmptyException(event as never)).toBeNull();
   });
 
+  // Regression: 13+ events 30d showed `type='DOMException'` (not 'AbortError')
+  // with value containing `Lock broken by another request with the 'steal' option`.
+  // Old filter checked type === 'AbortError' only and missed these.
+  it('drops Supabase lock-stolen DOMException by message pattern', () => {
+    const event = {
+      event: '$exception',
+      properties: {
+        $exception_list: [
+          {
+            type: 'DOMException',
+            value: "AbortError: Lock broken by another request with the 'steal' option.",
+            stacktrace: { frames: [{ filename: 'app/layout.tsx' }] },
+          },
+        ],
+      },
+    };
+    expect(filterEmptyException(event as never)).toBeNull();
+  });
+
+  // Regression: 16+ events 30d showed `type='Error'` with value
+  // `Lock "lock:sb-hdtmpkicuxvtmvrmtybx-auth-token" was released because another request stole it`.
+  it('drops Supabase auth-token lock-released Error by message pattern', () => {
+    const event = {
+      event: '$exception',
+      properties: {
+        $exception_list: [
+          {
+            type: 'Error',
+            value: 'Lock "lock:sb-hdtmpkicuxvtmvrmtybx-auth-token" was released because another request stole it',
+            stacktrace: { frames: [{ filename: 'app/layout.tsx' }] },
+          },
+        ],
+      },
+    };
+    expect(filterEmptyException(event as never)).toBeNull();
+  });
+
   it('keeps unrelated AbortError (not from Supabase lock)', () => {
     const event = {
       event: '$exception',

@@ -20,6 +20,7 @@ import {
 } from './shared';
 import { useOAuthSignIn } from './hooks/useOAuthSignIn';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
+import { useExperiment } from '@/hooks/useExperiment';
 
 interface FirstWinSignupModalProps {
   isOpen: boolean;
@@ -53,6 +54,26 @@ const FirstWinSignupModal: React.FC<FirstWinSignupModalProps> = ({
 
   const guestStats: GuestStats = getGuestStatsSummary();
   const isMultiGamesVariant = variant === 'multiGames';
+
+  // A/B: subtitle copy variant. Title + OAuth UI stay constant so we
+  // isolate the conversion delta to the persuasion line.
+  const { variant: ctaVariant, trackExposure: trackCtaExposure } =
+    useExperiment('signup-prompt-cta-copy');
+
+  // Map variant → translation key suffix for both firstWin & multiGames
+  // namespaces. Falls back to base `subtitle` for control.
+  const subtitleKey = (() => {
+    const ns = isMultiGamesVariant ? 'auth.multiGames' : 'auth.firstWin';
+    if (ctaVariant === 'urgency') return `${ns}.subtitleUrgency`;
+    if (ctaVariant === 'value-prop') return `${ns}.subtitleValueProp`;
+    return `${ns}.subtitle`;
+  })();
+
+  // Fire exposure only when the modal actually opens (it is mounted
+  // globally via SignupPromptHost — most users never see it).
+  useEffect(() => {
+    if (isOpen) trackCtaExposure();
+  }, [isOpen, trackCtaExposure]);
 
   // Trigger celebratory confetti when modal opens (only for firstWin variant)
   useEffect(() => {
@@ -148,10 +169,7 @@ const FirstWinSignupModal: React.FC<FirstWinSignupModalProps> = ({
                 : t('auth.firstWin.title')}
             </h2>
             <p className={cn('text-sm', isDarkMode ? 'text-gray-300' : 'text-gray-600')}>
-              {isMultiGamesVariant
-                ? t('auth.multiGames.subtitle') ||
-                  'Sign up to save your progress and track your achievements!'
-                : t('auth.firstWin.subtitle')}
+              {t(subtitleKey)}
             </p>
           </motion.div>
 

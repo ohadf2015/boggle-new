@@ -94,9 +94,12 @@ export type GrowthEvent =
   | 'dead_time_detected'
   // Landing-page CTA instrumentation (visitor → onboarding funnel leak)
   | 'landing_cta_clicked'
+  // Cross-promo CTA tracking (e.g. Word Hunt → Word Wheel)
+  | 'cross_promo_click'
   // CrazyGames portal short-flow funnel
   | 'cg_welcome_view'
-  | 'cg_welcome_play';
+  | 'cg_welcome_play'
+  | 'cg_lobby_arrival';
 
 /** Onboarding funnel step identifiers (FTUE state machine). */
 export type OnboardingStep =
@@ -377,9 +380,12 @@ export const trackGameCompletion = (
   }
 
   if (isWinner) {
+    const mode = gameMode || 'unknown';
     trackGrowthEvent(isFirstGame ? 'first_game_won' : 'streak_continued', {
       score,
       wordCount,
+      mode,
+      gameMode: mode,
     });
   }
 };

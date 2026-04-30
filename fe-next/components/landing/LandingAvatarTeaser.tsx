@@ -32,7 +32,7 @@ export function LandingAvatarTeaser({ onBuilderOpenChange }: LandingAvatarTeaser
   const ArrowIcon = dir === 'rtl' ? ArrowLeft : ArrowRight;
   const [isBuilderOpen, setIsBuilderOpen] = useState(false);
   const avatarPremium = useAvatarPremium();
-  const { profile } = useAuth();
+  const { profile, updateProfile } = useAuth();
 
   const openBuilder = () => {
     setIsBuilderOpen(true);
@@ -41,6 +41,13 @@ export function LandingAvatarTeaser({ onBuilderOpenChange }: LandingAvatarTeaser
   const closeBuilder = () => {
     setIsBuilderOpen(false);
     onBuilderOpenChange?.(false);
+  };
+  const handleSave = async (config: CustomAvatarConfig) => {
+    try {
+      await updateProfile({ avatar_config: config });
+    } finally {
+      closeBuilder();
+    }
   };
 
   return (
@@ -95,7 +102,7 @@ export function LandingAvatarTeaser({ onBuilderOpenChange }: LandingAvatarTeaser
     <AvatarBuilderModal
       isOpen={isBuilderOpen}
       onClose={closeBuilder}
-      onSave={closeBuilder}
+      onSave={handleSave}
       initialConfig={profile?.avatar_config ?? undefined}
       premium={avatarPremium}
     />

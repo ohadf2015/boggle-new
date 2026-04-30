@@ -295,4 +295,68 @@ describe('ProgressionContext — offline queue wiring (S6-4)', () => {
     );
     expect(completeCalls).toHaveLength(0);
   });
+
+  it('drains queue on mount when authenticated and online with pending items', async () => {
+    // GIVEN — queue has a pending completion BEFORE the provider mounts.
+    // This covers the case where the user was offline in a previous session,
+    // a save was queued to localStorage, and now the app loads while already
+    // online — the `online` event never fires, so a mount-time drain is needed.
+    const queued = {
+      world: 2, level: 3, stars: 3 as const, score: 700, words: 12,
+      goldEarned: 80, queuedAt: Date.now() - 120_000,
+    };
+    peekSpy.mockReturnValue([queued]);
+    dequeueSpy.mockReturnValueOnce(queued).mockReturnValueOnce(null);
+
+    mockFetch.mockImplementation((url: string) => {
+      if (url.includes('/api/adventure/state')) return Promise.resolve(makeStateResponse());
+      if (url.includes('/api/adventure/complete')) return Promise.resolve(makeCompleteSuccessResponse(2, 3, 3));
+      return Promise.resolve({ ok: true, json: async () => ({}) });
+    });
+
+    // WHEN — provider mounts (no online event dispatched)
+    const { result } = renderHook(() => useProgression(), { wrapper });
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    await act(async () => { await new Promise(r => setTimeout(r, 50)); });
+
+    // THEN — the queued completion was replayed via the complete endpoint
+    expect(dequeueSpy).toHaveBeenCalled();
+    const completeCalls = mockFetch.mock.calls.filter(
+      (c: [string]) => c[0].includes('/api/adventure/complete')
+    );
+    expect(completeCalls.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('enqueues completion when server returns 401 (expired session)', async () => {
+    // GIVEN — server rejects with 401, simulating an expired auth token.
+    // 401s are recoverable: the next session will have a fresh token, so the
+    // completion should queue for offline replay rather than be dropped.
+    mockFetch.mockImplementation((url: string) => {
+      if (url.includes('/api/adventure/state')) return Promise.resolve(makeStateResponse());
+      if (url.includes('/api/adventure/complete')) {
+        return Promise.resolve({
+          ok: false,
+          status: 401,
+          headers: { get: () => null },
+          text: async () => 'Unauthorized',
+        });
+      }
+      return Promise.resolve({ ok: true, json: async () => ({}) });
+    });
+
+    const { result } = renderHook(() => useProgression(), { wrapper });
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    let success: boolean | undefined;
+    await act(async () => {
+      success = await result.current.completeLevel(1, 2, 2, 450, 8, 25);
+    });
+
+    // THEN — 401 is treated as transient (token-refresh recoverable) and queued
+    expect(success).toBe(false);
+    expect(enqueueSpy).toHaveBeenCalledTimes(1);
+    expect(enqueueSpy).toHaveBeenCalledWith(
+      expect.objectContaining({ world: 1, level: 2, stars: 2, score: 450 })
+    );
+  });
 });

@@ -11,8 +11,13 @@ import { useWordSubmission } from '@/components/singleplayer/game/hooks/useWordS
 import { useSpamDetection } from '@/components/singleplayer/game/hooks/useSpamDetection';
 import { useBlastEngine } from './hooks/useBlastEngine';
 import { useBlastObjectives } from './hooks/useBlastObjectives';
+import { useBlastHint } from './hooks/useBlastHint';
+import { pickHintTarget } from './utils/blastHintPicker';
+import { BlastHintButton } from './BlastHintButton';
+import { BlastHintToast } from './BlastHintToast';
 import { useBlastComboStreak, getComboWindowMs } from './hooks/useBlastComboStreak';
 import { useBlastSequencer } from './hooks/useBlastSequencer';
+import { useBlastColorSeeding } from './hooks/useBlastColorSeeding';
 import { BlastStage } from './BlastStage';
 import { BlastWaveIntro } from './BlastWaveIntro';
 import { BlastSugarCrushFinale } from './BlastSugarCrushFinale';
@@ -20,6 +25,7 @@ import { BlastMoveWarningMascot } from './BlastMoveWarningMascot';
 import { BlastFxBridge } from './BlastFxBridge';
 import { type BlastComboType, type SpecialCombo } from './utils/blastCombos';
 import { getWaveObjectives, type WaveConfig } from './utils/blastWaveConfig';
+import { validateWaveObjectives } from './utils/blastObjectiveValidator';
 import { getComboMultiplier } from '@/shared/utils/scoring';
 import { type BlastGameConfig, type BlastResultsData, type BlastTileState, type BlastTileType } from './types';
 import { useDictionaryCache } from '@/hooks/useDictionaryCache';
@@ -101,8 +107,8 @@ export function BlastGame({
 
   // Wave objectives (SP only)
   const waveObjectives = useMemo(
-    () => (isMultiplayer ? [] : getWaveObjectives(waveNumber)),
-    [waveNumber, isMultiplayer],
+    () => (isMultiplayer ? [] : getWaveObjectives(waveNumber, config.language)),
+    [waveNumber, isMultiplayer, config.language],
   );
 
   // Core engine
@@ -119,6 +125,15 @@ export function BlastGame({
   // Pre-game buff effects (wave-1, SP only): bomb seed, shield revive, combo2x score multiplier.
   const { scoreMultiplier: buffScoreMultiplier, shieldConsumed, shieldToastVisible, buffIntroVisible } =
     useBlastBuffEffects({ buff: initialBuff, waveNumber, isMultiplayer, engine });
+
+  // Color tag seeding for color_power objectives (SP only)
+  useBlastColorSeeding({
+    objectives: waveObjectives,
+    waveNumber,
+    tileStates: engine.tileStates,
+    seedTileStates: engine.seedTileStates,
+    isMultiplayer,
+  });
 
   const combo = useComboSystem({ trackMaxCombo: true, onComboSound: playComboSound, timerIntervalMs: 250 });
   const sequencer = useBlastSequencer();
@@ -328,13 +343,53 @@ export function BlastGame({
   // eslint-disable-next-line react-hooks/exhaustive-deps -- capture once per wave
   }, [waveNumber]);
 
-  // Objective tracking
+  // Validate wave objectives against the freshly generated board, ONCE per
+  // wave. Repairs target_word / color_power if the seeded targets are
+  // unreachable on this particular grid (e.g. word can't be spelled by an
+  // adjacent path, or the board lacks enough color-tagged tiles).
+  // Without this, players see goals that are mathematically impossible.
+  const [validatedObjectives, setValidatedObjectives] = useState(waveObjectives);
+  const validatedWaveRef = useRef<number>(-1);
+  useEffect(() => {
+    if (validatedWaveRef.current === waveNumber) return;
+    if (isMultiplayer) return;
+    const grid = engine.grid;
+    const tileStates = engine.tileStates;
+    if (!grid || grid.length === 0 || tileStates.length === 0) return;
+    validatedWaveRef.current = waveNumber;
+    setValidatedObjectives(
+      validateWaveObjectives(waveObjectives, grid, tileStates, config.language),
+    );
+  }, [waveNumber, waveObjectives, engine.grid, engine.tileStates, config.language, isMultiplayer]);
+  // Reset to raw objectives when the wave (and thus the parent's `waveObjectives`) changes.
+  useEffect(() => {
+    if (validatedWaveRef.current !== waveNumber) {
+      setValidatedObjectives(waveObjectives);
+    }
+  }, [waveNumber, waveObjectives]);
+
+  // Objective tracking — pass the (validated, language-aware) objectives so
+  // the banner reads the same target_word/color_power that the engine baked
+  // into the board. Recomputing from waveNumber would default the language
+  // to 'en' and silently re-seed a different (English) target word.
   const objectives = useBlastObjectives({
     gameState: engine.gameState,
     tileTypeClears: engine.gameState.tileTypeClears,
-    waveNumber,
+    objectives: validatedObjectives,
     wordsFound: engine.gameState.wordsFound,
     initialTileTypeCounts,
+  });
+
+  // Hint flow — wave-6+ button, free first use, ad-gated thereafter.
+  // pickTarget reads live grid+tileStates at click time so the hint
+  // tracks the current board, not the wave-start snapshot.
+  const hint = useBlastHint({
+    waveNumber,
+    pickTarget: () => {
+      if (!engine.grid) return null;
+      return pickHintTarget(objectives.objectiveProgress, engine.grid, engine.tileStates);
+    },
+    addBonusScore: engine.addBonusScore,
   });
 
   // Combo timeout sound when streak drops to 0
@@ -387,6 +442,11 @@ export function BlastGame({
   // While the modal is open we defer Sugar Crush so the player can revive cleanly.
   const hasUsedContinueRef = useRef(false);
   const [continueDeclined, setContinueDeclined] = useState(false);
+  // Suppress the offer once the wave goal is already met — the player has
+  // effectively won the wave, so prompting for extra moves is noise. The
+  // dead-end branch in useBlastGameEnd will simply call onWaveComplete.
+  const objectiveAlreadyMet = engine.gameState.totalTiles > 0
+    && (engine.gameState.tilesCleared / engine.gameState.totalTiles) * 100 >= 90;
   const continueModalOpen = shouldOfferBlastContinue({
     hasRealAdProvider,
     isMultiplayer,
@@ -394,6 +454,7 @@ export function BlastGame({
     noWordsRemaining: engine.noWordsRemaining,
     hasUsedContinue: hasUsedContinueRef.current,
     continueDeclined,
+    objectiveAlreadyMet,
   });
 
   const handleContinueAccept = useCallback(() => {
@@ -406,10 +467,28 @@ export function BlastGame({
     setContinueDeclined(true);
   }, []);
 
+  // Sprint 3 polish: enrich results with target_word context so the wave-end
+  // card can acknowledge the goal either way (found vs missed). Reads the
+  // current objectiveProgress at fail/success time.
+  const handleGameEnd = useCallback((results: BlastResultsData) => {
+    const targetObj = objectives.objectiveProgress.find(
+      p => p.objective.type === 'target_word',
+    );
+    if (targetObj?.objective.targetWord) {
+      onGameEnd({
+        ...results,
+        targetWord: targetObj.objective.targetWord,
+        targetWordFound: targetObj.isComplete,
+      });
+    } else {
+      onGameEnd(results);
+    }
+  }, [objectives.objectiveProgress, onGameEnd]);
+
   // Game end detection + Sugar Crush (extracted to useBlastGameEnd)
   const { sugarCrushActive } = useBlastGameEnd({
     engine, isMultiplayer, gridSize: config.gridSize,
-    waveConfig, objectives, onGameEnd, onWaveComplete,
+    waveConfig, objectives, onGameEnd: handleGameEnd, onWaveComplete,
     maxCombo: combo.maxCombo, sounds,
     setExplosionShake, explosionShakeTimerRef,
     onDeadEndFinale: handleDeadEndFinale,
@@ -521,6 +600,19 @@ export function BlastGame({
         wordSubmitCount={wordSubmitCount}
         activeBuff={!isMultiplayer && waveNumber === 1 ? (initialBuff ?? null) : null}
         buffConsumed={initialBuff === 'shield' ? shieldConsumed : false}
+        objectiveProgress={objectives.objectiveProgress}
+        ddaBoostActive={!isMultiplayer && engine.ddaBoostActive}
+        hintSlot={!isMultiplayer ? (
+          <BlastHintButton
+            waveNumber={waveNumber}
+            unlocked={hint.unlocked}
+            freeAvailable={hint.freeAvailable}
+            onFreeHint={() => { hint.consumeFreeHint(); }}
+            onAdHint={() => { hint.consumeAdHint(); }}
+            t={tAdapter}
+          />
+        ) : null}
+        hintToast={<BlastHintToast target={hint.active} t={tAdapter} />}
         t={tAdapter}
       />
     </div>

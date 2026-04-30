@@ -114,7 +114,7 @@ export function ResultsHero({
         className="flex justify-center"
       >
         <SilentVideo
-          src={variant === 'win' ? '/mascot/celebration.mp4' : variant === 'loss' ? '/mascot/encouraging.mp4' : '/mascot/flexing.mp4'}
+          src={variant === 'win' ? '/mascot/celebration.webp' : variant === 'loss' ? '/mascot/encouraging.webp' : '/mascot/flexing.webp'}
           width={72}
           height={72}
           className="drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]"

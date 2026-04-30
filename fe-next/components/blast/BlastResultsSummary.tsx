@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils';
 import { useBlastBadgeUnlocks } from './hooks/useBlastBadgeUnlocks';
 import { BlastBragCard } from './BlastBragCard';
 import { getMascotForResults, MASCOT_IMAGES } from './utils/blastMascot';
+import { computeFailReason } from './utils/computeFailReason';
 import type { BlastResultsData } from './types';
 
 type IconType = ComponentType<{ className?: string; strokeWidth?: number }>;
@@ -59,6 +60,12 @@ export function BlastResultsSummary({
 
   // Fail signal mirrors advance gate in useBlastGameEnd.ts (clearPct >= 90)
   const didFail = results.clearPercentage < 90;
+  // Sprint 1 clarity guard: concrete "N tiles short" reads sharper than a
+  // bare percent. Falls back to needClearPct copy when shortfall is unknown.
+  const failReason = computeFailReason({
+    tilesCleared: results.tilesCleared,
+    totalTiles: results.totalTiles,
+  });
 
   return (
     <div
@@ -115,12 +122,63 @@ export function BlastResultsSummary({
           )}
           data-testid="blast-results-fail-banner"
         >
-          <p className="font-neo-display font-black uppercase tracking-wider text-sm">
-            {t('blast.results.needClearPct', { required: 90, got: results.clearPercentage })}
+          <p
+            className="font-neo-display font-black uppercase tracking-wider text-sm"
+            data-testid="blast-fail-reason"
+          >
+            {failReason.kind === 'tiles_short'
+              ? t('blast.results.tilesShort', { count: failReason.tilesShort })
+              : t('blast.results.needClearPct', { required: 90, got: results.clearPercentage })}
           </p>
           <p className="text-[11px] uppercase tracking-wider font-bold text-white/80">
             {t('blast.results.failHint')}
           </p>
+          {results.targetWord && !results.targetWordFound && (
+            <p
+              data-testid="blast-target-word-missed"
+              className="mt-1 text-[11px] uppercase tracking-wider font-bold text-white/85"
+            >
+              {t('blast.objective.targetWordMissed', { word: results.targetWord })}
+            </p>
+          )}
+        </AdaptiveMotion.div>
+      )}
+
+      {/* Target-word acknowledgement on success */}
+      {!didFail && results.targetWord && results.targetWordFound && (
+        <AdaptiveMotion.div
+          initial={{ scale: 0.85, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ type: 'spring', stiffness: 380, damping: 20, delay: 0.05 }}
+          className={cn(
+            'inline-flex items-center gap-2 px-3 py-1.5',
+            'rounded-neo border-3 border-neo-black shadow-hard',
+            'bg-neo-lime text-neo-black',
+            'font-neo-display font-black uppercase tracking-wider text-xs',
+          )}
+          data-testid="blast-target-word-found"
+        >
+          {t('blast.objective.targetWordFoundIt')} {results.targetWord}
+        </AdaptiveMotion.div>
+      )}
+
+      {/* Target-word missed but wave succeeded — positive frame so player feels
+          informed, not robbed. Mirrors LLM consensus: cascades that clear the
+          target should read as a friendly assist, not a stolen win. */}
+      {!didFail && results.targetWord && !results.targetWordFound && (
+        <AdaptiveMotion.div
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ type: 'spring', stiffness: 380, damping: 22, delay: 0.05 }}
+          className={cn(
+            'inline-flex items-center gap-2 px-3 py-1.5',
+            'rounded-neo border-2 border-neo-black/30',
+            'bg-neo-navy-light text-neo-cream',
+            'font-neo-body font-bold text-xs',
+          )}
+          data-testid="blast-target-word-cascade-credit"
+        >
+          {t('blast.objective.targetWordMissed', { word: results.targetWord })}
         </AdaptiveMotion.div>
       )}
 

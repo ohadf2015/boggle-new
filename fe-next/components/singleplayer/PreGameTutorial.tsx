@@ -177,16 +177,7 @@ const PreGameTutorial: React.FC<PreGameTutorialProps> = ({ onComplete, sessionId
                   showHints
                 />
               </motion.div>
-
-              <motion.button
-                onClick={handleNext}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 0.7 }}
-                transition={{ delay: 1.5 }}
-                className="text-neo-white/50 hover:text-neo-white text-xs font-bold transition-colors mt-1"
-              >
-                {t('preGameTutorial.skip')}
-              </motion.button>
+              {/* Removed redundant "skip" — top-right Skip + bottom chevron already cover it. */}
             </motion.div>
           )}
 

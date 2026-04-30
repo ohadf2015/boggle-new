@@ -613,11 +613,12 @@ module.exports = {
       },
       // Font families - using CSS variables from next/font
       fontFamily: {
-        'neo': ['var(--font-fredoka)', 'var(--font-rubik)', 'Fredoka', 'Rubik', 'sans-serif'],
-        'neo-display': ['var(--font-fredoka)', 'Fredoka', 'sans-serif'],
-        'neo-body': ['var(--font-rubik)', 'Rubik', 'sans-serif'],
+        'neo': ['var(--font-fredoka)', 'var(--font-heebo-hebrew)', 'var(--font-rubik)', 'Fredoka', 'Rubik', 'sans-serif'],
+        'neo-display': ['var(--font-fredoka)', 'var(--font-heebo-hebrew)', 'var(--font-rubik)', 'Fredoka', 'Rubik', 'sans-serif'],
+        'neo-display-he': ['var(--font-heebo-hebrew)', 'var(--font-rubik)', 'Rubik', 'sans-serif'],
+        'neo-body': ['var(--font-rubik)', 'var(--font-heebo-hebrew)', 'Rubik', 'sans-serif'],
         'neo-body-he': ['var(--font-heebo-hebrew)', 'var(--font-rubik)', 'Rubik', 'sans-serif'],
-        sans: ['var(--font-rubik)', 'Rubik', 'sans-serif'],
+        sans: ['var(--font-rubik)', 'var(--font-heebo-hebrew)', 'Rubik', 'sans-serif'],
       },
       // Additional spacing for better component composition
       spacing: {

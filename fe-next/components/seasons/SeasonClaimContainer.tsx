@@ -16,6 +16,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useSeasonClaim } from '@/hooks/useSeasonClaim';
+import { trpc } from '@/lib/trpc';
 import { SeasonClaimModal } from './SeasonClaimModal';
 
 const DISMISS_KEY = (seasonId: number) => `season-claim-dismissed:${seasonId}`;
@@ -29,6 +30,19 @@ export const SeasonClaimContainer: React.FC = () => {
 
   const [dismissed, setDismissed] = useState<Set<number>>(() => new Set());
   const [justClaimed, setJustClaimed] = useState<Set<number>>(() => new Set());
+
+  // Pull season-archive stats (games_played, total_score) for the modal recap.
+  // The query stays disabled until we have a real season to claim; cached 5min.
+  const recapQuery = trpc.leaderboard.getSeasonRecap.useQuery(
+    {
+      playerId: playerId ?? '00000000-0000-0000-0000-000000000000',
+      seasonId: next?.seasonId ?? 0,
+    },
+    {
+      enabled: !!playerId && !!next,
+      staleTime: 5 * 60_000,
+    },
+  );
 
   // Hydrate session-scoped dismissals on mount
   useEffect(() => {
@@ -69,6 +83,7 @@ export const SeasonClaimContainer: React.FC = () => {
       rewards={next.rewards}
       isClaiming={isClaiming}
       isClaimed={isClaimed}
+      recap={recapQuery.data?.data ?? null}
       onClaim={onClaim}
       onClose={onClose}
     />

@@ -13,7 +13,7 @@ import type { SpecialCombo } from '../utils/blastCombos';
 import { hasValidWords } from '../utils/blastDeadEndDetector';
 import { calculateEarnedStars } from '../utils/blastStarCalculator';
 import { calculateLeftoverMoveBonus, applyRevive } from '../utils/blastMoveUtils';
-import { createDDAState, updateDDA, getDDASpawnModifier } from '../utils/blastDDA';
+import { createDDAState, updateDDA, getDDASpawnModifier, isDDABoostActive } from '../utils/blastDDA';
 import { createSeededRandom, generateBlastLetter } from '../utils/blastLetterGenerator';
 import type { LetterGrid } from '@/shared/types/game';
 import {
@@ -68,7 +68,7 @@ export interface UseBlastEngineReturn {
   unlockMoves: () => void;
   /** Rewarded-ad continue: clear dead-end and add bonus moves without resetting progress */
   revive: (bonusMoves: number) => void;
-  getResults: (maxCombo: number, wavesCompleted?: number, waveResults?: WaveResult[]) => BlastResultsData;
+  getResults: (maxCombo: number, wavesCompleted?: number, waveResults?: WaveResult[], allObjectivesComplete?: boolean) => BlastResultsData;
   isCascading: boolean;
   startCascade: () => CascadeResult;
   stopCascade: () => void;
@@ -89,6 +89,10 @@ export interface UseBlastEngineReturn {
   getLatestState: () => { grid: LetterGrid | null; tileStates: BlastTileState[][] };
   /** Apply server-authoritative board state (MP sync) */
   applyServerBoard: (newGrid: LetterGrid, newTileStates: BlastTileState[][]) => void;
+  /** Sprint 1: visible "Lucky Boost" chip flips on after 2+ consecutive failed
+   *  words. Singleplayer only — hidden state surfaced so players see when the
+   *  game is helping them. Mirrors the boost gate in the spawn-modifier path. */
+  ddaBoostActive: boolean;
 }
 
 // ── Constants ──────────────────────────────────────────────────────────────
@@ -179,6 +183,9 @@ export function useBlastEngine(
 
   // DDA invisible assist
   const ddaStateRef = useRef(createDDAState());
+  // Sprint 1: surface DDA boost as visible state so the HUD can render a
+  // "Lucky Boost" chip. Synced via the existing updateDDA() call sites.
+  const [ddaBoostActive, setDdaBoostActive] = useState(false);
 
   // Best word tracking
   const bestWordRef = useRef('');
@@ -288,6 +295,7 @@ export function useBlastEngine(
     baseScore: number,
   ): WordSubmitResult => {
     ddaStateRef.current = updateDDA(ddaStateRef.current, 'success');
+    setDdaBoostActive(isDDABoostActive(ddaStateRef.current));
 
     const currentTiles = tileStatesRef.current;
     const result = processTilesForWord({ prev: currentTiles, path, word, baseScore, gridSize, currentWave });
@@ -351,8 +359,17 @@ export function useBlastEngine(
     const betweenTurn = applyBetweenTurnEffects(tilesAfterThaw, gridSize);
 
     setTileStates(tilesAfterThaw);
-     
+
     tileStatesRef.current = tilesAfterThaw;
+
+    // Count colored tiles in the path for color_power objective tracking
+    const colorCounts = { pink: 0, cyan: 0, lime: 0 };
+    for (const cell of path) {
+      const tile = currentTiles[cell.row]?.[cell.col];
+      if (tile?.colorTag === 'pink') colorCounts.pink++;
+      else if (tile?.colorTag === 'cyan') colorCounts.cyan++;
+      else if (tile?.colorTag === 'lime') colorCounts.lime++;
+    }
 
     setGameState(prev => {
       const newMovesRemaining = Math.max(0, prev.movesRemaining - 1) + bonusMoveCount;
@@ -372,6 +389,7 @@ export function useBlastEngine(
           newDiamondReveal,
           prev.diamondRevealTurns > 0 ? prev.diamondRevealTurns - 1 : 0,
         ),
+        lastWordColorCounts: colorCounts,
       };
     });
 
@@ -476,7 +494,12 @@ export function useBlastEngine(
   }, []);
 
   // ── getResults ──
-  const getResults = useCallback((maxCombo: number, wavesCompleted = 0, waveResults: WaveResult[] = []): BlastResultsData => {
+  const getResults = useCallback((
+    maxCombo: number,
+    wavesCompleted = 0,
+    waveResults: WaveResult[] = [],
+    allObjectivesComplete?: boolean,
+  ): BlastResultsData => {
     const gs = gameStateRef.current;
     const clearPercentage = gs.totalTiles > 0 ? Math.min(100, Math.round((gs.tilesCleared / gs.totalTiles) * 100)) : 0;
 
@@ -488,7 +511,9 @@ export function useBlastEngine(
       wordsFound: gs.wordsFound,
       bestWord: bestWordRef.current || (gs.wordsFound[0] ?? ''),
       maxCombo,
-      stars: calculateEarnedStars(gs.tilesCleared, gs.totalTiles),
+      // 3 stars require both ≥80% clear AND every objective complete.
+      // Without the flag, fall back to clear-pct-only (legacy callers).
+      stars: calculateEarnedStars(gs.tilesCleared, gs.totalTiles, allObjectivesComplete),
       wavesCompleted,
       waveResults,
     };
@@ -497,6 +522,7 @@ export function useBlastEngine(
   // ── trackWordFail ──
   const trackWordFail = useCallback(() => {
     ddaStateRef.current = updateDDA(ddaStateRef.current, 'fail');
+    setDdaBoostActive(isDDABoostActive(ddaStateRef.current));
   }, []);
 
   // ── consumeMove — deduct a move without clearing tiles (invalid word penalty) ──
@@ -563,6 +589,7 @@ export function useBlastEngine(
     gameState,
     isCascading,
     noWordsRemaining,
+    ddaBoostActive,
     ...actions,
-  }), [effectiveGrid, tileStates, gameState, isCascading, noWordsRemaining, actions]);
+  }), [effectiveGrid, tileStates, gameState, isCascading, noWordsRemaining, ddaBoostActive, actions]);
 }

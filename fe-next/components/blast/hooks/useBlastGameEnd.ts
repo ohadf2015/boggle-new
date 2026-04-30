@@ -26,7 +26,7 @@ interface GameEndDeps {
       tilesCleared: number;
       totalTiles: number;
     };
-    getResults: (maxCombo: number) => BlastResultsData;
+    getResults: (maxCombo: number, wavesCompleted?: number, waveResults?: import('../types').WaveResult[], allObjectivesComplete?: boolean) => BlastResultsData;
     getLatestState: () => { tileStates: BlastTileState[][] };
     setTileStates: (fn: (prev: BlastTileState[][]) => BlastTileState[][]) => void;
   };
@@ -82,7 +82,7 @@ export function useBlastGameEnd(deps: GameEndDeps) {
         return () => clearTimeout(timer);
       }
 
-      const results = engine.getResults(maxCombo);
+      const results = engine.getResults(maxCombo, undefined, undefined, objectives.allObjectivesComplete);
       const timer = setTimeout(() => onGameEnd(results), 2000);
       return () => clearTimeout(timer);
     }
@@ -169,7 +169,12 @@ export function useBlastGameEnd(deps: GameEndDeps) {
         if (latestDeps.onWaveComplete && clearPct >= 90) {
           latestDeps.onWaveComplete(score, wordsFound, clearPct);
         } else {
-          const results = engine.getResults(latestDeps.maxCombo);
+          const results = engine.getResults(
+            latestDeps.maxCombo,
+            undefined,
+            undefined,
+            objectives.allObjectivesComplete,
+          );
           latestDeps.onGameEnd(results);
         }
       })();

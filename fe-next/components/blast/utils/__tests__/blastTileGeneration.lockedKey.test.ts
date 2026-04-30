@@ -41,20 +41,12 @@ describe('generateTileStates — locked/key pairing (Phase 3)', () => {
     expect(countByType(tiles, 'key')).toBe(0);
   });
 
-  it('wave config enables locked+key at the unlock wave and they appear in distribution', () => {
-    // Find the first wave whose distribution has locked>0 — it must also have key>0.
-    let unlockWave = -1;
+  it('locked+key never appear at any wave (Sprint 1 retired)', () => {
     for (let w = 1; w <= 12; w++) {
       const dist = getWaveDistribution(getWaveConfig(w));
-      if ((dist.locked ?? 0) > 0) {
-        unlockWave = w;
-        expect(dist.key ?? 0).toBeGreaterThan(0);
-        // Locked and key should be paired 1:1 in share weight.
-        expect(dist.locked).toBeCloseTo(dist.key as number, 5);
-        break;
-      }
+      expect(dist.locked ?? 0).toBe(0);
+      expect(dist.key ?? 0).toBe(0);
     }
-    expect(unlockWave).toBeGreaterThan(0);
   });
 
   it('every locked tile has a reachable key tile within Manhattan ≤3', () => {

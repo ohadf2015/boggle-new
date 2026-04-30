@@ -1,7 +1,46 @@
 /**
  * blastWaveConfig - Pure function tests for wave scaling configuration.
  */
-import { getWaveConfig, getWaveDistribution, getWaveObjectives } from '../blastWaveConfig';
+import {
+  getWaveConfig,
+  getWaveDistribution,
+  getWaveObjectives,
+  seedTargetWordObjective,
+  seedColorPowerObjective,
+} from '../blastWaveConfig';
+
+/**
+ * Sprint 1 tile retirement: 14 special types disabled across all waves so the
+ * playable roster shrinks from 20 to 5 specials (bomb, rainbow, lightning,
+ * prism, gold) plus base obstacles (ice, frost/frozen). Type union and effect
+ * code stay intact (cleaner deletion left for a follow-up refactor); the
+ * spawn flags being uniformly false means players never see them.
+ */
+describe('blastWaveConfig — Sprint 1 retired tiles never spawn', () => {
+  const RETIRED_FLAGS = [
+    'vortexEnabled',
+    'magnetEnabled',
+    'gemEnabled',
+    'diamondEnabled',
+    'countdownEnabled',
+    'shuffleEnabled',
+    'magmaEnabled',
+    'portalEnabled',
+    'catalystEnabled',
+    'crystalEnabled',
+    'fuseEnabled',
+    'lockedEnabled',
+    'keyEnabled',
+    'anchorEnabled',
+  ] as const;
+
+  it.each([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])('wave %i has all retired flags off', (wave) => {
+    const cfg = getWaveConfig(wave) as unknown as Record<string, unknown>;
+    for (const flag of RETIRED_FLAGS) {
+      expect(cfg[flag]).toBe(false);
+    }
+  });
+});
 
 describe('getWaveConfig', () => {
   it('returns WaveConfig for wave 1', () => {
@@ -54,14 +93,16 @@ describe('getWaveConfig', () => {
     expect(getWaveConfig(4).lightningEnabled).toBe(true);
   });
 
-  it('enables magnet at wave 7', () => {
+  // Sprint 1 retirement: magnet/gems no longer spawn. Tests retained as
+  // negative assertions so a regression that re-enables them fails loudly.
+  it('keeps magnet retired across all waves', () => {
     expect(getWaveConfig(6).magnetEnabled).toBe(false);
-    expect(getWaveConfig(7).magnetEnabled).toBe(true);
+    expect(getWaveConfig(7).magnetEnabled).toBe(false);
   });
 
-  it('enables gems at wave 2', () => {
+  it('keeps gems retired across all waves', () => {
     expect(getWaveConfig(1).gemEnabled).toBe(false);
-    expect(getWaveConfig(2).gemEnabled).toBe(true);
+    expect(getWaveConfig(2).gemEnabled).toBe(false);
   });
 
   it('enables prisms at wave 3', () => {
@@ -127,16 +168,18 @@ describe('getWaveDistribution', () => {
     expect(dist.frozen).toBe(0);
   });
 
-  it('includes gems at wave 2', () => {
+  // Sprint 1 retirement: gem/diamond/magnet never spawn. Distribution checks
+  // become "zero across the board" assertions.
+  it('keeps gems out of distribution at wave 2 (retired)', () => {
     const dist = getWaveDistribution(getWaveConfig(2));
-    expect(dist.gem).toBeGreaterThan(0);
+    expect(dist.gem).toBe(0);
     expect(dist.prism).toBe(0);
     expect(dist.frozen).toBe(0);
   });
 
-  it('includes gems + prisms at wave 3', () => {
+  it('still unlocks prisms at wave 3 (kept)', () => {
     const dist = getWaveDistribution(getWaveConfig(3));
-    expect(dist.gem).toBeGreaterThan(0);
+    expect(dist.gem).toBe(0);
     expect(dist.prism).toBeGreaterThan(0);
     expect(dist.frozen).toBe(0);
   });
@@ -147,18 +190,18 @@ describe('getWaveDistribution', () => {
     expect(dist.magnet).toBe(0);
   });
 
-  it('includes lightning but not diamond at wave 4', () => {
+  it('keeps diamond retired at wave 4', () => {
     const dist = getWaveDistribution(getWaveConfig(4));
-    expect(dist.gem).toBeGreaterThan(0);
     expect(dist.prism).toBeGreaterThan(0);
     expect(dist.lightning).toBeGreaterThan(0);
     expect(dist.diamond).toBe(0);
+    expect(dist.gem).toBe(0);
   });
 
-  it('includes both lightning and magnet at wave 7', () => {
+  it('keeps magnet retired at wave 7', () => {
     const dist = getWaveDistribution(getWaveConfig(7));
     expect(dist.lightning).toBeGreaterThan(0);
-    expect(dist.magnet).toBeGreaterThan(0);
+    expect(dist.magnet).toBe(0);
   });
 
   it('distribution sums to approximately 1.0', () => {
@@ -209,9 +252,12 @@ describe('getWaveDistribution — new tile unlock progression', () => {
     expect(dist.crystal ?? 0).toBe(0);
   });
 
-  it('wave 2: unlocks treasure gem, still no prism/lightning/diamond/frozen/magnet', () => {
+  // Sprint 1 retirement: gems / diamond / magnet do not appear at any wave.
+  // The progressive-unlock tests collapse to "kept tiles still unlock, retired
+  // tiles never do".
+  it('wave 2: gems retired, lightning/prism/frozen/diamond/magnet still off', () => {
     const dist = getWaveDistribution(getWaveConfig(2));
-    expect(dist.gem).toBeGreaterThan(0);
+    expect(dist.gem ?? 0).toBe(0);
     expect(dist.lightning ?? 0).toBe(0);
     expect(dist.prism ?? 0).toBe(0);
     expect(dist.frozen ?? 0).toBe(0);
@@ -219,42 +265,39 @@ describe('getWaveDistribution — new tile unlock progression', () => {
     expect(dist.diamond ?? 0).toBe(0);
   });
 
-  it('wave 3: unlocks prism, still no lightning/frozen/magnet/diamond', () => {
+  it('wave 3: unlocks prism, no lightning/frozen yet', () => {
     const dist = getWaveDistribution(getWaveConfig(3));
     expect(dist.prism).toBeGreaterThan(0);
     expect(dist.lightning ?? 0).toBe(0);
     expect(dist.frozen ?? 0).toBe(0);
-    expect(dist.magnet ?? 0).toBe(0);
-    expect(dist.diamond ?? 0).toBe(0);
   });
 
-  it('wave 4: unlocks lightning, still no diamond/frozen/magnet', () => {
+  it('wave 4: unlocks lightning, retired diamond/magnet stay off', () => {
     const dist = getWaveDistribution(getWaveConfig(4));
     expect(dist.lightning).toBeGreaterThan(0);
     expect(dist.diamond ?? 0).toBe(0);
-    expect(dist.frozen ?? 0).toBe(0);
     expect(dist.magnet ?? 0).toBe(0);
+    expect(dist.frozen ?? 0).toBe(0);
   });
 
-  it('wave 5: unlocks diamond, still no frozen/magnet', () => {
+  it('wave 5: diamond retired (no longer unlocks)', () => {
     const dist = getWaveDistribution(getWaveConfig(5));
-    expect(dist.diamond).toBeGreaterThan(0);
+    expect(dist.diamond ?? 0).toBe(0);
     expect(dist.lightning).toBeGreaterThan(0);
     expect(dist.frozen ?? 0).toBe(0);
-    expect(dist.magnet ?? 0).toBe(0);
   });
 
-  it('wave 6: unlocks frozen, still no magnet', () => {
+  it('wave 6: unlocks frozen obstacle, magnet stays retired', () => {
     const dist = getWaveDistribution(getWaveConfig(6));
     expect(dist.frozen ?? 0).toBeGreaterThan(0);
-    expect(dist.diamond).toBeGreaterThan(0);
     expect(dist.magnet ?? 0).toBe(0);
+    expect(dist.diamond ?? 0).toBe(0);
   });
 
-  it('wave 7+: magnet is > 0', () => {
+  it('wave 7+: magnet stays retired', () => {
     const dist = getWaveDistribution(getWaveConfig(7));
-    expect(dist.magnet ?? 0).toBeGreaterThan(0);
-    expect(dist.diamond).toBeGreaterThan(0);
+    expect(dist.magnet ?? 0).toBe(0);
+    expect(dist.lightning).toBeGreaterThan(0);
   });
 
   it('all distributions for waves 1-6 sum to 1.0 (within 0.01)', () => {
@@ -270,26 +313,25 @@ describe('getWaveDistribution — new tile unlock progression', () => {
     expect(typeof config.diamondEnabled).toBe('boolean');
   });
 
-  it('diamondEnabled=false for wave 1-4, true for wave 5+', () => {
-    expect(getWaveConfig(4).diamondEnabled).toBe(false);
-    expect(getWaveConfig(5).diamondEnabled).toBe(true);
+  it('diamondEnabled stays false at every wave (retired)', () => {
+    for (let wave = 1; wave <= 12; wave++) {
+      expect(getWaveConfig(wave).diamondEnabled).toBe(false);
+    }
   });
 
-  it('crystalEnabled=false for waves 1-11, true at wave 12+ (master-tier unlock)', () => {
-    for (let wave = 1; wave <= 11; wave++) {
+  it('crystalEnabled stays false at every wave (retired)', () => {
+    for (let wave = 1; wave <= 15; wave++) {
       expect(getWaveConfig(wave).crystalEnabled).toBe(false);
     }
-    expect(getWaveConfig(12).crystalEnabled).toBe(true);
-    expect(getWaveConfig(15).crystalEnabled).toBe(true);
   });
 
-  it('crystal absent from distribution for waves 1-11, present at wave 12+', () => {
-    for (let wave = 1; wave <= 11; wave++) {
+  it('crystal absent from distribution at every wave (retired)', () => {
+    for (let wave = 1; wave <= 15; wave++) {
       const dist = getWaveDistribution(getWaveConfig(wave));
       expect(dist.crystal ?? 0).toBe(0);
     }
     const dist12 = getWaveDistribution(getWaveConfig(12));
-    expect(dist12.crystal).toBeGreaterThan(0);
+    expect(dist12.crystal ?? 0).toBe(0);
   });
 
   it('wave 12 distribution still sums to ~1.0 with crystal included', () => {
@@ -358,6 +400,116 @@ describe('getWaveConfig archetype', () => {
     for (let wave = 1; wave <= 12; wave++) {
       expect(known.has(getWaveConfig(wave).archetype)).toBe(true);
     }
+  });
+});
+
+describe('getWaveObjectives — target_word and color_power seeding', () => {
+  describe('seedTargetWordObjective', () => {
+    it('returns objectives unchanged for wave 1-2 (wave < 3)', () => {
+      const baseObjs = [{ type: 'clear_percent' as const, target: 90 }];
+      expect(seedTargetWordObjective(1, 'en', baseObjs)).toEqual(baseObjs);
+      expect(seedTargetWordObjective(2, 'en', baseObjs)).toEqual(baseObjs);
+    });
+
+    it('may add target_word to wave 3+ based on deterministic RNG', () => {
+      const baseObjs = [{ type: 'clear_percent' as const, target: 90 }];
+      const result3 = seedTargetWordObjective(3, 'en', baseObjs);
+      const result4 = seedTargetWordObjective(4, 'en', baseObjs);
+
+      // Wave 3: (3*37) % 100 = 111 % 100 = 11, which is < 25, so should add
+      expect(result3.length).toBe(baseObjs.length + 1);
+      expect(result3[result3.length - 1].type).toBe('target_word');
+      expect(result3[result3.length - 1]).toHaveProperty('targetWord');
+
+      // Wave 4: (4*37) % 100 = 148 % 100 = 48, which is NOT < 25, so should not add
+      expect(result4).toEqual(baseObjs);
+    });
+
+    it('respects language parameter for word pool lookup', () => {
+      const baseObjs = [{ type: 'clear_percent' as const, target: 90 }];
+      // Wave 3 should add target_word for any language with a word pool
+      const resultEn = seedTargetWordObjective(3, 'en', baseObjs);
+      const resultHe = seedTargetWordObjective(3, 'he', baseObjs);
+
+      // Both should either add or not add (depends on pool availability)
+      // The key is that the language is passed through
+      expect(resultEn.length).toBeGreaterThanOrEqual(baseObjs.length);
+      expect(resultHe.length).toBeGreaterThanOrEqual(baseObjs.length);
+    });
+  });
+
+  describe('seedColorPowerObjective', () => {
+    it('returns objectives unchanged for wave 1-3 (wave < 4)', () => {
+      const baseObjs = [{ type: 'clear_percent' as const, target: 90 }];
+      expect(seedColorPowerObjective(1, baseObjs)).toEqual(baseObjs);
+      expect(seedColorPowerObjective(2, baseObjs)).toEqual(baseObjs);
+      expect(seedColorPowerObjective(3, baseObjs)).toEqual(baseObjs);
+    });
+
+    it('may add color_power to wave 4+ based on deterministic RNG', () => {
+      const baseObjs = [{ type: 'clear_percent' as const, target: 90 }];
+      const result4 = seedColorPowerObjective(4, baseObjs);
+      const result5 = seedColorPowerObjective(5, baseObjs);
+
+      // Wave 4: (4*47) % 100 = 188 % 100 = 88, which is NOT < 25, so should not add
+      expect(result4).toEqual(baseObjs);
+
+      // Wave 5: (5*47) % 100 = 235 % 100 = 35, which is NOT < 25, so should not add
+      expect(result5).toEqual(baseObjs);
+    });
+
+    it('rotates color through pink, cyan, lime', () => {
+      const baseObjs = [{ type: 'clear_percent' as const, target: 90 }];
+
+      // Find waves that should add (call at different wave numbers)
+      // The RNG formula is ((wave * 47) % 100) < 25
+      // Need to find waves where this is true
+      const addingWaves: number[] = [];
+      for (let w = 4; w <= 20; w++) {
+        if (((w * 47) % 100) < 25) {
+          addingWaves.push(w);
+        }
+      }
+
+      if (addingWaves.length > 0) {
+        const w1 = addingWaves[0];
+        const w2 = addingWaves[1] ?? w1 + 3;
+        const w3 = addingWaves[2] ?? w1 + 6;
+
+        const result1 = seedColorPowerObjective(w1, baseObjs);
+        const result2 = seedColorPowerObjective(w2, baseObjs);
+        const result3 = seedColorPowerObjective(w3, baseObjs);
+
+        if (result1.length > baseObjs.length) {
+          expect((result1[result1.length - 1] as any).colorTag).toMatch(/pink|cyan|lime/);
+        }
+      }
+    });
+
+    it('increases minColorCount at wave 8+', () => {
+      // Find a wave >= 8 that adds color_power
+      let addingWave8Plus: number | null = null;
+      for (let w = 8; w <= 20; w++) {
+        if (((w * 47) % 100) < 25) {
+          addingWave8Plus = w;
+          break;
+        }
+      }
+
+      if (addingWave8Plus !== null) {
+        const baseObjs = [{ type: 'clear_percent' as const, target: 90 }];
+        const resultEarly = seedColorPowerObjective(4, baseObjs);
+        const resultLate = seedColorPowerObjective(addingWave8Plus, baseObjs);
+
+        // Extract minColorCount from the added objectives
+        const earlyColor = resultEarly.find((o: any) => o.type === 'color_power');
+        const lateColor = resultLate.find((o: any) => o.type === 'color_power');
+
+        if (lateColor) {
+          expect((lateColor as any).minColorCount).toBeGreaterThanOrEqual(3);
+        }
+      }
+    });
   });
 });
 

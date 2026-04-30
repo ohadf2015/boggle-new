@@ -184,7 +184,13 @@ describe('BlastResultsSummary', () => {
   it('shows fail banner + hides stars when clearPercentage < 90', () => {
     render(
       <BlastResultsSummary
-        results={makeResults({ clearPercentage: 75, stars: 1 })}
+        // 27/36 = 75%; ceil(36*0.9)=33 → 6 tiles short
+        results={makeResults({
+          clearPercentage: 75,
+          stars: 1,
+          tilesCleared: 27,
+          totalTiles: 36,
+        })}
         t={t}
         onPlayAgain={noop}
         onQuit={noop}
@@ -192,9 +198,11 @@ describe('BlastResultsSummary', () => {
     );
     const banner = screen.getByTestId('blast-results-fail-banner');
     expect(banner).toBeDefined();
-    // Interpolated copy carries both required (90) and actual (75) percents.
-    expect(banner.textContent).toContain('90');
-    expect(banner.textContent).toContain('75');
+    // Sprint 1 clarity guard: copy now leads with concrete shortfall instead
+    // of percentages — "Just N tiles short!" reads sharper.
+    const reason = screen.getByTestId('blast-fail-reason');
+    expect(reason.textContent).toContain('blast.results.tilesShort');
+    expect(reason.textContent).toContain('6');
     expect(banner.textContent).toContain('blast.results.failHint');
     // Stars row suppressed on fail; star-label key should not render.
     expect(screen.queryByText('blast.stars1')).toBeNull();
@@ -214,6 +222,82 @@ describe('BlastResultsSummary', () => {
     expect(screen.queryByTestId('blast-results-fail-banner')).toBeNull();
     expect(screen.getByText('blast.stars3')).toBeDefined();
     expect(screen.queryByText('blast.results.waveFailed')).toBeNull();
+  });
+
+  // Sprint 3 polish: target_word goal acknowledgement closes the loop on
+  // semantic-goal feedback regardless of fail/success.
+  it('shows target-word missed line under fail banner when goal not found', () => {
+    render(
+      <BlastResultsSummary
+        results={makeResults({
+          clearPercentage: 75,
+          tilesCleared: 27,
+          totalTiles: 36,
+          targetWord: 'CRYSTAL',
+          targetWordFound: false,
+        })}
+        t={t}
+        onPlayAgain={noop}
+        onQuit={noop}
+      />,
+    );
+    const missed = screen.getByTestId('blast-target-word-missed');
+    expect(missed.textContent).toContain('blast.objective.targetWordMissed');
+    expect(missed.textContent).toContain('CRYSTAL');
+  });
+
+  it('shows target-word found celebration when goal hit on a winning wave', () => {
+    render(
+      <BlastResultsSummary
+        results={makeResults({
+          clearPercentage: 95,
+          stars: 3,
+          targetWord: 'CRYSTAL',
+          targetWordFound: true,
+        })}
+        t={t}
+        onPlayAgain={noop}
+        onQuit={noop}
+      />,
+    );
+    const celebration = screen.getByTestId('blast-target-word-found');
+    expect(celebration.textContent).toContain('blast.objective.targetWordFoundIt');
+    expect(celebration.textContent).toContain('CRYSTAL');
+  });
+
+  it('omits target-word UI entirely when no targetWord set', () => {
+    render(
+      <BlastResultsSummary
+        results={makeResults({ clearPercentage: 95, stars: 3 })}
+        t={t}
+        onPlayAgain={noop}
+        onQuit={noop}
+      />,
+    );
+    expect(screen.queryByTestId('blast-target-word-missed')).toBeNull();
+    expect(screen.queryByTestId('blast-target-word-found')).toBeNull();
+    expect(screen.queryByTestId('blast-target-word-cascade-credit')).toBeNull();
+  });
+
+  it('shows positive cascade-credit line when wave succeeded but target missed', () => {
+    render(
+      <BlastResultsSummary
+        results={makeResults({
+          clearPercentage: 95,
+          stars: 3,
+          targetWord: 'CRYSTAL',
+          targetWordFound: false,
+        })}
+        t={t}
+        onPlayAgain={noop}
+        onQuit={noop}
+      />,
+    );
+    const credit = screen.getByTestId('blast-target-word-cascade-credit');
+    expect(credit.textContent).toContain('blast.objective.targetWordMissed');
+    expect(credit.textContent).toContain('CRYSTAL');
+    // Fail banner should NOT render on a winning wave
+    expect(screen.queryByTestId('blast-results-fail-banner')).toBeNull();
   });
 
   it('renders sticky CTA footer containing play-again + home', () => {

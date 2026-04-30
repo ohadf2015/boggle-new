@@ -21,7 +21,7 @@ export function getObjectiveTileTypes(objectives: BlastObjective[]): BlastTileTy
 
 /**
  * Format a human-readable label for an objective, using translation function.
- * Supports template variables: {target}, {tileType}, {minWordLength}.
+ * Supports template variables: {target}, {tileType}, {minWordLength}, {word}, {color}, {count}.
  */
 export function formatObjectiveLabel(
   objective: BlastObjective,
@@ -45,12 +45,33 @@ export function formatObjectiveLabel(
     case 'clear_percent':
       template = t('blast.objective.clearPercent') || 'Clear {target}% of the board';
       break;
+    case 'target_word':
+      template = t('blast.objective.targetWord') || 'Find: {word}';
+      break;
+    case 'color_power':
+      template = t('blast.objective.colorPower') || 'Use {count}+ {color} tiles in one word';
+      break;
     default:
       template = '';
   }
 
+  // Get color translation key
+  const colorKey = objective.colorTag ? `blast.objective.color${objective.colorTag.charAt(0).toUpperCase()}${objective.colorTag.slice(1)}` : '';
+  const colorLabel: string = colorKey ? (t(colorKey) || objective.colorTag || '') : '';
+
+  // Tile-type label resolves through the existing tile-guide translations
+  // (`blast.tileGuide.<type>.name`) — never leak the raw English type id
+  // into a non-English UI. Falls back to the id only when no translation
+  // exists for that type in the current locale (defensive last resort).
+  const tileLabel: string = objective.tileType
+    ? (t(`blast.tileGuide.${objective.tileType}.name`) || objective.tileType)
+    : '';
+
   return template
     .replace('{target}', String(objective.target))
-    .replace('{tileType}', objective.tileType || '')
-    .replace('{minWordLength}', String(objective.minWordLength || 0));
+    .replace('{tileType}', tileLabel)
+    .replace('{minWordLength}', String(objective.minWordLength || 0))
+    .replace('{word}', (objective.targetWord || '').toUpperCase())
+    .replace('{count}', String(objective.minColorCount || 0))
+    .replace('{color}', colorLabel);
 }

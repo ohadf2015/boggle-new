@@ -386,6 +386,7 @@ const es = {
     "backToHome": "Volver al Inicio",
     "backToMenu": "Volver al Menú",
     "next": "Siguiente",
+    "stepOf": "Paso {current} de {total}",
     "previous": "Anterior",
     "confirm": "Confirmar",
     "cancel": "Cancelar",
@@ -2281,12 +2282,13 @@ const es = {
   },
   "practiceResults": {
     "playAgain": "Jugar de nuevo",
+    "goHome": "Volver al inicio",
     "orTrySomethingNew": "o prueba algo nuevo",
     "wordsFound": "{count} palabras encontradas",
     "tryDaily": "Desafío diario",
     "tryDailyDesc": "Mismo puzzle, todos compiten",
     "tryBots": "Contra bots",
-    "tryBotsDesc": "Pon a prueba tus habilidades contra IA",
+    "tryBotsDesc": "¿Sin amigos en línea? Los bots no duermen.",
     "tryMultiplayer": "Jugar con amigos",
     "tryMultiplayerDesc": "Batallas de palabras en tiempo real",
     "wordHuntCta": "Jugar Word Hunt diario",
@@ -2678,6 +2680,22 @@ const es = {
       "name": "Jugador Leal",
       "description": "Jugó en 30 días diferentes"
     },
+    "EARLY_BIRD": {
+      "name": "Madrugador",
+      "description": "Primera palabra en menos de 2 segundos"
+    },
+    "PALINDROME_HUNTER": {
+      "name": "Cazador de palíndromos",
+      "description": "Encontraste una palabra que se lee igual al revés"
+    },
+    "COMEBACK_CHAMPION": {
+      "name": "Campeón de la remontada",
+      "description": "Ganaste con una remontada feroz al final"
+    },
+    "FIRST_GAME_WIN": {
+      "name": "Primera victoria",
+      "description": "Ganaste tu primera partida"
+    },
     "DAILY_DOUBLE": {
       "name": "Doble Diario",
       "description": "Aplastaste ambos retos de hoy"
@@ -2906,6 +2924,8 @@ const es = {
     "firstWin": {
       "title": "¡Felicitaciones por Tu Primera Victoria!",
       "subtitle": "¡Tienes habilidades! Crea una cuenta para mantener tu racha ganadora.",
+      "subtitleUrgency": "No pierdas esta victoria — regístrate antes de que se esfume.",
+      "subtitleValueProp": "Sigue tu racha y desbloquea los retos diarios.",
       "benefitsTitle": "Regístrate para desbloquear:",
       "benefits": {
         "trackProgress": "Seguir tu progreso",
@@ -2918,7 +2938,9 @@ const es = {
     "signInWith": "Iniciar con {provider}",
     "multiGames": {
       "title": "¡Estás mejorando!",
-      "subtitle": "¡Regístrate para guardar tu progreso y seguir tus logros!"
+      "subtitle": "¡Regístrate para guardar tu progreso y seguir tus logros!",
+      "subtitleUrgency": "Tus estadísticas desaparecerán si no las guardas.",
+      "subtitleValueProp": "Sube en la clasificación y juega con amigos."
     },
     "mpSignup": {
       "title": "Guarda tu progreso",
@@ -3612,7 +3634,9 @@ const es = {
     "recentWords": "Palabras Recientes",
     "leaderboard": "Tabla de Clasificación",
     "words": "palabras",
-    "noPlayersYet": "Aún no hay jugadores"
+    "noPlayersYet": "Aún no hay jugadores",
+    "live": "En vivo",
+    "connecting": "Conectando..."
   },
   "collectibles": {
     "title": "Mi Colección",
@@ -3712,6 +3736,7 @@ const es = {
     "unequip": "Desequipar",
     "purchase": "Comprar ({{cost}} oro)",
     "close": "Cerrar",
+    "unlockedToast": "✨ Nuevo cosmético desbloqueado: {{name}}",
     "rarity": {
       "common": "Común",
       "rare": "Raro",
@@ -3765,6 +3790,7 @@ const es = {
     "header": "Guía Rápida",
     "loading": "Cargando...",
     "skip": "Omitir",
+    "skipTutorial": "Saltar tutorial",
     "letsPlay": "¡A Jugar!",
     "timingHint": "¡La velocidad da combos!",
     "step1Title": "Desliza Letras",
@@ -3793,6 +3819,7 @@ const es = {
       "demoComplete": "¡Lo tienes! Ahora sabes cómo jugar.",
       "startHere": "Empieza aquí",
       "watchMe": "¡Mira esto!",
+      "demoAriaLabel": "Demostración: trazando la palabra {{word}}",
       "yourTurn": "¡Tu turno! Deletrea:",
       "letterCount": "{current}/{total}"
     },
@@ -3883,7 +3910,33 @@ const es = {
       "letsGo": "¡Empecemos!",
       "chooseLanguage": "Elige tu idioma",
       "letsPlay": "¡A jugar!",
-      "whereToStart": "¿Por dónde empezar?"
+      "whereToStart": "¿Por dónde empezar?",
+      "v2": {
+        "rewardsEarned": "RECOMPENSAS GANADAS",
+        "goldReward": "+{{gold}} ORO",
+        "goldEarned": "oro ganado",
+        "streak": "racha",
+        "streakStarted": "DÍA 1 DE RACHA",
+        "achievementUnlocked": "PRIMERAS PALABRAS",
+        "tomorrowBonus": "Vuelve mañana para +50 extra",
+        "scoreFooter": "{{score}} pts",
+        "claimAndPlay": "RECLAMAR Y JUGAR",
+        "skipForNow": "Omitir por ahora",
+        "titles": {
+          "wordling": "PALABRINO",
+          "wordHunter": "¡CAZAPALABRAS!",
+          "wordsmith": "¡MAESTRO DE PALABRAS!",
+          "wordSlayer": "¡VERDUGO DE PALABRAS!",
+          "wordLegend": "¡LEYENDA DE PALABRAS!"
+        },
+        "mascotReactions": {
+          "wordling": "¡Buen comienzo!",
+          "wordHunter": "¡Mira cómo vas!",
+          "wordsmith": "¡Eres un natural!",
+          "wordSlayer": "¡Estás en llamas!",
+          "wordLegend": "¡Debut legendario!"
+        }
+      }
     }
   },
   "preGameTutorial": {
@@ -3953,7 +4006,7 @@ const es = {
       },
       "letterFeedback": {
         "title": "Leyendo las Pistas",
-        "example": "Ejemplo: Objetivo es \"BEACH\"",
+        "example": "Ejemplo",
         "gotIt": "¡Entendido!",
         "legendGreen": "Lugar correcto",
         "legendYellow": "Lugar incorrecto",
@@ -4070,7 +4123,7 @@ const es = {
     "globalRank": "Posición Global",
     "loading": "Cargando clasificación...",
     "error": "Error al cargar la clasificación",
-    "empty": "¡Sin puntuaciones todavía. Sé el primero en jugar!",
+    "empty": "Tablero limpio. Pon la marca.",
     "beFirstToPlay": "¡Sé el primero en jugar!",
     "refresh": "Actualizar",
     "best": "Mejor",
@@ -4164,7 +4217,7 @@ const es = {
     "gallery": {
       "title": "Tableros de la comunidad",
       "boardCount": "tableros",
-      "empty": "Aún no hay tableros. ¡Sé el primero en crear uno!",
+      "empty": "Aún no hay tableros. Arma el primero y empieza la racha.",
       "emptyHint": "Crea un tablero personalizado y compártelo con la comunidad",
       "emptyTitle": "Aún no hay tableros",
       "emptySubtitle": "¡Sé el primero en crear uno!",
@@ -4340,6 +4393,45 @@ const es = {
     "rankedAt": "Puesto #{{position}}",
     "tierLabel": "Nivel"
   },
+  "seasonBadges": {
+    "section": {
+      "title": "Trofeos de temporada",
+      "empty": "Termina entre los 5 primeros para ganar un trofeo coleccionable",
+      "count": "{{count}} obtenidos",
+      "viewAll": "Ver todos"
+    },
+    "title": {
+      "rank1": "Campeón",
+      "rank2": "Subcampeón",
+      "rank3": "Medalla de bronce",
+      "rank4": "Finalista Top 5",
+      "rank5": "Finalista Top 5"
+    },
+    "subtitle": "{{theme}} · Temporada {{seasonId}}",
+    "modal": {
+      "headline": "¡Terminaste en el #{{rank}}!",
+      "subhead": "{{theme}} colocación desbloqueada",
+      "collectible": "Coleccionable permanente",
+      "viewProfile": "Ver en perfil"
+    },
+    "recap": {
+      "title": "Resumen de temporada",
+      "bestRank": "Mejor puesto",
+      "totalGames": "Partidas jugadas",
+      "finalScore": "Puntuación final",
+      "peakTier": "Nivel máximo",
+      "stats": "Tus números"
+    },
+    "rarity": {
+      "legendary": "Legendario",
+      "epic": "Épico",
+      "rare": "Raro",
+      "uncommon": "Poco común"
+    },
+    "publicProfile": {
+      "title": "Trofeos de temporada de {{username}}"
+    }
+  },
   "growth": {
     "dayStreak": "racha de días",
     "daysAway": "días para",
@@ -4459,6 +4551,8 @@ const es = {
     "welcomeTitle": "Palabras. Rivales. Gloria.",
     "welcomeSubtitle": "Gratis. Sin registro. Sin pagar para ganar.",
     "playTodayChallenge": "Jugar el desafío de hoy",
+    "moreGameModes": "Más modos de juego",
+    "moreGameModesHint": "Toca para explorar",
     "singlePlayer": "Juego Rápido",
     "singlePlayerDesc": "¡Salta y juega al instante!",
     "badgeBots": "Bots",
@@ -4479,6 +4573,7 @@ const es = {
     "practice": "Práctica",
     "practiceDesc": "Sin presión, solo palabras",
     "practiceFirstToUnlock": "Termina la práctica para desbloquear",
+    "playGamesToUnlock": "Juega {count} partidas para desbloquear",
     "brainTraining": "Entrenamiento Cerebral",
     "brainTrainingDesc": "Sigue tu crecimiento cognitivo",
     "adventureMode": "Aventura",
@@ -4507,7 +4602,7 @@ const es = {
     "shareSubtitleGuest": "¡Juega con amigos!",
     "shareButton": "Compartir",
     "shareTextAuth": "¡Únete a LexiClash! Usa mi código de referido: {code}",
-    "shareTextGuest": "¡Juega LexiClash - el mejor juego de palabras multijugador!",
+    "shareTextGuest": "Juguemos LexiClash juntos — a ver quién gana.",
     "shareNativeTitle": "Únete a LexiClash",
     "playNowFree": "¡Juega ahora — Gratis!",
     "letsPlay": "¡A jugar!",
@@ -4619,7 +4714,7 @@ const es = {
       "faq5A": "Sí. LexiClash está diseñado para jugadores a partir de 6 años. Cumplimos con las regulaciones COPPA, mostramos solo anuncios no personalizados y no rastreamos el comportamiento de navegación de los niños.",
       "faq6Q": "¿Puedo crear mi propio tablero?",
       "faq6A": "¡Sí! Usa el Constructor de Tableros Comunitarios para diseñar cuadrículas de letras personalizadas. Publícalos para que otros jugadores jueguen, califiquen y compitan. Los mejores tableros aparecen en la página principal.",
-      "communityTitle": "Únete a miles de entusiastas de juegos de palabras",
+      "communityTitle": "Aquí todos amamos las palabras.",
       "communityContent": "Los jugadores de LexiClash abarcan más de 40 países y cinco idiomas. Únete a la comunidad para competir en clasificaciones globales, compartir resultados del desafío diario y descubrir nuevas estrategias de palabras. Síguenos en Instagram @lexi.clash para consejos, actualizaciones y eventos de la comunidad."
     },
     "firstTimer": {
@@ -4743,10 +4838,12 @@ const es = {
     },
     "features": {
       "unlocked": {
+        "modeRoster": "Modos de Juego",
+        "modeRosterDesc": "¡Todos desbloqueados! Pruébalos.",
         "practiceMode": "Modo Práctica",
         "practiceModeDesc": "Practica a tu propio ritmo",
         "challengeMode": "Modo Desafío",
-        "challengeModeDesc": "Pon a prueba tus habilidades con puzzles más difíciles",
+        "challengeModeDesc": "Tableros más difíciles. Sin piedad.",
         "customBotCount": "Bots Personalizados",
         "customBotCountDesc": "Elige cuántos bots enfrentar",
         "advancedSettings": "Configuración Avanzada",
@@ -4840,8 +4937,8 @@ const es = {
   "rules": {
     "pageTitle": "LexiClash: Batalla de Palabras en Tiempo Real",
     "gameModes": "Modos de Juego",
-    "readyToTest": "¿Listo para Probar Tus Habilidades con Palabras?",
-    "readyToTestDesc": "Únete a miles de jugadores en la experiencia definitiva de batalla de palabras.",
+    "readyToTest": "¿Te la juegas?",
+    "readyToTestDesc": "Arma una sala, llama a tus amigos y vean quién manda.",
     "startPlaying": "Empezar a Jugar Ahora",
     "backToHome": "Volver al Inicio",
     "joinOrCreateDesc": "Crea tu propia sala de juego o únete a una existente usando un código de sala.",
@@ -4860,7 +4957,7 @@ const es = {
     "dontOverthinkDesc": "Envía palabras obvias de 3-4 letras rápidamente sin dudar.",
     "soloVsBotsDesc": "Compite contra oponentes de IA de diferentes niveles de dificultad.",
     "practiceModeDesc": "Tómate tu tiempo sin temporizador. Perfecto para aprender nuevas palabras.",
-    "challengeModeDesc": "Supera tus récords personales y rastrea tu mejora con el tiempo."
+    "challengeModeDesc": "Vence al tú de antes. Mira cómo sube el puntaje."
   },
   "social": {
     "playersOnline": "jugadores en línea",
@@ -4930,7 +5027,7 @@ const es = {
         "trackResults": "Ve quién supera tu desafío"
       },
       "ctaButton": "Regístrate para empezar a crear",
-      "socialProof": "Únete a miles creando desafíos"
+      "socialProof": "Hay un montón de tableros en construcción ahora mismo."
     },
     "playingAs": "Jugando como",
     "keepPlaying": "¡Vuelve mañana para un nuevo rompecabezas!",
@@ -5053,7 +5150,7 @@ const es = {
     },
     "nextChallenge": {
       "wordHuntTitle": "⚡ ¡Te Espera Word Hunt Diario!",
-      "wordHuntDesc": "¡Prueba tu velocidad! Encuentra la palabra objetivo lo más rápido posible.",
+      "wordHuntDesc": "Carrera contra el reloj. Atrapa la palabra.",
       "wordHuntCTA": "Jugar Word Hunt",
       "buzzTitle": "🔥 ¡Desafío Buzz Diario!",
       "buzzDesc": "¡Temas de tendencia! Resuelve rompecabezas de palabras generados por IA.",
@@ -8142,6 +8239,12 @@ const es = {
       "cta": "Ver anuncio por +{moves} movimientos",
       "decline": "Terminar partida"
     },
+    "retryWaveModal": {
+      "title": "Oleada {wave} — ¡muy cerca!",
+      "body": "Limpiaste {percent}%. Mira un anuncio para reintentar la oleada {wave} — tus oleadas previas se conservan.",
+      "cta": "Reintentar oleada {wave}",
+      "decline": "Reiniciar desde la oleada 1"
+    },
     "pregameBuff": {
       "title": "¿Potenciar?",
       "body": "Elige un boost, mira un anuncio corto y empieza la partida con ventaja.",
@@ -8302,6 +8405,7 @@ const es = {
       "newBadge": "NUEVO",
       "waveFailed": "Oleada Fallida",
       "needClearPct": "Necesitabas {required}% despejado — lograste {got}%",
+      "tilesShort": "¡Solo {count} fichas más!",
       "failHint": "Despeja al menos el 90% del tablero para avanzar",
       "tryAgain": "Intentar de Nuevo",
       "share": "Compartir",
@@ -8412,6 +8516,8 @@ const es = {
     "celebrateAgain": "Celebrar de nuevo",
     "best": "Mejor",
     "movesLeft": "Movimientos",
+    "luckyBoost": "Bonus de Suerte",
+    "luckyBoostDesc": "Más fichas especiales tras una racha dura",
     "bonusMove": "¡+1 Movimiento!",
     "bonusMoves": "¡+{count} Movimientos!",
     "outOfMoves": "¡Sin Movimientos!",
@@ -8429,7 +8535,29 @@ const es = {
       "collectType": "Recolecta {target} {tileType}",
       "clearAllType": "Limpia todos los {tileType}",
       "wordLength": "{target} palabras de {minWordLength}+ letras",
-      "clearPercent": "Limpia {target}% del tablero"
+      "clearPercent": "Limpia {target}% del tablero",
+      "targetWord": "Encuentra: {word}",
+      "targetWordFoundIt": "¡LO ENCONTRASTE!",
+      "targetWordMissed": "El objetivo era: {word} — ¡La cascada lo consiguió!",
+      "colorPower": "Usa {count}+ fichas {color} en una palabra",
+      "colorPink": "Rosa",
+      "colorCyan": "Cian",
+      "colorLime": "Lima",
+      "bannerTitle": "Objetivos"
+    },
+    "hint": {
+      "free": "GRATIS",
+      "ad": "PISTA",
+      "aria": {
+        "free": "Pista gratis — cuesta 25 pts",
+        "ad": "Mira un anuncio para una pista — cuesta 25 pts"
+      },
+      "toast": {
+        "targetWord": "Intenta formar: {word}",
+        "colorPower": "Busca fichas {color}",
+        "collectType": "Encuentra más {tileType}",
+        "clearAllType": "Limpia los {tileType} restantes"
+      }
     },
     "combo": {
       "bomb_bomb": "¡MEGA EXPLOSIÓN!",
@@ -9239,7 +9367,7 @@ const es = {
       "roleGuest": "Invitado",
       "roleStudent": "Estudiante",
       "roleTeacher": "Profesor",
-      "socialProof": "Únete a miles de estudiantes",
+      "socialProof": "No eres el único que está aprendiendo.",
       "student": "Estudiante",
       "studentCta": "Empezar a aprender",
       "studentDesc": "Aprende vocabulario jugando",
@@ -10006,7 +10134,7 @@ const es = {
       "practiceMode": "Modo Práctica",
       "practiceModeDesc": "Practica a tu propio ritmo",
       "challengeMode": "Modo Desafío",
-      "challengeModeDesc": "Pon a prueba tus habilidades con puzzles más difíciles",
+      "challengeModeDesc": "Tableros más difíciles. Sin piedad.",
       "customBotCount": "Bots Personalizados",
       "customBotCountDesc": "Elige cuántos bots enfrentar",
       "advancedSettings": "Configuración Avanzada",
@@ -10680,6 +10808,7 @@ const es = {
     "title": "Elige un boost",
     "cta": "BOOST",
     "close": "Cerrar",
+    "skipAndPlay": "Jugar sin boost",
     "remaining": "Boosts restantes hoy: {{n}}/{{cap}}",
     "watchAd": "Mira un anuncio para desbloquear",
     "activeThisGame": "Activo en esta partida",

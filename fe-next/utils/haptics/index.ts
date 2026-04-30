@@ -16,5 +16,6 @@ import { haptics as hapticsInstance } from './HapticsManager';
 
 export const hapticForWordScore = (_wordLength?: number) => hapticsInstance.tap();
 export const hapticError = () => hapticsInstance.error();
+export const hapticWordAccepted = () => hapticsInstance.success();
 export const hapticClueRevealed = (_clueCount?: number) => hapticsInstance.success();
 export const hapticGameWin = () => hapticsInstance.success();

@@ -33,77 +33,106 @@ function Afro({ fill }: HairPartProps) {
 
 function Wavy({ fill }: HairPartProps) {
   const u = useAvatarUid();
-  const cap = "M10 38 C6 24 18 12 34 8 C42 6 58 6 66 8 C82 12 94 24 90 38 C92 48 90 58 86 64 C82 60 82 52 82 46 C64 26 36 26 18 46 C18 52 18 60 14 64 C10 58 8 48 10 38Z";
+  /* Big flowing wavy cap: dome top + long cascading sides past jaw with scalloped wave bottom */
+  const cap = "M6 38 C2 22 16 6 34 4 Q50 0 66 4 C84 6 98 22 94 38 C96 52 96 66 90 78 Q84 86 80 80 Q82 68 80 56 Q70 38 50 36 Q30 38 20 56 Q18 68 20 80 Q16 86 10 78 C4 66 4 52 6 38Z";
   return (
     <g>
       <defs><HairPolishDefs uid={u} keyName="wavy" /></defs>
-      {/* Wavy hair — voluminous cap with flowing S-curve sides */}
       <path d={cap} fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
       <HairPolish uid={u} keyName="wavy" d={cap} />
-      {/* Wave S-curve texture on sides */}
-      <path d="M14 44 C16 50 14 56 16 62 M86 44 C84 50 86 56 84 62" stroke="#000" strokeWidth={0.7} opacity="0.1" />
-      {/* Double-strand glossy highlights */}
-      <path d="M20 42 C22 50 20 56 22 62" stroke="#fff" strokeWidth={1.2} opacity="0.15" />
-      <path d="M80 42 C78 50 80 56 78 62" stroke="#fff" strokeWidth={1.2} opacity="0.15" />
-      <path d="M22 44 C24 50 22 56 24 60" stroke="#fff" strokeWidth={0.7} opacity="0.1" />
-      <path d="M78 44 C76 50 78 56 76 60" stroke="#fff" strokeWidth={0.7} opacity="0.1" />
-      {/* Crown highlight arc */}
-      <path d="M34 10 C44 6 56 6 66 10" fill="none" stroke="#fff" strokeWidth={1.5} opacity="0.18" strokeLinecap="round" />
-      <path d="M38 8 C46 4 54 4 62 8" fill="none" stroke="#fff" strokeWidth={0.8} opacity="0.1" strokeLinecap="round" />
+      {/* Pronounced S-curve waves down left side */}
+      <path d="M10 44 Q14 50 10 56 Q6 62 10 68 Q14 74 12 80" fill="none" stroke="#000" strokeWidth={1} opacity="0.2" strokeLinecap="round" />
+      <path d="M14 46 Q18 52 14 58 Q10 64 14 70 Q18 76 16 80" fill="none" stroke="#000" strokeWidth={0.7} opacity="0.13" strokeLinecap="round" />
+      {/* Right side waves */}
+      <path d="M90 44 Q86 50 90 56 Q94 62 90 68 Q86 74 88 80" fill="none" stroke="#000" strokeWidth={1} opacity="0.2" strokeLinecap="round" />
+      <path d="M86 46 Q82 52 86 58 Q90 64 86 70 Q82 76 84 80" fill="none" stroke="#000" strokeWidth={0.7} opacity="0.13" strokeLinecap="round" />
+      {/* Glossy ribbon highlights */}
+      <path d="M12 42 Q16 52 12 62 Q8 72 12 78" fill="none" stroke="#fff" strokeWidth={1.3} opacity="0.2" strokeLinecap="round" />
+      <path d="M88 42 Q84 52 88 62 Q92 72 88 78" fill="none" stroke="#fff" strokeWidth={1.3} opacity="0.2" strokeLinecap="round" />
+      {/* Scalloped bottom hint — wave tips outside face zone */}
+      <path d="M14 78 Q18 84 22 80" fill="none" stroke="#000" strokeWidth={1} opacity="0.18" strokeLinecap="round" />
+      <path d="M86 78 Q82 84 78 80" fill="none" stroke="#000" strokeWidth={1} opacity="0.18" strokeLinecap="round" />
+      {/* Crown highlight */}
+      <path d="M30 8 C42 4 58 4 70 8" fill="none" stroke="#fff" strokeWidth={1.6} opacity="0.22" strokeLinecap="round" />
+      <path d="M36 5 C44 1 56 1 64 5" fill="none" stroke="#fff" strokeWidth={0.8} opacity="0.12" strokeLinecap="round" />
     </g>
   );
 }
 
 function Pigtails({ fill }: HairPartProps) {
   const u = useAvatarUid();
-  const cap = "M18 34 Q18 14 50 10 Q82 14 82 34";
+  /* Cap covers crown with center part and cute bangs hint */
+  const cap = "M14 30 Q12 8 50 4 Q88 8 86 30";
   return (
     <g>
       <defs><HairPolishDefs uid={u} keyName="pigtails" /></defs>
-      {/* Cap */}
       <path d={cap} fill={fill} stroke="#000" strokeWidth={S} />
       <HairPolish uid={u} keyName="pigtails" d={cap} />
-      {/* Part line */}
-      <line x1="50" y1="10" x2="50" y2="28" stroke="#000" strokeWidth={1} opacity="0.25" />
-      {/* Left pigtail — within viewBox */}
-      <path d="M18 34 C8 36 4 44 6 54 C8 64 10 72 14 76 C18 80 20 76 18 70 C16 62 12 54 10 48 C8 42 12 36 18 34Z"
+      {/* Center part */}
+      <line x1="50" y1="4" x2="50" y2="26" stroke="#000" strokeWidth={1} opacity="0.25" />
+      {/* Left pigtail — chubby teardrop pointing outward and slightly down (high anime style) */}
+      <path d="M18 22 C6 22 -2 32 2 42 C6 50 14 52 18 46 C20 40 18 34 18 28 C18 26 18 24 18 22Z"
         fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
-      {/* Right pigtail — within viewBox */}
-      <path d="M82 34 C92 36 96 44 94 54 C92 64 90 72 86 76 C82 80 80 76 82 70 C84 62 88 54 90 48 C92 42 88 36 82 34Z"
+      {/* Right pigtail — mirror */}
+      <path d="M82 22 C94 22 102 32 98 42 C94 50 86 52 82 46 C80 40 82 34 82 28 C82 26 82 24 82 22Z"
         fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
-      {/* Strand details */}
-      <path d="M10 42 Q8 52 10 62 M14 44 Q12 54 14 66" stroke="#000" strokeWidth={0.7} opacity="0.1" />
-      <path d="M90 42 Q92 52 90 62 M86 44 Q88 54 86 66" stroke="#000" strokeWidth={0.7} opacity="0.1" />
-      {/* Highlights */}
-      <path d="M12 40 Q10 50 12 58" stroke="#fff" strokeWidth={1} opacity="0.12" />
-      <path d="M88 40 Q90 50 88 58" stroke="#fff" strokeWidth={1} opacity="0.12" />
-      {/* Hair ties — wrapped band look */}
-      <ellipse cx="18" cy="34" rx="5" ry="3.5" fill={fill} stroke="#000" strokeWidth={2} />
-      <path d="M15 33 Q18 31 21 33" fill="none" stroke="#fff" strokeWidth={0.6} opacity="0.25" />
-      <ellipse cx="82" cy="34" rx="5" ry="3.5" fill={fill} stroke="#000" strokeWidth={2} />
-      <path d="M79 33 Q82 31 85 33" fill="none" stroke="#fff" strokeWidth={0.6} opacity="0.25" />
+      {/* Pigtail wisp/strand texture */}
+      <path d="M6 30 Q4 38 8 46" fill="none" stroke="#000" strokeWidth={0.8} opacity="0.18" strokeLinecap="round" />
+      <path d="M10 28 Q8 36 12 44" fill="none" stroke="#000" strokeWidth={0.6} opacity="0.12" strokeLinecap="round" />
+      <path d="M94 30 Q96 38 92 46" fill="none" stroke="#000" strokeWidth={0.8} opacity="0.18" strokeLinecap="round" />
+      <path d="M90 28 Q92 36 88 44" fill="none" stroke="#000" strokeWidth={0.6} opacity="0.12" strokeLinecap="round" />
+      {/* Glossy highlights */}
+      <path d="M4 32 Q2 40 6 48" fill="none" stroke="#fff" strokeWidth={1.1} opacity="0.2" strokeLinecap="round" />
+      <path d="M96 32 Q98 40 94 48" fill="none" stroke="#fff" strokeWidth={1.1} opacity="0.2" strokeLinecap="round" />
+      {/* Hair ties — scrunchie band where pigtail meets head */}
+      <ellipse cx="18" cy="24" rx="5" ry="3.5" fill={fill} stroke="#000" strokeWidth={2} />
+      <ellipse cx="16" cy="22" rx="2" ry="1" fill="#fff" opacity="0.3" />
+      <ellipse cx="82" cy="24" rx="5" ry="3.5" fill={fill} stroke="#000" strokeWidth={2} />
+      <ellipse cx="80" cy="22" rx="2" ry="1" fill="#fff" opacity="0.3" />
+      {/* Wrap detail on tie */}
+      <path d="M14 24 Q18 22 22 24" fill="none" stroke="#000" strokeWidth={0.7} opacity="0.3" />
+      <path d="M78 24 Q82 22 86 24" fill="none" stroke="#000" strokeWidth={0.7} opacity="0.3" />
+      {/* Crown sheen */}
+      <path d="M32 8 C42 4 58 4 68 8" fill="none" stroke="#fff" strokeWidth={1.4} opacity="0.2" strokeLinecap="round" />
     </g>
   );
 }
 
 function Sideshave({ fill }: HairPartProps) {
   const u = useAvatarUid();
-  const swept = "M34 22 Q50 10 82 18 Q86 22 86 36 L86 58 Q84 66 78 62 L78 38 Q66 20 38 28Z";
+  /* Bold swept-over volume: hair pulled high from the left, cascading across crown and down right side. */
+  const swept = "M28 30 Q32 6 56 4 Q82 6 90 18 Q92 30 92 42 C94 58 90 74 86 80 Q82 84 80 78 Q82 64 80 50 Q72 30 56 26 Q40 24 28 30Z";
+  /* Stubble pattern + fade lines for shaved side */
+  const stubbleDots = [
+    [18, 34], [22, 32], [25, 30], [16, 30], [20, 28], [24, 26], [14, 26], [18, 24], [22, 22],
+    [12, 22], [16, 20], [20, 18], [14, 16], [18, 14], [22, 12], [16, 10], [20, 8],
+    [25, 14], [27, 18], [27, 24], [27, 28],
+  ] as const;
   return (
     <g>
       <defs><HairPolishDefs uid={u} keyName="sideshave" /></defs>
-      {/* Shaved left side — visible buzzed stubble pattern */}
-      <path d="M20 36 Q20 24 32 22" fill="none" stroke={fill} strokeWidth={1.5} opacity="0.3" />
-      {[{x:22,y:34},{x:25,y:30},{x:28,y:27},{x:24,y:37},{x:27,y:33},{x:30,y:29},{x:22,y:28},{x:26,y:24}].map((p,i) => (
-        <circle key={`${p.x}-${p.y}`} cx={p.x} cy={p.y} r={1.3} fill={fill} opacity={0.25-(i%3)*0.04} />
+      {/* Shaved-side scalp tint */}
+      <path d="M14 36 Q14 16 26 8 Q28 22 28 36 Z" fill={fill} opacity="0.12" />
+      {/* Stubble dots */}
+      {stubbleDots.map(([x, y], i) => (
+        <circle key={`${x}-${y}`} cx={x} cy={y} r={1.2} fill={fill} opacity={0.36 - (i % 4) * 0.06} />
       ))}
-      {/* Shave demarcation line */}
-      <path d="M34 22 Q36 28 34 34" fill="none" stroke="#000" strokeWidth={1} opacity="0.15" />
-      {/* Cap on right side + swept-over volume */}
+      {/* Fade lines */}
+      <path d="M14 28 L26 22 M14 22 L26 16 M14 16 L26 10" stroke={fill} strokeWidth={0.7} opacity="0.22" />
+      {/* Demarcation between shaved + swept */}
+      <path d="M28 30 Q30 18 32 8" fill="none" stroke="#000" strokeWidth={1.4} opacity="0.45" />
+      {/* Swept cap */}
       <path d={swept} fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
       <HairPolish uid={u} keyName="sideshave" d={swept} />
-      <path d="M56 14 Q68 14 78 22" fill="none" stroke="#fff" strokeWidth={1} opacity="0.12" />
-      <path d="M40 24 Q50 16 62 16" fill="none" stroke="#fff" strokeWidth={0.8} opacity="0.1" />
+      {/* Sweep direction lines */}
+      <path d="M40 12 Q60 6 84 18" fill="none" stroke="#fff" strokeWidth={1.5} opacity="0.25" strokeLinecap="round" />
+      <path d="M44 16 Q62 12 80 22" fill="none" stroke="#fff" strokeWidth={0.9} opacity="0.16" strokeLinecap="round" />
+      <path d="M48 20 Q64 18 76 26" fill="none" stroke="#fff" strokeWidth={0.6} opacity="0.1" strokeLinecap="round" />
+      {/* Right cascade highlights */}
+      <path d="M88 36 Q92 50 90 70" fill="none" stroke="#fff" strokeWidth={1.1} opacity="0.18" strokeLinecap="round" />
+      <path d="M84 38 Q88 52 86 68" fill="none" stroke="#fff" strokeWidth={0.7} opacity="0.12" strokeLinecap="round" />
+      {/* Tip flick */}
+      <path d="M82 76 Q86 82 84 78" fill="none" stroke="#000" strokeWidth={0.8} opacity="0.2" strokeLinecap="round" />
     </g>
   );
 }
@@ -161,44 +190,51 @@ function Dreads({ fill }: HairPartProps) {
 }
 
 function Braids({ fill }: HairPartProps) {
-  /* Woven braid segments — alternating left/right overlapping ellipses */
-  const braidSegments = (cx: number, startY: number, dir: number) => {
-    const segs = [];
-    for (let i = 0; i < 7; i++) {
-      const y = startY + i * 7;
-      const xOff = (i % 2 === 0 ? -1 : 1) * dir * 2.5;
-      segs.push(
-        <ellipse key={y} cx={cx + xOff} cy={y} rx={5} ry={4} fill={fill} stroke="#000" strokeWidth={1.2}
-          strokeLinejoin="round" />
-      );
-    }
-    return segs;
-  };
   const u = useAvatarUid();
-  const cap = "M10 34 Q10 12 50 8 Q90 12 90 34";
+  const cap = "M10 32 Q10 10 50 6 Q90 10 90 32";
+  /* Tapered braid tube + diagonal weave cross-hatch — replaces stacked-bead bead-string look */
+  const braidTube = (cx: number, sy: number, ey: number) => {
+    const topW = 5;
+    const botW = 3;
+    return `M${cx - topW} ${sy} Q${cx - topW - 1} ${(sy + ey) / 2} ${cx - botW} ${ey} Q${cx} ${ey + 2} ${cx + botW} ${ey} Q${cx + topW + 1} ${(sy + ey) / 2} ${cx + topW} ${sy} Q${cx} ${sy - 1} ${cx - topW} ${sy}Z`;
+  };
+  const weave = (cx: number, sy: number, ey: number) => {
+    const lines = [];
+    const segH = 6;
+    const halfW = 4;
+    for (let y = sy; y < ey - segH / 2; y += segH) {
+      const t = (y - sy) / (ey - sy);
+      const w = halfW * (1 - t * 0.4);
+      lines.push(<line key={`a-${y}`} x1={cx - w} y1={y} x2={cx + w} y2={y + segH * 0.5} stroke="#000" strokeWidth={0.9} opacity={0.32} />);
+      lines.push(<line key={`b-${y}`} x1={cx + w} y1={y} x2={cx - w} y2={y + segH * 0.5} stroke="#000" strokeWidth={0.9} opacity={0.32} />);
+      lines.push(<line key={`h-${y}`} x1={cx - w + 0.5} y1={y + segH * 0.25} x2={cx + w - 0.5} y2={y + segH * 0.25} stroke="#fff" strokeWidth={0.5} opacity={0.18} />);
+    }
+    return lines;
+  };
   return (
     <g>
       <defs><HairPolishDefs uid={u} keyName="braids" /></defs>
-      {/* Cap */}
       <path d={cap} fill={fill} stroke="#000" strokeWidth={S} />
       <HairPolish uid={u} keyName="braids" d={cap} />
-      {/* Part line */}
-      <line x1="50" y1="8" x2="50" y2="28" stroke="#000" strokeWidth={1} opacity="0.2" />
-      {/* Left braid — pulled inward */}
-      <g>{braidSegments(18, 40, 1)}</g>
-      {/* Left braid center line */}
-      <path d="M18 40 Q16 54 18 68 Q16 76 18 82" fill="none" stroke="#000" strokeWidth={0.5} opacity="0.1" />
-      <path d="M20 44 Q18 56 20 68" fill="none" stroke="#fff" strokeWidth={0.6} opacity="0.12" />
-      {/* Right braid — pulled inward */}
-      <g>{braidSegments(82, 40, -1)}</g>
-      {/* Right braid center line */}
-      <path d="M82 40 Q84 54 82 68 Q84 76 82 82" fill="none" stroke="#000" strokeWidth={0.5} opacity="0.1" />
-      <path d="M80 44 Q82 56 80 68" fill="none" stroke="#fff" strokeWidth={0.6} opacity="0.12" />
-      {/* Beads at ends — within viewBox */}
-      <ellipse cx="18" cy="84" rx={4} ry={3.5} fill={fill} stroke="#000" strokeWidth={1.8} />
-      <ellipse cx="17" cy="83" rx={1.2} ry={0.8} fill="#fff" opacity="0.25" />
-      <ellipse cx="82" cy="84" rx={4} ry={3.5} fill={fill} stroke="#000" strokeWidth={1.8} />
-      <ellipse cx="81" cy="83" rx={1.2} ry={0.8} fill="#fff" opacity="0.25" />
+      {/* Center part */}
+      <line x1="50" y1="6" x2="50" y2="28" stroke="#000" strokeWidth={1} opacity="0.22" />
+      {/* Left braid */}
+      <path d={braidTube(16, 32, 86)} fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      <g>{weave(16, 32, 86)}</g>
+      {/* Right braid */}
+      <path d={braidTube(84, 32, 86)} fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      <g>{weave(84, 32, 86)}</g>
+      {/* Glossy highlight ribbons */}
+      <path d="M14 36 Q12 56 14 80" fill="none" stroke="#fff" strokeWidth={1} opacity="0.2" strokeLinecap="round" />
+      <path d="M86 36 Q88 56 86 80" fill="none" stroke="#fff" strokeWidth={1} opacity="0.2" strokeLinecap="round" />
+      {/* End ties — small bands */}
+      <ellipse cx="16" cy="88" rx="3.5" ry="2" fill={fill} stroke="#000" strokeWidth={1.4} />
+      <ellipse cx="84" cy="88" rx="3.5" ry="2" fill={fill} stroke="#000" strokeWidth={1.4} />
+      <path d="M13 88 Q16 87 19 88" fill="none" stroke="#fff" strokeWidth={0.6} opacity="0.3" />
+      <path d="M81 88 Q84 87 87 88" fill="none" stroke="#fff" strokeWidth={0.6} opacity="0.3" />
+      {/* Tiny tassel tips */}
+      <path d="M14 90 L13 94 M16 90 L16 94 M18 90 L19 94" stroke={fill} strokeWidth={1} strokeLinecap="round" opacity="0.7" />
+      <path d="M82 90 L81 94 M84 90 L84 94 M86 90 L87 94" stroke={fill} strokeWidth={1} strokeLinecap="round" opacity="0.7" />
     </g>
   );
 }

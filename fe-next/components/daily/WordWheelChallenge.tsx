@@ -425,7 +425,7 @@ const WordWheelChallenge: React.FC = () => {
         {phase === 'playing' && puzzle && (
           <motion.div
             key="playing"
-            className="flex-1 flex flex-col items-center justify-start pt-3 sm:pt-4 pb-4 relative z-20 overflow-y-auto overscroll-contain"
+            className="flex-1 flex flex-col items-center justify-start pt-3 sm:pt-4 pb-bottom-stack relative z-20 overflow-y-auto overscroll-contain"
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}

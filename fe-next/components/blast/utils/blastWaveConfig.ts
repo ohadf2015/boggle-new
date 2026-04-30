@@ -131,7 +131,7 @@ const WAVE_TABLE: WaveConfig[] = [
     minWordLength: 2, specialTileChance: 0.13, iceDistribution: 0.20, goldDistribution: 0.20,
     vowelModifier: 0.95, maxCascadeChain: 2, cascadeChainBonus: 0.6, scoreThreshold: undefined,
     lightningEnabled: false, vortexEnabled: false, magnetEnabled: false,
-    gemEnabled: true, prismEnabled: false, frostEnabled: false, frozenEnabled: false,
+    gemEnabled: false, prismEnabled: false, frostEnabled: false, frozenEnabled: false,
     diamondEnabled: false,
     countdownEnabled: false, shuffleEnabled: false, magmaEnabled: false, portalEnabled: false, catalystEnabled: false, crystalEnabled: false, fuseEnabled: false,
     lockedEnabled: false, keyEnabled: false, anchorEnabled: false,
@@ -143,7 +143,7 @@ const WAVE_TABLE: WaveConfig[] = [
     minWordLength: 2, specialTileChance: 0.19, iceDistribution: 0.23, goldDistribution: 0.18,
     vowelModifier: 0.90, maxCascadeChain: 2, cascadeChainBonus: 0.7, scoreThreshold: 80,
     lightningEnabled: false, vortexEnabled: false, magnetEnabled: false,
-    gemEnabled: true, prismEnabled: true, frostEnabled: false, frozenEnabled: false,
+    gemEnabled: false, prismEnabled: true, frostEnabled: false, frozenEnabled: false,
     diamondEnabled: false,
     countdownEnabled: false, shuffleEnabled: false, magmaEnabled: false, portalEnabled: false, catalystEnabled: false, crystalEnabled: false, fuseEnabled: false,
     lockedEnabled: false, keyEnabled: false, anchorEnabled: false,
@@ -155,7 +155,7 @@ const WAVE_TABLE: WaveConfig[] = [
     minWordLength: 2, specialTileChance: 0.21, iceDistribution: 0.25, goldDistribution: 0.16,
     vowelModifier: 0.85, maxCascadeChain: 3, cascadeChainBonus: 0.8, scoreThreshold: 180,
     lightningEnabled: true, vortexEnabled: false, magnetEnabled: false,
-    gemEnabled: true, prismEnabled: true, frostEnabled: false, frozenEnabled: false,
+    gemEnabled: false, prismEnabled: true, frostEnabled: false, frozenEnabled: false,
     diamondEnabled: false,
     countdownEnabled: false, shuffleEnabled: false, magmaEnabled: false, portalEnabled: false, catalystEnabled: false, crystalEnabled: false, fuseEnabled: false,
     lockedEnabled: false, keyEnabled: false, anchorEnabled: false,
@@ -167,8 +167,8 @@ const WAVE_TABLE: WaveConfig[] = [
     minWordLength: 2, specialTileChance: 0.23, iceDistribution: 0.27, goldDistribution: 0.14,
     vowelModifier: 0.85, maxCascadeChain: 3, cascadeChainBonus: 0.9, scoreThreshold: 250,
     lightningEnabled: true, vortexEnabled: false, magnetEnabled: false,
-    gemEnabled: true, prismEnabled: true, frostEnabled: false, frozenEnabled: false,
-    diamondEnabled: true,
+    gemEnabled: false, prismEnabled: true, frostEnabled: false, frozenEnabled: false,
+    diamondEnabled: false,
     countdownEnabled: false, shuffleEnabled: false, magmaEnabled: false, portalEnabled: false, catalystEnabled: false, crystalEnabled: false, fuseEnabled: false,
     lockedEnabled: false, keyEnabled: false, anchorEnabled: false,
     movesAllowed: 7,
@@ -179,8 +179,8 @@ const WAVE_TABLE: WaveConfig[] = [
     minWordLength: 2, specialTileChance: 0.24, iceDistribution: 0.28, goldDistribution: 0.13,
     vowelModifier: 0.82, maxCascadeChain: 3, cascadeChainBonus: 0.95, scoreThreshold: 350,
     lightningEnabled: true, vortexEnabled: false, magnetEnabled: false,
-    gemEnabled: true, prismEnabled: true, frostEnabled: true, frozenEnabled: true,
-    diamondEnabled: true,
+    gemEnabled: false, prismEnabled: true, frostEnabled: true, frozenEnabled: true,
+    diamondEnabled: false,
     countdownEnabled: false, shuffleEnabled: false, magmaEnabled: false, portalEnabled: false, catalystEnabled: false, crystalEnabled: false, fuseEnabled: false,
     lockedEnabled: false, keyEnabled: false, anchorEnabled: false,
     movesAllowed: 7,
@@ -190,9 +190,9 @@ const WAVE_TABLE: WaveConfig[] = [
     archetype: 'treasureHunt',
     minWordLength: 2, specialTileChance: 0.25, iceDistribution: 0.30, goldDistribution: 0.12,
     vowelModifier: 0.82, maxCascadeChain: 4, cascadeChainBonus: 1.0, scoreThreshold: 450,
-    lightningEnabled: true, vortexEnabled: true, magnetEnabled: true,
-    gemEnabled: true, prismEnabled: true, frostEnabled: true, frozenEnabled: true,
-    diamondEnabled: true,
+    lightningEnabled: true, vortexEnabled: false, magnetEnabled: false,
+    gemEnabled: false, prismEnabled: true, frostEnabled: true, frozenEnabled: true,
+    diamondEnabled: false,
     countdownEnabled: false, shuffleEnabled: false, magmaEnabled: false, portalEnabled: false, catalystEnabled: false, crystalEnabled: false, fuseEnabled: false,
     lockedEnabled: false, keyEnabled: false, anchorEnabled: false,
     movesAllowed: 6,
@@ -202,11 +202,11 @@ const WAVE_TABLE: WaveConfig[] = [
     archetype: 'scoreRush',
     minWordLength: 2, specialTileChance: 0.26, iceDistribution: 0.30, goldDistribution: 0.11,
     vowelModifier: 0.80, maxCascadeChain: 4, cascadeChainBonus: 1.0, scoreThreshold: 500,
-    lightningEnabled: true, vortexEnabled: true, magnetEnabled: true,
-    gemEnabled: true, prismEnabled: true, frostEnabled: true, frozenEnabled: true,
-    diamondEnabled: true,
-    countdownEnabled: false, shuffleEnabled: false, magmaEnabled: false, portalEnabled: false, catalystEnabled: true, crystalEnabled: false, fuseEnabled: false,
-    lockedEnabled: false, keyEnabled: false, anchorEnabled: true,
+    lightningEnabled: true, vortexEnabled: false, magnetEnabled: false,
+    gemEnabled: false, prismEnabled: true, frostEnabled: true, frozenEnabled: true,
+    diamondEnabled: false,
+    countdownEnabled: false, shuffleEnabled: false, magmaEnabled: false, portalEnabled: false, catalystEnabled: false, crystalEnabled: false, fuseEnabled: false,
+    lockedEnabled: false, keyEnabled: false, anchorEnabled: false,
     movesAllowed: 6,
   },
   // Wave 9 — countdown + fuse unlock (5 moves — tension mechanic, defuse or suffer)
@@ -214,11 +214,11 @@ const WAVE_TABLE: WaveConfig[] = [
     archetype: 'survival',
     minWordLength: 2, specialTileChance: 0.27, iceDistribution: 0.30, goldDistribution: 0.10,
     vowelModifier: 0.78, maxCascadeChain: 4, cascadeChainBonus: 1.0, scoreThreshold: 550,
-    lightningEnabled: true, vortexEnabled: true, magnetEnabled: true,
-    gemEnabled: true, prismEnabled: true, frostEnabled: true, frozenEnabled: true,
-    diamondEnabled: true,
-    countdownEnabled: true, shuffleEnabled: false, magmaEnabled: false, portalEnabled: false, catalystEnabled: true, crystalEnabled: false, fuseEnabled: true,
-    lockedEnabled: false, keyEnabled: false, anchorEnabled: true,
+    lightningEnabled: true, vortexEnabled: false, magnetEnabled: false,
+    gemEnabled: false, prismEnabled: true, frostEnabled: true, frozenEnabled: true,
+    diamondEnabled: false,
+    countdownEnabled: false, shuffleEnabled: false, magmaEnabled: false, portalEnabled: false, catalystEnabled: false, crystalEnabled: false, fuseEnabled: false,
+    lockedEnabled: false, keyEnabled: false, anchorEnabled: false,
     movesAllowed: 5,
   },
   // Wave 10 — shuffle + locked/key unlock (5 moves — rearranges board on clear)
@@ -226,11 +226,11 @@ const WAVE_TABLE: WaveConfig[] = [
     archetype: 'normal',
     minWordLength: 2, specialTileChance: 0.28, iceDistribution: 0.30, goldDistribution: 0.10,
     vowelModifier: 0.76, maxCascadeChain: 5, cascadeChainBonus: 1.0, scoreThreshold: 600,
-    lightningEnabled: true, vortexEnabled: true, magnetEnabled: true,
-    gemEnabled: true, prismEnabled: true, frostEnabled: true, frozenEnabled: true,
-    diamondEnabled: true,
-    countdownEnabled: true, shuffleEnabled: true, magmaEnabled: false, portalEnabled: false, catalystEnabled: true, crystalEnabled: false, fuseEnabled: true,
-    lockedEnabled: true, keyEnabled: true, anchorEnabled: true,
+    lightningEnabled: true, vortexEnabled: false, magnetEnabled: false,
+    gemEnabled: false, prismEnabled: true, frostEnabled: true, frozenEnabled: true,
+    diamondEnabled: false,
+    countdownEnabled: false, shuffleEnabled: false, magmaEnabled: false, portalEnabled: false, catalystEnabled: false, crystalEnabled: false, fuseEnabled: false,
+    lockedEnabled: false, keyEnabled: false, anchorEnabled: false,
     movesAllowed: 5,
   },
   // Wave 11 — magma + portal unlock (6 moves — diagonal eruption + teleport paths)
@@ -238,11 +238,11 @@ const WAVE_TABLE: WaveConfig[] = [
     archetype: 'scoreRush',
     minWordLength: 2, specialTileChance: 0.28, iceDistribution: 0.30, goldDistribution: 0.10,
     vowelModifier: 0.75, maxCascadeChain: 5, cascadeChainBonus: 1.0, scoreThreshold: 650,
-    lightningEnabled: true, vortexEnabled: true, magnetEnabled: true,
-    gemEnabled: true, prismEnabled: true, frostEnabled: true, frozenEnabled: true,
-    diamondEnabled: true,
-    countdownEnabled: true, shuffleEnabled: true, magmaEnabled: true, portalEnabled: true, catalystEnabled: true, crystalEnabled: false, fuseEnabled: true,
-    lockedEnabled: true, keyEnabled: true, anchorEnabled: true,
+    lightningEnabled: true, vortexEnabled: false, magnetEnabled: false,
+    gemEnabled: false, prismEnabled: true, frostEnabled: true, frozenEnabled: true,
+    diamondEnabled: false,
+    countdownEnabled: false, shuffleEnabled: false, magmaEnabled: false, portalEnabled: false, catalystEnabled: false, crystalEnabled: false, fuseEnabled: false,
+    lockedEnabled: false, keyEnabled: false, anchorEnabled: false,
     movesAllowed: 6,
   },
   // Wave 12+ — crystal unlock, everything available (master tier)
@@ -250,11 +250,11 @@ const WAVE_TABLE: WaveConfig[] = [
     archetype: 'survival',
     minWordLength: 2, specialTileChance: 0.30, iceDistribution: 0.30, goldDistribution: 0.10,
     vowelModifier: 0.75, maxCascadeChain: 5, cascadeChainBonus: 1.0, scoreThreshold: 700,
-    lightningEnabled: true, vortexEnabled: true, magnetEnabled: true,
-    gemEnabled: true, prismEnabled: true, frostEnabled: true, frozenEnabled: true,
-    diamondEnabled: true,
-    countdownEnabled: true, shuffleEnabled: true, magmaEnabled: true, portalEnabled: true, catalystEnabled: true, crystalEnabled: true, fuseEnabled: true,
-    lockedEnabled: true, keyEnabled: true, anchorEnabled: true,
+    lightningEnabled: true, vortexEnabled: false, magnetEnabled: false,
+    gemEnabled: false, prismEnabled: true, frostEnabled: true, frozenEnabled: true,
+    diamondEnabled: false,
+    countdownEnabled: false, shuffleEnabled: false, magmaEnabled: false, portalEnabled: false, catalystEnabled: false, crystalEnabled: false, fuseEnabled: false,
+    lockedEnabled: false, keyEnabled: false, anchorEnabled: false,
     movesAllowed: 6,
   },
 ];
@@ -281,6 +281,7 @@ export function getWaveConfig(wave: number): WaveConfig {
 // ==================== Wave Objectives ====================
 
 import type { BlastObjective } from '../types';
+import { getTargetWordPool, pickRandomTargetWord } from './blastTargetWordPool';
 
 /**
  * Objectives per wave — designed with progressive disclosure:
@@ -305,32 +306,119 @@ const WAVE_OBJECTIVES: Record<number, BlastObjective[]> = {
  * Get objectives for a given wave number.
  * Waves 1-6 use the lookup table. Wave 7+ uses wave 6 pattern
  * with linearly increasing score target.
+ *
+ * @param wave wave number
+ * @param language optional game language (for target_word pool lookup)
+ * @returns base objectives for the wave
  */
-export function getWaveObjectives(wave: number): BlastObjective[] {
+export function getWaveObjectives(wave: number, language?: string): BlastObjective[] {
   const clamped = Math.max(wave, 1);
 
+  let baseObjectives: BlastObjective[];
   if (clamped <= 7) {
-    return WAVE_OBJECTIVES[clamped].map(obj => ({ ...obj }));
+    baseObjectives = WAVE_OBJECTIVES[clamped].map(obj => ({ ...obj }));
+  } else {
+    // Wave 8+: rotating objective templates for variety
+    const baseScore = 150 + (clamped - 7) * 40;
+    const templateIndex = (clamped - 8) % 5;
+
+    const WAVE8_TEMPLATES: BlastObjective[][] = [
+      // Template 0: score + collect bombs
+      [{ type: 'score_target', target: baseScore }, { type: 'collect_type', tileType: 'bomb', target: 4 }],
+      // Template 1: score + long words
+      [{ type: 'score_target', target: baseScore }, { type: 'word_length', target: 3, minWordLength: 5 }],
+      // Template 2: score + collect prisms
+      [{ type: 'score_target', target: baseScore }, { type: 'collect_type', tileType: 'prism', target: 3 }],
+      // Template 3: score + clear ice
+      [{ type: 'score_target', target: baseScore }, { type: 'clear_all_type', tileType: 'ice', target: 0 }],
+      // Template 4: score + collect gems
+      [{ type: 'score_target', target: baseScore }, { type: 'collect_type', tileType: 'gem', target: 4 }],
+    ];
+
+    baseObjectives = [CLEAR_BOARD, ...WAVE8_TEMPLATES[templateIndex].map(obj => ({ ...obj }))];
   }
 
-  // Wave 8+: rotating objective templates for variety
-  const baseScore = 150 + (clamped - 7) * 40;
-  const templateIndex = (clamped - 8) % 5;
+  // Seed optional target_word and color_power objectives
+  const lang = language ?? 'en';
+  let withTargetWord = seedTargetWordObjective(clamped, lang, baseObjectives);
+  let withAllSeeds = seedColorPowerObjective(clamped, withTargetWord);
 
-  const WAVE8_TEMPLATES: BlastObjective[][] = [
-    // Template 0: score + collect bombs
-    [{ type: 'score_target', target: baseScore }, { type: 'collect_type', tileType: 'bomb', target: 4 }],
-    // Template 1: score + long words
-    [{ type: 'score_target', target: baseScore }, { type: 'word_length', target: 3, minWordLength: 5 }],
-    // Template 2: score + collect prisms
-    [{ type: 'score_target', target: baseScore }, { type: 'collect_type', tileType: 'prism', target: 3 }],
-    // Template 3: score + clear ice
-    [{ type: 'score_target', target: baseScore }, { type: 'clear_all_type', tileType: 'ice', target: 0 }],
-    // Template 4: score + collect gems
-    [{ type: 'score_target', target: baseScore }, { type: 'collect_type', tileType: 'gem', target: 4 }],
+  return withAllSeeds;
+}
+
+/**
+ * Optionally seed a target_word objective into wave objectives.
+ * Adds target_word goal for waves 3+ at 25% probability per wave.
+ * Defers to server/RNG for actual board validation.
+ *
+ * @param wave wave number
+ * @param language game language (en/he/sv/ja/es)
+ * @param objectives current wave objectives to augment
+ * @returns objectives with optional target_word added
+ */
+export function seedTargetWordObjective(
+  wave: number,
+  language: string,
+  objectives: BlastObjective[],
+): BlastObjective[] {
+  // Only add to wave 3+ at 25% rate
+  if (wave < 3) return objectives;
+
+  // Deterministic RNG: use wave as seed for pseudo-random chance
+  const shouldAdd = ((wave * 37) % 100) < 25;
+  if (!shouldAdd) return objectives;
+
+  const pool = getTargetWordPool(language as import('@/shared/types/game').Language);
+  if (pool.length === 0) return objectives; // No words available for language
+
+  const targetWord = pickRandomTargetWord(pool);
+  if (!targetWord) return objectives;
+
+  // Add target_word objective (bonus, not required for advance)
+  return [
+    ...objectives,
+    { type: 'target_word' as const, target: 1, targetWord },
   ];
+}
 
-  return [CLEAR_BOARD, ...WAVE8_TEMPLATES[templateIndex].map(obj => ({ ...obj }))];
+/**
+ * Optionally seed a color_power objective into wave objectives.
+ * Adds color_power goal for waves 4+ at 25% probability per wave.
+ * Rotates color: wave 4=pink, 5=cyan, 8=lime, then repeats.
+ *
+ * @param wave wave number
+ * @param objectives current wave objectives to augment
+ * @returns objectives with optional color_power added
+ */
+export function seedColorPowerObjective(
+  wave: number,
+  objectives: BlastObjective[],
+): BlastObjective[] {
+  // Only add to wave 4+ at 25% rate
+  if (wave < 4) return objectives;
+
+  // Deterministic RNG: use wave as seed for pseudo-random chance
+  const shouldAdd = ((wave * 47) % 100) < 25;
+  if (!shouldAdd) return objectives;
+
+  // Rotate color: pink (4) → cyan (5) → lime (8) → pink (11) ...
+  const colorRotation: Array<'pink' | 'cyan' | 'lime'> = ['pink', 'cyan', 'lime'];
+  const colorIndex = (wave - 4) % 3;
+  const color = colorRotation[colorIndex];
+
+  // Ramp minColorCount: early waves 3, later waves 4+
+  const minColorCount = wave >= 8 ? 4 : 3;
+
+  // Add color_power objective (bonus, not required for advance)
+  return [
+    ...objectives,
+    {
+      type: 'color_power' as const,
+      target: 1,
+      colorTag: color,
+      minColorCount,
+    },
+  ];
 }
 
 /** Lightning share when enabled (taken from gold + rainbow) */

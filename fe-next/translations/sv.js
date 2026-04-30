@@ -387,6 +387,7 @@ const sv = {
     "backToHome": "Tillbaka till startsidan",
     "backToMenu": "Tillbaka till menyn",
     "next": "Nästa",
+    "stepOf": "Steg {current} av {total}",
     "previous": "Föregående",
     "confirm": "Bekräfta",
     "cancel": "Avbryt",
@@ -1751,6 +1752,7 @@ const sv = {
     "header": "Snabbguide",
     "loading": "Laddar...",
     "skip": "Hoppa över",
+    "skipTutorial": "Hoppa över guiden",
     "letsPlay": "Nu kör vi!",
     "timingHint": "De första 10 sekunderna är avgörande!",
     "step1Title": "Svep Bokstäver",
@@ -1779,6 +1781,7 @@ const sv = {
       "demoComplete": "Du förstår! Nu vet du hur man spelar.",
       "startHere": "Börja här",
       "watchMe": "Titta!",
+      "demoAriaLabel": "Demo: spårar ordet {{word}}",
       "yourTurn": "Din tur! Stava:",
       "letterCount": "{current}/{total}"
     },
@@ -1869,7 +1872,33 @@ const sv = {
       "letsGo": "Nu kör vi!",
       "chooseLanguage": "Välj språk",
       "letsPlay": "Kör igång",
-      "whereToStart": "Var vill du börja?"
+      "whereToStart": "Var vill du börja?",
+      "v2": {
+        "rewardsEarned": "BELÖNINGAR INTJÄNADE",
+        "goldReward": "+{{gold}} GULD",
+        "goldEarned": "guld intjänat",
+        "streak": "svit",
+        "streakStarted": "DAG 1 SVIT",
+        "achievementUnlocked": "FÖRSTA ORDEN",
+        "tomorrowBonus": "Kom tillbaka imorgon för +50 bonus",
+        "scoreFooter": "{{score}} p",
+        "claimAndPlay": "HÄMTA & SPELA",
+        "skipForNow": "Hoppa över nu",
+        "titles": {
+          "wordling": "ORDLING",
+          "wordHunter": "ORDJÄGARE!",
+          "wordsmith": "ORDSMED!",
+          "wordSlayer": "ORDDRÄPARE!",
+          "wordLegend": "ORDLEGEND!"
+        },
+        "mascotReactions": {
+          "wordling": "Bra start!",
+          "wordHunter": "Kolla in dig!",
+          "wordsmith": "Du är ett naturtalent!",
+          "wordSlayer": "Du brinner!",
+          "wordLegend": "Legendarisk debut!"
+        }
+      }
     }
   },
   "preGameTutorial": {
@@ -2302,12 +2331,13 @@ const sv = {
   },
   "practiceResults": {
     "playAgain": "Spela igen",
+    "goHome": "Tillbaka till start",
     "orTrySomethingNew": "eller prova något nytt",
     "wordsFound": "{count} ord hittade",
     "tryDaily": "Daglig utmaning",
     "tryDailyDesc": "Samma pussel, alla tävlar",
     "tryBots": "Mot bottar",
-    "tryBotsDesc": "Testa dina färdigheter mot AI",
+    "tryBotsDesc": "Inga kompisar online? Botarna sover aldrig.",
     "tryMultiplayer": "Spela med vänner",
     "tryMultiplayerDesc": "Ordstrider i realtid",
     "wordHuntCta": "Spela dagens ordjakt",
@@ -2580,7 +2610,7 @@ const sv = {
       },
       "letterFeedback": {
         "title": "Läsa Ledtrådarna",
-        "example": "Exempel: Målet är \"BEACH\"",
+        "example": "Exempel",
         "gotIt": "Fattar!",
         "legendGreen": "Rätt plats",
         "legendYellow": "Fel plats",
@@ -2857,6 +2887,22 @@ const sv = {
       "name": "Lojal spelare",
       "description": "Spelade på 30 olika dagar"
     },
+    "EARLY_BIRD": {
+      "name": "Tidig fågel",
+      "description": "Första ord på under 2 sekunder"
+    },
+    "PALINDROME_HUNTER": {
+      "name": "Palindromjägare",
+      "description": "Hittade ett ord som läses likadant åt båda hållen"
+    },
+    "COMEBACK_CHAMPION": {
+      "name": "Comeback-mästare",
+      "description": "Vann med en rasande slutspurt"
+    },
+    "FIRST_GAME_WIN": {
+      "name": "Första segern",
+      "description": "Vann din allra första match"
+    },
     "DAILY_DOUBLE": {
       "name": "Dubbel Daglig",
       "description": "Klarade båda utmaningarna idag"
@@ -3094,6 +3140,8 @@ const sv = {
     "firstWin": {
       "title": "Grattis till din första vinst!",
       "subtitle": "Du har talang! Skapa ett konto för att fortsätta din vinstsvit.",
+      "subtitleUrgency": "Förlora inte den här vinsten — skapa konto innan den försvinner.",
+      "subtitleValueProp": "Spåra din svit och lås upp dagliga utmaningar.",
       "benefitsTitle": "Registrera dig för att låsa upp:",
       "benefits": {
         "trackProgress": "Följ dina framsteg",
@@ -3106,7 +3154,9 @@ const sv = {
     "signInWith": "Logga in med {provider}",
     "multiGames": {
       "title": "Du blir bättre!",
-      "subtitle": "Registrera dig för att spara dina framsteg och följa dina prestationer!"
+      "subtitle": "Registrera dig för att spara dina framsteg och följa dina prestationer!",
+      "subtitleUrgency": "Din statistik försvinner om du inte sparar den.",
+      "subtitleValueProp": "Klättra på topplistan och spela med vänner."
     },
     "mpSignup": {
       "title": "Behåll dina framsteg",
@@ -3513,7 +3563,9 @@ const sv = {
     "recentWords": "Senaste Ord",
     "leaderboard": "Topplista",
     "words": "ord",
-    "noPlayersYet": "Inga spelare ännu"
+    "noPlayersYet": "Inga spelare ännu",
+    "live": "Live",
+    "connecting": "Ansluter..."
   },
   "collectibles": {
     "title": "Min samling",
@@ -3613,6 +3665,7 @@ const sv = {
     "unequip": "Ta av",
     "purchase": "Köp ({{cost}} guld)",
     "close": "Stäng",
+    "unlockedToast": "✨ Ny kosmetik upplåst: {{name}}",
     "rarity": {
       "common": "Vanlig",
       "rare": "Sällsynt",
@@ -3673,7 +3726,7 @@ const sv = {
     "globalRank": "Global rank",
     "loading": "Laddar topplista...",
     "error": "Kunde inte ladda topplista",
-    "empty": "Inga poäng ännu. Var först att spela!",
+    "empty": "Helt tomt. Sätt ribban.",
     "beFirstToPlay": "Var först att spela!",
     "refresh": "Uppdatera",
     "best": "Bäst",
@@ -3767,7 +3820,7 @@ const sv = {
     "gallery": {
       "title": "Community-brädor",
       "boardCount": "brädor",
-      "empty": "Inga brädor ännu. Bli först att skapa en!",
+      "empty": "Inga brädor än. Bygg en och starta trenden.",
       "emptyHint": "Skapa ett eget bräde och dela det med gemenskapen",
       "emptyTitle": "Inga brädor ännu",
       "emptySubtitle": "Bli först att skapa en!",
@@ -4310,6 +4363,45 @@ const sv = {
     "rankedAt": "Plats #{{position}}",
     "tierLabel": "Nivå"
   },
+  "seasonBadges": {
+    "section": {
+      "title": "Säsongstroféer",
+      "empty": "Sluta topp 5 i en säsong för att få en samlartrofé",
+      "count": "{{count}} intjänade",
+      "viewAll": "Visa alla"
+    },
+    "title": {
+      "rank1": "Mästare",
+      "rank2": "Tvåa",
+      "rank3": "Bronsmedaljör",
+      "rank4": "Topp 5-finalist",
+      "rank5": "Topp 5-finalist"
+    },
+    "subtitle": "{{theme}} · Säsong {{seasonId}}",
+    "modal": {
+      "headline": "Du slutade #{{rank}}!",
+      "subhead": "{{theme}}-placering upplåst",
+      "collectible": "Permanent samlarobjekt",
+      "viewProfile": "Visa i profil"
+    },
+    "recap": {
+      "title": "Säsongssammanfattning",
+      "bestRank": "Bästa placering",
+      "totalGames": "Spelade matcher",
+      "finalScore": "Slutpoäng",
+      "peakTier": "Högsta nivå",
+      "stats": "Dina siffror"
+    },
+    "rarity": {
+      "legendary": "Legendarisk",
+      "epic": "Episk",
+      "rare": "Sällsynt",
+      "uncommon": "Ovanlig"
+    },
+    "publicProfile": {
+      "title": "{{username}}s säsongstroféer"
+    }
+  },
   "growth": {
     "dayStreak": "dagars svit",
     "daysAway": "dagar kvar",
@@ -4429,6 +4521,8 @@ const sv = {
     "welcomeTitle": "Ord. Rivaler. Ära.",
     "welcomeSubtitle": "Gratis. Ingen registrering. Inget pay-to-win.",
     "playTodayChallenge": "Spela dagens utmaning",
+    "moreGameModes": "Fler spellägen",
+    "moreGameModesHint": "Tryck för att utforska",
     "singlePlayer": "Snabbspel",
     "singlePlayerDesc": "Hoppa in och spela direkt",
     "badgeBots": "Bottar",
@@ -4449,6 +4543,7 @@ const sv = {
     "practice": "Träning",
     "practiceDesc": "Ingen press, bara ord",
     "practiceFirstToUnlock": "Avsluta övningen för att låsa upp",
+    "playGamesToUnlock": "Spela {count} spel för att låsa upp",
     "brainTraining": "Hjärnträning",
     "brainTrainingDesc": "Spåra kognitiv tillväxt",
     "adventureMode": "Äventyr",
@@ -4478,7 +4573,7 @@ const sv = {
     "shareSubtitleGuest": "Spela med vänner!",
     "shareButton": "Dela",
     "shareTextAuth": "Gå med mig i LexiClash! Använd min referenskod: {code}",
-    "shareTextGuest": "Spela LexiClash - det bästa multiplayer-ordspelet!",
+    "shareTextGuest": "Spela LexiClash med mig — vi får se vem som är bäst.",
     "shareNativeTitle": "Gå med i LexiClash",
     "playNowFree": "Spela nu — Gratis!",
     "letsPlay": "Nu kör vi!",
@@ -4590,7 +4685,7 @@ const sv = {
       "faq5A": "Ja. LexiClash är designat för spelare från 6 år och uppåt. Vi följer COPPA-regler, visar enbart icke-personaliserade annonser och spårar inte barns surfbeteende.",
       "faq6Q": "Kan jag skapa mitt eget bräde?",
       "faq6A": "Ja! Använd Communitybrädbyggaren för att designa egna bokstavsrutnät. Publicera dem så att andra kan spela, betygsätta och tävla. Topprankade brädor visas på startsidan.",
-      "communityTitle": "Gå med tusentals ordspelsentusiaster",
+      "communityTitle": "Här gillar alla ord.",
       "communityContent": "LexiClash-spelare finns i över 40 länder och fem språk. Gå med i communityt för att tävla på globala topplistor, dela dagliga utmaningsresultat och upptäcka nya ordstrategier. Följ oss på Instagram @lexi.clash för tips, uppdateringar och community-höjdpunkter."
     },
     "firstTimer": {
@@ -4714,10 +4809,12 @@ const sv = {
     },
     "features": {
       "unlocked": {
+        "modeRoster": "Spellägen",
+        "modeRosterDesc": "Alla lägen upplåsta. Prova dem!",
         "practiceMode": "Övningsläge",
         "practiceModeDesc": "Öva i din egen takt",
         "challengeMode": "Utmaningsläge",
-        "challengeModeDesc": "Testa dina färdigheter med svårare pussel",
+        "challengeModeDesc": "Svårare brickor. Inga ursäkter.",
         "customBotCount": "Anpassade Bottar",
         "customBotCountDesc": "Välj hur många bottar du spelar mot",
         "advancedSettings": "Avancerade Inställningar",
@@ -4811,8 +4908,8 @@ const sv = {
   "rules": {
     "pageTitle": "LexiClash: Ordstrid i Realtid",
     "gameModes": "Spellägen",
-    "readyToTest": "Redo att testa dina ordkunskaper?",
-    "readyToTestDesc": "Gå med tusentals spelare i den ultimata ordstridsupplevelsen. Skapa ett rum, bjud in dina vänner och se vem som har det bästa ordförrådet!",
+    "readyToTest": "Vågar du?",
+    "readyToTestDesc": "Skapa ett rum. Bjud in kompisarna. Se vem som faktiskt kan.",
     "startPlaying": "Börja spela nu",
     "backToHome": "Tillbaka till startsidan",
     "joinOrCreateDesc": "Skapa ditt eget spelrum eller gå med i ett befintligt med en rumskod. Dela koden med vänner för att bjuda in dem direkt.",
@@ -4831,7 +4928,7 @@ const sv = {
     "dontOverthinkDesc": "Skicka in uppenbara ord med 3-4 bokstäver snabbt utan att tveka. De läggs ihop snabbt och ger dig en solid grund medan du letar efter längre, högre poänggivande ord.",
     "soloVsBotsDesc": "Tävla mot AI-motståndare på olika svårighetsgrader. Perfekt för att öva strategier innan du utmanar riktiga spelare.",
     "practiceModeDesc": "Ta din tid utan timer. Perfekt för att lära dig nya ord och utforska rutnätet utan press.",
-    "challengeModeDesc": "Slå dina personliga rekord och följ din förbättring över tid. Tävla mot dig själv!"
+    "challengeModeDesc": "Slå ditt gamla jag. Se siffrorna stiga."
   },
   "social": {
     "playersOnline": "spelare online",
@@ -4935,7 +5032,7 @@ const sv = {
         "trackResults": "Se vem som klarar din utmaning"
       },
       "ctaButton": "Registrera dig och börja skapa",
-      "socialProof": "Gå med i tusentals som skapar utmaningar"
+      "socialProof": "Det byggs brickor överallt just nu."
     },
     "download": "Spara som bild",
     "downloadImage": "Spara delningsbild",
@@ -5038,7 +5135,7 @@ const sv = {
     },
     "nextChallenge": {
       "wordHuntTitle": "⚡ Daglig Word Hunt Väntar!",
-      "wordHuntDesc": "Testa din hastighet! Hitta målord så snabbt du kan.",
+      "wordHuntDesc": "Tävla mot klockan. Fånga ordet.",
       "wordHuntCTA": "Spela Word Hunt",
       "buzzTitle": "🔥 Daglig Buzz-utmaning!",
       "buzzDesc": "Trendiga ämnen! Lös AI-genererade ordpussel.",
@@ -8141,6 +8238,12 @@ const sv = {
       "cta": "Se annons för +{moves} drag",
       "decline": "Avsluta rundan"
     },
+    "retryWaveModal": {
+      "title": "Våg {wave} — så nära!",
+      "body": "Du rensade {percent}%. Se en annons för att göra om våg {wave} — tidigare vågor sparas.",
+      "cta": "Gör om våg {wave}",
+      "decline": "Starta om från våg 1"
+    },
     "pregameBuff": {
       "title": "Boosta?",
       "body": "Välj en boost, titta på en snabb annons och starta rundan med övertag.",
@@ -8311,6 +8414,7 @@ const sv = {
       "newBadge": "NY",
       "waveFailed": "Våg misslyckades",
       "needClearPct": "Behövde {required}% rensat — du fick {got}%",
+      "tilesShort": "Bara {count} brickor kvar!",
       "failHint": "Rensa minst 90% av brädet för att gå vidare",
       "tryAgain": "Försök igen",
       "share": "Dela",
@@ -8412,6 +8516,8 @@ const sv = {
     "celebrateAgain": "Fira igen",
     "best": "Bäst",
     "movesLeft": "Drag",
+    "luckyBoost": "Tursam boost",
+    "luckyBoostDesc": "Fler specialbrickor efter en tuff omgång",
     "bonusMove": "+1 Drag!",
     "bonusMoves": "+{count} Drag!",
     "outOfMoves": "Inga drag kvar!",
@@ -8429,7 +8535,29 @@ const sv = {
       "collectType": "Samla {target} {tileType}",
       "clearAllType": "Rensa alla {tileType}",
       "wordLength": "{target} ord med {minWordLength}+ bokstäver",
-      "clearPercent": "Rensa {target}% av brädet"
+      "clearPercent": "Rensa {target}% av brädet",
+      "targetWord": "Hitta: {word}",
+      "targetWordFoundIt": "HITTAD!",
+      "targetWordMissed": "Målet var: {word} — Vattenfallet fick det!",
+      "colorPower": "Använd {count}+ {color} brickor i ett ord",
+      "colorPink": "Rosa",
+      "colorCyan": "Cyan",
+      "colorLime": "Limefärg",
+      "bannerTitle": "Mål"
+    },
+    "hint": {
+      "free": "GRATIS",
+      "ad": "TIPS",
+      "aria": {
+        "free": "Gratis tips — kostar 25 poäng",
+        "ad": "Se en annons för ett tips — kostar 25 poäng"
+      },
+      "toast": {
+        "targetWord": "Försök forma: {word}",
+        "colorPower": "Leta efter {color} brickor",
+        "collectType": "Hitta fler {tileType}",
+        "clearAllType": "Rensa kvarvarande {tileType}"
+      }
     },
     "combo": {
       "bomb_bomb": "MEGASMALL!",
@@ -9238,7 +9366,7 @@ const sv = {
       "roleGuest": "Gäst",
       "roleStudent": "Elev",
       "roleTeacher": "Lärare",
-      "socialProof": "Häng med tusentals som lär sig",
+      "socialProof": "Du är inte ensam om att plugga.",
       "student": "Elev",
       "studentCta": "Börja lära dig",
       "studentDesc": "Bygg ordförråd genom lek",
@@ -9781,7 +9909,7 @@ const sv = {
       "practiceMode": "Övningsläge",
       "practiceModeDesc": "Öva i din egen takt",
       "challengeMode": "Utmaningsläge",
-      "challengeModeDesc": "Testa dina färdigheter med svårare pussel",
+      "challengeModeDesc": "Svårare brickor. Inga ursäkter.",
       "customBotCount": "Anpassade Bottar",
       "customBotCountDesc": "Välj hur många bottar du spelar mot",
       "advancedSettings": "Avancerade Inställningar",
@@ -10668,6 +10796,7 @@ const sv = {
     "title": "Välj en boost",
     "cta": "BOOST",
     "close": "Stäng",
+    "skipAndPlay": "Spela utan boost",
     "remaining": "Boostar kvar idag: {{n}}/{{cap}}",
     "watchAd": "Titta på annons för att låsa upp",
     "activeThisGame": "Aktiv detta spel",

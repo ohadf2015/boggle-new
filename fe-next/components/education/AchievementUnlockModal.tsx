@@ -210,7 +210,7 @@ const AchievementUnlockModal = memo<AchievementUnlockModalProps>(({ unlock, onCl
               transition={{ delay: 0.2, duration: 0.5, ease: 'easeOut' }}
             >
               <SilentVideo
-                src="/mascot/celebration.mp4"
+                src="/mascot/celebration.webp"
                 width={80}
                 height={80}
                 className="mx-auto drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]"

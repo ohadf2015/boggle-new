@@ -1,51 +1,19 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, memo, useRef } from 'react';
+import { useState, useEffect, useCallback, memo, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Hand } from 'lucide-react';
+import { getDemoConfig } from '../onboarding/demoConfigs';
 
 const AUTO_DISMISS_MS = 8000; // 8 seconds
-
-// Demo grid letters for swipe demonstration
-// LTR: reads left-to-right, RTL: reads right-to-left
-const DEMO_GRID_LTR = [
-  ['S', 'W', 'I'],
-  ['O', 'R', 'P'],
-  ['N', 'D', 'E'],
-];
-
-const DEMO_GRID_RTL = [
-  ['I', 'W', 'S'],
-  ['P', 'R', 'O'],
-  ['E', 'D', 'N'],
-];
-
-// Simple horizontal swipe path: S -> W -> I -> P -> E
-// LTR: swipes left-to-right (col 0 -> 2)
-const DEMO_PATH_LTR: [number, number][] = [
-  [0, 0], // S
-  [0, 1], // W
-  [0, 2], // I
-  [1, 2], // P
-  [2, 2], // E
-];
-
-// RTL: swipes right-to-left (col 2 -> 0)
-const DEMO_PATH_RTL: [number, number][] = [
-  [0, 2], // S
-  [0, 1], // W
-  [0, 0], // I
-  [1, 0], // P
-  [2, 0], // E
-];
-
-const DEMO_WORD = 'SWIPE';
 
 interface SwipeTipTooltipProps {
   isVisible: boolean;
   onDismiss: () => void;
   t: (key: string) => string;
   dir?: 'ltr' | 'rtl';
+  /** Locale for example word/grid. Defaults to 'en'. */
+  language?: string;
 }
 
 /**
@@ -55,13 +23,28 @@ interface SwipeTipTooltipProps {
  * Features a mini animated grid that traces a swipe path with finger indicator.
  */
 const SwipeTipTooltip = memo<SwipeTipTooltipProps>(
-  ({ isVisible, onDismiss, t, dir = 'ltr' }) => {
+  ({ isVisible, onDismiss, t, dir = 'ltr', language = 'en' }) => {
     const [selectedCells, setSelectedCells] = useState<[number, number][]>([]);
     const [isAnimating, setIsAnimating] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
     const [fingerPosition, setFingerPosition] = useState<{ x: number; y: number } | null>(null);
     const [isPopping, setIsPopping] = useState(false);
     const timerIdsRef = useRef<Set<ReturnType<typeof setTimeout>>>(new Set());
+
+    // Locale-aware example: 3x3 grid with vetted demo word per language.
+    // Reuses the shared demoConfigs vocabulary. RTL grid is the LTR letters
+    // mirrored column-wise so the same path coords visually swipe RTL.
+    const isRTL = dir === 'rtl';
+    const baseDemo = useMemo(() => getDemoConfig(language), [language]);
+    const DEMO_GRID = useMemo(
+      () => (isRTL ? baseDemo.letters.map(row => [...row].reverse()) : baseDemo.letters),
+      [baseDemo, isRTL],
+    );
+    const DEMO_PATH = useMemo<[number, number][]>(
+      () => baseDemo.path.map(p => [p.row, isRTL ? (DEMO_GRID[0].length - 1 - p.col) : p.col] as [number, number]),
+      [baseDemo, isRTL, DEMO_GRID],
+    );
+    const DEMO_WORD = baseDemo.word;
 
     const scheduleTimer = useCallback((cb: () => void, delay: number) => {
       const id = setTimeout(() => {
@@ -87,11 +70,6 @@ const SwipeTipTooltip = memo<SwipeTipTooltipProps>(
       // Let animation play before actual dismiss
       scheduleTimer(onDismiss, 300);
     }, [onDismiss, scheduleTimer]);
-
-    // Select grid and path based on direction
-    const isRTL = dir === 'rtl';
-    const DEMO_GRID = isRTL ? DEMO_GRID_RTL : DEMO_GRID_LTR;
-    const DEMO_PATH = isRTL ? DEMO_PATH_RTL : DEMO_PATH_LTR;
 
     const cellSize = 36;
     const gap = 3;

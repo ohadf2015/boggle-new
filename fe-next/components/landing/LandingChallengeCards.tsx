@@ -9,6 +9,8 @@ import { hasCompletedOnboarding } from '@/utils/onboardingStorage';
 import { isNewPlayer } from '@/utils/multiplayerProgressStorage';
 import { trackModeSelected, trackLandingCtaClick } from '@/utils/growthTracking';
 import { useIsPracticeVeteran } from '@/hooks/useIsPracticeVeteran';
+import { useUserStats } from '@/hooks/useUserStats';
+import { THRESHOLDS } from '@/utils/featureGates';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import type { LandingGameMode } from '@/lib/landing/fetchGameModeStats';
 
@@ -88,6 +90,17 @@ export function LandingChallengeCards({
   const { isOnCrazyGamesPlatform } = useCrazyGames();
   const isVeteran = isVeteranRaw || isOnCrazyGamesPlatform;
 
+  // Mode-roster newcomer gate — independent of onboarding-completed and MP-joined
+  // flags (both flip too eagerly in production: onboarding completes before the
+  // first real game, and isNewPlayer requires an MP join). Drives both the
+  // "More Game Modes" collapse and the locked-card overlay so a brand-new
+  // player doesn't see eight options on first paint.
+  const { userStats } = useUserStats();
+  const isNewcomerByGames =
+    !isOnCrazyGamesPlatform &&
+    !!userStats &&
+    userStats.totalGamesPlayed < THRESHOLDS.modeRoster;
+
   // Layered ordering, applied to a `LandingCardKey[]` working set:
   //   1. Start from the server-provided order (or `DEFAULT_ORDER`).
   //   2. Inject the synthetic `'quickPlay'` card just after `'daily'` so the
@@ -141,7 +154,12 @@ export function LandingChallengeCards({
   // than hiding, preserves discoverability while keeping landing calm + focused on
   // practice + daily. Practice & daily always stay unlocked.
   const lockNonEssential = !isVeteran;
-  const lockedMessage = t('landing.practiceFirstToUnlock');
+  // Newcomers (< THRESHOLDS.modeRoster games) get a games-count copy that sets a
+  // concrete expectation; longer-tenured non-veterans keep the practice-completion
+  // copy that matches the practice-graduation flow.
+  const lockedMessage = isNewcomerByGames
+    ? t('landing.playGamesToUnlock').replace('{count}', String(THRESHOLDS.modeRoster))
+    : t('landing.practiceFirstToUnlock');
   const isModeLocked = (mode: LandingCardKey): boolean =>
     lockNonEssential && mode !== 'practice' && mode !== 'daily';
 
@@ -319,16 +337,29 @@ export function LandingChallengeCards({
 
   const MP_MODES = new Set<LandingCardKey>(['arena', 'quickPlay']);
   const SP_MODES = new Set<LandingCardKey>(['practice', 'blast', 'adventure', 'connections', 'brainGym']);
+  // Newcomer-essential modes — always visible above the fold. Everything else
+  // collapses into a "More Game Modes" expander to reduce choice paralysis
+  // without removing the cards from the DOM (preserves SEO + AI-crawler links).
+  const ESSENTIAL_FOR_NEWBIES = new Set<LandingCardKey>(['daily', 'practice', 'quickPlay']);
 
   const heroCards = cardOrder.filter((m) => m === 'daily');
-  const mpCards = cardOrder.filter((m) => MP_MODES.has(m));
+  const mpCardsAll = cardOrder.filter((m) => MP_MODES.has(m));
   // Non-veterans see practice promoted to a dedicated featured row above the SP grid
   // so it stops looking like just another card. Locked siblings (blast/adventure/etc.)
   // already de-emphasize the rest.
   const featurePractice = !isVeteran && cardOrder.includes('practice');
-  const spCards = cardOrder
+  const spCardsAll = cardOrder
     .filter((m) => SP_MODES.has(m))
     .filter((m) => !(featurePractice && m === 'practice'));
+  // Split visible vs. collapsed for first-timers / newbies / newcomers (< 3 games).
+  // The newcomer-by-games signal is the durable gate — onboarding-flag and MP-join
+  // signals expire too quickly. Veterans + CG players still see everything.
+  const collapseExtras = isFirstTimer || isNewbie || isNewcomerByGames;
+  const mpCards = collapseExtras ? mpCardsAll.filter((m) => ESSENTIAL_FOR_NEWBIES.has(m)) : mpCardsAll;
+  const mpCardsExtra = collapseExtras ? mpCardsAll.filter((m) => !ESSENTIAL_FOR_NEWBIES.has(m)) : [];
+  const spCards = collapseExtras ? spCardsAll.filter((m) => ESSENTIAL_FOR_NEWBIES.has(m)) : spCardsAll;
+  const spCardsExtra = collapseExtras ? spCardsAll.filter((m) => !ESSENTIAL_FOR_NEWBIES.has(m)) : [];
+  const hasExtras = mpCardsExtra.length + spCardsExtra.length > 0;
 
   let runningIndex = 0;
   const nextIndex = () => runningIndex++;
@@ -401,6 +432,45 @@ export function LandingChallengeCards({
             {spCards.map((mode) => renderCard(mode, nextIndex()))}
           </div>
         </section>
+      )}
+
+      {hasExtras && (
+        // Native <details> keeps every link in the DOM for crawlers (Google,
+        // ChatGPT, Perplexity all parse <details> content) while letting
+        // first-timers opt into the longer mode list when they're ready.
+        <details
+          data-testid="landing-section-more"
+          className="group rounded-neo border-2 border-neo-white/20 bg-neo-navy-light/40 px-4 py-3"
+        >
+          <summary className="cursor-pointer list-none flex items-center justify-between gap-2 select-none">
+            <span className="font-neo-display font-bold text-sm sm:text-base uppercase tracking-wide text-neo-white/80">
+              {t('landing.moreGameModes') || 'More Game Modes'}
+            </span>
+            <span className="font-neo-body text-xs sm:text-sm text-neo-white/50 group-open:hidden">
+              {t('landing.moreGameModesHint') || 'Tap to explore'}
+            </span>
+            <span className="font-neo-body text-xs sm:text-sm text-neo-white/50 hidden group-open:inline">
+              {t('common.collapse') || 'Hide'}
+            </span>
+          </summary>
+          <div className="mt-4 space-y-5">
+            {mpCardsExtra.length > 0 && (
+              <div className={`grid grid-cols-1 gap-3 sm:gap-4 md:gap-5 items-stretch ${mpCardsExtra.length >= 2 ? 'sm:grid-cols-2' : 'max-w-md mx-auto'}`}>
+                {mpCardsExtra.map((mode) => renderCard(mode, nextIndex()))}
+              </div>
+            )}
+            {spCardsExtra.length > 0 && (
+              <div className={`grid grid-cols-1 gap-3 sm:gap-4 md:gap-5 items-stretch ${
+                spCardsExtra.length === 1 ? 'max-w-md mx-auto' :
+                spCardsExtra.length === 2 ? 'sm:grid-cols-2 max-w-3xl mx-auto' :
+                spCardsExtra.length >= 4 ? 'sm:grid-cols-2 xl:grid-cols-4' :
+                'sm:grid-cols-2 md:grid-cols-3'
+              }`}>
+                {spCardsExtra.map((mode) => renderCard(mode, nextIndex()))}
+              </div>
+            )}
+          </div>
+        </details>
       )}
     </div>
   );

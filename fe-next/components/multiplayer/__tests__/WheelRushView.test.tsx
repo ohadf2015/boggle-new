@@ -2,6 +2,13 @@ import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, act, fireEvent } from '@testing-library/react';
 import type { Socket } from 'socket.io-client';
+import { WHEEL_RUSH_FOG_MS } from '@/shared/constants/wheelRushConstants';
+
+let mockReducedMotion = false;
+vi.mock('framer-motion', async () => {
+  const actual = await vi.importActual<typeof import('framer-motion')>('framer-motion');
+  return { ...actual, useReducedMotion: () => mockReducedMotion };
+});
 
 vi.mock('@/contexts/SoundEffectsContext', () => ({
   useSoundEffects: () => ({
@@ -128,6 +135,44 @@ describe('WheelRushView', () => {
     expect(screen.getByText('10')).toBeTruthy();
   });
 
+  it('unmasks opponent scores after fog window expires', () => {
+    vi.useFakeTimers();
+    try {
+      const start = 1_700_000_000_000;
+      vi.setSystemTime(start);
+      const socket = makeMockSocket();
+      render(
+        <WheelRushView
+          socket={socket}
+          username="alice"
+          leaderboard={[
+            { username: 'alice', score: 10 },
+            { username: 'bob', score: 42 },
+          ]}
+          onQuit={vi.fn()}
+          t={tStub}
+        />,
+      );
+      act(() => {
+        socket.fire('wheelRushInit', { puzzle, startedAt: start });
+      });
+      // During fog: bob's score is masked
+      expect(screen.getByText('???')).toBeTruthy();
+
+      // Advance past fog window
+      act(() => {
+        vi.setSystemTime(start + WHEEL_RUSH_FOG_MS + 500);
+        vi.advanceTimersByTime(WHEEL_RUSH_FOG_MS + 500);
+      });
+
+      // After fog: bob's real score is visible, no more ???
+      expect(screen.queryByText('???')).toBeNull();
+      expect(screen.getByText('42')).toBeTruthy();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it('calls onQuit when quit button clicked', () => {
     const socket = makeMockSocket();
     const onQuit = vi.fn();
@@ -217,6 +262,88 @@ describe('WheelRushView', () => {
     });
     expect(screen.getByText(/wordWheel\.notInDictionary/)).toBeTruthy();
     expect(screen.queryByText(/^not-a-word$/)).toBeNull();
+  });
+
+  it('does not re-register socket listeners when puzzle is set after wheelRushInit', () => {
+    const socket = makeMockSocket();
+    render(
+      <WheelRushView
+        socket={socket}
+        username="alice"
+        leaderboard={[{ username: 'alice', score: 0 }]}
+        onQuit={vi.fn()}
+        t={tStub}
+      />,
+    );
+    const onMock = socket.on as ReturnType<typeof vi.fn>;
+    const beforeInit = onMock.mock.calls.length;
+
+    // wheelRushInit transitions puzzle null→object. Listener effect must NOT re-run.
+    act(() => {
+      socket.fire('wheelRushInit', { puzzle, startedAt: Date.now() });
+    });
+
+    const afterInit = onMock.mock.calls.length;
+    expect(afterInit - beforeInit).toBe(0);
+  });
+
+  it('drops the animate-pulse class on the fog dot when prefers-reduced-motion is set', () => {
+    mockReducedMotion = true;
+    try {
+      const socket = makeMockSocket();
+      const { container } = render(
+        <WheelRushView
+          socket={socket}
+          username="alice"
+          leaderboard={[{ username: 'alice', score: 0 }]}
+          onQuit={vi.fn()}
+          t={tStub}
+        />,
+      );
+      act(() => {
+        socket.fire('wheelRushInit', { puzzle, startedAt: Date.now() });
+      });
+      const dot = container.querySelector('.bg-neo-cyan');
+      expect(dot).toBeTruthy();
+      expect(dot?.className.includes('animate-pulse')).toBe(false);
+    } finally {
+      mockReducedMotion = false;
+    }
+  });
+
+  it('observes the wheel container with ResizeObserver instead of window resize', () => {
+    const ctorSpy = vi.fn();
+    const observeSpy = vi.fn();
+    class TrackedRO {
+      constructor(cb: ResizeObserverCallback) { ctorSpy(cb); }
+      observe = observeSpy;
+      unobserve = vi.fn();
+      disconnect = vi.fn();
+    }
+    const original = (global as unknown as { ResizeObserver: unknown }).ResizeObserver;
+    (global as unknown as { ResizeObserver: unknown }).ResizeObserver = TrackedRO;
+    try {
+      const socket = makeMockSocket();
+      render(
+        <WheelRushView
+          socket={socket}
+          username="alice"
+          leaderboard={[{ username: 'alice', score: 0 }]}
+          onQuit={vi.fn()}
+          t={tStub}
+        />,
+      );
+      act(() => {
+        socket.fire('wheelRushInit', { puzzle, startedAt: Date.now() });
+      });
+      expect(ctorSpy).toHaveBeenCalled();
+      // observe should be called with an Element (the wheel container)
+      expect(observeSpy).toHaveBeenCalled();
+      const observed = observeSpy.mock.calls[0]?.[0];
+      expect(observed).toBeInstanceOf(Element);
+    } finally {
+      (global as unknown as { ResizeObserver: unknown }).ResizeObserver = original;
+    }
   });
 
   it('does not render QuickReactions picker in-game', () => {

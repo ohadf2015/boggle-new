@@ -55,7 +55,7 @@ export const SeasonEndSummary: React.FC<SeasonEndSummaryProps> = ({
               transition={{ delay: 0.3, type: 'spring', stiffness: 200, damping: 14 }}
             >
               <SilentVideo
-                src="/mascot/trophy.mp4"
+                src="/mascot/trophy.webp"
                 width={80}
                 height={80}
                 className="mx-auto mb-2 drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]"

@@ -37,7 +37,7 @@ vi.mock('@/utils/logger', () => ({
   default: { info: vi.fn(), warn: vi.fn(), error: vi.fn(), debug: vi.fn() },
 }));
 
-import { trackGameStart, trackGameEnd } from '../growthTracking';
+import { trackGameStart, trackGameEnd, trackGameCompletion } from '../growthTracking';
 
 function findCapture(event: string): Record<string, unknown> | undefined {
   const hit = captureMock.mock.calls.find(([name]) => name === `growth:${event}`);
@@ -83,5 +83,33 @@ describe('trackGameEnd — mode property contract', () => {
     const payload = findCapture('game_abandoned');
     expect(payload).toBeDefined();
     expect(payload!.mode).toBe('adventure');
+  });
+});
+
+describe('trackGameCompletion — first_game_won mode propagation', () => {
+  beforeEach(() => captureMock.mockClear());
+
+  it('passes gameMode through to first_game_won when isFirstGame=true', () => {
+    trackGameCompletion(true, 250, 10, true, 'multiplayer');
+    const payload = findCapture('first_game_won');
+    expect(payload).toBeDefined();
+    expect(payload!.gameMode).toBe('multiplayer');
+    expect(payload!.mode).toBe('multiplayer');
+  });
+
+  it('still emits with mode=unknown when caller forgets to pass gameMode', () => {
+    trackGameCompletion(true, 100, 5, true);
+    const payload = findCapture('first_game_won');
+    expect(payload).toBeDefined();
+    expect(payload!.gameMode).toBe('unknown');
+    expect(payload!.mode).toBe('unknown');
+  });
+
+  it('emits streak_continued (not first_game_won) when isFirstGame=false', () => {
+    trackGameCompletion(true, 100, 5, false, 'blast');
+    expect(findCapture('first_game_won')).toBeUndefined();
+    const payload = findCapture('streak_continued');
+    expect(payload).toBeDefined();
+    expect(payload!.mode).toBe('blast');
   });
 });

@@ -151,7 +151,7 @@ const ScoreRevealV2: React.FC<ScoreRevealV2Props> = ({ score, onContinue, onSkip
           </div>
           <div className="flex-1">
             <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-neo-black/55 font-neo-body">
-              gold earned
+              {t('onboarding.ftue.v2.goldEarned')}
             </div>
             <div className="font-neo-display text-[2rem] font-black text-neo-black tabular-nums leading-none">
               +{displayGold}
@@ -175,7 +175,7 @@ const ScoreRevealV2: React.FC<ScoreRevealV2Props> = ({ score, onContinue, onSkip
           </div>
           <div className="flex-1">
             <div className="text-[9px] font-bold uppercase tracking-[0.18em] text-neo-black/55 leading-tight font-neo-body">
-              streak
+              {t('onboarding.ftue.v2.streak')}
             </div>
             <div className="font-neo-display text-base font-black text-neo-black uppercase leading-tight">
               {t('onboarding.ftue.v2.streakStarted')}

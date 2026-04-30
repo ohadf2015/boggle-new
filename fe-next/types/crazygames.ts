@@ -163,8 +163,8 @@ export interface CrazyGamesContextType {
   happyTime: () => void;
   trackEvent: (eventName: string) => void;
   // Ads
-  showMidgameAd: (callbacks?: AdCallbacks) => void;
-  showRewardedAd: (callbacks?: AdCallbacks) => void;
+  showMidgameAd: (callbacks?: AdCallbacks, placement?: string) => void;
+  showRewardedAd: (callbacks?: AdCallbacks, placement?: string) => void;
   hasAdblock: () => Promise<boolean>;
   // Banner ads
   requestBanner: (containerId: string, width: number, height: number) => void;

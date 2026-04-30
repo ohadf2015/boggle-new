@@ -3,7 +3,31 @@
  * Focuses on lifetime achievements that were previously impossible to earn
  */
 
-import { checkLifetimeAchievements, LIFETIME_ACHIEVEMENT_THRESHOLDS, type UserStats } from '../achievementManager';
+import {
+  checkLifetimeAchievements,
+  LIFETIME_ACHIEVEMENT_THRESHOLDS,
+  checkLiveAchievements,
+  awardFinalAchievements,
+  ACHIEVEMENT_ICONS,
+  type UserStats,
+} from '../achievementManager';
+import type { Game, WordDetail } from '@/shared/types/game';
+
+type GameStub = Partial<Game> & {
+  playerCombos?: Record<string, number>;
+  startTime?: number;
+  gameDuration?: number;
+};
+
+function buildGame(overrides: GameStub = {}): Game {
+  return {
+    minWordLength: 2,
+    playerAchievements: {},
+    playerWordDetails: {},
+    users: {},
+    ...overrides,
+  } as Game;
+}
 
 describe('checkLifetimeAchievements', () => {
   describe('games played achievements', () => {
@@ -199,6 +223,170 @@ describe('checkLifetimeAchievements', () => {
       const veteran = newAchievements.find(a => a.key === 'VETERAN');
       expect(veteran?.icon).toBe('🎖️');
     });
+  });
+});
+
+describe('checkLiveAchievements — new achievements', () => {
+  describe('EARLY_BIRD', () => {
+    it('awards on first valid word within 2 seconds', () => {
+      const game = buildGame({
+        playerWordDetails: {
+          alice: [{ word: 'cat', validated: true, timeSinceStart: 1.5 } as WordDetail],
+        },
+      });
+
+      const result = checkLiveAchievements(game, 'alice', 'cat', 1.5);
+
+      expect(result).toContainEqual(expect.objectContaining({ key: 'EARLY_BIRD' }));
+    });
+
+    it('does not award after 2 seconds', () => {
+      const game = buildGame({
+        playerWordDetails: {
+          alice: [{ word: 'cat', validated: true, timeSinceStart: 2.5 } as WordDetail],
+        },
+      });
+
+      const result = checkLiveAchievements(game, 'alice', 'cat', 2.5);
+
+      expect(result).not.toContainEqual(expect.objectContaining({ key: 'EARLY_BIRD' }));
+    });
+
+    it('does not double-award', () => {
+      const game = buildGame({
+        playerAchievements: { alice: ['EARLY_BIRD'] },
+        playerWordDetails: {
+          alice: [{ word: 'cat', validated: true, timeSinceStart: 1.5 } as WordDetail],
+        },
+      });
+
+      const result = checkLiveAchievements(game, 'alice', 'cat', 1.5);
+
+      expect(result).not.toContainEqual(expect.objectContaining({ key: 'EARLY_BIRD' }));
+    });
+  });
+
+  describe('PALINDROME_HUNTER', () => {
+    it('awards when player submits a palindrome of 4+ letters', () => {
+      const game = buildGame({
+        playerWordDetails: {
+          alice: [{ word: 'level', validated: true, timeSinceStart: 5 } as WordDetail],
+        },
+      });
+
+      const result = checkLiveAchievements(game, 'alice', 'level', 5);
+
+      expect(result).toContainEqual(expect.objectContaining({ key: 'PALINDROME_HUNTER' }));
+    });
+
+    it('rejects 3-letter palindromes', () => {
+      const game = buildGame({
+        playerWordDetails: {
+          alice: [{ word: 'pop', validated: true, timeSinceStart: 5 } as WordDetail],
+        },
+      });
+
+      const result = checkLiveAchievements(game, 'alice', 'pop', 5);
+
+      expect(result).not.toContainEqual(expect.objectContaining({ key: 'PALINDROME_HUNTER' }));
+    });
+
+    it('rejects non-palindromes', () => {
+      const game = buildGame({
+        playerWordDetails: {
+          alice: [{ word: 'hello', validated: true, timeSinceStart: 5 } as WordDetail],
+        },
+      });
+
+      const result = checkLiveAchievements(game, 'alice', 'hello', 5);
+
+      expect(result).not.toContainEqual(expect.objectContaining({ key: 'PALINDROME_HUNTER' }));
+    });
+
+    it('does not award when word is invalid', () => {
+      const game = buildGame({
+        playerWordDetails: {
+          alice: [{ word: 'level', validated: false, timeSinceStart: 5 } as WordDetail],
+        },
+      });
+
+      const result = checkLiveAchievements(game, 'alice', 'level', 5);
+
+      expect(result).not.toContainEqual(expect.objectContaining({ key: 'PALINDROME_HUNTER' }));
+    });
+  });
+
+  it('all new achievements have icons defined', () => {
+    expect(ACHIEVEMENT_ICONS.EARLY_BIRD).toBeDefined();
+    expect(ACHIEVEMENT_ICONS.PALINDROME_HUNTER).toBeDefined();
+    expect(ACHIEVEMENT_ICONS.COMEBACK_CHAMPION).toBeDefined();
+    expect(ACHIEVEMENT_ICONS.FIRST_GAME_WIN).toBeDefined();
+  });
+});
+
+describe('awardFinalAchievements — COMEBACK_CHAMPION', () => {
+  it('awards player who scored last among humans but had highest single-word score in last 25% of game', () => {
+    const game = buildGame({
+      gameDuration: 180,
+      playerWordDetails: {
+        alice: [
+          { word: 'cat', validated: true, timeSinceStart: 10 } as WordDetail,
+        ],
+        bob: [
+          { word: 'doghouse', validated: true, timeSinceStart: 160 } as WordDetail,
+          { word: 'hello', validated: true, timeSinceStart: 165 } as WordDetail,
+          { word: 'world', validated: true, timeSinceStart: 170 } as WordDetail,
+        ],
+      },
+      users: {
+        alice: { isBot: false } as Game['users'][string],
+        bob: { isBot: false } as Game['users'][string],
+      },
+    });
+
+    awardFinalAchievements(game, ['alice', 'bob']);
+
+    expect(game.playerAchievements!.bob).toContain('COMEBACK_CHAMPION');
+    expect(game.playerAchievements!.alice).not.toContain('COMEBACK_CHAMPION');
+  });
+
+  it('does not award in solo games', () => {
+    const game = buildGame({
+      gameDuration: 180,
+      playerWordDetails: {
+        alice: [
+          { word: 'doghouse', validated: true, timeSinceStart: 170 } as WordDetail,
+        ],
+      },
+      users: { alice: { isBot: false } as Game['users'][string] },
+    });
+
+    awardFinalAchievements(game, ['alice']);
+
+    expect(game.playerAchievements!.alice ?? []).not.toContain('COMEBACK_CHAMPION');
+  });
+});
+
+describe('checkLifetimeAchievements — FIRST_GAME_WIN', () => {
+  it('awards FIRST_GAME_WIN on first win', () => {
+    const stats: UserStats = { gamesWon: 1, gamesPlayed: 1 };
+    const result = checkLifetimeAchievements(stats, []);
+
+    expect(result).toContainEqual(expect.objectContaining({ key: 'FIRST_GAME_WIN' }));
+  });
+
+  it('does not award FIRST_GAME_WIN at 0 wins', () => {
+    const stats: UserStats = { gamesWon: 0 };
+    const result = checkLifetimeAchievements(stats, []);
+
+    expect(result).not.toContainEqual(expect.objectContaining({ key: 'FIRST_GAME_WIN' }));
+  });
+
+  it('does not re-award FIRST_GAME_WIN once earned', () => {
+    const stats: UserStats = { gamesWon: 5 };
+    const result = checkLifetimeAchievements(stats, ['FIRST_GAME_WIN']);
+
+    expect(result).not.toContainEqual(expect.objectContaining({ key: 'FIRST_GAME_WIN' }));
   });
 });
 

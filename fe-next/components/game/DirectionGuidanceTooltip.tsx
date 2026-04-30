@@ -1,34 +1,19 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, memo } from 'react';
+import { useState, useEffect, useCallback, memo, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Route } from 'lucide-react';
+import { getDemoConfig } from '../onboarding/demoConfigs';
 
-const STORAGE_KEY = 'lexiclash_direction_guidance_seen';
 const AUTO_DISMISS_MS = 8000; // 8 seconds - longer for interactive demo
-
-// Demo grid letters
-const DEMO_GRID = [
-  ['C', 'A', 'R'],
-  ['O', 'T', 'S'],
-  ['W', 'N', 'E'],
-];
-
-// Zigzag path demonstrating direction changes: C -> A -> T -> S (right, diagonal-down, right)
-const DEMO_PATH: [number, number][] = [
-  [0, 0], // C
-  [0, 1], // A - horizontal right
-  [1, 1], // T - vertical down
-  [1, 2], // S - horizontal right
-];
-
-const DEMO_WORD = 'CATS';
 
 interface DirectionGuidanceTooltipProps {
   isVisible: boolean;
   onDismiss: () => void;
   t: (key: string) => string;
   dir?: 'ltr' | 'rtl';
+  /** Locale for the example word/grid. Defaults to 'en'. */
+  language?: string;
 }
 
 /**
@@ -38,11 +23,22 @@ interface DirectionGuidanceTooltipProps {
  * Features a mini animated grid that traces a zigzag path.
  */
 const DirectionGuidanceTooltip = memo<DirectionGuidanceTooltipProps>(
-  ({ isVisible, onDismiss, t, dir = 'ltr' }) => {
+  ({ isVisible, onDismiss, t, dir = 'ltr', language = 'en' }) => {
     const [selectedCells, setSelectedCells] = useState<[number, number][]>([]);
     const [isAnimating, setIsAnimating] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
     const [isPopping, setIsPopping] = useState(false);
+
+    // Locale-aware example: 3x3 grid with L-shape path (right + down) showing
+    // direction-change. Reuses the vetted demoConfigs vocabulary.
+    const { letters: DEMO_GRID, path: demoPathCfg, word: DEMO_WORD } = useMemo(
+      () => getDemoConfig(language),
+      [language],
+    );
+    const DEMO_PATH = useMemo<[number, number][]>(
+      () => demoPathCfg.map(p => [p.row, p.col] as [number, number]),
+      [demoPathCfg],
+    );
 
     // Handle dismiss with pop animation
     const handleDismiss = useCallback(() => {
@@ -80,7 +76,7 @@ const DirectionGuidanceTooltip = memo<DirectionGuidanceTooltipProps>(
         },
         DEMO_PATH.length * 400 + 300
       );
-    }, [isAnimating]);
+    }, [isAnimating, DEMO_PATH]);
 
     // Auto-start animation when visible
     useEffect(() => {

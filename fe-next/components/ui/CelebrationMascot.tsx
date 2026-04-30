@@ -2,9 +2,9 @@
 
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { memo } from 'react';
+import Image from 'next/image';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import type { MascotClipShape, MascotBorderColor } from './Mascot';
-import { SilentVideo } from './SilentVideo';
 
 const CLIP_CLASSES: Record<MascotClipShape, string> = {
   none: '',
@@ -50,8 +50,8 @@ const SIZE_PIXELS: Record<MascotSize, number> = {
 };
 
 const VARIANT_PATHS: Record<CelebrationVariant, string> = {
-  trophy: '/mascot/trophy.mp4',
-  celebration: '/mascot/celebration.mp4',
+  trophy: '/mascot/trophy.webp',
+  celebration: '/mascot/celebration.webp',
 };
 
 interface CelebrationMascotProps {
@@ -127,13 +127,15 @@ export const CelebrationMascot = memo(function CelebrationMascot({
       }}
     >
       <div className={`w-full h-full ${CLIP_CLASSES[resolvedShape]} ${BORDER_CLASSES[resolvedBorder]} ${hasClip ? resolvedBg : ''}`}>
-        <SilentVideo
+        <Image
           src={imageSrc}
+          alt={altText}
           width={SIZE_PIXELS[size]}
           height={SIZE_PIXELS[size]}
-          className={`w-full h-full object-contain ${hasClip ? 'scale-110' : ''} drop-shadow-lg`}
-          preload={priority ? 'auto' : 'metadata'}
-          aria-label={altText}
+          className={`object-contain ${hasClip ? 'scale-110' : ''} drop-shadow-lg`}
+          priority={priority}
+          loading={priority ? undefined : 'lazy'}
+          unoptimized
         />
       </div>
     </AdaptiveMotion.div>

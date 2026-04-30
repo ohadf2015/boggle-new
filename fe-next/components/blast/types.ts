@@ -88,6 +88,8 @@ export interface BlastGameState {
   tileTypeClears: Record<BlastTileType, number>;
   /** Turns remaining where frozen tile inner types are revealed (diamond effect) */
   diamondRevealTurns: number;
+  /** Color counts in the last submitted word: { pink, cyan, lime } (for color_power tracking) */
+  lastWordColorCounts?: { pink: number; cyan: number; lime: number };
 }
 
 /** Per-wave summary for results breakdown */
@@ -124,6 +126,12 @@ export interface BlastResultsData {
   bestWave?: { waveNumber: number; score: number };
   /** Badges unlocked this run (for achievement ribbon) */
   badges?: Array<{ id: string; icon: string; label: string; isNew?: boolean }>;
+  /** Sprint 3 polish: target_word goal context surfaced on the results card so
+   *  the player sees acknowledgement either way ("Target was: CRYSTAL" on miss,
+   *  "FOUND IT!" on hit). Optional — only set when the wave actually had a
+   *  target_word objective. */
+  targetWord?: string;
+  targetWordFound?: boolean;
 }
 
 // ==================== Special Tile Effects ====================
@@ -340,7 +348,9 @@ export const SPECIAL_TILE_DISTRIBUTION: Record<Exclude<BlastTileType, 'standard'
 
 // ==================== Objectives ====================
 
-export type BlastObjectiveType = 'collect_type' | 'clear_all_type' | 'score_target' | 'word_length' | 'clear_percent';
+export type BlastObjectiveType = 'collect_type' | 'clear_all_type' | 'score_target' | 'word_length' | 'clear_percent' | 'target_word' | 'color_power';
+
+export type ColorTag = 'pink' | 'cyan' | 'lime';
 
 export interface BlastObjective {
   type: BlastObjectiveType;
@@ -350,7 +360,16 @@ export interface BlastObjective {
   target: number;
   /** Minimum word length required (for word_length type) */
   minWordLength?: number;
+  /** Target word to find (for target_word type) */
+  targetWord?: string;
+  /** Color tag for color_power objective */
+  colorTag?: ColorTag;
+  /** Minimum count of colored tiles required (for color_power type) */
+  minColorCount?: number;
 }
+
+/** 2D grid of letters for Blast board representation */
+export type LetterGrid = string[][];
 
 export interface BlastObjectiveProgress {
   objective: BlastObjective;

@@ -87,6 +87,8 @@ export interface UseResultsSideEffectsConfig {
   showWordFeedback: boolean;
   /** Game mode for daily quest tracking ('classic' | 'wordHunt') */
   mpGameMode?: 'classic' | 'wordHunt';
+  /** Engine mode (e.g. 'multiplayer'|'word-hunt'|'blast'|'wheel-rush'|'singleplayer'). Used to populate `mode` on first_game_won. */
+  gameMode?: string;
   /** Username normalization function */
   normalizeUsername: (name: string | undefined | null) => string;
 }
@@ -168,6 +170,7 @@ export function useResultsSideEffects({
   showWordFeedback,
   normalizeUsername,
   mpGameMode,
+  gameMode,
 }: UseResultsSideEffectsConfig): UseResultsSideEffectsReturn {
   // ==============================================
   // AUTH & CONTEXT
@@ -361,7 +364,8 @@ export function useResultsSideEffects({
       isCurrentUserWinner,
       currentPlayerData.score || 0,
       validWords.length,
-      isFirstGame
+      isFirstGame,
+      gameMode || (gameCode ? 'multiplayer' : 'singleplayer')
     );
 
     // Record game completion for streak (any game mode, win or loss)
@@ -409,7 +413,7 @@ export function useResultsSideEffects({
     }
 
     hasTrackedGameRef.current = true;
-  }, [currentPlayerData, isCurrentUserWinner, currentStreak, bestStreak, lastWinDate, recordWin, mpGameMode, gameCode, mpWinStreak]);
+  }, [currentPlayerData, isCurrentUserWinner, currentStreak, bestStreak, lastWinDate, recordWin, mpGameMode, gameCode, gameMode, mpWinStreak]);
 
   // ==============================================
   // EFFECT 5: Add Game to History

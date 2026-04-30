@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCosmetics } from '@/hooks/useCosmetics';
-import { type CosmeticCategory, RARITY_COLORS, type Cosmetic } from '@/lib/cosmetics';
+import { type CosmeticCategory, RARITY_COLORS, type Cosmetic, formatUnlockHint } from '@/lib/cosmetics';
 import { Lock } from 'lucide-react';
 import { CosmeticPreview } from './CosmeticPreview';
 
@@ -87,11 +87,14 @@ export function CosmeticCollection({ rankTier, streakDays, coins, spendCoins }: 
                   {t('cosmetics.equipped')}
                 </span>
               )}
-              {!item.isUnlocked && (
-                <span className="text-xs text-gray-500 mt-1 block">
-                  {t('cosmetics.locked')}
-                </span>
-              )}
+              {!item.isUnlocked && (() => {
+                const hint = formatUnlockHint(item);
+                return (
+                  <span className="text-xs text-neo-cream/70 mt-1 block font-neo-body">
+                    {hint ? t(hint.key, hint.params) : t('cosmetics.locked')}
+                  </span>
+                );
+              })()}
               {item.isUnlocked && !item.isEquipped && (
                 <button
                   onClick={(e) => {

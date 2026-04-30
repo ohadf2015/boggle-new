@@ -1,8 +1,8 @@
 /**
- * Mascot Integration Tests (split-format: MP4 for opaque, animated WebP for transparent).
+ * Mascot Integration Tests (all animated WebP).
  *
- * Verifies that mascot variants are mapped to the correct optimized asset
- * and rendered with the matching DOM element (<video> vs <img>).
+ * Verifies that mascot variants are mapped to the correct WebP asset
+ * and rendered uniformly via <img>. MP4s replaced with WebP for cross-device compat.
  */
 
 import { render } from '@testing-library/react';
@@ -20,16 +20,13 @@ const ALL_BASE_VARIANTS: MascotVariant[] = [
   'knight', 'sad', 'ghostly', 'dance', 'question',
 ];
 
-const VIDEO_VARIANTS: MascotVariant[] = ALL_BASE_VARIANTS.filter((v) => isVideoVariant(v));
-const WEBP_VARIANTS: MascotVariant[] = ALL_BASE_VARIANTS.filter((v) => !isVideoVariant(v));
-
-describe('Mascot Integration (split-format)', () => {
+describe('Mascot Integration (animated WebP)', () => {
   describe('getMascotImagePath', () => {
-    it('returns MP4 path for opaque variants', () => {
-      expect(getMascotImagePath('happy')).toBe('/mascot/winner.mp4');
-      expect(getMascotImagePath('gaming')).toBe('/mascot/play.mp4');
-      expect(getMascotImagePath('thinking')).toBe('/mascot/question.mp4');
-      expect(getMascotImagePath('oops')).toBe('/mascot/oops.mp4');
+    it('returns WebP path for previously-MP4 opaque variants', () => {
+      expect(getMascotImagePath('happy')).toBe('/mascot/winner.webp');
+      expect(getMascotImagePath('gaming')).toBe('/mascot/play.webp');
+      expect(getMascotImagePath('thinking')).toBe('/mascot/question.webp');
+      expect(getMascotImagePath('oops')).toBe('/mascot/oops.webp');
     });
 
     it('returns animated WebP path for transparent variants', () => {
@@ -39,10 +36,11 @@ describe('Mascot Integration (split-format)', () => {
       expect(getMascotImagePath('powerup')).toBe('/mascot/powerup-nobg.webp');
     });
 
-    it('returns an optimized asset (.mp4 or .webp) for every base variant', () => {
+    it('returns a .webp asset for every base variant', () => {
       ALL_BASE_VARIANTS.forEach((variant) => {
         const path = getMascotImagePath(variant);
-        expect(path).toMatch(/\.(mp4|webp)$/);
+        expect(path).toMatch(/\.webp$/);
+        expect(path).not.toContain('.mp4');
         expect(path).not.toContain('.gif');
         expect(path).not.toContain('.png');
       });
@@ -50,14 +48,8 @@ describe('Mascot Integration (split-format)', () => {
   });
 
   describe('isVideoVariant', () => {
-    it('returns true for opaque MP4 variants', () => {
-      VIDEO_VARIANTS.forEach((variant) => {
-        expect(isVideoVariant(variant)).toBe(true);
-      });
-    });
-
-    it('returns false for transparent WebP variants', () => {
-      WEBP_VARIANTS.forEach((variant) => {
+    it('returns false for every variant (no MP4s remain)', () => {
+      ALL_BASE_VARIANTS.forEach((variant) => {
         expect(isVideoVariant(variant)).toBe(false);
       });
     });
@@ -68,10 +60,10 @@ describe('Mascot Integration (split-format)', () => {
       expect(BASE_VARIANTS).toHaveLength(32);
     });
 
-    it('has an entry in MASCOT_IMAGES for every base variant', () => {
+    it('has a .webp entry in MASCOT_IMAGES for every base variant', () => {
       BASE_VARIANTS.forEach((variant) => {
         expect(MASCOT_IMAGES[variant]).toBeDefined();
-        expect(MASCOT_IMAGES[variant]).toMatch(/\.(mp4|webp)$/);
+        expect(MASCOT_IMAGES[variant]).toMatch(/\.webp$/);
       });
     });
   });
@@ -107,15 +99,15 @@ describe('Mascot Integration (split-format)', () => {
   });
 
   describe('Mascot component rendering', () => {
-    it('renders a <video> element for opaque variants', () => {
+    it('renders <img> with correct WebP src for any variant', () => {
       const { container } = render(<Mascot variant="happy" />);
-      const video = container.querySelector('video');
-      expect(video).toBeInTheDocument();
-      expect(video).toHaveAttribute('src', '/mascot/winner.mp4');
-      expect(video).toHaveAttribute('aria-label', 'Lexi mascot - happy');
+      const img = container.querySelector('img');
+      expect(img).toBeInTheDocument();
+      expect(img).toHaveAttribute('alt', 'Lexi mascot - happy');
+      expect(img?.getAttribute('src') || '').toContain('winner.webp');
     });
 
-    it('renders an <img> element for transparent variants', () => {
+    it('renders <img> for transparent variants', () => {
       const { container } = render(<Mascot variant="onfire" />);
       const img = container.querySelector('img');
       expect(img).toBeInTheDocument();
@@ -128,14 +120,22 @@ describe('Mascot Integration (split-format)', () => {
         unmount();
       });
     });
+
+    it('does not render <video> for any variant', () => {
+      ALL_BASE_VARIANTS.forEach((variant) => {
+        const { container, unmount } = render(<Mascot variant={variant} />);
+        expect(container.querySelector('video')).toBeNull();
+        unmount();
+      });
+    });
   });
 
   describe('MascotWithEntrance component', () => {
-    it('renders opaque variants via <video>', () => {
+    it('renders previously-opaque variants via <img>', () => {
       const { container } = render(<MascotWithEntrance variant="gaming" />);
-      const video = container.querySelector('video');
-      expect(video).toBeInTheDocument();
-      expect(video).toHaveAttribute('aria-label', 'Lexi mascot - gaming');
+      const img = container.querySelector('img');
+      expect(img).toBeInTheDocument();
+      expect(img).toHaveAttribute('alt', 'Lexi mascot - gaming');
     });
 
     it('renders transparent variants via <img>', () => {
@@ -146,11 +146,10 @@ describe('Mascot Integration (split-format)', () => {
   });
 
   describe('InteractiveMascot component', () => {
-    it('renders opaque base variant via <video>', () => {
+    it('renders previously-opaque base variant via <img>', () => {
       const { container } = render(<InteractiveMascot variant="thinking" />);
-      const video = container.querySelector('video');
-      expect(video).toBeInTheDocument();
-      expect(video).toHaveAttribute('aria-label', expect.stringContaining('thinking'));
+      const img = container.querySelector('img');
+      expect(img).toBeInTheDocument();
     });
 
     it('renders transparent base variant via <img> with correct src', () => {
@@ -161,7 +160,6 @@ describe('Mascot Integration (split-format)', () => {
     });
 
     it('renders extended variants mapped through VARIANT_MAP', () => {
-      // 'excited' maps to 'onfire' → transparent WebP → <img>
       const { container } = render(<InteractiveMascot variant="excited" />);
       const img = container.querySelector('img');
       expect(img).toBeInTheDocument();
@@ -169,33 +167,33 @@ describe('Mascot Integration (split-format)', () => {
   });
 
   describe('IdleMascot component', () => {
-    it('renders opaque base variant via <video>', () => {
+    it('renders previously-opaque base variant via <img>', () => {
       const { container } = render(<IdleMascot baseVariant="oops" />);
-      const video = container.querySelector('video');
-      expect(video).toBeInTheDocument();
+      const img = container.querySelector('img');
+      expect(img).toBeInTheDocument();
     });
 
     it('renders encouraging as its own base variant', () => {
       const { container } = render(<IdleMascot baseVariant="encouraging" />);
-      expect(container.querySelector('video, img')).toBeInTheDocument();
+      expect(container.querySelector('img')).toBeInTheDocument();
     });
   });
 
   describe('Path mapping correctness', () => {
-    it('maps winner.mp4 to happy', () => {
-      expect(getMascotImagePath('happy')).toContain('winner.mp4');
+    it('maps winner.webp to happy', () => {
+      expect(getMascotImagePath('happy')).toContain('winner.webp');
     });
 
-    it('maps play.mp4 to gaming', () => {
-      expect(getMascotImagePath('gaming')).toContain('play.mp4');
+    it('maps play.webp to gaming', () => {
+      expect(getMascotImagePath('gaming')).toContain('play.webp');
     });
 
-    it('maps question.mp4 to thinking', () => {
-      expect(getMascotImagePath('thinking')).toContain('question.mp4');
+    it('maps question.webp to thinking', () => {
+      expect(getMascotImagePath('thinking')).toContain('question.webp');
     });
 
-    it('maps oops.mp4 to oops', () => {
-      expect(getMascotImagePath('oops')).toContain('oops.mp4');
+    it('maps oops.webp to oops', () => {
+      expect(getMascotImagePath('oops')).toContain('oops.webp');
     });
   });
 

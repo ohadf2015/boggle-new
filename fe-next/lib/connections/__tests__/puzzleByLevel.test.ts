@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getPuzzleForLevel, getTotalLevels } from '../puzzles';
+import { getPuzzleForLevel, getTotalLevels, getPuzzlesForLocale } from '../puzzles';
 
 describe('getPuzzleForLevel', () => {
   it('returns same puzzle for same (locale, level) — deterministic', () => {
@@ -37,5 +37,34 @@ describe('getPuzzleForLevel', () => {
   it('getTotalLevels returns positive integer', () => {
     expect(getTotalLevels('en')).toBeGreaterThan(0);
     expect(Number.isInteger(getTotalLevels('en'))).toBe(true);
+  });
+});
+
+// Auto-ban behavior: puzzles in the banned set are skipped at runtime.
+// Source = `v_connections_banned_puzzles` (≥3 distinct authed dislike+gave_up).
+describe('getPuzzleForLevel — banned puzzle filter', () => {
+  it('never returns a banned puzzle id', () => {
+    const all = getPuzzlesForLocale('he');
+    // Pick the first 5 ids as a synthetic ban set
+    const banned = new Set(all.slice(0, 5).map((p) => p.id));
+    const total = getTotalLevels('he', banned);
+    expect(total).toBe(all.length - 5);
+    for (let lvl = 1; lvl <= Math.min(total, 50); lvl++) {
+      const puzzle = getPuzzleForLevel('he', lvl, banned)!;
+      expect(banned.has(puzzle.id)).toBe(false);
+    }
+  });
+
+  it('returns null when every puzzle is banned', () => {
+    const all = getPuzzlesForLocale('he');
+    const banned = new Set(all.map((p) => p.id));
+    expect(getPuzzleForLevel('he', 1, banned)).toBeNull();
+    expect(getTotalLevels('he', banned)).toBe(0);
+  });
+
+  it('falls through to original pool when banned set is empty', () => {
+    const a = getPuzzleForLevel('he', 1);
+    const b = getPuzzleForLevel('he', 1, new Set());
+    expect(a!.id).toBe(b!.id);
   });
 });

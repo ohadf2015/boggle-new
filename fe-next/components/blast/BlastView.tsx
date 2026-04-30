@@ -11,6 +11,7 @@ import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { BlastGame } from './BlastGame';
 import { BlastResultsSummary } from './BlastResultsSummary';
 import { BlastPregameBuffModal, type BlastPregameBuff } from './BlastPregameBuffModal';
+import { BlastRetryWaveModal } from './BlastRetryWaveModal';
 import { useBlastCheckpoint } from './hooks/useBlastCheckpoint';
 import { getWaveConfig, getWaveDistribution } from './utils/blastWaveConfig';
 import { calculateEarnedStars } from './utils/blastStarCalculator';
@@ -60,6 +61,29 @@ export function BlastView() {
   // Pre-game buff (rewarded-ad picker, single-use per run)
   const [pregameBuff, setPregameBuff] = useState<BlastPregameBuff | null>(null);
   const [buffModalOpen, setBuffModalOpen] = useState(false);
+
+  // Retry-on-loss flow — snapshot pre-wave state at every wave entry so that
+  // an ad-gated retry can restart only the failed wave, leaving prior wave
+  // progress (score, words, history) intact. One-shot per run.
+  type WaveSnapshot = {
+    waveNumber: number;
+    totalScore: number;
+    allWordsFound: string[];
+    waveHistory: WaveResult[];
+  };
+  const preWaveSnapshotRef = useRef<WaveSnapshot | null>(null);
+  const retryUsedRef = useRef(false);
+  const [retryDeclined, setRetryDeclined] = useState(false);
+
+  /** Capture pre-wave state right before entering `playing`. */
+  const snapshotPreWave = useCallback((wave: number, score: number, words: string[], history: WaveResult[]) => {
+    preWaveSnapshotRef.current = {
+      waveNumber: wave,
+      totalScore: score,
+      allWordsFound: [...words],
+      waveHistory: [...history],
+    };
+  }, []);
 
   // Apply wave-specific overrides.
   // `config` is memoized so BlastGame doesn't see a new object reference on
@@ -131,20 +155,47 @@ export function BlastView() {
 
   /** Advance to next wave */
   const handleWaveAdvance = useCallback(() => {
-    setCurrentWave(prev => prev + 1);
+    setCurrentWave(prev => {
+      const next = prev + 1;
+      // Snapshot pre-wave state with the post-completion totals — when this
+      // wave fails, the retry restores us back to this exact moment.
+      snapshotPreWave(next, totalScore, allWordsFound, waveHistory);
+      return next;
+    });
+    gameKeyRef.current += 1;
+    setPhase('playing');
+  }, [snapshotPreWave, totalScore, allWordsFound, waveHistory]);
+
+  const handleStart = useCallback(() => {
+    setCurrentWave(1);
+    snapshotPreWave(1, 0, [], []);
+    setPhase('playing');
+  }, [snapshotPreWave]);
+
+  const handleResume = useCallback(() => {
+    const wave = checkpoint.resumeFromWave;
+    setCurrentWave(wave);
+    snapshotPreWave(wave, 0, [], []);
+    setPhase('playing');
+  }, [checkpoint.resumeFromWave, snapshotPreWave]);
+
+  /** Retry the failed wave — restore the pre-wave snapshot, keep retry-used flag. */
+  const handleRetryWave = useCallback(() => {
+    const snap = preWaveSnapshotRef.current;
+    if (!snap) return;
+    retryUsedRef.current = true;
+    setResults(null);
+    setTotalScore(snap.totalScore);
+    setAllWordsFound(snap.allWordsFound);
+    setWaveHistory(snap.waveHistory);
+    setCurrentWave(snap.waveNumber);
     gameKeyRef.current += 1;
     setPhase('playing');
   }, []);
 
-  const handleStart = useCallback(() => {
-    setCurrentWave(1);
-    setPhase('playing');
+  const handleRetryDecline = useCallback(() => {
+    setRetryDeclined(true);
   }, []);
-
-  const handleResume = useCallback(() => {
-    setCurrentWave(checkpoint.resumeFromWave);
-    setPhase('playing');
-  }, [checkpoint.resumeFromWave]);
 
   const handlePlayAgain = useCallback(() => {
     setResults(null);
@@ -153,6 +204,9 @@ export function BlastView() {
     setAllWordsFound([]);
     setWaveHistory([]);
     setPregameBuff(null);
+    retryUsedRef.current = false;
+    setRetryDeclined(false);
+    preWaveSnapshotRef.current = null;
     gameKeyRef.current += 1;
     setPhase('ready');
   }, []);
@@ -310,14 +364,37 @@ export function BlastView() {
         );
       })()}
 
-      {phase === 'results' && results && (
-        <BlastResultsSummary
-          results={results}
-          t={t}
-          onPlayAgain={handlePlayAgain}
-          onQuit={handleQuit}
-        />
-      )}
+      {phase === 'results' && results && (() => {
+        // Retry-on-loss eligibility: failed (clearPct < 90), have an ad provider,
+        // haven't already retried this run, and player hasn't declined yet.
+        const failedClearPct = results.clearPercentage ?? 0;
+        const eligibleForRetry =
+          failedClearPct < 90
+          && hasRealAdProvider
+          && !retryUsedRef.current
+          && !retryDeclined
+          && preWaveSnapshotRef.current != null;
+        if (eligibleForRetry) {
+          return (
+            <BlastRetryWaveModal
+              isOpen
+              waveNumber={preWaveSnapshotRef.current!.waveNumber}
+              clearPct={failedClearPct}
+              onRetry={handleRetryWave}
+              onDecline={handleRetryDecline}
+              t={t}
+            />
+          );
+        }
+        return (
+          <BlastResultsSummary
+            results={results}
+            t={t}
+            onPlayAgain={handlePlayAgain}
+            onQuit={handleQuit}
+          />
+        );
+      })()}
     </div>
   );
 }

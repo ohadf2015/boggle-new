@@ -70,9 +70,10 @@ describe('CosmeticCollection', () => {
     expect(screen.getByText('cosmetics.equipped')).toBeDefined();
   });
 
-  it('shows locked indicator on locked items', () => {
+  it('shows unlock-condition hint on locked items (rank cosmetic shows tier requirement)', () => {
     render(<CosmeticCollection rankTier="Unranked" streakDays={0} coins={0} />);
-    expect(screen.getByText('cosmetics.locked')).toBeDefined();
+    // tile-neon is rank-Silver locked → should display the rank-unlock translation key
+    expect(screen.getAllByText('cosmetics.unlock.rank').length).toBeGreaterThan(0);
   });
 
   it('opens preview modal when clicking a cosmetic card', () => {

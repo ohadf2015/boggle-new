@@ -25,13 +25,6 @@ import type { BoardTheme } from '@/shared/types/socket';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   useGameMode,
-  useBlastTileOverlay,
-  useWordHuntTargetLength,
-  useWordHuntMyLife,
-  useWordHuntTargetAttempts,
-  useWordHuntTargetFound,
-  useWordHuntPlayerLives,
-  useWordHuntEliminatedPlayers,
 } from '@/hooks/gameState/store';
 
 // ==================== Types ====================
@@ -139,15 +132,8 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
   // Get player's game history for trail display logic
   const { profile } = useAuth();
 
-  // Game mode state from Zustand
+  // Only gameMode at root — mode-overlay state subscribed by InGameScreen.
   const gameMode = useGameMode();
-  const blastTileOverlay = useBlastTileOverlay();
-  const wordHuntTargetLength = useWordHuntTargetLength();
-  const wordHuntLife = useWordHuntMyLife();
-  const wordHuntAttempts = useWordHuntTargetAttempts();
-  const wordHuntFound = useWordHuntTargetFound();
-  const wordHuntPlayerLives = useWordHuntPlayerLives();
-  const wordHuntEliminatedPlayers = useWordHuntEliminatedPlayers();
 
   // Blast multiplayer bridge — converts Zustand state to BlastGame props
   const blastBridge = useBlastMultiplayerBridge({
@@ -295,13 +281,6 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
 
       // Game mode overlays
       gameMode={gameMode ?? undefined}
-      blastTileOverlay={blastTileOverlay}
-      wordHuntTargetLength={wordHuntTargetLength}
-      wordHuntAttempts={wordHuntAttempts}
-      wordHuntFound={wordHuntFound}
-      wordHuntLife={wordHuntLife}
-      wordHuntPlayerLives={wordHuntPlayerLives}
-      wordHuntEliminatedPlayers={wordHuntEliminatedPlayers}
       onWordHuntGuess={hostPlaying ? handleWordHuntGuess : undefined}
 
       // Player experience (for keyboard trail inactivity threshold)

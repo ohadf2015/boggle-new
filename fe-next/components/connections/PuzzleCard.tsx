@@ -431,7 +431,11 @@ export default function PuzzleCard({
               </p>
             )}
 
-            {isGaveUp && (
+            {/* Next button on BOTH correct + gaveUp so the rating CTA stays
+                on screen long enough for the player to actually tap it. Auto-
+                advance was hiding the prompt in 1.2s on correct answers
+                (ConnectionsGame.tsx) — feedback signal is now user-driven. */}
+            {isResolved && (
               <motion.button
                 onClick={onNext}
                 whileHover={{ scale: 1.05, y: -1 }}

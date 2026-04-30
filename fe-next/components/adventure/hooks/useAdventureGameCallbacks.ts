@@ -60,6 +60,7 @@ interface UseAdventureGameCallbacksParams {
   setShowLevelComplete: (v: boolean) => void;
   setRetriesUsed: React.Dispatch<React.SetStateAction<number>>;
   setShowStoryBeat: (v: boolean) => void;
+  setIsPaused: (v: boolean) => void;
   // Translation
   t: (key: string) => string;
   // Hints tracking ref value
@@ -90,7 +91,7 @@ export function useAdventureGameCallbacks(params: UseAdventureGameCallbacksParam
     handleEarnAchievement, upgradeRetryScoreRetention,
     onLevelComplete, totalStars, clearSelection, resetGame, startGame,
     storyBeat, showLootOrComplete,
-    setShowLevelComplete, setRetriesUsed, setShowStoryBeat,
+    setShowLevelComplete, setRetriesUsed, setShowStoryBeat, setIsPaused,
     t, hintsUsed,
     resetWordSubmitState, resetFlashChallenge,
     completionSaveFailedRef, retrySaveCompletion,
@@ -188,6 +189,7 @@ export function useAdventureGameCallbacks(params: UseAdventureGameCallbacksParam
 
   const handleRetry = useCallback(() => {
     setShowLevelComplete(false);
+    setIsPaused(false);
     setRetriesUsed(prev => prev + 1);
     resetRewards();
     clearSelection();
@@ -206,7 +208,7 @@ export function useAdventureGameCallbacks(params: UseAdventureGameCallbacksParam
       startGame();
     }
   }, [resetGame, startGame, clearSelection, resetBossHealth, resetPlayerHealth, resetCinematics,
-    resetRewards, upgradeRetryScoreRetention, gameScore, setShowLevelComplete, setRetriesUsed, isBossLevel,
+    resetRewards, upgradeRetryScoreRetention, gameScore, setShowLevelComplete, setIsPaused, setRetriesUsed, isBossLevel,
     resetWordSubmitState, resetFlashChallenge]);
 
   return { handleCinematicComplete, handleContinue, handleRetry };

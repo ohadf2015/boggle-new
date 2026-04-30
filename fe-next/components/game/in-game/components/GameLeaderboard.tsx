@@ -157,7 +157,7 @@ const LeaderboardRow = memo<LeaderboardRowProps>(function LeaderboardRow({
             size="lg"
           />
         )}
-        <div className="text-right relative min-w-[50px]">
+        <div className="text-end relative min-w-[50px]">
           {/* Score delta floating */}
           {showScoreDelta && scoreChange > 0 && (
             <div className="absolute -top-3 inset-e-0 text-[10px] font-black text-green-600 animate-bounce">

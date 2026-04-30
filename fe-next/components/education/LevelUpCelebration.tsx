@@ -110,7 +110,7 @@ const LevelUpCelebration = memo<LevelUpCelebrationProps>(
               transition={{ delay: 0.2, type: 'spring', stiffness: 200, damping: 12 }}
             >
               <SilentVideo
-                src="/mascot/celebration.mp4"
+                src="/mascot/celebration.webp"
                 width={96}
                 height={96}
                 className="mx-auto drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]"

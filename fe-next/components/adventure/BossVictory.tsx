@@ -302,7 +302,7 @@ const BossVictory = memo<BossVictoryProps>(
               transition={{ delay: 0.7, type: 'spring', stiffness: 200, damping: 14 }}
             >
               <SilentVideo
-                src={isVictory ? '/mascot/flexing.mp4' : '/mascot/encouraging.mp4'}
+                src={isVictory ? '/mascot/flexing.webp' : '/mascot/encouraging.webp'}
                 width={80}
                 height={80}
                 className="drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]"

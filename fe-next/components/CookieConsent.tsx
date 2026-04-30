@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { cn } from '@/lib/utils';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
 import {
@@ -22,6 +23,7 @@ import {
  */
 export default function CookieConsent() {
   const { t, language } = useLanguage();
+  const { isOnCrazyGamesPlatform } = useCrazyGames();
   const [visible, setVisible] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
   const [analytics, setAnalytics] = useState(false);
@@ -84,6 +86,9 @@ export default function CookieConsent() {
     return () => { document.body.style.paddingBottom = ''; };
   }, [visible]);
 
+  // CrazyGames embeds its own platform-level consent UI before our iframe loads.
+  // A second banner inside the iframe violates the embed UX expectation.
+  if (isOnCrazyGamesPlatform) return null;
   if (!visible) return null;
 
   const isRtl = language === 'he';
@@ -95,7 +100,7 @@ export default function CookieConsent() {
       aria-label={t('cookieConsent.title')}
       aria-modal="true"
       className={cn(
-        'fixed bottom-[calc(4rem+3.5rem+var(--admob-banner-height,0px))] sm:bottom-[var(--admob-banner-height,0px)] inset-x-0 z-[110] p-3 sm:p-4',
+        'fixed bottom-[var(--bottom-stack-height,0px)] inset-x-0 z-[110] p-3 sm:p-4',
         'bg-neo-navy border-t-4 border-neo-black',
         'animate-fade-in-up'
       )}
