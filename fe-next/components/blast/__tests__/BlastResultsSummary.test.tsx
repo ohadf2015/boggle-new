@@ -276,6 +276,28 @@ describe('BlastResultsSummary', () => {
     );
     expect(screen.queryByTestId('blast-target-word-missed')).toBeNull();
     expect(screen.queryByTestId('blast-target-word-found')).toBeNull();
+    expect(screen.queryByTestId('blast-target-word-cascade-credit')).toBeNull();
+  });
+
+  it('shows positive cascade-credit line when wave succeeded but target missed', () => {
+    render(
+      <BlastResultsSummary
+        results={makeResults({
+          clearPercentage: 95,
+          stars: 3,
+          targetWord: 'CRYSTAL',
+          targetWordFound: false,
+        })}
+        t={t}
+        onPlayAgain={noop}
+        onQuit={noop}
+      />,
+    );
+    const credit = screen.getByTestId('blast-target-word-cascade-credit');
+    expect(credit.textContent).toContain('blast.objective.targetWordMissed');
+    expect(credit.textContent).toContain('CRYSTAL');
+    // Fail banner should NOT render on a winning wave
+    expect(screen.queryByTestId('blast-results-fail-banner')).toBeNull();
   });
 
   it('renders sticky CTA footer containing play-again + home', () => {

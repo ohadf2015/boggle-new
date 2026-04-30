@@ -162,6 +162,26 @@ export function BlastResultsSummary({
         </AdaptiveMotion.div>
       )}
 
+      {/* Target-word missed but wave succeeded — positive frame so player feels
+          informed, not robbed. Mirrors LLM consensus: cascades that clear the
+          target should read as a friendly assist, not a stolen win. */}
+      {!didFail && results.targetWord && !results.targetWordFound && (
+        <AdaptiveMotion.div
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ type: 'spring', stiffness: 380, damping: 22, delay: 0.05 }}
+          className={cn(
+            'inline-flex items-center gap-2 px-3 py-1.5',
+            'rounded-neo border-2 border-neo-black/30',
+            'bg-neo-navy-light text-neo-cream',
+            'font-neo-body font-bold text-xs',
+          )}
+          data-testid="blast-target-word-cascade-credit"
+        >
+          {t('blast.objective.targetWordMissed', { word: results.targetWord })}
+        </AdaptiveMotion.div>
+      )}
+
       {/* Score card */}
       <AdaptiveMotion.div
         initial={{ scale: 0.8, opacity: 0 }}
