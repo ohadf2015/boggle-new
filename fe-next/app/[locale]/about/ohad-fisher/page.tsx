@@ -87,7 +87,6 @@ export default async function OhadFisherPage({ params }: PageProps) {
         sameAs: [
             `${SITE_URL}/about/ohad-fisher`,
             `${SITE_URL}/editorial-policy`,
-            'https://github.com/lexiclash',
         ],
         knowsAbout: ['Word Games', 'Cognitive Science', 'Linguistics', 'Brain Training', 'Game Design', 'Multilingual Learning'],
         worksFor: {
@@ -135,9 +134,6 @@ export default async function OhadFisherPage({ params }: PageProps) {
                             <div className="mt-3 flex flex-wrap justify-center gap-2 sm:justify-start">
                                 <a href="mailto:editor@lexiclash.live" className="rounded-neo border-3 border-black bg-neo-cyan px-3 py-1 font-neo-body text-xs font-bold text-black shadow-hard-sm hover:shadow-hard">
                                     editor@lexiclash.live
-                                </a>
-                                <a href="https://github.com/lexiclash" rel="me noopener" target="_blank" className="rounded-neo border-3 border-black bg-neo-lime px-3 py-1 font-neo-body text-xs font-bold text-black shadow-hard-sm hover:shadow-hard">
-                                    GitHub
                                 </a>
                                 <Link href={`/${locale}/editorial-policy`} className="rounded-neo border-3 border-black bg-neo-pink px-3 py-1 font-neo-body text-xs font-bold text-black shadow-hard-sm hover:shadow-hard">
                                     Editorial Policy

@@ -93,7 +93,6 @@ export function BlogPostingJsonLd({
             sameAs: [
                 'https://www.lexiclash.live/about/ohad-fisher',
                 'https://www.lexiclash.live/editorial-policy',
-                'https://github.com/lexiclash',
             ],
             knowsAbout: [
                 'Word Games',
