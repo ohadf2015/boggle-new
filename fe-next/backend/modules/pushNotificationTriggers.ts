@@ -9,6 +9,29 @@ import { translatePush, type PushLocale, isPushLocale } from '../utils/pushTrans
 import { sendToUser, type FCMPayload } from './fcmService';
 import { mascotImageUrl } from '../services/pushNotificationService';
 import { getSupabase, isSupabaseConfigured } from './supabase';
+import { shouldSendDirectMessagePush } from './pushDedup';
+
+// Translation table for achievement display names. Lazy-required to avoid pulling
+// the full 10k-line translations bundle into modules that don't need it.
+let cachedTranslations: Record<string, { achievements?: Record<string, { name?: string }> }> | null = null;
+function getTranslations() {
+  if (cachedTranslations) return cachedTranslations;
+  cachedTranslations = require('../../translations/index.js').translations;
+  return cachedTranslations!;
+}
+
+/**
+ * Resolve a single achievement key (e.g. 'WORD_MASTER') to a display name in
+ * the recipient's locale. Falls back to English, then to a humanized key.
+ */
+function resolveAchievementName(key: string, locale: PushLocale): string {
+  const t = getTranslations();
+  const localized = t[locale]?.achievements?.[key]?.name;
+  if (localized) return localized;
+  const en = t.en?.achievements?.[key]?.name;
+  if (en) return en;
+  return key.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+}
 
 export type PushNotificationType =
   | 'friend_request'
@@ -273,16 +296,21 @@ export async function notifyTurnReminder(
 }
 
 /**
- * Notify user of an achievement unlock
+ * Notify user of a single achievement unlock.
+ * Accepts an achievement KEY (e.g. 'WORD_MASTER') — resolves the localized
+ * display name from the user's profile.language. Pre-localized name strings
+ * are still accepted (no translation table match → used verbatim) for
+ * backwards compat with legacy call sites and tests.
  */
 export async function notifyAchievement(
   toUserId: string,
-  achievementName: string
+  achievementKeyOrName: string
 ): Promise<void> {
   const locale = await getUserLocale(toUserId);
+  const name = resolveAchievementName(achievementKeyOrName, locale);
   return triggerPush(toUserId, 'achievement', {
     title: translatePush(locale, 'achievement.title'),
-    body: translatePush(locale, 'achievement.body', { name: achievementName }),
+    body: translatePush(locale, 'achievement.body', { name }),
     imageUrl: mascotImageUrl('mindblown'),
     data: {
       type: 'achievement',
@@ -292,7 +320,54 @@ export async function notifyAchievement(
 }
 
 /**
- * Notify user of a new direct message (N-1)
+ * Notify user of multiple achievement unlocks in a single push.
+ * Coalesces N unlocks into one notification — prevents the "3 pushes for one
+ * game-end" UX bug where every achievement fires its own banner.
+ *
+ * 1 key  → "You earned: {name}"
+ * 2 keys → "You earned: {a} & {b}"
+ * 3+ keys → "You earned: {a}, {b} +{rest} more"
+ *
+ * No-op for empty arrays.
+ */
+export async function notifyAchievementsBatch(
+  toUserId: string,
+  achievementKeys: string[]
+): Promise<void> {
+  if (achievementKeys.length === 0) return;
+  if (achievementKeys.length === 1) {
+    return notifyAchievement(toUserId, achievementKeys[0]);
+  }
+  const locale = await getUserLocale(toUserId);
+  const names = achievementKeys.map((k) => resolveAchievementName(k, locale));
+  const count = names.length;
+  const title = translatePush(locale, 'achievement.titleMulti', { count });
+  const body = count === 2
+    ? translatePush(locale, 'achievement.bodyTwo', { a: names[0], b: names[1] })
+    : translatePush(locale, 'achievement.bodyMore', {
+        a: names[0],
+        b: names[1],
+        rest: count - 2,
+      });
+  return triggerPush(toUserId, 'achievement', {
+    title,
+    body,
+    imageUrl: mascotImageUrl('mindblown'),
+    data: {
+      type: 'achievement',
+      deepLink: '/adventure/achievements',
+    },
+  }, 'both');
+}
+
+/**
+ * Notify user of a new direct message (N-1).
+ *
+ * Push is coalesced via `shouldSendDirectMessagePush`: first message from a
+ * given sender pushes; subsequent messages within the 60s window only land in
+ * the in-app notifications row (so history stays complete) without firing a
+ * second banner. Caller-side `modeOverride='in_app_only'` (recipient online)
+ * skips the dedup gate since no push is being attempted anyway.
  */
 export async function notifyDirectMessage(
   toUserId: string,
@@ -309,6 +384,13 @@ export async function notifyDirectMessage(
     ? `/friends?tab=messages&friendUserId=${fromUserId}`
     : '/friends?tab=messages';
 
+  // Decide the actual delivery mode. Coalesce only when we'd otherwise push.
+  let mode: DeliveryMode = modeOverride ?? 'both';
+  if (mode === 'both' && fromUserId) {
+    const allow = await shouldSendDirectMessagePush(toUserId, fromUserId);
+    if (!allow) mode = 'in_app_only';
+  }
+
   const locale = await getUserLocale(toUserId);
   return triggerPush(toUserId, 'direct_message', {
     title: translatePush(locale, 'directMessage.title', { sender: fromUsername }),
@@ -318,7 +400,7 @@ export async function notifyDirectMessage(
       type: 'direct_message',
       deepLink,
     },
-  }, modeOverride ?? 'both', fromUserId);
+  }, mode, fromUserId);
 }
 
 /**

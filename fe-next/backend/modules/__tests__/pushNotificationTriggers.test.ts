@@ -10,6 +10,7 @@ import {
   notifyGameInvite,
   notifyDailyChallengeReminder,
   notifyAchievement,
+  notifyAchievementsBatch,
   notifyLevelUp,
   notifyChallengeDeclined,
   notifyChallengeAccepted,
@@ -26,6 +27,15 @@ const { mockSendToUser } = vi.hoisted(() => {
 });
 vi.mock('../fcmService', () => ({
   sendToUser: (...args: unknown[]) => mockSendToUser(...args),
+}));
+
+// Mock push dedup — Redis-backed in real code; tests control allow/deny.
+const { mockShouldSendDM } = vi.hoisted(() => ({
+  mockShouldSendDM: vi.fn(),
+}));
+vi.mock('../pushDedup', () => ({
+  shouldSendDirectMessagePush: (...args: unknown[]) => mockShouldSendDM(...args),
+  clearDirectMessagePushDedup: vi.fn(),
 }));
 
 // Mock supabase for notification history + profile locale lookup
@@ -65,6 +75,7 @@ describe('pushNotificationTriggers', () => {
     mockInsert.mockResolvedValue({ error: null });
     mockMaybeSingle.mockResolvedValue({ data: { language: 'en' }, error: null });
     mockSendToUser.mockResolvedValue(undefined);
+    mockShouldSendDM.mockResolvedValue(true);
   });
 
   describe('notifyFriendRequest', () => {
@@ -318,6 +329,122 @@ describe('pushNotificationTriggers', () => {
     it('does not throw on FCM failure', async () => {
       mockSendToUser.mockRejectedValue(new Error('FCM down'));
       await expect(notifySeasonStart('uid', 5, 4)).resolves.toBeUndefined();
+    });
+  });
+
+  describe('notifyAchievement: locale-aware name resolution', () => {
+    it('resolves localized achievement name from translation key', async () => {
+      mockMaybeSingle.mockResolvedValue({ data: { language: 'he' }, error: null });
+      await notifyAchievement('uid', 'WORD_MASTER');
+
+      // Hebrew achievement table: WORD_MASTER → "אדון המילים"
+      expect(mockSendToUser).toHaveBeenCalledWith('uid', expect.objectContaining({
+        body: expect.stringContaining('אדון המילים'),
+      }));
+    });
+
+    it('falls back to English achievement name when locale missing entry', async () => {
+      mockMaybeSingle.mockResolvedValue({ data: { language: 'en' }, error: null });
+      await notifyAchievement('uid', 'WORD_MASTER');
+
+      expect(mockSendToUser).toHaveBeenCalledWith('uid', expect.objectContaining({
+        body: 'You earned: Word Master',
+      }));
+    });
+
+    it('humanizes unknown keys (no translation entry)', async () => {
+      // Defensive: unknown_test_key → "Unknown Test Key"
+      await notifyAchievement('uid', 'UNKNOWN_TEST_KEY');
+
+      expect(mockSendToUser).toHaveBeenCalledWith('uid', expect.objectContaining({
+        body: 'You earned: UNKNOWN TEST KEY',
+      }));
+    });
+  });
+
+  describe('notifyAchievementsBatch: coalesce multi-unlock', () => {
+    it('no-ops on empty array', async () => {
+      await notifyAchievementsBatch('uid', []);
+      expect(mockSendToUser).not.toHaveBeenCalled();
+      expect(mockInsert).not.toHaveBeenCalled();
+    });
+
+    it('falls back to single-push copy for one key', async () => {
+      await notifyAchievementsBatch('uid', ['WORD_MASTER']);
+
+      expect(mockSendToUser).toHaveBeenCalledTimes(1);
+      expect(mockSendToUser).toHaveBeenCalledWith('uid', expect.objectContaining({
+        title: 'Achievement Unlocked!',
+        body: 'You earned: Word Master',
+      }));
+    });
+
+    it('uses two-key copy for exactly two unlocks', async () => {
+      await notifyAchievementsBatch('uid', ['WORD_MASTER', 'COMBO_KING']);
+
+      expect(mockSendToUser).toHaveBeenCalledTimes(1);
+      expect(mockSendToUser).toHaveBeenCalledWith('uid', expect.objectContaining({
+        title: '2 Achievements Unlocked!',
+        body: 'You earned: Word Master & Combo King',
+      }));
+    });
+
+    it('coalesces 3+ unlocks into a single "+N more" push', async () => {
+      await notifyAchievementsBatch('uid', [
+        'WORD_MASTER',
+        'COMBO_KING',
+        'PERFECTIONIST',
+        'LEXICON',
+      ]);
+
+      expect(mockSendToUser).toHaveBeenCalledTimes(1);
+      expect(mockSendToUser).toHaveBeenCalledWith('uid', expect.objectContaining({
+        title: '4 Achievements Unlocked!',
+        body: 'You earned: Word Master, Combo King +2 more',
+      }));
+    });
+
+    it('writes a single in-app row for the batched push', async () => {
+      await notifyAchievementsBatch('uid', ['WORD_MASTER', 'COMBO_KING']);
+      expect(mockInsert).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('notifyDirectMessage: push coalesce window', () => {
+    it('pushes when dedup gate allows (first message in window)', async () => {
+      mockShouldSendDM.mockResolvedValue(true);
+      await notifyDirectMessage('recipient', 'Sender', 'hi', 'sender-uid');
+
+      expect(mockShouldSendDM).toHaveBeenCalledWith('recipient', 'sender-uid');
+      expect(mockSendToUser).toHaveBeenCalled();
+      expect(mockInsert).toHaveBeenCalled();
+    });
+
+    it('skips push but still writes in-app row when window holds', async () => {
+      mockShouldSendDM.mockResolvedValue(false);
+      await notifyDirectMessage('recipient', 'Sender', 'second-msg', 'sender-uid');
+
+      expect(mockSendToUser).not.toHaveBeenCalled();
+      // History still written so the in-app messages list reflects every message.
+      expect(mockInsert).toHaveBeenCalled();
+    });
+
+    it('does not consult dedup when caller already requested in_app_only', async () => {
+      // Recipient socket online → caller passes 'in_app_only'. No push attempted,
+      // so no need to claim a dedup slot (would block legitimate push if user
+      // goes offline mid-burst).
+      await notifyDirectMessage('recipient', 'Sender', 'hi', 'sender-uid', 'in_app_only');
+      expect(mockShouldSendDM).not.toHaveBeenCalled();
+      expect(mockSendToUser).not.toHaveBeenCalled();
+      expect(mockInsert).toHaveBeenCalled();
+    });
+
+    it('skips dedup when senderId not provided (legacy path)', async () => {
+      // Without a sender-id we can't key the window; fall back to the prior
+      // behaviour (always push) rather than collapsing all anonymous DMs.
+      await notifyDirectMessage('recipient', 'Sender', 'hi');
+      expect(mockShouldSendDM).not.toHaveBeenCalled();
+      expect(mockSendToUser).toHaveBeenCalled();
     });
   });
 });

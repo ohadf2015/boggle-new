@@ -8,7 +8,7 @@ import type { Server } from 'socket.io';
 import type { WordDetail } from '@/shared/types';
 import type { GameState } from '../../modules/gameState/types';
 import { processGameResults, isSupabaseConfigured } from '../../modules/supabaseServer';
-import { notifyLevelUp, notifyAchievement } from '../../modules/pushNotificationTriggers';
+import { notifyLevelUp, notifyAchievementsBatch } from '../../modules/pushNotificationTriggers';
 import type { GameResultsOutput } from '../../modules/supabase/gameProcessing';
 import type { UserAuthInfo } from '../../modules/supabase/client';
 import { updateQuestProgress } from '../../modules/weeklyQuestManager';
@@ -340,13 +340,11 @@ function emitLifetimeAchievements(
         }
       }
       if (userData?.authUserId) {
-        for (const achievement of achievements) {
-          const displayName = (achievement.key as string)
-            .toLowerCase()
-            .replace(/_/g, ' ')
-            .replace(/\b\w/g, (c: string) => c.toUpperCase());
-          notifyAchievement(userData.authUserId, displayName);
-        }
+        // Pass raw keys so the trigger resolves locale-aware names from the
+        // shared achievements translation table; batch coalesces N unlocks
+        // into a single push (was N separate banners pre-batch).
+        const keys = achievements.map((a) => a.key as string);
+        notifyAchievementsBatch(userData.authUserId, keys);
       }
     }
   }

@@ -38,9 +38,13 @@ const STRINGS: Record<PushLocale, Dict> = {
 
     'achievement.title': 'Achievement Unlocked!',
     'achievement.body': 'You earned: {name}',
+    'achievement.titleMulti': '{count} Achievements Unlocked!',
+    'achievement.bodyTwo': 'You earned: {a} & {b}',
+    'achievement.bodyMore': 'You earned: {a}, {b} +{rest} more',
 
     'directMessage.title': 'Message from {sender}',
     'directMessage.body': '{preview}',
+    'directMessage.bodyMulti': '{count} new messages',
 
     'challengeAccepted.title': 'Challenge Accepted!',
     'challengeAccepted.body': '{sender} accepted your challenge — join now!',
@@ -86,9 +90,13 @@ const STRINGS: Record<PushLocale, Dict> = {
 
     'achievement.title': '!הישג נפתח',
     'achievement.body': '{name} :זכית ב',
+    'achievement.titleMulti': '!{count} הישגים נפתחו',
+    'achievement.bodyTwo': '{a} ו-{b} :זכית ב',
+    'achievement.bodyMore': 'ועוד {rest} {a}, {b} :זכית ב',
 
     'directMessage.title': '{sender} הודעה מ',
     'directMessage.body': '{preview}',
+    'directMessage.bodyMulti': 'הודעות חדשות {count}',
 
     'challengeAccepted.title': '!האתגר התקבל',
     'challengeAccepted.body': '!קיבל/ה את האתגר שלך — הצטרף/י עכשיו {sender}',
@@ -134,9 +142,13 @@ const STRINGS: Record<PushLocale, Dict> = {
 
     'achievement.title': 'Prestation upplåst!',
     'achievement.body': 'Du fick: {name}',
+    'achievement.titleMulti': '{count} prestationer upplåsta!',
+    'achievement.bodyTwo': 'Du fick: {a} & {b}',
+    'achievement.bodyMore': 'Du fick: {a}, {b} +{rest} till',
 
     'directMessage.title': 'Meddelande från {sender}',
     'directMessage.body': '{preview}',
+    'directMessage.bodyMulti': '{count} nya meddelanden',
 
     'challengeAccepted.title': 'Utmaning accepterad!',
     'challengeAccepted.body': '{sender} accepterade din utmaning — gå med nu!',
@@ -182,9 +194,13 @@ const STRINGS: Record<PushLocale, Dict> = {
 
     'achievement.title': '実績解除！',
     'achievement.body': '獲得：{name}',
+    'achievement.titleMulti': '{count}個の実績解除！',
+    'achievement.bodyTwo': '獲得：{a}・{b}',
+    'achievement.bodyMore': '獲得：{a}、{b} 他{rest}個',
 
     'directMessage.title': '{sender}さんからのメッセージ',
     'directMessage.body': '{preview}',
+    'directMessage.bodyMulti': '新着メッセージ{count}件',
 
     'challengeAccepted.title': '対戦が承認されました！',
     'challengeAccepted.body': '{sender}さんが対戦を承認しました — 今すぐ参加！',
@@ -230,9 +246,13 @@ const STRINGS: Record<PushLocale, Dict> = {
 
     'achievement.title': '¡Logro desbloqueado!',
     'achievement.body': 'Obtuviste: {name}',
+    'achievement.titleMulti': '¡{count} logros desbloqueados!',
+    'achievement.bodyTwo': 'Obtuviste: {a} y {b}',
+    'achievement.bodyMore': 'Obtuviste: {a}, {b} +{rest} más',
 
     'directMessage.title': 'Mensaje de {sender}',
     'directMessage.body': '{preview}',
+    'directMessage.bodyMulti': '{count} mensajes nuevos',
 
     'challengeAccepted.title': '¡Reto aceptado!',
     'challengeAccepted.body': '¡{sender} aceptó tu reto — únete ahora!',
