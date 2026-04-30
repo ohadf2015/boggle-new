@@ -79,6 +79,15 @@ const TierPositionPanel: React.FC<Props> = memo(({ position, userId, className }
         </div>
       )}
 
+      {isGrandmaster && (
+        <div
+          data-testid="tier-throne-label"
+          className="inline-block mt-2 px-2 py-0.5 rounded-neo border-neo text-xs font-bold bg-neo-yellow text-neo-black"
+        >
+          👑 {t('leaderboard.tier.topTierDefend')}
+        </div>
+      )}
+
       <ul role="list" className="mt-3 space-y-1">
         {position.neighbors.map((n) => (
           <li

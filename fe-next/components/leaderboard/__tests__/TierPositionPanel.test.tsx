@@ -84,3 +84,24 @@ describe('TierPositionPanel — Stone tier', () => {
     expect(screen.getByTestId('tier-climb-cta')).toBeInTheDocument();
   });
 });
+
+const grandmasterPosition: TierPosition = {
+  tier_id: 'grandmaster',
+  rank_in_tier: 7,
+  tier_population: 42,
+  neighbors: [
+    { player_id: 'gm1', display_name: 'topGM', total_score: 850000, avatar_image: null, avatar_config: null, rank_in_tier: 1 },
+  ],
+};
+
+describe('TierPositionPanel — Grandmaster tier', () => {
+  it('hides the percentile pill', () => {
+    render(<TierPositionPanel position={grandmasterPosition} userId="me" />);
+    expect(screen.queryByTestId('tier-percentile')).toBeNull();
+  });
+
+  it('shows the defend-throne label', () => {
+    render(<TierPositionPanel position={grandmasterPosition} userId="me" />);
+    expect(screen.getByTestId('tier-throne-label')).toBeInTheDocument();
+  });
+});
