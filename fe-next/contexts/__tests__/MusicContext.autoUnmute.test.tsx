@@ -1,16 +1,17 @@
 import { vi, type Mock, } from 'vitest';
 /**
- * Tests for MusicContext auto-unmute on game start
+ * Tests for MusicContext auto-unmute on game start.
  *
- * BUG: When user starts Word Hunt, music plays but is muted (volume 0)
- * until user manually clicks the sound controller.
+ * Two intents reconciled here:
+ *  1. Stale-mute recovery — if `isMuted=true` was persisted from a prior session,
+ *     the FIRST track played after unlock should auto-unmute so the user hears music.
+ *  2. In-session mute persistence — once the user has heard music and explicitly
+ *     mutes mid-session, subsequent `fadeToTrack` calls (e.g. route changes,
+ *     game-mode transitions) MUST keep mute. Earlier code unmuted on every
+ *     `fadeToTrack`, which made mute "come back" after navigation.
  *
- * Root cause: `isMuted` is persisted to localStorage from previous session.
- * When `fadeToTrack` runs, it uses `targetVolume = isMutedRef.current ? 0 : volumeRef.current`
- * If isMuted was true in localStorage, targetVolume is 0 and music plays silently.
- *
- * Expected behavior: When user explicitly starts a game (user gesture via unlockAudio),
- * audio should auto-unmute so they can hear the game music.
+ * Implementation guard: a one-shot ref (`hasAutoUnmuted`) lets auto-unmute fire once
+ * per provider lifetime, after which mute state is honored verbatim.
  */
 
 import React from 'react';
@@ -233,6 +234,91 @@ describe('MusicContext - Auto Unmute on Game Start', () => {
 
       // AND: isMuted should be false after game start (auto-unmuted)
       expect(screen.getByTestId('is-muted').textContent).toBe('unmuted');
+    });
+
+    it('should persist in-session mute across track changes (no auto-unmute on subsequent fadeToTrack)', async () => {
+      // GIVEN: User starts a game (unlocks audio), mutes mid-session,
+      // then navigates to another screen which calls fadeToTrack with a different track.
+      // EXPECTED: Mute persists. Previously fadeToTrack always auto-unmuted, causing
+      // the user-reported "mute keeps coming back" bug.
+
+      function TestNavigateAfterMute(): React.ReactElement {
+        const { fadeToTrack, TRACKS, audioUnlocked, unlockAudio, isMuted, toggleMute } = useMusic();
+        const [phase, setPhase] = React.useState<'ready' | 'playing' | 'lobby'>('ready');
+
+        const handleStart = React.useCallback(() => {
+          unlockAudio();
+          setPhase('playing');
+        }, [unlockAudio]);
+
+        const handleNavigate = React.useCallback(() => {
+          setPhase('lobby');
+        }, []);
+
+        React.useEffect(() => {
+          if (phase === 'playing') fadeToTrack(TRACKS.IN_GAME, 800, 800);
+          if (phase === 'lobby') fadeToTrack(TRACKS.LOBBY, 800, 800);
+        }, [phase, fadeToTrack, TRACKS]);
+
+        return (
+          <div>
+            <div data-testid="audio-unlocked">{audioUnlocked ? 'unlocked' : 'locked'}</div>
+            <div data-testid="is-muted">{isMuted ? 'muted' : 'unmuted'}</div>
+            <div data-testid="phase">{phase}</div>
+            <button data-testid="start" onClick={handleStart}>Start</button>
+            <button data-testid="mute" onClick={toggleMute}>Mute</button>
+            <button data-testid="navigate" onClick={handleNavigate}>Navigate</button>
+          </div>
+        );
+      }
+
+      render(
+        <MusicProvider>
+          <TestNavigateAfterMute />
+        </MusicProvider>
+      );
+
+      // Start game — audio unlocks, in-game track begins.
+      await act(async () => {
+        fireEvent.click(screen.getByTestId('start'));
+      });
+      await waitFor(() => {
+        expect(screen.getByTestId('audio-unlocked').textContent).toBe('unlocked');
+      });
+      await act(async () => {
+        vi.advanceTimersByTime(300);
+      });
+      await waitFor(() => {
+        expect(mockState.play).toHaveBeenCalled();
+      });
+
+      // User mutes mid-game.
+      await act(async () => {
+        fireEvent.click(screen.getByTestId('mute'));
+      });
+      expect(screen.getByTestId('is-muted').textContent).toBe('muted');
+
+      // Reset mocks so we observe ONLY the navigation fade.
+      mockState.fade.mockClear();
+      mockState.play.mockClear();
+      mockState.lastFadeToVolume = -1;
+
+      // Navigate — triggers fadeToTrack for a different track.
+      await act(async () => {
+        fireEvent.click(screen.getByTestId('navigate'));
+      });
+      await act(async () => {
+        vi.advanceTimersByTime(2000);
+      });
+
+      // Mute MUST persist.
+      expect(screen.getByTestId('is-muted').textContent).toBe('muted');
+
+      // The navigation fade should target volume 0 (muted), not the user's volume.
+      // If a fade ran, it must be to 0; otherwise lastFadeToVolume stays at the -1 sentinel.
+      if (mockState.fade.mock.calls.length > 0) {
+        expect(mockState.lastFadeToVolume).toBe(0);
+      }
     });
 
     it('should play at correct volume when already unmuted', async () => {

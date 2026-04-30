@@ -25,16 +25,28 @@ router.get('/', async (req: AdminRequest, res: Response): Promise<void> => {
     const search = (req.query.search as string) || null;
     const limit = Math.min(parseInt(req.query.limit as string) || 100, 500);
     const offset = parseInt(req.query.offset as string) || 0;
+    // status filter: 'all' | 'verified' | 'needs_review' | 'pending' | 'rejected_type' | 'not_found'
+    const status = (req.query.status as string) || 'all';
 
     let query = supabase
       .from('invalid_word_submissions')
-      .select('id, word, language, submission_count, player_appeal_count, reason, first_submitted_at, last_submitted_at, first_appealed_at, last_appealed_at, approved_at, approved_by', { count: 'exact' })
+      .select(
+        'id, word, language, submission_count, player_appeal_count, reason, first_submitted_at, last_submitted_at, first_appealed_at, last_appealed_at, approved_at, approved_by, ' +
+        'verification_status, verification_source, verification_word_type, verification_url, ' +
+        'milog_status, milog_word_type, milog_url',
+        { count: 'exact' }
+      )
       .is('approved_at', null)
       .gte('submission_count', minCount)
       .order('submission_count', { ascending: false });
 
     if (language) query = query.eq('language', language);
     if (search) query = query.ilike('word', `%${search}%`);
+    if (status !== 'all') {
+      // Match either of the per-language status columns. Hebrew uses milog_*, others use verification_*.
+      // For 'verified' we want both Hebrew Milog-verified AND non-Hebrew Wiktionary-verified.
+      query = query.or(`verification_status.eq.${status},milog_status.eq.${status}`);
+    }
     query = query.range(offset, offset + limit - 1);
 
     const { data, error, count } = await query;
@@ -187,6 +199,7 @@ router.post('/auto-promote', async (req: AdminRequest, res: Response): Promise<v
       promoted: result.promoted, failed: result.failed,
       submissionBased: result.words.submissionBased.length,
       milogBased: result.words.milogBased.length,
+      wiktionaryBased: result.words.wiktionaryBased.length,
     });
 
     if (!success) {
@@ -237,9 +250,20 @@ router.get('/auto-promote-stats', async (_req: AdminRequest, res: Response): Pro
       .gte('submission_count', 10);
     if (candidateError) throw candidateError;
 
+    // Verified candidates ready for one-click promotion (Milog he + Wiktionary en).
+    const { count: verifiedCandidatesCount, error: verifiedError } = await supabase
+      .from('invalid_word_submissions')
+      .select('*', { count: 'exact', head: true })
+      .or('verification_status.eq.verified,milog_status.eq.verified')
+      .is('approved_at', null)
+      .is('auto_promoted_at', null)
+      .is('rejected_at', null);
+    if (verifiedError) throw verifiedError;
+
     res.json({
       autoPromoted: autoPromotedCount || 0,
       candidates: candidateCount || 0,
+      verifiedCandidates: verifiedCandidatesCount || 0,
       bySource: sourceCounts,
     });
   } catch (error) {

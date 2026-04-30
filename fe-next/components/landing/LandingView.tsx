@@ -33,10 +33,6 @@ import { LandingLeaderboardPreview } from './LandingLeaderboardPreview';
 
 // Below-the-fold sections — lazy load to speed up initial render
 // LiveActivityTicker moved out to reduce landing clutter
-const UrgencyCard = dynamic(() => import('./UrgencyCard').then(m => m.UrgencyCard), {
-  ssr: false,
-  loading: () => <div className="h-20 w-full rounded-neo bg-neo-navy-light/50 animate-pulse" />,
-});
 // Engagement widgets — only high-value conditional ones on landing
 const AnonymousTeaserWidgets = dynamic(() => import('./AnonymousTeaserWidgets').then(m => m.AnonymousTeaserWidgets), {
   ssr: false,
@@ -209,12 +205,8 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
           </div>
         )}
 
-        {/* Engagement widgets — single high-value widget to avoid stacking noise */}
-        {isAuthenticated ? (
-          <div className="flex flex-col gap-4 max-w-4xl mx-auto w-full">
-            <UrgencyCard />
-          </div>
-        ) : hideExternalAuth ? null : (
+        {/* Engagement widgets — anonymous teasers only; authenticated urgency banner removed */}
+        {!isAuthenticated && !hideExternalAuth && (
           <AnonymousTeaserWidgets onSignUpClick={() => setShowAuthModal(true)} />
         )}
 

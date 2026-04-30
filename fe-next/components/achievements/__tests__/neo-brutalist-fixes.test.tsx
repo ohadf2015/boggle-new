@@ -76,7 +76,7 @@ vi.mock('../AchievementIcon', () => ({
   AchievementIcon: ({ achievementKey }: { achievementKey: string }) => <span data-testid="achievement-icon">{achievementKey}</span>,
 }));
 vi.mock('@/utils/achievementTiers', () => ({
-  calculateTier: () => 'BRONZE',
+  calculateTier: () => null,
   TIER_COLORS: {
     BRONZE: { bg: '#CD7F32', border: '#8B5A2B', text: '#000000', glow: '' },
     SILVER: { bg: '#C0C0C0', border: '#808080', text: '#000000', glow: '' },
@@ -84,6 +84,15 @@ vi.mock('@/utils/achievementTiers', () => ({
     PLATINUM: { bg: '#E5E4E2', border: '#B0B0B0', text: '#000000', glow: '' },
   },
   TIER_ICONS: { BRONZE: '🥉', SILVER: '🥈', GOLD: '🥇', PLATINUM: '💎' },
+  getTierToastStyle: () => ({
+    shadowClass: 'shadow-hard-yellow',
+    sparkleCount: 3,
+    pulseRadius: 7,
+    shineRepeat: 1,
+    confettiCount: 28,
+    confettiSpread: 55,
+    showRarityBadge: false,
+  }),
 }));
 
 // Mock tooltip

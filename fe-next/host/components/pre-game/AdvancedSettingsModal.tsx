@@ -1,6 +1,6 @@
 'use client';
 
-import React, { memo } from 'react';
+import React, { memo, useCallback, useEffect, useState } from 'react';
 import { Settings, Timer, Grid3X3, Type, Globe } from 'lucide-react';
 import { motion } from 'framer-motion';
 import {
@@ -50,8 +50,45 @@ export const AdvancedSettingsModal = memo<AdvancedSettingsModalProps>(function A
   onRoomLanguageChange,
   t,
 }) {
+  const [open, setOpen] = useState(false);
+  const [draftTimer, setDraftTimer] = useState(timerValue);
+  const [draftDifficulty, setDraftDifficulty] = useState<DifficultyLevel>(difficulty);
+  const [draftMinWord, setDraftMinWord] = useState(minWordLength);
+  const [draftLang, setDraftLang] = useState<Language>(roomLanguage);
+
+  // Sync drafts from props each time modal opens, so reopening after Cancel
+  // shows committed state (not stale drafts from previous discarded session).
+  useEffect(() => {
+    if (open) {
+      setDraftTimer(timerValue);
+      setDraftDifficulty(difficulty);
+      setDraftMinWord(minWordLength);
+      setDraftLang(roomLanguage);
+    }
+  }, [open, timerValue, difficulty, minWordLength, roomLanguage]);
+
+  const handleSave = useCallback(() => {
+    setTimerValue(draftTimer);
+    setDifficulty(draftDifficulty);
+    setMinWordLength(draftMinWord);
+    if (draftLang !== roomLanguage) onRoomLanguageChange(draftLang);
+    setOpen(false);
+  }, [
+    draftTimer,
+    draftDifficulty,
+    draftMinWord,
+    draftLang,
+    roomLanguage,
+    setTimerValue,
+    setDifficulty,
+    setMinWordLength,
+    onRoomLanguageChange,
+  ]);
+
+  const handleCancel = useCallback(() => setOpen(false), []);
+
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <motion.button
           whileTap={{ scale: 0.95 }}
@@ -83,8 +120,8 @@ export const AdvancedSettingsModal = memo<AdvancedSettingsModalProps>(function A
               {TIMER_OPTIONS.map((val) => (
                 <ChipButton
                   key={val}
-                  active={timerValue === val}
-                  onClick={() => setTimerValue(val)}
+                  active={draftTimer === val}
+                  onClick={() => setDraftTimer(val)}
                   label={`${val} ${t('hostView.min')}`}
                 />
               ))}
@@ -100,8 +137,8 @@ export const AdvancedSettingsModal = memo<AdvancedSettingsModalProps>(function A
               {DIFFICULTY_OPTIONS.map(({ key, board }) => (
                 <ChipButton
                   key={key}
-                  active={difficulty === key}
-                  onClick={() => setDifficulty(key)}
+                  active={draftDifficulty === key}
+                  onClick={() => setDraftDifficulty(key)}
                   label={board}
                 />
               ))}
@@ -117,8 +154,8 @@ export const AdvancedSettingsModal = memo<AdvancedSettingsModalProps>(function A
               {MIN_WORD_OPTIONS.map((val) => (
                 <ChipButton
                   key={val}
-                  active={minWordLength === val}
-                  onClick={() => setMinWordLength(val)}
+                  active={draftMinWord === val}
+                  onClick={() => setDraftMinWord(val)}
                   label={`${val} ${t('hostView.presetDrawerLetters')}`}
                 />
               ))}
@@ -133,12 +170,12 @@ export const AdvancedSettingsModal = memo<AdvancedSettingsModalProps>(function A
           >
             <div className="grid grid-cols-3 gap-1.5">
               {LANGUAGE_OPTIONS.map(({ code, flag, labelKey }) => {
-                const active = roomLanguage === code;
+                const active = draftLang === code;
                 return (
                   <button
                     key={code}
                     type="button"
-                    onClick={() => onRoomLanguageChange(code)}
+                    onClick={() => setDraftLang(code)}
                     aria-pressed={active}
                     aria-label={t(labelKey)}
                     className={cn(
@@ -155,6 +192,24 @@ export const AdvancedSettingsModal = memo<AdvancedSettingsModalProps>(function A
               })}
             </div>
           </SettingRow>
+        </div>
+
+        {/* Footer: Save / Cancel */}
+        <div className="flex gap-2 px-4 py-3 border-t-2 border-neo-white/10 bg-neo-navy-light/40">
+          <button
+            type="button"
+            onClick={handleCancel}
+            className="flex-1 px-3 py-2 rounded-neo border-2 border-neo-white/20 bg-white/5 text-neo-cream/80 text-sm font-bold uppercase hover:bg-white/10 hover:border-neo-white/30 transition-all"
+          >
+            {t('common.cancel')}
+          </button>
+          <button
+            type="button"
+            onClick={handleSave}
+            className="flex-1 px-3 py-2 rounded-neo border-2 border-neo-black bg-neo-lime text-neo-black text-sm font-black uppercase shadow-hard-sm hover:translate-y-[-1px] active:translate-y-0 active:shadow-hard-pressed transition-all"
+          >
+            {t('common.save')}
+          </button>
         </div>
       </DialogContent>
     </Dialog>

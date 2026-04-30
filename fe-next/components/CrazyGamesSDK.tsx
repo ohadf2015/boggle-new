@@ -111,6 +111,7 @@ export function CrazyGamesProvider({ children }: { children: ReactNode }) {
   );
   const [isLoading, setIsLoading] = useState(true);
   const [isInstantMultiplayer, setIsInstantMultiplayer] = useState(false);
+  const [cgUser, setCgUser] = useState<{ username: string | null } | null>(null);
 
   const { deviceType, isLandscape, viewportSize } = useCrazyGamesViewport();
   useCrazyGamesScrollPrevention(environment === 'crazygames');
@@ -187,6 +188,25 @@ export function CrazyGamesProvider({ children }: { children: ReactNode }) {
 
     checkSDK();
   }, []);
+
+  // Fetch CrazyGames user after SDK is ready
+  useEffect(() => {
+    if (!isAvailable || isLoading) return;
+
+    const fetchCgUser = async () => {
+      try {
+        if (window.CrazyGames?.SDK) {
+          const user = await window.CrazyGames.SDK.user.getUser();
+          setCgUser(user ? { username: user.username } : null);
+        }
+      } catch {
+        // Silently ignore errors; cgUser remains null
+        setCgUser(null);
+      }
+    };
+
+    fetchCgUser();
+  }, [isAvailable, isLoading]);
 
   // Gameplay event handlers
   const gameplayStart = useCallback(() => {
@@ -453,6 +473,7 @@ export function CrazyGamesProvider({ children }: { children: ReactNode }) {
     deviceType,
     isLandscape,
     viewportSize,
+    cgUser,
     gameplayStart, gameplayStop, loadingStart, loadingStop, happyTime, trackEvent,
     showMidgameAd, showRewardedAd, hasAdblock,
     requestBanner, requestResponsiveBanner, clearBanner, clearAllBanners,

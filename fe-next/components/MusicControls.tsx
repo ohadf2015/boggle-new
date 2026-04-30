@@ -68,31 +68,35 @@ const MusicControls: React.FC = memo(() => {
     return <Volume2 className={iconClass} strokeWidth={2.5} aria-hidden="true" />;
   }, [hasMounted, isMuted, volume, sfxMuted, sfxVolume]);
 
+  // Volume sliders are pure volume controls. Mute is a separate axis the user
+  // toggles via the master button — sliding the volume up while muted should
+  // not unilaterally unmute. (Doing so caused mute to "come back" after every
+  // tweak, since other surfaces also trigger volume changes.)
   const handleMusicVolumeChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const newVolume = parseFloat(e.target.value);
-    setVolume(newVolume);
-    if (isMuted && newVolume > 0) {
-      toggleMute();
-    }
-  }, [setVolume, isMuted, toggleMute]);
+    setVolume(parseFloat(e.target.value));
+  }, [setVolume]);
 
   const handleSfxVolumeChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const newVolume = parseFloat(e.target.value);
-    setSfxVolume(newVolume);
-    if (sfxMuted && newVolume > 0) {
-      toggleSfxMute();
-    }
-  }, [setSfxVolume, sfxMuted, toggleSfxMute]);
+    setSfxVolume(parseFloat(e.target.value));
+  }, [setSfxVolume]);
 
   const handleClick = useCallback(() => {
     if (!audioUnlocked) {
       unlockAudio();
-    } else {
-      // Toggle both music and SFX mute together for unified mute experience
-      toggleMute();
-      toggleSfxMute();
+      return;
     }
-  }, [audioUnlocked, unlockAudio, toggleMute, toggleSfxMute]);
+    // Coherent target: any audible → mute both; both already muted → unmute
+    // both. We never flip a channel against the chosen direction (which would
+    // happen if states had drifted apart and we toggled each independently).
+    const anyAudible = !isMuted || !sfxMuted;
+    if (anyAudible) {
+      if (!isMuted) toggleMute();
+      if (!sfxMuted) toggleSfxMute();
+    } else {
+      if (isMuted) toggleMute();
+      if (sfxMuted) toggleSfxMute();
+    }
+  }, [audioUnlocked, unlockAudio, isMuted, sfxMuted, toggleMute, toggleSfxMute]);
 
   const handleMouseEnter = useCallback(() => setShowSlider(true), []);
   const handleMouseLeave = useCallback(() => setShowSlider(false), []);

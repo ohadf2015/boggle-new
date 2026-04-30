@@ -125,8 +125,8 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
 }) => {
   return (
     <div className="flex-1 flex flex-col lg:flex-row min-h-0 overflow-x-hidden overflow-y-auto">
-      {/* Main game area */}
-      <div className="flex-1 flex flex-col min-h-0 overflow-y-auto overflow-x-hidden">
+      {/* Main game area — capped width on wider screens, with vertical rhythm between sections */}
+      <div className="flex-1 flex flex-col min-h-0 overflow-y-auto overflow-x-hidden w-full max-w-3xl mx-auto gap-1.5 md:gap-2 [@media(max-height:560px)]:gap-0.5">
         {/* Score + Quit — compact */}
         <WordHuntMPHeader
           score={score}
@@ -136,7 +136,7 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
         />
 
         {/* Clue Boxes — tight vertical padding; on short landscape collapse outer padding too */}
-        <div className={`px-2 py-0 [@media(max-height:560px)]:px-1 flex-shrink-0${wrongGuessShake ? ' animate-neo-shake' : ''}`}>
+        <div className={`px-2 [@media(max-height:560px)]:px-1 flex-shrink-0${wrongGuessShake ? ' animate-neo-shake' : ''}`}>
           <SurvivalClueBoxes
             currentHint={currentHint}
             targetWord={'?'.repeat(targetLength)}
@@ -155,7 +155,7 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
         </div>
 
         {/* Life Bar — compact wrapper */}
-        <div className="px-2 py-0 shrink-0">
+        <div className="px-2 shrink-0">
           <SurvivalLifeBar
             lifePoints={lifePoints}
             isGameOver={isGameOver}

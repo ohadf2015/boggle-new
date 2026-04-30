@@ -152,25 +152,34 @@ export async function runDictionaryEnrichment(): Promise<{
   promotion: PromotionResult;
 }> {
   const { processMilogVerificationQueue } = await import('../services/milogWordVerifier');
+  const { processWiktionaryEnVerificationQueue } = await import('../services/wiktionaryEnVerifier');
 
   logger.info('DICT_ENRICH', '=== Starting Dictionary Enrichment ===');
 
-  // Step 1: Process verification queue
-  logger.info('DICT_ENRICH', 'Step 1: Processing milog verification queue...');
-  const verificationResult = await processMilogVerificationQueue();
+  // Step 1a: Hebrew via Milog
+  logger.info('DICT_ENRICH', 'Step 1a: Processing milog (he) verification queue...');
+  const milogResult = await processMilogVerificationQueue();
 
-  // Step 2: Promote verified words
-  logger.info('DICT_ENRICH', 'Step 2: Promoting verified words to dictionary...');
+  // Step 1b: English via Wiktionary
+  logger.info('DICT_ENRICH', 'Step 1b: Processing wiktionary (en) verification queue...');
+  const wiktionaryResult = await processWiktionaryEnVerificationQueue();
+
+  // Step 2: Promote verified Hebrew words (Wiktionary-verified English handled by auto-promotion cron)
+  logger.info('DICT_ENRICH', 'Step 2: Promoting verified Hebrew words to dictionary...');
   const promotionResult = await promoteVerifiedWordsToDictionary();
 
+  const totalProcessed = milogResult.processed + wiktionaryResult.processed;
+  const totalVerified = milogResult.verified + wiktionaryResult.verified;
+
   logger.info('DICT_ENRICH', '=== Dictionary Enrichment Complete ===');
-  logger.info('DICT_ENRICH', `Verification: ${verificationResult.verified} verified, ${verificationResult.notFound} not found`);
+  logger.info('DICT_ENRICH', `Milog: ${milogResult.verified} verified / ${milogResult.processed} processed`);
+  logger.info('DICT_ENRICH', `Wiktionary: ${wiktionaryResult.verified} verified / ${wiktionaryResult.processed} processed`);
   logger.info('DICT_ENRICH', `Promotion: ${promotionResult.promoted} promoted, ${promotionResult.failed} failed`);
 
   return {
     verification: {
-      processed: verificationResult.processed,
-      verified: verificationResult.verified,
+      processed: totalProcessed,
+      verified: totalVerified,
     },
     promotion: promotionResult,
   };

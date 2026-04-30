@@ -566,6 +566,59 @@ describe('registerStartGameHandler', () => {
     });
   });
 
+  // ─── Self-heal reset broadcast (Word Hunt stale-state bug) ──────────
+  // When host starts the next round directly from finished/validating
+  // state (no explicit resetGame emit from clients first), the handler
+  // self-heals via resetGameForNewRound. We MUST broadcast 'resetGame'
+  // so clients clear stale Zustand state (wordHuntMyLife=0, eliminated
+  // players from prev round) — otherwise next round's WordHuntGameOverlay
+  // renders "Watch the remaining players" immediately for any player
+  // whose store wasn't manually reset via the back-to-room path.
+  describe('self-heal reset broadcast', () => {
+    it("broadcasts 'resetGame' before 'gameStarting' when self-healing from finished state", async () => {
+      const broadcastCalls: Array<{ event: string; payload: any }> = [];
+      mockBroadcastToRoom.mockImplementation((_io: any, _room: any, event: string, payload: any) => {
+        broadcastCalls.push({ event, payload });
+      });
+      // Game is finished — START transition not allowed until reset.
+      mockGetGame.mockReturnValue(makeGame({ gameState: 'finished', gameSessionId: 'session-2' }));
+      mockCanTransitionGameState.mockReturnValueOnce(false);
+
+      const { socket, handlers } = createMockSocket('socket-host');
+      registerStartGameHandler(mockIo, socket);
+
+      await triggerStartGame(handlers);
+
+      const events = broadcastCalls.map((c) => c.event);
+      const resetIdx = events.indexOf('resetGame');
+      const startingIdx = events.indexOf('gameStarting');
+      expect(resetIdx).toBeGreaterThanOrEqual(0);
+      expect(startingIdx).toBeGreaterThanOrEqual(0);
+      expect(resetIdx).toBeLessThan(startingIdx);
+      expect(broadcastCalls[resetIdx].payload).toEqual(
+        expect.objectContaining({
+          users: expect.any(Array),
+          gameSessionId: expect.anything(),
+        })
+      );
+    });
+
+    it("does NOT broadcast 'resetGame' when game is already in waiting state (no self-heal needed)", async () => {
+      mockGetGame.mockReturnValue(makeGame({ gameState: 'waiting' }));
+      mockCanTransitionGameState.mockReturnValue(true);
+
+      const { socket, handlers } = createMockSocket('socket-host');
+      registerStartGameHandler(mockIo, socket);
+
+      await triggerStartGame(handlers);
+
+      const resetBroadcasts = mockBroadcastToRoom.mock.calls.filter(
+        (call: any[]) => call[2] === 'resetGame'
+      );
+      expect(resetBroadcasts).toHaveLength(0);
+    });
+  });
+
   // ─── Dictionary loading ──────────────────────────────────────────────
 
   describe('dictionary loading', () => {

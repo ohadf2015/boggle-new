@@ -17,10 +17,12 @@ export interface WheelLetterProps {
   onPress: (letter: string, index: number, el: HTMLButtonElement) => void;
   isUsed: boolean;
   index: number;
+  /** When true, disables the breathing/pulse loop on the center letter (WCAG 2.3.3). */
+  reducedMotion?: boolean;
 }
 
 export const WheelLetter: React.FC<WheelLetterProps> = ({
-  letter, isCenter, angle = 0, radius = 0, onPress, isUsed, index,
+  letter, isCenter, angle = 0, radius = 0, onPress, isUsed, index, reducedMotion = false,
 }) => {
   const btnRef = useRef<HTMLButtonElement>(null);
   const { t } = useLanguage();
@@ -64,11 +66,11 @@ export const WheelLetter: React.FC<WheelLetterProps> = ({
       animate={{
         x: offsetX,
         y: offsetY,
-        ...(isCenter && !isUsed
+        ...(isCenter && !isUsed && !reducedMotion
           ? { scale: [1, 1.06, 1], boxShadow: ['3px 3px 0px black, 0 0 20px rgba(191,255,0,0.5)', '3px 3px 0px black, 0 0 28px rgba(191,255,0,0.7)', '3px 3px 0px black, 0 0 20px rgba(191,255,0,0.5)'] }
           : { scale: isUsed ? 0.9 : 1 }),
       }}
-      transition={isCenter && !isUsed
+      transition={isCenter && !isUsed && !reducedMotion
         ? { duration: 2, repeat: Infinity, ease: 'easeInOut', x: { type: 'spring', stiffness: 300, damping: 25 }, y: { type: 'spring', stiffness: 300, damping: 25 } }
         : { type: 'spring', stiffness: 400, damping: 22 }
       }

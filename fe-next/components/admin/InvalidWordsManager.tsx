@@ -31,6 +31,14 @@ interface InvalidWord {
   first_submitted_at: string;
   last_submitted_at: string;
   approved_at: string | null;
+  // External verification (Wiktionary for en/sv/es/ja, Milog for he).
+  verification_status?: string | null;
+  verification_source?: string | null;
+  verification_word_type?: string | null;
+  verification_url?: string | null;
+  milog_status?: string | null;
+  milog_word_type?: string | null;
+  milog_url?: string | null;
 }
 
 interface Stats {
@@ -83,12 +91,14 @@ export function InvalidWordsManager({ authToken }: InvalidWordsManagerProps) {
   const [autoPromoteStats, setAutoPromoteStats] = useState<{
     autoPromoted: number;
     candidates: number;
+    verifiedCandidates?: number;
   } | null>(null);
 
   // Filters
   const [searchQuery, setSearchQuery] = useState('');
   const [langFilter, setLangFilter] = useState<string>('all');
   const [minCount, setMinCount] = useState(3);
+  const [statusFilter, setStatusFilter] = useState<string>('all');
   const [limit] = useState(50);
   const [offset, setOffset] = useState(0);
 
@@ -124,6 +134,7 @@ export function InvalidWordsManager({ authToken }: InvalidWordsManagerProps) {
       const params = new URLSearchParams();
       if (searchQuery) params.append('search', searchQuery);
       if (langFilter && langFilter !== 'all') params.append('language', langFilter);
+      if (statusFilter && statusFilter !== 'all') params.append('status', statusFilter);
       params.append('minCount', minCount.toString());
       params.append('limit', limit.toString());
       params.append('offset', offset.toString());
@@ -145,7 +156,7 @@ export function InvalidWordsManager({ authToken }: InvalidWordsManagerProps) {
     } finally {
       setLoading(false);
     }
-  }, [authToken, searchQuery, langFilter, minCount, limit, offset]);
+  }, [authToken, searchQuery, langFilter, statusFilter, minCount, limit, offset]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -176,7 +187,19 @@ export function InvalidWordsManager({ authToken }: InvalidWordsManagerProps) {
   // Clear selection when filters or pagination change
   useEffect(() => {
     setSelectedIds(new Set());
-  }, [searchQuery, langFilter, minCount, offset]);
+  }, [searchQuery, langFilter, statusFilter, minCount, offset]);
+
+  /**
+   * Select every visible row whose external verifier has marked the word
+   * as `verified` (Wiktionary for en/sv/es/ja, Milog for he). Lets admins
+   * one-click bulk-approve high-confidence words.
+   */
+  const selectAllVerified = () => {
+    const verifiedIds = words
+      .filter(w => w.verification_status === 'verified' || w.milog_status === 'verified')
+      .map(w => w.id);
+    setSelectedIds(new Set(verifiedIds));
+  };
 
   const handleApprove = async (word: string, language: string, addToDictionary: boolean = false) => {
     const key = `${word}-${language}`;
@@ -402,13 +425,27 @@ export function InvalidWordsManager({ authToken }: InvalidWordsManagerProps) {
               <SelectItem value="20">≥20 submissions</SelectItem>
             </SelectContent>
           </Select>
+
+          <Select value={statusFilter} onValueChange={(val) => { setStatusFilter(val); setOffset(0); }}>
+            <SelectTrigger className="w-full sm:w-[170px] bg-slate-700 border-slate-600">
+              <SelectValue placeholder="Verification" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All</SelectItem>
+              <SelectItem value="verified">Verified (auto)</SelectItem>
+              <SelectItem value="needs_review">Needs review</SelectItem>
+              <SelectItem value="rejected_type">Rejected (abbrev/proper)</SelectItem>
+              <SelectItem value="not_found">Not found</SelectItem>
+              <SelectItem value="pending">Pending</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
       {/* Bulk Selection Toolbar */}
       {words.length > 0 && (
         <div className="flex flex-wrap items-center justify-between gap-2 bg-slate-800 p-3 rounded-lg border border-slate-700">
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
             <Button
               variant="outline"
               size="sm"
@@ -418,6 +455,22 @@ export function InvalidWordsManager({ authToken }: InvalidWordsManagerProps) {
             >
               Select All ({words.length})
             </Button>
+            {(() => {
+              const verifiedCount = words.filter(w =>
+                w.verification_status === 'verified' || w.milog_status === 'verified'
+              ).length;
+              if (verifiedCount === 0) return null;
+              return (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={selectAllVerified}
+                  className="border-emerald-700 bg-emerald-900/30 hover:bg-emerald-900/60 text-emerald-200"
+                >
+                  ✓ Select Verified ({verifiedCount})
+                </Button>
+              );
+            })()}
             <Button
               variant="ghost"
               size="sm"
@@ -497,13 +550,42 @@ export function InvalidWordsManager({ authToken }: InvalidWordsManagerProps) {
                       <div className="flex items-start justify-between ps-6">
                         <div>
                           <h3 className="text-lg font-bold text-white">{word.word}</h3>
-                          <div className="flex items-center gap-2 mt-1">
+                          <div className="flex items-center gap-2 mt-1 flex-wrap">
                             <Badge variant="outline" className="text-xs">
                               {(LANGUAGE_KEYS[word.language] ? t(LANGUAGE_KEYS[word.language]) : null) || LANGUAGE_FALLBACKS[word.language] || word.language}
                             </Badge>
                             <Badge className={cn("text-xs text-white", getReasonColor(word.reason))}>
                               {getReasonLabel(word.reason)}
                             </Badge>
+                            {(() => {
+                              // Verification badge — fold both Wiktionary (verification_*) and Milog (milog_*) signals.
+                              const status = word.verification_status || word.milog_status;
+                              const source = word.verification_source || (word.milog_status ? 'milog' : null);
+                              const url = word.verification_url || word.milog_url;
+                              const wordType = word.verification_word_type || word.milog_word_type;
+                              if (!status || status === 'pending') return null;
+                              const tone =
+                                status === 'verified' ? 'bg-emerald-600 text-white' :
+                                status === 'rejected_type' ? 'bg-red-700 text-white' :
+                                status === 'not_found' ? 'bg-slate-600 text-white' :
+                                status === 'needs_review' ? 'bg-amber-600 text-white' :
+                                status === 'error' ? 'bg-orange-700 text-white' :
+                                'bg-slate-500 text-white';
+                              const label =
+                                status === 'verified' ? `✓ ${source || 'verified'}${wordType ? ` (${wordType})` : ''}` :
+                                status === 'rejected_type' ? `✗ ${wordType || 'rejected'}` :
+                                status;
+                              const inner = (
+                                <Badge className={cn('text-xs', tone)}>
+                                  {label}
+                                </Badge>
+                              );
+                              return url ? (
+                                <a href={url} target="_blank" rel="noreferrer" className="hover:opacity-80">
+                                  {inner}
+                                </a>
+                              ) : inner;
+                            })()}
                           </div>
                         </div>
                         <div className="text-right">

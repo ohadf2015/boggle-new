@@ -370,7 +370,7 @@ export function startAutoPromotionCron() {
  */
 export async function triggerAutoPromotion(): Promise<{
   success: boolean;
-  result: { promoted: number; failed: number; skipped?: boolean; words: { submissionBased: string[]; milogBased: string[] } };
+  result: { promoted: number; failed: number; skipped?: boolean; words: { submissionBased: string[]; milogBased: string[]; wiktionaryBased: string[] } };
   duration: number;
   error?: string;
 }> {
@@ -390,7 +390,7 @@ export async function triggerAutoPromotion(): Promise<{
 
     return {
       success: false,
-      result: { promoted: 0, failed: 0, words: { submissionBased: [], milogBased: [] } },
+      result: { promoted: 0, failed: 0, words: { submissionBased: [], milogBased: [], wiktionaryBased: [] } },
       duration: Date.now() - startTime,
       error: errorMsg,
     };

@@ -251,19 +251,27 @@ function Ramen({ fill }: HairPartProps) {
 
 function Long({ fill }: HairPartProps) {
   const u = useAvatarUid();
-  const cap = "M12 38 C8 24 18 12 34 8 C42 6 50 6 50 6 C50 6 58 6 66 8 C82 12 92 24 88 38 C90 52 88 68 84 78 C82 84 78 86 76 82 C74 76 76 60 76 46 C60 28 40 28 24 46 C24 60 26 76 24 82 C22 86 18 84 16 78 C12 68 10 52 12 38Z";
+  const cap = "M12 38 C8 24 18 12 34 8 C42 6 58 6 66 8 C82 12 92 24 88 38 Q86 48 80 46 Q50 30 20 46 Q14 48 12 38Z";
+  const rightLock = "M88 38 C92 56 90 76 86 84 C82 90 76 88 76 80 C76 64 78 52 80 44 Z";
+  const leftLock = "M12 38 C8 56 10 76 14 84 C18 90 24 88 24 80 C24 64 22 52 20 44 Z";
   return (
     <g>
       <defs><HairPolishDefs uid={u} keyName="long" /></defs>
-      {/* Full long hair — voluminous cap with flowing S-curve sides */}
+      {/* Cap with curved hairline — face stays visible */}
       <path d={cap} fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
       <HairPolish uid={u} keyName="long" d={cap} />
+      {/* Right side-lock — flowing past chin */}
+      <path d={rightLock} fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      <HairPolish uid={u} keyName="long" d={rightLock} />
+      {/* Left side-lock */}
+      <path d={leftLock} fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      <HairPolish uid={u} keyName="long" d={leftLock} />
       {/* Strand flow lines */}
-      <path d="M18 46 C18 56 20 66 20 76" stroke="#000" strokeWidth={0.8} opacity="0.1" />
-      <path d="M82 46 C82 56 80 66 80 76" stroke="#000" strokeWidth={0.8} opacity="0.1" />
+      <path d="M18 50 C18 60 20 70 20 80" fill="none" stroke="#000" strokeWidth={0.8} opacity="0.1" />
+      <path d="M82 50 C82 60 80 70 80 80" fill="none" stroke="#000" strokeWidth={0.8} opacity="0.1" />
       {/* Glossy highlights — double strand */}
-      <path d="M24 44 C24 56 26 68 26 76" stroke="#fff" strokeWidth={1.2} opacity="0.15" />
-      <path d="M76 44 C76 56 74 68 74 76" stroke="#fff" strokeWidth={1.2} opacity="0.15" />
+      <path d="M16 50 C16 62 18 74 18 82" fill="none" stroke="#fff" strokeWidth={1.2} opacity="0.15" />
+      <path d="M84 50 C84 62 82 74 82 82" fill="none" stroke="#fff" strokeWidth={1.2} opacity="0.15" />
       {/* Crown highlight arc */}
       <path d="M34 12 C42 6 58 6 66 12" fill="none" stroke="#fff" strokeWidth={1.5} opacity="0.18" strokeLinecap="round" />
       {/* Secondary shine */}

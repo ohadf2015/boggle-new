@@ -155,6 +155,7 @@ export interface CrazyGamesContextType {
   deviceType: import('@/hooks/useCrazyGamesViewport').CrazyGamesDeviceType;
   isLandscape: boolean;
   viewportSize: { width: number; height: number };
+  cgUser: { username: string | null } | null;
   // Gameplay events
   gameplayStart: () => void;
   gameplayStop: () => void;
@@ -216,6 +217,7 @@ export const CRAZYGAMES_NOOP_CONTEXT: CrazyGamesContextType = {
   deviceType: 'desktop',
   isLandscape: true,
   viewportSize: { width: 1024, height: 768 },
+  cgUser: null,
   gameplayStart: () => {},
   gameplayStop: () => {},
   loadingStart: () => {},

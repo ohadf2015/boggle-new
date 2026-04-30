@@ -338,7 +338,7 @@ const WordWheelChallenge: React.FC = () => {
                 {t('wordWheel.title')}
               </h1>
               <span className="text-neo-cream/60 text-sm">
-                {t('daily.puzzleNumber').replace('{number}', String(puzzleNumber))}
+                {t('daily.puzzleNumber', { number: puzzleNumber })}
               </span>
             </div>
 
@@ -350,7 +350,7 @@ const WordWheelChallenge: React.FC = () => {
               </div>
               <div className="flex items-center gap-3 px-3 py-2 rounded-neo border-2 border-neo-black bg-neo-navy-light">
                 <span className="text-neo-cyan text-lg">🔤</span>
-                <span className="text-neo-cream/80 text-sm">{t('wordWheel.minLetters').replace('{min}', '3')}</span>
+                <span className="text-neo-cream/80 text-sm">{t('wordWheel.minLetters', { min: '3' })}</span>
               </div>
               <div className="flex items-center gap-3 px-3 py-2 rounded-neo border-2 border-neo-black bg-neo-navy-light">
                 <span className="text-neo-pink text-lg">⏱</span>

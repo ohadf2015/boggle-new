@@ -51,9 +51,15 @@ interface AnalyticsEventInsert {
  * Track analytics events (including guest players)
  */
 router.post('/track', async (req: TrackRequest, res: Response): Promise<void> => {
+  // Idempotent send — guards against double-write when an upstream timeout
+  // middleware closes the response before the awaited Supabase call resolves.
+  const send = (status: number, body: TrackResponse): void => {
+    if (res.headersSent) return;
+    res.status(status).json(body);
+  };
   try {
     if (!isSupabaseConfigured()) {
-      res.json({ success: false, error: 'Analytics service not available' } as TrackResponse);
+      send(200, { success: false, error: 'Analytics service not available' });
       return;
     }
 
@@ -70,7 +76,7 @@ router.post('/track', async (req: TrackRequest, res: Response): Promise<void> =>
     } = req.body;
 
     if (!event_type) {
-      res.status(400).json({ error: 'event_type is required' });
+      send(400, { success: false, error: 'event_type is required' });
       return;
     }
 
@@ -103,15 +109,15 @@ router.post('/track', async (req: TrackRequest, res: Response): Promise<void> =>
 
     if (error) {
       logger.error('ANALYTICS_API', `Track error: ${error.message}`);
-      res.json({ success: false, error: error.message } as TrackResponse);
+      send(200, { success: false, error: error.message });
       return;
     }
 
-    res.json({ success: true, event_id: data?.id } as TrackResponse);
+    send(200, { success: true, event_id: data?.id });
   } catch (error) {
     const err = error as Error;
     logger.error('ANALYTICS_API', `Track error: ${err.message}`);
-    res.json({ success: false, error: 'Failed to track event' } as TrackResponse);
+    send(200, { success: false, error: 'Failed to track event' });
   }
 });
 

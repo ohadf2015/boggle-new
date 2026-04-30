@@ -87,7 +87,8 @@ export const InvalidReason = {
   NOT_ON_BOARD: 'not_on_board',
   TOO_SHORT: 'too_short',
   PROFANITY: 'profanity',
-  REJECTED: 'rejected'
+  REJECTED: 'rejected',
+  INVALID_SHAPE: 'invalid_shape'
 } as const;
 
 export type InvalidReasonValue = typeof InvalidReason[keyof typeof InvalidReason];

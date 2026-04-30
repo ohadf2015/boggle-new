@@ -317,7 +317,10 @@ export const LanguageProvider = ({ children, initialLanguage, initialTranslation
                 if (fallback) {
                     return fallback;
                 }
-                logger.warn(`Translation missing for key: ${path} in language: ${language}`);
+                // Demoted from warn → debug so transient post-deploy gaps and
+                // unmerged feature copy don't page Sentry. Real-time gaps surface
+                // in dev console and via the i18n audit script.
+                logger.debug(`Translation missing for key: ${path} in language: ${language}`);
                 return path;
             }
             current = (current as Record<string, unknown>)[key];

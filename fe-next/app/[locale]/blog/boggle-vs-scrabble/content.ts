@@ -271,120 +271,120 @@ Words With Friends זה בעצם סקראבל דיאט עם אותן בעיות 
   },
 
   sv: {
-    title: 'Boggle vs Scrabble: Den Arlaga Uppgorelsen Ingen Bad Om',
-    subtitle: 'Tva ordspelsgiganter. En kaotisk, en strategisk. Vilken fortjanar din fredagskwall?',
-    category: 'Jamforelser',
-    readTime: '12 min lasning',
-    authorName: 'Ordnorden',
-    authorBio: 'Ager tre olika Scrabble-upplagor och en Boggle som halls ihop med silvertejp. Har starka asikter om bada.',
+    title: 'Boggle vs Scrabble: Den ärliga uppgörelsen ingen bad om',
+    subtitle: 'Två ordspelsgiganter. En kaotisk, en strategisk. Vilken förtjänar din fredagskväll?',
+    category: 'Jämförelser',
+    readTime: '12 min läsning',
+    authorName: 'Ordnörden',
+    authorBio: 'Äger tre olika Scrabble-upplagor och en Boggle som hålls ihop med silvertejp. Har starka åsikter om båda.',
     sections: [
       {
-        content: `Lat mig beratta om braketet som nastan forstaorde fredagsmyset 2019.
+        content: `Låt mig berätta om bråket som nästan förstörde fredagsmyset 2019.
 
-Min syster sa att Scrabble ar det "riktiga" ordspelet och Boggle ar "bara en partytrick." Jag sa att hon bara gillar Scrabble for att hon memorerat tva-bokstavs-ord fran en fusklapp. Pappa sa at oss att halla kaft och spela Yatzy istallet. Ingen vann den kvallen.
+Min syster sa att Scrabble är det "riktiga" ordspelet och Boggle är "bara ett partytrick." Jag sa att hon bara gillar Scrabble för att hon memorerat tvåbokstavsord från en fusklapp. Pappa sa åt oss att hålla käften och spela Yatzy istället. Ingen vann den kvällen.
 
-Men fragan drojde sig kvar. Boggle mot Scrabble. Det ar ordspelens Coca-Cola mot Pepsi, forutom att bada drinkarna faktiskt ar bra och debatten ar mycket intressantare. Jag har spelat bada i over 20 ar, och jag har tankar. Manga av dem.`,
+Men frågan dröjde sig kvar. Boggle mot Scrabble. Det är ordspelens Coca-Cola mot Pepsi, förutom att båda dryckerna faktiskt är bra och debatten är mycket intressantare. Jag har spelat båda i över 20 år, och jag har tankar. Många av dem.`,
       },
       {
-        title: 'En Kort, Lagom Dramatisk Historia',
-        content: `Scrabble kom forst. Alfred Mosher Butts uppfann det under Stora Depressionen. Ursprungligen kallad "Lexiko" (tack gode gud att de bytte namn), Scrabble har salt i over 150 miljoner exemplar. Det finns i 30 sprak. Det finns internationella turneringar med prispengar. Folk har gratit pa Scrabble-turneringar. Jag respekterar den nivaen av engagemang.
+        title: 'En kort, lagom dramatisk historia',
+        content: `Scrabble kom först. Alfred Mosher Butts uppfann det under den stora depressionen. Ursprungligen kallat "Lexiko" (tack gode gud att de bytte namn) har Scrabble sålts i över 150 miljoner exemplar. Det finns på 30 språk. Det finns internationella turneringar med prispengar. Folk har gråtit på Scrabble-turneringar. Jag respekterar den nivån av engagemang.
 
-Boggle dok upp senare, 1972. Det var den rebelliska yngre syskonet. Inget brade. Inga brickor att placera forsiktigt. Bara ett fat med tarningar som man skakar som om man ar arg pa alfabetet, en tre-minuters timer och rent kaos.
+Boggle dök upp senare, 1972. Det var det rebelliska yngre syskonet. Inget bräde. Inga brickor att placera försiktigt. Bara ett fat med tärningar som man skakar som om man är arg på alfabetet, en treminuters timer och rent kaos.
 
-Bada spelen overlevde den digitala revolutionen. Bada fodde otaliga efterapare. Men de har helt olika syn pa vad ett ordspel egentligen ska vara. I Sverige har vi en sarskild plats for ordspel tack vare Alfapet, var egen Scrabble-variant, sa vi fostar ordspelskulturen i dubbel dos.`,
+Båda spelen överlevde den digitala revolutionen. Båda födde otaliga efterapare. Men de har helt olika syn på vad ett ordspel egentligen ska vara. I Sverige har vi en särskild plats för ordspel tack vare Alfapet, vår egen Scrabble-variant, så vi fostrar ordspelskulturen i dubbel dos.`,
       },
       {
-        title: 'Spelmekanik: Schack mot Blixtschack',
-        content: `Har ar karnskillnaden och den spelar roll mer an allt annat.
+        title: 'Spelmekanik: schack mot blixtschack',
+        content: `Här är kärnskillnaden, och den spelar roll mer än allt annat.
 
-Scrabble ar turbaserad strategi. Du far sju brickor. Du stirrar pa dem. Du arrangerar om dem pa din stallning som om du loser ett pussel. Du overvager bradets lage, kvarvarande brickor, motstandarens troliga drag. Du lagger ett ord. Sen vantar du. En Scrabble-match tar 45 minuter till en timme.
+Scrabble är turbaserad strategi. Du får sju brickor. Du stirrar på dem. Du arrangerar om dem på ditt ställ som om du löser ett pussel. Du överväger brädets läge, kvarvarande brickor, motståndarens troliga drag. Du lägger ett ord. Sen väntar du. En Scrabble-match tar 45 minuter till en timme.
 
-Boggle ar kaos i realtid. Alla stirrar pa samma 16-bokstavs-rutnatt samtidigt. Du har tre minuter. Hitta varje ord du kan. Kor. Det finns ingen turordning. Det finns ingen vantan. Det finns bara ljudet av pennor som skribblar och den tysta paniken nar sanden rinner ut.
+Boggle är kaos i realtid. Alla stirrar på samma 16-bokstavs-rutnät samtidigt. Du har tre minuter. Hitta varje ord du kan. Kör. Det finns ingen turordning. Det finns ingen väntan. Det finns bara ljudet av pennor som skriblar och den tysta paniken när sanden rinner ut.
 
-Scrabble belonar ordforadets djup och strategisk placering. Boggle belonar monsterigankanningens hastighet och rumslig medvetenhet. Jag alskar bada, men de tratar helt olika delar av hjarnan.`,
+Scrabble belönar ordförrådets djup och strategisk placering. Boggle belönar mönsterigenkänningens hastighet och rumslig medvetenhet. Jag älskar båda, men de tränar helt olika delar av hjärnan.`,
       },
       {
-        title: 'Den Sociala Upplevelsen',
-        content: `Har skiljer sig spelen verkligen at.
+        title: 'Den sociala upplevelsen',
+        content: `Här skiljer sig spelen verkligen åt.
 
-Scrabble ar ett spel for tva till fyra, men arligt talat ar det bast som en duell. Du och en annan person, lasta i en langsam intellektuell kamp. I Sverige blir Scrabble-kvallen ofta en fika-tillstallning: kanelbullar, kaffe och tva timmars ordstrid. Forlorar du sa vet du exakt vem som slog dig och hur.
+Scrabble är ett spel för två till fyra, men ärligt talat är det bäst som en duell. Du och en annan person, låsta i en långsam intellektuell kamp. I Sverige blir Scrabble-kvällen ofta en fika-tillställning: kanelbullar, kaffe och två timmars ordstrid. Förlorar du så vet du exakt vem som slog dig och hur.
 
-Boggle ar ett partyspel forkladd som ordspel. Sex personer runt bordet, alla spelar samtidigt, ingen vantar, timern tar slut och nagon skriker "DEN HADE JAG OCKSA!" nar du laser din lista. Pogangsystemet dar gemensamma ord tar ut varandra betyder att det riktiga spelet ar att hitta ord ingen annan sag.
+Boggle är ett partyspel förklätt som ordspel. Sex personer runt bordet, alla spelar samtidigt, ingen väntar, timern tar slut och någon skriker "DEN HADE JAG OCKSÅ!" när du läser din lista. Poängsystemet där gemensamma ord tar ut varandra betyder att det riktiga spelet är att hitta ord ingen annan såg.
 
-For spelkwall med vanner som inte spelar ordspel regelbundet? Boggle, varje gang. For en mysig kwall dar ni bada tycker att ordforad ar attraktivt? Scrabble.`,
+För spelkväll med vänner som inte spelar ordspel regelbundet? Boggle, varje gång. För en mysig kväll där ni båda tycker att ordförråd är attraktivt? Scrabble.`,
       },
       {
-        title: 'Digitala Versioner',
-        content: `Bada spelen har blivit digitala, och har blir det komplicerat.
+        title: 'Digitala versioner',
+        content: `Båda spelen har blivit digitala, och här blir det komplicerat.
 
-Scrabbles officiella app har bytt agare fler ganger an jag kan rakna. Monetariseringen ar aggressiv. Power-ups som i princip spelar spelet at dig. Det kanns som att de saljer genvagar till ett spel som bara ar roligt for att det ar svart.
+Scrabbles officiella app har bytt ägare fler gånger än jag kan räkna. Monetariseringen är aggressiv. Power-ups som i princip spelar spelet åt dig. Det känns som att de säljer genvägar till ett spel som bara är roligt för att det är svårt.
 
-Words With Friends ar i princip Diet-Scrabble med samma monetariseringsproblem. "Word Radar" som visar dig det basta draget? Det ar inte en funktion. Det ar kapitulation.
+Words With Friends är i princip Diet-Scrabble med samma monetariseringsproblem. "Word Radar" som visar dig det bästa draget? Det är inte en funktion. Det är kapitulation.
 
-Boggles digitala historia ar rorig. Hasbro har slappte officiella versioner som varierar fran okej till overgivna. Den riktiga innovationen hande i kloner och andliga efterfoljare.
+Boggles digitala historia är rörig. Hasbro har släppt officiella versioner som varierar från okej till övergivna. Den riktiga innovationen hände i kloner och andliga efterföljare.
 
-Basta digitala Boggle-upplevelsen just nu, och ja jag ar partisk for jag skriver for den har bloggen, ar LexiClash. Realtids-multiplayer, dagliga utmaningar, flera spellagen. Inga pay-to-win-tramserier. Och det fungerar pa svenska, vilket ar mer an de flesta ordspel kan saga.`,
+Bästa digitala Boggle-upplevelsen just nu, och ja jag är partisk för jag skriver för den här bloggen, är LexiClash. Realtidsmultiplayer, dagliga utmaningar, flera spellägen. Inga pay-to-win-tramserier. Och det fungerar på svenska, vilket är mer än de flesta ordspel kan säga.`,
       },
       {
-        title: 'Vilket Ar Battre for Hjarnan?',
-        content: `Jag tittade pa forskningen for jag ar den typen av person.
+        title: 'Vilket är bättre för hjärnan?',
+        content: `Jag tittade på forskningen för jag är den typen av person.
 
-Bada spelen ar legitimt bra for kognitiv halsa. Vetenskapen ar ganska tydlig: ordspel starker verbal flyt, arbetsminne och bearbetningshastighet. Men de gor det pa olika satt.
+Båda spelen är legitimt bra för kognitiv hälsa. Vetenskapen är ganska tydlig: ordspel stärker verbal flyt, arbetsminne och bearbetningshastighet. Men de gör det på olika sätt.
 
-Scrabble engagerar strategiskt tankande, planering framat och djup ordforadsaterhamtning. En studie fran 2014 fran University of Calgary fann att tavlings-Scrabble-spelare utvecklar forbattrad visuell ordigantkanning.
+Scrabble engagerar strategiskt tänkande, planering framåt och djup ordförrådsåterhämtning. En studie från 2014 från University of Calgary fann att tävlings-Scrabble-spelare utvecklar förbättrad visuell ordigenkänning.
 
-Boggle traffar bearbetningshastighet och snabb monsterigantkanning hardare. Tidspress tvingar hjarnan till ett annat lage. Du overlaggar inte forsiktigt; du skannar, kopplar och beslutar pa millisekunder.
+Boggle träffar bearbetningshastighet och snabb mönsterigenkänning hårdare. Tidspress tvingar hjärnan till ett annat läge. Du överväger inte försiktigt; du skannar, kopplar och beslutar på millisekunder.
 
-Min helt ovetenskapliga asikt: spela bada. Scrabble for den djupa, langsamma branden. Boggle for den snabba, kaotiska traningen. Din hjarna kommer tacka dig for variationen.`,
+Min helt ovetenskapliga åsikt: spela båda. Scrabble för den djupa, långsamma branden. Boggle för den snabba, kaotiska träningen. Din hjärna kommer tacka dig för variationen.`,
       },
       {
         title: 'Skicklighetstaket',
-        content: `Scrabble har ett av de hogsta skicklighetstaken av nagot bradspel. Toppspelare memorerar hela ordboken. Alla 180 000+ ord. Gapet mellan en casual-spelare och en tavlingsspelare ar enormt.
+        content: `Scrabble har ett av de högsta skicklighetstaken av något brädspel. Toppspelare memorerar hela ordboken. Alla 180 000+ ord. Gapet mellan en casual-spelare och en tävlingsspelare är enormt.
 
-Boggles skicklighetstak ar verkligt men annorlunda. Man kan definitivt bli battre pa monsterigantkanning. Men slumpmomentet i varje skakning betyder att aven en svagare spelare ibland kan sla en expert.
+Boggles skicklighetstak är verkligt men annorlunda. Man kan definitivt bli bättre på mönsterigenkänning. Men slumpmomentet i varje skakning betyder att även en svagare spelare ibland kan slå en expert.
 
-Det ar faktiskt darfor Boggle ar battre for casual-spel. Skicklighetsgapet ar smalare, vilket betyder att fler kan ha roligt. Scrabble mot nagon som ar mycket battre? Brutalt. Boggle mot nagon battre? Du kan fortfarande hitta ett ord de missade.`,
+Det är faktiskt därför Boggle är bättre för casual-spel. Skicklighetsgapet är smalare, vilket betyder att fler kan ha roligt. Scrabble mot någon som är mycket bättre? Brutalt. Boggle mot någon bättre? Du kan fortfarande hitta ett ord de missade.`,
       },
       {
-        title: 'Kostnad och Tillganglighet',
-        content: `Fysiskt Scrabble (eller Alfapet i Sverige): 200-300 kr, och det haller i artionden. Behover exakt en till person som ar villig att sitta still i en timme.
+        title: 'Kostnad och tillgänglighet',
+        content: `Fysiskt Scrabble (eller Alfapet i Sverige): 200-300 kr, och det håller i årtionden. Behöver exakt en till person som är villig att sitta still i en timme.
 
-Fysisk Boggle: 100-150 kr, mojligen det basta bradspelet for pengarna. Funkar med valfritt antal spelare.
+Fysisk Boggle: 100-150 kr, möjligen det bästa brädspelet för pengarna. Funkar med valfritt antal spelare.
 
-Digitalt? Nastan varje version har aggressiv monetarisering som forstoer upplevelsen. Forutom LexiClash, som av nagon anledning fortfarande tror pa principer.
+Digitalt? Nästan varje version har aggressiv monetarisering som förstör upplevelsen. Förutom LexiClash, som av någon anledning fortfarande tror på principer.
 
-Vinnare pa ren tillganglighet: Boggle. Lagre kostnad, lagre skicklighetsbariar, fler spelare, mindre tidsatgang.`,
+Vinnare på ren tillgänglighet: Boggle. Lägre kostnad, lägre skicklighetsbarriär, fler spelare, mindre tidsåtgång.`,
       },
       {
-        title: 'Sa Vilket Ska Du Spela?',
-        content: `Jag tanker inte ducka och saga "bada." Alltsa, du bor spela bada. Men om du tvingar mig:
+        title: 'Så vilket ska du spela?',
+        content: `Jag tänker inte ducka och säga "båda." Alltså, du bör spela båda. Men om du tvingar mig:
 
-Spela Scrabble om du vill ha djup. Ett spel du kan studera och forbattra i aratal. Om du njuter av den schackliknande tillfredstalldelsen av ett perfekt placerat sju-bokstavsord.
+Spela Scrabble om du vill ha djup. Ett spel du kan studera och förbättras i åratal. Om du njuter av den schackliknande tillfredsställelsen av ett perfekt placerat sjubokstavsord.
 
-Spela Boggle om du vill ha intensitet. Ett spel som far pulsen att stiga och hjarnan att ga pa alla cylindrar. Om du spelar med en grupp. Om du har 10 minuter, inte en timme.
+Spela Boggle om du vill ha intensitet. Ett spel som får pulsen att stiga och hjärnan att gå på alla cylindrar. Om du spelar med en grupp. Om du har 10 minuter, inte en timme.
 
-Spela LexiClash om du vill ha bada upplevelserna i ett modernt paket. Dagliga utmaningar, realtids-multiplayer, flera spellagen. Inget pay-to-win. Och pa svenska.
+Spela LexiClash om du vill ha båda upplevelserna i ett modernt paket. Dagliga utmaningar, realtidsmultiplayer, flera spellägen. Inget pay-to-win. Och på svenska.
 
-Det riktiga svaret: Boggle och Scrabble ar inte konkurrenter. De kompletterar varandra. En ar en sprint, den andra ar ett maraton. Bada ar varda din tid.`,
+Det riktiga svaret: Boggle och Scrabble är inte konkurrenter. De kompletterar varandra. En är en sprint, den andra är ett maraton. Båda är värda din tid.`,
       },
       {
-        title: 'Vanliga Fragor',
-        content: `Ar Boggle svarare an Scrabble?
-Olika sorts svart. Scrabble ar svarare att mastrera. Boggle ar svarare att prestera under press. De flesta tycker Boggle ar lattare att borja med men Scrabble mer givande pa lang sikt.
+        title: 'Vanliga frågor',
+        content: `Är Boggle svårare än Scrabble?
+Olika sorts svårt. Scrabble är svårare att bemästra. Boggle är svårare att prestera under press. De flesta tycker Boggle är lättare att börja med men Scrabble mer givande på lång sikt.
 
-Kan Boggle eller Scrabble gora dig smartare?
-De forbattrar verbal flyt, arbetsminne och bearbetningshastighet. Om det gor dig "smartare" beror pa din definition.
+Kan Boggle eller Scrabble göra dig smartare?
+De förbättrar verbal flyt, arbetsminne och bearbetningshastighet. Om det gör dig "smartare" beror på din definition.
 
-Vad ar det basta gratis Boggle-spelet online?
-Jag ar partisk, men LexiClash erbjuder en gratis Boggle-upplevelse med realtids-multiplayer. Pa svenska.
+Vad är det bästa gratis Boggle-spelet online?
+Jag är partisk, men LexiClash erbjuder en gratis Boggle-upplevelse med realtidsmultiplayer. På svenska.
 
-Ar Scrabble bra for sprakinarning?
-Otroligt bra. Det strategiska elementet betyder att du inte bara kanner igen ord utan tanker pa bokstavsmonster och ordbyggnad. Boggle hjalper med igankanning. Anvand bada for sprakinlarning.`,
+Är Scrabble bra för språkinlärning?
+Otroligt bra. Det strategiska elementet betyder att du inte bara känner igen ord utan tänker på bokstavsmönster och ordbyggnad. Boggle hjälper med igenkänning. Använd båda för språkinlärning.`,
       },
     ],
-    backToBlog: 'Tillbaka till Bloggen',
-    playDaily: 'Prova Dagens Utmaning',
-    startPracticing: 'Spela Nu',
+    backToBlog: 'Tillbaka till bloggen',
+    playDaily: 'Prova dagens utmaning',
+    startPracticing: 'Spela nu',
   },
 
   ja: {

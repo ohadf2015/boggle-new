@@ -7,13 +7,16 @@ import { Trophy } from 'lucide-react';
 import { useSeason } from '@/hooks/useSeason';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
+import { useAuth } from '@/contexts/AuthContext';
 import { tierColor } from '@/lib/tierColors';
 
 export const SeasonBanner: React.FC = () => {
   const { currentSeason, timeRemaining, peakTier } = useSeason();
   const { t } = useLanguage();
   const { isOnCrazyGamesPlatform } = useCrazyGames();
+  const { isAuthenticated } = useAuth();
   if (isOnCrazyGamesPlatform) return null;
+  if (!isAuthenticated) return null;
 
   const isEndingSoon = timeRemaining.days < 7;
   const isCritical = timeRemaining.days <= 1;

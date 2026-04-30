@@ -89,24 +89,24 @@ describe('removeApprovedWord', () => {
     expect(dictionary.hebrewWords.has('מלכ')).toBe(false);
   });
 
-  it('should rewrite approved file without the word', async () => {
-    // Create a mock approved file with multiple words
+  it('should not touch the approved file (audit C3: persistence is DB-only)', async () => {
+    // Audit C3 (2026-05-01): runtime *_approved.txt writes were dead code on
+    // Railway (ephemeral FS). The function now only mutates the in-memory Set;
+    // DB (`word_scores.is_potentially_valid`) is the authoritative store.
     const approvedFile = path.join(path.resolve(__dirname, '..'), 'hebrew_words_approved.txt');
 
-    // Ensure the file exists with test content
     const originalContent = 'מילה\nבדיקה\nשלום\n';
     await fsp.writeFile(approvedFile, originalContent, 'utf-8');
 
-    // Add word to in-memory dict
     dictionary.hebrewWords.add('בדיקה');
-
     await removeApprovedWord('בדיקה', 'he');
 
-    // Read the file back
-    const updatedContent = await fsp.readFile(approvedFile, 'utf-8');
-    expect(updatedContent).not.toContain('בדיקה');
-    expect(updatedContent).toContain('מילה');
-    expect(updatedContent).toContain('שלום');
+    // In-memory removal is the contract that matters
+    expect(dictionary.hebrewWords.has('בדיקה')).toBe(false);
+
+    // File is untouched — content preserved exactly
+    const fileContent = await fsp.readFile(approvedFile, 'utf-8');
+    expect(fileContent).toBe(originalContent);
 
     // Clean up
     await fsp.writeFile(approvedFile, '', 'utf-8');

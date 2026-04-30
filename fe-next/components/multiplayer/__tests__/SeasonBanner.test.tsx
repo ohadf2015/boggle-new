@@ -53,9 +53,21 @@ vi.mock('@/components/CrazyGamesSDK', () => ({
   useCrazyGames: () => mockUseCrazyGames(),
 }));
 
+const mockUseAuth = vi.fn(() => ({ isAuthenticated: true, isGuest: false }));
+vi.mock('@/contexts/AuthContext', () => ({
+  useAuth: () => mockUseAuth(),
+}));
+
 describe('SeasonBanner', () => {
   beforeEach(() => {
     mockUseCrazyGames.mockReturnValue({ isOnCrazyGamesPlatform: false });
+    mockUseAuth.mockReturnValue({ isAuthenticated: true, isGuest: false });
+  });
+
+  it('renders nothing for unauthenticated guest users', () => {
+    mockUseAuth.mockReturnValue({ isAuthenticated: false, isGuest: true });
+    const { container } = render(<SeasonBanner />);
+    expect(container.querySelector('[data-testid="season-banner"]')).toBeNull();
   });
 
   it('renders nothing on CrazyGames embed', () => {

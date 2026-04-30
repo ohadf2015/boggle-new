@@ -264,11 +264,11 @@ describe('wordHandler submitWord error handling', () => {
       (isWordOnBoardAsync as Mock).mockResolvedValue(false);
 
       // WHEN: User submits a word that is not on the board
-      await handlers['submitWord']({ word: 'zzzz' });
+      await handlers['submitWord']({ word: 'pleat' });
 
       // THEN: Client is notified but no DB row is written — these events are 96% single-submit
       // with 0 appeals; admins cannot action them since the word simply wasn't on the grid.
-      expect(mockSocket.emit).toHaveBeenCalledWith('wordNotOnBoard', expect.objectContaining({ word: 'zzzz' }));
+      expect(mockSocket.emit).toHaveBeenCalledWith('wordNotOnBoard', expect.objectContaining({ word: 'pleat' }));
       expect(recordPlayerWrongWord).not.toHaveBeenCalled();
     });
 

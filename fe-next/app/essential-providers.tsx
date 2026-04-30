@@ -27,6 +27,7 @@ import { AdMobProvider } from '@/contexts/AdMobContext';
 import AnchoredNativeBanner from '@/components/ads/AnchoredNativeBanner';
 import { SeasonClaimContainer } from '@/components/seasons/SeasonClaimContainer';
 import { SeasonAnnouncementModal } from '@/components/seasons/SeasonAnnouncementModal';
+import { HomeOnlySeasonGate } from '@/components/seasons/HomeOnlySeasonGate';
 import { SignupPromptHost } from '@/components/auth/SignupPromptHost';
 import { initUtmCapture } from '@/utils/utmCapture';
 import { initConsoleOverride, initCapacitorLogFilter } from '@/utils/consoleOverride';
@@ -199,10 +200,12 @@ export function EssentialProviders({ children, lang, initialTranslations }: Esse
                                                 {memoizedChildren}
                                                 {/* Global coin-earn VFX: sound + flying coins on every addCoins */}
                                                 <GlobalCoinEarnFx />
-                                                {/* Season claim modal — auto-shows when player has unclaimed past seasons */}
-                                                <SeasonClaimContainer />
-                                                {/* Season-change announcement modal — fires once per season ID transition */}
-                                                <SeasonAnnouncementModal />
+                                                {/* Season modals are gated to home route + first interaction + suspense delay
+                                                    so they never interrupt gameplay or pop instantly on landing. */}
+                                                <HomeOnlySeasonGate>
+                                                    <SeasonClaimContainer />
+                                                    <SeasonAnnouncementModal />
+                                                </HomeOnlySeasonGate>
                                                 {/* Global guest signup prompt — fires on first win or 5+ games regardless of mode. MP routes delegate to useMultiplayerSignupNudge. */}
                                                 <SignupPromptHost />
                                                 {/* Native AdMob banner — single global mount, route-aware. */}

@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import Image from 'next/image';
+import Script from 'next/script';
 
 export const dynamic = 'force-dynamic';
 
@@ -54,7 +56,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-// FAQ data — all values are static string literals (safe for JSON serialization)
 const faqs = [
   {
     q: 'Can I play Boggle online free with no download?',
@@ -82,21 +83,16 @@ const faqs = [
   },
 ];
 
-// Static JSON-LD — all content is hardcoded string literals, not user input
 const faqJsonLd = JSON.stringify({
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
   mainEntity: faqs.map((faq) => ({
     '@type': 'Question',
     name: faq.q,
-    acceptedAnswer: {
-      '@type': 'Answer',
-      text: faq.a,
-    },
+    acceptedAnswer: { '@type': 'Answer', text: faq.a },
   })),
 });
 
-// HowTo schema — shows step cards in SERPs
 const howToJsonLd = JSON.stringify({
   '@context': 'https://schema.org',
   '@type': 'HowTo',
@@ -104,26 +100,12 @@ const howToJsonLd = JSON.stringify({
   description: 'Start playing free online Boggle in 3 simple steps — no download or account required.',
   totalTime: 'PT1M',
   step: [
-    {
-      '@type': 'HowToStep',
-      name: 'Open LexiClash',
-      text: 'Visit lexiclash.live in any browser — works on phone, tablet, and desktop. No download or signup needed.',
-      url: 'https://www.lexiclash.live/en/singleplayer',
-    },
-    {
-      '@type': 'HowToStep',
-      name: 'Choose Your Mode',
-      text: 'Pick Solo (vs AI bots), Multiplayer (2-20+ friends), Daily Challenge (same puzzle worldwide), or Adventure Mode (boss battles).',
-    },
-    {
-      '@type': 'HowToStep',
-      name: 'Find Words & Score',
-      text: 'Swipe or click to connect adjacent letters and form words. Longer words and fast combos score more points. Compete on the global leaderboard!',
-    },
+    { '@type': 'HowToStep', name: 'Open LexiClash', text: 'Visit lexiclash.live in any browser — works on phone, tablet, and desktop. No download or signup needed.', url: 'https://www.lexiclash.live/en/singleplayer' },
+    { '@type': 'HowToStep', name: 'Choose Your Mode', text: 'Pick Solo (vs AI bots), Multiplayer (2-20+ friends), Daily Challenge (same puzzle worldwide), or Adventure Mode (boss battles).' },
+    { '@type': 'HowToStep', name: 'Find Words & Score', text: 'Swipe or click to connect adjacent letters and form words. Longer words and fast combos score more points. Compete on the global leaderboard!' },
   ],
 });
 
-// WebApplication schema — enables star ratings in SERPs
 const softwareAppJsonLd = JSON.stringify({
   '@context': 'https://schema.org',
   '@type': 'WebApplication',
@@ -131,11 +113,7 @@ const softwareAppJsonLd = JSON.stringify({
   url: 'https://www.lexiclash.live',
   applicationCategory: 'GameApplication',
   operatingSystem: 'Any',
-  offers: {
-    '@type': 'Offer',
-    price: '0',
-    priceCurrency: 'USD',
-  },
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
   featureList: [
     'Real-time multiplayer up to 20 players',
     'No download required — play in browser',
@@ -149,154 +127,286 @@ const softwareAppJsonLd = JSON.stringify({
   inLanguage: ['en', 'he', 'sv', 'ja', 'es'],
 });
 
+const stickerBadges = ['NO DOWNLOAD', 'NO SIGNUP', 'NO ADS HELL', 'PLAY IN 5s', '5 LANGUAGES', 'REAL-TIME', 'INSTANT FUN'];
+
+const modes = [
+  { href: 'singleplayer', color: 'lime', label: 'Solo', title: 'BEAT THE BOTS', desc: 'You vs sneaky AI rivals. Three difficulty tiers — pick your pain.', mascot: '/mascot/play.webp', cta: 'Play Solo Free' },
+  { href: 'multiplayer', color: 'pink', label: 'Multiplayer', title: 'BRING THE CHAOS', desc: 'Real-time word brawls with 2–20+ friends. Share a code, drop in, fight.', mascot: '/mascot/dj.webp', cta: 'Play With Friends' },
+  { href: 'daily', color: 'cyan', label: 'Daily', title: 'WORD WHEEL', desc: 'One letter set, the whole world plays it. Chase the global record.', mascot: '/mascot/scholar.webp', cta: 'Spin The Wheel' },
+] as const;
+
+const modeColorMap = {
+  lime: 'border-neo-lime text-neo-lime',
+  pink: 'border-neo-pink text-neo-pink',
+  cyan: 'border-neo-cyan text-neo-cyan',
+} as const;
+
+const modeBgMap = {
+  lime: 'bg-neo-lime text-neo-navy',
+  pink: 'bg-neo-pink text-neo-white',
+  cyan: 'bg-neo-cyan text-neo-navy',
+} as const;
+
+const stats = [
+  { value: '50K+', label: 'Games Played', color: 'text-neo-lime' },
+  { value: '4.7★', label: 'Player Rating', color: 'text-neo-yellow' },
+  { value: '20', label: 'Max Players', color: 'text-neo-pink' },
+  { value: '5', label: 'Languages', color: 'text-neo-cyan' },
+];
+
+const features = [
+  { icon: '⚡', text: 'Free online — no download, no signup, no ads-hell' },
+  { icon: '🤖', text: 'Solo mode vs AI bots at three sass levels' },
+  { icon: '🎉', text: 'Real-time multiplayer with 2–20+ players' },
+  { icon: '🔠', text: 'Three grid sizes: 4×4, 5×5, 6×6' },
+  { icon: '🌀', text: 'Daily Word Wheel — chase the global record' },
+  { icon: '🔥', text: 'Combo scoring rewards lightning chains' },
+  { icon: '📱', text: 'Phone, tablet, desktop — same game everywhere' },
+  { icon: '🌍', text: 'Five languages: EN · HE · SV · JA · ES' },
+  { icon: '🐉', text: 'Adventure mode with boss battles & loot' },
+  { icon: '🧠', text: 'Brain drills to sharpen the word-brain' },
+];
+
+const compareRows: ReadonlyArray<readonly [string, string, string, string]> = [
+  ['Free to play', '✓', '✗ board game', '✓ with ads'],
+  ['No download', '✓', '✗', '✗ app required'],
+  ['Real-time MP', '✓', '✓ in person', '✗ turn-based'],
+  ['Online with friends', '✓', '✗', '✓'],
+  ['Daily challenges', '✓', '✗', '✗'],
+  ['Multi-language', '5 langs', '✗', '✗'],
+  ['Boss battles', '✓', '✗', '✗'],
+  ['Grid sizes', '4×4 · 5×5 · 6×6', '4×4 only', 'N/A'],
+];
+
 export default async function PlayBoggleOnlineFreePage({ params }: PageProps) {
   const { locale } = await params;
 
   return (
-    <main className="min-h-screen bg-neo-navy text-neo-white">
-      {/* JSON-LD structured data — static hardcoded content only, no user input */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: faqJsonLd }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: howToJsonLd }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: softwareAppJsonLd }}
-      />
+    <main className="relative min-h-screen overflow-x-hidden bg-neo-navy text-neo-white texture-halftone">
+      <Script id="ld-faq" type="application/ld+json">{faqJsonLd}</Script>
+      <Script id="ld-howto" type="application/ld+json">{howToJsonLd}</Script>
+      <Script id="ld-app" type="application/ld+json">{softwareAppJsonLd}</Script>
 
-      <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
-        <h1 className="mb-6 font-neo-display text-4xl font-bold leading-tight sm:text-5xl">
-          Play Boggle Online Free — No Download Required
-        </h1>
-
-        <p className="mb-8 text-lg leading-relaxed text-neo-gray-200">
-          Looking to play boggle online free with no download? LexiClash is the best free boggle alternative
-          you can play instantly in your browser. Find words on a letter grid, challenge AI bots solo, or compete
-          with friends in real-time multiplayer battles. Like Words With Friends meets Boggle — but everyone
-          plays at the same time! No app to install, no signup needed.
-        </p>
-
-        <section className="mb-12 flex flex-col gap-3 sm:flex-row sm:gap-4">
-          <Link
-            href={`/${locale}/singleplayer`}
-            className="rounded-neo border-4 border-neo-yellow bg-neo-yellow px-6 py-3 text-center font-bold text-neo-navy shadow-hard transition-all hover:shadow-hard-lg sm:px-8 sm:py-4"
-          >
-            Play Boggle Solo — Free
-          </Link>
-          <Link
-            href={`/${locale}/multiplayer`}
-            className="rounded-neo border-4 border-neo-cyan bg-transparent px-6 py-3 text-center font-bold text-neo-cyan shadow-hard transition-all hover:bg-neo-cyan/10 sm:px-8 sm:py-4"
-          >
-            Play With Friends
-          </Link>
-          <Link
-            href={`/${locale}/daily`}
-            className="rounded-neo border-4 border-neo-pink bg-transparent px-6 py-3 text-center font-bold text-neo-pink shadow-hard transition-all hover:bg-neo-pink/10 sm:px-8 sm:py-4"
-          >
-            Daily Word Wheel
-          </Link>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">
-            How to Play Boggle Online Free
-          </h2>
-          <div className="grid gap-4 sm:grid-cols-3">
-            {[
-              { step: '1', title: 'Open LexiClash', desc: 'Visit lexiclash.live — works on any device. No download or signup.' },
-              { step: '2', title: 'Choose Your Mode', desc: 'Solo vs AI, multiplayer with friends, daily challenge, or adventure mode.' },
-              { step: '3', title: 'Find Words & Score', desc: 'Connect adjacent letters to form words. Longer words + fast combos = more points!' },
-            ].map((item) => (
-              <div
-                key={item.step}
-                className="rounded-neo border-3 border-neo-cyan bg-neo-navy/50 p-5 shadow-hard"
-              >
-                <div className="mb-2 inline-flex h-8 w-8 items-center justify-center rounded-full border-3 border-neo-cyan bg-neo-cyan/20 font-bold text-neo-cyan">
-                  {item.step}
-                </div>
-                <h3 className="mb-1 font-bold text-neo-cyan">{item.title}</h3>
-                <p className="text-sm text-neo-gray-200">{item.desc}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section className="mb-12 flex flex-wrap items-center justify-center gap-6 rounded-neo border-3 border-neo-lime/30 bg-neo-navy/50 px-6 py-4 shadow-hard">
-          {[
-            { value: '50K+', label: 'Games Played' },
-            { value: '4.7★', label: 'Player Rating' },
-            { value: '5', label: 'Languages' },
-            { value: '0', label: 'Downloads Needed' },
-          ].map((stat) => (
-            <div key={stat.label} className="text-center">
-              <div className="font-neo-display text-2xl font-bold text-neo-lime">{stat.value}</div>
-              <div className="text-xs text-neo-gray-200">{stat.label}</div>
-            </div>
+      {/* STICKER MARQUEE */}
+      <div className="border-y-3 border-neo-black bg-neo-lime overflow-hidden">
+        <div className="flex animate-[scroll_30s_linear_infinite] gap-6 whitespace-nowrap py-2 font-neo-display text-sm font-black uppercase tracking-widest text-neo-navy sm:text-base">
+          {[...stickerBadges, ...stickerBadges, ...stickerBadges].map((b, i) => (
+            <span key={`b-${i}`} className="inline-flex items-center gap-3">
+              <span>★</span>
+              <span>{b}</span>
+            </span>
           ))}
+        </div>
+      </div>
+
+      <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
+
+        {/* HERO */}
+        <section className="relative grid items-center gap-10 lg:grid-cols-12">
+          <div className="relative lg:col-span-7">
+            <span className="inline-block rotate-[-3deg] rounded-neo border-3 border-neo-black bg-neo-yellow px-3 py-1 font-neo-display text-xs font-black uppercase tracking-widest text-neo-navy shadow-hard">
+              ★ Browser-Native ★ Zero Install ★
+            </span>
+            <h1 className="mt-5 font-neo-display text-5xl font-black leading-[0.92] tracking-tight sm:text-6xl lg:text-7xl">
+              Play <span className="inline-block rotate-[-2deg] bg-neo-lime px-3 text-neo-navy shadow-hard">Boggle</span>
+              <br />
+              Online <span className="text-neo-cyan">Free</span>.
+              <br />
+              <span className="text-neo-pink">No</span> downloads.
+            </h1>
+
+            <p className="mt-6 max-w-xl text-lg leading-relaxed text-neo-gray-200 sm:text-xl">
+              The loudest, fastest free Boggle alternative on the internet. Find words on a letter grid solo, or
+              throw 20 friends into a real-time word brawl. Open the browser. Start playing. That&apos;s it.
+            </p>
+
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:gap-4">
+              <Link
+                href={`/${locale}/singleplayer`}
+                className="group rounded-neo border-4 border-neo-black bg-neo-yellow px-7 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-navy shadow-hard-lg transition-all hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed"
+              >
+                <span className="block text-base sm:text-lg">▶ Play Free Now</span>
+                <span className="block text-[10px] font-bold uppercase tracking-widest opacity-70">No download · No login</span>
+              </Link>
+              <Link
+                href={`/${locale}/multiplayer`}
+                className="rounded-neo border-4 border-neo-black bg-neo-pink px-6 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-white shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg sm:px-7"
+              >
+                <span className="block text-base sm:text-lg">★ Play w/ Friends</span>
+                <span className="block text-[10px] font-bold uppercase tracking-widest opacity-80">2–20 players</span>
+              </Link>
+            </div>
+
+            <div className="mt-7 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs uppercase tracking-widest text-neo-gray-200">
+              <span className="inline-flex items-center gap-2"><span className="text-neo-lime">●</span> live now</span>
+              <span>50K+ games played</span>
+              <span className="text-neo-yellow">4.7★ rated</span>
+            </div>
+          </div>
+
+          {/* HERO IMAGE — tilted with sticker corners */}
+          <div className="relative lg:col-span-5">
+            <div className="relative mx-auto aspect-[16/10] w-full max-w-md rotate-[2deg] rounded-neo border-4 border-neo-black bg-neo-navy-light shadow-hard-xl sm:max-w-none">
+              <Image
+                src="/landing/play-boggle-hero.webp"
+                alt="LexiClash Boggle letter grid with kawaii mascot character"
+                fill
+                priority
+                sizes="(min-width: 1024px) 480px, 100vw"
+                className="rounded-neo object-cover"
+              />
+              <span className="absolute -left-3 -top-3 inline-block rotate-[-12deg] border-3 border-neo-black bg-neo-yellow px-3 py-1 font-neo-display text-sm font-black uppercase text-neo-navy shadow-hard">FREE!</span>
+              <span className="absolute -bottom-3 -right-3 inline-block rotate-[8deg] border-3 border-neo-black bg-neo-pink px-3 py-1 font-neo-display text-sm font-black uppercase text-neo-white shadow-hard">2026</span>
+            </div>
+          </div>
         </section>
 
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">
-            Why LexiClash Is the Best Free Boggle Online
-          </h2>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {[
-              'Play boggle free online — no download, no signup',
-              'Solo mode with AI bots at multiple difficulty levels',
-              'Real-time multiplayer with 2-20+ players',
-              'Multiple grid sizes: 4×4, 5×5, and 6×6',
-              'Daily Word Wheel challenge — chase the world record',
-              'Combo scoring system for fast word chains',
-              'Works on phone, tablet, and desktop browser',
-              'Available in 5 languages (EN, HE, SV, JA, ES)',
-              'Adventure mode with boss battles and upgrades',
-              'Brain training drills to sharpen word skills',
-            ].map((feature) => (
-              <div
-                key={feature}
-                className="flex gap-3 rounded-neo border-3 border-neo-yellow bg-neo-navy/50 p-4 shadow-hard"
+        {/* MODE TRIO */}
+        <section className="mt-20">
+          <div className="mb-8 flex items-end justify-between">
+            <h2 className="font-neo-display text-3xl font-black uppercase leading-tight sm:text-4xl">
+              Pick your <span className="text-neo-lime">poison</span>.
+            </h2>
+            <span className="hidden font-mono text-xs uppercase tracking-widest text-neo-gray-300 sm:inline">{'// 3 modes · 0 paywalls'}</span>
+          </div>
+          <div className="grid gap-5 sm:grid-cols-3">
+            {modes.map((m, i) => (
+              <Link
+                key={m.href}
+                href={`/${locale}/${m.href}`}
+                className={`group relative flex flex-col gap-4 rounded-neo border-4 border-neo-black bg-neo-navy-light p-6 shadow-hard-lg transition-all hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl ${modeColorMap[m.color]}`}
+                style={{ transform: `rotate(${i % 2 === 0 ? '-1deg' : '1deg'})` }}
               >
-                <span className="shrink-0 text-neo-yellow">✓</span>
-                <p className="text-sm sm:text-base">{feature}</p>
+                <span className={`absolute -right-2 -top-3 inline-block rotate-[6deg] rounded border-3 border-neo-black px-2 py-0.5 font-neo-display text-[10px] font-black uppercase tracking-widest shadow-hard ${modeBgMap[m.color]}`}>
+                  {m.label}
+                </span>
+                <div className="relative h-24 w-24">
+                  <Image src={m.mascot} alt="" fill sizes="96px" className="object-contain" />
+                </div>
+                <h3 className="font-neo-display text-2xl font-black leading-tight">{m.title}</h3>
+                <p className="text-sm text-neo-gray-200">{m.desc}</p>
+                <span className="mt-auto inline-flex items-center gap-2 font-neo-display text-sm font-black uppercase tracking-widest">
+                  {m.cta} <span className="transition-transform group-hover:translate-x-1">→</span>
+                </span>
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        {/* STATS STRIP */}
+        <section className="relative mt-16 overflow-hidden rounded-neo border-4 border-neo-black bg-neo-navy-light shadow-hard-lg">
+          <div className="absolute inset-0 texture-halftone-comic-light opacity-60" aria-hidden="true" />
+          <div className="relative grid grid-cols-2 gap-4 p-6 sm:grid-cols-4 sm:p-8">
+            {stats.map((s) => (
+              <div key={s.label} className="text-center">
+                <div className={`font-neo-display text-4xl font-black sm:text-5xl ${s.color}`}>{s.value}</div>
+                <div className="mt-1 text-xs font-bold uppercase tracking-widest text-neo-gray-200">{s.label}</div>
               </div>
             ))}
           </div>
         </section>
 
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">
-            LexiClash vs Boggle vs Words With Friends
+        {/* HOW TO PLAY */}
+        <section className="mt-20">
+          <h2 className="mb-2 font-neo-display text-3xl font-black uppercase sm:text-4xl">
+            Three steps. <span className="text-neo-pink">One minute.</span>
           </h2>
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse rounded-neo border-3 border-neo-gray-400 text-sm sm:text-base">
+          <p className="mb-8 max-w-2xl text-neo-gray-200">No tutorials. No onboarding wall. You&apos;ll be finding words before the kettle boils.</p>
+          <ol className="grid gap-5 sm:grid-cols-3">
+            {[
+              { n: '01', title: 'Open the browser', desc: 'Hit lexiclash.live on phone, tablet, or laptop. No app store. No account. No vibe-killers.', mascot: '/mascot/explorer.webp', tint: 'border-neo-cyan' },
+              { n: '02', title: 'Pick a mode', desc: 'Solo vs bots, real-time multiplayer, daily Word Wheel, or boss-battle adventure mode.', mascot: '/mascot/question.webp', tint: 'border-neo-pink' },
+              { n: '03', title: 'Find words. Score. Win.', desc: 'Connect adjacent letters. Longer words + faster chains = a fatter score and louder bragging rights.', mascot: '/mascot/flexing.webp', tint: 'border-neo-lime' },
+            ].map((s) => (
+              <li key={s.n} className={`relative rounded-neo border-4 ${s.tint} bg-neo-navy-light p-6 shadow-hard`}>
+                <span className="absolute -top-4 left-4 inline-block rotate-[-4deg] border-3 border-neo-black bg-neo-yellow px-3 py-1 font-neo-display text-sm font-black text-neo-navy shadow-hard">
+                  STEP {s.n}
+                </span>
+                <div className="mt-3 flex items-start gap-4">
+                  <div className="relative h-16 w-16 shrink-0">
+                    <Image src={s.mascot} alt="" fill sizes="64px" className="object-contain" />
+                  </div>
+                  <div>
+                    <h3 className="font-neo-display text-xl font-black">{s.title}</h3>
+                    <p className="mt-1 text-sm text-neo-gray-200">{s.desc}</p>
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </section>
+
+        {/* MULTIPLAYER SHOWCASE */}
+        <section className="relative mt-20 grid items-center gap-8 rounded-neo border-4 border-neo-black bg-neo-pink p-1 shadow-hard-xl lg:grid-cols-2">
+          <div className="relative aspect-[16/10] w-full overflow-hidden rounded-neo border-4 border-neo-black">
+            <Image
+              src="/landing/play-boggle-multiplayer.webp"
+              alt="Three mascots competing on a multiplayer Boggle word board"
+              fill
+              sizes="(min-width: 1024px) 600px, 100vw"
+              className="object-cover"
+            />
+          </div>
+          <div className="p-6 sm:p-8 lg:p-10">
+            <span className="inline-block rotate-[-2deg] border-3 border-neo-black bg-neo-yellow px-3 py-1 font-neo-display text-xs font-black uppercase tracking-widest text-neo-navy shadow-hard">★ MULTIPLAYER ★</span>
+            <h2 className="mt-4 font-neo-display text-3xl font-black uppercase leading-tight text-neo-white sm:text-4xl">
+              The party <span className="bg-neo-navy px-2 text-neo-lime">starts</span> when friends join.
+            </h2>
+            <p className="mt-4 text-neo-white/90">
+              Spin up a room in 3 seconds. Share a 4-letter code or QR. 20 people on phones, one TV in the middle —
+              chaos in five languages. Real-time scoring, combo streaks, the works.
+            </p>
+            <Link
+              href={`/${locale}/multiplayer`}
+              className="mt-6 inline-block rounded-neo border-4 border-neo-black bg-neo-navy px-7 py-3 font-neo-display text-base font-black uppercase tracking-wider text-neo-lime shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg"
+            >
+              Start a Room →
+            </Link>
+          </div>
+        </section>
+
+        {/* WHY LEXICLASH */}
+        <section className="mt-20">
+          <h2 className="mb-8 font-neo-display text-3xl font-black uppercase sm:text-4xl">
+            The <span className="text-neo-yellow">good stuff</span>, all included.
+          </h2>
+          <ul className="grid gap-3 sm:grid-cols-2">
+            {features.map((f, i) => (
+              <li
+                key={f.text}
+                className="flex items-start gap-4 rounded-neo border-3 border-neo-black bg-neo-navy-light p-4 shadow-hard transition-all hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard-lg"
+                style={{ transform: i % 3 === 0 ? 'rotate(-0.4deg)' : i % 3 === 1 ? 'rotate(0.3deg)' : 'rotate(0deg)' }}
+              >
+                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-neo border-3 border-neo-black bg-neo-lime text-xl shadow-hard-sm" aria-hidden="true">{f.icon}</span>
+                <p className="pt-1.5 text-sm sm:text-base">{f.text}</p>
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        {/* COMPARISON */}
+        <section className="mt-20">
+          <h2 className="mb-2 font-neo-display text-3xl font-black uppercase sm:text-4xl">
+            LexiClash <span className="text-neo-pink">vs</span> The World.
+          </h2>
+          <p className="mb-6 text-sm text-neo-gray-300 sm:text-base">Where Boggle and Words With Friends fall short, LexiClash struts.</p>
+          <div className="overflow-x-auto rounded-neo border-4 border-neo-black bg-neo-navy-light shadow-hard-lg">
+            <table className="w-full border-collapse text-sm sm:text-base">
               <thead>
-                <tr className="border-b-3 border-neo-gray-400 bg-neo-navy/80">
-                  <th className="px-4 py-3 text-left font-bold text-neo-yellow">Feature</th>
-                  <th className="px-4 py-3 text-center font-bold text-neo-cyan">LexiClash</th>
-                  <th className="px-4 py-3 text-center text-neo-gray-300">Boggle</th>
-                  <th className="px-4 py-3 text-center text-neo-gray-300">Words With Friends</th>
+                <tr className="border-b-3 border-neo-black bg-neo-navy">
+                  <th className="px-4 py-4 text-left font-neo-display font-black uppercase tracking-wider text-neo-yellow">Feature</th>
+                  <th className="px-4 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-lime">LexiClash</th>
+                  <th className="px-4 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-gray-300">Boggle</th>
+                  <th className="px-4 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-gray-300">WWF</th>
                 </tr>
               </thead>
               <tbody>
-                {[
-                  ['Free to play', '✓', '✗ (board game)', '✓ (with ads)'],
-                  ['No download', '✓', '✗', '✗ (app required)'],
-                  ['Real-time multiplayer', '✓', '✓ (in person)', '✗ (turn-based)'],
-                  ['Online with friends', '✓', '✗', '✓'],
-                  ['Daily challenges', '✓', '✗', '✗'],
-                  ['Multiple languages', '5 languages', '✗', '✗'],
-                  ['Boss battles', '✓', '✗', '✗'],
-                  ['Multiple grid sizes', '4×4, 5×5, 6×6', '4×4 only', 'N/A'],
-                ].map(([feature, lexi, boggle, wwf]) => (
-                  <tr key={feature} className="border-b border-neo-gray-400/50">
-                    <td className="px-4 py-3 font-medium">{feature}</td>
-                    <td className="px-4 py-3 text-center text-neo-cyan">{lexi}</td>
-                    <td className="px-4 py-3 text-center text-neo-gray-300">{boggle}</td>
-                    <td className="px-4 py-3 text-center text-neo-gray-300">{wwf}</td>
+                {compareRows.map((row, i) => (
+                  <tr key={row[0]} className={`border-b border-neo-gray-400/20 ${i % 2 ? 'bg-neo-navy/30' : ''}`}>
+                    <td className="px-4 py-3 font-bold">{row[0]}</td>
+                    <td className="px-4 py-3 text-center font-bold text-neo-lime">{row[1]}</td>
+                    <td className="px-4 py-3 text-center text-neo-gray-300">{row[2]}</td>
+                    <td className="px-4 py-3 text-center text-neo-gray-300">{row[3]}</td>
                   </tr>
                 ))}
               </tbody>
@@ -304,68 +414,87 @@ export default async function PlayBoggleOnlineFreePage({ params }: PageProps) {
           </div>
         </section>
 
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">Frequently Asked Questions</h2>
-          <div className="space-y-4">
+        {/* FAQ */}
+        <section className="mt-20">
+          <h2 className="mb-6 font-neo-display text-3xl font-black uppercase sm:text-4xl">
+            Quick <span className="text-neo-cyan">questions</span>.
+          </h2>
+          <div className="space-y-3">
             {faqs.map((faq, idx) => (
               <details
                 key={`faq-${idx}-${faq.q}`}
-                className="group rounded-neo border-3 border-neo-gray-400 bg-neo-navy/50 shadow-hard"
+                className="group rounded-neo border-3 border-neo-black bg-neo-navy-light shadow-hard transition-all open:shadow-hard-lg"
               >
-                <summary className="flex cursor-pointer items-center justify-between px-6 py-4 font-bold">
+                <summary className="flex cursor-pointer items-center justify-between gap-4 px-5 py-4 font-neo-display font-black uppercase tracking-wide sm:px-6">
                   <span>{faq.q}</span>
-                  <span className="text-neo-yellow transition-transform group-open:rotate-180">▼</span>
+                  <span className="grid h-7 w-7 shrink-0 place-items-center rounded border-2 border-neo-black bg-neo-yellow text-neo-navy transition-transform group-open:rotate-45">+</span>
                 </summary>
-                <div className="border-t border-neo-gray-400 px-6 py-4 text-neo-gray-200">{faq.a}</div>
+                <div className="border-t-3 border-neo-black bg-neo-navy/40 px-5 py-4 text-sm text-neo-gray-200 sm:px-6 sm:text-base">{faq.a}</div>
               </details>
             ))}
           </div>
         </section>
 
-        <section className="mb-12">
-          <h2 className="mb-4 font-neo-display text-2xl font-bold sm:text-3xl">Compare Word Games</h2>
+        {/* CROSS-LINKS */}
+        <section className="mt-20">
+          <h2 className="mb-6 font-neo-display text-3xl font-black uppercase sm:text-4xl">More word fights.</h2>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            <Link href={`/${locale}/daily-word-wheel`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-lime/40">
-              <h3 className="font-bold text-neo-lime">Daily Word Wheel</h3>
-              <p className="mt-1 text-xs text-neo-gray-200">New letter puzzle every day</p>
-            </Link>
-            <Link href={`/${locale}/lexiclash-vs-wordle`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-lime/40">
-              <h3 className="font-bold text-neo-cyan">LexiClash vs Wordle</h3>
-              <p className="mt-1 text-xs text-neo-gray-200">Unlimited play vs 1 puzzle/day</p>
-            </Link>
-            <Link href={`/${locale}/lexiclash-vs-scrabble`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-lime/40">
-              <h3 className="font-bold text-neo-cyan">LexiClash vs Scrabble GO</h3>
-              <p className="mt-1 text-xs text-neo-gray-200">No pay-to-win, no bots, real players</p>
-            </Link>
-            <Link href={`/${locale}/best-online-word-games`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-lime/40">
-              <h3 className="font-bold text-neo-cyan">Best Word Games 2026</h3>
-              <p className="mt-1 text-xs text-neo-gray-200">Complete comparison guide</p>
-            </Link>
+            {[
+              { href: 'daily-word-wheel', tag: 'DAILY', title: 'Daily Word Wheel', desc: 'New letter puzzle every day', accent: 'border-neo-lime text-neo-lime' },
+              { href: 'lexiclash-vs-wordle', tag: 'VS', title: 'LexiClash vs Wordle', desc: 'Unlimited play vs 1 puzzle/day', accent: 'border-neo-cyan text-neo-cyan' },
+              { href: 'lexiclash-vs-scrabble', tag: 'VS', title: 'LexiClash vs Scrabble GO', desc: 'No pay-to-win, real players', accent: 'border-neo-pink text-neo-pink' },
+              { href: 'best-online-word-games', tag: 'GUIDE', title: 'Best Word Games 2026', desc: 'Complete comparison guide', accent: 'border-neo-yellow text-neo-yellow' },
+            ].map((c) => (
+              <Link
+                key={c.href}
+                href={`/${locale}/${c.href}`}
+                className={`relative rounded-neo border-3 ${c.accent} bg-neo-navy-light p-4 shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg`}
+              >
+                <span className="absolute -top-3 left-3 border-2 border-neo-black bg-neo-navy px-2 py-0.5 font-neo-display text-[10px] font-black uppercase tracking-widest">{c.tag}</span>
+                <h3 className="mt-2 font-neo-display text-base font-black">{c.title}</h3>
+                <p className="mt-1 text-xs text-neo-gray-200">{c.desc}</p>
+              </Link>
+            ))}
           </div>
         </section>
 
-        <section className="mb-12">
-          <h2 className="font-neo-display text-2xl font-bold sm:text-3xl">Start Playing Now</h2>
-          <p className="mt-4 text-neo-gray-200">
-            Stop searching for &quot;boggle online free no download&quot; — you found it! LexiClash is the best
-            free alternative to Boggle and Words With Friends that you can play right now in your browser. No
-            app store visit, no account creation, no waiting. Just pure word-finding fun.
-          </p>
-          <p className="mt-4 text-neo-gray-200">
-            Challenge yourself solo against AI bots, compete with friends in real-time multiplayer, or try the
-            Daily Word Wheel challenge where everyone worldwide plays the same puzzle. Track your stats, earn
-            achievements, and climb the global leaderboard.
-          </p>
-          <div className="mt-6">
-            <Link
-              href={`/${locale}/singleplayer`}
-              className="inline-block rounded-neo border-4 border-neo-yellow bg-neo-yellow px-8 py-4 font-bold text-neo-navy shadow-hard transition-all hover:shadow-hard-lg"
-            >
-              Play Free Boggle Now — No Download
-            </Link>
+        {/* FINAL CTA */}
+        <section className="relative mt-20 mb-12 overflow-hidden rounded-neo border-4 border-neo-black bg-neo-yellow p-8 text-neo-navy shadow-hard-xl sm:p-12">
+          <div className="absolute inset-0 texture-halftone-comic opacity-30" aria-hidden="true" />
+          <div className="relative grid items-center gap-8 lg:grid-cols-[1fr_auto]">
+            <div>
+              <h2 className="font-neo-display text-4xl font-black leading-[0.95] sm:text-5xl">
+                Stop searching.<br />
+                <span className="bg-neo-navy px-3 text-neo-yellow">Start playing.</span>
+              </h2>
+              <p className="mt-4 max-w-xl text-base font-bold sm:text-lg">
+                You searched &ldquo;boggle online free no download&rdquo; and you found it. The browser is open. The game is free.
+                The friends are waiting. Push the button.
+              </p>
+              <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+                <Link
+                  href={`/${locale}/singleplayer`}
+                  className="rounded-neo border-4 border-neo-black bg-neo-navy px-7 py-4 text-center font-neo-display text-base font-black uppercase tracking-wider text-neo-lime shadow-hard-lg transition-all hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl sm:text-lg"
+                >
+                  ▶ Play Boggle Now
+                </Link>
+                <Link
+                  href={`/${locale}/multiplayer`}
+                  className="rounded-neo border-4 border-neo-black bg-neo-pink px-7 py-4 text-center font-neo-display text-base font-black uppercase tracking-wider text-neo-white shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg sm:text-lg"
+                >
+                  ★ Invite Friends
+                </Link>
+              </div>
+            </div>
+            <div className="relative hidden h-44 w-44 lg:block">
+              <Image src="/mascot/winner.webp" alt="" fill sizes="176px" className="object-contain" />
+            </div>
           </div>
         </section>
       </div>
+
+      {/* MARQUEE KEYFRAMES */}
+      <style>{`@keyframes scroll{from{transform:translateX(0)}to{transform:translateX(-33.333%)}}`}</style>
     </main>
   );
 }

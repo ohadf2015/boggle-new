@@ -1,6 +1,3 @@
-import * as fs from 'fs';
-import * as fsp from 'fs/promises';
-import * as path from 'path';
 import type { Language } from '@/shared/types';
 import logger from './utils/logger';
 import { getThemedWords, getCurrentTheme } from './data/dateThemedWords';
@@ -437,52 +434,26 @@ function getLanguageConfig(language: Language): LanguageConfig {
   return configs[language] || configs.en;
 }
 
+// Audit C3 (2026-05-01): runtime persistence is DB-only. We previously appended
+// to `*_approved.txt` here, but Railway containers have ephemeral FS — those
+// writes were lost on every redeploy. Real persistence happens via
+// `word_scores.is_potentially_valid=true`, rehydrated by `loadCommunityWords()`
+// at boot. The committed `*_approved.txt` files still seed the baseline at boot.
 async function addApprovedWord(word: string, language: Language): Promise<boolean> {
   const config = getLanguageConfig(language);
   const normalizedWord = normalizeWord(word, language);
   if (config.dictionary.has(normalizedWord)) return false;
-
   config.dictionary.add(normalizedWord);
-
-  try {
-    const approvedFilePath = path.join(__dirname, config.approvedFile);
-    await fsp.appendFile(approvedFilePath, normalizedWord + '\n', 'utf-8');
-    logger.info('DICT', `Word "${word}" (${language}) promoted to community-approved dictionary`);
-    return true;
-  } catch (error: unknown) {
-    const err = error as Error;
-    logger.error('DICT', `Error appending approved word to file: ${err.message}`);
-    return true;
-  }
+  logger.info('DICT', `Word "${word}" (${language}) added to in-memory dictionary; DB is the authoritative store`);
+  return true;
 }
 
 async function removeApprovedWord(word: string, language: Language): Promise<boolean> {
   const config = getLanguageConfig(language);
   const normalizedWord = normalizeWord(word, language);
   if (!config.dictionary.has(normalizedWord)) return false;
-
   config.dictionary.delete(normalizedWord);
-
-  try {
-    const approvedFilePath = path.join(__dirname, config.approvedFile);
-    if (fs.existsSync(approvedFilePath)) {
-      const content = await fsp.readFile(approvedFilePath, 'utf-8');
-      const words = content.split('\n').filter(w => {
-        const trimmed = w.trim();
-        if (!trimmed) return false;
-        return normalizeWord(trimmed, language) !== normalizedWord;
-      });
-      const tmpPath = approvedFilePath + '.tmp';
-      const newContent = words.length > 0 ? words.join('\n') + '\n' : '';
-      await fsp.writeFile(tmpPath, newContent, 'utf-8');
-      await fsp.rename(tmpPath, approvedFilePath);
-    }
-    logger.info('DICT', `Word "${word}" (${language}) removed from community-approved dictionary`);
-  } catch (error: unknown) {
-    const err = error as Error;
-    logger.error('DICT', `Error removing word from approved file: ${err.message}`);
-  }
-
+  logger.info('DICT', `Word "${word}" (${language}) removed from in-memory dictionary; DB is the authoritative store`);
   return true;
 }
 

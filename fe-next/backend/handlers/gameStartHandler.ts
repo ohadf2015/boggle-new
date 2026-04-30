@@ -251,6 +251,16 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
         game.gameState = 'waiting';
       }
 
+      // Broadcast 'resetGame' so clients clear stale Zustand state before the
+      // next round's gameStarted arrives. Without this, prev-round state like
+      // wordHuntMyLife=0 / eliminatedPlayers leaks into the new round and
+      // immediately triggers WordHuntGameOverOverlay ("Watch the remaining
+      // players") for any player who didn't fire confirmReadyForNextGame.
+      broadcastToRoom(io, getGameRoom(gameCode), 'resetGame', {
+        users: getGameUsers(gameCode),
+        gameSessionId: game.gameSessionId,
+      });
+
       logger.info('SOCKET', `Game ${gameCode} auto-reset successful, state now: ${game.gameState}`);
     }
 
@@ -522,7 +532,7 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
           wordHuntSolveReused = true;
         }
       } else {
-        logger.error('WORD_HUNT', `No target word found for game ${gameCode} - falling back to classic mode`);
+        logger.info('WORD_HUNT', `No target word found for game ${gameCode} - falling back to classic mode`);
         updateGame(gameCode, { gameMode: 'classic' });
         resolvedMode = 'classic' as GameMode;
       }

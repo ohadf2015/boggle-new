@@ -287,7 +287,7 @@ Words With Friends עשה משהו שסקרבל מעולם לא יכל: הוא �
     practice: 'תרגול',
   },
   sv: {
-    title: 'Fran Antika Brickor till Digitala Rutnät: Ordspelens Vilda Historia',
+    title: 'Från Antika Brickor till Digitala Rutnät: Ordspelens Vilda Historia',
     subtitle: 'Stulna idéer, korsordsvansinne, en hemmapappas uppfinning och ett ord med fem bokstäver som krossade internet.',
     category: 'Historia',
     readTime: '11 min läsning',

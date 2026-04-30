@@ -68,7 +68,7 @@ const REJECTED_TYPE_VALUES = new Set(Object.values(REJECTED_WORD_TYPES));
  */
 export interface MilogVerificationResult {
   verified: boolean;
-  status: 'verified' | 'not_found' | 'error' | 'rejected_type';
+  status: 'verified' | 'not_found' | 'error' | 'rejected_type' | 'needs_review';
   definitionCount: number;
   url?: string;
   error?: string;
@@ -161,9 +161,12 @@ export function parseVerificationResult(html: string, word: string): MilogVerifi
     };
   }
 
-  // Permissive fallback: links exist but no type parsed
+  // Default-deny on unknown POS (audit H3): if the parser can't classify the
+  // type but Milog has links, park for human review instead of permissively
+  // promoting. Prevents abbreviation/proper-name leaks when Milog markup shifts.
   return {
-    verified: true, status: 'verified', definitionCount, url, wordType: 'unknown',
+    verified: false, status: 'needs_review', definitionCount, url, wordType: 'unknown',
+    rejectedReason: 'word type could not be determined — needs human review',
   };
 }
 

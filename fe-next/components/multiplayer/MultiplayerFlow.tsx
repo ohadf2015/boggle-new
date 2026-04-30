@@ -1,9 +1,10 @@
 'use client';
 
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import RoomListView from './RoomListView';
 import JoinRoomModal from './JoinRoomModal';
 import CreateRoomModal from './CreateRoomModal';
+import CgLobbyHero from './CgLobbyHero';
+import CgAwareLobbyChrome from './CgAwareLobbyChrome';
 import type { Language, ActiveRoom } from '@/shared/types/game';
 import {
   getStoredUsername,
@@ -14,9 +15,9 @@ import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { SeasonBanner } from '@/components/multiplayer/SeasonBanner';
 import { MatchmakingOverlay } from '@/components/multiplayer/MatchmakingOverlay';
 import { useMatchmaking } from '@/hooks/useMatchmaking';
+import { useCgLobbyHeroVariant } from '@/hooks/useCgLobbyHeroVariant';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 
 type FlowState = 'room-list' | 'join-modal' | 'create-modal';
@@ -108,7 +109,7 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
 }) => {
   const { t } = useLanguage();
   const { isAdmin, profile } = useAuth();
-  const { isOnCrazyGamesPlatform } = useCrazyGames();
+  const { isOnCrazyGamesPlatform, cgUser } = useCrazyGames();
   const matchmaking = useMatchmaking();
 
   // Auto-join ranked match room when found
@@ -127,6 +128,10 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
 
   // UX-007: Track which room is being joined to show per-card loading state
   const [joiningRoomCode, setJoiningRoomCode] = useState<string | null>(null);
+
+  // CG lobby diet: hero expansion state and variant
+  const [heroExpanded, setHeroExpanded] = useState(false);
+  const heroVariant = useCgLobbyHeroVariant(cgUser ?? null);
 
   // UX-014: Room fetch timeout — if rooms haven't loaded after 10s, show retry banner
   const [roomFetchTimedOut, setRoomFetchTimedOut] = useState(false);
@@ -392,6 +397,14 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
   // and tanks gameplay-conversion. Show the lobby immediately; auto-join waits
   // for SDK ready (effect above) so platform calls fire correctly when they fire.
 
+  // CG lobby diet: determine if auto-join is pending or if hero should show
+  const cgAutoJoinPending =
+    isOnCrazyGamesPlatform &&
+    !cgAutoJoinHandledRef.current &&
+    (typeof window === 'undefined' || !window.sessionStorage.getItem('boggle_cg_auto_joined'));
+
+  const showCgHero = isOnCrazyGamesPlatform && !isClassroomMode && !cgAutoJoinPending;
+
   // Classroom mode: suppress public-lobby chrome. Auto-join effects above still
   // run (handleInvitationAutoJoin fires from prefilledRoom), so the host's room
   // is created/joined the same way — only the UI is replaced with a waiting
@@ -410,20 +423,36 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
   // Always show RoomListView as base, with modals as overlays
   return (
     <>
-      {/* SeasonBanner returns null for unranked users — render its wrapper
-          padding only when something will actually appear, so non-admin
-          unranked players don't get a 12px ghost gap above ARENA HUB. */}
-      <SeasonBanner />
-      {isAdmin && (
-        <div className="px-4 pt-3">
-          <button
-            onClick={() => matchmaking.joinQueue('classic', defaultLanguage)}
-            disabled={matchmaking.status !== 'idle'}
-            className="w-full rounded-neo border-neo bg-neo-pink px-4 py-3 font-neo-display text-neo-white shadow-hard-sm transition-transform active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed disabled:opacity-50"
-          >
-            ⚔️ {t('matchmaking.rankedMatch')}
-          </button>
-        </div>
+      {showCgHero && (
+        <CgLobbyHero
+          variant={heroVariant.variant}
+          displayName={heroVariant.displayName}
+          onPlay={() => {
+            heroVariant.markSeen();
+            handleQuickPlay();
+          }}
+          onBrowse={() => {
+            heroVariant.markSeen();
+            setHeroExpanded(true);
+          }}
+        />
+      )}
+
+      {(!showCgHero || heroExpanded) && (
+        <CgAwareLobbyChrome
+          isAdmin={isAdmin}
+          defaultLanguage={defaultLanguage}
+          activeRooms={activeRooms}
+          roomsLoading={roomsLoading}
+          roomFetchTimedOut={roomFetchTimedOut}
+          joiningRoomCode={joiningRoomCode}
+          isJoining={isJoining}
+          onRefreshRooms={refreshRooms}
+          onRoomClick={handleRoomClick}
+          onCreateRoom={handleCreateClick}
+          onQuickPlay={handleQuickPlay}
+          matchmaking={matchmaking}
+        />
       )}
 
       <MatchmakingOverlay
@@ -436,31 +465,6 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
         onCancel={matchmaking.leaveQueue}
         onCreateRoom={() => { matchmaking.leaveQueue(); setFlowState('create-modal'); }}
         t={t as (key: string, params?: Record<string, unknown>) => string}
-      />
-
-      {/* UX-014: Room fetch timeout retry banner */}
-      {roomFetchTimedOut && !roomsLoading && activeRooms.length === 0 && (
-        <div className="mx-4 mb-3 p-3 bg-neo-red/20 border-2 border-neo-red rounded-neo flex items-center justify-between gap-3">
-          <p className="text-sm font-bold text-neo-white">
-            {t('multiplayerFlow.roomList.fetchTimeout')}
-          </p>
-          <button
-            onClick={refreshRooms}
-            className="text-sm font-black uppercase text-neo-red border-2 border-neo-red rounded-neo px-3 py-1 hover:bg-neo-red/30 transition-colors"
-          >
-            {t('multiplayerFlow.roomList.retry')}
-          </button>
-        </div>
-      )}
-
-      <RoomListView
-        activeRooms={activeRooms}
-        roomsLoading={roomsLoading}
-        onRefreshRooms={refreshRooms}
-        onRoomClick={handleRoomClick}
-        onCreateRoom={handleCreateClick}
-        onQuickPlay={handleQuickPlay}
-        isQuickPlayLoading={!!joiningRoomCode || isJoining}
       />
 
       {/* Join Room Modal */}

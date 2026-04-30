@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { Clock, Shuffle, RotateCcw, Sparkles, Flame, TrendingUp, ChevronUp, Check } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -43,6 +43,10 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
   puzzle, duration, onComplete, onValidateWord, onEffect, language, paused = false,
 }) => {
   const { t } = useLanguage();
+  // `useReducedMotion` returns `true` when the user has set the OS-level
+  // reduced-motion preference; we gate the breathing/pulse loops on it
+  // (WCAG 2.3.3) but leave functional feedback animations (tap, success) intact.
+  const prefersReducedMotion = useReducedMotion() ?? false;
   const {
     playTileSelectSound, playWordAcceptedSound, playWordRejectedSound,
     playComboSound, playLegendaryWordSound, playEpicVictorySound,
@@ -72,14 +76,15 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
   const wheelContainerRef = useRef<HTMLDivElement>(null);
   const idleSubmitTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // ── Live leaderboard rivals (snapshot on mount) ──
+  // ── Live leaderboard rivals (snapshot on mount + refresh every 30s) ──
   const [rivals, setRivals] = useState<RivalScore[]>([]);
-  const [passToast, setPassToast] = useState<string | null>(null);
+  const [passToasts, setPassToasts] = useState<Array<{ id: number; name: string }>>([]);
   const passedNamesRef = useRef<Set<string>>(new Set());
+  const passToastIdRef = useRef(0);
 
   useEffect(() => {
     let cancelled = false;
-    (async () => {
+    const fetchRivals = async () => {
       try {
         const today = new Date().toISOString().split('T')[0];
         const res = await fetch(`/api/daily-challenge/word-wheel/leaderboard/${today}/${language}?limit=100`);
@@ -92,8 +97,12 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
           .sort((a: RivalScore, b: RivalScore) => a.score - b.score);
         setRivals(list);
       } catch { /* leaderboard is best-effort */ }
-    })();
-    return () => { cancelled = true; };
+    };
+    void fetchRivals();
+    // Refresh every 30s so late finishers who post higher scores during your
+    // game still appear in the pass-detection list.
+    const interval = setInterval(fetchRivals, 30_000);
+    return () => { cancelled = true; clearInterval(interval); };
   }, [language]);
 
   // Closest rival above me + pass detection
@@ -114,18 +123,36 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Detect newly-passed rivals when score changes
+  // Detect newly-passed rivals when score changes — queue toasts so multiple
+  // simultaneous passes (combo + pangram) all celebrate, plus mini-celebration
+  // burst (combo-flash particles + sound + haptic).
   useEffect(() => {
     if (!rivals.length) return;
+    const cx = gameContainerRef.current
+      ? gameContainerRef.current.getBoundingClientRect().width / 2
+      : 200;
+    let staggerIndex = 0;
     for (const r of rivals) {
       if (r.score > 0 && r.score <= score && !passedNamesRef.current.has(r.name)) {
         passedNamesRef.current.add(r.name);
-        setPassToast(r.name);
-        haptic([20, 40, 20]);
-        setTimeout(() => setPassToast(null), 2400);
+        const id = ++passToastIdRef.current;
+        // Stagger each pass slightly so the toasts don't pile up at the exact
+        // same y-offset.
+        const delay = staggerIndex * 250;
+        staggerIndex += 1;
+        setTimeout(() => {
+          setPassToasts(prev => [...prev, { id, name: r.name }]);
+          haptic([15, 25, 15, 25, 30]);
+          playComboSound(2);
+          onEffect({ type: 'combo', x: cx, y: 140, combo: 2 });
+          setTimeout(
+            () => setPassToasts(prev => prev.filter(t => t.id !== id)),
+            2400,
+          );
+        }, delay);
       }
     }
-  }, [score, rivals]);
+  }, [score, rivals, onEffect, playComboSound]);
 
   // ── Drag-to-build support ── (handlers defined after handleLetterPress)
   const draggingRef = useRef(false);
@@ -151,14 +178,14 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
   useEffect(() => { builtLettersRef.current = builtLetters; }, [builtLetters]);
   useEffect(() => { usedIndicesRef.current = usedIndices; }, [usedIndices]);
 
-  // Auto-submit after 2s idle when word is long enough
+  // Auto-submit after 1s idle (or instantly on drag-release; see handlePointerUp)
   useEffect(() => {
     if (idleSubmitTimerRef.current) { clearTimeout(idleSubmitTimerRef.current); idleSubmitTimerRef.current = null; }
     if (builtLetters.length >= 3 && !gameOverRef.current) {
       idleSubmitTimerRef.current = setTimeout(() => {
         idleSubmitTimerRef.current = null;
         handleSubmitRef.current();
-      }, 2000);
+      }, 1000);
     }
     return () => { if (idleSubmitTimerRef.current) { clearTimeout(idleSubmitTimerRef.current); idleSubmitTimerRef.current = null; } };
   }, [builtLetters]);
@@ -323,6 +350,11 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
   }, [playButtonClickSound]);
 
   // ── Shuffle outer letters ──
+  // builtLetters store positional wheelIndex; after shuffle the same index
+  // maps to a different letter, which would desync the wheel highlight from
+  // the word builder. Remap each built letter to its new position (preferring
+  // unused positions in the case of duplicate letters); drop any that can't
+  // be relocated.
   const handleShuffle = useCallback(() => {
     setOuterLetters(prev => {
       const arr = [...prev];
@@ -330,6 +362,20 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         const j = Math.floor(Math.random() * (i + 1));
         [arr[i], arr[j]] = [arr[j], arr[i]];
       }
+      // Remap built letters to new wheel positions
+      setBuiltLetters(prevBuilt => {
+        const claimed = new Set<number>();
+        const remapped: Array<{ letter: string; wheelIndex: number }> = [];
+        for (const bl of prevBuilt) {
+          if (bl.wheelIndex === -1) { remapped.push(bl); continue; } // center letter unaffected
+          const newIdx = arr.findIndex((l, idx) => l === bl.letter && !claimed.has(idx));
+          if (newIdx !== -1) {
+            claimed.add(newIdx);
+            remapped.push({ letter: bl.letter, wheelIndex: newIdx });
+          }
+        }
+        return remapped;
+      });
       return arr;
     });
     playBoardShuffleSound();
@@ -348,14 +394,14 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
 
     // Client-side checks
     if (word.length < 3) {
-      showFeedback(t('wordWheel.tooShort').replace('{min}', '3'), 'error');
+      showFeedback(t('wordWheel.tooShort', { min: '3' }), 'error');
       onEffect({ type: 'error', x: cx, y: 80 });
       playWordRejectedSound();
       return;
     }
 
     if (!word.includes(puzzle.centerLetter.toUpperCase())) {
-      showFeedback(t('wordWheel.missingCenter').replace('{letter}', puzzle.centerLetter), 'error');
+      showFeedback(t('wordWheel.missingCenter', { letter: puzzle.centerLetter }), 'error');
       onEffect({ type: 'error', x: cx, y: 80 });
       playWordRejectedSound();
       return;
@@ -503,7 +549,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
               </AnimatePresence>
             </div>
             <span className="text-neo-cream/60 text-xs sm:text-sm font-semibold truncate">
-              {t('wordWheel.wordsFound').replace('{count}', String(wordsFound.length))}
+              {t('wordWheel.wordsFound', { count: wordsFound.length })}
             </span>
             <motion.span
               key={score}
@@ -649,32 +695,47 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
             >
               <ChevronUp className="w-3 h-3 text-neo-lime" />
               <span>
-                {t('wordWheel.wordsToPass')
-                  .replace('{count}', String(wordsToPass))
-                  .replace('{name}', nextRival.name)}
+                {t('wordWheel.wordsToPass', { count: wordsToPass, name: nextRival.name })}
               </span>
             </motion.div>
           )}
         </AnimatePresence>
       </div>
 
-      {/* Pass notification toast */}
-      <AnimatePresence>
-        {passToast && (
-          <motion.div
-            className="absolute top-16 left-1/2 -translate-x-1/2 z-30 px-3 py-1.5 rounded-neo border-3 border-neo-black bg-linear-to-r from-neo-pink to-neo-purple text-neo-white font-neo-display font-black text-sm shadow-[3px_3px_0px_black,0_0_18px_rgba(255,20,147,0.5)] flex items-center gap-1.5 whitespace-nowrap"
-            initial={{ opacity: 0, y: -20, scale: 0.8 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -20, scale: 0.8 }}
-          >
-            <TrendingUp className="w-4 h-4" />
-            {t('wordWheel.passedPlayer').replace('{name}', passToast)}
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Pass notification toast stack — queued so back-to-back passes all
+          celebrate. Each toast stacks vertically with a small offset. */}
+      <div className="absolute top-16 left-1/2 -translate-x-1/2 z-30 pointer-events-none flex flex-col items-center gap-1.5">
+        <AnimatePresence>
+          {passToasts.map((toast, i) => (
+            <motion.div
+              key={toast.id}
+              className="px-3 py-1.5 rounded-neo border-3 border-neo-black bg-linear-to-r from-neo-pink to-neo-purple text-neo-white font-neo-display font-black text-sm shadow-[3px_3px_0px_black,0_0_18px_rgba(255,20,147,0.6)] flex items-center gap-1.5 whitespace-nowrap"
+              initial={{ opacity: 0, y: -20, scale: 0.6, rotate: -4 }}
+              animate={prefersReducedMotion
+                ? { opacity: 1, y: i * 4, scale: 1, rotate: 0 }
+                : { opacity: 1, y: i * 4, scale: [0.6, 1.15, 1], rotate: [-4, 2, 0] }
+              }
+              exit={{ opacity: 0, y: -10, scale: 0.7 }}
+              transition={prefersReducedMotion
+                ? { duration: 0.2 }
+                : { type: 'spring', stiffness: 500, damping: 18 }
+              }
+            >
+              <TrendingUp className="w-4 h-4" />
+              {t('wordWheel.passedPlayer', { name: toast.name })}
+            </motion.div>
+          ))}
+        </AnimatePresence>
+      </div>
 
-      {/* ── Centered wheel region (absorbs leftover vertical space) ── */}
-      <div className="flex-1 flex flex-col items-center justify-center w-full min-h-0 gap-2 py-1">
+      {/* ── Centered wheel + actions cluster (absorbs leftover vertical space) ──
+          Action bar lives INSIDE the flex-1 cluster so wheel and buttons stay
+          glued together regardless of viewport height. Previously the action
+          bar was sticky at the screen bottom, which on tall phones/tablets
+          left a 100–250px gap between the wheel and Submit. The inline-submit
+          chip near the word-builder still serves as the primary CTA when the
+          found-words list grows past viewport. */}
+      <div className="flex-1 flex flex-col items-center justify-center w-full min-h-0 gap-2 py-1" data-testid="wheel-cluster">
       {/* Tap-to-remove + double-tap-to-submit hint — reserved slot so the
           wheel does not shift down on first tap. */}
       <div
@@ -704,12 +765,12 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
           radius={wheelRadius}
           combo={combo}
         />
-        {/* Outer glow ring */}
+        {/* Outer glow ring — breathing loop disabled under reduced-motion */}
         <motion.div
           className="absolute inset-0 rounded-full border-2 border-neo-lime/20"
           style={{ boxShadow: '0 0 24px rgba(191,255,0,0.12), inset 0 0 24px rgba(191,255,0,0.06)' }}
-          animate={{ opacity: [0.6, 1, 0.6] }}
-          transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+          animate={prefersReducedMotion ? { opacity: 0.85 } : { opacity: [0.6, 1, 0.6] }}
+          transition={prefersReducedMotion ? { duration: 0 } : { duration: 3, repeat: Infinity, ease: 'easeInOut' }}
         />
         {/* Inner decorative ring */}
         <div className="absolute inset-4 sm:inset-5 rounded-full border border-neo-cyan/10" />
@@ -722,11 +783,12 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
           onPress={(letter, _, el) => handleLetterPress(letter, -1, el)}
           isUsed={usedIndices.has(-1)}
           index={-1}
+          reducedMotion={prefersReducedMotion}
         />
         {/* Outer letters */}
         {outerLetters.map((letter, i) => (
           <WheelLetter
-            key={letter}
+            key={`${letter}-${i}`}
             letter={letter}
             isCenter={false}
             angle={i * 60}
@@ -734,22 +796,20 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
             onPress={(l, _, el) => handleLetterPress(l, i, el)}
             isUsed={usedIndices.has(i)}
             index={i}
+            reducedMotion={prefersReducedMotion}
           />
         ))}
       </div>
 
       {/* ── Center letter rule hint ── */}
       <p className="text-neo-cream/40 text-xs text-center">
-        {t('wordWheel.centerLetterRule')} &middot; {t('wordWheel.minLetters').replace('{min}', '3')}
+        {t('wordWheel.centerLetterRule')} &middot; {t('wordWheel.minLetters', { min: '3' })}
       </p>
-      </div>
 
-      {/* ── Action Buttons (sticky so Submit stays in view as found-words list grows) ── */}
-      {/* Parent scroll container (WordWheelChallenge playing wrapper) reserves
-          --bottom-stack-height via `pb-bottom-stack`, so sticky bottom: 0 pins
-          to the content-edge above the AdMob banner without double-counting. */}
+      {/* ── Action Buttons (inline below wheel, glued via flex cluster) ── */}
       <div
-        className="sticky bottom-0 z-30 w-full flex items-center justify-center gap-3 py-2 bg-linear-to-t from-neo-navy via-neo-navy/95 to-transparent"
+        data-testid="word-wheel-action-bar"
+        className="w-full flex items-center justify-center gap-3 mt-1"
       >
         {/* Clear */}
         <motion.button
@@ -805,19 +865,21 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
           <Shuffle className="w-5 h-5" />
         </motion.button>
       </div>
+      </div>
 
-      {/* ── Found Words ── */}
+      {/* ── Found Words — capped height with internal scroll so a 40+ word
+          run doesn't push the page miles tall on small screens. ── */}
       <AnimatePresence>
         {wordsFound.length > 0 && (
           <motion.div
-            className="w-full"
+            className="w-full mt-2"
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
           >
             <h3 className="text-neo-cream/50 text-xs font-bold uppercase mb-2">
               {t('wordWheel.foundWords')} ({wordsFound.length})
             </h3>
-            <div className="flex flex-wrap gap-1.5">
+            <div className="flex flex-wrap gap-1.5 max-h-[112px] sm:max-h-[136px] overflow-y-auto pr-1">
               {wordsFound.map((word) => (
                 <motion.span
                   key={word}
@@ -828,11 +890,11 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
                       : 'bg-neo-navy-light border-neo-black',
                   )}
                   initial={{ scale: 0, opacity: 0 }}
-                  animate={word === lastFoundWord
+                  animate={word === lastFoundWord && !prefersReducedMotion
                     ? { scale: [0, 1.15, 1], opacity: 1 }
                     : { scale: 1, opacity: 1 }
                   }
-                  transition={{ type: 'spring', stiffness: 500 }}
+                  transition={prefersReducedMotion ? { duration: 0.2 } : { type: 'spring', stiffness: 500 }}
                 >
                   {word} <span className="text-neo-lime font-black">+{scoreWord(word)}</span>
                 </motion.span>

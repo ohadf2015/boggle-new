@@ -9,7 +9,7 @@ import type { CinematicPlayerProps } from '../adventure/boss/cinematics/Cinemati
 
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getAchievementIcon } from '@/constants/achievementIcons';
-import { calculateTier, TIER_COLORS } from '@/utils/achievementTiers';
+import { calculateTier, TIER_COLORS, getTierToastStyle } from '@/utils/achievementTiers';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { haptics } from '@/utils/haptics/HapticsManager';
 import type { AchievementPayload } from '@/shared/types/socket';
@@ -167,11 +167,23 @@ const INLINE_TOAST_DURATION = 2000;
 const INLINE_TOAST_GAP = 400;
 
 /**
- * AchievementInlineToast - Compact achievement notification for multiplayer
+ * AchievementInlineToast - Narrow capsule achievement notification for multiplayer
  *
- * Shows achievement icon (from ACHIEVEMENT_ICONS), translated name, and
- * description. Non-intrusive, fixed to top of screen.
+ * Shines + sparkles + pulsing yellow glow ring on icon. Non-intrusive, fixed
+ * to top of screen. Capsule shape matches the single-player AchievementToast
+ * for visual cohesion across surfaces.
  */
+const INLINE_SPARKLE_OFFSETS: Array<{ x: number; y: number; delay: number; size: number }> = [
+  { x: -16, y: -14, delay: 0.05, size: 10 },
+  { x: 16, y: -10, delay: 0.18, size: 9 },
+  { x: -12, y: 14, delay: 0.28, size: 8 },
+  { x: 14, y: 14, delay: 0.36, size: 8 },
+  { x: 0, y: -20, delay: 0.42, size: 7 },
+  { x: 0, y: 20, delay: 0.5, size: 7 },
+];
+
+const DEFAULT_INLINE_GLOW = 'rgba(255, 225, 53, 0.55)';
+
 function AchievementInlineToast({
   achievement,
   onDismiss,
@@ -179,12 +191,22 @@ function AchievementInlineToast({
   achievement: AchievementPayload;
   onDismiss: () => void;
 }) {
-  const { t } = useLanguage();
+  const { t, dir } = useLanguage();
   const { playAchievementSound } = useSoundEffects();
 
   const icon = getAchievementIcon(achievement.key);
   const name = t(`achievements.${achievement.key}.name`) || achievement.key;
-  const description = t(`achievements.${achievement.key}.description`);
+  const isRtl = dir === 'rtl';
+
+  // Tier-aware styling — falls back to a neutral yellow when count is absent
+  // so the existing test contract (shadow-hard-yellow on default) still holds.
+  const tier = achievement.count ? calculateTier(achievement.count) : null;
+  const tierColors = tier ? TIER_COLORS[tier] : null;
+  const tierStyle = getTierToastStyle(tier);
+  const sparkles = INLINE_SPARKLE_OFFSETS.slice(0, tierStyle.sparkleCount);
+  const iconBg = tierColors?.bg ?? 'var(--neo-yellow)';
+  const sparkleColor = tierColors?.border ?? 'var(--neo-yellow)';
+  const glow = tierColors?.glow ?? DEFAULT_INLINE_GLOW;
 
   useEffect(() => {
     playAchievementSound();
@@ -199,46 +221,129 @@ function AchievementInlineToast({
   const toast = (
     <motion.div
       data-testid="achievement-inline-toast"
-      initial={{ y: -60, opacity: 0, scale: 0.9 }}
+      initial={{ y: -40, opacity: 0, scale: 0.92 }}
       animate={{ y: 0, opacity: 1, scale: 1 }}
-      exit={{ y: -40, opacity: 0, scale: 0.95 }}
-      transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+      exit={{ y: -20, opacity: 0, scale: 0.96 }}
+      transition={{ type: 'spring', stiffness: 460, damping: 22, mass: 0.6 }}
       className="fixed inset-x-0 z-60 flex justify-center pointer-events-none px-4"
       style={{
         top: 'max(1rem, env(safe-area-inset-top, 1rem))',
       }}
     >
       <div
-        className="flex items-center gap-3 px-4 py-3 rounded-neo border-3 border-neo-black bg-neo-navy pointer-events-auto shadow-hard-yellow"
+        className={`relative flex items-center gap-2.5 px-3.5 py-2 rounded-full border-2 border-neo-black bg-neo-navy/95 pointer-events-auto ${tierStyle.shadowClass} overflow-hidden`}
         style={{
-          minWidth: 'min(280px, calc(100vw - 2rem))',
-          maxWidth: 'min(420px, calc(100vw - 2rem))',
+          minWidth: 'min(220px, calc(100vw - 2rem))',
+          maxWidth: 'min(320px, calc(100vw - 2rem))',
         }}
       >
-        {/* Achievement Icon */}
-        <div
-          data-testid="achievement-inline-icon"
-          className="w-12 h-12 flex items-center justify-center rounded-full border-2 border-neo-black bg-neo-yellow shrink-0"
-        >
-          <span className="text-2xl">{icon}</span>
+        {/* Shine sweep — rarer tiers run twice */}
+        <motion.div
+          aria-hidden
+          initial={{ x: isRtl ? 240 : -240, opacity: 0 }}
+          animate={{ x: isRtl ? -240 : 240, opacity: [0, 0.85, 0] }}
+          transition={{
+            delay: 0.12,
+            duration: 0.9,
+            ease: 'easeOut',
+            repeat: tierStyle.shineRepeat - 1,
+            repeatDelay: 0.6,
+          }}
+          className="pointer-events-none absolute inset-y-0 w-24"
+          style={{
+            background: `linear-gradient(${isRtl ? '-75deg' : '75deg'}, transparent, ${glow}, transparent)`,
+            mixBlendMode: 'screen',
+          }}
+        />
+
+        {/* Icon + glow ring + sparkles */}
+        <div className="relative flex-shrink-0">
+          <motion.div
+            animate={{
+              boxShadow: [
+                `0 0 0 0 ${glow}`,
+                `0 0 0 ${tierStyle.pulseRadius}px transparent`,
+                `0 0 0 0 ${glow}`,
+              ],
+            }}
+            transition={{ duration: 1.6, repeat: Infinity, ease: 'easeOut' }}
+            className="absolute inset-0 rounded-full"
+            aria-hidden
+          />
+          <motion.div
+            data-testid="achievement-inline-icon"
+            initial={{ scale: 0, rotate: -180 }}
+            animate={{ scale: 1, rotate: 0 }}
+            transition={{ delay: 0.05, type: 'spring', stiffness: 360, damping: 12 }}
+            className="relative w-9 h-9 flex items-center justify-center rounded-full border-2 border-neo-black"
+            style={{ backgroundColor: iconBg }}
+          >
+            <motion.span
+              className="text-lg leading-none"
+              animate={{ y: [0, -1.5, 0] }}
+              transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
+            >
+              {icon}
+            </motion.span>
+          </motion.div>
+          {sparkles.map((s, i) => (
+            <motion.span
+              key={i}
+              aria-hidden
+              initial={{ opacity: 0, scale: 0 }}
+              animate={{ opacity: [0, 1, 0], scale: [0, 1, 0.4] }}
+              transition={{ delay: s.delay, duration: 0.9, ease: 'easeOut' }}
+              className="absolute pointer-events-none select-none"
+              style={{
+                left: '50%',
+                top: '50%',
+                transform: `translate(${s.x}px, ${s.y}px)`,
+                fontSize: `${s.size}px`,
+                color: sparkleColor,
+                textShadow: `0 0 6px ${glow}`,
+                lineHeight: 1,
+              }}
+            >
+              ✦
+            </motion.span>
+          ))}
         </div>
 
-        {/* Text Content */}
-        <div className="flex flex-col flex-1 min-w-0">
-          <span className="text-xs font-bold uppercase tracking-wide text-neo-white/70">
-            {t('achievements.unlocked')}
-          </span>
-          <span
+        {/* Text content */}
+        <div className="relative flex flex-col flex-1 min-w-0 leading-tight">
+          <motion.span
+            initial={{ opacity: 0, y: -3 }}
+            animate={{ opacity: 0.7, y: 0 }}
+            transition={{ delay: 0.12 }}
+            className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-neo-white"
+          >
+            <span>{t('achievements.unlocked')}</span>
+            {tier && tierColors && tierStyle.showRarityBadge && (
+              <motion.span
+                initial={{ scale: 0, rotate: -8 }}
+                animate={{ scale: 1, rotate: 0 }}
+                transition={{ delay: 0.22, type: 'spring', stiffness: 500, damping: 14 }}
+                className="px-1.5 py-px rounded-sm font-black tracking-wider"
+                style={{
+                  backgroundColor: tierColors.bg,
+                  color: tierColors.text,
+                  boxShadow: `0 0 6px ${tierColors.glow}`,
+                }}
+                data-testid="achievement-inline-rarity"
+              >
+                {tier}
+              </motion.span>
+            )}
+          </motion.span>
+          <motion.span
             data-testid="achievement-inline-name"
-            className="font-black text-lg truncate text-neo-lime"
+            initial={{ opacity: 0, y: 3 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.18 }}
+            className="font-black text-sm truncate text-neo-lime"
           >
             {name}
-          </span>
-          {description && (
-            <span className="text-xs text-neo-white/60 truncate">
-              {description}
-            </span>
-          )}
+          </motion.span>
         </div>
       </div>
     </motion.div>

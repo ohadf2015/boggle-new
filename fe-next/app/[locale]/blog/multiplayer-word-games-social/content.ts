@@ -245,113 +245,113 @@ The seven-letter word hits different when the whole room hears it.`,
     practice: 'שחקו מולטיפלייר',
   },
   sv: {
-    title: 'Ordspel ar battre med folk. Forskningen forklarar varfor det kanns sa.',
-    subtitle: 'Om tavlingsinstinkt, skitsnack som bygger vanskap, och varfor hjarnan vaknar till liv pa ett satt den aldrig gor nar du sitter ensam med telefonen.',
-    category: 'Samhallsvetenskap',
-    readTime: '11 min lasning',
-    authorName: 'Ordnorden',
-    authorBio: 'Fick en gang en framling pa pendeln att spela Boggle fyra stationer for langt. Ingen av oss angrade det.',
+    title: 'Ordspel är bättre med folk. Forskningen förklarar varför det känns så.',
+    subtitle: 'Om tävlingsinstinkt, skitsnack som bygger vänskap, och varför hjärnan vaknar till liv på ett sätt den aldrig gör när du sitter ensam med telefonen.',
+    category: 'Samhällsvetenskap',
+    readTime: '11 min läsning',
+    authorName: 'Ordnörden',
+    authorBio: 'Fick en gång en främling på pendeln att spela Boggle fyra stationer för långt. Ingen av oss ångrade det.',
     sections: [
       {
-        content: `Jag for ett kalkylark over mina ordspelsresultat. Har gjort det i tva ar nu. Varje omgang taggad: solo eller med andra. Solokolumnen ar okej. Hyfsad. Men kolumnen for gruppspel ligger konsekvent 15 till 20 procent hogre.
+        content: `Jag för ett kalkylark över mina ordspelsresultat. Har gjort det i två år nu. Varje omgång taggad: solo eller med andra. Solokolumnen är okej. Hyfsad. Men kolumnen för gruppspel ligger konsekvent 15 till 20 procent högre.
 
-Lange trodde jag att jag bara anstrangde mig mer nar nagon satt mittemot. Delvis sant. Men den riktiga forklaringen ar konstigare an sa.
+Länge trodde jag att jag bara ansträngde mig mer när någon satt mittemot. Delvis sant. Men den riktiga förklaringen är konstigare än så.
 
-Forra fredagen stod valet mellan att ligga i soffan med pussel eller att samla fyra kompisar, kopa chips och skrika at varandra i tre timmar over ett bokstavsrutndt. Jag valde skrikandet. Nagon gang under kvallen hittade jag ett sjubokstavsord och Erik kallade mig sjalvgod, och den kombinationen av prestation plus social reaktion var, ja. Battre an nagon poangrekord jag nagonsin satt ensam.
+Förra fredagen stod valet mellan att ligga i soffan med pussel eller att samla fyra kompisar, köpa chips och skrika åt varandra i tre timmar över ett bokstavsrutnät. Jag valde skrikandet. Någon gång under kvällen hittade jag ett sjubokstavsord och Erik kallade mig självgod, och den kombinationen av prestation plus social reaktion var, ja. Bättre än något poängrekord jag någonsin satt ensam.
 
-Det visar sig att hjarnan kor annorlunda mjukvara nar andra manniskor ar i rummet. Inte bildligt talat. Faktiskt andra neurala natverk. Forskningen ar overraskande tydlig pa den punkten och den forandrade hur jag ser pa nagonting jag gjort slentrianmassigt i aratal.`,
+Det visar sig att hjärnan kör annorlunda mjukvara när andra människor är i rummet. Inte bildligt talat. Faktiskt andra neurala nätverk. Forskningen är överraskande tydlig på den punkten och den förändrade hur jag ser på någonting jag gjort slentrianmässigt i åratal.`,
       },
       {
-        title: 'Hjarnan solo, hjarnan med sallskap',
-        content: `Ensam aktiverar ordspel ungefar det du forvantar dig. Brocas omrade. Wernickes omrade. Dorsolaterala prefrontala cortex. Sprakprocessering, arbetsminne, de vanliga.
+        title: 'Hjärnan solo, hjärnan med sällskap',
+        content: `Ensam aktiverar ordspel ungefär det du förväntar dig. Brocas område. Wernickes område. Dorsolaterala prefrontala cortex. Språkprocessering, arbetsminne, de vanliga.
 
-Lagg till en enda manniska och ett helt nytt natverk vaknar. Neuroforskare kallar det "det sociala hjarnatverket", vilket later hogtravande men egentligen bara ar mediala prefrontala cortex, temporoparietala knutpunkten och bakre ovre temporala sulcus som gor det de utvecklades for: lista ut vad den andra personen tanker.
+Lägg till en enda människa och ett helt nytt nätverk vaknar. Neuroforskare kallar det "det sociala hjärnnätverket", vilket låter högtravande men egentligen bara är mediala prefrontala cortex, temporoparietala knutpunkten och bakre övre temporala sulcus som gör det de utvecklades för: lista ut vad den andra personen tänker.
 
-Redcay och kollegor stoppade in folk i en fMRI-maskin 2010 och jamforde solo mot interaktiva uppgifter. De interaktiva tande upp mentaliseringsregioner rejalt mer. Publicerades i Cerebral Cortex om du vill kolla sjalv.
+Redcay och kollegor stoppade in folk i en fMRI-maskin 2010 och jämförde solo mot interaktiva uppgifter. De interaktiva tände upp mentaliseringsregioner rejält mer. Publicerades i Cerebral Cortex om du vill kolla själv.
 
-Rent praktiskt: nar jag spelar ensam letar jag efter ord. Nar jag spelar mot Erik letar jag efter ord OCH hakar pa vad han kan ha sett OCH justerar strategi utifran hans kroppssprak OCH forsoker dolja att jag kort fast. Hjarnan kor dubbelskift.
+Rent praktiskt: när jag spelar ensam letar jag efter ord. När jag spelar mot Erik letar jag efter ord OCH hakar på vad han kan ha sett OCH justerar strategi utifrån hans kroppsspråk OCH försöker dölja att jag kört fast. Hjärnan kör dubbelskift.
 
-Man skulle kunna tro att det ar uttommande. Tvartom. Sociala natverket och beloningssystemet aktiveras ihop. Mer kognitiv anstrangning, mer njutning. Konstig byteshandel, men jag tar den.`,
+Man skulle kunna tro att det är uttömmande. Tvärtom. Sociala nätverket och belöningssystemet aktiveras ihop. Mer kognitiv ansträngning, mer njutning. Konstig byteshandel, men jag tar den.`,
       },
       {
-        title: 'Rivalitet gor dig smartare (till en viss grans)',
-        content: `Decetys forskargrupp publicerade nagonting 2004 som jag tanker pa ofta. De sa till vissa deltagare att de tavlade mot en manniska, andra att det var en dator. Ibland var "manniskan" i sjalva verket en algoritm. Spelade ingen roll. De som trodde att en riktig person satt pa andra sidan visade hogre aktivering i omraden for beloningsforvantan och strategisk planering.
+        title: 'Rivalitet gör dig smartare (till en viss gräns)',
+        content: `Decetys forskargrupp publicerade någonting 2004 som jag tänker på ofta. De sa till vissa deltagare att de tävlade mot en människa, andra att det var en dator. Ibland var "människan" i själva verket en algoritm. Spelade ingen roll. De som trodde att en riktig person satt på andra sidan visade högre aktivering i områden för belöningsförväntan och strategisk planering.
 
-Hjarnan bryr sig inte om sanningen. Den bryr sig om vad den tror.
+Hjärnan bryr sig inte om sanningen. Den bryr sig om vad den tror.
 
-Det stammar. Nar jag spelar mot en bot ar jag engagerad. Lagom. Men nar jag spelar mot nagon som garanterat kommer hana mig om jag forlorar? Da jobbar varje neuron jag har pa att hitta langa ord. Tavlingstrycket gor nagot som inget poangmal eller topplista kan replikera.
+Det stämmer. När jag spelar mot en bot är jag engagerad. Lagom. Men när jag spelar mot någon som garanterat kommer håna mig om jag förlorar? Då jobbar varje neuron jag har på att hitta långa ord. Tävlingstrycket gör något som inget poängmål eller topplista kan replikera.
 
-Leon Festinger kallade det social jamforelseteori redan 1954. Vi bedomer oss sjalva i relation till andra, inte mot nagon abstrakt standard. I ett ordspel kalibrerar varje ord motstandaren hittar din interna "ar jag tillrackligt bra?"-matare. Ligger du efter? Push harder. Ligger du fore? Slappna inte av.
+Leon Festinger kallade det social jämförelseteori redan 1954. Vi bedömer oss själva i relation till andra, inte mot någon abstrakt standard. I ett ordspel kalibrerar varje ord motståndaren hittar din interna "är jag tillräckligt bra?"-mätare. Ligger du efter? Push harder. Ligger du före? Slappna inte av.
 
-Fast det finns ett tak. For mycket press flippar omkopplaren fran "motiverad" till "angestfylld", och angestfyllda hjarnor ar urusla pa kreativ ordsokning. Sweetspoten ar lagsinsats-tavling. Skrytrattigheter, inget mer. Darfor kanns en avslappnad spelkvall sa mycket battre an en turnering.`,
+Fast det finns ett tak. För mycket press flippar omkopplaren från "motiverad" till "ångestfylld", och ångestfyllda hjärnor är urusla på kreativ ordsökning. Sweetspoten är låginsats-tävling. Skryträttigheter, inget mer. Därför känns en avslappnad spelkväll så mycket bättre än en turnering.`,
       },
       {
-        title: 'Nar alla hittar pa saker samtidigt',
-        content: `Jackbox forstorde mig. Fore Jackbox trodde jag att ordspel var en lugn, cerebral grej. Sen spelade jag Quiplash pa en fest och insag att ordlek infor publik ar ett helt annat rus.
+        title: 'När alla hittar på saker samtidigt',
+        content: `Jackbox förstörde mig. Före Jackbox trodde jag att ordspel var en lugn, cerebral grej. Sen spelade jag Quiplash på en fest och insåg att ordlek inför publik är ett helt annat rus.
 
-Speldesigners kallar det "delat kreativt utrymme." Flera manniskor som genererar ideer samtidigt, studsar av varandra, och slutresultatet hamnar nagon stans dit ingen av dem hade kommit ensam. En brasklapp dock: Osborns brainstorming-forskning fran 1950-talet visade att individer faktiskt producerar fler ideer solo an i grupp, for grupper har social friktion. Folk haller tillbaka, pratar over varandra, sjalvcensurerar.
+Speldesigners kallar det "delat kreativt utrymme." Flera människor som genererar idéer samtidigt, studsar av varandra, och slutresultatet hamnar någonstans dit ingen av dem hade kommit ensam. En brasklapp dock: Osborns brainstorming-forskning från 1950-talet visade att individer faktiskt producerar fler idéer solo än i grupp, för grupper har social friktion. Folk håller tillbaka, pratar över varandra, självcensurerar.
 
-Men ideerna som faktiskt kommer ur grupper tenderar att vara markligare och mer kreativa. Sarskilt nar formatet ar ratt. Ordspel ar ratt format. Du har struktur (maste vara ett riktigt ord), tidspress (ingen overtankning), och direkt publikreaktion ("VANTA, ar det dar ett ORD?!").
+Men idéerna som faktiskt kommer ur grupper tenderar att vara märkligare och mer kreativa. Särskilt när formatet är rätt. Ordspel är rätt format. Du har struktur (måste vara ett riktigt ord), tidspress (ingen övertänkning), och direkt publikreaktion ("VÄNTA, är det där ett ORD?!").
 
-Jag minns fortfarande en Boggle-runda for tva ar sen dar min kompis hittade ZOEAE. Halva bordet pastod att det inte var ett ord. Hon drog upp ordboken. Det ar plural av zoea, en krastdjurslarv. Diskussionen varade langre an omgangen. Det dar ar grejen med att spela med folk. Sa dar hander aldrig nar du sitter med telefonen vid midnatt.
+Jag minns fortfarande en Boggle-runda för två år sen där min kompis hittade ZOEAE. Halva bordet påstod att det inte var ett ord. Hon drog upp ordboken. Det är plural av zoea, en kräftdjurslarv. Diskussionen varade längre än omgången. Det där är grejen med att spela med folk. Så där händer aldrig när du sitter med telefonen vid midnatt.
 
-Spegelneuroner ar en del av forklaringen. Nar nagon reagerar pa ditt ord med genuin chock speglar din hjarna den kanslan och forstarker den ursprungliga gladjen. Det blir en feedbackloop. Bra ord, stor reaktion, storre kansla, forsok toppa det nasta runda.`,
+Spegelneuroner är en del av förklaringen. När någon reagerar på ditt ord med genuin chock speglar din hjärna den känslan och förstärker den ursprungliga glädjen. Det blir en feedbackloop. Bra ord, stor reaktion, större känsla, försök toppa det nästa runda.`,
       },
       {
-        title: 'Sa vad hande under pandemin da',
-        content: `Words With Friends fick 40 procent fler dagliga anvandare i mars 2020. Scrabble GO lanserades mitt under covid och laddades ner miljontals ganger. Folk satt instangda och behivde ett satt att kanna samhorighet som inte kravde annu en Zoom-AW.
+        title: 'Så vad hände under pandemin då',
+        content: `Words With Friends fick 40 procent fler dagliga användare i mars 2020. Scrabble GO lanserades mitt under covid och laddades ner miljontals gånger. Folk satt instängda och behövde ett sätt att känna samhörighet som inte krävde ännu en Zoom-AW.
 
-Vuorre och kollegor publicerade en studie i Computers in Human Behavior 2021 som visade att socialt spelande under nedstangningen var kopplat till battre psykisk halsa. Men bara nar det var faktisk interaktion fram och tillbaka. Att bara spela bredvid nagon, eller asynkront utan att chatta, hade inte samma effekt. Kommunikationen var den aktiva ingrediensen.
+Vuorre och kollegor publicerade en studie i Computers in Human Behavior 2021 som visade att socialt spelande under nedstängningen var kopplat till bättre psykisk hälsa. Men bara när det var faktisk interaktion fram och tillbaka. Att bara spela bredvid någon, eller asynkront utan att chatta, hade inte samma effekt. Kommunikationen var den aktiva ingrediensen.
 
-Jag kan bekrafta det fran egen erfarenhet. Jag och mina universitetskompisar startade en Boggle-kvall over Zoom den varen. Vi sa till oss sjalva att det handlade om spelet. Det handlade inte om spelet. Det handlade om att sitta en timme och skrika at varandra om obscyra ord och sen tjugo minuter till och prata om livet medan vi latsades att vi fortfarande diskuterade reglerna.
+Jag kan bekräfta det från egen erfarenhet. Jag och mina universitetskompisar startade en Boggle-kväll över Zoom den våren. Vi sa till oss själva att det handlade om spelet. Det handlade inte om spelet. Det handlade om att sitta en timme och skrika åt varandra om obskyra ord och sen tjugo minuter till och prata om livet medan vi låtsades att vi fortfarande diskuterade reglerna.
 
-Nar jag tanker tillbaka pa 2020 ar de dar torsdagskvallarna bland de tydligaste minnena jag har. Inte for att spelen var bra. For att kontakten var det. Aven genom en skarm, med daligt ljud och nagons katt som gick over tangentbordet, funkade det. Ordspelen gav oss en ursakt att dyka upp for varandra utan att behova saga "jag ar ensam och behover se ditt ansikte."`,
+När jag tänker tillbaka på 2020 är de där torsdagskvällarna bland de tydligaste minnena jag har. Inte för att spelen var bra. För att kontakten var det. Även genom en skärm, med dåligt ljud och någons katt som gick över tangentbordet, funkade det. Ordspelen gav oss en ursäkt att dyka upp för varandra utan att behöva säga "jag är ensam och behöver se ditt ansikte."`,
       },
       {
         title: 'Samma rum, helt annan grej',
-        content: `Bradspelscafeer gick fran under 1 000 globalt 2015 till over 5 000 ar 2023. Forsaljningen av festspel har slagit alla andra bradspelskategorier sedan 2019. Aptiten for att spela ihop pa riktigt dog inte under pandemin. Snarare blev folk hungrigare.
+        content: `Brädspelscaféer gick från under 1 000 globalt 2015 till över 5 000 år 2023. Försäljningen av festspel har slagit alla andra brädspelskategorier sedan 2019. Aptiten för att spela ihop på riktigt dog inte under pandemin. Snarare blev folk hungrigare.
 
-Jag borjade hosta ordspelskvall en gang i manaden efter nedstangningarna. Uppldigget ar lojligt enkelt. Snacks, en timer, bokstavsbrickor, och vem som an dyker upp. Inga formella inbjudningar. Inga krangliga regler. Bara kom och spela.
+Jag började hålla ordspelskväll en gång i månaden efter nedstängningarna. Upplägget är löjligt enkelt. Snacks, en timer, bokstavsbrickor, och vem som än dyker upp. Inga formella inbjudningar. Inga krångliga regler. Bara kom och spela.
 
-Det som fortsatter forvana mig ar hur annorlunda det kanns mot vara onlinesessioner. Online ar kul, men i samma rum finns information som en skarm inte kan overfora. Nagons kna som studsar for att de kort fast. Den lilla utandningen nar rutndtet ar daligt. Ett hojt ogonbryn over bordet nar din kompis spelar nagot ovantat.
+Det som fortsätter förvåna mig är hur annorlunda det känns mot våra onlinesessioner. Online är kul, men i samma rum finns information som en skärm inte kan överföra. Någons knä som studsar för att de kört fast. Den lilla utandningen när rutnätet är dåligt. Ett höjt ögonbryn över bordet när din kompis spelar något oväntat.
 
-Baltes metaanalys fran 2002 jamforde grupper som traffades fysiskt mot grupper som jobbade pa distans. Fysiska grupper vann pa koordination och kreativ problemlosning. Ingen overraskning kanske, men effektstorleken var storre an jag vantade mig. Fysisk narhet forandrar hur folk tanker tillsammans, inte bara hur de kanns om att vara tillsammans. Nar jag sitter mittemot nagon fangar jag upp signaler jag aldrig skulle se genom en webbkamera, och de signalerna forandrar hur jag spelar.`,
+Baltes metaanalys från 2002 jämförde grupper som träffades fysiskt mot grupper som jobbade på distans. Fysiska grupper vann på koordination och kreativ problemlösning. Ingen överraskning kanske, men effektstorleken var större än jag väntade mig. Fysisk närhet förändrar hur folk tänker tillsammans, inte bara hur de känns om att vara tillsammans. När jag sitter mittemot någon fångar jag upp signaler jag aldrig skulle se genom en webbkamera, och de signalerna förändrar hur jag spelar.`,
       },
       {
-        title: 'Att kalla sin kompis for ordbedragare ar halva poangen',
-        content: `Ingen pratar om det har men skitsnacket ar halva grejen.
+        title: 'Att kalla sin kompis för ordbedragare är halva poängen',
+        content: `Ingen pratar om det här men skitsnacket är halva grejen.
 
-Att kalla nagon "lexikal bedragare" nar de spelar PA for tva poang. Att flama teatraliskt nar motstandaren hittar ett sjubokstavsord. Den fejkade ilskan, den spelade fortvivlan, agg som varar exakt tills nasta omgang borjar.
+Att kalla någon "lexikal bedragare" när de spelar PÅ för två poäng. Att flåma teatraliskt när motståndaren hittar ett sjubokstavsord. Den fejkade ilskan, den spelade förtvivlan, agg som varar exakt tills nästa omgång börjar.
 
-Psykologer har ett begrepp for det: affiliativ retsamhet. Keltners forskargrupp publicerade nagonting om det 2001 som visade att lekfulla fornarmelser faktiskt starker sociala band. De signalerar tillit. Du kan bara kalla nagon fuskare om ni bada vet att du inte menar det. Det ar ett relationstest som ocksa fungerar som underhallning.
+Psykologer har ett begrepp för det: affiliativ retsamhet. Keltners forskargrupp publicerade någonting om det 2001 som visade att lekfulla förnärmelser faktiskt stärker sociala band. De signalerar tillit. Du kan bara kalla någon fuskare om ni båda vet att du inte menar det. Det är ett relationstest som också fungerar som underhållning.
 
-Men i ordspel gor skitsnacket nagot mer. Det forvandlar en ordforradsoving till en berattelse. Min kompiskrets refererar fortfarande till Maja-incidenten. Tre ar sen spelade hon QOPH (en hebreisk bokstav, tekniskt godkant) och utloste en tjugo minuter lang regeldebatt som klov rummet. Vi tar upp det minst en gang i manaden. Utan braket hade den omgangen varit glomd nasta morgon.
+Men i ordspel gör skitsnacket något mer. Det förvandlar en ordförrådsövning till en berättelse. Min kompiskrets refererar fortfarande till Maja-incidenten. Tre år sen spelade hon QOPH (en hebreisk bokstav, tekniskt godkänt) och utlöste en tjugo minuter lång regeldebatt som klöv rummet. Vi tar upp det minst en gång i månaden. Utan bråket hade den omgången varit glömd nästa morgon.
 
-Varje spelkvall producerar sadant material. Interna skamt, aterkommande bits, revanschmatcher. Och forskningen om delade nya upplevelser och relationskvalitet sager att det har spelar roll. Par och vankretsar som gor spannande saker ihop rapporterar hogre tillfredsstallelse. Ordspel checkar bada boxarna om man spelar dem ratt. Nytt rutndt varje gang, tidspress som haller adrenalinet uppe, och precis tillrackligt tavlingsspanning for att det ska kanna som att nagot star pa spel. Aven nar det enda som star pa spel ar vem som koper snacks nasta gang.`,
+Varje spelkväll producerar sådant material. Interna skämt, återkommande bits, revanschmatcher. Och forskningen om delade nya upplevelser och relationskvalitet säger att det här spelar roll. Par och vänkretsar som gör spännande saker ihop rapporterar högre tillfredsställelse. Ordspel checkar båda boxarna om man spelar dem rätt. Nytt rutnät varje gång, tidspress som håller adrenalinet uppe, och precis tillräckligt tävlingsspänning för att det ska kännas som att något står på spel. Även när det enda som står på spel är vem som köper snacks nästa gång.`,
       },
       {
-        title: 'Scrabble med foraldrar var viktigare an du tror',
-        content: `Jag spelade Scrabble med mina foraldrar varje sondagkvall under hela uppvaxten. Vid tolv tyckte jag det var det trakigaste som fanns. Vid trettio insag jag att det kanske var en av de viktigaste sakerna de gjorde for mig.
+        title: 'Scrabble med föräldrar var viktigare än du tror',
+        content: `Jag spelade Scrabble med mina föräldrar varje söndagskväll under hela uppväxten. Vid tolv tyckte jag det var det tråkigaste som fanns. Vid trettio insåg jag att det kanske var en av de viktigaste sakerna de gjorde för mig.
 
-En longitudinell studie av Coyl-Shepherd och Newland, publicerad i Journal of Family Issues 2013, foljde familjer over tid. De som spelade spel ihop regelbundet hade starkare sammanhallning, battre kommunikation mellan foraldrar och barn, och hogre tillfredsstallelse. Det holl aven nar de kontrollerade for andra familjeaktiviteter som gemensamma maltider eller delade hobbyer.
+En longitudinell studie av Coyl-Shepherd och Newland, publicerad i Journal of Family Issues 2013, följde familjer över tid. De som spelade spel ihop regelbundet hade starkare sammanhållning, bättre kommunikation mellan föräldrar och barn, och högre tillfredsställelse. Det höll även när de kontrollerade för andra familjeaktiviteter som gemensamma måltider eller delade hobbyer.
 
-Ordspel har en specifik fordel for familjer: alla behover inte vara pa samma niva. Min systerdotter borjade komma pa spelkvallarna vid sju, hittade KAT och SOL medan de vuxna jagade langre ord. Hon ar elva nu. Forra manaden slog hon tva av de vuxna. Ingen formell undervisning, inga gloslappar. Hon absorberade ordforrad genom att sitta vid bordet.
+Ordspel har en specifik fördel för familjer: alla behöver inte vara på samma nivå. Min systerdotter började komma på spelkvällarna vid sju, hittade KAT och SOL medan de vuxna jagade längre ord. Hon är elva nu. Förra månaden slog hon två av de vuxna. Ingen formell undervisning, inga gloslappar. Hon absorberade ordförråd genom att sitta vid bordet.
 
-Det finns nyare forskning om morforaldrar och barnbarn som spelar ihop som jag tycker ar intressant. Bada sidor vinner. Morforaldern far kognitiv stimulans och social kontakt, som ar tva av de starkaste skyddsfaktorerna mot kognitivt forfall. Barnet far ordforrad och odelad uppmarksamhet fran en vuxen som inte forsoker multitaska.
+Det finns nyare forskning om morföräldrar och barnbarn som spelar ihop som jag tycker är intressant. Båda sidor vinner. Morföräldern får kognitiv stimulans och social kontakt, som är två av de starkaste skyddsfaktorerna mot kognitivt förfall. Barnet får ordförråd och odelad uppmärksamhet från en vuxen som inte försöker multitaska.
 
-En forskningsoversikt i Educational Psychology Review fran 2022 kallade det "lagintensiv larandemiljo." Spel skapar varme. Varme minskar prestationsangesten som gor inlarning svarare. Barn behaller nya ord battre nar de plockar upp dem under lek an nar nagon driller dem med flashcards. Vilket ar logiskt. Ingen har nagonsin blivit stressad av att spela Boggle med mormor.`,
+En forskningsöversikt i Educational Psychology Review från 2022 kallade det "lågintensiv lärandemiljö." Spel skapar värme. Värme minskar prestationsångesten som gör inlärning svårare. Barn behåller nya ord bättre när de plockar upp dem under lek än när någon driller dem med flashcards. Vilket är logiskt. Ingen har någonsin blivit stressad av att spela Boggle med mormor.`,
       },
       {
-        title: 'Starta en spelkvall. Pa riktigt.',
-        content: `Allt jag last och allt jag upplevt pekar at samma hall. Ordspel ar battre med folk. De kognitiva fordelarna ar verkliga hursomhelst, solo eller socialt. Men den sociala versionen lagger till lager som solo inte kan rora: du spelar battre, du kannar mer, du minns det langre, och du hamnar narmare de manniskor du spelade med.
+        title: 'Starta en spelkväll. På riktigt.',
+        content: `Allt jag läst och allt jag upplevt pekar åt samma håll. Ordspel är bättre med folk. De kognitiva fördelarna är verkliga hursomhelst, solo eller socialt. Men den sociala versionen lägger till lager som solo inte kan röra: du spelar bättre, du känner mer, du minns det längre, och du hamnar närmare de människor du spelade med.
 
-Jag hade inte for avsikt att bygga en gemenskap kring ordspel. Det bara hande. En gruppchatt dar vi delar dagliga resultat. En spelkvall i manaden. Nagon onlineturnering nar nagon ar bortrest. Hade du sagt till mig for fem ar sen att min mest stabila umgangeskrets skulle vara "ordspelsvanner" hade jag skrattat. Men sa ar det. Det ar de manniskorna jag traffar oftast. De jag har flest interna skamt med.
+Jag hade inte för avsikt att bygga en gemenskap kring ordspel. Det bara hände. En gruppchatt där vi delar dagliga resultat. En spelkväll i månaden. Någon onlineturnering när någon är bortrest. Hade du sagt till mig för fem år sen att min mest stabila umgängeskrets skulle vara "ordspelsvänner" hade jag skrattat. Men så är det. Det är de människorna jag träffar oftast. De jag har flest interna skämt med.
 
-Sociologen Ray Oldenburg skrev om "tredje platser," sociala rum som varken ar hemma eller jobbet. Barer, frisorer, moten. Platser dit du kommer regelbundet, stamningen ar avslappnad, och tillit byggs gradvis. En ordspelskvall ar en tredje plats. Du behover inte vara bra. Du behover inte kunna obskyra ord. Du behover bara dyka upp.
+Sociologen Ray Oldenburg skrev om "tredje platser," sociala rum som varken är hemma eller jobbet. Barer, frisörer, möten. Platser dit du kommer regelbundet, stämningen är avslappnad, och tillit byggs gradvis. En ordspelskväll är en tredje plats. Du behöver inte vara bra. Du behöver inte kunna obskyra ord. Du behöver bara dyka upp.
 
-Sa. Samla nagra kompisar. Oppna chips. Stall en timer. Braka om huruvida QI raker. (Det gor det. Det ar den cirkulerande livskraften i kinesisk filosofi, och jag tar den striden med vem som helst.) Se vad som hander nar du slutar pussla ensam och borjar pussla ihop.
+Så. Samla några kompisar. Öppna chips. Ställ en timer. Bråka om huruvida QI räknas. (Det gör det. Det är den cirkulerande livskraften i kinesisk filosofi, och jag tar den striden med vem som helst.) Se vad som händer när du slutar pussla ensam och börjar pussla ihop.
 
-Sjubokstavsordet traffar annorlunda nar hela rummet hor det.`,
+Sjubokstavsordet träffar annorlunda när hela rummet hör det.`,
       },
     ],
     backToBlog: 'Tillbaka till bloggen',

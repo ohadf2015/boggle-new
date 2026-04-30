@@ -38,6 +38,8 @@ import { ensurePlayerState } from './playerDataInit';
 import { spamDetector, PenaltyTier, InvalidReason, type InvalidReasonValue } from '../modules/spamDetector.js';
 import { acquireGracePeriodLock, releaseGracePeriodLock } from '../services/gracePeriodLock';
 import { calculateWordScore } from '../modules/scoringEngine.js';
+import { isWordShapeWeird } from '@/shared/utils/wordShapeFilter';
+import type { Language } from '@/shared/types';
 
 // Rate limit weights
 const SUBMIT_WORD_WEIGHT = parseInt(process.env.RATE_WEIGHT_SUBMITWORD || '3');
@@ -266,6 +268,15 @@ function registerWordHandlers(io: Server, socket: Socket): void {
           minLength: minLength
         });
         handleSpamDetection(socket, gameCode, username, normalizedWord, InvalidReason.TOO_SHORT, game);
+        await releaseGraceLockIfNeeded();
+        return;
+      }
+
+      // Shape filter — reject garbage/abbrev/repeat-spam before dictionary lookup or queue logging
+      const shape = isWordShapeWeird(normalizedWord, (game.language || 'en') as Language);
+      if (shape.weird) {
+        socket.emit('wordRejected', { word: normalizedWord, reason: 'invalid_shape', detail: shape.reason });
+        handleSpamDetection(socket, gameCode, username, normalizedWord, InvalidReason.INVALID_SHAPE, game);
         await releaseGraceLockIfNeeded();
         return;
       }

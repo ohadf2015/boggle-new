@@ -102,6 +102,10 @@ export function MusicProvider({ children }: MusicProviderProps): React.ReactElem
   const isTransitioningRef = useRef(false);
   const isMutedRef = useRef(isMuted);
   const volumeRef = useRef(volume);
+  // One-shot guard: auto-unmute fires at most once per provider lifetime, so
+  // stale `isMuted=true` from a prior session is recovered on first track,
+  // but in-session mutes persist across navigation / track changes.
+  const hasAutoUnmutedRef = useRef(false);
 
   useEffect(() => { isMutedRef.current = isMuted; }, [isMuted]);
   useEffect(() => { volumeRef.current = volume; }, [volume]);
@@ -245,11 +249,18 @@ export function MusicProvider({ children }: MusicProviderProps): React.ReactElem
 
     const oldHowl = currentHowlRef.current;
 
-    // Auto-unmute when starting music
-    if (isMutedRef.current) {
-      logger.log('[Music] fadeToTrack - Auto-unmuting');
+    // Auto-unmute only on the FIRST track of the session. Stale-mute recovery
+    // for users whose `isMuted=true` was persisted from a prior session.
+    // Subsequent fadeToTrack calls honor the live mute state so in-session
+    // mutes survive navigation.
+    if (isMutedRef.current && !hasAutoUnmutedRef.current) {
+      logger.log('[Music] fadeToTrack - Auto-unmuting (one-shot stale-mute recovery)');
+      hasAutoUnmutedRef.current = true;
       isMutedRef.current = false;
       setIsMuted(false);
+    } else if (!hasAutoUnmutedRef.current) {
+      // First successful fade with audible mute state — burn the one-shot too.
+      hasAutoUnmutedRef.current = true;
     }
 
     const targetVolume = isMutedRef.current ? 0 : volumeRef.current;

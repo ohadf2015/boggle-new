@@ -254,109 +254,109 @@ LexiClash משלב את העוצמה של בוגל בזמן אמת עם פיצ'�
   },
 
   sv: {
-    title: 'Boggle vs Words With Friends: Det ena ar ett ordspel, det andra ar en vantan',
-    subtitle: 'Realtidskaos mot asynkron bricklaggning. Vilket respekterar din tid (och din planbok)?',
-    category: 'Jamforelse',
-    readTime: '9 min lasning',
-    authorName: 'Ordnorden',
-    authorBio: 'Har starka asikter om ordspel och noll talamod for pay-to-win-mekanik.',
+    title: 'Boggle vs Words With Friends: Det ena är ett ordspel, det andra är en väntan',
+    subtitle: 'Realtidskaos mot asynkron brickläggning. Vilket respekterar din tid (och din plånbok)?',
+    category: 'Jämförelse',
+    readTime: '9 min läsning',
+    authorName: 'Ordnörden',
+    authorBio: 'Har starka åsikter om ordspel och noll tålamod för pay-to-win-mekanik.',
     sections: [
       {
-        content: `Lat mig spara lite tid. Om du googlade "boggle vs words with friends" och vill ha ett snabbt svar: de ar helt olika spel som delar exakt en sak — bokstaver.
+        content: `Låt mig spara lite tid. Om du googlade "boggle vs words with friends" och vill ha ett snabbt svar: de är helt olika spel som delar exakt en sak — bokstäver.
 
-Det ar som att jamfora Mario Kart med en roadtrip. Bada involverar korning. I det ena skriker du pa dina vanner i realtid. Det andra tar fyra dagar och nagon somnar oundvikligen.
+Det är som att jämföra Mario Kart med en roadtrip. Båda involverar körning. I det ena skriker du på dina vänner i realtid. Det andra tar fyra dagar och någon somnar oundvikligen.
 
-Jag har spelat hundratals timmar av bada. Jag har asikter. De ar korrekta.`,
+Jag har spelat hundratals timmar av båda. Jag har åsikter. De är korrekta.`,
       },
       {
-        title: 'Vad ar Boggle egentligen?',
-        content: `Boggle ar ett ordletningsspel i realtid. Du far ett rutat med slumpmassiga bokstaver, en timer borjar ticka ner, och du hittar sa manga ord som mojligt genom att koppla ihop angransande bokstaver. Inga turer. Ingen vantan. Bara du, rutnat och din snabbt forsamrade fattning.
+        title: 'Vad är Boggle egentligen?',
+        content: `Boggle är ett ordletningsspel i realtid. Du får ett rutnät med slumpmässiga bokstäver, en timer börjar ticka ner, och du hittar så många ord som möjligt genom att koppla ihop angränsande bokstäver. Inga turer. Ingen väntan. Bara du, rutnätet och din snabbt försämrade fattning.
 
-Magin med Boggle ar tidspressen. Du har 2-3 minuter att skanna, kanna igen monster och plocka ut varje ord din hjarna kan hitta i kaoset. Monsterigenkanning under deadline. Din hjarna vaxlar upp och plotsligt ser du ord du inte visste att du kunde.
+Magin med Boggle är tidspressen. Du har 2-3 minuter att skanna, känna igen mönster och plocka ut varje ord din hjärna kan hitta i kaoset. Mönsterigenkänning under deadline. Din hjärna växlar upp och plötsligt ser du ord du inte visste att du kunde.
 
-I Sverige kanner vi igen kanslan fran Alfapet-kvallarna, men Boggle ar Alfapet pa steroider — ingen vantan pa din tur, bara ren hastighet. LexiClash bevarar denna karnloop pa svenska.`,
+I Sverige känner vi igen känslan från Alfapet-kvällarna, men Boggle är Alfapet på steroider — ingen väntan på din tur, bara ren hastighet. LexiClash bevarar denna kärnloop på svenska.`,
       },
       {
-        title: 'Vad ar Words With Friends egentligen?',
-        content: `Words With Friends ar turbaserat Scrabble med en annan bradlayout och ett mer generost lexikon. Du placerar brickor pa en brada, far poang baserat pa bokstavsvarden och bonusrutor, och sedan vantar du pa att din motstandare ska spela. Och vantar. Och vantar lite till.
+        title: 'Vad är Words With Friends egentligen?',
+        content: `Words With Friends är turbaserat Scrabble med en annan brädlayout och ett mer generöst lexikon. Du placerar brickor på en bräda, får poäng baserat på bokstavsvärden och bonusrutor, och sedan väntar du på att din motståndare ska spela. Och väntar. Och väntar lite till.
 
-Det lanserades 2009 och blev standard-ordspelet pa telefoner for att det spikade den sociala vinkeln. Du kunde spela med din kusin i Goteborg medan du egentligen borde jobba. Det asynkrona formatet innebar att ett enda spel kan stracka sig over dagar eller veckor.
+Det lanserades 2009 och blev standard-ordspelet på telefoner för att det spikade den sociala vinkeln. Du kunde spela med din kusin i Göteborg medan du egentligen borde jobba. Det asynkrona formatet innebär att ett enda spel kan sträcka sig över dagar eller veckor.
 
-Karnmekaniken ar brickplacering och poangoptimering. Du hittar inte ord under press — du bygger det hogst poanggivande ordet du kan fran dina sju brickor.`,
+Kärnmekaniken är brickplacering och poängoptimering. Du hittar inte ord under press — du bygger det högst poänggivande ordet du kan från dina sju brickor.`,
       },
       {
-        title: 'Hastighet mot strategi: Den grundlaggande klyftan',
-        content: `Det har ar den fundamentala splitten. Boggle ar en sprint. Words With Friends ar ett schackparti i slowmotion.
+        title: 'Hastighet mot strategi: Den grundläggande klyftan',
+        content: `Det här är den fundamentala splitten. Boggle är en sprint. Words With Friends är ett schackparti i slowmotion.
 
-I Boggle har du kanske 120 sekunder. Din hjarna gar in i ett flowtillstand dar medvetet tankande tar ett steg tillbaka och ren monsterigenkanning kors. Det ar nastan atletiskt.
+I Boggle har du kanske 120 sekunder. Din hjärna går in i ett flowtillstånd där medvetet tänkande tar ett steg tillbaka och ren mönsterigenkänning kör. Det är nästan atletiskt.
 
-Words With Friends ger dig obegransad tid per tur. Du kan stirra pa dina brickor i tjugo minuter, ordna om dem, prova olika kombinationer. Det ar cerebralt. Overvagt. Ibland tradigt.
+Words With Friends ger dig obegränsad tid per tur. Du kan stirra på dina brickor i tjugo minuter, ordna om dem, prova olika kombinationer. Det är cerebralt. Övervägt. Ibland trögt.
 
-Inget ar objektivt battre. Men de kliar helt olika kliador. Vill du ha adrenalin? Boggle vinner med hestlangder. Vill du kanna dig som en sofistikerad ordkonstnor? WWF har den vibben.
+Inget är objektivt bättre. Men de kliar helt olika klådor. Vill du ha adrenalin? Boggle vinner med hästlängder. Vill du känna dig som en sofistikerad ordkonstnär? WWF har den vibben.
 
-Personligen? Jag vill ha adrenalinet. Livet ar kort och jag har redan druckit mitt kaffe.`,
+Personligen? Jag vill ha adrenalinet. Livet är kort och jag har redan druckit mitt kaffe.`,
       },
       {
-        title: 'Multiplayer: Realtid vs "Jag aterkommer"',
-        content: `Boggle multiplayer ar elektriskt. Alla spelar samma rutat samtidigt. Nar timern slar noll jamfor ni ordlistor. Spnningen av att veta att nagon annan hittar ord du missar just nu ar det som gor det beroendeframkallande. LexiClash har liverum dar du ser motstandares poang ticka upp i realtid.
+        title: 'Multiplayer: Realtid vs "Jag återkommer"',
+        content: `Boggle multiplayer är elektriskt. Alla spelar samma rutnät samtidigt. När timern slår noll jämför ni ordlistor. Spänningen av att veta att någon annan hittar ord du missar just nu är det som gör det beroendeframkallande. LexiClash har liverum där du ser motståndares poäng ticka upp i realtid.
 
-Words With Friends multiplayer ar... e-post. Med brickor. Du gor ett drag. Du far en notis tre timmar senare. Du glomme spelet i tva dagar. Din motstandare knuffar dig. Du kanmer skuld. Upprepa i tre veckor.
+Words With Friends multiplayer är... e-post. Med brickor. Du gör ett drag. Du får en notis tre timmar senare. Du glömmer spelet i två dagar. Din motståndare knuffar dig. Du känner skuld. Upprepa i tre veckor.
 
-Jag har sju aktiva WWF-spel just nu. Jag bryr mig djupt om noll av dem. Min senaste Boggle-session pa LexiClash? Jag minns fortfarande ordet som avgjorde.`,
+Jag har sju aktiva WWF-spel just nu. Jag bryr mig djupt om noll av dem. Min senaste Boggle-session på LexiClash? Jag minns fortfarande ordet som avgjorde.`,
       },
       {
-        title: 'Monetiseringsproblemet (eller: Varfor jag ar bitter)',
-        content: `Har blir det fult.
+        title: 'Monetiseringsproblemet (eller: Varför jag är bitter)',
+        content: `Här blir det fult.
 
-Boggle-liknande spel har traditionellt varit enkla. Rutat, timer, ord, klart. LexiClash ar helt gratis utan pay-to-win-mekanik. Du vinner for att du hittade fler ord, punkt.
+Boggle-liknande spel har traditionellt varit enkla. Rutnät, timer, ord, klart. LexiClash är helt gratis utan pay-to-win-mekanik. Du vinner för att du hittade fler ord, punkt.
 
-Words With Friends 2? "Word Radar" markerar det basta tillgangliga ordet. "Swap+" later dig byta brickor utan att forlora din tur. Det har ar kopbara power-ups som ger betalande spelare en direkt konkurensfordel.
+Words With Friends 2? "Word Radar" markerar det bästa tillgängliga ordet. "Swap+" låter dig byta brickor utan att förlora din tur. Det här är köpbara power-ups som ger betalande spelare en direkt konkurrensfördel.
 
-Lat mig vara rak: om din motstandare kan betala for att se det optimala draget och du inte kan, ar det inte ett spel. Det ar en auktion.
+Låt mig vara rak: om din motståndare kan betala för att se det optimala draget och du inte kan, är det inte ett spel. Det är en auktion.
 
-Boggles renhet ar dess basta egenskap. Rutnat bryr sig inte om ditt kreditkort. Antingen ser du orden eller sa gor du det inte.`,
+Boggles renhet är dess bästa egenskap. Rutnätet bryr sig inte om ditt kreditkort. Antingen ser du orden eller så gör du det inte.`,
       },
       {
-        title: 'Solospel: En jamforelse',
-        content: `Boggle solo ar en zenupplevelse. Du mot rutnat. Ingen motstandare, inga notiser. LexiClash ger dig en ny daglig utmaning med leaderboards.
+        title: 'Solospel: En jämförelse',
+        content: `Boggle solo är en zenupplevelse. Du mot rutnätet. Ingen motståndare, inga notiser. LexiClash ger dig en ny daglig utmaning med leaderboards.
 
-Sololaget i WWF staller dig mot bottar. Det ar okej. Bottarna spelar som robotar — de hittar alltid det optimala ordet, vilket antingen ar for latt eller demoraliserande.
+Sololäget i WWF ställer dig mot bottar. Det är okej. Bottarna spelar som robotar — de hittar alltid det optimala ordet, vilket antingen är för lätt eller demoraliserande.
 
-For hjarntraning ar Boggles tidspressformat genuint battre. Studier visar att tidsbestamda ordletningsuppgifter aktiverar fler neurala vagar an otidsbestamnd brickplacering. Det ar ett traning. WWF solo ar mer som ett korsord — trevligt, men inte precis kardio for dina neuroner.`,
+För hjärnträning är Boggles tidspressformat genuint bättre. Studier visar att tidsbestämda ordletningsuppgifter aktiverar fler neurala vägar än obestämd brickplacering. Det är en träning. WWF solo är mer som ett korsord — trevligt, men inte precis kardio för dina neuroner.`,
       },
       {
         title: 'Community och sociala funktioner',
-        content: `Words With Friends vinner pa ren communitystorlek. Det har funnits sedan 2009 och har miljontals aktiva spelare. Att hitta motstandare ar aldrig ett problem.
+        content: `Words With Friends vinner på ren communitystorlek. Det har funnits sedan 2009 och har miljontals aktiva spelare. Att hitta motståndare är aldrig ett problem.
 
-Boggle-communities ar mindre men intensivare. LexiClash har liverum med realtids-leaderboards. Energin i ett kompetitivt Boggle-rum ar narmare en gamingstream an ett casual telefonspel. Det attraherar folk som faktiskt bryr sig om ordfinnande-skill.
+Boggle-communities är mindre men intensivare. LexiClash har liverum med realtids-leaderboards. Energin i ett kompetitivt Boggle-rum är närmare en gamingstream än ett casual telefonspel. Det attraherar folk som faktiskt bryr sig om ordfinnande-skill.
 
-Den sociala dynamiken ar helt annorlunda. WWF-vanskap utvecklas langsamt over veckor. Boggle-rivaliteter bildas omedelbart — du forlorade just med ett ord och du MASTE ha revansch nu.`,
+Den sociala dynamiken är helt annorlunda. WWF-vänskap utvecklas långsamt över veckor. Boggle-rivaliteter bildas omedelbart — du förlorade just med ett ord och du MÅSTE ha revansch nu.`,
       },
       {
-        title: 'Vilket ar egentligen roligare?',
-        content: `Kul ar subjektivt. Men jag tanker vara subjektiv tillbaka.
+        title: 'Vilket är egentligen roligare?',
+        content: `Kul är subjektivt. Men jag tänker vara subjektiv tillbaka.
 
-Boggle ar roligare. Dar, jag sa det.
+Boggle är roligare. Där, jag sa det.
 
-Tidspressen skapar ogonblick som WWF helt enkelt inte kan. Den sista-sekunden-upptackten av ett langt ord. Dopaminkicken nar du ser din poang explodera.
+Tidspressen skapar ögonblick som WWF helt enkelt inte kan. Sista-sekunden-upptäckten av ett långt ord. Dopaminkicken när du ser din poäng explodera.
 
-Vill du ha ett spel som far din puls att stiga — Boggle. Vill du ha ett spel som fyller dod tid — WWF. Bada ar giltiga. Ett ar mer levande.
+Vill du ha ett spel som får din puls att stiga — Boggle. Vill du ha ett spel som fyller död tid — WWF. Båda är giltiga. Ett är mer levande.
 
-LexiClash kombinerar det basta av Boggles realtidsintensitet med moderna funktioner som Aventyrslagt, dagliga utmaningar och liverum — allt utan pay-to-win. Det ar dar jag spelar nu.`,
+LexiClash kombinerar det bästa av Boggles realtidsintensitet med moderna funktioner som Äventyrsläge, dagliga utmaningar och liverum — allt utan pay-to-win. Det är där jag spelar nu.`,
       },
       {
-        title: 'Vanliga fragor',
-        content: `Ar Boggle svarare an Words With Friends?
-Olika svart. Boggle testar hastighet och monsterigenkanning under press. WWF testar ordforrad och strategisk placering.
+        title: 'Vanliga frågor',
+        content: `Är Boggle svårare än Words With Friends?
+Olika svårt. Boggle testar hastighet och mönsterigenkänning under press. WWF testar ordförråd och strategisk placering.
 
 Kan man spela Boggle online gratis?
 Ja. LexiClash erbjuder gratis Boggle-liknande spel online utan nedladdningar, utan pay-to-win, med realtidsmultiplayer.
 
-Ar Words With Friends pay-to-win?
-I praktiken, ja. Power-ups ger betalande spelare direkta konkurensfordelar.
+Är Words With Friends pay-to-win?
+I praktiken, ja. Power-ups ger betalande spelare direkta konkurrensfördelar.
 
-Vilket spel ar battre for hjarnan?
-Tidsbegransad ordletning (Boggle) aktiverar fler neurala vagar an otidsbegransad brickplacering (WWF).`,
+Vilket spel är bättre för hjärnan?
+Tidsbegränsad ordletning (Boggle) aktiverar fler neurala vägar än obegränsad brickplacering (WWF).`,
       },
     ],
     backToBlog: 'Tillbaka till bloggen',

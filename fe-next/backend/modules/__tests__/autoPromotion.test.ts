@@ -19,10 +19,11 @@ vi.mock('../../modules/supabaseServer', () => ({
 }));
 
 // Mock communityWordManager
-const { mockAddToCommunityCache, mockGetVerifiedWords, mockMarkWordPromoted } = vi.hoisted(() => ({
+const { mockAddToCommunityCache, mockGetVerifiedWords, mockMarkWordPromoted, mockGetVerifiedEnglishWords } = vi.hoisted(() => ({
   mockAddToCommunityCache: vi.fn(),
   mockGetVerifiedWords: vi.fn(),
   mockMarkWordPromoted: vi.fn(),
+  mockGetVerifiedEnglishWords: vi.fn(),
 }));
 vi.mock('../../modules/communityWordManager', () => ({
   addToCommunityCache: mockAddToCommunityCache,
@@ -32,6 +33,11 @@ vi.mock('../../modules/communityWordManager', () => ({
 vi.mock('../../services/milogWordVerifier', () => ({
   getVerifiedWordsForPromotion: mockGetVerifiedWords,
   markWordPromoted: mockMarkWordPromoted,
+}));
+
+// Mock wiktionaryEnVerifier
+vi.mock('../../services/wiktionaryEnVerifier', () => ({
+  getVerifiedEnglishWordsForPromotion: mockGetVerifiedEnglishWords,
 }));
 
 // Mock logger
@@ -67,6 +73,7 @@ describe('AutoPromotion', () => {
     mockAddToCommunityCache.mockResolvedValue(undefined);
     mockGetVerifiedWords.mockResolvedValue([]);
     mockMarkWordPromoted.mockResolvedValue(true);
+    mockGetVerifiedEnglishWords.mockResolvedValue([]);
   });
 
   it('returns correct result structure', async () => {
@@ -81,9 +88,33 @@ describe('AutoPromotion', () => {
         words: expect.objectContaining({
           submissionBased: expect.any(Array),
           milogBased: expect.any(Array),
+          wiktionaryBased: expect.any(Array),
         }),
       })
     );
+  });
+
+  it('promotes wiktionary-verified English words', async () => {
+    mockRpc.mockResolvedValueOnce({ data: [], error: null }); // submission queue empty
+    mockGetVerifiedEnglishWords.mockResolvedValueOnce([
+      { id: 'wk-1', word: 'pleat', url: 'https://en.wiktionary.org/wiki/pleat' },
+      { id: 'wk-2', word: 'quark', url: 'https://en.wiktionary.org/wiki/quark' },
+    ]);
+
+    const result = await runAutoPromotion();
+
+    expect(result.promoted).toBe(2);
+    expect(result.words.wiktionaryBased).toEqual(['pleat', 'quark']);
+    expect(mockAddToCommunityCache).toHaveBeenCalledWith('pleat', 'en');
+    expect(mockAddToCommunityCache).toHaveBeenCalledWith('quark', 'en');
+    expect(mockRpc).toHaveBeenCalledWith('mark_word_auto_promoted', {
+      p_word_id: 'wk-1',
+      p_source: 'wiktionary_verified',
+    });
+    expect(mockRpc).toHaveBeenCalledWith('mark_word_auto_promoted', {
+      p_word_id: 'wk-2',
+      p_source: 'wiktionary_verified',
+    });
   });
 
   it('promotes words with count >= MIN_SUBMISSIONS and reason = not_in_dictionary', async () => {

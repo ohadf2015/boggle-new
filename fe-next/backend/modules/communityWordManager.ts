@@ -36,7 +36,10 @@ export {
 import { setPendingVotesRef } from './communityWordHybridValidation';
 
 export const AI_VOTE_POINTS = 4;
-export const PROMINENT_THRESHOLD = 6;
+// Bumped 6 → 8 on 2026-05-01 for collusion defense; matches DB trigger
+// trg_word_scores_promote (migration tighten_word_promotion_threshold_to_8).
+// Now requires (1 AI yes + 4 likes) OR 8 player likes — not (1 AI + 2 likes).
+export const PROMINENT_THRESHOLD = 8;
 export const VALID_THRESHOLD = 0;
 
 const communityValidWords: Record<LanguageCode, Set<string>> = {
@@ -180,7 +183,13 @@ export async function recordAIVote(params: AIVoteParams): Promise<AIVoteResult> 
 
     if (upsertError) return { success: false, netScore: 0, isProminentlyValid: false, isValidForScoring: false, error: upsertError.message };
 
-    const isProminentlyValid = newNetScore >= PROMINENT_THRESHOLD;
+    // Read DB-authoritative flag — the trg_word_scores_promote trigger may refuse promotion
+    // even when newNetScore >= 8 if there are <2 distinct authed like-voters. Local JS
+    // computation would lie to the cache and create a JS/DB drift.
+    const { data: postState } = await client
+      .from('word_scores').select('is_potentially_valid')
+      .eq('word', normalizedWord).eq('language', lang).single();
+    const isProminentlyValid = postState?.is_potentially_valid === true;
     if (isProminentlyValid && !communityValidWords[lang]?.has(normalizedWord)) {
       await addToCommunityCache(normalizedWord, lang);
     }
@@ -296,11 +305,12 @@ export function updatePendingCache(word: string, language: string, voteType: 'li
   if (aiApproved !== null) existing.aiApproved = aiApproved;
   existing.lastVoted = Date.now();
   cache.set(normalized, existing);
-  if (existing.netScore >= PROMINENT_THRESHOLD) {
+  // Promotion is decided by recordVote/recordAIVote reading is_potentially_valid
+  // from the DB after upsert (the trg_word_scores_promote trigger gates on
+  // distinct authed voters). We only evict the pending entry here once the
+  // word has actually crossed into the community-valid set.
+  if (communityValidWords[lang]?.has(normalized)) {
     cache.delete(normalized);
-    addToCommunityCache(word, lang).catch((err: Error) => {
-      logger.error('COMMUNITY', `Failed to add word to community cache: ${err.message}`);
-    });
   }
 }
 

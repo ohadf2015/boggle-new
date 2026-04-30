@@ -53,16 +53,18 @@ describe('MilogWordVerifier', () => {
 
   describe('parseVerificationResult', () => {
     it('should return verified=true when word has definition links', () => {
-      // HTML structure when word exists - has links with /word/e_[id] pattern
+      // HTML structure when word exists - has links with /word/e_[id] pattern.
+      // POS label `שם עצם` (noun) included so parser hits the accept path
+      // (audit H3: unknown POS now defaults to needs_review).
       const html = `
         <html>
           <body>
             <div class="sr">
-              <a href="https://milog.co.il/שלום/e_2839">שָׁלוֹם</a>
+              <a href="https://milog.co.il/שלום/e_2839">שָׁלוֹם - שם עצם</a>
               <span>מצב של שקט ובטחון</span>
             </div>
             <div class="sr">
-              <a href="https://milog.co.il/שלום/e_2840">שָׁלוֹם</a>
+              <a href="https://milog.co.il/שלום/e_2840">שָׁלוֹם - שם עצם</a>
               <span>ברכה</span>
             </div>
           </body>
@@ -103,12 +105,13 @@ describe('MilogWordVerifier', () => {
     });
 
     it('should extract definition count from multiple results', () => {
+      // Each definition tagged as noun so all hit accept path.
       const html = `
         <html>
           <body>
-            <a href="https://milog.co.il/בית/e_1001">definition 1</a>
-            <a href="https://milog.co.il/בית/e_1002">definition 2</a>
-            <a href="https://milog.co.il/בית/e_1003">definition 3</a>
+            <a href="https://milog.co.il/בית/e_1001">definition 1 - שם עצם</a>
+            <a href="https://milog.co.il/בית/e_1002">definition 2 - שם עצם</a>
+            <a href="https://milog.co.il/בית/e_1003">definition 3 - שם עצם</a>
           </body>
         </html>
       `;
@@ -257,8 +260,11 @@ describe('MilogWordVerifier', () => {
       expect(result.rejectedReason).toContain('too short');
     });
 
-    it('should fall back to verified when type is unparseable but links exist', () => {
-      // Links exist but no recognizable word type label
+    it('should default-deny (needs_review) when type is unparseable, even if links exist', () => {
+      // Audit H3: links exist but no recognizable word type label.
+      // Old behavior: permissively returned `verified: true`.
+      // New behavior: park for human review so abbrev/proper-name leaks
+      // are caught when Milog markup shifts.
       const html = `
         <html><body>
           <div class="sr_e">
@@ -269,8 +275,8 @@ describe('MilogWordVerifier', () => {
 
       const result = parseVerificationResult(html, 'מילה');
 
-      expect(result.verified).toBe(true);
-      expect(result.status).toBe('verified');
+      expect(result.verified).toBe(false);
+      expect(result.status).toBe('needs_review');
       expect(result.wordType).toBe('unknown');
     });
 
@@ -318,7 +324,7 @@ describe('MilogWordVerifier', () => {
       const html = `
         <html>
           <body>
-            <a href="https://milog.co.il/שלום/e_2839">שָׁלוֹם</a>
+            <a href="https://milog.co.il/שלום/e_2839">שָׁלוֹם - שם עצם</a>
           </body>
         </html>
       `;
@@ -456,8 +462,8 @@ describe('MilogWordVerifier', () => {
 
       // Mock ky responses
       mockGet
-        .mockReturnValueOnce({ text: () => Promise.resolve('<a href="https://milog.co.il/שלום/e_1">def</a>') })
-        .mockReturnValueOnce({ text: () => Promise.resolve('<a href="https://milog.co.il/בוקר/e_2">def</a>') });
+        .mockReturnValueOnce({ text: () => Promise.resolve('<a href="https://milog.co.il/שלום/e_1">def - שם עצם</a>') })
+        .mockReturnValueOnce({ text: () => Promise.resolve('<a href="https://milog.co.il/בוקר/e_2">def - שם עצם</a>') });
 
       mockRedisGet.mockResolvedValue(null);
 
@@ -487,7 +493,7 @@ describe('MilogWordVerifier', () => {
         })
         .mockResolvedValue({ error: null });
 
-      mockGet.mockReturnValueOnce({ text: () => Promise.resolve('<a href="https://milog.co.il/בדיקה/e_1">def</a>') });
+      mockGet.mockReturnValueOnce({ text: () => Promise.resolve('<a href="https://milog.co.il/בדיקה/e_1">def - שם עצם</a>') });
 
       mockRedisGet.mockResolvedValue(null);
 

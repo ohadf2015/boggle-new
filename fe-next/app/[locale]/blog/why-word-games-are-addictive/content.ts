@@ -363,119 +363,119 @@ Det var fyra rundor sedan.
 
 Om det här låter bekant, grattis, du är inte trasig. Du upplever en av de mest elegant konstruerade psykologiska looparna som finns i spelvärlden. Ordspel kopplar in något djupt i hur våra hjärnor är kopplade, och resultatet är en sorts tvångsmässighet som känns annorlunda än, säg, att doomscrollla Instagram eller binge-watcha Netflix.
 
-Det känns... produktivt? Hälsoamt? Som om du gör något bra för dig själv även när väckarklockan kryper närmare?
+Det känns... produktivt? Hälsosamt? Som om du gör något bra för dig själv även när väckarklockan kryper närmare?
 
-Jag ville första VARFÖR. Inte den vaga förklaringen "det är kul", utan den faktiska neurovetenskapen och psykologin bakom varför ordspel är så absurt svåra att lägga ifrån sig. Så jag dök ner i forskningen. Och det jag hittade är fascinerande. Och lite oroande.`,
+Jag ville förstå VARFÖR. Inte den vaga förklaringen "det är kul", utan den faktiska neurovetenskapen och psykologin bakom varför ordspel är så absurt svåra att lägga ifrån sig. Så jag dök ner i forskningen. Och det jag hittade är fascinerande. Och lite oroande.`,
       },
       {
         title: 'Dopaminkicken: Din Hjärna På Variabla Beloningar',
         content: `Vi börjar med det stora: dopamin.
 
-Du här förmodligen hort dopamin beskrivas som "njutningskemikalien," men det är inte helt rätt. Dopamin är mer exakt "förväntanskemikalien." Det spikar inte när du FÅR belöningen, utan när du FÖRVÄNTAR dig att en kanske kommer.
+Du har förmodligen hört dopamin beskrivas som "njutningskemikalien," men det är inte helt rätt. Dopamin är mer exakt "förväntanskemikalien." Det spikar inte när du FÅR belöningen, utan när du FÖRVÄNTAR dig att en kanske kommer.
 
 Därför är spelmaskiner så beroendeframkallande. Det är inte vinsten (de flesta förlorar). Det är förväntan på att MÖJLIGEN vinna. Psykologer kallar detta ett "variabelt kvotförstärkningsschema," och det är det mest kraftfulla konditioneringsmönstret som beteendevetenskapen känner till.
 
 Tänk nu på vad som händer när du skannar ett rutnät av bokstäver i ett ordspel.
 
-Du ser en kluster: S, T, A, R... kan det våra STARK? Du följer vägen... K är precis där! STARK! Fem bokstäver! Dopaminspikar.
+Du ser ett kluster: S, T, A, R... kan det vara STARK? Du följer vägen... K är precis där! STARK! Fem bokstäver! Dopaminspikar.
 
-Men här är det lura: du vet aldrig NAR du hittar nästa ord. Ibland kommer de i snabba kluster: OM, MO, MOR, bom bom bom. Andra gånger stirrar du i trettio sekunder utan att se något, och sedan dyker plötsligt KATASTROFAL upp diagonalt och din hjärna lyser upp som Sergels torg på nyårsafton.
+Men här är det luriga: du vet aldrig NÄR du hittar nästa ord. Ibland kommer de i snabba kluster: OM, MO, MOR, bom bom bom. Andra gånger stirrar du i trettio sekunder utan att se något, och sedan dyker plötsligt KATASTROFAL upp diagonalt och din hjärna lyser upp som Sergels torg på nyårsafton.
 
 Denna oförutsägbarhet är EXAKT det variabla förstärkningsschemat. Din hjärna lär sig att belöningar kommer, men inte på ett förutsägbart schema, så den håller dig engagerad i ett tillstånd av ständig, lågintensiv förväntan.
 
-Professor Robert Sapolsky vid Stanford här visat att dopaminniverna faktiskt ökar MER när belöningar är osäkra än när de är garanterade. Ett ordspel där du hittade varje ord lätt skulle faktiskt våra MINDRE beroendeframkallande än ett där ord dyker upp med oförutsägbara intervall.
+Professor Robert Sapolsky vid Stanford har visat att dopaminnivåerna faktiskt ökar MER när belöningar är osäkra än när de är garanterade. Ett ordspel där du hittade varje ord lätt skulle faktiskt vara MINDRE beroendeframkallande än ett där ord dyker upp med oförutsägbara intervall.
 
 Evolutionen förberedde oss inte för 4x4 bokstavsrutnät.`,
       },
       {
         title: 'Flowtillstånd: När Tiden Försvinner',
-        content: `Har du någonsin tittat upp från ett ordspel och insett att en timme här gått? Det är inget bildsprak. Tiden känns bokstavligen annorlunda när du är i flow.
+        content: `Har du någonsin tittat upp från ett ordspel och insett att en timme har gått? Det är inget bildspråk. Tiden känns bokstavligen annorlunda när du är i flow.
 
 Mihaly Csikszentmihalyi identifierade flowtillståndet på 1970-talet som ett tillstånd av fullständig uppslukelse i en aktivitet. Du tappar tidsuppfattningen, din känsla av själv bleknar, och allt annat bara... faller bort.
 
-Flow kraver en mycket specifik balans: utmaningen måste våra PRECIS lagom svår. För lätt och du blir uttråkad. För svår och du blir frustrerad. Det söta stället är där din färdighetsnivå precis matchar svårigheten.
+Flow kräver en mycket specifik balans: utmaningen måste vara PRECIS lagom svår. För lätt och du blir uttråkad. För svår och du blir frustrerad. Det söta stället är där din färdighetsnivå precis matchar svårigheten.
 
 Ordspel är oavsiktligt perfekta flowmaskiner.
 
-Tänk på det. Ett 4x4-rutnät innehåller hundratals möjliga ord, från trivialt lätta (OM, PA, EN) till otroligt svåra (det atta bokstavers ordet som gömmer sig i ett spiralmönster). I varje ögonblick arbetar du precis vid gränsen av din förmåga.
+Tänk på det. Ett 4x4-rutnät innehåller hundratals möjliga ord, från trivialt lätta (OM, PÅ, EN) till otroligt svåra (det åttabokstavers ordet som gömmer sig i ett spiralmönster). I varje ögonblick arbetar du precis vid gränsen av din förmåga.
 
-Därför kan en femminutersrunda kannas som trettio sekunder. Din prefrontala cortex, delen som ansvarar för tidsuppfattning, rekryteras för ordsokningsuppgiften istället. Det finns bokstavligen inte tillräckligt med neurala resurser över för att spara tid.
+Därför kan en femminutersrunda kännas som trettio sekunder. Din prefrontala cortex, delen som ansvarar för tidsuppfattning, rekryteras för ordsökningsuppgiften istället. Det finns bokstavligen inte tillräckligt med neurala resurser över för att spara tid.
 
-Flowtillståndet är också därför "bara en runda till" är så färligt. Varje runda är tillräckligt kort för att flowtillståndet inte helt hinner avta mellan rundorna.`,
+Flowtillståndet är också därför "bara en runda till" är så farligt. Varje runda är tillräckligt kort för att flowtillståndet inte helt hinner avta mellan rundorna.`,
       },
       {
         title: 'Zeigarnikeffekten: Därför Förföljer Dig Ofärdiga Pussel',
         content: `På 1920-talet märkte den litauiska psykologen Bluma Zeigarnik något konstigt: servitörer kunde minnas komplexa beställningar perfekt under serveringen, men glömde dem helt så fort maten var serverad. Ofärdiga uppgifter fastnar i minnet; färdiga rensas ut.
 
-Detta är Zeigarnikeffekten, och ordspel utnyttjar den skoningslost.
+Detta är Zeigarnikeffekten, och ordspel utnyttjar den skoningslöst.
 
 När din runda slutar och spelet visar alla ord du MISSADE, händer något i din hjärna. De missade orden skapar öppna loopar. Din hjärna flaggar dem som oavslutat ärende.
 
-"SYMMETRI fanns på det brädet?! Jag såg S-Y-M! Varför sag jag det inte?!"
+"SYMMETRI fanns på det brädet?! Jag såg S-Y-M! Varför såg jag det inte?!"
 
-Den gnagande känslan? Det är Zeigarnikeffekten. Din hjärna här registrerat en ofullständig uppgift och den VILL verkligen stänga den loopen. Det mest direkta sättet? Spela en runda till.
+Den gnagande känslan? Det är Zeigarnikeffekten. Din hjärna har registrerat en ofullständig uppgift och den VILL verkligen stänga den loopen. Det mest direkta sättet? Spela en runda till.
 
-Det är samma mekanism som får dig att tänka på arbetsproblem i duschen. Din hjärna här en oppen loop, och den fortsatter peta på dig tills du löser den.
+Det är samma mekanism som får dig att tänka på arbetsproblem i duschen. Din hjärna har en öppen loop, och den fortsätter peta på dig tills du löser den.
 
 Jag missade en gång ordet XYLOFON på ett bräde och tänkte på det i tre dagar. Tre dagar! Min hjärna var trasig tills jag hittade det i ett senare spel och loopen äntligen stängdes.`,
       },
       {
         title: 'Social Jämförelse: Toppliste-Effekten',
-        content: `Människor är jämförelsemaskiner. Vi kan inte hjälpa det. Leon Festingers teori om social jämförelse från 1954 hävdar att vi utvärderar oss själva framfor allt genom att jämföra med andra.
+        content: `Människor är jämförelsemaskiner. Vi kan inte hjälpa det. Leon Festingers teori om social jämförelse från 1954 hävdar att vi utvärderar oss själva framför allt genom att jämföra med andra.
 
 Ordspel med topplistor kopplar direkt in i denna krets.
 
 Det räcker inte att hitta 30 ord. Du måste hitta FLER än din kompis. Du måste klättra från 7:e till 5:e plats. Du måste slå ditt eget tidigare rekord.
 
-Här blir det intressant neurologiskt. Tavling aktiverar det ventrala striatum, samma belöningscentrum som reagerar på mat, pengar och romantisk attraktion. Att besegra någon på en topplista utlöser en genuin neurokemisk beloning.
+Här blir det intressant neurologiskt. Tävling aktiverar det ventrala striatum, samma belöningscentrum som reagerar på mat, pengar och romantisk attraktion. Att besegra någon på en topplista utlöser en genuin neurokemisk belöning.
 
 Så du får faktiskt TVÅ dopaminvägar aktiverade samtidigt: en från ordfinnarloopen och en från den sociala tävlingen. Det är en dopaminsmörgås.
 
-Jag här en gruppchatt med fyra vänner där vi delar våra dagliga utmaningspoäng. Snacket är orimligt. Någon hittade 47 ord? "Var brädet på ett språk du faktiskt talar?" Det här blivit en daglig ritual, och det sociala ansvaret innebär att jag bokstavligen inte kan hoppa över en dag utan att bli rostad.`,
+Jag har en gruppchatt med fyra vänner där vi delar våra dagliga utmaningspoäng. Snacket är orimligt. Någon hittade 47 ord? "Var brädet på ett språk du faktiskt talar?" Det har blivit en daglig ritual, och det sociala ansvaret innebär att jag bokstavligen inte kan hoppa över en dag utan att bli rostad.`,
       },
       {
         title: '"Aha!"-Ögonblicket: Därför Känns Det SÅ Bra Att Hitta Ord',
-        content: `Det finns ett specifikt ögonblick när du ser ett ord, särskilt ett långt, där allt klickar. Neuroforskare kallar detta "insiktsupplevelsen" eller "aha-ögonblicket," och det här en distinkt neural signatur.
+        content: `Det finns ett specifikt ögonblick när du ser ett ord, särskilt ett långt, där allt klickar. Neuroforskare kallar detta "insiktsupplevelsen" eller "aha-ögonblicket," och det har en distinkt neural signatur.
 
-Forskning av Mark Beeman och John Kounios med EEG och fMRI här visat att insiktsögonblick föregås av en explosion av gammavågsaktivitet i den högra temporalloben. Detta följs av en rusning av aktivitet i belöningscentrumen, samma områden som aktiveras av skämt, trevliga överraskningar och plötslig förståelse.
+Forskning av Mark Beeman och John Kounios med EEG och fMRI har visat att insiktsögonblick föregås av en explosion av gammavågsaktivitet i den högra temporalloben. Detta följs av en rusning av aktivitet i belöningscentrumen, samma områden som aktiveras av skämt, trevliga överraskningar och plötslig förståelse.
 
-Att hitta ett ord bearbetas på samma sätt som att första en vits. Det är en insikt, och insikter är i sig njutbara.
+Att hitta ett ord bearbetas på samma sätt som att förstå en vits. Det är en insikt, och insikter är i sig njutbara.
 
 Därför känns det kategoriskt annorlunda att hitta ett långt, oväntat ord jämfört med ett kort, uppenbart. Att hitta "OM" är igenkänning. Att hitta "KATASTROFAL" som slingrar sig över brädet är insikt. Och insikt belönas neurokemiskt på ett sätt som enkel igenkänning inte gör.
 
-Det är också därför vi minns spektakulära ordspelsögonblick åratal senare. Jag kan fortfarande berätta om gången jag hittade JUXTAPOSITION på ett bräde. Kanslan av "detta här funnits här hela tiden och bara jag såg det". Ren insikt, kemiskt inbränd i mitt minne.`,
+Det är också därför vi minns spektakulära ordspelsögonblick åratal senare. Jag kan fortfarande berätta om gången jag hittade JUXTAPOSITION på ett bräde. Känslan av "detta har funnits här hela tiden och bara jag såg det". Ren insikt, kemiskt inbränd i mitt minne.`,
       },
       {
         title: 'Hälsosamt vs. Ohälsosamt: När "Beroendeframkallande" Blir Ett Problem',
-        content: `Allt jag här beskrivit, variabla belöningar, flowtillstånd, öppna loopar, socialt tryck, det är genuint kraftfulla psykologiska mekanismer. De är samma mekanismer som gör hasardspel beroendeframkallande och sociala medier tvångsmässiga.
+        content: `Allt jag har beskrivit, variabla belöningar, flowtillstånd, öppna loopar, socialt tryck, det är genuint kraftfulla psykologiska mekanismer. De är samma mekanismer som gör hasardspel beroendeframkallande och sociala medier tvångsmässiga.
 
 Kliniska psykologen Dr. Adam Alter drar gränsen vid störning. En aktivitet blir problematisk när den konsekvent stör saker du värdesätter mer: sömn, relationer, arbete, hälsa.
 
-De goda nyheterna är att ordspel är strukturellt mindre färliga än många alternativ. Korta rundor med naturliga stopppunkter. Ingen oändlig scrollning. Ingen finansiell mekanism.
+De goda nyheterna är att ordspel är strukturellt mindre farliga än många alternativ. Korta rundor med naturliga stopppunkter. Ingen oändlig scrollning. Ingen finansiell mekanism.
 
 Några praktiska gränser som fungerar för mig:
 - Jag spelar inte i sängen (okej, jag FÖRSÖKER att inte spela i sängen)
 - Jag sätter en rundgräns, inte en tidsgräns (tre rundor, sedan stopp)
 - Jag behandlar den dagliga utmaningen som mitt "en och klar"
-- Om jag märker "bara en runda till"-trangen mer än två gånger, lägger jag ner telefonen
+- Om jag märker "bara en runda till"-suget mer än två gånger, lägger jag ner telefonen
 
-Dessa är inte perfekta, och jag bryter mot dem regelbundet. Men att ha explicita gränser innebär att jag atminstone MÄRKER när jag bryter mot dem.`,
+Dessa är inte perfekta, och jag bryter mot dem regelbundet. Men att ha explicita gränser innebär att jag åtminstone MÄRKER när jag bryter mot dem.`,
       },
       {
         title: 'Därför Är Detta "Beroende" Faktiskt Bra För Dig',
-        content: `Här är plottvändningningen: jämfört med nästan allt annat som tävlar om din uppmärksamhet är ordspels-"beroende" anmärkningsvärt godartat. Kanske till och med fördelaktigt.
+        content: `Här är plottvändningen: jämfört med nästan allt annat som tävlar om din uppmärksamhet är ordspels-"beroende" anmärkningsvärt godartat. Kanske till och med fördelaktigt.
 
 Låt oss jämföra vad som händer i din hjärna under vanliga fritidsaktiviteter:
 
-Doomscrollning i sociala medier: Kortisolspikar från upprörande innehåll, social jämförelseangest, passiv konsumtion, ingen kognitiv utmaning.
+Doomscrollning i sociala medier: Kortisolspikar från upprörande innehåll, social jämförelseångest, passiv konsumtion, ingen kognitiv utmaning.
 
 Binge-tittande: Passiv underhållning, minimal kognitiv engagemang, ofta åtföljd av snacking.
 
-Ordspel: Aktiv kognitiv engagemang över flera hjärnregioner, vokabulärförstärkning, arbetsminnstraning, strategiskt tänkande, hanterbara dopamincykler med naturliga slutpunkter.
+Ordspel: Aktiv kognitiv engagemang över flera hjärnregioner, vokabulärförstärkning, arbetsminnesträning, strategiskt tänkande, hanterbara dopamincykler med naturliga slutpunkter.
 
 En studie från 2022 i NEJM Evidence visade att personer som löste korsord i 78 veckor hade mindre kognitiv nedgång än de som använde kommersiella hjärnträningsappar. Korsordgruppen förbättrades faktiskt på vissa mått medan appgruppen stod stilla.
 
-Så ja, din hjärna här kapats av dopaminloopar, flowtillstånd och öppna kognitiva loopar. Men till skillnad från de flesta saker som kapar din hjärna 2026, tränar den här faktiskt din hjärna samtidigt.
+Så ja, din hjärna har kapats av dopaminloopar, flowtillstånd och öppna kognitiva loopar. Men till skillnad från de flesta saker som kapar din hjärna 2026, tränar den här faktiskt din hjärna samtidigt.
 
 Du är inte bara beroende. Du är beroende av något som förmodligen gör dig skarpare.
 
@@ -488,7 +488,7 @@ Det är sent. Jag borde sluta. Men det finns ett sjubokstavsord gömt i det där
 - Zeigarnik, B. — Om färdiga och ofärdiga uppgifter (1927)
 - Festinger, L. — En Teori Om Sociala Jämförelseprocesser (1954)
 - Beeman, M. & Kounios, J. — Aha!-ögonblicket: Kognitiv neurovetenskap om insikt (2009)
-- Alter, A. — Omotstandlig: Uppkomsten av Beroendeframkallande Teknik (2017)`,
+- Alter, A. — Oemotståndlig: Uppkomsten av beroendeframkallande teknik (2017)`,
       },
     ],
     backToBlog: 'Tillbaka till Bloggen',

@@ -87,6 +87,25 @@ vi.mock('framer-motion', () => ({
         );
       }
     ),
+    span: React.forwardRef<HTMLSpanElement, React.PropsWithChildren<{ className?: string; style?: React.CSSProperties }>>(
+      function MotionSpan({ children, className, style, ...props }, ref) {
+        // Strip framer-only props that React doesn't recognize on real DOM nodes
+        const {
+          initial: _initial,
+          animate: _animate,
+          exit: _exit,
+          transition: _transition,
+          whileHover: _wh,
+          whileTap: _wt,
+          ...rest
+        } = props as Record<string, unknown>;
+        return (
+          <span ref={ref} className={className} style={style} {...(rest as Record<string, unknown>)}>
+            {children}
+          </span>
+        );
+      }
+    ),
   },
   AnimatePresence: ({ children }: React.PropsWithChildren<object>) => <>{children}</>,
 }));

@@ -29,7 +29,7 @@ export const contentByLocale: Record<string, LocaleContent> = {
       {
         content: `Hebrew word game players already know this, but playing word games in Hebrew is a fundamentally different experience from playing in English. Not harder, not easier. Different. Structurally different at the DNA level.
 
-In English, you look at a grid of letters and your brain searches for familiar patterns. C-A-T, T-H-E, S-T-R. You scan left to right, top to bottom, and letter combinations jump out at you because you've seen them a million times.
+In English, you look at a grid of letters and your brain searches for familiar patterns. C-A-T, T-H-E. You scan left to right, top to bottom, and letter combinations jump out.
 
 In Hebrew, you look at a grid of letters and your brain has to do something much more interesting. It has to reconstruct words from consonant skeletons, mentally insert vowels that aren't there, deal with a right-to-left reading direction that flips your spatial processing, and — this is the wild part — recognize that three seemingly random letters might share a root that connects them to dozens of different words.
 
@@ -74,13 +74,9 @@ The letters you see on the page (or in a word game grid) are consonants. The vow
 
 In formal or educational texts, you'll see tiny dots and dashes (nikkud) above and below the letters that indicate vowels. But in everyday Hebrew — newspapers, signs, text messages, and yes, word games — the nikkud is absent. You're reading consonant skeletons and your brain fills in the rest.
 
-For word games, this creates a fascinating dynamic.
+For word games, the same sequence of consonants can sometimes represent different words depending on which vowels you insert. The letters ד-ב-ר (D-V-R) could be davar (thing), diber (spoke), dever (plague), or dvar (word of). Context usually disambiguates, but in a word game grid, there is no context. So players need to know all the possible readings.
 
-First, it means that the same sequence of consonants can sometimes represent different words depending on which vowels you insert. The letters ד-ב-ר (D-V-R) could be davar (thing), diber (spoke), dever (plague), or dvar (word of). Context usually disambiguates, but in a word game grid, there is no context. So players need to know all the possible readings.
-
-Second, it means the information density of Hebrew letters is higher than English letters. Each Hebrew letter carries more semantic weight because it's doing the job of a consonant and implying possible vowel patterns. This makes Hebrew word games feel more... compressed. More concentrated. Every letter matters more.
-
-Third — and this is where it gets tricky for game design — it means that validating words is more complex. In English, C-A-T is a word and C-T-A is not. Simple. In Hebrew, you need to check whether a consonant sequence, combined with any valid vowel pattern, produces a real word. The dictionary lookup is fundamentally more complex.
+The information density of Hebrew letters is higher. Each letter carries semantic weight by acting as consonant and implying vowel patterns, making word games feel compressed. Validating words is more complex: In English, C-A-T is a word and C-T-A is not. Simple. In Hebrew, you need to check whether a consonant sequence, combined with any valid vowel pattern, produces a real word. The dictionary lookup is fundamentally more complex.
 
 I've heard Hebrew Scrabble players describe this as "reading between the letters." You're not just seeing what's there — you're seeing what could be there. It's pattern recognition at a deeper level.
 
@@ -94,17 +90,13 @@ In an English word game, you scan the grid left to right, top to bottom. Your ey
 
 In Hebrew, the primary scanning direction flips. But it doesn't just flip horizontally. The entire spatial cognitive framework shifts. Hebrew speakers process visual information differently in game contexts because their reading direction has trained their spatial attention.
 
-Research from the University of Haifa (2018) found that Hebrew speakers show a rightward spatial attention bias, while English speakers show a leftward bias. This means Hebrew players literally look at a letter grid differently. They start from the right side. Their eyes move differently. The words they find first are different.
+Research from the University of Haifa (2018) shows Hebrew speakers have rightward spatial attention bias, while English speakers show leftward bias. Hebrew players scan grids from the right, finding different words first.
 
-For game design, this has real implications:
-
-UI elements need to flip. Navigation arrows, progress bars, shadow directions. Everything that implies directionality needs to mirror. At LexiClash, we flip our hard shadows from right-cast (4px 4px) to left-cast (-4px 4px) in RTL mode. It sounds small, but players notice when it's wrong. It creates a subtle feeling of "something is off" that breaks immersion.
-
-Score displays and timers need to respect reading direction. In English, you might put the timer on the left and score on the right. In Hebrew, that feels backwards.
-
-Text input and word formation need special handling. When a Hebrew player builds a word letter by letter, the new letter should appear on the left side of the growing word, pushing existing letters right. Get this wrong and the word appears to form backwards, which is deeply disorienting.
-
-Animations need to respect directionality. A word sliding in from the left feels natural in English. In Hebrew, it should slide in from the right. Same for transitions, reveals, and any motion that implies sequence or direction.
+For game design:
+- UI elements flip: arrows, progress bars, shadows mirror (LexiClash flips hard shadows from 4px to -4px)
+- Score displays and timers respect reading direction
+- Text input: new letters appear left of growing words, pushing right
+- Animations slide in from right (vs left in English)
 
 The hardest part? Bidirectional (BiDi) text. Hebrew text that includes English words, numbers, or abbreviations switches direction mid-line. The Unicode Bidirectional Algorithm handles this in plain text, but in a game UI with animations, transitions, and custom layouts, BiDi support requires careful, manual testing.
 
@@ -116,11 +108,9 @@ I've seen games that clearly tested only in English. You can always tell because
 
 Scrabble (or as it's known in Hebrew, שבץ נא — "Shvatz Na") has a dedicated following. There's something deeply satisfying about playing Scrabble in a language where the root system means that every rack of tiles contains hidden families of words waiting to be discovered.
 
-But the culture goes beyond Scrabble. Hebrew crossword puzzles (תשבצים — "tashbetzim") are a national institution. Friday newspaper crosswords are a weekend ritual for many Israelis — so much so that there are crossword celebrities. Puzzle constructors like Dan Orion are genuine cultural figures.
+Hebrew crossword puzzles (תשבצים — "tashbetzim") are a national ritual. Friday newspapers feature crosswords that produce celebrities like Dan Orion. The root system makes wordplay inevitable — when words share consonant patterns, double meanings abound. Israeli humor relies heavily on this, visible in shop names and street art throughout Tel Aviv.
 
-Then there's the wordplay tradition. Hebrew is a language that loves puns and double meanings. The root system makes wordplay almost inevitable — when so many words share consonant patterns, double meanings are everywhere. Israeli humor relies heavily on this. Walk through Tel Aviv and you'll see shop names, restaurant names, and street art that play on Hebrew roots in clever ways.
-
-Hebrew also has a unique relationship with word creation. Because Modern Hebrew was essentially revived and modernized in the late 19th and 20th centuries, largely through the work of Eliezer Ben-Yehuda and the Academy of the Hebrew Language, there's a tradition of intentional word creation that English doesn't have.
+Modern Hebrew has a unique tradition of intentional word creation. Revived and modernized in the late 19th/20th centuries through Ben-Yehuda and the Academy of the Hebrew Language, new words follow ancient patterns.
 
 New Hebrew words are often constructed by fitting modern concepts into ancient root patterns. The word for "telephone" (טלפון, "telefon") is a direct loanword, but "computer" (מחשב, "makhshev") comes from the root ח-ש-ב (to think/calculate). "Electricity" (חשמל, "khashmal") was pulled from an obscure biblical word that originally referred to a mysterious gleaming substance in the Book of Ezekiel.
 
@@ -223,7 +213,7 @@ And if you're a native Hebrew speaker who's been nodding along to this entire ar
     authorBio: 'אובססיבי רב-לשוני של משחקי מילים שבילה שישה חודשים בלימוד שורשים עבריים רק כדי להיות פחות גרוע בערבי סקרבל ישראליים.',
     sections: [
       {
-        content: `אני הולכת לחשוף בפניכם סוד שכל שחקני משחקי מילים בעברית כבר יודעים: לשחק משחקי מילים בעברית זו חוויה שונה מהותית מלשחק באנגלית. לא יותר קשה, לא יותר קל — שונה. כמו, שונה מבחינה מבנית ברמת ה-DNA.
+        content: `לשחק משחקי מילים בעברית היא חוויה שונה מהותית מלשחק באנגלית. לא יותר קשה, לא יותר קל — שונה. שונה מבחינה מבנית ברמת ה-DNA.
 
 באנגלית, מסתכלים על לוח של אותיות והמוח מחפש דפוסים מוכרים. C-A-T, T-H-E. סורקים משמאל לימין, מלמעלה למטה, וצירופי אותיות קופצים לעיניים כי ראיתם אותם מיליון פעמים.
 
@@ -237,37 +227,27 @@ And if you're a native Hebrew speaker who's been nodding along to this entire ar
 
 באנגלית, מילים הן בעיקר רצפים שרירותיים של אותיות. CAT לא קשורה ל-CATALOG אלא במקרה. בעברית, כמעט כל מילה בשפה נגזרת משורש תלת-אותי שנושא משמעות ליבה.
 
-קחו את השורש כ-ת-ב, שקשור לכתיבה: כָּתַב, כּוֹתֵב, כְּתִיבָה, מִכְתָּב, כַּתָּב, כְּתוֹבֶת, הַכְתָּבָה, תַּכְתִּיב. שמונה מילים, כולן משלוש אותיות.
+קחו את השורש כ-ת-ב (כתיבה): כָּתַב, כּוֹתֵב, כְּתִיבָה, מִכְתָּב, כַּתָּב, כְּתוֹבֶת, הַכְתָּבָה, תַּכְתִּיב — שמונה מילים משלוש אותיות.
 
-עכשיו דמיינו שאתם משחקים ואתם רואים את האותיות כ, ת, ו-ב מפוזרות על הלוח. המוח שלכם נדלק: שלוש האותיות האלה הן שורש. אתם יודעים מיד שיש משפחה של מילים מתחבאת בצירוף הזה. השאלה היא לא אם יש מילה — השאלה היא איזו מילה אפשר ליצור עם שאר האותיות הזמינות.
+כששחקנים רואים כ, ת, ב מפוזרות על הלוח, המוח נדלק: זה שורש. מיד יודעים שיש משפחה של מילים מתחבאת. השאלה היא איזו מילה אפשר ליצור עם שאר האותיות.
 
-זה מה שהופך משחקי מילים בעברית למרגשים אינטלקטואלית בצורה שקשה לתאר. כל שורש שאתם מזהים הוא מפתח שפותח דלתות רבות.
+זה מה שהופך משחקי מילים בעברית למרגשים אינטלקטואלית. כל שורש שמזהים הוא מפתח שפותח דלתות רבות.
 
 פעם שיחקתי סיבוב שבו מצאתי שבע מילים שונות משורש תלת-אותי אחד. החברה הישראלית שלי רק הנהנה ואמרה, "עכשיו את חושבת בעברית." זו אחת המחמאות הכי טובות שקיבלתי.`,
       },
       {
         title: 'בלי ניקוד, בלי בעיה (טוב, עם קצת בעיות)',
-        content: `הנה משהו שמפוצץ את הראש של דוברי אנגלית שפוגשים עברית בפעם הראשונה: עברית כתובה בדרך כלל לא כוללת תנועות.
+        content: `עברית כתובה בדרך כלל ללא תנועות. האותיות הן עיצורים; התנועות מרומזות. זה כמו קריאת "הל אתם יכלם לקרא את ז?" — רק שדוברי עברית עושים זאת בקלות כי השפה תוכננה ככה מהיסוד.
 
-האותיות על הדף (או בלוח משחק מילים) הן עיצורים. התנועות מרומזות. דוברי השפה פשוט... יודעים אותן. זה כמו לקרוא "הל אתם יכלם לקרא את ז?" — רק שדוברי עברית עושים את זה בקלות כי השפה תוכננה ככה מהיסוד.
-
-למשחקי מילים, זה יוצר דינמיקה מרתקת. אותו רצף של עיצורים יכול לפעמים לייצג מילים שונות בהתאם לאיזה תנועות מכניסים. האותיות ד-ב-ר יכולות להיות דָּבָר, דִּבֵּר, דֶּבֶר, או דְּבַר. בלוח משחק אין הקשר. אז שחקנים צריכים להכיר את כל הקריאות האפשריות.
-
-צפיפות המידע של אותיות עבריות גבוהה יותר מאותיות אנגליות. כל אות עברית נושאת יותר משקל סמנטי כי היא עושה את העבודה של עיצור וגם מרמזת על דפוסי תנועות אפשריים.
+אותו רצף עיצורים יכול לייצג מילים שונות: ד-ב-ר = דָּבָר, דִּבֵּר, דֶּבֶר, דְּבַר. בלוח אין הקשר, אז שחקנים צריכים להכיר קריאות אפשריות. צפיפות המידע גבוהה יותר — כל אות נושאת משקל סמנטי יותר.
 
 שמעתי שחקני סקרבל עבריים מתארים את זה כ"קריאה בין האותיות." אתם לא רק רואים מה יש שם — אתם רואים מה יכול להיות שם.`,
       },
       {
         title: 'RTL: כשכל מה שידעתם על עיצוב מתהפך',
-        content: `עברית נכתבת ונקראת מימין לשמאל. אם אתם מעצבים או מפתחים, העובדה הבודדת הזו יוצרת מפל של אתגרי עיצוב.
+        content: `עברית נקראת מימין לשמאל. מחקר חיפה (2018) מצא שדוברי עברית מראים הטיית קשב מרחבית ימינה, בעוד דוברי אנגלית — שמאלה. שחקנים עבריים סורקים לוחות אחרת, מתחילים מהצד הימני.
 
-במשחק מילים באנגלית, סורקים את הלוח משמאל לימין, מלמעלה למטה. בעברית, כיוון הסריקה הראשי מתהפך. אבל זה לא רק מתהפך אופקית. כל המסגרת הקוגניטיבית המרחבית זזה.
-
-מחקר מאוניברסיטת חיפה (2018) מצא שדוברי עברית מראים הטיית קשב מרחבית ימינה, בעוד דוברי אנגלית מראים הטיה שמאלה. שחקנים עבריים ממש מסתכלים על לוח אותיות אחרת. הם מתחילים מהצד הימני.
-
-לעיצוב משחקים, לזה יש השלכות אמיתיות: אלמנטי UI צריכים להתהפך. חצי ניווט, סרגלי התקדמות, כיוני צללים — כל מה שמרמז על כיוון צריך להשתקף. הצללים הקשים שלנו מתהפכים ממוטל ימינה ל-מוטל שמאלה במצב RTL. נשמע קטן, אבל שחקנים שמים לב כשזה לא נכון.
-
-קלט טקסט ויצירת מילים צריכים טיפול מיוחד. כששחקן עברי בונה מילה אות אות, האות החדשה צריכה להופיע בצד שמאל של המילה הגדלה. אנימציות צריכות לכבד כיווניות.
+אלמנטי UI צריכים להתהפך: חצי ניווט, סרגלי התקדמות, צללים (LexiClash: מוטל ימינה → שמאלה). קלט וריצת מילים צריכים טיפול מיוחד — אות חדשה בצד שמאל, דחיפה ימינה. אנימציות כבדות כיווניות.
 
 החלק הקשה ביותר? טקסט דו-כיווני. טקסט עברי שכולל מילים באנגלית, מספרים או קיצורים מחליף כיוון באמצע השורה.
 
@@ -275,47 +255,41 @@ And if you're a native Hebrew speaker who's been nodding along to this entire ar
       },
       {
         title: 'תרבות משחקי מילים בישראל',
-        content: `לישראל יש תרבות משחקי מילים שמתחרה בכל מדינה שביקרתי בה, עם טעם ישראלי ייחודי.
+        content: `לישראל תרבות משחקי מילים ייחודית. סקרבל (שבץ נא) בעברית מספק עמוקות — מערכת השורשים אומרת שכל מגש אריחים מכיל משפחות מילים.
 
-סקרבל (או כפי שהוא מוכר בעברית, שבץ נא) הוא עם קהל מסור. יש משהו מספק עמוקות בלשחק סקרבל בשפה שבה מערכת השורשים אומרת שכל מגש אריחים מכיל משפחות מילים מוסתרות.
+תשבצים (תשבצים) טקס שבוע ישראלי — יוצרים כמו דן אוריון הם דמויות תרבותיות. עברית אוהבת משחקי מילים וכפל משמעות. מערכת השורשים הופכת משחקי מילים בלתי נמנעים — כפל משמעויות בכל מקום.
 
-תשבצים הם מוסד לאומי. תשבצי העיתון של יום שישי הם טקס סוף שבוע לישראלים רבים — עד כדי כך שיש סלבריטאים של תשבצים. יוצרי חידות כמו דן אוריון הם דמויות תרבותיות אמיתיות.
+עברית מודרנית (הוחייתה במאות ה-19 וה-20) יצרה מילים בכוונה. "מחשב" משורש ח-ש-ב (חשוב/חשב). "חשמל" משלפה מקראית עמומה (חומר נוצץ, יחזקאל).
 
-ואז יש מסורת משחקי המילים. עברית היא שפה שאוהבת משחקי מילים וכפל משמעות. מערכת השורשים הופכת משחקי מילים לכמעט בלתי נמנעים — כשכל כך הרבה מילים חולקות דפוסי עיצורים, כפל משמעויות הוא בכל מקום.
-
-לעברית יש גם יחס ייחודי ליצירת מילים. כי עברית מודרנית בעצם הוחייתה ומודרנה במאות ה-19 וה-20, יש מסורת של יצירת מילים מכוונת. "מחשב" בא מהשורש ח-ש-ב (לחשוב/לחשב). "חשמל" נשלף ממילה מקראית עמומה שהתייחסה במקור לחומר נוצץ מסתורי בספר יחזקאל.
-
-עבור שחקנים, זה אומר שלעברית יש שכבות. מילים קדומות דרות בצוותא עם מטבעות מודרניות. עברית מקראית, עברית של חז"ל, ועברית מודרנית — כולן תורמות אוצר מילים. משחק אחד עשוי לכלול מילה בת 3,000 שנה מהתורה ליד מילה שהומצאה ב-2015.`,
+שחקנים נתקלים בשכבות — מילים קדומות עם מטבעות מודרניות. עברית מקראית, חז"ל, ומודרנית כולן בלוח: מילה בת 3,000 שנה ליד מילה מ-2015.`,
       },
       {
         title: 'טיפים ללומדי עברית שמשחקים משחקי מילים',
-        content: `אם אתם לומדים עברית ורוצים להשתמש במשחקי מילים ככלי לימוד — מה שאני מאוד ממליצה — הנה האסטרטגיות שבאמת עובדות:
+        content: `אם לומדים עברית ורוצים להשתמש במשחקי מילים ככלי לימוד, הנה אסטרטגיות שעובדות:
 
-למדו שורשים, לא מילים. זה הטיפ החשוב ביותר. כשאתם נתקלים במילה חדשה, אל תשננו אותה בבידוד. חפשו את השורש התלת-אותי. אחר כך חפשו מילים אחרות מאותו שורש. פתאום, במקום ללמוד מילה אחת, למדתם חמש.
+למדו שורשים, לא מילים. מילה חדשה? חפשו שורש תלת-אותי, אחר כך מילים אחרות מאותו שורש. במקום מילה אחת, למדתם חמש.
 
-התחילו עם שורשים בתדירות גבוהה. יש כ-500 שורשים שמכסים את רוב העברית היומיומית. שורשים כמו כ-ת-ב, ל-מ-ד, ד-ב-ר, ש-מ-ע ו-ר-א-ה יופיעו כל הזמן במשחקים.
+התחילו עם שורשים בתדירות גבוהה (~500 מכסים עברית יומיומית). כ-ת-ב, ל-מ-ד, ד-ב-ר, ש-מ-ע, ר-א-ה — כל הזמן במשחקים.
 
-שחקו עם ניקוד פועל (אם המשחק תומך). זה מפחית דרמטית את העומס הקוגניטיבי. כשמשתפרים, כבו את הניקוד.
+שחקו עם ניקוד (כשתומכים) — מפחית עומס קוגניטיבי. כשמשתפרים, כבו.
 
-שימו לב למשקלים. מילים עבריות עוקבות אחרי תבניות ספציפיות. למשל, התבנית מִ__ָ_ יוצרת לעתים קרובות שמות מקום: מִקְדָּשׁ, מִסְפָּר. זיהוי הדפוסים האלה עוזר לחזות מילים תקפות.
+שימו לב למשקלים (תבניות). מִ__ָ_ יוצרת שמות מקום: מִקְדָּשׁ, מִסְפָּר. דפוסים עוזרים לחזות מילים תקפות.
 
 אל תפחדו מסלנג. "סבבה," "יאללה," "חפיף" — כולן מילים עבריות אמיתיות עם שורשים אמיתיים.
 
-השתמשו במשחקי מילים לתרגול מהירות קריאה. משחקי מילים מכריחים אתכם לקרוא מהר. אי אפשר לבלות 30 שניות על כל מילה כשהטיימר רץ. לחץ הזמן הוא למעשה יתרון כי הוא מאמן זיהוי אוטומטי.
+משחקי מילים מכריחים קריאה מהירה. אי אפשר 30 שניות לכל מילה עם טיימר. לחץ הזמן הוא יתרון — מאמן זיהוי אוטומטי.
 
-קבלו שתפסידו. הרבה. לזמן רב. אבל כל משחק מלמד אתכם משהו, והלמידה מצטברת.`,
+קבלו שתפסידו. הרבה. לזמן רב. כל משחק מלמד משהו, והלמידה מצטברת.`,
       },
       {
         title: 'סלנג עברי ומילים מודרניות במשחקי מילים',
-        content: `אחת השמחות של משחקי מילים בעברית היא המפגש עם העולם הפרוע והיצירתי של סלנג עברי מודרני.
+        content: `משחקי מילים בעברית חושפים סלנג עברי מודרני פרוע ויצירתי.
 
-סלנג עברי הוא מיקס יפהפה של השפעות. תמצאו מילים שאולות מערבית (יאללה, אחלה), אנגלית (קול), רוסית (במיוחד בסלנג ישן מהגירת שנות ה-90), ויצירות מקומיות שמשחקות עם מערכת השורשים של עברית.
+סלנג עברי: השפעות ערביות (יאללה, אחלה), אנגליות (קול), רוסיות (שנות ה-90), ויצירות מקומיות משחקות עם שורשים.
 
-קחו את המילה "פראייר" — פרייר שמשמעותה מי שנותן לאחרים לנצל אותו. היא באה מגרמנית/יידיש, והיא אחת המילים הכי טעונות תרבותית בעברית ישראלית. "אל תהיה פראייר" זה כמעט מוטו לאומי.
+"פראייר" (גרמנית/יידיש) — מנצל אתו. "אל תהיה פראייר" כמעט מוטו לאומי. "חבל על הזמן" = מילולית "בזבוז" → אידיומטית "מדהים" — הפיכה סמנטית שהופכת סלנג למבדר.
 
-או "חבל על הזמן" — מילולית "בזבוז זמן" אבל אידיומטית "מדהים." ההיפוך הסמנטי הזה הופך סלנג עברי למבדר אינסופית.
-
-רשתות חברתיות האיצו יצירת מילים עבריות. דוברי עברית טבעו מילים כמו "לייקק," "תיירג," ו"שיירר." המילים האלה עוקבות אחרי כללי מורפולוגיה עבריים — לקחו מושגים אנגליים והלבישו אותם בבגדים דקדוקיים עבריים.
+רשתות חברתיות האיצו יצירת מילים: "לייקק," "תיירג," "שיירר" עוקבות אחרי מורפולוגיה עברית — מושגים אנגליים בבגדים דקדוקיים.
 
 הצבא תורם רבות לסלנג העברי. מילים כמו "גרבי," "משופשף," ו"סמנכ"ל" נולדו בתרבות הצבאית והגרו לשימוש כללי.
 
@@ -323,15 +297,11 @@ And if you're a native Hebrew speaker who's been nodding along to this entire ar
       },
       {
         title: 'למה אני ממשיכה לחזור למשחקי מילים בעברית',
-        content: `התחלתי ללמוד עברית בגלל חברה. המשכתי בגלל משחקי מילים. זו לא בדיחה — זה ממש מה שקרה.
+        content: `למדתי עברית בגלל חברה. המשכתי בגלל משחקי מילים. שורשים שינו את ההבנה שלי איך שפות עובדות. קריאה ללא ניקוד אימנה זיהוי דפוסים. RTL חשפה הטיות מרחביות שלא הכרתי.
 
-מערכת השורשים שינתה את ההבנה שלי לגבי איך שפות יכולות לעבוד. הקריאה ללא ניקוד אימנה סוג של זיהוי דפוסים שלא ידעתי שאני מסוגלת לו. המעבר ל-RTL גרם לי להיות מודעת להטיות מרחביות שמעולם לא ידעתי שיש לי.
+משחקי מילים בעברית קשים יותר: עקומת לימוד תלולה, דרישות קוגניטיביות גבוהות. אבל עשירים יותר — למצוא מילה מרגיש כמו חפירה ארכיאולוגית. שורש משלוש אלפים שנה שעדיין עובד.
 
-משחקי מילים בעברית קשים יותר מאנגלית. לא אעמיד פנים אחרת. עקומת הלמידה תלולה יותר, הדרישות הקוגניטיביות גבוהות יותר, ולדוברים ילידים יש יתרון עצום.
-
-אבל הם גם עשירים יותר. מרובדים יותר. מתגמלים יותר כשדברים מתחברים. למצוא מילה בעברית מרגיש כמו חפירה ארכיאולוגית — לחשוף שורש, לזהות דפוס, לשחזר מילה שהתקיימה באיזושהי צורה לפני שלושת אלפים שנה ועדיין עובדת היום.
-
-ואם אתם דוברי עברית ילידים שהנהנתם לאורך כל המאמר הזה וחשבתם "כן, ברור" — תודה על הסבלנות. עכשיו תלמדו אותי את השורש של "הכרת תודה." אני יודעת שהוא מתחיל בנו"ן... או שלא. עזרו לי.`,
+ואם דוברי עברית ילידים הנהנתם לאורך זה וחשבתם "כן, ברור" — תודה. עכשיו תלמדו אותי את השורש של "הכרת תודה." אני יודעת שהוא מתחיל בנו"ן... או לא. עזרו לי.`,
       },
       {
         content: `מקורות:

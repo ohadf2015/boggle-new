@@ -27,14 +27,19 @@ const baseProps = {
   t,
 };
 
+const openModal = () => fireEvent.click(screen.getByLabelText('hostView.advancedSettings'));
+
 describe('AdvancedSettingsModal language chips', () => {
   beforeEach(() => {
     baseProps.onRoomLanguageChange.mockClear();
+    baseProps.setTimerValue.mockClear();
+    baseProps.setDifficulty.mockClear();
+    baseProps.setMinWordLength.mockClear();
   });
 
   it('renders one chip per supported language when opened', () => {
     render(<AdvancedSettingsModal {...baseProps} />);
-    fireEvent.click(screen.getByLabelText('hostView.advancedSettings'));
+    openModal();
 
     expect(screen.getByRole('button', { name: /joinView\.english/i })).toBeTruthy();
     expect(screen.getByRole('button', { name: /joinView\.hebrew/i })).toBeTruthy();
@@ -45,7 +50,7 @@ describe('AdvancedSettingsModal language chips', () => {
 
   it('marks the current language as selected via aria-pressed', () => {
     render(<AdvancedSettingsModal {...baseProps} roomLanguage="he" />);
-    fireEvent.click(screen.getByLabelText('hostView.advancedSettings'));
+    openModal();
 
     const hebrewChip = screen.getByRole('button', { name: /joinView\.hebrew/i });
     expect(hebrewChip.getAttribute('aria-pressed')).toBe('true');
@@ -53,14 +58,84 @@ describe('AdvancedSettingsModal language chips', () => {
     expect(englishChip.getAttribute('aria-pressed')).toBe('false');
   });
 
-  it('fires onRoomLanguageChange with the chosen language code on chip click', () => {
+  it('does not commit language change until Save is clicked', () => {
     render(<AdvancedSettingsModal {...baseProps} />);
-    fireEvent.click(screen.getByLabelText('hostView.advancedSettings'));
+    openModal();
 
     fireEvent.click(screen.getByRole('button', { name: /joinView\.swedish/i }));
-    expect(baseProps.onRoomLanguageChange).toHaveBeenCalledWith('sv');
+    expect(baseProps.onRoomLanguageChange).not.toHaveBeenCalled();
 
-    fireEvent.click(screen.getByRole('button', { name: /joinView\.japanese/i }));
-    expect(baseProps.onRoomLanguageChange).toHaveBeenCalledWith('ja');
+    fireEvent.click(screen.getByRole('button', { name: /common\.save/i }));
+    expect(baseProps.onRoomLanguageChange).toHaveBeenCalledWith('sv');
+  });
+});
+
+describe('AdvancedSettingsModal save/cancel', () => {
+  beforeEach(() => {
+    baseProps.setTimerValue.mockClear();
+    baseProps.setDifficulty.mockClear();
+    baseProps.setMinWordLength.mockClear();
+    baseProps.onRoomLanguageChange.mockClear();
+  });
+
+  it('renders Save and Cancel buttons when opened', () => {
+    render(<AdvancedSettingsModal {...baseProps} />);
+    openModal();
+
+    expect(screen.getByRole('button', { name: /common\.save/i })).toBeTruthy();
+    expect(screen.getByRole('button', { name: /common\.cancel/i })).toBeTruthy();
+  });
+
+  it('Save commits drafted timer/difficulty/minWordLength changes to parent setters', () => {
+    render(<AdvancedSettingsModal {...baseProps} />);
+    openModal();
+
+    fireEvent.click(screen.getByRole('button', { name: '1 hostView.min' }));
+    fireEvent.click(screen.getByRole('button', { name: '7×7' }));
+    fireEvent.click(screen.getByRole('button', { name: '4 hostView.presetDrawerLetters' }));
+
+    expect(baseProps.setTimerValue).not.toHaveBeenCalled();
+    expect(baseProps.setDifficulty).not.toHaveBeenCalled();
+    expect(baseProps.setMinWordLength).not.toHaveBeenCalled();
+
+    fireEvent.click(screen.getByRole('button', { name: /common\.save/i }));
+
+    expect(baseProps.setTimerValue).toHaveBeenCalledWith(1);
+    expect(baseProps.setDifficulty).toHaveBeenCalledWith('HARD');
+    expect(baseProps.setMinWordLength).toHaveBeenCalledWith(4);
+  });
+
+  it('Cancel discards drafts — no setters called', () => {
+    render(<AdvancedSettingsModal {...baseProps} />);
+    openModal();
+
+    fireEvent.click(screen.getByRole('button', { name: '1 hostView.min' }));
+    fireEvent.click(screen.getByRole('button', { name: /joinView\.swedish/i }));
+
+    fireEvent.click(screen.getByRole('button', { name: /common\.cancel/i }));
+
+    expect(baseProps.setTimerValue).not.toHaveBeenCalled();
+    expect(baseProps.onRoomLanguageChange).not.toHaveBeenCalled();
+  });
+
+  it('reopening after Cancel resets drafts to current props', () => {
+    render(<AdvancedSettingsModal {...baseProps} />);
+    openModal();
+
+    fireEvent.click(screen.getByRole('button', { name: '7×7' }));
+    fireEvent.click(screen.getByRole('button', { name: /common\.cancel/i }));
+
+    openModal();
+    const mediumChip = screen.getByRole('button', { name: '6×6' });
+    expect(mediumChip.getAttribute('class') || '').toMatch(/neo-lime/);
+  });
+
+  it('Save skips onRoomLanguageChange when language is unchanged (avoids redundant socket emit)', () => {
+    render(<AdvancedSettingsModal {...baseProps} />);
+    openModal();
+    fireEvent.click(screen.getByRole('button', { name: '1 hostView.min' }));
+    fireEvent.click(screen.getByRole('button', { name: /common\.save/i }));
+
+    expect(baseProps.onRoomLanguageChange).not.toHaveBeenCalled();
   });
 });
