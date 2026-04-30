@@ -8545,6 +8545,20 @@ const es = {
       "colorLime": "Lima",
       "bannerTitle": "Objetivos"
     },
+    "hint": {
+      "free": "GRATIS",
+      "ad": "PISTA",
+      "aria": {
+        "free": "Pista gratis — cuesta 25 pts",
+        "ad": "Mira un anuncio para una pista — cuesta 25 pts"
+      },
+      "toast": {
+        "targetWord": "Intenta formar: {word}",
+        "colorPower": "Busca fichas {color}",
+        "collectType": "Encuentra más {tileType}",
+        "clearAllType": "Limpia los {tileType} restantes"
+      }
+    },
     "combo": {
       "bomb_bomb": "¡MEGA EXPLOSIÓN!",
       "bomb_lightning": "¡BOMBA TRUENO!",

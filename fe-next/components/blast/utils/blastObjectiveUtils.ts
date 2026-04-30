@@ -59,9 +59,17 @@ export function formatObjectiveLabel(
   const colorKey = objective.colorTag ? `blast.objective.color${objective.colorTag.charAt(0).toUpperCase()}${objective.colorTag.slice(1)}` : '';
   const colorLabel: string = colorKey ? (t(colorKey) || objective.colorTag || '') : '';
 
+  // Tile-type label resolves through the existing tile-guide translations
+  // (`blast.tileGuide.<type>.name`) — never leak the raw English type id
+  // into a non-English UI. Falls back to the id only when no translation
+  // exists for that type in the current locale (defensive last resort).
+  const tileLabel: string = objective.tileType
+    ? (t(`blast.tileGuide.${objective.tileType}.name`) || objective.tileType)
+    : '';
+
   return template
     .replace('{target}', String(objective.target))
-    .replace('{tileType}', objective.tileType || '')
+    .replace('{tileType}', tileLabel)
     .replace('{minWordLength}', String(objective.minWordLength || 0))
     .replace('{word}', (objective.targetWord || '').toUpperCase())
     .replace('{count}', String(objective.minColorCount || 0))

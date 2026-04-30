@@ -94,6 +94,10 @@ interface BlastStageProps {
   objectiveProgress?: BlastObjectiveProgress[];
   // Visible "Lucky Boost" indicator — DDA assist surfacing
   ddaBoostActive?: boolean;
+  // Optional hint button (wave 6+) rendered in HUD controls
+  hintSlot?: React.ReactNode;
+  // Optional hint toast overlaid above the grid for HINT_HIGHLIGHT_MS
+  hintToast?: React.ReactNode;
   // Translation
   t: (key: string) => string | undefined;
 }
@@ -142,6 +146,8 @@ export const BlastStage = memo(function BlastStage({
   buffConsumed = false,
   objectiveProgress = [],
   ddaBoostActive = false,
+  hintSlot,
+  hintToast,
   t,
 }: BlastStageProps) {
   const { score, wordsFound, movesRemaining, totalMoves, tilesCleared, totalTiles, isComplete, isDeadEnd } = gameState;
@@ -240,9 +246,11 @@ export const BlastStage = memo(function BlastStage({
         activeBuff={activeBuff}
         buffConsumed={buffConsumed}
         ddaBoostActive={ddaBoostActive}
+        hintSlot={hintSlot}
         t={t}
       />
       <BlastObjectiveBanner objectives={objectiveProgress} t={t} />
+      {hintToast}
       </div>
 
       {/* 1b. Live leaderboard strip (MP only) */}

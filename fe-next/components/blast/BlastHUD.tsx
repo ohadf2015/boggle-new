@@ -77,6 +77,8 @@ interface BlastHUDProps {
   /** DDA "Lucky Boost" — surfaces when 2+ consecutive failed words triggered
    *  the invisible spawn-rate boost. Sprint 1 visibility guard. */
   ddaBoostActive?: boolean;
+  /** Optional hint button slot — rendered beside Help when present. Wave 6+ only. */
+  hintSlot?: React.ReactNode;
   t: (key: string) => string | undefined;
 }
 
@@ -101,6 +103,7 @@ export function BlastHUD({
   activeBuff = null,
   buffConsumed = false,
   ddaBoostActive = false,
+  hintSlot,
   t,
 }: BlastHUDProps) {
   const clearPct = totalTiles > 0 ? Math.round((tilesCleared / totalTiles) * 100) : 0;
@@ -175,6 +178,7 @@ export function BlastHUD({
         </div>
 
         <div className="flex items-center gap-1.5">
+          {hintSlot}
           {onShowHelp && (
             <button
               onClick={onShowHelp}

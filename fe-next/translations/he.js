@@ -8510,6 +8510,20 @@ const he = {
       "colorLime": "ליים",
       "bannerTitle": "מטרות"
     },
+    "hint": {
+      "free": "חינם",
+      "ad": "רמז",
+      "aria": {
+        "free": "רמז חינם — עולה 25 נק'",
+        "ad": "צפה בפרסומת לרמז — עולה 25 נק'"
+      },
+      "toast": {
+        "targetWord": "נסה ליצור: {word}",
+        "colorPower": "חפש אריחים בצבע {color}",
+        "collectType": "מצא עוד {tileType}",
+        "clearAllType": "נקה את ה{tileType} שנותרו"
+      }
+    },
     "combo": {
       "bomb_bomb": "מגה פיצוץ!",
       "bomb_lightning": "פצצת רעם!",

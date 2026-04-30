@@ -8527,6 +8527,20 @@ const ja = {
       "colorLime": "ライム",
       "bannerTitle": "目標"
     },
+    "hint": {
+      "free": "無料",
+      "ad": "ヒント",
+      "aria": {
+        "free": "無料ヒント — 25点減点",
+        "ad": "広告を見てヒントを取得 — 25点減点"
+      },
+      "toast": {
+        "targetWord": "作ってみよう: {word}",
+        "colorPower": "{color}のタイルを探そう",
+        "collectType": "{tileType}をもっと見つけよう",
+        "clearAllType": "残りの{tileType}をクリア"
+      }
+    },
     "combo": {
       "bomb_bomb": "メガブラスト！",
       "bomb_lightning": "サンダーボム！",

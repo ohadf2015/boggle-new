@@ -88,6 +88,18 @@ describe('BlastObjectiveBanner', () => {
     expect(container.querySelector('[data-testid="blast-objective-banner"]')).toBeNull();
   });
 
+  it('marks objective label dir="auto" for mixed-locale target words (RTL safety)', () => {
+    render(
+      <BlastObjectiveBanner
+        objectives={[progress('target_word', 0, 1, { targetWord: 'תורה' })]}
+        t={t}
+      />,
+    );
+    const row = screen.getByTestId('blast-objective-row-0');
+    const label = row.querySelector('span[dir="auto"]');
+    expect(label).not.toBeNull();
+  });
+
   it('has no dismiss button (persistent)', () => {
     render(
       <BlastObjectiveBanner

@@ -2,13 +2,15 @@
  * useBlastColorSeeding — Hook to seed color tags on tiles for color_power objectives.
  * Runs once per wave when objectives load, after tile states are initialized.
  *
- * Strategy: detect when a color_power objective is present, then tag ~30% of regular
- * tiles with the target color. Deterministic seeding ensures consistency.
+ * Critique fix (Sprint 3 P0): instead of a flat 30% sprinkle that can scatter
+ * pink tiles into unreachable singletons, escalate density until a connected
+ * cluster of size >= minColorCount exists. Removes the "wait-for-pink" luck
+ * perception flagged by all 3 LLM critiques.
  */
 
 import { useEffect } from 'react';
 import type { BlastObjective, BlastTileState } from '../types';
-import { seedColorTags } from '../utils/blastColorPowerSeeder';
+import { seedColorPowerWithGuarantee } from '../utils/blastColorPowerValidator';
 
 interface UseBlastColorSeedingDeps {
   /** Wave objectives that may include color_power type */
@@ -23,8 +25,6 @@ interface UseBlastColorSeedingDeps {
   isMultiplayer?: boolean;
 }
 
-const COLOR_SEEDING_DENSITY = 0.30; // 30% of eligible tiles
-
 export function useBlastColorSeeding(deps: UseBlastColorSeedingDeps) {
   const { objectives, waveNumber, tileStates, seedTileStates, isMultiplayer } = deps;
 
@@ -32,19 +32,25 @@ export function useBlastColorSeeding(deps: UseBlastColorSeedingDeps) {
     if (isMultiplayer) return; // No color seeding in MP
     if (!objectives || objectives.length === 0) return;
 
-    // Find color_power objective
     const colorPowerObj = objectives.find((obj): obj is any => obj.type === 'color_power');
-    if (!colorPowerObj) return; // No color objective for this wave
+    if (!colorPowerObj) return;
 
     const color = colorPowerObj.colorTag;
     if (!color) return;
 
-    // Seed color tags deterministically using wave number + objective seed
-    const seed = waveNumber * 73 + 12345; // Arbitrary mix to make seed unique per wave
-    const seededTiles = seedColorTags(tileStates, color, COLOR_SEEDING_DENSITY, seed);
+    const minColorCount: number =
+      typeof colorPowerObj.minColorCount === 'number' && colorPowerObj.minColorCount > 0
+        ? colorPowerObj.minColorCount
+        : 4;
 
-    // Apply seeded tiles via the engine's seedTileStates API
-    // This ensures both React state and internal ref are in sync
+    const baseSeed = waveNumber * 73 + 12345;
+    const { grid: seededTiles } = seedColorPowerWithGuarantee(
+      tileStates,
+      color,
+      minColorCount,
+      baseSeed,
+    );
+
     seedTileStates(() => seededTiles);
   }, [objectives, waveNumber, isMultiplayer, tileStates, seedTileStates]);
 }

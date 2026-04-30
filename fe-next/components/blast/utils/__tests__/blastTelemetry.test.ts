@@ -17,6 +17,8 @@ import {
   trackBlastRunEnded,
   trackBlastBadgeUnlocked,
   trackBlastResultsViewed,
+  trackBlastPathAbandoned,
+  trackBlastTileWastedInCascade,
 } from '../blastTelemetry';
 
 describe('blastTelemetry', () => {
@@ -86,6 +88,30 @@ describe('blastTelemetry', () => {
       finalScore: 9000,
       wavesCompleted: 3,
       badgeCount: 5,
+    });
+  });
+
+  it('fires blast_path_abandoned with word_length + time_s', () => {
+    trackBlastPathAbandoned({ wordLength: 5, timeSeconds: 3.4, waveNumber: 7 });
+    expect(captureMock).toHaveBeenCalledWith('blast_path_abandoned', {
+      wordLength: 5,
+      timeSeconds: 3.4,
+      waveNumber: 7,
+    });
+  });
+
+  it('fires blast_tile_wasted_in_cascade with goal_relevant flag', () => {
+    trackBlastTileWastedInCascade({
+      tileType: 'pink',
+      goalRelevant: true,
+      goalType: 'color_power',
+      waveNumber: 4,
+    });
+    expect(captureMock).toHaveBeenCalledWith('blast_tile_wasted_in_cascade', {
+      tileType: 'pink',
+      goalRelevant: true,
+      goalType: 'color_power',
+      waveNumber: 4,
     });
   });
 

@@ -13,7 +13,14 @@
  */
 import { renderHook } from '@testing-library/react';
 import { useBlastObjectives } from '../useBlastObjectives';
+import { getWaveObjectives } from '../../utils/blastWaveConfig';
 import type { BlastGameState, BlastTileType } from '../../types';
+
+// Bridge: tests were written against a `waveNumber` API. The hook now
+// consumes pre-computed objectives. Wrap once so each test stays readable.
+function objsForWave(wave: number) {
+  return getWaveObjectives(wave);
+}
 
 function makeGameState(overrides: Partial<BlastGameState> = {}): BlastGameState {
   return {
@@ -43,7 +50,7 @@ describe('useBlastObjectives', () => {
         ({ gameState }) => useBlastObjectives({
           gameState,
           tileTypeClears: {} as Record<BlastTileType, number>,
-          waveNumber: 2,
+          objectives: objsForWave(2),
           wordsFound,
         }),
         { initialProps: { gameState: makeGameState({ score: 10, wordsFound }) } },
@@ -68,7 +75,7 @@ describe('useBlastObjectives', () => {
         useBlastObjectives({
           gameState: makeGameState(),
           tileTypeClears,
-          waveNumber: 3,
+          objectives: objsForWave(3),
           wordsFound: [],
         }),
       );
@@ -85,7 +92,7 @@ describe('useBlastObjectives', () => {
         useBlastObjectives({
           gameState: makeGameState(),
           tileTypeClears,
-          waveNumber: 3,
+          objectives: objsForWave(3),
           wordsFound: [],
         }),
       );
@@ -103,7 +110,7 @@ describe('useBlastObjectives', () => {
         useBlastObjectives({
           gameState: makeGameState(),
           tileTypeClears,
-          waveNumber: 6,
+          objectives: objsForWave(6),
           wordsFound: [],
           initialTileTypeCounts: { frozen: 5 } as Record<BlastTileType, number>,
         }),
@@ -121,7 +128,7 @@ describe('useBlastObjectives', () => {
         useBlastObjectives({
           gameState: makeGameState(),
           tileTypeClears,
-          waveNumber: 6,
+          objectives: objsForWave(6),
           wordsFound: [],
           initialTileTypeCounts: { frozen: 5 } as Record<BlastTileType, number>,
         }),
@@ -140,7 +147,7 @@ describe('useBlastObjectives', () => {
         useBlastObjectives({
           gameState: makeGameState({ wordsFound }),
           tileTypeClears: {} as Record<BlastTileType, number>,
-          waveNumber: 4,
+          objectives: objsForWave(4),
           wordsFound,
         }),
       );
@@ -159,7 +166,7 @@ describe('useBlastObjectives', () => {
         useBlastObjectives({
           gameState: makeGameState({ wordsFound }),
           tileTypeClears: {} as Record<BlastTileType, number>,
-          waveNumber: 4,
+          objectives: objsForWave(4),
           wordsFound,
         }),
       );
@@ -179,7 +186,7 @@ describe('useBlastObjectives', () => {
         useBlastObjectives({
           gameState: makeGameState(),
           tileTypeClears: {} as Record<BlastTileType, number>,
-          waveNumber: 1,
+          objectives: objsForWave(1),
           wordsFound: [],
         }),
       );
@@ -194,7 +201,7 @@ describe('useBlastObjectives', () => {
         useBlastObjectives({
           gameState: makeGameState({ wordsFound, tilesCleared: 33, totalTiles: 36 }),
           tileTypeClears: {} as Record<BlastTileType, number>,
-          waveNumber: 1,
+          objectives: objsForWave(1),
           wordsFound,
         }),
       );
@@ -209,7 +216,7 @@ describe('useBlastObjectives', () => {
         useBlastObjectives({
           gameState: makeGameState({ score: 30 }),
           tileTypeClears,
-          waveNumber: 3,
+          objectives: objsForWave(3),
           wordsFound: [],
         }),
       );
@@ -225,7 +232,7 @@ describe('useBlastObjectives', () => {
         useBlastObjectives({
           gameState: makeGameState(),
           tileTypeClears: {} as Record<BlastTileType, number>,
-          waveNumber: 1,
+          objectives: objsForWave(1),
           wordsFound: [],
         }),
       );
@@ -243,7 +250,7 @@ describe('useBlastObjectives', () => {
         useBlastObjectives({
           gameState: makeGameState({ wordsFound }),
           tileTypeClears: {} as Record<BlastTileType, number>,
-          waveNumber: 1,
+          objectives: objsForWave(1),
           wordsFound,
         }),
       );
@@ -279,7 +286,7 @@ describe('useBlastObjectives', () => {
         useBlastObjectives({
           gameState,
           tileTypeClears: {} as Record<BlastTileType, number>,
-          waveNumber: 4,
+          objectives: objsForWave(4),
           wordsFound: ['word'],
         }),
       );
@@ -298,7 +305,7 @@ describe('useBlastObjectives', () => {
         useBlastObjectives({
           gameState,
           tileTypeClears: {} as Record<BlastTileType, number>,
-          waveNumber: 4,
+          objectives: objsForWave(4),
           wordsFound: ['word'],
         }),
       );
@@ -313,7 +320,7 @@ describe('useBlastObjectives', () => {
         useBlastObjectives({
           gameState,
           tileTypeClears: {} as Record<BlastTileType, number>,
-          waveNumber: 4,
+          objectives: objsForWave(4),
           wordsFound: [],
         }),
       );

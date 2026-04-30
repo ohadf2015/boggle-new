@@ -68,7 +68,7 @@ export interface UseBlastEngineReturn {
   unlockMoves: () => void;
   /** Rewarded-ad continue: clear dead-end and add bonus moves without resetting progress */
   revive: (bonusMoves: number) => void;
-  getResults: (maxCombo: number, wavesCompleted?: number, waveResults?: WaveResult[]) => BlastResultsData;
+  getResults: (maxCombo: number, wavesCompleted?: number, waveResults?: WaveResult[], allObjectivesComplete?: boolean) => BlastResultsData;
   isCascading: boolean;
   startCascade: () => CascadeResult;
   stopCascade: () => void;
@@ -494,7 +494,12 @@ export function useBlastEngine(
   }, []);
 
   // ── getResults ──
-  const getResults = useCallback((maxCombo: number, wavesCompleted = 0, waveResults: WaveResult[] = []): BlastResultsData => {
+  const getResults = useCallback((
+    maxCombo: number,
+    wavesCompleted = 0,
+    waveResults: WaveResult[] = [],
+    allObjectivesComplete?: boolean,
+  ): BlastResultsData => {
     const gs = gameStateRef.current;
     const clearPercentage = gs.totalTiles > 0 ? Math.min(100, Math.round((gs.tilesCleared / gs.totalTiles) * 100)) : 0;
 
@@ -506,7 +511,9 @@ export function useBlastEngine(
       wordsFound: gs.wordsFound,
       bestWord: bestWordRef.current || (gs.wordsFound[0] ?? ''),
       maxCombo,
-      stars: calculateEarnedStars(gs.tilesCleared, gs.totalTiles),
+      // 3 stars require both ≥80% clear AND every objective complete.
+      // Without the flag, fall back to clear-pct-only (legacy callers).
+      stars: calculateEarnedStars(gs.tilesCleared, gs.totalTiles, allObjectivesComplete),
       wavesCompleted,
       waveResults,
     };

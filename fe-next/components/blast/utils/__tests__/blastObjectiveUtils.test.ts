@@ -61,6 +61,16 @@ describe('formatObjectiveLabel', () => {
       'blast.objective.wordLength': 'Find {target} words with {minWordLength}+ letters',
       'blast.objective.clearPercent': 'Clear {target}% of the board',
       'blast.objective.targetWord': 'Find: {word}',
+      // The formatter now reads tile names from the existing tile-guide
+      // translations so non-English UIs don't leak raw English type ids
+      // (e.g. "אסוף 4 bomb"). Cover the keys it asks for.
+      'blast.tileGuide.bomb.name': 'bomb',
+      'blast.tileGuide.ice.name': 'ice',
+      'blast.tileGuide.lightning.name': 'lightning',
+      'blast.tileGuide.diamond.name': 'diamond',
+      'blast.tileGuide.frozen.name': 'frozen',
+      'blast.tileGuide.prism.name': 'prism',
+      'blast.tileGuide.gem.name': 'gem',
     };
     return map[key] || key;
   };

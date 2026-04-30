@@ -8722,6 +8722,20 @@ const en = {
       "colorLime": "Lime",
       "bannerTitle": "Goals"
     },
+    "hint": {
+      "free": "FREE",
+      "ad": "HINT",
+      "aria": {
+        "free": "Free hint — costs 25 pts",
+        "ad": "Watch an ad for a hint — costs 25 pts"
+      },
+      "toast": {
+        "targetWord": "Try forming: {word}",
+        "colorPower": "Look for {color} tiles",
+        "collectType": "Find more {tileType}",
+        "clearAllType": "Clear remaining {tileType}"
+      }
+    },
     "combo": {
       "bomb_bomb": "MEGA BLAST!",
       "bomb_lightning": "THUNDER BOMB!",

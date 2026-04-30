@@ -37,9 +37,18 @@ export const SPANISH_TARGET_WORDS = [
   'PALABRA', 'MUNDO', 'PERSONA', 'TIEMPO', 'ESPACIO', 'CORAZÓN',
 ] as const;
 
-/** Hebrew target words — NEEDS NATIVE REVIEW */
+/** Hebrew target words — NEEDS NATIVE REVIEW
+ *  Expanded 2026-04-30: prior pool had several 2-3 letter entries that fail
+ *  the path-solver's adjacency check on a 6×6 grid often enough to force
+ *  re-rolls. New entries are 4-6 letters, common nouns/verbs.
+ */
 export const HEBREW_TARGET_WORDS = [
-  'מילה', 'חבר', 'שמש', 'ירח', 'כוכב', 'ים', 'עץ', 'צבע',
+  // 4 letters
+  'מילה', 'חבר', 'שלום', 'אהבה', 'בית', 'ספר', 'מורה', 'מקום',
+  'חתול', 'תפוח', 'שמלה', 'שעון', 'חלום', 'חופש', 'דרך', 'יום',
+  // 5-6 letters
+  'מילון', 'שולחן', 'מסעדה', 'מכונית', 'ספרים', 'תלמיד', 'גלידה',
+  'כוכב', 'ירח', 'שמש', 'צבע', 'עץ', 'ים',
 ] as const;
 
 export type TargetWordPool = typeof ENGLISH_TARGET_WORDS | typeof SWEDISH_TARGET_WORDS

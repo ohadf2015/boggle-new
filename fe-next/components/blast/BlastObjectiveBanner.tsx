@@ -4,11 +4,36 @@ import { memo } from 'react';
 import { Check, Target, Heart } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatObjectiveLabel } from './utils/blastObjectiveUtils';
-import type { BlastObjectiveProgress } from './types';
+import { TILE_VISUALS } from './blastTileVisuals';
+import type { BlastObjectiveProgress, BlastTileType } from './types';
 
 interface BlastObjectiveBannerProps {
   objectives: BlastObjectiveProgress[];
   t: (key: string) => string | undefined;
+}
+
+/**
+ * Tiny inline tile preview that mirrors TILE_VISUALS — players see the
+ * literal sprite the goal asks for, not just a translated noun. ~18px so
+ * it sits next to the row text without a layout reflow.
+ */
+function ObjectiveTilePreview({ tileType }: { tileType: BlastTileType }) {
+  const visual = TILE_VISUALS[tileType];
+  if (!visual) return null;
+  const Icon = visual.indicator;
+  return (
+    <span
+      data-testid={`blast-objective-tile-preview-${tileType}`}
+      aria-hidden="true"
+      className={cn(
+        'shrink-0 inline-flex items-center justify-center w-[18px] h-[18px] rounded',
+        visual.text,
+      )}
+      style={visual.style}
+    >
+      {Icon ? <Icon className="w-3 h-3" strokeWidth={3} /> : null}
+    </span>
+  );
 }
 
 /**
@@ -61,7 +86,10 @@ export const BlastObjectiveBanner = memo(function BlastObjectiveBanner({
             {isTargetWord && <Target className="h-3.5 w-3.5 shrink-0" strokeWidth={2} />}
             {isColorPower && <Heart className={cn('h-3.5 w-3.5 shrink-0', colorClass)} fill={colorClass.replace('text-', '')} strokeWidth={2} />}
             {p.isComplete && !isTargetWord && !isColorPower && <Check className="h-3.5 w-3.5 shrink-0" strokeWidth={3} />}
-            <span className="flex-1 truncate">{formatObjectiveLabel(p.objective, t)}</span>
+            {(p.objective.type === 'collect_type' || p.objective.type === 'clear_all_type') && p.objective.tileType && (
+              <ObjectiveTilePreview tileType={p.objective.tileType} />
+            )}
+            <span dir="auto" className="flex-1 truncate">{formatObjectiveLabel(p.objective, t)}</span>
             {!isTargetWord && !isColorPower && (
               <span className="shrink-0 text-white/70">
                 {Math.min(p.current, p.objective.target)} / {p.objective.target}

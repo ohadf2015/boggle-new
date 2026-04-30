@@ -8545,6 +8545,20 @@ const sv = {
       "colorLime": "Limefärg",
       "bannerTitle": "Mål"
     },
+    "hint": {
+      "free": "GRATIS",
+      "ad": "TIPS",
+      "aria": {
+        "free": "Gratis tips — kostar 25 poäng",
+        "ad": "Se en annons för ett tips — kostar 25 poäng"
+      },
+      "toast": {
+        "targetWord": "Försök forma: {word}",
+        "colorPower": "Leta efter {color} brickor",
+        "collectType": "Hitta fler {tileType}",
+        "clearAllType": "Rensa kvarvarande {tileType}"
+      }
+    },
     "combo": {
       "bomb_bomb": "MEGASMALL!",
       "bomb_lightning": "ASKBOMB!",

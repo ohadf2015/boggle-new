@@ -128,7 +128,12 @@ export function useBlastDebris(
   useEffect(() => {
     let rafId: number;
     const tick = () => {
-      if (!mountedRef.current) return;
+      // No mountedRef early-return: this effect's deps are stable (`physics`
+      // only), but the sibling effect that flips mountedRef re-runs on
+      // cellSize/gridSize changes. An early-return here would cancel the loop
+      // forever during a transient unmounted window. Per-fragment
+      // `d.graphic.destroyed` checks below + the rafId cleanup on real unmount
+      // already handle correctness.
       const now = performance.now() / 1000;
       const debris = debrisRef.current;
       for (let i = debris.length - 1; i >= 0; i--) {

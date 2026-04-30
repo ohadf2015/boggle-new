@@ -75,6 +75,32 @@ export function trackBlastResultsViewed(params: {
   safeCapture('blast_results_viewed', { ...params });
 }
 
+/**
+ * Fired when player starts drawing a path then releases without submitting.
+ * Critique signal: are word lengths too short / grid too small / vocab too thin?
+ */
+export function trackBlastPathAbandoned(params: {
+  wordLength: number;
+  timeSeconds: number;
+  waveNumber: number;
+}): void {
+  safeCapture('blast_path_abandoned', { ...params });
+}
+
+/**
+ * Fired when a cascade clears a tile that mattered for the active goal
+ * (target_word letter, color_power tile). Validates whether cascade-credit
+ * framing actually feels positive vs hidden-loss.
+ */
+export function trackBlastTileWastedInCascade(params: {
+  tileType: string;
+  goalRelevant: boolean;
+  goalType: 'target_word' | 'color_power' | string;
+  waveNumber: number;
+}): void {
+  safeCapture('blast_tile_wasted_in_cascade', { ...params });
+}
+
 export function trackBlastBrag(params: {
   finalScore: number;
   percentile: number | null;
