@@ -1,6 +1,6 @@
 'use client';
 
-import React, { memo, useMemo } from 'react';
+import React, { memo, useEffect, useMemo, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -11,6 +11,7 @@ import {
   type LeaderboardTierId,
 } from '@/lib/ranked/leaderboardTiers';
 import type { TierPosition } from '@/hooks/useTierPosition';
+import { trackTierPositionViewed } from '@/utils/growthTracking';
 
 interface Props {
   position: TierPosition;
@@ -36,6 +37,19 @@ const TierPositionPanel: React.FC<Props> = memo(({ position, userId, className }
   const isStone = position.tier_id === 'stone';
   const isGrandmaster = position.tier_id === 'grandmaster';
   const isFirstInTier = position.rank_in_tier === 1;
+
+  const exposureFiredRef = useRef(false);
+  useEffect(() => {
+    if (exposureFiredRef.current) return;
+    exposureFiredRef.current = true;
+    trackTierPositionViewed({
+      tier_id: position.tier_id,
+      rank_in_tier: position.rank_in_tier,
+      tier_population: position.tier_population,
+      percentile,
+      season_id: null,
+    });
+  }, [position.tier_id, position.rank_in_tier, position.tier_population, percentile]);
 
   return (
     <motion.div

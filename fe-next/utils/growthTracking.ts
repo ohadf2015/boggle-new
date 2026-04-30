@@ -99,7 +99,10 @@ export type GrowthEvent =
   // CrazyGames portal short-flow funnel
   | 'cg_welcome_view'
   | 'cg_welcome_play'
-  | 'cg_lobby_arrival';
+  | 'cg_lobby_arrival'
+  | 'cg_lobby_hero_view'
+  | 'cg_lobby_hero_play'
+  | 'cg_lobby_hero_browse';
 
 /** Onboarding funnel step identifiers (FTUE state machine). */
 export type OnboardingStep =
@@ -877,6 +880,56 @@ export const trackLanguageChanged = (from: string, to: string): void => {
   setPostHogSuperProps({ locale: to });
   setPostHogUserProps({ locale_last_used: to });
   setPostHogUserPropsOnce({ locale_first_used: to });
+};
+
+/**
+ * Tier-position-panel exposure. Fires once per panel mount per session.
+ * Powers the `tier-position-panel` experiment uplift analysis on /leaderboard.
+ */
+export const trackTierPositionViewed = (props: {
+  tier_id: string;
+  rank_in_tier: number;
+  tier_population: number;
+  percentile: number;
+  season_id: number | null;
+}): void => {
+  try {
+    posthog.capture('tier_position_viewed', props);
+  } catch {
+    // PostHog not initialized — silent
+  }
+};
+
+/**
+ * Click on a peer row inside TierPositionPanel. Tracks whether the
+ * social-comparison piece converts into /player/[id] visits.
+ */
+export const trackTierPeerClicked = (props: {
+  tier_id: string;
+  peer_rank_in_tier: number;
+  was_above: boolean;
+}): void => {
+  try {
+    posthog.capture('tier_peer_clicked', props);
+  } catch {
+    // PostHog not initialized — silent
+  }
+};
+
+/**
+ * 50% / 90% progress milestone within current tier. Caller dedupes
+ * per session (use a ref guard at the call site).
+ */
+export const trackTierProgressionMilestone = (props: {
+  tier_id: string;
+  milestone_pct: 50 | 90;
+  score: number;
+}): void => {
+  try {
+    posthog.capture('tier_progression_milestone', props);
+  } catch {
+    // PostHog not initialized — silent
+  }
 };
 
 const growthTracking = {
