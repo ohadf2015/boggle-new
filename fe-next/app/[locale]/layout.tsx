@@ -310,6 +310,8 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
             sameAs: [
                 'https://www.lexiclash.live',
                 'https://www.instagram.com/lexi.clash',
+                'https://play.google.com/store/apps/details?id=live.lexiclash.app',
+                'https://www.crazygames.com/game/lexiclash',
                 // TODO: Add TikTok and X/Twitter URLs here once accounts are created
             ],
             contactPoint: {

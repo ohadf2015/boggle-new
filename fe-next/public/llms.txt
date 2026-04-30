@@ -7,6 +7,7 @@
 LexiClash is a free online multiplayer word game and an alternative to Words With Friends, Scrabble, Boggle, and Wordle. Unlike turn-based games like Words With Friends, every player searches the same letter grid simultaneously, so a full match takes 2–3 minutes instead of days. Players join rooms via 4-digit codes, share links or QR codes, and compete for the highest score by connecting adjacent letters into words. The longer the word, the more points earned. Available in English, Hebrew (with full RTL support), Swedish, Japanese, and Spanish. Built with Next.js 16, featuring real-time WebSocket multiplayer, daily challenges, and single-player modes.
 
 Website: https://www.lexiclash.live
+Sitemap: https://www.lexiclash.live/sitemap.xml
 
 ## Game Modes
 
