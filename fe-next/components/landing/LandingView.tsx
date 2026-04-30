@@ -18,6 +18,7 @@ import { InlineBannerAd } from '@/components/ads';
 const CrazyGamesBanner = dynamic(() => import('@/components/CrazyGamesBanner'), { ssr: false });
 import { hasCompletedOnboarding, markOnboardingComplete } from '@/utils/onboardingStorage';
 import { LandingSEOSection, ScrollIndicator } from './LandingSEOSection';
+import { LandingBlogSection } from './LandingBlogSection';
 import { LandingHero } from './LandingHero';
 const LandingSocialProofBar = dynamic(() => import('./LandingSocialProofBar').then(m => m.LandingSocialProofBar), {
   ssr: false,
@@ -241,6 +242,10 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
       )}
 
       <LandingSEOSection />
+
+      <div className="w-full px-4 sm:px-6 lg:px-8 pb-12 sm:pb-16 relative z-20">
+        <LandingBlogSection />
+      </div>
     </div>
   );
 };

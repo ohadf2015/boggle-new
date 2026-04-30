@@ -18,6 +18,7 @@ vi.mock('next/navigation', () => ({
   }),
   usePathname: () => '/en',
   useSearchParams: () => new URLSearchParams(),
+  useParams: () => ({ locale: 'en' }),
 }));
 
 // Mock next/link
