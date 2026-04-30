@@ -4502,7 +4502,7 @@ const ja = {
       "vaultSubtitle": "コインを貯めて報酬を解除"
     },
     "playingNow": "プレイ中",
-    "welcomeTitle": "言葉。ライバル。栄光。",
+    "welcomeTitle": "言葉。仲間。勝利。",
     "welcomeSubtitle": "無料。登録不要。ペイ・トゥ・ウィンなし。",
     "playTodayChallenge": "今日のチャレンジをプレイ",
     "moreGameModes": "その他のゲームモード",

@@ -111,13 +111,6 @@ vi.mock('../ScoreRevealV2', () => ({
   ),
 }));
 
-vi.mock('../ModeFork', () => ({
-  __esModule: true,
-  default: ({ onSelectMode }: any) => (
-    <button data-testid="mode-btn" onClick={() => onSelectMode('daily')}>daily</button>
-  ),
-}));
-
 vi.mock('../OnboardingProgress', () => ({
   __esModule: true,
   default: () => null,
@@ -194,19 +187,6 @@ describe('OnboardingFlow analytics', () => {
     fireEvent.click(screen.getByTestId('continue-btn'));
     expect(trackOnboardingStep).toHaveBeenCalledWith('score_reveal', {
       action: 'continue',
-    });
-  });
-
-  it('fires step=mode_select with mode param', () => {
-    render(<OnboardingFlow onComplete={vi.fn()} />);
-    fireEvent.click(screen.getByTestId('lang-btn'));
-    goNew();
-    fireEvent.click(screen.getByTestId('tut-btn'));
-    fireEvent.click(screen.getByTestId('profile-btn'));
-    fireEvent.click(screen.getByTestId('continue-btn'));
-    fireEvent.click(screen.getByTestId('mode-btn'));
-    expect(trackOnboardingStep).toHaveBeenCalledWith('mode_select', {
-      mode: 'daily',
     });
   });
 

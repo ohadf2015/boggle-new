@@ -84,11 +84,15 @@ export function LandingChallengeCards({
   });
   // Veterans skip the practice card entirely. Newcomers keep it as their
   // soft-onramp into the game (single-player word grids without pressure).
+  // Practice also disappears as soon as the player has finished any game —
+  // a recorded personal best is a durable "I've played" signal that survives
+  // localStorage clears for signed-in users.
   // CrazyGames bypass: portal players see every mode open — practice gate is
   // hidden chrome that confuses portal traffic and CG forbids walled content.
   const isVeteranRaw = useIsPracticeVeteran();
   const { isOnCrazyGamesPlatform } = useCrazyGames();
-  const isVeteran = isVeteranRaw || isOnCrazyGamesPlatform;
+  const hasPlayedAnyGame = !!playerAllTimeBest && playerAllTimeBest.score > 0;
+  const isVeteran = isVeteranRaw || isOnCrazyGamesPlatform || hasPlayedAnyGame;
 
   // Mode-roster newcomer gate — independent of onboarding-completed and MP-joined
   // flags (both flip too eagerly in production: onboarding completes before the
@@ -181,9 +185,6 @@ export function LandingChallengeCards({
               variant="cyan"
               highlighted={isVeteran}
               highlightLabel={isVeteran ? t('onboarding.welcome.startHere') : undefined}
-              duration={t('landing.duration').replace('{time}', '1-3')}
-              difficulty={2}
-              difficultyLabel={t('landing.difficultyMedium')}
               locked={locked}
               lockedMessage={locked ? lockedMessage : undefined}
               onClick={() => { trackModeSelected('quickPlay', 'home'); trackLandingCtaClick('mode_card', { mode: 'quickPlay', variant: 'cyan' }); }}
@@ -205,9 +206,6 @@ export function LandingChallengeCards({
               playerCount={{ count: activePlayers, label: t('landing.playingNow') }}
               highlighted={isFirstTimer && !isNewbie}
               highlightLabel={isFirstTimer && !isNewbie ? t('onboarding.welcome.startHere') : undefined}
-              duration={t('landing.duration').replace('{time}', '1-3')}
-              difficulty={2}
-              difficultyLabel={t('landing.difficultyMedium')}
               locked={locked}
               lockedMessage={locked ? lockedMessage : undefined}
               onClick={() => { trackModeSelected('arena', 'home'); trackLandingCtaClick('mode_card', { mode: 'arena', variant: 'pink' }); }}
@@ -232,9 +230,6 @@ export function LandingChallengeCards({
               personalBest={playerAllTimeBest ? { score: playerAllTimeBest.score, label: t('landing.personalBest') } : undefined}
               highlighted={showPracticeHighlight}
               highlightLabel={showPracticeHighlight ? t('onboarding.welcome.startHere') : undefined}
-              duration={t('landing.duration').replace('{time}', '1-3')}
-              difficulty={1}
-              difficultyLabel={t('landing.difficultyEasy')}
               onClick={() => { trackModeSelected('practice', 'home'); trackLandingCtaClick('mode_card', { mode: 'practice', variant: 'cyan' }); }}
             />
           </div>
@@ -259,9 +254,6 @@ export function LandingChallengeCards({
               modeImage="/modes/blast.png"
               variant="orange"
               badge="NEW"
-              duration={t('landing.duration').replace('{time}', '2-5')}
-              difficulty={3}
-              difficultyLabel={t('landing.difficultyHard')}
               locked={locked}
               lockedMessage={locked ? lockedMessage : undefined}
               onClick={() => { trackModeSelected('blast', 'home'); trackLandingCtaClick('mode_card', { mode: 'blast', variant: 'orange' }); }}
@@ -279,9 +271,6 @@ export function LandingChallengeCards({
               icon={<Map className="w-6 h-6" />}
               modeImage="/modes/adventure.png"
               variant="lime"
-              duration={t('landing.duration').replace('{time}', '2-5')}
-              difficulty={2}
-              difficultyLabel={t('landing.difficultyMedium')}
               locked={locked}
               lockedMessage={locked ? lockedMessage : undefined}
               onClick={() => { trackModeSelected('adventure', 'home'); trackLandingCtaClick('mode_card', { mode: 'adventure', variant: 'lime' }); }}
@@ -300,9 +289,6 @@ export function LandingChallengeCards({
               modeImage="/modes/connections.png"
               variant="purple"
               badge="NEW"
-              duration={t('landing.duration').replace('{time}', '2-5')}
-              difficulty={2}
-              difficultyLabel={t('landing.difficultyMedium')}
               locked={locked}
               lockedMessage={locked ? lockedMessage : undefined}
               onClick={() => { trackModeSelected('connections', 'home'); trackLandingCtaClick('mode_card', { mode: 'connections', variant: 'purple' }); }}
@@ -320,9 +306,6 @@ export function LandingChallengeCards({
               icon={<Brain className="w-6 h-6" />}
               modeImage="/modes/practice.png"
               variant="purple"
-              duration={t('landing.duration').replace('{time}', '1-3')}
-              difficulty={2}
-              difficultyLabel={t('landing.difficultyMedium')}
               locked={locked}
               lockedMessage={locked ? lockedMessage : undefined}
               onClick={() => { trackModeSelected('brainGym', 'home'); trackLandingCtaClick('mode_card', { mode: 'brainGym', variant: 'purple' }); }}
@@ -377,14 +360,6 @@ export function LandingChallengeCards({
           data-testid="landing-section-mp"
           aria-label={t('landing.sectionMultiplayerTitle')}
         >
-          <header className="mb-3 md:mb-4 flex items-baseline gap-2 px-1">
-            <span className="font-neo-display font-bold text-sm sm:text-base uppercase tracking-wide text-neo-pink">
-              {t('landing.sectionMultiplayerTitle')}
-            </span>
-            <span className="font-neo-body text-xs sm:text-sm text-neo-white/60">
-              {t('landing.sectionMultiplayerSubtitle')}
-            </span>
-          </header>
           <div className={`grid grid-cols-1 gap-3 sm:gap-4 md:gap-5 items-stretch ${mpCards.length >= 2 ? 'sm:grid-cols-2' : 'max-w-md mx-auto'}`}>
             {mpCards.map((mode) => renderCard(mode, nextIndex()))}
           </div>
@@ -396,14 +371,6 @@ export function LandingChallengeCards({
           data-testid="landing-section-practice-featured"
           aria-label={t('landing.practice')}
         >
-          <header className="mb-3 md:mb-4 flex items-baseline gap-2 px-1">
-            <span className="font-neo-display font-bold text-sm sm:text-base uppercase tracking-wide text-neo-lime">
-              {t('onboarding.welcome.startHere')}
-            </span>
-            <span className="font-neo-body text-xs sm:text-sm text-neo-white/60">
-              {t('landing.practiceDesc')}
-            </span>
-          </header>
           <div className="grid grid-cols-1 max-w-3xl mx-auto">
             {renderCard('practice', nextIndex())}
           </div>
@@ -415,14 +382,6 @@ export function LandingChallengeCards({
           data-testid="landing-section-sp"
           aria-label={t('landing.sectionSoloTitle')}
         >
-          <header className="mb-3 md:mb-4 flex items-baseline gap-2 px-1">
-            <span className="font-neo-display font-bold text-sm sm:text-base uppercase tracking-wide text-neo-cyan">
-              {t('landing.sectionSoloTitle')}
-            </span>
-            <span className="font-neo-body text-xs sm:text-sm text-neo-white/60">
-              {t('landing.sectionSoloSubtitle')}
-            </span>
-          </header>
           <div className={`grid grid-cols-1 gap-3 sm:gap-4 md:gap-5 items-stretch ${
             spCards.length === 1 ? 'max-w-md mx-auto' :
             spCards.length === 2 ? 'sm:grid-cols-2 max-w-3xl mx-auto' :
