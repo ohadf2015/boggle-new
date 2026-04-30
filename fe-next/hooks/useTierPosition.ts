@@ -23,6 +23,7 @@ export function useTierPosition(userId: string | undefined, seasonId?: number) {
   return useQuery<TierPosition | null>({
     queryKey: ['tier-position', userId, seasonId ?? 'current'],
     queryFn: async () => {
+      if (!supabase) throw new Error('supabase client not initialized');
       const { data, error } = await supabase.rpc('get_user_tier_position', {
         p_user_id: userId,
         p_season_id: seasonId ?? null,
@@ -30,7 +31,7 @@ export function useTierPosition(userId: string | undefined, seasonId?: number) {
       if (error) throw error;
       return data as TierPosition | null;
     },
-    enabled: !!userId,
+    enabled: !!userId && !!supabase,
     staleTime: 60_000,
     retry: false,
   });
