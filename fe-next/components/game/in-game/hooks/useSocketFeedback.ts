@@ -5,7 +5,7 @@ import type { Socket } from 'socket.io-client';
 import type { WordFeedback } from '../../WordFormingArea';
 import type { TranslationFn } from '../types';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
-import { hapticError } from '@/utils/haptics';
+import { hapticError, hapticWordAccepted } from '@/utils/haptics';
 
 interface UseSocketFeedbackOptions {
   socket: Socket | null;
@@ -64,8 +64,10 @@ export function useSocketFeedback(options: UseSocketFeedbackOptions): void {
         longWordLabel,
         timestamp: Date.now(),
       });
-      // Server-truth accept sound: only plays after server confirms.
+      // Server-truth accept sound + haptic: both fire only after server confirms,
+      // mirroring the audio-lie protection — no fake success buzz on client.
       playWordAcceptedSound();
+      hapticWordAccepted();
       // Layered per-length flavor — short words still get just the accept chime,
       // longer words get a richer reward via wordLengthSrc tiers (3..7, 8+).
       if (wordLen >= 5) {

@@ -1,14 +1,14 @@
 # Android Release Status — live.lexiclash.app
 
-**Updated:** 2026-04-20
+**Updated:** 2026-04-30
 
 ## Current Blocker
 **Production access gate** (Play policy, not technical): need ≥12 closed-test opt-ins × 14 days before "Apply for production access" unlocks. Dashboard: "2 testers currently opted in". No API bypass.
 
 ## Last Release
-versionCode **3766** uploaded 2026-04-21 to **internal** track. Ships **launch-crash fix**: disabled AdMob `MobileAdsInitProvider` via `tools:node="remove"` (auto-init ran before `Application.onCreate`, crashes there bypassed the UncaughtExceptionHandler). Crash logger moved from `MainActivity.onCreate` to new `LexiClashApplication.attachBaseContext` — earliest hook, captures ContentProvider failures. Un-gitignored `AndroidManifest.xml` + `LexiClashApplication.java` + `MainActivity.java` so fresh clones don't regenerate templates. Commit `d60e5bac9`.
+versionCode **4073** uploaded 2026-04-30 ~01:57 to **internal** track. Ships **Blast Sprint 1 + 2** — clarity guards (persistent goal banner, "Just N tiles short" fail card, mid-game toast cleanup, DDA Lucky Boost chip, 14 retired tiles via spawn-flag flip) + new semantic goals (`target_word` Wordscapes-style + `color_power` Royal-Match-style). Solver, deterministic seeding, +50/+30 bonus scoring all wired end-to-end. 1249 tests green. 7 commits: `3254c0b31` → `5bf8f7ac6`.
 
-Prior: 3765 (Sentry Capacitor-WebView filter removal, i18n error.html 5 locales + RTL), 3761 (native crash logger first added, MainActivity only), 3734 (2026-04-20), 3733 burned.
+Prior: 4019 (AdMob Banner Clearance Sweep), 4018 (margin fix patch), 3968 (segmented AdMob units), 3966 (native polish), 3959 (UNIMPLEMENTED plugin re-release), 3766 (launch-crash fix).
 
 Fastfile retargeted 2026-04-21: both `internal` and `promote_to_production` lanes now use `track: "internal"` (was `"alpha"`). Internal track exempts the 12-tester × 14-day production gate and propagates in minutes. Prereq: Play Console → Testing → Internal testing must have an active release created manually once, otherwise `supply` returns `Precondition check failed`.
 

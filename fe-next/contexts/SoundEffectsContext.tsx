@@ -11,6 +11,7 @@ import { getCountdownBeepParams } from '@/utils/countdownBeepParams';
 import { pickVariant, SOUND_VARIATIONS, comboLevelSrc, wordLengthSrc } from '@/lib/audio/soundVariations';
 import { SOUND_EFFECTS, SOUND_PRIORITIES, type SoundEffectOptions, type SoundEffectsContextType } from '@/lib/audio/soundEffectsConfig';
 import { useSoundPlayFunctions } from '@/hooks/useSoundPlayFunctions';
+import { useNativeAppStatePause } from '@/hooks/useNativeAppStatePause';
 
 interface SfxSettings {
   volume: number;
@@ -126,30 +127,31 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
     })();
   }, [audioUnlocked]);
 
+  // Lifted out of the visibility effect so the native app-state hook can call
+  // it too. All deps are stable refs — closure capture is safe.
+  const setVisible = useCallback((visible: boolean, reason: string) => {
+    const wasVisible = isTabVisibleRef.current;
+    isTabVisibleRef.current = visible;
+    logger.log(`[SFX] ${reason}:`, visible ? 'visible' : 'hidden');
+
+    if (!visible && wasVisible) {
+      const howl = soundsRef.current['fireCrackleLoop'];
+      if (howl && fireCrackleLoopIdRef.current !== null && howl.playing()) {
+        howl.pause();
+        logger.log('[SFX] Paused fire crackle loop (lost focus)');
+      }
+    } else if (visible && !wasVisible) {
+      const howl = soundsRef.current['fireCrackleLoop'];
+      if (howl && fireCrackleLoopIdRef.current !== null && !howl.playing() && !sfxMutedRef.current && isGameActiveRef.current) {
+        howl.play();
+        logger.log('[SFX] Resumed fire crackle loop (regained focus)');
+      }
+    }
+  }, []);
+
   // Track tab visibility AND window focus to block sounds when not in focus
   useEffect(() => {
     if (typeof window === 'undefined') return;
-
-    const setVisible = (visible: boolean, reason: string) => {
-      const wasVisible = isTabVisibleRef.current;
-      isTabVisibleRef.current = visible;
-      logger.log(`[SFX] ${reason}:`, visible ? 'visible' : 'hidden');
-
-      // Pause fire crackle loop when losing focus, resume when regaining
-      if (!visible && wasVisible) {
-        const howl = soundsRef.current['fireCrackleLoop'];
-        if (howl && fireCrackleLoopIdRef.current !== null && howl.playing()) {
-          howl.pause();
-          logger.log('[SFX] Paused fire crackle loop (lost focus)');
-        }
-      } else if (visible && !wasVisible) {
-        const howl = soundsRef.current['fireCrackleLoop'];
-        if (howl && fireCrackleLoopIdRef.current !== null && !howl.playing() && !sfxMutedRef.current && isGameActiveRef.current) {
-          howl.play();
-          logger.log('[SFX] Resumed fire crackle loop (regained focus)');
-        }
-      }
-    };
 
     const handleVisibilityChange = () => {
       setVisible(document.visibilityState === 'visible', 'Tab visibility changed');
@@ -174,7 +176,22 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
       window.removeEventListener('blur', handleBlur);
       window.removeEventListener('focus', handleFocus);
     };
-  }, []);
+  }, [setVisible]);
+
+  // Native parity: iOS swipe-up / call interrupt doesn't reliably fire
+  // visibilitychange in WKWebView. Capacitor's appStateChange does.
+  const handleNativeBackground = useCallback(
+    () => setVisible(false, 'Native app backgrounded'),
+    [setVisible]
+  );
+  const handleNativeForeground = useCallback(
+    () => setVisible(true, 'Native app foregrounded'),
+    [setVisible]
+  );
+  useNativeAppStatePause({
+    onBackground: handleNativeBackground,
+    onForeground: handleNativeForeground,
+  });
 
   // Initialize sound effects — wait for howler module to load first
   useEffect(() => {

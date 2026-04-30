@@ -10,9 +10,13 @@
 import { vi, describe, beforeEach, it, expect } from 'vitest';
 import { renderHook } from '@testing-library/react';
 
-const { mockHapticError } = vi.hoisted(() => ({ mockHapticError: vi.fn() }));
+const { mockHapticError, mockHapticWordAccepted } = vi.hoisted(() => ({
+  mockHapticError: vi.fn(),
+  mockHapticWordAccepted: vi.fn(),
+}));
 vi.mock('@/utils/haptics', () => ({
   hapticError: (...args: any[]) => mockHapticError(...args),
+  hapticWordAccepted: (...args: any[]) => mockHapticWordAccepted(...args),
   hapticForWordScore: vi.fn(),
 }));
 
@@ -65,6 +69,16 @@ describe('useSocketFeedback — server-truth sound feedback', () => {
 
     expect(playWordAcceptedSound).toHaveBeenCalledTimes(1);
     expect(playWordRejectedSound).not.toHaveBeenCalled();
+  });
+
+  it('fires accept haptic on wordAccepted event (server-truth pulse)', () => {
+    const socket = createMockSocket();
+    renderHook(() => useSocketFeedback(buildOptions(socket)));
+
+    socket.handlers['wordAccepted']?.({ word: 'TEST', score: 10 });
+
+    expect(mockHapticWordAccepted).toHaveBeenCalledTimes(1);
+    expect(mockHapticError).not.toHaveBeenCalled();
   });
 
   it('plays rejected sound and error haptic on wordRejected event', () => {

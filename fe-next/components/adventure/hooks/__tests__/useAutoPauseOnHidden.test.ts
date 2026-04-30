@@ -7,6 +7,14 @@
 
 import { vi } from 'vitest';
 import { renderHook } from '@testing-library/react';
+
+const { mockUseNativeAppStatePause } = vi.hoisted(() => ({
+  mockUseNativeAppStatePause: vi.fn(),
+}));
+vi.mock('@/hooks/useNativeAppStatePause', () => ({
+  useNativeAppStatePause: (opts: { onBackground?: () => void }) => mockUseNativeAppStatePause(opts),
+}));
+
 import { useAutoPauseOnHidden } from '../useAutoPauseOnHidden';
 
 const setHidden = (hidden: boolean) => {
@@ -60,6 +68,38 @@ describe('useAutoPauseOnHidden', () => {
     const { unmount } = renderHook(() => useAutoPauseOnHidden({ ...props, pauseGame }));
     unmount();
     setHidden(true);
+    expect(pauseGame).not.toHaveBeenCalled();
+  });
+
+  it('also pauses via Capacitor App background event (iOS swipe-up parity)', () => {
+    const pauseGame = vi.fn();
+    const setIsPaused = vi.fn();
+    mockUseNativeAppStatePause.mockClear();
+    renderHook(() => useAutoPauseOnHidden({ ...props, pauseGame, setIsPaused }));
+
+    expect(mockUseNativeAppStatePause).toHaveBeenCalledWith(
+      expect.objectContaining({ onBackground: expect.any(Function) })
+    );
+
+    const lastCall = mockUseNativeAppStatePause.mock.calls[mockUseNativeAppStatePause.mock.calls.length - 1];
+    const onBackground = lastCall[0].onBackground as () => void;
+    onBackground();
+
+    expect(pauseGame).toHaveBeenCalledTimes(1);
+    expect(setIsPaused).toHaveBeenCalledWith(true);
+  });
+
+  it('Capacitor onBackground respects isPaused/isPlaying/entryPhase guards', () => {
+    const pauseGame = vi.fn();
+    mockUseNativeAppStatePause.mockClear();
+    renderHook(() =>
+      useAutoPauseOnHidden({ ...props, isPaused: true, pauseGame })
+    );
+
+    const lastCall = mockUseNativeAppStatePause.mock.calls[mockUseNativeAppStatePause.mock.calls.length - 1];
+    const onBackground = lastCall[0].onBackground as () => void;
+    onBackground();
+
     expect(pauseGame).not.toHaveBeenCalled();
   });
 });
